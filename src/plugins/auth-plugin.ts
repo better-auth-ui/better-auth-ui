@@ -35,7 +35,8 @@ export interface AuthClientConfig {
 export interface AuthPluginOverrides {
     /**
      * Better Auth client returned from createAuthClient
-     * @required
+     * @default Required
+     * @remarks AuthClient
      */
     authClient: AnyAuthClient
     /**

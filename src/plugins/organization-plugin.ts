@@ -22,10 +22,10 @@ export interface OrganizationClientConfig {
 export interface OrganizationPluginOverrides
     extends Partial<AuthPluginOverrides> {
     /**
-     * Organization configuration
-     * @required
+     * Organization plugin configuration
+     * @default undefined
      */
-    organization: OrganizationOptions
+    organization?: OrganizationOptions | boolean
     /**
      * Called when a route error occurs
      */

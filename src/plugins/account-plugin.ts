@@ -22,14 +22,15 @@ export interface AccountClientConfig {
  */
 export interface AccountPluginOverrides extends Partial<AuthPluginOverrides> {
     /**
-     * Account configuration
-     * @required
+     * Enable account view & account configuration
+     * @default { fields: ["image", "name"] }
      */
-    account: AccountOptions
+    account?: boolean | Partial<AccountOptions>
     /**
      * User Account deletion configuration
+     * @default undefined
      */
-    deleteUser?: DeleteUserOptions
+    deleteUser?: DeleteUserOptions | boolean
     /**
      * Called when a route error occurs
      */

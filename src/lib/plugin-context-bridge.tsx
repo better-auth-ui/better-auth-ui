@@ -6,7 +6,9 @@ import { toast } from "sonner"
 import { RecaptchaV3 } from "../components/captcha/recaptcha-v3"
 import { useAuthData } from "../hooks/use-auth-data"
 import { authLocalization } from "../localization/auth-localization"
+import type { AccountPluginOverrides } from "../plugins/account-plugin"
 import type { AuthPluginOverrides } from "../plugins/auth-plugin"
+import type { OrganizationPluginOverrides } from "../plugins/organization-plugin"
 import type { AccountOptionsContext } from "../types/account-options"
 import type { AuthClient } from "../types/auth-client"
 import type { AuthHooks } from "../types/auth-hooks"
@@ -22,7 +24,11 @@ import type { SignUpOptions } from "../types/sign-up-options"
 import type { SocialOptions } from "../types/social-options"
 import { AuthUIContext, type AuthUIContextType } from "./auth-ui-provider"
 import { OrganizationRefetcher } from "./organization-refetcher"
-import { authViewPaths } from "./view-paths"
+import {
+    accountViewPaths,
+    authViewPaths,
+    organizationViewPaths
+} from "./view-paths"
 
 const DefaultLink: Link = ({ href, className, children }) => (
     <a className={className} href={href}>
@@ -56,7 +62,8 @@ export function BetterAuthPluginProvider({
 }: {
     children: ReactNode
 }) {
-    const overrides = usePluginOverrides<
+    // Read auth plugin overrides
+    const authOverrides = usePluginOverrides<
         AuthPluginOverrides,
         Partial<AuthPluginOverrides>
     >("auth", {
@@ -71,6 +78,25 @@ export function BetterAuthPluginProvider({
         replace: defaultReplace,
         toast: defaultToast
     })
+
+    // Read account plugin overrides (returns defaults if plugin not registered)
+    const accountOverrides = usePluginOverrides<
+        AccountPluginOverrides,
+        Partial<AccountPluginOverrides>
+    >("account", {})
+
+    // Read organization plugin overrides (returns defaults if plugin not registered)
+    const organizationOverrides = usePluginOverrides<
+        OrganizationPluginOverrides,
+        Partial<OrganizationPluginOverrides>
+    >("organization", {})
+
+    // Merge overrides: account/organization can override auth settings
+    const overrides = {
+        ...authOverrides,
+        ...accountOverrides,
+        ...organizationOverrides
+    }
 
     const authClient = overrides.authClient as AuthClient
 
@@ -95,15 +121,38 @@ export function BetterAuthPluginProvider({
     }, [overrides.avatar])
 
     const account = useMemo<AccountOptionsContext | undefined>(() => {
-        // Account is handled by account plugin, but we need to check if it exists
-        // This will be populated from account plugin overrides if needed
-        return undefined
-    }, [])
+        const accountProp = accountOverrides?.account
+        if (!accountProp) return undefined
 
-    // deleteUser is account-specific, not auth-specific
+        if (accountProp === true) {
+            return {
+                basePath: "/account",
+                fields: ["image", "name"],
+                viewPaths: accountViewPaths
+            }
+        }
+
+        // Remove trailing slash from basePath
+        const basePath = accountProp.basePath?.endsWith("/")
+            ? accountProp.basePath.slice(0, -1)
+            : accountProp.basePath
+
+        return {
+            basePath: basePath ?? "/account",
+            fields: accountProp.fields || ["image", "name"],
+            viewPaths: { ...accountViewPaths, ...accountProp.viewPaths }
+        }
+    }, [accountOverrides?.account])
+
     const deleteUser = useMemo<DeleteUserOptions | undefined>(() => {
-        return undefined
-    }, [])
+        if (!accountOverrides?.deleteUser) return
+
+        if (accountOverrides.deleteUser === true) {
+            return {}
+        }
+
+        return accountOverrides.deleteUser
+    }, [accountOverrides?.deleteUser])
 
     const social = useMemo<SocialOptions | undefined>(() => {
         return overrides.social
@@ -143,9 +192,51 @@ export function BetterAuthPluginProvider({
     }, [overrides.signUp])
 
     const organization = useMemo<OrganizationOptionsContext | undefined>(() => {
-        // Organization is handled by organization plugin
-        return undefined
-    }, [])
+        const organizationProp = organizationOverrides?.organization
+        if (!organizationProp) return undefined
+
+        if (organizationProp === true) {
+            return {
+                basePath: "/organization",
+                viewPaths: organizationViewPaths,
+                customRoles: []
+            }
+        }
+
+        let logo: OrganizationOptionsContext["logo"] | undefined
+
+        if (organizationProp.logo === true) {
+            logo = {
+                extension: "png",
+                size: 128
+            }
+        } else if (organizationProp.logo) {
+            logo = {
+                upload: organizationProp.logo.upload,
+                delete: organizationProp.logo.delete,
+                extension: organizationProp.logo.extension || "png",
+                size:
+                    organizationProp.logo.size ||
+                    (organizationProp.logo.upload ? 256 : 128)
+            }
+        }
+
+        // Remove trailing slash from basePath
+        const basePath = organizationProp.basePath?.endsWith("/")
+            ? organizationProp.basePath.slice(0, -1)
+            : organizationProp.basePath
+
+        return {
+            ...organizationProp,
+            logo,
+            basePath: basePath ?? "/organization",
+            customRoles: organizationProp.customRoles || [],
+            viewPaths: {
+                ...organizationViewPaths,
+                ...organizationProp.viewPaths
+            }
+        }
+    }, [organizationOverrides?.organization])
 
     const defaultMutators = useMemo(() => {
         return {
