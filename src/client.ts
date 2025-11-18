@@ -50,7 +50,7 @@ function createAuthMeta(
  */
 export const authClientPlugin = (
     config: AuthClientConfig
-): ReturnType<typeof defineClientPlugin> =>
+) =>
     defineClientPlugin({
         name: "auth",
         routes: () => ({
@@ -268,7 +268,7 @@ export const authClientPlugin = (
  */
 export const accountClientPlugin = (
     config: AuthClientConfig
-): ReturnType<typeof defineClientPlugin> =>
+) =>
     defineClientPlugin({
         name: "account",
         routes: () => ({
@@ -372,7 +372,7 @@ export const accountClientPlugin = (
  */
 export const organizationClientPlugin = (
     config: AuthClientConfig
-): ReturnType<typeof defineClientPlugin> =>
+) =>
     defineClientPlugin({
         name: "organization",
         routes: () => ({
