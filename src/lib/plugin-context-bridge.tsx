@@ -125,24 +125,35 @@ export function BetterAuthPluginProvider({
         if (!accountProp) return undefined
 
         if (accountProp === true) {
+            // Use basePath from accountOverrides root, or default to "/account"
+            const basePathRaw = accountOverrides?.basePath ?? "/account"
+            const basePath = basePathRaw.endsWith("/")
+                ? basePathRaw.slice(0, -1)
+                : basePathRaw
+
             return {
-                basePath: "/account",
+                basePath,
                 fields: ["image", "name"],
                 viewPaths: accountViewPaths
             }
         }
 
-        // Remove trailing slash from basePath
-        const basePath = accountProp.basePath?.endsWith("/")
-            ? accountProp.basePath.slice(0, -1)
-            : accountProp.basePath
+        // basePath can come from either:
+        // 1. accountProp.basePath (inside the account config object)
+        // 2. accountOverrides.basePath (at the root, from Partial<AuthPluginOverrides>)
+        // Priority: accountProp.basePath > accountOverrides.basePath > "/account"
+        const basePathRaw =
+            accountProp.basePath ?? accountOverrides?.basePath ?? "/account"
+        const basePath = basePathRaw.endsWith("/")
+            ? basePathRaw.slice(0, -1)
+            : basePathRaw
 
         return {
-            basePath: basePath ?? "/account",
+            basePath,
             fields: accountProp.fields || ["image", "name"],
             viewPaths: { ...accountViewPaths, ...accountProp.viewPaths }
         }
-    }, [accountOverrides?.account])
+    }, [accountOverrides?.account, accountOverrides?.basePath])
 
     const deleteUser = useMemo<DeleteUserOptions | undefined>(() => {
         if (!accountOverrides?.deleteUser) return
@@ -196,8 +207,15 @@ export function BetterAuthPluginProvider({
         if (!organizationProp) return undefined
 
         if (organizationProp === true) {
+            // Use basePath from organizationOverrides root, or default to "/organization"
+            const basePathRaw =
+                organizationOverrides?.basePath ?? "/organization"
+            const basePath = basePathRaw.endsWith("/")
+                ? basePathRaw.slice(0, -1)
+                : basePathRaw
+
             return {
-                basePath: "/organization",
+                basePath,
                 viewPaths: organizationViewPaths,
                 customRoles: []
             }
@@ -221,22 +239,29 @@ export function BetterAuthPluginProvider({
             }
         }
 
-        // Remove trailing slash from basePath
-        const basePath = organizationProp.basePath?.endsWith("/")
-            ? organizationProp.basePath.slice(0, -1)
-            : organizationProp.basePath
+        // basePath can come from either:
+        // 1. organizationProp.basePath (inside the organization config object)
+        // 2. organizationOverrides.basePath (at the root, from Partial<AuthPluginOverrides>)
+        // Priority: organizationProp.basePath > organizationOverrides.basePath > "/organization"
+        const basePathRaw =
+            organizationProp.basePath ??
+            organizationOverrides?.basePath ??
+            "/organization"
+        const basePath = basePathRaw.endsWith("/")
+            ? basePathRaw.slice(0, -1)
+            : basePathRaw
 
         return {
             ...organizationProp,
             logo,
-            basePath: basePath ?? "/organization",
+            basePath,
             customRoles: organizationProp.customRoles || [],
             viewPaths: {
                 ...organizationViewPaths,
                 ...organizationProp.viewPaths
             }
         }
-    }, [organizationOverrides?.organization])
+    }, [organizationOverrides?.organization, organizationOverrides?.basePath])
 
     const defaultMutators = useMemo(() => {
         return {
