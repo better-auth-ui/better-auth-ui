@@ -451,17 +451,17 @@ export const authClientPlugin = (config: AuthClientConfig) =>
             // Only include public-facing auth pages in sitemap
             return [
                 {
-                    url: `${config.siteBaseURL}${config.siteBasePath}/${authViewPaths.SIGN_IN}`,
+                    url: `${config.siteBaseURL}${config.siteBasePath}/auth/${authViewPaths.SIGN_IN}`,
                     lastModified: new Date(),
                     priority: 0.8
                 },
                 {
-                    url: `${config.siteBaseURL}${config.siteBasePath}/${authViewPaths.SIGN_UP}`,
+                    url: `${config.siteBaseURL}${config.siteBasePath}/auth/${authViewPaths.SIGN_UP}`,
                     lastModified: new Date(),
                     priority: 0.8
                 },
                 {
-                    url: `${config.siteBaseURL}${config.siteBasePath}/${authViewPaths.FORGOT_PASSWORD}`,
+                    url: `${config.siteBaseURL}${config.siteBasePath}/auth/${authViewPaths.FORGOT_PASSWORD}`,
                     lastModified: new Date(),
                     priority: 0.5
                 }
