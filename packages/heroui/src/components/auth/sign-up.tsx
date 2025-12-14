@@ -159,6 +159,7 @@ export function SignUp({
                       className="text-base md:text-sm"
                       placeholder={localization.auth.passwordPlaceholder}
                       type={isPasswordVisible ? "text" : "password"}
+                      name="password"
                       required
                     />
 
@@ -197,6 +198,7 @@ export function SignUp({
                     <InputGroup>
                       <InputGroup.Input
                         className="text-base md:text-sm"
+                        name="confirmPassword"
                         placeholder={
                           localization.auth.confirmPasswordPlaceholder
                         }
