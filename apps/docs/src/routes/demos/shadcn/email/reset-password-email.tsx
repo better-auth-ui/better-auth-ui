@@ -1,16 +1,16 @@
-import { EmailVerificationEmail } from "@better-auth-ui/react"
+import { ResetPasswordEmail } from "@better-auth-ui/react"
 import { render } from "@react-email/render"
 import { createFileRoute } from "@tanstack/react-router"
 
-export const Route = createFileRoute("/demos/shadcn/emails/email-verification-email")(
-  {
-    component: RouteComponent
-  }
-)
+export const Route = createFileRoute(
+  "/demos/shadcn/email/reset-password-email"
+)({
+  component: RouteComponent
+})
 
 const html = await render(
-  <EmailVerificationEmail
-    url="https://better-auth-ui.com/auth/verify-email?token=example-token"
+  <ResetPasswordEmail
+    url="https://better-auth-ui.com/auth/reset-password?token=example-token"
     appName="Better Auth UI"
     email="user@example.com"
     expirationMinutes={60}
@@ -22,7 +22,7 @@ const html = await render(
 function RouteComponent() {
   return (
     <iframe
-      title="Email Verification Email Preview"
+      title="Reset Password Email Preview"
       srcDoc={html}
       className="grow w-full border-0"
     />

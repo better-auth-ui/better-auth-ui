@@ -1,20 +1,20 @@
-import { EmailChangedEmail } from "@better-auth-ui/react"
+import { PasswordChangedEmail } from "@better-auth-ui/react"
 import { render } from "@react-email/render"
 import { createFileRoute } from "@tanstack/react-router"
 
 export const Route = createFileRoute(
-  "/demos/shadcn/emails/email-changed-email"
+  "/demos/shadcn/email/password-changed-email"
 )({
   component: RouteComponent
 })
 
 const html = await render(
-  <EmailChangedEmail
-    oldEmail="old@example.com"
-    newEmail="new@example.com"
+  <PasswordChangedEmail
+    email="user@example.com"
+    timestamp="January 15, 2024 at 3:30 PM"
     appName="Better Auth UI"
     supportEmail="support@example.com"
-    revertURL="https://better-auth-ui.com/revert-email"
+    secureAccountURL="https://better-auth-ui.com/secure-account"
     darkMode={true}
     poweredBy={true}
   />
@@ -23,7 +23,7 @@ const html = await render(
 function RouteComponent() {
   return (
     <iframe
-      title="Email Changed Email Preview"
+      title="Password Changed Email Preview"
       srcDoc={html}
       className="grow w-full border-0"
     />

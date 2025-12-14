@@ -1,7 +1,7 @@
 "use client"
 
 export * from "./components/auth/auth-provider"
-export * from "./components/emails"
+export * from "./components/email"
 export * from "./components/icons"
 export * from "./hooks/auth/use-auth"
 export * from "./hooks/auth/use-authenticate"

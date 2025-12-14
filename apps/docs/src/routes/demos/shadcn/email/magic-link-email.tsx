@@ -1,17 +1,17 @@
-import { OtpEmail } from "@better-auth-ui/react"
+import { MagicLinkEmail } from "@better-auth-ui/react"
 import { render } from "@react-email/render"
 import { createFileRoute } from "@tanstack/react-router"
 
-export const Route = createFileRoute("/demos/shadcn/emails/otp-email")({
+export const Route = createFileRoute("/demos/shadcn/email/magic-link-email")({
   component: RouteComponent
 })
 
 const html = await render(
-  <OtpEmail
-    verificationCode="123456"
-    email="user@example.com"
+  <MagicLinkEmail
+    url="https://better-auth-ui.com/auth/verify?token=example-token"
     appName="Better Auth UI"
-    expirationMinutes={10}
+    email="user@example.com"
+    expirationMinutes={5}
     darkMode={true}
     poweredBy={true}
   />
@@ -20,7 +20,7 @@ const html = await render(
 function RouteComponent() {
   return (
     <iframe
-      title="OTP Email Preview"
+      title="Magic Link Email Preview"
       srcDoc={html}
       className="grow w-full border-0"
     />

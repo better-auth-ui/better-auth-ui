@@ -5,7 +5,7 @@
   "scripts": {
     "build": "tsc",
     "dev": "tsc --watch",
-    "email": "email dev --dir src/components/emails -p 9000",
+    "email": "email dev --dir src/components/email -p 9000",
     "test": "vitest"
   },
   "files": [

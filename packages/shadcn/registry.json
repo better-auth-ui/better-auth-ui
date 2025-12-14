@@ -331,11 +331,11 @@
       "registryDependencies": [],
       "files": [
         {
-          "path": "../react/src/components/emails/email-verification.tsx",
+          "path": "../react/src/components/email/email-verification.tsx",
           "type": "registry:component"
         },
         {
-          "path": "../react/src/components/emails/email-styles.tsx",
+          "path": "../react/src/components/email/email-styles.tsx",
           "type": "registry:component"
         },
         {
@@ -356,11 +356,11 @@
       "registryDependencies": [],
       "files": [
         {
-          "path": "../react/src/components/emails/magic-link.tsx",
+          "path": "../react/src/components/email/magic-link.tsx",
           "type": "registry:component"
         },
         {
-          "path": "../react/src/components/emails/email-styles.tsx",
+          "path": "../react/src/components/email/email-styles.tsx",
           "type": "registry:component"
         },
         {
@@ -381,11 +381,11 @@
       "registryDependencies": [],
       "files": [
         {
-          "path": "../react/src/components/emails/reset-password.tsx",
+          "path": "../react/src/components/email/reset-password.tsx",
           "type": "registry:component"
         },
         {
-          "path": "../react/src/components/emails/email-styles.tsx",
+          "path": "../react/src/components/email/email-styles.tsx",
           "type": "registry:component"
         },
         {
@@ -406,11 +406,11 @@
       "registryDependencies": [],
       "files": [
         {
-          "path": "../react/src/components/emails/password-changed.tsx",
+          "path": "../react/src/components/email/password-changed.tsx",
           "type": "registry:component"
         },
         {
-          "path": "../react/src/components/emails/email-styles.tsx",
+          "path": "../react/src/components/email/email-styles.tsx",
           "type": "registry:component"
         },
         {
@@ -431,11 +431,11 @@
       "registryDependencies": [],
       "files": [
         {
-          "path": "../react/src/components/emails/email-changed.tsx",
+          "path": "../react/src/components/email/email-changed.tsx",
           "type": "registry:component"
         },
         {
-          "path": "../react/src/components/emails/email-styles.tsx",
+          "path": "../react/src/components/email/email-styles.tsx",
           "type": "registry:component"
         },
         {
@@ -456,11 +456,11 @@
       "registryDependencies": [],
       "files": [
         {
-          "path": "../react/src/components/emails/otp-email.tsx",
+          "path": "../react/src/components/email/otp-email.tsx",
           "type": "registry:component"
         },
         {
-          "path": "../react/src/components/emails/email-styles.tsx",
+          "path": "../react/src/components/email/email-styles.tsx",
           "type": "registry:component"
         },
         {
@@ -481,11 +481,11 @@
       "registryDependencies": [],
       "files": [
         {
-          "path": "../react/src/components/emails/new-device.tsx",
+          "path": "../react/src/components/email/new-device.tsx",
           "type": "registry:component"
         },
         {
-          "path": "../react/src/components/emails/email-styles.tsx",
+          "path": "../react/src/components/email/email-styles.tsx",
           "type": "registry:component"
         },
         {

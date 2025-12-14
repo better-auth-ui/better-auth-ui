@@ -2,7 +2,7 @@ import { NewDeviceEmail } from "@better-auth-ui/react"
 import { render } from "@react-email/render"
 import { createFileRoute } from "@tanstack/react-router"
 
-export const Route = createFileRoute("/demos/shadcn/emails/new-device-email")({
+export const Route = createFileRoute("/demos/shadcn/email/new-device-email")({
   component: RouteComponent
 })
 
