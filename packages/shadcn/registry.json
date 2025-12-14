@@ -318,6 +318,181 @@
           "type": "registry:hook"
         }
       ]
+    },
+    {
+      "name": "email-verification-email",
+      "type": "registry:component",
+      "title": "Email Verification Email",
+      "description": "Email template component that sends email verification links to users.",
+      "dependencies": [
+        "@better-auth-ui/react@workspace:*",
+        "@react-email/components"
+      ],
+      "registryDependencies": [],
+      "files": [
+        {
+          "path": "../react/src/components/emails/email-verification.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "../react/src/components/emails/email-styles.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "../react/src/lib/utils.ts",
+          "type": "registry:lib"
+        }
+      ]
+    },
+    {
+      "name": "magic-link-email",
+      "type": "registry:component",
+      "title": "Magic Link Email",
+      "description": "Email template component that sends magic link authentication emails for passwordless sign-in.",
+      "dependencies": [
+        "@better-auth-ui/react@workspace:*",
+        "@react-email/components"
+      ],
+      "registryDependencies": [],
+      "files": [
+        {
+          "path": "../react/src/components/emails/magic-link.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "../react/src/components/emails/email-styles.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "../react/src/lib/utils.ts",
+          "type": "registry:lib"
+        }
+      ]
+    },
+    {
+      "name": "reset-password-email",
+      "type": "registry:component",
+      "title": "Reset Password Email",
+      "description": "Email template component that sends password reset links to users.",
+      "dependencies": [
+        "@better-auth-ui/react@workspace:*",
+        "@react-email/components"
+      ],
+      "registryDependencies": [],
+      "files": [
+        {
+          "path": "../react/src/components/emails/reset-password.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "../react/src/components/emails/email-styles.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "../react/src/lib/utils.ts",
+          "type": "registry:lib"
+        }
+      ]
+    },
+    {
+      "name": "password-changed-email",
+      "type": "registry:component",
+      "title": "Password Changed Email",
+      "description": "Email template component that notifies users when their password has been changed.",
+      "dependencies": [
+        "@better-auth-ui/react@workspace:*",
+        "@react-email/components"
+      ],
+      "registryDependencies": [],
+      "files": [
+        {
+          "path": "../react/src/components/emails/password-changed.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "../react/src/components/emails/email-styles.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "../react/src/lib/utils.ts",
+          "type": "registry:lib"
+        }
+      ]
+    },
+    {
+      "name": "email-changed-email",
+      "type": "registry:component",
+      "title": "Email Changed Email",
+      "description": "Email template component that notifies users when their email address has been changed.",
+      "dependencies": [
+        "@better-auth-ui/react@workspace:*",
+        "@react-email/components"
+      ],
+      "registryDependencies": [],
+      "files": [
+        {
+          "path": "../react/src/components/emails/email-changed.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "../react/src/components/emails/email-styles.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "../react/src/lib/utils.ts",
+          "type": "registry:lib"
+        }
+      ]
+    },
+    {
+      "name": "otp-email",
+      "type": "registry:component",
+      "title": "OTP Email",
+      "description": "Email template component that sends one-time password (OTP) verification codes to users.",
+      "dependencies": [
+        "@better-auth-ui/react@workspace:*",
+        "@react-email/components"
+      ],
+      "registryDependencies": [],
+      "files": [
+        {
+          "path": "../react/src/components/emails/otp-email.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "../react/src/components/emails/email-styles.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "../react/src/lib/utils.ts",
+          "type": "registry:lib"
+        }
+      ]
+    },
+    {
+      "name": "new-device-email",
+      "type": "registry:component",
+      "title": "New Device Email",
+      "description": "Email template component that notifies users when a new device signs in to their account.",
+      "dependencies": [
+        "@better-auth-ui/react@workspace:*",
+        "@react-email/components"
+      ],
+      "registryDependencies": [],
+      "files": [
+        {
+          "path": "../react/src/components/emails/new-device.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "../react/src/components/emails/email-styles.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "../react/src/lib/utils.ts",
+          "type": "registry:lib"
+        }
+      ]
     }
   ]
 }

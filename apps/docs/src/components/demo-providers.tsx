@@ -15,7 +15,7 @@ export function DemoProviders({ children }: { children: React.ReactNode }) {
                 createdAt: new Date(),
                 updatedAt: new Date(),
                 expiresAt: new Date(),
-                token: "test-token"
+                token: "example-token"
               },
               user: {
                 id: "123",

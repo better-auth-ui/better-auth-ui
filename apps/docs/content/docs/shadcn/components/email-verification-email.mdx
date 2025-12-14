@@ -1,0 +1,44 @@
+---
+title: <EmailVerificationEmail />
+description: Email template component that sends email verification links to users.
+---
+
+## Usage
+
+<Demo src="/demos/shadcn/emails/email-verification-email" className="h-[620px]" />
+
+```tsx
+import { EmailVerificationEmail } from "@better-auth-ui/react"
+
+export function VerificationEmail() {
+  return (
+    <EmailVerificationEmail
+      url="https://example.com/verify?token=example-token"
+      email="user@example.com"
+      appName="My App"
+      expirationMinutes={60}
+      logoURL="https://example.com/logo.png"
+      darkMode={true}
+    />
+  )
+}
+```
+
+## Installation
+
+```npm
+npx shadcn@latest add https://better-auth-ui.com/r/email-verification-email.json
+```
+
+## Props
+
+<auto-type-table path="../../../../../../packages/react/src/components/emails/email-verification.tsx" name="EmailVerificationEmailProps" />
+
+## Features
+
+- Verification button and fallback URL
+- Expiration time information
+- Security notice for unauthorized requests
+- Customizable branding and styling
+- Support for light/dark mode themes
+- Localization support

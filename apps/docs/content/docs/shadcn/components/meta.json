@@ -13,6 +13,14 @@
     "sign-out",
     "forgot-password",
     "reset-password",
-    "magic-link"
+    "magic-link",
+    "---Emails---",
+    "email-verification-email",
+    "magic-link-email",
+    "reset-password-email",
+    "password-changed-email",
+    "email-changed-email",
+    "otp-email",
+    "new-device-email"
   ]
 }
