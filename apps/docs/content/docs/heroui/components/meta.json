@@ -5,6 +5,7 @@
     "auth-provider",
     "---User---",
     "user-avatar",
+    "user-button",
     "---Auth---",
     "auth",
     "sign-in",
