@@ -67,7 +67,10 @@ export function UserButton({
       ) : (
         <Button
           variant={variant}
-          className={cn("h-auto font-normal justify-start p-2", className)}
+          className={cn(
+            "h-auto font-normal justify-start px-3 py-2",
+            className
+          )}
         >
           <UserAvatar {...config} />
 
