@@ -39,14 +39,7 @@ export function MagicLink({
 }: MagicLinkProps) {
   const context = useAuth(config)
 
-  const {
-    basePaths,
-    localization,
-    magicLink,
-    socialProviders,
-    viewPaths,
-    Link
-  } = context
+  const { basePaths, localization, socialProviders, viewPaths, Link } = context
 
   const [{ email }, signInMagicLink, magicLinkPending] =
     useSignInMagicLink(context)
@@ -130,13 +123,11 @@ export function MagicLink({
                   {localization.auth.sendMagicLink}
                 </Button>
 
-                {magicLink && (
-                  <MagicLinkButton
-                    {...config}
-                    view="magicLink"
-                    isPending={isPending}
-                  />
-                )}
+                <MagicLinkButton
+                  {...config}
+                  view="magicLink"
+                  isPending={isPending}
+                />
               </Field>
             </FieldGroup>
           </form>
