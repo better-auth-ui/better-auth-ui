@@ -2,11 +2,11 @@ import { EmailVerificationEmail } from "@better-auth-ui/react"
 import { render } from "@react-email/render"
 import { createFileRoute } from "@tanstack/react-router"
 
-export const Route = createFileRoute("/demos/shadcn/email/email-verification-email")(
-  {
-    component: RouteComponent
-  }
-)
+export const Route = createFileRoute(
+  "/demos/shadcn/email/email-verification-email"
+)({
+  component: RouteComponent
+})
 
 const html = await render(
   <EmailVerificationEmail
