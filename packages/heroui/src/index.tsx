@@ -12,6 +12,8 @@ export {
   useSignUpEmail
 } from "@better-auth-ui/react"
 
+export { viewPaths } from "@better-auth-ui/react/core"
+
 export * from "./components/auth/auth"
 export * from "./components/auth/forgot-password"
 export * from "./components/auth/magic-link"
