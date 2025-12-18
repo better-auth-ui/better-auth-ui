@@ -1,6 +1,6 @@
 "use client"
 
-import { useAuthenticate } from "@better-auth-ui/shadcn"
+import { useAuthenticate } from "@better-auth-ui/shadcn/react"
 import { Spinner } from "@heroui/react"
 import Link from "next/link"
 

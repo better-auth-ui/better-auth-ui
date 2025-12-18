@@ -1,4 +1,4 @@
-import { AuthProvider } from "@better-auth-ui/heroui"
+import { AuthProvider } from "@better-auth-ui/heroui/react"
 import { Link, useNavigate } from "@tanstack/react-router"
 import type { ReactNode } from "react"
 

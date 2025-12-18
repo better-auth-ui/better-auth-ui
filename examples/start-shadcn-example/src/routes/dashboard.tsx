@@ -1,4 +1,5 @@
-import { UserButton, useAuthenticate } from "@better-auth-ui/shadcn"
+import { UserButton } from "@better-auth-ui/shadcn"
+import { useAuthenticate } from "@better-auth-ui/shadcn/react"
 import { createFileRoute } from "@tanstack/react-router"
 import { Spinner } from "@/components/ui/spinner"
 

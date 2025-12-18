@@ -21,6 +21,10 @@
       "import": "./dist/core.js",
       "types": "./dist/core.d.ts"
     },
+    "./react": {
+      "import": "./dist/react-exports.js",
+      "types": "./dist/react-exports.d.ts"
+    },
     "./styles": "./dist/styles.css"
   },
   "devDependencies": {

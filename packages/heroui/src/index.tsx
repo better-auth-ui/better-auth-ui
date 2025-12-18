@@ -1,17 +1,5 @@
 "use client"
 
-export {
-  type AnyAuthClient,
-  type AnyAuthConfig,
-  type AuthClient,
-  type AuthConfig,
-  AuthProvider,
-  useAuthenticate,
-  useSignInEmail,
-  useSignInSocial,
-  useSignUpEmail
-} from "@better-auth-ui/react"
-
 export * from "./components/auth/auth"
 export * from "./components/auth/forgot-password"
 export * from "./components/auth/magic-link"

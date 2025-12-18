@@ -1,4 +1,4 @@
-import { AuthProvider } from "@better-auth-ui/shadcn"
+import { AuthProvider } from "@better-auth-ui/shadcn/react"
 import { Link, useNavigate } from "@tanstack/react-router"
 import { ThemeProvider } from "next-themes"
 import type { ReactNode } from "react"
