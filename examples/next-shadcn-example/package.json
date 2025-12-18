@@ -16,8 +16,8 @@
     "better-auth": "^1.4.7",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
-    "lucide-react": "^0.561.0",
-    "next": "^16.0.10",
+    "lucide-react": "^0.562.0",
+    "next": "^16.1.0",
     "next-themes": "^0.4.6",
     "react": "^19.2.3",
     "react-dom": "^19.2.3",
@@ -25,9 +25,9 @@
     "tailwind-variants": "^3.2.2"
   },
   "devDependencies": {
-    "@biomejs/biome": "^2.3.8",
+    "@biomejs/biome": "^2.3.10",
     "@tailwindcss/postcss": "^4.1.18",
-    "@types/node": "^24.10.4",
+    "@types/node": "^25.0.3",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "tailwindcss": "^4.1.18",

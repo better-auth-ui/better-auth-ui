@@ -25,22 +25,22 @@
     }
   },
   "devDependencies": {
-    "@react-email/components": "^1.0.1",
-    "@react-email/preview-server": "^5.0.8",
-    "@testing-library/react": "^16.1.0",
+    "@react-email/components": "^1.0.2",
+    "@react-email/preview-server": "^5.1.0",
+    "@testing-library/react": "^16.3.1",
     "@testing-library/user-event": "^14.5.2",
     "@types/react": "^19.2.7",
     "@vitejs/plugin-react": "^5.1.2",
-    "@vitest/browser-playwright": "^4.0.15",
+    "@vitest/browser-playwright": "^4.0.16",
     "better-auth": "^1.4.7",
     "clsx": "^2.1.1",
     "playwright": "^1.57.0",
     "react": "^19.2.3",
     "react-dom": "^19.2.3",
-    "react-email": "^5.0.8",
+    "react-email": "^5.1.0",
     "tailwind-merge": "^3.4.0",
     "tailwindcss": "^4.1.18",
-    "vitest": "^4.0.15"
+    "vitest": "^4.0.16"
   },
   "dependencies": {
     "@better-auth-ui/core": "workspace:*"

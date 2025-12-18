@@ -1,5 +1,5 @@
-import { cn } from "fumadocs-ui/utils/cn"
 import { useEffect, useRef, useState } from "react"
+import { cn } from "@/lib/utils"
 
 interface DemoIframeProps {
   src: string

@@ -31,18 +31,18 @@
     "@heroicons/react": "^2.2.0",
     "@heroui/react": "^3.0.0-beta.2",
     "@heroui/styles": "^3.0.0-beta.2",
-    "@testing-library/react": "^16.1.0",
+    "@testing-library/react": "^16.3.1",
     "@testing-library/user-event": "^14.5.2",
     "@types/react": "^19.2.7",
     "@vitejs/plugin-react": "^5.1.2",
-    "@vitest/browser-playwright": "^4.0.15",
+    "@vitest/browser-playwright": "^4.0.16",
     "better-auth": "^1.4.7",
     "cpy-cli": "^6.0.0",
     "playwright": "^1.57.0",
     "react": "^19.2.3",
     "react-dom": "^19.2.3",
     "sonner": "^2.0.7",
-    "vitest": "^4.0.15"
+    "vitest": "^4.0.16"
   },
   "dependencies": {
     "@better-auth-ui/core": "workspace:*",
