@@ -10,7 +10,7 @@
     "format": "biome format --write"
   },
   "dependencies": {
-    "@better-auth-ui/shadcn": "workspace:*",
+    "@better-auth-ui/shadcn": "*",
     "@heroui/react": "^3.0.0-beta.2",
     "@heroui/styles": "^3.0.0-beta.2",
     "better-auth": "^1.4.7",

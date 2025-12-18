@@ -10,7 +10,7 @@
     "format": "biome format --write"
   },
   "dependencies": {
-    "@better-auth-ui/react": "workspace:*",
+    "@better-auth-ui/react": "*",
     "@heroui/react": "^3.0.0-beta.2",
     "@heroui/styles": "^3.0.0-beta.2",
     "@radix-ui/react-checkbox": "^1.3.3",

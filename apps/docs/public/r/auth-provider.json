@@ -1,10 +1,12 @@
 {
   "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "auth-provider",
-  "type": "registry:component",
   "title": "Auth Provider",
   "description": "A context provider component that supplies AuthConfig to all descendant components.",
-  "dependencies": ["@better-auth-ui/react@workspace:*", "better-auth"],
+  "dependencies": [
+    "@better-auth-ui/react@*",
+    "better-auth"
+  ],
   "files": [
     {
       "path": "../react/src/components/auth/auth-provider.tsx",
@@ -16,5 +18,6 @@
       "content": "import {\n  type AnyAuthConfig,\n  type AuthConfig,\n  AuthContext\n} from \"@better-auth-ui/react\"\nimport { deepmerge, defaultConfig } from \"@better-auth-ui/react/core\"\nimport { useContext } from \"react\"\nimport { toast } from \"sonner\"\n\nconst extendConfig: AnyAuthConfig = {\n  toast,\n  Link: (props) => <a {...props} />\n}\n\n/**\n * Constructs the effective AuthConfig by merging defaults, any AuthContext-provided config, and the optional `config` overrides.\n *\n * @param config - Partial configuration overrides applied on top of context and defaults\n * @returns The final `AuthConfig` with a non-optional `authClient`\n * @throws If the resulting config does not include an `authClient`\n */\nexport function useAuth(config?: AnyAuthConfig) {\n  const context = useContext(AuthContext)\n\n  const authConfig = deepmerge(\n    deepmerge(defaultConfig as AnyAuthConfig, extendConfig),\n    deepmerge(context || {}, config || {})\n  ) as AuthConfig\n\n  if (authConfig.authClient === undefined) {\n    throw new Error(\"[Better Auth UI] authClient is required\")\n  }\n\n  return authConfig\n}\n",
       "type": "registry:hook"
     }
-  ]
+  ],
+  "type": "registry:component"
 }

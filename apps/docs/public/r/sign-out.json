@@ -1,11 +1,16 @@
 {
   "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "sign-out",
-  "type": "registry:component",
   "title": "Sign Out",
   "description": "A component that signs the user out when mounted and displays a loading state.",
-  "dependencies": ["@better-auth-ui/react@workspace:*", "better-auth"],
-  "registryDependencies": ["card", "spinner"],
+  "dependencies": [
+    "@better-auth-ui/react@*",
+    "better-auth"
+  ],
+  "registryDependencies": [
+    "card",
+    "spinner"
+  ],
   "files": [
     {
       "path": "src/components/auth/sign-out.tsx",
@@ -17,5 +22,6 @@
       "content": "import type { AnyAuthConfig } from \"@better-auth-ui/react\"\nimport { useCallback } from \"react\"\n\nimport { useAuth } from \"./use-auth\"\n\nexport function useSignOut(config?: AnyAuthConfig) {\n  const { authClient, basePaths, viewPaths, replace, toast } = useAuth(config)\n  const { refetch } = authClient.useSession()\n\n  const signOut = useCallback(async () => {\n    const { error } = await authClient.signOut({\n      fetchOptions: { disableSignal: true }\n    })\n\n    if (error) {\n      toast.error(error.message || error.statusText)\n    }\n\n    await refetch()\n\n    replace(`${basePaths.auth}/${viewPaths.auth.signIn}`)\n  }, [\n    authClient,\n    basePaths.auth,\n    viewPaths.auth.signIn,\n    replace,\n    refetch,\n    toast.error\n  ])\n\n  return { signOut }\n}\n",
       "type": "registry:hook"
     }
-  ]
+  ],
+  "type": "registry:component"
 }

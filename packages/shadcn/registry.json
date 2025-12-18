@@ -9,7 +9,7 @@
       "title": "Sign In",
       "description": "A complete sign-in form component with email/password, magic link, and social provider support.",
       "dependencies": [
-        "@better-auth-ui/react@workspace:*",
+        "@better-auth-ui/react@*",
         "better-auth",
         "lucide-react"
       ],
@@ -61,7 +61,7 @@
       "title": "Sign Up",
       "description": "A complete sign-up form component with name, email, password fields, magic link, and social provider support.",
       "dependencies": [
-        "@better-auth-ui/react@workspace:*",
+        "@better-auth-ui/react@*",
         "better-auth",
         "lucide-react"
       ],
@@ -107,7 +107,7 @@
       "title": "Magic Link",
       "description": "A magic link sign-in form component with email input and optional social provider support.",
       "dependencies": [
-        "@better-auth-ui/react@workspace:*",
+        "@better-auth-ui/react@*",
         "better-auth",
         "lucide-react"
       ],
@@ -152,7 +152,7 @@
       "type": "registry:component",
       "title": "Forgot Password",
       "description": "A form component for requesting a password reset link via email.",
-      "dependencies": ["@better-auth-ui/react@workspace:*", "better-auth"],
+      "dependencies": ["@better-auth-ui/react@*", "better-auth"],
       "registryDependencies": [
         "button",
         "card",
@@ -182,7 +182,7 @@
       "title": "Reset Password",
       "description": "A form component for resetting password with a token from the URL.",
       "dependencies": [
-        "@better-auth-ui/react@workspace:*",
+        "@better-auth-ui/react@*",
         "better-auth",
         "lucide-react"
       ],
@@ -214,7 +214,7 @@
       "type": "registry:component",
       "title": "Sign Out",
       "description": "A component that signs the user out when mounted and displays a loading state.",
-      "dependencies": ["@better-auth-ui/react@workspace:*", "better-auth"],
+      "dependencies": ["@better-auth-ui/react@*", "better-auth"],
       "registryDependencies": ["card", "spinner"],
       "files": [
         {
@@ -233,7 +233,7 @@
       "title": "Auth",
       "description": "A unified authentication component that renders the appropriate auth view based on path or view prop.",
       "dependencies": [
-        "@better-auth-ui/react@workspace:*",
+        "@better-auth-ui/react@*",
         "better-auth",
         "lucide-react"
       ],
@@ -259,7 +259,7 @@
       "type": "registry:component",
       "title": "Auth Provider",
       "description": "A context provider component that supplies AuthConfig to all descendant components.",
-      "dependencies": ["@better-auth-ui/react@workspace:*", "better-auth"],
+      "dependencies": ["@better-auth-ui/react@*", "better-auth"],
       "files": [
         {
           "path": "../react/src/components/auth/auth-provider.tsx",
@@ -277,7 +277,7 @@
       "title": "User Avatar",
       "description": "Renders the current user's avatar using session data. Shows a skeleton while loading and falls back to initials when no image is available.",
       "dependencies": [
-        "@better-auth-ui/react@workspace:*",
+        "@better-auth-ui/react@*",
         "better-auth",
         "lucide-react"
       ],
@@ -299,7 +299,7 @@
       "title": "User Button",
       "description": "Renders a user button with dropdown menu showing user info and sign out option.",
       "dependencies": [
-        "@better-auth-ui/react@workspace:*",
+        "@better-auth-ui/react@*",
         "better-auth",
         "lucide-react"
       ],
@@ -324,10 +324,7 @@
       "type": "registry:component",
       "title": "Email Verification Email",
       "description": "Email template component that sends email verification links to users.",
-      "dependencies": [
-        "@better-auth-ui/react@workspace:*",
-        "@react-email/components"
-      ],
+      "dependencies": ["@better-auth-ui/react@*", "@react-email/components"],
       "registryDependencies": [],
       "files": [
         {
@@ -349,10 +346,7 @@
       "type": "registry:component",
       "title": "Magic Link Email",
       "description": "Email template component that sends magic link authentication emails for passwordless sign-in.",
-      "dependencies": [
-        "@better-auth-ui/react@workspace:*",
-        "@react-email/components"
-      ],
+      "dependencies": ["@better-auth-ui/react@*", "@react-email/components"],
       "registryDependencies": [],
       "files": [
         {
@@ -374,10 +368,7 @@
       "type": "registry:component",
       "title": "Reset Password Email",
       "description": "Email template component that sends password reset links to users.",
-      "dependencies": [
-        "@better-auth-ui/react@workspace:*",
-        "@react-email/components"
-      ],
+      "dependencies": ["@better-auth-ui/react@*", "@react-email/components"],
       "registryDependencies": [],
       "files": [
         {
@@ -399,10 +390,7 @@
       "type": "registry:component",
       "title": "Password Changed Email",
       "description": "Email template component that notifies users when their password has been changed.",
-      "dependencies": [
-        "@better-auth-ui/react@workspace:*",
-        "@react-email/components"
-      ],
+      "dependencies": ["@better-auth-ui/react@*", "@react-email/components"],
       "registryDependencies": [],
       "files": [
         {
@@ -424,10 +412,7 @@
       "type": "registry:component",
       "title": "Email Changed Email",
       "description": "Email template component that notifies users when their email address has been changed.",
-      "dependencies": [
-        "@better-auth-ui/react@workspace:*",
-        "@react-email/components"
-      ],
+      "dependencies": ["@better-auth-ui/react@*", "@react-email/components"],
       "registryDependencies": [],
       "files": [
         {
@@ -449,10 +434,7 @@
       "type": "registry:component",
       "title": "OTP Email",
       "description": "Email template component that sends one-time password (OTP) verification codes to users.",
-      "dependencies": [
-        "@better-auth-ui/react@workspace:*",
-        "@react-email/components"
-      ],
+      "dependencies": ["@better-auth-ui/react@*", "@react-email/components"],
       "registryDependencies": [],
       "files": [
         {
@@ -474,10 +456,7 @@
       "type": "registry:component",
       "title": "New Device Email",
       "description": "Email template component that notifies users when a new device signs in to their account.",
-      "dependencies": [
-        "@better-auth-ui/react@workspace:*",
-        "@react-email/components"
-      ],
+      "dependencies": ["@better-auth-ui/react@*", "@react-email/components"],
       "registryDependencies": [],
       "files": [
         {

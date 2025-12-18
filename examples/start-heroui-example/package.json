@@ -17,7 +17,7 @@
     "vite": "^7.3.0"
   },
   "dependencies": {
-    "@better-auth-ui/heroui": "workspace:*",
+    "@better-auth-ui/heroui": "*",
     "@heroui/react": "^3.0.0-beta.2",
     "@heroui/styles": "^3.0.0-beta.2",
     "@tailwindcss/vite": "^4.1.18",
