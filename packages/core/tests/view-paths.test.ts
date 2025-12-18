@@ -1,51 +1,50 @@
 import { describe, expect, it } from "vitest"
 import {
   type AuthView,
-  authPaths,
-  authViewPaths,
-  authViews,
   type ViewPaths,
   viewPaths
 } from "../src/lib/view-paths"
 
-describe("authViewPaths", () => {
+describe("viewPaths.auth", () => {
   it("should contain all expected view paths", () => {
-    expect(authViewPaths).toHaveProperty("signIn")
-    expect(authViewPaths).toHaveProperty("signUp")
-    expect(authViewPaths).toHaveProperty("magicLink")
-    expect(authViewPaths).toHaveProperty("forgotPassword")
-    expect(authViewPaths).toHaveProperty("resetPassword")
-    expect(authViewPaths).toHaveProperty("signOut")
+    expect(viewPaths.auth).toHaveProperty("signIn")
+    expect(viewPaths.auth).toHaveProperty("signUp")
+    expect(viewPaths.auth).toHaveProperty("magicLink")
+    expect(viewPaths.auth).toHaveProperty("forgotPassword")
+    expect(viewPaths.auth).toHaveProperty("resetPassword")
+    expect(viewPaths.auth).toHaveProperty("signOut")
   })
 
   it("should have correct path values", () => {
-    expect(authViewPaths.signIn).toBe("sign-in")
-    expect(authViewPaths.signUp).toBe("sign-up")
-    expect(authViewPaths.magicLink).toBe("magic-link")
-    expect(authViewPaths.forgotPassword).toBe("forgot-password")
-    expect(authViewPaths.resetPassword).toBe("reset-password")
-    expect(authViewPaths.signOut).toBe("sign-out")
+    expect(viewPaths.auth.signIn).toBe("sign-in")
+    expect(viewPaths.auth.signUp).toBe("sign-up")
+    expect(viewPaths.auth.magicLink).toBe("magic-link")
+    expect(viewPaths.auth.forgotPassword).toBe("forgot-password")
+    expect(viewPaths.auth.resetPassword).toBe("reset-password")
+    expect(viewPaths.auth.signOut).toBe("sign-out")
   })
 
   it("should use kebab-case for all paths", () => {
-    Object.values(authViewPaths).forEach((path) => {
+    Object.values(viewPaths.auth).forEach((path) => {
       expect(path).toMatch(/^[a-z]+(-[a-z]+)*$/)
     })
   })
 
   it("should not have empty path values", () => {
-    Object.values(authViewPaths).forEach((path) => {
+    Object.values(viewPaths.auth).forEach((path) => {
       expect(path.trim()).not.toBe("")
     })
   })
 })
 
-describe("authViews", () => {
-  it("should be an array of auth view keys", () => {
+describe("authViews (derived)", () => {
+  it("should be able to derive array of auth view keys", () => {
+    const authViews = Object.keys(viewPaths.auth) as AuthView[]
     expect(Array.isArray(authViews)).toBe(true)
   })
 
   it("should contain all expected view keys", () => {
+    const authViews = Object.keys(viewPaths.auth)
     expect(authViews).toContain("signIn")
     expect(authViews).toContain("signUp")
     expect(authViews).toContain("magicLink")
@@ -55,20 +54,23 @@ describe("authViews", () => {
   })
 
   it("should have valid AuthView type elements", () => {
+    const authViews = Object.keys(viewPaths.auth) as AuthView[]
     authViews.forEach((view) => {
       expect(typeof view).toBe("string")
-      expect(authViewPaths).toHaveProperty(view)
+      expect(viewPaths.auth).toHaveProperty(view)
     })
   })
 })
 
-describe("authPaths", () => {
-  it("should be an array of auth path values", () => {
+describe("authPaths (derived)", () => {
+  it("should be able to derive array of auth path values", () => {
+    const authPaths = Object.values(viewPaths.auth)
     expect(Array.isArray(authPaths)).toBe(true)
     expect(authPaths.length).toBe(6)
   })
 
   it("should contain all expected path values", () => {
+    const authPaths = Object.values(viewPaths.auth)
     expect(authPaths).toContain("sign-in")
     expect(authPaths).toContain("sign-up")
     expect(authPaths).toContain("magic-link")
@@ -78,6 +80,7 @@ describe("authPaths", () => {
   })
 
   it("should have no duplicates", () => {
+    const authPaths = Object.values(viewPaths.auth)
     const uniquePaths = [...new Set(authPaths)]
     expect(authPaths).toEqual(uniquePaths)
   })
@@ -86,10 +89,6 @@ describe("authPaths", () => {
 describe("viewPaths", () => {
   it("should have auth property", () => {
     expect(viewPaths).toHaveProperty("auth")
-  })
-
-  it("should reference authViewPaths", () => {
-    expect(viewPaths.auth).toBe(authViewPaths)
   })
 
   it("should maintain all auth view paths", () => {
@@ -114,7 +113,7 @@ describe("type safety", () => {
     ]
 
     validViews.forEach((view) => {
-      expect(authViewPaths[view]).toBeDefined()
+      expect(viewPaths.auth[view]).toBeDefined()
     })
   })
 

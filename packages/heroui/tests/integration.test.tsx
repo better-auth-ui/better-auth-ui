@@ -10,7 +10,8 @@ const componentNames = [
   "Auth",
   "ProviderButtons",
   "MagicLinkButton",
-  "ResendVerificationButton"
+  "UserAvatar",
+  "UserButton"
 ] as const
 
 describe("@better-auth-ui/heroui integration", () => {
@@ -31,11 +32,11 @@ describe("@better-auth-ui/heroui integration", () => {
   })
 })
 
-describe("@better-auth-ui/heroui server exports", () => {
-  it("should export server utilities", async () => {
-    const module = await import("../src/server")
+describe("@better-auth-ui/heroui core exports", () => {
+  it("should re-export viewPaths from core", async () => {
+    const module = await import("../src/index")
 
-    expect(module).toHaveProperty("authViewPaths")
     expect(module).toHaveProperty("viewPaths")
+    expect(module.viewPaths).toHaveProperty("auth")
   })
 })

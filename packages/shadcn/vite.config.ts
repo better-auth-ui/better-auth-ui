@@ -43,5 +43,8 @@ export default defineConfig({
     alias: {
       "@": resolve(__dirname, "src")
     }
+  },
+  test: {
+    passWithNoTests: true
   }
 })

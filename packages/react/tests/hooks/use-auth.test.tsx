@@ -3,8 +3,8 @@ import { renderHook } from "@testing-library/react"
 import { createAuthClient } from "better-auth/react"
 import type { ReactNode } from "react"
 import { afterEach, describe, expect, it, vi } from "vitest"
-import { AuthProvider } from "../../src/components/auth-provider"
-import { useAuth } from "../../src/hooks/use-auth"
+import { AuthProvider } from "../../src/components/auth/auth-provider"
+import { useAuth } from "../../src/hooks/auth/use-auth"
 
 // Mock better-auth
 vi.mock("better-auth/react", () => ({
