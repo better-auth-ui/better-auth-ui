@@ -1,4 +1,4 @@
-import { viewPaths } from "@better-auth-ui/core"
+import { viewPaths } from "@better-auth-ui/heroui/core"
 import { Auth } from "@better-auth-ui/heroui"
 import { notFound } from "next/navigation"
 
