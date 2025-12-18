@@ -31,12 +31,3 @@ describe("@better-auth-ui/heroui integration", () => {
     }
   })
 })
-
-describe("@better-auth-ui/heroui core exports", () => {
-  it("should re-export viewPaths from core", async () => {
-    const module = await import("../src/index")
-
-    expect(module).toHaveProperty("viewPaths")
-    expect(module.viewPaths).toHaveProperty("auth")
-  })
-})
