@@ -1,9 +1,5 @@
 import { describe, expect, it } from "vitest"
-import {
-  type AuthView,
-  type ViewPaths,
-  viewPaths
-} from "../src/lib/view-paths"
+import { type AuthView, type ViewPaths, viewPaths } from "../src/lib/view-paths"
 
 describe("viewPaths.auth", () => {
   it("should contain all expected view paths", () => {
