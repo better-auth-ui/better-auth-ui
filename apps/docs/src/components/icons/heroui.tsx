@@ -1,5 +1,11 @@
 import type { ComponentPropsWithRef } from "react"
 
+/**
+ * Render the HeroUI SVG icon.
+ *
+ * @param props - Standard SVG props forwarded to the root `<svg>` element (e.g., `className`, `style`, ARIA attributes)
+ * @returns The SVG element for the HeroUI icon
+ */
 export function HeroUI(props: ComponentPropsWithRef<"svg">) {
   return (
     <svg

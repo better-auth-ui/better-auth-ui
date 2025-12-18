@@ -20,6 +20,11 @@ const html = await render(
   />
 )
 
+/**
+ * Displays a preview of the pre-rendered PasswordChangedEmail inside an iframe.
+ *
+ * @returns A React element containing an `iframe` whose `srcDoc` is the pre-rendered email HTML.
+ */
 function RouteComponent() {
   return (
     <iframe

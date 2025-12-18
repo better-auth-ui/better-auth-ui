@@ -9,6 +9,11 @@ export const Route = createFileRoute("/demos/heroui")({
   })
 })
 
+/**
+ * Renders a placeholder that displays the matched child route.
+ *
+ * @returns A React element that renders the matched child route via an `Outlet`.
+ */
 function RouteComponent() {
   return <Outlet />
 }

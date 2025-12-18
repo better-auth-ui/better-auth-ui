@@ -7,6 +7,14 @@ interface DemoIframeProps {
   title?: string
 }
 
+/**
+ * Renders an iframe that fades in after its content finishes loading.
+ *
+ * @param src - URL to load in the iframe
+ * @param className - Additional class names applied to the iframe element
+ * @param title - Accessible title for the iframe; defaults to "Demo"
+ * @returns A React element containing a bordered wrapper and an iframe that transitions to full opacity once its content has loaded
+ */
 export function DemoIframe({
   src,
   className,

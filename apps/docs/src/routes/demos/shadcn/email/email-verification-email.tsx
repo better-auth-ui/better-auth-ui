@@ -19,6 +19,11 @@ const html = await render(
   />
 )
 
+/**
+ * Renders an iframe preview of the email verification template.
+ *
+ * @returns A JSX element containing an iframe whose srcDoc is the pre-rendered email verification HTML and titled "Email Verification Email Preview".
+ */
 function RouteComponent() {
   return (
     <iframe

@@ -10,6 +10,16 @@ import { NextJS } from "@/components/icons/nextjs"
 import { Shadcn } from "@/components/icons/shadcn"
 import { TanStackStart } from "@/components/icons/tanstack-start"
 
+/**
+ * Build a merged MDX components map for rendering MDX content.
+ *
+ * The returned map combines the library's default components, tab-related components,
+ * and any components passed via the `components` parameter; entries from `components`
+ * take precedence when keys collide.
+ *
+ * @param components - Optional component overrides to merge into the resulting MDX components map
+ * @returns The merged MDXComponents map ready for use when rendering MDX content
+ */
 export function getMDXComponents(components?: MDXComponents): MDXComponents {
   return {
     ...defaultComponents,

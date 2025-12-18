@@ -1,6 +1,15 @@
 import { AuthProvider } from "@better-auth-ui/heroui/react"
 import { authClient } from "@/lib/auth-client"
 
+/**
+ * Wraps children with an AuthProvider configured with a mocked authentication client for demos.
+ *
+ * Provides a hard-coded session, no-op navigation/replace functions, and a simple Link implementation
+ * so UI components can be rendered with a consistent authenticated state during documentation and tests.
+ *
+ * @param children - Content to render inside the provider
+ * @returns A React element that renders `children` within the demo AuthProvider
+ */
 export function DemoProviders({ children }: { children: React.ReactNode }) {
   return (
     <AuthProvider

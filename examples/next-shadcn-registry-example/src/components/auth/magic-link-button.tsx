@@ -13,10 +13,11 @@ export type MagicLinkButtonProps = AnyAuthConfig & {
 }
 
 /**
- * A button that links to either the magic-link or sign-in route and displays the corresponding icon and label.
+ * Render an auth action button that links to either the magic-link or sign-in route and shows the matching icon and label.
  *
- * @param isPending - If true, apply disabled styling and prevent interactions
+ * @param isPending - When true, disables the button to prevent interactions
  * @param view - Current auth view; when `"magicLink"`, the button shows the password/sign-in variant
+ * @returns The button element that navigates to the selected auth route
  */
 export function MagicLinkButton({
   isPending,

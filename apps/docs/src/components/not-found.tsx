@@ -1,6 +1,11 @@
 import { Link } from "@tanstack/react-router"
 import { HomeLayout } from "fumadocs-ui/layouts/home"
 
+/**
+ * Render a 404 Not Found page wrapped in the HomeLayout.
+ *
+ * @returns A JSX element containing a prominent "404" heading, a "Page Not Found" subtitle, explanatory text, and a link that navigates back to the site's home ("/").
+ */
 export function NotFound() {
   return (
     <HomeLayout

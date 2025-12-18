@@ -9,6 +9,11 @@ export const Route = createFileRoute("/demos/shadcn")({
   })
 })
 
+/**
+ * Renders the route's nested content using an Outlet.
+ *
+ * @returns A React element that renders the matched child route via an `Outlet`.
+ */
 function RouteComponent() {
   return <Outlet />
 }

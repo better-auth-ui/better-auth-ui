@@ -4,6 +4,12 @@ import type { ReactNode } from "react"
 
 import { authClient } from "@/lib/auth-client"
 
+/**
+ * Supplies authentication context and router-based navigation to its subtree for shadcn components.
+ *
+ * @param children - React nodes to render inside the authentication provider.
+ * @returns A React element that wraps `children` with an AuthProvider configured with the app auth client and navigation and Link bindings.
+ */
 export function Providers({ children }: { children: ReactNode }) {
   const navigate = useNavigate()
 

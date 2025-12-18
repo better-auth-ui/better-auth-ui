@@ -1,5 +1,10 @@
 import type { ComponentPropsWithRef } from "react"
 
+/**
+ * Renders the shadcn/ui icon as an SVG element.
+ *
+ * @returns A JSX SVG element representing the shadcn/ui icon. All provided SVG props are spread onto the root `<svg>` element.
+ */
 export function Shadcn(props: ComponentPropsWithRef<"svg">) {
   return (
     <svg

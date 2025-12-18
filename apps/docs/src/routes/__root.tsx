@@ -58,6 +58,11 @@ export const Route = createRootRoute({
   component: RootComponent
 })
 
+/**
+ * Renders the application's root document and hosts nested route content.
+ *
+ * @returns A JSX element containing the root document with nested route content.
+ */
 function RootComponent() {
   return (
     <RootDocument>
@@ -66,6 +71,12 @@ function RootComponent() {
   )
 }
 
+/**
+ * Render the root HTML document and application providers.
+ *
+ * @param children - React nodes to render inside the document body
+ * @returns The root `<html>` element containing head, body, application providers, toasts, and scripts
+ */
 function RootDocument({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" suppressHydrationWarning>

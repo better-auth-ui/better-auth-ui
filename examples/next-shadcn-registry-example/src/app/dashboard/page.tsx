@@ -5,6 +5,13 @@ import Link from "next/link"
 
 import { useAuthenticate } from "@/hooks/auth/use-authenticate"
 
+/**
+ * Renders the dashboard UI for an authenticated user or a centered loading spinner while authentication is pending.
+ *
+ * Displays a greeting that includes the authenticated user's email and a "Sign Out" link once session data is available.
+ *
+ * @returns The dashboard UI as JSX element (a loading spinner when unauthenticated or the user greeting and sign-out link when authenticated).
+ */
 export default function Dashboard() {
   const { data: sessionData } = useAuthenticate()
 

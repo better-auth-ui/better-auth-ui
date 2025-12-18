@@ -20,6 +20,11 @@ const html = await render(
   />
 )
 
+/**
+ * Renders an iframe that previews the pre-rendered "Email Changed" email HTML.
+ *
+ * @returns A JSX element containing an iframe whose `srcDoc` is the generated email HTML.
+ */
 function RouteComponent() {
   return (
     <iframe

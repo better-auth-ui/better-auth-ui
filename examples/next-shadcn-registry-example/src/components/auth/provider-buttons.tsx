@@ -19,11 +19,12 @@ export type ProviderButtonsProps = AnyAuthConfig & {
 export type SocialLayout = "auto" | "horizontal" | "vertical" | "grid"
 
 /**
- * Render social provider sign-in buttons and handle sign-in initiation and pending state.
+ * Render a form containing social provider sign-in buttons with layout and disabled state management.
  *
- * @param isPending - When true, disables all provider buttons.
- * @param socialLayout - Preferred layout for the provider buttons; when set to `"auto"` the layout is chosen based on the number of available providers.
- * @param signInSocial - The function to call when a social provider button is clicked.
+ * @param isPending - If true, disables all provider buttons.
+ * @param socialLayout - Preferred layout for the buttons; when `"auto"`, chooses `"horizontal"` if there are four or more providers, otherwise `"vertical"`.
+ * @param signInSocial - Form action handler invoked when a provider button is submitted.
+ * @returns A form element that contains one submit button per available social provider.
  */
 export function ProviderButtons({
   isPending,

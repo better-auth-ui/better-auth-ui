@@ -29,7 +29,9 @@ export type MagicLinkProps = AnyAuthConfig & {
 }
 
 /**
- * Render a card-based sign-in form that sends an email magic link and optionally shows social provider buttons.
+ * Renders a card-style sign-in UI that lets users request an email magic link and optionally sign in with social providers.
+ *
+ * @returns The card element containing the email magic-link form, optional social provider buttons, and a sign-up link.
  */
 export function MagicLink({
   className,

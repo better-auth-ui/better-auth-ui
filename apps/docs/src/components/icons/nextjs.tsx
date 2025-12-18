@@ -1,5 +1,14 @@
 import type { ComponentPropsWithRef } from "react"
 
+/**
+ * Render the Next.js logo as an SVG element.
+ *
+ * The rendered SVG includes accessibility attributes (`aria-label="Next.js"`, `role="img"`),
+ * a viewBox of `0 0 128 128`, and a single path that uses `currentColor` so the icon inherits text color.
+ *
+ * @param props - Standard SVG props (including `ref`) which are spread onto the root `<svg>` element
+ * @returns The SVG element for the Next.js logo
+ */
 export function NextJS(props: ComponentPropsWithRef<"svg">) {
   return (
     <svg

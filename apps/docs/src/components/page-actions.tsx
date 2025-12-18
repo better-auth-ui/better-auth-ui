@@ -13,6 +13,15 @@ import { buttonVariants } from "./ui/button"
 
 const cache = new Map<string, string>()
 
+/**
+ * Renders a button that copies the page's raw Markdown/MDX content to the clipboard.
+ *
+ * The button fetches the content from `markdownUrl` (cached per-URL to avoid repeated network requests),
+ * writes it to the clipboard as plain text, and reflects loading and success states in its disabled state and icon.
+ *
+ * @param markdownUrl - URL that returns the raw Markdown/MDX content to copy
+ * @returns A button element which, when activated, copies the referenced Markdown/MDX to the clipboard
+ */
 export function LLMCopyButton({
   /**
    * A URL to fetch the raw Markdown/MDX content of page
@@ -67,6 +76,16 @@ const optionVariants = cva(
   "text-sm p-2 rounded-lg inline-flex items-center gap-2 hover:text-fd-accent-foreground hover:bg-fd-accent [&_svg]:size-4"
 )
 
+/**
+ * Render a popover button that exposes external actions for viewing a document.
+ *
+ * Provides links to open the current page in GitHub and to create new conversations in ChatGPT and Claude,
+ * each opening in a new tab and populated with a read prompt referencing the page's raw Markdown/MDX URL.
+ *
+ * @param markdownUrl - URL to the raw Markdown/MDX content used to build the AI read prompt
+ * @param githubUrl - Source file URL on GitHub for the "Open in GitHub" action
+ * @returns A Popover containing an "Open" trigger button and a list of external action links
+ */
 export function ViewOptions({
   markdownUrl,
   githubUrl

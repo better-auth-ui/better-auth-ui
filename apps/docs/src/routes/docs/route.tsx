@@ -8,6 +8,11 @@ export const Route = createFileRoute("/docs")({
   component: RouteComponent
 })
 
+/**
+ * Renders the route's outlet for nested child routes.
+ *
+ * @returns A JSX element that renders nested child routes via an `Outlet`.
+ */
 function RouteComponent() {
   return <Outlet />
 }

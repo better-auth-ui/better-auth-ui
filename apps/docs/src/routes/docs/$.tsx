@@ -82,6 +82,11 @@ const clientLoader = browserCollections.docs.createClientLoader({
   }
 })
 
+/**
+ * Render the documentation page using loader-provided data, the resolved content component, and the transformed page tree.
+ *
+ * @returns The React element containing the documentation layout with the page content
+ */
 function Page() {
   const data = Route.useLoaderData()
   const Content = clientLoader.getComponent(data.path)
@@ -97,6 +102,12 @@ function Page() {
   )
 }
 
+/**
+ * Normalize a page tree by converting string icons into React elements and recursively transforming folder nodes and fallback subtrees.
+ *
+ * @param root - The root of the page tree to transform.
+ * @returns The transformed `PageTree.Root` where any node `icon` that was a string is replaced by a React element rendering that HTML string, folder nodes have their `index` and `children` recursively mapped, and `fallback` (if present) is transformed likewise.
+ */
 function transformPageTree(root: PageTree.Root): PageTree.Root {
   function mapNode<T extends PageTree.Node>(item: T): T {
     if (typeof item.icon === "string") {

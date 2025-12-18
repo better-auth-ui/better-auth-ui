@@ -20,6 +20,13 @@ export const Route = createFileRoute("/")({
   component: Home
 })
 
+/**
+ * Renders the site's landing (home) page with hero content, install command actions, previews, and feature highlights.
+ *
+ * The rendered UI includes copy-to-clipboard controls for installation commands (with brief visual feedback), primary CTAs, component screenshots linking to docs, and a features grid with icons and descriptions.
+ *
+ * @returns The React element for the Home page containing the full landing layout and interactive behaviors described above.
+ */
 function Home() {
   const [copiedShadcn, setCopiedShadcn] = useState(false)
   const [copiedHeroui, setCopiedHeroui] = useState(false)

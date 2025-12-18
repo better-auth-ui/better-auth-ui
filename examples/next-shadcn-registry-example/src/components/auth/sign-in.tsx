@@ -31,8 +31,9 @@ export type SignInProps = AnyAuthConfig & {
 }
 
 /**
- * Renders the Sign In UI with email/password, magic link, and social provider
- * options based on the provided `AuthConfig`.
+ * Render the sign-in UI with email/password, magic link, and social provider options based on the provided auth configuration.
+ *
+ * @returns A React element containing the sign-in form, optional magic link button, social provider buttons, and related links and validation UI
  */
 export function SignIn({
   className,

@@ -17,6 +17,11 @@ const html = await render(
   />
 )
 
+/**
+ * Renders an iframe containing a pre-rendered OTP email preview.
+ *
+ * @returns An iframe element whose `srcDoc` contains the rendered HTML preview of the OTP email.
+ */
 function RouteComponent() {
   return (
     <iframe

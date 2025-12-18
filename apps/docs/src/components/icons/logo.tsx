@@ -1,5 +1,11 @@
 import type { ComponentPropsWithRef } from "react"
 
+/**
+ * Renders the Better Auth UI logo as an inline SVG.
+ *
+ * @param props - Props forwarded to the underlying `<svg>` element (e.g., styling, event handlers, aria attributes).
+ * @returns An SVG element representing the logo.
+ */
 export function Logo(props: ComponentPropsWithRef<"svg">) {
   return (
     <svg

@@ -36,15 +36,9 @@ export type SignUpProps = AnyAuthConfig & {
 }
 
 /**
- * Renders a sign-up form with name, email, and password fields, optional social provider buttons, and submission handling.
+ * Render a sign-up form with optional social provider buttons and email/password fields.
  *
- * Submits credentials to the configured auth client and handles the response:
- * - If email verification is required, shows a notification and navigates to sign-in
- * - On success, refreshes the session and navigates to the configured redirect path
- * - On failure, displays error toasts
- * - Manages a pending state while the request is in-flight
- *
- * @param props - Configuration and appearance overrides (e.g., `className`, `localization`, `socialLayout`) plus auth-related options passed through to the auth hook.
+ * @param props - Configuration and appearance overrides (e.g., className, socialLayout, socialPosition) plus auth-related options forwarded to the auth hook.
  * @returns The sign-up form React element.
  */
 export function SignUp({

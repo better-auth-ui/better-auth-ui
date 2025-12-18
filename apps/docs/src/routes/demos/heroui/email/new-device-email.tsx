@@ -24,6 +24,11 @@ const html = await render(
   />
 )
 
+/**
+ * Renders an iframe that previews the pre-rendered "New Device" email HTML.
+ *
+ * @returns A JSX element containing an iframe with the email HTML set as `srcDoc`.
+ */
 function RouteComponent() {
   return (
     <iframe

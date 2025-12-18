@@ -6,6 +6,11 @@ export const Route = createFileRoute("/demos/heroui/forgot-password")({
 
 import { ForgotPassword } from "@better-auth-ui/heroui"
 
+/**
+ * Renders a centered container that displays the ForgotPassword UI.
+ *
+ * @returns The JSX element containing a vertically stacked, centered container with the `ForgotPassword` component.
+ */
 function RouteComponent() {
   return (
     <div className="flex flex-col p-4 md:p-6 my-auto items-center">

@@ -19,6 +19,11 @@ const html = await render(
   />
 )
 
+/**
+ * Renders a preview iframe containing the pre-rendered Reset Password email HTML.
+ *
+ * @returns A JSX element rendering an iframe whose `srcDoc` is the generated email HTML.
+ */
 function RouteComponent() {
   return (
     <iframe

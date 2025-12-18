@@ -21,12 +21,16 @@ export type AuthProps = AnyAuthConfig & {
 }
 
 /**
- * Selects and renders the appropriate authentication view component.
+ * Render the appropriate authentication view based on an explicit `view` or a route `path`.
  *
- * @param path - Route path used to resolve an auth view when `view` is not provided
- * @param socialLayout - Social layout to apply to the component
- * @param socialPosition - Social position to apply to the component
- * @param view - Explicit auth view to render (e.g., "signIn", "signUp")
+ * @param className - Optional CSS class applied to the rendered view container
+ * @param path - Route path used to resolve which auth view to render when `view` is not provided
+ * @param socialLayout - Layout for social provider buttons when applicable
+ * @param socialPosition - Positioning for social provider buttons when applicable
+ * @param view - Explicit auth view to render (e.g., `"signIn"`, `"signUp"`)
+ * @param config - Remaining authentication configuration passed through to the view component
+ * @returns The rendered authentication view element
+ * @throws Error If neither `view` nor `path` is provided, or if the resolved view is not one of the valid auth views
  */
 export function Auth({
   className,

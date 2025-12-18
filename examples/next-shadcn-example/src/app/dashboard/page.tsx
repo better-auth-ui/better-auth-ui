@@ -4,6 +4,11 @@ import { useAuthenticate } from "@better-auth-ui/shadcn/react"
 import { Spinner } from "@heroui/react"
 import Link from "next/link"
 
+/**
+ * Render the dashboard UI: show a full-page loading spinner while authentication is pending, then greet the authenticated user by email and present a Sign Out link.
+ *
+ * @returns A React element that displays a centered spinner when no session exists, or a centered greeting with `sessionData.user.email` and a link to `/auth/sign-out` when authenticated.
+ */
 export default function Dashboard() {
   const { data: sessionData } = useAuthenticate()
 

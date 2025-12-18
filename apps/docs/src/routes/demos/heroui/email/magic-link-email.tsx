@@ -17,6 +17,11 @@ const html = await render(
   />
 )
 
+/**
+ * Renders an iframe displaying the pre-rendered Magic Link email HTML preview.
+ *
+ * @returns A JSX element containing an iframe whose `srcDoc` is the rendered email HTML.
+ */
 function RouteComponent() {
   return (
     <iframe

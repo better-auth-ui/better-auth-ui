@@ -8,6 +8,12 @@ import type { ReactNode } from "react"
 import { authClient } from "@/lib/auth-client"
 import { AuthProvider } from "./auth/auth-provider"
 
+/**
+ * Wraps application content with theme and authentication providers.
+ *
+ * @param children - React nodes to be rendered inside the providers
+ * @returns The provided children wrapped with ThemeProvider and AuthProvider, wiring authentication navigation to the Next.js router
+ */
 export function Providers({ children }: { children: ReactNode }) {
   const router = useRouter()
 

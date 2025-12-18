@@ -3,6 +3,14 @@ import { notFound } from "next/navigation"
 
 import { Auth } from "@/components/auth/auth"
 
+/**
+ * Render the authentication page corresponding to the route `path`.
+ *
+ * Awaits the route `params`, validates that `path` is one of the allowed auth view paths, and returns a centered container rendering the `Auth` component for that `path`.
+ *
+ * @param params - Promise resolving to the route parameters object containing `path`
+ * @returns The React element for the authenticated route view; if `path` is not allowed, triggers a 404 response
+ */
 export default async function AuthPage({
   params
 }: {

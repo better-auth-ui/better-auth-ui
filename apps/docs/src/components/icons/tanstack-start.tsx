@@ -1,5 +1,11 @@
 import type { ComponentPropsWithRef } from "react"
 
+/**
+ * Renders the TanStack Start SVG icon.
+ *
+ * @param props - SVG element props forwarded to the rendered <svg> to allow customization (e.g., className, style, aria-attributes, event handlers)
+ * @returns The SVG element for the TanStack Start icon
+ */
 export function TanStackStart(props: ComponentPropsWithRef<"svg">) {
   return (
     <svg
