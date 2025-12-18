@@ -8,30 +8,31 @@
     "preview": "vite preview"
   },
   "devDependencies": {
-    "@tanstack/devtools-vite": "^0.3.11",
-    "@types/node": "^24.10.1",
+    "@tanstack/devtools-vite": "^0.3.12",
+    "@types/node": "^24.10.4",
     "@types/react": "^19.2.7",
     "@types/react-dom": "^19.2.0",
-    "@vitejs/plugin-react": "^5.0.4",
+    "@vitejs/plugin-react": "^5.1.2",
     "typescript": "^5.7.2",
-    "vite": "^7.1.7"
+    "vite": "^7.2.7"
   },
   "dependencies": {
     "@better-auth-ui/heroui": "workspace:*",
     "@heroui/react": "^3.0.0-beta.2",
     "@heroui/styles": "^3.0.0-beta.2",
-    "@tailwindcss/vite": "^4.0.6",
-    "@tanstack/react-devtools": "^0.8.2",
-    "@tanstack/react-router": "^1.139.10",
-    "@tanstack/react-router-devtools": "^1.139.10",
-    "@tanstack/react-start": "^1.139.10",
-    "@tanstack/router-plugin": "^1.139.10",
-    "better-auth": "^1.4.3",
+    "@tailwindcss/vite": "^4.1.18",
+    "@tanstack/react-devtools": "^0.8.4",
+    "@tanstack/react-router": "^1.141.2",
+    "@tanstack/react-router-devtools": "^1.141.2",
+    "@tanstack/react-start": "^1.141.3",
+    "@tanstack/router-plugin": "^1.141.2",
+    "better-auth": "^1.4.7",
     "next-themes": "^0.4.6",
-    "react": "^19.2.0",
-    "react-dom": "^19.2.0",
+    "react": "^19.2.3",
+    "react-dom": "^19.2.3",
+    "sonner": "^2.0.7",
     "tailwind-variants": "^3.2.2",
-    "tailwindcss": "^4.0.6",
+    "tailwindcss": "^4.1.18",
     "vite-tsconfig-paths": "^5.1.4"
   }
 }

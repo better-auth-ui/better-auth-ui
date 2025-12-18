@@ -1,0 +1,84 @@
+---
+title: Next.js
+description: Integrate Better Auth UI with Next.js
+icon: NextJS
+---
+
+import { Step, Steps } from 'fumadocs-ui/components/steps';
+
+## Prerequisites
+
+Make sure you've completed the [Quick Start](/docs/shadcn) guide first.
+
+## Integration
+
+<Steps>
+<Step>
+### Configure AuthProvider
+
+Configure `AuthProvider` with Next.js navigation.
+
+<Tabs groupId="shadcn-installation" items={["Registry", "Package"]}>
+  <Tab value="Registry">
+```tsx title="components/providers.tsx" file=<rootDir>/../../examples/next-shadcn-registry-example/src/components/providers.tsx
+```
+</Tab>
+  <Tab value="Package">
+```tsx title="components/providers.tsx" file=<rootDir>/../../examples/next-shadcn-example/src/components/providers.tsx
+```
+  </Tab>
+</Tabs>
+
+The `navigate`, `replace`, and `Link` props integrate with Next.js's navigation system.
+
+</Step>
+<Step>
+### Update the Root Layout
+
+Wrap your application with the `Providers` component in your root layout.
+
+```tsx title="app/layout.tsx" file=<rootDir>/../../examples/next-shadcn-example/src/app/layout.tsx
+```
+
+</Step>
+<Step>
+### Create the Auth Page
+
+Create a dynamic auth page that renders the appropriate authentication view based on the path.
+
+<Tabs groupId="shadcn-installation" items={["Registry", "Package"]}>
+  <Tab value="Registry">
+```tsx title="app/auth/[path]/page.tsx" file=<rootDir>/../../examples/next-shadcn-registry-example/src/app/auth/[path]/page.tsx
+```
+</Tab>
+  <Tab value="Package">
+```tsx title="app/auth/[path]/page.tsx" file=<rootDir>/../../examples/next-shadcn-example/src/app/auth/[path]/page.tsx
+```
+</Tab>
+</Tabs>
+
+The `viewPaths.auth` object contains all valid auth paths: `sign-in`, `sign-up`, `sign-out`, `forgot-password`, `reset-password`, and `magic-link`.
+
+</Step>
+</Steps>
+
+## Protecting Routes
+
+Use the `useAuthenticate` hook to protect routes and access session data.
+
+<Tabs groupId="shadcn-installation" items={["Registry", "Package"]}>
+  <Tab value="Registry">
+```tsx title="app/dashboard/page.tsx" file=<rootDir>/../../examples/next-shadcn-registry-example/src/app/dashboard/page.tsx
+```
+</Tab>
+  <Tab value="Package">
+```tsx title="app/dashboard/page.tsx" file=<rootDir>/../../examples/next-shadcn-example/src/app/dashboard/page.tsx
+```
+</Tab>
+</Tabs>
+
+The `useAuthenticate` hook will automatically redirect unauthenticated users to the sign-in page.
+
+## Example Project
+
+For a complete working example, check out the [next-shadcn-example](https://github.com/better-auth-ui/better-auth-ui/tree/main/examples/next-shadcn-example) in the repository.

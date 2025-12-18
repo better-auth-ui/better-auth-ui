@@ -1,0 +1,8 @@
+@import "tailwindcss";
+@import "@heroui/styles";
+@import "@better-auth-ui/heroui/styles";
+
+/* Override md breakpoint for iframe demos - show desktop styles at smaller widths */
+@theme inline {
+  --breakpoint-md: 28rem;
+}

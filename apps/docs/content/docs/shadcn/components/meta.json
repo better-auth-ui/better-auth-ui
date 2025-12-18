@@ -1,0 +1,26 @@
+{
+  "icon": "Box",
+  "defaultOpen": true,
+  "pages": [
+    "auth-provider",
+    "---User---",
+    "user-avatar",
+    "user-button",
+    "---Auth---",
+    "auth",
+    "sign-in",
+    "sign-up",
+    "sign-out",
+    "forgot-password",
+    "reset-password",
+    "magic-link",
+    "---Email---",
+    "email-verification-email",
+    "magic-link-email",
+    "reset-password-email",
+    "password-changed-email",
+    "email-changed-email",
+    "otp-email",
+    "new-device-email"
+  ]
+}

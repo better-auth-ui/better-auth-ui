@@ -1,0 +1,7 @@
+{
+  "title": "shadcn/ui",
+  "icon": "Shadcn",
+  "description": "shadcn/ui components",
+  "root": true,
+  "pages": ["index", "integrations", "components"]
+}

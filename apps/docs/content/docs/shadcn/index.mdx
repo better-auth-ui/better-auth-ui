@@ -1,0 +1,64 @@
+---
+title: Quick Start
+description: Getting Started with Better Auth UI for shadcn/ui
+icon: Rocket
+---
+
+import { Step, Steps } from 'fumadocs-ui/components/steps'
+import { Cards, Card } from 'fumadocs-ui/components/card'
+
+## Prerequisites
+
+Before you start, make sure you have the following prerequisites integrated into your project:
+
+- [Better Auth](https://www.better-auth.com/docs/installation)
+- [shadcn/ui](https://ui.shadcn.com/docs/installation)
+- [Sonner](https://ui.shadcn.com/docs/components/sonner)
+
+## Installation
+
+<Steps>
+<Step>
+### Install the components
+
+Install the `shadcn/ui` components using shadcn CLI or your preferred package manager.
+
+<Tabs groupId="shadcn-installation" items={["Registry", "Package"]}>
+  <Tab value="Registry">
+```npm
+npx shadcn@latest add https://better-auth-ui.com/r/auth.json
+```
+</Tab>
+  <Tab value="Package">
+```package-install
+@better-auth-ui/shadcn@latest
+```
+  </Tab>
+</Tabs>
+
+</Step>
+<Step>
+### Configure TailwindCSS
+
+**Please skip this step if you are using the registry method.**
+
+Add the following `@import` to your global css.
+
+```css title="styles/globals.css"
+@import "@better-auth-ui/shadcn/styles";
+```
+</Step>
+</Steps>
+
+## Next Steps
+
+Follow a framework-specific guide to integrate Better Auth UI into your project.
+
+<Cards>
+  <Card icon={<TanStackStart />} title="TanStack Start" href="/docs/shadcn/integrations/tanstack-start">
+    Integrate Better Auth UI with TanStack Start
+  </Card>
+  <Card icon={<NextJS />} title="Next.js" href="/docs/shadcn/integrations/nextjs">
+    Integrate Better Auth UI with Next.js
+  </Card>
+</Cards>

@@ -37,7 +37,7 @@ function RootDocument({ children }: { children: ReactNode }) {
         <HeadContent />
       </head>
 
-      <body>
+      <body className="antialiased">
         <Providers>{children}</Providers>
 
         <TanStackDevtools

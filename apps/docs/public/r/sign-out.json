@@ -1,0 +1,21 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "sign-out",
+  "type": "registry:component",
+  "title": "Sign Out",
+  "description": "A component that signs the user out when mounted and displays a loading state.",
+  "dependencies": ["@better-auth-ui/react@workspace:*", "better-auth"],
+  "registryDependencies": ["card", "spinner"],
+  "files": [
+    {
+      "path": "src/components/auth/sign-out.tsx",
+      "content": "\"use client\"\n\nimport type { AnyAuthConfig } from \"@better-auth-ui/react\"\nimport { useEffect, useRef } from \"react\"\n\nimport { Card, CardContent } from \"@/components/ui/card\"\nimport { Spinner } from \"@/components/ui/spinner\"\nimport { useSignOut } from \"@/hooks/auth/use-sign-out\"\nimport { cn } from \"@/lib/utils\"\n\nexport type SignOutProps = AnyAuthConfig & {\n  className?: string\n}\n\n/**\n * Signs the current user out when mounted and displays a loading card while the operation completes.\n */\nexport function SignOut({ className, ...config }: SignOutProps) {\n  const { signOut } = useSignOut(config)\n\n  const hasSignedOut = useRef(false)\n\n  useEffect(() => {\n    if (hasSignedOut.current) return\n    hasSignedOut.current = true\n\n    signOut()\n  }, [signOut])\n\n  return (\n    <Card\n      className={cn(\n        \"w-full max-w-sm py-4 md:py-6 gap-6 bg-transparent border-none\",\n        className\n      )}\n    >\n      <CardContent className=\"flex items-center justify-center min-h-[200px]\">\n        <Spinner className=\"mx-auto my-auto\" />\n      </CardContent>\n    </Card>\n  )\n}\n",
+      "type": "registry:component"
+    },
+    {
+      "path": "../react/src/hooks/auth/use-sign-out.ts",
+      "content": "import type { AnyAuthConfig } from \"@better-auth-ui/react\"\nimport { useCallback } from \"react\"\n\nimport { useAuth } from \"./use-auth\"\n\nexport function useSignOut(config?: AnyAuthConfig) {\n  const { authClient, basePaths, viewPaths, replace, toast } = useAuth(config)\n  const { refetch } = authClient.useSession()\n\n  const signOut = useCallback(async () => {\n    const { error } = await authClient.signOut({\n      fetchOptions: { disableSignal: true }\n    })\n\n    if (error) {\n      toast.error(error.message || error.statusText)\n    }\n\n    await refetch()\n\n    replace(`${basePaths.auth}/${viewPaths.auth.signIn}`)\n  }, [\n    authClient,\n    basePaths.auth,\n    viewPaths.auth.signIn,\n    replace,\n    refetch,\n    toast.error\n  ])\n\n  return { signOut }\n}\n",
+      "type": "registry:hook"
+    }
+  ]
+}

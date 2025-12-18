@@ -1,16 +1,19 @@
-export {
-  type AuthView,
-  authPaths,
-  authViewPaths,
-  viewPaths
-} from "@better-auth-ui/core"
+"use client"
 
-export * from "./components/auth-provider"
-export * from "./components/emails"
+export * from "./components/auth/auth-provider"
+export * from "./components/email"
 export * from "./components/icons"
-export * from "./hooks/use-auth"
-export * from "./hooks/use-authenticate"
-export * from "./hooks/use-hydrated"
+export * from "./hooks/auth/use-auth"
+export * from "./hooks/auth/use-authenticate"
+export * from "./hooks/auth/use-forgot-password"
+export * from "./hooks/auth/use-redirect-to"
+export * from "./hooks/auth/use-reset-password"
+export * from "./hooks/auth/use-sign-in-email"
+export * from "./hooks/auth/use-sign-in-magic-link"
+export * from "./hooks/auth/use-sign-in-social"
+export * from "./hooks/auth/use-sign-out"
+export * from "./hooks/auth/use-sign-up-email"
+export * from "./lib/auth-client"
+export * from "./lib/auth-config"
+export * from "./lib/auth-context"
 export * from "./lib/provider-icons"
-export * from "./lib/utils"
-export * from "./types/auth-client"

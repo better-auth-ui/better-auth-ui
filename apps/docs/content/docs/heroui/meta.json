@@ -1,0 +1,7 @@
+{
+  "title": "HeroUI v3",
+  "icon": "HeroUI",
+  "description": "HeroUI components",
+  "root": true,
+  "pages": ["index", "integrations", "components"]
+}

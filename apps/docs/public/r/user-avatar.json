@@ -1,0 +1,25 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "user-avatar",
+  "type": "registry:component",
+  "title": "User Avatar",
+  "description": "Renders the current user's avatar using session data. Shows a skeleton while loading and falls back to initials when no image is available.",
+  "dependencies": [
+    "@better-auth-ui/react@workspace:*",
+    "better-auth",
+    "lucide-react"
+  ],
+  "registryDependencies": ["avatar", "skeleton"],
+  "files": [
+    {
+      "path": "src/components/user/user-avatar.tsx",
+      "content": "\"use client\"\n\nimport type { AnyAuthConfig } from \"@better-auth-ui/react\"\nimport type { User } from \"better-auth\"\nimport { User2 } from \"lucide-react\"\nimport type { ReactNode } from \"react\"\n\nimport { Avatar, AvatarFallback, AvatarImage } from \"@/components/ui/avatar\"\nimport { Skeleton } from \"@/components/ui/skeleton\"\nimport { useAuth } from \"@/hooks/auth/use-auth\"\nimport { cn } from \"@/lib/utils\"\n\nexport type UserAvatarProps = AnyAuthConfig & {\n  className?: string\n  fallback?: ReactNode\n  isPending?: boolean\n  rounded?: boolean\n  user?: User & { username?: string | null }\n}\n\n/**\n * Renders the current user's avatar using session data.\n * Shows a skeleton while loading and falls back to initials when no image is available.\n */\nexport function UserAvatar({\n  className,\n  user,\n  isPending,\n  fallback,\n  rounded,\n  ...config\n}: UserAvatarProps) {\n  const { authClient } = useAuth(config)\n\n  const { data: sessionData, isPending: sessionPending } =\n    authClient.useSession()\n\n  if ((isPending || sessionPending) && !user) {\n    return (\n      <Skeleton\n        className={cn(\n          \"size-8\",\n          rounded ? \"rounded-full\" : \"rounded-lg\",\n          className\n        )}\n      />\n    )\n  }\n\n  const resolvedUser = user ?? sessionData?.user\n\n  const initials =\n    resolvedUser?.username?.slice(0, 2).toUpperCase() ||\n    resolvedUser?.name?.slice(0, 2).toUpperCase() ||\n    resolvedUser?.email?.slice(0, 2).toUpperCase()\n\n  return (\n    <Avatar\n      className={cn(\n        \"size-8\",\n        rounded ? \"rounded-full\" : \"rounded-lg\",\n        className\n      )}\n    >\n      <AvatarImage\n        src={resolvedUser?.image ?? undefined}\n        alt={\n          resolvedUser?.username || resolvedUser?.name || resolvedUser?.email\n        }\n      />\n\n      <AvatarFallback\n        className={cn(\n          \"text-foreground text-sm font-normal\",\n          rounded ? \"rounded-full\" : \"rounded-lg\"\n        )}\n      >\n        {initials ? initials : fallback || <User2 className=\"size-4\" />}\n      </AvatarFallback>\n    </Avatar>\n  )\n}\n",
+      "type": "registry:component"
+    },
+    {
+      "path": "src/hooks/auth/use-auth.tsx",
+      "content": "import {\n  type AnyAuthConfig,\n  type AuthConfig,\n  AuthContext\n} from \"@better-auth-ui/react\"\nimport { deepmerge, defaultConfig } from \"@better-auth-ui/react/core\"\nimport { useContext } from \"react\"\nimport { toast } from \"sonner\"\n\nconst extendConfig: AnyAuthConfig = {\n  toast,\n  Link: (props) => <a {...props} />\n}\n\n/**\n * Constructs the effective AuthConfig by merging defaults, any AuthContext-provided config, and the optional `config` overrides.\n *\n * @param config - Partial configuration overrides applied on top of context and defaults\n * @returns The final `AuthConfig` with a non-optional `authClient`\n * @throws If the resulting config does not include an `authClient`\n */\nexport function useAuth(config?: AnyAuthConfig) {\n  const context = useContext(AuthContext)\n\n  const authConfig = deepmerge(\n    deepmerge(defaultConfig as AnyAuthConfig, extendConfig),\n    deepmerge(context || {}, config || {})\n  ) as AuthConfig\n\n  if (authConfig.authClient === undefined) {\n    throw new Error(\"[Better Auth UI] authClient is required\")\n  }\n\n  return authConfig\n}\n",
+      "type": "registry:hook"
+    }
+  ]
+}

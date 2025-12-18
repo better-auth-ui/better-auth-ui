@@ -17,9 +17,13 @@
       "import": "./dist/index.js",
       "types": "./dist/index.d.ts"
     },
-    "./server": {
-      "import": "./dist/server.js",
-      "types": "./dist/server.d.ts"
+    "./core": {
+      "import": "./dist/core.js",
+      "types": "./dist/core.d.ts"
+    },
+    "./react": {
+      "import": "./dist/react-exports.js",
+      "types": "./dist/react-exports.d.ts"
     },
     "./styles": "./dist/styles.css"
   },
@@ -30,25 +34,27 @@
     "@testing-library/react": "^16.1.0",
     "@testing-library/user-event": "^14.5.2",
     "@types/react": "^19.2.7",
-    "@vitejs/plugin-react": "^5.0.4",
-    "@vitest/browser-playwright": "^4.0.14",
-    "better-auth": "^1.4.3",
+    "@vitejs/plugin-react": "^5.1.2",
+    "@vitest/browser-playwright": "^4.0.15",
+    "better-auth": "^1.4.7",
     "cpy-cli": "^6.0.0",
     "playwright": "^1.57.0",
-    "react": "^19.2.0",
-    "react-dom": "^19.2.0",
+    "react": "^19.2.3",
+    "react-dom": "^19.2.3",
     "sonner": "^2.0.7",
-    "vitest": "^4.0.14"
+    "vitest": "^4.0.15"
   },
   "dependencies": {
     "@better-auth-ui/core": "workspace:*",
-    "@better-auth-ui/react": "workspace:*"
+    "@better-auth-ui/react": "workspace:*",
+    "clsx": "^2.1.1",
+    "tailwind-merge": "^3.1.0"
   },
   "peerDependencies": {
     "@heroicons/react": ">=2.2.0",
     "@heroui/react": ">=3.0.0-beta.2",
     "@heroui/styles": ">=3.0.0-beta.2",
-    "better-auth": ">=1.4.2",
+    "better-auth": ">=1.4.6",
     "react": ">=18.0.0",
     "react-dom": ">=18.0.0",
     "sonner": ">=2.0.0"

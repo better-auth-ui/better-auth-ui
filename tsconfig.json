@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "declaration": true,
-    "isolatedModules": true,
+    "isolatedModules": false,
     "lib": ["esnext", "dom", "dom.iterable"],
     "module": "esnext",
     "moduleResolution": "bundler",

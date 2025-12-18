@@ -3,8 +3,9 @@ import { renderHook } from "@testing-library/react"
 import { createAuthClient } from "better-auth/react"
 import type { ReactNode } from "react"
 import { afterEach, describe, expect, it, vi } from "vitest"
-import { AuthProvider } from "../../src/components/auth-provider"
-import { useAuth } from "../../src/hooks/use-auth"
+import { AuthProvider } from "../../src/components/auth/auth-provider"
+import { useAuth } from "../../src/hooks/auth/use-auth"
+import { useRedirectTo } from "../../src/hooks/auth/use-redirect-to"
 
 // Mock better-auth
 vi.mock("better-auth/react", () => ({
@@ -161,9 +162,9 @@ describe("useAuth", () => {
         <AuthProvider authClient={mockAuthClient}>{children}</AuthProvider>
       )
 
-      const { result } = renderHook(() => useAuth(), { wrapper })
+      const { result } = renderHook(() => useRedirectTo(), { wrapper })
 
-      expect(result.current.redirectTo).toBe("/dashboard")
+      expect(result.current).toBe("/dashboard")
     })
 
     it("should reject redirectTo with double slashes", () => {
@@ -173,9 +174,9 @@ describe("useAuth", () => {
         <AuthProvider authClient={mockAuthClient}>{children}</AuthProvider>
       )
 
-      const { result } = renderHook(() => useAuth(), { wrapper })
+      const { result } = renderHook(() => useRedirectTo(), { wrapper })
 
-      expect(result.current.redirectTo).toBe("/")
+      expect(result.current).toBe("/")
     })
 
     it("should reject redirectTo with scheme", () => {
@@ -185,9 +186,9 @@ describe("useAuth", () => {
         <AuthProvider authClient={mockAuthClient}>{children}</AuthProvider>
       )
 
-      const { result } = renderHook(() => useAuth(), { wrapper })
+      const { result } = renderHook(() => useRedirectTo(), { wrapper })
 
-      expect(result.current.redirectTo).toBe("/")
+      expect(result.current).toBe("/")
     })
 
     it("should reject redirectTo not starting with slash", () => {
@@ -197,9 +198,9 @@ describe("useAuth", () => {
         <AuthProvider authClient={mockAuthClient}>{children}</AuthProvider>
       )
 
-      const { result } = renderHook(() => useAuth(), { wrapper })
+      const { result } = renderHook(() => useRedirectTo(), { wrapper })
 
-      expect(result.current.redirectTo).toBe("/")
+      expect(result.current).toBe("/")
     })
 
     it("should accept complex valid paths", () => {
@@ -213,9 +214,9 @@ describe("useAuth", () => {
         <AuthProvider authClient={mockAuthClient}>{children}</AuthProvider>
       )
 
-      const { result } = renderHook(() => useAuth(), { wrapper })
+      const { result } = renderHook(() => useRedirectTo(), { wrapper })
 
-      expect(result.current.redirectTo).toBe("/dashboard/settings?tab=profile")
+      expect(result.current).toBe("/dashboard/settings?tab=profile")
     })
 
     it("should handle URL-encoded redirectTo", () => {
@@ -225,9 +226,9 @@ describe("useAuth", () => {
         <AuthProvider authClient={mockAuthClient}>{children}</AuthProvider>
       )
 
-      const { result } = renderHook(() => useAuth(), { wrapper })
+      const { result } = renderHook(() => useRedirectTo(), { wrapper })
 
-      expect(result.current.redirectTo).toBe("/dashboard/settings")
+      expect(result.current).toBe("/dashboard/settings")
     })
 
     it("should trim whitespace from redirectTo", () => {
@@ -237,9 +238,9 @@ describe("useAuth", () => {
         <AuthProvider authClient={mockAuthClient}>{children}</AuthProvider>
       )
 
-      const { result } = renderHook(() => useAuth(), { wrapper })
+      const { result } = renderHook(() => useRedirectTo(), { wrapper })
 
-      expect(result.current.redirectTo).toBe("/dashboard")
+      expect(result.current).toBe("/dashboard")
     })
 
     it("should reject redirectTo with backslash prefix", () => {
@@ -249,10 +250,10 @@ describe("useAuth", () => {
         <AuthProvider authClient={mockAuthClient}>{children}</AuthProvider>
       )
 
-      const { result } = renderHook(() => useAuth(), { wrapper })
+      const { result } = renderHook(() => useRedirectTo(), { wrapper })
 
       // Should fall back to default since backslash can be normalized to forward slash by browsers
-      expect(result.current.redirectTo).toBe("/")
+      expect(result.current).toBe("/")
     })
   })
 

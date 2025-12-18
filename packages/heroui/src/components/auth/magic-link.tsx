@@ -1,171 +1,147 @@
-"use client"
-
-import { type AuthConfig, cn, useAuth } from "@better-auth-ui/react"
+import {
+  type AnyAuthConfig,
+  useSignInMagicLink,
+  useSignInSocial
+} from "@better-auth-ui/react"
 import {
   Button,
   Card,
+  Description,
   FieldError,
+  Fieldset,
   Form,
   Input,
   Label,
-  Separator,
   Spinner,
   TextField
 } from "@heroui/react"
-import type { DeepPartial } from "better-auth/client/plugins"
-import { type FormEvent, useState } from "react"
-import { toast } from "sonner"
 
+import { useAuth } from "../../hooks/use-auth"
+import { cn } from "../../lib/utils"
+import { FieldSeparator } from "./field-separator"
 import { MagicLinkButton } from "./magic-link-button"
 import { ProviderButtons, type SocialLayout } from "./provider-buttons"
 
-const magicLinkLocalization = {
-  ...MagicLinkButton.localization,
-  ...ProviderButtons.localization,
-  EMAIL: "Email",
-  EMAIL_PLACEHOLDER: "Enter your email",
-  MAGIC_LINK_SENT: "Magic link sent to your email",
-  NEED_TO_CREATE_AN_ACCOUNT: "Need to create an account?",
-  OR: "OR",
-  SEND_MAGIC_LINK: "Send Magic Link",
-  SIGN_IN: "Sign In",
-  SIGN_UP: "Sign Up"
-}
-
-export type MagicLinkLocalization = typeof magicLinkLocalization
-
-export type MagicLinkProps = DeepPartial<AuthConfig> & {
+export type MagicLinkProps = AnyAuthConfig & {
   className?: string
-  localization?: Partial<MagicLinkLocalization>
   socialLayout?: SocialLayout
+  socialPosition?: "top" | "bottom"
 }
 
 /**
  * Render a card-based sign-in form that sends an email magic link and optionally shows social provider buttons.
- *
- * Submits the entered email to the auth client, displays success or error toasts, and supports customizable localization and social layout via props.
- *
- * @param props - Component props to configure appearance, localization overrides, social layout, and auth-related options.
- * @returns A JSX element containing the magic-link sign-in user interface and related controls.
  */
-export function MagicLink({ className, ...props }: MagicLinkProps) {
-  const localization = { ...MagicLink.localization, ...props.localization }
+export function MagicLink({
+  className,
+  socialLayout,
+  socialPosition = "bottom",
+  ...config
+}: MagicLinkProps) {
+  const context = useAuth(config)
 
-  const {
-    authClient,
-    basePaths,
-    baseURL,
-    magicLink,
-    socialProviders,
-    redirectTo,
-    viewPaths,
-    Link
-  } = useAuth(props)
+  const { basePaths, localization, socialProviders, viewPaths, Link } = context
 
-  const [isPending, setIsPending] = useState(false)
+  const [{ email }, signInMagicLink, magicLinkPending] =
+    useSignInMagicLink(context)
+
+  const [_, signInSocial, socialPending] = useSignInSocial(context)
+
+  const isPending = magicLinkPending || socialPending
+
   const showSeparator = socialProviders && socialProviders.length > 0
 
-  const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    setIsPending(true)
-
-    const form = e.currentTarget
-    const formData = new FormData(form)
-
-    const email = formData.get("email") as string
-    const callbackURL = `${baseURL}${redirectTo}`
-
-    const { error } = await authClient.signIn.magicLink({
-      email,
-      callbackURL
-    })
-
-    if (error) {
-      toast.error(error.message)
-      setIsPending(false)
-      return
-    }
-
-    form.reset()
-
-    toast.success(localization.MAGIC_LINK_SENT)
-    setIsPending(false)
-  }
-
   return (
-    <Card className={cn("w-full max-w-sm md:p-6 gap-6", className)}>
-      <Card.Header className="text-xl font-medium">
-        {localization.SIGN_IN}
-      </Card.Header>
-
+    <Card className={cn("w-full max-w-sm p-4 md:p-6", className)}>
       <Card.Content>
-        <Form className="flex flex-col gap-6" onSubmit={onSubmit}>
-          <TextField
-            name="email"
-            type="email"
-            autoComplete="email"
-            isDisabled={isPending}
-          >
-            <Label>{localization.EMAIL}</Label>
+        <Fieldset className="gap-4">
+          <Fieldset.Legend className="text-xl">
+            {localization.auth.signIn}
+          </Fieldset.Legend>
 
-            <Input placeholder={localization.EMAIL_PLACEHOLDER} required />
+          <Description />
 
-            <FieldError />
-          </TextField>
-
-          <div className="flex flex-col gap-4">
-            <Button type="submit" className="w-full" isPending={isPending}>
-              {isPending && <Spinner color="current" size="sm" />}
-
-              {localization.SEND_MAGIC_LINK}
-            </Button>
-
-            {magicLink && (
-              <MagicLinkButton
-                view="magicLink"
-                isPending={isPending}
-                localization={localization}
-              />
-            )}
-          </div>
-
-          {showSeparator && (
+          {socialPosition === "top" && (
             <>
-              <div className="flex items-center gap-4">
-                <Separator className="flex-1 bg-surface-quaternary" />
+              {socialProviders && socialProviders.length > 0 && (
+                <ProviderButtons
+                  {...config}
+                  socialLayout={socialLayout}
+                  signInSocial={signInSocial}
+                  isPending={isPending}
+                />
+              )}
 
-                <p className="text-xs text-muted shrink-0">{localization.OR}</p>
-
-                <Separator className="flex-1 bg-surface-quaternary" />
-              </div>
-
-              <div className="flex flex-col gap-4">
-                {socialProviders && socialProviders.length > 0 && (
-                  <ProviderButtons
-                    {...props}
-                    isPending={isPending}
-                    setIsPending={setIsPending}
-                    localization={localization}
-                  />
-                )}
-              </div>
+              {showSeparator && (
+                <FieldSeparator>{localization.auth.or}</FieldSeparator>
+              )}
             </>
           )}
 
-          <p className="text-sm justify-center flex gap-2 items-center">
-            {localization.NEED_TO_CREATE_AN_ACCOUNT}
+          <Form action={signInMagicLink} className="flex flex-col gap-4">
+            <Fieldset.Group>
+              <TextField
+                defaultValue={email}
+                name="email"
+                type="email"
+                autoComplete="email"
+                isDisabled={isPending}
+              >
+                <Label>{localization.auth.email}</Label>
+
+                <Input
+                  className="text-base md:text-sm"
+                  placeholder={localization.auth.emailPlaceholder}
+                  required
+                />
+
+                <FieldError className="text-wrap" />
+              </TextField>
+            </Fieldset.Group>
+
+            <Fieldset.Actions className="flex-col gap-3">
+              <Button type="submit" className="w-full" isPending={isPending}>
+                {isPending && <Spinner color="current" size="sm" />}
+
+                {localization.auth.sendMagicLink}
+              </Button>
+
+              <MagicLinkButton
+                {...config}
+                view="magicLink"
+                isPending={isPending}
+              />
+            </Fieldset.Actions>
+          </Form>
+
+          {socialPosition === "bottom" && (
+            <>
+              {showSeparator && (
+                <FieldSeparator>{localization.auth.or}</FieldSeparator>
+              )}
+
+              {socialProviders && socialProviders.length > 0 && (
+                <ProviderButtons
+                  {...config}
+                  socialLayout={socialLayout}
+                  signInSocial={signInSocial}
+                  isPending={isPending}
+                />
+              )}
+            </>
+          )}
+
+          <Description className="flex justify-center gap-1.5 text-foreground text-sm">
+            {localization.auth.needToCreateAnAccount}
 
             <Link
               href={`${basePaths.auth}/${viewPaths.auth.signUp}`}
-              className="link link--underline-always text-accent"
+              className="link link--underline-hover text-accent"
             >
-              {localization.SIGN_UP}
+              {localization.auth.signUp}
             </Link>
-          </p>
-        </Form>
+          </Description>
+        </Fieldset>
       </Card.Content>
     </Card>
   )
 }
-
-MagicLink.localization = magicLinkLocalization

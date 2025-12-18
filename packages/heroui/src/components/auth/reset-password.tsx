@@ -1,148 +1,184 @@
-"use client"
-
-import { type AuthConfig, cn, useAuth } from "@better-auth-ui/react"
+import { type AnyAuthConfig, useResetPassword } from "@better-auth-ui/react"
+import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline"
 import {
   Button,
   Card,
+  Description,
   FieldError,
+  Fieldset,
   Form,
-  Input,
+  InputGroup,
   Label,
   Spinner,
   TextField
 } from "@heroui/react"
-import type { DeepPartial } from "better-auth/client/plugins"
-import { type FormEvent, useEffect, useState } from "react"
+import { useEffect, useState } from "react"
 import { toast } from "sonner"
 
-const resetPasswordLocalization = {
-  INVALID_RESET_PASSWORD_TOKEN: "Invalid reset password token",
-  NEW_PASSWORD_PLACEHOLDER: "Enter your new password",
-  PASSWORD: "Password",
-  PASSWORD_RESET_SUCCESS: "Password reset successfully",
-  REMEMBER_YOUR_PASSWORD: "Remember your password?",
-  RESET_PASSWORD: "Reset Password",
-  SIGN_IN: "Sign In"
-}
+import { useAuth } from "../../hooks/use-auth"
+import { cn } from "../../lib/utils"
 
-export type ResetPasswordLocalization = typeof resetPasswordLocalization
-
-export type ResetPasswordProps = DeepPartial<AuthConfig> & {
+export type ResetPasswordProps = AnyAuthConfig & {
   className?: string
-  localization?: Partial<ResetPasswordLocalization>
 }
 
 /**
  * Renders a password reset form that validates a token from the URL and submits a new password to the auth client.
- *
- * @param props - Component props; may include `className` for container styling and `localization` to override displayed strings.
- * @returns The rendered reset password form element.
  */
-export function ResetPassword({ className, ...props }: ResetPasswordProps) {
-  const localization = {
-    ...ResetPassword.localization,
-    ...props.localization
-  }
+export function ResetPassword({ className, ...config }: ResetPasswordProps) {
+  const context = useAuth(config)
 
-  const { authClient, basePaths, viewPaths, navigate, Link } = useAuth(props)
+  const {
+    basePaths,
+    emailAndPassword,
+    localization,
+    viewPaths,
+    navigate,
+    Link
+  } = context
 
-  const [isPending, setIsPending] = useState(false)
-  const [token, setToken] = useState<string | null>(null)
+  const [{ password, confirmPassword }, resetPassword, isPending] =
+    useResetPassword(context)
+
+  const [isPasswordVisible, setIsPasswordVisible] = useState(false)
+  const [isConfirmPasswordVisible, setIsConfirmPasswordVisible] =
+    useState(false)
 
   useEffect(() => {
     const searchParams = new URLSearchParams(window.location.search)
     const tokenParam = searchParams.get("token")
 
     if (!tokenParam) {
-      toast.error(localization.INVALID_RESET_PASSWORD_TOKEN)
+      toast.error(localization.auth.invalidResetPasswordToken)
       navigate(`${basePaths.auth}/${viewPaths.auth.signIn}`)
-      return
     }
-
-    setToken(tokenParam)
   }, [
     basePaths.auth,
-    localization.INVALID_RESET_PASSWORD_TOKEN,
+    localization.auth.invalidResetPasswordToken,
     viewPaths.auth.signIn,
     navigate
   ])
 
-  const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    setIsPending(true)
-
-    if (!token) {
-      toast.error(localization.INVALID_RESET_PASSWORD_TOKEN)
-      setIsPending(false)
-      return
-    }
-
-    const formData = new FormData(e.currentTarget)
-    const password = formData.get("password") as string
-
-    const { error } = await authClient.resetPassword({
-      token,
-      newPassword: password
-    })
-
-    if (error) {
-      toast.error(error.message)
-      setIsPending(false)
-
-      return
-    }
-
-    toast.success(localization.PASSWORD_RESET_SUCCESS)
-    navigate(`${basePaths.auth}/${viewPaths.auth.signIn}`)
-
-    setIsPending(false)
-  }
-
   return (
-    <Card className={cn("w-full max-w-sm md:p-6 gap-6", className)}>
-      <Card.Header className="text-xl font-medium">
-        {localization.RESET_PASSWORD}
-      </Card.Header>
-
+    <Card className={cn("w-full max-w-sm p-4 md:p-6", className)}>
       <Card.Content>
-        <Form className="flex flex-col gap-6" onSubmit={onSubmit}>
-          <TextField
-            minLength={8}
-            name="password"
-            type="password"
-            autoComplete="new-password"
-            isDisabled={isPending}
-          >
-            <Label>{localization.PASSWORD}</Label>
+        <Form action={resetPassword}>
+          <Fieldset className="gap-4">
+            <Fieldset.Legend className="text-xl">
+              {localization.auth.resetPassword}
+            </Fieldset.Legend>
 
-            <Input
-              placeholder={localization.NEW_PASSWORD_PLACEHOLDER}
-              required
-            />
+            <Description />
 
-            <FieldError />
-          </TextField>
-
-          <Button type="submit" className="w-full" isPending={isPending}>
-            {isPending && <Spinner color="current" size="sm" />}
-
-            {localization.RESET_PASSWORD}
-          </Button>
-
-          <p className="text-sm justify-center flex gap-2 items-center">
-            {localization.REMEMBER_YOUR_PASSWORD}
-
-            <Link
-              href={`${basePaths.auth}/${viewPaths.auth.signIn}`}
-              className="link link--underline-always text-accent"
+            <TextField
+              defaultValue={password}
+              minLength={emailAndPassword?.minPasswordLength}
+              maxLength={emailAndPassword?.maxPasswordLength}
+              name="password"
+              autoComplete="new-password"
+              isDisabled={isPending}
             >
-              {localization.SIGN_IN}
-            </Link>
-          </p>
+              <Label>{localization.auth.password}</Label>
+
+              <InputGroup>
+                <InputGroup.Input
+                  className="text-base md:text-sm"
+                  name="password"
+                  placeholder={localization.auth.newPasswordPlaceholder}
+                  type={isPasswordVisible ? "text" : "password"}
+                  required
+                />
+
+                <InputGroup.Suffix className="px-0">
+                  <Button
+                    isIconOnly
+                    aria-label={
+                      isPasswordVisible
+                        ? localization.auth.hidePassword
+                        : localization.auth.showPassword
+                    }
+                    size="sm"
+                    variant="ghost"
+                    onPress={() => setIsPasswordVisible(!isPasswordVisible)}
+                    isDisabled={isPending}
+                  >
+                    {isPasswordVisible ? <EyeSlashIcon /> : <EyeIcon />}
+                  </Button>
+                </InputGroup.Suffix>
+              </InputGroup>
+
+              <FieldError className="text-wrap" />
+            </TextField>
+
+            {emailAndPassword?.confirmPassword && (
+              <TextField
+                defaultValue={confirmPassword}
+                minLength={emailAndPassword?.minPasswordLength}
+                maxLength={emailAndPassword?.maxPasswordLength}
+                name="confirmPassword"
+                autoComplete="new-password"
+                isDisabled={isPending}
+              >
+                <Label>{localization.auth.confirmPassword}</Label>
+
+                <InputGroup>
+                  <InputGroup.Input
+                    className="text-base md:text-sm"
+                    placeholder={localization.auth.confirmPasswordPlaceholder}
+                    type={isConfirmPasswordVisible ? "text" : "password"}
+                    required
+                    name="confirmPassword"
+                  />
+
+                  <InputGroup.Suffix className="px-0">
+                    <Button
+                      isIconOnly
+                      aria-label={
+                        isConfirmPasswordVisible
+                          ? localization.auth.hidePassword
+                          : localization.auth.showPassword
+                      }
+                      size="sm"
+                      variant="ghost"
+                      onPress={() =>
+                        setIsConfirmPasswordVisible(!isConfirmPasswordVisible)
+                      }
+                      isDisabled={isPending}
+                    >
+                      {isConfirmPasswordVisible ? (
+                        <EyeSlashIcon />
+                      ) : (
+                        <EyeIcon />
+                      )}
+                    </Button>
+                  </InputGroup.Suffix>
+                </InputGroup>
+
+                <FieldError className="text-wrap" />
+              </TextField>
+            )}
+
+            <Fieldset.Actions>
+              <Button type="submit" className="w-full" isPending={isPending}>
+                {isPending && <Spinner color="current" size="sm" />}
+
+                {localization.auth.resetPassword}
+              </Button>
+            </Fieldset.Actions>
+
+            <Description className="flex justify-center gap-1.5 text-foreground text-sm">
+              {localization.auth.rememberYourPassword}
+
+              <Link
+                href={`${basePaths.auth}/${viewPaths.auth.signIn}`}
+                className="link link--underline-hover text-accent"
+              >
+                {localization.auth.signIn}
+              </Link>
+            </Description>
+          </Fieldset>
         </Form>
       </Card.Content>
     </Card>
   )
 }
-
-ResetPassword.localization = resetPasswordLocalization

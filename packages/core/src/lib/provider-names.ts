@@ -2,12 +2,8 @@ import type { SocialProvider } from "better-auth/social-providers"
 
 /**
  * Mapping of social authentication provider identifiers to their human-readable display names.
- *
- * Provides standardized display names for all supported social authentication providers.
- * Used by the `getProviderName` function to convert provider keys (e.g., "github") to
- * user-friendly names (e.g., "GitHub").
  */
-export const providerNames = {
+export const providerNames: Record<SocialProvider, string> = {
   apple: "Apple",
   atlassian: "Atlassian",
   cognito: "Cognito",
@@ -41,7 +37,7 @@ export const providerNames = {
   vercel: "Vercel",
   vk: "VK",
   zoom: "Zoom"
-} satisfies Record<SocialProvider, string>
+}
 
 /**
  * Get the human-readable display name for an authentication provider.
@@ -49,9 +45,9 @@ export const providerNames = {
  * @param provider - The provider identifier (e.g., "github", "google").
  * @returns The mapped display name for `provider` if available, otherwise `provider` with its first character capitalized.
  */
-export function getProviderName(provider: string): string {
+export function getProviderName(provider: string) {
   return (
-    providerNames[provider as keyof typeof providerNames] ||
+    providerNames[provider as SocialProvider] ||
     provider.charAt(0).toUpperCase() + provider.slice(1)
   )
 }

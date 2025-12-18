@@ -1,118 +1,84 @@
-"use client"
-
-import { type AuthConfig, cn, useAuth } from "@better-auth-ui/react"
+import { type AnyAuthConfig, useForgotPassword } from "@better-auth-ui/react"
 import {
   Button,
   Card,
+  Description,
   FieldError,
+  Fieldset,
   Form,
   Input,
   Label,
   Spinner,
   TextField
 } from "@heroui/react"
-import type { DeepPartial } from "better-auth/client/plugins"
-import { type FormEvent, useState } from "react"
-import { toast } from "sonner"
 
-const forgotPasswordLocalization = {
-  EMAIL: "Email",
-  EMAIL_PLACEHOLDER: "Enter your email",
-  FORGOT_PASSWORD: "Forgot Password",
-  PASSWORD_RESET_EMAIL_SENT: "Password reset email sent",
-  REMEMBER_YOUR_PASSWORD: "Remember your password?",
-  SEND_RESET_LINK: "Send Reset Link",
-  SIGN_IN: "Sign In"
-}
+import { useAuth } from "../../hooks/use-auth"
+import { cn } from "../../lib/utils"
 
-export type ForgotPasswordLocalization = typeof forgotPasswordLocalization
-
-export type ForgotPasswordProps = DeepPartial<AuthConfig> & {
+export type ForgotPasswordProps = AnyAuthConfig & {
   className?: string
-  localization?: Partial<ForgotPasswordLocalization>
 }
 
 /**
  * Renders a "Forgot Password" form with an email input and submit button.
- *
- * Supports overriding displayed text via `props.localization` and accepts an optional `className` to modify container styling.
- *
- * @returns The rendered Forgot Password form UI as a JSX element
  */
-export function ForgotPassword({ className, ...props }: ForgotPasswordProps) {
-  const localization = {
-    ...ForgotPassword.localization,
-    ...props.localization
-  }
+export function ForgotPassword({ className, ...config }: ForgotPasswordProps) {
+  const context = useAuth(config)
 
-  const { authClient, basePaths, viewPaths, navigate, Link } = useAuth(props)
-  const [isPending, setIsPending] = useState(false)
+  const { basePaths, localization, viewPaths, Link } = context
 
-  const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    setIsPending(true)
-
-    const formData = new FormData(e.currentTarget)
-    const email = formData.get("email") as string
-
-    const { error } = await authClient.requestPasswordReset({
-      email,
-      redirectTo: `${basePaths.auth}/${viewPaths.auth.resetPassword}`
-    })
-
-    if (error) {
-      toast.error(error.message)
-      setIsPending(false)
-      e.currentTarget.reset()
-      return
-    }
-
-    toast.success(localization.PASSWORD_RESET_EMAIL_SENT)
-    navigate(`${basePaths.auth}/${viewPaths.auth.signIn}`)
-    setIsPending(false)
-  }
+  const [{ email }, forgotPassword, isPending] = useForgotPassword(context)
 
   return (
-    <Card className={cn("w-full max-w-sm md:p-6 gap-6", className)}>
-      <Card.Header className="text-xl font-medium">
-        {localization.FORGOT_PASSWORD}
-      </Card.Header>
-
+    <Card className={cn("w-full max-w-sm p-4 md:p-6", className)}>
       <Card.Content>
-        <Form className="flex flex-col gap-6" onSubmit={onSubmit}>
-          <TextField
-            name="email"
-            type="email"
-            autoComplete="email"
-            isDisabled={isPending}
-          >
-            <Label>{localization.EMAIL}</Label>
+        <Form action={forgotPassword}>
+          <Fieldset className="gap-4">
+            <Fieldset.Legend className="text-xl">
+              {localization.auth.forgotPassword}
+            </Fieldset.Legend>
 
-            <Input placeholder={localization.EMAIL_PLACEHOLDER} required />
+            <Description />
 
-            <FieldError />
-          </TextField>
-
-          <Button type="submit" className="w-full" isPending={isPending}>
-            {isPending && <Spinner color="current" size="sm" />}
-
-            {localization.SEND_RESET_LINK}
-          </Button>
-
-          <p className="text-sm justify-center flex gap-2 items-center">
-            {localization.REMEMBER_YOUR_PASSWORD}
-
-            <Link
-              href={`${basePaths.auth}/${viewPaths.auth.signIn}`}
-              className="link link--underline-always text-accent"
+            <TextField
+              defaultValue={email}
+              name="email"
+              type="email"
+              autoComplete="email"
+              isDisabled={isPending}
             >
-              {localization.SIGN_IN}
-            </Link>
-          </p>
+              <Label>{localization.auth.email}</Label>
+
+              <Input
+                className="text-base md:text-sm"
+                placeholder={localization.auth.emailPlaceholder}
+                required
+              />
+
+              <FieldError className="text-wrap" />
+            </TextField>
+
+            <Fieldset.Actions>
+              <Button type="submit" className="w-full" isPending={isPending}>
+                {isPending && <Spinner color="current" size="sm" />}
+
+                {localization.auth.sendResetLink}
+              </Button>
+            </Fieldset.Actions>
+
+            <Description className="flex justify-center gap-1.5 text-foreground text-sm">
+              {localization.auth.rememberYourPassword}
+
+              <Link
+                href={`${basePaths.auth}/${viewPaths.auth.signIn}`}
+                className="link link--underline-hover text-accent"
+              >
+                {localization.auth.signIn}
+              </Link>
+            </Description>
+          </Fieldset>
         </Form>
       </Card.Content>
     </Card>
   )
 }
-
-ForgotPassword.localization = forgotPasswordLocalization

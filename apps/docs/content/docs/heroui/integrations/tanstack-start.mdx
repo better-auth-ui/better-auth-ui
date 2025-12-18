@@ -1,0 +1,60 @@
+---
+title: TanStack Start
+description: Integrate Better Auth UI with TanStack Start
+icon: TanStackStart
+---
+
+import { Step, Steps } from 'fumadocs-ui/components/steps';
+
+## Prerequisites
+
+Make sure you've completed the [Quick Start](/docs/heroui) guide first.
+
+## Integration
+
+<Steps>
+<Step>
+### Configure AuthProvider
+
+Configure `AuthProvider` with TanStack Router's navigation.
+
+```tsx title="components/providers.tsx" file=<rootDir>/../../examples/start-heroui-example/src/components/providers.tsx
+```
+
+The `navigate`, `replace`, and `Link` props integrate with TanStack Router's navigation system.
+
+</Step>
+<Step>
+### Update the Root Route
+
+Wrap your application with the `Providers` component in your root route.
+
+```tsx title="routes/__root.tsx" file=<rootDir>/../../examples/start-heroui-example/src/routes/__root.tsx
+```
+
+</Step>
+<Step>
+### Create the Auth Page
+
+Create a dynamic auth page that renders the appropriate authentication view based on the path.
+
+```tsx title="routes/auth/$path.tsx" file=<rootDir>/../../examples/start-heroui-example/src/routes/auth/$path.tsx
+```
+
+The `viewPaths.auth` object contains all valid auth paths: `sign-in`, `sign-up`, `sign-out`, `forgot-password`, `reset-password`, and `magic-link`.
+
+</Step>
+</Steps>
+
+## Protecting Routes
+
+Use the `useAuthenticate` hook to protect routes and access session data.
+
+```tsx title="routes/dashboard.tsx" file=<rootDir>/../../examples/start-heroui-example/src/routes/dashboard.tsx
+```
+
+The `useAuthenticate` hook will automatically redirect unauthenticated users to the sign-in page.
+
+## Example Project
+
+For a complete working example, check out the [start-heroui-example](https://github.com/better-auth-ui/better-auth-ui/tree/main/examples/start-heroui-example) in the repository.

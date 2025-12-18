@@ -1,0 +1,498 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry.json",
+  "name": "better-auth-ui",
+  "homepage": "https://better-auth-ui.com",
+  "items": [
+    {
+      "name": "sign-in",
+      "type": "registry:component",
+      "title": "Sign In",
+      "description": "A complete sign-in form component with email/password, magic link, and social provider support.",
+      "dependencies": [
+        "@better-auth-ui/react@workspace:*",
+        "better-auth",
+        "lucide-react"
+      ],
+      "registryDependencies": [
+        "button",
+        "card",
+        "input",
+        "label",
+        "checkbox",
+        "separator",
+        "field",
+        "sonner",
+        "spinner"
+      ],
+      "files": [
+        {
+          "path": "src/components/auth/sign-in.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/components/auth/magic-link-button.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/components/auth/provider-buttons.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/hooks/auth/use-auth.tsx",
+          "type": "registry:hook"
+        },
+        {
+          "path": "../react/src/hooks/auth/use-authenticate.ts",
+          "type": "registry:hook"
+        },
+        {
+          "path": "../react/src/hooks/auth/use-sign-in-email.ts",
+          "type": "registry:hook"
+        },
+        {
+          "path": "../react/src/hooks/auth/use-sign-in-social.ts",
+          "type": "registry:hook"
+        }
+      ]
+    },
+    {
+      "name": "sign-up",
+      "type": "registry:component",
+      "title": "Sign Up",
+      "description": "A complete sign-up form component with name, email, password fields, magic link, and social provider support.",
+      "dependencies": [
+        "@better-auth-ui/react@workspace:*",
+        "better-auth",
+        "lucide-react"
+      ],
+      "registryDependencies": [
+        "button",
+        "card",
+        "input",
+        "field",
+        "input-group",
+        "sonner",
+        "spinner"
+      ],
+      "files": [
+        {
+          "path": "src/components/auth/sign-up.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/components/auth/magic-link-button.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/components/auth/provider-buttons.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/hooks/auth/use-auth.tsx",
+          "type": "registry:hook"
+        },
+        {
+          "path": "../react/src/hooks/auth/use-sign-up-email.ts",
+          "type": "registry:hook"
+        },
+        {
+          "path": "../react/src/hooks/auth/use-sign-in-social.ts",
+          "type": "registry:hook"
+        }
+      ]
+    },
+    {
+      "name": "magic-link",
+      "type": "registry:component",
+      "title": "Magic Link",
+      "description": "A magic link sign-in form component with email input and optional social provider support.",
+      "dependencies": [
+        "@better-auth-ui/react@workspace:*",
+        "better-auth",
+        "lucide-react"
+      ],
+      "registryDependencies": [
+        "button",
+        "card",
+        "input",
+        "field",
+        "separator",
+        "sonner",
+        "spinner"
+      ],
+      "files": [
+        {
+          "path": "src/components/auth/magic-link.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/components/auth/magic-link-button.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/components/auth/provider-buttons.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/hooks/auth/use-auth.tsx",
+          "type": "registry:hook"
+        },
+        {
+          "path": "../react/src/hooks/auth/use-sign-in-magic-link.ts",
+          "type": "registry:hook"
+        },
+        {
+          "path": "../react/src/hooks/auth/use-sign-in-social.ts",
+          "type": "registry:hook"
+        }
+      ]
+    },
+    {
+      "name": "forgot-password",
+      "type": "registry:component",
+      "title": "Forgot Password",
+      "description": "A form component for requesting a password reset link via email.",
+      "dependencies": ["@better-auth-ui/react@workspace:*", "better-auth"],
+      "registryDependencies": [
+        "button",
+        "card",
+        "input",
+        "field",
+        "sonner",
+        "spinner"
+      ],
+      "files": [
+        {
+          "path": "src/components/auth/forgot-password.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/hooks/auth/use-auth.tsx",
+          "type": "registry:hook"
+        },
+        {
+          "path": "../react/src/hooks/auth/use-forgot-password.ts",
+          "type": "registry:hook"
+        }
+      ]
+    },
+    {
+      "name": "reset-password",
+      "type": "registry:component",
+      "title": "Reset Password",
+      "description": "A form component for resetting password with a token from the URL.",
+      "dependencies": [
+        "@better-auth-ui/react@workspace:*",
+        "better-auth",
+        "lucide-react"
+      ],
+      "registryDependencies": [
+        "button",
+        "card",
+        "field",
+        "input-group",
+        "sonner",
+        "spinner"
+      ],
+      "files": [
+        {
+          "path": "src/components/auth/reset-password.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/hooks/auth/use-auth.tsx",
+          "type": "registry:hook"
+        },
+        {
+          "path": "../react/src/hooks/auth/use-reset-password.ts",
+          "type": "registry:hook"
+        }
+      ]
+    },
+    {
+      "name": "sign-out",
+      "type": "registry:component",
+      "title": "Sign Out",
+      "description": "A component that signs the user out when mounted and displays a loading state.",
+      "dependencies": ["@better-auth-ui/react@workspace:*", "better-auth"],
+      "registryDependencies": ["card", "spinner"],
+      "files": [
+        {
+          "path": "src/components/auth/sign-out.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "../react/src/hooks/auth/use-sign-out.ts",
+          "type": "registry:hook"
+        }
+      ]
+    },
+    {
+      "name": "auth",
+      "type": "registry:component",
+      "title": "Auth",
+      "description": "A unified authentication component that renders the appropriate auth view based on path or view prop.",
+      "dependencies": [
+        "@better-auth-ui/react@workspace:*",
+        "better-auth",
+        "lucide-react"
+      ],
+      "registryDependencies": [
+        "https://better-auth-ui.pages.dev/r/auth-provider.json",
+        "https://better-auth-ui.pages.dev/r/sign-in.json",
+        "https://better-auth-ui.pages.dev/r/sign-up.json",
+        "https://better-auth-ui.pages.dev/r/magic-link.json",
+        "https://better-auth-ui.pages.dev/r/forgot-password.json",
+        "https://better-auth-ui.pages.dev/r/reset-password.json",
+        "https://better-auth-ui.pages.dev/r/sign-out.json",
+        "https://better-auth-ui.pages.dev/r/user-button.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/auth/auth.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "auth-provider",
+      "type": "registry:component",
+      "title": "Auth Provider",
+      "description": "A context provider component that supplies AuthConfig to all descendant components.",
+      "dependencies": ["@better-auth-ui/react@workspace:*", "better-auth"],
+      "files": [
+        {
+          "path": "../react/src/components/auth/auth-provider.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/hooks/auth/use-auth.tsx",
+          "type": "registry:hook"
+        }
+      ]
+    },
+    {
+      "name": "user-avatar",
+      "type": "registry:component",
+      "title": "User Avatar",
+      "description": "Renders the current user's avatar using session data. Shows a skeleton while loading and falls back to initials when no image is available.",
+      "dependencies": [
+        "@better-auth-ui/react@workspace:*",
+        "better-auth",
+        "lucide-react"
+      ],
+      "registryDependencies": ["avatar", "skeleton"],
+      "files": [
+        {
+          "path": "src/components/user/user-avatar.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/hooks/auth/use-auth.tsx",
+          "type": "registry:hook"
+        }
+      ]
+    },
+    {
+      "name": "user-button",
+      "type": "registry:component",
+      "title": "User Button",
+      "description": "Renders a user button with dropdown menu showing user info and sign out option.",
+      "dependencies": [
+        "@better-auth-ui/react@workspace:*",
+        "better-auth",
+        "lucide-react"
+      ],
+      "registryDependencies": ["avatar", "button", "dropdown-menu", "skeleton"],
+      "files": [
+        {
+          "path": "src/components/user/user-button.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/components/user/user-avatar.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/hooks/auth/use-auth.tsx",
+          "type": "registry:hook"
+        }
+      ]
+    },
+    {
+      "name": "email-verification-email",
+      "type": "registry:component",
+      "title": "Email Verification Email",
+      "description": "Email template component that sends email verification links to users.",
+      "dependencies": [
+        "@better-auth-ui/react@workspace:*",
+        "@react-email/components"
+      ],
+      "registryDependencies": [],
+      "files": [
+        {
+          "path": "../react/src/components/email/email-verification.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "../react/src/components/email/email-styles.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "../react/src/lib/utils.ts",
+          "type": "registry:lib"
+        }
+      ]
+    },
+    {
+      "name": "magic-link-email",
+      "type": "registry:component",
+      "title": "Magic Link Email",
+      "description": "Email template component that sends magic link authentication emails for passwordless sign-in.",
+      "dependencies": [
+        "@better-auth-ui/react@workspace:*",
+        "@react-email/components"
+      ],
+      "registryDependencies": [],
+      "files": [
+        {
+          "path": "../react/src/components/email/magic-link.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "../react/src/components/email/email-styles.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "../react/src/lib/utils.ts",
+          "type": "registry:lib"
+        }
+      ]
+    },
+    {
+      "name": "reset-password-email",
+      "type": "registry:component",
+      "title": "Reset Password Email",
+      "description": "Email template component that sends password reset links to users.",
+      "dependencies": [
+        "@better-auth-ui/react@workspace:*",
+        "@react-email/components"
+      ],
+      "registryDependencies": [],
+      "files": [
+        {
+          "path": "../react/src/components/email/reset-password.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "../react/src/components/email/email-styles.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "../react/src/lib/utils.ts",
+          "type": "registry:lib"
+        }
+      ]
+    },
+    {
+      "name": "password-changed-email",
+      "type": "registry:component",
+      "title": "Password Changed Email",
+      "description": "Email template component that notifies users when their password has been changed.",
+      "dependencies": [
+        "@better-auth-ui/react@workspace:*",
+        "@react-email/components"
+      ],
+      "registryDependencies": [],
+      "files": [
+        {
+          "path": "../react/src/components/email/password-changed.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "../react/src/components/email/email-styles.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "../react/src/lib/utils.ts",
+          "type": "registry:lib"
+        }
+      ]
+    },
+    {
+      "name": "email-changed-email",
+      "type": "registry:component",
+      "title": "Email Changed Email",
+      "description": "Email template component that notifies users when their email address has been changed.",
+      "dependencies": [
+        "@better-auth-ui/react@workspace:*",
+        "@react-email/components"
+      ],
+      "registryDependencies": [],
+      "files": [
+        {
+          "path": "../react/src/components/email/email-changed.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "../react/src/components/email/email-styles.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "../react/src/lib/utils.ts",
+          "type": "registry:lib"
+        }
+      ]
+    },
+    {
+      "name": "otp-email",
+      "type": "registry:component",
+      "title": "OTP Email",
+      "description": "Email template component that sends one-time password (OTP) verification codes to users.",
+      "dependencies": [
+        "@better-auth-ui/react@workspace:*",
+        "@react-email/components"
+      ],
+      "registryDependencies": [],
+      "files": [
+        {
+          "path": "../react/src/components/email/otp-email.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "../react/src/components/email/email-styles.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "../react/src/lib/utils.ts",
+          "type": "registry:lib"
+        }
+      ]
+    },
+    {
+      "name": "new-device-email",
+      "type": "registry:component",
+      "title": "New Device Email",
+      "description": "Email template component that notifies users when a new device signs in to their account.",
+      "dependencies": [
+        "@better-auth-ui/react@workspace:*",
+        "@react-email/components"
+      ],
+      "registryDependencies": [],
+      "files": [
+        {
+          "path": "../react/src/components/email/new-device.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "../react/src/components/email/email-styles.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "../react/src/lib/utils.ts",
+          "type": "registry:lib"
+        }
+      ]
+    }
+  ]
+}

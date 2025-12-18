@@ -1,0 +1,53 @@
+---
+title: Quick Start
+description: Getting Started with Better Auth UI for HeroUI v3
+icon: Rocket
+---
+
+import { Step, Steps } from 'fumadocs-ui/components/steps'
+import { Cards, Card } from 'fumadocs-ui/components/card'
+
+## Prerequisites
+
+Before you start, make sure you have the following prerequisites integrated into your project:
+
+- [Better Auth](https://www.better-auth.com/docs/installation)
+- [HeroUI v3](https://v3.heroui.com/docs/quick-start)
+- [Sonner](https://sonner.emilkowal.ski/getting-started)
+
+## Installation
+
+<Steps>
+<Step>
+### Install the library
+
+Install the `@better-auth-ui/heroui` library using your preferred package manager.
+
+```package-install
+@better-auth-ui/heroui@latest
+```
+
+</Step>
+<Step>
+### Configure TailwindCSS
+
+Add the following `@import` to your global css.
+
+```css title="styles/globals.css"
+@import "@better-auth-ui/heroui/styles";
+```
+</Step>
+</Steps>
+
+## Next Steps
+
+Follow a framework-specific guide to integrate Better Auth UI into your project.
+
+<Cards>
+  <Card icon={<TanStackStart />} title="TanStack Start" href="/docs/heroui/integrations/tanstack-start">
+    Integrate Better Auth UI with TanStack Start
+  </Card>
+  <Card icon={<NextJS />} title="Next.js" href="/docs/heroui/integrations/nextjs">
+    Integrate Better Auth UI with Next.js
+  </Card>
+</Cards>

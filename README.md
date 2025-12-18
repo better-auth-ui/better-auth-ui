@@ -1,49 +1,55 @@
 # Better Auth UI
 
-<picture>
-    <source srcset="https://raw.githubusercontent.com/daveyplate/better-auth-ui/main/docs/public/better-auth-ui-promo-dark.png" media="(prefers-color-scheme: dark)">
-    <source srcset="https://raw.githubusercontent.com/daveyplate/better-auth-ui/main/docs/public/better-auth-ui-promo-light.png" media="(prefers-color-scheme: light)">
-    <img src="https://raw.githubusercontent.com/daveyplate/better-auth-ui/main/docs/public/better-auth-ui-promo-dark.png" alt="Better Auth UI Logo">
-</picture>
+Beautiful, ready-to-use authentication components for [Better Auth](https://better-auth.com).
+
+Built with **shadcn/ui** and **HeroUI**. Drop in and go.
 
 ## [better-auth-ui.com](https://better-auth-ui.com)
 
-Plug & play UI components for [better-auth](https://better-auth.com).
-
-- *Own Your Auth*
-
-[Demo](https://newtech.dev/auth/login) - [Documentation](https://better-auth-ui.com) - [Roadmap](https://betterauthui.featurebase.app/roadmap)
+[Documentation](https://better-auth-ui.com/docs) • [Demo](https://better-auth-ui.com)
 
 ---
 
-### Sign In
+## Screenshots
 
-<img src="https://raw.githubusercontent.com/daveyplate/better-auth-ui/main/docs/public/screenshots/sign-in-dark.png" alt="Sign In Dark" width="384" /><img src="https://raw.githubusercontent.com/daveyplate/better-auth-ui/main/docs/public/screenshots/sign-in-light.png" alt="Sign In Light" width="384" />
+### shadcn/ui
 
-### Sign Up
+<picture>
+  <source srcset="https://raw.githubusercontent.com/better-auth-ui/better-auth-ui/shadcn-registry/apps/docs/public/screenshots/shadcn-sign-in-dark.png" media="(prefers-color-scheme: dark)">
+  <source srcset="https://raw.githubusercontent.com/better-auth-ui/better-auth-ui/shadcn-registry/apps/docs/public/screenshots/shadcn-sign-in-light.png" media="(prefers-color-scheme: light)">
+  <img src="https://raw.githubusercontent.com/better-auth-ui/better-auth-ui/shadcn-registry/apps/docs/public/screenshots/shadcn-sign-in-light.png" alt="shadcn/ui Sign In" width="400">
+</picture>
 
-<img src="https://raw.githubusercontent.com/daveyplate/better-auth-ui/main/docs/public/screenshots/sign-up-dark.png" alt="Sign Up Dark" width="384" /><img src="https://raw.githubusercontent.com/daveyplate/better-auth-ui/main/docs/public/screenshots/sign-up-light.png" alt="Sign Up Light" width="384" />
+### HeroUI
 
-### Forgot Password
-
-<img src="https://raw.githubusercontent.com/daveyplate/better-auth-ui/main/docs/public/screenshots/forgot-password-dark.png" alt="Forgot Password Dark" width="384" /><img src="https://raw.githubusercontent.com/daveyplate/better-auth-ui/main/docs/public/screenshots/forgot-password-light.png" alt="Forgot Password Light" width="384" />
-
-### User Button
-
-<img src="https://raw.githubusercontent.com/daveyplate/better-auth-ui/main/docs/public/screenshots/user-dropdown-dark.png" alt="User Dropdown Dark" width="182" /><img src="https://raw.githubusercontent.com/daveyplate/better-auth-ui/main/docs/public/screenshots/user-dropdown-light.png" alt="User Dropdown Light" width="182" />
-
-### Email Template
-
-<img src="https://raw.githubusercontent.com/daveyplate/better-auth-ui/main/docs/public/screenshots/email-template-dark.png" alt="Email Template Dark" width="384" /><img src="https://raw.githubusercontent.com/daveyplate/better-auth-ui/main/docs/public/screenshots/email-template-light.png" alt="Email Template Light" width="384" />
-
-### Settings Cards
-
-<img src="https://raw.githubusercontent.com/daveyplate/better-auth-ui/main/docs/public/screenshots/settings-cards-dark.png" alt="Settings Cards Dark" width="384" /><img src="https://raw.githubusercontent.com/daveyplate/better-auth-ui/main/docs/public/screenshots/settings-cards-light.png" alt="Settings Cards Light" width="384" />
+<picture>
+  <source srcset="https://raw.githubusercontent.com/better-auth-ui/better-auth-ui/shadcn-registry/apps/docs/public/screenshots/heroui-sign-in-dark.png" media="(prefers-color-scheme: dark)">
+  <source srcset="https://raw.githubusercontent.com/better-auth-ui/better-auth-ui/shadcn-registry/apps/docs/public/screenshots/heroui-sign-in-light.png" media="(prefers-color-scheme: light)">
+  <img src="https://raw.githubusercontent.com/better-auth-ui/better-auth-ui/shadcn-registry/apps/docs/public/screenshots/heroui-sign-in-light.png" alt="HeroUI Sign In" width="400">
+</picture>
 
 ---
 
-Fully customizable!
+## Features
+
+- **Fully Customizable** — Built on shadcn/ui and HeroUI. Own your code, style it your way.
+- **Drop-in Ready** — Pre-built Sign In, Sign Up, Forgot Password, and more. Just add and configure.
+- **Better Auth Native** — Built specifically for Better Auth. Social logins, magic links, and more.
+
+## Installation
+
+### shadcn/ui
+
+```bash
+bunx shadcn@latest add https://better-auth-ui.com/r/auth.json
+```
+
+### HeroUI
+
+```bash
+bunx install @better-auth-ui/heroui
+```
 
 ## License
 
-This project is licensed under the MIT License. See the LICENSE file for details.
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
