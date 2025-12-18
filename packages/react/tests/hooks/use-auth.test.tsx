@@ -164,7 +164,7 @@ describe("useAuth", () => {
 
       const { result } = renderHook(() => useRedirectTo(), { wrapper })
 
-      expect(result).toBe("/dashboard")
+      expect(result.current).toBe("/dashboard")
     })
 
     it("should reject redirectTo with double slashes", () => {
@@ -176,7 +176,7 @@ describe("useAuth", () => {
 
       const { result } = renderHook(() => useRedirectTo(), { wrapper })
 
-      expect(result).toBe("/")
+      expect(result.current).toBe("/")
     })
 
     it("should reject redirectTo with scheme", () => {
@@ -188,7 +188,7 @@ describe("useAuth", () => {
 
       const { result } = renderHook(() => useRedirectTo(), { wrapper })
 
-      expect(result).toBe("/")
+      expect(result.current).toBe("/")
     })
 
     it("should reject redirectTo not starting with slash", () => {
@@ -200,7 +200,7 @@ describe("useAuth", () => {
 
       const { result } = renderHook(() => useRedirectTo(), { wrapper })
 
-      expect(result).toBe("/")
+      expect(result.current).toBe("/")
     })
 
     it("should accept complex valid paths", () => {
@@ -216,7 +216,7 @@ describe("useAuth", () => {
 
       const { result } = renderHook(() => useRedirectTo(), { wrapper })
 
-      expect(result).toBe("/dashboard/settings?tab=profile")
+      expect(result.current).toBe("/dashboard/settings?tab=profile")
     })
 
     it("should handle URL-encoded redirectTo", () => {
@@ -228,7 +228,7 @@ describe("useAuth", () => {
 
       const { result } = renderHook(() => useRedirectTo(), { wrapper })
 
-      expect(result).toBe("/dashboard/settings")
+      expect(result.current).toBe("/dashboard/settings")
     })
 
     it("should trim whitespace from redirectTo", () => {
@@ -240,7 +240,7 @@ describe("useAuth", () => {
 
       const { result } = renderHook(() => useRedirectTo(), { wrapper })
 
-      expect(result).toBe("/dashboard")
+      expect(result.current).toBe("/dashboard")
     })
 
     it("should reject redirectTo with backslash prefix", () => {
@@ -253,7 +253,7 @@ describe("useAuth", () => {
       const { result } = renderHook(() => useRedirectTo(), { wrapper })
 
       // Should fall back to default since backslash can be normalized to forward slash by browsers
-      expect(result).toBe("/")
+      expect(result.current).toBe("/")
     })
   })
 
