@@ -89,7 +89,6 @@ export function MagicLink({
                 <Label>{localization.auth.email}</Label>
 
                 <Input
-                  className="text-base md:text-sm"
                   placeholder={localization.auth.emailPlaceholder}
                   required
                 />

@@ -82,7 +82,6 @@ export function ResetPassword({ className, ...config }: ResetPasswordProps) {
 
               <InputGroup>
                 <InputGroup.Input
-                  className="text-base md:text-sm"
                   name="password"
                   placeholder={localization.auth.newPasswordPlaceholder}
                   type={isPasswordVisible ? "text" : "password"}
@@ -123,7 +122,6 @@ export function ResetPassword({ className, ...config }: ResetPasswordProps) {
 
                 <InputGroup>
                   <InputGroup.Input
-                    className="text-base md:text-sm"
                     placeholder={localization.auth.confirmPasswordPlaceholder}
                     type={isConfirmPasswordVisible ? "text" : "password"}
                     required

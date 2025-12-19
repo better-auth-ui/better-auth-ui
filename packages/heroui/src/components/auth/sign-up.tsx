@@ -118,7 +118,6 @@ export function SignUp({
                   <Label>{localization.auth.name}</Label>
 
                   <Input
-                    className="text-base md:text-sm"
                     placeholder={localization.auth.namePlaceholder}
                     required
                   />
@@ -136,7 +135,6 @@ export function SignUp({
                   <Label>{localization.auth.email}</Label>
 
                   <Input
-                    className="text-base md:text-sm"
                     placeholder={localization.auth.emailPlaceholder}
                     required
                   />
@@ -156,7 +154,6 @@ export function SignUp({
 
                   <InputGroup>
                     <InputGroup.Input
-                      className="text-base md:text-sm"
                       placeholder={localization.auth.passwordPlaceholder}
                       type={isPasswordVisible ? "text" : "password"}
                       name="password"
@@ -197,7 +194,6 @@ export function SignUp({
 
                     <InputGroup>
                       <InputGroup.Input
-                        className="text-base md:text-sm"
                         name="confirmPassword"
                         placeholder={
                           localization.auth.confirmPasswordPlaceholder
