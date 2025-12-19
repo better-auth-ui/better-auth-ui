@@ -27,10 +27,10 @@ jobs:
       - name: Install dependencies
         run: bun install
 
-      - name: config git user
+      - name: Config git user
         run: |
-          git config --global user.name "daveycodez"
-          git config --global user.email "daveycodez@gmail.com"
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
       - name: Release
         run: |
