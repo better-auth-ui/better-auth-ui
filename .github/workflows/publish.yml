@@ -1,40 +1,38 @@
-name: publish
+name: Publish
 
-# Add manual trigger
 on:
-  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - '**/package.json'
 
 jobs:
   publish:
-    # prevents this action from running on forks
-    if: github.repository == 'better-auth-ui/better-auth-ui'
-    name: Publish to npm
+    name: Publish
     runs-on: ubuntu-latest
     permissions:
-      contents: write #allows to push commits to the repo
+      contents: read
+      id-token: write # needed for provenance data generation
+    timeout-minutes: 10
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v5
         with:
-          fetch-depth: 0 # include tags
+          fetch-depth: 0
+          filter: tree:0
 
-      - name: Setup Bun
+      - name: Install Bun
         uses: oven-sh/setup-bun@v2
-        with:
-          bun-version: latest
 
       - name: Install dependencies
         run: bun install
-        
-      - name: Set shas
-        uses: nrwl/nx-set-shas@v4
 
-      - name: config git user
-        run: |
-          git config --global user.name "daveycodez"
-          git config --global user.email "daveycodez@gmail.com"
+      - name: Print Environment Info
+        run: nx report
 
-      - name: Release a new package
-        run: nx release -d
+      - name: Publish packages
+        run: nx release publish
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_ACCESS_TOKEN }}
+          NPM_CONFIG_PROVENANCE: true

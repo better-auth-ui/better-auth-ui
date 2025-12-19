@@ -38,19 +38,20 @@
   "release": {
     "version": {
       "preVersionCommand": "nx registry:build packages/shadcn",
-      "conventionalCommits": false
+      "conventionalCommits": true
     },
     "changelog": {
       "projectChangelogs": false,
       "workspaceChangelog": {
         "createRelease": "github",
-        "renderOptions": {
-          "excludeAuthors": ["autofix-ci[bot]", "autofix.ci"]
-        }
+        "file": false
       }
     },
     "conventionalCommits": {
       "types": {
+        "feat": {
+          "semverBump": "patch"
+        },
         "__INVALID__": {
           "semverBump": "patch",
           "changelog": {
