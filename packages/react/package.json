@@ -43,7 +43,7 @@
     "vitest": "^4.0.16"
   },
   "dependencies": {
-    "@better-auth-ui/core": "workspace:*"
+    "@better-auth-ui/core": "*"
   },
   "peerDependencies": {
     "@react-email/components": ">=1.0.0",

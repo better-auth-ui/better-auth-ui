@@ -18,5 +18,47 @@
     "sharedGlobals": ["{workspaceRoot}/.github/workflows/ci.yml"],
     "default": ["sharedGlobals"]
   },
-  "nxCloudId": "691fe786e56af5ab30ac4788"
+  "nxCloudId": "691fe786e56af5ab30ac4788",
+  "plugins": [
+    {
+      "plugin": "@nx/js/typescript",
+      "options": {
+        "typecheck": {
+          "targetName": "typecheck"
+        },
+        "build": {
+          "targetName": "build",
+          "configName": "tsconfig.lib.json",
+          "buildDepsName": "build-deps",
+          "watchDepsName": "watch-deps"
+        }
+      }
+    }
+  ],
+  "release": {
+    "version": {
+      "preVersionCommand": "nx registry:build packages/shadcn",
+      "conventionalCommits": true
+    },
+    "changelog": {
+      "projectChangelogs": false,
+      "workspaceChangelog": {
+        "createRelease": "github",
+        "file": false
+      }
+    },
+    "conventionalCommits": {
+      "types": {
+        "feat": {
+          "semverBump": "patch"
+        },
+        "__INVALID__": {
+          "semverBump": "patch",
+          "changelog": {
+            "title": "Changes"
+          }
+        }
+      }
+    }
+  }
 }

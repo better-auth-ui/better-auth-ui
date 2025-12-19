@@ -1,11 +1,10 @@
 {
   "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "sign-up",
-  "type": "registry:component",
   "title": "Sign Up",
   "description": "A complete sign-up form component with name, email, password fields, magic link, and social provider support.",
   "dependencies": [
-    "@better-auth-ui/react@workspace:*",
+    "@better-auth-ui/react@*",
     "better-auth",
     "lucide-react"
   ],
@@ -49,5 +48,6 @@
       "content": "import { type AnyAuthConfig, useRedirectTo } from \"@better-auth-ui/react\"\nimport { useActionState } from \"react\"\n\nimport { useAuth } from \"./use-auth\"\n\nexport function useSignInSocial(config?: AnyAuthConfig) {\n  const { authClient, baseURL, toast } = useAuth(config)\n  const redirectTo = useRedirectTo(config)\n\n  const signInSocial = async (_: object, formData: FormData) => {\n    const provider = formData.get(\"provider\") as string\n\n    const callbackURL = `${baseURL}${redirectTo}`\n\n    const { error } = await authClient.signIn.social({\n      provider,\n      callbackURL\n    })\n\n    if (error) toast.error(error.message || error.statusText)\n\n    return { provider }\n  }\n\n  return useActionState(signInSocial, { provider: \"\" })\n}\n",
       "type": "registry:hook"
     }
-  ]
+  ],
+  "type": "registry:component"
 }

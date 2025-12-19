@@ -9,7 +9,7 @@
   },
   "files": {
     "ignoreUnknown": true,
-    "includes": ["**", "!node_modules", "!.source"]
+    "includes": ["**", "!node_modules", "!.source", "!public"]
   },
   "formatter": {
     "enabled": true,
