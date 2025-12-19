@@ -21,6 +21,5 @@
     "@swc/helpers": "~0.5.11",
     "nx": "22.3.1",
     "typescript": "^5.9.3"
-  },
-  "dependencies": {}
+  }
 }

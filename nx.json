@@ -2,19 +2,12 @@
   "$schema": "./node_modules/nx/schemas/nx-schema.json",
   "targetDefaults": {
     "build": {
-      "dependsOn": [
-        "^build"
-      ],
-      "outputs": [
-        "{projectRoot}/dist"
-      ],
+      "dependsOn": ["^build"],
+      "outputs": ["{projectRoot}/dist"],
       "cache": true
     },
     "dev": {
-      "dependsOn": [
-        "^dev",
-        "email"
-      ],
+      "dependsOn": ["^dev", "email"],
       "continuous": true
     },
     "email": {
@@ -22,12 +15,8 @@
     }
   },
   "namedInputs": {
-    "sharedGlobals": [
-      "{workspaceRoot}/.github/workflows/ci.yml"
-    ],
-    "default": [
-      "sharedGlobals"
-    ]
+    "sharedGlobals": ["{workspaceRoot}/.github/workflows/ci.yml"],
+    "default": ["sharedGlobals"]
   },
   "nxCloudId": "691fe786e56af5ab30ac4788",
   "plugins": [
@@ -45,5 +34,30 @@
         }
       }
     }
-  ]
+  ],
+  "release": {
+    "version": {
+      "preVersionCommand": "nx registry:build packages/shadcn",
+      "conventionalCommits": false
+    },
+    "changelog": {
+      "projectChangelogs": false,
+      "workspaceChangelog": {
+        "createRelease": "github",
+        "renderOptions": {
+          "excludeAuthors": ["autofix-ci[bot]", "autofix.ci"]
+        }
+      }
+    },
+    "conventionalCommits": {
+      "types": {
+        "__INVALID__": {
+          "semverBump": "patch",
+          "changelog": {
+            "title": "Changes"
+          }
+        }
+      }
+    }
+  }
 }

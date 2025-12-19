@@ -3,7 +3,11 @@
   "name": "magic-link",
   "title": "Magic Link",
   "description": "A magic link sign-in form component with email input and optional social provider support.",
-  "dependencies": ["@better-auth-ui/react@*", "better-auth", "lucide-react"],
+  "dependencies": [
+    "@better-auth-ui/react@*",
+    "better-auth",
+    "lucide-react"
+  ],
   "registryDependencies": [
     "button",
     "card",

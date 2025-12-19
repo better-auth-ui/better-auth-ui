@@ -1,0 +1,40 @@
+name: publish
+
+# Add manual trigger
+on:
+  workflow_dispatch:
+
+jobs:
+  publish:
+    # prevents this action from running on forks
+    if: github.repository == 'better-auth-ui/better-auth-ui'
+    name: Publish to npm
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write #allows to push commits to the repo
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0 # include tags
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install
+        
+      - name: Set shas
+        uses: nrwl/nx-set-shas@v4
+
+      - name: config git user
+        run: |
+          git config --global user.name "daveycodez"
+          git config --global user.email "daveycodez@gmail.com"
+
+      - name: Release a new package
+        run: nx release -d
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
