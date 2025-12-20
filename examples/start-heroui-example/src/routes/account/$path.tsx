@@ -15,7 +15,7 @@ function AccountPage() {
   const { path } = Route.useParams()
 
   return (
-    <div className="min-h-svh flex items-center justify-center p-4">
+    <div className="min-h-svh container mx-auto p-4 md:p-6">
       <Account path={path} />
     </div>
   )

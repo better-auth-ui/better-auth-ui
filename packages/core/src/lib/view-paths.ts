@@ -11,7 +11,8 @@ export const viewPaths = {
     signOut: "sign-out"
   },
   account: {
-    settings: "settings"
+    settings: "settings",
+    security: "security"
   }
 }
 

@@ -31,7 +31,7 @@ export function UserAvatar({
     return (
       <Skeleton
         className={cn(
-          "size-8",
+          size === "sm" ? "size-8" : size === "md" ? "size-10" : "size-12",
           rounded ? "rounded-full" : "rounded-lg",
           className
         )}

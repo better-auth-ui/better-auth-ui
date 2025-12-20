@@ -1,11 +1,14 @@
 import type { AnyAuthConfig } from "@better-auth-ui/react"
 import { UserProfile } from "./user-profile"
 
-export type SettingsProps = AnyAuthConfig & {
+export type AccountSettingsProps = AnyAuthConfig & {
   className?: string
 }
 
-export function Settings({ className, ...config }: SettingsProps) {
+export function AccountSettings({
+  className,
+  ...config
+}: AccountSettingsProps) {
   return (
     <div className={className}>
       <UserProfile {...config} />
