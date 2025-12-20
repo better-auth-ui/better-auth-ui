@@ -494,7 +494,7 @@
       ],
       "files": [
         {
-          "path": "src/components/settings/user-profile.tsx",
+          "path": "src/components/settings/account/user-profile.tsx",
           "type": "registry:component"
         },
         {
@@ -520,11 +520,11 @@
       "registryDependencies": ["user-profile"],
       "files": [
         {
-          "path": "src/components/settings/account-settings.tsx",
+          "path": "src/components/settings/account/account-settings.tsx",
           "type": "registry:component"
         },
         {
-          "path": "src/components/settings/user-profile.tsx",
+          "path": "src/components/settings/account/user-profile.tsx",
           "type": "registry:component"
         }
       ]
@@ -546,7 +546,7 @@
           "type": "registry:component"
         },
         {
-          "path": "src/components/settings/account-settings.tsx",
+          "path": "src/components/settings/account/account-settings.tsx",
           "type": "registry:component"
         },
         {

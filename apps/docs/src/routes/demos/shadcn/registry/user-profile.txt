@@ -4,7 +4,7 @@ export const Route = createFileRoute("/demos/shadcn/user-profile-registry")({
   component: RouteComponent
 })
 
-import { UserProfile } from "@/components/settings/user-profile"
+import { UserProfile } from "@/components/settings/account/user-profile"
 
 function RouteComponent() {
   return (
