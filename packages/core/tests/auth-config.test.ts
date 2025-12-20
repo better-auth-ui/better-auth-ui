@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest"
 import {
-  type AuthConfig,
   defaultConfig,
+  type AuthConfig,
   type EmailAndPasswordConfig
 } from "../src/lib/auth-config"
 import { basePaths } from "../src/lib/base-paths"
@@ -9,19 +9,106 @@ import { localization } from "../src/lib/localization"
 import { viewPaths } from "../src/lib/view-paths"
 
 describe("auth-config", () => {
+  describe("EmailAndPasswordConfig type", () => {
+    it("should allow valid email and password configuration", () => {
+      const config: EmailAndPasswordConfig = {
+        enabled: true,
+        forgotPassword: true,
+        confirmPassword: true,
+        minPasswordLength: 8,
+        maxPasswordLength: 128,
+        rememberMe: true,
+        requireEmailVerification: false
+      }
+
+      expect(config.enabled).toBe(true)
+      expect(config.forgotPassword).toBe(true)
+      expect(config.confirmPassword).toBe(true)
+      expect(config.minPasswordLength).toBe(8)
+      expect(config.maxPasswordLength).toBe(128)
+      expect(config.rememberMe).toBe(true)
+      expect(config.requireEmailVerification).toBe(false)
+    })
+
+    it("should work with minimal configuration", () => {
+      const config: EmailAndPasswordConfig = {
+        enabled: true,
+        forgotPassword: false
+      }
+
+      expect(config.enabled).toBe(true)
+      expect(config.forgotPassword).toBe(false)
+    })
+
+    it("should allow optional fields to be undefined", () => {
+      const config: EmailAndPasswordConfig = {
+        enabled: false,
+        forgotPassword: true
+      }
+
+      expect(config.confirmPassword).toBeUndefined()
+      expect(config.minPasswordLength).toBeUndefined()
+      expect(config.maxPasswordLength).toBeUndefined()
+      expect(config.rememberMe).toBeUndefined()
+      expect(config.requireEmailVerification).toBeUndefined()
+    })
+  })
+
+  describe("AuthConfig type", () => {
+    it("should allow complete auth configuration", () => {
+      const config: AuthConfig = {
+        basePaths: {
+          auth: "/auth",
+          settings: "/settings",
+          organization: "/organization"
+        },
+        baseURL: "https://example.com",
+        emailAndPassword: {
+          enabled: true,
+          forgotPassword: true,
+          minPasswordLength: 10,
+          maxPasswordLength: 256
+        },
+        localization: localization,
+        magicLink: true,
+        redirectTo: "/dashboard",
+        socialProviders: ["google", "github"],
+        viewPaths: viewPaths,
+        toast: {
+          error: () => {},
+          success: () => {},
+          info: () => {}
+        },
+        navigate: (path: string) => {},
+        replace: (path: string) => {}
+      }
+
+      expect(config.basePaths.auth).toBe("/auth")
+      expect(config.baseURL).toBe("https://example.com")
+      expect(config.redirectTo).toBe("/dashboard")
+      expect(config.socialProviders).toContain("google")
+      expect(config.magicLink).toBe(true)
+    })
+  })
+
   describe("defaultConfig", () => {
-    it("should have correct basePaths", () => {
+    it("should export a valid default configuration", () => {
+      expect(defaultConfig).toBeDefined()
+      expect(typeof defaultConfig).toBe("object")
+    })
+
+    it("should have correct basePaths defaults", () => {
       expect(defaultConfig.basePaths).toEqual(basePaths)
       expect(defaultConfig.basePaths.auth).toBe("/auth")
       expect(defaultConfig.basePaths.settings).toBe("/settings")
       expect(defaultConfig.basePaths.organization).toBe("/organization")
     })
 
-    it("should have empty baseURL", () => {
+    it("should have empty baseURL by default", () => {
       expect(defaultConfig.baseURL).toBe("")
     })
 
-    it("should have default emailAndPassword config", () => {
+    it("should have correct emailAndPassword defaults", () => {
       expect(defaultConfig.emailAndPassword).toBeDefined()
       expect(defaultConfig.emailAndPassword?.enabled).toBe(true)
       expect(defaultConfig.emailAndPassword?.forgotPassword).toBe(true)
@@ -30,15 +117,15 @@ describe("auth-config", () => {
       expect(defaultConfig.emailAndPassword?.maxPasswordLength).toBe(128)
     })
 
-    it("should have default redirectTo", () => {
+    it("should have root path as default redirectTo", () => {
       expect(defaultConfig.redirectTo).toBe("/")
     })
 
-    it("should have viewPaths", () => {
+    it("should have default viewPaths", () => {
       expect(defaultConfig.viewPaths).toEqual(viewPaths)
     })
 
-    it("should have localization", () => {
+    it("should have default localization", () => {
       expect(defaultConfig.localization).toEqual(localization)
     })
 
@@ -50,187 +137,68 @@ describe("auth-config", () => {
       expect(typeof defaultConfig.replace).toBe("function")
     })
 
-    it("should have toast configuration", () => {
+    it("should have toast configuration with all methods", () => {
       expect(defaultConfig.toast).toBeDefined()
       expect(typeof defaultConfig.toast.error).toBe("function")
       expect(typeof defaultConfig.toast.success).toBe("function")
       expect(typeof defaultConfig.toast.info).toBe("function")
     })
-  })
 
-  describe("EmailAndPasswordConfig", () => {
-    it("should allow all optional fields to be undefined", () => {
-      const minimalConfig: EmailAndPasswordConfig = {
-        enabled: true,
-        forgotPassword: true
-      }
+    it("should have navigate function that sets window.location.href", () => {
+      const originalHref = window.location.href
+      
+      // Mock window.location.href
+      delete (window as any).location
+      window.location = { href: "" } as any
 
-      expect(minimalConfig.enabled).toBe(true)
-      expect(minimalConfig.forgotPassword).toBe(true)
-      expect(minimalConfig.confirmPassword).toBeUndefined()
-      expect(minimalConfig.maxPasswordLength).toBeUndefined()
-      expect(minimalConfig.minPasswordLength).toBeUndefined()
-      expect(minimalConfig.rememberMe).toBeUndefined()
-      expect(minimalConfig.requireEmailVerification).toBeUndefined()
+      defaultConfig.navigate("/test-path")
+      expect(window.location.href).toBe("/test-path")
+
+      // Restore
+      window.location.href = originalHref
     })
 
-    it("should allow full configuration", () => {
-      const fullConfig: EmailAndPasswordConfig = {
-        enabled: true,
-        confirmPassword: true,
-        forgotPassword: true,
-        maxPasswordLength: 256,
-        minPasswordLength: 12,
-        rememberMe: true,
-        requireEmailVerification: true
-      }
+    it("should have replace function that calls window.location.replace", () => {
+      const replaceMock = vi.fn()
+      const originalReplace = window.location.replace
+      window.location.replace = replaceMock
 
-      expect(fullConfig.enabled).toBe(true)
-      expect(fullConfig.confirmPassword).toBe(true)
-      expect(fullConfig.forgotPassword).toBe(true)
-      expect(fullConfig.maxPasswordLength).toBe(256)
-      expect(fullConfig.minPasswordLength).toBe(12)
-      expect(fullConfig.rememberMe).toBe(true)
-      expect(fullConfig.requireEmailVerification).toBe(true)
-    })
+      defaultConfig.replace("/test-path")
+      expect(replaceMock).toHaveBeenCalledWith("/test-path")
 
-    it("should allow disabled email and password auth", () => {
-      const disabledConfig: EmailAndPasswordConfig = {
-        enabled: false,
-        forgotPassword: false
-      }
-
-      expect(disabledConfig.enabled).toBe(false)
-      expect(disabledConfig.forgotPassword).toBe(false)
+      // Restore
+      window.location.replace = originalReplace
     })
   })
 
-  describe("AuthConfig interface", () => {
-    it("should allow custom basePaths", () => {
-      const config: AuthConfig = {
-        ...defaultConfig,
-        basePaths: {
-          auth: "/custom-auth",
-          settings: "/custom-settings",
-          organization: "/custom-org"
-        }
-      }
-
-      expect(config.basePaths.auth).toBe("/custom-auth")
-      expect(config.basePaths.settings).toBe("/custom-settings")
-      expect(config.basePaths.organization).toBe("/custom-org")
-    })
-
-    it("should allow custom baseURL", () => {
-      const config: AuthConfig = {
-        ...defaultConfig,
+  describe("configuration merging", () => {
+    it("should allow partial overrides of default config", () => {
+      const customConfig: Partial<AuthConfig> = {
+        redirectTo: "/custom-dashboard",
         baseURL: "https://api.example.com"
       }
 
-      expect(config.baseURL).toBe("https://api.example.com")
+      const merged = { ...defaultConfig, ...customConfig }
+
+      expect(merged.redirectTo).toBe("/custom-dashboard")
+      expect(merged.baseURL).toBe("https://api.example.com")
+      expect(merged.basePaths).toEqual(defaultConfig.basePaths)
     })
 
-    it("should allow custom redirectTo", () => {
-      const config: AuthConfig = {
-        ...defaultConfig,
-        redirectTo: "/dashboard"
+    it("should handle deep merging of emailAndPassword config", () => {
+      const customConfig: Partial<AuthConfig> = {
+        emailAndPassword: {
+          ...defaultConfig.emailAndPassword!,
+          minPasswordLength: 12,
+          confirmPassword: true
+        }
       }
 
-      expect(config.redirectTo).toBe("/dashboard")
-    })
+      const merged = { ...defaultConfig, ...customConfig }
 
-    it("should allow social providers configuration", () => {
-      const config: AuthConfig = {
-        ...defaultConfig,
-        socialProviders: ["github", "google", "discord"]
-      }
-
-      expect(config.socialProviders).toEqual(["github", "google", "discord"])
-      expect(config.socialProviders?.length).toBe(3)
-    })
-
-    it("should allow magic link configuration", () => {
-      const configEnabled: AuthConfig = {
-        ...defaultConfig,
-        magicLink: true
-      }
-
-      const configDisabled: AuthConfig = {
-        ...defaultConfig,
-        magicLink: false
-      }
-
-      expect(configEnabled.magicLink).toBe(true)
-      expect(configDisabled.magicLink).toBe(false)
-    })
-
-    it("should allow custom navigate function", () => {
-      const mockNavigate = (path: string) => {
-        console.log(`Navigating to ${path}`)
-      }
-
-      const config: AuthConfig = {
-        ...defaultConfig,
-        navigate: mockNavigate
-      }
-
-      expect(config.navigate).toBe(mockNavigate)
-    })
-
-    it("should allow custom replace function", () => {
-      const mockReplace = (path: string) => {
-        console.log(`Replacing with ${path}`)
-      }
-
-      const config: AuthConfig = {
-        ...defaultConfig,
-        replace: mockReplace
-      }
-
-      expect(config.replace).toBe(mockReplace)
-    })
-  })
-
-  describe("default navigation functions", () => {
-    it("navigate should set window.location.href", () => {
-      const originalLocation = window.location.href
-
-      // Note: In test environment, this won't actually navigate
-      // but we can verify the function exists and is callable
-      expect(() => {
-        // We can't actually test navigation in a unit test environment
-        // but we can verify the function signature
-        const navFn = defaultConfig.navigate
-        expect(typeof navFn).toBe("function")
-      }).not.toThrow()
-    })
-
-    it("replace should call window.location.replace", () => {
-      // Verify the function exists and is callable
-      expect(() => {
-        const replaceFn = defaultConfig.replace
-        expect(typeof replaceFn).toBe("function")
-      }).not.toThrow()
-    })
-  })
-
-  describe("toast configuration", () => {
-    it("should call default toast functions", () => {
-      const message = "Test message"
-
-      // These will trigger browser alerts/confirms in real environment
-      // In test environment, they should not throw
-      expect(() => {
-        defaultConfig.toast.error(message)
-      }).not.toThrow()
-
-      expect(() => {
-        defaultConfig.toast.success(message)
-      }).not.toThrow()
-
-      expect(() => {
-        defaultConfig.toast.info(message)
-      }).not.toThrow()
+      expect(merged.emailAndPassword?.minPasswordLength).toBe(12)
+      expect(merged.emailAndPassword?.confirmPassword).toBe(true)
+      expect(merged.emailAndPassword?.enabled).toBe(true)
     })
   })
 })
