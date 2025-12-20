@@ -124,4 +124,6 @@
 /* Override md breakpoint for iframe demos - show desktop styles at smaller widths */
 @theme inline {
   --breakpoint-md: 28rem;
+  --breakpoint-lg: 38rem;
+  --breakpoint-xl: 48rem;
 }

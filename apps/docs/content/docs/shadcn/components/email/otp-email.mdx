@@ -1,0 +1,44 @@
+---
+title: <OtpEmail />
+description: Email template component that sends one-time password (OTP) verification codes to users.
+---
+
+## Usage
+
+<Demo src="/demos/shadcn/email/otp-email" className="h-[620px]" />
+
+```tsx
+import { OtpEmail } from "@better-auth-ui/react"
+
+export function OTPVerificationEmail() {
+  return (
+    <OtpEmail
+      verificationCode="123456"
+      email="user@example.com"
+      appName="My App"
+      expirationMinutes={10}
+      logoURL="https://example.com/logo.png"
+      darkMode={true}
+    />
+  )
+}
+```
+
+## Installation
+
+```npm
+npx shadcn@latest add https://better-auth-ui.com/r/otp-email.json
+```
+
+## Props
+
+<auto-type-table path="../../../../../../../packages/react/src/components/email/otp-email.tsx" name="OtpEmailProps" />
+
+## Features
+
+- Large, prominently displayed verification code
+- Expiration time information
+- Security notice for unauthorized requests
+- Customizable branding and styling
+- Support for light/dark mode themes
+- Localization support

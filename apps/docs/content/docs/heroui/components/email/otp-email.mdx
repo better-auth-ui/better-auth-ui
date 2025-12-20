@@ -1,0 +1,37 @@
+---
+title: <OtpEmail />
+description: Email template component that sends one-time password (OTP) verification codes to users.
+---
+
+## Usage
+
+<Demo src="/demos/heroui/email/otp-email" className="h-[620px]" />
+
+```tsx
+import { OtpEmail } from "@better-auth-ui/heroui"
+
+export function OTPVerificationEmail() {
+  return (
+    <OtpEmail
+      verificationCode="123456"
+      email="user@example.com"
+      appName="My App"
+      expirationMinutes={10}
+      darkMode={true}
+    />
+  )
+}
+```
+
+## Props
+
+<auto-type-table path="../../../../../../../packages/react/src/components/email/otp-email.tsx" name="OtpEmailProps" />
+
+## Features
+
+- Large, prominently displayed verification code
+- Expiration time information
+- Security notice for unauthorized requests
+- Customizable branding and styling
+- Support for light/dark mode themes
+- Localization support
