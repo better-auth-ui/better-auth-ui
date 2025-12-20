@@ -62,8 +62,8 @@ jobs:
       # Check code formatting and linting
       - run: bun nx-cloud record -- biome lint
 
-      # Run tests and build the project
-      - run: bun nx run-many -t build
+      # Run tests and build the project (excluding docs)
+      - run: bun nx run-many -t build --exclude=docs
       - run: bun nx run-many -t test
 
       # Publish new versions of the packages
