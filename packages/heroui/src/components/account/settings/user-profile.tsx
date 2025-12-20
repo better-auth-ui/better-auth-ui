@@ -39,10 +39,11 @@ export function UserProfile({ className, ...config }: UserProfileProps) {
   return (
     <Card className="p-4 md:p-6">
       <Form action={formAction}>
-        <Fieldset className="w-full">
+        <Fieldset className="w-full gap-4 md:gap-6">
           <Fieldset.Legend className="text-xl">
             {localization.account.profile}
           </Fieldset.Legend>
+
           <Description />
 
           <div className="flex items-center gap-3">
@@ -59,7 +60,7 @@ export function UserProfile({ className, ...config }: UserProfileProps) {
             </Button>
 
             <div className="flex flex-col gap-1">
-              <p className="text-sm font-medium leading-5">
+              <p className="text-sm font-medium">
                 {sessionData?.user?.displayUsername ||
                   sessionData?.user?.name ||
                   sessionData?.user?.email}
@@ -81,7 +82,9 @@ export function UserProfile({ className, ...config }: UserProfileProps) {
               isDisabled={isPending}
             >
               <Label>{localization.auth.name}</Label>
+
               <Input placeholder={localization.auth.name} />
+
               <FieldError />
             </TextField>
           </Fieldset.Group>
@@ -104,39 +107,24 @@ export function UserProfile({ className, ...config }: UserProfileProps) {
 
 function UserProfileSkeleton() {
   return (
-    <Card className="p-4 md:p-6">
-      <Form>
-        <Fieldset className="w-full">
-          <Skeleton className="h-7 w-16 rounded-xl" />
+    <Card className="p-4 md:p-6 gap-4 md:gap-6">
+      <Skeleton className="h-7 w-16 rounded-xl" />
 
-          <div className="flex items-center gap-3">
-            <Button
-              isIconOnly
-              variant="ghost"
-              className="p-0 h-auto w-auto rounded-full"
-            >
-              <UserAvatar size="lg" />
-            </Button>
+      <div className="flex items-center gap-3">
+        <Skeleton className="size-12 rounded-full" />
 
-            <div className="flex flex-col gap-1">
-              <Skeleton className="h-4 mt-0.5 w-24 rounded-lg" />
-              <Skeleton className="h-3.5 mt-0.5 w-32 rounded-lg" />
-            </div>
-          </div>
+        <div className="flex flex-col gap-1.5">
+          <Skeleton className="h-4 mt-0.5 w-24 rounded-lg" />
+          <Skeleton className="h-3 mt-0.5 w-32 rounded-lg" />
+        </div>
+      </div>
 
-          <Fieldset.Group>
-            <TextField>
-              <Skeleton className="h-4 w-16 my-0.5 rounded-lg" />
-              <Skeleton className="h-9 w-full rounded-xl" />
-              <FieldError />
-            </TextField>
-          </Fieldset.Group>
+      <div className="flex flex-col gap-1">
+        <Skeleton className="h-4 w-12 my-0.5 rounded-lg" />
+        <Skeleton className="h-9 w-full rounded-xl" />
+      </div>
 
-          <Fieldset.Actions>
-            <Skeleton className="h-10 md:h-9 w-36 rounded-full" />
-          </Fieldset.Actions>
-        </Fieldset>
-      </Form>
+      <Skeleton className="h-10 md:h-9 w-36 rounded-full mt-1" />
     </Card>
   )
 }
