@@ -11,11 +11,13 @@ function hastText(value: string): HastNode {
   return { type: "text", value }
 }
 
-function hastSpan(value: string, color: string): HastNode {
+function hastShikiSpan(value: string, light: string, dark: string): HastNode {
   return {
     type: "element",
     tagName: "span",
-    properties: { style: `color:${color}` },
+    // Fumadocs styles `.shiki code span { color: var(--shiki-light) }`
+    // and `.dark .shiki code span { color: var(--shiki-dark) }`
+    properties: { style: `--shiki-light: ${light}; --shiki-dark: ${dark};` },
     children: [hastText(value)]
   }
 }
@@ -84,7 +86,7 @@ export async function renderTypeToHastFast(type: string): Promise<HastNode> {
   // Only wrap "interesting" tokens to keep the AST tiny (memory-safe).
   // Everything else stays as plain text.
   const tokenRe =
-    /"([^"\\]|\\.)*"|'([^'\\]|\\.)*'|`([^`\\]|\\.)*`|\b\d+(?:\.\d+)?\b|\b[A-Za-z_$][A-Za-z0-9_$]*\b/g
+    /"([^"\\]|\\.)*"|'([^'\\]|\\.)*'|`([^`\\]|\\.)*`|\||&|\b\d+(?:\.\d+)?\b|\b[A-Za-z_$][A-Za-z0-9_$]*\b/g
 
   const out: HastNode[] = []
   let last = 0
@@ -95,15 +97,18 @@ export async function renderTypeToHastFast(type: string): Promise<HastNode> {
 
     const tok = match[0]
     if (tok[0] === '"' || tok[0] === "'" || tok[0] === "`") {
-      out.push(hastSpan(tok, "#a6e3a1"))
+      // GitHub-like Shiki colors (light/dark)
+      out.push(hastShikiSpan(tok, "#032F62", "#9ECBFF"))
+    } else if (tok === "|" || tok === "&") {
+      out.push(hastShikiSpan(tok, "#D73A49", "#F97583"))
     } else if (/^\d/.test(tok)) {
-      out.push(hastSpan(tok, "#f9e2af"))
+      out.push(hastShikiSpan(tok, "#005CC5", "#79B8FF"))
     } else if (tok === "true" || tok === "false") {
-      out.push(hastSpan(tok, "#fab387"))
+      out.push(hastShikiSpan(tok, "#005CC5", "#79B8FF"))
     } else if (keywords.has(tok)) {
-      out.push(hastSpan(tok, "#cba6f7"))
+      out.push(hastShikiSpan(tok, "#D73A49", "#F97583"))
     } else if (builtins.has(tok)) {
-      out.push(hastSpan(tok, "#89b4fa"))
+      out.push(hastShikiSpan(tok, "#005CC5", "#79B8FF"))
     } else {
       // leave identifiers as plain text (saves a *lot* of nodes)
       out.push(hastText(tok))
@@ -116,10 +121,15 @@ export async function renderTypeToHastFast(type: string): Promise<HastNode> {
 
   return {
     type: "element",
-    tagName: "code",
-    properties: { style: "font-variant-ligatures:none" },
-    children: out
+    tagName: "span",
+    properties: { className: "shiki" },
+    children: [
+      {
+        type: "element",
+        tagName: "code",
+        properties: { style: "font-variant-ligatures:none" },
+        children: out
+      }
+    ]
   }
 }
-
-
