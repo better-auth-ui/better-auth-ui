@@ -11,8 +11,8 @@
   },
   "dependencies": {
     "@better-auth-ui/heroui": "*",
-    "@heroui/react": "^3.0.0-beta.2",
-    "@heroui/styles": "^3.0.0-beta.2",
+    "@heroui/react": "^3.0.0-beta.3",
+    "@heroui/styles": "^3.0.0-beta.3",
     "better-auth": "^1.4.7",
     "next": "^16.1.0",
     "next-themes": "^0.4.6",
