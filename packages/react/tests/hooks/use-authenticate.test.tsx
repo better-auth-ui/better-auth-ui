@@ -99,9 +99,7 @@ describe("useAuthenticate", () => {
       renderHook(() => useAuthenticate(), { wrapper })
 
       await waitFor(() => {
-        expect(mockReplace).toHaveBeenCalledWith(
-          "/auth/sign-in?redirectTo=%2F"
-        )
+        expect(mockReplace).toHaveBeenCalledWith("/auth/sign-in?redirectTo=%2F")
       })
     })
 

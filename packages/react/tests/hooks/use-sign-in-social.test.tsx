@@ -1,7 +1,7 @@
 import { renderHook } from "@testing-library/react"
-import { act } from "react"
 import { createAuthClient } from "better-auth/react"
 import type { ReactNode } from "react"
+import { act } from "react"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import { AuthProvider } from "../../src/components/auth/auth-provider"
 import { useSignInSocial } from "../../src/hooks/auth/use-sign-in-social"
@@ -43,7 +43,11 @@ describe("useSignInSocial", () => {
   })
 
   const wrapper = ({ children }: { children: ReactNode }) => (
-    <AuthProvider authClient={mockAuthClient} toast={mockToast} baseURL="https://example.com">
+    <AuthProvider
+      authClient={mockAuthClient}
+      toast={mockToast}
+      baseURL="https://example.com"
+    >
       {children}
     </AuthProvider>
   )

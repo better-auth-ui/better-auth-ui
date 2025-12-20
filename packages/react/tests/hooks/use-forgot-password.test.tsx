@@ -1,7 +1,7 @@
 import { renderHook, waitFor } from "@testing-library/react"
-import { act } from "react"
 import { createAuthClient } from "better-auth/react"
 import type { ReactNode } from "react"
+import { act } from "react"
 import { afterEach, describe, expect, it, vi } from "vitest"
 import { AuthProvider } from "../../src/components/auth/auth-provider"
 import { useForgotPassword } from "../../src/hooks/auth/use-forgot-password"

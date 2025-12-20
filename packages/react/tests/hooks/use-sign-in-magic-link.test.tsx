@@ -1,7 +1,7 @@
 import { renderHook } from "@testing-library/react"
-import { act } from "react"
 import { createAuthClient } from "better-auth/react"
 import type { ReactNode } from "react"
+import { act } from "react"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import { AuthProvider } from "../../src/components/auth/auth-provider"
 import { useSignInMagicLink } from "../../src/hooks/auth/use-sign-in-magic-link"
@@ -43,7 +43,11 @@ describe("useSignInMagicLink", () => {
   })
 
   const wrapper = ({ children }: { children: ReactNode }) => (
-    <AuthProvider authClient={mockAuthClient} toast={mockToast} baseURL="https://example.com">
+    <AuthProvider
+      authClient={mockAuthClient}
+      toast={mockToast}
+      baseURL="https://example.com"
+    >
       {children}
     </AuthProvider>
   )
@@ -81,7 +85,9 @@ describe("useSignInMagicLink", () => {
         await signInMagicLinkAction(formData)
       })
 
-      expect(mockToast.success).toHaveBeenCalledWith("Magic link sent to your email")
+      expect(mockToast.success).toHaveBeenCalledWith(
+        "Magic link sent to your email"
+      )
     })
 
     it("should clear email in state after success", async () => {
