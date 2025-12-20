@@ -53,7 +53,7 @@ export function UserProfile({ className, ...config }: UserProfileProps) {
               variant="ghost"
               className="p-0 h-auto w-auto rounded-full"
             >
-              <UserAvatar size="lg" />
+              <UserAvatar {...config} size="lg" />
 
               <span className="absolute right-0 bottom-0 size-3.5 rounded-full bg-background ring-2 ring-surface-quaternary flex items-center justify-center">
                 <PencilIcon className="size-2 text-muted" />

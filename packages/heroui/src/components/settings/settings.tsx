@@ -71,7 +71,7 @@ export function Settings({
       </Tabs.ListContainer>
 
       <Tabs.Panel id="account" className="md:pt-0 px-0 md:px-2">
-        <AccountSettings />
+        <AccountSettings {...config} />
       </Tabs.Panel>
 
       <Tabs.Panel id="security">Security</Tabs.Panel>
