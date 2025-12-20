@@ -3,7 +3,7 @@ import type { SettingsView } from "@better-auth-ui/react/core"
 import { ShieldCheckIcon, UserCircleIcon } from "@heroicons/react/24/outline"
 import { cn, Tabs, type TabsProps } from "@heroui/react"
 import { useAuth } from "../../hooks/use-auth"
-import { AccountSettings } from "./settings/account-settings"
+import { AccountSettings } from "./account-settings"
 
 export type SettingsProps = AnyAuthConfig & {
   className?: string

@@ -1,7 +1,7 @@
 import type { AnyAuthConfig } from "@better-auth-ui/react"
 
-import { cn } from "../../../lib/utils"
-import { UserProfile } from "./user-profile"
+import { cn } from "../../lib/utils"
+import { UserProfile } from "./settings/user-profile"
 
 export type AccountSettingsProps = AnyAuthConfig & {
   className?: string

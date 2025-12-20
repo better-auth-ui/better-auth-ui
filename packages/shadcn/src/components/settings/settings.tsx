@@ -8,7 +8,7 @@ import { useMemo } from "react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useAuth } from "@/hooks/auth/use-auth"
 import { cn } from "@/lib/utils"
-import { AccountSettings } from "./settings/account-settings"
+import { AccountSettings } from "./account-settings"
 
 export type SettingsProps = AnyAuthConfig & {
   className?: string
