@@ -5,18 +5,18 @@ describe("auth-toast", () => {
   describe("defaultToast", () => {
     it("should display alert with message when no action provided", () => {
       const alertSpy = vi.spyOn(window, "alert").mockImplementation(() => {})
-      
+
       defaultToast("Test message")
-      
+
       expect(alertSpy).toHaveBeenCalledWith("Test message")
       alertSpy.mockRestore()
     })
 
     it("should handle undefined message", () => {
       const alertSpy = vi.spyOn(window, "alert").mockImplementation(() => {})
-      
+
       defaultToast(undefined)
-      
+
       expect(alertSpy).toHaveBeenCalledWith(undefined)
       alertSpy.mockRestore()
     })
@@ -24,11 +24,11 @@ describe("auth-toast", () => {
     it("should use confirm and call action onClick when action provided and user confirms", () => {
       const confirmSpy = vi.spyOn(window, "confirm").mockReturnValue(true)
       const actionFn = vi.fn()
-      
+
       defaultToast("Confirm action?", {
         action: { label: "Confirm", onClick: actionFn }
       })
-      
+
       expect(confirmSpy).toHaveBeenCalledWith("Confirm action?")
       expect(actionFn).toHaveBeenCalledTimes(1)
       confirmSpy.mockRestore()
@@ -37,11 +37,11 @@ describe("auth-toast", () => {
     it("should not call action onClick when user cancels", () => {
       const confirmSpy = vi.spyOn(window, "confirm").mockReturnValue(false)
       const actionFn = vi.fn()
-      
+
       defaultToast("Cancel action?", {
         action: { label: "Cancel", onClick: actionFn }
       })
-      
+
       expect(confirmSpy).toHaveBeenCalledWith("Cancel action?")
       expect(actionFn).not.toHaveBeenCalled()
       confirmSpy.mockRestore()
@@ -50,14 +50,14 @@ describe("auth-toast", () => {
     it("should handle async action onClick", async () => {
       const confirmSpy = vi.spyOn(window, "confirm").mockReturnValue(true)
       const asyncAction = vi.fn().mockResolvedValue("done")
-      
+
       defaultToast("Async action?", {
         action: { label: "Do it", onClick: asyncAction }
       })
-      
+
       expect(confirmSpy).toHaveBeenCalledWith("Async action?")
       expect(asyncAction).toHaveBeenCalledTimes(1)
-      
+
       await asyncAction()
       expect(await asyncAction.mock.results[0]?.value).toBe("done")
       confirmSpy.mockRestore()
@@ -66,11 +66,11 @@ describe("auth-toast", () => {
     it("should handle action with empty label", () => {
       const confirmSpy = vi.spyOn(window, "confirm").mockReturnValue(true)
       const actionFn = vi.fn()
-      
+
       defaultToast("Action", {
         action: { label: "", onClick: actionFn }
       })
-      
+
       expect(confirmSpy).toHaveBeenCalled()
       expect(actionFn).toHaveBeenCalled()
       confirmSpy.mockRestore()
@@ -105,7 +105,7 @@ describe("auth-toast", () => {
       }
 
       expect(mockToast.dismiss).toBeUndefined()
-      
+
       mockToast.error("Error")
       expect(mockToast.error).toHaveBeenCalledWith("Error")
     })

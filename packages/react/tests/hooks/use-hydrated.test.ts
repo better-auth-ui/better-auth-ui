@@ -29,7 +29,7 @@ describe("useHydrated", () => {
 
   it("should not cause re-renders when called multiple times", () => {
     let renderCount = 0
-    
+
     const { rerender } = renderHook(() => {
       renderCount++
       return useHydrated()
@@ -37,7 +37,7 @@ describe("useHydrated", () => {
 
     const initialRenderCount = renderCount
     rerender()
-    
+
     // Should only increment by 1 for the rerender, not multiple times
     expect(renderCount).toBe(initialRenderCount + 1)
   })

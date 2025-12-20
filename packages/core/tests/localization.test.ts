@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest"
 import {
-  localization,
   type AuthLocalization,
   type Localization,
+  localization,
   type SettingsLocalization
 } from "../src/lib/localization"
 
@@ -67,8 +67,12 @@ describe("localization", () => {
 
       for (const key of requiredKeys) {
         expect(localization.auth).toHaveProperty(key)
-        expect(typeof localization.auth[key as keyof typeof localization.auth]).toBe("string")
-        expect(localization.auth[key as keyof typeof localization.auth]).not.toBe("")
+        expect(
+          typeof localization.auth[key as keyof typeof localization.auth]
+        ).toBe("string")
+        expect(
+          localization.auth[key as keyof typeof localization.auth]
+        ).not.toBe("")
       }
     })
 
@@ -86,8 +90,12 @@ describe("localization", () => {
       expect(localization.auth.emailPlaceholder).toBe("Enter your email")
       expect(localization.auth.passwordPlaceholder).toBe("Enter your password")
       expect(localization.auth.namePlaceholder).toBe("Enter your name")
-      expect(localization.auth.newPasswordPlaceholder).toBe("Enter your new password")
-      expect(localization.auth.confirmPasswordPlaceholder).toBe("Confirm your password")
+      expect(localization.auth.newPasswordPlaceholder).toBe(
+        "Enter your new password"
+      )
+      expect(localization.auth.confirmPasswordPlaceholder).toBe(
+        "Confirm your password"
+      )
     })
 
     it("should have password visibility toggle strings", () => {
@@ -96,12 +104,24 @@ describe("localization", () => {
     })
 
     it("should have success and error message strings", () => {
-      expect(localization.auth.magicLinkSent).toBe("Magic link sent to your email")
-      expect(localization.auth.passwordResetEmailSent).toBe("Password reset email sent")
-      expect(localization.auth.passwordResetSuccess).toBe("Password reset successfully")
-      expect(localization.auth.verificationEmailSent).toBe("Verification email sent!")
-      expect(localization.auth.passwordsDoNotMatch).toBe("Passwords do not match")
-      expect(localization.auth.invalidResetPasswordToken).toBe("Invalid reset password token")
+      expect(localization.auth.magicLinkSent).toBe(
+        "Magic link sent to your email"
+      )
+      expect(localization.auth.passwordResetEmailSent).toBe(
+        "Password reset email sent"
+      )
+      expect(localization.auth.passwordResetSuccess).toBe(
+        "Password reset successfully"
+      )
+      expect(localization.auth.verificationEmailSent).toBe(
+        "Verification email sent!"
+      )
+      expect(localization.auth.passwordsDoNotMatch).toBe(
+        "Passwords do not match"
+      )
+      expect(localization.auth.invalidResetPasswordToken).toBe(
+        "Invalid reset password token"
+      )
     })
 
     it("should have template string with placeholder for provider", () => {
@@ -110,10 +130,16 @@ describe("localization", () => {
     })
 
     it("should have question/link strings", () => {
-      expect(localization.auth.alreadyHaveAnAccount).toBe("Already have an account?")
-      expect(localization.auth.needToCreateAnAccount).toBe("Need to create an account?")
+      expect(localization.auth.alreadyHaveAnAccount).toBe(
+        "Already have an account?"
+      )
+      expect(localization.auth.needToCreateAnAccount).toBe(
+        "Need to create an account?"
+      )
       expect(localization.auth.forgotPasswordLink).toBe("Forgot password?")
-      expect(localization.auth.rememberYourPassword).toBe("Remember your password?")
+      expect(localization.auth.rememberYourPassword).toBe(
+        "Remember your password?"
+      )
     })
 
     it("should have action button strings", () => {
@@ -141,10 +167,14 @@ describe("localization", () => {
 
       for (const key of requiredKeys) {
         expect(localization.settings).toHaveProperty(key)
-        expect(typeof localization.settings[key as keyof typeof localization.settings]).toBe(
-          "string"
-        )
-        expect(localization.settings[key as keyof typeof localization.settings]).not.toBe("")
+        expect(
+          typeof localization.settings[
+            key as keyof typeof localization.settings
+          ]
+        ).toBe("string")
+        expect(
+          localization.settings[key as keyof typeof localization.settings]
+        ).not.toBe("")
       }
     })
 
@@ -154,7 +184,9 @@ describe("localization", () => {
       expect(localization.settings.security).toBe("Security")
       expect(localization.settings.settings).toBe("Settings")
       expect(localization.settings.saveChanges).toBe("Save changes")
-      expect(localization.settings.profileUpdatedSuccess).toBe("Profile updated successfully")
+      expect(localization.settings.profileUpdatedSuccess).toBe(
+        "Profile updated successfully"
+      )
     })
   })
 
@@ -176,7 +208,8 @@ describe("localization", () => {
     })
 
     it("should correctly type SettingsLocalization", () => {
-      const testSettingsLocalization: SettingsLocalization = localization.settings
+      const testSettingsLocalization: SettingsLocalization =
+        localization.settings
 
       expect(testSettingsLocalization.settings).toBe("Settings")
       expect(testSettingsLocalization.profile).toBe("Profile")

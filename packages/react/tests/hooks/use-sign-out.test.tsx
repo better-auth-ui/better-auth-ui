@@ -148,13 +148,19 @@ describe("useSignOut", () => {
           authClient={mockAuthClient}
           toast={mockToast}
           replace={mockReplace}
-          basePaths={{ auth: "/custom-auth", settings: "/settings", organization: "/org" }}
+          basePaths={{
+            auth: "/custom-auth",
+            settings: "/settings",
+            organization: "/org"
+          }}
         >
           {children}
         </AuthProvider>
       )
 
-      const { result } = renderHook(() => useSignOut(), { wrapper: customWrapper })
+      const { result } = renderHook(() => useSignOut(), {
+        wrapper: customWrapper
+      })
 
       await result.current.signOut()
 
@@ -172,7 +178,12 @@ describe("useSignOut", () => {
           toast={mockToast}
           replace={mockReplace}
           viewPaths={{
-            auth: { signIn: "login", signUp: "register", resetPassword: "reset", magicLink: "magic" },
+            auth: {
+              signIn: "login",
+              signUp: "register",
+              resetPassword: "reset",
+              magicLink: "magic"
+            },
             settings: { account: "account" }
           }}
         >
@@ -180,7 +191,9 @@ describe("useSignOut", () => {
         </AuthProvider>
       )
 
-      const { result } = renderHook(() => useSignOut(), { wrapper: customWrapper })
+      const { result } = renderHook(() => useSignOut(), {
+        wrapper: customWrapper
+      })
 
       await result.current.signOut()
 
@@ -192,7 +205,11 @@ describe("useSignOut", () => {
     it("should accept config parameter to override context", async () => {
       mockSignOut.mockResolvedValue({ error: null })
 
-      const customBasePaths = { auth: "/api/auth", settings: "/settings", organization: "/org" }
+      const customBasePaths = {
+        auth: "/api/auth",
+        settings: "/settings",
+        organization: "/org"
+      }
 
       const { result } = renderHook(
         () => useSignOut({ basePaths: customBasePaths }),

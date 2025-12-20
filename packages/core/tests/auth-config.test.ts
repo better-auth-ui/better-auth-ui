@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest"
 import {
-  defaultConfig,
   type AuthConfig,
+  defaultConfig,
   type EmailAndPasswordConfig
 } from "../src/lib/auth-config"
 import { basePaths } from "../src/lib/base-paths"
@@ -146,7 +146,7 @@ describe("auth-config", () => {
 
     it("should have navigate function that sets window.location.href", () => {
       const originalHref = window.location.href
-      
+
       // Mock window.location.href
       delete (window as any).location
       window.location = { href: "" } as any

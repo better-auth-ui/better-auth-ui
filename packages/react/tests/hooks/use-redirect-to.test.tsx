@@ -48,7 +48,9 @@ describe("useRedirectTo", () => {
         </AuthProvider>
       )
 
-      const { result } = renderHook(() => useRedirectTo(), { wrapper: customWrapper })
+      const { result } = renderHook(() => useRedirectTo(), {
+        wrapper: customWrapper
+      })
 
       expect(result.current).toBe("/dashboard")
     })
@@ -178,7 +180,11 @@ describe("useRedirectTo", () => {
     })
 
     it("should handle multiple query parameters", () => {
-      window.history.pushState({}, "", "/?foo=bar&redirectTo=/dashboard&baz=qux")
+      window.history.pushState(
+        {},
+        "",
+        "/?foo=bar&redirectTo=/dashboard&baz=qux"
+      )
 
       const { result } = renderHook(() => useRedirectTo(), { wrapper })
 
@@ -194,7 +200,11 @@ describe("useRedirectTo", () => {
     })
 
     it("should handle special characters in path", () => {
-      window.history.pushState({}, "", "/?redirectTo=/path-with-dash/and_underscore")
+      window.history.pushState(
+        {},
+        "",
+        "/?redirectTo=/path-with-dash/and_underscore"
+      )
 
       const { result } = renderHook(() => useRedirectTo(), { wrapper })
 
