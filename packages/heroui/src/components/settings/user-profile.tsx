@@ -48,6 +48,7 @@ export function UserProfile({ className, ...config }: UserProfileProps) {
 
           <div className="flex items-center gap-3">
             <Button
+              type="button"
               isIconOnly
               variant="ghost"
               className="p-0 h-auto w-auto rounded-full"
