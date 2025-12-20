@@ -1,0 +1,29 @@
+---
+title: <Settings />
+description: A comprehensive settings component with tabbed navigation for account and security views.
+---
+
+## Usage
+
+<Demo src="/demos/shadcn/settings" className="h-[600px]" />
+
+<Tabs groupId="shadcn-installation" items={["Registry", "Package"]}>
+  <Tab value="Registry">
+```tsx file=<rootDir>/src/routes/demos/shadcn/registry/settings.txt#L7-
+```
+  </Tab>
+  <Tab value="Package">
+```tsx file=<rootDir>/src/routes/demos/shadcn/settings.tsx#L7-
+```
+  </Tab>
+</Tabs>
+
+## Installation
+
+```npm
+npx shadcn@latest add https://better-auth-ui.com/r/settings.json
+```
+
+## Props
+
+<auto-type-table path="../../../../../../packages/shadcn/src/components/settings/settings.tsx" name="SettingsProps" />
