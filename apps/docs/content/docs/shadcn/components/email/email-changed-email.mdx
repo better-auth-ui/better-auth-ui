@@ -1,0 +1,46 @@
+---
+title: <EmailChangedEmail />
+description: Email template component that notifies users when their email address has been changed.
+---
+
+## Usage
+
+<Demo src="/demos/shadcn/email/email-changed-email" className="h-[740px]" />
+
+```tsx
+import { EmailChangedEmail } from "@better-auth-ui/react"
+
+export function EmailChangeNotificationEmail() {
+  return (
+    <EmailChangedEmail
+      oldEmail="old@example.com"
+      newEmail="new@example.com"
+      appName="My App"
+      supportEmail="support@example.com"
+      revertURL="https://example.com/revert-email"
+      logoURL="https://example.com/logo.png"
+      darkMode={true}
+    />
+  )
+}
+```
+
+## Installation
+
+```npm
+npx shadcn@latest add https://better-auth-ui.com/r/email-changed-email.json
+```
+
+## Props
+
+<auto-type-table path="../../../../../../../packages/react/src/components/email/email-changed.tsx" name="EmailChangedEmailProps" />
+
+## Features
+
+- Email change notification
+- Shows previous and new email addresses
+- Revert action button if unauthorized
+- Support contact information
+- Customizable branding and styling
+- Support for light/dark mode themes
+- Localization support

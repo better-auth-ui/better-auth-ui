@@ -1,0 +1,45 @@
+---
+title: <NewDeviceEmail />
+description: Email template component that notifies users when a new device signs in to their account.
+---
+
+## Usage
+
+<Demo src="/demos/heroui/email/new-device-email" className="h-[840px]" />
+
+```tsx
+import { NewDeviceEmail } from "@better-auth-ui/heroui"
+
+export function NewDeviceNotificationEmail() {
+  return (
+    <NewDeviceEmail
+      userEmail="user@example.com"
+      deviceInfo={{
+        browser: "Chrome 120.0",
+        os: "macOS 14.2",
+        location: "San Francisco, CA",
+        ipAddress: "192.168.1.1",
+        timestamp: "January 15, 2024 at 3:30 PM"
+      }}
+      appName="My App"
+      supportEmail="support@example.com"
+      secureAccountLink="https://example.com/secure-account"
+      darkMode={true}
+    />
+  )
+}
+```
+
+## Props
+
+<auto-type-table path="../../../../../../../packages/react/src/components/email/new-device.tsx" name="NewDeviceEmailProps" />
+
+## Features
+
+- Device information display (browser, OS, location, IP)
+- Timestamp of the sign-in
+- Security action button if unauthorized
+- Support contact information
+- Customizable branding and styling
+- Support for light/dark mode themes
+- Localization support
