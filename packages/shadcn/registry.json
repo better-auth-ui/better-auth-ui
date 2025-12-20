@@ -539,10 +539,7 @@
         "better-auth",
         "lucide-react"
       ],
-      "registryDependencies": [
-        "tabs",
-        "account-settings"
-      ],
+      "registryDependencies": ["tabs", "account-settings"],
       "files": [
         {
           "path": "src/components/settings/settings.tsx",
