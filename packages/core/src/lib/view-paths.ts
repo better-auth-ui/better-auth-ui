@@ -10,8 +10,8 @@ export const viewPaths = {
     resetPassword: "reset-password",
     signOut: "sign-out"
   },
-  account: {
-    settings: "settings",
+  settings: {
+    account: "account",
     security: "security"
   }
 }
@@ -28,6 +28,6 @@ export type ViewPaths = typeof viewPaths
 export type AuthView = keyof ViewPaths["auth"]
 
 /**
- * Valid account view key.
+ * Valid settings view key.
  */
-export type AccountView = keyof ViewPaths["account"]
+export type SettingsView = keyof ViewPaths["settings"]

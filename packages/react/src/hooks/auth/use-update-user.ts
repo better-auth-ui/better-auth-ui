@@ -23,7 +23,7 @@ export function useUpdateUser(config?: AnyAuthConfig) {
     } else {
       await refetch()
 
-      toast.success(localization.account.profileUpdatedSuccess)
+      toast.success(localization.settings.profileUpdatedSuccess)
     }
 
     return { name }

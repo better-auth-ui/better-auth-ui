@@ -108,7 +108,10 @@ export const localization = {
     /** @remarks `"Verify your email"` */
     verifyYourEmail: "Verify your email"
   },
-  account: {
+  settings: {
+    /** @remarks `"Account"` */
+    account: "Account",
+
     /** @remarks `"Profile"` */
     profile: "Profile",
 
@@ -119,10 +122,13 @@ export const localization = {
     saveChanges: "Save changes",
 
     /** @remarks `"Security"` */
-    security: "Security"
+    security: "Security",
+
+    /** @remarks `"Settings"` */
+    settings: "Settings"
   }
 }
 
 export type Localization = typeof localization
 export type AuthLocalization = Localization["auth"]
-export type AccountLocalization = Localization["account"]
+export type SettingsLocalization = Localization["settings"]

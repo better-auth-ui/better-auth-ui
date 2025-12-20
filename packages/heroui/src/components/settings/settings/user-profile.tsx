@@ -41,7 +41,7 @@ export function UserProfile({ className, ...config }: UserProfileProps) {
       <Form action={formAction}>
         <Fieldset className="w-full gap-4 md:gap-6">
           <Fieldset.Legend className="text-xl">
-            {localization.account.profile}
+            {localization.settings.profile}
           </Fieldset.Legend>
 
           <Description />
@@ -96,7 +96,7 @@ export function UserProfile({ className, ...config }: UserProfileProps) {
               ) : (
                 <CheckIcon className="size-4" />
               )}
-              {localization.account.saveChanges}
+              {localization.settings.saveChanges}
             </Button>
           </Fieldset.Actions>
         </Fieldset>

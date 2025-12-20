@@ -48,7 +48,7 @@ export function UserProfile({ className, ...config }: UserProfileProps) {
       <Card className={cn("w-full py-4 md:py-6 gap-4 md:gap-6", className)}>
         <CardHeader className="px-4 md:px-6 gap-0">
           <CardTitle className="text-xl">
-            {localization.account.profile}
+            {localization.settings.profile}
           </CardTitle>
         </CardHeader>
 
@@ -117,7 +117,7 @@ export function UserProfile({ className, ...config }: UserProfileProps) {
           <Button type="submit" disabled={isPending}>
             {isPending ? <Spinner /> : <Save />}
 
-            {localization.account.saveChanges}
+            {localization.settings.saveChanges}
           </Button>
         </CardFooter>
       </Card>

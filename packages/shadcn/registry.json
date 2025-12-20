@@ -494,7 +494,7 @@
       ],
       "files": [
         {
-          "path": "src/components/account/settings/user-profile.tsx",
+          "path": "src/components/settings/settings/user-profile.tsx",
           "type": "registry:component"
         },
         {
@@ -520,20 +520,20 @@
       "registryDependencies": ["user-profile"],
       "files": [
         {
-          "path": "src/components/account/settings/account-settings.tsx",
+          "path": "src/components/settings/settings/account-settings.tsx",
           "type": "registry:component"
         },
         {
-          "path": "src/components/account/settings/user-profile.tsx",
+          "path": "src/components/settings/settings/user-profile.tsx",
           "type": "registry:component"
         }
       ]
     },
     {
-      "name": "account",
+      "name": "settings",
       "type": "registry:component",
-      "title": "Account",
-      "description": "A unified account component that renders the appropriate account view based on path or view prop with tab navigation.",
+      "title": "Settings",
+      "description": "A unified settings component that renders the appropriate settings view based on path or view prop with tab navigation.",
       "dependencies": [
         "@better-auth-ui/react@*",
         "better-auth",
@@ -545,11 +545,11 @@
       ],
       "files": [
         {
-          "path": "src/components/account/account.tsx",
+          "path": "src/components/settings/settings.tsx",
           "type": "registry:component"
         },
         {
-          "path": "src/components/account/settings/account-settings.tsx",
+          "path": "src/components/settings/settings/account-settings.tsx",
           "type": "registry:component"
         },
         {

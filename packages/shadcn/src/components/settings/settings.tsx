@@ -1,7 +1,7 @@
 "use client"
 
 import type { AnyAuthConfig } from "@better-auth-ui/react"
-import type { AccountView } from "@better-auth-ui/react/core"
+import type { SettingsView } from "@better-auth-ui/react/core"
 import { Shield, UserCircle2 } from "lucide-react"
 import { useMemo } from "react"
 
@@ -10,42 +10,42 @@ import { useAuth } from "@/hooks/auth/use-auth"
 import { cn } from "@/lib/utils"
 import { AccountSettings } from "./settings/account-settings"
 
-export type AccountProps = AnyAuthConfig & {
+export type SettingsProps = AnyAuthConfig & {
   className?: string
   path?: string
-  view?: AccountView
+  view?: SettingsView
   hideNav?: boolean
 }
 
 /**
- * Selects and renders the appropriate account view component.
+ * Selects and renders the appropriate settings view component.
  *
- * @param path - Route path used to resolve an account view when `view` is not provided
- * @param view - Explicit auth view to render (e.g., "userProfile")
+ * @param path - Route path used to resolve a settings view when `view` is not provided
+ * @param view - Explicit settings view to render (e.g., "account")
  * @param hideNav - Hide the navigation tabs
  */
-export function Account({
+export function Settings({
   className,
   view,
   path,
   hideNav,
   ...config
-}: AccountProps) {
+}: SettingsProps) {
   const { basePaths, localization, viewPaths, Link } = useAuth(config)
 
   if (!view && !path) {
     throw new Error("[Better Auth UI] Either `view` or `path` must be provided")
   }
 
-  const accountPathViews = useMemo(
+  const settingsPathViews = useMemo(
     () =>
       Object.fromEntries(
-        Object.entries(viewPaths.account).map(([k, v]) => [v, k])
-      ) as Record<string, AccountView>,
-    [viewPaths.account]
+        Object.entries(viewPaths.settings).map(([k, v]) => [v, k])
+      ) as Record<string, SettingsView>,
+    [viewPaths.settings]
   )
 
-  const currentView = view || (path ? accountPathViews[path] : undefined)
+  const currentView = view || (path ? settingsPathViews[path] : undefined)
 
   return (
     <Tabs
@@ -54,33 +54,33 @@ export function Account({
     >
       <div className={cn("overflow-auto rounded-md", hideNav && "hidden")}>
         <TabsList
-          aria-label={localization.auth.account}
+          aria-label={localization.settings.settings}
           className="min-w-full md:w-64 lg:w-72 xl:w-80 md:flex-col md:h-fit md:items-stretch"
         >
-          <TabsTrigger value="settings" asChild>
-            <Link href={`${basePaths.account}/${viewPaths.account.settings}`}>
+          <TabsTrigger value="account" asChild>
+            <Link href={`${basePaths.settings}/${viewPaths.settings.account}`}>
               <UserCircle2 />
 
-              {localization.auth.account}
+              {localization.settings.account}
             </Link>
           </TabsTrigger>
 
           <TabsTrigger value="security" asChild>
-            <Link href={`${basePaths.account}/${viewPaths.account.security}`}>
+            <Link href={`${basePaths.settings}/${viewPaths.settings.security}`}>
               <Shield />
 
-              {localization.account.security}
+              {localization.settings.security}
             </Link>
           </TabsTrigger>
         </TabsList>
       </div>
 
-      <TabsContent value="settings" tabIndex={-1}>
+      <TabsContent value="account" tabIndex={-1}>
         <AccountSettings {...config} />
       </TabsContent>
 
       <TabsContent value="security" tabIndex={-1}>
-        {localization.account.security}
+        {localization.settings.security}
       </TabsContent>
     </Tabs>
   )
