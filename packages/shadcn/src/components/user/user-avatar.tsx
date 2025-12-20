@@ -14,7 +14,6 @@ export type UserAvatarProps = AnyAuthConfig & {
   className?: string
   fallback?: ReactNode
   isPending?: boolean
-  rounded?: boolean
   user?: User & { username?: string | null; displayUsername?: string | null }
 }
 
@@ -27,7 +26,6 @@ export function UserAvatar({
   user,
   isPending,
   fallback,
-  rounded,
   ...config
 }: UserAvatarProps) {
   const { authClient } = useAuth(config)
@@ -36,15 +34,7 @@ export function UserAvatar({
     authClient.useSession()
 
   if ((isPending || sessionPending) && !user) {
-    return (
-      <Skeleton
-        className={cn(
-          "size-8",
-          rounded ? "rounded-full" : "rounded-lg",
-          className
-        )}
-      />
-    )
+    return <Skeleton className={cn("size-8 rounded-full", className)} />
   }
 
   const resolvedUser = user ?? sessionData?.user
@@ -59,11 +49,7 @@ export function UserAvatar({
 
   return (
     <Avatar
-      className={cn(
-        "size-8 bg-muted text-foreground",
-        rounded ? "rounded-full" : "rounded-lg",
-        className
-      )}
+      className={cn("size-8 bg-muted text-foreground rounded-full", className)}
     >
       <AvatarImage
         src={resolvedUser?.image ?? undefined}

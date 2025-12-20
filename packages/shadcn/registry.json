@@ -472,6 +472,91 @@
           "type": "registry:lib"
         }
       ]
+    },
+    {
+      "name": "user-profile",
+      "type": "registry:component",
+      "title": "User Profile",
+      "description": "A form component for editing user profile information including name and avatar.",
+      "dependencies": [
+        "@better-auth-ui/react@*",
+        "better-auth",
+        "lucide-react"
+      ],
+      "registryDependencies": [
+        "button",
+        "card",
+        "field",
+        "input",
+        "skeleton",
+        "spinner",
+        "user-avatar"
+      ],
+      "files": [
+        {
+          "path": "src/components/account/settings/user-profile.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/components/user/user-avatar.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/hooks/auth/use-auth.tsx",
+          "type": "registry:hook"
+        },
+        {
+          "path": "../react/src/hooks/auth/use-update-user.ts",
+          "type": "registry:hook"
+        }
+      ]
+    },
+    {
+      "name": "account-settings",
+      "type": "registry:component",
+      "title": "Account Settings",
+      "description": "A container component that displays account settings including user profile.",
+      "dependencies": ["@better-auth-ui/react@*"],
+      "registryDependencies": ["user-profile"],
+      "files": [
+        {
+          "path": "src/components/account/settings/account-settings.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/components/account/settings/user-profile.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "account",
+      "type": "registry:component",
+      "title": "Account",
+      "description": "A unified account component that renders the appropriate account view based on path or view prop with tab navigation.",
+      "dependencies": [
+        "@better-auth-ui/react@*",
+        "better-auth",
+        "lucide-react"
+      ],
+      "registryDependencies": [
+        "tabs",
+        "account-settings"
+      ],
+      "files": [
+        {
+          "path": "src/components/account/account.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/components/account/settings/account-settings.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/hooks/auth/use-auth.tsx",
+          "type": "registry:hook"
+        }
+      ]
     }
   ]
 }

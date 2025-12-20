@@ -116,7 +116,10 @@ export const localization = {
     profileUpdatedSuccess: "Profile updated successfully",
 
     /** @remarks `"Save changes"` */
-    saveChanges: "Save changes"
+    saveChanges: "Save changes",
+
+    /** @remarks `"Security"` */
+    security: "Security"
   }
 }
 

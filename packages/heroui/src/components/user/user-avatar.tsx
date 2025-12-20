@@ -8,7 +8,6 @@ export type UserAvatarProps = AnyAuthConfig & {
   className?: string
   fallback?: ReactNode
   isPending?: boolean
-  rounded?: boolean
   user?: User & { username?: string | null; displayUsername?: string | null }
   size?: "sm" | "md" | "lg"
 }
@@ -17,7 +16,6 @@ export function UserAvatar({
   className,
   fallback,
   isPending,
-  rounded = true,
   user,
   size = "sm",
   ...config
@@ -31,8 +29,8 @@ export function UserAvatar({
     return (
       <Skeleton
         className={cn(
+          "rounded-full",
           size === "sm" ? "size-8" : size === "md" ? "size-10" : "size-12",
-          rounded ? "rounded-full" : "rounded-lg",
           className
         )}
       />
@@ -50,10 +48,7 @@ export function UserAvatar({
     .toUpperCase()
 
   return (
-    <Avatar
-      size={size}
-      className={cn(rounded ? "rounded-full" : "rounded-lg", className)}
-    >
+    <Avatar size={size} className={cn("rounded-full", className)}>
       <Avatar.Image
         alt={
           resolvedUser?.displayUsername ||
