@@ -18,7 +18,7 @@ import {
   TextField
 } from "@heroui/react"
 
-import { UserAvatar } from "../../user/user-avatar"
+import { UserAvatar } from "../user/user-avatar"
 
 export type UserProfileProps = AnyAuthConfig & {
   className?: string
