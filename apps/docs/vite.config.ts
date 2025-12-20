@@ -16,6 +16,9 @@ export default defineConfig({
   server: {
     port: 3000
   },
+  resolve: {
+    external: ["fumadocs-core", "fumadocs-ui"]
+  },
   plugins: [
     mdx(await import("./source.config")),
     tailwindcss(),
