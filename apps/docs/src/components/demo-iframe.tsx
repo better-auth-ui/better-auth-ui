@@ -47,7 +47,7 @@ export function DemoIframe({
         title={title}
         src={src}
         className={cn(
-          "w-full rounded-xl bg-transparent transition-all",
+          "bg-background w-full rounded-xl transition-all",
           isLoaded ? "opacity-100" : "opacity-0",
           className
         )}
