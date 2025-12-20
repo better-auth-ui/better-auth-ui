@@ -29,7 +29,12 @@ export type MagicLinkProps = AnyAuthConfig & {
 }
 
 /**
- * Render a card-based sign-in form that sends an email magic link and optionally shows social provider buttons.
+ * Render a sign-in card that sends an email magic link and optionally displays social provider buttons.
+ *
+ * @param className - Additional CSS class names applied to the card container
+ * @param socialLayout - Layout variant used by social provider buttons
+ * @param socialPosition - Position to render social provider buttons; either `"top"` or `"bottom"` (default: `"bottom"`)
+ * @returns The rendered sign-in card element
  */
 export function MagicLink({
   className,
@@ -89,7 +94,6 @@ export function MagicLink({
                 <Label>{localization.auth.email}</Label>
 
                 <Input
-                  className="text-base md:text-sm"
                   placeholder={localization.auth.emailPlaceholder}
                   required
                 />

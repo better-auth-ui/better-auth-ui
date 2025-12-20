@@ -57,10 +57,10 @@ export interface AuthConfig {
      */
     auth: string
     /**
-     * Base path for account management routes
-     * @default "/account"
+     * Base path for settings routes
+     * @default "/settings"
      */
-    account: string
+    settings: string
     /**
      * Base path for organization management routes
      * @default "/organization"

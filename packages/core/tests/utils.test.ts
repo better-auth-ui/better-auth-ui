@@ -201,7 +201,7 @@ describe("deepmerge", () => {
   describe("complex scenarios", () => {
     it("should merge configuration objects", () => {
       const target = {
-        basePaths: { auth: "/auth", account: "/account" },
+        basePaths: { auth: "/auth", settings: "/settings" },
         redirectTo: "/",
         emailAndPassword: { enabled: true, minLength: 8 }
       }
@@ -212,7 +212,7 @@ describe("deepmerge", () => {
       const result = deepmerge(target, source)
 
       expect(result).toEqual({
-        basePaths: { auth: "/auth", account: "/account" },
+        basePaths: { auth: "/auth", settings: "/settings" },
         redirectTo: "/dashboard",
         emailAndPassword: { enabled: true, minLength: 10, maxLength: 128 }
       })

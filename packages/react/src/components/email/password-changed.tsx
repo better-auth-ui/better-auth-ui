@@ -93,7 +93,7 @@ export interface PasswordChangedEmailProps {
  * <PasswordChangedEmail
  *   email="user@example.com"
  *   timestamp="February 10, 2025 at 4:20 PM UTC"
- *   secureAccountURL="https://example.com/account/security"
+ *   secureAccountURL="https://example.com/settings/security"
  *   appName="My App"
  *   supportEmail="support@example.com"
  *   logoURL="https://example.com/logo.png"
@@ -368,7 +368,7 @@ PasswordChangedEmail.localization = passwordChangedEmailLocalization
 PasswordChangedEmail.PreviewProps = {
   email: "m@example.com",
   timestamp: "February 10, 2025 at 4:20 PM UTC",
-  secureAccountURL: "https://better-auth-ui.com/account/security",
+  secureAccountURL: "https://better-auth-ui.com/settings/security",
   appName: "Better Auth",
   supportEmail: "support@example.com",
   darkMode: true

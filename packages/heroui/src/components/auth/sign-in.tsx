@@ -30,8 +30,9 @@ export type SignInProps = AnyAuthConfig & {
 }
 
 /**
- * Renders the Sign In UI with email/password, magic link, and social provider
- * options based on the provided `AuthConfig`.
+ * Renders the sign-in form with email/password, optional magic link, and social provider buttons, honoring configuration and localization from the provided auth config.
+ *
+ * @returns The JSX element for the sign-in UI.
  */
 export function SignIn({
   className,
@@ -101,7 +102,6 @@ export function SignIn({
                   <Label>{localization.auth.email}</Label>
 
                   <Input
-                    className="text-base md:text-sm"
                     placeholder={localization.auth.emailPlaceholder}
                     required
                     disabled={isPending}
@@ -133,7 +133,6 @@ export function SignIn({
                   </div>
 
                   <Input
-                    className="text-base md:text-sm"
                     placeholder={localization.auth.passwordPlaceholder}
                     required
                   />

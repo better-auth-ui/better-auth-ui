@@ -8,16 +8,24 @@ export type UserAvatarProps = AnyAuthConfig & {
   className?: string
   fallback?: ReactNode
   isPending?: boolean
-  rounded?: boolean
   user?: User & { username?: string | null; displayUsername?: string | null }
   size?: "sm" | "md" | "lg"
 }
 
+/**
+ * Render a user avatar that shows the user's image, initials, or a custom fallback; displays a circular skeleton while the session (or explicit pending flag) is pending.
+ *
+ * @param className - Additional CSS classes applied to the outer avatar container
+ * @param fallback - Custom fallback content to render when no image or initials are available
+ * @param isPending - When true, force rendering of the loading skeleton (unless an explicit `user` prop is provided)
+ * @param user - Optional user object to display; when omitted the current session user is used if available
+ * @param size - Visual size of the avatar; one of `"sm"`, `"md"`, or `"lg"` (default: `"sm"`)
+ * @returns A React element that displays the user's avatar image, initials, or the provided fallback; renders a circular skeleton while loading
+ */
 export function UserAvatar({
   className,
   fallback,
   isPending,
-  rounded = true,
   user,
   size = "sm",
   ...config
@@ -31,8 +39,8 @@ export function UserAvatar({
     return (
       <Skeleton
         className={cn(
-          "size-8",
-          rounded ? "rounded-full" : "rounded-lg",
+          "rounded-full",
+          size === "sm" ? "size-8" : size === "md" ? "size-10" : "size-12",
           className
         )}
       />
@@ -50,10 +58,7 @@ export function UserAvatar({
     .toUpperCase()
 
   return (
-    <Avatar
-      size={size}
-      className={cn(rounded ? "rounded-full" : "rounded-lg", className)}
-    >
+    <Avatar size={size} className={cn("rounded-full", className)}>
       <Avatar.Image
         alt={
           resolvedUser?.displayUsername ||

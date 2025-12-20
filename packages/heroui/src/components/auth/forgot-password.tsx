@@ -20,7 +20,10 @@ export type ForgotPasswordProps = AnyAuthConfig & {
 }
 
 /**
- * Renders a "Forgot Password" form with an email input and submit button.
+ * Render a "Forgot Password" form that collects the user's email and submits a password reset request.
+ *
+ * @param className - Optional additional CSS classes applied to the root Card element
+ * @returns The rendered Forgot Password form element
  */
 export function ForgotPassword({ className, ...config }: ForgotPasswordProps) {
   const context = useAuth(config)
@@ -50,7 +53,6 @@ export function ForgotPassword({ className, ...config }: ForgotPasswordProps) {
               <Label>{localization.auth.email}</Label>
 
               <Input
-                className="text-base md:text-sm"
                 placeholder={localization.auth.emailPlaceholder}
                 required
               />

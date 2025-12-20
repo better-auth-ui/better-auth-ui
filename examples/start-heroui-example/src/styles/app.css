@@ -1,3 +1,8 @@
 @import "tailwindcss";
 @import "@heroui/styles";
 @import "@better-auth-ui/heroui/styles";
+
+html,
+body {
+  @apply bg-background text-foreground;
+}

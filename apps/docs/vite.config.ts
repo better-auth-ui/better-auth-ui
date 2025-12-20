@@ -5,6 +5,13 @@ import mdx from "fumadocs-mdx/vite"
 import { defineConfig } from "vite"
 import tsConfigPaths from "vite-tsconfig-paths"
 
+// Paths that require authentication or dynamic data should not be prerendered
+const EXCLUDED_PRERENDER_PATHS = [
+  "/settings",
+  "/auth",
+  "/organization"
+] as const
+
 export default defineConfig({
   server: {
     port: 3000
@@ -18,7 +25,11 @@ export default defineConfig({
     tanstackStart({
       prerender: {
         enabled: true,
-        autoSubfolderIndex: false
+        autoSubfolderIndex: false,
+        filter: ({ path }) =>
+          !EXCLUDED_PRERENDER_PATHS.some((excludedPath) =>
+            path.startsWith(excludedPath)
+          )
       },
       pages: [
         {

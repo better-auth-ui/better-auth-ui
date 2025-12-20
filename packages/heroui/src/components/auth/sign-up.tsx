@@ -32,16 +32,11 @@ export type SignUpProps = AnyAuthConfig & {
 }
 
 /**
- * Renders a sign-up form with name, email, and password fields, optional social provider buttons, and submission handling.
+ * Render a sign-up form with optional social provider buttons, name/email/password fields, and controls for password visibility.
  *
- * Submits credentials to the configured auth client and handles the response:
- * - If email verification is required, shows a notification and navigates to sign-in
- * - On success, refreshes the session and navigates to the configured redirect path
- * - On failure, displays error toasts
- * - Manages a pending state while the request is in-flight
+ * The component reflects request state by disabling inputs and showing a pending indicator when a sign-up or social sign-in is in progress.
  *
- * @param props - Configuration and appearance overrides (e.g., `className`, `localization`, `socialLayout`) plus auth-related options passed through to the auth hook.
- * @returns The sign-up form React element.
+ * @returns A React element representing the sign-up form UI.
  */
 export function SignUp({
   className,
@@ -118,7 +113,6 @@ export function SignUp({
                   <Label>{localization.auth.name}</Label>
 
                   <Input
-                    className="text-base md:text-sm"
                     placeholder={localization.auth.namePlaceholder}
                     required
                   />
@@ -136,7 +130,6 @@ export function SignUp({
                   <Label>{localization.auth.email}</Label>
 
                   <Input
-                    className="text-base md:text-sm"
                     placeholder={localization.auth.emailPlaceholder}
                     required
                   />
@@ -156,7 +149,6 @@ export function SignUp({
 
                   <InputGroup>
                     <InputGroup.Input
-                      className="text-base md:text-sm"
                       placeholder={localization.auth.passwordPlaceholder}
                       type={isPasswordVisible ? "text" : "password"}
                       name="password"
@@ -197,7 +189,6 @@ export function SignUp({
 
                     <InputGroup>
                       <InputGroup.Input
-                        className="text-base md:text-sm"
                         name="confirmPassword"
                         placeholder={
                           localization.auth.confirmPasswordPlaceholder

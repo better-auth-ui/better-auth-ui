@@ -14,20 +14,25 @@ export type UserAvatarProps = AnyAuthConfig & {
   className?: string
   fallback?: ReactNode
   isPending?: boolean
-  rounded?: boolean
   user?: User & { username?: string | null; displayUsername?: string | null }
 }
 
 /**
- * Renders the current user's avatar using session data.
- * Shows a skeleton while loading and falls back to initials when no image is available.
+ * Display a user's avatar using session information or an explicit user prop.
+ *
+ * Renders a circular avatar that shows the user's image when available, a fallback node if provided, or the user's first two initials; while the session is loading (or when `isPending` is true) and no `user` prop is supplied, renders a skeleton placeholder.
+ *
+ * @param className - Additional CSS classes applied to the avatar container
+ * @param user - Optional user object to display instead of the session user
+ * @param isPending - When true, treat the component as loading and show the skeleton if no `user` is provided
+ * @param fallback - Node to render inside the avatar fallback area before initials or the default icon
+ * @returns The avatar element to render (JSX)
  */
 export function UserAvatar({
   className,
   user,
   isPending,
   fallback,
-  rounded,
   ...config
 }: UserAvatarProps) {
   const { authClient } = useAuth(config)
@@ -36,15 +41,7 @@ export function UserAvatar({
     authClient.useSession()
 
   if ((isPending || sessionPending) && !user) {
-    return (
-      <Skeleton
-        className={cn(
-          "size-8",
-          rounded ? "rounded-full" : "rounded-lg",
-          className
-        )}
-      />
-    )
+    return <Skeleton className={cn("size-8 rounded-full", className)} />
   }
 
   const resolvedUser = user ?? sessionData?.user
@@ -59,11 +56,7 @@ export function UserAvatar({
 
   return (
     <Avatar
-      className={cn(
-        "size-8 bg-muted text-foreground",
-        rounded ? "rounded-full" : "rounded-lg",
-        className
-      )}
+      className={cn("size-8 bg-muted text-foreground rounded-full", className)}
     >
       <AvatarImage
         src={resolvedUser?.image ?? undefined}
