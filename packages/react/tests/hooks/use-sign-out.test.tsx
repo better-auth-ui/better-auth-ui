@@ -70,7 +70,11 @@ describe("useSignOut", () => {
     it("should use custom basePaths", async () => {
       mockSignOut.mockResolvedValue({ data: {}, error: null })
 
-      const wrapperWithCustomPaths = ({ children }: { children: ReactNode }) => (
+      const wrapperWithCustomPaths = ({
+        children
+      }: {
+        children: ReactNode
+      }) => (
         <AuthProvider
           authClient={mockAuthClient}
           toast={mockToast}

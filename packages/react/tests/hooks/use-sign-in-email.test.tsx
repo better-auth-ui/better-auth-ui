@@ -90,7 +90,11 @@ describe("useSignInEmail", () => {
           authClient={mockAuthClient}
           toast={mockToast}
           navigate={mockNavigate}
-          emailAndPassword={{ enabled: true, forgotPassword: true, rememberMe: true }}
+          emailAndPassword={{
+            enabled: true,
+            forgotPassword: true,
+            rememberMe: true
+          }}
         >
           {children}
         </AuthProvider>
@@ -409,7 +413,11 @@ describe("useSignInEmail", () => {
           authClient={mockAuthClient}
           toast={mockToast}
           navigate={mockNavigate}
-          emailAndPassword={{ enabled: true, forgotPassword: true, rememberMe: true }}
+          emailAndPassword={{
+            enabled: true,
+            forgotPassword: true,
+            rememberMe: true
+          }}
         >
           {children}
         </AuthProvider>

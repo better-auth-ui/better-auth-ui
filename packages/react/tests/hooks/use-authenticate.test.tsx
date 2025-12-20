@@ -113,7 +113,11 @@ describe("useAuthenticate", () => {
         error: null
       })
 
-      const wrapperWithCustomPaths = ({ children }: { children: ReactNode }) => (
+      const wrapperWithCustomPaths = ({
+        children
+      }: {
+        children: ReactNode
+      }) => (
         <AuthProvider
           authClient={mockAuthClient}
           replace={mockReplace}
@@ -197,7 +201,9 @@ describe("useAuthenticate", () => {
 
       await waitFor(() => {
         expect(mockReplace).toHaveBeenCalledWith(
-          expect.stringContaining("redirectTo=%2Fsearch%3Fq%3Dhello%20world%26filter%3Dnew")
+          expect.stringContaining(
+            "redirectTo=%2Fsearch%3Fq%3Dhello%20world%26filter%3Dnew"
+          )
         )
       })
     })

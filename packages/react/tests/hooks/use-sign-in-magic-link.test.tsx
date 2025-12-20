@@ -132,7 +132,9 @@ describe("useSignInMagicLink", () => {
       await action(formData)
 
       await waitFor(() => {
-        expect(mockToast.error).toHaveBeenCalledWith("Failed to send magic link")
+        expect(mockToast.error).toHaveBeenCalledWith(
+          "Failed to send magic link"
+        )
       })
     })
 

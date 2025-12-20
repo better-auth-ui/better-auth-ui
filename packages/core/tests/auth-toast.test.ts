@@ -1,5 +1,9 @@
 import { describe, expect, it, vi } from "vitest"
-import { defaultToast, type DismissToast, type RenderToast } from "../src/lib/auth-toast"
+import {
+  type DismissToast,
+  defaultToast,
+  type RenderToast
+} from "../src/lib/auth-toast"
 
 describe("auth-toast", () => {
   describe("defaultToast", () => {
@@ -9,9 +13,9 @@ describe("auth-toast", () => {
 
     it("should call alert when no action is provided", () => {
       const alertSpy = vi.spyOn(window, "alert").mockImplementation(() => {})
-      
+
       defaultToast("Test message")
-      
+
       expect(alertSpy).toHaveBeenCalledWith("Test message")
       alertSpy.mockRestore()
     })
@@ -19,59 +23,59 @@ describe("auth-toast", () => {
     it("should call confirm and execute action when action is provided", () => {
       const confirmSpy = vi.spyOn(window, "confirm").mockReturnValue(true)
       const actionFn = vi.fn()
-      
+
       defaultToast("Test message", {
         action: {
           label: "Click me",
           onClick: actionFn
         }
       })
-      
+
       expect(confirmSpy).toHaveBeenCalledWith("Test message")
       expect(actionFn).toHaveBeenCalled()
-      
+
       confirmSpy.mockRestore()
     })
 
     it("should not execute action when user cancels confirm", () => {
       const confirmSpy = vi.spyOn(window, "confirm").mockReturnValue(false)
       const actionFn = vi.fn()
-      
+
       defaultToast("Test message", {
         action: {
           label: "Click me",
           onClick: actionFn
         }
       })
-      
+
       expect(confirmSpy).toHaveBeenCalledWith("Test message")
       expect(actionFn).not.toHaveBeenCalled()
-      
+
       confirmSpy.mockRestore()
     })
 
     it("should handle async action functions", async () => {
       const confirmSpy = vi.spyOn(window, "confirm").mockReturnValue(true)
       const asyncAction = vi.fn().mockResolvedValue(undefined)
-      
+
       defaultToast("Test message", {
         action: {
           label: "Async action",
           onClick: asyncAction
         }
       })
-      
+
       expect(confirmSpy).toHaveBeenCalled()
       expect(asyncAction).toHaveBeenCalled()
-      
+
       confirmSpy.mockRestore()
     })
 
     it("should accept undefined message", () => {
       const alertSpy = vi.spyOn(window, "alert").mockImplementation(() => {})
-      
+
       defaultToast(undefined)
-      
+
       expect(alertSpy).toHaveBeenCalled()
       alertSpy.mockRestore()
     })
@@ -195,9 +199,9 @@ describe("auth-toast", () => {
   describe("edge cases", () => {
     it("should handle empty string messages", () => {
       const alertSpy = vi.spyOn(window, "alert").mockImplementation(() => {})
-      
+
       defaultToast("")
-      
+
       expect(alertSpy).toHaveBeenCalledWith("")
       alertSpy.mockRestore()
     })
@@ -205,17 +209,17 @@ describe("auth-toast", () => {
     it("should handle action with empty label", () => {
       const confirmSpy = vi.spyOn(window, "confirm").mockReturnValue(true)
       const actionFn = vi.fn()
-      
+
       defaultToast("Message", {
         action: {
           label: "",
           onClick: actionFn
         }
       })
-      
+
       expect(confirmSpy).toHaveBeenCalled()
       expect(actionFn).toHaveBeenCalled()
-      
+
       confirmSpy.mockRestore()
     })
 
@@ -224,7 +228,7 @@ describe("auth-toast", () => {
       const actionFn = vi.fn().mockImplementation(() => {
         throw new Error("Action error")
       })
-      
+
       expect(() => {
         defaultToast("Message", {
           action: {
@@ -233,7 +237,7 @@ describe("auth-toast", () => {
           }
         })
       }).toThrow("Action error")
-      
+
       confirmSpy.mockRestore()
     })
   })

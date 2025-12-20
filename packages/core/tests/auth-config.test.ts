@@ -1,5 +1,9 @@
 import { describe, expect, it } from "vitest"
-import { defaultConfig, type AuthConfig, type EmailAndPasswordConfig } from "../src/lib/auth-config"
+import {
+  type AuthConfig,
+  defaultConfig,
+  type EmailAndPasswordConfig
+} from "../src/lib/auth-config"
 import { basePaths } from "../src/lib/base-paths"
 import { localization } from "../src/lib/localization"
 import { viewPaths } from "../src/lib/view-paths"
@@ -190,7 +194,7 @@ describe("auth-config", () => {
   describe("default navigation functions", () => {
     it("navigate should set window.location.href", () => {
       const originalLocation = window.location.href
-      
+
       // Note: In test environment, this won't actually navigate
       // but we can verify the function exists and is callable
       expect(() => {
@@ -213,7 +217,7 @@ describe("auth-config", () => {
   describe("toast configuration", () => {
     it("should call default toast functions", () => {
       const message = "Test message"
-      
+
       // These will trigger browser alerts/confirms in real environment
       // In test environment, they should not throw
       expect(() => {

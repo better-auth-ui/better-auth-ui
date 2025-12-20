@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest"
-import { localization, type Localization } from "../src/lib/localization"
+import { type Localization, localization } from "../src/lib/localization"
 
 describe("localization", () => {
   describe("auth localization", () => {
@@ -19,8 +19,12 @@ describe("localization", () => {
       expect(localization.auth.emailPlaceholder).toBe("Enter your email")
       expect(localization.auth.passwordPlaceholder).toBe("Enter your password")
       expect(localization.auth.namePlaceholder).toBe("Enter your name")
-      expect(localization.auth.newPasswordPlaceholder).toBe("Enter your new password")
-      expect(localization.auth.confirmPasswordPlaceholder).toBe("Confirm your password")
+      expect(localization.auth.newPasswordPlaceholder).toBe(
+        "Enter your new password"
+      )
+      expect(localization.auth.confirmPasswordPlaceholder).toBe(
+        "Confirm your password"
+      )
     })
 
     it("should have sign in/up related texts", () => {
@@ -37,13 +41,19 @@ describe("localization", () => {
       expect(localization.auth.forgotPasswordLink).toBe("Forgot password?")
       expect(localization.auth.resetPassword).toBe("Reset password")
       expect(localization.auth.newPassword).toBe("New password")
-      expect(localization.auth.passwordResetEmailSent).toBe("Password reset email sent")
-      expect(localization.auth.passwordResetSuccess).toBe("Password reset successfully")
+      expect(localization.auth.passwordResetEmailSent).toBe(
+        "Password reset email sent"
+      )
+      expect(localization.auth.passwordResetSuccess).toBe(
+        "Password reset successfully"
+      )
     })
 
     it("should have magic link texts", () => {
       expect(localization.auth.magicLink).toBe("Magic link")
-      expect(localization.auth.magicLinkSent).toBe("Magic link sent to your email")
+      expect(localization.auth.magicLinkSent).toBe(
+        "Magic link sent to your email"
+      )
       expect(localization.auth.sendMagicLink).toBe("Send magic link")
       expect(localization.auth.sendingMagicLink).toBe("Sending magic link...")
     })
@@ -53,9 +63,15 @@ describe("localization", () => {
     })
 
     it("should have question prompts", () => {
-      expect(localization.auth.alreadyHaveAnAccount).toBe("Already have an account?")
-      expect(localization.auth.needToCreateAnAccount).toBe("Need to create an account?")
-      expect(localization.auth.rememberYourPassword).toBe("Remember your password?")
+      expect(localization.auth.alreadyHaveAnAccount).toBe(
+        "Already have an account?"
+      )
+      expect(localization.auth.needToCreateAnAccount).toBe(
+        "Need to create an account?"
+      )
+      expect(localization.auth.rememberYourPassword).toBe(
+        "Remember your password?"
+      )
     })
 
     it("should have separator text", () => {
@@ -73,16 +89,22 @@ describe("localization", () => {
 
     it("should have password confirmation texts", () => {
       expect(localization.auth.confirmPassword).toBe("Confirm password")
-      expect(localization.auth.passwordsDoNotMatch).toBe("Passwords do not match")
+      expect(localization.auth.passwordsDoNotMatch).toBe(
+        "Passwords do not match"
+      )
     })
 
     it("should have error messages", () => {
-      expect(localization.auth.invalidResetPasswordToken).toBe("Invalid reset password token")
+      expect(localization.auth.invalidResetPasswordToken).toBe(
+        "Invalid reset password token"
+      )
     })
 
     it("should have verification texts", () => {
       expect(localization.auth.resend).toBe("Resend")
-      expect(localization.auth.verificationEmailSent).toBe("Verification email sent")
+      expect(localization.auth.verificationEmailSent).toBe(
+        "Verification email sent"
+      )
     })
   })
 
@@ -118,46 +140,68 @@ describe("localization", () => {
 
     it("should have common email labels", () => {
       expect(localization.email.yourEmail).toBe("Your email")
-      expect(localization.email.ifYouDidNotRequest).toContain("If you did not request")
+      expect(localization.email.ifYouDidNotRequest).toContain(
+        "If you did not request"
+      )
       expect(localization.email.contactSupport).toBe("contact support")
     })
 
     it("should have verification email texts", () => {
       expect(localization.email.verifyYourEmail).toBe("Verify your email")
-      expect(localization.email.clickButtonToVerify).toContain("Click the button below")
+      expect(localization.email.clickButtonToVerify).toContain(
+        "Click the button below"
+      )
       expect(localization.email.verifyEmail).toBe("Verify Email")
-      expect(localization.email.linkExpiresIn).toBe("This link expires in {{minutes}} minutes")
+      expect(localization.email.linkExpiresIn).toBe(
+        "This link expires in {{minutes}} minutes"
+      )
     })
 
     it("should have magic link email texts", () => {
-      expect(localization.email.signInToYourAccount).toBe("Sign in to your account")
-      expect(localization.email.clickButtonToSignIn).toContain("Click the button below")
+      expect(localization.email.signInToYourAccount).toBe(
+        "Sign in to your account"
+      )
+      expect(localization.email.clickButtonToSignIn).toContain(
+        "Click the button below"
+      )
       expect(localization.email.signIn).toBe("Sign in")
     })
 
     it("should have password reset email texts", () => {
       expect(localization.email.resetYourPassword).toBe("Reset your password")
-      expect(localization.email.clickButtonToReset).toContain("Click the button below")
+      expect(localization.email.clickButtonToReset).toContain(
+        "Click the button below"
+      )
       expect(localization.email.resetPassword).toBe("Reset Password")
     })
 
     it("should have OTP email texts", () => {
-      expect(localization.email.yourVerificationCode).toBe("Your verification code")
+      expect(localization.email.yourVerificationCode).toBe(
+        "Your verification code"
+      )
       expect(localization.email.enterCodeToVerify).toContain("Enter this code")
       expect(localization.email.verificationCode).toBe("Verification Code")
-      expect(localization.email.codeExpiresIn).toBe("This code expires in {{minutes}} minutes")
+      expect(localization.email.codeExpiresIn).toBe(
+        "This code expires in {{minutes}} minutes"
+      )
     })
 
     it("should have password changed email texts", () => {
       expect(localization.email.passwordChanged).toBe("Password changed")
-      expect(localization.email.passwordChangedSuccessfully).toContain("Your password has been changed")
-      expect(localization.email.ifYouDidNotChange).toContain("If you did not change")
+      expect(localization.email.passwordChangedSuccessfully).toContain(
+        "Your password has been changed"
+      )
+      expect(localization.email.ifYouDidNotChange).toContain(
+        "If you did not change"
+      )
       expect(localization.email.secureYourAccount).toBe("Secure your account")
     })
 
     it("should have email changed notification texts", () => {
       expect(localization.email.emailChanged).toBe("Email changed")
-      expect(localization.email.yourEmailHasBeenChanged).toContain("Your email has been changed")
+      expect(localization.email.yourEmailHasBeenChanged).toContain(
+        "Your email has been changed"
+      )
       expect(localization.email.previousEmail).toBe("Previous email")
       expect(localization.email.newEmail).toBe("New email")
       expect(localization.email.revertEmailChange).toBe("Revert email change")
@@ -165,7 +209,9 @@ describe("localization", () => {
 
     it("should have new device email texts", () => {
       expect(localization.email.newDeviceSignIn).toBe("New device sign-in")
-      expect(localization.email.detectedSignInFromNewDevice).toContain("We detected a sign-in")
+      expect(localization.email.detectedSignInFromNewDevice).toContain(
+        "We detected a sign-in"
+      )
       expect(localization.email.deviceDetails).toBe("Device details")
       expect(localization.email.browser).toBe("Browser")
       expect(localization.email.operatingSystem).toBe("Operating System")
@@ -266,22 +312,22 @@ describe("localization", () => {
     it("should cover all email notification types", () => {
       // Verification
       expect(localization.email.verifyYourEmail).toBeDefined()
-      
+
       // Magic link
       expect(localization.email.signInToYourAccount).toBeDefined()
-      
+
       // Password reset
       expect(localization.email.resetYourPassword).toBeDefined()
-      
+
       // OTP
       expect(localization.email.yourVerificationCode).toBeDefined()
-      
+
       // Password changed
       expect(localization.email.passwordChanged).toBeDefined()
-      
+
       // Email changed
       expect(localization.email.emailChanged).toBeDefined()
-      
+
       // New device
       expect(localization.email.newDeviceSignIn).toBeDefined()
     })
