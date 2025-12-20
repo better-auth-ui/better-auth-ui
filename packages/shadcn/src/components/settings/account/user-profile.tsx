@@ -27,6 +27,15 @@ export type UserProfileProps = AnyAuthConfig & {
   className?: string
 }
 
+/**
+ * Render the current user's profile editor UI.
+ *
+ * Renders a form that displays the user's avatar and identity, lets the user edit their name with inline validation, and submit changes. While session data is loading it renders a skeleton variant; while a submit is pending it disables inputs and shows a spinner.
+ *
+ * @param className - Optional additional CSS class names applied to the card container
+ * @param config - Authentication/configuration options forwarded to auth and user-update hooks
+ * @returns A React element containing the user profile form and controls
+ */
 export function UserProfile({ className, ...config }: UserProfileProps) {
   const { authClient, localization } = useAuth(config)
 
@@ -125,6 +134,11 @@ export function UserProfile({ className, ...config }: UserProfileProps) {
   )
 }
 
+/**
+ * Render a skeleton placeholder for the user profile settings card shown while profile data loads.
+ *
+ * @returns A JSX element representing the loading skeleton for the user profile card
+ */
 function UserProfileSkeleton() {
   return (
     <Card className="w-full py-4 md:py-6 gap-4 md:gap-6">

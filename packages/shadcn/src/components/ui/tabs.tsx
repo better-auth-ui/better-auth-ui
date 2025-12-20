@@ -3,6 +3,14 @@ import * as TabsPrimitive from "@radix-ui/react-tabs"
 
 import { cn } from "@/lib/utils"
 
+/**
+ * Wraps the Radix UI Tabs root with a standardized vertical layout and a `data-slot="tabs"` attribute.
+ *
+ * Merges any provided `className` with the default "flex flex-col gap-2" classes and forwards all other props to the underlying Radix Tabs root.
+ *
+ * @param className - Additional className(s) merged with the default layout classes
+ * @returns The rendered Radix Tabs root element
+ */
 function Tabs({
   className,
   ...props
@@ -16,6 +24,13 @@ function Tabs({
   )
 }
 
+/**
+ * Render a styled Tabs list wrapper that applies standardized layout, spacing, and a `data-slot="tabs-list"` attribute.
+ *
+ * @param className - Optional additional CSS classes to merge with the component's default styling.
+ * @param props - Additional props forwarded to the underlying Radix `TabsPrimitive.List`.
+ * @returns The rendered Tabs list element with the applied classes and `data-slot` attribute.
+ */
 function TabsList({
   className,
   ...props
@@ -32,6 +47,13 @@ function TabsList({
   )
 }
 
+/**
+ * Renders a styled tabs trigger that wraps Radix UI's TabsPrimitive.Trigger and applies standardized classes and a `data-slot="tabs-trigger"` attribute.
+ *
+ * @param className - Additional CSS classes to merge with the component's default classes.
+ * @param props - Remaining props are forwarded to the underlying Radix `TabsPrimitive.Trigger`.
+ * @returns The rendered Tabs trigger element with merged class names and forwarded props.
+ */
 function TabsTrigger({
   className,
   ...props
@@ -48,6 +70,11 @@ function TabsTrigger({
   )
 }
 
+/**
+ * Renders a tab panel container that wraps Radix `TabsPrimitive.Content`, applies standard layout styling, and sets `data-slot="tabs-content"`.
+ *
+ * @returns A React element for the tab content area with the combined class names (`"flex-1 outline-none"` plus any `className`) and `data-slot="tabs-content"`.
+ */
 function TabsContent({
   className,
   ...props

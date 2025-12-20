@@ -11,6 +11,11 @@ export const Route = createFileRoute("/settings/$path")({
   component: SettingsPage
 })
 
+/**
+ * Renders the settings page for the current settings subpath.
+ *
+ * @returns The React element that displays the Settings component for the current `path` route parameter.
+ */
 function SettingsPage() {
   const { path } = Route.useParams()
 

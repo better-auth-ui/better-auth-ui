@@ -7,6 +7,13 @@ export type AccountSettingsProps = AnyAuthConfig & {
   className?: string
 }
 
+/**
+ * Renders the account settings layout and user profile UI.
+ *
+ * @param className - Optional additional CSS class names for the outer container.
+ * @param config - Auth-related props forwarded to the UserProfile component.
+ * @returns A JSX element containing a styled container that renders the user profile.
+ */
 export function AccountSettings({
   className,
   ...config

@@ -13,11 +13,14 @@ export type SettingsProps = AnyAuthConfig & {
 }
 
 /**
- * Selects and renders the appropriate settings view component.
+ * Render the settings UI and select the active settings view based on `view` or `path`.
  *
- * @param path - Route path used to resolve a settings view when `view` is not provided
- * @param view - Explicit settings view to render (e.g., "account")
- * @param hideNav - Hide the navigation tabs
+ * @param path - Route path used to resolve which settings view to activate when `view` is not provided
+ * @param view - Explicit settings view to activate (for example, `"account"` or `"security"`)
+ * @param hideNav - When `true`, hide the navigation tabs
+ * @returns A React element containing the settings tabs and the currently selected panel
+ *
+ * @throws Error if neither `view` nor `path` is provided
  */
 export function Settings({
   className,
@@ -79,6 +82,13 @@ export function Settings({
   )
 }
 
+/**
+ * Renders a responsive pair of Tabs components: horizontal on small screens and vertical on medium-and-up screens.
+ *
+ * @param className - Additional CSS classes applied to both responsive tab containers.
+ * @param props - All other props are forwarded to each underlying Tabs component.
+ * @returns A JSX element containing the responsive Tabs pair.
+ */
 export function ResponsiveTabs({ className, ...props }: TabsProps) {
   return (
     <>
