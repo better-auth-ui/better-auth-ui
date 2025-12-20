@@ -1,5 +1,5 @@
 import { type AnyAuthConfig, useResetPassword } from "@better-auth-ui/react"
-import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline"
+import { Eye, EyeSlash } from "@gravity-ui/icons"
 import {
   Button,
   Card,
@@ -101,7 +101,7 @@ export function ResetPassword({ className, ...config }: ResetPasswordProps) {
                     onPress={() => setIsPasswordVisible(!isPasswordVisible)}
                     isDisabled={isPending}
                   >
-                    {isPasswordVisible ? <EyeSlashIcon /> : <EyeIcon />}
+                    {isPasswordVisible ? <EyeSlash /> : <Eye />}
                   </Button>
                 </InputGroup.Suffix>
               </InputGroup>
@@ -144,9 +144,9 @@ export function ResetPassword({ className, ...config }: ResetPasswordProps) {
                       isDisabled={isPending}
                     >
                       {isConfirmPasswordVisible ? (
-                        <EyeSlashIcon />
+                        <EyeSlash />
                       ) : (
-                        <EyeIcon />
+                        <Eye />
                       )}
                     </Button>
                   </InputGroup.Suffix>

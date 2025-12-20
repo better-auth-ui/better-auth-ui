@@ -3,7 +3,7 @@ import {
   useSignInSocial,
   useSignUpEmail
 } from "@better-auth-ui/react"
-import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline"
+import { Eye, EyeSlash } from "@gravity-ui/icons"
 import {
   Button,
   Card,
@@ -168,7 +168,7 @@ export function SignUp({
                         onPress={() => setIsPasswordVisible(!isPasswordVisible)}
                         isDisabled={isPending}
                       >
-                        {isPasswordVisible ? <EyeSlashIcon /> : <EyeIcon />}
+                        {isPasswordVisible ? <EyeSlash /> : <Eye />}
                       </Button>
                     </InputGroup.Suffix>
                   </InputGroup>
@@ -215,9 +215,9 @@ export function SignUp({
                           isDisabled={isPending}
                         >
                           {isConfirmPasswordVisible ? (
-                            <EyeSlashIcon />
+                            <EyeSlash />
                           ) : (
-                            <EyeIcon />
+                            <Eye />
                           )}
                         </Button>
                       </InputGroup.Suffix>

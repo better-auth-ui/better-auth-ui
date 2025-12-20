@@ -1,6 +1,6 @@
 import type { AuthView } from "@better-auth-ui/core"
 import type { AnyAuthConfig } from "@better-auth-ui/react"
-import { EnvelopeIcon, LockClosedIcon } from "@heroicons/react/24/outline"
+import { Envelope, Lock } from "@gravity-ui/icons"
 
 import { useAuth } from "../../hooks/use-auth"
 import { cn } from "../../lib/utils"
@@ -33,7 +33,7 @@ export function MagicLinkButton({
         isPending && "status-disabled pointer-events-none"
       )}
     >
-      {isMagicLinkView ? <LockClosedIcon /> : <EnvelopeIcon />}
+      {isMagicLinkView ? <Lock /> : <Envelope />}
 
       {localization.auth.continueWith.replace(
         "{{provider}}",

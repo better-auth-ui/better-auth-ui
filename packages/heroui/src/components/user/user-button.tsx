@@ -1,10 +1,10 @@
 import { type AnyAuthConfig, useAuth } from "@better-auth-ui/react"
 import {
-  ArrowRightEndOnRectangleIcon,
-  ArrowRightStartOnRectangleIcon,
-  ChevronUpDownIcon,
-  UserPlusIcon
-} from "@heroicons/react/24/outline"
+  ArrowRightFromSquare,
+  ArrowRightToSquare,
+  ChevronsExpandVertical,
+  PersonPlus
+} from "@gravity-ui/icons"
 import { Button, cn, Dropdown, Label, Skeleton } from "@heroui/react"
 
 import { UserAvatar } from "./user-avatar"
@@ -95,7 +95,7 @@ export function UserButton({
             </p>
           )}
 
-          <ChevronUpDownIcon className="ml-auto size-4" />
+          <ChevronsExpandVertical className="ml-auto size-4" />
         </Button>
       )}
 
@@ -133,7 +133,7 @@ export function UserButton({
               >
                 <Label>{localization.auth.signOut}</Label>
 
-                <ArrowRightStartOnRectangleIcon className="size-4 text-danger" />
+                <ArrowRightFromSquare className="size-4 text-danger" />
               </Link>
             </Dropdown.Item>
           ) : (
@@ -148,7 +148,7 @@ export function UserButton({
                 >
                   <Label>{localization.auth.signIn}</Label>
 
-                  <ArrowRightEndOnRectangleIcon className="size-4" />
+                  <ArrowRightToSquare className="size-4" />
                 </Link>
               </Dropdown.Item>
 
@@ -162,7 +162,7 @@ export function UserButton({
                 >
                   <Label>{localization.auth.signUp}</Label>
 
-                  <UserPlusIcon className="size-4" />
+                  <PersonPlus className="size-4" />
                 </Link>
               </Dropdown.Item>
             </>

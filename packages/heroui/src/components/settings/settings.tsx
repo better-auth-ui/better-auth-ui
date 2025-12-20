@@ -1,6 +1,6 @@
 import type { AnyAuthConfig } from "@better-auth-ui/react"
 import type { SettingsView } from "@better-auth-ui/react/core"
-import { ShieldCheckIcon, UserCircleIcon } from "@heroicons/react/24/outline"
+import { Person, Shield } from "@gravity-ui/icons"
 import { cn, Tabs, type TabsProps } from "@heroui/react"
 import { useMemo } from "react"
 import { useAuth } from "../../hooks/use-auth"
@@ -30,7 +30,7 @@ export function Settings({
   hideNav,
   ...config
 }: SettingsProps) {
-  const { basePaths, viewPaths } = useAuth(config)
+  const { basePaths, localization, viewPaths } = useAuth(config)
 
   if (!view && !path) {
     throw new Error("[Better Auth UI] Either `view` or `path` must be provided")
@@ -50,7 +50,7 @@ export function Settings({
     <ResponsiveTabs selectedKey={currentView} className="w-full gap-2 md:gap-4">
       <Tabs.ListContainer>
         <Tabs.List
-          aria-label="Settings"
+          aria-label={localization.settings.settings}
           className={cn(
             "overflow-auto md:w-64 lg:w-72 xl:w-80",
             hideNav && "hidden"
@@ -61,8 +61,10 @@ export function Settings({
             href={`${basePaths.settings}/${viewPaths.settings.account}`}
             className="gap-1.5"
           >
-            <UserCircleIcon className="size-4" />
-            Account
+            <Person />
+
+            {localization.settings.account}
+
             <Tabs.Indicator />
           </Tabs.Tab>
 
@@ -71,8 +73,10 @@ export function Settings({
             href={`${basePaths.settings}/${viewPaths.settings.security}`}
             className="gap-1.5"
           >
-            <ShieldCheckIcon className="size-4" />
-            Security
+            <Shield />
+
+            {localization.settings.security}
+
             <Tabs.Indicator />
           </Tabs.Tab>
         </Tabs.List>
@@ -82,7 +86,7 @@ export function Settings({
         <AccountSettings {...config} />
       </Tabs.Panel>
 
-      <Tabs.Panel id="security">Security</Tabs.Panel>
+      <Tabs.Panel id="security">{localization.settings.security}</Tabs.Panel>
     </ResponsiveTabs>
   )
 }

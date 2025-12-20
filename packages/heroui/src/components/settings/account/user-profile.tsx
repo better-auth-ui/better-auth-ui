@@ -3,7 +3,7 @@ import {
   useAuth,
   useUpdateUser
 } from "@better-auth-ui/react"
-import { CheckIcon, PencilIcon } from "@heroicons/react/24/outline"
+import { FloppyDisk, Pencil } from "@gravity-ui/icons"
 import {
   Button,
   Card,
@@ -63,7 +63,7 @@ export function UserProfile({ className, ...config }: UserProfileProps) {
               <UserAvatar {...config} size="lg" />
 
               <span className="absolute right-0 bottom-0 size-3.5 rounded-full bg-background ring-2 ring-surface-quaternary flex items-center justify-center">
-                <PencilIcon className="size-2 text-muted" />
+                <Pencil className="size-2.5 text-muted" />
               </span>
             </Button>
 
@@ -102,7 +102,7 @@ export function UserProfile({ className, ...config }: UserProfileProps) {
               {isPending ? (
                 <Spinner color="current" size="sm" />
               ) : (
-                <CheckIcon className="size-4" />
+                <FloppyDisk />
               )}
               {localization.settings.saveChanges}
             </Button>
