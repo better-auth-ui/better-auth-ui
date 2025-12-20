@@ -25,7 +25,7 @@ export default defineConfig({
     port: 3000
   },
   resolve: {
-    noExternal: FumadocsDeps
+    noExternal: [...FumadocsDeps, "@gravity-ui/icons"]
   },
   plugins: [
     mdx(await import("./source.config")),

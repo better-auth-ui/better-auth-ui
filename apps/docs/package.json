@@ -35,6 +35,7 @@
     "lucide-react": "^0.562.0",
     "lucide-static": "^0.562.0",
     "react": "^19.2.3",
+    "react-aria-components": "^1.14.0",
     "react-dom": "^19.2.3",
     "remark-code-import": "^1.2.0",
     "sonner": "^2.0.7",

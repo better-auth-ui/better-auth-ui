@@ -1,4 +1,5 @@
 import { createFileRoute, Outlet } from "@tanstack/react-router"
+import { RouterProvider } from "react-aria-components"
 
 import herouiCss from "@/styles/heroui.css?url"
 
@@ -10,5 +11,9 @@ export const Route = createFileRoute("/demos/heroui")({
 })
 
 function RouteComponent() {
-  return <Outlet />
+  return (
+    <RouterProvider navigate={() => {}}>
+      <Outlet />
+    </RouterProvider>
+  )
 }
