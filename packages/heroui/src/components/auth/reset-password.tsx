@@ -9,6 +9,7 @@ import {
   Form,
   InputGroup,
   Label,
+  Link,
   Spinner,
   TextField
 } from "@heroui/react"
@@ -33,8 +34,7 @@ export function ResetPassword({ className, ...config }: ResetPasswordProps) {
     emailAndPassword,
     localization,
     viewPaths,
-    navigate,
-    Link
+    navigate
   } = context
 
   const [{ password, confirmPassword }, resetPassword, isPending] =
@@ -169,7 +169,7 @@ export function ResetPassword({ className, ...config }: ResetPasswordProps) {
 
               <Link
                 href={`${basePaths.auth}/${viewPaths.auth.signIn}`}
-                className="link link--underline-hover text-accent"
+                className="text-accent rounded"
               >
                 {localization.auth.signIn}
               </Link>

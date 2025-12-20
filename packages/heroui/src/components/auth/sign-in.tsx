@@ -13,6 +13,7 @@ import {
   Form,
   Input,
   Label,
+  Link,
   Spinner,
   TextField
 } from "@heroui/react"
@@ -48,8 +49,7 @@ export function SignIn({
     localization,
     magicLink,
     socialProviders,
-    viewPaths,
-    Link
+    viewPaths
   } = context
 
   const [{ email, password }, signInEmail, signInPending] =
@@ -125,7 +125,7 @@ export function SignIn({
                       emailAndPassword?.forgotPassword && (
                         <Link
                           href={`${basePaths.auth}/${viewPaths.auth.forgotPassword}`}
-                          className="link link--underline-hover text-muted"
+                          className="text-muted rounded"
                         >
                           {localization.auth.forgotPasswordLink}
                         </Link>
@@ -156,7 +156,7 @@ export function SignIn({
                   {emailAndPassword?.forgotPassword && (
                     <Link
                       href={`${basePaths.auth}/${viewPaths.auth.forgotPassword}`}
-                      className="link link--underline-hover text-muted"
+                      className="text-muted rounded"
                     >
                       {localization.auth.forgotPasswordLink}
                     </Link>
@@ -205,7 +205,7 @@ export function SignIn({
 
               <Link
                 href={`${basePaths.auth}/${viewPaths.auth.signUp}`}
-                className="link link--underline-hover text-accent"
+                className="text-accent rounded"
               >
                 {localization.auth.signUp}
               </Link>

@@ -29,7 +29,7 @@ export function MagicLinkButton({
     <Link
       href={`${basePaths.auth}/${isMagicLinkView ? viewPaths.auth.signIn : viewPaths.auth.magicLink}`}
       className={cn(
-        "button button--tertiary w-full",
+        "button button--md button--tertiary w-full focus:ring-accent focus:ring-2 focus:ring-offset-2",
         isPending && "status-disabled pointer-events-none"
       )}
     >

@@ -12,6 +12,7 @@ import {
   Form,
   Input,
   Label,
+  Link,
   Spinner,
   TextField
 } from "@heroui/react"
@@ -44,7 +45,7 @@ export function MagicLink({
 }: MagicLinkProps) {
   const context = useAuth(config)
 
-  const { basePaths, localization, socialProviders, viewPaths, Link } = context
+  const { basePaths, localization, socialProviders, viewPaths } = context
 
   const [{ email }, signInMagicLink, magicLinkPending] =
     useSignInMagicLink(context)
@@ -139,7 +140,7 @@ export function MagicLink({
 
             <Link
               href={`${basePaths.auth}/${viewPaths.auth.signUp}`}
-              className="link link--underline-hover text-accent"
+              className="text-accent rounded"
             >
               {localization.auth.signUp}
             </Link>

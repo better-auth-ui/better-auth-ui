@@ -8,6 +8,7 @@ import {
   Form,
   Input,
   Label,
+  Link,
   Spinner,
   TextField
 } from "@heroui/react"
@@ -28,7 +29,7 @@ export type ForgotPasswordProps = AnyAuthConfig & {
 export function ForgotPassword({ className, ...config }: ForgotPasswordProps) {
   const context = useAuth(config)
 
-  const { basePaths, localization, viewPaths, Link } = context
+  const { basePaths, localization, viewPaths } = context
 
   const [{ email }, forgotPassword, isPending] = useForgotPassword(context)
 
@@ -73,7 +74,7 @@ export function ForgotPassword({ className, ...config }: ForgotPasswordProps) {
 
               <Link
                 href={`${basePaths.auth}/${viewPaths.auth.signIn}`}
-                className="link link--underline-hover text-accent"
+                className="text-accent rounded"
               >
                 {localization.auth.signIn}
               </Link>

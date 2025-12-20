@@ -14,6 +14,7 @@ import {
   Input,
   InputGroup,
   Label,
+  Link,
   Spinner,
   TextField
 } from "@heroui/react"
@@ -52,8 +53,7 @@ export function SignUp({
     localization,
     magicLink,
     socialProviders,
-    viewPaths,
-    Link
+    viewPaths
   } = context
 
   const [
@@ -214,11 +214,7 @@ export function SignUp({
                           }
                           isDisabled={isPending}
                         >
-                          {isConfirmPasswordVisible ? (
-                            <EyeSlash />
-                          ) : (
-                            <Eye />
-                          )}
+                          {isConfirmPasswordVisible ? <EyeSlash /> : <Eye />}
                         </Button>
                       </InputGroup.Suffix>
                     </InputGroup>
@@ -269,7 +265,7 @@ export function SignUp({
 
               <Link
                 href={`${basePaths.auth}/${viewPaths.auth.signIn}`}
-                className="link link--underline-hover text-accent"
+                className="text-accent rounded"
               >
                 {localization.auth.signIn}
               </Link>

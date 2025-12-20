@@ -51,8 +51,7 @@ export function UserButton({
   variant = "ghost",
   ...config
 }: UserButtonProps) {
-  const { authClient, basePaths, viewPaths, localization, Link } =
-    useAuth(config)
+  const { authClient, basePaths, viewPaths, localization } = useAuth(config)
 
   const { data: sessionData, isPending } = authClient.useSession()
 
@@ -68,50 +67,50 @@ export function UserButton({
         <Button
           variant={variant}
           className={cn(
-            "h-auto font-normal justify-start px-3 py-2",
+            "h-auto font-normal justify-start px-3 py-2 text-left",
             className
           )}
         >
           <UserAvatar {...config} />
 
           {isPending ? (
-            <div className="flex flex-col gap-1 text-left">
+            <div className="flex flex-col gap-1">
               <Skeleton className="h-4 w-24 rounded-lg" />
               <Skeleton className="h-3 w-32 rounded-lg" />
             </div>
           ) : user ? (
-            <div className="flex flex-col gap-0 text-left">
-              <p className="text-sm font-medium leading-5">
+            <div>
+              <p className="text-sm font-medium">
                 {user.displayUsername || user.name || user.email}
               </p>
 
               {(user.displayUsername || user.name) && (
-                <p className="text-muted text-xs leading-none">{user.email}</p>
+                <p className="text-muted text-xs leading-none mb-1">
+                  {user.email}
+                </p>
               )}
             </div>
           ) : (
-            <p className="text-sm font-medium leading-5">
-              {localization.auth.account}
-            </p>
+            <p className="text-sm font-medium">{localization.auth.account}</p>
           )}
 
-          <ChevronsExpandVertical className="ml-auto size-4" />
+          <ChevronsExpandVertical className="ml-auto" />
         </Button>
       )}
 
       <Dropdown.Popover placement={placement}>
         {user && (
-          <div className="px-3 pb-1 pt-3">
+          <div className="px-3 py-2">
             <div className="flex items-center gap-2">
               <UserAvatar {...config} />
 
-              <div className="flex flex-col gap-0">
-                <p className="text-sm font-medium leading-5">
+              <div>
+                <p className="text-sm font-medium">
                   {user.displayUsername || user.name || user.email}
                 </p>
 
                 {(user.displayUsername || user.name) && (
-                  <p className="text-muted text-xs leading-none">
+                  <p className="text-muted text-xs leading-none mb-1">
                     {user.email}
                   </p>
                 )}
@@ -125,45 +124,30 @@ export function UserButton({
             <Dropdown.Item
               textValue={localization.auth.signOut}
               variant="danger"
-              className="!p-0"
+              href={`${basePaths.auth}/${viewPaths.auth.signOut}`}
             >
-              <Link
-                href={`${basePaths.auth}/${viewPaths.auth.signOut}`}
-                className="p-2 flex w-full items-center justify-between gap-2"
-              >
-                <Label>{localization.auth.signOut}</Label>
+              <Label>{localization.auth.signOut}</Label>
 
-                <ArrowRightFromSquare className="size-4 text-danger" />
-              </Link>
+              <ArrowRightFromSquare className="ml-auto text-danger" />
             </Dropdown.Item>
           ) : (
             <>
               <Dropdown.Item
                 textValue={localization.auth.signIn}
-                className="!p-0"
+                href={`${basePaths.auth}/${viewPaths.auth.signIn}`}
               >
-                <Link
-                  href={`${basePaths.auth}/${viewPaths.auth.signIn}`}
-                  className="p-2 flex w-full items-center justify-between gap-2"
-                >
-                  <Label>{localization.auth.signIn}</Label>
+                <Label>{localization.auth.signIn}</Label>
 
-                  <ArrowRightToSquare className="size-4" />
-                </Link>
+                <ArrowRightToSquare className="ml-auto" />
               </Dropdown.Item>
 
               <Dropdown.Item
                 textValue={localization.auth.signUp}
-                className="!p-0"
+                href={`${basePaths.auth}/${viewPaths.auth.signUp}`}
               >
-                <Link
-                  href={`${basePaths.auth}/${viewPaths.auth.signUp}`}
-                  className="p-2 flex w-full items-center justify-between gap-2"
-                >
-                  <Label>{localization.auth.signUp}</Label>
+                <Label>{localization.auth.signUp}</Label>
 
-                  <PersonPlus className="size-4" />
-                </Link>
+                <PersonPlus className="ml-auto" />
               </Dropdown.Item>
             </>
           )}
