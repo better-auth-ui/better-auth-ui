@@ -25,24 +25,6 @@ export default defineConfig({
       persist: {
         id: "package-manager"
       }
-      // packageManagers: [
-      //   {
-      //     name: "bun",
-      //     command: (command) => command.replace("npm install", "bun add")
-      //   },
-      //   {
-      //     name: "npm",
-      //     command: (command) => command
-      //   },
-      //   {
-      //     name: "pnpm",
-      //     command: (command) => command.replace("npm install", "pnpm add")
-      //   },
-      //   {
-      //     name: "yarn",
-      //     command: (command) => command.replace("npm install", "yarn add")
-      //   }
-      // ]
     }
   }
 })
