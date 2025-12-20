@@ -2,6 +2,7 @@ import type { AnyAuthConfig } from "@better-auth-ui/react"
 import type { SettingsView } from "@better-auth-ui/react/core"
 import { ShieldCheckIcon, UserCircleIcon } from "@heroicons/react/24/outline"
 import { cn, Tabs, type TabsProps } from "@heroui/react"
+import { useMemo } from "react"
 import { useAuth } from "../../hooks/use-auth"
 import { AccountSettings } from "./account/account-settings"
 
@@ -35,9 +36,13 @@ export function Settings({
     throw new Error("[Better Auth UI] Either `view` or `path` must be provided")
   }
 
-  const settingsPathViews = Object.fromEntries(
-    Object.entries(viewPaths.settings).map(([k, v]) => [v, k])
-  ) as Record<string, SettingsView>
+  const settingsPathViews = useMemo(
+    () =>
+      Object.fromEntries(
+        Object.entries(viewPaths.settings).map(([k, v]) => [v, k])
+      ) as Record<string, SettingsView>,
+    [viewPaths.settings]
+  )
 
   const currentView = view || (path ? settingsPathViews[path] : undefined)
 
