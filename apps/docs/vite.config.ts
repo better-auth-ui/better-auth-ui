@@ -12,12 +12,20 @@ const EXCLUDED_PRERENDER_PATHS = [
   "/organization"
 ] as const
 
+const FumadocsDeps = [
+  "fumadocs-core",
+  "fumadocs-ui",
+  "fumadocs-openapi",
+  "@fumadocs/base-ui",
+  "@fumadocs/ui"
+]
+
 export default defineConfig({
   server: {
     port: 3000
   },
   resolve: {
-    external: ["fumadocs-core", "fumadocs-ui"]
+    noExternal: FumadocsDeps
   },
   plugins: [
     mdx(await import("./source.config")),
