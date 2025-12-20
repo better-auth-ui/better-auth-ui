@@ -107,8 +107,19 @@ export const localization = {
 
     /** @remarks `"Verify your email"` */
     verifyYourEmail: "Verify your email"
+  },
+  account: {
+    /** @remarks `"Profile"` */
+    profile: "Profile",
+
+    /** @remarks `"Profile updated successfully"` */
+    profileUpdatedSuccess: "Profile updated successfully",
+
+    /** @remarks `"Save changes"` */
+    saveChanges: "Save changes"
   }
 }
 
 export type Localization = typeof localization
 export type AuthLocalization = Localization["auth"]
+export type AccountLocalization = Localization["account"]

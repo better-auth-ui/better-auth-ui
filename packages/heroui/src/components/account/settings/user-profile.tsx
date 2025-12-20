@@ -1,4 +1,8 @@
-import { type AnyAuthConfig, useAuth } from "@better-auth-ui/react"
+import {
+  type AnyAuthConfig,
+  useAuth,
+  useUpdateUser
+} from "@better-auth-ui/react"
 import { CheckIcon, PencilIcon } from "@heroicons/react/24/outline"
 import {
   Button,
@@ -10,6 +14,7 @@ import {
   Input,
   Label,
   Skeleton,
+  Spinner,
   TextField
 } from "@heroui/react"
 
@@ -20,19 +25,24 @@ export type UserProfileProps = AnyAuthConfig & {
 }
 
 export function UserProfile({ className, ...config }: UserProfileProps) {
-  const { authClient } = useAuth(config)
+  const { authClient, localization } = useAuth(config)
 
-  const { data: sessionData, isPending } = authClient.useSession()
+  const { data: sessionData, isPending: isSessionPending } =
+    authClient.useSession()
 
-  if (isPending) {
+  const [state, formAction, isPending] = useUpdateUser(config)
+
+  if (isSessionPending) {
     return <UserProfileSkeleton />
   }
 
   return (
     <Card className="p-4 md:p-6">
-      <Form>
+      <Form action={formAction}>
         <Fieldset className="w-full">
-          <Fieldset.Legend className="text-xl">Profile</Fieldset.Legend>
+          <Fieldset.Legend className="text-xl">
+            {localization.account.profile}
+          </Fieldset.Legend>
           <Description />
 
           <div className="flex items-center gap-3">
@@ -65,17 +75,25 @@ export function UserProfile({ className, ...config }: UserProfileProps) {
           </div>
 
           <Fieldset.Group>
-            <TextField name="name" defaultValue={sessionData?.user?.name}>
-              <Label>Name</Label>
-              <Input placeholder="Name" />
+            <TextField
+              name="name"
+              defaultValue={sessionData?.user?.name || state.name}
+              isDisabled={isPending}
+            >
+              <Label>{localization.auth.name}</Label>
+              <Input placeholder={localization.auth.name} />
               <FieldError />
             </TextField>
           </Fieldset.Group>
 
           <Fieldset.Actions>
             <Button type="submit" isPending={isPending}>
-              <CheckIcon className="size-4" />
-              Save changes
+              {isPending ? (
+                <Spinner color="current" size="sm" />
+              ) : (
+                <CheckIcon className="size-4" />
+              )}
+              {localization.account.saveChanges}
             </Button>
           </Fieldset.Actions>
         </Fieldset>
