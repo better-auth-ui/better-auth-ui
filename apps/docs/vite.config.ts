@@ -18,7 +18,11 @@ export default defineConfig({
     tanstackStart({
       prerender: {
         enabled: true,
-        autoSubfolderIndex: false
+        autoSubfolderIndex: false,
+        filter: ({ path }) =>
+          !path.startsWith("/settings") &&
+          !path.startsWith("/auth") &&
+          !path.startsWith("/organization")
       },
       pages: [
         {
