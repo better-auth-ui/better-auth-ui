@@ -24,6 +24,13 @@ export type UserProfileProps = AnyAuthConfig & {
   className?: string
 }
 
+/**
+ * Display and edit the authenticated user's profile in a card-based form.
+ *
+ * Renders a loading skeleton while the session is pending. When loaded, shows the user's avatar with an edit indicator, the best-available identifier (displayUsername, name, or email) with a conditional email line, a name input prefilled from the session or local state, and a submit button that reflects update pending state. Labels and texts come from the provided auth localization; the form action is wired to the update user action from the auth hooks.
+ *
+ * @returns A JSX element containing the profile card and editable form
+ */
 export function UserProfile({ className, ...config }: UserProfileProps) {
   const { authClient, localization } = useAuth(config)
 
@@ -106,6 +113,13 @@ export function UserProfile({ className, ...config }: UserProfileProps) {
   )
 }
 
+/**
+ * Renders a skeleton placeholder that matches the UserProfile layout while data is loading.
+ *
+ * Displays placeholder elements for the profile header, avatar, user text lines, name field, and action button to indicate loading state.
+ *
+ * @returns A Card element containing skeleton UI blocks that visually represent the user profile form during loading.
+ */
 function UserProfileSkeleton() {
   return (
     <Card className="p-4 md:p-6 gap-4 md:gap-6">

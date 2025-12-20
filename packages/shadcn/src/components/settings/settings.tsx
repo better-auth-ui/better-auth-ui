@@ -18,11 +18,12 @@ export type SettingsProps = AnyAuthConfig & {
 }
 
 /**
- * Selects and renders the appropriate settings view component.
+ * Renders a tabbed settings interface and selects which view to display.
  *
- * @param path - Route path used to resolve a settings view when `view` is not provided
- * @param view - Explicit settings view to render (e.g., "account")
- * @param hideNav - Hide the navigation tabs
+ * @param path - Route path used to resolve the settings view when `view` is not provided
+ * @param view - Explicit settings view to render (e.g., "account" or "security")
+ * @param hideNav - When true, hide the navigation tabs
+ * @returns A JSX element rendering the settings tabs and the currently selected view
  */
 export function Settings({
   className,

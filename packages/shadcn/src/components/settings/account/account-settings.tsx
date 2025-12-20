@@ -9,6 +9,11 @@ export type AccountSettingsProps = AnyAuthConfig & {
   className?: string
 }
 
+/**
+ * Renders the account settings layout and forwards auth configuration props to the contained UserProfile.
+ *
+ * @returns A React element that renders a layout wrapper and a UserProfile configured with the component props.
+ */
 export function AccountSettings({
   className,
   ...config
