@@ -41,24 +41,7 @@ export default defineConfig({
           !EXCLUDED_PRERENDER_PATHS.some((excludedPath) =>
             path.startsWith(excludedPath)
           )
-      },
-      pages: [
-        {
-          path: "/"
-        },
-        {
-          path: "/docs"
-        },
-        {
-          path: "/docs/shadcn"
-        },
-        {
-          path: "/docs/heroui"
-        },
-        {
-          path: "/api/search"
-        }
-      ]
+      }
     }),
     react()
   ]
