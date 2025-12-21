@@ -1,13 +1,7 @@
 import type { AnyAuthClient, AnyAuthConfig } from "@better-auth-ui/react"
-import {
-  QueryClient,
-  QueryClientContext,
-  useQuery
-} from "@tanstack/react-query"
-import { useContext } from "react"
+import { useQuery } from "@tanstack/react-query"
 import { useAuth } from "./use-auth"
 
-const queryClient = new QueryClient()
 /**
  * Fetches and returns the list of device sessions for multi-session support.
  *
@@ -17,9 +11,7 @@ const queryClient = new QueryClient()
 export function useListDeviceSessions<TAuthClient extends AnyAuthClient>(
   config?: AnyAuthConfig & { authClient?: TAuthClient }
 ) {
-  const contextQueryClient = useContext(QueryClientContext)
-
-  const { authClient, multiSession } = useAuth(config)
+  const { authClient, multiSession, queryClient } = useAuth(config)
 
   const { data: sessionData } = authClient.useSession()
 
@@ -32,6 +24,6 @@ export function useListDeviceSessions<TAuthClient extends AnyAuthClient>(
         }),
       enabled: !!multiSession && !!sessionData
     },
-    contextQueryClient || queryClient
+    queryClient
   )
 }
