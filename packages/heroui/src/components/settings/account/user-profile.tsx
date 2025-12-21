@@ -34,14 +34,9 @@ export type UserProfileProps = AnyAuthConfig & {
 export function UserProfile({ className, ...config }: UserProfileProps) {
   const { authClient, localization } = useAuth(config)
 
-  const { data: sessionData, isPending: isSessionPending } =
-    authClient.useSession()
+  const { data: sessionData } = authClient.useSession()
 
   const [state, formAction, isPending] = useUpdateUser(config)
-
-  if (isSessionPending) {
-    return <UserProfileSkeleton />
-  }
 
   return (
     <Card className="p-4 md:p-6">
@@ -59,6 +54,7 @@ export function UserProfile({ className, ...config }: UserProfileProps) {
               isIconOnly
               variant="ghost"
               className="p-0 h-auto w-auto rounded-full"
+              isDisabled={!sessionData}
             >
               <UserAvatar {...config} size="lg" />
 
@@ -67,36 +63,54 @@ export function UserProfile({ className, ...config }: UserProfileProps) {
               </span>
             </Button>
 
-            <div className="flex flex-col">
-              <p className="text-sm font-medium">
-                {sessionData?.user?.displayUsername ||
-                  sessionData?.user?.name ||
-                  sessionData?.user?.email}
-              </p>
+            {sessionData ? (
+              <div className="flex flex-col">
+                <p className="text-sm font-medium">
+                  {sessionData?.user?.displayUsername ||
+                    sessionData?.user?.name ||
+                    sessionData?.user?.email}
+                </p>
 
-              {(sessionData?.user?.displayUsername ||
-                sessionData?.user?.name) && (
-                <p className="text-muted text-xs">{sessionData?.user?.email}</p>
-              )}
-            </div>
+                {(sessionData?.user?.displayUsername ||
+                  sessionData?.user?.name) && (
+                  <p className="text-muted text-xs">
+                    {sessionData?.user?.email}
+                  </p>
+                )}
+              </div>
+            ) : (
+              <div className="flex flex-col gap-1">
+                <Skeleton className="h-4 mt-0.5 w-24 rounded-lg" />
+                <Skeleton className="h-3 mt-0.5 w-32 rounded-lg" />
+              </div>
+            )}
           </div>
 
           <Fieldset.Group>
             <TextField
+              key={sessionData?.user?.name}
               name="name"
               defaultValue={sessionData?.user?.name || state.name}
-              isDisabled={isPending}
+              isDisabled={isPending || !sessionData}
             >
               <Label>{localization.auth.name}</Label>
 
-              <Input placeholder={localization.auth.name} />
+              {sessionData ? (
+                <Input placeholder={localization.auth.name} />
+              ) : (
+                <Skeleton className="h-10 md:h-9 w-full rounded-xl" />
+              )}
 
               <FieldError />
             </TextField>
           </Fieldset.Group>
 
           <Fieldset.Actions>
-            <Button type="submit" isPending={isPending}>
+            <Button
+              type="submit"
+              isPending={isPending}
+              isDisabled={!sessionData}
+            >
               {isPending ? (
                 <Spinner color="current" size="sm" />
               ) : (
@@ -107,37 +121,6 @@ export function UserProfile({ className, ...config }: UserProfileProps) {
           </Fieldset.Actions>
         </Fieldset>
       </Form>
-    </Card>
-  )
-}
-
-/**
- * Renders a skeleton placeholder that matches the UserProfile layout while data is loading.
- *
- * Displays placeholder elements for the profile header, avatar, user text lines, name field, and action button to indicate loading state.
- *
- * @returns A Card element containing skeleton UI blocks that visually represent the user profile form during loading.
- */
-function UserProfileSkeleton() {
-  return (
-    <Card className="p-4 md:p-6 gap-4 md:gap-6">
-      <Skeleton className="h-7 w-18 rounded-xl" />
-
-      <div className="flex items-center gap-2">
-        <Skeleton className="size-12 rounded-full" />
-
-        <div className="flex flex-col gap-1">
-          <Skeleton className="h-4 mt-0.5 w-24 rounded-lg" />
-          <Skeleton className="h-3 mt-0.5 w-32 rounded-lg" />
-        </div>
-      </div>
-
-      <div className="flex flex-col gap-1">
-        <Skeleton className="h-4 w-12 my-0.5 rounded-lg" />
-        <Skeleton className="h-10 md:h-9 w-full rounded-xl" />
-      </div>
-
-      <Skeleton className="h-10 md:h-9 w-36 rounded-full mt-1" />
     </Card>
   )
 }

@@ -506,7 +506,7 @@
           "type": "registry:hook"
         },
         {
-          "path": "../react/src/hooks/auth/use-update-user.ts",
+          "path": "../react/src/hooks/settings/use-update-user.ts",
           "type": "registry:hook"
         }
       ]

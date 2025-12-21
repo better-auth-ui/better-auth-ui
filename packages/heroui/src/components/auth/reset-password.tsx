@@ -29,13 +29,8 @@ export type ResetPasswordProps = AnyAuthConfig & {
 export function ResetPassword({ className, ...config }: ResetPasswordProps) {
   const context = useAuth(config)
 
-  const {
-    basePaths,
-    emailAndPassword,
-    localization,
-    viewPaths,
-    navigate
-  } = context
+  const { basePaths, emailAndPassword, localization, viewPaths, navigate } =
+    context
 
   const [{ password, confirmPassword }, resetPassword, isPending] =
     useResetPassword(context)
@@ -143,11 +138,7 @@ export function ResetPassword({ className, ...config }: ResetPasswordProps) {
                       }
                       isDisabled={isPending}
                     >
-                      {isConfirmPasswordVisible ? (
-                        <EyeSlash />
-                      ) : (
-                        <Eye />
-                      )}
+                      {isConfirmPasswordVisible ? <EyeSlash /> : <Eye />}
                     </Button>
                   </InputGroup.Suffix>
                 </InputGroup>

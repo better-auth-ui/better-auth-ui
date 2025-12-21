@@ -8,7 +8,7 @@ export function Header() {
       <div className="py-3 px-4 md:px-6 mx-auto justify-between flex items-center">
         <Link
           href="/"
-          className="flex items-center gap-3 rounded"
+          className="flex items-center gap-2.5 rounded"
           underline="none"
         >
           <Logo />

@@ -1,6 +1,6 @@
 import type { AnyAuthClient, AnyAuthConfig } from "@better-auth-ui/react"
 import { useQuery } from "@tanstack/react-query"
-import { useAuth } from "./use-auth"
+import { useAuth } from "../auth/use-auth"
 
 /**
  * Fetches and returns the list of device sessions for multi-session support.
