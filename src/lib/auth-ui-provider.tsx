@@ -356,6 +356,7 @@ export const AuthUIProvider = ({
     navigate,
     replace,
     Link = DefaultLink,
+    emailVerification,
     ...props
 }: AuthUIProviderProps) => {
     const authClient = authClientProp as AuthClient
@@ -716,6 +717,7 @@ export const AuthUIProvider = ({
                 changeEmail,
                 credentials,
                 deleteUser,
+                emailVerification,
                 freshAge,
                 genericOAuth,
                 hooks,

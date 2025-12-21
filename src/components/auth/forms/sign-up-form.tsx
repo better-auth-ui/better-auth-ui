@@ -97,7 +97,8 @@ export function SignUpForm({
         navigate,
         toast,
         avatar,
-        localizeErrors
+        localizeErrors,
+        emailVerification
     } = useContext(AuthUIContext)
 
     const confirmPasswordEnabled = credentials?.confirmPassword
@@ -391,6 +392,10 @@ export function SignUpForm({
 
             if ("token" in data && data.token) {
                 await onSuccess()
+            } else if (emailVerification) {
+                navigate(
+                    `${basePath}/${viewPaths.EMAIL_VERIFICATION}?email=${encodeURIComponent(email as string)}`
+                )
             } else {
                 navigate(
                     `${basePath}/${viewPaths.SIGN_IN}${window.location.search}`
@@ -415,6 +420,7 @@ export function SignUpForm({
             resetCaptcha()
         }
     }
+
 
     return (
         <Form {...form}>
@@ -833,3 +839,4 @@ export function SignUpForm({
         </Form>
     )
 }
+

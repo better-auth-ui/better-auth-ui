@@ -176,8 +176,14 @@ export const authLocalization = {
     /** @default "Please check your email to verify the change." */
     EMAIL_VERIFY_CHANGE: "Please check your email to verify the change.",
 
-    /** @default "Please check your email for the verification link." */
-    EMAIL_VERIFICATION: "Please check your email for the verification link.",
+    /** @default "Email Verification" */
+    EMAIL_VERIFICATION: "Email Verification",
+
+    /** @default "Please check your email for the verification code to complete your registration." */
+    EMAIL_VERIFICATION_DESCRIPTION: "Please check your email for the verification code to complete your registration.",
+
+    /** @default "Email verification successful." */
+    EMAIL_VERIFICATION_SUCCESS: "Email verification successful.",
 
     /** @default "Enable Two-Factor" */
     ENABLE_TWO_FACTOR: "Enable Two-Factor",

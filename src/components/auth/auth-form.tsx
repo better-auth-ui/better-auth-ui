@@ -8,6 +8,7 @@ import type { AuthViewPath } from "../../lib/view-paths"
 import type { AuthLocalization } from "../../localization/auth-localization"
 import { AuthCallback } from "./auth-callback"
 import { EmailOTPForm } from "./forms/email-otp-form"
+import { EmailVerificationForm } from "./forms/email-verification-form"
 import { ForgotPasswordForm } from "./forms/forgot-password-form"
 import { MagicLinkForm } from "./forms/magic-link-form"
 import { RecoverAccountForm } from "./forms/recover-account-form"
@@ -247,6 +248,21 @@ export function AuthForm({
                 classNames={classNames}
                 callbackURL={callbackURL}
                 localization={localization}
+                redirectTo={redirectTo}
+                isSubmitting={isSubmitting}
+                setIsSubmitting={setIsSubmitting}
+            />
+        )
+    }
+
+    if (view === "EMAIL_VERIFICATION") {
+        return (
+            <EmailVerificationForm
+                className={className}
+                classNames={classNames}
+                callbackURL={callbackURL}
+                localization={localization}
+                otpSeparators={otpSeparators}
                 redirectTo={redirectTo}
                 isSubmitting={isSubmitting}
                 setIsSubmitting={setIsSubmitting}
