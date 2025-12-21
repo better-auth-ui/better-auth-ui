@@ -1,7 +1,13 @@
 "use client"
 
 import type { AnyAuthConfig } from "@better-auth-ui/react"
-import { ChevronsUpDown, LogIn, LogOut, UserPlus2 } from "lucide-react"
+import {
+  ChevronsUpDown,
+  LogIn,
+  LogOut,
+  Settings,
+  UserPlus2
+} from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -118,13 +124,27 @@ export function UserButton({
         )}
 
         {user ? (
-          <DropdownMenuItem asChild>
-            <Link href={`${basePaths.auth}/${viewPaths.auth.signOut}`}>
-              <LogOut />
+          <>
+            <DropdownMenuItem asChild>
+              <Link
+                href={`${basePaths.settings}/${viewPaths.settings.account}`}
+              >
+                <Settings />
 
-              {localization.auth.signOut}
-            </Link>
-          </DropdownMenuItem>
+                {localization.settings.settings}
+              </Link>
+            </DropdownMenuItem>
+
+            <DropdownMenuSeparator />
+
+            <DropdownMenuItem asChild>
+              <Link href={`${basePaths.auth}/${viewPaths.auth.signOut}`}>
+                <LogOut />
+
+                {localization.auth.signOut}
+              </Link>
+            </DropdownMenuItem>
+          </>
         ) : (
           <>
             <DropdownMenuItem asChild>

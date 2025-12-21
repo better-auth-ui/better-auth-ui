@@ -3,6 +3,7 @@ import {
   ArrowRightFromSquare,
   ArrowRightToSquare,
   ChevronsExpandVertical,
+  Gear,
   PersonPlus
 } from "@gravity-ui/icons"
 import { Button, cn, Dropdown, Label, Skeleton } from "@heroui/react"
@@ -85,7 +86,7 @@ export function UserButton({
               </p>
 
               {(user.displayUsername || user.name) && (
-                <p className="text-muted text-xs leading-none mb-1">
+                <p className="text-muted text-xs leading-none mb-0.5">
                   {user.email}
                 </p>
               )}
@@ -100,7 +101,7 @@ export function UserButton({
 
       <Dropdown.Popover placement={placement}>
         {user && (
-          <div className="px-3 py-2">
+          <div className="px-3 pt-3 pb-1">
             <div className="flex items-center gap-2">
               <UserAvatar {...config} />
 
@@ -110,7 +111,7 @@ export function UserButton({
                 </p>
 
                 {(user.displayUsername || user.name) && (
-                  <p className="text-muted text-xs leading-none mb-1">
+                  <p className="text-muted text-xs leading-none mb-0.5">
                     {user.email}
                   </p>
                 )}
@@ -121,15 +122,26 @@ export function UserButton({
 
         <Dropdown.Menu>
           {user ? (
-            <Dropdown.Item
-              textValue={localization.auth.signOut}
-              variant="danger"
-              href={`${basePaths.auth}/${viewPaths.auth.signOut}`}
-            >
-              <Label>{localization.auth.signOut}</Label>
+            <>
+              <Dropdown.Item
+                textValue={localization.settings.settings}
+                href={`${basePaths.settings}/${viewPaths.settings.account}`}
+              >
+                <Label>{localization.settings.settings}</Label>
 
-              <ArrowRightFromSquare className="ml-auto text-danger" />
-            </Dropdown.Item>
+                <Gear className="ml-auto text-muted" />
+              </Dropdown.Item>
+
+              <Dropdown.Item
+                textValue={localization.auth.signOut}
+                variant="danger"
+                href={`${basePaths.auth}/${viewPaths.auth.signOut}`}
+              >
+                <Label>{localization.auth.signOut}</Label>
+
+                <ArrowRightFromSquare className="ml-auto text-danger" />
+              </Dropdown.Item>
+            </>
           ) : (
             <>
               <Dropdown.Item
