@@ -121,7 +121,7 @@ export function UserProfile({ className, ...config }: UserProfileProps) {
 function UserProfileSkeleton() {
   return (
     <Card className="p-4 md:p-6 gap-4 md:gap-6">
-      <Skeleton className="h-7 w-16 rounded-xl" />
+      <Skeleton className="h-7 w-18 rounded-xl" />
 
       <div className="flex items-center gap-2">
         <Skeleton className="size-12 rounded-full" />

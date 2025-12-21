@@ -68,7 +68,12 @@ export function UserAvatar({
         src={resolvedUser?.image ?? undefined}
       />
 
-      <Avatar.Fallback delayMs={resolvedUser?.image ? 600 : undefined}>
+      <Avatar.Fallback
+        className={cn(
+          size === "lg" ? "text-xl" : size === "md" ? "text-base" : "text-sm"
+        )}
+        delayMs={resolvedUser?.image ? 600 : undefined}
+      >
         {fallback || initials || <Person className="size-4" />}
       </Avatar.Fallback>
     </Avatar>
