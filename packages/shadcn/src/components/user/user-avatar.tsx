@@ -56,7 +56,10 @@ export function UserAvatar({
 
   return (
     <Avatar
-      className={cn("size-8 bg-muted text-foreground rounded-full", className)}
+      className={cn(
+        "size-8 bg-muted text-foreground text-sm rounded-full",
+        className
+      )}
     >
       <AvatarImage
         src={resolvedUser?.image ?? undefined}

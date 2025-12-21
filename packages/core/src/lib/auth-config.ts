@@ -81,6 +81,8 @@ export interface AuthConfig {
   localization: Localization
   /** Whether magic link (passwordless) authentication is enabled */
   magicLink?: boolean
+  /** Whether multi-session support is enabled */
+  multiSession?: boolean
   /**
    * Default redirect path after successful authentication
    * @default "/"

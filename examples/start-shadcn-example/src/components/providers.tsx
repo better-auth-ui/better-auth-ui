@@ -14,6 +14,7 @@ export function Providers({ children }: { children: ReactNode }) {
       <AuthProvider
         authClient={authClient}
         magicLink
+        multiSession
         socialProviders={["github", "google"]}
         redirectTo="/dashboard"
         navigate={(path) => navigate({ to: path })}

@@ -3,6 +3,9 @@ export const localization = {
     /** @remarks `"Account"` */
     account: "Account",
 
+    /** @remarks `"Add Account"` */
+    addAccount: "Add Account",
+
     /** @remarks `"Already have an account?"` */
     alreadyHaveAnAccount: "Already have an account?",
 
@@ -102,6 +105,9 @@ export const localization = {
     /** @remarks `"Sign Up"` */
     signUp: "Sign Up",
 
+    /** @remarks `"Switch Account"` */
+    switchAccount: "Switch Account",
+
     /** @remarks `"Verification email sent!"` */
     verificationEmailSent: "Verification email sent!",
 
@@ -125,7 +131,10 @@ export const localization = {
     security: "Security",
 
     /** @remarks `"Settings"` */
-    settings: "Settings"
+    settings: "Settings",
+
+    /** @remarks `"Theme"` */
+    theme: "Theme"
   }
 }
 

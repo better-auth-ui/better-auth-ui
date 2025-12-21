@@ -1,14 +1,25 @@
-import { type AnyAuthConfig, useAuth } from "@better-auth-ui/react"
+import {
+  type AnyAuthConfig,
+  useAuth,
+  useListDeviceSessions
+} from "@better-auth-ui/react"
 import {
   ArrowRightFromSquare,
   ArrowRightToSquare,
+  Check,
   ChevronsExpandVertical,
+  CirclePlus,
+  Display,
   Gear,
-  PersonPlus
+  Moon,
+  PersonPlus,
+  Persons,
+  Sun
 } from "@gravity-ui/icons"
-import { Button, cn, Dropdown, Label, Skeleton } from "@heroui/react"
+import { Button, cn, Dropdown, Label, Separator, Tabs } from "@heroui/react"
 
 import { UserAvatar } from "./user-avatar"
+import { UserView } from "./user-view"
 
 export type UserButtonProps = AnyAuthConfig & {
   className?: string
@@ -52,16 +63,22 @@ export function UserButton({
   variant = "ghost",
   ...config
 }: UserButtonProps) {
-  const { authClient, basePaths, viewPaths, localization } = useAuth(config)
+  const {
+    authClient,
+    basePaths,
+    viewPaths,
+    localization,
+    multiSession,
+    toast
+  } = useAuth(config)
 
-  const { data: sessionData, isPending } = authClient.useSession()
-
-  const user = sessionData?.user
+  const { data: sessionData } = authClient.useSession()
+  const { data: deviceSessions } = useListDeviceSessions(config)
 
   return (
     <Dropdown>
       {size === "icon" ? (
-        <Dropdown.Trigger className={cn(className)}>
+        <Dropdown.Trigger className={cn("rounded-full", className)}>
           <UserAvatar {...config} />
         </Dropdown.Trigger>
       ) : (
@@ -72,74 +89,134 @@ export function UserButton({
             className
           )}
         >
-          <UserAvatar {...config} />
-
-          {isPending ? (
-            <div className="flex flex-col gap-1">
-              <Skeleton className="h-4 w-24 rounded-lg" />
-              <Skeleton className="h-3 w-32 rounded-lg" />
-            </div>
-          ) : user ? (
-            <div>
-              <p className="text-sm font-medium">
-                {user.displayUsername || user.name || user.email}
-              </p>
-
-              {(user.displayUsername || user.name) && (
-                <p className="text-muted text-xs leading-none mb-0.5">
-                  {user.email}
-                </p>
-              )}
-            </div>
+          {sessionData ? (
+            <UserView {...config} />
           ) : (
-            <p className="text-sm font-medium">{localization.auth.account}</p>
+            <>
+              <UserAvatar {...config} />
+
+              <p className="text-sm font-medium">{localization.auth.account}</p>
+            </>
           )}
 
-          <ChevronsExpandVertical className="ml-auto" />
+          <ChevronsExpandVertical className="ml-auto size-3.5" />
         </Button>
       )}
 
-      <Dropdown.Popover placement={placement}>
-        {user && (
+      <Dropdown.Popover
+        placement={placement}
+        className="min-w-40 md:min-w-55 max-w-[48svw]"
+      >
+        {sessionData && (
           <div className="px-3 pt-3 pb-1">
-            <div className="flex items-center gap-2">
-              <UserAvatar {...config} />
-
-              <div>
-                <p className="text-sm font-medium">
-                  {user.displayUsername || user.name || user.email}
-                </p>
-
-                {(user.displayUsername || user.name) && (
-                  <p className="text-muted text-xs leading-none mb-0.5">
-                    {user.email}
-                  </p>
-                )}
-              </div>
-            </div>
+            <UserView {...config} />
           </div>
         )}
 
         <Dropdown.Menu>
-          {user ? (
+          {sessionData ? (
             <>
               <Dropdown.Item
                 textValue={localization.settings.settings}
                 href={`${basePaths.settings}/${viewPaths.settings.account}`}
               >
-                <Label>{localization.settings.settings}</Label>
+                <Gear className="text-muted" />
 
-                <Gear className="ml-auto text-muted" />
+                <Label>{localization.settings.settings}</Label>
               </Dropdown.Item>
+
+              <Dropdown.Item className="py-1 pe-2 hidden">
+                <Label>{localization.settings.theme}</Label>
+
+                <Tabs className="ml-auto" hideSeparator>
+                  <Tabs.ListContainer>
+                    <Tabs.List aria-label="Theme" className="*:h-5 *:w-5 *:p-0">
+                      <Tabs.Tab id="system">
+                        <Display className="size-3" />
+
+                        <Tabs.Indicator />
+                      </Tabs.Tab>
+                      <Tabs.Tab id="light">
+                        <Sun className="size-3" />
+
+                        <Tabs.Indicator />
+                      </Tabs.Tab>
+                      <Tabs.Tab id="dark">
+                        <Moon className="size-3" />
+
+                        <Tabs.Indicator />
+                      </Tabs.Tab>
+                    </Tabs.List>
+                  </Tabs.ListContainer>
+                </Tabs>
+              </Dropdown.Item>
+
+              {multiSession && (
+                <Dropdown.SubmenuTrigger>
+                  <Dropdown.Item textValue={localization.auth.switchAccount}>
+                    <Persons className="text-muted" />
+
+                    <Label>{localization.auth.switchAccount}</Label>
+
+                    <Dropdown.SubmenuIndicator />
+                  </Dropdown.Item>
+
+                  <Dropdown.Popover className="min-w-40 md:min-w-55 max-w-[48svw]">
+                    <Dropdown.Menu>
+                      <Dropdown.Item className="px-1.5">
+                        <UserView {...config} />
+
+                        <Check />
+                      </Dropdown.Item>
+
+                      {deviceSessions
+                        ?.filter(
+                          (session) =>
+                            session.session.id !== sessionData?.session.id
+                        )
+                        .map((session) => (
+                          <Dropdown.Item
+                            key={session.session.id}
+                            className="px-1.5"
+                            onPress={async () => {
+                              const { error } =
+                                await authClient.multiSession.setActive({
+                                  sessionToken: session.session.token
+                                })
+
+                              if (error) {
+                                toast.error(error.message || error.statusText)
+                              }
+                            }}
+                          >
+                            <UserView {...config} user={session.user} />
+                          </Dropdown.Item>
+                        ))}
+
+                      <Separator />
+
+                      <Dropdown.Item
+                        textValue={localization.auth.addAccount}
+                        href={`${basePaths.auth}/${viewPaths.auth.signIn}`}
+                      >
+                        <CirclePlus className="text-muted" />
+
+                        <Label>{localization.auth.addAccount}</Label>
+                      </Dropdown.Item>
+                    </Dropdown.Menu>
+                  </Dropdown.Popover>
+                </Dropdown.SubmenuTrigger>
+              )}
+
+              <Separator />
 
               <Dropdown.Item
                 textValue={localization.auth.signOut}
-                variant="danger"
                 href={`${basePaths.auth}/${viewPaths.auth.signOut}`}
               >
-                <Label>{localization.auth.signOut}</Label>
+                <ArrowRightFromSquare className="text-muted" />
 
-                <ArrowRightFromSquare className="ml-auto text-danger" />
+                <Label>{localization.auth.signOut}</Label>
               </Dropdown.Item>
             </>
           ) : (
@@ -148,18 +225,18 @@ export function UserButton({
                 textValue={localization.auth.signIn}
                 href={`${basePaths.auth}/${viewPaths.auth.signIn}`}
               >
-                <Label>{localization.auth.signIn}</Label>
+                <ArrowRightToSquare className="text-muted" />
 
-                <ArrowRightToSquare className="ml-auto" />
+                <Label>{localization.auth.signIn}</Label>
               </Dropdown.Item>
 
               <Dropdown.Item
                 textValue={localization.auth.signUp}
                 href={`${basePaths.auth}/${viewPaths.auth.signUp}`}
               >
-                <Label>{localization.auth.signUp}</Label>
+                <PersonPlus className="text-muted" />
 
-                <PersonPlus className="ml-auto" />
+                <Label>{localization.auth.signUp}</Label>
               </Dropdown.Item>
             </>
           )}

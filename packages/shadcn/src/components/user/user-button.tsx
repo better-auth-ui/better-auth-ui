@@ -3,6 +3,7 @@
 import type { AnyAuthConfig } from "@better-auth-ui/react"
 import {
   ChevronsUpDown,
+  CirclePlus,
   LogIn,
   LogOut,
   Settings,
@@ -18,10 +19,10 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu"
-import { Skeleton } from "@/components/ui/skeleton"
 import { useAuth } from "@/hooks/auth/use-auth"
 import { cn } from "@/lib/utils"
 import { UserAvatar } from "./user-avatar"
+import { UserView } from "./user-view"
 
 export type UserButtonProps = AnyAuthConfig & {
   className?: string
@@ -48,10 +49,10 @@ export function UserButton({
   variant = "ghost",
   ...config
 }: UserButtonProps) {
-  const { authClient, basePaths, viewPaths, localization, Link } =
+  const { authClient, basePaths, viewPaths, localization, Link, multiSession } =
     useAuth(config)
 
-  const { data: sessionData, isPending } = authClient.useSession()
+  const { data: sessionData } = authClient.useSession()
 
   const user = sessionData?.user
 
@@ -65,29 +66,15 @@ export function UserButton({
             variant={variant}
             className={cn("h-auto font-normal", className)}
           >
-            <UserAvatar {...config} />
-
-            {isPending ? (
-              <div className="grid flex-1 gap-1 text-left text-sm leading-tight">
-                <Skeleton className="h-4 w-24" />
-                <Skeleton className="h-3 w-32" />
-              </div>
-            ) : user ? (
-              <div className="grid flex-1 text-left text-sm leading-tight">
-                <span className="truncate font-medium">
-                  {user.displayUsername || user.name || user.email}
-                </span>
-
-                {(user.displayUsername || user.name) && (
-                  <span className="text-muted-foreground truncate text-xs">
-                    {user.email}
-                  </span>
-                )}
-              </div>
+            {user ? (
+              <UserView {...config} />
             ) : (
-              <div className="grid flex-1 text-left text-sm leading-tight">
-                {localization.auth.account}
-              </div>
+              <>
+                <UserAvatar {...config} />
+                <div className="grid flex-1 text-left text-sm leading-tight">
+                  {localization.auth.account}
+                </div>
+              </>
             )}
 
             <ChevronsUpDown className="ml-auto" />
@@ -103,20 +90,8 @@ export function UserButton({
       >
         {user && (
           <>
-            <DropdownMenuLabel className="flex items-center gap-2 text-sm font-normal">
-              <UserAvatar {...config} />
-
-              <div className="grid flex-1 leading-tight">
-                <span className="truncate font-medium">
-                  {user.displayUsername || user.name || user.email}
-                </span>
-
-                {(user.displayUsername || user.name) && (
-                  <span className="text-muted-foreground truncate text-xs">
-                    {user.email}
-                  </span>
-                )}
-              </div>
+            <DropdownMenuLabel className="text-sm font-normal">
+              <UserView {...config} />
             </DropdownMenuLabel>
 
             <DropdownMenuSeparator />
@@ -134,6 +109,35 @@ export function UserButton({
                 {localization.settings.settings}
               </Link>
             </DropdownMenuItem>
+
+            {multiSession && (
+              <>
+                <DropdownMenuSeparator />
+
+                <DropdownMenuItem className="px-2">
+                  <UserView
+                    {...config}
+                    user={{
+                      id: "",
+                      name: "John Doe",
+                      email: "john.doe@example.com",
+                      emailVerified: false,
+                      createdAt: new Date(),
+                      updatedAt: new Date()
+                    }}
+                  />
+                </DropdownMenuItem>
+
+                <DropdownMenuSeparator />
+
+                <DropdownMenuItem asChild>
+                  <Link href={`${basePaths.auth}/${viewPaths.auth.signIn}`}>
+                    <CirclePlus />
+                    Add Account
+                  </Link>
+                </DropdownMenuItem>
+              </>
+            )}
 
             <DropdownMenuSeparator />
 
