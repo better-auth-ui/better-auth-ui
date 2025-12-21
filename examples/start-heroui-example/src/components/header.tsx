@@ -4,8 +4,8 @@ import { Logo } from "./logo"
 
 export function Header() {
   return (
-    <header className="py-2 px-4 md:px-6 bg-surface shadow-xs sticky top-0 z-10">
-      <div className="container mx-auto justify-between flex items-center">
+    <header className="sticky top-0 z-10 bg-surface shadow-xs">
+      <div className="py-3 px-4 md:px-6 mx-auto justify-between flex items-center">
         <Link
           href="/"
           className="flex items-center gap-3 rounded"
