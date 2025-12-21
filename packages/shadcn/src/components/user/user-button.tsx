@@ -1,13 +1,18 @@
 "use client"
 
-import type { AnyAuthConfig } from "@better-auth-ui/react"
 import {
+  type AnyAuthConfig,
+  useListDeviceSessions
+} from "@better-auth-ui/react"
+import {
+  Check,
   ChevronsUpDown,
   CirclePlus,
   LogIn,
   LogOut,
   Settings,
-  UserPlus2
+  UserPlus2,
+  UsersRound
 } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
@@ -17,6 +22,9 @@ import {
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu"
 import { useAuth } from "@/hooks/auth/use-auth"
@@ -49,12 +57,19 @@ export function UserButton({
   variant = "ghost",
   ...config
 }: UserButtonProps) {
-  const { authClient, basePaths, viewPaths, localization, Link, multiSession } =
-    useAuth(config)
+  const {
+    authClient,
+    basePaths,
+    viewPaths,
+    localization,
+    multiSession,
+    toast,
+    Link
+  } = useAuth(config)
 
-  const { data: sessionData } = authClient.useSession()
-
-  const user = sessionData?.user
+  const { data: sessionData, isPending: sessionPending } =
+    authClient.useSession()
+  const { data: deviceSessions } = useListDeviceSessions(config)
 
   return (
     <DropdownMenu>
@@ -66,11 +81,12 @@ export function UserButton({
             variant={variant}
             className={cn("h-auto font-normal", className)}
           >
-            {user ? (
+            {sessionData || sessionPending ? (
               <UserView {...config} />
             ) : (
               <>
                 <UserAvatar {...config} />
+
                 <div className="grid flex-1 text-left text-sm leading-tight">
                   {localization.auth.account}
                 </div>
@@ -83,12 +99,12 @@ export function UserButton({
       </DropdownMenuTrigger>
 
       <DropdownMenuContent
-        className="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-lg"
+        className="w-[--radix-dropdown-menu-trigger-width] min-w-40 md:min-w-56 max-w-[48svw]"
         sideOffset={sideOffset}
         align={align}
         onCloseAutoFocus={(e) => e.preventDefault()}
       >
-        {user && (
+        {sessionData && (
           <>
             <DropdownMenuLabel className="text-sm font-normal">
               <UserView {...config} />
@@ -98,7 +114,7 @@ export function UserButton({
           </>
         )}
 
-        {user ? (
+        {sessionData ? (
           <>
             <DropdownMenuItem asChild>
               <Link
@@ -111,32 +127,54 @@ export function UserButton({
             </DropdownMenuItem>
 
             {multiSession && (
-              <>
-                <DropdownMenuSeparator />
+              <DropdownMenuSub>
+                <DropdownMenuSubTrigger>
+                  <UsersRound />
 
-                <DropdownMenuItem className="px-2">
-                  <UserView
-                    {...config}
-                    user={{
-                      id: "",
-                      name: "John Doe",
-                      email: "john.doe@example.com",
-                      emailVerified: false,
-                      createdAt: new Date(),
-                      updatedAt: new Date()
-                    }}
-                  />
-                </DropdownMenuItem>
+                  {localization.auth.switchAccount}
+                </DropdownMenuSubTrigger>
 
-                <DropdownMenuSeparator />
+                <DropdownMenuSubContent className="min-w-40 md:min-w-56 max-w-[48svw]">
+                  <DropdownMenuItem>
+                    <UserView {...config} />
 
-                <DropdownMenuItem asChild>
-                  <Link href={`${basePaths.auth}/${viewPaths.auth.signIn}`}>
-                    <CirclePlus />
-                    Add Account
-                  </Link>
-                </DropdownMenuItem>
-              </>
+                    <Check className="ml-auto" />
+                  </DropdownMenuItem>
+
+                  {deviceSessions
+                    ?.filter(
+                      (session) =>
+                        session.session.id !== sessionData?.session.id
+                    )
+                    .map((session) => (
+                      <DropdownMenuItem
+                        key={session.session.id}
+                        onSelect={async () => {
+                          const { error } =
+                            await authClient.multiSession.setActive({
+                              sessionToken: session.session.token
+                            })
+
+                          if (error) {
+                            toast.error(error.message || error.statusText)
+                          }
+                        }}
+                      >
+                        <UserView {...config} user={session.user} />
+                      </DropdownMenuItem>
+                    ))}
+
+                  <DropdownMenuSeparator />
+
+                  <DropdownMenuItem asChild>
+                    <Link href={`${basePaths.auth}/${viewPaths.auth.signIn}`}>
+                      <CirclePlus />
+
+                      {localization.auth.addAccount}
+                    </Link>
+                  </DropdownMenuItem>
+                </DropdownMenuSubContent>
+              </DropdownMenuSub>
             )}
 
             <DropdownMenuSeparator />

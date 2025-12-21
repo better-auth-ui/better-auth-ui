@@ -13,7 +13,7 @@ export function Header() {
           <h1 className="text-lg font-bold">Better Auth UI</h1>
         </Link>
 
-        <UserButton size="icon" />
+        <UserButton size="icon" align="end" />
       </div>
     </header>
   )

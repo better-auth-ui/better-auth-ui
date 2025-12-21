@@ -72,7 +72,8 @@ export function UserButton({
     toast
   } = useAuth(config)
 
-  const { data: sessionData } = authClient.useSession()
+  const { data: sessionData, isPending: sessionPending } =
+    authClient.useSession()
   const { data: deviceSessions } = useListDeviceSessions(config)
 
   return (
@@ -89,7 +90,7 @@ export function UserButton({
             className
           )}
         >
-          {sessionData ? (
+          {sessionData || sessionPending ? (
             <UserView {...config} />
           ) : (
             <>
@@ -105,7 +106,7 @@ export function UserButton({
 
       <Dropdown.Popover
         placement={placement}
-        className="min-w-40 md:min-w-55 max-w-[48svw]"
+        className="min-w-40 md:min-w-56 max-w-[48svw]"
       >
         {sessionData && (
           <div className="px-3 pt-3 pb-1">
@@ -161,7 +162,7 @@ export function UserButton({
                     <Dropdown.SubmenuIndicator />
                   </Dropdown.Item>
 
-                  <Dropdown.Popover className="min-w-40 md:min-w-55 max-w-[48svw]">
+                  <Dropdown.Popover className="min-w-40 md:min-w-56 max-w-[48svw]">
                     <Dropdown.Menu>
                       <Dropdown.Item className="px-2">
                         <UserView {...config} />
