@@ -163,10 +163,10 @@ export function UserButton({
 
                   <Dropdown.Popover className="min-w-40 md:min-w-55 max-w-[48svw]">
                     <Dropdown.Menu>
-                      <Dropdown.Item className="px-1.5">
+                      <Dropdown.Item className="px-2">
                         <UserView {...config} />
 
-                        <Check />
+                        <Check className="ml-auto" />
                       </Dropdown.Item>
 
                       {deviceSessions
@@ -177,7 +177,7 @@ export function UserButton({
                         .map((session) => (
                           <Dropdown.Item
                             key={session.session.id}
-                            className="px-1.5"
+                            className="px-2"
                             onPress={async () => {
                               const { error } =
                                 await authClient.multiSession.setActive({
