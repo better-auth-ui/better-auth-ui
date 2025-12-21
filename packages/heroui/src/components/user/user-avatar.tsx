@@ -1,5 +1,5 @@
 import { type AnyAuthConfig, useAuth } from "@better-auth-ui/react"
-import { UserIcon } from "@heroicons/react/24/outline"
+import { Person } from "@gravity-ui/icons"
 import { Avatar, cn, Skeleton } from "@heroui/react"
 import type { User } from "better-auth"
 import type { ReactNode } from "react"
@@ -69,7 +69,7 @@ export function UserAvatar({
       />
 
       <Avatar.Fallback delayMs={resolvedUser?.image ? 600 : undefined}>
-        {fallback || initials || <UserIcon className="size-4" />}
+        {fallback || initials || <Person className="size-4" />}
       </Avatar.Fallback>
     </Avatar>
   )

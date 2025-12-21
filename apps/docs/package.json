@@ -16,7 +16,6 @@
     "@better-auth-ui/heroui": "*",
     "@better-auth-ui/react": "*",
     "@better-auth-ui/shadcn": "*",
-    "@heroicons/react": "^2.2.0",
     "@heroui/react": "^3.0.0-beta.3",
     "@heroui/styles": "^3.0.0-beta.3",
     "@orama/orama": "^3.1.18",

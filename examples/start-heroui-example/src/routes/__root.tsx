@@ -2,7 +2,7 @@ import { TanStackDevtools } from "@tanstack/react-devtools"
 import { createRootRoute, HeadContent, Scripts } from "@tanstack/react-router"
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools"
 import type { ReactNode } from "react"
-
+import { Header } from "@/components/header"
 import { Providers } from "@/components/providers"
 import appCss from "@/styles/app.css?url"
 
@@ -37,8 +37,12 @@ function RootDocument({ children }: { children: ReactNode }) {
         <HeadContent />
       </head>
 
-      <body className="antialiased">
-        <Providers>{children}</Providers>
+      <body className="antialiased min-h-svh flex flex-col">
+        <Providers>
+          <Header />
+
+          {children}
+        </Providers>
 
         <TanStackDevtools
           config={{
