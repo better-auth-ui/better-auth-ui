@@ -1,0 +1,33 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "settings",
+  "title": "Settings",
+  "description": "A unified settings component that renders the appropriate settings view based on path or view prop with tab navigation.",
+  "dependencies": [
+    "@better-auth-ui/react@*",
+    "better-auth",
+    "lucide-react"
+  ],
+  "registryDependencies": [
+    "tabs",
+    "account-settings"
+  ],
+  "files": [
+    {
+      "path": "src/components/settings/settings.tsx",
+      "content": "\"use client\"\n\nimport { type AnyAuthConfig, useAuthenticate } from \"@better-auth-ui/react\"\nimport type { SettingsView } from \"@better-auth-ui/react/core\"\nimport { Shield, UserCircle2 } from \"lucide-react\"\nimport { useMemo } from \"react\"\n\nimport { Tabs, TabsContent, TabsList, TabsTrigger } from \"@/components/ui/tabs\"\nimport { useAuth } from \"@/hooks/auth/use-auth\"\nimport { cn } from \"@/lib/utils\"\nimport { AccountSettings } from \"./account/account-settings\"\n\nexport type SettingsProps = AnyAuthConfig & {\n  className?: string\n  path?: string\n  view?: SettingsView\n  hideNav?: boolean\n}\n\n/**\n * Renders a tabbed settings interface and selects which view to display.\n *\n * @param path - Route path used to resolve the settings view when `view` is not provided\n * @param view - Explicit settings view to render (e.g., \"account\" or \"security\")\n * @param hideNav - When true, hide the navigation tabs\n * @returns A JSX element rendering the settings tabs and the currently selected view\n */\nexport function Settings({\n  className,\n  view,\n  path,\n  hideNav,\n  ...config\n}: SettingsProps) {\n  useAuthenticate()\n\n  const { basePaths, localization, viewPaths, Link } = useAuth(config)\n\n  if (!view && !path) {\n    throw new Error(\"[Better Auth UI] Either `view` or `path` must be provided\")\n  }\n\n  const settingsPathViews = useMemo(\n    () =>\n      Object.fromEntries(\n        Object.entries(viewPaths.settings).map(([k, v]) => [v, k])\n      ) as Record<string, SettingsView>,\n    [viewPaths.settings]\n  )\n\n  const currentView = view || (path ? settingsPathViews[path] : undefined)\n\n  return (\n    <Tabs\n      value={currentView}\n      className={cn(\"w-full md:flex-row gap-4 md:gap-6\", className)}\n    >\n      <div className={cn(\"overflow-auto rounded-md\", hideNav && \"hidden\")}>\n        <TabsList\n          aria-label={localization.settings.settings}\n          className=\"min-w-full md:w-64 lg:w-72 xl:w-80 md:flex-col md:h-fit md:items-stretch\"\n        >\n          <TabsTrigger value=\"account\" asChild>\n            <Link href={`${basePaths.settings}/${viewPaths.settings.account}`}>\n              <UserCircle2 />\n\n              {localization.settings.account}\n            </Link>\n          </TabsTrigger>\n\n          <TabsTrigger value=\"security\" asChild>\n            <Link href={`${basePaths.settings}/${viewPaths.settings.security}`}>\n              <Shield />\n\n              {localization.settings.security}\n            </Link>\n          </TabsTrigger>\n        </TabsList>\n      </div>\n\n      <TabsContent value=\"account\" tabIndex={-1}>\n        <AccountSettings {...config} />\n      </TabsContent>\n\n      <TabsContent value=\"security\" tabIndex={-1}>\n        {localization.settings.security}\n      </TabsContent>\n    </Tabs>\n  )\n}\n",
+      "type": "registry:component"
+    },
+    {
+      "path": "src/components/settings/account/account-settings.tsx",
+      "content": "\"use client\"\n\nimport type { AnyAuthConfig } from \"@better-auth-ui/react\"\n\nimport { useAuth } from \"@/hooks/auth/use-auth\"\nimport { cn } from \"@/lib/utils\"\nimport { Accounts } from \"./accounts\"\nimport { UserProfile } from \"./user-profile\"\n\nexport type AccountSettingsProps = AnyAuthConfig & {\n  className?: string\n}\n\n/**\n * Renders the account settings layout including user profile and accounts management.\n *\n * @param className - Optional additional CSS class names for the outer container.\n * @param config - Auth-related props forwarded to the UserProfile and Accounts components.\n * @returns A JSX element containing a styled container that renders the user profile and accounts management.\n */\nexport function AccountSettings({\n  className,\n  ...config\n}: AccountSettingsProps) {\n  const { multiSession } = useAuth(config)\n\n  return (\n    <div className={cn(\"flex flex-col gap-4 md:gap-6\", className)}>\n      <UserProfile {...config} />\n\n      {multiSession && <Accounts {...config} />}\n    </div>\n  )\n}\n",
+      "type": "registry:component"
+    },
+    {
+      "path": "src/hooks/auth/use-auth.tsx",
+      "content": "import {\n  type AnyAuthConfig,\n  type AuthConfig,\n  AuthContext\n} from \"@better-auth-ui/react\"\nimport { deepmerge, defaultConfig } from \"@better-auth-ui/react/core\"\nimport { useContext } from \"react\"\nimport { toast } from \"sonner\"\n\nconst extendConfig: AnyAuthConfig = {\n  toast,\n  Link: (props) => <a {...props} />\n}\n\n/**\n * Constructs the effective AuthConfig by merging defaults, any AuthContext-provided config, and the optional `config` overrides.\n *\n * @param config - Partial configuration overrides applied on top of context and defaults\n * @returns The final `AuthConfig` with a non-optional `authClient`\n * @throws If the resulting config does not include an `authClient`\n */\nexport function useAuth(config?: AnyAuthConfig) {\n  const context = useContext(AuthContext)\n\n  const authConfig = deepmerge(\n    deepmerge(defaultConfig as AnyAuthConfig, extendConfig),\n    deepmerge(context || {}, config || {})\n  ) as AuthConfig\n\n  if (authConfig.authClient === undefined) {\n    throw new Error(\"[Better Auth UI] authClient is required\")\n  }\n\n  return authConfig\n}\n",
+      "type": "registry:hook"
+    }
+  ],
+  "type": "registry:component"
+}

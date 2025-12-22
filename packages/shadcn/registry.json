@@ -554,6 +554,69 @@
           "type": "registry:hook"
         }
       ]
+    },
+    {
+      "name": "user-view",
+      "type": "registry:component",
+      "title": "User View",
+      "description": "Renders a user view that shows the user's avatar alongside their name and email.",
+      "dependencies": [
+        "@better-auth-ui/react@*",
+        "better-auth"
+      ],
+      "registryDependencies": ["skeleton", "user-avatar"],
+      "files": [
+        {
+          "path": "src/components/user/user-view.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/components/user/user-avatar.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/hooks/auth/use-auth.tsx",
+          "type": "registry:hook"
+        }
+      ]
+    },
+    {
+      "name": "accounts",
+      "type": "registry:component",
+      "title": "Accounts",
+      "description": "Display and manage multiple signed-in accounts for multi-session support. Shows all device sessions, allows switching between accounts, and signing out of individual accounts.",
+      "dependencies": [
+        "@better-auth-ui/react@*",
+        "better-auth",
+        "lucide-react"
+      ],
+      "registryDependencies": ["button", "card", "spinner", "user-view"],
+      "files": [
+        {
+          "path": "src/components/settings/account/accounts.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/components/user/user-view.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/hooks/auth/use-auth.tsx",
+          "type": "registry:hook"
+        },
+        {
+          "path": "../react/src/hooks/settings/use-list-device-sessions.ts",
+          "type": "registry:hook"
+        },
+        {
+          "path": "../react/src/hooks/settings/use-set-active-session.ts",
+          "type": "registry:hook"
+        },
+        {
+          "path": "../react/src/hooks/settings/use-revoke-session.ts",
+          "type": "registry:hook"
+        }
+      ]
     }
   ]
 }
