@@ -57,7 +57,7 @@ export function UserProfile({ className, ...config }: UserProfileProps) {
         </CardHeader>
 
         <CardContent className="px-4 md:px-6 grid gap-4 md:gap-6">
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2.5">
             <Button
               type="button"
               variant="ghost"
