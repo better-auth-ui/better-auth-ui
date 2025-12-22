@@ -29,7 +29,7 @@ export type AccountsProps = AnyAuthConfig & {
  * Display and manage multiple signed-in accounts for multi-session support.
  *
  * Shows all device sessions, allows switching between accounts, and signing out
- * of individual accounts. Only renders when multiSession is enabled.
+ * of individual accounts. Shown in AccountSettings when multiSession is enabled.
  *
  * @returns A JSX element containing the accounts card, or null if multiSession is disabled
  */

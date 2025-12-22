@@ -10,8 +10,10 @@ export function DemoProviders({ children }: { children: React.ReactNode }) {
         multiSession
         navigate={() => {}}
         replace={() => {}}
-        // biome-ignore lint/a11y/useValidAnchor: this is a demo
-        Link={({ href, ...props }) => <a href="#" {...props} />}
+        Link={({ href, ...props }) => (
+          // biome-ignore lint/a11y/useValidAnchor: this is a demo
+          <a href="#" onClick={(e) => e.preventDefault()} {...props} />
+        )}
       >
         {children}
       </AuthProvider>
