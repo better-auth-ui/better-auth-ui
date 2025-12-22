@@ -1,7 +1,8 @@
 import {
   type AnyAuthConfig,
   useAuth,
-  useListDeviceSessions
+  useListDeviceSessions,
+  useSetActiveSession
 } from "@better-auth-ui/react"
 import {
   ArrowRightFromSquare,
@@ -63,18 +64,15 @@ export function UserButton({
   variant = "ghost",
   ...config
 }: UserButtonProps) {
-  const {
-    authClient,
-    basePaths,
-    viewPaths,
-    localization,
-    multiSession,
-    toast
-  } = useAuth(config)
+  const context = useAuth(config)
+  const { authClient, basePaths, viewPaths, localization, multiSession } =
+    context
 
+  const { settingActiveSession, setActiveSession } =
+    useSetActiveSession(context)
   const { data: sessionData, isPending: sessionPending } =
     authClient.useSession()
-  const { data: deviceSessions } = useListDeviceSessions(config)
+  const { data: deviceSessions } = useListDeviceSessions(context)
 
   return (
     <Dropdown>
@@ -90,8 +88,11 @@ export function UserButton({
             className
           )}
         >
-          {sessionData || sessionPending ? (
-            <UserView {...config} />
+          {sessionData || sessionPending || settingActiveSession ? (
+            <UserView
+              {...config}
+              isPending={sessionPending || !!settingActiveSession}
+            />
           ) : (
             <>
               <UserAvatar {...config} />
@@ -172,27 +173,24 @@ export function UserButton({
 
                       {deviceSessions
                         ?.filter(
-                          (session) =>
-                            session.session.id !== sessionData?.session.id
+                          (deviceSession) =>
+                            deviceSession.session.id !==
+                            deviceSession?.session.id
                         )
-                        .map((session) => (
-                          <Dropdown.Item
-                            key={session.session.id}
-                            className="px-2"
-                            onPress={async () => {
-                              const { error } =
-                                await authClient.multiSession.setActive({
-                                  sessionToken: session.session.token
-                                })
-
-                              if (error) {
-                                toast.error(error.message || error.statusText)
+                        .map((deviceSession) => {
+                          return (
+                            <Dropdown.Item
+                              key={deviceSession.session.id}
+                              className="px-2"
+                              isDisabled={!!settingActiveSession}
+                              onPress={() =>
+                                setActiveSession(deviceSession.session.token)
                               }
-                            }}
-                          >
-                            <UserView {...config} user={session.user} />
-                          </Dropdown.Item>
-                        ))}
+                            >
+                              <UserView {...config} user={deviceSession.user} />
+                            </Dropdown.Item>
+                          )
+                        })}
 
                       <Separator />
 

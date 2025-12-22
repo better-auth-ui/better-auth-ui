@@ -1,4 +1,4 @@
-import type { AnyAuthConfig } from "@better-auth-ui/react"
+import { type AnyAuthConfig, useAuthenticate } from "@better-auth-ui/react"
 import type { SettingsView } from "@better-auth-ui/react/core"
 import { Person, Shield } from "@gravity-ui/icons"
 import { cn, Tabs, type TabsProps } from "@heroui/react"
@@ -30,6 +30,8 @@ export function Settings({
   hideNav,
   ...config
 }: SettingsProps) {
+  useAuthenticate()
+
   const { basePaths, localization, viewPaths } = useAuth(config)
 
   if (!view && !path) {

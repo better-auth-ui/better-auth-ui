@@ -19,7 +19,7 @@ export function AccountSettings({
   ...config
 }: AccountSettingsProps) {
   return (
-    <div className={cn("w-full flex flex-col gap-4 md:gap-6", className)}>
+    <div className={cn("flex flex-col gap-4 md:gap-6", className)}>
       <UserProfile {...config} />
     </div>
   )

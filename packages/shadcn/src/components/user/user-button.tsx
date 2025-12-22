@@ -2,7 +2,8 @@
 
 import {
   type AnyAuthConfig,
-  useListDeviceSessions
+  useListDeviceSessions,
+  useSetActiveSession
 } from "@better-auth-ui/react"
 import {
   Check,
@@ -57,19 +58,15 @@ export function UserButton({
   variant = "ghost",
   ...config
 }: UserButtonProps) {
-  const {
-    authClient,
-    basePaths,
-    viewPaths,
-    localization,
-    multiSession,
-    toast,
-    Link
-  } = useAuth(config)
+  const context = useAuth(config)
+  const { authClient, basePaths, viewPaths, localization, multiSession, Link } =
+    context
 
   const { data: sessionData, isPending: sessionPending } =
     authClient.useSession()
-  const { data: deviceSessions } = useListDeviceSessions(config)
+  const { data: deviceSessions } = useListDeviceSessions(context)
+  const { settingActiveSession, setActiveSession } =
+    useSetActiveSession(context)
 
   return (
     <DropdownMenu>
@@ -81,8 +78,11 @@ export function UserButton({
             variant={variant}
             className={cn("h-auto font-normal", className)}
           >
-            {sessionData || sessionPending ? (
-              <UserView {...config} />
+            {sessionData || sessionPending || settingActiveSession ? (
+              <UserView
+                {...config}
+                isPending={sessionPending || !!settingActiveSession}
+              />
             ) : (
               <>
                 <UserAvatar {...config} />
@@ -143,24 +143,17 @@ export function UserButton({
 
                   {deviceSessions
                     ?.filter(
-                      (session) =>
-                        session.session.id !== sessionData?.session.id
+                      (deviceSession) =>
+                        deviceSession.session.id !== sessionData?.session.id
                     )
-                    .map((session) => (
+                    .map((deviceSession) => (
                       <DropdownMenuItem
-                        key={session.session.id}
-                        onSelect={async () => {
-                          const { error } =
-                            await authClient.multiSession.setActive({
-                              sessionToken: session.session.token
-                            })
-
-                          if (error) {
-                            toast.error(error.message || error.statusText)
-                          }
-                        }}
+                        key={deviceSession.session.id}
+                        onSelect={() =>
+                          setActiveSession(deviceSession.session.token)
+                        }
                       >
-                        <UserView {...config} user={session.user} />
+                        <UserView {...config} user={deviceSession.user} />
                       </DropdownMenuItem>
                     ))}
 

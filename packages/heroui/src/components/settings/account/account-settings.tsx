@@ -1,4 +1,4 @@
-import type { AnyAuthConfig } from "@better-auth-ui/react"
+import { type AnyAuthConfig, useAuth } from "@better-auth-ui/react"
 
 import { cn } from "../../../lib/utils"
 import { Accounts } from "./accounts"
@@ -19,10 +19,13 @@ export function AccountSettings({
   className,
   ...config
 }: AccountSettingsProps) {
+  const { multiSession } = useAuth(config)
+
   return (
-    <div className={cn("w-full flex flex-col gap-4 md:gap-6", className)}>
+    <div className={cn("flex flex-col gap-4 md:gap-6", className)}>
       <UserProfile {...config} />
-      <Accounts {...config} />
+
+      {multiSession && <Accounts {...config} />}
     </div>
   )
 }

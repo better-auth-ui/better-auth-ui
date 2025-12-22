@@ -1,8 +1,9 @@
 import {
   type AnyAuthConfig,
   useAuth,
-  useAuthenticate,
-  useListDeviceSessions
+  useListDeviceSessions,
+  useRevokeSession,
+  useSetActiveSession
 } from "@better-auth-ui/react"
 import {
   ArrowRightArrowLeft,
@@ -10,7 +11,6 @@ import {
   CirclePlus
 } from "@gravity-ui/icons"
 import { Button, buttonVariants, Card, cn, Spinner } from "@heroui/react"
-import { useState } from "react"
 
 import { UserView } from "../../user/user-view"
 
@@ -27,49 +27,14 @@ export type AccountsProps = AnyAuthConfig & {
  * @returns A JSX element containing the accounts card, or null if multiSession is disabled
  */
 export function Accounts({ className, ...config }: AccountsProps) {
-  const { authClient, basePaths, localization, toast, viewPaths, Link } =
-    useAuth(config)
+  const context = useAuth(config)
+  const { authClient, basePaths, localization, viewPaths, Link } = context
 
-  const { data: sessionData, refetch } = useAuthenticate()
-  const { data: deviceSessions, refetch: refetchDeviceSessions } =
-    useListDeviceSessions(config)
-
-  const [pendingSession, sendPendingSession] = useState<string | null>(null)
-  const [revokingSession, setRevokingSession] = useState<string | null>(null)
-
-  const setActiveSession = async (sessionToken: string) => {
-    sendPendingSession(sessionToken)
-
-    const { error } = await authClient.multiSession.setActive({
-      sessionToken
-    })
-
-    if (error) {
-      toast.error(error.message || error.statusText)
-    } else {
-      await refetch()
-      await refetchDeviceSessions()
-    }
-
-    sendPendingSession(null)
-  }
-
-  const revokeSession = async (sessionToken: string) => {
-    setRevokingSession(sessionToken)
-
-    const { error } = await authClient.multiSession.revoke({
-      sessionToken
-    })
-
-    if (error) {
-      toast.error(error.message || error.statusText)
-    } else {
-      await refetch()
-      await refetchDeviceSessions()
-    }
-
-    setRevokingSession(null)
-  }
+  const { data: sessionData } = authClient.useSession()
+  const { data: deviceSessions } = useListDeviceSessions(context)
+  const { settingActiveSession, setActiveSession } =
+    useSetActiveSession(context)
+  const { revokingSession, revokeSession } = useRevokeSession(context)
 
   return (
     <Card className={cn("p-4 md:p-6 gap-4 md:gap-6", className)}>
@@ -84,21 +49,21 @@ export function Accounts({ className, ...config }: AccountsProps) {
           [
             sessionData,
             ...deviceSessions.filter(
-              (session) => session.session.id !== sessionData.session.id
+              (deviceSession) =>
+                deviceSession.session.id !== sessionData.session.id
             )
-          ]?.map((session) => {
-            const isActive = session.session.id === sessionData.session.id
-            const isSwitching = pendingSession === session.session.token
-            const isRevoking = revokingSession === session.session.token
+          ]?.map((deviceSession) => {
+            const isActive = deviceSession.session.id === sessionData.session.id
+            const isSwitching =
+              settingActiveSession === deviceSession.session.token
+            const isRevoking = revokingSession === deviceSession.session.token
 
             return (
               <div
-                key={session.session.id}
-                className={cn(
-                  "flex items-center rounded-3xl border-2 border-default p-3 justify-between"
-                )}
+                key={deviceSession.session.id}
+                className="flex items-center rounded-3xl border-2 border-default p-3 justify-between"
               >
-                <UserView {...config} user={session.user} size="md" />
+                <UserView {...config} user={deviceSession.user} size="md" />
 
                 <div className="flex items-center gap-1 shrink-0">
                   {!isActive && (
@@ -106,7 +71,9 @@ export function Accounts({ className, ...config }: AccountsProps) {
                       isIconOnly
                       variant="ghost"
                       size="sm"
-                      onPress={() => setActiveSession(session.session.token)}
+                      onPress={() =>
+                        setActiveSession(deviceSession.session.token)
+                      }
                       isPending={isSwitching || isRevoking}
                       aria-label={localization.auth.switchAccount}
                     >
@@ -122,7 +89,7 @@ export function Accounts({ className, ...config }: AccountsProps) {
                     isIconOnly
                     variant="ghost"
                     size="sm"
-                    onPress={() => revokeSession(session.session.token)}
+                    onPress={() => revokeSession(deviceSession.session.token)}
                     isPending={isSwitching || isRevoking}
                     aria-label={localization.auth.signOut}
                   >
@@ -137,7 +104,7 @@ export function Accounts({ className, ...config }: AccountsProps) {
             )
           })
         ) : (
-          <div className="flex items-center gap-2 p-3 rounded-3xl border-2 border-surface-tertiary">
+          <div className="flex items-center rounded-3xl border-2 border-default p-3">
             <UserView isPending size="md" {...config} />
           </div>
         )}

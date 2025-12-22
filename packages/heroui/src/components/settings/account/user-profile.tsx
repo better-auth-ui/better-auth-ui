@@ -7,7 +7,7 @@ import { FloppyDisk, Pencil } from "@gravity-ui/icons"
 import {
   Button,
   Card,
-  Description,
+  cn,
   FieldError,
   Fieldset,
   Form,
@@ -32,22 +32,23 @@ export type UserProfileProps = AnyAuthConfig & {
  * @returns A JSX element containing the profile card and editable form
  */
 export function UserProfile({ className, ...config }: UserProfileProps) {
-  const { authClient, localization } = useAuth(config)
+  const context = useAuth(config)
+  const { authClient, localization } = context
 
   const { data: sessionData } = authClient.useSession()
 
-  const [state, formAction, isPending] = useUpdateUser(config)
+  const [state, formAction, isPending] = useUpdateUser(context)
 
   return (
-    <Card className="p-4 md:p-6">
+    <Card className={cn("p-4 md:p-6 gap-4 md:gap-6", className)}>
+      <Card.Header>
+        <Card.Title className="text-xl">
+          {localization.settings.profile}
+        </Card.Title>
+      </Card.Header>
+
       <Form action={formAction}>
         <Fieldset className="w-full gap-4 md:gap-6">
-          <Fieldset.Legend className="text-xl">
-            {localization.settings.profile}
-          </Fieldset.Legend>
-
-          <Description />
-
           <div className="flex items-center gap-2">
             <Button
               type="button"
