@@ -97,6 +97,7 @@ export function UserProfile({ className, ...config }: UserProfileProps) {
 
             {sessionData ? (
               <Input
+                key={sessionData?.user?.name}
                 id="name"
                 name="name"
                 defaultValue={sessionData?.user?.name || state.name}

@@ -59,7 +59,7 @@ export function Accounts({ className, ...config }: AccountsProps) {
               (deviceSession) =>
                 deviceSession.session.id !== sessionData.session.id
             )
-          ]?.map((deviceSession) => {
+          ].map((deviceSession) => {
             const isActive = deviceSession.session.id === sessionData.session.id
             const isSwitching =
               settingActiveSession === deviceSession.session.token
@@ -108,10 +108,10 @@ export function Accounts({ className, ...config }: AccountsProps) {
       </CardContent>
 
       <CardFooter className="px-4 md:px-6">
-        <Button variant="secondary" asChild>
+        <Button variant="secondary" asChild disabled={isPending}>
           <Link
             href={`${basePaths.auth}/${viewPaths.auth.signIn}`}
-            className={cn(!sessionData && "opacity-50 pointer-events-none")}
+            className={cn(isPending && "opacity-50 pointer-events-none")}
           >
             <PlusCircle />
 

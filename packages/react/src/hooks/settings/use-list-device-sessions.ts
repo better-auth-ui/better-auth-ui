@@ -17,7 +17,12 @@ export function useListDeviceSessions<TAuthClient extends AnyAuthClient>(
 
   return useQuery(
     {
-      queryKey: ["auth", "multiSession", "listDeviceSessions"],
+      queryKey: [
+        "auth",
+        "multiSession",
+        "listDeviceSessions",
+        sessionData?.session.id
+      ],
       queryFn: async () =>
         authClient.multiSession.listDeviceSessions({
           fetchOptions: { throw: true }

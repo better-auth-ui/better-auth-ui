@@ -17,14 +17,15 @@ export type UserViewProps = AnyAuthConfig & {
  *
  * @param className - Additional CSS classes applied to the outer container
  * @param isPending - When true, force rendering of the loading skeleton (unless an explicit `user` prop is provided)
+ * @param size - Size variant for the avatar ("sm" | "md" | "lg"), defaults to "sm"
  * @param user - Optional user object to display; when omitted the current session user is used if available
  * @returns A React element that displays the user's avatar with their name and email
  */
 export function UserView({
   className,
   isPending,
-  user,
   size = "sm",
+  user,
   ...config
 }: UserViewProps) {
   const { authClient } = useAuth(config)
