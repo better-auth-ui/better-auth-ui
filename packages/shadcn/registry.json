@@ -560,10 +560,7 @@
       "type": "registry:component",
       "title": "User View",
       "description": "Renders a user view that shows the user's avatar alongside their name and email.",
-      "dependencies": [
-        "@better-auth-ui/react@*",
-        "better-auth"
-      ],
+      "dependencies": ["@better-auth-ui/react@*", "better-auth"],
       "registryDependencies": ["skeleton", "user-avatar"],
       "files": [
         {

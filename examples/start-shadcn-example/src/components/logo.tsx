@@ -20,4 +20,3 @@ export function Logo(props: ComponentPropsWithRef<"svg">) {
     </svg>
   )
 }
-
