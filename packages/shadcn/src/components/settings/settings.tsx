@@ -1,6 +1,6 @@
 "use client"
 
-import type { AnyAuthConfig } from "@better-auth-ui/react"
+import { type AnyAuthConfig, useAuthenticate } from "@better-auth-ui/react"
 import type { SettingsView } from "@better-auth-ui/react/core"
 import { Shield, UserCircle2 } from "lucide-react"
 import { useMemo } from "react"
@@ -32,6 +32,8 @@ export function Settings({
   hideNav,
   ...config
 }: SettingsProps) {
+  useAuthenticate()
+
   const { basePaths, localization, viewPaths, Link } = useAuth(config)
 
   if (!view && !path) {

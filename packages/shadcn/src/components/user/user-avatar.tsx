@@ -56,7 +56,10 @@ export function UserAvatar({
 
   return (
     <Avatar
-      className={cn("size-8 bg-muted text-foreground rounded-full", className)}
+      className={cn(
+        "size-8 bg-muted text-foreground text-sm rounded-full",
+        className
+      )}
     >
       <AvatarImage
         src={resolvedUser?.image ?? undefined}
@@ -68,7 +71,7 @@ export function UserAvatar({
       />
 
       <AvatarFallback delayMs={resolvedUser?.image ? 600 : undefined}>
-        {fallback || initials || <User2 />}
+        {fallback || initials || <User2 className="size-4" />}
       </AvatarFallback>
     </Avatar>
   )

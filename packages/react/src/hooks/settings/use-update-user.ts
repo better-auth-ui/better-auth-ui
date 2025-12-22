@@ -1,7 +1,7 @@
 import type { AnyAuthConfig } from "@better-auth-ui/react"
 import { useActionState } from "react"
 
-import { useAuth } from "./use-auth"
+import { useAuth } from "../auth/use-auth"
 
 /**
  * Provides an action state hook that updates the current user's name, triggers a session refetch, and shows localized toast notifications.

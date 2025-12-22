@@ -1,12 +1,19 @@
 "use client"
 
-import type { AnyAuthConfig } from "@better-auth-ui/react"
 import {
+  type AnyAuthConfig,
+  useListDeviceSessions,
+  useSetActiveSession
+} from "@better-auth-ui/react"
+import {
+  Check,
   ChevronsUpDown,
+  CirclePlus,
   LogIn,
   LogOut,
   Settings,
-  UserPlus2
+  UserPlus2,
+  UsersRound
 } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
@@ -16,12 +23,15 @@ import {
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu"
-import { Skeleton } from "@/components/ui/skeleton"
 import { useAuth } from "@/hooks/auth/use-auth"
 import { cn } from "@/lib/utils"
 import { UserAvatar } from "./user-avatar"
+import { UserView } from "./user-view"
 
 export type UserButtonProps = AnyAuthConfig & {
   className?: string
@@ -48,12 +58,15 @@ export function UserButton({
   variant = "ghost",
   ...config
 }: UserButtonProps) {
-  const { authClient, basePaths, viewPaths, localization, Link } =
-    useAuth(config)
+  const context = useAuth(config)
+  const { authClient, basePaths, viewPaths, localization, multiSession, Link } =
+    context
 
-  const { data: sessionData, isPending } = authClient.useSession()
-
-  const user = sessionData?.user
+  const { data: sessionData, isPending: sessionPending } =
+    authClient.useSession()
+  const { data: deviceSessions } = useListDeviceSessions(context)
+  const { settingActiveSession, setActiveSession } =
+    useSetActiveSession(context)
 
   return (
     <DropdownMenu>
@@ -65,29 +78,19 @@ export function UserButton({
             variant={variant}
             className={cn("h-auto font-normal", className)}
           >
-            <UserAvatar {...config} />
-
-            {isPending ? (
-              <div className="grid flex-1 gap-1 text-left text-sm leading-tight">
-                <Skeleton className="h-4 w-24" />
-                <Skeleton className="h-3 w-32" />
-              </div>
-            ) : user ? (
-              <div className="grid flex-1 text-left text-sm leading-tight">
-                <span className="truncate font-medium">
-                  {user.displayUsername || user.name || user.email}
-                </span>
-
-                {(user.displayUsername || user.name) && (
-                  <span className="text-muted-foreground truncate text-xs">
-                    {user.email}
-                  </span>
-                )}
-              </div>
+            {sessionData || sessionPending || settingActiveSession ? (
+              <UserView
+                {...config}
+                isPending={sessionPending || !!settingActiveSession}
+              />
             ) : (
-              <div className="grid flex-1 text-left text-sm leading-tight">
-                {localization.auth.account}
-              </div>
+              <>
+                <UserAvatar {...config} />
+
+                <div className="grid flex-1 text-left text-sm leading-tight">
+                  {localization.auth.account}
+                </div>
+              </>
             )}
 
             <ChevronsUpDown className="ml-auto" />
@@ -96,34 +99,22 @@ export function UserButton({
       </DropdownMenuTrigger>
 
       <DropdownMenuContent
-        className="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-lg"
+        className="w-[--radix-dropdown-menu-trigger-width] min-w-40 md:min-w-56 max-w-[48svw]"
         sideOffset={sideOffset}
         align={align}
         onCloseAutoFocus={(e) => e.preventDefault()}
       >
-        {user && (
+        {sessionData && (
           <>
-            <DropdownMenuLabel className="flex items-center gap-2 text-sm font-normal">
-              <UserAvatar {...config} />
-
-              <div className="grid flex-1 leading-tight">
-                <span className="truncate font-medium">
-                  {user.displayUsername || user.name || user.email}
-                </span>
-
-                {(user.displayUsername || user.name) && (
-                  <span className="text-muted-foreground truncate text-xs">
-                    {user.email}
-                  </span>
-                )}
-              </div>
+            <DropdownMenuLabel className="text-sm font-normal">
+              <UserView {...config} />
             </DropdownMenuLabel>
 
             <DropdownMenuSeparator />
           </>
         )}
 
-        {user ? (
+        {sessionData ? (
           <>
             <DropdownMenuItem asChild>
               <Link
@@ -134,6 +125,50 @@ export function UserButton({
                 {localization.settings.settings}
               </Link>
             </DropdownMenuItem>
+
+            {multiSession && (
+              <DropdownMenuSub>
+                <DropdownMenuSubTrigger>
+                  <UsersRound />
+
+                  {localization.auth.switchAccount}
+                </DropdownMenuSubTrigger>
+
+                <DropdownMenuSubContent className="min-w-40 md:min-w-56 max-w-[48svw]">
+                  <DropdownMenuItem>
+                    <UserView {...config} />
+
+                    <Check className="ml-auto" />
+                  </DropdownMenuItem>
+
+                  {deviceSessions
+                    ?.filter(
+                      (deviceSession) =>
+                        deviceSession.session.id !== sessionData?.session.id
+                    )
+                    .map((deviceSession) => (
+                      <DropdownMenuItem
+                        key={deviceSession.session.id}
+                        onSelect={() =>
+                          setActiveSession(deviceSession.session.token)
+                        }
+                      >
+                        <UserView {...config} user={deviceSession.user} />
+                      </DropdownMenuItem>
+                    ))}
+
+                  <DropdownMenuSeparator />
+
+                  <DropdownMenuItem asChild>
+                    <Link href={`${basePaths.auth}/${viewPaths.auth.signIn}`}>
+                      <CirclePlus />
+
+                      {localization.auth.addAccount}
+                    </Link>
+                  </DropdownMenuItem>
+                </DropdownMenuSubContent>
+              </DropdownMenuSub>
+            )}
 
             <DropdownMenuSeparator />
 

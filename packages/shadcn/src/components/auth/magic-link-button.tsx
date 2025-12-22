@@ -6,6 +6,7 @@ import { Lock, Mail } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { useAuth } from "@/hooks/auth/use-auth"
+import { cn } from "@/lib/utils"
 
 export type MagicLinkButtonProps = AnyAuthConfig & {
   isPending: boolean
@@ -31,8 +32,8 @@ export function MagicLinkButton({
     <Button
       type="button"
       variant="outline"
-      className="w-full"
       disabled={isPending}
+      className={cn("w-full", isPending && "opacity-50 pointer-events-none")}
       asChild
     >
       <Link

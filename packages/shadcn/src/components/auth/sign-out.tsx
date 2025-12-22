@@ -5,6 +5,7 @@ import { useEffect, useRef } from "react"
 
 import { Card, CardContent } from "@/components/ui/card"
 import { Spinner } from "@/components/ui/spinner"
+import { useAuth } from "@/hooks/auth/use-auth"
 import { useSignOut } from "@/hooks/auth/use-sign-out"
 import { cn } from "@/lib/utils"
 
@@ -16,7 +17,8 @@ export type SignOutProps = AnyAuthConfig & {
  * Signs the current user out when mounted and displays a loading card while the operation completes.
  */
 export function SignOut({ className, ...config }: SignOutProps) {
-  const { signOut } = useSignOut(config)
+  const context = useAuth(config)
+  const { signOut } = useSignOut(context)
 
   const hasSignedOut = useRef(false)
 

@@ -1,8 +1,9 @@
-import type { AnyAuthConfig } from "@better-auth-ui/react"
+import { type AnyAuthConfig, useAuthenticate } from "@better-auth-ui/react"
 import type { SettingsView } from "@better-auth-ui/react/core"
 import { Person, Shield } from "@gravity-ui/icons"
 import { cn, Tabs, type TabsProps } from "@heroui/react"
 import { useMemo } from "react"
+
 import { useAuth } from "../../hooks/use-auth"
 import { AccountSettings } from "./account/account-settings"
 
@@ -30,6 +31,8 @@ export function Settings({
   hideNav,
   ...config
 }: SettingsProps) {
+  useAuthenticate()
+
   const { basePaths, localization, viewPaths } = useAuth(config)
 
   if (!view && !path) {
@@ -59,7 +62,7 @@ export function Settings({
           <Tabs.Tab
             id="account"
             href={`${basePaths.settings}/${viewPaths.settings.account}`}
-            className="gap-1.5"
+            className="gap-2 md:text-base"
           >
             <Person />
 
@@ -71,7 +74,7 @@ export function Settings({
           <Tabs.Tab
             id="security"
             href={`${basePaths.settings}/${viewPaths.settings.security}`}
-            className="gap-1.5"
+            className="gap-2 md:text-base"
           >
             <Shield />
 

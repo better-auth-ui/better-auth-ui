@@ -9,5 +9,6 @@
     "strict": true,
     "target": "esnext",
     "jsx": "react-jsx"
-  }
+  },
+  "references": []
 }

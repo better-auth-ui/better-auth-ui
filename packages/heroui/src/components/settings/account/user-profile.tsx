@@ -1,13 +1,9 @@
-import {
-  type AnyAuthConfig,
-  useAuth,
-  useUpdateUser
-} from "@better-auth-ui/react"
+import { type AnyAuthConfig, useUpdateUser } from "@better-auth-ui/react"
 import { FloppyDisk, Pencil } from "@gravity-ui/icons"
 import {
   Button,
   Card,
-  Description,
+  cn,
   FieldError,
   Fieldset,
   Form,
@@ -18,6 +14,7 @@ import {
   TextField
 } from "@heroui/react"
 
+import { useAuth } from "../../../hooks/use-auth"
 import { UserAvatar } from "../../user/user-avatar"
 
 export type UserProfileProps = AnyAuthConfig & {
@@ -32,33 +29,30 @@ export type UserProfileProps = AnyAuthConfig & {
  * @returns A JSX element containing the profile card and editable form
  */
 export function UserProfile({ className, ...config }: UserProfileProps) {
-  const { authClient, localization } = useAuth(config)
+  const context = useAuth(config)
+  const { authClient, localization } = context
 
-  const { data: sessionData, isPending: isSessionPending } =
-    authClient.useSession()
+  const { data: sessionData } = authClient.useSession()
 
-  const [state, formAction, isPending] = useUpdateUser(config)
-
-  if (isSessionPending) {
-    return <UserProfileSkeleton />
-  }
+  const [state, formAction, isPending] = useUpdateUser(context)
 
   return (
-    <Card className="p-4 md:p-6">
+    <Card className={cn("p-4 md:p-6 gap-4 md:gap-6", className)}>
+      <Card.Header>
+        <Card.Title className="text-xl">
+          {localization.settings.profile}
+        </Card.Title>
+      </Card.Header>
+
       <Form action={formAction}>
         <Fieldset className="w-full gap-4 md:gap-6">
-          <Fieldset.Legend className="text-xl">
-            {localization.settings.profile}
-          </Fieldset.Legend>
-
-          <Description />
-
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
             <Button
               type="button"
               isIconOnly
               variant="ghost"
               className="p-0 h-auto w-auto rounded-full"
+              isDisabled={!sessionData}
             >
               <UserAvatar {...config} size="lg" />
 
@@ -67,38 +61,54 @@ export function UserProfile({ className, ...config }: UserProfileProps) {
               </span>
             </Button>
 
-            <div className="flex flex-col gap-1">
-              <p className="text-sm font-medium">
-                {sessionData?.user?.displayUsername ||
-                  sessionData?.user?.name ||
-                  sessionData?.user?.email}
-              </p>
-
-              {(sessionData?.user?.displayUsername ||
-                sessionData?.user?.name) && (
-                <p className="text-muted text-xs leading-none">
-                  {sessionData?.user?.email}
+            {sessionData ? (
+              <div className="flex flex-col">
+                <p className="text-sm font-medium">
+                  {sessionData?.user?.displayUsername ||
+                    sessionData?.user?.name ||
+                    sessionData?.user?.email}
                 </p>
-              )}
-            </div>
+
+                {(sessionData?.user?.displayUsername ||
+                  sessionData?.user?.name) && (
+                  <p className="text-muted text-xs">
+                    {sessionData?.user?.email}
+                  </p>
+                )}
+              </div>
+            ) : (
+              <div className="flex flex-col gap-1">
+                <Skeleton className="h-4 mt-0.5 w-24 rounded-lg" />
+                <Skeleton className="h-3 mt-0.5 w-32 rounded-lg" />
+              </div>
+            )}
           </div>
 
           <Fieldset.Group>
             <TextField
+              key={sessionData?.user?.name}
               name="name"
               defaultValue={sessionData?.user?.name || state.name}
-              isDisabled={isPending}
+              isDisabled={isPending || !sessionData}
             >
               <Label>{localization.auth.name}</Label>
 
-              <Input placeholder={localization.auth.name} />
+              {sessionData ? (
+                <Input placeholder={localization.auth.name} />
+              ) : (
+                <Skeleton className="h-10 md:h-9 w-full rounded-xl" />
+              )}
 
               <FieldError />
             </TextField>
           </Fieldset.Group>
 
           <Fieldset.Actions>
-            <Button type="submit" isPending={isPending}>
+            <Button
+              type="submit"
+              isPending={isPending}
+              isDisabled={!sessionData}
+            >
               {isPending ? (
                 <Spinner color="current" size="sm" />
               ) : (
@@ -109,37 +119,6 @@ export function UserProfile({ className, ...config }: UserProfileProps) {
           </Fieldset.Actions>
         </Fieldset>
       </Form>
-    </Card>
-  )
-}
-
-/**
- * Renders a skeleton placeholder that matches the UserProfile layout while data is loading.
- *
- * Displays placeholder elements for the profile header, avatar, user text lines, name field, and action button to indicate loading state.
- *
- * @returns A Card element containing skeleton UI blocks that visually represent the user profile form during loading.
- */
-function UserProfileSkeleton() {
-  return (
-    <Card className="p-4 md:p-6 gap-4 md:gap-6">
-      <Skeleton className="h-7 w-16 rounded-xl" />
-
-      <div className="flex items-center gap-3">
-        <Skeleton className="size-12 rounded-full" />
-
-        <div className="flex flex-col gap-1.5">
-          <Skeleton className="h-4 mt-0.5 w-24 rounded-lg" />
-          <Skeleton className="h-3 mt-0.5 w-32 rounded-lg" />
-        </div>
-      </div>
-
-      <div className="flex flex-col gap-1">
-        <Skeleton className="h-4 w-12 my-0.5 rounded-lg" />
-        <Skeleton className="h-9 w-full rounded-xl" />
-      </div>
-
-      <Skeleton className="h-10 md:h-9 w-36 rounded-full mt-1" />
     </Card>
   )
 }
