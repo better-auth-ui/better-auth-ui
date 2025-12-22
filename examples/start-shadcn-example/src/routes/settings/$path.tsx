@@ -15,7 +15,7 @@ function SettingsPage() {
   const { path } = Route.useParams()
 
   return (
-    <div className="min-h-svh container mx-auto p-4 md:p-6">
+    <div className="w-full max-w-6xl mx-auto p-4 md:p-6">
       <Settings path={path} />
     </div>
   )

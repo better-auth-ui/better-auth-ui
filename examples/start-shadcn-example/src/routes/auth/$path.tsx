@@ -15,7 +15,7 @@ function AuthPage() {
   const { path } = Route.useParams()
 
   return (
-    <div className="min-h-svh flex items-center justify-center p-4 md:p-6">
+    <div className="grow flex items-center justify-center p-4 md:p-6">
       <Auth path={path} />
     </div>
   )

@@ -40,7 +40,7 @@ export function UserView({
       <div className={cn("flex items-center gap-2", className)}>
         <UserAvatar isPending {...config} />
 
-        <div className="grid flex-1 gap-1 text-left text-sm leading-tight">
+        <div className="grid flex-1 gap-1 text-left text-sm">
           <Skeleton className="h-4 w-24" />
           <Skeleton className="h-3 w-32" />
         </div>

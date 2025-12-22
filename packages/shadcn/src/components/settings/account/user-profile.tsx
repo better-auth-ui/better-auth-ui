@@ -73,22 +73,22 @@ export function UserProfile({ className, ...config }: UserProfileProps) {
             </Button>
 
             {sessionData ? (
-              <div className="flex flex-col gap-1">
-                <p className="text-sm font-medium">
+              <div className="grid flex-1 text-left text-sm leading-tight">
+                <span className="truncate font-medium">
                   {sessionData?.user?.displayUsername ||
                     sessionData?.user?.name ||
                     sessionData?.user?.email}
-                </p>
+                </span>
 
                 {(sessionData?.user?.displayUsername ||
                   sessionData?.user?.name) && (
-                  <p className="text-muted-foreground text-xs leading-none">
+                  <span className="text-muted-foreground truncate text-xs">
                     {sessionData?.user?.email}
-                  </p>
+                  </span>
                 )}
               </div>
             ) : (
-              <div className="flex flex-col gap-2">
+              <div className="flex flex-col gap-1">
                 <Skeleton className="h-4 w-24 mt-0.5" />
                 <Skeleton className="h-3 w-32" />
               </div>
