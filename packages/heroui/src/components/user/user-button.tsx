@@ -1,6 +1,5 @@
 import {
   type AnyAuthConfig,
-  useAuth,
   useListDeviceSessions,
   useSetActiveSession
 } from "@better-auth-ui/react"
@@ -19,6 +18,7 @@ import {
 } from "@gravity-ui/icons"
 import { Button, cn, Dropdown, Label, Separator, Tabs } from "@heroui/react"
 
+import { useAuth } from "../../hooks/use-auth"
 import { UserAvatar } from "./user-avatar"
 import { UserView } from "./user-view"
 

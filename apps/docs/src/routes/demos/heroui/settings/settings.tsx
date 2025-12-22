@@ -8,7 +8,7 @@ import { Settings } from "@better-auth-ui/heroui"
 
 function RouteComponent() {
   return (
-    <div className="container mx-auto p-4 md:p-6">
+    <div className="w-full mx-auto p-4 md:p-6">
       <Settings view="account" />
     </div>
   )

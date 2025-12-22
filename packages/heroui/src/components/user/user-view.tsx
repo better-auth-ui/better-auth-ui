@@ -1,7 +1,8 @@
-import { type AnyAuthConfig, useAuth } from "@better-auth-ui/react"
+import type { AnyAuthConfig } from "@better-auth-ui/react"
 import { cn, Skeleton } from "@heroui/react"
 import type { User } from "better-auth"
 
+import { useAuth } from "../../hooks/use-auth"
 import { UserAvatar } from "./user-avatar"
 
 export type UserViewProps = AnyAuthConfig & {

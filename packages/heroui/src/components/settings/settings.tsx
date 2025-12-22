@@ -3,6 +3,7 @@ import type { SettingsView } from "@better-auth-ui/react/core"
 import { Person, Shield } from "@gravity-ui/icons"
 import { cn, Tabs, type TabsProps } from "@heroui/react"
 import { useMemo } from "react"
+
 import { useAuth } from "../../hooks/use-auth"
 import { AccountSettings } from "./account/account-settings"
 

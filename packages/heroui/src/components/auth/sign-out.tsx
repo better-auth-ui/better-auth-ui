@@ -3,6 +3,7 @@ import { useSignOut } from "@better-auth-ui/react"
 import { Card, Spinner } from "@heroui/react"
 import { useEffect, useRef } from "react"
 
+import { useAuth } from "../../hooks/use-auth"
 import { cn } from "../../lib/utils"
 
 export type SignOutProps = AnyAuthConfig & {
@@ -13,7 +14,8 @@ export type SignOutProps = AnyAuthConfig & {
  * Signs the current user out when mounted and displays a loading card while the operation completes.
  */
 export function SignOut({ className, ...config }: SignOutProps) {
-  const { signOut } = useSignOut(config)
+  const context = useAuth(config)
+  const { signOut } = useSignOut(context)
 
   const hasSignedOut = useRef(false)
 

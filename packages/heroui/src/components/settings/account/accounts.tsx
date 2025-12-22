@@ -1,6 +1,5 @@
 import {
   type AnyAuthConfig,
-  useAuth,
   useListDeviceSessions,
   useRevokeSession,
   useSetActiveSession
@@ -12,6 +11,7 @@ import {
 } from "@gravity-ui/icons"
 import { Button, buttonVariants, Card, cn, Spinner } from "@heroui/react"
 
+import { useAuth } from "../../../hooks/use-auth"
 import { UserView } from "../../user/user-view"
 
 export type AccountsProps = AnyAuthConfig & {
@@ -31,7 +31,7 @@ export function Accounts({ className, ...config }: AccountsProps) {
   const { authClient, basePaths, localization, viewPaths, Link } = context
 
   const { data: sessionData } = authClient.useSession()
-  const { data: deviceSessions } = useListDeviceSessions(context)
+  const { data: deviceSessions, isPending } = useListDeviceSessions(context)
   const { settingActiveSession, setActiveSession } =
     useSetActiveSession(context)
   const { revokingSession, revokeSession } = useRevokeSession(context)
@@ -45,10 +45,10 @@ export function Accounts({ className, ...config }: AccountsProps) {
       </Card.Header>
 
       <Card.Content className="gap-3">
-        {sessionData && deviceSessions ? (
+        {sessionData && !isPending ? (
           [
             sessionData,
-            ...deviceSessions.filter(
+            ...(deviceSessions || []).filter(
               (deviceSession) =>
                 deviceSession.session.id !== sessionData.session.id
             )

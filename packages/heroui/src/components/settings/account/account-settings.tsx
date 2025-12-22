@@ -1,5 +1,6 @@
-import { type AnyAuthConfig, useAuth } from "@better-auth-ui/react"
+import type { AnyAuthConfig } from "@better-auth-ui/react"
 
+import { useAuth } from "../../../hooks/use-auth"
 import { cn } from "../../../lib/utils"
 import { Accounts } from "./accounts"
 import { UserProfile } from "./user-profile"

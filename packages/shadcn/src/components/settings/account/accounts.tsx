@@ -38,7 +38,7 @@ export function Accounts({ className, ...config }: AccountsProps) {
   const { authClient, basePaths, localization, viewPaths, Link } = context
 
   const { data: sessionData } = authClient.useSession()
-  const { data: deviceSessions } = useListDeviceSessions(context)
+  const { data: deviceSessions, isPending } = useListDeviceSessions(context)
   const { settingActiveSession, setActiveSession } =
     useSetActiveSession(context)
   const { revokingSession, revokeSession } = useRevokeSession(context)
@@ -52,10 +52,10 @@ export function Accounts({ className, ...config }: AccountsProps) {
       </CardHeader>
 
       <CardContent className="px-4 md:px-6 grid gap-3">
-        {sessionData && deviceSessions ? (
+        {sessionData && !isPending ? (
           [
             sessionData,
-            ...deviceSessions.filter(
+            ...(deviceSessions || []).filter(
               (deviceSession) =>
                 deviceSession.session.id !== sessionData.session.id
             )
