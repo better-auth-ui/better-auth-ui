@@ -23,7 +23,7 @@ export function AccountSettings({
   const { multiSession } = useAuth(config)
 
   return (
-    <div className={cn("flex flex-col gap-4 md:gap-6", className)}>
+    <div className={cn("flex w-full flex-col gap-4 md:gap-6", className)}>
       <UserProfile {...config} />
 
       {multiSession && <Accounts {...config} />}

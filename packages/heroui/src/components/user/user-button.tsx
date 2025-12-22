@@ -175,7 +175,7 @@ export function UserButton({
                         ?.filter(
                           (deviceSession) =>
                             deviceSession.session.id !==
-                            deviceSession?.session.id
+                            sessionData?.session?.id
                         )
                         .map((deviceSession) => {
                           return (
