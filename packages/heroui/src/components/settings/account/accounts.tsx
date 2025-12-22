@@ -1,6 +1,7 @@
 import {
   type AnyAuthConfig,
   useAuth,
+  useAuthenticate,
   useListDeviceSessions
 } from "@better-auth-ui/react"
 import {
@@ -8,15 +9,7 @@ import {
   ArrowRightFromSquare,
   CirclePlus
 } from "@gravity-ui/icons"
-
-import {
-  Button,
-  buttonVariants,
-  Card,
-  cn,
-  Skeleton,
-  Spinner
-} from "@heroui/react"
+import { Button, buttonVariants, Card, cn, Spinner } from "@heroui/react"
 import { useState } from "react"
 
 import { UserView } from "../../user/user-view"
@@ -37,16 +30,15 @@ export function Accounts({ className, ...config }: AccountsProps) {
   const { authClient, basePaths, localization, toast, viewPaths, Link } =
     useAuth(config)
 
-  const { data: sessionData, refetch } = authClient.useSession()
-
+  const { data: sessionData, refetch } = useAuthenticate()
   const { data: deviceSessions, refetch: refetchDeviceSessions } =
     useListDeviceSessions(config)
 
-  const [switchingSession, setSwitchingSession] = useState<string | null>(null)
+  const [pendingSession, sendPendingSession] = useState<string | null>(null)
   const [revokingSession, setRevokingSession] = useState<string | null>(null)
 
-  const handleSwitchAccount = async (sessionToken: string) => {
-    setSwitchingSession(sessionToken)
+  const setActiveSession = async (sessionToken: string) => {
+    sendPendingSession(sessionToken)
 
     const { error } = await authClient.multiSession.setActive({
       sessionToken
@@ -59,10 +51,10 @@ export function Accounts({ className, ...config }: AccountsProps) {
       await refetchDeviceSessions()
     }
 
-    setSwitchingSession(null)
+    sendPendingSession(null)
   }
 
-  const handleSignOut = async (sessionToken: string) => {
+  const revokeSession = async (sessionToken: string) => {
     setRevokingSession(sessionToken)
 
     const { error } = await authClient.multiSession.revoke({
@@ -72,6 +64,7 @@ export function Accounts({ className, ...config }: AccountsProps) {
     if (error) {
       toast.error(error.message || error.statusText)
     } else {
+      await refetch()
       await refetchDeviceSessions()
     }
 
@@ -95,7 +88,7 @@ export function Accounts({ className, ...config }: AccountsProps) {
             )
           ]?.map((session) => {
             const isActive = session.session.id === sessionData.session.id
-            const isSwitching = switchingSession === session.session.token
+            const isSwitching = pendingSession === session.session.token
             const isRevoking = revokingSession === session.session.token
 
             return (
@@ -107,13 +100,13 @@ export function Accounts({ className, ...config }: AccountsProps) {
               >
                 <UserView {...config} user={session.user} size="md" />
 
-                <div className="flex items-center gap-1.5 shrink-0">
+                <div className="flex items-center gap-1 shrink-0">
                   {!isActive && (
                     <Button
                       isIconOnly
                       variant="ghost"
                       size="sm"
-                      onPress={() => handleSwitchAccount(session.session.token)}
+                      onPress={() => setActiveSession(session.session.token)}
                       isPending={isSwitching || isRevoking}
                       aria-label={localization.auth.switchAccount}
                     >
@@ -129,7 +122,7 @@ export function Accounts({ className, ...config }: AccountsProps) {
                     isIconOnly
                     variant="ghost"
                     size="sm"
-                    onPress={() => handleSignOut(session.session.token)}
+                    onPress={() => revokeSession(session.session.token)}
                     isPending={isSwitching || isRevoking}
                     aria-label={localization.auth.signOut}
                   >
@@ -145,12 +138,7 @@ export function Accounts({ className, ...config }: AccountsProps) {
           })
         ) : (
           <div className="flex items-center gap-2 p-3 rounded-3xl border-2 border-surface-tertiary">
-            <Skeleton className="size-10 rounded-full" />
-
-            <div className="flex flex-col gap-1.5 flex-1">
-              <Skeleton className="h-4 w-24 rounded-lg" />
-              <Skeleton className="h-3 w-32 rounded-lg" />
-            </div>
+            <UserView isPending size="md" {...config} />
           </div>
         )}
       </Card.Content>
