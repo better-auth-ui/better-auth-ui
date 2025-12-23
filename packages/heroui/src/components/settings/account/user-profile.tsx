@@ -94,7 +94,10 @@ export function UserProfile({ className, ...config }: UserProfileProps) {
               <Label>{localization.auth.name}</Label>
 
               {sessionData ? (
-                <Input placeholder={localization.auth.name} />
+                <Input
+                  autoComplete="name"
+                  placeholder={localization.auth.name}
+                />
               ) : (
                 <Skeleton className="h-10 md:h-9 w-full rounded-xl" />
               )}

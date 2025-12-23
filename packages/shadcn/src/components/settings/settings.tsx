@@ -2,7 +2,7 @@
 
 import { type AnyAuthConfig, useAuthenticate } from "@better-auth-ui/react"
 import type { SettingsView } from "@better-auth-ui/react/core"
-import { Shield, UserCircle2 } from "lucide-react"
+import { ShieldCheck, UserCircle2 } from "lucide-react"
 import { useMemo } from "react"
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -70,7 +70,7 @@ export function Settings({
 
           <TabsTrigger value="security" asChild>
             <Link href={`${basePaths.settings}/${viewPaths.settings.security}`}>
-              <Shield />
+              <ShieldCheck />
 
               {localization.settings.security}
             </Link>

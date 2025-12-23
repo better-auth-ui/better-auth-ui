@@ -100,6 +100,7 @@ export function UserProfile({ className, ...config }: UserProfileProps) {
                 key={sessionData?.user?.name}
                 id="name"
                 name="name"
+                autoComplete="name"
                 defaultValue={sessionData?.user?.name || state.name}
                 placeholder={localization.auth.name}
                 disabled={isPending}
