@@ -392,7 +392,7 @@ export function SignUpForm({
 
             if ("token" in data && data.token) {
                 await onSuccess()
-            } else if (emailVerification) {
+            } else if (emailVerification?.otp) {
                 navigate(
                     `${basePath}/${viewPaths.EMAIL_VERIFICATION}?email=${encodeURIComponent(email as string)}`
                 )

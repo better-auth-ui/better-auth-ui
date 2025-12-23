@@ -22,6 +22,7 @@ import type { AvatarOptions } from "../types/avatar-options"
 import type { CaptchaOptions } from "../types/captcha-options"
 import type { CredentialsOptions } from "../types/credentials-options"
 import type { DeleteUserOptions } from "../types/delete-user-options"
+import type { EmailVerificationOptions } from "../types/email-verification-options"
 import type { GenericOAuthOptions } from "../types/generic-oauth-options"
 import type { GravatarOptions } from "../types/gravatar-options"
 import type { Link } from "../types/link"
@@ -119,9 +120,9 @@ export type AuthUIContextType = {
      */
     deleteUser?: DeleteUserOptions
     /**
-     * Show Verify Email card for unverified emails
+     * Email verification configuration
      */
-    emailVerification?: boolean
+    emailVerification?: EmailVerificationOptions
     /**
      * Freshness age for Session data
      * @default 60 * 60 * 24
@@ -266,6 +267,11 @@ export type AuthUIProviderProps = {
      */
     viewPaths?: Partial<AuthViewPaths>
     /**
+     * Email verification configuration
+     * @default true
+     */
+    emailVerification?: boolean | Partial<EmailVerificationOptions>
+    /**
      * Render custom Toasts
      * @default Sonner
      */
@@ -321,6 +327,7 @@ export type AuthUIProviderProps = {
         | "organization"
         | "localizeErrors"
         | "teams"
+        | "emailVerification"
     >
 >
 
@@ -356,7 +363,7 @@ export const AuthUIProvider = ({
     navigate,
     replace,
     Link = DefaultLink,
-    emailVerification,
+    emailVerification: emailVerificationProp,
     ...props
 }: AuthUIProviderProps) => {
     const authClient = authClientProp as AuthClient
@@ -379,6 +386,22 @@ export const AuthUIProvider = ({
             Image: avatarProp.Image
         }
     }, [avatarProp])
+
+    const emailVerification = useMemo<
+        EmailVerificationOptions | undefined
+    >(() => {
+        if (!emailVerificationProp) return
+
+        if (emailVerificationProp === true) {
+            return {
+                otp: true
+            }
+        }
+
+        return {
+            otp: emailVerificationProp.otp ?? false
+        }
+    }, [emailVerificationProp])
 
     const account = useMemo<AccountOptionsContext | undefined>(() => {
         if (accountProp === false) return
