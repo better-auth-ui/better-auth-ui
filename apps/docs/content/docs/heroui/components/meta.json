@@ -19,6 +19,7 @@
     "settings/settings",
     "settings/account/account-settings",
     "settings/account/user-profile",
+    "settings/account/change-email",
     "settings/account/accounts",
     "---Email---",
     "email/email-verification-email",

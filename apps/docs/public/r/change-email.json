@@ -1,0 +1,37 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "change-email",
+  "title": "Change Email",
+  "description": "A form component for changing the user's email address with verification.",
+  "dependencies": [
+    "@better-auth-ui/react@*",
+    "better-auth",
+    "lucide-react"
+  ],
+  "registryDependencies": [
+    "button",
+    "card",
+    "field",
+    "input",
+    "skeleton",
+    "spinner"
+  ],
+  "files": [
+    {
+      "path": "src/components/settings/account/change-email.tsx",
+      "content": "\"use client\"\n\nimport { type AnyAuthConfig, useChangeEmail } from \"@better-auth-ui/react\"\nimport { Check } from \"lucide-react\"\nimport { useState } from \"react\"\n\nimport { Button } from \"@/components/ui/button\"\nimport {\n  Card,\n  CardContent,\n  CardFooter,\n  CardHeader,\n  CardTitle\n} from \"@/components/ui/card\"\nimport { Field, FieldError, FieldLabel } from \"@/components/ui/field\"\nimport { Input } from \"@/components/ui/input\"\nimport { Skeleton } from \"@/components/ui/skeleton\"\nimport { Spinner } from \"@/components/ui/spinner\"\nimport { useAuth } from \"@/hooks/auth/use-auth\"\nimport { cn } from \"@/lib/utils\"\n\nexport type ChangeEmailProps = AnyAuthConfig & {\n  className?: string\n}\n\n/**\n * Display and edit the authenticated user's email address in a card-based form.\n *\n * Renders a loading skeleton while the session is pending. When loaded, shows\n * the current email address and a form to update it. A verification email will\n * be sent to the new address upon submission.\n *\n * @returns A JSX element containing the change email card and form\n */\nexport function ChangeEmail({ className, ...config }: ChangeEmailProps) {\n  const context = useAuth(config)\n  const { authClient, localization } = context\n\n  const { data: sessionData } = authClient.useSession()\n  const [state, formAction, isPending] = useChangeEmail(context)\n\n  const [fieldErrors, setFieldErrors] = useState<{\n    email?: string\n  }>({})\n\n  return (\n    <form action={formAction}>\n      <Card className={cn(\"w-full py-4 md:py-6 gap-4 md:gap-6\", className)}>\n        <CardHeader className=\"px-4 md:px-6 gap-0\">\n          <CardTitle className=\"text-xl\">\n            {localization.settings.changeEmail}\n          </CardTitle>\n        </CardHeader>\n\n        <CardContent className=\"px-4 md:px-6 grid gap-4 md:gap-6\">\n          <Field className=\"gap-1\">\n            <FieldLabel htmlFor=\"email\">{localization.auth.email}</FieldLabel>\n\n            {sessionData ? (\n              <Input\n                key={sessionData?.user?.email}\n                id=\"email\"\n                name=\"email\"\n                type=\"email\"\n                autoComplete=\"email\"\n                defaultValue={sessionData?.user?.email || state.email}\n                placeholder={localization.auth.emailPlaceholder}\n                disabled={isPending}\n                required\n                onChange={() => {\n                  setFieldErrors((prev) => ({\n                    ...prev,\n                    email: undefined\n                  }))\n                }}\n                onInvalid={(e) => {\n                  e.preventDefault()\n                  setFieldErrors((prev) => ({\n                    ...prev,\n                    email: (e.target as HTMLInputElement).validationMessage\n                  }))\n                }}\n                aria-invalid={!!fieldErrors.email}\n              />\n            ) : (\n              <Skeleton className=\"h-9 w-full\" />\n            )}\n\n            <FieldError>{fieldErrors.email}</FieldError>\n          </Field>\n        </CardContent>\n\n        <CardFooter className=\"px-4 md:px-6\">\n          <Button type=\"submit\" disabled={isPending || !sessionData}>\n            {isPending ? <Spinner /> : <Check />}\n\n            {localization.settings.updateEmail}\n          </Button>\n        </CardFooter>\n      </Card>\n    </form>\n  )\n}\n",
+      "type": "registry:component"
+    },
+    {
+      "path": "src/hooks/auth/use-auth.tsx",
+      "content": "import {\n  type AnyAuthConfig,\n  type AuthConfig,\n  AuthContext\n} from \"@better-auth-ui/react\"\nimport { deepmerge, defaultConfig } from \"@better-auth-ui/react/core\"\nimport { useContext } from \"react\"\nimport { toast } from \"sonner\"\n\nconst extendConfig: AnyAuthConfig = {\n  toast,\n  Link: (props) => <a {...props} />\n}\n\n/**\n * Constructs the effective AuthConfig by merging defaults, any AuthContext-provided config, and the optional `config` overrides.\n *\n * @param config - Partial configuration overrides applied on top of context and defaults\n * @returns The final `AuthConfig` with a non-optional `authClient`\n * @throws If the resulting config does not include an `authClient`\n */\nexport function useAuth(config?: AnyAuthConfig) {\n  const context = useContext(AuthContext)\n\n  const authConfig = deepmerge(\n    deepmerge(defaultConfig as AnyAuthConfig, extendConfig),\n    deepmerge(context || {}, config || {})\n  ) as AuthConfig\n\n  if (authConfig.authClient === undefined) {\n    throw new Error(\"[Better Auth UI] authClient is required\")\n  }\n\n  return authConfig\n}\n",
+      "type": "registry:hook"
+    },
+    {
+      "path": "../react/src/hooks/settings/use-change-email.ts",
+      "content": "import type { AnyAuthConfig } from \"@better-auth-ui/react\"\nimport { useActionState } from \"react\"\n\nimport { useAuth } from \"../auth/use-auth\"\n\n/**\n * Provides an action state hook that initiates an email change request for the current user.\n *\n * @param config - Optional auth configuration forwarded to the auth hook\n * @returns An action state (initialized with `email` = \"\") whose action initiates the email change process and displays success or error toasts\n */\nexport function useChangeEmail(config?: AnyAuthConfig) {\n  const { authClient, baseURL, localization, toast, viewPaths } =\n    useAuth(config)\n\n  const changeEmail = async (_: object, formData: FormData) => {\n    const email = formData.get(\"email\") as string\n\n    const { error } = await authClient.changeEmail(\n      {\n        newEmail: email,\n        callbackURL: `${baseURL}/${viewPaths.settings.account}`\n      },\n      { disableSignal: true }\n    )\n\n    if (error) {\n      toast.error(error.message || error.statusText)\n    } else {\n      toast.success(localization.settings.changeEmailSuccess)\n    }\n\n    return { email }\n  }\n\n  return useActionState(changeEmail, { email: \"\" })\n}\n",
+      "type": "registry:hook"
+    }
+  ],
+  "type": "registry:component"
+}

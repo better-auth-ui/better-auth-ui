@@ -512,12 +512,45 @@
       ]
     },
     {
+      "name": "change-email",
+      "type": "registry:component",
+      "title": "Change Email",
+      "description": "A form component for changing the user's email address with verification.",
+      "dependencies": [
+        "@better-auth-ui/react@*",
+        "better-auth",
+        "lucide-react"
+      ],
+      "registryDependencies": [
+        "button",
+        "card",
+        "field",
+        "input",
+        "skeleton",
+        "spinner"
+      ],
+      "files": [
+        {
+          "path": "src/components/settings/account/change-email.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/hooks/auth/use-auth.tsx",
+          "type": "registry:hook"
+        },
+        {
+          "path": "../react/src/hooks/settings/use-change-email.ts",
+          "type": "registry:hook"
+        }
+      ]
+    },
+    {
       "name": "account-settings",
       "type": "registry:component",
       "title": "Account Settings",
-      "description": "A container component that displays account settings including user profile.",
+      "description": "A container component that displays account settings including user profile and change email.",
       "dependencies": ["@better-auth-ui/react@*"],
-      "registryDependencies": ["user-profile"],
+      "registryDependencies": ["user-profile", "change-email"],
       "files": [
         {
           "path": "src/components/settings/account/account-settings.tsx",
@@ -525,6 +558,10 @@
         },
         {
           "path": "src/components/settings/account/user-profile.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/components/settings/account/change-email.tsx",
           "type": "registry:component"
         }
       ]

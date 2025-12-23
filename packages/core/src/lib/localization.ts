@@ -128,6 +128,12 @@ export const localization = {
     /** @remarks `"Active"` */
     active: "Active",
 
+    /** @remarks `"Change Email"` */
+    changeEmail: "Change Email",
+
+    /** @remarks `"Check your email to confirm the change"` */
+    changeEmailSuccess: "Check your email to confirm the change",
+
     /** @remarks `"Profile"` */
     profile: "Profile",
 
@@ -144,7 +150,10 @@ export const localization = {
     settings: "Settings",
 
     /** @remarks `"Theme"` */
-    theme: "Theme"
+    theme: "Theme",
+
+    /** @remarks `"Update Email"` */
+    updateEmail: "Update Email"
   }
 }
 
