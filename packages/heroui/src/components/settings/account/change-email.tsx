@@ -59,6 +59,7 @@ export function ChangeEmail({ className, ...config }: ChangeEmailProps) {
 
               {sessionData ? (
                 <Input
+                  required
                   autoComplete="email"
                   placeholder={localization.auth.emailPlaceholder}
                 />
