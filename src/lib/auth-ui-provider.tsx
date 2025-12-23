@@ -394,7 +394,7 @@ export const AuthUIProvider = ({
 
         if (emailVerificationProp === true) {
             return {
-                otp: true
+                otp: false
             }
         }
 
