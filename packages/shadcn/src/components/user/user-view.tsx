@@ -1,6 +1,6 @@
 "use client"
 
-import type { AnyAuthConfig } from "@better-auth-ui/react"
+import { type AnyAuthConfig, useSession } from "@better-auth-ui/react"
 import type { User } from "better-auth"
 
 import { Skeleton } from "@/components/ui/skeleton"
@@ -28,10 +28,9 @@ export function UserView({
   user,
   ...config
 }: UserViewProps) {
-  const { authClient } = useAuth(config)
+  const context = useAuth(config)
 
-  const { data: sessionData, isPending: sessionPending } =
-    authClient.useSession()
+  const { data: sessionData, isPending: sessionPending } = useSession(context)
 
   const resolvedUser = user ?? sessionData?.user
 

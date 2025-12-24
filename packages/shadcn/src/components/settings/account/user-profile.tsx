@@ -1,6 +1,10 @@
 "use client"
 
-import { type AnyAuthConfig, useUpdateUser } from "@better-auth-ui/react"
+import {
+  type AnyAuthConfig,
+  useSession,
+  useUpdateUser
+} from "@better-auth-ui/react"
 import { Pencil, Save } from "lucide-react"
 import { useState } from "react"
 
@@ -35,9 +39,9 @@ export type UserProfileProps = AnyAuthConfig & {
  */
 export function UserProfile({ className, ...config }: UserProfileProps) {
   const context = useAuth(config)
-  const { authClient, localization } = context
+  const { localization } = context
 
-  const { data: sessionData } = authClient.useSession()
+  const { data: sessionData } = useSession(context)
   const [state, formAction, isPending] = useUpdateUser(context)
 
   const [fieldErrors, setFieldErrors] = useState<{

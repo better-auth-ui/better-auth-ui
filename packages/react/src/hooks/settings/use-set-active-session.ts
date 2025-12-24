@@ -2,7 +2,6 @@ import type { AnyAuthConfig } from "@better-auth-ui/react"
 import { useCallback, useState } from "react"
 
 import { useAuth } from "../auth/use-auth"
-import { useListDeviceSessions } from "./use-list-device-sessions"
 
 /**
  * Provides functionality to set an active session from device sessions in multi-session mode.
@@ -11,9 +10,7 @@ import { useListDeviceSessions } from "./use-list-device-sessions"
  * @returns An object containing the pending session token and a function to set the active session
  */
 export function useSetActiveSession(config?: AnyAuthConfig) {
-  const { authClient, toast } = useAuth(config)
-  const { refetch: refetchSession } = authClient.useSession()
-  const { refetch: refetchDeviceSessions } = useListDeviceSessions(config)
+  const { authClient, queryClient, toast } = useAuth(config)
 
   const [settingActiveSession, setSettingActiveSession] = useState<
     string | null
@@ -30,13 +27,12 @@ export function useSetActiveSession(config?: AnyAuthConfig) {
       if (error) {
         toast.error(error.message || error.statusText)
       } else {
-        await refetchSession()
-        await refetchDeviceSessions()
+        await queryClient.invalidateQueries({ queryKey: ["auth"] })
       }
 
       setSettingActiveSession(null)
     },
-    [authClient, refetchSession, refetchDeviceSessions, toast]
+    [authClient, queryClient, toast]
   )
 
   return { settingActiveSession, setActiveSession }

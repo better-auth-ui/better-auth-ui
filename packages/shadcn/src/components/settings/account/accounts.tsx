@@ -4,6 +4,7 @@ import {
   type AnyAuthConfig,
   useListDeviceSessions,
   useRevokeSession,
+  useSession,
   useSetActiveSession
 } from "@better-auth-ui/react"
 import { ArrowLeftRight, LogOut, PlusCircle } from "lucide-react"
@@ -35,9 +36,9 @@ export type AccountsProps = AnyAuthConfig & {
  */
 export function Accounts({ className, ...config }: AccountsProps) {
   const context = useAuth(config)
-  const { authClient, basePaths, localization, viewPaths, Link } = context
+  const { basePaths, localization, viewPaths, Link } = context
 
-  const { data: sessionData } = authClient.useSession()
+  const { data: sessionData } = useSession(context)
   const { data: deviceSessions, isPending } = useListDeviceSessions(context)
   const { settingActiveSession, setActiveSession } =
     useSetActiveSession(context)

@@ -32,9 +32,9 @@ export function Settings({
   hideNav,
   ...config
 }: SettingsProps) {
-  useAuthenticate()
-
-  const { basePaths, localization, viewPaths, Link } = useAuth(config)
+  const context = useAuth(config)
+  const { basePaths, localization, viewPaths, Link } = context
+  useAuthenticate(context)
 
   if (!view && !path) {
     throw new Error("[Better Auth UI] Either `view` or `path` must be provided")

@@ -3,6 +3,7 @@
 import {
   type AnyAuthConfig,
   useListDeviceSessions,
+  useSession,
   useSetActiveSession
 } from "@better-auth-ui/react"
 import {
@@ -59,11 +60,9 @@ export function UserButton({
   ...config
 }: UserButtonProps) {
   const context = useAuth(config)
-  const { authClient, basePaths, viewPaths, localization, multiSession, Link } =
-    context
+  const { basePaths, viewPaths, localization, multiSession, Link } = context
 
-  const { data: sessionData, isPending: sessionPending } =
-    authClient.useSession()
+  const { data: sessionData, isPending: sessionPending } = useSession(context)
   const { data: deviceSessions } = useListDeviceSessions(context)
   const { settingActiveSession, setActiveSession } =
     useSetActiveSession(context)

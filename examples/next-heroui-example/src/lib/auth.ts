@@ -1,9 +1,9 @@
 import { betterAuth } from "better-auth"
+import { multiSession } from "better-auth/plugins"
 
 export const auth = betterAuth({
   emailAndPassword: {
-    enabled: true,
-    minPasswordLength: 8,
-    maxPasswordLength: 128
-  }
+    enabled: true
+  },
+  plugins: [multiSession()]
 })
