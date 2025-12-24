@@ -1,6 +1,6 @@
 "use client"
 
-import { type AnyAuthConfig, useSession } from "@better-auth-ui/react"
+import type { AnyAuthConfig } from "@better-auth-ui/react"
 import type { User } from "better-auth"
 import { User2 } from "lucide-react"
 import type { ReactNode } from "react"
@@ -8,6 +8,7 @@ import type { ReactNode } from "react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useAuth } from "@/hooks/auth/use-auth"
+import { useSession } from "@/hooks/auth/use-session"
 import { cn } from "@/lib/utils"
 
 export type UserAvatarProps = AnyAuthConfig & {

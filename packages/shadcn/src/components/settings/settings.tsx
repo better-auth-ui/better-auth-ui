@@ -9,6 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useAuth } from "@/hooks/auth/use-auth"
 import { cn } from "@/lib/utils"
 import { AccountSettings } from "./account/account-settings"
+import { SecuritySettings } from "./security/security-settings"
 
 export type SettingsProps = AnyAuthConfig & {
   className?: string
@@ -87,7 +88,7 @@ export function Settings({
       </TabsContent>
 
       <TabsContent value="security" tabIndex={-1}>
-        {localization.settings.security}
+        <SecuritySettings {...config} />
       </TabsContent>
     </Tabs>
   )

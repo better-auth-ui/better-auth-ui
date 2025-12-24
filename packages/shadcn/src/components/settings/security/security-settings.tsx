@@ -1,7 +1,9 @@
+"use client"
+
 import type { AnyAuthConfig } from "@better-auth-ui/react"
 
-import { useAuth } from "../../../hooks/use-auth"
-import { cn } from "../../../lib/utils"
+import { useAuth } from "@/hooks/auth/use-auth"
+import { cn } from "@/lib/utils"
 import { ChangePassword } from "./change-password"
 
 export type SecuritySettingsProps = AnyAuthConfig & {

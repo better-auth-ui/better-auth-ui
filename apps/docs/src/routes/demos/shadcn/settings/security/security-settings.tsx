@@ -1,12 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router"
 
 export const Route = createFileRoute(
-  "/demos/heroui/settings/security/security-settings"
+  "/demos/shadcn/settings/security/security-settings"
 )({
   component: RouteComponent
 })
 
-import { SecuritySettings } from "@better-auth-ui/heroui"
+import { SecuritySettings } from "@better-auth-ui/shadcn"
 
 function RouteComponent() {
   return (

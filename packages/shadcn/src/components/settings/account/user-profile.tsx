@@ -1,10 +1,6 @@
 "use client"
 
-import {
-  type AnyAuthConfig,
-  useSession,
-  useUpdateUser
-} from "@better-auth-ui/react"
+import { type AnyAuthConfig, useUpdateUser } from "@better-auth-ui/react"
 import { Pencil, Save } from "lucide-react"
 import { useState } from "react"
 
@@ -22,6 +18,7 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { Spinner } from "@/components/ui/spinner"
 import { UserAvatar } from "@/components/user/user-avatar"
 import { useAuth } from "@/hooks/auth/use-auth"
+import { useSession } from "@/hooks/auth/use-session"
 import { cn } from "@/lib/utils"
 
 export type UserProfileProps = AnyAuthConfig & {

@@ -3,7 +3,6 @@
 import {
   type AnyAuthConfig,
   useListDeviceSessions,
-  useSession,
   useSetActiveSession
 } from "@better-auth-ui/react"
 import {
@@ -30,6 +29,7 @@ import {
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu"
 import { useAuth } from "@/hooks/auth/use-auth"
+import { useSession } from "@/hooks/auth/use-session"
 import { cn } from "@/lib/utils"
 import { UserAvatar } from "./user-avatar"
 import { UserView } from "./user-view"

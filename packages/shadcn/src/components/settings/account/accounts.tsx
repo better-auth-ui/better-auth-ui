@@ -4,7 +4,6 @@ import {
   type AnyAuthConfig,
   useListDeviceSessions,
   useRevokeSession,
-  useSession,
   useSetActiveSession
 } from "@better-auth-ui/react"
 import { ArrowLeftRight, LogOut, PlusCircle } from "lucide-react"
@@ -20,6 +19,7 @@ import {
 import { Spinner } from "@/components/ui/spinner"
 import { UserView } from "@/components/user/user-view"
 import { useAuth } from "@/hooks/auth/use-auth"
+import { useSession } from "@/hooks/auth/use-session"
 import { cn } from "@/lib/utils"
 
 export type AccountsProps = AnyAuthConfig & {
