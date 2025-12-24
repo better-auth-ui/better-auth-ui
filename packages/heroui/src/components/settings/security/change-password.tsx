@@ -14,6 +14,7 @@ import {
   Input,
   InputGroup,
   Label,
+  Skeleton,
   Spinner,
   TextField
 } from "@heroui/react"
@@ -64,11 +65,15 @@ export function ChangePassword({ className, ...config }: ChangePasswordProps) {
             >
               <Label>{localization.settings.currentPassword}</Label>
 
-              <Input
-                autoComplete="current-password"
-                placeholder={localization.settings.currentPasswordPlaceholder}
-                required
-              />
+              {sessionData ? (
+                <Input
+                  autoComplete="current-password"
+                  placeholder={localization.settings.currentPasswordPlaceholder}
+                  required
+                />
+              ) : (
+                <Skeleton className="h-10 md:h-9 w-full rounded-xl" />
+              )}
 
               <FieldError />
             </TextField>
@@ -81,34 +86,38 @@ export function ChangePassword({ className, ...config }: ChangePasswordProps) {
             >
               <Label>{localization.auth.newPassword}</Label>
 
-              <InputGroup>
-                <InputGroup.Input
-                  name="newPassword"
-                  type={isNewPasswordVisible ? "text" : "password"}
-                  autoComplete="new-password"
-                  placeholder={localization.auth.newPasswordPlaceholder}
-                  required
-                />
+              {sessionData ? (
+                <InputGroup>
+                  <InputGroup.Input
+                    name="newPassword"
+                    type={isNewPasswordVisible ? "text" : "password"}
+                    autoComplete="new-password"
+                    placeholder={localization.auth.newPasswordPlaceholder}
+                    required
+                  />
 
-                <InputGroup.Suffix className="px-0">
-                  <Button
-                    isIconOnly
-                    aria-label={
-                      isNewPasswordVisible
-                        ? localization.auth.hidePassword
-                        : localization.auth.showPassword
-                    }
-                    size="sm"
-                    variant="ghost"
-                    onPress={() =>
-                      setIsNewPasswordVisible(!isNewPasswordVisible)
-                    }
-                    isDisabled={isPending}
-                  >
-                    {isNewPasswordVisible ? <EyeSlash /> : <Eye />}
-                  </Button>
-                </InputGroup.Suffix>
-              </InputGroup>
+                  <InputGroup.Suffix className="px-0">
+                    <Button
+                      isIconOnly
+                      aria-label={
+                        isNewPasswordVisible
+                          ? localization.auth.hidePassword
+                          : localization.auth.showPassword
+                      }
+                      size="sm"
+                      variant="ghost"
+                      onPress={() =>
+                        setIsNewPasswordVisible(!isNewPasswordVisible)
+                      }
+                      isDisabled={isPending}
+                    >
+                      {isNewPasswordVisible ? <EyeSlash /> : <Eye />}
+                    </Button>
+                  </InputGroup.Suffix>
+                </InputGroup>
+              ) : (
+                <Skeleton className="h-10 md:h-9 w-full rounded-xl" />
+              )}
 
               <FieldError />
             </TextField>
@@ -123,34 +132,38 @@ export function ChangePassword({ className, ...config }: ChangePasswordProps) {
               >
                 <Label>{localization.auth.confirmPassword}</Label>
 
-                <InputGroup>
-                  <InputGroup.Input
-                    name="confirmPassword"
-                    type={isConfirmPasswordVisible ? "text" : "password"}
-                    autoComplete="new-password"
-                    placeholder={localization.auth.confirmPasswordPlaceholder}
-                    required
-                  />
+                {sessionData ? (
+                  <InputGroup>
+                    <InputGroup.Input
+                      name="confirmPassword"
+                      type={isConfirmPasswordVisible ? "text" : "password"}
+                      autoComplete="new-password"
+                      placeholder={localization.auth.confirmPasswordPlaceholder}
+                      required
+                    />
 
-                  <InputGroup.Suffix className="px-0">
-                    <Button
-                      isIconOnly
-                      aria-label={
-                        isConfirmPasswordVisible
-                          ? localization.auth.hidePassword
-                          : localization.auth.showPassword
-                      }
-                      size="sm"
-                      variant="ghost"
-                      onPress={() =>
-                        setIsConfirmPasswordVisible(!isConfirmPasswordVisible)
-                      }
-                      isDisabled={isPending}
-                    >
-                      {isConfirmPasswordVisible ? <EyeSlash /> : <Eye />}
-                    </Button>
-                  </InputGroup.Suffix>
-                </InputGroup>
+                    <InputGroup.Suffix className="px-0">
+                      <Button
+                        isIconOnly
+                        aria-label={
+                          isConfirmPasswordVisible
+                            ? localization.auth.hidePassword
+                            : localization.auth.showPassword
+                        }
+                        size="sm"
+                        variant="ghost"
+                        onPress={() =>
+                          setIsConfirmPasswordVisible(!isConfirmPasswordVisible)
+                        }
+                        isDisabled={isPending}
+                      >
+                        {isConfirmPasswordVisible ? <EyeSlash /> : <Eye />}
+                      </Button>
+                    </InputGroup.Suffix>
+                  </InputGroup>
+                ) : (
+                  <Skeleton className="h-10 md:h-9 w-full rounded-xl" />
+                )}
 
                 <FieldError />
               </TextField>
