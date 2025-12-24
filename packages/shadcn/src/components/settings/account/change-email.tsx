@@ -17,6 +17,7 @@ import { Input } from "@/components/ui/input"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Spinner } from "@/components/ui/spinner"
 import { useAuth } from "@/hooks/auth/use-auth"
+import { useSession } from "@/hooks/auth/use-session"
 import { cn } from "@/lib/utils"
 
 export type ChangeEmailProps = AnyAuthConfig & {
@@ -34,9 +35,9 @@ export type ChangeEmailProps = AnyAuthConfig & {
  */
 export function ChangeEmail({ className, ...config }: ChangeEmailProps) {
   const context = useAuth(config)
-  const { authClient, localization } = context
+  const { localization } = context
+  const { data: sessionData } = useSession(context)
 
-  const { data: sessionData } = authClient.useSession()
   const [state, formAction, isPending] = useChangeEmail(context)
 
   const [fieldErrors, setFieldErrors] = useState<{

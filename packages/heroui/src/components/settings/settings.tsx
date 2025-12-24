@@ -1,11 +1,12 @@
 import { type AnyAuthConfig, useAuthenticate } from "@better-auth-ui/react"
 import type { SettingsView } from "@better-auth-ui/react/core"
 import { Person, Shield } from "@gravity-ui/icons"
-import { cn, Tabs, type TabsProps } from "@heroui/react"
+import { cn, Tabs, type TabsProps, useIsHydrated } from "@heroui/react"
 import { useMemo } from "react"
 
 import { useAuth } from "../../hooks/use-auth"
 import { AccountSettings } from "./account/account-settings"
+import { SecuritySettings } from "./security/security-settings"
 
 export type SettingsProps = AnyAuthConfig & {
   className?: string
@@ -31,9 +32,9 @@ export function Settings({
   hideNav,
   ...config
 }: SettingsProps) {
-  useAuthenticate()
-
-  const { basePaths, localization, viewPaths } = useAuth(config)
+  const context = useAuth(config)
+  const { basePaths, localization, viewPaths } = context
+  useAuthenticate(context)
 
   if (!view && !path) {
     throw new Error("[Better Auth UI] Either `view` or `path` must be provided")
@@ -49,48 +50,53 @@ export function Settings({
 
   const currentView = view || (path ? settingsPathViews[path] : undefined)
 
+  const isHydrated = useIsHydrated()
+
   return (
-    <ResponsiveTabs selectedKey={currentView} className="w-full gap-2 md:gap-4">
-      <Tabs.ListContainer>
-        <Tabs.List
-          aria-label={localization.settings.settings}
-          className={cn(
-            "overflow-auto md:w-64 lg:w-72 xl:w-80",
-            hideNav && "hidden"
-          )}
-        >
-          <Tabs.Tab
-            id="account"
-            href={`${basePaths.settings}/${viewPaths.settings.account}`}
-            className="gap-2 md:text-base"
+    <div
+      key={`settings-${isHydrated}`}
+      className="w-full flex flex-col md:flex-row gap-4 md:gap-6"
+    >
+      <ResponsiveTabs selectedKey={currentView}>
+        <Tabs.ListContainer>
+          <Tabs.List
+            aria-label={localization.settings.settings}
+            className={cn(
+              "overflow-auto md:w-64 lg:w-72 xl:w-80",
+              hideNav && "hidden"
+            )}
           >
-            <Person />
+            <Tabs.Tab
+              id="account"
+              href={`${basePaths.settings}/${viewPaths.settings.account}`}
+              className="gap-2 md:text-base"
+            >
+              <Person />
 
-            {localization.settings.account}
+              {localization.settings.account}
 
-            <Tabs.Indicator />
-          </Tabs.Tab>
+              <Tabs.Indicator />
+            </Tabs.Tab>
 
-          <Tabs.Tab
-            id="security"
-            href={`${basePaths.settings}/${viewPaths.settings.security}`}
-            className="gap-2 md:text-base"
-          >
-            <Shield />
+            <Tabs.Tab
+              id="security"
+              href={`${basePaths.settings}/${viewPaths.settings.security}`}
+              className="gap-2 md:text-base"
+            >
+              <Shield />
 
-            {localization.settings.security}
+              {localization.settings.security}
 
-            <Tabs.Indicator />
-          </Tabs.Tab>
-        </Tabs.List>
-      </Tabs.ListContainer>
+              <Tabs.Indicator />
+            </Tabs.Tab>
+          </Tabs.List>
+        </Tabs.ListContainer>
+      </ResponsiveTabs>
 
-      <Tabs.Panel id="account" className="md:pt-0 px-0 md:px-2">
-        <AccountSettings {...config} />
-      </Tabs.Panel>
+      {currentView === "account" && <AccountSettings {...config} />}
 
-      <Tabs.Panel id="security">{localization.settings.security}</Tabs.Panel>
-    </ResponsiveTabs>
+      {currentView === "security" && <SecuritySettings {...config} />}
+    </div>
   )
 }
 

@@ -9,11 +9,11 @@ export function useSignInEmail(config?: AnyAuthConfig) {
     baseURL,
     emailAndPassword,
     localization,
+    queryClient,
     toast,
     navigate
   } = useAuth(config)
 
-  const { refetch } = authClient.useSession()
   const redirectTo = useRedirectTo(config)
 
   const signInEmail = async (_: object, formData: FormData) => {
@@ -21,14 +21,11 @@ export function useSignInEmail(config?: AnyAuthConfig) {
     const password = formData.get("password") as string
     const rememberMe = formData.get("rememberMe") === "on"
 
-    const { error } = await authClient.signIn.email(
-      {
-        email,
-        password,
-        ...(emailAndPassword?.rememberMe ? { rememberMe } : {})
-      },
-      { disableSignal: true }
-    )
+    const { error } = await authClient.signIn.email({
+      email,
+      password,
+      ...(emailAndPassword?.rememberMe ? { rememberMe } : {})
+    })
 
     if (error) {
       if (error.code === "EMAIL_NOT_VERIFIED") {
@@ -63,7 +60,7 @@ export function useSignInEmail(config?: AnyAuthConfig) {
       }
     }
 
-    await refetch()
+    await queryClient.invalidateQueries({ queryKey: ["auth"] })
 
     navigate(redirectTo)
 

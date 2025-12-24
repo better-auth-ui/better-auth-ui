@@ -8,6 +8,7 @@ import type { ReactNode } from "react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useAuth } from "@/hooks/auth/use-auth"
+import { useSession } from "@/hooks/auth/use-session"
 import { cn } from "@/lib/utils"
 
 export type UserAvatarProps = AnyAuthConfig & {
@@ -35,10 +36,9 @@ export function UserAvatar({
   fallback,
   ...config
 }: UserAvatarProps) {
-  const { authClient } = useAuth(config)
+  const context = useAuth(config)
 
-  const { data: sessionData, isPending: sessionPending } =
-    authClient.useSession()
+  const { data: sessionData, isPending: sessionPending } = useSession(context)
 
   if ((isPending || sessionPending) && !user) {
     return <Skeleton className={cn("size-8 rounded-full", className)} />

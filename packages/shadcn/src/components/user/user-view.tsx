@@ -5,6 +5,7 @@ import type { User } from "better-auth"
 
 import { Skeleton } from "@/components/ui/skeleton"
 import { useAuth } from "@/hooks/auth/use-auth"
+import { useSession } from "@/hooks/auth/use-session"
 import { cn } from "@/lib/utils"
 import { UserAvatar } from "./user-avatar"
 
@@ -28,10 +29,9 @@ export function UserView({
   user,
   ...config
 }: UserViewProps) {
-  const { authClient } = useAuth(config)
+  const context = useAuth(config)
 
-  const { data: sessionData, isPending: sessionPending } =
-    authClient.useSession()
+  const { data: sessionData, isPending: sessionPending } = useSession(context)
 
   const resolvedUser = user ?? sessionData?.user
 

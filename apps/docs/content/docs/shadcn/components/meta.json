@@ -21,6 +21,8 @@
     "settings/account/user-profile",
     "settings/account/change-email",
     "settings/account/accounts",
+    "settings/security/security-settings",
+    "settings/security/change-password",
     "---Email---",
     "email/email-verification-email",
     "email/magic-link-email",

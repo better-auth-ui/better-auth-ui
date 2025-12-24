@@ -290,6 +290,14 @@
         {
           "path": "src/hooks/auth/use-auth.tsx",
           "type": "registry:hook"
+        },
+        {
+          "path": "src/hooks/auth/use-session.ts",
+          "type": "registry:hook"
+        },
+        {
+          "path": "../react/src/hooks/auth/use-session.tsx",
+          "type": "registry:hook"
         }
       ]
     },
@@ -315,6 +323,22 @@
         },
         {
           "path": "src/hooks/auth/use-auth.tsx",
+          "type": "registry:hook"
+        },
+        {
+          "path": "src/hooks/auth/use-session.ts",
+          "type": "registry:hook"
+        },
+        {
+          "path": "../react/src/hooks/auth/use-session.tsx",
+          "type": "registry:hook"
+        },
+        {
+          "path": "../react/src/hooks/settings/use-list-device-sessions.ts",
+          "type": "registry:hook"
+        },
+        {
+          "path": "../react/src/hooks/settings/use-set-active-session.ts",
           "type": "registry:hook"
         }
       ]
@@ -506,6 +530,14 @@
           "type": "registry:hook"
         },
         {
+          "path": "src/hooks/auth/use-session.ts",
+          "type": "registry:hook"
+        },
+        {
+          "path": "../react/src/hooks/auth/use-session.tsx",
+          "type": "registry:hook"
+        },
+        {
           "path": "../react/src/hooks/settings/use-update-user.ts",
           "type": "registry:hook"
         }
@@ -536,6 +568,14 @@
         },
         {
           "path": "src/hooks/auth/use-auth.tsx",
+          "type": "registry:hook"
+        },
+        {
+          "path": "src/hooks/auth/use-session.ts",
+          "type": "registry:hook"
+        },
+        {
+          "path": "../react/src/hooks/auth/use-session.tsx",
           "type": "registry:hook"
         },
         {
@@ -576,7 +616,7 @@
         "better-auth",
         "lucide-react"
       ],
-      "registryDependencies": ["tabs", "account-settings"],
+      "registryDependencies": ["tabs", "account-settings", "security-settings"],
       "files": [
         {
           "path": "src/components/settings/settings.tsx",
@@ -584,6 +624,10 @@
         },
         {
           "path": "src/components/settings/account/account-settings.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/components/settings/security/security-settings.tsx",
           "type": "registry:component"
         },
         {
@@ -610,6 +654,14 @@
         },
         {
           "path": "src/hooks/auth/use-auth.tsx",
+          "type": "registry:hook"
+        },
+        {
+          "path": "src/hooks/auth/use-session.ts",
+          "type": "registry:hook"
+        },
+        {
+          "path": "../react/src/hooks/auth/use-session.tsx",
           "type": "registry:hook"
         }
       ]
@@ -639,6 +691,14 @@
           "type": "registry:hook"
         },
         {
+          "path": "src/hooks/auth/use-session.ts",
+          "type": "registry:hook"
+        },
+        {
+          "path": "../react/src/hooks/auth/use-session.tsx",
+          "type": "registry:hook"
+        },
+        {
           "path": "../react/src/hooks/settings/use-list-device-sessions.ts",
           "type": "registry:hook"
         },
@@ -649,6 +709,69 @@
         {
           "path": "../react/src/hooks/settings/use-revoke-session.ts",
           "type": "registry:hook"
+        }
+      ]
+    },
+    {
+      "name": "change-password",
+      "type": "registry:component",
+      "title": "Change Password",
+      "description": "A form component for users to change their password with current password verification.",
+      "dependencies": [
+        "@better-auth-ui/react@*",
+        "better-auth",
+        "lucide-react"
+      ],
+      "registryDependencies": [
+        "button",
+        "card",
+        "field",
+        "input",
+        "input-group",
+        "spinner"
+      ],
+      "files": [
+        {
+          "path": "src/components/settings/security/change-password.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/hooks/auth/use-auth.tsx",
+          "type": "registry:hook"
+        },
+        {
+          "path": "src/hooks/auth/use-session.ts",
+          "type": "registry:hook"
+        },
+        {
+          "path": "../react/src/hooks/auth/use-session.tsx",
+          "type": "registry:hook"
+        },
+        {
+          "path": "src/hooks/settings/use-change-password.ts",
+          "type": "registry:hook"
+        },
+        {
+          "path": "../react/src/hooks/settings/use-change-password.ts",
+          "type": "registry:hook"
+        }
+      ]
+    },
+    {
+      "name": "security-settings",
+      "type": "registry:component",
+      "title": "Security Settings",
+      "description": "A container component that displays security settings including password management.",
+      "dependencies": ["@better-auth-ui/react@*"],
+      "registryDependencies": ["change-password"],
+      "files": [
+        {
+          "path": "src/components/settings/security/security-settings.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/components/settings/security/change-password.tsx",
+          "type": "registry:component"
         }
       ]
     }

@@ -1,4 +1,4 @@
-import type { AnyAuthConfig } from "@better-auth-ui/react"
+import { type AnyAuthConfig, useSession } from "@better-auth-ui/react"
 import { Person } from "@gravity-ui/icons"
 import { Avatar, cn, Skeleton } from "@heroui/react"
 import type { User } from "better-auth"
@@ -32,10 +32,8 @@ export function UserAvatar({
   size = "sm",
   ...config
 }: UserAvatarProps) {
-  const { authClient } = useAuth(config)
-
-  const { data: sessionData, isPending: sessionPending } =
-    authClient.useSession()
+  const context = useAuth(config)
+  const { data: sessionData, isPending: sessionPending } = useSession(context)
 
   if ((isPending || sessionPending) && !user) {
     return (

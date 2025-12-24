@@ -9,6 +9,12 @@ export const localization = {
     /** @remarks `"Already have an account?"` */
     alreadyHaveAnAccount: "Already have an account?",
 
+    /** @remarks `"Confirm Password"` */
+    confirmPassword: "Confirm Password",
+
+    /** @remarks `"Confirm your password"` */
+    confirmPasswordPlaceholder: "Confirm your password",
+
     /** @remarks `"Continue with {{provider}}"` */
     continueWith: "Continue with {{provider}}",
 
@@ -42,11 +48,17 @@ export const localization = {
     /** @remarks `"Enter your name"` */
     namePlaceholder: "Enter your name",
 
-    /** @remarks `"New password"` */
-    newPassword: "New password",
+    /** @remarks `"Need to create an account?"` */
+    needToCreateAnAccount: "Need to create an account?",
+
+    /** @remarks `"New Password"` */
+    newPassword: "New Password",
 
     /** @remarks `"Enter your new password"` */
     newPasswordPlaceholder: "Enter your new password",
+
+    /** @remarks `"OR"` */
+    or: "OR",
 
     /** @remarks `"Password"` */
     password: "Password",
@@ -54,32 +66,20 @@ export const localization = {
     /** @remarks `"Enter your password"` */
     passwordPlaceholder: "Enter your password",
 
-    /** @remarks `"Confirm password"` */
-    confirmPassword: "Confirm password",
-
-    /** @remarks `"Confirm your password"` */
-    confirmPasswordPlaceholder: "Confirm your password",
-
-    /** @remarks `"Passwords do not match"` */
-    passwordsDoNotMatch: "Passwords do not match",
-
     /** @remarks `"Password reset email sent"` */
     passwordResetEmailSent: "Password reset email sent",
 
     /** @remarks `"Password reset successfully"` */
     passwordResetSuccess: "Password reset successfully",
 
-    /** @remarks `"Need to create an account?"` */
-    needToCreateAnAccount: "Need to create an account?",
-
-    /** @remarks `"OR"` */
-    or: "OR",
-
-    /** @remarks `"Remember your password?"` */
-    rememberYourPassword: "Remember your password?",
+    /** @remarks `"Passwords do not match"` */
+    passwordsDoNotMatch: "Passwords do not match",
 
     /** @remarks `"Remember me"` */
     rememberMe: "Remember me",
+
+    /** @remarks `"Remember your password?"` */
+    rememberYourPassword: "Remember your password?",
 
     /** @remarks `"Resend"` */
     resend: "Resend",
@@ -134,6 +134,18 @@ export const localization = {
     /** @remarks `"Check your email to confirm the change"` */
     changeEmailSuccess: "Check your email to confirm the change",
 
+    /** @remarks `"Change Password"` */
+    changePassword: "Change Password",
+
+    /** @remarks `"Password changed successfully"` */
+    changePasswordSuccess: "Password changed successfully",
+
+    /** @remarks `"Current Password"` */
+    currentPassword: "Current Password",
+
+    /** @remarks `"Enter your current password"` */
+    currentPasswordPlaceholder: "Enter your current password",
+
     /** @remarks `"Profile"` */
     profile: "Profile",
 
@@ -153,7 +165,10 @@ export const localization = {
     theme: "Theme",
 
     /** @remarks `"Update Email"` */
-    updateEmail: "Update Email"
+    updateEmail: "Update Email",
+
+    /** @remarks `"Update Password"` */
+    updatePassword: "Update Password"
   }
 }
 

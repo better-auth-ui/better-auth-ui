@@ -18,6 +18,7 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { Spinner } from "@/components/ui/spinner"
 import { UserAvatar } from "@/components/user/user-avatar"
 import { useAuth } from "@/hooks/auth/use-auth"
+import { useSession } from "@/hooks/auth/use-session"
 import { cn } from "@/lib/utils"
 
 export type UserProfileProps = AnyAuthConfig & {
@@ -35,9 +36,9 @@ export type UserProfileProps = AnyAuthConfig & {
  */
 export function UserProfile({ className, ...config }: UserProfileProps) {
   const context = useAuth(config)
-  const { authClient, localization } = context
+  const { localization } = context
 
-  const { data: sessionData } = authClient.useSession()
+  const { data: sessionData } = useSession(context)
   const [state, formAction, isPending] = useUpdateUser(context)
 
   const [fieldErrors, setFieldErrors] = useState<{

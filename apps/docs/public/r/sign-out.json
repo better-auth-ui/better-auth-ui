@@ -19,7 +19,7 @@
     },
     {
       "path": "../react/src/hooks/auth/use-sign-out.ts",
-      "content": "import type { AnyAuthConfig } from \"@better-auth-ui/react\"\nimport { useCallback } from \"react\"\n\nimport { useAuth } from \"./use-auth\"\n\nexport function useSignOut(config?: AnyAuthConfig) {\n  const { authClient, basePaths, viewPaths, replace, toast } = useAuth(config)\n  const { refetch } = authClient.useSession()\n\n  const signOut = useCallback(async () => {\n    const { error } = await authClient.signOut({\n      fetchOptions: { disableSignal: true }\n    })\n\n    if (error) {\n      toast.error(error.message || error.statusText)\n    }\n\n    await refetch()\n\n    replace(`${basePaths.auth}/${viewPaths.auth.signIn}`)\n  }, [\n    authClient,\n    basePaths.auth,\n    viewPaths.auth.signIn,\n    replace,\n    refetch,\n    toast.error\n  ])\n\n  return { signOut }\n}\n",
+      "content": "import type { AnyAuthConfig } from \"@better-auth-ui/react\"\nimport { useCallback } from \"react\"\n\nimport { useAuth } from \"./use-auth\"\n\nexport function useSignOut(config?: AnyAuthConfig) {\n  const { authClient, basePaths, queryClient, viewPaths, replace, toast } =\n    useAuth(config)\n\n  const signOut = useCallback(async () => {\n    const { error } = await authClient.signOut()\n\n    if (error) {\n      toast.error(error.message || error.statusText)\n    }\n\n    await queryClient.invalidateQueries({ queryKey: [\"auth\"] })\n\n    replace(`${basePaths.auth}/${viewPaths.auth.signIn}`)\n  }, [\n    authClient,\n    basePaths.auth,\n    viewPaths.auth.signIn,\n    replace,\n    queryClient,\n    toast.error\n  ])\n\n  return { signOut }\n}\n",
       "type": "registry:hook"
     }
   ],

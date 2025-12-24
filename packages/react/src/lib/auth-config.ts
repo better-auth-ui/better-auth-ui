@@ -19,7 +19,7 @@ export type AuthConfig = BaseAuthConfig & {
    * React Query client instance
    * @remarks `QueryClient`
    */
-  queryClient?: QueryClient
+  queryClient: QueryClient
 }
 
 /**

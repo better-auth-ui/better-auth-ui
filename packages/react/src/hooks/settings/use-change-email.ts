@@ -16,13 +16,10 @@ export function useChangeEmail(config?: AnyAuthConfig) {
   const changeEmail = async (_: object, formData: FormData) => {
     const email = formData.get("email") as string
 
-    const { error } = await authClient.changeEmail(
-      {
-        newEmail: email,
-        callbackURL: `${baseURL}/${viewPaths.settings.account}`
-      },
-      { disableSignal: true }
-    )
+    const { error } = await authClient.changeEmail({
+      newEmail: email,
+      callbackURL: `${baseURL}/${viewPaths.settings.account}`
+    })
 
     if (error) {
       toast.error(error.message || error.statusText)

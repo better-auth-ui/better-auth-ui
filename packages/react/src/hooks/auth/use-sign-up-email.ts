@@ -9,12 +9,12 @@ export function useSignUpEmail(config?: AnyAuthConfig) {
     basePaths,
     emailAndPassword,
     localization,
+    queryClient,
     toast,
     viewPaths,
     navigate
   } = useAuth(config)
 
-  const { refetch } = authClient.useSession()
   const redirectTo = useRedirectTo(config)
 
   const signUpEmail = async (_: object, formData: FormData) => {
@@ -37,14 +37,11 @@ export function useSignUpEmail(config?: AnyAuthConfig) {
       }
     }
 
-    const { error } = await authClient.signUp.email(
-      {
-        name,
-        email,
-        password
-      },
-      { disableSignal: true }
-    )
+    const { error } = await authClient.signUp.email({
+      name,
+      email,
+      password
+    })
 
     if (error) {
       toast.error(error.message || error.statusText)
@@ -61,7 +58,7 @@ export function useSignUpEmail(config?: AnyAuthConfig) {
       toast.success(localization.auth.verifyYourEmail)
       navigate(`${basePaths.auth}/${viewPaths.auth.signIn}`)
     } else {
-      await refetch()
+      await queryClient.invalidateQueries({ queryKey: ["auth"] })
 
       navigate(redirectTo)
     }

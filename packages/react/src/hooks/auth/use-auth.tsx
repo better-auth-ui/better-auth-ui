@@ -5,9 +5,16 @@ import {
   AuthContext
 } from "@better-auth-ui/react"
 import { QueryClient, QueryClientContext } from "@tanstack/react-query"
-import { useContext } from "react"
+import type { BetterFetchError } from "better-auth/react"
+import { useContext, useEffect } from "react"
 
-const queryClient = new QueryClient()
+const fallbackQueryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 1000
+    }
+  }
+})
 
 const extendConfig: AnyAuthConfig = {
   Link: (props) => <a {...props} />
@@ -22,15 +29,25 @@ const extendConfig: AnyAuthConfig = {
  */
 export function useAuth(config?: AnyAuthConfig) {
   const context = useContext(AuthContext)
-  const contextQueryClient = useContext(QueryClientContext)
+
+  const queryClient = useContext(QueryClientContext) || fallbackQueryClient
+  queryClient.mount()
 
   const authConfig = {
-    queryClient: contextQueryClient || queryClient,
+    queryClient,
     ...deepmerge(
       deepmerge(defaultConfig as AnyAuthConfig, extendConfig),
       deepmerge(context || {}, config || {})
     )
   } as AuthConfig
+
+  useEffect(() => {
+    queryClient.getQueryCache().config.onError = (error) => {
+      authConfig.toast.error(
+        error.message || (error as BetterFetchError).statusText
+      )
+    }
+  }, [queryClient, authConfig.toast.error])
 
   if (authConfig.authClient === undefined) {
     throw new Error("[Better Auth UI] authClient is required")

@@ -1,4 +1,8 @@
-import { type AnyAuthConfig, useChangeEmail } from "@better-auth-ui/react"
+import {
+  type AnyAuthConfig,
+  useChangeEmail,
+  useSession
+} from "@better-auth-ui/react"
 import { Check } from "@gravity-ui/icons"
 import {
   Button,
@@ -31,9 +35,9 @@ export type ChangeEmailProps = AnyAuthConfig & {
  */
 export function ChangeEmail({ className, ...config }: ChangeEmailProps) {
   const context = useAuth(config)
-  const { authClient, localization } = context
+  const { localization } = context
 
-  const { data: sessionData } = authClient.useSession()
+  const { data: sessionData } = useSession(context)
 
   const [state, formAction, isPending] = useChangeEmail(context)
 
@@ -49,10 +53,10 @@ export function ChangeEmail({ className, ...config }: ChangeEmailProps) {
         <Fieldset className="w-full gap-4 md:gap-6">
           <Fieldset.Group>
             <TextField
-              key={sessionData?.user?.email}
+              key={sessionData?.user.email}
               name="email"
               type="email"
-              defaultValue={sessionData?.user?.email || state.email}
+              defaultValue={sessionData?.user.email || state.email}
               isDisabled={isPending || !sessionData}
             >
               <Label>{localization.auth.email}</Label>

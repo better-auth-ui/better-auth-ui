@@ -1,21 +1,21 @@
-import type { AnyAuthClient, AnyAuthConfig } from "@better-auth-ui/react"
+import { type AnyAuthConfig, useSession } from "@better-auth-ui/react"
+import type { DefinedInitialDataOptions } from "@tanstack/react-query"
 import { useEffect } from "react"
-
 import { useAuth } from "./use-auth"
 
 /**
  * Redirects unauthenticated users to the sign-in page (preserving the current URL) and exposes the active auth session.
  *
- * @param config - Optional partial AuthConfig used to customize auth behavior; may include an `authClient` override.
- * @returns Result of useSession hook from the auth client
+ * @param config - Optional partial AuthConfig used to customize auth behavior.
+ * @param options - Optional query options for the underlying session query.
+ * @returns Result of useSession hook containing session data and query state.
  */
-export function useAuthenticate<TAuthClient extends AnyAuthClient>(
-  config?: AnyAuthConfig & { authClient?: TAuthClient }
+export function useAuthenticate(
+  config?: AnyAuthConfig,
+  options?: Partial<DefinedInitialDataOptions>
 ) {
-  const { authClient, basePaths, viewPaths, replace } = useAuth(config)
-  const { data, isPending, ...rest } = (
-    authClient as unknown as TAuthClient
-  ).useSession()
+  const { basePaths, viewPaths, replace } = useAuth(config)
+  const { data, isPending, ...rest } = useSession(config, options)
 
   useEffect(() => {
     if (data || isPending) return

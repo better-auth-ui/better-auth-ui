@@ -19,6 +19,7 @@ import {
 import { Spinner } from "@/components/ui/spinner"
 import { UserView } from "@/components/user/user-view"
 import { useAuth } from "@/hooks/auth/use-auth"
+import { useSession } from "@/hooks/auth/use-session"
 import { cn } from "@/lib/utils"
 
 export type AccountsProps = AnyAuthConfig & {
@@ -35,9 +36,9 @@ export type AccountsProps = AnyAuthConfig & {
  */
 export function Accounts({ className, ...config }: AccountsProps) {
   const context = useAuth(config)
-  const { authClient, basePaths, localization, viewPaths, Link } = context
+  const { basePaths, localization, viewPaths, Link } = context
 
-  const { data: sessionData } = authClient.useSession()
+  const { data: sessionData } = useSession(context)
   const { data: deviceSessions, isPending } = useListDeviceSessions(context)
   const { settingActiveSession, setActiveSession } =
     useSetActiveSession(context)

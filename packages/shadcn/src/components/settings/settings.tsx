@@ -9,6 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useAuth } from "@/hooks/auth/use-auth"
 import { cn } from "@/lib/utils"
 import { AccountSettings } from "./account/account-settings"
+import { SecuritySettings } from "./security/security-settings"
 
 export type SettingsProps = AnyAuthConfig & {
   className?: string
@@ -32,9 +33,9 @@ export function Settings({
   hideNav,
   ...config
 }: SettingsProps) {
-  useAuthenticate()
-
-  const { basePaths, localization, viewPaths, Link } = useAuth(config)
+  const context = useAuth(config)
+  const { basePaths, localization, viewPaths, Link } = context
+  useAuthenticate(context)
 
   if (!view && !path) {
     throw new Error("[Better Auth UI] Either `view` or `path` must be provided")
@@ -87,7 +88,7 @@ export function Settings({
       </TabsContent>
 
       <TabsContent value="security" tabIndex={-1}>
-        {localization.settings.security}
+        <SecuritySettings {...config} />
       </TabsContent>
     </Tabs>
   )
