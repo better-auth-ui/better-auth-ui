@@ -6,9 +6,9 @@ import { useAuth } from "./use-auth"
 /**
  * Redirects unauthenticated users to the sign-in page (preserving the current URL) and exposes the active auth session.
  *
- * @param config - Optional partial AuthConfig used to customize auth behavior; may include an `authClient` override.
- * @param options - Optional query options.
- * @returns Result of useSession hook from the auth client
+ * @param config - Optional partial AuthConfig used to customize auth behavior.
+ * @param options - Optional query options for the underlying session query.
+ * @returns Result of useSession hook containing session data and query state.
  */
 export function useAuthenticate(
   config?: AnyAuthConfig,

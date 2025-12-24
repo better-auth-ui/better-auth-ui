@@ -6,7 +6,7 @@ import {
 } from "@better-auth-ui/react"
 import { QueryClient, QueryClientContext } from "@tanstack/react-query"
 import type { BetterFetchError } from "better-auth/react"
-import { useContext } from "react"
+import { useContext, useEffect } from "react"
 
 const fallbackQueryClient = new QueryClient({
   defaultOptions: {
@@ -41,11 +41,13 @@ export function useAuth(config?: AnyAuthConfig) {
     )
   } as AuthConfig
 
-  queryClient.getQueryCache().config.onError = (error) => {
-    authConfig.toast.error(
-      error.message || (error as BetterFetchError).statusText
-    )
-  }
+  useEffect(() => {
+    queryClient.getQueryCache().config.onError = (error) => {
+      authConfig.toast.error(
+        error.message || (error as BetterFetchError).statusText
+      )
+    }
+  }, [queryClient, authConfig.toast.error])
 
   if (authConfig.authClient === undefined) {
     throw new Error("[Better Auth UI] authClient is required")

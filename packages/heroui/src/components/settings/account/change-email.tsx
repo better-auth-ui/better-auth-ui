@@ -53,10 +53,10 @@ export function ChangeEmail({ className, ...config }: ChangeEmailProps) {
         <Fieldset className="w-full gap-4 md:gap-6">
           <Fieldset.Group>
             <TextField
-              key={sessionData?.user?.email}
+              key={sessionData?.user.email}
               name="email"
               type="email"
-              defaultValue={sessionData?.user?.email || state.email}
+              defaultValue={sessionData?.user.email || state.email}
               isDisabled={isPending || !sessionData}
             >
               <Label>{localization.auth.email}</Label>

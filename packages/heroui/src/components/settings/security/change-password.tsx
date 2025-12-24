@@ -79,7 +79,6 @@ export function ChangePassword({ className, ...config }: ChangePasswordProps) {
             </TextField>
 
             <TextField
-              name="newPassword"
               minLength={emailAndPassword?.minPasswordLength}
               maxLength={emailAndPassword?.maxPasswordLength}
               isDisabled={isPending || !sessionData}
@@ -124,7 +123,6 @@ export function ChangePassword({ className, ...config }: ChangePasswordProps) {
 
             {emailAndPassword?.confirmPassword && (
               <TextField
-                name="confirmPassword"
                 minLength={emailAndPassword?.minPasswordLength}
                 maxLength={emailAndPassword?.maxPasswordLength}
                 isDisabled={isPending || !sessionData}
