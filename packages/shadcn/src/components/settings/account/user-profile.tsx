@@ -1,6 +1,6 @@
 "use client"
 
-import { type AnyAuthConfig, useUpdateUser } from "@better-auth-ui/react"
+import type { AnyAuthConfig } from "@better-auth-ui/react"
 import { Pencil, Save } from "lucide-react"
 import { useState } from "react"
 
@@ -19,6 +19,7 @@ import { Spinner } from "@/components/ui/spinner"
 import { UserAvatar } from "@/components/user/user-avatar"
 import { useAuth } from "@/hooks/auth/use-auth"
 import { useSession } from "@/hooks/auth/use-session"
+import { useUpdateUser } from "@/hooks/settings/use-update-user"
 import { cn } from "@/lib/utils"
 
 export type UserProfileProps = AnyAuthConfig & {

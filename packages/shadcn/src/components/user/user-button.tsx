@@ -1,10 +1,6 @@
 "use client"
 
-import {
-  type AnyAuthConfig,
-  useListDeviceSessions,
-  useSetActiveSession
-} from "@better-auth-ui/react"
+import type { AnyAuthConfig } from "@better-auth-ui/react"
 import {
   Check,
   ChevronsUpDown,
@@ -15,7 +11,6 @@ import {
   UserPlus2,
   UsersRound
 } from "lucide-react"
-
 import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
@@ -30,6 +25,8 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { useAuth } from "@/hooks/auth/use-auth"
 import { useSession } from "@/hooks/auth/use-session"
+import { useListDeviceSessions } from "@/hooks/settings/use-list-device-sessions"
+import { useSetActiveSession } from "@/hooks/settings/use-set-active-session"
 import { cn } from "@/lib/utils"
 import { UserAvatar } from "./user-avatar"
 import { UserView } from "./user-view"

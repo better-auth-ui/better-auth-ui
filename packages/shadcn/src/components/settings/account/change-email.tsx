@@ -1,6 +1,6 @@
 "use client"
 
-import { type AnyAuthConfig, useChangeEmail } from "@better-auth-ui/react"
+import type { AnyAuthConfig } from "@better-auth-ui/react"
 import { Check } from "lucide-react"
 import { useState } from "react"
 
@@ -18,6 +18,7 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { Spinner } from "@/components/ui/spinner"
 import { useAuth } from "@/hooks/auth/use-auth"
 import { useSession } from "@/hooks/auth/use-session"
+import { useChangeEmail } from "@/hooks/settings/use-change-email"
 import { cn } from "@/lib/utils"
 
 export type ChangeEmailProps = AnyAuthConfig & {
