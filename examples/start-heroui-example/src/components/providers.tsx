@@ -1,10 +1,9 @@
 import { AuthProvider } from "@better-auth-ui/heroui/react"
 import { Link, useNavigate } from "@tanstack/react-router"
-import { ThemeProvider } from "next-themes"
+import { useTheme } from "next-themes"
 import type { ReactNode } from "react"
 import { RouterProvider } from "react-aria-components"
 import { Toaster } from "sonner"
-
 import { authClient } from "@/lib/auth-client"
 
 /**
@@ -15,24 +14,27 @@ import { authClient } from "@/lib/auth-client"
  */
 export function Providers({ children }: { children: ReactNode }) {
   const navigate = useNavigate()
+  const { theme, setTheme } = useTheme()
 
   return (
-    <ThemeProvider defaultTheme="system" enableSystem>
-      <RouterProvider navigate={(path) => navigate({ to: path })}>
-        <AuthProvider
-          authClient={authClient}
-          socialProviders={["google", "github"]}
-          magicLink
-          multiSession
-          navigate={(path) => navigate({ to: path })}
-          replace={(path) => navigate({ to: path, replace: true })}
-          Link={({ href, ...props }) => <Link to={href} {...props} />}
-        >
-          {children}
+    <RouterProvider navigate={(path) => navigate({ to: path })}>
+      <AuthProvider
+        authClient={authClient}
+        socialProviders={["google", "github"]}
+        magicLink
+        multiSession
+        navigate={(path) => navigate({ to: path })}
+        replace={(path) => navigate({ to: path, replace: true })}
+        settings={{
+          theme,
+          setTheme
+        }}
+        Link={({ href, ...props }) => <Link to={href} {...props} />}
+      >
+        {children}
 
-          <Toaster />
-        </AuthProvider>
-      </RouterProvider>
-    </ThemeProvider>
+        <Toaster />
+      </AuthProvider>
+    </RouterProvider>
   )
 }

@@ -146,6 +146,12 @@ export const localization = {
     /** @remarks `"Enter your current password"` */
     currentPasswordPlaceholder: "Enter your current password",
 
+    /** @remarks `"Dark"` */
+    dark: "Dark",
+
+    /** @remarks `"Light"` */
+    light: "Light",
+
     /** @remarks `"Profile"` */
     profile: "Profile",
 
@@ -160,6 +166,9 @@ export const localization = {
 
     /** @remarks `"Settings"` */
     settings: "Settings",
+
+    /** @remarks `"System"` */
+    system: "System",
 
     /** @remarks `"Theme"` */
     theme: "Theme",

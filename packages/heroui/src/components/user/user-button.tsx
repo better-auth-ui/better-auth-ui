@@ -49,6 +49,7 @@ export type UserButtonProps = AnyAuthConfig & {
     | "end"
     | "end top"
     | "end bottom"
+  themeToggle?: boolean
   variant?:
     | "ghost"
     | "primary"
@@ -63,10 +64,17 @@ export function UserButton({
   placement = "bottom",
   size = "default",
   variant = "ghost",
+  themeToggle = true,
   ...config
 }: UserButtonProps) {
   const context = useAuth(config)
-  const { basePaths, viewPaths, localization, multiSession } = context
+  const {
+    basePaths,
+    viewPaths,
+    localization,
+    multiSession,
+    settings: { theme, setTheme, themes }
+  } = context
 
   const { settingActiveSession, setActiveSession } =
     useSetActiveSession(context)
@@ -126,31 +134,56 @@ export function UserButton({
                 <Label>{localization.settings.settings}</Label>
               </Dropdown.Item>
 
-              <Dropdown.Item className="py-1 pe-2 hidden">
-                <Label>{localization.settings.theme}</Label>
+              {themeToggle && theme && setTheme && themes?.length && (
+                <Dropdown.Item className="py-1 pe-2">
+                  <Label>{localization.settings.theme}</Label>
 
-                <Tabs className="ml-auto" hideSeparator>
-                  <Tabs.ListContainer>
-                    <Tabs.List aria-label="Theme" className="*:h-5 *:w-5 *:p-0">
-                      <Tabs.Tab id="system">
-                        <Display className="size-3" />
+                  <Tabs
+                    className="ml-auto"
+                    hideSeparator
+                    selectedKey={theme}
+                    onSelectionChange={(key) => setTheme(key as string)}
+                  >
+                    <Tabs.ListContainer>
+                      <Tabs.List
+                        aria-label={localization.settings.theme}
+                        className="*:h-5 *:w-5 *:p-0"
+                      >
+                        {themes.includes("system") && (
+                          <Tabs.Tab
+                            id="system"
+                            aria-label={localization.settings.system}
+                          >
+                            <Display className="size-3" />
 
-                        <Tabs.Indicator />
-                      </Tabs.Tab>
-                      <Tabs.Tab id="light">
-                        <Sun className="size-3" />
+                            <Tabs.Indicator />
+                          </Tabs.Tab>
+                        )}
+                        {themes.includes("light") && (
+                          <Tabs.Tab
+                            id="light"
+                            aria-label={localization.settings.light}
+                          >
+                            <Sun className="size-3" />
 
-                        <Tabs.Indicator />
-                      </Tabs.Tab>
-                      <Tabs.Tab id="dark">
-                        <Moon className="size-3" />
+                            <Tabs.Indicator />
+                          </Tabs.Tab>
+                        )}
+                        {themes.includes("dark") && (
+                          <Tabs.Tab
+                            id="dark"
+                            aria-label={localization.settings.dark}
+                          >
+                            <Moon className="size-3" />
 
-                        <Tabs.Indicator />
-                      </Tabs.Tab>
-                    </Tabs.List>
-                  </Tabs.ListContainer>
-                </Tabs>
-              </Dropdown.Item>
+                            <Tabs.Indicator />
+                          </Tabs.Tab>
+                        )}
+                      </Tabs.List>
+                    </Tabs.ListContainer>
+                  </Tabs>
+                </Dropdown.Item>
+              )}
 
               {multiSession && (
                 <Dropdown.SubmenuTrigger>
