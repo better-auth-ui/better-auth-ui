@@ -39,7 +39,11 @@ function RootDocument({ children }: { children: ReactNode }) {
       </head>
 
       <body className="antialiased min-h-svh flex flex-col">
-        <ThemeProvider defaultTheme="system" enableSystem>
+        <ThemeProvider
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
           <Providers>
             <Header />
 
