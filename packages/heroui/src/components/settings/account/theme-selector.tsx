@@ -1,6 +1,13 @@
 import type { AnyAuthConfig } from "@better-auth-ui/react"
-import { Card, cn, Label, Radio, RadioGroup } from "@heroui/react"
-
+import { Display, Moon, Sun } from "@gravity-ui/icons"
+import {
+  Card,
+  cn,
+  Label,
+  Radio,
+  RadioGroup,
+  useIsHydrated
+} from "@heroui/react"
 import { useAuth } from "../../../hooks/use-auth"
 
 export type ThemeSelectorProps = AnyAuthConfig & {
@@ -11,7 +18,7 @@ function ThemePreviewSystem() {
   return (
     <svg
       aria-hidden="true"
-      className="w-full h-full"
+      className="w-full h-auto"
       fill="none"
       viewBox="0 0 240 117"
       xmlns="http://www.w3.org/2000/svg"
@@ -30,11 +37,11 @@ function ThemePreviewSystem() {
       {/* Light side (top-left diagonal) */}
       <g clipPath="url(#systemDiagonalLight)">
         <path
-          d="M12 0.5H228C234.351 0.5 239.5 5.64873 239.5 12V116.5H0.5V12C0.5 5.64873 5.64873 0.5 12 0.5Z"
+          d="M12 0.5H228C234.351 0.5 239.5 5.64873 239.5 12V105C239.5 111.351 234.351 116.5 228 116.5H12C5.64873 116.5 0.5 111.351 0.5 105V12C0.5 5.64873 5.64873 0.5 12 0.5Z"
           fill="white"
         />
         <path
-          d="M12 0.5H228C234.351 0.5 239.5 5.64873 239.5 12V116.5H0.5V12C0.5 5.64873 5.64873 0.5 12 0.5Z"
+          d="M12 0.5H228C234.351 0.5 239.5 5.64873 239.5 12V105C239.5 111.351 234.351 116.5 228 116.5H12C5.64873 116.5 0.5 111.351 0.5 105V12C0.5 5.64873 5.64873 0.5 12 0.5Z"
           stroke="#E4E4E7"
         />
         <path
@@ -87,11 +94,11 @@ function ThemePreviewSystem() {
       {/* Dark side (bottom-right diagonal) */}
       <g clipPath="url(#systemDiagonalDark)">
         <path
-          d="M12 0.5H228C234.351 0.5 239.5 5.64873 239.5 12V116.5H0.5V12C0.5 5.64873 5.64873 0.5 12 0.5Z"
+          d="M12 0.5H228C234.351 0.5 239.5 5.64873 239.5 12V105C239.5 111.351 234.351 116.5 228 116.5H12C5.64873 116.5 0.5 111.351 0.5 105V12C0.5 5.64873 5.64873 0.5 12 0.5Z"
           fill="black"
         />
         <path
-          d="M12 0.5H228C234.351 0.5 239.5 5.64873 239.5 12V116.5H0.5V12C0.5 5.64873 5.64873 0.5 12 0.5Z"
+          d="M12 0.5H228C234.351 0.5 239.5 5.64873 239.5 12V105C239.5 111.351 234.351 116.5 228 116.5H12C5.64873 116.5 0.5 111.351 0.5 105V12C0.5 5.64873 5.64873 0.5 12 0.5Z"
           stroke="#3F3F46"
         />
         <path
@@ -148,17 +155,17 @@ function ThemePreviewLight() {
   return (
     <svg
       aria-hidden="true"
-      className="w-full h-full"
+      className="w-full h-auto"
       fill="none"
       viewBox="0 0 240 117"
       xmlns="http://www.w3.org/2000/svg"
     >
       <path
-        d="M12 0.5H228C234.351 0.5 239.5 5.64873 239.5 12V116.5H0.5V12C0.5 5.64873 5.64873 0.5 12 0.5Z"
+        d="M12 0.5H228C234.351 0.5 239.5 5.64873 239.5 12V105C239.5 111.351 234.351 116.5 228 116.5H12C5.64873 116.5 0.5 111.351 0.5 105V12C0.5 5.64873 5.64873 0.5 12 0.5Z"
         fill="white"
       />
       <path
-        d="M12 0.5H228C234.351 0.5 239.5 5.64873 239.5 12V116.5H0.5V12C0.5 5.64873 5.64873 0.5 12 0.5Z"
+        d="M12 0.5H228C234.351 0.5 239.5 5.64873 239.5 12V105C239.5 111.351 234.351 116.5 228 116.5H12C5.64873 116.5 0.5 111.351 0.5 105V12C0.5 5.64873 5.64873 0.5 12 0.5Z"
         stroke="#E4E4E7"
       />
       <path
@@ -214,17 +221,17 @@ function ThemePreviewDark() {
   return (
     <svg
       aria-hidden="true"
-      className="w-full h-full"
+      className="w-full h-auto"
       fill="none"
       viewBox="0 0 240 117"
       xmlns="http://www.w3.org/2000/svg"
     >
       <path
-        d="M12 0.5H228C234.351 0.5 239.5 5.64873 239.5 12V116.5H0.5V12C0.5 5.64873 5.64873 0.5 12 0.5Z"
+        d="M12 0.5H228C234.351 0.5 239.5 5.64873 239.5 12V105C239.5 111.351 234.351 116.5 228 116.5H12C5.64873 116.5 0.5 111.351 0.5 105V12C0.5 5.64873 5.64873 0.5 12 0.5Z"
         fill="black"
       />
       <path
-        d="M12 0.5H228C234.351 0.5 239.5 5.64873 239.5 12V116.5H0.5V12C0.5 5.64873 5.64873 0.5 12 0.5Z"
+        d="M12 0.5H228C234.351 0.5 239.5 5.64873 239.5 12V105C239.5 111.351 234.351 116.5 228 116.5H12C5.64873 116.5 0.5 111.351 0.5 105V12C0.5 5.64873 5.64873 0.5 12 0.5Z"
         stroke="#3F3F46"
       />
       <path
@@ -294,6 +301,8 @@ export function ThemeSelector({ className, ...config }: ThemeSelectorProps) {
     settings: { theme, setTheme, themes }
   } = context
 
+  const hydrated = useIsHydrated()
+
   if (!setTheme || !themes?.length) {
     return null
   }
@@ -301,24 +310,23 @@ export function ThemeSelector({ className, ...config }: ThemeSelectorProps) {
   return (
     <Card className={cn("p-4 md:p-6 gap-4 md:gap-6", className)}>
       <Card.Header>
-        <Card.Title className="text-xl">
-          {localization.settings.theme}
-        </Card.Title>
+        <Card.Title className="text-xl">Appearance</Card.Title>
       </Card.Header>
 
       <Card.Content>
         <RadioGroup
           isOnSurface
-          value={theme}
+          value={hydrated ? theme : undefined}
           onChange={setTheme}
-          isDisabled={!theme}
+          isDisabled={!hydrated || !theme}
         >
-          <div className="grid gap-4 md:grid-cols-3 -mt-4">
+          <Label>Theme</Label>
+          <div className="grid gap-4 md:grid-cols-3">
             {themes.includes("system") && (
               <Radio
                 value="system"
                 className={cn(
-                  "group relative flex-col gap-4 rounded-xl border-2 border-default px-5 py-4 hover:bg-default/20 transition-all data-[selected=true]:border-accent data-[selected=true]:bg-accent/10",
+                  "group relative flex-col gap-4 rounded-xl border border-default px-5 py-4 hover:bg-default/20 transition-all data-[selected=true]:border-accent data-[selected=true]:bg-accent/10",
                   "data-[focus-visible=true]:border-accent data-[focus-visible=true]:bg-accent/10"
                 )}
               >
@@ -326,12 +334,12 @@ export function ThemeSelector({ className, ...config }: ThemeSelectorProps) {
                   <Radio.Indicator />
                 </Radio.Control>
                 <Radio.Content className="flex flex-col gap-3">
-                  <Label className="cursor-pointer font-medium">
+                  <Label className="cursor-pointer font-medium flex gap-2 items-center">
+                    <Display className="text-muted" />
                     {localization.settings.system}
                   </Label>
-                  <div className="rounded-lg overflow-hidden aspect-[240/117]">
-                    <ThemePreviewSystem />
-                  </div>
+
+                  <ThemePreviewSystem />
                 </Radio.Content>
               </Radio>
             )}
@@ -340,7 +348,7 @@ export function ThemeSelector({ className, ...config }: ThemeSelectorProps) {
               <Radio
                 value="light"
                 className={cn(
-                  "group relative flex-col gap-4 rounded-xl border-2 border-default px-5 py-4 hover:bg-default/20 transition-all data-[selected=true]:border-accent data-[selected=true]:bg-accent/10",
+                  "group relative flex-col gap-4 rounded-xl border border-default px-5 py-4 hover:bg-default/20 transition-all data-[selected=true]:border-accent data-[selected=true]:bg-accent/10",
                   "data-[focus-visible=true]:border-accent data-[focus-visible=true]:bg-accent/10"
                 )}
               >
@@ -348,12 +356,11 @@ export function ThemeSelector({ className, ...config }: ThemeSelectorProps) {
                   <Radio.Indicator />
                 </Radio.Control>
                 <Radio.Content className="flex flex-col gap-3">
-                  <Label className="cursor-pointer font-medium">
+                  <Label className="cursor-pointer font-medium flex gap-2 items-center">
+                    <Sun className="text-muted" />
                     {localization.settings.light}
                   </Label>
-                  <div className="rounded-lg overflow-hidden aspect-[240/117]">
-                    <ThemePreviewLight />
-                  </div>
+                  <ThemePreviewLight />
                 </Radio.Content>
               </Radio>
             )}
@@ -362,7 +369,7 @@ export function ThemeSelector({ className, ...config }: ThemeSelectorProps) {
               <Radio
                 value="dark"
                 className={cn(
-                  "group relative flex-col gap-4 rounded-xl border-2 border-default px-5 py-4 hover:bg-default/20 transition-all data-[selected=true]:border-accent data-[selected=true]:bg-accent/10",
+                  "group relative flex-col gap-4 rounded-xl border border-default px-5 py-4 hover:bg-default/20 transition-all data-[selected=true]:border-accent data-[selected=true]:bg-accent/10",
                   "data-[focus-visible=true]:border-accent data-[focus-visible=true]:bg-accent/10"
                 )}
               >
@@ -370,12 +377,11 @@ export function ThemeSelector({ className, ...config }: ThemeSelectorProps) {
                   <Radio.Indicator />
                 </Radio.Control>
                 <Radio.Content className="flex flex-col gap-3">
-                  <Label className="cursor-pointer font-medium">
+                  <Label className="cursor-pointer font-medium flex gap-2 items-center">
+                    <Moon className="text-muted" />
                     {localization.settings.dark}
                   </Label>
-                  <div className="rounded-lg overflow-hidden aspect-[240/117]">
-                    <ThemePreviewDark />
-                  </div>
+                  <ThemePreviewDark />
                 </Radio.Content>
               </Radio>
             )}
