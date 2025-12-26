@@ -321,7 +321,7 @@ export function ThemeSelector({ className, ...config }: ThemeSelectorProps) {
           isDisabled={!hydrated || !theme}
         >
           <Label>Theme</Label>
-          <div className="grid gap-4 md:grid-cols-3">
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {themes.includes("system") && (
               <Radio
                 value="system"
