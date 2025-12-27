@@ -3,8 +3,8 @@ import type { AnyAuthConfig } from "@better-auth-ui/react"
 import { useAuth } from "../../../hooks/use-auth"
 import { cn } from "../../../lib/utils"
 import { Accounts } from "./accounts"
+import { Appearance } from "./appearance"
 import { ChangeEmail } from "./change-email"
-import { ThemeSelector } from "./theme-selector"
 import { UserProfile } from "./user-profile"
 
 export type AccountSettingsProps = AnyAuthConfig & {
@@ -27,10 +27,8 @@ export function AccountSettings({
   return (
     <div className={cn("flex w-full flex-col gap-4 md:gap-6", className)}>
       <UserProfile {...config} />
-
-      <ThemeSelector {...config} />
-
       <ChangeEmail {...config} />
+      <Appearance {...config} />
 
       {multiSession && <Accounts {...config} />}
     </div>

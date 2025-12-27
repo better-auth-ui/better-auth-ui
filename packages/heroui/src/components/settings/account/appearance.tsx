@@ -294,7 +294,7 @@ function ThemePreviewDark() {
  * @param config - Auth-related props forwarded to access theme settings.
  * @returns A JSX element containing the theme selector card, or null if theme settings are not configured.
  */
-export function ThemeSelector({ className, ...config }: ThemeSelectorProps) {
+export function Appearance({ className, ...config }: ThemeSelectorProps) {
   const context = useAuth(config)
   const {
     localization,
