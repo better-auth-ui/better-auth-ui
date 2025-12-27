@@ -14,14 +14,15 @@ export type ThemeSelectorProps = AnyAuthConfig & {
   className?: string
 }
 
-function ThemePreviewSystem() {
+function ThemePreviewSystem(props: React.SVGProps<SVGSVGElement>) {
   return (
     <svg
-      aria-hidden="true"
-      className="w-full h-auto"
       fill="none"
       viewBox="0 0 240 117"
       xmlns="http://www.w3.org/2000/svg"
+      role="img"
+      aria-label="System theme preview"
+      {...props}
     >
       <defs>
         {/* Diagonal clip for light (top-left) */}
@@ -151,14 +152,15 @@ function ThemePreviewSystem() {
   )
 }
 
-function ThemePreviewLight() {
+function ThemePreviewLight(props: React.SVGProps<SVGSVGElement>) {
   return (
     <svg
-      aria-hidden="true"
-      className="w-full h-auto"
       fill="none"
       viewBox="0 0 240 117"
       xmlns="http://www.w3.org/2000/svg"
+      role="img"
+      aria-label="Light"
+      {...props}
     >
       <path
         d="M12 0.5H228C234.351 0.5 239.5 5.64873 239.5 12V105C239.5 111.351 234.351 116.5 228 116.5H12C5.64873 116.5 0.5 111.351 0.5 105V12C0.5 5.64873 5.64873 0.5 12 0.5Z"
@@ -217,14 +219,15 @@ function ThemePreviewLight() {
   )
 }
 
-function ThemePreviewDark() {
+function ThemePreviewDark(props: React.SVGProps<SVGSVGElement>) {
   return (
     <svg
-      aria-hidden="true"
-      className="w-full h-auto"
       fill="none"
       viewBox="0 0 240 117"
       xmlns="http://www.w3.org/2000/svg"
+      role="img"
+      aria-label="Dark"
+      {...props}
     >
       <path
         d="M12 0.5H228C234.351 0.5 239.5 5.64873 239.5 12V105C239.5 111.351 234.351 116.5 228 116.5H12C5.64873 116.5 0.5 111.351 0.5 105V12C0.5 5.64873 5.64873 0.5 12 0.5Z"
@@ -343,7 +346,7 @@ export function Appearance({ className, ...config }: ThemeSelectorProps) {
                     {localization.settings.system}
                   </Label>
 
-                  <ThemePreviewSystem />
+                  <ThemePreviewSystem className="w-full" />
                 </Radio.Content>
               </Radio>
             )}
@@ -366,7 +369,7 @@ export function Appearance({ className, ...config }: ThemeSelectorProps) {
                     {localization.settings.light}
                   </Label>
 
-                  <ThemePreviewLight />
+                  <ThemePreviewLight className="w-full" />
                 </Radio.Content>
               </Radio>
             )}
@@ -389,7 +392,7 @@ export function Appearance({ className, ...config }: ThemeSelectorProps) {
                     {localization.settings.dark}
                   </Label>
 
-                  <ThemePreviewDark />
+                  <ThemePreviewDark className="w-full" />
                 </Radio.Content>
               </Radio>
             )}
