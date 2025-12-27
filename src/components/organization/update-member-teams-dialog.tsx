@@ -2,13 +2,14 @@
 
 import type { User } from "better-auth"
 import type { Member } from "better-auth/plugins/organization"
-import { Loader2 } from "lucide-react"
-import { type ComponentProps, useContext, useMemo, useState } from "react"
+import { type ComponentProps, useContext, useMemo } from "react"
 import { AuthUIContext } from "../../lib/auth-ui-provider"
-import { cn, getLocalizedError } from "../../lib/utils"
+import { cn } from "../../lib/utils"
 import type { AuthLocalization } from "../../localization/auth-localization"
 import type { SettingsCardClassNames } from "../settings/shared/settings-card"
+import { SettingsCellSkeleton } from "../settings/skeletons/settings-cell-skeleton"
 import { Button } from "../ui/button"
+import { Card, CardContent, CardHeader, CardTitle } from "../ui/card"
 import {
     Dialog,
     DialogContent,
@@ -17,14 +18,8 @@ import {
     DialogHeader,
     DialogTitle
 } from "../ui/dialog"
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue
-} from "../ui/select"
 import { MemberCell } from "./member-cell"
+import { UpdateMemberTeamCell } from "./update-member-team-cell"
 
 export interface UpdateMemberTeamsDialogProps
     extends ComponentProps<typeof Dialog> {
@@ -41,12 +36,8 @@ export function UpdateMemberTeamsDialog({
     ...props
 }: UpdateMemberTeamsDialogProps) {
     const {
-        authClient,
-        hooks: { useSession, useListMembers },
-        localization: contextLocalization,
-        organization,
-        toast,
-        localizeErrors
+        hooks: { useListTeams, useListUserTeams },
+        localization: contextLocalization
     } = useContext(AuthUIContext)
 
     const localization = useMemo(
@@ -54,84 +45,21 @@ export function UpdateMemberTeamsDialog({
         [contextLocalization, localizationProp]
     )
 
-    const { data, refetch } = useListMembers({
-        query: { organizationId: member.organizationId }
-    })
+    const {
+        data: memberTeams,
+        isPending: memberTeamsPending,
+        refetch
+    } = useListUserTeams()
 
-    const members = data?.members
-
-    const { data: sessionData } = useSession()
-
-    const [isUpdating, setIsUpdating] = useState(false)
-    const [selectedRole, setSelectedRole] = useState(member.role)
-
-    const builtInRoles = [
-        { role: "owner", label: localization.OWNER },
-        { role: "admin", label: localization.ADMIN },
-        { role: "member", label: localization.MEMBER }
-    ]
-
-    const roles = [...builtInRoles, ...(organization?.customRoles || [])]
-
-    const currentUserRole = members?.find(
-        (m) => m.user?.id === sessionData?.user.id
-    )?.role
-
-    const availableRoles = roles.filter((role) => {
-        if (role.role === "owner") {
-            return currentUserRole === "owner"
-        }
-
-        if (role.role === "admin") {
-            return currentUserRole === "owner" || currentUserRole === "admin"
-        }
-
-        return true
-    })
-
-    const updateMemberRole = async () => {
-        if (selectedRole === member.role) {
-            toast({
-                variant: "error",
-                message: `${localization.ROLE} ${localization.IS_THE_SAME}`
-            })
-
-            return
-        }
-
-        setIsUpdating(true)
-
-        try {
-            await authClient.organization.updateMemberRole({
-                memberId: member.id,
-                role: selectedRole,
-                organizationId: member.organizationId,
-                fetchOptions: {
-                    throw: true
-                }
-            })
-
-            toast({
-                variant: "success",
-                message: localization.MEMBER_ROLE_UPDATED
-            })
-
-            await refetch?.()
-
-            onOpenChange?.(false)
-        } catch (error) {
-            toast({
-                variant: "error",
-                message: getLocalizedError({
-                    error,
-                    localization,
-                    localizeErrors
-                })
-            })
-        }
-
-        setIsUpdating(false)
+    function isAdded(teamId: string) {
+        return memberTeams?.some((mt) => mt.id === teamId) ?? false
     }
+
+    const { data: orgTeams, isPending: orgTeamsPending } = useListTeams({
+        organizationId: member.organizationId
+    })
+
+    const isPending = memberTeamsPending || orgTeamsPending
 
     return (
         <Dialog onOpenChange={onOpenChange} {...props}>
@@ -163,53 +91,56 @@ export function UpdateMemberTeamsDialog({
                         localization={localization}
                         hideActions
                     />
-
-                    <Select
-                        value={selectedRole}
-                        onValueChange={setSelectedRole}
-                    >
-                        <SelectTrigger className="w-full">
-                            <SelectValue
-                                placeholder={localization.SELECT_ROLE}
-                            />
-                        </SelectTrigger>
-
-                        <SelectContent>
-                            {availableRoles.map((role) => (
-                                <SelectItem key={role.role} value={role.role}>
-                                    {role.label}
-                                </SelectItem>
-                            ))}
-                        </SelectContent>
-                    </Select>
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>{localization.TEAMS}</CardTitle>
+                        </CardHeader>
+                        <CardContent
+                            className={cn("grid gap-4", classNames?.content)}
+                        >
+                            {isPending ? (
+                                <SettingsCellSkeleton
+                                    key="skeleton"
+                                    classNames={classNames}
+                                />
+                            ) : orgTeams && orgTeams.length > 0 ? (
+                                orgTeams
+                                    .sort(
+                                        (a, b) =>
+                                            new Date(a.createdAt).getTime() -
+                                            new Date(b.createdAt).getTime()
+                                    )
+                                    .map((team) => (
+                                        <UpdateMemberTeamCell
+                                            classNames={classNames}
+                                            key={team.id}
+                                            added={isAdded(team.id)}
+                                            userId={member.userId}
+                                            localization={localization}
+                                            refetch={refetch}
+                                            team={team}
+                                        />
+                                    ))
+                            ) : (
+                                <p className="text-muted-foreground text-sm">
+                                    {localization.NO_TEAMS_FOUND}
+                                </p>
+                            )}
+                        </CardContent>
+                    </Card>
                 </div>
 
                 <DialogFooter className={classNames?.dialog?.footer}>
                     <Button
                         type="button"
-                        variant="outline"
                         onClick={() => onOpenChange?.(false)}
-                        className={cn(
-                            classNames?.button,
-                            classNames?.outlineButton
-                        )}
-                        disabled={isUpdating}
-                    >
-                        {localization.CANCEL}
-                    </Button>
-
-                    <Button
-                        type="button"
-                        onClick={updateMemberRole}
                         className={cn(
                             classNames?.button,
                             classNames?.primaryButton
                         )}
-                        disabled={isUpdating}
+                        disabled={isPending}
                     >
-                        {isUpdating && <Loader2 className="animate-spin" />}
-
-                        {localization.UPDATE_TEAMS}
+                        {localization.DONE}
                     </Button>
                 </DialogFooter>
             </DialogContent>
