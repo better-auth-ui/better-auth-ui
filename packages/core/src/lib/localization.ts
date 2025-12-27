@@ -128,6 +128,9 @@ export const localization = {
     /** @remarks `"Active"` */
     active: "Active",
 
+    /** @remarks `"Appearance"` */
+    appearance: "Appearance",
+
     /** @remarks `"Change Email"` */
     changeEmail: "Change Email",
 

@@ -310,7 +310,9 @@ export function ThemeSelector({ className, ...config }: ThemeSelectorProps) {
   return (
     <Card className={cn("p-4 md:p-6 gap-4 md:gap-6", className)}>
       <Card.Header>
-        <Card.Title className="text-xl">Appearance</Card.Title>
+        <Card.Title className="text-xl">
+          {localization.settings.appearance}
+        </Card.Title>
       </Card.Header>
 
       <Card.Content>
@@ -320,19 +322,21 @@ export function ThemeSelector({ className, ...config }: ThemeSelectorProps) {
           onChange={setTheme}
           isDisabled={!hydrated || !theme}
         >
-          <Label>Theme</Label>
+          <Label className="mb-2">{localization.settings.theme}</Label>
+
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {themes.includes("system") && (
               <Radio
                 value="system"
                 className={cn(
-                  "group relative flex-col gap-4 rounded-xl border border-default px-5 py-4 hover:bg-default/20 transition-all data-[selected=true]:border-accent data-[selected=true]:bg-accent/10",
+                  "mt-0 group relative flex-col gap-4 rounded-xl border border-default px-5 py-4 hover:bg-default/20 transition-all data-[selected=true]:border-accent data-[selected=true]:bg-accent/10",
                   "data-[focus-visible=true]:border-accent data-[focus-visible=true]:bg-accent/10"
                 )}
               >
                 <Radio.Control className="absolute top-3 right-3 size-5">
                   <Radio.Indicator />
                 </Radio.Control>
+
                 <Radio.Content className="flex flex-col gap-3">
                   <Label className="cursor-pointer font-medium flex gap-2 items-center">
                     <Display className="text-muted" />
@@ -348,18 +352,20 @@ export function ThemeSelector({ className, ...config }: ThemeSelectorProps) {
               <Radio
                 value="light"
                 className={cn(
-                  "group relative flex-col gap-4 rounded-xl border border-default px-5 py-4 hover:bg-default/20 transition-all data-[selected=true]:border-accent data-[selected=true]:bg-accent/10",
+                  "mt-0 group relative flex-col gap-4 rounded-xl border border-default px-5 py-4 hover:bg-default/20 transition-all data-[selected=true]:border-accent data-[selected=true]:bg-accent/10",
                   "data-[focus-visible=true]:border-accent data-[focus-visible=true]:bg-accent/10"
                 )}
               >
                 <Radio.Control className="absolute top-3 right-3 size-5">
                   <Radio.Indicator />
                 </Radio.Control>
+
                 <Radio.Content className="flex flex-col gap-3">
                   <Label className="cursor-pointer font-medium flex gap-2 items-center">
                     <Sun className="text-muted" />
                     {localization.settings.light}
                   </Label>
+
                   <ThemePreviewLight />
                 </Radio.Content>
               </Radio>
@@ -369,18 +375,20 @@ export function ThemeSelector({ className, ...config }: ThemeSelectorProps) {
               <Radio
                 value="dark"
                 className={cn(
-                  "group relative flex-col gap-4 rounded-xl border border-default px-5 py-4 hover:bg-default/20 transition-all data-[selected=true]:border-accent data-[selected=true]:bg-accent/10",
+                  "mt-0 group relative flex-col gap-4 rounded-xl border border-default px-5 py-4 hover:bg-default/20 transition-all data-[selected=true]:border-accent data-[selected=true]:bg-accent/10",
                   "data-[focus-visible=true]:border-accent data-[focus-visible=true]:bg-accent/10"
                 )}
               >
                 <Radio.Control className="absolute top-3 right-3 size-5">
                   <Radio.Indicator />
                 </Radio.Control>
+
                 <Radio.Content className="flex flex-col gap-3">
                   <Label className="cursor-pointer font-medium flex gap-2 items-center">
                     <Moon className="text-muted" />
                     {localization.settings.dark}
                   </Label>
+
                   <ThemePreviewDark />
                 </Radio.Content>
               </Radio>
