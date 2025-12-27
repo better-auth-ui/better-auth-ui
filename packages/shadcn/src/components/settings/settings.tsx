@@ -61,7 +61,7 @@ export function Settings({
           aria-label={localization.settings.settings}
           className="min-w-full md:w-64 lg:w-72 xl:w-80 md:flex-col md:h-fit md:items-stretch"
         >
-          <TabsTrigger value="account" asChild className="text-sm md:text-base">
+          <TabsTrigger value="account" asChild>
             <Link href={`${basePaths.settings}/${viewPaths.settings.account}`}>
               <UserCircle2 />
 
@@ -69,11 +69,7 @@ export function Settings({
             </Link>
           </TabsTrigger>
 
-          <TabsTrigger
-            value="security"
-            asChild
-            className="text-sm md:text-base"
-          >
+          <TabsTrigger value="security" asChild>
             <Link href={`${basePaths.settings}/${viewPaths.settings.security}`}>
               <ShieldCheck />
 
