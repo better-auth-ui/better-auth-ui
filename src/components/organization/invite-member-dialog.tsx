@@ -50,13 +50,15 @@ export function InviteMemberDialog({
     ...props
 }: InviteMemberDialogProps) {
     const {
+        teams: teamOptions,
         authClient,
-        hooks: { useListInvitations, useListMembers, useSession },
+        hooks: { useListInvitations, useListMembers, useSession, useListTeams },
         localization: contextLocalization,
         toast,
         organization: organizationOptions,
         localizeErrors
     } = useContext(AuthUIContext)
+    const { enabled: teamsEnabled } = teamOptions || {}
 
     const localization = useMemo(
         () => ({ ...contextLocalization, ...localizationProp }),
@@ -87,6 +89,12 @@ export function InviteMemberDialog({
         (role) => membership?.role === "owner" || role.role !== "owner"
     )
 
+    const { data: teams } = teamsEnabled
+        ? useListTeams({
+              organizationId: organization.id
+          })
+        : { data: undefined }
+
     const formSchema = z.object({
         email: z
             .string()
@@ -96,26 +104,33 @@ export function InviteMemberDialog({
             }),
         role: z.string().min(1, {
             message: `${localization.ROLE} ${localization.IS_REQUIRED}`
-        })
+        }),
+        teamId: z.string().optional()
     })
 
     const form = useForm({
         resolver: zodResolver(formSchema),
         defaultValues: {
             email: "",
-            role: "member"
+            role: "member",
+            teamId: ""
         }
     })
 
     const isSubmitting = form.formState.isSubmitting
 
-    async function onSubmit({ email, role }: z.infer<typeof formSchema>) {
+    async function onSubmit({
+        email,
+        role,
+        teamId
+    }: z.infer<typeof formSchema>) {
         try {
             await authClient.organization.inviteMember({
                 email,
                 role: role as (typeof builtInRoles)[number]["role"],
                 organizationId: organization.id,
-                fetchOptions: { throw: true }
+                fetchOptions: { throw: true },
+                ...(teamsEnabled && { teamId })
             })
 
             await refetch?.()
@@ -191,41 +206,86 @@ export function InviteMemberDialog({
                             )}
                         />
 
-                        <FormField
-                            control={form.control}
-                            name="role"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel className={classNames?.label}>
-                                        {localization.ROLE}
-                                    </FormLabel>
+                        <div className="grid grid-cols-2 gap-2">
+                            <FormField
+                                control={form.control}
+                                name="role"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel
+                                            className={classNames?.label}
+                                        >
+                                            {localization.ROLE}
+                                        </FormLabel>
 
-                                    <Select
-                                        onValueChange={field.onChange}
-                                        defaultValue={field.value}
-                                    >
-                                        <FormControl>
-                                            <SelectTrigger>
-                                                <SelectValue />
-                                            </SelectTrigger>
-                                        </FormControl>
+                                        <Select
+                                            onValueChange={field.onChange}
+                                            defaultValue={field.value}
+                                        >
+                                            <FormControl>
+                                                <SelectTrigger>
+                                                    <SelectValue />
+                                                </SelectTrigger>
+                                            </FormControl>
 
-                                        <SelectContent>
-                                            {availableRoles.map((role) => (
-                                                <SelectItem
-                                                    key={role.role}
-                                                    value={role.role}
-                                                >
-                                                    {role.label}
-                                                </SelectItem>
-                                            ))}
-                                        </SelectContent>
-                                    </Select>
+                                            <SelectContent>
+                                                {availableRoles.map((role) => (
+                                                    <SelectItem
+                                                        key={role.role}
+                                                        value={role.role}
+                                                    >
+                                                        {role.label}
+                                                    </SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
 
-                                    <FormMessage />
-                                </FormItem>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+
+                            {teamsEnabled && (
+                                <FormField
+                                    control={form.control}
+                                    name="teamId"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel
+                                                className={classNames?.label}
+                                            >
+                                                {localization.TEAM}
+                                            </FormLabel>
+
+                                            <Select
+                                                onValueChange={field.onChange}
+                                                defaultValue={field.value}
+                                            >
+                                                <FormControl>
+                                                    <SelectTrigger>
+                                                        <SelectValue />
+                                                        <SelectValue placeholder="Select team" />
+                                                    </SelectTrigger>
+                                                </FormControl>
+
+                                                <SelectContent>
+                                                    {teams?.map((team) => (
+                                                        <SelectItem
+                                                            key={team.id}
+                                                            value={team.id}
+                                                        >
+                                                            {team.name}
+                                                        </SelectItem>
+                                                    ))}
+                                                </SelectContent>
+                                            </Select>
+
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
                             )}
-                        />
+                        </div>
 
                         <DialogFooter className={classNames?.dialog?.footer}>
                             <Button
