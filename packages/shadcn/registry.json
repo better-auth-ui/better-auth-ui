@@ -604,9 +604,9 @@
       "name": "account-settings",
       "type": "registry:component",
       "title": "Account Settings",
-      "description": "A container component that displays account settings including user profile and change email.",
+      "description": "A container component that displays account settings including user profile, change email, and appearance.",
       "dependencies": ["@better-auth-ui/react@*"],
-      "registryDependencies": ["user-profile", "change-email"],
+      "registryDependencies": ["user-profile", "change-email", "appearance"],
       "files": [
         {
           "path": "src/components/settings/account/account-settings.tsx",
@@ -619,6 +619,32 @@
         {
           "path": "src/components/settings/account/change-email.tsx",
           "type": "registry:component"
+        },
+        {
+          "path": "src/components/settings/account/appearance.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "appearance",
+      "type": "registry:component",
+      "title": "Appearance",
+      "description": "A theme selector card with visual theme previews for system, light, and dark themes.",
+      "dependencies": ["@better-auth-ui/react@*", "lucide-react"],
+      "registryDependencies": ["card", "label", "radio-group"],
+      "files": [
+        {
+          "path": "src/components/settings/account/appearance.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/hooks/auth/use-auth.tsx",
+          "type": "registry:hook"
+        },
+        {
+          "path": "src/hooks/use-hydrated.ts",
+          "type": "registry:hook"
         }
       ]
     },
