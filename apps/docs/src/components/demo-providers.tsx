@@ -10,6 +10,10 @@ export function DemoProviders({ children }: { children: React.ReactNode }) {
         multiSession
         navigate={() => {}}
         replace={() => {}}
+        settings={{
+          theme: "system",
+          setTheme: () => {}
+        }}
         Link={({ href, ...props }) => (
           // biome-ignore lint/a11y/useValidAnchor: this is a demo
           <a href="#" onClick={(e) => e.preventDefault()} {...props} />
