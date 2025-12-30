@@ -327,7 +327,7 @@ export function Appearance({ className, ...config }: AppearanceProps) {
         >
           <Label className="mb-2">{localization.settings.theme}</Label>
 
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {themes.includes("system") && (
               <Radio
                 value="system"
