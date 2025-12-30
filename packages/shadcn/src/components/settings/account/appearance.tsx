@@ -4,6 +4,12 @@ import type { AnyAuthConfig } from "@better-auth-ui/react"
 import { Monitor, Moon, Sun } from "lucide-react"
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import {
+  Field,
+  FieldContent,
+  FieldLabel,
+  FieldTitle
+} from "@/components/ui/field"
 import { Label } from "@/components/ui/label"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { useAuth } from "@/hooks/auth/use-auth"
@@ -312,103 +318,70 @@ export function Appearance({ className, ...config }: AppearanceProps) {
 
   return (
     <Card className={cn("py-4 md:py-6 gap-4 md:gap-6", className)}>
-      <CardHeader>
+      <CardHeader className="px-4 md:px-6 gap-0">
         <CardTitle className="text-xl">
           {localization.settings.appearance}
         </CardTitle>
       </CardHeader>
 
-      <CardContent>
+      <CardContent className="px-4 md:px-6">
         <Label className="mb-4">{localization.settings.theme}</Label>
 
         <RadioGroup
-          value={hydrated ? theme : undefined}
+          value={hydrated ? theme : ""}
           onValueChange={setTheme}
-          disabled={!hydrated || !theme}
           className="grid gap-4 md:grid-cols-2 lg:grid-cols-3"
         >
           {themes.includes("system") && (
-            <label
-              htmlFor="theme-system"
-              className={cn(
-                "group relative flex cursor-pointer flex-col gap-4 rounded-xl border px-5 py-4 transition-all",
-                "hover:bg-accent/50 has-[:disabled]:cursor-not-allowed has-[:disabled]:opacity-50",
-                hydrated && theme === "system"
-                  ? "border-primary bg-primary/10"
-                  : "border-border"
-              )}
-            >
-              <RadioGroupItem
-                id="theme-system"
-                value="system"
-                className="absolute top-3 right-3 size-5"
-              />
+            <FieldLabel htmlFor="system">
+              <Field orientation="horizontal">
+                <FieldContent className="gap-3">
+                  <FieldTitle>
+                    <Monitor className="size-4 text-muted-foreground" />
+                    {localization.settings.system}
+                  </FieldTitle>
 
-              <div className="flex flex-col gap-3">
-                <Label className="pointer-events-none flex cursor-pointer items-center gap-2 font-medium">
-                  <Monitor className="size-4 text-muted-foreground" />
-                  {localization.settings.system}
-                </Label>
+                  <ThemePreviewSystem className="w-full" />
+                </FieldContent>
 
-                <ThemePreviewSystem className="w-full" />
-              </div>
-            </label>
+                <RadioGroupItem value="system" id="system" />
+              </Field>
+            </FieldLabel>
           )}
 
           {themes.includes("light") && (
-            <label
-              htmlFor="theme-light"
-              className={cn(
-                "group relative flex cursor-pointer flex-col gap-4 rounded-xl border px-5 py-4 transition-all",
-                "hover:bg-accent/50 has-[:disabled]:cursor-not-allowed has-[:disabled]:opacity-50",
-                hydrated && theme === "light"
-                  ? "border-primary bg-primary/10"
-                  : "border-border"
-              )}
-            >
-              <RadioGroupItem
-                id="theme-light"
-                value="light"
-                className="absolute top-3 right-3 size-5"
-              />
+            <FieldLabel htmlFor="light">
+              <Field orientation="horizontal">
+                <FieldContent className="gap-3">
+                  <FieldTitle>
+                    <Sun className="size-4 text-muted-foreground" />
 
-              <div className="flex flex-col gap-3">
-                <Label className="pointer-events-none flex cursor-pointer items-center gap-2 font-medium">
-                  <Sun className="size-4 text-muted-foreground" />
-                  {localization.settings.light}
-                </Label>
+                    {localization.settings.light}
+                  </FieldTitle>
 
-                <ThemePreviewLight className="w-full" />
-              </div>
-            </label>
+                  <ThemePreviewLight className="w-full" />
+                </FieldContent>
+
+                <RadioGroupItem value="light" id="light" />
+              </Field>
+            </FieldLabel>
           )}
 
           {themes.includes("dark") && (
-            <label
-              htmlFor="theme-dark"
-              className={cn(
-                "group relative flex cursor-pointer flex-col gap-4 rounded-xl border px-5 py-4 transition-all",
-                "hover:bg-accent/50 has-[:disabled]:cursor-not-allowed has-[:disabled]:opacity-50",
-                hydrated && theme === "dark"
-                  ? "border-primary bg-primary/10"
-                  : "border-border"
-              )}
-            >
-              <RadioGroupItem
-                id="theme-dark"
-                value="dark"
-                className="absolute top-3 right-3 size-5"
-              />
+            <FieldLabel htmlFor="dark">
+              <Field orientation="horizontal">
+                <FieldContent className="gap-3">
+                  <FieldTitle>
+                    <Moon className="size-4 text-muted-foreground" />
 
-              <div className="flex flex-col gap-3">
-                <Label className="pointer-events-none flex cursor-pointer items-center gap-2 font-medium">
-                  <Moon className="size-4 text-muted-foreground" />
-                  {localization.settings.dark}
-                </Label>
+                    {localization.settings.dark}
+                  </FieldTitle>
+                  <ThemePreviewDark className="w-full" />
+                </FieldContent>
 
-                <ThemePreviewDark className="w-full" />
-              </div>
-            </label>
+                <RadioGroupItem value="dark" id="dark" />
+              </Field>
+            </FieldLabel>
           )}
         </RadioGroup>
       </CardContent>

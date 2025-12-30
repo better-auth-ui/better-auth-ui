@@ -1,6 +1,6 @@
 import { UserButton } from "@better-auth-ui/shadcn"
 import { Link } from "@tanstack/react-router"
-
+import { Suspense } from "react"
 import { Logo } from "./logo"
 
 export function Header() {
@@ -13,7 +13,9 @@ export function Header() {
           <h1 className="text-base">BETTER-AUTH. UI</h1>
         </Link>
 
-        <UserButton size="icon" align="end" />
+        <Suspense>
+          <UserButton size="icon" align="end" />
+        </Suspense>
       </div>
     </header>
   )
