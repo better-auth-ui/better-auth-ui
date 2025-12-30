@@ -134,57 +134,6 @@ export function UserButton({
                 <Label>{localization.settings.settings}</Label>
               </Dropdown.Item>
 
-              {themeToggle && theme && setTheme && themes?.length && (
-                <Dropdown.Item className="py-1 pe-2">
-                  <Label>{localization.settings.theme}</Label>
-
-                  <Tabs
-                    className="ml-auto"
-                    hideSeparator
-                    selectedKey={theme}
-                    onSelectionChange={(key) => setTheme(key as string)}
-                  >
-                    <Tabs.ListContainer>
-                      <Tabs.List
-                        aria-label={localization.settings.theme}
-                        className="*:h-5 *:w-5 *:p-0"
-                      >
-                        {themes.includes("system") && (
-                          <Tabs.Tab
-                            id="system"
-                            aria-label={localization.settings.system}
-                          >
-                            <Display className="size-3" />
-
-                            <Tabs.Indicator />
-                          </Tabs.Tab>
-                        )}
-                        {themes.includes("light") && (
-                          <Tabs.Tab
-                            id="light"
-                            aria-label={localization.settings.light}
-                          >
-                            <Sun className="size-3" />
-
-                            <Tabs.Indicator />
-                          </Tabs.Tab>
-                        )}
-                        {themes.includes("dark") && (
-                          <Tabs.Tab
-                            id="dark"
-                            aria-label={localization.settings.dark}
-                          >
-                            <Moon className="size-3" />
-
-                            <Tabs.Indicator />
-                          </Tabs.Tab>
-                        )}
-                      </Tabs.List>
-                    </Tabs.ListContainer>
-                  </Tabs>
-                </Dropdown.Item>
-              )}
-
               {multiSession && (
                 <Dropdown.SubmenuTrigger>
                   <Dropdown.Item textValue={localization.auth.switchAccount}>
@@ -237,6 +186,57 @@ export function UserButton({
                     </Dropdown.Menu>
                   </Dropdown.Popover>
                 </Dropdown.SubmenuTrigger>
+              )}
+
+              {themeToggle && theme && setTheme && themes?.length && (
+                <Dropdown.Item className="py-1 pe-2">
+                  <Label>{localization.settings.theme}</Label>
+
+                  <Tabs
+                    className="ml-auto"
+                    hideSeparator
+                    selectedKey={theme}
+                    onSelectionChange={(key) => setTheme(key as string)}
+                  >
+                    <Tabs.ListContainer>
+                      <Tabs.List
+                        aria-label={localization.settings.theme}
+                        className="*:h-5 *:w-5 *:p-0"
+                      >
+                        {themes.includes("system") && (
+                          <Tabs.Tab
+                            id="system"
+                            aria-label={localization.settings.system}
+                          >
+                            <Display className="size-3" />
+
+                            <Tabs.Indicator />
+                          </Tabs.Tab>
+                        )}
+                        {themes.includes("light") && (
+                          <Tabs.Tab
+                            id="light"
+                            aria-label={localization.settings.light}
+                          >
+                            <Sun className="size-3" />
+
+                            <Tabs.Indicator />
+                          </Tabs.Tab>
+                        )}
+                        {themes.includes("dark") && (
+                          <Tabs.Tab
+                            id="dark"
+                            aria-label={localization.settings.dark}
+                          >
+                            <Moon className="size-3" />
+
+                            <Tabs.Indicator />
+                          </Tabs.Tab>
+                        )}
+                      </Tabs.List>
+                    </Tabs.ListContainer>
+                  </Tabs>
+                </Dropdown.Item>
               )}
 
               <Separator />
