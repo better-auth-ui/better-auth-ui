@@ -10,7 +10,7 @@ import { Appearance } from "@better-auth-ui/heroui"
 
 function RouteComponent() {
   return (
-    <div className="container mx-auto p-4 md:p-6">
+    <div className="container mx-auto my-auto p-4 md:p-6">
       <Appearance />
     </div>
   )
