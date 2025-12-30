@@ -10,7 +10,7 @@ import {
 } from "@heroui/react"
 import { useAuth } from "../../../hooks/use-auth"
 
-export type ThemeSelectorProps = AnyAuthConfig & {
+export type AppearanceProps = AnyAuthConfig & {
   className?: string
 }
 
@@ -297,7 +297,7 @@ function ThemePreviewDark(props: React.SVGProps<SVGSVGElement>) {
  * @param config - Auth-related props forwarded to access theme settings.
  * @returns A JSX element containing the theme selector card, or null if theme settings are not configured.
  */
-export function Appearance({ className, ...config }: ThemeSelectorProps) {
+export function Appearance({ className, ...config }: AppearanceProps) {
   const context = useAuth(config)
   const {
     localization,
