@@ -20,6 +20,7 @@
     "settings/account/account-settings",
     "settings/account/user-profile",
     "settings/account/change-email",
+    "settings/account/appearance",
     "settings/account/accounts",
     "settings/security/security-settings",
     "settings/security/change-password",

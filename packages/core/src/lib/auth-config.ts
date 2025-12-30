@@ -43,6 +43,36 @@ export type EmailAndPasswordConfig = {
 }
 
 /**
+ * Available theme options for the application.
+ */
+export type Theme = "system" | "light" | "dark"
+
+/**
+ * Configuration options for user settings.
+ */
+export type SettingsConfig = {
+  /**
+   * Whether the settings section is enabled
+   * @default true
+   */
+  enabled?: boolean
+  /**
+   * Function to set the application theme
+   * @param theme - The theme value to set
+   */
+  setTheme?: (theme: string) => void
+  /**
+   * Current theme value
+   */
+  theme?: string
+  /**
+   * Available theme options to display in the theme switcher
+   * @default ["system", "light", "dark"]
+   */
+  themes?: Theme[]
+}
+
+/**
  * Core authentication configuration interface.
  *
  * Defines the base structure for authentication settings including paths,
@@ -89,6 +119,11 @@ export interface AuthConfig {
    */
   redirectTo: string
   /**
+   * Settings section configuration
+   * @default { enabled: true }
+   */
+  settings: SettingsConfig
+  /**
    * List of enabled social authentication providers
    * @remarks `SocialProvider[]`
    */
@@ -123,6 +158,10 @@ export const defaultConfig: AuthConfig = {
     maxPasswordLength: 128
   },
   redirectTo: "/",
+  settings: {
+    enabled: true,
+    themes: ["system", "light", "dark"]
+  },
   viewPaths,
   localization,
   navigate: (path: string) => {

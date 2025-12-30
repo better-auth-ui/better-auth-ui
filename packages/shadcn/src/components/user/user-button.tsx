@@ -7,7 +7,10 @@ import {
   CirclePlus,
   LogIn,
   LogOut,
+  Monitor,
+  Moon,
   Settings,
+  Sun,
   UserPlus2,
   UsersRound
 } from "lucide-react"
@@ -23,6 +26,7 @@ import {
   DropdownMenuSubTrigger,
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu"
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useAuth } from "@/hooks/auth/use-auth"
 import { useSession } from "@/hooks/auth/use-session"
 import { useListDeviceSessions } from "@/hooks/settings/use-list-device-sessions"
@@ -36,6 +40,7 @@ export type UserButtonProps = AnyAuthConfig & {
   align?: "center" | "end" | "start" | undefined
   sideOffset?: number
   size?: "default" | "icon"
+  themeToggle?: boolean
   variant?:
     | "default"
     | "destructive"
@@ -53,11 +58,19 @@ export function UserButton({
   align,
   sideOffset,
   size = "default",
+  themeToggle = true,
   variant = "ghost",
   ...config
 }: UserButtonProps) {
   const context = useAuth(config)
-  const { basePaths, viewPaths, localization, multiSession, Link } = context
+  const {
+    basePaths,
+    viewPaths,
+    localization,
+    multiSession,
+    Link,
+    settings: { theme, setTheme, themes }
+  } = context
 
   const { data: sessionData, isPending: sessionPending } = useSession(context)
   const { data: deviceSessions } = useListDeviceSessions(context)
@@ -167,6 +180,51 @@ export function UserButton({
             )}
 
             <DropdownMenuSeparator />
+
+            {themeToggle && theme && setTheme && themes?.length && (
+              <>
+                <DropdownMenuItem
+                  className="justify-between py-0.75 hover:bg-transparent! cursor-default!"
+                  onSelect={(e) => e.preventDefault()}
+                >
+                  {localization.settings.theme}
+
+                  <Tabs value={theme} onValueChange={setTheme}>
+                    <TabsList className="h-6">
+                      {themes.includes("system") && (
+                        <TabsTrigger
+                          value="system"
+                          className="size-5 p-0"
+                          aria-label={localization.settings.system}
+                        >
+                          <Monitor className="size-3" />
+                        </TabsTrigger>
+                      )}
+                      {themes.includes("light") && (
+                        <TabsTrigger
+                          value="light"
+                          className="size-5 p-0"
+                          aria-label={localization.settings.light}
+                        >
+                          <Sun className="size-3" />
+                        </TabsTrigger>
+                      )}
+                      {themes.includes("dark") && (
+                        <TabsTrigger
+                          value="dark"
+                          className="size-5 p-0"
+                          aria-label={localization.settings.dark}
+                        >
+                          <Moon className="size-3" />
+                        </TabsTrigger>
+                      )}
+                    </TabsList>
+                  </Tabs>
+                </DropdownMenuItem>
+
+                <DropdownMenuSeparator />
+              </>
+            )}
 
             <DropdownMenuItem asChild>
               <Link href={`${basePaths.auth}/${viewPaths.auth.signOut}`}>

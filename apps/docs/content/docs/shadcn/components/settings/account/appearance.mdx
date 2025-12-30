@@ -1,0 +1,56 @@
+---
+title: <Appearance />
+description: A theme selector card with visual theme previews for system, light, and dark themes.
+---
+
+## Usage
+
+<Demo src="/demos/shadcn/settings/account/appearance" className="h-[32rem] md:h-[36rem]" />
+
+<Tabs groupId="shadcn-installation" items={["Registry", "Package"]}>
+  <Tab value="Registry">
+```tsx file=<rootDir>/src/routes/demos/shadcn/registry/settings/account/appearance.txt#L7-
+```
+  </Tab>
+  <Tab value="Package">
+```tsx file=<rootDir>/src/routes/demos/shadcn/settings/account/appearance.tsx#L7-
+```
+  </Tab>
+</Tabs>
+
+## Installation
+
+```npm
+npx shadcn@latest add https://better-auth-ui.com/r/appearance.json
+```
+
+## Theme Configuration
+
+The Appearance component requires theme settings to be configured in your `AuthUIProvider`. Without these settings, the component will not render.
+
+```tsx
+import { AuthUIProvider } from "@better-auth-ui/react"
+import { useTheme } from "next-themes"
+
+function Providers({ children }: { children: React.ReactNode }) {
+  const { theme, setTheme } = useTheme()
+
+  return (
+    <AuthUIProvider
+      settings={{
+        theme,
+        setTheme,
+        themes: ["system", "light", "dark"]
+      }}
+      // ... other props
+    >
+      {children}
+    </AuthUIProvider>
+  )
+}
+```
+
+## Props
+
+<auto-type-table path="../../../../../../../../packages/shadcn/src/components/settings/account/appearance.tsx" name="AppearanceProps" />
+
