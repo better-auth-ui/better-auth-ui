@@ -16,7 +16,7 @@ import { UserView } from "@/components/user/user-view"
 import { useAuth } from "@/hooks/auth/use-auth"
 import { useSession } from "@/hooks/auth/use-session"
 import { useListDeviceSessions } from "@/hooks/settings/use-list-device-sessions"
-import { useRevokeSession } from "@/hooks/settings/use-revoke-session"
+import { useRevokeMultiSession } from "@/hooks/settings/use-revoke-multi-session"
 import { useSetActiveSession } from "@/hooks/settings/use-set-active-session"
 import { cn } from "@/lib/utils"
 
@@ -40,7 +40,7 @@ export function Accounts({ className, ...config }: AccountsProps) {
   const { data: deviceSessions, isPending } = useListDeviceSessions(context)
   const { settingActiveSession, setActiveSession } =
     useSetActiveSession(context)
-  const { revokingSession, revokeSession } = useRevokeSession(context)
+  const { revokingSession, revokeSession } = useRevokeMultiSession(context)
 
   return (
     <Card className={cn("w-full py-4 md:py-6 gap-4 md:gap-6", className)}>

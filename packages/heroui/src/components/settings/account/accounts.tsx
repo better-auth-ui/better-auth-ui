@@ -1,7 +1,7 @@
 import {
   type AnyAuthConfig,
   useListDeviceSessions,
-  useRevokeSession,
+  useRevokeMultiSession,
   useSession,
   useSetActiveSession
 } from "@better-auth-ui/react"
@@ -35,7 +35,7 @@ export function Accounts({ className, ...config }: AccountsProps) {
   const { data: deviceSessions, isPending } = useListDeviceSessions(context)
   const { settingActiveSession, setActiveSession } =
     useSetActiveSession(context)
-  const { revokingSession, revokeSession } = useRevokeSession(context)
+  const { revokingSession, revokeSession } = useRevokeMultiSession(context)
 
   return (
     <Card className={cn("p-4 md:p-6 gap-4 md:gap-6", className)}>

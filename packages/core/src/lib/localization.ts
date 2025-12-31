@@ -134,6 +134,9 @@ export const localization = {
     /** @remarks `"Connected Accounts"` */
     connectedAccounts: "Connected Accounts",
 
+    /** @remarks `"Current Session"` */
+    currentSession: "Current Session",
+
     /** @remarks `"Connect {{provider}}"` */
     connectProvider: "Connect {{provider}}",
 
@@ -170,11 +173,20 @@ export const localization = {
     /** @remarks `"Profile updated successfully"` */
     profileUpdatedSuccess: "Profile updated successfully",
 
+    /** @remarks `"Revoke Session"` */
+    revokeSession: "Revoke Session",
+
+    /** @remarks `"Session revoked successfully"` */
+    revokeSessionSuccess: "Session revoked successfully",
+
     /** @remarks `"Save changes"` */
     saveChanges: "Save changes",
 
     /** @remarks `"Security"` */
     security: "Security",
+
+    /** @remarks `"Sessions"` */
+    sessions: "Sessions",
 
     /** @remarks `"Settings"` */
     settings: "Settings",

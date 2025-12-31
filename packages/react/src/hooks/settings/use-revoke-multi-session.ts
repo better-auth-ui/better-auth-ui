@@ -4,13 +4,13 @@ import { useCallback, useState } from "react"
 import { useAuth } from "../auth/use-auth"
 
 /**
- * Provides functionality to revoke an active session.
- * This is used to revoke sessions from the sessions list (devices where user is logged in).
+ * Provides functionality to revoke a session from device sessions in multi-session mode.
+ * This is used for the multi-session plugin where users can have multiple accounts on the same device.
  *
  * @param config - Optional auth configuration forwarded to the auth hook
  * @returns An object containing the revoking session token and a function to revoke a session
  */
-export function useRevokeSession(config?: AnyAuthConfig) {
+export function useRevokeMultiSession(config?: AnyAuthConfig) {
   const { authClient, queryClient, toast } = useAuth(config)
 
   const [revokingSession, setRevokingSession] = useState<string | null>(null)
@@ -19,8 +19,8 @@ export function useRevokeSession(config?: AnyAuthConfig) {
     async (sessionToken: string) => {
       setRevokingSession(sessionToken)
 
-      const { error } = await authClient.revokeSession({
-        token: sessionToken
+      const { error } = await authClient.multiSession.revoke({
+        sessionToken
       })
 
       if (error) {
@@ -36,3 +36,4 @@ export function useRevokeSession(config?: AnyAuthConfig) {
 
   return { revokingSession, revokeSession }
 }
+

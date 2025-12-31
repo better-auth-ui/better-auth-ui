@@ -48,7 +48,8 @@
     "@better-auth-ui/core": "*",
     "@better-auth-ui/react": "*",
     "clsx": "^2.1.1",
-    "tailwind-merge": "^3.1.0"
+    "tailwind-merge": "^3.1.0",
+    "ua-parser-js": "^2.0.3"
   },
   "peerDependencies": {
     "@gravity-ui/icons": ">=2.16.0",

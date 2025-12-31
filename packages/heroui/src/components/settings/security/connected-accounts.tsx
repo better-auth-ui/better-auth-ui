@@ -85,7 +85,7 @@ export function ConnectedAccounts({
                       </span>
 
                       {account.accountId && (
-                        <span className="text-xs text-foreground-2">
+                        <span className="text-xs text-muted">
                           {account.accountId}
                         </span>
                       )}
@@ -133,11 +133,11 @@ export function ConnectedAccounts({
                     </div>
 
                     <div className="flex flex-col">
-                      <span className="text-sm font-medium text-foreground-2">
+                      <span className="text-sm font-medium">
                         {providerName}
                       </span>
 
-                      <span className="text-xs text-foreground-3">
+                      <span className="text-xs text-muted">
                         {localization.settings.connectProvider.replace(
                           "{{provider}}",
                           providerName
