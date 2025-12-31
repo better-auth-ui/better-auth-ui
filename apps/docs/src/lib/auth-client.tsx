@@ -3,6 +3,10 @@ import { createAuthClient } from "better-auth/react"
 const customFetchImpl: typeof fetch = async (input, _init) => {
   const endpoint = (input as URL).pathname
 
+  if (endpoint === "/api/auth/list-accounts") {
+    return new Response(JSON.stringify([]))
+  }
+
   if (endpoint === "/api/auth/get-session") {
     return new Response(
       JSON.stringify({

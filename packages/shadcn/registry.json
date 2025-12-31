@@ -843,12 +843,7 @@
         "better-auth",
         "lucide-react"
       ],
-      "registryDependencies": [
-        "button",
-        "card",
-        "skeleton",
-        "spinner"
-      ],
+      "registryDependencies": ["button", "card", "skeleton", "spinner"],
       "files": [
         {
           "path": "src/components/settings/security/connected-accounts.tsx",
