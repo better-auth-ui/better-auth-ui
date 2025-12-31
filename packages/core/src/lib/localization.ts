@@ -125,8 +125,17 @@ export const localization = {
     accountsDescription:
       "Manage the accounts you're currently signed in to on this device.",
 
+    /** @remarks `"Account unlinked"` */
+    accountUnlinked: "Account unlinked",
+
     /** @remarks `"Active"` */
     active: "Active",
+
+    /** @remarks `"Connected Accounts"` */
+    connectedAccounts: "Connected Accounts",
+
+    /** @remarks `"Connect {{provider}}"` */
+    connectProvider: "Connect {{provider}}",
 
     /** @remarks `"Appearance"` */
     appearance: "Appearance",
@@ -175,6 +184,9 @@ export const localization = {
 
     /** @remarks `"Theme"` */
     theme: "Theme",
+
+    /** @remarks `"Unlink {{provider}}"` */
+    unlinkProvider: "Unlink {{provider}}",
 
     /** @remarks `"Update Email"` */
     updateEmail: "Update Email",

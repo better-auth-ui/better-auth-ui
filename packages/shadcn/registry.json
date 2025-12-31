@@ -815,9 +815,9 @@
       "name": "security-settings",
       "type": "registry:component",
       "title": "Security Settings",
-      "description": "A container component that displays security settings including password management.",
+      "description": "A container component that displays security settings including password management and connected accounts.",
       "dependencies": ["@better-auth-ui/react@*"],
-      "registryDependencies": ["change-password"],
+      "registryDependencies": ["change-password", "connected-accounts"],
       "files": [
         {
           "path": "src/components/settings/security/security-settings.tsx",
@@ -826,6 +826,64 @@
         {
           "path": "src/components/settings/security/change-password.tsx",
           "type": "registry:component"
+        },
+        {
+          "path": "src/components/settings/security/connected-accounts.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "connected-accounts",
+      "type": "registry:component",
+      "title": "Connected Accounts",
+      "description": "Display and manage connected social accounts. Shows all linked social accounts with the ability to unlink them, followed by available providers that can be linked.",
+      "dependencies": [
+        "@better-auth-ui/react@*",
+        "better-auth",
+        "lucide-react"
+      ],
+      "registryDependencies": ["button", "card", "skeleton", "spinner"],
+      "files": [
+        {
+          "path": "src/components/settings/security/connected-accounts.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/hooks/auth/use-auth.tsx",
+          "type": "registry:hook"
+        },
+        {
+          "path": "src/hooks/auth/use-session.ts",
+          "type": "registry:hook"
+        },
+        {
+          "path": "../react/src/hooks/auth/use-session.tsx",
+          "type": "registry:hook"
+        },
+        {
+          "path": "src/hooks/settings/use-link-social.ts",
+          "type": "registry:hook"
+        },
+        {
+          "path": "src/hooks/settings/use-list-accounts.ts",
+          "type": "registry:hook"
+        },
+        {
+          "path": "src/hooks/settings/use-unlink-account.ts",
+          "type": "registry:hook"
+        },
+        {
+          "path": "../react/src/hooks/settings/use-link-social.ts",
+          "type": "registry:hook"
+        },
+        {
+          "path": "../react/src/hooks/settings/use-list-accounts.ts",
+          "type": "registry:hook"
+        },
+        {
+          "path": "../react/src/hooks/settings/use-unlink-account.ts",
+          "type": "registry:hook"
         }
       ]
     }

@@ -10,6 +10,7 @@ export function DemoProviders({ children }: { children: React.ReactNode }) {
         multiSession
         navigate={() => {}}
         replace={() => {}}
+        socialProviders={["github", "google"]}
         settings={{
           theme: "system",
           setTheme: () => {}

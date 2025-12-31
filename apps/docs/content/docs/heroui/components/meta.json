@@ -24,6 +24,7 @@
     "settings/account/accounts",
     "settings/security/security-settings",
     "settings/security/change-password",
+    "settings/security/connected-accounts",
     "---Email---",
     "email/email-verification-email",
     "email/magic-link-email",
