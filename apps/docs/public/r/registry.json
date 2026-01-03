@@ -52,6 +52,14 @@
         {
           "path": "../react/src/hooks/auth/use-sign-in-social.ts",
           "type": "registry:hook"
+        },
+        {
+          "path": "../react/src/hooks/auth/use-redirect-to.ts",
+          "type": "registry:hook"
+        },
+        {
+          "path": "../react/src/hooks/use-hydrated.ts",
+          "type": "registry:hook"
         }
       ]
     },
@@ -98,6 +106,14 @@
         {
           "path": "../react/src/hooks/auth/use-sign-in-social.ts",
           "type": "registry:hook"
+        },
+        {
+          "path": "../react/src/hooks/auth/use-redirect-to.ts",
+          "type": "registry:hook"
+        },
+        {
+          "path": "../react/src/hooks/use-hydrated.ts",
+          "type": "registry:hook"
         }
       ]
     },
@@ -143,6 +159,14 @@
         },
         {
           "path": "../react/src/hooks/auth/use-sign-in-social.ts",
+          "type": "registry:hook"
+        },
+        {
+          "path": "../react/src/hooks/auth/use-redirect-to.ts",
+          "type": "registry:hook"
+        },
+        {
+          "path": "../react/src/hooks/use-hydrated.ts",
           "type": "registry:hook"
         }
       ]
@@ -741,18 +765,6 @@
           "type": "registry:hook"
         },
         {
-          "path": "src/hooks/settings/use-list-device-sessions.ts",
-          "type": "registry:hook"
-        },
-        {
-          "path": "src/hooks/settings/use-set-active-session.ts",
-          "type": "registry:hook"
-        },
-        {
-          "path": "src/hooks/settings/use-revoke-session.ts",
-          "type": "registry:hook"
-        },
-        {
           "path": "../react/src/hooks/settings/use-list-device-sessions.ts",
           "type": "registry:hook"
         },
@@ -761,7 +773,7 @@
           "type": "registry:hook"
         },
         {
-          "path": "../react/src/hooks/settings/use-revoke-session.ts",
+          "path": "../react/src/hooks/settings/use-revoke-multi-session.ts",
           "type": "registry:hook"
         }
       ]
@@ -843,12 +855,7 @@
         "better-auth",
         "lucide-react"
       ],
-      "registryDependencies": [
-        "button",
-        "card",
-        "skeleton",
-        "spinner"
-      ],
+      "registryDependencies": ["button", "card", "skeleton", "spinner"],
       "files": [
         {
           "path": "src/components/settings/security/connected-accounts.tsx",

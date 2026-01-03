@@ -52,6 +52,14 @@
         {
           "path": "../react/src/hooks/auth/use-sign-in-social.ts",
           "type": "registry:hook"
+        },
+        {
+          "path": "../react/src/hooks/auth/use-redirect-to.ts",
+          "type": "registry:hook"
+        },
+        {
+          "path": "../react/src/hooks/use-hydrated.ts",
+          "type": "registry:hook"
         }
       ]
     },
@@ -98,6 +106,14 @@
         {
           "path": "../react/src/hooks/auth/use-sign-in-social.ts",
           "type": "registry:hook"
+        },
+        {
+          "path": "../react/src/hooks/auth/use-redirect-to.ts",
+          "type": "registry:hook"
+        },
+        {
+          "path": "../react/src/hooks/use-hydrated.ts",
+          "type": "registry:hook"
         }
       ]
     },
@@ -143,6 +159,14 @@
         },
         {
           "path": "../react/src/hooks/auth/use-sign-in-social.ts",
+          "type": "registry:hook"
+        },
+        {
+          "path": "../react/src/hooks/auth/use-redirect-to.ts",
+          "type": "registry:hook"
+        },
+        {
+          "path": "../react/src/hooks/use-hydrated.ts",
           "type": "registry:hook"
         }
       ]
