@@ -18,7 +18,7 @@ export function useListAccounts(
 
   return useQuery(
     {
-      queryKey: ["auth", "listAccounts", sessionData?.session.id],
+      queryKey: ["auth", "listAccounts"],
       queryFn: () =>
         authClient.listAccounts({
           fetchOptions: { throw: true }

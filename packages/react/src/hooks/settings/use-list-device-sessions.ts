@@ -18,12 +18,7 @@ export function useListDeviceSessions(
 
   return useQuery(
     {
-      queryKey: [
-        "auth",
-        "multiSession",
-        "listDeviceSessions",
-        sessionData?.session.id
-      ],
+      queryKey: ["auth", "multiSession", "listDeviceSessions"],
       queryFn: async () =>
         authClient.multiSession.listDeviceSessions({
           fetchOptions: { throw: true }

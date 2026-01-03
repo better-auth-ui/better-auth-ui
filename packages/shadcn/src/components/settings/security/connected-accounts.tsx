@@ -10,7 +10,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Spinner } from "@/components/ui/spinner"
 import { useAuth } from "@/hooks/auth/use-auth"
-import { useSession } from "@/hooks/auth/use-session"
 import { useLinkSocial } from "@/hooks/settings/use-link-social"
 import { useListAccounts } from "@/hooks/settings/use-list-accounts"
 import { useUnlinkAccount } from "@/hooks/settings/use-unlink-account"
@@ -35,24 +34,9 @@ export function ConnectedAccounts({
   const context = useAuth(config)
   const { localization, socialProviders } = context
 
-  const { data: sessionData } = useSession(context)
-  const { data: accounts, isPending: isLoadingAccounts } =
-    useListAccounts(context)
+  const { data: accounts, isPending } = useListAccounts(context)
   const { linkSocial, linkingProvider } = useLinkSocial(context)
   const { unlinkAccount, unlinkingProvider } = useUnlinkAccount(context)
-
-  // Get list of providers that are not yet connected
-  const availableProviders =
-    socialProviders?.filter(
-      (provider) =>
-        !accounts?.some((account) => account.providerId === provider)
-    ) || []
-
-  // Get list of connected accounts (excluding credential provider)
-  const connectedAccounts =
-    accounts?.filter((account) => account.providerId !== "credential") || []
-
-  const isLoading = !sessionData || isLoadingAccounts
 
   return (
     <Card className={cn("w-full py-4 md:py-6 gap-4 md:gap-6", className)}>
@@ -63,66 +47,66 @@ export function ConnectedAccounts({
       </CardHeader>
 
       <CardContent className="px-4 md:px-6 grid gap-3">
-        {/* Connected Accounts */}
-        {isLoading ? (
+        {isPending ? (
           <AccountRowSkeleton />
         ) : (
           <>
-            {connectedAccounts.map((account) => {
-              const ProviderIcon = providerIcons[account.providerId]
-              const providerName = getProviderName(account.providerId)
-              const isCurrentlyUnlinking =
-                unlinkingProvider === account.providerId
+            {accounts
+              ?.filter((account) => account.providerId !== "credential")
+              .map((account) => {
+                const ProviderIcon = providerIcons[account.providerId]
+                const providerName = getProviderName(account.providerId)
+                const isCurrentlyUnlinking =
+                  unlinkingProvider === account.providerId
 
-              return (
-                <div
-                  key={account.id}
-                  className="flex items-center rounded-lg border p-3 justify-between"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="flex size-10 items-center justify-center rounded-md bg-muted">
-                      {ProviderIcon && <ProviderIcon className="size-5" />}
-                    </div>
-
-                    <div className="flex flex-col">
-                      <span className="text-sm font-medium">
-                        {providerName}
-                      </span>
-
-                      {account.accountId && (
-                        <span className="text-xs text-muted-foreground">
-                          {account.accountId}
-                        </span>
-                      )}
-                    </div>
-                  </div>
-
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => unlinkAccount(account.providerId)}
-                    disabled={
-                      isCurrentlyUnlinking ||
-                      !!unlinkingProvider ||
-                      !!linkingProvider
-                    }
-                    aria-label={localization.settings.unlinkProvider.replace(
-                      "{{provider}}",
-                      providerName
-                    )}
+                return (
+                  <div
+                    key={account.id}
+                    className="flex items-center rounded-lg border p-3 justify-between"
                   >
-                    {isCurrentlyUnlinking ? (
-                      <Spinner className="size-4" />
-                    ) : (
-                      <X className="size-4" />
-                    )}
-                  </Button>
-                </div>
-              )
-            })}
+                    <div className="flex items-center gap-3">
+                      <div className="flex size-10 items-center justify-center rounded-md bg-muted">
+                        {ProviderIcon && <ProviderIcon className="size-5" />}
+                      </div>
 
-            {/* Available Providers to Connect */}
-            {availableProviders.map((provider) => {
+                      <div className="flex flex-col">
+                        <span className="text-sm font-medium">
+                          {providerName}
+                        </span>
+
+                        {account.accountId && (
+                          <span className="text-xs text-muted-foreground">
+                            {account.accountId}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => unlinkAccount(account.providerId)}
+                      disabled={
+                        isCurrentlyUnlinking ||
+                        !!unlinkingProvider ||
+                        !!linkingProvider
+                      }
+                      aria-label={localization.settings.unlinkProvider.replace(
+                        "{{provider}}",
+                        providerName
+                      )}
+                    >
+                      {isCurrentlyUnlinking ? (
+                        <Spinner className="size-4" />
+                      ) : (
+                        <X className="size-4" />
+                      )}
+                    </Button>
+                  </div>
+                )
+              })}
+
+            {socialProviders?.map((provider) => {
               const ProviderIcon = providerIcons[provider]
               const providerName = getProviderName(provider)
               const isCurrentlyLinking = linkingProvider === provider

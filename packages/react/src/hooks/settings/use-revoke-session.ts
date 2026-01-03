@@ -2,6 +2,7 @@ import type { AnyAuthConfig } from "@better-auth-ui/react"
 import { useCallback, useState } from "react"
 
 import { useAuth } from "../auth/use-auth"
+import { useListSessions } from "./use-list-sessions"
 
 /**
  * Provides functionality to revoke an active session.
@@ -11,7 +12,8 @@ import { useAuth } from "../auth/use-auth"
  * @returns An object containing the revoking session token and a function to revoke a session
  */
 export function useRevokeSession(config?: AnyAuthConfig) {
-  const { authClient, queryClient, toast } = useAuth(config)
+  const { authClient, toast } = useAuth(config)
+  const { refetch } = useListSessions(config)
 
   const [revokingSession, setRevokingSession] = useState<string | null>(null)
 
@@ -26,12 +28,12 @@ export function useRevokeSession(config?: AnyAuthConfig) {
       if (error) {
         toast.error(error.message || error.statusText)
       } else {
-        await queryClient.invalidateQueries({ queryKey: ["auth"] })
+        await refetch()
       }
 
       setRevokingSession(null)
     },
-    [authClient, queryClient, toast]
+    [authClient, refetch, toast]
   )
 
   return { revokingSession, revokeSession }

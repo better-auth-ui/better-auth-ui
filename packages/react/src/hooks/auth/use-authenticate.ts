@@ -1,7 +1,9 @@
-import { type AnyAuthConfig, useSession } from "@better-auth-ui/react"
+import type { AnyAuthConfig } from "@better-auth-ui/react"
 import type { DefinedInitialDataOptions } from "@tanstack/react-query"
 import { useEffect } from "react"
+
 import { useAuth } from "./use-auth"
+import { useSession } from "./use-session"
 
 /**
  * Redirects unauthenticated users to the sign-in page (preserving the current URL) and exposes the active auth session.

@@ -19,7 +19,7 @@ export function useListSessions(
 
   return useQuery(
     {
-      queryKey: ["auth", "listSessions", sessionData?.session.id],
+      queryKey: ["auth", "listSessions"],
       queryFn: async () =>
         authClient.listSessions({
           fetchOptions: { throw: true }
@@ -30,4 +30,3 @@ export function useListSessions(
     queryClient
   )
 }
-
