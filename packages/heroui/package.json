@@ -36,7 +36,7 @@
     "@types/react": "^19.2.7",
     "@vitejs/plugin-react": "^5.1.2",
     "@vitest/browser-playwright": "^4.0.16",
-    "better-auth": "^1.4.7",
+    "better-auth": "^1.4.10",
     "cpy-cli": "^6.0.0",
     "playwright": "^1.57.0",
     "react": "^19.2.3",
@@ -55,7 +55,7 @@
     "@gravity-ui/icons": ">=2.16.0",
     "@heroui/react": ">=3.0.0-beta.3",
     "@heroui/styles": ">=3.0.0-beta.3",
-    "better-auth": ">=1.4.6",
+    "better-auth": ">=1.4.10",
     "react": ">=18.0.0",
     "react-dom": ">=18.0.0",
     "sonner": ">=2.0.0"

@@ -13,7 +13,7 @@
     "@better-auth-ui/shadcn": "*",
     "@heroui/react": "^3.0.0-beta.3",
     "@heroui/styles": "^3.0.0-beta.3",
-    "better-auth": "^1.4.7",
+    "better-auth": "^1.4.10",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "lucide-react": "^0.562.0",
