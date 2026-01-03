@@ -100,7 +100,6 @@ export function SignIn({
                   <Input
                     placeholder={localization.auth.emailPlaceholder}
                     required
-                    disabled={isPending}
                   />
 
                   <FieldError className="text-wrap" />
@@ -113,6 +112,7 @@ export function SignIn({
                   name="password"
                   type="password"
                   autoComplete="current-password"
+                  isDisabled={isPending}
                 >
                   <div className="flex justify-between">
                     <Label>{localization.auth.password}</Label>
