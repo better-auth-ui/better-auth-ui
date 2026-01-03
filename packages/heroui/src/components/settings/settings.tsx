@@ -69,7 +69,7 @@ export function Settings({
             <Tabs.Tab
               id="account"
               href={`${basePaths.settings}/${viewPaths.settings.account}`}
-              className="gap-2 md:text-base"
+              className="gap-2"
             >
               <Person />
 
@@ -81,7 +81,7 @@ export function Settings({
             <Tabs.Tab
               id="security"
               href={`${basePaths.settings}/${viewPaths.settings.security}`}
-              className="gap-2 md:text-base"
+              className="gap-2"
             >
               <Shield />
 

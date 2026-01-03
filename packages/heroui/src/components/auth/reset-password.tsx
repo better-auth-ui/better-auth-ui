@@ -59,11 +59,7 @@ export function ResetPassword({ className, ...config }: ResetPasswordProps) {
       <Card.Content>
         <Form action={resetPassword}>
           <Fieldset className="gap-4">
-            <Fieldset.Legend className="text-xl">
-              {localization.auth.resetPassword}
-            </Fieldset.Legend>
-
-            <Description />
+            <Label className="text-xl">{localization.auth.resetPassword}</Label>
 
             <TextField
               defaultValue={password}

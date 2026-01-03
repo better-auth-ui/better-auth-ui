@@ -60,11 +60,7 @@ export function MagicLink({
     <Card className={cn("w-full max-w-sm p-4 md:p-6", className)}>
       <Card.Content>
         <Fieldset className="gap-4">
-          <Fieldset.Legend className="text-xl">
-            {localization.auth.signIn}
-          </Fieldset.Legend>
-
-          <Description />
+          <Label className="text-xl">{localization.auth.signIn}</Label>
 
           {socialPosition === "top" && (
             <>

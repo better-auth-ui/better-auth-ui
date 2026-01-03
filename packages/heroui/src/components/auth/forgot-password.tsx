@@ -38,11 +38,9 @@ export function ForgotPassword({ className, ...config }: ForgotPasswordProps) {
       <Card.Content>
         <Form action={forgotPassword}>
           <Fieldset className="gap-4">
-            <Fieldset.Legend className="text-xl">
+            <Label className="text-xl">
               {localization.auth.forgotPassword}
-            </Fieldset.Legend>
-
-            <Description />
+            </Label>
 
             <TextField
               defaultValue={email}
