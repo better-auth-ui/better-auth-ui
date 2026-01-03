@@ -27,20 +27,8 @@ export function Sessions({ className, ...config }: SessionsProps) {
   const { localization } = context
 
   const { data: sessionData } = useSession(context)
-  const { data: sessions, isPending: isLoadingSessions } =
-    useListSessions(context)
+  const { data: sessions, isPending } = useListSessions(context)
   const { revokingSession, revokeSession } = useRevokeSession(context)
-
-  const isLoading = !sessionData || isLoadingSessions
-
-  // Sort sessions so current session is first
-  const sortedSessions = sessions
-    ? [
-        ...(sessionData?.session ? [sessionData.session] : []),
-        ...sessions.filter((s) => s.token === sessionData?.session.token),
-        ...sessions.filter((s) => s.token !== sessionData?.session.token)
-      ]
-    : []
 
   return (
     <Card className={cn("p-4 md:p-6 gap-4 md:gap-6", className)}>
@@ -51,28 +39,29 @@ export function Sessions({ className, ...config }: SessionsProps) {
       </Card.Header>
 
       <Card.Content className="gap-3">
-        {isLoading ? (
+        {isPending ? (
           <SessionRowSkeleton />
         ) : (
-          sortedSessions.map((session) => {
-            const isCurrentSession =
-              session.token === sessionData?.session.token
-            const isRevoking = revokingSession === session.token
-            const ua = new UAParser(session.userAgent || "").getResult()
-            const isMobile =
-              ua.device.type === "mobile" ||
-              ua.device.type === "tablet" ||
-              ua.device.type === "wearable"
+          sessions
+            ?.toSorted((session) =>
+              session.id === sessionData?.session.id ? -1 : 1
+            )
+            .map((session) => {
+              const isCurrentSession =
+                session.token === sessionData?.session.token
+              const isRevoking = revokingSession === session.token
+              const ua = new UAParser(session.userAgent || "").getResult()
+              const isMobile =
+                ua.device.type === "mobile" ||
+                ua.device.type === "tablet" ||
+                ua.device.type === "wearable"
 
-            return (
-              <div
-                key={session.id}
-                className={cn(
-                  "flex items-center rounded-3xl border-2 p-3 justify-between border-default"
-                )}
-              >
-                <div className="flex items-center gap-3">
-                  <div className="flex size-10 items-center justify-center rounded-xl bg-default">
+              return (
+                <div
+                  key={session.id}
+                  className="flex items-center rounded-3xl border-2 p-3 gap-3 border-default"
+                >
+                  <div className="flex size-10 items-center justify-center rounded-xl bg-surface-secondary">
                     {isMobile ? (
                       <Smartphone className="size-5" />
                     ) : (
@@ -81,7 +70,7 @@ export function Sessions({ className, ...config }: SessionsProps) {
                   </div>
 
                   <div className="flex flex-col">
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-1.5">
                       <span className="text-sm font-medium truncate">
                         {ua.browser.name || "Unknown Browser"}
                         {ua.os.name ? `, ${ua.os.name}` : ""}
@@ -105,26 +94,25 @@ export function Sessions({ className, ...config }: SessionsProps) {
                       )}
                     </div>
                   </div>
-                </div>
 
-                <Button
-                  isIconOnly
-                  variant="ghost"
-                  size="sm"
-                  onPress={() => revokeSession(session.token)}
-                  isPending={isRevoking}
-                  isDisabled={!!revokingSession}
-                  aria-label={localization.settings.revokeSession}
-                >
-                  {isRevoking ? (
-                    <Spinner color="current" size="sm" />
-                  ) : (
-                    <ArrowRightFromSquare />
-                  )}
-                </Button>
-              </div>
-            )
-          })
+                  <Button
+                    isIconOnly
+                    className="ml-auto"
+                    variant="ghost"
+                    size="sm"
+                    onPress={() => revokeSession(session.token)}
+                    isPending={!!revokingSession}
+                    aria-label={localization.settings.revokeSession}
+                  >
+                    {isRevoking ? (
+                      <Spinner color="current" size="sm" />
+                    ) : (
+                      <ArrowRightFromSquare />
+                    )}
+                  </Button>
+                </div>
+              )
+            })
         )}
       </Card.Content>
     </Card>

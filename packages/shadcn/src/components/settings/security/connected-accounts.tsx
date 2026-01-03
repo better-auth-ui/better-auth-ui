@@ -48,8 +48,9 @@ export function ConnectedAccounts({
         !accounts?.some((account) => account.providerId === provider)
     ) || []
 
-  // Get list of connected accounts
-  const connectedAccounts = accounts || []
+  // Get list of connected accounts (excluding credential provider)
+  const connectedAccounts =
+    accounts?.filter((account) => account.providerId !== "credential") || []
 
   const isLoading = !sessionData || isLoadingAccounts
 
