@@ -24,7 +24,7 @@ export type SessionsProps = AnyAuthConfig & {
  */
 export function Sessions({ className, ...config }: SessionsProps) {
   const context = useAuth(config)
-  const { localization } = context
+  const { basePaths, localization, viewPaths, navigate } = context
 
   const { data: sessionData } = useSession(context)
   const { data: sessions, isPending } = useListSessions(context)
@@ -100,7 +100,13 @@ export function Sessions({ className, ...config }: SessionsProps) {
                     className="ml-auto"
                     variant="ghost"
                     size="sm"
-                    onPress={() => revokeSession(session.token)}
+                    onPress={() =>
+                      isCurrentSession
+                        ? navigate(
+                            `${basePaths.auth}/${viewPaths.auth.signOut}`
+                          )
+                        : revokeSession(session.token)
+                    }
                     isPending={!!revokingSession}
                     aria-label={localization.settings.revokeSession}
                   >

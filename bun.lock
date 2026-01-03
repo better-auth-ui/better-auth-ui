@@ -283,9 +283,6 @@
       "dependencies": {
         "@better-auth-ui/core": "*",
         "@better-auth-ui/react": "*",
-        "clsx": "^2.1.1",
-        "tailwind-merge": "^3.1.0",
-        "ua-parser-js": "^2.0.3",
       },
       "devDependencies": {
         "@gravity-ui/icons": "^2.16.0",
@@ -297,11 +294,14 @@
         "@vitejs/plugin-react": "^5.1.2",
         "@vitest/browser-playwright": "^4.0.16",
         "better-auth": "^1.4.10",
+        "clsx": "^2.1.1",
         "cpy-cli": "^6.0.0",
         "playwright": "^1.57.0",
         "react": "^19.2.3",
         "react-dom": "^19.2.3",
         "sonner": "^2.0.7",
+        "tailwind-merge": "^3.1.0",
+        "ua-parser-js": "^2.0.3",
         "vitest": "^4.0.16",
       },
       "peerDependencies": {
@@ -309,9 +309,12 @@
         "@heroui/react": ">=3.0.0-beta.3",
         "@heroui/styles": ">=3.0.0-beta.3",
         "better-auth": ">=1.4.10",
+        "clsx": ">=2.1.0",
         "react": ">=18.0.0",
         "react-dom": ">=18.0.0",
         "sonner": ">=2.0.0",
+        "tailwind-merge": ">=3.1.0",
+        "ua-parser-js": ">=2.0.3",
       },
     },
     "packages/react": {
