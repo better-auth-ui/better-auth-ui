@@ -36,4 +36,3 @@ export function useRevokeMultiSession(config?: AnyAuthConfig) {
 
   return { revokingSession, revokeSession }
 }
-

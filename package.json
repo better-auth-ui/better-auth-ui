@@ -14,7 +14,7 @@
     "examples/*"
   ],
   "devDependencies": {
-    "@biomejs/biome": "2.3.10",
+    "@biomejs/biome": "2.3.11",
     "@nx/js": "22.3.3",
     "@swc-node/register": "~1.11.1",
     "@swc/core": "~1.15.8",

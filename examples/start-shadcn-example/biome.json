@@ -8,7 +8,12 @@
   },
   "files": {
     "ignoreUnknown": true,
-    "includes": ["**", "!**/src/routeTree.gen.ts", "!**/src/components/ui"]
+    "includes": [
+      "**",
+      "!**/src/routeTree.gen.ts",
+      "!**/src/components/ui",
+      "!auth-schema.ts"
+    ]
   },
   "formatter": {
     "enabled": true,
