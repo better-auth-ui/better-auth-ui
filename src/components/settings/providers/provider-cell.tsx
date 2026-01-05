@@ -9,6 +9,7 @@ import type { Provider } from "../../../lib/social-providers"
 import { cn, getLocalizedError } from "../../../lib/utils"
 import type { AuthLocalization } from "../../../localization/auth-localization"
 import type { Refetch } from "../../../types/refetch"
+import type { AuthHooks } from "../../../types/auth-hooks"
 import { useIsMobile } from "../../../hooks/use-mobile"
 import { Button } from "../../ui/button"
 import { Card } from "../../ui/card"
@@ -149,9 +150,20 @@ function CardContentWithTooltip({
     provider: Provider
     classNames?: SettingsCardClassNames
 }) {
-    const email = account ? <AccountInfo account={account} /> : null
-    const emailText = useAccountEmail(account)
-    const [tooltipOpen, setTooltipOpen] = useState(false)
+    const {
+        hooks: { useAccountInfo }
+    } = useContext(AuthUIContext)
+
+    const accountInfoData = account
+        ? useAccountInfo({
+              query: { accountId: account.accountId }
+          })
+        : null
+
+    const email = account ? (
+        <AccountInfo account={account} accountInfo={accountInfoData} />
+    ) : null
+    const emailText = accountInfoData?.data?.user.email || null
 
     const content = (
         <>
@@ -168,15 +180,11 @@ function CardContentWithTooltip({
 
     if (isMobile && emailText) {
         return (
-            <Tooltip open={tooltipOpen} onOpenChange={setTooltipOpen}>
+            <Tooltip>
                 <TooltipTrigger asChild>
-                    <button
-                        type="button"
-                        className="flex min-w-0 flex-1 cursor-pointer items-center gap-3 border-0 bg-transparent p-0 text-left"
-                        onClick={() => setTooltipOpen(!tooltipOpen)}
-                    >
+                    <div className="flex min-w-0 flex-1 items-center gap-3">
                         {content}
-                    </button>
+                    </div>
                 </TooltipTrigger>
                 <TooltipContent>
                     {emailText}
@@ -192,28 +200,22 @@ function CardContentWithTooltip({
     )
 }
 
-function useAccountEmail(account?: Account | null): string | null {
+function AccountInfo({
+    account,
+    accountInfo: accountInfoProp
+}: {
+    account: { accountId: string }
+    accountInfo?: ReturnType<AuthHooks["useAccountInfo"]> | null
+}) {
     const {
         hooks: { useAccountInfo }
     } = useContext(AuthUIContext)
 
-    if (!account) return null
-
-    const { data: accountInfo } = useAccountInfo({
+    const accountInfoData = accountInfoProp ?? useAccountInfo({
         query: { accountId: account.accountId }
     })
 
-    return accountInfo?.user.email || null
-}
-
-function AccountInfo({ account }: { account: { accountId: string } }) {
-    const {
-        hooks: { useAccountInfo }
-    } = useContext(AuthUIContext)
-
-    const { data: accountInfo, isPending } = useAccountInfo({
-        query: { accountId: account.accountId }
-    })
+    const { data: accountInfo, isPending } = accountInfoData
 
     if (isPending) {
         return <Skeleton className="my-0.5 h-3 w-28" />
