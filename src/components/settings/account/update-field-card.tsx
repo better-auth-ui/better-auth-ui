@@ -242,9 +242,10 @@ export function UpdateFieldCard({
                                                     disabled={isSubmitting}
                                                 >
                                                     <SelectTrigger
-                                                        className={
-                                                            cn("w-full", classNames?.input)
-                                                        }
+                                                        className={cn(
+                                                            "w-full",
+                                                            classNames?.input
+                                                        )}
                                                     >
                                                         <SelectValue
                                                             placeholder={
