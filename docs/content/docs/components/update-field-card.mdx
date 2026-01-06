@@ -6,13 +6,14 @@ description: Generic settings card for updating custom user fields
 ## Import
 
 ```tsx
-import { UpdateFieldCard } from "@better-auth/ui-react/components"
+import { UpdateFieldCard } from "@daveyplate/better-auth-ui"
 ```
 
 ## Usage
 
 ```tsx
-<UpdateFieldCard 
+import { UpdateFieldCard } from "./update-field-card";
+<UpdateFieldCard
     name="phoneNumber"
     label="Phone Number"
     type="text"
@@ -22,27 +23,28 @@ import { UpdateFieldCard } from "@better-auth/ui-react/components"
 
 ## Props
 
-| Name           | Type                                    | Default     | Description                                    |
-|----------------|-----------------------------------------|-------------|------------------------------------------------|
-| `name`         | `string`                                | (required)  | Field name in the user object                  |
-| `label`        | `ReactNode`                             | `undefined` | Display label for the field                    |
-| `type`         | `"text" \| "number" \| "boolean"`       | `"text"`    | Input type for the field                       |
-| `value`        | `unknown`                               | `undefined` | Current field value                            |
-| `placeholder`  | `string`                                | `undefined` | Input placeholder text                         |
-| `required`     | `boolean`                               | `false`     | Whether the field is required                  |
-| `description`  | `ReactNode`                             | `undefined` | Description text shown below the title         |
-| `instructions` | `ReactNode`                             | `undefined` | Additional instructions shown in the card      |
-| `validate`     | `(value: string) => boolean \| Promise<boolean>` | `undefined` | Custom validation function         |
-| `className`    | `string`                                | `undefined` | Additional CSS classes for styling             |
-| `classNames`   | `SettingsCardClassNames`                | `undefined` | Class names for individual card components     |
-| `localization` | `Partial<AuthLocalization>`             | `undefined` | Localization object for translations           |
+| Name           | Type                                             | Default     | Description                                |
+|----------------|--------------------------------------------------|-------------|--------------------------------------------|
+| `name`         | `string`                                         | (required)  | Field name in the user object              |
+| `label`        | `ReactNode`                                      | `undefined` | Display label for the field                |
+| `type`         | `"text" \| "number" \| "boolean" \| "select"`    | `"text"`    | Input type for the field                   |
+| `value`        | `unknown`                                        | `undefined` | Current field value                        |
+| `placeholder`  | `string`                                         | `undefined` | Input placeholder text                     |
+| `required`     | `boolean`                                        | `false`     | Whether the field is required              |
+| `description`  | `ReactNode`                                      | `undefined` | Description text shown below the title     |
+| `instructions` | `ReactNode`                                      | `undefined` | Additional instructions shown in the card  |
+| `validate`     | `(value: string) => boolean \| Promise<boolean>` | `undefined` | Custom validation function                 |
+| `className`    | `string`                                         | `undefined` | Additional CSS classes for styling         |
+| `classNames`   | `SettingsCardClassNames`                         | `undefined` | Class names for individual card components |
+| `localization` | `Partial<AuthLocalization>`                      | `undefined` | Localization object for translations       |
+| `options`      | `SelectOption[]`                                 | `undefined` | Array of select options                    |
 
 ## Examples
 
 ### Text Field
 
 ```tsx
-<UpdateFieldCard 
+<UpdateFieldCard
     name="bio"
     label="Bio"
     type="text"
@@ -74,9 +76,26 @@ import { UpdateFieldCard } from "@better-auth/ui-react/components"
 />
 ```
 
+### Select Field
+
+```tsx
+<UpdateFieldCard
+  name="role"
+  label="User Role"
+  type="select"
+  value="admin"
+  required
+  options={[
+    { label: "Admin", value: "admin" },
+    { label: "User", value: "user" },
+    { label: "Guest", value: "guest" }
+  ]}
+/>
+```
+
 ## Features
 
-- Supports text, number, and boolean field types
+- Supports text, number, boolean and select field types
 - Built-in form validation
 - Custom validation support
 - Success/error feedback

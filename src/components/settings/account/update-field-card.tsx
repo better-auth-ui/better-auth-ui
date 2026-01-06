@@ -20,12 +20,24 @@ import {
     FormMessage
 } from "../../ui/form"
 import { Input } from "../../ui/input"
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue
+} from "../../ui/select"
 import { Skeleton } from "../../ui/skeleton"
 import { Textarea } from "../../ui/textarea"
 import {
     SettingsCard,
     type SettingsCardClassNames
 } from "../shared/settings-card"
+
+export interface SelectOption {
+    label: string
+    value: string
+}
 
 export interface UpdateFieldCardProps {
     className?: string
@@ -41,6 +53,7 @@ export interface UpdateFieldCardProps {
     multiline?: boolean
     value?: unknown
     validate?: (value: string) => boolean | Promise<boolean>
+    options?: SelectOption[]
 }
 
 export function UpdateFieldCard({
@@ -56,7 +69,8 @@ export function UpdateFieldCard({
     type,
     multiline,
     value,
-    validate
+    validate,
+    options
 }: UpdateFieldCardProps) {
     const {
         hooks: { useSession },
@@ -102,6 +116,10 @@ export function UpdateFieldCard({
             : z.coerce.boolean({
                   message: `${label} ${localization.IS_INVALID}`
               })
+    } else if (type === "select") {
+        fieldSchema = required
+            ? z.string().min(1, `${label} ${localization.IS_REQUIRED}`)
+            : z.string().optional()
     } else {
         fieldSchema = required
             ? z.string().min(1, `${label} ${localization.IS_REQUIRED}`)
@@ -213,7 +231,51 @@ export function UpdateFieldCard({
                                 render={({ field }) => (
                                     <FormItem>
                                         <FormControl>
-                                            {type === "number" ? (
+                                            {type === "select" ? (
+                                                <Select
+                                                    onValueChange={
+                                                        field.onChange
+                                                    }
+                                                    defaultValue={
+                                                        field.value as string
+                                                    }
+                                                    disabled={isSubmitting}
+                                                >
+                                                    <SelectTrigger
+                                                        className={
+                                                            cn("w-full", classNames?.input)
+                                                        }
+                                                    >
+                                                        <SelectValue
+                                                            placeholder={
+                                                                placeholder ||
+                                                                (typeof label ===
+                                                                "string"
+                                                                    ? label
+                                                                    : "Select an option")
+                                                            }
+                                                        />
+                                                    </SelectTrigger>
+                                                    <SelectContent>
+                                                        {options?.map(
+                                                            (option) => (
+                                                                <SelectItem
+                                                                    key={
+                                                                        option.value
+                                                                    }
+                                                                    value={
+                                                                        option.value
+                                                                    }
+                                                                >
+                                                                    {
+                                                                        option.label
+                                                                    }
+                                                                </SelectItem>
+                                                            )
+                                                        )}
+                                                    </SelectContent>
+                                                </Select>
+                                            ) : type === "number" ? (
                                                 <Input
                                                     className={
                                                         classNames?.input
