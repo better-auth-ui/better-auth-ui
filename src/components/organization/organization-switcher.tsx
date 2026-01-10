@@ -78,6 +78,7 @@ export interface OrganizationSwitcherProps
      * @default false
      */
     hidePersonal?: boolean
+    hideCreate?: boolean
 }
 
 /**
@@ -103,6 +104,7 @@ export function OrganizationSwitcher({
     size,
     onSetActive,
     hidePersonal,
+    hideCreate,
     ...props
 }: OrganizationSwitcherProps) {
     const {
@@ -488,13 +490,15 @@ export function OrganizationSwitcher({
                     {!isPending &&
                     sessionData &&
                     !(user as User).isAnonymous ? (
-                        <DropdownMenuItem
-                            className={cn(classNames?.content?.menuItem)}
-                            onClick={() => setIsCreateOrgDialogOpen(true)}
-                        >
-                            <PlusCircleIcon />
-                            {localization.CREATE_ORGANIZATION}
-                        </DropdownMenuItem>
+                        hideCreate ? null : (
+                            <DropdownMenuItem
+                                className={cn(classNames?.content?.menuItem)}
+                                onClick={() => setIsCreateOrgDialogOpen(true)}
+                            >
+                                <PlusCircleIcon />
+                                {localization.CREATE_ORGANIZATION}
+                            </DropdownMenuItem>
+                        )
                     ) : (
                         <Link href={`${basePath}/${viewPaths.SIGN_IN}`}>
                             <DropdownMenuItem
