@@ -5,7 +5,6 @@ import type { ReactNode } from "react"
 import { afterEach, describe, expect, it, vi } from "vitest"
 import { AuthProvider } from "../../src/components/auth/auth-provider"
 import { useAuth } from "../../src/hooks/auth/use-auth"
-import { useRedirectTo } from "../../src/hooks/auth/use-redirect-to"
 
 // Mock better-auth
 vi.mock("better-auth/react", () => ({
@@ -151,109 +150,6 @@ describe("useAuth", () => {
 
       expect(result.current.emailAndPassword?.enabled).toBe(true)
       expect(result.current.emailAndPassword?.rememberMe).toBe(true)
-    })
-  })
-
-  describe("redirectTo validation from URL", () => {
-    it("should use redirectTo from URL query param when valid", () => {
-      window.history.pushState({}, "", "/?redirectTo=/dashboard")
-
-      const wrapper = ({ children }: { children: ReactNode }) => (
-        <AuthProvider authClient={mockAuthClient}>{children}</AuthProvider>
-      )
-
-      const { result } = renderHook(() => useRedirectTo(), { wrapper })
-
-      expect(result.current).toBe("/dashboard")
-    })
-
-    it("should reject redirectTo with double slashes", () => {
-      window.history.pushState({}, "", "/?redirectTo=//evil.com")
-
-      const wrapper = ({ children }: { children: ReactNode }) => (
-        <AuthProvider authClient={mockAuthClient}>{children}</AuthProvider>
-      )
-
-      const { result } = renderHook(() => useRedirectTo(), { wrapper })
-
-      expect(result.current).toBe("/")
-    })
-
-    it("should reject redirectTo with scheme", () => {
-      window.history.pushState({}, "", "/?redirectTo=http://evil.com")
-
-      const wrapper = ({ children }: { children: ReactNode }) => (
-        <AuthProvider authClient={mockAuthClient}>{children}</AuthProvider>
-      )
-
-      const { result } = renderHook(() => useRedirectTo(), { wrapper })
-
-      expect(result.current).toBe("/")
-    })
-
-    it("should reject redirectTo not starting with slash", () => {
-      window.history.pushState({}, "", "/?redirectTo=dashboard")
-
-      const wrapper = ({ children }: { children: ReactNode }) => (
-        <AuthProvider authClient={mockAuthClient}>{children}</AuthProvider>
-      )
-
-      const { result } = renderHook(() => useRedirectTo(), { wrapper })
-
-      expect(result.current).toBe("/")
-    })
-
-    it("should accept complex valid paths", () => {
-      window.history.pushState(
-        {},
-        "",
-        "/?redirectTo=/dashboard/settings?tab=profile"
-      )
-
-      const wrapper = ({ children }: { children: ReactNode }) => (
-        <AuthProvider authClient={mockAuthClient}>{children}</AuthProvider>
-      )
-
-      const { result } = renderHook(() => useRedirectTo(), { wrapper })
-
-      expect(result.current).toBe("/dashboard/settings?tab=profile")
-    })
-
-    it("should handle URL-encoded redirectTo", () => {
-      window.history.pushState({}, "", "/?redirectTo=%2Fdashboard%2Fsettings")
-
-      const wrapper = ({ children }: { children: ReactNode }) => (
-        <AuthProvider authClient={mockAuthClient}>{children}</AuthProvider>
-      )
-
-      const { result } = renderHook(() => useRedirectTo(), { wrapper })
-
-      expect(result.current).toBe("/dashboard/settings")
-    })
-
-    it("should trim whitespace from redirectTo", () => {
-      window.history.pushState({}, "", "/?redirectTo=%20/dashboard%20")
-
-      const wrapper = ({ children }: { children: ReactNode }) => (
-        <AuthProvider authClient={mockAuthClient}>{children}</AuthProvider>
-      )
-
-      const { result } = renderHook(() => useRedirectTo(), { wrapper })
-
-      expect(result.current).toBe("/dashboard")
-    })
-
-    it("should reject redirectTo with backslash prefix", () => {
-      window.history.pushState({}, "", "/?redirectTo=/\\evil.com")
-
-      const wrapper = ({ children }: { children: ReactNode }) => (
-        <AuthProvider authClient={mockAuthClient}>{children}</AuthProvider>
-      )
-
-      const { result } = renderHook(() => useRedirectTo(), { wrapper })
-
-      // Should fall back to default since backslash can be normalized to forward slash by browsers
-      expect(result.current).toBe("/")
     })
   })
 

@@ -27,11 +27,6 @@
       "path": "src/hooks/auth/use-session.ts",
       "content": "export { useSession } from \"@better-auth-ui/react\"\n",
       "type": "registry:hook"
-    },
-    {
-      "path": "../react/src/hooks/auth/use-session.tsx",
-      "content": "import type { AnyAuthConfig } from \"@better-auth-ui/react\"\nimport { type DefinedInitialDataOptions, useQuery } from \"@tanstack/react-query\"\n\nimport { useAuth } from \"../auth/use-auth\"\n\n/**\n * Fetches and returns the session data.\n *\n * @param config - Optional partial AuthConfig used to customize auth behavior; may include an `authClient` override.\n * @param options - Optional query options.\n * @returns Query result containing session data, loading state, and error state\n */\nexport function useSession(\n  config?: AnyAuthConfig,\n  options?: Partial<DefinedInitialDataOptions>\n) {\n  const { authClient, queryClient } = useAuth(config)\n\n  return useQuery(\n    {\n      queryKey: [\"auth\", \"session\"],\n      queryFn: () => authClient.getSession({ fetchOptions: { throw: true } }),\n      ...(options as object)\n    },\n    queryClient\n  )\n}\n",
-      "type": "registry:hook"
     }
   ],
   "type": "registry:component"

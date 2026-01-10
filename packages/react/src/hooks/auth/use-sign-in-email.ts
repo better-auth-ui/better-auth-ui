@@ -2,7 +2,6 @@ import type { AnyAuthConfig } from "@better-auth-ui/react"
 import { useActionState } from "react"
 
 import { useAuth } from "./use-auth"
-import { useRedirectTo } from "./use-redirect-to"
 
 export function useSignInEmail(config?: AnyAuthConfig) {
   const {
@@ -11,11 +10,10 @@ export function useSignInEmail(config?: AnyAuthConfig) {
     emailAndPassword,
     localization,
     queryClient,
+    redirectTo,
     toast,
     navigate
   } = useAuth(config)
-
-  const redirectTo = useRedirectTo(config)
 
   const signInEmail = async (_: object, formData: FormData) => {
     const email = formData.get("email") as string

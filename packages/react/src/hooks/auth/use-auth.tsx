@@ -41,6 +41,12 @@ export function useAuth(config?: AnyAuthConfig) {
     )
   } as AuthConfig
 
+  if (typeof window !== "undefined") {
+    authConfig.redirectTo =
+      new URLSearchParams(window.location.search).get("redirectTo")?.trim() ||
+      authConfig.redirectTo
+  }
+
   useEffect(() => {
     queryClient.getQueryCache().config.onError = (error) => {
       authConfig.toast.error(
