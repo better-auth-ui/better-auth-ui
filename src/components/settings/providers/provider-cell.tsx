@@ -4,14 +4,17 @@ import type { Account } from "better-auth"
 import type { SocialProvider } from "better-auth/social-providers"
 import { Loader2 } from "lucide-react"
 import { useContext, useState } from "react"
+import { useIsOverflow } from "../../../hooks/use-is-overflow"
 import { AuthUIContext } from "../../../lib/auth-ui-provider"
 import type { Provider } from "../../../lib/social-providers"
 import { cn, getLocalizedError } from "../../../lib/utils"
 import type { AuthLocalization } from "../../../localization/auth-localization"
 import type { Refetch } from "../../../types/refetch"
+
 import { Button } from "../../ui/button"
 import { Card } from "../../ui/card"
 import { Skeleton } from "../../ui/skeleton"
+import { Tooltip, TooltipContent, TooltipTrigger } from "../../ui/tooltip"
 import type { SettingsCardClassNames } from "../shared/settings-card"
 
 export interface ProviderCellProps {
@@ -48,6 +51,7 @@ export function ProviderCell({
     localization = { ...contextLocalization, ...localization }
 
     const [isLoading, setIsLoading] = useState(false)
+
 
     const handleLink = async () => {
         setIsLoading(true)
@@ -108,23 +112,19 @@ export function ProviderCell({
     return (
         <Card
             className={cn(
-                "flex-row items-center gap-3 px-4 py-3",
+                "min-w-0 flex-row items-center gap-3 px-4 py-3",
                 className,
                 classNames?.cell
             )}
         >
-            {provider.icon && (
-                <provider.icon className={cn("size-4", classNames?.icon)} />
-            )}
-
-            <div className="flex-col">
-                <div className="text-sm">{provider.name}</div>
-
-                {account && <AccountInfo account={account} />}
-            </div>
+            <ProviderCellContent
+                account={account}
+                provider={provider}
+                classNames={classNames}
+            />
 
             <Button
-                className={cn("relative ms-auto", classNames?.button)}
+                className={cn("relative ms-auto shrink-0", classNames?.button)}
                 disabled={isLoading}
                 size="sm"
                 type="button"
@@ -138,7 +138,44 @@ export function ProviderCell({
     )
 }
 
-function AccountInfo({ account }: { account: { accountId: string } }) {
+function ProviderCellContent({
+    account,
+    classNames,
+    provider
+}: {
+    account?: Account | null
+    classNames?: SettingsCardClassNames
+    provider: Provider
+}) {
+    if (account) {
+        return (
+            <ConnectedProviderContent
+                account={account}
+                classNames={classNames}
+                provider={provider}
+            />
+        )
+    }
+
+    return (
+        <div className="flex min-w-0 flex-1 items-center gap-3">
+            <ProviderContent
+                classNames={classNames}
+                provider={provider}
+            />
+        </div>
+    )
+}
+
+function ConnectedProviderContent({
+    account,
+    classNames,
+    provider
+}: {
+    account: Account
+    classNames?: SettingsCardClassNames
+    provider: Provider
+}) {
     const {
         hooks: { useAccountInfo }
     } = useContext(AuthUIContext)
@@ -147,15 +184,72 @@ function AccountInfo({ account }: { account: { accountId: string } }) {
         query: { accountId: account.accountId }
     })
 
-    if (isPending) {
-        return <Skeleton className="my-0.5 h-3 w-28" />
+    const email = accountInfo?.user.email
+    const { ref: emailRef, isOverflow } = useIsOverflow<HTMLSpanElement>()
+
+    const emailElement = isPending ? (
+        <Skeleton className="my-0.5 h-3 w-28" />
+    ) : email ? (
+        <span
+            ref={emailRef}
+            className="truncate text-muted-foreground text-xs"
+        >
+            {email}
+        </span>
+    ) : null
+
+    const content = (
+        <ProviderContent
+            accountInfo={emailElement}
+            classNames={classNames}
+            provider={provider}
+        />
+    )
+
+    const wrapperClassName = "flex min-w-0 flex-1 items-center gap-3"
+
+    if (email && isOverflow) {
+        return (
+            <Tooltip>
+                <TooltipTrigger asChild>
+                    <div className={cn(wrapperClassName, "cursor-default")}>
+                        {content}
+                    </div>
+                </TooltipTrigger>
+                <TooltipContent>
+                    <p>{email}</p>
+                </TooltipContent>
+            </Tooltip>
+        )
     }
 
-    if (!accountInfo) return null
-
     return (
-        <div className="text-muted-foreground text-xs">
-            {accountInfo?.user.email}
+        <div className={wrapperClassName}>
+            {content}
         </div>
     )
 }
+
+function ProviderContent({
+    accountInfo,
+    classNames,
+    provider
+}: {
+    accountInfo?: React.ReactNode
+    classNames?: SettingsCardClassNames
+    provider: Provider
+}) {
+    return (
+        <>
+            {provider.icon && (
+                <provider.icon className={cn("size-4 shrink-0", classNames?.icon)} />
+            )}
+
+            <div className="flex min-w-0 flex-col">
+                <div className="text-sm">{provider.name}</div>
+                {accountInfo}
+            </div>
+        </>
+    )
+}
+
