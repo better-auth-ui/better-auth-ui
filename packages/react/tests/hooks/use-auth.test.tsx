@@ -3,8 +3,7 @@ import { renderHook } from "@testing-library/react"
 import { createAuthClient } from "better-auth/react"
 import type { ReactNode } from "react"
 import { afterEach, describe, expect, it, vi } from "vitest"
-import { AuthProvider } from "../../src/components/auth/auth-provider"
-import { useAuth } from "../../src/hooks/auth/use-auth"
+import { AuthProvider, useAuth } from "../../src/components/auth/auth-provider"
 
 // Mock better-auth
 vi.mock("better-auth/react", () => ({
@@ -29,10 +28,10 @@ describe("useAuth", () => {
   })
 
   describe("basic functionality", () => {
-    it("should throw error when authClient is not provided", () => {
+    it("should throw error when AuthProvider is not provided", () => {
       expect(() => {
         renderHook(() => useAuth())
-      }).toThrow()
+      }).toThrow("[Better Auth UI] AuthProvider is required")
     })
 
     it("should return config when authClient is provided via context", () => {
@@ -41,16 +40,6 @@ describe("useAuth", () => {
       )
 
       const { result } = renderHook(() => useAuth(), { wrapper })
-
-      expect(result.current.authClient).toBeDefined()
-      expect(result.current.basePaths).toBeDefined()
-      expect(result.current.viewPaths).toBeDefined()
-    })
-
-    it("should return config when authClient is provided via argument", () => {
-      const { result } = renderHook(() =>
-        useAuth({ authClient: mockAuthClient })
-      )
 
       expect(result.current.authClient).toBeDefined()
       expect(result.current.basePaths).toBeDefined()
@@ -102,51 +91,34 @@ describe("useAuth", () => {
   })
 
   describe("configuration merging", () => {
-    it("should merge context and prop configurations", () => {
-      const wrapper = ({ children }: { children: ReactNode }) => (
-        <AuthProvider authClient={mockAuthClient} baseURL="http://example.com">
-          {children}
-        </AuthProvider>
-      )
-
-      const { result } = renderHook(
-        () => useAuth({ redirectTo: "/dashboard" }),
-        { wrapper }
-      )
-
-      expect(result.current.baseURL).toBe("http://example.com")
-      expect(result.current.redirectTo).toBe("/dashboard")
-    })
-
-    it("should override context config with prop config", () => {
-      const wrapper = ({ children }: { children: ReactNode }) => (
-        <AuthProvider authClient={mockAuthClient} redirectTo="/home">
-          {children}
-        </AuthProvider>
-      )
-
-      const { result } = renderHook(
-        () => useAuth({ redirectTo: "/dashboard" }),
-        { wrapper }
-      )
-
-      expect(result.current.redirectTo).toBe("/dashboard")
-    })
-
-    it("should deep merge nested configurations", () => {
+    it("should use configurations from AuthProvider", () => {
       const wrapper = ({ children }: { children: ReactNode }) => (
         <AuthProvider
           authClient={mockAuthClient}
-          emailAndPassword={{ enabled: true }}
+          baseURL="http://example.com"
+          redirectTo="/dashboard"
         >
           {children}
         </AuthProvider>
       )
 
-      const { result } = renderHook(
-        () => useAuth({ emailAndPassword: { rememberMe: true } }),
-        { wrapper }
+      const { result } = renderHook(() => useAuth(), { wrapper })
+
+      expect(result.current.baseURL).toBe("http://example.com")
+      expect(result.current.redirectTo).toBe("/dashboard")
+    })
+
+    it("should merge nested configurations from AuthProvider", () => {
+      const wrapper = ({ children }: { children: ReactNode }) => (
+        <AuthProvider
+          authClient={mockAuthClient}
+          emailAndPassword={{ enabled: true, rememberMe: true }}
+        >
+          {children}
+        </AuthProvider>
       )
+
+      const { result } = renderHook(() => useAuth(), { wrapper })
 
       expect(result.current.emailAndPassword?.enabled).toBe(true)
       expect(result.current.emailAndPassword?.rememberMe).toBe(true)
