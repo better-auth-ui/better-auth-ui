@@ -4,7 +4,6 @@ import type { AnyAuthConfig } from "@better-auth-ui/react"
 import type { User } from "better-auth"
 
 import { Skeleton } from "@/components/ui/skeleton"
-import { useAuth } from "@/hooks/auth/use-auth"
 import { useSession } from "@/hooks/auth/use-session"
 import { cn } from "@/lib/utils"
 import { UserAvatar } from "./user-avatar"
@@ -23,22 +22,15 @@ export type UserViewProps = AnyAuthConfig & {
  * @param user - Optional user object to display; when omitted the current session user is used if available
  * @returns A React element that displays the user's avatar with their name and email
  */
-export function UserView({
-  className,
-  isPending,
-  user,
-  ...config
-}: UserViewProps) {
-  const context = useAuth(config)
-
-  const { data: sessionData, isPending: sessionPending } = useSession(context)
+export function UserView({ className, isPending, user }: UserViewProps) {
+  const { data: sessionData, isPending: sessionPending } = useSession()
 
   const resolvedUser = user ?? sessionData?.user
 
   if ((isPending || sessionPending) && !user) {
     return (
       <div className={cn("flex items-center gap-2", className)}>
-        <UserAvatar isPending {...config} />
+        <UserAvatar isPending />
 
         <div className="grid flex-1 gap-1 text-left text-sm">
           <Skeleton className="h-4 w-24" />
@@ -50,7 +42,7 @@ export function UserView({
 
   return (
     <div className={cn("flex items-center gap-2", className)}>
-      <UserAvatar user={resolvedUser} {...config} />
+      <UserAvatar user={resolvedUser} />
 
       <div className="grid flex-1 text-left text-sm leading-tight">
         <span className="truncate font-medium">

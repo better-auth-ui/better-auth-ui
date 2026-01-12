@@ -14,6 +14,7 @@ import {
 } from "@tanstack/react-query"
 import type { BetterFetchError } from "better-auth/react"
 import { type PropsWithChildren, useContext, useEffect } from "react"
+import { useHydrated } from "../../hooks/use-hydrated"
 
 const fallbackQueryClient = new QueryClient({
   defaultOptions: {
@@ -47,7 +48,9 @@ export function AuthProvider({
 
   const mergedConfig = deepmerge(baseAuthConfig, config) as AuthConfig
 
-  if (typeof window !== "undefined") {
+  const hydrated = useHydrated()
+
+  if (hydrated) {
     mergedConfig.redirectTo =
       new URLSearchParams(window.location.search).get("redirectTo")?.trim() ||
       mergedConfig.redirectTo

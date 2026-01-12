@@ -1,7 +1,6 @@
 "use client"
 
-import type { AnyAuthConfig } from "@better-auth-ui/react"
-import { providerIcons } from "@better-auth-ui/react"
+import { providerIcons, useAuth } from "@better-auth-ui/react"
 import { getProviderName } from "@better-auth-ui/react/core"
 import { Link, X } from "lucide-react"
 
@@ -9,13 +8,12 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Spinner } from "@/components/ui/spinner"
-import { useAuth } from "@/hooks/auth/use-auth"
 import { useLinkSocial } from "@/hooks/settings/use-link-social"
 import { useListAccounts } from "@/hooks/settings/use-list-accounts"
 import { useUnlinkAccount } from "@/hooks/settings/use-unlink-account"
 import { cn } from "@/lib/utils"
 
-export type ConnectedAccountsProps = AnyAuthConfig & {
+export type ConnectedAccountsProps = {
   className?: string
 }
 
@@ -27,16 +25,11 @@ export type ConnectedAccountsProps = AnyAuthConfig & {
  *
  * @returns A JSX element containing the connected accounts card
  */
-export function ConnectedAccounts({
-  className,
-  ...config
-}: ConnectedAccountsProps) {
-  const context = useAuth(config)
-  const { localization, socialProviders } = context
-
-  const { data: accounts, isPending } = useListAccounts(context)
-  const { linkSocial, linkingProvider } = useLinkSocial(context)
-  const { unlinkAccount, unlinkingProvider } = useUnlinkAccount(context)
+export function ConnectedAccounts({ className }: ConnectedAccountsProps) {
+  const { localization, socialProviders } = useAuth()
+  const { data: accounts, isPending } = useListAccounts()
+  const { linkSocial, linkingProvider } = useLinkSocial()
+  const { unlinkAccount, unlinkingProvider } = useUnlinkAccount()
 
   return (
     <Card className={cn("w-full py-4 md:py-6 gap-4 md:gap-6", className)}>

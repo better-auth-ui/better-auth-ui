@@ -1,9 +1,8 @@
 "use client"
 
-import type { AnyAuthConfig } from "@better-auth-ui/react"
+import { useAuth } from "@better-auth-ui/react"
 import type { AuthView } from "@better-auth-ui/react/core"
 
-import { useAuth } from "@/hooks/auth/use-auth"
 import { ForgotPassword } from "./forgot-password"
 import { MagicLink } from "./magic-link"
 import type { SocialLayout } from "./provider-buttons"
@@ -12,7 +11,7 @@ import { SignIn } from "./sign-in"
 import { SignOut } from "./sign-out"
 import { SignUp } from "./sign-up"
 
-export type AuthProps = AnyAuthConfig & {
+export type AuthProps = {
   className?: string
   path?: string
   socialLayout?: SocialLayout
@@ -33,10 +32,9 @@ export function Auth({
   view,
   path,
   socialLayout,
-  socialPosition,
-  ...config
+  socialPosition
 }: AuthProps) {
-  const { viewPaths } = useAuth(config)
+  const { viewPaths } = useAuth()
 
   if (!view && !path) {
     throw new Error("[Better Auth UI] Either `view` or `path` must be provided")
@@ -55,7 +53,6 @@ export function Auth({
           className={className}
           socialLayout={socialLayout}
           socialPosition={socialPosition}
-          {...config}
         />
       )
     case "signUp":
@@ -64,7 +61,6 @@ export function Auth({
           className={className}
           socialLayout={socialLayout}
           socialPosition={socialPosition}
-          {...config}
         />
       )
     case "magicLink":
@@ -73,15 +69,14 @@ export function Auth({
           className={className}
           socialLayout={socialLayout}
           socialPosition={socialPosition}
-          {...config}
         />
       )
     case "forgotPassword":
-      return <ForgotPassword className={className} {...config} />
+      return <ForgotPassword className={className} />
     case "resetPassword":
-      return <ResetPassword className={className} {...config} />
+      return <ResetPassword className={className} />
     case "signOut":
-      return <SignOut className={className} {...config} />
+      return <SignOut className={className} />
     default:
       throw new Error(
         `[Better Auth UI] Valid views are: ${Object.keys(viewPaths.auth).join(", ")}`

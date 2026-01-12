@@ -1,6 +1,6 @@
 "use client"
 
-import type { AnyAuthConfig } from "@better-auth-ui/react"
+import { useAuth } from "@better-auth-ui/react"
 import { Eye, EyeOff } from "lucide-react"
 import { useState } from "react"
 
@@ -22,14 +22,13 @@ import {
   InputGroupInput
 } from "@/components/ui/input-group"
 import { Spinner } from "@/components/ui/spinner"
-import { useAuth } from "@/hooks/auth/use-auth"
 import { useSignInSocial } from "@/hooks/auth/use-sign-in-social"
 import { useSignUpEmail } from "@/hooks/auth/use-sign-up-email"
 import { cn } from "@/lib/utils"
 import { MagicLinkButton } from "./magic-link-button"
 import { ProviderButtons, type SocialLayout } from "./provider-buttons"
 
-export type SignUpProps = AnyAuthConfig & {
+export type SignUpProps = {
   className?: string
   socialLayout?: SocialLayout
   socialPosition?: "top" | "bottom"
@@ -44,17 +43,16 @@ export type SignUpProps = AnyAuthConfig & {
  * - On failure, displays error toasts
  * - Manages a pending state while the request is in-flight
  *
- * @param props - Configuration and appearance overrides (e.g., `className`, `localization`, `socialLayout`) plus auth-related options passed through to the auth hook.
+ * @param className - Additional CSS classes applied to the outer container
+ * @param socialLayout - Social layout to apply to the component
+ * @param socialPosition - Social position to apply to the component
  * @returns The sign-up form React element.
  */
 export function SignUp({
   className,
   socialLayout,
-  socialPosition = "bottom",
-  ...config
+  socialPosition = "bottom"
 }: SignUpProps) {
-  const context = useAuth(config)
-
   const {
     basePaths,
     emailAndPassword,
@@ -63,15 +61,13 @@ export function SignUp({
     socialProviders,
     viewPaths,
     Link
-  } = context
-
+  } = useAuth()
   const [
     { name, email, password, confirmPassword },
     signUpEmail,
     signUpPending
-  ] = useSignUpEmail(context)
-
-  const [_, signInSocial, socialPending] = useSignInSocial(context)
+  ] = useSignUpEmail()
+  const [_, signInSocial, socialPending] = useSignInSocial()
 
   const isPending = signUpPending || socialPending
 
@@ -101,7 +97,6 @@ export function SignUp({
             <>
               {socialProviders && socialProviders.length > 0 && (
                 <ProviderButtons
-                  {...config}
                   socialLayout={socialLayout}
                   signInSocial={signInSocial}
                   isPending={isPending}
@@ -316,11 +311,7 @@ export function SignUp({
                   </Button>
 
                   {magicLink && (
-                    <MagicLinkButton
-                      {...config}
-                      view="signUp"
-                      isPending={isPending}
-                    />
+                    <MagicLinkButton view="signUp" isPending={isPending} />
                   )}
                 </Field>
               </FieldGroup>
@@ -337,7 +328,6 @@ export function SignUp({
 
               {socialProviders && socialProviders.length > 0 && (
                 <ProviderButtons
-                  {...config}
                   socialLayout={socialLayout}
                   signInSocial={signInSocial}
                   isPending={isPending}

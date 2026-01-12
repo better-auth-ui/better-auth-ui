@@ -1,6 +1,6 @@
 "use client"
 
-import type { AnyAuthConfig } from "@better-auth-ui/react"
+import { useAuth } from "@better-auth-ui/react"
 import { useState } from "react"
 
 import { Button } from "@/components/ui/button"
@@ -15,14 +15,13 @@ import {
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import { Spinner } from "@/components/ui/spinner"
-import { useAuth } from "@/hooks/auth/use-auth"
 import { useSignInMagicLink } from "@/hooks/auth/use-sign-in-magic-link"
 import { useSignInSocial } from "@/hooks/auth/use-sign-in-social"
 import { cn } from "@/lib/utils"
 import { MagicLinkButton } from "./magic-link-button"
 import { ProviderButtons, type SocialLayout } from "./provider-buttons"
 
-export type MagicLinkProps = AnyAuthConfig & {
+export type MagicLinkProps = {
   className?: string
   socialLayout?: SocialLayout
   socialPosition?: "top" | "bottom"
@@ -37,14 +36,10 @@ export function MagicLink({
   socialPosition = "bottom",
   ...config
 }: MagicLinkProps) {
-  const context = useAuth(config)
-
-  const { basePaths, localization, socialProviders, viewPaths, Link } = context
-
-  const [{ email }, signInMagicLink, magicLinkPending] =
-    useSignInMagicLink(context)
-
-  const [_, signInSocial, socialPending] = useSignInSocial(context)
+  const { basePaths, localization, socialProviders, viewPaths, Link } =
+    useAuth()
+  const [{ email }, signInMagicLink, magicLinkPending] = useSignInMagicLink()
+  const [_, signInSocial, socialPending] = useSignInSocial()
 
   const isPending = magicLinkPending || socialPending
 

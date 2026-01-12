@@ -1,6 +1,6 @@
 "use client"
 
-import type { AnyAuthConfig } from "@better-auth-ui/react"
+import { useAuth } from "@better-auth-ui/react"
 import { Check, Eye, EyeOff } from "lucide-react"
 import { useState } from "react"
 
@@ -22,12 +22,11 @@ import {
 } from "@/components/ui/input-group"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Spinner } from "@/components/ui/spinner"
-import { useAuth } from "@/hooks/auth/use-auth"
 import { useSession } from "@/hooks/auth/use-session"
 import { useChangePassword } from "@/hooks/settings/use-change-password"
 import { cn } from "@/lib/utils"
 
-export type ChangePasswordProps = AnyAuthConfig & {
+export type ChangePasswordProps = {
   className?: string
 }
 
@@ -40,13 +39,10 @@ export type ChangePasswordProps = AnyAuthConfig & {
  *
  * @returns A JSX element containing the change password card and form
  */
-export function ChangePassword({ className, ...config }: ChangePasswordProps) {
-  const context = useAuth(config)
-  const { emailAndPassword, localization } = context
-
-  const { data: sessionData } = useSession(context)
-
-  const [, formAction, isPending] = useChangePassword(context)
+export function ChangePassword({ className }: ChangePasswordProps) {
+  const { emailAndPassword, localization } = useAuth()
+  const { data: sessionData } = useSession()
+  const [, formAction, isPending] = useChangePassword()
 
   const [isNewPasswordVisible, setIsNewPasswordVisible] = useState(false)
   const [isConfirmPasswordVisible, setIsConfirmPasswordVisible] =

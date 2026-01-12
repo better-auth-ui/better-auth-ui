@@ -1,6 +1,6 @@
 "use client"
 
-import type { AnyAuthConfig } from "@better-auth-ui/react"
+import { useAuth } from "@better-auth-ui/react"
 import { Eye, EyeOff } from "lucide-react"
 import { useEffect, useState } from "react"
 
@@ -20,20 +20,17 @@ import {
   InputGroupInput
 } from "@/components/ui/input-group"
 import { Spinner } from "@/components/ui/spinner"
-import { useAuth } from "@/hooks/auth/use-auth"
 import { useResetPassword } from "@/hooks/auth/use-reset-password"
 import { cn } from "@/lib/utils"
 
-export type ResetPasswordProps = AnyAuthConfig & {
+export type ResetPasswordProps = {
   className?: string
 }
 
 /**
  * Renders a password reset form that validates a token from the URL and submits a new password to the auth client.
  */
-export function ResetPassword({ className, ...config }: ResetPasswordProps) {
-  const context = useAuth(config)
-
+export function ResetPassword({ className }: ResetPasswordProps) {
   const {
     basePaths,
     emailAndPassword,
@@ -42,10 +39,9 @@ export function ResetPassword({ className, ...config }: ResetPasswordProps) {
     navigate,
     toast,
     Link
-  } = context
-
+  } = useAuth()
   const [{ password, confirmPassword }, resetPassword, isPending] =
-    useResetPassword(context)
+    useResetPassword()
 
   const [isPasswordVisible, setIsPasswordVisible] = useState(false)
   const [isConfirmPasswordVisible, setIsConfirmPasswordVisible] =

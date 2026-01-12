@@ -1,17 +1,15 @@
 "use client"
 
-import type { AnyAuthConfig } from "@better-auth-ui/react"
 import type { User } from "better-auth"
 import { User2 } from "lucide-react"
 import type { ReactNode } from "react"
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Skeleton } from "@/components/ui/skeleton"
-import { useAuth } from "@/hooks/auth/use-auth"
 import { useSession } from "@/hooks/auth/use-session"
 import { cn } from "@/lib/utils"
 
-export type UserAvatarProps = AnyAuthConfig & {
+export type UserAvatarProps = {
   className?: string
   fallback?: ReactNode
   isPending?: boolean
@@ -33,12 +31,9 @@ export function UserAvatar({
   className,
   user,
   isPending,
-  fallback,
-  ...config
+  fallback
 }: UserAvatarProps) {
-  const context = useAuth(config)
-
-  const { data: sessionData, isPending: sessionPending } = useSession(context)
+  const { data: sessionData, isPending: sessionPending } = useSession()
 
   if ((isPending || sessionPending) && !user) {
     return <Skeleton className={cn("size-8 rounded-full", className)} />

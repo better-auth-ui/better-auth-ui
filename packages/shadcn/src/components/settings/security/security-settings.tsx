@@ -1,13 +1,12 @@
 "use client"
 
-import type { AnyAuthConfig } from "@better-auth-ui/react"
+import { useAuth } from "@better-auth-ui/react"
 
-import { useAuth } from "@/hooks/auth/use-auth"
 import { cn } from "@/lib/utils"
 import { ChangePassword } from "./change-password"
 import { ConnectedAccounts } from "./connected-accounts"
 
-export type SecuritySettingsProps = AnyAuthConfig & {
+export type SecuritySettingsProps = {
   className?: string
 }
 
@@ -15,19 +14,15 @@ export type SecuritySettingsProps = AnyAuthConfig & {
  * Renders the security settings layout including password management and connected accounts.
  *
  * @param className - Optional additional CSS class names for the outer container.
- * @param config - Auth-related props forwarded to the child components.
  * @returns A JSX element containing a styled container that renders the security settings.
  */
-export function SecuritySettings({
-  className,
-  ...config
-}: SecuritySettingsProps) {
-  const { emailAndPassword, socialProviders } = useAuth(config)
+export function SecuritySettings({ className }: SecuritySettingsProps) {
+  const { emailAndPassword, socialProviders } = useAuth()
 
   return (
     <div className={cn("flex w-full flex-col gap-4 md:gap-6", className)}>
-      {emailAndPassword?.enabled && <ChangePassword {...config} />}
-      {socialProviders?.length && <ConnectedAccounts {...config} />}
+      {emailAndPassword?.enabled && <ChangePassword />}
+      {socialProviders?.length && <ConnectedAccounts />}
     </div>
   )
 }
