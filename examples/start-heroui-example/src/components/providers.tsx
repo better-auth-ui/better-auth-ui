@@ -23,13 +23,13 @@ export function Providers({ children }: { children: ReactNode }) {
         socialProviders={["google", "github"]}
         magicLink
         multiSession
-        navigate={(path) => navigate({ to: path })}
-        replace={(path) => navigate({ to: path, replace: true })}
+        navigate={(path) => navigate({ href: path })}
+        replace={(path) => navigate({ href: path, replace: true })}
         settings={{
           theme,
           setTheme
         }}
-        Link={({ href, ...props }) => <Link to={href} {...props} />}
+        Link={Link}
       >
         {children}
 

@@ -13,7 +13,9 @@ export type AuthConfig = BaseAuthConfig & {
    * React component for rendering links
    * @remarks `LinkComponent`
    */
-  Link: ComponentType<PropsWithChildren<{ className?: string; href: string }>>
+  Link: ComponentType<
+    PropsWithChildren<{ className?: string; href: string; to?: string }>
+  >
 }
 
 /**
