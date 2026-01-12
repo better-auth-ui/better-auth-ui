@@ -13,7 +13,7 @@ import {
   QueryClientProvider
 } from "@tanstack/react-query"
 import type { BetterFetchError } from "better-auth/react"
-import { type PropsWithChildren, useContext, useEffect } from "react"
+import { type PropsWithChildren, useContext, useEffect, useMemo } from "react"
 import { useHydrated } from "../../hooks/use-hydrated"
 
 const fallbackQueryClient = new QueryClient({
@@ -46,21 +46,18 @@ export function AuthProvider({
   const resolvedQueryClient =
     queryClient || queryClientContext || fallbackQueryClient
 
-  const mergedConfig = deepmerge(baseAuthConfig, config) as AuthConfig
-
   const hydrated = useHydrated()
 
-const hydrated = useHydrated()
-
-const mergedConfig = useMemo(() => {
-  const merged = deepmerge(baseAuthConfig, config) as AuthConfig
-  if (hydrated) {
-    merged.redirectTo =
-      new URLSearchParams(window.location.search).get("redirectTo")?.trim() ||
-      merged.redirectTo
-  }
-  return merged
-}, [config, hydrated])
+  const mergedConfig = useMemo(() => {
+    const merged = deepmerge(baseAuthConfig, config) as AuthConfig
+    if (hydrated) {
+      merged.redirectTo =
+        new URLSearchParams(window.location.search).get("redirectTo")?.trim() ||
+        merged.redirectTo
+    }
+    return merged
+    // biome-ignore lint/correctness/useExhaustiveDependencies: config is a serialized version of config
+  }, [config, hydrated])
 
   useEffect(() => {
     resolvedQueryClient.getQueryCache().config.onError = (error) => {
