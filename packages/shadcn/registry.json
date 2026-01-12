@@ -323,7 +323,13 @@
         "better-auth",
         "lucide-react"
       ],
-      "registryDependencies": ["avatar", "button", "dropdown-menu", "skeleton", "tabs"],
+      "registryDependencies": [
+        "avatar",
+        "button",
+        "dropdown-menu",
+        "skeleton",
+        "tabs"
+      ],
       "files": [
         {
           "path": "src/components/user/user-button.tsx",
@@ -610,7 +616,12 @@
       "title": "Account Settings",
       "description": "A container component that displays account settings including user profile, change email, and appearance.",
       "dependencies": ["@better-auth-ui/react@*"],
-      "registryDependencies": ["user-profile", "change-email", "appearance", "accounts"],
+      "registryDependencies": [
+        "user-profile",
+        "change-email",
+        "appearance",
+        "accounts"
+      ],
       "files": [
         {
           "path": "src/components/settings/account/account-settings.tsx",
