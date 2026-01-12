@@ -50,11 +50,17 @@ export function AuthProvider({
 
   const hydrated = useHydrated()
 
+const hydrated = useHydrated()
+
+const mergedConfig = useMemo(() => {
+  const merged = deepmerge(baseAuthConfig, config) as AuthConfig
   if (hydrated) {
-    mergedConfig.redirectTo =
+    merged.redirectTo =
       new URLSearchParams(window.location.search).get("redirectTo")?.trim() ||
-      mergedConfig.redirectTo
+      merged.redirectTo
   }
+  return merged
+}, [config, hydrated])
 
   useEffect(() => {
     resolvedQueryClient.getQueryCache().config.onError = (error) => {
