@@ -5,7 +5,6 @@ import { useCallback, useState } from "react"
  * Provides functionality to revoke an active session.
  * This is used to revoke sessions from the sessions list (devices where user is logged in).
  *
- * @param config - Optional auth configuration forwarded to the auth hook
  * @returns An object containing the revoking session token and a function to revoke a session
  */
 export function useRevokeSession() {
