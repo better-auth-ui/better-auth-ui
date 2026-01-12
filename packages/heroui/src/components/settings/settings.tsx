@@ -2,15 +2,16 @@ import { useAuth, useAuthenticate } from "@better-auth-ui/react"
 import type { SettingsView } from "@better-auth-ui/react/core"
 import { Person, Shield } from "@gravity-ui/icons"
 import { cn, Tabs, type TabsProps, useIsHydrated } from "@heroui/react"
-import { useMemo } from "react"
+import { type ComponentProps, useMemo } from "react"
+
 import { AccountSettings } from "./account/account-settings"
 import { SecuritySettings } from "./security/security-settings"
 
 export type SettingsProps = {
   className?: string
+  hideNav?: boolean
   path?: string
   view?: SettingsView
-  hideNav?: boolean
 }
 
 /**
@@ -24,7 +25,13 @@ export type SettingsProps = {
  *
  * @throws Error if neither `view` nor `path` is provided
  */
-export function Settings({ className, view, path, hideNav }: SettingsProps) {
+export function Settings({
+  className,
+  hideNav,
+  path,
+  view,
+  ...props
+}: SettingsProps & ComponentProps<"div">) {
   const { basePaths, localization, viewPaths } = useAuth()
   useAuthenticate()
 
@@ -51,6 +58,7 @@ export function Settings({ className, view, path, hideNav }: SettingsProps) {
         "w-full flex flex-col md:flex-row gap-4 md:gap-6",
         className
       )}
+      {...props}
     >
       <ResponsiveTabs selectedKey={currentView}>
         <Tabs.ListContainer>

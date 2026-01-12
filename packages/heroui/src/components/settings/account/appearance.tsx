@@ -2,6 +2,7 @@ import { useAuth } from "@better-auth-ui/react"
 import { Display, Moon, Sun } from "@gravity-ui/icons"
 import {
   Card,
+  type CardProps,
   cn,
   Label,
   Radio,
@@ -11,6 +12,7 @@ import {
 
 export type AppearanceProps = {
   className?: string
+  variant?: CardProps["variant"]
 }
 
 function ThemePreviewSystem(props: React.SVGProps<SVGSVGElement>) {
@@ -295,7 +297,10 @@ function ThemePreviewDark(props: React.SVGProps<SVGSVGElement>) {
  * @param className - Optional additional CSS class names for the card container.
  * @returns A JSX element containing the theme selector card, or null if theme settings are not configured.
  */
-export function Appearance({ className }: AppearanceProps) {
+export function Appearance({
+  className,
+  ...props
+}: AppearanceProps & CardProps) {
   const {
     localization,
     settings: { theme, setTheme, themes }
@@ -308,7 +313,7 @@ export function Appearance({ className }: AppearanceProps) {
   }
 
   return (
-    <Card className={cn("p-4 md:p-6 gap-4 md:gap-6", className)}>
+    <Card className={cn("p-4 md:p-6 gap-4 md:gap-6", className)} {...props}>
       <Card.Header>
         <Card.Title className="text-xl">
           {localization.settings.appearance}

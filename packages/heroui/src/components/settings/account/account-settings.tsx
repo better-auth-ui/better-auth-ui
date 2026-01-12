@@ -1,4 +1,5 @@
 import { useAuth } from "@better-auth-ui/react"
+import type { ComponentProps } from "react"
 
 import { cn } from "../../../lib/utils"
 import { Accounts } from "./accounts"
@@ -18,11 +19,17 @@ export type AccountSettingsProps = {
  * @param className - Optional additional CSS class names for the outer container.
  * @returns The account settings container as a JSX element.
  */
-export function AccountSettings({ className }: AccountSettingsProps) {
+export function AccountSettings({
+  className,
+  ...props
+}: AccountSettingsProps & ComponentProps<"div">) {
   const { multiSession } = useAuth()
 
   return (
-    <div className={cn("flex w-full flex-col gap-4 md:gap-6", className)}>
+    <div
+      className={cn("flex w-full flex-col gap-4 md:gap-6", className)}
+      {...props}
+    >
       <UserProfile />
       <ChangeEmail />
       <Appearance />

@@ -1,5 +1,6 @@
 import { useAuth } from "@better-auth-ui/react"
 import type { AuthView } from "@better-auth-ui/react/core"
+import type { CardProps } from "@heroui/react"
 
 import { ForgotPassword } from "./forgot-password"
 import { MagicLink } from "./magic-link"
@@ -14,6 +15,7 @@ export type AuthProps = {
   path?: string
   socialLayout?: SocialLayout
   socialPosition?: "top" | "bottom"
+  variant?: CardProps["variant"]
   view?: AuthView
 }
 
@@ -23,16 +25,17 @@ export type AuthProps = {
  * @param path - Route path used to resolve an auth view when `view` is not provided
  * @param socialLayout - Social layout to apply to sign-in/sign-up/magic-link views
  * @param socialPosition - Position for social buttons ("top" or "bottom")
+ * @param variant - Variant to apply to the card
  * @param view - Explicit auth view to render (e.g., "signIn", "signUp")
  * @returns The React element for the resolved authentication view
  */
 export function Auth({
-  className,
-  view,
   path,
   socialLayout,
-  socialPosition
-}: AuthProps) {
+  socialPosition,
+  view,
+  ...props
+}: AuthProps & CardProps) {
   const { viewPaths } = useAuth()
 
   if (!view && !path) {
@@ -49,33 +52,33 @@ export function Auth({
     case "signIn":
       return (
         <SignIn
-          className={className}
           socialLayout={socialLayout}
           socialPosition={socialPosition}
+          {...props}
         />
       )
     case "signUp":
       return (
         <SignUp
-          className={className}
           socialLayout={socialLayout}
           socialPosition={socialPosition}
+          {...props}
         />
       )
     case "magicLink":
       return (
         <MagicLink
-          className={className}
           socialLayout={socialLayout}
           socialPosition={socialPosition}
+          {...props}
         />
       )
     case "forgotPassword":
-      return <ForgotPassword className={className} />
+      return <ForgotPassword {...props} />
     case "resetPassword":
-      return <ResetPassword className={className} />
+      return <ResetPassword {...props} />
     case "signOut":
-      return <SignOut className={className} />
+      return <SignOut {...props} />
     default:
       throw new Error(
         `[Better Auth UI] Valid views are: ${Object.keys(viewPaths.auth).join(", ")}`

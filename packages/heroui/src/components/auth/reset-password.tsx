@@ -3,6 +3,7 @@ import { Eye, EyeSlash } from "@gravity-ui/icons"
 import {
   Button,
   Card,
+  type CardProps,
   Description,
   FieldError,
   Fieldset,
@@ -20,6 +21,7 @@ import { cn } from "../../lib/utils"
 
 export type ResetPasswordProps = {
   className?: string
+  variant?: CardProps["variant"]
 }
 
 /**
@@ -27,7 +29,10 @@ export type ResetPasswordProps = {
  *
  * Renders password (and optional confirm-password) inputs with visibility toggles, applies min/max length constraints from the auth configuration, shows field errors, and submits the new password to the auth client.
  */
-export function ResetPassword({ className }: ResetPasswordProps) {
+export function ResetPassword({
+  className,
+  ...props
+}: ResetPasswordProps & CardProps) {
   const { basePaths, emailAndPassword, localization, viewPaths, navigate } =
     useAuth()
 
@@ -54,7 +59,7 @@ export function ResetPassword({ className }: ResetPasswordProps) {
   ])
 
   return (
-    <Card className={cn("w-full max-w-sm p-4 md:p-6", className)}>
+    <Card className={cn("w-full max-w-sm p-4 md:p-6", className)} {...props}>
       <Card.Content>
         <Form action={resetPassword}>
           <Fieldset className="gap-4">

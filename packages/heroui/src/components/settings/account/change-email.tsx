@@ -3,6 +3,7 @@ import { Check } from "@gravity-ui/icons"
 import {
   Button,
   Card,
+  type CardProps,
   cn,
   FieldError,
   Fieldset,
@@ -16,6 +17,7 @@ import {
 
 export type ChangeEmailProps = {
   className?: string
+  variant?: CardProps["variant"]
 }
 
 /**
@@ -27,13 +29,16 @@ export type ChangeEmailProps = {
  *
  * @returns A JSX element rendering the change-email card and form
  */
-export function ChangeEmail({ className }: ChangeEmailProps) {
+export function ChangeEmail({
+  className,
+  ...props
+}: ChangeEmailProps & CardProps) {
   const { localization } = useAuth()
   const { data: sessionData } = useSession()
   const [state, formAction, isPending] = useChangeEmail()
 
   return (
-    <Card className={cn("p-4 md:p-6 gap-4 md:gap-6", className)}>
+    <Card className={cn("p-4 md:p-6 gap-4 md:gap-6", className)} {...props}>
       <Card.Header>
         <Card.Title className="text-xl">
           {localization.settings.changeEmail}

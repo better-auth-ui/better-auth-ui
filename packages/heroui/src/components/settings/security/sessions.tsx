@@ -5,11 +5,20 @@ import {
   useSession
 } from "@better-auth-ui/react"
 import { ArrowRightFromSquare, Display, Smartphone } from "@gravity-ui/icons"
-import { Button, Card, Chip, cn, Skeleton, Spinner } from "@heroui/react"
+import {
+  Button,
+  Card,
+  type CardProps,
+  Chip,
+  cn,
+  Skeleton,
+  Spinner
+} from "@heroui/react"
 import { UAParser } from "ua-parser-js"
 
 export type SessionsProps = {
   className?: string
+  variant?: CardProps["variant"]
 }
 
 /**
@@ -20,7 +29,7 @@ export type SessionsProps = {
  *
  * @returns A JSX element containing the sessions card
  */
-export function Sessions({ className }: SessionsProps) {
+export function Sessions({ className, ...props }: SessionsProps & CardProps) {
   const { basePaths, localization, viewPaths, navigate } = useAuth()
 
   const { data: sessionData } = useSession()
@@ -28,7 +37,7 @@ export function Sessions({ className }: SessionsProps) {
   const { revokingSession, revokeSession } = useRevokeSession()
 
   return (
-    <Card className={cn("p-4 md:p-6 gap-4 md:gap-6", className)}>
+    <Card className={cn("p-4 md:p-6 gap-4 md:gap-6", className)} {...props}>
       <Card.Header>
         <Card.Title className="text-xl">
           {localization.settings.sessions}

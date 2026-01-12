@@ -2,6 +2,7 @@ import { useAuth, useSignInEmail, useSignInSocial } from "@better-auth-ui/react"
 import {
   Button,
   Card,
+  type CardProps,
   Checkbox,
   Description,
   FieldError,
@@ -19,10 +20,11 @@ import { FieldSeparator } from "./field-separator"
 import { MagicLinkButton } from "./magic-link-button"
 import { ProviderButtons, type SocialLayout } from "./provider-buttons"
 
-export type SignInProps = {
+export interface SignInProps {
   className?: string
   socialLayout?: SocialLayout
   socialPosition?: "top" | "bottom"
+  variant?: CardProps["variant"]
 }
 
 /**
@@ -33,8 +35,9 @@ export type SignInProps = {
 export function SignIn({
   className,
   socialLayout,
-  socialPosition = "bottom"
-}: SignInProps) {
+  socialPosition = "bottom",
+  ...props
+}: SignInProps & CardProps) {
   const {
     basePaths,
     emailAndPassword,
@@ -43,9 +46,7 @@ export function SignIn({
     socialProviders,
     viewPaths
   } = useAuth()
-
   const [{ email, password }, signInEmail, signInPending] = useSignInEmail()
-
   const [_, signInSocial, socialPending] = useSignInSocial()
 
   const isPending = signInPending || socialPending
@@ -54,7 +55,7 @@ export function SignIn({
     emailAndPassword?.enabled && socialProviders && socialProviders.length > 0
 
   return (
-    <Card className={cn("w-full max-w-sm p-4 md:p-6", className)}>
+    <Card className={cn("w-full max-w-sm p-4 md:p-6", className)} {...props}>
       <Card.Content>
         <Fieldset className="gap-4">
           <Label className="text-xl">{localization.auth.signIn}</Label>

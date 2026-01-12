@@ -17,7 +17,16 @@ import {
   Persons,
   Sun
 } from "@gravity-ui/icons"
-import { Button, cn, Dropdown, Label, Separator, Tabs } from "@heroui/react"
+import {
+  Button,
+  type ButtonProps,
+  cn,
+  Dropdown,
+  type DropdownPopoverProps,
+  Label,
+  Separator,
+  Tabs
+} from "@heroui/react"
 
 import { UserAvatar } from "./user-avatar"
 import { UserView } from "./user-view"
@@ -25,37 +34,9 @@ import { UserView } from "./user-view"
 export type UserButtonProps = {
   className?: string
   size?: "default" | "icon"
-  placement?:
-    | "bottom"
-    | "bottom left"
-    | "bottom right"
-    | "bottom start"
-    | "bottom end"
-    | "top"
-    | "top left"
-    | "top right"
-    | "top start"
-    | "top end"
-    | "left"
-    | "left top"
-    | "left bottom"
-    | "start"
-    | "start top"
-    | "start bottom"
-    | "right"
-    | "right top"
-    | "right bottom"
-    | "end"
-    | "end top"
-    | "end bottom"
+  placement?: DropdownPopoverProps["placement"]
   themeToggle?: boolean
-  variant?:
-    | "ghost"
-    | "primary"
-    | "secondary"
-    | "tertiary"
-    | "danger"
-    | "danger-soft"
+  variant?: ButtonProps["variant"]
 }
 
 /**

@@ -1,6 +1,6 @@
 import { useSession } from "@better-auth-ui/react"
 import { Person } from "@gravity-ui/icons"
-import { Avatar, cn, Skeleton } from "@heroui/react"
+import { Avatar, type AvatarProps, cn, Skeleton } from "@heroui/react"
 import type { User } from "better-auth"
 import type { ReactNode } from "react"
 
@@ -9,7 +9,7 @@ export type UserAvatarProps = {
   fallback?: ReactNode
   isPending?: boolean
   user?: User & { username?: string | null; displayUsername?: string | null }
-  size?: "sm" | "md" | "lg"
+  size?: AvatarProps["size"]
 }
 
 /**
@@ -27,8 +27,10 @@ export function UserAvatar({
   fallback,
   isPending,
   user,
-  size = "sm"
-}: UserAvatarProps) {
+  size = "sm",
+  style,
+  ...props
+}: UserAvatarProps & AvatarProps) {
   const { data: sessionData, isPending: sessionPending } = useSession()
 
   if ((isPending || sessionPending) && !user) {
@@ -39,6 +41,7 @@ export function UserAvatar({
           size === "sm" ? "size-8" : size === "md" ? "size-10" : "size-12",
           className
         )}
+        style={style}
       />
     )
   }
@@ -54,7 +57,12 @@ export function UserAvatar({
     .toUpperCase()
 
   return (
-    <Avatar size={size} className={cn("rounded-full", className)}>
+    <Avatar
+      size={size}
+      className={cn("rounded-full", className)}
+      style={style}
+      {...props}
+    >
       <Avatar.Image
         alt={
           resolvedUser?.displayUsername ||

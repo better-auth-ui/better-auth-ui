@@ -1,13 +1,13 @@
 import { useSession } from "@better-auth-ui/react"
-import { cn, Skeleton } from "@heroui/react"
+import { type AvatarProps, cn, Skeleton } from "@heroui/react"
 import type { User } from "better-auth"
-
+import type { ComponentProps } from "react"
 import { UserAvatar } from "./user-avatar"
 
 export type UserViewProps = {
   className?: string
   isPending?: boolean
-  size?: "sm" | "md" | "lg"
+  size?: AvatarProps["size"]
   user?: User & { username?: string | null; displayUsername?: string | null }
 }
 
@@ -23,15 +23,19 @@ export function UserView({
   className,
   isPending,
   size = "sm",
-  user
-}: UserViewProps) {
+  user,
+  ...props
+}: UserViewProps & ComponentProps<"div">) {
   const { data: sessionData, isPending: sessionPending } = useSession()
 
   const resolvedUser = user ?? sessionData?.user
 
   if ((isPending || sessionPending) && !user) {
     return (
-      <div className={cn("flex items-center gap-2 min-w-0", className)}>
+      <div
+        className={cn("flex items-center gap-2 min-w-0", className)}
+        {...props}
+      >
         <UserAvatar isPending size={size} />
 
         <div className="flex flex-col gap-1.5 min-w-0">
@@ -43,7 +47,10 @@ export function UserView({
   }
 
   return (
-    <div className={cn("flex items-center gap-2 min-w-0", className)}>
+    <div
+      className={cn("flex items-center gap-2 min-w-0", className)}
+      {...props}
+    >
       <UserAvatar user={resolvedUser} size={size} />
 
       <div className="min-w-0">

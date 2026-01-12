@@ -3,6 +3,7 @@ import { Check, Eye, EyeSlash } from "@gravity-ui/icons"
 import {
   Button,
   Card,
+  type CardProps,
   cn,
   FieldError,
   Fieldset,
@@ -18,6 +19,7 @@ import { useState } from "react"
 
 export type ChangePasswordProps = {
   className?: string
+  variant?: CardProps["variant"]
 }
 
 /**
@@ -29,7 +31,10 @@ export type ChangePasswordProps = {
  *
  * @returns A JSX element containing the change-password card and form
  */
-export function ChangePassword({ className }: ChangePasswordProps) {
+export function ChangePassword({
+  className,
+  ...props
+}: ChangePasswordProps & CardProps) {
   const { emailAndPassword, localization } = useAuth()
   const { data: sessionData } = useSession()
   const [, formAction, isPending] = useChangePassword()
@@ -39,7 +44,7 @@ export function ChangePassword({ className }: ChangePasswordProps) {
     useState(false)
 
   return (
-    <Card className={cn("p-4 md:p-6 gap-4 md:gap-6", className)}>
+    <Card className={cn("p-4 md:p-6 gap-4 md:gap-6", className)} {...props}>
       <Card.Header>
         <Card.Title className="text-xl">
           {localization.settings.changePassword}

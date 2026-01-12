@@ -3,6 +3,7 @@ import { Eye, EyeSlash } from "@gravity-ui/icons"
 import {
   Button,
   Card,
+  type CardProps,
   Description,
   FieldError,
   Fieldset,
@@ -25,6 +26,7 @@ export type SignUpProps = {
   className?: string
   socialLayout?: SocialLayout
   socialPosition?: "top" | "bottom"
+  variant?: CardProps["variant"]
 }
 
 /**
@@ -40,8 +42,9 @@ export type SignUpProps = {
 export function SignUp({
   className,
   socialLayout,
-  socialPosition = "bottom"
-}: SignUpProps) {
+  socialPosition = "bottom",
+  ...props
+}: SignUpProps & CardProps) {
   const {
     basePaths,
     emailAndPassword,
@@ -69,7 +72,7 @@ export function SignUp({
     emailAndPassword?.enabled && socialProviders && socialProviders.length > 0
 
   return (
-    <Card className={cn("w-full max-w-sm p-4 md:p-6", className)}>
+    <Card className={cn("w-full max-w-sm p-4 md:p-6", className)} {...props}>
       <Card.Content>
         <Fieldset className="gap-4">
           <Label className="text-xl">{localization.auth.signUp}</Label>

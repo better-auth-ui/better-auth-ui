@@ -6,6 +6,7 @@ import {
 import {
   Button,
   Card,
+  type CardProps,
   Description,
   FieldError,
   Fieldset,
@@ -25,6 +26,7 @@ export type MagicLinkProps = {
   className?: string
   socialLayout?: SocialLayout
   socialPosition?: "top" | "bottom"
+  variant?: CardProps["variant"]
 }
 
 /**
@@ -38,8 +40,9 @@ export type MagicLinkProps = {
 export function MagicLink({
   className,
   socialLayout,
-  socialPosition = "bottom"
-}: MagicLinkProps) {
+  socialPosition = "bottom",
+  ...props
+}: MagicLinkProps & CardProps) {
   const { basePaths, localization, socialProviders, viewPaths } = useAuth()
   const [{ email }, signInMagicLink, magicLinkPending] = useSignInMagicLink()
   const [_, signInSocial, socialPending] = useSignInSocial()
@@ -49,7 +52,7 @@ export function MagicLink({
   const showSeparator = socialProviders && socialProviders.length > 0
 
   return (
-    <Card className={cn("w-full max-w-sm p-4 md:p-6", className)}>
+    <Card className={cn("w-full max-w-sm p-4 md:p-6", className)} {...props}>
       <Card.Content>
         <Fieldset className="gap-4">
           <Label className="text-xl">{localization.auth.signIn}</Label>

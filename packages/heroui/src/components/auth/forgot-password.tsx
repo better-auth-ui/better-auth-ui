@@ -2,6 +2,7 @@ import { useAuth, useForgotPassword } from "@better-auth-ui/react"
 import {
   Button,
   Card,
+  type CardProps,
   Description,
   FieldError,
   Fieldset,
@@ -17,6 +18,7 @@ import { cn } from "../../lib/utils"
 
 export type ForgotPasswordProps = {
   className?: string
+  variant?: CardProps["variant"]
 }
 
 /**
@@ -28,12 +30,15 @@ export type ForgotPasswordProps = {
  * @param className - Optional additional CSS class names applied to the card
  * @returns The forgot-password form UI as a JSX element
  */
-export function ForgotPassword({ className }: ForgotPasswordProps) {
+export function ForgotPassword({
+  className,
+  ...props
+}: ForgotPasswordProps & CardProps) {
   const { basePaths, localization, viewPaths } = useAuth()
   const [{ email }, forgotPassword, isPending] = useForgotPassword()
 
   return (
-    <Card className={cn("w-full max-w-sm p-4 md:p-6", className)}>
+    <Card className={cn("w-full max-w-sm p-4 md:p-6", className)} {...props}>
       <Card.Content>
         <Form action={forgotPassword}>
           <Fieldset className="gap-4">

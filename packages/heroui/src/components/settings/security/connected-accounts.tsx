@@ -7,10 +7,18 @@ import {
   useUnlinkAccount
 } from "@better-auth-ui/react"
 import { Link as LinkIcon, Xmark } from "@gravity-ui/icons"
-import { Button, Card, cn, Skeleton, Spinner } from "@heroui/react"
+import {
+  Button,
+  Card,
+  type CardProps,
+  cn,
+  Skeleton,
+  Spinner
+} from "@heroui/react"
 
 export type ConnectedAccountsProps = {
   className?: string
+  variant?: CardProps["variant"]
 }
 
 /**
@@ -22,7 +30,10 @@ export type ConnectedAccountsProps = {
  *
  * @returns A JSX element containing the connected accounts card
  */
-export function ConnectedAccounts({ className }: ConnectedAccountsProps) {
+export function ConnectedAccounts({
+  className,
+  ...props
+}: ConnectedAccountsProps & CardProps) {
   const { localization, socialProviders } = useAuth()
 
   const { data: accounts, isPending } = useListAccounts()
@@ -30,7 +41,7 @@ export function ConnectedAccounts({ className }: ConnectedAccountsProps) {
   const { unlinkAccount, unlinkingProvider } = useUnlinkAccount()
 
   return (
-    <Card className={cn("p-4 md:p-6 gap-4 md:gap-6", className)}>
+    <Card className={cn("p-4 md:p-6 gap-4 md:gap-6", className)} {...props}>
       <Card.Header>
         <Card.Title className="text-xl">
           {localization.settings.connectedAccounts}

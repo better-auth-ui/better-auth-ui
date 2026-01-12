@@ -10,12 +10,20 @@ import {
   ArrowRightFromSquare,
   CirclePlus
 } from "@gravity-ui/icons"
-import { Button, buttonVariants, Card, cn, Spinner } from "@heroui/react"
+import {
+  Button,
+  buttonVariants,
+  Card,
+  type CardProps,
+  cn,
+  Spinner
+} from "@heroui/react"
 
 import { UserView } from "../../user/user-view"
 
 export type AccountsProps = {
   className?: string
+  variant?: CardProps["variant"]
 }
 
 /**
@@ -26,7 +34,7 @@ export type AccountsProps = {
  *
  * @returns A JSX element containing the accounts management card
  */
-export function Accounts({ className }: AccountsProps) {
+export function Accounts({ className, ...props }: AccountsProps & CardProps) {
   const { basePaths, localization, viewPaths, Link } = useAuth()
   const { data: sessionData } = useSession()
   const { data: deviceSessions, isPending } = useListDeviceSessions()
@@ -34,7 +42,7 @@ export function Accounts({ className }: AccountsProps) {
   const { revokingSession, revokeSession } = useRevokeMultiSession()
 
   return (
-    <Card className={cn("p-4 md:p-6 gap-4 md:gap-6", className)}>
+    <Card className={cn("p-4 md:p-6 gap-4 md:gap-6", className)} {...props}>
       <Card.Header>
         <Card.Title className="text-xl">
           {localization.settings.accounts}
