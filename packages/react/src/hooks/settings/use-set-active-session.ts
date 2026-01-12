@@ -3,9 +3,9 @@ import { useQueryClient } from "@tanstack/react-query"
 import { useCallback, useState } from "react"
 
 /**
- * Provides functionality to set an active session from device sessions in multi-session mode.
+ * Hook that sets an active device session in multi-session mode.
  *
- * @returns An object containing the pending session token and a function to set the active session
+ * @returns An object with `settingActiveSession` — the session token currently being set or `null`, and `setActiveSession(sessionToken)` — function that makes the given session token the active session.
  */
 export function useSetActiveSession() {
   const queryClient = useQueryClient()

@@ -2,6 +2,12 @@ import { AuthProvider } from "@better-auth-ui/heroui"
 import { Toaster } from "sonner"
 import { authClient } from "@/lib/auth-client"
 
+/**
+ * Wraps content with a demo-configured AuthProvider and renders a global Toaster.
+ *
+ * @param children - The React nodes to render inside the demo AuthProvider
+ * @returns The rendered provider-wrapped children and a Toaster element
+ */
 export function DemoProviders({ children }: { children: React.ReactNode }) {
   return (
     <>

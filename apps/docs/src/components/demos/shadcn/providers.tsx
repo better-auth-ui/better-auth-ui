@@ -4,6 +4,11 @@ import type { ReactNode } from "react"
 
 import { authClient } from "@/lib/auth-client"
 
+/**
+ * Wraps children with an AuthProvider preconfigured for magic link, multi-session, social sign-in, and app navigation.
+ *
+ * @returns The AuthProvider React element that renders `children` within the configured authentication context.
+ */
 export function Providers({ children }: { children: ReactNode }) {
   const navigate = useNavigate()
 

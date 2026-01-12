@@ -18,12 +18,12 @@ export type ConnectedAccountsProps = {
 }
 
 /**
- * Display and manage connected social accounts.
+ * Render a card UI for viewing and managing linked social accounts.
  *
- * Shows all linked social accounts with the ability to unlink them,
- * followed by available providers that can be linked.
+ * Displays currently linked social accounts (excluding credentials) with unlink controls,
+ * and lists available social providers with link controls. Actions are disabled while a link or unlink is in progress.
  *
- * @returns A JSX element containing the connected accounts card
+ * @returns The connected accounts card as a React element
  */
 export function ConnectedAccounts({ className }: ConnectedAccountsProps) {
   const { localization, socialProviders } = useAuth()

@@ -2,6 +2,14 @@ import { UserButton } from "@better-auth-ui/heroui"
 import { Link } from "@heroui/react"
 import { Logo } from "./logo"
 
+/**
+ * Render the application header containing the brand link and user account button.
+ *
+ * The header is a top-aligned bar that displays the application logo and title on the left
+ * and a user control button on the right.
+ *
+ * @returns The header JSX element containing the logo/title link and a user button.
+ */
 export function Header() {
   return (
     <header className="sticky top-0 z-10 bg-background border-b border-default">

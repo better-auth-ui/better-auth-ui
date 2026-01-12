@@ -9,7 +9,9 @@ export type SignOutProps = {
 }
 
 /**
- * Signs the current user out when mounted and displays a loading card while the operation completes.
+ * Initiates sign-out on mount and renders a loading card while sign-out proceeds.
+ *
+ * @returns A Card containing a centered Spinner shown during the sign-out process
  */
 export function SignOut({ className }: SignOutProps) {
   const { signOut } = useSignOut()

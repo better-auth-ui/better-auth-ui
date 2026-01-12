@@ -26,9 +26,9 @@ export type SignInProps = {
 }
 
 /**
- * Renders the sign-in form with email/password, optional magic link, and social provider buttons, honoring configuration and localization from the provided auth config.
+ * Render the sign-in UI using auth context for configuration and localization.
  *
- * @returns The JSX element for the sign-in UI.
+ * @returns The sign-in JSX element containing email/password fields, optional magic-link button, and social provider buttons.
  */
 export function SignIn({
   className,

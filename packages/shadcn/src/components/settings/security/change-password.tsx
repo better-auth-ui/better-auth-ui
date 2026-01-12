@@ -31,13 +31,12 @@ export type ChangePasswordProps = {
 }
 
 /**
- * Display a form allowing the authenticated user to change their password.
+ * Renders a card form that allows the authenticated user to change their password.
  *
- * Renders a card containing fields for current password, new password, and
- * optionally password confirmation (based on emailAndPassword.confirmPassword config).
- * Upon successful submission, all other sessions are revoked for security.
+ * Shows fields for current password, new password, and — when emailAndPassword.confirmPassword is true — a confirmation field.
+ * Successful submission revokes all other sessions for the user.
  *
- * @returns A JSX element containing the change password card and form
+ * @returns A JSX element containing the change-password form card
  */
 export function ChangePassword({ className }: ChangePasswordProps) {
   const { emailAndPassword, localization } = useAuth()

@@ -13,10 +13,11 @@ export type MagicLinkButtonProps = {
 }
 
 /**
- * A button that links to either the magic-link or sign-in route and displays the corresponding icon and label.
+ * Renders a full-width outline button that navigates to either the magic-link flow or the sign-in flow and shows the matching icon and label.
  *
- * @param isPending - If true, apply disabled styling and prevent interactions
- * @param view - Current auth view; when `"magicLink"`, the button shows the password/sign-in variant
+ * @param isPending - If true, disables the button and applies pending styling
+ * @param view - Current auth view; when "magicLink", the button targets the sign-in/password route
+ * @returns The button element configured to navigate to the appropriate auth route
  */
 export function MagicLinkButton({ isPending, view }: MagicLinkButtonProps) {
   const { basePaths, viewPaths, localization, Link } = useAuth()

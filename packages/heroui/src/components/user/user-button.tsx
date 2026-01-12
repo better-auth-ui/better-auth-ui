@@ -58,6 +58,18 @@ export type UserButtonProps = {
     | "danger-soft"
 }
 
+/**
+ * Render a user account dropdown button that shows account actions, session switching, and theme controls.
+ *
+ * Renders either an icon-only trigger or a full button showing the current user state; its dropdown contains account settings, multi-session switching (when enabled), theme selection (when enabled), and sign-in/sign-out flows depending on authentication state.
+ *
+ * @param className - Additional CSS classes applied to the trigger element
+ * @param placement - Dropdown popover placement (e.g., "bottom", "top-start", "bottom-end")
+ * @param size - "icon" renders an avatar-only trigger; "default" renders a button with label and chevron
+ * @param variant - Button visual variant passed to the underlying Button component
+ * @param themeToggle - When true and theming is available, show theme selection controls in the menu
+ * @returns The user button and its dropdown menu as a JSX element
+ */
 export function UserButton({
   className,
   placement = "bottom",

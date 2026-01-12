@@ -2,6 +2,15 @@ import { useAuth } from "@better-auth-ui/react"
 import { useQueryClient } from "@tanstack/react-query"
 import { useActionState } from "react"
 
+/**
+ * Creates an action state for performing email/password sign-up and handling post-sign-up flow.
+ *
+ * Validates the optional confirm-password field, shows localized toast messages on mismatch or API errors,
+ * triggers email verification flow when required, invalidates auth queries on successful sign-in when verification
+ * is not required, and navigates to the appropriate view after completion.
+ *
+ * @returns The action state returned by `useActionState` that manages the email sign-up operation and the form fields `name`, `email`, `password`, and `confirmPassword`.
+ */
 export function useSignUpEmail() {
   const queryClient = useQueryClient()
   const {

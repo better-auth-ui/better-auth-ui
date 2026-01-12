@@ -35,17 +35,10 @@ export type SignUpProps = {
 }
 
 /**
- * Renders a sign-up form with name, email, and password fields, optional social provider buttons, and submission handling.
+ * Render a sign-up form with name, email, password (and optional confirm password) fields, optional social provider buttons, and password visibility toggles.
  *
- * Submits credentials to the configured auth client and handles the response:
- * - If email verification is required, shows a notification and navigates to sign-in
- * - On success, refreshes the session and navigates to the configured redirect path
- * - On failure, displays error toasts
- * - Manages a pending state while the request is in-flight
+ * The component integrates with authentication hooks to handle email/password and social sign-in flows and reflects pending/validation state in the UI.
  *
- * @param className - Additional CSS classes applied to the outer container
- * @param socialLayout - Social layout to apply to the component
- * @param socialPosition - Social position to apply to the component
  * @returns The sign-up form React element.
  */
 export function SignUp({

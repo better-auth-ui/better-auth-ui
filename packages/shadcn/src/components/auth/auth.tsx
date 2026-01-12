@@ -20,12 +20,17 @@ export type AuthProps = {
 }
 
 /**
- * Selects and renders the appropriate authentication view component.
+ * Render the selected authentication view component.
+ *
+ * The view is determined by the explicit `view` prop or, if absent, resolved from `path` using the application's auth view paths.
  *
  * @param path - Route path used to resolve an auth view when `view` is not provided
  * @param socialLayout - Social layout to apply to the component
  * @param socialPosition - Social position to apply to the component
  * @param view - Explicit auth view to render (e.g., "signIn", "signUp")
+ * @returns The rendered authentication view element
+ * @throws Error if neither `view` nor `path` is provided
+ * @throws Error if the resolved view is not a valid auth view
  */
 export function Auth({
   className,

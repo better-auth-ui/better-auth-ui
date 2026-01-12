@@ -50,7 +50,9 @@ export type UserButtonProps = {
 }
 
 /**
- * Renders a user button with dropdown menu showing user info and sign out option.
+ * Displays a user button that opens a dropdown with the current user view, account actions, multi-session switching, optional theme controls, and sign-in/sign-out links.
+ *
+ * @returns The user button and its dropdown menu as a React element.
  */
 export function UserButton({
   className,

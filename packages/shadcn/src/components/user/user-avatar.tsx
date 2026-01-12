@@ -17,15 +17,15 @@ export type UserAvatarProps = {
 }
 
 /**
- * Display a user's avatar using session information or an explicit user prop.
+ * Render a circular user avatar using the provided user or the current session user.
  *
- * Renders a circular avatar that shows the user's image when available, a fallback node if provided, or the user's first two initials; while the session is loading (or when `isPending` is true) and no `user` prop is supplied, renders a skeleton placeholder.
+ * Shows the user's image when available; otherwise displays the provided `fallback`, the user's first two uppercase initials, or a default icon. If `isPending` is true or the session is loading and no `user` prop is supplied, renders a skeleton placeholder.
  *
  * @param className - Additional CSS classes applied to the avatar container
  * @param user - Optional user object to display instead of the session user
- * @param isPending - When true, treat the component as loading and show the skeleton if no `user` is provided
+ * @param isPending - When true, show the skeleton placeholder if no `user` is provided
  * @param fallback - Node to render inside the avatar fallback area before initials or the default icon
- * @returns The avatar element to render (JSX)
+ * @returns The avatar element
  */
 export function UserAvatar({
   className,

@@ -21,11 +21,11 @@ export type UserProfileProps = {
 }
 
 /**
- * Display and edit the authenticated user's profile in a card-based form.
+ * Render a profile card that lets the authenticated user view and update their display name.
  *
- * Renders a loading skeleton while the session is pending. When loaded, shows the user's avatar with an edit indicator, the best-available identifier (displayUsername, name, or email) with a conditional email line, a name input prefilled from the session or local state, and a submit button that reflects update pending state. Labels and texts come from the provided auth localization; the form action is wired to the update user action from the auth hooks.
+ * The component uses auth localization for labels, reflects session loading state with skeletons, shows the best-available user identifier (display username, name, or email), and wires the form submission to the user update action from auth hooks.
  *
- * @returns A JSX element containing the profile card and editable form
+ * @returns A JSX element containing the user profile card and an editable name form
  */
 export function UserProfile({ className }: UserProfileProps) {
   const { localization } = useAuth()

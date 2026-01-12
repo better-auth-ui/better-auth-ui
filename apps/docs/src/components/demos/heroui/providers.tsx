@@ -4,6 +4,12 @@ import type { ReactNode } from "react"
 
 import { authClient } from "@/lib/auth-client"
 
+/**
+ * Wraps the given children with an AuthProvider configured for the application.
+ *
+ * @param children - Elements to render inside the AuthProvider
+ * @returns The children wrapped with the configured AuthProvider component
+ */
 export function Providers({ children }: { children: ReactNode }) {
   const navigate = useNavigate()
 

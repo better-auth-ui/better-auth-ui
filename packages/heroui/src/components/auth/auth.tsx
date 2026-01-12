@@ -18,12 +18,13 @@ export type AuthProps = {
 }
 
 /**
- * Selects and renders the appropriate authentication view component.
+ * Render the appropriate authentication view based on the provided `view` or `path`.
  *
  * @param path - Route path used to resolve an auth view when `view` is not provided
- * @param socialLayout - Social layout to apply to the component
- * @param socialPosition - Social position to apply to the component
+ * @param socialLayout - Social layout to apply to sign-in/sign-up/magic-link views
+ * @param socialPosition - Position for social buttons ("top" or "bottom")
  * @param view - Explicit auth view to render (e.g., "signIn", "signUp")
+ * @returns The React element for the resolved authentication view
  */
 export function Auth({
   className,
