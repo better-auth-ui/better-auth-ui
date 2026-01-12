@@ -18,6 +18,6 @@ export function useListDeviceSessions(options?: DefinedInitialDataOptions) {
         fetchOptions: { throw: true }
       }),
     enabled: multiSession && !!sessionData,
-    ...options
+    ...(options as object)
   })
 }

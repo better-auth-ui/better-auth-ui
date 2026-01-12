@@ -19,6 +19,6 @@ export function useListAccounts(options?: DefinedInitialDataOptions) {
         fetchOptions: { throw: true }
       }),
     enabled: !!socialProviders?.length && !!sessionData,
-    ...options
+    ...(options as object)
   })
 }
