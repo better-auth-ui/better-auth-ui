@@ -3,6 +3,7 @@
 export * from "./components/auth/auth-provider"
 export * from "./components/email"
 export * from "./components/icons"
+export * from "./components/settings/account/theme-preview"
 export * from "./hooks/auth/use-authenticate"
 export * from "./hooks/auth/use-forgot-password"
 export * from "./hooks/auth/use-reset-password"
