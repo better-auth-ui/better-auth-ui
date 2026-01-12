@@ -1,6 +1,6 @@
 "use client"
 
-import type { AnyAuthConfig } from "@better-auth-ui/react"
+import { useAuth } from "@better-auth-ui/react"
 import { ArrowLeftRight, LogOut, PlusCircle } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
@@ -13,34 +13,30 @@ import {
 } from "@/components/ui/card"
 import { Spinner } from "@/components/ui/spinner"
 import { UserView } from "@/components/user/user-view"
-import { useAuth } from "@/hooks/auth/use-auth"
 import { useSession } from "@/hooks/auth/use-session"
 import { useListDeviceSessions } from "@/hooks/settings/use-list-device-sessions"
 import { useRevokeMultiSession } from "@/hooks/settings/use-revoke-multi-session"
 import { useSetActiveSession } from "@/hooks/settings/use-set-active-session"
 import { cn } from "@/lib/utils"
 
-export type AccountsProps = AnyAuthConfig & {
+export type AccountsProps = {
   className?: string
 }
 
 /**
- * Display and manage multiple signed-in accounts for multi-session support.
+ * Render a card that lists and manages all device sessions for the current user.
  *
- * Shows all device sessions, allows switching between accounts, and signing out
- * of individual accounts. Shown in AccountSettings when multiSession is enabled.
+ * Shows each session with user information and actions to switch to or revoke a session.
+ * When device session data is loading, a pending placeholder row is displayed.
  *
- * @returns A JSX element containing the accounts card, or null if multiSession is disabled
+ * @returns A JSX element containing the accounts management card
  */
-export function Accounts({ className, ...config }: AccountsProps) {
-  const context = useAuth(config)
-  const { basePaths, localization, viewPaths, Link } = context
-
-  const { data: sessionData } = useSession(context)
-  const { data: deviceSessions, isPending } = useListDeviceSessions(context)
-  const { settingActiveSession, setActiveSession } =
-    useSetActiveSession(context)
-  const { revokingSession, revokeSession } = useRevokeMultiSession(context)
+export function Accounts({ className }: AccountsProps) {
+  const { basePaths, localization, viewPaths, Link } = useAuth()
+  const { data: sessionData } = useSession()
+  const { data: deviceSessions, isPending } = useListDeviceSessions()
+  const { settingActiveSession, setActiveSession } = useSetActiveSession()
+  const { revokingSession, revokeSession } = useRevokeMultiSession()
 
   return (
     <Card className={cn("w-full py-4 md:py-6 gap-4 md:gap-6", className)}>
@@ -69,7 +65,7 @@ export function Accounts({ className, ...config }: AccountsProps) {
                 key={deviceSession.session.id}
                 className="h-15 flex items-center rounded-xl border p-3 justify-between"
               >
-                <UserView {...config} user={deviceSession.user} />
+                <UserView user={deviceSession.user} />
 
                 <div className="flex items-center gap-1 shrink-0">
                   {!isActive && (
@@ -101,7 +97,7 @@ export function Accounts({ className, ...config }: AccountsProps) {
           })
         ) : (
           <div className="h-15 flex items-center rounded-xl border p-3">
-            <UserView isPending {...config} />
+            <UserView isPending />
           </div>
         )}
       </CardContent>

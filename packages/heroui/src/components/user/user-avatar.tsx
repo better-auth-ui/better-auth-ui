@@ -1,12 +1,10 @@
-import { type AnyAuthConfig, useSession } from "@better-auth-ui/react"
+import { useSession } from "@better-auth-ui/react"
 import { Person } from "@gravity-ui/icons"
 import { Avatar, cn, Skeleton } from "@heroui/react"
 import type { User } from "better-auth"
 import type { ReactNode } from "react"
 
-import { useAuth } from "../../hooks/use-auth"
-
-export type UserAvatarProps = AnyAuthConfig & {
+export type UserAvatarProps = {
   className?: string
   fallback?: ReactNode
   isPending?: boolean
@@ -29,11 +27,9 @@ export function UserAvatar({
   fallback,
   isPending,
   user,
-  size = "sm",
-  ...config
+  size = "sm"
 }: UserAvatarProps) {
-  const context = useAuth(config)
-  const { data: sessionData, isPending: sessionPending } = useSession(context)
+  const { data: sessionData, isPending: sessionPending } = useSession()
 
   if ((isPending || sessionPending) && !user) {
     return (

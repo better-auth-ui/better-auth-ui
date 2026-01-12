@@ -1,16 +1,16 @@
-import type { AnyAuthConfig } from "@better-auth-ui/react"
+import { useAuth } from "@better-auth-ui/react"
 import { useActionState } from "react"
 
-import { useAuth } from "../auth/use-auth"
-
 /**
- * Provides an action state hook that allows an authenticated user to change their password.
+ * Hook that creates an action state for changing the authenticated user's password.
  *
- * @param config - Optional auth configuration forwarded to the auth hook
- * @returns An action state whose action initiates the password change process and displays success or error toasts
+ * The action validates confirm-password when enabled, submits the password-change request,
+ * revokes other sessions on success, and displays success or error toasts.
+ *
+ * @returns The `useActionState` result whose state is an empty object `{}`.
  */
-export function useChangePassword(config?: AnyAuthConfig) {
-  const { authClient, emailAndPassword, localization, toast } = useAuth(config)
+export function useChangePassword() {
+  const { authClient, emailAndPassword, localization, toast } = useAuth()
 
   const changePassword = async (_: object, formData: FormData) => {
     const currentPassword = formData.get("currentPassword") as string

@@ -1,6 +1,5 @@
 import { UserButton } from "@better-auth-ui/heroui"
 import { Link } from "@heroui/react"
-import { Suspense } from "react"
 import { Logo } from "./logo"
 
 export function Header() {
@@ -17,9 +16,7 @@ export function Header() {
           <h1 className="text-base">BETTER-AUTH. UI</h1>
         </Link>
 
-        <Suspense>
-          <UserButton size="icon" placement="bottom right" />
-        </Suspense>
+        <UserButton size="icon" placement="bottom right" />
       </div>
     </header>
   )

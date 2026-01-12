@@ -1,6 +1,6 @@
 "use client"
 
-import type { AnyAuthConfig } from "@better-auth-ui/react"
 import { createContext } from "react"
+import type { AuthConfig } from "./auth-config"
 
-export const AuthContext = createContext<AnyAuthConfig | undefined>(undefined)
+export const AuthContext = createContext<AuthConfig | undefined>(undefined)

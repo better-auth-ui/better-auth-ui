@@ -1,19 +1,25 @@
-import type { AnyAuthConfig } from "@better-auth-ui/react"
+import { useAuth } from "@better-auth-ui/react"
+import { useQueryClient } from "@tanstack/react-query"
 import { useActionState } from "react"
 
-import { useAuth } from "./use-auth"
-
-export function useSignInEmail(config?: AnyAuthConfig) {
+/**
+ * Create an action state that signs a user in with email and password.
+ *
+ * The action sends an email/password sign-in request, invalidates the auth query cache and navigates to the configured redirect on success. If the account's email is not verified, a toast is shown with an action to resend a verification email; other errors are surfaced via toasts. On error the action returns the submitted email with an empty password; on success it returns the submitted email and password.
+ *
+ * @returns An action state object whose action performs the email sign-in and resolves to an object `{ email, password }` (password preserved on success, set to `""` on error).
+ */
+export function useSignInEmail() {
   const {
     authClient,
     baseURL,
     emailAndPassword,
     localization,
-    queryClient,
     redirectTo,
     toast,
     navigate
-  } = useAuth(config)
+  } = useAuth()
+  const queryClient = useQueryClient()
 
   const signInEmail = async (_: object, formData: FormData) => {
     const email = formData.get("email") as string

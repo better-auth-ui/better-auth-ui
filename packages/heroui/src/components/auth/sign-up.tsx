@@ -1,8 +1,4 @@
-import {
-  type AnyAuthConfig,
-  useSignInSocial,
-  useSignUpEmail
-} from "@better-auth-ui/react"
+import { useAuth, useSignInSocial, useSignUpEmail } from "@better-auth-ui/react"
 import { Eye, EyeSlash } from "@gravity-ui/icons"
 import {
   Button,
@@ -20,33 +16,32 @@ import {
 } from "@heroui/react"
 import { useState } from "react"
 
-import { useAuth } from "../../hooks/use-auth"
 import { cn } from "../../lib/utils"
 import { FieldSeparator } from "./field-separator"
 import { MagicLinkButton } from "./magic-link-button"
 import { ProviderButtons, type SocialLayout } from "./provider-buttons"
 
-export type SignUpProps = AnyAuthConfig & {
+export type SignUpProps = {
   className?: string
   socialLayout?: SocialLayout
   socialPosition?: "top" | "bottom"
 }
 
 /**
- * Render a sign-up form with optional social provider buttons, name/email/password fields, and controls for password visibility.
+ * Render a sign-up form with name, email, password (and optional confirm password) fields, optional social provider buttons, and password visibility controls.
  *
- * The component reflects request state by disabling inputs and showing a pending indicator when a sign-up or social sign-in is in progress.
+ * The component reflects request state by disabling inputs and showing a pending indicator during sign-up or social sign-in.
  *
- * @returns A React element representing the sign-up form UI.
+ * @param className - Additional CSS classes applied to the outer card container
+ * @param socialLayout - Social layout to apply to the provider buttons component
+ * @param socialPosition - Position of social provider buttons relative to the form; `"top"` or `"bottom"` (default `"bottom"`)
+ * @returns The sign-up form React element
  */
 export function SignUp({
   className,
   socialLayout,
-  socialPosition = "bottom",
-  ...config
+  socialPosition = "bottom"
 }: SignUpProps) {
-  const context = useAuth(config)
-
   const {
     basePaths,
     emailAndPassword,
@@ -54,15 +49,15 @@ export function SignUp({
     magicLink,
     socialProviders,
     viewPaths
-  } = context
+  } = useAuth()
 
   const [
     { name, email, password, confirmPassword },
     signUpEmail,
     signUpPending
-  ] = useSignUpEmail(context)
+  ] = useSignUpEmail()
 
-  const [_, signInSocial, socialPending] = useSignInSocial(context)
+  const [_, signInSocial, socialPending] = useSignInSocial()
 
   const [isPasswordVisible, setIsPasswordVisible] = useState(false)
   const [isConfirmPasswordVisible, setIsConfirmPasswordVisible] =
@@ -83,7 +78,6 @@ export function SignUp({
             <>
               {socialProviders && socialProviders.length > 0 && (
                 <ProviderButtons
-                  {...config}
                   isPending={isPending}
                   socialLayout={socialLayout}
                   signInSocial={signInSocial}
@@ -228,11 +222,7 @@ export function SignUp({
                 </Button>
 
                 {magicLink && (
-                  <MagicLinkButton
-                    {...config}
-                    view="signUp"
-                    isPending={isPending}
-                  />
+                  <MagicLinkButton view="signUp" isPending={isPending} />
                 )}
               </Fieldset.Actions>
             </Form>
@@ -246,7 +236,6 @@ export function SignUp({
 
               {socialProviders && socialProviders.length > 0 && (
                 <ProviderButtons
-                  {...config}
                   socialLayout={socialLayout}
                   signInSocial={signInSocial}
                   isPending={isPending}

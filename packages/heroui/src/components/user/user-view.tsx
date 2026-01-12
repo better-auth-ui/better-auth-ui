@@ -1,11 +1,10 @@
-import { type AnyAuthConfig, useSession } from "@better-auth-ui/react"
+import { useSession } from "@better-auth-ui/react"
 import { cn, Skeleton } from "@heroui/react"
 import type { User } from "better-auth"
 
-import { useAuth } from "../../hooks/use-auth"
 import { UserAvatar } from "./user-avatar"
 
-export type UserViewProps = AnyAuthConfig & {
+export type UserViewProps = {
   className?: string
   isPending?: boolean
   size?: "sm" | "md" | "lg"
@@ -13,30 +12,27 @@ export type UserViewProps = AnyAuthConfig & {
 }
 
 /**
- * Render a user view that shows the user's avatar alongside their name and email.
+ * Render a compact user item with an avatar, a primary label (display username, name, or email), and an optional secondary email line.
  *
- * @param className - Additional CSS classes applied to the outer container
- * @param isPending - When true, force rendering of the loading skeleton (unless an explicit `user` prop is provided)
- * @param size - Size variant for the avatar ("sm" | "md" | "lg"), defaults to "sm"
- * @param user - Optional user object to display; when omitted the current session user is used if available
- * @returns A React element that displays the user's avatar with their name and email
+ * @param isPending - If true and no `user` prop is provided, renders a loading skeleton instead of user details
+ * @param size - Avatar size variant; defaults to `"sm"`
+ * @param user - Optional user to display; when omitted the current session user is used if available
+ * @returns A React element containing the user's avatar and text labels
  */
 export function UserView({
   className,
   isPending,
   size = "sm",
-  user,
-  ...config
+  user
 }: UserViewProps) {
-  const context = useAuth(config)
-  const { data: sessionData, isPending: sessionPending } = useSession(context)
+  const { data: sessionData, isPending: sessionPending } = useSession()
 
   const resolvedUser = user ?? sessionData?.user
 
   if ((isPending || sessionPending) && !user) {
     return (
       <div className={cn("flex items-center gap-2 min-w-0", className)}>
-        <UserAvatar isPending size={size} {...config} />
+        <UserAvatar isPending size={size} />
 
         <div className="flex flex-col gap-1.5 min-w-0">
           <Skeleton className="h-4 w-24 rounded-lg" />
@@ -48,7 +44,7 @@ export function UserView({
 
   return (
     <div className={cn("flex items-center gap-2 min-w-0", className)}>
-      <UserAvatar user={resolvedUser} size={size} {...config} />
+      <UserAvatar user={resolvedUser} size={size} />
 
       <div className="min-w-0">
         <p className="text-sm font-medium truncate">

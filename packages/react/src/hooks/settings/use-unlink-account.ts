@@ -1,18 +1,19 @@
-import type { AnyAuthConfig } from "@better-auth-ui/react"
+import { useAuth } from "@better-auth-ui/react"
 import { useCallback, useState } from "react"
 
-import { useAuth } from "../auth/use-auth"
 import { useListAccounts } from "./use-list-accounts"
 
 /**
- * Provides functionality to unlink a social account from the current user.
+ * Exposes state and an action to unlink a linked social provider from the current user.
  *
- * @param config - Optional auth configuration forwarded to the auth hook
- * @returns An object containing the unlinking provider and a function to unlink an account
+ * The action sets `unlinkingProvider` to the provider id while the operation is in progress,
+ * triggers a refetch of linked accounts on success, and shows a localized success or error toast.
+ *
+ * @returns An object with `unlinkingProvider` (the provider id being unlinked or `null`) and `unlinkAccount` (a function that initiates unlinking for a given provider id)
  */
-export function useUnlinkAccount(config?: AnyAuthConfig) {
-  const { authClient, localization, toast } = useAuth(config)
-  const { refetch } = useListAccounts(config)
+export function useUnlinkAccount() {
+  const { authClient, localization, toast } = useAuth()
+  const { refetch } = useListAccounts()
 
   const [unlinkingProvider, setUnlinkingProvider] = useState<string | null>(
     null

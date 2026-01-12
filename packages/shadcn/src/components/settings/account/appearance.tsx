@@ -1,6 +1,6 @@
 "use client"
 
-import type { AnyAuthConfig } from "@better-auth-ui/react"
+import { useAuth } from "@better-auth-ui/react"
 import { Monitor, Moon, Sun } from "lucide-react"
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -12,11 +12,10 @@ import {
 } from "@/components/ui/field"
 import { Label } from "@/components/ui/label"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
-import { useAuth } from "@/hooks/auth/use-auth"
 import { useHydrated } from "@/hooks/use-hydrated"
 import { cn } from "@/lib/utils"
 
-export type AppearanceProps = AnyAuthConfig & {
+export type AppearanceProps = {
   className?: string
 }
 
@@ -300,15 +299,13 @@ function ThemePreviewDark(props: React.SVGProps<SVGSVGElement>) {
  * if theme settings are configured (theme, setTheme, and themes are provided).
  *
  * @param className - Optional additional CSS class names for the card container.
- * @param config - Auth-related props forwarded to access theme settings.
  * @returns A JSX element containing the theme selector card, or null if theme settings are not configured.
  */
-export function Appearance({ className, ...config }: AppearanceProps) {
-  const context = useAuth(config)
+export function Appearance({ className }: AppearanceProps) {
   const {
     localization,
     settings: { theme, setTheme, themes }
-  } = context
+  } = useAuth()
 
   const hydrated = useHydrated()
 
@@ -331,6 +328,7 @@ export function Appearance({ className, ...config }: AppearanceProps) {
           value={hydrated ? theme : ""}
           onValueChange={setTheme}
           className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3"
+          disabled={!hydrated}
         >
           {themes.includes("system") && (
             <FieldLabel htmlFor="system">

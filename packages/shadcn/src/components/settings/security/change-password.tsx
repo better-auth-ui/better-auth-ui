@@ -1,6 +1,6 @@
 "use client"
 
-import type { AnyAuthConfig } from "@better-auth-ui/react"
+import { useAuth } from "@better-auth-ui/react"
 import { Check, Eye, EyeOff } from "lucide-react"
 import { useState } from "react"
 
@@ -22,31 +22,27 @@ import {
 } from "@/components/ui/input-group"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Spinner } from "@/components/ui/spinner"
-import { useAuth } from "@/hooks/auth/use-auth"
 import { useSession } from "@/hooks/auth/use-session"
 import { useChangePassword } from "@/hooks/settings/use-change-password"
 import { cn } from "@/lib/utils"
 
-export type ChangePasswordProps = AnyAuthConfig & {
+export type ChangePasswordProps = {
   className?: string
 }
 
 /**
- * Display a form allowing the authenticated user to change their password.
+ * Render a card form for changing the authenticated user's password.
  *
- * Renders a card containing fields for current password, new password, and
- * optionally password confirmation (based on emailAndPassword.confirmPassword config).
- * Upon successful submission, all other sessions are revoked for security.
+ * Displays a card with fields for current password, new password, and optionally
+ * confirm password (based on `emailAndPassword.confirmPassword`). All other sessions
+ * are revoked upon successful password change.
  *
- * @returns A JSX element containing the change password card and form
+ * @returns A JSX element containing the change-password card and form
  */
-export function ChangePassword({ className, ...config }: ChangePasswordProps) {
-  const context = useAuth(config)
-  const { emailAndPassword, localization } = context
-
-  const { data: sessionData } = useSession(context)
-
-  const [, formAction, isPending] = useChangePassword(context)
+export function ChangePassword({ className }: ChangePasswordProps) {
+  const { emailAndPassword, localization } = useAuth()
+  const { data: sessionData } = useSession()
+  const [, formAction, isPending] = useChangePassword()
 
   const [isNewPasswordVisible, setIsNewPasswordVisible] = useState(false)
   const [isConfirmPasswordVisible, setIsConfirmPasswordVisible] =

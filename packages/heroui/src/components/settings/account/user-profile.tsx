@@ -1,8 +1,4 @@
-import {
-  type AnyAuthConfig,
-  useSession,
-  useUpdateUser
-} from "@better-auth-ui/react"
+import { useAuth, useSession, useUpdateUser } from "@better-auth-ui/react"
 import { FloppyDisk, Pencil } from "@gravity-ui/icons"
 import {
   Button,
@@ -18,27 +14,23 @@ import {
   TextField
 } from "@heroui/react"
 
-import { useAuth } from "../../../hooks/use-auth"
 import { UserAvatar } from "../../user/user-avatar"
 
-export type UserProfileProps = AnyAuthConfig & {
+export type UserProfileProps = {
   className?: string
 }
 
 /**
- * Display and edit the authenticated user's profile in a card-based form.
+ * Render a profile card that lets the authenticated user view and update their display name.
  *
- * Renders a loading skeleton while the session is pending. When loaded, shows the user's avatar with an edit indicator, the best-available identifier (displayUsername, name, or email) with a conditional email line, a name input prefilled from the session or local state, and a submit button that reflects update pending state. Labels and texts come from the provided auth localization; the form action is wired to the update user action from the auth hooks.
+ * The component uses auth localization for labels, reflects session loading state with skeletons, shows the best-available user identifier (display username, name, or email), and wires the form submission to the user update action from auth hooks.
  *
- * @returns A JSX element containing the profile card and editable form
+ * @returns A JSX element containing the user profile card and an editable name form
  */
-export function UserProfile({ className, ...config }: UserProfileProps) {
-  const context = useAuth(config)
-  const { localization } = context
-
-  const { data: sessionData } = useSession(context)
-
-  const [state, formAction, isPending] = useUpdateUser(context)
+export function UserProfile({ className }: UserProfileProps) {
+  const { localization } = useAuth()
+  const { data: sessionData } = useSession()
+  const [state, formAction, isPending] = useUpdateUser()
 
   return (
     <Card className={cn("p-4 md:p-6 gap-4 md:gap-6", className)}>
@@ -58,7 +50,7 @@ export function UserProfile({ className, ...config }: UserProfileProps) {
               className="p-0 h-auto w-auto rounded-full"
               isDisabled={!sessionData}
             >
-              <UserAvatar {...config} size="lg" />
+              <UserAvatar size="lg" />
 
               <span className="absolute right-0 bottom-0 size-3.5 rounded-full bg-background ring-2 ring-surface-quaternary flex items-center justify-center">
                 <Pencil className="size-2.5 text-muted" />

@@ -1,5 +1,5 @@
 import {
-  type AnyAuthConfig,
+  useAuth,
   useListSessions,
   useRevokeSession,
   useSession
@@ -8,27 +8,24 @@ import { ArrowRightFromSquare, Display, Smartphone } from "@gravity-ui/icons"
 import { Button, Card, Chip, cn, Skeleton, Spinner } from "@heroui/react"
 import { UAParser } from "ua-parser-js"
 
-import { useAuth } from "../../../hooks/use-auth"
-
-export type SessionsProps = AnyAuthConfig & {
+export type SessionsProps = {
   className?: string
 }
 
 /**
- * Display and manage all active sessions (devices where user is logged in).
+ * Render a card listing all active sessions for the current user with revoke controls.
  *
- * Shows all active sessions with browser/OS info, IP address, and last active time.
- * Users can revoke any session except the current one.
+ * Shows each session's browser, OS, IP address, and creation time. The current session is marked
+ * and navigates to sign-out on click, while other sessions can be revoked individually.
  *
  * @returns A JSX element containing the sessions card
  */
-export function Sessions({ className, ...config }: SessionsProps) {
-  const context = useAuth(config)
-  const { basePaths, localization, viewPaths, navigate } = context
+export function Sessions({ className }: SessionsProps) {
+  const { basePaths, localization, viewPaths, navigate } = useAuth()
 
-  const { data: sessionData } = useSession(context)
-  const { data: sessions, isPending } = useListSessions(context)
-  const { revokingSession, revokeSession } = useRevokeSession(context)
+  const { data: sessionData } = useSession()
+  const { data: sessions, isPending } = useListSessions()
+  const { revokingSession, revokeSession } = useRevokeSession()
 
   return (
     <Card className={cn("p-4 md:p-6 gap-4 md:gap-6", className)}>

@@ -1,6 +1,6 @@
 "use client"
 
-import type { AnyAuthConfig } from "@better-auth-ui/react"
+import { useAuth } from "@better-auth-ui/react"
 import { Pencil, Save } from "lucide-react"
 import { useState } from "react"
 
@@ -17,30 +17,28 @@ import { Input } from "@/components/ui/input"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Spinner } from "@/components/ui/spinner"
 import { UserAvatar } from "@/components/user/user-avatar"
-import { useAuth } from "@/hooks/auth/use-auth"
 import { useSession } from "@/hooks/auth/use-session"
 import { useUpdateUser } from "@/hooks/settings/use-update-user"
 import { cn } from "@/lib/utils"
 
-export type UserProfileProps = AnyAuthConfig & {
+export type UserProfileProps = {
   className?: string
 }
 
 /**
- * Render the current user's profile editor UI.
+ * Render a profile card that lets the authenticated user view and update their display name.
  *
- * Renders a form that displays the user's avatar and identity, lets the user edit their name with inline validation, and submit changes. While session data is loading it renders a skeleton variant; while a submit is pending it disables inputs and shows a spinner.
+ * The component uses auth localization for labels, reflects session loading state with skeletons, shows the best-available
+ * user identifier (display username, name, or email) and secondary email line, and includes a name input that can be
+ * edited and saved.
  *
  * @param className - Optional additional CSS class names applied to the card container
- * @param config - Authentication/configuration options forwarded to auth and user-update hooks
- * @returns A React element containing the user profile form and controls
+ * @returns A JSX element containing the profile card with editable name field
  */
-export function UserProfile({ className, ...config }: UserProfileProps) {
-  const context = useAuth(config)
-  const { localization } = context
-
-  const { data: sessionData } = useSession(context)
-  const [state, formAction, isPending] = useUpdateUser(context)
+export function UserProfile({ className }: UserProfileProps) {
+  const { localization } = useAuth()
+  const { data: sessionData } = useSession()
+  const [state, formAction, isPending] = useUpdateUser()
 
   const [fieldErrors, setFieldErrors] = useState<{
     name?: string
@@ -64,7 +62,7 @@ export function UserProfile({ className, ...config }: UserProfileProps) {
               className="relative p-0 h-auto w-auto rounded-full"
               disabled={!sessionData}
             >
-              <UserAvatar {...config} className="size-12 text-base" />
+              <UserAvatar className="size-12 text-base" />
 
               <span className="absolute right-0 bottom-0 size-4 rounded-full bg-background ring-2 ring-secondary flex items-center justify-center">
                 <Pencil className="size-2 text-muted-foreground" />

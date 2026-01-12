@@ -2,7 +2,6 @@ import { defineConfig, defineDocs } from "fumadocs-mdx/config"
 import lastModified from "fumadocs-mdx/plugins/last-modified"
 import { createGenerator, remarkAutoTypeTable } from "fumadocs-typescript"
 import remarkCodeImport from "remark-code-import"
-import { renderTypeToHastFast } from "./src/lib/render-type-to-hast-fast"
 
 const generator = createGenerator()
 
@@ -23,8 +22,8 @@ export default defineConfig({
       [
         remarkAutoTypeTable,
         {
-          generator,
-          renderType: renderTypeToHastFast
+          generator
+          // renderType: renderTypeToHastFast
         }
       ]
     ],

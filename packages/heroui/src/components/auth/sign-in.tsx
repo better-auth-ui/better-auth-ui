@@ -1,8 +1,4 @@
-import {
-  type AnyAuthConfig,
-  useSignInEmail,
-  useSignInSocial
-} from "@better-auth-ui/react"
+import { useAuth, useSignInEmail, useSignInSocial } from "@better-auth-ui/react"
 import {
   Button,
   Card,
@@ -18,31 +14,27 @@ import {
   TextField
 } from "@heroui/react"
 
-import { useAuth } from "../../hooks/use-auth"
 import { cn } from "../../lib/utils"
 import { FieldSeparator } from "./field-separator"
 import { MagicLinkButton } from "./magic-link-button"
 import { ProviderButtons, type SocialLayout } from "./provider-buttons"
 
-export type SignInProps = AnyAuthConfig & {
+export type SignInProps = {
   className?: string
   socialLayout?: SocialLayout
   socialPosition?: "top" | "bottom"
 }
 
 /**
- * Renders the sign-in form with email/password, optional magic link, and social provider buttons, honoring configuration and localization from the provided auth config.
+ * Render the sign-in UI using auth context for configuration and localization.
  *
- * @returns The JSX element for the sign-in UI.
+ * @returns The sign-in JSX element containing email/password fields, optional magic-link button, and social provider buttons.
  */
 export function SignIn({
   className,
   socialLayout,
-  socialPosition = "bottom",
-  ...config
+  socialPosition = "bottom"
 }: SignInProps) {
-  const context = useAuth(config)
-
   const {
     basePaths,
     emailAndPassword,
@@ -50,12 +42,11 @@ export function SignIn({
     magicLink,
     socialProviders,
     viewPaths
-  } = context
+  } = useAuth()
 
-  const [{ email, password }, signInEmail, signInPending] =
-    useSignInEmail(context)
+  const [{ email, password }, signInEmail, signInPending] = useSignInEmail()
 
-  const [_, signInSocial, socialPending] = useSignInSocial(context)
+  const [_, signInSocial, socialPending] = useSignInSocial()
 
   const isPending = signInPending || socialPending
 
@@ -72,7 +63,6 @@ export function SignIn({
             <>
               {socialProviders && socialProviders.length > 0 && (
                 <ProviderButtons
-                  {...config}
                   socialLayout={socialLayout}
                   signInSocial={signInSocial}
                   isPending={isPending}
@@ -168,11 +158,7 @@ export function SignIn({
                 </Button>
 
                 {magicLink && (
-                  <MagicLinkButton
-                    {...config}
-                    view="signIn"
-                    isPending={isPending}
-                  />
+                  <MagicLinkButton view="signIn" isPending={isPending} />
                 )}
               </Fieldset.Actions>
             </Form>
@@ -186,7 +172,6 @@ export function SignIn({
 
               {socialProviders && socialProviders.length > 0 && (
                 <ProviderButtons
-                  {...config}
                   socialLayout={socialLayout}
                   signInSocial={signInSocial}
                   isPending={isPending}

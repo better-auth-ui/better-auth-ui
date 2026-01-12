@@ -38,11 +38,15 @@
           "type": "registry:component"
         },
         {
-          "path": "src/hooks/auth/use-auth.tsx",
+          "path": "../react/src/hooks/auth/use-authenticate.ts",
           "type": "registry:hook"
         },
         {
-          "path": "../react/src/hooks/auth/use-authenticate.ts",
+          "path": "src/hooks/auth/use-sign-in-email.ts",
+          "type": "registry:hook"
+        },
+        {
+          "path": "src/hooks/auth/use-sign-in-social.ts",
           "type": "registry:hook"
         },
         {
@@ -88,7 +92,11 @@
           "type": "registry:component"
         },
         {
-          "path": "src/hooks/auth/use-auth.tsx",
+          "path": "src/hooks/auth/use-sign-up-email.ts",
+          "type": "registry:hook"
+        },
+        {
+          "path": "src/hooks/auth/use-sign-in-social.ts",
           "type": "registry:hook"
         },
         {
@@ -134,7 +142,11 @@
           "type": "registry:component"
         },
         {
-          "path": "src/hooks/auth/use-auth.tsx",
+          "path": "src/hooks/auth/use-sign-in-magic-link.ts",
+          "type": "registry:hook"
+        },
+        {
+          "path": "src/hooks/auth/use-sign-in-social.ts",
           "type": "registry:hook"
         },
         {
@@ -167,7 +179,7 @@
           "type": "registry:component"
         },
         {
-          "path": "src/hooks/auth/use-auth.tsx",
+          "path": "src/hooks/auth/use-forgot-password.ts",
           "type": "registry:hook"
         },
         {
@@ -200,7 +212,7 @@
           "type": "registry:component"
         },
         {
-          "path": "src/hooks/auth/use-auth.tsx",
+          "path": "src/hooks/auth/use-reset-password.ts",
           "type": "registry:hook"
         },
         {
@@ -220,6 +232,10 @@
         {
           "path": "src/components/auth/sign-out.tsx",
           "type": "registry:component"
+        },
+        {
+          "path": "src/hooks/auth/use-sign-out.ts",
+          "type": "registry:hook"
         },
         {
           "path": "../react/src/hooks/auth/use-sign-out.ts",
@@ -259,15 +275,15 @@
       "type": "registry:component",
       "title": "Auth Provider",
       "description": "A context provider component that supplies AuthConfig to all descendant components.",
-      "dependencies": ["@better-auth-ui/react@*", "better-auth"],
+      "dependencies": ["@better-auth-ui/react@*", "better-auth", "sonner"],
       "files": [
         {
-          "path": "../react/src/components/auth/auth-provider.tsx",
+          "path": "src/components/auth/auth-provider.tsx",
           "type": "registry:component"
         },
         {
-          "path": "src/hooks/auth/use-auth.tsx",
-          "type": "registry:hook"
+          "path": "../react/src/components/auth/auth-provider.tsx",
+          "type": "registry:component"
         }
       ]
     },
@@ -288,11 +304,11 @@
           "type": "registry:component"
         },
         {
-          "path": "src/hooks/auth/use-auth.tsx",
+          "path": "src/hooks/auth/use-session.ts",
           "type": "registry:hook"
         },
         {
-          "path": "src/hooks/auth/use-session.ts",
+          "path": "../react/src/hooks/auth/use-session.tsx",
           "type": "registry:hook"
         }
       ]
@@ -307,7 +323,13 @@
         "better-auth",
         "lucide-react"
       ],
-      "registryDependencies": ["avatar", "button", "dropdown-menu", "skeleton"],
+      "registryDependencies": [
+        "avatar",
+        "button",
+        "dropdown-menu",
+        "skeleton",
+        "tabs"
+      ],
       "files": [
         {
           "path": "src/components/user/user-button.tsx",
@@ -318,8 +340,8 @@
           "type": "registry:component"
         },
         {
-          "path": "src/hooks/auth/use-auth.tsx",
-          "type": "registry:hook"
+          "path": "src/components/user/user-view.tsx",
+          "type": "registry:component"
         },
         {
           "path": "src/hooks/auth/use-session.ts",
@@ -530,10 +552,6 @@
           "type": "registry:component"
         },
         {
-          "path": "src/hooks/auth/use-auth.tsx",
-          "type": "registry:hook"
-        },
-        {
           "path": "src/hooks/auth/use-session.ts",
           "type": "registry:hook"
         },
@@ -575,10 +593,6 @@
           "type": "registry:component"
         },
         {
-          "path": "src/hooks/auth/use-auth.tsx",
-          "type": "registry:hook"
-        },
-        {
           "path": "src/hooks/auth/use-session.ts",
           "type": "registry:hook"
         },
@@ -602,7 +616,12 @@
       "title": "Account Settings",
       "description": "A container component that displays account settings including user profile, change email, and appearance.",
       "dependencies": ["@better-auth-ui/react@*"],
-      "registryDependencies": ["user-profile", "change-email", "appearance"],
+      "registryDependencies": [
+        "user-profile",
+        "change-email",
+        "appearance",
+        "accounts"
+      ],
       "files": [
         {
           "path": "src/components/settings/account/account-settings.tsx",
@@ -619,6 +638,10 @@
         {
           "path": "src/components/settings/account/appearance.tsx",
           "type": "registry:component"
+        },
+        {
+          "path": "src/components/settings/account/accounts.tsx",
+          "type": "registry:component"
         }
       ]
     },
@@ -628,15 +651,11 @@
       "title": "Appearance",
       "description": "A theme selector card with visual theme previews for system, light, and dark themes.",
       "dependencies": ["@better-auth-ui/react@*", "lucide-react"],
-      "registryDependencies": ["card", "label", "radio-group"],
+      "registryDependencies": ["card", "label", "radio-group", "field"],
       "files": [
         {
           "path": "src/components/settings/account/appearance.tsx",
           "type": "registry:component"
-        },
-        {
-          "path": "src/hooks/auth/use-auth.tsx",
-          "type": "registry:hook"
         },
         {
           "path": "src/hooks/use-hydrated.ts",
@@ -667,10 +686,6 @@
         {
           "path": "src/components/settings/security/security-settings.tsx",
           "type": "registry:component"
-        },
-        {
-          "path": "src/hooks/auth/use-auth.tsx",
-          "type": "registry:hook"
         }
       ]
     },
@@ -689,10 +704,6 @@
         {
           "path": "src/components/user/user-avatar.tsx",
           "type": "registry:component"
-        },
-        {
-          "path": "src/hooks/auth/use-auth.tsx",
-          "type": "registry:hook"
         },
         {
           "path": "src/hooks/auth/use-session.ts",
@@ -725,15 +736,23 @@
           "type": "registry:component"
         },
         {
-          "path": "src/hooks/auth/use-auth.tsx",
-          "type": "registry:hook"
-        },
-        {
           "path": "src/hooks/auth/use-session.ts",
           "type": "registry:hook"
         },
         {
           "path": "../react/src/hooks/auth/use-session.tsx",
+          "type": "registry:hook"
+        },
+        {
+          "path": "src/hooks/settings/use-list-device-sessions.ts",
+          "type": "registry:hook"
+        },
+        {
+          "path": "src/hooks/settings/use-set-active-session.ts",
+          "type": "registry:hook"
+        },
+        {
+          "path": "src/hooks/settings/use-revoke-multi-session.ts",
           "type": "registry:hook"
         },
         {
@@ -766,16 +785,13 @@
         "field",
         "input",
         "input-group",
+        "skeleton",
         "spinner"
       ],
       "files": [
         {
           "path": "src/components/settings/security/change-password.tsx",
           "type": "registry:component"
-        },
-        {
-          "path": "src/hooks/auth/use-auth.tsx",
-          "type": "registry:hook"
         },
         {
           "path": "src/hooks/auth/use-session.ts",
@@ -832,18 +848,6 @@
         {
           "path": "src/components/settings/security/connected-accounts.tsx",
           "type": "registry:component"
-        },
-        {
-          "path": "src/hooks/auth/use-auth.tsx",
-          "type": "registry:hook"
-        },
-        {
-          "path": "src/hooks/auth/use-session.ts",
-          "type": "registry:hook"
-        },
-        {
-          "path": "../react/src/hooks/auth/use-session.tsx",
-          "type": "registry:hook"
         },
         {
           "path": "src/hooks/settings/use-link-social.ts",

@@ -1,14 +1,12 @@
-import { type AnyAuthConfig, useAuthenticate } from "@better-auth-ui/react"
+import { useAuth, useAuthenticate } from "@better-auth-ui/react"
 import type { SettingsView } from "@better-auth-ui/react/core"
 import { Person, Shield } from "@gravity-ui/icons"
 import { cn, Tabs, type TabsProps, useIsHydrated } from "@heroui/react"
 import { useMemo } from "react"
-
-import { useAuth } from "../../hooks/use-auth"
 import { AccountSettings } from "./account/account-settings"
 import { SecuritySettings } from "./security/security-settings"
 
-export type SettingsProps = AnyAuthConfig & {
+export type SettingsProps = {
   className?: string
   path?: string
   view?: SettingsView
@@ -16,25 +14,19 @@ export type SettingsProps = AnyAuthConfig & {
 }
 
 /**
- * Render the settings UI and select the active settings view based on `view` or `path`.
+ * Renders the settings UI and activates the appropriate settings view based on `view` or `path`.
  *
+ * @param className - Additional CSS class names applied to the root container
  * @param path - Route path used to resolve which settings view to activate when `view` is not provided
- * @param view - Explicit settings view to activate (for example, `"account"` or `"security"`)
+ * @param view - Explicit settings view to activate, e.g. `"account"` or `"security"`
  * @param hideNav - When `true`, hide the navigation tabs
- * @returns A React element containing the settings tabs and the currently selected panel
+ * @returns A DOM tree containing the responsive settings tabs and the currently selected settings panel
  *
  * @throws Error if neither `view` nor `path` is provided
  */
-export function Settings({
-  className,
-  view,
-  path,
-  hideNav,
-  ...config
-}: SettingsProps) {
-  const context = useAuth(config)
-  const { basePaths, localization, viewPaths } = context
-  useAuthenticate(context)
+export function Settings({ className, view, path, hideNav }: SettingsProps) {
+  const { basePaths, localization, viewPaths } = useAuth()
+  useAuthenticate()
 
   if (!view && !path) {
     throw new Error("[Better Auth UI] Either `view` or `path` must be provided")
@@ -55,7 +47,10 @@ export function Settings({
   return (
     <div
       key={`settings-${isHydrated}`}
-      className="w-full flex flex-col md:flex-row gap-4 md:gap-6"
+      className={cn(
+        "w-full flex flex-col md:flex-row gap-4 md:gap-6",
+        className
+      )}
     >
       <ResponsiveTabs selectedKey={currentView}>
         <Tabs.ListContainer>
@@ -93,9 +88,8 @@ export function Settings({
         </Tabs.ListContainer>
       </ResponsiveTabs>
 
-      {currentView === "account" && <AccountSettings {...config} />}
-
-      {currentView === "security" && <SecuritySettings {...config} />}
+      {currentView === "account" && <AccountSettings />}
+      {currentView === "security" && <SecuritySettings />}
     </div>
   )
 }

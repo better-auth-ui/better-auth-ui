@@ -1,6 +1,6 @@
 "use client"
 
-import type { AnyAuthConfig } from "@better-auth-ui/react"
+import { useAuth } from "@better-auth-ui/react"
 import { useState } from "react"
 
 import { Button } from "@/components/ui/button"
@@ -14,23 +14,25 @@ import {
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import { Spinner } from "@/components/ui/spinner"
-import { useAuth } from "@/hooks/auth/use-auth"
 import { useForgotPassword } from "@/hooks/auth/use-forgot-password"
 import { cn } from "@/lib/utils"
 
-export type ForgotPasswordProps = AnyAuthConfig & {
+export type ForgotPasswordProps = {
   className?: string
 }
 
 /**
- * Renders a "Forgot Password" form with an email input and submit button.
+ * Render a card-based "Forgot Password" form that sends a password-reset email.
+ *
+ * The form displays an email input, submit button, and a link back to sign-in.
+ * Toasts are displayed on success or error via the `useForgotPassword` hook.
+ *
+ * @param className - Optional additional CSS class names applied to the card
+ * @returns The forgot-password form UI as a JSX element
  */
-export function ForgotPassword({ className, ...config }: ForgotPasswordProps) {
-  const context = useAuth(config)
-
-  const { basePaths, localization, viewPaths, Link } = context
-
-  const [{ email }, forgotPassword, isPending] = useForgotPassword(context)
+export function ForgotPassword({ className }: ForgotPasswordProps) {
+  const { basePaths, localization, viewPaths, Link } = useAuth()
+  const [{ email }, forgotPassword, isPending] = useForgotPassword()
 
   const [fieldErrors, setFieldErrors] = useState<{
     email?: string

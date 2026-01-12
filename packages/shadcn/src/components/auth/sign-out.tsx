@@ -1,24 +1,24 @@
 "use client"
 
-import type { AnyAuthConfig } from "@better-auth-ui/react"
 import { useEffect, useRef } from "react"
 
 import { Card, CardContent } from "@/components/ui/card"
 import { Spinner } from "@/components/ui/spinner"
-import { useAuth } from "@/hooks/auth/use-auth"
 import { useSignOut } from "@/hooks/auth/use-sign-out"
 import { cn } from "@/lib/utils"
 
-export type SignOutProps = AnyAuthConfig & {
+export type SignOutProps = {
   className?: string
 }
 
 /**
- * Signs the current user out when mounted and displays a loading card while the operation completes.
+ * Signs the current user out on mount and renders a centered loading card while the operation completes.
+ *
+ * @param className - Optional additional class names appended to the root Card
+ * @returns The loading Card element shown during sign-out
  */
-export function SignOut({ className, ...config }: SignOutProps) {
-  const context = useAuth(config)
-  const { signOut } = useSignOut(context)
+export function SignOut({ className }: SignOutProps) {
+  const { signOut } = useSignOut()
 
   const hasSignedOut = useRef(false)
 

@@ -1,5 +1,5 @@
 import {
-  type AnyAuthConfig,
+  useAuth,
   useSignInMagicLink,
   useSignInSocial
 } from "@better-auth-ui/react"
@@ -16,41 +16,33 @@ import {
   Spinner,
   TextField
 } from "@heroui/react"
-
-import { useAuth } from "../../hooks/use-auth"
 import { cn } from "../../lib/utils"
 import { FieldSeparator } from "./field-separator"
 import { MagicLinkButton } from "./magic-link-button"
 import { ProviderButtons, type SocialLayout } from "./provider-buttons"
 
-export type MagicLinkProps = AnyAuthConfig & {
+export type MagicLinkProps = {
   className?: string
   socialLayout?: SocialLayout
   socialPosition?: "top" | "bottom"
 }
 
 /**
- * Render a sign-in card that sends an email magic link and optionally displays social provider buttons.
+ * Render a card-based sign-in form that sends an email magic link and optionally shows social provider buttons.
  *
  * @param className - Additional CSS class names applied to the card container
- * @param socialLayout - Layout variant used by social provider buttons
- * @param socialPosition - Position to render social provider buttons; either `"top"` or `"bottom"` (default: `"bottom"`)
- * @returns The rendered sign-in card element
+ * @param socialLayout - Layout style for social provider buttons
+ * @param socialPosition - Position of social provider buttons; `"top"` or `"bottom"`. Defaults to `"bottom"`.
+ * @returns The magic-link sign-in UI as a JSX element
  */
 export function MagicLink({
   className,
   socialLayout,
-  socialPosition = "bottom",
-  ...config
+  socialPosition = "bottom"
 }: MagicLinkProps) {
-  const context = useAuth(config)
-
-  const { basePaths, localization, socialProviders, viewPaths } = context
-
-  const [{ email }, signInMagicLink, magicLinkPending] =
-    useSignInMagicLink(context)
-
-  const [_, signInSocial, socialPending] = useSignInSocial(context)
+  const { basePaths, localization, socialProviders, viewPaths } = useAuth()
+  const [{ email }, signInMagicLink, magicLinkPending] = useSignInMagicLink()
+  const [_, signInSocial, socialPending] = useSignInSocial()
 
   const isPending = magicLinkPending || socialPending
 
@@ -66,7 +58,6 @@ export function MagicLink({
             <>
               {socialProviders && socialProviders.length > 0 && (
                 <ProviderButtons
-                  {...config}
                   socialLayout={socialLayout}
                   signInSocial={signInSocial}
                   isPending={isPending}
@@ -106,11 +97,7 @@ export function MagicLink({
                 {localization.auth.sendMagicLink}
               </Button>
 
-              <MagicLinkButton
-                {...config}
-                view="magicLink"
-                isPending={isPending}
-              />
+              <MagicLinkButton view="magicLink" isPending={isPending} />
             </Fieldset.Actions>
           </Form>
 
@@ -122,7 +109,6 @@ export function MagicLink({
 
               {socialProviders && socialProviders.length > 0 && (
                 <ProviderButtons
-                  {...config}
                   socialLayout={socialLayout}
                   signInSocial={signInSocial}
                   isPending={isPending}

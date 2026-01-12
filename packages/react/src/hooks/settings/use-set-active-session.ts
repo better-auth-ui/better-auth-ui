@@ -1,16 +1,15 @@
-import type { AnyAuthConfig } from "@better-auth-ui/react"
+import { useAuth } from "@better-auth-ui/react"
+import { useQueryClient } from "@tanstack/react-query"
 import { useCallback, useState } from "react"
 
-import { useAuth } from "../auth/use-auth"
-
 /**
- * Provides functionality to set an active session from device sessions in multi-session mode.
+ * Hook that sets an active device session in multi-session mode.
  *
- * @param config - Optional auth configuration forwarded to the auth hook
- * @returns An object containing the pending session token and a function to set the active session
+ * @returns An object with `settingActiveSession` — the session token currently being set or `null`, and `setActiveSession(sessionToken)` — function that makes the given session token the active session.
  */
-export function useSetActiveSession(config?: AnyAuthConfig) {
-  const { authClient, queryClient, toast } = useAuth(config)
+export function useSetActiveSession() {
+  const queryClient = useQueryClient()
+  const { authClient, toast } = useAuth()
 
   const [settingActiveSession, setSettingActiveSession] = useState<
     string | null

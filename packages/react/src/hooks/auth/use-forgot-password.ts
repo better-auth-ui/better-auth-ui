@@ -1,11 +1,18 @@
-import type { AnyAuthConfig } from "@better-auth-ui/react"
+import { useAuth } from "@better-auth-ui/react"
 import { useActionState } from "react"
 
-import { useAuth } from "./use-auth"
-
-export function useForgotPassword(config?: AnyAuthConfig) {
+/**
+ * Provides an action state hook for the forgot-password flow.
+ *
+ * The configured action sends a password reset request for the submitted email,
+ * shows a success or error toast, navigates to the sign-in view on success,
+ * and returns the submitted email.
+ *
+ * @returns The action state for the forgot-password flow. The action, when invoked, sends a password-reset request and resolves to an object containing the submitted `email`.
+ */
+export function useForgotPassword() {
   const { authClient, basePaths, localization, toast, viewPaths, navigate } =
-    useAuth(config)
+    useAuth()
 
   const forgotPassword = async (_: object, formData: FormData) => {
     const email = formData.get("email") as string

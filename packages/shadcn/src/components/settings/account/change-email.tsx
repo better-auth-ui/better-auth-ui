@@ -1,6 +1,6 @@
 "use client"
 
-import type { AnyAuthConfig } from "@better-auth-ui/react"
+import { useAuth } from "@better-auth-ui/react"
 import { Check } from "lucide-react"
 import { useState } from "react"
 
@@ -16,30 +16,28 @@ import { Field, FieldError, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Spinner } from "@/components/ui/spinner"
-import { useAuth } from "@/hooks/auth/use-auth"
 import { useSession } from "@/hooks/auth/use-session"
 import { useChangeEmail } from "@/hooks/settings/use-change-email"
 import { cn } from "@/lib/utils"
 
-export type ChangeEmailProps = AnyAuthConfig & {
+export type ChangeEmailProps = {
   className?: string
 }
 
 /**
- * Display and edit the authenticated user's email address in a card-based form.
+ * Render a card containing a form to view and update the authenticated user's email.
  *
- * Renders a loading skeleton while the session is pending. When loaded, shows
- * the current email address and a form to update it. A verification email will
- * be sent to the new address upon submission.
+ * Shows a loading skeleton until session data is available, displays the current
+ * email as the form's default value, and sends a verification email to the
+ * new address upon successful submission.
  *
- * @returns A JSX element containing the change email card and form
+ * @returns A JSX element rendering the change-email card and form
  */
-export function ChangeEmail({ className, ...config }: ChangeEmailProps) {
-  const context = useAuth(config)
-  const { localization } = context
-  const { data: sessionData } = useSession(context)
+export function ChangeEmail({ className }: ChangeEmailProps) {
+  const { localization } = useAuth()
+  const { data: sessionData } = useSession()
 
-  const [state, formAction, isPending] = useChangeEmail(context)
+  const [state, formAction, isPending] = useChangeEmail()
 
   const [fieldErrors, setFieldErrors] = useState<{
     email?: string

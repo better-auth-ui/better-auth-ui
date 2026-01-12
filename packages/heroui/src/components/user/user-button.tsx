@@ -1,5 +1,5 @@
 import {
-  type AnyAuthConfig,
+  useAuth,
   useListDeviceSessions,
   useSession,
   useSetActiveSession
@@ -19,11 +19,10 @@ import {
 } from "@gravity-ui/icons"
 import { Button, cn, Dropdown, Label, Separator, Tabs } from "@heroui/react"
 
-import { useAuth } from "../../hooks/use-auth"
 import { UserAvatar } from "./user-avatar"
 import { UserView } from "./user-view"
 
-export type UserButtonProps = AnyAuthConfig & {
+export type UserButtonProps = {
   className?: string
   size?: "default" | "icon"
   placement?:
@@ -59,33 +58,42 @@ export type UserButtonProps = AnyAuthConfig & {
     | "danger-soft"
 }
 
+/**
+ * Render a user account dropdown button that shows account actions, session switching, and theme controls.
+ *
+ * Renders either an icon-only trigger or a full button showing the current user state; its dropdown contains account settings, multi-session switching (when enabled), theme selection (when enabled), and sign-in/sign-out flows depending on authentication state.
+ *
+ * @param className - Additional CSS classes applied to the trigger element
+ * @param placement - Dropdown popover placement (e.g., "bottom", "top-start", "bottom-end")
+ * @param size - "icon" renders an avatar-only trigger; "default" renders a button with label and chevron
+ * @param variant - Button visual variant passed to the underlying Button component
+ * @param themeToggle - When true and theming is available, show theme selection controls in the menu
+ * @returns The user button and its dropdown menu as a JSX element
+ */
 export function UserButton({
   className,
   placement = "bottom",
   size = "default",
   variant = "ghost",
-  themeToggle = true,
-  ...config
+  themeToggle = true
 }: UserButtonProps) {
-  const context = useAuth(config)
   const {
     basePaths,
     viewPaths,
     localization,
     multiSession,
     settings: { theme, setTheme, themes }
-  } = context
+  } = useAuth()
 
-  const { settingActiveSession, setActiveSession } =
-    useSetActiveSession(context)
-  const { data: sessionData, isPending: sessionPending } = useSession(context)
-  const { data: deviceSessions } = useListDeviceSessions(context)
+  const { settingActiveSession, setActiveSession } = useSetActiveSession()
+  const { data: sessionData, isPending: sessionPending } = useSession()
+  const { data: deviceSessions } = useListDeviceSessions()
 
   return (
     <Dropdown>
       {size === "icon" ? (
         <Dropdown.Trigger className={cn("rounded-full", className)}>
-          <UserAvatar {...config} />
+          <UserAvatar />
         </Dropdown.Trigger>
       ) : (
         <Button
@@ -96,13 +104,10 @@ export function UserButton({
           )}
         >
           {sessionData || sessionPending || settingActiveSession ? (
-            <UserView
-              {...config}
-              isPending={sessionPending || !!settingActiveSession}
-            />
+            <UserView isPending={sessionPending || !!settingActiveSession} />
           ) : (
             <>
-              <UserAvatar {...config} />
+              <UserAvatar />
 
               <p className="text-sm font-medium">{localization.auth.account}</p>
             </>
@@ -118,7 +123,7 @@ export function UserButton({
       >
         {sessionData && (
           <div className="px-3 pt-3 pb-1">
-            <UserView {...config} />
+            <UserView />
           </div>
         )}
 
@@ -147,7 +152,7 @@ export function UserButton({
                   <Dropdown.Popover className="min-w-40 md:min-w-56 max-w-[48svw]">
                     <Dropdown.Menu>
                       <Dropdown.Item className="px-2">
-                        <UserView {...config} />
+                        <UserView />
 
                         <Check className="ml-auto" />
                       </Dropdown.Item>
@@ -168,7 +173,7 @@ export function UserButton({
                                 setActiveSession(deviceSession.session.token)
                               }
                             >
-                              <UserView {...config} user={deviceSession.user} />
+                              <UserView user={deviceSession.user} />
                             </Dropdown.Item>
                           )
                         })}

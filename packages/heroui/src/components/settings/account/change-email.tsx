@@ -1,8 +1,4 @@
-import {
-  type AnyAuthConfig,
-  useChangeEmail,
-  useSession
-} from "@better-auth-ui/react"
+import { useAuth, useChangeEmail, useSession } from "@better-auth-ui/react"
 import { Check } from "@gravity-ui/icons"
 import {
   Button,
@@ -18,28 +14,23 @@ import {
   TextField
 } from "@heroui/react"
 
-import { useAuth } from "../../../hooks/use-auth"
-
-export type ChangeEmailProps = AnyAuthConfig & {
+export type ChangeEmailProps = {
   className?: string
 }
 
 /**
- * Display and edit the authenticated user's email address in a card-based form.
+ * Render a card containing a form to view and update the authenticated user's email.
  *
- * Renders a loading skeleton while the session is pending. When loaded, shows
- * the current email address and a form to update it. A verification email will
- * be sent to the new address upon submission.
+ * Shows a loading skeleton until session data is available, displays the current
+ * email as the form's default value, and sends a verification email to the
+ * new address upon successful submission.
  *
- * @returns A JSX element containing the change email card and form
+ * @returns A JSX element rendering the change-email card and form
  */
-export function ChangeEmail({ className, ...config }: ChangeEmailProps) {
-  const context = useAuth(config)
-  const { localization } = context
-
-  const { data: sessionData } = useSession(context)
-
-  const [state, formAction, isPending] = useChangeEmail(context)
+export function ChangeEmail({ className }: ChangeEmailProps) {
+  const { localization } = useAuth()
+  const { data: sessionData } = useSession()
+  const [state, formAction, isPending] = useChangeEmail()
 
   return (
     <Card className={cn("p-4 md:p-6 gap-4 md:gap-6", className)}>

@@ -1,8 +1,4 @@
-import {
-  type AnyAuthConfig,
-  useChangePassword,
-  useSession
-} from "@better-auth-ui/react"
+import { useAuth, useChangePassword, useSession } from "@better-auth-ui/react"
 import { Check, Eye, EyeSlash } from "@gravity-ui/icons"
 import {
   Button,
@@ -20,28 +16,23 @@ import {
 } from "@heroui/react"
 import { useState } from "react"
 
-import { useAuth } from "../../../hooks/use-auth"
-
-export type ChangePasswordProps = AnyAuthConfig & {
+export type ChangePasswordProps = {
   className?: string
 }
 
 /**
- * Display a form allowing the authenticated user to change their password.
+ * Render a card form for changing the authenticated user's password.
  *
- * Renders a card containing fields for current password, new password, and
- * optionally password confirmation (based on emailAndPassword.confirmPassword config).
- * Upon successful submission, all other sessions are revoked for security.
+ * Displays a card with fields for current password, new password, and optionally
+ * confirm password (based on `emailAndPassword.confirmPassword`). All other sessions
+ * are revoked upon successful password change.
  *
- * @returns A JSX element containing the change password card and form
+ * @returns A JSX element containing the change-password card and form
  */
-export function ChangePassword({ className, ...config }: ChangePasswordProps) {
-  const context = useAuth(config)
-  const { emailAndPassword, localization } = context
-
-  const { data: sessionData } = useSession(context)
-
-  const [, formAction, isPending] = useChangePassword(context)
+export function ChangePassword({ className }: ChangePasswordProps) {
+  const { emailAndPassword, localization } = useAuth()
+  const { data: sessionData } = useSession()
+  const [, formAction, isPending] = useChangePassword()
 
   const [isNewPasswordVisible, setIsNewPasswordVisible] = useState(false)
   const [isConfirmPasswordVisible, setIsConfirmPasswordVisible] =

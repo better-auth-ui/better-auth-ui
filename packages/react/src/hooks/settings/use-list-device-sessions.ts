@@ -1,31 +1,25 @@
-import { type AnyAuthConfig, useSession } from "@better-auth-ui/react"
+import { useAuth, useSession } from "@better-auth-ui/react"
 import { type DefinedInitialDataOptions, useQuery } from "@tanstack/react-query"
-import { useAuth } from "../auth/use-auth"
 
 /**
- * Fetches and returns the list of device sessions for multi-session support.
+ * Retrieve device sessions for multi-session account switching.
  *
- * @param config - Optional partial AuthConfig used to customize auth behavior; may include an `authClient` override.
- * @param options - Optional query options.
- * @returns Query result containing device sessions data, loading state, and error state
+ * The query is enabled only when `multiSession` is true and session data is available.
+ *
+ * @param options - Optional React Query options to customize the query behavior.
+ * @returns The React Query result for the device sessions list; `data` is the array of device session objects and includes loading and error states.
  */
-export function useListDeviceSessions(
-  config?: AnyAuthConfig,
-  options?: DefinedInitialDataOptions
-) {
-  const { authClient, multiSession, queryClient } = useAuth(config)
-  const { data: sessionData } = useSession(config, options)
+export function useListDeviceSessions(options?: DefinedInitialDataOptions) {
+  const { authClient, multiSession } = useAuth()
+  const { data: sessionData } = useSession(options)
 
-  return useQuery(
-    {
-      queryKey: ["auth", "multiSession", "listDeviceSessions"],
-      queryFn: async () =>
-        authClient.multiSession.listDeviceSessions({
-          fetchOptions: { throw: true }
-        }),
-      enabled: multiSession && !!sessionData,
-      ...(options as object)
-    },
-    queryClient
-  )
+  return useQuery({
+    queryKey: ["auth", "multiSession", "listDeviceSessions"],
+    queryFn: async () =>
+      authClient.multiSession.listDeviceSessions({
+        fetchOptions: { throw: true }
+      }),
+    enabled: multiSession && !!sessionData,
+    ...(options as object)
+  })
 }

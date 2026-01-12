@@ -1,6 +1,6 @@
 "use client"
 
-import type { AnyAuthConfig } from "@better-auth-ui/react"
+import { useAuth } from "@better-auth-ui/react"
 import {
   Check,
   ChevronsUpDown,
@@ -27,7 +27,6 @@ import {
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { useAuth } from "@/hooks/auth/use-auth"
 import { useSession } from "@/hooks/auth/use-session"
 import { useListDeviceSessions } from "@/hooks/settings/use-list-device-sessions"
 import { useSetActiveSession } from "@/hooks/settings/use-set-active-session"
@@ -35,7 +34,7 @@ import { cn } from "@/lib/utils"
 import { UserAvatar } from "./user-avatar"
 import { UserView } from "./user-view"
 
-export type UserButtonProps = AnyAuthConfig & {
+export type UserButtonProps = {
   className?: string
   align?: "center" | "end" | "start" | undefined
   sideOffset?: number
@@ -51,7 +50,18 @@ export type UserButtonProps = AnyAuthConfig & {
 }
 
 /**
- * Renders a user button with dropdown menu showing user info and sign out option.
+ * Render a user dropdown button that shows user info, settings, theme controls, and authentication actions.
+ *
+ * Includes user profile, settings link, optional multi-session account switching, theme picker,
+ * and sign-in/sign-up/sign-out actions depending on authentication state.
+ *
+ * @param className - Additional CSS classes applied to the button trigger
+ * @param align - Alignment of the dropdown menu relative to the trigger
+ * @param sideOffset - Offset between the trigger and the dropdown menu
+ * @param size - "icon" renders only the avatar; "default" renders a full button with label and chevron
+ * @param themeToggle - When true, renders a theme picker in the menu; defaults to true
+ * @param variant - Visual variant of the trigger button
+ * @returns The dropdown menu component with user actions
  */
 export function UserButton({
   className,
@@ -59,10 +69,8 @@ export function UserButton({
   sideOffset,
   size = "default",
   themeToggle = true,
-  variant = "ghost",
-  ...config
+  variant = "ghost"
 }: UserButtonProps) {
-  const context = useAuth(config)
   const {
     basePaths,
     viewPaths,
@@ -70,31 +78,27 @@ export function UserButton({
     multiSession,
     Link,
     settings: { theme, setTheme, themes }
-  } = context
+  } = useAuth()
 
-  const { data: sessionData, isPending: sessionPending } = useSession(context)
-  const { data: deviceSessions } = useListDeviceSessions(context)
-  const { settingActiveSession, setActiveSession } =
-    useSetActiveSession(context)
+  const { data: sessionData, isPending: sessionPending } = useSession()
+  const { data: deviceSessions } = useListDeviceSessions()
+  const { settingActiveSession, setActiveSession } = useSetActiveSession()
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild={size === "default"}>
         {size === "icon" ? (
-          <UserAvatar {...config} />
+          <UserAvatar />
         ) : (
           <Button
             variant={variant}
             className={cn("h-auto font-normal", className)}
           >
             {sessionData || sessionPending || settingActiveSession ? (
-              <UserView
-                {...config}
-                isPending={sessionPending || !!settingActiveSession}
-              />
+              <UserView isPending={sessionPending || !!settingActiveSession} />
             ) : (
               <>
-                <UserAvatar {...config} />
+                <UserAvatar />
 
                 <div className="grid flex-1 text-left text-sm leading-tight">
                   {localization.auth.account}
@@ -116,7 +120,7 @@ export function UserButton({
         {sessionData && (
           <>
             <DropdownMenuLabel className="text-sm font-normal">
-              <UserView {...config} />
+              <UserView />
             </DropdownMenuLabel>
 
             <DropdownMenuSeparator />
@@ -145,7 +149,7 @@ export function UserButton({
 
                 <DropdownMenuSubContent className="min-w-40 md:min-w-56 max-w-[48svw]">
                   <DropdownMenuItem>
-                    <UserView {...config} />
+                    <UserView />
 
                     <Check className="ml-auto" />
                   </DropdownMenuItem>
@@ -162,7 +166,7 @@ export function UserButton({
                           setActiveSession(deviceSession.session.token)
                         }
                       >
-                        <UserView {...config} user={deviceSession.user} />
+                        <UserView user={deviceSession.user} />
                       </DropdownMenuItem>
                     ))}
 
