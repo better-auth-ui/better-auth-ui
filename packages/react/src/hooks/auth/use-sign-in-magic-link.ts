@@ -1,11 +1,8 @@
-import type { AnyAuthConfig } from "@better-auth-ui/react"
+import { useAuth } from "@better-auth-ui/react"
 import { useActionState } from "react"
 
-import { useAuth } from "./use-auth"
-
-export function useSignInMagicLink(config?: AnyAuthConfig) {
-  const { authClient, baseURL, localization, redirectTo, toast } =
-    useAuth(config)
+export function useSignInMagicLink() {
+  const { authClient, baseURL, localization, redirectTo, toast } = useAuth()
 
   const signInMagicLink = async (_: object, formData: FormData) => {
     const email = formData.get("email") as string

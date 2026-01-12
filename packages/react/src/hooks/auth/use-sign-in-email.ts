@@ -1,19 +1,18 @@
-import type { AnyAuthConfig } from "@better-auth-ui/react"
+import { useAuth } from "@better-auth-ui/react"
+import { useQueryClient } from "@tanstack/react-query"
 import { useActionState } from "react"
 
-import { useAuth } from "./use-auth"
-
-export function useSignInEmail(config?: AnyAuthConfig) {
+export function useSignInEmail() {
   const {
     authClient,
     baseURL,
     emailAndPassword,
     localization,
-    queryClient,
     redirectTo,
     toast,
     navigate
-  } = useAuth(config)
+  } = useAuth()
+  const queryClient = useQueryClient()
 
   const signInEmail = async (_: object, formData: FormData) => {
     const email = formData.get("email") as string

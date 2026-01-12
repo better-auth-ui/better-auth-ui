@@ -1,5 +1,6 @@
 import {
   type AnyAuthConfig,
+  useAuth,
   useSignInEmail,
   useSignInSocial
 } from "@better-auth-ui/react"
@@ -18,7 +19,6 @@ import {
   TextField
 } from "@heroui/react"
 
-import { useAuth } from "../../hooks/use-auth"
 import { cn } from "../../lib/utils"
 import { FieldSeparator } from "./field-separator"
 import { MagicLinkButton } from "./magic-link-button"
@@ -38,11 +38,8 @@ export type SignInProps = AnyAuthConfig & {
 export function SignIn({
   className,
   socialLayout,
-  socialPosition = "bottom",
-  ...config
+  socialPosition = "bottom"
 }: SignInProps) {
-  const context = useAuth(config)
-
   const {
     basePaths,
     emailAndPassword,
@@ -50,12 +47,11 @@ export function SignIn({
     magicLink,
     socialProviders,
     viewPaths
-  } = context
+  } = useAuth()
 
-  const [{ email, password }, signInEmail, signInPending] =
-    useSignInEmail(context)
+  const [{ email, password }, signInEmail, signInPending] = useSignInEmail()
 
-  const [_, signInSocial, socialPending] = useSignInSocial(context)
+  const [_, signInSocial, socialPending] = useSignInSocial()
 
   const isPending = signInPending || socialPending
 
@@ -72,7 +68,6 @@ export function SignIn({
             <>
               {socialProviders && socialProviders.length > 0 && (
                 <ProviderButtons
-                  {...config}
                   socialLayout={socialLayout}
                   signInSocial={signInSocial}
                   isPending={isPending}
@@ -168,11 +163,7 @@ export function SignIn({
                 </Button>
 
                 {magicLink && (
-                  <MagicLinkButton
-                    {...config}
-                    view="signIn"
-                    isPending={isPending}
-                  />
+                  <MagicLinkButton view="signIn" isPending={isPending} />
                 )}
               </Fieldset.Actions>
             </Form>
@@ -186,7 +177,6 @@ export function SignIn({
 
               {socialProviders && socialProviders.length > 0 && (
                 <ProviderButtons
-                  {...config}
                   socialLayout={socialLayout}
                   signInSocial={signInSocial}
                   isPending={isPending}

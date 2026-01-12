@@ -1,5 +1,4 @@
 import type { AuthConfig as BaseAuthConfig } from "@better-auth-ui/react/core"
-import type { QueryClient } from "@tanstack/react-query"
 import type { DeepPartial } from "better-auth"
 import type { ComponentType, PropsWithChildren } from "react"
 import type { AnyAuthClient, AuthClient } from "./auth-client"
@@ -15,11 +14,6 @@ export type AuthConfig = BaseAuthConfig & {
    * @remarks `LinkComponent`
    */
   Link: ComponentType<PropsWithChildren<{ className?: string; href: string }>>
-  /**
-   * React Query client instance
-   * @remarks `QueryClient`
-   */
-  queryClient: QueryClient
 }
 
 /**

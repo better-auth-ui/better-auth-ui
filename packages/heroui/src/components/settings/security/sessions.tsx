@@ -1,5 +1,5 @@
 import {
-  type AnyAuthConfig,
+  useAuth,
   useListSessions,
   useRevokeSession,
   useSession
@@ -8,9 +8,7 @@ import { ArrowRightFromSquare, Display, Smartphone } from "@gravity-ui/icons"
 import { Button, Card, Chip, cn, Skeleton, Spinner } from "@heroui/react"
 import { UAParser } from "ua-parser-js"
 
-import { useAuth } from "../../../hooks/use-auth"
-
-export type SessionsProps = AnyAuthConfig & {
+export type SessionsProps = {
   className?: string
 }
 
@@ -22,13 +20,12 @@ export type SessionsProps = AnyAuthConfig & {
  *
  * @returns A JSX element containing the sessions card
  */
-export function Sessions({ className, ...config }: SessionsProps) {
-  const context = useAuth(config)
-  const { basePaths, localization, viewPaths, navigate } = context
+export function Sessions({ className }: SessionsProps) {
+  const { basePaths, localization, viewPaths, navigate } = useAuth()
 
-  const { data: sessionData } = useSession(context)
-  const { data: sessions, isPending } = useListSessions(context)
-  const { revokingSession, revokeSession } = useRevokeSession(context)
+  const { data: sessionData } = useSession()
+  const { data: sessions, isPending } = useListSessions()
+  const { revokingSession, revokeSession } = useRevokeSession()
 
   return (
     <Card className={cn("p-4 md:p-6 gap-4 md:gap-6", className)}>

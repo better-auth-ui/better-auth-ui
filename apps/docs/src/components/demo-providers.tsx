@@ -1,4 +1,4 @@
-import { AuthProvider } from "@better-auth-ui/heroui/react"
+import { AuthProvider } from "@better-auth-ui/heroui"
 import { Toaster } from "sonner"
 import { authClient } from "@/lib/auth-client"
 

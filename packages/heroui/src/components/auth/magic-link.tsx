@@ -1,5 +1,5 @@
 import {
-  type AnyAuthConfig,
+  useAuth,
   useSignInMagicLink,
   useSignInSocial
 } from "@better-auth-ui/react"
@@ -16,14 +16,12 @@ import {
   Spinner,
   TextField
 } from "@heroui/react"
-
-import { useAuth } from "../../hooks/use-auth"
 import { cn } from "../../lib/utils"
 import { FieldSeparator } from "./field-separator"
 import { MagicLinkButton } from "./magic-link-button"
 import { ProviderButtons, type SocialLayout } from "./provider-buttons"
 
-export type MagicLinkProps = AnyAuthConfig & {
+export type MagicLinkProps = {
   className?: string
   socialLayout?: SocialLayout
   socialPosition?: "top" | "bottom"
@@ -40,17 +38,11 @@ export type MagicLinkProps = AnyAuthConfig & {
 export function MagicLink({
   className,
   socialLayout,
-  socialPosition = "bottom",
-  ...config
+  socialPosition = "bottom"
 }: MagicLinkProps) {
-  const context = useAuth(config)
-
-  const { basePaths, localization, socialProviders, viewPaths } = context
-
-  const [{ email }, signInMagicLink, magicLinkPending] =
-    useSignInMagicLink(context)
-
-  const [_, signInSocial, socialPending] = useSignInSocial(context)
+  const { basePaths, localization, socialProviders, viewPaths } = useAuth()
+  const [{ email }, signInMagicLink, magicLinkPending] = useSignInMagicLink()
+  const [_, signInSocial, socialPending] = useSignInSocial()
 
   const isPending = magicLinkPending || socialPending
 
@@ -66,7 +58,6 @@ export function MagicLink({
             <>
               {socialProviders && socialProviders.length > 0 && (
                 <ProviderButtons
-                  {...config}
                   socialLayout={socialLayout}
                   signInSocial={signInSocial}
                   isPending={isPending}
@@ -106,11 +97,7 @@ export function MagicLink({
                 {localization.auth.sendMagicLink}
               </Button>
 
-              <MagicLinkButton
-                {...config}
-                view="magicLink"
-                isPending={isPending}
-              />
+              <MagicLinkButton view="magicLink" isPending={isPending} />
             </Fieldset.Actions>
           </Form>
 
@@ -122,7 +109,6 @@ export function MagicLink({
 
               {socialProviders && socialProviders.length > 0 && (
                 <ProviderButtons
-                  {...config}
                   socialLayout={socialLayout}
                   signInSocial={signInSocial}
                   isPending={isPending}

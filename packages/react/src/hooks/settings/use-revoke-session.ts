@@ -1,8 +1,5 @@
-import type { AnyAuthConfig } from "@better-auth-ui/react"
+import { useAuth, useListSessions } from "@better-auth-ui/react"
 import { useCallback, useState } from "react"
-
-import { useAuth } from "../auth/use-auth"
-import { useListSessions } from "./use-list-sessions"
 
 /**
  * Provides functionality to revoke an active session.
@@ -11,9 +8,9 @@ import { useListSessions } from "./use-list-sessions"
  * @param config - Optional auth configuration forwarded to the auth hook
  * @returns An object containing the revoking session token and a function to revoke a session
  */
-export function useRevokeSession(config?: AnyAuthConfig) {
-  const { authClient, toast } = useAuth(config)
-  const { refetch } = useListSessions(config)
+export function useRevokeSession() {
+  const { authClient, toast } = useAuth()
+  const { refetch } = useListSessions()
 
   const [revokingSession, setRevokingSession] = useState<string | null>(null)
 

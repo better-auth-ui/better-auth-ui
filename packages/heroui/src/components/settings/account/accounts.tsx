@@ -1,5 +1,5 @@
 import {
-  type AnyAuthConfig,
+  useAuth,
   useListDeviceSessions,
   useRevokeMultiSession,
   useSession,
@@ -12,10 +12,9 @@ import {
 } from "@gravity-ui/icons"
 import { Button, buttonVariants, Card, cn, Spinner } from "@heroui/react"
 
-import { useAuth } from "../../../hooks/use-auth"
 import { UserView } from "../../user/user-view"
 
-export type AccountsProps = AnyAuthConfig & {
+export type AccountsProps = {
   className?: string
 }
 
@@ -27,15 +26,12 @@ export type AccountsProps = AnyAuthConfig & {
  *
  * @returns A JSX element containing the accounts card, or null if multiSession is disabled
  */
-export function Accounts({ className, ...config }: AccountsProps) {
-  const context = useAuth(config)
-  const { basePaths, localization, viewPaths, Link } = context
-
-  const { data: sessionData } = useSession(context)
-  const { data: deviceSessions, isPending } = useListDeviceSessions(context)
-  const { settingActiveSession, setActiveSession } =
-    useSetActiveSession(context)
-  const { revokingSession, revokeSession } = useRevokeMultiSession(context)
+export function Accounts({ className }: AccountsProps) {
+  const { basePaths, localization, viewPaths, Link } = useAuth()
+  const { data: sessionData } = useSession()
+  const { data: deviceSessions, isPending } = useListDeviceSessions()
+  const { settingActiveSession, setActiveSession } = useSetActiveSession()
+  const { revokingSession, revokeSession } = useRevokeMultiSession()
 
   return (
     <Card className={cn("p-4 md:p-6 gap-4 md:gap-6", className)}>
@@ -64,7 +60,7 @@ export function Accounts({ className, ...config }: AccountsProps) {
                 key={deviceSession.session.id}
                 className="flex items-center rounded-3xl border-2 border-default p-3 justify-between"
               >
-                <UserView {...config} user={deviceSession.user} size="md" />
+                <UserView user={deviceSession.user} size="md" />
 
                 <div className="flex items-center gap-1 shrink-0">
                   {!isActive && (
@@ -106,7 +102,7 @@ export function Accounts({ className, ...config }: AccountsProps) {
           })
         ) : (
           <div className="flex items-center rounded-3xl border-2 border-default p-3">
-            <UserView isPending size="md" {...config} />
+            <UserView isPending size="md" />
           </div>
         )}
       </Card.Content>

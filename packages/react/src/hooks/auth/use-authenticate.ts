@@ -1,8 +1,7 @@
-import type { AnyAuthConfig } from "@better-auth-ui/react"
+import { useAuth } from "@better-auth-ui/react"
 import type { DefinedInitialDataOptions } from "@tanstack/react-query"
 import { useEffect } from "react"
 
-import { useAuth } from "./use-auth"
 import { useSession } from "./use-session"
 
 /**
@@ -12,12 +11,9 @@ import { useSession } from "./use-session"
  * @param options - Optional query options for the underlying session query.
  * @returns Result of useSession hook containing session data and query state.
  */
-export function useAuthenticate(
-  config?: AnyAuthConfig,
-  options?: Partial<DefinedInitialDataOptions>
-) {
-  const { basePaths, viewPaths, replace } = useAuth(config)
-  const { data, isPending, ...rest } = useSession(config, options)
+export function useAuthenticate(options?: Partial<DefinedInitialDataOptions>) {
+  const { basePaths, viewPaths, replace } = useAuth()
+  const { data, isPending, ...rest } = useSession(options)
 
   useEffect(() => {
     if (data || isPending) return

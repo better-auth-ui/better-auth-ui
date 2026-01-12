@@ -1,11 +1,10 @@
-import { type AnyAuthConfig, useSession } from "@better-auth-ui/react"
+import { useSession } from "@better-auth-ui/react"
 import { cn, Skeleton } from "@heroui/react"
 import type { User } from "better-auth"
 
-import { useAuth } from "../../hooks/use-auth"
 import { UserAvatar } from "./user-avatar"
 
-export type UserViewProps = AnyAuthConfig & {
+export type UserViewProps = {
   className?: string
   isPending?: boolean
   size?: "sm" | "md" | "lg"
@@ -25,18 +24,16 @@ export function UserView({
   className,
   isPending,
   size = "sm",
-  user,
-  ...config
+  user
 }: UserViewProps) {
-  const context = useAuth(config)
-  const { data: sessionData, isPending: sessionPending } = useSession(context)
+  const { data: sessionData, isPending: sessionPending } = useSession()
 
   const resolvedUser = user ?? sessionData?.user
 
   if ((isPending || sessionPending) && !user) {
     return (
       <div className={cn("flex items-center gap-2 min-w-0", className)}>
-        <UserAvatar isPending size={size} {...config} />
+        <UserAvatar isPending size={size} />
 
         <div className="flex flex-col gap-1.5 min-w-0">
           <Skeleton className="h-4 w-24 rounded-lg" />
@@ -48,7 +45,7 @@ export function UserView({
 
   return (
     <div className={cn("flex items-center gap-2 min-w-0", className)}>
-      <UserAvatar user={resolvedUser} size={size} {...config} />
+      <UserAvatar user={resolvedUser} size={size} />
 
       <div className="min-w-0">
         <p className="text-sm font-medium truncate">

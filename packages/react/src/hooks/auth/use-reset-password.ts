@@ -1,9 +1,7 @@
-import type { AnyAuthConfig } from "@better-auth-ui/react"
+import { useAuth } from "@better-auth-ui/react"
 import { useActionState } from "react"
 
-import { useAuth } from "./use-auth"
-
-export function useResetPassword(config?: AnyAuthConfig) {
+export function useResetPassword() {
   const {
     authClient,
     basePaths,
@@ -12,7 +10,7 @@ export function useResetPassword(config?: AnyAuthConfig) {
     toast,
     viewPaths,
     navigate
-  } = useAuth(config)
+  } = useAuth()
 
   const resetPassword = async (_: object, formData: FormData) => {
     const password = formData.get("password") as string

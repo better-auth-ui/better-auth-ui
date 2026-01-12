@@ -1,10 +1,8 @@
-import type { AnyAuthConfig } from "@better-auth-ui/react"
+import { useAuth } from "@better-auth-ui/react"
 import { useActionState } from "react"
 
-import { useAuth } from "./use-auth"
-
-export function useSignInSocial(config?: AnyAuthConfig) {
-  const { authClient, baseURL, redirectTo, toast } = useAuth(config)
+export function useSignInSocial() {
+  const { authClient, baseURL, redirectTo, toast } = useAuth()
 
   const signInSocial = async (_: object, formData: FormData) => {
     const provider = formData.get("provider") as string

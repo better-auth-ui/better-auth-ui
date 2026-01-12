@@ -1,8 +1,4 @@
-import {
-  type AnyAuthConfig,
-  useSession,
-  useUpdateUser
-} from "@better-auth-ui/react"
+import { useAuth, useSession, useUpdateUser } from "@better-auth-ui/react"
 import { FloppyDisk, Pencil } from "@gravity-ui/icons"
 import {
   Button,
@@ -18,10 +14,9 @@ import {
   TextField
 } from "@heroui/react"
 
-import { useAuth } from "../../../hooks/use-auth"
 import { UserAvatar } from "../../user/user-avatar"
 
-export type UserProfileProps = AnyAuthConfig & {
+export type UserProfileProps = {
   className?: string
 }
 
@@ -32,13 +27,10 @@ export type UserProfileProps = AnyAuthConfig & {
  *
  * @returns A JSX element containing the profile card and editable form
  */
-export function UserProfile({ className, ...config }: UserProfileProps) {
-  const context = useAuth(config)
-  const { localization } = context
-
-  const { data: sessionData } = useSession(context)
-
-  const [state, formAction, isPending] = useUpdateUser(context)
+export function UserProfile({ className }: UserProfileProps) {
+  const { localization } = useAuth()
+  const { data: sessionData } = useSession()
+  const [state, formAction, isPending] = useUpdateUser()
 
   return (
     <Card className={cn("p-4 md:p-6 gap-4 md:gap-6", className)}>
@@ -58,7 +50,7 @@ export function UserProfile({ className, ...config }: UserProfileProps) {
               className="p-0 h-auto w-auto rounded-full"
               isDisabled={!sessionData}
             >
-              <UserAvatar {...config} size="lg" />
+              <UserAvatar size="lg" />
 
               <span className="absolute right-0 bottom-0 size-3.5 rounded-full bg-background ring-2 ring-surface-quaternary flex items-center justify-center">
                 <Pencil className="size-2.5 text-muted" />

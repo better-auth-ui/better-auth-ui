@@ -1,7 +1,7 @@
 import { getProviderName } from "@better-auth-ui/core"
 import {
-  type AnyAuthConfig,
   providerIcons,
+  useAuth,
   useLinkSocial,
   useListAccounts,
   useUnlinkAccount
@@ -9,9 +9,7 @@ import {
 import { Link as LinkIcon, Xmark } from "@gravity-ui/icons"
 import { Button, Card, cn, Skeleton, Spinner } from "@heroui/react"
 
-import { useAuth } from "../../../hooks/use-auth"
-
-export type ConnectedAccountsProps = AnyAuthConfig & {
+export type ConnectedAccountsProps = {
   className?: string
 }
 
@@ -23,16 +21,12 @@ export type ConnectedAccountsProps = AnyAuthConfig & {
  *
  * @returns A JSX element containing the connected accounts card
  */
-export function ConnectedAccounts({
-  className,
-  ...config
-}: ConnectedAccountsProps) {
-  const context = useAuth(config)
-  const { localization, socialProviders } = context
+export function ConnectedAccounts({ className }: ConnectedAccountsProps) {
+  const { localization, socialProviders } = useAuth()
 
-  const { data: accounts, isPending } = useListAccounts(context)
-  const { linkSocial, linkingProvider } = useLinkSocial(context)
-  const { unlinkAccount, unlinkingProvider } = useUnlinkAccount(context)
+  const { data: accounts, isPending } = useListAccounts()
+  const { linkSocial, linkingProvider } = useLinkSocial()
+  const { unlinkAccount, unlinkingProvider } = useUnlinkAccount()
 
   return (
     <Card className={cn("p-4 md:p-6 gap-4 md:gap-6", className)}>

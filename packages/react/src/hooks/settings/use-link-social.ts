@@ -1,16 +1,13 @@
-import type { AnyAuthConfig } from "@better-auth-ui/react"
+import { useAuth } from "@better-auth-ui/react"
 import { useCallback, useState } from "react"
-
-import { useAuth } from "../auth/use-auth"
 
 /**
  * Provides functionality to link a social account to the current user.
  *
- * @param config - Optional auth configuration forwarded to the auth hook
  * @returns An object containing the linking provider and a function to link a social account
  */
-export function useLinkSocial(config?: AnyAuthConfig) {
-  const { authClient, baseURL, toast } = useAuth(config)
+export function useLinkSocial() {
+  const { authClient, baseURL, toast } = useAuth()
 
   const [linkingProvider, setLinkingProvider] = useState<string | null>(null)
 

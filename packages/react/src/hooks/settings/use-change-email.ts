@@ -1,17 +1,13 @@
-import type { AnyAuthConfig } from "@better-auth-ui/react"
+import { useAuth } from "@better-auth-ui/react"
 import { useActionState } from "react"
-
-import { useAuth } from "../auth/use-auth"
 
 /**
  * Provides an action state hook that initiates an email change request for the current user.
  *
- * @param config - Optional auth configuration forwarded to the auth hook
  * @returns An action state (initialized with `email` = "") whose action initiates the email change process and displays success or error toasts
  */
-export function useChangeEmail(config?: AnyAuthConfig) {
-  const { authClient, baseURL, localization, toast, viewPaths } =
-    useAuth(config)
+export function useChangeEmail() {
+  const { authClient, baseURL, localization, toast, viewPaths } = useAuth()
 
   const changeEmail = async (_: object, formData: FormData) => {
     const email = formData.get("email") as string

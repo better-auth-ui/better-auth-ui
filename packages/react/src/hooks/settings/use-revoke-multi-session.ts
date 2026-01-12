@@ -1,17 +1,16 @@
-import type { AnyAuthConfig } from "@better-auth-ui/react"
+import { useAuth } from "@better-auth-ui/react"
+import { useQueryClient } from "@tanstack/react-query"
 import { useCallback, useState } from "react"
-
-import { useAuth } from "../auth/use-auth"
 
 /**
  * Provides functionality to revoke a session from device sessions in multi-session mode.
  * This is used for the multi-session plugin where users can have multiple accounts on the same device.
  *
- * @param config - Optional auth configuration forwarded to the auth hook
  * @returns An object containing the revoking session token and a function to revoke a session
  */
-export function useRevokeMultiSession(config?: AnyAuthConfig) {
-  const { authClient, queryClient, toast } = useAuth(config)
+export function useRevokeMultiSession() {
+  const queryClient = useQueryClient()
+  const { authClient, toast } = useAuth()
 
   const [revokingSession, setRevokingSession] = useState<string | null>(null)
 

@@ -1,4 +1,4 @@
-import type { AnyAuthConfig } from "@better-auth-ui/react"
+import { useAuth } from "@better-auth-ui/react"
 import { Display, Moon, Sun } from "@gravity-ui/icons"
 import {
   Card,
@@ -8,9 +8,8 @@ import {
   RadioGroup,
   useIsHydrated
 } from "@heroui/react"
-import { useAuth } from "../../../hooks/use-auth"
 
-export type AppearanceProps = AnyAuthConfig & {
+export type AppearanceProps = {
   className?: string
 }
 
@@ -294,15 +293,13 @@ function ThemePreviewDark(props: React.SVGProps<SVGSVGElement>) {
  * if theme settings are configured (theme, setTheme, and themes are provided).
  *
  * @param className - Optional additional CSS class names for the card container.
- * @param config - Auth-related props forwarded to access theme settings.
  * @returns A JSX element containing the theme selector card, or null if theme settings are not configured.
  */
-export function Appearance({ className, ...config }: AppearanceProps) {
-  const context = useAuth(config)
+export function Appearance({ className }: AppearanceProps) {
   const {
     localization,
     settings: { theme, setTheme, themes }
-  } = context
+  } = useAuth()
 
   const hydrated = useIsHydrated()
 

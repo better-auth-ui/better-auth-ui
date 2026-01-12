@@ -1,12 +1,11 @@
 import { getProviderName } from "@better-auth-ui/core"
-import { type AnyAuthConfig, providerIcons } from "@better-auth-ui/react"
+import { providerIcons, useAuth } from "@better-auth-ui/react"
 import { Button, Fieldset, Form } from "@heroui/react"
 import { useMemo } from "react"
 
-import { useAuth } from "../../hooks/use-auth"
 import { cn } from "../../lib/utils"
 
-export type ProviderButtonsProps = AnyAuthConfig & {
+export type ProviderButtonsProps = {
   isPending: boolean
   socialLayout?: SocialLayout
   signInSocial: (formData: FormData) => void
@@ -24,10 +23,9 @@ export type SocialLayout = "auto" | "horizontal" | "vertical" | "grid"
 export function ProviderButtons({
   isPending,
   socialLayout = "auto",
-  signInSocial,
-  ...config
+  signInSocial
 }: ProviderButtonsProps) {
-  const { localization, socialProviders } = useAuth(config)
+  const { localization, socialProviders } = useAuth()
 
   const resolvedSocialLayout = useMemo(() => {
     if (socialLayout === "auto") {

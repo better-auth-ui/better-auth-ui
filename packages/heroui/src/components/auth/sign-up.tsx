@@ -1,8 +1,4 @@
-import {
-  type AnyAuthConfig,
-  useSignInSocial,
-  useSignUpEmail
-} from "@better-auth-ui/react"
+import { useAuth, useSignInSocial, useSignUpEmail } from "@better-auth-ui/react"
 import { Eye, EyeSlash } from "@gravity-ui/icons"
 import {
   Button,
@@ -20,13 +16,12 @@ import {
 } from "@heroui/react"
 import { useState } from "react"
 
-import { useAuth } from "../../hooks/use-auth"
 import { cn } from "../../lib/utils"
 import { FieldSeparator } from "./field-separator"
 import { MagicLinkButton } from "./magic-link-button"
 import { ProviderButtons, type SocialLayout } from "./provider-buttons"
 
-export type SignUpProps = AnyAuthConfig & {
+export type SignUpProps = {
   className?: string
   socialLayout?: SocialLayout
   socialPosition?: "top" | "bottom"
@@ -42,11 +37,8 @@ export type SignUpProps = AnyAuthConfig & {
 export function SignUp({
   className,
   socialLayout,
-  socialPosition = "bottom",
-  ...config
+  socialPosition = "bottom"
 }: SignUpProps) {
-  const context = useAuth(config)
-
   const {
     basePaths,
     emailAndPassword,
@@ -54,15 +46,15 @@ export function SignUp({
     magicLink,
     socialProviders,
     viewPaths
-  } = context
+  } = useAuth()
 
   const [
     { name, email, password, confirmPassword },
     signUpEmail,
     signUpPending
-  ] = useSignUpEmail(context)
+  ] = useSignUpEmail()
 
-  const [_, signInSocial, socialPending] = useSignInSocial(context)
+  const [_, signInSocial, socialPending] = useSignInSocial()
 
   const [isPasswordVisible, setIsPasswordVisible] = useState(false)
   const [isConfirmPasswordVisible, setIsConfirmPasswordVisible] =
@@ -83,7 +75,6 @@ export function SignUp({
             <>
               {socialProviders && socialProviders.length > 0 && (
                 <ProviderButtons
-                  {...config}
                   isPending={isPending}
                   socialLayout={socialLayout}
                   signInSocial={signInSocial}
@@ -228,11 +219,7 @@ export function SignUp({
                 </Button>
 
                 {magicLink && (
-                  <MagicLinkButton
-                    {...config}
-                    view="signUp"
-                    isPending={isPending}
-                  />
+                  <MagicLinkButton view="signUp" isPending={isPending} />
                 )}
               </Fieldset.Actions>
             </Form>
@@ -246,7 +233,6 @@ export function SignUp({
 
               {socialProviders && socialProviders.length > 0 && (
                 <ProviderButtons
-                  {...config}
                   socialLayout={socialLayout}
                   signInSocial={signInSocial}
                   isPending={isPending}

@@ -1,6 +1,6 @@
 "use client"
 
-import { AuthProvider } from "@better-auth-ui/heroui/react"
+import { AuthProvider } from "@better-auth-ui/heroui"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { ThemeProvider } from "next-themes"

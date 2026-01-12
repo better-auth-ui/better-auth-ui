@@ -1,11 +1,10 @@
-import type { AnyAuthConfig } from "@better-auth-ui/react"
+import { useAuth } from "@better-auth-ui/react"
+import { useQueryClient } from "@tanstack/react-query"
 import { useCallback } from "react"
 
-import { useAuth } from "./use-auth"
-
-export function useSignOut(config?: AnyAuthConfig) {
-  const { authClient, basePaths, queryClient, viewPaths, replace, toast } =
-    useAuth(config)
+export function useSignOut() {
+  const queryClient = useQueryClient()
+  const { authClient, basePaths, viewPaths, replace, toast } = useAuth()
 
   const signOut = useCallback(async () => {
     const { error } = await authClient.signOut()
