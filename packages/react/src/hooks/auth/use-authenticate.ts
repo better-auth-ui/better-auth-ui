@@ -11,7 +11,7 @@ import { useSession } from "./use-session"
  * @returns An object containing `data` (the current session or `undefined`), `isPending` (whether the session query is in progress), and other session query state
  */
 export function useAuthenticate(options?: Partial<DefinedInitialDataOptions>) {
-  const { basePaths, viewPaths, replace } = useAuth()
+  const { basePaths, viewPaths, navigate } = useAuth()
   const { data, isPending, ...rest } = useSession(options)
 
   useEffect(() => {
@@ -21,8 +21,8 @@ export function useAuthenticate(options?: Partial<DefinedInitialDataOptions>) {
     const redirectTo = encodeURIComponent(currentURL)
     const signInPath = `${basePaths.auth}/${viewPaths.auth.signIn}?redirectTo=${redirectTo}`
 
-    replace(signInPath)
-  }, [basePaths.auth, data, isPending, viewPaths.auth.signIn, replace])
+    navigate({ href: signInPath, replace: true })
+  }, [basePaths.auth, data, isPending, viewPaths.auth.signIn, navigate])
 
   return { data, isPending, ...rest }
 }

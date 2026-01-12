@@ -67,7 +67,7 @@ export function useSignInEmail() {
 
     await queryClient.invalidateQueries({ queryKey: ["auth"] })
 
-    navigate(redirectTo)
+    navigate({ href: redirectTo })
 
     return { email, password }
   }

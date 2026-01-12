@@ -136,15 +136,16 @@ export interface AuthConfig {
    */
   toast: Toast
   /**
-   * Function to navigate to a new path (e.g., router.push)
-   * @default window.location.href = path
+   * Function to navigate to a new path
+   * @param options - Navigation options with href and optional replace flag
+   * @default window.location.href = href (or window.location.replace if replace: true)
+   * @example
+   * // TanStack Router
+   * navigate={navigate}
+   * // Next.js
+   * navigate={({href, replace}) => replace ? router.replace(href) : router.push(href)}
    */
-  navigate: (path: string) => void
-  /**
-   * Function to replace current path (e.g., router.replace)
-   * @default window.location.replace(path)
-   */
-  replace: (path: string) => void
+  navigate: (options: { href: string; replace?: boolean }) => void
 }
 
 export const defaultConfig: AuthConfig = {
@@ -164,10 +165,13 @@ export const defaultConfig: AuthConfig = {
   },
   viewPaths,
   localization,
-  navigate: (path: string) => {
-    window.location.href = path
+  navigate: ({ href, replace }) => {
+    if (replace) {
+      window.location.replace(href)
+    } else {
+      window.location.href = href
+    }
   },
-  replace: (path: string) => window.location.replace(path),
   toast: {
     error: defaultToast,
     success: defaultToast,

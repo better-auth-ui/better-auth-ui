@@ -26,7 +26,7 @@ export function useForgotPassword() {
       toast.error(error.message || error.statusText)
     } else {
       toast.success(localization.auth.passwordResetEmailSent)
-      navigate(`${basePaths.auth}/${viewPaths.auth.signIn}`)
+      navigate({ href: `${basePaths.auth}/${viewPaths.auth.signIn}` })
     }
 
     return { email }

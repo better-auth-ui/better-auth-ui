@@ -63,11 +63,11 @@ export function useSignUpEmail() {
 
     if (emailAndPassword?.requireEmailVerification) {
       toast.success(localization.auth.verifyYourEmail)
-      navigate(`${basePaths.auth}/${viewPaths.auth.signIn}`)
+      navigate({ href: `${basePaths.auth}/${viewPaths.auth.signIn}` })
     } else {
       await queryClient.invalidateQueries({ queryKey: ["auth"] })
 
-      navigate(redirectTo)
+      navigate({ href: redirectTo })
     }
 
     return {

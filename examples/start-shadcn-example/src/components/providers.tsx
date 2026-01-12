@@ -16,8 +16,7 @@ export function Providers({ children }: { children: ReactNode }) {
       multiSession
       socialProviders={["github", "google"]}
       redirectTo="/dashboard"
-      navigate={(path) => navigate({ to: path })}
-      replace={(path) => navigate({ to: path, replace: true })}
+      navigate={navigate}
       settings={{
         theme,
         setTheme

@@ -9,7 +9,7 @@ import { useCallback } from "react"
  */
 export function useSignOut() {
   const queryClient = useQueryClient()
-  const { authClient, basePaths, viewPaths, replace, toast } = useAuth()
+  const { authClient, basePaths, viewPaths, navigate, toast } = useAuth()
 
   const signOut = useCallback(async () => {
     const { error } = await authClient.signOut()
@@ -20,12 +20,15 @@ export function useSignOut() {
 
     await queryClient.invalidateQueries({ queryKey: ["auth"] })
 
-    replace(`${basePaths.auth}/${viewPaths.auth.signIn}`)
+    navigate({
+      href: `${basePaths.auth}/${viewPaths.auth.signIn}`,
+      replace: true
+    })
   }, [
     authClient,
     basePaths.auth,
     viewPaths.auth.signIn,
-    replace,
+    navigate,
     queryClient,
     toast.error
   ])

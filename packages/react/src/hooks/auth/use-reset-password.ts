@@ -32,7 +32,7 @@ export function useResetPassword() {
 
     if (!token) {
       toast.error(localization.auth.invalidResetPasswordToken)
-      navigate(`${basePaths.auth}/${viewPaths.auth.signIn}`)
+      navigate({ href: `${basePaths.auth}/${viewPaths.auth.signIn}` })
 
       return {
         password: "",
@@ -67,7 +67,7 @@ export function useResetPassword() {
     }
 
     toast.success(localization.auth.passwordResetSuccess)
-    navigate(`${basePaths.auth}/${viewPaths.auth.signIn}`)
+    navigate({ href: `${basePaths.auth}/${viewPaths.auth.signIn}` })
 
     return {
       password,
