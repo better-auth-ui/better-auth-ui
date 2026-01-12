@@ -13,6 +13,6 @@ export function useSession(options?: Partial<DefinedInitialDataOptions>) {
   return useQuery({
     queryKey: ["auth", "session"],
     queryFn: () => authClient.getSession({ fetchOptions: { throw: true } }),
-    ...(options as object)
+    ...options
   })
 }

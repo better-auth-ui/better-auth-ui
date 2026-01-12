@@ -19,6 +19,6 @@ export function useListSessions(options?: DefinedInitialDataOptions) {
         fetchOptions: { throw: true }
       }),
     enabled: !!sessionData,
-    ...(options as object)
+    ...options
   })
 }
