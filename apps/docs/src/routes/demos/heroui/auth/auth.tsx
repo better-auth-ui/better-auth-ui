@@ -9,7 +9,7 @@ import { Auth } from "@better-auth-ui/heroui"
 function RouteComponent() {
   return (
     <div className="flex flex-col p-4 md:p-6 my-auto items-center">
-      <Auth view="signIn" magicLink socialProviders={["github", "google"]} />
+      <Auth view="signIn" />
     </div>
   )
 }

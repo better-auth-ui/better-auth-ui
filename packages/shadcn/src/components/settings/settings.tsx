@@ -1,10 +1,6 @@
 "use client"
 
-import {
-  type AnyAuthConfig,
-  useAuth,
-  useAuthenticate
-} from "@better-auth-ui/react"
+import { useAuth, useAuthenticate } from "@better-auth-ui/react"
 import type { SettingsView } from "@better-auth-ui/react/core"
 import { ShieldCheck, UserCircle2 } from "lucide-react"
 import { useMemo } from "react"
@@ -14,7 +10,7 @@ import { cn } from "@/lib/utils"
 import { AccountSettings } from "./account/account-settings"
 import { SecuritySettings } from "./security/security-settings"
 
-export type SettingsProps = AnyAuthConfig & {
+export type SettingsProps = {
   className?: string
   path?: string
   view?: SettingsView

@@ -1,5 +1,4 @@
 import {
-  type AnyAuthConfig,
   useAuth,
   useListDeviceSessions,
   useSession,
@@ -23,7 +22,7 @@ import { Button, cn, Dropdown, Label, Separator, Tabs } from "@heroui/react"
 import { UserAvatar } from "./user-avatar"
 import { UserView } from "./user-view"
 
-export type UserButtonProps = AnyAuthConfig & {
+export type UserButtonProps = {
   className?: string
   size?: "default" | "icon"
   placement?:

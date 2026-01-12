@@ -7,6 +7,7 @@ export function DemoProviders({ children }: { children: React.ReactNode }) {
     <>
       <AuthProvider
         authClient={authClient}
+        magicLink
         multiSession
         navigate={() => {}}
         replace={() => {}}

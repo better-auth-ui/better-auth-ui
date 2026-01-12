@@ -1,9 +1,4 @@
-import {
-  type AnyAuthConfig,
-  useAuth,
-  useSignInEmail,
-  useSignInSocial
-} from "@better-auth-ui/react"
+import { useAuth, useSignInEmail, useSignInSocial } from "@better-auth-ui/react"
 import {
   Button,
   Card,
@@ -24,7 +19,7 @@ import { FieldSeparator } from "./field-separator"
 import { MagicLinkButton } from "./magic-link-button"
 import { ProviderButtons, type SocialLayout } from "./provider-buttons"
 
-export type SignInProps = AnyAuthConfig & {
+export type SignInProps = {
   className?: string
   socialLayout?: SocialLayout
   socialPosition?: "top" | "bottom"

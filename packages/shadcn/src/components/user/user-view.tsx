@@ -1,6 +1,5 @@
 "use client"
 
-import type { AnyAuthConfig } from "@better-auth-ui/react"
 import type { User } from "better-auth"
 
 import { Skeleton } from "@/components/ui/skeleton"
@@ -8,7 +7,7 @@ import { useSession } from "@/hooks/auth/use-session"
 import { cn } from "@/lib/utils"
 import { UserAvatar } from "./user-avatar"
 
-export type UserViewProps = AnyAuthConfig & {
+export type UserViewProps = {
   className?: string
   isPending?: boolean
   user?: User & { username?: string | null; displayUsername?: string | null }

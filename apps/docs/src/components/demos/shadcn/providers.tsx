@@ -10,8 +10,11 @@ export function Providers({ children }: { children: ReactNode }) {
   return (
     <AuthProvider
       authClient={authClient}
+      magicLink
+      multiSession
       navigate={(path) => navigate({ to: path })}
       replace={(path) => navigate({ to: path, replace: true })}
+      socialProviders={["github", "google"]}
       Link={({ href, ...props }) => <Link to={href} {...props} />}
     >
       {children}
