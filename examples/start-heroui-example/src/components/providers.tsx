@@ -4,6 +4,7 @@ import { useTheme } from "next-themes"
 import type { ReactNode } from "react"
 import { RouterProvider } from "react-aria-components"
 import { Toaster } from "sonner"
+
 import { authClient } from "@/lib/auth-client"
 
 /**
@@ -17,7 +18,7 @@ export function Providers({ children }: { children: ReactNode }) {
   const { theme, setTheme } = useTheme()
 
   return (
-    <RouterProvider navigate={(path) => navigate({ to: path })}>
+    <RouterProvider navigate={(path) => navigate({ href: path })}>
       <AuthProvider
         authClient={authClient}
         socialProviders={["google", "github"]}
