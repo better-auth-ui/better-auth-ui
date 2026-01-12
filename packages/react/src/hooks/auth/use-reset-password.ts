@@ -1,6 +1,17 @@
 import { useAuth } from "@better-auth-ui/react"
 import { useActionState } from "react"
 
+/**
+ * Provides an action state hook for resetting a user's password using the `token` query parameter.
+ *
+ * When the returned action is invoked with a FormData containing `password` (and optionally `confirmPassword`),
+ * it attempts to reset the password, shows success or error toasts, navigates to the sign-in view on success or when
+ * the token is missing, and returns updated form field values.
+ *
+ * @returns The `useActionState` result configured for the reset-password action. When the action is executed it
+ * returns an object with `password` and, if confirm-password is enabled, `confirmPassword` (both strings).
+ * On failure or missing token these fields are set to empty strings.
+ */
 export function useResetPassword() {
   const {
     authClient,

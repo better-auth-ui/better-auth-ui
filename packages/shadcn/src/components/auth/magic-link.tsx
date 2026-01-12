@@ -29,6 +29,11 @@ export type MagicLinkProps = {
 
 /**
  * Render a card-based sign-in form that sends an email magic link and optionally shows social provider buttons.
+ *
+ * @param className - Additional CSS class names applied to the card container
+ * @param socialLayout - Layout style for social provider buttons
+ * @param socialPosition - Position of social provider buttons; `"top"` or `"bottom"`. Defaults to `"bottom"`.
+ * @returns The magic-link sign-in UI as a JSX element
  */
 export function MagicLink({
   className,

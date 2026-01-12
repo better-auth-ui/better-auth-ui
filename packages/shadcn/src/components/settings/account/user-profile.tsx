@@ -26,12 +26,14 @@ export type UserProfileProps = {
 }
 
 /**
- * Render the current user's profile editor UI.
+ * Render a profile card that lets the authenticated user view and update their display name.
  *
- * Renders a form that displays the user's avatar and identity, lets the user edit their name with inline validation, and submit changes. While session data is loading it renders a skeleton variant; while a submit is pending it disables inputs and shows a spinner.
+ * The component uses auth localization for labels, reflects session loading state with skeletons, shows the best-available
+ * user identifier (display username, name, or email) and secondary email line, and includes a name input that can be
+ * edited and saved.
  *
  * @param className - Optional additional CSS class names applied to the card container
- * @returns A React element containing the user profile form and controls
+ * @returns A JSX element containing the profile card with editable name field
  */
 export function UserProfile({ className }: UserProfileProps) {
   const { localization } = useAuth()

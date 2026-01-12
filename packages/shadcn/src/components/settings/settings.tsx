@@ -18,12 +18,13 @@ export type SettingsProps = {
 }
 
 /**
- * Renders a tabbed settings interface and selects which view to display.
+ * Renders the settings UI and activates the appropriate settings view based on `view` or `path`.
  *
- * @param path - Route path used to resolve the settings view when `view` is not provided
- * @param view - Explicit settings view to render (e.g., "account" or "security")
- * @param hideNav - When true, hide the navigation tabs
- * @returns A JSX element rendering the settings tabs and the currently selected view
+ * @param className - Additional CSS class names applied to the root container
+ * @param path - Route path used to resolve which settings view to activate when `view` is not provided
+ * @param view - Explicit settings view to activate (for example, `"account"` or `"security"`)
+ * @param hideNav - When `true`, hides the settings navigation tabs
+ * @returns A JSX element rendering the settings layout and the selected settings panel
  */
 export function Settings({ className, view, path, hideNav }: SettingsProps) {
   const { basePaths, localization, viewPaths, Link } = useAuth()

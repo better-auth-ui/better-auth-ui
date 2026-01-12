@@ -13,8 +13,10 @@ export type AccountSettingsProps = {
 /**
  * Renders the account settings layout including user profile, change email, appearance, and accounts management.
  *
+ * UserProfile, ChangeEmail, and Appearance are always rendered; Accounts is rendered when `multiSession` is enabled.
+ *
  * @param className - Optional additional CSS class names for the outer container.
- * @returns A JSX element containing a styled container that renders the user profile, change email, appearance, and accounts management.
+ * @returns The account settings container as a JSX element.
  */
 export function AccountSettings({ className }: AccountSettingsProps) {
   const { multiSession } = useAuth()

@@ -24,12 +24,12 @@ export type AccountsProps = {
 }
 
 /**
- * Display and manage multiple signed-in accounts for multi-session support.
+ * Render a card that lists and manages all device sessions for the current user.
  *
- * Shows all device sessions, allows switching between accounts, and signing out
- * of individual accounts. Shown in AccountSettings when multiSession is enabled.
+ * Shows each session with user information and actions to switch to or revoke a session.
+ * When device session data is loading, a pending placeholder row is displayed.
  *
- * @returns A JSX element containing the accounts card, or null if multiSession is disabled
+ * @returns A JSX element containing the accounts management card
  */
 export function Accounts({ className }: AccountsProps) {
   const { basePaths, localization, viewPaths, Link } = useAuth()

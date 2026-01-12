@@ -14,12 +14,13 @@ export type SettingsProps = {
 }
 
 /**
- * Render the settings UI and select the active settings view based on `view` or `path`.
+ * Renders the settings UI and activates the appropriate settings view based on `view` or `path`.
  *
+ * @param className - Additional CSS class names applied to the root container
  * @param path - Route path used to resolve which settings view to activate when `view` is not provided
- * @param view - Explicit settings view to activate (for example, `"account"` or `"security"`)
+ * @param view - Explicit settings view to activate, e.g. `"account"` or `"security"`
  * @param hideNav - When `true`, hide the navigation tabs
- * @returns A React element containing the settings tabs and the currently selected panel
+ * @returns A DOM tree containing the responsive settings tabs and the currently selected settings panel
  *
  * @throws Error if neither `view` nor `path` is provided
  */

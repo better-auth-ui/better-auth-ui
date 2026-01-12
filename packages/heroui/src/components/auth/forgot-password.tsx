@@ -20,10 +20,13 @@ export type ForgotPasswordProps = {
 }
 
 /**
- * Render a "Forgot Password" form that collects the user's email and submits a password reset request.
+ * Render a card-based "Forgot Password" form that sends a password-reset email.
  *
- * @param className - Optional additional CSS classes applied to the root Card element
- * @returns The rendered Forgot Password form element
+ * The form displays an email input, submit button, and a link back to sign-in.
+ * Toasts are displayed on success or error via the `useForgotPassword` hook.
+ *
+ * @param className - Optional additional CSS class names applied to the card
+ * @returns The forgot-password form UI as a JSX element
  */
 export function ForgotPassword({ className }: ForgotPasswordProps) {
   const { basePaths, localization, viewPaths } = useAuth()

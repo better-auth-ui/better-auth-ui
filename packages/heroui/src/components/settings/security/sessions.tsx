@@ -13,10 +13,10 @@ export type SessionsProps = {
 }
 
 /**
- * Display and manage all active sessions (devices where user is logged in).
+ * Render a card listing all active sessions for the current user with revoke controls.
  *
- * Shows all active sessions with browser/OS info, IP address, and last active time.
- * Users can revoke any session except the current one.
+ * Shows each session's browser, OS, IP address, and creation time. The current session is marked
+ * and navigates to sign-out on click, while other sessions can be revoked individually.
  *
  * @returns A JSX element containing the sessions card
  */

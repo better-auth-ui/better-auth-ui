@@ -17,11 +17,14 @@ export type ProviderButtonsProps = {
 export type SocialLayout = "auto" | "horizontal" | "vertical" | "grid"
 
 /**
- * Render social provider sign-in buttons and handle sign-in initiation and pending state.
+ * Render sign-in buttons for configured social providers.
+ *
+ * The rendered buttons submit a form to initiate social sign-in. The visual layout adapts based on `socialLayout` and the number of available providers.
  *
  * @param isPending - When true, disables all provider buttons.
  * @param socialLayout - Preferred layout for the provider buttons; when set to `"auto"` the layout is chosen based on the number of available providers.
- * @param signInSocial - The function to call when a social provider button is clicked.
+ * @param signInSocial - Form action invoked when a provider button is submitted.
+ * @returns A JSX form element containing provider sign-in buttons.
  */
 export function ProviderButtons({
   isPending,

@@ -18,10 +18,11 @@ export type ConnectedAccountsProps = {
 }
 
 /**
- * Display and manage connected social accounts.
+ * Render a card showing linked social accounts and available social providers to connect.
  *
- * Shows all linked social accounts with the ability to unlink them,
- * followed by available providers that can be linked.
+ * Linked accounts (excluding the "credential" provider) are shown with an unlink control;
+ * available providers are shown with a connect control. Button states and labels reflect
+ * ongoing link/unlink activity and use localization for provider-specific text.
  *
  * @returns A JSX element containing the connected accounts card
  */

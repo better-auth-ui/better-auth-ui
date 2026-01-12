@@ -35,7 +35,14 @@ export type AuthProviderProps = PropsWithChildren<AnyAuthConfig> & {
 }
 
 /**
- * Provides AuthConfig to descendant components.
+ * Provides merged authentication configuration and a resolved React Query client to descendant components.
+ *
+ * The component merges the provided auth config with the library defaults, updates `redirectTo` from the
+ * current URL when the app is hydrated, wires a QueryClient (prop, context, or fallback) and installs an
+ * error handler that surfaces query errors via the configured toast. It then supplies the merged config
+ * via AuthContext and wraps children with QueryClientProvider.
+ *
+ * @returns The children wrapped with AuthContext.Provider and QueryClientProvider configured for auth.
  */
 export function AuthProvider({
   children,
@@ -77,10 +84,10 @@ export function AuthProvider({
 }
 
 /**
- * Returns the `AuthContext` configuration
+ * Accesses the current authentication configuration from AuthContext.
  *
- * @returns The `AuthContext`
- * @throws If the `AuthContext` is not provided
+ * @returns The merged authentication configuration provided by AuthProvider.
+ * @throws If no AuthProvider is present in the component tree.
  */
 export function useAuth() {
   const context = useContext(AuthContext)

@@ -14,12 +14,12 @@ export type UserViewProps = {
 }
 
 /**
- * Render a user view that shows the user's avatar alongside their name and email.
+ * Render a compact user item with an avatar, a primary label (display username, name, or email), and an optional secondary email line.
  *
+ * @param isPending - If true and no `user` prop is provided, renders a loading skeleton instead of user details
  * @param className - Additional CSS classes applied to the outer container
- * @param isPending - When true, force rendering of the loading skeleton (unless an explicit `user` prop is provided)
- * @param user - Optional user object to display; when omitted the current session user is used if available
- * @returns A React element that displays the user's avatar with their name and email
+ * @param user - Optional user object to display; when omitted the current session user is used
+ * @returns A React element showing the user's avatar with their identifying information
  */
 export function UserView({ className, isPending, user }: UserViewProps) {
   const { data: sessionData, isPending: sessionPending } = useSession()

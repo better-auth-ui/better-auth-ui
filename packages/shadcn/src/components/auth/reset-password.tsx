@@ -28,7 +28,11 @@ export type ResetPasswordProps = {
 }
 
 /**
- * Renders a password reset form that validates a token from the URL and submits a new password to the auth client.
+ * Render a password reset form that validates the reset token from the URL, accepts a new password (and optional confirmation), and submits it to the auth client.
+ *
+ * The component checks for a `token` query parameter on mount and, if missing, shows an error toast and navigates to the sign-in page. It exposes per-field validation messages, toggles for password visibility, and disables inputs while the reset request is pending.
+ *
+ * @returns The password reset form UI ready to be mounted in the app layout.
  */
 export function ResetPassword({ className }: ResetPasswordProps) {
   const {

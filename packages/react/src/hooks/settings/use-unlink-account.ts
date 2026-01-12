@@ -4,9 +4,12 @@ import { useCallback, useState } from "react"
 import { useListAccounts } from "./use-list-accounts"
 
 /**
- * Provides functionality to unlink a social account from the current user.
+ * Exposes state and an action to unlink a linked social provider from the current user.
  *
- * @returns An object containing the unlinking provider and a function to unlink an account
+ * The action sets `unlinkingProvider` to the provider id while the operation is in progress,
+ * triggers a refetch of linked accounts on success, and shows a localized success or error toast.
+ *
+ * @returns An object with `unlinkingProvider` (the provider id being unlinked or `null`) and `unlinkAccount` (a function that initiates unlinking for a given provider id)
  */
 export function useUnlinkAccount() {
   const { authClient, localization, toast } = useAuth()

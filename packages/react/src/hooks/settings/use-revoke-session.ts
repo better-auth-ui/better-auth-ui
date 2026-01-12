@@ -2,10 +2,11 @@ import { useAuth, useListSessions } from "@better-auth-ui/react"
 import { useCallback, useState } from "react"
 
 /**
- * Provides functionality to revoke an active session.
- * This is used to revoke sessions from the sessions list (devices where user is logged in).
+ * Revokes an active user session and refreshes the sessions list on success.
  *
- * @returns An object containing the revoking session token and a function to revoke a session
+ * @returns An object with:
+ * - `revokingSession` — the token of the session currently being revoked, or `null` if none.
+ * - `revokeSession(sessionToken)` — revokes the session identified by `sessionToken`.
  */
 export function useRevokeSession() {
   const { authClient, toast } = useAuth()
