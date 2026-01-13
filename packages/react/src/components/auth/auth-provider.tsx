@@ -16,13 +16,7 @@ import type { BetterFetchError } from "better-auth/react"
 import { type PropsWithChildren, useContext, useEffect, useMemo } from "react"
 import { useHydrated } from "../../hooks/use-hydrated"
 
-const fallbackQueryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      staleTime: 1000
-    }
-  }
-})
+const fallbackQueryClient = new QueryClient()
 
 const baseAuthConfig: AnyAuthConfig = {
   ...defaultConfig,

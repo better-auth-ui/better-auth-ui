@@ -1,5 +1,5 @@
 import { useAuth } from "@better-auth-ui/react"
-import type { DefinedInitialDataOptions } from "@tanstack/react-query"
+import type { UseQueryOptions } from "@tanstack/react-query"
 import { useEffect } from "react"
 
 import { useSession } from "./use-session"
@@ -10,7 +10,7 @@ import { useSession } from "./use-session"
  * @param options - Query options forwarded to the session query hook
  * @returns An object containing `data` (the current session or `undefined`), `isPending` (whether the session query is in progress), and other session query state
  */
-export function useAuthenticate(options?: Partial<DefinedInitialDataOptions>) {
+export function useAuthenticate(options?: Partial<UseQueryOptions>) {
   const { basePaths, viewPaths, navigate } = useAuth()
   const { data, isPending, ...rest } = useSession(options)
 

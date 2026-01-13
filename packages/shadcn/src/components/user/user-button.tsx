@@ -95,7 +95,7 @@ export function UserButton({
             className={cn("h-auto font-normal", className)}
           >
             {sessionData || sessionPending || settingActiveSession ? (
-              <UserView isPending={sessionPending || !!settingActiveSession} />
+              <UserView isPending={!!settingActiveSession} />
             ) : (
               <>
                 <UserAvatar />

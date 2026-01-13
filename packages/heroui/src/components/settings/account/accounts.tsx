@@ -50,15 +50,10 @@ export function Accounts({ className, ...props }: AccountsProps & CardProps) {
       </Card.Header>
 
       <Card.Content className="gap-3">
-        {sessionData && !isPending ? (
-          [
-            sessionData,
-            ...(deviceSessions || []).filter(
-              (deviceSession) =>
-                deviceSession.session.id !== sessionData.session.id
-            )
-          ].map((deviceSession) => {
-            const isActive = deviceSession.session.id === sessionData.session.id
+        {!isPending ? (
+          deviceSessions?.map((deviceSession) => {
+            const isActive =
+              deviceSession.session.id === sessionData?.session.id
             const isSwitching =
               settingActiveSession === deviceSession.session.token
             const isRevoking = revokingSession === deviceSession.session.token

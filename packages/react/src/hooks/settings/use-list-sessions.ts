@@ -1,5 +1,5 @@
 import { useAuth, useSession } from "@better-auth-ui/react"
-import { type DefinedInitialDataOptions, useQuery } from "@tanstack/react-query"
+import { type UseQueryOptions, useQuery } from "@tanstack/react-query"
 
 /**
  * Retrieve the active sessions (devices where the current user is signed in).
@@ -9,7 +9,7 @@ import { type DefinedInitialDataOptions, useQuery } from "@tanstack/react-query"
  * @param options - Optional React Query options to customize the query behavior.
  * @returns The React Query result for the sessions list; `data` is the array of session objects, and the result includes loading and error states.
  */
-export function useListSessions(options?: DefinedInitialDataOptions) {
+export function useListSessions(options?: Partial<UseQueryOptions>) {
   const { authClient } = useAuth()
   const { data: sessionData } = useSession(options)
 

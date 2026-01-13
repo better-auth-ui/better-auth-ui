@@ -26,7 +26,9 @@ export function UserView({
   user,
   ...props
 }: UserViewProps & ComponentProps<"div">) {
-  const { data: sessionData, isPending: sessionPending } = useSession()
+  const { data: sessionData, isPending: sessionPending } = useSession({
+    enabled: !user && !isPending
+  })
 
   const resolvedUser = user ?? sessionData?.user
 

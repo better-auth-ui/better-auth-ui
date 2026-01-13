@@ -1,5 +1,5 @@
 import { useAuth, useSession } from "@better-auth-ui/react"
-import { type DefinedInitialDataOptions, useQuery } from "@tanstack/react-query"
+import { type UseQueryOptions, useQuery } from "@tanstack/react-query"
 
 /**
  * Retrieve device sessions for multi-session account switching.
@@ -9,7 +9,7 @@ import { type DefinedInitialDataOptions, useQuery } from "@tanstack/react-query"
  * @param options - Optional React Query options to customize the query behavior.
  * @returns The React Query result for the device sessions list; `data` is the array of device session objects and includes loading and error states.
  */
-export function useListDeviceSessions(options?: DefinedInitialDataOptions) {
+export function useListDeviceSessions(options?: Partial<UseQueryOptions>) {
   const { authClient, multiSession } = useAuth()
   const { data: sessionData } = useSession(options)
 
