@@ -2,6 +2,7 @@
   "icon": "Box",
   "defaultOpen": true,
   "pages": [
+    "---Provider---",
     "auth-provider",
     "---User---",
     "user/user-avatar",
