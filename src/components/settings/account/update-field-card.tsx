@@ -54,6 +54,7 @@ export interface UpdateFieldCardProps {
     value?: unknown
     validate?: (value: string) => boolean | Promise<boolean>
     options?: SelectOption[]
+    onUpdateComplete?: () => void
 }
 
 export function UpdateFieldCard({
@@ -70,7 +71,8 @@ export function UpdateFieldCard({
     multiline,
     value,
     validate,
-    options
+    options,
+    onUpdateComplete
 }: UpdateFieldCardProps) {
     const {
         hooks: { useSession },
@@ -153,7 +155,6 @@ export function UpdateFieldCard({
             form.setError(name, {
                 message: `${label} ${localization.IS_INVALID}`
             })
-
             return
         }
 
@@ -164,6 +165,7 @@ export function UpdateFieldCard({
                 variant: "success",
                 message: `${label} ${localization.UPDATED_SUCCESSFULLY}`
             })
+            onUpdateComplete?.()
         } catch (error) {
             toast({
                 variant: "error",
