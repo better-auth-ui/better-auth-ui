@@ -25,15 +25,15 @@
     }
   },
   "devDependencies": {
-    "@react-email/components": "^1.0.4",
+    "@react-email/components": "^1.0.6",
     "@react-email/preview-server": "^5.2.5",
-    "@tanstack/react-query": "^5.90.17",
-    "@testing-library/react": "^16.3.1",
+    "@tanstack/react-query": "^5.90.19",
+    "@testing-library/react": "^16.3.2",
     "@testing-library/user-event": "^14.5.2",
-    "@types/react": "^19.2.8",
+    "@types/react": "^19.2.9",
     "@vitejs/plugin-react": "^5.1.2",
     "@vitest/browser-playwright": "^4.0.17",
-    "better-auth": "^1.4.12",
+    "better-auth": "^1.4.17",
     "clsx": "^2.1.1",
     "playwright": "^1.57.0",
     "react": "^19.2.3",
@@ -47,9 +47,9 @@
     "@better-auth-ui/core": "*"
   },
   "peerDependencies": {
-    "@react-email/components": ">=1.0.0",
-    "@tanstack/react-query": ">=5.90.0",
-    "better-auth": ">=1.4.12",
+    "@react-email/components": ">=1.0.6",
+    "@tanstack/react-query": ">=5.90.19",
+    "better-auth": ">=1.4.17",
     "clsx": ">=2.0.0",
     "react": ">=18.0.0",
     "react-dom": ">=18.0.0",
