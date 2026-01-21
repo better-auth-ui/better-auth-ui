@@ -32,6 +32,7 @@ export type AppearanceProps = {
  */
 export function Appearance({
   className,
+  variant,
   ...props
 }: AppearanceProps & CardProps) {
   const {
@@ -46,7 +47,11 @@ export function Appearance({
   }
 
   return (
-    <Card className={cn("p-4 md:p-6 gap-4 md:gap-6", className)} {...props}>
+    <Card
+      className={cn("p-4 md:p-6 gap-4 md:gap-6", className)}
+      variant={variant}
+      {...props}
+    >
       <Card.Header>
         <Card.Title className="text-xl">
           {localization.settings.appearance}
@@ -55,7 +60,7 @@ export function Appearance({
 
       <Card.Content>
         <RadioGroup
-          isOnSurface
+          variant={variant === "transparent" ? "primary" : "secondary"}
           value={hydrated ? theme : undefined}
           onChange={setTheme}
           isDisabled={!hydrated || !theme}

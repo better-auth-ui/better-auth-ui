@@ -33,6 +33,7 @@ export type ChangePasswordProps = {
  */
 export function ChangePassword({
   className,
+  variant,
   ...props
 }: ChangePasswordProps & CardProps) {
   const { emailAndPassword, localization } = useAuth()
@@ -44,7 +45,11 @@ export function ChangePassword({
     useState(false)
 
   return (
-    <Card className={cn("p-4 md:p-6 gap-4 md:gap-6", className)} {...props}>
+    <Card
+      className={cn("p-4 md:p-6 gap-4 md:gap-6", className)}
+      variant={variant}
+      {...props}
+    >
       <Card.Header>
         <Card.Title className="text-xl">
           {localization.settings.changePassword}
@@ -66,6 +71,7 @@ export function ChangePassword({
                   autoComplete="current-password"
                   placeholder={localization.settings.currentPasswordPlaceholder}
                   required
+                  variant={variant === "transparent" ? "primary" : "secondary"}
                 />
               ) : (
                 <Skeleton className="h-10 md:h-9 w-full rounded-xl" />
@@ -82,7 +88,9 @@ export function ChangePassword({
               <Label>{localization.auth.newPassword}</Label>
 
               {sessionData ? (
-                <InputGroup>
+                <InputGroup
+                  variant={variant === "transparent" ? "primary" : "secondary"}
+                >
                   <InputGroup.Input
                     name="newPassword"
                     type={isNewPasswordVisible ? "text" : "password"}
@@ -127,7 +135,11 @@ export function ChangePassword({
                 <Label>{localization.auth.confirmPassword}</Label>
 
                 {sessionData ? (
-                  <InputGroup>
+                  <InputGroup
+                    variant={
+                      variant === "transparent" ? "primary" : "secondary"
+                    }
+                  >
                     <InputGroup.Input
                       name="confirmPassword"
                       type={isConfirmPasswordVisible ? "text" : "password"}

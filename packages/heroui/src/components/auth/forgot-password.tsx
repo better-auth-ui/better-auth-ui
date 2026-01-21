@@ -32,13 +32,18 @@ export type ForgotPasswordProps = {
  */
 export function ForgotPassword({
   className,
+  variant,
   ...props
 }: ForgotPasswordProps & CardProps) {
   const { basePaths, localization, viewPaths } = useAuth()
   const [{ email }, forgotPassword, isPending] = useForgotPassword()
 
   return (
-    <Card className={cn("w-full max-w-sm p-4 md:p-6", className)} {...props}>
+    <Card
+      className={cn("w-full max-w-sm p-4 md:p-6", className)}
+      variant={variant}
+      {...props}
+    >
       <Card.Content>
         <Form action={forgotPassword}>
           <Fieldset className="gap-4">
@@ -58,6 +63,7 @@ export function ForgotPassword({
               <Input
                 placeholder={localization.auth.emailPlaceholder}
                 required
+                variant={variant === "transparent" ? "primary" : "secondary"}
               />
 
               <FieldError className="text-wrap" />
@@ -76,7 +82,7 @@ export function ForgotPassword({
 
               <Link
                 href={`${basePaths.auth}/${viewPaths.auth.signIn}`}
-                className="text-accent rounded"
+                className="text-accent decoration-accent no-underline hover:underline"
               >
                 {localization.auth.signIn}
               </Link>

@@ -41,6 +41,7 @@ export function MagicLink({
   className,
   socialLayout,
   socialPosition = "bottom",
+  variant,
   ...props
 }: MagicLinkProps & CardProps) {
   const { basePaths, localization, socialProviders, viewPaths } = useAuth()
@@ -52,7 +53,11 @@ export function MagicLink({
   const showSeparator = socialProviders && socialProviders.length > 0
 
   return (
-    <Card className={cn("w-full max-w-sm p-4 md:p-6", className)} {...props}>
+    <Card
+      className={cn("w-full max-w-sm p-4 md:p-6", className)}
+      variant={variant}
+      {...props}
+    >
       <Card.Content>
         <Fieldset className="gap-4">
           <Label className="text-xl">{localization.auth.signIn}</Label>
@@ -87,6 +92,7 @@ export function MagicLink({
                 <Input
                   placeholder={localization.auth.emailPlaceholder}
                   required
+                  variant={variant === "transparent" ? "primary" : "secondary"}
                 />
 
                 <FieldError className="text-wrap" />
@@ -125,7 +131,7 @@ export function MagicLink({
 
             <Link
               href={`${basePaths.auth}/${viewPaths.auth.signUp}`}
-              className="text-accent rounded"
+              className="text-accent decoration-accent no-underline hover:underline"
             >
               {localization.auth.signUp}
             </Link>

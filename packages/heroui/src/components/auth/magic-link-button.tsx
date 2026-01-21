@@ -1,6 +1,7 @@
 import type { AuthView } from "@better-auth-ui/core"
 import { useAuth } from "@better-auth-ui/react"
 import { Envelope, Lock } from "@gravity-ui/icons"
+import { buttonVariants } from "@heroui/styles"
 
 import { cn } from "../../lib/utils"
 
@@ -25,7 +26,8 @@ export function MagicLinkButton({ isPending, view }: MagicLinkButtonProps) {
     <Link
       href={`${basePaths.auth}/${isMagicLinkView ? viewPaths.auth.signIn : viewPaths.auth.magicLink}`}
       className={cn(
-        "button button--md button--tertiary w-full focus:ring-accent focus:ring-2 focus:ring-offset-2 focus:ring-offset-surface",
+        buttonVariants({ variant: "tertiary" }),
+        "w-full focus:ring-accent focus:ring-2 focus:ring-offset-2 focus:ring-offset-surface",
         isPending && "status-disabled pointer-events-none"
       )}
     >

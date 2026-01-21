@@ -31,6 +31,7 @@ export type UserProfileProps = {
  */
 export function UserProfile({
   className,
+  variant,
   ...props
 }: UserProfileProps & CardProps) {
   const { localization } = useAuth()
@@ -38,7 +39,11 @@ export function UserProfile({
   const [state, formAction, isPending] = useUpdateUser()
 
   return (
-    <Card className={cn("p-4 md:p-6 gap-4 md:gap-6", className)} {...props}>
+    <Card
+      className={cn("p-4 md:p-6 gap-4 md:gap-6", className)}
+      variant={variant}
+      {...props}
+    >
       <Card.Header>
         <Card.Title className="text-xl">
           {localization.settings.profile}
@@ -57,7 +62,7 @@ export function UserProfile({
             >
               <UserAvatar size="lg" />
 
-              <span className="absolute right-0 bottom-0 size-3.5 rounded-full bg-background ring-2 ring-surface-quaternary flex items-center justify-center">
+              <span className="absolute right-0 bottom-0 size-3.5 rounded-full bg-background ring-2 ring-surface-tertiary flex items-center justify-center">
                 <Pencil className="size-2.5 text-muted" />
               </span>
             </Button>
@@ -98,6 +103,7 @@ export function UserProfile({
                 <Input
                   autoComplete="name"
                   placeholder={localization.auth.name}
+                  variant={variant === "transparent" ? "primary" : "secondary"}
                 />
               ) : (
                 <Skeleton className="h-10 md:h-9 w-full rounded-xl" />

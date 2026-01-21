@@ -43,6 +43,7 @@ export function SignUp({
   className,
   socialLayout,
   socialPosition = "bottom",
+  variant,
   ...props
 }: SignUpProps & CardProps) {
   const {
@@ -72,7 +73,11 @@ export function SignUp({
     emailAndPassword?.enabled && socialProviders && socialProviders.length > 0
 
   return (
-    <Card className={cn("w-full max-w-sm p-4 md:p-6", className)} {...props}>
+    <Card
+      className={cn("w-full max-w-sm p-4 md:p-6", className)}
+      variant={variant}
+      {...props}
+    >
       <Card.Content>
         <Fieldset className="gap-4">
           <Label className="text-xl">{localization.auth.signUp}</Label>
@@ -108,6 +113,9 @@ export function SignUp({
                   <Input
                     placeholder={localization.auth.namePlaceholder}
                     required
+                    variant={
+                      variant === "transparent" ? "primary" : "secondary"
+                    }
                   />
 
                   <FieldError className="text-wrap" />
@@ -125,6 +133,9 @@ export function SignUp({
                   <Input
                     placeholder={localization.auth.emailPlaceholder}
                     required
+                    variant={
+                      variant === "transparent" ? "primary" : "secondary"
+                    }
                   />
 
                   <FieldError className="text-wrap" />
@@ -140,7 +151,11 @@ export function SignUp({
                 >
                   <Label>{localization.auth.password}</Label>
 
-                  <InputGroup>
+                  <InputGroup
+                    variant={
+                      variant === "transparent" ? "primary" : "secondary"
+                    }
+                  >
                     <InputGroup.Input
                       placeholder={localization.auth.passwordPlaceholder}
                       type={isPasswordVisible ? "text" : "password"}
@@ -180,7 +195,11 @@ export function SignUp({
                   >
                     <Label>{localization.auth.confirmPassword}</Label>
 
-                    <InputGroup>
+                    <InputGroup
+                      variant={
+                        variant === "transparent" ? "primary" : "secondary"
+                      }
+                    >
                       <InputGroup.Input
                         name="confirmPassword"
                         placeholder={
@@ -253,7 +272,7 @@ export function SignUp({
 
               <Link
                 href={`${basePaths.auth}/${viewPaths.auth.signIn}`}
-                className="text-accent rounded"
+                className="text-accent decoration-accent no-underline hover:underline"
               >
                 {localization.auth.signIn}
               </Link>

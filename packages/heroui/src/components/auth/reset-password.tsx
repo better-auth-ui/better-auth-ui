@@ -31,6 +31,7 @@ export type ResetPasswordProps = {
  */
 export function ResetPassword({
   className,
+  variant,
   ...props
 }: ResetPasswordProps & CardProps) {
   const { basePaths, emailAndPassword, localization, viewPaths, navigate } =
@@ -59,7 +60,11 @@ export function ResetPassword({
   ])
 
   return (
-    <Card className={cn("w-full max-w-sm p-4 md:p-6", className)} {...props}>
+    <Card
+      className={cn("w-full max-w-sm p-4 md:p-6", className)}
+      variant={variant}
+      {...props}
+    >
       <Card.Content>
         <Form action={resetPassword}>
           <Fieldset className="gap-4">
@@ -75,7 +80,9 @@ export function ResetPassword({
             >
               <Label>{localization.auth.password}</Label>
 
-              <InputGroup>
+              <InputGroup
+                variant={variant === "transparent" ? "primary" : "secondary"}
+              >
                 <InputGroup.Input
                   name="password"
                   placeholder={localization.auth.newPasswordPlaceholder}
@@ -115,7 +122,9 @@ export function ResetPassword({
               >
                 <Label>{localization.auth.confirmPassword}</Label>
 
-                <InputGroup>
+                <InputGroup
+                  variant={variant === "transparent" ? "primary" : "secondary"}
+                >
                   <InputGroup.Input
                     placeholder={localization.auth.confirmPasswordPlaceholder}
                     type={isConfirmPasswordVisible ? "text" : "password"}
@@ -160,7 +169,7 @@ export function ResetPassword({
 
               <Link
                 href={`${basePaths.auth}/${viewPaths.auth.signIn}`}
-                className="text-accent rounded"
+                className="text-accent decoration-accent no-underline hover:underline"
               >
                 {localization.auth.signIn}
               </Link>

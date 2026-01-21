@@ -19,8 +19,8 @@
   },
   "dependencies": {
     "@better-auth-ui/heroui": "*",
-    "@heroui/react": "^3.0.0-beta.3",
-    "@heroui/styles": "^3.0.0-beta.3",
+    "@heroui/react": "^3.0.0-beta.5",
+    "@heroui/styles": "^3.0.0-beta.5",
     "@tailwindcss/vite": "^4.1.18",
     "@tanstack/react-devtools": "^0.9.2",
     "@tanstack/react-router": "^1.150.0",

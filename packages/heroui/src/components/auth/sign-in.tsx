@@ -36,6 +36,7 @@ export function SignIn({
   className,
   socialLayout,
   socialPosition = "bottom",
+  variant,
   ...props
 }: SignInProps & CardProps) {
   const {
@@ -55,7 +56,11 @@ export function SignIn({
     emailAndPassword?.enabled && socialProviders && socialProviders.length > 0
 
   return (
-    <Card className={cn("w-full max-w-sm p-4 md:p-6", className)} {...props}>
+    <Card
+      className={cn("w-full max-w-sm p-4 md:p-6", className)}
+      variant={variant}
+      {...props}
+    >
       <Card.Content>
         <Fieldset className="gap-4">
           <Label className="text-xl">{localization.auth.signIn}</Label>
@@ -90,6 +95,9 @@ export function SignIn({
 
                   <Input
                     placeholder={localization.auth.emailPlaceholder}
+                    variant={
+                      variant === "transparent" ? "primary" : "secondary"
+                    }
                     required
                   />
 
@@ -112,7 +120,7 @@ export function SignIn({
                       emailAndPassword?.forgotPassword && (
                         <Link
                           href={`${basePaths.auth}/${viewPaths.auth.forgotPassword}`}
-                          className="text-muted rounded"
+                          className="text-muted no-underline hover:underline"
                         >
                           {localization.auth.forgotPasswordLink}
                         </Link>
@@ -121,6 +129,9 @@ export function SignIn({
 
                   <Input
                     placeholder={localization.auth.passwordPlaceholder}
+                    variant={
+                      variant === "transparent" ? "primary" : "secondary"
+                    }
                     required
                   />
 
@@ -143,7 +154,7 @@ export function SignIn({
                   {emailAndPassword?.forgotPassword && (
                     <Link
                       href={`${basePaths.auth}/${viewPaths.auth.forgotPassword}`}
-                      className="text-muted rounded"
+                      className="text-muted no-underline hover:underline"
                     >
                       {localization.auth.forgotPasswordLink}
                     </Link>
@@ -187,7 +198,7 @@ export function SignIn({
 
               <Link
                 href={`${basePaths.auth}/${viewPaths.auth.signUp}`}
-                className="text-accent rounded"
+                className="text-accent no-underline hover:underline decoration-accent"
               >
                 {localization.auth.signUp}
               </Link>

@@ -31,6 +31,7 @@ export type ChangeEmailProps = {
  */
 export function ChangeEmail({
   className,
+  variant,
   ...props
 }: ChangeEmailProps & CardProps) {
   const { localization } = useAuth()
@@ -38,7 +39,11 @@ export function ChangeEmail({
   const [state, formAction, isPending] = useChangeEmail()
 
   return (
-    <Card className={cn("p-4 md:p-6 gap-4 md:gap-6", className)} {...props}>
+    <Card
+      className={cn("p-4 md:p-6 gap-4 md:gap-6", className)}
+      variant={variant}
+      {...props}
+    >
       <Card.Header>
         <Card.Title className="text-xl">
           {localization.settings.changeEmail}
@@ -62,6 +67,7 @@ export function ChangeEmail({
                   required
                   autoComplete="email"
                   placeholder={localization.auth.emailPlaceholder}
+                  variant={variant === "transparent" ? "primary" : "secondary"}
                 />
               ) : (
                 <Skeleton className="h-10 md:h-9 w-full rounded-xl" />
