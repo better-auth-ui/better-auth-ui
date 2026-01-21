@@ -61,7 +61,7 @@ export function Accounts({ className, ...props }: AccountsProps & CardProps) {
             return (
               <div
                 key={deviceSession.session.id}
-                className="flex items-center rounded-3xl border-2 border-default p-3 justify-between"
+                className="flex items-center rounded-3xl border p-3 justify-between"
               >
                 <UserView user={deviceSession.user} size="md" />
 
@@ -104,7 +104,7 @@ export function Accounts({ className, ...props }: AccountsProps & CardProps) {
             )
           })
         ) : (
-          <div className="flex items-center rounded-3xl border-2 border-default p-3">
+          <div className="flex items-center rounded-3xl border p-3">
             <UserView isPending size="md" />
           </div>
         )}

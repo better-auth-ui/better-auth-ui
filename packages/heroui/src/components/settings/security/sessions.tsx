@@ -65,7 +65,7 @@ export function Sessions({ className, ...props }: SessionsProps & CardProps) {
               return (
                 <div
                   key={session.id}
-                  className="flex items-center rounded-3xl border-2 p-3 gap-3 border-default"
+                  className="flex items-center rounded-3xl border p-3 gap-3"
                 >
                   <div className="flex size-10 items-center justify-center rounded-xl bg-surface-secondary">
                     {isMobile ? (
@@ -133,7 +133,7 @@ export function Sessions({ className, ...props }: SessionsProps & CardProps) {
 
 function SessionRowSkeleton() {
   return (
-    <div className="flex items-center rounded-3xl border-2 border-default p-3 justify-between">
+    <div className="flex items-center rounded-3xl border p-3 justify-between">
       <div className="flex items-center gap-3">
         <Skeleton className="size-10 rounded-xl" />
 

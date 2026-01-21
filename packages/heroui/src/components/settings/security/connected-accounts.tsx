@@ -64,7 +64,7 @@ export function ConnectedAccounts({
                 return (
                   <div
                     key={account.id}
-                    className="flex items-center rounded-3xl border-2 border-default p-3 gap-3"
+                    className="flex items-center rounded-3xl border p-3 gap-3"
                   >
                     <div className="flex size-10 items-center justify-center rounded-xl bg-surface-secondary">
                       {ProviderIcon && <ProviderIcon className="size-5" />}
@@ -112,7 +112,7 @@ export function ConnectedAccounts({
               return (
                 <div
                   key={provider}
-                  className="flex items-center rounded-3xl border-2 border-dashed border-default p-3 gap-3"
+                  className="flex items-center rounded-3xl border border-dashed p-3 gap-3"
                 >
                   <div className="flex size-10 items-center justify-center rounded-xl bg-default">
                     {ProviderIcon && (
@@ -161,7 +161,7 @@ export function ConnectedAccounts({
 
 function AccountRowSkeleton() {
   return (
-    <div className="flex items-center rounded-3xl border-2 border-default p-3 justify-between">
+    <div className="flex items-center rounded-3xl border p-3 justify-between">
       <div className="flex items-center gap-3">
         <Skeleton className="size-10 rounded-xl" />
 
