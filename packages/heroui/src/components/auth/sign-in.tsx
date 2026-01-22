@@ -61,10 +61,12 @@ export function SignIn({
       variant={variant}
       {...props}
     >
+      <Card.Header className="text-xl mb-2 font-medium">
+        {localization.auth.signIn}
+      </Card.Header>
+
       <Card.Content>
         <Fieldset className="gap-4">
-          <Label className="text-xl">{localization.auth.signIn}</Label>
-
           {socialPosition === "top" && (
             <>
               {socialProviders && socialProviders.length > 0 && (
@@ -115,16 +117,6 @@ export function SignIn({
                 >
                   <div className="flex justify-between">
                     <Label>{localization.auth.password}</Label>
-
-                    {!emailAndPassword?.rememberMe &&
-                      emailAndPassword?.forgotPassword && (
-                        <Link
-                          href={`${basePaths.auth}/${viewPaths.auth.forgotPassword}`}
-                          className="text-muted no-underline hover:underline"
-                        >
-                          {localization.auth.forgotPasswordLink}
-                        </Link>
-                      )}
                   </div>
 
                   <Input
@@ -140,26 +132,19 @@ export function SignIn({
               </Fieldset.Group>
 
               {emailAndPassword?.rememberMe && (
-                <div className="flex justify-between mt-1">
-                  <Checkbox name="rememberMe" isDisabled={isPending}>
-                    <Checkbox.Control>
-                      <Checkbox.Indicator />
-                    </Checkbox.Control>
+                <Checkbox
+                  name="rememberMe"
+                  isDisabled={isPending}
+                  variant={variant === "transparent" ? "primary" : "secondary"}
+                >
+                  <Checkbox.Control>
+                    <Checkbox.Indicator />
+                  </Checkbox.Control>
 
-                    <Checkbox.Content>
-                      <Label>{localization.auth.rememberMe}</Label>
-                    </Checkbox.Content>
-                  </Checkbox>
-
-                  {emailAndPassword?.forgotPassword && (
-                    <Link
-                      href={`${basePaths.auth}/${viewPaths.auth.forgotPassword}`}
-                      className="text-muted no-underline hover:underline"
-                    >
-                      {localization.auth.forgotPasswordLink}
-                    </Link>
-                  )}
-                </div>
+                  <Checkbox.Content>
+                    <Label>{localization.auth.rememberMe}</Label>
+                  </Checkbox.Content>
+                </Checkbox>
               )}
 
               <Fieldset.Actions className="flex-col gap-3">
@@ -192,13 +177,22 @@ export function SignIn({
             </>
           )}
 
+          {emailAndPassword?.forgotPassword && (
+            <Link
+              href={`${basePaths.auth}/${viewPaths.auth.forgotPassword}`}
+              className="no-underline hover:underline self-center"
+            >
+              {localization.auth.forgotPasswordLink}
+            </Link>
+          )}
+
           {emailAndPassword?.enabled && (
             <Description className="flex justify-center gap-1.5 text-foreground text-sm">
               {localization.auth.needToCreateAnAccount}
 
               <Link
                 href={`${basePaths.auth}/${viewPaths.auth.signUp}`}
-                className="text-accent no-underline hover:underline decoration-accent"
+                className="text-accent no-underline hover:underline decoration-accent-hover"
               >
                 {localization.auth.signUp}
               </Link>

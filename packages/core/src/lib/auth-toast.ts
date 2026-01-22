@@ -1,6 +1,9 @@
 export type RenderToast = (
   message?: string,
-  options?: { action?: { label: string; onClick: () => Promise<void> | void } }
+  options?: {
+    action?: { label: string; onClick: () => Promise<void> | void }
+    actionProps?: { children: string; onClick: () => Promise<void> | void }
+  }
 ) => string | number | unknown
 
 export type DismissToast = (
@@ -21,6 +24,8 @@ export const defaultToast: RenderToast = (message, options) => {
 export type Toast = {
   /** Display an error toast notification */
   error: RenderToast
+  /** Display a danger toast notification */
+  danger?: RenderToast
   /** Display a success toast notification */
   success: RenderToast
   /** Display an info toast notification */
