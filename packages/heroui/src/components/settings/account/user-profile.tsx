@@ -62,7 +62,7 @@ export function UserProfile({
             >
               <UserAvatar size="lg" />
 
-              <span className="absolute right-0 bottom-0 size-3.5 rounded-full bg-background ring-2 ring-surface-tertiary flex items-center justify-center">
+              <span className="absolute right-0 bottom-0 size-3.5 rounded-full bg-background ring ring-border flex items-center justify-center">
                 <Pencil className="size-2.5 text-muted" />
               </span>
             </Button>

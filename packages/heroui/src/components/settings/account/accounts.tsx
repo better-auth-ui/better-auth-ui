@@ -59,13 +59,13 @@ export function Accounts({ className, ...props }: AccountsProps & CardProps) {
             const isRevoking = revokingSession === deviceSession.session.token
 
             return (
-              <div
+              <Card
                 key={deviceSession.session.id}
-                className="flex items-center rounded-3xl border p-3 justify-between"
+                className="flex-row items-center border p-3 shadow-none"
               >
                 <UserView user={deviceSession.user} size="md" />
 
-                <div className="flex items-center gap-1 shrink-0">
+                <div className="flex items-center gap-1 shrink-0 ml-auto">
                   {!isActive && (
                     <Button
                       isIconOnly
@@ -100,7 +100,7 @@ export function Accounts({ className, ...props }: AccountsProps & CardProps) {
                     )}
                   </Button>
                 </div>
-              </div>
+              </Card>
             )
           })
         ) : (

@@ -62,9 +62,9 @@ export function ConnectedAccounts({
                   unlinkingProvider === account.providerId
 
                 return (
-                  <div
+                  <Card
                     key={account.id}
-                    className="flex items-center rounded-3xl border p-3 gap-3"
+                    className="flex-row items-center border p-3 shadow-none"
                   >
                     <div className="flex size-10 items-center justify-center rounded-xl bg-surface-secondary">
                       {ProviderIcon && <ProviderIcon className="size-5" />}
@@ -100,7 +100,7 @@ export function ConnectedAccounts({
                         <Xmark />
                       )}
                     </Button>
-                  </div>
+                  </Card>
                 )
               })}
 
@@ -110,9 +110,9 @@ export function ConnectedAccounts({
               const isCurrentlyLinking = linkingProvider === provider
 
               return (
-                <div
+                <Card
                   key={provider}
-                  className="flex items-center rounded-3xl border border-dashed p-3 gap-3"
+                  className="flex-row items-center border border-dashed p-3 shadow-none"
                 >
                   <div className="flex size-10 items-center justify-center rounded-xl bg-default">
                     {ProviderIcon && (
@@ -149,7 +149,7 @@ export function ConnectedAccounts({
                       <LinkIcon />
                     )}
                   </Button>
-                </div>
+                </Card>
               )
             })}
           </>
