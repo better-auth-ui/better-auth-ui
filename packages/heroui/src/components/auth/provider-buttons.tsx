@@ -1,6 +1,6 @@
 import { getProviderName } from "@better-auth-ui/core"
 import { providerIcons, useAuth } from "@better-auth-ui/react"
-import { Button, Fieldset, Form } from "@heroui/react"
+import { Button, Form } from "@heroui/react"
 import { useMemo } from "react"
 
 import { cn } from "../../lib/utils"
@@ -41,45 +41,44 @@ export function ProviderButtons({
   }, [socialLayout, socialProviders?.length])
 
   return (
-    <Form action={signInSocial}>
-      <Fieldset.Actions
-        className={cn(
-          "gap-3",
-          resolvedSocialLayout === "grid" && "grid grid-cols-2",
-          resolvedSocialLayout === "vertical" && "flex-col",
-          resolvedSocialLayout === "horizontal" && "flex-wrap"
-        )}
-      >
-        {socialProviders?.map((provider) => {
-          const ProviderIcon = providerIcons[provider]
+    <Form
+      action={signInSocial}
+      className={cn(
+        "gap-3",
+        resolvedSocialLayout === "grid" && "grid grid-cols-2",
+        resolvedSocialLayout === "vertical" && "flex flex-col",
+        resolvedSocialLayout === "horizontal" && "flex flex-wrap"
+      )}
+    >
+      {socialProviders?.map((provider) => {
+        const ProviderIcon = providerIcons[provider]
 
-          return (
-            <Button
-              key={provider}
-              name="provider"
-              value={provider}
-              className={cn(
-                "w-full",
-                resolvedSocialLayout === "horizontal" && "flex-1"
-              )}
-              variant="tertiary"
-              type="submit"
-              isPending={isPending}
-            >
-              <ProviderIcon />
+        return (
+          <Button
+            key={provider}
+            name="provider"
+            value={provider}
+            className={cn(
+              "w-full",
+              resolvedSocialLayout === "horizontal" && "flex-1"
+            )}
+            variant="tertiary"
+            type="submit"
+            isPending={isPending}
+          >
+            <ProviderIcon />
 
-              {resolvedSocialLayout === "vertical"
-                ? localization.auth.continueWith.replace(
-                    "{{provider}}",
-                    getProviderName(provider)
-                  )
-                : resolvedSocialLayout === "grid"
-                  ? getProviderName(provider)
-                  : null}
-            </Button>
-          )
-        })}
-      </Fieldset.Actions>
+            {resolvedSocialLayout === "vertical"
+              ? localization.auth.continueWith.replace(
+                  "{{provider}}",
+                  getProviderName(provider)
+                )
+              : resolvedSocialLayout === "grid"
+                ? getProviderName(provider)
+                : null}
+          </Button>
+        )
+      })}
     </Form>
   )
 }

@@ -6,7 +6,6 @@ import {
   Checkbox,
   Description,
   FieldError,
-  Fieldset,
   Form,
   Input,
   Label,
@@ -57,149 +56,142 @@ export function SignIn({
 
   return (
     <Card
-      className={cn("w-full max-w-sm p-4 md:p-6", className)}
+      className={cn("w-full max-w-sm p-4 md:p-6 gap-4", className)}
       variant={variant}
       {...props}
     >
-      <Card.Header className="text-xl mb-2 font-medium">
+      <Card.Header className="text-xl font-medium">
         {localization.auth.signIn}
       </Card.Header>
 
-      <Card.Content>
-        <Fieldset className="gap-4">
-          {socialPosition === "top" && (
-            <>
-              {socialProviders && socialProviders.length > 0 && (
-                <ProviderButtons
-                  socialLayout={socialLayout}
-                  signInSocial={signInSocial}
-                  isPending={isPending}
-                />
-              )}
+      <Card.Content className="gap-4">
+        {socialPosition === "top" && (
+          <>
+            {socialProviders && socialProviders.length > 0 && (
+              <ProviderButtons
+                socialLayout={socialLayout}
+                signInSocial={signInSocial}
+                isPending={isPending}
+              />
+            )}
 
-              {showSeparator && (
-                <FieldSeparator>{localization.auth.or}</FieldSeparator>
-              )}
-            </>
-          )}
+            {showSeparator && (
+              <FieldSeparator>{localization.auth.or}</FieldSeparator>
+            )}
+          </>
+        )}
 
-          {emailAndPassword?.enabled && (
-            <Form action={signInEmail} className="flex flex-col gap-4">
-              <Fieldset.Group>
-                <TextField
-                  defaultValue={email}
-                  name="email"
-                  type="email"
-                  autoComplete="email"
-                  isDisabled={isPending}
-                >
-                  <Label>{localization.auth.email}</Label>
-
-                  <Input
-                    placeholder={localization.auth.emailPlaceholder}
-                    variant={
-                      variant === "transparent" ? "primary" : "secondary"
-                    }
-                    required
-                  />
-
-                  <FieldError className="text-wrap" />
-                </TextField>
-
-                <TextField
-                  defaultValue={password}
-                  minLength={emailAndPassword?.minPasswordLength}
-                  maxLength={emailAndPassword?.maxPasswordLength}
-                  name="password"
-                  type="password"
-                  autoComplete="current-password"
-                  isDisabled={isPending}
-                >
-                  <div className="flex justify-between">
-                    <Label>{localization.auth.password}</Label>
-                  </div>
-
-                  <Input
-                    placeholder={localization.auth.passwordPlaceholder}
-                    variant={
-                      variant === "transparent" ? "primary" : "secondary"
-                    }
-                    required
-                  />
-
-                  <FieldError className="text-wrap" />
-                </TextField>
-              </Fieldset.Group>
-
-              {emailAndPassword?.rememberMe && (
-                <Checkbox
-                  name="rememberMe"
-                  isDisabled={isPending}
-                  variant={variant === "transparent" ? "primary" : "secondary"}
-                >
-                  <Checkbox.Control>
-                    <Checkbox.Indicator />
-                  </Checkbox.Control>
-
-                  <Checkbox.Content>
-                    <Label>{localization.auth.rememberMe}</Label>
-                  </Checkbox.Content>
-                </Checkbox>
-              )}
-
-              <Fieldset.Actions className="flex-col gap-3">
-                <Button type="submit" className="w-full" isPending={isPending}>
-                  {isPending && <Spinner color="current" size="sm" />}
-
-                  {localization.auth.signIn}
-                </Button>
-
-                {magicLink && (
-                  <MagicLinkButton view="signIn" isPending={isPending} />
-                )}
-              </Fieldset.Actions>
-            </Form>
-          )}
-
-          {socialPosition === "bottom" && (
-            <>
-              {showSeparator && (
-                <FieldSeparator>{localization.auth.or}</FieldSeparator>
-              )}
-
-              {socialProviders && socialProviders.length > 0 && (
-                <ProviderButtons
-                  socialLayout={socialLayout}
-                  signInSocial={signInSocial}
-                  isPending={isPending}
-                />
-              )}
-            </>
-          )}
-
-          {emailAndPassword?.forgotPassword && (
-            <Link
-              href={`${basePaths.auth}/${viewPaths.auth.forgotPassword}`}
-              className="no-underline hover:underline self-center"
+        {emailAndPassword?.enabled && (
+          <Form action={signInEmail} className="flex flex-col gap-4">
+            <TextField
+              defaultValue={email}
+              name="email"
+              type="email"
+              autoComplete="email"
+              isDisabled={isPending}
             >
-              {localization.auth.forgotPasswordLink}
-            </Link>
-          )}
+              <Label>{localization.auth.email}</Label>
 
-          {emailAndPassword?.enabled && (
-            <Description className="flex justify-center gap-1.5 text-foreground text-sm">
-              {localization.auth.needToCreateAnAccount}
+              <Input
+                placeholder={localization.auth.emailPlaceholder}
+                variant={variant === "transparent" ? "primary" : "secondary"}
+                required
+              />
 
-              <Link
-                href={`${basePaths.auth}/${viewPaths.auth.signUp}`}
-                className="text-accent no-underline hover:underline decoration-accent-hover"
+              <FieldError className="text-wrap" />
+            </TextField>
+
+            <TextField
+              defaultValue={password}
+              minLength={emailAndPassword?.minPasswordLength}
+              maxLength={emailAndPassword?.maxPasswordLength}
+              name="password"
+              type="password"
+              autoComplete="current-password"
+              isDisabled={isPending}
+            >
+              <div className="flex justify-between">
+                <Label>{localization.auth.password}</Label>
+              </div>
+
+              <Input
+                placeholder={localization.auth.passwordPlaceholder}
+                variant={variant === "transparent" ? "primary" : "secondary"}
+                required
+              />
+
+              <FieldError className="text-wrap" />
+            </TextField>
+
+            {emailAndPassword?.rememberMe && (
+              <Checkbox
+                name="rememberMe"
+                isDisabled={isPending}
+                variant={variant === "transparent" ? "primary" : "secondary"}
               >
-                {localization.auth.signUp}
-              </Link>
-            </Description>
-          )}
-        </Fieldset>
+                <Checkbox.Control>
+                  <Checkbox.Indicator />
+                </Checkbox.Control>
+
+                <Checkbox.Content>
+                  <Label>{localization.auth.rememberMe}</Label>
+                </Checkbox.Content>
+              </Checkbox>
+            )}
+
+            <div className="flex flex-col gap-3">
+              <Button type="submit" className="w-full" isPending={isPending}>
+                {isPending && <Spinner color="current" size="sm" />}
+
+                {localization.auth.signIn}
+              </Button>
+
+              {magicLink && (
+                <MagicLinkButton view="signIn" isPending={isPending} />
+              )}
+            </div>
+          </Form>
+        )}
+
+        {socialPosition === "bottom" && (
+          <>
+            {showSeparator && (
+              <FieldSeparator>{localization.auth.or}</FieldSeparator>
+            )}
+
+            {socialProviders && socialProviders.length > 0 && (
+              <ProviderButtons
+                socialLayout={socialLayout}
+                signInSocial={signInSocial}
+                isPending={isPending}
+              />
+            )}
+          </>
+        )}
       </Card.Content>
+
+      <Card.Footer className="flex-col gap-3">
+        {emailAndPassword?.forgotPassword && (
+          <Link
+            href={`${basePaths.auth}/${viewPaths.auth.forgotPassword}`}
+            className="no-underline hover:underline self-center"
+          >
+            {localization.auth.forgotPasswordLink}
+          </Link>
+        )}
+
+        {emailAndPassword?.enabled && (
+          <Description className="justify-center text-foreground text-sm">
+            {localization.auth.needToCreateAnAccount}{" "}
+            <Link
+              href={`${basePaths.auth}/${viewPaths.auth.signUp}`}
+              className="text-accent no-underline hover:underline decoration-accent-hover"
+            >
+              {localization.auth.signUp}
+            </Link>
+          </Description>
+        )}
+      </Card.Footer>
     </Card>
   )
 }

@@ -95,7 +95,12 @@ export function Sessions({ className, ...props }: SessionsProps & CardProps) {
                       {session.createdAt && (
                         <>
                           {session.ipAddress && <span>•</span>}
-                          <span>{session.createdAt.toLocaleString()}</span>
+                          <span>
+                            {session.createdAt.toLocaleString([], {
+                              dateStyle: "short",
+                              timeStyle: "short"
+                            })}
+                          </span>
                         </>
                       )}
                     </div>

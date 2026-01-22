@@ -60,14 +60,14 @@ export function Settings({
       )}
       {...props}
     >
-      <ResponsiveTabs selectedKey={currentView}>
+      <ResponsiveTabs
+        selectedKey={currentView}
+        className={cn(hideNav && "hidden")}
+      >
         <Tabs.ListContainer>
           <Tabs.List
             aria-label={localization.settings.settings}
-            className={cn(
-              "overflow-auto md:w-64 lg:w-72 xl:w-80",
-              hideNav && "hidden"
-            )}
+            className="overflow-auto md:w-64 lg:w-72 xl:w-80"
           >
             <Tabs.Tab
               id="account"

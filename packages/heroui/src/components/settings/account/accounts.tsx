@@ -53,7 +53,7 @@ export function Accounts({ className, ...props }: AccountsProps & CardProps) {
         {!isPending ? (
           deviceSessions?.map((deviceSession) => {
             const isActive =
-              deviceSession.session.id === sessionData?.session.id
+              deviceSession.session.userId === sessionData?.session.userId
             const isSwitching =
               settingActiveSession === deviceSession.session.token
             const isRevoking = revokingSession === deviceSession.session.token
