@@ -33,7 +33,7 @@
     "@testing-library/user-event": "^14.5.2",
     "@types/react": "^19.2.9",
     "@vitejs/plugin-react": "^5.1.2",
-    "@vitest/browser-playwright": "^4.0.17",
+    "@vitest/browser-playwright": "^4.0.18",
     "better-auth": "^1.4.17",
     "concurrently": "^9.2.1",
     "cpy-cli": "^6.0.0",
@@ -44,7 +44,7 @@
     "tsc-alias": "^1.8.16",
     "vite": "^7.3.1",
     "vite-plugin-dts": "^4.5.4",
-    "vitest": "^4.0.17"
+    "vitest": "^4.0.18"
   },
   "dependencies": {
     "@better-auth-ui/core": "*",

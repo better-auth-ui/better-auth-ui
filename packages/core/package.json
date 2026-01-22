@@ -21,7 +21,7 @@
   },
   "devDependencies": {
     "better-auth": "^1.4.17",
-    "vitest": "^4.0.17"
+    "vitest": "^4.0.18"
   },
   "peerDependencies": {
     "better-auth": ">=1.4.17"
