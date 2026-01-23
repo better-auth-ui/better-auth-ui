@@ -1,16 +1,25 @@
 import { useAuth } from "@better-auth-ui/react"
+import type { BetterFetchError } from "better-auth/react"
 import { useActionState } from "react"
+
+interface UseSignInMagicLinkOptions {
+  onError?: (error: BetterFetchError) => unknown | Promise<unknown>
+  onSuccess?: ({ email }: { email: string }) => unknown | Promise<unknown>
+}
 
 /**
  * Provides a hook that sends a magic-link sign-in email and exposes the action state for that flow.
  *
  * The returned action state invokes the auth client's magic-link sign-in using the email from a FormData
- * input, shows success or error toasts, and normalizes the stored email based on the result.
+ * input, calls the appropriate callback, and normalizes the stored email based on the result.
  *
  * @returns An action state object that triggers sending a magic link and holds the `email` field (initially `""`).
  */
-export function useSignInMagicLink() {
-  const { authClient, baseURL, localization, redirectTo, toast } = useAuth()
+export function useSignInMagicLink({
+  onError,
+  onSuccess
+}: UseSignInMagicLinkOptions = {}) {
+  const { authClient, baseURL, redirectTo } = useAuth()
 
   const signInMagicLink = async (_: object, formData: FormData) => {
     const email = formData.get("email") as string
@@ -23,12 +32,12 @@ export function useSignInMagicLink() {
     })
 
     if (error) {
-      toast.error(error.message || error.statusText)
+      await onError?.(error as BetterFetchError)
 
       return { email }
     }
 
-    toast.success(localization.auth.magicLinkSent)
+    await onSuccess?.({ email })
 
     return { email: "" }
   }

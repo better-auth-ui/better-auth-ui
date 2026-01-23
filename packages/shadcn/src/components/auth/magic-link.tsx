@@ -2,6 +2,7 @@
 
 import { useAuth } from "@better-auth-ui/react"
 import { useState } from "react"
+import { toast } from "sonner"
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -43,7 +44,10 @@ export function MagicLink({
 }: MagicLinkProps) {
   const { basePaths, localization, socialProviders, viewPaths, Link } =
     useAuth()
-  const [{ email }, signInMagicLink, magicLinkPending] = useSignInMagicLink()
+  const [{ email }, signInMagicLink, magicLinkPending] = useSignInMagicLink({
+    onError: (error) => toast.error(error.message || error.statusText),
+    onSuccess: () => toast.success(localization.auth.magicLinkSent)
+  })
   const [_, signInSocial, socialPending] = useSignInSocial()
 
   const isPending = magicLinkPending || socialPending

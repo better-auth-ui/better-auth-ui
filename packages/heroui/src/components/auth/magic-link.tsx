@@ -15,7 +15,8 @@ import {
   Label,
   Link,
   Spinner,
-  TextField
+  TextField,
+  toast
 } from "@heroui/react"
 import { cn } from "../../lib/utils"
 import { FieldSeparator } from "./field-separator"
@@ -45,7 +46,10 @@ export function MagicLink({
   ...props
 }: MagicLinkProps & CardProps) {
   const { basePaths, localization, socialProviders, viewPaths } = useAuth()
-  const [{ email }, signInMagicLink, magicLinkPending] = useSignInMagicLink()
+  const [{ email }, signInMagicLink, magicLinkPending] = useSignInMagicLink({
+    onError: (error) => toast.danger(error.message || error.statusText),
+    onSuccess: () => toast.success(localization.auth.magicLinkSent)
+  })
   const [_, signInSocial, socialPending] = useSignInSocial()
 
   const isPending = magicLinkPending || socialPending
