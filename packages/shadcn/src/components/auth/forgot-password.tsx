@@ -2,7 +2,7 @@
 
 import { useAuth } from "@better-auth-ui/react"
 import { useState } from "react"
-
+import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import {
@@ -32,7 +32,10 @@ export type ForgotPasswordProps = {
  */
 export function ForgotPassword({ className }: ForgotPasswordProps) {
   const { basePaths, localization, viewPaths, Link } = useAuth()
-  const [{ email }, forgotPassword, isPending] = useForgotPassword()
+  const [{ email }, forgotPassword, isPending] = useForgotPassword({
+    onError: (error) => toast.error(error.message || error.statusText),
+    onSuccess: () => toast.success(localization.auth.passwordResetEmailSent)
+  })
 
   const [fieldErrors, setFieldErrors] = useState<{
     email?: string

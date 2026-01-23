@@ -11,7 +11,8 @@ import {
   Label,
   Link,
   Spinner,
-  TextField
+  TextField,
+  toast
 } from "@heroui/react"
 
 import { cn } from "../../lib/utils"
@@ -36,7 +37,11 @@ export function ForgotPassword({
   ...props
 }: ForgotPasswordProps & CardProps) {
   const { basePaths, localization, viewPaths } = useAuth()
-  const [{ email }, forgotPassword, isPending] = useForgotPassword()
+  const [{ email }, forgotPassword, isPending] = useForgotPassword({
+    onError: async (error) => toast.danger(error.message || error.statusText),
+    onSuccess: async () =>
+      toast.success(localization.auth.passwordResetEmailSent)
+  })
 
   return (
     <Card

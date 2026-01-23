@@ -1,5 +1,11 @@
 import { useAuth } from "@better-auth-ui/react"
+import type { BetterFetchError } from "better-auth/react"
 import { useActionState } from "react"
+
+interface UseForgotPasswordOptions {
+  onError?: (error: BetterFetchError) => unknown | Promise<unknown>
+  onSuccess?: ({ email }: { email: string }) => unknown | Promise<unknown>
+}
 
 /**
  * Provides an action state hook for the forgot-password flow.
@@ -10,9 +16,11 @@ import { useActionState } from "react"
  *
  * @returns The action state for the forgot-password flow. The action, when invoked, sends a password-reset request and resolves to an object containing the submitted `email`.
  */
-export function useForgotPassword() {
-  const { authClient, basePaths, localization, toast, viewPaths, navigate } =
-    useAuth()
+export function useForgotPassword({
+  onError,
+  onSuccess
+}: UseForgotPasswordOptions = {}) {
+  const { authClient, basePaths, viewPaths, navigate } = useAuth()
 
   const forgotPassword = async (_: object, formData: FormData) => {
     const email = formData.get("email") as string
@@ -23,9 +31,9 @@ export function useForgotPassword() {
     })
 
     if (error) {
-      toast.error(error.message || error.statusText)
+      await onError?.(error as BetterFetchError)
     } else {
-      toast.success(localization.auth.passwordResetEmailSent)
+      await onSuccess?.({ email })
       navigate({ href: `${basePaths.auth}/${viewPaths.auth.signIn}` })
     }
 
