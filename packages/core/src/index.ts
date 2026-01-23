@@ -1,3 +1,4 @@
+export * from "./lib/auth-callback-options"
 export * from "./lib/auth-config"
 export * from "./lib/auth-error"
 export * from "./lib/auth-toast"

@@ -1,11 +1,6 @@
 import { useAuth } from "@better-auth-ui/react"
-import type { AuthError } from "@better-auth-ui/react/core"
+import type { AuthCallbackOptions } from "@better-auth-ui/react/core"
 import { useActionState } from "react"
-
-interface UseSignInSocialOptions {
-  onError?: (error: AuthError) => unknown | Promise<unknown>
-  onSuccess?: () => unknown | Promise<unknown>
-}
 
 /**
  * Creates an action state for initiating a social sign-in using the configured auth client.
@@ -20,7 +15,7 @@ interface UseSignInSocialOptions {
 export function useSignInSocial({
   onError,
   onSuccess
-}: UseSignInSocialOptions = {}) {
+}: AuthCallbackOptions = {}) {
   const { authClient, baseURL, redirectTo } = useAuth()
 
   const signInSocial = async (_: object, formData: FormData) => {

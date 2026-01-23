@@ -1,12 +1,7 @@
 import { useAuth } from "@better-auth-ui/react"
-import type { AuthError } from "@better-auth-ui/react/core"
+import type { AuthCallbackOptions } from "@better-auth-ui/react/core"
 import { useQueryClient } from "@tanstack/react-query"
 import { useActionState } from "react"
-
-interface UseSignInEmailOptions {
-  onError?: (error: AuthError) => unknown | Promise<unknown>
-  onSuccess?: () => unknown | Promise<unknown>
-}
 
 /**
  * Create an action state that signs a user in with email and password.
@@ -19,7 +14,7 @@ interface UseSignInEmailOptions {
 export function useSignInEmail({
   onError,
   onSuccess
-}: UseSignInEmailOptions = {}) {
+}: AuthCallbackOptions = {}) {
   const { authClient, emailAndPassword, redirectTo, navigate } = useAuth()
   const queryClient = useQueryClient()
 

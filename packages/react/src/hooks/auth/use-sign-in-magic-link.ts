@@ -1,11 +1,6 @@
 import { useAuth } from "@better-auth-ui/react"
-import type { AuthError } from "@better-auth-ui/react/core"
+import type { AuthCallbackOptions } from "@better-auth-ui/react/core"
 import { useActionState } from "react"
-
-interface UseSignInMagicLinkOptions {
-  onError?: (error: AuthError) => unknown | Promise<unknown>
-  onSuccess?: () => unknown | Promise<unknown>
-}
 
 /**
  * Provides a hook that sends a magic-link sign-in email and exposes the action state for that flow.
@@ -18,7 +13,7 @@ interface UseSignInMagicLinkOptions {
 export function useSignInMagicLink({
   onError,
   onSuccess
-}: UseSignInMagicLinkOptions = {}) {
+}: AuthCallbackOptions = {}) {
   const { authClient, baseURL, redirectTo } = useAuth()
 
   const signInMagicLink = async (_: object, formData: FormData) => {

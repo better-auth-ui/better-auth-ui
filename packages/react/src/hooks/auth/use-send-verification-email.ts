@@ -1,11 +1,6 @@
 import { useAuth } from "@better-auth-ui/react"
-import type { AuthError } from "@better-auth-ui/react/core"
+import type { AuthCallbackOptions } from "@better-auth-ui/react/core"
 import { useCallback } from "react"
-
-interface UseSendVerificationEmailOptions {
-  onError?: (error: AuthError) => unknown | Promise<unknown>
-  onSuccess?: () => unknown | Promise<unknown>
-}
 
 /**
  * Provides a function to send a verification email to the specified email address.
@@ -16,7 +11,7 @@ interface UseSendVerificationEmailOptions {
 export function useSendVerificationEmail({
   onError,
   onSuccess
-}: UseSendVerificationEmailOptions = {}) {
+}: AuthCallbackOptions = {}) {
   const { authClient, baseURL, redirectTo } = useAuth()
 
   const sendVerificationEmail = useCallback(

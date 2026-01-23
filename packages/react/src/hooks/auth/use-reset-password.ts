@@ -1,11 +1,6 @@
 import { useAuth } from "@better-auth-ui/react"
-import type { AuthError } from "@better-auth-ui/react/core"
+import type { AuthCallbackOptions } from "@better-auth-ui/react/core"
 import { useActionState } from "react"
-
-interface UseResetPasswordOptions {
-  onError?: (error: AuthError) => unknown | Promise<unknown>
-  onSuccess?: () => unknown | Promise<unknown>
-}
 
 /**
  * Provides an action state hook for resetting a user's password using the `token` query parameter.
@@ -23,7 +18,7 @@ interface UseResetPasswordOptions {
 export function useResetPassword({
   onError,
   onSuccess
-}: UseResetPasswordOptions = {}) {
+}: AuthCallbackOptions = {}) {
   const {
     authClient,
     basePaths,

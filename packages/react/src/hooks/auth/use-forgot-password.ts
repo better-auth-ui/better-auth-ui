@@ -1,11 +1,6 @@
 import { useAuth } from "@better-auth-ui/react"
-import type { AuthError } from "@better-auth-ui/react/core"
+import type { AuthCallbackOptions } from "@better-auth-ui/react/core"
 import { useActionState } from "react"
-
-interface UseForgotPasswordOptions {
-  onError?: (error: AuthError) => unknown | Promise<unknown>
-  onSuccess?: () => unknown | Promise<unknown>
-}
 
 /**
  * Provides an action state hook for the forgot-password flow.
@@ -19,7 +14,7 @@ interface UseForgotPasswordOptions {
 export function useForgotPassword({
   onError,
   onSuccess
-}: UseForgotPasswordOptions = {}) {
+}: AuthCallbackOptions = {}) {
   const { authClient, basePaths, viewPaths, navigate } = useAuth()
 
   const forgotPassword = async (_: object, formData: FormData) => {
