@@ -60,7 +60,7 @@ export function Appearance({
 
       <Card.Content>
         <RadioGroup
-          variant={variant === "transparent" ? "primary" : "secondary"}
+          variant={variant === "transparent" ? "secondary" : "primary"}
           value={hydrated ? theme : undefined}
           onChange={setTheme}
           isDisabled={!hydrated || !theme}
@@ -72,7 +72,10 @@ export function Appearance({
               <Radio
                 value="system"
                 className={cn(
-                  "mt-0 group relative flex-col gap-4 rounded-xl border px-5 py-4 hover:bg-default/20 transition-all data-[selected=true]:border-accent data-[selected=true]:bg-accent/10",
+                  variant === "transparent"
+                    ? "bg-surface"
+                    : "bg-surface-secondary",
+                  "mt-0 group relative flex-col gap-4 rounded-xl border border-transparent px-5 py-4 transition-all data-[selected=true]:border-accent data-[selected=true]:bg-accent/10",
                   "data-[focus-visible=true]:border-accent data-[focus-visible=true]:bg-accent/10"
                 )}
               >
@@ -95,7 +98,10 @@ export function Appearance({
               <Radio
                 value="light"
                 className={cn(
-                  "mt-0 group relative flex-col gap-4 rounded-xl border px-5 py-4 hover:bg-default/20 transition-all data-[selected=true]:border-accent data-[selected=true]:bg-accent/10",
+                  variant === "transparent"
+                    ? "bg-surface"
+                    : "bg-surface-secondary",
+                  "mt-0 group relative flex-col gap-4 rounded-xl border border-transparent px-5 py-4 transition-all data-[selected=true]:border-accent data-[selected=true]:bg-accent/10",
                   "data-[focus-visible=true]:border-accent data-[focus-visible=true]:bg-accent/10"
                 )}
               >
@@ -118,7 +124,10 @@ export function Appearance({
               <Radio
                 value="dark"
                 className={cn(
-                  "mt-0 group relative flex-col gap-4 rounded-xl border px-5 py-4 hover:bg-default/20 transition-all data-[selected=true]:border-accent data-[selected=true]:bg-accent/10",
+                  variant === "transparent"
+                    ? "bg-surface"
+                    : "bg-surface-secondary",
+                  "mt-0 group relative flex-col gap-4 rounded-xl border border-transparent px-5 py-4 transition-all data-[selected=true]:border-accent data-[selected=true]:bg-accent/10",
                   "data-[focus-visible=true]:border-accent data-[focus-visible=true]:bg-accent/10"
                 )}
               >
