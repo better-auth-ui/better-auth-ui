@@ -1,5 +1,5 @@
-import { useAuth } from "@better-auth-ui/react"
-import type { UseQueryOptions } from "@tanstack/react-query"
+import { type SessionData, useAuth } from "@better-auth-ui/react"
+import type { UseQueryOptions, UseQueryResult } from "@tanstack/react-query"
 import { useEffect } from "react"
 
 import { useSession } from "./use-session"
@@ -10,19 +10,27 @@ import { useSession } from "./use-session"
  * @param options - Query options forwarded to the session query hook
  * @returns An object containing `data` (the current session or `undefined`), `isPending` (whether the session query is in progress), and other session query state
  */
-export function useAuthenticate(options?: Partial<UseQueryOptions>) {
+export function useAuthenticate(
+  options?: Partial<UseQueryOptions>
+): UseQueryResult<SessionData> {
   const { basePaths, viewPaths, navigate } = useAuth()
-  const { data, isPending, ...rest } = useSession(options)
+  const session = useSession(options)
 
   useEffect(() => {
-    if (data || isPending) return
+    if (session.data || session.isPending) return
 
     const currentURL = window.location.pathname + window.location.search
     const redirectTo = encodeURIComponent(currentURL)
     const signInPath = `${basePaths.auth}/${viewPaths.auth.signIn}?redirectTo=${redirectTo}`
 
     navigate({ to: signInPath, replace: true })
-  }, [basePaths.auth, data, isPending, viewPaths.auth.signIn, navigate])
+  }, [
+    basePaths.auth,
+    session.data,
+    session.isPending,
+    viewPaths.auth.signIn,
+    navigate
+  ])
 
-  return { data, isPending, ...rest }
+  return session
 }

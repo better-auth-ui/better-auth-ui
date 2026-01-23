@@ -14,5 +14,12 @@ export const auth = betterAuth({
     enabled: true
   },
   secret: process.env.BETTER_AUTH_SECRET as string,
-  plugins: [multiSession()]
+  plugins: [multiSession()],
+  user: {
+    additionalFields: {
+      premium: {
+        type: "boolean"
+      }
+    }
+  }
 })

@@ -7,7 +7,7 @@ import type { AnyAuthClient, AuthClient } from "./auth-client"
  * Extends the base AuthConfig with React-specific requirements including
  * an authClient instance and a Link component for navigation.
  */
-export type AuthConfig = BaseAuthConfig & {
+export interface AuthConfig extends BaseAuthConfig {
   authClient: AuthClient
   /**
    * React component for rendering links
@@ -28,3 +28,9 @@ export type AnyAuthConfig = DeepPartial<Omit<AuthConfig, "authClient">> & {
    */
   authClient?: AnyAuthClient
 }
+
+type ResolveSessionData<T> = "SessionData" extends keyof T
+  ? T["SessionData"]
+  : AuthClient["$Infer"]["Session"]
+
+export type SessionData = ResolveSessionData<AuthConfig>
