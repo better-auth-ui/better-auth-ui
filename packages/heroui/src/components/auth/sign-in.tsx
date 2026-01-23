@@ -59,7 +59,7 @@ export function SignIn({
   })
 
   const [{ email, password }, signInEmail, signInPending] = useSignInEmail({
-    onError: (error, { email }) => {
+    onError: (error) => {
       if (error.code === "EMAIL_NOT_VERIFIED") {
         toast.danger(error.message || error.statusText, {
           actionProps: {

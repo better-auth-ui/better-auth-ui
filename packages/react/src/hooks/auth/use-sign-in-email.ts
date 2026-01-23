@@ -4,10 +4,7 @@ import { useQueryClient } from "@tanstack/react-query"
 import { useActionState } from "react"
 
 interface UseSignInEmailOptions {
-  onError?: (
-    error: AuthError,
-    context: { email: string }
-  ) => unknown | Promise<unknown>
+  onError?: (error: AuthError) => unknown | Promise<unknown>
   onSuccess?: (context: {
     email: string
     password: string
@@ -41,7 +38,7 @@ export function useSignInEmail({
     })
 
     if (error) {
-      await onError?.(error, { email })
+      await onError?.(error)
 
       return {
         email,
