@@ -12,7 +12,7 @@ import type { AuthConfig } from "./auth-config"
  * Used for type flexibility when accepting auth clients that may have different
  * plugin configurations or feature sets.
  */
-export type AnyAuthClient = ReturnType<typeof createAuthClient>
+export type AnyAuthClient = Omit<ReturnType<typeof createAuthClient>, "signUp">
 
 const authClient = createAuthClient({
   plugins: [magicLinkClient(), multiSessionClient(), usernameClient()]
