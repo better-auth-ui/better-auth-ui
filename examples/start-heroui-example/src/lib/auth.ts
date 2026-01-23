@@ -18,7 +18,8 @@ export const auth = betterAuth({
   user: {
     additionalFields: {
       premium: {
-        type: "boolean"
+        type: "boolean",
+        required: false
       }
     }
   }
