@@ -5,11 +5,7 @@ import { useActionState } from "react"
 
 interface UseSignUpEmailOptions {
   onError?: (error: AuthError) => unknown | Promise<unknown>
-  onSuccess?: (context: {
-    name: string
-    email: string
-    password: string
-  }) => unknown | Promise<unknown>
+  onSuccess?: () => unknown | Promise<unknown>
 }
 
 /**
@@ -77,7 +73,7 @@ export function useSignUpEmail({
       }
     }
 
-    await onSuccess?.({ name, email, password })
+    await onSuccess?.()
 
     if (emailAndPassword?.requireEmailVerification) {
       toast.success(localization.auth.verifyYourEmail)

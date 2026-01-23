@@ -5,10 +5,7 @@ import { useActionState } from "react"
 
 interface UseSignInEmailOptions {
   onError?: (error: AuthError) => unknown | Promise<unknown>
-  onSuccess?: (context: {
-    email: string
-    password: string
-  }) => unknown | Promise<unknown>
+  onSuccess?: () => unknown | Promise<unknown>
 }
 
 /**
@@ -46,7 +43,7 @@ export function useSignInEmail({
       }
     }
 
-    await onSuccess?.({ email, password })
+    await onSuccess?.()
 
     await queryClient.invalidateQueries({ queryKey: ["auth"] })
 

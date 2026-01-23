@@ -4,7 +4,7 @@ import { useActionState } from "react"
 
 interface UseSignInMagicLinkOptions {
   onError?: (error: AuthError) => unknown | Promise<unknown>
-  onSuccess?: ({ email }: { email: string }) => unknown | Promise<unknown>
+  onSuccess?: () => unknown | Promise<unknown>
 }
 
 /**
@@ -37,7 +37,7 @@ export function useSignInMagicLink({
       return { email }
     }
 
-    await onSuccess?.({ email })
+    await onSuccess?.()
 
     return { email: "" }
   }

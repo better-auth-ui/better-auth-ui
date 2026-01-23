@@ -4,7 +4,7 @@ import { useActionState } from "react"
 
 interface UseForgotPasswordOptions {
   onError?: (error: AuthError) => unknown | Promise<unknown>
-  onSuccess?: ({ email }: { email: string }) => unknown | Promise<unknown>
+  onSuccess?: () => unknown | Promise<unknown>
 }
 
 /**
@@ -33,7 +33,7 @@ export function useForgotPassword({
     if (error) {
       await onError?.(error)
     } else {
-      await onSuccess?.({ email })
+      await onSuccess?.()
       navigate({ href: `${basePaths.auth}/${viewPaths.auth.signIn}` })
     }
 

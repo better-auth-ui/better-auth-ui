@@ -4,7 +4,7 @@ import { useCallback } from "react"
 
 interface UseSendVerificationEmailOptions {
   onError?: (error: AuthError) => unknown | Promise<unknown>
-  onSuccess?: (context: { email: string }) => unknown | Promise<unknown>
+  onSuccess?: () => unknown | Promise<unknown>
 }
 
 /**
@@ -31,7 +31,7 @@ export function useSendVerificationEmail({
       if (error) {
         await onError?.(error)
       } else {
-        await onSuccess?.({ email })
+        await onSuccess?.()
       }
     },
     [authClient, baseURL, redirectTo, onError, onSuccess]

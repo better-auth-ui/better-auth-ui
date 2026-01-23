@@ -4,7 +4,7 @@ import { useActionState } from "react"
 
 interface UseSignInSocialOptions {
   onError?: (error: AuthError) => unknown | Promise<unknown>
-  onSuccess?: ({ provider }: { provider: string }) => unknown | Promise<unknown>
+  onSuccess?: () => unknown | Promise<unknown>
 }
 
 /**
@@ -36,7 +36,7 @@ export function useSignInSocial({
     if (error) {
       await onError?.(error)
     } else {
-      await onSuccess?.({ provider })
+      await onSuccess?.()
     }
 
     return { provider }
