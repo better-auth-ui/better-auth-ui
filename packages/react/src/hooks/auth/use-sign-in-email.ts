@@ -1,24 +1,32 @@
 import { useAuth } from "@better-auth-ui/react"
+import type { AuthError } from "@better-auth-ui/react/core"
 import { useQueryClient } from "@tanstack/react-query"
 import { useActionState } from "react"
+
+interface UseSignInEmailOptions {
+  onError?: (
+    error: AuthError,
+    context: { email: string }
+  ) => unknown | Promise<unknown>
+  onSuccess?: (context: {
+    email: string
+    password: string
+  }) => unknown | Promise<unknown>
+}
 
 /**
  * Create an action state that signs a user in with email and password.
  *
- * The action sends an email/password sign-in request, invalidates the auth query cache and navigates to the configured redirect on success. If the account's email is not verified, a toast is shown with an action to resend a verification email; other errors are surfaced via toasts. On error the action returns the submitted email with an empty password; on success it returns the submitted email and password.
+ * The action sends an email/password sign-in request, invalidates the auth query cache and navigates to the configured redirect on success. On error the action returns the submitted email with an empty password; on success it returns the submitted email and password.
  *
+ * @param options - Optional callbacks for error and success handling
  * @returns An action state object whose action performs the email sign-in and resolves to an object `{ email, password }` (password preserved on success, set to `""` on error).
  */
-export function useSignInEmail() {
-  const {
-    authClient,
-    baseURL,
-    emailAndPassword,
-    localization,
-    redirectTo,
-    toast,
-    navigate
-  } = useAuth()
+export function useSignInEmail({
+  onError,
+  onSuccess
+}: UseSignInEmailOptions = {}) {
+  const { authClient, emailAndPassword, redirectTo, navigate } = useAuth()
   const queryClient = useQueryClient()
 
   const signInEmail = async (_: object, formData: FormData) => {
@@ -33,37 +41,15 @@ export function useSignInEmail() {
     })
 
     if (error) {
-      if (error.code === "EMAIL_NOT_VERIFIED") {
-        const toastId = toast.error(error.message || error.statusText, {
-          action: {
-            label: localization.auth.resend,
-            onClick: async () => {
-              const callbackURL = `${baseURL}${redirectTo}`
-
-              toast.dismiss?.(toastId)
-
-              const { error } = await authClient.sendVerificationEmail({
-                email,
-                callbackURL
-              })
-
-              if (error) {
-                toast.error(error.message || error.statusText)
-              } else {
-                toast.success(localization.auth.verificationEmailSent)
-              }
-            }
-          }
-        })
-      } else {
-        toast.error(error.message || error.statusText)
-      }
+      await onError?.(error, { email })
 
       return {
         email,
         password: ""
       }
     }
+
+    await onSuccess?.({ email, password })
 
     await queryClient.invalidateQueries({ queryKey: ["auth"] })
 

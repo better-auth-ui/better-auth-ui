@@ -1,4 +1,9 @@
-import { useAuth, useSignInEmail, useSignInSocial } from "@better-auth-ui/react"
+import {
+  useAuth,
+  useSendVerificationEmail,
+  useSignInEmail,
+  useSignInSocial
+} from "@better-auth-ui/react"
 import {
   Button,
   Card,
@@ -47,7 +52,27 @@ export function SignIn({
     socialProviders,
     viewPaths
   } = useAuth()
-  const [{ email, password }, signInEmail, signInPending] = useSignInEmail()
+
+  const { sendVerificationEmail } = useSendVerificationEmail({
+    onError: (error) => toast.danger(error.message || error.statusText),
+    onSuccess: () => toast.success(localization.auth.verificationEmailSent)
+  })
+
+  const [{ email, password }, signInEmail, signInPending] = useSignInEmail({
+    onError: (error, { email }) => {
+      if (error.code === "EMAIL_NOT_VERIFIED") {
+        toast.danger(error.message || error.statusText, {
+          actionProps: {
+            children: localization.auth.resend,
+            onClick: () => sendVerificationEmail(email)
+          }
+        })
+      } else {
+        toast.danger(error.message || error.statusText)
+      }
+    }
+  })
+
   const [_, signInSocial, socialPending] = useSignInSocial({
     onError: (error) => toast.danger(error.message || error.statusText)
   })

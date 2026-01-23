@@ -36,8 +36,14 @@ export type ResetPasswordProps = {
  * @returns The password reset form UI ready to be mounted in the app layout.
  */
 export function ResetPassword({ className }: ResetPasswordProps) {
-  const { basePaths, emailAndPassword, localization, viewPaths, navigate, Link } =
-    useAuth()
+  const {
+    basePaths,
+    emailAndPassword,
+    localization,
+    viewPaths,
+    navigate,
+    Link
+  } = useAuth()
   const [{ password, confirmPassword }, resetPassword, isPending] =
     useResetPassword({
       onError: (error) => toast.error(error.message || error.statusText),

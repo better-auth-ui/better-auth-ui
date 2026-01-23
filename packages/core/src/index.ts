@@ -1,4 +1,5 @@
 export * from "./lib/auth-config"
+export * from "./lib/auth-error"
 export * from "./lib/auth-toast"
 export * from "./lib/base-paths"
 export * from "./lib/localization"

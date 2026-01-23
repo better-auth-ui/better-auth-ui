@@ -1,9 +1,9 @@
 import { useAuth } from "@better-auth-ui/react"
-import type { BetterFetchError } from "better-auth/react"
+import type { AuthError } from "@better-auth-ui/react/core"
 import { useActionState } from "react"
 
 interface UseForgotPasswordOptions {
-  onError?: (error: BetterFetchError) => unknown | Promise<unknown>
+  onError?: (error: AuthError) => unknown | Promise<unknown>
   onSuccess?: ({ email }: { email: string }) => unknown | Promise<unknown>
 }
 
@@ -31,7 +31,7 @@ export function useForgotPassword({
     })
 
     if (error) {
-      await onError?.(error as BetterFetchError)
+      await onError?.(error)
     } else {
       await onSuccess?.({ email })
       navigate({ href: `${basePaths.auth}/${viewPaths.auth.signIn}` })

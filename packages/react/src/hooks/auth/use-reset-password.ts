@@ -1,9 +1,9 @@
 import { useAuth } from "@better-auth-ui/react"
-import type { BetterFetchError } from "better-auth/react"
+import type { AuthError } from "@better-auth-ui/react/core"
 import { useActionState } from "react"
 
 interface UseResetPasswordOptions {
-  onError?: (error: BetterFetchError) => unknown | Promise<unknown>
+  onError?: (error: AuthError) => unknown | Promise<unknown>
   onSuccess?: () => unknown | Promise<unknown>
 }
 
@@ -42,7 +42,7 @@ export function useResetPassword({
         message: localization.auth.invalidResetPasswordToken,
         status: 400,
         statusText: "MISSING_TOKEN"
-      } as BetterFetchError)
+      })
 
       return {
         password: "",
@@ -59,7 +59,7 @@ export function useResetPassword({
         message: localization.auth.passwordsDoNotMatch,
         status: 400,
         statusText: "PASSWORD_MISMATCH"
-      } as BetterFetchError)
+      })
 
       return {
         password: "",
@@ -73,7 +73,7 @@ export function useResetPassword({
     })
 
     if (error) {
-      await onError?.(error as BetterFetchError)
+      await onError?.(error)
 
       return {
         password: "",

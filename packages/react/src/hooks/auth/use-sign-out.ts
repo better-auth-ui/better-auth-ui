@@ -1,10 +1,10 @@
 import { useAuth } from "@better-auth-ui/react"
+import type { AuthError } from "@better-auth-ui/react/core"
 import { useQueryClient } from "@tanstack/react-query"
-import type { BetterFetchError } from "better-auth/react"
 import { useCallback } from "react"
 
 interface UseSignOutOptions {
-  onError?: (error: BetterFetchError) => unknown | Promise<unknown>
+  onError?: (error: AuthError) => unknown | Promise<unknown>
   onSuccess?: () => unknown | Promise<unknown>
 }
 
@@ -22,7 +22,7 @@ export function useSignOut({ onError, onSuccess }: UseSignOutOptions = {}) {
     const { error } = await authClient.signOut()
 
     if (error) {
-      await onError?.(error as BetterFetchError)
+      await onError?.(error)
     } else {
       await onSuccess?.()
     }

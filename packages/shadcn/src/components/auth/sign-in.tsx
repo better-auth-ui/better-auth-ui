@@ -18,6 +18,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Spinner } from "@/components/ui/spinner"
+import { useSendVerificationEmail } from "@/hooks/auth/use-send-verification-email"
 import { useSignInEmail } from "@/hooks/auth/use-sign-in-email"
 import { useSignInSocial } from "@/hooks/auth/use-sign-in-social"
 import { cn } from "@/lib/utils"
@@ -53,7 +54,26 @@ export function SignIn({
     Link
   } = useAuth()
 
-  const [{ email, password }, signInEmail, signInPending] = useSignInEmail()
+  const { sendVerificationEmail } = useSendVerificationEmail({
+    onError: (error) => toast.error(error.message || error.statusText),
+    onSuccess: () => toast.success(localization.auth.verificationEmailSent)
+  })
+
+  const [{ email, password }, signInEmail, signInPending] = useSignInEmail({
+    onError: (error, { email }) => {
+      if (error.code === "EMAIL_NOT_VERIFIED") {
+        toast.error(error.message || error.statusText, {
+          action: {
+            label: localization.auth.resend,
+            onClick: () => sendVerificationEmail(email)
+          }
+        })
+      } else {
+        toast.error(error.message || error.statusText)
+      }
+    }
+  })
+
   const [_, signInSocial, socialPending] = useSignInSocial({
     onError: (error) => toast.error(error.message || error.statusText)
   })
