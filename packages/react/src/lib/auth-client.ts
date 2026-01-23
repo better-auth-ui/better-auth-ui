@@ -4,6 +4,7 @@ import {
   usernameClient
 } from "better-auth/client/plugins"
 import { createAuthClient } from "better-auth/react"
+import type { AuthConfig } from "./auth-config"
 
 /**
  * Type representing any auth client created with `createAuthClient`.
@@ -23,4 +24,12 @@ const authClient = createAuthClient({
  * This is the standard auth client type used throughout the React package
  * and includes all required plugins enabled.
  */
-export type AuthClient = typeof authClient
+
+type ResolveAuthClient<T> = "AuthClient" extends keyof T
+  ? T["AuthClient"]
+  : typeof authClient
+
+/**
+ * The resolved auth client type, either from user augmentation or the default.
+ */
+export type AuthClient = ResolveAuthClient<AuthConfig>

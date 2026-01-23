@@ -12,6 +12,6 @@ export const authClient = createAuthClient({
 
 declare module "@better-auth-ui/heroui/react" {
   interface AuthConfig {
-    SessionData: (typeof authClient)["$Infer"]["Session"]
+    AuthClient: typeof authClient
   }
 }

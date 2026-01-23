@@ -1,4 +1,4 @@
-import { type SessionData, useAuth } from "@better-auth-ui/react"
+import { type AuthClient, useAuth } from "@better-auth-ui/react"
 import type { UseQueryOptions, UseQueryResult } from "@tanstack/react-query"
 import { useEffect } from "react"
 
@@ -12,7 +12,7 @@ import { useSession } from "./use-session"
  */
 export function useAuthenticate(
   options?: Partial<UseQueryOptions>
-): UseQueryResult<SessionData> {
+): UseQueryResult<AuthClient["$Infer"]["Session"] | null> {
   const { basePaths, viewPaths, navigate } = useAuth()
   const session = useSession(options)
 

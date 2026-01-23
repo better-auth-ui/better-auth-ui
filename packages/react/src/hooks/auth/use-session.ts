@@ -1,4 +1,4 @@
-import { type SessionData, useAuth } from "@better-auth-ui/react"
+import { type AuthClient, useAuth } from "@better-auth-ui/react"
 import {
   type UseQueryOptions,
   type UseQueryResult,
@@ -13,15 +13,15 @@ import {
  */
 export function useSession(
   options?: Partial<UseQueryOptions>
-): UseQueryResult<SessionData> {
+): UseQueryResult<AuthClient["$Infer"]["Session"] | null> {
   const { authClient } = useAuth()
 
   return useQuery({
     queryKey: ["auth", "session"],
-    queryFn: async () =>
-      (await authClient.getSession({
+    queryFn: () =>
+      authClient.getSession({
         fetchOptions: { throw: true }
-      })) as SessionData,
+      }),
     ...(options as object)
   })
 }
