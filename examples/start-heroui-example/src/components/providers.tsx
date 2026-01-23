@@ -17,21 +17,13 @@ export function Providers({ children }: { children: ReactNode }) {
   const { theme, setTheme } = useTheme()
 
   return (
-    <RouterProvider
-      navigate={(path) => {
-        navigate({ to: path })
-        navigate({ to: path, replace: true })
-      }}
-    >
+    <RouterProvider navigate={(path) => navigate({ to: path })}>
       <AuthProvider
         authClient={authClient}
         socialProviders={["google", "github"]}
         magicLink
         multiSession
-        navigate={(options) => {
-          navigate(options)
-          navigate({ ...options, replace: true })
-        }}
+        navigate={navigate}
         settings={{
           theme,
           setTheme

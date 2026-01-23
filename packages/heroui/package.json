@@ -39,7 +39,7 @@
     "better-auth": "^1.4.17",
     "clsx": "^2.1.1",
     "cpy-cli": "^6.0.0",
-    "playwright": "^1.57.0",
+    "playwright": "^1.58.0",
     "react": "^19.2.3",
     "react-dom": "^19.2.3",
     "sonner": "^2.0.7",

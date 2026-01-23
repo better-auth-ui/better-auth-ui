@@ -27,7 +27,7 @@
   "devDependencies": {
     "@react-email/components": "^1.0.6",
     "@react-email/preview-server": "^5.2.5",
-    "@tanstack/react-query": "^5.90.19",
+    "@tanstack/react-query": "^5.90.20",
     "@testing-library/react": "^16.3.2",
     "@testing-library/user-event": "^14.5.2",
     "@types/react": "^19.2.9",
@@ -35,7 +35,7 @@
     "@vitest/browser-playwright": "^4.0.18",
     "better-auth": "^1.4.17",
     "clsx": "^2.1.1",
-    "playwright": "^1.57.0",
+    "playwright": "^1.58.0",
     "react": "^19.2.3",
     "react-dom": "^19.2.3",
     "react-email": "^5.2.5",
@@ -48,7 +48,7 @@
   },
   "peerDependencies": {
     "@react-email/components": ">=1.0.6",
-    "@tanstack/react-query": ">=5.90.19",
+    "@tanstack/react-query": ">=5.90.20",
     "better-auth": ">=1.4.17",
     "clsx": ">=2.0.0",
     "react": ">=18.0.0",
