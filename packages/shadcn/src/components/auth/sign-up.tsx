@@ -63,11 +63,15 @@ export function SignUp({
     viewPaths,
     Link
   } = useAuth()
+
   const [
     { name, email, password, confirmPassword },
     signUpEmail,
     signUpPending
-  ] = useSignUpEmail()
+  ] = useSignUpEmail({
+    onError: (error) => toast.error(error.message || error.statusText)
+  })
+
   const [_, signInSocial, socialPending] = useSignInSocial({
     onError: (error) => toast.error(error.message || error.statusText)
   })

@@ -60,7 +60,9 @@ export function SignUp({
     { name, email, password, confirmPassword },
     signUpEmail,
     signUpPending
-  ] = useSignUpEmail()
+  ] = useSignUpEmail({
+    onError: (error) => toast.danger(error.message || error.statusText)
+  })
 
   const [_, signInSocial, socialPending] = useSignInSocial({
     onError: (error) => toast.danger(error.message || error.statusText)

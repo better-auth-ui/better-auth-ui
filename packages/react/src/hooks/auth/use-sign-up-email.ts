@@ -1,17 +1,31 @@
 import { useAuth } from "@better-auth-ui/react"
+import type { AuthError } from "@better-auth-ui/react/core"
 import { useQueryClient } from "@tanstack/react-query"
 import { useActionState } from "react"
+
+interface UseSignUpEmailOptions {
+  onError?: (error: AuthError) => unknown | Promise<unknown>
+  onSuccess?: (context: {
+    name: string
+    email: string
+    password: string
+  }) => unknown | Promise<unknown>
+}
 
 /**
  * Creates an action state for performing email/password sign-up and handling post-sign-up flow.
  *
- * Validates the optional confirm-password field, shows localized toast messages on mismatch or API errors,
+ * Validates the optional confirm-password field, triggers callbacks on error/success,
  * triggers email verification flow when required, invalidates auth queries on successful sign-up when verification
  * is not required, and navigates to the appropriate view after completion.
  *
+ * @param options - Optional callbacks for error and success handling
  * @returns The action state returned by `useActionState` that manages the email sign-up operation and the form fields `name`, `email`, `password`, and `confirmPassword`.
  */
-export function useSignUpEmail() {
+export function useSignUpEmail({
+  onError,
+  onSuccess
+}: UseSignUpEmailOptions = {}) {
   const queryClient = useQueryClient()
   const {
     authClient,
@@ -31,16 +45,18 @@ export function useSignUpEmail() {
     const confirmPassword = formData.get("confirmPassword") as string
 
     // Validate confirmPassword if enabled
-    if (emailAndPassword?.confirmPassword) {
-      if (password !== confirmPassword) {
-        toast.error(localization.auth.passwordsDoNotMatch)
+    if (emailAndPassword?.confirmPassword && password !== confirmPassword) {
+      await onError?.({
+        message: localization.auth.passwordsDoNotMatch,
+        status: 400,
+        statusText: "PASSWORD_MISMATCH"
+      })
 
-        return {
-          name,
-          email,
-          password: "",
-          confirmPassword: ""
-        }
+      return {
+        name,
+        email,
+        password: "",
+        confirmPassword: ""
       }
     }
 
@@ -51,7 +67,7 @@ export function useSignUpEmail() {
     })
 
     if (error) {
-      toast.error(error.message || error.statusText)
+      await onError?.(error)
 
       return {
         name,
@@ -60,6 +76,8 @@ export function useSignUpEmail() {
         confirmPassword: ""
       }
     }
+
+    await onSuccess?.({ name, email, password })
 
     if (emailAndPassword?.requireEmailVerification) {
       toast.success(localization.auth.verifyYourEmail)
