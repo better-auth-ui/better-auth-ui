@@ -10,7 +10,6 @@ export function DemoProviders({ children }: { children: React.ReactNode }) {
         magicLink
         multiSession
         navigate={() => {}}
-        replace={() => {}}
         socialProviders={["github", "google"]}
         settings={{
           theme: "system",

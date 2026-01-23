@@ -145,7 +145,7 @@ export interface AuthConfig {
    * // Next.js
    * navigate={({href, replace}) => replace ? router.replace(href) : router.push(href)}
    */
-  navigate: (options: { href: string; replace?: boolean }) => void
+  navigate: (options: { to: string; replace?: boolean }) => void
 }
 
 export const defaultConfig: AuthConfig = {
@@ -165,11 +165,11 @@ export const defaultConfig: AuthConfig = {
   },
   viewPaths,
   localization,
-  navigate: ({ href, replace }) => {
+  navigate: ({ to, replace }) => {
     if (replace) {
-      window.location.replace(href)
+      window.location.replace(to)
     } else {
-      window.location.href = href
+      window.location.href = to
     }
   },
   toast: {

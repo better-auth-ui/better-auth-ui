@@ -27,8 +27,8 @@ export function Providers({ children }: { children: ReactNode }) {
           socialProviders={["google", "github"]}
           magicLink
           multiSession
-          navigate={({ href, replace }) =>
-            replace ? router.replace(href) : router.push(href)
+          navigate={({ to, replace }) =>
+            replace ? router.replace(to) : router.push(to)
           }
           Link={Link}
         >

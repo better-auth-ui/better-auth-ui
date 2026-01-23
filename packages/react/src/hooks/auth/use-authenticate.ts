@@ -21,7 +21,7 @@ export function useAuthenticate(options?: Partial<UseQueryOptions>) {
     const redirectTo = encodeURIComponent(currentURL)
     const signInPath = `${basePaths.auth}/${viewPaths.auth.signIn}?redirectTo=${redirectTo}`
 
-    navigate({ href: signInPath, replace: true })
+    navigate({ to: signInPath, replace: true })
   }, [basePaths.auth, data, isPending, viewPaths.auth.signIn, navigate])
 
   return { data, isPending, ...rest }

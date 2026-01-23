@@ -77,7 +77,7 @@ export function useResetPassword({
     }
 
     await onSuccess?.()
-    navigate({ href: `${basePaths.auth}/${viewPaths.auth.signIn}` })
+    navigate({ to: `${basePaths.auth}/${viewPaths.auth.signIn}` })
 
     return {
       password,

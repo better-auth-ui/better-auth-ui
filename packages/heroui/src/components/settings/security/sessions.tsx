@@ -114,7 +114,7 @@ export function Sessions({ className, ...props }: SessionsProps & CardProps) {
                     onPress={() =>
                       isCurrentSession
                         ? navigate({
-                            href: `${basePaths.auth}/${viewPaths.auth.signOut}`
+                            to: `${basePaths.auth}/${viewPaths.auth.signOut}`
                           })
                         : revokeSession(session.token)
                     }

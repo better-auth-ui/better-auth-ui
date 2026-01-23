@@ -25,7 +25,7 @@ export function useSignOut({ onError, onSuccess }: AuthCallbackOptions = {}) {
     await queryClient.invalidateQueries({ queryKey: ["auth"] })
 
     navigate({
-      href: `${basePaths.auth}/${viewPaths.auth.signIn}`,
+      to: `${basePaths.auth}/${viewPaths.auth.signIn}`,
       replace: true
     })
   }, [

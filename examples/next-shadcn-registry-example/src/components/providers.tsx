@@ -15,8 +15,8 @@ export function Providers({ children }: { children: ReactNode }) {
     <ThemeProvider attribute="data-theme" defaultTheme="system" enableSystem>
       <AuthProvider
         authClient={authClient}
-        navigate={({ href, replace }) =>
-          replace ? router.replace(href) : router.push(href)
+        navigate={({ to, replace }) =>
+          replace ? router.replace(to) : router.push(to)
         }
         Link={Link}
       >
