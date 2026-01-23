@@ -38,9 +38,8 @@ export function ForgotPassword({
 }: ForgotPasswordProps & CardProps) {
   const { basePaths, localization, viewPaths } = useAuth()
   const [{ email }, forgotPassword, isPending] = useForgotPassword({
-    onError: async (error) => toast.danger(error.message || error.statusText),
-    onSuccess: async () =>
-      toast.success(localization.auth.passwordResetEmailSent)
+    onError: (error) => toast.danger(error.message || error.statusText),
+    onSuccess: () => toast.success(localization.auth.passwordResetEmailSent)
   })
 
   return (

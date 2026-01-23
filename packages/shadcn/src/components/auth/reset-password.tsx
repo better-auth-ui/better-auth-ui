@@ -3,6 +3,7 @@
 import { useAuth } from "@better-auth-ui/react"
 import { Eye, EyeOff } from "lucide-react"
 import { useEffect, useState } from "react"
+import { toast } from "sonner"
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -35,17 +36,13 @@ export type ResetPasswordProps = {
  * @returns The password reset form UI ready to be mounted in the app layout.
  */
 export function ResetPassword({ className }: ResetPasswordProps) {
-  const {
-    basePaths,
-    emailAndPassword,
-    localization,
-    viewPaths,
-    navigate,
-    toast,
-    Link
-  } = useAuth()
+  const { basePaths, emailAndPassword, localization, viewPaths, navigate, Link } =
+    useAuth()
   const [{ password, confirmPassword }, resetPassword, isPending] =
-    useResetPassword()
+    useResetPassword({
+      onError: (error) => toast.error(error.message || error.statusText),
+      onSuccess: () => toast.success(localization.auth.passwordResetSuccess)
+    })
 
   const [isPasswordVisible, setIsPasswordVisible] = useState(false)
   const [isConfirmPasswordVisible, setIsConfirmPasswordVisible] =
@@ -68,8 +65,7 @@ export function ResetPassword({ className }: ResetPasswordProps) {
     basePaths.auth,
     localization.auth.invalidResetPasswordToken,
     viewPaths.auth.signIn,
-    navigate,
-    toast
+    navigate
   ])
 
   return (

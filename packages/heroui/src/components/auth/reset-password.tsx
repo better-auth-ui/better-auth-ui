@@ -12,10 +12,10 @@ import {
   Label,
   Link,
   Spinner,
-  TextField
+  TextField,
+  toast
 } from "@heroui/react"
 import { useEffect, useState } from "react"
-import { toast } from "sonner"
 
 import { cn } from "../../lib/utils"
 
@@ -38,7 +38,10 @@ export function ResetPassword({
     useAuth()
 
   const [{ password, confirmPassword }, resetPassword, isPending] =
-    useResetPassword()
+    useResetPassword({
+      onError: (error) => toast.danger(error.message || error.statusText),
+      onSuccess: () => toast.success(localization.auth.passwordResetSuccess)
+    })
 
   const [isPasswordVisible, setIsPasswordVisible] = useState(false)
   const [isConfirmPasswordVisible, setIsConfirmPasswordVisible] =
@@ -49,7 +52,7 @@ export function ResetPassword({
     const tokenParam = searchParams.get("token")
 
     if (!tokenParam) {
-      toast.error(localization.auth.invalidResetPasswordToken)
+      toast.danger(localization.auth.invalidResetPasswordToken)
       navigate({ href: `${basePaths.auth}/${viewPaths.auth.signIn}` })
     }
   }, [
