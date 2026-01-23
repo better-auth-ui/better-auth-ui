@@ -13,7 +13,8 @@ import {
   Label,
   Link,
   Spinner,
-  TextField
+  TextField,
+  toast
 } from "@heroui/react"
 import { useState } from "react"
 
@@ -61,7 +62,9 @@ export function SignUp({
     signUpPending
   ] = useSignUpEmail()
 
-  const [_, signInSocial, socialPending] = useSignInSocial()
+  const [_, signInSocial, socialPending] = useSignInSocial({
+    onError: (error) => toast.danger(error.message || error.statusText)
+  })
 
   const [isPasswordVisible, setIsPasswordVisible] = useState(false)
   const [isConfirmPasswordVisible, setIsConfirmPasswordVisible] =

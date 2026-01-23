@@ -3,6 +3,7 @@
 import { useAuth } from "@better-auth-ui/react"
 import { Eye, EyeOff } from "lucide-react"
 import { useState } from "react"
+import { toast } from "sonner"
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -67,7 +68,9 @@ export function SignUp({
     signUpEmail,
     signUpPending
   ] = useSignUpEmail()
-  const [_, signInSocial, socialPending] = useSignInSocial()
+  const [_, signInSocial, socialPending] = useSignInSocial({
+    onError: (error) => toast.error(error.message || error.statusText)
+  })
 
   const isPending = signUpPending || socialPending
 

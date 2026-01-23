@@ -50,7 +50,9 @@ export function MagicLink({
     onError: (error) => toast.danger(error.message || error.statusText),
     onSuccess: () => toast.success(localization.auth.magicLinkSent)
   })
-  const [_, signInSocial, socialPending] = useSignInSocial()
+  const [_, signInSocial, socialPending] = useSignInSocial({
+    onError: (error) => toast.danger(error.message || error.statusText)
+  })
 
   const isPending = magicLinkPending || socialPending
 

@@ -11,7 +11,8 @@ import {
   Label,
   Link,
   Spinner,
-  TextField
+  TextField,
+  toast
 } from "@heroui/react"
 
 import { cn } from "../../lib/utils"
@@ -47,7 +48,9 @@ export function SignIn({
     viewPaths
   } = useAuth()
   const [{ email, password }, signInEmail, signInPending] = useSignInEmail()
-  const [_, signInSocial, socialPending] = useSignInSocial()
+  const [_, signInSocial, socialPending] = useSignInSocial({
+    onError: (error) => toast.danger(error.message || error.statusText)
+  })
 
   const isPending = signInPending || socialPending
 

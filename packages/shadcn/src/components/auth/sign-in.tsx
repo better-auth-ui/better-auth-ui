@@ -2,6 +2,7 @@
 
 import { useAuth } from "@better-auth-ui/react"
 import { useState } from "react"
+import { toast } from "sonner"
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -53,7 +54,9 @@ export function SignIn({
   } = useAuth()
 
   const [{ email, password }, signInEmail, signInPending] = useSignInEmail()
-  const [_, signInSocial, socialPending] = useSignInSocial()
+  const [_, signInSocial, socialPending] = useSignInSocial({
+    onError: (error) => toast.error(error.message || error.statusText)
+  })
 
   const isPending = signInPending || socialPending
 
