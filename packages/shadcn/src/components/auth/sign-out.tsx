@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useRef } from "react"
+import { toast } from "sonner"
 
 import { Card, CardContent } from "@/components/ui/card"
 import { Spinner } from "@/components/ui/spinner"
@@ -18,7 +19,9 @@ export type SignOutProps = {
  * @returns The loading Card element shown during sign-out
  */
 export function SignOut({ className }: SignOutProps) {
-  const { signOut } = useSignOut()
+  const { signOut } = useSignOut({
+    onError: (error) => toast.error(error.message || error.statusText)
+  })
 
   const hasSignedOut = useRef(false)
 

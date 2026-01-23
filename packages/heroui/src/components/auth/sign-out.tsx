@@ -1,5 +1,5 @@
 import { useSignOut } from "@better-auth-ui/react"
-import { Card, type CardProps, Spinner } from "@heroui/react"
+import { Card, type CardProps, Spinner, toast } from "@heroui/react"
 import { useEffect, useRef } from "react"
 
 import { cn } from "../../lib/utils"
@@ -15,7 +15,9 @@ export type SignOutProps = {
  * @returns A Card containing a centered Spinner shown during the sign-out process
  */
 export function SignOut({ className, ...props }: SignOutProps & CardProps) {
-  const { signOut } = useSignOut()
+  const { signOut } = useSignOut({
+    onError: (error) => toast.danger(error.message || error.statusText)
+  })
 
   const hasSignedOut = useRef(false)
 
