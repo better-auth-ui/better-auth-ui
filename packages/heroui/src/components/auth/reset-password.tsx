@@ -167,9 +167,8 @@ export function ResetPassword({
               </Button>
             </Fieldset.Actions>
 
-            <Description className="flex justify-center gap-1.5 text-foreground text-sm">
-              {localization.auth.rememberYourPassword}
-
+            <Description className="text-center text-sm">
+              {localization.auth.rememberYourPassword}{" "}
               <Link
                 href={`${basePaths.auth}/${viewPaths.auth.signIn}`}
                 className="text-accent decoration-accent no-underline hover:underline"

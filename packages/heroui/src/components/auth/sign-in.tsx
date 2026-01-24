@@ -209,7 +209,7 @@ export function SignIn({
         )}
 
         {emailAndPassword?.enabled && (
-          <Description className="justify-center text-foreground text-sm">
+          <Description className="justify-center text-sm">
             {localization.auth.needToCreateAnAccount}{" "}
             <Link
               href={`${basePaths.auth}/${viewPaths.auth.signUp}`}

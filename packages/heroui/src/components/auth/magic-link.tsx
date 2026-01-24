@@ -132,9 +132,8 @@ export function MagicLink({
             </>
           )}
 
-          <Description className="flex justify-center gap-1.5 text-foreground text-sm">
-            {localization.auth.needToCreateAnAccount}
-
+          <Description className="text-center text-sm">
+            {localization.auth.needToCreateAnAccount}{" "}
             <Link
               href={`${basePaths.auth}/${viewPaths.auth.signUp}`}
               className="text-accent decoration-accent no-underline hover:underline"

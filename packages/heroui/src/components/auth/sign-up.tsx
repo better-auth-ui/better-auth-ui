@@ -272,9 +272,8 @@ export function SignUp({
           )}
 
           {emailAndPassword?.enabled && (
-            <Description className="flex justify-center gap-1.5 text-foreground text-sm">
-              {localization.auth.alreadyHaveAnAccount}
-
+            <Description className="text-center text-sm">
+              {localization.auth.alreadyHaveAnAccount}{" "}
               <Link
                 href={`${basePaths.auth}/${viewPaths.auth.signIn}`}
                 className="text-accent decoration-accent no-underline hover:underline"
