@@ -31,7 +31,7 @@ export function SignOut({ className, ...props }: SignOutProps & CardProps) {
   return (
     <Card
       variant="transparent"
-      className={cn("w-full max-w-sm p-4 md:p-6 gap-6", className)}
+      className={cn("w-full max-w-sm", className)}
       {...props}
     >
       <Spinner className="mx-auto my-auto" color="current" />

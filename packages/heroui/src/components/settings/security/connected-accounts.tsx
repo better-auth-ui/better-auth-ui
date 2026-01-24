@@ -41,7 +41,7 @@ export function ConnectedAccounts({
   const { unlinkAccount, unlinkingProvider } = useUnlinkAccount()
 
   return (
-    <Card className={cn("p-4 md:p-6 gap-4 md:gap-6", className)} {...props}>
+    <Card className={cn("p-4 md:p-6 gap-4", className)} {...props}>
       <Card.Header>
         <Card.Title className="text-xl">
           {localization.settings.connectedAccounts}

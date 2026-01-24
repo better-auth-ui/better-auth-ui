@@ -46,7 +46,7 @@ export function ChangePassword({
 
   return (
     <Card
-      className={cn("p-4 md:p-6 gap-4 md:gap-6", className)}
+      className={cn("p-4 md:p-6 gap-4", className)}
       variant={variant}
       {...props}
     >
@@ -56,83 +56,41 @@ export function ChangePassword({
         </Card.Title>
       </Card.Header>
 
-      <Form action={formAction}>
-        <Fieldset className="w-full gap-4 md:gap-6">
-          <Fieldset.Group>
-            <TextField
-              name="currentPassword"
-              type="password"
-              isDisabled={isPending || !sessionData}
-            >
-              <Label>{localization.settings.currentPassword}</Label>
+      <Card.Content>
+        <Form action={formAction}>
+          <Fieldset className="w-full gap-4">
+            <Fieldset.Group>
+              <TextField
+                name="currentPassword"
+                type="password"
+                isDisabled={isPending || !sessionData}
+              >
+                <Label>{localization.settings.currentPassword}</Label>
 
-              {sessionData ? (
-                <Input
-                  autoComplete="current-password"
-                  placeholder={localization.settings.currentPasswordPlaceholder}
-                  required
-                  variant={variant === "transparent" ? "primary" : "secondary"}
-                />
-              ) : (
-                <Skeleton className="h-10 md:h-9 w-full rounded-xl" />
-              )}
-
-              <FieldError />
-            </TextField>
-
-            <TextField
-              minLength={emailAndPassword?.minPasswordLength}
-              maxLength={emailAndPassword?.maxPasswordLength}
-              isDisabled={isPending || !sessionData}
-            >
-              <Label>{localization.auth.newPassword}</Label>
-
-              {sessionData ? (
-                <InputGroup
-                  variant={variant === "transparent" ? "primary" : "secondary"}
-                >
-                  <InputGroup.Input
-                    name="newPassword"
-                    type={isNewPasswordVisible ? "text" : "password"}
-                    autoComplete="new-password"
-                    placeholder={localization.auth.newPasswordPlaceholder}
+                {sessionData ? (
+                  <Input
+                    autoComplete="current-password"
+                    placeholder={
+                      localization.settings.currentPasswordPlaceholder
+                    }
                     required
+                    variant={
+                      variant === "transparent" ? "primary" : "secondary"
+                    }
                   />
+                ) : (
+                  <Skeleton className="h-10 md:h-9 w-full rounded-xl" />
+                )}
 
-                  <InputGroup.Suffix className="px-0">
-                    <Button
-                      isIconOnly
-                      aria-label={
-                        isNewPasswordVisible
-                          ? localization.auth.hidePassword
-                          : localization.auth.showPassword
-                      }
-                      size="sm"
-                      variant="ghost"
-                      onPress={() =>
-                        setIsNewPasswordVisible(!isNewPasswordVisible)
-                      }
-                      isDisabled={isPending}
-                    >
-                      {isNewPasswordVisible ? <EyeSlash /> : <Eye />}
-                    </Button>
-                  </InputGroup.Suffix>
-                </InputGroup>
-              ) : (
-                <Skeleton className="h-10 md:h-9 w-full rounded-xl" />
-              )}
+                <FieldError />
+              </TextField>
 
-              <FieldError />
-            </TextField>
-
-            {emailAndPassword?.confirmPassword && (
               <TextField
                 minLength={emailAndPassword?.minPasswordLength}
                 maxLength={emailAndPassword?.maxPasswordLength}
                 isDisabled={isPending || !sessionData}
-                isRequired
               >
-                <Label>{localization.auth.confirmPassword}</Label>
+                <Label>{localization.auth.newPassword}</Label>
 
                 {sessionData ? (
                   <InputGroup
@@ -141,10 +99,10 @@ export function ChangePassword({
                     }
                   >
                     <InputGroup.Input
-                      name="confirmPassword"
-                      type={isConfirmPasswordVisible ? "text" : "password"}
+                      name="newPassword"
+                      type={isNewPasswordVisible ? "text" : "password"}
                       autoComplete="new-password"
-                      placeholder={localization.auth.confirmPasswordPlaceholder}
+                      placeholder={localization.auth.newPasswordPlaceholder}
                       required
                     />
 
@@ -152,18 +110,18 @@ export function ChangePassword({
                       <Button
                         isIconOnly
                         aria-label={
-                          isConfirmPasswordVisible
+                          isNewPasswordVisible
                             ? localization.auth.hidePassword
                             : localization.auth.showPassword
                         }
                         size="sm"
                         variant="ghost"
                         onPress={() =>
-                          setIsConfirmPasswordVisible(!isConfirmPasswordVisible)
+                          setIsNewPasswordVisible(!isNewPasswordVisible)
                         }
                         isDisabled={isPending}
                       >
-                        {isConfirmPasswordVisible ? <EyeSlash /> : <Eye />}
+                        {isNewPasswordVisible ? <EyeSlash /> : <Eye />}
                       </Button>
                     </InputGroup.Suffix>
                   </InputGroup>
@@ -173,22 +131,76 @@ export function ChangePassword({
 
                 <FieldError />
               </TextField>
-            )}
-          </Fieldset.Group>
 
-          <Fieldset.Actions>
-            <Button
-              type="submit"
-              isPending={isPending}
-              isDisabled={!sessionData}
-            >
-              {isPending ? <Spinner color="current" size="sm" /> : <Check />}
+              {emailAndPassword?.confirmPassword && (
+                <TextField
+                  minLength={emailAndPassword?.minPasswordLength}
+                  maxLength={emailAndPassword?.maxPasswordLength}
+                  isDisabled={isPending || !sessionData}
+                  isRequired
+                >
+                  <Label>{localization.auth.confirmPassword}</Label>
 
-              {localization.settings.updatePassword}
-            </Button>
-          </Fieldset.Actions>
-        </Fieldset>
-      </Form>
+                  {sessionData ? (
+                    <InputGroup
+                      variant={
+                        variant === "transparent" ? "primary" : "secondary"
+                      }
+                    >
+                      <InputGroup.Input
+                        name="confirmPassword"
+                        type={isConfirmPasswordVisible ? "text" : "password"}
+                        autoComplete="new-password"
+                        placeholder={
+                          localization.auth.confirmPasswordPlaceholder
+                        }
+                        required
+                      />
+
+                      <InputGroup.Suffix className="px-0">
+                        <Button
+                          isIconOnly
+                          aria-label={
+                            isConfirmPasswordVisible
+                              ? localization.auth.hidePassword
+                              : localization.auth.showPassword
+                          }
+                          size="sm"
+                          variant="ghost"
+                          onPress={() =>
+                            setIsConfirmPasswordVisible(
+                              !isConfirmPasswordVisible
+                            )
+                          }
+                          isDisabled={isPending}
+                        >
+                          {isConfirmPasswordVisible ? <EyeSlash /> : <Eye />}
+                        </Button>
+                      </InputGroup.Suffix>
+                    </InputGroup>
+                  ) : (
+                    <Skeleton className="h-10 md:h-9 w-full rounded-xl" />
+                  )}
+
+                  <FieldError />
+                </TextField>
+              )}
+            </Fieldset.Group>
+
+            <Fieldset.Actions>
+              <Button
+                type="submit"
+                isPending={isPending}
+                isDisabled={!sessionData}
+              >
+                {isPending ? <Spinner color="current" size="sm" /> : <Check />}
+
+                {localization.settings.updatePassword}
+              </Button>
+            </Fieldset.Actions>
+          </Fieldset>
+        </Form>
+      </Card.Content>
     </Card>
   )
 }

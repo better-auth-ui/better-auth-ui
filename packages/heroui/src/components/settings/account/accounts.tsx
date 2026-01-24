@@ -42,7 +42,7 @@ export function Accounts({ className, ...props }: AccountsProps & CardProps) {
   const { revokingSession, revokeSession } = useRevokeMultiSession()
 
   return (
-    <Card className={cn("p-4 md:p-6 gap-4 md:gap-6", className)} {...props}>
+    <Card className={cn("p-4 md:p-6 gap-4", className)} {...props}>
       <Card.Header>
         <Card.Title className="text-xl">
           {localization.settings.accounts}
@@ -113,10 +113,7 @@ export function Accounts({ className, ...props }: AccountsProps & CardProps) {
       <Card.Footer>
         <Link
           href={`${basePaths.auth}/${viewPaths.auth.signIn}`}
-          className={cn(
-            buttonVariants({ variant: "secondary" }),
-            isPending && "status-disabled"
-          )}
+          className={cn(buttonVariants({ variant: "secondary" }))}
         >
           <CirclePlus />
 

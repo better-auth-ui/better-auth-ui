@@ -88,8 +88,8 @@ export function SignIn({
       variant={variant}
       {...props}
     >
-      <Card.Header className="text-xl font-medium">
-        {localization.auth.signIn}
+      <Card.Header>
+        <Card.Title className="text-xl">{localization.auth.signIn}</Card.Title>
       </Card.Header>
 
       <Card.Content className="gap-4">
