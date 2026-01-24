@@ -15,6 +15,7 @@ import { Button } from "@/components/ui/button"
 import { Item } from "@/components/ui/item"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Spinner } from "@/components/ui/spinner"
+import { cn } from "@/lib/utils"
 
 export type ConnectedAccountProps = {
   account?: Account
@@ -52,12 +53,15 @@ export function ConnectedAccount({ account, provider }: ConnectedAccountProps) {
     account?.accountId
 
   return (
-    <Item className="p-3 gap-3" variant="outline">
+    <Item
+      className={cn("p-3 gap-3", !account && "border-dashed")}
+      variant="outline"
+    >
       <div className="flex size-10 items-center justify-center rounded-md bg-muted">
         {ProviderIcon ? (
-          <ProviderIcon className="size-5" />
+          <ProviderIcon className={cn("size-5", !account && "opacity-50")} />
         ) : (
-          <Plug className="size-5" />
+          <Plug className={cn("size-5", !account && "opacity-50")} />
         )}
       </div>
 
