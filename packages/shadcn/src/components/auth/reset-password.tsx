@@ -75,8 +75,8 @@ export function ResetPassword({ className }: ResetPasswordProps) {
   ])
 
   return (
-    <Card className={cn("w-full max-w-sm py-4 md:py-6", className)}>
-      <CardHeader className="px-4 md:px-6 -mb-4">
+    <Card className={cn("w-full max-w-sm py-4 md:py-6 gap-4", className)}>
+      <CardHeader className="px-4 md:px-6 gap-0">
         <CardTitle className="text-xl">
           {localization.auth.resetPassword}
         </CardTitle>
@@ -210,9 +210,8 @@ export function ResetPassword({ className }: ResetPasswordProps) {
               </Button>
             </Field>
 
-            <FieldDescription className="flex justify-center gap-1">
-              {localization.auth.rememberYourPassword}
-
+            <FieldDescription className="text-center">
+              {localization.auth.rememberYourPassword}{" "}
               <Link
                 href={`${basePaths.auth}/${viewPaths.auth.signIn}`}
                 className="underline underline-offset-4"

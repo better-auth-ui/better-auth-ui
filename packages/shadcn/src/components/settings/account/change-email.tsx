@@ -45,14 +45,14 @@ export function ChangeEmail({ className }: ChangeEmailProps) {
 
   return (
     <form action={formAction}>
-      <Card className={cn("w-full py-4 md:py-6 gap-4 md:gap-6", className)}>
+      <Card className={cn("w-full py-4 md:py-6 gap-4", className)}>
         <CardHeader className="px-4 md:px-6 gap-0">
           <CardTitle className="text-xl">
             {localization.settings.changeEmail}
           </CardTitle>
         </CardHeader>
 
-        <CardContent className="px-4 md:px-6 grid gap-4 md:gap-6">
+        <CardContent className="px-4 md:px-6">
           <Field className="gap-1">
             <FieldLabel htmlFor="email">{localization.auth.email}</FieldLabel>
 

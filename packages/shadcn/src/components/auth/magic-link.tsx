@@ -61,8 +61,8 @@ export function MagicLink({
   const showSeparator = socialProviders && socialProviders.length > 0
 
   return (
-    <Card className={cn("w-full max-w-sm py-4 md:py-6", className)}>
-      <CardHeader className="px-4 md:px-6 -mb-4">
+    <Card className={cn("w-full max-w-sm py-4 md:py-6 gap-4", className)}>
+      <CardHeader className="px-4 md:px-6 gap-0">
         <CardTitle className="text-xl">{localization.auth.signIn}</CardTitle>
       </CardHeader>
 
@@ -157,9 +157,8 @@ export function MagicLink({
             </>
           )}
 
-          <FieldDescription className="flex justify-center gap-1">
-            {localization.auth.needToCreateAnAccount}
-
+          <FieldDescription className="text-center">
+            {localization.auth.needToCreateAnAccount}{" "}
             <Link
               href={`${basePaths.auth}/${viewPaths.auth.signUp}`}
               className="underline underline-offset-4"

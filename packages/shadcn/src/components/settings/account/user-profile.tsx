@@ -46,14 +46,14 @@ export function UserProfile({ className }: UserProfileProps) {
 
   return (
     <form action={formAction}>
-      <Card className={cn("w-full py-4 md:py-6 gap-4 md:gap-6", className)}>
+      <Card className={cn("w-full py-4 md:py-6 gap-4", className)}>
         <CardHeader className="px-4 md:px-6 gap-0">
           <CardTitle className="text-xl">
             {localization.settings.profile}
           </CardTitle>
         </CardHeader>
 
-        <CardContent className="px-4 md:px-6 grid gap-4 md:gap-6">
+        <CardContent className="px-4 md:px-6 grid gap-4">
           <div className="flex items-center gap-2.5">
             <Button
               type="button"

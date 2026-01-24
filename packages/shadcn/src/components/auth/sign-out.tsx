@@ -36,7 +36,7 @@ export function SignOut({ className }: SignOutProps) {
     <Card
       className={cn("w-full max-w-sm bg-transparent border-none", className)}
     >
-      <CardContent className="flex items-center justify-center min-h-[200px]">
+      <CardContent className="flex items-center justify-center">
         <Spinner className="mx-auto my-auto" />
       </CardContent>
     </Card>
