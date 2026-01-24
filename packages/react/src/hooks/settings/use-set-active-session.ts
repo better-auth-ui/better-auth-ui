@@ -43,9 +43,10 @@ export function useSetActiveSession() {
         toast.error(error.message || error.statusText)
       } else {
         window.scrollTo({ top: 0 })
-        await refetchSession()
-        await refetchDeviceSessions()
       }
+
+      await refetchSession()
+      await refetchDeviceSessions()
 
       setSettingActiveSession(null)
     },
