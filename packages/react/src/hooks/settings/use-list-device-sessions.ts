@@ -23,12 +23,7 @@ export function useListDeviceSessions(
   const { data: sessionData } = useSession()
 
   return useQuery<DeviceSession[], AuthError>({
-    queryKey: [
-      "auth",
-      "multiSession",
-      "listDeviceSessions",
-      sessionData?.user.id
-    ],
+    queryKey: ["auth", "multiSession", "listDeviceSessions"],
     queryFn: () =>
       authClient.multiSession.listDeviceSessions({
         fetchOptions: { throw: true }

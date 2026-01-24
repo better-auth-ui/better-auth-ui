@@ -1,4 +1,9 @@
-import { useAuth, useSession } from "@better-auth-ui/react"
+import {
+  useAuth,
+  useListDeviceSessions,
+  useSession
+} from "@better-auth-ui/react"
+import { useQueryClient } from "@tanstack/react-query"
 import { useCallback, useState } from "react"
 
 /**
@@ -7,8 +12,11 @@ import { useCallback, useState } from "react"
  * @returns An object with `settingActiveSession` — the session token currently being set or `null`, and `setActiveSession(sessionToken)` — function that makes the given session token the active session.
  */
 export function useSetActiveSession() {
+  const queryClient = useQueryClient()
   const { authClient, toast } = useAuth()
-  const { refetch } = useSession()
+  const { data: sessionData, refetch: refetchSession } = useSession()
+  const { data: deviceSessions, refetch: refetchDeviceSessions } =
+    useListDeviceSessions()
 
   const [settingActiveSession, setSettingActiveSession] = useState<
     string | null
@@ -22,16 +30,34 @@ export function useSetActiveSession() {
         sessionToken
       })
 
+      const deviceSession = deviceSessions?.find(
+        (session) => session.session.token === sessionToken
+      )
+
+      if (deviceSession) {
+        queryClient.setQueryData(["auth", "getSession"], deviceSession)
+      }
+
       if (error) {
+        queryClient.setQueryData(["auth", "getSession"], sessionData)
         toast.error(error.message || error.statusText)
       } else {
         window.scrollTo({ top: 0 })
-        await refetch()
+        await refetchSession()
+        await refetchDeviceSessions()
       }
 
       setSettingActiveSession(null)
     },
-    [authClient, toast, refetch]
+    [
+      authClient,
+      toast,
+      refetchSession,
+      refetchDeviceSessions,
+      deviceSessions,
+      queryClient,
+      sessionData
+    ]
   )
 
   return { settingActiveSession, setActiveSession }
