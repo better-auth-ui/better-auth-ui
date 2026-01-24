@@ -57,7 +57,7 @@ export function ConnectedAccount({ account, provider }: ConnectedAccountProps) {
         {ProviderIcon ? (
           <ProviderIcon className={cn("size-5", !account && "opacity-50")} />
         ) : (
-          <PlugConnection className="size-5" />
+          <PlugConnection className={cn("size-5", !account && "opacity-50")} />
         )}
       </div>
 
