@@ -7,7 +7,7 @@ import {
   useUnlinkAccount
 } from "@better-auth-ui/react"
 import { Link, PlugConnection, Xmark } from "@gravity-ui/icons"
-import { Button, Card, Skeleton, Spinner } from "@heroui/react"
+import { Button, Card, cn, Skeleton, Spinner } from "@heroui/react"
 import type { Account, SocialProvider } from "better-auth"
 
 export type ConnectedAccountProps = {
@@ -47,10 +47,15 @@ export function ConnectedAccount({ account, provider }: ConnectedAccountProps) {
     account?.accountId
 
   return (
-    <Card className="flex-row items-center border p-3 shadow-none">
+    <Card
+      className={cn(
+        "flex-row items-center border p-3 shadow-none",
+        !account && "border-dashed"
+      )}
+    >
       <div className="flex size-10 items-center justify-center rounded-xl bg-surface-secondary">
         {ProviderIcon ? (
-          <ProviderIcon className="size-5" />
+          <ProviderIcon className={cn("size-5", !account && "opacity-50")} />
         ) : (
           <PlugConnection className="size-5" />
         )}
