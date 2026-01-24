@@ -1,5 +1,4 @@
-import { useAuth } from "@better-auth-ui/react"
-import { useQueryClient } from "@tanstack/react-query"
+import { useAuth, useSession } from "@better-auth-ui/react"
 import { useCallback, useState } from "react"
 
 /**
@@ -8,8 +7,8 @@ import { useCallback, useState } from "react"
  * @returns An object with `settingActiveSession` — the session token currently being set or `null`, and `setActiveSession(sessionToken)` — function that makes the given session token the active session.
  */
 export function useSetActiveSession() {
-  const queryClient = useQueryClient()
   const { authClient, toast } = useAuth()
+  const { refetch } = useSession()
 
   const [settingActiveSession, setSettingActiveSession] = useState<
     string | null
@@ -27,13 +26,12 @@ export function useSetActiveSession() {
         toast.error(error.message || error.statusText)
       } else {
         window.scrollTo({ top: 0 })
-
-        await queryClient.resetQueries({ queryKey: ["auth"] })
+        await refetch()
       }
 
       setSettingActiveSession(null)
     },
-    [authClient, queryClient, toast]
+    [authClient, toast, refetch]
   )
 
   return { settingActiveSession, setActiveSession }

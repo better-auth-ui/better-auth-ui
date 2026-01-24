@@ -1,6 +1,5 @@
-import { useAuth } from "@better-auth-ui/react"
+import { useAuth, useSession } from "@better-auth-ui/react"
 import type { AuthCallbackOptions } from "@better-auth-ui/react/core"
-import { useQueryClient } from "@tanstack/react-query"
 import { useActionState } from "react"
 
 /**
@@ -17,7 +16,6 @@ export function useSignUpEmail({
   onError,
   onSuccess
 }: AuthCallbackOptions = {}) {
-  const queryClient = useQueryClient()
   const {
     authClient,
     basePaths,
@@ -28,6 +26,8 @@ export function useSignUpEmail({
     viewPaths,
     navigate
   } = useAuth()
+
+  const { refetch } = useSession()
 
   const signUpEmail = async (_: object, formData: FormData) => {
     const name = formData.get("name") as string
@@ -74,7 +74,7 @@ export function useSignUpEmail({
       toast.success(localization.auth.verifyYourEmail)
       navigate({ to: `${basePaths.auth}/${viewPaths.auth.signIn}` })
     } else {
-      await queryClient.invalidateQueries({ queryKey: ["auth"] })
+      await refetch()
 
       navigate({ to: redirectTo })
     }

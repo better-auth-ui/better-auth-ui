@@ -1,6 +1,5 @@
-import { useAuth } from "@better-auth-ui/react"
+import { useAuth, useSession } from "@better-auth-ui/react"
 import type { AuthCallbackOptions } from "@better-auth-ui/react/core"
-import { useQueryClient } from "@tanstack/react-query"
 import { useActionState } from "react"
 
 /**
@@ -16,7 +15,7 @@ export function useSignInEmail({
   onSuccess
 }: AuthCallbackOptions = {}) {
   const { authClient, emailAndPassword, redirectTo, navigate } = useAuth()
-  const queryClient = useQueryClient()
+  const { refetch } = useSession()
 
   const signInEmail = async (_: object, formData: FormData) => {
     const email = formData.get("email") as string
@@ -39,8 +38,7 @@ export function useSignInEmail({
     }
 
     await onSuccess?.()
-
-    await queryClient.invalidateQueries({ queryKey: ["auth"] })
+    await refetch()
 
     navigate({ to: redirectTo })
 

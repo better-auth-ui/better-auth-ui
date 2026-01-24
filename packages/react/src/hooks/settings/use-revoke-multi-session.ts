@@ -1,5 +1,4 @@
-import { useAuth } from "@better-auth-ui/react"
-import { useQueryClient } from "@tanstack/react-query"
+import { useAuth, useListDeviceSessions } from "@better-auth-ui/react"
 import { useCallback, useState } from "react"
 
 /**
@@ -10,9 +9,8 @@ import { useCallback, useState } from "react"
  * - `revokeSession(sessionToken)` — function that revokes the session identified by `sessionToken`.
  */
 export function useRevokeMultiSession() {
-  const queryClient = useQueryClient()
   const { authClient, toast } = useAuth()
-
+  const { refetch } = useListDeviceSessions()
   const [revokingSession, setRevokingSession] = useState<string | null>(null)
 
   const revokeSession = useCallback(
@@ -26,12 +24,12 @@ export function useRevokeMultiSession() {
       if (error) {
         toast.error(error.message || error.statusText)
       } else {
-        await queryClient.invalidateQueries({ queryKey: ["auth"] })
+        await refetch()
       }
 
       setRevokingSession(null)
     },
-    [authClient, queryClient, toast]
+    [authClient, refetch, toast]
   )
 
   return { revokingSession, revokeSession }

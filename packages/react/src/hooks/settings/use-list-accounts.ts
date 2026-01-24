@@ -19,7 +19,7 @@ export function useListAccounts(
   const { data: sessionData } = useSession()
 
   return useQuery<Account[], AuthError>({
-    queryKey: ["auth", "listAccounts"],
+    queryKey: ["auth", "listAccounts", sessionData?.user.id],
     queryFn: () =>
       authClient.listAccounts({
         fetchOptions: { throw: true }

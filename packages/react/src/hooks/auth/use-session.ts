@@ -18,9 +18,9 @@ export function useSession(
   const { authClient } = useAuth()
 
   return useQuery<AuthClient["$Infer"]["Session"] | null, AuthError>({
-    queryKey: ["auth", "session"],
-    queryFn: async () =>
-      await authClient.getSession({
+    queryKey: ["auth", "getSession"],
+    queryFn: () =>
+      authClient.getSession({
         fetchOptions: { throw: true }
       }),
     ...(options as object)

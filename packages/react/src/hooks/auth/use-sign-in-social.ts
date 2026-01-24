@@ -32,6 +32,7 @@ export function useSignInSocial({
       await onError?.(error)
     } else {
       await onSuccess?.()
+      await new Promise((resolve) => setTimeout(resolve, 10000))
     }
 
     return { provider }

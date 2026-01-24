@@ -18,7 +18,7 @@ export function useListSessions(
   const { data: sessionData } = useSession()
 
   return useQuery<Session[], AuthError>({
-    queryKey: ["auth", "listSessions"],
+    queryKey: ["auth", "listSessions", sessionData?.user.id],
     queryFn: async () =>
       authClient.listSessions({
         fetchOptions: { throw: true }
