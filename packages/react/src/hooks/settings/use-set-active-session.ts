@@ -26,7 +26,9 @@ export function useSetActiveSession() {
       if (error) {
         toast.error(error.message || error.statusText)
       } else {
-        await queryClient.invalidateQueries({ queryKey: ["auth"] })
+        window.scrollTo({ top: 0 })
+
+        await queryClient.resetQueries({ queryKey: ["auth"] })
       }
 
       setSettingActiveSession(null)

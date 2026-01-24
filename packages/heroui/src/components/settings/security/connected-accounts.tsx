@@ -1,20 +1,7 @@
-import { getProviderName } from "@better-auth-ui/core"
-import {
-  providerIcons,
-  useAuth,
-  useLinkSocial,
-  useListAccounts,
-  useUnlinkAccount
-} from "@better-auth-ui/react"
-import { Link as LinkIcon, Xmark } from "@gravity-ui/icons"
-import {
-  Button,
-  Card,
-  type CardProps,
-  cn,
-  Skeleton,
-  Spinner
-} from "@heroui/react"
+import { useAuth, useListAccounts } from "@better-auth-ui/react"
+import { Card, type CardProps, cn, Skeleton, toast } from "@heroui/react"
+import { useEffect } from "react"
+import { ConnectedAccount } from "./connected-account"
 
 export type ConnectedAccountsProps = {
   className?: string
@@ -35,10 +22,11 @@ export function ConnectedAccounts({
   ...props
 }: ConnectedAccountsProps & CardProps) {
   const { localization, socialProviders } = useAuth()
+  const { data: accounts, isPending, error } = useListAccounts()
 
-  const { data: accounts, isPending } = useListAccounts()
-  const { linkSocial, linkingProvider } = useLinkSocial()
-  const { unlinkAccount, unlinkingProvider } = useUnlinkAccount()
+  useEffect(() => {
+    if (error) toast.danger(error.message || error.statusText)
+  }, [error])
 
   return (
     <Card className={cn("p-4 md:p-6 gap-4", className)} {...props}>
@@ -55,102 +43,16 @@ export function ConnectedAccounts({
           <>
             {accounts
               ?.filter((account) => account.providerId !== "credential")
-              .map((account) => {
-                const ProviderIcon = providerIcons[account.providerId]
-                const providerName = getProviderName(account.providerId)
-                const isCurrentlyUnlinking =
-                  unlinkingProvider === account.providerId
-
-                return (
-                  <Card
-                    key={account.id}
-                    className="flex-row items-center border p-3 shadow-none"
-                  >
-                    <div className="flex size-10 items-center justify-center rounded-xl bg-surface-secondary">
-                      {ProviderIcon && <ProviderIcon className="size-5" />}
-                    </div>
-
-                    <div className="flex flex-col">
-                      <span className="text-sm font-medium">
-                        {providerName}
-                      </span>
-
-                      {account.accountId && (
-                        <span className="text-xs text-muted">
-                          {account.accountId}
-                        </span>
-                      )}
-                    </div>
-
-                    <Button
-                      className="ml-auto"
-                      isIconOnly
-                      variant="ghost"
-                      size="sm"
-                      onPress={() => unlinkAccount(account.providerId)}
-                      isPending={!!unlinkingProvider || !!linkingProvider}
-                      aria-label={localization.settings.unlinkProvider.replace(
-                        "{{provider}}",
-                        providerName
-                      )}
-                    >
-                      {isCurrentlyUnlinking ? (
-                        <Spinner color="current" size="sm" />
-                      ) : (
-                        <Xmark />
-                      )}
-                    </Button>
-                  </Card>
-                )
-              })}
+              .map((account) => (
+                <ConnectedAccount
+                  key={account.id}
+                  account={account}
+                  provider={account.providerId}
+                />
+              ))}
 
             {socialProviders?.map((provider) => {
-              const ProviderIcon = providerIcons[provider]
-              const providerName = getProviderName(provider)
-              const isCurrentlyLinking = linkingProvider === provider
-
-              return (
-                <Card
-                  key={provider}
-                  className="flex-row items-center border border-dashed p-3 shadow-none"
-                >
-                  <div className="flex size-10 items-center justify-center rounded-xl bg-default">
-                    {ProviderIcon && (
-                      <ProviderIcon className="size-5 opacity-50" />
-                    )}
-                  </div>
-
-                  <div className="flex flex-col">
-                    <span className="text-sm font-medium">{providerName}</span>
-
-                    <span className="text-xs text-muted">
-                      {localization.settings.connectProvider.replace(
-                        "{{provider}}",
-                        providerName
-                      )}
-                    </span>
-                  </div>
-
-                  <Button
-                    className="ml-auto"
-                    isIconOnly
-                    variant="ghost"
-                    size="sm"
-                    onPress={() => linkSocial(provider)}
-                    isPending={!!linkingProvider || !!unlinkingProvider}
-                    aria-label={localization.settings.connectProvider.replace(
-                      "{{provider}}",
-                      providerName
-                    )}
-                  >
-                    {isCurrentlyLinking ? (
-                      <Spinner color="current" size="sm" />
-                    ) : (
-                      <LinkIcon />
-                    )}
-                  </Button>
-                </Card>
-              )
+              return <ConnectedAccount key={provider} provider={provider} />
             })}
           </>
         )}

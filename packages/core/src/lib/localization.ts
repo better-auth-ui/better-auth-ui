@@ -131,6 +131,9 @@ export const localization = {
     /** @remarks `"Active"` */
     active: "Active",
 
+    /** @remarks `"Connect"` */
+    connect: "Connect",
+
     /** @remarks `"Connected Accounts"` */
     connectedAccounts: "Connected Accounts",
 

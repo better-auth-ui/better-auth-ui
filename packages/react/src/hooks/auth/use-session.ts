@@ -1,3 +1,4 @@
+import type { AuthError } from "@better-auth-ui/core"
 import { type AuthClient, useAuth } from "@better-auth-ui/react"
 import {
   type UseQueryOptions,
@@ -12,14 +13,14 @@ import {
  * @returns The React Query result for the session query: `data` contains session information, `isLoading`/`isFetching` indicate loading state, and `error` contains any fetch error.
  */
 export function useSession(
-  options?: Partial<UseQueryOptions>
-): UseQueryResult<AuthClient["$Infer"]["Session"] | null> {
+  options?: Partial<UseQueryOptions<AuthClient["$Infer"]["Session"], AuthError>>
+): UseQueryResult<AuthClient["$Infer"]["Session"] | null, AuthError> {
   const { authClient } = useAuth()
 
-  return useQuery({
+  return useQuery<AuthClient["$Infer"]["Session"] | null, AuthError>({
     queryKey: ["auth", "session"],
-    queryFn: () =>
-      authClient.getSession({
+    queryFn: async () =>
+      await authClient.getSession({
         fetchOptions: { throw: true }
       }),
     ...(options as object)

@@ -1,5 +1,7 @@
+import type { AuthError } from "@better-auth-ui/core"
 import { useAuth, useSession } from "@better-auth-ui/react"
 import { type UseQueryOptions, useQuery } from "@tanstack/react-query"
+import type { Account } from "better-auth"
 
 /**
  * Retrieve the current user's linked social accounts.
@@ -10,12 +12,13 @@ import { type UseQueryOptions, useQuery } from "@tanstack/react-query"
  * @param options - Optional react-query / initial-data options forwarded to `useSession` and `useQuery`
  * @returns The react-query result containing linked accounts data, loading state, and error state
  */
-export function useListAccounts(options?: Partial<UseQueryOptions>) {
+export function useListAccounts(
+  options?: Partial<UseQueryOptions<Account[], AuthError>>
+) {
   const { authClient, socialProviders } = useAuth()
+  const { data: sessionData } = useSession()
 
-  const { data: sessionData } = useSession(options)
-
-  return useQuery({
+  return useQuery<Account[], AuthError>({
     queryKey: ["auth", "listAccounts"],
     queryFn: () =>
       authClient.listAccounts({

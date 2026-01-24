@@ -1,5 +1,5 @@
 import { useAuth, useChangeEmail, useSession } from "@better-auth-ui/react"
-import { Check } from "@gravity-ui/icons"
+import { Check, Envelope } from "@gravity-ui/icons"
 import {
   Button,
   Card,
@@ -8,7 +8,7 @@ import {
   FieldError,
   Fieldset,
   Form,
-  Input,
+  InputGroup,
   Label,
   Skeleton,
   Spinner,
@@ -64,14 +64,21 @@ export function ChangeEmail({
                 <Label>{localization.auth.email}</Label>
 
                 {sessionData ? (
-                  <Input
-                    required
-                    autoComplete="email"
-                    placeholder={localization.auth.emailPlaceholder}
+                  <InputGroup
                     variant={
                       variant === "transparent" ? "primary" : "secondary"
                     }
-                  />
+                  >
+                    <InputGroup.Prefix>
+                      <Envelope />
+                    </InputGroup.Prefix>
+
+                    <InputGroup.Input
+                      required
+                      autoComplete="email"
+                      placeholder={localization.auth.emailPlaceholder}
+                    />
+                  </InputGroup>
                 ) : (
                   <Skeleton className="h-10 md:h-9 w-full rounded-xl" />
                 )}

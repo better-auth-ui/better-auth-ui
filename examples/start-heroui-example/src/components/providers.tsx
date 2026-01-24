@@ -20,7 +20,7 @@ export function Providers({ children }: { children: ReactNode }) {
     <RouterProvider navigate={(path) => navigate({ to: path })}>
       <AuthProvider
         authClient={authClient}
-        socialProviders={["google", "github"]}
+        socialProviders={["github", "google"]}
         magicLink
         multiSession
         navigate={navigate}

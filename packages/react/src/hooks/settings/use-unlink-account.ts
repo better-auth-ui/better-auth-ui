@@ -15,13 +15,11 @@ export function useUnlinkAccount() {
   const { authClient, localization, toast } = useAuth()
   const { refetch } = useListAccounts()
 
-  const [unlinkingProvider, setUnlinkingProvider] = useState<string | null>(
-    null
-  )
+  const [isPending, setIsPending] = useState(false)
 
   const unlinkAccount = useCallback(
     async (providerId: string) => {
-      setUnlinkingProvider(providerId)
+      setIsPending(true)
 
       const { error } = await authClient.unlinkAccount({
         providerId
@@ -34,10 +32,10 @@ export function useUnlinkAccount() {
         toast.success(localization.settings.accountUnlinked)
       }
 
-      setUnlinkingProvider(null)
+      setIsPending(false)
     },
     [authClient, localization, refetch, toast]
   )
 
-  return { unlinkingProvider, unlinkAccount }
+  return { unlinkAccount, isPending }
 }

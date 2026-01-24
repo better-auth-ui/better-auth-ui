@@ -11,12 +11,11 @@ import { useCallback, useState } from "react"
  */
 export function useLinkSocial() {
   const { authClient, baseURL, toast } = useAuth()
-
-  const [linkingProvider, setLinkingProvider] = useState<string | null>(null)
+  const [isPending, setIsPending] = useState(false)
 
   const linkSocial = useCallback(
     async (provider: string) => {
-      setLinkingProvider(provider)
+      setIsPending(true)
 
       const callbackURL = `${baseURL}${window.location.pathname}`
 
@@ -29,10 +28,10 @@ export function useLinkSocial() {
         toast.error(error.message || error.statusText)
       }
 
-      setLinkingProvider(null)
+      setIsPending(false)
     },
     [authClient, baseURL, toast]
   )
 
-  return { linkingProvider, linkSocial }
+  return { linkSocial, isPending }
 }
