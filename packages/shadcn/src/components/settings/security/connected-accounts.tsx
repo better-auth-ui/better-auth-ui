@@ -1,17 +1,14 @@
 "use client"
 
-import { providerIcons, useAuth } from "@better-auth-ui/react"
-import { getProviderName } from "@better-auth-ui/react/core"
-import { Link, X } from "lucide-react"
+import { useAuth, useListAccounts } from "@better-auth-ui/react"
+import { useEffect } from "react"
+import { toast } from "sonner"
 
-import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Item } from "@/components/ui/item"
 import { Skeleton } from "@/components/ui/skeleton"
-import { Spinner } from "@/components/ui/spinner"
-import { useLinkSocial } from "@/hooks/settings/use-link-social"
-import { useListAccounts } from "@/hooks/settings/use-list-accounts"
-import { useUnlinkAccount } from "@/hooks/settings/use-unlink-account"
 import { cn } from "@/lib/utils"
+import { ConnectedAccount } from "./connected-account"
 
 export type ConnectedAccountsProps = {
   className?: string
@@ -28,9 +25,11 @@ export type ConnectedAccountsProps = {
  */
 export function ConnectedAccounts({ className }: ConnectedAccountsProps) {
   const { localization, socialProviders } = useAuth()
-  const { data: accounts, isPending } = useListAccounts()
-  const { linkSocial, linkingProvider } = useLinkSocial()
-  const { unlinkAccount, unlinkingProvider } = useUnlinkAccount()
+  const { data: accounts, isPending, error } = useListAccounts()
+
+  useEffect(() => {
+    if (error) toast.error(error.message || error.statusText)
+  }, [error])
 
   return (
     <Card className={cn("w-full py-4 md:py-6 gap-4", className)}>
@@ -47,112 +46,16 @@ export function ConnectedAccounts({ className }: ConnectedAccountsProps) {
           <>
             {accounts
               ?.filter((account) => account.providerId !== "credential")
-              .map((account) => {
-                const ProviderIcon = providerIcons[account.providerId]
-                const providerName = getProviderName(account.providerId)
-                const isCurrentlyUnlinking =
-                  unlinkingProvider === account.providerId
-
-                return (
-                  <div
-                    key={account.id}
-                    className="flex items-center rounded-lg border p-3 justify-between"
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className="flex size-10 items-center justify-center rounded-md bg-muted">
-                        {ProviderIcon && <ProviderIcon className="size-5" />}
-                      </div>
-
-                      <div className="flex flex-col">
-                        <span className="text-sm font-medium">
-                          {providerName}
-                        </span>
-
-                        {account.accountId && (
-                          <span className="text-xs text-muted-foreground">
-                            {account.accountId}
-                          </span>
-                        )}
-                      </div>
-                    </div>
-
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => unlinkAccount(account.providerId)}
-                      disabled={
-                        isCurrentlyUnlinking ||
-                        !!unlinkingProvider ||
-                        !!linkingProvider
-                      }
-                      aria-label={localization.settings.unlinkProvider.replace(
-                        "{{provider}}",
-                        providerName
-                      )}
-                    >
-                      {isCurrentlyUnlinking ? (
-                        <Spinner className="size-4" />
-                      ) : (
-                        <X className="size-4" />
-                      )}
-                    </Button>
-                  </div>
-                )
-              })}
+              .map((account) => (
+                <ConnectedAccount
+                  key={account.id}
+                  account={account}
+                  provider={account.providerId}
+                />
+              ))}
 
             {socialProviders?.map((provider) => {
-              const ProviderIcon = providerIcons[provider]
-              const providerName = getProviderName(provider)
-              const isCurrentlyLinking = linkingProvider === provider
-
-              return (
-                <div
-                  key={provider}
-                  className="flex items-center rounded-lg border border-dashed p-3 justify-between"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="flex size-10 items-center justify-center rounded-md bg-muted">
-                      {ProviderIcon && (
-                        <ProviderIcon className="size-5 opacity-50" />
-                      )}
-                    </div>
-
-                    <div className="flex flex-col">
-                      <span className="text-sm font-medium text-muted-foreground">
-                        {providerName}
-                      </span>
-
-                      <span className="text-xs text-muted-foreground/70">
-                        {localization.settings.connectProvider.replace(
-                          "{{provider}}",
-                          providerName
-                        )}
-                      </span>
-                    </div>
-                  </div>
-
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => linkSocial(provider)}
-                    disabled={
-                      isCurrentlyLinking ||
-                      !!unlinkingProvider ||
-                      !!linkingProvider
-                    }
-                    aria-label={localization.settings.connectProvider.replace(
-                      "{{provider}}",
-                      providerName
-                    )}
-                  >
-                    {isCurrentlyLinking ? (
-                      <Spinner className="size-4" />
-                    ) : (
-                      <Link className="size-4" />
-                    )}
-                  </Button>
-                </div>
-              )
+              return <ConnectedAccount key={provider} provider={provider} />
             })}
           </>
         )}
@@ -163,15 +66,13 @@ export function ConnectedAccounts({ className }: ConnectedAccountsProps) {
 
 function AccountRowSkeleton() {
   return (
-    <div className="flex items-center rounded-lg border p-3 justify-between">
-      <div className="flex items-center gap-3">
-        <Skeleton className="size-10 rounded-md" />
+    <Item className="p-3 gap-3" variant="outline">
+      <Skeleton className="size-10 rounded-md" />
 
-        <div className="flex flex-col gap-1">
-          <Skeleton className="h-4 w-20" />
-          <Skeleton className="h-3 w-32" />
-        </div>
+      <div className="flex flex-col gap-1">
+        <Skeleton className="h-4 w-20" />
+        <Skeleton className="h-3 w-32" />
       </div>
-    </div>
+    </Item>
   )
 }
