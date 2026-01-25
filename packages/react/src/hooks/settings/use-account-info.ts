@@ -1,13 +1,5 @@
-import type { AuthError } from "@better-auth-ui/core"
-import { useAuth } from "@better-auth-ui/react"
-import { type UseQueryOptions, useQuery } from "@tanstack/react-query"
-import type { OAuth2UserInfo } from "better-auth"
-
-type AccountInfo = {
-  user: OAuth2UserInfo
-  // biome-ignore lint/suspicious/noExplicitAny: any
-  data: Record<string, any>
-}
+import { type AuthClient, useAuth } from "@better-auth-ui/react"
+import { type UseAuthQueryOptions, useAuthQuery } from "../auth/use-auth-query"
 
 /**
  * Retrieve provider-specific account info for a given account ID.
@@ -22,18 +14,17 @@ type AccountInfo = {
  */
 export function useAccountInfo(
   accountId?: string,
-  options?: Partial<UseQueryOptions<AccountInfo, AuthError>>
+  options?: UseAuthQueryOptions<AuthClient["accountInfo"]>
 ) {
   const { authClient } = useAuth()
 
-  return useQuery<AccountInfo, AuthError>({
-    queryKey: ["auth", "accountInfo", accountId],
-    queryFn: () =>
-      authClient.accountInfo({
-        query: { accountId },
-        fetchOptions: { throw: true }
-      }),
-    enabled: !!accountId,
-    ...(options as object)
+  return useAuthQuery({
+    authFn: authClient.accountInfo,
+    params: { query: { accountId } },
+    options: {
+      queryKey: ["auth", "accountInfo", accountId],
+      enabled: !!accountId,
+      ...options
+    }
   })
 }

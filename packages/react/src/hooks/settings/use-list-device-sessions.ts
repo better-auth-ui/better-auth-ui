@@ -1,12 +1,9 @@
-import type { AuthError } from "@better-auth-ui/core"
-import { useAuth, useSession } from "@better-auth-ui/react"
-import { type UseQueryOptions, useQuery } from "@tanstack/react-query"
-import type { Session, User } from "better-auth"
-
-type DeviceSession = {
-  session: Session
-  user: User
-}
+import { type AuthClient, useAuth, useSession } from "@better-auth-ui/react"
+import {
+  type UseAuthQueryOptions,
+  type UseAuthQueryResult,
+  useAuthQuery
+} from "../auth/use-auth-query"
 
 /**
  * Retrieve device sessions for multi-session account switching.
@@ -17,19 +14,19 @@ type DeviceSession = {
  * @returns The React Query result for the device sessions list; `data` is the array of device session objects and includes loading and error states.
  */
 export function useListDeviceSessions(
-  options?: Partial<UseQueryOptions<DeviceSession[], AuthError>>
-) {
-  const { authClient, multiSession } = useAuth()
+  options?: UseAuthQueryOptions<
+    AuthClient["multiSession"]["listDeviceSessions"]
+  >
+): UseAuthQueryResult<AuthClient["multiSession"]["listDeviceSessions"]> {
+  const { authClient } = useAuth()
   const { data: sessionData } = useSession()
 
-  return useQuery<DeviceSession[], AuthError>({
-    queryKey: ["auth", "multiSession", "listDeviceSessions"],
-    queryFn: () =>
-      authClient.multiSession.listDeviceSessions({
-        fetchOptions: { throw: true }
-      }),
-    enabled: multiSession && !!sessionData,
-
-    ...(options as object)
+  return useAuthQuery({
+    authFn: authClient.multiSession.listDeviceSessions,
+    options: {
+      queryKey: ["auth", "multiSession", "listDeviceSessions"],
+      enabled: !!sessionData,
+      ...options
+    }
   })
 }

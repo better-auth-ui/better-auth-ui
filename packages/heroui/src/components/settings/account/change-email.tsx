@@ -15,7 +15,7 @@ import {
   TextField,
   toast
 } from "@heroui/react"
-import { type FormEvent, useEffect } from "react"
+import type { FormEvent } from "react"
 
 export type ChangeEmailProps = {
   className?: string
@@ -36,29 +36,27 @@ export function ChangeEmail({
   variant,
   ...props
 }: ChangeEmailProps & CardProps) {
-  const { localization } = useAuth()
-  const { data: sessionData, error: sessionError } = useSession()
+  const { localization, baseURL, viewPaths } = useAuth()
+  const { data: sessionData } = useSession({
+    throwOnError: (error) => {
+      toast.danger(error.error?.message || error.message)
+      return false
+    }
+  })
 
-  useEffect(() => {
-    if (sessionError)
-      toast.danger(sessionError.error?.message || sessionError.message)
-  }, [sessionError])
-
-  const { mutate: changeEmail, isPending, isSuccess, error } = useChangeEmail()
-
-  useEffect(() => {
-    if (isSuccess) toast.success(localization.settings.changeEmailSuccess)
-  }, [isSuccess, localization.settings.changeEmailSuccess])
-
-  useEffect(() => {
-    if (error) toast.danger(error.error?.message || error.message)
-  }, [error])
+  const { mutate: changeEmail, isPending } = useChangeEmail({
+    onSuccess: () => toast.success(localization.settings.changeEmailSuccess),
+    onError: (error) => toast.danger(error.error?.message || error.message)
+  })
 
   function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault()
     const formData = new FormData(e.currentTarget)
 
-    changeEmail({ newEmail: formData.get("email") as string })
+    changeEmail({
+      newEmail: formData.get("email") as string,
+      callbackURL: `${baseURL}/${viewPaths.settings.account}`
+    })
   }
 
   return (

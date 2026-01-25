@@ -1,6 +1,9 @@
-import { useAuth, useAuthMutation } from "@better-auth-ui/react"
-import type { UseMutationOptions } from "@tanstack/react-query"
-import type { BetterFetchError } from "better-auth/react"
+import {
+  type AuthClient,
+  useAuth,
+  useAuthMutation
+} from "@better-auth-ui/react"
+import type { UseAuthMutationOptions } from "./use-auth-mutation"
 
 export { useAuthMutation } from "./use-auth-mutation"
 
@@ -13,11 +16,7 @@ export { useAuthMutation } from "./use-auth-mutation"
  * @returns The `useMutation` result.
  */
 export function useForgotPassword(
-  options?: UseMutationOptions<
-    { status: boolean },
-    BetterFetchError,
-    { email: string }
-  >
+  options?: UseAuthMutationOptions<AuthClient["requestPasswordReset"]>
 ) {
   const { authClient } = useAuth()
   return useAuthMutation(authClient.requestPasswordReset, options)

@@ -1,10 +1,9 @@
 import { type AuthClient, useAuth } from "@better-auth-ui/react"
 import {
-  type UseQueryOptions,
-  type UseQueryResult,
-  useQuery
-} from "@tanstack/react-query"
-import type { BetterFetchError } from "better-auth/react"
+  type UseAuthQueryOptions,
+  type UseAuthQueryResult,
+  useAuthQuery
+} from "./use-auth-query"
 
 /**
  * Retrieve the current authentication session.
@@ -13,20 +12,15 @@ import type { BetterFetchError } from "better-auth/react"
  * @returns The React Query result for the session query: `data` contains session information, `isLoading`/`isFetching` indicate loading state, and `error` contains any fetch error.
  */
 export function useSession(
-  options?: Partial<
-    UseQueryOptions<AuthClient["$Infer"]["Session"], BetterFetchError>
-  >
-): UseQueryResult<AuthClient["$Infer"]["Session"] | null, BetterFetchError> {
+  options?: Partial<UseAuthQueryOptions<AuthClient["getSession"]>>
+): UseAuthQueryResult<AuthClient["getSession"]> {
   const { authClient } = useAuth()
 
-  authClient.getSession.name
-
-  return useQuery({
-    queryKey: ["auth", "getSession"],
-    queryFn: () =>
-      authClient.getSession({
-        fetchOptions: { throw: true }
-      }),
-    ...(options as object)
+  return useAuthQuery({
+    authFn: authClient.getSession,
+    options: {
+      queryKey: ["auth", "getSession"],
+      ...options
+    }
   })
 }

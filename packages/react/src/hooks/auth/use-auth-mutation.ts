@@ -6,6 +6,10 @@ import {
 import type { BetterFetchError } from "better-auth/react"
 
 // biome-ignore lint/suspicious/noExplicitAny: any
+export type UseAuthMutationOptions<TFn extends (...args: any) => Promise<any>> =
+  UseMutationOptions<{ status: boolean }, BetterFetchError, Parameters<TFn>[0]>
+
+// biome-ignore lint/suspicious/noExplicitAny: any
 export function useAuthMutation<TFn extends (...args: any) => Promise<any>>(
   fn: TFn,
   options?: UseMutationOptions<

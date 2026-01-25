@@ -1,7 +1,5 @@
-import type { AuthError } from "@better-auth-ui/core"
-import { useAuth, useSession } from "@better-auth-ui/react"
-import { type UseQueryOptions, useQuery } from "@tanstack/react-query"
-import type { Session } from "better-auth"
+import { type AuthClient, useAuth, useSession } from "@better-auth-ui/react"
+import { type UseAuthQueryOptions, useAuthQuery } from "../auth/use-auth-query"
 
 /**
  * Retrieve the active sessions (devices where the current user is signed in).
@@ -12,18 +10,17 @@ import type { Session } from "better-auth"
  * @returns The React Query result for the sessions list; `data` is the array of session objects, and the result includes loading and error states.
  */
 export function useListSessions(
-  options?: Partial<UseQueryOptions<Session[], AuthError>>
+  options?: UseAuthQueryOptions<AuthClient["listSessions"]>
 ) {
   const { authClient } = useAuth()
   const { data: sessionData } = useSession()
 
-  return useQuery<Session[], AuthError>({
-    queryKey: ["auth", "listSessions", sessionData?.user.id],
-    queryFn: async () =>
-      authClient.listSessions({
-        fetchOptions: { throw: true }
-      }),
-    enabled: !!sessionData,
-    ...(options as object)
+  return useAuthQuery({
+    authFn: authClient.listSessions,
+    options: {
+      queryKey: ["auth", "listSessions", sessionData?.user.id],
+      enabled: !!sessionData,
+      ...options
+    }
   })
 }

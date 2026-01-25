@@ -1,6 +1,10 @@
-import { useAuth, useSession } from "@better-auth-ui/react"
-import { useMutation } from "@tanstack/react-query"
-import type { BetterFetchError } from "better-auth/react"
+import {
+  type AuthClient,
+  useAuth,
+  useAuthMutation,
+  useSession
+} from "@better-auth-ui/react"
+import type { UseAuthMutationOptions } from "../auth/use-auth-mutation"
 
 /**
  * Hook that creates a mutation for changing the current user's email address.
@@ -10,23 +14,16 @@ import type { BetterFetchError } from "better-auth/react"
  *
  * @returns The `useMutation` result.
  */
-export function useChangeEmail() {
-  const { authClient, baseURL, viewPaths } = useAuth()
+export function useChangeEmail(
+  options?: UseAuthMutationOptions<AuthClient["changeEmail"]>
+) {
+  const { authClient } = useAuth()
   const { refetch } = useSession()
 
-  return useMutation<
-    { status: boolean },
-    BetterFetchError,
-    { newEmail: string }
-  >({
-    mutationFn: ({ newEmail }) =>
-      authClient.changeEmail({
-        newEmail,
-        callbackURL: `${baseURL}/${viewPaths.settings.account}`,
-        fetchOptions: { throw: true }
-      }),
+  return useAuthMutation(authClient.changeEmail, {
     onSettled: () => {
       refetch()
-    }
+    },
+    ...options
   })
 }
