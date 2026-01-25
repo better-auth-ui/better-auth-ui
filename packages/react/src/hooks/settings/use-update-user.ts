@@ -1,35 +1,40 @@
-import { useAuth, useSession } from "@better-auth-ui/react"
-import { useActionState } from "react"
+import { type AuthClient, useAuth, useSession } from "@better-auth-ui/react"
+import { useMutation, useQueryClient } from "@tanstack/react-query"
+import type { BetterFetchError } from "better-auth/react"
 
 /**
- * Hook that creates an action state for updating the authenticated user's profile name.
+ * Hook that creates a mutation for updating the authenticated user's profile.
  *
- * The action submits the name update, refetches the session on success,
+ * The mutation submits the name update, refetches the session on success,
  * and displays success or error toasts.
  *
- * @returns The `useActionState` result whose state holds `name` (initialized to `""`).
+ * @returns The `useMutation` result.
  */
 export function useUpdateUser() {
-  const { authClient, localization, toast } = useAuth()
-  const { refetch } = useSession()
+  const { authClient } = useAuth()
+  const { data: sessionData, refetch } = useSession()
+  const queryClient = useQueryClient()
 
-  const updateUser = async (_: object, formData: FormData) => {
-    const name = formData.get("name") as string
+  return useMutation<
+    { status: boolean },
+    BetterFetchError,
+    Partial<AuthClient["$Infer"]["Session"]["user"]>
+  >({
+    mutationFn: async (fields) => {
+      const result = await authClient.updateUser({
+        ...fields,
+        fetchOptions: { throw: true }
+      })
 
-    const { error } = await authClient.updateUser({
-      name
-    })
+      queryClient.setQueryData(["auth", "getSession"], {
+        ...sessionData,
+        user: { ...sessionData?.user, ...fields }
+      })
 
-    if (error) {
-      toast.error(error.message || error.statusText)
-    } else {
-      await refetch()
-
-      toast.success(localization.settings.profileUpdatedSuccess)
+      return result
+    },
+    onSettled: () => {
+      refetch()
     }
-
-    return { name }
-  }
-
-  return useActionState(updateUser, { name: "" })
+  })
 }

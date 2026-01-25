@@ -2,7 +2,7 @@
 
 import { useAuth } from "@better-auth-ui/react"
 import { Pencil, Save } from "lucide-react"
-import { useState } from "react"
+import { type FormEvent, useState } from "react"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -38,14 +38,21 @@ export type UserProfileProps = {
 export function UserProfile({ className }: UserProfileProps) {
   const { localization } = useAuth()
   const { data: sessionData } = useSession()
-  const [state, formAction, isPending] = useUpdateUser()
+  const { mutate: updateUser, isPending } = useUpdateUser()
 
   const [fieldErrors, setFieldErrors] = useState<{
     name?: string
   }>({})
 
+  function handleSubmit(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault()
+    const formData = new FormData(e.currentTarget)
+
+    updateUser({ name: formData.get("name") as string })
+  }
+
   return (
-    <form action={formAction}>
+    <form onSubmit={handleSubmit}>
       <Card className={cn("w-full py-4 md:py-6 gap-4", className)}>
         <CardHeader className="px-4 md:px-6 gap-0">
           <CardTitle className="text-xl">
@@ -101,7 +108,7 @@ export function UserProfile({ className }: UserProfileProps) {
                 id="name"
                 name="name"
                 autoComplete="name"
-                defaultValue={sessionData?.user?.name || state.name}
+                defaultValue={sessionData?.user?.name}
                 placeholder={localization.auth.name}
                 disabled={isPending}
                 required

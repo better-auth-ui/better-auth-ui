@@ -12,9 +12,10 @@ import {
   Label,
   Skeleton,
   Spinner,
-  TextField
+  TextField,
+  toast
 } from "@heroui/react"
-
+import { type FormEvent, useEffect } from "react"
 import { UserAvatar } from "../../user/user-avatar"
 
 export type UserProfileProps = {
@@ -35,8 +36,36 @@ export function UserProfile({
   ...props
 }: UserProfileProps & CardProps) {
   const { localization } = useAuth()
-  const { data: sessionData } = useSession()
-  const [state, formAction, isPending] = useUpdateUser()
+  const { data: sessionData, error: sessionError } = useSession()
+
+  useEffect(() => {
+    if (sessionError)
+      toast.danger(sessionError.error?.message || sessionError.message)
+  }, [sessionError])
+
+  const {
+    mutate: updateUser,
+    isPending,
+    error: updateUserError,
+    isSuccess: updateUserSuccess
+  } = useUpdateUser()
+
+  useEffect(() => {
+    if (updateUserError)
+      toast.danger(updateUserError.error?.message || updateUserError.message)
+  }, [updateUserError])
+
+  useEffect(() => {
+    if (updateUserSuccess)
+      toast.success(localization.settings.profileUpdatedSuccess)
+  }, [updateUserSuccess, localization.settings.profileUpdatedSuccess])
+
+  function handleSubmit(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault()
+    const formData = new FormData(e.currentTarget)
+
+    updateUser({ name: formData.get("name") as string })
+  }
 
   return (
     <Card
@@ -51,7 +80,7 @@ export function UserProfile({
       </Card.Header>
 
       <Card.Content>
-        <Form action={formAction}>
+        <Form onSubmit={handleSubmit}>
           <Fieldset className="w-full gap-4">
             <div className="flex items-center gap-2">
               <Button
@@ -95,7 +124,7 @@ export function UserProfile({
               <TextField
                 key={sessionData?.user?.name}
                 name="name"
-                defaultValue={sessionData?.user?.name || state.name}
+                defaultValue={sessionData?.user?.name}
                 isDisabled={isPending || !sessionData}
               >
                 <Label>{localization.auth.name}</Label>

@@ -12,8 +12,10 @@ import {
   Label,
   Skeleton,
   Spinner,
-  TextField
+  TextField,
+  toast
 } from "@heroui/react"
+import { type FormEvent, useEffect } from "react"
 
 export type ChangeEmailProps = {
   className?: string
@@ -35,8 +37,29 @@ export function ChangeEmail({
   ...props
 }: ChangeEmailProps & CardProps) {
   const { localization } = useAuth()
-  const { data: sessionData } = useSession()
-  const [state, formAction, isPending] = useChangeEmail()
+  const { data: sessionData, error: sessionError } = useSession()
+
+  useEffect(() => {
+    if (sessionError)
+      toast.danger(sessionError.error?.message || sessionError.message)
+  }, [sessionError])
+
+  const { mutate: changeEmail, isPending, isSuccess, error } = useChangeEmail()
+
+  useEffect(() => {
+    if (isSuccess) toast.success(localization.settings.changeEmailSuccess)
+  }, [isSuccess, localization.settings.changeEmailSuccess])
+
+  useEffect(() => {
+    if (error) toast.danger(error.error?.message || error.message)
+  }, [error])
+
+  function handleSubmit(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault()
+    const formData = new FormData(e.currentTarget)
+
+    changeEmail({ newEmail: formData.get("email") as string })
+  }
 
   return (
     <Card
@@ -51,14 +74,14 @@ export function ChangeEmail({
       </Card.Header>
 
       <Card.Content>
-        <Form action={formAction}>
+        <Form onSubmit={handleSubmit}>
           <Fieldset className="w-full gap-4">
             <Fieldset.Group>
               <TextField
                 key={sessionData?.user.email}
                 name="email"
                 type="email"
-                defaultValue={sessionData?.user.email || state.email}
+                defaultValue={sessionData?.user.email}
                 isDisabled={isPending || !sessionData}
               >
                 <Label>{localization.auth.email}</Label>

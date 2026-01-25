@@ -1,6 +1,6 @@
-import type { AuthError } from "@better-auth-ui/core"
 import { type AuthClient, useAuth } from "@better-auth-ui/react"
 import type { UseQueryOptions, UseQueryResult } from "@tanstack/react-query"
+import type { BetterFetchError } from "better-auth/react"
 import { useEffect } from "react"
 import { useSession } from "./use-session"
 
@@ -11,8 +11,10 @@ import { useSession } from "./use-session"
  * @returns An object containing `data` (the current session or `undefined`), `isPending` (whether the session query is in progress), and other session query state
  */
 export function useAuthenticate(
-  options?: Partial<UseQueryOptions<AuthClient["$Infer"]["Session"], AuthError>>
-): UseQueryResult<AuthClient["$Infer"]["Session"] | null, AuthError> {
+  options?: Partial<
+    UseQueryOptions<AuthClient["$Infer"]["Session"], BetterFetchError>
+  >
+): UseQueryResult<AuthClient["$Infer"]["Session"] | null, BetterFetchError> {
   const { basePaths, viewPaths, navigate } = useAuth()
   const session = useSession(options)
 

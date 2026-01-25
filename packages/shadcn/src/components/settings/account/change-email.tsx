@@ -2,7 +2,7 @@
 
 import { useAuth } from "@better-auth-ui/react"
 import { Check } from "lucide-react"
-import { useState } from "react"
+import { type FormEvent, useState } from "react"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -37,14 +37,21 @@ export function ChangeEmail({ className }: ChangeEmailProps) {
   const { localization } = useAuth()
   const { data: sessionData } = useSession()
 
-  const [state, formAction, isPending] = useChangeEmail()
+  const { mutate: changeEmail, isPending } = useChangeEmail()
 
   const [fieldErrors, setFieldErrors] = useState<{
     email?: string
   }>({})
 
+  function handleSubmit(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault()
+    const formData = new FormData(e.currentTarget)
+
+    changeEmail({ newEmail: formData.get("email") as string })
+  }
+
   return (
-    <form action={formAction}>
+    <form onSubmit={handleSubmit}>
       <Card className={cn("w-full py-4 md:py-6 gap-4", className)}>
         <CardHeader className="px-4 md:px-6 gap-0">
           <CardTitle className="text-xl">
@@ -63,7 +70,7 @@ export function ChangeEmail({ className }: ChangeEmailProps) {
                 name="email"
                 type="email"
                 autoComplete="email"
-                defaultValue={sessionData?.user?.email || state.email}
+                defaultValue={sessionData?.user?.email}
                 placeholder={localization.auth.emailPlaceholder}
                 disabled={isPending}
                 required
