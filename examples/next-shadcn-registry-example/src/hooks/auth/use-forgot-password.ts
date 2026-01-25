@@ -1,31 +1,23 @@
 import type { AnyAuthConfig } from "@better-auth-ui/react"
-import { useActionState } from "react"
+import { useMutation } from "@tanstack/react-query"
 
 import { useAuth } from "./use-auth"
 
 export function useForgotPassword(config?: AnyAuthConfig) {
-  const { authClient, basePaths, localization, toast, viewPaths, navigate } =
-    useAuth(config)
+  const { authClient, basePaths, viewPaths, navigate } = useAuth(config)
 
-  const forgotPassword = async (_: object, formData: FormData) => {
-    const email = formData.get("email") as string
+  return useMutation({
+    mutationFn: async ({ email }: { email: string }) => {
+      const result = await authClient.requestPasswordReset({
+        email,
+        redirectTo: `${basePaths.auth}/${viewPaths.auth.resetPassword}`,
+        fetchOptions: { throw: true }
+      })
 
-    const { error } = await authClient.requestPasswordReset({
-      email,
-      redirectTo: `${basePaths.auth}/${viewPaths.auth.resetPassword}`
-    })
-
-    if (error) {
-      toast.error(error.message || error.statusText)
-    } else {
-      toast.success(localization.auth.passwordResetEmailSent)
+      return result
+    },
+    onSuccess: () => {
       navigate(`${basePaths.auth}/${viewPaths.auth.signIn}`)
     }
-
-    return { email }
-  }
-
-  return useActionState(forgotPassword, {
-    email: ""
   })
 }

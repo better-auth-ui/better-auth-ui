@@ -1,41 +1,24 @@
-import { useAuth } from "@better-auth-ui/react"
-import type { AuthCallbackOptions } from "@better-auth-ui/react/core"
-import { useActionState } from "react"
+import { useAuth, useAuthMutation } from "@better-auth-ui/react"
+import type { UseMutationOptions } from "@tanstack/react-query"
+import type { BetterFetchError } from "better-auth/react"
+
+export { useAuthMutation } from "./use-auth-mutation"
 
 /**
- * Provides an action state hook for the forgot-password flow.
+ * Hook that creates a mutation for the forgot-password flow.
  *
- * The configured action sends a password reset request for the submitted email,
- * shows a success or error toast, navigates to the sign-in view on success,
- * and returns the submitted email.
+ * The mutation sends a password reset request for the submitted email,
+ * and navigates to the sign-in view on success.
  *
- * @returns The action state for the forgot-password flow. The action, when invoked, sends a password-reset request and resolves to an object containing the submitted `email`.
+ * @returns The `useMutation` result.
  */
-export function useForgotPassword({
-  onError,
-  onSuccess
-}: AuthCallbackOptions = {}) {
-  const { authClient, basePaths, viewPaths, navigate } = useAuth()
-
-  const forgotPassword = async (_: object, formData: FormData) => {
-    const email = formData.get("email") as string
-
-    const { error } = await authClient.requestPasswordReset({
-      email,
-      redirectTo: `${basePaths.auth}/${viewPaths.auth.resetPassword}`
-    })
-
-    if (error) {
-      await onError?.(error)
-    } else {
-      await onSuccess?.()
-      navigate({ to: `${basePaths.auth}/${viewPaths.auth.signIn}` })
-    }
-
-    return { email }
-  }
-
-  return useActionState(forgotPassword, {
-    email: ""
-  })
+export function useForgotPassword(
+  options?: UseMutationOptions<
+    { status: boolean },
+    BetterFetchError,
+    { email: string }
+  >
+) {
+  const { authClient } = useAuth()
+  return useAuthMutation(authClient.requestPasswordReset, options)
 }

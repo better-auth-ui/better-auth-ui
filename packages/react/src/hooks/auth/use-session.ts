@@ -19,7 +19,9 @@ export function useSession(
 ): UseQueryResult<AuthClient["$Infer"]["Session"] | null, BetterFetchError> {
   const { authClient } = useAuth()
 
-  return useQuery<AuthClient["$Infer"]["Session"] | null, BetterFetchError>({
+  authClient.getSession.name
+
+  return useQuery({
     queryKey: ["auth", "getSession"],
     queryFn: () =>
       authClient.getSession({

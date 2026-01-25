@@ -1,4 +1,4 @@
-import { useAuth, useForgotPassword } from "@better-auth-ui/react"
+import { useAuth, useAuthMutation } from "@better-auth-ui/react"
 import {
   Button,
   Card,
@@ -36,11 +36,18 @@ export function ForgotPassword({
   variant,
   ...props
 }: ForgotPasswordProps & CardProps) {
-  const { basePaths, localization, viewPaths } = useAuth()
-  const [{ email }, forgotPassword, isPending] = useForgotPassword({
-    onError: (error) => toast.danger(error.message || error.statusText),
-    onSuccess: () => toast.success(localization.auth.passwordResetEmailSent)
-  })
+  const { authClient, basePaths, localization, viewPaths, navigate } = useAuth()
+
+  const { mutate: requestPasswordReset, isPending } = useAuthMutation(
+    authClient.requestPasswordReset,
+    {
+      onError: (error) => toast.danger(error.error?.message || error.message),
+      onSuccess: () => {
+        toast.success(localization.auth.passwordResetEmailSent)
+        navigate({ to: `${basePaths.auth}/${viewPaths.auth.signIn}` })
+      }
+    }
+  )
 
   return (
     <Card
@@ -49,14 +56,19 @@ export function ForgotPassword({
       {...props}
     >
       <Card.Content>
-        <Form action={forgotPassword}>
+        <Form
+          onSubmit={(e) => {
+            e.preventDefault()
+            const formData = new FormData(e.currentTarget)
+            requestPasswordReset({ email: formData.get("email") as string })
+          }}
+        >
           <Fieldset className="gap-4">
             <Label className="text-xl">
               {localization.auth.forgotPassword}
             </Label>
 
             <TextField
-              defaultValue={email}
               name="email"
               type="email"
               autoComplete="email"

@@ -32,7 +32,7 @@ export type ForgotPasswordProps = {
  */
 export function ForgotPassword({ className }: ForgotPasswordProps) {
   const { basePaths, localization, viewPaths, Link } = useAuth()
-  const [{ email }, forgotPassword, isPending] = useForgotPassword({
+  const { mutate, isPending } = useForgotPassword({
     onError: (error) => toast.error(error.message || error.statusText),
     onSuccess: () => toast.success(localization.auth.passwordResetEmailSent)
   })
@@ -50,7 +50,15 @@ export function ForgotPassword({ className }: ForgotPasswordProps) {
       </CardHeader>
 
       <CardContent className="px-4 md:px-6">
-        <form action={forgotPassword}>
+        <form
+          onSubmit={(e) => {
+            e.preventDefault()
+            const formData = new FormData(e.currentTarget)
+            const email = formData.get("email") as string
+
+            mutate({ email })
+          }}
+        >
           <FieldGroup className="gap-4">
             <Field className="gap-1">
               <FieldLabel htmlFor="email">{localization.auth.email}</FieldLabel>
@@ -60,7 +68,6 @@ export function ForgotPassword({ className }: ForgotPasswordProps) {
                 name="email"
                 type="email"
                 autoComplete="email"
-                defaultValue={email}
                 placeholder={localization.auth.emailPlaceholder}
                 required
                 disabled={isPending}

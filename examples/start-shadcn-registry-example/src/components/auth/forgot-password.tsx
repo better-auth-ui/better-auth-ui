@@ -26,9 +26,9 @@ export type ForgotPasswordProps = AnyAuthConfig & {
 export function ForgotPassword({ className, ...config }: ForgotPasswordProps) {
   const context = useAuth(config)
 
-  const { basePaths, localization, viewPaths, Link } = context
+  const { basePaths, localization, toast, viewPaths, Link } = context
 
-  const [{ email }, forgotPassword, isPending] = useForgotPassword(context)
+  const { mutate, isPending } = useForgotPassword(context)
 
   const [fieldErrors, setFieldErrors] = useState<{
     email?: string
@@ -43,7 +43,23 @@ export function ForgotPassword({ className, ...config }: ForgotPasswordProps) {
       </CardHeader>
 
       <CardContent className="px-4 md:px-6">
-        <form action={forgotPassword}>
+        <form
+          onSubmit={(e) => {
+            e.preventDefault()
+            const formData = new FormData(e.currentTarget)
+            const email = formData.get("email") as string
+
+            mutate(
+              { email },
+              {
+                onError: (error) =>
+                  toast.error(error.message || error.statusText),
+                onSuccess: () =>
+                  toast.success(localization.auth.passwordResetEmailSent)
+              }
+            )
+          }}
+        >
           <FieldGroup className="gap-4">
             <Field className="gap-1">
               <FieldLabel htmlFor="email">{localization.auth.email}</FieldLabel>
@@ -53,7 +69,6 @@ export function ForgotPassword({ className, ...config }: ForgotPasswordProps) {
                 name="email"
                 type="email"
                 autoComplete="email"
-                defaultValue={email}
                 placeholder={localization.auth.emailPlaceholder}
                 required
                 disabled={isPending}

@@ -25,7 +25,7 @@ export function ConnectedAccounts({
   const { data: accounts, isPending, error } = useListAccounts()
 
   useEffect(() => {
-    if (error) toast.danger(error.message || error.statusText)
+    if (error) toast.danger(error.error?.message || error.message)
   }, [error])
 
   return (
