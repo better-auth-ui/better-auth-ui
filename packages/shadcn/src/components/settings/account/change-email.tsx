@@ -2,7 +2,8 @@
 
 import { useAuth } from "@better-auth-ui/react"
 import { Check } from "lucide-react"
-import { type FormEvent, useState } from "react"
+import { type FormEvent, useEffect, useState } from "react"
+import { toast } from "sonner"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -35,9 +36,29 @@ export type ChangeEmailProps = {
  */
 export function ChangeEmail({ className }: ChangeEmailProps) {
   const { localization } = useAuth()
-  const { data: sessionData } = useSession()
+  const { data: sessionData, error: sessionError } = useSession()
 
-  const { mutate: changeEmail, isPending } = useChangeEmail()
+  useEffect(() => {
+    if (sessionError)
+      toast.error(sessionError.error?.message || sessionError.message)
+  }, [sessionError])
+
+  const {
+    mutate: changeEmail,
+    isPending,
+    isSuccess: changeEmailSuccess,
+    error: changeEmailError
+  } = useChangeEmail()
+
+  useEffect(() => {
+    if (changeEmailSuccess)
+      toast.success(localization.settings.changeEmailSuccess)
+  }, [changeEmailSuccess, localization.settings.changeEmailSuccess])
+
+  useEffect(() => {
+    if (changeEmailError)
+      toast.error(changeEmailError.error?.message || changeEmailError.message)
+  }, [changeEmailError])
 
   const [fieldErrors, setFieldErrors] = useState<{
     email?: string
