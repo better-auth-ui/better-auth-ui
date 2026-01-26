@@ -58,7 +58,7 @@ export function ForgotPassword({ className }: ForgotPasswordProps) {
       <CardContent className="px-4 md:px-6">
         <form onSubmit={handleSubmit}>
           <FieldGroup className="gap-4">
-            <Field className="gap-1">
+            <Field className="gap-1" data-invalid={!!fieldErrors.email}>
               <FieldLabel htmlFor="email">{localization.auth.email}</FieldLabel>
 
               <Input

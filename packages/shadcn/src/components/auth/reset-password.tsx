@@ -111,7 +111,7 @@ export function ResetPassword({ className }: ResetPasswordProps) {
       <CardContent className="px-4 md:px-6">
         <form onSubmit={handleSubmit}>
           <FieldGroup className="gap-4">
-            <Field className="gap-1">
+            <Field className="gap-1" data-invalid={!!fieldErrors.password}>
               <FieldLabel htmlFor="password">
                 {localization.auth.password}
               </FieldLabel>
@@ -168,7 +168,10 @@ export function ResetPassword({ className }: ResetPasswordProps) {
             </Field>
 
             {emailAndPassword?.confirmPassword && (
-              <Field className="gap-1">
+              <Field
+                className="gap-1"
+                data-invalid={!!fieldErrors.confirmPassword}
+              >
                 <FieldLabel htmlFor="confirmPassword">
                   {localization.auth.confirmPassword}
                 </FieldLabel>

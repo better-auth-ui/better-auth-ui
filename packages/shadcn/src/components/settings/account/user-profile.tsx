@@ -121,7 +121,7 @@ export function UserProfile({ className }: UserProfileProps) {
             )}
           </div>
 
-          <Field className="gap-1">
+          <Field className="gap-1" data-invalid={!!fieldErrors.name}>
             <FieldLabel htmlFor="name">{localization.auth.name}</FieldLabel>
 
             {sessionData ? (

@@ -144,7 +144,7 @@ export function SignIn({
           {emailAndPassword?.enabled && (
             <form onSubmit={handleSubmit}>
               <FieldGroup className="gap-4">
-                <Field className="gap-1">
+                <Field className="gap-1" data-invalid={!!fieldErrors.email}>
                   <FieldLabel htmlFor="email">
                     {localization.auth.email}
                   </FieldLabel>
@@ -176,7 +176,7 @@ export function SignIn({
                   <FieldError>{fieldErrors.email}</FieldError>
                 </Field>
 
-                <Field className="gap-1">
+                <Field className="gap-1" data-invalid={!!fieldErrors.password}>
                   <FieldLabel htmlFor="password">
                     {localization.auth.password}
                   </FieldLabel>

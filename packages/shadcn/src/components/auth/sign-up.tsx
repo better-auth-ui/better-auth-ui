@@ -148,7 +148,7 @@ export function SignUp({
           {emailAndPassword?.enabled && (
             <form onSubmit={handleSubmit}>
               <FieldGroup className="gap-4">
-                <Field className="gap-1">
+                <Field className="gap-1" data-invalid={!!fieldErrors.name}>
                   <FieldLabel htmlFor="name">
                     {localization.auth.name}
                   </FieldLabel>
@@ -180,7 +180,7 @@ export function SignUp({
                   <FieldError>{fieldErrors.name}</FieldError>
                 </Field>
 
-                <Field className="gap-1">
+                <Field className="gap-1" data-invalid={!!fieldErrors.email}>
                   <FieldLabel htmlFor="email">
                     {localization.auth.email}
                   </FieldLabel>
@@ -212,7 +212,7 @@ export function SignUp({
                   <FieldError>{fieldErrors.email}</FieldError>
                 </Field>
 
-                <Field className="gap-1">
+                <Field className="gap-1" data-invalid={!!fieldErrors.password}>
                   <FieldLabel htmlFor="password">
                     {localization.auth.password}
                   </FieldLabel>
@@ -273,7 +273,10 @@ export function SignUp({
                 </Field>
 
                 {emailAndPassword?.confirmPassword && (
-                  <Field className="gap-1">
+                  <Field
+                    className="gap-1"
+                    data-invalid={!!fieldErrors.confirmPassword}
+                  >
                     <FieldLabel htmlFor="confirmPassword">
                       {localization.auth.confirmPassword}
                     </FieldLabel>

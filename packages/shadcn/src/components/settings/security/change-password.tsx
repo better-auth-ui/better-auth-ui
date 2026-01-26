@@ -64,7 +64,7 @@ export function ChangePassword({ className }: ChangePasswordProps) {
         </CardHeader>
 
         <CardContent className="px-4 md:px-6 grid gap-4">
-          <Field className="gap-1">
+          <Field className="gap-1" data-invalid={!!fieldErrors.currentPassword}>
             <FieldLabel htmlFor="currentPassword">
               {localization.settings.currentPassword}
             </FieldLabel>
@@ -101,7 +101,7 @@ export function ChangePassword({ className }: ChangePasswordProps) {
             <FieldError>{fieldErrors.currentPassword}</FieldError>
           </Field>
 
-          <Field className="gap-1">
+          <Field className="gap-1" data-invalid={!!fieldErrors.newPassword}>
             <FieldLabel htmlFor="newPassword">
               {localization.auth.newPassword}
             </FieldLabel>
@@ -160,7 +160,10 @@ export function ChangePassword({ className }: ChangePasswordProps) {
           </Field>
 
           {emailAndPassword?.confirmPassword && (
-            <Field className="gap-1">
+            <Field
+              className="gap-1"
+              data-invalid={!!fieldErrors.confirmPassword}
+            >
               <FieldLabel htmlFor="confirmPassword">
                 {localization.auth.confirmPassword}
               </FieldLabel>

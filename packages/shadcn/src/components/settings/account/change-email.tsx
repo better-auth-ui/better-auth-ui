@@ -81,7 +81,7 @@ export function ChangeEmail({ className }: ChangeEmailProps) {
         </CardHeader>
 
         <CardContent className="px-4 md:px-6">
-          <Field className="gap-1">
+          <Field className="gap-1" data-invalid={!!fieldErrors.email}>
             <FieldLabel htmlFor="email">{localization.auth.email}</FieldLabel>
 
             {sessionData ? (
