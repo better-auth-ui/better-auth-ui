@@ -13,7 +13,8 @@ import {
   Label,
   Skeleton,
   Spinner,
-  TextField
+  TextField,
+  toast
 } from "@heroui/react"
 import { useState } from "react"
 
@@ -38,11 +39,47 @@ export function ChangePassword({
 }: ChangePasswordProps & CardProps) {
   const { emailAndPassword, localization } = useAuth()
   const { data: sessionData } = useSession()
-  const [, formAction, isPending] = useChangePassword()
+
+  const [currentPassword, setCurrentPassword] = useState("")
+  const [newPassword, setNewPassword] = useState("")
+  const [confirmPassword, setConfirmPassword] = useState("")
+
+  const { mutate: changePassword, isPending } = useChangePassword({
+    onError: (error) => {
+      setCurrentPassword("")
+      setNewPassword("")
+      setConfirmPassword("")
+      toast.danger(error.error?.message || error.message)
+    },
+    onSuccess: () => {
+      setCurrentPassword("")
+      setNewPassword("")
+      setConfirmPassword("")
+      toast.success(localization.settings.changePasswordSuccess)
+    }
+  })
 
   const [isNewPasswordVisible, setIsNewPasswordVisible] = useState(false)
   const [isConfirmPasswordVisible, setIsConfirmPasswordVisible] =
     useState(false)
+
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+
+    if (emailAndPassword?.confirmPassword && newPassword !== confirmPassword) {
+      setCurrentPassword("")
+      setNewPassword("")
+      setConfirmPassword("")
+      toast.danger(localization.auth.passwordsDoNotMatch)
+      return
+    }
+
+    changePassword({
+      currentPassword,
+      newPassword,
+      revokeOtherSessions: true
+    })
+  }
 
   return (
     <Card
@@ -57,13 +94,15 @@ export function ChangePassword({
       </Card.Header>
 
       <Card.Content>
-        <Form action={formAction}>
+        <Form onSubmit={handleSubmit}>
           <Fieldset className="w-full gap-4">
             <Fieldset.Group>
               <TextField
                 name="currentPassword"
                 type="password"
                 isDisabled={isPending || !sessionData}
+                value={currentPassword}
+                onChange={setCurrentPassword}
               >
                 <Label>{localization.settings.currentPassword}</Label>
 
@@ -89,6 +128,8 @@ export function ChangePassword({
                 minLength={emailAndPassword?.minPasswordLength}
                 maxLength={emailAndPassword?.maxPasswordLength}
                 isDisabled={isPending || !sessionData}
+                value={newPassword}
+                onChange={setNewPassword}
               >
                 <Label>{localization.auth.newPassword}</Label>
 
@@ -138,6 +179,8 @@ export function ChangePassword({
                   maxLength={emailAndPassword?.maxPasswordLength}
                   isDisabled={isPending || !sessionData}
                   isRequired
+                  value={confirmPassword}
+                  onChange={setConfirmPassword}
                 >
                   <Label>{localization.auth.confirmPassword}</Label>
 

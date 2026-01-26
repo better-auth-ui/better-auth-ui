@@ -2,7 +2,7 @@
 
 import { useAuth } from "@better-auth-ui/react"
 import { Check } from "lucide-react"
-import { type FormEvent, useEffect, useState } from "react"
+import { type FormEvent, useState } from "react"
 import { toast } from "sonner"
 
 import { Button } from "@/components/ui/button"
@@ -35,30 +35,13 @@ export type ChangeEmailProps = {
  * @returns A JSX element rendering the change-email card and form
  */
 export function ChangeEmail({ className }: ChangeEmailProps) {
-  const { localization } = useAuth()
-  const { data: sessionData, error: sessionError } = useSession()
+  const { baseURL, localization, viewPaths } = useAuth()
+  const { data: sessionData } = useSession()
 
-  useEffect(() => {
-    if (sessionError)
-      toast.error(sessionError.error?.message || sessionError.message)
-  }, [sessionError])
-
-  const {
-    mutate: changeEmail,
-    isPending,
-    isSuccess: changeEmailSuccess,
-    error: changeEmailError
-  } = useChangeEmail()
-
-  useEffect(() => {
-    if (changeEmailSuccess)
-      toast.success(localization.settings.changeEmailSuccess)
-  }, [changeEmailSuccess, localization.settings.changeEmailSuccess])
-
-  useEffect(() => {
-    if (changeEmailError)
-      toast.error(changeEmailError.error?.message || changeEmailError.message)
-  }, [changeEmailError])
+  const { mutate: changeEmail, isPending } = useChangeEmail({
+    onSuccess: () => toast.success(localization.settings.changeEmailSuccess),
+    onError: (error) => toast.error(error.error?.message || error.message)
+  })
 
   const [fieldErrors, setFieldErrors] = useState<{
     email?: string
@@ -67,8 +50,10 @@ export function ChangeEmail({ className }: ChangeEmailProps) {
   function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault()
     const formData = new FormData(e.currentTarget)
-
-    changeEmail({ newEmail: formData.get("email") as string })
+    changeEmail({
+      newEmail: formData.get("email") as string,
+      callbackURL: `${baseURL}/${viewPaths.settings.account}`
+    })
   }
 
   return (

@@ -15,7 +15,7 @@ import {
   TextField,
   toast
 } from "@heroui/react"
-import { type FormEvent, useEffect } from "react"
+import type { FormEvent } from "react"
 import { UserAvatar } from "../../user/user-avatar"
 
 export type UserProfileProps = {
@@ -36,34 +36,16 @@ export function UserProfile({
   ...props
 }: UserProfileProps & CardProps) {
   const { localization } = useAuth()
-  const { data: sessionData, error: sessionError } = useSession()
+  const { data: sessionData } = useSession()
 
-  useEffect(() => {
-    if (sessionError)
-      toast.danger(sessionError.error?.message || sessionError.message)
-  }, [sessionError])
-
-  const {
-    mutate: updateUser,
-    isPending,
-    error: updateUserError,
-    isSuccess: updateUserSuccess
-  } = useUpdateUser()
-
-  useEffect(() => {
-    if (updateUserError)
-      toast.danger(updateUserError.error?.message || updateUserError.message)
-  }, [updateUserError])
-
-  useEffect(() => {
-    if (updateUserSuccess)
-      toast.success(localization.settings.profileUpdatedSuccess)
-  }, [updateUserSuccess, localization.settings.profileUpdatedSuccess])
+  const { mutate: updateUser, isPending } = useUpdateUser({
+    onError: (error) => toast.danger(error.error?.message || error.message),
+    onSuccess: () => toast.success(localization.settings.profileUpdatedSuccess)
+  })
 
   function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault()
     const formData = new FormData(e.currentTarget)
-
     updateUser({ name: formData.get("name") as string })
   }
 

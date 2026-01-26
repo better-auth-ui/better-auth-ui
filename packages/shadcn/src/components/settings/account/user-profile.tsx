@@ -2,7 +2,7 @@
 
 import { useAuth } from "@better-auth-ui/react"
 import { Pencil, Save } from "lucide-react"
-import { type FormEvent, useEffect, useState } from "react"
+import { type FormEvent, useState } from "react"
 import { toast } from "sonner"
 
 import { Button } from "@/components/ui/button"
@@ -38,29 +38,12 @@ export type UserProfileProps = {
  */
 export function UserProfile({ className }: UserProfileProps) {
   const { localization } = useAuth()
-  const { data: sessionData, error: sessionError } = useSession()
+  const { data: sessionData } = useSession()
 
-  useEffect(() => {
-    if (sessionError)
-      toast.error(sessionError.error?.message || sessionError.message)
-  }, [sessionError])
-
-  const {
-    mutate: updateUser,
-    isPending,
-    error: updateUserError,
-    isSuccess: updateUserSuccess
-  } = useUpdateUser()
-
-  useEffect(() => {
-    if (updateUserError)
-      toast.error(updateUserError.error?.message || updateUserError.message)
-  }, [updateUserError])
-
-  useEffect(() => {
-    if (updateUserSuccess)
-      toast.success(localization.settings.profileUpdatedSuccess)
-  }, [updateUserSuccess, localization.settings.profileUpdatedSuccess])
+  const { mutate: updateUser, isPending } = useUpdateUser({
+    onError: (error) => toast.error(error.error?.message || error.message),
+    onSuccess: () => toast.success(localization.settings.profileUpdatedSuccess)
+  })
 
   const [fieldErrors, setFieldErrors] = useState<{
     name?: string
@@ -69,7 +52,6 @@ export function UserProfile({ className }: UserProfileProps) {
   function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault()
     const formData = new FormData(e.currentTarget)
-
     updateUser({ name: formData.get("name") as string })
   }
 

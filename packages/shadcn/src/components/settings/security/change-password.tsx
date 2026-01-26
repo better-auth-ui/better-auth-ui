@@ -1,8 +1,13 @@
 "use client"
 
-import { useAuth } from "@better-auth-ui/react"
+import {
+  useAuth,
+  useChangePassword,
+  useSession
+} from "@better-auth-ui/react"
 import { Check, Eye, EyeOff } from "lucide-react"
 import { useState } from "react"
+import { toast } from "sonner"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -22,8 +27,6 @@ import {
 } from "@/components/ui/input-group"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Spinner } from "@/components/ui/spinner"
-import { useSession } from "@/hooks/auth/use-session"
-import { useChangePassword } from "@/hooks/settings/use-change-password"
 import { cn } from "@/lib/utils"
 
 export type ChangePasswordProps = {
@@ -42,7 +45,25 @@ export type ChangePasswordProps = {
 export function ChangePassword({ className }: ChangePasswordProps) {
   const { emailAndPassword, localization } = useAuth()
   const { data: sessionData } = useSession()
-  const [, formAction, isPending] = useChangePassword()
+
+  const [currentPassword, setCurrentPassword] = useState("")
+  const [newPassword, setNewPassword] = useState("")
+  const [confirmPassword, setConfirmPassword] = useState("")
+
+  const { mutate: changePassword, isPending } = useChangePassword({
+    onError: (error) => {
+      setCurrentPassword("")
+      setNewPassword("")
+      setConfirmPassword("")
+      toast.error(error.error?.message || error.message)
+    },
+    onSuccess: () => {
+      setCurrentPassword("")
+      setNewPassword("")
+      setConfirmPassword("")
+      toast.success(localization.settings.changePasswordSuccess)
+    }
+  })
 
   const [isNewPasswordVisible, setIsNewPasswordVisible] = useState(false)
   const [isConfirmPasswordVisible, setIsConfirmPasswordVisible] =
@@ -54,8 +75,26 @@ export function ChangePassword({ className }: ChangePasswordProps) {
     confirmPassword?: string
   }>({})
 
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+
+    if (emailAndPassword?.confirmPassword && newPassword !== confirmPassword) {
+      setCurrentPassword("")
+      setNewPassword("")
+      setConfirmPassword("")
+      toast.error(localization.auth.passwordsDoNotMatch)
+      return
+    }
+
+    changePassword({
+      currentPassword,
+      newPassword,
+      revokeOtherSessions: true
+    })
+  }
+
   return (
-    <form action={formAction}>
+    <form onSubmit={handleSubmit}>
       <Card className={cn("w-full py-4 md:py-6 gap-4", className)}>
         <CardHeader className="px-4 md:px-6 gap-0">
           <CardTitle className="text-xl">
@@ -76,14 +115,16 @@ export function ChangePassword({ className }: ChangePasswordProps) {
                 type="password"
                 autoComplete="current-password"
                 placeholder={localization.settings.currentPasswordPlaceholder}
-                disabled={isPending}
-                required
-                onChange={() => {
+                value={currentPassword}
+                onChange={(e) => {
+                  setCurrentPassword(e.target.value)
                   setFieldErrors((prev) => ({
                     ...prev,
                     currentPassword: undefined
                   }))
                 }}
+                disabled={isPending}
+                required
                 onInvalid={(e) => {
                   e.preventDefault()
                   setFieldErrors((prev) => ({
@@ -114,16 +155,18 @@ export function ChangePassword({ className }: ChangePasswordProps) {
                   type={isNewPasswordVisible ? "text" : "password"}
                   autoComplete="new-password"
                   placeholder={localization.auth.newPasswordPlaceholder}
-                  minLength={emailAndPassword?.minPasswordLength}
-                  maxLength={emailAndPassword?.maxPasswordLength}
-                  disabled={isPending}
-                  required
-                  onChange={() => {
+                  value={newPassword}
+                  onChange={(e) => {
+                    setNewPassword(e.target.value)
                     setFieldErrors((prev) => ({
                       ...prev,
                       newPassword: undefined
                     }))
                   }}
+                  minLength={emailAndPassword?.minPasswordLength}
+                  maxLength={emailAndPassword?.maxPasswordLength}
+                  disabled={isPending}
+                  required
                   onInvalid={(e) => {
                     e.preventDefault()
                     setFieldErrors((prev) => ({
@@ -176,16 +219,18 @@ export function ChangePassword({ className }: ChangePasswordProps) {
                     type={isConfirmPasswordVisible ? "text" : "password"}
                     autoComplete="new-password"
                     placeholder={localization.auth.confirmPasswordPlaceholder}
-                    minLength={emailAndPassword?.minPasswordLength}
-                    maxLength={emailAndPassword?.maxPasswordLength}
-                    disabled={isPending}
-                    required
-                    onChange={() => {
+                    value={confirmPassword}
+                    onChange={(e) => {
+                      setConfirmPassword(e.target.value)
                       setFieldErrors((prev) => ({
                         ...prev,
                         confirmPassword: undefined
                       }))
                     }}
+                    minLength={emailAndPassword?.minPasswordLength}
+                    maxLength={emailAndPassword?.maxPasswordLength}
+                    disabled={isPending}
+                    required
                     onInvalid={(e) => {
                       e.preventDefault()
                       setFieldErrors((prev) => ({
