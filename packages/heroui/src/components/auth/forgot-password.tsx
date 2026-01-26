@@ -1,4 +1,4 @@
-import { useAuth, useAuthMutation } from "@better-auth-ui/react"
+import { useAuth, useRequestPasswordReset } from "@better-auth-ui/react"
 import {
   Button,
   Card,
@@ -14,7 +14,7 @@ import {
   TextField,
   toast
 } from "@heroui/react"
-
+import type { FormEvent } from "react"
 import { cn } from "../../lib/utils"
 
 export type ForgotPasswordProps = {
@@ -36,18 +36,21 @@ export function ForgotPassword({
   variant,
   ...props
 }: ForgotPasswordProps & CardProps) {
-  const { authClient, basePaths, localization, viewPaths, navigate } = useAuth()
+  const { basePaths, localization, viewPaths, navigate } = useAuth()
 
-  const { mutate: requestPasswordReset, isPending } = useAuthMutation(
-    authClient.requestPasswordReset,
-    {
-      onError: (error) => toast.danger(error.error?.message || error.message),
-      onSuccess: () => {
-        toast.success(localization.auth.passwordResetEmailSent)
-        navigate({ to: `${basePaths.auth}/${viewPaths.auth.signIn}` })
-      }
+  const { mutate: requestPasswordReset, isPending } = useRequestPasswordReset({
+    onError: (error) => toast.danger(error.error?.message || error.message),
+    onSuccess: () => {
+      toast.success(localization.auth.passwordResetEmailSent)
+      navigate({ to: `${basePaths.auth}/${viewPaths.auth.signIn}` })
     }
-  )
+  })
+
+  function handleSubmit(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault()
+    const formData = new FormData(e.currentTarget)
+    requestPasswordReset({ email: formData.get("email") as string })
+  }
 
   return (
     <Card
@@ -56,13 +59,7 @@ export function ForgotPassword({
       {...props}
     >
       <Card.Content>
-        <Form
-          onSubmit={(e) => {
-            e.preventDefault()
-            const formData = new FormData(e.currentTarget)
-            requestPasswordReset({ email: formData.get("email") as string })
-          }}
-        >
+        <Form onSubmit={handleSubmit}>
           <Fieldset className="gap-4">
             <Label className="text-xl">
               {localization.auth.forgotPassword}

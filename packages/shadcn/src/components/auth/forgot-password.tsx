@@ -1,7 +1,7 @@
 "use client"
 
-import { useAuth } from "@better-auth-ui/react"
-import { useState } from "react"
+import { useAuth, useRequestPasswordReset } from "@better-auth-ui/react"
+import { type FormEvent, useState } from "react"
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -14,7 +14,6 @@ import {
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import { Spinner } from "@/components/ui/spinner"
-import { useForgotPassword } from "@/hooks/auth/use-forgot-password"
 import { cn } from "@/lib/utils"
 
 export type ForgotPasswordProps = {
@@ -32,10 +31,17 @@ export type ForgotPasswordProps = {
  */
 export function ForgotPassword({ className }: ForgotPasswordProps) {
   const { basePaths, localization, viewPaths, Link } = useAuth()
-  const { mutate, isPending } = useForgotPassword({
+
+  const { mutate: requestPasswordReset, isPending } = useRequestPasswordReset({
     onError: (error) => toast.error(error.message || error.statusText),
     onSuccess: () => toast.success(localization.auth.passwordResetEmailSent)
   })
+
+  function handleSubmit(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault()
+    const formData = new FormData(e.currentTarget)
+    requestPasswordReset({ email: formData.get("email") as string })
+  }
 
   const [fieldErrors, setFieldErrors] = useState<{
     email?: string
@@ -50,15 +56,7 @@ export function ForgotPassword({ className }: ForgotPasswordProps) {
       </CardHeader>
 
       <CardContent className="px-4 md:px-6">
-        <form
-          onSubmit={(e) => {
-            e.preventDefault()
-            const formData = new FormData(e.currentTarget)
-            const email = formData.get("email") as string
-
-            mutate({ email })
-          }}
-        >
+        <form onSubmit={handleSubmit}>
           <FieldGroup className="gap-4">
             <Field className="gap-1">
               <FieldLabel htmlFor="email">{localization.auth.email}</FieldLabel>

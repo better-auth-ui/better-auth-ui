@@ -15,7 +15,7 @@ export { useAuthMutation } from "./use-auth-mutation"
  *
  * @returns The `useMutation` result.
  */
-export function useForgotPassword(
+export function useRequestPasswordReset(
   options?: UseAuthMutationOptions<AuthClient["requestPasswordReset"]>
 ) {
   const { authClient } = useAuth()
