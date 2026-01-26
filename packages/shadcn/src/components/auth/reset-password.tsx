@@ -85,6 +85,7 @@ export function ResetPassword({ className }: ResetPasswordProps) {
     if (!token) {
       toast.error(localization.auth.invalidResetPasswordToken)
       navigate({ to: `${basePaths.auth}/${viewPaths.auth.signIn}` })
+      return
     }
 
     const formData = new FormData(e.currentTarget)
