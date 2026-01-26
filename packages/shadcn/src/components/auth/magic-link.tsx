@@ -1,6 +1,10 @@
 "use client"
 
-import { useAuth } from "@better-auth-ui/react"
+import {
+  useAuth,
+  useSignInMagicLink,
+  useSignInSocial
+} from "@better-auth-ui/react"
 import { useState } from "react"
 import { toast } from "sonner"
 
@@ -16,8 +20,6 @@ import {
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import { Spinner } from "@/components/ui/spinner"
-import { useSignInMagicLink } from "@/hooks/auth/use-sign-in-magic-link"
-import { useSignInSocial } from "@/hooks/auth/use-sign-in-social"
 import { cn } from "@/lib/utils"
 import { MagicLinkButton } from "./magic-link-button"
 import { ProviderButtons, type SocialLayout } from "./provider-buttons"
@@ -39,17 +41,24 @@ export type MagicLinkProps = {
 export function MagicLink({
   className,
   socialLayout,
-  socialPosition = "bottom",
-  ...config
+  socialPosition = "bottom"
 }: MagicLinkProps) {
-  const { basePaths, localization, socialProviders, viewPaths, Link } =
+  const { basePaths, baseURL, localization, redirectTo, socialProviders, viewPaths, Link } =
     useAuth()
-  const [{ email }, signInMagicLink, magicLinkPending] = useSignInMagicLink({
-    onError: (error) => toast.error(error.message || error.statusText),
-    onSuccess: () => toast.success(localization.auth.magicLinkSent)
-  })
-  const [_, signInSocial, socialPending] = useSignInSocial({
-    onError: (error) => toast.error(error.message || error.statusText)
+
+  const [email, setEmail] = useState("")
+
+  const { mutate: signInMagicLink, isPending: magicLinkPending } =
+    useSignInMagicLink({
+      onError: (error) => toast.error(error.error?.message || error.message),
+      onSuccess: () => {
+        setEmail("")
+        toast.success(localization.auth.magicLinkSent)
+      }
+    })
+
+  const { mutate: signInSocial, isPending: socialPending } = useSignInSocial({
+    onError: (error) => toast.error(error.error?.message || error.message)
   })
 
   const isPending = magicLinkPending || socialPending
@@ -57,6 +66,11 @@ export function MagicLink({
   const [fieldErrors, setFieldErrors] = useState<{
     email?: string
   }>({})
+
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    signInMagicLink({ email, callbackURL: `${baseURL}${redirectTo}` })
+  }
 
   const showSeparator = socialProviders && socialProviders.length > 0
 
@@ -72,7 +86,6 @@ export function MagicLink({
             <>
               {socialProviders && socialProviders.length > 0 && (
                 <ProviderButtons
-                  {...config}
                   socialLayout={socialLayout}
                   signInSocial={signInSocial}
                   isPending={isPending}
@@ -87,7 +100,7 @@ export function MagicLink({
             </>
           )}
 
-          <form action={signInMagicLink}>
+          <form onSubmit={handleSubmit}>
             <FieldGroup className="gap-4">
               <Field className="gap-1">
                 <FieldLabel htmlFor="email">
@@ -99,16 +112,17 @@ export function MagicLink({
                   name="email"
                   type="email"
                   autoComplete="email"
-                  defaultValue={email}
-                  placeholder={localization.auth.emailPlaceholder}
-                  required
-                  disabled={isPending}
-                  onChange={() => {
+                  value={email}
+                  onChange={(e) => {
+                    setEmail(e.target.value)
                     setFieldErrors((prev) => ({
                       ...prev,
                       email: undefined
                     }))
                   }}
+                  placeholder={localization.auth.emailPlaceholder}
+                  required
+                  disabled={isPending}
                   onInvalid={(e) => {
                     e.preventDefault()
                     setFieldErrors((prev) => ({
@@ -129,11 +143,7 @@ export function MagicLink({
                   {localization.auth.sendMagicLink}
                 </Button>
 
-                <MagicLinkButton
-                  {...config}
-                  view="magicLink"
-                  isPending={isPending}
-                />
+                <MagicLinkButton view="magicLink" isPending={isPending} />
               </Field>
             </FieldGroup>
           </form>
@@ -148,7 +158,6 @@ export function MagicLink({
 
               {socialProviders && socialProviders.length > 0 && (
                 <ProviderButtons
-                  {...config}
                   socialLayout={socialLayout}
                   signInSocial={signInSocial}
                   isPending={isPending}

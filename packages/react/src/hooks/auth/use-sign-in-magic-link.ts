@@ -1,41 +1,22 @@
-import { useAuth } from "@better-auth-ui/react"
-import type { AuthCallbackOptions } from "@better-auth-ui/react/core"
-import { useActionState } from "react"
+import {
+  type AuthClient,
+  useAuth,
+  useAuthMutation
+} from "@better-auth-ui/react"
+import type { UseAuthMutationOptions } from "./use-auth-mutation"
+
+export { useAuthMutation } from "./use-auth-mutation"
 
 /**
- * Provides a hook that sends a magic-link sign-in email and exposes the action state for that flow.
+ * Hook that creates a mutation for magic-link sign-in.
  *
- * The returned action state invokes the auth client's magic-link sign-in using the email from a FormData
- * input, calls the appropriate callback, and normalizes the stored email based on the result.
+ * The mutation sends a magic-link sign-in email to the specified address.
  *
- * @returns An action state object that triggers sending a magic link and holds the `email` field (initially `""`).
+ * @returns The `useMutation` result.
  */
-export function useSignInMagicLink({
-  onError,
-  onSuccess
-}: AuthCallbackOptions = {}) {
-  const { authClient, baseURL, redirectTo } = useAuth()
-
-  const signInMagicLink = async (_: object, formData: FormData) => {
-    const email = formData.get("email") as string
-
-    const callbackURL = `${baseURL}${redirectTo}`
-
-    const { error } = await authClient.signIn.magicLink({
-      email,
-      callbackURL
-    })
-
-    if (error) {
-      await onError?.(error)
-
-      return { email }
-    }
-
-    await onSuccess?.()
-
-    return { email: "" }
-  }
-
-  return useActionState(signInMagicLink, { email: "" })
+export function useSignInMagicLink(
+  options?: UseAuthMutationOptions<AuthClient["signIn"]["magicLink"]>
+) {
+  const { authClient } = useAuth()
+  return useAuthMutation(authClient.signIn.magicLink, options)
 }

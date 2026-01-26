@@ -18,6 +18,8 @@ import {
   TextField,
   toast
 } from "@heroui/react"
+import { useState } from "react"
+
 import { cn } from "../../lib/utils"
 import { FieldSeparator } from "./field-separator"
 import { MagicLinkButton } from "./magic-link-button"
@@ -45,16 +47,30 @@ export function MagicLink({
   variant,
   ...props
 }: MagicLinkProps & CardProps) {
-  const { basePaths, localization, socialProviders, viewPaths } = useAuth()
-  const [{ email }, signInMagicLink, magicLinkPending] = useSignInMagicLink({
-    onError: (error) => toast.danger(error.message || error.statusText),
-    onSuccess: () => toast.success(localization.auth.magicLinkSent)
-  })
-  const [_, signInSocial, socialPending] = useSignInSocial({
-    onError: (error) => toast.danger(error.message || error.statusText)
+  const { basePaths, baseURL, localization, redirectTo, socialProviders, viewPaths } =
+    useAuth()
+
+  const [email, setEmail] = useState("")
+
+  const { mutate: signInMagicLink, isPending: magicLinkPending } =
+    useSignInMagicLink({
+      onError: (error) => toast.danger(error.error?.message || error.message),
+      onSuccess: () => {
+        setEmail("")
+        toast.success(localization.auth.magicLinkSent)
+      }
+    })
+
+  const { mutate: signInSocial, isPending: socialPending } = useSignInSocial({
+    onError: (error) => toast.danger(error.error?.message || error.message)
   })
 
   const isPending = magicLinkPending || socialPending
+
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    signInMagicLink({ email, callbackURL: `${baseURL}${redirectTo}` })
+  }
 
   const showSeparator = socialProviders && socialProviders.length > 0
 
@@ -84,14 +100,15 @@ export function MagicLink({
             </>
           )}
 
-          <Form action={signInMagicLink} className="flex flex-col gap-4">
+          <Form onSubmit={handleSubmit} className="flex flex-col gap-4">
             <Fieldset.Group>
               <TextField
-                defaultValue={email}
                 name="email"
                 type="email"
                 autoComplete="email"
                 isDisabled={isPending}
+                value={email}
+                onChange={setEmail}
               >
                 <Label>{localization.auth.email}</Label>
 
