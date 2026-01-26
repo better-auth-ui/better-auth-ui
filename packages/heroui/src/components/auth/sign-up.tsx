@@ -52,20 +52,33 @@ export function SignUp({
     emailAndPassword,
     localization,
     magicLink,
+    navigate,
+    redirectTo,
     socialProviders,
     viewPaths
   } = useAuth()
 
-  const [
-    { name, email, password, confirmPassword },
-    signUpEmail,
-    signUpPending
-  ] = useSignUpEmail({
-    onError: (error) => toast.danger(error.message || error.statusText)
+  const [password, setPassword] = useState("")
+  const [confirmPassword, setConfirmPassword] = useState("")
+
+  const { mutate: signUpEmail, isPending: signUpPending } = useSignUpEmail({
+    onError: (error) => {
+      setPassword("")
+      setConfirmPassword("")
+      toast.danger(error.error?.message || error.message)
+    },
+    onSuccess: () => {
+      if (emailAndPassword?.requireEmailVerification) {
+        toast.success(localization.auth.verifyYourEmail)
+        navigate({ to: `${basePaths.auth}/${viewPaths.auth.signIn}` })
+      } else {
+        navigate({ to: redirectTo })
+      }
+    }
   })
 
-  const [_, signInSocial, socialPending] = useSignInSocial({
-    onError: (error) => toast.danger(error.message || error.statusText)
+  const { mutate: signInSocial, isPending: socialPending } = useSignInSocial({
+    onError: (error) => toast.danger(error.error?.message || error.message)
   })
 
   const [isPasswordVisible, setIsPasswordVisible] = useState(false)
@@ -73,6 +86,22 @@ export function SignUp({
     useState(false)
 
   const isPending = signUpPending || socialPending
+
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    const formData = new FormData(e.currentTarget)
+    const name = formData.get("name") as string
+    const email = formData.get("email") as string
+
+    if (emailAndPassword?.confirmPassword && password !== confirmPassword) {
+      toast.danger(localization.auth.passwordsDoNotMatch)
+      setPassword("")
+      setConfirmPassword("")
+      return
+    }
+
+    signUpEmail({ name, email, password })
+  }
 
   const showSeparator =
     emailAndPassword?.enabled && socialProviders && socialProviders.length > 0
@@ -104,10 +133,9 @@ export function SignUp({
           )}
 
           {emailAndPassword?.enabled && (
-            <Form action={signUpEmail} className="flex flex-col gap-4">
+            <Form onSubmit={handleSubmit} className="flex flex-col gap-4">
               <Fieldset.Group>
                 <TextField
-                  defaultValue={name}
                   name="name"
                   type="text"
                   autoComplete="name"
@@ -127,7 +155,6 @@ export function SignUp({
                 </TextField>
 
                 <TextField
-                  defaultValue={email}
                   name="email"
                   type="email"
                   autoComplete="email"
@@ -147,12 +174,13 @@ export function SignUp({
                 </TextField>
 
                 <TextField
-                  defaultValue={password}
                   minLength={emailAndPassword?.minPasswordLength}
                   maxLength={emailAndPassword?.maxPasswordLength}
                   name="password"
                   autoComplete="new-password"
                   isDisabled={isPending}
+                  value={password}
+                  onChange={setPassword}
                 >
                   <Label>{localization.auth.password}</Label>
 
@@ -191,12 +219,13 @@ export function SignUp({
 
                 {emailAndPassword?.confirmPassword && (
                   <TextField
-                    defaultValue={confirmPassword}
                     minLength={emailAndPassword?.minPasswordLength}
                     maxLength={emailAndPassword?.maxPasswordLength}
                     name="confirmPassword"
                     autoComplete="new-password"
                     isDisabled={isPending}
+                    value={confirmPassword}
+                    onChange={setConfirmPassword}
                   >
                     <Label>{localization.auth.confirmPassword}</Label>
 

@@ -1,6 +1,10 @@
 "use client"
 
-import { useAuth } from "@better-auth-ui/react"
+import {
+  useAuth,
+  useSignInSocial,
+  useSignUpEmail
+} from "@better-auth-ui/react"
 import { Eye, EyeOff } from "lucide-react"
 import { useState } from "react"
 import { toast } from "sonner"
@@ -23,8 +27,6 @@ import {
   InputGroupInput
 } from "@/components/ui/input-group"
 import { Spinner } from "@/components/ui/spinner"
-import { useSignInSocial } from "@/hooks/auth/use-sign-in-social"
-import { useSignUpEmail } from "@/hooks/auth/use-sign-up-email"
 import { cn } from "@/lib/utils"
 import { MagicLinkButton } from "./magic-link-button"
 import { ProviderButtons, type SocialLayout } from "./provider-buttons"
@@ -59,21 +61,34 @@ export function SignUp({
     emailAndPassword,
     localization,
     magicLink,
+    navigate,
+    redirectTo,
     socialProviders,
     viewPaths,
     Link
   } = useAuth()
 
-  const [
-    { name, email, password, confirmPassword },
-    signUpEmail,
-    signUpPending
-  ] = useSignUpEmail({
-    onError: (error) => toast.error(error.message || error.statusText)
+  const [password, setPassword] = useState("")
+  const [confirmPassword, setConfirmPassword] = useState("")
+
+  const { mutate: signUpEmail, isPending: signUpPending } = useSignUpEmail({
+    onError: (error) => {
+      setPassword("")
+      setConfirmPassword("")
+      toast.error(error.error?.message || error.message)
+    },
+    onSuccess: () => {
+      if (emailAndPassword?.requireEmailVerification) {
+        toast.success(localization.auth.verifyYourEmail)
+        navigate({ to: `${basePaths.auth}/${viewPaths.auth.signIn}` })
+      } else {
+        navigate({ to: redirectTo })
+      }
+    }
   })
 
-  const [_, signInSocial, socialPending] = useSignInSocial({
-    onError: (error) => toast.error(error.message || error.statusText)
+  const { mutate: signInSocial, isPending: socialPending } = useSignInSocial({
+    onError: (error) => toast.error(error.error?.message || error.message)
   })
 
   const isPending = signUpPending || socialPending
@@ -88,6 +103,22 @@ export function SignUp({
     password?: string
     confirmPassword?: string
   }>({})
+
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    const formData = new FormData(e.currentTarget)
+    const name = formData.get("name") as string
+    const email = formData.get("email") as string
+
+    if (emailAndPassword?.confirmPassword && password !== confirmPassword) {
+      toast.error(localization.auth.passwordsDoNotMatch)
+      setPassword("")
+      setConfirmPassword("")
+      return
+    }
+
+    signUpEmail({ name, email, password })
+  }
 
   const showSeparator =
     emailAndPassword?.enabled && socialProviders && socialProviders.length > 0
@@ -119,7 +150,7 @@ export function SignUp({
           )}
 
           {emailAndPassword?.enabled && (
-            <form action={signUpEmail}>
+            <form onSubmit={handleSubmit}>
               <FieldGroup className="gap-4">
                 <Field className="gap-1">
                   <FieldLabel htmlFor="name">
@@ -131,7 +162,6 @@ export function SignUp({
                     name="name"
                     type="text"
                     autoComplete="name"
-                    defaultValue={name}
                     placeholder={localization.auth.namePlaceholder}
                     required
                     disabled={isPending}
@@ -164,7 +194,6 @@ export function SignUp({
                     name="email"
                     type="email"
                     autoComplete="email"
-                    defaultValue={email}
                     placeholder={localization.auth.emailPlaceholder}
                     required
                     disabled={isPending}
@@ -198,18 +227,19 @@ export function SignUp({
                       name="password"
                       type={isPasswordVisible ? "text" : "password"}
                       autoComplete="new-password"
-                      defaultValue={password}
-                      placeholder={localization.auth.passwordPlaceholder}
-                      required
-                      minLength={emailAndPassword?.minPasswordLength}
-                      maxLength={emailAndPassword?.maxPasswordLength}
-                      disabled={isPending}
-                      onChange={() => {
+                      value={password}
+                      onChange={(e) => {
+                        setPassword(e.target.value)
                         setFieldErrors((prev) => ({
                           ...prev,
                           password: undefined
                         }))
                       }}
+                      placeholder={localization.auth.passwordPlaceholder}
+                      required
+                      minLength={emailAndPassword?.minPasswordLength}
+                      maxLength={emailAndPassword?.maxPasswordLength}
+                      disabled={isPending}
                       onInvalid={(e) => {
                         e.preventDefault()
 
@@ -258,7 +288,14 @@ export function SignUp({
                         name="confirmPassword"
                         type={isConfirmPasswordVisible ? "text" : "password"}
                         autoComplete="new-password"
-                        defaultValue={confirmPassword}
+                        value={confirmPassword}
+                        onChange={(e) => {
+                          setConfirmPassword(e.target.value)
+                          setFieldErrors((prev) => ({
+                            ...prev,
+                            confirmPassword: undefined
+                          }))
+                        }}
                         placeholder={
                           localization.auth.confirmPasswordPlaceholder
                         }
@@ -266,12 +303,6 @@ export function SignUp({
                         minLength={emailAndPassword?.minPasswordLength}
                         maxLength={emailAndPassword?.maxPasswordLength}
                         disabled={isPending}
-                        onChange={() => {
-                          setFieldErrors((prev) => ({
-                            ...prev,
-                            confirmPassword: undefined
-                          }))
-                        }}
                         onInvalid={(e) => {
                           e.preventDefault()
                           setFieldErrors((prev) => ({
