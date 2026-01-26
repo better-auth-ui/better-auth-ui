@@ -49,13 +49,15 @@ export function ChangePassword({
       setCurrentPassword("")
       setNewPassword("")
       setConfirmPassword("")
-      toast.danger(error.error?.message || error.message)
+      toast.danger(error.error?.message || error.message, { timeout: 3000 })
     },
     onSuccess: () => {
       setCurrentPassword("")
       setNewPassword("")
       setConfirmPassword("")
-      toast.success(localization.settings.changePasswordSuccess)
+      toast.success(localization.settings.changePasswordSuccess, {
+        timeout: 3000
+      })
     }
   })
 
@@ -70,7 +72,7 @@ export function ChangePassword({
       setCurrentPassword("")
       setNewPassword("")
       setConfirmPassword("")
-      toast.danger(localization.auth.passwordsDoNotMatch)
+      toast.danger(localization.auth.passwordsDoNotMatch, { timeout: 3000 })
       return
     }
 

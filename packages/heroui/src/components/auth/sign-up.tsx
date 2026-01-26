@@ -65,11 +65,11 @@ export function SignUp({
     onError: (error) => {
       setPassword("")
       setConfirmPassword("")
-      toast.danger(error.error?.message || error.message)
+      toast.danger(error.error?.message || error.message, { timeout: 3000 })
     },
     onSuccess: () => {
       if (emailAndPassword?.requireEmailVerification) {
-        toast.success(localization.auth.verifyYourEmail)
+        toast.success(localization.auth.verifyYourEmail, { timeout: 3000 })
         navigate({ to: `${basePaths.auth}/${viewPaths.auth.signIn}` })
       } else {
         navigate({ to: redirectTo })
@@ -78,7 +78,8 @@ export function SignUp({
   })
 
   const { mutate: signInSocial, isPending: socialPending } = useSignInSocial({
-    onError: (error) => toast.danger(error.error?.message || error.message)
+    onError: (error) =>
+      toast.danger(error.error?.message || error.message, { timeout: 3000 })
   })
 
   const [isPasswordVisible, setIsPasswordVisible] = useState(false)
@@ -94,7 +95,7 @@ export function SignUp({
     const email = formData.get("email") as string
 
     if (emailAndPassword?.confirmPassword && password !== confirmPassword) {
-      toast.danger(localization.auth.passwordsDoNotMatch)
+      toast.danger(localization.auth.passwordsDoNotMatch, { timeout: 3000 })
       setPassword("")
       setConfirmPassword("")
       return

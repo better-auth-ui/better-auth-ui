@@ -39,8 +39,12 @@ export function UserProfile({
   const { data: sessionData } = useSession()
 
   const { mutate: updateUser, isPending } = useUpdateUser({
-    onError: (error) => toast.danger(error.error?.message || error.message),
-    onSuccess: () => toast.success(localization.settings.profileUpdatedSuccess)
+    onError: (error) =>
+      toast.danger(error.error?.message || error.message, { timeout: 3000 }),
+    onSuccess: () =>
+      toast.success(localization.settings.profileUpdatedSuccess, {
+        timeout: 3000
+      })
   })
 
   function handleSubmit(e: FormEvent<HTMLFormElement>) {

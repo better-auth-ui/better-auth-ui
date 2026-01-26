@@ -39,9 +39,10 @@ export function ForgotPassword({
   const { basePaths, localization, viewPaths, navigate } = useAuth()
 
   const { mutate: requestPasswordReset, isPending } = useRequestPasswordReset({
-    onError: (error) => toast.danger(error.error?.message || error.message),
+    onError: (error) =>
+      toast.danger(error.error?.message || error.message, { timeout: 3000 }),
     onSuccess: () => {
-      toast.success(localization.auth.passwordResetEmailSent)
+      toast.success(localization.auth.passwordResetEmailSent, { timeout: 3000 })
       navigate({ to: `${basePaths.auth}/${viewPaths.auth.signIn}` })
     }
   })

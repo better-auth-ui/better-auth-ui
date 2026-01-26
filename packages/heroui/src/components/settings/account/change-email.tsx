@@ -39,14 +39,16 @@ export function ChangeEmail({
   const { localization, baseURL, viewPaths } = useAuth()
   const { data: sessionData } = useSession({
     throwOnError: (error) => {
-      toast.danger(error.error?.message || error.message)
+      toast.danger(error.error?.message || error.message, { timeout: 3000 })
       return false
     }
   })
 
   const { mutate: changeEmail, isPending } = useChangeEmail({
-    onSuccess: () => toast.success(localization.settings.changeEmailSuccess),
-    onError: (error) => toast.danger(error.error?.message || error.message)
+    onSuccess: () =>
+      toast.success(localization.settings.changeEmailSuccess, { timeout: 3000 }),
+    onError: (error) =>
+      toast.danger(error.error?.message || error.message, { timeout: 3000 })
   })
 
   function handleSubmit(e: FormEvent<HTMLFormElement>) {

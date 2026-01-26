@@ -25,7 +25,8 @@ export function ConnectedAccounts({
   const { data: accounts, isPending, error } = useListAccounts()
 
   useEffect(() => {
-    if (error) toast.danger(error.error?.message || error.message)
+    if (error)
+      toast.danger(error.error?.message || error.message, { timeout: 3000 })
   }, [error])
 
   return (
