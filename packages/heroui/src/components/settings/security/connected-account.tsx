@@ -30,7 +30,13 @@ export function ConnectedAccount({ account, provider }: ConnectedAccountProps) {
 
   const { data: accountInfo, isPending: isLoadingInfo } = useAccountInfo(
     account?.accountId,
-    { enabled: !!account }
+    {
+      enabled: !!account,
+      throwOnError: (error) => {
+        if (error.error) toast.danger(error.error.message, { timeout: 3000 })
+        return false
+      }
+    }
   )
 
   const { mutate: linkSocial, isPending: isLinking } = useLinkSocial({

@@ -1,37 +1,28 @@
-import { useAuth, useListSessions } from "@better-auth-ui/react"
-import { useCallback, useState } from "react"
+import {
+  type AuthClient,
+  useAuth,
+  useAuthMutation
+} from "@better-auth-ui/react"
+import type { UseAuthMutationOptions } from "../auth/use-auth-mutation"
+
+import { useListSessions } from "./use-list-sessions"
 
 /**
- * Revokes an active user session and refreshes the sessions list on success.
+ * Hook that creates a mutation for revoking a user session.
  *
- * @returns An object with:
- * - `revokingSession` — the token of the session currently being revoked, or `null` if none.
- * - `revokeSession(sessionToken)` — revokes the session identified by `sessionToken`.
+ * @returns The `useMutation` result.
  */
-export function useRevokeSession() {
-  const { authClient, toast } = useAuth()
+export function useRevokeSession(
+  options?: UseAuthMutationOptions<AuthClient["revokeSession"]>
+) {
+  const { authClient } = useAuth()
   const { refetch } = useListSessions()
 
-  const [revokingSession, setRevokingSession] = useState<string | null>(null)
-
-  const revokeSession = useCallback(
-    async (sessionToken: string) => {
-      setRevokingSession(sessionToken)
-
-      const { error } = await authClient.revokeSession({
-        token: sessionToken
-      })
-
-      if (error) {
-        toast.error(error.message || error.statusText)
-      } else {
-        await refetch()
-      }
-
-      setRevokingSession(null)
-    },
-    [authClient, refetch, toast]
-  )
-
-  return { revokingSession, revokeSession }
+  return useAuthMutation(authClient.revokeSession, {
+    ...options,
+    onSuccess: async (...args) => {
+      await refetch()
+      await options?.onSuccess?.(...args)
+    }
+  })
 }

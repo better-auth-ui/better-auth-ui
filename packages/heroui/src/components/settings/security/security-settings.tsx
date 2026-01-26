@@ -4,7 +4,7 @@ import type { ComponentProps } from "react"
 import { cn } from "../../../lib/utils"
 import { ChangePassword } from "./change-password"
 import { ConnectedAccounts } from "./connected-accounts"
-import { Sessions } from "./sessions"
+import { ActiveSessions } from "./active-sessions"
 
 export type SecuritySettingsProps = {
   className?: string
@@ -32,7 +32,7 @@ export function SecuritySettings({
     >
       {emailAndPassword?.enabled && <ChangePassword />}
       {socialProviders?.length && <ConnectedAccounts />}
-      <Sessions />
+      <ActiveSessions />
     </div>
   )
 }

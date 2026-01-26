@@ -1,6 +1,5 @@
 import { useAuth, useListAccounts } from "@better-auth-ui/react"
 import { Card, type CardProps, cn, Skeleton, toast } from "@heroui/react"
-import { useEffect } from "react"
 import { ConnectedAccount } from "./connected-account"
 
 export type ConnectedAccountsProps = {
@@ -22,12 +21,13 @@ export function ConnectedAccounts({
   ...props
 }: ConnectedAccountsProps & CardProps) {
   const { localization, socialProviders } = useAuth()
-  const { data: accounts, isPending, error } = useListAccounts()
 
-  useEffect(() => {
-    if (error)
-      toast.danger(error.error?.message || error.message, { timeout: 3000 })
-  }, [error])
+  const { data: accounts, isPending } = useListAccounts({
+    throwOnError: (error) => {
+      if (error.error) toast.danger(error.error.message, { timeout: 3000 })
+      return false
+    }
+  })
 
   return (
     <Card className={cn("p-4 md:p-6 gap-4", className)} {...props}>
