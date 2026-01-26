@@ -4,12 +4,11 @@ import {
   useAuthMutation,
   useSession
 } from "@better-auth-ui/react"
-import {
-  type UseMutationOptions,
-  type UseMutationResult,
-  useQueryClient
-} from "@tanstack/react-query"
-import type { BetterFetchError } from "better-auth/react"
+import { useQueryClient } from "@tanstack/react-query"
+import type {
+  UseAuthMutationOptions,
+  UseAuthMutationResult
+} from "../auth/use-auth-mutation"
 
 /**
  * Hook that creates a mutation for updating the authenticated user's profile.
@@ -20,23 +19,15 @@ import type { BetterFetchError } from "better-auth/react"
  * @returns The `useMutation` result.
  */
 export function useUpdateUser(
-  options?: UseMutationOptions<
-    { status: boolean },
-    BetterFetchError,
-    Partial<AuthClient["$Infer"]["Session"]["user"]>
-  >
-): UseMutationResult<
-  { status: boolean },
-  BetterFetchError,
-  Partial<AuthClient["$Infer"]["Session"]["user"]>
-> {
+  options?: UseAuthMutationOptions<AuthClient["updateUser"]>
+): UseAuthMutationResult<AuthClient["updateUser"]> {
   const { authClient } = useAuth()
   const { data: sessionData, refetch } = useSession()
   const queryClient = useQueryClient()
 
   return useAuthMutation(authClient.updateUser, {
     ...options,
-    onSuccess: (_, variables, ...rest) => {
+    onSuccess: async (data, variables, ...rest) => {
       queryClient.setQueryData(["auth", "getSession"], {
         ...sessionData,
         user: { ...sessionData?.user, ...variables }
@@ -44,7 +35,7 @@ export function useUpdateUser(
 
       refetch()
 
-      options?.onSuccess?.(_, variables, ...rest)
+      await options?.onSuccess?.(data, variables, ...rest)
     }
   })
 }
