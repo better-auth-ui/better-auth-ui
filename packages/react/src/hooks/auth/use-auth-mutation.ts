@@ -6,21 +6,33 @@ import {
 import type { BetterFetchError } from "better-auth/react"
 
 // biome-ignore lint/suspicious/noExplicitAny: any
-export type UseAuthMutationOptions<TFn extends (...args: any) => Promise<any>> =
-  UseMutationOptions<{ status: boolean }, BetterFetchError, Parameters<TFn>[0]>
+type AuthFn = (...args: any) => Promise<any>
 
-// biome-ignore lint/suspicious/noExplicitAny: any
-export function useAuthMutation<TFn extends (...args: any) => Promise<any>>(
+type MutationParams<TFn extends AuthFn> = keyof Omit<
+  Parameters<TFn>[0],
+  "fetchOptions"
+> extends never
+  ? // biome-ignore lint/suspicious/noConfusingVoidType: void is needed for mutations with no params
+    void
+  : Omit<Parameters<TFn>[0], "fetchOptions">
+
+export type UseAuthMutationOptions<TFn extends AuthFn> = UseMutationOptions<
+  { status: boolean },
+  BetterFetchError,
+  MutationParams<TFn>
+>
+
+export function useAuthMutation<TFn extends AuthFn>(
   fn: TFn,
   options?: UseMutationOptions<
     Awaited<ReturnType<TFn>>,
     BetterFetchError,
-    Omit<Parameters<TFn>[0], "fetchOptions">
+    MutationParams<TFn>
   >
 ): UseMutationResult<
   Awaited<ReturnType<TFn>>,
   BetterFetchError,
-  Omit<Parameters<TFn>[0], "fetchOptions">
+  MutationParams<TFn>
 > {
   return useMutation({
     mutationFn: (params) =>

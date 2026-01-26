@@ -1,42 +1,31 @@
-import { useAuth } from "@better-auth-ui/react"
-import type { AuthCallbackOptions } from "@better-auth-ui/react/core"
+import {
+  type AuthClient,
+  useAuth,
+  useAuthMutation
+} from "@better-auth-ui/react"
 import { useQueryClient } from "@tanstack/react-query"
-import { useCallback } from "react"
+import type { UseAuthMutationOptions } from "./use-auth-mutation"
+
+export { useAuthMutation } from "./use-auth-mutation"
 
 /**
- * Provides a sign-out action that signs the current user out, invalidates auth-related queries, and redirects to the sign-in view.
+ * Hook that creates a mutation for signing out.
  *
- * @param options - Optional callbacks for error and success handling
- * @returns An object containing `signOut`, a function that performs the sign-out flow described above.
+ * The mutation signs out the current user and removes auth queries from cache.
+ *
+ * @returns The `useMutation` result.
  */
-export function useSignOut({ onError, onSuccess }: AuthCallbackOptions = {}) {
+export function useSignOut(
+  options?: UseAuthMutationOptions<AuthClient["signOut"]>
+) {
+  const { authClient } = useAuth()
   const queryClient = useQueryClient()
-  const { authClient, basePaths, viewPaths, navigate } = useAuth()
 
-  const signOut = useCallback(async () => {
-    const { error } = await authClient.signOut()
-
-    if (error) {
-      await onError?.(error)
-    } else {
-      await onSuccess?.()
+  return useAuthMutation(authClient.signOut, {
+    ...options,
+    onSuccess: async (...args) => {
+      queryClient.removeQueries({ queryKey: ["auth"] })
+      await options?.onSuccess?.(...args)
     }
-
-    queryClient.removeQueries({ queryKey: ["auth"] })
-
-    navigate({
-      to: `${basePaths.auth}/${viewPaths.auth.signIn}`,
-      replace: true
-    })
-  }, [
-    authClient,
-    basePaths.auth,
-    viewPaths.auth.signIn,
-    navigate,
-    onError,
-    onSuccess,
-    queryClient
-  ])
-
-  return { signOut }
+  })
 }

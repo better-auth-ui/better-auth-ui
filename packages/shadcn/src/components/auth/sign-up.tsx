@@ -1,10 +1,6 @@
 "use client"
 
-import {
-  useAuth,
-  useSignInSocial,
-  useSignUpEmail
-} from "@better-auth-ui/react"
+import { useAuth, useSignInSocial, useSignUpEmail } from "@better-auth-ui/react"
 import { Eye, EyeOff } from "lucide-react"
 import { useState } from "react"
 import { toast } from "sonner"

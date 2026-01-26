@@ -47,8 +47,14 @@ export function MagicLink({
   variant,
   ...props
 }: MagicLinkProps & CardProps) {
-  const { basePaths, baseURL, localization, redirectTo, socialProviders, viewPaths } =
-    useAuth()
+  const {
+    basePaths,
+    baseURL,
+    localization,
+    redirectTo,
+    socialProviders,
+    viewPaths
+  } = useAuth()
 
   const [email, setEmail] = useState("")
 

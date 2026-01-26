@@ -43,8 +43,15 @@ export function MagicLink({
   socialLayout,
   socialPosition = "bottom"
 }: MagicLinkProps) {
-  const { basePaths, baseURL, localization, redirectTo, socialProviders, viewPaths, Link } =
-    useAuth()
+  const {
+    basePaths,
+    baseURL,
+    localization,
+    redirectTo,
+    socialProviders,
+    viewPaths,
+    Link
+  } = useAuth()
 
   const [email, setEmail] = useState("")
 

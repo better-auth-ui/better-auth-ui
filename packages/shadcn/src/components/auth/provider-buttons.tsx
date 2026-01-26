@@ -1,8 +1,8 @@
 "use client"
 
 import { getProviderName } from "@better-auth-ui/core"
-import type { SocialProvider } from "better-auth/social-providers"
 import { providerIcons, useAuth } from "@better-auth-ui/react"
+import type { SocialProvider } from "better-auth/social-providers"
 import { useMemo } from "react"
 
 import { Button } from "@/components/ui/button"
@@ -12,7 +12,10 @@ import { cn } from "@/lib/utils"
 export type ProviderButtonsProps = {
   isPending: boolean
   socialLayout?: SocialLayout
-  signInSocial: (params: { provider: SocialProvider; callbackURL: string }) => void
+  signInSocial: (params: {
+    provider: SocialProvider
+    callbackURL: string
+  }) => void
 }
 
 export type SocialLayout = "auto" | "horizontal" | "vertical" | "grid"
