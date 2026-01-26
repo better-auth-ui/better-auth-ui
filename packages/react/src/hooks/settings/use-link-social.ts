@@ -1,37 +1,18 @@
-import { useAuth } from "@better-auth-ui/react"
-import { useCallback, useState } from "react"
+import {
+  type AuthClient,
+  useAuth,
+  useAuthMutation
+} from "@better-auth-ui/react"
+import type { UseAuthMutationOptions } from "../auth/use-auth-mutation"
 
 /**
- * Provides state and an action for linking a social provider account to the current user.
+ * Hook that creates a mutation for linking a social provider to the current user.
  *
- * The action sets `linkingProvider` to the provider id while the link operation is in progress,
- * shows an error toast on failure, and clears `linkingProvider` when complete.
- *
- * @returns An object with `linkingProvider` (provider id being linked or `null`) and `linkSocial` (function to initiate linking for a given provider).
+ * @returns The `useMutation` result.
  */
-export function useLinkSocial() {
-  const { authClient, baseURL, toast } = useAuth()
-  const [isPending, setIsPending] = useState(false)
-
-  const linkSocial = useCallback(
-    async (provider: string) => {
-      setIsPending(true)
-
-      const callbackURL = `${baseURL}${window.location.pathname}`
-
-      const { error } = await authClient.linkSocial({
-        provider,
-        callbackURL
-      })
-
-      if (error) {
-        toast.error(error.message || error.statusText)
-      }
-
-      setIsPending(false)
-    },
-    [authClient, baseURL, toast]
-  )
-
-  return { linkSocial, isPending }
+export function useLinkSocial(
+  options?: UseAuthMutationOptions<AuthClient["linkSocial"]>
+) {
+  const { authClient } = useAuth()
+  return useAuthMutation(authClient.linkSocial, options)
 }

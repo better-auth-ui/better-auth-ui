@@ -10,6 +10,7 @@ import {
 } from "@better-auth-ui/react"
 import type { Account, SocialProvider } from "better-auth"
 import { LinkIcon, Plug, X } from "lucide-react"
+import { toast } from "sonner"
 
 import { Button } from "@/components/ui/button"
 import { Item } from "@/components/ui/item"
@@ -33,14 +34,20 @@ export type ConnectedAccountProps = {
  * @returns A JSX element containing the connected account card
  */
 export function ConnectedAccount({ account, provider }: ConnectedAccountProps) {
-  const { localization } = useAuth()
+  const { baseURL, localization } = useAuth()
 
   const { data: accountInfo, isPending: isLoadingInfo } = useAccountInfo(
     account?.accountId
   )
 
-  const { linkSocial, isPending: isLinking } = useLinkSocial()
-  const { unlinkAccount, isPending: isUnlinking } = useUnlinkAccount()
+  const { mutate: linkSocial, isPending: isLinking } = useLinkSocial({
+    onError: (error) => toast.error(error.error?.message || error.message)
+  })
+
+  const { mutate: unlinkAccount, isPending: isUnlinking } = useUnlinkAccount({
+    onError: (error) => toast.error(error.error?.message || error.message),
+    onSuccess: () => toast.success(localization.settings.accountUnlinked)
+  })
 
   const ProviderIcon = providerIcons[provider]
   const providerName = getProviderName(provider)
@@ -87,7 +94,7 @@ export function ConnectedAccount({ account, provider }: ConnectedAccountProps) {
           className="ml-auto"
           variant="ghost"
           size="icon"
-          onClick={() => unlinkAccount(account.providerId)}
+          onClick={() => unlinkAccount({ providerId: account.providerId })}
           disabled={isUnlinking}
           aria-label={localization.settings.unlinkProvider.replace(
             "{{provider}}",
@@ -105,7 +112,12 @@ export function ConnectedAccount({ account, provider }: ConnectedAccountProps) {
           className="ml-auto"
           variant="outline"
           size="sm"
-          onClick={() => linkSocial(provider)}
+          onClick={() =>
+            linkSocial({
+              provider,
+              callbackURL: `${baseURL}${window.location.pathname}`
+            })
+          }
           disabled={isLinking}
           aria-label={localization.settings.connectProvider.replace(
             "{{provider}}",
