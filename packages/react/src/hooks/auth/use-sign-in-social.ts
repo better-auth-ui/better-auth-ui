@@ -1,42 +1,22 @@
-import { useAuth } from "@better-auth-ui/react"
-import type { AuthCallbackOptions } from "@better-auth-ui/react/core"
-import { useActionState } from "react"
+import {
+  type AuthClient,
+  useAuth,
+  useAuthMutation
+} from "@better-auth-ui/react"
+import type { UseAuthMutationOptions } from "./use-auth-mutation"
+
+export { useAuthMutation } from "./use-auth-mutation"
 
 /**
- * Creates an action state for initiating a social sign-in using the configured auth client.
+ * Hook that creates a mutation for social sign-in.
  *
- * The action extracts the "provider" value from the supplied FormData, constructs a callback URL
- * from the auth context's base URL and redirect path, and invokes the client's social sign-in flow.
- * If the sign-in returns an error, the onError callback is called.
+ * The mutation initiates a social sign-in flow with the specified provider.
  *
- * @returns An action state whose action, when executed, returns an object `{ provider: string }`
- *          containing the social provider that was used to start the sign-in.
+ * @returns The `useMutation` result.
  */
-export function useSignInSocial({
-  onError,
-  onSuccess
-}: AuthCallbackOptions = {}) {
-  const { authClient, baseURL, redirectTo } = useAuth()
-
-  const signInSocial = async (_: object, formData: FormData) => {
-    const provider = formData.get("provider") as string
-
-    const callbackURL = `${baseURL}${redirectTo}`
-
-    const { error } = await authClient.signIn.social({
-      provider,
-      callbackURL
-    })
-
-    if (error) {
-      await onError?.(error)
-    } else {
-      await onSuccess?.()
-      await new Promise((resolve) => setTimeout(resolve, 10000))
-    }
-
-    return { provider }
-  }
-
-  return useActionState(signInSocial, { provider: "" })
+export function useSignInSocial(
+  options?: UseAuthMutationOptions<AuthClient["signIn"]["social"]>
+) {
+  const { authClient } = useAuth()
+  return useAuthMutation(authClient.signIn.social, options)
 }

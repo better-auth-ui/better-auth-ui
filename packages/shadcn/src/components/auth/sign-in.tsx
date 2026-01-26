@@ -1,6 +1,11 @@
 "use client"
 
-import { useAuth } from "@better-auth-ui/react"
+import {
+  useAuth,
+  useSendVerificationEmail,
+  useSignInEmail,
+  useSignInSocial
+} from "@better-auth-ui/react"
 import { useState } from "react"
 import { toast } from "sonner"
 
@@ -18,9 +23,6 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Spinner } from "@/components/ui/spinner"
-import { useSendVerificationEmail } from "@/hooks/auth/use-send-verification-email"
-import { useSignInEmail } from "@/hooks/auth/use-sign-in-email"
-import { useSignInSocial } from "@/hooks/auth/use-sign-in-social"
 import { cn } from "@/lib/utils"
 import { MagicLinkButton } from "./magic-link-button"
 import { ProviderButtons, type SocialLayout } from "./provider-buttons"
@@ -46,36 +48,48 @@ export function SignIn({
 }: SignInProps) {
   const {
     basePaths,
+    baseURL,
     emailAndPassword,
     localization,
     magicLink,
+    navigate,
+    redirectTo,
     socialProviders,
     viewPaths,
     Link
   } = useAuth()
 
-  const { sendVerificationEmail } = useSendVerificationEmail({
-    onError: (error) => toast.error(error.message || error.statusText),
+  const [password, setPassword] = useState("")
+
+  const { mutate: sendVerificationEmail } = useSendVerificationEmail({
+    onError: (error) => toast.error(error.error?.message || error.message),
     onSuccess: () => toast.success(localization.auth.verificationEmailSent)
   })
 
-  const [{ email, password }, signInEmail, signInPending] = useSignInEmail({
-    onError: (error) => {
-      if (error.code === "EMAIL_NOT_VERIFIED") {
-        toast.error(error.message || error.statusText, {
+  const { mutate: signInEmail, isPending: signInPending } = useSignInEmail({
+    onError: (error, { email }) => {
+      setPassword("")
+
+      if (error.error?.code === "EMAIL_NOT_VERIFIED") {
+        toast.error(error.error?.message || error.message, {
           action: {
             label: localization.auth.resend,
-            onClick: () => sendVerificationEmail(email)
+            onClick: () =>
+              sendVerificationEmail({
+                email,
+                callbackURL: `${baseURL}${redirectTo}`
+              })
           }
         })
       } else {
-        toast.error(error.message || error.statusText)
+        toast.error(error.error?.message || error.message)
       }
-    }
+    },
+    onSuccess: () => navigate({ to: redirectTo })
   })
 
-  const [_, signInSocial, socialPending] = useSignInSocial({
-    onError: (error) => toast.error(error.message || error.statusText)
+  const { mutate: signInSocial, isPending: socialPending } = useSignInSocial({
+    onError: (error) => toast.error(error.error?.message || error.message)
   })
 
   const isPending = signInPending || socialPending
@@ -84,6 +98,19 @@ export function SignIn({
     email?: string
     password?: string
   }>({})
+
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    const formData = new FormData(e.currentTarget)
+    const email = formData.get("email") as string
+    const rememberMe = formData.get("rememberMe") === "on"
+
+    signInEmail({
+      email,
+      password,
+      ...(emailAndPassword?.rememberMe ? { rememberMe } : {})
+    })
+  }
 
   const showSeparator =
     emailAndPassword?.enabled && socialProviders && socialProviders.length > 0
@@ -115,7 +142,7 @@ export function SignIn({
           )}
 
           {emailAndPassword?.enabled && (
-            <form action={signInEmail}>
+            <form onSubmit={handleSubmit}>
               <FieldGroup className="gap-4">
                 <Field className="gap-1">
                   <FieldLabel htmlFor="email">
@@ -127,7 +154,6 @@ export function SignIn({
                     name="email"
                     type="email"
                     autoComplete="email"
-                    defaultValue={email}
                     placeholder={localization.auth.emailPlaceholder}
                     required
                     disabled={isPending}
@@ -160,18 +186,19 @@ export function SignIn({
                     name="password"
                     type="password"
                     autoComplete="current-password"
-                    defaultValue={password}
-                    placeholder={localization.auth.passwordPlaceholder}
-                    required
-                    minLength={emailAndPassword?.minPasswordLength}
-                    maxLength={emailAndPassword?.maxPasswordLength}
-                    disabled={isPending}
-                    onChange={() => {
+                    value={password}
+                    onChange={(e) => {
+                      setPassword(e.target.value)
                       setFieldErrors((prev) => ({
                         ...prev,
                         password: undefined
                       }))
                     }}
+                    placeholder={localization.auth.passwordPlaceholder}
+                    required
+                    minLength={emailAndPassword?.minPasswordLength}
+                    maxLength={emailAndPassword?.maxPasswordLength}
+                    disabled={isPending}
                     onInvalid={(e) => {
                       e.preventDefault()
 

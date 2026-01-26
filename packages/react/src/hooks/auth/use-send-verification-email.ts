@@ -1,36 +1,22 @@
-import { useAuth } from "@better-auth-ui/react"
-import type { AuthCallbackOptions } from "@better-auth-ui/react/core"
-import { useCallback } from "react"
+import {
+  type AuthClient,
+  useAuth,
+  useAuthMutation
+} from "@better-auth-ui/react"
+import type { UseAuthMutationOptions } from "./use-auth-mutation"
+
+export { useAuthMutation } from "./use-auth-mutation"
 
 /**
- * Provides a function to send a verification email to the specified email address.
+ * Hook that creates a mutation to send a verification email.
  *
- * @param options - Optional callbacks for error and success handling
- * @returns An object containing `sendVerificationEmail`, a function that sends a verification email.
+ * The mutation sends a verification email to the specified email address.
+ *
+ * @returns The `useMutation` result.
  */
-export function useSendVerificationEmail({
-  onError,
-  onSuccess
-}: AuthCallbackOptions = {}) {
-  const { authClient, baseURL, redirectTo } = useAuth()
-
-  const sendVerificationEmail = useCallback(
-    async (email: string) => {
-      const callbackURL = `${baseURL}${redirectTo}`
-
-      const { error } = await authClient.sendVerificationEmail({
-        email,
-        callbackURL
-      })
-
-      if (error) {
-        await onError?.(error)
-      } else {
-        await onSuccess?.()
-      }
-    },
-    [authClient, baseURL, redirectTo, onError, onSuccess]
-  )
-
-  return { sendVerificationEmail }
+export function useSendVerificationEmail(
+  options?: UseAuthMutationOptions<AuthClient["sendVerificationEmail"]>
+) {
+  const { authClient } = useAuth()
+  return useAuthMutation(authClient.sendVerificationEmail, options)
 }

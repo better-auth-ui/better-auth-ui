@@ -1,52 +1,32 @@
-import { useAuth, useSession } from "@better-auth-ui/react"
-import type { AuthCallbackOptions } from "@better-auth-ui/react/core"
-import { useActionState } from "react"
+import {
+  type AuthClient,
+  useAuth,
+  useAuthMutation,
+  useSession
+} from "@better-auth-ui/react"
+import type { UseAuthMutationOptions } from "./use-auth-mutation"
+
+export { useAuthMutation } from "./use-auth-mutation"
 
 /**
- * Create an action state that signs a user in with email and password.
+ * Hook that creates a mutation for email/password sign-in.
  *
- * The action sends an email/password sign-in request, invalidates the auth query cache and navigates to the configured redirect on success. On error the action returns the submitted email with an empty password; on success it returns the submitted email and password.
+ * The mutation sends an email/password sign-in request and
+ * refetches the session on completion.
  *
- * @param options - Optional callbacks for error and success handling
- * @returns An action state object whose action performs the email sign-in and resolves to an object `{ email, password }` (password preserved on success, set to `""` on error).
+ * @returns The `useMutation` result.
  */
-export function useSignInEmail({
-  onError,
-  onSuccess
-}: AuthCallbackOptions = {}) {
-  const { authClient, emailAndPassword, redirectTo, navigate } = useAuth()
+export function useSignInEmail(
+  options?: UseAuthMutationOptions<AuthClient["signIn"]["email"]>
+) {
+  const { authClient } = useAuth()
   const { refetch } = useSession()
 
-  const signInEmail = async (_: object, formData: FormData) => {
-    const email = formData.get("email") as string
-    const password = formData.get("password") as string
-    const rememberMe = formData.get("rememberMe") === "on"
-
-    const { error } = await authClient.signIn.email({
-      email,
-      password,
-      ...(emailAndPassword?.rememberMe ? { rememberMe } : {})
-    })
-
-    if (error) {
-      await onError?.(error)
-
-      return {
-        email,
-        password: ""
-      }
-    }
-
-    await onSuccess?.()
-    await refetch()
-
-    navigate({ to: redirectTo })
-
-    return { email, password }
-  }
-
-  return useActionState(signInEmail, {
-    email: "",
-    password: ""
+  return useAuthMutation(authClient.signIn.email, {
+    onSuccess: async (...args) => {
+      await refetch()
+      await options?.onSuccess?.(...args)
+    },
+    ...options
   })
 }

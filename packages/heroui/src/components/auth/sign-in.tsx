@@ -19,6 +19,7 @@ import {
   TextField,
   toast
 } from "@heroui/react"
+import { useState } from "react"
 
 import { cn } from "../../lib/utils"
 import { FieldSeparator } from "./field-separator"
@@ -46,36 +47,61 @@ export function SignIn({
 }: SignInProps & CardProps) {
   const {
     basePaths,
+    baseURL,
     emailAndPassword,
     localization,
     magicLink,
+    navigate,
+    redirectTo,
     socialProviders,
     viewPaths
   } = useAuth()
 
-  const { sendVerificationEmail } = useSendVerificationEmail({
-    onError: (error) => toast.danger(error.message || error.statusText),
+  const [password, setPassword] = useState("")
+
+  const { mutate: sendVerificationEmail } = useSendVerificationEmail({
+    onError: (error) => toast.danger(error.error?.message || error.message),
     onSuccess: () => toast.success(localization.auth.verificationEmailSent)
   })
 
-  const [{ email, password }, signInEmail, signInPending] = useSignInEmail({
-    onError: (error) => {
-      if (error.code === "EMAIL_NOT_VERIFIED") {
-        toast.danger(error.message || error.statusText, {
+  const { mutate: signInEmail, isPending: signInPending } = useSignInEmail({
+    onError: (error, { email }) => {
+      setPassword("")
+
+      if (error.error?.code === "EMAIL_NOT_VERIFIED") {
+        toast.danger(error.error?.message || error.message, {
           actionProps: {
             children: localization.auth.resend,
-            onClick: () => sendVerificationEmail(email)
+            onClick: () =>
+              sendVerificationEmail({
+                email,
+                callbackURL: `${baseURL}${redirectTo}`
+              })
           }
         })
       } else {
-        toast.danger(error.message || error.statusText)
+        toast.danger(error.error?.message || error.message)
       }
-    }
+    },
+    onSuccess: () => navigate({ to: redirectTo })
   })
 
-  const [_, signInSocial, socialPending] = useSignInSocial({
-    onError: (error) => toast.danger(error.message || error.statusText)
+  const { mutate: signInSocial, isPending: socialPending } = useSignInSocial({
+    onError: (error) => toast.danger(error.error?.message || error.message)
   })
+
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    const formData = new FormData(e.currentTarget)
+    const email = formData.get("email") as string
+    const rememberMe = formData.get("rememberMe") === "on"
+
+    signInEmail({
+      email,
+      password,
+      ...(emailAndPassword?.rememberMe ? { rememberMe } : {})
+    })
+  }
 
   const isPending = signInPending || socialPending
 
@@ -110,9 +136,8 @@ export function SignIn({
         )}
 
         {emailAndPassword?.enabled && (
-          <Form action={signInEmail} className="flex flex-col gap-4">
+          <Form onSubmit={handleSubmit} className="flex flex-col gap-4">
             <TextField
-              defaultValue={email}
               name="email"
               type="email"
               autoComplete="email"
@@ -130,17 +155,16 @@ export function SignIn({
             </TextField>
 
             <TextField
-              defaultValue={password}
               minLength={emailAndPassword?.minPasswordLength}
               maxLength={emailAndPassword?.maxPasswordLength}
               name="password"
               type="password"
               autoComplete="current-password"
               isDisabled={isPending}
+              value={password}
+              onChange={setPassword}
             >
-              <div className="flex justify-between">
-                <Label>{localization.auth.password}</Label>
-              </div>
+              <Label>{localization.auth.password}</Label>
 
               <Input
                 placeholder={localization.auth.passwordPlaceholder}
