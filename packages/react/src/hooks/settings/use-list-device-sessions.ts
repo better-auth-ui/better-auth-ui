@@ -14,8 +14,8 @@ import {
  * @returns The React Query result for the device sessions list; `data` is the array of device session objects and includes loading and error states.
  */
 export function useListDeviceSessions(
-  options?: UseAuthQueryOptions<
-    AuthClient["multiSession"]["listDeviceSessions"]
+  options?: Partial<
+    UseAuthQueryOptions<AuthClient["multiSession"]["listDeviceSessions"]>
   >
 ): UseAuthQueryResult<AuthClient["multiSession"]["listDeviceSessions"]> {
   const { authClient } = useAuth()

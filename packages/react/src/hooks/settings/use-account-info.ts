@@ -14,7 +14,7 @@ import { type UseAuthQueryOptions, useAuthQuery } from "../auth/use-auth-query"
  */
 export function useAccountInfo(
   accountId?: string,
-  options?: UseAuthQueryOptions<AuthClient["accountInfo"]>
+  options?: Partial<UseAuthQueryOptions<AuthClient["accountInfo"]>>
 ) {
   const { authClient } = useAuth()
 

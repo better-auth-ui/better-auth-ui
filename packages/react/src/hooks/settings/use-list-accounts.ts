@@ -11,7 +11,7 @@ import { type UseAuthQueryOptions, useAuthQuery } from "../auth/use-auth-query"
  * @returns The react-query result containing linked accounts data, loading state, and error state
  */
 export function useListAccounts(
-  options?: UseAuthQueryOptions<AuthClient["listAccounts"]>
+  options?: Partial<UseAuthQueryOptions<AuthClient["listAccounts"]>>
 ) {
   const { authClient } = useAuth()
   const { data: sessionData } = useSession()

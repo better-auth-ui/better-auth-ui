@@ -10,7 +10,7 @@ import { type UseAuthQueryOptions, useAuthQuery } from "../auth/use-auth-query"
  * @returns The React Query result for the sessions list; `data` is the array of session objects, and the result includes loading and error states.
  */
 export function useListSessions(
-  options?: UseAuthQueryOptions<AuthClient["listSessions"]>
+  options?: Partial<UseAuthQueryOptions<AuthClient["listSessions"]>>
 ) {
   const { authClient } = useAuth()
   const { data: sessionData } = useSession()

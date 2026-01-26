@@ -10,7 +10,7 @@ import { useSession } from "./use-session"
  * @returns An object containing `data` (the current session or `undefined`), `isPending` (whether the session query is in progress), and other session query state
  */
 export function useAuthenticate(
-  options?: UseAuthQueryOptions<AuthClient["getSession"]>
+  options?: Partial<UseAuthQueryOptions<AuthClient["getSession"]>>
 ): UseAuthQueryResult<AuthClient["getSession"]> {
   const { basePaths, viewPaths, navigate } = useAuth()
   const session = useSession(options)
