@@ -1,8 +1,9 @@
 "use client"
 
-import { useAuth, useRequestPasswordReset } from "@better-auth-ui/react"
+import { useAuth } from "@better-auth-ui/react"
 import { type FormEvent, useState } from "react"
 import { toast } from "sonner"
+
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import {
@@ -14,6 +15,7 @@ import {
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import { Spinner } from "@/components/ui/spinner"
+import { useRequestPasswordReset } from "@/hooks/auth/use-request-password-reset"
 import { cn } from "@/lib/utils"
 
 export type ForgotPasswordProps = {

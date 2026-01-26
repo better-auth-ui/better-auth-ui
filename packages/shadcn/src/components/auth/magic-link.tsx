@@ -1,10 +1,6 @@
 "use client"
 
-import {
-  useAuth,
-  useSignInMagicLink,
-  useSignInSocial
-} from "@better-auth-ui/react"
+import { useAuth } from "@better-auth-ui/react"
 import { useState } from "react"
 import { toast } from "sonner"
 
@@ -20,6 +16,8 @@ import {
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import { Spinner } from "@/components/ui/spinner"
+import { useSignInMagicLink } from "@/hooks/auth/use-sign-in-magic-link"
+import { useSignInSocial } from "@/hooks/auth/use-sign-in-social"
 import { cn } from "@/lib/utils"
 import { MagicLinkButton } from "./magic-link-button"
 import { ProviderButtons, type SocialLayout } from "./provider-buttons"

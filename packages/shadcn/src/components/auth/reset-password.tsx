@@ -1,6 +1,6 @@
 "use client"
 
-import { useAuth, useResetPassword } from "@better-auth-ui/react"
+import { useAuth } from "@better-auth-ui/react"
 import { Eye, EyeOff } from "lucide-react"
 import { type FormEvent, useEffect, useState } from "react"
 import { toast } from "sonner"
@@ -21,6 +21,7 @@ import {
   InputGroupInput
 } from "@/components/ui/input-group"
 import { Spinner } from "@/components/ui/spinner"
+import { useResetPassword } from "@/hooks/auth/use-reset-password"
 import { cn } from "@/lib/utils"
 
 export type ResetPasswordProps = {
