@@ -1,92 +1,22 @@
-import { useAuth } from "@better-auth-ui/react"
-import type { AuthCallbackOptions } from "@better-auth-ui/react/core"
-import { useActionState } from "react"
+import {
+  type AuthClient,
+  useAuth,
+  useAuthMutation
+} from "@better-auth-ui/react"
+import type { UseAuthMutationOptions } from "./use-auth-mutation"
+
+export { useAuthMutation } from "./use-auth-mutation"
 
 /**
- * Provides an action state hook for resetting a user's password using the `token` query parameter.
+ * Hook that creates a mutation for the reset-password flow.
  *
- * When the returned action is invoked with a FormData containing `password` (and optionally `confirmPassword`),
- * it attempts to reset the password, calls the appropriate callback, navigates to the sign-in view on success,
- * and returns updated form field values.
+ * The mutation resets the user's password using the provided token and new password.
  *
- * Note: Token validation on mount should be handled by the component.
- *
- * @returns The `useActionState` result configured for the reset-password action. When the action is executed it
- * returns an object with `password` and, if confirm-password is enabled, `confirmPassword` (both strings).
- * On failure these fields are set to empty strings.
+ * @returns The `useMutation` result.
  */
-export function useResetPassword({
-  onError,
-  onSuccess
-}: AuthCallbackOptions = {}) {
-  const {
-    authClient,
-    basePaths,
-    emailAndPassword,
-    localization,
-    viewPaths,
-    navigate
-  } = useAuth()
-
-  const resetPassword = async (_: object, formData: FormData) => {
-    const searchParams = new URLSearchParams(window.location.search)
-    const token = searchParams.get("token")
-
-    if (!token) {
-      await onError?.({
-        message: localization.auth.invalidResetPasswordToken,
-        status: 400,
-        statusText: "MISSING_TOKEN"
-      })
-
-      return {
-        password: "",
-        confirmPassword: ""
-      }
-    }
-
-    const password = formData.get("password") as string
-    const confirmPassword = formData.get("confirmPassword") as string
-
-    // Validate confirmPassword if enabled
-    if (emailAndPassword?.confirmPassword && password !== confirmPassword) {
-      await onError?.({
-        message: localization.auth.passwordsDoNotMatch,
-        status: 400,
-        statusText: "PASSWORD_MISMATCH"
-      })
-
-      return {
-        password: "",
-        confirmPassword: ""
-      }
-    }
-
-    const { error } = await authClient.resetPassword({
-      token,
-      newPassword: password
-    })
-
-    if (error) {
-      await onError?.(error)
-
-      return {
-        password: "",
-        confirmPassword: ""
-      }
-    }
-
-    await onSuccess?.()
-    navigate({ to: `${basePaths.auth}/${viewPaths.auth.signIn}` })
-
-    return {
-      password,
-      confirmPassword
-    }
-  }
-
-  return useActionState(resetPassword, {
-    password: "",
-    confirmPassword: ""
-  })
+export function useResetPassword(
+  options?: UseAuthMutationOptions<AuthClient["resetPassword"]>
+) {
+  const { authClient } = useAuth()
+  return useAuthMutation(authClient.resetPassword, options)
 }

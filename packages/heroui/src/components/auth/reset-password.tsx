@@ -15,7 +15,7 @@ import {
   TextField,
   toast
 } from "@heroui/react"
-import { useEffect, useState } from "react"
+import { type FormEvent, useEffect, useState } from "react"
 
 import { cn } from "../../lib/utils"
 
@@ -37,11 +37,13 @@ export function ResetPassword({
   const { basePaths, emailAndPassword, localization, viewPaths, navigate } =
     useAuth()
 
-  const [{ password, confirmPassword }, resetPassword, isPending] =
-    useResetPassword({
-      onError: (error) => toast.danger(error.message || error.statusText),
-      onSuccess: () => toast.success(localization.auth.passwordResetSuccess)
-    })
+  const { mutate: resetPassword, isPending } = useResetPassword({
+    onError: (error) => toast.danger(error.error?.message || error.message),
+    onSuccess: () => {
+      toast.success(localization.auth.passwordResetSuccess)
+      navigate({ to: `${basePaths.auth}/${viewPaths.auth.signIn}` })
+    }
+  })
 
   const [isPasswordVisible, setIsPasswordVisible] = useState(false)
   const [isConfirmPasswordVisible, setIsConfirmPasswordVisible] =
@@ -49,9 +51,9 @@ export function ResetPassword({
 
   useEffect(() => {
     const searchParams = new URLSearchParams(window.location.search)
-    const tokenParam = searchParams.get("token")
+    const token = searchParams.get("token") as string
 
-    if (!tokenParam) {
+    if (!token) {
       toast.danger(localization.auth.invalidResetPasswordToken)
       navigate({ to: `${basePaths.auth}/${viewPaths.auth.signIn}` })
     }
@@ -62,6 +64,29 @@ export function ResetPassword({
     navigate
   ])
 
+  function handleSubmit(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault()
+
+    const searchParams = new URLSearchParams(window.location.search)
+    const token = searchParams.get("token") as string
+
+    if (!token) {
+      toast.danger(localization.auth.invalidResetPasswordToken)
+      navigate({ to: `${basePaths.auth}/${viewPaths.auth.signIn}` })
+    }
+
+    const formData = new FormData(e.currentTarget)
+    const password = formData.get("password") as string
+    const confirmPassword = formData.get("confirmPassword") as string
+
+    if (emailAndPassword?.confirmPassword && password !== confirmPassword) {
+      toast.danger(localization.auth.passwordsDoNotMatch)
+      return
+    }
+
+    resetPassword({ token, newPassword: password })
+  }
+
   return (
     <Card
       className={cn("w-full max-w-sm p-4 md:p-6", className)}
@@ -69,12 +94,11 @@ export function ResetPassword({
       {...props}
     >
       <Card.Content>
-        <Form action={resetPassword}>
+        <Form onSubmit={handleSubmit}>
           <Fieldset className="gap-4">
             <Label className="text-xl">{localization.auth.resetPassword}</Label>
 
             <TextField
-              defaultValue={password}
               minLength={emailAndPassword?.minPasswordLength}
               maxLength={emailAndPassword?.maxPasswordLength}
               name="password"
@@ -116,7 +140,6 @@ export function ResetPassword({
 
             {emailAndPassword?.confirmPassword && (
               <TextField
-                defaultValue={confirmPassword}
                 minLength={emailAndPassword?.minPasswordLength}
                 maxLength={emailAndPassword?.maxPasswordLength}
                 name="confirmPassword"
