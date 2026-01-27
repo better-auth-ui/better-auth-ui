@@ -38,8 +38,8 @@
     "concurrently": "^9.2.1",
     "cpy-cli": "^6.0.0",
     "playwright": "^1.58.0",
-    "react": "^19.2.3",
-    "react-dom": "^19.2.3",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4",
     "sonner": "^2.0.7",
     "tsc-alias": "^1.8.16",
     "ua-parser-js": "^2.0.8",
@@ -57,7 +57,7 @@
     "@radix-ui/react-separator": "^1.1.8",
     "@radix-ui/react-slot": "^1.2.4",
     "@radix-ui/react-tabs": "^1.1.13",
-    "@tanstack/react-form": "^1.27.7",
+    "@tanstack/react-form": "^1.28.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "lucide-react": "^0.563.0",
@@ -68,8 +68,8 @@
   "peerDependencies": {
     "@better-auth-ui/react": "*",
     "better-auth": ">=1.4.17",
-    "react": ">=18.0.0",
-    "react-dom": ">=18.0.0",
+    "react": ">=19.2.4",
+    "react-dom": ">=19.2.4",
     "sonner": ">=2.0.0",
     "ua-parser-js": ">=2.0.0"
   }
