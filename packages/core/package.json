@@ -20,10 +20,10 @@
     }
   },
   "devDependencies": {
-    "better-auth": "^1.4.17",
+    "better-auth": "^1.4.18",
     "vitest": "^4.0.18"
   },
   "peerDependencies": {
-    "better-auth": ">=1.4.17"
+    "better-auth": ">=1.4.18"
   }
 }
