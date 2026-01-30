@@ -22,11 +22,14 @@ export function useSignUpEmail(
   const { authClient } = useAuth()
   const { refetch } = useSession()
 
-  return useAuthMutation(authClient.signUp.email, {
-    ...options,
-    onSuccess: async (...args) => {
-      await refetch()
-      await options?.onSuccess?.(...args)
+  return useAuthMutation({
+    authFn: authClient.signUp.email,
+    options: {
+      ...options,
+      onSuccess: async (...args) => {
+        await refetch()
+        await options?.onSuccess?.(...args)
+      }
     }
   })
 }

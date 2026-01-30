@@ -46,7 +46,9 @@ export function ChangeEmail({
 
   const { mutate: changeEmail, isPending } = useChangeEmail({
     onSuccess: () =>
-      toast.success(localization.settings.changeEmailSuccess, { timeout: 3000 }),
+      toast.success(localization.settings.changeEmailSuccess, {
+        timeout: 3000
+      }),
     onError: (error) =>
       toast.danger(error.error?.message || error.message, { timeout: 3000 })
   })

@@ -18,11 +18,14 @@ export function useRevokeSession(
   const { authClient } = useAuth()
   const { refetch } = useListSessions()
 
-  return useAuthMutation(authClient.revokeSession, {
-    ...options,
-    onSuccess: async (...args) => {
-      await refetch()
-      await options?.onSuccess?.(...args)
+  return useAuthMutation({
+    authFn: authClient.revokeSession,
+    options: {
+      ...options,
+      onSuccess: async (...args) => {
+        await refetch()
+        await options?.onSuccess?.(...args)
+      }
     }
   })
 }

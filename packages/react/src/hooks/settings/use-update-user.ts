@@ -25,17 +25,20 @@ export function useUpdateUser(
   const { data: sessionData, refetch } = useSession()
   const queryClient = useQueryClient()
 
-  return useAuthMutation(authClient.updateUser, {
-    ...options,
-    onSuccess: async (data, variables, ...rest) => {
-      queryClient.setQueryData(["auth", "getSession"], {
-        ...sessionData,
-        user: { ...sessionData?.user, ...variables }
-      })
+  return useAuthMutation({
+    authFn: authClient.updateUser,
+    options: {
+      ...options,
+      onSuccess: async (data, variables, ...rest) => {
+        queryClient.setQueryData(["auth", "getSession"], {
+          ...sessionData,
+          user: { ...sessionData?.user, ...variables }
+        })
 
-      refetch()
+        refetch()
 
-      await options?.onSuccess?.(data, variables, ...rest)
+        await options?.onSuccess?.(data, variables, ...rest)
+      }
     }
   })
 }

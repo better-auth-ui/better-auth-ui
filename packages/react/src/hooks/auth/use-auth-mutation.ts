@@ -13,10 +13,13 @@ type MutationParams<TFn extends AuthFn> = undefined extends Parameters<TFn>[0]
     void | Omit<NonNullable<Parameters<TFn>[0]>, "fetchOptions">
   : Omit<Parameters<TFn>[0], "fetchOptions">
 
-export type UseAuthMutationOptions<TFn extends AuthFn> = UseMutationOptions<
-  { status: boolean },
-  BetterFetchError,
-  MutationParams<TFn>
+export type UseAuthMutationOptions<TFn extends AuthFn> = Omit<
+  UseMutationOptions<
+    Awaited<ReturnType<TFn>>,
+    BetterFetchError,
+    MutationParams<TFn>
+  >,
+  "mutationFn"
 >
 
 export type UseAuthMutationResult<TFn extends AuthFn> = UseMutationResult<
@@ -25,17 +28,18 @@ export type UseAuthMutationResult<TFn extends AuthFn> = UseMutationResult<
   MutationParams<TFn>
 >
 
-export function useAuthMutation<TFn extends AuthFn>(
-  fn: TFn,
-  options?: UseMutationOptions<
-    Awaited<ReturnType<TFn>>,
-    BetterFetchError,
-    MutationParams<TFn>
-  >
-): UseAuthMutationResult<TFn> {
+type UseAuthMutationProps<TFn extends AuthFn> = {
+  authFn: TFn
+  options?: UseAuthMutationOptions<TFn>
+}
+
+export function useAuthMutation<TFn extends AuthFn>({
+  authFn,
+  options
+}: UseAuthMutationProps<TFn>): UseAuthMutationResult<TFn> {
   return useMutation({
     mutationFn: (params) =>
-      fn({
+      authFn({
         ...params,
         fetchOptions: { throw: true }
       }),

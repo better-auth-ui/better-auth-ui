@@ -18,5 +18,5 @@ export function useSignInMagicLink(
   options?: UseAuthMutationOptions<AuthClient["signIn"]["magicLink"]>
 ) {
   const { authClient } = useAuth()
-  return useAuthMutation(authClient.signIn.magicLink, options)
+  return useAuthMutation({ authFn: authClient.signIn.magicLink, options })
 }

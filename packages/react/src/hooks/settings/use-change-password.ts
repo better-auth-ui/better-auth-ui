@@ -16,5 +16,5 @@ export function useChangePassword(
   options?: UseAuthMutationOptions<AuthClient["changePassword"]>
 ) {
   const { authClient } = useAuth()
-  return useAuthMutation(authClient.changePassword, options)
+  return useAuthMutation({ authFn: authClient.changePassword, options })
 }

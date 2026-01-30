@@ -14,5 +14,5 @@ export function useLinkSocial(
   options?: UseAuthMutationOptions<AuthClient["linkSocial"]>
 ) {
   const { authClient } = useAuth()
-  return useAuthMutation(authClient.linkSocial, options)
+  return useAuthMutation({ authFn: authClient.linkSocial, options })
 }

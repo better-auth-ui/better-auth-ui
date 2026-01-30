@@ -21,11 +21,14 @@ export function useSignOut(
   const { authClient } = useAuth()
   const queryClient = useQueryClient()
 
-  return useAuthMutation(authClient.signOut, {
-    ...options,
-    onSuccess: async (...args) => {
-      queryClient.removeQueries({ queryKey: ["auth"] })
-      await options?.onSuccess?.(...args)
+  return useAuthMutation({
+    authFn: authClient.signOut,
+    options: {
+      ...options,
+      onSuccess: async (...args) => {
+        queryClient.removeQueries({ queryKey: ["auth"] })
+        await options?.onSuccess?.(...args)
+      }
     }
   })
 }

@@ -20,11 +20,14 @@ export function useChangeEmail(
   const { authClient } = useAuth()
   const { refetch } = useSession()
 
-  return useAuthMutation(authClient.changeEmail, {
-    ...options,
-    onSuccess: async (...args) => {
-      refetch()
-      await options?.onSuccess?.(...args)
+  return useAuthMutation({
+    authFn: authClient.changeEmail,
+    options: {
+      ...options,
+      onSuccess: async (...args) => {
+        refetch()
+        await options?.onSuccess?.(...args)
+      }
     }
   })
 }

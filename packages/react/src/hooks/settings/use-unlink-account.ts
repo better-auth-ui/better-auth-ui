@@ -18,11 +18,14 @@ export function useUnlinkAccount(
   const { authClient } = useAuth()
   const { refetch } = useListAccounts()
 
-  return useAuthMutation(authClient.unlinkAccount, {
-    ...options,
-    onSuccess: async (...args) => {
-      await refetch()
-      await options?.onSuccess?.(...args)
+  return useAuthMutation({
+    authFn: authClient.unlinkAccount,
+    options: {
+      ...options,
+      onSuccess: async (...args) => {
+        await refetch()
+        await options?.onSuccess?.(...args)
+      }
     }
   })
 }
