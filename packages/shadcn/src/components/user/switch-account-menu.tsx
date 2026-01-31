@@ -27,14 +27,14 @@ import { UserView } from "./user-view"
 export function SwitchAccountMenu() {
   const { basePaths, viewPaths, localization, Link } = useAuth()
   const { data: sessionData } = useSession()
-  const { data: deviceSessions } = useListDeviceSessions()
+  const { data: deviceSessions, isPending } = useListDeviceSessions()
 
   return (
     <DropdownMenuSubContent className="min-w-40 md:min-w-56 max-w-[48svw]">
       <DropdownMenuItem>
-        <UserView />
+        <UserView isPending={isPending} />
 
-        <Check className="ml-auto" />
+        {!isPending && <Check className="ml-auto" />}
       </DropdownMenuItem>
 
       {deviceSessions
