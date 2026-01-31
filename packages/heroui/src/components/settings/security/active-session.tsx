@@ -1,8 +1,4 @@
-import {
-  useAuth,
-  useRevokeSession,
-  useSession
-} from "@better-auth-ui/react"
+import { useAuth, useRevokeSession, useSession } from "@better-auth-ui/react"
 import { ArrowRightFromSquare, Display, Smartphone } from "@gravity-ui/icons"
 import { Button, Card, Chip, Spinner, toast } from "@heroui/react"
 import type { Session } from "better-auth"
@@ -29,7 +25,9 @@ export function ActiveSession({ session }: ActiveSessionProps) {
     onError: (error) =>
       toast.danger(error.error?.message || error.message, { timeout: 3000 }),
     onSuccess: () =>
-      toast.success(localization.settings.revokeSessionSuccess, { timeout: 3000 })
+      toast.success(localization.settings.revokeSessionSuccess, {
+        timeout: 3000
+      })
   })
 
   const isCurrentSession = session.token === sessionData?.session.token

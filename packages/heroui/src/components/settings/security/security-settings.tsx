@@ -2,9 +2,9 @@ import { useAuth } from "@better-auth-ui/react"
 import type { CardProps } from "@heroui/react"
 import type { ComponentProps } from "react"
 import { cn } from "../../../lib/utils"
+import { ActiveSessions } from "./active-sessions"
 import { ChangePassword } from "./change-password"
 import { ConnectedAccounts } from "./connected-accounts"
-import { ActiveSessions } from "./active-sessions"
 
 export type SecuritySettingsProps = {
   className?: string

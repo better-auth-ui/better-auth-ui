@@ -1,10 +1,6 @@
 "use client"
 
-import {
-  useAuth,
-  useChangePassword,
-  useSession
-} from "@better-auth-ui/react"
+import { useAuth, useChangePassword, useSession } from "@better-auth-ui/react"
 import { Check, Eye, EyeOff } from "lucide-react"
 import { useState } from "react"
 import { toast } from "sonner"

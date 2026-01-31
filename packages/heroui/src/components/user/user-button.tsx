@@ -1,15 +1,8 @@
-import {
-  useAuth,
-  useListDeviceSessions,
-  useSession,
-  useSetActiveSession
-} from "@better-auth-ui/react"
+import { useAuth, useSession } from "@better-auth-ui/react"
 import {
   ArrowRightFromSquare,
   ArrowRightToSquare,
-  Check,
   ChevronsExpandVertical,
-  CirclePlus,
   Display,
   Gear,
   Moon,
@@ -28,6 +21,7 @@ import {
   Tabs
 } from "@heroui/react"
 
+import { SwitchAccountMenu } from "./switch-account-menu"
 import { UserAvatar } from "./user-avatar"
 import { UserView } from "./user-view"
 
@@ -66,9 +60,7 @@ export function UserButton({
     settings: { theme, setTheme, themes }
   } = useAuth()
 
-  const { settingActiveSession, setActiveSession } = useSetActiveSession()
   const { data: sessionData, isPending: sessionPending } = useSession()
-  const { data: deviceSessions } = useListDeviceSessions()
 
   return (
     <Dropdown>
@@ -84,8 +76,8 @@ export function UserButton({
             className
           )}
         >
-          {sessionData || sessionPending || settingActiveSession ? (
-            <UserView isPending={!!settingActiveSession} />
+          {sessionData || sessionPending ? (
+            <UserView isPending={sessionPending} />
           ) : (
             <>
               <UserAvatar />
@@ -131,45 +123,7 @@ export function UserButton({
                   </Dropdown.Item>
 
                   <Dropdown.Popover className="min-w-40 md:min-w-56 max-w-[48svw]">
-                    <Dropdown.Menu>
-                      <Dropdown.Item className="px-2">
-                        <UserView />
-
-                        <Check className="ml-auto" />
-                      </Dropdown.Item>
-
-                      {deviceSessions
-                        ?.filter(
-                          (deviceSession) =>
-                            deviceSession.session.id !==
-                            sessionData?.session?.id
-                        )
-                        .map((deviceSession) => {
-                          return (
-                            <Dropdown.Item
-                              key={deviceSession.session.id}
-                              className="px-2"
-                              isDisabled={!!settingActiveSession}
-                              onPress={() =>
-                                setActiveSession(deviceSession.session.token)
-                              }
-                            >
-                              <UserView user={deviceSession.user} />
-                            </Dropdown.Item>
-                          )
-                        })}
-
-                      <Separator />
-
-                      <Dropdown.Item
-                        textValue={localization.auth.addAccount}
-                        href={`${basePaths.auth}/${viewPaths.auth.signIn}`}
-                      >
-                        <CirclePlus className="text-muted" />
-
-                        <Label>{localization.auth.addAccount}</Label>
-                      </Dropdown.Item>
-                    </Dropdown.Menu>
+                    <SwitchAccountMenu />
                   </Dropdown.Popover>
                 </Dropdown.SubmenuTrigger>
               )}

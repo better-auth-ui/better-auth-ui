@@ -1,10 +1,8 @@
 "use client"
 
-import { useAuth } from "@better-auth-ui/react"
+import { useAuth, useSetActiveSession } from "@better-auth-ui/react"
 import {
-  Check,
   ChevronsUpDown,
-  CirclePlus,
   LogIn,
   LogOut,
   Monitor,
@@ -22,15 +20,13 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuSub,
-  DropdownMenuSubContent,
   DropdownMenuSubTrigger,
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useSession } from "@/hooks/auth/use-session"
-import { useListDeviceSessions } from "@/hooks/settings/use-list-device-sessions"
-import { useSetActiveSession } from "@/hooks/settings/use-set-active-session"
 import { cn } from "@/lib/utils"
+import { SwitchAccountMenu } from "./switch-account-menu"
 import { UserAvatar } from "./user-avatar"
 import { UserView } from "./user-view"
 
@@ -80,9 +76,8 @@ export function UserButton({
     settings: { theme, setTheme, themes }
   } = useAuth()
 
+  const { isPending: settingActiveSession } = useSetActiveSession()
   const { data: sessionData, isPending: sessionPending } = useSession()
-  const { data: deviceSessions } = useListDeviceSessions()
-  const { settingActiveSession, setActiveSession } = useSetActiveSession()
 
   return (
     <DropdownMenu>
@@ -147,39 +142,7 @@ export function UserButton({
                   {localization.auth.switchAccount}
                 </DropdownMenuSubTrigger>
 
-                <DropdownMenuSubContent className="min-w-40 md:min-w-56 max-w-[48svw]">
-                  <DropdownMenuItem>
-                    <UserView />
-
-                    <Check className="ml-auto" />
-                  </DropdownMenuItem>
-
-                  {deviceSessions
-                    ?.filter(
-                      (deviceSession) =>
-                        deviceSession.session.id !== sessionData?.session.id
-                    )
-                    .map((deviceSession) => (
-                      <DropdownMenuItem
-                        key={deviceSession.session.id}
-                        onSelect={() =>
-                          setActiveSession(deviceSession.session.token)
-                        }
-                      >
-                        <UserView user={deviceSession.user} />
-                      </DropdownMenuItem>
-                    ))}
-
-                  <DropdownMenuSeparator />
-
-                  <DropdownMenuItem asChild>
-                    <Link href={`${basePaths.auth}/${viewPaths.auth.signIn}`}>
-                      <CirclePlus />
-
-                      {localization.auth.addAccount}
-                    </Link>
-                  </DropdownMenuItem>
-                </DropdownMenuSubContent>
+                <SwitchAccountMenu />
               </DropdownMenuSub>
             )}
 

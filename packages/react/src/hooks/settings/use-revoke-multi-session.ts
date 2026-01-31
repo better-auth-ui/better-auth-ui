@@ -1,36 +1,30 @@
-import { useAuth, useListDeviceSessions } from "@better-auth-ui/react"
-import { useCallback, useState } from "react"
+import {
+  type AuthClient,
+  useAuth,
+  useAuthMutation,
+  useListDeviceSessions
+} from "@better-auth-ui/react"
+import type { UseAuthMutationOptions } from "../auth/use-auth-mutation"
 
 /**
- * Hook to revoke a device session in multi-session mode.
+ * Hook that creates a mutation for revoking a device session in multi-session mode.
  *
- * @returns An object with `revokingSession` and `revokeSession(sessionToken)`:
- * - `revokingSession` — the session token currently being revoked, or `null`.
- * - `revokeSession(sessionToken)` — function that revokes the session identified by `sessionToken`.
+ * @returns The `useMutation` result.
  */
-export function useRevokeMultiSession() {
-  const { authClient, toast } = useAuth()
+export function useRevokeMultiSession(
+  options?: UseAuthMutationOptions<AuthClient["multiSession"]["revoke"]>
+) {
+  const { authClient } = useAuth()
   const { refetch } = useListDeviceSessions()
-  const [revokingSession, setRevokingSession] = useState<string | null>(null)
 
-  const revokeSession = useCallback(
-    async (sessionToken: string) => {
-      setRevokingSession(sessionToken)
-
-      const { error } = await authClient.multiSession.revoke({
-        sessionToken
-      })
-
-      if (error) {
-        toast.error(error.message || error.statusText)
-      } else {
+  return useAuthMutation({
+    authFn: authClient.multiSession.revoke,
+    options: {
+      ...options,
+      onSuccess: async (...args) => {
         await refetch()
+        await options?.onSuccess?.(...args)
       }
-
-      setRevokingSession(null)
-    },
-    [authClient, refetch, toast]
-  )
-
-  return { revokingSession, revokeSession }
+    }
+  })
 }

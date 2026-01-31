@@ -118,9 +118,6 @@ export const localization = {
     /** @remarks `"Account"` */
     account: "Account",
 
-    /** @remarks `"Accounts"` */
-    accounts: "Accounts",
-
     /** @remarks `"Accounts description"` */
     accountsDescription:
       "Manage the accounts you're currently signed in to on this device.",
@@ -169,6 +166,9 @@ export const localization = {
 
     /** @remarks `"Light"` */
     light: "Light",
+
+    /** @remarks `"Manage Accounts"` */
+    manageAccounts: "Manage Accounts",
 
     /** @remarks `"Profile"` */
     profile: "Profile",

@@ -2,9 +2,9 @@
 
 import { useAuth } from "@better-auth-ui/react"
 import { cn } from "@/lib/utils"
-import { Accounts } from "./accounts"
 import { Appearance } from "./appearance"
 import { ChangeEmail } from "./change-email"
+import { ManageAccounts } from "./manage-accounts"
 import { UserProfile } from "./user-profile"
 
 export type AccountSettingsProps = {
@@ -28,7 +28,7 @@ export function AccountSettings({ className }: AccountSettingsProps) {
       <ChangeEmail />
       <Appearance />
 
-      {multiSession && <Accounts />}
+      {multiSession && <ManageAccounts />}
     </div>
   )
 }
