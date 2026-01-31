@@ -1,8 +1,10 @@
-import { useAuth, useListDeviceSessions } from "@better-auth-ui/react"
+import {
+  useAuth,
+  useListDeviceSessions,
+  useSession
+} from "@better-auth-ui/react"
 import { CirclePlus } from "@gravity-ui/icons"
 import { buttonVariants, Card, type CardProps, cn, toast } from "@heroui/react"
-
-import { UserView } from "../../user/user-view"
 import { ManageAccount } from "./manage-account"
 
 export type ManageAccountsProps = {
@@ -23,6 +25,7 @@ export function ManageAccounts({
   ...props
 }: ManageAccountsProps & CardProps) {
   const { basePaths, localization, viewPaths, Link } = useAuth()
+  const { data: sessionData } = useSession()
 
   const { data: deviceSessions, isPending } = useListDeviceSessions({
     throwOnError: (error) => {
@@ -40,16 +43,25 @@ export function ManageAccounts({
       </Card.Header>
 
       <Card.Content className="gap-3">
-        {isPending ? (
-          <AccountRowSkeleton />
-        ) : (
-          deviceSessions?.map((deviceSession) => (
+        <ManageAccount
+          isPending={isPending}
+          deviceSession={deviceSessions?.find(
+            (deviceSession) =>
+              deviceSession.session.id === sessionData?.session.id
+          )}
+        />
+
+        {deviceSessions
+          ?.filter(
+            (deviceSession) =>
+              deviceSession.session.id !== sessionData?.session.id
+          )
+          .map((deviceSession) => (
             <ManageAccount
               key={deviceSession.session.id}
               deviceSession={deviceSession}
             />
-          ))
-        )}
+          ))}
       </Card.Content>
 
       <Card.Footer>
@@ -63,13 +75,5 @@ export function ManageAccounts({
         </Link>
       </Card.Footer>
     </Card>
-  )
-}
-
-function AccountRowSkeleton() {
-  return (
-    <div className="flex items-center rounded-3xl border p-3">
-      <UserView isPending size="md" />
-    </div>
   )
 }

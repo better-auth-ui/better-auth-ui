@@ -33,7 +33,7 @@ export function ActiveSessions({
     <Card className={cn("p-4 md:p-6 gap-4", className)} {...props}>
       <Card.Header>
         <Card.Title className="text-xl">
-          {localization.settings.sessions}
+          {localization.settings.activeSessions}
         </Card.Title>
       </Card.Header>
 

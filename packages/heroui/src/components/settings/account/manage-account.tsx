@@ -1,21 +1,23 @@
 import {
   useAuth,
-  type useListDeviceSessions,
   useRevokeMultiSession,
   useSession,
   useSetActiveSession
 } from "@better-auth-ui/react"
 import { ArrowRightArrowLeft, ArrowRightFromSquare } from "@gravity-ui/icons"
 import { Button, Card, Spinner, toast } from "@heroui/react"
+import type { Session, User } from "better-auth"
 
 import { UserView } from "../../user/user-view"
 
-export type DeviceSession = NonNullable<
-  ReturnType<typeof useListDeviceSessions>["data"]
->[number]
+export type DeviceSession = {
+  session: Session
+  user: User
+}
 
 export type ManageAccountProps = {
-  deviceSession: DeviceSession
+  deviceSession?: DeviceSession
+  isPending?: boolean
 }
 
 /**
@@ -27,7 +29,10 @@ export type ManageAccountProps = {
  * @param deviceSession - The device session object containing session and user data
  * @returns A JSX element containing the account card
  */
-export function ManageAccount({ deviceSession }: ManageAccountProps) {
+export function ManageAccount({
+  deviceSession,
+  isPending
+}: ManageAccountProps) {
   const { localization } = useAuth()
   const { data: sessionData } = useSession()
 
@@ -47,49 +52,51 @@ export function ManageAccount({ deviceSession }: ManageAccountProps) {
         })
     })
 
-  const isActive = deviceSession.session.userId === sessionData?.session.userId
+  const isActive = deviceSession?.session.userId === sessionData?.session.userId
 
   return (
     <Card className="flex-row items-center border p-3 shadow-none">
-      <UserView user={deviceSession.user} size="md" />
+      <UserView user={deviceSession?.user} isPending={isPending} size="md" />
 
-      <div className="flex items-center gap-1 shrink-0 ml-auto">
-        {!isActive && (
+      {deviceSession && (
+        <div className="flex items-center gap-1 shrink-0 ml-auto">
+          {!isActive && (
+            <Button
+              isIconOnly
+              variant="ghost"
+              size="sm"
+              onPress={() =>
+                setActiveSession({ sessionToken: deviceSession.session.token })
+              }
+              isPending={isSwitching || isRevoking}
+              aria-label={localization.auth.switchAccount}
+            >
+              {isSwitching ? (
+                <Spinner color="current" size="sm" />
+              ) : (
+                <ArrowRightArrowLeft />
+              )}
+            </Button>
+          )}
+
           <Button
             isIconOnly
             variant="ghost"
             size="sm"
             onPress={() =>
-              setActiveSession({ sessionToken: deviceSession.session.token })
+              revokeSession({ sessionToken: deviceSession.session.token })
             }
             isPending={isSwitching || isRevoking}
-            aria-label={localization.auth.switchAccount}
+            aria-label={localization.auth.signOut}
           >
-            {isSwitching ? (
+            {isRevoking ? (
               <Spinner color="current" size="sm" />
             ) : (
-              <ArrowRightArrowLeft />
+              <ArrowRightFromSquare />
             )}
           </Button>
-        )}
-
-        <Button
-          isIconOnly
-          variant="ghost"
-          size="sm"
-          onPress={() =>
-            revokeSession({ sessionToken: deviceSession.session.token })
-          }
-          isPending={isSwitching || isRevoking}
-          aria-label={localization.auth.signOut}
-        >
-          {isRevoking ? (
-            <Spinner color="current" size="sm" />
-          ) : (
-            <ArrowRightFromSquare />
-          )}
-        </Button>
-      </div>
+        </div>
+      )}
     </Card>
   )
 }

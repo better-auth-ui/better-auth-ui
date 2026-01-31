@@ -20,7 +20,8 @@ export type DeviceSession = NonNullable<
 >[number]
 
 export type ManageAccountProps = {
-  deviceSession: DeviceSession
+  deviceSession?: DeviceSession
+  isPending?: boolean
 }
 
 /**
@@ -30,9 +31,13 @@ export type ManageAccountProps = {
  * All sessions have a revoke/sign-out button.
  *
  * @param deviceSession - The device session object containing session and user data
+ * @param isPending - Whether the device session is pending
  * @returns A JSX element containing the account card
  */
-export function ManageAccount({ deviceSession }: ManageAccountProps) {
+export function ManageAccount({
+  deviceSession,
+  isPending
+}: ManageAccountProps) {
   const { localization } = useAuth()
   const { data: sessionData } = useSession()
 
@@ -47,39 +52,41 @@ export function ManageAccount({ deviceSession }: ManageAccountProps) {
       onSuccess: () => toast.success(localization.settings.revokeSessionSuccess)
     })
 
-  const isActive = deviceSession.session.userId === sessionData?.session.userId
+  const isActive = deviceSession?.session.userId === sessionData?.session.userId
 
   return (
     <Item className="p-3 gap-3" variant="outline">
-      <UserView user={deviceSession.user} />
+      <UserView user={deviceSession?.user} isPending={isPending} />
 
-      <div className="flex items-center gap-1 shrink-0 ml-auto">
-        {!isActive && (
+      {deviceSession && (
+        <div className="flex items-center gap-1 shrink-0 ml-auto">
+          {!isActive && (
+            <Button
+              variant="ghost"
+              size="icon-sm"
+              onClick={() =>
+                setActiveSession({ sessionToken: deviceSession.session.token })
+              }
+              disabled={isSwitching || isRevoking}
+              aria-label={localization.auth.switchAccount}
+            >
+              {isSwitching ? <Spinner /> : <ArrowLeftRight />}
+            </Button>
+          )}
+
           <Button
             variant="ghost"
             size="icon-sm"
             onClick={() =>
-              setActiveSession({ sessionToken: deviceSession.session.token })
+              revokeSession({ sessionToken: deviceSession.session.token })
             }
             disabled={isSwitching || isRevoking}
-            aria-label={localization.auth.switchAccount}
+            aria-label={localization.auth.signOut}
           >
-            {isSwitching ? <Spinner /> : <ArrowLeftRight />}
+            {isRevoking ? <Spinner /> : <LogOut />}
           </Button>
-        )}
-
-        <Button
-          variant="ghost"
-          size="icon-sm"
-          onClick={() =>
-            revokeSession({ sessionToken: deviceSession.session.token })
-          }
-          disabled={isSwitching || isRevoking}
-          aria-label={localization.auth.signOut}
-        >
-          {isRevoking ? <Spinner /> : <LogOut />}
-        </Button>
-      </div>
+        </div>
+      )}
     </Item>
   )
 }

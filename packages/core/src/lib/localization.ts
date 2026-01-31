@@ -118,15 +118,14 @@ export const localization = {
     /** @remarks `"Account"` */
     account: "Account",
 
-    /** @remarks `"Accounts description"` */
-    accountsDescription:
-      "Manage the accounts you're currently signed in to on this device.",
-
     /** @remarks `"Account unlinked"` */
     accountUnlinked: "Account unlinked",
 
     /** @remarks `"Active"` */
     active: "Active",
+
+    /** @remarks `"Active Sessions"` */
+    activeSessions: "Active Sessions",
 
     /** @remarks `"Connect"` */
     connect: "Connect",
@@ -187,9 +186,6 @@ export const localization = {
 
     /** @remarks `"Security"` */
     security: "Security",
-
-    /** @remarks `"Sessions"` */
-    sessions: "Sessions",
 
     /** @remarks `"Settings"` */
     settings: "Settings",

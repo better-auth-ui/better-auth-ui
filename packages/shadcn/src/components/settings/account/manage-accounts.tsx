@@ -1,6 +1,10 @@
 "use client"
 
-import { useAuth, useListDeviceSessions } from "@better-auth-ui/react"
+import {
+  useAuth,
+  useListDeviceSessions,
+  useSession
+} from "@better-auth-ui/react"
 import { PlusCircle } from "lucide-react"
 import { toast } from "sonner"
 
@@ -12,7 +16,6 @@ import {
   CardHeader,
   CardTitle
 } from "@/components/ui/card"
-import { UserView } from "@/components/user/user-view"
 import { cn } from "@/lib/utils"
 import { ManageAccount } from "./manage-account"
 
@@ -30,6 +33,7 @@ export type ManageAccountsProps = {
  */
 export function ManageAccounts({ className }: ManageAccountsProps) {
   const { basePaths, localization, viewPaths, Link } = useAuth()
+  const { data: sessionData } = useSession()
 
   const { data: deviceSessions, isPending } = useListDeviceSessions({
     throwOnError: (error) => {
@@ -47,18 +51,25 @@ export function ManageAccounts({ className }: ManageAccountsProps) {
       </CardHeader>
 
       <CardContent className="px-4 md:px-6 grid gap-3">
-        {isPending ? (
-          <div className="h-15 flex items-center rounded-xl border p-3">
-            <UserView isPending />
-          </div>
-        ) : (
-          deviceSessions?.map((deviceSession) => (
+        <ManageAccount
+          isPending={isPending}
+          deviceSession={deviceSessions?.find(
+            (deviceSession) =>
+              deviceSession.session.id === sessionData?.session.id
+          )}
+        />
+
+        {deviceSessions
+          ?.filter(
+            (deviceSession) =>
+              deviceSession.session.id !== sessionData?.session.id
+          )
+          .map((deviceSession) => (
             <ManageAccount
               key={deviceSession.session.id}
               deviceSession={deviceSession}
             />
-          ))
-        )}
+          ))}
       </CardContent>
 
       <CardFooter className="px-4 md:px-6">
