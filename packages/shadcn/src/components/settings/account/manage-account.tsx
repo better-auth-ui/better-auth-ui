@@ -20,7 +20,7 @@ export type DeviceSession = NonNullable<
 >[number]
 
 export type ManageAccountProps = {
-  deviceSession?: DeviceSession
+  deviceSession?: DeviceSession | null
   isPending?: boolean
 }
 

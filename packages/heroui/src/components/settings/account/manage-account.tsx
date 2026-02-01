@@ -16,7 +16,7 @@ export type DeviceSession = {
 }
 
 export type ManageAccountProps = {
-  deviceSession?: DeviceSession
+  deviceSession?: DeviceSession | null
   isPending?: boolean
 }
 

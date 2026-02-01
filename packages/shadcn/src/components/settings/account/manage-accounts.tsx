@@ -53,10 +53,7 @@ export function ManageAccounts({ className }: ManageAccountsProps) {
       <CardContent className="px-4 md:px-6 grid gap-3">
         <ManageAccount
           isPending={isPending}
-          deviceSession={deviceSessions?.find(
-            (deviceSession) =>
-              deviceSession.session.id === sessionData?.session.id
-          )}
+          deviceSession={!isPending ? sessionData : null}
         />
 
         {deviceSessions
