@@ -3,7 +3,6 @@
 import type { Session } from "better-auth"
 import { LaptopIcon, Loader2, SmartphoneIcon } from "lucide-react"
 import { useContext, useState } from "react"
-import { UAParser } from "ua-parser-js"
 import { AuthUIContext } from "../../../lib/auth-ui-provider"
 import { cn, getLocalizedError } from "../../../lib/utils"
 import type { AuthLocalization } from "../../../localization/auth-localization"
@@ -70,9 +69,9 @@ export function SessionCell({
         }
     }
 
-    const parser = UAParser(session.userAgent as string)
-    const isMobile = parser.device.type === "mobile"
+    const isMobile = /Mobile|Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|webOS|Windows Phone/i.test(session.userAgent || '')
 
+    console.error({isMobile})
     return (
         <Card
             className={cn(
@@ -92,17 +91,6 @@ export function SessionCell({
                     {isCurrentSession
                         ? localization.CURRENT_SESSION
                         : session?.ipAddress}
-                </span>
-
-                <span className="text-muted-foreground text-xs">
-                    {session.userAgent?.includes("tauri-plugin-http")
-                        ? localization.APP
-                        : parser.os.name && parser.browser.name
-                          ? `${parser.os.name}, ${parser.browser.name}`
-                          : parser.os.name ||
-                            parser.browser.name ||
-                            session.userAgent ||
-                            localization.UNKNOWN}
                 </span>
             </div>
 

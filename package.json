@@ -34,36 +34,6 @@
                 "types": "./dist/server.d.cts",
                 "default": "./dist/server.cjs"
             }
-        },
-        "./tanstack": {
-            "import": {
-                "types": "./dist/tanstack.d.ts",
-                "default": "./dist/tanstack.js"
-            },
-            "require": {
-                "types": "./dist/tanstack.d.cts",
-                "default": "./dist/tanstack.cjs"
-            }
-        },
-        "./instantdb": {
-            "import": {
-                "types": "./dist/instantdb.d.ts",
-                "default": "./dist/instantdb.js"
-            },
-            "require": {
-                "types": "./dist/instantdb.d.cts",
-                "default": "./dist/instantdb.cjs"
-            }
-        },
-        "./triplit": {
-            "import": {
-                "types": "./dist/triplit.d.ts",
-                "default": "./dist/triplit.js"
-            },
-            "require": {
-                "types": "./dist/triplit.d.cts",
-                "default": "./dist/triplit.cjs"
-            }
         }
     },
     "files": [
@@ -92,7 +62,6 @@
         "@radix-ui/react-tabs": "^1.1.13",
         "@radix-ui/react-use-callback-ref": "^1.1.1",
         "@radix-ui/react-use-layout-effect": "^1.1.1",
-        "@tanstack/react-query": "^5.90.12",
         "@types/node": "^25.0.3",
         "@types/react": "^19.2.7",
         "@types/react-dom": "^19.2.3",
@@ -114,9 +83,7 @@
     "peerDependencies": {
         "@better-auth/passkey": ">=1.4.6",
         "@captchafox/react": "^1.10.0",
-        "@daveyplate/better-auth-tanstack": "^1.3.6",
         "@hookform/resolvers": ">=5.2.0",
-        "@instantdb/react": ">=0.18.0",
         "@marsidev/react-turnstile": ">=1.1.0",
         "@radix-ui/react-avatar": ">=1.1.0",
         "@radix-ui/react-checkbox": ">=1.1.0",
@@ -132,9 +99,6 @@
         "@radix-ui/react-use-callback-ref": ">=1.1.0",
         "@radix-ui/react-use-layout-effect": ">=1.1.0",
         "@radix-ui/react-tooltip": ">=1.2.0",
-        "@tanstack/react-query": ">=5.66.0",
-        "@triplit/client": ">=1.0.0",
-        "@triplit/react": ">=1.0.0",
         "better-auth": "^1.4.6",
         "class-variance-authority": ">=0.7.0",
         "clsx": ">=2.1.0",
@@ -156,7 +120,6 @@
         "@wojtekmaj/react-recaptcha-v3": "^0.1.4",
         "react-google-recaptcha": "^3.1.0",
         "react-qr-code": "^2.0.18",
-        "ua-parser-js": "^2.0.7",
         "vaul": "^1.1.2"
     },
     "packageManager": "pnpm@10.26.2",
