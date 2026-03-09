@@ -445,6 +445,28 @@ export const authClientPlugin = (config: AuthClientConfig) =>
                         PageComponent: AcceptInvitationPage
                     }
                 }
+            ),
+            emailVerification: createRoute(
+                `/auth/${authViewPaths.EMAIL_VERIFICATION}`,
+                () => {
+                    const EmailVerificationPage = lazy(() =>
+                        import(
+                            "../components/auth/pages/email-verification-page"
+                        ).then((m) => ({
+                            default: m.EmailVerificationPage
+                        }))
+                    )
+
+                    return {
+                        PageComponent: EmailVerificationPage,
+                        meta: createAuthMeta(
+                            config,
+                            `/auth/${authViewPaths.EMAIL_VERIFICATION}`,
+                            "Email Verification",
+                            "Verify your email address"
+                        )
+                    }
+                }
             )
         }),
         sitemap: async () => {

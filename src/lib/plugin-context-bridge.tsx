@@ -22,6 +22,7 @@ import type { OrganizationOptionsContext } from "../types/organization-options"
 import type { RenderToast } from "../types/render-toast"
 import type { SignUpOptions } from "../types/sign-up-options"
 import type { SocialOptions } from "../types/social-options"
+import type { TeamOptionsContext } from "../types/team-options"
 import { AuthUIContext, type AuthUIContextType } from "./auth-ui-provider"
 import { OrganizationRefetcher } from "./organization-refetcher"
 import {
@@ -263,6 +264,32 @@ export function BetterAuthPluginProvider({
         }
     }, [organizationOverrides?.organization, organizationOverrides?.basePath])
 
+    const teams = useMemo<TeamOptionsContext | undefined>(() => {
+        const teamsProp =
+            organizationOverrides?.teams ?? accountOverrides?.teams
+        if (!teamsProp || !organization) return
+
+        if (teamsProp === true) {
+            return {
+                enabled: true,
+                customRoles: [],
+                colors: {
+                    count: 5,
+                    prefix: "team"
+                }
+            }
+        }
+
+        return {
+            enabled: teamsProp.enabled ?? true,
+            customRoles: teamsProp.customRoles || [],
+            colors: {
+                count: teamsProp.colors?.count ?? 5,
+                prefix: teamsProp.colors?.prefix ?? "team"
+            }
+        }
+    }, [organizationOverrides?.teams, accountOverrides?.teams, organization])
+
     const defaultMutators = useMemo(() => {
         return {
             deleteApiKey: (params: any) =>
@@ -430,6 +457,7 @@ export function BetterAuthPluginProvider({
         localization,
         nameRequired: overrides.nameRequired ?? true,
         organization,
+        teams,
         account,
         signUp,
         social,

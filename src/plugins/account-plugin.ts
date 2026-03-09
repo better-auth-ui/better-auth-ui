@@ -3,6 +3,7 @@ import { lazy } from "react"
 import { accountViewPaths } from "../lib/view-paths"
 import type { AccountOptions } from "../types/account-options"
 import type { DeleteUserOptions } from "../types/delete-user-options"
+import type { TeamOptions } from "../types/team-options"
 import type { AuthPluginOverrides } from "./auth-plugin"
 
 /**
@@ -31,6 +32,11 @@ export interface AccountPluginOverrides extends Partial<AuthPluginOverrides> {
      * @default undefined
      */
     deleteUser?: DeleteUserOptions | boolean
+    /**
+     * Enable teams feature
+     * @default undefined
+     */
+    teams?: TeamOptions | boolean
     /**
      * Called when a route error occurs
      */
@@ -161,6 +167,28 @@ export const accountClientPlugin = (config: AccountClientConfig) =>
                             `/account/${accountViewPaths.ORGANIZATIONS}`,
                             "Organizations",
                             "Manage your organizations"
+                        )
+                    }
+                }
+            ),
+            accountTeams: createRoute(
+                `/account/${accountViewPaths.TEAMS}`,
+                () => {
+                    const AccountTeamsPage = lazy(() =>
+                        import(
+                            "../components/account/pages/account-teams-page"
+                        ).then((m) => ({
+                            default: m.AccountTeamsPage
+                        }))
+                    )
+
+                    return {
+                        PageComponent: AccountTeamsPage,
+                        meta: createAuthMeta(
+                            config,
+                            `/account/${accountViewPaths.TEAMS}`,
+                            "Teams",
+                            "Manage your team memberships"
                         )
                     }
                 }

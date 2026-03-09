@@ -2,6 +2,7 @@ import { createRoute, defineClientPlugin } from "@btst/stack/plugins/client"
 import { lazy } from "react"
 import { organizationViewPaths } from "../lib/view-paths"
 import type { OrganizationOptions } from "../types/organization-options"
+import type { TeamOptions } from "../types/team-options"
 import type { AuthPluginOverrides } from "./auth-plugin"
 
 /**
@@ -26,6 +27,11 @@ export interface OrganizationPluginOverrides
      * @default undefined
      */
     organization?: OrganizationOptions | boolean
+    /**
+     * Enable teams feature within organizations
+     * @default undefined
+     */
+    teams?: TeamOptions | boolean
     /**
      * Called when a route error occurs
      */
@@ -133,6 +139,28 @@ export const organizationClientPlugin = (config: OrganizationClientConfig) =>
                             `/organization/${organizationViewPaths.API_KEYS}`,
                             "Organization API Keys",
                             "Manage organization API keys"
+                        )
+                    }
+                }
+            ),
+            organizationTeams: createRoute(
+                `/organization/${organizationViewPaths.TEAMS}`,
+                () => {
+                    const OrganizationTeamsPage = lazy(() =>
+                        import(
+                            "../components/organization/pages/organization-teams-page"
+                        ).then((m) => ({
+                            default: m.OrganizationTeamsPage
+                        }))
+                    )
+
+                    return {
+                        PageComponent: OrganizationTeamsPage,
+                        meta: createAuthMeta(
+                            config,
+                            `/organization/${organizationViewPaths.TEAMS}`,
+                            "Organization Teams",
+                            "Manage organization teams"
                         )
                     }
                 }
