@@ -66,7 +66,9 @@ export function SignInForm({
         viewPaths,
         navigate,
         toast,
-        Link
+        Link,
+        localizeErrors,
+        emailVerification
     } = useContext(AuthUIContext)
 
     const rememberMeEnabled = credentials?.rememberMe
@@ -155,8 +157,24 @@ export function SignInForm({
 
             toast({
                 variant: "error",
-                message: getLocalizedError({ error, localization })
+                message: getLocalizedError({
+                    error,
+                    localization,
+                    localizeErrors
+                })
             })
+
+            if (
+                emailVerification?.otp &&
+                (error as { error?: { code?: string; message?: string } })
+                    ?.error?.code === "EMAIL_NOT_VERIFIED"
+            ) {
+                navigate(
+                    `${basePath}/${
+                        viewPaths.EMAIL_VERIFICATION
+                    }?email=${encodeURIComponent(email)}`
+                )
+            }
         }
     }
 
@@ -216,7 +234,11 @@ export function SignInForm({
                                             "text-sm hover:underline",
                                             classNames?.forgotPasswordLink
                                         )}
-                                        href={`${basePath}/${viewPaths.FORGOT_PASSWORD}${isHydrated ? window.location.search : ""}`}
+                                        href={`${basePath}/${viewPaths.FORGOT_PASSWORD}${
+                                            isHydrated
+                                                ? window.location.search
+                                                : ""
+                                        }`}
                                     >
                                         {localization.FORGOT_PASSWORD_LINK}
                                     </Link>

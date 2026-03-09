@@ -78,6 +78,7 @@ export interface OrganizationSwitcherProps
      * @default false
      */
     hidePersonal?: boolean
+    hideCreate?: boolean
 }
 
 /**
@@ -103,6 +104,7 @@ export function OrganizationSwitcher({
     size,
     onSetActive,
     hidePersonal,
+    hideCreate,
     ...props
 }: OrganizationSwitcherProps) {
     const {
@@ -116,7 +118,8 @@ export function OrganizationSwitcher({
         navigate,
         toast,
         viewPaths,
-        Link
+        Link,
+        localizeErrors
     } = useContext(AuthUIContext)
 
     const {
@@ -198,7 +201,11 @@ export function OrganizationSwitcher({
             } catch (error) {
                 toast({
                     variant: "error",
-                    message: getLocalizedError({ error, localization })
+                    message: getLocalizedError({
+                        error,
+                        localization,
+                        localizeErrors
+                    })
                 })
 
                 setActiveOrganizationPending(false)
@@ -208,6 +215,7 @@ export function OrganizationSwitcher({
             authClient,
             toast,
             localization,
+            localizeErrors,
             onSetActive,
             hidePersonal,
             pathMode,
@@ -482,13 +490,15 @@ export function OrganizationSwitcher({
                     {!isPending &&
                     sessionData &&
                     !(user as User).isAnonymous ? (
-                        <DropdownMenuItem
-                            className={cn(classNames?.content?.menuItem)}
-                            onClick={() => setIsCreateOrgDialogOpen(true)}
-                        >
-                            <PlusCircleIcon />
-                            {localization.CREATE_ORGANIZATION}
-                        </DropdownMenuItem>
+                        hideCreate ? null : (
+                            <DropdownMenuItem
+                                className={cn(classNames?.content?.menuItem)}
+                                onClick={() => setIsCreateOrgDialogOpen(true)}
+                            >
+                                <PlusCircleIcon />
+                                {localization.CREATE_ORGANIZATION}
+                            </DropdownMenuItem>
+                        )
                     ) : (
                         <Link href={`${basePath}/${viewPaths.SIGN_IN}`}>
                             <DropdownMenuItem

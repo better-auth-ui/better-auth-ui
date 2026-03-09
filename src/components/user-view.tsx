@@ -73,7 +73,7 @@ export function UserView({
 
             <div
                 className={cn(
-                    "grid flex-1 text-left leading-tight",
+                    "grid flex-1 text-start leading-tight",
                     classNames?.content
                 )}
             >

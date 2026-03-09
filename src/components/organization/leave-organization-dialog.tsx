@@ -40,7 +40,8 @@ export function LeaveOrganizationDialog({
         authClient,
         hooks: { useListOrganizations },
         localization: contextLocalization,
-        toast
+        toast,
+        localizeErrors
     } = useContext(AuthUIContext)
 
     const localization = useMemo(
@@ -72,7 +73,11 @@ export function LeaveOrganizationDialog({
         } catch (error) {
             toast({
                 variant: "error",
-                message: getLocalizedError({ error, localization })
+                message: getLocalizedError({
+                    error,
+                    localization,
+                    localizeErrors
+                })
             })
         }
 

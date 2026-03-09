@@ -37,7 +37,8 @@ export function OrganizationCell({
         localization: contextLocalization,
         organization: organizationOptions,
         navigate,
-        toast
+        toast,
+        localizeErrors
     } = useContext(AuthUIContext)
 
     const localization = useMemo(
@@ -75,7 +76,11 @@ export function OrganizationCell({
         } catch (error) {
             toast({
                 variant: "error",
-                message: getLocalizedError({ error, localization })
+                message: getLocalizedError({
+                    error,
+                    localization,
+                    localizeErrors
+                })
             })
 
             setIsManagingOrganization(false)
@@ -89,7 +94,8 @@ export function OrganizationCell({
         pathMode,
         navigate,
         toast,
-        localization
+        localization,
+        localizeErrors
     ])
 
     return (

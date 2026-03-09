@@ -29,7 +29,8 @@ export function PasskeysCard({
         freshAge,
         hooks: { useListPasskeys, useSession },
         localization: authLocalization,
-        toast
+        toast,
+        localizeErrors
     } = useContext(AuthUIContext)
 
     localization = { ...authLocalization, ...localization }
@@ -59,7 +60,11 @@ export function PasskeysCard({
         } catch (error) {
             toast({
                 variant: "error",
-                message: getLocalizedError({ error, localization })
+                message: getLocalizedError({
+                    error,
+                    localization,
+                    localizeErrors
+                })
             })
         }
     }

@@ -2,7 +2,7 @@
 
 import type { User } from "better-auth"
 import type { Member } from "better-auth/plugins/organization"
-import { EllipsisIcon, UserCogIcon, UserXIcon } from "lucide-react"
+import { EllipsisIcon, UserCogIcon, Users, UserXIcon } from "lucide-react"
 import { useContext, useState } from "react"
 
 import { AuthUIContext } from "../../lib/auth-ui-provider"
@@ -21,6 +21,7 @@ import { UserView } from "../user-view"
 import { LeaveOrganizationDialog } from "./leave-organization-dialog"
 import { RemoveMemberDialog } from "./remove-member-dialog"
 import { UpdateMemberRoleDialog } from "./update-member-role-dialog"
+import { UpdateMemberTeamsDialog } from "./update-member-teams-dialog"
 
 export interface MemberCellProps {
     className?: string
@@ -38,6 +39,7 @@ export function MemberCell({
     hideActions
 }: MemberCellProps) {
     const {
+        teams: teamOptions,
         organization: organizationOptions,
         hooks: {
             useListMembers,
@@ -47,12 +49,14 @@ export function MemberCell({
         },
         localization: contextLocalization
     } = useContext(AuthUIContext)
+    const { enabled: teamsEnabled } = teamOptions || {}
     const localization = { ...contextLocalization, ...localizationProp }
 
     const { data: sessionData } = useSession()
     const [removeDialogOpen, setRemoveDialogOpen] = useState(false)
     const [leaveDialogOpen, setLeaveDialogOpen] = useState(false)
     const [updateRoleDialogOpen, setUpdateRoleDialogOpen] = useState(false)
+    const [updateTeamsDialogOpen, setUpdateTeamsDialogOpen] = useState(false)
 
     const builtInRoles = [
         { role: "owner", label: localization.OWNER },
@@ -127,16 +131,32 @@ export function MemberCell({
                                 onCloseAutoFocus={(e) => e.preventDefault()}
                             >
                                 {hasPermissionToUpdateMember?.success && (
-                                    <DropdownMenuItem
-                                        onClick={() =>
-                                            setUpdateRoleDialogOpen(true)
-                                        }
-                                    >
-                                        <UserCogIcon
-                                            className={classNames?.icon}
-                                        />
-                                        {localization?.UPDATE_ROLE}
-                                    </DropdownMenuItem>
+                                    <>
+                                        <DropdownMenuItem
+                                            onClick={() =>
+                                                setUpdateRoleDialogOpen(true)
+                                            }
+                                        >
+                                            <UserCogIcon
+                                                className={classNames?.icon}
+                                            />
+                                            {localization?.UPDATE_ROLE}
+                                        </DropdownMenuItem>
+                                        {teamsEnabled && (
+                                            <DropdownMenuItem
+                                                onClick={() =>
+                                                    setUpdateTeamsDialogOpen(
+                                                        true
+                                                    )
+                                                }
+                                            >
+                                                <Users
+                                                    className={classNames?.icon}
+                                                />
+                                                {localization?.UPDATE_TEAMS}
+                                            </DropdownMenuItem>
+                                        )}
+                                    </>
                                 )}
 
                                 <DropdownMenuItem
@@ -182,6 +202,15 @@ export function MemberCell({
                 classNames={classNames}
                 localization={localization}
             />
+            {teamsEnabled && (
+                <UpdateMemberTeamsDialog
+                    open={updateTeamsDialogOpen}
+                    onOpenChange={setUpdateTeamsDialogOpen}
+                    member={member}
+                    classNames={classNames}
+                    localization={localization}
+                />
+            )}
         </>
     )
 }

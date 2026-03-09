@@ -4,3 +4,4 @@ export type CaptchaProvider =
     | "google-recaptcha-v2-invisible"
     | "google-recaptcha-v3"
     | "hcaptcha"
+    | "captchafox"

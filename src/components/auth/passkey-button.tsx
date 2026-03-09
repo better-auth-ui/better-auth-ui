@@ -26,7 +26,8 @@ export function PasskeyButton({
     const {
         authClient,
         localization: contextLocalization,
-        toast
+        toast,
+        localizeErrors
     } = useContext(AuthUIContext)
 
     localization = { ...contextLocalization, ...localization }
@@ -46,7 +47,8 @@ export function PasskeyButton({
                     variant: "error",
                     message: getLocalizedError({
                         error: response.error,
-                        localization
+                        localization,
+                        localizeErrors
                     })
                 })
 
@@ -57,7 +59,11 @@ export function PasskeyButton({
         } catch (error) {
             toast({
                 variant: "error",
-                message: getLocalizedError({ error, localization })
+                message: getLocalizedError({
+                    error,
+                    localization,
+                    localizeErrors
+                })
             })
 
             setIsSubmitting?.(false)

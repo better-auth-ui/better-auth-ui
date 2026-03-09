@@ -54,6 +54,19 @@ export interface SignUpFormProps {
     passwordValidation?: PasswordValidation
 }
 
+/**
+ * Render a configurable sign-up form that handles standard and dynamic additional fields, avatar upload, CAPTCHA integration, validation, and submission flow.
+ *
+ * @param className - Additional container className applied to the form element
+ * @param classNames - Optional className overrides for specific form elements (labels, inputs, buttons, etc.)
+ * @param callbackURL - Optional explicit callback URL to include in the sign-up request; if omitted a callback is derived from app configuration and redirectTo
+ * @param isSubmitting - External submitting state to disable inputs and show loading UI
+ * @param localization - Localization overrides for labels, placeholders, and messages used by the form
+ * @param redirectTo - Optional URL to redirect to after successful sign-up (overrides configured redirect)
+ * @param setIsSubmitting - Optional callback invoked with the form's submitting state (useful for parent components)
+ * @param passwordValidation - Optional password validation rules to customize password constraints and messages
+ * @returns A JSX element that renders the fully wired sign-up form UI
+ */
 export function SignUpForm({
     className,
     classNames,
@@ -83,11 +96,14 @@ export function SignUpForm({
         viewPaths,
         navigate,
         toast,
-        avatar
+        avatar,
+        localizeErrors,
+        emailVerification
     } = useContext(AuthUIContext)
 
     const confirmPasswordEnabled = credentials?.confirmPassword
     const usernameEnabled = credentials?.username
+    const usernameRequired = credentials?.usernameRequired ?? true
     const contextPasswordValidation = credentials?.passwordValidation
     const signUpFields = signUpOptions?.fields
 
@@ -140,9 +156,11 @@ export function SignUpForm({
                 : z.string().optional(),
         image: z.string().optional(),
         username: usernameEnabled
-            ? z.string().min(1, {
-                  message: `${localization.USERNAME} ${localization.IS_REQUIRED}`
-              })
+            ? usernameRequired
+                ? z.string().min(1, {
+                      message: `${localization.USERNAME} ${localization.IS_REQUIRED}`
+                  })
+                : z.string().optional()
             : z.string().optional(),
         confirmPassword: confirmPasswordEnabled
             ? getPasswordSchema(passwordValidation, {
@@ -292,7 +310,11 @@ export function SignUpForm({
             console.error(error)
             toast({
                 variant: "error",
-                message: getLocalizedError({ error, localization })
+                message: getLocalizedError({
+                    error,
+                    localization,
+                    localizeErrors
+                })
             })
         }
 
@@ -342,7 +364,16 @@ export function SignUpForm({
             const additionalParams: Record<string, unknown> = {}
 
             if (username !== undefined) {
-                additionalParams.username = username
+                if (
+                    !usernameRequired &&
+                    (username === null ||
+                        username === "" ||
+                        (typeof username === "string" &&
+                            username.trim() === ""))
+                ) {
+                } else {
+                    additionalParams.username = username
+                }
             }
 
             if (image !== undefined) {
@@ -361,6 +392,10 @@ export function SignUpForm({
 
             if ("token" in data && data.token) {
                 await onSuccess()
+            } else if (emailVerification?.otp) {
+                navigate(
+                    `${basePath}/${viewPaths.EMAIL_VERIFICATION}?email=${encodeURIComponent(email as string)}`
+                )
             } else {
                 navigate(
                     `${basePath}/${viewPaths.SIGN_IN}${window.location.search}`
@@ -373,7 +408,11 @@ export function SignUpForm({
         } catch (error) {
             toast({
                 variant: "error",
-                message: getLocalizedError({ error, localization })
+                message: getLocalizedError({
+                    error,
+                    localization,
+                    localizeErrors
+                })
             })
 
             form.resetField("password")
@@ -507,10 +546,16 @@ export function SignUpForm({
                             <FormItem>
                                 <FormLabel className={classNames?.label}>
                                     {localization.NAME}
+                                    {!nameRequired && (
+                                        <span className="ml-1 text-muted-foreground">
+                                            {localization.OPTIONAL_BRACKETS}
+                                        </span>
+                                    )}
                                 </FormLabel>
 
                                 <FormControl>
                                     <Input
+                                        autoComplete="name"
                                         className={classNames?.input}
                                         placeholder={
                                             localization.NAME_PLACEHOLDER
@@ -535,10 +580,16 @@ export function SignUpForm({
                             <FormItem>
                                 <FormLabel className={classNames?.label}>
                                     {localization.USERNAME}
+                                    {!usernameRequired && (
+                                        <span className="ml-1 text-muted-foreground">
+                                            {localization.OPTIONAL_BRACKETS}
+                                        </span>
+                                    )}
                                 </FormLabel>
 
                                 <FormControl>
                                     <Input
+                                        autoComplete="username"
                                         className={classNames?.input}
                                         placeholder={
                                             localization.USERNAME_PLACEHOLDER
@@ -566,6 +617,7 @@ export function SignUpForm({
 
                             <FormControl>
                                 <Input
+                                    autoComplete="email"
                                     className={classNames?.input}
                                     type="email"
                                     placeholder={localization.EMAIL_PLACEHOLDER}

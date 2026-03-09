@@ -28,12 +28,24 @@ export function errorCodeToCamelCase(errorCode: string): string {
  */
 export function getLocalizedError({
     error,
-    localization
+    localization,
+    localizeErrors = true
 }: {
     // biome-ignore lint/suspicious/noExplicitAny: ignore
     error: any
     localization?: Partial<AuthLocalization>
+    localizeErrors: boolean
 }) {
+    const DEFAULT_ERROR_MESSAGE = "Request failed"
+
+    // If localization is disabled, return backend error message directly
+    if (!localizeErrors) {
+        if (error?.message) return error.message
+        if (error?.error?.message) return error.error.message
+
+        return DEFAULT_ERROR_MESSAGE
+    }
+
     if (typeof error === "string") {
         if (localization?.[error as keyof AuthLocalization])
             return localization[error as keyof AuthLocalization]
@@ -53,7 +65,9 @@ export function getLocalizedError({
         )
     }
 
-    return error?.message || localization?.REQUEST_FAILED || "Request failed"
+    return (
+        error?.message || localization?.REQUEST_FAILED || DEFAULT_ERROR_MESSAGE
+    )
 }
 
 export function getSearchParam(paramName: string) {

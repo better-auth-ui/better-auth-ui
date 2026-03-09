@@ -8,6 +8,7 @@ import type { AuthViewPath } from "../../lib/view-paths"
 import type { AuthLocalization } from "../../localization/auth-localization"
 import { AuthCallback } from "./auth-callback"
 import { EmailOTPForm } from "./forms/email-otp-form"
+import { EmailVerificationForm } from "./forms/email-verification-form"
 import { ForgotPasswordForm } from "./forms/forgot-password-form"
 import { MagicLinkForm } from "./forms/magic-link-form"
 import { RecoverAccountForm } from "./forms/recover-account-form"
@@ -49,6 +50,23 @@ export interface AuthFormProps {
     setIsSubmitting?: (isSubmitting: boolean) => void
 }
 
+/**
+ * Render the appropriate authentication UI view based on component props and AuthUIContext feature flags.
+ *
+ * The component chooses a view from (in priority): the `view` prop, a view resolved from `pathname`, or `"SIGN_IN"`, then validates that the view is allowed given enabled features and credentials before rendering the corresponding form component.
+ *
+ * @param className - Optional base CSS class applied to rendered form components
+ * @param classNames - Optional object of per-element CSS class overrides for rendered form components
+ * @param callbackURL - Optional URL used by flows that require a callback (magic link, email OTP)
+ * @param isSubmitting - Whether a form submission is currently in progress
+ * @param localization - Optional localization strings that override context-provided localization
+ * @param pathname - Optional path to resolve the active auth view when `view` is not provided
+ * @param redirectTo - Optional URL to redirect to after successful authentication
+ * @param view - Optional explicit view to render; takes precedence over `pathname`
+ * @param otpSeparators - Number of visual separators to render between OTP input groups
+ * @param setIsSubmitting - Setter to update the submitting state
+ * @returns The React element for the selected authentication view, or `null` if no suitable view is available.
+ */
 export function AuthForm({
     className,
     classNames,
@@ -146,7 +164,7 @@ export function AuthForm({
         twoFactorEnabled
     ])
 
-    if (view === "SIGN_OUT") return <SignOut />
+    if (view === "SIGN_OUT") return <SignOut redirectTo={redirectTo} />
     if (view === "CALLBACK") return <AuthCallback redirectTo={redirectTo} />
 
     if (view === "SIGN_IN") {
@@ -230,6 +248,21 @@ export function AuthForm({
                 classNames={classNames}
                 callbackURL={callbackURL}
                 localization={localization}
+                redirectTo={redirectTo}
+                isSubmitting={isSubmitting}
+                setIsSubmitting={setIsSubmitting}
+            />
+        )
+    }
+
+    if (view === "EMAIL_VERIFICATION") {
+        return (
+            <EmailVerificationForm
+                className={className}
+                classNames={classNames}
+                callbackURL={callbackURL}
+                localization={localization}
+                otpSeparators={otpSeparators}
                 redirectTo={redirectTo}
                 isSubmitting={isSubmitting}
                 setIsSubmitting={setIsSubmitting}

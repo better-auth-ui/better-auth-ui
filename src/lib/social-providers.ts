@@ -19,6 +19,7 @@ import {
     SpotifyIcon,
     TikTokIcon,
     TwitchIcon,
+    VercelIcon,
     VKIcon,
     XIcon,
     ZoomIcon
@@ -119,6 +120,11 @@ export const socialProviders = [
         provider: "twitch",
         name: "Twitch",
         icon: TwitchIcon
+    },
+    {
+        provider: "vercel",
+        name: "Vercel",
+        icon: VercelIcon
     },
     {
         provider: "vk",

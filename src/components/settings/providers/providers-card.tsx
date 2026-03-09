@@ -66,6 +66,31 @@ export function ProvidersCard({
                     ))
                 ) : (
                     <>
+                        {accounts?.map((account) => {
+                            const socialProvider = socialProviders.find(
+                                (sp) => sp.provider === account.providerId
+                            )
+                            const genericOAuthProvider =
+                                genericOAuth?.providers?.find(
+                                    (gp) => gp.provider === account.providerId
+                                )
+
+                            const provider =
+                                socialProvider || genericOAuthProvider
+                            if (!provider) return null
+
+                            return (
+                                <ProviderCell
+                                    key={account.providerId}
+                                    classNames={classNames}
+                                    account={account}
+                                    provider={provider}
+                                    refetch={refetch}
+                                    other={!socialProvider}
+                                />
+                            )
+                        })}
+
                         {social?.providers?.map((provider) => {
                             const socialProvider = socialProviders.find(
                                 (socialProvider) =>
@@ -78,9 +103,6 @@ export function ProvidersCard({
                                 <ProviderCell
                                     key={provider}
                                     classNames={classNames}
-                                    account={accounts?.find(
-                                        (acc) => acc.providerId === provider
-                                    )}
                                     provider={socialProvider}
                                     refetch={refetch}
                                 />

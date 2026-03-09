@@ -89,7 +89,8 @@ function OrganizationSlugForm({
         optimistic,
         toast,
         organization: organizationOptions,
-        replace
+        replace,
+        localizeErrors
     } = useContext(AuthUIContext)
 
     const localization = useMemo(
@@ -160,7 +161,11 @@ function OrganizationSlugForm({
         } catch (error) {
             toast({
                 variant: "error",
-                message: getLocalizedError({ error, localization })
+                message: getLocalizedError({
+                    error,
+                    localization,
+                    localizeErrors
+                })
             })
         }
     }

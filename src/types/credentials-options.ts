@@ -29,4 +29,10 @@ export type CredentialsOptions = {
      * @default false
      */
     username?: boolean
+
+    /**
+     * Make username required when username is enabled
+     * @default true
+     */
+    usernameRequired?: boolean
 }

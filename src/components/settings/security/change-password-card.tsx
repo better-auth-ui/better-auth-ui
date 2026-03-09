@@ -52,7 +52,8 @@ export function ChangePasswordCard({
         hooks: { useSession, useListAccounts },
         localization: contextLocalization,
         viewPaths,
-        toast
+        toast,
+        localizeErrors
     } = useContext(AuthUIContext)
 
     const confirmPasswordEnabled = credentials?.confirmPassword
@@ -131,7 +132,11 @@ export function ChangePasswordCard({
         } catch (error) {
             toast({
                 variant: "error",
-                message: getLocalizedError({ error, localization })
+                message: getLocalizedError({
+                    error,
+                    localization,
+                    localizeErrors
+                })
             })
         }
     }
@@ -155,7 +160,11 @@ export function ChangePasswordCard({
         } catch (error) {
             toast({
                 variant: "error",
-                message: getLocalizedError({ error, localization })
+                message: getLocalizedError({
+                    error,
+                    localization,
+                    localizeErrors
+                })
             })
         }
 

@@ -45,7 +45,8 @@ export function UpdateMemberRoleDialog({
         hooks: { useSession, useListMembers },
         localization: contextLocalization,
         organization,
-        toast
+        toast,
+        localizeErrors
     } = useContext(AuthUIContext)
 
     const localization = useMemo(
@@ -121,7 +122,11 @@ export function UpdateMemberRoleDialog({
         } catch (error) {
             toast({
                 variant: "error",
-                message: getLocalizedError({ error, localization })
+                message: getLocalizedError({
+                    error,
+                    localization,
+                    localizeErrors
+                })
             })
         }
 

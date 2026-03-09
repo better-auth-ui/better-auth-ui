@@ -53,7 +53,8 @@ export function DeleteAccountDialog({
         localization: contextLocalization,
         viewPaths,
         navigate,
-        toast
+        toast,
+        localizeErrors
     } = useContext(AuthUIContext)
 
     localization = { ...contextLocalization, ...localization }
@@ -121,7 +122,11 @@ export function DeleteAccountDialog({
         } catch (error) {
             toast({
                 variant: "error",
-                message: getLocalizedError({ error, localization })
+                message: getLocalizedError({
+                    error,
+                    localization,
+                    localizeErrors
+                })
             })
         }
 

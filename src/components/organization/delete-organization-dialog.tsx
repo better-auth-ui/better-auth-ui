@@ -52,7 +52,8 @@ export function DeleteOrganizationDialog({
         hooks: { useListOrganizations },
         localization: contextLocalization,
         navigate,
-        toast
+        toast,
+        localizeErrors
     } = useContext(AuthUIContext)
 
     const localization = useMemo(
@@ -102,7 +103,11 @@ export function DeleteOrganizationDialog({
         } catch (error) {
             toast({
                 variant: "error",
-                message: getLocalizedError({ error, localization })
+                message: getLocalizedError({
+                    error,
+                    localization,
+                    localizeErrors
+                })
             })
         }
     }

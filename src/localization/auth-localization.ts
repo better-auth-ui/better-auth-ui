@@ -11,6 +11,7 @@ import { ORGANIZATION_ERROR_CODES } from "./organization-error-codes"
 import { PASSKEY_ERROR_CODES } from "./passkey-error-codes"
 import { PHONE_NUMBER_ERROR_CODES } from "./phone-number-error-codes"
 import { STRIPE_ERROR_CODES } from "./stripe-localization"
+import { TEAM_ERROR_CODES } from "./team-error-codes"
 import { TWO_FACTOR_ERROR_CODES } from "./two-factor-error-codes"
 import { USERNAME_ERROR_CODES } from "./username-error-codes"
 
@@ -114,6 +115,9 @@ export const authLocalization = {
     /** @default "Current Session" */
     CURRENT_SESSION: "Current Session",
 
+    /** @default "Update" */
+    UPDATE: "Update",
+
     /** @default "Delete" */
     DELETE: "Delete",
 
@@ -172,8 +176,15 @@ export const authLocalization = {
     /** @default "Please check your email to verify the change." */
     EMAIL_VERIFY_CHANGE: "Please check your email to verify the change.",
 
-    /** @default "Please check your email for the verification link." */
-    EMAIL_VERIFICATION: "Please check your email for the verification link.",
+    /** @default "Email Verification" */
+    EMAIL_VERIFICATION: "Email Verification",
+
+    /** @default "Please check your email for the verification code to complete your registration." */
+    EMAIL_VERIFICATION_DESCRIPTION:
+        "Please check your email for the verification code to complete your registration.",
+
+    /** @default "Email verification successful." */
+    EMAIL_VERIFICATION_SUCCESS: "Email verification successful.",
 
     /** @default "Enable Two-Factor" */
     ENABLE_TWO_FACTOR: "Enable Two-Factor",
@@ -523,6 +534,9 @@ export const authLocalization = {
     /** @default "Username" */
     USERNAME_PLACEHOLDER: "Username",
 
+    /** @default "(Optional)" */
+    OPTIONAL_BRACKETS: "(Optional)",
+
     /** @default "Username or email" */
     SIGN_IN_USERNAME_PLACEHOLDER: "Username or email",
 
@@ -717,6 +731,131 @@ export const authLocalization = {
     /** @default "The slug does not match" */
     SLUG_DOES_NOT_MATCH: "The slug does not match",
 
+    // Teams
+    /** @default "Team" */
+    TEAM: "Team",
+
+    /** @default "Teams" */
+    TEAMS: "Teams",
+
+    /** @default "Active" */
+    TEAM_ACTIVE: "Active",
+
+    /** @default "Set Active" */
+    TEAM_SET_ACTIVE: "Set Active",
+
+    /** @default "Create Team" */
+    CREATE_TEAM: "Create Team",
+
+    /** @default "Team created successfully" */
+    CREATE_TEAM_SUCCESS: "Team created successfully",
+
+    /** @default "Update Team" */
+    UPDATE_TEAM: "Update Team",
+
+    /** @default "Update Teams" */
+    UPDATE_TEAMS: "Update Teams",
+
+    /** @default "Select teams" */
+    SELECT_TEAMS: "Select teams",
+
+    /** @default "Add" */
+    ADD: "Add",
+
+    /** @default "Remove" */
+    REMOVE: "Remove",
+
+    /** @default "Update the name for this team" */
+    UPDATE_TEAM_DESCRIPTION: "Update the name for this team",
+
+    /** @default "Add or remove teams for this member" */
+    UPDATE_TEAMS_DESCRIPTION: "Add or remove teams for this member",
+
+    /** @default "Are you sure you want to remove this team from the organization?" */
+    REMOVE_TEAM_CONFIRM:
+        "Are you sure you want to remove this team from the organization?",
+
+    /** @default "Add new team to your organization." */
+    CREATE_TEAM_INSTRUCTIONS: "Add new team to your organization.",
+
+    /** @default "Team Name" */
+    TEAM_NAME: "Team Name",
+
+    /** @default "Engineering Team" */
+    TEAM_NAME_PLACEHOLDER: "Engineering Team",
+
+    /** @default "This is your team's visible name." */
+    TEAM_NAME_DESCRIPTION: "This is your team's visible name.",
+
+    /** @default "Please use 64 characters at maximum." */
+    TEAM_NAME_INSTRUCTIONS: "Please use 64 characters at maximum.",
+
+    /** @default "Manage your teams within your organization." */
+    TEAMS_DESCRIPTION: "Manage your teams within your organization.",
+
+    /** @default "You are a member of the following teams." */
+    USER_TEAMS_DESCRIPTION: "You are a member of the following teams.",
+
+    /** @default "Delete Team" */
+    DELETE_TEAM: "Delete Team",
+
+    /** @default "Permanently remove this team and all of its contents." */
+    DELETE_TEAM_DESCRIPTION:
+        "Permanently remove this team and all of its contents.",
+
+    /** @default "Team deleted successfully" */
+    DELETE_TEAM_SUCCESS: "Team deleted successfully",
+
+    /** @default "Enter the team name to continue:" */
+    DELETE_TEAM_INSTRUCTIONS: "Enter the team name to continue:",
+
+    /** @default "Team name is required" */
+    TEAM_NAME_REQUIRED: "Team name is required",
+
+    /** @default "The team name does not match" */
+    TEAM_NAME_DOES_NOT_MATCH: "The team name does not match",
+
+    /** @default "Team Members" */
+    TEAM_MEMBERS: "Team Members",
+
+    /** @default "Manage your team members and their roles." */
+    TEAM_MEMBERS_DESCRIPTION: "Manage your team members and their roles.",
+
+    /** @default "Add Team Member" */
+    ADD_TEAM_MEMBER: "Add Team Member",
+
+    /** @default "Remove Team Member" */
+    REMOVE_TEAM_MEMBER: "Remove Team Member",
+
+    /** @default "Are you sure you want to remove this member from the team?" */
+    REMOVE_TEAM_MEMBER_CONFIRM:
+        "Are you sure you want to remove this member from the team?",
+
+    /** @default "Team member removed successfully" */
+    REMOVE_TEAM_MEMBER_SUCCESS: "Team member removed successfully",
+
+    /** @default "Team member added successfully" */
+    ADD_TEAM_MEMBER_SUCCESS: "Team member added successfully",
+
+    /** @default "Team updated successfully" */
+    UPDATE_TEAM_SUCCESS: "Team updated successfully",
+
+    /** @default "Manage Team Members" */
+    MANAGE_TEAM_MEMBERS: "Manage Team Members",
+
+    /** @default "Search and add organization members to this team." */
+    MANAGE_TEAM_MEMBERS_DESCRIPTION:
+        "Search and add organization members to this team.",
+
+    /** @default "No teams found" */
+    NO_TEAMS_FOUND: "No teams found",
+
+    /** @default "member" */
+    MEMBER_SINGULAR: "member",
+
+    /** @default "members" */
+    MEMBER_PLURAL: "members",
+
     /** @default "Unknown" */
     UNKNOWN: "Unknown",
 
@@ -733,6 +872,7 @@ export const authLocalization = {
     ...PASSKEY_ERROR_CODES,
     ...PHONE_NUMBER_ERROR_CODES,
     ...STRIPE_ERROR_CODES,
+    ...TEAM_ERROR_CODES,
     ...TWO_FACTOR_ERROR_CODES,
     ...USERNAME_ERROR_CODES
 }

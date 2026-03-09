@@ -57,7 +57,8 @@ export function MagicLinkForm({
         localization: contextLocalization,
         redirectTo: contextRedirectTo,
         viewPaths,
-        toast
+        toast,
+        localizeErrors
     } = useContext(AuthUIContext)
 
     localization = { ...contextLocalization, ...localization }
@@ -127,7 +128,11 @@ export function MagicLinkForm({
         } catch (error) {
             toast({
                 variant: "error",
-                message: getLocalizedError({ error, localization })
+                message: getLocalizedError({
+                    error,
+                    localization,
+                    localizeErrors
+                })
             })
             resetCaptcha()
         }

@@ -14,7 +14,8 @@ export function OneTap({ localization, redirectTo }: OneTapProps) {
     const {
         authClient,
         localization: contextLocalization,
-        toast
+        toast,
+        localizeErrors
     } = useContext(AuthUIContext)
     const oneTapFetched = useRef(false)
 
@@ -39,10 +40,14 @@ export function OneTap({ localization, redirectTo }: OneTapProps) {
         } catch (error) {
             toast({
                 variant: "error",
-                message: getLocalizedError({ error, localization })
+                message: getLocalizedError({
+                    error,
+                    localization,
+                    localizeErrors
+                })
             })
         }
-    }, [authClient, localization, onSuccess, toast])
+    }, [authClient, localization, localizeErrors, onSuccess, toast])
 
     return null
 }

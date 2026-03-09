@@ -39,7 +39,8 @@ export function ApiKeyDeleteDialog({
     const {
         localization: contextLocalization,
         mutators: { deleteApiKey },
-        toast
+        toast,
+        localizeErrors
     } = useContext(AuthUIContext)
 
     localization = { ...contextLocalization, ...localization }
@@ -57,7 +58,11 @@ export function ApiKeyDeleteDialog({
         } catch (error) {
             toast({
                 variant: "error",
-                message: getLocalizedError({ error, localization })
+                message: getLocalizedError({
+                    error,
+                    localization,
+                    localizeErrors
+                })
             })
         }
 

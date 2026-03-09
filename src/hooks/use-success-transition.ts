@@ -1,10 +1,4 @@
-import {
-    useCallback,
-    useContext,
-    useEffect,
-    useState,
-    useTransition
-} from "react"
+import { useCallback, useContext, useState } from "react"
 import { AuthUIContext } from "../lib/auth-ui-provider"
 import { getSearchParam } from "../lib/utils"
 
@@ -21,8 +15,7 @@ export function useOnSuccessTransition({
         [redirectToProp, contextRedirectTo]
     )
 
-    const [isPending, startTransition] = useTransition()
-    const [success, setSuccess] = useState(false)
+    const [isPending, setIsPending] = useState(false)
 
     const {
         navigate,
@@ -32,20 +25,17 @@ export function useOnSuccessTransition({
 
     const { refetch: refetchSession } = useSession()
 
-    useEffect(() => {
-        if (!success || isPending) return
-
-        startTransition(() => {
-            navigate(getRedirectTo())
-        })
-    }, [success, isPending, navigate, getRedirectTo])
-
     const onSuccess = useCallback(async () => {
-        await refetchSession?.()
-        setSuccess(true)
+        setIsPending(true)
 
-        if (onSessionChange) startTransition(onSessionChange)
-    }, [refetchSession, onSessionChange])
+        await refetchSession?.()
+
+        if (onSessionChange) await onSessionChange()
+
+        setIsPending(false)
+
+        navigate(getRedirectTo())
+    }, [refetchSession, onSessionChange, navigate, getRedirectTo])
 
     return { onSuccess, isPending }
 }

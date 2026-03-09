@@ -81,7 +81,7 @@ The [`<AuthUIProvider />`](/components/auth-ui-provider) can be fully customized
 <Step>
 ### Auth Pages
 
-Create a dynamic route segment for authentication views in `app/auth/[authView]/page.tsx`.
+Create a dynamic route segment for authentication views in `app/auth/[path]/page.tsx`.
 
 ```tsx title="app/auth/[path]/page.tsx"
 import { AuthView } from "@daveyplate/better-auth-ui"
@@ -169,11 +169,59 @@ export default async function OrganizationPage({ params }: { params: Promise<{ p
 }
 ```
 
-If you prefer slug-based org URLs, set `organization={{ pathMode: "slug", basePath: "/organization", slug: currentSlug }}` in the `AuthUIProvider` and structure your routes accordingly:
+#### Slug-Based Organization URLs
+
+If you prefer slug-based organization URLs (e.g., `/organization/my-org/settings`), you'll need to:
+
+1. Update your `AuthUIProvider` to use `useParams` to get the current slug from the URL
+2. Create a nested dynamic route structure: `app/organization/[slug]/[path]/page.tsx`
+
+First, update your providers to extract the slug from the URL:
+
+```tsx title="app/providers.tsx"
+"use client"
+
+import { AuthUIProvider } from "@daveyplate/better-auth-ui"
+import Link from "next/link"
+import { useParams, useRouter } from "next/navigation"
+import type { ReactNode } from "react"
+
+import { authClient } from "@/lib/auth-client"
+
+export function Providers({ children }: { children: ReactNode }) {
+    const router = useRouter()
+    const { slug } = useParams<{ slug: string }>()
+
+    return (
+        <AuthUIProvider
+            authClient={authClient}
+            navigate={router.push}
+            replace={router.replace}
+            onSessionChange={() => {
+                router.refresh()
+            }}
+            organization={{
+                pathMode: "slug",
+                basePath: "/organization",
+                slug
+            }}
+            Link={Link}
+        >
+            {children}
+        </AuthUIProvider>
+    )
+}
+```
+
+Then create the page component with the nested route structure:
 
 ```tsx title="app/organization/[slug]/[path]/page.tsx"
 import { OrganizationView } from "@daveyplate/better-auth-ui"
 import { organizationViewPaths } from "@daveyplate/better-auth-ui/server"
+
+export function generateStaticParams() {
+    return Object.values(organizationViewPaths).map((path) => ({ path }))
+}
 
 export default async function OrganizationPage({ params }: { params: Promise<{ path: string }> }) {
     const { path } = await params
@@ -185,6 +233,10 @@ export default async function OrganizationPage({ params }: { params: Promise<{ p
     )
 }
 ```
+
+<small>
+**Note**: Since the `slug` parameter comes from `useParams`, it will be `undefined` when not on an organization page. This is expected behavior—the `AuthUIProvider` will handle this gracefully and only use the slug when navigating within organization routes.
+</small>
 </Step>
 </Steps>
 
@@ -306,7 +358,72 @@ export async function getStaticPaths() {
 }
 
 export async function getStaticProps({ params }: { params: { path: string } }) {
-    return { props: { organizationView: params.path } }
+    return { props: { path: params.path } }
+}
+```
+
+#### Slug-Based Organization URLs
+
+If you prefer slug-based organization URLs (e.g., `/organization/my-org/settings`), you'll need to:
+
+1. Update your `AuthUIProvider` in `_app.tsx` to use `useRouter` to get the current slug from the URL
+2. Create a nested dynamic route structure: `pages/organization/[slug]/[path].tsx`
+
+First, update your `_app.tsx` to extract the slug from the URL:
+
+```tsx title="pages/_app.tsx"
+import type { AppProps } from "next/app"
+import { AuthUIProvider } from "@daveyplate/better-auth-ui"
+import { useRouter } from "next/router"
+import Link from "next/link"
+
+import { authClient } from "@/lib/auth-client"
+
+export default function App({ Component, pageProps }: AppProps) {
+    const router = useRouter()
+    const slug = router.query.slug as string | undefined
+
+    return (
+        <AuthUIProvider
+            authClient={authClient}
+            navigate={router.push}
+            replace={router.replace}
+            organization={{
+                pathMode: "slug",
+                basePath: "/organization",
+                slug
+            }}
+            Link={Link}
+        >
+            <Component {...pageProps} />
+        </AuthUIProvider>
+    )
+}
+```
+
+Then create the page component with the nested route structure:
+
+```tsx title="pages/organization/[slug]/[path].tsx"
+import { OrganizationView } from "@daveyplate/better-auth-ui"
+import { organizationViewPaths } from "@daveyplate/better-auth-ui/server"
+
+export default function OrganizationPage({ path }: { path: string }) {
+    return (
+        <main className="container mx-auto p-4 md:p-6">
+            <OrganizationView path={path} />
+        </main>
+    )
+}
+
+export async function getStaticPaths() {
+    return {
+        paths: Object.values(organizationViewPaths).map((path) => ({ params: { slug: "", path } })),
+        fallback: "blocking"
+    }
+}
+
+export async function getStaticProps({ params }: { params: { path: string } }) {
+    return { props: { path: params.path } }
 }
 ```
 </Step>

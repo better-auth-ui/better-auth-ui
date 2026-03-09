@@ -47,7 +47,8 @@ export function TwoFactorPasswordDialog({
         viewPaths,
         navigate,
         toast,
-        twoFactor
+        twoFactor,
+        localizeErrors
     } = useContext(AuthUIContext)
     const [showBackupCodesDialog, setShowBackupCodesDialog] = useState(false)
     const [backupCodes, setBackupCodes] = useState<string[]>([])
@@ -86,7 +87,11 @@ export function TwoFactorPasswordDialog({
         } catch (error) {
             toast({
                 variant: "error",
-                message: getLocalizedError({ error, localization })
+                message: getLocalizedError({
+                    error,
+                    localization,
+                    localizeErrors
+                })
             })
         }
     }
@@ -107,7 +112,11 @@ export function TwoFactorPasswordDialog({
         } catch (error) {
             toast({
                 variant: "error",
-                message: getLocalizedError({ error, localization })
+                message: getLocalizedError({
+                    error,
+                    localization,
+                    localizeErrors
+                })
             })
         }
     }

@@ -62,7 +62,8 @@ export function CreateOrganizationDialog({
         localization: contextLocalization,
         organization: organizationOptions,
         navigate,
-        toast
+        toast,
+        localizeErrors
     } = useContext(AuthUIContext)
 
     const localization = useMemo(
@@ -128,7 +129,11 @@ export function CreateOrganizationDialog({
         } catch (error) {
             toast({
                 variant: "error",
-                message: getLocalizedError({ error, localization })
+                message: getLocalizedError({
+                    error,
+                    localization,
+                    localizeErrors
+                })
             })
         }
 
@@ -177,7 +182,11 @@ export function CreateOrganizationDialog({
         } catch (error) {
             toast({
                 variant: "error",
-                message: getLocalizedError({ error, localization })
+                message: getLocalizedError({
+                    error,
+                    localization,
+                    localizeErrors
+                })
             })
         }
     }

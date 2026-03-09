@@ -1,3 +1,4 @@
+import type { Passkey } from "@better-auth/passkey"
 import type { BetterFetchError } from "@better-fetch/fetch"
 import type { Account, User } from "better-auth"
 import type { Member } from "better-auth/plugins/organization"
@@ -24,7 +25,7 @@ export type AuthHooks = {
     ) => AuthHook<{ user: User }>
     useListDeviceSessions: () => AuthHook<AnyAuthClient["$Infer"]["Session"][]>
     useListSessions: () => AuthHook<AnyAuthSession["session"][]>
-    useListPasskeys: () => Partial<ReturnType<AuthClient["useListPasskeys"]>>
+    useListPasskeys: () => AuthHook<Passkey[]>
     useListApiKeys: () => AuthHook<ApiKey[]>
     useActiveOrganization: () => Partial<
         ReturnType<AuthClient["useActiveOrganization"]>
@@ -57,5 +58,24 @@ export type AuthHooks = {
         members: (Member & { user?: Partial<User> | null })[]
         total: number
     }>
+    useListTeams: (params?: { organizationId?: string }) => AuthHook<Team[]>
+    useListTeamMembers: (params: { teamId?: string }) => AuthHook<TeamMember[]>
+    useListUserTeams: () => AuthHook<Team[]>
     useIsRestoring?: () => boolean
+}
+
+export type Team = {
+    id: string
+    name: string
+    organizationId: string
+    createdAt: Date
+    updatedAt: Date
+}
+
+export type TeamMember = {
+    id: string
+    teamId: string
+    userId: string
+    createdAt: Date
+    user?: Partial<User> | null
 }

@@ -22,6 +22,7 @@ import type { AvatarOptions } from "../types/avatar-options"
 import type { CaptchaOptions } from "../types/captcha-options"
 import type { CredentialsOptions } from "../types/credentials-options"
 import type { DeleteUserOptions } from "../types/delete-user-options"
+import type { EmailVerificationOptions } from "../types/email-verification-options"
 import type { GenericOAuthOptions } from "../types/generic-oauth-options"
 import type { GravatarOptions } from "../types/gravatar-options"
 import type { Link } from "../types/link"
@@ -32,6 +33,7 @@ import type {
 import type { RenderToast } from "../types/render-toast"
 import type { SignUpOptions } from "../types/sign-up-options"
 import type { SocialOptions } from "../types/social-options"
+import type { TeamOptions, TeamOptionsContext } from "../types/team-options"
 import { OrganizationRefetcher } from "./organization-refetcher"
 import type { AuthViewPaths } from "./view-paths"
 import {
@@ -118,9 +120,9 @@ export type AuthUIContextType = {
      */
     deleteUser?: DeleteUserOptions
     /**
-     * Show Verify Email card for unverified emails
+     * Email verification configuration
      */
-    emailVerification?: boolean
+    emailVerification?: EmailVerificationOptions
     /**
      * Freshness age for Session data
      * @default 60 * 60 * 24
@@ -136,6 +138,12 @@ export type AuthUIContextType = {
     gravatar?: boolean | GravatarOptions
     hooks: AuthHooks
     localization: typeof authLocalization
+    /**
+     * Enable or disable error localization.
+     * When false, errors messages from backend will be used directly.
+     * @default true
+     */
+    localizeErrors: boolean
     /**
      * Enable or disable Magic Link support
      * @default false
@@ -171,6 +179,10 @@ export type AuthUIContextType = {
      * Organization configuration
      */
     organization?: OrganizationOptionsContext
+    /**
+     * Teams configuration (requires organizations to be enabled)
+     */
+    teams?: TeamOptionsContext
     /**
      * Enable or disable Passkey support
      * @default false
@@ -255,6 +267,11 @@ export type AuthUIProviderProps = {
      */
     viewPaths?: Partial<AuthViewPaths>
     /**
+     * Email verification configuration
+     * @default undefined
+     */
+    emailVerification?: boolean | Partial<EmailVerificationOptions>
+    /**
      * Render custom Toasts
      * @default Sonner
      */
@@ -266,6 +283,12 @@ export type AuthUIProviderProps = {
      */
     localization?: AuthLocalization
     /**
+     * Enable or disable error localization.
+     * When false, errors messages from backend will be used directly.
+     * @default true
+     */
+    localizeErrors?: boolean
+    /**
      * ADVANCED: Custom mutators for updating auth data
      */
     mutators?: Partial<AuthMutators>
@@ -273,6 +296,10 @@ export type AuthUIProviderProps = {
      * Organization plugin configuration
      */
     organization?: OrganizationOptions | boolean
+    /**
+     * Teams plugin configuration (requires organizations to be enabled)
+     */
+    teams?: TeamOptions | boolean
     /**
      * Enable or disable Credentials support
      * @default { forgotPassword: true }
@@ -298,6 +325,9 @@ export type AuthUIProviderProps = {
         | "credentials"
         | "signUp"
         | "organization"
+        | "localizeErrors"
+        | "teams"
+        | "emailVerification"
     >
 >
 
@@ -323,14 +353,17 @@ export const AuthUIProvider = ({
     hooks: hooksProp,
     mutators: mutatorsProp,
     localization: localizationProp,
+    localizeErrors = true,
     nameRequired = true,
     organization: organizationProp,
+    teams: teamsProp,
     signUp: signUpProp = true,
     toast = defaultToast,
     viewPaths: viewPathsProp,
     navigate,
     replace,
     Link = DefaultLink,
+    emailVerification: emailVerificationProp,
     ...props
 }: AuthUIProviderProps) => {
     const authClient = authClientProp as AuthClient
@@ -353,6 +386,22 @@ export const AuthUIProvider = ({
             Image: avatarProp.Image
         }
     }, [avatarProp])
+
+    const emailVerification = useMemo<
+        EmailVerificationOptions | undefined
+    >(() => {
+        if (!emailVerificationProp) return
+
+        if (emailVerificationProp === true) {
+            return {
+                otp: false
+            }
+        }
+
+        return {
+            otp: emailVerificationProp.otp ?? false
+        }
+    }, [emailVerificationProp])
 
     const account = useMemo<AccountOptionsContext | undefined>(() => {
         if (accountProp === false) return
@@ -404,13 +453,15 @@ export const AuthUIProvider = ({
 
         if (credentialsProp === true) {
             return {
-                forgotPassword: true
+                forgotPassword: true,
+                usernameRequired: true
             }
         }
 
         return {
             ...credentialsProp,
-            forgotPassword: credentialsProp?.forgotPassword ?? true
+            forgotPassword: credentialsProp?.forgotPassword ?? true,
+            usernameRequired: credentialsProp?.usernameRequired ?? true
         }
     }, [credentialsProp])
 
@@ -452,9 +503,8 @@ export const AuthUIProvider = ({
                 delete: organizationProp.logo.delete,
                 extension: organizationProp.logo.extension || "png",
                 size:
-                    organizationProp.logo.size || organizationProp.logo.upload
-                        ? 256
-                        : 128
+                    organizationProp.logo.size ||
+                    (organizationProp.logo.upload ? 256 : 128)
             }
         }
 
@@ -474,6 +524,30 @@ export const AuthUIProvider = ({
             }
         }
     }, [organizationProp])
+
+    const teams = useMemo<TeamOptionsContext | undefined>(() => {
+        if (!teamsProp || !organization) return
+
+        if (teamsProp === true) {
+            return {
+                enabled: true,
+                customRoles: [],
+                colors: {
+                    count: 5,
+                    prefix: "team"
+                }
+            }
+        }
+
+        return {
+            enabled: teamsProp.enabled ?? true,
+            customRoles: teamsProp.customRoles || [],
+            colors: {
+                count: teamsProp.colors?.count ?? 5,
+                prefix: teamsProp.colors?.prefix ?? "team"
+            }
+        }
+    }, [teamsProp, organization])
 
     const defaultMutators = useMemo(() => {
         return {
@@ -506,6 +580,12 @@ export const AuthUIProvider = ({
                 authClient.organization.update({
                     ...params,
                     fetchOptions: { throw: true }
+                }),
+            updateTeam: (params) =>
+                authClient.$fetch("/organization/update-team", {
+                    method: "POST",
+                    body: params,
+                    throw: true
                 }),
             updateUser: (params) =>
                 authClient.updateUser({
@@ -570,7 +650,9 @@ export const AuthUIProvider = ({
                 useAuthData({
                     queryFn: () =>
                         authClient.$fetch(
-                            `/organization/list-invitations?organizationId=${params?.query?.organizationId || ""}`
+                            `/organization/list-invitations?organizationId=${
+                                params?.query?.organizationId || ""
+                            }`
                         ),
                     cacheKey: `listInvitations:${JSON.stringify(params)}`
                 }),
@@ -586,9 +668,38 @@ export const AuthUIProvider = ({
                 useAuthData({
                     queryFn: () =>
                         authClient.$fetch(
-                            `/organization/list-members?organizationId=${params?.query?.organizationId || ""}`
+                            `/organization/list-members?organizationId=${
+                                params?.query?.organizationId || ""
+                            }`
                         ),
                     cacheKey: `listMembers:${JSON.stringify(params)}`
+                }),
+            useListTeams: (params) =>
+                useAuthData({
+                    queryFn: () =>
+                        authClient.$fetch(
+                            `/organization/list-teams?organizationId=${
+                                params?.organizationId || ""
+                            }`
+                        ),
+                    cacheKey: `listTeams:${JSON.stringify(params)}`
+                }),
+            useListTeamMembers: (params) =>
+                useAuthData({
+                    queryFn: () =>
+                        authClient.$fetch("/organization/list-team-members", {
+                            method: "POST",
+                            body: params?.teamId
+                                ? { query: { teamId: params.teamId } }
+                                : undefined
+                        }),
+                    cacheKey: `listTeamMembers:${JSON.stringify(params)}`
+                }),
+            useListUserTeams: () =>
+                useAuthData({
+                    queryFn: () =>
+                        authClient.$fetch("/organization/list-user-teams"),
+                    cacheKey: "listUserTeams"
                 })
         } as AuthHooks
     }, [authClient])
@@ -629,13 +740,16 @@ export const AuthUIProvider = ({
                 changeEmail,
                 credentials,
                 deleteUser,
+                emailVerification,
                 freshAge,
                 genericOAuth,
                 hooks,
                 mutators,
                 localization,
+                localizeErrors,
                 nameRequired,
                 organization,
+                teams,
                 account,
                 signUp,
                 social,

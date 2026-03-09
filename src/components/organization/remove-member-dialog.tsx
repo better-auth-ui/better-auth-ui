@@ -37,7 +37,8 @@ export function RemoveMemberDialog({
         authClient,
         hooks: { useListMembers },
         localization: contextLocalization,
-        toast
+        toast,
+        localizeErrors
     } = useContext(AuthUIContext)
 
     const localization = useMemo(
@@ -72,7 +73,11 @@ export function RemoveMemberDialog({
         } catch (error) {
             toast({
                 variant: "error",
-                message: getLocalizedError({ error, localization })
+                message: getLocalizedError({
+                    error,
+                    localization,
+                    localizeErrors
+                })
             })
         }
 

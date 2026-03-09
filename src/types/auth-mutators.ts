@@ -12,6 +12,10 @@ export interface AuthMutators {
         organizationId: string
         data: Record<string, unknown>
     }>
+    updateTeam: MutateFn<{
+        teamId: string
+        data: Record<string, unknown>
+    }>
     updateUser: MutateFn
     unlinkAccount: MutateFn<{ providerId: string; accountId?: string }>
 }

@@ -6,12 +6,12 @@ import { useContext, useEffect, useRef } from "react"
 import { useOnSuccessTransition } from "../../hooks/use-success-transition"
 import { AuthUIContext } from "../../lib/auth-ui-provider"
 
-export function SignOut() {
+export function SignOut({ redirectTo }: { redirectTo?: string }) {
     const signingOut = useRef(false)
 
     const { authClient, basePath, viewPaths } = useContext(AuthUIContext)
     const { onSuccess } = useOnSuccessTransition({
-        redirectTo: `${basePath}/${viewPaths.SIGN_IN}`
+        redirectTo: redirectTo || `${basePath}/${viewPaths.SIGN_IN}`
     })
 
     useEffect(() => {

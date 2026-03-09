@@ -51,7 +51,8 @@ export function ForgotPasswordForm({
         localization: contextLocalization,
         navigate,
         toast,
-        viewPaths
+        viewPaths,
+        localizeErrors
     } = useContext(AuthUIContext)
 
     localization = { ...contextLocalization, ...localization }
@@ -104,7 +105,11 @@ export function ForgotPasswordForm({
         } catch (error) {
             toast({
                 variant: "error",
-                message: getLocalizedError({ error, localization })
+                message: getLocalizedError({
+                    error,
+                    localization,
+                    localizeErrors
+                })
             })
             resetCaptcha()
         }

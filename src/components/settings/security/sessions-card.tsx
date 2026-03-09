@@ -40,7 +40,10 @@ export function SessionsCard({
         >
             <CardContent className={cn("grid gap-4", classNames?.content)}>
                 {isPending ? (
-                    <SettingsCellSkeleton classNames={classNames} />
+                    <SettingsCellSkeleton
+                        key="skeleton"
+                        classNames={classNames}
+                    />
                 ) : (
                     sessions?.map((session) => (
                         <SessionCell

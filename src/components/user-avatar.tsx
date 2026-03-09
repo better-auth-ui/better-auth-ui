@@ -115,7 +115,7 @@ export function UserAvatar({
         >
             {avatar?.Image ? (
                 <avatar.Image
-                    alt={name || localization?.USER!}
+                    alt={name || localization?.USER}
                     className={classNames?.image}
                     src={src || ""}
                 />

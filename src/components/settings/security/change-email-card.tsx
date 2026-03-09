@@ -30,7 +30,8 @@ export function ChangeEmailCard({
         emailVerification,
         hooks: { useSession },
         localization: contextLocalization,
-        toast
+        toast,
+        localizeErrors
     } = useContext(AuthUIContext)
 
     localization = { ...contextLocalization, ...localization }
@@ -85,7 +86,11 @@ export function ChangeEmailCard({
         } catch (error) {
             toast({
                 variant: "error",
-                message: getLocalizedError({ error, localization })
+                message: getLocalizedError({
+                    error,
+                    localization,
+                    localizeErrors
+                })
             })
         }
     }
@@ -104,12 +109,16 @@ export function ChangeEmailCard({
 
             toast({
                 variant: "success",
-                message: localization.EMAIL_VERIFICATION!
+                message: localization.EMAIL_VERIFY_CHANGE!
             })
         } catch (error) {
             toast({
                 variant: "error",
-                message: getLocalizedError({ error, localization })
+                message: getLocalizedError({
+                    error,
+                    localization,
+                    localizeErrors
+                })
             })
             setResendDisabled(false)
             throw error

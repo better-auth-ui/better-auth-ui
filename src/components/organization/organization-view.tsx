@@ -21,6 +21,7 @@ import { Label } from "../ui/label"
 import { OrganizationInvitationsCard } from "./organization-invitations-card"
 import { OrganizationMembersCard } from "./organization-members-card"
 import { OrganizationSettingsCards } from "./organization-settings-cards"
+import { TeamsCard } from "./teams-card"
 
 export type OrganizationViewPageProps = Omit<AccountViewProps, "view"> & {
     slug?: string
@@ -38,6 +39,7 @@ export function OrganizationView({
     slug: slugProp
 }: OrganizationViewPageProps) {
     const {
+        teams: teamOptions,
         organization: organizationOptions,
         localization: contextLocalization,
         account: accountOptions,
@@ -46,6 +48,7 @@ export function OrganizationView({
     } = useContext(AuthUIContext)
 
     const { slug: contextSlug, viewPaths, apiKey } = organizationOptions || {}
+    const { enabled: teamsEnabled } = teamOptions || {}
 
     useAuthenticate()
 
@@ -73,6 +76,13 @@ export function OrganizationView({
         { view: "SETTINGS", label: localization.SETTINGS },
         { view: "MEMBERS", label: localization.MEMBERS }
     ]
+
+    if (teamsEnabled) {
+        navItems.push({
+            view: "TEAMS",
+            label: localization.TEAMS
+        })
+    }
 
     if (apiKey) {
         navItems.push({
@@ -205,6 +215,14 @@ export function OrganizationView({
                         slug={slug}
                     />
                 </div>
+            )}
+
+            {view === "TEAMS" && organization?.id && teamsEnabled && (
+                <TeamsCard
+                    classNames={classNames}
+                    localization={localization}
+                    organizationId={organization.id}
+                />
             )}
 
             {view === "API_KEYS" && (

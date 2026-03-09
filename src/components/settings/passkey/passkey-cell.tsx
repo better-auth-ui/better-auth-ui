@@ -1,5 +1,6 @@
 "use client"
 
+import type { Passkey } from "@better-auth/passkey"
 import { FingerprintIcon, Loader2 } from "lucide-react"
 import { useContext, useState } from "react"
 
@@ -15,7 +16,7 @@ export interface PasskeyCellProps {
     className?: string
     classNames?: SettingsCardClassNames
     localization?: Partial<AuthLocalization>
-    passkey: { id: string; createdAt: Date }
+    passkey: Passkey
 }
 
 export function PasskeyCell({
@@ -29,7 +30,8 @@ export function PasskeyCell({
         hooks: { useSession, useListPasskeys },
         localization: contextLocalization,
         mutators: { deletePasskey },
-        toast
+        toast,
+        localizeErrors
     } = useContext(AuthUIContext)
 
     localization = { ...contextLocalization, ...localization }
@@ -62,7 +64,11 @@ export function PasskeyCell({
 
             toast({
                 variant: "error",
-                message: getLocalizedError({ error, localization })
+                message: getLocalizedError({
+                    error,
+                    localization,
+                    localizeErrors
+                })
             })
         }
     }

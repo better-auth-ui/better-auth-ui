@@ -22,32 +22,32 @@ import { useRouter } from "next/navigation"
 import Link from "next/link"
 
 export function Providers({ children }: { children: React.ReactNode }) {
-    const router = useRouter()
+  const router = useRouter()
 
-    return (
-        <AuthUIProvider
-            authClient={authClient}
-            navigate={router.push}
-            replace={router.replace}
-            onSessionChange={() => router.refresh()}
-            Link={Link}
-            localization={{
-                SIGN_IN: "Log in",
-                SIGN_IN_DESCRIPTION: "Use your email and password to log in.",
-                SIGN_UP: "Create Account",
-                FORGOT_PASSWORD: "Reset Password",
-                EMAIL_PLACEHOLDER: "your-email@example.com",
-                PASSWORD_PLACEHOLDER: "Secret password",
-                MAGIC_LINK_EMAIL: "Check your inbox for your login link!",
-                FORGOT_PASSWORD_EMAIL: "Check your inbox for the password reset link.",
-                RESET_PASSWORD_SUCCESS: "You can now sign in with your new password!",
-                CHANGE_PASSWORD_SUCCESS: "Your password has been successfully updated.",
-                DELETE_ACCOUNT_SUCCESS: "Your account has been permanently deleted.",
-            }}
-        >
-            {children}
-        </AuthUIProvider>
-    )
+  return (
+    <AuthUIProvider
+      authClient={authClient}
+      navigate={router.push}
+      replace={router.replace}
+      onSessionChange={() => router.refresh()}
+      Link={Link}
+      localization={{
+        SIGN_IN: "Log in",
+        SIGN_IN_DESCRIPTION: "Use your email and password to log in.",
+        SIGN_UP: "Create Account",
+        FORGOT_PASSWORD: "Reset Password",
+        EMAIL_PLACEHOLDER: "your-email@example.com",
+        PASSWORD_PLACEHOLDER: "Secret password",
+        MAGIC_LINK_EMAIL: "Check your inbox for your login link!",
+        FORGOT_PASSWORD_EMAIL: "Check your inbox for the password reset link.",
+        RESET_PASSWORD_SUCCESS: "You can now sign in with your new password!",
+        CHANGE_PASSWORD_SUCCESS: "Your password has been successfully updated.",
+        DELETE_ACCOUNT_SUCCESS: "Your account has been permanently deleted.",
+      }}
+    >
+      {children}
+    </AuthUIProvider>
+  )
 }
 ```
 
@@ -59,21 +59,59 @@ You can also provide overridden strings on an individual component basis. Here's
 import { AuthCard } from "@daveyplate/better-auth-ui"
 
 export default function AuthPage({ params }: { params: { pathname: string } }) {
+  return (
+    <div className="flex justify-center items-center">
+      <AuthCard
+        pathname={params.pathname}
+        localization={{
+          SIGN_IN: "Log In",
+          SIGN_UP: "Register an Account",
+          FORGOT_PASSWORD: "Forgot Your Password?",
+          SIGN_IN_DESCRIPTION: "Log in and start using your account.",
+          MAGIC_LINK: "Log in via Email",
+        }}
+      />
+    </div>
+  )
+}
+```
+
+## Using Backend Error Messages
+
+By default, `@daveyplate/better-auth-ui` localizes all error messages using the provided `localization` prop. However, if your backend already returns translated error messages (for example, when using multilingual plugins like `better-auth-localization`), you can configure the provider to use the backend error messages directly instead of the localized strings.
+
+To enable this behavior, set the `localizeErrors` prop to `false` on your `<AuthUIProvider />`:
+
+```tsx title="app/providers.tsx"
+"use client"
+
+import { AuthUIProvider } from "@daveyplate/better-auth-ui"
+import { authClient } from "@/lib/auth-client"
+import { useRouter } from "next/navigation"
+import Link from "next/link"
+
+export function Providers({ children }: { children: React.ReactNode }) {
+    const router = useRouter()
+
     return (
-        <div className="flex justify-center items-center">
-            <AuthCard
-                pathname={params.pathname}
-                localization={{
-                    SIGN_IN: "Log In",
-                    SIGN_UP: "Register an Account",
-                    FORGOT_PASSWORD: "Forgot Your Password?",
-                    SIGN_IN_DESCRIPTION: "Log in and start using your account.",
-                    MAGIC_LINK: "Log in via Email",
-                }}
-            />
-        </div>
+        <AuthUIProvider
+            ...
+            localizeErrors={false}
+        >
+            {children}
+        </AuthUIProvider>
     )
 }
 ```
+
+When `localizeErrors` is set to `false`, all error messages in toast notifications will use the backend error messages directly. In the backend response payload you must return the error message as `error.message` or `error.error.message`.
+
+This is particularly useful when:
+
+- Using multilingual plugins that translate backend messages
+- Your backend already provides user-friendly, translated error messages
+- You want to ensure consistency between backend and frontend error messages
+
+**Note:** When `localizeErrors` is `false`, the `localization` prop will still be used for all UI strings (buttons, labels, placeholders, etc.), but error messages on toast notifications will come directly from the backend.
 
 You can find all available strings to override in the [`AuthLocalization`](/api-reference/auth-localization) reference.

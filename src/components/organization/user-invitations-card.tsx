@@ -2,7 +2,7 @@
 
 import { CheckIcon, EllipsisIcon, Loader2, XIcon } from "lucide-react"
 import { useContext, useMemo, useState } from "react"
-
+import { useLang } from "../../hooks/use-lang"
 import { AuthUIContext } from "../../lib/auth-ui-provider"
 import { cn, getLocalizedError } from "../../lib/utils"
 import type { SettingsCardProps } from "../settings/shared/settings-card"
@@ -17,6 +17,16 @@ import {
 } from "../ui/dropdown-menu"
 import { UserAvatar } from "../user-avatar"
 
+/**
+ * Render a settings card that lists all pending user invitations.
+ *
+ * The card is omitted (returns `null`) when there are no pending invitations.
+ *
+ * @param className - Optional container class name passed to the SettingsCard
+ * @param classNames - Optional classNames map applied to SettingsCard subcomponents
+ * @param localization - Partial localization overrides that are merged with AuthUIContext localization
+ * @returns The SettingsCard element containing a row for each pending invitation, or `null` when none exist
+ */
 export function UserInvitationsCard({
     className,
     classNames,
@@ -79,6 +89,14 @@ export function UserInvitationsCard({
     )
 }
 
+/**
+ * Render a row showing a pending user invitation with controls to accept or reject it.
+ *
+ * @param classNames - Optional className overrides for card parts (matches SettingsCardProps["classNames"]).
+ * @param invitation - Invitation data; `expiresAt` must be a Date instance.
+ * @param onChanged - Optional callback invoked after the invitation is accepted or rejected.
+ * @returns The JSX element representing the invitation row.
+ */
 function UserInvitationRow({
     classNames,
     invitation,
@@ -98,10 +116,12 @@ function UserInvitationRow({
         authClient,
         organization: organizationOptions,
         localization: contextLocalization,
-        toast
+        toast,
+        localizeErrors
     } = useContext(AuthUIContext)
 
     const localization = contextLocalization
+    const { lang } = useLang()
 
     const [isLoading, setIsLoading] = useState(false)
 
@@ -132,7 +152,11 @@ function UserInvitationRow({
         } catch (error) {
             toast({
                 variant: "error",
-                message: getLocalizedError({ error, localization })
+                message: getLocalizedError({
+                    error,
+                    localization,
+                    localizeErrors
+                })
             })
         }
 
@@ -157,7 +181,11 @@ function UserInvitationRow({
         } catch (error) {
             toast({
                 variant: "error",
-                message: getLocalizedError({ error, localization })
+                message: getLocalizedError({
+                    error,
+                    localization,
+                    localizeErrors
+                })
             })
         }
 
@@ -180,7 +208,7 @@ function UserInvitationRow({
 
                     <span className="truncate text-muted-foreground text-xs">
                         {localization.EXPIRES}{" "}
-                        {invitation.expiresAt.toLocaleDateString()}
+                        {invitation.expiresAt.toLocaleDateString(lang ?? "en")}
                     </span>
                 </div>
             </div>

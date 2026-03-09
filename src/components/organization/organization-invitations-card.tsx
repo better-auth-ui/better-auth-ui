@@ -1,7 +1,7 @@
 "use client"
 
 import type { Organization } from "better-auth/plugins/organization"
-import { useContext, useMemo } from "react"
+import { type ReactNode, useContext, useMemo } from "react"
 import { useCurrentOrganization } from "../../hooks/use-current-organization"
 import { AuthUIContext } from "../../lib/auth-ui-provider"
 import { cn } from "../../lib/utils"
@@ -10,13 +10,19 @@ import { SettingsCard } from "../settings/shared/settings-card"
 import { CardContent } from "../ui/card"
 import { InvitationCell } from "./invitation-cell"
 
+export interface OrganizationInvitationsCardProps extends SettingsCardProps {
+    slug?: string
+    emptyState?: ReactNode
+}
+
 export function OrganizationInvitationsCard({
     className,
     classNames,
     localization: localizationProp,
     slug: slugProp,
+    emptyState,
     ...props
-}: SettingsCardProps & { slug?: string }) {
+}: OrganizationInvitationsCardProps) {
     const {
         localization: contextLocalization,
         organization: organizationOptions
@@ -49,8 +55,9 @@ function OrganizationInvitationsContent({
     classNames,
     localization: localizationProp,
     organization,
+    emptyState,
     ...props
-}: SettingsCardProps & { organization: Organization }) {
+}: SettingsCardProps & { organization: Organization; emptyState?: ReactNode }) {
     const {
         hooks: { useListInvitations },
         localization: contextLocalization
@@ -68,7 +75,7 @@ function OrganizationInvitationsContent({
     const pendingInvitations = invitations?.filter(
         (invitation) => invitation.status === "pending"
     )
-    if (!pendingInvitations?.length) return null
+    if (!pendingInvitations?.length) return <>{emptyState}</>
 
     return (
         <SettingsCard

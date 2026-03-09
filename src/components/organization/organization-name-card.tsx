@@ -82,7 +82,8 @@ function OrganizationNameForm({
         hooks: { useHasPermission },
         mutators: { updateOrganization },
         optimistic,
-        toast
+        toast,
+        localizeErrors
     } = useContext(AuthUIContext)
 
     const localization = { ...contextLocalization, ...localizationProp }
@@ -141,7 +142,11 @@ function OrganizationNameForm({
         } catch (error) {
             toast({
                 variant: "error",
-                message: getLocalizedError({ error, localization })
+                message: getLocalizedError({
+                    error,
+                    localization,
+                    localizeErrors
+                })
             })
         }
     }

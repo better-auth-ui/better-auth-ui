@@ -1,6 +1,6 @@
 import type { ReactNode } from "react"
 
-export type FieldType = "string" | "number" | "boolean"
+export type FieldType = "string" | "number" | "boolean" | "select"
 
 export interface AdditionalField {
     description?: ReactNode

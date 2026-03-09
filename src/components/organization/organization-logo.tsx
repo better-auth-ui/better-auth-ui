@@ -95,13 +95,13 @@ export function OrganizationLogo({
         >
             {avatar?.Image ? (
                 <avatar.Image
-                    alt={name || localization?.ORGANIZATION!}
+                    alt={name || localization?.ORGANIZATION}
                     className={classNames?.image}
                     src={src || ""}
                 />
             ) : (
                 <AvatarImage
-                    alt={name || localization?.ORGANIZATION!}
+                    alt={name || localization?.ORGANIZATION}
                     className={classNames?.image}
                     src={src || undefined}
                 />

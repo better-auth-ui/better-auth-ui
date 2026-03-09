@@ -42,7 +42,8 @@ export function ProviderButton({
         viewPaths,
         social,
         genericOAuth,
-        toast
+        toast,
+        localizeErrors
     } = useContext(AuthUIContext)
 
     const getRedirectTo = useCallback(
@@ -109,7 +110,11 @@ export function ProviderButton({
         } catch (error) {
             toast({
                 variant: "error",
-                message: getLocalizedError({ error, localization })
+                message: getLocalizedError({
+                    error,
+                    localization,
+                    localizeErrors
+                })
             })
 
             setIsSubmitting(false)

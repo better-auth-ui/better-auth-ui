@@ -3,7 +3,7 @@
 import type { Organization } from "better-auth/plugins/organization"
 import { EllipsisIcon, Loader2, XIcon } from "lucide-react"
 import { useContext, useMemo, useState } from "react"
-
+import { useLang } from "../../hooks/use-lang"
 import { AuthUIContext } from "../../lib/auth-ui-provider"
 import { cn, getLocalizedError } from "../../lib/utils"
 import type { AuthLocalization } from "../../localization/auth-localization"
@@ -27,6 +27,16 @@ export interface InvitationCellProps {
     organization: Organization
 }
 
+/**
+ * Renders a row showing an organization invitation with avatar, email, expiry, role, and actions.
+ *
+ * @param className - Optional container class names to apply to the card element
+ * @param classNames - Optional object of class names for subcomponents (cell, button, icon, outlineButton)
+ * @param invitation - The invitation record to display (email, role, expiresAt, id)
+ * @param localization - Optional localization overrides for displayed strings
+ * @param organization - Organization associated with the invitation (used to scope listing/refetch)
+ * @returns The invitation row as a JSX element with a dropdown action to cancel the invitation
+ */
 export function InvitationCell({
     className,
     classNames,
@@ -39,13 +49,15 @@ export function InvitationCell({
         hooks: { useListInvitations },
         organization: organizationOptions,
         localization: contextLocalization,
-        toast
+        toast,
+        localizeErrors
     } = useContext(AuthUIContext)
 
     const localization = useMemo(
         () => ({ ...contextLocalization, ...localizationProp }),
         [contextLocalization, localizationProp]
     )
+    const { lang } = useLang()
 
     const [isLoading, setIsLoading] = useState(false)
 
@@ -80,7 +92,11 @@ export function InvitationCell({
         } catch (error) {
             toast({
                 variant: "error",
-                message: getLocalizedError({ error, localization })
+                message: getLocalizedError({
+                    error,
+                    localization,
+                    localizeErrors
+                })
             })
         }
 
@@ -109,7 +125,7 @@ export function InvitationCell({
 
                     <span className="truncate text-muted-foreground text-xs">
                         {localization.EXPIRES}{" "}
-                        {invitation.expiresAt.toLocaleDateString()}
+                        {invitation.expiresAt.toLocaleDateString(lang ?? "en")}
                     </span>
                 </div>
             </div>

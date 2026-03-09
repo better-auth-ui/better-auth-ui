@@ -46,6 +46,7 @@ export interface AuthViewProps {
     classNames?: AuthViewClassNames
     callbackURL?: string
     cardHeader?: ReactNode
+    cardFooter?: ReactNode
     localization?: AuthLocalization
     path?: string
     pathname?: string
@@ -60,6 +61,7 @@ export function AuthView({
     classNames,
     callbackURL,
     cardHeader,
+    cardFooter,
     localization,
     path: pathProp,
     pathname,
@@ -111,8 +113,14 @@ export function AuthView({
     }, [])
 
     if (view === "CALLBACK") return <AuthCallback redirectTo={redirectTo} />
-    if (view === "SIGN_OUT") return <SignOut />
-    if (view === "ACCEPT_INVITATION") return <AcceptInvitationCard />
+    if (view === "SIGN_OUT") return <SignOut redirectTo={redirectTo} />
+    if (view === "ACCEPT_INVITATION")
+        return (
+            <AcceptInvitationCard
+                className={className}
+                classNames={classNames}
+            />
+        )
 
     const description =
         !credentials && !magicLink && !emailOTP
@@ -214,6 +222,7 @@ export function AuthView({
                 )}
 
                 {view !== "RESET_PASSWORD" &&
+                    view !== "EMAIL_VERIFICATION" &&
                     (social?.providers?.length ||
                         genericOAuth?.providers?.length ||
                         (view === "SIGN_IN" && passkey)) && (
@@ -324,6 +333,12 @@ export function AuthView({
                     )}
             </CardContent>
 
+            {cardFooter && (
+                <CardFooter className={classNames?.footer}>
+                    {cardFooter}
+                </CardFooter>
+            )}
+
             {credentials && signUp && (
                 <CardFooter
                     className={cn(
@@ -350,9 +365,15 @@ export function AuthView({
                                 "text-foreground underline",
                                 classNames?.footerLink
                             )}
-                            href={`${basePath}/${viewPaths[(view === "SIGN_IN" || view === "MAGIC_LINK" || view === "EMAIL_OTP") ? "SIGN_UP" : "SIGN_IN"]}${
-                                isHydrated ? window.location.search : ""
-                            }`}
+                            href={`${basePath}/${
+                                viewPaths[
+                                    view === "SIGN_IN" ||
+                                    view === "MAGIC_LINK" ||
+                                    view === "EMAIL_OTP"
+                                        ? "SIGN_UP"
+                                        : "SIGN_IN"
+                                ]
+                            }${isHydrated ? window.location.search : ""}`}
                         >
                             <Button
                                 variant="link"

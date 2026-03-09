@@ -1,3 +1,4 @@
+import { CaptchaFox } from "@captchafox/react"
 import HCaptcha from "@hcaptcha/react-hcaptcha"
 import { Turnstile } from "@marsidev/react-turnstile"
 import { type RefObject, useContext } from "react"
@@ -48,6 +49,8 @@ export function Captcha({ ref, localization, action }: CaptchaProps) {
 
     const showHCaptcha = captcha.provider === "hcaptcha"
 
+    const showCaptchaFox = captcha.provider === "captchafox"
+
     return (
         <>
             {showRecaptchaV2 && <RecaptchaV2 ref={ref} />}
@@ -68,6 +71,15 @@ export function Captcha({ ref, localization, action }: CaptchaProps) {
             {showHCaptcha && (
                 <div className="mx-auto">
                     <HCaptcha
+                        ref={ref}
+                        sitekey={captcha.siteKey}
+                        theme={theme}
+                    />
+                </div>
+            )}
+            {showCaptchaFox && (
+                <div className="mx-auto">
+                    <CaptchaFox
                         ref={ref}
                         sitekey={captcha.siteKey}
                         theme={theme}
