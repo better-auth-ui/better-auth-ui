@@ -91,37 +91,50 @@ export function ProvidersCard({
                             )
                         })}
 
-                        {social?.providers?.map((provider) => {
-                            const socialProvider = socialProviders.find(
-                                (socialProvider) =>
-                                    socialProvider.provider === provider
+                        {social?.providers
+                            ?.filter(
+                                (provider) =>
+                                    !accounts?.some(
+                                        (acc) =>
+                                            acc.providerId === provider
+                                    )
                             )
+                            .map((provider) => {
+                                const socialProvider = socialProviders.find(
+                                    (socialProvider) =>
+                                        socialProvider.provider === provider
+                                )
 
-                            if (!socialProvider) return null
+                                if (!socialProvider) return null
 
-                            return (
+                                return (
+                                    <ProviderCell
+                                        key={provider}
+                                        classNames={classNames}
+                                        provider={socialProvider}
+                                        refetch={refetch}
+                                    />
+                                )
+                            })}
+
+                        {genericOAuth?.providers
+                            ?.filter(
+                                (provider) =>
+                                    !accounts?.some(
+                                        (acc) =>
+                                            acc.providerId ===
+                                            provider.provider
+                                    )
+                            )
+                            .map((provider) => (
                                 <ProviderCell
-                                    key={provider}
+                                    key={provider.provider}
                                     classNames={classNames}
-                                    provider={socialProvider}
+                                    provider={provider}
                                     refetch={refetch}
+                                    other
                                 />
-                            )
-                        })}
-
-                        {genericOAuth?.providers?.map((provider) => (
-                            <ProviderCell
-                                key={provider.provider}
-                                classNames={classNames}
-                                account={accounts?.find(
-                                    (acc) =>
-                                        acc.providerId === provider.provider
-                                )}
-                                provider={provider}
-                                refetch={refetch}
-                                other
-                            />
-                        ))}
+                            ))}
                     </>
                 )}
             </CardContent>
