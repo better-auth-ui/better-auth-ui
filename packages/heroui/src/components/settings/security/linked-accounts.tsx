@@ -29,13 +29,21 @@ export function LinkedAccounts({
     (account) => account.providerId !== "credential"
   )
 
+  const linkedProviderIds = new Set(
+    linkedAccounts?.map((account) => account.providerId)
+  )
+
+  const unlinkedProviders = socialProviders?.filter(
+    (provider) => !linkedProviderIds.has(provider)
+  )
+
   const allRows = [
     ...(linkedAccounts?.map((account) => ({
       key: account.id,
       account,
       provider: account.providerId
     })) ?? []),
-    ...(socialProviders?.map((provider) => ({
+    ...(unlinkedProviders?.map((provider) => ({
       key: provider,
       account: undefined,
       provider
