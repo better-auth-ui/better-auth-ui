@@ -3,6 +3,7 @@ import { Card, type CardProps, cn, Skeleton } from "@heroui/react"
 import { LinkedAccount } from "./linked-account"
 
 export type LinkedAccountsProps = {
+  allowMultipleAccountsPerProvider?: boolean
   className?: string
   variant?: CardProps["variant"]
 }
@@ -17,6 +18,7 @@ export type LinkedAccountsProps = {
  * @returns A JSX element containing the linked accounts card
  */
 export function LinkedAccounts({
+  allowMultipleAccountsPerProvider = true,
   className,
   variant,
   ...props
@@ -33,9 +35,9 @@ export function LinkedAccounts({
     linkedAccounts?.map((account) => account.providerId)
   )
 
-  const unlinkedProviders = socialProviders?.filter(
-    (provider) => !linkedProviderIds.has(provider)
-  )
+  const availableProviders = allowMultipleAccountsPerProvider
+    ? socialProviders
+    : socialProviders?.filter((provider) => !linkedProviderIds.has(provider))
 
   const allRows = [
     ...(linkedAccounts?.map((account) => ({
@@ -43,7 +45,7 @@ export function LinkedAccounts({
       account,
       provider: account.providerId
     })) ?? []),
-    ...(unlinkedProviders?.map((provider) => ({
+    ...(availableProviders?.map((provider) => ({
       key: provider,
       account: undefined,
       provider
