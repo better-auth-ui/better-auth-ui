@@ -48,7 +48,10 @@ export function ForgotPassword({
     e.preventDefault()
 
     const formData = new FormData(e.currentTarget)
-    requestPasswordReset({ email: formData.get("email") as string })
+    requestPasswordReset({
+      email: formData.get("email") as string,
+      redirectTo: `${basePaths.auth}/${viewPaths.auth.resetPassword}`
+    })
   }
 
   return (

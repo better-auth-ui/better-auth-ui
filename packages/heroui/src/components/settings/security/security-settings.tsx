@@ -5,11 +5,12 @@ import type { ComponentProps } from "react"
 import { ActiveSessions } from "./active-sessions"
 import { ChangePassword } from "./change-password"
 import { DangerZone } from "./danger-zone"
-import { LinkedAccounts } from "./linked-accounts"
+import { LinkedAccounts, type LinkedAccountsProps } from "./linked-accounts"
 import { Passkeys } from "./passkeys"
 
 export type SecuritySettingsProps = {
   className?: string
+  linkedAccounts?: Pick<LinkedAccountsProps, "allowMultipleAccountsPerProvider">
   variant?: CardProps["variant"]
 }
 
@@ -25,6 +26,7 @@ export type SecuritySettingsProps = {
  */
 export function SecuritySettings({
   className,
+  linkedAccounts,
   variant,
   ...props
 }: SecuritySettingsProps & ComponentProps<"div">) {
@@ -36,7 +38,9 @@ export function SecuritySettings({
       {...props}
     >
       {emailAndPassword?.enabled && <ChangePassword variant={variant} />}
-      {!!socialProviders?.length && <LinkedAccounts variant={variant} />}
+      {!!socialProviders?.length && (
+        <LinkedAccounts {...linkedAccounts} variant={variant} />
+      )}
       {passkey && <Passkeys variant={variant} />}
       <ActiveSessions variant={variant} />
       {deleteUser?.enabled && <DangerZone variant={variant} />}
