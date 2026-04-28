@@ -63,7 +63,7 @@ export function ChangePassword({ className }: ChangePasswordProps) {
 }
 
 function SetPassword({ className }: { className?: string }) {
-  const { localization } = useAuth()
+  const { basePaths, localization, viewPaths } = useAuth()
   const { data: session } = useSession()
 
   const { mutate: requestPasswordReset, isPending } = useRequestPasswordReset({
@@ -73,7 +73,10 @@ function SetPassword({ className }: { className?: string }) {
   const handleSetPassword = () => {
     if (!session) return
 
-    requestPasswordReset({ email: session.user.email })
+    requestPasswordReset({
+      email: session.user.email,
+      redirectTo: `${basePaths.auth}/${viewPaths.auth.resetPassword}`
+    })
   }
 
   return (

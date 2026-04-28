@@ -72,7 +72,7 @@ function SetPassword({
   variant,
   ...props
 }: Omit<CardProps, "children">) {
-  const { localization } = useAuth()
+  const { basePaths, localization, viewPaths } = useAuth()
   const { data: session } = useSession()
 
   const { mutate: requestPasswordReset, isPending } = useRequestPasswordReset({
@@ -81,7 +81,10 @@ function SetPassword({
 
   const handleSetPassword = () => {
     if (!session?.user.email) return
-    requestPasswordReset({ email: session.user.email })
+    requestPasswordReset({
+      email: session.user.email,
+      redirectTo: `${basePaths.auth}/${viewPaths.auth.resetPassword}`
+    })
   }
 
   return (
