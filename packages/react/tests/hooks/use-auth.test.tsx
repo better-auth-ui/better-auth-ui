@@ -1,4 +1,5 @@
 import { basePaths, viewPaths } from "@better-auth-ui/core"
+import { magicLinkPlugin } from "@better-auth-ui/core/plugins"
 import { renderHook } from "@testing-library/react"
 import { createAuthClient } from "better-auth/react"
 import type { ReactNode } from "react"
@@ -144,12 +145,13 @@ describe("useAuth", () => {
     })
   })
 
-  describe("magic link configuration", () => {
-    it("should accept magicLink boolean", () => {
+  describe("plugins configuration", () => {
+    it("should accept plugins array and expose registered plugins", () => {
+      const plugin = magicLinkPlugin()
       const wrapper = ({ children }: { children: ReactNode }) => (
         <AuthProvider
           authClient={mockAuthClient}
-          magicLink={true}
+          plugins={[plugin]}
           navigate={() => {}}
         >
           {children}
@@ -158,7 +160,20 @@ describe("useAuth", () => {
 
       const { result } = renderHook(() => useAuth(), { wrapper })
 
-      expect(result.current.magicLink).toBe(true)
+      expect(result.current.plugins).toHaveLength(1)
+      expect(result.current.plugins[0].id).toBe("magicLink")
+    })
+
+    it("should default to an empty plugins array", () => {
+      const wrapper = ({ children }: { children: ReactNode }) => (
+        <AuthProvider authClient={mockAuthClient} navigate={() => {}}>
+          {children}
+        </AuthProvider>
+      )
+
+      const { result } = renderHook(() => useAuth(), { wrapper })
+
+      expect(result.current.plugins).toEqual([])
     })
   })
 })
