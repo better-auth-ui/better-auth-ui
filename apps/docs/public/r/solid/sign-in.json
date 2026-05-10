@@ -1,0 +1,23 @@
+{
+  "name": "sign-in",
+  "type": "registry:component",
+  "title": "Solid Sign In",
+  "description": "Minimal Solid sign-in component wired to the Solid Better Auth UI provider.",
+  "dependencies": [
+    "@better-auth-ui/solid@latest",
+    "@better-auth-ui/core@latest",
+    "@tanstack/solid-query",
+    "better-auth",
+    "solid-js"
+  ],
+  "registryDependencies": [
+    "solid/auth-provider"
+  ],
+  "files": [
+    {
+      "path": "src/components/auth/sign-in.tsx",
+      "type": "registry:component",
+      "content": "import { useAuth } from \"@better-auth-ui/solid\"\n\nexport function SignIn() {\n  const auth = useAuth()\n\n  return (\n    <form aria-label=\"Sign in\">\n      <h1>Sign in</h1>\n      <p>Solid auth base path: {auth.basePaths.auth}</p>\n      <button type=\"submit\">Continue</button>\n    </form>\n  )\n}\n"
+    }
+  ]
+}

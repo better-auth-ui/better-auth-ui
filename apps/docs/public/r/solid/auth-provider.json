@@ -1,0 +1,21 @@
+{
+  "name": "auth-provider",
+  "type": "registry:component",
+  "title": "Solid Auth Provider",
+  "description": "Solid provider wrapper for Better Auth UI using Solid Query and the Solid package surface.",
+  "dependencies": [
+    "@better-auth-ui/solid@latest",
+    "@better-auth-ui/core@latest",
+    "@tanstack/solid-query",
+    "better-auth",
+    "solid-js"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "src/components/auth/auth-provider.tsx",
+      "type": "registry:component",
+      "content": "import {\n  createAuthClient,\n  AuthProvider as SolidAuthProvider\n} from \"@better-auth-ui/solid\"\nimport { QueryClient, QueryClientProvider } from \"@tanstack/solid-query\"\nimport type { ParentProps } from \"solid-js\"\n\nconst queryClient = new QueryClient()\nconst authClient = createAuthClient({ baseURL: import.meta.env.VITE_AUTH_URL })\n\nexport function AuthProvider(props: ParentProps) {\n  return (\n    <QueryClientProvider client={queryClient}>\n      <SolidAuthProvider authClient={authClient}>\n        {props.children}\n      </SolidAuthProvider>\n    </QueryClientProvider>\n  )\n}\n"
+    }
+  ]
+}
