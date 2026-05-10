@@ -62,6 +62,21 @@ export const solidRegistryManifest = {
           type: "registry:component"
         }
       ]
+    },
+    {
+      name: "sign-out",
+      type: "registry:component",
+      title: "Solid Sign Out",
+      description:
+        "Minimal Solid sign-out component that ends the session and returns to sign in.",
+      dependencies: solidDependencies,
+      registryDependencies: ["solid/auth-provider"],
+      files: [
+        {
+          path: "src/components/auth/sign-out.tsx",
+          type: "registry:component"
+        }
+      ]
     }
   ]
 } satisfies SolidRegistryManifest

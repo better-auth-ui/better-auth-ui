@@ -1,0 +1,23 @@
+{
+  "name": "sign-out",
+  "type": "registry:component",
+  "title": "Solid Sign Out",
+  "description": "Minimal Solid sign-out component that ends the session and returns to sign in.",
+  "dependencies": [
+    "@better-auth-ui/solid@latest",
+    "@better-auth-ui/core@latest",
+    "@tanstack/solid-query",
+    "better-auth",
+    "solid-js"
+  ],
+  "registryDependencies": [
+    "solid/auth-provider"
+  ],
+  "files": [
+    {
+      "path": "src/components/auth/sign-out.tsx",
+      "type": "registry:component",
+      "content": "import { useAuth } from \"@better-auth-ui/solid\"\nimport { onMount } from \"solid-js\"\n\nexport type SignOutProps = {\n  label?: string\n}\n\nconst signInHref = (basePath: string, signInPath: string) =>\n  `${basePath}/${signInPath}`\n\nexport function SignOut(props: SignOutProps) {\n  const auth = useAuth()\n  let hasRequestedSignOut = false\n\n  onMount(async () => {\n    if (hasRequestedSignOut) return\n    hasRequestedSignOut = true\n\n    try {\n      await auth.authClient.signOut({ fetchOptions: { throw: true } })\n    } finally {\n      auth.navigate({\n        to: signInHref(auth.basePaths.auth, auth.viewPaths.auth.signIn),\n        replace: true\n      })\n    }\n  })\n\n  return (\n    <section aria-label=\"Signing out\" aria-live=\"polite\" role=\"status\">\n      <h1>Signing out</h1>\n      <p>{props.label ?? \"Ending your session…\"}</p>\n    </section>\n  )\n}\n"
+    }
+  ]
+}

@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/solid-router"
 
+import { AuthProvider } from "@/components/auth/auth-provider"
 import { SignIn } from "@/components/auth/sign-in"
 
 export const Route = createFileRoute("/")({
@@ -7,5 +8,9 @@ export const Route = createFileRoute("/")({
 })
 
 function HomePage() {
-  return <SignIn />
+  return (
+    <AuthProvider>
+      <SignIn />
+    </AuthProvider>
+  )
 }

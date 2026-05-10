@@ -94,6 +94,10 @@ describe("Solid registry isolation", () => {
 
     expect(viteConfig).toContain("@tanstack/solid-start/plugin/vite")
     expect(viteConfig).toContain("vite-plugin-solid")
+    expect(viteConfig).toContain(
+      'dedupe: ["solid-js", "solid-js/store", "solid-js/web"]'
+    )
+    expect(viteConfig).toContain('noExternal: ["@better-auth-ui/solid"]')
     expect(viteConfig).not.toContain("@tanstack/react-start")
     expect(viteConfig).not.toContain("@vitejs/plugin-react")
   })
@@ -122,6 +126,7 @@ describe("Solid registry isolation", () => {
   it("keeps Start auth and route source in the Solid example tree", () => {
     const expectedFiles = [
       "src/lib/auth.ts",
+      "src/components/auth/sign-out.tsx",
       "src/routes/__root.tsx",
       "src/routes/index.tsx",
       "src/routes/auth/$path.tsx",
@@ -135,6 +140,40 @@ describe("Solid registry isolation", () => {
       expect(content).not.toContain("@better-auth-ui/react")
       expect(content).not.toContain('from "react"')
     }
+
+    const signOut = readFileSync(
+      resolve(__dirname, "../src/components/auth/sign-out.tsx"),
+      "utf8"
+    )
+    const authProvider = readFileSync(
+      resolve(__dirname, "../src/components/auth/auth-provider.tsx"),
+      "utf8"
+    )
+    const rootRoute = readFileSync(
+      resolve(__dirname, "../src/routes/__root.tsx"),
+      "utf8"
+    )
+    const homeRoute = readFileSync(
+      resolve(__dirname, "../src/routes/index.tsx"),
+      "utf8"
+    )
+    const authRoute = readFileSync(
+      resolve(__dirname, "../src/routes/auth/$path.tsx"),
+      "utf8"
+    )
+
+    expect(authProvider).toContain("import.meta.env.SSR")
+    expect(authProvider).toContain("http://localhost:5173/api/auth")
+    expect(homeRoute).toContain('from "@/components/auth/auth-provider"')
+    expect(homeRoute).toContain("<AuthProvider>")
+    expect(homeRoute).toContain("</AuthProvider>")
+    expect(authRoute).toContain('from "@/components/auth/auth-provider"')
+    expect(authRoute).toContain("<AuthProvider>")
+    expect(authRoute).toContain("</AuthProvider>")
+    expect(rootRoute).not.toContain("<AuthProvider>")
+    expect(signOut).toContain('from "@better-auth-ui/solid"')
+    expect(signOut).toContain('from "solid-js"')
+    expect(signOut).toContain("auth.authClient.signOut")
   })
 
   it("writes registry index and item snapshots only inside the solid namespace", () => {
@@ -152,7 +191,8 @@ describe("Solid registry isolation", () => {
       join(outputRoot, "solid/README.md"),
       join(outputRoot, "solid/auth-provider.json"),
       join(outputRoot, "solid/registry.json"),
-      join(outputRoot, "solid/sign-in.json")
+      join(outputRoot, "solid/sign-in.json"),
+      join(outputRoot, "solid/sign-out.json")
     ])
     expect(readFileSync(untouchedRootRegistry, "utf8")).toBe(
       '{"name":"existing-shadcn"}\n'
@@ -166,7 +206,11 @@ describe("Solid registry isolation", () => {
     expect(registry).toMatchObject({
       name: "better-auth-ui-solid",
       namespace: "solid",
-      items: [{ name: "auth-provider" }, { name: "sign-in" }]
+      items: [
+        { name: "auth-provider" },
+        { name: "sign-in" },
+        { name: "sign-out" }
+      ]
     })
 
     const signIn = readJson<{
@@ -180,6 +224,21 @@ describe("Solid registry isolation", () => {
       expect.objectContaining({
         content: expect.stringContaining("export function SignIn"),
         path: "src/components/auth/sign-in.tsx"
+      })
+    ])
+    expect(signIn.files[0]?.content).not.toContain("useAuth")
+
+    const signOut = readJson<{
+      files: Array<{ content: string; path: string }>
+      name: string
+      registryDependencies: string[]
+    }>(join(outputRoot, "solid/sign-out.json"))
+    expect(signOut.name).toBe("sign-out")
+    expect(signOut.registryDependencies).toEqual(["solid/auth-provider"])
+    expect(signOut.files).toEqual([
+      expect.objectContaining({
+        content: expect.stringContaining("export function SignOut"),
+        path: "src/components/auth/sign-out.tsx"
       })
     ])
   })
@@ -217,7 +276,11 @@ describe("Solid registry isolation", () => {
     expect(report.packageName).toBe("@better-auth-ui/solid")
     expect(report.packageExports).toEqual([".", "./server", "./plugins"])
     expect(report.exampleSolidDependency).toBe("*")
-    expect(report.staticItemNames).toEqual(["auth-provider", "sign-in"])
+    expect(report.staticItemNames).toEqual([
+      "auth-provider",
+      "sign-in",
+      "sign-out"
+    ])
     expect(report.missingStaticFiles).toEqual([])
     expect(report.missingDocsLinks).toEqual([])
   })
@@ -227,6 +290,6 @@ describe("Solid registry isolation", () => {
 
     expect(report.shadcnRegistryName).toBe("better-auth-ui")
     expect(report.shadcnCouplingFindings).toEqual([])
-    expect(report.staticItemNames).toHaveLength(2)
+    expect(report.staticItemNames).toHaveLength(3)
   })
 })

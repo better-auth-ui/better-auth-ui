@@ -11,6 +11,10 @@ export default defineConfig({
   resolve: {
     alias: {
       "@": new URL("./src", import.meta.url).pathname
-    }
+    },
+    dedupe: ["solid-js", "solid-js/store", "solid-js/web"]
+  },
+  ssr: {
+    noExternal: ["@better-auth-ui/solid"]
   }
 })

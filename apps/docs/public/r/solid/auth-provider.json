@@ -15,7 +15,7 @@
     {
       "path": "src/components/auth/auth-provider.tsx",
       "type": "registry:component",
-      "content": "import {\n  createAuthClient,\n  AuthProvider as SolidAuthProvider\n} from \"@better-auth-ui/solid\"\nimport { QueryClient, QueryClientProvider } from \"@tanstack/solid-query\"\nimport type { ParentProps } from \"solid-js\"\n\nconst queryClient = new QueryClient()\nconst authClient = createAuthClient({ baseURL: import.meta.env.VITE_AUTH_URL })\n\nexport function AuthProvider(props: ParentProps) {\n  return (\n    <QueryClientProvider client={queryClient}>\n      <SolidAuthProvider authClient={authClient}>\n        {props.children}\n      </SolidAuthProvider>\n    </QueryClientProvider>\n  )\n}\n"
+      "content": "import {\n  createAuthClient,\n  AuthProvider as SolidAuthProvider\n} from \"@better-auth-ui/solid\"\nimport { QueryClient, QueryClientProvider } from \"@tanstack/solid-query\"\nimport type { ParentProps } from \"solid-js\"\n\nconst queryClient = new QueryClient()\nconst authBaseURL =\n  import.meta.env.VITE_AUTH_URL ??\n  (import.meta.env.SSR ? \"http://localhost:5173/api/auth\" : \"/api/auth\")\nconst authClient = createAuthClient({\n  baseURL: authBaseURL\n})\n\nexport function AuthProvider(props: ParentProps) {\n  return (\n    <QueryClientProvider client={queryClient}>\n      <SolidAuthProvider authClient={authClient}>\n        {props.children}\n      </SolidAuthProvider>\n    </QueryClientProvider>\n  )\n}\n"
     }
   ]
 }
