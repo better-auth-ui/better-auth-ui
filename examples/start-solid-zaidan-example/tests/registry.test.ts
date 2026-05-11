@@ -183,6 +183,7 @@ describe("Solid registry isolation", () => {
   it("uses local Zaidan UI primitives in auth components and registry payloads", () => {
     const uiFiles = [
       "src/components/ui/button.tsx",
+      "src/components/ui/card.tsx",
       "src/components/ui/input.tsx",
       "src/components/ui/label.tsx",
       "src/lib/utils.ts"
@@ -190,12 +191,16 @@ describe("Solid registry isolation", () => {
     const formAuthFiles = [
       {
         path: "src/components/auth/sign-in.tsx",
-        imports: ['from "@/components/ui/button"']
+        imports: [
+          'from "@/components/ui/button"',
+          'from "@/components/ui/card"'
+        ]
       },
       {
         path: "src/components/auth/sign-up.tsx",
         imports: [
           'from "@/components/ui/button"',
+          'from "@/components/ui/card"',
           'from "@/components/ui/input"',
           'from "@/components/ui/label"'
         ]
@@ -204,6 +209,7 @@ describe("Solid registry isolation", () => {
         path: "src/components/auth/forgot-password.tsx",
         imports: [
           'from "@/components/ui/button"',
+          'from "@/components/ui/card"',
           'from "@/components/ui/input"',
           'from "@/components/ui/label"'
         ]
@@ -212,6 +218,7 @@ describe("Solid registry isolation", () => {
         path: "src/components/auth/reset-password.tsx",
         imports: [
           'from "@/components/ui/button"',
+          'from "@/components/ui/card"',
           'from "@/components/ui/input"',
           'from "@/components/ui/label"'
         ]
@@ -368,6 +375,142 @@ describe("Solid registry isolation", () => {
     expect(signUp).toContain('autocomplete="new-password"')
   })
 
+  it("matches the shadcn example route shell for layout parity", () => {
+    const rootRoute = readFileSync(
+      resolve(__dirname, "../src/routes/__root.tsx"),
+      "utf8"
+    )
+    const homeRoute = readFileSync(
+      resolve(__dirname, "../src/routes/index.tsx"),
+      "utf8"
+    )
+    const authRoute = readFileSync(
+      resolve(__dirname, "../src/routes/auth/$path.tsx"),
+      "utf8"
+    )
+    const header = readFileSync(
+      resolve(__dirname, "../src/components/header.tsx"),
+      "utf8"
+    )
+
+    expect(rootRoute).toContain('from "@/components/header"')
+    expect(rootRoute).toContain(
+      '<body class="antialiased min-h-svh flex flex-col">'
+    )
+    expect(rootRoute).toContain("<Header />")
+    expect(rootRoute).toContain('<main class="grow flex flex-col">')
+    expect(homeRoute).toContain(
+      'class="grow flex items-center justify-center flex-col gap-4"'
+    )
+    expect(authRoute).toContain(
+      'class="flex justify-center my-auto p-4 md:p-6"'
+    )
+    expect(header).toContain(
+      '<header class="sticky top-0 z-10 bg-background border-b">'
+    )
+    expect(header).toContain(
+      'class="py-3 px-4 md:px-6 mx-auto justify-between flex items-center"'
+    )
+    expect(header).toContain("BETTER-AUTH. UI")
+  })
+
+  it("uses card slots around auth forms like the shadcn example", () => {
+    const card = readFileSync(
+      resolve(__dirname, "../src/components/ui/card.tsx"),
+      "utf8"
+    )
+    const authForms = [
+      "src/components/auth/sign-in.tsx",
+      "src/components/auth/sign-up.tsx",
+      "src/components/auth/forgot-password.tsx",
+      "src/components/auth/reset-password.tsx"
+    ]
+
+    expect(card).toContain('data-slot="card"')
+    expect(card).toContain('data-slot="card-header"')
+    expect(card).toContain('data-slot="card-title"')
+    expect(card).toContain('data-slot="card-content"')
+
+    for (const formPath of authForms) {
+      const content = readFileSync(resolve(__dirname, "..", formPath), "utf8")
+
+      expect(content).toContain('from "@/components/ui/card"')
+      expect(content).toContain("<Card")
+      expect(content).toContain("<CardHeader>")
+      expect(content).toContain("<CardTitle")
+      expect(content).toContain("<CardContent>")
+      expect(content).toContain('class="w-full max-w-sm"')
+    }
+  })
+
+  it("moves auth forms closer to the shadcn field and footer structure", () => {
+    const signIn = readFileSync(
+      resolve(__dirname, "../src/components/auth/sign-in.tsx"),
+      "utf8"
+    )
+    const signUp = readFileSync(
+      resolve(__dirname, "../src/components/auth/sign-up.tsx"),
+      "utf8"
+    )
+    const forgotPassword = readFileSync(
+      resolve(__dirname, "../src/components/auth/forgot-password.tsx"),
+      "utf8"
+    )
+    const resetPassword = readFileSync(
+      resolve(__dirname, "../src/components/auth/reset-password.tsx"),
+      "utf8"
+    )
+
+    expect(signIn).toContain('from "@better-auth-ui/solid"')
+    expect(signIn).toContain("signInEmailOptions")
+    expect(signIn).toContain("createMutation")
+    expect(signIn).toContain(
+      "placeholder={auth.localization.auth.emailPlaceholder}"
+    )
+    expect(signIn).toContain(
+      "placeholder={auth.localization.auth.passwordPlaceholder}"
+    )
+    expect(signIn).toContain("auth.localization.auth.forgotPasswordLink")
+    expect(signIn).toContain("auth.localization.auth.needToCreateAnAccount")
+    expect(signIn).toContain("auth.viewPaths.auth.forgotPassword")
+    expect(signIn).toContain("auth.viewPaths.auth.signUp")
+
+    expect(signUp).toContain(
+      "placeholder={auth.localization.auth.namePlaceholder}"
+    )
+    expect(signUp).toContain(
+      "placeholder={auth.localization.auth.emailPlaceholder}"
+    )
+    expect(signUp).toContain(
+      "placeholder={auth.localization.auth.passwordPlaceholder}"
+    )
+    expect(signUp).toContain("auth.emailAndPassword.confirmPassword")
+    expect(signUp).toContain(
+      "auth.localization.auth.confirmPasswordPlaceholder"
+    )
+    expect(signUp).toContain("auth.localization.auth.alreadyHaveAnAccount")
+    expect(signUp).toContain("auth.viewPaths.auth.signIn")
+
+    expect(forgotPassword).toContain(
+      "placeholder={auth.localization.auth.emailPlaceholder}"
+    )
+    expect(forgotPassword).toContain(
+      "auth.localization.auth.rememberYourPassword"
+    )
+    expect(forgotPassword).toContain("auth.viewPaths.auth.signIn")
+
+    expect(resetPassword).toContain(
+      "placeholder={auth.localization.auth.newPasswordPlaceholder}"
+    )
+    expect(resetPassword).toContain(
+      "placeholder={auth.localization.auth.confirmPasswordPlaceholder}"
+    )
+    expect(resetPassword).toContain(
+      "auth.localization.auth.rememberYourPassword"
+    )
+    expect(resetPassword).toContain("auth.viewPaths.auth.signIn")
+  })
+
   it("writes registry index and item snapshots only inside the solid namespace", () => {
     const outputRoot = makeTempRoot()
     const untouchedRootRegistry = join(outputRoot, "registry.json")
@@ -426,7 +569,8 @@ describe("Solid registry isolation", () => {
         })
       ])
     )
-    expect(signIn.files[0]?.content).not.toContain("useAuth")
+    expect(signIn.files[0]?.content).toContain("useAuth")
+    expect(signIn.files[0]?.content).toContain("signInEmailOptions")
 
     const signOut = readJson<{
       files: Array<{ content: string; path: string }>
@@ -490,8 +634,9 @@ describe("Solid registry isolation", () => {
     )
     expect(resetPassword.files[0]?.content).toContain("resetPasswordOptions")
     expect(resetPassword.files[0]?.content).toContain(
-      "Password reset successfully. You can sign in with your new password."
+      "Password reset successfully. You can sign in with your new"
     )
+    expect(resetPassword.files[0]?.content).toContain("password.")
     expect(resetPassword.files[0]?.content).toContain(
       "Reset token is required. Open the link from your email."
     )

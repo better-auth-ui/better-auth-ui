@@ -9,8 +9,10 @@ export const Route = createFileRoute("/")({
 
 function HomePage() {
   return (
-    <AuthProvider>
-      <SignIn />
-    </AuthProvider>
+    <div class="grow flex items-center justify-center flex-col gap-4">
+      <AuthProvider>
+        <SignIn />
+      </AuthProvider>
+    </div>
   )
 }

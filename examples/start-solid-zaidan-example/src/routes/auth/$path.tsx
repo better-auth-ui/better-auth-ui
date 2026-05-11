@@ -19,5 +19,9 @@ function AuthPage() {
 
   const Component = authRoute.component
 
-  return <AuthProvider>{() => <Component />}</AuthProvider>
+  return (
+    <div class="flex justify-center my-auto p-4 md:p-6">
+      <AuthProvider>{() => <Component />}</AuthProvider>
+    </div>
+  )
 }

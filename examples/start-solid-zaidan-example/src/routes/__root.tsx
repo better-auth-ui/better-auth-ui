@@ -5,6 +5,9 @@ import {
   Scripts
 } from "@tanstack/solid-router"
 import type { JSX } from "solid-js"
+
+import { Header } from "@/components/header"
+
 import "../styles/globals.css"
 
 export const Route = createRootRoute({
@@ -32,8 +35,9 @@ function RootDocument(props: { children: JSX.Element }) {
       <head>
         <HeadContent />
       </head>
-      <body>
-        {props.children}
+      <body class="antialiased min-h-svh flex flex-col">
+        <Header />
+        <main class="grow flex flex-col">{props.children}</main>
         <Scripts />
       </body>
     </html>

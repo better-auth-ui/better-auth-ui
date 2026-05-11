@@ -56,6 +56,10 @@
           "type": "registry:ui"
         },
         {
+          "path": "src/components/ui/card.tsx",
+          "type": "registry:ui"
+        },
+        {
           "path": "src/components/ui/input.tsx",
           "type": "registry:ui"
         },
@@ -95,6 +99,10 @@
         },
         {
           "path": "src/components/ui/button.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/components/ui/card.tsx",
           "type": "registry:ui"
         },
         {
@@ -140,6 +148,10 @@
           "type": "registry:ui"
         },
         {
+          "path": "src/components/ui/card.tsx",
+          "type": "registry:ui"
+        },
+        {
           "path": "src/components/ui/input.tsx",
           "type": "registry:ui"
         },
@@ -163,7 +175,11 @@
         "@better-auth-ui/core@latest",
         "@tanstack/solid-query",
         "better-auth",
-        "solid-js"
+        "solid-js",
+        "@kobalte/core",
+        "class-variance-authority",
+        "clsx",
+        "tailwind-merge"
       ],
       "registryDependencies": [
         "solid/auth-provider"
@@ -175,6 +191,10 @@
         },
         {
           "path": "src/components/ui/button.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/components/ui/card.tsx",
           "type": "registry:ui"
         },
         {

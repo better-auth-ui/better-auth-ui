@@ -46,6 +46,10 @@ const zaidanUiFiles = [
     type: "registry:ui"
   },
   {
+    path: "src/components/ui/card.tsx",
+    type: "registry:ui"
+  },
+  {
     path: "src/components/ui/input.tsx",
     type: "registry:ui"
   },
@@ -133,7 +137,7 @@ export const solidRegistryManifest = {
       title: "Solid Sign In",
       description:
         "Minimal Solid sign-in component wired to the Solid Better Auth UI provider.",
-      dependencies: solidDependencies,
+      dependencies: solidAuthFormDependencies,
       registryDependencies: ["solid/auth-provider"],
       files: [
         {
