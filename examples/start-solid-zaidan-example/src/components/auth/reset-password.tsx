@@ -1,6 +1,9 @@
 import { resetPasswordOptions, useAuth } from "@better-auth-ui/solid"
 import { createMutation } from "@tanstack/solid-query"
 import { createSignal, Show } from "solid-js"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
 
 export type ResetPasswordProps = {
   token?: string
@@ -38,8 +41,8 @@ export function ResetPassword(props: ResetPasswordProps) {
     <form aria-label="Reset password" onSubmit={submitPasswordReset}>
       <h1>Reset password</h1>
       <p>Choose a new password for your account.</p>
-      <label for="reset-password-new">New password</label>
-      <input
+      <Label for="reset-password-new">New password</Label>
+      <Input
         autocomplete="new-password"
         id="reset-password-new"
         maxLength={auth.emailAndPassword.maxPasswordLength}
@@ -50,8 +53,8 @@ export function ResetPassword(props: ResetPasswordProps) {
         type="password"
         value={password()}
       />
-      <label for="reset-password-confirm">Confirm password</label>
-      <input
+      <Label for="reset-password-confirm">Confirm password</Label>
+      <Input
         autocomplete="new-password"
         id="reset-password-confirm"
         maxLength={auth.emailAndPassword.maxPasswordLength}
@@ -62,9 +65,9 @@ export function ResetPassword(props: ResetPasswordProps) {
         type="password"
         value={confirmPassword()}
       />
-      <button disabled={resetPassword.isPending} type="submit">
+      <Button disabled={resetPassword.isPending} type="submit">
         {resetPassword.isPending ? "Resetting…" : "Reset password"}
-      </button>
+      </Button>
       <Show when={tokenError()}>
         <p role="alert">
           Reset token is required. Open the link from your email.

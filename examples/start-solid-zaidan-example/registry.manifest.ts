@@ -1,6 +1,6 @@
 export type SolidRegistryFile = {
   path: `src/${string}`
-  type: "registry:component" | "registry:lib" | "registry:file"
+  type: "registry:component" | "registry:lib" | "registry:file" | "registry:ui"
 }
 
 export type SolidRegistryItem = {
@@ -28,6 +28,37 @@ const solidDependencies = [
   "solid-js"
 ]
 
+const zaidanUiDependencies = [
+  "@kobalte/core",
+  "class-variance-authority",
+  "clsx",
+  "tailwind-merge"
+]
+
+const solidAuthFormDependencies = [
+  ...solidDependencies,
+  ...zaidanUiDependencies
+]
+
+const zaidanUiFiles = [
+  {
+    path: "src/components/ui/button.tsx",
+    type: "registry:ui"
+  },
+  {
+    path: "src/components/ui/input.tsx",
+    type: "registry:ui"
+  },
+  {
+    path: "src/components/ui/label.tsx",
+    type: "registry:ui"
+  },
+  {
+    path: "src/lib/utils.ts",
+    type: "registry:lib"
+  }
+] satisfies SolidRegistryFile[]
+
 export const solidRegistryManifest = {
   name: "better-auth-ui-solid",
   namespace: "solid",
@@ -39,7 +70,7 @@ export const solidRegistryManifest = {
       title: "Solid Auth Provider",
       description:
         "Solid provider wrapper for Better Auth UI using Solid Query and the Solid package surface.",
-      dependencies: solidDependencies,
+      dependencies: solidAuthFormDependencies,
       registryDependencies: [],
       files: [
         {
@@ -54,13 +85,14 @@ export const solidRegistryManifest = {
       title: "Solid Forgot Password",
       description:
         "Minimal Solid forgot-password component using the Solid password reset mutation options.",
-      dependencies: solidDependencies,
+      dependencies: solidAuthFormDependencies,
       registryDependencies: ["solid/auth-provider"],
       files: [
         {
           path: "src/components/auth/forgot-password.tsx",
           type: "registry:component"
-        }
+        },
+        ...zaidanUiFiles
       ]
     },
     {
@@ -69,13 +101,14 @@ export const solidRegistryManifest = {
       title: "Solid Reset Password",
       description:
         "Minimal Solid reset-password component using the Solid password reset mutation options.",
-      dependencies: solidDependencies,
+      dependencies: solidAuthFormDependencies,
       registryDependencies: ["solid/auth-provider"],
       files: [
         {
           path: "src/components/auth/reset-password.tsx",
           type: "registry:component"
-        }
+        },
+        ...zaidanUiFiles
       ]
     },
     {
@@ -84,13 +117,14 @@ export const solidRegistryManifest = {
       title: "Solid Sign Up",
       description:
         "Minimal Solid sign-up component using the Solid email sign-up mutation options.",
-      dependencies: solidDependencies,
+      dependencies: solidAuthFormDependencies,
       registryDependencies: ["solid/auth-provider"],
       files: [
         {
           path: "src/components/auth/sign-up.tsx",
           type: "registry:component"
-        }
+        },
+        ...zaidanUiFiles
       ]
     },
     {
@@ -105,7 +139,8 @@ export const solidRegistryManifest = {
         {
           path: "src/components/auth/sign-in.tsx",
           type: "registry:component"
-        }
+        },
+        ...zaidanUiFiles
       ]
     },
     {

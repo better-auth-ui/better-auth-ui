@@ -1,9 +1,11 @@
+import tailwindcss from "@tailwindcss/vite"
 import { tanstackStart } from "@tanstack/solid-start/plugin/vite"
 import { defineConfig } from "vite"
 import viteSolid from "vite-plugin-solid"
 
 export default defineConfig({
   plugins: [
+    tailwindcss(),
     tanstackStart(),
     // TanStack Start requires Solid's Vite plugin after the Start plugin.
     viteSolid({ ssr: true })

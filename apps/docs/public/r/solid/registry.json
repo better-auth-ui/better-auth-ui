@@ -13,7 +13,11 @@
         "@better-auth-ui/core@latest",
         "@tanstack/solid-query",
         "better-auth",
-        "solid-js"
+        "solid-js",
+        "@kobalte/core",
+        "class-variance-authority",
+        "clsx",
+        "tailwind-merge"
       ],
       "registryDependencies": [],
       "files": [
@@ -33,7 +37,11 @@
         "@better-auth-ui/core@latest",
         "@tanstack/solid-query",
         "better-auth",
-        "solid-js"
+        "solid-js",
+        "@kobalte/core",
+        "class-variance-authority",
+        "clsx",
+        "tailwind-merge"
       ],
       "registryDependencies": [
         "solid/auth-provider"
@@ -42,6 +50,22 @@
         {
           "path": "src/components/auth/forgot-password.tsx",
           "type": "registry:component"
+        },
+        {
+          "path": "src/components/ui/button.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/components/ui/input.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/components/ui/label.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/lib/utils.ts",
+          "type": "registry:lib"
         }
       ]
     },
@@ -55,7 +79,11 @@
         "@better-auth-ui/core@latest",
         "@tanstack/solid-query",
         "better-auth",
-        "solid-js"
+        "solid-js",
+        "@kobalte/core",
+        "class-variance-authority",
+        "clsx",
+        "tailwind-merge"
       ],
       "registryDependencies": [
         "solid/auth-provider"
@@ -64,6 +92,22 @@
         {
           "path": "src/components/auth/reset-password.tsx",
           "type": "registry:component"
+        },
+        {
+          "path": "src/components/ui/button.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/components/ui/input.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/components/ui/label.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/lib/utils.ts",
+          "type": "registry:lib"
         }
       ]
     },
@@ -77,7 +121,11 @@
         "@better-auth-ui/core@latest",
         "@tanstack/solid-query",
         "better-auth",
-        "solid-js"
+        "solid-js",
+        "@kobalte/core",
+        "class-variance-authority",
+        "clsx",
+        "tailwind-merge"
       ],
       "registryDependencies": [
         "solid/auth-provider"
@@ -86,6 +134,22 @@
         {
           "path": "src/components/auth/sign-up.tsx",
           "type": "registry:component"
+        },
+        {
+          "path": "src/components/ui/button.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/components/ui/input.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/components/ui/label.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/lib/utils.ts",
+          "type": "registry:lib"
         }
       ]
     },
@@ -108,6 +172,22 @@
         {
           "path": "src/components/auth/sign-in.tsx",
           "type": "registry:component"
+        },
+        {
+          "path": "src/components/ui/button.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/components/ui/input.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/components/ui/label.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/lib/utils.ts",
+          "type": "registry:lib"
         }
       ]
     },

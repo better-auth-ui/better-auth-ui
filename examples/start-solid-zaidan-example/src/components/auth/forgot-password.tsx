@@ -1,6 +1,9 @@
 import { requestPasswordResetOptions, useAuth } from "@better-auth-ui/solid"
 import { createMutation } from "@tanstack/solid-query"
 import { createSignal, Show } from "solid-js"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
 
 export type ForgotPasswordProps = {
   redirectTo?: string
@@ -26,8 +29,8 @@ export function ForgotPassword(props: ForgotPasswordProps) {
     <form aria-label="Forgot password" onSubmit={submitPasswordReset}>
       <h1>Forgot password</h1>
       <p>Enter your email and we&apos;ll send a password reset link.</p>
-      <label for="forgot-password-email">Email</label>
-      <input
+      <Label for="forgot-password-email">Email</Label>
+      <Input
         id="forgot-password-email"
         name="email"
         onInput={(event) => setEmail(event.currentTarget.value)}
@@ -35,9 +38,9 @@ export function ForgotPassword(props: ForgotPasswordProps) {
         type="email"
         value={email()}
       />
-      <button disabled={requestReset.isPending} type="submit">
+      <Button disabled={requestReset.isPending} type="submit">
         {requestReset.isPending ? "Sending…" : "Send reset link"}
-      </button>
+      </Button>
       <Show when={requestReset.isSuccess}>
         <p role="status">Check your email for the reset link.</p>
       </Show>

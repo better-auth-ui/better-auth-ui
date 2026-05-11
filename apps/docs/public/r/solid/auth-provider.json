@@ -8,7 +8,11 @@
     "@better-auth-ui/core@latest",
     "@tanstack/solid-query",
     "better-auth",
-    "solid-js"
+    "solid-js",
+    "@kobalte/core",
+    "class-variance-authority",
+    "clsx",
+    "tailwind-merge"
   ],
   "registryDependencies": [],
   "files": [

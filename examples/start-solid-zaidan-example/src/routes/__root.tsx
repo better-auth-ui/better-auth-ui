@@ -5,6 +5,7 @@ import {
   Scripts
 } from "@tanstack/solid-router"
 import type { JSX } from "solid-js"
+import "../styles/globals.css"
 
 export const Route = createRootRoute({
   component: RootComponent,

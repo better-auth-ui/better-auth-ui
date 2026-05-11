@@ -102,6 +102,166 @@ describe("Solid registry isolation", () => {
     expect(viteConfig).not.toContain("@vitejs/plugin-react")
   })
 
+  it("declares the Zaidan shadcn setup and Tailwind v4 globals", () => {
+    const componentsJson = readJson<{
+      aliases: Record<string, string>
+      registries: Record<string, string>
+      rsc: boolean
+      style: string
+      tailwind: {
+        baseColor: string
+        config: string
+        css: string
+        cssVariables: boolean
+        prefix: string
+      }
+      iconLibrary: string
+      menuAccent: string
+      menuColor: string
+      rtl: boolean
+      tsx: boolean
+    }>(resolve(__dirname, "../components.json"))
+    const packageJson = readJson<{
+      dependencies: Record<string, string>
+      devDependencies: Record<string, string>
+    }>(resolve(__dirname, "../package.json"))
+    const viteConfig = readFileSync(
+      resolve(__dirname, "../vite.config.ts"),
+      "utf8"
+    )
+    const rootRoute = readFileSync(
+      resolve(__dirname, "../src/routes/__root.tsx"),
+      "utf8"
+    )
+    const globals = readFileSync(
+      resolve(__dirname, "../src/styles/globals.css"),
+      "utf8"
+    )
+
+    expect(componentsJson).toMatchObject({
+      style: "kobalte",
+      rsc: false,
+      tsx: true,
+      tailwind: {
+        config: "",
+        css: "src/styles/globals.css",
+        baseColor: "neutral",
+        cssVariables: true,
+        prefix: ""
+      },
+      iconLibrary: "lucide",
+      rtl: false,
+      aliases: {
+        components: "@/components",
+        utils: "@/lib/utils",
+        ui: "@/components/ui",
+        lib: "@/lib",
+        hooks: "@/hooks"
+      },
+      menuColor: "default",
+      menuAccent: "subtle",
+      registries: {
+        "@zaidan": "https://zaidan.carere.dev/r/{style}/{name}.json"
+      }
+    })
+    expect(packageJson.dependencies).toMatchObject({
+      "@kobalte/core": expect.any(String),
+      "class-variance-authority": expect.any(String),
+      clsx: expect.any(String),
+      "tailwind-merge": expect.any(String)
+    })
+    expect(packageJson.devDependencies).toMatchObject({
+      "@tailwindcss/vite": expect.any(String),
+      tailwindcss: expect.any(String)
+    })
+    expect(viteConfig).toContain('import tailwindcss from "@tailwindcss/vite"')
+    expect(viteConfig).toContain("tailwindcss()")
+    expect(rootRoute).toContain('import "../styles/globals.css"')
+    expect(globals).toContain('@import "tailwindcss"')
+  })
+
+  it("uses local Zaidan UI primitives in auth components and registry payloads", () => {
+    const uiFiles = [
+      "src/components/ui/button.tsx",
+      "src/components/ui/input.tsx",
+      "src/components/ui/label.tsx",
+      "src/lib/utils.ts"
+    ]
+    const formAuthFiles = [
+      {
+        path: "src/components/auth/sign-in.tsx",
+        imports: ['from "@/components/ui/button"']
+      },
+      {
+        path: "src/components/auth/sign-up.tsx",
+        imports: [
+          'from "@/components/ui/button"',
+          'from "@/components/ui/input"',
+          'from "@/components/ui/label"'
+        ]
+      },
+      {
+        path: "src/components/auth/forgot-password.tsx",
+        imports: [
+          'from "@/components/ui/button"',
+          'from "@/components/ui/input"',
+          'from "@/components/ui/label"'
+        ]
+      },
+      {
+        path: "src/components/auth/reset-password.tsx",
+        imports: [
+          'from "@/components/ui/button"',
+          'from "@/components/ui/input"',
+          'from "@/components/ui/label"'
+        ]
+      }
+    ]
+
+    for (const file of uiFiles) {
+      expect(existsSync(resolve(__dirname, "..", file))).toBe(true)
+    }
+
+    for (const file of formAuthFiles) {
+      const content = readFileSync(resolve(__dirname, "..", file.path), "utf8")
+
+      for (const expectedImport of file.imports) {
+        expect(content).toContain(expectedImport)
+      }
+      expect(content).not.toContain("<button")
+      expect(content).not.toContain("<input")
+      expect(content).not.toContain("<label")
+    }
+
+    const outputRoot = makeTempRoot()
+    buildSolidRegistry({
+      exampleRoot: resolve(__dirname, ".."),
+      manifest: solidRegistryManifest,
+      outputRoot
+    })
+
+    const signUp = readJson<{
+      dependencies: string[]
+      files: Array<{ path: string; type: string }>
+      registryDependencies: string[]
+    }>(join(outputRoot, "solid/sign-up.json"))
+
+    expect(signUp.registryDependencies).toEqual(["solid/auth-provider"])
+    expect(signUp.dependencies).toEqual(
+      expect.arrayContaining([
+        "@kobalte/core",
+        "class-variance-authority",
+        "clsx",
+        "tailwind-merge"
+      ])
+    )
+    expect(signUp.files.map((file) => file.path)).toEqual([
+      "src/components/auth/sign-up.tsx",
+      ...uiFiles
+    ])
+    expect(signUp.files.map((file) => file.type)).toContain("registry:ui")
+  })
+
   it("documents apps/docs/public/r/solid as static asset hosting only", () => {
     const staticHostReadme = readFileSync(
       resolve(__dirname, "../../../apps/docs/public/r/solid/README.md"),
@@ -258,12 +418,14 @@ describe("Solid registry isolation", () => {
     }>(join(outputRoot, "solid/sign-in.json"))
     expect(signIn.name).toBe("sign-in")
     expect(signIn.dependencies).toContain("@better-auth-ui/solid@latest")
-    expect(signIn.files).toEqual([
-      expect.objectContaining({
-        content: expect.stringContaining("export function SignIn"),
-        path: "src/components/auth/sign-in.tsx"
-      })
-    ])
+    expect(signIn.files).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          content: expect.stringContaining("export function SignIn"),
+          path: "src/components/auth/sign-in.tsx"
+        })
+      ])
+    )
     expect(signIn.files[0]?.content).not.toContain("useAuth")
 
     const signOut = readJson<{
@@ -291,12 +453,14 @@ describe("Solid registry isolation", () => {
       "@better-auth-ui/solid@latest"
     )
     expect(forgotPassword.registryDependencies).toEqual(["solid/auth-provider"])
-    expect(forgotPassword.files).toEqual([
-      expect.objectContaining({
-        content: expect.stringContaining("export function ForgotPassword"),
-        path: "src/components/auth/forgot-password.tsx"
-      })
-    ])
+    expect(forgotPassword.files).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          content: expect.stringContaining("export function ForgotPassword"),
+          path: "src/components/auth/forgot-password.tsx"
+        })
+      ])
+    )
     expect(forgotPassword.files[0]?.content).toContain(
       "requestPasswordResetOptions"
     )
@@ -316,12 +480,14 @@ describe("Solid registry isolation", () => {
     expect(resetPassword.name).toBe("reset-password")
     expect(resetPassword.dependencies).toContain("@better-auth-ui/solid@latest")
     expect(resetPassword.registryDependencies).toEqual(["solid/auth-provider"])
-    expect(resetPassword.files).toEqual([
-      expect.objectContaining({
-        content: expect.stringContaining("export function ResetPassword"),
-        path: "src/components/auth/reset-password.tsx"
-      })
-    ])
+    expect(resetPassword.files).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          content: expect.stringContaining("export function ResetPassword"),
+          path: "src/components/auth/reset-password.tsx"
+        })
+      ])
+    )
     expect(resetPassword.files[0]?.content).toContain("resetPasswordOptions")
     expect(resetPassword.files[0]?.content).toContain(
       "Password reset successfully. You can sign in with your new password."
@@ -341,12 +507,14 @@ describe("Solid registry isolation", () => {
     expect(signUp.name).toBe("sign-up")
     expect(signUp.dependencies).toContain("@better-auth-ui/solid@latest")
     expect(signUp.registryDependencies).toEqual(["solid/auth-provider"])
-    expect(signUp.files).toEqual([
-      expect.objectContaining({
-        content: expect.stringContaining("export function SignUp"),
-        path: "src/components/auth/sign-up.tsx"
-      })
-    ])
+    expect(signUp.files).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          content: expect.stringContaining("export function SignUp"),
+          path: "src/components/auth/sign-up.tsx"
+        })
+      ])
+    )
     expect(signUp.files[0]?.content).toContain("signUpEmailOptions")
     expect(signUp.files[0]?.content).toContain(
       "Account created. Check your email if verification is required."
