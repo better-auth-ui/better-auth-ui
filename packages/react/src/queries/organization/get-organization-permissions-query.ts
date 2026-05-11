@@ -32,8 +32,10 @@ export function useOrganizationPermissions(authClient: AuthClient) {
     if (!role) return EMPTY_PERMISSIONS
 
     const can = (resource: string, action: string) =>
-      authClient.organization.hasPermission({
-        //role: role as Parameters<typeof authClient.organization.checkRolePermission>[0]["role"],
+      authClient.organization.checkRolePermission({
+        role: role as Parameters<
+          typeof authClient.organization.checkRolePermission
+        >[0]["role"],
         permissions: { [resource]: [action] } as Parameters<
           typeof authClient.organization.checkRolePermission
         >[0]["permissions"]

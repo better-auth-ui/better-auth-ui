@@ -3,6 +3,7 @@
 export const organizationQueryKeys = {
   all: ["organization"] as const,
 
+  listOrganizations: () => ["organization", "list"] as const,
   getActiveOrganization: () => ["organization", "active"] as const,
   getActiveMemberRole: () => ["organization", "active", "member-role"] as const,
   listOrganizationMembers: () => ["organization", "active", "members"] as const,
