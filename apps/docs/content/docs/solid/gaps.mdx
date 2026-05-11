@@ -7,10 +7,49 @@ Solid support is additive. It should not silently pretend React-only APIs exist.
 
 | Area | Status | Guidance |
 |------|--------|----------|
-| `react-email` templates | No Solid equivalent selected yet | Keep email templates in the React packages or provide app-owned Solid-compatible email rendering. |
+| `react-email` templates | App-owned Solid rendering only | React templates in the shadcn example use `@react-email/components`; Solid setup does not include `react-email` or an `@better-auth-ui/solid/email` export. Use app-owned Solid-compatible rendering instead. |
 | `sonner` toasts | Example parity via `solid-sonner` | The Solid/Zaidan Start example mounts a Zaidan Sonner `Toaster` and surfaces query/mutation failures with `solid-sonner`; the Solid package still does not re-export a toast UI. |
 | HeroUI components | React-only | Use the React/HeroUI docs for HeroUI, or install Solid/Zaidan registry components from `/r/solid`. |
 | React render-hook internals | Not ported | Solid tests cover equivalent provider/config/query/mutation behavior instead of React hook mechanics. |
 | Docs runtime execution | Not supported | `apps/docs/public/r/solid` is static asset hosting only; Solid source executes in `examples/start-solid-zaidan-example`. |
 
 If you need one of these areas, treat it as a new design task. Do not add compatibility shims without deciding the owning package, runtime dependency, and test strategy first.
+
+## Email rendering in Solid
+
+The React Start shadcn registry includes email template payloads such as `email-verification-email`, `magic-link-email`, and `reset-password-email`. Those payloads point at `packages/react/src/components/auth/email/*` and depend on `@react-email/components`, so they are React-only and are not part of the Solid/Zaidan setup.
+
+Solid keeps email rendering app-owned. `@better-auth-ui/solid` deliberately exposes only the auth provider, query/mutation factories, server helpers, and plugin helpers; it does not export email templates and does not add React dependencies to the Solid package.
+
+### Minimal manual option
+
+For a small Solid-owned email template, render the component to HTML on the server with `solid-js/web`:
+
+```package-install
+solid-js
+```
+
+```tsx
+import { renderToString } from "solid-js/web"
+
+function WelcomeEmail(props: { name: string }) {
+  return (
+    <html>
+      <body>
+        <h1>Welcome, {props.name}</h1>
+        <p>Thanks for joining.</p>
+      </body>
+    </html>
+  )
+}
+
+const html = renderToString(() => <WelcomeEmail name="Andrés" />)
+```
+
+Pass the resulting `html` string to your mail provider from your app/server code. Keep the template source in your application or Solid example layer, not in `@better-auth-ui/core`.
+
+### Community package option
+
+`@monkedevlife/solidjs-email-render` exists on the npm registry as a community package for transforming SolidJS components into HTML email templates. Treat it cautiously: the registry marks version `0.0.1` as deprecated, it requires Node `>=20`, and it adds rendering-specific dependencies such as `html-to-text`, `prettier`, and `@monkedevlife/solidjs-email-tailwind`.
+
+Use it only when you accept that maintenance and dependency surface in your app. It should remain an app-owned choice, not a dependency of `@better-auth-ui/solid`.

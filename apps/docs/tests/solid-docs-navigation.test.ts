@@ -82,6 +82,12 @@ describe("Solid docs navigation", () => {
     const source = readFileSync(sourceFile, "utf8")
 
     expect(gaps).toContain("react-email")
+    expect(gaps).toContain("@react-email/components")
+    expect(gaps).toContain("solid-js/web")
+    expect(gaps).toContain("renderToString")
+    expect(gaps).toContain("@monkedevlife/solidjs-email-render")
+    expect(gaps).toContain("deprecated")
+    expect(gaps).toContain("app-owned")
     expect(gaps).toContain("sonner")
     expect(gaps).toContain("solid-sonner")
     expect(mutations).toContain("Zaidan Sonner")
