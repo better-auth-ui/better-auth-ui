@@ -83,6 +83,7 @@ function UserButtonPendingView() {
 
 function ThemeToggleItem() {
   const [theme, setTheme] = createSignal<ThemeMode>("system")
+  let tabsListElement!: HTMLDivElement
 
   onMount(() => {
     const initialTheme = readStoredThemePreference()
@@ -97,10 +98,48 @@ function ThemeToggleItem() {
     applyThemePreference(nextTheme)
   }
 
+  const focusActiveTab = () => {
+    const activeTab = tabsListElement?.querySelector<HTMLElement>(
+      '[role="tab"][data-selected]'
+    )
+
+    activeTab?.focus({ preventScroll: true })
+  }
+
+  const handleTabsKeyDown = (event: KeyboardEvent) => {
+    if (event.key !== "ArrowUp" && event.key !== "ArrowDown") return
+
+    const target = event.target as HTMLElement
+    if (target.getAttribute("role") !== "tab") return
+
+    const wrapper = target.closest<HTMLElement>('[role="menuitem"]')
+    const content = wrapper?.closest<HTMLElement>(
+      '[data-slot="dropdown-menu-content"]'
+    )
+    if (!wrapper || !content) return
+
+    const items = Array.from(
+      content.querySelectorAll<HTMLElement>(
+        '[role="menuitem"]:not([aria-disabled="true"])'
+      )
+    )
+    const currentIndex = items.indexOf(wrapper)
+    const nextIndex =
+      event.key === "ArrowDown" ? currentIndex + 1 : currentIndex - 1
+    const next = items[nextIndex]
+    if (!next) return
+
+    event.preventDefault()
+    next.focus()
+  }
+
   return (
     <DropdownMenuItem
-      class="gap-2 rounded-md px-2 py-1.5 text-sm focus:bg-accent focus:text-accent-foreground"
+      class="gap-1.5 rounded-md px-1.5 py-1 text-sm focus:bg-accent focus:text-accent-foreground"
       closeOnSelect={false}
+      onFocus={(event) => {
+        if (event.target === event.currentTarget) focusActiveTab()
+      }}
     >
       <div class="flex w-full items-center gap-2">
         <PaletteIcon class="size-4 text-muted-foreground" />
@@ -108,12 +147,13 @@ function ThemeToggleItem() {
 
         <Tabs
           class="ml-auto"
+          onKeyDown={handleTabsKeyDown}
           onChange={(nextTheme) => {
             if (isThemeMode(nextTheme)) selectTheme(nextTheme)
           }}
           value={theme()}
         >
-          <TabsList class="h-6!">
+          <TabsList class="h-6!" ref={tabsListElement}>
             <TabsTrigger aria-label="System" class="size-5 p-0" value="system">
               <Monitor class="size-3" />
             </TabsTrigger>
@@ -146,7 +186,7 @@ export function UserButton(rawProps: UserButtonProps = {}) {
   const size = () => props.size
   const contentClass = () =>
     cn(
-      "w-[--kb-popper-anchor-width] min-w-40 md:min-w-56 max-w-[48svw] rounded-lg border bg-popover p-1 text-popover-foreground shadow-md",
+      "w-[--kb-popper-anchor-width] min-w-40 md:min-w-56 max-w-[48svw] rounded-lg bg-popover p-1 text-popover-foreground shadow-md",
       props.align === "end" && "origin-top-right"
     )
   const triggerClass = () =>
@@ -156,7 +196,7 @@ export function UserButton(rawProps: UserButtonProps = {}) {
         variant: props.variant
       }),
       size() === "icon"
-        ? "rounded-full p-0"
+        ? "rounded-full! border-0! p-0"
         : "py-2.5 h-auto font-normal justify-between gap-3 rounded-full",
       props.class
     )
@@ -320,7 +360,7 @@ export function UserButton(rawProps: UserButtonProps = {}) {
               <>
                 <DropdownMenuItem
                   as="a"
-                  class="gap-2 rounded-md px-2 py-1.5 text-sm focus:bg-accent focus:text-accent-foreground"
+                  class="gap-1.5 rounded-md px-1.5 py-1 text-sm focus:bg-accent focus:text-accent-foreground"
                   href={signInHref}
                 >
                   <LogIn class="size-4 text-muted-foreground" />
@@ -329,7 +369,7 @@ export function UserButton(rawProps: UserButtonProps = {}) {
 
                 <DropdownMenuItem
                   as="a"
-                  class="gap-2 rounded-md px-2 py-1.5 text-sm focus:bg-accent focus:text-accent-foreground"
+                  class="gap-1.5 rounded-md px-1.5 py-1 text-sm focus:bg-accent focus:text-accent-foreground"
                   href={signUpHref}
                 >
                   <UserPlus2 class="size-4 text-muted-foreground" />
@@ -341,7 +381,7 @@ export function UserButton(rawProps: UserButtonProps = {}) {
             }
           >
             <DropdownMenuItem
-              class="gap-2 rounded-md px-2 py-1.5 text-sm text-muted-foreground"
+              class="gap-1.5 rounded-md px-1.5 py-1 text-sm text-muted-foreground"
               disabled
             >
               <Settings class="size-4 text-muted-foreground" />
@@ -354,7 +394,7 @@ export function UserButton(rawProps: UserButtonProps = {}) {
 
             <DropdownMenuItem
               as="a"
-              class="gap-2 rounded-md px-2 py-1.5 text-sm focus:bg-accent focus:text-accent-foreground"
+              class="gap-1.5 rounded-md px-1.5 py-1 text-sm focus:bg-accent focus:text-accent-foreground"
               href={signOutHref}
             >
               <LogOut class="size-4 text-muted-foreground" />

@@ -243,6 +243,8 @@
       "dependencies": {
         "@better-auth-ui/core": "*",
         "@better-auth-ui/solid": "*",
+        "@fontsource-variable/geist": "^5.2.8",
+        "@fontsource-variable/inter": "^5.2.8",
         "@kobalte/core": "^0.13.11",
         "@tanstack/solid-query": "^5.100.9",
         "@tanstack/solid-router": "^1.167.65",
@@ -251,6 +253,7 @@
         "class-variance-authority": "^0.7.1",
         "clsx": "^2.1.1",
         "lucide-solid": "^0.542.0",
+        "shadcn": "^4.7.0",
         "solid-js": "^1.9.12",
         "tailwind-merge": "^3.4.0",
       },

@@ -41,6 +41,29 @@ const verifyLocalRegistryCoherence = () =>
     repoRoot: resolve(__dirname, "../../..")
   })
 
+const extractCssBlock = (css: string, selector: string) => {
+  const start = css.indexOf(`${selector} {`)
+  expect(start, `Expected ${selector} block`).toBeGreaterThanOrEqual(0)
+
+  const bodyStart = css.indexOf("{", start) + 1
+  const end = css.indexOf("\n}", bodyStart)
+  expect(end, `Expected ${selector} block end`).toBeGreaterThan(bodyStart)
+
+  return css.slice(bodyStart, end).trim()
+}
+
+const extractCssDeclarations = (css: string, selector: string) =>
+  extractCssBlock(css, selector)
+    .split("\n")
+    .map((line) => line.trim())
+    .filter((line) => line.startsWith("--"))
+
+const extractCssImports = (css: string) =>
+  css
+    .split("\n")
+    .map((line) => line.trim())
+    .filter((line) => line.startsWith("@import"))
+
 describe("Solid registry isolation", () => {
   afterEach(() => {
     for (const root of tempRoots.splice(0)) {
@@ -178,6 +201,171 @@ describe("Solid registry isolation", () => {
     expect(viteConfig).toContain("tailwindcss()")
     expect(rootRoute).toContain('import "../styles/globals.css"')
     expect(globals).toContain('@import "tailwindcss"')
+  })
+
+  it("shares the shadcn token and global CSS contract", () => {
+    const shadcnGlobals = readFileSync(
+      resolve(__dirname, "../../start-shadcn-example/src/styles/app.css"),
+      "utf8"
+    )
+    const solidGlobals = readFileSync(
+      resolve(__dirname, "../src/styles/globals.css"),
+      "utf8"
+    )
+    const packageJson = readJson<{
+      dependencies: Record<string, string>
+    }>(resolve(__dirname, "../package.json"))
+
+    expect(extractCssImports(solidGlobals).slice(0, 5)).toEqual(
+      extractCssImports(shadcnGlobals).slice(0, 5)
+    )
+    expect(extractCssBlock(solidGlobals, "@theme inline")).toBe(
+      extractCssBlock(shadcnGlobals, "@theme inline")
+    )
+    expect(extractCssDeclarations(solidGlobals, ":root")).toEqual(
+      extractCssDeclarations(shadcnGlobals, ":root")
+    )
+    expect(extractCssDeclarations(solidGlobals, ".dark")).toEqual(
+      extractCssDeclarations(shadcnGlobals, ".dark")
+    )
+    expect(solidGlobals).toContain("@layer base")
+    expect(solidGlobals).toContain("@apply border-border outline-ring/50")
+    expect(solidGlobals).toContain("@apply bg-background text-foreground")
+    expect(solidGlobals).toContain("@apply font-sans")
+    expect(packageJson.dependencies).toMatchObject({
+      "@fontsource-variable/geist": expect.any(String),
+      "@fontsource-variable/inter": expect.any(String),
+      shadcn: expect.any(String)
+    })
+  })
+
+  it("keeps Solid primitive metrics aligned with the shadcn class contract", () => {
+    const solidBase = readFileSync(
+      resolve(__dirname, "../src/styles/base.css"),
+      "utf8"
+    )
+    const shadcnButton = readFileSync(
+      resolve(
+        __dirname,
+        "../../start-shadcn-example/src/components/ui/button.tsx"
+      ),
+      "utf8"
+    )
+    const shadcnInput = readFileSync(
+      resolve(
+        __dirname,
+        "../../start-shadcn-example/src/components/ui/input.tsx"
+      ),
+      "utf8"
+    )
+    const shadcnCard = readFileSync(
+      resolve(
+        __dirname,
+        "../../start-shadcn-example/src/components/ui/card.tsx"
+      ),
+      "utf8"
+    )
+    const shadcnSeparator = readFileSync(
+      resolve(
+        __dirname,
+        "../../start-shadcn-example/src/components/ui/separator.tsx"
+      ),
+      "utf8"
+    )
+    const solidButton = readFileSync(
+      resolve(__dirname, "../src/components/ui/button.tsx"),
+      "utf8"
+    )
+    const solidInput = readFileSync(
+      resolve(__dirname, "../src/components/ui/input.tsx"),
+      "utf8"
+    )
+    const solidCard = readFileSync(
+      resolve(__dirname, "../src/components/ui/card.tsx"),
+      "utf8"
+    )
+    const solidDropdown = readFileSync(
+      resolve(__dirname, "../src/components/ui/dropdown-menu.tsx"),
+      "utf8"
+    )
+    const solidSeparator = readFileSync(
+      resolve(__dirname, "../src/components/ui/separator.tsx"),
+      "utf8"
+    )
+
+    expect(solidButton).toContain('data-slot="button"')
+    expect(solidButton).toContain("z-button-size-default")
+    expect(shadcnButton).toContain("rounded-lg border border-transparent")
+    expect(solidBase).toContain("rounded-lg border border-transparent")
+    expect(solidBase).toContain(".z-button-size-default")
+    expect(solidBase).toContain("@apply h-8 gap-1.5 px-2.5")
+    expect(solidBase).toContain(".z-button-size-lg")
+    expect(solidBase).toContain("@apply h-9 gap-1.5 px-2.5")
+    expect(shadcnButton).toContain(
+      "border-border bg-background hover:bg-muted hover:text-foreground"
+    )
+    expect(solidBase).toContain(
+      "border-border bg-background hover:bg-muted hover:text-foreground"
+    )
+    expect(
+      extractCssBlock(solidBase, ".z-button-variant-outline")
+    ).not.toContain("shadow-xs")
+
+    expect(solidInput).toContain('data-slot="input"')
+    expect(solidBase).toContain(".z-input")
+    expect(shadcnInput).toContain(
+      "h-8 w-full min-w-0 rounded-lg border border-input bg-transparent px-2.5 py-1"
+    )
+    expect(solidBase).toContain(
+      "h-8 rounded-lg border bg-transparent px-2.5 py-1 text-base transition-colors"
+    )
+    expect(solidBase).toContain(
+      "file:h-6 file:text-sm file:font-medium file:text-foreground"
+    )
+    expect(solidBase).toContain(
+      "disabled:bg-input/50 dark:disabled:bg-input/80"
+    )
+    expect(solidBase).not.toContain(
+      "h-9 rounded-md border bg-transparent px-2.5 py-1 text-base shadow-xs"
+    )
+
+    expect(solidCard).toContain('data-slot="card"')
+    expect(solidBase).toContain(".z-card")
+    expect(shadcnCard).toContain(
+      "gap-4 overflow-hidden rounded-xl bg-card py-4 text-sm"
+    )
+    expect(solidBase).toContain("gap-4 overflow-hidden rounded-xl py-4 text-sm")
+    expect(solidBase).toContain("data-[size=sm]:gap-3")
+    expect(solidBase).toContain(".z-card-header")
+    expect(solidBase).toContain("gap-1 rounded-t-xl px-4")
+    expect(solidBase).toContain(".z-card-content")
+    expect(solidBase).toContain("px-4 group-data-[size=sm]/card:px-3")
+
+    expect(solidSeparator).toContain('data-slot="separator"')
+    expect(shadcnSeparator).toContain("shrink-0 bg-border")
+    expect(solidSeparator).toContain("bg-border")
+    expect(solidSeparator).toContain("data-[orientation=horizontal]:h-px")
+    expect(solidSeparator).toContain("data-[orientation=vertical]:self-stretch")
+    expect(solidSeparator).not.toContain("data-[orientation=vertical]:h-full")
+
+    expect(solidDropdown).toContain('data-slot="dropdown-menu-content"')
+    expect(solidBase).toContain(".z-dropdown-menu-content")
+    expect(solidBase).toContain("min-w-32 rounded-lg p-1 shadow-md")
+    expect(solidBase).toContain(".z-dropdown-menu-item")
+    expect(solidBase).toContain("gap-1.5 rounded-md px-1.5 py-1 text-sm")
+    expect(solidBase).toContain(".z-dropdown-menu-label")
+    expect(solidBase).toContain("px-1.5 py-1 text-xs font-medium")
+    expect(solidBase).toContain(".z-dropdown-menu-separator")
+    expect(solidBase).toContain("bg-border -mx-1 my-1 h-px")
+
+    const solidUserButton = readFileSync(
+      resolve(__dirname, "../src/components/auth/user-button.tsx"),
+      "utf8"
+    )
+    expect(solidUserButton).toContain(
+      '"w-[--kb-popper-anchor-width] min-w-40 md:min-w-56 max-w-[48svw] rounded-lg bg-popover p-1 text-popover-foreground shadow-md"'
+    )
+    expect(solidUserButton).not.toContain("rounded-lg border bg-popover")
   })
 
   it("uses local Zaidan UI primitives in auth components and registry payloads", () => {
@@ -655,6 +843,13 @@ describe("Solid registry isolation", () => {
       resolve(__dirname, "../src/components/ui/tabs.tsx"),
       "utf8"
     )
+    const shadcnThemeToggleItem = readFileSync(
+      resolve(
+        __dirname,
+        "../../start-shadcn-example/src/components/auth/theme/theme-toggle-item.tsx"
+      ),
+      "utf8"
+    )
     const packageJson = readJson<{
       dependencies: Record<string, string>
     }>(resolve(__dirname, "../package.json"))
@@ -687,6 +882,10 @@ describe("Solid registry isolation", () => {
     expect(tabs).toContain('from "@kobalte/core/tabs"')
     expect(tabs).toContain('data-slot="tabs-list"')
     expect(tabs).toContain('data-slot="tabs-trigger"')
+    expect(tabs).toContain("rounded-lg p-[3px]")
+    expect(tabs).toContain("data-[selected]:bg-background")
+    expect(tabs).toContain("data-[selected]:text-foreground")
+    expect(tabs).toContain("data-[selected]:shadow-sm")
 
     expect(userButton).toContain('from "@better-auth-ui/solid"')
     expect(userButton).toContain("useSession")
@@ -723,6 +922,10 @@ describe("Solid registry isolation", () => {
     expect(userButton).toContain("readStoredThemePreference")
     expect(userButton).toContain("saveThemePreference")
     expect(userButton).toContain("applyThemePreference")
+    expect(shadcnThemeToggleItem).toContain('[role="tab"][data-state="active"]')
+    expect(userButton).toContain('[role="tab"][data-selected]')
+    expect(userButton).toContain("focusActiveTab")
+    expect(userButton).toContain("onFocus")
     expect(userButton).toContain("isUserButtonHydrated")
     expect(userButton).toContain("setIsUserButtonHydrated(true)")
     expect(userButton).toContain("when={isUserButtonHydrated()}")
@@ -736,7 +939,7 @@ describe("Solid registry isolation", () => {
     )
     expect(userButton).not.toContain("w-full max-w-sm")
     expect(userButton).toContain(
-      '"w-[--kb-popper-anchor-width] min-w-40 md:min-w-56 max-w-[48svw] rounded-lg border bg-popover p-1 text-popover-foreground shadow-md"'
+      '"w-[--kb-popper-anchor-width] min-w-40 md:min-w-56 max-w-[48svw] rounded-lg bg-popover p-1 text-popover-foreground shadow-md"'
     )
     expect(userButton).toContain('"min-width": "min(14rem, 48svw)"')
     expect(userButton).toContain('"max-width": "48svw"')
