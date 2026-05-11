@@ -1,5 +1,6 @@
 import { Link } from "@tanstack/solid-router"
 
+import { UserButton } from "./auth/user-button"
 import { Logo } from "./logo"
 
 export function Header() {
@@ -11,6 +12,8 @@ export function Header() {
 
           <h1 class="text-base">BETTER-AUTH. UI</h1>
         </Link>
+
+        <UserButton size="icon" align="end" />
       </div>
     </header>
   )

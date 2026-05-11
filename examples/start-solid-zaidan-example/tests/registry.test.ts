@@ -401,12 +401,16 @@ describe("Solid registry isolation", () => {
     )
 
     expect(rootRoute).toContain('from "@/components/header"')
+    expect(rootRoute).toContain("shellComponent: RootDocument")
     expect(rootRoute).toContain(
       'import { HydrationScript } from "solid-js/web"'
     )
     expect(rootRoute).toContain("<HydrationScript />")
     expect(rootRoute).toContain(
-      '<body class="antialiased min-h-svh flex flex-col">'
+      "<head>\n        <script>{themeScript}</script>\n        <HydrationScript />\n      </head>"
+    )
+    expect(rootRoute).toContain(
+      '<body class="antialiased min-h-svh flex flex-col bg-background text-foreground">\n        <HeadContent />'
     )
     expect(rootRoute).toContain("<Header />")
     expect(rootRoute).toContain('<main class="grow flex flex-col">')
@@ -619,6 +623,18 @@ describe("Solid registry isolation", () => {
       resolve(__dirname, "../src/components/auth/user-button.tsx"),
       "utf8"
     )
+    const theme = readFileSync(
+      resolve(__dirname, "../src/lib/theme.ts"),
+      "utf8"
+    )
+    const header = readFileSync(
+      resolve(__dirname, "../src/components/header.tsx"),
+      "utf8"
+    )
+    const rootRoute = readFileSync(
+      resolve(__dirname, "../src/routes/__root.tsx"),
+      "utf8"
+    )
     const avatar = readFileSync(
       resolve(__dirname, "../src/components/ui/avatar.tsx"),
       "utf8"
@@ -629,6 +645,14 @@ describe("Solid registry isolation", () => {
     )
     const separator = readFileSync(
       resolve(__dirname, "../src/components/ui/separator.tsx"),
+      "utf8"
+    )
+    const skeleton = readFileSync(
+      resolve(__dirname, "../src/components/ui/skeleton.tsx"),
+      "utf8"
+    )
+    const tabs = readFileSync(
+      resolve(__dirname, "../src/components/ui/tabs.tsx"),
       "utf8"
     )
     const packageJson = readJson<{
@@ -657,12 +681,22 @@ describe("Solid registry isolation", () => {
     expect(separator).toContain('data-slot="separator"')
     expect(separator).toContain("SeparatorPrimitive")
 
+    expect(skeleton).toContain('data-slot="skeleton"')
+    expect(skeleton).toContain("z-skeleton animate-pulse")
+
+    expect(tabs).toContain('from "@kobalte/core/tabs"')
+    expect(tabs).toContain('data-slot="tabs-list"')
+    expect(tabs).toContain('data-slot="tabs-trigger"')
+
     expect(userButton).toContain('from "@better-auth-ui/solid"')
     expect(userButton).toContain("useSession")
     expect(userButton).toContain('from "@/components/ui/avatar"')
     expect(userButton).toContain('from "@/components/ui/dropdown-menu"')
     expect(userButton).toContain('from "@/components/ui/separator"')
-    expect(userButton).toContain("<DropdownMenu>")
+    expect(userButton).toContain('from "@/components/ui/skeleton"')
+    expect(userButton).toContain('from "@/components/ui/tabs"')
+    expect(userButton).toContain("<DropdownMenu")
+    expect(userButton).toContain("modal={false}")
     expect(userButton).toContain("<Avatar")
     expect(userButton).toContain("<DropdownMenuTrigger")
     expect(userButton).toContain("<DropdownMenuContent")
@@ -672,6 +706,63 @@ describe("Solid registry isolation", () => {
     expect(userButton).toContain("auth.localization.auth.signUp")
     expect(userButton).toContain("auth.localization.auth.signOut")
     expect(userButton).toContain("auth.localization.settings.settings")
+    expect(userButton).toContain("type UserButtonProps")
+    expect(userButton).toContain('size?: "default" | "icon"')
+    expect(userButton).toContain('align?: "center" | "end" | "start"')
+    expect(userButton).toContain('size: "default" as const')
+    expect(userButton).toContain('size() === "icon"')
+    expect(userButton).toContain("ThemeToggleItem")
+    expect(userButton).toContain("PaletteIcon")
+    expect(userButton).toContain("<Tabs")
+    expect(userButton).toContain("<TabsList")
+    expect(userButton).toContain("<TabsTrigger")
+    expect(userButton).toContain('aria-label="System"')
+    expect(userButton).toContain('aria-label="Light"')
+    expect(userButton).toContain('aria-label="Dark"')
+    expect(userButton).toContain('from "@/lib/theme"')
+    expect(userButton).toContain("readStoredThemePreference")
+    expect(userButton).toContain("saveThemePreference")
+    expect(userButton).toContain("applyThemePreference")
+    expect(userButton).toContain("isUserButtonHydrated")
+    expect(userButton).toContain("setIsUserButtonHydrated(true)")
+    expect(userButton).toContain("when={isUserButtonHydrated()}")
+    expect(userButton).toContain("<UserButtonPendingView")
+    expect(userButton).toContain("<Skeleton")
+    expect(userButton).toContain('class="size-8 rounded-full"')
+    expect(userButton).toContain('class="h-4 w-24"')
+    expect(userButton).toContain('class="h-3 w-32"')
+    expect(userButton).toContain(
+      '"py-2.5 h-auto font-normal justify-between gap-3 rounded-full"'
+    )
+    expect(userButton).not.toContain("w-full max-w-sm")
+    expect(userButton).toContain(
+      '"w-[--kb-popper-anchor-width] min-w-40 md:min-w-56 max-w-[48svw] rounded-lg border bg-popover p-1 text-popover-foreground shadow-md"'
+    )
+    expect(userButton).toContain('"min-width": "min(14rem, 48svw)"')
+    expect(userButton).toContain('"max-width": "48svw"')
+    expect(userButton).toContain('width: "max-content"')
+    expect(userButton).toContain("<Show when={session.data}>")
+    expect(userButton.indexOf("{auth.localization.auth.signUp}")).toBeLessThan(
+      userButton.indexOf("<ThemeToggleItem />")
+    )
+    expect(userButton).not.toContain("needToCreateAnAccount")
+
+    expect(header).toContain('from "./auth/user-button"')
+    expect(header).toContain('<UserButton size="icon" align="end" />')
+
+    expect(theme).toContain("export const themeStorageKey")
+    expect(theme).toContain('"start-solid-zaidan-theme"')
+    expect(theme).toContain("export const themeScript")
+    expect(theme).toContain("document.documentElement.classList.remove")
+    expect(theme).toContain("document.documentElement.classList.add")
+    expect(theme).toContain("localStorage.getItem(themeStorageKey)")
+    expect(theme).toContain("matchMedia")
+    expect(theme).toContain('addEventListener("storage"')
+
+    expect(rootRoute).toContain('from "@/lib/theme"')
+    expect(rootRoute).toContain("themeScript")
+    expect(rootRoute).toContain("<script>{themeScript}</script>")
+    expect(rootRoute).toContain("syncDocumentThemePreference()")
   })
 
   it("writes registry index and item snapshots only inside the solid namespace", () => {
