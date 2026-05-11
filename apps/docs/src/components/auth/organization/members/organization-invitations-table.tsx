@@ -44,6 +44,10 @@ import { type BaseOrganizationRoles, cn } from "@/lib/utils"
 
 const COLUMN_COUNT = 6
 const SKELETON_ROWS = 4
+const SKELETON_KEYS = Array.from(
+  { length: SKELETON_ROWS },
+  (_, i) => `skeleton-${i}`
+)
 
 const dateFormatter = new Intl.DateTimeFormat("en-US", {
   month: "short",
@@ -169,8 +173,8 @@ export function OrganizationInvitations({
           <TableBody>
             {(() => {
               if (isPending) {
-                return Array.from({ length: SKELETON_ROWS }).map((_, i) => (
-                  <InvitationSkeletonRow key={`skeleton-${i}`} />
+                return SKELETON_KEYS.map((key) => (
+                  <InvitationSkeletonRow key={key} />
                 ))
               }
 

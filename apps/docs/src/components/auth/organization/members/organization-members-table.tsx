@@ -43,6 +43,10 @@ import { cn } from "@/lib/utils"
 
 const COLUMN_COUNT = 5
 const SKELETON_ROWS = 4
+const SKELETON_KEYS = Array.from(
+  { length: SKELETON_ROWS },
+  (_, i) => `skeleton-${i}`
+)
 
 const dateFormatter = new Intl.DateTimeFormat("en-US", {
   month: "short",
@@ -137,8 +141,8 @@ export function OrganizationMembers({ className }: OrganizationMembersProps) {
           <TableBody>
             {(() => {
               if (isPending) {
-                return Array.from({ length: SKELETON_ROWS }).map((_, i) => (
-                  <MemberSkeletonRow key={`skeleton-${i}`} />
+                return SKELETON_KEYS.map((key) => (
+                  <MemberSkeletonRow key={key} />
                 ))
               }
 
