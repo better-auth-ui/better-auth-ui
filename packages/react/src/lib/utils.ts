@@ -1,19 +1,19 @@
+import type { Auth } from "better-auth"
 import { type ClassValue, clsx } from "clsx"
 import { twMerge } from "tailwind-merge"
 import type { AuthClient, OrganizationAuthClient } from "./auth-client"
+import type { OrganizationAuthServer } from "./auth-server"
+
+type OrganizationAuth = OrganizationAuthServer
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
-export function assertAuthClientHasOrganizationOrThrow(
-  authClient: AuthClient
-): asserts authClient is OrganizationAuthClient {
-  if (!authClientHasOrganizationPlugin(authClient)) {
-    throw new Error(
-      "The provided authClient does not have the organization plugin. Please ensure your auth client is created with the organization plugin from better-auth/client/plugins."
-    )
-  }
+export function authHasOrganizationPlugin<T extends Auth>(
+  auth: T
+): auth is T & OrganizationAuth {
+  return "setActiveOrganization" in auth.api
 }
 
 export function authClientHasOrganizationPlugin(
@@ -32,4 +32,24 @@ export function authClientHasOrganizationPlugin(
     atom !== null &&
     typeof (atom as { lc?: unknown }).lc === "number"
   )
+}
+
+export function assertAuthClientHasOrganizationOrThrow(
+  authClient: AuthClient
+): asserts authClient is OrganizationAuthClient {
+  if (!authClientHasOrganizationPlugin(authClient)) {
+    throw new Error(
+      "The provided authClient does not have the organization plugin. Please ensure your auth client is created with the organization plugin from better-auth/client/plugins."
+    )
+  }
+}
+
+export function assertAuthHasOrganizationOrThrow<T extends Auth>(
+  auth: T
+): asserts auth is T & OrganizationAuth {
+  if (!authHasOrganizationPlugin(auth)) {
+    throw new Error(
+      "The provided auth does not have the organization plugin. Please ensure your auth instance is created with the organization plugin from better-auth/plugins."
+    )
+  }
 }

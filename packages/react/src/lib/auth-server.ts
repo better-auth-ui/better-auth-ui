@@ -1,6 +1,11 @@
 import type { passkey } from "@better-auth/passkey"
 import type { Auth } from "better-auth"
-import type { magicLink, multiSession, username } from "better-auth/plugins"
+import type {
+  magicLink,
+  multiSession,
+  organization,
+  username
+} from "better-auth/plugins"
 
 export type AuthServer = Pick<Auth, "api">
 
@@ -8,6 +13,11 @@ export type AuthServer = Pick<Auth, "api">
 // server-side query factories can depend on a narrow `auth` shape that
 // includes the plugin's API surface without requiring the full `betterAuth`
 // return type to be threaded through as a generic.
+
+export type OrganizationAuthServer = Pick<
+  Auth<{ plugins: [ReturnType<typeof organization>] }>,
+  "api"
+>
 
 export type MagicLinkAuthServer = Pick<
   Auth<{ plugins: [ReturnType<typeof magicLink>] }>,
