@@ -3,6 +3,7 @@ import type { passkeyClient } from "@better-auth/passkey/client"
 import type {
   magicLinkClient,
   multiSessionClient,
+  organizationClient,
   usernameClient
 } from "better-auth/client/plugins"
 import type { createAuthClient } from "better-auth/react"
@@ -14,6 +15,12 @@ export type AuthClient = ReturnType<typeof createAuthClient>
 // being honoured by every downstream bundler (RSC graphs, dev builds,
 // Turbopack, older configs, etc.) and keeps the plugin packages out of
 // consumers' runtime bundles entirely.
+
+export type OrganizationAuthClient = ReturnType<
+  typeof createAuthClient<{
+    plugins: [ReturnType<typeof organizationClient<{}>>]
+  }>
+>
 
 export type MagicLinkAuthClient = ReturnType<
   typeof createAuthClient<{ plugins: [ReturnType<typeof magicLinkClient>] }>
