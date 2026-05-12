@@ -338,7 +338,9 @@ describe("Solid auth route component selection", () => {
     expect(settingsComponents).toContain("System")
     expect(settingsComponents).toContain("Light")
     expect(settingsComponents).toContain("Dark")
-    expect(settingsComponents).toContain("Manage accounts")
+    expect(settingsComponents).toContain(
+      "multiSessionLocalization.manageAccounts"
+    )
     expect(settingsComponents).toContain("<ItemGroup")
     expect(settingsComponents).toContain("<ItemMedia")
     expect(settingsComponents).toContain("<ItemContent")
@@ -347,8 +349,10 @@ describe("Solid auth route component selection", () => {
     expect(settingsComponents).toContain("<ItemActions")
     expect(settingsComponents).toContain("<ItemSeparator")
     expect(settingsComponents).toContain("Current session")
-    expect(settingsComponents).toContain("Switch account")
-    expect(settingsComponents).toContain("Sign out")
+    expect(settingsComponents).toContain(
+      "multiSessionLocalization.switchAccount"
+    )
+    expect(settingsComponents).toContain("auth.localization.auth.signOut")
     expect(settingsComponents).toContain("Save changes")
     expect(settingsComponents).toContain("disabled")
     expect(settingsComponents).not.toContain("Plugin account cards")
@@ -358,6 +362,45 @@ describe("Solid auth route component selection", () => {
     )
     expect(settingsComponents).not.toMatch(
       /<User class=|<Mail class=|<Palette class=|<LinkIcon class=/
+    )
+  })
+
+  it("wires manage accounts to Solid multi-session switch and sign-out actions", () => {
+    const settingsComponents = readFileSync(
+      resolve(__dirname, "../src/routes/settings/-route-components.tsx"),
+      "utf8"
+    )
+
+    expect(settingsComponents).toContain("setActiveSessionOptions")
+    expect(settingsComponents).toContain("revokeMultiSessionOptions")
+    expect(settingsComponents).toContain(
+      "const setActiveSession = createMutation"
+    )
+    expect(settingsComponents).toContain(
+      "const revokeMultiSession = createMutation"
+    )
+    expect(settingsComponents).toContain("window.scrollTo({ top: 0 })")
+    expect(settingsComponents).toContain(
+      "auth.localization.settings.revokeSessionSuccess"
+    )
+    expect(settingsComponents).toContain("setActiveSession.mutate({")
+    expect(settingsComponents).toContain("revokeMultiSession.mutate({")
+    expect(settingsComponents).toContain("sessionToken:")
+    expect(settingsComponents).toContain("deviceSession.session.token")
+    expect(settingsComponents).toContain("ArrowLeftRight")
+    expect(settingsComponents).toContain("MoreHorizontal")
+    expect(settingsComponents).toContain("DropdownMenuTrigger")
+    expect(settingsComponents).toContain("DropdownMenuContent")
+    expect(settingsComponents).toContain("DropdownMenuItem")
+    expect(settingsComponents).toContain("auth.localization.auth.signOut")
+    expect(settingsComponents).not.toContain(
+      "Multi-session switch and sign-out actions are shown but disabled until"
+    )
+    expect(settingsComponents).not.toMatch(
+      /<Button disabled size="sm" type="button" variant="secondary">\s*Switch account/
+    )
+    expect(settingsComponents).not.toMatch(
+      /<Button disabled size="sm" type="button" variant="secondary">\s*Sign out/
     )
   })
 
@@ -517,7 +560,7 @@ describe("Solid auth route component selection", () => {
     expect(settingsComponents).toContain("<ItemActions")
     expect(settingsComponents).toContain("<ItemSeparator")
     expect(settingsComponents).toContain("Current session")
-    expect(settingsComponents).toContain("Sign out")
+    expect(settingsComponents).toContain("auth.localization.auth.signOut")
     expect(settingsComponents).toContain("auth.plugins.flatMap")
     expect(settingsComponents).toContain("plugin.securityCards")
     expect(settingsComponents).not.toContain("Plugin security cards")
@@ -692,6 +735,50 @@ describe("Solid auth route component selection", () => {
     )
     expect(settingsComponents).not.toMatch(
       /<Button disabled size="sm" type="button" variant="outline">\s*<LogOut \/>\s*Sign out/
+    )
+  })
+
+  it("wires linked accounts to real Solid account queries and link/unlink parity", () => {
+    const settingsComponents = readFileSync(
+      resolve(__dirname, "../src/routes/settings/-route-components.tsx"),
+      "utf8"
+    )
+
+    expect(settingsComponents).toContain("accountInfoOptions")
+    expect(settingsComponents).toContain("linkSocialOptions")
+    expect(settingsComponents).toContain("unlinkAccountOptions")
+    expect(settingsComponents).toContain("const linkedAccounts = createQuery")
+    expect(settingsComponents).toContain("...listAccountsOptions(")
+    expect(settingsComponents).toContain('providerId !== "credential"')
+    expect(settingsComponents).toContain("const accountInfo = createQuery")
+    expect(settingsComponents).toContain("...accountInfoOptions(")
+    expect(settingsComponents).toContain("account?.accountId")
+    expect(settingsComponents).toContain("const linkSocial = createMutation")
+    expect(settingsComponents).toContain(
+      "...linkSocialOptions(auth.authClient)"
+    )
+    expect(settingsComponents).toContain("provider,")
+    expect(settingsComponents).toContain("callbackURL:")
+    expect(settingsComponents).toContain("window.location.pathname")
+    expect(settingsComponents).toContain("const unlinkAccount = createMutation")
+    expect(settingsComponents).toContain(
+      "...unlinkAccountOptions(auth.authClient)"
+    )
+    expect(settingsComponents).toContain("accountUnlinked")
+    expect(settingsComponents).toContain("providerId: account.providerId")
+    expect(settingsComponents).toContain(
+      "auth.localization.settings.linkProvider"
+    )
+    expect(settingsComponents).toContain(
+      "auth.localization.settings.unlinkProvider"
+    )
+    expect(settingsComponents).toContain("auth.localization.settings.link")
+    expect(settingsComponents).toContain("Link2Off")
+    expect(settingsComponents).not.toContain(
+      "link and unlink mutations are not wired in this Solid slice yet."
+    )
+    expect(settingsComponents).not.toMatch(
+      /<Button disabled size="sm" type="button" variant="outline">\s*<Link2 \/>\s*Link/
     )
   })
 

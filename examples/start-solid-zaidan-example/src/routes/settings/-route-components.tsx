@@ -3,11 +3,16 @@ import {
   getProviderName,
   type SettingsView
 } from "@better-auth-ui/core"
+import { multiSessionLocalization } from "@better-auth-ui/core/plugins"
 import {
+  type AccountInfoParams,
   type ApiKeyAuthClient,
+  accountInfoOptions,
   changeEmailOptions,
   changePasswordOptions,
+  type ListDeviceSessionsData,
   type ListSession,
+  linkSocialOptions,
   listAccountsOptions,
   listApiKeysOptions,
   listDeviceSessionsOptions,
@@ -16,7 +21,10 @@ import {
   type MultiSessionAuthClient,
   type PasskeyAuthClient,
   requestPasswordResetOptions,
+  revokeMultiSessionOptions,
   revokeSessionOptions,
+  setActiveSessionOptions,
+  unlinkAccountOptions,
   updateUserOptions,
   useAuth,
   useSession
@@ -24,13 +32,16 @@ import {
 import { createMutation, createQuery } from "@tanstack/solid-query"
 import Bowser from "bowser"
 import {
+  ArrowLeftRight,
   Eye,
   EyeOff,
   KeyRound,
   Link2,
+  Link2Off,
   LogOut,
   Monitor,
   Moon,
+  MoreHorizontal,
   Plug,
   Smartphone,
   Sun,
@@ -99,6 +110,29 @@ type ChangePasswordFieldErrors = {
   newPassword?: string
 }
 
+type LinkedAccount = {
+  accountId?: string
+  id: string
+  providerId: string
+}
+
+type LinkedProvider = Parameters<typeof getProviderName>[0]
+
+type DeviceSession = NonNullable<
+  ListDeviceSessionsData<MultiSessionAuthClient>
+>[number]
+
+type AccountInfoResponse = {
+  data?: {
+    login?: string | null
+    username?: string | null
+  } | null
+  user?: {
+    email?: string | null
+    name?: string | null
+  } | null
+}
+
 const hasAuthPlugin = (plugins: { id: string }[], id: string) =>
   plugins.some((plugin) => plugin.id === id)
 
@@ -154,14 +188,6 @@ export function shouldLoadLinkedAccounts(props: {
 export const shouldLoadDeviceSessions = shouldLoadLinkedAccounts
 
 export const shouldLoadAccounts = shouldLoadLinkedAccounts
-
-function SettingsUnavailableNotice(props: { children: string }) {
-  return (
-    <p class="rounded-md border border-dashed p-3 text-sm text-muted-foreground">
-      {props.children}
-    </p>
-  )
-}
 
 const getUsername = (session: SettingsSession) =>
   (session.data?.user as { username?: string | null } | undefined)?.username ??
@@ -450,6 +476,15 @@ export function AccountSettings(props: { session: SettingsSession }) {
       userId: userId()
     })
   }))
+  const setActiveSession = createMutation(() => ({
+    ...setActiveSessionOptions(auth.authClient as MultiSessionAuthClient),
+    onSuccess: () => window.scrollTo({ top: 0 })
+  }))
+  const revokeMultiSession = createMutation(() => ({
+    ...revokeMultiSessionOptions(auth.authClient as MultiSessionAuthClient),
+    onSuccess: () =>
+      toast.success(auth.localization.settings.revokeSessionSuccess)
+  }))
   const username = () => getUsername(props.session)
   const displayName = () =>
     resolveUserLabel(
@@ -459,6 +494,28 @@ export function AccountSettings(props: { session: SettingsSession }) {
 
   const isProfilePending = () =>
     updateUser.isPending || isUploadingAvatar() || isDeletingAvatar()
+  const isAccountActionPending = () =>
+    setActiveSession.isPending || revokeMultiSession.isPending
+  const otherDeviceSessions = () => {
+    const sessions = (deviceSessions.data ?? []) as DeviceSession[]
+
+    return sessions.filter(
+      (deviceSession) =>
+        deviceSession.session.id !== props.session.data?.session.id
+    )
+  }
+
+  const switchToSession = (deviceSession: DeviceSession) => {
+    setActiveSession.mutate({
+      sessionToken: deviceSession.session.token
+    } as Parameters<typeof setActiveSession.mutate>[0])
+  }
+
+  const signOutSession = (deviceSession: DeviceSession) => {
+    revokeMultiSession.mutate({
+      sessionToken: deviceSession.session.token
+    } as Parameters<typeof revokeMultiSession.mutate>[0])
+  }
 
   const submitChangeEmail = (event: SubmitEvent) => {
     event.preventDefault()
@@ -700,100 +757,147 @@ export function AccountSettings(props: { session: SettingsSession }) {
       <AppearanceSettings />
 
       <div>
-        <h2 class="mb-3 text-sm font-semibold">Manage accounts</h2>
-        <Card>
+        <h2 class="mb-3 text-sm font-semibold">
+          {multiSessionLocalization.manageAccounts}
+        </h2>
+        <Card class="p-0">
           <CardContent class="p-0">
             <ItemGroup class="gap-0">
-              <Item class="rounded-none p-4">
-                <ItemMedia class="rounded-full bg-transparent">
-                  <Avatar class="size-10 rounded-full bg-muted text-muted-foreground">
-                    <AvatarImage
-                      alt={displayName()}
-                      src={props.session.data?.user.image ?? undefined}
-                    />
-                    <AvatarFallback class="rounded-full bg-muted text-muted-foreground">
-                      {resolveUserInitials(
-                        props.session.data?.user.name,
-                        props.session.data?.user.email
-                      )}
-                    </AvatarFallback>
-                  </Avatar>
-                </ItemMedia>
-                <ItemContent>
-                  <ItemTitle>Current session</ItemTitle>
-                  <ItemDescription>
-                    Signed in as {displayName()}
-                  </ItemDescription>
-                </ItemContent>
-                <ItemActions>
-                  <Button disabled size="sm" type="button" variant="secondary">
-                    Switch account
-                  </Button>
-                  <Button disabled size="sm" type="button" variant="secondary">
-                    Sign out
-                  </Button>
-                </ItemActions>
-              </Item>
+              <ManageAccountRow
+                description={`Signed in as ${displayName()}`}
+                image={props.session.data?.user.image}
+                isBusy={isAccountActionPending()}
+                isCurrentSession
+                name={props.session.data?.user.name}
+                email={props.session.data?.user.email}
+                onSignOut={() => {
+                  const currentSession = props.session.data
 
-              <For each={deviceSessions.data ?? []}>
+                  if (currentSession) {
+                    signOutSession(currentSession as DeviceSession)
+                  }
+                }}
+              />
+
+              <For each={otherDeviceSessions()}>
                 {(deviceSession) => (
-                  <Show
-                    when={
-                      deviceSession.session.id !==
-                      props.session.data?.session.id
-                    }
-                  >
+                  <>
                     <ItemSeparator />
-                    <Item class="rounded-none p-4">
-                      <ItemMedia class="rounded-full bg-transparent">
-                        <Avatar class="size-10 rounded-full bg-muted text-muted-foreground">
-                          <AvatarImage
-                            alt={resolveUserLabel(
-                              deviceSession.user.name,
-                              deviceSession.user.email
-                            )}
-                            src={deviceSession.user.image ?? undefined}
-                          />
-                          <AvatarFallback class="rounded-full bg-muted text-muted-foreground">
-                            {resolveUserInitials(
-                              deviceSession.user.name,
-                              deviceSession.user.email
-                            )}
-                          </AvatarFallback>
-                        </Avatar>
-                      </ItemMedia>
-                      <ItemContent>
-                        <ItemTitle>
-                          {resolveUserLabel(
-                            deviceSession.user.name,
-                            deviceSession.user.email
-                          )}
-                        </ItemTitle>
-                        <ItemDescription>Device session</ItemDescription>
-                      </ItemContent>
-                      <ItemActions>
-                        <Button
-                          disabled
-                          size="sm"
-                          type="button"
-                          variant="secondary"
-                        >
-                          Switch account
-                        </Button>
-                      </ItemActions>
-                    </Item>
-                  </Show>
+                    <ManageAccountRow
+                      description="Device session"
+                      email={deviceSession.user.email}
+                      image={deviceSession.user.image}
+                      isBusy={isAccountActionPending()}
+                      name={deviceSession.user.name}
+                      onSignOut={() => signOutSession(deviceSession)}
+                      onSwitch={() => switchToSession(deviceSession)}
+                    />
+                  </>
                 )}
               </For>
+
+              <Show when={deviceSessions.isPending}>
+                <ItemSeparator />
+                <ManageAccountRowSkeleton />
+              </Show>
             </ItemGroup>
           </CardContent>
         </Card>
-        <SettingsUnavailableNotice>
-          Multi-session switch and sign-out actions are shown but disabled until
-          their Solid settings UI is wired.
-        </SettingsUnavailableNotice>
       </div>
     </div>
+  )
+}
+
+function ManageAccountRow(props: {
+  description: string
+  email?: string | null
+  image?: string | null
+  isBusy: boolean
+  isCurrentSession?: boolean
+  name?: string | null
+  onSignOut: () => void
+  onSwitch?: () => void
+}) {
+  const auth = useAuth()
+  const label = () => resolveUserLabel(props.name, props.email)
+
+  return (
+    <Item class="rounded-none p-0">
+      <ItemMedia class="rounded-full bg-transparent">
+        <Avatar class="size-10 rounded-full bg-muted text-muted-foreground">
+          <AvatarImage alt={label()} src={props.image ?? undefined} />
+          <AvatarFallback class="rounded-full bg-muted text-muted-foreground">
+            {resolveUserInitials(props.name, props.email)}
+          </AvatarFallback>
+        </Avatar>
+      </ItemMedia>
+      <ItemContent class="p-0">
+        <ItemTitle>
+          <Show fallback={label()} when={props.isCurrentSession}>
+            {props.name ? props.name : null}
+          </Show>
+        </ItemTitle>
+        <ItemDescription>{props.email}</ItemDescription>
+      </ItemContent>
+      <ItemActions>
+        <Show
+          fallback={
+            <DropdownMenu>
+              <DropdownMenuTrigger
+                as={Button}
+                class="shrink-0"
+                disabled={props.isBusy}
+                size="icon-sm"
+                variant="ghost"
+              >
+                <MoreHorizontal class="size-4" />
+              </DropdownMenuTrigger>
+
+              <DropdownMenuContent class="min-w-fit">
+                <DropdownMenuItem onSelect={props.onSwitch}>
+                  <ArrowLeftRight class="text-muted-foreground" />
+                  {multiSessionLocalization.switchAccount}
+                </DropdownMenuItem>
+                <DropdownMenuItem onSelect={props.onSignOut}>
+                  <LogOut class="text-muted-foreground" />
+                  {auth.localization.auth.signOut}
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          }
+          when={props.isCurrentSession}
+        >
+          <Button
+            class="shrink-0"
+            disabled={props.isBusy}
+            onClick={props.onSignOut}
+            size="sm"
+            type="button"
+            variant="outline"
+          >
+            <LogOut class="size-4" />
+            {auth.localization.auth.signOut}
+          </Button>
+        </Show>
+      </ItemActions>
+    </Item>
+  )
+}
+
+function ManageAccountRowSkeleton() {
+  return (
+    <Item class="rounded-none p-0">
+      <ItemMedia class="rounded-full bg-transparent">
+        <Skeleton class="size-10 rounded-full" />
+      </ItemMedia>
+      <ItemContent>
+        <Skeleton class="h-4 w-28" />
+        <Skeleton class="h-3 w-20" />
+      </ItemContent>
+      <ItemActions>
+        <Skeleton class="h-8 w-8 rounded-md" />
+      </ItemActions>
+    </Item>
   )
 }
 
@@ -1184,50 +1288,199 @@ function ChangePasswordSettings(props: {
 
 function LinkedAccountsSettings() {
   const auth = useAuth()
+  const session = useSession(auth.authClient)
+  const userId = () => session.data?.user.id
+  const linkedAccounts = createQuery(() => ({
+    ...listAccountsOptions(auth.authClient, userId()),
+    enabled: shouldLoadLinkedAccounts({
+      isSsr: import.meta.env.SSR,
+      userId: userId()
+    })
+  }))
+  const socialProviders = () => auth.socialProviders ?? []
+  const accountRows = () => {
+    const linked = (linkedAccounts.data ?? [])
+      .filter(
+        (account: { providerId?: string }) =>
+          account.providerId !== "credential"
+      )
+      .map((account: LinkedAccount) => ({
+        account,
+        key: account.id,
+        provider: account.providerId as LinkedProvider
+      }))
+
+    return [
+      ...linked,
+      ...socialProviders().map((provider) => ({
+        account: undefined,
+        key: provider,
+        provider: provider as LinkedProvider
+      }))
+    ]
+  }
 
   return (
     <div>
-      <h2 class="mb-3 text-sm font-semibold">Linked accounts</h2>
+      <h2 class="mb-3 text-sm font-semibold">
+        {auth.localization.settings.linkedAccounts}
+      </h2>
 
       <Card class="p-0">
         <CardContent class="p-0">
-          <For each={auth.socialProviders ?? []}>
-            {(provider, index) => (
-              <div
-                class={cn(
-                  "flex items-center justify-between gap-3 p-4 text-sm",
-                  index() > 0 && "border-t"
+          <Show
+            fallback={
+              <For each={socialProviders()}>
+                {(_, index) => (
+                  <>
+                    <Show when={index() > 0}>
+                      <ItemSeparator />
+                    </Show>
+                    <LinkedAccountRowSkeleton />
+                  </>
                 )}
-              >
-                <div class="flex items-center gap-3">
-                  <div class="flex size-10 shrink-0 items-center justify-center rounded-md bg-muted">
-                    <Plug class="size-4.5 opacity-50" />
-                  </div>
-                  <div class="flex min-w-0 flex-col">
-                    <span class="font-medium leading-tight">
-                      {getProviderName(provider)}
-                    </span>
-                    <span class="truncate text-muted-foreground text-xs">
-                      Link {getProviderName(provider)} account
-                    </span>
-                  </div>
-                </div>
-
-                <Button disabled size="sm" type="button" variant="outline">
-                  <Link2 />
-                  Link
-                </Button>
-              </div>
-            )}
-          </For>
+              </For>
+            }
+            when={!linkedAccounts.isPending}
+          >
+            <For each={accountRows()}>
+              {(row, index) => (
+                <>
+                  <Show when={index() > 0}>
+                    <ItemSeparator />
+                  </Show>
+                  <LinkedAccountRow
+                    account={row.account}
+                    provider={row.provider}
+                    userId={userId()}
+                  />
+                </>
+              )}
+            </For>
+          </Show>
         </CardContent>
       </Card>
+    </div>
+  )
+}
 
-      <SettingsUnavailableNotice>
-        Social account linking controls are shown only when social providers are
-        configured; link and unlink mutations are not wired in this Solid slice
-        yet.
-      </SettingsUnavailableNotice>
+function LinkedAccountRow(props: {
+  account?: LinkedAccount
+  provider: LinkedProvider
+  userId?: string
+}) {
+  const auth = useAuth()
+  const providerName = () => getProviderName(props.provider)
+  const accountInfo = createQuery(() => ({
+    ...accountInfoOptions(auth.authClient, props.userId, {
+      query: { accountId: props.account?.accountId }
+    } as AccountInfoParams<typeof auth.authClient>),
+    enabled: Boolean(props.userId && props.account?.accountId)
+  }))
+  const linkSocial = createMutation(() => ({
+    ...linkSocialOptions(auth.authClient)
+  }))
+  const unlinkAccount = createMutation(() => ({
+    ...unlinkAccountOptions(auth.authClient),
+    onSuccess: () => toast.success(auth.localization.settings.accountUnlinked)
+  }))
+  const accountInfoData = () =>
+    accountInfo.data as AccountInfoResponse | undefined
+  const displayName = () =>
+    accountInfoData()?.data?.login ||
+    accountInfoData()?.data?.username ||
+    accountInfoData()?.user?.email ||
+    accountInfoData()?.user?.name ||
+    props.account?.accountId
+  const linkProviderLabel = () =>
+    auth.localization.settings.linkProvider.replace(
+      "{{provider}}",
+      providerName()
+    )
+  const unlinkProviderLabel = () =>
+    auth.localization.settings.unlinkProvider.replace(
+      "{{provider}}",
+      providerName()
+    )
+  const linkProvider = () => {
+    linkSocial.mutate({
+      callbackURL: `${auth.baseURL}${window.location.pathname}`,
+      provider: props.provider
+    } as Parameters<typeof linkSocial.mutate>[0])
+  }
+  const unlinkProvider = (account: LinkedAccount) => {
+    unlinkAccount.mutate({
+      providerId: account.providerId
+    } as Parameters<typeof unlinkAccount.mutate>[0])
+  }
+
+  return (
+    <div class="flex items-center justify-between gap-3 p-4 text-sm">
+      <div class="flex min-w-0 items-center gap-3">
+        <div class="flex size-10 shrink-0 items-center justify-center rounded-md bg-muted">
+          <Plug class={cn("size-4.5", !props.account && "opacity-50")} />
+        </div>
+        <div class="flex min-w-0 flex-col">
+          <span class="font-medium leading-tight">{providerName()}</span>
+          <Show
+            fallback={
+              <span class="truncate text-muted-foreground text-xs">
+                {props.account ? displayName() : linkProviderLabel()}
+              </span>
+            }
+            when={props.account && accountInfo.isPending}
+          >
+            <Skeleton class="my-0.5 h-3 w-24" />
+          </Show>
+        </div>
+      </div>
+
+      <Show
+        fallback={
+          <Button
+            aria-label={linkProviderLabel()}
+            class="ml-auto shrink-0"
+            disabled={linkSocial.isPending}
+            onClick={linkProvider}
+            size="sm"
+            type="button"
+            variant="outline"
+          >
+            <Link2 />
+            {auth.localization.settings.link}
+          </Button>
+        }
+        when={props.account}
+      >
+        {(account) => (
+          <Button
+            aria-label={unlinkProviderLabel()}
+            class="ml-auto shrink-0"
+            disabled={unlinkAccount.isPending}
+            onClick={() => unlinkProvider(account())}
+            size="sm"
+            type="button"
+            variant="outline"
+          >
+            <Link2Off />
+            {auth.localization.settings.unlinkProvider
+              .replace("{{provider}}", "")
+              .trim()}
+          </Button>
+        )}
+      </Show>
+    </div>
+  )
+}
+
+function LinkedAccountRowSkeleton() {
+  return (
+    <div class="flex items-center gap-3 p-4">
+      <Skeleton class="size-10 rounded-md" />
+      <div class="flex flex-col gap-1">
+        <Skeleton class="h-4 w-20" />
+        <Skeleton class="h-3 w-32" />
+      </div>
     </div>
   )
 }
