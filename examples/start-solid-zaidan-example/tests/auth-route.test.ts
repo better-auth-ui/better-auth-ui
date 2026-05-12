@@ -328,8 +328,12 @@ describe("Solid auth route component selection", () => {
     expect(settingsComponents).toContain("getUsername(props.session)")
     expect(settingsComponents).toContain("Profile")
     expect(settingsComponents).toContain("<h2")
-    expect(settingsComponents).toContain("Change email")
-    expect(settingsComponents).toContain("Update email")
+    expect(settingsComponents).toContain(
+      "auth.localization.settings.changeEmail"
+    )
+    expect(settingsComponents).toContain(
+      "auth.localization.settings.updateEmail"
+    )
     expect(settingsComponents).toContain("Appearance")
     expect(settingsComponents).toContain("System")
     expect(settingsComponents).toContain("Light")
@@ -411,6 +415,45 @@ describe("Solid auth route component selection", () => {
     expect(settingsComponents).toContain("avatarDeletedSuccess")
     expect(settingsComponents).toContain("uploadAvatar")
     expect(settingsComponents).toContain("changeAvatar")
+  })
+
+  it("wires change email to the Solid changeEmail mutation like the shadcn account form", () => {
+    const settingsComponents = readFileSync(
+      resolve(__dirname, "../src/routes/settings/-route-components.tsx"),
+      "utf8"
+    )
+
+    expect(settingsComponents).toContain("changeEmailOptions")
+    expect(settingsComponents).toContain("const changeEmail = createMutation")
+    expect(settingsComponents).toContain("onSubmit={submitChangeEmail}")
+    expect(settingsComponents).toContain("const formData = new FormData")
+    expect(settingsComponents).toContain('formData.get("email")')
+    expect(settingsComponents).toContain("newEmail:")
+    expect(settingsComponents).toContain("callbackURL:")
+    expect(settingsComponents).toContain("auth.baseURL")
+    expect(settingsComponents).toContain("auth.viewPaths.settings.account")
+    expect(settingsComponents).toContain(
+      "auth.localization.settings.changeEmail"
+    )
+    expect(settingsComponents).toContain("auth.localization.auth.email")
+    expect(settingsComponents).toContain(
+      "auth.localization.auth.emailPlaceholder"
+    )
+    expect(settingsComponents).toContain(
+      'toast.success("Email updated successfully")'
+    )
+    expect(settingsComponents).not.toContain(
+      "toast.success(auth.localization.settings.changeEmailSuccess)"
+    )
+    expect(settingsComponents).toContain(
+      "auth.localization.settings.updateEmail"
+    )
+    expect(settingsComponents).not.toContain(
+      "Change email mutation is not available in this Solid slice yet."
+    )
+    expect(settingsComponents).not.toMatch(
+      /<Button disabled size="sm" type="button">\s*Update email/
+    )
   })
 
   it("uses the exact shadcn theme preview SVG shapes for the Solid appearance cards", () => {

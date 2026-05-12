@@ -5,6 +5,7 @@ import {
 } from "@better-auth-ui/core"
 import {
   type ApiKeyAuthClient,
+  changeEmailOptions,
   listApiKeysOptions,
   listDeviceSessionsOptions,
   listPasskeysOptions,
@@ -379,6 +380,7 @@ function AppearanceSettings() {
 export function AccountSettings(props: { session: SettingsSession }) {
   const auth = useAuth()
   const [name, setName] = createSignal("")
+  const [emailFieldError, setEmailFieldError] = createSignal<string>()
   const [isUploadingAvatar, setIsUploadingAvatar] = createSignal(false)
   const [isDeletingAvatar, setIsDeletingAvatar] = createSignal(false)
   let avatarFileInput: HTMLInputElement | undefined
@@ -387,6 +389,10 @@ export function AccountSettings(props: { session: SettingsSession }) {
     ...updateUserOptions(auth.authClient),
     onSuccess: () =>
       toast.success(auth.localization.settings.profileUpdatedSuccess)
+  }))
+  const changeEmail = createMutation(() => ({
+    ...changeEmailOptions(auth.authClient),
+    onSuccess: () => toast.success("Email updated successfully")
   }))
   const deviceSessions = createQuery(() => ({
     ...listDeviceSessionsOptions(
@@ -407,6 +413,17 @@ export function AccountSettings(props: { session: SettingsSession }) {
 
   const isProfilePending = () =>
     updateUser.isPending || isUploadingAvatar() || isDeletingAvatar()
+
+  const submitChangeEmail = (event: SubmitEvent) => {
+    event.preventDefault()
+
+    const formData = new FormData(event.currentTarget as HTMLFormElement)
+
+    changeEmail.mutate({
+      callbackURL: `${auth.baseURL}/${auth.viewPaths.settings.account}`,
+      newEmail: String(formData.get("email") ?? "")
+    } as Parameters<typeof changeEmail.mutate>[0])
+  }
 
   const submitProfile = (event: SubmitEvent) => {
     event.preventDefault()
@@ -588,30 +605,50 @@ export function AccountSettings(props: { session: SettingsSession }) {
       </div>
 
       <div>
-        <h2 class="mb-3 text-sm font-semibold">Change email</h2>
-        <Card>
-          <CardContent class="flex flex-col gap-6">
-            <div class="grid gap-2">
-              <Label for="settings-email">Email</Label>
-              <Input
-                autocomplete="email"
-                id="settings-email"
-                name="email"
-                placeholder="you@example.com"
-                type="email"
-                value={props.session.data?.user.email ?? ""}
-              />
-            </div>
-          </CardContent>
-          <CardFooter>
-            <Button disabled size="sm" type="button">
-              Update email
-            </Button>
-          </CardFooter>
-        </Card>
-        <SettingsUnavailableNotice>
-          Change email mutation is not available in this Solid slice yet.
-        </SettingsUnavailableNotice>
+        <h2 class="mb-3 text-sm font-semibold">
+          {auth.localization.settings.changeEmail}
+        </h2>
+        <form onSubmit={submitChangeEmail}>
+          <Card>
+            <CardContent class="flex flex-col gap-6">
+              <div class="grid gap-2">
+                <Label for="settings-email">
+                  {auth.localization.auth.email}
+                </Label>
+                <Input
+                  aria-invalid={!!emailFieldError()}
+                  autocomplete="email"
+                  disabled={changeEmail.isPending || !props.session.data}
+                  id="settings-email"
+                  name="email"
+                  onInput={() => setEmailFieldError(undefined)}
+                  onInvalid={(event) => {
+                    event.preventDefault()
+                    setEmailFieldError(event.currentTarget.validationMessage)
+                  }}
+                  placeholder={auth.localization.auth.emailPlaceholder}
+                  required
+                  type="email"
+                  value={props.session.data?.user.email ?? ""}
+                />
+                <Show when={emailFieldError()}>
+                  {(message) => (
+                    <p class="text-destructive text-sm">{message()}</p>
+                  )}
+                </Show>
+              </div>
+            </CardContent>
+            <CardFooter>
+              <Button
+                disabled={changeEmail.isPending || !props.session.data}
+                size="sm"
+                type="submit"
+              >
+                {auth.localization.settings.updateEmail}
+              </Button>
+            </CardFooter>
+          </Card>
+        </form>
       </div>
 
       <AppearanceSettings />

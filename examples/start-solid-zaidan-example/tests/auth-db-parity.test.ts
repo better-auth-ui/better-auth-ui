@@ -51,6 +51,16 @@ describe("Solid auth database parity", () => {
     expect(solidAuth).not.toContain('"*"')
   })
 
+  it("enables Better Auth changeEmail on the server so the settings form can submit", () => {
+    const solidAuth = readExampleFile("src/lib/auth.ts")
+
+    expect(solidAuth).toContain("changeEmail:")
+    expect(solidAuth).toContain("enabled: true")
+    expect(solidAuth).toContain("updateEmailWithoutVerification: true")
+    expect(solidAuth).not.toContain("change email disabled")
+    expect(solidAuth).not.toContain("Verification email isn't enabled")
+  })
+
   it("declares the same Neon/Drizzle environment contract for local DATABASE_URL", () => {
     const db = readExampleFile("src/lib/db.ts")
     const schema = readExampleFile("src/lib/schema.ts")

@@ -34,6 +34,10 @@ const authOptions = {
   trustedOrigins:
     process.env.NODE_ENV === "production" ? [] : localDevTrustedOrigins,
   user: {
+    changeEmail: {
+      enabled: true,
+      updateEmailWithoutVerification: true
+    },
     deleteUser: {
       enabled: true
     }
