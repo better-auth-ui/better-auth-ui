@@ -358,6 +358,61 @@ describe("Solid auth route component selection", () => {
     )
   })
 
+  it("wires profile save to Solid updateUser mutation like the shadcn user profile", () => {
+    const settingsComponents = readFileSync(
+      resolve(__dirname, "../src/routes/settings/-route-components.tsx"),
+      "utf8"
+    )
+
+    expect(settingsComponents).toContain("updateUserOptions")
+    expect(settingsComponents).toContain("createMutation")
+    expect(settingsComponents).toContain("const updateUser = createMutation")
+    expect(settingsComponents).toContain("onSubmit={submitProfile}")
+    expect(settingsComponents).toContain("const formData = new FormData")
+    expect(settingsComponents).toContain('formData.get("name")')
+    expect(settingsComponents).toContain('formData.get("username")')
+    expect(settingsComponents).toContain("updateUser.mutate({")
+    expect(settingsComponents).toContain("name,")
+    expect(settingsComponents).toContain("username")
+    expect(settingsComponents).toContain("profileUpdatedSuccess")
+    expect(settingsComponents).not.toContain(
+      "Profile and avatar update mutations are not available in this Solid"
+    )
+    expect(settingsComponents).not.toMatch(
+      /<Button disabled size="sm" type="button">\s*Save changes/
+    )
+  })
+
+  it("wires avatar upload and delete to Solid updateUser mutation like shadcn ChangeAvatar", () => {
+    const settingsComponents = readFileSync(
+      resolve(__dirname, "../src/routes/settings/-route-components.tsx"),
+      "utf8"
+    )
+
+    expect(settingsComponents).toContain("fileToBase64")
+    expect(settingsComponents).toContain('import { toast } from "solid-sonner"')
+    expect(settingsComponents).toContain("DropdownMenu")
+    expect(settingsComponents).toContain("DropdownMenuContent")
+    expect(settingsComponents).toContain("DropdownMenuItem")
+    expect(settingsComponents).toContain("DropdownMenuTrigger")
+    expect(settingsComponents).toContain("Upload")
+    expect(settingsComponents).toContain("Trash2")
+    expect(settingsComponents).toContain('type="file"')
+    expect(settingsComponents).toContain('accept="image/*"')
+    expect(settingsComponents).toContain("handleAvatarFileChange")
+    expect(settingsComponents).toContain("auth.avatar.resize")
+    expect(settingsComponents).toContain("auth.avatar.upload")
+    expect(settingsComponents).toContain("updateUser.mutate(")
+    expect(settingsComponents).toContain("{ image },")
+    expect(settingsComponents).toContain("avatarChangedSuccess")
+    expect(settingsComponents).toContain("deleteAvatar")
+    expect(settingsComponents).toContain("{ image: null },")
+    expect(settingsComponents).toContain("auth.avatar.delete")
+    expect(settingsComponents).toContain("avatarDeletedSuccess")
+    expect(settingsComponents).toContain("uploadAvatar")
+    expect(settingsComponents).toContain("changeAvatar")
+  })
+
   it("uses the exact shadcn theme preview SVG shapes for the Solid appearance cards", () => {
     const settingsComponents = readFileSync(
       resolve(__dirname, "../src/routes/settings/-route-components.tsx"),
