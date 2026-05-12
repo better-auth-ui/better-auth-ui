@@ -4,6 +4,14 @@ import { viewPaths } from "@better-auth-ui/core"
 import { describe, expect, it } from "vitest"
 import { ForgotPassword } from "../src/components/auth/forgot-password"
 import { ResetPassword } from "../src/components/auth/reset-password"
+import {
+  resolveUserInitials,
+  resolveUserLabel,
+  shouldLoadAccounts as shouldLoadAccountsFromShared,
+  shouldLoadDeviceSessions as shouldLoadDeviceSessionsFromShared,
+  shouldLoadLinkedAccounts as shouldLoadLinkedAccountsFromShared,
+  timeAgo
+} from "../src/components/auth/settings/shared/helpers"
 import { SignIn } from "../src/components/auth/sign-in"
 import {
   resolveSignInPath,
@@ -15,8 +23,7 @@ import { resolveAuthRoute } from "../src/routes/auth/-route-components"
 import {
   AccountSettings,
   resolveSettingsRoute,
-  SecuritySettings,
-  shouldLoadLinkedAccounts
+  SecuritySettings
 } from "../src/routes/settings/-route-components"
 
 describe("Solid auth route component selection", () => {
@@ -190,13 +197,84 @@ describe("Solid auth route component selection", () => {
   })
 
   it("loads linked accounts only after a client session user is known", () => {
-    expect(shouldLoadLinkedAccounts({ isSsr: true, userId: "user-1" })).toBe(
-      false
+    expect(
+      shouldLoadLinkedAccountsFromShared({ isSsr: true, userId: "user-1" })
+    ).toBe(false)
+    expect(shouldLoadLinkedAccountsFromShared({ isSsr: false })).toBe(false)
+    expect(
+      shouldLoadLinkedAccountsFromShared({ isSsr: false, userId: "user-1" })
+    ).toBe(true)
+  })
+
+  it("keeps shared settings load guards behavior-compatible in the shared settings module", () => {
+    const blockedBySsr = { isSsr: true, userId: "user-1" }
+    const blockedWithoutUser = { isSsr: false }
+    const loadableClientUser = { isSsr: false, userId: "user-1" }
+
+    expect(shouldLoadAccountsFromShared(blockedBySsr)).toBe(false)
+    expect(shouldLoadAccountsFromShared(blockedWithoutUser)).toBe(false)
+    expect(shouldLoadAccountsFromShared(loadableClientUser)).toBe(true)
+    expect(shouldLoadDeviceSessionsFromShared(loadableClientUser)).toBe(true)
+    expect(shouldLoadLinkedAccountsFromShared(loadableClientUser)).toBe(true)
+  })
+
+  it("moves settings label and time helpers into the shared settings module", () => {
+    expect(resolveUserLabel("  Ada Lovelace  ", "ada@example.com")).toBe(
+      "Ada Lovelace"
     )
-    expect(shouldLoadLinkedAccounts({ isSsr: false })).toBe(false)
-    expect(shouldLoadLinkedAccounts({ isSsr: false, userId: "user-1" })).toBe(
-      true
+    expect(resolveUserLabel("", "  ada@example.com  ")).toBe("ada@example.com")
+    expect(resolveUserInitials("Ada Lovelace", "ada@example.com")).toBe("AD")
+
+    expect(timeAgo(new Date(Date.now() - 2 * 60 * 1000))).toBe("2 minutes ago")
+  })
+
+  it("keeps the route compatibility facade minimal while shared contracts live in the extracted module", () => {
+    const settingsRoute = readFileSync(
+      resolve(__dirname, "../src/routes/settings/$path.tsx"),
+      "utf8"
     )
+    const settingsComponents = readFileSync(
+      resolve(__dirname, "../src/routes/settings/-route-components.tsx"),
+      "utf8"
+    )
+    const sharedHelpers = readFileSync(
+      resolve(__dirname, "../src/components/auth/settings/shared/helpers.ts"),
+      "utf8"
+    )
+    const sharedTypes = readFileSync(
+      resolve(__dirname, "../src/components/auth/settings/shared/types.ts"),
+      "utf8"
+    )
+
+    expect(settingsRoute).toContain(
+      'import { Settings } from "@/routes/settings/-route-components"'
+    )
+    expect(settingsComponents).toContain("export const Settings =")
+    expect(settingsComponents).toContain("export const SecuritySettings =")
+    expect(settingsComponents).toContain("export const resolveSettingsRoute =")
+    expect(settingsComponents).toContain(
+      'export { AccountSettings } from "@/components/auth/settings/account/account-settings"'
+    )
+    expect(settingsComponents).not.toContain(
+      'from "@/components/auth/settings/shared/helpers"'
+    )
+    expect(settingsComponents).not.toContain(
+      'from "@/components/auth/settings/shared/types"'
+    )
+    expect(settingsComponents).not.toContain("shouldLoadAccounts")
+    expect(settingsComponents).not.toContain("shouldLoadDeviceSessions")
+    expect(settingsComponents).not.toContain("shouldLoadLinkedAccounts")
+    expect(settingsComponents).not.toContain("SettingsRouteResolution")
+    expect(settingsComponents).not.toContain(
+      "function shouldLoadLinkedAccounts"
+    )
+    expect(sharedHelpers).toContain("function shouldLoadLinkedAccounts")
+    expect(sharedHelpers).toContain("resolveUserLabel")
+    expect(sharedHelpers).toContain("resolveUserInitials")
+    expect(sharedHelpers).toContain("function timeAgo")
+    expect(sharedTypes).toContain("export type SettingsSession")
+    expect(sharedTypes).toContain("export type SettingsRouteResolution")
+    expect(sharedTypes).toContain("export type ListedPasskey")
   })
 
   it("keeps Solid settings route validation route-level and shares the auth client", () => {
@@ -224,47 +302,67 @@ describe("Solid auth route component selection", () => {
       resolve(__dirname, "../src/routes/settings/-route-components.tsx"),
       "utf8"
     )
+    const settingsShell = readFileSync(
+      resolve(__dirname, "../src/components/auth/settings/settings.tsx"),
+      "utf8"
+    )
 
     expect(settingsRoute).not.toContain("ensureSession")
     expect(settingsRoute).not.toContain("redirect")
     expect(settingsRoute).not.toContain("async beforeLoad")
     expect(settingsComponents).not.toContain("useAuthenticate")
     expect(settingsComponents).not.toContain("useListAccounts")
-    expect(settingsComponents).toContain("createEffect")
-    expect(settingsComponents).toContain("auth.navigate")
-    expect(settingsComponents).toContain("shouldLoadLinkedAccounts")
-    expect(settingsComponents).toContain("shouldLoadDeviceSessions")
-    expect(settingsComponents).toContain("listDeviceSessionsOptions")
+    expect(settingsShell).toContain("createEffect")
+    expect(settingsShell).toContain("auth.navigate")
+    expect(settingsShell).toContain("createSettingsComponent")
+    expect(settingsShell).toContain("createSettingsRouteResolver")
+    expect(settingsComponents).toContain("createSettingsComponent({")
+    expect(settingsComponents).toContain("createSettingsRouteResolver({")
+    expect(
+      readFileSync(
+        resolve(
+          __dirname,
+          "../src/components/auth/settings/account/account-settings.tsx"
+        ),
+        "utf8"
+      )
+    ).toContain("listDeviceSessionsOptions")
   })
 
-  it("uses Zaidan Tabs for settings navigation without document anchors", () => {
+  it("extracts Zaidan Tabs settings navigation into the settings shell without document anchors", () => {
     const settingsComponents = readFileSync(
       resolve(__dirname, "../src/routes/settings/-route-components.tsx"),
       "utf8"
     )
+    const settingsShell = readFileSync(
+      resolve(__dirname, "../src/components/auth/settings/settings.tsx"),
+      "utf8"
+    )
 
-    expect(settingsComponents).toContain(
+    expect(settingsShell).toContain(
       'import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"'
     )
-    expect(settingsComponents).toContain("<Tabs")
-    expect(settingsComponents).toContain("<TabsList")
-    expect(settingsComponents).toContain("<TabsTrigger")
-    expect(settingsComponents).toContain("<TabsContent")
-    expect(settingsComponents).toContain("value={currentView()}")
-    expect(settingsComponents).toContain("onChange={handleSettingsTabChange}")
-    expect(settingsComponents).toContain("auth.navigate({")
-    expect(settingsComponents).toContain(
+    expect(settingsShell).toContain("<Tabs")
+    expect(settingsShell).toContain("<TabsList")
+    expect(settingsShell).toContain("<TabsTrigger")
+    expect(settingsShell).toContain("<TabsContent")
+    expect(settingsShell).toContain("value={props.currentView}")
+    expect(settingsShell).toContain("onChange={props.onTabChange}")
+    expect(settingsShell).toContain("auth.navigate({")
+    expect(settingsShell).toContain(
       'class={cn("w-full gap-4 md:gap-6", props.class)}'
     )
-    expect(settingsComponents).toContain("<div>")
-    expect(settingsComponents).not.toContain("<nav")
-    expect(settingsComponents).not.toContain(
-      "Manage account and security settings"
+    expect(settingsShell).toContain("<div>")
+    expect(settingsShell).not.toContain("<nav")
+    expect(settingsShell).not.toContain("Manage account and security settings")
+    expect(settingsShell).not.toMatch(/<h1[^>]*>/)
+    expect(settingsShell).not.toMatch(/<a\s/)
+    expect(settingsShell).not.toMatch(/href=\{`\$\{auth\.basePaths\.settings\}/)
+    expect(settingsComponents).toContain(
+      'from "@/components/auth/settings/settings"'
     )
-    expect(settingsComponents).not.toMatch(/<h1[^>]*>/)
-    expect(settingsComponents).not.toMatch(/<a\s/)
-    expect(settingsComponents).not.toMatch(
-      /href=\{`\$\{auth\.basePaths\.settings\}/
+    expect(settingsComponents).not.toContain(
+      'import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"'
     )
   })
 
@@ -319,44 +417,73 @@ describe("Solid auth route component selection", () => {
       resolve(__dirname, "../src/routes/settings/-route-components.tsx"),
       "utf8"
     )
+    const accountSettings = readFileSync(
+      resolve(
+        __dirname,
+        "../src/components/auth/settings/account/account-settings.tsx"
+      ),
+      "utf8"
+    )
+    const userProfile = readFileSync(
+      resolve(
+        __dirname,
+        "../src/components/auth/settings/account/user-profile.tsx"
+      ),
+      "utf8"
+    )
+    const changeEmail = readFileSync(
+      resolve(
+        __dirname,
+        "../src/components/auth/settings/account/change-email.tsx"
+      ),
+      "utf8"
+    )
+    const appearanceSettings = readFileSync(
+      resolve(
+        __dirname,
+        "../src/components/auth/settings/account/appearance-settings.tsx"
+      ),
+      "utf8"
+    )
+    const manageAccountRow = readFileSync(
+      resolve(
+        __dirname,
+        "../src/components/auth/settings/account/manage-account-row.tsx"
+      ),
+      "utf8"
+    )
 
-    expect(settingsComponents).toContain("useAuth")
-    expect(settingsComponents).toContain("useSession")
-    expect(settingsComponents).toContain("session.data?.user.name")
-    expect(settingsComponents).toContain("session.data?.user.email")
-    expect(settingsComponents).toContain("username?: string | null")
-    expect(settingsComponents).toContain("getUsername(props.session)")
-    expect(settingsComponents).toContain("Profile")
-    expect(settingsComponents).toContain("<h2")
     expect(settingsComponents).toContain(
-      "auth.localization.settings.changeEmail"
+      'from "@/components/auth/settings/account/account-settings"'
     )
-    expect(settingsComponents).toContain(
-      "auth.localization.settings.updateEmail"
-    )
-    expect(settingsComponents).toContain("Appearance")
-    expect(settingsComponents).toContain("System")
-    expect(settingsComponents).toContain("Light")
-    expect(settingsComponents).toContain("Dark")
-    expect(settingsComponents).toContain(
-      "multiSessionLocalization.manageAccounts"
-    )
-    expect(settingsComponents).toContain("<ItemGroup")
-    expect(settingsComponents).toContain("<ItemMedia")
-    expect(settingsComponents).toContain("<ItemContent")
-    expect(settingsComponents).toContain("<ItemTitle")
-    expect(settingsComponents).toContain("<ItemDescription")
-    expect(settingsComponents).toContain("<ItemActions")
-    expect(settingsComponents).toContain("<ItemSeparator")
-    expect(settingsComponents).toContain(
-      "auth.localization.settings.currentSession"
-    )
-    expect(settingsComponents).toContain(
-      "multiSessionLocalization.switchAccount"
-    )
-    expect(settingsComponents).toContain("auth.localization.auth.signOut")
-    expect(settingsComponents).toContain("Save changes")
-    expect(settingsComponents).toContain("disabled")
+    expect(settingsComponents).toContain("AccountSettings,")
+    expect(settingsComponents).not.toContain("function AppearanceSettings")
+    expect(settingsComponents).not.toContain("function ManageAccountRow")
+    expect(accountSettings).toContain("useAuth")
+    expect(accountSettings).toContain("session.data?.user.name")
+    expect(accountSettings).toContain("session.data?.user.email")
+    expect(accountSettings).toContain("getUsername(props.session)")
+    expect(accountSettings).toContain("username?: string | null")
+    expect(userProfile).toContain("Profile")
+    expect(userProfile).toContain("<h2")
+    expect(changeEmail).toContain("auth.localization.settings.changeEmail")
+    expect(changeEmail).toContain("auth.localization.settings.updateEmail")
+    expect(appearanceSettings).toContain("Appearance")
+    expect(appearanceSettings).toContain("System")
+    expect(appearanceSettings).toContain("Light")
+    expect(appearanceSettings).toContain("Dark")
+    expect(accountSettings).toContain("multiSessionLocalization.manageAccounts")
+    expect(accountSettings).toContain("<ItemGroup")
+    expect(manageAccountRow).toContain("<ItemMedia")
+    expect(manageAccountRow).toContain("<ItemContent")
+    expect(manageAccountRow).toContain("<ItemTitle")
+    expect(manageAccountRow).toContain("<ItemDescription")
+    expect(manageAccountRow).toContain("<ItemActions")
+    expect(accountSettings).toContain("<ItemSeparator")
+    expect(manageAccountRow).toContain("multiSessionLocalization.switchAccount")
+    expect(manageAccountRow).toContain("auth.localization.auth.signOut")
+    expect(userProfile).toContain("Save changes")
+    expect(userProfile).toContain("disabled")
     expect(settingsComponents).not.toContain("Plugin account cards")
     expect(settingsComponents).not.toContain("Social accounts")
     expect(settingsComponents).not.toMatch(
@@ -368,163 +495,175 @@ describe("Solid auth route component selection", () => {
   })
 
   it("wires manage accounts to Solid multi-session switch and sign-out actions", () => {
-    const settingsComponents = readFileSync(
-      resolve(__dirname, "../src/routes/settings/-route-components.tsx"),
+    const accountSettings = readFileSync(
+      resolve(
+        __dirname,
+        "../src/components/auth/settings/account/account-settings.tsx"
+      ),
+      "utf8"
+    )
+    const manageAccountRow = readFileSync(
+      resolve(
+        __dirname,
+        "../src/components/auth/settings/account/manage-account-row.tsx"
+      ),
       "utf8"
     )
 
-    expect(settingsComponents).toContain("setActiveSessionOptions")
-    expect(settingsComponents).toContain("revokeMultiSessionOptions")
-    expect(settingsComponents).toContain(
-      "const setActiveSession = createMutation"
-    )
-    expect(settingsComponents).toContain(
+    expect(accountSettings).toContain("setActiveSessionOptions")
+    expect(accountSettings).toContain("revokeMultiSessionOptions")
+    expect(accountSettings).toContain("const setActiveSession = createMutation")
+    expect(accountSettings).toContain(
       "const revokeMultiSession = createMutation"
     )
-    expect(settingsComponents).toContain("window.scrollTo({ top: 0 })")
-    expect(settingsComponents).toContain(
+    expect(accountSettings).toContain("window.scrollTo({ top: 0 })")
+    expect(accountSettings).toContain(
       "auth.localization.settings.revokeSessionSuccess"
     )
-    expect(settingsComponents).toContain("setActiveSession.mutate({")
-    expect(settingsComponents).toContain("revokeMultiSession.mutate({")
-    expect(settingsComponents).toContain("sessionToken:")
-    expect(settingsComponents).toContain("deviceSession.session.token")
-    expect(settingsComponents).toContain("ArrowLeftRight")
-    expect(settingsComponents).toContain("MoreHorizontal")
-    expect(settingsComponents).toContain("DropdownMenuTrigger")
-    expect(settingsComponents).toContain("DropdownMenuContent")
-    expect(settingsComponents).toContain("DropdownMenuItem")
-    expect(settingsComponents).toContain("auth.localization.auth.signOut")
-    expect(settingsComponents).not.toContain(
+    expect(accountSettings).toContain("setActiveSession.mutate({")
+    expect(accountSettings).toContain("revokeMultiSession.mutate({")
+    expect(accountSettings).toContain("sessionToken:")
+    expect(accountSettings).toContain("deviceSession.session.token")
+    expect(manageAccountRow).toContain("ArrowLeftRight")
+    expect(manageAccountRow).toContain("MoreHorizontal")
+    expect(manageAccountRow).toContain("DropdownMenuTrigger")
+    expect(manageAccountRow).toContain("DropdownMenuContent")
+    expect(manageAccountRow).toContain("DropdownMenuItem")
+    expect(manageAccountRow).toContain("auth.localization.auth.signOut")
+    expect(accountSettings).not.toContain(
       "Multi-session switch and sign-out actions are shown but disabled until"
     )
-    expect(settingsComponents).not.toMatch(
+    expect(accountSettings).not.toMatch(
       /<Button disabled size="sm" type="button" variant="secondary">\s*Switch account/
     )
-    expect(settingsComponents).not.toMatch(
+    expect(accountSettings).not.toMatch(
       /<Button disabled size="sm" type="button" variant="secondary">\s*Sign out/
     )
   })
 
   it("wires profile save to Solid updateUser mutation like the shadcn user profile", () => {
-    const settingsComponents = readFileSync(
-      resolve(__dirname, "../src/routes/settings/-route-components.tsx"),
+    const userProfile = readFileSync(
+      resolve(
+        __dirname,
+        "../src/components/auth/settings/account/user-profile.tsx"
+      ),
       "utf8"
     )
 
-    expect(settingsComponents).toContain("updateUserOptions")
-    expect(settingsComponents).toContain("createMutation")
-    expect(settingsComponents).toContain("const updateUser = createMutation")
-    expect(settingsComponents).toContain("onSubmit={submitProfile}")
-    expect(settingsComponents).toContain("const formData = new FormData")
-    expect(settingsComponents).toContain('formData.get("name")')
-    expect(settingsComponents).toContain('formData.get("username")')
-    expect(settingsComponents).toContain("updateUser.mutate({")
-    expect(settingsComponents).toContain("name,")
-    expect(settingsComponents).toContain("username")
-    expect(settingsComponents).toContain("profileUpdatedSuccess")
-    expect(settingsComponents).not.toContain(
+    expect(userProfile).toContain("updateUserOptions")
+    expect(userProfile).toContain("createMutation")
+    expect(userProfile).toContain("const updateUser = createMutation")
+    expect(userProfile).toContain("onSubmit={submitProfile}")
+    expect(userProfile).toContain("const formData = new FormData")
+    expect(userProfile).toContain('formData.get("name")')
+    expect(userProfile).toContain('formData.get("username")')
+    expect(userProfile).toContain("updateUser.mutate({")
+    expect(userProfile).toContain("name,")
+    expect(userProfile).toContain("username")
+    expect(userProfile).toContain("profileUpdatedSuccess")
+    expect(userProfile).not.toContain(
       "Profile and avatar update mutations are not available in this Solid"
     )
-    expect(settingsComponents).not.toMatch(
+    expect(userProfile).not.toMatch(
       /<Button disabled size="sm" type="button">\s*Save changes/
     )
   })
 
   it("wires avatar upload and delete to Solid updateUser mutation like shadcn ChangeAvatar", () => {
-    const settingsComponents = readFileSync(
-      resolve(__dirname, "../src/routes/settings/-route-components.tsx"),
+    const userProfile = readFileSync(
+      resolve(
+        __dirname,
+        "../src/components/auth/settings/account/user-profile.tsx"
+      ),
       "utf8"
     )
 
-    expect(settingsComponents).toContain("fileToBase64")
-    expect(settingsComponents).toContain('import { toast } from "solid-sonner"')
-    expect(settingsComponents).toContain("DropdownMenu")
-    expect(settingsComponents).toContain("DropdownMenuContent")
-    expect(settingsComponents).toContain("DropdownMenuItem")
-    expect(settingsComponents).toContain("DropdownMenuTrigger")
-    expect(settingsComponents).toContain("Upload")
-    expect(settingsComponents).toContain("Trash2")
-    expect(settingsComponents).toContain('type="file"')
-    expect(settingsComponents).toContain('accept="image/*"')
-    expect(settingsComponents).toContain("handleAvatarFileChange")
-    expect(settingsComponents).toContain("auth.avatar.resize")
-    expect(settingsComponents).toContain("auth.avatar.upload")
-    expect(settingsComponents).toContain("updateUser.mutate(")
-    expect(settingsComponents).toContain("{ image },")
-    expect(settingsComponents).toContain("avatarChangedSuccess")
-    expect(settingsComponents).toContain("deleteAvatar")
-    expect(settingsComponents).toContain("{ image: null },")
-    expect(settingsComponents).toContain("auth.avatar.delete")
-    expect(settingsComponents).toContain("avatarDeletedSuccess")
-    expect(settingsComponents).toContain("uploadAvatar")
-    expect(settingsComponents).toContain("changeAvatar")
+    expect(userProfile).toContain("fileToBase64")
+    expect(userProfile).toContain('import { toast } from "solid-sonner"')
+    expect(userProfile).toContain("DropdownMenu")
+    expect(userProfile).toContain("DropdownMenuContent")
+    expect(userProfile).toContain("DropdownMenuItem")
+    expect(userProfile).toContain("DropdownMenuTrigger")
+    expect(userProfile).toContain("Upload")
+    expect(userProfile).toContain("Trash2")
+    expect(userProfile).toContain('type="file"')
+    expect(userProfile).toContain('accept="image/*"')
+    expect(userProfile).toContain("handleAvatarFileChange")
+    expect(userProfile).toContain("auth.avatar.resize")
+    expect(userProfile).toContain("auth.avatar.upload")
+    expect(userProfile).toContain("updateUser.mutate(")
+    expect(userProfile).toContain("{ image },")
+    expect(userProfile).toContain("avatarChangedSuccess")
+    expect(userProfile).toContain("deleteAvatar")
+    expect(userProfile).toContain("{ image: null },")
+    expect(userProfile).toContain("auth.avatar.delete")
+    expect(userProfile).toContain("avatarDeletedSuccess")
+    expect(userProfile).toContain("uploadAvatar")
+    expect(userProfile).toContain("changeAvatar")
   })
 
   it("wires change email to the Solid changeEmail mutation like the shadcn account form", () => {
-    const settingsComponents = readFileSync(
-      resolve(__dirname, "../src/routes/settings/-route-components.tsx"),
+    const changeEmail = readFileSync(
+      resolve(
+        __dirname,
+        "../src/components/auth/settings/account/change-email.tsx"
+      ),
       "utf8"
     )
 
-    expect(settingsComponents).toContain("changeEmailOptions")
-    expect(settingsComponents).toContain("const changeEmail = createMutation")
-    expect(settingsComponents).toContain("onSubmit={submitChangeEmail}")
-    expect(settingsComponents).toContain("const formData = new FormData")
-    expect(settingsComponents).toContain('formData.get("email")')
-    expect(settingsComponents).toContain("newEmail:")
-    expect(settingsComponents).toContain("callbackURL:")
-    expect(settingsComponents).toContain("auth.baseURL")
-    expect(settingsComponents).toContain("auth.viewPaths.settings.account")
-    expect(settingsComponents).toContain(
-      "auth.localization.settings.changeEmail"
-    )
-    expect(settingsComponents).toContain("auth.localization.auth.email")
-    expect(settingsComponents).toContain(
-      "auth.localization.auth.emailPlaceholder"
-    )
-    expect(settingsComponents).toContain(
-      'toast.success("Email updated successfully")'
-    )
-    expect(settingsComponents).not.toContain(
+    expect(changeEmail).toContain("changeEmailOptions")
+    expect(changeEmail).toContain("const changeEmail = createMutation")
+    expect(changeEmail).toContain("onSubmit={submitChangeEmail}")
+    expect(changeEmail).toContain("const formData = new FormData")
+    expect(changeEmail).toContain('formData.get("email")')
+    expect(changeEmail).toContain("newEmail:")
+    expect(changeEmail).toContain("callbackURL:")
+    expect(changeEmail).toContain("auth.baseURL")
+    expect(changeEmail).toContain("auth.viewPaths.settings.account")
+    expect(changeEmail).toContain("auth.localization.settings.changeEmail")
+    expect(changeEmail).toContain("auth.localization.auth.email")
+    expect(changeEmail).toContain("auth.localization.auth.emailPlaceholder")
+    expect(changeEmail).toContain('toast.success("Email updated successfully")')
+    expect(changeEmail).not.toContain(
       "toast.success(auth.localization.settings.changeEmailSuccess)"
     )
-    expect(settingsComponents).toContain(
-      "auth.localization.settings.updateEmail"
-    )
-    expect(settingsComponents).not.toContain(
+    expect(changeEmail).toContain("auth.localization.settings.updateEmail")
+    expect(changeEmail).not.toContain(
       "Change email mutation is not available in this Solid slice yet."
     )
-    expect(settingsComponents).not.toMatch(
+    expect(changeEmail).not.toMatch(
       /<Button disabled size="sm" type="button">\s*Update email/
     )
   })
 
   it("uses the exact shadcn theme preview SVG shapes for the Solid appearance cards", () => {
-    const settingsComponents = readFileSync(
-      resolve(__dirname, "../src/routes/settings/-route-components.tsx"),
+    const appearanceSettings = readFileSync(
+      resolve(
+        __dirname,
+        "../src/components/auth/settings/account/appearance-settings.tsx"
+      ),
       "utf8"
     )
 
-    expect(settingsComponents).toContain("ThemePreviewSystem")
-    expect(settingsComponents).toContain("ThemePreviewLight")
-    expect(settingsComponents).toContain("ThemePreviewDark")
-    expect(settingsComponents).toContain('viewBox="0 0 240 117"')
-    expect(settingsComponents).toContain("systemDiagonalLight")
-    expect(settingsComponents).toContain("systemDiagonalDark")
-    expect(settingsComponents).toContain(
+    expect(appearanceSettings).toContain("ThemePreviewSystem")
+    expect(appearanceSettings).toContain("ThemePreviewLight")
+    expect(appearanceSettings).toContain("ThemePreviewDark")
+    expect(appearanceSettings).toContain('viewBox="0 0 240 117"')
+    expect(appearanceSettings).toContain("systemDiagonalLight")
+    expect(appearanceSettings).toContain("systemDiagonalDark")
+    expect(appearanceSettings).toContain(
       'd="M12 0.5H228C234.351 0.5 239.5 5.64873 239.5 12V105C239.5 111.351 234.351 116.5 228 116.5H12C5.64873 116.5 0.5 111.351 0.5 105V12C0.5 5.64873 5.64873 0.5 12 0.5Z"'
     )
-    expect(settingsComponents).toContain(
+    expect(appearanceSettings).toContain(
       'd="M88 51C88 46.5817 91.5817 43 96 43H221C225.418 43 229 46.5817 229 51V85C229 89.4183 225.418 93 221 93H96C91.5817 93 88 89.4183 88 85V51Z"'
     )
-    expect(settingsComponents).toContain(
+    expect(appearanceSettings).toContain(
       '<circle cx="22.5" cy="25.5" fill="#E4E4E7" r="5.5" />'
     )
-    expect(settingsComponents).toContain(
+    expect(appearanceSettings).toContain(
       '<circle cx="22.5" cy="25.5" fill="#3F3F46" r="5.5" />'
     )
-    expect(settingsComponents).not.toContain(
+    expect(appearanceSettings).not.toContain(
       "bg-gradient-to-r from-background to-slate-950"
     )
   })
@@ -534,39 +673,72 @@ describe("Solid auth route component selection", () => {
       resolve(__dirname, "../src/routes/settings/-route-components.tsx"),
       "utf8"
     )
-
-    expect(settingsComponents).toContain("auth.emailAndPassword?.enabled")
-    expect(settingsComponents).toContain("<ChangePasswordSettings")
-    expect(settingsComponents).toContain(
-      "auth.emailAndPassword.confirmPassword"
+    const securitySettings = readFileSync(
+      resolve(
+        __dirname,
+        "../src/components/auth/settings/security/security-settings.tsx"
+      ),
+      "utf8"
     )
+    const changePassword = readFileSync(
+      resolve(
+        __dirname,
+        "../src/components/auth/settings/security/change-password-settings.tsx"
+      ),
+      "utf8"
+    )
+    const linkedAccounts = readFileSync(
+      resolve(
+        __dirname,
+        "../src/components/auth/settings/security/linked-accounts-settings.tsx"
+      ),
+      "utf8"
+    )
+    const activeSessions = readFileSync(
+      resolve(
+        __dirname,
+        "../src/components/auth/settings/security/active-sessions-settings.tsx"
+      ),
+      "utf8"
+    )
+
     expect(settingsComponents).toContain(
+      'from "@/components/auth/settings/security/security-settings"'
+    )
+    expect(settingsComponents).toContain("createSecuritySettingsComponent({")
+    expect(settingsComponents).toContain("security: SecuritySettings")
+    expect(settingsComponents).not.toContain("function ChangePasswordSettings")
+    expect(settingsComponents).not.toContain("function LinkedAccountsSettings")
+    expect(settingsComponents).not.toContain("function ActiveSessionsSettings")
+    expect(securitySettings).toContain("auth.emailAndPassword?.enabled")
+    expect(securitySettings).toContain("<ChangePasswordSettings")
+    expect(securitySettings).toContain("auth.emailAndPassword.confirmPassword")
+    expect(changePassword).toContain(
       "auth.localization.settings.currentPassword"
     )
-    expect(settingsComponents).toContain("auth.localization.auth.newPassword")
-    expect(settingsComponents).toContain(
-      "auth.localization.auth.confirmPassword"
-    )
-    expect(settingsComponents).toContain(
+    expect(changePassword).toContain("auth.localization.auth.newPassword")
+    expect(changePassword).toContain("auth.localization.auth.confirmPassword")
+    expect(changePassword).toContain(
       "auth.localization.settings.updatePassword"
     )
-    expect(settingsComponents).toContain("!!auth.socialProviders?.length")
-    expect(settingsComponents).toContain("<LinkedAccountsSettings")
-    expect(settingsComponents).toContain("<ActiveSessionsSettings")
-    expect(settingsComponents).toContain("<ItemGroup")
-    expect(settingsComponents).toContain("<Item")
-    expect(settingsComponents).toContain("<ItemMedia")
-    expect(settingsComponents).toContain("<ItemContent")
-    expect(settingsComponents).toContain("<ItemTitle")
-    expect(settingsComponents).toContain("<ItemDescription")
-    expect(settingsComponents).toContain("<ItemActions")
-    expect(settingsComponents).toContain("<ItemSeparator")
-    expect(settingsComponents).toContain(
+    expect(securitySettings).toContain("!!auth.socialProviders?.length")
+    expect(securitySettings).toContain("<LinkedAccountsSettings")
+    expect(securitySettings).toContain("<ActiveSessionsSettings")
+    expect(linkedAccounts).toContain("<ItemSeparator")
+    expect(activeSessions).toContain("<ItemGroup")
+    expect(activeSessions).toContain("<Item")
+    expect(activeSessions).toContain("<ItemMedia")
+    expect(activeSessions).toContain("<ItemContent")
+    expect(activeSessions).toContain("<ItemTitle")
+    expect(activeSessions).toContain("<ItemDescription")
+    expect(activeSessions).toContain("<ItemActions")
+    expect(activeSessions).toContain("<ItemSeparator")
+    expect(activeSessions).toContain(
       "auth.localization.settings.currentSession"
     )
-    expect(settingsComponents).toContain("auth.localization.auth.signOut")
-    expect(settingsComponents).toContain("auth.plugins.flatMap")
-    expect(settingsComponents).toContain("plugin.securityCards")
+    expect(activeSessions).toContain("auth.localization.auth.signOut")
+    expect(securitySettings).toContain("auth.plugins.flatMap")
+    expect(securitySettings).toContain("plugin.securityCards")
     expect(settingsComponents).not.toContain("Plugin security cards")
     expect(settingsComponents).not.toContain("API keys are not available")
     expect(settingsComponents).not.toContain("Passkeys are not available")
@@ -576,60 +748,55 @@ describe("Solid auth route component selection", () => {
   })
 
   it("wires change password to Solid mutations and account detection like shadcn", () => {
-    const settingsComponents = readFileSync(
-      resolve(__dirname, "../src/routes/settings/-route-components.tsx"),
+    const changePassword = readFileSync(
+      resolve(
+        __dirname,
+        "../src/components/auth/settings/security/change-password-settings.tsx"
+      ),
       "utf8"
     )
 
-    expect(settingsComponents).toContain("changePasswordOptions")
-    expect(settingsComponents).toContain("requestPasswordResetOptions")
-    expect(settingsComponents).toContain("listAccountsOptions")
-    expect(settingsComponents).toContain("const linkedAccounts = createQuery")
-    expect(settingsComponents).toContain('providerId === "credential"')
-    expect(settingsComponents).toContain("requestPasswordReset.mutate")
-    expect(settingsComponents).toContain("props.session.data.user.email")
-    expect(settingsComponents).toContain("passwordResetEmailSent")
-    expect(settingsComponents).toContain(
-      "const changePassword = createMutation"
-    )
-    expect(settingsComponents).toContain("submitChangePassword")
-    expect(settingsComponents).toContain("passwordsDoNotMatch")
-    expect(settingsComponents).toContain("changePassword.mutate({")
-    expect(settingsComponents).toContain("currentPassword,")
-    expect(settingsComponents).toContain("newPassword,")
-    expect(settingsComponents).toContain("revokeOtherSessions: true")
-    expect(settingsComponents).toContain("changePasswordSuccess")
-    expect(settingsComponents).toContain(
+    expect(changePassword).toContain("changePasswordOptions")
+    expect(changePassword).toContain("requestPasswordResetOptions")
+    expect(changePassword).toContain("listAccountsOptions")
+    expect(changePassword).toContain("const linkedAccounts = createQuery")
+    expect(changePassword).toContain('providerId === "credential"')
+    expect(changePassword).toContain("requestPasswordReset.mutate")
+    expect(changePassword).toContain("props.session.data.user.email")
+    expect(changePassword).toContain("passwordResetEmailSent")
+    expect(changePassword).toContain("const changePassword = createMutation")
+    expect(changePassword).toContain("submitChangePassword")
+    expect(changePassword).toContain("passwordsDoNotMatch")
+    expect(changePassword).toContain("changePassword.mutate({")
+    expect(changePassword).toContain("currentPassword,")
+    expect(changePassword).toContain("newPassword,")
+    expect(changePassword).toContain("revokeOtherSessions: true")
+    expect(changePassword).toContain("changePasswordSuccess")
+    expect(changePassword).toContain(
       "auth.localization.settings.currentPassword"
     )
-    expect(settingsComponents).toContain(
+    expect(changePassword).toContain(
       "auth.localization.settings.currentPasswordPlaceholder"
     )
-    expect(settingsComponents).toContain("auth.localization.auth.newPassword")
-    expect(settingsComponents).toContain(
+    expect(changePassword).toContain("auth.localization.auth.newPassword")
+    expect(changePassword).toContain(
       "auth.localization.auth.newPasswordPlaceholder"
     )
-    expect(settingsComponents).toContain(
-      "auth.localization.auth.confirmPassword"
-    )
-    expect(settingsComponents).toContain(
+    expect(changePassword).toContain("auth.localization.auth.confirmPassword")
+    expect(changePassword).toContain(
       "auth.localization.auth.confirmPasswordPlaceholder"
     )
-    expect(settingsComponents).toContain(
+    expect(changePassword).toContain(
       "auth.localization.settings.updatePassword"
     )
-    expect(settingsComponents).toContain(
-      "auth.emailAndPassword.minPasswordLength"
-    )
-    expect(settingsComponents).toContain(
-      "auth.emailAndPassword.maxPasswordLength"
-    )
-    expect(settingsComponents).toContain("Eye")
-    expect(settingsComponents).toContain("EyeOff")
-    expect(settingsComponents).not.toContain(
+    expect(changePassword).toContain("auth.emailAndPassword.minPasswordLength")
+    expect(changePassword).toContain("auth.emailAndPassword.maxPasswordLength")
+    expect(changePassword).toContain("Eye")
+    expect(changePassword).toContain("EyeOff")
+    expect(changePassword).not.toContain(
       "Change password mutation is not wired in this Solid slice yet."
     )
-    expect(settingsComponents).not.toMatch(
+    expect(changePassword).not.toMatch(
       /<Button disabled size="sm" type="button">\s*Update password/
     )
   })
@@ -639,6 +806,10 @@ describe("Solid auth route component selection", () => {
     const item = readFileSync(itemPath, "utf8")
     const settingsComponents = readFileSync(
       resolve(__dirname, "../src/routes/settings/-route-components.tsx"),
+      "utf8"
+    )
+    const passkeys = readFileSync(
+      resolve(__dirname, "../src/components/auth/passkey/passkeys.tsx"),
       "utf8"
     )
 
@@ -673,27 +844,34 @@ describe("Solid auth route component selection", () => {
     expect(item).toMatch(
       /export \{[\s\S]*ItemFooter[\s\S]*ItemHeader[\s\S]*itemMediaVariants[\s\S]*itemVariants/
     )
-    expect(settingsComponents).toContain('from "@/components/ui/item"')
+    expect(settingsComponents).not.toContain('from "@/components/ui/item"')
+    expect(passkeys).toContain('from "@/components/ui/item"')
   })
 
   it("does not invent placeholder active-session rows when only the current session is known", () => {
-    const settingsComponents = readFileSync(
-      resolve(__dirname, "../src/routes/settings/-route-components.tsx"),
+    const activeSessions = readFileSync(
+      resolve(
+        __dirname,
+        "../src/components/auth/settings/security/active-sessions-settings.tsx"
+      ),
       "utf8"
     )
 
-    expect(settingsComponents).toContain(
+    expect(activeSessions).toContain(
       "auth.localization.settings.currentSession"
     )
-    expect(settingsComponents).not.toContain("Other active sessions")
-    expect(settingsComponents).not.toContain(
+    expect(activeSessions).not.toContain("Other active sessions")
+    expect(activeSessions).not.toContain(
       "Additional sessions will appear here."
     )
   })
 
   it("wires active sessions to real Solid session queries and revoke/sign-out parity", () => {
-    const settingsComponents = readFileSync(
-      resolve(__dirname, "../src/routes/settings/-route-components.tsx"),
+    const activeSessions = readFileSync(
+      resolve(
+        __dirname,
+        "../src/components/auth/settings/security/active-sessions-settings.tsx"
+      ),
       "utf8"
     )
     const solidIndex = readFileSync(
@@ -704,86 +882,79 @@ describe("Solid auth route component selection", () => {
     expect(solidIndex).toContain(
       'export * from "./queries/settings/list-sessions-query"'
     )
-    expect(settingsComponents).toContain('import Bowser from "bowser"')
-    expect(settingsComponents).toContain("listSessionsOptions")
-    expect(settingsComponents).toContain("revokeSessionOptions")
-    expect(settingsComponents).toContain("const activeSessions = createQuery")
-    expect(settingsComponents).toContain("...listSessionsOptions(")
-    expect(settingsComponents).toContain("const revokeSession = createMutation")
-    expect(settingsComponents).toContain(
-      "...revokeSessionOptions(auth.authClient)"
-    )
-    expect(settingsComponents).toContain("revokeSession.mutate(activeSession)")
-    expect(settingsComponents).toContain(
+    expect(activeSessions).toContain('import Bowser from "bowser"')
+    expect(activeSessions).toContain("listSessionsOptions")
+    expect(activeSessions).toContain("revokeSessionOptions")
+    expect(activeSessions).toContain("const activeSessions = createQuery")
+    expect(activeSessions).toContain("...listSessionsOptions(")
+    expect(activeSessions).toContain("const revokeSession = createMutation")
+    expect(activeSessions).toContain("...revokeSessionOptions(auth.authClient)")
+    expect(activeSessions).toContain("revokeSession.mutate(activeSession)")
+    expect(activeSessions).toContain(
       "auth.localization.settings.revokeSessionSuccess"
     )
-    expect(settingsComponents).toContain("activeSession.token ===")
-    expect(settingsComponents).toContain("props.session.data?.session.token")
-    expect(settingsComponents).toContain("auth.navigate({")
-    expect(settingsComponents).toContain("auth.basePaths.auth")
-    expect(settingsComponents).toContain("auth.viewPaths.auth.signOut")
-    expect(settingsComponents).toContain("auth.localization.auth.signOut")
-    expect(settingsComponents).toContain(
-      "auth.localization.settings.revokeSession"
-    )
-    expect(settingsComponents).toContain("auth.localization.settings.revoke")
-    expect(settingsComponents).toContain(
+    expect(activeSessions).toContain("activeSession.token ===")
+    expect(activeSessions).toContain("props.session.data?.session.token")
+    expect(activeSessions).toContain("auth.navigate({")
+    expect(activeSessions).toContain("auth.basePaths.auth")
+    expect(activeSessions).toContain("auth.viewPaths.auth.signOut")
+    expect(activeSessions).toContain("auth.localization.auth.signOut")
+    expect(activeSessions).toContain("auth.localization.settings.revokeSession")
+    expect(activeSessions).toContain("auth.localization.settings.revoke")
+    expect(activeSessions).toContain(
       "auth.localization.settings.currentSession"
     )
-    expect(settingsComponents).toContain(
+    expect(activeSessions).toContain(
       "Bowser.parse(props.activeSession.userAgent"
     )
-    expect(settingsComponents).toContain("<Smartphone")
-    expect(settingsComponents).toContain("<Monitor")
-    expect(settingsComponents).toContain("<X")
-    expect(settingsComponents).not.toContain(
+    expect(activeSessions).toContain("<Smartphone")
+    expect(activeSessions).toContain("<Monitor")
+    expect(activeSessions).toContain("<X")
+    expect(activeSessions).not.toContain(
       "Session revocation is not wired in this Solid slice yet."
     )
-    expect(settingsComponents).not.toMatch(
+    expect(activeSessions).not.toMatch(
       /<Button disabled size="sm" type="button" variant="outline">\s*<LogOut \/>\s*Sign out/
     )
   })
 
   it("wires linked accounts to real Solid account queries and link/unlink parity", () => {
-    const settingsComponents = readFileSync(
-      resolve(__dirname, "../src/routes/settings/-route-components.tsx"),
+    const linkedAccounts = readFileSync(
+      resolve(
+        __dirname,
+        "../src/components/auth/settings/security/linked-accounts-settings.tsx"
+      ),
       "utf8"
     )
 
-    expect(settingsComponents).toContain("accountInfoOptions")
-    expect(settingsComponents).toContain("linkSocialOptions")
-    expect(settingsComponents).toContain("unlinkAccountOptions")
-    expect(settingsComponents).toContain("const linkedAccounts = createQuery")
-    expect(settingsComponents).toContain("...listAccountsOptions(")
-    expect(settingsComponents).toContain('providerId !== "credential"')
-    expect(settingsComponents).toContain("const accountInfo = createQuery")
-    expect(settingsComponents).toContain("...accountInfoOptions(")
-    expect(settingsComponents).toContain("account?.accountId")
-    expect(settingsComponents).toContain("const linkSocial = createMutation")
-    expect(settingsComponents).toContain(
-      "...linkSocialOptions(auth.authClient)"
-    )
-    expect(settingsComponents).toContain("provider,")
-    expect(settingsComponents).toContain("callbackURL:")
-    expect(settingsComponents).toContain("window.location.pathname")
-    expect(settingsComponents).toContain("const unlinkAccount = createMutation")
-    expect(settingsComponents).toContain(
-      "...unlinkAccountOptions(auth.authClient)"
-    )
-    expect(settingsComponents).toContain("accountUnlinked")
-    expect(settingsComponents).toContain("providerId: account.providerId")
-    expect(settingsComponents).toContain(
-      "auth.localization.settings.linkProvider"
-    )
-    expect(settingsComponents).toContain(
+    expect(linkedAccounts).toContain("accountInfoOptions")
+    expect(linkedAccounts).toContain("linkSocialOptions")
+    expect(linkedAccounts).toContain("unlinkAccountOptions")
+    expect(linkedAccounts).toContain("const linkedAccounts = createQuery")
+    expect(linkedAccounts).toContain("...listAccountsOptions(")
+    expect(linkedAccounts).toContain('providerId !== "credential"')
+    expect(linkedAccounts).toContain("const accountInfo = createQuery")
+    expect(linkedAccounts).toContain("...accountInfoOptions(")
+    expect(linkedAccounts).toContain("account?.accountId")
+    expect(linkedAccounts).toContain("const linkSocial = createMutation")
+    expect(linkedAccounts).toContain("...linkSocialOptions(auth.authClient)")
+    expect(linkedAccounts).toContain("provider,")
+    expect(linkedAccounts).toContain("callbackURL:")
+    expect(linkedAccounts).toContain("window.location.pathname")
+    expect(linkedAccounts).toContain("const unlinkAccount = createMutation")
+    expect(linkedAccounts).toContain("...unlinkAccountOptions(auth.authClient)")
+    expect(linkedAccounts).toContain("accountUnlinked")
+    expect(linkedAccounts).toContain("providerId: account.providerId")
+    expect(linkedAccounts).toContain("auth.localization.settings.linkProvider")
+    expect(linkedAccounts).toContain(
       "auth.localization.settings.unlinkProvider"
     )
-    expect(settingsComponents).toContain("auth.localization.settings.link")
-    expect(settingsComponents).toContain("Link2Off")
-    expect(settingsComponents).not.toContain(
+    expect(linkedAccounts).toContain("auth.localization.settings.link")
+    expect(linkedAccounts).toContain("Link2Off")
+    expect(linkedAccounts).not.toContain(
       "link and unlink mutations are not wired in this Solid slice yet."
     )
-    expect(settingsComponents).not.toMatch(
+    expect(linkedAccounts).not.toMatch(
       /<Button disabled size="sm" type="button" variant="outline">\s*<Link2 \/>\s*Link/
     )
   })
@@ -797,37 +968,184 @@ describe("Solid auth route component selection", () => {
       resolve(__dirname, "../src/routes/settings/-route-components.tsx"),
       "utf8"
     )
+    const securitySettings = readFileSync(
+      resolve(
+        __dirname,
+        "../src/components/auth/settings/security/security-settings.tsx"
+      ),
+      "utf8"
+    )
 
     expect(authProvider).toContain("deleteUserPlugin")
-    expect(settingsComponents).toContain(
-      'hasAuthPlugin(auth.plugins, "apiKey")'
-    )
-    expect(settingsComponents).toContain(
-      'hasAuthPlugin(auth.plugins, "passkey")'
-    )
-    expect(settingsComponents).toContain(
+    expect(securitySettings).toContain('hasAuthPlugin(auth.plugins, "apiKey")')
+    expect(securitySettings).toContain('hasAuthPlugin(auth.plugins, "passkey")')
+    expect(securitySettings).toContain(
       'hasAuthPlugin(auth.plugins, "deleteUser")'
     )
-    expect(settingsComponents).toContain("listApiKeysOptions")
-    expect(settingsComponents).toContain("createApiKeyOptions")
-    expect(settingsComponents).toContain("deleteApiKeyOptions")
-    expect(settingsComponents).toContain("apiKeyLocalization.apiKeys")
-    expect(settingsComponents).toContain("listPasskeysOptions")
-    expect(settingsComponents).toContain("addPasskeyOptions")
-    expect(settingsComponents).toContain("deletePasskeyOptions")
-    expect(settingsComponents).toContain("<CreateApiKeyDialog")
-    expect(settingsComponents).toContain("<NewApiKeyDialog")
-    expect(settingsComponents).toContain("<DeleteApiKeyDialog")
-    expect(settingsComponents).toContain("<AddPasskeyDialog")
-    expect(settingsComponents).toContain("<DeletePasskeyDialog")
-    expect(settingsComponents).toContain("apiKeyLocalization.createApiKey")
-    expect(settingsComponents).toContain("apiKeyLocalization.noApiKeys")
-    expect(settingsComponents).toContain("passkeyLocalization.passkeys")
-    expect(settingsComponents).toContain("passkeyLocalization.addPasskey")
-    expect(settingsComponents).toContain("passkeyLocalization.noPasskeys")
-    expect(settingsComponents).toContain("Danger zone")
-    expect(settingsComponents).toContain("Delete user")
-    expect(settingsComponents).toContain("text-destructive")
+    const apiKeyFiles = [
+      "api-keys.tsx",
+      "api-key.tsx",
+      "api-key-skeleton.tsx",
+      "api-keys-empty.tsx",
+      "create-api-key-dialog.tsx",
+      "new-api-key-dialog.tsx",
+      "delete-api-key-dialog.tsx"
+    ]
+    const passkeyFiles = [
+      "passkeys.tsx",
+      "passkey.tsx",
+      "passkey-skeleton.tsx",
+      "passkeys-empty.tsx",
+      "add-passkey-dialog.tsx",
+      "delete-passkey-dialog.tsx"
+    ]
+    const deleteUserFiles = ["danger-zone.tsx", "delete-user.tsx"]
+
+    for (const file of apiKeyFiles) {
+      expect(
+        existsSync(
+          resolve(__dirname, `../src/components/auth/api-key/${file}`)
+        ),
+        file
+      ).toBe(true)
+    }
+
+    for (const file of passkeyFiles) {
+      expect(
+        existsSync(
+          resolve(__dirname, `../src/components/auth/passkey/${file}`)
+        ),
+        file
+      ).toBe(true)
+    }
+
+    for (const file of deleteUserFiles) {
+      expect(
+        existsSync(
+          resolve(__dirname, `../src/components/auth/delete-user/${file}`)
+        ),
+        file
+      ).toBe(true)
+    }
+
+    const apiKeys = readFileSync(
+      resolve(__dirname, "../src/components/auth/api-key/api-keys.tsx"),
+      "utf8"
+    )
+    const apiKey = readFileSync(
+      resolve(__dirname, "../src/components/auth/api-key/api-key.tsx"),
+      "utf8"
+    )
+    const apiKeysEmpty = readFileSync(
+      resolve(__dirname, "../src/components/auth/api-key/api-keys-empty.tsx"),
+      "utf8"
+    )
+    const createApiKeyDialog = readFileSync(
+      resolve(
+        __dirname,
+        "../src/components/auth/api-key/create-api-key-dialog.tsx"
+      ),
+      "utf8"
+    )
+    const newApiKeyDialog = readFileSync(
+      resolve(
+        __dirname,
+        "../src/components/auth/api-key/new-api-key-dialog.tsx"
+      ),
+      "utf8"
+    )
+    const deleteApiKeyDialog = readFileSync(
+      resolve(
+        __dirname,
+        "../src/components/auth/api-key/delete-api-key-dialog.tsx"
+      ),
+      "utf8"
+    )
+    const passkeys = readFileSync(
+      resolve(__dirname, "../src/components/auth/passkey/passkeys.tsx"),
+      "utf8"
+    )
+    const passkey = readFileSync(
+      resolve(__dirname, "../src/components/auth/passkey/passkey.tsx"),
+      "utf8"
+    )
+    const passkeysEmpty = readFileSync(
+      resolve(__dirname, "../src/components/auth/passkey/passkeys-empty.tsx"),
+      "utf8"
+    )
+    const addPasskeyDialog = readFileSync(
+      resolve(
+        __dirname,
+        "../src/components/auth/passkey/add-passkey-dialog.tsx"
+      ),
+      "utf8"
+    )
+    const deletePasskeyDialog = readFileSync(
+      resolve(
+        __dirname,
+        "../src/components/auth/passkey/delete-passkey-dialog.tsx"
+      ),
+      "utf8"
+    )
+    const dangerZone = readFileSync(
+      resolve(__dirname, "../src/components/auth/delete-user/danger-zone.tsx"),
+      "utf8"
+    )
+    const deleteUser = readFileSync(
+      resolve(__dirname, "../src/components/auth/delete-user/delete-user.tsx"),
+      "utf8"
+    )
+
+    expect(settingsComponents).toContain(
+      'from "@/components/auth/api-key/api-keys"'
+    )
+    expect(settingsComponents).toContain("apiKeys: ApiKeysSettings")
+    expect(settingsComponents).not.toContain("function ApiKeysSettings")
+    expect(settingsComponents).not.toContain("function ApiKeyRow")
+    expect(settingsComponents).not.toContain("function CreateApiKeyDialog")
+    expect(settingsComponents).not.toContain("function NewApiKeyDialog")
+    expect(settingsComponents).not.toContain("function DeleteApiKeyDialog")
+    expect(apiKeys).toContain("listApiKeysOptions")
+    expect(apiKeys).toContain("apiKeyLocalization.apiKeys")
+    expect(apiKeys).toContain("<CreateApiKeyDialog")
+    expect(apiKeys).toContain("<ApiKey")
+    expect(apiKeys).toContain("<ApiKeySkeleton")
+    expect(apiKeys).toContain("<ApiKeysEmpty")
+    expect(apiKey).toContain("apiKeyLocalization.deleteApiKey")
+    expect(apiKey).toContain("<DeleteApiKeyDialog")
+    expect(createApiKeyDialog).toContain("createApiKeyOptions")
+    expect(createApiKeyDialog).toContain("<NewApiKeyDialog")
+    expect(newApiKeyDialog).toContain("apiKeyLocalization.newApiKey")
+    expect(deleteApiKeyDialog).toContain("deleteApiKeyOptions")
+    expect(settingsComponents).toContain(
+      'from "@/components/auth/passkey/passkeys"'
+    )
+    expect(settingsComponents).toContain("passkeys: PasskeysSettings")
+    expect(settingsComponents).not.toContain("function PasskeysSettings")
+    expect(settingsComponents).not.toContain("function PasskeyRow")
+    expect(settingsComponents).not.toContain("function AddPasskeyDialog")
+    expect(settingsComponents).not.toContain("function DeletePasskeyDialog")
+    expect(passkeys).toContain("listPasskeysOptions")
+    expect(addPasskeyDialog).toContain("addPasskeyOptions")
+    expect(deletePasskeyDialog).toContain("deletePasskeyOptions")
+    expect(passkeys).toContain("<AddPasskeyDialog")
+    expect(passkey).toContain("<DeletePasskeyDialog")
+    expect(apiKeys).toContain("apiKeyLocalization.createApiKey")
+    expect(apiKeysEmpty).toContain("apiKeyLocalization.noApiKeys")
+    expect(passkeys).toContain("passkeyLocalization.passkeys")
+    expect(passkeys).toContain("passkeyLocalization.addPasskey")
+    expect(passkeysEmpty).toContain("passkeyLocalization.noPasskeys")
+    expect(settingsComponents).toContain(
+      'from "@/components/auth/delete-user/danger-zone"'
+    )
+    expect(settingsComponents).toContain("dangerZone: DangerZone")
+    expect(settingsComponents).not.toContain("function DangerZoneSettings")
+    expect(settingsComponents).not.toContain("function DeleteUserSettings")
+    expect(dangerZone).toContain("DangerZone")
+    expect(dangerZone).toContain("auth.localization.settings.dangerZone")
+    expect(dangerZone).toContain("<DeleteUser")
+    expect(deleteUser).toContain("deleteUserLocalization")
+    expect(deleteUser).toContain("text-destructive")
     expect(settingsComponents).not.toMatch(
       /<Button class="shrink-0" disabled size="sm" type="button">\s*Create API key/
     )
@@ -845,10 +1163,17 @@ describe("Solid auth route component selection", () => {
     )
   })
 
-  it("provides the local Solid Zaidan Dialog primitive for API key dialogs", () => {
+  it("provides the local Solid Zaidan Dialog primitive for extracted auth dialogs", () => {
     const dialogPath = resolve(__dirname, "../src/components/ui/dialog.tsx")
-    const settingsComponents = readFileSync(
-      resolve(__dirname, "../src/routes/settings/-route-components.tsx"),
+    const createApiKeyDialog = readFileSync(
+      resolve(
+        __dirname,
+        "../src/components/auth/api-key/create-api-key-dialog.tsx"
+      ),
+      "utf8"
+    )
+    const deleteUser = readFileSync(
+      resolve(__dirname, "../src/components/auth/delete-user/delete-user.tsx"),
       "utf8"
     )
 
@@ -868,42 +1193,60 @@ describe("Solid auth route component selection", () => {
     expect(dialog).toMatch(
       /export \{[\s\S]*Dialog[\s\S]*DialogClose[\s\S]*DialogContent[\s\S]*DialogDescription[\s\S]*DialogFooter[\s\S]*DialogHeader[\s\S]*DialogTitle[\s\S]*DialogTrigger/
     )
-    expect(settingsComponents).toContain('from "@/components/ui/dialog"')
+    expect(createApiKeyDialog).toContain('from "@/components/ui/dialog"')
+    expect(deleteUser).toContain('from "@/components/ui/dialog"')
   })
 
   it("wires API key create, new-key reveal, copy, and delete dialogs to Solid mutations", () => {
-    const settingsComponents = readFileSync(
-      resolve(__dirname, "../src/routes/settings/-route-components.tsx"),
+    const createApiKeyDialog = readFileSync(
+      resolve(
+        __dirname,
+        "../src/components/auth/api-key/create-api-key-dialog.tsx"
+      ),
+      "utf8"
+    )
+    const newApiKeyDialog = readFileSync(
+      resolve(
+        __dirname,
+        "../src/components/auth/api-key/new-api-key-dialog.tsx"
+      ),
+      "utf8"
+    )
+    const deleteApiKeyDialog = readFileSync(
+      resolve(
+        __dirname,
+        "../src/components/auth/api-key/delete-api-key-dialog.tsx"
+      ),
       "utf8"
     )
 
-    expect(settingsComponents).toContain("const createApiKey = createMutation")
-    expect(settingsComponents).toContain(
+    expect(createApiKeyDialog).toContain("const createApiKey = createMutation")
+    expect(createApiKeyDialog).toContain(
       "...createApiKeyOptions(auth.authClient as ApiKeyAuthClient)"
     )
-    expect(settingsComponents).toContain("createApiKey.mutate(")
-    expect(settingsComponents).toContain("setNewApiKeySecret(result.key)")
-    expect(settingsComponents).toContain("setIsNewKeyDialogOpen(true)")
-    expect(settingsComponents).toContain("navigator.clipboard.writeText")
-    expect(settingsComponents).toContain("setIsCopied(true)")
-    expect(settingsComponents).toContain("setTimeout(() => setIsCopied(false)")
-    expect(settingsComponents).toContain("const deleteApiKey = createMutation")
-    expect(settingsComponents).toContain(
+    expect(createApiKeyDialog).toContain("createApiKey.mutate(")
+    expect(createApiKeyDialog).toContain("setNewApiKeySecret(result.key)")
+    expect(createApiKeyDialog).toContain("setIsNewKeyDialogOpen(true)")
+    expect(newApiKeyDialog).toContain("navigator.clipboard.writeText")
+    expect(newApiKeyDialog).toContain("setIsCopied(true)")
+    expect(newApiKeyDialog).toContain("setTimeout(() => setIsCopied(false)")
+    expect(deleteApiKeyDialog).toContain("const deleteApiKey = createMutation")
+    expect(deleteApiKeyDialog).toContain(
       "...deleteApiKeyOptions(auth.authClient as ApiKeyAuthClient)"
     )
-    expect(settingsComponents).toContain("deleteApiKey.mutate({")
-    expect(settingsComponents).toContain("keyId: props.apiKey.id")
-    expect(settingsComponents).toContain("onOpenChange(false)")
-    expect(settingsComponents).toContain("apiKey.start")
-    expect(settingsComponents).toContain('"*".repeat(16)')
-    expect(settingsComponents).toContain(
+    expect(deleteApiKeyDialog).toContain("deleteApiKey.mutate({")
+    expect(deleteApiKeyDialog).toContain("keyId: props.apiKey.id")
+    expect(deleteApiKeyDialog).toContain("onOpenChange(false)")
+    expect(deleteApiKeyDialog).toContain("apiKey.start")
+    expect(deleteApiKeyDialog).toContain('"*".repeat(16)')
+    expect(deleteApiKeyDialog).toContain(
       "apiKeyLocalization.deleteApiKeyWarning"
     )
-    expect(settingsComponents).toContain("apiKeyLocalization.newApiKeyWarning")
-    expect(settingsComponents).toContain(
+    expect(newApiKeyDialog).toContain("apiKeyLocalization.newApiKeyWarning")
+    expect(newApiKeyDialog).toContain(
       "auth.localization.settings.copyToClipboard"
     )
-    expect(settingsComponents).toContain("apiKeyLocalization.dismissNewKey")
+    expect(newApiKeyDialog).toContain("apiKeyLocalization.dismissNewKey")
   })
 
   it("wires passkey list, add, and delete dialogs to Solid passkey mutations", () => {
@@ -912,41 +1255,70 @@ describe("Solid auth route component selection", () => {
       "utf8"
     )
 
-    expect(settingsComponents).toContain("passkeyLocalization")
-    expect(settingsComponents).toContain("type ListedPasskey")
-    expect(settingsComponents).toContain("const [isAddDialogOpen")
-    expect(settingsComponents).toContain("const addPasskey = createMutation")
+    const passkeys = readFileSync(
+      resolve(__dirname, "../src/components/auth/passkey/passkeys.tsx"),
+      "utf8"
+    )
+    const passkey = readFileSync(
+      resolve(__dirname, "../src/components/auth/passkey/passkey.tsx"),
+      "utf8"
+    )
+    const addPasskeyDialog = readFileSync(
+      resolve(
+        __dirname,
+        "../src/components/auth/passkey/add-passkey-dialog.tsx"
+      ),
+      "utf8"
+    )
+    const deletePasskeyDialog = readFileSync(
+      resolve(
+        __dirname,
+        "../src/components/auth/passkey/delete-passkey-dialog.tsx"
+      ),
+      "utf8"
+    )
+
     expect(settingsComponents).toContain(
+      'from "@/components/auth/passkey/passkeys"'
+    )
+    expect(passkeys).toContain("passkeyLocalization")
+    const settingsTypes = readFileSync(
+      resolve(__dirname, "../src/components/auth/settings/shared/types.ts"),
+      "utf8"
+    )
+
+    expect(settingsTypes).toContain("export type ListedPasskey")
+    expect(passkeys).toContain("const [isAddDialogOpen")
+    expect(addPasskeyDialog).toContain("const addPasskey = createMutation")
+    expect(addPasskeyDialog).toContain(
       "...addPasskeyOptions(auth.authClient as PasskeyAuthClient)"
     )
-    expect(settingsComponents).toContain(
-      "onPasskeyAdded={() => passkeys.refetch()}"
+    expect(passkeys).toContain("onPasskeyAdded={() => passkeys.refetch()}")
+    expect(addPasskeyDialog).toContain("props.onPasskeyAdded()")
+    expect(addPasskeyDialog).toContain("addPasskey.mutate(")
+    expect(addPasskeyDialog).toContain("name ? { name } : undefined")
+    expect(addPasskeyDialog).toContain("props.onOpenChange(false)")
+    expect(deletePasskeyDialog).toContain(
+      "const deletePasskey = createMutation"
     )
-    expect(settingsComponents).toContain("props.onPasskeyAdded()")
-    expect(settingsComponents).toContain("addPasskey.mutate(")
-    expect(settingsComponents).toContain("name ? { name } : undefined")
-    expect(settingsComponents).toContain("props.onOpenChange(false)")
-    expect(settingsComponents).toContain("const deletePasskey = createMutation")
-    expect(settingsComponents).toContain(
+    expect(deletePasskeyDialog).toContain(
       "...deletePasskeyOptions(auth.authClient as PasskeyAuthClient)"
     )
-    expect(settingsComponents).toContain("deletePasskey.mutate({")
-    expect(settingsComponents).toContain("id: props.passkey.id")
-    expect(settingsComponents).toContain(
-      "passkeyLocalization.deletePasskey.replace"
-    )
-    expect(settingsComponents).toContain(
+    expect(deletePasskeyDialog).toContain("deletePasskey.mutate({")
+    expect(deletePasskeyDialog).toContain("id: props.passkey.id")
+    expect(passkey).toContain("passkeyLocalization.deletePasskey.replace")
+    expect(deletePasskeyDialog).toContain(
       "passkeyLocalization.deletePasskeyTitle"
     )
-    expect(settingsComponents).toContain(
+    expect(deletePasskeyDialog).toContain(
       "passkeyLocalization.deletePasskeyWarning"
     )
-    expect(settingsComponents).toContain("passkeyLocalization.name")
-    expect(settingsComponents).toContain("auth.localization.settings.optional")
-    expect(settingsComponents).toContain("auth.localization.settings.cancel")
-    expect(settingsComponents).toContain("Fingerprint")
+    expect(addPasskeyDialog).toContain("passkeyLocalization.name")
+    expect(addPasskeyDialog).toContain("auth.localization.settings.optional")
+    expect(deletePasskeyDialog).toContain("auth.localization.settings.cancel")
+    expect(passkey).toContain("Fingerprint")
     expect(settingsComponents).not.toContain("Loading passkeys…")
-    expect(settingsComponents).not.toMatch(
+    expect(passkey).not.toMatch(
       /<Button disabled size="sm" type="button" variant="outline">\s*Revoke/
     )
   })
@@ -956,43 +1328,64 @@ describe("Solid auth route component selection", () => {
       resolve(__dirname, "../src/routes/settings/-route-components.tsx"),
       "utf8"
     )
+    const securitySettings = readFileSync(
+      resolve(
+        __dirname,
+        "../src/components/auth/settings/security/security-settings.tsx"
+      ),
+      "utf8"
+    )
+    const dangerZone = readFileSync(
+      resolve(__dirname, "../src/components/auth/delete-user/danger-zone.tsx"),
+      "utf8"
+    )
+    const deleteUser = readFileSync(
+      resolve(__dirname, "../src/components/auth/delete-user/delete-user.tsx"),
+      "utf8"
+    )
 
-    expect(settingsComponents).toContain("authQueryKeys")
-    expect(settingsComponents).toContain("deleteUserLocalization")
-    expect(settingsComponents).toContain("deleteUserOptions")
-    expect(settingsComponents).toContain("useQueryClient")
-    expect(settingsComponents).toContain("const queryClient = useQueryClient()")
     expect(settingsComponents).toContain(
+      'from "@/components/auth/delete-user/danger-zone"'
+    )
+    expect(settingsComponents).not.toContain("authQueryKeys")
+    expect(settingsComponents).not.toContain("deleteUserLocalization")
+    expect(settingsComponents).not.toContain("deleteUserOptions")
+    expect(settingsComponents).not.toContain("useQueryClient")
+    expect(deleteUser).toContain("authQueryKeys")
+    expect(deleteUser).toContain("deleteUserLocalization")
+    expect(deleteUser).toContain("deleteUserOptions")
+    expect(deleteUser).toContain("useQueryClient")
+    expect(deleteUser).toContain("const queryClient = useQueryClient()")
+    expect(securitySettings).toContain(
       "<DangerZoneSettings session={props.session} />"
     )
-    expect(settingsComponents).toContain("function DeleteUserSettings")
-    expect(settingsComponents).toContain("const accounts = createQuery")
-    expect(settingsComponents).toContain(
+    expect(settingsComponents).toContain("dangerZone: DangerZone")
+    expect(settingsComponents).not.toContain("function DeleteUserSettings")
+    expect(dangerZone).toContain("auth.localization.settings.dangerZone")
+    expect(dangerZone).toContain("<DeleteUser session={props.session}")
+    expect(deleteUser).toContain("const accounts = createQuery")
+    expect(deleteUser).toContain(
       "...listAccountsOptions(auth.authClient, userId())"
     )
-    expect(settingsComponents).toContain('providerId === "credential"')
-    expect(settingsComponents).toContain("const needsPassword = () =>")
-    expect(settingsComponents).toContain("deleteUserOptions(auth.authClient)")
-    expect(settingsComponents).toContain(
+    expect(deleteUser).toContain('providerId === "credential"')
+    expect(deleteUser).toContain("const needsPassword = () =>")
+    expect(deleteUser).toContain("deleteUserOptions(auth.authClient)")
+    expect(deleteUser).toContain(
       "deleteUserLocalization.deleteUserVerificationSent"
     )
-    expect(settingsComponents).toContain(
-      "deleteUserLocalization.deleteUserSuccess"
-    )
-    expect(settingsComponents).toContain(
+    expect(deleteUser).toContain("deleteUserLocalization.deleteUserSuccess")
+    expect(deleteUser).toContain(
       "queryClient.removeQueries({ queryKey: authQueryKeys.all })"
     )
-    expect(settingsComponents).toContain("auth.viewPaths.auth.signIn")
-    expect(settingsComponents).toContain('setPassword("")')
-    expect(settingsComponents).toContain('name="password"')
-    expect(settingsComponents).toContain('autocomplete="current-password"')
-    expect(settingsComponents).toContain(
-      "auth.localization.auth.passwordPlaceholder"
-    )
-    expect(settingsComponents).toContain("TriangleAlert")
-    expect(settingsComponents).toContain('variant="destructive"')
-    expect(settingsComponents).toContain("auth.localization.settings.cancel")
-    expect(settingsComponents).not.toMatch(
+    expect(deleteUser).toContain("auth.viewPaths.auth.signIn")
+    expect(deleteUser).toContain('setPassword("")')
+    expect(deleteUser).toContain('name="password"')
+    expect(deleteUser).toContain('autocomplete="current-password"')
+    expect(deleteUser).toContain("auth.localization.auth.passwordPlaceholder")
+    expect(deleteUser).toContain("TriangleAlert")
+    expect(deleteUser).toContain('variant="destructive"')
+    expect(deleteUser).toContain("auth.localization.settings.cancel")
+    expect(deleteUser).not.toMatch(
       /<Button disabled size="sm" type="button" variant="destructive">\s*Delete user/
     )
   })
