@@ -13,7 +13,6 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Spinner } from "@/components/ui/spinner"
-import { customViewPaths } from "@/hooks/custom-view-paths"
 import { cn } from "@/lib/utils"
 
 function getInitials(name: string) {
@@ -30,7 +29,7 @@ export type OrganizationListProps = {
 }
 
 export function OrganizationList({ className }: OrganizationListProps) {
-  const { authClient, basePaths, Link, navigate } = useAuth()
+  const { authClient, Link, navigate } = useAuth()
   assertAuthClientHasOrganizationOrThrow(authClient)
 
   const { data: activeOrganization, isPending: activePending } =
@@ -44,7 +43,6 @@ export function OrganizationList({ className }: OrganizationListProps) {
   } = useSetActiveOrganization(authClient)
 
   const isLoading = activePending || listPending
-  const createOrganizationHref = `${basePaths.auth}/${customViewPaths.auth.createOrganization}`
 
   return (
     <Card className={cn("w-full max-w-sm pb-0", className)}>
@@ -112,7 +110,7 @@ export function OrganizationList({ className }: OrganizationListProps) {
           )}
 
           <Link
-            href={createOrganizationHref}
+            href={"/auth/list-organizations"}
             className="flex w-full items-center gap-3 rounded-b-xl bg-transparent px-6 py-3 text-left text-muted-foreground transition-colors hover:bg-accent hover:text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50"
           >
             <div className="flex aspect-square size-10 shrink-0 items-center justify-center rounded-md border border-dashed bg-transparent">
