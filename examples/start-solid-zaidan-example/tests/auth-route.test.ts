@@ -950,4 +950,50 @@ describe("Solid auth route component selection", () => {
       /<Button disabled size="sm" type="button" variant="outline">\s*Revoke/
     )
   })
+
+  it("wires delete-user danger-zone dialog to Solid mutation parity", () => {
+    const settingsComponents = readFileSync(
+      resolve(__dirname, "../src/routes/settings/-route-components.tsx"),
+      "utf8"
+    )
+
+    expect(settingsComponents).toContain("authQueryKeys")
+    expect(settingsComponents).toContain("deleteUserLocalization")
+    expect(settingsComponents).toContain("deleteUserOptions")
+    expect(settingsComponents).toContain("useQueryClient")
+    expect(settingsComponents).toContain("const queryClient = useQueryClient()")
+    expect(settingsComponents).toContain(
+      "<DangerZoneSettings session={props.session} />"
+    )
+    expect(settingsComponents).toContain("function DeleteUserSettings")
+    expect(settingsComponents).toContain("const accounts = createQuery")
+    expect(settingsComponents).toContain(
+      "...listAccountsOptions(auth.authClient, userId())"
+    )
+    expect(settingsComponents).toContain('providerId === "credential"')
+    expect(settingsComponents).toContain("const needsPassword = () =>")
+    expect(settingsComponents).toContain("deleteUserOptions(auth.authClient)")
+    expect(settingsComponents).toContain(
+      "deleteUserLocalization.deleteUserVerificationSent"
+    )
+    expect(settingsComponents).toContain(
+      "deleteUserLocalization.deleteUserSuccess"
+    )
+    expect(settingsComponents).toContain(
+      "queryClient.removeQueries({ queryKey: authQueryKeys.all })"
+    )
+    expect(settingsComponents).toContain("auth.viewPaths.auth.signIn")
+    expect(settingsComponents).toContain('setPassword("")')
+    expect(settingsComponents).toContain('name="password"')
+    expect(settingsComponents).toContain('autocomplete="current-password"')
+    expect(settingsComponents).toContain(
+      "auth.localization.auth.passwordPlaceholder"
+    )
+    expect(settingsComponents).toContain("TriangleAlert")
+    expect(settingsComponents).toContain('variant="destructive"')
+    expect(settingsComponents).toContain("auth.localization.settings.cancel")
+    expect(settingsComponents).not.toMatch(
+      /<Button disabled size="sm" type="button" variant="destructive">\s*Delete user/
+    )
+  })
 })

@@ -1,10 +1,12 @@
 import {
+  authQueryKeys,
   fileToBase64,
   getProviderName,
   type SettingsView
 } from "@better-auth-ui/core"
 import {
   apiKeyLocalization,
+  deleteUserLocalization,
   multiSessionLocalization,
   passkeyLocalization
 } from "@better-auth-ui/core/plugins"
@@ -18,6 +20,7 @@ import {
   createApiKeyOptions,
   deleteApiKeyOptions,
   deletePasskeyOptions,
+  deleteUserOptions,
   type ListApiKeysData,
   type ListDeviceSessionsData,
   type ListSession,
@@ -38,7 +41,11 @@ import {
   useAuth,
   useSession
 } from "@better-auth-ui/solid"
-import { createMutation, createQuery } from "@tanstack/solid-query"
+import {
+  createMutation,
+  createQuery,
+  useQueryClient
+} from "@tanstack/solid-query"
 import Bowser from "bowser"
 import {
   ArrowLeftRight,
@@ -58,6 +65,7 @@ import {
   Smartphone,
   Sun,
   Trash2,
+  TriangleAlert,
   Upload,
   X
 } from "lucide-solid"
@@ -164,6 +172,15 @@ type AccountInfoResponse = {
     name?: string | null
   } | null
 }
+
+type DeleteUserPluginConfig = {
+  id: string
+  localization?: Partial<typeof deleteUserLocalization>
+  sendDeleteAccountVerification?: boolean
+}
+
+const defaultDangerZoneTitle = "Danger zone"
+const defaultDeleteUserLabel = "Delete user"
 
 const hasAuthPlugin = (plugins: { id: string }[], id: string) =>
   plugins.some((plugin) => plugin.id === id)
@@ -960,7 +977,7 @@ export function SecuritySettings(props: { session: SettingsSession }) {
       </Show>
 
       <Show when={hasAuthPlugin(auth.plugins, "deleteUser")}>
-        <DangerZoneSettings />
+        <DangerZoneSettings session={props.session} />
       </Show>
 
       {auth.plugins.flatMap((plugin) => {
@@ -2309,25 +2326,178 @@ function DeletePasskeyDialog(props: {
   )
 }
 
-function DangerZoneSettings() {
+function DangerZoneSettings(props: { session: SettingsSession }) {
+  const auth = useAuth()
+  const dangerZoneTitle = () =>
+    auth.localization.settings.dangerZone || defaultDangerZoneTitle
+
   return (
     <div class="flex w-full flex-col">
-      <h2 class="mb-3 text-sm font-semibold text-destructive">Danger zone</h2>
+      <h2 class="mb-3 text-sm font-semibold text-destructive">
+        {dangerZoneTitle()}
+      </h2>
 
-      <Card class="p-0">
-        <CardContent class="flex items-center justify-between gap-3 p-4 text-sm">
-          <div>
-            <p class="font-medium">Delete user</p>
-            <p class="text-muted-foreground">
-              Permanently delete your account and all associated data.
-            </p>
-          </div>
-          <Button disabled size="sm" type="button" variant="destructive">
-            Delete user
-          </Button>
-        </CardContent>
-      </Card>
+      <DeleteUserSettings session={props.session} />
     </div>
+  )
+}
+
+function DeleteUserSettings(props: { session: SettingsSession }) {
+  const auth = useAuth()
+  const queryClient = useQueryClient()
+  const userId = () => props.session.data?.user.id
+  const [confirmOpen, setConfirmOpen] = createSignal(false)
+  const [password, setPassword] = createSignal("")
+  const deleteUserPluginConfig = () =>
+    auth.plugins.find((plugin) => plugin.id === "deleteUser") as
+      | DeleteUserPluginConfig
+      | undefined
+  const deleteUserLabels = () => {
+    const pluginLocalization = deleteUserPluginConfig()?.localization
+
+    return {
+      deleteUser:
+        pluginLocalization?.deleteUser ??
+        deleteUserLocalization.deleteUser ??
+        defaultDeleteUserLabel,
+      deleteUserDescription:
+        pluginLocalization?.deleteUserDescription ??
+        deleteUserLocalization.deleteUserDescription,
+      deleteUserSuccess:
+        pluginLocalization?.deleteUserSuccess ??
+        deleteUserLocalization.deleteUserSuccess,
+      deleteUserVerificationSent:
+        pluginLocalization?.deleteUserVerificationSent ??
+        deleteUserLocalization.deleteUserVerificationSent
+    }
+  }
+  const sendDeleteAccountVerification = () =>
+    Boolean(deleteUserPluginConfig()?.sendDeleteAccountVerification)
+  const accounts = createQuery(() => ({
+    ...listAccountsOptions(auth.authClient, userId()),
+    enabled: shouldLoadAccounts({
+      isSsr: import.meta.env.SSR,
+      userId: userId()
+    })
+  }))
+  const hasCredentialAccount = () =>
+    accounts.data?.some(
+      (account: { providerId?: string }) => account.providerId === "credential"
+    )
+  const needsPassword = () =>
+    !sendDeleteAccountVerification() && Boolean(hasCredentialAccount())
+  const deleteUser = createMutation(() => ({
+    ...deleteUserOptions(auth.authClient),
+    onSuccess: () => {
+      setConfirmOpen(false)
+      setPassword("")
+
+      if (sendDeleteAccountVerification()) {
+        toast.success(deleteUserLabels().deleteUserVerificationSent)
+        return
+      }
+
+      toast.success(deleteUserLabels().deleteUserSuccess)
+      queryClient.removeQueries({ queryKey: authQueryKeys.all })
+      auth.navigate({
+        replace: true,
+        to: `${auth.basePaths.auth}/${auth.viewPaths.auth.signIn}`
+      })
+    }
+  }))
+
+  const handleDialogOpenChange = (open: boolean) => {
+    setConfirmOpen(open)
+    setPassword("")
+  }
+
+  const submitDeleteUser = (event: SubmitEvent) => {
+    event.preventDefault()
+
+    deleteUser.mutate(
+      (needsPassword() ? { password: password() } : {}) as Parameters<
+        typeof deleteUser.mutate
+      >[0]
+    )
+  }
+
+  return (
+    <Card class="border-destructive p-0">
+      <CardContent class="flex flex-col gap-6 p-4 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <p class="font-medium text-sm leading-tight">
+            {deleteUserLabels().deleteUser}
+          </p>
+          <p class="mt-0.5 text-muted-foreground text-xs">
+            {deleteUserLabels().deleteUserDescription}
+          </p>
+        </div>
+
+        <Dialog open={confirmOpen()} onOpenChange={handleDialogOpenChange}>
+          <DialogTrigger
+            as={Button}
+            disabled={!accounts.data || accounts.isPending}
+            size="sm"
+            variant="destructive"
+          >
+            {deleteUserLabels().deleteUser}
+          </DialogTrigger>
+
+          <DialogContent>
+            <form class="flex flex-col gap-6" onSubmit={submitDeleteUser}>
+              <DialogHeader>
+                <div class="flex size-10 items-center justify-center rounded-md bg-destructive/10 text-destructive dark:bg-destructive/20">
+                  <TriangleAlert class="size-4.5" />
+                </div>
+                <DialogTitle>{deleteUserLabels().deleteUser}</DialogTitle>
+                <DialogDescription>
+                  {deleteUserLabels().deleteUserDescription}
+                </DialogDescription>
+              </DialogHeader>
+
+              <Show when={needsPassword()}>
+                <div class="grid gap-2">
+                  <Label for="delete-password">
+                    {auth.localization.auth.password}
+                  </Label>
+                  <Input
+                    autocomplete="current-password"
+                    disabled={deleteUser.isPending}
+                    id="delete-password"
+                    name="password"
+                    onInput={(event) => setPassword(event.currentTarget.value)}
+                    placeholder={auth.localization.auth.passwordPlaceholder}
+                    required
+                    type="password"
+                    value={password()}
+                  />
+                </div>
+              </Show>
+
+              <DialogFooter>
+                <DialogClose
+                  as={Button}
+                  disabled={deleteUser.isPending}
+                  type="button"
+                  variant="outline"
+                >
+                  {auth.localization.settings.cancel}
+                </DialogClose>
+                <Button
+                  disabled={deleteUser.isPending}
+                  type="submit"
+                  variant="destructive"
+                >
+                  {deleteUser.isPending
+                    ? `${deleteUserLabels().deleteUser}…`
+                    : deleteUserLabels().deleteUser}
+                </Button>
+              </DialogFooter>
+            </form>
+          </DialogContent>
+        </Dialog>
+      </CardContent>
+    </Card>
   )
 }
 
