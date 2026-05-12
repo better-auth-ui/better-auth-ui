@@ -353,7 +353,6 @@ describe("Solid auth route component selection", () => {
     expect(settingsComponents).toContain("disabled")
     expect(settingsComponents).not.toContain("Plugin account cards")
     expect(settingsComponents).not.toContain("Social accounts")
-    expect(settingsComponents).not.toContain("listAccountsOptions")
     expect(settingsComponents).not.toMatch(
       /<CardTitle[^>]*class="flex items-center gap-2"/
     )
@@ -496,10 +495,16 @@ describe("Solid auth route component selection", () => {
     expect(settingsComponents).toContain(
       "auth.emailAndPassword.confirmPassword"
     )
-    expect(settingsComponents).toContain("Current password")
-    expect(settingsComponents).toContain("New password")
-    expect(settingsComponents).toContain("Confirm password")
-    expect(settingsComponents).toContain("Update password")
+    expect(settingsComponents).toContain(
+      "auth.localization.settings.currentPassword"
+    )
+    expect(settingsComponents).toContain("auth.localization.auth.newPassword")
+    expect(settingsComponents).toContain(
+      "auth.localization.auth.confirmPassword"
+    )
+    expect(settingsComponents).toContain(
+      "auth.localization.settings.updatePassword"
+    )
     expect(settingsComponents).toContain("!!auth.socialProviders?.length")
     expect(settingsComponents).toContain("<LinkedAccountsSettings")
     expect(settingsComponents).toContain("<ActiveSessionsSettings")
@@ -520,6 +525,65 @@ describe("Solid auth route component selection", () => {
     expect(settingsComponents).not.toContain("Passkeys are not available")
     expect(settingsComponents).not.toContain(
       "Danger zone actions are not available"
+    )
+  })
+
+  it("wires change password to Solid mutations and account detection like shadcn", () => {
+    const settingsComponents = readFileSync(
+      resolve(__dirname, "../src/routes/settings/-route-components.tsx"),
+      "utf8"
+    )
+
+    expect(settingsComponents).toContain("changePasswordOptions")
+    expect(settingsComponents).toContain("requestPasswordResetOptions")
+    expect(settingsComponents).toContain("listAccountsOptions")
+    expect(settingsComponents).toContain("const linkedAccounts = createQuery")
+    expect(settingsComponents).toContain('providerId === "credential"')
+    expect(settingsComponents).toContain("requestPasswordReset.mutate")
+    expect(settingsComponents).toContain("props.session.data.user.email")
+    expect(settingsComponents).toContain("passwordResetEmailSent")
+    expect(settingsComponents).toContain(
+      "const changePassword = createMutation"
+    )
+    expect(settingsComponents).toContain("submitChangePassword")
+    expect(settingsComponents).toContain("passwordsDoNotMatch")
+    expect(settingsComponents).toContain("changePassword.mutate({")
+    expect(settingsComponents).toContain("currentPassword,")
+    expect(settingsComponents).toContain("newPassword,")
+    expect(settingsComponents).toContain("revokeOtherSessions: true")
+    expect(settingsComponents).toContain("changePasswordSuccess")
+    expect(settingsComponents).toContain(
+      "auth.localization.settings.currentPassword"
+    )
+    expect(settingsComponents).toContain(
+      "auth.localization.settings.currentPasswordPlaceholder"
+    )
+    expect(settingsComponents).toContain("auth.localization.auth.newPassword")
+    expect(settingsComponents).toContain(
+      "auth.localization.auth.newPasswordPlaceholder"
+    )
+    expect(settingsComponents).toContain(
+      "auth.localization.auth.confirmPassword"
+    )
+    expect(settingsComponents).toContain(
+      "auth.localization.auth.confirmPasswordPlaceholder"
+    )
+    expect(settingsComponents).toContain(
+      "auth.localization.settings.updatePassword"
+    )
+    expect(settingsComponents).toContain(
+      "auth.emailAndPassword.minPasswordLength"
+    )
+    expect(settingsComponents).toContain(
+      "auth.emailAndPassword.maxPasswordLength"
+    )
+    expect(settingsComponents).toContain("Eye")
+    expect(settingsComponents).toContain("EyeOff")
+    expect(settingsComponents).not.toContain(
+      "Change password mutation is not wired in this Solid slice yet."
+    )
+    expect(settingsComponents).not.toMatch(
+      /<Button disabled size="sm" type="button">\s*Update password/
     )
   })
 
