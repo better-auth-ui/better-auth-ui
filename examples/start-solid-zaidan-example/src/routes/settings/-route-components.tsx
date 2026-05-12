@@ -5,16 +5,19 @@ import {
 } from "@better-auth-ui/core"
 import {
   apiKeyLocalization,
-  multiSessionLocalization
+  multiSessionLocalization,
+  passkeyLocalization
 } from "@better-auth-ui/core/plugins"
 import {
   type AccountInfoParams,
   type ApiKeyAuthClient,
   accountInfoOptions,
+  addPasskeyOptions,
   changeEmailOptions,
   changePasswordOptions,
   createApiKeyOptions,
   deleteApiKeyOptions,
+  deletePasskeyOptions,
   type ListApiKeysData,
   type ListDeviceSessionsData,
   type ListSession,
@@ -43,8 +46,8 @@ import {
   Copy,
   Eye,
   EyeOff,
+  Fingerprint,
   Key,
-  KeyRound,
   Link2,
   Link2Off,
   LogOut,
@@ -144,6 +147,12 @@ type DeviceSession = NonNullable<
 type ListedApiKey = NonNullable<
   ListApiKeysData<ApiKeyAuthClient>
 >["apiKeys"][number]
+
+type ListedPasskey = {
+  id: string
+  name?: string | null
+  createdAt: Date | string
+}
 
 type AccountInfoResponse = {
   data?: {
@@ -2037,6 +2046,7 @@ function DeleteApiKeyDialog(props: {
 function PasskeysSettings(props: { session: SettingsSession }) {
   const auth = useAuth()
   const userId = () => props.session.data?.user.id
+  const [isAddDialogOpen, setIsAddDialogOpen] = createSignal(false)
   const passkeys = createQuery(() => ({
     ...listPasskeysOptions(auth.authClient as PasskeyAuthClient, userId()),
     enabled: shouldLoadDeviceSessions({
@@ -2049,55 +2059,42 @@ function PasskeysSettings(props: { session: SettingsSession }) {
   return (
     <div class="flex flex-col gap-3">
       <div class="flex items-end justify-between gap-3">
-        <h2 class="truncate text-sm font-semibold">Passkeys</h2>
-        <Button class="shrink-0" disabled size="sm" type="button">
-          Add passkey
-        </Button>
+        <h2 class="truncate text-sm font-semibold">
+          {passkeyLocalization.passkeys}
+        </h2>
+        <Dialog open={isAddDialogOpen()} onOpenChange={setIsAddDialogOpen}>
+          <DialogTrigger
+            as={Button}
+            class="shrink-0"
+            disabled={passkeys.isPending}
+            size="sm"
+          >
+            {passkeyLocalization.addPasskey}
+          </DialogTrigger>
+          <AddPasskeyDialog
+            onOpenChange={setIsAddDialogOpen}
+            onPasskeyAdded={() => passkeys.refetch()}
+          />
+        </Dialog>
       </div>
 
       <Card class="p-0">
         <CardContent class="p-0">
-          <Show
-            when={!passkeys.isPending}
-            fallback={
-              <div class="flex items-center gap-3 p-4 text-sm text-muted-foreground">
-                Loading passkeys…
-              </div>
-            }
-          >
+          <Show when={!passkeys.isPending} fallback={<PasskeySkeleton />}>
             <Show
               when={items().length > 0}
               fallback={
-                <div class="flex flex-col items-center justify-center gap-3 p-6 text-center text-sm">
-                  <KeyRound class="size-6 text-muted-foreground" />
-                  <div>
-                    <p class="font-medium">No passkeys</p>
-                    <p class="text-muted-foreground">
-                      Create a passkey to securely access your account.
-                    </p>
-                  </div>
-                  <Button disabled size="sm" type="button" variant="secondary">
-                    Add passkey
-                  </Button>
-                </div>
+                <PasskeysEmpty onAddPress={() => setIsAddDialogOpen(true)} />
               }
             >
               <For each={items()}>
                 {(passkey, index) => (
-                  <div
-                    class={cn(
-                      "flex items-center justify-between gap-3 p-4 text-sm",
-                      index() > 0 && "border-t"
-                    )}
-                  >
-                    <div>
-                      <p class="font-medium">{passkey.name ?? "Passkey"}</p>
-                      <p class="text-muted-foreground text-xs">Passkey</p>
-                    </div>
-                    <Button disabled size="sm" type="button" variant="outline">
-                      Revoke
-                    </Button>
-                  </div>
+                  <>
+                    <Show when={index() > 0}>
+                      <ItemSeparator />
+                    </Show>
+                    <PasskeyRow passkey={passkey as ListedPasskey} />
+                  </>
                 )}
               </For>
             </Show>
@@ -2105,6 +2102,210 @@ function PasskeysSettings(props: { session: SettingsSession }) {
         </CardContent>
       </Card>
     </div>
+  )
+}
+
+function PasskeySkeleton() {
+  return (
+    <div class="flex items-center gap-3 p-4">
+      <Skeleton class="size-10 rounded-md" />
+      <div class="flex flex-col gap-1">
+        <Skeleton class="h-4 w-28" />
+        <Skeleton class="h-3 w-32" />
+      </div>
+    </div>
+  )
+}
+
+function PasskeysEmpty(props: { onAddPress: () => void }) {
+  return (
+    <div class="flex flex-col items-center justify-center gap-4 p-6 text-center">
+      <div class="flex size-10 items-center justify-center rounded-md bg-muted">
+        <Fingerprint class="size-4.5" />
+      </div>
+
+      <div class="flex flex-col items-center justify-center gap-1">
+        <p class="font-semibold text-sm">{passkeyLocalization.noPasskeys}</p>
+        <p class="text-muted-foreground text-xs">
+          {passkeyLocalization.passkeysDescription}
+        </p>
+      </div>
+
+      <Button onClick={props.onAddPress} size="sm" type="button">
+        {passkeyLocalization.addPasskey}
+      </Button>
+    </div>
+  )
+}
+
+function PasskeyRow(props: { passkey: ListedPasskey }) {
+  const auth = useAuth()
+  const [deleteOpen, setDeleteOpen] = createSignal(false)
+  const passkeyName = () => props.passkey.name || passkeyLocalization.passkey
+
+  return (
+    <div class="flex items-center gap-3 p-4 text-sm">
+      <div class="flex size-10 shrink-0 items-center justify-center rounded-md bg-muted">
+        <Fingerprint class="size-4.5" />
+      </div>
+
+      <div class="flex min-w-0 flex-col">
+        <span class="truncate font-medium leading-tight">{passkeyName()}</span>
+        <span class="text-muted-foreground text-xs">
+          {new Date(props.passkey.createdAt).toLocaleString(undefined, {
+            dateStyle: "medium",
+            timeStyle: "short"
+          })}
+        </span>
+      </div>
+
+      <Dialog open={deleteOpen()} onOpenChange={setDeleteOpen}>
+        <DialogTrigger
+          as={Button}
+          aria-label={passkeyLocalization.deletePasskey.replace(
+            "{{name}}",
+            passkeyName()
+          )}
+          class="ml-auto shrink-0"
+          size="sm"
+          variant="outline"
+        >
+          <X />
+          {auth.localization.settings.delete}
+        </DialogTrigger>
+        <DeletePasskeyDialog
+          onOpenChange={setDeleteOpen}
+          passkey={props.passkey}
+        />
+      </Dialog>
+    </div>
+  )
+}
+
+function AddPasskeyDialog(props: {
+  onOpenChange: (open: boolean) => void
+  onPasskeyAdded: () => void
+}) {
+  const auth = useAuth()
+  const addPasskey = createMutation(() => ({
+    ...addPasskeyOptions(auth.authClient as PasskeyAuthClient),
+    onSuccess: () => {
+      props.onOpenChange(false)
+      props.onPasskeyAdded()
+    }
+  }))
+
+  const submitAddPasskey = (event: SubmitEvent) => {
+    event.preventDefault()
+
+    const formData = new FormData(event.currentTarget as HTMLFormElement)
+    const name = String(formData.get("name") ?? "").trim()
+
+    addPasskey.mutate(
+      (name ? { name } : undefined) as Parameters<typeof addPasskey.mutate>[0]
+    )
+  }
+
+  return (
+    <DialogContent>
+      <form class="flex flex-col gap-6" onSubmit={submitAddPasskey}>
+        <DialogHeader>
+          <div class="flex size-10 items-center justify-center rounded-md bg-muted">
+            <Fingerprint class="size-4.5" />
+          </div>
+          <DialogTitle>{passkeyLocalization.addPasskey}</DialogTitle>
+          <DialogDescription>
+            {passkeyLocalization.passkeysDescription}
+          </DialogDescription>
+        </DialogHeader>
+
+        <div class="grid gap-2">
+          <Label for="passkey-name">{passkeyLocalization.name}</Label>
+          <Input
+            autofocus
+            disabled={addPasskey.isPending}
+            id="passkey-name"
+            name="name"
+            placeholder={auth.localization.settings.optional}
+          />
+        </div>
+
+        <DialogFooter>
+          <DialogClose
+            as={Button}
+            disabled={addPasskey.isPending}
+            type="button"
+            variant="outline"
+          >
+            {auth.localization.settings.cancel}
+          </DialogClose>
+          <Button disabled={addPasskey.isPending} type="submit">
+            {addPasskey.isPending
+              ? `${passkeyLocalization.addPasskey}…`
+              : passkeyLocalization.addPasskey}
+          </Button>
+        </DialogFooter>
+      </form>
+    </DialogContent>
+  )
+}
+
+function DeletePasskeyDialog(props: {
+  onOpenChange: (open: boolean) => void
+  passkey: ListedPasskey
+}) {
+  const auth = useAuth()
+  const passkeyName = () => props.passkey.name || passkeyLocalization.passkey
+  const previewId = () => `delete-passkey-preview-${props.passkey.id}`
+  const deletePasskey = createMutation(() => ({
+    ...deletePasskeyOptions(auth.authClient as PasskeyAuthClient),
+    onSuccess: () => props.onOpenChange(false)
+  }))
+
+  const deleteKey = () => {
+    deletePasskey.mutate({
+      id: props.passkey.id
+    } as Parameters<typeof deletePasskey.mutate>[0])
+  }
+
+  return (
+    <DialogContent>
+      <DialogHeader>
+        <div class="flex size-10 items-center justify-center rounded-md bg-muted">
+          <Fingerprint class="size-4.5" />
+        </div>
+        <DialogTitle>{passkeyLocalization.deletePasskeyTitle}</DialogTitle>
+        <DialogDescription>
+          {passkeyLocalization.deletePasskeyWarning}
+        </DialogDescription>
+      </DialogHeader>
+
+      <div class="grid gap-2">
+        <Label for={previewId()}>{passkeyName()}</Label>
+        <Input disabled id={previewId()} readonly value={passkeyName()} />
+      </div>
+
+      <DialogFooter>
+        <DialogClose
+          as={Button}
+          disabled={deletePasskey.isPending}
+          type="button"
+          variant="outline"
+        >
+          {auth.localization.settings.cancel}
+        </DialogClose>
+        <Button
+          disabled={deletePasskey.isPending}
+          onClick={deleteKey}
+          type="button"
+          variant="destructive"
+        >
+          {deletePasskey.isPending
+            ? `${passkeyLocalization.deletePasskeyTitle}…`
+            : passkeyLocalization.deletePasskeyTitle}
+        </Button>
+      </DialogFooter>
+    </DialogContent>
   )
 }
 

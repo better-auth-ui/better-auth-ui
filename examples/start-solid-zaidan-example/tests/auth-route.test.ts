@@ -813,14 +813,18 @@ describe("Solid auth route component selection", () => {
     expect(settingsComponents).toContain("deleteApiKeyOptions")
     expect(settingsComponents).toContain("apiKeyLocalization.apiKeys")
     expect(settingsComponents).toContain("listPasskeysOptions")
+    expect(settingsComponents).toContain("addPasskeyOptions")
+    expect(settingsComponents).toContain("deletePasskeyOptions")
     expect(settingsComponents).toContain("<CreateApiKeyDialog")
     expect(settingsComponents).toContain("<NewApiKeyDialog")
     expect(settingsComponents).toContain("<DeleteApiKeyDialog")
+    expect(settingsComponents).toContain("<AddPasskeyDialog")
+    expect(settingsComponents).toContain("<DeletePasskeyDialog")
     expect(settingsComponents).toContain("apiKeyLocalization.createApiKey")
     expect(settingsComponents).toContain("apiKeyLocalization.noApiKeys")
-    expect(settingsComponents).toContain("Passkeys")
-    expect(settingsComponents).toContain("Add passkey")
-    expect(settingsComponents).toContain("No passkeys")
+    expect(settingsComponents).toContain("passkeyLocalization.passkeys")
+    expect(settingsComponents).toContain("passkeyLocalization.addPasskey")
+    expect(settingsComponents).toContain("passkeyLocalization.noPasskeys")
     expect(settingsComponents).toContain("Danger zone")
     expect(settingsComponents).toContain("Delete user")
     expect(settingsComponents).toContain("text-destructive")
@@ -832,6 +836,12 @@ describe("Solid auth route component selection", () => {
     )
     expect(settingsComponents).not.toContain(
       '<p class="text-muted-foreground text-xs">API key</p>'
+    )
+    expect(settingsComponents).not.toMatch(
+      /<Button class="shrink-0" disabled size="sm" type="button">\s*Add passkey/
+    )
+    expect(settingsComponents).not.toMatch(
+      /<Button disabled size="sm" type="button" variant="secondary">\s*Add passkey/
     )
   })
 
@@ -894,5 +904,50 @@ describe("Solid auth route component selection", () => {
       "auth.localization.settings.copyToClipboard"
     )
     expect(settingsComponents).toContain("apiKeyLocalization.dismissNewKey")
+  })
+
+  it("wires passkey list, add, and delete dialogs to Solid passkey mutations", () => {
+    const settingsComponents = readFileSync(
+      resolve(__dirname, "../src/routes/settings/-route-components.tsx"),
+      "utf8"
+    )
+
+    expect(settingsComponents).toContain("passkeyLocalization")
+    expect(settingsComponents).toContain("type ListedPasskey")
+    expect(settingsComponents).toContain("const [isAddDialogOpen")
+    expect(settingsComponents).toContain("const addPasskey = createMutation")
+    expect(settingsComponents).toContain(
+      "...addPasskeyOptions(auth.authClient as PasskeyAuthClient)"
+    )
+    expect(settingsComponents).toContain(
+      "onPasskeyAdded={() => passkeys.refetch()}"
+    )
+    expect(settingsComponents).toContain("props.onPasskeyAdded()")
+    expect(settingsComponents).toContain("addPasskey.mutate(")
+    expect(settingsComponents).toContain("name ? { name } : undefined")
+    expect(settingsComponents).toContain("props.onOpenChange(false)")
+    expect(settingsComponents).toContain("const deletePasskey = createMutation")
+    expect(settingsComponents).toContain(
+      "...deletePasskeyOptions(auth.authClient as PasskeyAuthClient)"
+    )
+    expect(settingsComponents).toContain("deletePasskey.mutate({")
+    expect(settingsComponents).toContain("id: props.passkey.id")
+    expect(settingsComponents).toContain(
+      "passkeyLocalization.deletePasskey.replace"
+    )
+    expect(settingsComponents).toContain(
+      "passkeyLocalization.deletePasskeyTitle"
+    )
+    expect(settingsComponents).toContain(
+      "passkeyLocalization.deletePasskeyWarning"
+    )
+    expect(settingsComponents).toContain("passkeyLocalization.name")
+    expect(settingsComponents).toContain("auth.localization.settings.optional")
+    expect(settingsComponents).toContain("auth.localization.settings.cancel")
+    expect(settingsComponents).toContain("Fingerprint")
+    expect(settingsComponents).not.toContain("Loading passkeys…")
+    expect(settingsComponents).not.toMatch(
+      /<Button disabled size="sm" type="button" variant="outline">\s*Revoke/
+    )
   })
 })
