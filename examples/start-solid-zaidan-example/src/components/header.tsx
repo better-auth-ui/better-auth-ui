@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/solid-router"
 
-import { UserButton } from "./auth/user-button"
+import { UserButton } from "./auth/user/user-button"
 import { Logo } from "./logo"
 
 export function Header() {

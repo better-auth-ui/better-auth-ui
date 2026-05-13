@@ -2,36 +2,24 @@ import {
   type ListSession,
   listSessionsOptions,
   revokeSessionOptions,
-  useAuth
+  useAuth,
+  useSession
 } from "@better-auth-ui/solid"
 import { createMutation, createQuery } from "@tanstack/solid-query"
-import Bowser from "bowser"
-import { LogOut, Monitor, Smartphone, X } from "lucide-solid"
-import { createMemo, For, Show } from "solid-js"
+import { For, Show } from "solid-js"
 import { toast } from "solid-sonner"
 import {
   resolveUserLabel,
-  shouldLoadDeviceSessions,
-  timeAgo
+  shouldLoadDeviceSessions
 } from "@/components/auth/settings/shared/helpers"
-import type { SettingsSession } from "@/components/auth/settings/shared/types"
-import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
-import {
-  Item,
-  ItemActions,
-  ItemContent,
-  ItemDescription,
-  ItemGroup,
-  ItemMedia,
-  ItemSeparator,
-  ItemTitle
-} from "@/components/ui/item"
-import { Skeleton } from "@/components/ui/skeleton"
+import { ItemGroup, ItemSeparator } from "@/components/ui/item"
+import { ActiveSessionRow, ActiveSessionRowSkeleton } from "./active-session"
 
-export function ActiveSessionsSettings(props: { session: SettingsSession }) {
+export function ActiveSessionsSettings() {
   const auth = useAuth()
-  const userId = () => props.session.data?.user.id
+  const session = useSession(auth.authClient)
+  const userId = () => session.data?.user.id
   const activeSessions = createQuery(() => ({
     ...listSessionsOptions(auth.authClient, userId()),
     enabled: shouldLoadDeviceSessions({
@@ -41,7 +29,7 @@ export function ActiveSessionsSettings(props: { session: SettingsSession }) {
   }))
   const sessions = () =>
     [...(activeSessions.data ?? [])].sort((activeSession) =>
-      activeSession.id === props.session.data?.session.id ? -1 : 1
+      activeSession.id === session.data?.session.id ? -1 : 1
     )
   const revokeSession = createMutation(() => ({
     ...revokeSessionOptions(auth.authClient),
@@ -49,10 +37,7 @@ export function ActiveSessionsSettings(props: { session: SettingsSession }) {
       toast.success(auth.localization.settings.revokeSessionSuccess)
   }))
   const displayName = () =>
-    resolveUserLabel(
-      props.session.data?.user.name,
-      props.session.data?.user.email
-    )
+    resolveUserLabel(session.data?.user.name, session.data?.user.email)
 
   const signOut = () => {
     auth.navigate({
@@ -74,7 +59,7 @@ export function ActiveSessionsSettings(props: { session: SettingsSession }) {
         <CardContent class="p-0">
           <Show
             fallback={<ActiveSessionRowSkeleton />}
-            when={!activeSessions.isPending && props.session.data}
+            when={!activeSessions.isPending && session.data}
           >
             <ItemGroup class="gap-0">
               <For each={sessions()}>
@@ -88,8 +73,7 @@ export function ActiveSessionsSettings(props: { session: SettingsSession }) {
                       displayName={displayName()}
                       isRevoking={revokeSession.isPending}
                       isCurrentSession={
-                        activeSession.token ===
-                        props.session.data?.session.token
+                        activeSession.token === session.data?.session.token
                       }
                       onRevoke={revoke}
                       onSignOut={signOut}
@@ -102,101 +86,5 @@ export function ActiveSessionsSettings(props: { session: SettingsSession }) {
         </CardContent>
       </Card>
     </div>
-  )
-}
-
-function ActiveSessionRow(props: {
-  activeSession: ListSession
-  displayName: string
-  isCurrentSession: boolean
-  isRevoking: boolean
-  onRevoke: (activeSession: ListSession) => void
-  onSignOut: () => void
-}) {
-  const auth = useAuth()
-  const userAgent = createMemo(() =>
-    Bowser.parse(props.activeSession.userAgent || "")
-  )
-  const isMobile = () =>
-    userAgent().platform.type === "mobile" ||
-    userAgent().platform.type === "tablet"
-  const browserAndOs = () => {
-    const browser = userAgent().browser.name || "Unknown Browser"
-    const os = userAgent().os.name
-
-    return os ? `${browser}, ${os}` : browser
-  }
-
-  return (
-    <Item class="rounded-none p-0">
-      <ItemMedia>
-        <Show
-          fallback={<Monitor class="size-4.5 text-white" />}
-          when={isMobile()}
-        >
-          <Smartphone class="size-4.5 text-white" />
-        </Show>
-      </ItemMedia>
-
-      <ItemContent class="p-0">
-        <ItemTitle>{browserAndOs()}</ItemTitle>
-        <ItemDescription class="flex flex-col gap-1">
-          <Show
-            fallback={
-              <Show when={props.activeSession.createdAt}>
-                <span class="truncate text-white text-xs capitalize">
-                  {timeAgo(props.activeSession.createdAt)}
-                </span>
-              </Show>
-            }
-            when={props.isCurrentSession}
-          >
-            <span class="w-fit rounded-full bg-primary/10 px-2 py-0.5 font-medium text-primary text-xs">
-              {auth.localization.settings.currentSession}
-            </span>
-          </Show>
-        </ItemDescription>
-      </ItemContent>
-
-      <ItemActions>
-        <Button
-          aria-label={
-            props.isCurrentSession
-              ? auth.localization.auth.signOut
-              : auth.localization.settings.revokeSession
-          }
-          disabled={props.isRevoking}
-          onClick={() =>
-            props.isCurrentSession
-              ? props.onSignOut()
-              : props.onRevoke(props.activeSession)
-          }
-          size="sm"
-          type="button"
-          variant="outline"
-        >
-          <Show fallback={<X class="size-4" />} when={props.isCurrentSession}>
-            <LogOut class="size-4" />
-          </Show>
-          {props.isCurrentSession
-            ? auth.localization.auth.signOut
-            : auth.localization.settings.revoke}
-        </Button>
-      </ItemActions>
-    </Item>
-  )
-}
-
-function ActiveSessionRowSkeleton() {
-  return (
-    <Item class="rounded-none p-4">
-      <ItemMedia>
-        <Skeleton class="size-10 rounded-md" />
-      </ItemMedia>
-      <ItemContent>
-        <Skeleton class="h-4 w-20" />
-        <Skeleton class="h-3 w-32" />
-      </ItemContent>
-    </Item>
   )
 }

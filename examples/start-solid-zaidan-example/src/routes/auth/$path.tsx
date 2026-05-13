@@ -1,26 +1,23 @@
+import { viewPaths } from "@better-auth-ui/core"
 import { createFileRoute, redirect } from "@tanstack/solid-router"
 
-import { resolveAuthRoute } from "@/routes/auth/-route-components"
+import { Auth } from "@/components/auth/auth"
 
 export const Route = createFileRoute("/auth/$path")({
   beforeLoad({ params: { path } }) {
-    const authRoute = resolveAuthRoute(path)
-
-    if ("redirectTo" in authRoute) throw redirect({ to: authRoute.redirectTo })
+    if (!Object.values(viewPaths.auth).includes(path)) {
+      throw redirect({ to: "/" })
+    }
   },
   component: AuthPage
 })
 
 function AuthPage() {
-  const authRoute = resolveAuthRoute(Route.useParams()().path)
-
-  if ("redirectTo" in authRoute) return null
-
-  const Component = authRoute.component
+  const { path } = Route.useParams()()
 
   return (
     <div class="flex justify-center my-auto p-4 md:p-6">
-      <Component />
+      <Auth path={path} />
     </div>
   )
 }

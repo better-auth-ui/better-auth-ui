@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/solid-router"
 
-import { UserButton } from "@/components/auth/user-button"
+import { UserButton } from "@/components/auth/user/user-button"
 
 export const Route = createFileRoute("/")({
   component: HomePage

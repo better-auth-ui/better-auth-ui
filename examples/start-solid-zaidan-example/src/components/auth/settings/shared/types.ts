@@ -4,15 +4,12 @@ import type {
   ApiKeyAuthClient,
   ListApiKeysData,
   ListDeviceSessionsData,
-  MultiSessionAuthClient,
-  useSession
+  MultiSessionAuthClient
 } from "@better-auth-ui/solid"
 import type { Component } from "solid-js"
 
-export type SettingsSession = ReturnType<typeof useSession>
-
 export type SettingsPanel = {
-  component: Component<{ session: SettingsSession }>
+  component: Component
   title: string
 }
 

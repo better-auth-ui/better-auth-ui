@@ -1,11 +1,11 @@
 import { viewPaths } from "@better-auth-ui/core"
 import type { Component } from "solid-js"
 
-import { ForgotPassword } from "@/components/auth/forgot-password"
-import { ResetPassword } from "@/components/auth/reset-password"
-import { SignIn } from "@/components/auth/sign-in"
-import { SignOut } from "@/components/auth/sign-out"
-import { SignUp } from "@/components/auth/sign-up"
+import { ForgotPassword } from "./forgot-password"
+import { ResetPassword } from "./reset-password"
+import { SignIn } from "./sign-in"
+import { SignOut } from "./sign-out"
+import { SignUp } from "./sign-up"
 
 type SupportedAuthRoute = {
   component: Component
@@ -14,6 +14,10 @@ type SupportedAuthRoute = {
 
 type UnsupportedAuthRoute = {
   redirectTo: "/"
+}
+
+export type AuthProps = {
+  path?: string
 }
 
 const authRouteComponents: Partial<Record<string, SupportedAuthRoute>> = {
@@ -36,10 +40,20 @@ const authRouteComponents: Partial<Record<string, SupportedAuthRoute>> = {
   }
 }
 
-export const resolveAuthRoute = (
+export function resolveAuthRoute(
   path: string
-): SupportedAuthRoute | UnsupportedAuthRoute => {
+): SupportedAuthRoute | UnsupportedAuthRoute {
   const route = authRouteComponents[path]
 
   return route ?? { redirectTo: "/" }
+}
+
+export function Auth(props: AuthProps) {
+  const authRoute = resolveAuthRoute(props.path ?? "")
+
+  if ("redirectTo" in authRoute) return null
+
+  const Component = authRoute.component
+
+  return <Component />
 }

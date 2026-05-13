@@ -1,5 +1,5 @@
 import { fileToBase64 } from "@better-auth-ui/core"
-import { updateUserOptions, useAuth } from "@better-auth-ui/solid"
+import { updateUserOptions, useAuth, useSession } from "@better-auth-ui/solid"
 import { createMutation } from "@tanstack/solid-query"
 import { Trash2, Upload } from "lucide-solid"
 import { createSignal } from "solid-js"
@@ -8,7 +8,6 @@ import {
   resolveUserInitials,
   resolveUserLabel
 } from "@/components/auth/settings/shared/helpers"
-import type { SettingsSession } from "@/components/auth/settings/shared/types"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter } from "@/components/ui/card"
@@ -21,11 +20,13 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 
-export function UserProfile(props: {
-  session: SettingsSession
-  username: string
-}) {
+const getUsername = (session: ReturnType<typeof useSession>) =>
+  (session.data?.user as { username?: string | null } | undefined)?.username ??
+  ""
+
+export function UserProfile() {
   const auth = useAuth()
+  const session = useSession(auth.authClient)
   const [name, setName] = createSignal("")
   const [isUploadingAvatar, setIsUploadingAvatar] = createSignal(false)
   const [isDeletingAvatar, setIsDeletingAvatar] = createSignal(false)
@@ -36,10 +37,8 @@ export function UserProfile(props: {
       toast.success(auth.localization.settings.profileUpdatedSuccess)
   }))
   const displayName = () =>
-    resolveUserLabel(
-      props.session.data?.user.name,
-      props.session.data?.user.email
-    )
+    resolveUserLabel(session.data?.user.name, session.data?.user.email)
+  const username = () => getUsername(session)
   const isProfilePending = () =>
     updateUser.isPending || isUploadingAvatar() || isDeletingAvatar()
 
@@ -52,7 +51,7 @@ export function UserProfile(props: {
 
     updateUser.mutate({
       name,
-      ...(props.username ? { username: usernameValue } : {})
+      ...(username() ? { username: usernameValue } : {})
     } as Parameters<typeof updateUser.mutate>[0])
   }
 
@@ -92,7 +91,7 @@ export function UserProfile(props: {
   }
 
   const deleteAvatar = () => {
-    const currentImage = props.session.data?.user.image
+    const currentImage = session.data?.user.image
 
     updateUser.mutate(
       { image: null },
@@ -140,12 +139,12 @@ export function UserProfile(props: {
                     <AvatarImage
                       alt={displayName()}
                       sizes="lg"
-                      src={props.session.data?.user.image ?? undefined}
+                      src={session.data?.user.image ?? undefined}
                     />
                     <AvatarFallback class="rounded-full bg-muted text-muted-foreground">
                       {resolveUserInitials(
-                        props.session.data?.user.name,
-                        props.session.data?.user.email
+                        session.data?.user.name,
+                        session.data?.user.email
                       )}
                     </AvatarFallback>
                   </Avatar>
@@ -155,7 +154,7 @@ export function UserProfile(props: {
                   <DropdownMenuTrigger
                     as={Button}
                     class=""
-                    disabled={!props.session.data || isProfilePending()}
+                    disabled={!session.data || isProfilePending()}
                     size="sm"
                     variant="secondary"
                   >
@@ -167,7 +166,7 @@ export function UserProfile(props: {
                       {auth.localization.settings.uploadAvatar}
                     </DropdownMenuItem>
                     <DropdownMenuItem
-                      disabled={!props.session.data?.user.image}
+                      disabled={!session.data?.user.image}
                       onSelect={deleteAvatar}
                       variant="destructive"
                     >
@@ -189,7 +188,7 @@ export function UserProfile(props: {
                 onInput={(event) => setName(event.currentTarget.value)}
                 placeholder={auth.localization.auth.name}
                 required
-                value={name() || (props.session.data?.user.name ?? "")}
+                value={name() || (session.data?.user.name ?? "")}
               />
             </div>
 
@@ -197,18 +196,18 @@ export function UserProfile(props: {
               <Label for="settings-username">Username</Label>
               <Input
                 autocomplete="username"
-                disabled={isProfilePending() || !props.username}
+                disabled={isProfilePending() || !username()}
                 id="settings-username"
                 name="username"
                 placeholder="Username"
-                value={props.username}
+                value={username()}
               />
             </div>
           </CardContent>
           <CardFooter>
             <Button
               aria-label="Save changes"
-              disabled={isProfilePending() || !props.session.data}
+              disabled={isProfilePending() || !session.data}
               size="sm"
               type="submit"
             >

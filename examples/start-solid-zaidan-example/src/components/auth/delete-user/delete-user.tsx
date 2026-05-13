@@ -3,7 +3,8 @@ import { deleteUserLocalization } from "@better-auth-ui/core/plugins"
 import {
   deleteUserOptions,
   listAccountsOptions,
-  useAuth
+  useAuth,
+  useSession
 } from "@better-auth-ui/solid"
 import {
   createMutation,
@@ -14,10 +15,7 @@ import { TriangleAlert } from "lucide-solid"
 import { createSignal, Show } from "solid-js"
 import { toast } from "solid-sonner"
 import { shouldLoadAccounts } from "@/components/auth/settings/shared/helpers"
-import type {
-  DeleteUserPluginConfig,
-  SettingsSession
-} from "@/components/auth/settings/shared/types"
+import type { DeleteUserPluginConfig } from "@/components/auth/settings/shared/types"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import {
@@ -35,10 +33,11 @@ import { Label } from "@/components/ui/label"
 
 const defaultDeleteUserLabel = "Delete user"
 
-export function DeleteUser(props: { session: SettingsSession }) {
+export function DeleteUser() {
   const auth = useAuth()
+  const session = useSession(auth.authClient)
   const queryClient = useQueryClient()
-  const userId = () => props.session.data?.user.id
+  const userId = () => session.data?.user.id
   const [confirmOpen, setConfirmOpen] = createSignal(false)
   const [password, setPassword] = createSignal("")
   const deleteUserPluginConfig = () =>

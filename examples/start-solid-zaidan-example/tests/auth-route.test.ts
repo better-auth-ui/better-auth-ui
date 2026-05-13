@@ -2,8 +2,14 @@ import { existsSync, readFileSync } from "node:fs"
 import { resolve } from "node:path"
 import { viewPaths } from "@better-auth-ui/core"
 import { describe, expect, it } from "vitest"
+import { resolveAuthRoute } from "../src/components/auth/auth"
 import { ForgotPassword } from "../src/components/auth/forgot-password"
 import { ResetPassword } from "../src/components/auth/reset-password"
+import { AccountSettings } from "../src/components/auth/settings/account/account-settings"
+import {
+  resolveSettingsRoute,
+  SecuritySettings
+} from "../src/components/auth/settings/settings"
 import {
   resolveUserInitials,
   resolveUserLabel,
@@ -19,12 +25,18 @@ import {
 } from "../src/components/auth/sign-in-path"
 import { SignOut } from "../src/components/auth/sign-out"
 import { SignUp } from "../src/components/auth/sign-up"
-import { resolveAuthRoute } from "../src/routes/auth/-route-components"
-import {
-  AccountSettings,
-  resolveSettingsRoute,
-  SecuritySettings
-} from "../src/routes/settings/-route-components"
+
+const isSimpleReExportOnly = (source: string) => {
+  const statement = source
+    .split("\n")
+    .map((line) => line.trim())
+    .filter((line) => line && !line.startsWith("//"))
+    .join(" ")
+    .replace(/\s+/g, " ")
+    .trim()
+
+  return /^export\s+(?:\{[\s\S]*\}|\*)\s+from\s+["'][^"']+["']$/.test(statement)
+}
 
 describe("Solid auth route component selection", () => {
   it("maps supported auth paths to their existing Solid components", () => {
@@ -52,6 +64,36 @@ describe("Solid auth route component selection", () => {
 
   it("keeps invalid auth paths on the existing redirect-to-home behavior", () => {
     expect(resolveAuthRoute("unknown-auth-path")).toEqual({ redirectTo: "/" })
+  })
+
+  it("removes the auth route-local component facade like the shadcn example", () => {
+    const authRoute = readFileSync(
+      resolve(__dirname, "../src/routes/auth/$path.tsx"),
+      "utf8"
+    )
+    const authComponentPath = resolve(
+      __dirname,
+      "../src/routes/auth/-route-components.tsx"
+    )
+    const authComponent = readFileSync(
+      resolve(__dirname, "../src/components/auth/auth.tsx"),
+      "utf8"
+    )
+
+    expect(existsSync(authComponentPath)).toBe(false)
+    expect(authRoute).toContain('import { Auth } from "@/components/auth/auth"')
+    expect(authRoute).toContain("viewPaths.auth")
+    expect(authRoute).toContain(
+      "if (!Object.values(viewPaths.auth).includes(path))"
+    )
+    expect(authRoute).toContain('throw redirect({ to: "/" })')
+    expect(authRoute).toContain("<Auth path={path} />")
+    expect(authRoute).not.toContain("resolveAuthRoute")
+    expect(authRoute).not.toContain("-route-components")
+    expect(authComponent).toContain('import { SignIn } from "./sign-in"')
+    expect(authComponent).toContain('import { SignUp } from "./sign-up"')
+    expect(authComponent).toContain("export function Auth(")
+    expect(authComponent).toContain("export function resolveAuthRoute(")
   })
 
   it("wires the Solid auth provider to TanStack navigation and the shadcn redirect target", () => {
@@ -228,13 +270,17 @@ describe("Solid auth route component selection", () => {
     expect(timeAgo(new Date(Date.now() - 2 * 60 * 1000))).toBe("2 minutes ago")
   })
 
-  it("keeps the route compatibility facade minimal while shared contracts live in the extracted module", () => {
+  it("removes the route compatibility facade while shared contracts live in the extracted module", () => {
     const settingsRoute = readFileSync(
       resolve(__dirname, "../src/routes/settings/$path.tsx"),
       "utf8"
     )
+    const settingsComponentsPath = resolve(
+      __dirname,
+      "../src/routes/settings/-route-components.tsx"
+    )
     const settingsComponents = readFileSync(
-      resolve(__dirname, "../src/routes/settings/-route-components.tsx"),
+      resolve(__dirname, "../src/components/auth/settings/settings.tsx"),
       "utf8"
     )
     const sharedHelpers = readFileSync(
@@ -247,24 +293,25 @@ describe("Solid auth route component selection", () => {
     )
 
     expect(settingsRoute).toContain(
-      'import { Settings } from "@/routes/settings/-route-components"'
+      'import { Settings } from "@/components/auth/settings/settings"'
     )
-    expect(settingsComponents).toContain("export const Settings =")
-    expect(settingsComponents).toContain("export const SecuritySettings =")
-    expect(settingsComponents).toContain("export const resolveSettingsRoute =")
+    expect(existsSync(settingsComponentsPath)).toBe(false)
+    expect(settingsComponents).toContain("export function Settings(")
+    expect(settingsComponents).toContain(
+      'export { SecuritySettings } from "@/components/auth/settings/security/security-settings"'
+    )
+    expect(settingsComponents).toContain(
+      "export function resolveSettingsRoute("
+    )
     expect(settingsComponents).toContain(
       'export { AccountSettings } from "@/components/auth/settings/account/account-settings"'
     )
     expect(settingsComponents).not.toContain(
       'from "@/components/auth/settings/shared/helpers"'
     )
-    expect(settingsComponents).not.toContain(
-      'from "@/components/auth/settings/shared/types"'
-    )
     expect(settingsComponents).not.toContain("shouldLoadAccounts")
     expect(settingsComponents).not.toContain("shouldLoadDeviceSessions")
     expect(settingsComponents).not.toContain("shouldLoadLinkedAccounts")
-    expect(settingsComponents).not.toContain("SettingsRouteResolution")
     expect(settingsComponents).not.toContain(
       "function shouldLoadLinkedAccounts"
     )
@@ -272,7 +319,7 @@ describe("Solid auth route component selection", () => {
     expect(sharedHelpers).toContain("resolveUserLabel")
     expect(sharedHelpers).toContain("resolveUserInitials")
     expect(sharedHelpers).toContain("function timeAgo")
-    expect(sharedTypes).toContain("export type SettingsSession")
+    expect(sharedTypes).not.toContain("export type SettingsSession")
     expect(sharedTypes).toContain("export type SettingsRouteResolution")
     expect(sharedTypes).toContain("export type ListedPasskey")
   })
@@ -288,18 +335,29 @@ describe("Solid auth route component selection", () => {
     )
 
     expect(settingsRoute).toContain("viewPaths.settings")
+    expect(settingsRoute).toContain(
+      "if (!Object.values(viewPaths.settings).includes(path))"
+    )
     expect(settingsRoute).toContain("throw notFound()")
+    expect(settingsRoute).toContain("async beforeLoad")
+    expect(settingsRoute).toContain("createIsomorphicFn()")
+    expect(settingsRoute).toContain("ensureSessionServer")
+    expect(settingsRoute).toContain("ensureSessionClient")
+    expect(settingsRoute).toContain("getRequestHeaders()")
+    expect(settingsRoute).toContain('to: "/auth/$path"')
+    expect(settingsRoute).toContain('params: { path: "sign-in" }')
+    expect(settingsRoute).toContain("search: { redirectTo: location.href }")
     expect(settingsRoute).not.toContain("minimal {path()} settings route")
     expect(authProvider).toContain("export const authClient")
   })
 
-  it("keeps Solid settings navigation lightweight and non-blocking", () => {
+  it("gates Solid settings navigation at the route instead of redirecting from the component", () => {
     const settingsRoute = readFileSync(
       resolve(__dirname, "../src/routes/settings/$path.tsx"),
       "utf8"
     )
     const settingsComponents = readFileSync(
-      resolve(__dirname, "../src/routes/settings/-route-components.tsx"),
+      resolve(__dirname, "../src/components/auth/settings/settings.tsx"),
       "utf8"
     )
     const settingsShell = readFileSync(
@@ -307,31 +365,130 @@ describe("Solid auth route component selection", () => {
       "utf8"
     )
 
-    expect(settingsRoute).not.toContain("ensureSession")
-    expect(settingsRoute).not.toContain("redirect")
-    expect(settingsRoute).not.toContain("async beforeLoad")
+    expect(settingsRoute).toContain("ensureSession")
+    expect(settingsRoute).toContain("redirect")
+    expect(settingsRoute).toContain("async beforeLoad")
     expect(settingsComponents).not.toContain("useAuthenticate")
     expect(settingsComponents).not.toContain("useListAccounts")
-    expect(settingsShell).toContain("createEffect")
+    expect(settingsShell).not.toContain("createEffect")
+    expect(settingsShell).not.toContain("redirectTo = encodeURIComponent")
+    expect(settingsShell).not.toContain("replace: true")
     expect(settingsShell).toContain("auth.navigate")
-    expect(settingsShell).toContain("createSettingsComponent")
-    expect(settingsShell).toContain("createSettingsRouteResolver")
-    expect(settingsComponents).toContain("createSettingsComponent({")
-    expect(settingsComponents).toContain("createSettingsRouteResolver({")
+    expect(settingsShell).not.toContain("createSettingsComponent")
+    expect(settingsShell).not.toContain("createSettingsRouteResolver")
+    expect(settingsShell).not.toContain("SettingsShell")
+    expect(settingsComponents).not.toContain("routeComponents")
+    expect(settingsComponents).not.toContain("props.routeComponents")
+    expect(settingsComponents).toContain("function Settings(")
     expect(
       readFileSync(
         resolve(
           __dirname,
-          "../src/components/auth/settings/account/account-settings.tsx"
+          "../src/components/auth/multi-session/manage-accounts.tsx"
         ),
         "utf8"
       )
     ).toContain("listDeviceSessionsOptions")
   })
 
+  it("uses colocated session queries instead of drilling session through settings sections", () => {
+    const settingsComponents = readFileSync(
+      resolve(__dirname, "../src/components/auth/settings/settings.tsx"),
+      "utf8"
+    )
+    const accountSettings = readFileSync(
+      resolve(
+        __dirname,
+        "../src/components/auth/settings/account/account-settings.tsx"
+      ),
+      "utf8"
+    )
+    const manageAccounts = readFileSync(
+      resolve(
+        __dirname,
+        "../src/components/auth/multi-session/manage-accounts.tsx"
+      ),
+      "utf8"
+    )
+    const userProfile = readFileSync(
+      resolve(
+        __dirname,
+        "../src/components/auth/settings/account/user-profile.tsx"
+      ),
+      "utf8"
+    )
+    const changeEmail = readFileSync(
+      resolve(
+        __dirname,
+        "../src/components/auth/settings/account/change-email.tsx"
+      ),
+      "utf8"
+    )
+    const securitySettings = readFileSync(
+      resolve(
+        __dirname,
+        "../src/components/auth/settings/security/security-settings.tsx"
+      ),
+      "utf8"
+    )
+    const activeSessions = readFileSync(
+      resolve(
+        __dirname,
+        "../src/components/auth/settings/security/active-sessions-settings.tsx"
+      ),
+      "utf8"
+    )
+    const apiKeys = readFileSync(
+      resolve(__dirname, "../src/components/auth/api-key/api-keys.tsx"),
+      "utf8"
+    )
+    const changePassword = readFileSync(
+      resolve(
+        __dirname,
+        "../src/components/auth/settings/security/change-password-settings.tsx"
+      ),
+      "utf8"
+    )
+    const passkeys = readFileSync(
+      resolve(__dirname, "../src/components/auth/passkey/passkeys.tsx"),
+      "utf8"
+    )
+    const dangerZone = readFileSync(
+      resolve(__dirname, "../src/components/auth/delete-user/danger-zone.tsx"),
+      "utf8"
+    )
+    const deleteUser = readFileSync(
+      resolve(__dirname, "../src/components/auth/delete-user/delete-user.tsx"),
+      "utf8"
+    )
+
+    expect(settingsComponents).toContain("<AccountSettings />")
+    expect(settingsComponents).toContain("<SecuritySettings />")
+    expect(settingsComponents).not.toContain("session={session}")
+    expect(accountSettings).not.toContain("session={session}")
+    expect(securitySettings).not.toContain("props.session")
+    expect(securitySettings).not.toContain("session={props.session}")
+    expect(dangerZone).not.toContain("props.session")
+    expect(dangerZone).not.toContain("session={props.session}")
+
+    for (const source of [
+      manageAccounts,
+      userProfile,
+      changeEmail,
+      changePassword,
+      activeSessions,
+      apiKeys,
+      passkeys,
+      deleteUser
+    ]) {
+      expect(source).toContain("useSession")
+      expect(source).toContain("const session = useSession(auth.authClient")
+    }
+  })
+
   it("extracts Zaidan Tabs settings navigation into the settings shell without document anchors", () => {
     const settingsComponents = readFileSync(
-      resolve(__dirname, "../src/routes/settings/-route-components.tsx"),
+      resolve(__dirname, "../src/components/auth/settings/settings.tsx"),
       "utf8"
     )
     const settingsShell = readFileSync(
@@ -346,8 +503,8 @@ describe("Solid auth route component selection", () => {
     expect(settingsShell).toContain("<TabsList")
     expect(settingsShell).toContain("<TabsTrigger")
     expect(settingsShell).toContain("<TabsContent")
-    expect(settingsShell).toContain("value={props.currentView}")
-    expect(settingsShell).toContain("onChange={props.onTabChange}")
+    expect(settingsShell).toContain("value={currentView()}")
+    expect(settingsShell).toContain("onChange={handleSettingsTabChange}")
     expect(settingsShell).toContain("auth.navigate({")
     expect(settingsShell).toContain(
       'class={cn("w-full gap-4 md:gap-6", props.class)}'
@@ -359,16 +516,16 @@ describe("Solid auth route component selection", () => {
     expect(settingsShell).not.toMatch(/<a\s/)
     expect(settingsShell).not.toMatch(/href=\{`\$\{auth\.basePaths\.settings\}/)
     expect(settingsComponents).toContain(
-      'from "@/components/auth/settings/settings"'
+      'from "@/components/auth/settings/account/account-settings"'
     )
-    expect(settingsComponents).not.toContain(
-      'import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"'
+    expect(settingsComponents).toContain(
+      'from "@/components/auth/settings/security/security-settings"'
     )
   })
 
   it("uses TanStack Link for UserButton auth/settings menu navigation", () => {
     const userButton = readFileSync(
-      resolve(__dirname, "../src/components/auth/user-button.tsx"),
+      resolve(__dirname, "../src/components/auth/user/user-button.tsx"),
       "utf8"
     )
 
@@ -385,6 +542,160 @@ describe("Solid auth route component selection", () => {
     expect(userButton).not.toMatch(
       /href=\{(?:signInHref|signUpHref|settingsHref|signOutHref)\}/
     )
+  })
+
+  it("provides canonical shadcn-like Solid auth wrapper files without changing behavior", () => {
+    const canonicalWrappers = [
+      {
+        expected: "export function ThemeToggleItem",
+        file: "theme/theme-toggle-item.tsx"
+      },
+      {
+        expected: "export function AppearanceSettings",
+        file: "theme/appearance.tsx"
+      },
+      {
+        expected: "export function UserAvatar",
+        file: "user/user-avatar.tsx"
+      },
+      {
+        expected: "export function UserView",
+        file: "user/user-view.tsx"
+      },
+      {
+        expected: "export function UserButton",
+        file: "user/user-button.tsx"
+      },
+      {
+        expected: "export function ManageAccounts",
+        file: "multi-session/manage-accounts.tsx"
+      },
+      {
+        expected: "export function ManageAccountRow",
+        file: "multi-session/manage-account.tsx"
+      },
+      {
+        expected: "export function ActiveSessionRow",
+        file: "settings/security/active-session.tsx"
+      },
+      {
+        expected: 'from "./active-sessions-settings"',
+        file: "settings/security/active-sessions.tsx"
+      },
+      {
+        expected: 'from "./change-password-settings"',
+        file: "settings/security/change-password.tsx"
+      },
+      {
+        expected: "export function LinkedAccountRow",
+        file: "settings/security/linked-account.tsx"
+      },
+      {
+        expected: 'from "./linked-accounts-settings"',
+        file: "settings/security/linked-accounts.tsx"
+      }
+    ]
+
+    for (const wrapper of canonicalWrappers) {
+      const source = readFileSync(
+        resolve(__dirname, `../src/components/auth/${wrapper.file}`),
+        "utf8"
+      )
+
+      expect(source, wrapper.file).toContain(wrapper.expected)
+      if (wrapper.expected.startsWith("export function")) {
+        expect(isSimpleReExportOnly(source), wrapper.file).toBe(false)
+      }
+    }
+
+    const compatibilityWrappers = [
+      {
+        expected: 'export { UserButton } from "./user/user-button"',
+        file: "user-button.tsx"
+      },
+      {
+        expected: 'export { AppearanceSettings } from "../../theme/appearance"',
+        file: "settings/account/appearance-settings.tsx"
+      },
+      {
+        expected:
+          'export { ManageAccountRow, ManageAccountRowSkeleton } from "../../multi-session/manage-account"',
+        file: "settings/account/manage-account-row.tsx"
+      }
+    ]
+
+    for (const wrapper of compatibilityWrappers) {
+      const source = readFileSync(
+        resolve(__dirname, `../src/components/auth/${wrapper.file}`),
+        "utf8"
+      ).trim()
+      const normalizedSource = source.replace(/\s+/g, " ")
+
+      expect(normalizedSource, wrapper.file).toBe(wrapper.expected)
+      expect(isSimpleReExportOnly(source), wrapper.file).toBe(true)
+    }
+
+    const userButton = readFileSync(
+      resolve(__dirname, "../src/components/auth/user/user-button.tsx"),
+      "utf8"
+    )
+    expect(userButton).toContain(
+      'from "@/components/auth/theme/theme-toggle-item"'
+    )
+    expect(userButton).toContain('from "@/components/auth/user/user-avatar"')
+    expect(userButton).toContain('from "@/components/auth/user/user-view"')
+    expect(userButton).not.toContain("function ThemeToggleItem")
+
+    const accountSettings = readFileSync(
+      resolve(
+        __dirname,
+        "../src/components/auth/settings/account/account-settings.tsx"
+      ),
+      "utf8"
+    )
+    const securitySettings = readFileSync(
+      resolve(
+        __dirname,
+        "../src/components/auth/settings/security/security-settings.tsx"
+      ),
+      "utf8"
+    )
+
+    expect(accountSettings).toContain(
+      'from "@/components/auth/theme/appearance"'
+    )
+    expect(accountSettings).toContain(
+      'from "@/components/auth/multi-session/manage-accounts"'
+    )
+    expect(accountSettings).not.toContain("listDeviceSessionsOptions")
+    expect(securitySettings).toContain(
+      'from "@/components/auth/settings/security/active-sessions"'
+    )
+    expect(securitySettings).toContain(
+      'from "@/components/auth/settings/security/change-password"'
+    )
+    expect(securitySettings).toContain(
+      'from "@/components/auth/settings/security/linked-accounts"'
+    )
+
+    const activeSessionsSettings = readFileSync(
+      resolve(
+        __dirname,
+        "../src/components/auth/settings/security/active-sessions-settings.tsx"
+      ),
+      "utf8"
+    )
+    const linkedAccountsSettings = readFileSync(
+      resolve(
+        __dirname,
+        "../src/components/auth/settings/security/linked-accounts-settings.tsx"
+      ),
+      "utf8"
+    )
+    expect(activeSessionsSettings).toContain('from "./active-session"')
+    expect(activeSessionsSettings).not.toContain("function ActiveSessionRow(")
+    expect(linkedAccountsSettings).toContain('from "./linked-account"')
+    expect(linkedAccountsSettings).not.toContain("function LinkedAccountRow(")
   })
 
   it("uses TanStack Link for auth form helper navigation", () => {
@@ -414,7 +725,7 @@ describe("Solid auth route component selection", () => {
 
   it("renders the account tab like the shadcn settings baseline", () => {
     const settingsComponents = readFileSync(
-      resolve(__dirname, "../src/routes/settings/-route-components.tsx"),
+      resolve(__dirname, "../src/components/auth/settings/settings.tsx"),
       "utf8"
     )
     const accountSettings = readFileSync(
@@ -439,16 +750,20 @@ describe("Solid auth route component selection", () => {
       "utf8"
     )
     const appearanceSettings = readFileSync(
-      resolve(
-        __dirname,
-        "../src/components/auth/settings/account/appearance-settings.tsx"
-      ),
+      resolve(__dirname, "../src/components/auth/theme/appearance.tsx"),
       "utf8"
     )
     const manageAccountRow = readFileSync(
       resolve(
         __dirname,
-        "../src/components/auth/settings/account/manage-account-row.tsx"
+        "../src/components/auth/multi-session/manage-account.tsx"
+      ),
+      "utf8"
+    )
+    const manageAccounts = readFileSync(
+      resolve(
+        __dirname,
+        "../src/components/auth/multi-session/manage-accounts.tsx"
       ),
       "utf8"
     )
@@ -459,11 +774,12 @@ describe("Solid auth route component selection", () => {
     expect(settingsComponents).toContain("AccountSettings,")
     expect(settingsComponents).not.toContain("function AppearanceSettings")
     expect(settingsComponents).not.toContain("function ManageAccountRow")
-    expect(accountSettings).toContain("useAuth")
-    expect(accountSettings).toContain("session.data?.user.name")
-    expect(accountSettings).toContain("session.data?.user.email")
-    expect(accountSettings).toContain("getUsername(props.session)")
-    expect(accountSettings).toContain("username?: string | null")
+    expect(manageAccounts).toContain("useAuth")
+    expect(manageAccounts).toContain("session.data?.user.name")
+    expect(manageAccounts).toContain("session.data?.user.email")
+    expect(accountSettings).toContain("<UserProfile />")
+    expect(userProfile).toContain("getUsername(session)")
+    expect(userProfile).toContain("username?: string | null")
     expect(userProfile).toContain("Profile")
     expect(userProfile).toContain("<h2")
     expect(changeEmail).toContain("auth.localization.settings.changeEmail")
@@ -472,14 +788,15 @@ describe("Solid auth route component selection", () => {
     expect(appearanceSettings).toContain("System")
     expect(appearanceSettings).toContain("Light")
     expect(appearanceSettings).toContain("Dark")
-    expect(accountSettings).toContain("multiSessionLocalization.manageAccounts")
-    expect(accountSettings).toContain("<ItemGroup")
+    expect(accountSettings).toContain("<ManageAccounts />")
+    expect(manageAccounts).toContain("multiSessionLocalization.manageAccounts")
+    expect(manageAccounts).toContain("<ItemGroup")
     expect(manageAccountRow).toContain("<ItemMedia")
     expect(manageAccountRow).toContain("<ItemContent")
     expect(manageAccountRow).toContain("<ItemTitle")
     expect(manageAccountRow).toContain("<ItemDescription")
     expect(manageAccountRow).toContain("<ItemActions")
-    expect(accountSettings).toContain("<ItemSeparator")
+    expect(manageAccounts).toContain("<ItemSeparator")
     expect(manageAccountRow).toContain("multiSessionLocalization.switchAccount")
     expect(manageAccountRow).toContain("auth.localization.auth.signOut")
     expect(userProfile).toContain("Save changes")
@@ -505,38 +822,46 @@ describe("Solid auth route component selection", () => {
     const manageAccountRow = readFileSync(
       resolve(
         __dirname,
-        "../src/components/auth/settings/account/manage-account-row.tsx"
+        "../src/components/auth/multi-session/manage-account.tsx"
+      ),
+      "utf8"
+    )
+    const manageAccounts = readFileSync(
+      resolve(
+        __dirname,
+        "../src/components/auth/multi-session/manage-accounts.tsx"
       ),
       "utf8"
     )
 
-    expect(accountSettings).toContain("setActiveSessionOptions")
-    expect(accountSettings).toContain("revokeMultiSessionOptions")
-    expect(accountSettings).toContain("const setActiveSession = createMutation")
-    expect(accountSettings).toContain(
+    expect(accountSettings).toContain("<ManageAccounts />")
+    expect(manageAccounts).toContain("setActiveSessionOptions")
+    expect(manageAccounts).toContain("revokeMultiSessionOptions")
+    expect(manageAccounts).toContain("const setActiveSession = createMutation")
+    expect(manageAccounts).toContain(
       "const revokeMultiSession = createMutation"
     )
-    expect(accountSettings).toContain("window.scrollTo({ top: 0 })")
-    expect(accountSettings).toContain(
+    expect(manageAccounts).toContain("window.scrollTo({ top: 0 })")
+    expect(manageAccounts).toContain(
       "auth.localization.settings.revokeSessionSuccess"
     )
-    expect(accountSettings).toContain("setActiveSession.mutate({")
-    expect(accountSettings).toContain("revokeMultiSession.mutate({")
-    expect(accountSettings).toContain("sessionToken:")
-    expect(accountSettings).toContain("deviceSession.session.token")
+    expect(manageAccounts).toContain("setActiveSession.mutate({")
+    expect(manageAccounts).toContain("revokeMultiSession.mutate({")
+    expect(manageAccounts).toContain("sessionToken:")
+    expect(manageAccounts).toContain("deviceSession.session.token")
     expect(manageAccountRow).toContain("ArrowLeftRight")
     expect(manageAccountRow).toContain("MoreHorizontal")
     expect(manageAccountRow).toContain("DropdownMenuTrigger")
     expect(manageAccountRow).toContain("DropdownMenuContent")
     expect(manageAccountRow).toContain("DropdownMenuItem")
     expect(manageAccountRow).toContain("auth.localization.auth.signOut")
-    expect(accountSettings).not.toContain(
+    expect(manageAccounts).not.toContain(
       "Multi-session switch and sign-out actions are shown but disabled until"
     )
-    expect(accountSettings).not.toMatch(
+    expect(manageAccounts).not.toMatch(
       /<Button disabled size="sm" type="button" variant="secondary">\s*Switch account/
     )
-    expect(accountSettings).not.toMatch(
+    expect(manageAccounts).not.toMatch(
       /<Button disabled size="sm" type="button" variant="secondary">\s*Sign out/
     )
   })
@@ -638,10 +963,7 @@ describe("Solid auth route component selection", () => {
 
   it("uses the exact shadcn theme preview SVG shapes for the Solid appearance cards", () => {
     const appearanceSettings = readFileSync(
-      resolve(
-        __dirname,
-        "../src/components/auth/settings/account/appearance-settings.tsx"
-      ),
+      resolve(__dirname, "../src/components/auth/theme/appearance.tsx"),
       "utf8"
     )
 
@@ -670,7 +992,7 @@ describe("Solid auth route component selection", () => {
 
   it("renders the security tab like the shadcn settings baseline", () => {
     const settingsComponents = readFileSync(
-      resolve(__dirname, "../src/routes/settings/-route-components.tsx"),
+      resolve(__dirname, "../src/components/auth/settings/settings.tsx"),
       "utf8"
     )
     const securitySettings = readFileSync(
@@ -701,12 +1023,19 @@ describe("Solid auth route component selection", () => {
       ),
       "utf8"
     )
+    const activeSession = readFileSync(
+      resolve(
+        __dirname,
+        "../src/components/auth/settings/security/active-session.tsx"
+      ),
+      "utf8"
+    )
 
     expect(settingsComponents).toContain(
       'from "@/components/auth/settings/security/security-settings"'
     )
-    expect(settingsComponents).toContain("createSecuritySettingsComponent({")
-    expect(settingsComponents).toContain("security: SecuritySettings")
+    expect(settingsComponents).not.toContain("createSecuritySettingsComponent")
+    expect(settingsComponents).toContain("<SecuritySettings />")
     expect(settingsComponents).not.toContain("function ChangePasswordSettings")
     expect(settingsComponents).not.toContain("function LinkedAccountsSettings")
     expect(settingsComponents).not.toContain("function ActiveSessionsSettings")
@@ -726,17 +1055,16 @@ describe("Solid auth route component selection", () => {
     expect(securitySettings).toContain("<ActiveSessionsSettings")
     expect(linkedAccounts).toContain("<ItemSeparator")
     expect(activeSessions).toContain("<ItemGroup")
-    expect(activeSessions).toContain("<Item")
-    expect(activeSessions).toContain("<ItemMedia")
-    expect(activeSessions).toContain("<ItemContent")
-    expect(activeSessions).toContain("<ItemTitle")
-    expect(activeSessions).toContain("<ItemDescription")
-    expect(activeSessions).toContain("<ItemActions")
+    expect(activeSessions).toContain("<ActiveSessionRow")
+    expect(activeSession).toContain("<Item")
+    expect(activeSession).toContain("<ItemMedia")
+    expect(activeSession).toContain("<ItemContent")
+    expect(activeSession).toContain("<ItemTitle")
+    expect(activeSession).toContain("<ItemDescription")
+    expect(activeSession).toContain("<ItemActions")
     expect(activeSessions).toContain("<ItemSeparator")
-    expect(activeSessions).toContain(
-      "auth.localization.settings.currentSession"
-    )
-    expect(activeSessions).toContain("auth.localization.auth.signOut")
+    expect(activeSession).toContain("auth.localization.settings.currentSession")
+    expect(activeSession).toContain("auth.localization.auth.signOut")
     expect(securitySettings).toContain("auth.plugins.flatMap")
     expect(securitySettings).toContain("plugin.securityCards")
     expect(settingsComponents).not.toContain("Plugin security cards")
@@ -762,7 +1090,7 @@ describe("Solid auth route component selection", () => {
     expect(changePassword).toContain("const linkedAccounts = createQuery")
     expect(changePassword).toContain('providerId === "credential"')
     expect(changePassword).toContain("requestPasswordReset.mutate")
-    expect(changePassword).toContain("props.session.data.user.email")
+    expect(changePassword).toContain("session.data.user.email")
     expect(changePassword).toContain("passwordResetEmailSent")
     expect(changePassword).toContain("const changePassword = createMutation")
     expect(changePassword).toContain("submitChangePassword")
@@ -805,7 +1133,7 @@ describe("Solid auth route component selection", () => {
     const itemPath = resolve(__dirname, "../src/components/ui/item.tsx")
     const item = readFileSync(itemPath, "utf8")
     const settingsComponents = readFileSync(
-      resolve(__dirname, "../src/routes/settings/-route-components.tsx"),
+      resolve(__dirname, "../src/components/auth/settings/settings.tsx"),
       "utf8"
     )
     const passkeys = readFileSync(
@@ -849,21 +1177,17 @@ describe("Solid auth route component selection", () => {
   })
 
   it("does not invent placeholder active-session rows when only the current session is known", () => {
-    const activeSessions = readFileSync(
+    const activeSession = readFileSync(
       resolve(
         __dirname,
-        "../src/components/auth/settings/security/active-sessions-settings.tsx"
+        "../src/components/auth/settings/security/active-session.tsx"
       ),
       "utf8"
     )
 
-    expect(activeSessions).toContain(
-      "auth.localization.settings.currentSession"
-    )
-    expect(activeSessions).not.toContain("Other active sessions")
-    expect(activeSessions).not.toContain(
-      "Additional sessions will appear here."
-    )
+    expect(activeSession).toContain("auth.localization.settings.currentSession")
+    expect(activeSession).not.toContain("Other active sessions")
+    expect(activeSession).not.toContain("Additional sessions will appear here.")
   })
 
   it("wires active sessions to real Solid session queries and revoke/sign-out parity", () => {
@@ -871,6 +1195,13 @@ describe("Solid auth route component selection", () => {
       resolve(
         __dirname,
         "../src/components/auth/settings/security/active-sessions-settings.tsx"
+      ),
+      "utf8"
+    )
+    const activeSession = readFileSync(
+      resolve(
+        __dirname,
+        "../src/components/auth/settings/security/active-session.tsx"
       ),
       "utf8"
     )
@@ -882,7 +1213,7 @@ describe("Solid auth route component selection", () => {
     expect(solidIndex).toContain(
       'export * from "./queries/settings/list-sessions-query"'
     )
-    expect(activeSessions).toContain('import Bowser from "bowser"')
+    expect(activeSession).toContain('import Bowser from "bowser"')
     expect(activeSessions).toContain("listSessionsOptions")
     expect(activeSessions).toContain("revokeSessionOptions")
     expect(activeSessions).toContain("const activeSessions = createQuery")
@@ -894,26 +1225,24 @@ describe("Solid auth route component selection", () => {
       "auth.localization.settings.revokeSessionSuccess"
     )
     expect(activeSessions).toContain("activeSession.token ===")
-    expect(activeSessions).toContain("props.session.data?.session.token")
+    expect(activeSessions).toContain("session.data?.session.token")
     expect(activeSessions).toContain("auth.navigate({")
     expect(activeSessions).toContain("auth.basePaths.auth")
     expect(activeSessions).toContain("auth.viewPaths.auth.signOut")
-    expect(activeSessions).toContain("auth.localization.auth.signOut")
-    expect(activeSessions).toContain("auth.localization.settings.revokeSession")
-    expect(activeSessions).toContain("auth.localization.settings.revoke")
-    expect(activeSessions).toContain(
-      "auth.localization.settings.currentSession"
-    )
-    expect(activeSessions).toContain(
+    expect(activeSession).toContain("auth.localization.auth.signOut")
+    expect(activeSession).toContain("auth.localization.settings.revokeSession")
+    expect(activeSession).toContain("auth.localization.settings.revoke")
+    expect(activeSession).toContain("auth.localization.settings.currentSession")
+    expect(activeSession).toContain(
       "Bowser.parse(props.activeSession.userAgent"
     )
-    expect(activeSessions).toContain("<Smartphone")
-    expect(activeSessions).toContain("<Monitor")
-    expect(activeSessions).toContain("<X")
-    expect(activeSessions).not.toContain(
+    expect(activeSession).toContain("<Smartphone")
+    expect(activeSession).toContain("<Monitor")
+    expect(activeSession).toContain("<X")
+    expect(activeSession).not.toContain(
       "Session revocation is not wired in this Solid slice yet."
     )
-    expect(activeSessions).not.toMatch(
+    expect(activeSession).not.toMatch(
       /<Button disabled size="sm" type="button" variant="outline">\s*<LogOut \/>\s*Sign out/
     )
   })
@@ -926,35 +1255,41 @@ describe("Solid auth route component selection", () => {
       ),
       "utf8"
     )
+    const linkedAccount = readFileSync(
+      resolve(
+        __dirname,
+        "../src/components/auth/settings/security/linked-account.tsx"
+      ),
+      "utf8"
+    )
 
-    expect(linkedAccounts).toContain("accountInfoOptions")
-    expect(linkedAccounts).toContain("linkSocialOptions")
-    expect(linkedAccounts).toContain("unlinkAccountOptions")
+    expect(linkedAccount).toContain("accountInfoOptions")
+    expect(linkedAccount).toContain("linkSocialOptions")
+    expect(linkedAccount).toContain("unlinkAccountOptions")
     expect(linkedAccounts).toContain("const linkedAccounts = createQuery")
     expect(linkedAccounts).toContain("...listAccountsOptions(")
     expect(linkedAccounts).toContain('providerId !== "credential"')
-    expect(linkedAccounts).toContain("const accountInfo = createQuery")
-    expect(linkedAccounts).toContain("...accountInfoOptions(")
-    expect(linkedAccounts).toContain("account?.accountId")
-    expect(linkedAccounts).toContain("const linkSocial = createMutation")
-    expect(linkedAccounts).toContain("...linkSocialOptions(auth.authClient)")
-    expect(linkedAccounts).toContain("provider,")
-    expect(linkedAccounts).toContain("callbackURL:")
-    expect(linkedAccounts).toContain("window.location.pathname")
-    expect(linkedAccounts).toContain("const unlinkAccount = createMutation")
-    expect(linkedAccounts).toContain("...unlinkAccountOptions(auth.authClient)")
-    expect(linkedAccounts).toContain("accountUnlinked")
-    expect(linkedAccounts).toContain("providerId: account.providerId")
-    expect(linkedAccounts).toContain("auth.localization.settings.linkProvider")
-    expect(linkedAccounts).toContain(
-      "auth.localization.settings.unlinkProvider"
-    )
-    expect(linkedAccounts).toContain("auth.localization.settings.link")
-    expect(linkedAccounts).toContain("Link2Off")
-    expect(linkedAccounts).not.toContain(
+    expect(linkedAccounts).toContain("<LinkedAccountRow")
+    expect(linkedAccount).toContain("const accountInfo = createQuery")
+    expect(linkedAccount).toContain("...accountInfoOptions(")
+    expect(linkedAccount).toContain("account?.accountId")
+    expect(linkedAccount).toContain("const linkSocial = createMutation")
+    expect(linkedAccount).toContain("...linkSocialOptions(auth.authClient)")
+    expect(linkedAccount).toContain("provider:")
+    expect(linkedAccount).toContain("callbackURL:")
+    expect(linkedAccount).toContain("window.location.pathname")
+    expect(linkedAccount).toContain("const unlinkAccount = createMutation")
+    expect(linkedAccount).toContain("...unlinkAccountOptions(auth.authClient)")
+    expect(linkedAccount).toContain("accountUnlinked")
+    expect(linkedAccount).toContain("providerId: account.providerId")
+    expect(linkedAccount).toContain("auth.localization.settings.linkProvider")
+    expect(linkedAccount).toContain("auth.localization.settings.unlinkProvider")
+    expect(linkedAccount).toContain("auth.localization.settings.link")
+    expect(linkedAccount).toContain("Link2Off")
+    expect(linkedAccount).not.toContain(
       "link and unlink mutations are not wired in this Solid slice yet."
     )
-    expect(linkedAccounts).not.toMatch(
+    expect(linkedAccount).not.toMatch(
       /<Button disabled size="sm" type="button" variant="outline">\s*<Link2 \/>\s*Link/
     )
   })
@@ -965,7 +1300,7 @@ describe("Solid auth route component selection", () => {
       "utf8"
     )
     const settingsComponents = readFileSync(
-      resolve(__dirname, "../src/routes/settings/-route-components.tsx"),
+      resolve(__dirname, "../src/components/auth/settings/settings.tsx"),
       "utf8"
     )
     const securitySettings = readFileSync(
@@ -1096,10 +1431,10 @@ describe("Solid auth route component selection", () => {
       "utf8"
     )
 
-    expect(settingsComponents).toContain(
+    expect(securitySettings).toContain(
       'from "@/components/auth/api-key/api-keys"'
     )
-    expect(settingsComponents).toContain("apiKeys: ApiKeysSettings")
+    expect(settingsComponents).not.toContain("apiKeys: ApiKeysSettings")
     expect(settingsComponents).not.toContain("function ApiKeysSettings")
     expect(settingsComponents).not.toContain("function ApiKeyRow")
     expect(settingsComponents).not.toContain("function CreateApiKeyDialog")
@@ -1117,10 +1452,10 @@ describe("Solid auth route component selection", () => {
     expect(createApiKeyDialog).toContain("<NewApiKeyDialog")
     expect(newApiKeyDialog).toContain("apiKeyLocalization.newApiKey")
     expect(deleteApiKeyDialog).toContain("deleteApiKeyOptions")
-    expect(settingsComponents).toContain(
+    expect(securitySettings).toContain(
       'from "@/components/auth/passkey/passkeys"'
     )
-    expect(settingsComponents).toContain("passkeys: PasskeysSettings")
+    expect(settingsComponents).not.toContain("passkeys: PasskeysSettings")
     expect(settingsComponents).not.toContain("function PasskeysSettings")
     expect(settingsComponents).not.toContain("function PasskeyRow")
     expect(settingsComponents).not.toContain("function AddPasskeyDialog")
@@ -1135,10 +1470,10 @@ describe("Solid auth route component selection", () => {
     expect(passkeys).toContain("passkeyLocalization.passkeys")
     expect(passkeys).toContain("passkeyLocalization.addPasskey")
     expect(passkeysEmpty).toContain("passkeyLocalization.noPasskeys")
-    expect(settingsComponents).toContain(
+    expect(securitySettings).toContain(
       'from "@/components/auth/delete-user/danger-zone"'
     )
-    expect(settingsComponents).toContain("dangerZone: DangerZone")
+    expect(settingsComponents).not.toContain("dangerZone: DangerZone")
     expect(settingsComponents).not.toContain("function DangerZoneSettings")
     expect(settingsComponents).not.toContain("function DeleteUserSettings")
     expect(dangerZone).toContain("DangerZone")
@@ -1251,7 +1586,14 @@ describe("Solid auth route component selection", () => {
 
   it("wires passkey list, add, and delete dialogs to Solid passkey mutations", () => {
     const settingsComponents = readFileSync(
-      resolve(__dirname, "../src/routes/settings/-route-components.tsx"),
+      resolve(__dirname, "../src/components/auth/settings/settings.tsx"),
+      "utf8"
+    )
+    const securitySettings = readFileSync(
+      resolve(
+        __dirname,
+        "../src/components/auth/settings/security/security-settings.tsx"
+      ),
       "utf8"
     )
 
@@ -1278,7 +1620,7 @@ describe("Solid auth route component selection", () => {
       "utf8"
     )
 
-    expect(settingsComponents).toContain(
+    expect(securitySettings).toContain(
       'from "@/components/auth/passkey/passkeys"'
     )
     expect(passkeys).toContain("passkeyLocalization")
@@ -1325,7 +1667,7 @@ describe("Solid auth route component selection", () => {
 
   it("wires delete-user danger-zone dialog to Solid mutation parity", () => {
     const settingsComponents = readFileSync(
-      resolve(__dirname, "../src/routes/settings/-route-components.tsx"),
+      resolve(__dirname, "../src/components/auth/settings/settings.tsx"),
       "utf8"
     )
     const securitySettings = readFileSync(
@@ -1344,7 +1686,7 @@ describe("Solid auth route component selection", () => {
       "utf8"
     )
 
-    expect(settingsComponents).toContain(
+    expect(securitySettings).toContain(
       'from "@/components/auth/delete-user/danger-zone"'
     )
     expect(settingsComponents).not.toContain("authQueryKeys")
@@ -1356,13 +1698,11 @@ describe("Solid auth route component selection", () => {
     expect(deleteUser).toContain("deleteUserOptions")
     expect(deleteUser).toContain("useQueryClient")
     expect(deleteUser).toContain("const queryClient = useQueryClient()")
-    expect(securitySettings).toContain(
-      "<DangerZoneSettings session={props.session} />"
-    )
-    expect(settingsComponents).toContain("dangerZone: DangerZone")
+    expect(securitySettings).toContain("<DangerZone />")
+    expect(settingsComponents).not.toContain("dangerZone: DangerZone")
     expect(settingsComponents).not.toContain("function DeleteUserSettings")
     expect(dangerZone).toContain("auth.localization.settings.dangerZone")
-    expect(dangerZone).toContain("<DeleteUser session={props.session}")
+    expect(dangerZone).toContain("<DeleteUser />")
     expect(deleteUser).toContain("const accounts = createQuery")
     expect(deleteUser).toContain(
       "...listAccountsOptions(auth.authClient, userId())"

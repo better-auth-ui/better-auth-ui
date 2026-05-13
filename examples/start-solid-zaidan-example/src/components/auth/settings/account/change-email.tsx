@@ -1,15 +1,15 @@
-import { changeEmailOptions, useAuth } from "@better-auth-ui/solid"
+import { changeEmailOptions, useAuth, useSession } from "@better-auth-ui/solid"
 import { createMutation } from "@tanstack/solid-query"
 import { createSignal, Show } from "solid-js"
 import { toast } from "solid-sonner"
-import type { SettingsSession } from "@/components/auth/settings/shared/types"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 
-export function ChangeEmail(props: { session: SettingsSession }) {
+export function ChangeEmail() {
   const auth = useAuth()
+  const session = useSession(auth.authClient)
   const [emailFieldError, setEmailFieldError] = createSignal<string>()
   const changeEmail = createMutation(() => ({
     ...changeEmailOptions(auth.authClient),
@@ -40,7 +40,7 @@ export function ChangeEmail(props: { session: SettingsSession }) {
               <Input
                 aria-invalid={!!emailFieldError()}
                 autocomplete="email"
-                disabled={changeEmail.isPending || !props.session.data}
+                disabled={changeEmail.isPending || !session.data}
                 id="settings-email"
                 name="email"
                 onInput={() => setEmailFieldError(undefined)}
@@ -51,7 +51,7 @@ export function ChangeEmail(props: { session: SettingsSession }) {
                 placeholder={auth.localization.auth.emailPlaceholder}
                 required
                 type="email"
-                value={props.session.data?.user.email ?? ""}
+                value={session.data?.user.email ?? ""}
               />
               <Show when={emailFieldError()}>
                 {(message) => (
@@ -62,7 +62,7 @@ export function ChangeEmail(props: { session: SettingsSession }) {
           </CardContent>
           <CardFooter>
             <Button
-              disabled={changeEmail.isPending || !props.session.data}
+              disabled={changeEmail.isPending || !session.data}
               size="sm"
               type="submit"
             >

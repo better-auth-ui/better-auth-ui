@@ -1,5 +1,6 @@
 import { apiKey } from "@better-auth/api-key"
 import { passkey } from "@better-auth/passkey"
+import type { AuthServer } from "@better-auth-ui/solid/server"
 import { betterAuth } from "better-auth"
 import { drizzleAdapter } from "better-auth/adapters/drizzle"
 import { multiSession, username } from "better-auth/plugins"
@@ -44,6 +45,8 @@ const authOptions = {
   }
 }
 
-const auth = betterAuth(authOptions)
+const authInstance = betterAuth(authOptions)
 
-export const authHandler = (request: Request) => auth.handler(request)
+export const auth: AuthServer = authInstance
+
+export const authHandler = (request: Request) => authInstance.handler(request)

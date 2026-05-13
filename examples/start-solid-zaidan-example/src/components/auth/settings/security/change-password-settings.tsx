@@ -2,17 +2,15 @@ import {
   changePasswordOptions,
   listAccountsOptions,
   requestPasswordResetOptions,
-  useAuth
+  useAuth,
+  useSession
 } from "@better-auth-ui/solid"
 import { createMutation, createQuery } from "@tanstack/solid-query"
 import { Eye, EyeOff } from "lucide-solid"
 import { createSignal, Show } from "solid-js"
 import { toast } from "solid-sonner"
 import { shouldLoadAccounts } from "@/components/auth/settings/shared/helpers"
-import type {
-  ChangePasswordFieldErrors,
-  SettingsSession
-} from "@/components/auth/settings/shared/types"
+import type { ChangePasswordFieldErrors } from "@/components/auth/settings/shared/types"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -27,12 +25,10 @@ function ChangePasswordSkeletonInput() {
   )
 }
 
-export function ChangePasswordSettings(props: {
-  confirmPassword?: boolean
-  session: SettingsSession
-}) {
+export function ChangePasswordSettings(props: { confirmPassword?: boolean }) {
   const auth = useAuth()
-  const userId = () => props.session.data?.user.id
+  const session = useSession(auth.authClient)
+  const userId = () => session.data?.user.id
   const linkedAccounts = createQuery(() => ({
     ...listAccountsOptions(auth.authClient, userId()),
     enabled: shouldLoadAccounts({
@@ -88,10 +84,10 @@ export function ChangePasswordSettings(props: {
   }
 
   const sendResetLink = () => {
-    if (!props.session.data) return
+    if (!session.data) return
 
     requestPasswordReset.mutate({
-      email: props.session.data.user.email
+      email: session.data.user.email
     } as Parameters<typeof requestPasswordReset.mutate>[0])
   }
 
@@ -133,7 +129,7 @@ export function ChangePasswordSettings(props: {
             </div>
 
             <Button
-              disabled={requestPasswordReset.isPending || !props.session.data}
+              disabled={requestPasswordReset.isPending || !session.data}
               onClick={sendResetLink}
               size="sm"
               type="button"
@@ -163,7 +159,7 @@ export function ChangePasswordSettings(props: {
               </Label>
               <Show
                 fallback={<ChangePasswordSkeletonInput />}
-                when={props.session.data && !linkedAccounts.isPending}
+                when={session.data && !linkedAccounts.isPending}
               >
                 <Input
                   aria-invalid={!!fieldErrors().currentPassword}
@@ -205,7 +201,7 @@ export function ChangePasswordSettings(props: {
               </Label>
               <Show
                 fallback={<ChangePasswordSkeletonInput />}
-                when={props.session.data && !linkedAccounts.isPending}
+                when={session.data && !linkedAccounts.isPending}
               >
                 <div class="relative">
                   <Input
@@ -277,7 +273,7 @@ export function ChangePasswordSettings(props: {
                 </Label>
                 <Show
                   fallback={<ChangePasswordSkeletonInput />}
-                  when={props.session.data && !linkedAccounts.isPending}
+                  when={session.data && !linkedAccounts.isPending}
                 >
                   <div class="relative">
                     <Input
@@ -348,7 +344,7 @@ export function ChangePasswordSettings(props: {
 
           <CardFooter>
             <Button
-              disabled={isPasswordPending() || !props.session.data}
+              disabled={isPasswordPending() || !session.data}
               size="sm"
               type="submit"
             >

@@ -1,13 +1,37 @@
 import { viewPaths } from "@better-auth-ui/core"
-import { createFileRoute, notFound } from "@tanstack/solid-router"
+import { ensureSession as ensureSessionClient } from "@better-auth-ui/solid"
+import { ensureSession as ensureSessionServer } from "@better-auth-ui/solid/server"
+import { createFileRoute, notFound, redirect } from "@tanstack/solid-router"
+import { createIsomorphicFn } from "@tanstack/solid-start"
+import { getRequestHeaders } from "@tanstack/solid-start/server"
 
-import { Settings } from "@/routes/settings/-route-components"
+import { authClient } from "@/components/auth/auth-provider"
+import { Settings } from "@/components/auth/settings/settings"
+import { auth } from "@/lib/auth"
 
 export const Route = createFileRoute("/settings/$path")({
-  beforeLoad({ params: { path } }) {
+  async beforeLoad({ params: { path }, context: { queryClient }, location }) {
     if (!Object.values(viewPaths.settings).includes(path)) {
       throw notFound()
     }
+
+    const ensureSession = createIsomorphicFn()
+      .server(() =>
+        ensureSessionServer(queryClient, auth, { headers: getRequestHeaders() })
+      )
+      .client(() => ensureSessionClient(queryClient, authClient))
+
+    const session = await ensureSession()
+
+    if (!session) {
+      throw redirect({
+        to: "/auth/$path",
+        params: { path: "sign-in" },
+        search: { redirectTo: location.href }
+      })
+    }
+
+    return { session }
   },
   component: SettingsPage
 })

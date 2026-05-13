@@ -1,29 +1,16 @@
 import { useAuth, useSession } from "@better-auth-ui/solid"
-import type { Component } from "solid-js"
-import { createEffect, createMemo, Show } from "solid-js"
+import { createMemo, Show } from "solid-js"
+import { AccountSettings } from "@/components/auth/settings/account/account-settings"
+import { SecuritySettings } from "@/components/auth/settings/security/security-settings"
 import type {
   SettingsPathViews,
-  SettingsRouteResolution,
-  SettingsSession
+  SettingsRouteResolution
 } from "@/components/auth/settings/shared/types"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { cn } from "@/lib/utils"
 
-type SettingsPanel = Component<{ session: SettingsSession }>
-
-type SettingsRouteComponents = {
-  account: SettingsPanel
-  security: SettingsPanel
-}
-
-type SettingsShellProps = {
-  activeRoute: SettingsRouteResolution
-  class?: string
-  currentView: string | undefined
-  onTabChange: (nextView: string) => void
-  routeComponents: SettingsRouteComponents
-  session: SettingsSession
-}
+export { AccountSettings } from "@/components/auth/settings/account/account-settings"
+export { SecuritySettings } from "@/components/auth/settings/security/security-settings"
 
 const settingsPathViews = () => {
   const auth = useAuth()
@@ -33,41 +20,48 @@ const settingsPathViews = () => {
   ) as SettingsPathViews
 }
 
-export function createSettingsRouteResolver(
-  routeComponents: SettingsRouteComponents
-) {
-  return function resolveSettingsRoute(path: string): SettingsRouteResolution {
-    if (path === "account") {
-      return { component: routeComponents.account, title: "Account" }
-    }
-
-    if (path === "security") {
-      return { component: routeComponents.security, title: "Security" }
-    }
-
-    return { redirectTo: "/" }
+export function resolveSettingsRoute(path: string): SettingsRouteResolution {
+  if (path === "account") {
+    return { component: AccountSettings, title: "Account" }
   }
+
+  if (path === "security") {
+    return { component: SecuritySettings, title: "Security" }
+  }
+
+  return { redirectTo: "/" }
 }
 
-export function SettingsShell(props: SettingsShellProps) {
+export function Settings(props: { class?: string; path: string }) {
   const auth = useAuth()
-  const AccountSettings = props.routeComponents.account
-  const SecuritySettings = props.routeComponents.security
+  const session = useSession(auth.authClient, {
+    enabled: !import.meta.env.SSR
+  })
+  const currentView = createMemo(() => settingsPathViews()[props.path])
+  const activeRoute = createMemo(() => resolveSettingsRoute(props.path))
+
+  const handleSettingsTabChange = (nextView: string) => {
+    if (nextView !== "account" && nextView !== "security") return
+
+    auth.navigate({
+      to: `${auth.basePaths.settings}/${auth.viewPaths.settings[nextView]}`
+    })
+  }
 
   return (
     <div class={cn("w-full gap-4 md:gap-6", props.class)}>
       <Show
-        when={!props.session.isPending && props.session.data}
+        when={!session.isPending && session.data}
         fallback={
           <p class="text-sm text-muted-foreground">Loading settings…</p>
         }
       >
-        <Show when={!("redirectTo" in props.activeRoute)}>
+        <Show when={!("redirectTo" in activeRoute())}>
           <Tabs
             aria-label={auth.localization.settings.settings}
             class="w-full gap-4 md:gap-6"
-            onChange={props.onTabChange}
-            value={props.currentView}
+            onChange={handleSettingsTabChange}
+            value={currentView()}
           >
             <div>
               <TabsList aria-label={auth.localization.settings.settings}>
@@ -81,60 +75,14 @@ export function SettingsShell(props: SettingsShellProps) {
             </div>
 
             <TabsContent tabIndex={-1} value="account">
-              <AccountSettings session={props.session} />
+              <AccountSettings />
             </TabsContent>
             <TabsContent tabIndex={-1} value="security">
-              <SecuritySettings session={props.session} />
+              <SecuritySettings />
             </TabsContent>
           </Tabs>
         </Show>
       </Show>
     </div>
   )
-}
-
-export function createSettingsComponent(
-  routeComponents: SettingsRouteComponents
-) {
-  const resolveSettingsRoute = createSettingsRouteResolver(routeComponents)
-
-  return function Settings(props: { class?: string; path: string }) {
-    const auth = useAuth()
-    const session = useSession(auth.authClient, {
-      enabled: !import.meta.env.SSR
-    })
-    const currentView = createMemo(() => settingsPathViews()[props.path])
-    const activeRoute = createMemo(() => resolveSettingsRoute(props.path))
-
-    const handleSettingsTabChange = (nextView: string) => {
-      if (nextView !== "account" && nextView !== "security") return
-
-      auth.navigate({
-        to: `${auth.basePaths.settings}/${auth.viewPaths.settings[nextView]}`
-      })
-    }
-
-    createEffect(() => {
-      if (import.meta.env.SSR || session.isPending || session.data) return
-
-      const currentURL = window.location.pathname + window.location.search
-      const redirectTo = encodeURIComponent(currentURL)
-
-      auth.navigate({
-        replace: true,
-        to: `${auth.basePaths.auth}/${auth.viewPaths.auth.signIn}?redirectTo=${redirectTo}`
-      })
-    })
-
-    return (
-      <SettingsShell
-        activeRoute={activeRoute()}
-        class={props.class}
-        currentView={currentView()}
-        onTabChange={handleSettingsTabChange}
-        routeComponents={routeComponents}
-        session={session}
-      />
-    )
-  }
 }
