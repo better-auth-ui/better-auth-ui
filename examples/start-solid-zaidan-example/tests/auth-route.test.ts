@@ -21,6 +21,8 @@ import {
 import { SignIn } from "../src/components/auth/sign-in"
 import {
   resolveSignInPath,
+  resolveSocialAuthParams,
+  resolveSocialAuthURLs,
   resolveSubmittedSignIn
 } from "../src/components/auth/sign-in-path"
 import { SignOut } from "../src/components/auth/sign-out"
@@ -109,6 +111,10 @@ describe("Solid auth route component selection", () => {
       resolve(__dirname, "../src/lib/auth-client.ts"),
       "utf8"
     )
+    const authServer = readFileSync(
+      resolve(__dirname, "../src/lib/auth.ts"),
+      "utf8"
+    )
 
     expect(providers).toContain(
       'import { useNavigate } from "@tanstack/solid-router"'
@@ -122,15 +128,173 @@ describe("Solid auth route component selection", () => {
     expect(providers).toContain("const navigate = useNavigate()")
     expect(providers).toContain('redirectTo="/settings/account"')
     expect(providers).toContain("navigate={navigate}")
+    expect(providers).toContain('socialProviders={["github"]}')
     expect(providers).toContain("multiSessionPlugin()")
     expect(providers).toContain("apiKeyPlugin()")
     expect(providers).toContain("passkeyPlugin()")
+    expect(providers).toContain('from "@/lib/auth/passkey-plugin"')
     expect(providers).toContain("deleteUserPlugin()")
     expect(providers).toContain("usernamePlugin()")
+    expect(providers).not.toContain("magicLinkPlugin()")
+    expect(providers).not.toContain('from "@/lib/auth/magic-link-plugin"')
     expect(authClient).toContain("export const authClient")
     expect(authClient).toContain("createAuthClient")
+    expect(authClient).toContain("magicLinkClient")
+    expect(authClient).toContain("magicLinkClient()")
+    expect(authServer).toContain("socialProviders")
+    expect(authServer).toContain("github")
+    expect(authServer).toContain("GITHUB_CLIENT_ID")
+    expect(authServer).toContain("GITHUB_CLIENT_SECRET")
+    expect(authServer).toContain("magicLink")
+    expect(authServer).toContain("sendMagicLink")
+    expect(authServer).toContain("Magic link email delivery is not configured")
+    expect(authServer).toContain("console.info")
+    expect(authServer).toContain('"http://localhost:3000"')
     expect(authProvider).not.toContain("useNavigate")
     expect(authProvider).not.toContain("createAuthClient")
+  })
+
+  it("loads the example-local env file into server-side auth config when Vite runs from the workspace", () => {
+    const viteConfig = readFileSync(
+      resolve(__dirname, "../vite.config.ts"),
+      "utf8"
+    )
+
+    expect(viteConfig).toContain('import { defineConfig, loadEnv } from "vite"')
+    expect(viteConfig).toContain("const exampleEnvDir")
+    expect(viteConfig).toContain('loadEnv(mode, exampleEnvDir, "")')
+    expect(viteConfig).toContain("Object.assign(process.env")
+    expect(viteConfig).toContain("envDir: exampleEnvDir")
+    expect(viteConfig).toContain("GITHUB_CLIENT_ID")
+    expect(viteConfig).toContain("GITHUB_CLIENT_SECRET")
+    expect(viteConfig).toContain("BETTER_AUTH_URL")
+    expect(viteConfig).not.toContain("process.cwd()")
+  })
+
+  it("keeps magic-link configured but not surfaced in the default shadcn-parity sign-in", () => {
+    const authRoute = readFileSync(
+      resolve(__dirname, "../src/routes/auth/$path.tsx"),
+      "utf8"
+    )
+    const authComponent = readFileSync(
+      resolve(__dirname, "../src/components/auth/auth.tsx"),
+      "utf8"
+    )
+    const signInUsername = readFileSync(
+      resolve(
+        __dirname,
+        "../src/components/auth/username/sign-in-username.tsx"
+      ),
+      "utf8"
+    )
+    const providers = readFileSync(
+      resolve(__dirname, "../src/components/providers.tsx"),
+      "utf8"
+    )
+    const authClient = readFileSync(
+      resolve(__dirname, "../src/lib/auth-client.ts"),
+      "utf8"
+    )
+    const authServer = readFileSync(
+      resolve(__dirname, "../src/lib/auth.ts"),
+      "utf8"
+    )
+    const magicLinkPlugin = readFileSync(
+      resolve(__dirname, "../src/lib/auth/magic-link-plugin.ts"),
+      "utf8"
+    )
+
+    expect(authRoute).not.toContain("magicLinkPlugin().viewPaths")
+    expect(authRoute).not.toContain("supportedAuthPaths")
+    expect(authComponent).toContain("plugin.views?.auth")
+    expect(authComponent).toContain("plugin.fallbackViews?.auth?.signIn")
+    expect(signInUsername).toContain(".flatMap(")
+    expect(signInUsername).toContain('view="signIn"')
+    expect(providers).not.toContain("magicLinkPlugin()")
+    expect(authClient).toContain("magicLinkClient()")
+    expect(authServer).toContain("magicLink({")
+    expect(magicLinkPlugin).toContain("authButtons: [MagicLinkButton]")
+    expect(magicLinkPlugin).toContain("views:")
+  })
+
+  it("surfaces shadcn-visible GitHub and passkey auth entry points in Solid", () => {
+    const providers = readFileSync(
+      resolve(__dirname, "../src/components/providers.tsx"),
+      "utf8"
+    )
+    const passkeyPlugin = readFileSync(
+      resolve(__dirname, "../src/lib/auth/passkey-plugin.ts"),
+      "utf8"
+    )
+    const providerButtons = readFileSync(
+      resolve(__dirname, "../src/components/auth/provider-buttons.tsx"),
+      "utf8"
+    )
+    const providerButton = readFileSync(
+      resolve(__dirname, "../src/components/auth/provider-button.tsx"),
+      "utf8"
+    )
+    const signInUsername = readFileSync(
+      resolve(
+        __dirname,
+        "../src/components/auth/username/sign-in-username.tsx"
+      ),
+      "utf8"
+    )
+
+    expect(providers).toContain('socialProviders={["github"]}')
+    expect(providerButtons).toContain("auth.socialProviders")
+    expect(providerButtons).toContain("<ProviderButton")
+    expect(providerButtons).toContain("view={props.view}")
+    expect(providerButton).toContain("auth.authClient.signIn.social")
+    expect(providerButton).toContain("provider: props.provider")
+    expect(providerButton).toContain("resolveSocialAuthParams")
+    expect(passkeyPlugin).toContain("authButtons: [PasskeyButton]")
+    expect(passkeyPlugin).toContain("securityCards: [Passkeys]")
+    expect(signInUsername).toContain("plugin.authButtons")
+    expect(signInUsername).toContain('view="signIn"')
+  })
+
+  it("builds GitHub social sign-in and sign-up redirect URLs from existing auth redirects", () => {
+    const sharedAuthContext = {
+      basePaths: { auth: "/auth" },
+      baseURL: "http://localhost:5173",
+      redirectTo: "/settings/account",
+      viewPaths: {
+        auth: {
+          signIn: "sign-in",
+          signUp: "sign-up"
+        }
+      }
+    }
+
+    expect(
+      resolveSocialAuthURLs({ ...sharedAuthContext, view: "signIn" })
+    ).toEqual({
+      callbackURL: "http://localhost:5173/settings/account",
+      errorCallbackURL: "http://localhost:5173/auth/sign-in"
+    })
+
+    expect(
+      resolveSocialAuthURLs({ ...sharedAuthContext, view: "signUp" })
+    ).toEqual({
+      callbackURL: "http://localhost:5173/settings/account",
+      errorCallbackURL: "http://localhost:5173/auth/sign-up",
+      newUserCallbackURL: "http://localhost:5173/settings/account"
+    })
+
+    expect(
+      resolveSocialAuthParams({
+        ...sharedAuthContext,
+        provider: "github",
+        view: "signUp"
+      })
+    ).toEqual({
+      callbackURL: "http://localhost:5173/settings/account",
+      errorCallbackURL: "http://localhost:5173/auth/sign-up",
+      newUserCallbackURL: "http://localhost:5173/settings/account",
+      provider: "github"
+    })
   })
 
   it("shares the router QueryClient with Solid auth queries across navigation", () => {
@@ -172,7 +336,10 @@ describe("Solid auth route component selection", () => {
 
   it("redirects Solid sign-in success like shadcn and refreshes the session query", () => {
     const signIn = readFileSync(
-      resolve(__dirname, "../src/components/auth/sign-in.tsx"),
+      resolve(
+        __dirname,
+        "../src/components/auth/username/sign-in-username.tsx"
+      ),
       "utf8"
     )
 
@@ -183,7 +350,8 @@ describe("Solid auth route component selection", () => {
     expect(signIn).toContain("queryClient.invalidateQueries({")
     expect(signIn).toContain("queryKey: authQueryKeys.session")
     expect(signIn).toContain("auth.navigate({ to: auth.redirectTo })")
-    expect(signIn).not.toContain("callbackURL:")
+    expect(signIn).toContain("<ProviderButtons")
+    expect(signIn).toContain('view="signIn"')
   })
 
   it("selects Better Auth email sign-in for email identifiers even when username auth is enabled", () => {
@@ -241,7 +409,8 @@ describe("Solid auth route component selection", () => {
     expect(signUp).toContain("queryClient.invalidateQueries({")
     expect(signUp).toContain("queryKey: authQueryKeys.session")
     expect(signUp).toContain("auth.navigate({ to: auth.redirectTo })")
-    expect(signUp).not.toContain("callbackURL:")
+    expect(signUp).toContain("<ProviderButtons")
+    expect(signUp).toContain('view="signUp"')
   })
 
   it("keeps the shadcn redirect target routable in the Solid example", () => {
@@ -474,7 +643,7 @@ describe("Solid auth route component selection", () => {
     const activeSessions = readFileSync(
       resolve(
         __dirname,
-        "../src/components/auth/settings/security/active-sessions-settings.tsx"
+        "../src/components/auth/settings/security/active-sessions.tsx"
       ),
       "utf8"
     )
@@ -485,7 +654,7 @@ describe("Solid auth route component selection", () => {
     const changePassword = readFileSync(
       resolve(
         __dirname,
-        "../src/components/auth/settings/security/change-password-settings.tsx"
+        "../src/components/auth/settings/security/change-password.tsx"
       ),
       "utf8"
     )
@@ -619,11 +788,11 @@ describe("Solid auth route component selection", () => {
         file: "settings/security/active-session.tsx"
       },
       {
-        expected: 'from "./active-sessions-settings"',
+        expected: "export function ActiveSessionsSettings",
         file: "settings/security/active-sessions.tsx"
       },
       {
-        expected: 'from "./change-password-settings"',
+        expected: "export function ChangePasswordSettings",
         file: "settings/security/change-password.tsx"
       },
       {
@@ -631,7 +800,7 @@ describe("Solid auth route component selection", () => {
         file: "settings/security/linked-account.tsx"
       },
       {
-        expected: 'from "./linked-accounts-settings"',
+        expected: "export function LinkedAccountsSettings",
         file: "settings/security/linked-accounts.tsx"
       }
     ]
@@ -721,14 +890,14 @@ describe("Solid auth route component selection", () => {
     const activeSessionsSettings = readFileSync(
       resolve(
         __dirname,
-        "../src/components/auth/settings/security/active-sessions-settings.tsx"
+        "../src/components/auth/settings/security/active-sessions.tsx"
       ),
       "utf8"
     )
     const linkedAccountsSettings = readFileSync(
       resolve(
         __dirname,
-        "../src/components/auth/settings/security/linked-accounts-settings.tsx"
+        "../src/components/auth/settings/security/linked-accounts.tsx"
       ),
       "utf8"
     )
@@ -738,9 +907,212 @@ describe("Solid auth route component selection", () => {
     expect(linkedAccountsSettings).not.toContain("function LinkedAccountRow(")
   })
 
+  it("closes remaining shadcn-like Solid auth file parity with real implementations or documented guards", () => {
+    const canonicalFiles = [
+      "additional-field.tsx",
+      "provider-button.tsx",
+      "provider-buttons.tsx",
+      "username/username-field.tsx",
+      "username/sign-in-username.tsx",
+      "magic-link.tsx",
+      "magic-link-button.tsx",
+      "passkey/passkey-button.tsx",
+      "settings/account/change-avatar.tsx",
+      "settings/security/active-sessions.tsx",
+      "settings/security/change-password.tsx",
+      "settings/security/linked-accounts.tsx"
+    ]
+
+    for (const file of canonicalFiles) {
+      expect(
+        existsSync(resolve(__dirname, `../src/components/auth/${file}`)),
+        file
+      ).toBe(true)
+    }
+
+    const expectedImplementations = [
+      {
+        expected: "export function AdditionalField",
+        file: "additional-field.tsx"
+      },
+      {
+        expected: "export function ProviderButton",
+        file: "provider-button.tsx"
+      },
+      {
+        expected: "export function ProviderButtons",
+        file: "provider-buttons.tsx"
+      },
+      {
+        expected: "export function UsernameField",
+        file: "username/username-field.tsx"
+      },
+      {
+        expected: "export function SignInUsername",
+        file: "username/sign-in-username.tsx"
+      },
+      {
+        expected: "export function MagicLink",
+        file: "magic-link.tsx"
+      },
+      {
+        expected: "export function MagicLinkButton",
+        file: "magic-link-button.tsx"
+      },
+      {
+        expected: "export function PasskeyButton",
+        file: "passkey/passkey-button.tsx"
+      },
+      {
+        expected: "export function ChangeAvatar",
+        file: "settings/account/change-avatar.tsx"
+      },
+      {
+        expected: "export function ActiveSessionsSettings",
+        file: "settings/security/active-sessions.tsx"
+      },
+      {
+        expected: "export function ChangePasswordSettings",
+        file: "settings/security/change-password.tsx"
+      },
+      {
+        expected: "export function LinkedAccountsSettings",
+        file: "settings/security/linked-accounts.tsx"
+      }
+    ]
+
+    for (const implementation of expectedImplementations) {
+      const source = readFileSync(
+        resolve(__dirname, `../src/components/auth/${implementation.file}`),
+        "utf8"
+      )
+
+      expect(source, implementation.file).toContain(implementation.expected)
+      expect(isSimpleReExportOnly(source), implementation.file).toBe(false)
+    }
+
+    const signIn = readFileSync(
+      resolve(__dirname, "../src/components/auth/sign-in.tsx"),
+      "utf8"
+    )
+    const signInUsername = readFileSync(
+      resolve(
+        __dirname,
+        "../src/components/auth/username/sign-in-username.tsx"
+      ),
+      "utf8"
+    )
+    const userProfile = readFileSync(
+      resolve(
+        __dirname,
+        "../src/components/auth/settings/account/user-profile.tsx"
+      ),
+      "utf8"
+    )
+    const changeAvatar = readFileSync(
+      resolve(
+        __dirname,
+        "../src/components/auth/settings/account/change-avatar.tsx"
+      ),
+      "utf8"
+    )
+    const providerButton = readFileSync(
+      resolve(__dirname, "../src/components/auth/provider-button.tsx"),
+      "utf8"
+    )
+    const providerButtons = readFileSync(
+      resolve(__dirname, "../src/components/auth/provider-buttons.tsx"),
+      "utf8"
+    )
+    const additionalField = readFileSync(
+      resolve(__dirname, "../src/components/auth/additional-field.tsx"),
+      "utf8"
+    )
+    const passkeyButton = readFileSync(
+      resolve(__dirname, "../src/components/auth/passkey/passkey-button.tsx"),
+      "utf8"
+    )
+    const magicLink = readFileSync(
+      resolve(__dirname, "../src/components/auth/magic-link.tsx"),
+      "utf8"
+    )
+    const magicLinkButton = readFileSync(
+      resolve(__dirname, "../src/components/auth/magic-link-button.tsx"),
+      "utf8"
+    )
+
+    expect(signIn).toContain('from "./username/sign-in-username"')
+    expect(signIn).not.toContain("function resolveSubmittedSignIn")
+    expect(signInUsername).toContain("resolveSubmittedSignIn")
+    expect(signInUsername).toContain("signInUsernameOptions")
+    expect(signInUsername).toContain("authQueryKeys.session")
+    expect(userProfile).toContain(
+      'from "@/components/auth/settings/account/change-avatar"'
+    )
+    expect(userProfile).toContain("<ChangeAvatar")
+    expect(userProfile).not.toContain("handleAvatarFileChange")
+    expect(changeAvatar).toContain("fileToBase64")
+    expect(changeAvatar).toContain("updateUserOptions")
+    expect(changeAvatar).toContain("avatarChangedSuccess")
+    expect(providerButton).toContain("auth.authClient.signIn.social")
+    expect(providerButton).toContain("resolveSocialAuthParams")
+    expect(providerButton).toContain("getProviderName")
+    expect(providerButtons).toContain("ProviderButton")
+    expect(providerButtons).toContain('SocialLayout = "auto"')
+    expect(additionalField).toContain("resolveInputType")
+    expect(additionalField).toContain("field.render")
+    expect(passkeyButton).toContain("signInPasskeyOptions")
+    expect(passkeyButton).toContain('view === "signUp"')
+    expect(magicLink).toContain("signInMagicLinkOptions")
+    expect(magicLink).toContain('plugin.id === "magicLink"')
+    expect(magicLinkButton).toContain('view === "magicLink"')
+    expect(magicLinkButton).toContain('plugin.id === "magicLink"')
+    expect(magicLinkButton).not.toContain("magic link plugin is not wired")
+  })
+
+  it("removes unused security compatibility wrappers while keeping canonical implementations real", () => {
+    const removedCompatibilityWrappers = [
+      "settings/security/active-sessions-settings.tsx",
+      "settings/security/change-password-settings.tsx",
+      "settings/security/linked-accounts-settings.tsx"
+    ]
+
+    for (const file of removedCompatibilityWrappers) {
+      expect(
+        existsSync(resolve(__dirname, `../src/components/auth/${file}`)),
+        file
+      ).toBe(false)
+    }
+
+    const canonicalImplementations = [
+      {
+        expected: "export function ActiveSessionsSettings",
+        file: "settings/security/active-sessions.tsx"
+      },
+      {
+        expected: "export function ChangePasswordSettings",
+        file: "settings/security/change-password.tsx"
+      },
+      {
+        expected: "export function LinkedAccountsSettings",
+        file: "settings/security/linked-accounts.tsx"
+      }
+    ]
+
+    for (const implementation of canonicalImplementations) {
+      const source = readFileSync(
+        resolve(__dirname, `../src/components/auth/${implementation.file}`),
+        "utf8"
+      )
+
+      expect(source, implementation.file).toContain(implementation.expected)
+      expect(isSimpleReExportOnly(source), implementation.file).toBe(false)
+    }
+  })
+
   it("uses TanStack Link for auth form helper navigation", () => {
     const helperLinkFiles = [
-      "sign-in.tsx",
+      "username/sign-in-username.tsx",
       "sign-up.tsx",
       "forgot-password.tsx",
       "reset-password.tsx"
@@ -935,36 +1307,36 @@ describe("Solid auth route component selection", () => {
   })
 
   it("wires avatar upload and delete to Solid updateUser mutation like shadcn ChangeAvatar", () => {
-    const userProfile = readFileSync(
+    const changeAvatar = readFileSync(
       resolve(
         __dirname,
-        "../src/components/auth/settings/account/user-profile.tsx"
+        "../src/components/auth/settings/account/change-avatar.tsx"
       ),
       "utf8"
     )
 
-    expect(userProfile).toContain("fileToBase64")
-    expect(userProfile).toContain('import { toast } from "solid-sonner"')
-    expect(userProfile).toContain("DropdownMenu")
-    expect(userProfile).toContain("DropdownMenuContent")
-    expect(userProfile).toContain("DropdownMenuItem")
-    expect(userProfile).toContain("DropdownMenuTrigger")
-    expect(userProfile).toContain("Upload")
-    expect(userProfile).toContain("Trash2")
-    expect(userProfile).toContain('type="file"')
-    expect(userProfile).toContain('accept="image/*"')
-    expect(userProfile).toContain("handleAvatarFileChange")
-    expect(userProfile).toContain("auth.avatar.resize")
-    expect(userProfile).toContain("auth.avatar.upload")
-    expect(userProfile).toContain("updateUser.mutate(")
-    expect(userProfile).toContain("{ image },")
-    expect(userProfile).toContain("avatarChangedSuccess")
-    expect(userProfile).toContain("deleteAvatar")
-    expect(userProfile).toContain("{ image: null },")
-    expect(userProfile).toContain("auth.avatar.delete")
-    expect(userProfile).toContain("avatarDeletedSuccess")
-    expect(userProfile).toContain("uploadAvatar")
-    expect(userProfile).toContain("changeAvatar")
+    expect(changeAvatar).toContain("fileToBase64")
+    expect(changeAvatar).toContain('import { toast } from "solid-sonner"')
+    expect(changeAvatar).toContain("DropdownMenu")
+    expect(changeAvatar).toContain("DropdownMenuContent")
+    expect(changeAvatar).toContain("DropdownMenuItem")
+    expect(changeAvatar).toContain("DropdownMenuTrigger")
+    expect(changeAvatar).toContain("Upload")
+    expect(changeAvatar).toContain("Trash2")
+    expect(changeAvatar).toContain('type="file"')
+    expect(changeAvatar).toContain('accept="image/*"')
+    expect(changeAvatar).toContain("handleAvatarFileChange")
+    expect(changeAvatar).toContain("auth.avatar.resize")
+    expect(changeAvatar).toContain("auth.avatar.upload")
+    expect(changeAvatar).toContain("updateUser.mutate(")
+    expect(changeAvatar).toContain("{ image },")
+    expect(changeAvatar).toContain("avatarChangedSuccess")
+    expect(changeAvatar).toContain("deleteAvatar")
+    expect(changeAvatar).toContain("{ image: null },")
+    expect(changeAvatar).toContain("auth.avatar.delete")
+    expect(changeAvatar).toContain("avatarDeletedSuccess")
+    expect(changeAvatar).toContain("uploadAvatar")
+    expect(changeAvatar).toContain("changeAvatar")
   })
 
   it("wires change email to the Solid changeEmail mutation like the shadcn account form", () => {
@@ -1045,21 +1417,21 @@ describe("Solid auth route component selection", () => {
     const changePassword = readFileSync(
       resolve(
         __dirname,
-        "../src/components/auth/settings/security/change-password-settings.tsx"
+        "../src/components/auth/settings/security/change-password.tsx"
       ),
       "utf8"
     )
     const linkedAccounts = readFileSync(
       resolve(
         __dirname,
-        "../src/components/auth/settings/security/linked-accounts-settings.tsx"
+        "../src/components/auth/settings/security/linked-accounts.tsx"
       ),
       "utf8"
     )
     const activeSessions = readFileSync(
       resolve(
         __dirname,
-        "../src/components/auth/settings/security/active-sessions-settings.tsx"
+        "../src/components/auth/settings/security/active-sessions.tsx"
       ),
       "utf8"
     )
@@ -1119,7 +1491,7 @@ describe("Solid auth route component selection", () => {
     const changePassword = readFileSync(
       resolve(
         __dirname,
-        "../src/components/auth/settings/security/change-password-settings.tsx"
+        "../src/components/auth/settings/security/change-password.tsx"
       ),
       "utf8"
     )
@@ -1234,7 +1606,7 @@ describe("Solid auth route component selection", () => {
     const activeSessions = readFileSync(
       resolve(
         __dirname,
-        "../src/components/auth/settings/security/active-sessions-settings.tsx"
+        "../src/components/auth/settings/security/active-sessions.tsx"
       ),
       "utf8"
     )
@@ -1291,7 +1663,7 @@ describe("Solid auth route component selection", () => {
     const linkedAccounts = readFileSync(
       resolve(
         __dirname,
-        "../src/components/auth/settings/security/linked-accounts-settings.tsx"
+        "../src/components/auth/settings/security/linked-accounts.tsx"
       ),
       "utf8"
     )

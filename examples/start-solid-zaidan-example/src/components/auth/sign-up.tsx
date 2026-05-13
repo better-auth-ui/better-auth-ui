@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { ProviderButtons } from "./provider-buttons"
 
 export function SignUp() {
   const auth = useAuth()
@@ -319,6 +320,13 @@ export function SignUp() {
             </Show>
           </div>
         </form>
+
+        <Show when={auth.socialProviders?.length}>
+          <div class="my-4 text-center text-muted-foreground text-xs">
+            {auth.localization.auth.or}
+          </div>
+          <ProviderButtons view="signUp" />
+        </Show>
 
         <div class="mt-4 flex w-full flex-col items-center gap-3">
           <p class="text-center text-sm text-muted-foreground">

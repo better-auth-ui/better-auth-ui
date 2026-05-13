@@ -2,7 +2,11 @@ import { apiKeyClient } from "@better-auth/api-key/client"
 import { passkeyClient } from "@better-auth/passkey/client"
 import type { AuthClient } from "@better-auth-ui/solid"
 import { createAuthClient } from "@better-auth-ui/solid"
-import { multiSessionClient, usernameClient } from "better-auth/client/plugins"
+import {
+  magicLinkClient,
+  multiSessionClient,
+  usernameClient
+} from "better-auth/client/plugins"
 
 const resolveAuthBaseURL = () => {
   if (import.meta.env.VITE_AUTH_URL) return import.meta.env.VITE_AUTH_URL
@@ -20,6 +24,7 @@ export const authClient: AuthClient = createAuthClient({
     multiSessionClient(),
     apiKeyClient(),
     passkeyClient(),
-    usernameClient()
+    usernameClient(),
+    magicLinkClient()
   ]
 })

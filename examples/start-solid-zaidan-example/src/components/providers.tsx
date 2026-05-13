@@ -2,14 +2,13 @@ import {
   apiKeyPlugin,
   deleteUserPlugin,
   multiSessionPlugin,
-  passkeyPlugin,
   usernamePlugin
 } from "@better-auth-ui/core/plugins"
 import type { QueryClient } from "@tanstack/solid-query"
 import { useNavigate } from "@tanstack/solid-router"
 import type { JSX } from "solid-js"
 import { onCleanup, onMount } from "solid-js"
-
+import { passkeyPlugin } from "@/lib/auth/passkey-plugin"
 import { authClient } from "@/lib/auth-client"
 import { syncDocumentThemePreference } from "@/lib/theme"
 
@@ -39,6 +38,7 @@ export function Providers(props: ProvidersProps) {
       redirectTo="/settings/account"
       navigate={navigate}
       queryClient={props.queryClient}
+      socialProviders={["github"]}
       plugins={[
         multiSessionPlugin(),
         apiKeyPlugin(),

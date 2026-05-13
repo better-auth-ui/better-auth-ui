@@ -1,3 +1,5 @@
+import type { SocialProvider } from "better-auth/social-providers"
+
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
 export type SignInPathInput = {
@@ -17,6 +19,30 @@ export type SubmittedSignInInput = {
 export type SubmittedSignIn = {
   password: string
   signInPath: SignInPath
+}
+
+export type SocialAuthView = "signIn" | "signUp"
+
+export type SocialAuthURLInput = {
+  basePaths: { auth: string }
+  baseURL: string
+  redirectTo: string
+  view: SocialAuthView
+  viewPaths: { auth: { signIn: string; signUp: string } }
+}
+
+export type SocialAuthURLs = {
+  callbackURL: string
+  errorCallbackURL: string
+  newUserCallbackURL?: string
+}
+
+export type SocialAuthParamsInput = SocialAuthURLInput & {
+  provider: SocialProvider
+}
+
+export type SocialAuthParams = SocialAuthURLs & {
+  provider: SocialProvider
 }
 
 const getFormValue = (formData: FormData, name: string) => {
@@ -49,5 +75,36 @@ export function resolveSubmittedSignIn({
   return {
     password: getFormValue(formData, "password"),
     signInPath: resolveSignInPath({ identifier, usernameAuth })
+  }
+}
+
+export function resolveSocialAuthURLs({
+  basePaths,
+  baseURL,
+  redirectTo,
+  view,
+  viewPaths
+}: SocialAuthURLInput): SocialAuthURLs {
+  const authViewPath =
+    view === "signUp" ? viewPaths.auth.signUp : viewPaths.auth.signIn
+  const urls: SocialAuthURLs = {
+    callbackURL: `${baseURL}${redirectTo}`,
+    errorCallbackURL: `${baseURL}${basePaths.auth}/${authViewPath}`
+  }
+
+  if (view === "signUp") {
+    urls.newUserCallbackURL = `${baseURL}${redirectTo}`
+  }
+
+  return urls
+}
+
+export function resolveSocialAuthParams({
+  provider,
+  ...input
+}: SocialAuthParamsInput): SocialAuthParams {
+  return {
+    provider,
+    ...resolveSocialAuthURLs(input)
   }
 }
