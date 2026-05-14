@@ -1,0 +1,55 @@
+---
+title: useSession
+description: Read, prefetch, and invalidate the current authenticated session.
+---
+
+## Usage
+
+```tsx
+import { useSession } from "@better-auth-ui/solid"
+
+const session = useSession(authClient)
+const user = () => session.data?.user
+```
+
+Pass Better Auth params and Solid Query options through the same object.
+
+```tsx
+const session = useSession(authClient, {
+  query: { disableCookieCache: true },
+  staleTime: 30_000
+})
+```
+
+## Options factory
+
+```tsx
+import { sessionOptions } from "@better-auth-ui/solid"
+import { createQuery } from "@tanstack/solid-query"
+
+const session = createQuery(() => sessionOptions(authClient))
+```
+
+## Loader helpers
+
+```ts
+import { ensureSession, fetchSession, prefetchSession } from "@better-auth-ui/solid"
+
+await ensureSession(queryClient, authClient)
+await prefetchSession(queryClient, authClient)
+const session = await fetchSession(queryClient, authClient)
+```
+
+## Invalidation
+
+```ts
+import { sessionOptions } from "@better-auth-ui/solid"
+
+queryClient.invalidateQueries({
+  queryKey: sessionOptions(authClient).queryKey
+})
+```
+
+## Params
+
+<auto-type-table path="../../../../../../packages/solid/src/queries/auth/session-query.ts" name="SessionParams" />

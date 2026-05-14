@@ -1,0 +1,7 @@
+{
+  "title": "Solid",
+  "icon": "Solid",
+  "description": "Solid package and runtime APIs",
+  "root": true,
+  "pages": ["index", "queries", "mutations", "ssr"]
+}

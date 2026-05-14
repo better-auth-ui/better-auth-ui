@@ -1,0 +1,46 @@
+---
+title: <AccountSettings />
+description: A Solid account settings stack for profile, email, appearance, and multi-session account management.
+---
+
+## Usage
+
+Use `AccountSettings` inside your settings shell when the active tab is account.
+
+```tsx
+import { AccountSettings } from "@/components/auth/settings/account/account-settings"
+
+export function AccountTab() {
+  return <AccountSettings />
+}
+```
+
+The component composes the account cards shipped by the Solid registry payloads: profile, email, theme appearance, and multi-session account switching.
+
+## Installation
+
+```bash
+zaidan add https://better-auth-ui.com/r/solid/account-settings.json
+```
+
+## Props
+
+<auto-type-table path="../../../../../../examples/start-solid-zaidan-example/src/components/auth/settings/account/account-settings.tsx" name="AccountSettingsProps" />
+
+### Parity classification
+
+Zaidan exposes the wrapper styling hook as Solid `class`, adapting the shadcn `className` prop to the local Solid convention. Behavior remains configured through `AuthProvider`, Better Auth plugins, and installed child files.
+
+## Plugin gates
+
+- `theme` powers the appearance card.
+- `multi-session` powers account switching through `ManageAccounts`.
+- `delete-user` is a related account/security payload; expose the danger-zone UI only when the Better Auth delete-user plugin is configured.
+
+## Installed files
+
+- `src/components/auth/settings/account/account-settings.tsx`
+- `src/components/auth/settings/account/manage-account-row.tsx`
+- `src/components/auth/settings/account/appearance-settings.tsx`
+
+After install, pair it with `user-profile`, `change-email`, `theme`, `multi-session`, and any account danger-zone payloads you expose.

@@ -1,0 +1,21 @@
+---
+title: deleteUserOptions
+description: Delete the current user account.
+---
+
+Requires the Better Auth delete-user capability to be enabled on the server.
+
+## Usage
+
+```tsx
+import { deleteUserOptions } from "@better-auth-ui/solid"
+import { createMutation } from "@tanstack/solid-query"
+
+const deleteUser = createMutation(() => deleteUserOptions(authClient))
+
+deleteUser.mutate()
+```
+
+## Params
+
+<auto-type-table path="../../../../../../packages/solid/src/mutations/settings/delete-user-mutation.ts" name="DeleteUserParams" />

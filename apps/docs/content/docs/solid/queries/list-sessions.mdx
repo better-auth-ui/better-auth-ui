@@ -1,0 +1,34 @@
+---
+title: useListSessions
+description: List active sessions for the current user.
+---
+
+`useListSessions` powers account security screens that show active sessions/devices for the signed-in user.
+
+## Usage
+
+```tsx
+import { useListSessions } from "@better-auth-ui/solid"
+
+const sessions = useListSessions(authClient)
+```
+
+## Options factory and loader helpers
+
+```ts
+import {
+  ensureListSessions,
+  fetchListSessions,
+  listSessionsOptions,
+  prefetchListSessions
+} from "@better-auth-ui/solid"
+
+const options = listSessionsOptions(authClient, userId)
+await ensureListSessions(queryClient, authClient, userId)
+await prefetchListSessions(queryClient, authClient, userId)
+const sessions = await fetchListSessions(queryClient, authClient, userId)
+```
+
+## Params
+
+<auto-type-table path="../../../../../../packages/solid/src/queries/settings/list-sessions-query.ts" name="ListSessionsParams" />

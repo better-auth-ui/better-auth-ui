@@ -1,0 +1,34 @@
+---
+title: useListDeviceSessions
+description: List device sessions for multi-session account switching.
+---
+
+Requires the Better Auth multi-session plugin on your client/server setup. The helper is available in `@better-auth-ui/solid`; the endpoint succeeds only when your Better Auth client exposes multi-session methods.
+
+## Usage
+
+```tsx
+import { useListDeviceSessions } from "@better-auth-ui/solid"
+
+const deviceSessions = useListDeviceSessions(authClient)
+```
+
+## Options factory and loader helpers
+
+```ts
+import {
+  ensureListDeviceSessions,
+  fetchListDeviceSessions,
+  listDeviceSessionsOptions,
+  prefetchListDeviceSessions
+} from "@better-auth-ui/solid"
+
+const options = listDeviceSessionsOptions(authClient, userId)
+await ensureListDeviceSessions(queryClient, authClient, userId)
+await prefetchListDeviceSessions(queryClient, authClient, userId)
+const sessions = await fetchListDeviceSessions(queryClient, authClient, userId)
+```
+
+## Params
+
+<auto-type-table path="../../../../../../packages/solid/src/queries/multi-session/list-device-sessions-query.ts" name="ListDeviceSessionsParams" />

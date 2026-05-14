@@ -1,0 +1,73 @@
+---
+title: Mutations
+description: Solid mutation factories for Better Auth write endpoints.
+---
+
+Solid mutations expose `@tanstack/solid-query` mutation options for Better Auth write endpoints. They preserve shared mutation keys and pass `throw: true` so failures surface through standard Solid Query error handling.
+
+Unlike React, Solid package mutations are currently **options factories**, not purpose-built `use*` mutation hooks. Use the factory with `createMutation`, or use the generic `useAuthMutation` escape hatch for endpoints without a named factory.
+
+```tsx
+import { signInEmailOptions } from "@better-auth-ui/solid"
+import { createMutation } from "@tanstack/solid-query"
+
+const signIn = createMutation(() => signInEmailOptions(authClient))
+```
+
+## Error handling
+
+Every named factory wires `throw: true` into `fetchOptions`, so the mutation rejects with a `BetterFetchError` on failure instead of resolving with `{ error }`.
+
+## Cache side effects
+
+Solid factories intentionally do not attach React-style hook side effects. Invalidate or refetch explicitly with the shared keys after a successful mutation.
+
+```ts
+import { authQueryKeys } from "@better-auth-ui/core"
+
+await queryClient.invalidateQueries({ queryKey: authQueryKeys.session })
+```
+
+## Escape hatch
+
+For write-style endpoints without a purpose-built factory, use `useAuthMutation` in components or `authMutationOptions` where Solid Query takes mutation options.
+
+## UI boundary
+
+The Solid package does not render toast UI. Attach success/error handling in your app, or use installed Zaidan components that already integrate with the app's toast surface.
+
+## Available mutations
+
+### Auth
+
+<Cards>
+  <Card title="signInEmailOptions" href="/docs/solid/mutations/sign-in-email" />
+  <Card title="signInUsernameOptions" href="/docs/solid/mutations/sign-in-username" />
+  <Card title="signInMagicLinkOptions" href="/docs/solid/mutations/sign-in-magic-link" />
+  <Card title="signInPasskeyOptions" href="/docs/solid/mutations/sign-in-passkey" />
+  <Card title="signInSocialOptions" href="/docs/solid/mutations/sign-in-social" />
+  <Card title="signUpEmailOptions" href="/docs/solid/mutations/sign-up-email" />
+  <Card title="signOutOptions" href="/docs/solid/mutations/sign-out" />
+  <Card title="requestPasswordResetOptions" href="/docs/solid/mutations/request-password-reset" />
+  <Card title="resetPasswordOptions" href="/docs/solid/mutations/reset-password" />
+  <Card title="sendVerificationEmailOptions" href="/docs/solid/mutations/send-verification-email" />
+  <Card title="isUsernameAvailableOptions" href="/docs/solid/mutations/is-username-available" />
+</Cards>
+
+### Settings
+
+<Cards>
+  <Card title="updateUserOptions" href="/docs/solid/mutations/update-user" />
+  <Card title="changeEmailOptions" href="/docs/solid/mutations/change-email" />
+  <Card title="changePasswordOptions" href="/docs/solid/mutations/change-password" />
+  <Card title="deleteUserOptions" href="/docs/solid/mutations/delete-user" />
+  <Card title="linkSocialOptions" href="/docs/solid/mutations/link-social" />
+  <Card title="unlinkAccountOptions" href="/docs/solid/mutations/unlink-account" />
+  <Card title="addPasskeyOptions" href="/docs/solid/mutations/add-passkey" />
+  <Card title="deletePasskeyOptions" href="/docs/solid/mutations/delete-passkey" />
+  <Card title="revokeSessionOptions" href="/docs/solid/mutations/revoke-session" />
+  <Card title="revokeMultiSessionOptions" href="/docs/solid/mutations/revoke-multi-session" />
+  <Card title="setActiveSessionOptions" href="/docs/solid/mutations/set-active-session" />
+  <Card title="createApiKeyOptions" href="/docs/solid/mutations/create-api-key" />
+  <Card title="deleteApiKeyOptions" href="/docs/solid/mutations/delete-api-key" />
+</Cards>

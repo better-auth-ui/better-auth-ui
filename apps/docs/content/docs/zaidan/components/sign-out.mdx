@@ -1,0 +1,41 @@
+---
+title: <SignOut />
+description: A Solid sign-out component that signs the user out on mount and navigates back to sign-in.
+---
+
+## Usage
+
+Render `<SignOut />` on the sign-out route. It calls the installed auth client when mounted.
+
+```tsx
+import { SignOut } from "@/components/auth/sign-out"
+
+export function SignOutRoute() {
+  return <SignOut label="Signing you out…" />
+}
+```
+
+After the sign-out request finishes, the component navigates to the configured sign-in path from `<AuthProvider />`.
+
+## Installation
+
+```bash
+zaidan add https://better-auth-ui.com/r/solid/sign-out.json
+```
+
+## Props
+
+<auto-type-table path="../../../../../../examples/start-solid-zaidan-example/src/components/auth/sign-out.tsx" name="SignOutProps" />
+
+### Parity classification
+
+Zaidan exposes the wrapper styling hook as Solid `class`, adapting the shadcn `className` prop to the local Solid convention. `label` is a Zaidan/Solid status copy override retained for backwards compatibility.
+
+## Installed files
+
+Installs a sign-out action that calls the Solid auth client from the installed app-side provider context.
+
+
+- `src/components/auth/sign-out.tsx`
+
+After install, decide where users should land after sign-out and adapt navigation if needed.

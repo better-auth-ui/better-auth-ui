@@ -9,6 +9,7 @@ import { HeroUI } from "@/components/icons/heroui"
 import { NextJS } from "@/components/icons/nextjs"
 import { React } from "@/components/icons/react"
 import { Shadcn } from "@/components/icons/shadcn"
+import { Solid } from "@/components/icons/solid"
 import { TanStackStart } from "@/components/icons/tanstack-start"
 
 export function getMDXComponents(components?: MDXComponents): MDXComponents {
@@ -26,6 +27,7 @@ export function getMDXComponents(components?: MDXComponents): MDXComponents {
     NextJS,
     React,
     Shadcn,
+    Solid,
     TanStackStart,
     ComponentPreview,
     ...components

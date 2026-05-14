@@ -1,0 +1,17 @@
+---
+title: useUser
+description: Retrieve the current authenticated user.
+---
+
+Thin wrapper over [`useSession`](/docs/solid/queries/session) that returns `session.data?.user` as `data`. It shares the session cache entry and does not make an extra request.
+
+## Usage
+
+```tsx
+import { useUser } from "@better-auth-ui/solid"
+
+const user = useUser(authClient)
+const email = () => user.data?.email
+```
+
+Accepts the same options as `useSession`.

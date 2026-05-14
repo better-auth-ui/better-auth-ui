@@ -1,0 +1,25 @@
+---
+title: API key
+description: Install the Solid API key UI payload.
+---
+
+The API key payload installs API key management cards and dialogs from `/r/solid/api-key.json`.
+
+```bash
+zaidan add https://better-auth-ui.com/r/solid/api-key.json
+```
+
+## Runtime prerequisites
+
+- Server: `apiKey()` from `@better-auth/api-key`.
+- Client: `apiKeyClient()` from `@better-auth/api-key/client`.
+- Runtime API: `createApiKeyOptions`, list/delete actions, and query keys from [Solid runtime APIs](/docs/solid).
+
+## Copied files
+
+- `src/components/auth/api-key/api-keys.tsx`
+- `src/components/auth/api-key/create-api-key-dialog.tsx`
+- `src/components/auth/api-key/delete-api-key-dialog.tsx`
+- `src/components/auth/api-key/new-api-key-dialog.tsx`
+
+After install, review token display and copy behavior before exposing this UI to users.

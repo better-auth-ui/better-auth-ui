@@ -1,0 +1,27 @@
+---
+title: Magic link
+description: Install the Solid magic-link UI payload.
+---
+
+The magic-link payload installs passwordless sign-in view pieces from `/r/solid/magic-link.json`.
+
+```bash
+zaidan add https://better-auth-ui.com/r/solid/magic-link.json
+```
+
+Replace example email logging with a real email provider before production.
+
+## Runtime prerequisites
+
+- Server: `magicLink()` from `better-auth/plugins` with `sendMagicLink` wired to a real email provider.
+- Client: `magicLinkClient()` from `better-auth/client/plugins`.
+- Runtime API: `signInMagicLinkOptions` and view path behavior from [Solid mutations](/docs/solid/mutations).
+
+## Copied files
+
+- `src/lib/auth/magic-link-plugin.ts`
+- `src/components/auth/magic-link.tsx`
+- `src/components/auth/magic-link-button.tsx`
+- Local form UI primitives under `src/components/ui/**`
+
+After install, add the magic-link path to your auth route and test the email callback in your environment.

@@ -1,0 +1,79 @@
+---
+title: Queries
+description: Solid Query factories and auth read helpers.
+---
+
+Solid queries are package runtime APIs. They return `@tanstack/solid-query` options and Solid hooks for Better Auth read endpoints, with shared `@better-auth-ui/core` cache keys.
+
+Every supported query exposes an options factory. UI-safe queries also expose a `use*` hook. Session and user-scoped families additionally expose `ensure*`, `prefetch*`, and `fetch*` helpers for loaders and server-aware route code.
+
+```ts
+import { sessionOptions, useSession } from "@better-auth-ui/solid"
+
+const sessionQuery = sessionOptions(authClient)
+const session = useSession(authClient, { enabled: !import.meta.env.SSR })
+```
+
+## Cache keys
+
+Use shared core keys instead of inlining tuples.
+
+```ts
+import { authQueryKeys } from "@better-auth-ui/core"
+
+queryClient.invalidateQueries({ queryKey: authQueryKeys.session })
+queryClient.invalidateQueries({ queryKey: authQueryKeys.user(userId) })
+```
+
+## Escape hatch
+
+For read-style endpoints without a purpose-built Solid helper, use `useAuthQuery` in components or `authQueryOptions` where Solid Query takes an options object.
+
+```tsx
+import { useAuthQuery } from "@better-auth-ui/solid"
+
+const result = useAuthQuery(
+  authClient.magicLink.list,
+  ["auth", "magicLink", "list"],
+  { query: { limit: 20 } }
+)
+```
+
+## Available queries
+
+### Auth
+
+<Cards>
+  <Card title="useSession" href="/docs/solid/queries/session">
+    The current authenticated session.
+  </Card>
+  <Card title="useUser" href="/docs/solid/queries/user">
+    The current authenticated user, derived from the session cache.
+  </Card>
+  <Card title="useAuthenticate" href="/docs/solid/queries/authenticate">
+    Session query plus Solid-side redirect when unauthenticated.
+  </Card>
+</Cards>
+
+### Settings
+
+<Cards>
+  <Card title="useListAccounts" href="/docs/solid/queries/list-accounts">
+    The current user's linked social accounts.
+  </Card>
+  <Card title="useAccountInfo" href="/docs/solid/queries/account-info">
+    Provider-specific info for a linked account.
+  </Card>
+  <Card title="useListSessions" href="/docs/solid/queries/list-sessions">
+    Active sessions for the current user.
+  </Card>
+  <Card title="useListDeviceSessions" href="/docs/solid/queries/list-device-sessions">
+    Device sessions for multi-session account switching.
+  </Card>
+  <Card title="useListPasskeys" href="/docs/solid/queries/list-passkeys">
+    Passkeys registered for the current user.
+  </Card>
+  <Card title="useListApiKeys" href="/docs/solid/queries/list-api-keys">
+    API keys for the current user when the API key plugin is installed.
+  </Card>
+</Cards>

@@ -1,0 +1,44 @@
+{
+  "name": "user-view",
+  "type": "registry:component",
+  "title": "Solid User View",
+  "description": "Solid user identity row used by account menus and profile surfaces.",
+  "dependencies": [
+    "@better-auth-ui/solid@latest",
+    "@better-auth-ui/core@latest",
+    "@tanstack/solid-query",
+    "better-auth",
+    "lucide-solid",
+    "solid-sonner",
+    "solid-js",
+    "@kobalte/core",
+    "class-variance-authority",
+    "clsx",
+    "tailwind-merge"
+  ],
+  "registryDependencies": [
+    "solid/user-avatar"
+  ],
+  "files": [
+    {
+      "path": "src/components/auth/user/user-view.tsx",
+      "type": "registry:component",
+      "content": "import { Show } from \"solid-js\"\nimport { UserAvatar } from \"./user-avatar\"\n\nexport function UserView(props: {\n  image?: string | null\n  initials?: string\n  label: string\n  secondaryLabel?: string | null\n}) {\n  return (\n    <div class=\"contents\">\n      <UserAvatar\n        image={props.image}\n        initials={props.initials}\n        label={props.label}\n      />\n\n      <div class=\"grid min-w-0 flex-1 text-sm leading-tight\">\n        <span class=\"truncate font-medium text-foreground\">{props.label}</span>\n\n        <Show when={props.secondaryLabel}>\n          <span class=\"truncate text-xs text-muted-foreground\">\n            {props.secondaryLabel}\n          </span>\n        </Show>\n      </div>\n    </div>\n  )\n}\n"
+    },
+    {
+      "path": "src/components/auth/user/user-avatar.tsx",
+      "type": "registry:component",
+      "content": "import { User } from \"lucide-solid\"\nimport type { JSX } from \"solid-js\"\nimport { Show } from \"solid-js\"\nimport { Avatar, AvatarFallback, AvatarImage } from \"@/components/ui/avatar\"\n\nexport function UserAvatar(props: {\n  class?: string\n  fallback?: JSX.Element\n  image?: string | null\n  initials?: string\n  label: string\n}) {\n  return (\n    <Avatar\n      class={\n        props.class ?? \"size-9 rounded-full bg-muted text-muted-foreground\"\n      }\n    >\n      <AvatarImage alt={props.label} src={props.image ?? undefined} />\n      <AvatarFallback class=\"rounded-full bg-muted text-muted-foreground\">\n        <Show\n          fallback={props.fallback ?? <User class=\"size-4\" />}\n          when={props.initials}\n        >\n          {(initials) => initials()}\n        </Show>\n      </AvatarFallback>\n    </Avatar>\n  )\n}\n"
+    },
+    {
+      "path": "src/components/ui/avatar.tsx",
+      "type": "registry:ui",
+      "content": "import * as ImagePrimitive from \"@kobalte/core/image\"\nimport type { PolymorphicProps } from \"@kobalte/core/polymorphic\"\nimport type { ComponentProps, ValidComponent } from \"solid-js\"\nimport { mergeProps, splitProps } from \"solid-js\"\n\nimport { cn } from \"@/lib/utils\"\n\ntype AvatarRootProps<T extends ValidComponent = \"span\"> = PolymorphicProps<\n  T,\n  ImagePrimitive.ImageRootProps<T>\n> &\n  Pick<ComponentProps<T>, \"class\"> & {\n    size?: \"sm\" | \"default\" | \"lg\"\n  }\n\nconst Avatar = <T extends ValidComponent = \"span\">(\n  props: AvatarRootProps<T>\n) => {\n  const mergedProps = mergeProps({ size: \"default\" }, props)\n  const [local, others] = splitProps(mergedProps as AvatarRootProps, [\n    \"class\",\n    \"size\"\n  ])\n\n  return (\n    <ImagePrimitive.Root\n      class={cn(\n        \"group/avatar relative z-avatar flex shrink-0 select-none after:absolute after:inset-0 after:border after:border-border after:mix-blend-darken dark:after:mix-blend-lighten\",\n        local.class\n      )}\n      data-size={local.size}\n      data-slot=\"avatar\"\n      {...others}\n    />\n  )\n}\n\ntype AvatarImageProps<T extends ValidComponent = \"img\"> = PolymorphicProps<\n  T,\n  ImagePrimitive.ImageImgProps<T>\n> &\n  Pick<ComponentProps<T>, \"class\">\n\nconst AvatarImage = <T extends ValidComponent = \"img\">(\n  props: AvatarImageProps<T>\n) => {\n  const [local, others] = splitProps(props as AvatarImageProps, [\"class\"])\n\n  return (\n    <ImagePrimitive.Img\n      class={cn(\n        \"z-avatar-image aspect-square size-full object-cover\",\n        local.class\n      )}\n      data-slot=\"avatar-image\"\n      {...others}\n    />\n  )\n}\n\ntype AvatarFallbackProps<T extends ValidComponent = \"span\"> = PolymorphicProps<\n  T,\n  ImagePrimitive.ImageFallbackProps<T>\n> &\n  Pick<ComponentProps<T>, \"class\">\n\nconst AvatarFallback = <T extends ValidComponent = \"span\">(\n  props: AvatarFallbackProps<T>\n) => {\n  const [local, others] = splitProps(props as AvatarFallbackProps, [\"class\"])\n\n  return (\n    <ImagePrimitive.Fallback\n      class={cn(\n        \"z-avatar-fallback flex size-full items-center justify-center text-sm group-data-[size=sm]/avatar:text-xs\",\n        local.class\n      )}\n      data-slot=\"avatar-fallback\"\n      {...others}\n    />\n  )\n}\n\ntype AvatarBadgeProps = ComponentProps<\"span\">\n\nfunction AvatarBadge(props: AvatarBadgeProps) {\n  const [local, others] = splitProps(props as AvatarBadgeProps, [\"class\"])\n\n  return (\n    <span\n      data-slot=\"avatar-badge\"\n      class={cn(\n        \"absolute right-0 bottom-0 z-10 z-avatar-badge inline-flex select-none items-center justify-center rounded-full bg-blend-color ring-2\",\n        \"group-data-[size=sm]/avatar:size-2 group-data-[size=sm]/avatar:[&>svg]:hidden\",\n        \"group-data-[size=default]/avatar:size-2.5 group-data-[size=default]/avatar:[&>svg]:size-2\",\n        \"group-data-[size=lg]/avatar:size-3 group-data-[size=lg]/avatar:[&>svg]:size-2\",\n        local.class\n      )}\n      {...others}\n    />\n  )\n}\n\ntype AvatarGroupProps = ComponentProps<\"div\">\n\nfunction AvatarGroup(props: AvatarGroupProps) {\n  const [local, others] = splitProps(props as AvatarGroupProps, [\"class\"])\n\n  return (\n    <div\n      data-slot=\"avatar-group\"\n      class={cn(\n        \"group/avatar-group z-avatar-group flex -space-x-2 *:data-[slot=avatar]:ring-2 *:data-[slot=avatar]:ring-background\",\n        local.class\n      )}\n      {...others}\n    />\n  )\n}\n\ntype AvatarGroupCountProps = ComponentProps<\"div\">\n\nfunction AvatarGroupCount(props: AvatarGroupCountProps) {\n  const [local, others] = splitProps(props as AvatarGroupCountProps, [\"class\"])\n\n  return (\n    <div\n      data-slot=\"avatar-group-count\"\n      class={cn(\n        \"relative z-avatar-group-count flex shrink-0 items-center justify-center ring-2 ring-background\",\n        local.class\n      )}\n      {...others}\n    />\n  )\n}\n\nexport {\n  Avatar,\n  AvatarBadge,\n  AvatarFallback,\n  AvatarGroup,\n  AvatarGroupCount,\n  AvatarImage\n}\n"
+    },
+    {
+      "path": "src/lib/utils.ts",
+      "type": "registry:lib",
+      "content": "import { type ClassValue, clsx } from \"clsx\"\nimport { twMerge } from \"tailwind-merge\"\n\nexport const cn = (...inputs: ClassValue[]) => twMerge(clsx(inputs))\n"
+    }
+  ]
+}

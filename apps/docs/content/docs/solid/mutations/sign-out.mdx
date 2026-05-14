@@ -1,0 +1,22 @@
+---
+title: signOutOptions
+description: Sign-out mutation options.
+---
+
+## Usage
+
+```tsx
+import { signOutOptions } from "@better-auth-ui/solid"
+import { createMutation } from "@tanstack/solid-query"
+
+const signOut = createMutation(() => signOutOptions(authClient))
+signOut.mutate()
+```
+
+## Cache
+
+After sign-out, remove or invalidate `authQueryKeys.all` so user-scoped data leaves the cache.
+
+## Params
+
+<auto-type-table path="../../../../../../packages/solid/src/mutations/auth/sign-out-mutation.ts" name="SignOutParams" />

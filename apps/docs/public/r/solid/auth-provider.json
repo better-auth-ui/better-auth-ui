@@ -1,0 +1,42 @@
+{
+  "name": "auth-provider",
+  "type": "registry:component",
+  "title": "Solid Auth Provider",
+  "description": "Solid provider wrapper for Better Auth UI using Solid Query and the Solid package surface.",
+  "dependencies": [
+    "@better-auth-ui/solid@latest",
+    "@better-auth-ui/core@latest",
+    "@tanstack/solid-query",
+    "better-auth",
+    "lucide-solid",
+    "solid-sonner",
+    "solid-js",
+    "@kobalte/core",
+    "class-variance-authority",
+    "clsx",
+    "tailwind-merge"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "src/components/auth/auth-provider.tsx",
+      "type": "registry:component",
+      "content": "import {\n  AuthProvider as AuthProviderPrimitive,\n  type AuthProviderProps\n} from \"@better-auth-ui/solid\"\n\nimport { ErrorToaster } from \"./error-toaster\"\n\nexport type { AuthProviderProps }\n\nconst resolveProviderChildren = (children: AuthProviderProps[\"children\"]) =>\n  typeof children === \"function\" ? children() : children\n\nexport function AuthProvider(props: AuthProviderProps) {\n  const { children, ...config } = props\n\n  return (\n    <AuthProviderPrimitive {...config}>\n      {() => (\n        <>\n          {resolveProviderChildren(children)}\n          <ErrorToaster />\n        </>\n      )}\n    </AuthProviderPrimitive>\n  )\n}\n"
+    },
+    {
+      "path": "src/components/auth/error-toaster.tsx",
+      "type": "registry:component",
+      "content": "import { useQueryClient } from \"@tanstack/solid-query\"\nimport type { BetterFetchError } from \"better-auth/client\"\nimport { onMount } from \"solid-js\"\nimport { toast } from \"solid-sonner\"\n\nconst resolveErrorMessage = (error: Error) =>\n  (error as BetterFetchError)?.error?.message || error.message\n\nexport function ErrorToaster() {\n  const queryClient = useQueryClient()\n\n  onMount(() => {\n    queryClient.getQueryCache().config.onError = (error) => {\n      const err = error as BetterFetchError\n      if (err?.error) toast.error(err.error.message)\n    }\n\n    queryClient.setMutationDefaults([], {\n      onError: (error) => {\n        toast.error(resolveErrorMessage(error))\n      }\n    })\n  })\n\n  return null\n}\n"
+    },
+    {
+      "path": "src/components/ui/sonner.tsx",
+      "type": "registry:ui",
+      "content": "import {\n  CircleCheck,\n  Info,\n  LoaderCircle,\n  OctagonX,\n  TriangleAlert\n} from \"lucide-solid\"\nimport {\n  type ComponentProps,\n  createSignal,\n  type JSX,\n  onCleanup,\n  onMount\n} from \"solid-js\"\nimport { Toaster as Sonner } from \"solid-sonner\"\n\nimport { readStoredThemePreference, resolveThemePreference } from \"@/lib/theme\"\n\ntype ToasterProps = ComponentProps<typeof Sonner>\n\nconst resolveCurrentTheme = (): ToasterProps[\"theme\"] => {\n  const prefersDark = matchMedia(\"(prefers-color-scheme: dark)\").matches\n\n  return resolveThemePreference(readStoredThemePreference(), prefersDark)\n}\n\nconst Toaster = (props: ToasterProps) => {\n  const [theme, setTheme] = createSignal<ToasterProps[\"theme\"]>(\"system\")\n\n  onMount(() => {\n    const mediaQuery = matchMedia(\"(prefers-color-scheme: dark)\")\n    const syncTheme = () => setTheme(resolveCurrentTheme())\n\n    syncTheme()\n    window.addEventListener(\"storage\", syncTheme)\n    mediaQuery.addEventListener(\"change\", syncTheme)\n\n    onCleanup(() => {\n      window.removeEventListener(\"storage\", syncTheme)\n      mediaQuery.removeEventListener(\"change\", syncTheme)\n    })\n  })\n\n  return (\n    <Sonner\n      theme={theme()}\n      class=\"toaster group\"\n      position=\"top-center\"\n      icons={{\n        success: <CircleCheck class=\"size-4\" />,\n        info: <Info class=\"size-4\" />,\n        warning: <TriangleAlert class=\"size-4\" />,\n        error: <OctagonX class=\"size-4\" />,\n        loading: <LoaderCircle class=\"size-4 animate-spin\" />\n      }}\n      style={\n        {\n          \"--normal-bg\": \"var(--popover)\",\n          \"--normal-text\": \"var(--popover-foreground)\",\n          \"--normal-border\": \"var(--border)\",\n          \"--border-radius\": \"var(--radius)\"\n        } as JSX.CSSProperties\n      }\n      {...props}\n    />\n  )\n}\n\nexport { Toaster }\n"
+    },
+    {
+      "path": "src/lib/theme.ts",
+      "type": "registry:lib",
+      "content": "export type ThemeMode = \"system\" | \"light\" | \"dark\"\n\nexport const themeStorageKey = \"start-solid-zaidan-theme\"\n\nexport const isThemeMode = (value: string | null): value is ThemeMode =>\n  value === \"system\" || value === \"light\" || value === \"dark\"\n\nexport const resolveThemePreference = (\n  theme: ThemeMode,\n  prefersDark: boolean\n): \"light\" | \"dark\" =>\n  theme === \"system\" ? (prefersDark ? \"dark\" : \"light\") : theme\n\nexport const setDocumentThemeClass = (theme: \"light\" | \"dark\") => {\n  document.documentElement.classList.remove(\"light\", \"dark\")\n  document.documentElement.classList.add(theme)\n}\n\nexport const readStoredThemePreference = (): ThemeMode => {\n  const storedTheme = localStorage.getItem(themeStorageKey)\n\n  return isThemeMode(storedTheme) ? storedTheme : \"system\"\n}\n\nexport const saveThemePreference = (theme: ThemeMode) => {\n  localStorage.setItem(themeStorageKey, theme)\n}\n\nexport const applyThemePreference = (theme: ThemeMode) => {\n  const prefersDark = matchMedia(\"(prefers-color-scheme: dark)\").matches\n\n  setDocumentThemeClass(resolveThemePreference(theme, prefersDark))\n}\n\nexport const syncDocumentThemePreference = () => {\n  const mediaQuery = matchMedia(\"(prefers-color-scheme: dark)\")\n  const applyStoredPreference = () => {\n    applyThemePreference(readStoredThemePreference())\n  }\n  const handleSystemThemeChange = () => {\n    if (readStoredThemePreference() === \"system\") applyStoredPreference()\n  }\n  const handleStorage = (event: StorageEvent) => {\n    if (event.key === themeStorageKey) applyStoredPreference()\n  }\n\n  applyStoredPreference()\n  window.addEventListener(\"storage\", handleStorage)\n  mediaQuery.addEventListener(\"change\", handleSystemThemeChange)\n\n  return () => {\n    window.removeEventListener(\"storage\", handleStorage)\n    mediaQuery.removeEventListener(\"change\", handleSystemThemeChange)\n  }\n}\n\nexport const themeScript = `\ntry {\n  const themeStorageKey = \"${themeStorageKey}\";\n  const storedTheme = localStorage.getItem(themeStorageKey);\n  const theme = storedTheme === \"light\" || storedTheme === \"dark\" || storedTheme === \"system\" ? storedTheme : \"system\";\n  const prefersDark = matchMedia(\"(prefers-color-scheme: dark)\").matches;\n  const resolvedTheme = theme === \"system\" ? (prefersDark ? \"dark\" : \"light\") : theme;\n  document.documentElement.classList.remove(\"light\", \"dark\");\n  document.documentElement.classList.add(resolvedTheme);\n} catch (_) {}\n`\n"
+    }
+  ]
+}

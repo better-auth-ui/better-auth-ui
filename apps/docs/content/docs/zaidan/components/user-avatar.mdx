@@ -1,0 +1,58 @@
+---
+title: <UserAvatar />
+description: Renders the Solid session user avatar with image, initials, and icon fallback support.
+---
+
+## Usage
+
+Use `UserAvatar` anywhere you need the session user image without the full account menu. Pass a stable `label` for accessible image text and either `image`, `initials`, or a custom fallback icon.
+
+```tsx
+import { UserAvatar } from "@/components/auth/user/user-avatar"
+
+export function AccountAvatar() {
+  return <UserAvatar label="Ada Lovelace" initials="AL" />
+}
+```
+
+Render it from session data when composing custom user surfaces.
+
+```tsx
+import { UserAvatar } from "@/components/auth/user/user-avatar"
+
+export function SessionAvatar(props: {
+  user: { email?: string | null; image?: string | null; name?: string | null }
+}) {
+  const label = () => props.user.name || props.user.email || "Account"
+
+  return (
+    <UserAvatar
+      image={props.user.image}
+      initials={label().slice(0, 2).toUpperCase()}
+      label={label()}
+    />
+  )
+}
+```
+
+## Installation
+
+```bash
+zaidan add https://better-auth-ui.com/r/solid/user-avatar.json
+```
+
+## Props
+
+<auto-type-table path="../../../../../../examples/start-solid-zaidan-example/src/components/auth/user/user-avatar.tsx" name="UserAvatarProps" />
+
+### Parity classification
+
+`user` and `isPending` match the shadcn avatar surface in Solid form. Zaidan exposes the styling hook as Solid `class`; `fallback`, `image`, `initials`, and `label` are intentional-difference helpers kept for existing Zaidan composition examples and app-owned copied files.
+
+## Installed files
+
+- `src/components/auth/user/user-avatar.tsx`
+- `src/components/ui/avatar.tsx`
+- `src/lib/utils.ts`
+
+After install, customize fallback initials, icon behavior, or avatar sizing in your copied file.

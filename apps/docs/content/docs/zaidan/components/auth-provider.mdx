@@ -1,0 +1,82 @@
+---
+title: <AuthProvider />
+description: Provides AuthConfig and Solid Query context to installed Solid auth components.
+---
+
+## Usage
+
+Install the provider payload, then wrap your application shell before rendering auth components such as `<SignIn />`, `<UserButton />`, or settings pages.
+
+```bash
+zaidan add https://better-auth-ui.com/r/solid/auth-provider.json
+```
+
+```tsx title="src/components/providers.tsx"
+import type { QueryClient } from "@tanstack/solid-query"
+import { useNavigate } from "@tanstack/solid-router"
+import type { JSX } from "solid-js"
+
+import { authClient } from "@/lib/auth-client"
+
+import { AuthProvider } from "./auth/auth-provider"
+import { Toaster } from "./ui/sonner"
+
+export function Providers(props: {
+  children?: JSX.Element | (() => JSX.Element)
+  queryClient?: QueryClient
+}) {
+  const navigate = useNavigate()
+
+  return (
+    <AuthProvider
+      authClient={authClient}
+      navigate={navigate}
+      queryClient={props.queryClient}
+      redirectTo="/settings/account"
+      socialProviders={["github"]}
+    >
+      {() => (
+        <>
+          {typeof props.children === "function"
+            ? props.children()
+            : props.children}
+          <Toaster />
+        </>
+      )}
+    </AuthProvider>
+  )
+}
+```
+
+The installed wrapper delegates to `@better-auth-ui/solid`'s `AuthProvider` primitive and adds the Zaidan error toaster. Keep this provider near your root route so every copied auth surface can read the same auth config and Solid Query client.
+
+Solid component previews are not rendered inside the Next.js docs app yet. Use the TanStack Start example as the runnable reference until a future iframe preview can point at example routes.
+
+## Installation
+
+```bash
+zaidan add https://better-auth-ui.com/r/solid/auth-provider.json
+```
+
+## Props
+
+The Zaidan wrapper re-exports `AuthProviderProps` from `@better-auth-ui/solid`.
+
+| Prop | Type | Description |
+| --- | --- | --- |
+| `authClient` | `AuthClient` | Better Auth Solid client returned by `createAuthClient`. Required so copied components can call Better Auth APIs. |
+| `children` | `JSX.Element \| (() => JSX.Element)` | App content rendered inside the auth context. Function children keep Solid evaluation inside the provider. |
+| `queryClient` | `QueryClient` | Optional TanStack Solid Query client. Pass the router/app client so auth queries share cache with the rest of the app. |
+| `navigate` | `(options) => unknown` | Optional navigation adapter, usually from `useNavigate()`, used by auth flows that redirect after actions. |
+| `redirectTo` | `string` | Optional default post-auth destination, for example `/settings/account`. |
+| `socialProviders` | `string[]` | Optional enabled social providers shown by copied auth surfaces, such as `github`. |
+| `plugins` | `AuthPlugin[]` | Optional Better Auth UI plugin descriptors for installed plugin payloads such as username, passkey, multi-session, API key, delete-user, or theme. |
+
+## Installed files
+
+- `src/components/auth/auth-provider.tsx`
+- `src/components/auth/error-toaster.tsx`
+- `src/components/ui/sonner.tsx`
+- `src/lib/theme.ts`
+
+After install, these files are app-owned. Keep navigation, toast placement, and theme behavior aligned with your TanStack Start shell.

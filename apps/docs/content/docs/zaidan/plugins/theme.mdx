@@ -1,0 +1,25 @@
+---
+title: Theme
+description: Install the Solid theme preference UI payload.
+---
+
+The theme payload installs theme preference helpers and controls from `/r/solid/theme.json`.
+
+```bash
+zaidan add https://better-auth-ui.com/r/solid/theme.json
+```
+
+## Runtime prerequisites
+
+- Root route: run the theme script before hydration.
+- Provider: call `syncDocumentThemePreference()` from your app provider.
+- Runtime docs: keep package/provider boundaries in [Solid runtime APIs](/docs/solid).
+
+## Copied files
+
+- `src/lib/theme.ts`
+- `src/components/auth/theme/appearance.tsx`
+- `src/components/auth/theme/theme-toggle-item.tsx`
+- Local tabs and dropdown primitives under `src/components/ui/**`
+
+After install, keep the storage key and allowed theme values aligned with your app shell.

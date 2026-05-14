@@ -1,0 +1,23 @@
+---
+title: updateUserOptions
+description: Update the current user's profile fields.
+---
+
+## Usage
+
+```tsx
+import { updateUserOptions } from "@better-auth-ui/solid"
+import { createMutation } from "@tanstack/solid-query"
+
+const updateUser = createMutation(() => updateUserOptions(authClient))
+
+updateUser.mutate({ name: "Alice" })
+```
+
+## Cache
+
+Invalidate `authQueryKeys.session` after a successful update so cached user data refreshes.
+
+## Params
+
+<auto-type-table path="../../../../../../packages/solid/src/mutations/settings/update-user-mutation.ts" name="UpdateUserParams" />

@@ -1,0 +1,1652 @@
+{
+  "name": "better-auth-ui-solid",
+  "namespace": "solid",
+  "homepage": "https://better-auth-ui.com",
+  "items": [
+    {
+      "name": "auth-provider",
+      "type": "registry:component",
+      "title": "Solid Auth Provider",
+      "description": "Solid provider wrapper for Better Auth UI using Solid Query and the Solid package surface.",
+      "dependencies": [
+        "@better-auth-ui/solid@latest",
+        "@better-auth-ui/core@latest",
+        "@tanstack/solid-query",
+        "better-auth",
+        "lucide-solid",
+        "solid-sonner",
+        "solid-js",
+        "@kobalte/core",
+        "class-variance-authority",
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [],
+      "files": [
+        {
+          "path": "src/components/auth/auth-provider.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/components/auth/error-toaster.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/components/ui/sonner.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/lib/theme.ts",
+          "type": "registry:lib"
+        }
+      ]
+    },
+    {
+      "name": "additional-field",
+      "type": "registry:component",
+      "title": "Solid Additional Field",
+      "description": "Additional field renderer used by Solid sign-up and profile surfaces.",
+      "dependencies": [
+        "@better-auth-ui/solid@latest",
+        "@better-auth-ui/core@latest",
+        "@tanstack/solid-query",
+        "better-auth",
+        "lucide-solid",
+        "solid-sonner",
+        "solid-js",
+        "@kobalte/core",
+        "class-variance-authority",
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "solid/auth-provider"
+      ],
+      "files": [
+        {
+          "path": "src/components/auth/additional-field.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/components/ui/button.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/components/ui/card.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/components/ui/input.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/components/ui/label.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/lib/utils.ts",
+          "type": "registry:lib"
+        }
+      ]
+    },
+    {
+      "name": "sign-in",
+      "type": "registry:component",
+      "title": "Solid Sign In",
+      "description": "Solid sign-in surface with email/password, username, and provider button support.",
+      "dependencies": [
+        "@better-auth-ui/solid@latest",
+        "@better-auth-ui/core@latest",
+        "@tanstack/solid-query",
+        "better-auth",
+        "lucide-solid",
+        "solid-sonner",
+        "solid-js",
+        "@kobalte/core",
+        "class-variance-authority",
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "solid/auth-provider"
+      ],
+      "files": [
+        {
+          "path": "src/components/auth/sign-in.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/components/auth/username/sign-in-username.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/components/auth/sign-in-path.ts",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/components/auth/provider-button.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/components/auth/provider-buttons.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/components/ui/button.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/components/ui/card.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/components/ui/input.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/components/ui/label.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/lib/utils.ts",
+          "type": "registry:lib"
+        }
+      ]
+    },
+    {
+      "name": "sign-up",
+      "type": "registry:component",
+      "title": "Solid Sign Up",
+      "description": "Solid sign-up component using the Solid email sign-up mutation options.",
+      "dependencies": [
+        "@better-auth-ui/solid@latest",
+        "@better-auth-ui/core@latest",
+        "@tanstack/solid-query",
+        "better-auth",
+        "lucide-solid",
+        "solid-sonner",
+        "solid-js",
+        "@kobalte/core",
+        "class-variance-authority",
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "solid/auth-provider",
+        "solid/additional-field"
+      ],
+      "files": [
+        {
+          "path": "src/components/auth/sign-up.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/components/auth/provider-button.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/components/auth/provider-buttons.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/components/ui/button.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/components/ui/card.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/components/ui/input.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/components/ui/label.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/lib/utils.ts",
+          "type": "registry:lib"
+        }
+      ]
+    },
+    {
+      "name": "magic-link",
+      "type": "registry:component",
+      "title": "Solid Magic Link",
+      "description": "Solid magic-link sign-in form and toggle button.",
+      "dependencies": [
+        "@better-auth-ui/solid@latest",
+        "@better-auth-ui/core@latest",
+        "@tanstack/solid-query",
+        "better-auth",
+        "lucide-solid",
+        "solid-sonner",
+        "solid-js",
+        "@kobalte/core",
+        "class-variance-authority",
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "solid/auth-provider"
+      ],
+      "files": [
+        {
+          "path": "src/lib/auth/magic-link-plugin.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "src/components/auth/magic-link.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/components/auth/magic-link-button.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/components/ui/button.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/components/ui/card.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/components/ui/input.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/components/ui/label.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/lib/utils.ts",
+          "type": "registry:lib"
+        }
+      ]
+    },
+    {
+      "name": "username",
+      "type": "registry:component",
+      "title": "Solid Username",
+      "description": "Solid username sign-in form and username availability field.",
+      "dependencies": [
+        "@better-auth-ui/solid@latest",
+        "@better-auth-ui/core@latest",
+        "@tanstack/solid-query",
+        "better-auth",
+        "lucide-solid",
+        "solid-sonner",
+        "solid-js",
+        "@kobalte/core",
+        "class-variance-authority",
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "solid/auth-provider"
+      ],
+      "files": [
+        {
+          "path": "src/components/auth/username/sign-in-username.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/components/auth/username/username-field.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/components/auth/sign-in-path.ts",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/components/ui/button.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/components/ui/card.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/components/ui/input.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/components/ui/label.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/lib/utils.ts",
+          "type": "registry:lib"
+        }
+      ]
+    },
+    {
+      "name": "passkey",
+      "type": "registry:component",
+      "title": "Solid Passkey",
+      "description": "Solid passkey sign-in button and passkey management cards.",
+      "dependencies": [
+        "@better-auth-ui/solid@latest",
+        "@better-auth-ui/core@latest",
+        "@tanstack/solid-query",
+        "better-auth",
+        "lucide-solid",
+        "solid-sonner",
+        "solid-js",
+        "@kobalte/core",
+        "class-variance-authority",
+        "clsx",
+        "tailwind-merge",
+        "@better-auth/passkey"
+      ],
+      "registryDependencies": [
+        "solid/auth-provider"
+      ],
+      "files": [
+        {
+          "path": "src/lib/auth/passkey-plugin.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "src/components/auth/passkey/passkey-button.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/components/auth/passkey/passkeys.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/components/auth/passkey/passkey.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/components/auth/passkey/passkeys-empty.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/components/auth/passkey/passkey-skeleton.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/components/auth/passkey/add-passkey-dialog.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/components/auth/passkey/delete-passkey-dialog.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/components/ui/avatar.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/components/ui/button.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/components/ui/card.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/components/ui/dialog.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/components/ui/dropdown-menu.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/components/ui/input.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/components/ui/item.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/components/ui/label.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/components/ui/separator.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/components/ui/skeleton.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/components/ui/tabs.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/lib/utils.ts",
+          "type": "registry:lib"
+        }
+      ]
+    },
+    {
+      "name": "api-key",
+      "type": "registry:component",
+      "title": "Solid API Keys",
+      "description": "Solid API key management cards and dialogs.",
+      "dependencies": [
+        "@better-auth-ui/solid@latest",
+        "@better-auth-ui/core@latest",
+        "@tanstack/solid-query",
+        "better-auth",
+        "lucide-solid",
+        "solid-sonner",
+        "solid-js",
+        "@kobalte/core",
+        "class-variance-authority",
+        "clsx",
+        "tailwind-merge",
+        "@better-auth/api-key"
+      ],
+      "registryDependencies": [
+        "solid/auth-provider"
+      ],
+      "files": [
+        {
+          "path": "src/components/auth/api-key/api-keys.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/components/auth/api-key/api-key.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/components/auth/api-key/api-keys-empty.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/components/auth/api-key/api-key-skeleton.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/components/auth/api-key/create-api-key-dialog.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/components/auth/api-key/delete-api-key-dialog.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/components/auth/api-key/new-api-key-dialog.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/components/ui/avatar.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/components/ui/button.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/components/ui/card.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/components/ui/dialog.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/components/ui/dropdown-menu.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/components/ui/input.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/components/ui/item.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/components/ui/label.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/components/ui/separator.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/components/ui/skeleton.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/components/ui/tabs.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/lib/utils.ts",
+          "type": "registry:lib"
+        }
+      ]
+    },
+    {
+      "name": "forgot-password",
+      "type": "registry:component",
+      "title": "Solid Forgot Password",
+      "description": "Solid forgot-password component using the Solid password reset mutation options.",
+      "dependencies": [
+        "@better-auth-ui/solid@latest",
+        "@better-auth-ui/core@latest",
+        "@tanstack/solid-query",
+        "better-auth",
+        "lucide-solid",
+        "solid-sonner",
+        "solid-js",
+        "@kobalte/core",
+        "class-variance-authority",
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "solid/auth-provider"
+      ],
+      "files": [
+        {
+          "path": "src/components/auth/forgot-password.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/components/ui/button.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/components/ui/card.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/components/ui/input.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/components/ui/label.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/lib/utils.ts",
+          "type": "registry:lib"
+        }
+      ]
+    },
+    {
+      "name": "reset-password",
+      "type": "registry:component",
+      "title": "Solid Reset Password",
+      "description": "Solid reset-password component using the Solid password reset mutation options.",
+      "dependencies": [
+        "@better-auth-ui/solid@latest",
+        "@better-auth-ui/core@latest",
+        "@tanstack/solid-query",
+        "better-auth",
+        "lucide-solid",
+        "solid-sonner",
+        "solid-js",
+        "@kobalte/core",
+        "class-variance-authority",
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "solid/auth-provider"
+      ],
+      "files": [
+        {
+          "path": "src/components/auth/reset-password.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/components/ui/button.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/components/ui/card.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/components/ui/input.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/components/ui/label.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/lib/utils.ts",
+          "type": "registry:lib"
+        }
+      ]
+    },
+    {
+      "name": "sign-out",
+      "type": "registry:component",
+      "title": "Solid Sign Out",
+      "description": "Solid sign-out component that ends the session and returns to sign in.",
+      "dependencies": [
+        "@better-auth-ui/solid@latest",
+        "@better-auth-ui/core@latest",
+        "@tanstack/solid-query",
+        "better-auth",
+        "lucide-solid",
+        "solid-sonner",
+        "solid-js"
+      ],
+      "registryDependencies": [
+        "solid/auth-provider"
+      ],
+      "files": [
+        {
+          "path": "src/components/auth/sign-out.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "auth",
+      "type": "registry:component",
+      "title": "Solid Auth",
+      "description": "Solid auth router surface that selects the active auth view.",
+      "dependencies": [
+        "@better-auth-ui/solid@latest",
+        "@better-auth-ui/core@latest",
+        "@tanstack/solid-query",
+        "better-auth",
+        "lucide-solid",
+        "solid-sonner",
+        "solid-js",
+        "@kobalte/core",
+        "class-variance-authority",
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "solid/auth-provider"
+      ],
+      "files": [
+        {
+          "path": "src/components/auth/auth.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "user-button",
+      "type": "registry:component",
+      "title": "Solid User Button",
+      "description": "Solid user menu trigger with account, settings, theme, and auth links.",
+      "dependencies": [
+        "@better-auth-ui/solid@latest",
+        "@better-auth-ui/core@latest",
+        "@tanstack/solid-query",
+        "better-auth",
+        "lucide-solid",
+        "solid-sonner",
+        "solid-js",
+        "@kobalte/core",
+        "class-variance-authority",
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "solid/auth-provider",
+        "solid/theme"
+      ],
+      "files": [
+        {
+          "path": "src/components/auth/user-button.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/components/auth/user/user-button.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/components/auth/user/user-avatar.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/components/auth/user/user-view.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/components/auth/theme/theme-toggle-item.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/lib/theme.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "src/components/ui/avatar.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/components/ui/button.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/components/ui/card.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/components/ui/dialog.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/components/ui/dropdown-menu.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/components/ui/input.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/components/ui/item.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/components/ui/label.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/components/ui/separator.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/components/ui/skeleton.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/components/ui/tabs.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/lib/utils.ts",
+          "type": "registry:lib"
+        }
+      ]
+    },
+    {
+      "name": "user-avatar",
+      "type": "registry:component",
+      "title": "Solid User Avatar",
+      "description": "Solid user avatar primitive for auth account surfaces.",
+      "dependencies": [
+        "@better-auth-ui/solid@latest",
+        "@better-auth-ui/core@latest",
+        "@tanstack/solid-query",
+        "better-auth",
+        "lucide-solid",
+        "solid-sonner",
+        "solid-js",
+        "@kobalte/core",
+        "class-variance-authority",
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "solid/auth-provider"
+      ],
+      "files": [
+        {
+          "path": "src/components/auth/user/user-avatar.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/components/ui/avatar.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/lib/utils.ts",
+          "type": "registry:lib"
+        }
+      ]
+    },
+    {
+      "name": "user-view",
+      "type": "registry:component",
+      "title": "Solid User View",
+      "description": "Solid user identity row used by account menus and profile surfaces.",
+      "dependencies": [
+        "@better-auth-ui/solid@latest",
+        "@better-auth-ui/core@latest",
+        "@tanstack/solid-query",
+        "better-auth",
+        "lucide-solid",
+        "solid-sonner",
+        "solid-js",
+        "@kobalte/core",
+        "class-variance-authority",
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "solid/user-avatar"
+      ],
+      "files": [
+        {
+          "path": "src/components/auth/user/user-view.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/components/auth/user/user-avatar.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/components/ui/avatar.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/lib/utils.ts",
+          "type": "registry:lib"
+        }
+      ]
+    },
+    {
+      "name": "user-profile",
+      "type": "registry:component",
+      "title": "Solid User Profile",
+      "description": "Solid user profile card for account settings.",
+      "dependencies": [
+        "@better-auth-ui/solid@latest",
+        "@better-auth-ui/core@latest",
+        "@tanstack/solid-query",
+        "better-auth",
+        "lucide-solid",
+        "solid-sonner",
+        "solid-js",
+        "@kobalte/core",
+        "class-variance-authority",
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "solid/auth-provider",
+        "solid/additional-field"
+      ],
+      "files": [
+        {
+          "path": "src/components/auth/settings/account/user-profile.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/components/auth/settings/account/change-avatar.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/components/auth/additional-field.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/components/ui/avatar.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/components/ui/button.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/components/ui/card.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/components/ui/dialog.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/components/ui/dropdown-menu.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/components/ui/input.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/components/ui/item.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/components/ui/label.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/components/ui/separator.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/components/ui/skeleton.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/components/ui/tabs.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/lib/utils.ts",
+          "type": "registry:lib"
+        }
+      ]
+    },
+    {
+      "name": "account-settings",
+      "type": "registry:component",
+      "title": "Solid Account Settings",
+      "description": "Solid account settings with profile, email, appearance, and danger-zone cards.",
+      "dependencies": [
+        "@better-auth-ui/solid@latest",
+        "@better-auth-ui/core@latest",
+        "@tanstack/solid-query",
+        "better-auth",
+        "lucide-solid",
+        "solid-sonner",
+        "solid-js",
+        "@kobalte/core",
+        "class-variance-authority",
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "solid/user-profile",
+        "solid/change-email",
+        "solid/delete-user",
+        "solid/theme"
+      ],
+      "files": [
+        {
+          "path": "src/components/auth/settings/account/account-settings.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/components/auth/settings/account/manage-account-row.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/components/auth/settings/account/appearance-settings.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/components/ui/avatar.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/components/ui/button.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/components/ui/card.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/components/ui/dialog.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/components/ui/dropdown-menu.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/components/ui/input.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/components/ui/item.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/components/ui/label.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/components/ui/separator.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/components/ui/skeleton.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/components/ui/tabs.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/lib/utils.ts",
+          "type": "registry:lib"
+        }
+      ]
+    },
+    {
+      "name": "security-settings",
+      "type": "registry:component",
+      "title": "Solid Security Settings",
+      "description": "Solid security settings tabs for sessions, linked accounts, passkeys, and API keys.",
+      "dependencies": [
+        "@better-auth-ui/solid@latest",
+        "@better-auth-ui/core@latest",
+        "@tanstack/solid-query",
+        "better-auth",
+        "lucide-solid",
+        "solid-sonner",
+        "solid-js",
+        "@kobalte/core",
+        "class-variance-authority",
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "solid/active-sessions",
+        "solid/linked-accounts",
+        "solid/change-password",
+        "solid/passkey",
+        "solid/api-key"
+      ],
+      "files": [
+        {
+          "path": "src/components/auth/settings/security/security-settings.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/components/auth/settings/shared/helpers.ts",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/components/auth/settings/shared/types.ts",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/components/ui/avatar.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/components/ui/button.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/components/ui/card.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/components/ui/dialog.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/components/ui/dropdown-menu.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/components/ui/input.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/components/ui/item.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/components/ui/label.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/components/ui/separator.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/components/ui/skeleton.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/components/ui/tabs.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/lib/utils.ts",
+          "type": "registry:lib"
+        }
+      ]
+    },
+    {
+      "name": "settings",
+      "type": "registry:component",
+      "title": "Solid Settings",
+      "description": "Solid settings shell combining account and security sections.",
+      "dependencies": [
+        "@better-auth-ui/solid@latest",
+        "@better-auth-ui/core@latest",
+        "@tanstack/solid-query",
+        "better-auth",
+        "lucide-solid",
+        "solid-sonner",
+        "solid-js",
+        "@kobalte/core",
+        "class-variance-authority",
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "solid/account-settings",
+        "solid/security-settings"
+      ],
+      "files": [
+        {
+          "path": "src/components/auth/settings/settings.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/components/ui/avatar.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/components/ui/button.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/components/ui/card.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/components/ui/dialog.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/components/ui/dropdown-menu.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/components/ui/input.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/components/ui/item.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/components/ui/label.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/components/ui/separator.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/components/ui/skeleton.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/components/ui/tabs.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/lib/utils.ts",
+          "type": "registry:lib"
+        }
+      ]
+    },
+    {
+      "name": "active-sessions",
+      "type": "registry:component",
+      "title": "Solid Active Sessions",
+      "description": "Solid active sessions management card.",
+      "dependencies": [
+        "@better-auth-ui/solid@latest",
+        "@better-auth-ui/core@latest",
+        "@tanstack/solid-query",
+        "better-auth",
+        "lucide-solid",
+        "solid-sonner",
+        "solid-js",
+        "@kobalte/core",
+        "class-variance-authority",
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "solid/auth-provider"
+      ],
+      "files": [
+        {
+          "path": "src/components/auth/settings/security/active-sessions.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/components/auth/settings/security/active-session.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/components/ui/avatar.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/components/ui/button.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/components/ui/card.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/components/ui/dialog.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/components/ui/dropdown-menu.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/components/ui/input.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/components/ui/item.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/components/ui/label.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/components/ui/separator.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/components/ui/skeleton.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/components/ui/tabs.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/lib/utils.ts",
+          "type": "registry:lib"
+        }
+      ]
+    },
+    {
+      "name": "linked-accounts",
+      "type": "registry:component",
+      "title": "Solid Linked Accounts",
+      "description": "Solid linked accounts management card.",
+      "dependencies": [
+        "@better-auth-ui/solid@latest",
+        "@better-auth-ui/core@latest",
+        "@tanstack/solid-query",
+        "better-auth",
+        "lucide-solid",
+        "solid-sonner",
+        "solid-js",
+        "@kobalte/core",
+        "class-variance-authority",
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "solid/auth-provider"
+      ],
+      "files": [
+        {
+          "path": "src/components/auth/settings/security/linked-accounts.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/components/auth/settings/security/linked-account.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/components/ui/avatar.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/components/ui/button.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/components/ui/card.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/components/ui/dialog.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/components/ui/dropdown-menu.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/components/ui/input.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/components/ui/item.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/components/ui/label.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/components/ui/separator.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/components/ui/skeleton.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/components/ui/tabs.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/lib/utils.ts",
+          "type": "registry:lib"
+        }
+      ]
+    },
+    {
+      "name": "change-password",
+      "type": "registry:component",
+      "title": "Solid Change Password",
+      "description": "Solid change-password settings card.",
+      "dependencies": [
+        "@better-auth-ui/solid@latest",
+        "@better-auth-ui/core@latest",
+        "@tanstack/solid-query",
+        "better-auth",
+        "lucide-solid",
+        "solid-sonner",
+        "solid-js",
+        "@kobalte/core",
+        "class-variance-authority",
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "solid/auth-provider"
+      ],
+      "files": [
+        {
+          "path": "src/components/auth/settings/security/change-password.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/components/ui/button.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/components/ui/card.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/components/ui/input.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/components/ui/label.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/lib/utils.ts",
+          "type": "registry:lib"
+        }
+      ]
+    },
+    {
+      "name": "change-email",
+      "type": "registry:component",
+      "title": "Solid Change Email",
+      "description": "Solid change-email settings card.",
+      "dependencies": [
+        "@better-auth-ui/solid@latest",
+        "@better-auth-ui/core@latest",
+        "@tanstack/solid-query",
+        "better-auth",
+        "lucide-solid",
+        "solid-sonner",
+        "solid-js",
+        "@kobalte/core",
+        "class-variance-authority",
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "solid/auth-provider"
+      ],
+      "files": [
+        {
+          "path": "src/components/auth/settings/account/change-email.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/components/ui/button.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/components/ui/card.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/components/ui/input.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/components/ui/label.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/lib/utils.ts",
+          "type": "registry:lib"
+        }
+      ]
+    },
+    {
+      "name": "delete-user",
+      "type": "registry:component",
+      "title": "Solid Delete User",
+      "description": "Solid delete-user danger-zone card and confirmation dialog.",
+      "dependencies": [
+        "@better-auth-ui/solid@latest",
+        "@better-auth-ui/core@latest",
+        "@tanstack/solid-query",
+        "better-auth",
+        "lucide-solid",
+        "solid-sonner",
+        "solid-js",
+        "@kobalte/core",
+        "class-variance-authority",
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "solid/auth-provider"
+      ],
+      "files": [
+        {
+          "path": "src/components/auth/delete-user/danger-zone.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/components/auth/delete-user/delete-user.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/components/ui/avatar.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/components/ui/button.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/components/ui/card.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/components/ui/dialog.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/components/ui/dropdown-menu.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/components/ui/input.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/components/ui/item.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/components/ui/label.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/components/ui/separator.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/components/ui/skeleton.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/components/ui/tabs.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/lib/utils.ts",
+          "type": "registry:lib"
+        }
+      ]
+    },
+    {
+      "name": "multi-session",
+      "type": "registry:component",
+      "title": "Solid Multi Session",
+      "description": "Solid multi-session account switcher components.",
+      "dependencies": [
+        "@better-auth-ui/solid@latest",
+        "@better-auth-ui/core@latest",
+        "@tanstack/solid-query",
+        "better-auth",
+        "lucide-solid",
+        "solid-sonner",
+        "solid-js",
+        "@kobalte/core",
+        "class-variance-authority",
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "solid/auth-provider"
+      ],
+      "files": [
+        {
+          "path": "src/components/auth/multi-session/manage-account.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/components/auth/multi-session/manage-accounts.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/components/ui/avatar.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/components/ui/button.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/components/ui/card.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/components/ui/dialog.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/components/ui/dropdown-menu.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/components/ui/input.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/components/ui/item.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/components/ui/label.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/components/ui/separator.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/components/ui/skeleton.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/components/ui/tabs.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/lib/utils.ts",
+          "type": "registry:lib"
+        }
+      ]
+    },
+    {
+      "name": "theme",
+      "type": "registry:component",
+      "title": "Solid Theme",
+      "description": "Solid theme preference utilities and controls for auth surfaces.",
+      "dependencies": [
+        "@better-auth-ui/solid@latest",
+        "@better-auth-ui/core@latest",
+        "@tanstack/solid-query",
+        "better-auth",
+        "lucide-solid",
+        "solid-sonner",
+        "solid-js",
+        "@kobalte/core",
+        "class-variance-authority",
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [],
+      "files": [
+        {
+          "path": "src/components/auth/theme/appearance.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/components/auth/theme/theme-toggle-item.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/lib/theme.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "src/components/ui/tabs.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/components/ui/dropdown-menu.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "src/lib/utils.ts",
+          "type": "registry:lib"
+        }
+      ]
+    }
+  ]
+}

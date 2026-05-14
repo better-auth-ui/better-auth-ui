@@ -1,0 +1,21 @@
+---
+title: isUsernameAvailableOptions
+description: Check username availability.
+---
+
+Requires the Better Auth username plugin.
+
+## Usage
+
+```tsx
+import { isUsernameAvailableOptions } from "@better-auth-ui/solid"
+import { createMutation } from "@tanstack/solid-query"
+
+const checkUsername = createMutation(() => isUsernameAvailableOptions(authClient))
+
+checkUsername.mutate({ username: "alice" })
+```
+
+## Params
+
+<auto-type-table path="../../../../../../packages/solid/src/mutations/username/is-username-available-mutation.ts" name="IsUsernameAvailableParams" />

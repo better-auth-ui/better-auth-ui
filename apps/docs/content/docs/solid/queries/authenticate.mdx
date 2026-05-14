@@ -1,0 +1,22 @@
+---
+title: useAuthenticate
+description: Redirect unauthenticated Solid users to the configured sign-in route.
+---
+
+`useAuthenticate` wraps [`useSession`](/docs/solid/queries/session) and triggers the configured `navigate` callback when no session is available. Use it inside client-rendered route components; it reads `window.location` and is not a server helper.
+
+## Usage
+
+```tsx
+import { useAuthenticate } from "@better-auth-ui/solid"
+
+export function ProtectedRoute() {
+  const session = useAuthenticate(authClient)
+
+  return <main>{session.data?.user.email}</main>
+}
+```
+
+## Redirect behavior
+
+The redirect target is built from `basePaths.auth`, `viewPaths.auth.signIn`, and the current URL encoded as `redirectTo`. Configure those paths on `AuthProvider`.

@@ -1,0 +1,21 @@
+---
+title: createApiKeyOptions
+description: Create an API key for the current user.
+---
+
+This is a Solid package API page for the API key plugin. React docs do not currently have a matching page, so this is documented as a supported Solid extension rather than invented React parity.
+
+## Usage
+
+```tsx
+import { createApiKeyOptions } from "@better-auth-ui/solid"
+import { createMutation } from "@tanstack/solid-query"
+
+const createApiKey = createMutation(() => createApiKeyOptions(authClient))
+
+createApiKey.mutate({ name: "CLI" })
+```
+
+## Params
+
+<auto-type-table path="../../../../../../packages/solid/src/mutations/api-key/create-api-key-mutation.ts" name="CreateApiKeyParams" />

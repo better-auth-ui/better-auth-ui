@@ -1,0 +1,21 @@
+---
+title: signInUsernameOptions
+description: Username/password sign-in mutation options.
+---
+
+Requires the Better Auth username plugin.
+
+## Usage
+
+```tsx
+import { signInUsernameOptions } from "@better-auth-ui/solid"
+import { createMutation } from "@tanstack/solid-query"
+
+const signIn = createMutation(() => signInUsernameOptions(authClient))
+
+signIn.mutate({ username: "alice", password: "hunter2" })
+```
+
+## Params
+
+<auto-type-table path="../../../../../../packages/solid/src/mutations/username/sign-in-username-mutation.ts" name="SignInUsernameParams" />

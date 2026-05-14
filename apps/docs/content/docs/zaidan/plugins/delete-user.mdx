@@ -1,0 +1,24 @@
+---
+title: Delete user
+description: Install the Solid delete-user UI payload.
+---
+
+The delete-user payload installs the danger-zone card and confirmation dialog from `/r/solid/delete-user.json`.
+
+```bash
+zaidan add https://better-auth-ui.com/r/solid/delete-user.json
+```
+
+## Runtime prerequisites
+
+- Server: enable account deletion according to your Better Auth policy.
+- Runtime API: delete-user mutation behavior from [Solid mutations](/docs/solid/mutations).
+- Product: decide whether deletion is immediate, delayed, or disabled for your app.
+
+## Copied files
+
+- `src/components/auth/delete-user/danger-zone.tsx`
+- `src/components/auth/delete-user/delete-user.tsx`
+- Local dialog and button primitives under `src/components/ui/**`
+
+After install, adjust confirmation copy and account-retention policy text locally.

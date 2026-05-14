@@ -1,0 +1,19 @@
+---
+title: signUpEmailOptions
+description: Email/password sign-up mutation options.
+---
+
+## Usage
+
+```tsx
+import { signUpEmailOptions } from "@better-auth-ui/solid"
+import { createMutation } from "@tanstack/solid-query"
+
+const signUp = createMutation(() => signUpEmailOptions(authClient))
+
+signUp.mutate({ email: "alice@example.com", password: "hunter2", name: "Alice" })
+```
+
+## Params
+
+<auto-type-table path="../../../../../../packages/solid/src/mutations/auth/sign-up-email-mutation.ts" name="SignUpEmailParams" />

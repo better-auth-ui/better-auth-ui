@@ -1,0 +1,46 @@
+---
+title: <ActiveSessions />
+description: A Solid security card for listing active sessions and revoking device sessions.
+---
+
+## Usage
+
+Render `ActiveSessionsSettings` in the security tab for signed-in users.
+
+```tsx
+import { ActiveSessionsSettings } from "@/components/auth/settings/security/active-sessions"
+
+export function SessionsCard() {
+  return <ActiveSessionsSettings />
+}
+```
+
+The card sorts the current session first, then uses Solid Query mutations for revoke and sign-out actions.
+
+## Installation
+
+```bash
+zaidan add https://better-auth-ui.com/r/solid/active-sessions.json
+```
+
+## Props
+
+<auto-type-table path="../../../../../../examples/start-solid-zaidan-example/src/components/auth/settings/security/active-sessions.tsx" name="ActiveSessionsSettingsProps" />
+
+### Parity classification
+
+Zaidan exposes the wrapper styling hook as Solid `class`, adapting the shadcn `className` prop to the local Solid convention. `ActiveSessionsSettings` still reads the current session and auth client from `AuthProvider`.
+
+## Plugin gates
+
+- Requires an authenticated session.
+- Uses `listSessionsOptions` to load active sessions outside SSR.
+- Uses `revokeSessionOptions` to revoke another active session.
+
+## Installed files
+
+- `src/components/auth/settings/security/active-sessions.tsx`
+- `src/components/auth/settings/security/active-session.tsx`
+- Local card, dialog, and button primitives.
+
+After install, review session labels and revoke-session confirmation copy.

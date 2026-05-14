@@ -1,0 +1,21 @@
+---
+title: signInPasskeyOptions
+description: Passkey sign-in mutation options.
+---
+
+Requires the Better Auth passkey plugin.
+
+## Usage
+
+```tsx
+import { signInPasskeyOptions } from "@better-auth-ui/solid"
+import { createMutation } from "@tanstack/solid-query"
+
+const signInWithPasskey = createMutation(() => signInPasskeyOptions(authClient))
+
+signInWithPasskey.mutate()
+```
+
+## Params
+
+<auto-type-table path="../../../../../../packages/solid/src/mutations/passkey/sign-in-passkey-mutation.ts" name="SignInPasskeyParams" />

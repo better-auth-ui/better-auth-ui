@@ -1,0 +1,52 @@
+---
+title: <UserButton />
+description: Renders the Solid account trigger with session-aware menu items, settings links, sign out, and theme controls.
+---
+
+## Usage
+
+Install `user-button` when you need the signed-in account menu in a Solid route or header. It reads the active session from `AuthProvider`, shows sign-in/sign-up actions when unauthenticated, and renders the settings, theme, and sign-out entries when a user is signed in.
+
+```tsx
+import { UserButton } from "@/components/auth/user/user-button"
+
+export function HeaderActions() {
+  return <UserButton size="icon" align="end" />
+}
+```
+
+Use the default size when the trigger should show the avatar, user label, and secondary label together.
+
+```tsx
+import { UserButton } from "@/components/auth/user/user-button"
+
+export function AccountMenu() {
+  return <UserButton />
+}
+```
+
+The menu uses the copied theme item from the Zaidan payload and the route paths from your `AuthProvider` config. It displays the current Better Auth session only; if your app enables multi-session, keep account switching in the multi-session/settings payload and use this button as the current-session entry point.
+
+## Installation
+
+```bash
+zaidan add https://better-auth-ui.com/r/solid/user-button.json
+```
+
+## Props
+
+<auto-type-table path="../../../../../../examples/start-solid-zaidan-example/src/components/auth/user/user-button.tsx" name="UserButtonProps" />
+
+### Parity classification
+
+`links` and `hideSettings` are Solid-adapted matches for the shadcn user menu contract. Zaidan exposes the styling hook as Solid `class` to follow local Solid conventions.
+
+## Installed files
+
+- `src/components/auth/user-button.tsx`
+- `src/components/auth/user/user-button.tsx`
+- `src/components/auth/user/user-avatar.tsx`
+- `src/components/auth/user/user-view.tsx`
+- `src/components/auth/theme/theme-toggle-item.tsx`
+
+After install, point the auth and settings links at your TanStack Router paths and decide whether the header should render the icon or full account row.

@@ -1,0 +1,59 @@
+---
+title: <UserView />
+description: Renders a compact Solid user identity row with avatar, primary label, and optional secondary label.
+---
+
+## Usage
+
+Use `UserView` inside account menus, settings headers, or custom session surfaces where you already have the session user data. It composes the copied `UserAvatar` component and leaves fetching to the parent surface.
+
+```tsx
+import { UserView } from "@/components/auth/user/user-view"
+
+export function AccountSummary() {
+  return <UserView label="Ada Lovelace" secondaryLabel="ada@example.com" />
+}
+```
+
+When you render it from session state, pass the user's image and a short fallback from the active Better Auth session.
+
+```tsx
+import { UserView } from "@/components/auth/user/user-view"
+
+export function SessionUserView(props: {
+  user: { email?: string | null; image?: string | null; name?: string | null }
+}) {
+  const label = () => props.user.name || props.user.email || "Account"
+
+  return (
+    <UserView
+      image={props.user.image}
+      initials={label().slice(0, 2).toUpperCase()}
+      label={label()}
+      secondaryLabel={props.user.email}
+    />
+  )
+}
+```
+
+## Installation
+
+```bash
+zaidan add https://better-auth-ui.com/r/solid/user-view.json
+```
+
+## Props
+
+<auto-type-table path="../../../../../../examples/start-solid-zaidan-example/src/components/auth/user/user-view.tsx" name="UserViewProps" />
+
+### Parity classification
+
+`user` and `isPending` match the shadcn user surface in Solid form. Zaidan exposes the styling hook as Solid `class`; `image`, `initials`, `label`, and `secondaryLabel` are intentional-difference legacy composition helpers retained for app-owned copied files.
+
+## Installed files
+
+- `src/components/auth/user/user-view.tsx`
+- `src/components/auth/user/user-avatar.tsx`
+- `src/components/ui/avatar.tsx`
+
+After install, tune the label and secondary label mapping to match your account model.

@@ -1,0 +1,24 @@
+---
+title: Multi-session
+description: Install the Solid multi-session UI payload.
+---
+
+The multi-session payload installs account switching UI from `/r/solid/multi-session.json`.
+
+```bash
+zaidan add https://better-auth-ui.com/r/solid/multi-session.json
+```
+
+## Runtime prerequisites
+
+- Server: `multiSession()` from `better-auth/plugins`.
+- Client: `multiSessionClient()` from `better-auth/client/plugins`.
+- Runtime API: multi-session actions and session switching behavior from [Solid runtime APIs](/docs/solid).
+
+## Copied files
+
+- `src/components/auth/multi-session/manage-account.tsx`
+- `src/components/auth/multi-session/manage-accounts.tsx`
+- Local avatar, dialog, menu, and card primitives under `src/components/ui/**`
+
+After install, place the switcher where your account menu or settings surface expects it.

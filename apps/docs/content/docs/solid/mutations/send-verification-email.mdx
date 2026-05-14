@@ -1,0 +1,21 @@
+---
+title: sendVerificationEmailOptions
+description: Send an email verification message.
+---
+
+## Usage
+
+```tsx
+import { sendVerificationEmailOptions } from "@better-auth-ui/solid"
+import { createMutation } from "@tanstack/solid-query"
+
+const sendVerificationEmail = createMutation(() =>
+  sendVerificationEmailOptions(authClient)
+)
+
+sendVerificationEmail.mutate({ email: "alice@example.com" })
+```
+
+## Params
+
+<auto-type-table path="../../../../../../packages/solid/src/mutations/auth/send-verification-email-mutation.ts" name="SendVerificationEmailParams" />

@@ -1,0 +1,46 @@
+---
+title: <SignIn />
+description: A Solid sign-in form with email/password, username-aware routing, and provider button support.
+---
+
+## Usage
+
+Render `<SignIn />` inside an auth route that is wrapped by the installed `<AuthProvider />`.
+
+```tsx
+import { SignIn } from "@/components/auth/sign-in"
+
+export function SignInRoute() {
+  return <SignIn />
+}
+```
+
+The payload delegates to the username-aware sign-in form when the username plugin is present. It also renders configured auth provider buttons and links to the forgot-password and sign-up paths from the provider context.
+
+## Installation
+
+```bash
+zaidan add https://better-auth-ui.com/r/solid/sign-in.json
+```
+
+## Props
+
+<auto-type-table path="../../../../../../examples/start-solid-zaidan-example/src/components/auth/sign-in.tsx" name="SignInProps" />
+
+## Parity classification
+
+Zaidan follows Solid's local `class` prop convention. It adapts the shadcn `className` styling hook to `class`; `socialLayout` and `socialPosition` keep their shadcn semantics in Solid form.
+
+Configure labels, routes, social providers, and username support through `<AuthProvider />` and your Better Auth plugins.
+
+## Installed files
+
+Installs the sign-in entry surface with email/password, username-aware routing, and provider button wiring.
+
+- `src/components/auth/sign-in.tsx`
+- `src/components/auth/username/sign-in-username.tsx`
+- `src/components/auth/sign-in-path.ts`
+- `src/components/auth/provider-button.tsx`
+- `src/components/auth/provider-buttons.tsx`
+
+After install, configure providers such as GitHub in Better Auth and adjust labels/routes locally.

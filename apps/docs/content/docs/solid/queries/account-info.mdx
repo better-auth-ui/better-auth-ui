@@ -1,0 +1,38 @@
+---
+title: useAccountInfo
+description: Read provider-specific account info for a linked account.
+---
+
+Use `useAccountInfo` when a settings screen needs provider metadata for the current user's linked account. It is user-scoped and waits for the active session.
+
+## Usage
+
+```tsx
+import { useAccountInfo } from "@better-auth-ui/solid"
+
+const github = useAccountInfo(authClient, {
+  query: { accountId: "github-account-id" }
+})
+```
+
+## Options factory and loader helpers
+
+```ts
+import {
+  accountInfoOptions,
+  ensureAccountInfo,
+  fetchAccountInfo,
+  prefetchAccountInfo
+} from "@better-auth-ui/solid"
+
+const options = accountInfoOptions(authClient, userId, {
+  query: { accountId }
+})
+await ensureAccountInfo(queryClient, authClient, userId, { query: { accountId } })
+await prefetchAccountInfo(queryClient, authClient, userId, { query: { accountId } })
+const info = await fetchAccountInfo(queryClient, authClient, userId, { query: { accountId } })
+```
+
+## Params
+
+<auto-type-table path="../../../../../../packages/solid/src/queries/settings/account-info-query.ts" name="AccountInfoParams" />

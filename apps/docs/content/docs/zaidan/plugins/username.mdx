@@ -1,0 +1,27 @@
+---
+title: Username
+description: Install the Solid username auth UI payload.
+---
+
+The username payload installs username-aware sign-in and username field pieces from `/r/solid/username.json`.
+
+```bash
+zaidan add https://better-auth-ui.com/r/solid/username.json
+```
+
+Configure `username()` and `usernameClient()` in your Better Auth setup, then use [Solid runtime APIs](/docs/solid) for query and mutation boundaries.
+
+## Runtime prerequisites
+
+- Server: `username()` from `better-auth/plugins`.
+- Client: `usernameClient()` from `better-auth/client/plugins`.
+- Runtime API: `signInUsernameOptions` and username availability helpers from `@better-auth-ui/solid`.
+
+## Copied files
+
+- `src/components/auth/username/sign-in-username.tsx`
+- `src/components/auth/username/username-field.tsx`
+- `src/components/auth/sign-in-path.ts`
+- Local form UI primitives under `src/components/ui/**`
+
+After install, customize labels, routing, and validation copy in your app.

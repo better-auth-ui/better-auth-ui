@@ -1,0 +1,28 @@
+{
+  "icon": "Box",
+  "defaultOpen": true,
+  "pages": [
+    "---Provider---",
+    "auth-provider",
+    "---Auth---",
+    "auth",
+    "sign-in",
+    "sign-up",
+    "forgot-password",
+    "reset-password",
+    "sign-out",
+    "---User---",
+    "user-button",
+    "user-avatar",
+    "user-view",
+    "---Settings---",
+    "settings",
+    "account-settings",
+    "user-profile",
+    "change-email",
+    "security-settings",
+    "active-sessions",
+    "linked-accounts",
+    "change-password"
+  ]
+}

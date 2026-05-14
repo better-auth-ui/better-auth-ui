@@ -8,6 +8,7 @@ import { HeroUI } from "@/components/icons/heroui"
 import { NextJS } from "@/components/icons/nextjs"
 import { React } from "@/components/icons/react"
 import { Shadcn } from "@/components/icons/shadcn"
+import { Solid } from "@/components/icons/solid"
 import { TanStackStart } from "@/components/icons/tanstack-start"
 
 const docsBaseUrl = "/docs"
@@ -17,6 +18,7 @@ const customIcons = {
   NextJS,
   React,
   Shadcn,
+  Solid,
   TanStackStart
 }
 

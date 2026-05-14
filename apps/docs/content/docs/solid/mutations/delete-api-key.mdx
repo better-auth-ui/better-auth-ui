@@ -1,0 +1,21 @@
+---
+title: deleteApiKeyOptions
+description: Delete an API key for the current user.
+---
+
+Requires the Better Auth API key plugin.
+
+## Usage
+
+```tsx
+import { deleteApiKeyOptions } from "@better-auth-ui/solid"
+import { createMutation } from "@tanstack/solid-query"
+
+const deleteApiKey = createMutation(() => deleteApiKeyOptions(authClient))
+
+deleteApiKey.mutate({ keyId: "api-key-id" })
+```
+
+## Params
+
+<auto-type-table path="../../../../../../packages/solid/src/mutations/api-key/delete-api-key-mutation.ts" name="DeleteApiKeyParams" />

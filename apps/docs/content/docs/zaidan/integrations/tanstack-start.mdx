@@ -1,0 +1,54 @@
+---
+title: TanStack Start
+description: Prepare a Solid TanStack Start app for Zaidan payloads.
+icon: TanStackStart
+---
+
+Make sure you've completed the [Quick Start](/docs/zaidan) guide first.
+
+Zaidan payloads assume a Solid app that already has Better Auth UI runtime wiring. Use this setup before installing registry payloads from `/r/solid`.
+
+## Quick path
+
+1. Create a TanStack Start app using `@tanstack/solid-start`.
+2. Add `@better-auth-ui/solid`, `@tanstack/solid-query`, `better-auth`, `solid-sonner`, and the UI dependencies copied by Zaidan payloads.
+3. Load Tailwind v4 from `src/styles/globals.css` and import it from `src/routes/__root.tsx`.
+4. Configure `components.json` aliases so copied files resolve `@/components`, `@/lib`, `@/hooks`, and `@/components/ui`.
+5. Install `auth-provider` before feature payloads.
+
+## Setup checklist
+
+- Solid app uses `@better-auth-ui/solid` and `@tanstack/solid-query`.
+- Tailwind v4 styles are loaded from the app global CSS file.
+- Kobalte and local UI primitives are available through copied payload files.
+- `components.json` points local aliases at your app source tree.
+- Registry alias can stay compatible with Zaidan's style namespace: `"@zaidan": "https://zaidan.carere.dev/r/{style}/{name}.json"`.
+
+```json title="components.json"
+{
+  "style": "kobalte",
+  "tsx": true,
+  "tailwind": {
+    "css": "src/styles/globals.css",
+    "cssVariables": true
+  },
+  "aliases": {
+    "components": "@/components",
+    "ui": "@/components/ui",
+    "lib": "@/lib",
+    "utils": "@/lib/utils",
+    "hooks": "@/hooks"
+  },
+  "registries": {
+    "@zaidan": "https://zaidan.carere.dev/r/{style}/{name}.json"
+  }
+}
+```
+
+## Provider boundary
+
+Installable files expect an app-owned provider like `examples/start-solid-zaidan-example/src/components/providers.tsx`. Keep `createAuthClient`, `QueryClient`, router navigation, and `AuthProvider` wiring there.
+
+## Reference app
+
+Use `examples/start-solid-zaidan-example` as the review baseline for Zaidan-compatible setup.

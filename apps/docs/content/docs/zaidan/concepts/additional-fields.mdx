@@ -1,0 +1,86 @@
+---
+title: Additional Fields
+description: Render custom user fields in copied Zaidan auth and profile forms.
+---
+
+`additionalFields` is an `AuthProvider` config option from the Solid runtime. Zaidan payloads copy the Solid `<AdditionalField />` renderer so sign-up and profile forms can render those fields inside your app-owned files.
+
+<Callout type="info">
+  Define the same fields in your Better Auth server config under `user.additionalFields`. Zaidan only copies the UI renderer — the server still owns persistence and validation.
+</Callout>
+
+## Quick path
+
+1. Configure `additionalFields` on the copied `AuthProvider` shell.
+2. Install auth/profile payloads that render additional fields.
+3. Customize the copied renderer if your app needs richer Solid controls.
+
+```bash
+zaidan add https://better-auth-ui.com/r/solid/auth-provider.json
+zaidan add https://better-auth-ui.com/r/solid/sign-up.json
+zaidan add https://better-auth-ui.com/r/solid/user-profile.json
+```
+
+## Configure fields
+
+Pass field definitions to `<AuthProvider>`:
+
+```tsx
+import { AuthProvider } from "@/components/auth/auth-provider"
+
+<AuthProvider
+  authClient={authClient}
+  navigate={navigate}
+  additionalFields={[
+    {
+      name: "bio",
+      type: "string",
+      label: "Bio",
+      inputType: "textarea"
+    },
+    {
+      name: "birthday",
+      type: "date",
+      label: "Birthday",
+      signUp: true,
+      required: true
+    }
+  ]}
+>
+  {children}
+</AuthProvider>
+```
+
+Fields render on the user profile by default. Set `signUp: true` to also render them on the sign-up form.
+
+## Install model
+
+The additional field payload copies:
+
+- `src/components/auth/additional-field.tsx`
+- local button, input, and label primitives used by the renderer
+
+```bash
+zaidan add https://better-auth-ui.com/r/solid/additional-field.json
+```
+
+After install, adapt validation messages, Solid `class` styling, and field layouts in your app-owned copy.
+
+## Renderer behavior
+
+The Solid renderer supports native controls for the current Zaidan payload set:
+
+| Input type | Rendering behavior |
+| --- | --- |
+| `input`, `number`, `date`, `datetime`, `hidden` | native input variants |
+| `textarea` | native textarea with Zaidan classes |
+| `select`, `combobox` | native select from `options` |
+| `switch`, `checkbox` | native checkbox |
+
+Advanced shadcn-only field primitives such as calendar, slider, or combobox widgets are intentionally not invented in the Solid payload. Customize the copied renderer when your app has those primitives.
+
+## Type reference
+
+<auto-type-table path="../../../../../../packages/core/src/config/additional-fields-config.ts" name="AdditionalField" />
+
+<auto-type-table path="../../../../../../examples/start-solid-zaidan-example/src/components/auth/additional-field.tsx" name="AdditionalFieldProps" />

@@ -1,0 +1,34 @@
+---
+title: useListPasskeys
+description: List passkeys registered for the current user.
+---
+
+Requires the Better Auth passkey plugin. Use this query in passkey settings screens and invalidate it after add/delete passkey mutations.
+
+## Usage
+
+```tsx
+import { useListPasskeys } from "@better-auth-ui/solid"
+
+const passkeys = useListPasskeys(authClient)
+```
+
+## Options factory and loader helpers
+
+```ts
+import {
+  ensureListPasskeys,
+  fetchListPasskeys,
+  listPasskeysOptions,
+  prefetchListPasskeys
+} from "@better-auth-ui/solid"
+
+const options = listPasskeysOptions(authClient, userId)
+await ensureListPasskeys(queryClient, authClient, userId)
+await prefetchListPasskeys(queryClient, authClient, userId)
+const passkeys = await fetchListPasskeys(queryClient, authClient, userId)
+```
+
+## Params
+
+<auto-type-table path="../../../../../../packages/solid/src/queries/passkey/list-passkeys-query.ts" name="ListPasskeysParams" />

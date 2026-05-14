@@ -1,0 +1,33 @@
+{
+  "title": "Mutations",
+  "icon": "DatabaseZap",
+  "pages": [
+    "index",
+    "---Auth---",
+    "sign-in-email",
+    "sign-in-username",
+    "sign-in-magic-link",
+    "sign-in-passkey",
+    "sign-in-social",
+    "sign-up-email",
+    "sign-out",
+    "request-password-reset",
+    "reset-password",
+    "send-verification-email",
+    "is-username-available",
+    "---Settings---",
+    "update-user",
+    "change-email",
+    "change-password",
+    "delete-user",
+    "link-social",
+    "unlink-account",
+    "add-passkey",
+    "delete-passkey",
+    "revoke-session",
+    "revoke-multi-session",
+    "set-active-session",
+    "create-api-key",
+    "delete-api-key"
+  ]
+}

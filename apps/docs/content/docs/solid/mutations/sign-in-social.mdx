@@ -1,0 +1,19 @@
+---
+title: signInSocialOptions
+description: Social sign-in mutation options.
+---
+
+## Usage
+
+```tsx
+import { signInSocialOptions } from "@better-auth-ui/solid"
+import { createMutation } from "@tanstack/solid-query"
+
+const signInSocial = createMutation(() => signInSocialOptions(authClient))
+
+signInSocial.mutate({ provider: "github" })
+```
+
+## Params
+
+<auto-type-table path="../../../../../../packages/solid/src/mutations/auth/sign-in-social-mutation.ts" name="SignInSocialParams" />

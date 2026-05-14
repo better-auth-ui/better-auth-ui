@@ -1,0 +1,52 @@
+---
+title: Overview
+description: Solid package setup and runtime API boundaries.
+icon: Solid
+---
+
+Solid package/runtime track: @better-auth-ui/solid owns provider wiring, Solid Query factories, mutation factories, and server helpers.
+
+Use [Zaidan](/docs/zaidan) when your job is installing copied Solid components or wiring TanStack Start app routes. Stay in this Solid section when your job is using package runtime APIs.
+
+## Quick path
+
+1. Install the Solid package and Solid Query.
+2. Create a Better Auth client with `createAuthClient`.
+3. Wrap your app with `AuthProvider` and pass a `QueryClient`.
+4. Use query and mutation option factories from `@better-auth-ui/solid` in your components.
+5. Use `@better-auth-ui/solid/server` only at server boundaries that need server-side session data.
+
+```package-install
+@better-auth-ui/solid @tanstack/solid-query better-auth solid-js
+```
+
+## Package exports
+
+| Export | Owns |
+| --- | --- |
+| `@better-auth-ui/solid` | `createAuthClient`, `AuthProvider`, `useAuth`, auth config types, provider icons, query factories, mutation factories, and hooks such as `useSession`. |
+| `@better-auth-ui/solid/server` | Server-safe query helpers and auth server types for SSR boundaries. |
+
+## What belongs elsewhere
+
+- Component installation, generated payloads, and copied-file ownership belong in [Zaidan](/docs/zaidan).
+- TanStack Start app setup belongs in [Zaidan integrations](/docs/zaidan/integrations/tanstack-start).
+- React email templates, React render-hook behavior, and HeroUI React components are not Solid package APIs.
+- Registry generation is part of the Solid example + Zaidan docs, not this package reference.
+
+## Next
+
+<Cards>
+  <Card title="Queries" href="/docs/solid/queries">
+    Review Solid Query factories, cache keys, and loader helpers.
+  </Card>
+  <Card title="Mutations" href="/docs/solid/mutations">
+    Use mutation option factories for Better Auth write endpoints.
+  </Card>
+  <Card title="SSR" href="/docs/solid/ssr">
+    Use server-safe helpers to prefetch session data at SSR boundaries.
+  </Card>
+  <Card title="Zaidan components" href="/docs/zaidan">
+    Switch tracks when you need installable Solid UI payloads.
+  </Card>
+</Cards>

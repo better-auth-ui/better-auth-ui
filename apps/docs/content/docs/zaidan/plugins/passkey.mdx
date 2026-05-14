@@ -1,0 +1,29 @@
+---
+title: Passkey
+description: Install the Solid passkey UI payload.
+---
+
+The passkey payload installs passkey sign-in and management UI from `/r/solid/passkey.json`.
+
+```bash
+zaidan add https://better-auth-ui.com/r/solid/passkey.json
+```
+
+Configure Better Auth WebAuthn origin and trusted origins before production.
+
+## Runtime prerequisites
+
+- Server: `passkey()` from `@better-auth/passkey`.
+- Client: `passkeyClient()` from `@better-auth/passkey/client`.
+- Production: set the WebAuthn origin and trusted origins correctly.
+- Runtime API: passkey options and queries from [Solid runtime APIs](/docs/solid).
+
+## Copied files
+
+- `src/lib/auth/passkey-plugin.ts`
+- `src/components/auth/passkey/passkey-button.tsx`
+- `src/components/auth/passkey/passkeys.tsx`
+- `src/components/auth/passkey/add-passkey-dialog.tsx`
+- `src/components/auth/passkey/delete-passkey-dialog.tsx`
+
+After install, mount the plugin through your app-owned provider and tune security copy locally.

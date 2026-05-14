@@ -1,0 +1,40 @@
+---
+title: SSR
+description: Server-side helpers and SSR boundaries for the Solid package.
+---
+
+`@better-auth-ui/solid/server` provides server-safe query helpers for SSR boundaries. It does not create routes, generate registry payloads, install components, or prescribe TanStack Start app setup.
+
+## Quick path
+
+1. Configure Better Auth in your app server code.
+2. Pass your app's Better Auth instance and request headers to the server helper.
+3. Seed or read the same Solid Query cache that your client-side auth hooks use after hydration.
+
+```ts
+import { ensureSession } from "@better-auth-ui/solid/server"
+
+export const beforeLoad = async ({ context }) => {
+  const session = await ensureSession(context.queryClient, auth, {
+    headers: context.request.headers
+  })
+
+  return { session }
+}
+```
+
+## Server exports
+
+| Export | Purpose |
+| --- | --- |
+| `AuthServer` | Minimal Better Auth server shape used by server query helpers. |
+| `MagicLinkAuthServer`, `MultiSessionAuthServer`, `PasskeyAuthServer`, `UsernameAuthServer` | Typed server shapes for plugin-enabled Better Auth instances. |
+| `sessionOptions` | Server-side Solid Query options for `auth.api.getSession`. |
+| `ensureSession` | Ensure server session data is present in the query cache. |
+| `prefetchSession` | Warm session data without reading it immediately. |
+| `fetchSession` | Fetch session data through the query client. |
+| `listApiKeysOptions`, `listDeviceSessionsOptions`, `listPasskeysOptions`, `accountInfoOptions`, `listAccountsOptions`, `listSessionsOptions` | Shared read helpers re-exported for server-side prefetch flows. |
+
+## Boundary
+
+Server helpers require your app's Better Auth instance and request headers. They do not own secrets, route files, or copied UI code. For TanStack Start installation and component customization, switch to [Zaidan](/docs/zaidan).

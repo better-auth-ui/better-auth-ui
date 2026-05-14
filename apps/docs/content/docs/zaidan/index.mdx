@@ -1,0 +1,79 @@
+---
+title: Quick Start
+description: Getting started with Better Auth UI for Zaidan Solid payloads.
+icon: Rocket
+---
+
+import { Step, Steps } from 'fumadocs-ui/components/steps'
+import { Cards, Card } from 'fumadocs-ui/components/card'
+
+Zaidan installs Solid-owned Better Auth UI component files into your app. Use this page for the happy path: prepare a TanStack Start app, install the provider payload, then add the auth or settings surfaces you need.
+
+Use [Solid](/docs/solid) for `@better-auth-ui/solid` package/runtime APIs.
+
+## Prerequisites
+
+Before installing payloads, make sure your app has:
+
+- [Better Auth](https://www.better-auth.com/docs/installation)
+- [TanStack Start for Solid](/docs/zaidan/integrations/tanstack-start)
+- `@better-auth-ui/solid` and `@tanstack/solid-query`
+- Tailwind v4 and the local UI primitives copied by Zaidan payloads
+
+## Installation
+
+<Steps>
+<Step>
+### Install the provider payload
+
+Install `auth-provider` first so feature payloads can share `AuthProvider`, the error toaster, the theme helper, and Solid Query wiring.
+
+```bash
+zaidan add https://better-auth-ui.com/r/solid/auth-provider.json
+```
+</Step>
+<Step>
+### Install auth components
+
+Add the auth surfaces you want to expose in your app.
+
+```bash
+zaidan add https://better-auth-ui.com/r/solid/sign-up.json
+zaidan add https://better-auth-ui.com/r/solid/sign-in.json
+```
+</Step>
+<Step>
+### Install settings or plugin surfaces as needed
+
+Install larger surfaces only when your app needs them. Copied files are app-owned after install, so review and customize them like normal application code.
+
+```bash
+zaidan add https://better-auth-ui.com/r/solid/settings.json
+zaidan add https://better-auth-ui.com/r/solid/passkey.json
+```
+</Step>
+</Steps>
+
+The payloads are generated from `examples/start-solid-zaidan-example/registry.manifest.ts` and hosted under `apps/docs/public/r/solid/**`.
+
+The generated registry index is available at `https://better-auth-ui.com/r/solid/registry.json`.
+
+## Next Steps
+
+Follow the framework setup first, then use the component and plugin pages as references while reviewing copied files.
+
+<Cards>
+  <Card icon={<TanStackStart />} title="TanStack Start" href="/docs/zaidan/integrations/tanstack-start">
+    Prepare a Solid app for Zaidan payloads.
+  </Card>
+  <Card title="Additional Fields" href="/docs/zaidan/concepts/additional-fields">
+    Render custom Better Auth user fields in copied Solid forms.
+  </Card>
+</Cards>
+
+## Zaidan boundary
+
+- Installable auth, user, settings, and plugin component files.
+- Zaidan/Tailwind/Kobalte setup needed by those payloads.
+- Links back to Solid runtime docs when an installed component needs package APIs.
+- Social/GitHub provider buttons are included by auth payloads when your Better Auth client enables those providers.

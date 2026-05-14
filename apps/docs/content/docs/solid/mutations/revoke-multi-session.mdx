@@ -1,0 +1,23 @@
+---
+title: revokeMultiSessionOptions
+description: Revoke a multi-session device session.
+---
+
+Requires the Better Auth multi-session plugin.
+
+## Usage
+
+```tsx
+import { revokeMultiSessionOptions } from "@better-auth-ui/solid"
+import { createMutation } from "@tanstack/solid-query"
+
+const revokeMultiSession = createMutation(() =>
+  revokeMultiSessionOptions(authClient)
+)
+
+revokeMultiSession.mutate({ sessionToken: "session-token" })
+```
+
+## Params
+
+<auto-type-table path="../../../../../../packages/solid/src/mutations/multi-session/revoke-multi-session-mutation.ts" name="RevokeMultiSessionParams" />

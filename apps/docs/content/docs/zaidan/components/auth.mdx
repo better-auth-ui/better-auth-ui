@@ -1,0 +1,42 @@
+---
+title: <Auth />
+description: A composed Solid auth route component that renders the matching auth view for the current route path.
+---
+
+## Usage
+
+Use `<Auth />` from your Solid auth route and pass the route segment from TanStack Router.
+
+```tsx
+import { Auth } from "@/components/auth/auth"
+
+export function AuthRoute(props: { params: { path: string } }) {
+  const params = props.params
+
+  return <Auth path={params.path} />
+}
+```
+
+The component resolves sign-in, sign-up, sign-out, forgot-password, and reset-password views from the installed `AuthProvider` context. Unsupported paths render nothing so your route can keep its own fallback or redirect policy.
+
+## Installation
+
+```bash
+zaidan add https://better-auth-ui.com/r/solid/auth.json
+```
+
+## Props
+
+<auto-type-table path="../../../../../../examples/start-solid-zaidan-example/src/components/auth/auth.tsx" name="AuthProps" />
+
+## Parity classification
+
+Zaidan follows Solid's local `class` prop convention. It adapts the shadcn `className` styling hook to `class`; `path`, `view`, `socialLayout`, and `socialPosition` keep their shadcn semantics in Solid form.
+
+## Installed files
+
+Installs the auth router surface that composes the auth flow views and route-path helpers.
+
+- `src/components/auth/auth.tsx`
+
+After install, keep allowed auth paths aligned with the plugin views you enable.
