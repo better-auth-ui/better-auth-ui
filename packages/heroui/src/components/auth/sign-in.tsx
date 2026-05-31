@@ -156,6 +156,11 @@ export function SignIn({
               type="email"
               autoComplete="email"
               isDisabled={isPending}
+              validate={(value) => {
+                if (!value) return localization.auth.fieldRequired
+                if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value))
+                  return localization.auth.invalidEmail
+              }}
             >
               <Label>{localization.auth.email}</Label>
 
@@ -177,6 +182,21 @@ export function SignIn({
               isDisabled={isPending}
               value={password}
               onChange={setPassword}
+              validate={(value) => {
+                if (!value) return localization.auth.fieldRequired
+                const min = emailAndPassword?.minPasswordLength
+                const max = emailAndPassword?.maxPasswordLength
+                if (min && value.length < min)
+                  return localization.auth.tooShort.replace(
+                    "{{min}}",
+                    String(min)
+                  )
+                if (max && value.length > max)
+                  return localization.auth.tooLong.replace(
+                    "{{max}}",
+                    String(max)
+                  )
+              }}
             >
               <Label>{localization.auth.password}</Label>
 

@@ -47,7 +47,7 @@ export function SlugField({
   variant,
   ...props
 }: SlugFieldProps & TextFieldProps) {
-  const { authClient } = useAuth()
+  const { authClient, localization: authLocalization } = useAuth()
   const { localization, checkSlug: checkSlugEnabled } =
     useAuthPlugin(organizationPlugin)
 
@@ -86,6 +86,9 @@ export function SlugField({
       {...props}
       value={value}
       onChange={handleChange}
+      validate={(val) => {
+        if (!val) return authLocalization.auth.fieldRequired
+      }}
     >
       <Label>{localization.slug}</Label>
 

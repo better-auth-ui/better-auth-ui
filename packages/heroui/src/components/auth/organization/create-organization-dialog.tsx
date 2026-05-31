@@ -93,6 +93,9 @@ export function CreateOrganizationDialog({
                 isDisabled={isCreating}
                 value={name}
                 onChange={setName}
+                validate={(value) => {
+                  if (!value) return localization.auth.fieldRequired
+                }}
               >
                 <Label>{organizationLocalization.name}</Label>
 

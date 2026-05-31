@@ -98,6 +98,11 @@ export function ForgotPassword({
             type="email"
             autoComplete="email"
             isDisabled={isPending}
+            validate={(value) => {
+              if (!value) return localization.auth.fieldRequired
+              if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value))
+                return localization.auth.invalidEmail
+            }}
           >
             <Label>{localization.auth.email}</Label>
 

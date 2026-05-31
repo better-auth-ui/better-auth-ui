@@ -111,6 +111,18 @@ export function ResetPassword({
             name="password"
             autoComplete="new-password"
             isDisabled={isPending}
+            validate={(value) => {
+              if (!value) return localization.auth.fieldRequired
+              const min = emailAndPassword?.minPasswordLength
+              const max = emailAndPassword?.maxPasswordLength
+              if (min && value.length < min)
+                return localization.auth.tooShort.replace(
+                  "{{min}}",
+                  String(min)
+                )
+              if (max && value.length > max)
+                return localization.auth.tooLong.replace("{{max}}", String(max))
+            }}
           >
             <Label>{localization.auth.password}</Label>
 
@@ -152,6 +164,21 @@ export function ResetPassword({
               name="confirmPassword"
               autoComplete="new-password"
               isDisabled={isPending}
+              validate={(value) => {
+                if (!value) return localization.auth.fieldRequired
+                const min = emailAndPassword?.minPasswordLength
+                const max = emailAndPassword?.maxPasswordLength
+                if (min && value.length < min)
+                  return localization.auth.tooShort.replace(
+                    "{{min}}",
+                    String(min)
+                  )
+                if (max && value.length > max)
+                  return localization.auth.tooLong.replace(
+                    "{{max}}",
+                    String(max)
+                  )
+              }}
             >
               <Label>{localization.auth.confirmPassword}</Label>
 

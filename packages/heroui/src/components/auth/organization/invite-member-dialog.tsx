@@ -108,6 +108,11 @@ export function InviteMemberDialog({
                 name="email"
                 type="email"
                 isDisabled={isInviting}
+                validate={(value) => {
+                  if (!value) return localization.auth.fieldRequired
+                  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value))
+                    return localization.auth.invalidEmail
+                }}
               >
                 <Label>{localization.auth.email}</Label>
 

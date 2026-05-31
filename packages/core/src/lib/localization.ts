@@ -21,6 +21,9 @@ export const localization = {
     /** @remarks `"Enter your email"` */
     emailPlaceholder: "Enter your email",
 
+    /** @remarks `"This field is required"` */
+    fieldRequired: "This field is required",
+
     /** @remarks `"Forgot Password"` */
     forgotPassword: "Forgot Password",
 
@@ -29,6 +32,9 @@ export const localization = {
 
     /** @remarks `"Hide password"` */
     hidePassword: "Hide password",
+
+    /** @remarks `"Please enter a valid email address"` */
+    invalidEmail: "Please enter a valid email address",
 
     /** @remarks `"Invalid reset password token"` */
     invalidResetPasswordToken: "Invalid reset password token",
@@ -68,6 +74,12 @@ export const localization = {
 
     /** @remarks `"Remember me"` */
     rememberMe: "Remember me",
+
+    /** @remarks `"Must be at most {{max}} characters"` */
+    tooLong: "Must be at most {{max}} characters",
+
+    /** @remarks `"Must be at least {{min}} characters"` */
+    tooShort: "Must be at least {{min}} characters",
 
     /** @remarks `"Remember your password?"` */
     rememberYourPassword: "Remember your password?",
