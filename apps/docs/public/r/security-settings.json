@@ -16,7 +16,8 @@
     {
       "path": "src/components/auth/settings/security/security-settings.tsx",
       "content": "\"use client\"\n\nimport { useAuth } from \"@better-auth-ui/react\"\nimport { cn } from \"@/lib/utils\"\nimport { ActiveSessions } from \"./active-sessions\"\nimport { ChangePassword } from \"./change-password\"\nimport { LinkedAccounts } from \"./linked-accounts\"\n\nexport type SecuritySettingsProps = {\n  className?: string\n}\n\n/**\n * Renders the security settings layout including password management, linked accounts, and active sessions.\n *\n * ChangePassword is rendered when password authentication is enabled; LinkedAccounts is rendered when social providers are present.\n * Each registered auth plugin may contribute `securityCards` (for example passkeys, delete-user).\n *\n * @param className - Optional additional CSS class names for the outer container.\n * @returns The security settings container as a JSX element.\n */\nexport function SecuritySettings({ className }: SecuritySettingsProps) {\n  const { emailAndPassword, plugins, socialProviders } = useAuth()\n\n  return (\n    <div className={cn(\"flex w-full flex-col gap-4 md:gap-6\", className)}>\n      {emailAndPassword?.enabled && <ChangePassword />}\n      {!!socialProviders?.length && <LinkedAccounts />}\n      <ActiveSessions />\n      {plugins.flatMap(\n        (plugin) =>\n          plugin.securityCards?.map((Card, index) => (\n            <Card key={`${plugin.id}-${index.toString()}`} />\n          )) ?? []\n      )}\n    </div>\n  )\n}\n",
-      "type": "registry:component"
+      "type": "registry:component",
+      "target": "@components/auth/settings/security/security-settings.tsx"
     }
   ],
   "type": "registry:component"

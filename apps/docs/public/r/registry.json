@@ -14,15 +14,19 @@
         "@tanstack/react-query",
         "better-auth"
       ],
-      "registryDependencies": ["sonner"],
+      "registryDependencies": [
+        "sonner"
+      ],
       "files": [
         {
           "path": "src/components/auth/auth-provider.tsx",
-          "type": "registry:component"
+          "type": "registry:component",
+          "target": "@components/auth/auth-provider.tsx"
         },
         {
           "path": "src/components/auth/error-toaster.tsx",
-          "type": "registry:component"
+          "type": "registry:component",
+          "target": "@components/auth/error-toaster.tsx"
         }
       ]
     },
@@ -56,7 +60,8 @@
       "files": [
         {
           "path": "src/components/auth/additional-field.tsx",
-          "type": "registry:component"
+          "type": "registry:component",
+          "target": "@components/auth/additional-field.tsx"
         }
       ]
     },
@@ -85,15 +90,18 @@
       "files": [
         {
           "path": "src/components/auth/sign-in.tsx",
-          "type": "registry:component"
+          "type": "registry:component",
+          "target": "@components/auth/sign-in.tsx"
         },
         {
           "path": "src/components/auth/provider-button.tsx",
-          "type": "registry:component"
+          "type": "registry:component",
+          "target": "@components/auth/provider-button.tsx"
         },
         {
           "path": "src/components/auth/provider-buttons.tsx",
-          "type": "registry:component"
+          "type": "registry:component",
+          "target": "@components/auth/provider-buttons.tsx"
         }
       ]
     },
@@ -122,15 +130,18 @@
       "files": [
         {
           "path": "src/components/auth/sign-up.tsx",
-          "type": "registry:component"
+          "type": "registry:component",
+          "target": "@components/auth/sign-up.tsx"
         },
         {
           "path": "src/components/auth/provider-button.tsx",
-          "type": "registry:component"
+          "type": "registry:component",
+          "target": "@components/auth/provider-button.tsx"
         },
         {
           "path": "src/components/auth/provider-buttons.tsx",
-          "type": "registry:component"
+          "type": "registry:component",
+          "target": "@components/auth/provider-buttons.tsx"
         }
       ]
     },
@@ -158,27 +169,33 @@
       "files": [
         {
           "path": "src/lib/auth/auth-plugin.ts",
-          "type": "registry:lib"
+          "type": "registry:lib",
+          "target": "@lib/auth/auth-plugin.ts"
         },
         {
           "path": "src/lib/auth/magic-link-plugin.ts",
-          "type": "registry:lib"
+          "type": "registry:lib",
+          "target": "@lib/auth/magic-link-plugin.ts"
         },
         {
           "path": "src/components/auth/magic-link.tsx",
-          "type": "registry:component"
+          "type": "registry:component",
+          "target": "@components/auth/magic-link.tsx"
         },
         {
           "path": "src/components/auth/magic-link-button.tsx",
-          "type": "registry:component"
+          "type": "registry:component",
+          "target": "@components/auth/magic-link-button.tsx"
         },
         {
           "path": "src/components/auth/provider-button.tsx",
-          "type": "registry:component"
+          "type": "registry:component",
+          "target": "@components/auth/provider-button.tsx"
         },
         {
           "path": "src/components/auth/provider-buttons.tsx",
-          "type": "registry:component"
+          "type": "registry:component",
+          "target": "@components/auth/provider-buttons.tsx"
         }
       ]
     },
@@ -209,19 +226,23 @@
       "files": [
         {
           "path": "src/lib/auth/auth-plugin.ts",
-          "type": "registry:lib"
+          "type": "registry:lib",
+          "target": "@lib/auth/auth-plugin.ts"
         },
         {
           "path": "src/lib/auth/username-plugin.ts",
-          "type": "registry:lib"
+          "type": "registry:lib",
+          "target": "@lib/auth/username-plugin.ts"
         },
         {
           "path": "src/components/auth/username/username-field.tsx",
-          "type": "registry:component"
+          "type": "registry:component",
+          "target": "@components/auth/username/username-field.tsx"
         },
         {
           "path": "src/components/auth/username/sign-in-username.tsx",
-          "type": "registry:component"
+          "type": "registry:component",
+          "target": "@components/auth/username/sign-in-username.tsx"
         }
       ]
     },
@@ -250,39 +271,48 @@
       "files": [
         {
           "path": "src/lib/auth/auth-plugin.ts",
-          "type": "registry:lib"
+          "type": "registry:lib",
+          "target": "@lib/auth/auth-plugin.ts"
         },
         {
           "path": "src/lib/auth/passkey-plugin.ts",
-          "type": "registry:lib"
+          "type": "registry:lib",
+          "target": "@lib/auth/passkey-plugin.ts"
         },
         {
           "path": "src/components/auth/passkey/passkey-button.tsx",
-          "type": "registry:component"
+          "type": "registry:component",
+          "target": "@components/auth/passkey/passkey-button.tsx"
         },
         {
           "path": "src/components/auth/passkey/add-passkey-dialog.tsx",
-          "type": "registry:component"
+          "type": "registry:component",
+          "target": "@components/auth/passkey/add-passkey-dialog.tsx"
         },
         {
           "path": "src/components/auth/passkey/delete-passkey-dialog.tsx",
-          "type": "registry:component"
+          "type": "registry:component",
+          "target": "@components/auth/passkey/delete-passkey-dialog.tsx"
         },
         {
           "path": "src/components/auth/passkey/passkeys-empty.tsx",
-          "type": "registry:component"
+          "type": "registry:component",
+          "target": "@components/auth/passkey/passkeys-empty.tsx"
         },
         {
           "path": "src/components/auth/passkey/passkey-skeleton.tsx",
-          "type": "registry:component"
+          "type": "registry:component",
+          "target": "@components/auth/passkey/passkey-skeleton.tsx"
         },
         {
           "path": "src/components/auth/passkey/passkeys.tsx",
-          "type": "registry:component"
+          "type": "registry:component",
+          "target": "@components/auth/passkey/passkeys.tsx"
         },
         {
           "path": "src/components/auth/passkey/passkey.tsx",
-          "type": "registry:component"
+          "type": "registry:component",
+          "target": "@components/auth/passkey/passkey.tsx"
         }
       ]
     },
@@ -313,43 +343,53 @@
       "files": [
         {
           "path": "src/lib/auth/auth-plugin.ts",
-          "type": "registry:lib"
+          "type": "registry:lib",
+          "target": "@lib/auth/auth-plugin.ts"
         },
         {
           "path": "src/lib/auth/api-key-plugin.ts",
-          "type": "registry:lib"
+          "type": "registry:lib",
+          "target": "@lib/auth/api-key-plugin.ts"
         },
         {
           "path": "src/components/auth/api-key/api-keys.tsx",
-          "type": "registry:component"
+          "type": "registry:component",
+          "target": "@components/auth/api-key/api-keys.tsx"
         },
         {
           "path": "src/components/auth/api-key/api-key.tsx",
-          "type": "registry:component"
+          "type": "registry:component",
+          "target": "@components/auth/api-key/api-key.tsx"
         },
         {
           "path": "src/components/auth/api-key/api-keys-empty.tsx",
-          "type": "registry:component"
+          "type": "registry:component",
+          "target": "@components/auth/api-key/api-keys-empty.tsx"
         },
         {
           "path": "src/components/auth/api-key/api-key-skeleton.tsx",
-          "type": "registry:component"
+          "type": "registry:component",
+          "target": "@components/auth/api-key/api-key-skeleton.tsx"
         },
         {
           "path": "src/components/auth/api-key/create-api-key-dialog.tsx",
-          "type": "registry:component"
+          "type": "registry:component",
+          "target": "@components/auth/api-key/create-api-key-dialog.tsx"
         },
         {
           "path": "src/components/auth/api-key/new-api-key-dialog.tsx",
-          "type": "registry:component"
+          "type": "registry:component",
+          "target": "@components/auth/api-key/new-api-key-dialog.tsx"
         },
         {
           "path": "src/components/auth/api-key/delete-api-key-dialog.tsx",
-          "type": "registry:component"
+          "type": "registry:component",
+          "target": "@components/auth/api-key/delete-api-key-dialog.tsx"
         },
         {
           "path": "src/components/auth/api-key/organization-api-keys.tsx",
-          "type": "registry:component"
+          "type": "registry:component",
+          "target": "@components/auth/api-key/organization-api-keys.tsx"
         }
       ]
     },
@@ -376,31 +416,38 @@
       "files": [
         {
           "path": "src/lib/auth/auth-plugin.ts",
-          "type": "registry:lib"
+          "type": "registry:lib",
+          "target": "@lib/auth/auth-plugin.ts"
         },
         {
           "path": "src/lib/auth/multi-session-plugin.ts",
-          "type": "registry:lib"
+          "type": "registry:lib",
+          "target": "@lib/auth/multi-session-plugin.ts"
         },
         {
           "path": "src/components/auth/multi-session/manage-accounts.tsx",
-          "type": "registry:component"
+          "type": "registry:component",
+          "target": "@components/auth/multi-session/manage-accounts.tsx"
         },
         {
           "path": "src/components/auth/multi-session/manage-account.tsx",
-          "type": "registry:component"
+          "type": "registry:component",
+          "target": "@components/auth/multi-session/manage-account.tsx"
         },
         {
           "path": "src/components/auth/multi-session/switch-account-submenu.tsx",
-          "type": "registry:component"
+          "type": "registry:component",
+          "target": "@components/auth/multi-session/switch-account-submenu.tsx"
         },
         {
           "path": "src/components/auth/multi-session/switch-account-submenu-content.tsx",
-          "type": "registry:component"
+          "type": "registry:component",
+          "target": "@components/auth/multi-session/switch-account-submenu-content.tsx"
         },
         {
           "path": "src/components/auth/multi-session/switch-account-submenu-item.tsx",
-          "type": "registry:component"
+          "type": "registry:component",
+          "target": "@components/auth/multi-session/switch-account-submenu-item.tsx"
         }
       ]
     },
@@ -439,147 +486,183 @@
       "files": [
         {
           "path": "src/lib/auth/auth-plugin.ts",
-          "type": "registry:lib"
+          "type": "registry:lib",
+          "target": "@lib/auth/auth-plugin.ts"
         },
         {
           "path": "src/lib/auth/organization-plugin.tsx",
-          "type": "registry:lib"
+          "type": "registry:lib",
+          "target": "@lib/auth/organization-plugin.tsx"
         },
         {
           "path": "src/components/auth/organization/organization.tsx",
-          "type": "registry:component"
+          "type": "registry:component",
+          "target": "@components/auth/organization/organization.tsx"
         },
         {
           "path": "src/components/auth/organization/organization-switcher.tsx",
-          "type": "registry:component"
+          "type": "registry:component",
+          "target": "@components/auth/organization/organization-switcher.tsx"
         },
         {
           "path": "src/components/auth/organization/organization-settings.tsx",
-          "type": "registry:component"
+          "type": "registry:component",
+          "target": "@components/auth/organization/organization-settings.tsx"
         },
         {
           "path": "src/components/auth/organization/organization-people.tsx",
-          "type": "registry:component"
+          "type": "registry:component",
+          "target": "@components/auth/organization/organization-people.tsx"
         },
         {
           "path": "src/components/auth/organization/organization-profile.tsx",
-          "type": "registry:component"
+          "type": "registry:component",
+          "target": "@components/auth/organization/organization-profile.tsx"
         },
         {
           "path": "src/components/auth/organization/organization-danger-zone.tsx",
-          "type": "registry:component"
+          "type": "registry:component",
+          "target": "@components/auth/organization/organization-danger-zone.tsx"
         },
         {
           "path": "src/components/auth/organization/organization-members.tsx",
-          "type": "registry:component"
+          "type": "registry:component",
+          "target": "@components/auth/organization/organization-members.tsx"
         },
         {
           "path": "src/components/auth/organization/organization-member-row.tsx",
-          "type": "registry:component"
+          "type": "registry:component",
+          "target": "@components/auth/organization/organization-member-row.tsx"
         },
         {
           "path": "src/components/auth/organization/organization-member-row-skeleton.tsx",
-          "type": "registry:component"
+          "type": "registry:component",
+          "target": "@components/auth/organization/organization-member-row-skeleton.tsx"
         },
         {
           "path": "src/components/auth/organization/organization-invitations.tsx",
-          "type": "registry:component"
+          "type": "registry:component",
+          "target": "@components/auth/organization/organization-invitations.tsx"
         },
         {
           "path": "src/components/auth/organization/organization-invitation-row.tsx",
-          "type": "registry:component"
+          "type": "registry:component",
+          "target": "@components/auth/organization/organization-invitation-row.tsx"
         },
         {
           "path": "src/components/auth/organization/organization-invitation-row-skeleton.tsx",
-          "type": "registry:component"
+          "type": "registry:component",
+          "target": "@components/auth/organization/organization-invitation-row-skeleton.tsx"
         },
         {
           "path": "src/components/auth/organization/organization-invitations-empty.tsx",
-          "type": "registry:component"
+          "type": "registry:component",
+          "target": "@components/auth/organization/organization-invitations-empty.tsx"
         },
         {
           "path": "src/components/auth/organization/organizations.tsx",
-          "type": "registry:component"
+          "type": "registry:component",
+          "target": "@components/auth/organization/organizations.tsx"
         },
         {
           "path": "src/components/auth/organization/organization-row.tsx",
-          "type": "registry:component"
+          "type": "registry:component",
+          "target": "@components/auth/organization/organization-row.tsx"
         },
         {
           "path": "src/components/auth/organization/organizations-settings.tsx",
-          "type": "registry:component"
+          "type": "registry:component",
+          "target": "@components/auth/organization/organizations-settings.tsx"
         },
         {
           "path": "src/components/auth/organization/organizations-empty.tsx",
-          "type": "registry:component"
+          "type": "registry:component",
+          "target": "@components/auth/organization/organizations-empty.tsx"
         },
         {
           "path": "src/components/auth/organization/user-invitations.tsx",
-          "type": "registry:component"
+          "type": "registry:component",
+          "target": "@components/auth/organization/user-invitations.tsx"
         },
         {
           "path": "src/components/auth/organization/user-invitation-row.tsx",
-          "type": "registry:component"
+          "type": "registry:component",
+          "target": "@components/auth/organization/user-invitation-row.tsx"
         },
         {
           "path": "src/components/auth/organization/user-invitation-row-skeleton.tsx",
-          "type": "registry:component"
+          "type": "registry:component",
+          "target": "@components/auth/organization/user-invitation-row-skeleton.tsx"
         },
         {
           "path": "src/components/auth/organization/user-invitations-empty.tsx",
-          "type": "registry:component"
+          "type": "registry:component",
+          "target": "@components/auth/organization/user-invitations-empty.tsx"
         },
         {
           "path": "src/components/auth/organization/create-organization-dialog.tsx",
-          "type": "registry:component"
+          "type": "registry:component",
+          "target": "@components/auth/organization/create-organization-dialog.tsx"
         },
         {
           "path": "src/components/auth/organization/invite-member-dialog.tsx",
-          "type": "registry:component"
+          "type": "registry:component",
+          "target": "@components/auth/organization/invite-member-dialog.tsx"
         },
         {
           "path": "src/components/auth/organization/delete-organization-dialog.tsx",
-          "type": "registry:component"
+          "type": "registry:component",
+          "target": "@components/auth/organization/delete-organization-dialog.tsx"
         },
         {
           "path": "src/components/auth/organization/delete-organization-skeleton.tsx",
-          "type": "registry:component"
+          "type": "registry:component",
+          "target": "@components/auth/organization/delete-organization-skeleton.tsx"
         },
         {
           "path": "src/components/auth/organization/delete-organization.tsx",
-          "type": "registry:component"
+          "type": "registry:component",
+          "target": "@components/auth/organization/delete-organization.tsx"
         },
         {
           "path": "src/components/auth/organization/leave-organization-dialog.tsx",
-          "type": "registry:component"
+          "type": "registry:component",
+          "target": "@components/auth/organization/leave-organization-dialog.tsx"
         },
         {
           "path": "src/components/auth/organization/leave-organization.tsx",
-          "type": "registry:component"
+          "type": "registry:component",
+          "target": "@components/auth/organization/leave-organization.tsx"
         },
         {
           "path": "src/components/auth/organization/remove-member-dialog.tsx",
-          "type": "registry:component"
+          "type": "registry:component",
+          "target": "@components/auth/organization/remove-member-dialog.tsx"
         },
         {
           "path": "src/components/auth/organization/change-organization-logo.tsx",
-          "type": "registry:component"
+          "type": "registry:component",
+          "target": "@components/auth/organization/change-organization-logo.tsx"
         },
         {
           "path": "src/components/auth/organization/organization-logo.tsx",
-          "type": "registry:component"
+          "type": "registry:component",
+          "target": "@components/auth/organization/organization-logo.tsx"
         },
         {
           "path": "src/components/auth/organization/organization-view.tsx",
-          "type": "registry:component"
+          "type": "registry:component",
+          "target": "@components/auth/organization/organization-view.tsx"
         },
         {
           "path": "src/components/auth/organization/organization-view-skeleton.tsx",
-          "type": "registry:component"
+          "type": "registry:component",
+          "target": "@components/auth/organization/organization-view-skeleton.tsx"
         },
         {
           "path": "src/components/auth/organization/slug-field.tsx",
-          "type": "registry:component"
+          "type": "registry:component",
+          "target": "@components/auth/organization/slug-field.tsx"
         }
       ]
     },
@@ -593,23 +676,33 @@
         "@better-auth-ui/core@latest",
         "lucide-react"
       ],
-      "registryDependencies": ["card", "field", "label", "radio-group", "tabs"],
+      "registryDependencies": [
+        "card",
+        "field",
+        "label",
+        "radio-group",
+        "tabs"
+      ],
       "files": [
         {
           "path": "src/lib/auth/auth-plugin.ts",
-          "type": "registry:lib"
+          "type": "registry:lib",
+          "target": "@lib/auth/auth-plugin.ts"
         },
         {
           "path": "src/lib/auth/theme-plugin.ts",
-          "type": "registry:lib"
+          "type": "registry:lib",
+          "target": "@lib/auth/theme-plugin.ts"
         },
         {
           "path": "src/components/auth/theme/appearance.tsx",
-          "type": "registry:component"
+          "type": "registry:component",
+          "target": "@components/auth/theme/appearance.tsx"
         },
         {
           "path": "src/components/auth/theme/theme-toggle-item.tsx",
-          "type": "registry:component"
+          "type": "registry:component",
+          "target": "@components/auth/theme/theme-toggle-item.tsx"
         }
       ]
     },
@@ -637,19 +730,23 @@
       "files": [
         {
           "path": "src/lib/auth/auth-plugin.ts",
-          "type": "registry:lib"
+          "type": "registry:lib",
+          "target": "@lib/auth/auth-plugin.ts"
         },
         {
           "path": "src/lib/auth/delete-user-plugin.ts",
-          "type": "registry:lib"
+          "type": "registry:lib",
+          "target": "@lib/auth/delete-user-plugin.ts"
         },
         {
           "path": "src/components/auth/delete-user/danger-zone.tsx",
-          "type": "registry:component"
+          "type": "registry:component",
+          "target": "@components/auth/delete-user/danger-zone.tsx"
         },
         {
           "path": "src/components/auth/delete-user/delete-account.tsx",
-          "type": "registry:component"
+          "type": "registry:component",
+          "target": "@components/auth/delete-user/delete-account.tsx"
         }
       ]
     },
@@ -674,7 +771,8 @@
       "files": [
         {
           "path": "src/components/auth/forgot-password.tsx",
-          "type": "registry:component"
+          "type": "registry:component",
+          "target": "@components/auth/forgot-password.tsx"
         }
       ]
     },
@@ -700,7 +798,8 @@
       "files": [
         {
           "path": "src/components/auth/reset-password.tsx",
-          "type": "registry:component"
+          "type": "registry:component",
+          "target": "@components/auth/reset-password.tsx"
         }
       ]
     },
@@ -714,11 +813,15 @@
         "@better-auth-ui/core@latest",
         "better-auth"
       ],
-      "registryDependencies": ["card", "spinner"],
+      "registryDependencies": [
+        "card",
+        "spinner"
+      ],
       "files": [
         {
           "path": "src/components/auth/sign-out.tsx",
-          "type": "registry:component"
+          "type": "registry:component",
+          "target": "@components/auth/sign-out.tsx"
         }
       ]
     },
@@ -742,7 +845,8 @@
       "files": [
         {
           "path": "src/components/auth/auth.tsx",
-          "type": "registry:component"
+          "type": "registry:component",
+          "target": "@components/auth/auth.tsx"
         }
       ]
     },
@@ -757,11 +861,15 @@
         "better-auth",
         "lucide-react"
       ],
-      "registryDependencies": ["avatar", "skeleton"],
+      "registryDependencies": [
+        "avatar",
+        "skeleton"
+      ],
       "files": [
         {
           "path": "src/components/auth/user/user-avatar.tsx",
-          "type": "registry:component"
+          "type": "registry:component",
+          "target": "@components/auth/user/user-avatar.tsx"
         }
       ]
     },
@@ -782,7 +890,8 @@
       "files": [
         {
           "path": "src/components/auth/user/user-view.tsx",
-          "type": "registry:component"
+          "type": "registry:component",
+          "target": "@components/auth/user/user-view.tsx"
         }
       ]
     },
@@ -806,7 +915,8 @@
       "files": [
         {
           "path": "src/components/auth/user/user-button.tsx",
-          "type": "registry:component"
+          "type": "registry:component",
+          "target": "@components/auth/user/user-button.tsx"
         }
       ]
     },
@@ -839,11 +949,13 @@
       "files": [
         {
           "path": "src/components/auth/settings/account/user-profile.tsx",
-          "type": "registry:component"
+          "type": "registry:component",
+          "target": "@components/auth/settings/account/user-profile.tsx"
         },
         {
           "path": "src/components/auth/settings/account/change-avatar.tsx",
-          "type": "registry:component"
+          "type": "registry:component",
+          "target": "@components/auth/settings/account/change-avatar.tsx"
         }
       ]
     },
@@ -869,7 +981,8 @@
       "files": [
         {
           "path": "src/components/auth/settings/account/change-email.tsx",
-          "type": "registry:component"
+          "type": "registry:component",
+          "target": "@components/auth/settings/account/change-email.tsx"
         }
       ]
     },
@@ -889,7 +1002,8 @@
       "files": [
         {
           "path": "src/components/auth/settings/account/account-settings.tsx",
-          "type": "registry:component"
+          "type": "registry:component",
+          "target": "@components/auth/settings/account/account-settings.tsx"
         }
       ]
     },
@@ -917,7 +1031,8 @@
       "files": [
         {
           "path": "src/components/auth/settings/security/change-password.tsx",
-          "type": "registry:component"
+          "type": "registry:component",
+          "target": "@components/auth/settings/security/change-password.tsx"
         }
       ]
     },
@@ -942,11 +1057,13 @@
       "files": [
         {
           "path": "src/components/auth/settings/security/linked-accounts.tsx",
-          "type": "registry:component"
+          "type": "registry:component",
+          "target": "@components/auth/settings/security/linked-accounts.tsx"
         },
         {
           "path": "src/components/auth/settings/security/linked-account.tsx",
-          "type": "registry:component"
+          "type": "registry:component",
+          "target": "@components/auth/settings/security/linked-account.tsx"
         }
       ]
     },
@@ -972,11 +1089,13 @@
       "files": [
         {
           "path": "src/components/auth/settings/security/active-sessions.tsx",
-          "type": "registry:component"
+          "type": "registry:component",
+          "target": "@components/auth/settings/security/active-sessions.tsx"
         },
         {
           "path": "src/components/auth/settings/security/active-session.tsx",
-          "type": "registry:component"
+          "type": "registry:component",
+          "target": "@components/auth/settings/security/active-session.tsx"
         }
       ]
     },
@@ -997,7 +1116,8 @@
       "files": [
         {
           "path": "src/components/auth/settings/security/security-settings.tsx",
-          "type": "registry:component"
+          "type": "registry:component",
+          "target": "@components/auth/settings/security/security-settings.tsx"
         }
       ]
     },
@@ -1018,7 +1138,8 @@
       "files": [
         {
           "path": "src/components/auth/settings/settings.tsx",
-          "type": "registry:component"
+          "type": "registry:component",
+          "target": "@components/auth/settings/settings.tsx"
         }
       ]
     },
@@ -1036,11 +1157,13 @@
       "files": [
         {
           "path": "../../packages/react/src/components/auth/email/email-verification.tsx",
-          "type": "registry:component"
+          "type": "registry:component",
+          "target": "@components/../../packages/react/src/components/auth/email/email-verification.tsx"
         },
         {
           "path": "../../packages/react/src/components/auth/email/email-styles.tsx",
-          "type": "registry:component"
+          "type": "registry:component",
+          "target": "@components/../../packages/react/src/components/auth/email/email-styles.tsx"
         }
       ]
     },
@@ -1058,11 +1181,13 @@
       "files": [
         {
           "path": "../../packages/react/src/components/auth/email/magic-link.tsx",
-          "type": "registry:component"
+          "type": "registry:component",
+          "target": "@components/../../packages/react/src/components/auth/email/magic-link.tsx"
         },
         {
           "path": "../../packages/react/src/components/auth/email/email-styles.tsx",
-          "type": "registry:component"
+          "type": "registry:component",
+          "target": "@components/../../packages/react/src/components/auth/email/email-styles.tsx"
         }
       ]
     },
@@ -1080,11 +1205,13 @@
       "files": [
         {
           "path": "../../packages/react/src/components/auth/email/reset-password.tsx",
-          "type": "registry:component"
+          "type": "registry:component",
+          "target": "@components/../../packages/react/src/components/auth/email/reset-password.tsx"
         },
         {
           "path": "../../packages/react/src/components/auth/email/email-styles.tsx",
-          "type": "registry:component"
+          "type": "registry:component",
+          "target": "@components/../../packages/react/src/components/auth/email/email-styles.tsx"
         }
       ]
     },
@@ -1102,11 +1229,13 @@
       "files": [
         {
           "path": "../../packages/react/src/components/auth/email/password-changed.tsx",
-          "type": "registry:component"
+          "type": "registry:component",
+          "target": "@components/../../packages/react/src/components/auth/email/password-changed.tsx"
         },
         {
           "path": "../../packages/react/src/components/auth/email/email-styles.tsx",
-          "type": "registry:component"
+          "type": "registry:component",
+          "target": "@components/../../packages/react/src/components/auth/email/email-styles.tsx"
         }
       ]
     },
@@ -1124,11 +1253,13 @@
       "files": [
         {
           "path": "../../packages/react/src/components/auth/email/email-changed.tsx",
-          "type": "registry:component"
+          "type": "registry:component",
+          "target": "@components/../../packages/react/src/components/auth/email/email-changed.tsx"
         },
         {
           "path": "../../packages/react/src/components/auth/email/email-styles.tsx",
-          "type": "registry:component"
+          "type": "registry:component",
+          "target": "@components/../../packages/react/src/components/auth/email/email-styles.tsx"
         }
       ]
     },
@@ -1146,11 +1277,13 @@
       "files": [
         {
           "path": "../../packages/react/src/components/auth/email/otp-email.tsx",
-          "type": "registry:component"
+          "type": "registry:component",
+          "target": "@components/../../packages/react/src/components/auth/email/otp-email.tsx"
         },
         {
           "path": "../../packages/react/src/components/auth/email/email-styles.tsx",
-          "type": "registry:component"
+          "type": "registry:component",
+          "target": "@components/../../packages/react/src/components/auth/email/email-styles.tsx"
         }
       ]
     },
@@ -1168,11 +1301,13 @@
       "files": [
         {
           "path": "../../packages/react/src/components/auth/email/new-device.tsx",
-          "type": "registry:component"
+          "type": "registry:component",
+          "target": "@components/../../packages/react/src/components/auth/email/new-device.tsx"
         },
         {
           "path": "../../packages/react/src/components/auth/email/email-styles.tsx",
-          "type": "registry:component"
+          "type": "registry:component",
+          "target": "@components/../../packages/react/src/components/auth/email/email-styles.tsx"
         }
       ]
     },
@@ -1190,11 +1325,13 @@
       "files": [
         {
           "path": "../../packages/react/src/components/auth/email/organization-invitation.tsx",
-          "type": "registry:component"
+          "type": "registry:component",
+          "target": "@components/../../packages/react/src/components/auth/email/organization-invitation.tsx"
         },
         {
           "path": "../../packages/react/src/components/auth/email/email-styles.tsx",
-          "type": "registry:component"
+          "type": "registry:component",
+          "target": "@components/../../packages/react/src/components/auth/email/email-styles.tsx"
         }
       ]
     }

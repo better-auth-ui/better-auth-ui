@@ -16,7 +16,8 @@
     {
       "path": "src/components/auth/sign-out.tsx",
       "content": "\"use client\"\n\nimport { useAuth, useSignOut } from \"@better-auth-ui/react\"\nimport { useEffect, useRef } from \"react\"\nimport { Spinner } from \"@/components/ui/spinner\"\nimport { cn } from \"@/lib/utils\"\n\nexport type SignOutProps = {\n  className?: string\n}\n\n/**\n * Signs the current user out on mount and renders a centered spinner while the operation completes.\n *\n * @param className - Optional additional class names appended to the root element\n * @returns The spinner shown during sign-out\n */\nexport function SignOut({ className }: SignOutProps) {\n  const { authClient, basePaths, navigate, viewPaths } = useAuth()\n\n  const { mutate: signOut } = useSignOut(authClient, {\n    onError: () => {\n      navigate({\n        to: `${basePaths.auth}/${viewPaths.auth.signIn}`,\n        replace: true\n      })\n    },\n    onSuccess: () =>\n      navigate({\n        to: `${basePaths.auth}/${viewPaths.auth.signIn}`,\n        replace: true\n      })\n  })\n\n  const hasSignedOut = useRef(false)\n\n  useEffect(() => {\n    if (hasSignedOut.current) return\n    hasSignedOut.current = true\n\n    signOut()\n  }, [signOut])\n\n  return <Spinner className={cn(\"mx-auto my-auto\", className)} />\n}\n",
-      "type": "registry:component"
+      "type": "registry:component",
+      "target": "@components/auth/sign-out.tsx"
     }
   ],
   "type": "registry:component"
