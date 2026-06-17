@@ -1,4 +1,12 @@
-export type * from "./lib/auth-server"
+export type {
+  ApiKeyAuthServer,
+  AuthServer,
+  MagicLinkAuthServer,
+  MultiSessionAuthServer,
+  OrganizationAuthServer,
+  PasskeyAuthServer,
+  UsernameAuthServer
+} from "@better-auth-ui/core/server"
 export * from "./server/queries/api-key/list-api-keys-query"
 export * from "./server/queries/auth/session-query"
 export * from "./server/queries/multi-session/list-device-sessions-query"
