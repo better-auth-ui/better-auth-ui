@@ -1,10 +1,10 @@
-import { authQueryKeys } from "@better-auth-ui/core"
+import { describe, expect, it, vi } from "vitest"
+import { authQueryKeys } from "../src"
 import {
   apiKeyQueryKeys,
   organizationQueryKeys,
   passkeyQueryKeys
-} from "@better-auth-ui/core/plugins"
-import { describe, expect, it, vi } from "vitest"
+} from "../src/plugins"
 import {
   activeOrganizationOptions,
   listApiKeysOptions,
