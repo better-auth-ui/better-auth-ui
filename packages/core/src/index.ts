@@ -1,4 +1,5 @@
 export * from "./config"
+export * from "./lib/auth-client"
 export * from "./lib/auth-method"
 export * from "./lib/auth-mutation-keys"
 export * from "./lib/auth-mutation-options"

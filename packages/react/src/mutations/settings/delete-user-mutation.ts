@@ -1,6 +1,6 @@
 import { deleteUserMutationKeys } from "@better-auth-ui/core/plugins"
 import { mutationOptions, useMutation } from "@tanstack/react-query"
-import type { BetterFetchError } from "better-auth/react"
+import type { BetterFetchError } from "better-auth/client"
 
 import type { AuthClient } from "../../lib/auth-client"
 

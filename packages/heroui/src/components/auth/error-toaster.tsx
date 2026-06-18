@@ -5,7 +5,7 @@ import {
   matchQuery,
   useQueryClient
 } from "@tanstack/react-query"
-import type { BetterFetchError } from "better-auth/react"
+import type { BetterFetchError } from "better-auth/client"
 import { useEffect } from "react"
 
 export function ErrorToaster() {

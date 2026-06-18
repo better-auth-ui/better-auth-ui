@@ -5,7 +5,7 @@ import {
   useMutation,
   useQueryClient
 } from "@tanstack/react-query"
-import type { BetterFetchError } from "better-auth/react"
+import type { BetterFetchError } from "better-auth/client"
 
 import type { AuthClient } from "../../lib/auth-client"
 

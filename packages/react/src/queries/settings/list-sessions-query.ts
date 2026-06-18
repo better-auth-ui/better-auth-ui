@@ -6,7 +6,7 @@ import {
   skipToken,
   useQuery
 } from "@tanstack/react-query"
-import type { BetterFetchError } from "better-auth/react"
+import type { BetterFetchError } from "better-auth/client"
 
 import type { AuthClient, InferData } from "../../lib/auth-client"
 import { useSession } from "../auth/session-query"
