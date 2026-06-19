@@ -12,8 +12,7 @@ type OmitUseKeys<T> = {
   [K in keyof T as K extends `use${string}` ? never : K]: T[K]
 }
 
-export type AuthClient = OmitUseKeys<ReturnType<typeof createAuthClient>> &
-  Record<string, unknown>
+export type AuthClient = OmitUseKeys<ReturnType<typeof createAuthClient>>
 
 // The per-plugin client types below are pure type-level declarations — no
 // runtime code is emitted for them. This avoids relying on `/* @__PURE__ */`
