@@ -1,11 +1,12 @@
 import {
+  createAuthMutation,
   type ListSession,
   listSessionsOptions,
   revokeSessionOptions,
   useAuth,
   useSession
 } from "@better-auth-ui/solid"
-import { createMutation, createQuery } from "@tanstack/solid-query"
+import { createQuery } from "@tanstack/solid-query"
 import { For, Show } from "solid-js"
 import { toast } from "solid-sonner"
 import {
@@ -38,7 +39,7 @@ export function ActiveSessionsSettings(
     [...(activeSessions.data ?? [])].sort((activeSession) =>
       activeSession.id === session.data?.session.id ? -1 : 1
     )
-  const revokeSession = createMutation(() => ({
+  const revokeSession = createAuthMutation(() => ({
     ...revokeSessionOptions(auth.authClient),
     onSuccess: () =>
       toast.success(auth.localization.settings.revokeSessionSuccess)

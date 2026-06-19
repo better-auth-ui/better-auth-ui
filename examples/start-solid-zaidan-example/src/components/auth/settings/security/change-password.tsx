@@ -1,11 +1,12 @@
 import {
   changePasswordOptions,
+  createAuthMutation,
   listAccountsOptions,
   requestPasswordResetOptions,
   useAuth,
   useSession
 } from "@better-auth-ui/solid"
-import { createMutation, createQuery } from "@tanstack/solid-query"
+import { createQuery } from "@tanstack/solid-query"
 import type { BetterFetchError } from "better-auth/client"
 import { Eye, EyeOff } from "lucide-solid"
 import { createSignal, Show } from "solid-js"
@@ -49,12 +50,12 @@ export function ChangePasswordSettings(
     linkedAccounts.data?.some(
       (account: { providerId?: string }) => account.providerId === "credential"
     )
-  const requestPasswordReset = createMutation(() => ({
+  const requestPasswordReset = createAuthMutation(() => ({
     ...requestPasswordResetOptions(auth.authClient),
     onSuccess: () =>
       toast.success(auth.localization.auth.passwordResetEmailSent)
   }))
-  const changePassword = createMutation(() => ({
+  const changePassword = createAuthMutation(() => ({
     ...changePasswordOptions(auth.authClient),
     onError: (error: BetterFetchError) => {
       setCurrentPassword("")

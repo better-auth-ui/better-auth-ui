@@ -4,6 +4,7 @@ import {
   usernameLocalization
 } from "@better-auth-ui/core/plugins"
 import {
+  createAuthMutation,
   signInEmailOptions,
   signInUsernameOptions,
   type UsernameAuthClient,
@@ -11,7 +12,7 @@ import {
   useFetchOptions
 } from "@better-auth-ui/solid"
 import type { AuthPlugin } from "@better-auth-ui/solid/plugins"
-import { createMutation, useQueryClient } from "@tanstack/solid-query"
+import { useQueryClient } from "@tanstack/solid-query"
 import { Link } from "@tanstack/solid-router"
 import type { BetterFetchError } from "better-auth/client"
 import { Eye, EyeOff } from "lucide-solid"
@@ -51,11 +52,16 @@ export function SignInUsername(props: SignInUsernameProps) {
     queryClient.invalidateQueries({ queryKey: authQueryKeys.session })
     auth.navigate({ to: auth.redirectTo })
   }
-  const signIn = createMutation(() => ({
+  const signIn = createAuthMutation(() => ({
     ...signInEmailOptions(auth.authClient),
     onError: (error, variables) => {
+      const signInVariables = variables as { email: string }
+
       if ((error as BetterFetchError).error?.code === "EMAIL_NOT_VERIFIED") {
-        sessionStorage.setItem("better-auth-ui.verify-email", variables.email)
+        sessionStorage.setItem(
+          "better-auth-ui.verify-email",
+          signInVariables.email
+        )
         auth.navigate({
           to: `${auth.basePaths.auth}/${auth.viewPaths.auth.verifyEmail}`
         })
@@ -65,7 +71,7 @@ export function SignInUsername(props: SignInUsernameProps) {
     },
     onSuccess: onSignInSuccess
   }))
-  const signInUsername = createMutation(() => ({
+  const signInUsername = createAuthMutation(() => ({
     ...signInUsernameOptions(auth.authClient as UsernameAuthClient),
     onError: () => {
       resetFetchOptions()

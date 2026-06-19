@@ -1,5 +1,8 @@
-import { sendVerificationEmailOptions, useAuth } from "@better-auth-ui/solid"
-import { createMutation } from "@tanstack/solid-query"
+import {
+  createAuthMutation,
+  sendVerificationEmailOptions,
+  useAuth
+} from "@better-auth-ui/solid"
 import { Link } from "@tanstack/solid-router"
 import { createSignal, onCleanup, onMount } from "solid-js"
 import { isServer } from "solid-js/web"
@@ -30,7 +33,7 @@ export function VerifyEmail(props: VerifyEmailProps) {
   )
   const [cooldown, setCooldown] = createSignal(RESEND_COOLDOWN_SECONDS)
 
-  const sendVerificationEmail = createMutation(() => ({
+  const sendVerificationEmail = createAuthMutation(() => ({
     ...sendVerificationEmailOptions(auth.authClient),
     onSuccess: () => {
       toast.success(auth.localization.auth.verificationEmailSent)

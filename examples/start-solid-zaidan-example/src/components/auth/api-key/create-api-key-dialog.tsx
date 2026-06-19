@@ -2,9 +2,9 @@ import { apiKeyLocalization } from "@better-auth-ui/core/plugins"
 import {
   type ApiKeyAuthClient,
   createApiKeyOptions,
+  createAuthMutation,
   useAuth
 } from "@better-auth-ui/solid"
-import { createMutation } from "@tanstack/solid-query"
 import { Key } from "lucide-solid"
 import { createSignal } from "solid-js"
 import { NewApiKeyDialog } from "@/components/auth/api-key/new-api-key-dialog"
@@ -31,12 +31,14 @@ export function CreateApiKeyDialog(props: {
   const [newApiKeySecret, setNewApiKeySecret] = createSignal<string | null>(
     null
   )
-  const createApiKey = createMutation(() => ({
+  const createApiKey = createAuthMutation(() => ({
     ...createApiKeyOptions(auth.authClient as ApiKeyAuthClient),
     onSuccess: (result) => {
+      const apiKey = result as { key: string; name?: string | null }
+
       props.onOpenChange(false)
-      setNewApiKeyName(result.name ?? null)
-      setNewApiKeySecret(result.key)
+      setNewApiKeyName(apiKey.name ?? null)
+      setNewApiKeySecret(apiKey.key)
       setIsNewKeyDialogOpen(true)
     }
   }))

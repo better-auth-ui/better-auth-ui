@@ -1,9 +1,9 @@
 import {
+  createAuthMutation,
   isUsernameAvailableOptions,
   type UsernameAuthClient,
   useAuth
 } from "@better-auth-ui/solid"
-import { createMutation } from "@tanstack/solid-query"
 import { Check, X } from "lucide-solid"
 import { createSignal, Show } from "solid-js"
 import type { AdditionalFieldProps } from "@/components/auth/additional-field"
@@ -27,10 +27,12 @@ export function UsernameField(props: AdditionalFieldProps) {
   const currentUsername = String(props.field.defaultValue ?? "")
   const [value, setValue] = createSignal(currentUsername)
   const [error, setError] = createSignal<string>()
-  const availability = createMutation(() => ({
+  const availability = createAuthMutation(() => ({
     ...isUsernameAvailableOptions(auth.authClient as UsernameAuthClient),
     onError: () => undefined
   }))
+  const availabilityData = () =>
+    availability.data as { available?: boolean } | undefined
   const shouldCheckAvailability = () =>
     Boolean(usernamePlugin()?.isUsernameAvailable) &&
     Boolean(value().trim()) &&
@@ -73,18 +75,19 @@ export function UsernameField(props: AdditionalFieldProps) {
         <Show when={shouldCheckAvailability()}>
           <span
             aria-label={
-              availability.data?.available
+              availabilityData()?.available
                 ? usernamePlugin()?.localization?.usernameAvailable
-                : availability.data?.available === false
+                : availabilityData()?.available === false
                   ? usernamePlugin()?.localization?.usernameTaken
                   : undefined
             }
             class="absolute top-1/2 right-3 -translate-y-1/2"
             role="status"
           >
-            {availability.data?.available ? (
+            {availabilityData()?.available ? (
               <Check class="size-4" />
-            ) : availability.error || availability.data?.available === false ? (
+            ) : availability.error ||
+              availabilityData()?.available === false ? (
               <X class="size-4 text-destructive" />
             ) : (
               <span class="text-muted-foreground text-xs">…</span>

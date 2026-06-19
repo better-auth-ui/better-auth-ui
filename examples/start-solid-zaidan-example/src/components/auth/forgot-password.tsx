@@ -1,10 +1,10 @@
 import {
+  createAuthMutation,
   requestPasswordResetOptions,
   useAuth,
   useFetchOptions
 } from "@better-auth-ui/solid"
 import type { AuthPlugin } from "@better-auth-ui/solid/plugins"
-import { createMutation } from "@tanstack/solid-query"
 import { Link } from "@tanstack/solid-router"
 import { createSignal, Show } from "solid-js"
 import { Button } from "@/components/ui/button"
@@ -23,7 +23,7 @@ export function ForgotPassword(props: ForgotPasswordProps) {
   const { fetchOptions, resetFetchOptions } = useFetchOptions()
   const [email, setEmail] = createSignal("")
   const [emailError, setEmailError] = createSignal<string>()
-  const requestReset = createMutation(() => ({
+  const requestReset = createAuthMutation(() => ({
     ...requestPasswordResetOptions(auth.authClient),
     onError: () => {
       resetFetchOptions()

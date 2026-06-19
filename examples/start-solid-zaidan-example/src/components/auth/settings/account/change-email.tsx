@@ -1,5 +1,9 @@
-import { changeEmailOptions, useAuth, useSession } from "@better-auth-ui/solid"
-import { createMutation } from "@tanstack/solid-query"
+import {
+  changeEmailOptions,
+  createAuthMutation,
+  useAuth,
+  useSession
+} from "@better-auth-ui/solid"
 import { createSignal, Show } from "solid-js"
 import { toast } from "solid-sonner"
 import { Button } from "@/components/ui/button"
@@ -16,7 +20,7 @@ export function ChangeEmail(props: ChangeEmailProps = {}) {
   const auth = useAuth()
   const session = useSession(auth.authClient)
   const [emailFieldError, setEmailFieldError] = createSignal<string>()
-  const changeEmail = createMutation(() => ({
+  const changeEmail = createAuthMutation(() => ({
     ...changeEmailOptions(auth.authClient),
     onSuccess: () =>
       toast.success(auth.localization.settings.changeEmailSuccess)

@@ -1,9 +1,9 @@
 import {
   addPasskeyOptions,
+  createAuthMutation,
   type PasskeyAuthClient,
   useAuth
 } from "@better-auth-ui/solid"
-import { createMutation } from "@tanstack/solid-query"
 import { Fingerprint } from "lucide-solid"
 import { passkeyLabels } from "@/components/auth/passkey/passkey-localization"
 import { Button } from "@/components/ui/button"
@@ -25,7 +25,7 @@ export function AddPasskeyDialog(props: {
 }) {
   const auth = useAuth()
   const labels = () => passkeyLabels(auth)
-  const addPasskey = createMutation(() => ({
+  const addPasskey = createAuthMutation(() => ({
     ...addPasskeyOptions(auth.authClient as PasskeyAuthClient),
     onSuccess: () => {
       props.onOpenChange(false)

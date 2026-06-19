@@ -1,10 +1,10 @@
 import { apiKeyLocalization } from "@better-auth-ui/core/plugins"
 import {
   type ApiKeyAuthClient,
+  createAuthMutation,
   deleteApiKeyOptions,
   useAuth
 } from "@better-auth-ui/solid"
-import { createMutation } from "@tanstack/solid-query"
 import { Key } from "lucide-solid"
 import type { ListedApiKey } from "@/components/auth/settings/shared/types"
 import { Button } from "@/components/ui/button"
@@ -27,7 +27,7 @@ export function DeleteApiKeyDialog(props: {
   const auth = useAuth()
   const preview = () => `${props.apiKey.start}${"*".repeat(16)}`
   const previewId = () => `delete-api-key-preview-${props.apiKey.id}`
-  const deleteApiKey = createMutation(() => ({
+  const deleteApiKey = createAuthMutation(() => ({
     ...deleteApiKeyOptions(auth.authClient as ApiKeyAuthClient),
     onSuccess: () => props.onOpenChange(false)
   }))

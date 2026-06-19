@@ -1,16 +1,13 @@
 import { authQueryKeys } from "@better-auth-ui/core"
 import { deleteUserLocalization } from "@better-auth-ui/core/plugins"
 import {
+  createAuthMutation,
   deleteUserOptions,
   listAccountsOptions,
   useAuth,
   useSession
 } from "@better-auth-ui/solid"
-import {
-  createMutation,
-  createQuery,
-  useQueryClient
-} from "@tanstack/solid-query"
+import { createQuery, useQueryClient } from "@tanstack/solid-query"
 import { TriangleAlert } from "lucide-solid"
 import { createSignal, Show } from "solid-js"
 import { toast } from "solid-sonner"
@@ -83,7 +80,7 @@ export function DeleteAccount(props: DeleteAccountProps = {}) {
     )
   const needsPassword = () =>
     !sendDeleteAccountVerification() && Boolean(hasCredentialAccount())
-  const deleteUser = createMutation(() => ({
+  const deleteUser = createAuthMutation(() => ({
     ...deleteUserOptions(auth.authClient),
     onSuccess: () => {
       setConfirmOpen(false)

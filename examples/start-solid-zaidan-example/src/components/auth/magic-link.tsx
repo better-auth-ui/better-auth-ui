@@ -4,12 +4,12 @@ import {
   magicLinkLocalization
 } from "@better-auth-ui/core/plugins"
 import {
+  createAuthMutation,
   type MagicLinkAuthClient,
   signInMagicLinkOptions,
   useAuth
 } from "@better-auth-ui/solid"
 import type { AuthPlugin } from "@better-auth-ui/solid/plugins"
-import { createMutation } from "@tanstack/solid-query"
 import { Link } from "@tanstack/solid-router"
 import { type Component, createSignal, For, Show } from "solid-js"
 import { toast } from "solid-sonner"
@@ -47,7 +47,7 @@ export function MagicLink(props: MagicLinkProps) {
       | Partial<MagicLinkLocalization>
       | undefined)
   })
-  const signInMagicLink = createMutation(() => ({
+  const signInMagicLink = createAuthMutation(() => ({
     ...signInMagicLinkOptions(auth.authClient as MagicLinkAuthClient),
     onSuccess: () => {
       setEmail("")

@@ -4,6 +4,7 @@ import {
   multiSessionLocalization
 } from "@better-auth-ui/core/plugins"
 import {
+  createAuthMutation,
   listDeviceSessionsOptions,
   type MultiSessionAuthClient,
   revokeMultiSessionOptions,
@@ -11,7 +12,7 @@ import {
   useAuth,
   useSession
 } from "@better-auth-ui/solid"
-import { createMutation, createQuery } from "@tanstack/solid-query"
+import { createQuery } from "@tanstack/solid-query"
 import { For, Show } from "solid-js"
 import { toast } from "solid-sonner"
 import {
@@ -53,11 +54,11 @@ export function ManageAccounts(props: ManageAccountsProps = {}) {
       userId: userId()
     })
   }))
-  const setActiveSession = createMutation(() => ({
+  const setActiveSession = createAuthMutation(() => ({
     ...setActiveSessionOptions(auth.authClient as MultiSessionAuthClient),
     onSuccess: () => window.scrollTo({ top: 0 })
   }))
-  const revokeMultiSession = createMutation(() => ({
+  const revokeMultiSession = createAuthMutation(() => ({
     ...revokeMultiSessionOptions(auth.authClient as MultiSessionAuthClient),
     onSuccess: () =>
       toast.success(auth.localization.settings.revokeSessionSuccess)
