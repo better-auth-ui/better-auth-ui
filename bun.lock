@@ -400,6 +400,7 @@
       "peerDependencies": {
         "@better-auth/passkey": ">=1.6.19",
         "@mikkelscheike/email-provider-links": ">=5.1.8",
+        "@tanstack/query-core": ">=5.101.0",
         "better-auth": ">=1.6.19",
       },
     },
