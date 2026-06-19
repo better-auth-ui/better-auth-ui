@@ -22,6 +22,11 @@
       "src": "./src/plugins.ts",
       "types": "./dist/plugins.d.ts",
       "import": "./dist/plugins.js"
+    },
+    "./server": {
+      "src": "./src/server.ts",
+      "types": "./dist/server.d.ts",
+      "import": "./dist/server.js"
     }
   },
   "devDependencies": {

@@ -2,7 +2,7 @@ import { authQueryKeys } from "@better-auth-ui/core"
 import type { DataTag, QueryClient, QueryOptions } from "@tanstack/query-core"
 import type { APIError } from "better-auth"
 
-import type { AuthServer } from "../../lib/auth-server"
+import type { AuthServer } from "../../../lib/auth-server"
 
 type SessionData<TAuth extends AuthServer = AuthServer> = Awaited<
   ReturnType<TAuth["api"]["getSession"]>
