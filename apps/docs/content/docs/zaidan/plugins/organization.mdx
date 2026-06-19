@@ -165,8 +165,8 @@ export function Header() {
 The plugin contributes an `organizations` segment to `viewPaths.settings`. Spread `organizationPlugin().viewPaths.settings` into your settings route's allowed-path set so `/settings/organizations` resolves correctly.
 
 ```tsx title="src/routes/settings/$path.tsx"
-import { ensureSession as ensureSessionClient } from "@better-auth-ui/solid"
-import { ensureSession as ensureSessionServer } from "@better-auth-ui/solid/server"
+import { ensureSession as ensureSessionClient } from "@better-auth-ui/core"
+import { ensureSessionServer } from "@better-auth-ui/core/server"
 import { viewPaths } from "@better-auth-ui/core"
 import { createFileRoute, notFound, redirect } from "@tanstack/solid-router"
 import { createIsomorphicFn } from "@tanstack/solid-start"
@@ -229,8 +229,8 @@ function SettingsPage() {
 Mount a dynamic route at `/organization/$slug/$path` that renders `<Organization />` for the matching tab. `<Organization />` is the shell — it shows the `settings` (profile + danger zone) and `people` (members + invitations) tabs for the organization identified by the URL slug.
 
 ```tsx title="src/routes/organization/$slug/$path.tsx"
-import { ensureSession as ensureSessionClient } from "@better-auth-ui/solid"
-import { ensureSession as ensureSessionServer } from "@better-auth-ui/solid/server"
+import { ensureSession as ensureSessionClient } from "@better-auth-ui/core"
+import { ensureSessionServer } from "@better-auth-ui/core/server"
 import { createFileRoute, notFound, redirect } from "@tanstack/solid-router"
 import { createIsomorphicFn } from "@tanstack/solid-start"
 import { getRequestHeaders } from "@tanstack/solid-start/server"
@@ -354,8 +354,8 @@ When the user is on a non-slug page (`/settings/organizations`, `/dashboard`, et
 Move `/organization/$path` to `/organization/$slug/$path`. Validate the path segment and gate on the signed-in session as before.
 
 ```tsx title="src/routes/organization/$slug/$path.tsx"
-import { ensureSession as ensureSessionClient } from "@better-auth-ui/solid"
-import { ensureSession as ensureSessionServer } from "@better-auth-ui/solid/server"
+import { ensureSession as ensureSessionClient } from "@better-auth-ui/core"
+import { ensureSessionServer } from "@better-auth-ui/core/server"
 import { createFileRoute, notFound, redirect } from "@tanstack/solid-router"
 import { createIsomorphicFn } from "@tanstack/solid-start"
 import { getRequestHeaders } from "@tanstack/solid-start/server"

@@ -8,9 +8,8 @@ import {
   useMutation
 } from "@tanstack/react-query"
 import type { BetterFetchError } from "better-auth/react"
-
+import { useSession } from "../../hooks/queries/use-session"
 import type { PasskeyAuthClient } from "../../lib/auth-client"
-import { useSession } from "../../queries/auth/session-query"
 
 export type AddPasskeyParams<TAuthClient extends PasskeyAuthClient> =
   Parameters<TAuthClient["passkey"]["addPasskey"]>[0]

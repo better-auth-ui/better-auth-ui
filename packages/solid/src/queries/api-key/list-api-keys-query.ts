@@ -1,7 +1,7 @@
 import { apiKeyQueryKeys } from "@better-auth-ui/core/plugins"
 import type { QueryClient } from "@tanstack/solid-query"
+import { useSession } from "../../hooks/queries/use-session"
 import type { ApiKeyAuthClient, InferData } from "../../lib/auth-client"
-import { useSession } from "../auth/session-query"
 import {
   createUserScopedOptions,
   createUserScopedQuery,

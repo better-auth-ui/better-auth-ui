@@ -31,7 +31,7 @@ const { data: session } = useSession(authClient, {
 ## Options factory
 
 ```tsx
-import { sessionOptions } from "@better-auth-ui/react"
+import { sessionOptions } from "@better-auth-ui/core"
 import { useQuery } from "@tanstack/react-query"
 
 const { data: session } = useQuery(sessionOptions(authClient))
@@ -39,25 +39,25 @@ const { data: session } = useQuery(sessionOptions(authClient))
 
 ## Server-side prefetching
 
-For client/router loaders that already have an `authClient`, use the client helpers from `@better-auth-ui/react`.
+For client/router loaders that already have an `authClient`, use the client helpers from `@better-auth-ui/core`.
 
 ```tsx
-import { ensureSession, fetchSession, prefetchSession } from "@better-auth-ui/react"
+import { ensureSession, fetchSession, prefetchSession } from "@better-auth-ui/core"
 
 await ensureSession(queryClient, authClient)
 await prefetchSession(queryClient, authClient)
 const session = await fetchSession(queryClient, authClient)
 ```
 
-For server loaders, import from `@better-auth-ui/react/server`. These helpers call your Better Auth server instance directly and require the request params passed to `auth.api.getSession`, typically request headers.
+For server loaders, import from `@better-auth-ui/core/server`. These helpers call your Better Auth server instance directly and require the request params passed to `auth.api.getSession`, typically request headers.
 
 ```ts
-import { ensureSession } from "@better-auth-ui/react/server"
+import { ensureSessionServer } from "@better-auth-ui/core/server"
 import { getRequestHeaders } from "@tanstack/react-start/server"
 
 import { auth } from "@/lib/auth"
 
-const session = await ensureSession(queryClient, auth, {
+const session = await ensureSessionServer(queryClient, auth, {
   headers: getRequestHeaders()
 })
 ```
@@ -67,7 +67,7 @@ Both entrypoints share the same session query key, so server-prefetched data hyd
 ## Invalidation
 
 ```ts
-import { sessionOptions } from "@better-auth-ui/react"
+import { sessionOptions } from "@better-auth-ui/core"
 
 queryClient.invalidateQueries({
   queryKey: sessionOptions(authClient).queryKey
@@ -84,8 +84,8 @@ queryClient.invalidateQueries({ queryKey: authQueryKeys.session })
 
 ## Client params
 
-<auto-type-table path="../../../../../../packages/react/src/queries/auth/session-query.ts" name="SessionParams" />
+<auto-type-table path="../../../../../../packages/core/src/queries/auth/session-query.ts" name="SessionParams" />
 
 ## Server params
 
-<auto-type-table path="../../../../../../packages/react/src/server/queries/auth/session-query.ts" name="SessionParams" />
+<auto-type-table path="../../../../../../packages/core/src/server/queries/auth/session-query-server.ts" name="SessionParams" />

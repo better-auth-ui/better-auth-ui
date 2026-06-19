@@ -269,19 +269,19 @@ describe("React/Solid docs parity", () => {
     const reactSsr = readDocsFile("react", "ssr.mdx")
     const solidSsr = readDocsFile("solid", "ssr.mdx")
 
-    expect(reactSession).toContain("@better-auth-ui/react/server")
-    expect(reactSession).toContain("ensureSession(queryClient, auth")
+    expect(reactSession).toContain("@better-auth-ui/core/server")
+    expect(reactSession).toContain("ensureSessionServer(queryClient, auth")
     expect(reactSession).toContain("headers: getRequestHeaders()")
     expect(reactSession).toContain(
-      "packages/react/src/server/queries/auth/session-query.ts"
+      "packages/core/src/server/queries/auth/session-query-server.ts"
     )
 
-    expect(solidSession).toContain("@better-auth-ui/solid/server")
-    expect(solidSession).toContain("ensureSession(queryClient, auth")
+    expect(solidSession).toContain("@better-auth-ui/core/server")
+    expect(solidSession).toContain("ensureSessionServer(queryClient, auth")
     expect(solidSession).toContain("headers: request.headers")
     expect(solidSession).toContain("server-auth helpers for session")
     expect(solidSession).toContain(
-      "packages/solid/src/server/queries/auth/session-query.ts"
+      "packages/core/src/server/queries/auth/session-query-server.ts"
     )
 
     expect(reactListApiKeys).toContain("@better-auth-ui/react/server")

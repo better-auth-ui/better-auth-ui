@@ -1,7 +1,7 @@
 import { organizationQueryKeys } from "@better-auth-ui/core/plugins"
 import { createQuery, type QueryClient } from "@tanstack/solid-query"
+import { useSession } from "../../hooks/queries/use-session"
 import type { OrganizationAuthClient } from "../../lib/auth-client"
-import { useSession } from "../auth/session-query"
 import {
   createOrganizationQueryOptions,
   ensureOrganizationQuery,

@@ -4,8 +4,8 @@ import {
   type MutationKey
 } from "@tanstack/solid-query"
 import type { BetterFetchError } from "better-auth/client"
+import { useSession } from "../hooks/queries/use-session"
 import type { AuthClient } from "../lib/auth-client"
-import { useSession } from "../queries/auth/session-query"
 import {
   type AuthMutationMeta,
   createAuthMutationOptions,

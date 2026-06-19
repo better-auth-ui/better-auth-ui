@@ -5,12 +5,12 @@ import { describe, expect, expectTypeOf, it } from "vitest"
 import * as solid from "../src"
 
 describe("Solid session core boundary", () => {
-  it("keeps the Solid hook and transitional root helpers available", () => {
+  it("keeps only the Solid hook in the framework root", () => {
     expect("useSession" in solid).toBe(true)
-    expect(solid.sessionOptions).toBe(core.sessionOptions)
-    expect(solid.ensureSession).toBe(core.ensureSession)
-    expect(solid.prefetchSession).toBe(core.prefetchSession)
-    expect(solid.fetchSession).toBe(core.fetchSession)
+    expect("sessionOptions" in solid).toBe(false)
+    expect("ensureSession" in solid).toBe(false)
+    expect("prefetchSession" in solid).toBe(false)
+    expect("fetchSession" in solid).toBe(false)
   })
 
   it("exposes framework-agnostic session helpers from core", () => {
@@ -24,18 +24,20 @@ describe("Solid session core boundary", () => {
     expect("fetchSessionServer" in coreServer).toBe(true)
   })
 
-  it("preserves DataTag query key inference for transitional Solid helpers", () => {
+  it("preserves DataTag query key inference for core session helpers", () => {
     type SessionResult = { session: { id: string }; user: { id: string } }
     const authClient = {
-      getSession: async (): Promise<SessionResult> => ({
-        session: { id: "session-1" },
-        user: { id: "user-1" }
+      getSession: async (): Promise<{ data: SessionResult }> => ({
+        data: {
+          session: { id: "session-1" },
+          user: { id: "user-1" }
+        }
       })
     }
     const queryClient = new QueryClient()
 
     const cached = queryClient.getQueryData(
-      solid.sessionOptions(authClient).queryKey
+      core.sessionOptions(authClient).queryKey
     )
 
     expectTypeOf(cached).toEqualTypeOf<SessionResult | undefined>()

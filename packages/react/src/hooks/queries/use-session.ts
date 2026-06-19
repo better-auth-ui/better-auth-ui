@@ -1,10 +1,7 @@
 import {
-  ensureSession,
-  fetchSession,
-  prefetchSession,
-  type Session,
-  type SessionAuthClient,
+  type AuthClient,
   type SessionData,
+  type SessionOptions,
   type SessionParams,
   sessionOptions
 } from "@better-auth-ui/core"
@@ -16,10 +13,7 @@ import {
 } from "@tanstack/react-query"
 import type { BetterFetchError } from "better-auth/client"
 
-export type { Session, SessionAuthClient, SessionData, SessionParams }
-export { ensureSession, fetchSession, prefetchSession, sessionOptions }
-
-export type UseSessionOptions<TAuthClient extends SessionAuthClient> = Omit<
+export type UseSessionOptions<TAuthClient extends AuthClient> = Omit<
   UseQueryOptions<
     SessionData<TAuthClient>,
     BetterFetchError,
@@ -27,13 +21,14 @@ export type UseSessionOptions<TAuthClient extends SessionAuthClient> = Omit<
   >,
   "queryKey" | "queryFn"
 > &
+  SessionOptions<TAuthClient> &
   SessionParams<TAuthClient>
 
 /**
  * Subscribe to the current session via TanStack Query.
  *
- * Core owns the framework-agnostic options factory. React keeps only the
- * framework-specific `useQuery` boundary.
+ * Shares a query key with the server-side `sessionOptions`, so SSR-hydrated
+ * session data is reused from the cache without an immediate refetch.
  *
  * @param authClient - The Better Auth client.
  * @param options - `getSession` params (`query`, `fetchOptions`) merged
@@ -41,7 +36,7 @@ export type UseSessionOptions<TAuthClient extends SessionAuthClient> = Omit<
  * @param queryClient - Optional custom `QueryClient`. Defaults to the client
  *   from the nearest `QueryClientProvider`.
  */
-export function useSession<TAuthClient extends SessionAuthClient>(
+export function useSession<TAuthClient extends AuthClient>(
   authClient: TAuthClient,
   options: UseSessionOptions<TAuthClient> = {},
   queryClient?: QueryClient

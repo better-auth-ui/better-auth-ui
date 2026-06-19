@@ -5,12 +5,12 @@ import { describe, expect, expectTypeOf, it } from "vitest"
 import * as react from "../src"
 
 describe("React session core boundary", () => {
-  it("keeps the React hook and transitional root helpers available", () => {
+  it("keeps only the React hook in the framework root", () => {
     expect("useSession" in react).toBe(true)
-    expect(react.sessionOptions).toBe(core.sessionOptions)
-    expect(react.ensureSession).toBe(core.ensureSession)
-    expect(react.prefetchSession).toBe(core.prefetchSession)
-    expect(react.fetchSession).toBe(core.fetchSession)
+    expect("sessionOptions" in react).toBe(false)
+    expect("ensureSession" in react).toBe(false)
+    expect("prefetchSession" in react).toBe(false)
+    expect("fetchSession" in react).toBe(false)
   })
 
   it("exposes framework-agnostic session helpers from core", () => {
@@ -24,18 +24,20 @@ describe("React session core boundary", () => {
     expect("fetchSessionServer" in coreServer).toBe(true)
   })
 
-  it("preserves DataTag query key inference for transitional React helpers", () => {
+  it("preserves DataTag query key inference for core session helpers", () => {
     type SessionResult = { session: { id: string }; user: { id: string } }
     const authClient = {
-      getSession: async (): Promise<SessionResult> => ({
-        session: { id: "session-1" },
-        user: { id: "user-1" }
+      getSession: async (): Promise<{ data: SessionResult }> => ({
+        data: {
+          session: { id: "session-1" },
+          user: { id: "user-1" }
+        }
       })
     }
     const queryClient = new QueryClient()
 
     const cached = queryClient.getQueryData(
-      react.sessionOptions(authClient).queryKey
+      core.sessionOptions(authClient).queryKey
     )
 
     expectTypeOf(cached).toEqualTypeOf<SessionResult | undefined>()

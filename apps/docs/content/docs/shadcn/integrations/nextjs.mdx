@@ -85,7 +85,7 @@ Better Auth UI supports two route protection patterns depending on whether your 
 For SSR routes, check the session in an async server component so unauthenticated users are redirected before any HTML is streamed — no flash of unauthenticated UI. Call `ensureSession` from `@better-auth-ui/react/server` with a per-request `QueryClient` (direct `auth.api` call, no HTTP hop), and wrap the rendered children in `HydrationBoundary` so downstream `useSession` calls read from the hydrated cache under `authQueryKeys.session` on mount.
 
 ```tsx title="app/dashboard/page.tsx"
-import { ensureSession } from "@better-auth-ui/react/server"
+import { ensureSessionServer as ensureSession } from "@better-auth-ui/core/server"
 import { dehydrate, HydrationBoundary } from "@tanstack/react-query"
 import { headers } from "next/headers"
 import Link from "next/link"

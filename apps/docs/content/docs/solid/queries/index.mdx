@@ -8,7 +8,8 @@ Solid queries are package runtime APIs. They return `@tanstack/solid-query` opti
 Every supported query exposes an options factory. UI-safe queries also expose a `use*` hook. Session and user-scoped families additionally expose `ensure*`, `prefetch*`, and `fetch*` helpers for loaders and server-aware route code.
 
 ```ts
-import { sessionOptions, useSession } from "@better-auth-ui/solid"
+import { useSession } from "@better-auth-ui/solid"
+import { sessionOptions } from "@better-auth-ui/core"
 
 const sessionQuery = sessionOptions(authClient)
 const session = useSession(authClient, { enabled: !import.meta.env.SSR })

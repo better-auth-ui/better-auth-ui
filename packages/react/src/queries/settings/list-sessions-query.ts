@@ -7,9 +7,8 @@ import {
   useQuery
 } from "@tanstack/react-query"
 import type { BetterFetchError } from "better-auth/react"
-
+import { useSession } from "../../hooks/queries/use-session"
 import type { AuthClient, InferData } from "../../lib/auth-client"
-import { useSession } from "../auth/session-query"
 
 export type ListSessionsData<TAuthClient extends AuthClient> = InferData<
   TAuthClient["listSessions"]

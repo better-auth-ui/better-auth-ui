@@ -104,7 +104,7 @@ Use `ensureSession` in `beforeLoad` to gate protected routes. If no session is r
 ```tsx title="src/routes/settings/$path.tsx"
 import { viewPaths } from "@better-auth-ui/core"
 import { Settings } from "@better-auth-ui/heroui"
-import { ensureSession } from "@better-auth-ui/react"
+import { ensureSession } from "@better-auth-ui/core"
 import { createFileRoute, notFound, redirect } from "@tanstack/react-router"
 
 import { authClient } from "@/lib/auth-client"
@@ -151,7 +151,7 @@ Anything you `return` from `beforeLoad` is merged into the route context, so you
 Use `prefetchSession` when you want to warm the cache without blocking navigation — for example, on a marketing route that lazily renders an authed widget:
 
 ```ts
-import { prefetchSession } from "@better-auth-ui/react"
+import { prefetchSession } from "@better-auth-ui/core"
 
 export const Route = createFileRoute("/")({
   loader: ({ context: { queryClient } }) => {
@@ -167,7 +167,7 @@ The same pattern works for every settings read — `prefetchListAccounts`, `pref
 If you'd rather skip the HTTP round-trip and hit the Better Auth server directly from a TanStack Start server function (or any other server runtime), import the matching helpers from `@better-auth-ui/react/server`. They accept your Better Auth server instance instead of an `authClient`:
 
 ```ts title="src/lib/session.ts"
-import { ensureSession } from "@better-auth-ui/react/server"
+import { ensureSessionServer as ensureSession } from "@better-auth-ui/core/server"
 import type { QueryClient } from "@tanstack/react-query"
 import { createServerFn } from "@tanstack/react-start"
 import { getRequestHeaders } from "@tanstack/react-start/server"

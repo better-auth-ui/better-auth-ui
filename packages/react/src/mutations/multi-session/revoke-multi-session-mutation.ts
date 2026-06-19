@@ -8,9 +8,8 @@ import {
   useMutation
 } from "@tanstack/react-query"
 import type { BetterFetchError } from "better-auth/react"
-
+import { useSession } from "../../hooks/queries/use-session"
 import type { MultiSessionAuthClient } from "../../lib/auth-client"
-import { useSession } from "../../queries/auth/session-query"
 
 export type RevokeMultiSessionParams<
   TAuthClient extends MultiSessionAuthClient

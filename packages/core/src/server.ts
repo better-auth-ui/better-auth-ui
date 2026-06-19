@@ -1,2 +1,2 @@
-export type { AuthServer } from "./server/auth-server"
-export * from "./server/queries/session-query"
+export type * from "./lib/auth-server"
+export * from "./server/queries/auth/session-query-server"

@@ -7,9 +7,8 @@ import {
   useQuery
 } from "@tanstack/react-query"
 import type { BetterFetchError } from "better-auth/react"
-
+import { useSession } from "../../hooks/queries/use-session"
 import type { InferData, OrganizationAuthClient } from "../../lib/auth-client"
-import { useSession } from "../auth/session-query"
 import { useActiveOrganization } from "./active-organization-query"
 
 export type ListOrganizationInvitationsData<

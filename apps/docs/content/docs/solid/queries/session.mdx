@@ -24,7 +24,7 @@ const session = useSession(authClient, {
 ## Options factory
 
 ```tsx
-import { sessionOptions } from "@better-auth-ui/solid"
+import { sessionOptions } from "@better-auth-ui/core"
 import { createQuery } from "@tanstack/solid-query"
 
 const session = createQuery(() => sessionOptions(authClient))
@@ -32,34 +32,34 @@ const session = createQuery(() => sessionOptions(authClient))
 
 ## Server-side prefetching
 
-For client/router loaders that already have an `authClient`, use the client helpers from `@better-auth-ui/solid`.
+For client/router loaders that already have an `authClient`, use the client helpers from `@better-auth-ui/core`.
 
 ```ts
-import { ensureSession, fetchSession, prefetchSession } from "@better-auth-ui/solid"
+import { ensureSession, fetchSession, prefetchSession } from "@better-auth-ui/core"
 
 await ensureSession(queryClient, authClient)
 await prefetchSession(queryClient, authClient)
 const session = await fetchSession(queryClient, authClient)
 ```
 
-For server loaders, import from `@better-auth-ui/solid/server`. These helpers call your Better Auth server instance directly and require the request params passed to `auth.api.getSession`, typically request headers.
+For server loaders, import from `@better-auth-ui/core/server`. These helpers call your Better Auth server instance directly and require the request params passed to `auth.api.getSession`, typically request headers.
 
 ```ts
-import { ensureSession } from "@better-auth-ui/solid/server"
+import { ensureSessionServer } from "@better-auth-ui/core/server"
 
 import { auth } from "~/lib/auth"
 
-const session = await ensureSession(queryClient, auth, {
+const session = await ensureSessionServer(queryClient, auth, {
   headers: request.headers
 })
 ```
 
-Today the Solid server entrypoint provides true server-auth helpers for session. Other query families use client/router helpers from `@better-auth-ui/solid` unless explicitly exported from `@better-auth-ui/solid/server`.
+Today `@better-auth-ui/core/server` provides true server-auth helpers for session. Other query families use client/router helpers from `@better-auth-ui/solid` unless explicitly exported from a server entrypoint.
 
 ## Invalidation
 
 ```ts
-import { sessionOptions } from "@better-auth-ui/solid"
+import { sessionOptions } from "@better-auth-ui/core"
 
 queryClient.invalidateQueries({
   queryKey: sessionOptions(authClient).queryKey
@@ -68,8 +68,8 @@ queryClient.invalidateQueries({
 
 ## Client params
 
-<auto-type-table path="../../../../../../packages/solid/src/queries/auth/session-query.ts" name="SessionParams" />
+<auto-type-table path="../../../../../../packages/core/src/queries/auth/session-query.ts" name="SessionParams" />
 
 ## Server params
 
-<auto-type-table path="../../../../../../packages/solid/src/server/queries/auth/session-query.ts" name="SessionParams" />
+<auto-type-table path="../../../../../../packages/core/src/server/queries/auth/session-query-server.ts" name="SessionParams" />

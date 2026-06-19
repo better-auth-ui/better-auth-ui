@@ -7,9 +7,8 @@ import {
   useQuery
 } from "@tanstack/react-query"
 import type { BetterFetchError } from "better-auth/react"
-
+import { useSession } from "../../hooks/queries/use-session"
 import type { ApiKeyAuthClient, InferData } from "../../lib/auth-client"
-import { useSession } from "../auth/session-query"
 
 export type ListApiKeysData<
   TAuthClient extends ApiKeyAuthClient = ApiKeyAuthClient

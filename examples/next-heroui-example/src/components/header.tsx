@@ -1,5 +1,5 @@
+import { ensureSessionServer as ensureSession } from "@better-auth-ui/core/server"
 import { UserButton } from "@better-auth-ui/heroui"
-import { ensureSession } from "@better-auth-ui/react/server"
 import { Link } from "@heroui/react"
 import { dehydrate, HydrationBoundary } from "@tanstack/react-query"
 import { headers } from "next/headers"

@@ -30,15 +30,27 @@
     }
   },
   "devDependencies": {
+    "@better-auth/api-key": "^1.6.19",
+    "@better-auth/passkey": "^1.6.19",
     "@mikkelscheike/email-provider-links": "^5.1.8",
+    "@tanstack/query-core": "^5.100.9",
     "better-auth": "^1.6.19",
-    "vitest": "^4.1.9",
-    "@tanstack/query-core": "^5.100.9"
+    "vitest": "^4.1.9"
   },
   "peerDependencies": {
+    "@better-auth/api-key": ">=1.6.19",
+    "@better-auth/passkey": ">=1.6.19",
     "@mikkelscheike/email-provider-links": ">=5.1.8",
-    "better-auth": ">=1.6.19",
-    "@tanstack/query-core": ">=5.100.9"
+    "@tanstack/query-core": ">=5.100.9",
+    "better-auth": ">=1.6.19"
+  },
+  "peerDependenciesMeta": {
+    "@better-auth/api-key": {
+      "optional": true
+    },
+    "@better-auth/passkey": {
+      "optional": true
+    }
   },
   "repository": {
     "type": "git",

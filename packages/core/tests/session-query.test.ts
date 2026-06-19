@@ -5,7 +5,7 @@ import {
   fetchSession,
   prefetchSession,
   sessionOptions
-} from "../src/queries/session-query"
+} from "../src/queries/auth/session-query"
 import {
   ensureSessionServer,
   fetchSessionServer,

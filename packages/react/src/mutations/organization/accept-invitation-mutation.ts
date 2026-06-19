@@ -8,9 +8,8 @@ import {
   useMutation
 } from "@tanstack/react-query"
 import type { BetterFetchError } from "better-auth/react"
-
+import { useSession } from "../../hooks/queries/use-session"
 import type { OrganizationAuthClient } from "../../lib/auth-client"
-import { useSession } from "../../queries/auth/session-query"
 
 export type AcceptInvitationParams<TAuthClient extends OrganizationAuthClient> =
   Parameters<TAuthClient["organization"]["acceptInvitation"]>[0]

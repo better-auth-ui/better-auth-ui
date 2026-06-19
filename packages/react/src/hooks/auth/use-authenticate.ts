@@ -1,10 +1,7 @@
 import { useEffect } from "react"
 import { useAuth } from "../../components/auth/auth-provider"
 import type { AuthClient } from "../../lib/auth-client"
-import {
-  type UseSessionOptions,
-  useSession
-} from "../../queries/auth/session-query"
+import { type UseSessionOptions, useSession } from "../queries/use-session"
 
 /**
  * Calls `useSession` and redirects unauthenticated users to the sign-in page,

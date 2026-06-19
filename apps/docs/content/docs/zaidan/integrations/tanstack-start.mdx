@@ -91,8 +91,8 @@ Better Auth UI supports two route protection patterns depending on whether your 
 For SSR routes, check the session in `beforeLoad` so unauthenticated users are redirected before any component renders — no flash of unauthenticated UI. Use `createIsomorphicFn` to run `ensureSessionServer` on the server (direct `auth.api` call, no HTTP hop) and `ensureSessionClient` on the client (goes through `authClient`). Both share the same TanStack Query cache under `authQueryKeys.session`, so the session is hydrated from SSR and reused by any child `useSession` call.
 
 ```tsx title="routes/dashboard.tsx"
-import { ensureSession as ensureSessionClient } from "@better-auth-ui/solid"
-import { ensureSession as ensureSessionServer } from "@better-auth-ui/solid/server"
+import { ensureSession as ensureSessionClient } from "@better-auth-ui/core"
+import { ensureSessionServer } from "@better-auth-ui/core/server"
 import { createFileRoute, A, redirect } from "@tanstack/solid-router"
 import { createIsomorphicFn } from "@tanstack/solid-start"
 import { getRequestHeaders } from "@tanstack/solid-start/server"

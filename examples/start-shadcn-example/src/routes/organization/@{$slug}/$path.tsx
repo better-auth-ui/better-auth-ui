@@ -1,5 +1,5 @@
-import { ensureSession as ensureSessionClient } from "@better-auth-ui/react"
-import { ensureSession as ensureSessionServer } from "@better-auth-ui/react/server"
+import { ensureSession as ensureSessionClient } from "@better-auth-ui/core"
+import { ensureSessionServer } from "@better-auth-ui/core/server"
 import { createFileRoute, notFound, redirect } from "@tanstack/react-router"
 import { createIsomorphicFn } from "@tanstack/react-start"
 import { getRequestHeaders } from "@tanstack/react-start/server"

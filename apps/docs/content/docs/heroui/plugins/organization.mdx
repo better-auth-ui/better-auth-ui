@@ -111,8 +111,8 @@ The plugin contributes an `organizations` segment to `viewPaths.settings`. Sprea
 import { viewPaths } from "@better-auth-ui/core"
 import { Settings } from "@better-auth-ui/heroui"
 import { organizationPlugin } from "@better-auth-ui/heroui/plugins" // [!code highlight]
-import { ensureSession as ensureSessionClient } from "@better-auth-ui/react"
-import { ensureSession as ensureSessionServer } from "@better-auth-ui/react/server"
+import { ensureSession as ensureSessionClient } from "@better-auth-ui/core"
+import { ensureSessionServer } from "@better-auth-ui/core/server"
 import { createFileRoute, notFound, redirect } from "@tanstack/react-router"
 import { createIsomorphicFn } from "@tanstack/react-start"
 import { getRequestHeaders } from "@tanstack/react-start/server"
@@ -169,7 +169,7 @@ function SettingsPage() {
 import { viewPaths } from "@better-auth-ui/core"
 import { Settings } from "@better-auth-ui/heroui"
 import { organizationPlugin } from "@better-auth-ui/heroui/plugins" // [!code highlight]
-import { ensureSession } from "@better-auth-ui/react/server"
+import { ensureSessionServer as ensureSession } from "@better-auth-ui/core/server"
 import { dehydrate, HydrationBoundary } from "@tanstack/react-query"
 import { headers } from "next/headers"
 import { notFound, redirect } from "next/navigation"
@@ -238,8 +238,8 @@ import {
   Organization,
   organizationPlugin
 } from "@better-auth-ui/heroui/plugins"
-import { ensureSession as ensureSessionClient } from "@better-auth-ui/react"
-import { ensureSession as ensureSessionServer } from "@better-auth-ui/react/server"
+import { ensureSession as ensureSessionClient } from "@better-auth-ui/core"
+import { ensureSessionServer } from "@better-auth-ui/core/server"
 import { createFileRoute, notFound, redirect } from "@tanstack/react-router"
 import { createIsomorphicFn } from "@tanstack/react-start"
 import { getRequestHeaders } from "@tanstack/react-start/server"
@@ -296,7 +296,7 @@ import {
   Organization,
   organizationPlugin
 } from "@better-auth-ui/heroui/plugins"
-import { ensureSession } from "@better-auth-ui/react/server"
+import { ensureSessionServer as ensureSession } from "@better-auth-ui/core/server"
 import { dehydrate, HydrationBoundary } from "@tanstack/react-query"
 import { headers } from "next/headers"
 import { notFound, redirect } from "next/navigation"
@@ -459,8 +459,8 @@ import {
   Organization,
   organizationPlugin
 } from "@better-auth-ui/heroui/plugins"
-import { ensureSession as ensureSessionClient } from "@better-auth-ui/react"
-import { ensureSession as ensureSessionServer } from "@better-auth-ui/react/server"
+import { ensureSession as ensureSessionClient } from "@better-auth-ui/core"
+import { ensureSessionServer } from "@better-auth-ui/core/server"
 import { createFileRoute, notFound, redirect } from "@tanstack/react-router"
 import { createIsomorphicFn } from "@tanstack/react-start"
 import { getRequestHeaders } from "@tanstack/react-start/server"
@@ -517,7 +517,7 @@ import {
   Organization,
   organizationPlugin
 } from "@better-auth-ui/heroui/plugins"
-import { ensureSession } from "@better-auth-ui/react/server"
+import { ensureSessionServer as ensureSession } from "@better-auth-ui/core/server"
 import { dehydrate, HydrationBoundary } from "@tanstack/react-query"
 import { headers } from "next/headers"
 import { notFound, redirect } from "next/navigation"

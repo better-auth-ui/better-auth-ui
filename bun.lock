@@ -391,12 +391,16 @@
       "name": "@better-auth-ui/core",
       "version": "1.6.27",
       "devDependencies": {
+        "@better-auth/api-key": "^1.6.19",
+        "@better-auth/passkey": "^1.6.19",
         "@mikkelscheike/email-provider-links": "^5.1.8",
         "@tanstack/query-core": "^5.100.9",
         "better-auth": "^1.6.19",
         "vitest": "^4.1.9",
       },
       "peerDependencies": {
+        "@better-auth/api-key": ">=1.6.19",
+        "@better-auth/passkey": ">=1.6.19",
         "@mikkelscheike/email-provider-links": ">=5.1.8",
         "@tanstack/query-core": ">=5.100.9",
         "better-auth": ">=1.6.19",

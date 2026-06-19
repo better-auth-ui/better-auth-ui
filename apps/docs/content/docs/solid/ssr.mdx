@@ -94,8 +94,8 @@ Use `ensureSession` in `beforeLoad` to gate protected routes. In TanStack Start,
 
 ```tsx title="src/routes/settings/$path.tsx"
 import { viewPaths } from "@better-auth-ui/core"
-import { ensureSession as ensureSessionClient } from "@better-auth-ui/solid"
-import { ensureSession as ensureSessionServer } from "@better-auth-ui/solid/server"
+import { ensureSession as ensureSessionClient } from "@better-auth-ui/core"
+import { ensureSessionServer } from "@better-auth-ui/core/server"
 import { createFileRoute, notFound, redirect } from "@tanstack/solid-router"
 import { createIsomorphicFn } from "@tanstack/solid-start"
 import { getRequestHeaders } from "@tanstack/solid-start/server"
@@ -149,7 +149,7 @@ Anything you `return` from `beforeLoad` is merged into the route context, so you
 Use `prefetchSession` when you want to warm the cache without blocking navigation — for example, on a public route that lazily renders an authed widget:
 
 ```ts
-import { prefetchSession } from "@better-auth-ui/solid"
+import { prefetchSession } from "@better-auth-ui/core"
 
 export const Route = createFileRoute("/")({
   loader: ({ context: { queryClient } }) => {
@@ -165,7 +165,7 @@ The same pattern works for Solid read helpers that expose client-shaped loader h
 If you'd rather skip the HTTP round-trip for the session and hit the Better Auth server directly from a TanStack Start server function (or any other server runtime), import the session helpers from `@better-auth-ui/solid/server`. They accept your Better Auth server instance instead of an `authClient`:
 
 ```ts title="src/lib/session.ts"
-import { ensureSession } from "@better-auth-ui/solid/server"
+import { ensureSessionServer as ensureSession } from "@better-auth-ui/core/server"
 import type { QueryClient } from "@tanstack/solid-query"
 import { createServerFn } from "@tanstack/solid-start"
 import { getRequestHeaders } from "@tanstack/solid-start/server"

@@ -2,10 +2,7 @@ import { createEffect } from "solid-js"
 import { isServer } from "solid-js/web"
 import type { AuthClient } from "../../lib/auth-client"
 import { useAuth } from "../../lib/auth-provider"
-import {
-  type UseSessionOptions,
-  useSession
-} from "../../queries/auth/session-query"
+import { type UseSessionOptions, useSession } from "../queries/use-session"
 
 export function useAuthenticate<TAuthClient extends AuthClient>(
   authClient: TAuthClient,

@@ -6,7 +6,8 @@ description: TanStack Query primitives for every Better Auth read endpoint.
 Every query exposes a hook and an options factory. The factory's `.queryKey` is the canonical key.
 
 ```ts
-import { useSession, sessionOptions } from "@better-auth-ui/react"
+import { useSession } from "@better-auth-ui/react"
+import { sessionOptions } from "@better-auth-ui/core"
 ```
 
 Use the hook in components. Use the factory anywhere TanStack Query takes a `queryOptions` object (`useQuery`, `useQueries`, `prefetchQuery`, loaders). Read `.queryKey` off the factory for cache seeding or invalidation.
