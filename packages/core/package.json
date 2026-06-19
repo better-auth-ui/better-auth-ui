@@ -22,16 +22,23 @@
       "src": "./src/plugins.ts",
       "types": "./dist/plugins.d.ts",
       "import": "./dist/plugins.js"
+    },
+    "./server": {
+      "src": "./src/server.ts",
+      "types": "./dist/server.d.ts",
+      "import": "./dist/server.js"
     }
   },
   "devDependencies": {
     "@mikkelscheike/email-provider-links": "^5.1.8",
     "better-auth": "^1.6.19",
-    "vitest": "^4.1.9"
+    "vitest": "^4.1.9",
+    "@tanstack/query-core": "^5.100.9"
   },
   "peerDependencies": {
     "@mikkelscheike/email-provider-links": ">=5.1.8",
-    "better-auth": ">=1.6.19"
+    "better-auth": ">=1.6.19",
+    "@tanstack/query-core": ">=5.100.9"
   },
   "repository": {
     "type": "git",
