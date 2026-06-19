@@ -29,10 +29,11 @@ export type SessionOptions<TAuthClient extends AuthClient> = Omit<
  * @param authClient - The Better Auth client.
  * @param params - Parameters forwarded to `authClient.getSession`.
  */
-export function sessionOptions<
-  TAuthClient extends AuthClient,
-  TData = SessionData<TAuthClient>
->(authClient: TAuthClient, params?: SessionParams<TAuthClient>) {
+export function sessionOptions<TAuthClient extends AuthClient>(
+  authClient: TAuthClient,
+  params?: SessionParams<TAuthClient>
+) {
+  type TData = SessionData<TAuthClient>
   const queryKey = authQueryKeys.session
 
   const options = {
