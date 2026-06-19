@@ -36,19 +36,18 @@ export function sessionOptions<TAuthClient extends AuthClient>(
   type TData = SessionData<TAuthClient>
   const queryKey = authQueryKeys.session
 
-  const options: QueryOptions<TData, BetterFetchError, TData, typeof queryKey> =
-    {
-      queryKey,
-      queryFn: ({ signal }) =>
-        authClient.getSession({
-          ...params,
-          fetchOptions: { ...params?.fetchOptions, signal, throw: true }
-        }) as Promise<TData>
-    }
-
-  return options as typeof options & {
+  const options = {
+    queryKey,
+    queryFn: ({ signal }) =>
+      authClient.getSession({
+        ...params,
+        fetchOptions: { ...params?.fetchOptions, signal, throw: true }
+      }) as Promise<TData>
+  } as QueryOptions<TData, BetterFetchError, TData, typeof queryKey> & {
     queryKey: DataTag<typeof queryKey, TData, BetterFetchError>
   }
+
+  return options
 }
 
 /**
