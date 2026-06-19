@@ -1,9 +1,13 @@
 import {
   type AuthClient,
-  sessionOptions,
-  type UseSessionOptions
+  type SessionOptions,
+  type SessionParams,
+  sessionOptions
 } from "@better-auth-ui/core"
 import { type QueryClient, useQuery } from "@tanstack/react-query"
+
+export type UseSessionOptions<TAuthClient extends AuthClient> =
+  SessionOptions<TAuthClient> & SessionParams<TAuthClient>
 
 /**
  * Subscribe to the current session via TanStack Query.

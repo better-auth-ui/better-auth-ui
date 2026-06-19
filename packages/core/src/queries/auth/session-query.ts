@@ -95,6 +95,3 @@ export const fetchSession = <TAuthClient extends AuthClient>(
   authClient: TAuthClient,
   params?: SessionParams<TAuthClient>
 ) => queryClient.fetchQuery(sessionOptions(authClient, params))
-
-export type UseSessionOptions<TAuthClient extends AuthClient> =
-  SessionOptions<TAuthClient> & SessionParams<TAuthClient>
