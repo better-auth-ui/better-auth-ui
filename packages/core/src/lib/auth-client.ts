@@ -21,30 +21,44 @@ export type AuthClient = OmitUseKeys<ReturnType<typeof createAuthClient>> &
 // Turbopack, older configs, etc.) and keeps the plugin packages out of
 // consumers' runtime bundles entirely.
 
-export type MagicLinkAuthClient = ReturnType<
-  typeof createAuthClient<{ plugins: [ReturnType<typeof magicLinkClient>] }>
+export type MagicLinkAuthClient = OmitUseKeys<
+  ReturnType<
+    typeof createAuthClient<{ plugins: [ReturnType<typeof magicLinkClient>] }>
+  >
 >
 
-export type MultiSessionAuthClient = ReturnType<
-  typeof createAuthClient<{ plugins: [ReturnType<typeof multiSessionClient>] }>
+export type MultiSessionAuthClient = OmitUseKeys<
+  ReturnType<
+    typeof createAuthClient<{
+      plugins: [ReturnType<typeof multiSessionClient>]
+    }>
+  >
 >
 
-export type PasskeyAuthClient = ReturnType<
-  typeof createAuthClient<{ plugins: [ReturnType<typeof passkeyClient>] }>
+export type PasskeyAuthClient = OmitUseKeys<
+  ReturnType<
+    typeof createAuthClient<{ plugins: [ReturnType<typeof passkeyClient>] }>
+  >
 >
 
-export type ApiKeyAuthClient = ReturnType<
-  typeof createAuthClient<{ plugins: [ReturnType<typeof apiKeyClient>] }>
+export type ApiKeyAuthClient = OmitUseKeys<
+  ReturnType<
+    typeof createAuthClient<{ plugins: [ReturnType<typeof apiKeyClient>] }>
+  >
 >
 
-export type UsernameAuthClient = ReturnType<
-  typeof createAuthClient<{ plugins: [ReturnType<typeof usernameClient>] }>
+export type UsernameAuthClient = OmitUseKeys<
+  ReturnType<
+    typeof createAuthClient<{ plugins: [ReturnType<typeof usernameClient>] }>
+  >
 >
 
-export type OrganizationAuthClient = ReturnType<
-  typeof createAuthClient<{
-    plugins: [ReturnType<typeof organizationClient<object>>]
-  }>
+export type OrganizationAuthClient = OmitUseKeys<
+  ReturnType<
+    typeof createAuthClient<{
+      plugins: [ReturnType<typeof organizationClient<object>>]
+    }>
+  >
 >
 
 /**
