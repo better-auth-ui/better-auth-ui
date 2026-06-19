@@ -22,17 +22,16 @@ export type SessionParams<TAuth extends AuthServer> = Parameters<
  * @param params - Parameters forwarded to `auth.api.getSession` (typically
  *   includes request `headers` for cookie-based session resolution).
  */
-export function sessionOptionsServer<TAuth extends AuthServer>(
-  auth: TAuth,
-  params: SessionParams<TAuth>
-) {
-  type TData = SessionData<TAuth>
+export function sessionOptionsServer<
+  TAuth extends AuthServer,
+  TData = SessionData<TAuth>
+>(auth: TAuth, params: SessionParams<TAuth>) {
   const queryKey = authQueryKeys.session
 
-  const options: QueryOptions<TData, APIError, TData, typeof queryKey> = {
+  const options = {
     queryKey,
     queryFn: () => auth.api.getSession(params) as Promise<TData>
-  }
+  } as QueryOptions<TData, APIError, TData, typeof queryKey>
 
   return options as typeof options & {
     queryKey: DataTag<typeof queryKey, TData, APIError>

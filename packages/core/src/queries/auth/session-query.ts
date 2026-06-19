@@ -29,11 +29,10 @@ export type SessionOptions<TAuthClient extends AuthClient> = Omit<
  * @param authClient - The Better Auth client.
  * @param params - Parameters forwarded to `authClient.getSession`.
  */
-export function sessionOptions<TAuthClient extends AuthClient>(
-  authClient: TAuthClient,
-  params?: SessionParams<TAuthClient>
-) {
-  type TData = SessionData<TAuthClient>
+export function sessionOptions<
+  TAuthClient extends AuthClient,
+  TData = SessionData<TAuthClient>
+>(authClient: TAuthClient, params?: SessionParams<TAuthClient>) {
   const queryKey = authQueryKeys.session
 
   const options = {
@@ -42,12 +41,12 @@ export function sessionOptions<TAuthClient extends AuthClient>(
       authClient.getSession({
         ...params,
         fetchOptions: { ...params?.fetchOptions, signal, throw: true }
-      }) as Promise<TData>
-  } as QueryOptions<TData, BetterFetchError, TData, typeof queryKey> & {
+      })
+  } as QueryOptions<TData, BetterFetchError, TData, typeof queryKey>
+
+  return options as typeof options & {
     queryKey: DataTag<typeof queryKey, TData, BetterFetchError>
   }
-
-  return options
 }
 
 /**
