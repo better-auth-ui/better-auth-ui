@@ -2,7 +2,7 @@ import {
   magicLinkPlugin as coreMagicLinkPlugin,
   type MagicLinkLocalization,
   magicLinkLocalization
-} from "@better-auth-ui/core/plugins"
+} from "@better-auth-ui/core/plugins/magic-link"
 import {
   createAuthMutation,
   type MagicLinkAuthClient,

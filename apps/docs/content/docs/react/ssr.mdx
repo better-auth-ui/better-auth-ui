@@ -167,7 +167,7 @@ The same pattern works for every settings read — `prefetchListAccounts`, `pref
 If you'd rather skip the HTTP round-trip for the session and hit the Better Auth server directly from a TanStack Start server function (or any other server runtime), import the session helpers from `@better-auth-ui/core/server`. They accept your Better Auth server instance instead of an `authClient`:
 
 ```ts title="src/lib/session.ts"
-import { ensureSessionServer as ensureSession } from "@better-auth-ui/core/server"
+import { ensureSessionServer } from "@better-auth-ui/core/server"
 import type { QueryClient } from "@tanstack/react-query"
 import { createServerFn } from "@tanstack/react-start"
 import { getRequestHeaders } from "@tanstack/react-start/server"
@@ -179,14 +179,14 @@ const getSession = createServerFn().handler(() =>
 )
 
 export const ensureServerSession = (queryClient: QueryClient) =>
-  ensureSession(queryClient, auth, { headers: getRequestHeaders() })
+  ensureSessionServer(queryClient, auth, { headers: getRequestHeaders() })
 ```
 
-Session server-auth helpers are canonical from `@better-auth-ui/core/server` as `sessionOptionsServer`, `ensureSessionServer`, `prefetchSessionServer`, and `fetchSessionServer`. The React server entrypoint also keeps compatibility aliases (`sessionOptions`, `ensureSession`, `prefetchSession`, `fetchSession`) and mirrors supported non-session read helpers with server-auth signatures. These helpers accept your Better Auth server instance (`auth`) and request params instead of a browser `authClient`.
+Session server-auth helpers are canonical from `@better-auth-ui/core/server` as `sessionOptionsServer`, `ensureSessionServer`, `prefetchSessionServer`, and `fetchSessionServer`. These helpers accept your Better Auth server instance (`auth`) and request params instead of a browser `authClient`.
 
 Available server query helper families include:
 
-- Session: `sessionOptions`, `ensureSession`, `prefetchSession`, `fetchSession`
+- Session: `sessionOptionsServer`, `ensureSessionServer`, `prefetchSessionServer`, `fetchSessionServer`
 - Settings/passkey: `listAccountsOptions`, `ensureListAccounts`, `prefetchListAccounts`, `fetchListAccounts`, `accountInfoOptions`, `ensureAccountInfo`, `listSessionsOptions`, `ensureListSessions`, `listDeviceSessionsOptions`, `ensureListDeviceSessions`, `listPasskeysOptions`, and `ensureListPasskeys` with matching prefetch/fetch helpers
 - API-key: `listApiKeysOptions`, `ensureListApiKeys`, `prefetchListApiKeys`, `fetchListApiKeys`
 - Organization: `activeOrganizationOptions`, `ensureActiveOrganization`, `prefetchActiveOrganization`, `fetchActiveOrganization`, `fullOrganizationOptions`, `ensureFullOrganization`, `listOrganizationsOptions`, `ensureListOrganizations`, `listOrganizationMembersOptions`, `ensureListOrganizationMembers`, `listOrganizationInvitationsOptions`, `ensureListOrganizationInvitations`, `listUserInvitationsOptions`, `ensureListUserInvitations`, `hasPermissionOptions`, and `ensureHasPermission` with matching prefetch/fetch helpers

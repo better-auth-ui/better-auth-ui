@@ -1,4 +1,4 @@
-import { organizationMutationKeys } from "@better-auth-ui/core/plugins"
+import { organizationMutationKeys } from "@better-auth-ui/core/plugins/organization"
 import { mutationOptions, useMutation } from "@tanstack/react-query"
 import type { BetterFetchError } from "better-auth/react"
 

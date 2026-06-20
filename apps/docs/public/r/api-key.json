@@ -31,7 +31,7 @@
     },
     {
       "path": "src/lib/auth/api-key-plugin.ts",
-      "content": "import { createAuthPlugin } from \"@better-auth-ui/core\"\nimport {\n  type ApiKeyPluginOptions,\n  apiKeyPlugin as coreApiKeyPlugin\n} from \"@better-auth-ui/core/plugins\"\n\nimport { ApiKeys } from \"@/components/auth/api-key/api-keys\"\nimport { OrganizationApiKeys } from \"@/components/auth/api-key/organization-api-keys\"\n\nexport const apiKeyPlugin = createAuthPlugin(\n  coreApiKeyPlugin.id,\n  (options: ApiKeyPluginOptions = {}) => {\n    const core = coreApiKeyPlugin(options)\n\n    return {\n      ...core,\n      securityCards: [ApiKeys],\n      ...(core.organization ? { organizationCards: [OrganizationApiKeys] } : {})\n    }\n  }\n)\n",
+      "content": "import { createAuthPlugin } from \"@better-auth-ui/core\"\nimport {\n  type ApiKeyPluginOptions,\n  apiKeyPlugin as coreApiKeyPlugin\n} from \"@better-auth-ui/core/plugins/api-key\"\n\nimport { ApiKeys } from \"@/components/auth/api-key/api-keys\"\nimport { OrganizationApiKeys } from \"@/components/auth/api-key/organization-api-keys\"\n\nexport const apiKeyPlugin = createAuthPlugin(\n  coreApiKeyPlugin.id,\n  (options: ApiKeyPluginOptions = {}) => {\n    const core = coreApiKeyPlugin(options)\n\n    return {\n      ...core,\n      securityCards: [ApiKeys],\n      ...(core.organization ? { organizationCards: [OrganizationApiKeys] } : {})\n    }\n  }\n)\n",
       "type": "registry:lib",
       "target": "@lib/auth/api-key-plugin.ts"
     },

@@ -1,4 +1,4 @@
-import { magicLinkMutationKeys } from "@better-auth-ui/core/plugins"
+import { magicLinkMutationKeys } from "@better-auth-ui/core/plugins/magic-link"
 import type { MagicLinkAuthClient } from "../../lib/auth-client"
 import { createAuthMutationOptions } from "../create-auth-mutation"
 

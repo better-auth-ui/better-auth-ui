@@ -5,7 +5,7 @@ description: Add account deletion with a confirmation dialog to your Solid/Zaida
 
 import { Step, Steps } from "fumadocs-ui/components/steps"
 
-The copied Solid/Zaidan delete-user components render the danger-zone account deletion UI for Better Auth's built-in [account deletion](https://www.better-auth.com/docs/concepts/users-accounts#delete-user) capability. Register the UI plugin directly from `@better-auth-ui/core/plugins` to show `<DangerZone />` in the copied security settings surface.
+The copied Solid/Zaidan delete-user components render the danger-zone account deletion UI for Better Auth's built-in [account deletion](https://www.better-auth.com/docs/concepts/users-accounts#delete-user) capability. Register the UI plugin directly from `@better-auth-ui/core/plugins/delete-user` to show `<DangerZone />` in the copied security settings surface.
 
 ## Setup
 
@@ -48,10 +48,10 @@ This copies the following files into your project:
 <Step>
 ### Register the UI plugin
 
-Import `deleteUserPlugin()` directly from `@better-auth-ui/core/plugins` and register it with your copied Solid auth provider:
+Import `deleteUserPlugin()` directly from `@better-auth-ui/core/plugins/delete-user` and register it with your copied Solid auth provider:
 
 ```tsx title="src/components/providers.tsx"
-import { deleteUserPlugin } from "@better-auth-ui/core/plugins"
+import { deleteUserPlugin } from "@better-auth-ui/core/plugins/delete-user"
 import { AuthProvider } from "@/components/auth/auth-provider"
 
 <AuthProvider

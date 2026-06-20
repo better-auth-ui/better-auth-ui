@@ -3,7 +3,7 @@ import {
   usernamePlugin as coreUsernamePlugin,
   type UsernameLocalization,
   type UsernamePluginOptions
-} from "@better-auth-ui/core/plugins"
+} from "@better-auth-ui/core/plugins/username"
 import { SignInUsername } from "@/components/auth/username/sign-in-username"
 import { UsernameField } from "@/components/auth/username/username-field"
 

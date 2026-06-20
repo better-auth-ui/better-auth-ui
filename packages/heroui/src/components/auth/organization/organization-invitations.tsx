@@ -1,4 +1,4 @@
-import type { OrganizationLocalization } from "@better-auth-ui/core/plugins"
+import type { OrganizationLocalization } from "@better-auth-ui/core/plugins/organization"
 import {
   type OrganizationAuthClient,
   useAuth,

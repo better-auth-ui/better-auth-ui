@@ -25,12 +25,12 @@
     {
       "path": "src/lib/auth/passkey-plugin.ts",
       "type": "registry:lib",
-      "content": "import { createAuthPlugin } from \"@better-auth-ui/core\"\nimport {\n  passkeyPlugin as corePasskeyPlugin,\n  type PasskeyPluginOptions\n} from \"@better-auth-ui/core/plugins\"\n\nimport { PasskeyButton } from \"@/components/auth/passkey/passkey-button\"\nimport { PasskeysSettings as Passkeys } from \"@/components/auth/passkey/passkeys\"\n\nexport const passkeyPlugin = createAuthPlugin(\n  corePasskeyPlugin.id,\n  (options: PasskeyPluginOptions = {}) => ({\n    ...corePasskeyPlugin(options),\n    authButtons: [PasskeyButton],\n    securityCards: [Passkeys]\n  })\n)\n"
+      "content": "import { createAuthPlugin } from \"@better-auth-ui/core\"\nimport {\n  passkeyPlugin as corePasskeyPlugin,\n  type PasskeyPluginOptions\n} from \"@better-auth-ui/core/plugins/passkey\"\n\nimport { PasskeyButton } from \"@/components/auth/passkey/passkey-button\"\nimport { PasskeysSettings as Passkeys } from \"@/components/auth/passkey/passkeys\"\n\nexport const passkeyPlugin = createAuthPlugin(\n  corePasskeyPlugin.id,\n  (options: PasskeyPluginOptions = {}) => ({\n    ...corePasskeyPlugin(options),\n    authButtons: [PasskeyButton],\n    securityCards: [Passkeys]\n  })\n)\n"
     },
     {
       "path": "src/components/auth/passkey/passkey-localization.ts",
       "type": "registry:component",
-      "content": "import type { AuthPlugin } from \"@better-auth-ui/core\"\nimport {\n  passkeyPlugin as corePasskeyPlugin,\n  type PasskeyLocalization,\n  passkeyLocalization\n} from \"@better-auth-ui/core/plugins\"\n\nexport function passkeyLabels(auth: { plugins: AuthPlugin[] }) {\n  const plugin = auth.plugins.find(\n    (plugin) => plugin.id === corePasskeyPlugin.id\n  )\n\n  return {\n    ...passkeyLocalization,\n    ...(plugin?.localization as Partial<PasskeyLocalization> | undefined)\n  }\n}\n"
+      "content": "import type { AuthPlugin } from \"@better-auth-ui/core\"\nimport {\n  passkeyPlugin as corePasskeyPlugin,\n  type PasskeyLocalization,\n  passkeyLocalization\n} from \"@better-auth-ui/core/plugins/passkey\"\n\nexport function passkeyLabels(auth: { plugins: AuthPlugin[] }) {\n  const plugin = auth.plugins.find(\n    (plugin) => plugin.id === corePasskeyPlugin.id\n  )\n\n  return {\n    ...passkeyLocalization,\n    ...(plugin?.localization as Partial<PasskeyLocalization> | undefined)\n  }\n}\n"
     },
     {
       "path": "src/components/auth/passkey/passkey-button.tsx",

@@ -1,4 +1,4 @@
-import { apiKeyLocalization } from "@better-auth-ui/core/plugins"
+import { apiKeyLocalization } from "@better-auth-ui/core/plugins/api-key"
 import {
   type ApiKeyAuthClient,
   createAuthMutation,

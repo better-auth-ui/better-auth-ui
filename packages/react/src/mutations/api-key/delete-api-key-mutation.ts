@@ -1,7 +1,7 @@
 import {
   apiKeyMutationKeys,
   apiKeyQueryKeys
-} from "@better-auth-ui/core/plugins"
+} from "@better-auth-ui/core/plugins/api-key"
 import {
   mutationOptions,
   type QueryClient,

@@ -1,5 +1,5 @@
 import { authQueryKeys } from "@better-auth-ui/core"
-import { deleteUserPlugin } from "@better-auth-ui/core/plugins"
+import { deleteUserPlugin } from "@better-auth-ui/core/plugins/delete-user"
 import { createAuthClient } from "@better-auth-ui/solid"
 import { QueryClient } from "@tanstack/solid-query"
 import type { Meta, StoryObj } from "storybook-solidjs-vite"

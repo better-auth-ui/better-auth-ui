@@ -2,7 +2,7 @@ import { authQueryKeys } from "@better-auth-ui/core"
 import {
   multiSessionMutationKeys,
   multiSessionQueryKeys
-} from "@better-auth-ui/core/plugins"
+} from "@better-auth-ui/core/plugins/multi-session"
 import type { MultiSessionAuthClient } from "../../lib/auth-client"
 import { createAuthMutationOptions } from "../create-auth-mutation"
 import { useSessionScopedMutation } from "../use-session-scoped-mutation"

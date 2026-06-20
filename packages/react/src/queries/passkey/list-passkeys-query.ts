@@ -1,4 +1,4 @@
-import { passkeyQueryKeys } from "@better-auth-ui/core/plugins"
+import { passkeyQueryKeys } from "@better-auth-ui/core/plugins/passkey"
 import {
   type DataTag,
   type QueryClient,

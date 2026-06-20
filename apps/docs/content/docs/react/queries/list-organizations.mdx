@@ -38,10 +38,10 @@ const organizations = await fetchListOrganizations(queryClient, authClient, user
 
 ## Server-side prefetching
 
-For server loaders, import from `@better-auth-ui/react/server`. The server helper uses your Better Auth server instance and the signed-in `userId` so the cache key stays partitioned per user.
+For server loaders, import from `@better-auth-ui/core/server`. The server helper uses your Better Auth server instance and the signed-in `userId` so the cache key stays partitioned per user.
 
 ```ts
-import { ensureListOrganizations } from "@better-auth-ui/react/server"
+import { ensureListOrganizations } from "@better-auth-ui/core/server"
 import { getRequestHeaders } from "@tanstack/react-start/server"
 
 import { auth } from "@/lib/auth"

@@ -2232,12 +2232,7 @@ describe("Solid registry isolation", () => {
     const report = verifyLocalRegistryCoherence()
 
     expect(report.packageName).toBe("@better-auth-ui/solid")
-    expect(report.packageExports).toEqual([
-      ".",
-      "./email",
-      "./server",
-      "./plugins"
-    ])
+    expect(report.packageExports).toEqual([".", "./email", "./plugins"])
     expect(report.exampleSolidDependency).toBe("*")
     expect(report.staticItemNames).toEqual(expectedSolidRegistryPayloadNames)
     expect(report.missingStaticFiles).toEqual([])
@@ -2325,7 +2320,7 @@ describe("Solid registry isolation", () => {
     expect(solidMutationsDoc).toContain("createApiKeyOptions")
     expect(solidQueriesDoc).toContain("listPasskeysOptions")
     expect(solidQueriesDoc).toContain("listApiKeysOptions")
-    expect(solidSsrDoc).toContain("@better-auth-ui/solid/server")
+    expect(solidSsrDoc).toContain("@better-auth-ui/core/server")
   })
 
   it("keeps the top-level Solid and Zaidan docs IA ownership explicit", () => {
@@ -2696,7 +2691,7 @@ describe("Solid registry isolation", () => {
     expect(combinedSolidPackageDocs).toContain("listPasskeysOptions")
     expect(combinedSolidPackageDocs).toContain("createApiKeyOptions")
     expect(combinedSolidPackageDocs).toContain("signInUsernameOptions")
-    expect(combinedSolidPackageDocs).toContain("@better-auth-ui/solid/server")
+    expect(combinedSolidPackageDocs).toContain("@better-auth-ui/core/server")
     expect(combinedSolidPackageDocs).not.toContain(
       "@better-auth-ui/solid/plugins"
     )
@@ -3006,7 +3001,7 @@ describe("Solid registry isolation", () => {
       "npx shadcn@latest add https://better-auth-ui.com/r/solid/delete-user.json"
     )
     expect(deleteUserPluginDoc).toContain(
-      'import { deleteUserPlugin } from "@better-auth-ui/core/plugins"'
+      'import { deleteUserPlugin } from "@better-auth-ui/core/plugins/delete-user"'
     )
     expect(deleteUserPluginDoc).toContain("plugins={[deleteUserPlugin()]}")
     expect(deleteUserPluginDoc).toContain('name="DangerZoneProps"')
@@ -3271,7 +3266,7 @@ describe("Solid registry isolation", () => {
       "ensureSessionServer(queryClient, auth"
     )
     expect(organizationPluginDoc).toContain(
-      "ensureSessionClient(queryClient, authClient)"
+      "ensureSession(queryClient, authClient)"
     )
     expect(organizationPluginDoc).toContain(
       "validOrganizationPaths.includes(path)"

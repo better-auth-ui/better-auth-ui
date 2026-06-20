@@ -1,5 +1,5 @@
 import { authQueryKeys } from "@better-auth-ui/core"
-import { passkeyMutationKeys } from "@better-auth-ui/core/plugins"
+import { passkeyMutationKeys } from "@better-auth-ui/core/plugins/passkey"
 import type { PasskeyAuthClient } from "../../lib/auth-client"
 import { createAuthMutationOptions } from "../create-auth-mutation"
 

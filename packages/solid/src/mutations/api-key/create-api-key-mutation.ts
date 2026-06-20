@@ -1,7 +1,7 @@
 import {
   apiKeyMutationKeys,
   apiKeyQueryKeys
-} from "@better-auth-ui/core/plugins"
+} from "@better-auth-ui/core/plugins/api-key"
 import type { ApiKeyAuthClient } from "../../lib/auth-client"
 import { createAuthMutationOptions } from "../create-auth-mutation"
 import { useSessionScopedMutation } from "../use-session-scoped-mutation"

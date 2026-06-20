@@ -3,19 +3,18 @@ import type { BetterFetchError } from "better-auth/client"
 import type { AuthClient, InferData } from "../../lib/auth-client"
 import { authQueryKeys } from "../../lib/auth-query-keys"
 
-export type SessionAuthClient = Pick<AuthClient, "getSession">
-
-export type SessionData<TAuthClient extends SessionAuthClient = AuthClient> =
+export type SessionData<TAuthClient extends AuthClient = AuthClient> =
   InferData<TAuthClient["getSession"]>
 
-export type Session<TAuthClient extends SessionAuthClient = AuthClient> =
-  NonNullable<SessionData<TAuthClient>>
+export type Session<TAuthClient extends AuthClient = AuthClient> = NonNullable<
+  SessionData<TAuthClient>
+>
 
-export type SessionParams<TAuthClient extends SessionAuthClient> = Parameters<
+export type SessionParams<TAuthClient extends AuthClient> = Parameters<
   TAuthClient["getSession"]
 >[0]
 
-export type SessionOptions<TAuthClient extends SessionAuthClient> = Omit<
+export type SessionOptions<TAuthClient extends AuthClient> = Omit<
   ReturnType<typeof sessionOptions<TAuthClient>>,
   "queryKey" | "queryFn"
 >
@@ -29,7 +28,7 @@ export type SessionOptions<TAuthClient extends SessionAuthClient> = Omit<
  * @param authClient - The Better Auth client.
  * @param params - Parameters forwarded to `authClient.getSession`.
  */
-export function sessionOptions<TAuthClient extends SessionAuthClient>(
+export function sessionOptions<TAuthClient extends AuthClient>(
   authClient: TAuthClient,
   params?: SessionParams<TAuthClient>
 ) {
@@ -59,7 +58,7 @@ export function sessionOptions<TAuthClient extends SessionAuthClient>(
  * @param authClient - The Better Auth client.
  * @param params - Parameters forwarded to `authClient.getSession`.
  */
-export const ensureSession = <TAuthClient extends SessionAuthClient>(
+export const ensureSession = <TAuthClient extends AuthClient>(
   queryClient: QueryClient,
   authClient: TAuthClient,
   params?: SessionParams<TAuthClient>
@@ -74,7 +73,7 @@ export const ensureSession = <TAuthClient extends SessionAuthClient>(
  * @param authClient - The Better Auth client.
  * @param params - Parameters forwarded to `authClient.getSession`.
  */
-export const prefetchSession = <TAuthClient extends SessionAuthClient>(
+export const prefetchSession = <TAuthClient extends AuthClient>(
   queryClient: QueryClient,
   authClient: TAuthClient,
   params?: SessionParams<TAuthClient>
@@ -90,7 +89,7 @@ export const prefetchSession = <TAuthClient extends SessionAuthClient>(
  * @param authClient - The Better Auth client.
  * @param params - Parameters forwarded to `authClient.getSession`.
  */
-export const fetchSession = <TAuthClient extends SessionAuthClient>(
+export const fetchSession = <TAuthClient extends AuthClient>(
   queryClient: QueryClient,
   authClient: TAuthClient,
   params?: SessionParams<TAuthClient>

@@ -38,10 +38,10 @@ const organization = await fetchFullOrganization(queryClient, authClient, userId
 
 ## Server-side prefetching
 
-For server loaders, import from `@better-auth-ui/react/server`. The server helper calls your Better Auth server instance directly and accepts the same request params forwarded to `auth.api.getFullOrganization`.
+For server loaders, import from `@better-auth-ui/core/server`. The server helper calls your Better Auth server instance directly and accepts the same request params forwarded to `auth.api.getFullOrganization`.
 
 ```ts
-import { ensureFullOrganization } from "@better-auth-ui/react/server"
+import { ensureFullOrganization } from "@better-auth-ui/core/server"
 import { getRequestHeaders } from "@tanstack/react-start/server"
 
 import { auth } from "@/lib/auth"

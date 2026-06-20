@@ -1,7 +1,7 @@
 import {
   passkeyMutationKeys,
   passkeyQueryKeys
-} from "@better-auth-ui/core/plugins"
+} from "@better-auth-ui/core/plugins/passkey"
 import {
   mutationOptions,
   type QueryClient,

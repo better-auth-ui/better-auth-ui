@@ -1,4 +1,4 @@
-import { magicLinkMutationKeys } from "@better-auth-ui/core/plugins"
+import { magicLinkMutationKeys } from "@better-auth-ui/core/plugins/magic-link"
 import { mutationOptions, useMutation } from "@tanstack/react-query"
 import type { BetterFetchError } from "better-auth/react"
 

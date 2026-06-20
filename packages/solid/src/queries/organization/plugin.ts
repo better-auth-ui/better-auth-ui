@@ -1,4 +1,4 @@
-import { organizationPlugin } from "@better-auth-ui/core/plugins"
+import { organizationPlugin } from "@better-auth-ui/core/plugins/organization"
 import { useAuth } from "../../lib/auth-provider"
 
 export function useOrganizationSlug() {

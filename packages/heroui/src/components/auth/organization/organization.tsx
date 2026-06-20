@@ -1,4 +1,4 @@
-import type { OrganizationView } from "@better-auth-ui/core/plugins"
+import type { OrganizationView } from "@better-auth-ui/core/plugins/organization"
 import {
   type OrganizationAuthClient,
   useActiveOrganization,

@@ -1,7 +1,7 @@
 import {
   multiSessionMutationKeys,
   multiSessionQueryKeys
-} from "@better-auth-ui/core/plugins"
+} from "@better-auth-ui/core/plugins/multi-session"
 import {
   mutationOptions,
   type QueryClient,

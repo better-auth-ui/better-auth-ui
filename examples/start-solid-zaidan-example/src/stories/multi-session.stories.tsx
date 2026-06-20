@@ -1,5 +1,5 @@
 import { authQueryKeys } from "@better-auth-ui/core"
-import { multiSessionQueryKeys } from "@better-auth-ui/core/plugins"
+import { multiSessionQueryKeys } from "@better-auth-ui/core/plugins/multi-session"
 import type { MultiSessionAuthClient } from "@better-auth-ui/solid"
 import { QueryClient } from "@tanstack/solid-query"
 import {

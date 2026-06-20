@@ -14,7 +14,7 @@ Use [Zaidan](/docs/zaidan) when your job is installing copied Solid components o
 2. Create a Better Auth client with `createAuthClient`.
 3. Wrap your app with `AuthProvider` and pass a `QueryClient`.
 4. Use query and mutation option factories from `@better-auth-ui/solid` in your components.
-5. Use `@better-auth-ui/solid/server` only at server boundaries that need server-side session data.
+5. Use `@better-auth-ui/core/server` only at server boundaries that need server-side session data.
 
 ```package-install
 @better-auth-ui/solid @tanstack/solid-query better-auth solid-js
@@ -25,7 +25,7 @@ Use [Zaidan](/docs/zaidan) when your job is installing copied Solid components o
 | Export | Owns |
 | --- | --- |
 | `@better-auth-ui/solid` | `createAuthClient`, `AuthProvider`, `useAuth`, auth config types, provider icons, query factories, mutation factories, and hooks such as `useSession`. |
-| `@better-auth-ui/solid/server` | Server-safe query helpers and auth server types for SSR boundaries. |
+| `@better-auth-ui/core/server` | Server-safe query helpers and auth server types for SSR boundaries. |
 
 ## What belongs elsewhere
 

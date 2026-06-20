@@ -1,7 +1,7 @@
 import {
   passkeyMutationKeys,
   passkeyQueryKeys
-} from "@better-auth-ui/core/plugins"
+} from "@better-auth-ui/core/plugins/passkey"
 import type { PasskeyAuthClient } from "../../lib/auth-client"
 import { createAuthMutationOptions } from "../create-auth-mutation"
 import { useSessionScopedMutation } from "../use-session-scoped-mutation"

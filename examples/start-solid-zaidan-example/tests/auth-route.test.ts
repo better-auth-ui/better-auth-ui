@@ -135,7 +135,7 @@ describe("Solid auth route component selection", () => {
     expect(providers).toContain('from "@/lib/auth/multi-session-plugin"')
     expect(providers).toContain("multiSessionPlugin()")
     expect(providers).not.toContain(
-      'multiSessionPlugin\n} from "@better-auth-ui/core/plugins"'
+      'multiSessionPlugin\n} from "@better-auth-ui/core/plugins/delete-user"'
     )
     expect(providers).toContain("apiKeyPlugin({ organization: true })")
     expect(providers).toContain("passkeyPlugin()")
@@ -572,7 +572,7 @@ describe("Solid auth route component selection", () => {
     expect(settingsRoute).toContain("async beforeLoad")
     expect(settingsRoute).toContain("createIsomorphicFn()")
     expect(settingsRoute).toContain("ensureSessionServer")
-    expect(settingsRoute).toContain("ensureSessionClient")
+    expect(settingsRoute).toContain("ensureSession")
     expect(settingsRoute).toContain("getRequestHeaders()")
     expect(settingsRoute).toContain('to: "/auth/$path"')
     expect(settingsRoute).toContain('params: { path: "sign-in" }')

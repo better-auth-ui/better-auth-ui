@@ -1,7 +1,7 @@
 import {
   organizationLocalization as defaultOrganizationLocalization,
   type OrganizationLocalization
-} from "@better-auth-ui/core/plugins"
+} from "@better-auth-ui/core/plugins/organization"
 import type { OrganizationAuthClient } from "@better-auth-ui/solid"
 import {
   useActiveOrganization,

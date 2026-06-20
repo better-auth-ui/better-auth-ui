@@ -29,7 +29,7 @@
     },
     {
       "path": "src/lib/auth/passkey-plugin.ts",
-      "content": "import { createAuthPlugin } from \"@better-auth-ui/core\"\nimport {\n  passkeyPlugin as corePasskeyPlugin,\n  type PasskeyPluginOptions\n} from \"@better-auth-ui/core/plugins\"\n\nimport { PasskeyButton } from \"@/components/auth/passkey/passkey-button\"\nimport { Passkeys } from \"@/components/auth/passkey/passkeys\"\n\nexport const passkeyPlugin = createAuthPlugin(\n  corePasskeyPlugin.id,\n  (options: PasskeyPluginOptions = {}) => ({\n    ...corePasskeyPlugin(options),\n    authButtons: [PasskeyButton],\n    securityCards: [Passkeys]\n  })\n)\n",
+      "content": "import { createAuthPlugin } from \"@better-auth-ui/core\"\nimport {\n  passkeyPlugin as corePasskeyPlugin,\n  type PasskeyPluginOptions\n} from \"@better-auth-ui/core/plugins/passkey\"\n\nimport { PasskeyButton } from \"@/components/auth/passkey/passkey-button\"\nimport { Passkeys } from \"@/components/auth/passkey/passkeys\"\n\nexport const passkeyPlugin = createAuthPlugin(\n  corePasskeyPlugin.id,\n  (options: PasskeyPluginOptions = {}) => ({\n    ...corePasskeyPlugin(options),\n    authButtons: [PasskeyButton],\n    securityCards: [Passkeys]\n  })\n)\n",
       "type": "registry:lib",
       "target": "@lib/auth/passkey-plugin.ts"
     },

@@ -27,7 +27,7 @@
     },
     {
       "path": "src/lib/auth/multi-session-plugin.ts",
-      "content": "import { createAuthPlugin } from \"@better-auth-ui/core\"\nimport {\n  multiSessionPlugin as coreMultiSessionPlugin,\n  type MultiSessionPluginOptions\n} from \"@better-auth-ui/core/plugins\"\n\nimport { ManageAccounts } from \"@/components/auth/multi-session/manage-accounts\"\nimport { SwitchAccountSubmenu } from \"@/components/auth/multi-session/switch-account-submenu\"\n\nexport const multiSessionPlugin = createAuthPlugin(\n  coreMultiSessionPlugin.id,\n  (options: MultiSessionPluginOptions = {}) => ({\n    ...coreMultiSessionPlugin(options),\n    accountCards: [ManageAccounts],\n    userMenuItems: [SwitchAccountSubmenu]\n  })\n)\n",
+      "content": "import { createAuthPlugin } from \"@better-auth-ui/core\"\nimport {\n  multiSessionPlugin as coreMultiSessionPlugin,\n  type MultiSessionPluginOptions\n} from \"@better-auth-ui/core/plugins/multi-session\"\n\nimport { ManageAccounts } from \"@/components/auth/multi-session/manage-accounts\"\nimport { SwitchAccountSubmenu } from \"@/components/auth/multi-session/switch-account-submenu\"\n\nexport const multiSessionPlugin = createAuthPlugin(\n  coreMultiSessionPlugin.id,\n  (options: MultiSessionPluginOptions = {}) => ({\n    ...coreMultiSessionPlugin(options),\n    accountCards: [ManageAccounts],\n    userMenuItems: [SwitchAccountSubmenu]\n  })\n)\n",
       "type": "registry:lib",
       "target": "@lib/auth/multi-session-plugin.ts"
     },

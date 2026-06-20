@@ -28,8 +28,7 @@ describe("@better-auth-ui/solid foundation", () => {
     expect(Object.keys(metadata.exports).sort()).toEqual([
       ".",
       "./email",
-      "./plugins",
-      "./server"
+      "./plugins"
     ])
     expect(metadata.exports).toHaveProperty("./email")
   })

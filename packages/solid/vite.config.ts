@@ -34,7 +34,6 @@ export default defineConfig({
     lib: {
       entry: {
         index: "src/index.ts",
-        server: "src/server.ts",
         plugins: "src/plugins.ts"
       },
       formats: ["es"],

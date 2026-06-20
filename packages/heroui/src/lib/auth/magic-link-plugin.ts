@@ -2,7 +2,7 @@ import { createAuthPlugin } from "@better-auth-ui/core"
 import {
   magicLinkPlugin as coreMagicLinkPlugin,
   type MagicLinkPluginOptions
-} from "@better-auth-ui/core/plugins"
+} from "@better-auth-ui/core/plugins/magic-link"
 
 import { MagicLink } from "../../components/auth/magic-link/magic-link"
 import { MagicLinkButton } from "../../components/auth/magic-link/magic-link-button"

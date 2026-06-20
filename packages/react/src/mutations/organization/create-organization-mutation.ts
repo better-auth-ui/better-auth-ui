@@ -1,7 +1,7 @@
 import {
   organizationMutationKeys,
   organizationQueryKeys
-} from "@better-auth-ui/core/plugins"
+} from "@better-auth-ui/core/plugins/organization"
 import {
   mutationOptions,
   type QueryClient,

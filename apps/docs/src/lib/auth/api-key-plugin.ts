@@ -2,7 +2,7 @@ import { createAuthPlugin } from "@better-auth-ui/core"
 import {
   type ApiKeyPluginOptions,
   apiKeyPlugin as coreApiKeyPlugin
-} from "@better-auth-ui/core/plugins"
+} from "@better-auth-ui/core/plugins/api-key"
 
 import { ApiKeys } from "@/components/auth/api-key/api-keys"
 import { OrganizationApiKeys } from "@/components/auth/api-key/organization-api-keys"

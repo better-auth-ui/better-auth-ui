@@ -1,4 +1,4 @@
-import { organizationMutationKeys } from "@better-auth-ui/core/plugins"
+import { organizationMutationKeys } from "@better-auth-ui/core/plugins/organization"
 import type { OrganizationAuthClient } from "../../lib/auth-client"
 import { memberRoleMeta } from "./metadata"
 import {

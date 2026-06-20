@@ -9,7 +9,6 @@ export default defineConfig({
       entry: {
         index: "src/index.ts",
         email: "src/email.ts",
-        server: "src/server.ts",
         plugins: "src/plugins.ts"
       },
       formats: ["es"]

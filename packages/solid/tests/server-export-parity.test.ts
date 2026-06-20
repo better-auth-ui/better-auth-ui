@@ -1,7 +1,9 @@
+import { existsSync } from "node:fs"
+import { join } from "node:path"
+import type { ApiKeyAuthServer } from "@better-auth-ui/core/plugins/api-key/server"
+import type { OrganizationAuthServer } from "@better-auth-ui/core/plugins/organization/server"
+import * as coreServer from "@better-auth-ui/core/server"
 import { describe, expect, expectTypeOf, it } from "vitest"
-import * as reactServer from "../../react/src/server"
-import type { ApiKeyAuthServer, OrganizationAuthServer } from "../src/server"
-import * as solidServer from "../src/server"
 
 const serverHelperExports = [
   "accountInfoOptions",
@@ -56,25 +58,30 @@ const serverHelperExports = [
   "prefetchListPasskeys",
   "prefetchListSessions",
   "prefetchListUserInvitations",
-  "sessionOptions",
-  "ensureSession",
-  "prefetchSession",
-  "fetchSession"
+  "sessionOptionsServer",
+  "ensureSessionServer",
+  "prefetchSessionServer",
+  "fetchSessionServer"
 ] as const
 
-describe("Solid server export parity", () => {
-  it("matches React's true server-auth helper surface", () => {
+describe("server helper exports", () => {
+  it("exposes true server-auth helpers from core/server", () => {
     for (const exportName of serverHelperExports) {
-      expect(exportName in reactServer, `React exports ${exportName}`).toBe(
-        true
-      )
-      expect(exportName in solidServer, `Solid exports ${exportName}`).toBe(
-        true
-      )
+      expect(
+        exportName in coreServer,
+        `core/server exports ${exportName}`
+      ).toBe(true)
     }
   })
 
-  it("exposes plugin-specific Solid server auth types", () => {
+  it("removes framework server entrypoints in favor of core/server", () => {
+    expect(existsSync(join(process.cwd(), "../react/src/server.ts"))).toBe(
+      false
+    )
+    expect(existsSync(join(process.cwd(), "src/server.ts"))).toBe(false)
+  })
+
+  it("keeps plugin-specific server auth types behind plugin server subpaths", () => {
     expectTypeOf<ApiKeyAuthServer>().toHaveProperty("api")
     expectTypeOf<OrganizationAuthServer>().toHaveProperty("api")
   })

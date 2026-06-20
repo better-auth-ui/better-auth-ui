@@ -1,4 +1,4 @@
-import { ensureSessionServer as ensureSession } from "@better-auth-ui/core/server"
+import { ensureSessionServer } from "@better-auth-ui/core/server"
 import { dehydrate, HydrationBoundary } from "@tanstack/react-query"
 import { headers } from "next/headers"
 import Link from "next/link"
@@ -12,7 +12,7 @@ export async function Header() {
   const requestHeaders = await headers()
   const queryClient = getQueryClient()
 
-  await ensureSession(queryClient, auth, { headers: requestHeaders })
+  await ensureSessionServer(queryClient, auth, { headers: requestHeaders })
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>

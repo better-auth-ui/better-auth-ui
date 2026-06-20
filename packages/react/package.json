@@ -24,11 +24,6 @@
       "types": "./dist/email.d.ts",
       "import": "./dist/email.js"
     },
-    "./server": {
-      "src": "./src/server.ts",
-      "types": "./dist/server.d.ts",
-      "import": "./dist/server.js"
-    },
     "./plugins": {
       "src": "./src/plugins.ts",
       "types": "./dist/plugins.d.ts",

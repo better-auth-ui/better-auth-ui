@@ -2,7 +2,7 @@ import {
   multiSessionPlugin as coreMultiSessionPlugin,
   type MultiSessionLocalization,
   multiSessionLocalization
-} from "@better-auth-ui/core/plugins"
+} from "@better-auth-ui/core/plugins/multi-session"
 import {
   createAuthMutation,
   listDeviceSessionsOptions,

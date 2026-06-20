@@ -1,5 +1,5 @@
 import { authQueryKeys } from "@better-auth-ui/core"
-import { deleteUserLocalization } from "@better-auth-ui/core/plugins"
+import { deleteUserLocalization } from "@better-auth-ui/core/plugins/delete-user"
 import {
   createAuthMutation,
   deleteUserOptions,

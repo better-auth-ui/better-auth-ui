@@ -1,4 +1,4 @@
-import { multiSessionQueryKeys } from "@better-auth-ui/core/plugins"
+import { multiSessionQueryKeys } from "@better-auth-ui/core/plugins/multi-session"
 import {
   type DataTag,
   type QueryClient,

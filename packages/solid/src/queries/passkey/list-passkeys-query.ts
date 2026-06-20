@@ -1,4 +1,4 @@
-import { passkeyQueryKeys } from "@better-auth-ui/core/plugins"
+import { passkeyQueryKeys } from "@better-auth-ui/core/plugins/passkey"
 import type { QueryClient } from "@tanstack/solid-query"
 import { useSession } from "../../hooks/queries/use-session"
 import type { InferData, PasskeyAuthClient } from "../../lib/auth-client"

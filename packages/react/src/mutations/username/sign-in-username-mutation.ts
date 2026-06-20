@@ -1,5 +1,5 @@
 import { authQueryKeys } from "@better-auth-ui/core"
-import { usernameMutationKeys } from "@better-auth-ui/core/plugins"
+import { usernameMutationKeys } from "@better-auth-ui/core/plugins/username"
 import {
   mutationOptions,
   type QueryClient,

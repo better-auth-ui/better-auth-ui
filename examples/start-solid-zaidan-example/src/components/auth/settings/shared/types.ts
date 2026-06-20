@@ -1,5 +1,5 @@
 import type { getProviderName, SettingsView } from "@better-auth-ui/core"
-import type { deleteUserLocalization } from "@better-auth-ui/core/plugins"
+import type { deleteUserLocalization } from "@better-auth-ui/core/plugins/delete-user"
 import type {
   ApiKeyAuthClient,
   ListApiKeysData,

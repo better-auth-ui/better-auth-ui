@@ -1,4 +1,4 @@
-import { organizationQueryKeys } from "@better-auth-ui/core/plugins"
+import { organizationQueryKeys } from "@better-auth-ui/core/plugins/organization"
 import {
   type DataTag,
   type QueryClient,

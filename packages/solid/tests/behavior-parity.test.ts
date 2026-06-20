@@ -8,17 +8,23 @@ import {
 } from "@better-auth-ui/core"
 import {
   apiKeyMutationKeys,
-  apiKeyQueryKeys,
-  deleteUserMutationKeys,
-  magicLinkMutationKeys,
+  apiKeyQueryKeys
+} from "@better-auth-ui/core/plugins/api-key"
+import { deleteUserMutationKeys } from "@better-auth-ui/core/plugins/delete-user"
+import { magicLinkMutationKeys } from "@better-auth-ui/core/plugins/magic-link"
+import {
   multiSessionMutationKeys,
-  multiSessionQueryKeys,
+  multiSessionQueryKeys
+} from "@better-auth-ui/core/plugins/multi-session"
+import {
   organizationMutationKeys,
-  organizationQueryKeys,
+  organizationQueryKeys
+} from "@better-auth-ui/core/plugins/organization"
+import {
   passkeyMutationKeys,
-  passkeyQueryKeys,
-  usernameMutationKeys
-} from "@better-auth-ui/core/plugins"
+  passkeyQueryKeys
+} from "@better-auth-ui/core/plugins/passkey"
+import { usernameMutationKeys } from "@better-auth-ui/core/plugins/username"
 import { afterEach, describe, expect, it, vi } from "vitest"
 import {
   accountInfoOptions,

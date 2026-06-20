@@ -94,7 +94,7 @@ Use `ensureSession` in `beforeLoad` to gate protected routes. In TanStack Start,
 
 ```tsx title="src/routes/settings/$path.tsx"
 import { viewPaths } from "@better-auth-ui/core"
-import { ensureSession as ensureSessionClient } from "@better-auth-ui/core"
+import { ensureSession } from "@better-auth-ui/core"
 import { ensureSessionServer } from "@better-auth-ui/core/server"
 import { createFileRoute, notFound, redirect } from "@tanstack/solid-router"
 import { createIsomorphicFn } from "@tanstack/solid-start"
@@ -110,15 +110,15 @@ export const Route = createFileRoute("/settings/$path")({
       throw notFound()
     }
 
-    const ensureSession = createIsomorphicFn()
+    const ensureSessionIso = createIsomorphicFn()
       .server(() =>
         ensureSessionServer(queryClient, auth, {
           headers: getRequestHeaders()
         })
       )
-      .client(() => ensureSessionClient(queryClient, authClient))
+      .client(() => ensureSession(queryClient, authClient))
 
-    const session = await ensureSession()
+    const session = await ensureSessionIso()
 
     if (!session) {
       throw redirect({
@@ -158,14 +158,14 @@ export const Route = createFileRoute("/")({
 })
 ```
 
-The same pattern works for Solid read helpers that expose client-shaped loader helpers — for example `prefetchListAccounts`, `prefetchListApiKeys`, and `prefetchActiveOrganization` live in `@better-auth-ui/solid` next to their options factories. When you want to call the Better Auth server instance directly instead, use the matching server-auth helpers from `@better-auth-ui/solid/server`.
+The same pattern works for Solid read helpers that expose client-shaped loader helpers — for example `prefetchListAccounts`, `prefetchListApiKeys`, and `prefetchActiveOrganization` live in `@better-auth-ui/solid` next to their options factories. When you want to call the Better Auth server instance directly instead, use the matching server-auth helpers from `@better-auth-ui/core/server`.
 
 ## Server-only helpers
 
 If you'd rather skip the HTTP round-trip for the session and hit the Better Auth server directly from a TanStack Start server function (or any other server runtime), import the session helpers from `@better-auth-ui/core/server`. They accept your Better Auth server instance instead of an `authClient`:
 
 ```ts title="src/lib/session.ts"
-import { ensureSessionServer as ensureSession } from "@better-auth-ui/core/server"
+import { ensureSessionServer } from "@better-auth-ui/core/server"
 import type { QueryClient } from "@tanstack/solid-query"
 import { createServerFn } from "@tanstack/solid-start"
 import { getRequestHeaders } from "@tanstack/solid-start/server"
@@ -177,15 +177,15 @@ const getSession = createServerFn().handler(() =>
 )
 
 export const ensureServerSession = (queryClient: QueryClient) =>
-  ensureSession(queryClient, auth, { headers: getRequestHeaders() })
+  ensureSessionServer(queryClient, auth, { headers: getRequestHeaders() })
 ```
 
-Session server-auth helpers are canonical from `@better-auth-ui/core/server` as `sessionOptionsServer`, `ensureSessionServer`, `prefetchSessionServer`, and `fetchSessionServer`. The Solid server entrypoint also keeps compatibility aliases (`sessionOptions`, `ensureSession`, `prefetchSession`, `fetchSession`) and mirrors React's supported non-session read helpers with server-auth signatures.
+Session server-auth helpers are canonical from `@better-auth-ui/core/server` as `sessionOptionsServer`, `ensureSessionServer`, `prefetchSessionServer`, and `fetchSessionServer`.
 
-Available `@better-auth-ui/solid/server` exports include:
+Available `@better-auth-ui/core/server` exports include:
 
-- Session compatibility helpers: `sessionOptions`, `ensureSession`, `prefetchSession`, `fetchSession`
-- Server auth types: `AuthServer`, `ApiKeyAuthServer`, `MagicLinkAuthServer`, `MultiSessionAuthServer`, `OrganizationAuthServer`, `PasskeyAuthServer`, `UsernameAuthServer`
+- Session helpers: `sessionOptionsServer`, `ensureSessionServer`, `prefetchSessionServer`, `fetchSessionServer`
+- Base server auth type: `AuthServer`
 - Settings/passkey: `listAccountsOptions`, `ensureListAccounts`, `prefetchListAccounts`, `fetchListAccounts`, `accountInfoOptions`, `ensureAccountInfo`, `listSessionsOptions`, `ensureListSessions`, `listDeviceSessionsOptions`, `ensureListDeviceSessions`, `listPasskeysOptions`, and `ensureListPasskeys` with matching prefetch/fetch helpers
 - API-key: `listApiKeysOptions`, `ensureListApiKeys`, `prefetchListApiKeys`, `fetchListApiKeys`
 - Organization: `activeOrganizationOptions`, `ensureActiveOrganization`, `prefetchActiveOrganization`, `fetchActiveOrganization`, `fullOrganizationOptions`, `ensureFullOrganization`, `listOrganizationsOptions`, `ensureListOrganizations`, `listOrganizationMembersOptions`, `ensureListOrganizationMembers`, `listOrganizationInvitationsOptions`, `ensureListOrganizationInvitations`, `listUserInvitationsOptions`, `ensureListUserInvitations`, `hasPermissionOptions`, and `ensureHasPermission` with matching prefetch/fetch helpers

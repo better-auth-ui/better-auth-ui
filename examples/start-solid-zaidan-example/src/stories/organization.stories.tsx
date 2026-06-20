@@ -1,5 +1,5 @@
 import { authQueryKeys } from "@better-auth-ui/core"
-import { organizationQueryKeys } from "@better-auth-ui/core/plugins"
+import { organizationQueryKeys } from "@better-auth-ui/core/plugins/organization"
 import type { OrganizationAuthClient } from "@better-auth-ui/solid"
 import { QueryClient } from "@tanstack/solid-query"
 import {

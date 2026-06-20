@@ -1,5 +1,5 @@
 import {
-  type SessionAuthClient,
+  type AuthClient,
   type SessionData,
   type SessionOptions,
   type SessionParams,
@@ -12,7 +12,7 @@ import {
 } from "@tanstack/solid-query"
 import type { BetterFetchError } from "better-auth/client"
 
-export type UseSessionOptions<TAuthClient extends SessionAuthClient> = Omit<
+export type UseSessionOptions<TAuthClient extends AuthClient> = Omit<
   QueryOptions<
     SessionData<TAuthClient>,
     BetterFetchError,
@@ -23,7 +23,7 @@ export type UseSessionOptions<TAuthClient extends SessionAuthClient> = Omit<
   SessionOptions<TAuthClient> &
   SessionParams<TAuthClient>
 
-export function useSession<TAuthClient extends SessionAuthClient>(
+export function useSession<TAuthClient extends AuthClient>(
   authClient: TAuthClient,
   options: UseSessionOptions<TAuthClient> = {}
 ): UseQueryResult<SessionData<TAuthClient>, BetterFetchError> {
@@ -31,7 +31,7 @@ export function useSession<TAuthClient extends SessionAuthClient>(
     const { query, fetchOptions, ...queryOptions } = options
 
     return {
-      ...sessionOptions(authClient as never, { query, fetchOptions } as never),
+      ...sessionOptions(authClient, { query, fetchOptions }),
       ...queryOptions
     } as never
   }) as UseQueryResult<SessionData<TAuthClient>, BetterFetchError>

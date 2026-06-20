@@ -1,4 +1,4 @@
-import { organizationLocalization } from "@better-auth-ui/core/plugins"
+import { organizationLocalization } from "@better-auth-ui/core/plugins/organization"
 import type { OrganizationAuthClient } from "@better-auth-ui/solid"
 import { useAuth, useListUserInvitations } from "@better-auth-ui/solid"
 import { For, Show } from "solid-js"

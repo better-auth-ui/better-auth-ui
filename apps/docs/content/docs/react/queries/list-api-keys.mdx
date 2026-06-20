@@ -32,10 +32,10 @@ const apiKeys = await fetchListApiKeys(queryClient, authClient, userId)
 
 ## Server-side prefetching
 
-For server loaders, import from `@better-auth-ui/react/server`. These helpers call your Better Auth server instance directly, so they take `auth`, the signed-in `userId`, and request params instead of an `authClient`.
+For server loaders, import from `@better-auth-ui/core/server`. These helpers call your Better Auth server instance directly, so they take `auth`, the signed-in `userId`, and request params instead of an `authClient`.
 
 ```ts
-import { ensureListApiKeys } from "@better-auth-ui/react/server"
+import { ensureListApiKeys } from "@better-auth-ui/core/server"
 import { getRequestHeaders } from "@tanstack/react-start/server"
 
 import { auth } from "@/lib/auth"

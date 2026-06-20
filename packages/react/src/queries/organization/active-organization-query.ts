@@ -1,7 +1,7 @@
 import {
   organizationPlugin,
   organizationQueryKeys
-} from "@better-auth-ui/core/plugins"
+} from "@better-auth-ui/core/plugins/organization"
 import {
   type DataTag,
   type QueryClient,
