@@ -5,10 +5,30 @@ import {
   type SessionParams,
   sessionOptions
 } from "@better-auth-ui/core"
-import { createQuery } from "@tanstack/solid-query"
+import {
+  createQuery,
+  type QueryOptions as SolidQueryOptions
+} from "@tanstack/solid-query"
+import type { BetterFetchError } from "better-auth/client"
+
+type SessionQueryKey<TAuthClient extends AuthClient> = ReturnType<
+  typeof sessionOptions<TAuthClient>
+>["queryKey"]
+
+type SolidSessionOptions<TAuthClient extends AuthClient> = Omit<
+  SolidQueryOptions<
+    SessionData<TAuthClient>,
+    BetterFetchError,
+    SessionData<TAuthClient>,
+    SessionQueryKey<TAuthClient>
+  >,
+  "queryKey" | "queryFn"
+>
 
 export type UseSessionOptions<TAuthClient extends AuthClient> =
-  SessionOptions<TAuthClient> & SessionParams<TAuthClient>
+  SolidSessionOptions<TAuthClient> &
+    SessionOptions<TAuthClient> &
+    SessionParams<TAuthClient>
 
 export function useSession<TAuthClient extends AuthClient>(
   authClient: TAuthClient,
