@@ -5,7 +5,10 @@ export type OmitUseKeys<T> = {
   [K in keyof T as K extends `use${string}` ? never : K]: T[K]
 }
 
-export type AuthClient = OmitUseKeys<ReturnType<typeof createAuthClient>>
+export type AuthClient = Omit<
+  OmitUseKeys<ReturnType<typeof createAuthClient>>,
+  "$store"
+>
 
 /**
  * Unwraps a Better Auth client method's `data` payload.
