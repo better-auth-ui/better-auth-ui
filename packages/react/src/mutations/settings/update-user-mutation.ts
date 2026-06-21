@@ -1,6 +1,5 @@
 import {
   type AuthClient,
-  authQueryKeys,
   type UpdateUserOptions,
   updateUserOptions
 } from "@better-auth-ui/core"
@@ -23,10 +22,7 @@ export function useUpdateUser<TAuthClient extends AuthClient>(
   return useMutation(
     {
       ...updateUserOptions(authClient),
-      ...options,
-      meta: {
-        awaits: [authQueryKeys.session]
-      }
+      ...options
     },
     queryClient
   )
