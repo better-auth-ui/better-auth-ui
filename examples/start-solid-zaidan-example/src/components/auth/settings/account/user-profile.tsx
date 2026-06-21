@@ -21,8 +21,8 @@ export function UserProfile(props: UserProfileProps = {}) {
   const auth = useAuth()
   const session = useSession(auth.authClient)
   const [name, setName] = createSignal("")
-  const updateUser = updateUserMutation(auth.authClient)
-  const isProfilePending = () => updateUser.isPending
+  const { mutate: updateUser, isPending: updateUserPending } =
+    updateUserMutation(auth.authClient)
 
   const profileFields = () =>
     auth.additionalFields?.filter((field) => field.profile !== false) ?? []
@@ -56,10 +56,10 @@ export function UserProfile(props: UserProfileProps = {}) {
       }
     }
 
-    updateUser.mutate({
+    updateUser({
       name,
       ...additionalFieldValues
-    } as Parameters<typeof updateUser.mutate>[0])
+    })
   }
 
   return (
@@ -76,7 +76,7 @@ export function UserProfile(props: UserProfileProps = {}) {
               <Label for="settings-name">{auth.localization.auth.name}</Label>
               <Input
                 autocomplete="name"
-                disabled={isProfilePending()}
+                disabled={updateUserPending}
                 id="settings-name"
                 name="name"
                 onInput={(event) => setName(event.currentTarget.value)}
@@ -99,7 +99,7 @@ export function UserProfile(props: UserProfileProps = {}) {
                       ...field,
                       defaultValue: value() as AdditionalFieldValue | null
                     }}
-                    isPending={isProfilePending() || !session.data}
+                    isPending={updateUserPending || !session.data}
                     name={field.name}
                   />
                 )
@@ -109,7 +109,7 @@ export function UserProfile(props: UserProfileProps = {}) {
           <CardFooter>
             <Button
               aria-label="Save changes"
-              disabled={isProfilePending() || !session.data}
+              disabled={updateUserPending || !session.data}
               size="sm"
               type="submit"
             >
