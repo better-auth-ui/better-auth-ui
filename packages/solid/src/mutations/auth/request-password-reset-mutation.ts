@@ -1,15 +1,19 @@
-import { authMutationKeys } from "@better-auth-ui/core"
-import type { AuthClient } from "../../lib/auth-client"
-import { createAuthMutationOptions } from "../create-auth-mutation"
+import {
+  type AuthClient,
+  type RequestPasswordResetOptions,
+  requestPasswordResetOptions
+} from "@better-auth-ui/core"
+import { useMutation } from "@tanstack/solid-query"
 
-export type RequestPasswordResetParams<TAuthClient extends AuthClient> =
-  Parameters<TAuthClient["requestPasswordReset"]>[0]
+export type { RequestPasswordResetParams } from "@better-auth-ui/core"
 
-export function requestPasswordResetOptions<TAuthClient extends AuthClient>(
-  authClient: TAuthClient
+export function useRequestPasswordReset<TAuthClient extends AuthClient>(
+  authClient: TAuthClient,
+  options?: RequestPasswordResetOptions<TAuthClient>
 ) {
-  return createAuthMutationOptions(
-    authClient.requestPasswordReset,
-    authMutationKeys.requestPasswordReset
-  )
+  return useMutation(() => ({
+    ...requestPasswordResetOptions(authClient),
+    ...options
+  }))
 }
+export const requestPasswordResetMutation = useRequestPasswordReset

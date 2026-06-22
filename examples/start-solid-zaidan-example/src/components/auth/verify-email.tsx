@@ -1,8 +1,5 @@
-import {
-  createAuthMutation,
-  sendVerificationEmailOptions,
-  useAuth
-} from "@better-auth-ui/solid"
+import { sendVerificationEmailOptions } from "@better-auth-ui/core"
+import { createAuthMutation, useAuth } from "@better-auth-ui/solid"
 import { Link } from "@tanstack/solid-router"
 import { createSignal, onCleanup, onMount } from "solid-js"
 import { isServer } from "solid-js/web"

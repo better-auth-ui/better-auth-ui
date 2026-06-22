@@ -1,4 +1,5 @@
-import { listAccountsOptions, useAuth, useSession } from "@better-auth-ui/solid"
+import { listAccountsOptions } from "@better-auth-ui/core"
+import { useAuth, useSession } from "@better-auth-ui/solid"
 import { createQuery } from "@tanstack/solid-query"
 import { For, Show } from "solid-js"
 import { shouldLoadLinkedAccounts } from "@/components/auth/settings/shared/helpers"
@@ -26,7 +27,8 @@ export function LinkedAccountsSettings(
     enabled: shouldLoadLinkedAccounts({
       isSsr: import.meta.env.SSR,
       userId: userId()
-    })
+    }),
+    initialData: undefined
   }))
   const socialProviders = () => auth.socialProviders ?? []
   const linkedSocialAccounts = () =>

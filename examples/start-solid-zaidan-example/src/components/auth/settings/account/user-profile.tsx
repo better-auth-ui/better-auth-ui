@@ -2,7 +2,7 @@ import {
   type AdditionalFieldValue,
   parseAdditionalFieldValue
 } from "@better-auth-ui/core"
-import { updateUserMutation, useAuth, useSession } from "@better-auth-ui/solid"
+import { useAuth, useSession, useUpdateUser } from "@better-auth-ui/solid"
 import { createSignal, For } from "solid-js"
 import { toast } from "solid-sonner"
 import { AdditionalField } from "@/components/auth/additional-field"
@@ -21,7 +21,7 @@ export function UserProfile(props: UserProfileProps = {}) {
   const auth = useAuth()
   const session = useSession(auth.authClient)
   const [name, setName] = createSignal("")
-  const updateUser = updateUserMutation(auth.authClient, {
+  const updateUser = useUpdateUser(auth.authClient, {
     onSuccess: () =>
       toast.success(auth.localization.settings.profileUpdatedSuccess)
   })

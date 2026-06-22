@@ -1,7 +1,7 @@
 import {
   type CreateMutationOptions,
-  createMutation,
-  type MutationKey
+  type MutationKey,
+  useMutation
 } from "@tanstack/solid-query"
 import type { BetterFetchError } from "better-auth/client"
 import { useSession } from "../hooks/queries/use-session"
@@ -45,7 +45,7 @@ export function useSessionScopedMutation<
 ) {
   const session = useSession(authClient)
 
-  return createMutation(() => {
+  return useMutation(() => {
     const userId = (session.data as { user?: { id?: string } } | undefined)
       ?.user?.id
 

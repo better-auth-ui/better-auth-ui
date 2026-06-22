@@ -1,11 +1,9 @@
 import {
-  createAuthMutation,
   type ListSession,
   listSessionsOptions,
-  revokeSessionOptions,
-  useAuth,
-  useSession
-} from "@better-auth-ui/solid"
+  revokeSessionOptions
+} from "@better-auth-ui/core"
+import { createAuthMutation, useAuth, useSession } from "@better-auth-ui/solid"
 import { createQuery } from "@tanstack/solid-query"
 import { For, Show } from "solid-js"
 import { toast } from "solid-sonner"
@@ -33,7 +31,8 @@ export function ActiveSessionsSettings(
     enabled: shouldLoadDeviceSessions({
       isSsr: import.meta.env.SSR,
       userId: userId()
-    })
+    }),
+    initialData: undefined
   }))
   const sessions = () =>
     [...(activeSessions.data ?? [])].sort((activeSession) =>

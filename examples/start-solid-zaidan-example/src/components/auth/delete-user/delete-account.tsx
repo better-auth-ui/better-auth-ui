@@ -1,12 +1,10 @@
-import { authQueryKeys } from "@better-auth-ui/core"
-import { deleteUserLocalization } from "@better-auth-ui/core/plugins/delete-user"
 import {
-  createAuthMutation,
+  authQueryKeys,
   deleteUserOptions,
-  listAccountsOptions,
-  useAuth,
-  useSession
-} from "@better-auth-ui/solid"
+  listAccountsOptions
+} from "@better-auth-ui/core"
+import { deleteUserLocalization } from "@better-auth-ui/core/plugins/delete-user"
+import { createAuthMutation, useAuth, useSession } from "@better-auth-ui/solid"
 import { createQuery, useQueryClient } from "@tanstack/solid-query"
 import { TriangleAlert } from "lucide-solid"
 import { createSignal, Show } from "solid-js"
@@ -72,7 +70,8 @@ export function DeleteAccount(props: DeleteAccountProps = {}) {
     enabled: shouldLoadAccounts({
       isSsr: import.meta.env.SSR,
       userId: userId()
-    })
+    }),
+    initialData: undefined
   }))
   const hasCredentialAccount = () =>
     accounts.data?.some(

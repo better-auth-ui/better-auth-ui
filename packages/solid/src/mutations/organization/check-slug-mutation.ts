@@ -1,5 +1,5 @@
 import { organizationMutationKeys } from "@better-auth-ui/core/plugins/organization"
-import { createMutation } from "@tanstack/solid-query"
+import { useMutation } from "@tanstack/solid-query"
 import type { OrganizationAuthClient } from "../../lib/auth-client"
 import {
   createOrganizationMutationOptions,
@@ -29,7 +29,7 @@ export function useCheckOrganizationSlug<
   authClient: TAuthClient,
   options?: CheckOrganizationSlugOptions<TAuthClient>
 ) {
-  return createMutation(() => ({
+  return useMutation(() => ({
     ...checkOrganizationSlugOptions(authClient),
     ...options
   }))

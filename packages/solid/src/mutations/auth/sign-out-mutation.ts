@@ -1,13 +1,19 @@
-import { authMutationKeys } from "@better-auth-ui/core"
-import type { AuthClient } from "../../lib/auth-client"
-import { createAuthMutationOptions } from "../create-auth-mutation"
+import {
+  type AuthClient,
+  type SignOutOptions,
+  signOutOptions
+} from "@better-auth-ui/core"
+import { useMutation } from "@tanstack/solid-query"
 
-export type SignOutParams<TAuthClient extends AuthClient> = Parameters<
-  TAuthClient["signOut"]
->[0]
+export type { SignOutParams } from "@better-auth-ui/core"
 
-export function signOutOptions<TAuthClient extends AuthClient>(
-  authClient: TAuthClient
+export function useSignOutMutation<TAuthClient extends AuthClient>(
+  authClient: TAuthClient,
+  options?: SignOutOptions<TAuthClient>
 ) {
-  return createAuthMutationOptions(authClient.signOut, authMutationKeys.signOut)
+  return useMutation(() => ({
+    ...signOutOptions(authClient),
+    ...options
+  }))
 }
+export const signOutMutation = useSignOutMutation

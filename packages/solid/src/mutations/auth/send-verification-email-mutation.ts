@@ -1,15 +1,19 @@
-import { authMutationKeys } from "@better-auth-ui/core"
-import type { AuthClient } from "../../lib/auth-client"
-import { createAuthMutationOptions } from "../create-auth-mutation"
+import {
+  type AuthClient,
+  type SendVerificationEmailOptions,
+  sendVerificationEmailOptions
+} from "@better-auth-ui/core"
+import { useMutation } from "@tanstack/solid-query"
 
-export type SendVerificationEmailParams<TAuthClient extends AuthClient> =
-  Parameters<TAuthClient["sendVerificationEmail"]>[0]
+export type { SendVerificationEmailParams } from "@better-auth-ui/core"
 
-export function sendVerificationEmailOptions<TAuthClient extends AuthClient>(
-  authClient: TAuthClient
+export function useSendVerificationEmail<TAuthClient extends AuthClient>(
+  authClient: TAuthClient,
+  options?: SendVerificationEmailOptions<TAuthClient>
 ) {
-  return createAuthMutationOptions(
-    authClient.sendVerificationEmail,
-    authMutationKeys.sendVerificationEmail
-  )
+  return useMutation(() => ({
+    ...sendVerificationEmailOptions(authClient),
+    ...options
+  }))
 }
+export const sendVerificationEmailMutation = useSendVerificationEmail

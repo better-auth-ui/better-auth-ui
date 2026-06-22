@@ -1,7 +1,10 @@
-import { authQueryKeys, parseAdditionalFieldValue } from "@better-auth-ui/core"
+import {
+  authQueryKeys,
+  parseAdditionalFieldValue,
+  signUpEmailOptions
+} from "@better-auth-ui/core"
 import {
   createAuthMutation,
-  signUpEmailOptions,
   useAuth,
   useFetchOptions
 } from "@better-auth-ui/solid"
@@ -45,7 +48,7 @@ export function SignUp(props: SignUpProps) {
     onError: () => {
       resetFetchOptions()
     },
-    onSuccess: (_data: unknown, variables: { email: string }) => {
+    onSuccess: (_data, variables) => {
       if (auth.emailAndPassword.requireEmailVerification) {
         sessionStorage.setItem("better-auth-ui.verify-email", variables.email)
         auth.navigate({

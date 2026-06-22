@@ -1,5 +1,5 @@
 import { authMutationKeys, authQueryKeys } from "@better-auth-ui/core"
-import { createMutation, useQueryClient } from "@tanstack/solid-query"
+import { useMutation, useQueryClient } from "@tanstack/solid-query"
 import type { AuthClient } from "../../lib/auth-client"
 
 export function useSignOut<TAuthClient extends AuthClient>(
@@ -7,7 +7,7 @@ export function useSignOut<TAuthClient extends AuthClient>(
 ) {
   const queryClient = useQueryClient()
 
-  return createMutation(() => ({
+  return useMutation(() => ({
     mutationKey: authMutationKeys.signOut,
     mutationFn: async () => {
       await authClient.signOut({

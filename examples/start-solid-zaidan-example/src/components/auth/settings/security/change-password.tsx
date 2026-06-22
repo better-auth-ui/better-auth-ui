@@ -1,11 +1,9 @@
 import {
   changePasswordOptions,
-  createAuthMutation,
   listAccountsOptions,
-  requestPasswordResetOptions,
-  useAuth,
-  useSession
-} from "@better-auth-ui/solid"
+  requestPasswordResetOptions
+} from "@better-auth-ui/core"
+import { createAuthMutation, useAuth, useSession } from "@better-auth-ui/solid"
 import { createQuery } from "@tanstack/solid-query"
 import type { BetterFetchError } from "better-auth/client"
 import { Eye, EyeOff } from "lucide-solid"
@@ -44,7 +42,8 @@ export function ChangePasswordSettings(
     enabled: shouldLoadAccounts({
       isSsr: import.meta.env.SSR,
       userId: userId()
-    })
+    }),
+    initialData: undefined
   }))
   const hasCredentialAccount = () =>
     linkedAccounts.data?.some(

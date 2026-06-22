@@ -5,9 +5,10 @@ export type OmitUseKeys<T> = {
   [K in keyof T as K extends `use${string}` ? never : K]: T[K]
 }
 
-export type AuthClient = Omit<
-  OmitUseKeys<ReturnType<typeof createAuthClient>>,
-  "$store"
+export type OmitUseAndStoreKeys<T> = Omit<OmitUseKeys<T>, "$store">
+
+export type AuthClient = OmitUseAndStoreKeys<
+  ReturnType<typeof createAuthClient>
 >
 
 /**

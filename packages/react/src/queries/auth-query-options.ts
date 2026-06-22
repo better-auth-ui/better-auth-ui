@@ -1,31 +1,13 @@
 import {
-  type DataTag,
-  type QueryKey,
-  queryOptions,
-  type UseQueryOptions
-} from "@tanstack/react-query"
-import type { BetterFetchError, BetterFetchOption } from "better-auth/client"
+  type AuthQueryFn,
+  type AuthQueryFnData,
+  type AuthQueryKey,
+  authQueryOptions as coreAuthQueryOptions
+} from "@better-auth-ui/core"
+import type { DataTag, QueryKey, UseQueryOptions } from "@tanstack/react-query"
+import type { BetterFetchError } from "better-auth/client"
 
-/**
- * Read-style Better Auth client method (params shape `{ query?, fetchOptions? }`).
- * Mutation-style endpoints use `AuthMutationFn` / `useAuthMutation` instead.
- */
-export type AuthQueryFn<TData = unknown> = (params: {
-  query?: Record<string, unknown>
-  fetchOptions?: BetterFetchOption
-}) => Promise<{ data: TData }>
-
-export type AuthQueryFnData<TFn> =
-  TFn extends AuthQueryFn<infer TData> ? TData : never
-
-/**
- * Final query key produced by {@link authQueryOptions}: the caller's prefix
- * followed by `params.query ?? null`.
- */
-export type AuthQueryKey<
-  TFn extends AuthQueryFn = AuthQueryFn,
-  TPrefix extends QueryKey = QueryKey
-> = readonly [...TPrefix, NonNullable<Parameters<TFn>[0]>["query"] | null]
+export type { AuthQueryFn, AuthQueryFnData, AuthQueryKey }
 
 /**
  * Return type of {@link authQueryOptions}. Named so TypeScript emits
@@ -54,15 +36,7 @@ export type AuthQueryOptions<
 }
 
 /**
- * Build `queryOptions` for a Better Auth endpoint.
- *
- * Injects React Query's `signal` and `throw: true` into `fetchOptions` so the
- * request is cancelled on unmount and errors surface as `BetterFetchError`
- * instead of `{ data, error }`.
- *
- * @param authFn - Better Auth client method (e.g. `authClient.getSession`).
- * @param queryKey - Scope prefix for the key. `params.query` is appended automatically.
- * @param params - Parameters forwarded to `authFn`.
+ * React adapter for core Better Auth query options.
  */
 export function authQueryOptions<
   TFn extends AuthQueryFn,
@@ -72,12 +46,8 @@ export function authQueryOptions<
   queryKey: TPrefix,
   params?: Parameters<TFn>[0]
 ): AuthQueryOptions<TFn, TPrefix> {
-  return queryOptions<AuthQueryFnData<TFn>, BetterFetchError>({
-    queryKey: [...queryKey, params?.query ?? null] as const,
-    queryFn: ({ signal }) =>
-      authFn({
-        ...params,
-        fetchOptions: { ...params?.fetchOptions, signal, throw: true }
-      }) as Promise<AuthQueryFnData<TFn>>
-  }) as AuthQueryOptions<TFn, TPrefix>
+  return coreAuthQueryOptions(authFn, queryKey, params) as AuthQueryOptions<
+    TFn,
+    TPrefix
+  >
 }

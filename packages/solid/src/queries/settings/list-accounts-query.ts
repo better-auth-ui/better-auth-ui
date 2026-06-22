@@ -1,38 +1,15 @@
-import { authQueryKeys } from "@better-auth-ui/core"
-import type { QueryClient } from "@tanstack/solid-query"
-import { useSession } from "../../hooks/queries/use-session"
-import type { AuthClient, InferData } from "../../lib/auth-client"
 import {
-  createUserScopedOptions,
-  createUserScopedQuery,
-  ensureUserScopedQuery,
-  fetchUserScopedQuery,
-  getSessionUserId,
-  prefetchUserScopedQuery
-} from "../create-user-scoped-query"
+  type AuthClient,
+  type ListAccountsData,
+  type ListAccountsOptions,
+  type ListAccountsParams,
+  listAccountsOptions
+} from "@better-auth-ui/core"
+import { createQuery, type QueryClient, skipToken } from "@tanstack/solid-query"
+import { useSession } from "../../hooks/queries/use-session"
+import { getSessionUserId } from "../create-user-scoped-query"
 
-export type ListAccountsData<TAuthClient extends AuthClient> = InferData<
-  TAuthClient["listAccounts"]
->
-export type ListAccountsParams<TAuthClient extends AuthClient> = Parameters<
-  TAuthClient["listAccounts"]
->[0]
-export type ListAccountsOptions<TAuthClient extends AuthClient> = Omit<
-  ReturnType<typeof listAccountsOptions<TAuthClient>>,
-  "queryKey" | "queryFn"
->
-
-export function listAccountsOptions<TAuthClient extends AuthClient>(
-  authClient: TAuthClient,
-  userId: string | undefined,
-  params?: ListAccountsParams<TAuthClient>
-) {
-  return createUserScopedOptions(
-    authQueryKeys.listAccounts(userId, params?.query),
-    authClient.listAccounts,
-    params
-  )
-}
+export type { ListAccountsParams } from "@better-auth-ui/core"
 
 export const ensureListAccounts = <TAuthClient extends AuthClient>(
   queryClient: QueryClient,
@@ -40,38 +17,21 @@ export const ensureListAccounts = <TAuthClient extends AuthClient>(
   userId: string,
   params?: ListAccountsParams<TAuthClient>
 ) =>
-  ensureUserScopedQuery(
-    queryClient,
-    authQueryKeys.listAccounts(userId, params?.query),
-    authClient.listAccounts,
-    params
-  )
+  queryClient.ensureQueryData(listAccountsOptions(authClient, userId, params))
 
 export const prefetchListAccounts = <TAuthClient extends AuthClient>(
   queryClient: QueryClient,
   authClient: TAuthClient,
   userId: string,
   params?: ListAccountsParams<TAuthClient>
-) =>
-  prefetchUserScopedQuery(
-    queryClient,
-    authQueryKeys.listAccounts(userId, params?.query),
-    authClient.listAccounts,
-    params
-  )
+) => queryClient.prefetchQuery(listAccountsOptions(authClient, userId, params))
 
 export const fetchListAccounts = <TAuthClient extends AuthClient>(
   queryClient: QueryClient,
   authClient: TAuthClient,
   userId: string,
   params?: ListAccountsParams<TAuthClient>
-) =>
-  fetchUserScopedQuery(
-    queryClient,
-    authQueryKeys.listAccounts(userId, params?.query),
-    authClient.listAccounts,
-    params
-  )
+) => queryClient.fetchQuery(listAccountsOptions(authClient, userId, params))
 
 export type UseListAccountsOptions<TAuthClient extends AuthClient> =
   ListAccountsOptions<TAuthClient> & ListAccountsParams<TAuthClient>
@@ -82,13 +42,37 @@ export function useListAccounts<TAuthClient extends AuthClient>(
 ) {
   const session = useSession(authClient)
   const userId = () => getSessionUserId(session)
-  const { query, fetchOptions, ...queryOptionsRest } = options
+  const { query, fetchOptions, initialData, ...queryOptions } = options
 
-  return createUserScopedQuery(
-    () => authQueryKeys.listAccounts(userId(), query),
-    authClient.listAccounts,
-    () => ({ query, fetchOptions }) as ListAccountsParams<TAuthClient>,
-    () => Boolean(userId()),
-    () => queryOptionsRest
-  )
+  if (initialData !== undefined) {
+    return createQuery(() => {
+      const baseOptions = listAccountsOptions(authClient, userId(), {
+        query,
+        fetchOptions
+      })
+
+      return {
+        ...queryOptions,
+        ...baseOptions,
+        queryFn: userId() ? baseOptions.queryFn : skipToken,
+        initialData: initialData as
+          | ListAccountsData<TAuthClient>
+          | (() => ListAccountsData<TAuthClient>)
+      }
+    })
+  }
+
+  return createQuery(() => {
+    const baseOptions = listAccountsOptions(authClient, userId(), {
+      query,
+      fetchOptions
+    })
+
+    return {
+      ...queryOptions,
+      ...baseOptions,
+      queryFn: userId() ? baseOptions.queryFn : skipToken,
+      initialData: undefined
+    }
+  })
 }

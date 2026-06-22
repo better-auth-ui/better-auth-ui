@@ -1,6 +1,6 @@
+import { requestPasswordResetOptions } from "@better-auth-ui/core"
 import {
   createAuthMutation,
-  requestPasswordResetOptions,
   useAuth,
   useFetchOptions
 } from "@better-auth-ui/solid"

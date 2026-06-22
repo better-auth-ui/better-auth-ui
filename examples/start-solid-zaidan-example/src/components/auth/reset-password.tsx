@@ -1,8 +1,5 @@
-import {
-  createAuthMutation,
-  resetPasswordOptions,
-  useAuth
-} from "@better-auth-ui/solid"
+import { resetPasswordOptions } from "@better-auth-ui/core"
+import { createAuthMutation, useAuth } from "@better-auth-ui/solid"
 import { Link } from "@tanstack/solid-router"
 import { Eye, EyeOff } from "lucide-solid"
 import { createSignal, Show } from "solid-js"

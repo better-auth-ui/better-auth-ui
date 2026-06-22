@@ -7,6 +7,7 @@ export default defineConfig({
     lib: {
       entry: {
         index: "src/index.ts",
+        plugins: "src/plugins.ts",
         "plugins/api-key/index": "src/plugins/api-key/index.ts",
         "plugins/api-key/server": "src/plugins/api-key/server.ts",
         "plugins/delete-user/index": "src/plugins/delete-user/index.ts",

@@ -1,16 +1,19 @@
-import { authMutationKeys } from "@better-auth-ui/core"
-import type { AuthClient } from "../../lib/auth-client"
-import { createAuthMutationOptions } from "../create-auth-mutation"
+import {
+  type AuthClient,
+  type ChangePasswordOptions,
+  changePasswordOptions
+} from "@better-auth-ui/core"
+import { useMutation } from "@tanstack/solid-query"
 
-export type ChangePasswordParams<TAuthClient extends AuthClient> = Parameters<
-  TAuthClient["changePassword"]
->[0]
+export type { ChangePasswordParams } from "@better-auth-ui/core"
 
-export function changePasswordOptions<TAuthClient extends AuthClient>(
-  authClient: TAuthClient
+export function useChangePassword<TAuthClient extends AuthClient>(
+  authClient: TAuthClient,
+  options?: ChangePasswordOptions<TAuthClient>
 ) {
-  return createAuthMutationOptions(
-    authClient.changePassword,
-    authMutationKeys.changePassword
-  )
+  return useMutation(() => ({
+    ...changePasswordOptions(authClient),
+    ...options
+  }))
 }
+export const changePasswordMutation = useChangePassword

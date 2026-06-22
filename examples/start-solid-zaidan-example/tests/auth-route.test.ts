@@ -372,9 +372,9 @@ describe("Solid auth route component selection", () => {
       "utf8"
     )
 
-    expect(signIn).toContain(
-      'import { authQueryKeys } from "@better-auth-ui/core"'
-    )
+    expect(signIn).toContain("authQueryKeys")
+    expect(signIn).toContain("signInEmailOptions")
+    expect(signIn).toContain('from "@better-auth-ui/core"')
     expect(signIn).toContain("useQueryClient")
     expect(signIn).toContain("queryClient.invalidateQueries({")
     expect(signIn).toContain("queryKey: authQueryKeys.session")
@@ -1323,7 +1323,7 @@ describe("Solid auth route component selection", () => {
     expect(userProfile).toContain("<ChangeAvatar")
     expect(userProfile).not.toContain("handleAvatarFileChange")
     expect(changeAvatar).toContain("fileToBase64")
-    expect(changeAvatar).toContain("updateUserMutation")
+    expect(changeAvatar).toContain("useUpdateUser")
     expect(changeAvatar).toContain("avatarChangedSuccess")
     expect(providerButton).toContain("auth.authClient.signIn.social")
     expect(providerButton).toContain("resolveSocialAuthParams")
@@ -1912,8 +1912,8 @@ describe("Solid auth route component selection", () => {
       "utf8"
     )
 
-    expect(userProfile).toContain("updateUserMutation")
-    expect(userProfile).toContain("const updateUser = updateUserMutation")
+    expect(userProfile).toContain("useUpdateUser")
+    expect(userProfile).toContain("const updateUser = useUpdateUser")
     expect(userProfile).toContain("onSubmit={submitProfile}")
     expect(userProfile).toContain("const formData = new FormData")
     expect(userProfile).toContain('formData.get("name")')

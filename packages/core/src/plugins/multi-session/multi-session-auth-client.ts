@@ -1,8 +1,8 @@
 import type { createAuthClient } from "better-auth/client"
 import type { multiSessionClient } from "better-auth/client/plugins"
-import type { OmitUseKeys } from "../../lib/auth-client"
+import type { OmitUseAndStoreKeys } from "../../lib/auth-client"
 
-export type MultiSessionAuthClient = OmitUseKeys<
+export type MultiSessionAuthClient = OmitUseAndStoreKeys<
   ReturnType<
     typeof createAuthClient<{
       plugins: [ReturnType<typeof multiSessionClient>]

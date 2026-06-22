@@ -1,16 +1,19 @@
-import { authMutationKeys } from "@better-auth-ui/core"
-import type { AuthClient } from "../../lib/auth-client"
-import { createAuthMutationOptions } from "../create-auth-mutation"
+import {
+  type AuthClient,
+  type SignInSocialOptions,
+  signInSocialOptions
+} from "@better-auth-ui/core"
+import { useMutation } from "@tanstack/solid-query"
 
-export type SignInSocialParams<TAuthClient extends AuthClient> = Parameters<
-  TAuthClient["signIn"]["social"]
->[0]
+export type { SignInSocialParams } from "@better-auth-ui/core"
 
-export function signInSocialOptions<TAuthClient extends AuthClient>(
-  authClient: TAuthClient
+export function useSignInSocial<TAuthClient extends AuthClient>(
+  authClient: TAuthClient,
+  options?: SignInSocialOptions<TAuthClient>
 ) {
-  return createAuthMutationOptions(
-    authClient.signIn.social,
-    authMutationKeys.signIn.social
-  )
+  return useMutation(() => ({
+    ...signInSocialOptions(authClient),
+    ...options
+  }))
 }
+export const signInSocialMutation = useSignInSocial

@@ -21,6 +21,20 @@ function sourceFiles(dir: string): string[] {
 }
 
 describe("core query boundary", () => {
+  it("keeps the aggregate plugins subpath export", () => {
+    const packageJson = JSON.parse(readFileSync("package.json", "utf8")) as {
+      exports: Record<string, unknown>
+    }
+    const viteConfig = readFileSync("vite.config.ts", "utf8")
+
+    expect(packageJson.exports["./plugins"]).toEqual({
+      src: "./src/plugins.ts",
+      types: "./dist/plugins.d.ts",
+      import: "./dist/plugins.js"
+    })
+    expect(viteConfig).toContain('plugins: "src/plugins.ts"')
+  })
+
   it("does not import framework runtimes", () => {
     const files = sourceFiles("src")
     const offenders = files.flatMap((file) => {

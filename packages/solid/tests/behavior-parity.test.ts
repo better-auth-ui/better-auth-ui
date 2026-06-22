@@ -1,9 +1,24 @@
 import { readFileSync } from "node:fs"
 import { resolve } from "node:path"
 import {
+  accountInfoOptions,
   authMutationKeys,
   authQueryKeys,
   basePaths,
+  changeEmailOptions,
+  changePasswordOptions,
+  deleteUserOptions,
+  linkSocialOptions,
+  listAccountsOptions,
+  requestPasswordResetOptions,
+  resetPasswordOptions,
+  revokeSessionOptions,
+  sendVerificationEmailOptions,
+  signInEmailOptions,
+  signInSocialOptions,
+  signOutOptions,
+  signUpEmailOptions,
+  unlinkAccountOptions,
   updateUserOptions,
   viewPaths
 } from "@better-auth-ui/core"
@@ -28,42 +43,26 @@ import {
 import { usernameMutationKeys } from "@better-auth-ui/core/plugins/username"
 import { afterEach, describe, expect, it, vi } from "vitest"
 import {
-  accountInfoOptions,
   addPasskeyOptions,
-  changeEmailOptions,
-  changePasswordOptions,
   createApiKeyOptions,
   createOrganizationMeta,
   createOrganizationOptions,
   deleteApiKeyOptions,
   deletePasskeyOptions,
-  deleteUserOptions,
   hasPermissionOptions,
   isUsernameAvailableOptions,
-  linkSocialOptions,
-  listAccountsOptions,
   listApiKeysOptions,
   listDeviceSessionsOptions,
   listOrganizationMembersOptions,
   listOrganizationsOptions,
   listPasskeysOptions,
-  requestPasswordResetOptions,
-  resetPasswordOptions,
   resolveAuthConfig,
   revokeMultiSessionOptions,
-  revokeSessionOptions,
-  sendVerificationEmailOptions,
   setActiveSessionOptions,
-  signInEmailOptions,
   signInMagicLinkOptions,
   signInPasskeyOptions,
-  signInSocialOptions,
-  signInUsernameOptions,
-  signOutOptions,
-  signUpEmailOptions,
-  unlinkAccountOptions
+  signInUsernameOptions
 } from "../src"
-import { invalidateAuthMutationMeta } from "../src/lib/mutation-invalidator"
 import { getSessionUserId } from "../src/queries/create-user-scoped-query"
 
 const signal = new AbortController().signal
@@ -160,7 +159,46 @@ describe("Solid auth behavior parity", () => {
       "const session = useSession(authClient)"
     )
     expect(listAccountsQuery).toContain("getSessionUserId(session)")
+    expect(listAccountsQuery).toContain("return createQuery(() =>")
+    expect(listAccountsQuery).toContain("listAccountsOptions(authClient")
+    expect(listAccountsQuery).not.toContain("createUserScopedQuery(")
     expect(listAccountsQuery).not.toContain("getUserId(authClient)")
+  })
+
+  it("uses accessor-style wrappers for base Solid query and mutation files", () => {
+    const baseFiles = [
+      "../src/queries/settings/account-info-query.ts",
+      "../src/queries/settings/list-accounts-query.ts",
+      "../src/queries/settings/list-sessions-query.ts",
+      "../src/mutations/auth/request-password-reset-mutation.ts",
+      "../src/mutations/auth/reset-password-mutation.ts",
+      "../src/mutations/auth/send-verification-email-mutation.ts",
+      "../src/mutations/auth/sign-in-email-mutation.ts",
+      "../src/mutations/auth/sign-in-social-mutation.ts",
+      "../src/mutations/auth/sign-out-mutation.ts",
+      "../src/mutations/auth/sign-up-email-mutation.ts",
+      "../src/mutations/settings/change-email-mutation.ts",
+      "../src/mutations/settings/change-password-mutation.ts",
+      "../src/mutations/settings/delete-user-mutation.ts",
+      "../src/mutations/settings/link-social-mutation.ts",
+      "../src/mutations/settings/revoke-session-mutation.ts",
+      "../src/mutations/settings/unlink-account-mutation.ts",
+      "../src/mutations/settings/update-user-mutation.ts"
+    ]
+
+    for (const file of baseFiles) {
+      const source = readFileSync(resolve(__dirname, file), "utf8")
+
+      expect(source).not.toContain("createAuthMutationOptions")
+      expect(source).not.toContain("createUserScopedQuery")
+
+      if (file.includes("/mutations/")) {
+        expect(source).toContain("useMutation(() =>")
+        expect(source).not.toContain("createMutation")
+      } else {
+        expect(source).toContain("createQuery(() =>")
+      }
+    }
   })
 
   it("creates auth mutation options with shared mutation keys and throwing fetch options", async () => {
@@ -357,37 +395,15 @@ describe("Solid auth behavior parity", () => {
     })
   })
 
-  it("invalidates auth mutation metadata by query prefix", async () => {
-    const invalidated: unknown[] = []
-    const queryClient = {
-      invalidateQueries: vi.fn(async (filters) => {
-        for (const queryKey of [
-          organizationQueryKeys.lists("user-1"),
-          organizationQueryKeys.fullDetail("user-1", {
-            organizationId: "org-1"
-          }),
-          ["unrelated"]
-        ]) {
-          if (filters.predicate({ queryKey })) {
-            invalidated.push(queryKey)
-          }
-        }
-      })
-    }
-
-    await invalidateAuthMutationMeta(queryClient as never, {
-      options: {
-        mutationKey: organizationMutationKeys.create,
-        meta: createOrganizationMeta("user-1")
-      }
-    })
-
-    expect(queryClient.invalidateQueries).toHaveBeenCalledTimes(2)
-    expect(invalidated).toContainEqual(organizationQueryKeys.lists("user-1"))
-    expect(invalidated).toContainEqual(
-      organizationQueryKeys.fullDetail("user-1", { organizationId: "org-1" })
+  it("delegates provider-level mutation invalidation to core", () => {
+    const source = readFileSync(
+      resolve(__dirname, "../src/lib/mutation-invalidator.tsx"),
+      "utf8"
     )
-    expect(invalidated).not.toContainEqual(["unrelated"])
+
+    expect(source).toContain("setupMutationInvalidation")
+    expect(source).not.toContain("mutation.options?.meta")
+    expect(source).not.toContain("mutation.meta")
   })
 
   describe("mutation meta for cache invalidation", () => {

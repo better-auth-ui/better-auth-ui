@@ -2,7 +2,7 @@ import {
   organizationMutationKeys,
   organizationQueryKeys
 } from "@better-auth-ui/core/plugins/organization"
-import { createMutation, useQueryClient } from "@tanstack/solid-query"
+import { useMutation, useQueryClient } from "@tanstack/solid-query"
 import { useSession } from "../../hooks/queries/use-session"
 import type { OrganizationAuthClient } from "../../lib/auth-client"
 import { useListOrganizations } from "../../queries/organization"
@@ -41,7 +41,7 @@ export function useSetActiveOrganization<
     (session.data as { user?: { id?: string } } | undefined)?.user?.id
   const organizationsQuery = useListOrganizations(authClient)
 
-  return createMutation(() => ({
+  return useMutation(() => ({
     ...createOrganizationMutationOptions(
       authClient.organization.setActive,
       organizationMutationKeys.setActive

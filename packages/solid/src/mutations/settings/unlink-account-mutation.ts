@@ -1,38 +1,31 @@
-import { authMutationKeys, authQueryKeys } from "@better-auth-ui/core"
-import type { AuthClient } from "../../lib/auth-client"
-import { createAuthMutationOptions } from "../create-auth-mutation"
-import { useSessionScopedMutation } from "../use-session-scoped-mutation"
+import {
+  type AuthClient,
+  authQueryKeys,
+  type UnlinkAccountOptions,
+  unlinkAccountOptions
+} from "@better-auth-ui/core"
+import { useMutation } from "@tanstack/solid-query"
+import { useSession } from "../../hooks/queries/use-session"
 
-export type UnlinkAccountParams<TAuthClient extends AuthClient> = Parameters<
-  TAuthClient["unlinkAccount"]
->[0]
-
-export type UnlinkAccountOptions = Parameters<
-  typeof useSessionScopedMutation<
-    AuthClient,
-    AuthClient["unlinkAccount"],
-    typeof authMutationKeys.unlinkAccount
-  >
->[4]
-
-export function unlinkAccountOptions<TAuthClient extends AuthClient>(
-  authClient: TAuthClient
-) {
-  return createAuthMutationOptions(
-    authClient.unlinkAccount,
-    authMutationKeys.unlinkAccount
-  )
-}
+export type { UnlinkAccountParams } from "@better-auth-ui/core"
 
 export function useUnlinkAccount<TAuthClient extends AuthClient>(
   authClient: TAuthClient,
-  options?: UnlinkAccountOptions
+  options?: UnlinkAccountOptions<TAuthClient>
 ) {
-  return useSessionScopedMutation(
-    authClient,
-    authClient.unlinkAccount,
-    authMutationKeys.unlinkAccount,
-    (userId) => ({ awaits: [authQueryKeys.listAccounts(userId)] }),
-    options
-  )
+  const session = useSession(authClient)
+
+  return useMutation(() => {
+    const userId = session.data?.user.id
+
+    return {
+      ...unlinkAccountOptions(authClient),
+      ...options,
+      meta: {
+        awaits: [authQueryKeys.listAccounts(userId)]
+      }
+    }
+  })
 }
+
+export const unlinkAccountMutation = useUnlinkAccount

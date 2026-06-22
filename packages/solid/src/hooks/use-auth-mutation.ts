@@ -1,7 +1,7 @@
 import {
   type CreateMutationOptions,
-  createMutation,
-  type MutationKey
+  type MutationKey,
+  useMutation
 } from "@tanstack/solid-query"
 import type { BetterFetchError } from "better-auth/client"
 import {
@@ -28,7 +28,7 @@ export function useAuthMutation<
   mutationKey: TMutationKey,
   options?: UseAuthMutationOptions<TFn>
 ) {
-  return createMutation(() => ({
+  return useMutation(() => ({
     ...authMutationOptions(authFn, mutationKey),
     ...options
   }))

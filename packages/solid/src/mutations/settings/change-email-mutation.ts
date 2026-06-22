@@ -1,17 +1,19 @@
-import { authMutationKeys, authQueryKeys } from "@better-auth-ui/core"
-import type { AuthClient } from "../../lib/auth-client"
-import { createAuthMutationOptions } from "../create-auth-mutation"
+import {
+  type AuthClient,
+  type ChangeEmailOptions,
+  changeEmailOptions
+} from "@better-auth-ui/core"
+import { useMutation } from "@tanstack/solid-query"
 
-export type ChangeEmailParams<TAuthClient extends AuthClient> = Parameters<
-  TAuthClient["changeEmail"]
->[0]
+export type { ChangeEmailParams } from "@better-auth-ui/core"
 
-export function changeEmailOptions<TAuthClient extends AuthClient>(
-  authClient: TAuthClient
+export function useChangeEmail<TAuthClient extends AuthClient>(
+  authClient: TAuthClient,
+  options?: ChangeEmailOptions<TAuthClient>
 ) {
-  return createAuthMutationOptions(
-    authClient.changeEmail,
-    authMutationKeys.changeEmail,
-    { awaits: [authQueryKeys.session] }
-  )
+  return useMutation(() => ({
+    ...changeEmailOptions(authClient),
+    ...options
+  }))
 }
+export const changeEmailMutation = useChangeEmail

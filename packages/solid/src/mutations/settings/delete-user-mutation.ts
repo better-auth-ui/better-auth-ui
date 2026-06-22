@@ -1,16 +1,19 @@
-import { deleteUserMutationKeys } from "@better-auth-ui/core/plugins/delete-user"
-import type { AuthClient } from "../../lib/auth-client"
-import { createAuthMutationOptions } from "../create-auth-mutation"
+import {
+  type AuthClient,
+  type DeleteUserOptions,
+  deleteUserOptions
+} from "@better-auth-ui/core"
+import { useMutation } from "@tanstack/solid-query"
 
-export type DeleteUserParams<TAuthClient extends AuthClient> = Parameters<
-  TAuthClient["deleteUser"]
->[0]
+export type { DeleteUserParams } from "@better-auth-ui/core"
 
-export function deleteUserOptions<TAuthClient extends AuthClient>(
-  authClient: TAuthClient
+export function useDeleteUser<TAuthClient extends AuthClient>(
+  authClient: TAuthClient,
+  options?: DeleteUserOptions<TAuthClient>
 ) {
-  return createAuthMutationOptions(
-    authClient.deleteUser,
-    deleteUserMutationKeys.deleteUser
-  )
+  return useMutation(() => ({
+    ...deleteUserOptions(authClient),
+    ...options
+  }))
 }
+export const deleteUserMutation = useDeleteUser

@@ -1,9 +1,5 @@
-import {
-  changeEmailOptions,
-  createAuthMutation,
-  useAuth,
-  useSession
-} from "@better-auth-ui/solid"
+import { changeEmailOptions } from "@better-auth-ui/core"
+import { createAuthMutation, useAuth, useSession } from "@better-auth-ui/solid"
 import { createSignal, Show } from "solid-js"
 import { toast } from "solid-sonner"
 import { Button } from "@/components/ui/button"

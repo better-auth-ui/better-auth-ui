@@ -1,38 +1,31 @@
-import { authMutationKeys, authQueryKeys } from "@better-auth-ui/core"
-import type { AuthClient } from "../../lib/auth-client"
-import { createAuthMutationOptions } from "../create-auth-mutation"
-import { useSessionScopedMutation } from "../use-session-scoped-mutation"
+import {
+  type AuthClient,
+  authQueryKeys,
+  type RevokeSessionOptions,
+  revokeSessionOptions
+} from "@better-auth-ui/core"
+import { useMutation } from "@tanstack/solid-query"
+import { useSession } from "../../hooks/queries/use-session"
 
-export type RevokeSessionParams<TAuthClient extends AuthClient> = Parameters<
-  TAuthClient["revokeSession"]
->[0]
-
-export type RevokeSessionOptions = Parameters<
-  typeof useSessionScopedMutation<
-    AuthClient,
-    AuthClient["revokeSession"],
-    typeof authMutationKeys.revokeSession
-  >
->[4]
-
-export function revokeSessionOptions<TAuthClient extends AuthClient>(
-  authClient: TAuthClient
-) {
-  return createAuthMutationOptions(
-    authClient.revokeSession,
-    authMutationKeys.revokeSession
-  )
-}
+export type { RevokeSessionParams } from "@better-auth-ui/core"
 
 export function useRevokeSession<TAuthClient extends AuthClient>(
   authClient: TAuthClient,
-  options?: RevokeSessionOptions
+  options?: RevokeSessionOptions<TAuthClient>
 ) {
-  return useSessionScopedMutation(
-    authClient,
-    authClient.revokeSession,
-    authMutationKeys.revokeSession,
-    (userId) => ({ awaits: [authQueryKeys.listSessions(userId)] }),
-    options
-  )
+  const session = useSession(authClient)
+
+  return useMutation(() => {
+    const userId = session.data?.user.id
+
+    return {
+      ...revokeSessionOptions(authClient),
+      ...options,
+      meta: {
+        awaits: [authQueryKeys.listSessions(userId)]
+      }
+    }
+  })
 }
+
+export const revokeSessionMutation = useRevokeSession

@@ -1,11 +1,10 @@
-import { authQueryKeys } from "@better-auth-ui/core"
+import { authQueryKeys, signInEmailOptions } from "@better-auth-ui/core"
 import {
   type UsernameLocalization,
   usernameLocalization
 } from "@better-auth-ui/core/plugins/username"
 import {
   createAuthMutation,
-  signInEmailOptions,
   signInUsernameOptions,
   type UsernameAuthClient,
   useAuth,
