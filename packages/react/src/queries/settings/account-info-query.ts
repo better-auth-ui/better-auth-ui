@@ -7,8 +7,6 @@ import {
 import { type QueryClient, skipToken, useQuery } from "@tanstack/react-query"
 import { useSession } from "../../hooks/queries/use-session"
 
-export type { AccountInfoParams } from "@better-auth-ui/core"
-
 /**
  * Get the current user's provider-specific account info from the query cache.
  */

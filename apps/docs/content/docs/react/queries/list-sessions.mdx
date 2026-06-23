@@ -20,7 +20,7 @@ const { data: sessions } = useListSessions(authClient, { refetchOnMount: false }
 ## Options factory
 
 ```tsx
-import { listSessionsOptions } from "@better-auth-ui/react"
+import { listSessionsOptions } from "@better-auth-ui/core"
 import { useQuery } from "@tanstack/react-query"
 
 const { data: sessions } = useQuery(listSessionsOptions(authClient, userId))
@@ -29,7 +29,7 @@ const { data: sessions } = useQuery(listSessionsOptions(authClient, userId))
 ## Invalidation
 
 ```ts
-import { listSessionsOptions } from "@better-auth-ui/react"
+import { listSessionsOptions } from "@better-auth-ui/core"
 
 queryClient.invalidateQueries({
   queryKey: listSessionsOptions(authClient, userId).queryKey
@@ -38,4 +38,4 @@ queryClient.invalidateQueries({
 
 ## Params
 
-<auto-type-table path="../../../../../../packages/react/src/queries/settings/list-sessions-query.ts" name="ListSessionsParams" />
+<auto-type-table path="../../../../../../packages/core/src/queries/list-sessions-query.ts" name="ListSessionsParams" />

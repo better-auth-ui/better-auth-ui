@@ -30,7 +30,7 @@ Settings queries (`useListAccounts`, `useAccountInfo`, `useListSessions`, `useLi
 
 ## Escape hatch
 
-For read-style endpoints without a purpose-built hook, use `useAuthQuery` (or its options factory `authQueryOptions`). Mutation-style endpoints should use `useAuthMutation` instead.
+For read-style endpoints without a purpose-built hook, use `useAuthQuery`. Mutation-style endpoints should use `useAuthMutation` instead.
 
 ```tsx
 import { useAuth, useAuthQuery } from "@better-auth-ui/react"
@@ -45,9 +45,11 @@ const { data } = useAuthQuery(
 
 `options.query` is appended to the key, so the cached key above is `["auth", "magicLink", "list", { limit: 20 }]` (or `[..., null]` when omitted). Pass `fetchOptions` through the same options object.
 
-For loaders, `prefetchQuery`, or `useQueries`, use the factory directly:
+For loaders, `prefetchQuery`, or `useQueries`, import the core factory directly:
 
 ```ts
+import { authQueryOptions } from "@better-auth-ui/core"
+
 authQueryOptions(authClient.magicLink.list, ["auth", "magicLink", "list"], {
   query: { limit: 20 }
 })

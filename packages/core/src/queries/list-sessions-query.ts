@@ -27,7 +27,7 @@ export type ListSessionsOptions<TAuthClient extends AuthClient> = Omit<
  */
 export function listSessionsOptions<TAuthClient extends AuthClient>(
   authClient: TAuthClient,
-  userId: string | undefined,
+  userId?: string,
   params?: ListSessionsParams<TAuthClient>
 ) {
   type TData = ListSessionsData<TAuthClient>

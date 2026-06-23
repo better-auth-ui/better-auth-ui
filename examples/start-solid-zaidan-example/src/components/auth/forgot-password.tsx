@@ -1,8 +1,7 @@
-import { requestPasswordResetOptions } from "@better-auth-ui/core"
 import {
-  createAuthMutation,
   useAuth,
-  useFetchOptions
+  useFetchOptions,
+  useRequestPasswordReset
 } from "@better-auth-ui/solid"
 import type { AuthPlugin } from "@better-auth-ui/solid/plugins"
 import { Link } from "@tanstack/solid-router"
@@ -23,12 +22,11 @@ export function ForgotPassword(props: ForgotPasswordProps) {
   const { fetchOptions, resetFetchOptions } = useFetchOptions()
   const [email, setEmail] = createSignal("")
   const [emailError, setEmailError] = createSignal<string>()
-  const requestReset = createAuthMutation(() => ({
-    ...requestPasswordResetOptions(auth.authClient),
+  const requestReset = useRequestPasswordReset(auth.authClient, {
     onError: () => {
       resetFetchOptions()
     }
-  }))
+  })
 
   const captchaComponent = () =>
     (auth.plugins as AuthPlugin[]).find((plugin) => plugin.captchaComponent)

@@ -20,7 +20,7 @@ const { data: accounts } = useListAccounts(authClient, { refetchOnMount: false }
 ## Options factory
 
 ```tsx
-import { listAccountsOptions } from "@better-auth-ui/react"
+import { listAccountsOptions } from "@better-auth-ui/core"
 import { useQuery } from "@tanstack/react-query"
 
 const { data: accounts } = useQuery(listAccountsOptions(authClient, userId))
@@ -29,7 +29,7 @@ const { data: accounts } = useQuery(listAccountsOptions(authClient, userId))
 ## Invalidation
 
 ```ts
-import { listAccountsOptions } from "@better-auth-ui/react"
+import { listAccountsOptions } from "@better-auth-ui/core"
 
 queryClient.invalidateQueries({
   queryKey: listAccountsOptions(authClient, userId).queryKey
@@ -38,4 +38,4 @@ queryClient.invalidateQueries({
 
 ## Params
 
-<auto-type-table path="../../../../../../packages/react/src/queries/settings/list-accounts-query.ts" name="ListAccountsParams" />
+<auto-type-table path="../../../../../../packages/core/src/queries/list-accounts-query.ts" name="ListAccountsParams" />

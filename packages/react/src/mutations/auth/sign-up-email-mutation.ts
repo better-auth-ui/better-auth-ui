@@ -5,8 +5,6 @@ import {
 } from "@better-auth-ui/core"
 import { type QueryClient, useMutation } from "@tanstack/react-query"
 
-export type { SignUpEmailParams } from "@better-auth-ui/core"
-
 /**
  * Create a mutation for email/password sign-up.
  */

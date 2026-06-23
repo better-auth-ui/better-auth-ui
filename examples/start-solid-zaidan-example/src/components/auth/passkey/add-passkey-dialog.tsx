@@ -1,7 +1,6 @@
 import {
-  addPasskeyOptions,
-  createAuthMutation,
   type PasskeyAuthClient,
+  useAddPasskey,
   useAuth
 } from "@better-auth-ui/solid"
 import { Fingerprint } from "lucide-solid"
@@ -25,13 +24,12 @@ export function AddPasskeyDialog(props: {
 }) {
   const auth = useAuth()
   const labels = () => passkeyLabels(auth)
-  const addPasskey = createAuthMutation(() => ({
-    ...addPasskeyOptions(auth.authClient as PasskeyAuthClient),
+  const addPasskey = useAddPasskey(auth.authClient as PasskeyAuthClient, {
     onSuccess: () => {
       props.onOpenChange(false)
       props.onPasskeyAdded()
     }
-  }))
+  })
 
   const submitAddPasskey = (event: SubmitEvent) => {
     event.preventDefault()

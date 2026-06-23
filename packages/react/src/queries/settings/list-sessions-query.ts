@@ -7,8 +7,6 @@ import {
 import { type QueryClient, skipToken, useQuery } from "@tanstack/react-query"
 import { useSession } from "../../hooks/queries/use-session"
 
-export type { ListSessionsParams } from "@better-auth-ui/core"
-
 /**
  * Get the current user's active sessions from the query cache.
  */

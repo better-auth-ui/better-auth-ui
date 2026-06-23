@@ -373,7 +373,7 @@ describe("Solid auth route component selection", () => {
     )
 
     expect(signIn).toContain("authQueryKeys")
-    expect(signIn).toContain("signInEmailOptions")
+    expect(signIn).toContain("useSignInEmail")
     expect(signIn).toContain('from "@better-auth-ui/core"')
     expect(signIn).toContain("useQueryClient")
     expect(signIn).toContain("queryClient.invalidateQueries({")
@@ -1160,8 +1160,8 @@ describe("Solid auth route component selection", () => {
       "export type SwitchAccountSubmenuItemProps = {"
     )
     expect(switchAccountSubmenuItem).toContain("deviceSession: DeviceSession")
-    expect(switchAccountSubmenuItem).toContain("setActiveSessionOptions")
-    expect(switchAccountSubmenuItem).toContain("createAuthMutation")
+    expect(switchAccountSubmenuItem).toContain("useSetActiveSession")
+    expect(switchAccountSubmenuItem).toContain("useSetActiveSession")
     expect(switchAccountSubmenuItem).toContain("window.scrollTo({ top: 0 })")
     expect(switchAccountSubmenuItem).toContain(
       "disabled={setActiveSession.isPending}"
@@ -1315,7 +1315,7 @@ describe("Solid auth route component selection", () => {
     expect(signIn).toContain('from "./username/sign-in-username"')
     expect(signIn).not.toContain("function resolveSubmittedSignIn")
     expect(signInUsername).toContain("resolveSubmittedSignIn")
-    expect(signInUsername).toContain("signInUsernameOptions")
+    expect(signInUsername).toContain("useSignInUsername")
     expect(signInUsername).toContain("authQueryKeys.session")
     expect(userProfile).toContain(
       'from "@/components/auth/settings/account/change-avatar"'
@@ -1332,9 +1332,9 @@ describe("Solid auth route component selection", () => {
     expect(providerButtons).toContain('SocialLayout = "auto"')
     expect(additionalField).toContain("resolveInputType")
     expect(additionalField).toContain("field.render")
-    expect(passkeyButton).toContain("signInPasskeyOptions")
+    expect(passkeyButton).toContain("useSignInPasskey")
     expect(passkeyButton).toContain('view === "signUp"')
-    expect(magicLink).toContain("signInMagicLinkOptions")
+    expect(magicLink).toContain("useSignInMagicLink")
     expect(magicLink).toContain("type MagicLinkLocalization")
     expect(magicLink).toContain("magicLinkLocalization")
     expect(magicLink).toContain("coreMagicLinkPlugin.id")
@@ -1537,10 +1537,10 @@ describe("Solid auth route component selection", () => {
       expect(source).toContain("{(Captcha) => <Captcha />}")
     }
 
-    expect(signUp).toContain("signUpEmailOptions")
-    expect(signInUsername).toContain("signInEmailOptions")
-    expect(signInUsername).toContain("signInUsernameOptions")
-    expect(forgotPassword).toContain("requestPasswordResetOptions")
+    expect(signUp).toContain("useSignUpEmail")
+    expect(signInUsername).toContain("useSignInEmail")
+    expect(signInUsername).toContain("useSignInUsername")
+    expect(forgotPassword).toContain("useRequestPasswordReset")
   })
 
   it("wires additional fields into Solid sign-up and profile submissions", () => {
@@ -1870,13 +1870,13 @@ describe("Solid auth route component selection", () => {
     )
 
     expect(accountSettings).toContain("plugin.accountCards")
-    expect(manageAccounts).toContain("setActiveSessionOptions")
-    expect(manageAccounts).toContain("revokeMultiSessionOptions")
+    expect(manageAccounts).toContain("useSetActiveSession")
+    expect(manageAccounts).toContain("useRevokeMultiSession")
     expect(manageAccounts).toContain(
-      "const setActiveSession = createAuthMutation"
+      "const setActiveSession = useSetActiveSession"
     )
     expect(manageAccounts).toContain(
-      "const revokeMultiSession = createAuthMutation"
+      "const revokeMultiSession = useRevokeMultiSession"
     )
     expect(manageAccounts).toContain("window.scrollTo({ top: 0 })")
     expect(manageAccounts).toContain(
@@ -1973,8 +1973,8 @@ describe("Solid auth route component selection", () => {
       "utf8"
     )
 
-    expect(changeEmail).toContain("changeEmailOptions")
-    expect(changeEmail).toContain("const changeEmail = createAuthMutation")
+    expect(changeEmail).toContain("useChangeEmail")
+    expect(changeEmail).toContain("const changeEmail = useChangeEmail")
     expect(changeEmail).toContain("onSubmit={submitChangeEmail}")
     expect(changeEmail).toContain("const formData = new FormData")
     expect(changeEmail).toContain('formData.get("email")')
@@ -2128,17 +2128,15 @@ describe("Solid auth route component selection", () => {
       "utf8"
     )
 
-    expect(changePassword).toContain("changePasswordOptions")
-    expect(changePassword).toContain("requestPasswordResetOptions")
+    expect(changePassword).toContain("useChangePassword")
+    expect(changePassword).toContain("useRequestPasswordReset")
     expect(changePassword).toContain("listAccountsOptions")
     expect(changePassword).toContain("const linkedAccounts = createQuery")
     expect(changePassword).toContain('providerId === "credential"')
     expect(changePassword).toContain("requestPasswordReset.mutate")
     expect(changePassword).toContain("session.data.user.email")
     expect(changePassword).toContain("passwordResetEmailSent")
-    expect(changePassword).toContain(
-      "const changePassword = createAuthMutation"
-    )
+    expect(changePassword).toContain("const changePassword = useChangePassword")
     expect(changePassword).toContain("submitChangePassword")
     expect(changePassword).toContain("passwordsDoNotMatch")
     expect(changePassword).toContain("changePassword.mutate({")
@@ -2263,11 +2261,11 @@ describe("Solid auth route component selection", () => {
     )
     expect(activeSession).toContain('import Bowser from "bowser"')
     expect(activeSessions).toContain("listSessionsOptions")
-    expect(activeSessions).toContain("revokeSessionOptions")
+    expect(activeSessions).toContain("useRevokeSession")
     expect(activeSessions).toContain("const activeSessions = createQuery")
     expect(activeSessions).toContain("...listSessionsOptions(")
-    expect(activeSessions).toContain("const revokeSession = createAuthMutation")
-    expect(activeSessions).toContain("...revokeSessionOptions(auth.authClient)")
+    expect(activeSessions).toContain("const revokeSession = useRevokeSession")
+    expect(activeSessions).toContain("useRevokeSession(auth.authClient")
     expect(activeSessions).toContain("revokeSession.mutate(activeSession)")
     expect(activeSessions).toContain(
       "auth.localization.settings.revokeSessionSuccess"
@@ -2312,8 +2310,8 @@ describe("Solid auth route component selection", () => {
     )
 
     expect(linkedAccount).toContain("accountInfoOptions")
-    expect(linkedAccount).toContain("linkSocialOptions")
-    expect(linkedAccount).toContain("unlinkAccountOptions")
+    expect(linkedAccount).toContain("useLinkSocial")
+    expect(linkedAccount).toContain("useUnlinkAccount")
     expect(linkedAccounts).toContain("const linkedAccounts = createQuery")
     expect(linkedAccounts).toContain("...listAccountsOptions(")
     expect(linkedAccounts).toContain('providerId !== "credential"')
@@ -2321,13 +2319,13 @@ describe("Solid auth route component selection", () => {
     expect(linkedAccount).toContain("const accountInfo = createQuery")
     expect(linkedAccount).toContain("...accountInfoOptions(")
     expect(linkedAccount).toContain("account?.accountId")
-    expect(linkedAccount).toContain("const linkSocial = createAuthMutation")
-    expect(linkedAccount).toContain("...linkSocialOptions(auth.authClient)")
+    expect(linkedAccount).toContain("const linkSocial = useLinkSocial")
+    expect(linkedAccount).toContain("useLinkSocial(auth.authClient")
     expect(linkedAccount).toContain("provider:")
     expect(linkedAccount).toContain("callbackURL:")
     expect(linkedAccount).toContain("window.location.pathname")
-    expect(linkedAccount).toContain("const unlinkAccount = createAuthMutation")
-    expect(linkedAccount).toContain("...unlinkAccountOptions(auth.authClient)")
+    expect(linkedAccount).toContain("const unlinkAccount = useUnlinkAccount")
+    expect(linkedAccount).toContain("useUnlinkAccount(auth.authClient")
     expect(linkedAccount).toContain("accountUnlinked")
     expect(linkedAccount).toContain("providerId: account.providerId")
     expect(linkedAccount).toContain("auth.localization.settings.linkProvider")
@@ -2534,12 +2532,12 @@ describe("Solid auth route component selection", () => {
     expect(apiKeys).toContain("hideDelete={props.hideDelete}")
     expect(apiKey).toContain("apiKeyLocalization.deleteApiKey")
     expect(apiKey).toContain("<DeleteApiKeyDialog")
-    expect(createApiKeyDialog).toContain("createApiKeyOptions")
+    expect(createApiKeyDialog).toContain("useCreateApiKey")
     expect(createApiKeyDialog).toContain('configId: "organization"')
     expect(createApiKeyDialog).toContain("organizationId: props.organizationId")
     expect(createApiKeyDialog).toContain("<NewApiKeyDialog")
     expect(newApiKeyDialog).toContain("apiKeyLocalization.newApiKey")
-    expect(deleteApiKeyDialog).toContain("deleteApiKeyOptions")
+    expect(deleteApiKeyDialog).toContain("useDeleteApiKey")
     expect(deleteApiKeyDialog).toContain('configId: "organization"')
     expect(organizationApiKeys).toContain("useActiveOrganization")
     expect(organizationApiKeys).toContain("useListOrganizationMembers")
@@ -2561,8 +2559,8 @@ describe("Solid auth route component selection", () => {
     expect(settingsComponents).not.toContain("function AddPasskeyDialog")
     expect(settingsComponents).not.toContain("function DeletePasskeyDialog")
     expect(passkeys).toContain("listPasskeysOptions")
-    expect(addPasskeyDialog).toContain("addPasskeyOptions")
-    expect(deletePasskeyDialog).toContain("deletePasskeyOptions")
+    expect(addPasskeyDialog).toContain("useAddPasskey")
+    expect(deletePasskeyDialog).toContain("useDeletePasskey")
     expect(passkeys).toContain("<AddPasskeyDialog")
     expect(passkey).toContain("<DeletePasskeyDialog")
     expect(apiKeys).toContain("apiKeyLocalization.createApiKey")
@@ -2658,11 +2656,9 @@ describe("Solid auth route component selection", () => {
       "utf8"
     )
 
+    expect(createApiKeyDialog).toContain("const createApiKey = useCreateApiKey")
     expect(createApiKeyDialog).toContain(
-      "const createApiKey = createAuthMutation"
-    )
-    expect(createApiKeyDialog).toContain(
-      "...createApiKeyOptions(auth.authClient as ApiKeyAuthClient)"
+      "useCreateApiKey(auth.authClient as ApiKeyAuthClient"
     )
     expect(createApiKeyDialog).toContain("createApiKey.mutate(")
     expect(createApiKeyDialog).toContain("setNewApiKeySecret(apiKey.key)")
@@ -2670,11 +2666,9 @@ describe("Solid auth route component selection", () => {
     expect(newApiKeyDialog).toContain("navigator.clipboard.writeText")
     expect(newApiKeyDialog).toContain("setIsCopied(true)")
     expect(newApiKeyDialog).toContain("setTimeout(() => setIsCopied(false)")
+    expect(deleteApiKeyDialog).toContain("const deleteApiKey = useDeleteApiKey")
     expect(deleteApiKeyDialog).toContain(
-      "const deleteApiKey = createAuthMutation"
-    )
-    expect(deleteApiKeyDialog).toContain(
-      "...deleteApiKeyOptions(auth.authClient as ApiKeyAuthClient)"
+      "useDeleteApiKey(auth.authClient as ApiKeyAuthClient"
     )
     expect(deleteApiKeyDialog).toContain("deleteApiKey.mutate({")
     expect(deleteApiKeyDialog).toContain("keyId: props.apiKey.id")
@@ -2809,9 +2803,9 @@ describe("Solid auth route component selection", () => {
 
     expect(settingsTypes).toContain("export type ListedPasskey")
     expect(passkeys).toContain("const [isAddDialogOpen")
-    expect(addPasskeyDialog).toContain("const addPasskey = createAuthMutation")
+    expect(addPasskeyDialog).toContain("const addPasskey = useAddPasskey")
     expect(addPasskeyDialog).toContain(
-      "...addPasskeyOptions(auth.authClient as PasskeyAuthClient)"
+      "useAddPasskey(auth.authClient as PasskeyAuthClient"
     )
     expect(passkeys).toContain("onPasskeyAdded={() => passkeys.refetch()}")
     expect(addPasskeyDialog).toContain("props.onPasskeyAdded()")
@@ -2819,10 +2813,10 @@ describe("Solid auth route component selection", () => {
     expect(addPasskeyDialog).toContain("name ? { name } : undefined")
     expect(addPasskeyDialog).toContain("props.onOpenChange(false)")
     expect(deletePasskeyDialog).toContain(
-      "const deletePasskey = createAuthMutation"
+      "const deletePasskey = useDeletePasskey"
     )
     expect(deletePasskeyDialog).toContain(
-      "...deletePasskeyOptions(auth.authClient as PasskeyAuthClient)"
+      "useDeletePasskey(auth.authClient as PasskeyAuthClient"
     )
     expect(deletePasskeyDialog).toContain("deletePasskey.mutate({")
     expect(deletePasskeyDialog).toContain("id: props.passkey.id")
@@ -2872,11 +2866,11 @@ describe("Solid auth route component selection", () => {
     )
     expect(settingsComponents).not.toContain("authQueryKeys")
     expect(settingsComponents).not.toContain("deleteUserLocalization")
-    expect(settingsComponents).not.toContain("deleteUserOptions")
+    expect(settingsComponents).not.toContain("useDeleteUser")
     expect(settingsComponents).not.toContain("useQueryClient")
     expect(deleteAccount).toContain("authQueryKeys")
     expect(deleteAccount).toContain("deleteUserLocalization")
-    expect(deleteAccount).toContain("deleteUserOptions")
+    expect(deleteAccount).toContain("useDeleteUser")
     expect(deleteAccount).toContain("useQueryClient")
     expect(deleteAccount).toContain("const queryClient = useQueryClient()")
     expect(securitySettings).toContain("<DangerZone />")
@@ -2910,7 +2904,7 @@ describe("Solid auth route component selection", () => {
     )
     expect(deleteAccount).toContain('providerId === "credential"')
     expect(deleteAccount).toContain("const needsPassword = () =>")
-    expect(deleteAccount).toContain("deleteUserOptions(auth.authClient)")
+    expect(deleteAccount).toContain("useDeleteUser(auth.authClient")
     expect(deleteAccount).toContain(
       "deleteUserLocalization.deleteUserVerificationSent"
     )

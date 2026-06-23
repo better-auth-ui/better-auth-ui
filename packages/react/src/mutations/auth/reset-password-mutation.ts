@@ -5,8 +5,6 @@ import {
 } from "@better-auth-ui/core"
 import { useMutation } from "@tanstack/react-query"
 
-export type { ResetPasswordParams } from "@better-auth-ui/core"
-
 /**
  * Create a mutation for completing a password reset.
  */

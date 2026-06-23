@@ -5,8 +5,6 @@ import {
 } from "@better-auth-ui/core"
 import { useMutation } from "@tanstack/react-query"
 
-export type { LinkSocialParams } from "@better-auth-ui/core"
-
 /**
  * Create a mutation for linking a social provider to the current user.
  */

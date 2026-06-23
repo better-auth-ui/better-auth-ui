@@ -1,13 +1,10 @@
 import {
   type AuthClient,
-  authQueryKeys,
   type UnlinkAccountOptions,
   unlinkAccountOptions
 } from "@better-auth-ui/core"
 import { type QueryClient, useMutation } from "@tanstack/react-query"
 import { useSession } from "../../hooks/queries/use-session"
-
-export type { UnlinkAccountParams } from "@better-auth-ui/core"
 
 /**
  * Create a mutation for unlinking a social provider from the current user.
@@ -22,11 +19,8 @@ export function useUnlinkAccount<TAuthClient extends AuthClient>(
 
   return useMutation(
     {
-      ...unlinkAccountOptions(authClient),
-      ...options,
-      meta: {
-        awaits: [authQueryKeys.listAccounts(userId)]
-      }
+      ...unlinkAccountOptions(authClient, userId),
+      ...options
     },
     queryClient
   )

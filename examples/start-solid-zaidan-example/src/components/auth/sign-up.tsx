@@ -1,13 +1,5 @@
-import {
-  authQueryKeys,
-  parseAdditionalFieldValue,
-  signUpEmailOptions
-} from "@better-auth-ui/core"
-import {
-  createAuthMutation,
-  useAuth,
-  useFetchOptions
-} from "@better-auth-ui/solid"
+import { authQueryKeys, parseAdditionalFieldValue } from "@better-auth-ui/core"
+import { useAuth, useFetchOptions, useSignUpEmail } from "@better-auth-ui/solid"
 import type { AuthPlugin } from "@better-auth-ui/solid/plugins"
 import { useQueryClient } from "@tanstack/solid-query"
 import { Link } from "@tanstack/solid-router"
@@ -43,8 +35,7 @@ export function SignUp(props: SignUpProps) {
   const [isPasswordVisible, setIsPasswordVisible] = createSignal(false)
   const [isConfirmPasswordVisible, setIsConfirmPasswordVisible] =
     createSignal(false)
-  const signUp = createAuthMutation(() => ({
-    ...signUpEmailOptions(auth.authClient),
+  const signUp = useSignUpEmail(auth.authClient, {
     onError: () => {
       resetFetchOptions()
     },
@@ -60,7 +51,7 @@ export function SignUp(props: SignUpProps) {
       queryClient.invalidateQueries({ queryKey: authQueryKeys.session })
       auth.navigate({ to: auth.redirectTo })
     }
-  }))
+  })
   const captchaComponent = () =>
     (auth.plugins as AuthPlugin[]).find((plugin) => plugin.captchaComponent)
       ?.captchaComponent

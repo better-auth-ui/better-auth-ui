@@ -962,21 +962,21 @@ describe("Solid registry isolation", () => {
     expect(signOut).toContain("auth.authClient.signOut")
     expect(forgotPassword).toContain('from "@better-auth-ui/solid"')
     expect(forgotPassword).toContain('from "solid-js"')
-    expect(forgotPassword).toContain("requestPasswordResetOptions")
-    expect(forgotPassword).toContain("createAuthMutation")
+    expect(forgotPassword).toContain("useRequestPasswordReset")
+    expect(forgotPassword).toContain("useRequestPasswordReset")
     expect(forgotPassword).toContain('type="email"')
     expect(resetPassword).toContain('from "@better-auth-ui/solid"')
     expect(resetPassword).toContain('from "solid-js"')
-    expect(resetPassword).toContain("resetPasswordOptions")
-    expect(resetPassword).toContain("createAuthMutation")
+    expect(resetPassword).toContain("useResetPassword")
+    expect(resetPassword).toContain("useResetPassword")
     expect(resetPassword).toContain(
       'type={isPasswordVisible() ? "text" : "password"}'
     )
     expect(resetPassword).toContain("tokenFromLocation")
     expect(signUp).toContain('from "@better-auth-ui/solid"')
     expect(signUp).toContain('from "solid-js"')
-    expect(signUp).toContain("signUpEmailOptions")
-    expect(signUp).toContain("createAuthMutation")
+    expect(signUp).toContain("useSignUpEmail")
+    expect(signUp).toContain("useSignUpEmail")
     expect(signUp).toContain('type="email"')
     expect(signUp).toContain('autocomplete="new-password"')
   })
@@ -1079,8 +1079,8 @@ describe("Solid registry isolation", () => {
     )
 
     expect(signIn).toContain('from "@better-auth-ui/solid"')
-    expect(signIn).toContain("signInEmailOptions")
-    expect(signIn).toContain("createAuthMutation")
+    expect(signIn).toContain("useSignInEmail")
+    expect(signIn).toContain("useSignInEmail")
     expect(signIn).toContain("usernameOrEmailPlaceholder")
     expect(signIn).toContain(
       "placeholder={auth.localization.auth.passwordPlaceholder}"
@@ -1495,7 +1495,7 @@ describe("Solid registry isolation", () => {
     expect(authClient).toContain("passkeyClient()")
     expect(authClient).toContain("usernameClient()")
 
-    expect(signIn).toContain("signInUsernameOptions")
+    expect(signIn).toContain("useSignInUsername")
     expect(signIn).toContain("usernameOrEmailPlaceholder")
     expect(signIn).toContain("resolveSubmittedSignIn")
     expect(signIn).toContain("new FormData(event.currentTarget)")
@@ -2130,7 +2130,7 @@ describe("Solid registry isolation", () => {
       ])
     )
     expect(forgotPassword.files[0]?.content).toContain(
-      "requestPasswordResetOptions"
+      "useRequestPasswordReset"
     )
     expect(forgotPassword.files[0]?.content).toContain(
       "Check your email for the reset link."
@@ -2158,7 +2158,7 @@ describe("Solid registry isolation", () => {
         })
       ])
     )
-    expect(resetPassword.files[0]?.content).toContain("resetPasswordOptions")
+    expect(resetPassword.files[0]?.content).toContain("useResetPassword")
     expect(resetPassword.files[0]?.content).toContain(
       "Password reset successfully. You can sign in with your new"
     )
@@ -2191,7 +2191,7 @@ describe("Solid registry isolation", () => {
         })
       ])
     )
-    expect(signUp.files[0]?.content).toContain("signUpEmailOptions")
+    expect(signUp.files[0]?.content).toContain("useSignUpEmail")
     expect(signUp.files[0]?.content).toContain(
       "Account created. Check your email if verification is required."
     )
@@ -3940,7 +3940,7 @@ describe("Solid registry isolation", () => {
       "change-email": {
         importExample:
           'import { ChangeEmail } from "@/components/auth/settings/account/change-email"',
-        pluginGates: ["changeEmailOptions", "email verification", "session"],
+        pluginGates: ["useChangeEmail", "email verification", "session"],
         props: ["class"],
         usageExample: "<ChangeEmail />"
       },
@@ -3960,7 +3960,7 @@ describe("Solid registry isolation", () => {
       "active-sessions": {
         importExample:
           'import { ActiveSessionsSettings } from "@/components/auth/settings/security/active-sessions"',
-        pluginGates: ["session", "listSessionsOptions", "revokeSessionOptions"],
+        pluginGates: ["session", "listSessionsOptions", "useRevokeSession"],
         props: ["class"],
         usageExample: "<ActiveSessionsSettings />"
       },
@@ -3977,7 +3977,7 @@ describe("Solid registry isolation", () => {
         pluginGates: [
           "emailAndPassword",
           "credential",
-          "requestPasswordResetOptions"
+          "useRequestPasswordReset"
         ],
         props: ["class", "confirmPassword"],
         usageExample: "<ChangePasswordSettings confirmPassword />"

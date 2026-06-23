@@ -5,8 +5,6 @@ import {
 } from "@better-auth-ui/core"
 import { type QueryClient, useMutation } from "@tanstack/react-query"
 
-export type { UpdateUserParams } from "@better-auth-ui/core"
-
 /**
  * Create a mutation for updating the authenticated user's profile.
  *

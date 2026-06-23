@@ -1,9 +1,9 @@
-import { type QueryKey, useQuery } from "@tanstack/react-query"
 import {
   type AuthQueryFn,
   type AuthQueryOptions,
   authQueryOptions
-} from "../queries/auth-query-options"
+} from "@better-auth-ui/core"
+import { type QueryKey, useQuery } from "@tanstack/react-query"
 
 type UseAuthQueryOptions<
   TFn extends AuthQueryFn,

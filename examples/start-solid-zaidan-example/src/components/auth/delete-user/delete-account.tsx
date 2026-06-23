@@ -1,10 +1,6 @@
-import {
-  authQueryKeys,
-  deleteUserOptions,
-  listAccountsOptions
-} from "@better-auth-ui/core"
+import { authQueryKeys, listAccountsOptions } from "@better-auth-ui/core"
 import { deleteUserLocalization } from "@better-auth-ui/core/plugins/delete-user"
-import { createAuthMutation, useAuth, useSession } from "@better-auth-ui/solid"
+import { useAuth, useDeleteUser, useSession } from "@better-auth-ui/solid"
 import { createQuery, useQueryClient } from "@tanstack/solid-query"
 import { TriangleAlert } from "lucide-solid"
 import { createSignal, Show } from "solid-js"
@@ -79,8 +75,7 @@ export function DeleteAccount(props: DeleteAccountProps = {}) {
     )
   const needsPassword = () =>
     !sendDeleteAccountVerification() && Boolean(hasCredentialAccount())
-  const deleteUser = createAuthMutation(() => ({
-    ...deleteUserOptions(auth.authClient),
+  const deleteUser = useDeleteUser(auth.authClient, {
     onSuccess: () => {
       setConfirmOpen(false)
       setPassword("")
@@ -97,7 +92,7 @@ export function DeleteAccount(props: DeleteAccountProps = {}) {
         to: `${auth.basePaths.auth}/${auth.viewPaths.auth.signIn}`
       })
     }
-  }))
+  })
 
   const handleDialogOpenChange = (open: boolean) => {
     setConfirmOpen(open)

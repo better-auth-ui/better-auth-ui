@@ -1,14 +1,14 @@
-import { authQueryKeys, signInEmailOptions } from "@better-auth-ui/core"
+import { authQueryKeys } from "@better-auth-ui/core"
 import {
   type UsernameLocalization,
   usernameLocalization
 } from "@better-auth-ui/core/plugins/username"
 import {
-  createAuthMutation,
-  signInUsernameOptions,
   type UsernameAuthClient,
   useAuth,
-  useFetchOptions
+  useFetchOptions,
+  useSignInEmail,
+  useSignInUsername
 } from "@better-auth-ui/solid"
 import type { AuthPlugin } from "@better-auth-ui/solid/plugins"
 import { useQueryClient } from "@tanstack/solid-query"
@@ -51,8 +51,7 @@ export function SignInUsername(props: SignInUsernameProps) {
     queryClient.invalidateQueries({ queryKey: authQueryKeys.session })
     auth.navigate({ to: auth.redirectTo })
   }
-  const signIn = createAuthMutation(() => ({
-    ...signInEmailOptions(auth.authClient),
+  const signIn = useSignInEmail(auth.authClient, {
     onError: (error, variables) => {
       const signInVariables = variables as { email: string }
 
@@ -69,14 +68,16 @@ export function SignInUsername(props: SignInUsernameProps) {
       resetFetchOptions()
     },
     onSuccess: onSignInSuccess
-  }))
-  const signInUsername = createAuthMutation(() => ({
-    ...signInUsernameOptions(auth.authClient as UsernameAuthClient),
-    onError: () => {
-      resetFetchOptions()
-    },
-    onSuccess: onSignInSuccess
-  }))
+  })
+  const signInUsername = useSignInUsername(
+    auth.authClient as UsernameAuthClient,
+    {
+      onError: () => {
+        resetFetchOptions()
+      },
+      onSuccess: onSignInSuccess
+    }
+  )
   const usernamePlugin = auth.plugins.find((plugin) => plugin.id === "username")
   const usernameAuth = Boolean(usernamePlugin)
   const usernameLabels: UsernameLocalization = {

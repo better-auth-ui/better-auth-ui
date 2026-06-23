@@ -1,9 +1,8 @@
 import { apiKeyLocalization } from "@better-auth-ui/core/plugins/api-key"
 import {
   type ApiKeyAuthClient,
-  createAuthMutation,
-  deleteApiKeyOptions,
-  useAuth
+  useAuth,
+  useDeleteApiKey
 } from "@better-auth-ui/solid"
 import { Key } from "lucide-solid"
 import type { ListedApiKey } from "@/components/auth/settings/shared/types"
@@ -27,10 +26,9 @@ export function DeleteApiKeyDialog(props: {
   const auth = useAuth()
   const preview = () => `${props.apiKey.start}${"*".repeat(16)}`
   const previewId = () => `delete-api-key-preview-${props.apiKey.id}`
-  const deleteApiKey = createAuthMutation(() => ({
-    ...deleteApiKeyOptions(auth.authClient as ApiKeyAuthClient),
+  const deleteApiKey = useDeleteApiKey(auth.authClient as ApiKeyAuthClient, {
     onSuccess: () => props.onOpenChange(false)
-  }))
+  })
 
   const deleteKey = () => {
     deleteApiKey.mutate({

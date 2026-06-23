@@ -1,11 +1,9 @@
 import {
   type AccountInfoParams,
   accountInfoOptions,
-  getProviderName,
-  linkSocialOptions,
-  unlinkAccountOptions
+  getProviderName
 } from "@better-auth-ui/core"
-import { createAuthMutation, useAuth } from "@better-auth-ui/solid"
+import { useAuth, useLinkSocial, useUnlinkAccount } from "@better-auth-ui/solid"
 import { createQuery } from "@tanstack/solid-query"
 import { Link2, Link2Off, Plug } from "lucide-solid"
 import type { ComponentProps } from "solid-js"
@@ -81,13 +79,10 @@ export function LinkedAccountRow(props: {
     enabled: Boolean(props.userId && props.account?.accountId),
     initialData: undefined
   }))
-  const linkSocial = createAuthMutation(() => ({
-    ...linkSocialOptions(auth.authClient)
-  }))
-  const unlinkAccount = createAuthMutation(() => ({
-    ...unlinkAccountOptions(auth.authClient),
+  const linkSocial = useLinkSocial(auth.authClient)
+  const unlinkAccount = useUnlinkAccount(auth.authClient, {
     onSuccess: () => toast.success(auth.localization.settings.accountUnlinked)
-  }))
+  })
   const accountInfoData = () =>
     accountInfo.data as AccountInfoResponse | undefined
   const displayName = () =>

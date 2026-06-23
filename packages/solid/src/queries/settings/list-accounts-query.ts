@@ -1,11 +1,10 @@
 import {
   type AuthClient,
-  type ListAccountsData,
   type ListAccountsOptions,
   type ListAccountsParams,
   listAccountsOptions
 } from "@better-auth-ui/core"
-import { createQuery, type QueryClient, skipToken } from "@tanstack/solid-query"
+import { type QueryClient, skipToken, useQuery } from "@tanstack/solid-query"
 import { useSession } from "../../hooks/queries/use-session"
 import { getSessionUserId } from "../create-user-scoped-query"
 
@@ -33,8 +32,11 @@ export const fetchListAccounts = <TAuthClient extends AuthClient>(
   params?: ListAccountsParams<TAuthClient>
 ) => queryClient.fetchQuery(listAccountsOptions(authClient, userId, params))
 
-export type UseListAccountsOptions<TAuthClient extends AuthClient> =
-  ListAccountsOptions<TAuthClient> & ListAccountsParams<TAuthClient>
+export type UseListAccountsOptions<TAuthClient extends AuthClient> = Omit<
+  ListAccountsOptions<TAuthClient>,
+  "initialData"
+> &
+  ListAccountsParams<TAuthClient>
 
 export function useListAccounts<TAuthClient extends AuthClient>(
   authClient: TAuthClient,
@@ -42,27 +44,9 @@ export function useListAccounts<TAuthClient extends AuthClient>(
 ) {
   const session = useSession(authClient)
   const userId = () => getSessionUserId(session)
-  const { query, fetchOptions, initialData, ...queryOptions } = options
+  const { query, fetchOptions, ...queryOptions } = options
 
-  if (initialData !== undefined) {
-    return createQuery(() => {
-      const baseOptions = listAccountsOptions(authClient, userId(), {
-        query,
-        fetchOptions
-      })
-
-      return {
-        ...queryOptions,
-        ...baseOptions,
-        queryFn: userId() ? baseOptions.queryFn : skipToken,
-        initialData: initialData as
-          | ListAccountsData<TAuthClient>
-          | (() => ListAccountsData<TAuthClient>)
-      }
-    })
-  }
-
-  return createQuery(() => {
+  return useQuery(() => {
     const baseOptions = listAccountsOptions(authClient, userId(), {
       query,
       fetchOptions

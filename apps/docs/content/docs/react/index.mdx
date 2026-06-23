@@ -4,12 +4,9 @@ description: Shared React hooks, query primitives, and components used by both s
 icon: React
 ---
 
-The `@better-auth-ui/react` package ships the data layer behind every Better Auth UI component. It's built on [TanStack Query](https://tanstack.com/query) and exposes two kinds of primitives per endpoint:
+The `@better-auth-ui/react` package ships the hook layer behind every Better Auth UI component. It's built on [TanStack Query](https://tanstack.com/query) and exposes purpose-built hooks per endpoint, such as `useSession`, `useSignInEmail`, and `useUpdateUser`.
 
-- **Hooks** — `useSession`, `useSignInEmail`, `useUpdateUser`, …
-- **Options factories** — `sessionOptions`, `signInEmailOptions`, `updateUserOptions`, …
-
-Every hook is a thin wrapper around `useQuery` or `useMutation` plus its matching options factory. Use the hook in components, and use the factory anywhere TanStack Query takes a `queryOptions` / `mutationOptions` object (`useQuery`, `useQueries`, `prefetchQuery`, `useIsMutating`, loaders, a global `MutationCache`, …).
+Every hook is a thin wrapper around `useQuery` or `useMutation` plus its matching core options factory. Use the hook in components, and import core options factories from `@better-auth-ui/core` anywhere TanStack Query takes a `queryOptions` / `mutationOptions` object (`useQuery`, `useQueries`, `prefetchQuery`, `useIsMutating`, loaders, a global `MutationCache`, …).
 
 ## Prerequisites
 
@@ -23,9 +20,11 @@ Wrap your app with a `QueryClientProvider` above `<AuthProvider>`.
 
 All keys are prefixed with `"auth"`. Per-user reads are nested under `["auth", "user", userId, ...]` so they're cleared automatically when the user signs out or switches account. Mutation keys (`authMutationKeys.signIn.email`, `authMutationKeys.updateUser`, …) are stable and match-friendly for `useIsMutating` or a global `MutationCache` observer.
 
-Read a key off the factory for cache seeding or invalidation:
+Read a key off a core factory for cache seeding or invalidation:
 
 ```ts
+import { sessionOptions, signInEmailOptions } from "@better-auth-ui/core"
+
 sessionOptions(authClient).queryKey
 signInEmailOptions(authClient).mutationKey
 ```
@@ -33,7 +32,7 @@ signInEmailOptions(authClient).mutationKey
 Or pull from the shared key factories in `@better-auth-ui/core`:
 
 ```ts
-import { authQueryKeys, authMutationKeys } from "@better-auth-ui/core"
+import { authMutationKeys, authQueryKeys } from "@better-auth-ui/core"
 
 queryClient.invalidateQueries({ queryKey: authQueryKeys.session })
 useIsMutating({ mutationKey: authMutationKeys.signIn.all })
@@ -41,10 +40,12 @@ useIsMutating({ mutationKey: authMutationKeys.signIn.all })
 
 ## Escape hatches
 
-For Better Auth endpoints that don't have a purpose-built hook yet, use the generic wrappers:
+For Better Auth endpoints that don't have a purpose-built hook yet, use the generic hook wrappers:
 
-- `useAuthQuery(authFn, queryKey, options?)` / `authQueryOptions(authFn, queryKey, params?)` — read-style endpoints.
-- `useAuthMutation(authFn, mutationKey, options?)` / `authMutationOptions(authFn, mutationKey)` — write-style endpoints.
+- `useAuthQuery(authFn, queryKey, options?)` — read-style endpoints.
+- `useAuthMutation(authFn, mutationKey, options?)` — write-style endpoints.
+
+For loaders, prefetching, or other non-component usage, import the matching generic options factories from `@better-auth-ui/core`: `authQueryOptions(authFn, queryKey, params?)` and `authMutationOptions(authFn, mutationKey)`.
 
 Both wire `throw: true` into `fetchOptions` so results reject with a `BetterFetchError` instead of resolving to `{ error }`.
 

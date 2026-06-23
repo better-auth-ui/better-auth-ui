@@ -159,7 +159,7 @@ describe("Solid auth behavior parity", () => {
       "const session = useSession(authClient)"
     )
     expect(listAccountsQuery).toContain("getSessionUserId(session)")
-    expect(listAccountsQuery).toContain("return createQuery(() =>")
+    expect(listAccountsQuery).toContain("return useQuery(() =>")
     expect(listAccountsQuery).toContain("listAccountsOptions(authClient")
     expect(listAccountsQuery).not.toContain("createUserScopedQuery(")
     expect(listAccountsQuery).not.toContain("getUserId(authClient)")
@@ -170,9 +170,9 @@ describe("Solid auth behavior parity", () => {
       "../src/queries/settings/account-info-query.ts",
       "../src/queries/settings/list-accounts-query.ts",
       "../src/queries/settings/list-sessions-query.ts",
-      "../src/mutations/auth/request-password-reset-mutation.ts",
+      "../src/mutations/auth/use-request-password-reset.ts",
       "../src/mutations/auth/reset-password-mutation.ts",
-      "../src/mutations/auth/send-verification-email-mutation.ts",
+      "../src/mutations/auth/use-send-verification-email.ts",
       "../src/mutations/auth/sign-in-email-mutation.ts",
       "../src/mutations/auth/sign-in-social-mutation.ts",
       "../src/mutations/auth/sign-out-mutation.ts",
@@ -195,6 +195,8 @@ describe("Solid auth behavior parity", () => {
       if (file.includes("/mutations/")) {
         expect(source).toContain("useMutation(() =>")
         expect(source).not.toContain("createMutation")
+      } else if (file.includes("list-accounts-query")) {
+        expect(source).toContain("useQuery(() =>")
       } else {
         expect(source).toContain("createQuery(() =>")
       }
@@ -502,19 +504,35 @@ describe("Solid auth behavior parity", () => {
       ).toBeUndefined()
     })
 
-    it("userId-scoped mutations have no meta at factory level (meta injected by hook)", () => {
-      // These mutations use useSessionScopedMutation which injects meta
-      // at the Solid hook level, not at the factory level
-      expect(addPasskeyOptions(authClient as never).meta).toBeUndefined()
-      expect(deletePasskeyOptions(authClient as never).meta).toBeUndefined()
-      expect(revokeSessionOptions(authClient as never).meta).toBeUndefined()
-      expect(unlinkAccountOptions(authClient as never).meta).toBeUndefined()
-      expect(createApiKeyOptions(authClient as never).meta).toBeUndefined()
-      expect(deleteApiKeyOptions(authClient as never).meta).toBeUndefined()
+    it("userId-scoped mutations define meta at factory level", () => {
+      const userId = "user-1"
+
+      expect(addPasskeyOptions(authClient as never, userId).meta).toEqual({
+        awaits: [passkeyQueryKeys.lists(userId)]
+      })
+      expect(deletePasskeyOptions(authClient as never, userId).meta).toEqual({
+        awaits: [passkeyQueryKeys.lists(userId)]
+      })
+      expect(revokeSessionOptions(authClient as never, userId).meta).toEqual({
+        awaits: [authQueryKeys.listSessions(userId)]
+      })
+      expect(unlinkAccountOptions(authClient as never, userId).meta).toEqual({
+        awaits: [authQueryKeys.listAccounts(userId)]
+      })
+      expect(createApiKeyOptions(authClient as never, userId).meta).toEqual({
+        awaits: [apiKeyQueryKeys.lists(userId)]
+      })
+      expect(deleteApiKeyOptions(authClient as never, userId).meta).toEqual({
+        awaits: [apiKeyQueryKeys.lists(userId)]
+      })
       expect(
-        revokeMultiSessionOptions(authClient as never).meta
-      ).toBeUndefined()
-      expect(setActiveSessionOptions(authClient as never).meta).toBeUndefined()
+        revokeMultiSessionOptions(authClient as never, userId).meta
+      ).toEqual({ awaits: [multiSessionQueryKeys.lists(userId)] })
+      expect(setActiveSessionOptions(authClient as never, userId).meta).toEqual(
+        {
+          awaits: [authQueryKeys.session, multiSessionQueryKeys.lists(userId)]
+        }
+      )
     })
   })
 })

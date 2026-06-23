@@ -10,8 +10,6 @@ import {
   useQueryClient
 } from "@tanstack/react-query"
 
-export type { SignOutParams } from "@better-auth-ui/core"
-
 /**
  * Create a mutation for signing the current user out.
  */

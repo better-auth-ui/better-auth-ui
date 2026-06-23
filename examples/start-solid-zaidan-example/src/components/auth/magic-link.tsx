@@ -4,10 +4,9 @@ import {
   magicLinkLocalization
 } from "@better-auth-ui/core/plugins/magic-link"
 import {
-  createAuthMutation,
   type MagicLinkAuthClient,
-  signInMagicLinkOptions,
-  useAuth
+  useAuth,
+  useSignInMagicLink
 } from "@better-auth-ui/solid"
 import type { AuthPlugin } from "@better-auth-ui/solid/plugins"
 import { Link } from "@tanstack/solid-router"
@@ -47,13 +46,15 @@ export function MagicLink(props: MagicLinkProps) {
       | Partial<MagicLinkLocalization>
       | undefined)
   })
-  const signInMagicLink = createAuthMutation(() => ({
-    ...signInMagicLinkOptions(auth.authClient as MagicLinkAuthClient),
-    onSuccess: () => {
-      setEmail("")
-      toast.success(magicLinkLabels().magicLinkSent)
+  const signInMagicLink = useSignInMagicLink(
+    auth.authClient as MagicLinkAuthClient,
+    {
+      onSuccess: () => {
+        setEmail("")
+        toast.success(magicLinkLabels().magicLinkSent)
+      }
     }
-  }))
+  )
   const showSeparator = () => Boolean(auth.socialProviders?.length)
   const socialPosition = () => props.socialPosition ?? "bottom"
 

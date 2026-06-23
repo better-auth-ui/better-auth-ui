@@ -1,6 +1,5 @@
 import {
   type AuthClient,
-  authQueryKeys,
   type UnlinkAccountOptions,
   unlinkAccountOptions
 } from "@better-auth-ui/core"
@@ -19,11 +18,8 @@ export function useUnlinkAccount<TAuthClient extends AuthClient>(
     const userId = session.data?.user.id
 
     return {
-      ...unlinkAccountOptions(authClient),
-      ...options,
-      meta: {
-        awaits: [authQueryKeys.listAccounts(userId)]
-      }
+      ...unlinkAccountOptions(authClient, userId),
+      ...options
     }
   })
 }

@@ -1,8 +1,7 @@
 import {
-  createAuthMutation,
-  isUsernameAvailableOptions,
   type UsernameAuthClient,
-  useAuth
+  useAuth,
+  useIsUsernameAvailable
 } from "@better-auth-ui/solid"
 import { Check, X } from "lucide-solid"
 import { createSignal, Show } from "solid-js"
@@ -27,10 +26,12 @@ export function UsernameField(props: AdditionalFieldProps) {
   const currentUsername = String(props.field.defaultValue ?? "")
   const [value, setValue] = createSignal(currentUsername)
   const [error, setError] = createSignal<string>()
-  const availability = createAuthMutation(() => ({
-    ...isUsernameAvailableOptions(auth.authClient as UsernameAuthClient),
-    onError: () => undefined
-  }))
+  const availability = useIsUsernameAvailable(
+    auth.authClient as UsernameAuthClient,
+    {
+      onError: () => undefined
+    }
+  )
   const availabilityData = () =>
     availability.data as { available?: boolean } | undefined
   const shouldCheckAvailability = () =>

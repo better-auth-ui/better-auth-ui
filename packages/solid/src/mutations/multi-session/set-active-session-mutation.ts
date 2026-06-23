@@ -3,27 +3,26 @@ import {
   multiSessionMutationKeys,
   multiSessionQueryKeys
 } from "@better-auth-ui/core/plugins/multi-session"
+import { useMutation } from "@tanstack/solid-query"
+import { useSession } from "../../hooks/queries/use-session"
 import type { MultiSessionAuthClient } from "../../lib/auth-client"
 import { createAuthMutationOptions } from "../create-auth-mutation"
-import { useSessionScopedMutation } from "../use-session-scoped-mutation"
 
 export type SetActiveSessionParams<TAuthClient extends MultiSessionAuthClient> =
   Parameters<TAuthClient["multiSession"]["setActive"]>[0]
 
-export type SetActiveSessionOptions = Parameters<
-  typeof useSessionScopedMutation<
-    MultiSessionAuthClient,
-    MultiSessionAuthClient["multiSession"]["setActive"],
-    typeof multiSessionMutationKeys.setActive
-  >
->[4]
+export type SetActiveSessionOptions = Omit<
+  ReturnType<typeof setActiveSessionOptions<MultiSessionAuthClient>>,
+  "mutationKey" | "mutationFn" | "meta"
+>
 
 export function setActiveSessionOptions<
   TAuthClient extends MultiSessionAuthClient
->(authClient: TAuthClient) {
+>(authClient: TAuthClient, userId?: string) {
   return createAuthMutationOptions(
     authClient.multiSession.setActive,
-    multiSessionMutationKeys.setActive
+    multiSessionMutationKeys.setActive,
+    { awaits: [authQueryKeys.session, multiSessionQueryKeys.lists(userId)] }
   )
 }
 
@@ -31,13 +30,14 @@ export function useSetActiveSession<TAuthClient extends MultiSessionAuthClient>(
   authClient: TAuthClient,
   options?: SetActiveSessionOptions
 ) {
-  return useSessionScopedMutation(
-    authClient,
-    authClient.multiSession.setActive,
-    multiSessionMutationKeys.setActive,
-    (userId) => ({
-      awaits: [authQueryKeys.session, multiSessionQueryKeys.lists(userId)]
-    }),
-    options
-  )
+  const session = useSession(authClient)
+
+  return useMutation(() => {
+    const userId = session.data?.user.id
+
+    return {
+      ...setActiveSessionOptions(authClient, userId),
+      ...options
+    }
+  })
 }

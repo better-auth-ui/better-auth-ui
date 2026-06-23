@@ -2,27 +2,27 @@ import {
   passkeyMutationKeys,
   passkeyQueryKeys
 } from "@better-auth-ui/core/plugins/passkey"
+import { useMutation } from "@tanstack/solid-query"
+import { useSession } from "../../hooks/queries/use-session"
 import type { PasskeyAuthClient } from "../../lib/auth-client"
 import { createAuthMutationOptions } from "../create-auth-mutation"
-import { useSessionScopedMutation } from "../use-session-scoped-mutation"
 
 export type AddPasskeyParams<TAuthClient extends PasskeyAuthClient> =
   Parameters<TAuthClient["passkey"]["addPasskey"]>[0]
 
-export type AddPasskeyOptions = Parameters<
-  typeof useSessionScopedMutation<
-    PasskeyAuthClient,
-    PasskeyAuthClient["passkey"]["addPasskey"],
-    typeof passkeyMutationKeys.addPasskey
-  >
->[4]
+export type AddPasskeyOptions = Omit<
+  ReturnType<typeof addPasskeyOptions<PasskeyAuthClient>>,
+  "mutationKey" | "mutationFn" | "meta"
+>
 
 export function addPasskeyOptions<TAuthClient extends PasskeyAuthClient>(
-  authClient: TAuthClient
+  authClient: TAuthClient,
+  userId?: string
 ) {
   return createAuthMutationOptions(
     authClient.passkey.addPasskey,
-    passkeyMutationKeys.addPasskey
+    passkeyMutationKeys.addPasskey,
+    { awaits: [passkeyQueryKeys.lists(userId)] }
   )
 }
 
@@ -30,11 +30,14 @@ export function useAddPasskey<TAuthClient extends PasskeyAuthClient>(
   authClient: TAuthClient,
   options?: AddPasskeyOptions
 ) {
-  return useSessionScopedMutation(
-    authClient,
-    authClient.passkey.addPasskey,
-    passkeyMutationKeys.addPasskey,
-    (userId) => ({ awaits: [passkeyQueryKeys.lists(userId)] }),
-    options
-  )
+  const session = useSession(authClient)
+
+  return useMutation(() => {
+    const userId = session.data?.user.id
+
+    return {
+      ...addPasskeyOptions(authClient, userId),
+      ...options
+    }
+  })
 }

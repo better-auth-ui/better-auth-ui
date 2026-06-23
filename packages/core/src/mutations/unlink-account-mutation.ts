@@ -2,6 +2,7 @@ import type { MutationOptions } from "@tanstack/query-core"
 import type { BetterFetchError } from "better-auth/client"
 import type { AuthClient } from "../lib/auth-client"
 import { authMutationKeys } from "../lib/auth-mutation-keys"
+import { authQueryKeys } from "../lib/auth-query-keys"
 
 export type UnlinkAccountParams<TAuthClient extends AuthClient> = Parameters<
   TAuthClient["unlinkAccount"]
@@ -18,7 +19,8 @@ export type UnlinkAccountOptions<TAuthClient extends AuthClient> = Omit<
  * @param authClient - The Better Auth client.
  */
 export function unlinkAccountOptions<TAuthClient extends AuthClient>(
-  authClient: TAuthClient
+  authClient: TAuthClient,
+  userId?: string
 ) {
   const mutationKey = authMutationKeys.unlinkAccount
 
@@ -30,7 +32,10 @@ export function unlinkAccountOptions<TAuthClient extends AuthClient>(
 
   return {
     mutationKey,
-    mutationFn
+    mutationFn,
+    meta: {
+      awaits: [authQueryKeys.listAccounts(userId)]
+    }
   } as MutationOptions<
     Awaited<ReturnType<typeof mutationFn>>,
     BetterFetchError,

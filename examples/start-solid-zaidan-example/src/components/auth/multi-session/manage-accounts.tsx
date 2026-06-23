@@ -4,13 +4,12 @@ import {
   multiSessionLocalization
 } from "@better-auth-ui/core/plugins/multi-session"
 import {
-  createAuthMutation,
   listDeviceSessionsOptions,
   type MultiSessionAuthClient,
-  revokeMultiSessionOptions,
-  setActiveSessionOptions,
   useAuth,
-  useSession
+  useRevokeMultiSession,
+  useSession,
+  useSetActiveSession
 } from "@better-auth-ui/solid"
 import { createQuery } from "@tanstack/solid-query"
 import { For, Show } from "solid-js"
@@ -54,15 +53,19 @@ export function ManageAccounts(props: ManageAccountsProps = {}) {
       userId: userId()
     })
   }))
-  const setActiveSession = createAuthMutation(() => ({
-    ...setActiveSessionOptions(auth.authClient as MultiSessionAuthClient),
-    onSuccess: () => window.scrollTo({ top: 0 })
-  }))
-  const revokeMultiSession = createAuthMutation(() => ({
-    ...revokeMultiSessionOptions(auth.authClient as MultiSessionAuthClient),
-    onSuccess: () =>
-      toast.success(auth.localization.settings.revokeSessionSuccess)
-  }))
+  const setActiveSession = useSetActiveSession(
+    auth.authClient as MultiSessionAuthClient,
+    {
+      onSuccess: () => window.scrollTo({ top: 0 })
+    }
+  )
+  const revokeMultiSession = useRevokeMultiSession(
+    auth.authClient as MultiSessionAuthClient,
+    {
+      onSuccess: () =>
+        toast.success(auth.localization.settings.revokeSessionSuccess)
+    }
+  )
   const displayName = () =>
     resolveUserLabel(session.data?.user.name, session.data?.user.email)
   const isAccountActionPending = () =>

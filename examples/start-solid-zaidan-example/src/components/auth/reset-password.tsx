@@ -1,5 +1,4 @@
-import { resetPasswordOptions } from "@better-auth-ui/core"
-import { createAuthMutation, useAuth } from "@better-auth-ui/solid"
+import { useAuth, useResetPassword } from "@better-auth-ui/solid"
 import { Link } from "@tanstack/solid-router"
 import { Eye, EyeOff } from "lucide-solid"
 import { createSignal, Show } from "solid-js"
@@ -30,9 +29,7 @@ export function ResetPassword(props: ResetPasswordProps) {
   const [isPasswordVisible, setIsPasswordVisible] = createSignal(false)
   const [isConfirmPasswordVisible, setIsConfirmPasswordVisible] =
     createSignal(false)
-  const resetPassword = createAuthMutation(() =>
-    resetPasswordOptions(auth.authClient)
-  )
+  const resetPassword = useResetPassword(auth.authClient)
 
   const submitPasswordReset = (event: SubmitEvent) => {
     event.preventDefault()

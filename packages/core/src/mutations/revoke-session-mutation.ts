@@ -2,6 +2,7 @@ import type { MutationOptions } from "@tanstack/query-core"
 import type { BetterFetchError } from "better-auth/client"
 import type { AuthClient } from "../lib/auth-client"
 import { authMutationKeys } from "../lib/auth-mutation-keys"
+import { authQueryKeys } from "../lib/auth-query-keys"
 
 export type RevokeSessionParams<TAuthClient extends AuthClient> = Parameters<
   TAuthClient["revokeSession"]
@@ -18,7 +19,8 @@ export type RevokeSessionOptions<TAuthClient extends AuthClient> = Omit<
  * @param authClient - The Better Auth client.
  */
 export function revokeSessionOptions<TAuthClient extends AuthClient>(
-  authClient: TAuthClient
+  authClient: TAuthClient,
+  userId?: string
 ) {
   const mutationKey = authMutationKeys.revokeSession
 
@@ -30,7 +32,10 @@ export function revokeSessionOptions<TAuthClient extends AuthClient>(
 
   return {
     mutationKey,
-    mutationFn
+    mutationFn,
+    meta: {
+      awaits: [authQueryKeys.listSessions(userId)]
+    }
   } as MutationOptions<
     Awaited<ReturnType<typeof mutationFn>>,
     BetterFetchError,

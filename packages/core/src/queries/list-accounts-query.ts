@@ -27,7 +27,7 @@ export type ListAccountsOptions<TAuthClient extends AuthClient> = Omit<
  */
 export function listAccountsOptions<TAuthClient extends AuthClient>(
   authClient: TAuthClient,
-  userId: string | undefined,
+  userId?: string,
   params?: ListAccountsParams<TAuthClient>
 ) {
   type TData = ListAccountsData<TAuthClient>

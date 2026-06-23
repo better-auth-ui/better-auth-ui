@@ -1,9 +1,8 @@
 import { type AuthView, authMutationKeys } from "@better-auth-ui/core"
 import {
-  createAuthMutation,
   type PasskeyAuthClient,
-  signInPasskeyOptions,
-  useAuth
+  useAuth,
+  useSignInPasskey
 } from "@better-auth-ui/solid"
 import { useIsMutating } from "@tanstack/solid-query"
 import { Fingerprint } from "lucide-solid"
@@ -19,10 +18,9 @@ export type PasskeyButtonProps = {
 export function PasskeyButton(props: PasskeyButtonProps) {
   const auth = useAuth()
   const labels = () => passkeyLabels(auth)
-  const signInPasskey = createAuthMutation(() => ({
-    ...signInPasskeyOptions(auth.authClient as PasskeyAuthClient),
+  const signInPasskey = useSignInPasskey(auth.authClient as PasskeyAuthClient, {
     onSuccess: () => auth.navigate({ to: auth.redirectTo })
-  }))
+  })
   const signInMutating = useIsMutating(() => ({
     mutationKey: authMutationKeys.signIn.all
   }))

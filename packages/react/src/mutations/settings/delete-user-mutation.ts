@@ -5,8 +5,6 @@ import {
 } from "@better-auth-ui/core"
 import { useMutation } from "@tanstack/react-query"
 
-export type { DeleteUserParams } from "@better-auth-ui/core"
-
 /**
  * Create a mutation for deleting the authenticated user's account.
  *

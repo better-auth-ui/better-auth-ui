@@ -1,6 +1,5 @@
 import {
   type AuthClient,
-  authQueryKeys,
   type RevokeSessionOptions,
   revokeSessionOptions
 } from "@better-auth-ui/core"
@@ -19,11 +18,8 @@ export function useRevokeSession<TAuthClient extends AuthClient>(
     const userId = session.data?.user.id
 
     return {
-      ...revokeSessionOptions(authClient),
-      ...options,
-      meta: {
-        awaits: [authQueryKeys.listSessions(userId)]
-      }
+      ...revokeSessionOptions(authClient, userId),
+      ...options
     }
   })
 }

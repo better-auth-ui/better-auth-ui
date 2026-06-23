@@ -1,8 +1,7 @@
 import {
-  createAuthMutation,
   type MultiSessionAuthClient,
-  setActiveSessionOptions,
-  useAuth
+  useAuth,
+  useSetActiveSession
 } from "@better-auth-ui/solid"
 import { LoaderCircle } from "lucide-solid"
 import type { DeviceSession } from "@/components/auth/settings/shared/types"
@@ -15,10 +14,12 @@ export type SwitchAccountSubmenuItemProps = {
 
 export function SwitchAccountSubmenuItem(props: SwitchAccountSubmenuItemProps) {
   const auth = useAuth()
-  const setActiveSession = createAuthMutation(() => ({
-    ...setActiveSessionOptions(auth.authClient as MultiSessionAuthClient),
-    onSuccess: () => window.scrollTo({ top: 0 })
-  }))
+  const setActiveSession = useSetActiveSession(
+    auth.authClient as MultiSessionAuthClient,
+    {
+      onSuccess: () => window.scrollTo({ top: 0 })
+    }
+  )
 
   return (
     <DropdownMenuItem
