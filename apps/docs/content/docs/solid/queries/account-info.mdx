@@ -23,7 +23,7 @@ import {
   ensureAccountInfo,
   fetchAccountInfo,
   prefetchAccountInfo
-} from "@better-auth-ui/solid"
+} from "@better-auth-ui/core"
 
 const options = accountInfoOptions(authClient, userId, {
   query: { accountId }
@@ -36,7 +36,7 @@ const info = await fetchAccountInfo(queryClient, authClient, userId, { query: { 
 ## Invalidation
 
 ```ts
-import { accountInfoOptions } from "@better-auth-ui/solid"
+import { accountInfoOptions } from "@better-auth-ui/core"
 
 queryClient.invalidateQueries({
   queryKey: accountInfoOptions(authClient, userId, {
@@ -47,4 +47,4 @@ queryClient.invalidateQueries({
 
 ## Params
 
-<auto-type-table path="../../../../../../packages/solid/src/queries/settings/account-info-query.ts" name="AccountInfoParams" />
+<auto-type-table path="../../../../../../packages/core/src/queries/account-info-query.ts" name="AccountInfoParams" />

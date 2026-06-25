@@ -1,10 +1,17 @@
-import { readdirSync, readFileSync, statSync } from "node:fs"
-import { relative, resolve } from "node:path"
+import { readdirSync, statSync } from "node:fs"
+import { resolve } from "node:path"
 import { describe, expect, it } from "vitest"
 
 const repoRoot = resolve(import.meta.dirname, "../../..")
-const reactMutationsDir = resolve(repoRoot, "packages/react/src/mutations")
+const reactMutationHooksDir = resolve(
+  repoRoot,
+  "packages/react/src/hooks/mutations"
+)
 const solidMutationsDir = resolve(repoRoot, "packages/solid/src/mutations")
+const solidMutationHooksDir = resolve(
+  repoRoot,
+  "packages/solid/src/hooks/mutations"
+)
 
 function listFiles(dir: string) {
   const files: string[] = []
@@ -17,40 +24,38 @@ function listFiles(dir: string) {
       continue
     }
 
-    files.push(relative(dir, path))
+    files.push(path)
   }
 
   return files.sort()
 }
 
-function readRootMutationExports(packageName: "react" | "solid") {
-  const indexFile = resolve(repoRoot, `packages/${packageName}/src/index.ts`)
-
-  return readFileSync(indexFile, "utf8")
-    .split("\n")
-    .filter((line) => line.startsWith('export * from "./mutations'))
-    .sort()
+function reactMutationNames() {
+  return listFiles(reactMutationHooksDir)
+    .map((file) => file.split("/").at(-1) ?? "")
+    .filter((file) => file.startsWith("use-") && file.endsWith(".ts"))
+    .map((file) => file.replace(/^use-/, "").replace(/\.ts$/, ""))
 }
 
-describe("Solid mutation export parity", () => {
-  it("contains every React mutation implementation file", () => {
-    const reactFiles = listFiles(reactMutationsDir)
-    const solidFiles = new Set(listFiles(solidMutationsDir))
+function solidMutationNames() {
+  return new Set(
+    [...listFiles(solidMutationsDir), ...listFiles(solidMutationHooksDir)]
+      .map((file) => file.split("/").at(-1) ?? "")
+      .map((file) => file.replace(/\.ts$/, ""))
+      .map((file) =>
+        file.startsWith("use-") ? file.replace(/^use-/, "") : file
+      )
+      .map((file) => file.replace(/-mutation$/, ""))
+  )
+}
 
-    for (const file of reactFiles) {
-      expect(solidFiles.has(file), `Solid has mutations/${file}`).toBe(true)
-    }
-  })
+describe("Solid mutation implementation parity", () => {
+  it("contains an implementation for every React mutation hook", () => {
+    const reactNames = reactMutationNames()
+    const solidNames = solidMutationNames()
 
-  it("exports every React root mutation export", () => {
-    const reactExports = readRootMutationExports("react")
-    const solidExports = new Set(readRootMutationExports("solid"))
-
-    for (const exportLine of reactExports) {
-      expect(
-        solidExports.has(exportLine),
-        `Solid root exports ${exportLine}`
-      ).toBe(true)
+    for (const name of reactNames) {
+      expect(solidNames.has(name), `Solid implements ${name}`).toBe(true)
     }
   })
 })

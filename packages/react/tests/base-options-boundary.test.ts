@@ -1,45 +1,12 @@
+import type { AuthClient } from "@better-auth-ui/core"
 import * as core from "@better-auth-ui/core"
 import { describe, expect, expectTypeOf, it } from "vitest"
 import type {
   AccountInfoParams,
-  ChangeEmailParams,
-  ChangePasswordParams,
-  DeleteUserParams,
-  LinkSocialParams,
-  ListAccountsParams,
-  ListSessionsParams,
-  RequestPasswordResetParams,
-  ResetPasswordParams,
-  RevokeSessionParams,
-  SendVerificationEmailParams,
   SignInEmailParams,
-  SignInSocialParams,
-  SignOutParams,
-  SignUpEmailParams,
-  UnlinkAccountParams,
   UpdateUserParams
 } from "../src"
 import * as react from "../src"
-
-type PublicReactParamExports = [
-  AccountInfoParams<core.AuthClient>,
-  ChangeEmailParams<core.AuthClient>,
-  ChangePasswordParams<core.AuthClient>,
-  DeleteUserParams<core.AuthClient>,
-  LinkSocialParams<core.AuthClient>,
-  ListAccountsParams<core.AuthClient>,
-  ListSessionsParams<core.AuthClient>,
-  RequestPasswordResetParams<core.AuthClient>,
-  ResetPasswordParams<core.AuthClient>,
-  RevokeSessionParams<core.AuthClient>,
-  SendVerificationEmailParams<core.AuthClient>,
-  SignInEmailParams<core.AuthClient>,
-  SignInSocialParams<core.AuthClient>,
-  SignOutParams<core.AuthClient>,
-  SignUpEmailParams<core.AuthClient>,
-  UnlinkAccountParams<core.AuthClient>,
-  UpdateUserParams<core.AuthClient>
-]
 
 const baseOptionFactories = [
   "accountInfoOptions",
@@ -61,6 +28,26 @@ const baseOptionFactories = [
   "updateUserOptions"
 ] as const
 
+const baseParamExports = [
+  "AccountInfoParams",
+  "ChangeEmailParams",
+  "ChangePasswordParams",
+  "DeleteUserParams",
+  "LinkSocialParams",
+  "ListAccountsParams",
+  "ListSessionsParams",
+  "RequestPasswordResetParams",
+  "ResetPasswordParams",
+  "RevokeSessionParams",
+  "SendVerificationEmailParams",
+  "SignInEmailParams",
+  "SignInSocialParams",
+  "SignOutParams",
+  "SignUpEmailParams",
+  "UnlinkAccountParams",
+  "UpdateUserParams"
+] as const
+
 describe("React base option factory ownership", () => {
   it("exports base option factories from core, not the React package", () => {
     for (const name of baseOptionFactories) {
@@ -76,7 +63,21 @@ describe("React base option factory ownership", () => {
     expect(react).not.toHaveProperty("authQueryOptions")
   })
 
-  it("keeps public base params type exports available", () => {
-    expectTypeOf<PublicReactParamExports>().toEqualTypeOf<PublicReactParamExports>()
+  it("keeps compatibility params available as type-only exports", () => {
+    expectTypeOf<AccountInfoParams<AuthClient>>().toEqualTypeOf<
+      AccountInfoParams<AuthClient>
+    >()
+    expectTypeOf<SignInEmailParams<AuthClient>>().toEqualTypeOf<
+      SignInEmailParams<AuthClient>
+    >()
+    expectTypeOf<UpdateUserParams<AuthClient>>().toEqualTypeOf<
+      UpdateUserParams<AuthClient>
+    >()
+  })
+
+  it("does not publish core-owned params from the React root at runtime", () => {
+    for (const name of baseParamExports) {
+      expect(react).not.toHaveProperty(name)
+    }
   })
 })

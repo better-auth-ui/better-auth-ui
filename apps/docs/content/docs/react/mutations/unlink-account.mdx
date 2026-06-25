@@ -19,7 +19,7 @@ unlinkAccount({ providerId: "github", accountId: "acc_123" })
 ## Options factory
 
 ```tsx
-import { unlinkAccountOptions } from "@better-auth-ui/react"
+import { unlinkAccountOptions } from "@better-auth-ui/core"
 import { useMutation } from "@tanstack/react-query"
 
 const { mutate } = useMutation(unlinkAccountOptions(authClient))

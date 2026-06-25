@@ -21,7 +21,7 @@ import {
   fetchListAccounts,
   listAccountsOptions,
   prefetchListAccounts
-} from "@better-auth-ui/solid"
+} from "@better-auth-ui/core"
 
 const options = listAccountsOptions(authClient, userId)
 await ensureListAccounts(queryClient, authClient, userId)
@@ -32,7 +32,7 @@ const accounts = await fetchListAccounts(queryClient, authClient, userId)
 ## Invalidation
 
 ```ts
-import { listAccountsOptions } from "@better-auth-ui/solid"
+import { listAccountsOptions } from "@better-auth-ui/core"
 
 queryClient.invalidateQueries({
   queryKey: listAccountsOptions(authClient, userId).queryKey
@@ -41,4 +41,4 @@ queryClient.invalidateQueries({
 
 ## Params
 
-<auto-type-table path="../../../../../../packages/solid/src/queries/settings/list-accounts-query.ts" name="ListAccountsParams" />
+<auto-type-table path="../../../../../../packages/core/src/queries/list-accounts-query.ts" name="ListAccountsParams" />

@@ -1,18 +1,8 @@
-import { authQueryKeys, signOutOptions } from "@better-auth-ui/core"
-import { useMutation, useQueryClient } from "@tanstack/solid-query"
-import type { AuthClient } from "../../lib/auth-client"
+import { type AuthClient, signOutOptions } from "@better-auth-ui/core"
+import { useMutation } from "@tanstack/solid-query"
 
 export function useSignOut<TAuthClient extends AuthClient>(
   authClient: TAuthClient
 ) {
-  const queryClient = useQueryClient()
-
-  return useMutation(() => ({
-    ...signOutOptions(authClient),
-    onSuccess: () => {
-      queryClient.removeQueries({
-        queryKey: authQueryKeys.all
-      })
-    }
-  }))
+  return useMutation(() => signOutOptions(authClient))
 }

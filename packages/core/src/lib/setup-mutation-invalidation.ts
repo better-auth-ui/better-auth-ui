@@ -9,6 +9,7 @@ import { authMutationKeys } from "./auth-mutation-keys"
 type AuthMutationMeta = {
   invalidates?: Array<QueryKey>
   awaits?: Array<QueryKey>
+  removes?: Array<QueryKey>
 }
 
 /**
@@ -40,7 +41,15 @@ export function setupMutationInvalidation(queryClient: QueryClient) {
       return
     }
 
-    const { invalidates, awaits } = (mutation.meta ?? {}) as AuthMutationMeta
+    const { invalidates, awaits, removes } = (mutation.meta ??
+      {}) as AuthMutationMeta
+
+    if (removes?.length) {
+      queryClient.removeQueries({
+        predicate: (query) =>
+          removes.some((queryKey) => matchQuery({ queryKey }, query))
+      })
+    }
 
     if (invalidates?.length) {
       queryClient.invalidateQueries({

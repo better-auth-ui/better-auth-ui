@@ -1,16 +1,15 @@
 import {
+  type AuthMutationFn,
+  type AuthMutationFnData,
+  type AuthMutationFnVariables,
+  authMutationOptions
+} from "@better-auth-ui/core"
+import {
   type MutationKey,
   type UseMutationOptions,
   useMutation
 } from "@tanstack/react-query"
 import type { BetterFetchError } from "better-auth/client"
-
-import {
-  type AuthMutationFn,
-  type AuthMutationFnData,
-  type AuthMutationFnVariables,
-  authMutationOptions
-} from "../mutations/auth-mutation-options"
 
 type UseAuthMutationOptions<TFn extends AuthMutationFn> = Omit<
   UseMutationOptions<

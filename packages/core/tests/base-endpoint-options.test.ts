@@ -20,10 +20,26 @@ import {
   signUpEmailOptions,
   unlinkAccountOptions
 } from "../src"
-import type { ApiKeyAuthClient } from "../src/plugins/api-key/api-key-auth-client"
+import {
+  type ApiKeyAuthClient,
+  apiKeyMutationKeys,
+  apiKeyQueryKeys,
+  createApiKeyOptions,
+  deleteApiKeyOptions
+} from "../src/plugins/api-key"
 import { deleteUserMutationKeys } from "../src/plugins/delete-user"
-import type { MagicLinkAuthClient } from "../src/plugins/magic-link/magic-link-auth-client"
-import type { MultiSessionAuthClient } from "../src/plugins/multi-session/multi-session-auth-client"
+import {
+  type MagicLinkAuthClient,
+  magicLinkMutationKeys,
+  signInMagicLinkOptions
+} from "../src/plugins/magic-link"
+import {
+  type MultiSessionAuthClient,
+  multiSessionMutationKeys,
+  multiSessionQueryKeys,
+  revokeMultiSessionOptions,
+  setActiveSessionOptions
+} from "../src/plugins/multi-session"
 import type { OrganizationAuthClient } from "../src/plugins/organization/organization-auth-client"
 import type { PasskeyAuthClient } from "../src/plugins/passkey/passkey-auth-client"
 import type { UsernameAuthClient } from "../src/plugins/username/username-auth-client"
@@ -130,6 +146,7 @@ describe("core base endpoint option factories", () => {
     expect(unlinkAccount.mutationKey).toEqual(authMutationKeys.unlinkAccount)
     expect("deleteUser" in authMutationKeys).toBe(false)
     expect(signInEmail.meta).toEqual({ awaits: [authQueryKeys.session] })
+    expect(signOut.meta).toEqual({ removes: [authQueryKeys.all] })
     expect(signUpEmail.meta).toEqual({ awaits: [authQueryKeys.session] })
     expect(changeEmail.meta).toEqual({ awaits: [authQueryKeys.session] })
 
@@ -156,6 +173,70 @@ describe("core base endpoint option factories", () => {
     ).resolves.toEqual({ data: "/goodbye" })
     expect(authClient.deleteUser).toHaveBeenCalledWith({
       callbackURL: "/goodbye",
+      fetchOptions: { credentials: "include", throw: true }
+    })
+  })
+
+  it("builds plugin mutation options", async () => {
+    const authClient = {
+      apiKey: {
+        create: vi.fn(async (params) => ({ data: params.name })),
+        delete: vi.fn(async (params) => ({ data: params.keyId }))
+      },
+      signIn: {
+        magicLink: vi.fn(async (params) => ({ data: params.email }))
+      },
+      multiSession: {
+        revoke: vi.fn(async (params) => ({ data: params.sessionToken })),
+        setActive: vi.fn(async (params) => ({ data: params.sessionToken }))
+      }
+    }
+
+    const userId = "user-1"
+    const createApiKey = createApiKeyOptions(authClient as never, userId)
+    const deleteApiKey = deleteApiKeyOptions(authClient as never, userId)
+    const magicLink = signInMagicLinkOptions(authClient as never)
+    const revokeMultiSession = revokeMultiSessionOptions(
+      authClient as never,
+      userId
+    )
+    const setActiveSession = setActiveSessionOptions(
+      authClient as never,
+      userId
+    )
+
+    expect(createApiKey.mutationKey).toEqual(apiKeyMutationKeys.create)
+    expect(deleteApiKey.mutationKey).toEqual(apiKeyMutationKeys.delete)
+    expect(magicLink.mutationKey).toEqual(magicLinkMutationKeys.signIn)
+    expect(revokeMultiSession.mutationKey).toEqual(
+      multiSessionMutationKeys.revoke
+    )
+    expect(setActiveSession.mutationKey).toEqual(
+      multiSessionMutationKeys.setActive
+    )
+    expect(createApiKey.meta).toEqual({
+      awaits: [apiKeyQueryKeys.lists(userId)]
+    })
+    expect(deleteApiKey.meta).toEqual({
+      awaits: [apiKeyQueryKeys.lists(userId)]
+    })
+    expect(revokeMultiSession.meta).toEqual({
+      awaits: [multiSessionQueryKeys.lists(userId)]
+    })
+    expect(setActiveSession.meta).toEqual({
+      awaits: [authQueryKeys.session, multiSessionQueryKeys.lists(userId)]
+    })
+
+    await expect(
+      (
+        createApiKey as { mutationFn?: (variables: unknown) => unknown }
+      ).mutationFn?.({
+        name: "CI key",
+        fetchOptions: { credentials: "include" }
+      })
+    ).resolves.toEqual({ data: "CI key" })
+    expect(authClient.apiKey.create).toHaveBeenCalledWith({
+      name: "CI key",
       fetchOptions: { credentials: "include", throw: true }
     })
   })

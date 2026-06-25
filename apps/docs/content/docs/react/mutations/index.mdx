@@ -3,13 +3,14 @@ title: Mutations
 description: TanStack Query primitives for every Better Auth write endpoint.
 ---
 
-Every mutation exposes a hook and an options factory. The factory's `.mutationKey` is the canonical key.
+React exposes mutation hooks. Core owns the shared options factories, and each factory's `.mutationKey` is the canonical key.
 
 ```ts
-import { useSignInEmail, signInEmailOptions } from "@better-auth-ui/react"
+import { signInEmailOptions } from "@better-auth-ui/core"
+import { useSignInEmail } from "@better-auth-ui/react"
 ```
 
-Use the hook in components. Use the factory anywhere TanStack Query takes a `mutationOptions` object — `useMutation`, `useIsMutating`, or a global `MutationCache` observer.
+Use the hook in components. Use the core factory anywhere TanStack Query takes a `mutationOptions` object — `useMutation`, `useIsMutating`, or a global `MutationCache` observer.
 
 ## Error handling
 
@@ -69,7 +70,7 @@ new MutationCache({
 
 ## Escape hatch
 
-For write-style endpoints without a purpose-built hook, use `useAuthMutation` (or its options factory `authMutationOptions`). Read-style endpoints should use `useAuthQuery` instead.
+For write-style endpoints without a purpose-built hook, use `useAuthMutation` with the core `authMutationOptions` factory. Read-style endpoints should use `useAuthQuery` instead.
 
 ```tsx
 import { useAuth, useAuthMutation } from "@better-auth-ui/react"
@@ -85,9 +86,11 @@ mutate({ email: "user@example.com", type: "sign-in" })
 
 Variables are inferred from `authFn`'s parameter — required params reject `mutate()` at the type level, optional-param methods (e.g. `signOut`) allow it. `throw: true` is wired into `fetchOptions` so `onError` and `error` get a `BetterFetchError`.
 
-For shared mutation registration (`useIsMutating`, a global `MutationCache` observer, manual `useMutation`), use the factory directly:
+For shared mutation registration (`useIsMutating`, a global `MutationCache` observer, manual `useMutation`), import the factory from core and use it directly:
 
 ```ts
+import { authMutationOptions } from "@better-auth-ui/core"
+
 authMutationOptions(authClient.emailOtp.sendVerificationOtp, [
   "auth",
   "emailOtp",

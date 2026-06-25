@@ -208,21 +208,23 @@ describe("React/Solid docs parity", () => {
 
   it("keeps Solid settings query docs aligned with React invalidation guidance", () => {
     const solidSettingsQueries = [
-      ["list-accounts", "listAccountsOptions"],
-      ["account-info", "accountInfoOptions"],
-      ["list-sessions", "listSessionsOptions"],
-      ["list-device-sessions", "listDeviceSessionsOptions"],
-      ["list-passkeys", "listPasskeysOptions"],
-      ["list-api-keys", "listApiKeysOptions"]
+      ["list-accounts", "listAccountsOptions", "@better-auth-ui/core"],
+      ["account-info", "accountInfoOptions", "@better-auth-ui/core"],
+      ["list-sessions", "listSessionsOptions", "@better-auth-ui/core"],
+      [
+        "list-device-sessions",
+        "listDeviceSessionsOptions",
+        "@better-auth-ui/solid"
+      ],
+      ["list-passkeys", "listPasskeysOptions", "@better-auth-ui/solid"],
+      ["list-api-keys", "listApiKeysOptions", "@better-auth-ui/solid"]
     ] as const
 
-    for (const [page, factory] of solidSettingsQueries) {
+    for (const [page, factory, packageName] of solidSettingsQueries) {
       const content = readDocsFile("solid", "queries", `${page}.mdx`)
 
       expect(content).toContain("## Invalidation")
-      expect(content).toContain(
-        `import { ${factory} } from "@better-auth-ui/solid"`
-      )
+      expect(content).toContain(`import { ${factory} } from "${packageName}"`)
       expect(content).toContain(`${factory}(authClient, userId`)
     }
   })

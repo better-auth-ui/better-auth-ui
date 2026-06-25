@@ -5,32 +5,9 @@ import {
   type AuthClient,
   accountInfoOptions
 } from "@better-auth-ui/core"
-import { createQuery, type QueryClient, skipToken } from "@tanstack/solid-query"
+import { createQuery, skipToken } from "@tanstack/solid-query"
 import { useSession } from "../../hooks/queries/use-session"
 import { getSessionUserId } from "../create-user-scoped-query"
-
-export type { AccountInfoParams } from "@better-auth-ui/core"
-
-export const ensureAccountInfo = <TAuthClient extends AuthClient>(
-  queryClient: QueryClient,
-  authClient: TAuthClient,
-  userId: string,
-  params?: AccountInfoParams<TAuthClient>
-) => queryClient.ensureQueryData(accountInfoOptions(authClient, userId, params))
-
-export const prefetchAccountInfo = <TAuthClient extends AuthClient>(
-  queryClient: QueryClient,
-  authClient: TAuthClient,
-  userId: string,
-  params?: AccountInfoParams<TAuthClient>
-) => queryClient.prefetchQuery(accountInfoOptions(authClient, userId, params))
-
-export const fetchAccountInfo = <TAuthClient extends AuthClient>(
-  queryClient: QueryClient,
-  authClient: TAuthClient,
-  userId: string,
-  params?: AccountInfoParams<TAuthClient>
-) => queryClient.fetchQuery(accountInfoOptions(authClient, userId, params))
 
 export type UseAccountInfoOptions<TAuthClient extends AuthClient> =
   AccountInfoOptions<TAuthClient> & AccountInfoParams<TAuthClient>

@@ -19,7 +19,7 @@ revokeSession({ token: session.token })
 ## Options factory
 
 ```tsx
-import { revokeSessionOptions } from "@better-auth-ui/react"
+import { revokeSessionOptions } from "@better-auth-ui/core"
 import { useMutation } from "@tanstack/react-query"
 
 const { mutate } = useMutation(revokeSessionOptions(authClient))

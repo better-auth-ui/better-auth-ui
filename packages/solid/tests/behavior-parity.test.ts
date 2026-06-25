@@ -24,13 +24,20 @@ import {
 } from "@better-auth-ui/core"
 import {
   apiKeyMutationKeys,
-  apiKeyQueryKeys
+  apiKeyQueryKeys,
+  createApiKeyOptions,
+  deleteApiKeyOptions
 } from "@better-auth-ui/core/plugins/api-key"
 import { deleteUserMutationKeys } from "@better-auth-ui/core/plugins/delete-user"
-import { magicLinkMutationKeys } from "@better-auth-ui/core/plugins/magic-link"
+import {
+  magicLinkMutationKeys,
+  signInMagicLinkOptions
+} from "@better-auth-ui/core/plugins/magic-link"
 import {
   multiSessionMutationKeys,
-  multiSessionQueryKeys
+  multiSessionQueryKeys,
+  revokeMultiSessionOptions,
+  setActiveSessionOptions
 } from "@better-auth-ui/core/plugins/multi-session"
 import {
   organizationMutationKeys,
@@ -44,10 +51,8 @@ import { usernameMutationKeys } from "@better-auth-ui/core/plugins/username"
 import { afterEach, describe, expect, it, vi } from "vitest"
 import {
   addPasskeyOptions,
-  createApiKeyOptions,
   createOrganizationMeta,
   createOrganizationOptions,
-  deleteApiKeyOptions,
   deletePasskeyOptions,
   hasPermissionOptions,
   isUsernameAvailableOptions,
@@ -57,9 +62,6 @@ import {
   listOrganizationsOptions,
   listPasskeysOptions,
   resolveAuthConfig,
-  revokeMultiSessionOptions,
-  setActiveSessionOptions,
-  signInMagicLinkOptions,
   signInPasskeyOptions,
   signInUsernameOptions
 } from "../src"
@@ -170,9 +172,9 @@ describe("Solid auth behavior parity", () => {
       "../src/queries/settings/account-info-query.ts",
       "../src/queries/settings/list-accounts-query.ts",
       "../src/queries/settings/list-sessions-query.ts",
-      "../src/mutations/auth/use-request-password-reset.ts",
+      "../src/hooks/mutations/use-request-password-reset.ts",
       "../src/mutations/auth/reset-password-mutation.ts",
-      "../src/mutations/auth/use-send-verification-email.ts",
+      "../src/hooks/mutations/use-send-verification-email.ts",
       "../src/mutations/auth/sign-in-email-mutation.ts",
       "../src/mutations/auth/sign-in-social-mutation.ts",
       "../src/mutations/auth/sign-out-mutation.ts",

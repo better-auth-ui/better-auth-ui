@@ -4,33 +4,9 @@ import {
   type ListAccountsParams,
   listAccountsOptions
 } from "@better-auth-ui/core"
-import { type QueryClient, skipToken, useQuery } from "@tanstack/solid-query"
+import { skipToken, useQuery } from "@tanstack/solid-query"
 import { useSession } from "../../hooks/queries/use-session"
 import { getSessionUserId } from "../create-user-scoped-query"
-
-export type { ListAccountsParams } from "@better-auth-ui/core"
-
-export const ensureListAccounts = <TAuthClient extends AuthClient>(
-  queryClient: QueryClient,
-  authClient: TAuthClient,
-  userId: string,
-  params?: ListAccountsParams<TAuthClient>
-) =>
-  queryClient.ensureQueryData(listAccountsOptions(authClient, userId, params))
-
-export const prefetchListAccounts = <TAuthClient extends AuthClient>(
-  queryClient: QueryClient,
-  authClient: TAuthClient,
-  userId: string,
-  params?: ListAccountsParams<TAuthClient>
-) => queryClient.prefetchQuery(listAccountsOptions(authClient, userId, params))
-
-export const fetchListAccounts = <TAuthClient extends AuthClient>(
-  queryClient: QueryClient,
-  authClient: TAuthClient,
-  userId: string,
-  params?: ListAccountsParams<TAuthClient>
-) => queryClient.fetchQuery(listAccountsOptions(authClient, userId, params))
 
 export type UseListAccountsOptions<TAuthClient extends AuthClient> = Omit<
   ListAccountsOptions<TAuthClient>,

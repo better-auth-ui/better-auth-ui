@@ -2,6 +2,7 @@ import type { MutationOptions } from "@tanstack/query-core"
 import type { BetterFetchError } from "better-auth/client"
 import type { AuthClient } from "../lib/auth-client"
 import { authMutationKeys } from "../lib/auth-mutation-keys"
+import { authQueryKeys } from "../lib/auth-query-keys"
 
 export type SignOutParams<TAuthClient extends AuthClient> = Parameters<
   TAuthClient["signOut"]
@@ -9,7 +10,7 @@ export type SignOutParams<TAuthClient extends AuthClient> = Parameters<
 
 export type SignOutOptions<TAuthClient extends AuthClient> = Omit<
   ReturnType<typeof signOutOptions<TAuthClient>>,
-  "mutationKey" | "mutationFn"
+  "mutationKey" | "mutationFn" | "meta"
 >
 
 /**
@@ -31,7 +32,10 @@ export function signOutOptions<TAuthClient extends AuthClient>(
 
   return {
     mutationKey,
-    mutationFn
+    mutationFn,
+    meta: {
+      removes: [authQueryKeys.all]
+    }
   } as MutationOptions<
     Awaited<ReturnType<typeof mutationFn>>,
     BetterFetchError,
