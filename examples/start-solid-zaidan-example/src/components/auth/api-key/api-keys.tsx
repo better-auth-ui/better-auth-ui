@@ -1,11 +1,10 @@
 import { apiKeyLocalization } from "@better-auth-ui/core/plugins/api-key"
 import {
   type ApiKeyAuthClient,
-  listApiKeysOptions,
   useAuth,
+  useListApiKeys,
   useSession
 } from "@better-auth-ui/solid"
-import { createQuery } from "@tanstack/solid-query"
 import { createSignal, For, Show } from "solid-js"
 import { ApiKey } from "@/components/auth/api-key/api-key"
 import { ApiKeySkeleton } from "@/components/auth/api-key/api-key-skeleton"
@@ -41,19 +40,15 @@ export function ApiKeys(props: ApiKeysProps = {}) {
           }
         }
       : undefined
-  const apiKeys = createQuery(() => ({
-    ...listApiKeysOptions(
-      auth.authClient as ApiKeyAuthClient,
-      userId(),
-      listParams() as Parameters<typeof listApiKeysOptions<ApiKeyAuthClient>>[2]
-    ),
+  const apiKeys = useListApiKeys(auth.authClient as ApiKeyAuthClient, {
+    ...listParams(),
     enabled:
       !props.isPending &&
       shouldLoadDeviceSessions({
         isSsr: import.meta.env.SSR,
         userId: userId()
       })
-  }))
+  })
   const keys = () => apiKeys.data?.apiKeys ?? []
   const pending = () => Boolean(props.isPending || apiKeys.isPending)
 

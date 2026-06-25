@@ -10,7 +10,10 @@ import { useSession } from "../../hooks/queries/use-session"
 import { getSessionUserId } from "../create-user-scoped-query"
 
 export type UseListSessionsOptions<TAuthClient extends AuthClient> =
-  ListSessionsOptions<TAuthClient> & ListSessionsParams<TAuthClient>
+  ListSessionsOptions<TAuthClient> &
+    ListSessionsParams<TAuthClient> & {
+      enabled?: boolean
+    }
 
 export function useListSessions<TAuthClient extends AuthClient>(
   authClient: TAuthClient,

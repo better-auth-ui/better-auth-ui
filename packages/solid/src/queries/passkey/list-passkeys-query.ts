@@ -73,7 +73,10 @@ export const fetchListPasskeys = <TAuthClient extends PasskeyAuthClient>(
   )
 
 export type UseListPasskeysOptions<TAuthClient extends PasskeyAuthClient> =
-  ListPasskeysOptions<TAuthClient> & ListPasskeysParams<TAuthClient>
+  ListPasskeysOptions<TAuthClient> &
+    ListPasskeysParams<TAuthClient> & {
+      enabled?: boolean
+    }
 
 export function useListPasskeys<TAuthClient extends PasskeyAuthClient>(
   authClient: TAuthClient,

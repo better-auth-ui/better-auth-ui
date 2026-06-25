@@ -1,10 +1,10 @@
+import { type AccountInfoParams, getProviderName } from "@better-auth-ui/core"
 import {
-  type AccountInfoParams,
-  accountInfoOptions,
-  getProviderName
-} from "@better-auth-ui/core"
-import { useAuth, useLinkSocial, useUnlinkAccount } from "@better-auth-ui/solid"
-import { createQuery } from "@tanstack/solid-query"
+  useAccountInfo,
+  useAuth,
+  useLinkSocial,
+  useUnlinkAccount
+} from "@better-auth-ui/solid"
 import { Link2, Link2Off, Plug } from "lucide-solid"
 import type { ComponentProps } from "solid-js"
 import { Show } from "solid-js"
@@ -72,20 +72,10 @@ export function LinkedAccountRow(props: {
 }) {
   const auth = useAuth()
   const providerName = () => getProviderName(props.provider)
-  const accountInfo = createQuery(() => {
-    const { initialData: _initialData, ...accountOptions } = accountInfoOptions(
-      auth.authClient,
-      props.userId,
-      {
-        query: { accountId: props.account?.accountId }
-      } as AccountInfoParams<typeof auth.authClient>
-    )
-
-    return {
-      ...accountOptions,
-      enabled: Boolean(props.userId && props.account?.accountId)
-    }
-  })
+  const accountInfo = useAccountInfo(auth.authClient, {
+    query: { accountId: props.account?.accountId },
+    enabled: Boolean(props.userId && props.account?.accountId)
+  } as AccountInfoParams<typeof auth.authClient> & { enabled: boolean })
   const linkSocial = useLinkSocial(auth.authClient)
   const unlinkAccount = useUnlinkAccount(auth.authClient, {
     onSuccess: () => toast.success(auth.localization.settings.accountUnlinked)

@@ -1,11 +1,10 @@
-import { listAccountsOptions } from "@better-auth-ui/core"
 import {
   useAuth,
   useChangePassword,
+  useListAccounts,
   useRequestPasswordReset,
   useSession
 } from "@better-auth-ui/solid"
-import { createQuery } from "@tanstack/solid-query"
 import type { BetterFetchError } from "better-auth/client"
 import { Eye, EyeOff } from "lucide-solid"
 import { createSignal, Show } from "solid-js"
@@ -38,17 +37,11 @@ export function ChangePasswordSettings(
   const auth = useAuth()
   const session = useSession(auth.authClient)
   const userId = () => session.data?.user.id
-  const linkedAccounts = createQuery(() => {
-    const { initialData: _initialData, ...accountOptions } =
-      listAccountsOptions(auth.authClient, userId())
-
-    return {
-      ...accountOptions,
-      enabled: shouldLoadAccounts({
-        isSsr: import.meta.env.SSR,
-        userId: userId()
-      })
-    }
+  const linkedAccounts = useListAccounts(auth.authClient, {
+    enabled: shouldLoadAccounts({
+      isSsr: import.meta.env.SSR,
+      userId: userId()
+    })
   })
   const hasCredentialAccount = () =>
     linkedAccounts.data?.some(

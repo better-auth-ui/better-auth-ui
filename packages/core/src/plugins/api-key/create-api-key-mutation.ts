@@ -1,6 +1,5 @@
 import type { MutationOptions } from "@tanstack/query-core"
 import type { BetterFetchError } from "better-auth/client"
-import { authMutationOptions } from "../../lib/auth-mutation-options"
 import type { ApiKeyAuthClient } from "./api-key-auth-client"
 import { apiKeyMutationKeys } from "./api-key-mutation-keys"
 import { apiKeyQueryKeys } from "./api-key-query-keys"
@@ -23,14 +22,23 @@ export function createApiKeyOptions<TAuthClient extends ApiKeyAuthClient>(
   authClient: TAuthClient,
   userId?: string
 ) {
+  const mutationKey = apiKeyMutationKeys.create
+
+  const mutationFn = (params: CreateApiKeyParams<TAuthClient>) =>
+    authClient.apiKey.create({
+      ...params,
+      fetchOptions: { ...params?.fetchOptions, throw: true }
+    })
+
   return {
-    ...authMutationOptions(authClient.apiKey.create, apiKeyMutationKeys.create),
+    mutationKey,
+    mutationFn,
     meta: {
       awaits: [apiKeyQueryKeys.lists(userId)]
     }
   } as MutationOptions<
-    Awaited<ReturnType<TAuthClient["apiKey"]["create"]>>,
+    Awaited<ReturnType<typeof mutationFn>>,
     BetterFetchError,
-    CreateApiKeyParams<TAuthClient>
+    Parameters<typeof mutationFn>[0]
   >
 }

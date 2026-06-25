@@ -1,10 +1,9 @@
 import {
-  listPasskeysOptions,
   type PasskeyAuthClient,
   useAuth,
+  useListPasskeys,
   useSession
 } from "@better-auth-ui/solid"
-import { createQuery } from "@tanstack/solid-query"
 import { createSignal, For, Show } from "solid-js"
 import { AddPasskeyDialog } from "@/components/auth/passkey/add-passkey-dialog"
 import { Passkey } from "@/components/auth/passkey/passkey"
@@ -29,13 +28,12 @@ export function PasskeysSettings(props: PasskeysSettingsProps) {
   const session = useSession(auth.authClient)
   const userId = () => session.data?.user.id
   const [isAddDialogOpen, setIsAddDialogOpen] = createSignal(false)
-  const passkeys = createQuery(() => ({
-    ...listPasskeysOptions(auth.authClient as PasskeyAuthClient, userId()),
+  const passkeys = useListPasskeys(auth.authClient as PasskeyAuthClient, {
     enabled: shouldLoadDeviceSessions({
       isSsr: import.meta.env.SSR,
       userId: userId()
     })
-  }))
+  })
   const items = () => passkeys.data ?? []
 
   return (

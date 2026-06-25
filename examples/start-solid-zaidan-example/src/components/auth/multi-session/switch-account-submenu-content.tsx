@@ -4,12 +4,11 @@ import {
   multiSessionLocalization
 } from "@better-auth-ui/core/plugins/multi-session"
 import {
-  listDeviceSessionsOptions,
   type MultiSessionAuthClient,
   useAuth,
+  useListDeviceSessions,
   useSession
 } from "@better-auth-ui/solid"
-import { createQuery } from "@tanstack/solid-query"
 import { Link } from "@tanstack/solid-router"
 import { Check, CirclePlus } from "lucide-solid"
 import { For, Show } from "solid-js"
@@ -37,16 +36,15 @@ export function SwitchAccountSubmenuContent() {
       | Partial<MultiSessionLocalization>
       | undefined)
   })
-  const deviceSessions = createQuery(() => ({
-    ...listDeviceSessionsOptions(
-      auth.authClient as MultiSessionAuthClient,
-      userId()
-    ),
-    enabled: shouldLoadDeviceSessions({
-      isSsr: import.meta.env.SSR,
-      userId: userId()
-    })
-  }))
+  const deviceSessions = useListDeviceSessions(
+    auth.authClient as MultiSessionAuthClient,
+    {
+      enabled: shouldLoadDeviceSessions({
+        isSsr: import.meta.env.SSR,
+        userId: userId()
+      })
+    }
+  )
   const otherDeviceSessions = () => {
     const sessions = (deviceSessions.data ?? []) as DeviceSession[]
 

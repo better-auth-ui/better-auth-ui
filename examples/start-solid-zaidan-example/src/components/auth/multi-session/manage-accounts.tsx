@@ -4,14 +4,13 @@ import {
   multiSessionLocalization
 } from "@better-auth-ui/core/plugins/multi-session"
 import {
-  listDeviceSessionsOptions,
   type MultiSessionAuthClient,
   useAuth,
+  useListDeviceSessions,
   useRevokeMultiSession,
   useSession,
   useSetActiveSession
 } from "@better-auth-ui/solid"
-import { createQuery } from "@tanstack/solid-query"
 import { For, Show } from "solid-js"
 import { toast } from "solid-sonner"
 import {
@@ -43,16 +42,15 @@ export function ManageAccounts(props: ManageAccountsProps = {}) {
       | Partial<MultiSessionLocalization>
       | undefined)
   })
-  const deviceSessions = createQuery(() => ({
-    ...listDeviceSessionsOptions(
-      auth.authClient as MultiSessionAuthClient,
-      userId()
-    ),
-    enabled: shouldLoadDeviceSessions({
-      isSsr: import.meta.env.SSR,
-      userId: userId()
-    })
-  }))
+  const deviceSessions = useListDeviceSessions(
+    auth.authClient as MultiSessionAuthClient,
+    {
+      enabled: shouldLoadDeviceSessions({
+        isSsr: import.meta.env.SSR,
+        userId: userId()
+      })
+    }
+  )
   const setActiveSession = useSetActiveSession(
     auth.authClient as MultiSessionAuthClient,
     {

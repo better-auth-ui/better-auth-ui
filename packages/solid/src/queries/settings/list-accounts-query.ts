@@ -12,7 +12,9 @@ export type UseListAccountsOptions<TAuthClient extends AuthClient> = Omit<
   ListAccountsOptions<TAuthClient>,
   "initialData"
 > &
-  ListAccountsParams<TAuthClient>
+  ListAccountsParams<TAuthClient> & {
+    enabled?: boolean
+  }
 
 export function useListAccounts<TAuthClient extends AuthClient>(
   authClient: TAuthClient,

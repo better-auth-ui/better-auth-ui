@@ -1,6 +1,5 @@
 import type { MutationOptions } from "@tanstack/query-core"
 import type { BetterFetchError } from "better-auth/client"
-import { authMutationOptions } from "../../lib/auth-mutation-options"
 import type { ApiKeyAuthClient } from "./api-key-auth-client"
 import { apiKeyMutationKeys } from "./api-key-mutation-keys"
 import { apiKeyQueryKeys } from "./api-key-query-keys"
@@ -23,14 +22,23 @@ export function deleteApiKeyOptions<TAuthClient extends ApiKeyAuthClient>(
   authClient: TAuthClient,
   userId?: string
 ) {
+  const mutationKey = apiKeyMutationKeys.delete
+
+  const mutationFn = (params: DeleteApiKeyParams<TAuthClient>) =>
+    authClient.apiKey.delete({
+      ...params,
+      fetchOptions: { ...params?.fetchOptions, throw: true }
+    })
+
   return {
-    ...authMutationOptions(authClient.apiKey.delete, apiKeyMutationKeys.delete),
+    mutationKey,
+    mutationFn,
     meta: {
       awaits: [apiKeyQueryKeys.lists(userId)]
     }
   } as MutationOptions<
-    Awaited<ReturnType<TAuthClient["apiKey"]["delete"]>>,
+    Awaited<ReturnType<typeof mutationFn>>,
     BetterFetchError,
-    DeleteApiKeyParams<TAuthClient>
+    Parameters<typeof mutationFn>[0]
   >
 }

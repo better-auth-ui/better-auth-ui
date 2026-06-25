@@ -1,6 +1,5 @@
 import type { MutationOptions } from "@tanstack/query-core"
 import type { BetterFetchError } from "better-auth/client"
-import { authMutationOptions } from "../../lib/auth-mutation-options"
 import type { MagicLinkAuthClient } from "./magic-link-auth-client"
 import { magicLinkMutationKeys } from "./magic-link-mutation-keys"
 
@@ -21,12 +20,20 @@ export type SignInMagicLinkOptions<TAuthClient extends MagicLinkAuthClient> =
 export function signInMagicLinkOptions<TAuthClient extends MagicLinkAuthClient>(
   authClient: TAuthClient
 ) {
-  return authMutationOptions(
-    authClient.signIn.magicLink,
-    magicLinkMutationKeys.signIn
-  ) as MutationOptions<
-    Awaited<ReturnType<TAuthClient["signIn"]["magicLink"]>>,
+  const mutationKey = magicLinkMutationKeys.signIn
+
+  const mutationFn = (params: SignInMagicLinkParams<TAuthClient>) =>
+    authClient.signIn.magicLink({
+      ...params,
+      fetchOptions: { ...params?.fetchOptions, throw: true }
+    })
+
+  return {
+    mutationKey,
+    mutationFn
+  } as MutationOptions<
+    Awaited<ReturnType<typeof mutationFn>>,
     BetterFetchError,
-    SignInMagicLinkParams<TAuthClient>
+    Parameters<typeof mutationFn>[0]
   >
 }

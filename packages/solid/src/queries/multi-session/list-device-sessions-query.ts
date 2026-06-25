@@ -85,7 +85,9 @@ export const fetchListDeviceSessions = <
 export type UseListDeviceSessionsOptions<
   TAuthClient extends MultiSessionAuthClient
 > = ListDeviceSessionsOptions<TAuthClient> &
-  ListDeviceSessionsParams<TAuthClient>
+  ListDeviceSessionsParams<TAuthClient> & {
+    enabled?: boolean
+  }
 
 export function useListDeviceSessions<
   TAuthClient extends MultiSessionAuthClient

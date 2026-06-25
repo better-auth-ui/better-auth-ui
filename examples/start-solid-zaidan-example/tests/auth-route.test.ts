@@ -624,7 +624,7 @@ describe("Solid auth route component selection", () => {
         ),
         "utf8"
       )
-    ).toContain("listDeviceSessionsOptions")
+    ).toContain("useListDeviceSessions")
   })
 
   it("uses colocated session queries instead of drilling session through settings sections", () => {
@@ -1147,8 +1147,8 @@ describe("Solid auth route component selection", () => {
       "Placeholder for Multi Session submenu wiring"
     )
 
-    expect(switchAccountSubmenuContent).toContain("listDeviceSessionsOptions")
-    expect(switchAccountSubmenuContent).toContain("createQuery")
+    expect(switchAccountSubmenuContent).toContain("useListDeviceSessions")
+    expect(switchAccountSubmenuContent).not.toContain("createQuery")
     expect(switchAccountSubmenuContent).toContain("shouldLoadDeviceSessions")
     expect(switchAccountSubmenuContent).toContain("DropdownMenuSubContent")
     expect(switchAccountSubmenuContent).toContain("SwitchAccountSubmenuItem")
@@ -2132,8 +2132,8 @@ describe("Solid auth route component selection", () => {
 
     expect(changePassword).toContain("useChangePassword")
     expect(changePassword).toContain("useRequestPasswordReset")
-    expect(changePassword).toContain("listAccountsOptions")
-    expect(changePassword).toContain("const linkedAccounts = createQuery")
+    expect(changePassword).toContain("useListAccounts")
+    expect(changePassword).toContain("const linkedAccounts = useListAccounts")
     expect(changePassword).toContain('providerId === "credential"')
     expect(changePassword).toContain("requestPasswordReset.mutate")
     expect(changePassword).toContain("session.data.user.email")
@@ -2262,10 +2262,10 @@ describe("Solid auth route component selection", () => {
       'export * from "./queries/settings/list-sessions-query"'
     )
     expect(activeSession).toContain('import Bowser from "bowser"')
-    expect(activeSessions).toContain("listSessionsOptions")
+    expect(activeSessions).toContain("useListSessions")
     expect(activeSessions).toContain("useRevokeSession")
-    expect(activeSessions).toContain("const activeSessions = createQuery")
-    expect(activeSessions).toContain("...sessionOptions")
+    expect(activeSessions).toContain("const activeSessions = useListSessions")
+    expect(activeSessions).not.toContain("createQuery")
     expect(activeSessions).not.toContain("initialData: undefined")
     expect(activeSessions).toContain("const revokeSession = useRevokeSession")
     expect(activeSessions).toContain("useRevokeSession(auth.authClient")
@@ -2312,16 +2312,16 @@ describe("Solid auth route component selection", () => {
       "utf8"
     )
 
-    expect(linkedAccount).toContain("accountInfoOptions")
+    expect(linkedAccount).toContain("useAccountInfo")
     expect(linkedAccount).toContain("useLinkSocial")
     expect(linkedAccount).toContain("useUnlinkAccount")
-    expect(linkedAccounts).toContain("const linkedAccounts = createQuery")
-    expect(linkedAccounts).toContain("...accountOptions")
+    expect(linkedAccounts).toContain("const linkedAccounts = useListAccounts")
+    expect(linkedAccounts).not.toContain("createQuery")
     expect(linkedAccounts).not.toContain("initialData: undefined")
     expect(linkedAccounts).toContain('providerId !== "credential"')
     expect(linkedAccounts).toContain("<LinkedAccountRow")
-    expect(linkedAccount).toContain("const accountInfo = createQuery")
-    expect(linkedAccount).toContain("...accountOptions")
+    expect(linkedAccount).toContain("const accountInfo = useAccountInfo")
+    expect(linkedAccount).not.toContain("createQuery")
     expect(linkedAccount).not.toContain("initialData: undefined")
     expect(linkedAccount).toContain("account?.accountId")
     expect(linkedAccount).toContain("const linkSocial = useLinkSocial")
@@ -2526,7 +2526,7 @@ describe("Solid auth route component selection", () => {
     expect(settingsComponents).not.toContain("function CreateApiKeyDialog")
     expect(settingsComponents).not.toContain("function NewApiKeyDialog")
     expect(settingsComponents).not.toContain("function DeleteApiKeyDialog")
-    expect(apiKeys).toContain("listApiKeysOptions")
+    expect(apiKeys).toContain("useListApiKeys")
     expect(apiKeys).toContain("apiKeyLocalization.apiKeys")
     expect(apiKeys).toContain("<CreateApiKeyDialog")
     expect(apiKeys).toContain("<ApiKey")
@@ -2563,7 +2563,7 @@ describe("Solid auth route component selection", () => {
     expect(settingsComponents).not.toContain("function PasskeyRow")
     expect(settingsComponents).not.toContain("function AddPasskeyDialog")
     expect(settingsComponents).not.toContain("function DeletePasskeyDialog")
-    expect(passkeys).toContain("listPasskeysOptions")
+    expect(passkeys).toContain("useListPasskeys")
     expect(addPasskeyDialog).toContain("useAddPasskey")
     expect(deletePasskeyDialog).toContain("useDeletePasskey")
     expect(passkeys).toContain("<AddPasskeyDialog")
@@ -2903,8 +2903,8 @@ describe("Solid auth route component selection", () => {
       'class={cn("z-card-padding-none border-destructive", props.class)}'
     )
     expect(deleteAccount).not.toContain("className")
-    expect(deleteAccount).toContain("const accounts = createQuery")
-    expect(deleteAccount).toContain("...accountOptions")
+    expect(deleteAccount).toContain("const accounts = useListAccounts")
+    expect(deleteAccount).not.toContain("createQuery")
     expect(deleteAccount).not.toContain("initialData: undefined")
     expect(deleteAccount).toContain('providerId === "credential"')
     expect(deleteAccount).toContain("const needsPassword = () =>")

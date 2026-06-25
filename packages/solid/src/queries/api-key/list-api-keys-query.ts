@@ -73,7 +73,10 @@ export const fetchListApiKeys = <TAuthClient extends ApiKeyAuthClient>(
   )
 
 export type UseListApiKeysOptions<TAuthClient extends ApiKeyAuthClient> =
-  ListApiKeysOptions<TAuthClient> & ListApiKeysParams<TAuthClient>
+  ListApiKeysOptions<TAuthClient> &
+    ListApiKeysParams<TAuthClient> & {
+      enabled?: boolean
+    }
 
 export function useListApiKeys<TAuthClient extends ApiKeyAuthClient>(
   authClient: TAuthClient,

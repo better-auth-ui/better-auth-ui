@@ -1,6 +1,5 @@
 import type { MutationOptions } from "@tanstack/query-core"
 import type { BetterFetchError } from "better-auth/client"
-import { authMutationOptions } from "../../lib/auth-mutation-options"
 import { authQueryKeys } from "../../lib/auth-query-keys"
 import type { MultiSessionAuthClient } from "./multi-session-auth-client"
 import { multiSessionMutationKeys } from "./multi-session-mutation-keys"
@@ -25,17 +24,23 @@ export type SetActiveSessionOptions<
 export function setActiveSessionOptions<
   TAuthClient extends MultiSessionAuthClient
 >(authClient: TAuthClient, userId?: string) {
+  const mutationKey = multiSessionMutationKeys.setActive
+
+  const mutationFn = (params: SetActiveSessionParams<TAuthClient>) =>
+    authClient.multiSession.setActive({
+      ...params,
+      fetchOptions: { ...params?.fetchOptions, throw: true }
+    })
+
   return {
-    ...authMutationOptions(
-      authClient.multiSession.setActive,
-      multiSessionMutationKeys.setActive
-    ),
+    mutationKey,
+    mutationFn,
     meta: {
       awaits: [authQueryKeys.session, multiSessionQueryKeys.lists(userId)]
     }
   } as MutationOptions<
-    Awaited<ReturnType<TAuthClient["multiSession"]["setActive"]>>,
+    Awaited<ReturnType<typeof mutationFn>>,
     BetterFetchError,
-    SetActiveSessionParams<TAuthClient>
+    Parameters<typeof mutationFn>[0]
   >
 }

@@ -1,6 +1,10 @@
-import { type ListSession, listSessionsOptions } from "@better-auth-ui/core"
-import { useAuth, useRevokeSession, useSession } from "@better-auth-ui/solid"
-import { createQuery } from "@tanstack/solid-query"
+import type { ListSession } from "@better-auth-ui/core"
+import {
+  useAuth,
+  useListSessions,
+  useRevokeSession,
+  useSession
+} from "@better-auth-ui/solid"
 import { For, Show } from "solid-js"
 import { toast } from "solid-sonner"
 import {
@@ -22,17 +26,11 @@ export function ActiveSessionsSettings(
   const auth = useAuth()
   const session = useSession(auth.authClient)
   const userId = () => session.data?.user.id
-  const activeSessions = createQuery(() => {
-    const { initialData: _initialData, ...sessionOptions } =
-      listSessionsOptions(auth.authClient, userId())
-
-    return {
-      ...sessionOptions,
-      enabled: shouldLoadDeviceSessions({
-        isSsr: import.meta.env.SSR,
-        userId: userId()
-      })
-    }
+  const activeSessions = useListSessions(auth.authClient, {
+    enabled: shouldLoadDeviceSessions({
+      isSsr: import.meta.env.SSR,
+      userId: userId()
+    })
   })
   const sessions = () =>
     [...(activeSessions.data ?? [])].sort((activeSession) =>
