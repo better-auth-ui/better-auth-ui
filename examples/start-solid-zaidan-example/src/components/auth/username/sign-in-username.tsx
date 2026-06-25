@@ -53,13 +53,8 @@ export function SignInUsername(props: SignInUsernameProps) {
   }
   const signIn = useSignInEmail(auth.authClient, {
     onError: (error, variables) => {
-      const signInVariables = variables as { email: string }
-
       if ((error as BetterFetchError).error?.code === "EMAIL_NOT_VERIFIED") {
-        sessionStorage.setItem(
-          "better-auth-ui.verify-email",
-          signInVariables.email
-        )
+        sessionStorage.setItem("better-auth-ui.verify-email", variables.email)
         auth.navigate({
           to: `${auth.basePaths.auth}/${auth.viewPaths.auth.verifyEmail}`
         })
@@ -113,7 +108,7 @@ export function SignInUsername(props: SignInUsernameProps) {
         fetchOptions: fetchOptions(),
         password: submittedPassword,
         username: signInPath.username
-      } as Parameters<typeof signInUsername.mutate>[0])
+      })
       return
     }
 
@@ -121,7 +116,7 @@ export function SignInUsername(props: SignInUsernameProps) {
       email: signInPath.email,
       fetchOptions: fetchOptions(),
       password: submittedPassword
-    } as Parameters<typeof signIn.mutate>[0])
+    })
   }
 
   return (

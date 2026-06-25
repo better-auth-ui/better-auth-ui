@@ -10,9 +10,6 @@ export type AccountInfoParams<TAuthClient extends AuthClient> = Parameters<
   TAuthClient["accountInfo"]
 >[0]
 
-export type AccountInfo<TAuthClient extends AuthClient = AuthClient> =
-  NonNullable<AccountInfoData<TAuthClient>>
-
 export type AccountInfoOptions<TAuthClient extends AuthClient> = Omit<
   ReturnType<typeof accountInfoOptions<TAuthClient>>,
   "queryKey" | "queryFn"
