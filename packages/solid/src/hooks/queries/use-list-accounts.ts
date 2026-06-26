@@ -5,14 +5,16 @@ import {
   listAccountsOptions
 } from "@better-auth-ui/core"
 import { useQuery } from "@tanstack/solid-query"
-import { useSession } from "../../hooks/queries/use-session"
-import { getSessionUserId } from "../create-user-scoped-query"
+import { getSessionUserId } from "../../queries/create-user-scoped-query"
+import { useSession } from "./use-session"
 
 export type UseListAccountsOptions<TAuthClient extends AuthClient> = Omit<
   ListAccountsOptions<TAuthClient>,
   "initialData"
 > &
-  ListAccountsParams<TAuthClient>
+  ListAccountsParams<TAuthClient> & {
+    enabled?: boolean | ((query: never) => boolean)
+  }
 
 export function useListAccounts<TAuthClient extends AuthClient>(
   authClient: TAuthClient,
@@ -20,7 +22,7 @@ export function useListAccounts<TAuthClient extends AuthClient>(
 ) {
   const session = useSession(authClient)
   const userId = () => getSessionUserId(session)
-  const { query, fetchOptions, ...queryOptions } = options
+  const { query, fetchOptions, enabled, ...queryOptions } = options
 
   return useQuery(() => {
     const baseOptions = listAccountsOptions(authClient, userId(), {
@@ -31,7 +33,11 @@ export function useListAccounts<TAuthClient extends AuthClient>(
     return {
       ...queryOptions,
       ...baseOptions,
-      enabled: Boolean(userId()),
+      enabled: (query) =>
+        Boolean(userId()) &&
+        (typeof enabled === "function"
+          ? enabled(query as never)
+          : enabled !== false),
       initialData: undefined
     }
   })

@@ -82,7 +82,7 @@ The tree of routes now has `{ queryClient }` available in every loader, `beforeL
 
 ## Prefetch the session in `beforeLoad`
 
-Every `@better-auth-ui/solid` query ships matching `ensure*`, `prefetch*`, and `fetch*` helpers alongside its options factory. They accept a `QueryClient`, the `authClient`, and the same params as the underlying query.
+Every Solid client-shaped query helper ships matching `ensure*`, `prefetch*`, and `fetch*` helpers alongside its options factory. Base/session helpers are exported from `@better-auth-ui/solid` or `@better-auth-ui/core`; optional plugin helpers live under `@better-auth-ui/solid/plugins/<plugin>`. They accept a `QueryClient`, the `authClient`, and the same params as the underlying query.
 
 | Helper | When to use |
 | --- | --- |
@@ -158,7 +158,7 @@ export const Route = createFileRoute("/")({
 })
 ```
 
-The same pattern works for Solid read helpers that expose client-shaped loader helpers — for example `prefetchListAccounts`, `prefetchListApiKeys`, and `prefetchActiveOrganization` live in `@better-auth-ui/solid` next to their options factories. When you want to call the Better Auth server instance directly instead, use `@better-auth-ui/core/server` for session/settings helpers and the plugin `/server` entrypoints for plugin server-auth helpers.
+The same pattern works for Solid read helpers that expose client-shaped loader helpers. Base/settings helpers such as `prefetchListAccounts` live with the base Solid/core helpers, while plugin helpers such as `prefetchListApiKeys` and `prefetchActiveOrganization` live under `@better-auth-ui/solid/plugins/api-key` and `@better-auth-ui/solid/plugins/organization`. When you want to call the Better Auth server instance directly instead, use `@better-auth-ui/core/server` for session/settings helpers and the plugin `/server` entrypoints for plugin server-auth helpers.
 
 ## Server-only helpers
 

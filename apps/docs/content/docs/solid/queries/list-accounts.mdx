@@ -3,7 +3,7 @@ title: useListAccounts
 description: List linked accounts for the current user.
 ---
 
-User-scoped query helpers wait for the active session user before firing. They use `skipToken` until `userId` exists, so account data stays isolated per signed-in user.
+User-scoped query helpers wait for the active session user before firing. Solid hooks stay disabled until `userId` exists while preserving consumer `enabled` controls, so account data stays isolated per signed-in user.
 
 ## Usage
 

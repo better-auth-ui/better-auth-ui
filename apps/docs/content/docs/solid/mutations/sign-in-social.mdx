@@ -8,7 +8,7 @@ Starts the provider OAuth flow and redirects through Better Auth.
 ## Options factory
 
 ```tsx
-import { signInSocialOptions } from "@better-auth-ui/solid"
+import { signInSocialOptions } from "@better-auth-ui/core"
 import { createMutation } from "@tanstack/solid-query"
 
 const signInSocial = createMutation(() => signInSocialOptions(authClient))
@@ -21,4 +21,4 @@ signInSocial.mutate({
 
 ## Params
 
-<auto-type-table path="../../../../../../packages/solid/src/mutations/auth/sign-in-social-mutation.ts" name="SignInSocialParams" />
+<auto-type-table path="../../../../../../packages/core/src/mutations/sign-in-social-mutation.ts" name="SignInSocialParams" />

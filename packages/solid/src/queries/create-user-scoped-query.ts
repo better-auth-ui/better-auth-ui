@@ -91,11 +91,14 @@ export function createUserScopedQuery<
 ) {
   return createQuery(() => {
     const baseOptions = createUserScopedOptions(queryKey(), authFn, params())
+    const { enabled, ...queryOptions } = queryOptionsRest()
 
     return {
-      ...queryOptionsRest(),
+      ...queryOptions,
       ...baseOptions,
-      enabled: canFetch()
+      enabled: (query) =>
+        canFetch() &&
+        (typeof enabled === "function" ? enabled(query) : enabled !== false)
     }
   })
 }

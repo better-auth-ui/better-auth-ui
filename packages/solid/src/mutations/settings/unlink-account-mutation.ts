@@ -6,8 +6,6 @@ import {
 import { useMutation } from "@tanstack/solid-query"
 import { useSession } from "../../hooks/queries/use-session"
 
-export type { UnlinkAccountParams } from "@better-auth-ui/core"
-
 export function useUnlinkAccount<TAuthClient extends AuthClient>(
   authClient: TAuthClient,
   options?: UnlinkAccountOptions<TAuthClient>

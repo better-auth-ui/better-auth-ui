@@ -6,11 +6,14 @@ import {
   listSessionsOptions
 } from "@better-auth-ui/core"
 import { createQuery } from "@tanstack/solid-query"
-import { useSession } from "../../hooks/queries/use-session"
-import { getSessionUserId } from "../create-user-scoped-query"
+import { getSessionUserId } from "../../queries/create-user-scoped-query"
+import { useSession } from "./use-session"
 
 export type UseListSessionsOptions<TAuthClient extends AuthClient> =
-  ListSessionsOptions<TAuthClient> & ListSessionsParams<TAuthClient>
+  ListSessionsOptions<TAuthClient> &
+    ListSessionsParams<TAuthClient> & {
+      enabled?: boolean | ((query: never) => boolean)
+    }
 
 export function useListSessions<TAuthClient extends AuthClient>(
   authClient: TAuthClient,
@@ -18,7 +21,7 @@ export function useListSessions<TAuthClient extends AuthClient>(
 ) {
   const session = useSession(authClient)
   const userId = () => getSessionUserId(session)
-  const { query, fetchOptions, initialData, ...queryOptions } = options
+  const { query, fetchOptions, initialData, enabled, ...queryOptions } = options
 
   if (initialData !== undefined) {
     return createQuery(() => {
@@ -30,7 +33,11 @@ export function useListSessions<TAuthClient extends AuthClient>(
       return {
         ...queryOptions,
         ...baseOptions,
-        enabled: Boolean(userId()),
+        enabled: (query) =>
+          Boolean(userId()) &&
+          (typeof enabled === "function"
+            ? enabled(query as never)
+            : enabled !== false),
         initialData: initialData as
           | ListSessionsData<TAuthClient>
           | (() => ListSessionsData<TAuthClient>)
@@ -47,7 +54,11 @@ export function useListSessions<TAuthClient extends AuthClient>(
     return {
       ...queryOptions,
       ...baseOptions,
-      enabled: Boolean(userId()),
+      enabled: (query) =>
+        Boolean(userId()) &&
+        (typeof enabled === "function"
+          ? enabled(query as never)
+          : enabled !== false),
       initialData: undefined
     }
   })

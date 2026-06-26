@@ -1,24 +1,5 @@
 "use client"
 
-export type {
-  AccountInfoParams,
-  ChangeEmailParams,
-  ChangePasswordParams,
-  DeleteUserParams,
-  LinkSocialParams,
-  ListAccountsParams,
-  ListSessionsParams,
-  RequestPasswordResetParams,
-  ResetPasswordParams,
-  RevokeSessionParams,
-  SendVerificationEmailParams,
-  SignInEmailParams,
-  SignInSocialParams,
-  SignOutParams,
-  SignUpEmailParams,
-  UnlinkAccountParams,
-  UpdateUserParams
-} from "@better-auth-ui/core"
 export * from "./components/auth/auth-provider"
 export * from "./components/auth/fetch-options-provider"
 export * from "./components/icons"

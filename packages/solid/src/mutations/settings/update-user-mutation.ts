@@ -5,8 +5,6 @@ import {
 } from "@better-auth-ui/core"
 import { useMutation } from "@tanstack/solid-query"
 
-export type { UpdateUserParams } from "@better-auth-ui/core"
-
 export function useUpdateUser<TAuthClient extends AuthClient>(
   authClient: TAuthClient,
   options?: UpdateUserOptions<TAuthClient>

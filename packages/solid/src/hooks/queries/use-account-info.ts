@@ -6,11 +6,14 @@ import {
   accountInfoOptions
 } from "@better-auth-ui/core"
 import { createQuery } from "@tanstack/solid-query"
-import { useSession } from "../../hooks/queries/use-session"
-import { getSessionUserId } from "../create-user-scoped-query"
+import { getSessionUserId } from "../../queries/create-user-scoped-query"
+import { useSession } from "./use-session"
 
 export type UseAccountInfoOptions<TAuthClient extends AuthClient> =
-  AccountInfoOptions<TAuthClient> & AccountInfoParams<TAuthClient>
+  AccountInfoOptions<TAuthClient> &
+    AccountInfoParams<TAuthClient> & {
+      enabled?: boolean | ((query: never) => boolean)
+    }
 
 export function useAccountInfo<TAuthClient extends AuthClient>(
   authClient: TAuthClient,
@@ -18,7 +21,7 @@ export function useAccountInfo<TAuthClient extends AuthClient>(
 ) {
   const session = useSession(authClient)
   const userId = () => getSessionUserId(session)
-  const { query, fetchOptions, initialData, ...queryOptions } = options
+  const { query, fetchOptions, initialData, enabled, ...queryOptions } = options
 
   if (initialData !== undefined) {
     return createQuery(() => {
@@ -26,12 +29,15 @@ export function useAccountInfo<TAuthClient extends AuthClient>(
         query,
         fetchOptions
       })
-      const canFetch = Boolean(userId() && query?.accountId)
 
       return {
         ...queryOptions,
         ...baseOptions,
-        enabled: canFetch,
+        enabled: (queryState) =>
+          Boolean(userId() && query?.accountId) &&
+          (typeof enabled === "function"
+            ? enabled(queryState as never)
+            : enabled !== false),
         initialData: initialData as
           | AccountInfoData<TAuthClient>
           | (() => AccountInfoData<TAuthClient>)
@@ -44,12 +50,15 @@ export function useAccountInfo<TAuthClient extends AuthClient>(
       query,
       fetchOptions
     })
-    const canFetch = Boolean(userId() && query?.accountId)
 
     return {
       ...queryOptions,
       ...baseOptions,
-      enabled: canFetch,
+      enabled: (queryState) =>
+        Boolean(userId() && query?.accountId) &&
+        (typeof enabled === "function"
+          ? enabled(queryState as never)
+          : enabled !== false),
       initialData: undefined
     }
   })

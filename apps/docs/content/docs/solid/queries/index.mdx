@@ -29,7 +29,7 @@ queryClient.invalidateQueries({ queryKey: authQueryKeys.session })
 
 ## Per-user queries
 
-Settings queries (`useListAccounts`, `useAccountInfo`, `useListSessions`, `useListDeviceSessions`, `useListPasskeys`, `useListApiKeys`) are keyed per-user and wait for the active session before firing — `queryFn` is swapped for `skipToken` until `userId` resolves. This means they drop out of the cache cleanly on sign-out and on account switching with a persister they stay isolated per user.
+Settings queries (`useListAccounts`, `useAccountInfo`, `useListSessions`, `useListDeviceSessions`, `useListPasskeys`, `useListApiKeys`) are keyed per-user and wait for the active session before firing. Solid hooks stay disabled until the required user-scoped inputs resolve (`userId`, and `accountId` for `useAccountInfo`), while preserving consumer `enabled` controls. This means they drop out of the cache cleanly on sign-out and on account switching with a persister they stay isolated per user.
 
 ## Escape hatch
 

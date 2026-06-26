@@ -157,7 +157,7 @@ describe("Solid auth behavior parity", () => {
     expect(getSessionUserId({ data: null } as never)).toBeUndefined()
 
     const listAccountsQuery = readFileSync(
-      resolve(__dirname, "../src/queries/settings/list-accounts-query.ts"),
+      resolve(__dirname, "../src/hooks/queries/use-list-accounts.ts"),
       "utf8"
     )
 
@@ -169,13 +169,29 @@ describe("Solid auth behavior parity", () => {
     expect(listAccountsQuery).toContain("listAccountsOptions(authClient")
     expect(listAccountsQuery).not.toContain("createUserScopedQuery(")
     expect(listAccountsQuery).not.toContain("getUserId(authClient)")
+
+    const accountInfoQuery = readFileSync(
+      resolve(__dirname, "../src/hooks/queries/use-account-info.ts"),
+      "utf8"
+    )
+    const listSessionsQuery = readFileSync(
+      resolve(__dirname, "../src/hooks/queries/use-list-sessions.ts"),
+      "utf8"
+    )
+
+    expect(accountInfoQuery).toContain("Boolean(userId() && query?.accountId)")
+    expect(accountInfoQuery).toContain("enabled(queryState as never)")
+    expect(listAccountsQuery).toContain("Boolean(userId())")
+    expect(listAccountsQuery).toContain("enabled(query as never)")
+    expect(listSessionsQuery).toContain("Boolean(userId())")
+    expect(listSessionsQuery).toContain("enabled(query as never)")
   })
 
   it("uses accessor-style wrappers for base Solid query and mutation files", () => {
     const baseFiles = [
-      "../src/queries/settings/account-info-query.ts",
-      "../src/queries/settings/list-accounts-query.ts",
-      "../src/queries/settings/list-sessions-query.ts",
+      "../src/hooks/queries/use-account-info.ts",
+      "../src/hooks/queries/use-list-accounts.ts",
+      "../src/hooks/queries/use-list-sessions.ts",
       "../src/hooks/mutations/use-request-password-reset.ts",
       "../src/mutations/auth/reset-password-mutation.ts",
       "../src/hooks/mutations/use-send-verification-email.ts",
@@ -201,7 +217,7 @@ describe("Solid auth behavior parity", () => {
       if (file.includes("/mutations/")) {
         expect(source).toContain("useMutation(() =>")
         expect(source).not.toContain("createMutation")
-      } else if (file.includes("list-accounts-query")) {
+      } else if (file.includes("use-list-accounts")) {
         expect(source).toContain("useQuery(() =>")
       } else {
         expect(source).toContain("createQuery(() =>")

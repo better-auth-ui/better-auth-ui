@@ -2220,7 +2220,7 @@ describe("Solid auth route component selection", () => {
     )
 
     expect(solidIndex).toContain(
-      'export * from "./queries/settings/list-sessions-query"'
+      'export * from "./hooks/queries/use-list-sessions"'
     )
     expect(activeSession).toContain('import Bowser from "bowser"')
     expect(activeSessions).toContain("useListSessions")

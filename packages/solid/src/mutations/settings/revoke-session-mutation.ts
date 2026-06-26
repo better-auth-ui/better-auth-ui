@@ -6,8 +6,6 @@ import {
 import { useMutation } from "@tanstack/solid-query"
 import { useSession } from "../../hooks/queries/use-session"
 
-export type { RevokeSessionParams } from "@better-auth-ui/core"
-
 export function useRevokeSession<TAuthClient extends AuthClient>(
   authClient: TAuthClient,
   options?: RevokeSessionOptions<TAuthClient>

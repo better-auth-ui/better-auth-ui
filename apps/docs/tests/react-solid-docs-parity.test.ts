@@ -9,8 +9,14 @@ function readDocsFile(...segments: string[]) {
 }
 
 function readMeta(framework: "react" | "solid", area: "queries" | "mutations") {
-  return JSON.parse(readDocsFile(framework, area, "meta.json")) as {
-    pages: string[]
+  try {
+    return JSON.parse(readDocsFile(framework, area, "meta.json")) as {
+      pages: string[]
+    }
+  } catch (error) {
+    throw new Error(`Failed to read docs meta for ${framework}/${area}`, {
+      cause: error
+    })
   }
 }
 
@@ -214,10 +220,18 @@ describe("React/Solid docs parity", () => {
       [
         "list-device-sessions",
         "listDeviceSessionsOptions",
-        "@better-auth-ui/solid"
+        "@better-auth-ui/solid/plugins/multi-session"
       ],
-      ["list-passkeys", "listPasskeysOptions", "@better-auth-ui/solid"],
-      ["list-api-keys", "listApiKeysOptions", "@better-auth-ui/solid"]
+      [
+        "list-passkeys",
+        "listPasskeysOptions",
+        "@better-auth-ui/solid/plugins/passkey"
+      ],
+      [
+        "list-api-keys",
+        "listApiKeysOptions",
+        "@better-auth-ui/solid/plugins/api-key"
+      ]
     ] as const
 
     for (const [page, factory, packageName] of solidSettingsQueries) {

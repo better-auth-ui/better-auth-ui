@@ -1,11 +1,5 @@
-import type { AuthClient } from "@better-auth-ui/core"
 import * as core from "@better-auth-ui/core"
-import { describe, expect, expectTypeOf, it } from "vitest"
-import type {
-  AccountInfoParams,
-  SignInEmailParams,
-  UpdateUserParams
-} from "../src"
+import { describe, expect, it } from "vitest"
 import * as react from "../src"
 
 const baseOptionFactories = [
@@ -61,18 +55,6 @@ describe("React base option factory ownership", () => {
     expect(react).toHaveProperty("useListAccounts")
     expect(react).toHaveProperty("useListSessions")
     expect(react).not.toHaveProperty("authQueryOptions")
-  })
-
-  it("keeps compatibility params available as type-only exports", () => {
-    expectTypeOf<AccountInfoParams<AuthClient>>().toEqualTypeOf<
-      AccountInfoParams<AuthClient>
-    >()
-    expectTypeOf<SignInEmailParams<AuthClient>>().toEqualTypeOf<
-      SignInEmailParams<AuthClient>
-    >()
-    expectTypeOf<UpdateUserParams<AuthClient>>().toEqualTypeOf<
-      UpdateUserParams<AuthClient>
-    >()
   })
 
   it("does not publish core-owned params from the React root at runtime", () => {

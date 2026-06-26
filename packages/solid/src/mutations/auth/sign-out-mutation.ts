@@ -5,8 +5,6 @@ import {
 } from "@better-auth-ui/core"
 import { useMutation } from "@tanstack/solid-query"
 
-export type { SignOutParams } from "@better-auth-ui/core"
-
 export function useSignOutMutation<TAuthClient extends AuthClient>(
   authClient: TAuthClient,
   options?: SignOutOptions<TAuthClient>

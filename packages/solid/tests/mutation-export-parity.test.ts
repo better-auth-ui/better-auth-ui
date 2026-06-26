@@ -12,6 +12,10 @@ const solidMutationHooksDir = resolve(
   repoRoot,
   "packages/solid/src/hooks/mutations"
 )
+const solidPluginMutationHooksDir = resolve(
+  repoRoot,
+  "packages/solid/src/plugins"
+)
 
 function listFiles(dir: string) {
   const files: string[] = []
@@ -39,7 +43,11 @@ function reactMutationNames() {
 
 function solidMutationNames() {
   return new Set(
-    [...listFiles(solidMutationsDir), ...listFiles(solidMutationHooksDir)]
+    [
+      ...listFiles(solidMutationsDir),
+      ...listFiles(solidMutationHooksDir),
+      ...listFiles(solidPluginMutationHooksDir)
+    ]
       .map((file) => file.split("/").at(-1) ?? "")
       .map((file) => file.replace(/\.ts$/, ""))
       .map((file) =>
