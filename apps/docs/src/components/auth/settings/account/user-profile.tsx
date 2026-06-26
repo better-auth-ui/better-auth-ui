@@ -4,8 +4,8 @@ import {
   type AdditionalFieldValue,
   parseAdditionalFieldValue
 } from "@better-auth-ui/core"
+import type { UsernameAuthClient } from "@better-auth-ui/core/plugins/username"
 import { useAuth, useSession, useUpdateUser } from "@better-auth-ui/react"
-import type { UsernameAuthClient } from "@better-auth-ui/react/plugins/username"
 import { type SyntheticEvent, useState } from "react"
 import { toast } from "sonner"
 

@@ -1,10 +1,8 @@
 "use client"
 
+import type { OrganizationAuthClient } from "@better-auth-ui/core/plugins/organization"
 import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
-import {
-  type OrganizationAuthClient,
-  useRemoveMember
-} from "@better-auth-ui/react/plugins/organization"
+import { useRemoveMember } from "@better-auth-ui/react/plugins/organization"
 import type { Member, User } from "better-auth/client"
 import { Trash2 } from "lucide-react"
 import { toast } from "sonner"

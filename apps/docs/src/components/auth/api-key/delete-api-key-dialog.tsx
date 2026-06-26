@@ -1,8 +1,8 @@
 "use client"
 
+import type { ApiKeyAuthClient } from "@better-auth-ui/core/plugins/api-key"
 import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
 import {
-  type ApiKeyAuthClient,
   type ListedApiKey,
   useDeleteApiKey
 } from "@better-auth-ui/react/plugins/api-key"

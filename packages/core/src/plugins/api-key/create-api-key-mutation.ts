@@ -7,16 +7,6 @@ import { apiKeyQueryKeys } from "./api-key-query-keys"
 export type CreateApiKeyParams<TAuthClient extends ApiKeyAuthClient> =
   Parameters<TAuthClient["apiKey"]["create"]>[0]
 
-type CreateApiKeyResult<TAuthClient extends ApiKeyAuthClient> = Awaited<
-  ReturnType<TAuthClient["apiKey"]["create"]>
->
-
-type CreateApiKeyData<TAuthClient extends ApiKeyAuthClient> = [
-  Extract<CreateApiKeyResult<TAuthClient>, { data: unknown }>
-] extends [never]
-  ? CreateApiKeyResult<TAuthClient>
-  : Extract<CreateApiKeyResult<TAuthClient>, { data: unknown }>["data"]
-
 export type CreateApiKeyOptions<TAuthClient extends ApiKeyAuthClient> = Omit<
   ReturnType<typeof createApiKeyOptions<TAuthClient>>,
   "mutationKey" | "mutationFn" | "meta"
@@ -31,11 +21,7 @@ export type CreateApiKeyOptions<TAuthClient extends ApiKeyAuthClient> = Omit<
 export function createApiKeyOptions<TAuthClient extends ApiKeyAuthClient>(
   authClient: TAuthClient,
   userId?: string
-): MutationOptions<
-  CreateApiKeyData<TAuthClient>,
-  BetterFetchError,
-  CreateApiKeyParams<TAuthClient>
-> {
+) {
   const mutationKey = apiKeyMutationKeys.create
 
   const mutationFn = (params: CreateApiKeyParams<TAuthClient>) =>
@@ -51,8 +37,8 @@ export function createApiKeyOptions<TAuthClient extends ApiKeyAuthClient>(
       awaits: [apiKeyQueryKeys.lists(userId)]
     }
   } as MutationOptions<
-    CreateApiKeyData<TAuthClient>,
+    Awaited<ReturnType<typeof mutationFn>>,
     BetterFetchError,
-    CreateApiKeyParams<TAuthClient>
+    Parameters<typeof mutationFn>[0]
   >
 }

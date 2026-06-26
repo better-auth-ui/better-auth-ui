@@ -1,10 +1,8 @@
 "use client"
 
+import type { OrganizationAuthClient } from "@better-auth-ui/core/plugins/organization"
 import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
-import {
-  type OrganizationAuthClient,
-  useDeleteOrganization
-} from "@better-auth-ui/react/plugins/organization"
+import { useDeleteOrganization } from "@better-auth-ui/react/plugins/organization"
 import type { Organization } from "better-auth/client"
 import { TriangleAlert } from "lucide-react"
 import type { SyntheticEvent } from "react"

@@ -1,10 +1,8 @@
 "use client"
 
+import type { PasskeyAuthClient } from "@better-auth-ui/core/plugins/passkey"
 import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
-import {
-  type PasskeyAuthClient,
-  useListPasskeys
-} from "@better-auth-ui/react/plugins/passkey"
+import { useListPasskeys } from "@better-auth-ui/react/plugins/passkey"
 import { useState } from "react"
 
 import { Button } from "@/components/ui/button"

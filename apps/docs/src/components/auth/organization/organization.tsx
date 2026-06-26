@@ -1,11 +1,11 @@
 "use client"
 
-import type { OrganizationView } from "@better-auth-ui/core/plugins/organization"
+import type {
+  OrganizationAuthClient,
+  OrganizationView
+} from "@better-auth-ui/core/plugins/organization"
 import { useAuth, useAuthenticate, useAuthPlugin } from "@better-auth-ui/react"
-import {
-  type OrganizationAuthClient,
-  useActiveOrganization
-} from "@better-auth-ui/react/plugins/organization"
+import { useActiveOrganization } from "@better-auth-ui/react/plugins/organization"
 import { Settings as SettingsIcon, User2 as UserIcon } from "lucide-react"
 import { useEffect, useMemo } from "react"
 
