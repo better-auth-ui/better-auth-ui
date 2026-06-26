@@ -26,6 +26,46 @@
       "types": "./dist/plugins.d.ts",
       "import": "./dist/plugins.js"
     },
+    "./plugins/api-key": {
+      "src": "./src/plugins/api-key/index.ts",
+      "types": "./dist/plugins/api-key/index.d.ts",
+      "import": "./dist/plugins/api-key/index.js"
+    },
+    "./plugins/delete-user": {
+      "src": "./src/plugins/delete-user/index.ts",
+      "types": "./dist/plugins/delete-user/index.d.ts",
+      "import": "./dist/plugins/delete-user/index.js"
+    },
+    "./plugins/magic-link": {
+      "src": "./src/plugins/magic-link/index.ts",
+      "types": "./dist/plugins/magic-link/index.d.ts",
+      "import": "./dist/plugins/magic-link/index.js"
+    },
+    "./plugins/multi-session": {
+      "src": "./src/plugins/multi-session/index.ts",
+      "types": "./dist/plugins/multi-session/index.d.ts",
+      "import": "./dist/plugins/multi-session/index.js"
+    },
+    "./plugins/organization": {
+      "src": "./src/plugins/organization/index.ts",
+      "types": "./dist/plugins/organization/index.d.ts",
+      "import": "./dist/plugins/organization/index.js"
+    },
+    "./plugins/passkey": {
+      "src": "./src/plugins/passkey/index.ts",
+      "types": "./dist/plugins/passkey/index.d.ts",
+      "import": "./dist/plugins/passkey/index.js"
+    },
+    "./plugins/theme": {
+      "src": "./src/plugins/theme/index.ts",
+      "types": "./dist/plugins/theme/index.d.ts",
+      "import": "./dist/plugins/theme/index.js"
+    },
+    "./plugins/username": {
+      "src": "./src/plugins/username/index.ts",
+      "types": "./dist/plugins/username/index.d.ts",
+      "import": "./dist/plugins/username/index.js"
+    },
     "./styles": {
       "src": "./src/styles.css",
       "default": "./dist/styles.css"

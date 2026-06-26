@@ -38,7 +38,7 @@ Pass `deleteUserPlugin()` to `<AuthProvider>`:
 
 ```tsx title="components/providers.tsx"
 import { AuthProvider } from "@better-auth-ui/heroui"
-import { deleteUserPlugin } from "@better-auth-ui/heroui/plugins" // [!code highlight]
+import { deleteUserPlugin } from "@better-auth-ui/heroui/plugins/delete-user" // [!code highlight]
 
 <AuthProvider
   authClient={authClient}
@@ -63,7 +63,7 @@ The `<DangerZone />` card is automatically rendered in `<SecuritySettings />` wh
 **Usage**
 
 ```tsx
-import { DangerZone } from "@better-auth-ui/heroui/plugins"
+import { DangerZone } from "@better-auth-ui/heroui/plugins/delete-user"
 
 <DangerZone />
 ```
@@ -79,7 +79,7 @@ The delete account card with confirmation dialog. Used inside `<DangerZone />` b
 **Usage**
 
 ```tsx
-import { DeleteAccount } from "@better-auth-ui/heroui/plugins"
+import { DeleteAccount } from "@better-auth-ui/heroui/plugins/delete-user"
 
 <DeleteAccount />
 ```

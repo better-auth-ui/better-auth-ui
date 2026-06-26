@@ -3,7 +3,7 @@ import { ensureSessionServer } from "@better-auth-ui/core/server"
 import {
   Organization,
   organizationPlugin
-} from "@better-auth-ui/heroui/plugins"
+} from "@better-auth-ui/heroui/plugins/organization"
 import { createFileRoute, notFound, redirect } from "@tanstack/react-router"
 import { createIsomorphicFn } from "@tanstack/react-start"
 import { getRequestHeaders } from "@tanstack/react-start/server"

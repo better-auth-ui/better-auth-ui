@@ -1,5 +1,8 @@
 import { AuthProvider } from "@better-auth-ui/heroui"
-import { DangerZone, deleteUserPlugin } from "@better-auth-ui/heroui/plugins"
+import {
+  DangerZone,
+  deleteUserPlugin
+} from "@better-auth-ui/heroui/plugins/delete-user"
 
 import { authClient } from "@/lib/auth-client"
 

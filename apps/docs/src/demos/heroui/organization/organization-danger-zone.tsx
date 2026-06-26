@@ -1,4 +1,4 @@
-import { OrganizationDangerZone } from "@better-auth-ui/heroui/plugins"
+import { OrganizationDangerZone } from "@better-auth-ui/heroui/plugins/organization"
 
 import { OrganizationDemoWrapper } from "./organization-demo-wrapper"
 
