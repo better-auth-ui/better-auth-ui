@@ -1,9 +1,9 @@
 "use client"
 
+import type { MultiSessionAuthClient } from "@better-auth-ui/core/plugins/multi-session"
 import { useAuth } from "@better-auth-ui/react"
 import {
   type ListDeviceSession,
-  type MultiSessionAuthClient,
   useSetActiveSession
 } from "@better-auth-ui/react/plugins/multi-session"
 import { UserView } from "@/components/auth/user/user-view"
