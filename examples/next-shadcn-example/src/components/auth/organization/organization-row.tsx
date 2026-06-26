@@ -22,7 +22,7 @@ export type OrganizationRowProps = {
  * Single organization row: logo and labels via `OrganizationView`, plus a Manage action.
  */
 export function OrganizationRow({ organization }: OrganizationRowProps) {
-  const { authClient, basePaths, navigate } = useAuth()
+  const { authClient, basePaths, navigate } = useAuth<OrganizationAuthClient>()
   const {
     localization: organizationLocalization,
     viewPaths: organizationViewPaths,
@@ -31,7 +31,7 @@ export function OrganizationRow({ organization }: OrganizationRowProps) {
   } = useAuthPlugin(organizationPlugin)
 
   const { mutate: setActiveOrganization, isPending: setActivePending } =
-    useSetActiveOrganization(authClient as OrganizationAuthClient, {
+    useSetActiveOrganization(authClient, {
       onSuccess: () => {
         navigate({
           to: `${basePaths.organization}/${organizationViewPaths.organization.settings}`

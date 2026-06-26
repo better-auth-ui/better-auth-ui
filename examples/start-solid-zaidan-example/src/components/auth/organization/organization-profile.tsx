@@ -34,16 +34,11 @@ const fallbackLocalization = {
 >
 
 export function OrganizationProfile(props: OrganizationProfileProps) {
-  const auth = useAuth()
-  const activeOrganization = useActiveOrganization(
-    auth.authClient as OrganizationAuthClient
-  )
-  const updateOrganization = useUpdateOrganization(
-    auth.authClient as OrganizationAuthClient,
-    {
-      onSuccess: () => toast.success(localization().organizationUpdatedSuccess)
-    }
-  )
+  const auth = useAuth<OrganizationAuthClient>()
+  const activeOrganization = useActiveOrganization(auth.authClient)
+  const updateOrganization = useUpdateOrganization(auth.authClient, {
+    onSuccess: () => toast.success(localization().organizationUpdatedSuccess)
+  })
   const [name, setName] = createSignal("")
   const [slug, setSlug] = createSignal("")
   const organizationPluginConfig = () =>

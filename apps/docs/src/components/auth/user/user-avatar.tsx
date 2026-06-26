@@ -38,11 +38,10 @@ export function UserAvatar({
   isPending,
   fallback
 }: UserAvatarProps) {
-  const { authClient } = useAuth()
-  const { data: session, isPending: sessionPending } = useSession(
-    authClient as UsernameAuthClient,
-    { enabled: !user && !isPending }
-  )
+  const { authClient } = useAuth<UsernameAuthClient>()
+  const { data: session, isPending: sessionPending } = useSession(authClient, {
+    enabled: !user && !isPending
+  })
 
   if ((isPending || sessionPending) && !user) {
     return <Skeleton className={cn("size-8 rounded-full", className)} />

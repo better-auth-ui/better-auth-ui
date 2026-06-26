@@ -23,12 +23,12 @@ export type PasskeysSettingsProps = {
 }
 
 export function PasskeysSettings(props: PasskeysSettingsProps) {
-  const auth = useAuth()
+  const auth = useAuth<PasskeyAuthClient>()
   const labels = () => passkeyLabels(auth)
   const session = useSession(auth.authClient)
   const userId = () => session.data?.user.id
   const [isAddDialogOpen, setIsAddDialogOpen] = createSignal(false)
-  const passkeys = useListPasskeys(auth.authClient as PasskeyAuthClient, {
+  const passkeys = useListPasskeys(auth.authClient, {
     enabled: shouldLoadDeviceSessions({
       isSsr: import.meta.env.SSR,
       userId: userId()

@@ -22,9 +22,9 @@ export function AddPasskeyDialog(props: {
   onOpenChange: (open: boolean) => void
   onPasskeyAdded: () => void
 }) {
-  const auth = useAuth()
+  const auth = useAuth<PasskeyAuthClient>()
   const labels = () => passkeyLabels(auth)
-  const addPasskey = useAddPasskey(auth.authClient as PasskeyAuthClient, {
+  const addPasskey = useAddPasskey(auth.authClient, {
     onSuccess: () => {
       props.onOpenChange(false)
       props.onPasskeyAdded()

@@ -3,7 +3,7 @@ title: isUsernameAvailableOptions
 description: Check username availability.
 ---
 
-Requires the Better Auth username plugin. If TypeScript cannot infer the plugin methods from your client, type or cast `authClient` as `UsernameAuthClient` from `@better-auth-ui/solid`.
+Requires the Better Auth username plugin. When reading the client from auth context, call `useAuth<UsernameAuthClient>()` so TypeScript sees the plugin methods.
 
 This check is modeled as a mutation because callers usually trigger it from user input, not from route-level data loading. Returned data is typed as `{ available: boolean; message: string | null }`.
 

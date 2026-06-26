@@ -35,12 +35,10 @@ export function AddPasskeyDialog({
   open,
   onOpenChange
 }: AddPasskeyDialogProps) {
-  const { authClient, localization } = useAuth()
+  const { authClient, localization } = useAuth<PasskeyAuthClient>()
   const { localization: passkeyLocalization } = useAuthPlugin(passkeyPlugin)
 
-  const { mutate: addPasskey, isPending: isAdding } = useAddPasskey(
-    authClient as PasskeyAuthClient
-  )
+  const { mutate: addPasskey, isPending: isAdding } = useAddPasskey(authClient)
 
   const handleSubmit = (e: SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault()

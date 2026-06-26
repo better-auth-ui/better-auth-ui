@@ -35,7 +35,7 @@ type AuthPluginWithButtons = AuthPlugin & {
 }
 
 export function MagicLink(props: MagicLinkProps) {
-  const auth = useAuth()
+  const auth = useAuth<MagicLinkAuthClient>()
   const [email, setEmail] = createSignal("")
   const [emailError, setEmailError] = createSignal<string>()
   const magicLinkPluginConfig = () =>
@@ -46,15 +46,12 @@ export function MagicLink(props: MagicLinkProps) {
       | Partial<MagicLinkLocalization>
       | undefined)
   })
-  const signInMagicLink = useSignInMagicLink(
-    auth.authClient as MagicLinkAuthClient,
-    {
-      onSuccess: () => {
-        setEmail("")
-        toast.success(magicLinkLabels().magicLinkSent)
-      }
+  const signInMagicLink = useSignInMagicLink(auth.authClient, {
+    onSuccess: () => {
+      setEmail("")
+      toast.success(magicLinkLabels().magicLinkSent)
     }
-  )
+  })
   const showSeparator = () => Boolean(auth.socialProviders?.length)
   const socialPosition = () => props.socialPosition ?? "bottom"
 

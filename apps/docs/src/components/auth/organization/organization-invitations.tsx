@@ -60,15 +60,15 @@ export function OrganizationInvitations({
   className,
   ...props
 }: OrganizationInvitationsProps & ComponentProps<"div">) {
-  const { authClient, localization } = useAuth()
+  const { authClient, localization } = useAuth<OrganizationAuthClient>()
   const { localization: organizationLocalization, roles } =
     useAuthPlugin(organizationPlugin)
 
   const { data: invitations, isPending: invitationsPending } =
-    useListOrganizationInvitations(authClient as OrganizationAuthClient)
+    useListOrganizationInvitations(authClient)
 
   const { isPending: invitationPermissionPending } = useHasPermission(
-    authClient as OrganizationAuthClient,
+    authClient,
     {
       permissions: { invitation: ["cancel"] }
     }

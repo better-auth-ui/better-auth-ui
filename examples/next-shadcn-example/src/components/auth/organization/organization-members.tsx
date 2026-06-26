@@ -60,28 +60,22 @@ export function OrganizationMembers({
   className,
   ...props
 }: OrganizationMembersProps & ComponentProps<"div">) {
-  const { authClient } = useAuth()
+  const { authClient } = useAuth<OrganizationAuthClient>()
   const { localization: organizationLocalization, roles } =
     useAuthPlugin(organizationPlugin)
 
   const { data: session } = useSession(authClient)
   const { data: activeOrganization, isPending: activeOrganizationPending } =
-    useActiveOrganization(authClient as OrganizationAuthClient)
+    useActiveOrganization(authClient)
   const { data: membersData, isPending: membersPending } =
-    useListOrganizationMembers(authClient as OrganizationAuthClient)
+    useListOrganizationMembers(authClient)
 
-  const { isPending: updatePermissionPending } = useHasPermission(
-    authClient as OrganizationAuthClient,
-    {
-      permissions: { member: ["update"] }
-    }
-  )
-  const { isPending: deletePermissionPending } = useHasPermission(
-    authClient as OrganizationAuthClient,
-    {
-      permissions: { member: ["delete"] }
-    }
-  )
+  const { isPending: updatePermissionPending } = useHasPermission(authClient, {
+    permissions: { member: ["update"] }
+  })
+  const { isPending: deletePermissionPending } = useHasPermission(authClient, {
+    permissions: { member: ["delete"] }
+  })
 
   const isPending =
     activeOrganizationPending ||

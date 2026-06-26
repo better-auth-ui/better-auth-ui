@@ -18,15 +18,13 @@ import {
   useSetActiveSession
 } from "@better-auth-ui/react"
 
-const { authClient } = useAuth()
-const { mutate: setActive } = useSetActiveSession(
-  authClient as MultiSessionAuthClient
-)
+const { authClient } = useAuth<MultiSessionAuthClient>()
+const { mutate: setActive } = useSetActiveSession(authClient)
 
 setActive({ sessionToken: deviceSession.session.token })
 ```
 
-`useSetActiveSession` requires the Better Auth `multiSession` plugin. Cast `authClient` to `MultiSessionAuthClient` so TypeScript picks up the plugin-extended method signature.
+`useSetActiveSession` requires the Better Auth `multiSession` plugin. Type `useAuth` with `MultiSessionAuthClient` so TypeScript picks up the plugin-extended method signature.
 
 ## Options factory
 

@@ -61,16 +61,11 @@ function formatInvitationDate(createdAt?: Date | string | null) {
 export function OrganizationInvitationRow(
   props: OrganizationInvitationRowProps
 ) {
-  const auth = useAuth()
-  const permission = useHasPermission(
-    auth.authClient as OrganizationAuthClient,
-    {
-      permissions: { invitation: ["cancel"] }
-    }
-  )
-  const cancelInvitation = useCancelInvitation(
-    auth.authClient as OrganizationAuthClient
-  )
+  const auth = useAuth<OrganizationAuthClient>()
+  const permission = useHasPermission(auth.authClient, {
+    permissions: { invitation: ["cancel"] }
+  })
+  const cancelInvitation = useCancelInvitation(auth.authClient)
   const roleLabel = () =>
     props.roles[props.invitation.role ?? ""] ??
     formatRole(props.invitation.role)

@@ -23,15 +23,15 @@ export type UserInvitationRowProps = {
  * Single invitation row with accept/reject actions for the current user.
  */
 export function UserInvitationRow({ invitation }: UserInvitationRowProps) {
-  const { authClient } = useAuth()
+  const { authClient } = useAuth<OrganizationAuthClient>()
   const { localization: organizationLocalization, roles } =
     useAuthPlugin(organizationPlugin)
 
   const { mutate: acceptInvitation, isPending: isAccepting } =
-    useAcceptInvitation(authClient as OrganizationAuthClient)
+    useAcceptInvitation(authClient)
 
   const { mutate: rejectInvitation, isPending: isRejecting } =
-    useRejectInvitation(authClient as OrganizationAuthClient)
+    useRejectInvitation(authClient)
 
   return (
     <div className="flex items-center gap-3">

@@ -42,14 +42,14 @@ export function DeletePasskeyDialog({
   onOpenChange,
   passkey
 }: DeletePasskeyDialogProps) {
-  const { authClient, localization } = useAuth()
+  const { authClient, localization } = useAuth<PasskeyAuthClient>()
   const { localization: passkeyLocalization } = useAuthPlugin(passkeyPlugin)
 
   const passkeyName = passkey.name || passkeyLocalization.passkey
   const previewId = `delete-passkey-preview-${passkey.id}`
 
   const { mutate: deletePasskey, isPending: isDeleting } = useDeletePasskey(
-    authClient as PasskeyAuthClient,
+    authClient,
     {
       onSuccess: () => onOpenChange(false)
     }

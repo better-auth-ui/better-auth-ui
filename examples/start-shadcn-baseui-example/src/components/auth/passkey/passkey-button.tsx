@@ -28,11 +28,12 @@ export type PasskeyButtonProps = {
  * @param view - Current auth view. Hides the button on `"signUp"`.
  */
 export function PasskeyButton({ view }: PasskeyButtonProps) {
-  const { authClient, localization, redirectTo, navigate } = useAuth()
+  const { authClient, localization, redirectTo, navigate } =
+    useAuth<PasskeyAuthClient>()
   const { localization: passkeyLocalization } = useAuthPlugin(passkeyPlugin)
 
   const { mutate: signInPasskey, isPending: passkeyPending } = useSignInPasskey(
-    authClient as PasskeyAuthClient,
+    authClient,
     {
       onSuccess: () => navigate({ to: redirectTo })
     }

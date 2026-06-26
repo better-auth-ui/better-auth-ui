@@ -62,7 +62,7 @@ export function SignInUsername({
     viewPaths,
     navigate,
     Link
-  } = useAuth()
+  } = useAuth<UsernameAuthClient>()
 
   const { fetchOptions, resetFetchOptions } = useFetchOptions()
 
@@ -91,7 +91,7 @@ export function SignInUsername({
     })
 
   const { mutate: signInUsername, isPending: isSignInUsernamePending } =
-    useSignInUsername(authClient as UsernameAuthClient, {
+    useSignInUsername(authClient, {
       onError: (error) => {
         setPassword("")
 

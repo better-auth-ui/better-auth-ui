@@ -129,7 +129,7 @@ function SortableTableHead(props: {
 }
 
 export function OrganizationInvitations(props: OrganizationInvitationsProps) {
-  const auth = useAuth()
+  const auth = useAuth<OrganizationAuthClient>()
   const [invitationSearch, setInvitationSearch] = createSignal("")
   const [invitationRoleFilter, setInvitationRoleFilter] = createSignal("all")
   const [invitationStatusFilter, setInvitationStatusFilter] =
@@ -139,9 +139,7 @@ export function OrganizationInvitations(props: OrganizationInvitationsProps) {
   const [sortDescriptor, setSortDescriptor] = createSignal<
     SortDescriptor | undefined
   >()
-  const invitations = useListOrganizationInvitations(
-    auth.authClient as OrganizationAuthClient
-  )
+  const invitations = useListOrganizationInvitations(auth.authClient)
   const invitationRows = () =>
     (invitations.data ?? []) as OrganizationInvitation[]
   const organizationPluginConfig = () =>

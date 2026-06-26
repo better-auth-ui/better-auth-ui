@@ -32,19 +32,19 @@ const statusBadgeClasses: Record<string, string> = {
 export function OrganizationInvitationRow({
   invitation
 }: OrganizationInvitationRowProps) {
-  const { authClient } = useAuth()
+  const { authClient } = useAuth<OrganizationAuthClient>()
   const { localization: organizationLocalization, roles } =
     useAuthPlugin(organizationPlugin)
 
   const {
     data: cancelInvitationPermission,
     isPending: cancelPermissionPending
-  } = useHasPermission(authClient as OrganizationAuthClient, {
+  } = useHasPermission(authClient, {
     permissions: { invitation: ["cancel"] }
   })
 
   const { mutate: cancelInvitation, isPending: cancelPending } =
-    useCancelInvitation(authClient as OrganizationAuthClient)
+    useCancelInvitation(authClient)
 
   const roleLabel = roles?.[invitation.role] ?? invitation.role
 

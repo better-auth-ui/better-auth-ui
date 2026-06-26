@@ -16,19 +16,16 @@ import {
   useListDeviceSessions
 } from "@better-auth-ui/react"
 
-const { authClient } = useAuth()
-const { data: deviceSessions } = useListDeviceSessions(
-  authClient as MultiSessionAuthClient
-)
+const { authClient } = useAuth<MultiSessionAuthClient>()
+const { data: deviceSessions } = useListDeviceSessions(authClient)
 
 // With React Query options
-const { data: deviceSessions } = useListDeviceSessions(
-  authClient as MultiSessionAuthClient,
-  { refetchOnMount: false }
-)
+const { data: deviceSessions } = useListDeviceSessions(authClient, {
+  refetchOnMount: false
+})
 ```
 
-`useListDeviceSessions` requires the Better Auth `multiSession` plugin. Cast `authClient` to `MultiSessionAuthClient` so TypeScript picks up the plugin-extended method signature.
+`useListDeviceSessions` requires the Better Auth `multiSession` plugin. Type `useAuth` with `MultiSessionAuthClient` so TypeScript picks up the plugin-extended method signature.
 
 ## Options factory
 

@@ -14,10 +14,8 @@ import {
   useSignInMagicLink
 } from "@better-auth-ui/react"
 
-const { authClient } = useAuth()
-const { mutate: signInMagicLink } = useSignInMagicLink(
-  authClient as MagicLinkAuthClient
-)
+const { authClient } = useAuth<MagicLinkAuthClient>()
+const { mutate: signInMagicLink } = useSignInMagicLink(authClient)
 
 signInMagicLink({
   email: "alice@example.com",
@@ -25,7 +23,7 @@ signInMagicLink({
 })
 ```
 
-`useSignInMagicLink` requires the Better Auth `magicLink` plugin. Cast `authClient` to `MagicLinkAuthClient` so TypeScript picks up the plugin-extended method signature.
+`useSignInMagicLink` requires the Better Auth `magicLink` plugin. Type `useAuth` with `MagicLinkAuthClient` so TypeScript picks up the plugin-extended method signature.
 
 ## Options factory
 

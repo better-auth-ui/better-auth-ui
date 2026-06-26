@@ -27,7 +27,7 @@ export type ApiKeysProps = {
 }
 
 export function ApiKeys(props: ApiKeysProps = {}) {
-  const auth = useAuth()
+  const auth = useAuth<ApiKeyAuthClient>()
   const session = useSession(auth.authClient)
   const userId = () => session.data?.user.id
   const [isCreateDialogOpen, setIsCreateDialogOpen] = createSignal(false)
@@ -40,7 +40,7 @@ export function ApiKeys(props: ApiKeysProps = {}) {
           }
         }
       : undefined
-  const apiKeys = useListApiKeys(auth.authClient as ApiKeyAuthClient, {
+  const apiKeys = useListApiKeys(auth.authClient, {
     ...listParams(),
     enabled:
       !props.isPending &&

@@ -16,13 +16,11 @@ import { LeaveOrganizationDialog } from "./leave-organization-dialog"
  * Danger-zone row to leave the active organization.
  */
 export function LeaveOrganization() {
-  const { authClient } = useAuth()
+  const { authClient } = useAuth<OrganizationAuthClient>()
   const { localization: organizationLocalization } =
     useAuthPlugin(organizationPlugin)
 
-  const { data: activeOrganization } = useActiveOrganization(
-    authClient as OrganizationAuthClient
-  )
+  const { data: activeOrganization } = useActiveOrganization(authClient)
 
   const [confirmOpen, setConfirmOpen] = useState(false)
 

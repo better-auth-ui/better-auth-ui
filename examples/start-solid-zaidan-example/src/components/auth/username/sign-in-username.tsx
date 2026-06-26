@@ -39,7 +39,7 @@ type AuthPluginWithButtons = {
 }
 
 export function SignInUsername(props: SignInUsernameProps) {
-  const auth = useAuth()
+  const auth = useAuth<UsernameAuthClient>()
   const { fetchOptions, resetFetchOptions } = useFetchOptions()
   const queryClient = useQueryClient()
   const [identifier, setIdentifier] = createSignal("")
@@ -64,15 +64,12 @@ export function SignInUsername(props: SignInUsernameProps) {
     },
     onSuccess: onSignInSuccess
   })
-  const signInUsername = useSignInUsername(
-    auth.authClient as UsernameAuthClient,
-    {
-      onError: () => {
-        resetFetchOptions()
-      },
-      onSuccess: onSignInSuccess
-    }
-  )
+  const signInUsername = useSignInUsername(auth.authClient, {
+    onError: () => {
+      resetFetchOptions()
+    },
+    onSuccess: onSignInSuccess
+  })
   const usernamePlugin = auth.plugins.find((plugin) => plugin.id === "username")
   const usernameAuth = Boolean(usernamePlugin)
   const usernameLabels: UsernameLocalization = {

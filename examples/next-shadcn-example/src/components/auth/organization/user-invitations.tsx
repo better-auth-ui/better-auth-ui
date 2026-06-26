@@ -23,13 +23,11 @@ export type UserInvitationsProps = {
  * card; uses `UserInvitationsEmpty` when there are no pending invitations.
  */
 export function UserInvitations({ className }: UserInvitationsProps) {
-  const { authClient } = useAuth()
+  const { authClient } = useAuth<OrganizationAuthClient>()
   const { localization: organizationLocalization } =
     useAuthPlugin(organizationPlugin)
 
-  const { data: invitations, isPending } = useListUserInvitations(
-    authClient as OrganizationAuthClient
-  )
+  const { data: invitations, isPending } = useListUserInvitations(authClient)
 
   return (
     <div className={className}>

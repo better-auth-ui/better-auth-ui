@@ -27,14 +27,14 @@ export type OrganizationsProps = {
  * Owns `CreateOrganizationDialog` open state and the create actions.
  */
 export function Organizations({ className }: OrganizationsProps) {
-  const { authClient } = useAuth()
+  const { authClient } = useAuth<OrganizationAuthClient>()
   const { localization: organizationLocalization } =
     useAuthPlugin(organizationPlugin)
 
   const [createOpen, setCreateOpen] = useState(false)
 
   const { data: organizations, isPending: organizationsPending } =
-    useListOrganizations(authClient as OrganizationAuthClient)
+    useListOrganizations(authClient)
 
   return (
     <>

@@ -37,7 +37,7 @@ export function CreateOrganizationDialog({
   open,
   onOpenChange
 }: CreateOrganizationDialogProps) {
-  const { authClient, localization } = useAuth()
+  const { authClient, localization } = useAuth<OrganizationAuthClient>()
   const { localization: organizationLocalization } =
     useAuthPlugin(organizationPlugin)
 
@@ -47,7 +47,7 @@ export function CreateOrganizationDialog({
   const [nameError, setNameError] = useState<string>()
 
   const { mutate: createOrganization, isPending: isCreating } =
-    useCreateOrganization(authClient as OrganizationAuthClient, {
+    useCreateOrganization(authClient, {
       onSuccess: () => onOpenChange(false)
     })
 

@@ -20,10 +20,8 @@ type UserInvitation = {
 }
 
 export function UserInvitations(props: UserInvitationsProps = {}) {
-  const auth = useAuth()
-  const invitations = useListUserInvitations(
-    auth.authClient as OrganizationAuthClient
-  )
+  const auth = useAuth<OrganizationAuthClient>()
+  const invitations = useListUserInvitations(auth.authClient)
   const invitationRows = () => (invitations.data ?? []) as UserInvitation[]
 
   return (

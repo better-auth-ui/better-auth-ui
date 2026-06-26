@@ -2661,9 +2661,13 @@ describe("Solid auth route component selection", () => {
       "utf8"
     )
 
-    expect(createApiKeyDialog).toContain("const createApiKey = useCreateApiKey")
     expect(createApiKeyDialog).toContain(
-      "useCreateApiKey(auth.authClient as ApiKeyAuthClient"
+      "const auth = useAuth<ApiKeyAuthClient>()"
+    )
+    expect(createApiKeyDialog).toContain("const createApiKey = useCreateApiKey")
+    expect(createApiKeyDialog).toContain("useCreateApiKey(auth.authClient")
+    expect(createApiKeyDialog).not.toMatch(
+      /auth\.authClient\s+as\s+ApiKeyAuthClient/
     )
     expect(createApiKeyDialog).toContain("createApiKey.mutate(")
     expect(createApiKeyDialog).toContain("setNewApiKeySecret(apiKey.key)")
@@ -2671,9 +2675,13 @@ describe("Solid auth route component selection", () => {
     expect(newApiKeyDialog).toContain("navigator.clipboard.writeText")
     expect(newApiKeyDialog).toContain("setIsCopied(true)")
     expect(newApiKeyDialog).toContain("setTimeout(() => setIsCopied(false)")
-    expect(deleteApiKeyDialog).toContain("const deleteApiKey = useDeleteApiKey")
     expect(deleteApiKeyDialog).toContain(
-      "useDeleteApiKey(auth.authClient as ApiKeyAuthClient"
+      "const auth = useAuth<ApiKeyAuthClient>()"
+    )
+    expect(deleteApiKeyDialog).toContain("const deleteApiKey = useDeleteApiKey")
+    expect(deleteApiKeyDialog).toContain("useDeleteApiKey(auth.authClient")
+    expect(deleteApiKeyDialog).not.toMatch(
+      /auth\.authClient\s+as\s+ApiKeyAuthClient/
     )
     expect(deleteApiKeyDialog).toContain("deleteApiKey.mutate({")
     expect(deleteApiKeyDialog).toContain("keyId: props.apiKey.id")
@@ -2808,9 +2816,13 @@ describe("Solid auth route component selection", () => {
 
     expect(settingsTypes).toContain("export type ListedPasskey")
     expect(passkeys).toContain("const [isAddDialogOpen")
-    expect(addPasskeyDialog).toContain("const addPasskey = useAddPasskey")
     expect(addPasskeyDialog).toContain(
-      "useAddPasskey(auth.authClient as PasskeyAuthClient"
+      "const auth = useAuth<PasskeyAuthClient>()"
+    )
+    expect(addPasskeyDialog).toContain("const addPasskey = useAddPasskey")
+    expect(addPasskeyDialog).toContain("useAddPasskey(auth.authClient")
+    expect(addPasskeyDialog).not.toMatch(
+      /auth\.authClient\s+as\s+PasskeyAuthClient/
     )
     expect(passkeys).toContain("onPasskeyAdded={() => passkeys.refetch()}")
     expect(addPasskeyDialog).toContain("props.onPasskeyAdded()")
@@ -2818,10 +2830,14 @@ describe("Solid auth route component selection", () => {
     expect(addPasskeyDialog).toContain("name ? { name } : undefined")
     expect(addPasskeyDialog).toContain("props.onOpenChange(false)")
     expect(deletePasskeyDialog).toContain(
-      "const deletePasskey = useDeletePasskey"
+      "const auth = useAuth<PasskeyAuthClient>()"
     )
     expect(deletePasskeyDialog).toContain(
-      "useDeletePasskey(auth.authClient as PasskeyAuthClient"
+      "const deletePasskey = useDeletePasskey"
+    )
+    expect(deletePasskeyDialog).toContain("useDeletePasskey(auth.authClient")
+    expect(deletePasskeyDialog).not.toMatch(
+      /auth\.authClient\s+as\s+PasskeyAuthClient/
     )
     expect(deletePasskeyDialog).toContain("deletePasskey.mutate({")
     expect(deletePasskeyDialog).toContain("id: props.passkey.id")

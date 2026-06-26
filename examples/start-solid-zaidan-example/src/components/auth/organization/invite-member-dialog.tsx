@@ -66,10 +66,8 @@ function pickDefaultRole(roles: RoleMap) {
 }
 
 export function InviteMemberDialog(props: InviteMemberDialogProps) {
-  const auth = useAuth()
-  const activeOrganization = useActiveOrganization(
-    auth.authClient as OrganizationAuthClient
-  )
+  const auth = useAuth<OrganizationAuthClient>()
+  const activeOrganization = useActiveOrganization(auth.authClient)
   const organizationPluginConfig = () =>
     auth.plugins.find((plugin) => plugin.id === organizationPlugin.id) as
       | {
@@ -90,15 +88,12 @@ export function InviteMemberDialog(props: InviteMemberDialogProps) {
   )
   const [email, setEmail] = createSignal("")
   const [role, setRole] = createSignal(pickDefaultRole(roles()))
-  const inviteMember = useInviteMember(
-    auth.authClient as OrganizationAuthClient,
-    {
-      onSuccess: () => {
-        props.onOpenChange(false)
-        toast.success(localization().inviteMemberSuccess)
-      }
+  const inviteMember = useInviteMember(auth.authClient, {
+    onSuccess: () => {
+      props.onOpenChange(false)
+      toast.success(localization().inviteMemberSuccess)
     }
-  )
+  })
 
   createEffect(() => {
     if (!props.open) {

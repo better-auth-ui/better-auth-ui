@@ -24,12 +24,10 @@ export type PasskeysProps = {
 }
 
 export function Passkeys({ className }: PasskeysProps) {
-  const { authClient } = useAuth()
+  const { authClient } = useAuth<PasskeyAuthClient>()
   const { localization: passkeyLocalization } = useAuthPlugin(passkeyPlugin)
 
-  const { data: passkeys, isPending } = useListPasskeys(
-    authClient as PasskeyAuthClient
-  )
+  const { data: passkeys, isPending } = useListPasskeys(authClient)
 
   const [addOpen, setAddOpen] = useState(false)
 

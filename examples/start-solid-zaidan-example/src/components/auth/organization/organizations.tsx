@@ -21,8 +21,8 @@ type OrganizationPluginConfig = {
 }
 
 export function Organizations(props: OrganizationsProps = {}) {
-  const auth = useAuth()
-  const client = auth.authClient as OrganizationAuthClient
+  const auth = useAuth<OrganizationAuthClient>()
+  const client = auth.authClient
   const localization = () =>
     (
       auth.plugins.find((plugin) => plugin.id === organizationPlugin.id) as

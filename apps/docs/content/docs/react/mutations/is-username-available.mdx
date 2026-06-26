@@ -16,16 +16,14 @@ import {
   useIsUsernameAvailable
 } from "@better-auth-ui/react"
 
-const { authClient } = useAuth()
-const { mutateAsync: checkUsername, data } = useIsUsernameAvailable(
-  authClient as UsernameAuthClient
-)
+const { authClient } = useAuth<UsernameAuthClient>()
+const { mutateAsync: checkUsername, data } = useIsUsernameAvailable(authClient)
 
 const result = await checkUsername({ username: "alice" })
 // result.available -> boolean
 ```
 
-`useIsUsernameAvailable` requires the Better Auth `username` plugin. Cast `authClient` to `UsernameAuthClient` so TypeScript picks up the plugin-extended method signature.
+`useIsUsernameAvailable` requires the Better Auth `username` plugin. Type `useAuth` with `UsernameAuthClient` so TypeScript picks up the plugin-extended method signature.
 
 ## Options factory
 

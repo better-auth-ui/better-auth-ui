@@ -57,13 +57,13 @@ export function MagicLink({
     socialProviders,
     viewPaths,
     Link
-  } = useAuth()
+  } = useAuth<MagicLinkAuthClient>()
   const { localization: magicLinkLocalization } = useAuthPlugin(magicLinkPlugin)
 
   const [email, setEmail] = useState("")
 
   const { mutate: signInMagicLink, isPending: signInMagicLinkPending } =
-    useSignInMagicLink(authClient as MagicLinkAuthClient, {
+    useSignInMagicLink(authClient, {
       onSuccess: () => {
         setEmail("")
         toast.success(magicLinkLocalization.magicLinkSent)

@@ -16,9 +16,9 @@ export type PasskeyButtonProps = {
 }
 
 export function PasskeyButton(props: PasskeyButtonProps) {
-  const auth = useAuth()
+  const auth = useAuth<PasskeyAuthClient>()
   const labels = () => passkeyLabels(auth)
-  const signInPasskey = useSignInPasskey(auth.authClient as PasskeyAuthClient, {
+  const signInPasskey = useSignInPasskey(auth.authClient, {
     onSuccess: () => auth.navigate({ to: auth.redirectTo })
   })
   const signInMutating = useIsMutating(() => ({

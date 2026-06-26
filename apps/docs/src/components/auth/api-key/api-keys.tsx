@@ -37,11 +37,11 @@ export function ApiKeys({
   hideCreate,
   hideDelete
 }: ApiKeysProps) {
-  const { authClient } = useAuth()
+  const { authClient } = useAuth<ApiKeyAuthClient>()
   const { localization: apiKeyLocalization } = useAuthPlugin(apiKeyPlugin)
 
   const { data: listData, isPending: isListPending } = useListApiKeys(
-    authClient as ApiKeyAuthClient,
+    authClient,
     {
       enabled: !isPendingProp,
       ...(organizationId

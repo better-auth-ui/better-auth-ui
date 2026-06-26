@@ -48,7 +48,8 @@ export function SlugField({
   disabled,
   id = "slug"
 }: SlugFieldProps) {
-  const { authClient, localization: authLocalization } = useAuth()
+  const { authClient, localization: authLocalization } =
+    useAuth<OrganizationAuthClient>()
   const {
     localization,
     checkSlug: checkSlugEnabled,
@@ -62,7 +63,7 @@ export function SlugField({
     data: checkSlugData,
     error: checkSlugError,
     reset: resetCheckSlug
-  } = useCheckSlug(authClient as OrganizationAuthClient)
+  } = useCheckSlug(authClient)
 
   const debouncer = useDebouncer(
     (next: string) => {

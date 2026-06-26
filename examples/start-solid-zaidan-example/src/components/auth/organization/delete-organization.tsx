@@ -15,11 +15,9 @@ export type DeleteOrganizationProps = {
 }
 
 export function DeleteOrganization(props: DeleteOrganizationProps) {
-  const auth = useAuth()
+  const auth = useAuth<OrganizationAuthClient>()
   const [confirmOpen, setConfirmOpen] = createSignal(false)
-  const activeOrganization = useActiveOrganization(
-    auth.authClient as OrganizationAuthClient
-  )
+  const activeOrganization = useActiveOrganization(auth.authClient)
   return (
     <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
       <div>

@@ -115,11 +115,9 @@ export function UserButton({
   hideSettings = false
 }: UserButtonProps) {
   const { authClient, basePaths, viewPaths, localization, plugins, navigate } =
-    useAuth()
+    useAuth<MultiSessionAuthClient>()
 
-  const { isPending: settingActiveSession } = useSetActiveSession(
-    authClient as MultiSessionAuthClient
-  )
+  const { isPending: settingActiveSession } = useSetActiveSession(authClient)
   const { data: session, isPending: sessionPending } = useSession(authClient)
 
   const userLinks = links?.flatMap((link, index) => {

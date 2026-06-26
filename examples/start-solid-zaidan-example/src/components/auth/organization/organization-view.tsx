@@ -46,8 +46,8 @@ export function OrganizationView(props: OrganizationViewProps) {
     "hideSlug",
     "organization"
   ])
-  const auth = useAuth()
-  const client = auth.authClient as OrganizationAuthClient
+  const auth = useAuth<OrganizationAuthClient>()
+  const client = auth.authClient
   const pluginConfig = () =>
     auth.plugins.find((plugin) => plugin.id === organizationPlugin.id) as
       | OrganizationPluginConfig

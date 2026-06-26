@@ -14,10 +14,8 @@ export type OrganizationProps = {
 
 export function Organization(props: OrganizationProps) {
   const navigate = useNavigate()
-  const auth = useAuth()
-  const activeOrganization = useActiveOrganization(
-    auth.authClient as OrganizationAuthClient
-  )
+  const auth = useAuth<OrganizationAuthClient>()
+  const activeOrganization = useActiveOrganization(auth.authClient)
 
   const handlePathChange = (path: string) => {
     if (!props.slug) return

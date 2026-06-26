@@ -31,7 +31,7 @@ export type ManageAccountsProps = {
 }
 
 export function ManageAccounts(props: ManageAccountsProps = {}) {
-  const auth = useAuth()
+  const auth = useAuth<MultiSessionAuthClient>()
   const session = useSession(auth.authClient)
   const userId = () => session.data?.user.id
   const multiSessionPluginConfig = () =>
@@ -42,28 +42,19 @@ export function ManageAccounts(props: ManageAccountsProps = {}) {
       | Partial<MultiSessionLocalization>
       | undefined)
   })
-  const deviceSessions = useListDeviceSessions(
-    auth.authClient as MultiSessionAuthClient,
-    {
-      enabled: shouldLoadDeviceSessions({
-        isSsr: import.meta.env.SSR,
-        userId: userId()
-      })
-    }
-  )
-  const setActiveSession = useSetActiveSession(
-    auth.authClient as MultiSessionAuthClient,
-    {
-      onSuccess: () => window.scrollTo({ top: 0 })
-    }
-  )
-  const revokeMultiSession = useRevokeMultiSession(
-    auth.authClient as MultiSessionAuthClient,
-    {
-      onSuccess: () =>
-        toast.success(auth.localization.settings.revokeSessionSuccess)
-    }
-  )
+  const deviceSessions = useListDeviceSessions(auth.authClient, {
+    enabled: shouldLoadDeviceSessions({
+      isSsr: import.meta.env.SSR,
+      userId: userId()
+    })
+  })
+  const setActiveSession = useSetActiveSession(auth.authClient, {
+    onSuccess: () => window.scrollTo({ top: 0 })
+  })
+  const revokeMultiSession = useRevokeMultiSession(auth.authClient, {
+    onSuccess: () =>
+      toast.success(auth.localization.settings.revokeSessionSuccess)
+  })
   const displayName = () =>
     resolveUserLabel(session.data?.user.name, session.data?.user.email)
   const isAccountActionPending = () =>

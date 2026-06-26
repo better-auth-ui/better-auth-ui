@@ -23,7 +23,7 @@ import {
 import { SwitchAccountSubmenuItem } from "./switch-account-submenu-item"
 
 export function SwitchAccountSubmenuContent() {
-  const auth = useAuth()
+  const auth = useAuth<MultiSessionAuthClient>()
   const session = useSession(auth.authClient, {
     enabled: !import.meta.env.SSR
   })
@@ -36,15 +36,12 @@ export function SwitchAccountSubmenuContent() {
       | Partial<MultiSessionLocalization>
       | undefined)
   })
-  const deviceSessions = useListDeviceSessions(
-    auth.authClient as MultiSessionAuthClient,
-    {
-      enabled: shouldLoadDeviceSessions({
-        isSsr: import.meta.env.SSR,
-        userId: userId()
-      })
-    }
-  )
+  const deviceSessions = useListDeviceSessions(auth.authClient, {
+    enabled: shouldLoadDeviceSessions({
+      isSsr: import.meta.env.SSR,
+      userId: userId()
+    })
+  })
   const otherDeviceSessions = () => {
     const sessions = (deviceSessions.data ?? []) as DeviceSession[]
 

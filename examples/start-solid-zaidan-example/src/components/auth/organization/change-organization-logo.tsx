@@ -18,7 +18,6 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Label } from "@/components/ui/label"
 import { organizationPlugin } from "@/lib/auth/organization-plugin"
-import { authClient } from "@/lib/auth-client"
 import { OrganizationLogo } from "./organization-logo"
 
 export type ChangeOrganizationLogoProps = {
@@ -52,13 +51,9 @@ const fallbackLocalization = {
 >
 
 export function ChangeOrganizationLogo(props: ChangeOrganizationLogoProps) {
-  const auth = useAuth()
-  const activeOrganization = useActiveOrganization(
-    authClient as OrganizationAuthClient
-  )
-  const updateOrganization = useUpdateOrganization(
-    authClient as OrganizationAuthClient
-  )
+  const auth = useAuth<OrganizationAuthClient>()
+  const activeOrganization = useActiveOrganization(auth.authClient)
+  const updateOrganization = useUpdateOrganization(auth.authClient)
   const [isUploadingLogo, setIsUploadingLogo] = createSignal(false)
   const [isDeletingLogo, setIsDeletingLogo] = createSignal(false)
   let logoFileInput: HTMLInputElement | undefined

@@ -40,26 +40,26 @@ export function OrganizationMemberRow({
   isOwner,
   organization
 }: OrganizationMemberRowProps) {
-  const { authClient } = useAuth()
+  const { authClient } = useAuth<OrganizationAuthClient>()
   const { localization: organizationLocalization, roles } =
     useAuthPlugin(organizationPlugin)
 
   const { data: session } = useSession(authClient)
 
   const { data: hasUpdatePermission, isPending: updatePermissionPending } =
-    useHasPermission(authClient as OrganizationAuthClient, {
+    useHasPermission(authClient, {
       permissions: { member: ["update"] }
     })
 
   const { data: hasDeletePermission, isPending: deletePermissionPending } =
-    useHasPermission(authClient as OrganizationAuthClient, {
+    useHasPermission(authClient, {
       permissions: { member: ["delete"] }
     })
 
   const isPending = updatePermissionPending || deletePermissionPending
 
   const { mutate: updateMemberRole, isPending: isUpdatingRole } =
-    useUpdateMemberRole(authClient as OrganizationAuthClient, {
+    useUpdateMemberRole(authClient, {
       onSuccess: () => toast.success(organizationLocalization.memberRoleUpdated)
     })
 

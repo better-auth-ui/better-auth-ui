@@ -82,8 +82,8 @@ function OrganizationSwitcherTrigger(rawProps: OrganizationSwitcherProps = {}) {
 
 function MountedOrganizationSwitcher(rawProps: OrganizationSwitcherProps = {}) {
   const props = mergeProps({ hideSlug: true }, rawProps)
-  const auth = useAuth()
-  const client = auth.authClient as OrganizationAuthClient
+  const auth = useAuth<OrganizationAuthClient>()
+  const client = auth.authClient
   const navigate = useNavigate()
   const session = useSession(client)
   const activeOrganization = useActiveOrganization(client)

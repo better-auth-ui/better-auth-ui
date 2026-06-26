@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 
 export function UsernameField(props: AdditionalFieldProps) {
-  const auth = useAuth()
+  const auth = useAuth<UsernameAuthClient>()
   const usernamePlugin = () =>
     auth.plugins.find((plugin) => plugin.id === "username") as
       | {
@@ -26,12 +26,9 @@ export function UsernameField(props: AdditionalFieldProps) {
   const currentUsername = String(props.field.defaultValue ?? "")
   const [value, setValue] = createSignal(currentUsername)
   const [error, setError] = createSignal<string>()
-  const availability = useIsUsernameAvailable(
-    auth.authClient as UsernameAuthClient,
-    {
-      onError: () => undefined
-    }
-  )
+  const availability = useIsUsernameAvailable(auth.authClient, {
+    onError: () => undefined
+  })
   const availabilityData = () =>
     availability.data as { available?: boolean } | undefined
   const shouldCheckAvailability = () =>

@@ -13,13 +13,10 @@ export type SwitchAccountSubmenuItemProps = {
 }
 
 export function SwitchAccountSubmenuItem(props: SwitchAccountSubmenuItemProps) {
-  const auth = useAuth()
-  const setActiveSession = useSetActiveSession(
-    auth.authClient as MultiSessionAuthClient,
-    {
-      onSuccess: () => window.scrollTo({ top: 0 })
-    }
-  )
+  const auth = useAuth<MultiSessionAuthClient>()
+  const setActiveSession = useSetActiveSession(auth.authClient, {
+    onSuccess: () => window.scrollTo({ top: 0 })
+  })
 
   return (
     <DropdownMenuItem

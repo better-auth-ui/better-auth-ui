@@ -6,18 +6,18 @@ import {
 import { RouterProvider } from "@heroui/react"
 import { ErrorToaster } from "./error-toaster"
 
-export type AuthProviderProps<TAuthClient = AuthClient> =
+export type AuthProviderProps<TAuthClient extends AuthClient = AuthClient> =
   AuthProviderPropsPrimitive<TAuthClient>
 
 /**
  * Heroui-flavored `AuthProvider`. Wraps the primitive provider with a
  * heroui `RouterProvider` and the heroui `ErrorToaster`.
  */
-export function AuthProvider({
+export function AuthProvider<TAuthClient extends AuthClient = AuthClient>({
   children,
   navigate,
   ...config
-}: AuthProviderProps) {
+}: AuthProviderProps<TAuthClient>) {
   return (
     <AuthProviderPrimitive navigate={navigate} {...config}>
       <RouterProvider navigate={(path) => navigate({ to: path })}>

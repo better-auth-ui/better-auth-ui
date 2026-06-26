@@ -26,10 +26,8 @@ const organizationFallbackLocalization = {
 } satisfies Pick<OrganizationLocalization, "slug" | "slugPlaceholder">
 
 export function SlugField(props: SlugFieldProps) {
-  const auth = useAuth()
-  const checkOrganizationSlug = useCheckOrganizationSlug(
-    auth.authClient as OrganizationAuthClient
-  )
+  const auth = useAuth<OrganizationAuthClient>()
+  const checkOrganizationSlug = useCheckOrganizationSlug(auth.authClient)
   const organizationPluginConfig = () =>
     auth.plugins.find((plugin) => plugin.id === organizationPlugin.id) as
       | {

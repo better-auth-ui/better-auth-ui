@@ -39,12 +39,11 @@ export function CreateApiKeyDialog({
   onOpenChange,
   organizationId
 }: CreateApiKeyDialogProps) {
-  const { authClient, localization } = useAuth()
+  const { authClient, localization } = useAuth<ApiKeyAuthClient>()
   const { localization: apiKeyLocalization } = useAuthPlugin(apiKeyPlugin)
 
-  const { mutate: createApiKey, isPending: isCreating } = useCreateApiKey(
-    authClient as ApiKeyAuthClient
-  )
+  const { mutate: createApiKey, isPending: isCreating } =
+    useCreateApiKey(authClient)
 
   const [isNewKeyDialogOpen, setIsNewKeyDialogOpen] = useState(false)
   const [keyName, setKeyName] = useState<string | null>(null)

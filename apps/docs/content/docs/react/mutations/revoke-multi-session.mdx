@@ -14,15 +14,13 @@ import {
   useRevokeMultiSession
 } from "@better-auth-ui/react"
 
-const { authClient } = useAuth()
-const { mutate: revokeMultiSession } = useRevokeMultiSession(
-  authClient as MultiSessionAuthClient
-)
+const { authClient } = useAuth<MultiSessionAuthClient>()
+const { mutate: revokeMultiSession } = useRevokeMultiSession(authClient)
 
 revokeMultiSession({ sessionToken: deviceSession.session.token })
 ```
 
-`useRevokeMultiSession` requires the Better Auth `multiSession` plugin. Cast `authClient` to `MultiSessionAuthClient` so TypeScript picks up the plugin-extended method signature.
+`useRevokeMultiSession` requires the Better Auth `multiSession` plugin. Type `useAuth` with `MultiSessionAuthClient` so TypeScript picks up the plugin-extended method signature.
 
 ## Options factory
 

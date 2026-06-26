@@ -3,7 +3,7 @@ title: signInUsernameOptions
 description: Username/password sign-in mutation options.
 ---
 
-Requires the Better Auth username plugin. If TypeScript cannot infer the plugin methods from your client, type or cast `authClient` as `UsernameAuthClient` from `@better-auth-ui/solid`.
+Requires the Better Auth username plugin. When reading the client from auth context, call `useAuth<UsernameAuthClient>()` so TypeScript sees the plugin methods.
 
 ## Options factory
 

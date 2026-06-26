@@ -31,7 +31,8 @@ export function UsernameField({
   field,
   isPending
 }: AdditionalFieldProps) {
-  const { authClient, localization: authLocalization } = useAuth()
+  const { authClient, localization: authLocalization } =
+    useAuth<UsernameAuthClient>()
   const {
     localization,
     minUsernameLength,
@@ -49,7 +50,7 @@ export function UsernameField({
     data: availability,
     error: availabilityError,
     reset: resetAvailability
-  } = useIsUsernameAvailable(authClient as UsernameAuthClient, {
+  } = useIsUsernameAvailable(authClient, {
     onError: () => {}
   })
 

@@ -30,10 +30,10 @@ export function OrganizationDangerZone({
   className,
   ...props
 }: OrganizationDangerZoneProps & ComponentProps<"div">) {
-  const { authClient, localization } = useAuth()
+  const { authClient, localization } = useAuth<OrganizationAuthClient>()
 
   const { data: deletePermission, isPending: deletePermissionPending } =
-    useHasPermission(authClient as OrganizationAuthClient, {
+    useHasPermission(authClient, {
       permissions: { organization: ["delete"] }
     })
 

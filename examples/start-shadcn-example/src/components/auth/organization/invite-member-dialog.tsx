@@ -50,7 +50,7 @@ export function InviteMemberDialog({
   open,
   onOpenChange
 }: InviteMemberDialogProps) {
-  const { authClient, localization } = useAuth()
+  const { authClient, localization } = useAuth<OrganizationAuthClient>()
   const { localization: organizationLocalization, roles } =
     useAuthPlugin(organizationPlugin)
 
@@ -69,7 +69,7 @@ export function InviteMemberDialog({
   }, [open])
 
   const { mutate: inviteMember, isPending: isInviting } = useInviteMember(
-    authClient as OrganizationAuthClient,
+    authClient,
     {
       onSuccess: () => {
         onOpenChange(false)

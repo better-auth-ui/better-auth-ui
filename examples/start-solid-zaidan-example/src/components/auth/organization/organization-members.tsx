@@ -131,7 +131,7 @@ function SortableTableHead(props: {
 }
 
 export function OrganizationMembers(props: OrganizationMembersProps) {
-  const auth = useAuth()
+  const auth = useAuth<OrganizationAuthClient>()
   const [inviteOpen, setInviteOpen] = createSignal(false)
   const [memberSearch, setMemberSearch] = createSignal("")
   const [memberRoleFilter, setMemberRoleFilter] = createSignal("all")
@@ -141,9 +141,7 @@ export function OrganizationMembers(props: OrganizationMembersProps) {
     direction: "ascending"
   })
   const session = useSession(auth.authClient)
-  const members = useListOrganizationMembers(
-    auth.authClient as OrganizationAuthClient
-  )
+  const members = useListOrganizationMembers(auth.authClient)
   const memberRows = () => (members.data?.members ?? []) as OrganizationMember[]
   const organizationPluginConfig = () =>
     auth.plugins.find((plugin) => plugin.id === organizationPlugin.id) as

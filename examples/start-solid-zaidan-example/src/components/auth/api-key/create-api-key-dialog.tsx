@@ -24,13 +24,13 @@ export function CreateApiKeyDialog(props: {
   organizationId?: string
   onOpenChange: (open: boolean) => void
 }) {
-  const auth = useAuth()
+  const auth = useAuth<ApiKeyAuthClient>()
   const [isNewKeyDialogOpen, setIsNewKeyDialogOpen] = createSignal(false)
   const [newApiKeyName, setNewApiKeyName] = createSignal<string | null>(null)
   const [newApiKeySecret, setNewApiKeySecret] = createSignal<string | null>(
     null
   )
-  const createApiKey = useCreateApiKey(auth.authClient as ApiKeyAuthClient, {
+  const createApiKey = useCreateApiKey(auth.authClient, {
     onSuccess: (result: { key: string; name?: string | null }) => {
       const apiKey = result
 

@@ -1,14 +1,17 @@
-import type { AuthConfig } from "@better-auth-ui/core"
 import { QueryClient, QueryClientProvider } from "@tanstack/solid-query"
 import { createContext, type JSX, useContext } from "solid-js"
 import type { AuthClient } from "./auth-client"
-import { resolveAuthConfig, type SolidAuthConfigInput } from "./auth-config"
+import {
+  resolveAuthConfig,
+  type SolidAuthConfig,
+  type SolidAuthConfigInput
+} from "./auth-config"
 import { FetchOptionsProvider } from "./fetch-options-provider"
 import { MutationInvalidator } from "./mutation-invalidator"
 
-const AuthContext = createContext<AuthConfig>()
+const AuthContext = createContext<SolidAuthConfig>()
 /** Provider-instance scoped config fallback for SSR — replaces the former module-level global. */
-const RenderingAuthConfigContext = createContext<AuthConfig>()
+const RenderingAuthConfigContext = createContext<SolidAuthConfig>()
 
 const fallbackQueryClient = new QueryClient({
   defaultOptions: {
@@ -18,7 +21,7 @@ const fallbackQueryClient = new QueryClient({
   }
 })
 
-export type AuthProviderProps<TAuthClient = AuthClient> =
+export type AuthProviderProps<TAuthClient extends AuthClient = AuthClient> =
   SolidAuthConfigInput<TAuthClient> & {
     children?: JSX.Element | (() => JSX.Element)
     /** TanStack QueryClient to use for your application's queries. */
@@ -28,9 +31,11 @@ export type AuthProviderProps<TAuthClient = AuthClient> =
 const resolveProviderChildren = (children: AuthProviderProps["children"]) =>
   typeof children === "function" ? children() : children
 
-export function AuthProvider(props: AuthProviderProps) {
+export function AuthProvider<TAuthClient extends AuthClient = AuthClient>(
+  props: AuthProviderProps<TAuthClient>
+) {
   const { children, queryClient: qc, ...configInput } = props
-  const config = resolveAuthConfig(configInput as AuthProviderProps<AuthClient>)
+  const config = resolveAuthConfig(configInput)
   const queryClient = qc || fallbackQueryClient
 
   return (
@@ -47,7 +52,9 @@ export function AuthProvider(props: AuthProviderProps) {
   )
 }
 
-export function useAuth(): AuthConfig {
+export function useAuth<
+  TAuthClient extends AuthClient = AuthClient
+>(): SolidAuthConfig<TAuthClient> {
   const context = useContext(AuthContext)
   const renderingConfig = useContext(RenderingAuthConfigContext)
   const auth = context ?? renderingConfig
@@ -56,5 +63,5 @@ export function useAuth(): AuthConfig {
     throw new Error("[Better Auth UI] AuthProvider is required")
   }
 
-  return auth
+  return auth as SolidAuthConfig<TAuthClient>
 }

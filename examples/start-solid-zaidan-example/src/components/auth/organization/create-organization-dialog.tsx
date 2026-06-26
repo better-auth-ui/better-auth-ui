@@ -35,16 +35,13 @@ const organizationFallbackLocalization = {
 >
 
 export function CreateOrganizationDialog(props: CreateOrganizationDialogProps) {
-  const auth = useAuth()
+  const auth = useAuth<OrganizationAuthClient>()
   const [name, setName] = createSignal("")
   const [slug, setSlug] = createSignal("")
   const [slugEdited, setSlugEdited] = createSignal(false)
-  const createOrganization = useCreateOrganization(
-    auth.authClient as OrganizationAuthClient,
-    {
-      onSuccess: () => props.onOpenChange(false)
-    }
-  )
+  const createOrganization = useCreateOrganization(auth.authClient, {
+    onSuccess: () => props.onOpenChange(false)
+  })
   const organizationPluginConfig = () =>
     auth.plugins.find((plugin) => plugin.id === organizationPlugin.id) as
       | { localization?: OrganizationLocalization }

@@ -3,7 +3,7 @@ title: useSignInMagicLink
 description: Magic-link sign-in mutation hook.
 ---
 
-Requires the Better Auth magic-link plugin. If TypeScript cannot infer the plugin methods from your client, type or cast `authClient` as `MagicLinkAuthClient` from `@better-auth-ui/core/plugins/magic-link`.
+Requires the Better Auth magic-link plugin. When reading the client from auth context, call `useAuth<MagicLinkAuthClient>()` so TypeScript sees the plugin methods.
 
 ## Usage
 

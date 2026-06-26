@@ -23,15 +23,13 @@ export type OrganizationApiKeysProps = {
  * `apiKey` statements), so we gate on role directly.
  */
 export function OrganizationApiKeys({ className }: OrganizationApiKeysProps) {
-  const { authClient } = useAuth()
+  const { authClient } = useAuth<OrganizationAuthClient>()
   const { data: session } = useSession(authClient)
 
   const { data: activeOrganization, isPending: activeOrganizationPending } =
-    useActiveOrganization(authClient as OrganizationAuthClient)
+    useActiveOrganization(authClient)
 
-  const { data: membersData } = useListOrganizationMembers(
-    authClient as OrganizationAuthClient
-  )
+  const { data: membersData } = useListOrganizationMembers(authClient)
 
   const canManageApiKeys = membersData?.members.some(
     (member) => member.role === "owner" && member.userId === session?.user.id

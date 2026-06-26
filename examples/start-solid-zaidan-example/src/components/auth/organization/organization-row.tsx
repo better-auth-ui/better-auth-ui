@@ -21,8 +21,8 @@ type OrganizationPluginConfig = {
 }
 
 export function OrganizationRow(props: OrganizationRowProps) {
-  const auth = useAuth()
-  const client = auth.authClient as OrganizationAuthClient
+  const auth = useAuth<OrganizationAuthClient>()
+  const client = auth.authClient
   const navigate = useNavigate()
   const organizationPluginConfig = () =>
     auth.plugins.find((plugin) => plugin.id === organizationPlugin.id) as

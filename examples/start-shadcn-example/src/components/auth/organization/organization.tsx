@@ -40,7 +40,8 @@ export function Organization({
     throw new Error("[Better Auth UI] Either `view` or `path` must be provided")
   }
 
-  const { authClient, basePaths, localization, navigate } = useAuth()
+  const { authClient, basePaths, localization, navigate } =
+    useAuth<OrganizationAuthClient>()
   useAuthenticate(authClient)
 
   const {
@@ -50,9 +51,8 @@ export function Organization({
     slugPrefix
   } = useAuthPlugin(organizationPlugin)
 
-  const { data: activeOrganization, isPending } = useActiveOrganization(
-    authClient as OrganizationAuthClient
-  )
+  const { data: activeOrganization, isPending } =
+    useActiveOrganization(authClient)
 
   useEffect(() => {
     if (!isPending && !activeOrganization) {
