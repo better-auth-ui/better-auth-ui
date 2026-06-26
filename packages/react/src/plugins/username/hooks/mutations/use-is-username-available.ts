@@ -1,8 +1,7 @@
+import type { UsernameAuthClient } from "@better-auth-ui/core/plugins/username"
 import { usernameMutationKeys } from "@better-auth-ui/core/plugins/username"
 import { mutationOptions, useMutation } from "@tanstack/react-query"
 import type { BetterFetchError } from "better-auth/react"
-
-import type { UsernameAuthClient } from "../../username-auth-client"
 
 export type IsUsernameAvailableParams<TAuthClient extends UsernameAuthClient> =
   Parameters<TAuthClient["isUsernameAvailable"]>[0]

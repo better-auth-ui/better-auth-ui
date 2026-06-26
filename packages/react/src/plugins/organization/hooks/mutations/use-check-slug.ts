@@ -1,8 +1,7 @@
+import type { OrganizationAuthClient } from "@better-auth-ui/core/plugins/organization"
 import { organizationMutationKeys } from "@better-auth-ui/core/plugins/organization"
 import { mutationOptions, useMutation } from "@tanstack/react-query"
 import type { BetterFetchError } from "better-auth/react"
-
-import type { OrganizationAuthClient } from "../../organization-auth-client"
 
 export type CheckSlugParams<TAuthClient extends OrganizationAuthClient> =
   Parameters<TAuthClient["organization"]["checkSlug"]>[0]

@@ -1,3 +1,4 @@
+import type { MultiSessionAuthClient } from "@better-auth-ui/core/plugins/multi-session"
 import {
   multiSessionMutationKeys,
   multiSessionQueryKeys
@@ -9,7 +10,6 @@ import {
 } from "@tanstack/react-query"
 import type { BetterFetchError } from "better-auth/react"
 import { useSession } from "../../../../hooks/queries/use-session"
-import type { MultiSessionAuthClient } from "../../multi-session-auth-client"
 
 export type RevokeMultiSessionParams<
   TAuthClient extends MultiSessionAuthClient

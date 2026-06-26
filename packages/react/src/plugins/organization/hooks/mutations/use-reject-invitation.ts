@@ -1,3 +1,4 @@
+import type { OrganizationAuthClient } from "@better-auth-ui/core/plugins/organization"
 import {
   organizationMutationKeys,
   organizationQueryKeys
@@ -9,7 +10,6 @@ import {
 } from "@tanstack/react-query"
 import type { BetterFetchError } from "better-auth/react"
 import { useSession } from "../../../../hooks/queries/use-session"
-import type { OrganizationAuthClient } from "../../organization-auth-client"
 
 export type RejectInvitationParams<TAuthClient extends OrganizationAuthClient> =
   Parameters<TAuthClient["organization"]["rejectInvitation"]>[0]

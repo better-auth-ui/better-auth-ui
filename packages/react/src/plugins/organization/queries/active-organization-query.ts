@@ -1,3 +1,4 @@
+import type { OrganizationAuthClient } from "@better-auth-ui/core/plugins/organization"
 import {
   organizationPlugin,
   organizationQueryKeys
@@ -12,7 +13,6 @@ import {
 import type { BetterFetchError } from "better-auth/react"
 import { useSession } from "../../../hooks/queries/use-session"
 import { useAuthPlugin } from "../../../hooks/use-auth-plugin"
-import type { OrganizationAuthClient } from "../organization-auth-client"
 import type { FullOrganizationParams } from "./full-organization-query"
 import type { ListOrganization } from "./list-organizations-query"
 

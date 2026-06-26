@@ -2,6 +2,7 @@
 
 import {
   type AdditionalField,
+  type AuthClient,
   type AuthConfig,
   type DeepPartial,
   deepmerge,
@@ -13,7 +14,6 @@ import {
   QueryClientProvider
 } from "@tanstack/react-query"
 import { type PropsWithChildren, type ReactNode, useContext } from "react"
-import type { AuthClient } from "../../lib/auth-client"
 import { MutationInvalidator } from "../mutation-invalidator"
 import { AuthContext } from "./auth-context"
 import { FetchOptionsProvider } from "./fetch-options-provider"

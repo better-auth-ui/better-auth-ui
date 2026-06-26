@@ -1,3 +1,5 @@
+import type { InferData } from "@better-auth-ui/core"
+import type { OrganizationAuthClient } from "@better-auth-ui/core/plugins/organization"
 import { organizationQueryKeys } from "@better-auth-ui/core/plugins/organization"
 import {
   type DataTag,
@@ -8,8 +10,6 @@ import {
 } from "@tanstack/react-query"
 import type { BetterFetchError } from "better-auth/react"
 import { useSession } from "../../../hooks/queries/use-session"
-import type { InferData } from "../../../lib/auth-client"
-import type { OrganizationAuthClient } from "../organization-auth-client"
 
 export type ListOrganizationsData<
   TAuthClient extends OrganizationAuthClient = OrganizationAuthClient
