@@ -1,3 +1,3 @@
-export type { MultiSessionAuthClient } from "../../lib/auth-client"
 export * from "./hooks/mutations"
+export type * from "./multi-session-auth-client"
 export * from "./queries"

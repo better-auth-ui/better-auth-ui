@@ -1,6 +1,6 @@
 import { organizationMutationKeys } from "@better-auth-ui/core/plugins/organization"
 import { useMutation } from "@tanstack/solid-query"
-import type { OrganizationAuthClient } from "../../../lib/auth-client"
+import type { OrganizationAuthClient } from "../organization-auth-client"
 import {
   createOrganizationMutationOptions,
   type OrganizationMutationOptions

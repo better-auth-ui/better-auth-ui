@@ -1,3 +1,3 @@
-export type { ApiKeyAuthClient } from "../../lib/auth-client"
+export type * from "./api-key-auth-client"
 export * from "./hooks/mutations"
 export * from "./queries"

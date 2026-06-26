@@ -1,10 +1,7 @@
 import { multiSessionQueryKeys } from "@better-auth-ui/core/plugins/multi-session"
 import type { QueryClient } from "@tanstack/solid-query"
 import { useSession } from "../../../hooks/queries/use-session"
-import type {
-  InferData,
-  MultiSessionAuthClient
-} from "../../../lib/auth-client"
+import type { InferData } from "../../../lib/auth-client"
 import {
   createUserScopedOptions,
   createUserScopedQuery,
@@ -13,6 +10,7 @@ import {
   getSessionUserId,
   prefetchUserScopedQuery
 } from "../../../queries/create-user-scoped-query"
+import type { MultiSessionAuthClient } from "../multi-session-auth-client"
 
 export type ListDeviceSessionsData<TAuthClient extends MultiSessionAuthClient> =
   InferData<TAuthClient["multiSession"]["listDeviceSessions"]>

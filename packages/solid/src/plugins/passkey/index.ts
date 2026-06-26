@@ -1,3 +1,3 @@
-export type { PasskeyAuthClient } from "../../lib/auth-client"
 export * from "./mutations"
+export type * from "./passkey-auth-client"
 export * from "./queries"

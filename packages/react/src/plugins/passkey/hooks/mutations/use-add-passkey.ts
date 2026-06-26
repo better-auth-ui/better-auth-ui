@@ -9,7 +9,7 @@ import {
 } from "@tanstack/react-query"
 import type { BetterFetchError } from "better-auth/react"
 import { useSession } from "../../../../hooks/queries/use-session"
-import type { PasskeyAuthClient } from "../../../../lib/auth-client"
+import type { PasskeyAuthClient } from "../../passkey-auth-client"
 
 export type AddPasskeyParams<TAuthClient extends PasskeyAuthClient> =
   Parameters<TAuthClient["passkey"]["addPasskey"]>[0]

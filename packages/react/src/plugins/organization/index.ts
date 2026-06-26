@@ -1,3 +1,3 @@
-export type { OrganizationAuthClient } from "../../lib/auth-client"
 export * from "./hooks/mutations"
+export type * from "./organization-auth-client"
 export * from "./queries"

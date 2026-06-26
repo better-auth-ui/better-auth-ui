@@ -5,11 +5,11 @@ import {
 } from "@tanstack/solid-query"
 import type { BetterFetchError } from "better-auth/client"
 import { useSession } from "../../../hooks/queries/use-session"
-import type { OrganizationAuthClient } from "../../../lib/auth-client"
 import {
   createAuthMutationOptions,
   type MutationMethod
 } from "../../../mutations/create-auth-mutation"
+import type { OrganizationAuthClient } from "../organization-auth-client"
 import type { AuthMutationMeta } from "./metadata"
 
 export type OrganizationMutationOptions<TMethod extends MutationMethod> = Omit<

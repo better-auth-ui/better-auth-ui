@@ -1,15 +1,16 @@
 import type { MutationOptions } from "@tanstack/query-core"
 import type { BetterFetchError } from "better-auth/client"
 import { authQueryKeys } from "../../lib/auth-query-keys"
-import type { MultiSessionAuthClient } from "./multi-session-auth-client"
+import type { MultiSessionAuthClientContract } from "./multi-session-auth-client"
 import { multiSessionMutationKeys } from "./multi-session-mutation-keys"
 import { multiSessionQueryKeys } from "./multi-session-query-keys"
 
-export type SetActiveSessionParams<TAuthClient extends MultiSessionAuthClient> =
-  Parameters<TAuthClient["multiSession"]["setActive"]>[0]
+export type SetActiveSessionParams<
+  TAuthClient extends MultiSessionAuthClientContract
+> = Parameters<TAuthClient["multiSession"]["setActive"]>[0]
 
 export type SetActiveSessionOptions<
-  TAuthClient extends MultiSessionAuthClient
+  TAuthClient extends MultiSessionAuthClientContract
 > = Omit<
   ReturnType<typeof setActiveSessionOptions<TAuthClient>>,
   "mutationKey" | "mutationFn" | "meta"
@@ -22,7 +23,7 @@ export type SetActiveSessionOptions<
  * @param userId - The current signed-in user's ID. Used for cache partitioning.
  */
 export function setActiveSessionOptions<
-  TAuthClient extends MultiSessionAuthClient
+  TAuthClient extends MultiSessionAuthClientContract
 >(authClient: TAuthClient, userId?: string) {
   const mutationKey = multiSessionMutationKeys.setActive
 

@@ -1,16 +1,17 @@
 import type { MutationOptions } from "@tanstack/query-core"
 import type { BetterFetchError } from "better-auth/client"
-import type { ApiKeyAuthClient } from "./api-key-auth-client"
+import type { ApiKeyAuthClientContract } from "./api-key-auth-client"
 import { apiKeyMutationKeys } from "./api-key-mutation-keys"
 import { apiKeyQueryKeys } from "./api-key-query-keys"
 
-export type CreateApiKeyParams<TAuthClient extends ApiKeyAuthClient> =
+export type CreateApiKeyParams<TAuthClient extends ApiKeyAuthClientContract> =
   Parameters<TAuthClient["apiKey"]["create"]>[0]
 
-export type CreateApiKeyOptions<TAuthClient extends ApiKeyAuthClient> = Omit<
-  ReturnType<typeof createApiKeyOptions<TAuthClient>>,
-  "mutationKey" | "mutationFn" | "meta"
->
+export type CreateApiKeyOptions<TAuthClient extends ApiKeyAuthClientContract> =
+  Omit<
+    ReturnType<typeof createApiKeyOptions<TAuthClient>>,
+    "mutationKey" | "mutationFn" | "meta"
+  >
 
 /**
  * Mutation options factory for creating an API key.
@@ -18,10 +19,9 @@ export type CreateApiKeyOptions<TAuthClient extends ApiKeyAuthClient> = Omit<
  * @param authClient - The Better Auth API key client.
  * @param userId - The current signed-in user's ID. Used for cache partitioning.
  */
-export function createApiKeyOptions<TAuthClient extends ApiKeyAuthClient>(
-  authClient: TAuthClient,
-  userId?: string
-) {
+export function createApiKeyOptions<
+  TAuthClient extends ApiKeyAuthClientContract
+>(authClient: TAuthClient, userId?: string) {
   const mutationKey = apiKeyMutationKeys.create
 
   const mutationFn = (params: CreateApiKeyParams<TAuthClient>) =>

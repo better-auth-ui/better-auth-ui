@@ -12,7 +12,7 @@ import {
 import type { BetterFetchError } from "better-auth/react"
 import { useSession } from "../../../hooks/queries/use-session"
 import { useAuthPlugin } from "../../../hooks/use-auth-plugin"
-import type { OrganizationAuthClient } from "../../../lib/auth-client"
+import type { OrganizationAuthClient } from "../organization-auth-client"
 import type { FullOrganizationParams } from "./full-organization-query"
 import type { ListOrganization } from "./list-organizations-query"
 

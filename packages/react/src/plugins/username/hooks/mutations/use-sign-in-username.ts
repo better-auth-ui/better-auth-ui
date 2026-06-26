@@ -7,7 +7,7 @@ import {
 } from "@tanstack/react-query"
 import type { BetterFetchError } from "better-auth/react"
 
-import type { UsernameAuthClient } from "../../../../lib/auth-client"
+import type { UsernameAuthClient } from "../../username-auth-client"
 
 export type SignInUsernameParams<TAuthClient extends UsernameAuthClient> =
   Parameters<TAuthClient["signIn"]["username"]>[0]

@@ -1,15 +1,15 @@
 import type { MutationOptions } from "@tanstack/query-core"
 import type { BetterFetchError } from "better-auth/client"
-import type { MultiSessionAuthClient } from "./multi-session-auth-client"
+import type { MultiSessionAuthClientContract } from "./multi-session-auth-client"
 import { multiSessionMutationKeys } from "./multi-session-mutation-keys"
 import { multiSessionQueryKeys } from "./multi-session-query-keys"
 
 export type RevokeMultiSessionParams<
-  TAuthClient extends MultiSessionAuthClient
+  TAuthClient extends MultiSessionAuthClientContract
 > = Parameters<TAuthClient["multiSession"]["revoke"]>[0]
 
 export type RevokeMultiSessionOptions<
-  TAuthClient extends MultiSessionAuthClient
+  TAuthClient extends MultiSessionAuthClientContract
 > = Omit<
   ReturnType<typeof revokeMultiSessionOptions<TAuthClient>>,
   "mutationKey" | "mutationFn" | "meta"
@@ -22,7 +22,7 @@ export type RevokeMultiSessionOptions<
  * @param userId - The current signed-in user's ID. Used for cache partitioning.
  */
 export function revokeMultiSessionOptions<
-  TAuthClient extends MultiSessionAuthClient
+  TAuthClient extends MultiSessionAuthClientContract
 >(authClient: TAuthClient, userId?: string) {
   const mutationKey = multiSessionMutationKeys.revoke
 

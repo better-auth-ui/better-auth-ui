@@ -8,10 +8,8 @@ import {
 } from "@tanstack/react-query"
 import type { BetterFetchError } from "better-auth/react"
 import { useSession } from "../../../hooks/queries/use-session"
-import type {
-  InferData,
-  OrganizationAuthClient
-} from "../../../lib/auth-client"
+import type { InferData } from "../../../lib/auth-client"
+import type { OrganizationAuthClient } from "../organization-auth-client"
 
 export type ListOrganizationsData<
   TAuthClient extends OrganizationAuthClient = OrganizationAuthClient

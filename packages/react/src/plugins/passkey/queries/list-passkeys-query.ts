@@ -8,7 +8,8 @@ import {
 } from "@tanstack/react-query"
 import type { BetterFetchError } from "better-auth/react"
 import { useSession } from "../../../hooks/queries/use-session"
-import type { InferData, PasskeyAuthClient } from "../../../lib/auth-client"
+import type { InferData } from "../../../lib/auth-client"
+import type { PasskeyAuthClient } from "../passkey-auth-client"
 
 export type ListPasskeysData<TAuthClient extends PasskeyAuthClient> = InferData<
   TAuthClient["passkey"]["listUserPasskeys"]
