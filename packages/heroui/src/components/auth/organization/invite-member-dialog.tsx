@@ -1,8 +1,6 @@
+import type { OrganizationAuthClient } from "@better-auth-ui/core/plugins/organization"
 import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
-import {
-  type OrganizationAuthClient,
-  useInviteMember
-} from "@better-auth-ui/react/plugins/organization"
+import { useInviteMember } from "@better-auth-ui/react/plugins/organization"
 import { PersonPlus } from "@gravity-ui/icons"
 import {
   AlertDialog,

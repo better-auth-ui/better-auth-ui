@@ -13,10 +13,8 @@ Keyed per-user; waits for the active session before firing.
 
 ```tsx
 import { useAuth } from "@better-auth-ui/react"
-import {
-  type PasskeyAuthClient,
-  useListPasskeys
-} from "@better-auth-ui/react/plugins/passkey"
+import type { PasskeyAuthClient } from "@better-auth-ui/core/plugins/passkey"
+import { useListPasskeys } from "@better-auth-ui/react/plugins/passkey"
 
 const { authClient } = useAuth<PasskeyAuthClient>()
 const { data: passkeys } = useListPasskeys(authClient)

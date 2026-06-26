@@ -1,8 +1,6 @@
+import type { PasskeyAuthClient } from "@better-auth-ui/core/plugins/passkey"
 import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
-import {
-  type PasskeyAuthClient,
-  useAddPasskey
-} from "@better-auth-ui/react/plugins/passkey"
+import { useAddPasskey } from "@better-auth-ui/react/plugins/passkey"
 import { Fingerprint } from "@gravity-ui/icons"
 import {
   AlertDialog,

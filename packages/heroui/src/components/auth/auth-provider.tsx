@@ -1,5 +1,5 @@
+import type { AuthClient } from "@better-auth-ui/core"
 import {
-  type AuthClient,
   AuthProvider as AuthProviderPrimitive,
   type AuthProviderProps as AuthProviderPropsPrimitive
 } from "@better-auth-ui/react"

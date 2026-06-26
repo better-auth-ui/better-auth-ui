@@ -1,8 +1,6 @@
+import type { ApiKeyAuthClient } from "@better-auth-ui/core/plugins/api-key"
 import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
-import {
-  type ApiKeyAuthClient,
-  useCreateApiKey
-} from "@better-auth-ui/react/plugins/api-key"
+import { useCreateApiKey } from "@better-auth-ui/react/plugins/api-key"
 import { Key } from "@gravity-ui/icons"
 import {
   AlertDialog,

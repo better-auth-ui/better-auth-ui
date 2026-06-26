@@ -1,6 +1,6 @@
+import type { OrganizationAuthClient } from "@better-auth-ui/core/plugins/organization"
 import { useAuth, useAuthPlugin, useSession } from "@better-auth-ui/react"
 import {
-  type OrganizationAuthClient,
   useActiveOrganization,
   useListOrganizationMembers
 } from "@better-auth-ui/react/plugins/organization"

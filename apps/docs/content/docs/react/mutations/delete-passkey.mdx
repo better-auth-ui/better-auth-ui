@@ -9,10 +9,8 @@ Refetches the passkey list on success.
 
 ```tsx
 import { useAuth } from "@better-auth-ui/react"
-import {
-  type PasskeyAuthClient,
-  useDeletePasskey
-} from "@better-auth-ui/react/plugins/passkey"
+import type { PasskeyAuthClient } from "@better-auth-ui/core/plugins/passkey"
+import { useDeletePasskey } from "@better-auth-ui/react/plugins/passkey"
 
 const { authClient } = useAuth<PasskeyAuthClient>()
 const { mutate: deletePasskey } = useDeletePasskey(authClient)

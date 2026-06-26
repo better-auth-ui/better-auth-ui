@@ -11,10 +11,8 @@ Modeled as a mutation (not a query) because callers typically trigger the check 
 
 ```tsx
 import { useAuth } from "@better-auth-ui/react"
-import {
-  type UsernameAuthClient,
-  useIsUsernameAvailable
-} from "@better-auth-ui/react/plugins/username"
+import type { UsernameAuthClient } from "@better-auth-ui/core/plugins/username"
+import { useIsUsernameAvailable } from "@better-auth-ui/react/plugins/username"
 
 const { authClient } = useAuth<UsernameAuthClient>()
 const { mutateAsync: checkUsername, data } = useIsUsernameAvailable(authClient)

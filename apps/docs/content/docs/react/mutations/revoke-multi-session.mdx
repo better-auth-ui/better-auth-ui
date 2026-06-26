@@ -9,10 +9,8 @@ Refetches the device sessions list on success.
 
 ```tsx
 import { useAuth } from "@better-auth-ui/react"
-import {
-  type MultiSessionAuthClient,
-  useRevokeMultiSession
-} from "@better-auth-ui/react/plugins/multi-session"
+import type { MultiSessionAuthClient } from "@better-auth-ui/core/plugins/multi-session"
+import { useRevokeMultiSession } from "@better-auth-ui/react/plugins/multi-session"
 
 const { authClient } = useAuth<MultiSessionAuthClient>()
 const { mutate: revokeMultiSession } = useRevokeMultiSession(authClient)

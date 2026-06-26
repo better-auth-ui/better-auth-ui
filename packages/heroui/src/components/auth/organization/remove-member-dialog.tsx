@@ -1,8 +1,6 @@
+import type { OrganizationAuthClient } from "@better-auth-ui/core/plugins/organization"
 import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
-import {
-  type OrganizationAuthClient,
-  useRemoveMember
-} from "@better-auth-ui/react/plugins/organization"
+import { useRemoveMember } from "@better-auth-ui/react/plugins/organization"
 import { TrashBin } from "@gravity-ui/icons"
 import { AlertDialog, Button, Card, Chip, Spinner, toast } from "@heroui/react"
 import type { Member, User } from "better-auth/client"

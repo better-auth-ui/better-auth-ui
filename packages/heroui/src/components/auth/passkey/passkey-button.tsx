@@ -1,9 +1,7 @@
 import { type AuthView, authMutationKeys } from "@better-auth-ui/core"
+import type { PasskeyAuthClient } from "@better-auth-ui/core/plugins/passkey"
 import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
-import {
-  type PasskeyAuthClient,
-  useSignInPasskey
-} from "@better-auth-ui/react/plugins/passkey"
+import { useSignInPasskey } from "@better-auth-ui/react/plugins/passkey"
 import { Fingerprint } from "@gravity-ui/icons"
 import { Button, Spinner } from "@heroui/react"
 import { useIsMutating } from "@tanstack/react-query"

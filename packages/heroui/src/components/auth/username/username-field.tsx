@@ -1,8 +1,6 @@
+import type { UsernameAuthClient } from "@better-auth-ui/core/plugins/username"
 import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
-import {
-  type UsernameAuthClient,
-  useIsUsernameAvailable
-} from "@better-auth-ui/react/plugins/username"
+import { useIsUsernameAvailable } from "@better-auth-ui/react/plugins/username"
 import { Check, Xmark } from "@gravity-ui/icons"
 import {
   FieldError,

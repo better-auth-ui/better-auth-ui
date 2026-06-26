@@ -11,10 +11,8 @@ Keyed per-user; waits for the active session before firing.
 
 ```tsx
 import { useAuth } from "@better-auth-ui/react"
-import {
-  type MultiSessionAuthClient,
-  useListDeviceSessions
-} from "@better-auth-ui/react/plugins/multi-session"
+import type { MultiSessionAuthClient } from "@better-auth-ui/core/plugins/multi-session"
+import { useListDeviceSessions } from "@better-auth-ui/react/plugins/multi-session"
 
 const { authClient } = useAuth<MultiSessionAuthClient>()
 const { data: deviceSessions } = useListDeviceSessions(authClient)

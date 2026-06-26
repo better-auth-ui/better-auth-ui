@@ -1,5 +1,5 @@
+import type { UsernameAuthClient } from "@better-auth-ui/core/plugins/username"
 import { useAuth, useSession } from "@better-auth-ui/react"
-import type { UsernameAuthClient } from "@better-auth-ui/react/plugins/username"
 import { type AvatarProps, cn, Skeleton } from "@heroui/react"
 import type { User } from "better-auth"
 import type { ComponentProps } from "react"

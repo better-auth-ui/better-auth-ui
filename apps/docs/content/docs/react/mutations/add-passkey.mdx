@@ -9,10 +9,8 @@ Prompts the WebAuthn ceremony then refetches the passkey list on success.
 
 ```tsx
 import { useAuth } from "@better-auth-ui/react"
-import {
-  type PasskeyAuthClient,
-  useAddPasskey
-} from "@better-auth-ui/react/plugins/passkey"
+import type { PasskeyAuthClient } from "@better-auth-ui/core/plugins/passkey"
+import { useAddPasskey } from "@better-auth-ui/react/plugins/passkey"
 
 const { authClient } = useAuth<PasskeyAuthClient>()
 const { mutate: addPasskey, isPending } = useAddPasskey(authClient)

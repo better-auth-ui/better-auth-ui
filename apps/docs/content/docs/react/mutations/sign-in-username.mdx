@@ -9,10 +9,8 @@ Resets the session query on success so the new session is refetched.
 
 ```tsx
 import { useAuth } from "@better-auth-ui/react"
-import {
-  type UsernameAuthClient,
-  useSignInUsername
-} from "@better-auth-ui/react/plugins/username"
+import type { UsernameAuthClient } from "@better-auth-ui/core/plugins/username"
+import { useSignInUsername } from "@better-auth-ui/react/plugins/username"
 
 const { authClient } = useAuth<UsernameAuthClient>()
 const { mutate: signInUsername } = useSignInUsername(authClient)

@@ -9,10 +9,8 @@ The session is established when the user clicks the emailed link, so no session-
 
 ```tsx
 import { useAuth } from "@better-auth-ui/react"
-import {
-  type MagicLinkAuthClient,
-  useSignInMagicLink
-} from "@better-auth-ui/react/plugins/magic-link"
+import type { MagicLinkAuthClient } from "@better-auth-ui/core/plugins/magic-link"
+import { useSignInMagicLink } from "@better-auth-ui/react/plugins/magic-link"
 
 const { authClient } = useAuth<MagicLinkAuthClient>()
 const { mutate: signInMagicLink } = useSignInMagicLink(authClient)
