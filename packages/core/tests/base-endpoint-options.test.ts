@@ -48,6 +48,13 @@ const signal = new AbortController().signal
 
 type HasStore<T> = "$store" extends keyof T ? true : false
 
+type MutationSuccessData<TOptions> =
+  NonNullable<
+    TOptions extends { onSuccess?: infer TOnSuccess } ? TOnSuccess : never
+  > extends (data: infer TData, ...args: infer _Args) => unknown
+    ? TData
+    : never
+
 describe("core base endpoint option factories", () => {
   it("omits Solid-only store members from core auth client types", () => {
     expectTypeOf<HasStore<AuthClient>>().toEqualTypeOf<false>()
@@ -193,7 +200,7 @@ describe("core base endpoint option factories", () => {
     }
 
     const userId = "user-1"
-    const createApiKey = createApiKeyOptions(authClient as never, userId)
+    const createApiKey = createApiKeyOptions(authClient, userId)
     const deleteApiKey = deleteApiKeyOptions(authClient as never, userId)
     const magicLink = signInMagicLinkOptions(authClient as never)
     const revokeMultiSession = revokeMultiSessionOptions(
@@ -214,6 +221,9 @@ describe("core base endpoint option factories", () => {
     expect(setActiveSession.mutationKey).toEqual(
       multiSessionMutationKeys.setActive
     )
+    expectTypeOf<
+      MutationSuccessData<typeof createApiKey>
+    >().toEqualTypeOf<string>()
     expect(createApiKey.meta).toEqual({
       awaits: [apiKeyQueryKeys.lists(userId)]
     })

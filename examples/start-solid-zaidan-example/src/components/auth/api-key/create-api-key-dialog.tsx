@@ -31,9 +31,7 @@ export function CreateApiKeyDialog(props: {
     null
   )
   const createApiKey = useCreateApiKey(auth.authClient, {
-    onSuccess: (result: { key: string; name?: string | null }) => {
-      const apiKey = result
-
+    onSuccess: (apiKey) => {
       props.onOpenChange(false)
       setNewApiKeyName(apiKey.name ?? null)
       setNewApiKeySecret(apiKey.key)
