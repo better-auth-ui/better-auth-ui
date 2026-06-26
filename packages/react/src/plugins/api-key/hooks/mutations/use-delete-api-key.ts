@@ -1,4 +1,5 @@
 import {
+  type ApiKeyAuthClient,
   apiKeyMutationKeys,
   apiKeyQueryKeys
 } from "@better-auth-ui/core/plugins/api-key"
@@ -9,7 +10,6 @@ import {
 } from "@tanstack/react-query"
 import type { BetterFetchError } from "better-auth/react"
 import { useSession } from "../../../../hooks/queries/use-session"
-import type { ApiKeyAuthClient } from "../../api-key-auth-client"
 
 export type DeleteApiKeyParams<
   TAuthClient extends ApiKeyAuthClient = ApiKeyAuthClient
