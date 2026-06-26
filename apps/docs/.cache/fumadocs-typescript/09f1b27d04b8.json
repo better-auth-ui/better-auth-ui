@@ -1,0 +1,18 @@
+[
+  {
+    "id": "organization-danger-zone.tsx-OrganizationDangerZoneProps",
+    "name": "OrganizationDangerZoneProps",
+    "description": "",
+    "entries": [
+      {
+        "name": "className",
+        "description": "",
+        "tags": [],
+        "type": "string",
+        "simplifiedType": "string",
+        "required": false,
+        "deprecated": false
+      }
+    ]
+  }
+]

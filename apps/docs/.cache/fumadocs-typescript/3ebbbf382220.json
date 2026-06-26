@@ -1,0 +1,36 @@
+[
+  {
+    "id": "remove-member-mutation.ts-RemoveMemberParams",
+    "name": "RemoveMemberParams",
+    "description": "",
+    "entries": [
+      {
+        "name": "organizationId",
+        "description": "",
+        "tags": [],
+        "type": "string",
+        "simplifiedType": "string",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "memberIdOrEmail",
+        "description": "",
+        "tags": [],
+        "type": "string",
+        "simplifiedType": "string",
+        "required": true,
+        "deprecated": false
+      },
+      {
+        "name": "fetchOptions",
+        "description": "",
+        "tags": [],
+        "type": "ClientFetchOption<Partial<{ memberIdOrEmail: string; organizationId?: string; }> & Record<string, any>, Partial<Record<string, any>> & Record<string, any>, Record<string, any>>",
+        "simplifiedType": "ClientFetchOption<Record<string, any> & Partial<object>, Record<string, any> & Partial<Record<string, any>>, union>",
+        "required": false,
+        "deprecated": false
+      }
+    ]
+  }
+]

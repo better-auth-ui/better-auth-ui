@@ -1,0 +1,54 @@
+[
+  {
+    "id": "organization.tsx-OrganizationProps",
+    "name": "OrganizationProps",
+    "description": "",
+    "entries": [
+      {
+        "name": "className",
+        "description": "",
+        "tags": [],
+        "type": "string",
+        "simplifiedType": "string",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "hideNav",
+        "description": "",
+        "tags": [],
+        "type": "boolean",
+        "simplifiedType": "boolean",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "path",
+        "description": "",
+        "tags": [],
+        "type": "string",
+        "simplifiedType": "string",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "variant",
+        "description": "",
+        "tags": [],
+        "type": "\"default\" | \"secondary\" | \"tertiary\" | \"transparent\"",
+        "simplifiedType": "\"default\" | \"secondary\" | \"tertiary\" | \"transparent\"",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "view",
+        "description": "",
+        "tags": [{ "name": "remarks", "text": "`OrganizationView`" }],
+        "type": "keyof OrganizationViewPaths",
+        "simplifiedType": "OrganizationView",
+        "required": false,
+        "deprecated": false
+      }
+    ]
+  }
+]

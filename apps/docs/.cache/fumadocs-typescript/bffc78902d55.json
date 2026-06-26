@@ -1,0 +1,18 @@
+[
+  {
+    "id": "passkey-button.tsx-PasskeyButtonProps",
+    "name": "PasskeyButtonProps",
+    "description": "",
+    "entries": [
+      {
+        "name": "view",
+        "description": "",
+        "tags": [],
+        "type": "keyof AuthViewPaths",
+        "simplifiedType": "keyof AuthViewPaths",
+        "required": false,
+        "deprecated": false
+      }
+    ]
+  }
+]

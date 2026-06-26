@@ -1,0 +1,36 @@
+[
+  {
+    "id": "delete-organization-dialog.tsx-DeleteOrganizationDialogProps",
+    "name": "DeleteOrganizationDialogProps",
+    "description": "",
+    "entries": [
+      {
+        "name": "isOpen",
+        "description": "",
+        "tags": [],
+        "type": "boolean",
+        "simplifiedType": "boolean",
+        "required": true,
+        "deprecated": false
+      },
+      {
+        "name": "onOpenChange",
+        "description": "",
+        "tags": [],
+        "type": "(open: boolean) => void",
+        "simplifiedType": "function",
+        "required": true,
+        "deprecated": false
+      },
+      {
+        "name": "organization",
+        "description": "",
+        "tags": [],
+        "type": "{ id: string; name: string; slug: string; createdAt: Date; logo?: string | null; metadata?: any; }",
+        "simplifiedType": "object",
+        "required": true,
+        "deprecated": false
+      }
+    ]
+  }
+]
