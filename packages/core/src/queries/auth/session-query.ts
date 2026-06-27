@@ -41,8 +41,8 @@ export function sessionOptions<TAuthClient extends AuthClient>(
       authClient.getSession({
         ...params,
         fetchOptions: { ...params?.fetchOptions, signal, throw: true }
-      })
-  } as QueryOptions<TData, BetterFetchError, TData, typeof queryKey>
+      }) as Promise<TData>
+  } satisfies QueryOptions<TData, BetterFetchError, TData, typeof queryKey>
 
   return options as typeof options & {
     queryKey: DataTag<typeof queryKey, TData, BetterFetchError>

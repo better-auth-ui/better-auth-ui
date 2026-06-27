@@ -45,9 +45,9 @@ export function listSessionsOptions<TAuthClient extends AuthClient>(
           authClient.listSessions({
             ...params,
             fetchOptions: { ...params?.fetchOptions, signal, throw: true }
-          })
+          }) as Promise<TData>
       : skipToken
-  } as QueryOptions<TData, BetterFetchError, TData, typeof queryKey>
+  } satisfies QueryOptions<TData, BetterFetchError, TData, typeof queryKey>
 
   return options as typeof options & {
     queryKey: DataTag<typeof queryKey, TData, BetterFetchError>

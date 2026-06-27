@@ -1,28 +1,13 @@
 import {
   type AuthClient,
-  type SessionData,
   type SessionOptions,
   type SessionParams,
   sessionOptions
 } from "@better-auth-ui/core"
-import {
-  type QueryClient,
-  type UseQueryOptions,
-  type UseQueryResult,
-  useQuery
-} from "@tanstack/react-query"
-import type { BetterFetchError } from "better-auth/client"
+import { type QueryClient, useQuery } from "@tanstack/react-query"
 
-export type UseSessionOptions<TAuthClient extends AuthClient> = Omit<
-  UseQueryOptions<
-    SessionData<TAuthClient>,
-    BetterFetchError,
-    SessionData<TAuthClient>
-  >,
-  "queryKey" | "queryFn"
-> &
-  SessionOptions<TAuthClient> &
-  SessionParams<TAuthClient>
+export type UseSessionOptions<TAuthClient extends AuthClient> =
+  SessionOptions<TAuthClient> & SessionParams<TAuthClient>
 
 /**
  * Subscribe to the current session via TanStack Query.
@@ -40,14 +25,14 @@ export function useSession<TAuthClient extends AuthClient>(
   authClient: TAuthClient,
   options: UseSessionOptions<TAuthClient> = {},
   queryClient?: QueryClient
-): UseQueryResult<SessionData<TAuthClient>, BetterFetchError> {
+) {
   const { query, fetchOptions, ...queryOptions } = options
 
   return useQuery(
     {
       ...sessionOptions(authClient, { query, fetchOptions }),
       ...queryOptions
-    } as never,
+    },
     queryClient
-  ) as UseQueryResult<SessionData<TAuthClient>, BetterFetchError>
+  )
 }
