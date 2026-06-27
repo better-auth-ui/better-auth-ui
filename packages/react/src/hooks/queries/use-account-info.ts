@@ -1,14 +1,21 @@
 import {
-  type AccountInfoOptions,
+  type AccountInfoData,
   type AccountInfoParams,
   type AuthClient,
   accountInfoOptions
 } from "@better-auth-ui/core"
-import { type QueryClient, useQuery } from "@tanstack/react-query"
+import {
+  type QueryClient,
+  type UseQueryOptions,
+  useQuery
+} from "@tanstack/react-query"
 import { useSession } from "./use-session"
 
-export type UseAccountInfoOptions<TAuthClient extends AuthClient> =
-  AccountInfoOptions<TAuthClient> & AccountInfoParams<TAuthClient>
+export type UseAccountInfoOptions<TAuthClient extends AuthClient> = Omit<
+  UseQueryOptions<AccountInfoData<TAuthClient>>,
+  "queryKey"
+> &
+  AccountInfoParams<TAuthClient>
 
 /**
  * Subscribe to provider-specific info for a linked account via TanStack Query.
@@ -23,15 +30,13 @@ export function useAccountInfo<TAuthClient extends AuthClient>(
 
   const { query, fetchOptions, ...queryOptions } = options
 
-  const baseOptions = accountInfoOptions(authClient, userId, {
-    query,
-    fetchOptions
-  })
-
   return useQuery(
     {
-      ...queryOptions,
-      ...baseOptions
+      ...accountInfoOptions(authClient, userId, {
+        query,
+        fetchOptions
+      }),
+      ...queryOptions
     },
     queryClient
   )

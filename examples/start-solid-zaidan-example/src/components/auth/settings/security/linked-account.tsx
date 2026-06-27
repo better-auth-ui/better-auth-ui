@@ -71,9 +71,9 @@ export function LinkedAccountRow(props: {
 }) {
   const auth = useAuth()
   const providerName = () => getProviderName(props.provider)
-  const accountInfo = useAccountInfo(auth.authClient, {
+  const accountInfo = useAccountInfo(auth.authClient, () => ({
     query: { accountId: props.account?.accountId ?? "" }
-  })
+  }))
   const linkSocial = useLinkSocial(auth.authClient)
   const unlinkAccount = useUnlinkAccount(auth.authClient, {
     onSuccess: () => toast.success(auth.localization.settings.accountUnlinked)

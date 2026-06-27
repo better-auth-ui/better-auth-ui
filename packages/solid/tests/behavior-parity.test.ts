@@ -132,7 +132,7 @@ describe("Solid auth behavior parity", () => {
     expect(apiKeys.queryKey).toEqual(apiKeyQueryKeys.list("user-1"))
     await expect(
       (
-        accountInfo as {
+        accountInfo as unknown as {
           queryFn?: (context: { signal: AbortSignal }) => unknown
         }
       ).queryFn?.({ signal })
@@ -152,7 +152,7 @@ describe("Solid auth behavior parity", () => {
     )
 
     expect(listAccountsQuery).toContain(
-      "const session = useSession(authClient)"
+      "const session = useSession(authClient, undefined, queryClient)"
     )
     expect(listAccountsQuery).toContain("session.data?.user.id")
     expect(listAccountsQuery).toContain("return useQuery(() =>")
@@ -177,7 +177,7 @@ describe("Solid auth behavior parity", () => {
     expect(accountInfoQuery).not.toContain("enabled: (queryState)")
     expect(accountInfoQuery).not.toContain("query: never")
     expect(accountInfoQuery).not.toContain("initialData: undefined")
-    expect(listSessionsQuery).toContain("session.data?.user.id")
+    expect(listSessionsQuery).toContain("session?.user.id")
     expect(listSessionsQuery).not.toContain("getSessionUserId")
     expect(listSessionsQuery).not.toContain("enabled: (queryState)")
     expect(listSessionsQuery).not.toContain("query: never")

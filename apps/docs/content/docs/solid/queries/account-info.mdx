@@ -10,9 +10,9 @@ Use `useAccountInfo` when a settings screen needs provider metadata for the curr
 ```tsx
 import { useAccountInfo } from "@better-auth-ui/solid"
 
-const github = useAccountInfo(authClient, {
+const github = useAccountInfo(authClient, () => ({
   query: { accountId: "github-account-id" }
-})
+}))
 ```
 
 ## Options factory and loader helpers

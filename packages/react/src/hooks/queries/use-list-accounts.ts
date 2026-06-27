@@ -1,14 +1,21 @@
 import {
   type AuthClient,
-  type ListAccountsOptions,
+  type ListAccountsData,
   type ListAccountsParams,
   listAccountsOptions
 } from "@better-auth-ui/core"
-import { type QueryClient, useQuery } from "@tanstack/react-query"
+import {
+  type QueryClient,
+  type UseQueryOptions,
+  useQuery
+} from "@tanstack/react-query"
 import { useSession } from "./use-session"
 
-export type UseListAccountsOptions<TAuthClient extends AuthClient> =
-  ListAccountsOptions<TAuthClient> & ListAccountsParams<TAuthClient>
+export type UseListAccountsOptions<TAuthClient extends AuthClient> = Omit<
+  UseQueryOptions<ListAccountsData<TAuthClient>>,
+  "queryKey"
+> &
+  ListAccountsParams<TAuthClient>
 
 /**
  * Subscribe to the current user's linked social accounts via TanStack Query.
@@ -23,15 +30,13 @@ export function useListAccounts<TAuthClient extends AuthClient>(
 
   const { query, fetchOptions, ...queryOptions } = options
 
-  const baseOptions = listAccountsOptions(authClient, userId, {
-    query,
-    fetchOptions
-  })
-
   return useQuery(
     {
-      ...queryOptions,
-      ...baseOptions
+      ...listAccountsOptions(authClient, userId, {
+        query,
+        fetchOptions
+      }),
+      ...queryOptions
     },
     queryClient
   )

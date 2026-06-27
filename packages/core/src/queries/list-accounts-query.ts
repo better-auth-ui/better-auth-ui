@@ -1,10 +1,8 @@
 import {
-  type DataTag,
   type QueryClient,
   type QueryOptions,
   skipToken
 } from "@tanstack/query-core"
-import type { BetterFetchError } from "better-auth/client"
 import type { AuthClient, InferData } from "../lib/auth-client"
 import { authQueryKeys } from "../lib/auth-query-keys"
 
@@ -19,9 +17,10 @@ export type ListAccount<TAuthClient extends AuthClient = AuthClient> =
   NonNullable<ListAccountsData<TAuthClient>>[number]
 
 export type ListAccountsOptions<TAuthClient extends AuthClient> = Omit<
-  ReturnType<typeof listAccountsOptions<TAuthClient>>,
-  "queryKey" | "queryFn"
->
+  QueryOptions<ListAccountsData<TAuthClient>>,
+  "queryKey"
+> &
+  ListAccountsParams<TAuthClient>
 
 /**
  * Query options factory for a user's linked social accounts.
@@ -38,40 +37,66 @@ export function listAccountsOptions<TAuthClient extends AuthClient>(
   type TData = ListAccountsData<TAuthClient>
   const queryKey = authQueryKeys.listAccounts(userId, params?.query)
 
-  const options = {
+  return {
     queryKey,
     queryFn: userId
       ? ({ signal }) =>
           authClient.listAccounts({
             ...params,
             fetchOptions: { ...params?.fetchOptions, signal, throw: true }
-          })
+          }) as Promise<TData>
       : skipToken
-  } as QueryOptions<TData, BetterFetchError, TData, typeof queryKey>
-
-  return options as typeof options & {
-    queryKey: DataTag<typeof queryKey, TData, BetterFetchError>
-  }
+  } satisfies QueryOptions
 }
 
 export const ensureListAccounts = <TAuthClient extends AuthClient>(
   queryClient: QueryClient,
   authClient: TAuthClient,
-  userId: string,
-  params?: ListAccountsParams<TAuthClient>
-) =>
-  queryClient.ensureQueryData(listAccountsOptions(authClient, userId, params))
+  userId?: string,
+  options?: ListAccountsOptions<TAuthClient>
+) => {
+  const { fetchOptions, query, ...queryOptions } = options ?? {}
+
+  return queryClient.ensureQueryData({
+    ...listAccountsOptions(authClient, userId, { query, fetchOptions }),
+    ...queryOptions
+  })
+}
 
 export const prefetchListAccounts = <TAuthClient extends AuthClient>(
   queryClient: QueryClient,
   authClient: TAuthClient,
-  userId: string,
-  params?: ListAccountsParams<TAuthClient>
-) => queryClient.prefetchQuery(listAccountsOptions(authClient, userId, params))
+  userId?: string,
+  options?: ListAccountsOptions<TAuthClient>
+) => {
+  const { fetchOptions, query, ...queryOptions } = options ?? {}
+
+  return queryClient.prefetchQuery({
+    ...listAccountsOptions(authClient, userId, { query, fetchOptions }),
+    ...queryOptions
+  })
+}
 
 export const fetchListAccounts = <TAuthClient extends AuthClient>(
   queryClient: QueryClient,
   authClient: TAuthClient,
-  userId: string,
+  userId?: string,
+  options?: ListAccountsOptions<TAuthClient>
+) => {
+  const { fetchOptions, query, ...queryOptions } = options ?? {}
+
+  return queryClient.fetchQuery({
+    ...listAccountsOptions(authClient, userId, { query, fetchOptions }),
+    ...queryOptions
+  })
+}
+
+export const getListAccounts = <TAuthClient extends AuthClient = AuthClient>(
+  queryClient: QueryClient,
+  _authClient?: TAuthClient,
+  userId?: string,
   params?: ListAccountsParams<TAuthClient>
-) => queryClient.fetchQuery(listAccountsOptions(authClient, userId, params))
+) => {
+  const queryKey = authQueryKeys.listAccounts(userId, params?.query)
+  return queryClient.getQueryData<ListAccountsData<TAuthClient>>(queryKey)
+}

@@ -2,48 +2,40 @@ import {
   type AccountInfoData,
   type AccountInfoParams,
   type AuthClient,
-  accountInfoOptions,
-  type authQueryKeys
+  accountInfoOptions
 } from "@better-auth-ui/core"
 import {
-  type QueryOptions as SolidQueryOptions,
+  type QueryClient,
+  type QueryOptions,
   useQuery
 } from "@tanstack/solid-query"
-import type { BetterFetchError } from "better-auth/client"
+import type { Accessor } from "solid-js"
 import { useSession } from "./use-session"
 
-export type UseAccountInfoOptions<TAuthClient extends AuthClient> = Omit<
-  SolidQueryOptions<
-    AccountInfoData<TAuthClient>,
-    BetterFetchError,
-    AccountInfoData<TAuthClient>,
-    ReturnType<typeof authQueryKeys.accountInfo>
-  >,
-  "initialData" | "queryKey" | "queryFn"
-> &
-  Partial<NonNullable<AccountInfoParams<TAuthClient>>>
+export type UseAccountInfoOptions<TAuthClient extends AuthClient> = Accessor<
+  Omit<QueryOptions<AccountInfoData<TAuthClient>>, "queryKey"> &
+    AccountInfoParams<TAuthClient>
+>
 
 export function useAccountInfo<TAuthClient extends AuthClient>(
   authClient: TAuthClient,
-  options: UseAccountInfoOptions<TAuthClient> = {}
+  options?: UseAccountInfoOptions<TAuthClient>,
+  queryClient?: Accessor<QueryClient>
 ) {
-  const session = useSession(authClient)
+  const session = useSession(authClient, undefined, queryClient)
   const userId = () => session.data?.user.id
-  const { query, fetchOptions, ...queryOptions } = options
 
   return useQuery(() => {
-    const { initialData: _initialData, ...baseOptions } = accountInfoOptions(
-      authClient,
-      userId(),
-      {
-        query,
-        fetchOptions
-      }
-    )
+    const { query, fetchOptions, initialData, ...queryOptions } =
+      options?.() ?? {}
 
     return {
-      ...baseOptions,
-      ...queryOptions
+      ...accountInfoOptions(authClient, userId(), {
+        query,
+        fetchOptions
+      }),
+      ...queryOptions,
+      initialData: initialData as undefined
     }
-  })
+  }, queryClient)
 }

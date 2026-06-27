@@ -18,9 +18,9 @@ export type SwitchAccountSubmenuProps = {
 
 export function SwitchAccountSubmenu(props: SwitchAccountSubmenuProps) {
   const auth = useAuth()
-  const session = useSession(auth.authClient, {
+  const session = useSession(auth.authClient, () => ({
     enabled: !import.meta.env.SSR
-  })
+  }))
   const multiSessionPluginConfig = () =>
     auth.plugins.find((plugin) => plugin.id === coreMultiSessionPlugin.id)
   const multiSessionLabels = (): MultiSessionLocalization => ({

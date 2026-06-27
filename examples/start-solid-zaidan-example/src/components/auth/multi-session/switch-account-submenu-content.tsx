@@ -20,9 +20,9 @@ import { SwitchAccountSubmenuItem } from "./switch-account-submenu-item"
 
 export function SwitchAccountSubmenuContent() {
   const auth = useAuth<MultiSessionAuthClient>()
-  const session = useSession(auth.authClient, {
+  const session = useSession(auth.authClient, () => ({
     enabled: !import.meta.env.SSR
-  })
+  }))
   const multiSessionPluginConfig = () =>
     auth.plugins.find((plugin) => plugin.id === coreMultiSessionPlugin.id)
   const multiSessionLabels = (): MultiSessionLocalization => ({

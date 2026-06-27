@@ -7,13 +7,27 @@ import type { UseSessionOptions } from "../src/hooks/queries/use-session"
 
 describe("Solid base query option typing", () => {
   it("preserves Solid Query options while carrying Better Auth params", () => {
-    expectTypeOf<UseSessionOptions<AuthClient>>().toHaveProperty("query")
-    expectTypeOf<UseSessionOptions<AuthClient>>().toHaveProperty("fetchOptions")
-    expectTypeOf<UseSessionOptions<AuthClient>>().toHaveProperty("enabled")
+    expectTypeOf<ReturnType<UseSessionOptions<AuthClient>>>().toHaveProperty(
+      "query"
+    )
+    expectTypeOf<ReturnType<UseSessionOptions<AuthClient>>>().toHaveProperty(
+      "fetchOptions"
+    )
+    expectTypeOf<ReturnType<UseSessionOptions<AuthClient>>>().toHaveProperty(
+      "enabled"
+    )
 
-    expectTypeOf<UseAccountInfoOptions<AuthClient>>().toHaveProperty("enabled")
-    expectTypeOf<UseAccountInfoOptions<AuthClient>>().toHaveProperty("query")
-    expectTypeOf<UseListAccountsOptions<AuthClient>>().toHaveProperty("enabled")
-    expectTypeOf<UseListSessionsOptions<AuthClient>>().toHaveProperty("enabled")
+    expectTypeOf<
+      ReturnType<UseAccountInfoOptions<AuthClient>>
+    >().toHaveProperty("enabled")
+    expectTypeOf<
+      ReturnType<UseAccountInfoOptions<AuthClient>>
+    >().toHaveProperty("query")
+    expectTypeOf<
+      ReturnType<UseListAccountsOptions<AuthClient>>
+    >().toHaveProperty("enabled")
+    expectTypeOf<
+      ReturnType<UseListSessionsOptions<AuthClient>>
+    >().toHaveProperty("enabled")
   })
 })
