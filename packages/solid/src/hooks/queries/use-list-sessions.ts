@@ -26,13 +26,11 @@ export function useListSessions<TAuthClient extends AuthClient>(
   const { data: session } = useSession(authClient)
   const { query, fetchOptions, ...queryOptions } = options
 
-  return useQuery(() => {
-    return {
-      ...listSessionsOptions(authClient, session?.user.id, {
-        query,
-        fetchOptions
-      }),
-      ...queryOptions
-    }
-  })
+  return useQuery(() => ({
+    ...listSessionsOptions(authClient, session?.user.id, {
+      query,
+      fetchOptions
+    }),
+    ...queryOptions
+  }))
 }
