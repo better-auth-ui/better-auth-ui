@@ -136,7 +136,7 @@ export function ChangeOrganizationLogo({
           <OrganizationLogo
             size="lg"
             isPending={activeOrganizationPending}
-            organization={activeOrganization ?? undefined}
+            organization={activeOrganization}
           />
         </Button>
 
