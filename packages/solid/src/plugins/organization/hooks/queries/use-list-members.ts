@@ -5,10 +5,9 @@ import {
   type OrganizationAuthClient
 } from "@better-auth-ui/core/plugins/organization"
 import {
-  createQuery,
   type QueryClient,
   type QueryOptions,
-  skipToken
+  useQuery
 } from "@tanstack/solid-query"
 import type { Accessor } from "solid-js"
 import { useSession } from "../../../../hooks/queries/use-session"
@@ -37,10 +36,15 @@ export function useListOrganizationMembers<
     queryClient
   )
 
-  return createQuery(() => {
+  return useQuery(() => {
     const userId = session.data?.user.id
-    const { query, fetchOptions, initialData, ...queryOptions } =
-      options?.() ?? {}
+    const {
+      query,
+      fetchOptions,
+      initialData,
+      enabled = true,
+      ...queryOptions
+    } = options?.() ?? {}
     const organizationId = query?.organizationId ?? activeOrganization.data?.id
     const baseOptions = listOrganizationMembersOptions(authClient, userId, {
       query: { ...query, organizationId },
@@ -49,8 +53,9 @@ export function useListOrganizationMembers<
 
     return {
       ...baseOptions,
-      queryFn: userId && organizationId ? baseOptions.queryFn : skipToken,
+      queryFn: baseOptions.queryFn,
       ...queryOptions,
+      enabled: Boolean(userId) && Boolean(organizationId) && enabled,
       initialData: initialData as undefined
     }
   }, queryClient)

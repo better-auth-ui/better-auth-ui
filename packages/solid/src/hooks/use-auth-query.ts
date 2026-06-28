@@ -6,11 +6,13 @@ import {
 } from "@better-auth-ui/core"
 import {
   type CreateQueryOptions,
-  createQuery,
   type DataTag,
-  type QueryKey
+  type QueryClient,
+  type QueryKey,
+  useQuery
 } from "@tanstack/solid-query"
 import type { BetterFetchError } from "better-auth/client"
+import type { Accessor } from "solid-js"
 
 type SolidAuthQueryOptions<
   TFn extends AuthQueryFn,
@@ -43,9 +45,10 @@ export function useAuthQuery<
 >(
   authFn: TFn,
   queryKey: TQueryKey,
-  options?: UseAuthQueryOptions<TFn, TQueryKey>
+  options?: UseAuthQueryOptions<TFn, TQueryKey>,
+  queryClient?: Accessor<QueryClient>
 ) {
-  return createQuery(() => {
+  return useQuery(() => {
     const { query, fetchOptions, ...queryOptions } = options ?? {}
 
     return {
@@ -55,5 +58,5 @@ export function useAuthQuery<
       } as Parameters<TFn>[0]) as SolidAuthQueryOptions<TFn, TQueryKey>),
       ...queryOptions
     }
-  })
+  }, queryClient)
 }

@@ -5,10 +5,9 @@ import {
   type PasskeyAuthClient
 } from "@better-auth-ui/core/plugins/passkey"
 import {
-  createQuery,
   type QueryClient,
   type QueryOptions,
-  skipToken
+  useQuery
 } from "@tanstack/solid-query"
 import type { Accessor } from "solid-js"
 import { useSession } from "../../../../hooks/queries/use-session"
@@ -26,10 +25,15 @@ export function useListPasskeys<TAuthClient extends PasskeyAuthClient>(
 ) {
   const sessionQuery = useSession(authClient, undefined, queryClient)
 
-  return createQuery(() => {
+  return useQuery(() => {
     const userId = sessionQuery.data?.user.id
-    const { query, fetchOptions, initialData, ...queryOptions } =
-      options?.() ?? {}
+    const {
+      query,
+      fetchOptions,
+      initialData,
+      enabled = true,
+      ...queryOptions
+    } = options?.() ?? {}
     const baseOptions = listPasskeysOptions(authClient, userId, {
       query,
       fetchOptions
@@ -37,8 +41,9 @@ export function useListPasskeys<TAuthClient extends PasskeyAuthClient>(
 
     return {
       ...baseOptions,
-      queryFn: userId ? baseOptions.queryFn : skipToken,
+      queryFn: baseOptions.queryFn,
       ...queryOptions,
+      enabled: Boolean(userId) && enabled,
       initialData: initialData as undefined
     }
   }, queryClient)

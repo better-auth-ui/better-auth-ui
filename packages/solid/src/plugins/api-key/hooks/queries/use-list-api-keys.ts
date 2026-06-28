@@ -5,10 +5,9 @@ import {
   listApiKeysOptions
 } from "@better-auth-ui/core/plugins/api-key"
 import {
-  createQuery,
   type QueryClient,
   type QueryOptions,
-  skipToken
+  useQuery
 } from "@tanstack/solid-query"
 import type { Accessor } from "solid-js"
 import { useSession } from "../../../../hooks/queries/use-session"
@@ -26,10 +25,15 @@ export function useListApiKeys<TAuthClient extends ApiKeyAuthClient>(
 ) {
   const session = useSession(authClient, undefined, queryClient)
 
-  return createQuery(() => {
+  return useQuery(() => {
     const userId = session.data?.user.id
-    const { query, fetchOptions, initialData, ...queryOptions } =
-      options?.() ?? {}
+    const {
+      query,
+      fetchOptions,
+      initialData,
+      enabled = true,
+      ...queryOptions
+    } = options?.() ?? {}
     const queryParams = query as
       | { configId?: string; organizationId?: string }
       | undefined
@@ -44,8 +48,9 @@ export function useListApiKeys<TAuthClient extends ApiKeyAuthClient>(
 
     return {
       ...baseOptions,
-      queryFn: userId && hasRequiredParams ? baseOptions.queryFn : skipToken,
+      queryFn: baseOptions.queryFn,
       ...queryOptions,
+      enabled: Boolean(userId) && hasRequiredParams && enabled,
       initialData: initialData as undefined
     }
   }, queryClient)

@@ -226,6 +226,59 @@ describe("Solid auth behavior parity", () => {
     }
   })
 
+  it("uses useQuery without skipToken for Solid plugin query hooks", () => {
+    const queryFiles = [
+      "../src/hooks/use-auth-query.ts",
+      "../src/plugins/api-key/hooks/queries/use-list-api-keys.ts",
+      "../src/plugins/multi-session/hooks/queries/use-list-device-sessions.ts",
+      "../src/plugins/organization/hooks/queries/use-active-organization.ts",
+      "../src/plugins/organization/hooks/queries/use-full-organization.ts",
+      "../src/plugins/organization/hooks/queries/use-has-permission.ts",
+      "../src/plugins/organization/hooks/queries/use-list-invitations.ts",
+      "../src/plugins/organization/hooks/queries/use-list-members.ts",
+      "../src/plugins/organization/hooks/queries/use-list-organizations.ts",
+      "../src/plugins/organization/hooks/queries/use-list-user-invitations.ts",
+      "../src/plugins/passkey/hooks/queries/use-list-passkeys.ts"
+    ]
+
+    for (const file of queryFiles) {
+      const source = readFileSync(resolve(__dirname, file), "utf8")
+
+      expect(source).toMatch(/useQuery\([\s\S]*,\s*queryClient\s*\)/)
+      expect(source).not.toContain("createQuery")
+      expect(source).not.toContain("skipToken")
+    }
+  })
+
+  it("guards Solid plugin query fetches with enabled instead of skipToken", () => {
+    const guardedQueryFiles = [
+      "../src/plugins/api-key/hooks/queries/use-list-api-keys.ts",
+      "../src/plugins/multi-session/hooks/queries/use-list-device-sessions.ts",
+      "../src/plugins/organization/hooks/queries/use-active-organization.ts",
+      "../src/plugins/organization/hooks/queries/use-full-organization.ts",
+      "../src/plugins/organization/hooks/queries/use-has-permission.ts",
+      "../src/plugins/organization/hooks/queries/use-list-invitations.ts",
+      "../src/plugins/organization/hooks/queries/use-list-members.ts",
+      "../src/plugins/organization/hooks/queries/use-list-organizations.ts",
+      "../src/plugins/organization/hooks/queries/use-list-user-invitations.ts",
+      "../src/plugins/passkey/hooks/queries/use-list-passkeys.ts"
+    ]
+
+    for (const file of guardedQueryFiles) {
+      const source = readFileSync(resolve(__dirname, file), "utf8")
+
+      if (file.includes("use-active-organization")) {
+        expect(source).toContain(
+          "queryFn: slug === null ? async () => null : baseOptions.queryFn"
+        )
+      } else {
+        expect(source).toContain("queryFn: baseOptions.queryFn")
+      }
+      expect(source).toContain("enabled:")
+      expect(source).toContain("initialData: initialData as undefined")
+    }
+  })
+
   it("threads queryClient through Solid plugin mutation hooks", () => {
     const mutationFiles = [
       "../src/hooks/use-auth-mutation.ts",
