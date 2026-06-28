@@ -27,10 +27,10 @@ export function ActiveSessionsSettings(
     [...(activeSessions.data ?? [])].sort((activeSession) =>
       activeSession.id === session.data?.session.id ? -1 : 1
     )
-  const revokeSession = useRevokeSession(auth.authClient, {
+  const revokeSession = useRevokeSession(auth.authClient, () => ({
     onSuccess: () =>
       toast.success(auth.localization.settings.revokeSessionSuccess)
-  })
+  }))
   const displayName = () =>
     resolveUserLabel(session.data?.user.name, session.data?.user.email)
 

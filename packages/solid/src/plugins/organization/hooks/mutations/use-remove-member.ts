@@ -3,21 +3,26 @@ import {
   type RemoveMemberOptions,
   removeMemberOptions
 } from "@better-auth-ui/core/plugins/organization"
-import { useMutation } from "@tanstack/solid-query"
+import { type QueryClient, useMutation } from "@tanstack/solid-query"
+import type { Accessor } from "solid-js"
 import { useSession } from "../../../../hooks/queries/use-session"
+
+export type UseRemoveMemberOptions<TAuthClient extends OrganizationAuthClient> =
+  Accessor<RemoveMemberOptions<TAuthClient>>
 
 export function useRemoveMember<TAuthClient extends OrganizationAuthClient>(
   authClient: TAuthClient,
-  options?: RemoveMemberOptions<TAuthClient>
+  options?: UseRemoveMemberOptions<TAuthClient>,
+  queryClient?: Accessor<QueryClient>
 ) {
-  const session = useSession(authClient)
+  const session = useSession(authClient, undefined, queryClient)
 
   return useMutation(() => {
     const userId = session.data?.user.id
 
     return {
       ...removeMemberOptions(authClient, userId),
-      ...options
+      ...(options?.() ?? {})
     }
-  })
+  }, queryClient)
 }

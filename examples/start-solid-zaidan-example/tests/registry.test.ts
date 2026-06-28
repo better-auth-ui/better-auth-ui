@@ -3293,9 +3293,9 @@ describe("Solid registry isolation", () => {
     expect(organizationPluginDoc).toContain("non-slug page")
     expect(organizationPluginDoc).toContain("`null`")
     expect(organizationPluginDoc).toContain(
-      "The copied Zaidan components read the configured client"
+      "Copied Zaidan components are wired through `<AuthProvider>`"
     )
-    expect(organizationPluginDoc).toContain("useAuth()")
+    expect(organizationPluginDoc).not.toContain("useAuth()")
     expect(organizationPluginDoc).toContain(
       "low-level `@better-auth-ui/solid` hooks"
     )

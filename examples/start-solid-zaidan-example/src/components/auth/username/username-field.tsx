@@ -24,9 +24,9 @@ export function UsernameField(props: AdditionalFieldProps) {
   const currentUsername = String(props.field.defaultValue ?? "")
   const [value, setValue] = createSignal(currentUsername)
   const [error, setError] = createSignal<string>()
-  const availability = useIsUsernameAvailable(auth.authClient, {
+  const availability = useIsUsernameAvailable(auth.authClient, () => ({
     onError: () => undefined
-  })
+  }))
   const availabilityData = () =>
     availability.data as { available?: boolean } | undefined
   const shouldCheckAvailability = () =>

@@ -25,9 +25,9 @@ export function DeletePasskeyDialog(props: {
   const labels = () => passkeyLabels(auth)
   const passkeyName = () => props.passkey.name || labels().passkey
   const previewId = () => `delete-passkey-preview-${props.passkey.id}`
-  const deletePasskey = useDeletePasskey(auth.authClient, {
+  const deletePasskey = useDeletePasskey(auth.authClient, () => ({
     onSuccess: () => props.onOpenChange(false)
-  })
+  }))
 
   const deleteKey = () => {
     deletePasskey.mutate({

@@ -38,7 +38,7 @@ function LeaveOrganizationDialog(props: {
   const activeOrganization = useActiveOrganization(auth.authClient)
   const organizationSettingsPath =
     organizationPlugin().viewPaths.settings?.organizations ?? "organizations"
-  const leaveOrganization = useLeaveOrganization(auth.authClient, {
+  const leaveOrganization = useLeaveOrganization(auth.authClient, () => ({
     onSuccess: () => {
       props.onOpenChange(false)
       toast.success(props.localization.leftOrganization)
@@ -47,7 +47,7 @@ function LeaveOrganizationDialog(props: {
         to: `${auth.basePaths.settings}/${organizationSettingsPath}`
       })
     }
-  })
+  }))
 
   const handleLeave = () => {
     if (!activeOrganization.data) return

@@ -28,14 +28,14 @@ export function CreateApiKeyDialog(props: {
   const [newApiKeySecret, setNewApiKeySecret] = createSignal<string | null>(
     null
   )
-  const createApiKey = useCreateApiKey(auth.authClient, {
+  const createApiKey = useCreateApiKey(auth.authClient, () => ({
     onSuccess: (apiKey) => {
       props.onOpenChange(false)
       setNewApiKeyName(apiKey.name ?? null)
       setNewApiKeySecret(apiKey.key)
       setIsNewKeyDialogOpen(true)
     }
-  })
+  }))
 
   const submitCreateApiKey = (event: SubmitEvent) => {
     event.preventDefault()

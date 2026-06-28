@@ -52,9 +52,9 @@ export function OrganizationRow(props: OrganizationRowProps) {
       }
     })
   }
-  const setActiveOrganization = useSetActiveOrganization(client, {
+  const setActiveOrganization = useSetActiveOrganization(client, () => ({
     onSuccess: navigateToOrganization
-  })
+  }))
 
   const manageOrganization = () => {
     if (isSlugMode()) {

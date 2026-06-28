@@ -215,13 +215,138 @@ describe("Solid auth behavior parity", () => {
       expect(source).not.toContain("createUserScopedQuery")
 
       if (file.includes("/mutations/")) {
-        expect(source).toContain("useMutation(() =>")
+        expect(source).toMatch(/useMutation\([\s\S]*,\s*queryClient\s*\)/)
+        expect(source).toContain("queryClient?: Accessor<QueryClient>")
+        expect(source).toContain("...(options?.() ?? {})")
         expect(source).not.toContain("createMutation")
       } else {
-        expect(source).toContain("useQuery(() =>")
+        expect(source).toMatch(/useQuery\([\s\S]*,\s*queryClient\s*\)/)
         expect(source).not.toContain("createQuery")
       }
     }
+  })
+
+  it("threads queryClient through Solid plugin mutation hooks", () => {
+    const mutationFiles = [
+      "../src/hooks/use-auth-mutation.ts",
+      "../src/plugins/api-key/hooks/mutations/use-create-api-key.ts",
+      "../src/plugins/api-key/hooks/mutations/use-delete-api-key.ts",
+      "../src/plugins/magic-link/hooks/mutations/use-sign-in-magic-link.ts",
+      "../src/plugins/multi-session/hooks/mutations/use-revoke-multi-session.ts",
+      "../src/plugins/multi-session/hooks/mutations/use-set-active-session.ts",
+      "../src/plugins/organization/hooks/mutations/use-accept-invitation.ts",
+      "../src/plugins/organization/hooks/mutations/use-cancel-invitation.ts",
+      "../src/plugins/organization/hooks/mutations/use-check-slug.ts",
+      "../src/plugins/organization/hooks/mutations/use-create-organization.ts",
+      "../src/plugins/organization/hooks/mutations/use-delete-organization.ts",
+      "../src/plugins/organization/hooks/mutations/use-invite-member.ts",
+      "../src/plugins/organization/hooks/mutations/use-leave-organization.ts",
+      "../src/plugins/organization/hooks/mutations/use-reject-invitation.ts",
+      "../src/plugins/organization/hooks/mutations/use-remove-member.ts",
+      "../src/plugins/organization/hooks/mutations/use-set-active-organization.ts",
+      "../src/plugins/organization/hooks/mutations/use-update-member-role.ts",
+      "../src/plugins/organization/hooks/mutations/use-update-organization.ts",
+      "../src/plugins/passkey/hooks/mutations/use-add-passkey.ts",
+      "../src/plugins/passkey/hooks/mutations/use-delete-passkey.ts",
+      "../src/plugins/passkey/hooks/mutations/use-sign-in-passkey.ts",
+      "../src/plugins/username/hooks/mutations/use-is-username-available.ts",
+      "../src/plugins/username/hooks/mutations/use-sign-in-username.ts"
+    ]
+
+    for (const file of mutationFiles) {
+      const source = readFileSync(resolve(__dirname, file), "utf8")
+
+      expect(source).toMatch(/useMutation\([\s\S]*,\s*queryClient\s*\)/)
+      expect(source).toContain("queryClient?: Accessor<QueryClient>")
+
+      if (file.includes("use-set-active-organization")) {
+        expect(source).toContain("const mutationOptions = options?.() ?? {}")
+        expect(source).toContain("...mutationOptions")
+      } else {
+        expect(source).toContain("...(options?.() ?? {})")
+      }
+    }
+
+    const sessionScopedFiles = [
+      "../src/hooks/mutations/use-revoke-session.ts",
+      "../src/hooks/mutations/use-unlink-account.ts",
+      "../src/plugins/api-key/hooks/mutations/use-create-api-key.ts",
+      "../src/plugins/api-key/hooks/mutations/use-delete-api-key.ts",
+      "../src/plugins/multi-session/hooks/mutations/use-revoke-multi-session.ts",
+      "../src/plugins/multi-session/hooks/mutations/use-set-active-session.ts",
+      "../src/plugins/organization/hooks/mutations/use-accept-invitation.ts",
+      "../src/plugins/organization/hooks/mutations/use-cancel-invitation.ts",
+      "../src/plugins/organization/hooks/mutations/use-create-organization.ts",
+      "../src/plugins/organization/hooks/mutations/use-delete-organization.ts",
+      "../src/plugins/organization/hooks/mutations/use-invite-member.ts",
+      "../src/plugins/organization/hooks/mutations/use-leave-organization.ts",
+      "../src/plugins/organization/hooks/mutations/use-reject-invitation.ts",
+      "../src/plugins/organization/hooks/mutations/use-remove-member.ts",
+      "../src/plugins/organization/hooks/mutations/use-set-active-organization.ts",
+      "../src/plugins/organization/hooks/mutations/use-update-member-role.ts",
+      "../src/plugins/organization/hooks/mutations/use-update-organization.ts",
+      "../src/plugins/passkey/hooks/mutations/use-add-passkey.ts",
+      "../src/plugins/passkey/hooks/mutations/use-delete-passkey.ts"
+    ]
+
+    for (const file of sessionScopedFiles) {
+      const source = readFileSync(resolve(__dirname, file), "utf8")
+
+      expect(source).toContain("useSession(authClient, undefined, queryClient)")
+    }
+
+    const activeOrganizationScopedFiles = [
+      "../src/plugins/organization/hooks/mutations/use-invite-member.ts",
+      "../src/plugins/organization/hooks/mutations/use-update-member-role.ts",
+      "../src/plugins/organization/hooks/mutations/use-update-organization.ts"
+    ]
+
+    for (const file of activeOrganizationScopedFiles) {
+      const source = readFileSync(resolve(__dirname, file), "utf8")
+
+      expect(source).toMatch(
+        /useActiveOrganization\(\s*authClient,\s*undefined,\s*queryClient\s*\)/
+      )
+    }
+
+    const setActiveOrganizationSource = readFileSync(
+      resolve(
+        __dirname,
+        "../src/plugins/organization/hooks/mutations/use-set-active-organization.ts"
+      ),
+      "utf8"
+    )
+
+    expect(setActiveOrganizationSource).toMatch(
+      /useListOrganizations\(\s*authClient,\s*undefined,\s*queryClient\s*\)/
+    )
+    expect(setActiveOrganizationSource).toContain(
+      "const contextQueryClient = useQueryClient(queryClient?.())"
+    )
+    expect(setActiveOrganizationSource).toContain(
+      "const mutationQueryClient = () => queryClient?.() ?? contextQueryClient"
+    )
+    expect(setActiveOrganizationSource).toContain(
+      "mutationQueryClient().cancelQueries"
+    )
+    expect(setActiveOrganizationSource).toContain(
+      "const userOnMutateResult = await mutationOptions.onMutate?.("
+    )
+    expect(setActiveOrganizationSource).toContain(
+      "await mutationOptions.onSuccess?.("
+    )
+    expect(setActiveOrganizationSource).toContain(
+      "await mutationOptions.onError?.("
+    )
+    expect(setActiveOrganizationSource).toContain(
+      "await mutationOptions.onSettled?.("
+    )
+    expect(setActiveOrganizationSource).toContain(
+      "onMutateResult?.userOnMutateResult"
+    )
+    expect(setActiveOrganizationSource).not.toContain(
+      "queryClient.cancelQueries"
+    )
   })
 
   it("creates auth mutation options with shared mutation keys and throwing fetch options", async () => {

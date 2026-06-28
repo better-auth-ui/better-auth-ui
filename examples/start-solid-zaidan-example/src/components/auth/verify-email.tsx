@@ -29,12 +29,15 @@ export function VerifyEmail(props: VerifyEmailProps) {
   )
   const [cooldown, setCooldown] = createSignal(RESEND_COOLDOWN_SECONDS)
 
-  const sendVerificationEmail = useSendVerificationEmail(auth.authClient, {
-    onSuccess: () => {
-      toast.success(auth.localization.auth.verificationEmailSent)
-      setCooldown(RESEND_COOLDOWN_SECONDS)
-    }
-  })
+  const sendVerificationEmail = useSendVerificationEmail(
+    auth.authClient,
+    () => ({
+      onSuccess: () => {
+        toast.success(auth.localization.auth.verificationEmailSent)
+        setCooldown(RESEND_COOLDOWN_SECONDS)
+      }
+    })
+  )
 
   onMount(() => {
     const storedEmail = sessionStorage.getItem("better-auth-ui.verify-email")

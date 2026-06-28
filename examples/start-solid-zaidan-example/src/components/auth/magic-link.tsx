@@ -44,12 +44,12 @@ export function MagicLink(props: MagicLinkProps) {
       | Partial<MagicLinkLocalization>
       | undefined)
   })
-  const signInMagicLink = useSignInMagicLink(auth.authClient, {
+  const signInMagicLink = useSignInMagicLink(auth.authClient, () => ({
     onSuccess: () => {
       setEmail("")
       toast.success(magicLinkLabels().magicLinkSent)
     }
-  })
+  }))
   const showSeparator = () => Boolean(auth.socialProviders?.length)
   const socialPosition = () => props.socialPosition ?? "bottom"
 

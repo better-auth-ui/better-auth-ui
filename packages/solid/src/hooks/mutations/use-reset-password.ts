@@ -3,14 +3,23 @@ import {
   type ResetPasswordOptions,
   resetPasswordOptions
 } from "@better-auth-ui/core"
-import { useMutation } from "@tanstack/solid-query"
+import { type QueryClient, useMutation } from "@tanstack/solid-query"
+import type { Accessor } from "solid-js"
+
+export type UseResetPasswordOptions<TAuthClient extends AuthClient> = Accessor<
+  ResetPasswordOptions<TAuthClient>
+>
 
 export function useResetPassword<TAuthClient extends AuthClient>(
   authClient: TAuthClient,
-  options?: ResetPasswordOptions<TAuthClient>
+  options?: UseResetPasswordOptions<TAuthClient>,
+  queryClient?: Accessor<QueryClient>
 ) {
-  return useMutation(() => ({
-    ...resetPasswordOptions(authClient),
-    ...options
-  }))
+  return useMutation(
+    () => ({
+      ...resetPasswordOptions(authClient),
+      ...(options?.() ?? {})
+    }),
+    queryClient
+  )
 }

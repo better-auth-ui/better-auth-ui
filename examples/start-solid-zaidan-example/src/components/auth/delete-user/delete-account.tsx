@@ -65,7 +65,7 @@ export function DeleteAccount(props: DeleteAccountProps = {}) {
     )
   const needsPassword = () =>
     !sendDeleteAccountVerification() && Boolean(hasCredentialAccount())
-  const deleteUser = useDeleteUser(auth.authClient, {
+  const deleteUser = useDeleteUser(auth.authClient, () => ({
     onSuccess: () => {
       setConfirmOpen(false)
       setPassword("")
@@ -82,7 +82,7 @@ export function DeleteAccount(props: DeleteAccountProps = {}) {
         to: `${auth.basePaths.auth}/${auth.viewPaths.auth.signIn}`
       })
     }
-  })
+  }))
 
   const handleDialogOpenChange = (open: boolean) => {
     setConfirmOpen(open)

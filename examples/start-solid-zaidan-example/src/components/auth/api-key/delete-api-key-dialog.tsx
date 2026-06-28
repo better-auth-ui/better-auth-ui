@@ -24,9 +24,9 @@ export function DeleteApiKeyDialog(props: {
   const auth = useAuth<ApiKeyAuthClient>()
   const preview = () => `${props.apiKey.start}${"*".repeat(16)}`
   const previewId = () => `delete-api-key-preview-${props.apiKey.id}`
-  const deleteApiKey = useDeleteApiKey(auth.authClient, {
+  const deleteApiKey = useDeleteApiKey(auth.authClient, () => ({
     onSuccess: () => props.onOpenChange(false)
-  })
+  }))
 
   const deleteKey = () => {
     deleteApiKey.mutate({

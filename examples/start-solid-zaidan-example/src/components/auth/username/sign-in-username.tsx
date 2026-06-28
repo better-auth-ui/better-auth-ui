@@ -47,7 +47,7 @@ export function SignInUsername(props: SignInUsernameProps) {
     queryClient.invalidateQueries({ queryKey: authQueryKeys.session })
     auth.navigate({ to: auth.redirectTo })
   }
-  const signIn = useSignInEmail(auth.authClient, {
+  const signIn = useSignInEmail(auth.authClient, () => ({
     onError: (error, variables) => {
       if ((error as BetterFetchError).error?.code === "EMAIL_NOT_VERIFIED") {
         sessionStorage.setItem("better-auth-ui.verify-email", variables.email)
@@ -59,13 +59,13 @@ export function SignInUsername(props: SignInUsernameProps) {
       resetFetchOptions()
     },
     onSuccess: onSignInSuccess
-  })
-  const signInUsername = useSignInUsername(auth.authClient, {
+  }))
+  const signInUsername = useSignInUsername(auth.authClient, () => ({
     onError: () => {
       resetFetchOptions()
     },
     onSuccess: onSignInSuccess
-  })
+  }))
   const usernamePlugin = auth.plugins.find((plugin) => plugin.id === "username")
   const usernameAuth = Boolean(usernamePlugin)
   const usernameLabels: UsernameLocalization = {

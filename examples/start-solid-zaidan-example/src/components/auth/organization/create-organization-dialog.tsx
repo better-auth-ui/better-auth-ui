@@ -42,9 +42,9 @@ export function CreateOrganizationDialog(props: CreateOrganizationDialogProps) {
   const [name, setName] = createSignal("")
   const [slug, setSlug] = createSignal("")
   const [slugEdited, setSlugEdited] = createSignal(false)
-  const createOrganization = useCreateOrganization(auth.authClient, {
+  const createOrganization = useCreateOrganization(auth.authClient, () => ({
     onSuccess: () => props.onOpenChange(false)
-  })
+  }))
   const organizationPluginConfig = () =>
     auth.plugins.find((plugin) => plugin.id === organizationPlugin.id) as
       | { localization?: OrganizationLocalization }

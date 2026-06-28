@@ -3,21 +3,27 @@ import {
   type RevokeSessionOptions,
   revokeSessionOptions
 } from "@better-auth-ui/core"
-import { useMutation } from "@tanstack/solid-query"
+import { type QueryClient, useMutation } from "@tanstack/solid-query"
+import type { Accessor } from "solid-js"
 import { useSession } from "../queries/use-session"
+
+export type UseRevokeSessionOptions<TAuthClient extends AuthClient> = Accessor<
+  RevokeSessionOptions<TAuthClient>
+>
 
 export function useRevokeSession<TAuthClient extends AuthClient>(
   authClient: TAuthClient,
-  options?: RevokeSessionOptions<TAuthClient>
+  options?: UseRevokeSessionOptions<TAuthClient>,
+  queryClient?: Accessor<QueryClient>
 ) {
-  const session = useSession(authClient)
+  const session = useSession(authClient, undefined, queryClient)
 
   return useMutation(() => {
     const userId = session.data?.user.id
 
     return {
       ...revokeSessionOptions(authClient, userId),
-      ...options
+      ...(options?.() ?? {})
     }
-  })
+  }, queryClient)
 }

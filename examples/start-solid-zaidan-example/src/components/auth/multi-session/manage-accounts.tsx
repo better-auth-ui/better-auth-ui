@@ -38,13 +38,13 @@ export function ManageAccounts(props: ManageAccountsProps = {}) {
       | undefined)
   })
   const deviceSessions = useListDeviceSessions(auth.authClient)
-  const setActiveSession = useSetActiveSession(auth.authClient, {
+  const setActiveSession = useSetActiveSession(auth.authClient, () => ({
     onSuccess: () => window.scrollTo({ top: 0 })
-  })
-  const revokeMultiSession = useRevokeMultiSession(auth.authClient, {
+  }))
+  const revokeMultiSession = useRevokeMultiSession(auth.authClient, () => ({
     onSuccess: () =>
       toast.success(auth.localization.settings.revokeSessionSuccess)
-  })
+  }))
   const displayName = () =>
     resolveUserLabel(session.data?.user.name, session.data?.user.email)
   const isAccountActionPending = () =>

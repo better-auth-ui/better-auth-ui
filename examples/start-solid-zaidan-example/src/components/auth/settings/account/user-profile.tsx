@@ -23,10 +23,10 @@ export function UserProfile(props: UserProfileProps = {}) {
   const [name, setName] = createSignal("")
   const { mutate: updateUser, isPending: updateUserPending } = useUpdateUser(
     auth.authClient,
-    {
+    () => ({
       onSuccess: () =>
         toast.success(auth.localization.settings.profileUpdatedSuccess)
-    }
+    })
   )
 
   const profileFields = () =>

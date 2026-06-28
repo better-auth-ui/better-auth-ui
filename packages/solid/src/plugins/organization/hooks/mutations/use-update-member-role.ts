@@ -3,16 +3,26 @@ import {
   type UpdateMemberRoleOptions,
   updateMemberRoleOptions
 } from "@better-auth-ui/core/plugins/organization"
-import { useMutation } from "@tanstack/solid-query"
+import { type QueryClient, useMutation } from "@tanstack/solid-query"
+import type { Accessor } from "solid-js"
 import { useSession } from "../../../../hooks/queries/use-session"
 import { useActiveOrganization } from "../queries"
 
+export type UseUpdateMemberRoleOptions = Accessor<
+  UpdateMemberRoleOptions<OrganizationAuthClient>
+>
+
 export function useUpdateMemberRole(
   authClient: OrganizationAuthClient,
-  options?: UpdateMemberRoleOptions<OrganizationAuthClient>
+  options?: UseUpdateMemberRoleOptions,
+  queryClient?: Accessor<QueryClient>
 ) {
-  const session = useSession(authClient)
-  const activeOrganization = useActiveOrganization(authClient)
+  const session = useSession(authClient, undefined, queryClient)
+  const activeOrganization = useActiveOrganization(
+    authClient,
+    undefined,
+    queryClient
+  )
 
   return useMutation(() => {
     const userId = session.data?.user.id
@@ -23,7 +33,7 @@ export function useUpdateMemberRole(
         userId,
         activeOrganization.data?.id
       ),
-      ...options
+      ...(options?.() ?? {})
     }
-  })
+  }, queryClient)
 }

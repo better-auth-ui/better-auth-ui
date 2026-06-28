@@ -35,7 +35,7 @@ export function SignUp(props: SignUpProps) {
   const [isPasswordVisible, setIsPasswordVisible] = createSignal(false)
   const [isConfirmPasswordVisible, setIsConfirmPasswordVisible] =
     createSignal(false)
-  const signUp = useSignUpEmail(auth.authClient, {
+  const signUp = useSignUpEmail(auth.authClient, () => ({
     onError: () => {
       resetFetchOptions()
     },
@@ -51,7 +51,7 @@ export function SignUp(props: SignUpProps) {
       queryClient.invalidateQueries({ queryKey: authQueryKeys.session })
       auth.navigate({ to: auth.redirectTo })
     }
-  })
+  }))
   const captchaComponent = () =>
     (auth.plugins as AuthPlugin[]).find((plugin) => plugin.captchaComponent)
       ?.captchaComponent

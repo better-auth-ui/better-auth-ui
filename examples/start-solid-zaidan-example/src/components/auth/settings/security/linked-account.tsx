@@ -75,9 +75,9 @@ export function LinkedAccountRow(props: {
     query: { accountId: props.account?.accountId ?? "" }
   }))
   const linkSocial = useLinkSocial(auth.authClient)
-  const unlinkAccount = useUnlinkAccount(auth.authClient, {
+  const unlinkAccount = useUnlinkAccount(auth.authClient, () => ({
     onSuccess: () => toast.success(auth.localization.settings.accountUnlinked)
-  })
+  }))
   const accountInfoData = () =>
     accountInfo.data as AccountInfoResponse | undefined
   const displayName = () =>

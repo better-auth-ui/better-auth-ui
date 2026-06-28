@@ -38,7 +38,7 @@ export function DeleteOrganizationDialog(props: DeleteOrganizationDialogProps) {
   const auth = useAuth<OrganizationAuthClient>()
   const organizationSettingsPath =
     organizationPlugin().viewPaths.settings?.organizations ?? "organizations"
-  const deleteOrganization = useDeleteOrganization(auth.authClient, {
+  const deleteOrganization = useDeleteOrganization(auth.authClient, () => ({
     onSuccess: () => {
       props.onOpenChange(false)
       toast.success(props.localization.organizationDeleted)
@@ -47,7 +47,7 @@ export function DeleteOrganizationDialog(props: DeleteOrganizationDialogProps) {
         to: `${auth.basePaths.settings}/${organizationSettingsPath}`
       })
     }
-  })
+  }))
 
   const handleSubmit = (event: SubmitEvent) => {
     event.preventDefault()

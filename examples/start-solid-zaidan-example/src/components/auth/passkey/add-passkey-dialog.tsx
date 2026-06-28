@@ -22,12 +22,12 @@ export function AddPasskeyDialog(props: {
 }) {
   const auth = useAuth<PasskeyAuthClient>()
   const labels = () => passkeyLabels(auth)
-  const addPasskey = useAddPasskey(auth.authClient, {
+  const addPasskey = useAddPasskey(auth.authClient, () => ({
     onSuccess: () => {
       props.onOpenChange(false)
       props.onPasskeyAdded()
     }
-  })
+  }))
 
   const submitAddPasskey = (event: SubmitEvent) => {
     event.preventDefault()

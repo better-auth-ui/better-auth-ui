@@ -40,11 +40,11 @@ export function ChangePasswordSettings(
     linkedAccounts.data?.some(
       (account: { providerId?: string }) => account.providerId === "credential"
     )
-  const requestPasswordReset = useRequestPasswordReset(auth.authClient, {
+  const requestPasswordReset = useRequestPasswordReset(auth.authClient, () => ({
     onSuccess: () =>
       toast.success(auth.localization.auth.passwordResetEmailSent)
-  })
-  const changePassword = useChangePassword(auth.authClient, {
+  }))
+  const changePassword = useChangePassword(auth.authClient, () => ({
     onError: (error: BetterFetchError) => {
       setCurrentPassword("")
       setNewPassword("")
@@ -57,7 +57,7 @@ export function ChangePasswordSettings(
       setConfirmPassword("")
       toast.success(auth.localization.settings.changePasswordSuccess)
     }
-  })
+  }))
   const [currentPassword, setCurrentPassword] = createSignal("")
   const [newPassword, setNewPassword] = createSignal("")
   const [confirmPassword, setConfirmPassword] = createSignal("")

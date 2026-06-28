@@ -88,12 +88,12 @@ export function InviteMemberDialog(props: InviteMemberDialogProps) {
   )
   const [email, setEmail] = createSignal("")
   const [role, setRole] = createSignal(pickDefaultRole(roles()))
-  const inviteMember = useInviteMember(auth.authClient, {
+  const inviteMember = useInviteMember(auth.authClient, () => ({
     onSuccess: () => {
       props.onOpenChange(false)
       toast.success(localization().inviteMemberSuccess)
     }
-  })
+  }))
 
   createEffect(() => {
     if (!props.open) {

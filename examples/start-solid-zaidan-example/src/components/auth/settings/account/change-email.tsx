@@ -15,10 +15,10 @@ export function ChangeEmail(props: ChangeEmailProps = {}) {
   const auth = useAuth()
   const session = useSession(auth.authClient)
   const [emailFieldError, setEmailFieldError] = createSignal<string>()
-  const changeEmail = useChangeEmail(auth.authClient, {
+  const changeEmail = useChangeEmail(auth.authClient, () => ({
     onSuccess: () =>
       toast.success(auth.localization.settings.changeEmailSuccess)
-  })
+  }))
 
   const submitChangeEmail = (event: SubmitEvent) => {
     event.preventDefault()

@@ -85,12 +85,12 @@ function RemoveMemberDialog(props: {
   open: boolean
 }) {
   const auth = useAuth<OrganizationAuthClient>()
-  const removeMember = useRemoveMember(auth.authClient, {
+  const removeMember = useRemoveMember(auth.authClient, () => ({
     onSuccess: () => {
       props.onOpenChange(false)
       toast.success(props.localization.memberRemoved)
     }
-  })
+  }))
 
   return (
     <Dialog open={props.open} onOpenChange={props.onOpenChange}>
@@ -141,7 +141,7 @@ function LeaveOrganizationDialog(props: {
   const activeOrganization = useActiveOrganization(auth.authClient)
   const organizationSettingsPath =
     organizationPlugin().viewPaths.settings?.organizations ?? "organizations"
-  const leaveOrganization = useLeaveOrganization(auth.authClient, {
+  const leaveOrganization = useLeaveOrganization(auth.authClient, () => ({
     onSuccess: () => {
       props.onOpenChange(false)
       toast.success(props.localization.leftOrganization)
@@ -150,7 +150,7 @@ function LeaveOrganizationDialog(props: {
         to: `${auth.basePaths.settings}/${organizationSettingsPath}`
       })
     }
-  })
+  }))
 
   const handleLeave = () => {
     if (!activeOrganization.data) return
@@ -204,9 +204,9 @@ export function OrganizationMemberRow(props: OrganizationMemberRowProps) {
   const deletePermission = useHasPermission(auth.authClient, () => ({
     permissions: { member: ["delete"] }
   }))
-  const updateMemberRole = useUpdateMemberRole(auth.authClient, {
+  const updateMemberRole = useUpdateMemberRole(auth.authClient, () => ({
     onSuccess: () => toast.success(props.localization.memberRoleUpdated)
-  })
+  }))
   const assignableRoles = () =>
     Object.entries(props.roles).filter(
       ([key]) => props.isOwner || key !== "owner"

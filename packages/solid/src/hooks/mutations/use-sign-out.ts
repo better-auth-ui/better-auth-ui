@@ -3,14 +3,23 @@ import {
   type SignOutOptions,
   signOutOptions
 } from "@better-auth-ui/core"
-import { useMutation } from "@tanstack/solid-query"
+import { type QueryClient, useMutation } from "@tanstack/solid-query"
+import type { Accessor } from "solid-js"
+
+export type UseSignOutOptions<TAuthClient extends AuthClient> = Accessor<
+  SignOutOptions<TAuthClient>
+>
 
 export function useSignOut<TAuthClient extends AuthClient>(
   authClient: TAuthClient,
-  options?: SignOutOptions<TAuthClient>
+  options?: UseSignOutOptions<TAuthClient>,
+  queryClient?: Accessor<QueryClient>
 ) {
-  return useMutation(() => ({
-    ...signOutOptions(authClient),
-    ...options
-  }))
+  return useMutation(
+    () => ({
+      ...signOutOptions(authClient),
+      ...(options?.() ?? {})
+    }),
+    queryClient
+  )
 }
