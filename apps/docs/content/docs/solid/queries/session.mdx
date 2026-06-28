@@ -15,10 +15,10 @@ const user = () => session.data?.user
 Pass Better Auth params and Solid Query options through the same object.
 
 ```tsx
-const session = useSession(authClient, {
+const session = useSession(authClient, () => ({
   query: { disableCookieCache: true },
   staleTime: 30_000
-})
+}))
 ```
 
 ## Options factory

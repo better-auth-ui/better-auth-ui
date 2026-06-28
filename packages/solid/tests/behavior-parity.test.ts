@@ -177,7 +177,10 @@ describe("Solid auth behavior parity", () => {
     expect(accountInfoQuery).not.toContain("enabled: (queryState)")
     expect(accountInfoQuery).not.toContain("query: never")
     expect(accountInfoQuery).not.toContain("initialData: undefined")
-    expect(listSessionsQuery).toContain("session?.user.id")
+    expect(listSessionsQuery).toContain(
+      "const session = useSession(authClient, undefined, queryClient)"
+    )
+    expect(listSessionsQuery).toContain("session.data?.user.id")
     expect(listSessionsQuery).not.toContain("getSessionUserId")
     expect(listSessionsQuery).not.toContain("enabled: (queryState)")
     expect(listSessionsQuery).not.toContain("query: never")

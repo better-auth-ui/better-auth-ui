@@ -12,7 +12,7 @@ import { useSession } from "@better-auth-ui/solid"
 import { sessionOptions } from "@better-auth-ui/core"
 
 const sessionQuery = sessionOptions(authClient)
-const session = useSession(authClient, { enabled: !import.meta.env.SSR })
+const session = useSession(authClient, () => ({ enabled: !import.meta.env.SSR }))
 ```
 
 ## Invalidation
