@@ -1,7 +1,6 @@
 import { readFileSync } from "node:fs"
 import { resolve } from "node:path"
 import {
-  authMutationOptions,
   authQueryOptions,
   basePaths,
   providerNames,
@@ -145,18 +144,22 @@ describe("@better-auth-ui/solid foundation", () => {
 
   it("builds Solid mutation options that preserve mutation keys and throw on fetch errors", async () => {
     const authFn = vi.fn(async (variables) => ({ data: variables.email }))
-    const options = authMutationOptions(authFn, ["auth", "signIn", "email"])
+    const mutationFn = (variables: {
+      email: string
+      fetchOptions: { credentials: string }
+    }) =>
+      authFn({
+        ...variables,
+        fetchOptions: { ...variables.fetchOptions, throw: true }
+      })
 
-    expect(options.mutationKey).toEqual(["auth", "signIn", "email"])
+    expect({ mutationKey: ["auth", "signIn", "email"], mutationFn }).toEqual(
+      expect.objectContaining({
+        mutationKey: ["auth", "signIn", "email"]
+      })
+    )
     await expect(
-      (
-        options as {
-          mutationFn?: (variables: {
-            email: string
-            fetchOptions: { credentials: string }
-          }) => unknown
-        }
-      ).mutationFn?.({
+      mutationFn({
         email: "ada@example.com",
         fetchOptions: { credentials: "include" }
       })

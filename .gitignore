@@ -64,3 +64,5 @@ Thumbs.db
 .codex
 .opencode
 opencode.json
+# Local Pi runtime state
+.atl/

@@ -1,7 +1,6 @@
 export * from "./config"
 export * from "./lib/auth-client"
 export * from "./lib/auth-mutation-keys"
-export * from "./lib/auth-mutation-options"
 export * from "./lib/auth-plugin"
 export * from "./lib/auth-query-keys"
 export * from "./lib/auth-query-options"
