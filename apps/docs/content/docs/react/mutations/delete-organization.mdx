@@ -8,10 +8,9 @@ Organization mutations require `organizationClient()` on the Better Auth client.
 ## Usage
 
 ```tsx
-import { useAuth } from "@better-auth-ui/react"
+import { authClient } from "@/lib/auth-client"
 import { useDeleteOrganization } from "@better-auth-ui/react/plugins/organization"
 
-const { authClient } = useAuth()
 const mutation = useDeleteOrganization(authClient)
 
 mutation.mutate(/* params */)

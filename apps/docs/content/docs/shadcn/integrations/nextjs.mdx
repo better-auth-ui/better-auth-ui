@@ -133,13 +133,13 @@ Use it in two situations:
 ```tsx title="app/dashboard/page.tsx"
 "use client"
 
-import { useAuth, useAuthenticate } from "@better-auth-ui/react"
+import { authClient } from "@/lib/auth-client"
+import { useAuthenticate } from "@better-auth-ui/react"
 import Link from "next/link"
 
 import { Spinner } from "@/components/ui/spinner"
 
 export default function Dashboard() {
-  const { authClient } = useAuth()
   const { data: session } = useAuthenticate(authClient)
 
   if (!session) {

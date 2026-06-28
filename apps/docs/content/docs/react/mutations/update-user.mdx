@@ -8,9 +8,9 @@ On success, the shared mutation invalidator awaits session invalidation so cache
 ## Usage
 
 ```tsx
-import { useAuth, useUpdateUser } from "@better-auth-ui/react"
+import { authClient } from "@/lib/auth-client"
+import { useUpdateUser } from "@better-auth-ui/react"
 
-const { authClient } = useAuth()
 const { mutate: updateUser, isPending } = useUpdateUser(authClient)
 
 updateUser({ name: "Alice", image: "https://.../avatar.png" })

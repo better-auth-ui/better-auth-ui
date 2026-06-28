@@ -8,9 +8,9 @@ Refetches the session on success so the new email surfaces everywhere that reads
 ## Usage
 
 ```tsx
-import { useAuth, useChangeEmail } from "@better-auth-ui/react"
+import { authClient } from "@/lib/auth-client"
+import { useChangeEmail } from "@better-auth-ui/react"
 
-const { authClient } = useAuth()
 const { mutate: changeEmail } = useChangeEmail(authClient)
 
 changeEmail({

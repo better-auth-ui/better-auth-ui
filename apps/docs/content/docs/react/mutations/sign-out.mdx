@@ -8,9 +8,9 @@ Removes every `["auth", ...]` query on success, clearing the session, linked acc
 ## Usage
 
 ```tsx
-import { useAuth, useSignOut } from "@better-auth-ui/react"
+import { authClient } from "@/lib/auth-client"
+import { useSignOut } from "@better-auth-ui/react"
 
-const { authClient } = useAuth()
 const { mutate: signOut } = useSignOut(authClient, {
   onSuccess: () => navigate("/")
 })

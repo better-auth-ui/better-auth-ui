@@ -8,10 +8,9 @@ Organization queries require `organizationClient()` on your Better Auth client. 
 ## Usage
 
 ```tsx
-import { useAuth } from "@better-auth-ui/react"
+import { authClient } from "@/lib/auth-client"
 import { useHasPermission } from "@better-auth-ui/react/plugins/organization"
 
-const { authClient } = useAuth()
 const result = useHasPermission(authClient, {
   permissions: { organization: ["update"] }
 })

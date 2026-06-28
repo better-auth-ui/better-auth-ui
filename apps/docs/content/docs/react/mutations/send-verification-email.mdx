@@ -6,9 +6,9 @@ description: Resend the verification email to an address.
 ## Usage
 
 ```tsx
-import { useAuth, useSendVerificationEmail } from "@better-auth-ui/react"
+import { authClient } from "@/lib/auth-client"
+import { useSendVerificationEmail } from "@better-auth-ui/react"
 
-const { authClient } = useAuth()
 const { mutate: sendVerificationEmail } = useSendVerificationEmail(authClient)
 
 sendVerificationEmail({

@@ -6,6 +6,7 @@ description: TanStack Query primitives for every Better Auth write endpoint.
 React exposes mutation hooks. Core owns the shared options factories, and each factory's `.mutationKey` is the canonical key.
 
 ```ts
+import { authClient } from "@/lib/auth-client"
 import { signInEmailOptions } from "@better-auth-ui/core"
 import { useSignInEmail } from "@better-auth-ui/react"
 ```
@@ -17,7 +18,6 @@ Use the hook in components. Use the core factory anywhere TanStack Query takes a
 Every mutation wires `throw: true` into `fetchOptions`, so the promise rejects with a `BetterFetchError` on failure instead of resolving with `{ error }`. This means you can rely on `error`, `isError`, `throwOnError`, and standard `onError` handlers from `useMutation`.
 
 ```tsx
-const { authClient } = useAuth()
 const { mutate, error } = useSignInEmail(authClient, {
   onError: (err) => toast.error(err.message)
 })
@@ -73,9 +73,9 @@ new MutationCache({
 For write-style endpoints without a purpose-built hook, use `useAuthMutation` with the core `authMutationOptions` factory. Read-style endpoints should use `useAuthQuery` instead.
 
 ```tsx
-import { useAuth, useAuthMutation } from "@better-auth-ui/react"
+import { authClient } from "@/lib/auth-client"
+import { useAuthMutation } from "@better-auth-ui/react"
 
-const { authClient } = useAuth()
 const { mutate } = useAuthMutation(
   authClient.emailOtp.sendVerificationOtp,
   ["auth", "emailOtp", "sendVerificationOtp"]

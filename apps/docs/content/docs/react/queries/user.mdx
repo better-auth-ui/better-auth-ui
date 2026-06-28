@@ -8,9 +8,9 @@ Thin wrapper over [`useSession`](/docs/react/queries/session) that returns `sess
 ## Usage
 
 ```tsx
-import { useAuth, useUser } from "@better-auth-ui/react"
+import { authClient } from "@/lib/auth-client"
+import { useUser } from "@better-auth-ui/react"
 
-const { authClient } = useAuth()
 const { data: user } = useUser(authClient)
 ```
 

@@ -8,10 +8,9 @@ Requires the Better Auth API key plugin.
 ## Usage
 
 ```tsx
-import { useAuth } from "@better-auth-ui/react"
+import { authClient } from "@/lib/auth-client"
 import { useCreateApiKey } from "@better-auth-ui/react/plugins/api-key"
 
-const { authClient } = useAuth()
 const mutation = useCreateApiKey(authClient)
 
 mutation.mutate(/* params */)

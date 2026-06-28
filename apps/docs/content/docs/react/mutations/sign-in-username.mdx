@@ -8,11 +8,9 @@ Resets the session query on success so the new session is refetched.
 ## Usage
 
 ```tsx
-import { useAuth } from "@better-auth-ui/react"
-import type { UsernameAuthClient } from "@better-auth-ui/core/plugins/username"
+import { authClient } from "@/lib/auth-client"
 import { useSignInUsername } from "@better-auth-ui/react/plugins/username"
 
-const { authClient } = useAuth<UsernameAuthClient>()
 const { mutate: signInUsername } = useSignInUsername(authClient)
 
 signInUsername({
@@ -21,7 +19,7 @@ signInUsername({
 })
 ```
 
-`useSignInUsername` requires the Better Auth `username` plugin. Type `useAuth` with `UsernameAuthClient` so TypeScript picks up the plugin-extended method signature.
+`useSignInUsername` requires the Better Auth `username` plugin. Import your configured `authClient`; it already carries the plugin methods from `createAuthClient`.
 
 ## Options factory
 

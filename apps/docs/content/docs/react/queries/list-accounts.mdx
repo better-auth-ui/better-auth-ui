@@ -8,9 +8,9 @@ Keyed per-user; waits for the active session before firing.
 ## Usage
 
 ```tsx
-import { useAuth, useListAccounts } from "@better-auth-ui/react"
+import { authClient } from "@/lib/auth-client"
+import { useListAccounts } from "@better-auth-ui/react"
 
-const { authClient } = useAuth()
 const { data: accounts } = useListAccounts(authClient)
 
 // With React Query options

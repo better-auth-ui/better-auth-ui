@@ -10,18 +10,16 @@ Modeled as a mutation (not a query) because callers typically trigger the check 
 ## Usage
 
 ```tsx
-import { useAuth } from "@better-auth-ui/react"
-import type { UsernameAuthClient } from "@better-auth-ui/core/plugins/username"
+import { authClient } from "@/lib/auth-client"
 import { useIsUsernameAvailable } from "@better-auth-ui/react/plugins/username"
 
-const { authClient } = useAuth<UsernameAuthClient>()
 const { mutateAsync: checkUsername, data } = useIsUsernameAvailable(authClient)
 
 const result = await checkUsername({ username: "alice" })
 // result.available -> boolean
 ```
 
-`useIsUsernameAvailable` requires the Better Auth `username` plugin. Type `useAuth` with `UsernameAuthClient` so TypeScript picks up the plugin-extended method signature.
+`useIsUsernameAvailable` requires the Better Auth `username` plugin. Import your configured `authClient`; it already carries the plugin methods from `createAuthClient`.
 
 ## Options factory
 

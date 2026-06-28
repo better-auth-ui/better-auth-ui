@@ -8,9 +8,9 @@ Refetches the linked accounts list on success.
 ## Usage
 
 ```tsx
-import { useAuth, useUnlinkAccount } from "@better-auth-ui/react"
+import { authClient } from "@/lib/auth-client"
+import { useUnlinkAccount } from "@better-auth-ui/react"
 
-const { authClient } = useAuth()
 const { mutate: unlinkAccount } = useUnlinkAccount(authClient)
 
 unlinkAccount({ providerId: "github", accountId: "acc_123" })

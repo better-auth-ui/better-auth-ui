@@ -10,11 +10,9 @@ Keyed per-user; waits for the active session before firing.
 ## Usage
 
 ```tsx
-import { useAuth } from "@better-auth-ui/react"
-import type { MultiSessionAuthClient } from "@better-auth-ui/core/plugins/multi-session"
+import { authClient } from "@/lib/auth-client"
 import { useListDeviceSessions } from "@better-auth-ui/react/plugins/multi-session"
 
-const { authClient } = useAuth<MultiSessionAuthClient>()
 const { data: deviceSessions } = useListDeviceSessions(authClient)
 
 // With React Query options
@@ -23,7 +21,7 @@ const { data: deviceSessions } = useListDeviceSessions(authClient, {
 })
 ```
 
-`useListDeviceSessions` requires the Better Auth `multiSession` plugin. Type `useAuth` with `MultiSessionAuthClient` so TypeScript picks up the plugin-extended method signature.
+`useListDeviceSessions` requires the Better Auth `multiSession` plugin. Import your configured `authClient`; it already carries the plugin methods from `createAuthClient`.
 
 ## Options factory
 

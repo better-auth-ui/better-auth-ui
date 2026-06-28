@@ -8,9 +8,9 @@ Resets the session query on success so the new session is refetched.
 ## Usage
 
 ```tsx
-import { useAuth, useSignInEmail } from "@better-auth-ui/react"
+import { authClient } from "@/lib/auth-client"
+import { useSignInEmail } from "@better-auth-ui/react"
 
-const { authClient } = useAuth()
 const { mutate: signInEmail, isPending } = useSignInEmail(authClient)
 
 signInEmail({

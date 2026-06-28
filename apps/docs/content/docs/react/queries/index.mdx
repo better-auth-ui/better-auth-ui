@@ -33,9 +33,9 @@ Settings queries (`useListAccounts`, `useAccountInfo`, `useListSessions`, `useLi
 For read-style endpoints without a purpose-built hook, use `useAuthQuery`. Mutation-style endpoints should use `useAuthMutation` instead.
 
 ```tsx
-import { useAuth, useAuthQuery } from "@better-auth-ui/react"
+import { authClient } from "@/lib/auth-client"
+import { useAuthQuery } from "@better-auth-ui/react"
 
-const { authClient } = useAuth()
 const { data } = useAuthQuery(
   authClient.magicLink.list,
   ["auth", "magicLink", "list"],

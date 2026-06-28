@@ -141,7 +141,8 @@ Use it in two situations:
 2. **On its own** for statically prerendered or purely client-rendered routes (SSG output, SPA routes, marketing pages), where server-side session access isn't available.
 
 ```tsx title="routes/dashboard.tsx"
-import { useAuth, useAuthenticate } from "@better-auth-ui/react"
+import { authClient } from "@/lib/auth-client"
+import { useAuthenticate } from "@better-auth-ui/react"
 import { createFileRoute, Link } from "@tanstack/react-router"
 
 import { Spinner } from "@/components/ui/spinner"
@@ -151,7 +152,6 @@ export const Route = createFileRoute("/dashboard")({
 })
 
 function Dashboard() {
-  const { authClient } = useAuth()
   const { data: session } = useAuthenticate(authClient)
 
   if (!session) {

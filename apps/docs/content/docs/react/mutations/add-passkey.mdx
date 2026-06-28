@@ -8,17 +8,15 @@ Prompts the WebAuthn ceremony then refetches the passkey list on success.
 ## Usage
 
 ```tsx
-import { useAuth } from "@better-auth-ui/react"
-import type { PasskeyAuthClient } from "@better-auth-ui/core/plugins/passkey"
+import { authClient } from "@/lib/auth-client"
 import { useAddPasskey } from "@better-auth-ui/react/plugins/passkey"
 
-const { authClient } = useAuth<PasskeyAuthClient>()
 const { mutate: addPasskey, isPending } = useAddPasskey(authClient)
 
 addPasskey({ name: "MacBook Pro" })
 ```
 
-`useAddPasskey` requires the Better Auth `passkey` plugin. Type `useAuth` with `PasskeyAuthClient` so TypeScript picks up the plugin-extended method signature.
+`useAddPasskey` requires the Better Auth `passkey` plugin. Import your configured `authClient`; it already carries the plugin methods from `createAuthClient`.
 
 ## Options factory
 

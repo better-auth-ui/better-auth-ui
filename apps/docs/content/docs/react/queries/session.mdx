@@ -6,9 +6,8 @@ description: Read, prefetch, and invalidate the current authenticated session.
 ## Usage
 
 ```tsx
-import { useAuth, useSession } from "@better-auth-ui/react"
-
-const { authClient } = useAuth()
+import { authClient } from "@/lib/auth-client"
+import { useSession } from "@better-auth-ui/react"
 
 // Most common
 const { data: session } = useSession(authClient)

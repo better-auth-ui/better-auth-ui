@@ -8,9 +8,9 @@ Refetches the sessions list on success.
 ## Usage
 
 ```tsx
-import { useAuth, useRevokeSession } from "@better-auth-ui/react"
+import { authClient } from "@/lib/auth-client"
+import { useRevokeSession } from "@better-auth-ui/react"
 
-const { authClient } = useAuth()
 const { mutate: revokeSession } = useRevokeSession(authClient)
 
 revokeSession({ token: session.token })
