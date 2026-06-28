@@ -1,10 +1,5 @@
 import type { MutationOptions } from "@tanstack/query-core"
 import type { BetterFetchError } from "better-auth/client"
-import {
-  type AuthMutationFnData,
-  type AuthMutationFnVariables,
-  authMutationOptions
-} from "../../lib/auth-mutation-options"
 import { authQueryKeys } from "../../lib/auth-query-keys"
 import type { UsernameAuthClient } from "./username-auth-client"
 import { usernameMutationKeys } from "./username-mutation-keys"
@@ -13,7 +8,7 @@ export type SignInUsernameFn<TAuthClient extends UsernameAuthClient> =
   TAuthClient["signIn"]["username"]
 
 export type SignInUsernameParams<TAuthClient extends UsernameAuthClient> =
-  AuthMutationFnVariables<SignInUsernameFn<TAuthClient>>
+  Parameters<SignInUsernameFn<TAuthClient>>[0]
 
 export type SignInUsernameOptions<TAuthClient extends UsernameAuthClient> =
   Omit<
@@ -29,17 +24,23 @@ export type SignInUsernameOptions<TAuthClient extends UsernameAuthClient> =
 export function signInUsernameOptions<TAuthClient extends UsernameAuthClient>(
   authClient: TAuthClient
 ) {
+  const mutationKey = usernameMutationKeys.signIn
+
+  const mutationFn = (params: SignInUsernameParams<TAuthClient>) =>
+    authClient.signIn.username({
+      ...params,
+      fetchOptions: { ...params?.fetchOptions, throw: true }
+    })
+
   return {
-    ...authMutationOptions(
-      authClient.signIn.username,
-      usernameMutationKeys.signIn
-    ),
+    mutationKey,
+    mutationFn,
     meta: {
       awaits: [authQueryKeys.session]
     }
   } as MutationOptions<
-    AuthMutationFnData<SignInUsernameFn<TAuthClient>>,
+    Awaited<ReturnType<typeof mutationFn>>,
     BetterFetchError,
-    AuthMutationFnVariables<SignInUsernameFn<TAuthClient>>
+    Parameters<typeof mutationFn>[0]
   >
 }

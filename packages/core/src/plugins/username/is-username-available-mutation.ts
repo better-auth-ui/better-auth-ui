@@ -1,10 +1,5 @@
 import type { MutationOptions } from "@tanstack/query-core"
 import type { BetterFetchError } from "better-auth/client"
-import {
-  type AuthMutationFnData,
-  type AuthMutationFnVariables,
-  authMutationOptions
-} from "../../lib/auth-mutation-options"
 import type { UsernameAuthClient } from "./username-auth-client"
 import { usernameMutationKeys } from "./username-mutation-keys"
 
@@ -12,7 +7,7 @@ export type IsUsernameAvailableFn<TAuthClient extends UsernameAuthClient> =
   TAuthClient["isUsernameAvailable"]
 
 export type IsUsernameAvailableParams<TAuthClient extends UsernameAuthClient> =
-  AuthMutationFnVariables<IsUsernameAvailableFn<TAuthClient>>
+  Parameters<IsUsernameAvailableFn<TAuthClient>>[0]
 
 export type IsUsernameAvailableOptions<TAuthClient extends UsernameAuthClient> =
   Omit<
@@ -31,12 +26,20 @@ export type IsUsernameAvailableOptions<TAuthClient extends UsernameAuthClient> =
 export function isUsernameAvailableOptions<
   TAuthClient extends UsernameAuthClient
 >(authClient: TAuthClient) {
-  return authMutationOptions(
-    authClient.isUsernameAvailable,
-    usernameMutationKeys.isUsernameAvailable
-  ) as MutationOptions<
-    AuthMutationFnData<IsUsernameAvailableFn<TAuthClient>>,
+  const mutationKey = usernameMutationKeys.isUsernameAvailable
+
+  const mutationFn = (params: IsUsernameAvailableParams<TAuthClient>) =>
+    authClient.isUsernameAvailable({
+      ...params,
+      fetchOptions: { ...params?.fetchOptions, throw: true }
+    })
+
+  return {
+    mutationKey,
+    mutationFn
+  } as MutationOptions<
+    Awaited<ReturnType<typeof mutationFn>>,
     BetterFetchError,
-    AuthMutationFnVariables<IsUsernameAvailableFn<TAuthClient>>
+    Parameters<typeof mutationFn>[0]
   >
 }

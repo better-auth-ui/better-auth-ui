@@ -1,10 +1,5 @@
 import type { MutationOptions } from "@tanstack/query-core"
 import type { BetterFetchError } from "better-auth/client"
-import {
-  type AuthMutationFnData,
-  type AuthMutationFnVariables,
-  authMutationOptions
-} from "../../lib/auth-mutation-options"
 import { authQueryKeys } from "../../lib/auth-query-keys"
 import type { PasskeyAuthClient } from "./passkey-auth-client"
 import { passkeyMutationKeys } from "./passkey-mutation-keys"
@@ -13,7 +8,7 @@ export type SignInPasskeyFn<TAuthClient extends PasskeyAuthClient> =
   TAuthClient["signIn"]["passkey"]
 
 export type SignInPasskeyParams<TAuthClient extends PasskeyAuthClient> =
-  AuthMutationFnVariables<SignInPasskeyFn<TAuthClient>>
+  Parameters<SignInPasskeyFn<TAuthClient>>[0]
 
 export type SignInPasskeyOptions<TAuthClient extends PasskeyAuthClient> = Omit<
   ReturnType<typeof signInPasskeyOptions<TAuthClient>>,
@@ -28,17 +23,24 @@ export type SignInPasskeyOptions<TAuthClient extends PasskeyAuthClient> = Omit<
 export function signInPasskeyOptions<TAuthClient extends PasskeyAuthClient>(
   authClient: TAuthClient
 ) {
+  const mutationKey = passkeyMutationKeys.signIn
+
+  // biome-ignore lint/suspicious/noConfusingVoidType: void allows no-arg mutate
+  const mutationFn = (params?: SignInPasskeyParams<TAuthClient> | void) =>
+    authClient.signIn.passkey({
+      ...(params ?? {}),
+      fetchOptions: { ...params?.fetchOptions, throw: true }
+    })
+
   return {
-    ...authMutationOptions(
-      authClient.signIn.passkey,
-      passkeyMutationKeys.signIn
-    ),
+    mutationKey,
+    mutationFn,
     meta: {
       awaits: [authQueryKeys.session]
     }
   } as MutationOptions<
-    AuthMutationFnData<SignInPasskeyFn<TAuthClient>>,
+    Awaited<ReturnType<typeof mutationFn>>,
     BetterFetchError,
-    AuthMutationFnVariables<SignInPasskeyFn<TAuthClient>>
+    Parameters<typeof mutationFn>[0]
   >
 }

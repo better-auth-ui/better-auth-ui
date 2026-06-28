@@ -1,10 +1,5 @@
 import type { MutationOptions } from "@tanstack/query-core"
 import type { BetterFetchError } from "better-auth/client"
-import {
-  type AuthMutationFnData,
-  type AuthMutationFnVariables,
-  authMutationOptions
-} from "../../lib/auth-mutation-options"
 import type { PasskeyAuthClient } from "./passkey-auth-client"
 import { passkeyMutationKeys } from "./passkey-mutation-keys"
 import { passkeyQueryKeys } from "./passkey-query-keys"
@@ -13,7 +8,7 @@ export type AddPasskeyFn<TAuthClient extends PasskeyAuthClient> =
   TAuthClient["passkey"]["addPasskey"]
 
 export type AddPasskeyParams<TAuthClient extends PasskeyAuthClient> =
-  AuthMutationFnVariables<AddPasskeyFn<TAuthClient>>
+  Parameters<AddPasskeyFn<TAuthClient>>[0]
 
 export type AddPasskeyOptions<TAuthClient extends PasskeyAuthClient> = Omit<
   ReturnType<typeof addPasskeyOptions<TAuthClient>>,
@@ -30,17 +25,23 @@ export function addPasskeyOptions<TAuthClient extends PasskeyAuthClient>(
   authClient: TAuthClient,
   userId?: string
 ) {
+  const mutationKey = passkeyMutationKeys.addPasskey
+
+  const mutationFn = (params: AddPasskeyParams<TAuthClient>) =>
+    authClient.passkey.addPasskey({
+      ...params,
+      fetchOptions: { ...params?.fetchOptions, throw: true }
+    })
+
   return {
-    ...authMutationOptions(
-      authClient.passkey.addPasskey,
-      passkeyMutationKeys.addPasskey
-    ),
+    mutationKey,
+    mutationFn,
     meta: {
       awaits: [passkeyQueryKeys.lists(userId)]
     }
   } as MutationOptions<
-    AuthMutationFnData<AddPasskeyFn<TAuthClient>>,
+    Awaited<ReturnType<typeof mutationFn>>,
     BetterFetchError,
-    AuthMutationFnVariables<AddPasskeyFn<TAuthClient>>
+    Parameters<typeof mutationFn>[0]
   >
 }
