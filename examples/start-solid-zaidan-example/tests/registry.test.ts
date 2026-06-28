@@ -1695,7 +1695,7 @@ describe("Solid registry isolation", () => {
     expect(userButton).toContain("<MountedUserButton {...props} />")
     expect(userButton).toContain("<UserButtonHydrationFallback {...props} />")
     expect(userButton).toContain("<UserButtonPendingView")
-    expect(userButton).toContain("useSession(auth.authClient, {")
+    expect(userButton).toContain("useSession(auth.authClient, () => ({")
     expect(userButton).toContain("enabled: !import.meta.env.SSR")
     expect(userButton).toContain("<Skeleton")
     expect(userButton).toContain('class="size-8 rounded-full"')
