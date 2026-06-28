@@ -1,5 +1,5 @@
 import { AuthProvider } from "@better-auth-ui/heroui"
-import { Appearance, themePlugin } from "@better-auth-ui/heroui/plugins"
+import { Appearance, themePlugin } from "@better-auth-ui/heroui/plugins/theme"
 import { useTheme } from "fumadocs-ui/provider/base"
 
 import { authClient } from "@/lib/auth-client"

@@ -1,9 +1,10 @@
-import type { OrganizationLocalization } from "@better-auth-ui/core/plugins"
 import type {
   DeleteOrganizationParams,
-  OrganizationAuthClient
-} from "@better-auth-ui/solid"
-import { useAuth, useDeleteOrganization } from "@better-auth-ui/solid"
+  OrganizationAuthClient,
+  OrganizationLocalization
+} from "@better-auth-ui/core/plugins/organization"
+import { useAuth } from "@better-auth-ui/solid"
+import { useDeleteOrganization } from "@better-auth-ui/solid/plugins/organization"
 import type { Organization } from "better-auth/client"
 import { TriangleAlert } from "lucide-solid"
 import { toast } from "solid-sonner"
@@ -34,22 +35,19 @@ export type DeleteOrganizationDialogProps = {
 }
 
 export function DeleteOrganizationDialog(props: DeleteOrganizationDialogProps) {
-  const auth = useAuth()
+  const auth = useAuth<OrganizationAuthClient>()
   const organizationSettingsPath =
     organizationPlugin().viewPaths.settings?.organizations ?? "organizations"
-  const deleteOrganization = useDeleteOrganization(
-    auth.authClient as OrganizationAuthClient,
-    {
-      onSuccess: () => {
-        props.onOpenChange(false)
-        toast.success(props.localization.organizationDeleted)
-        auth.navigate({
-          replace: true,
-          to: `${auth.basePaths.settings}/${organizationSettingsPath}`
-        })
-      }
+  const deleteOrganization = useDeleteOrganization(auth.authClient, () => ({
+    onSuccess: () => {
+      props.onOpenChange(false)
+      toast.success(props.localization.organizationDeleted)
+      auth.navigate({
+        replace: true,
+        to: `${auth.basePaths.settings}/${organizationSettingsPath}`
+      })
     }
-  )
+  }))
 
   const handleSubmit = (event: SubmitEvent) => {
     event.preventDefault()

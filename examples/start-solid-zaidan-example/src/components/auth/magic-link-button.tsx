@@ -3,7 +3,7 @@ import {
   magicLinkPlugin as coreMagicLinkPlugin,
   type MagicLinkLocalization,
   magicLinkLocalization
-} from "@better-auth-ui/core/plugins"
+} from "@better-auth-ui/core/plugins/magic-link"
 import { useAuth } from "@better-auth-ui/solid"
 import { useIsMutating } from "@tanstack/solid-query"
 import { Link } from "@tanstack/solid-router"

@@ -1,6 +1,9 @@
-import type { OrganizationLocalization } from "@better-auth-ui/core/plugins"
-import type { OrganizationAuthClient } from "@better-auth-ui/solid"
-import { useAuth, useCheckOrganizationSlug } from "@better-auth-ui/solid"
+import type {
+  OrganizationAuthClient,
+  OrganizationLocalization
+} from "@better-auth-ui/core/plugins/organization"
+import { useAuth } from "@better-auth-ui/solid"
+import { useCheckOrganizationSlug } from "@better-auth-ui/solid/plugins/organization"
 import { createDebounce } from "@solid-primitives/debounce"
 import { Check, LoaderCircle, X } from "lucide-solid"
 import { createEffect } from "solid-js"
@@ -26,10 +29,8 @@ const organizationFallbackLocalization = {
 } satisfies Pick<OrganizationLocalization, "slug" | "slugPlaceholder">
 
 export function SlugField(props: SlugFieldProps) {
-  const auth = useAuth()
-  const checkOrganizationSlug = useCheckOrganizationSlug(
-    auth.authClient as OrganizationAuthClient
-  )
+  const auth = useAuth<OrganizationAuthClient>()
+  const checkOrganizationSlug = useCheckOrganizationSlug(auth.authClient)
   const organizationPluginConfig = () =>
     auth.plugins.find((plugin) => plugin.id === organizationPlugin.id) as
       | {

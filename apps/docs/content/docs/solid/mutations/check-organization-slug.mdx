@@ -6,7 +6,7 @@ description: Check whether an organization slug is available.
 ## Usage
 
 ```tsx
-import { useCheckOrganizationSlug } from "@better-auth-ui/solid"
+import { useCheckOrganizationSlug } from "@better-auth-ui/solid/plugins/organization"
 
 const mutation = useCheckOrganizationSlug(authClient)
 
@@ -18,7 +18,7 @@ Organization mutations require `organizationClient()` on the Better Auth client.
 ## Options factory
 
 ```tsx
-import { checkOrganizationSlugOptions } from "@better-auth-ui/solid"
+import { checkOrganizationSlugOptions } from "@better-auth-ui/core/plugins/organization"
 import { createMutation } from "@tanstack/solid-query"
 
 const mutation = createMutation(() => checkOrganizationSlugOptions(authClient))
@@ -26,4 +26,4 @@ const mutation = createMutation(() => checkOrganizationSlugOptions(authClient))
 
 ## Params
 
-<auto-type-table path="../../../../../../packages/solid/src/mutations/organization/check-slug-mutation.ts" name="CheckOrganizationSlugParams" />
+<auto-type-table path="../../../../../../packages/core/src/plugins/organization/check-slug-mutation.ts" name="CheckOrganizationSlugParams" />

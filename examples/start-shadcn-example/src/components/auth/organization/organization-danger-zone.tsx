@@ -1,10 +1,8 @@
 "use client"
 
-import {
-  type OrganizationAuthClient,
-  useAuth,
-  useHasPermission
-} from "@better-auth-ui/react"
+import type { OrganizationAuthClient } from "@better-auth-ui/core/plugins/organization"
+import { useAuth } from "@better-auth-ui/react"
+import { useHasPermission } from "@better-auth-ui/react/plugins/organization"
 import type { ComponentProps } from "react"
 
 import { Card, CardContent } from "@/components/ui/card"
@@ -30,10 +28,10 @@ export function OrganizationDangerZone({
   className,
   ...props
 }: OrganizationDangerZoneProps & ComponentProps<"div">) {
-  const { authClient, localization } = useAuth()
+  const { authClient, localization } = useAuth<OrganizationAuthClient>()
 
   const { data: deletePermission, isPending: deletePermissionPending } =
-    useHasPermission(authClient as OrganizationAuthClient, {
+    useHasPermission(authClient, {
       permissions: { organization: ["delete"] }
     })
 

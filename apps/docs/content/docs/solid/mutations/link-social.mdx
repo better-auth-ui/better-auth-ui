@@ -6,7 +6,7 @@ description: Link a social provider to the current account.
 ## Usage
 
 ```tsx
-import { linkSocialOptions } from "@better-auth-ui/solid"
+import { linkSocialOptions } from "@better-auth-ui/core"
 import { createMutation } from "@tanstack/solid-query"
 
 const linkSocial = createMutation(() => linkSocialOptions(authClient))
@@ -16,4 +16,4 @@ linkSocial.mutate({ provider: "github" })
 
 ## Params
 
-<auto-type-table path="../../../../../../packages/solid/src/mutations/settings/link-social-mutation.ts" name="LinkSocialParams" />
+<auto-type-table path="../../../../../../packages/core/src/mutations/link-social-mutation.ts" name="LinkSocialParams" />

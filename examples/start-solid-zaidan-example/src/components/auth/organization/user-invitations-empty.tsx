@@ -1,4 +1,4 @@
-import { organizationLocalization } from "@better-auth-ui/core/plugins"
+import { organizationLocalization } from "@better-auth-ui/core/plugins/organization"
 import { Send } from "lucide-solid"
 
 export function UserInvitationsEmpty() {

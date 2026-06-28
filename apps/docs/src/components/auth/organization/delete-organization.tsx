@@ -1,12 +1,11 @@
 "use client"
 
+import type { OrganizationAuthClient } from "@better-auth-ui/core/plugins/organization"
+import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
 import {
-  type OrganizationAuthClient,
   useActiveOrganization,
-  useAuth,
-  useAuthPlugin,
   useHasPermission
-} from "@better-auth-ui/react"
+} from "@better-auth-ui/react/plugins/organization"
 import { useState } from "react"
 
 import { Button } from "@/components/ui/button"
@@ -19,16 +18,14 @@ import { DeleteOrganizationSkeleton } from "./delete-organization-skeleton"
  * the `organization:delete` permission.
  */
 export function DeleteOrganization() {
-  const { authClient } = useAuth()
+  const { authClient } = useAuth<OrganizationAuthClient>()
   const { localization: organizationLocalization } =
     useAuthPlugin(organizationPlugin)
 
-  const { data: activeOrganization } = useActiveOrganization(
-    authClient as OrganizationAuthClient
-  )
+  const { data: activeOrganization } = useActiveOrganization(authClient)
 
   const { data: permission, isPending: permissionPending } = useHasPermission(
-    authClient as OrganizationAuthClient,
+    authClient,
     {
       permissions: { organization: ["delete"] }
     }

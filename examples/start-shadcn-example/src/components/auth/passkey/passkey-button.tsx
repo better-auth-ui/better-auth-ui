@@ -1,12 +1,9 @@
 "use client"
 
 import { type AuthView, authMutationKeys } from "@better-auth-ui/core"
-import {
-  type PasskeyAuthClient,
-  useAuth,
-  useAuthPlugin,
-  useSignInPasskey
-} from "@better-auth-ui/react"
+import type { PasskeyAuthClient } from "@better-auth-ui/core/plugins/passkey"
+import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
+import { useSignInPasskey } from "@better-auth-ui/react/plugins/passkey"
 import { useIsMutating } from "@tanstack/react-query"
 import { Fingerprint } from "lucide-react"
 
@@ -28,11 +25,12 @@ export type PasskeyButtonProps = {
  * @param view - Current auth view. Hides the button on `"signUp"`.
  */
 export function PasskeyButton({ view }: PasskeyButtonProps) {
-  const { authClient, localization, redirectTo, navigate } = useAuth()
+  const { authClient, localization, redirectTo, navigate } =
+    useAuth<PasskeyAuthClient>()
   const { localization: passkeyLocalization } = useAuthPlugin(passkeyPlugin)
 
   const { mutate: signInPasskey, isPending: passkeyPending } = useSignInPasskey(
-    authClient as PasskeyAuthClient,
+    authClient,
     {
       onSuccess: () => navigate({ to: redirectTo })
     }

@@ -1,6 +1,6 @@
 import { viewPaths } from "@better-auth-ui/core"
+import { ensureSessionServer } from "@better-auth-ui/core/server"
 import { Settings } from "@better-auth-ui/heroui"
-import { ensureSession } from "@better-auth-ui/react/server"
 import { dehydrate, HydrationBoundary } from "@tanstack/react-query"
 import { headers } from "next/headers"
 import { notFound, redirect } from "next/navigation"
@@ -24,7 +24,7 @@ export default async function SettingsPage({
   const requestHeaders = await headers()
   const queryClient = getQueryClient()
 
-  const session = await ensureSession(queryClient, auth, {
+  const session = await ensureSessionServer(queryClient, auth, {
     headers: requestHeaders
   })
 

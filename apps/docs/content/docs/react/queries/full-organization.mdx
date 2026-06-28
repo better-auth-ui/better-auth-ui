@@ -8,9 +8,9 @@ Organization queries require `organizationClient()` on your Better Auth client. 
 ## Usage
 
 ```tsx
-import { useAuth, useFullOrganization } from "@better-auth-ui/react"
+import { authClient } from "@/lib/auth-client"
+import { useFullOrganization } from "@better-auth-ui/react/plugins/organization"
 
-const { authClient } = useAuth()
 const result = useFullOrganization(authClient)
 ```
 
@@ -22,7 +22,7 @@ import {
   fetchFullOrganization,
   fullOrganizationOptions,
   prefetchFullOrganization
-} from "@better-auth-ui/react"
+} from "@better-auth-ui/core/plugins/organization"
 
 const options = fullOrganizationOptions(authClient, userId)
 await ensureFullOrganization(queryClient, authClient, userId)
@@ -38,10 +38,10 @@ const organization = await fetchFullOrganization(queryClient, authClient, userId
 
 ## Server-side prefetching
 
-For server loaders, import from `@better-auth-ui/react/server`. The server helper calls your Better Auth server instance directly and accepts the same request params forwarded to `auth.api.getFullOrganization`.
+For server loaders, import from `@better-auth-ui/core/plugins/organization/server`. The server helper calls your Better Auth server instance directly and accepts the same request params forwarded to `auth.api.getFullOrganization`.
 
 ```ts
-import { ensureFullOrganization } from "@better-auth-ui/react/server"
+import { ensureFullOrganization } from "@better-auth-ui/core/plugins/organization/server"
 import { getRequestHeaders } from "@tanstack/react-start/server"
 
 import { auth } from "@/lib/auth"
@@ -54,4 +54,4 @@ await ensureFullOrganization(queryClient, auth, userId, {
 
 ## Params
 
-<auto-type-table path="../../../../../../packages/react/src/queries/organization/full-organization-query.ts" name="FullOrganizationParams" />
+<auto-type-table path="../../../../../../packages/core/src/plugins/organization/full-organization-query.ts" name="FullOrganizationParams" />

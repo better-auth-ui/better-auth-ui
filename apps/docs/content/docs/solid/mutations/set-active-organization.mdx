@@ -6,7 +6,7 @@ description: Set the active organization on the session.
 ## Usage
 
 ```tsx
-import { useSetActiveOrganization } from "@better-auth-ui/solid"
+import { useSetActiveOrganization } from "@better-auth-ui/solid/plugins/organization"
 
 const mutation = useSetActiveOrganization(authClient)
 
@@ -18,7 +18,7 @@ Organization mutations require `organizationClient()` on the Better Auth client.
 ## Options factory
 
 ```tsx
-import { setActiveOrganizationOptions } from "@better-auth-ui/solid"
+import { setActiveOrganizationOptions } from "@better-auth-ui/core/plugins/organization"
 import { createMutation } from "@tanstack/solid-query"
 
 const mutation = createMutation(() => setActiveOrganizationOptions(authClient))
@@ -26,4 +26,4 @@ const mutation = createMutation(() => setActiveOrganizationOptions(authClient))
 
 ## Params
 
-<auto-type-table path="../../../../../../packages/solid/src/mutations/organization/set-active-organization-mutation.ts" name="SetActiveOrganizationParams" />
+<auto-type-table path="../../../../../../packages/core/src/plugins/organization/set-active-organization-mutation.ts" name="SetActiveOrganizationParams" />

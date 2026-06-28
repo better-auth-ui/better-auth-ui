@@ -1,11 +1,13 @@
 import { fileToBase64 } from "@better-auth-ui/core"
-import type { OrganizationLocalization } from "@better-auth-ui/core/plugins"
-import type { OrganizationAuthClient } from "@better-auth-ui/solid"
+import type {
+  OrganizationAuthClient,
+  OrganizationLocalization
+} from "@better-auth-ui/core/plugins/organization"
+import { useAuth } from "@better-auth-ui/solid"
 import {
   useActiveOrganization,
-  useAuth,
   useUpdateOrganization
-} from "@better-auth-ui/solid"
+} from "@better-auth-ui/solid/plugins/organization"
 import { Trash2, Upload } from "lucide-solid"
 import { createSignal, Show } from "solid-js"
 import { toast } from "solid-sonner"
@@ -18,7 +20,6 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Label } from "@/components/ui/label"
 import { organizationPlugin } from "@/lib/auth/organization-plugin"
-import { authClient } from "@/lib/auth-client"
 import { OrganizationLogo } from "./organization-logo"
 
 export type ChangeOrganizationLogoProps = {
@@ -52,13 +53,9 @@ const fallbackLocalization = {
 >
 
 export function ChangeOrganizationLogo(props: ChangeOrganizationLogoProps) {
-  const auth = useAuth()
-  const activeOrganization = useActiveOrganization(
-    authClient as OrganizationAuthClient
-  )
-  const updateOrganization = useUpdateOrganization(
-    authClient as OrganizationAuthClient
-  )
+  const auth = useAuth<OrganizationAuthClient>()
+  const activeOrganization = useActiveOrganization(auth.authClient)
+  const updateOrganization = useUpdateOrganization(auth.authClient)
   const [isUploadingLogo, setIsUploadingLogo] = createSignal(false)
   const [isDeletingLogo, setIsDeletingLogo] = createSignal(false)
   let logoFileInput: HTMLInputElement | undefined
@@ -146,7 +143,7 @@ export function ChangeOrganizationLogo(props: ChangeOrganizationLogoProps) {
           >
             <OrganizationLogo
               isPending={activeOrganization.isPending}
-              organization={activeOrganization.data ?? undefined}
+              organization={activeOrganization.data}
               size="lg"
             />
           </Button>

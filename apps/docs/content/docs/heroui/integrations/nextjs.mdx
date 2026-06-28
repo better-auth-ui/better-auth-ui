@@ -74,10 +74,10 @@ Better Auth UI supports two route protection patterns depending on whether your 
 
 ### Server-rendered routes (async server component)
 
-For SSR routes, check the session in an async server component so unauthenticated users are redirected before any HTML is streamed — no flash of unauthenticated UI. Call `ensureSession` from `@better-auth-ui/react/server` with a per-request `QueryClient` (direct `auth.api` call, no HTTP hop), and wrap the rendered children in `HydrationBoundary` so downstream `useSession` calls read from the hydrated cache under `authQueryKeys.session` on mount.
+For SSR routes, check the session in an async server component so unauthenticated users are redirected before any HTML is streamed — no flash of unauthenticated UI. Call `ensureSessionServer` from `@better-auth-ui/core/server` with a per-request `QueryClient` (direct `auth.api` call, no HTTP hop), and wrap the rendered children in `HydrationBoundary` so downstream `useSession` calls read from the hydrated cache under `authQueryKeys.session` on mount.
 
 ```tsx title="app/dashboard/page.tsx"
-import { ensureSession } from "@better-auth-ui/react/server"
+import { ensureSessionServer } from "@better-auth-ui/core/server"
 import { dehydrate, HydrationBoundary } from "@tanstack/react-query"
 import { headers } from "next/headers"
 import Link from "next/link"
@@ -89,7 +89,7 @@ import { getQueryClient } from "@/lib/query-client"
 export default async function Dashboard() {
   const queryClient = getQueryClient()
 
-  const session = await ensureSession(queryClient, auth, {
+  const session = await ensureSessionServer(queryClient, auth, {
     headers: await headers()
   })
 
@@ -125,12 +125,12 @@ Use it in two situations:
 ```tsx title="app/dashboard/page.tsx"
 "use client"
 
-import { useAuth, useAuthenticate } from "@better-auth-ui/react"
+import { authClient } from "@/lib/auth-client"
+import { useAuthenticate } from "@better-auth-ui/react"
 import { Spinner } from "@heroui/react"
 import Link from "next/link"
 
 export default function Dashboard() {
-  const { authClient } = useAuth()
   const { data: session } = useAuthenticate(authClient)
 
   if (!session) {

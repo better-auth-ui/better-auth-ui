@@ -1,64 +1,70 @@
 import { readFileSync } from "node:fs"
 import { resolve } from "node:path"
 import {
+  accountInfoOptions,
   authMutationKeys,
   authQueryKeys,
   basePaths,
+  changeEmailOptions,
+  changePasswordOptions,
+  deleteUserOptions,
+  linkSocialOptions,
+  listAccountsOptions,
+  requestPasswordResetOptions,
+  resetPasswordOptions,
+  revokeSessionOptions,
+  sendVerificationEmailOptions,
+  signInEmailOptions,
+  signInSocialOptions,
+  signOutOptions,
+  signUpEmailOptions,
+  unlinkAccountOptions,
+  updateUserOptions,
   viewPaths
 } from "@better-auth-ui/core"
 import {
   apiKeyMutationKeys,
   apiKeyQueryKeys,
-  deleteUserMutationKeys,
+  createApiKeyOptions,
+  deleteApiKeyOptions,
+  listApiKeysOptions
+} from "@better-auth-ui/core/plugins/api-key"
+import { deleteUserMutationKeys } from "@better-auth-ui/core/plugins/delete-user"
+import {
   magicLinkMutationKeys,
+  signInMagicLinkOptions
+} from "@better-auth-ui/core/plugins/magic-link"
+import {
+  listDeviceSessionsOptions,
   multiSessionMutationKeys,
   multiSessionQueryKeys,
-  organizationMutationKeys,
-  organizationQueryKeys,
-  passkeyMutationKeys,
-  passkeyQueryKeys,
-  usernameMutationKeys
-} from "@better-auth-ui/core/plugins"
-import { afterEach, describe, expect, it, vi } from "vitest"
+  revokeMultiSessionOptions,
+  setActiveSessionOptions
+} from "@better-auth-ui/core/plugins/multi-session"
 import {
-  accountInfoOptions,
-  addPasskeyOptions,
-  changeEmailOptions,
-  changePasswordOptions,
-  createApiKeyOptions,
   createOrganizationMeta,
   createOrganizationOptions,
-  deleteApiKeyOptions,
-  deletePasskeyOptions,
-  deleteUserOptions,
   hasPermissionOptions,
-  isUsernameAvailableOptions,
-  linkSocialOptions,
-  listAccountsOptions,
-  listApiKeysOptions,
-  listDeviceSessionsOptions,
   listOrganizationMembersOptions,
   listOrganizationsOptions,
+  organizationMutationKeys,
+  organizationQueryKeys
+} from "@better-auth-ui/core/plugins/organization"
+import {
+  addPasskeyOptions,
+  deletePasskeyOptions,
   listPasskeysOptions,
-  requestPasswordResetOptions,
-  resetPasswordOptions,
-  resolveAuthConfig,
-  revokeMultiSessionOptions,
-  revokeSessionOptions,
-  sendVerificationEmailOptions,
-  setActiveSessionOptions,
-  signInEmailOptions,
-  signInMagicLinkOptions,
-  signInPasskeyOptions,
-  signInSocialOptions,
+  passkeyMutationKeys,
+  passkeyQueryKeys,
+  signInPasskeyOptions
+} from "@better-auth-ui/core/plugins/passkey"
+import {
+  isUsernameAvailableOptions,
   signInUsernameOptions,
-  signOutOptions,
-  signUpEmailOptions,
-  unlinkAccountOptions,
-  updateUserOptions
-} from "../src"
-import { invalidateAuthMutationMeta } from "../src/lib/mutation-invalidator"
-import { getSessionUserId } from "../src/queries/create-user-scoped-query"
+  usernameMutationKeys
+} from "@better-auth-ui/core/plugins/username"
+import { afterEach, describe, expect, it, vi } from "vitest"
+import { resolveAuthConfig } from "../src"
 
 const signal = new AbortController().signal
 
@@ -126,7 +132,7 @@ describe("Solid auth behavior parity", () => {
     expect(apiKeys.queryKey).toEqual(apiKeyQueryKeys.list("user-1"))
     await expect(
       (
-        accountInfo as {
+        accountInfo as unknown as {
           queryFn?: (context: { signal: AbortSignal }) => unknown
         }
       ).queryFn?.({ signal })
@@ -139,22 +145,261 @@ describe("Solid auth behavior parity", () => {
     })
   })
 
-  it("derives user-scoped query IDs from one existing session query result", () => {
-    expect(
-      getSessionUserId({ data: { user: { id: "user-1" } } } as never)
-    ).toBe("user-1")
-    expect(getSessionUserId({ data: null } as never)).toBeUndefined()
-
+  it("keeps user-scoped base query wrappers thin around core readiness", () => {
     const listAccountsQuery = readFileSync(
-      resolve(__dirname, "../src/queries/settings/list-accounts-query.ts"),
+      resolve(__dirname, "../src/hooks/queries/use-list-accounts.ts"),
       "utf8"
     )
 
     expect(listAccountsQuery).toContain(
-      "const session = useSession(authClient)"
+      "const session = useSession(authClient, undefined, queryClient)"
     )
-    expect(listAccountsQuery).toContain("getSessionUserId(session)")
-    expect(listAccountsQuery).not.toContain("getUserId(authClient)")
+    expect(listAccountsQuery).toContain("session.data?.user.id")
+    expect(listAccountsQuery).toContain("return useQuery(() =>")
+    expect(listAccountsQuery).toContain("listAccountsOptions(")
+    expect(listAccountsQuery).toContain("authClient,")
+    expect(listAccountsQuery).not.toContain("createUserScopedQuery(")
+    expect(listAccountsQuery).not.toContain("getSessionUserId")
+    expect(listAccountsQuery).not.toContain("enabled: (queryState)")
+    expect(listAccountsQuery).not.toContain("query: never")
+
+    const accountInfoQuery = readFileSync(
+      resolve(__dirname, "../src/hooks/queries/use-account-info.ts"),
+      "utf8"
+    )
+    const listSessionsQuery = readFileSync(
+      resolve(__dirname, "../src/hooks/queries/use-list-sessions.ts"),
+      "utf8"
+    )
+
+    expect(accountInfoQuery).toContain("session.data?.user.id")
+    expect(accountInfoQuery).not.toContain("getSessionUserId")
+    expect(accountInfoQuery).not.toContain("enabled: (queryState)")
+    expect(accountInfoQuery).not.toContain("query: never")
+    expect(accountInfoQuery).not.toContain("initialData: undefined")
+    expect(listSessionsQuery).toContain(
+      "const session = useSession(authClient, undefined, queryClient)"
+    )
+    expect(listSessionsQuery).toContain("session.data?.user.id")
+    expect(listSessionsQuery).not.toContain("getSessionUserId")
+    expect(listSessionsQuery).not.toContain("enabled: (queryState)")
+    expect(listSessionsQuery).not.toContain("query: never")
+    expect(listSessionsQuery).not.toContain("initialData: undefined")
+  })
+
+  it("uses accessor-style wrappers for base Solid query and mutation files", () => {
+    const baseFiles = [
+      "../src/hooks/queries/use-account-info.ts",
+      "../src/hooks/queries/use-list-accounts.ts",
+      "../src/hooks/queries/use-list-sessions.ts",
+      "../src/hooks/mutations/use-request-password-reset.ts",
+      "../src/hooks/mutations/use-reset-password.ts",
+      "../src/hooks/mutations/use-send-verification-email.ts",
+      "../src/hooks/mutations/use-sign-in-email.ts",
+      "../src/hooks/mutations/use-sign-in-social.ts",
+      "../src/hooks/mutations/use-sign-out.ts",
+      "../src/hooks/mutations/use-sign-up-email.ts",
+      "../src/hooks/mutations/use-change-email.ts",
+      "../src/hooks/mutations/use-change-password.ts",
+      "../src/hooks/mutations/use-delete-user.ts",
+      "../src/hooks/mutations/use-link-social.ts",
+      "../src/hooks/mutations/use-revoke-session.ts",
+      "../src/hooks/mutations/use-unlink-account.ts",
+      "../src/hooks/mutations/use-update-user.ts"
+    ]
+
+    for (const file of baseFiles) {
+      const source = readFileSync(resolve(__dirname, file), "utf8")
+
+      expect(source).not.toContain("createAuthMutationOptions")
+      expect(source).not.toContain("createUserScopedQuery")
+
+      if (file.includes("/mutations/")) {
+        expect(source).toMatch(/useMutation\([\s\S]*,\s*queryClient\s*\)/)
+        expect(source).toContain("queryClient?: Accessor<QueryClient>")
+        expect(source).toContain("...(options?.() ?? {})")
+        expect(source).not.toContain("createMutation")
+      } else {
+        expect(source).toMatch(/useQuery\([\s\S]*,\s*queryClient\s*\)/)
+        expect(source).not.toContain("createQuery")
+      }
+    }
+  })
+
+  it("uses useQuery without skipToken for Solid plugin query hooks", () => {
+    const queryFiles = [
+      "../src/hooks/use-auth-query.ts",
+      "../src/plugins/api-key/hooks/queries/use-list-api-keys.ts",
+      "../src/plugins/multi-session/hooks/queries/use-list-device-sessions.ts",
+      "../src/plugins/organization/hooks/queries/use-active-organization.ts",
+      "../src/plugins/organization/hooks/queries/use-full-organization.ts",
+      "../src/plugins/organization/hooks/queries/use-has-permission.ts",
+      "../src/plugins/organization/hooks/queries/use-list-invitations.ts",
+      "../src/plugins/organization/hooks/queries/use-list-members.ts",
+      "../src/plugins/organization/hooks/queries/use-list-organizations.ts",
+      "../src/plugins/organization/hooks/queries/use-list-user-invitations.ts",
+      "../src/plugins/passkey/hooks/queries/use-list-passkeys.ts"
+    ]
+
+    for (const file of queryFiles) {
+      const source = readFileSync(resolve(__dirname, file), "utf8")
+
+      expect(source).toMatch(/useQuery\([\s\S]*,\s*queryClient\s*\)/)
+      expect(source).not.toContain("createQuery")
+      expect(source).not.toContain("skipToken")
+    }
+  })
+
+  it("guards Solid plugin query fetches with enabled instead of skipToken", () => {
+    const guardedQueryFiles = [
+      "../src/plugins/api-key/hooks/queries/use-list-api-keys.ts",
+      "../src/plugins/multi-session/hooks/queries/use-list-device-sessions.ts",
+      "../src/plugins/organization/hooks/queries/use-active-organization.ts",
+      "../src/plugins/organization/hooks/queries/use-full-organization.ts",
+      "../src/plugins/organization/hooks/queries/use-has-permission.ts",
+      "../src/plugins/organization/hooks/queries/use-list-invitations.ts",
+      "../src/plugins/organization/hooks/queries/use-list-members.ts",
+      "../src/plugins/organization/hooks/queries/use-list-organizations.ts",
+      "../src/plugins/organization/hooks/queries/use-list-user-invitations.ts",
+      "../src/plugins/passkey/hooks/queries/use-list-passkeys.ts"
+    ]
+
+    for (const file of guardedQueryFiles) {
+      const source = readFileSync(resolve(__dirname, file), "utf8")
+
+      if (file.includes("use-active-organization")) {
+        expect(source).toContain(
+          "queryFn: slug === null ? async () => null : baseOptions.queryFn"
+        )
+      } else {
+        expect(source).toContain("queryFn: baseOptions.queryFn")
+      }
+      expect(source).toContain("enabled:")
+      expect(source).toContain("initialData: initialData as undefined")
+    }
+  })
+
+  it("threads queryClient through Solid plugin mutation hooks", () => {
+    const mutationFiles = [
+      "../src/hooks/use-auth-mutation.ts",
+      "../src/plugins/api-key/hooks/mutations/use-create-api-key.ts",
+      "../src/plugins/api-key/hooks/mutations/use-delete-api-key.ts",
+      "../src/plugins/magic-link/hooks/mutations/use-sign-in-magic-link.ts",
+      "../src/plugins/multi-session/hooks/mutations/use-revoke-multi-session.ts",
+      "../src/plugins/multi-session/hooks/mutations/use-set-active-session.ts",
+      "../src/plugins/organization/hooks/mutations/use-accept-invitation.ts",
+      "../src/plugins/organization/hooks/mutations/use-cancel-invitation.ts",
+      "../src/plugins/organization/hooks/mutations/use-check-slug.ts",
+      "../src/plugins/organization/hooks/mutations/use-create-organization.ts",
+      "../src/plugins/organization/hooks/mutations/use-delete-organization.ts",
+      "../src/plugins/organization/hooks/mutations/use-invite-member.ts",
+      "../src/plugins/organization/hooks/mutations/use-leave-organization.ts",
+      "../src/plugins/organization/hooks/mutations/use-reject-invitation.ts",
+      "../src/plugins/organization/hooks/mutations/use-remove-member.ts",
+      "../src/plugins/organization/hooks/mutations/use-set-active-organization.ts",
+      "../src/plugins/organization/hooks/mutations/use-update-member-role.ts",
+      "../src/plugins/organization/hooks/mutations/use-update-organization.ts",
+      "../src/plugins/passkey/hooks/mutations/use-add-passkey.ts",
+      "../src/plugins/passkey/hooks/mutations/use-delete-passkey.ts",
+      "../src/plugins/passkey/hooks/mutations/use-sign-in-passkey.ts",
+      "../src/plugins/username/hooks/mutations/use-is-username-available.ts",
+      "../src/plugins/username/hooks/mutations/use-sign-in-username.ts"
+    ]
+
+    for (const file of mutationFiles) {
+      const source = readFileSync(resolve(__dirname, file), "utf8")
+
+      expect(source).toMatch(/useMutation\([\s\S]*,\s*queryClient\s*\)/)
+      expect(source).toContain("queryClient?: Accessor<QueryClient>")
+
+      if (file.includes("use-set-active-organization")) {
+        expect(source).toContain("const mutationOptions = options?.() ?? {}")
+        expect(source).toContain("...mutationOptions")
+      } else {
+        expect(source).toContain("...(options?.() ?? {})")
+      }
+    }
+
+    const sessionScopedFiles = [
+      "../src/hooks/mutations/use-revoke-session.ts",
+      "../src/hooks/mutations/use-unlink-account.ts",
+      "../src/plugins/api-key/hooks/mutations/use-create-api-key.ts",
+      "../src/plugins/api-key/hooks/mutations/use-delete-api-key.ts",
+      "../src/plugins/multi-session/hooks/mutations/use-revoke-multi-session.ts",
+      "../src/plugins/multi-session/hooks/mutations/use-set-active-session.ts",
+      "../src/plugins/organization/hooks/mutations/use-accept-invitation.ts",
+      "../src/plugins/organization/hooks/mutations/use-cancel-invitation.ts",
+      "../src/plugins/organization/hooks/mutations/use-create-organization.ts",
+      "../src/plugins/organization/hooks/mutations/use-delete-organization.ts",
+      "../src/plugins/organization/hooks/mutations/use-invite-member.ts",
+      "../src/plugins/organization/hooks/mutations/use-leave-organization.ts",
+      "../src/plugins/organization/hooks/mutations/use-reject-invitation.ts",
+      "../src/plugins/organization/hooks/mutations/use-remove-member.ts",
+      "../src/plugins/organization/hooks/mutations/use-set-active-organization.ts",
+      "../src/plugins/organization/hooks/mutations/use-update-member-role.ts",
+      "../src/plugins/organization/hooks/mutations/use-update-organization.ts",
+      "../src/plugins/passkey/hooks/mutations/use-add-passkey.ts",
+      "../src/plugins/passkey/hooks/mutations/use-delete-passkey.ts"
+    ]
+
+    for (const file of sessionScopedFiles) {
+      const source = readFileSync(resolve(__dirname, file), "utf8")
+
+      expect(source).toContain("useSession(authClient, undefined, queryClient)")
+    }
+
+    const activeOrganizationScopedFiles = [
+      "../src/plugins/organization/hooks/mutations/use-invite-member.ts",
+      "../src/plugins/organization/hooks/mutations/use-update-member-role.ts",
+      "../src/plugins/organization/hooks/mutations/use-update-organization.ts"
+    ]
+
+    for (const file of activeOrganizationScopedFiles) {
+      const source = readFileSync(resolve(__dirname, file), "utf8")
+
+      expect(source).toMatch(
+        /useActiveOrganization\(\s*authClient,\s*undefined,\s*queryClient\s*\)/
+      )
+    }
+
+    const setActiveOrganizationSource = readFileSync(
+      resolve(
+        __dirname,
+        "../src/plugins/organization/hooks/mutations/use-set-active-organization.ts"
+      ),
+      "utf8"
+    )
+
+    expect(setActiveOrganizationSource).toMatch(
+      /useListOrganizations\(\s*authClient,\s*undefined,\s*queryClient\s*\)/
+    )
+    expect(setActiveOrganizationSource).toContain(
+      "const contextQueryClient = useQueryClient(queryClient?.())"
+    )
+    expect(setActiveOrganizationSource).toContain(
+      "const mutationQueryClient = () => queryClient?.() ?? contextQueryClient"
+    )
+    expect(setActiveOrganizationSource).toContain(
+      "mutationQueryClient().cancelQueries"
+    )
+    expect(setActiveOrganizationSource).toContain(
+      "const userOnMutateResult = await mutationOptions.onMutate?.("
+    )
+    expect(setActiveOrganizationSource).toContain(
+      "await mutationOptions.onSuccess?.("
+    )
+    expect(setActiveOrganizationSource).toContain(
+      "await mutationOptions.onError?.("
+    )
+    expect(setActiveOrganizationSource).toContain(
+      "await mutationOptions.onSettled?.("
+    )
+    expect(setActiveOrganizationSource).toContain(
+      "onMutateResult?.userOnMutateResult"
+    )
+    expect(setActiveOrganizationSource).not.toContain(
+      "queryClient.cancelQueries"
+    )
   })
 
   it("creates auth mutation options with shared mutation keys and throwing fetch options", async () => {
@@ -351,37 +596,15 @@ describe("Solid auth behavior parity", () => {
     })
   })
 
-  it("invalidates auth mutation metadata by query prefix", async () => {
-    const invalidated: unknown[] = []
-    const queryClient = {
-      invalidateQueries: vi.fn(async (filters) => {
-        for (const queryKey of [
-          organizationQueryKeys.lists("user-1"),
-          organizationQueryKeys.fullDetail("user-1", {
-            organizationId: "org-1"
-          }),
-          ["unrelated"]
-        ]) {
-          if (filters.predicate({ queryKey })) {
-            invalidated.push(queryKey)
-          }
-        }
-      })
-    }
-
-    await invalidateAuthMutationMeta(queryClient as never, {
-      options: {
-        mutationKey: organizationMutationKeys.create,
-        meta: createOrganizationMeta("user-1")
-      }
-    })
-
-    expect(queryClient.invalidateQueries).toHaveBeenCalledTimes(2)
-    expect(invalidated).toContainEqual(organizationQueryKeys.lists("user-1"))
-    expect(invalidated).toContainEqual(
-      organizationQueryKeys.fullDetail("user-1", { organizationId: "org-1" })
+  it("delegates provider-level mutation invalidation to core", () => {
+    const source = readFileSync(
+      resolve(__dirname, "../src/lib/mutation-invalidator.tsx"),
+      "utf8"
     )
-    expect(invalidated).not.toContainEqual(["unrelated"])
+
+    expect(source).toContain("setupMutationInvalidation")
+    expect(source).not.toContain("mutation.options?.meta")
+    expect(source).not.toContain("mutation.meta")
   })
 
   describe("mutation meta for cache invalidation", () => {
@@ -480,19 +703,35 @@ describe("Solid auth behavior parity", () => {
       ).toBeUndefined()
     })
 
-    it("userId-scoped mutations have no meta at factory level (meta injected by hook)", () => {
-      // These mutations use useSessionScopedMutation which injects meta
-      // at the Solid hook level, not at the factory level
-      expect(addPasskeyOptions(authClient as never).meta).toBeUndefined()
-      expect(deletePasskeyOptions(authClient as never).meta).toBeUndefined()
-      expect(revokeSessionOptions(authClient as never).meta).toBeUndefined()
-      expect(unlinkAccountOptions(authClient as never).meta).toBeUndefined()
-      expect(createApiKeyOptions(authClient as never).meta).toBeUndefined()
-      expect(deleteApiKeyOptions(authClient as never).meta).toBeUndefined()
+    it("userId-scoped mutations define meta at factory level", () => {
+      const userId = "user-1"
+
+      expect(addPasskeyOptions(authClient as never, userId).meta).toEqual({
+        awaits: [passkeyQueryKeys.lists(userId)]
+      })
+      expect(deletePasskeyOptions(authClient as never, userId).meta).toEqual({
+        awaits: [passkeyQueryKeys.lists(userId)]
+      })
+      expect(revokeSessionOptions(authClient as never, userId).meta).toEqual({
+        awaits: [authQueryKeys.listSessions(userId)]
+      })
+      expect(unlinkAccountOptions(authClient as never, userId).meta).toEqual({
+        awaits: [authQueryKeys.listAccounts(userId)]
+      })
+      expect(createApiKeyOptions(authClient as never, userId).meta).toEqual({
+        awaits: [apiKeyQueryKeys.lists(userId)]
+      })
+      expect(deleteApiKeyOptions(authClient as never, userId).meta).toEqual({
+        awaits: [apiKeyQueryKeys.lists(userId)]
+      })
       expect(
-        revokeMultiSessionOptions(authClient as never).meta
-      ).toBeUndefined()
-      expect(setActiveSessionOptions(authClient as never).meta).toBeUndefined()
+        revokeMultiSessionOptions(authClient as never, userId).meta
+      ).toEqual({ awaits: [multiSessionQueryKeys.lists(userId)] })
+      expect(setActiveSessionOptions(authClient as never, userId).meta).toEqual(
+        {
+          awaits: [authQueryKeys.session, multiSessionQueryKeys.lists(userId)]
+        }
+      )
     })
   })
 })

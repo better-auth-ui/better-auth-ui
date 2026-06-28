@@ -1,11 +1,8 @@
 "use client"
 
-import {
-  type OrganizationAuthClient,
-  useAuth,
-  useAuthPlugin,
-  useDeleteOrganization
-} from "@better-auth-ui/react"
+import type { OrganizationAuthClient } from "@better-auth-ui/core/plugins/organization"
+import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
+import { useDeleteOrganization } from "@better-auth-ui/react/plugins/organization"
 import type { Organization } from "better-auth/client"
 import { TriangleAlert } from "lucide-react"
 import type { SyntheticEvent } from "react"
@@ -38,14 +35,15 @@ export function DeleteOrganizationDialog({
   onOpenChange,
   organization
 }: DeleteOrganizationDialogProps) {
-  const { authClient, basePaths, localization, navigate } = useAuth()
+  const { authClient, basePaths, localization, navigate } =
+    useAuth<OrganizationAuthClient>()
   const {
     localization: organizationLocalization,
     viewPaths: organizationPluginViewPaths
   } = useAuthPlugin(organizationPlugin)
 
   const { mutate: deleteOrganization, isPending } = useDeleteOrganization(
-    authClient as OrganizationAuthClient,
+    authClient,
     {
       onSuccess: () => {
         onOpenChange(false)

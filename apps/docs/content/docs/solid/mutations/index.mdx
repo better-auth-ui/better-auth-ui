@@ -3,20 +3,21 @@ title: Mutations
 description: TanStack Query primitives for every Better Auth write endpoint.
 ---
 
-Every mutation exposes an options factory. The factory's `.mutationKey` is the canonical key.
+Solid exposes `use*` hooks for component code. Shared/base options factories live in `@better-auth-ui/core` and plugin options factories live in their core plugin entrypoints.
 
 ```ts
-import { signInEmailOptions } from "@better-auth-ui/solid"
+import { useSignInEmail } from "@better-auth-ui/solid"
+import { signInEmailOptions } from "@better-auth-ui/core"
 ```
 
-Use the factory anywhere Solid Query takes a `mutationOptions` object — `createMutation`, global mutation state checks, or a `MutationCache` observer. Organization mutations additionally expose `use*` hooks for component code because they need provider-scoped invalidation metadata.
+Use the hook in components. Use the core factory anywhere Solid Query takes a `mutationOptions` object — `createMutation`, global mutation state checks, or a `MutationCache` observer.
 
 ## Error handling
 
 Every mutation wires `throw: true` into `fetchOptions`, so the promise rejects with a `BetterFetchError` on failure instead of resolving with `{ error }`. This means you can rely on `error`, `isError`, `throwOnError`, and standard `onError` handlers from `createMutation`.
 
 ```tsx
-import { signInEmailOptions } from "@better-auth-ui/solid"
+import { signInEmailOptions } from "@better-auth-ui/core"
 import { createMutation } from "@tanstack/solid-query"
 
 const signIn = createMutation(() => ({
@@ -27,14 +28,14 @@ const signIn = createMutation(() => ({
 
 ## Cache side effects
 
-Factories that change auth state set up the same shared mutation keys as React. Apply cache side effects in your mutation handlers, or use the Organization hooks where available so `AuthProvider` can consume their invalidation metadata.
+Factories that change auth state set up the same shared mutation keys as React. `AuthProvider` installs the shared mutation invalidator so core metadata handles the common cache side effects.
 
 Common side effects mirror the React docs:
 
 - `signInEmailOptions` / `signInUsernameOptions` / `signInPasskeyOptions` / `signUpEmailOptions` — reset the session query so the new session is refetched. (`signInSocialOptions` and `signInMagicLinkOptions` redirect instead, so they leave the cache alone.)
 - `signOutOptions` — remove every `["auth", ...]` query.
-- `updateUserOptions` — merge or refetch the cached session after a successful profile update.
-- `setActiveSessionOptions` — update the active session and refetch session/device-session queries.
+- `useUpdateUser` — update the current user's profile fields and refresh cached session data.
+- `setActiveSessionOptions` — refetch session/device-session queries after the active session changes.
 - `changeEmailOptions` — refetch the session.
 - `addPasskeyOptions` / `deletePasskeyOptions` — refetch the passkey list.
 - `revokeSessionOptions` — refetch the sessions list.
@@ -115,21 +116,21 @@ For endpoints that already have a key in `authMutationKeys`, prefer it over an i
 <Cards>
   <Card title="signInEmailOptions" href="/docs/solid/mutations/sign-in-email" />
   <Card title="signInUsernameOptions" href="/docs/solid/mutations/sign-in-username" />
-  <Card title="signInMagicLinkOptions" href="/docs/solid/mutations/sign-in-magic-link" />
+  <Card title="useSignInMagicLink" href="/docs/solid/mutations/sign-in-magic-link" />
   <Card title="signInPasskeyOptions" href="/docs/solid/mutations/sign-in-passkey" />
   <Card title="signInSocialOptions" href="/docs/solid/mutations/sign-in-social" />
   <Card title="signUpEmailOptions" href="/docs/solid/mutations/sign-up-email" />
-  <Card title="signOutOptions" href="/docs/solid/mutations/sign-out" />
-  <Card title="requestPasswordResetOptions" href="/docs/solid/mutations/request-password-reset" />
+  <Card title="useSignOut" href="/docs/solid/mutations/sign-out" />
+  <Card title="useRequestPasswordReset" href="/docs/solid/mutations/request-password-reset" />
   <Card title="resetPasswordOptions" href="/docs/solid/mutations/reset-password" />
-  <Card title="sendVerificationEmailOptions" href="/docs/solid/mutations/send-verification-email" />
+  <Card title="useSendVerificationEmail" href="/docs/solid/mutations/send-verification-email" />
   <Card title="isUsernameAvailableOptions" href="/docs/solid/mutations/is-username-available" />
 </Cards>
 
 ### Settings
 
 <Cards>
-  <Card title="updateUserOptions" href="/docs/solid/mutations/update-user" />
+  <Card title="useUpdateUser" href="/docs/solid/mutations/update-user" />
   <Card title="changeEmailOptions" href="/docs/solid/mutations/change-email" />
   <Card title="changePasswordOptions" href="/docs/solid/mutations/change-password" />
   <Card title="deleteUserOptions" href="/docs/solid/mutations/delete-user" />
@@ -138,10 +139,10 @@ For endpoints that already have a key in `authMutationKeys`, prefer it over an i
   <Card title="addPasskeyOptions" href="/docs/solid/mutations/add-passkey" />
   <Card title="deletePasskeyOptions" href="/docs/solid/mutations/delete-passkey" />
   <Card title="revokeSessionOptions" href="/docs/solid/mutations/revoke-session" />
-  <Card title="revokeMultiSessionOptions" href="/docs/solid/mutations/revoke-multi-session" />
-  <Card title="setActiveSessionOptions" href="/docs/solid/mutations/set-active-session" />
-  <Card title="createApiKeyOptions" href="/docs/solid/mutations/create-api-key" />
-  <Card title="deleteApiKeyOptions" href="/docs/solid/mutations/delete-api-key" />
+  <Card title="useRevokeMultiSession" href="/docs/solid/mutations/revoke-multi-session" />
+  <Card title="useSetActiveSession" href="/docs/solid/mutations/set-active-session" />
+  <Card title="useCreateApiKey" href="/docs/solid/mutations/create-api-key" />
+  <Card title="useDeleteApiKey" href="/docs/solid/mutations/delete-api-key" />
 </Cards>
 
 ### Organization

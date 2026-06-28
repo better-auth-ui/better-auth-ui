@@ -6,7 +6,7 @@ description: Create an organization.
 ## Usage
 
 ```tsx
-import { useCreateOrganization } from "@better-auth-ui/solid"
+import { useCreateOrganization } from "@better-auth-ui/solid/plugins/organization"
 
 const mutation = useCreateOrganization(authClient)
 
@@ -18,7 +18,7 @@ Organization mutations require `organizationClient()` on the Better Auth client.
 ## Options factory
 
 ```tsx
-import { createOrganizationOptions } from "@better-auth-ui/solid"
+import { createOrganizationOptions } from "@better-auth-ui/core/plugins/organization"
 import { createMutation } from "@tanstack/solid-query"
 
 const mutation = createMutation(() => createOrganizationOptions(authClient))
@@ -26,4 +26,4 @@ const mutation = createMutation(() => createOrganizationOptions(authClient))
 
 ## Params
 
-<auto-type-table path="../../../../../../packages/solid/src/mutations/organization/create-organization-mutation.ts" name="CreateOrganizationParams" />
+<auto-type-table path="../../../../../../packages/core/src/plugins/organization/create-organization-mutation.ts" name="CreateOrganizationParams" />

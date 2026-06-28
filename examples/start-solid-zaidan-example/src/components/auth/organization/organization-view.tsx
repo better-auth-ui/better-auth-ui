@@ -1,12 +1,13 @@
-import type { OrganizationLocalization } from "@better-auth-ui/core/plugins"
-import { organizationLocalization } from "@better-auth-ui/core/plugins"
-import type { OrganizationAuthClient } from "@better-auth-ui/solid"
+import type {
+  OrganizationAuthClient,
+  OrganizationLocalization
+} from "@better-auth-ui/core/plugins/organization"
+import { organizationLocalization } from "@better-auth-ui/core/plugins/organization"
+import { useAuth, useSession } from "@better-auth-ui/solid"
 import {
   useActiveOrganization,
-  useAuth,
-  useListOrganizationMembers,
-  useSession
-} from "@better-auth-ui/solid"
+  useListOrganizationMembers
+} from "@better-auth-ui/solid/plugins/organization"
 import type { Organization } from "better-auth/client"
 import type { ComponentProps } from "solid-js"
 import { Show, splitProps } from "solid-js"
@@ -34,7 +35,7 @@ export type OrganizationViewProps = ComponentProps<"div"> & {
   size?: OrganizationLogoSize
   hideRole?: boolean
   hideSlug?: boolean
-  organization?: Partial<Organization>
+  organization?: Partial<Organization> | null
 }
 
 export function OrganizationView(props: OrganizationViewProps) {
@@ -46,8 +47,8 @@ export function OrganizationView(props: OrganizationViewProps) {
     "hideSlug",
     "organization"
   ])
-  const auth = useAuth()
-  const client = auth.authClient as OrganizationAuthClient
+  const auth = useAuth<OrganizationAuthClient>()
+  const client = auth.authClient
   const pluginConfig = () =>
     auth.plugins.find((plugin) => plugin.id === organizationPlugin.id) as
       | OrganizationPluginConfig
@@ -59,15 +60,15 @@ export function OrganizationView(props: OrganizationViewProps) {
       member: organizationLocalization.member
     }
   const session = useSession(client)
-  const activeOrganization = useActiveOrganization(client, {
+  const activeOrganization = useActiveOrganization(client, () => ({
     enabled: !local.organization && !local.isPending
-  } as never)
+  }))
   const resolvedOrganization = () =>
     local.organization ?? activeOrganization.data
-  const membersList = useListOrganizationMembers(client, {
+  const membersList = useListOrganizationMembers(client, () => ({
     query: { organizationId: resolvedOrganization()?.id },
     enabled: !!resolvedOrganization()?.id && !local.hideRole
-  } as never)
+  }))
   const membership = () =>
     (membersList.data?.members as OrganizationMember[] | undefined)?.find(
       (member) => member.userId === session.data?.user.id

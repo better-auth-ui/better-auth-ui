@@ -1,6 +1,9 @@
-import type { OrganizationLocalization } from "@better-auth-ui/core/plugins"
-import type { OrganizationAuthClient } from "@better-auth-ui/solid"
-import { useActiveOrganization, useAuth } from "@better-auth-ui/solid"
+import type {
+  OrganizationAuthClient,
+  OrganizationLocalization
+} from "@better-auth-ui/core/plugins/organization"
+import { useAuth } from "@better-auth-ui/solid"
+import { useActiveOrganization } from "@better-auth-ui/solid/plugins/organization"
 import { createSignal, Show } from "solid-js"
 import { Button } from "@/components/ui/button"
 import { DeleteOrganizationDialog } from "./delete-organization-dialog"
@@ -15,11 +18,9 @@ export type DeleteOrganizationProps = {
 }
 
 export function DeleteOrganization(props: DeleteOrganizationProps) {
-  const auth = useAuth()
+  const auth = useAuth<OrganizationAuthClient>()
   const [confirmOpen, setConfirmOpen] = createSignal(false)
-  const activeOrganization = useActiveOrganization(
-    auth.authClient as OrganizationAuthClient
-  )
+  const activeOrganization = useActiveOrganization(auth.authClient)
   return (
     <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
       <div>

@@ -1,11 +1,8 @@
 "use client"
 
-import {
-  type PasskeyAuthClient,
-  useAuth,
-  useAuthPlugin,
-  useListPasskeys
-} from "@better-auth-ui/react"
+import type { PasskeyAuthClient } from "@better-auth-ui/core/plugins/passkey"
+import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
+import { useListPasskeys } from "@better-auth-ui/react/plugins/passkey"
 import { useState } from "react"
 
 import { Button } from "@/components/ui/button"
@@ -24,12 +21,10 @@ export type PasskeysProps = {
 }
 
 export function Passkeys({ className }: PasskeysProps) {
-  const { authClient } = useAuth()
+  const { authClient } = useAuth<PasskeyAuthClient>()
   const { localization: passkeyLocalization } = useAuthPlugin(passkeyPlugin)
 
-  const { data: passkeys, isPending } = useListPasskeys(
-    authClient as PasskeyAuthClient
-  )
+  const { data: passkeys, isPending } = useListPasskeys(authClient)
 
   const [addOpen, setAddOpen] = useState(false)
 

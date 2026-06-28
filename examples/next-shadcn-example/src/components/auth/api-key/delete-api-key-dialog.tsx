@@ -1,12 +1,11 @@
 "use client"
 
-import {
-  type ApiKeyAuthClient,
-  type ListedApiKey,
-  useAuth,
-  useAuthPlugin,
-  useDeleteApiKey
-} from "@better-auth-ui/react"
+import type {
+  ApiKeyAuthClient,
+  ListedApiKey
+} from "@better-auth-ui/core/plugins/api-key"
+import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
+import { useDeleteApiKey } from "@better-auth-ui/react/plugins/api-key"
 import { Key } from "lucide-react"
 
 import {
@@ -40,12 +39,12 @@ export function DeleteApiKeyDialog({
   apiKey,
   organizationId
 }: DeleteApiKeyDialogProps) {
-  const { authClient, localization } = useAuth()
+  const { authClient, localization } = useAuth<ApiKeyAuthClient>()
   const { localization: apiKeyLocalization } = useAuthPlugin(apiKeyPlugin)
   const preview = `${apiKey.start}${"*".repeat(16)}`
   const previewId = `delete-api-key-preview-${apiKey.id}`
   const { mutate: deleteApiKey, isPending: isDeleting } = useDeleteApiKey(
-    authClient as ApiKeyAuthClient,
+    authClient,
     {
       onSuccess: () => onOpenChange(false)
     }

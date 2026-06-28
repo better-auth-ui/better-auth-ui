@@ -1,6 +1,6 @@
 import { apiKeyClient } from "@better-auth/api-key/client"
 import { passkeyClient } from "@better-auth/passkey/client"
-import type { AuthClient } from "@better-auth-ui/solid"
+import type { AuthClient } from "@better-auth-ui/core"
 import { createAuthClient } from "@better-auth-ui/solid"
 import {
   magicLinkClient,

@@ -1,20 +1,10 @@
 import { authQueryKeys } from "@better-auth-ui/core"
-import { deleteUserLocalization } from "@better-auth-ui/core/plugins"
-import {
-  deleteUserOptions,
-  listAccountsOptions,
-  useAuth,
-  useSession
-} from "@better-auth-ui/solid"
-import {
-  createMutation,
-  createQuery,
-  useQueryClient
-} from "@tanstack/solid-query"
+import { deleteUserLocalization } from "@better-auth-ui/core/plugins/delete-user"
+import { useAuth, useDeleteUser, useListAccounts } from "@better-auth-ui/solid"
+import { useQueryClient } from "@tanstack/solid-query"
 import { TriangleAlert } from "lucide-solid"
 import { createSignal, Show } from "solid-js"
 import { toast } from "solid-sonner"
-import { shouldLoadAccounts } from "@/components/auth/settings/shared/helpers"
 import type { DeleteUserPluginConfig } from "@/components/auth/settings/shared/types"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
@@ -40,9 +30,7 @@ export type DeleteAccountProps = {
 
 export function DeleteAccount(props: DeleteAccountProps = {}) {
   const auth = useAuth()
-  const session = useSession(auth.authClient)
   const queryClient = useQueryClient()
-  const userId = () => session.data?.user.id
   const [confirmOpen, setConfirmOpen] = createSignal(false)
   const [password, setPassword] = createSignal("")
   const deleteUserPluginConfig = () =>
@@ -70,21 +58,14 @@ export function DeleteAccount(props: DeleteAccountProps = {}) {
   }
   const sendDeleteAccountVerification = () =>
     Boolean(deleteUserPluginConfig()?.sendDeleteAccountVerification)
-  const accounts = createQuery(() => ({
-    ...listAccountsOptions(auth.authClient, userId()),
-    enabled: shouldLoadAccounts({
-      isSsr: import.meta.env.SSR,
-      userId: userId()
-    })
-  }))
+  const accounts = useListAccounts(auth.authClient)
   const hasCredentialAccount = () =>
     accounts.data?.some(
       (account: { providerId?: string }) => account.providerId === "credential"
     )
   const needsPassword = () =>
     !sendDeleteAccountVerification() && Boolean(hasCredentialAccount())
-  const deleteUser = createMutation(() => ({
-    ...deleteUserOptions(auth.authClient),
+  const deleteUser = useDeleteUser(auth.authClient, () => ({
     onSuccess: () => {
       setConfirmOpen(false)
       setPassword("")

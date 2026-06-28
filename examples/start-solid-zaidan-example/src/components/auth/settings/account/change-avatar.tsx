@@ -1,6 +1,5 @@
 import { fileToBase64 } from "@better-auth-ui/core"
-import { updateUserOptions, useAuth, useSession } from "@better-auth-ui/solid"
-import { createMutation } from "@tanstack/solid-query"
+import { useAuth, useSession, useUpdateUser } from "@better-auth-ui/solid"
 import { Trash2, Upload } from "lucide-solid"
 import { createSignal } from "solid-js"
 import { toast } from "solid-sonner"
@@ -25,9 +24,7 @@ export function ChangeAvatar(props: ChangeAvatarProps) {
   const [isUploadingAvatar, setIsUploadingAvatar] = createSignal(false)
   const [isDeletingAvatar, setIsDeletingAvatar] = createSignal(false)
   let avatarFileInput: HTMLInputElement | undefined
-  const updateUser = createMutation(() => ({
-    ...updateUserOptions(auth.authClient)
-  }))
+  const updateUser = useUpdateUser(auth.authClient)
   const displayName = () =>
     resolveUserLabel(session.data?.user.name, session.data?.user.email)
   const isPending = () =>

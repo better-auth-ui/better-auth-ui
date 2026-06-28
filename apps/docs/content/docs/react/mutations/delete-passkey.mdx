@@ -8,26 +8,20 @@ Refetches the passkey list on success.
 ## Usage
 
 ```tsx
-import {
-  type PasskeyAuthClient,
-  useAuth,
-  useDeletePasskey
-} from "@better-auth-ui/react"
+import { useDeletePasskey } from "@better-auth-ui/react/plugins/passkey"
+import { authClient } from "@/lib/auth-client"
 
-const { authClient } = useAuth()
-const { mutate: deletePasskey } = useDeletePasskey(
-  authClient as PasskeyAuthClient
-)
+const { mutate: deletePasskey } = useDeletePasskey(authClient)
 
 deletePasskey({ id: passkey.id })
 ```
 
-`useDeletePasskey` requires the Better Auth `passkey` plugin. Cast `authClient` to `PasskeyAuthClient` so TypeScript picks up the plugin-extended method signature.
+`useDeletePasskey` requires the Better Auth `passkey` plugin on your app auth client.
 
 ## Options factory
 
 ```tsx
-import { deletePasskeyOptions } from "@better-auth-ui/react"
+import { deletePasskeyOptions } from "@better-auth-ui/core/plugins/passkey"
 import { useMutation } from "@tanstack/react-query"
 
 const { mutate } = useMutation(deletePasskeyOptions(authClient))
@@ -35,4 +29,4 @@ const { mutate } = useMutation(deletePasskeyOptions(authClient))
 
 ## Params
 
-<auto-type-table path="../../../../../../packages/react/src/mutations/passkey/delete-passkey-mutation.ts" name="DeletePasskeyParams" />
+<auto-type-table path="../../../../../../packages/core/src/plugins/passkey/delete-passkey-mutation.ts" name="DeletePasskeyParams" />

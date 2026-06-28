@@ -1,6 +1,9 @@
-import type { OrganizationLocalization } from "@better-auth-ui/core/plugins"
-import type { OrganizationAuthClient } from "@better-auth-ui/solid"
-import { useAuth, useListOrganizationInvitations } from "@better-auth-ui/solid"
+import type {
+  OrganizationAuthClient,
+  OrganizationLocalization
+} from "@better-auth-ui/core/plugins/organization"
+import { useAuth } from "@better-auth-ui/solid"
+import { useListOrganizationInvitations } from "@better-auth-ui/solid/plugins/organization"
 import { ChevronUp, Filter, Search, X } from "lucide-solid"
 import { createMemo, createSignal, For, type JSX, Show } from "solid-js"
 import { Badge } from "@/components/ui/badge"
@@ -129,7 +132,7 @@ function SortableTableHead(props: {
 }
 
 export function OrganizationInvitations(props: OrganizationInvitationsProps) {
-  const auth = useAuth()
+  const auth = useAuth<OrganizationAuthClient>()
   const [invitationSearch, setInvitationSearch] = createSignal("")
   const [invitationRoleFilter, setInvitationRoleFilter] = createSignal("all")
   const [invitationStatusFilter, setInvitationStatusFilter] =
@@ -139,9 +142,7 @@ export function OrganizationInvitations(props: OrganizationInvitationsProps) {
   const [sortDescriptor, setSortDescriptor] = createSignal<
     SortDescriptor | undefined
   >()
-  const invitations = useListOrganizationInvitations(
-    auth.authClient as OrganizationAuthClient
-  )
+  const invitations = useListOrganizationInvitations(auth.authClient)
   const invitationRows = () =>
     (invitations.data ?? []) as OrganizationInvitation[]
   const organizationPluginConfig = () =>

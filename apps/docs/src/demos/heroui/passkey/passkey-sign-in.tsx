@@ -1,5 +1,5 @@
 import { AuthProvider, SignIn } from "@better-auth-ui/heroui"
-import { passkeyPlugin } from "@better-auth-ui/heroui/plugins"
+import { passkeyPlugin } from "@better-auth-ui/heroui/plugins/passkey"
 
 import { authClient } from "@/lib/auth-client"
 

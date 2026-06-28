@@ -1,9 +1,6 @@
-import {
-  type OrganizationAuthClient,
-  useAuth,
-  useAuthPlugin,
-  useLeaveOrganization
-} from "@better-auth-ui/react"
+import type { OrganizationAuthClient } from "@better-auth-ui/core/plugins/organization"
+import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
+import { useLeaveOrganization } from "@better-auth-ui/react/plugins/organization"
 import { ArrowRightFromSquare } from "@gravity-ui/icons"
 import { AlertDialog, Button, Card, Spinner, toast } from "@heroui/react"
 import type { Organization } from "better-auth/client"

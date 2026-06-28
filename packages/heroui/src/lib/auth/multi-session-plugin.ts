@@ -2,7 +2,7 @@ import { createAuthPlugin } from "@better-auth-ui/core"
 import {
   multiSessionPlugin as coreMultiSessionPlugin,
   type MultiSessionPluginOptions
-} from "@better-auth-ui/core/plugins"
+} from "@better-auth-ui/core/plugins/multi-session"
 
 import { ManageAccounts } from "../../components/auth/multi-session/manage-accounts"
 import { SwitchAccountSubmenu } from "../../components/auth/multi-session/switch-account-submenu"

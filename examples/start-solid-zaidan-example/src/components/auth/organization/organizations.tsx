@@ -1,7 +1,10 @@
-import type { OrganizationLocalization } from "@better-auth-ui/core/plugins"
-import { organizationLocalization } from "@better-auth-ui/core/plugins"
-import type { OrganizationAuthClient } from "@better-auth-ui/solid"
-import { useAuth, useListOrganizations } from "@better-auth-ui/solid"
+import type {
+  OrganizationAuthClient,
+  OrganizationLocalization
+} from "@better-auth-ui/core/plugins/organization"
+import { organizationLocalization } from "@better-auth-ui/core/plugins/organization"
+import { useAuth } from "@better-auth-ui/solid"
+import { useListOrganizations } from "@better-auth-ui/solid/plugins/organization"
 import { createSignal, For, Show } from "solid-js"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
@@ -21,8 +24,8 @@ type OrganizationPluginConfig = {
 }
 
 export function Organizations(props: OrganizationsProps = {}) {
-  const auth = useAuth()
-  const client = auth.authClient as OrganizationAuthClient
+  const auth = useAuth<OrganizationAuthClient>()
+  const client = auth.authClient
   const localization = () =>
     (
       auth.plugins.find((plugin) => plugin.id === organizationPlugin.id) as

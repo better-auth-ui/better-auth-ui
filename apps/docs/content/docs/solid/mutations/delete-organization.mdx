@@ -6,7 +6,7 @@ description: Delete an organization.
 ## Usage
 
 ```tsx
-import { useDeleteOrganization } from "@better-auth-ui/solid"
+import { useDeleteOrganization } from "@better-auth-ui/solid/plugins/organization"
 
 const mutation = useDeleteOrganization(authClient)
 
@@ -18,7 +18,7 @@ Organization mutations require `organizationClient()` on the Better Auth client.
 ## Options factory
 
 ```tsx
-import { deleteOrganizationOptions } from "@better-auth-ui/solid"
+import { deleteOrganizationOptions } from "@better-auth-ui/core/plugins/organization"
 import { createMutation } from "@tanstack/solid-query"
 
 const mutation = createMutation(() => deleteOrganizationOptions(authClient))
@@ -26,4 +26,4 @@ const mutation = createMutation(() => deleteOrganizationOptions(authClient))
 
 ## Params
 
-<auto-type-table path="../../../../../../packages/solid/src/mutations/organization/delete-organization-mutation.ts" name="DeleteOrganizationParams" />
+<auto-type-table path="../../../../../../packages/core/src/plugins/organization/delete-organization-mutation.ts" name="DeleteOrganizationParams" />

@@ -6,7 +6,8 @@ description: TanStack Query primitives for every Better Auth read endpoint.
 Every query exposes a hook and an options factory. The factory's `.queryKey` is the canonical key.
 
 ```ts
-import { useSession, sessionOptions } from "@better-auth-ui/react"
+import { useSession } from "@better-auth-ui/react"
+import { sessionOptions } from "@better-auth-ui/core"
 ```
 
 Use the hook in components. Use the factory anywhere TanStack Query takes a `queryOptions` object (`useQuery`, `useQueries`, `prefetchQuery`, loaders). Read `.queryKey` off the factory for cache seeding or invalidation.
@@ -29,12 +30,12 @@ Settings queries (`useListAccounts`, `useAccountInfo`, `useListSessions`, `useLi
 
 ## Escape hatch
 
-For read-style endpoints without a purpose-built hook, use `useAuthQuery` (or its options factory `authQueryOptions`). Mutation-style endpoints should use `useAuthMutation` instead.
+For read-style endpoints without a purpose-built hook, use `useAuthQuery`. Mutation-style endpoints should use `useAuthMutation` instead.
 
 ```tsx
-import { useAuth, useAuthQuery } from "@better-auth-ui/react"
+import { authClient } from "@/lib/auth-client"
+import { useAuthQuery } from "@better-auth-ui/react"
 
-const { authClient } = useAuth()
 const { data } = useAuthQuery(
   authClient.magicLink.list,
   ["auth", "magicLink", "list"],
@@ -44,9 +45,11 @@ const { data } = useAuthQuery(
 
 `options.query` is appended to the key, so the cached key above is `["auth", "magicLink", "list", { limit: 20 }]` (or `[..., null]` when omitted). Pass `fetchOptions` through the same options object.
 
-For loaders, `prefetchQuery`, or `useQueries`, use the factory directly:
+For loaders, `prefetchQuery`, or `useQueries`, import the core factory directly:
 
 ```ts
+import { authQueryOptions } from "@better-auth-ui/core"
+
 authQueryOptions(authClient.magicLink.list, ["auth", "magicLink", "list"], {
   query: { limit: 20 }
 })

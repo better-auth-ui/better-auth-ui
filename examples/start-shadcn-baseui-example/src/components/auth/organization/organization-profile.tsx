@@ -1,12 +1,11 @@
 "use client"
 
+import type { OrganizationAuthClient } from "@better-auth-ui/core/plugins/organization"
+import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
 import {
-  type OrganizationAuthClient,
   useActiveOrganization,
-  useAuth,
-  useAuthPlugin,
   useUpdateOrganization
-} from "@better-auth-ui/react"
+} from "@better-auth-ui/react/plugins/organization"
 import { type SyntheticEvent, useEffect, useState } from "react"
 import { toast } from "sonner"
 
@@ -30,13 +29,11 @@ export type OrganizationProfileProps = {
  * Profile card for the active organization: logo (when enabled), display name, and slug.
  */
 export function OrganizationProfile({ className }: OrganizationProfileProps) {
-  const { authClient, localization } = useAuth()
+  const { authClient, localization } = useAuth<OrganizationAuthClient>()
   const { localization: organizationLocalization } =
     useAuthPlugin(organizationPlugin)
 
-  const { data: activeOrganization } = useActiveOrganization(
-    authClient as OrganizationAuthClient
-  )
+  const { data: activeOrganization } = useActiveOrganization(authClient)
 
   const [slug, setSlug] = useState(activeOrganization?.slug ?? "")
 
@@ -45,7 +42,7 @@ export function OrganizationProfile({ className }: OrganizationProfileProps) {
   }, [activeOrganization?.slug])
 
   const { mutate: commitOrganizationUpdate, isPending } = useUpdateOrganization(
-    authClient as OrganizationAuthClient,
+    authClient,
     {
       onSuccess: () =>
         toast.success(organizationLocalization.organizationUpdatedSuccess)

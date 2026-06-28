@@ -1,23 +1,34 @@
 import { readFileSync } from "node:fs"
 import { resolve } from "node:path"
-import { basePaths, providerNames, viewPaths } from "@better-auth-ui/core"
+import {
+  authQueryOptions,
+  basePaths,
+  providerNames,
+  viewPaths
+} from "@better-auth-ui/core"
 import { socialProviderList } from "better-auth/social-providers"
 import { describe, expect, it, vi } from "vitest"
-import {
-  authMutationOptions,
-  authQueryOptions,
-  createAuthClient,
-  providerIconNames,
-  resolveAuthConfig
-} from "../src"
+import { createAuthClient, providerIconNames, resolveAuthConfig } from "../src"
+
+type PackageJson = {
+  name: string
+  version: string
+  exports: Record<string, unknown>
+  peerDependencies: Record<string, string>
+}
+
+function parsePackageJson(source: string): PackageJson {
+  try {
+    return JSON.parse(source) as PackageJson
+  } catch (error) {
+    throw new Error("Unable to parse packages/solid/package.json", {
+      cause: error
+    })
+  }
+}
 
 const packageJson = () =>
-  JSON.parse(readFileSync(resolve(__dirname, "../package.json"), "utf8")) as {
-    name: string
-    version: string
-    exports: Record<string, unknown>
-    peerDependencies: Record<string, string>
-  }
+  parsePackageJson(readFileSync(resolve(__dirname, "../package.json"), "utf8"))
 
 describe("@better-auth-ui/solid foundation", () => {
   it("declares the additive Solid package exports with native email support", () => {
@@ -28,10 +39,16 @@ describe("@better-auth-ui/solid foundation", () => {
     expect(Object.keys(metadata.exports).sort()).toEqual([
       ".",
       "./email",
-      "./plugins",
-      "./server"
+      "./plugins/api-key",
+      "./plugins/captcha",
+      "./plugins/magic-link",
+      "./plugins/multi-session",
+      "./plugins/organization",
+      "./plugins/passkey",
+      "./plugins/username"
     ])
     expect(metadata.exports).toHaveProperty("./email")
+    expect(metadata.exports).toHaveProperty("./plugins/api-key")
   })
 
   it("declares Solid runtime peers needed by the public surface", () => {
@@ -50,6 +67,19 @@ describe("@better-auth-ui/solid foundation", () => {
 
   it("exposes the Solid Better Auth client factory", () => {
     expect(typeof createAuthClient).toBe("function")
+  })
+
+  it("does not expose core-owned auth option factories from the Solid root", async () => {
+    const solid = await import("../src")
+    const indexSource = readFileSync(
+      resolve(__dirname, "../src/index.ts"),
+      "utf8"
+    )
+
+    expect(solid).not.toHaveProperty("authMutationOptions")
+    expect(solid).not.toHaveProperty("authQueryOptions")
+    expect(indexSource).not.toContain("./mutations/auth-mutation-options")
+    expect(indexSource).not.toContain("./queries/auth-query-options")
   })
 
   it("resolves auth config with React-equivalent defaults", () => {
@@ -114,18 +144,22 @@ describe("@better-auth-ui/solid foundation", () => {
 
   it("builds Solid mutation options that preserve mutation keys and throw on fetch errors", async () => {
     const authFn = vi.fn(async (variables) => ({ data: variables.email }))
-    const options = authMutationOptions(authFn, ["auth", "signIn", "email"])
+    const mutationFn = (variables: {
+      email: string
+      fetchOptions: { credentials: string }
+    }) =>
+      authFn({
+        ...variables,
+        fetchOptions: { ...variables.fetchOptions, throw: true }
+      })
 
-    expect(options.mutationKey).toEqual(["auth", "signIn", "email"])
+    expect({ mutationKey: ["auth", "signIn", "email"], mutationFn }).toEqual(
+      expect.objectContaining({
+        mutationKey: ["auth", "signIn", "email"]
+      })
+    )
     await expect(
-      (
-        options as {
-          mutationFn?: (variables: {
-            email: string
-            fetchOptions: { credentials: string }
-          }) => unknown
-        }
-      ).mutationFn?.({
+      mutationFn({
         email: "ada@example.com",
         fetchOptions: { credentials: "include" }
       })

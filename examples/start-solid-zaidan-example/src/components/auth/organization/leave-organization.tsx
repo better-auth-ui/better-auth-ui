@@ -1,13 +1,13 @@
-import type { OrganizationLocalization } from "@better-auth-ui/core/plugins"
 import type {
   LeaveOrganizationParams,
-  OrganizationAuthClient
-} from "@better-auth-ui/solid"
+  OrganizationAuthClient,
+  OrganizationLocalization
+} from "@better-auth-ui/core/plugins/organization"
+import { useAuth } from "@better-auth-ui/solid"
 import {
   useActiveOrganization,
-  useAuth,
   useLeaveOrganization
-} from "@better-auth-ui/solid"
+} from "@better-auth-ui/solid/plugins/organization"
 import { createSignal, Show } from "solid-js"
 import { toast } from "solid-sonner"
 import { Button } from "@/components/ui/button"
@@ -34,25 +34,20 @@ function LeaveOrganizationDialog(props: {
   onOpenChange: (open: boolean) => void
   open: boolean
 }) {
-  const auth = useAuth()
-  const activeOrganization = useActiveOrganization(
-    auth.authClient as OrganizationAuthClient
-  )
+  const auth = useAuth<OrganizationAuthClient>()
+  const activeOrganization = useActiveOrganization(auth.authClient)
   const organizationSettingsPath =
     organizationPlugin().viewPaths.settings?.organizations ?? "organizations"
-  const leaveOrganization = useLeaveOrganization(
-    auth.authClient as OrganizationAuthClient,
-    {
-      onSuccess: () => {
-        props.onOpenChange(false)
-        toast.success(props.localization.leftOrganization)
-        auth.navigate({
-          replace: true,
-          to: `${auth.basePaths.settings}/${organizationSettingsPath}`
-        })
-      }
+  const leaveOrganization = useLeaveOrganization(auth.authClient, () => ({
+    onSuccess: () => {
+      props.onOpenChange(false)
+      toast.success(props.localization.leftOrganization)
+      auth.navigate({
+        replace: true,
+        to: `${auth.basePaths.settings}/${organizationSettingsPath}`
+      })
     }
-  )
+  }))
 
   const handleLeave = () => {
     if (!activeOrganization.data) return
@@ -95,11 +90,9 @@ function LeaveOrganizationDialog(props: {
 }
 
 export function LeaveOrganization(props: LeaveOrganizationProps) {
-  const auth = useAuth()
+  const auth = useAuth<OrganizationAuthClient>()
   const [confirmOpen, setConfirmOpen] = createSignal(false)
-  const activeOrganization = useActiveOrganization(
-    auth.authClient as OrganizationAuthClient
-  )
+  const activeOrganization = useActiveOrganization(auth.authClient)
 
   return (
     <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">

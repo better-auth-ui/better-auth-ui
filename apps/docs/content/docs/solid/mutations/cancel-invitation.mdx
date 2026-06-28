@@ -6,7 +6,7 @@ description: Cancel an organization invitation.
 ## Usage
 
 ```tsx
-import { useCancelInvitation } from "@better-auth-ui/solid"
+import { useCancelInvitation } from "@better-auth-ui/solid/plugins/organization"
 
 const mutation = useCancelInvitation(authClient)
 
@@ -18,7 +18,7 @@ Organization mutations require `organizationClient()` on the Better Auth client.
 ## Options factory
 
 ```tsx
-import { cancelInvitationOptions } from "@better-auth-ui/solid"
+import { cancelInvitationOptions } from "@better-auth-ui/core/plugins/organization"
 import { createMutation } from "@tanstack/solid-query"
 
 const mutation = createMutation(() => cancelInvitationOptions(authClient))
@@ -26,4 +26,4 @@ const mutation = createMutation(() => cancelInvitationOptions(authClient))
 
 ## Params
 
-<auto-type-table path="../../../../../../packages/solid/src/mutations/organization/cancel-invitation-mutation.ts" name="CancelInvitationParams" />
+<auto-type-table path="../../../../../../packages/core/src/plugins/organization/cancel-invitation-mutation.ts" name="CancelInvitationParams" />

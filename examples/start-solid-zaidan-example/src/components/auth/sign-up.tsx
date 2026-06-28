@@ -1,11 +1,7 @@
 import { authQueryKeys, parseAdditionalFieldValue } from "@better-auth-ui/core"
-import {
-  signUpEmailOptions,
-  useAuth,
-  useFetchOptions
-} from "@better-auth-ui/solid"
-import type { AuthPlugin } from "@better-auth-ui/solid/plugins"
-import { createMutation, useQueryClient } from "@tanstack/solid-query"
+import type { AuthPlugin } from "@better-auth-ui/solid"
+import { useAuth, useFetchOptions, useSignUpEmail } from "@better-auth-ui/solid"
+import { useQueryClient } from "@tanstack/solid-query"
 import { Link } from "@tanstack/solid-router"
 import { Eye, EyeOff } from "lucide-solid"
 import { createSignal, For, Show } from "solid-js"
@@ -39,8 +35,7 @@ export function SignUp(props: SignUpProps) {
   const [isPasswordVisible, setIsPasswordVisible] = createSignal(false)
   const [isConfirmPasswordVisible, setIsConfirmPasswordVisible] =
     createSignal(false)
-  const signUp = createMutation(() => ({
-    ...signUpEmailOptions(auth.authClient),
+  const signUp = useSignUpEmail(auth.authClient, () => ({
     onError: () => {
       resetFetchOptions()
     },

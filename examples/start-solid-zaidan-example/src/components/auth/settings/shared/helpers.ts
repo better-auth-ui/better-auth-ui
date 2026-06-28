@@ -35,14 +35,3 @@ export function timeAgo(date: Date | string) {
 
   return relativeTimeFormat.format(0, "second")
 }
-
-export function shouldLoadLinkedAccounts(props: {
-  isSsr: boolean
-  userId?: string
-}) {
-  return !props.isSsr && Boolean(props.userId)
-}
-
-export const shouldLoadDeviceSessions = shouldLoadLinkedAccounts
-
-export const shouldLoadAccounts = shouldLoadLinkedAccounts

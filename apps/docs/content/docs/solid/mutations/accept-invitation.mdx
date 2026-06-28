@@ -6,7 +6,7 @@ description: Accept an organization invitation.
 ## Usage
 
 ```tsx
-import { useAcceptInvitation } from "@better-auth-ui/solid"
+import { useAcceptInvitation } from "@better-auth-ui/solid/plugins/organization"
 
 const mutation = useAcceptInvitation(authClient)
 
@@ -18,7 +18,7 @@ Organization mutations require `organizationClient()` on the Better Auth client.
 ## Options factory
 
 ```tsx
-import { acceptInvitationOptions } from "@better-auth-ui/solid"
+import { acceptInvitationOptions } from "@better-auth-ui/core/plugins/organization"
 import { createMutation } from "@tanstack/solid-query"
 
 const mutation = createMutation(() => acceptInvitationOptions(authClient))
@@ -26,4 +26,4 @@ const mutation = createMutation(() => acceptInvitationOptions(authClient))
 
 ## Params
 
-<auto-type-table path="../../../../../../packages/solid/src/mutations/organization/accept-invitation-mutation.ts" name="AcceptInvitationParams" />
+<auto-type-table path="../../../../../../packages/core/src/plugins/organization/accept-invitation-mutation.ts" name="AcceptInvitationParams" />

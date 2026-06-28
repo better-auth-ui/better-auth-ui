@@ -1,8 +1,5 @@
-import type { AuthClient } from "../../lib/auth-client"
-import {
-  type UseSessionOptions,
-  useSession
-} from "../../queries/auth/session-query"
+import type { AuthClient } from "@better-auth-ui/core"
+import { type UseSessionOptions, useSession } from "../queries/use-session"
 
 export function useUser<TAuthClient extends AuthClient>(
   authClient: TAuthClient,

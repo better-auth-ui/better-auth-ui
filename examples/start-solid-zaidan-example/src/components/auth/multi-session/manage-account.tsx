@@ -2,7 +2,7 @@ import {
   multiSessionPlugin as coreMultiSessionPlugin,
   type MultiSessionLocalization,
   multiSessionLocalization
-} from "@better-auth-ui/core/plugins"
+} from "@better-auth-ui/core/plugins/multi-session"
 import { useAuth } from "@better-auth-ui/solid"
 import { ArrowLeftRight, LogOut, MoreHorizontal } from "lucide-solid"
 import { Show } from "solid-js"

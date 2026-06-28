@@ -1,13 +1,14 @@
 "use client"
 
-import type { OrganizationLocalization } from "@better-auth-ui/core/plugins"
+import type {
+  OrganizationAuthClient,
+  OrganizationLocalization
+} from "@better-auth-ui/core/plugins/organization"
+import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
 import {
-  type OrganizationAuthClient,
-  useAuth,
-  useAuthPlugin,
   useHasPermission,
   useListOrganizationInvitations
-} from "@better-auth-ui/react"
+} from "@better-auth-ui/react/plugins/organization"
 import { ChevronUp, Filter, Search, X } from "lucide-react"
 import { type ComponentProps, type ReactNode, useMemo, useState } from "react"
 
@@ -60,15 +61,15 @@ export function OrganizationInvitations({
   className,
   ...props
 }: OrganizationInvitationsProps & ComponentProps<"div">) {
-  const { authClient, localization } = useAuth()
+  const { authClient, localization } = useAuth<OrganizationAuthClient>()
   const { localization: organizationLocalization, roles } =
     useAuthPlugin(organizationPlugin)
 
   const { data: invitations, isPending: invitationsPending } =
-    useListOrganizationInvitations(authClient as OrganizationAuthClient)
+    useListOrganizationInvitations(authClient)
 
   const { isPending: invitationPermissionPending } = useHasPermission(
-    authClient as OrganizationAuthClient,
+    authClient,
     {
       permissions: { invitation: ["cancel"] }
     }

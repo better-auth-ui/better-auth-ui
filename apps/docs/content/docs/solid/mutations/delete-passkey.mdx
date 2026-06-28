@@ -8,7 +8,7 @@ Requires the Better Auth passkey plugin.
 ## Usage
 
 ```tsx
-import { deletePasskeyOptions } from "@better-auth-ui/solid"
+import { deletePasskeyOptions } from "@better-auth-ui/core/plugins/passkey"
 import { createMutation } from "@tanstack/solid-query"
 
 const deletePasskey = createMutation(() => deletePasskeyOptions(authClient))
@@ -18,4 +18,4 @@ deletePasskey.mutate({ id: "passkey-id" })
 
 ## Params
 
-<auto-type-table path="../../../../../../packages/solid/src/mutations/passkey/delete-passkey-mutation.ts" name="DeletePasskeyParams" />
+<auto-type-table path="../../../../../../packages/core/src/plugins/passkey/delete-passkey-mutation.ts" name="DeletePasskeyParams" />

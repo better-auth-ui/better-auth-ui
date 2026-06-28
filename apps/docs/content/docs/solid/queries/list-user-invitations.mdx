@@ -6,7 +6,7 @@ description: List invitations addressed to the current user.
 ## Usage
 
 ```tsx
-import { useListUserInvitations } from "@better-auth-ui/solid"
+import { useListUserInvitations } from "@better-auth-ui/solid/plugins/organization"
 
 const result = useListUserInvitations(authClient)
 ```
@@ -16,7 +16,7 @@ Organization queries require `organizationClient()` on your Better Auth client. 
 ## Options factory
 
 ```tsx
-import { listUserInvitationsOptions } from "@better-auth-ui/solid"
+import { listUserInvitationsOptions } from "@better-auth-ui/core/plugins/organization"
 import { createQuery } from "@tanstack/solid-query"
 
 const query = createQuery(() =>
@@ -32,14 +32,14 @@ const query = createQuery(() =>
 
 ## Server-side prefetching
 
-For Solid route loaders, import the router-loader helpers from `@better-auth-ui/solid`. These helpers use the Solid client-shaped `authClient`/`userId` signature so they hydrate into the same cache keys as the component hook. True server-auth Organization helpers are not currently exported from `@better-auth-ui/solid/server`; use the session server helper first when your route needs request-header authentication.
+For Solid route loaders, import the router-loader helpers from `@better-auth-ui/core/plugins/organization`. These helpers use the Solid client-shaped `authClient`/`userId` signature so they hydrate into the same cache keys as the component hook. When you want to call your Better Auth server instance directly, matching server-auth Organization helpers are available from `@better-auth-ui/core/plugins/organization/server`.
 
 ```ts
 import {
   ensureListUserInvitations,
   fetchListUserInvitations,
   prefetchListUserInvitations
-} from "@better-auth-ui/solid"
+} from "@better-auth-ui/core/plugins/organization"
 
 await ensureListUserInvitations(queryClient, authClient, userId)
 await prefetchListUserInvitations(queryClient, authClient, userId)
@@ -48,4 +48,4 @@ const invitations = await fetchListUserInvitations(queryClient, authClient, user
 
 ## Params
 
-<auto-type-table path="../../../../../../packages/solid/src/queries/organization/list-user-invitations-query.ts" name="ListUserInvitationsParams" />
+<auto-type-table path="../../../../../../packages/core/src/plugins/organization/list-user-invitations-query.ts" name="ListUserInvitationsParams" />

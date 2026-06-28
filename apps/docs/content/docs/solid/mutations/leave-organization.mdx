@@ -6,7 +6,7 @@ description: Leave an organization.
 ## Usage
 
 ```tsx
-import { useLeaveOrganization } from "@better-auth-ui/solid"
+import { useLeaveOrganization } from "@better-auth-ui/solid/plugins/organization"
 
 const mutation = useLeaveOrganization(authClient)
 
@@ -18,7 +18,7 @@ Organization mutations require `organizationClient()` on the Better Auth client.
 ## Options factory
 
 ```tsx
-import { leaveOrganizationOptions } from "@better-auth-ui/solid"
+import { leaveOrganizationOptions } from "@better-auth-ui/core/plugins/organization"
 import { createMutation } from "@tanstack/solid-query"
 
 const mutation = createMutation(() => leaveOrganizationOptions(authClient))
@@ -26,4 +26,4 @@ const mutation = createMutation(() => leaveOrganizationOptions(authClient))
 
 ## Params
 
-<auto-type-table path="../../../../../../packages/solid/src/mutations/organization/leave-organization-mutation.ts" name="LeaveOrganizationParams" />
+<auto-type-table path="../../../../../../packages/core/src/plugins/organization/leave-organization-mutation.ts" name="LeaveOrganizationParams" />

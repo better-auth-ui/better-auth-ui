@@ -1,17 +1,13 @@
 import { authQueryKeys } from "@better-auth-ui/core"
+import type { UsernameAuthClient } from "@better-auth-ui/core/plugins/username"
 import {
   type UsernameLocalization,
   usernameLocalization
-} from "@better-auth-ui/core/plugins"
-import {
-  signInEmailOptions,
-  signInUsernameOptions,
-  type UsernameAuthClient,
-  useAuth,
-  useFetchOptions
-} from "@better-auth-ui/solid"
-import type { AuthPlugin } from "@better-auth-ui/solid/plugins"
-import { createMutation, useQueryClient } from "@tanstack/solid-query"
+} from "@better-auth-ui/core/plugins/username"
+import type { AuthPlugin } from "@better-auth-ui/solid"
+import { useAuth, useFetchOptions, useSignInEmail } from "@better-auth-ui/solid"
+import { useSignInUsername } from "@better-auth-ui/solid/plugins/username"
+import { useQueryClient } from "@tanstack/solid-query"
 import { Link } from "@tanstack/solid-router"
 import type { BetterFetchError } from "better-auth/client"
 import { Eye, EyeOff } from "lucide-solid"
@@ -39,7 +35,7 @@ type AuthPluginWithButtons = {
 }
 
 export function SignInUsername(props: SignInUsernameProps) {
-  const auth = useAuth()
+  const auth = useAuth<UsernameAuthClient>()
   const { fetchOptions, resetFetchOptions } = useFetchOptions()
   const queryClient = useQueryClient()
   const [identifier, setIdentifier] = createSignal("")
@@ -51,8 +47,7 @@ export function SignInUsername(props: SignInUsernameProps) {
     queryClient.invalidateQueries({ queryKey: authQueryKeys.session })
     auth.navigate({ to: auth.redirectTo })
   }
-  const signIn = createMutation(() => ({
-    ...signInEmailOptions(auth.authClient),
+  const signIn = useSignInEmail(auth.authClient, () => ({
     onError: (error, variables) => {
       if ((error as BetterFetchError).error?.code === "EMAIL_NOT_VERIFIED") {
         sessionStorage.setItem("better-auth-ui.verify-email", variables.email)
@@ -65,8 +60,7 @@ export function SignInUsername(props: SignInUsernameProps) {
     },
     onSuccess: onSignInSuccess
   }))
-  const signInUsername = createMutation(() => ({
-    ...signInUsernameOptions(auth.authClient as UsernameAuthClient),
+  const signInUsername = useSignInUsername(auth.authClient, () => ({
     onError: () => {
       resetFetchOptions()
     },
@@ -107,7 +101,7 @@ export function SignInUsername(props: SignInUsernameProps) {
         fetchOptions: fetchOptions(),
         password: submittedPassword,
         username: signInPath.username
-      } as Parameters<typeof signInUsername.mutate>[0])
+      })
       return
     }
 
@@ -115,7 +109,7 @@ export function SignInUsername(props: SignInUsernameProps) {
       email: signInPath.email,
       fetchOptions: fetchOptions(),
       password: submittedPassword
-    } as Parameters<typeof signIn.mutate>[0])
+    })
   }
 
   return (

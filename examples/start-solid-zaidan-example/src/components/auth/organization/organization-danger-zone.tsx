@@ -1,6 +1,9 @@
-import type { OrganizationLocalization } from "@better-auth-ui/core/plugins"
-import type { OrganizationAuthClient } from "@better-auth-ui/solid"
-import { useAuth, useHasPermission } from "@better-auth-ui/solid"
+import type {
+  OrganizationAuthClient,
+  OrganizationLocalization
+} from "@better-auth-ui/core/plugins/organization"
+import { useAuth } from "@better-auth-ui/solid"
+import { useHasPermission } from "@better-auth-ui/solid/plugins/organization"
 import { Show } from "solid-js"
 import { Card, CardContent } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
@@ -34,13 +37,10 @@ const fallbackLocalization = {
 >
 
 export function OrganizationDangerZone(props: OrganizationDangerZoneProps) {
-  const auth = useAuth()
-  const deletePermission = useHasPermission(
-    auth.authClient as OrganizationAuthClient,
-    {
-      permissions: { organization: ["delete"] }
-    }
-  )
+  const auth = useAuth<OrganizationAuthClient>()
+  const deletePermission = useHasPermission(auth.authClient, () => ({
+    permissions: { organization: ["delete"] }
+  }))
   const organizationPluginConfig = () =>
     auth.plugins.find((plugin) => plugin.id === organizationPlugin.id) as
       | {

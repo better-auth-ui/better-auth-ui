@@ -79,11 +79,11 @@ Better Auth UI supports two route protection patterns depending on whether your 
 
 ### Server-rendered routes (`beforeLoad`)
 
-For SSR routes, check the session in `beforeLoad` so unauthenticated users are redirected before any component renders — no flash of unauthenticated UI. Use `createIsomorphicFn` to run `ensureSessionServer` on the server (direct `auth.api` call, no HTTP hop) and `ensureSessionClient` on the client (goes through `authClient`). Both share the same TanStack Query cache under `authQueryKeys.session`, so the session is hydrated from SSR and reused by any child `useSession` call.
+For SSR routes, check the session in `beforeLoad` so unauthenticated users are redirected before any component renders — no flash of unauthenticated UI. Use `createIsomorphicFn` to run `ensureSessionServer` on the server (direct `auth.api` call, no HTTP hop) and `ensureSession` on the client (goes through `authClient`). Both share the same TanStack Query cache under `authQueryKeys.session`, so the session is hydrated from SSR and reused by any child `useSession` call.
 
 ```tsx title="routes/dashboard.tsx"
-import { ensureSession as ensureSessionClient } from "@better-auth-ui/react"
-import { ensureSession as ensureSessionServer } from "@better-auth-ui/react/server"
+import { ensureSession } from "@better-auth-ui/core"
+import { ensureSessionServer } from "@better-auth-ui/core/server"
 import { createFileRoute, Link, redirect } from "@tanstack/react-router"
 import { createIsomorphicFn } from "@tanstack/react-start"
 import { getRequestHeaders } from "@tanstack/react-start/server"
@@ -93,13 +93,13 @@ import { authClient } from "@/lib/auth-client"
 
 export const Route = createFileRoute("/dashboard")({
   async beforeLoad({ context: { queryClient }, location }) {
-    const ensureSession = createIsomorphicFn()
+    const ensureSessionIso = createIsomorphicFn()
       .server(() =>
         ensureSessionServer(queryClient, auth, { headers: getRequestHeaders() })
       )
-      .client(() => ensureSessionClient(queryClient, authClient))
+      .client(() => ensureSession(queryClient, authClient))
 
-    const session = await ensureSession()
+    const session = await ensureSessionIso()
 
     if (!session) {
       throw redirect({
@@ -141,7 +141,8 @@ Use it in two situations:
 2. **On its own** for statically prerendered or purely client-rendered routes (SSG output, SPA routes, marketing pages), where server-side session access isn't available.
 
 ```tsx title="routes/dashboard.tsx"
-import { useAuth, useAuthenticate } from "@better-auth-ui/react"
+import { authClient } from "@/lib/auth-client"
+import { useAuthenticate } from "@better-auth-ui/react"
 import { createFileRoute, Link } from "@tanstack/react-router"
 
 import { Spinner } from "@/components/ui/spinner"
@@ -151,7 +152,6 @@ export const Route = createFileRoute("/dashboard")({
 })
 
 function Dashboard() {
-  const { authClient } = useAuth()
   const { data: session } = useAuthenticate(authClient)
 
   if (!session) {

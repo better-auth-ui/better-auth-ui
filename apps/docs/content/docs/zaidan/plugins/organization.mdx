@@ -165,8 +165,8 @@ export function Header() {
 The plugin contributes an `organizations` segment to `viewPaths.settings`. Spread `organizationPlugin().viewPaths.settings` into your settings route's allowed-path set so `/settings/organizations` resolves correctly.
 
 ```tsx title="src/routes/settings/$path.tsx"
-import { ensureSession as ensureSessionClient } from "@better-auth-ui/solid"
-import { ensureSession as ensureSessionServer } from "@better-auth-ui/solid/server"
+import { ensureSession } from "@better-auth-ui/core"
+import { ensureSessionServer } from "@better-auth-ui/core/server"
 import { viewPaths } from "@better-auth-ui/core"
 import { createFileRoute, notFound, redirect } from "@tanstack/solid-router"
 import { createIsomorphicFn } from "@tanstack/solid-start"
@@ -188,13 +188,13 @@ export const Route = createFileRoute("/settings/$path")({
       throw notFound()
     }
 
-    const ensureSession = createIsomorphicFn()
+    const ensureSessionIso = createIsomorphicFn()
       .server(() =>
         ensureSessionServer(queryClient, auth, { headers: getRequestHeaders() })
       )
-      .client(() => ensureSessionClient(queryClient, authClient))
+      .client(() => ensureSession(queryClient, authClient))
 
-    const session = await ensureSession()
+    const session = await ensureSessionIso()
 
     if (!session) {
       throw redirect({
@@ -229,8 +229,8 @@ function SettingsPage() {
 Mount a dynamic route at `/organization/$slug/$path` that renders `<Organization />` for the matching tab. `<Organization />` is the shell — it shows the `settings` (profile + danger zone) and `people` (members + invitations) tabs for the organization identified by the URL slug.
 
 ```tsx title="src/routes/organization/$slug/$path.tsx"
-import { ensureSession as ensureSessionClient } from "@better-auth-ui/solid"
-import { ensureSession as ensureSessionServer } from "@better-auth-ui/solid/server"
+import { ensureSession } from "@better-auth-ui/core"
+import { ensureSessionServer } from "@better-auth-ui/core/server"
 import { createFileRoute, notFound, redirect } from "@tanstack/solid-router"
 import { createIsomorphicFn } from "@tanstack/solid-start"
 import { getRequestHeaders } from "@tanstack/solid-start/server"
@@ -250,13 +250,13 @@ export const Route = createFileRoute("/organization/$slug/$path")({
       throw notFound()
     }
 
-    const ensureSession = createIsomorphicFn()
+    const ensureSessionIso = createIsomorphicFn()
       .server(() =>
         ensureSessionServer(queryClient, auth, { headers: getRequestHeaders() })
       )
-      .client(() => ensureSessionClient(queryClient, authClient))
+      .client(() => ensureSession(queryClient, authClient))
 
-    const session = await ensureSession()
+    const session = await ensureSessionIso()
 
     if (!session) {
       throw redirect({
@@ -354,8 +354,8 @@ When the user is on a non-slug page (`/settings/organizations`, `/dashboard`, et
 Move `/organization/$path` to `/organization/$slug/$path`. Validate the path segment and gate on the signed-in session as before.
 
 ```tsx title="src/routes/organization/$slug/$path.tsx"
-import { ensureSession as ensureSessionClient } from "@better-auth-ui/solid"
-import { ensureSession as ensureSessionServer } from "@better-auth-ui/solid/server"
+import { ensureSession } from "@better-auth-ui/core"
+import { ensureSessionServer } from "@better-auth-ui/core/server"
 import { createFileRoute, notFound, redirect } from "@tanstack/solid-router"
 import { createIsomorphicFn } from "@tanstack/solid-start"
 import { getRequestHeaders } from "@tanstack/solid-start/server"
@@ -375,13 +375,13 @@ export const Route = createFileRoute("/organization/$slug/$path")({
       throw notFound()
     }
 
-    const ensureSession = createIsomorphicFn()
+    const ensureSessionIso = createIsomorphicFn()
       .server(() =>
         ensureSessionServer(queryClient, auth, { headers: getRequestHeaders() })
       )
-      .client(() => ensureSessionClient(queryClient, authClient))
+      .client(() => ensureSession(queryClient, authClient))
 
-    const session = await ensureSession()
+    const session = await ensureSessionIso()
 
     if (!session) {
       throw redirect({
@@ -472,7 +472,7 @@ Read these inside custom slot components via `useAuthPlugin(organizationPlugin).
 
 ## Solid Hooks
 
-The copied Zaidan components read the configured client from `<AuthProvider>` with `useAuth()`. If you build custom organization UI with the low-level `@better-auth-ui/solid` hooks, pass your configured `authClient` as shown in the linked Solid API docs.
+Copied Zaidan components are wired through `<AuthProvider>`. If you build custom organization UI with the low-level `@better-auth-ui/solid` hooks, pass your configured `authClient` as shown in the linked Solid API docs.
 
 ### Queries
 

@@ -1,7 +1,7 @@
 "use client"
 
 import { AuthProvider } from "@better-auth-ui/heroui"
-import { deleteUserPlugin } from "@better-auth-ui/heroui/plugins"
+import { deleteUserPlugin } from "@better-auth-ui/heroui/plugins/delete-user"
 import { Toast } from "@heroui/react"
 import { QueryClientProvider } from "@tanstack/react-query"
 import { useRouter } from "next/navigation"

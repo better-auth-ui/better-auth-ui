@@ -24,20 +24,45 @@
       "types": "./dist/email.d.ts",
       "import": "./dist/email.js"
     },
-    "./server": {
-      "src": "./src/server.ts",
-      "types": "./dist/server.d.ts",
-      "import": "./dist/server.js"
+    "./plugins/api-key": {
+      "src": "./src/plugins/api-key/index.ts",
+      "types": "./dist/plugins/api-key/index.d.ts",
+      "import": "./dist/plugins/api-key/index.js"
     },
-    "./plugins": {
-      "src": "./src/plugins.ts",
-      "types": "./dist/plugins.d.ts",
-      "import": "./dist/plugins.js"
+    "./plugins/captcha": {
+      "src": "./src/plugins/captcha/index.ts",
+      "types": "./dist/plugins/captcha/index.d.ts",
+      "import": "./dist/plugins/captcha/index.js"
+    },
+    "./plugins/magic-link": {
+      "src": "./src/plugins/magic-link/index.ts",
+      "types": "./dist/plugins/magic-link/index.d.ts",
+      "import": "./dist/plugins/magic-link/index.js"
+    },
+    "./plugins/multi-session": {
+      "src": "./src/plugins/multi-session/index.ts",
+      "types": "./dist/plugins/multi-session/index.d.ts",
+      "import": "./dist/plugins/multi-session/index.js"
+    },
+    "./plugins/organization": {
+      "src": "./src/plugins/organization/index.ts",
+      "types": "./dist/plugins/organization/index.d.ts",
+      "import": "./dist/plugins/organization/index.js"
+    },
+    "./plugins/passkey": {
+      "src": "./src/plugins/passkey/index.ts",
+      "types": "./dist/plugins/passkey/index.d.ts",
+      "import": "./dist/plugins/passkey/index.js"
+    },
+    "./plugins/username": {
+      "src": "./src/plugins/username/index.ts",
+      "types": "./dist/plugins/username/index.d.ts",
+      "import": "./dist/plugins/username/index.js"
     }
   },
   "devDependencies": {
-    "@better-auth/api-key": "^1.6.19",
-    "@better-auth/passkey": "^1.6.19",
+    "@better-auth/api-key": "1.7.0-beta.9",
+    "@better-auth/passkey": "1.7.0-beta.9",
     "@react-email/components": "^1.0.12",
     "@react-email/preview-server": "^5.2.10",
     "@tanstack/query-core": "^5.100.14",
@@ -47,7 +72,7 @@
     "@types/react": "^19.2.15",
     "@vitejs/plugin-react": "^6.0.2",
     "@vitest/browser-playwright": "^4.1.9",
-    "better-auth": "^1.6.19",
+    "better-auth": "1.7.0-beta.9",
     "clsx": "^2.1.1",
     "playwright": "^1.61.0",
     "react": "^19.2.6",
@@ -60,12 +85,12 @@
   },
   "peerDependencies": {
     "@better-auth-ui/core": "*",
-    "@better-auth/api-key": ">=1.6.19",
-    "@better-auth/passkey": ">=1.6.19",
+    "@better-auth/api-key": ">=1.7.0-beta.9",
+    "@better-auth/passkey": ">=1.7.0-beta.9",
     "@react-email/components": ">=1.0.12",
     "@tanstack/query-core": ">=5.100.14",
     "@tanstack/react-query": ">=5.100.14",
-    "better-auth": ">=1.6.19",
+    "better-auth": ">=1.7.0-beta.9",
     "clsx": ">=2.0.0",
     "react": ">=19.2.6",
     "react-dom": ">=19.2.6",

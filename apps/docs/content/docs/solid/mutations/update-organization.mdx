@@ -6,7 +6,7 @@ description: Update organization name, slug, or logo data.
 ## Usage
 
 ```tsx
-import { useUpdateOrganization } from "@better-auth-ui/solid"
+import { useUpdateOrganization } from "@better-auth-ui/solid/plugins/organization"
 
 const mutation = useUpdateOrganization(authClient)
 
@@ -18,7 +18,7 @@ Organization mutations require `organizationClient()` on the Better Auth client.
 ## Options factory
 
 ```tsx
-import { updateOrganizationOptions } from "@better-auth-ui/solid"
+import { updateOrganizationOptions } from "@better-auth-ui/core/plugins/organization"
 import { createMutation } from "@tanstack/solid-query"
 
 const mutation = createMutation(() => updateOrganizationOptions(authClient))
@@ -26,4 +26,4 @@ const mutation = createMutation(() => updateOrganizationOptions(authClient))
 
 ## Params
 
-<auto-type-table path="../../../../../../packages/solid/src/mutations/organization/update-organization-mutation.ts" name="UpdateOrganizationParams" />
+<auto-type-table path="../../../../../../packages/core/src/plugins/organization/update-organization-mutation.ts" name="UpdateOrganizationParams" />

@@ -1,7 +1,13 @@
 import { viewPaths } from "@better-auth-ui/core"
+import { magicLinkPlugin } from "@better-auth-ui/core/plugins/magic-link"
 import { notFound } from "next/navigation"
 
 import { Auth } from "@/components/auth/auth"
+
+const validAuthPaths = new Set([
+  ...Object.values(viewPaths.auth),
+  ...Object.values(magicLinkPlugin().viewPaths.auth ?? {})
+])
 
 export default async function AuthPage({
   params
@@ -12,7 +18,7 @@ export default async function AuthPage({
 }) {
   const { path } = await params
 
-  if (!Object.values(viewPaths.auth).includes(path)) {
+  if (!validAuthPaths.has(path)) {
     notFound()
   }
 

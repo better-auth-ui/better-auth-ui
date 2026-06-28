@@ -55,7 +55,7 @@ Pass `apiKeyPlugin()` to `<AuthProvider>`:
 
 ```tsx title="components/providers.tsx"
 import { AuthProvider } from "@better-auth-ui/heroui"
-import { apiKeyPlugin } from "@better-auth-ui/heroui/plugins" // [!code highlight]
+import { apiKeyPlugin } from "@better-auth-ui/heroui/plugins/api-key" // [!code highlight]
 
 import { authClient } from "@/lib/auth-client"
 
@@ -83,7 +83,7 @@ The `<ApiKeys />` security card is automatically rendered in `<SecuritySettings 
 **Usage**
 
 ```tsx
-import { ApiKeys } from "@better-auth-ui/heroui/plugins"
+import { ApiKeys } from "@better-auth-ui/heroui/plugins/api-key"
 
 <ApiKeys />
 ```
@@ -100,7 +100,7 @@ To enable, opt in on the UI plugin and add a matching API key configuration to y
 
 ```ts title="components/providers.tsx"
 import { AuthProvider } from "@better-auth-ui/heroui"
-import { apiKeyPlugin } from "@better-auth-ui/heroui/plugins"
+import { apiKeyPlugin } from "@better-auth-ui/heroui/plugins/api-key"
 
 import { authClient } from "@/lib/auth-client"
 
@@ -136,7 +136,7 @@ See the [Better Auth docs](https://www.better-auth.com/docs/plugins/api-key/adva
 **Usage**
 
 ```tsx
-import { OrganizationApiKeys } from "@better-auth-ui/heroui/plugins"
+import { OrganizationApiKeys } from "@better-auth-ui/heroui/plugins/api-key"
 
 <OrganizationApiKeys />
 ```

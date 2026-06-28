@@ -1,14 +1,28 @@
-import { type QueryKey, useQuery } from "@tanstack/react-query"
 import {
   type AuthQueryFn,
-  type AuthQueryOptions,
+  type AuthQueryFnData,
+  type AuthQueryKey,
   authQueryOptions
-} from "../queries/auth-query-options"
+} from "@better-auth-ui/core"
+import {
+  type QueryKey,
+  type UseQueryOptions,
+  useQuery
+} from "@tanstack/react-query"
+import type { BetterFetchError } from "better-auth/client"
 
 type UseAuthQueryOptions<
   TFn extends AuthQueryFn,
   TPrefix extends QueryKey
-> = Omit<AuthQueryOptions<TFn, TPrefix>, "queryKey" | "queryFn"> &
+> = Omit<
+  UseQueryOptions<
+    AuthQueryFnData<TFn>,
+    BetterFetchError,
+    AuthQueryFnData<TFn>,
+    AuthQueryKey<TFn, TPrefix>
+  >,
+  "queryKey" | "queryFn"
+> &
   Pick<NonNullable<Parameters<TFn>[0]>, "query" | "fetchOptions">
 
 /**

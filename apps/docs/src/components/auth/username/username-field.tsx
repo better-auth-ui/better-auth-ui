@@ -1,11 +1,8 @@
 "use client"
 
-import {
-  type UsernameAuthClient,
-  useAuth,
-  useAuthPlugin,
-  useIsUsernameAvailable
-} from "@better-auth-ui/react"
+import type { UsernameAuthClient } from "@better-auth-ui/core/plugins/username"
+import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
+import { useIsUsernameAvailable } from "@better-auth-ui/react/plugins/username"
 import { useDebouncer } from "@tanstack/react-pacer"
 import { Check, X } from "lucide-react"
 import { useState } from "react"
@@ -31,7 +28,8 @@ export function UsernameField({
   field,
   isPending
 }: AdditionalFieldProps) {
-  const { authClient, localization: authLocalization } = useAuth()
+  const { authClient, localization: authLocalization } =
+    useAuth<UsernameAuthClient>()
   const {
     localization,
     minUsernameLength,
@@ -49,7 +47,7 @@ export function UsernameField({
     data: availability,
     error: availabilityError,
     reset: resetAvailability
-  } = useIsUsernameAvailable(authClient as UsernameAuthClient, {
+  } = useIsUsernameAvailable(authClient, {
     onError: () => {}
   })
 
