@@ -1,0 +1,50 @@
+[
+  {
+    "id": "multi-session-localization.ts-MultiSessionLocalization",
+    "name": "MultiSessionLocalization",
+    "description": "",
+    "entries": [
+      {
+        "name": "switchAccount",
+        "description": "",
+        "tags": [{ "name": "remarks", "text": "`\"Switch Account\"`" }],
+        "type": "string",
+        "simplifiedType": "\"Switch Account\"",
+        "required": true,
+        "deprecated": false
+      },
+      {
+        "name": "addAccount",
+        "description": "",
+        "tags": [{ "name": "remarks", "text": "`\"Add Account\"`" }],
+        "type": "string",
+        "simplifiedType": "\"Add Account\"",
+        "required": true,
+        "deprecated": false
+      },
+      {
+        "name": "manageAccounts",
+        "description": "",
+        "tags": [{ "name": "remarks", "text": "`\"Manage accounts\"`" }],
+        "type": "string",
+        "simplifiedType": "\"Manage accounts\"",
+        "required": true,
+        "deprecated": false
+      },
+      {
+        "name": "manageAccountsDescription",
+        "description": "",
+        "tags": [
+          {
+            "name": "remarks",
+            "text": "`\"Manage your accounts for secure access.\"`"
+          }
+        ],
+        "type": "string",
+        "simplifiedType": "\"Manage your accounts for secure access.\"",
+        "required": true,
+        "deprecated": false
+      }
+    ]
+  }
+]

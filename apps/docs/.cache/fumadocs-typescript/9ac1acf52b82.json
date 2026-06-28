@@ -1,0 +1,18 @@
+[
+  {
+    "id": "multi-session-plugin.ts-MultiSessionPluginOptions",
+    "name": "MultiSessionPluginOptions",
+    "description": "",
+    "entries": [
+      {
+        "name": "localization",
+        "description": "Override the plugin's default localization strings.",
+        "tags": [{ "name": "remarks", "text": "`MultiSessionLocalization`" }],
+        "type": "Partial<{ switchAccount: string; addAccount: string; manageAccounts: string; manageAccountsDescription: string; }>",
+        "simplifiedType": "MultiSessionLocalization",
+        "required": false,
+        "deprecated": false
+      }
+    ]
+  }
+]

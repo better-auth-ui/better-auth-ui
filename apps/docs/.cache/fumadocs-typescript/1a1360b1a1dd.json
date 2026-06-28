@@ -1,0 +1,18 @@
+[
+  {
+    "id": "change-password.tsx-ChangePasswordProps",
+    "name": "ChangePasswordProps",
+    "description": "",
+    "entries": [
+      {
+        "name": "className",
+        "description": "",
+        "tags": [],
+        "type": "string",
+        "simplifiedType": "string",
+        "required": false,
+        "deprecated": false
+      }
+    ]
+  }
+]

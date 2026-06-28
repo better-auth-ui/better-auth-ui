@@ -1,0 +1,36 @@
+[
+  {
+    "id": "additional-field.tsx-AdditionalFieldProps",
+    "name": "AdditionalFieldProps",
+    "description": "",
+    "entries": [
+      {
+        "name": "field",
+        "description": "",
+        "tags": [],
+        "type": "AdditionalFieldConfig",
+        "simplifiedType": "object",
+        "required": true,
+        "deprecated": false
+      },
+      {
+        "name": "isPending",
+        "description": "",
+        "tags": [],
+        "type": "boolean",
+        "simplifiedType": "boolean",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "name",
+        "description": "",
+        "tags": [],
+        "type": "string",
+        "simplifiedType": "string",
+        "required": true,
+        "deprecated": false
+      }
+    ]
+  }
+]

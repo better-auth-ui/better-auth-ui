@@ -10,9 +10,9 @@
     "format": "biome format --write"
   },
   "devDependencies": {
-    "@biomejs/biome": "^2.5.0",
+    "@biomejs/biome": "^2.5.1",
     "@tailwindcss/postcss": "^4.3.1",
-    "@types/node": "^25.9.4",
+    "@types/node": "^26.0.1",
     "@types/nodemailer": "^8.0.1",
     "@types/react": "^19.2.15",
     "@types/react-dom": "^19",
@@ -29,7 +29,7 @@
     "@neondatabase/serverless": "^1.0.2",
     "@react-email/render": "^2.0.9",
     "@tanstack/react-pacer": "^0.22.1",
-    "@tanstack/react-query": "^5.100.14",
+    "@tanstack/react-query": "^5.101.2",
     "better-auth": "1.7.0-beta.9",
     "bowser": "^2.11.0",
     "class-variance-authority": "^0.7.1",
@@ -44,7 +44,7 @@
     "react": "^19.2.6",
     "react-day-picker": "^10.0.1",
     "react-dom": "^19.2.6",
-    "shadcn": "^4.8.2",
+    "shadcn": "^4.12.0",
     "sonner": "^2.0.7",
     "tailwind-merge": "^3.5.0",
     "tailwind-variants": "^3.2.2"

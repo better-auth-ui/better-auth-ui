@@ -1,0 +1,87 @@
+[
+  {
+    "id": "organization-plugin.ts-OrganizationPluginOptions",
+    "name": "OrganizationPluginOptions",
+    "description": "",
+    "entries": [
+      {
+        "name": "checkSlug",
+        "description": "Whether to call `organization.checkSlug` when entering an organization slug.",
+        "tags": [{ "name": "default", "text": "true" }],
+        "type": "boolean",
+        "simplifiedType": "boolean",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "localization",
+        "description": "Override the plugin's default localization strings.",
+        "tags": [{ "name": "remarks", "text": "`OrganizationLocalization`" }],
+        "type": "OrganizationLocalization",
+        "simplifiedType": "OrganizationLocalization",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "viewPaths",
+        "description": "Override URL segments contributed by this plugin.\n\n- `settings.organizations` — segment for the organizations settings view (default `\"organizations\"`).\n- `organization.settings` — segment for the `/organization/...` profile and danger zone tab (default `\"settings\"`).\n- `organization.people` — segment for the `/organization/...` members and invitations tab (default `\"people\"`).",
+        "tags": [],
+        "type": "{ settings?: { organizations?: string; }; organization?: Partial<OrganizationViewPaths>; }",
+        "simplifiedType": "object",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "logo",
+        "description": "Organization logo upload, optimization, and deletion configuration.\nSame shape as {@link AvatarConfig} used for user avatars (`AuthConfig.avatar`).",
+        "tags": [
+          { "name": "remarks", "text": "`AvatarConfig`" },
+          {
+            "name": "default",
+            "text": "{ enabled: true, resize: resizeAvatar, size: 256, extension: \"png\" }"
+          }
+        ],
+        "type": "Partial<AvatarConfig>",
+        "simplifiedType": "AvatarConfig",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "roles",
+        "description": "Map of role keys to display labels. When omitted, defaults to localized\nlabels for `owner`, `admin`, and `member` (from `localization.owner`\netc.) plus {@link OrganizationPluginOptions.additionalRoles}. When set,\nreplaces that default map entirely; use {@link OrganizationPluginOptions.additionalRoles}\nto add more labels on top. Looked up at render time via `roles?.[role]`.",
+        "tags": [{ "name": "remarks", "text": "`Record<string, string>`" }],
+        "type": "Record<string, string>",
+        "simplifiedType": "Record<string, string>",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "additionalRoles",
+        "description": "Extra role labels merged after the effective role map (either\n{@link OrganizationPluginOptions.roles} when provided, or the localized\ndefaults). Use this for custom server roles without redefining built-in\nlabels.",
+        "tags": [{ "name": "remarks", "text": "`Record<string, string>`" }],
+        "type": "Record<string, string>",
+        "simplifiedType": "Record<string, string>",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "slug",
+        "description": "",
+        "tags": [],
+        "type": "string | null",
+        "simplifiedType": "string | null",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "slugPrefix",
+        "description": "Prefix prepended to organization slugs.",
+        "tags": [{ "name": "default", "text": "\"\"" }],
+        "type": "string",
+        "simplifiedType": "string",
+        "required": false,
+        "deprecated": false
+      }
+    ]
+  }
+]

@@ -1,0 +1,102 @@
+[
+  {
+    "id": "passkey-localization.ts-PasskeyLocalization",
+    "name": "PasskeyLocalization",
+    "description": "",
+    "entries": [
+      {
+        "name": "passkey",
+        "description": "",
+        "tags": [{ "name": "remarks", "text": "`\"Passkey\"`" }],
+        "type": "string",
+        "simplifiedType": "\"Passkey\"",
+        "required": true,
+        "deprecated": false
+      },
+      {
+        "name": "addPasskey",
+        "description": "",
+        "tags": [{ "name": "remarks", "text": "`\"Add passkey\"`" }],
+        "type": "string",
+        "simplifiedType": "\"Add passkey\"",
+        "required": true,
+        "deprecated": false
+      },
+      {
+        "name": "deletePasskey",
+        "description": "",
+        "tags": [
+          { "name": "remarks", "text": "`\"Delete passkey {{name}}\"`" }
+        ],
+        "type": "string",
+        "simplifiedType": "\"Delete passkey {{name}}\"",
+        "required": true,
+        "deprecated": false
+      },
+      {
+        "name": "deletePasskeyTitle",
+        "description": "",
+        "tags": [{ "name": "remarks", "text": "`\"Delete passkey\"`" }],
+        "type": "string",
+        "simplifiedType": "\"Delete passkey\"",
+        "required": true,
+        "deprecated": false
+      },
+      {
+        "name": "deletePasskeyWarning",
+        "description": "",
+        "tags": [
+          {
+            "name": "remarks",
+            "text": "`\"This action cannot be undone. You will need to add this passkey again before you can use it to sign in.\"`"
+          }
+        ],
+        "type": "string",
+        "simplifiedType": "\"This action cannot be undone. You will need to add this passkey again before you can use it to sign in.\"",
+        "required": true,
+        "deprecated": false
+      },
+      {
+        "name": "passkeys",
+        "description": "",
+        "tags": [{ "name": "remarks", "text": "`\"Passkeys\"`" }],
+        "type": "string",
+        "simplifiedType": "\"Passkeys\"",
+        "required": true,
+        "deprecated": false
+      },
+      {
+        "name": "passkeysDescription",
+        "description": "",
+        "tags": [
+          {
+            "name": "remarks",
+            "text": "`\"Create a passkey to securely access your account.\"`"
+          }
+        ],
+        "type": "string",
+        "simplifiedType": "\"Create a passkey to securely access your account.\"",
+        "required": true,
+        "deprecated": false
+      },
+      {
+        "name": "noPasskeys",
+        "description": "",
+        "tags": [{ "name": "remarks", "text": "`\"No passkeys\"`" }],
+        "type": "string",
+        "simplifiedType": "\"No passkeys\"",
+        "required": true,
+        "deprecated": false
+      },
+      {
+        "name": "name",
+        "description": "",
+        "tags": [{ "name": "remarks", "text": "`\"Name\"`" }],
+        "type": "string",
+        "simplifiedType": "\"Name\"",
+        "required": true,
+        "deprecated": false
+      }
+    ]
+  }
+]

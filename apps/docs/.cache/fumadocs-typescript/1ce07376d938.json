@@ -1,0 +1,18 @@
+[
+  {
+    "id": "passkeys.tsx-PasskeysProps",
+    "name": "PasskeysProps",
+    "description": "",
+    "entries": [
+      {
+        "name": "className",
+        "description": "",
+        "tags": [],
+        "type": "string",
+        "simplifiedType": "string",
+        "required": false,
+        "deprecated": false
+      }
+    ]
+  }
+]

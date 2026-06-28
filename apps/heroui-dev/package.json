@@ -11,17 +11,17 @@
     "cf-typegen": "wrangler types"
   },
   "devDependencies": {
-    "@cloudflare/vite-plugin": "^1.42.0",
-    "@tanstack/devtools-vite": "^0.7.0",
-    "@types/node": "^25.9.4",
+    "@cloudflare/vite-plugin": "^1.42.3",
+    "@tanstack/devtools-vite": "^0.7.2",
+    "@types/node": "^26.0.1",
     "@types/nodemailer": "^8.0.1",
     "@types/react": "^19.2.15",
     "@types/react-dom": "^19.2.0",
-    "@vitejs/plugin-react": "^6.0.2",
+    "@vitejs/plugin-react": "^6.0.3",
     "drizzle-kit": "^0.31.10",
     "typescript": "^6.0.3",
-    "vite": "^8.0.14",
-    "wrangler": "^4.102.0"
+    "vite": "^8.1.0",
+    "wrangler": "^4.105.0"
   },
   "dependencies": {
     "@better-auth-ui/core": "*",
@@ -36,8 +36,8 @@
     "@react-email/components": "^1.0.12",
     "@react-email/render": "^2.0.9",
     "@tailwindcss/vite": "^4.3.1",
-    "@tanstack/react-devtools": "^0.10.5",
-    "@tanstack/react-query": "^5.100.14",
+    "@tanstack/react-devtools": "^0.10.8",
+    "@tanstack/react-query": "^5.101.2",
     "@tanstack/react-router": "^1.170.16",
     "@tanstack/react-router-devtools": "^1.167.0",
     "@tanstack/react-router-ssr-query": "^1.167.0",
@@ -49,7 +49,7 @@
     "nodemailer": "^9.0.1",
     "react": "^19.2.6",
     "react-dom": "^19.2.6",
-    "react-email": "^6.6.3",
+    "react-email": "^6.6.5",
     "tailwind-variants": "^3.2.2",
     "tailwindcss": "^4.3.1"
   }

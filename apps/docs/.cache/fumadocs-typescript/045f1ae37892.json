@@ -1,0 +1,18 @@
+[
+  {
+    "id": "reset-password.tsx-ResetPasswordProps",
+    "name": "ResetPasswordProps",
+    "description": "",
+    "entries": [
+      {
+        "name": "className",
+        "description": "",
+        "tags": [],
+        "type": "string",
+        "simplifiedType": "string",
+        "required": false,
+        "deprecated": false
+      }
+    ]
+  }
+]

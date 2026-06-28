@@ -1,0 +1,36 @@
+[
+  {
+    "id": "send-verification-email-mutation.ts-SendVerificationEmailParams",
+    "name": "SendVerificationEmailParams",
+    "description": "",
+    "entries": [
+      {
+        "name": "callbackURL",
+        "description": "",
+        "tags": [],
+        "type": "string",
+        "simplifiedType": "string",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "email",
+        "description": "",
+        "tags": [],
+        "type": "string",
+        "simplifiedType": "string",
+        "required": true,
+        "deprecated": false
+      },
+      {
+        "name": "fetchOptions",
+        "description": "",
+        "tags": [],
+        "type": "ClientFetchOption<Partial<{ email: string; callbackURL?: string; }> & Record<string, any>, Partial<Record<string, any>> & Record<string, any>, Record<string, any>>",
+        "simplifiedType": "ClientFetchOption<Record<string, any> & Partial<object>, Record<string, any> & Partial<Record<string, any>>, union>",
+        "required": false,
+        "deprecated": false
+      }
+    ]
+  }
+]

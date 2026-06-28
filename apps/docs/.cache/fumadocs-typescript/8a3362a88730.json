@@ -1,0 +1,99 @@
+[
+  {
+    "id": "organization-switcher.tsx-OrganizationSwitcherProps",
+    "name": "OrganizationSwitcherProps",
+    "description": "Props for the `OrganizationSwitcher` component.",
+    "entries": [
+      {
+        "name": "className",
+        "description": "",
+        "tags": [],
+        "type": "string",
+        "simplifiedType": "string",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "align",
+        "description": "",
+        "tags": [],
+        "type": "\"start\" | \"center\" | \"end\"",
+        "simplifiedType": "\"start\" | \"center\" | \"end\"",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "side",
+        "description": "",
+        "tags": [],
+        "type": "\"bottom\" | \"top\" | \"left\" | \"right\"",
+        "simplifiedType": "\"bottom\" | \"top\" | \"left\" | \"right\"",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "sideOffset",
+        "description": "",
+        "tags": [],
+        "type": "number",
+        "simplifiedType": "number",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "trigger",
+        "description": "",
+        "tags": [],
+        "type": "ReactElement<DropdownMenuTriggerProps & RefAttributes<HTMLButtonElement>, string | JSXElementConstructor<any>>",
+        "simplifiedType": "object",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "hideCreate",
+        "description": "",
+        "tags": [],
+        "type": "boolean",
+        "simplifiedType": "boolean",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "hidePersonal",
+        "description": "",
+        "tags": [],
+        "type": "boolean",
+        "simplifiedType": "boolean",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "hideSettings",
+        "description": "",
+        "tags": [],
+        "type": "boolean",
+        "simplifiedType": "boolean",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "hideSlug",
+        "description": "",
+        "tags": [],
+        "type": "boolean",
+        "simplifiedType": "boolean",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "setActive",
+        "description": "",
+        "tags": [],
+        "type": "((organization: Organization | null) => void)",
+        "simplifiedType": "function",
+        "required": false,
+        "deprecated": false
+      }
+    ]
+  }
+]

@@ -1,0 +1,54 @@
+[
+  {
+    "id": "theme-localization.ts-ThemeLocalization",
+    "name": "ThemeLocalization",
+    "description": "",
+    "entries": [
+      {
+        "name": "appearance",
+        "description": "",
+        "tags": [{ "name": "remarks", "text": "`\"Appearance\"`" }],
+        "type": "string",
+        "simplifiedType": "\"Appearance\"",
+        "required": true,
+        "deprecated": false
+      },
+      {
+        "name": "theme",
+        "description": "",
+        "tags": [{ "name": "remarks", "text": "`\"Theme\"`" }],
+        "type": "string",
+        "simplifiedType": "\"Theme\"",
+        "required": true,
+        "deprecated": false
+      },
+      {
+        "name": "system",
+        "description": "",
+        "tags": [{ "name": "remarks", "text": "`\"System\"`" }],
+        "type": "string",
+        "simplifiedType": "\"System\"",
+        "required": true,
+        "deprecated": false
+      },
+      {
+        "name": "light",
+        "description": "",
+        "tags": [{ "name": "remarks", "text": "`\"Light\"`" }],
+        "type": "string",
+        "simplifiedType": "\"Light\"",
+        "required": true,
+        "deprecated": false
+      },
+      {
+        "name": "dark",
+        "description": "",
+        "tags": [{ "name": "remarks", "text": "`\"Dark\"`" }],
+        "type": "string",
+        "simplifiedType": "\"Dark\"",
+        "required": true,
+        "deprecated": false
+      }
+    ]
+  }
+]
