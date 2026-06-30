@@ -4,11 +4,8 @@ import type { OrganizationAuthClient } from "./organization-auth-client"
 import { organizationMutationKeys } from "./organization-mutation-keys"
 import { organizationQueryKeys } from "./organization-query-keys"
 
-export type CancelInvitationFn<TAuthClient extends OrganizationAuthClient> =
-  TAuthClient["organization"]["cancelInvitation"]
-
 export type CancelInvitationParams<TAuthClient extends OrganizationAuthClient> =
-  Parameters<CancelInvitationFn<TAuthClient>>[0]
+  Parameters<TAuthClient["organization"]["cancelInvitation"]>[0]
 
 export type CancelInvitationOptions<
   TAuthClient extends OrganizationAuthClient
@@ -17,6 +14,12 @@ export type CancelInvitationOptions<
   "mutationKey" | "mutationFn" | "meta"
 >
 
+/**
+ * Mutation options factory for canceling a pending organization invitation.
+ *
+ * @param authClient - The Better Auth organization client.
+ * @param userId - The current signed-in user's ID. Used for cache invalidation.
+ */
 export function cancelInvitationOptions<
   TAuthClient extends OrganizationAuthClient
 >(authClient: TAuthClient, userId?: string) {

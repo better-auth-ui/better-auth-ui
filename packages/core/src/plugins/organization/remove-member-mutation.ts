@@ -4,13 +4,9 @@ import type { OrganizationAuthClient } from "./organization-auth-client"
 import { organizationMutationKeys } from "./organization-mutation-keys"
 import { organizationQueryKeys } from "./organization-query-keys"
 
-export type RemoveMemberFn<
-  TAuthClient extends OrganizationAuthClient = OrganizationAuthClient
-> = TAuthClient["organization"]["removeMember"]
-
 export type RemoveMemberParams<
   TAuthClient extends OrganizationAuthClient = OrganizationAuthClient
-> = Parameters<RemoveMemberFn<TAuthClient>>[0]
+> = Parameters<TAuthClient["organization"]["removeMember"]>[0]
 
 export type RemoveMemberOptions<
   TAuthClient extends OrganizationAuthClient = OrganizationAuthClient
@@ -19,6 +15,12 @@ export type RemoveMemberOptions<
   "mutationKey" | "mutationFn" | "meta"
 >
 
+/**
+ * Mutation options factory for removing a member from an organization.
+ *
+ * @param authClient - The Better Auth organization client.
+ * @param userId - The current signed-in user's ID. Used for cache invalidation.
+ */
 export function removeMemberOptions<TAuthClient extends OrganizationAuthClient>(
   authClient: TAuthClient,
   userId?: string

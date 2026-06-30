@@ -26,6 +26,16 @@ export type ActiveOrganizationOptions<
 > = Omit<QueryOptions<ActiveOrganizationData<TAuthClient>>, "queryKey"> &
   ActiveOrganizationParams<TAuthClient>
 
+/**
+ * Query options factory for the current user's active organization.
+ *
+ * `organizationSlug: null` returns `null` without a network request, while a
+ * missing user ID disables the query with `skipToken`.
+ *
+ * @param authClient - The Better Auth organization client.
+ * @param userId - The current signed-in user's ID. Used for cache partitioning.
+ * @param params - Parameters forwarded to `getFullOrganization`.
+ */
 export function activeOrganizationOptions<
   TAuthClient extends OrganizationAuthClient
 >(
@@ -59,6 +69,9 @@ export function activeOrganizationOptions<
   } satisfies QueryOptions
 }
 
+/**
+ * Get the active organization from cache, fetching if needed.
+ */
 export const ensureActiveOrganization = <
   TAuthClient extends OrganizationAuthClient
 >(
@@ -75,6 +88,9 @@ export const ensureActiveOrganization = <
   })
 }
 
+/**
+ * Prefetch the active organization into the query cache.
+ */
 export const prefetchActiveOrganization = <
   TAuthClient extends OrganizationAuthClient
 >(
@@ -91,6 +107,9 @@ export const prefetchActiveOrganization = <
   })
 }
 
+/**
+ * Fetch and cache the active organization, resolving with data or throwing.
+ */
 export const fetchActiveOrganization = <
   TAuthClient extends OrganizationAuthClient
 >(
@@ -106,6 +125,9 @@ export const fetchActiveOrganization = <
     ...queryOptions
   })
 }
+/**
+ * Read the active organization synchronously from the query cache.
+ */
 export const getActiveOrganization = <
   TAuthClient extends OrganizationAuthClient = OrganizationAuthClient
 >(

@@ -4,11 +4,8 @@ import { authQueryKeys } from "../../lib/auth-query-keys"
 import type { UsernameAuthClient } from "./username-auth-client"
 import { usernameMutationKeys } from "./username-mutation-keys"
 
-export type SignInUsernameFn<TAuthClient extends UsernameAuthClient> =
-  TAuthClient["signIn"]["username"]
-
 export type SignInUsernameParams<TAuthClient extends UsernameAuthClient> =
-  Parameters<SignInUsernameFn<TAuthClient>>[0]
+  Parameters<TAuthClient["signIn"]["username"]>[0]
 
 export type SignInUsernameOptions<TAuthClient extends UsernameAuthClient> =
   Omit<

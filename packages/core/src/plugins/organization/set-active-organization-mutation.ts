@@ -4,13 +4,9 @@ import type { OrganizationAuthClient } from "./organization-auth-client"
 import { organizationMutationKeys } from "./organization-mutation-keys"
 import { organizationQueryKeys } from "./organization-query-keys"
 
-export type SetActiveOrganizationFn<
-  TAuthClient extends OrganizationAuthClient = OrganizationAuthClient
-> = TAuthClient["organization"]["setActive"]
-
 export type SetActiveOrganizationParams<
   TAuthClient extends OrganizationAuthClient = OrganizationAuthClient
-> = Parameters<SetActiveOrganizationFn<TAuthClient>>[0]
+> = Parameters<TAuthClient["organization"]["setActive"]>[0]
 
 export type SetActiveOrganizationOptions<
   TAuthClient extends OrganizationAuthClient = OrganizationAuthClient
@@ -19,6 +15,12 @@ export type SetActiveOrganizationOptions<
   "mutationKey" | "mutationFn" | "meta"
 >
 
+/**
+ * Mutation options factory for setting the active organization.
+ *
+ * @param authClient - The Better Auth organization client.
+ * @param userId - The current signed-in user's ID. Used for cache invalidation.
+ */
 export function setActiveOrganizationOptions<
   TAuthClient extends OrganizationAuthClient
 >(authClient: TAuthClient, userId?: string) {

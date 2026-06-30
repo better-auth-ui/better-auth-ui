@@ -4,11 +4,8 @@ import { authQueryKeys } from "../../lib/auth-query-keys"
 import type { PasskeyAuthClient } from "./passkey-auth-client"
 import { passkeyMutationKeys } from "./passkey-mutation-keys"
 
-export type SignInPasskeyFn<TAuthClient extends PasskeyAuthClient> =
-  TAuthClient["signIn"]["passkey"]
-
 export type SignInPasskeyParams<TAuthClient extends PasskeyAuthClient> =
-  Parameters<SignInPasskeyFn<TAuthClient>>[0]
+  Parameters<TAuthClient["signIn"]["passkey"]>[0]
 
 export type SignInPasskeyOptions<TAuthClient extends PasskeyAuthClient> = Omit<
   ReturnType<typeof signInPasskeyOptions<TAuthClient>>,

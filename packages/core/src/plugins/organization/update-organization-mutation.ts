@@ -27,13 +27,12 @@ export function updateOrganizationOptions<
 >(authClient: TAuthClient, userId?: string, organizationId?: string) {
   const mutationKey = organizationMutationKeys.update
 
-  const mutationFn = (params: UpdateOrganizationParams<TAuthClient>) => {
-    return authClient.organization.update({
+  const mutationFn = (params: UpdateOrganizationParams<TAuthClient>) =>
+    authClient.organization.update({
       ...params,
       organizationId: params.organizationId ?? organizationId,
       fetchOptions: { ...params?.fetchOptions, throw: true }
     })
-  }
 
   return {
     mutationKey,

@@ -3,11 +3,8 @@ import type { BetterFetchError } from "better-auth/client"
 import type { OrganizationAuthClient } from "./organization-auth-client"
 import { organizationMutationKeys } from "./organization-mutation-keys"
 
-export type CheckSlugFn<TAuthClient extends OrganizationAuthClient> =
-  TAuthClient["organization"]["checkSlug"]
-
 export type CheckSlugParams<TAuthClient extends OrganizationAuthClient> =
-  Parameters<CheckSlugFn<TAuthClient>>[0]
+  Parameters<TAuthClient["organization"]["checkSlug"]>[0]
 
 export type CheckSlugOptions<TAuthClient extends OrganizationAuthClient> = Omit<
   ReturnType<typeof checkSlugOptions<TAuthClient>>,

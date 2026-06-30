@@ -20,6 +20,16 @@ export type HasPermissionOptions<
 > = Omit<QueryOptions<HasPermissionData<TAuthClient>>, "queryKey"> &
   HasPermissionParams<TAuthClient>
 
+/**
+ * Query options factory for checking organization permissions.
+ *
+ * Unlike most organization queries, `hasPermission` uses flat params rather than
+ * a nested `query` object. Missing user or organization IDs disable the query.
+ *
+ * @param authClient - The Better Auth organization client.
+ * @param userId - The current signed-in user's ID. Used for cache partitioning.
+ * @param params - Parameters forwarded to `authClient.organization.hasPermission`.
+ */
 export function hasPermissionOptions<
   TAuthClient extends OrganizationAuthClient
 >(
@@ -47,6 +57,9 @@ export function hasPermissionOptions<
   } satisfies QueryOptions
 }
 
+/**
+ * Get organization permission data from cache, fetching if needed.
+ */
 export const ensureHasPermission = <TAuthClient extends OrganizationAuthClient>(
   queryClient: QueryClient,
   authClient: TAuthClient,
@@ -66,6 +79,9 @@ export const ensureHasPermission = <TAuthClient extends OrganizationAuthClient>(
   })
 }
 
+/**
+ * Prefetch organization permission data into the query cache.
+ */
 export const prefetchHasPermission = <
   TAuthClient extends OrganizationAuthClient
 >(
@@ -87,6 +103,9 @@ export const prefetchHasPermission = <
   })
 }
 
+/**
+ * Fetch and cache organization permission data, resolving with data or throwing.
+ */
 export const fetchHasPermission = <TAuthClient extends OrganizationAuthClient>(
   queryClient: QueryClient,
   authClient: TAuthClient,
@@ -105,6 +124,9 @@ export const fetchHasPermission = <TAuthClient extends OrganizationAuthClient>(
     ...queryOptions
   })
 }
+/**
+ * Read organization permission data synchronously from the query cache.
+ */
 export const getHasPermission = <
   TAuthClient extends OrganizationAuthClient = OrganizationAuthClient
 >(

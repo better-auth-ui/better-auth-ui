@@ -4,11 +4,8 @@ import type { OrganizationAuthClient } from "./organization-auth-client"
 import { organizationMutationKeys } from "./organization-mutation-keys"
 import { organizationQueryKeys } from "./organization-query-keys"
 
-export type RejectInvitationFn<TAuthClient extends OrganizationAuthClient> =
-  TAuthClient["organization"]["rejectInvitation"]
-
 export type RejectInvitationParams<TAuthClient extends OrganizationAuthClient> =
-  Parameters<RejectInvitationFn<TAuthClient>>[0]
+  Parameters<TAuthClient["organization"]["rejectInvitation"]>[0]
 
 export type RejectInvitationOptions<
   TAuthClient extends OrganizationAuthClient
@@ -17,6 +14,12 @@ export type RejectInvitationOptions<
   "mutationKey" | "mutationFn" | "meta"
 >
 
+/**
+ * Mutation options factory for rejecting an organization invitation.
+ *
+ * @param authClient - The Better Auth organization client.
+ * @param userId - The current signed-in user's ID. Used for cache invalidation.
+ */
 export function rejectInvitationOptions<
   TAuthClient extends OrganizationAuthClient
 >(authClient: TAuthClient, userId?: string) {

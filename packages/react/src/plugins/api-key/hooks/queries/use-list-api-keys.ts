@@ -17,6 +17,13 @@ export type UseListApiKeysOptions<TAuthClient extends ApiKeyAuthClient> = Omit<
 > &
   ListApiKeysParams<TAuthClient>
 
+/**
+ * Subscribe to API keys visible to the current user.
+ *
+ * @param authClient - The Better Auth client with the API key plugin.
+ * @param options - React Query options and API key list params.
+ * @param queryClient - Optional React Query client instance.
+ */
 export function useListApiKeys<TAuthClient extends ApiKeyAuthClient>(
   authClient: TAuthClient,
   options: UseListApiKeysOptions<TAuthClient> = {},
