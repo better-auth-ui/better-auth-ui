@@ -20,15 +20,17 @@ export type UpdateOrganizationOptions<
  *
  * @param authClient - The Better Auth organization client.
  * @param userId - The current signed-in user's ID. Used for cache invalidation.
+ * @param organizationId - Optional organization ID fallback when params omit it.
  */
 export function updateOrganizationOptions<
   TAuthClient extends OrganizationAuthClient
->(authClient: TAuthClient, userId?: string) {
+>(authClient: TAuthClient, userId?: string, organizationId?: string) {
   const mutationKey = organizationMutationKeys.update
 
   const mutationFn = (params: UpdateOrganizationParams<TAuthClient>) => {
     return authClient.organization.update({
       ...params,
+      organizationId: params.organizationId ?? organizationId,
       fetchOptions: { ...params?.fetchOptions, throw: true }
     })
   }
