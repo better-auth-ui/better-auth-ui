@@ -1,5 +1,5 @@
 ---
-title: addPasskeyOptions
+title: useAddPasskey
 description: Register a new passkey for the current user.
 ---
 
@@ -9,9 +9,9 @@ Requires the Better Auth passkey plugin.
 
 ```tsx
 import { addPasskeyOptions } from "@better-auth-ui/core/plugins/passkey"
-import { createMutation } from "@tanstack/solid-query"
+import { useMutation } from "@tanstack/solid-query"
 
-const addPasskey = createMutation(() => addPasskeyOptions(authClient))
+const addPasskey = useMutation(() => addPasskeyOptions(authClient))
 
 addPasskey.mutate({ name: "Work laptop" })
 ```

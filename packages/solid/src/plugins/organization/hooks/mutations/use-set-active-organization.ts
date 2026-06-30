@@ -33,8 +33,7 @@ export function useSetActiveOrganization<
   queryClient?: Accessor<QueryClient>
 ) {
   const session = useSession(authClient, undefined, queryClient)
-  const contextQueryClient = useQueryClient(queryClient?.())
-  const mutationQueryClient = () => queryClient?.() ?? contextQueryClient
+  const mutationQueryClient = useQueryClient(queryClient?.())
   const userId = () =>
     (session.data as { user?: { id?: string } } | undefined)?.user?.id
   const organizationsQuery = useListOrganizations(
@@ -56,19 +55,19 @@ export function useSetActiveOrganization<
         // Cancel any outgoing refetches across every slug-partitioned
         // active-organization cache entry so they don't overwrite our
         // optimistic update.
-        await mutationQueryClient().cancelQueries({
+        await mutationQueryClient.cancelQueries({
           queryKey: organizationQueryKeys.activeOrganizations(userId())
         })
 
         // Snapshot every slug-partitioned variant so the rollback hits
         // whichever cache entry the UI is actually subscribed to.
-        const previousOrganizations = mutationQueryClient().getQueriesData({
+        const previousOrganizations = mutationQueryClient.getQueriesData({
           queryKey: organizationQueryKeys.activeOrganizations(userId())
         })
 
         // Optimistically update to the new value
         if (variables?.organizationId === null) {
-          mutationQueryClient().setQueriesData(
+          mutationQueryClient.setQueriesData(
             { queryKey: organizationQueryKeys.activeOrganizations(userId()) },
             null
           )
@@ -90,7 +89,7 @@ export function useSetActiveOrganization<
         )
 
         if (newOrganization) {
-          mutationQueryClient().setQueriesData(
+          mutationQueryClient.setQueriesData(
             { queryKey: organizationQueryKeys.activeOrganizations(userId()) },
             newOrganization
           )
@@ -117,7 +116,7 @@ export function useSetActiveOrganization<
 
         if (previousOrganizations?.length) {
           for (const [queryKey, data] of previousOrganizations) {
-            mutationQueryClient().setQueryData(queryKey, data)
+            mutationQueryClient.setQueryData(queryKey, data)
           }
         }
 
@@ -131,7 +130,7 @@ export function useSetActiveOrganization<
       // Always refetch after error or success — invalidate every
       // slug-partitioned variant via the broader prefix.
       onSettled: async (data, error, variables, onMutateResult, context) => {
-        await mutationQueryClient().invalidateQueries({
+        await mutationQueryClient.invalidateQueries({
           queryKey: organizationQueryKeys.activeOrganizations(userId())
         })
 

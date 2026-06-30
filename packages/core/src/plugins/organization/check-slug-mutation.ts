@@ -9,18 +9,10 @@ export type CheckSlugFn<TAuthClient extends OrganizationAuthClient> =
 export type CheckSlugParams<TAuthClient extends OrganizationAuthClient> =
   Parameters<CheckSlugFn<TAuthClient>>[0]
 
-export type CheckOrganizationSlugParams<
-  TAuthClient extends OrganizationAuthClient = OrganizationAuthClient
-> = CheckSlugParams<TAuthClient>
-
 export type CheckSlugOptions<TAuthClient extends OrganizationAuthClient> = Omit<
   ReturnType<typeof checkSlugOptions<TAuthClient>>,
   "mutationKey" | "mutationFn"
 >
-
-export type CheckOrganizationSlugOptions<
-  TAuthClient extends OrganizationAuthClient = OrganizationAuthClient
-> = CheckSlugOptions<TAuthClient>
 
 /**
  * Mutation options factory for checking organization slug availability.
@@ -47,5 +39,3 @@ export function checkSlugOptions<TAuthClient extends OrganizationAuthClient>(
     Parameters<typeof mutationFn>[0]
   >
 }
-
-export const checkOrganizationSlugOptions = checkSlugOptions

@@ -1,5 +1,5 @@
 ---
-title: deletePasskeyOptions
+title: useDeletePasskey
 description: Delete a passkey from the current user's account.
 ---
 
@@ -9,9 +9,9 @@ Requires the Better Auth passkey plugin.
 
 ```tsx
 import { deletePasskeyOptions } from "@better-auth-ui/core/plugins/passkey"
-import { createMutation } from "@tanstack/solid-query"
+import { useMutation } from "@tanstack/solid-query"
 
-const deletePasskey = createMutation(() => deletePasskeyOptions(authClient))
+const deletePasskey = useMutation(() => deletePasskeyOptions(authClient))
 
 deletePasskey.mutate({ id: "passkey-id" })
 ```

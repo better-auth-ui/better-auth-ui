@@ -3302,7 +3302,7 @@ describe("Solid registry isolation", () => {
     expect(organizationPluginDoc).toContain("useActiveOrganization()")
     expect(organizationPluginDoc).toContain("useHasPermission()")
     expect(organizationPluginDoc).toContain("useCreateOrganization()")
-    expect(organizationPluginDoc).toContain("useCheckOrganizationSlug()")
+    expect(organizationPluginDoc).toContain("useCheckSlug()")
     expect(organizationPluginDoc).not.toContain(
       "useCreateOrganization(authClient)"
     )
@@ -3371,7 +3371,7 @@ describe("Solid registry isolation", () => {
     expect(organizationRegistry).toContain("hideSlug?: boolean")
     expect(organizationRegistry).toContain("hideCreate?: boolean")
     expect(organizationRegistry).toContain("CreateOrganizationDialog")
-    expect(organizationRegistry).toContain("useCheckOrganizationSlug")
+    expect(organizationRegistry).toContain("useCheckSlug")
     expect(organizationRegistry).toContain("organization-row.tsx")
     expect(organizationPayload.registryDependencies).toEqual([
       solidRegistryUrl("user-view")

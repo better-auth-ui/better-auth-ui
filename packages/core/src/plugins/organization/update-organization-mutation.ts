@@ -19,14 +19,13 @@ export type UpdateOrganizationOptions<
   "mutationKey" | "mutationFn" | "meta"
 >
 
-export const updateOrganizationMeta = (userId: string | undefined) => ({
-  awaits: [
-    organizationQueryKeys.lists(userId),
-    organizationQueryKeys.fullDetails(userId),
-    organizationQueryKeys.activeOrganizations(userId)
-  ]
-})
-
+/**
+ * Mutation options factory for updating an organization.
+ *
+ * @param authClient - The Better Auth organization client.
+ * @param userId - The current signed-in user's ID. Used for cache invalidation.
+ * @param organizationId - Optional organization ID fallback when params omit it.
+ */
 export function updateOrganizationOptions<
   TAuthClient extends OrganizationAuthClient
 >(authClient: TAuthClient, userId?: string, organizationId?: string) {
@@ -48,7 +47,13 @@ export function updateOrganizationOptions<
   return {
     mutationKey,
     mutationFn,
-    meta: updateOrganizationMeta(userId)
+    meta: {
+      awaits: [
+        organizationQueryKeys.lists(userId),
+        organizationQueryKeys.fullDetails(userId),
+        organizationQueryKeys.activeOrganizations(userId)
+      ]
+    }
   } as MutationOptions<
     Awaited<ReturnType<typeof mutationFn>>,
     BetterFetchError,

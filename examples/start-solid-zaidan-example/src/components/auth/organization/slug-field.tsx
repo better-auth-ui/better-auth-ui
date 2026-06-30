@@ -3,7 +3,7 @@ import type {
   OrganizationLocalization
 } from "@better-auth-ui/core/plugins/organization"
 import { useAuth } from "@better-auth-ui/solid"
-import { useCheckOrganizationSlug } from "@better-auth-ui/solid/plugins/organization"
+import { useCheckSlug } from "@better-auth-ui/solid/plugins/organization"
 import { createDebounce } from "@solid-primitives/debounce"
 import { Check, LoaderCircle, X } from "lucide-solid"
 import { createEffect } from "solid-js"
@@ -30,7 +30,7 @@ const organizationFallbackLocalization = {
 
 export function SlugField(props: SlugFieldProps) {
   const auth = useAuth<OrganizationAuthClient>()
-  const checkOrganizationSlug = useCheckOrganizationSlug(auth.authClient)
+  const slugAvailability = useCheckSlug(auth.authClient)
   const organizationPluginConfig = () =>
     auth.plugins.find((plugin) => plugin.id === organizationPlugin.id) as
       | {
@@ -50,12 +50,12 @@ export function SlugField(props: SlugFieldProps) {
     props.value.trim() !== props.currentSlug
 
   const debouncedCheck = createDebounce((slug: string) => {
-    checkOrganizationSlug.mutate({ slug })
+    slugAvailability.mutate({ slug })
   }, 300)
 
   createEffect(() => {
     if (!shouldCheckSlug()) {
-      checkOrganizationSlug.reset()
+      slugAvailability.reset()
       return
     }
 
@@ -80,9 +80,9 @@ export function SlugField(props: SlugFieldProps) {
         />
         {shouldCheckSlug() ? (
           <span class="absolute inset-y-0 right-3 inline-flex items-center">
-            {checkOrganizationSlug.data?.status ? (
+            {slugAvailability.data?.status ? (
               <Check class="size-4 text-foreground" />
-            ) : checkOrganizationSlug.error ? (
+            ) : slugAvailability.error ? (
               <X class="size-4 text-destructive" />
             ) : (
               <LoaderCircle class="size-4 animate-spin text-muted-foreground" />

@@ -23,6 +23,13 @@ export type ListOrganizationInvitationsOptions<
 > &
   ListOrganizationInvitationsParams<TAuthClient>
 
+/**
+ * Query options factory for organization invitations visible to the current user.
+ *
+ * @param authClient - The Better Auth organization client.
+ * @param userId - The current signed-in user's ID. Used for cache partitioning.
+ * @param params - Parameters forwarded to `authClient.organization.listInvitations`.
+ */
 export function listOrganizationInvitationsOptions<
   TAuthClient extends OrganizationAuthClient
 >(
@@ -32,19 +39,24 @@ export function listOrganizationInvitationsOptions<
 ) {
   type TData = ListOrganizationInvitationsData<TAuthClient>
   const queryKey = organizationQueryKeys.invitations.list(userId, params?.query)
+  const query = params?.query as { organizationId?: string } | undefined
 
   return {
     queryKey,
-    queryFn: userId
-      ? ({ signal }) =>
-          authClient.organization.listInvitations({
-            ...params,
-            fetchOptions: { ...params?.fetchOptions, signal, throw: true }
-          }) as Promise<TData>
-      : skipToken
+    queryFn:
+      userId && query?.organizationId
+        ? ({ signal }) =>
+            authClient.organization.listInvitations({
+              ...params,
+              fetchOptions: { ...params?.fetchOptions, signal, throw: true }
+            }) as Promise<TData>
+        : skipToken
   } satisfies QueryOptions
 }
 
+/**
+ * Get organization invitations from the cache, fetching if needed.
+ */
 export const ensureListOrganizationInvitations = <
   TAuthClient extends OrganizationAuthClient
 >(
@@ -64,6 +76,9 @@ export const ensureListOrganizationInvitations = <
   })
 }
 
+/**
+ * Prefetch organization invitations into the query cache.
+ */
 export const prefetchListOrganizationInvitations = <
   TAuthClient extends OrganizationAuthClient
 >(
@@ -83,6 +98,9 @@ export const prefetchListOrganizationInvitations = <
   })
 }
 
+/**
+ * Fetch and cache organization invitations, resolving with data or throwing on error.
+ */
 export const fetchListOrganizationInvitations = <
   TAuthClient extends OrganizationAuthClient
 >(
@@ -101,6 +119,9 @@ export const fetchListOrganizationInvitations = <
     ...queryOptions
   })
 }
+/**
+ * Read organization invitations synchronously from the query cache without fetching.
+ */
 export const getListOrganizationInvitations = <
   TAuthClient extends OrganizationAuthClient = OrganizationAuthClient
 >(

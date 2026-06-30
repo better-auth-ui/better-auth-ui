@@ -17,13 +17,6 @@ export type CancelInvitationOptions<
   "mutationKey" | "mutationFn" | "meta"
 >
 
-export const cancelInvitationMeta = (userId: string | undefined) => ({
-  awaits: [
-    organizationQueryKeys.invitations.all(userId),
-    organizationQueryKeys.fullDetails(userId)
-  ]
-})
-
 export function cancelInvitationOptions<
   TAuthClient extends OrganizationAuthClient
 >(authClient: TAuthClient, userId?: string) {
@@ -38,7 +31,12 @@ export function cancelInvitationOptions<
   return {
     mutationKey,
     mutationFn,
-    meta: cancelInvitationMeta(userId)
+    meta: {
+      awaits: [
+        organizationQueryKeys.invitations.all(userId),
+        organizationQueryKeys.fullDetails(userId)
+      ]
+    }
   } as MutationOptions<
     Awaited<ReturnType<typeof mutationFn>>,
     BetterFetchError,

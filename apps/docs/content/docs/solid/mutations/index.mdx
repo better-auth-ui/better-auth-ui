@@ -10,17 +10,17 @@ import { useSignInEmail } from "@better-auth-ui/solid"
 import { signInEmailOptions } from "@better-auth-ui/core"
 ```
 
-Use the hook in components. Use the core factory anywhere Solid Query takes a `mutationOptions` object — `createMutation`, global mutation state checks, or a `MutationCache` observer.
+Use the hook in components. Use the core factory anywhere Solid Query takes a `mutationOptions` object — `useMutation`, global mutation state checks, or a `MutationCache` observer.
 
 ## Error handling
 
-Every mutation wires `throw: true` into `fetchOptions`, so the promise rejects with a `BetterFetchError` on failure instead of resolving with `{ error }`. This means you can rely on `error`, `isError`, `throwOnError`, and standard `onError` handlers from `createMutation`.
+Every mutation wires `throw: true` into `fetchOptions`, so the promise rejects with a `BetterFetchError` on failure instead of resolving with `{ error }`. This means you can rely on `error`, `isError`, `throwOnError`, and standard `onError` handlers from `useMutation`.
 
 ```tsx
 import { signInEmailOptions } from "@better-auth-ui/core"
-import { createMutation } from "@tanstack/solid-query"
+import { useMutation } from "@tanstack/solid-query"
 
-const signIn = createMutation(() => ({
+const signIn = useMutation(() => ({
   ...signInEmailOptions(authClient),
   onError: (err) => toast.error(err.message)
 }))
@@ -97,7 +97,7 @@ mutation.mutate({ email: "user@example.com", type: "sign-in" })
 
 Variables are inferred from `authFn`'s parameter — required params reject `mutate()` at the type level, optional-param methods (e.g. `signOut`) allow it. `throw: true` is wired into `fetchOptions` so `onError` and `error` get a `BetterFetchError`.
 
-For shared mutation registration, global mutation state checks, a `MutationCache` observer, or manual `createMutation`, use the factory directly:
+For shared mutation registration, global mutation state checks, a `MutationCache` observer, or manual `useMutation`, use the factory directly:
 
 ```ts
 authMutationOptions(authClient.emailOtp.sendVerificationOtp, [
@@ -114,31 +114,31 @@ For endpoints that already have a key in `authMutationKeys`, prefer it over an i
 ### Auth
 
 <Cards>
-  <Card title="signInEmailOptions" href="/docs/solid/mutations/sign-in-email" />
-  <Card title="signInUsernameOptions" href="/docs/solid/mutations/sign-in-username" />
+  <Card title="useSignInEmail" href="/docs/solid/mutations/sign-in-email" />
+  <Card title="useSignInUsername" href="/docs/solid/mutations/sign-in-username" />
   <Card title="useSignInMagicLink" href="/docs/solid/mutations/sign-in-magic-link" />
-  <Card title="signInPasskeyOptions" href="/docs/solid/mutations/sign-in-passkey" />
-  <Card title="signInSocialOptions" href="/docs/solid/mutations/sign-in-social" />
-  <Card title="signUpEmailOptions" href="/docs/solid/mutations/sign-up-email" />
+  <Card title="useSignInPasskey" href="/docs/solid/mutations/sign-in-passkey" />
+  <Card title="useSignInSocial" href="/docs/solid/mutations/sign-in-social" />
+  <Card title="useSignUpEmail" href="/docs/solid/mutations/sign-up-email" />
   <Card title="useSignOut" href="/docs/solid/mutations/sign-out" />
   <Card title="useRequestPasswordReset" href="/docs/solid/mutations/request-password-reset" />
-  <Card title="resetPasswordOptions" href="/docs/solid/mutations/reset-password" />
+  <Card title="useResetPassword" href="/docs/solid/mutations/reset-password" />
   <Card title="useSendVerificationEmail" href="/docs/solid/mutations/send-verification-email" />
-  <Card title="isUsernameAvailableOptions" href="/docs/solid/mutations/is-username-available" />
+  <Card title="useIsUsernameAvailable" href="/docs/solid/mutations/is-username-available" />
 </Cards>
 
 ### Settings
 
 <Cards>
   <Card title="useUpdateUser" href="/docs/solid/mutations/update-user" />
-  <Card title="changeEmailOptions" href="/docs/solid/mutations/change-email" />
-  <Card title="changePasswordOptions" href="/docs/solid/mutations/change-password" />
-  <Card title="deleteUserOptions" href="/docs/solid/mutations/delete-user" />
-  <Card title="linkSocialOptions" href="/docs/solid/mutations/link-social" />
-  <Card title="unlinkAccountOptions" href="/docs/solid/mutations/unlink-account" />
-  <Card title="addPasskeyOptions" href="/docs/solid/mutations/add-passkey" />
-  <Card title="deletePasskeyOptions" href="/docs/solid/mutations/delete-passkey" />
-  <Card title="revokeSessionOptions" href="/docs/solid/mutations/revoke-session" />
+  <Card title="useChangeEmail" href="/docs/solid/mutations/change-email" />
+  <Card title="useChangePassword" href="/docs/solid/mutations/change-password" />
+  <Card title="useDeleteUser" href="/docs/solid/mutations/delete-user" />
+  <Card title="useLinkSocial" href="/docs/solid/mutations/link-social" />
+  <Card title="useUnlinkAccount" href="/docs/solid/mutations/unlink-account" />
+  <Card title="useAddPasskey" href="/docs/solid/mutations/add-passkey" />
+  <Card title="useDeletePasskey" href="/docs/solid/mutations/delete-passkey" />
+  <Card title="useRevokeSession" href="/docs/solid/mutations/revoke-session" />
   <Card title="useRevokeMultiSession" href="/docs/solid/mutations/revoke-multi-session" />
   <Card title="useSetActiveSession" href="/docs/solid/mutations/set-active-session" />
   <Card title="useCreateApiKey" href="/docs/solid/mutations/create-api-key" />
@@ -159,5 +159,5 @@ For endpoints that already have a key in `authMutationKeys`, prefer it over an i
   <Card title="useAcceptInvitation" href="/docs/solid/mutations/accept-invitation" />
   <Card title="useCancelInvitation" href="/docs/solid/mutations/cancel-invitation" />
   <Card title="useRejectInvitation" href="/docs/solid/mutations/reject-invitation" />
-  <Card title="useCheckOrganizationSlug" href="/docs/solid/mutations/check-organization-slug" />
+  <Card title="useCheckSlug" href="/docs/solid/mutations/check-organization-slug" />
 </Cards>

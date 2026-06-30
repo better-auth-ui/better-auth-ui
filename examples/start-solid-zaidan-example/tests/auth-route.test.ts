@@ -2950,6 +2950,13 @@ describe("Solid auth route component selection", () => {
       ),
       "utf8"
     )
+    const coreActiveOrganizationQuery = readFileSync(
+      resolve(
+        __dirname,
+        "../../../packages/core/src/plugins/organization/active-organization-query.ts"
+      ),
+      "utf8"
+    )
     const listMembersQuery = readFileSync(
       resolve(
         __dirname,
@@ -2976,7 +2983,7 @@ describe("Solid auth route component selection", () => {
       "organizationId={activeOrganization.data?.id}"
     )
     expect(activeOrganizationQuery).toContain("slug === null")
-    expect(activeOrganizationQuery).toContain("async () => null")
+    expect(coreActiveOrganizationQuery).toContain("async () => null")
     expect(listMembersQuery).toContain("activeOrganization.data?.id")
   })
 
@@ -3593,8 +3600,8 @@ describe("Solid auth route component selection", () => {
     expect(createDialog).toContain('id="create-organization-slug"')
     expect(slugField).toContain("export function sanitizeSlug")
     expect(slugField).toContain('replace(/[^a-z0-9]+/g, "-")')
-    expect(slugField).toContain("useCheckOrganizationSlug")
-    expect(slugField).not.toContain("useCheckSlug")
+    expect(slugField).toContain("useCheckSlug")
+    expect(slugField).toContain("@better-auth-ui/solid/plugins/organization")
     expect(slugField).toContain("currentSlug")
     expect(slugField).toContain("checkSlug")
     expect(organizations).toContain("CreateOrganizationDialog")

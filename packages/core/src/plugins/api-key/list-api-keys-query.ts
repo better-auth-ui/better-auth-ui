@@ -24,6 +24,13 @@ export type ListApiKeysOptions<
 > = Omit<QueryOptions<ListApiKeysData<TAuthClient>>, "queryKey"> &
   ListApiKeysParams<TAuthClient>
 
+/**
+ * Query options factory for the current user's API keys.
+ *
+ * @param authClient - The Better Auth API key client.
+ * @param userId - The current signed-in user's ID. Used for cache partitioning.
+ * @param params - Parameters forwarded to `authClient.apiKey.list`.
+ */
 export function listApiKeysOptions<TAuthClient extends ApiKeyAuthClient>(
   authClient: TAuthClient,
   userId?: string,
@@ -31,19 +38,29 @@ export function listApiKeysOptions<TAuthClient extends ApiKeyAuthClient>(
 ) {
   type TData = ListApiKeysData<TAuthClient>
   const queryKey = apiKeyQueryKeys.list(userId, params?.query)
+  const query = params?.query as
+    | { configId?: string; organizationId?: string }
+    | undefined
+  const hasRequiredParams =
+    query?.configId === "organization" ? Boolean(query.organizationId) : true
 
   return {
     queryKey,
-    queryFn: userId
-      ? ({ signal }) =>
-          authClient.apiKey.list({
-            ...params,
-            fetchOptions: { ...params?.fetchOptions, signal, throw: true }
-          }) as Promise<TData>
-      : skipToken
+    queryFn:
+      userId && hasRequiredParams
+        ? ({ signal }) =>
+            authClient.apiKey.list({
+              ...params,
+              fetchOptions: { ...params?.fetchOptions, signal, throw: true }
+            }) as Promise<TData>
+        : skipToken
   } satisfies QueryOptions
 }
 
+/**
+ * Get API keys from the cache, fetching them if no cached entry exists.
+ * Useful for loaders and guards that need the data before rendering.
+ */
 export const ensureListApiKeys = <TAuthClient extends ApiKeyAuthClient>(
   queryClient: QueryClient,
   authClient: TAuthClient,
@@ -58,6 +75,10 @@ export const ensureListApiKeys = <TAuthClient extends ApiKeyAuthClient>(
   })
 }
 
+/**
+ * Prefetch API keys into the query cache without returning the data.
+ * Use this to warm the cache ahead of navigation.
+ */
 export const prefetchListApiKeys = <TAuthClient extends ApiKeyAuthClient>(
   queryClient: QueryClient,
   authClient: TAuthClient,
@@ -72,6 +93,9 @@ export const prefetchListApiKeys = <TAuthClient extends ApiKeyAuthClient>(
   })
 }
 
+/**
+ * Fetch and cache API keys, resolving with data or throwing on error.
+ */
 export const fetchListApiKeys = <TAuthClient extends ApiKeyAuthClient>(
   queryClient: QueryClient,
   authClient: TAuthClient,
@@ -85,6 +109,9 @@ export const fetchListApiKeys = <TAuthClient extends ApiKeyAuthClient>(
     ...queryOptions
   })
 }
+/**
+ * Read API keys synchronously from the query cache without fetching.
+ */
 export const getListApiKeys = <
   TAuthClient extends ApiKeyAuthClient = ApiKeyAuthClient
 >(

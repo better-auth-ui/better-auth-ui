@@ -3,7 +3,7 @@ import {
   isUsernameAvailableOptions,
   type UsernameAuthClient
 } from "@better-auth-ui/core/plugins/username"
-import { useMutation } from "@tanstack/react-query"
+import { type QueryClient, useMutation } from "@tanstack/react-query"
 
 /**
  * Create a mutation for checking whether a username is available.
@@ -13,13 +13,18 @@ import { useMutation } from "@tanstack/react-query"
  *
  * @param authClient - The Better Auth client with the username plugin.
  * @param options - React Query options forwarded to `useMutation`.
+ * @param queryClient - Optional React Query client to scope this mutation to.
  */
 export function useIsUsernameAvailable<TAuthClient extends UsernameAuthClient>(
   authClient: TAuthClient,
-  options?: IsUsernameAvailableOptions<TAuthClient>
+  options?: IsUsernameAvailableOptions<TAuthClient>,
+  queryClient?: QueryClient
 ) {
-  return useMutation({
-    ...isUsernameAvailableOptions(authClient),
-    ...options
-  })
+  return useMutation(
+    {
+      ...isUsernameAvailableOptions(authClient),
+      ...options
+    },
+    queryClient
+  )
 }

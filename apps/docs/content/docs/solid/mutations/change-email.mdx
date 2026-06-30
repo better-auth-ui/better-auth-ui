@@ -1,5 +1,5 @@
 ---
-title: changeEmailOptions
+title: useChangeEmail
 description: Change the current user's email address.
 ---
 
@@ -7,9 +7,9 @@ description: Change the current user's email address.
 
 ```tsx
 import { changeEmailOptions } from "@better-auth-ui/core"
-import { createMutation } from "@tanstack/solid-query"
+import { useMutation } from "@tanstack/solid-query"
 
-const changeEmail = createMutation(() => changeEmailOptions(authClient))
+const changeEmail = useMutation(() => changeEmailOptions(authClient))
 
 changeEmail.mutate({ newEmail: "alice@example.com" })
 ```

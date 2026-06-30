@@ -20,9 +20,9 @@ sendVerificationEmail.mutate({
 
 ```tsx
 import { sendVerificationEmailOptions } from "@better-auth-ui/core"
-import { createMutation } from "@tanstack/solid-query"
+import { useMutation } from "@tanstack/solid-query"
 
-const sendVerificationEmail = createMutation(() =>
+const sendVerificationEmail = useMutation(() =>
   sendVerificationEmailOptions(authClient)
 )
 ```

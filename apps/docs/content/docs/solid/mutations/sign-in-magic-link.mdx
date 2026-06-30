@@ -22,9 +22,9 @@ sendMagicLink.mutate({
 
 ```tsx
 import { signInMagicLinkOptions } from "@better-auth-ui/core/plugins/magic-link"
-import { createMutation } from "@tanstack/solid-query"
+import { useMutation } from "@tanstack/solid-query"
 
-const sendMagicLink = createMutation(() => signInMagicLinkOptions(authClient))
+const sendMagicLink = useMutation(() => signInMagicLinkOptions(authClient))
 ```
 
 ## Params

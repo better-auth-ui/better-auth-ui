@@ -27,23 +27,12 @@ export function useListPasskeys<TAuthClient extends PasskeyAuthClient>(
 
   return useQuery(() => {
     const userId = sessionQuery.data?.user.id
-    const {
-      query,
-      fetchOptions,
-      initialData,
-      enabled = true,
-      ...queryOptions
-    } = options?.() ?? {}
-    const baseOptions = listPasskeysOptions(authClient, userId, {
-      query,
-      fetchOptions
-    })
+    const { query, fetchOptions, initialData, ...queryOptions } =
+      options?.() ?? {}
 
     return {
-      ...baseOptions,
-      queryFn: baseOptions.queryFn,
+      ...listPasskeysOptions(authClient, userId, { query, fetchOptions }),
       ...queryOptions,
-      enabled: Boolean(userId) && enabled,
       initialData: initialData as undefined
     }
   }, queryClient)

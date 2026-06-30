@@ -1,4 +1,3 @@
-export { createAuthClient } from "better-auth/solid"
 export * from "./hooks/auth/use-authenticate"
 export * from "./hooks/auth/use-user"
 export * from "./hooks/mutations/use-change-email"

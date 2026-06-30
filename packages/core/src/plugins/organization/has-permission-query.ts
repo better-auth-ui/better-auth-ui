@@ -36,13 +36,14 @@ export function hasPermissionOptions<
 
   return {
     queryKey,
-    queryFn: userId
-      ? ({ signal }) =>
-          authClient.organization.hasPermission({
-            ...query,
-            fetchOptions: { ...fetchOptions, signal, throw: true }
-          }) as Promise<TData>
-      : skipToken
+    queryFn:
+      userId && params.organizationId
+        ? ({ signal }) =>
+            authClient.organization.hasPermission({
+              ...query,
+              fetchOptions: { ...fetchOptions, signal, throw: true }
+            }) as Promise<TData>
+        : skipToken
   } satisfies QueryOptions
 }
 

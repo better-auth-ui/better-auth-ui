@@ -34,20 +34,28 @@ export function activeOrganizationOptions<
   params?: ActiveOrganizationParams<TAuthClient>
 ) {
   type TData = ActiveOrganizationData<TAuthClient>
+  const query = params?.query as
+    | { organizationSlug?: string | null }
+    | undefined
+  const hasNoActiveOrganization = query?.organizationSlug === null
+  const effectiveQuery = hasNoActiveOrganization ? undefined : params?.query
   const queryKey = organizationQueryKeys.activeOrganization(
     userId,
-    params?.query
+    effectiveQuery
   )
 
   return {
     queryKey,
-    queryFn: userId
-      ? ({ signal }) =>
-          authClient.organization.getFullOrganization({
-            ...params,
-            fetchOptions: { ...params?.fetchOptions, signal, throw: true }
-          }) as Promise<TData>
-      : skipToken
+    queryFn: hasNoActiveOrganization
+      ? async () => null
+      : userId
+        ? ({ signal }) =>
+            authClient.organization.getFullOrganization({
+              ...params,
+              query: effectiveQuery,
+              fetchOptions: { ...params?.fetchOptions, signal, throw: true }
+            } as ActiveOrganizationParams<TAuthClient>) as unknown as Promise<TData>
+        : skipToken
   } satisfies QueryOptions
 }
 

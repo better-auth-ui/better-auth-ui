@@ -28,9 +28,7 @@ export function useHasPermission<TAuthClient extends OrganizationAuthClient>(
   const session = useSession(authClient, undefined, queryClient)
   const activeOrganization = useActiveOrganization(
     authClient,
-    () => ({
-      enabled: !options().organizationId
-    }),
+    undefined,
     queryClient
   )
 
@@ -39,23 +37,19 @@ export function useHasPermission<TAuthClient extends OrganizationAuthClient>(
     const {
       fetchOptions,
       initialData,
-      enabled = true,
       permissions,
       organizationId: optionsOrganizationId,
       ...queryOptions
-    } = options?.() ?? {}
+    } = options()
     const organizationId = optionsOrganizationId ?? activeOrganization.data?.id
-    const baseOptions = hasPermissionOptions(authClient, userId, {
-      fetchOptions,
-      organizationId,
-      permissions
-    })
 
     return {
-      ...baseOptions,
-      queryFn: baseOptions.queryFn,
+      ...hasPermissionOptions(authClient, userId, {
+        fetchOptions,
+        organizationId,
+        permissions
+      }),
       ...queryOptions,
-      enabled: Boolean(userId) && Boolean(organizationId) && enabled,
       initialData: initialData as undefined
     }
   }, queryClient)

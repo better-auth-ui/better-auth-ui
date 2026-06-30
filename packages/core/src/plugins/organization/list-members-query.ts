@@ -20,6 +20,13 @@ export type ListOrganizationMembersOptions<
 > = Omit<QueryOptions<ListOrganizationMembersData<TAuthClient>>, "queryKey"> &
   ListOrganizationMembersParams<TAuthClient>
 
+/**
+ * Query options factory for organization members visible to the current user.
+ *
+ * @param authClient - The Better Auth organization client.
+ * @param userId - The current signed-in user's ID. Used for cache partitioning.
+ * @param params - Parameters forwarded to `authClient.organization.listMembers`.
+ */
 export function listOrganizationMembersOptions<
   TAuthClient extends OrganizationAuthClient
 >(
@@ -29,19 +36,24 @@ export function listOrganizationMembersOptions<
 ) {
   type TData = ListOrganizationMembersData<TAuthClient>
   const queryKey = organizationQueryKeys.members.list(userId, params?.query)
+  const query = params?.query as { organizationId?: string } | undefined
 
   return {
     queryKey,
-    queryFn: userId
-      ? ({ signal }) =>
-          authClient.organization.listMembers({
-            ...params,
-            fetchOptions: { ...params?.fetchOptions, signal, throw: true }
-          }) as Promise<TData>
-      : skipToken
+    queryFn:
+      userId && query?.organizationId
+        ? ({ signal }) =>
+            authClient.organization.listMembers({
+              ...params,
+              fetchOptions: { ...params?.fetchOptions, signal, throw: true }
+            }) as Promise<TData>
+        : skipToken
   } satisfies QueryOptions
 }
 
+/**
+ * Get organization members from the cache, fetching if needed.
+ */
 export const ensureListOrganizationMembers = <
   TAuthClient extends OrganizationAuthClient
 >(
@@ -61,6 +73,9 @@ export const ensureListOrganizationMembers = <
   })
 }
 
+/**
+ * Prefetch organization members into the query cache.
+ */
 export const prefetchListOrganizationMembers = <
   TAuthClient extends OrganizationAuthClient
 >(
@@ -80,6 +95,9 @@ export const prefetchListOrganizationMembers = <
   })
 }
 
+/**
+ * Fetch and cache organization members, resolving with data or throwing on error.
+ */
 export const fetchListOrganizationMembers = <
   TAuthClient extends OrganizationAuthClient
 >(
@@ -98,6 +116,9 @@ export const fetchListOrganizationMembers = <
     ...queryOptions
   })
 }
+/**
+ * Read organization members synchronously from the query cache without fetching.
+ */
 export const getListOrganizationMembers = <
   TAuthClient extends OrganizationAuthClient = OrganizationAuthClient
 >(

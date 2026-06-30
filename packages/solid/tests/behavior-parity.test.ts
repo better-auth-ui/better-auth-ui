@@ -42,7 +42,6 @@ import {
   setActiveSessionOptions
 } from "@better-auth-ui/core/plugins/multi-session"
 import {
-  createOrganizationMeta,
   createOrganizationOptions,
   hasPermissionOptions,
   listOrganizationMembersOptions,
@@ -250,7 +249,7 @@ describe("Solid auth behavior parity", () => {
     }
   })
 
-  it("guards Solid plugin query fetches with enabled instead of skipToken", () => {
+  it("delegates Solid plugin query dependency gating to core options", () => {
     const guardedQueryFiles = [
       "../src/plugins/api-key/hooks/queries/use-list-api-keys.ts",
       "../src/plugins/multi-session/hooks/queries/use-list-device-sessions.ts",
@@ -267,14 +266,9 @@ describe("Solid auth behavior parity", () => {
     for (const file of guardedQueryFiles) {
       const source = readFileSync(resolve(__dirname, file), "utf8")
 
-      if (file.includes("use-active-organization")) {
-        expect(source).toContain(
-          "queryFn: slug === null ? async () => null : baseOptions.queryFn"
-        )
-      } else {
-        expect(source).toContain("queryFn: baseOptions.queryFn")
-      }
-      expect(source).toContain("enabled:")
+      expect(source).not.toContain("skipToken")
+      expect(source).not.toContain("queryFn:")
+      expect(source).not.toContain("enabled:")
       expect(source).toContain("initialData: initialData as undefined")
     }
   })
@@ -374,13 +368,10 @@ describe("Solid auth behavior parity", () => {
       /useListOrganizations\(\s*authClient,\s*undefined,\s*queryClient\s*\)/
     )
     expect(setActiveOrganizationSource).toContain(
-      "const contextQueryClient = useQueryClient(queryClient?.())"
+      "const mutationQueryClient = useQueryClient(queryClient?.())"
     )
     expect(setActiveOrganizationSource).toContain(
-      "const mutationQueryClient = () => queryClient?.() ?? contextQueryClient"
-    )
-    expect(setActiveOrganizationSource).toContain(
-      "mutationQueryClient().cancelQueries"
+      "mutationQueryClient.cancelQueries"
     )
     expect(setActiveOrganizationSource).toContain(
       "const userOnMutateResult = await mutationOptions.onMutate?.("
@@ -568,7 +559,10 @@ describe("Solid auth behavior parity", () => {
       organizationId: "org-1",
       permissions: { organization: ["update"] }
     } as never)
-    const createOrganization = createOrganizationOptions(authClient as never)
+    const createOrganization = createOrganizationOptions(
+      authClient as never,
+      "user-1"
+    )
 
     expect(listOrganizations.queryKey).toEqual(
       organizationQueryKeys.list("user-1")
@@ -587,7 +581,7 @@ describe("Solid auth behavior parity", () => {
     expect(createOrganization.mutationKey).toEqual(
       organizationMutationKeys.create
     )
-    expect(createOrganizationMeta("user-1")).toEqual({
+    expect(createOrganization.meta).toEqual({
       awaits: [organizationQueryKeys.lists("user-1")],
       invalidates: [
         organizationQueryKeys.fullDetails("user-1"),

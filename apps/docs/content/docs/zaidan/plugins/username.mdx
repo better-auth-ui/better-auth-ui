@@ -43,7 +43,7 @@ export const auth = betterAuth({
 Add `usernameClient()` to your auth client so `authClient.signIn.username` and `authClient.username.*` are available:
 
 ```ts title="src/lib/auth-client.ts"
-import { createAuthClient } from "@better-auth-ui/solid"
+import { createAuthClient } from "better-auth/solid"
 import { usernameClient } from "better-auth/client/plugins" // [!code highlight]
 
 export const authClient = createAuthClient({

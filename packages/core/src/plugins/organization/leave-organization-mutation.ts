@@ -19,17 +19,6 @@ export type LeaveOrganizationOptions<
   "mutationKey" | "mutationFn" | "meta"
 >
 
-export const leaveOrganizationMeta = (userId: string | undefined) => ({
-  awaits: [
-    organizationQueryKeys.members.all(userId),
-    organizationQueryKeys.fullDetails(userId)
-  ],
-  invalidates: [
-    organizationQueryKeys.lists(userId),
-    organizationQueryKeys.activeOrganizations(userId)
-  ]
-})
-
 export function leaveOrganizationOptions<
   TAuthClient extends OrganizationAuthClient
 >(authClient: TAuthClient, userId?: string) {
@@ -44,7 +33,16 @@ export function leaveOrganizationOptions<
   return {
     mutationKey,
     mutationFn,
-    meta: leaveOrganizationMeta(userId)
+    meta: {
+      awaits: [
+        organizationQueryKeys.members.all(userId),
+        organizationQueryKeys.fullDetails(userId)
+      ],
+      invalidates: [
+        organizationQueryKeys.lists(userId),
+        organizationQueryKeys.activeOrganizations(userId)
+      ]
+    }
   } as MutationOptions<
     Awaited<ReturnType<typeof mutationFn>>,
     BetterFetchError,

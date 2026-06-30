@@ -27,30 +27,12 @@ export function useListApiKeys<TAuthClient extends ApiKeyAuthClient>(
 
   return useQuery(() => {
     const userId = session.data?.user.id
-    const {
-      query,
-      fetchOptions,
-      initialData,
-      enabled = true,
-      ...queryOptions
-    } = options?.() ?? {}
-    const queryParams = query as
-      | { configId?: string; organizationId?: string }
-      | undefined
-    const hasRequiredParams =
-      queryParams?.configId === "organization"
-        ? Boolean(queryParams.organizationId)
-        : true
-    const baseOptions = listApiKeysOptions(authClient, userId, {
-      query,
-      fetchOptions
-    })
+    const { query, fetchOptions, initialData, ...queryOptions } =
+      options?.() ?? {}
 
     return {
-      ...baseOptions,
-      queryFn: baseOptions.queryFn,
+      ...listApiKeysOptions(authClient, userId, { query, fetchOptions }),
       ...queryOptions,
-      enabled: Boolean(userId) && hasRequiredParams && enabled,
       initialData: initialData as undefined
     }
   }, queryClient)

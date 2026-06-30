@@ -20,6 +20,13 @@ export type ListUserInvitationsOptions<
 > = Omit<QueryOptions<ListUserInvitationsData<TAuthClient>>, "queryKey"> &
   ListUserInvitationsParams<TAuthClient>
 
+/**
+ * Query options factory for invitations addressed to the current user.
+ *
+ * @param authClient - The Better Auth organization client.
+ * @param userId - The current signed-in user's ID. Used for cache partitioning.
+ * @param params - Parameters forwarded to `authClient.organization.listUserInvitations`.
+ */
 export function listUserInvitationsOptions<
   TAuthClient extends OrganizationAuthClient
 >(
@@ -45,6 +52,9 @@ export function listUserInvitationsOptions<
   } satisfies QueryOptions
 }
 
+/**
+ * Get user invitations from the cache, fetching if needed.
+ */
 export const ensureListUserInvitations = <
   TAuthClient extends OrganizationAuthClient
 >(
@@ -61,6 +71,9 @@ export const ensureListUserInvitations = <
   })
 }
 
+/**
+ * Prefetch user invitations into the query cache.
+ */
 export const prefetchListUserInvitations = <
   TAuthClient extends OrganizationAuthClient
 >(
@@ -77,6 +90,9 @@ export const prefetchListUserInvitations = <
   })
 }
 
+/**
+ * Fetch and cache user invitations, resolving with data or throwing on error.
+ */
 export const fetchListUserInvitations = <
   TAuthClient extends OrganizationAuthClient
 >(
@@ -92,6 +108,9 @@ export const fetchListUserInvitations = <
     ...queryOptions
   })
 }
+/**
+ * Read user invitations synchronously from the query cache without fetching.
+ */
 export const getListUserInvitations = <
   TAuthClient extends OrganizationAuthClient = OrganizationAuthClient
 >(

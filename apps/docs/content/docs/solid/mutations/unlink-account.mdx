@@ -1,5 +1,5 @@
 ---
-title: unlinkAccountOptions
+title: useUnlinkAccount
 description: Unlink a social account from the current user.
 ---
 
@@ -7,9 +7,9 @@ description: Unlink a social account from the current user.
 
 ```tsx
 import { unlinkAccountOptions } from "@better-auth-ui/core"
-import { createMutation } from "@tanstack/solid-query"
+import { useMutation } from "@tanstack/solid-query"
 
-const unlinkAccount = createMutation(() => unlinkAccountOptions(authClient))
+const unlinkAccount = useMutation(() => unlinkAccountOptions(authClient))
 
 unlinkAccount.mutate({ providerId: "github", accountId: "github-account-id" })
 ```

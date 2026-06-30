@@ -40,7 +40,7 @@ export const auth = betterAuth({
 Add `multiSessionClient()` so `authClient.multiSession.*` methods are available to the copied Solid components:
 
 ```ts title="src/lib/auth-client.ts"
-import { createAuthClient } from "@better-auth-ui/solid" // [!code highlight]
+import { createAuthClient } from "better-auth/solid" // [!code highlight]
 import { multiSessionClient } from "better-auth/client/plugins" // [!code highlight]
 
 export const authClient = createAuthClient({

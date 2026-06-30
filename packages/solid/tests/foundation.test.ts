@@ -7,8 +7,9 @@ import {
   viewPaths
 } from "@better-auth-ui/core"
 import { socialProviderList } from "better-auth/social-providers"
+import { createAuthClient } from "better-auth/solid"
 import { describe, expect, it, vi } from "vitest"
-import { createAuthClient, providerIconNames, resolveAuthConfig } from "../src"
+import { providerIconNames, resolveAuthConfig } from "../src"
 
 type PackageJson = {
   name: string
@@ -65,8 +66,10 @@ describe("@better-auth-ui/solid foundation", () => {
     )
   })
 
-  it("exposes the Solid Better Auth client factory", () => {
-    expect(typeof createAuthClient).toBe("function")
+  it("does not expose the Better Auth client factory from the Solid root", async () => {
+    const solid = await import("../src")
+
+    expect(solid).not.toHaveProperty("createAuthClient")
   })
 
   it("does not expose core-owned auth option factories from the Solid root", async () => {

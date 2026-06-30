@@ -1,17 +1,27 @@
 ---
-title: signInPasskeyOptions
-description: Passkey sign-in mutation options.
+title: useSignInPasskey
+description: Passkey sign-in mutation hook.
 ---
 
 Requires the Better Auth passkey plugin. Import your configured `authClient`; it already carries the passkey methods from `createAuthClient`.
+
+## Usage
+
+```tsx
+import { useSignInPasskey } from "@better-auth-ui/solid/plugins/passkey"
+
+const mutation = useSignInPasskey(authClient)
+
+mutation.mutate(/* params */)
+```
 
 ## Options factory
 
 ```tsx
 import { signInPasskeyOptions } from "@better-auth-ui/core/plugins/passkey"
-import { createMutation } from "@tanstack/solid-query"
+import { useMutation } from "@tanstack/solid-query"
 
-const signInWithPasskey = createMutation(() => signInPasskeyOptions(authClient))
+const signInWithPasskey = useMutation(() => signInPasskeyOptions(authClient))
 
 signInWithPasskey.mutate()
 ```

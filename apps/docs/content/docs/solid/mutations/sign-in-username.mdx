@@ -1,17 +1,27 @@
 ---
-title: signInUsernameOptions
-description: Username/password sign-in mutation options.
+title: useSignInUsername
+description: Username/password sign-in mutation hook.
 ---
 
 Requires the Better Auth username plugin. Import your configured `authClient`; it already carries the username methods from `createAuthClient`.
+
+## Usage
+
+```tsx
+import { useSignInUsername } from "@better-auth-ui/solid/plugins/username"
+
+const mutation = useSignInUsername(authClient)
+
+mutation.mutate(/* params */)
+```
 
 ## Options factory
 
 ```tsx
 import { signInUsernameOptions } from "@better-auth-ui/core/plugins/username"
-import { createMutation } from "@tanstack/solid-query"
+import { useMutation } from "@tanstack/solid-query"
 
-const signIn = createMutation(() => signInUsernameOptions(authClient))
+const signIn = useMutation(() => signInUsernameOptions(authClient))
 
 signIn.mutate({ username: "alice", password: passwordInput })
 ```

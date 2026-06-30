@@ -10,6 +10,13 @@ export type UseDeleteUserOptions<TAuthClient extends AuthClient> = Accessor<
   DeleteUserOptions<TAuthClient>
 >
 
+/**
+ * Create a mutation for deleting the current user.
+ *
+ * @param authClient - The Better Auth client.
+ * @param options - Solid Query options forwarded to `useMutation`.
+ * @param queryClient - Optional Solid Query client accessor to scope this mutation to.
+ */
 export function useDeleteUser<TAuthClient extends AuthClient>(
   authClient: TAuthClient,
   options?: UseDeleteUserOptions<TAuthClient>,

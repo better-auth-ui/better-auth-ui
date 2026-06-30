@@ -19,11 +19,6 @@ export type SetActiveOrganizationOptions<
   "mutationKey" | "mutationFn" | "meta"
 >
 
-export const setActiveOrganizationMeta = (userId: string | undefined) => ({
-  awaits: [organizationQueryKeys.activeOrganizations(userId)],
-  invalidates: [organizationQueryKeys.lists(userId)]
-})
-
 export function setActiveOrganizationOptions<
   TAuthClient extends OrganizationAuthClient
 >(authClient: TAuthClient, userId?: string) {
@@ -38,7 +33,10 @@ export function setActiveOrganizationOptions<
   return {
     mutationKey,
     mutationFn,
-    meta: setActiveOrganizationMeta(userId)
+    meta: {
+      awaits: [organizationQueryKeys.activeOrganizations(userId)],
+      invalidates: [organizationQueryKeys.lists(userId)]
+    }
   } as MutationOptions<
     Awaited<ReturnType<typeof mutationFn>>,
     BetterFetchError,

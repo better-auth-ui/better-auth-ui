@@ -6,7 +6,6 @@ import {
 } from "@better-auth-ui/core/plugins/organization"
 import {
   type QueryClient,
-  skipToken,
   type UseQueryOptions,
   useQuery
 } from "@tanstack/react-query"
@@ -35,23 +34,18 @@ export function useHasPermission<TAuthClient extends OrganizationAuthClient>(
 
   const { data: activeOrganization } = useActiveOrganization(
     authClient,
-    { enabled: !optionsOrganizationId },
+    undefined,
     queryClient
   )
-
   const organizationId = optionsOrganizationId ?? activeOrganization?.id
-  const baseOptions = hasPermissionOptions(authClient, userId, {
-    fetchOptions,
-    organizationId,
-    permissions
-  })
 
   return useQuery(
     {
-      ...baseOptions,
-
-      queryFn: userId && organizationId ? baseOptions.queryFn : skipToken,
-
+      ...hasPermissionOptions(authClient, userId, {
+        fetchOptions,
+        organizationId,
+        permissions
+      }),
       ...queryOptions
     },
     queryClient

@@ -30,32 +30,22 @@ export function useListOrganizationMembers<
   const session = useSession(authClient, undefined, queryClient)
   const activeOrganization = useActiveOrganization(
     authClient,
-    () => ({
-      enabled: !options?.().query?.organizationId
-    }),
+    undefined,
     queryClient
   )
 
   return useQuery(() => {
     const userId = session.data?.user.id
-    const {
-      query,
-      fetchOptions,
-      initialData,
-      enabled = true,
-      ...queryOptions
-    } = options?.() ?? {}
+    const { query, fetchOptions, initialData, ...queryOptions } =
+      options?.() ?? {}
     const organizationId = query?.organizationId ?? activeOrganization.data?.id
-    const baseOptions = listOrganizationMembersOptions(authClient, userId, {
-      query: { ...query, organizationId },
-      fetchOptions
-    })
 
     return {
-      ...baseOptions,
-      queryFn: baseOptions.queryFn,
+      ...listOrganizationMembersOptions(authClient, userId, {
+        query: { ...query, organizationId },
+        fetchOptions
+      }),
       ...queryOptions,
-      enabled: Boolean(userId) && Boolean(organizationId) && enabled,
       initialData: initialData as undefined
     }
   }, queryClient)

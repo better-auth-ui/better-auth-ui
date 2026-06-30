@@ -42,7 +42,7 @@ Add `apiKeyClient()` to your Solid auth client so `authClient.apiKey.*` methods 
 
 ```ts title="src/lib/auth-client.ts"
 import { apiKeyClient } from "@better-auth/api-key/client" // [!code highlight]
-import { createAuthClient } from "@better-auth-ui/solid"
+import { createAuthClient } from "better-auth/solid"
 
 export const authClient = createAuthClient({
   plugins: [

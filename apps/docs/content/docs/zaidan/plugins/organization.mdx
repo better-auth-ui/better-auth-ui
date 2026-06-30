@@ -42,7 +42,7 @@ export const auth = betterAuth({
 Add `organizationClient()` to your auth client so `authClient.organization.*` methods are available:
 
 ```ts title="src/lib/auth-client.ts"
-import { createAuthClient } from "@better-auth-ui/solid"
+import { createAuthClient } from "better-auth/solid"
 import { organizationClient } from "better-auth/client/plugins" // [!code highlight]
 
 export const authClient = createAuthClient({
@@ -496,7 +496,7 @@ Copied Zaidan components are wired through `<AuthProvider>`. If you build custom
 - `useCancelInvitation()` — Cancel a pending invitation
 - `useAcceptInvitation()` — Accept an invitation
 - `useRejectInvitation()` — Reject an invitation
-- `useCheckOrganizationSlug()` — Check whether an organization slug is available
+- `useCheckSlug()` — Check whether an organization slug is available
 
 ## Components
 

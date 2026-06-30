@@ -24,6 +24,13 @@ export type ListOrganizationsOptions<
 > = Omit<QueryOptions<ListOrganizationsData<TAuthClient>>, "queryKey"> &
   ListOrganizationsParams<TAuthClient>
 
+/**
+ * Query options factory for organizations available to the current user.
+ *
+ * @param authClient - The Better Auth organization client.
+ * @param userId - The current signed-in user's ID. Used for cache partitioning.
+ * @param params - Parameters forwarded to `authClient.organization.list`.
+ */
 export function listOrganizationsOptions<
   TAuthClient extends OrganizationAuthClient
 >(
@@ -46,6 +53,9 @@ export function listOrganizationsOptions<
   } satisfies QueryOptions
 }
 
+/**
+ * Get organizations from the cache, fetching if needed.
+ */
 export const ensureListOrganizations = <
   TAuthClient extends OrganizationAuthClient
 >(
@@ -62,6 +72,9 @@ export const ensureListOrganizations = <
   })
 }
 
+/**
+ * Prefetch organizations into the query cache.
+ */
 export const prefetchListOrganizations = <
   TAuthClient extends OrganizationAuthClient
 >(
@@ -78,6 +91,9 @@ export const prefetchListOrganizations = <
   })
 }
 
+/**
+ * Fetch and cache organizations, resolving with data or throwing on error.
+ */
 export const fetchListOrganizations = <
   TAuthClient extends OrganizationAuthClient
 >(
@@ -93,6 +109,9 @@ export const fetchListOrganizations = <
     ...queryOptions
   })
 }
+/**
+ * Read organizations synchronously from the query cache without fetching.
+ */
 export const getListOrganizations = <
   TAuthClient extends OrganizationAuthClient = OrganizationAuthClient
 >(

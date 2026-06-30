@@ -6,7 +6,6 @@ import {
 } from "@better-auth-ui/core/plugins/organization"
 import {
   type QueryClient,
-  skipToken,
   type UseQueryOptions,
   useQuery
 } from "@tanstack/react-query"
@@ -26,19 +25,11 @@ export function useListOrganizations<
 ) {
   const { data: session } = useSession(authClient, undefined, queryClient)
   const userId = session?.user.id
-
   const { query, fetchOptions, ...queryOptions } = options
-  const baseOptions = listOrganizationsOptions(authClient, userId, {
-    query,
-    fetchOptions
-  })
 
   return useQuery(
     {
-      ...baseOptions,
-
-      queryFn: userId ? baseOptions.queryFn : skipToken,
-
+      ...listOrganizationsOptions(authClient, userId, { query, fetchOptions }),
       ...queryOptions
     },
     queryClient

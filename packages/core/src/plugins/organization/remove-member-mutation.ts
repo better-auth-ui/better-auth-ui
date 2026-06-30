@@ -19,14 +19,6 @@ export type RemoveMemberOptions<
   "mutationKey" | "mutationFn" | "meta"
 >
 
-export const removeMemberMeta = (userId: string | undefined) => ({
-  awaits: [
-    organizationQueryKeys.members.all(userId),
-    organizationQueryKeys.fullDetails(userId)
-  ],
-  invalidates: [organizationQueryKeys.lists(userId)]
-})
-
 export function removeMemberOptions<TAuthClient extends OrganizationAuthClient>(
   authClient: TAuthClient,
   userId?: string
@@ -42,7 +34,13 @@ export function removeMemberOptions<TAuthClient extends OrganizationAuthClient>(
   return {
     mutationKey,
     mutationFn,
-    meta: removeMemberMeta(userId)
+    meta: {
+      awaits: [
+        organizationQueryKeys.members.all(userId),
+        organizationQueryKeys.fullDetails(userId)
+      ],
+      invalidates: [organizationQueryKeys.lists(userId)]
+    }
   } as MutationOptions<
     Awaited<ReturnType<typeof mutationFn>>,
     BetterFetchError,

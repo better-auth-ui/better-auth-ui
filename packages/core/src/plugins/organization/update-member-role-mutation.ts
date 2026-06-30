@@ -19,14 +19,6 @@ export type UpdateMemberRoleOptions<
   "mutationKey" | "mutationFn" | "meta"
 >
 
-export const memberRoleMeta = (userId: string | undefined) => ({
-  awaits: [
-    organizationQueryKeys.members.all(userId),
-    organizationQueryKeys.fullDetails(userId)
-  ],
-  invalidates: [organizationQueryKeys.permissions.all(userId)]
-})
-
 export function updateMemberRoleOptions<
   TAuthClient extends OrganizationAuthClient
 >(authClient: TAuthClient, userId?: string, organizationId?: string) {
@@ -48,7 +40,13 @@ export function updateMemberRoleOptions<
   return {
     mutationKey,
     mutationFn,
-    meta: memberRoleMeta(userId)
+    meta: {
+      awaits: [
+        organizationQueryKeys.members.all(userId),
+        organizationQueryKeys.fullDetails(userId)
+      ],
+      invalidates: [organizationQueryKeys.permissions.all(userId)]
+    }
   } as MutationOptions<
     Awaited<ReturnType<typeof mutationFn>>,
     BetterFetchError,

@@ -13,15 +13,15 @@ const mutation = useRejectInvitation(authClient)
 mutation.mutate(/* params */)
 ```
 
-Organization mutations require `organizationClient()` on the Better Auth client. They attach the same `meta.invalidates` / `meta.awaits` cache metadata used by upstream React, and the Solid `AuthProvider` installs a mutation invalidator that refreshes affected organization/session caches after successful auth mutations.
+Organization mutations require `organizationClient()` on the Better Auth client. They attach the same `meta.invalidates` / `meta.awaits` cache metadata used by the shared React implementation, and the Solid `AuthProvider` installs a mutation invalidator that refreshes affected organization/session caches after successful auth mutations.
 
 ## Options factory
 
 ```tsx
 import { rejectInvitationOptions } from "@better-auth-ui/core/plugins/organization"
-import { createMutation } from "@tanstack/solid-query"
+import { useMutation } from "@tanstack/solid-query"
 
-const mutation = createMutation(() => rejectInvitationOptions(authClient))
+const mutation = useMutation(() => rejectInvitationOptions(authClient))
 ```
 
 ## Params

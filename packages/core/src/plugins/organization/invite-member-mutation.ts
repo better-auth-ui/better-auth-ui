@@ -19,13 +19,6 @@ export type InviteMemberOptions<
   "mutationKey" | "mutationFn" | "meta"
 >
 
-export const inviteMemberMeta = (userId: string | undefined) => ({
-  awaits: [
-    organizationQueryKeys.invitations.all(userId),
-    organizationQueryKeys.fullDetails(userId)
-  ]
-})
-
 export function inviteMemberOptions<TAuthClient extends OrganizationAuthClient>(
   authClient: TAuthClient,
   userId?: string,
@@ -49,7 +42,12 @@ export function inviteMemberOptions<TAuthClient extends OrganizationAuthClient>(
   return {
     mutationKey,
     mutationFn,
-    meta: inviteMemberMeta(userId)
+    meta: {
+      awaits: [
+        organizationQueryKeys.invitations.all(userId),
+        organizationQueryKeys.fullDetails(userId)
+      ]
+    }
   } as MutationOptions<
     Awaited<ReturnType<typeof mutationFn>>,
     BetterFetchError,

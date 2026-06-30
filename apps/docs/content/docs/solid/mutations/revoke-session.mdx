@@ -1,5 +1,5 @@
 ---
-title: revokeSessionOptions
+title: useRevokeSession
 description: Revoke one active session for the current user.
 ---
 
@@ -7,9 +7,9 @@ description: Revoke one active session for the current user.
 
 ```tsx
 import { revokeSessionOptions } from "@better-auth-ui/core"
-import { createMutation } from "@tanstack/solid-query"
+import { useMutation } from "@tanstack/solid-query"
 
-const revokeSession = createMutation(() => revokeSessionOptions(authClient))
+const revokeSession = useMutation(() => revokeSessionOptions(authClient))
 
 revokeSession.mutate({ token: "session-token" })
 ```

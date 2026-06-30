@@ -27,8 +27,6 @@ export function UsernameField(props: AdditionalFieldProps) {
   const availability = useIsUsernameAvailable(auth.authClient, () => ({
     onError: () => undefined
   }))
-  const availabilityData = () =>
-    availability.data as { available?: boolean } | undefined
   const shouldCheckAvailability = () =>
     Boolean(usernamePlugin()?.isUsernameAvailable) &&
     Boolean(value().trim()) &&
@@ -71,19 +69,18 @@ export function UsernameField(props: AdditionalFieldProps) {
         <Show when={shouldCheckAvailability()}>
           <span
             aria-label={
-              availabilityData()?.available
+              availability.data?.available
                 ? usernamePlugin()?.localization?.usernameAvailable
-                : availabilityData()?.available === false
+                : availability.data?.available === false
                   ? usernamePlugin()?.localization?.usernameTaken
                   : undefined
             }
             class="absolute top-1/2 right-3 -translate-y-1/2"
             role="status"
           >
-            {availabilityData()?.available ? (
+            {availability.data?.available ? (
               <Check class="size-4" />
-            ) : availability.error ||
-              availabilityData()?.available === false ? (
+            ) : availability.error || availability.data?.available === false ? (
               <X class="size-4 text-destructive" />
             ) : (
               <span class="text-muted-foreground text-xs">…</span>

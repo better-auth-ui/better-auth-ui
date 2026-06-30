@@ -19,9 +19,9 @@ createApiKey.mutate({ name: "CLI" })
 
 ```tsx
 import { createApiKeyOptions } from "@better-auth-ui/core/plugins/api-key"
-import { createMutation } from "@tanstack/solid-query"
+import { useMutation } from "@tanstack/solid-query"
 
-const createApiKey = createMutation(() => createApiKeyOptions(authClient, userId))
+const createApiKey = useMutation(() => createApiKeyOptions(authClient, userId))
 ```
 
 ## Params
