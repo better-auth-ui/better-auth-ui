@@ -1,4 +1,5 @@
 import type { AuthClient } from "@better-auth-ui/core"
+import type { QueryClient } from "@tanstack/react-query"
 import { useEffect } from "react"
 import { useAuth } from "../../components/auth/auth-provider"
 import { type UseSessionOptions, useSession } from "../queries/use-session"
@@ -9,13 +10,15 @@ import { type UseSessionOptions, useSession } from "../queries/use-session"
  *
  * @param authClient - The Better Auth client.
  * @param options - `getSession` params & `useQuery` options.
+ * @param queryClient - Optional React Query client override.
  */
 export function useAuthenticate<TAuthClient extends AuthClient>(
   authClient: TAuthClient,
-  options?: UseSessionOptions<TAuthClient>
+  options?: UseSessionOptions<TAuthClient>,
+  queryClient?: QueryClient
 ) {
   const { basePaths, viewPaths, navigate } = useAuth()
-  const session = useSession(authClient, options)
+  const session = useSession(authClient, options, queryClient)
 
   useEffect(() => {
     if (session.data || session.isPending) return
