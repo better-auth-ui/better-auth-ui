@@ -7,19 +7,35 @@ import type { InferData } from "../../lib/auth-client"
 import type { OrganizationAuthClient } from "./organization-auth-client"
 import { organizationQueryKeys } from "./organization-query-keys"
 
+/**
+ * Data returned by the Better Auth full organization endpoint.
+ */
 export type FullOrganizationData<
   TAuthClient extends OrganizationAuthClient = OrganizationAuthClient
 > = InferData<TAuthClient["organization"]["getFullOrganization"]>
 
+/**
+ * Parameters accepted by the Better Auth full organization endpoint.
+ */
 export type FullOrganizationParams<
   TAuthClient extends OrganizationAuthClient = OrganizationAuthClient
 > = Parameters<TAuthClient["organization"]["getFullOrganization"]>[0]
 
+/**
+ * Query options for fetching a full organization, excluding the generated query key.
+ */
 export type FullOrganizationOptions<
   TAuthClient extends OrganizationAuthClient = OrganizationAuthClient
 > = Omit<QueryOptions<FullOrganizationData<TAuthClient>>, "queryKey"> &
   FullOrganizationParams<TAuthClient>
 
+/**
+ * Query options factory for fetching a full organization.
+ *
+ * @param authClient - The Better Auth client with the organization plugin.
+ * @param userId - The current signed-in user's ID. Used for cache partitioning.
+ * @param params - Parameters forwarded to `getFullOrganization`.
+ */
 export function fullOrganizationOptions<
   TAuthClient extends OrganizationAuthClient
 >(
@@ -42,6 +58,9 @@ export function fullOrganizationOptions<
   } satisfies QueryOptions
 }
 
+/**
+ * Get a full organization from cache, fetching it if needed.
+ */
 export const ensureFullOrganization = <
   TAuthClient extends OrganizationAuthClient
 >(
@@ -58,6 +77,9 @@ export const ensureFullOrganization = <
   })
 }
 
+/**
+ * Prefetch a full organization into the query cache.
+ */
 export const prefetchFullOrganization = <
   TAuthClient extends OrganizationAuthClient
 >(
@@ -74,6 +96,9 @@ export const prefetchFullOrganization = <
   })
 }
 
+/**
+ * Fetch and cache a full organization, resolving with data or throwing.
+ */
 export const fetchFullOrganization = <
   TAuthClient extends OrganizationAuthClient
 >(

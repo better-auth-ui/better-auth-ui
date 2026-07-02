@@ -6,6 +6,13 @@ import {
 import { type QueryClient, useMutation } from "@tanstack/react-query"
 import { useSession } from "../../../../hooks/queries/use-session"
 
+/**
+ * React mutation hook for rejecting organization invitations.
+ *
+ * @param authClient - The Better Auth client.
+ * @param options - Mutation options merged with the core mutation options.
+ * @param queryClient - Optional React Query client override.
+ */
 export function useRejectInvitation<TAuthClient extends OrganizationAuthClient>(
   authClient: TAuthClient,
   options?: RejectInvitationOptions<TAuthClient>,

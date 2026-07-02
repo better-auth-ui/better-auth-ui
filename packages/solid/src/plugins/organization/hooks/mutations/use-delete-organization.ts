@@ -7,10 +7,20 @@ import { type QueryClient, useMutation } from "@tanstack/solid-query"
 import type { Accessor } from "solid-js"
 import { useSession } from "../../../../hooks/queries/use-session"
 
+/**
+ * Reactive mutation options accessor for `useDeleteOrganization`.
+ */
 export type UseDeleteOrganizationOptions<
   TAuthClient extends OrganizationAuthClient
 > = Accessor<DeleteOrganizationOptions<TAuthClient>>
 
+/**
+ * Solid mutation hook for deleting organizations.
+ *
+ * @param authClient - The Better Auth client.
+ * @param options - Reactive mutation options merged with the core mutation options.
+ * @param queryClient - Optional Solid Query client accessor override.
+ */
 export function useDeleteOrganization<
   TAuthClient extends OrganizationAuthClient = OrganizationAuthClient
 >(

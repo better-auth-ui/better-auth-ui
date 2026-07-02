@@ -12,6 +12,9 @@ import {
 import type { Accessor } from "solid-js"
 import { useSession } from "../../../../hooks/queries/use-session"
 
+/**
+ * Reactive options accessor for `useListDeviceSessions`, combining Solid Query options with core query parameters.
+ */
 export type UseListDeviceSessionsOptions<
   TAuthClient extends MultiSessionAuthClient
 > = Accessor<
@@ -19,6 +22,13 @@ export type UseListDeviceSessionsOptions<
     ListDeviceSessionsParams<TAuthClient>
 >
 
+/**
+ * Solid query hook for device sessions for the current user.
+ *
+ * @param authClient - The Better Auth client.
+ * @param options - Reactive core query parameters and Solid Query options.
+ * @param queryClient - Optional Solid Query client accessor override.
+ */
 export function useListDeviceSessions<
   TAuthClient extends MultiSessionAuthClient
 >(

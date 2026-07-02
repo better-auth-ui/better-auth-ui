@@ -16,6 +16,13 @@ type SetActiveOrganizationVariables<
   organizationSlug?: string
 }
 
+/**
+ * React mutation hook for setting the active organization.
+ *
+ * @param authClient - The Better Auth client.
+ * @param options - Mutation options merged with the core mutation options.
+ * @param queryClient - Optional React Query client override.
+ */
 export function useSetActiveOrganization<
   TAuthClient extends OrganizationAuthClient = OrganizationAuthClient
 >(

@@ -13,6 +13,9 @@ import type { Accessor } from "solid-js"
 import { useSession } from "../../../../hooks/queries/use-session"
 import { useActiveOrganization } from "./use-active-organization"
 
+/**
+ * Reactive options accessor for `useHasPermission`, combining Solid Query options with core query parameters.
+ */
 export type UseHasPermissionOptions<
   TAuthClient extends OrganizationAuthClient = OrganizationAuthClient
 > = Accessor<
@@ -20,6 +23,13 @@ export type UseHasPermissionOptions<
     HasPermissionParams<TAuthClient>
 >
 
+/**
+ * Solid query hook for organization permission checks.
+ *
+ * @param authClient - The Better Auth client.
+ * @param options - Reactive core query parameters and Solid Query options.
+ * @param queryClient - Optional Solid Query client accessor override.
+ */
 export function useHasPermission<TAuthClient extends OrganizationAuthClient>(
   authClient: TAuthClient,
   options: UseHasPermissionOptions<TAuthClient>,

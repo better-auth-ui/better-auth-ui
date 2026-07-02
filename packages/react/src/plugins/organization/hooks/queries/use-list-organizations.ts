@@ -11,11 +11,21 @@ import {
 } from "@tanstack/react-query"
 import { useSession } from "../../../../hooks/queries/use-session"
 
+/**
+ * Options for `useListOrganizations`, combining React Query options with core query parameters.
+ */
 export type UseListOrganizationsOptions<
   TAuthClient extends OrganizationAuthClient = OrganizationAuthClient
 > = Omit<UseQueryOptions<ListOrganizationsData<TAuthClient>>, "queryKey"> &
   ListOrganizationsParams<TAuthClient>
 
+/**
+ * React query hook for the current user's organizations.
+ *
+ * @param authClient - The Better Auth client.
+ * @param options - Core query parameters and React Query options.
+ * @param queryClient - Optional React Query client override.
+ */
 export function useListOrganizations<
   TAuthClient extends OrganizationAuthClient
 >(

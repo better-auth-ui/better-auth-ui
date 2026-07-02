@@ -12,6 +12,9 @@ import {
 import { useSession } from "../../../../hooks/queries/use-session"
 import { useActiveOrganization } from "./use-active-organization"
 
+/**
+ * Options for `useListOrganizationMembers`, combining React Query options with core query parameters.
+ */
 export type UseListOrganizationMembersOptions<
   TAuthClient extends OrganizationAuthClient = OrganizationAuthClient
 > = Omit<
@@ -20,6 +23,13 @@ export type UseListOrganizationMembersOptions<
 > &
   ListOrganizationMembersParams<TAuthClient>
 
+/**
+ * React query hook for organization members.
+ *
+ * @param authClient - The Better Auth client.
+ * @param options - Core query parameters and React Query options.
+ * @param queryClient - Optional React Query client override.
+ */
 export function useListOrganizationMembers<
   TAuthClient extends OrganizationAuthClient
 >(

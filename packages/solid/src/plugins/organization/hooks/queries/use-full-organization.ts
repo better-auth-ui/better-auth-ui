@@ -12,6 +12,9 @@ import {
 import type { Accessor } from "solid-js"
 import { useSession } from "../../../../hooks/queries/use-session"
 
+/**
+ * Reactive options accessor for `useFullOrganization`, combining Solid Query options with core query parameters.
+ */
 export type UseFullOrganizationOptions<
   TAuthClient extends OrganizationAuthClient
 > = Accessor<
@@ -19,6 +22,13 @@ export type UseFullOrganizationOptions<
     FullOrganizationParams<TAuthClient>
 >
 
+/**
+ * Solid query hook for a full organization by query parameters.
+ *
+ * @param authClient - The Better Auth client.
+ * @param options - Reactive core query parameters and Solid Query options.
+ * @param queryClient - Optional Solid Query client accessor override.
+ */
 export function useFullOrganization<TAuthClient extends OrganizationAuthClient>(
   authClient: TAuthClient,
   options?: UseFullOrganizationOptions<TAuthClient>,

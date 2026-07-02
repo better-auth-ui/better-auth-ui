@@ -4,6 +4,12 @@ import { isServer } from "solid-js/web"
 import { useAuth } from "../../lib/auth-provider"
 import { type UseSessionOptions, useSession } from "../queries/use-session"
 
+/**
+ * Calls `useSession` and redirects unauthenticated users to the sign-in page.
+ *
+ * @param authClient - The Better Auth client.
+ * @param options - `getSession` params and Solid Query options.
+ */
 export function useAuthenticate<TAuthClient extends AuthClient>(
   authClient: TAuthClient,
   options?: UseSessionOptions<TAuthClient>

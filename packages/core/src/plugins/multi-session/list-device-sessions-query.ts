@@ -7,23 +7,42 @@ import type { InferData } from "../../lib/auth-client"
 import type { MultiSessionAuthClient } from "./multi-session-auth-client"
 import { multiSessionQueryKeys } from "./multi-session-query-keys"
 
+/**
+ * Data returned by the Better Auth device sessions endpoint.
+ */
 export type ListDeviceSessionsData<
   TAuthClient extends MultiSessionAuthClient = MultiSessionAuthClient
 > = InferData<TAuthClient["multiSession"]["listDeviceSessions"]>
 
+/**
+ * Single device session item returned by the device sessions endpoint.
+ */
 export type ListDeviceSession<
   TAuthClient extends MultiSessionAuthClient = MultiSessionAuthClient
 > = NonNullable<ListDeviceSessionsData<TAuthClient>>[number]
 
+/**
+ * Parameters accepted by the Better Auth device sessions endpoint.
+ */
 export type ListDeviceSessionsParams<
   TAuthClient extends MultiSessionAuthClient = MultiSessionAuthClient
 > = Parameters<TAuthClient["multiSession"]["listDeviceSessions"]>[0]
 
+/**
+ * Query options for listing device sessions, excluding the generated query key.
+ */
 export type ListDeviceSessionsOptions<
   TAuthClient extends MultiSessionAuthClient = MultiSessionAuthClient
 > = Omit<QueryOptions<ListDeviceSessionsData<TAuthClient>>, "queryKey"> &
   ListDeviceSessionsParams<TAuthClient>
 
+/**
+ * Query options factory for listing the current user's device sessions.
+ *
+ * @param authClient - The Better Auth client with the multi-session plugin.
+ * @param userId - The current signed-in user's ID. Used for cache partitioning.
+ * @param params - Parameters forwarded to the device sessions endpoint.
+ */
 export function listDeviceSessionsOptions<
   TAuthClient extends MultiSessionAuthClient
 >(
@@ -46,6 +65,9 @@ export function listDeviceSessionsOptions<
   } satisfies QueryOptions
 }
 
+/**
+ * Get device sessions from cache, fetching them if needed.
+ */
 export const ensureListDeviceSessions = <
   TAuthClient extends MultiSessionAuthClient
 >(
@@ -62,6 +84,9 @@ export const ensureListDeviceSessions = <
   })
 }
 
+/**
+ * Prefetch device sessions into the query cache.
+ */
 export const prefetchListDeviceSessions = <
   TAuthClient extends MultiSessionAuthClient
 >(
@@ -78,6 +103,9 @@ export const prefetchListDeviceSessions = <
   })
 }
 
+/**
+ * Fetch and cache device sessions, resolving with data or throwing.
+ */
 export const fetchListDeviceSessions = <
   TAuthClient extends MultiSessionAuthClient
 >(
@@ -93,6 +121,9 @@ export const fetchListDeviceSessions = <
     ...queryOptions
   })
 }
+/**
+ * Read device sessions synchronously from the query cache.
+ */
 export const getListDeviceSessions = <
   TAuthClient extends MultiSessionAuthClient = MultiSessionAuthClient
 >(

@@ -21,10 +21,20 @@ type SetActiveOrganizationVariables<
   organizationSlug?: string
 }
 
+/**
+ * Reactive mutation options accessor for `useSetActiveOrganization`.
+ */
 export type UseSetActiveOrganizationOptions<
   TAuthClient extends OrganizationAuthClient
 > = Accessor<SetActiveOrganizationOptions<TAuthClient>>
 
+/**
+ * Solid mutation hook for setting the active organization.
+ *
+ * @param authClient - The Better Auth client.
+ * @param options - Reactive mutation options merged with the core mutation options.
+ * @param queryClient - Optional Solid Query client accessor override.
+ */
 export function useSetActiveOrganization<
   TAuthClient extends OrganizationAuthClient = OrganizationAuthClient
 >(

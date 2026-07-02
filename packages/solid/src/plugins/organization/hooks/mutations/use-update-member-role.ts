@@ -8,10 +8,20 @@ import type { Accessor } from "solid-js"
 import { useSession } from "../../../../hooks/queries/use-session"
 import { useActiveOrganization } from "../queries"
 
+/**
+ * Reactive mutation options accessor for `useUpdateMemberRole`.
+ */
 export type UseUpdateMemberRoleOptions = Accessor<
   UpdateMemberRoleOptions<OrganizationAuthClient>
 >
 
+/**
+ * Solid mutation hook for updating organization member roles.
+ *
+ * @param authClient - The Better Auth client.
+ * @param options - Reactive mutation options merged with the core mutation options.
+ * @param queryClient - Optional Solid Query client accessor override.
+ */
 export function useUpdateMemberRole(
   authClient: OrganizationAuthClient,
   options?: UseUpdateMemberRoleOptions,

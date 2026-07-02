@@ -12,12 +12,22 @@ import {
 import type { Accessor } from "solid-js"
 import { useSession } from "../../../../hooks/queries/use-session"
 
+/**
+ * Reactive options accessor for `useListPasskeys`, combining Solid Query options with core query parameters.
+ */
 export type UseListPasskeysOptions<TAuthClient extends PasskeyAuthClient> =
   Accessor<
     Omit<QueryOptions<ListPasskeysData<TAuthClient>>, "queryKey"> &
       ListPasskeysParams<TAuthClient>
   >
 
+/**
+ * Solid query hook for passkeys for the current user.
+ *
+ * @param authClient - The Better Auth client.
+ * @param options - Reactive core query parameters and Solid Query options.
+ * @param queryClient - Optional Solid Query client accessor override.
+ */
 export function useListPasskeys<TAuthClient extends PasskeyAuthClient>(
   authClient: TAuthClient,
   options?: UseListPasskeysOptions<TAuthClient>,
