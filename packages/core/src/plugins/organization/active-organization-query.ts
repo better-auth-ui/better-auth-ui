@@ -96,18 +96,21 @@ export function activeOrganizationOptions<
     effectiveQuery
   )
 
+  const queryFn = (() => {
+    if (hasNoActiveOrganization) return async () => null
+    if (!userId) return skipToken
+
+    return ({ signal }: { signal: AbortSignal }) =>
+      authClient.organization.getFullOrganization({
+        ...params,
+        query: effectiveQuery,
+        fetchOptions: { ...params?.fetchOptions, signal, throw: true }
+      } as ActiveOrganizationParams<TAuthClient>) as unknown as Promise<TData>
+  })()
+
   return {
     queryKey,
-    queryFn: hasNoActiveOrganization
-      ? async () => null
-      : userId
-        ? ({ signal }) =>
-            authClient.organization.getFullOrganization({
-              ...params,
-              query: effectiveQuery,
-              fetchOptions: { ...params?.fetchOptions, signal, throw: true }
-            } as ActiveOrganizationParams<TAuthClient>) as unknown as Promise<TData>
-        : skipToken
+    queryFn
   } satisfies QueryOptions
 }
 
