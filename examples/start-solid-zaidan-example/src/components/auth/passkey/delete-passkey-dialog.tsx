@@ -1,9 +1,6 @@
-import {
-  deletePasskeyOptions,
-  type PasskeyAuthClient,
-  useAuth
-} from "@better-auth-ui/solid"
-import { createMutation } from "@tanstack/solid-query"
+import type { PasskeyAuthClient } from "@better-auth-ui/core/plugins/passkey"
+import { useAuth } from "@better-auth-ui/solid"
+import { useDeletePasskey } from "@better-auth-ui/solid/plugins/passkey"
 import { Fingerprint } from "lucide-solid"
 import { passkeyLabels } from "@/components/auth/passkey/passkey-localization"
 import type { ListedPasskey } from "@/components/auth/settings/shared/types"
@@ -24,12 +21,11 @@ export function DeletePasskeyDialog(props: {
   onOpenChange: (open: boolean) => void
   passkey: ListedPasskey
 }) {
-  const auth = useAuth()
+  const auth = useAuth<PasskeyAuthClient>()
   const labels = () => passkeyLabels(auth)
   const passkeyName = () => props.passkey.name || labels().passkey
   const previewId = () => `delete-passkey-preview-${props.passkey.id}`
-  const deletePasskey = createMutation(() => ({
-    ...deletePasskeyOptions(auth.authClient as PasskeyAuthClient),
+  const deletePasskey = useDeletePasskey(auth.authClient, () => ({
     onSuccess: () => props.onOpenChange(false)
   }))
 

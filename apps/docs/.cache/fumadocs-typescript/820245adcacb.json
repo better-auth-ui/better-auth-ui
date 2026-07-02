@@ -1,0 +1,72 @@
+[
+  {
+    "id": "user-button.tsx-UserButtonProps",
+    "name": "UserButtonProps",
+    "description": "",
+    "entries": [
+      {
+        "name": "className",
+        "description": "",
+        "tags": [],
+        "type": "string",
+        "simplifiedType": "string",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "size",
+        "description": "",
+        "tags": [],
+        "type": "\"default\" | \"icon\"",
+        "simplifiedType": "\"default\" | \"icon\"",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "placement",
+        "description": "The placement of the element with respect to its anchor element.",
+        "tags": [],
+        "type": "Placement",
+        "simplifiedType": "Placement",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "variant",
+        "description": "",
+        "tags": [],
+        "type": "\"secondary\" | \"tertiary\" | \"danger\" | \"danger-soft\" | \"ghost\" | \"outline\" | \"primary\"",
+        "simplifiedType": "\"secondary\" | \"tertiary\" | \"danger\" | \"danger-soft\" | \"ghost\" | \"outline\" | \"primary\"",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "links",
+        "description": "Additional menu entries rendered above the built-in items.",
+        "tags": [],
+        "type": "(ReactElement<unknown, string | JSXElementConstructor<any>> | UserButtonLink)[]",
+        "simplifiedType": "array",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "hideSettings",
+        "description": "Hide the built-in \"Settings\" link. Useful when replacing it via `links`.",
+        "tags": [],
+        "type": "boolean",
+        "simplifiedType": "boolean",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "hideSubtitle",
+        "description": "When true, the subtitle line (email when name/username is shown) is hidden.",
+        "tags": [],
+        "type": "boolean",
+        "simplifiedType": "boolean",
+        "required": false,
+        "deprecated": false
+      }
+    ]
+  }
+]

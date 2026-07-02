@@ -1,0 +1,18 @@
+[
+  {
+    "id": "organization-members.tsx-OrganizationMembersProps",
+    "name": "OrganizationMembersProps",
+    "description": "Props for the {@link OrganizationMembers} component.",
+    "entries": [
+      {
+        "name": "className",
+        "description": "",
+        "tags": [],
+        "type": "string",
+        "simplifiedType": "string",
+        "required": false,
+        "deprecated": false
+      }
+    ]
+  }
+]

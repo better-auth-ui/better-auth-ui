@@ -8,26 +8,20 @@ Resets the session query on success so the new session is refetched.
 ## Usage
 
 ```tsx
-import {
-  type PasskeyAuthClient,
-  useAuth,
-  useSignInPasskey
-} from "@better-auth-ui/react"
+import { authClient } from "@/lib/auth-client"
+import { useSignInPasskey } from "@better-auth-ui/react/plugins/passkey"
 
-const { authClient } = useAuth()
-const { mutate: signInPasskey } = useSignInPasskey(
-  authClient as PasskeyAuthClient
-)
+const { mutate: signInPasskey } = useSignInPasskey(authClient)
 
 signInPasskey()
 ```
 
-`useSignInPasskey` requires the Better Auth `passkey` plugin. Cast `authClient` to `PasskeyAuthClient` so TypeScript picks up the plugin-extended method signature.
+`useSignInPasskey` requires the Better Auth `passkey` plugin. Import your configured `authClient`; it already carries the plugin methods from `createAuthClient`.
 
 ## Options factory
 
 ```tsx
-import { signInPasskeyOptions } from "@better-auth-ui/react"
+import { signInPasskeyOptions } from "@better-auth-ui/core/plugins/passkey"
 import { useMutation } from "@tanstack/react-query"
 
 const { mutate } = useMutation(signInPasskeyOptions(authClient))
@@ -35,4 +29,4 @@ const { mutate } = useMutation(signInPasskeyOptions(authClient))
 
 ## Params
 
-<auto-type-table path="../../../../../../packages/react/src/mutations/passkey/sign-in-passkey-mutation.ts" name="SignInPasskeyParams" />
+<auto-type-table path="../../../../../../packages/core/src/plugins/passkey/sign-in-passkey-mutation.ts" name="SignInPasskeyParams" />

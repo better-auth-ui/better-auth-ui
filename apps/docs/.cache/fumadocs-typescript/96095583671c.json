@@ -1,0 +1,72 @@
+[
+  {
+    "id": "user-button.tsx-UserButtonProps",
+    "name": "UserButtonProps",
+    "description": "",
+    "entries": [
+      {
+        "name": "class",
+        "description": "",
+        "tags": [],
+        "type": "string",
+        "simplifiedType": "string",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "align",
+        "description": "",
+        "tags": [],
+        "type": "\"center\" | \"end\" | \"start\"",
+        "simplifiedType": "\"center\" | \"end\" | \"start\"",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "hideSettings",
+        "description": "",
+        "tags": [],
+        "type": "boolean",
+        "simplifiedType": "boolean",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "links",
+        "description": "",
+        "tags": [],
+        "type": "(JSX.Element | UserButtonLink)[]",
+        "simplifiedType": "array",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "sideOffset",
+        "description": "",
+        "tags": [],
+        "type": "number",
+        "simplifiedType": "number",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "size",
+        "description": "",
+        "tags": [],
+        "type": "\"default\" | \"icon\"",
+        "simplifiedType": "\"default\" | \"icon\"",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "variant",
+        "description": "",
+        "tags": [],
+        "type": "\"link\" | \"default\" | \"destructive\" | \"ghost\" | \"outline\" | \"secondary\"",
+        "simplifiedType": "\"link\" | \"default\" | \"destructive\" | \"ghost\" | \"outline\" | \"secondary\"",
+        "required": false,
+        "deprecated": false
+      }
+    ]
+  }
+]

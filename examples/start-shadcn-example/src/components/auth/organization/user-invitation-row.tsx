@@ -1,12 +1,11 @@
 "use client"
 
+import type { OrganizationAuthClient } from "@better-auth-ui/core/plugins/organization"
+import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
 import {
-  type OrganizationAuthClient,
   useAcceptInvitation,
-  useAuth,
-  useAuthPlugin,
   useRejectInvitation
-} from "@better-auth-ui/react"
+} from "@better-auth-ui/react/plugins/organization"
 import type { Invitation } from "better-auth/client"
 import { Check, Clock, X } from "lucide-react"
 
@@ -23,15 +22,15 @@ export type UserInvitationRowProps = {
  * Single invitation row with accept/reject actions for the current user.
  */
 export function UserInvitationRow({ invitation }: UserInvitationRowProps) {
-  const { authClient } = useAuth()
+  const { authClient } = useAuth<OrganizationAuthClient>()
   const { localization: organizationLocalization, roles } =
     useAuthPlugin(organizationPlugin)
 
   const { mutate: acceptInvitation, isPending: isAccepting } =
-    useAcceptInvitation(authClient as OrganizationAuthClient)
+    useAcceptInvitation(authClient)
 
   const { mutate: rejectInvitation, isPending: isRejecting } =
-    useRejectInvitation(authClient as OrganizationAuthClient)
+    useRejectInvitation(authClient)
 
   return (
     <div className="flex items-center gap-3">

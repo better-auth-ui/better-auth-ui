@@ -65,7 +65,7 @@ const config: StorybookConfig = {
             "@": resolve(__dirname, "../src"),
             "@better-auth-ui/solid": resolve(
               __dirname,
-              "../../../packages/solid/src/index.ts"
+              "../../../packages/solid/src"
             )
           },
           conditions: ["browser", "default"],

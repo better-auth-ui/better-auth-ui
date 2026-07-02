@@ -1,17 +1,14 @@
 ---
-title: sendVerificationEmailOptions
+title: useSendVerificationEmail
 description: Send an email verification message.
 ---
 
-## Options factory
+## Usage
 
 ```tsx
-import { sendVerificationEmailOptions } from "@better-auth-ui/solid"
-import { createMutation } from "@tanstack/solid-query"
+import { useSendVerificationEmail } from "@better-auth-ui/solid"
 
-const sendVerificationEmail = createMutation(() =>
-  sendVerificationEmailOptions(authClient)
-)
+const sendVerificationEmail = useSendVerificationEmail(authClient)
 
 sendVerificationEmail.mutate({
   email: "alice@example.com",
@@ -19,6 +16,17 @@ sendVerificationEmail.mutate({
 })
 ```
 
+## Options factory
+
+```tsx
+import { sendVerificationEmailOptions } from "@better-auth-ui/core"
+import { useMutation } from "@tanstack/solid-query"
+
+const sendVerificationEmail = useMutation(() =>
+  sendVerificationEmailOptions(authClient)
+)
+```
+
 ## Params
 
-<auto-type-table path="../../../../../../packages/solid/src/mutations/auth/send-verification-email-mutation.ts" name="SendVerificationEmailParams" />
+<auto-type-table path="../../../../../../packages/core/src/mutations/send-verification-email-mutation.ts" name="SendVerificationEmailParams" />

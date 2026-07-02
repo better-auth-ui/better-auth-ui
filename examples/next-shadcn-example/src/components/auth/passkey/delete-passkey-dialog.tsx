@@ -1,11 +1,8 @@
 "use client"
 
-import {
-  type PasskeyAuthClient,
-  useAuth,
-  useAuthPlugin,
-  useDeletePasskey
-} from "@better-auth-ui/react"
+import type { PasskeyAuthClient } from "@better-auth-ui/core/plugins/passkey"
+import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
+import { useDeletePasskey } from "@better-auth-ui/react/plugins/passkey"
 import { Fingerprint } from "lucide-react"
 
 import {
@@ -42,14 +39,14 @@ export function DeletePasskeyDialog({
   onOpenChange,
   passkey
 }: DeletePasskeyDialogProps) {
-  const { authClient, localization } = useAuth()
+  const { authClient, localization } = useAuth<PasskeyAuthClient>()
   const { localization: passkeyLocalization } = useAuthPlugin(passkeyPlugin)
 
   const passkeyName = passkey.name || passkeyLocalization.passkey
   const previewId = `delete-passkey-preview-${passkey.id}`
 
   const { mutate: deletePasskey, isPending: isDeleting } = useDeletePasskey(
-    authClient as PasskeyAuthClient,
+    authClient,
     {
       onSuccess: () => onOpenChange(false)
     }

@@ -1,5 +1,5 @@
-import type { OrganizationLocalization } from "@better-auth-ui/core/plugins"
-import { organizationLocalization } from "@better-auth-ui/core/plugins"
+import type { OrganizationLocalization } from "@better-auth-ui/core/plugins/organization"
+import { organizationLocalization } from "@better-auth-ui/core/plugins/organization"
 import { useAuth } from "@better-auth-ui/solid"
 import { Briefcase } from "lucide-solid"
 import { Button } from "@/components/ui/button"

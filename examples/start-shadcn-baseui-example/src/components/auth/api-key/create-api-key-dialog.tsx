@@ -1,11 +1,8 @@
 "use client"
 
-import {
-  type ApiKeyAuthClient,
-  useAuth,
-  useAuthPlugin,
-  useCreateApiKey
-} from "@better-auth-ui/react"
+import type { ApiKeyAuthClient } from "@better-auth-ui/core/plugins/api-key"
+import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
+import { useCreateApiKey } from "@better-auth-ui/react/plugins/api-key"
 import { Key } from "lucide-react"
 import { type SyntheticEvent, useState } from "react"
 
@@ -39,12 +36,11 @@ export function CreateApiKeyDialog({
   onOpenChange,
   organizationId
 }: CreateApiKeyDialogProps) {
-  const { authClient, localization } = useAuth()
+  const { authClient, localization } = useAuth<ApiKeyAuthClient>()
   const { localization: apiKeyLocalization } = useAuthPlugin(apiKeyPlugin)
 
-  const { mutate: createApiKey, isPending: isCreating } = useCreateApiKey(
-    authClient as ApiKeyAuthClient
-  )
+  const { mutate: createApiKey, isPending: isCreating } =
+    useCreateApiKey(authClient)
 
   const [isNewKeyDialogOpen, setIsNewKeyDialogOpen] = useState(false)
   const [keyName, setKeyName] = useState<string | null>(null)

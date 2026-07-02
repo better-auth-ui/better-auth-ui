@@ -1,12 +1,12 @@
 import { authMutationKeys } from "@better-auth-ui/core"
+import type { UsernameAuthClient } from "@better-auth-ui/core/plugins/username"
 import {
-  type UsernameAuthClient,
   useAuth,
   useAuthPlugin,
   useFetchOptions,
-  useSignInEmail,
-  useSignInUsername
+  useSignInEmail
 } from "@better-auth-ui/react"
+import { useSignInUsername } from "@better-auth-ui/react/plugins/username"
 import {
   Button,
   Card,

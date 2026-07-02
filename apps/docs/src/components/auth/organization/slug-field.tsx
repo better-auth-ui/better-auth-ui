@@ -1,11 +1,8 @@
 "use client"
 
-import {
-  type OrganizationAuthClient,
-  useAuth,
-  useAuthPlugin,
-  useCheckSlug
-} from "@better-auth-ui/react"
+import type { OrganizationAuthClient } from "@better-auth-ui/core/plugins/organization"
+import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
+import { useCheckSlug } from "@better-auth-ui/react/plugins/organization"
 import { useDebouncer } from "@tanstack/react-pacer"
 import { Check, X } from "lucide-react"
 import { useEffect, useState } from "react"
@@ -48,7 +45,8 @@ export function SlugField({
   disabled,
   id = "slug"
 }: SlugFieldProps) {
-  const { authClient, localization: authLocalization } = useAuth()
+  const { authClient, localization: authLocalization } =
+    useAuth<OrganizationAuthClient>()
   const {
     localization,
     checkSlug: checkSlugEnabled,
@@ -62,7 +60,7 @@ export function SlugField({
     data: checkSlugData,
     error: checkSlugError,
     reset: resetCheckSlug
-  } = useCheckSlug(authClient as OrganizationAuthClient)
+  } = useCheckSlug(authClient)
 
   const debouncer = useDebouncer(
     (next: string) => {

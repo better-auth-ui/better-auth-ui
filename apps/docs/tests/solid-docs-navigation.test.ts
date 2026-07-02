@@ -253,7 +253,7 @@ describe("Solid docs navigation", () => {
     expect(index).toContain("/docs/zaidan/integrations/tanstack-start")
     expect(index).not.toContain("/docs/solid/integrations")
     expect(index).not.toContain("Solid Start")
-    expect(ssr).toContain("@better-auth-ui/solid/server")
+    expect(ssr).toContain("@better-auth-ui/core/server")
     expect(ssr).toContain("does not create routes")
   })
 

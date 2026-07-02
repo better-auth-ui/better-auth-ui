@@ -1,0 +1,27 @@
+[
+  {
+    "id": "api-key-plugin.ts-ApiKeyPluginOptions",
+    "name": "ApiKeyPluginOptions",
+    "description": "",
+    "entries": [
+      {
+        "name": "localization",
+        "description": "Override the plugin's default localization strings.",
+        "tags": [{ "name": "remarks", "text": "`ApiKeyLocalization`" }],
+        "type": "Partial<{ apiKey: string; apiKeys: string; apiKeysDescription: string; createApiKey: string; noApiKeys: string; name: string; newApiKey: string; newApiKeyWarning: string; deleteApiKey: string; deleteApiKeyWarning: string; dismissNewKey: string; }>",
+        "simplifiedType": "ApiKeyLocalization",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "organization",
+        "description": "Enable organization-owned API keys.\n\nWhen `true`, the plugin contributes an organization-scoped API keys card\nto `<OrganizationSettings />`, and list/create/delete operations made on\nbehalf of an organization send `configId: \"organization\"`.\n\nRequires a matching server-side `apiKey` config entry with\n`configId: \"organization\"` and `references: \"organization\"`:\n\n```ts\napiKey([\n  { configId: \"default\", references: \"user\" },\n  { configId: \"organization\", references: \"organization\" }\n])\n```",
+        "tags": [{ "name": "default", "text": "false" }],
+        "type": "boolean",
+        "simplifiedType": "boolean",
+        "required": false,
+        "deprecated": false
+      }
+    ]
+  }
+]

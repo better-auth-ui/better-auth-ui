@@ -1,0 +1,63 @@
+[
+  {
+    "id": "username-plugin.ts-UsernamePluginOptions",
+    "name": "UsernamePluginOptions",
+    "description": "",
+    "entries": [
+      {
+        "name": "displayUsername",
+        "description": "Whether to use displayUsername for the visible username field in the profile.",
+        "tags": [],
+        "type": "boolean",
+        "simplifiedType": "boolean",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "isUsernameAvailable",
+        "description": "Whether to check username availability on sign-up and user profile.",
+        "tags": [],
+        "type": "boolean",
+        "simplifiedType": "boolean",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "minUsernameLength",
+        "description": "Minimum allowed username length.",
+        "tags": [{ "name": "default", "text": "3" }],
+        "type": "number",
+        "simplifiedType": "number",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "maxUsernameLength",
+        "description": "Maximum allowed username length.",
+        "tags": [{ "name": "default", "text": "30" }],
+        "type": "number",
+        "simplifiedType": "number",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "localization",
+        "description": "Override the plugin's default localization strings.",
+        "tags": [{ "name": "remarks", "text": "`UsernameLocalization`" }],
+        "type": "Partial<{ username: string; usernamePlaceholder: string; usernameOrEmailPlaceholder: string; usernameAvailable: string; usernameTaken: string; displayUsername: string; displayUsernamePlaceholder: string; }>",
+        "simplifiedType": "UsernameLocalization",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "usernamePrefix",
+        "description": "Prefix prepended to usernames.",
+        "tags": [{ "name": "default", "text": "\"\"" }],
+        "type": "string",
+        "simplifiedType": "string",
+        "required": false,
+        "deprecated": false
+      }
+    ]
+  }
+]

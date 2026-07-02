@@ -47,7 +47,7 @@ Add `magicLinkClient()` to your Solid auth client so `authClient.signIn.magicLin
 
 ```ts title="src/lib/auth-client.ts"
 import { magicLinkClient } from "better-auth/client/plugins" // [!code highlight]
-import { createAuthClient } from "@better-auth-ui/solid" // [!code highlight]
+import { createAuthClient } from "better-auth/solid" // [!code highlight]
 
 export const authClient = createAuthClient({
   plugins: [

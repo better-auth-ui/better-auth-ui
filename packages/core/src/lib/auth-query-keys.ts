@@ -34,24 +34,17 @@ export const authQueryKeys = {
   /** Prefix for every per-user query. */
   users: () => [...authQueryKeys.all, "user"] as const,
   /** Prefix for every query scoped to a specific user. */
-  user: (userId: string | undefined) =>
-    [...authQueryKeys.users(), userId] as const,
+  user: (userId?: string) => [...authQueryKeys.users(), userId] as const,
 
   /** Key for `accountInfo` for the given user. */
-  accountInfo: <TQuery = undefined>(
-    userId: string | undefined,
-    query?: TQuery
-  ) => [...authQueryKeys.user(userId), "accountInfo", query ?? null] as const,
+  accountInfo: <TQuery = undefined>(userId?: string, query?: TQuery) =>
+    [...authQueryKeys.user(userId), "accountInfo", query ?? null] as const,
 
   /** Key for `listAccounts` for the given user. */
-  listAccounts: <TQuery = undefined>(
-    userId: string | undefined,
-    query?: TQuery
-  ) => [...authQueryKeys.user(userId), "listAccounts", query ?? null] as const,
+  listAccounts: <TQuery = undefined>(userId?: string, query?: TQuery) =>
+    [...authQueryKeys.user(userId), "listAccounts", query ?? null] as const,
 
   /** Key for `listSessions` for the given user. */
-  listSessions: <TQuery = undefined>(
-    userId: string | undefined,
-    query?: TQuery
-  ) => [...authQueryKeys.user(userId), "listSessions", query ?? null] as const
+  listSessions: <TQuery = undefined>(userId?: string, query?: TQuery) =>
+    [...authQueryKeys.user(userId), "listSessions", query ?? null] as const
 } as const

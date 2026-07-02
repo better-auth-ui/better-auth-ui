@@ -38,7 +38,7 @@ export const auth = betterAuth({
 })
 ```
 
-Better Auth protects `/sign-up/email`, `/sign-in/email`, and `/request-password-reset` by default. If your app enables the username plugin and protects username sign-in too, include that endpoint explicitly:
+Better Auth protects `/sign-up/email`, `/sign-in/email`, and `/request-password-reset` by default. Better Auth 1.7+ matches full auth paths, so use exact endpoints like these or explicit wildcards such as `/sign-in/*`; do not rely on partial prefixes like `/sign-in`. If your app enables the username plugin and protects username sign-in too, include that endpoint explicitly:
 
 ```ts title="src/lib/auth.ts"
 captcha({
@@ -60,7 +60,7 @@ captcha({
 Pass `captchaPlugin({ render })` to `<AuthProvider>`. `render` is a Solid component that receives `setToken`, `clearToken`, and `setReset` and is responsible for mounting your provider widget.
 
 ```tsx title="src/components/providers.tsx"
-import { captchaPlugin } from "@better-auth-ui/solid/plugins" // [!code highlight]
+import { captchaPlugin } from "@better-auth-ui/solid/plugins/captcha" // [!code highlight]
 import { AuthProvider } from "@/components/auth/auth-provider"
 import { authClient } from "@/lib/auth-client"
 
@@ -100,7 +100,7 @@ The server-side Better Auth provider names are the same as shadcn. Only the clie
 ```
 
 ```tsx title="src/components/turnstile-widget.tsx"
-import type { CaptchaRenderProps } from "@better-auth-ui/solid/plugins"
+import type { CaptchaRenderProps } from "@better-auth-ui/solid/plugins/captcha"
 import {
   createCaptchaController,
   Turnstile,
@@ -134,7 +134,7 @@ export function TurnstileWidget({
 ```
 
 ```tsx title="src/components/providers.tsx"
-import { captchaPlugin } from "@better-auth-ui/solid/plugins"
+import { captchaPlugin } from "@better-auth-ui/solid/plugins/captcha"
 import { AuthProvider } from "@/components/auth/auth-provider"
 
 import { TurnstileWidget } from "@/components/turnstile-widget"
@@ -154,7 +154,7 @@ import { TurnstileWidget } from "@/components/turnstile-widget"
 ```
 
 ```tsx title="src/components/hcaptcha-widget.tsx"
-import type { CaptchaRenderProps } from "@better-auth-ui/solid/plugins"
+import type { CaptchaRenderProps } from "@better-auth-ui/solid/plugins/captcha"
 import {
   createCaptchaController,
   HCaptcha,
@@ -188,7 +188,7 @@ export function HCaptchaWidget({
 ```
 
 ```tsx title="src/components/providers.tsx"
-import { captchaPlugin } from "@better-auth-ui/solid/plugins"
+import { captchaPlugin } from "@better-auth-ui/solid/plugins/captcha"
 import { AuthProvider } from "@/components/auth/auth-provider"
 
 import { HCaptchaWidget } from "@/components/hcaptcha-widget"
@@ -208,7 +208,7 @@ import { HCaptchaWidget } from "@/components/hcaptcha-widget"
 ```
 
 ```tsx title="src/components/captchafox-widget.tsx"
-import type { CaptchaRenderProps } from "@better-auth-ui/solid/plugins"
+import type { CaptchaRenderProps } from "@better-auth-ui/solid/plugins/captcha"
 import {
   CaptchaFox,
   type CaptchaFoxHandle,
@@ -242,7 +242,7 @@ export function CaptchaFoxWidget({
 ```
 
 ```tsx title="src/components/providers.tsx"
-import { captchaPlugin } from "@better-auth-ui/solid/plugins"
+import { captchaPlugin } from "@better-auth-ui/solid/plugins/captcha"
 import { AuthProvider } from "@/components/auth/auth-provider"
 
 import { CaptchaFoxWidget } from "@/components/captchafox-widget"

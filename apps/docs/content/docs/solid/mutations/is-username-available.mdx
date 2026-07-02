@@ -1,23 +1,33 @@
 ---
-title: isUsernameAvailableOptions
+title: useIsUsernameAvailable
 description: Check username availability.
 ---
 
-Requires the Better Auth username plugin. If TypeScript cannot infer the plugin methods from your client, type or cast `authClient` as `UsernameAuthClient` from `@better-auth-ui/solid`.
+Requires the Better Auth username plugin. Import your configured `authClient`; it already carries the username methods from `createAuthClient`.
 
 This check is modeled as a mutation because callers usually trigger it from user input, not from route-level data loading. Returned data is typed as `{ available: boolean; message: string | null }`.
+
+## Usage
+
+```tsx
+import { useIsUsernameAvailable } from "@better-auth-ui/solid/plugins/username"
+
+const mutation = useIsUsernameAvailable(authClient)
+
+mutation.mutate(/* params */)
+```
 
 ## Options factory
 
 ```tsx
-import { isUsernameAvailableOptions } from "@better-auth-ui/solid"
-import { createMutation } from "@tanstack/solid-query"
+import { isUsernameAvailableOptions } from "@better-auth-ui/core/plugins/username"
+import { useMutation } from "@tanstack/solid-query"
 
-const checkUsername = createMutation(() => isUsernameAvailableOptions(authClient))
+const checkUsername = useMutation(() => isUsernameAvailableOptions(authClient))
 
 checkUsername.mutate({ username: "alice" })
 ```
 
 ## Params
 
-<auto-type-table path="../../../../../../packages/solid/src/mutations/username/is-username-available-mutation.ts" name="IsUsernameAvailableParams" />
+<auto-type-table path="../../../../../../packages/core/src/plugins/username/is-username-available-mutation.ts" name="IsUsernameAvailableParams" />

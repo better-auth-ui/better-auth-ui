@@ -6,24 +6,24 @@ description: Remove a member from an organization.
 ## Usage
 
 ```tsx
-import { useRemoveMember } from "@better-auth-ui/solid"
+import { useRemoveMember } from "@better-auth-ui/solid/plugins/organization"
 
 const mutation = useRemoveMember(authClient)
 
 mutation.mutate(/* params */)
 ```
 
-Organization mutations require `organizationClient()` on the Better Auth client. They attach the same `meta.invalidates` / `meta.awaits` cache metadata used by upstream React, and the Solid `AuthProvider` installs a mutation invalidator that refreshes affected organization/session caches after successful auth mutations.
+Organization mutations require `organizationClient()` on the Better Auth client. They attach the same `meta.invalidates` / `meta.awaits` cache metadata used by the shared React implementation, and the Solid `AuthProvider` installs a mutation invalidator that refreshes affected organization/session caches after successful auth mutations.
 
 ## Options factory
 
 ```tsx
-import { removeMemberOptions } from "@better-auth-ui/solid"
-import { createMutation } from "@tanstack/solid-query"
+import { removeMemberOptions } from "@better-auth-ui/core/plugins/organization"
+import { useMutation } from "@tanstack/solid-query"
 
-const mutation = createMutation(() => removeMemberOptions(authClient))
+const mutation = useMutation(() => removeMemberOptions(authClient))
 ```
 
 ## Params
 
-<auto-type-table path="../../../../../../packages/solid/src/mutations/organization/remove-member-mutation.ts" name="RemoveMemberParams" />
+<auto-type-table path="../../../../../../packages/core/src/plugins/organization/remove-member-mutation.ts" name="RemoveMemberParams" />

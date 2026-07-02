@@ -12,7 +12,7 @@ export type OrganizationLogoProps = {
   class?: string
   fallback?: JSX.Element
   isPending?: boolean
-  organization?: Partial<Organization>
+  organization?: Partial<Organization> | null
   size?: OrganizationLogoSize
 }
 

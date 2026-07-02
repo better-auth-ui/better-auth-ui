@@ -1,0 +1,63 @@
+[
+  {
+    "id": "api-keys.tsx-ApiKeysProps",
+    "name": "ApiKeysProps",
+    "description": "",
+    "entries": [
+      {
+        "name": "className",
+        "description": "",
+        "tags": [],
+        "type": "string",
+        "simplifiedType": "string",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "variant",
+        "description": "",
+        "tags": [],
+        "type": "\"default\" | \"secondary\" | \"tertiary\" | \"transparent\"",
+        "simplifiedType": "\"default\" | \"secondary\" | \"tertiary\" | \"transparent\"",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "organizationId",
+        "description": "Scope the list and create payload to an organization.",
+        "tags": [],
+        "type": "string",
+        "simplifiedType": "string",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "isPending",
+        "description": "Force the loading skeleton and disable the list query.",
+        "tags": [],
+        "type": "boolean",
+        "simplifiedType": "boolean",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "hideCreate",
+        "description": "Hide the \"Create API key\" button (header + empty state).",
+        "tags": [],
+        "type": "boolean",
+        "simplifiedType": "boolean",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "hideDelete",
+        "description": "Hide the per-row delete button on listed keys.",
+        "tags": [],
+        "type": "boolean",
+        "simplifiedType": "boolean",
+        "required": false,
+        "deprecated": false
+      }
+    ]
+  }
+]

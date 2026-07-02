@@ -1,5 +1,5 @@
 import { AuthProvider } from "@better-auth-ui/heroui"
-import { organizationPlugin } from "@better-auth-ui/heroui/plugins"
+import { organizationPlugin } from "@better-auth-ui/heroui/plugins/organization"
 import type { ReactNode } from "react"
 
 import { authClient } from "@/lib/auth-client"

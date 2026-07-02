@@ -8,26 +8,20 @@ Prompts the WebAuthn ceremony then refetches the passkey list on success.
 ## Usage
 
 ```tsx
-import {
-  type PasskeyAuthClient,
-  useAddPasskey,
-  useAuth
-} from "@better-auth-ui/react"
+import { authClient } from "@/lib/auth-client"
+import { useAddPasskey } from "@better-auth-ui/react/plugins/passkey"
 
-const { authClient } = useAuth()
-const { mutate: addPasskey, isPending } = useAddPasskey(
-  authClient as PasskeyAuthClient
-)
+const { mutate: addPasskey, isPending } = useAddPasskey(authClient)
 
 addPasskey({ name: "MacBook Pro" })
 ```
 
-`useAddPasskey` requires the Better Auth `passkey` plugin. Cast `authClient` to `PasskeyAuthClient` so TypeScript picks up the plugin-extended method signature.
+`useAddPasskey` requires the Better Auth `passkey` plugin. Import your configured `authClient`; it already carries the plugin methods from `createAuthClient`.
 
 ## Options factory
 
 ```tsx
-import { addPasskeyOptions } from "@better-auth-ui/react"
+import { addPasskeyOptions } from "@better-auth-ui/core/plugins/passkey"
 import { useMutation } from "@tanstack/react-query"
 
 const { mutate } = useMutation(addPasskeyOptions(authClient))
@@ -35,4 +29,4 @@ const { mutate } = useMutation(addPasskeyOptions(authClient))
 
 ## Params
 
-<auto-type-table path="../../../../../../packages/react/src/mutations/passkey/add-passkey-mutation.ts" name="AddPasskeyParams" />
+<auto-type-table path="../../../../../../packages/core/src/plugins/passkey/add-passkey-mutation.ts" name="AddPasskeyParams" />

@@ -28,7 +28,7 @@
     },
     {
       "path": "src/lib/auth/delete-user-plugin.ts",
-      "content": "import { createAuthPlugin } from \"@better-auth-ui/core\"\nimport {\n  deleteUserPlugin as coreDeleteUserPlugin,\n  type DeleteUserPluginOptions\n} from \"@better-auth-ui/core/plugins\"\n\nimport { DangerZone } from \"@/components/auth/delete-user/danger-zone\"\n\nexport const deleteUserPlugin = createAuthPlugin(\n  coreDeleteUserPlugin.id,\n  (options: DeleteUserPluginOptions = {}) => ({\n    ...coreDeleteUserPlugin(options),\n    securityCards: [DangerZone]\n  })\n)\n",
+      "content": "import { createAuthPlugin } from \"@better-auth-ui/core\"\nimport {\n  deleteUserPlugin as coreDeleteUserPlugin,\n  type DeleteUserPluginOptions\n} from \"@better-auth-ui/core/plugins/delete-user\"\n\nimport { DangerZone } from \"@/components/auth/delete-user/danger-zone\"\n\nexport const deleteUserPlugin = createAuthPlugin(\n  coreDeleteUserPlugin.id,\n  (options: DeleteUserPluginOptions = {}) => ({\n    ...coreDeleteUserPlugin(options),\n    securityCards: [DangerZone]\n  })\n)\n",
       "type": "registry:lib",
       "target": "@lib/auth/delete-user-plugin.ts"
     },

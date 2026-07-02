@@ -1,3 +1,4 @@
+import type { apiKeyClient } from "@better-auth/api-key/client"
 import { basePaths, viewPaths } from "@better-auth-ui/core"
 import { renderHook } from "@testing-library/react"
 import { createAuthClient } from "better-auth/react"
@@ -15,6 +16,10 @@ vi.mock("better-auth/react", () => ({
     }))
   }))
 }))
+
+type ApiKeyTestClient = ReturnType<
+  typeof createAuthClient<{ plugins: [ReturnType<typeof apiKeyClient>] }>
+>
 
 describe("useAuth", () => {
   const mockAuthClient = createAuthClient({
@@ -46,6 +51,20 @@ describe("useAuth", () => {
       expect(result.current.authClient).toBeDefined()
       expect(result.current.basePaths).toBeDefined()
       expect(result.current.viewPaths).toBeDefined()
+    })
+
+    it("supports generic auth client narrowing for consumers", () => {
+      const wrapper = ({ children }: { children: ReactNode }) => (
+        <AuthProvider authClient={mockAuthClient} navigate={() => {}}>
+          {children}
+        </AuthProvider>
+      )
+
+      const { result } = renderHook(() => useAuth<ApiKeyTestClient>(), {
+        wrapper
+      })
+
+      expect(result.current.authClient).toBeDefined()
     })
   })
 
@@ -141,24 +160,6 @@ describe("useAuth", () => {
       const { result } = renderHook(() => useAuth(), { wrapper })
 
       expect(result.current.socialProviders).toEqual(["github", "google"])
-    })
-  })
-
-  describe("magic link configuration", () => {
-    it("should accept magicLink boolean", () => {
-      const wrapper = ({ children }: { children: ReactNode }) => (
-        <AuthProvider
-          authClient={mockAuthClient}
-          magicLink={true}
-          navigate={() => {}}
-        >
-          {children}
-        </AuthProvider>
-      )
-
-      const { result } = renderHook(() => useAuth(), { wrapper })
-
-      expect(result.current.magicLink).toBe(true)
     })
   })
 })

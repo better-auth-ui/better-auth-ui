@@ -1,0 +1,18 @@
+[
+  {
+    "id": "change-email.tsx-ChangeEmailProps",
+    "name": "ChangeEmailProps",
+    "description": "",
+    "entries": [
+      {
+        "name": "class",
+        "description": "",
+        "tags": [],
+        "type": "string",
+        "simplifiedType": "string",
+        "required": false,
+        "deprecated": false
+      }
+    ]
+  }
+]

@@ -1,0 +1,18 @@
+[
+  {
+    "id": "captcha-plugin.tsx-CaptchaPluginOptions",
+    "name": "CaptchaPluginOptions",
+    "description": "",
+    "entries": [
+      {
+        "name": "render",
+        "description": "Renders the captcha widget. Wire `setToken`, `clearToken`, `setReset`.",
+        "tags": [],
+        "type": "ComponentType<CaptchaRenderProps>",
+        "simplifiedType": "ComponentType<CaptchaRenderProps>",
+        "required": true,
+        "deprecated": false
+      }
+    ]
+  }
+]

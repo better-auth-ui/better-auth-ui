@@ -36,7 +36,7 @@ export const auth = betterAuth({
 })
 ```
 
-The Better Auth captcha plugin protects `/sign-up/email`, `/sign-in/email`, and `/request-password-reset` by default — exactly the views the UI plugin renders the widget on. To also protect `/sign-in/username`, pass it explicitly:
+The Better Auth captcha plugin protects `/sign-up/email`, `/sign-in/email`, and `/request-password-reset` by default — exactly the views the UI plugin renders the widget on. Better Auth 1.7+ matches full auth paths, so use exact endpoints like these or explicit wildcards such as `/sign-in/*`; do not rely on partial prefixes like `/sign-in`. To also protect `/sign-in/username`, pass it explicitly:
 
 ```ts
 captcha({
@@ -59,7 +59,7 @@ Pass `captchaPlugin({ render })` to `<AuthProvider>`. `render` is a component th
 
 ```tsx title="components/providers.tsx"
 import { AuthProvider } from "@better-auth-ui/heroui"
-import { captchaPlugin } from "@better-auth-ui/react/plugins" // [!code highlight]
+import { captchaPlugin } from "@better-auth-ui/react/plugins/captcha" // [!code highlight]
 
 import { TurnstileWidget } from "@/components/turnstile-widget" // [!code highlight]
 
@@ -86,7 +86,7 @@ The `render` component is mounted as a real React component, so hooks like `useT
 ```
 
 ```tsx title="components/turnstile-widget.tsx"
-import type { CaptchaRenderProps } from "@better-auth-ui/react/plugins"
+import type { CaptchaRenderProps } from "@better-auth-ui/react/plugins/captcha"
 import { type TurnstileInstance, Turnstile } from "@marsidev/react-turnstile"
 import { useEffect, useRef } from "react"
 
@@ -117,7 +117,7 @@ export function TurnstileWidget({
 
 ```tsx title="components/providers.tsx"
 import { AuthProvider } from "@better-auth-ui/heroui"
-import { captchaPlugin } from "@better-auth-ui/react/plugins"
+import { captchaPlugin } from "@better-auth-ui/react/plugins/captcha"
 
 import { TurnstileWidget } from "@/components/turnstile-widget"
 
@@ -136,7 +136,7 @@ import { TurnstileWidget } from "@/components/turnstile-widget"
 ```
 
 ```tsx title="components/hcaptcha-widget.tsx"
-import type { CaptchaRenderProps } from "@better-auth-ui/react/plugins"
+import type { CaptchaRenderProps } from "@better-auth-ui/react/plugins/captcha"
 import HCaptcha from "@hcaptcha/react-hcaptcha"
 import { useTheme } from "next-themes"
 import { useEffect, useRef } from "react"
@@ -169,7 +169,7 @@ export function HCaptchaWidget({
 
 ```tsx title="components/providers.tsx"
 import { AuthProvider } from "@better-auth-ui/heroui"
-import { captchaPlugin } from "@better-auth-ui/react/plugins"
+import { captchaPlugin } from "@better-auth-ui/react/plugins/captcha"
 
 import { HCaptchaWidget } from "@/components/hcaptcha-widget"
 
@@ -188,7 +188,7 @@ import { HCaptchaWidget } from "@/components/hcaptcha-widget"
 ```
 
 ```tsx title="components/captchafox-widget.tsx"
-import type { CaptchaRenderProps } from "@better-auth-ui/react/plugins"
+import type { CaptchaRenderProps } from "@better-auth-ui/react/plugins/captcha"
 import { CaptchaFox, type CaptchaFoxInstance } from "@captchafox/react"
 import { useTheme } from "next-themes"
 import { useEffect, useRef } from "react"
@@ -222,7 +222,7 @@ export function CaptchaFoxWidget({
 
 ```tsx title="components/providers.tsx"
 import { AuthProvider } from "@better-auth-ui/heroui"
-import { captchaPlugin } from "@better-auth-ui/react/plugins"
+import { captchaPlugin } from "@better-auth-ui/react/plugins/captcha"
 
 import { CaptchaFoxWidget } from "@/components/captchafox-widget"
 

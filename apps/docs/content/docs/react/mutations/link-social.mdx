@@ -8,9 +8,9 @@ Kicks off the OAuth redirect — the linked account appears in `useListAccounts`
 ## Usage
 
 ```tsx
-import { useAuth, useLinkSocial } from "@better-auth-ui/react"
+import { authClient } from "@/lib/auth-client"
+import { useLinkSocial } from "@better-auth-ui/react"
 
-const { authClient } = useAuth()
 const { mutate: linkSocial } = useLinkSocial(authClient)
 
 linkSocial({
@@ -22,7 +22,7 @@ linkSocial({
 ## Options factory
 
 ```tsx
-import { linkSocialOptions } from "@better-auth-ui/react"
+import { linkSocialOptions } from "@better-auth-ui/core"
 import { useMutation } from "@tanstack/react-query"
 
 const { mutate } = useMutation(linkSocialOptions(authClient))
@@ -30,4 +30,4 @@ const { mutate } = useMutation(linkSocialOptions(authClient))
 
 ## Params
 
-<auto-type-table path="../../../../../../packages/react/src/mutations/settings/link-social-mutation.ts" name="LinkSocialParams" />
+<auto-type-table path="../../../../../../packages/core/src/mutations/link-social-mutation.ts" name="LinkSocialParams" />

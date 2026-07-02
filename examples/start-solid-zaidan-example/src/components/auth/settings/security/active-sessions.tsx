@@ -1,17 +1,13 @@
+import type { ListSession } from "@better-auth-ui/core"
 import {
-  type ListSession,
-  listSessionsOptions,
-  revokeSessionOptions,
   useAuth,
+  useListSessions,
+  useRevokeSession,
   useSession
 } from "@better-auth-ui/solid"
-import { createMutation, createQuery } from "@tanstack/solid-query"
 import { For, Show } from "solid-js"
 import { toast } from "solid-sonner"
-import {
-  resolveUserLabel,
-  shouldLoadDeviceSessions
-} from "@/components/auth/settings/shared/helpers"
+import { resolveUserLabel } from "@/components/auth/settings/shared/helpers"
 import { Card, CardContent } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
 import { cn } from "@/lib/utils"
@@ -26,20 +22,12 @@ export function ActiveSessionsSettings(
 ) {
   const auth = useAuth()
   const session = useSession(auth.authClient)
-  const userId = () => session.data?.user.id
-  const activeSessions = createQuery(() => ({
-    ...listSessionsOptions(auth.authClient, userId()),
-    enabled: shouldLoadDeviceSessions({
-      isSsr: import.meta.env.SSR,
-      userId: userId()
-    })
-  }))
+  const activeSessions = useListSessions(auth.authClient)
   const sessions = () =>
     [...(activeSessions.data ?? [])].sort((activeSession) =>
       activeSession.id === session.data?.session.id ? -1 : 1
     )
-  const revokeSession = createMutation(() => ({
-    ...revokeSessionOptions(auth.authClient),
+  const revokeSession = useRevokeSession(auth.authClient, () => ({
     onSuccess: () =>
       toast.success(auth.localization.settings.revokeSessionSuccess)
   }))

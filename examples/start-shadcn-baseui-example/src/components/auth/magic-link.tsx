@@ -1,12 +1,9 @@
 "use client"
 
 import { authMutationKeys } from "@better-auth-ui/core"
-import {
-  type MagicLinkAuthClient,
-  useAuth,
-  useAuthPlugin,
-  useSignInMagicLink
-} from "@better-auth-ui/react"
+import type { MagicLinkAuthClient } from "@better-auth-ui/core/plugins/magic-link"
+import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
+import { useSignInMagicLink } from "@better-auth-ui/react/plugins/magic-link"
 import { useIsMutating } from "@tanstack/react-query"
 import { type SyntheticEvent, useState } from "react"
 import { toast } from "sonner"
@@ -57,13 +54,13 @@ export function MagicLink({
     socialProviders,
     viewPaths,
     Link
-  } = useAuth()
+  } = useAuth<MagicLinkAuthClient>()
   const { localization: magicLinkLocalization } = useAuthPlugin(magicLinkPlugin)
 
   const [email, setEmail] = useState("")
 
   const { mutate: signInMagicLink, isPending: signInMagicLinkPending } =
-    useSignInMagicLink(authClient as MagicLinkAuthClient, {
+    useSignInMagicLink(authClient, {
       onSuccess: () => {
         setEmail("")
         toast.success(magicLinkLocalization.magicLinkSent)

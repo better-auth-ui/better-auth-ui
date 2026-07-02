@@ -1,15 +1,14 @@
+import type { OrganizationAuthClient } from "@better-auth-ui/core/plugins/organization"
 import {
   organizationLocalization as defaultOrganizationLocalization,
   type OrganizationLocalization
-} from "@better-auth-ui/core/plugins"
-import type { OrganizationAuthClient } from "@better-auth-ui/solid"
+} from "@better-auth-ui/core/plugins/organization"
+import { useAuth, useSession } from "@better-auth-ui/solid"
 import {
   useActiveOrganization,
-  useAuth,
   useListOrganizations,
-  useSession,
   useSetActiveOrganization
-} from "@better-auth-ui/solid"
+} from "@better-auth-ui/solid/plugins/organization"
 import { useNavigate } from "@tanstack/solid-router"
 import type { Organization } from "better-auth/client"
 import {
@@ -82,8 +81,8 @@ function OrganizationSwitcherTrigger(rawProps: OrganizationSwitcherProps = {}) {
 
 function MountedOrganizationSwitcher(rawProps: OrganizationSwitcherProps = {}) {
   const props = mergeProps({ hideSlug: true }, rawProps)
-  const auth = useAuth()
-  const client = auth.authClient as OrganizationAuthClient
+  const auth = useAuth<OrganizationAuthClient>()
+  const client = auth.authClient
   const navigate = useNavigate()
   const session = useSession(client)
   const activeOrganization = useActiveOrganization(client)

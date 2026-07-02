@@ -1,9 +1,9 @@
-import type { OrganizationAuthClient } from "@better-auth-ui/solid"
+import type { OrganizationAuthClient } from "@better-auth-ui/core/plugins/organization"
+import { useAuth } from "@better-auth-ui/solid"
 import {
-  useAuth,
   useCancelInvitation,
   useHasPermission
-} from "@better-auth-ui/solid"
+} from "@better-auth-ui/solid/plugins/organization"
 import { X } from "lucide-solid"
 import { Show } from "solid-js"
 import { Badge } from "@/components/ui/badge"
@@ -61,16 +61,11 @@ function formatInvitationDate(createdAt?: Date | string | null) {
 export function OrganizationInvitationRow(
   props: OrganizationInvitationRowProps
 ) {
-  const auth = useAuth()
-  const permission = useHasPermission(
-    auth.authClient as OrganizationAuthClient,
-    {
-      permissions: { invitation: ["cancel"] }
-    }
-  )
-  const cancelInvitation = useCancelInvitation(
-    auth.authClient as OrganizationAuthClient
-  )
+  const auth = useAuth<OrganizationAuthClient>()
+  const permission = useHasPermission(auth.authClient, () => ({
+    permissions: { invitation: ["cancel"] }
+  }))
+  const cancelInvitation = useCancelInvitation(auth.authClient)
   const roleLabel = () =>
     props.roles[props.invitation.role ?? ""] ??
     formatRole(props.invitation.role)

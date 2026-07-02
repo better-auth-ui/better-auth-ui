@@ -1,11 +1,8 @@
 "use client"
 
-import {
-  type OrganizationAuthClient,
-  useAuth,
-  useAuthPlugin,
-  useRemoveMember
-} from "@better-auth-ui/react"
+import type { OrganizationAuthClient } from "@better-auth-ui/core/plugins/organization"
+import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
+import { useRemoveMember } from "@better-auth-ui/react/plugins/organization"
 import type { Member, User } from "better-auth/client"
 import { Trash2 } from "lucide-react"
 import { toast } from "sonner"
@@ -38,19 +35,16 @@ export function RemoveMemberDialog({
   onOpenChange,
   member
 }: RemoveMemberDialogProps) {
-  const { authClient, localization } = useAuth()
+  const { authClient, localization } = useAuth<OrganizationAuthClient>()
   const { localization: organizationLocalization, roles } =
     useAuthPlugin(organizationPlugin)
 
-  const { mutate: removeMember, isPending } = useRemoveMember(
-    authClient as OrganizationAuthClient,
-    {
-      onSuccess: () => {
-        onOpenChange(false)
-        toast.success(organizationLocalization.memberRemoved)
-      }
+  const { mutate: removeMember, isPending } = useRemoveMember(authClient, {
+    onSuccess: () => {
+      onOpenChange(false)
+      toast.success(organizationLocalization.memberRemoved)
     }
-  )
+  })
 
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>

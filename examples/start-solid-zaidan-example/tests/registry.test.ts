@@ -32,8 +32,16 @@ const makeTempRoot = () => {
   return root
 }
 
+const parseJson = <T>(source: string, path: string) => {
+  try {
+    return JSON.parse(source) as T
+  } catch (error) {
+    throw new Error(`Invalid JSON in ${path}`, { cause: error })
+  }
+}
+
 const readJson = <T>(path: string) =>
-  JSON.parse(readFileSync(path, "utf8")) as T
+  parseJson<T>(readFileSync(path, "utf8"), path)
 
 const collectFiles = (root: string): string[] =>
   readdirSync(root, { withFileTypes: true }).flatMap((entry) => {
@@ -962,21 +970,21 @@ describe("Solid registry isolation", () => {
     expect(signOut).toContain("auth.authClient.signOut")
     expect(forgotPassword).toContain('from "@better-auth-ui/solid"')
     expect(forgotPassword).toContain('from "solid-js"')
-    expect(forgotPassword).toContain("requestPasswordResetOptions")
-    expect(forgotPassword).toContain("createMutation")
+    expect(forgotPassword).toContain("useRequestPasswordReset")
+    expect(forgotPassword).toContain("useRequestPasswordReset")
     expect(forgotPassword).toContain('type="email"')
     expect(resetPassword).toContain('from "@better-auth-ui/solid"')
     expect(resetPassword).toContain('from "solid-js"')
-    expect(resetPassword).toContain("resetPasswordOptions")
-    expect(resetPassword).toContain("createMutation")
+    expect(resetPassword).toContain("useResetPassword")
+    expect(resetPassword).toContain("useResetPassword")
     expect(resetPassword).toContain(
       'type={isPasswordVisible() ? "text" : "password"}'
     )
     expect(resetPassword).toContain("tokenFromLocation")
     expect(signUp).toContain('from "@better-auth-ui/solid"')
     expect(signUp).toContain('from "solid-js"')
-    expect(signUp).toContain("signUpEmailOptions")
-    expect(signUp).toContain("createMutation")
+    expect(signUp).toContain("useSignUpEmail")
+    expect(signUp).toContain("useSignUpEmail")
     expect(signUp).toContain('type="email"')
     expect(signUp).toContain('autocomplete="new-password"')
   })
@@ -1079,8 +1087,8 @@ describe("Solid registry isolation", () => {
     )
 
     expect(signIn).toContain('from "@better-auth-ui/solid"')
-    expect(signIn).toContain("signInEmailOptions")
-    expect(signIn).toContain("createMutation")
+    expect(signIn).toContain("useSignInEmail")
+    expect(signIn).toContain("useSignInEmail")
     expect(signIn).toContain("usernameOrEmailPlaceholder")
     expect(signIn).toContain(
       "placeholder={auth.localization.auth.passwordPlaceholder}"
@@ -1495,7 +1503,7 @@ describe("Solid registry isolation", () => {
     expect(authClient).toContain("passkeyClient()")
     expect(authClient).toContain("usernameClient()")
 
-    expect(signIn).toContain("signInUsernameOptions")
+    expect(signIn).toContain("useSignInUsername")
     expect(signIn).toContain("usernameOrEmailPlaceholder")
     expect(signIn).toContain("resolveSubmittedSignIn")
     expect(signIn).toContain("new FormData(event.currentTarget)")
@@ -1687,7 +1695,7 @@ describe("Solid registry isolation", () => {
     expect(userButton).toContain("<MountedUserButton {...props} />")
     expect(userButton).toContain("<UserButtonHydrationFallback {...props} />")
     expect(userButton).toContain("<UserButtonPendingView")
-    expect(userButton).toContain("useSession(auth.authClient, {")
+    expect(userButton).toContain("useSession(auth.authClient, () => ({")
     expect(userButton).toContain("enabled: !import.meta.env.SSR")
     expect(userButton).toContain("<Skeleton")
     expect(userButton).toContain('class="size-8 rounded-full"')
@@ -1978,7 +1986,7 @@ describe("Solid registry isolation", () => {
     expect(generatedSwitchAccountSubmenuSource).toContain(
       'from "./switch-account-submenu-content"'
     )
-    expect(generatedSwitchAccountSubmenuContentSource).toContain(
+    expect(generatedSwitchAccountSubmenuContentSource).not.toContain(
       'from "@/components/auth/settings/shared/helpers"'
     )
     expect(generatedSwitchAccountSubmenuContentSource).toContain(
@@ -2130,7 +2138,7 @@ describe("Solid registry isolation", () => {
       ])
     )
     expect(forgotPassword.files[0]?.content).toContain(
-      "requestPasswordResetOptions"
+      "useRequestPasswordReset"
     )
     expect(forgotPassword.files[0]?.content).toContain(
       "Check your email for the reset link."
@@ -2158,7 +2166,7 @@ describe("Solid registry isolation", () => {
         })
       ])
     )
-    expect(resetPassword.files[0]?.content).toContain("resetPasswordOptions")
+    expect(resetPassword.files[0]?.content).toContain("useResetPassword")
     expect(resetPassword.files[0]?.content).toContain(
       "Password reset successfully. You can sign in with your new"
     )
@@ -2191,7 +2199,7 @@ describe("Solid registry isolation", () => {
         })
       ])
     )
-    expect(signUp.files[0]?.content).toContain("signUpEmailOptions")
+    expect(signUp.files[0]?.content).toContain("useSignUpEmail")
     expect(signUp.files[0]?.content).toContain(
       "Account created. Check your email if verification is required."
     )
@@ -2235,8 +2243,13 @@ describe("Solid registry isolation", () => {
     expect(report.packageExports).toEqual([
       ".",
       "./email",
-      "./server",
-      "./plugins"
+      "./plugins/api-key",
+      "./plugins/captcha",
+      "./plugins/magic-link",
+      "./plugins/multi-session",
+      "./plugins/organization",
+      "./plugins/passkey",
+      "./plugins/username"
     ])
     expect(report.exampleSolidDependency).toBe("*")
     expect(report.staticItemNames).toEqual(expectedSolidRegistryPayloadNames)
@@ -2325,7 +2338,7 @@ describe("Solid registry isolation", () => {
     expect(solidMutationsDoc).toContain("createApiKeyOptions")
     expect(solidQueriesDoc).toContain("listPasskeysOptions")
     expect(solidQueriesDoc).toContain("listApiKeysOptions")
-    expect(solidSsrDoc).toContain("@better-auth-ui/solid/server")
+    expect(solidSsrDoc).toContain("@better-auth-ui/core/server")
   })
 
   it("keeps the top-level Solid and Zaidan docs IA ownership explicit", () => {
@@ -2686,7 +2699,7 @@ describe("Solid registry isolation", () => {
       .join("\n")
 
     expect(combinedSolidPackageDocs).toContain(
-      "@better-auth-ui/solid owns provider wiring, Solid Query factories, mutation factories, and server helpers."
+      "`@better-auth-ui/solid` owns provider wiring and Solid hooks; core owns shared option factories/helpers"
     )
     expect(combinedSolidPackageDocs).toContain("ensureSession")
     expect(combinedSolidPackageDocs).toContain("prefetchSession")
@@ -2696,9 +2709,9 @@ describe("Solid registry isolation", () => {
     expect(combinedSolidPackageDocs).toContain("listPasskeysOptions")
     expect(combinedSolidPackageDocs).toContain("createApiKeyOptions")
     expect(combinedSolidPackageDocs).toContain("signInUsernameOptions")
-    expect(combinedSolidPackageDocs).toContain("@better-auth-ui/solid/server")
-    expect(combinedSolidPackageDocs).not.toContain(
-      "@better-auth-ui/solid/plugins"
+    expect(combinedSolidPackageDocs).toContain("@better-auth-ui/core/server")
+    expect(combinedSolidPackageDocs).toContain(
+      "@better-auth-ui/solid/plugins/api-key"
     )
 
     for (const { name, content } of solidPackageDocs) {
@@ -2959,7 +2972,7 @@ describe("Solid registry isolation", () => {
       expect(
         page,
         `runtime-only plugin ${name} should link Solid runtime`
-      ).toContain("@better-auth-ui/solid/plugins")
+      ).toContain("@better-auth-ui/solid/plugins/captcha")
       expect(
         page,
         `runtime-only plugin ${name} should explain setup`
@@ -3006,7 +3019,7 @@ describe("Solid registry isolation", () => {
       "npx shadcn@latest add https://better-auth-ui.com/r/solid/delete-user.json"
     )
     expect(deleteUserPluginDoc).toContain(
-      'import { deleteUserPlugin } from "@better-auth-ui/core/plugins"'
+      'import { deleteUserPlugin } from "@better-auth-ui/core/plugins/delete-user"'
     )
     expect(deleteUserPluginDoc).toContain("plugins={[deleteUserPlugin()]}")
     expect(deleteUserPluginDoc).toContain('name="DangerZoneProps"')
@@ -3145,9 +3158,9 @@ describe("Solid registry isolation", () => {
       resolve(__dirname, "../../../apps/docs/public/r/solid/organization.json"),
       "utf8"
     )
-    const organizationPayload = JSON.parse(organizationRegistry) as {
+    const organizationPayload = parseJson<{
       registryDependencies: string[]
-    }
+    }>(organizationRegistry, "apps/docs/public/r/solid/organization.json")
     const solidRegistry = readFileSync(
       resolve(__dirname, "../../../apps/docs/public/r/solid/registry.json"),
       "utf8"
@@ -3271,7 +3284,7 @@ describe("Solid registry isolation", () => {
       "ensureSessionServer(queryClient, auth"
     )
     expect(organizationPluginDoc).toContain(
-      "ensureSessionClient(queryClient, authClient)"
+      "ensureSession(queryClient, authClient)"
     )
     expect(organizationPluginDoc).toContain(
       "validOrganizationPaths.includes(path)"
@@ -3280,16 +3293,16 @@ describe("Solid registry isolation", () => {
     expect(organizationPluginDoc).toContain("non-slug page")
     expect(organizationPluginDoc).toContain("`null`")
     expect(organizationPluginDoc).toContain(
-      "The copied Zaidan components read the configured client"
+      "Copied Zaidan components are wired through `<AuthProvider>`"
     )
-    expect(organizationPluginDoc).toContain("useAuth()")
+    expect(organizationPluginDoc).not.toContain("useAuth()")
     expect(organizationPluginDoc).toContain(
       "low-level `@better-auth-ui/solid` hooks"
     )
     expect(organizationPluginDoc).toContain("useActiveOrganization()")
     expect(organizationPluginDoc).toContain("useHasPermission()")
     expect(organizationPluginDoc).toContain("useCreateOrganization()")
-    expect(organizationPluginDoc).toContain("useCheckOrganizationSlug()")
+    expect(organizationPluginDoc).toContain("useCheckSlug()")
     expect(organizationPluginDoc).not.toContain(
       "useCreateOrganization(authClient)"
     )
@@ -3358,7 +3371,7 @@ describe("Solid registry isolation", () => {
     expect(organizationRegistry).toContain("hideSlug?: boolean")
     expect(organizationRegistry).toContain("hideCreate?: boolean")
     expect(organizationRegistry).toContain("CreateOrganizationDialog")
-    expect(organizationRegistry).toContain("useCheckOrganizationSlug")
+    expect(organizationRegistry).toContain("useCheckSlug")
     expect(organizationRegistry).toContain("organization-row.tsx")
     expect(organizationPayload.registryDependencies).toEqual([
       solidRegistryUrl("user-view")
@@ -3750,9 +3763,11 @@ describe("Solid registry isolation", () => {
       }
     }
 
-    const meta = JSON.parse(
-      readFileSync(resolve(zaidanDocsRoot, "components/meta.json"), "utf8")
-    ) as { pages: string[] }
+    const metaPath = resolve(zaidanDocsRoot, "components/meta.json")
+    const meta = parseJson<{ pages: string[] }>(
+      readFileSync(metaPath, "utf8"),
+      metaPath
+    )
     const authStart = meta.pages.indexOf("---Auth---")
     expect(meta.pages.slice(authStart + 1, authStart + 7)).toEqual([
       "auth",
@@ -3945,7 +3960,7 @@ describe("Solid registry isolation", () => {
       "change-email": {
         importExample:
           'import { ChangeEmail } from "@/components/auth/settings/account/change-email"',
-        pluginGates: ["changeEmailOptions", "email verification", "session"],
+        pluginGates: ["useChangeEmail", "email verification", "session"],
         props: ["class"],
         usageExample: "<ChangeEmail />"
       },
@@ -3965,7 +3980,7 @@ describe("Solid registry isolation", () => {
       "active-sessions": {
         importExample:
           'import { ActiveSessionsSettings } from "@/components/auth/settings/security/active-sessions"',
-        pluginGates: ["session", "listSessionsOptions", "revokeSessionOptions"],
+        pluginGates: ["session", "listSessionsOptions", "useRevokeSession"],
         props: ["class"],
         usageExample: "<ActiveSessionsSettings />"
       },
@@ -3982,7 +3997,7 @@ describe("Solid registry isolation", () => {
         pluginGates: [
           "emailAndPassword",
           "credential",
-          "requestPasswordResetOptions"
+          "useRequestPasswordReset"
         ],
         props: ["class", "confirmPassword"],
         usageExample: "<ChangePasswordSettings confirmPassword />"

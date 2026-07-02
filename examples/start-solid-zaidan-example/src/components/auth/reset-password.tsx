@@ -1,5 +1,4 @@
-import { resetPasswordOptions, useAuth } from "@better-auth-ui/solid"
-import { createMutation } from "@tanstack/solid-query"
+import { useAuth, useResetPassword } from "@better-auth-ui/solid"
 import { Link } from "@tanstack/solid-router"
 import { Eye, EyeOff } from "lucide-solid"
 import { createSignal, Show } from "solid-js"
@@ -17,7 +16,7 @@ export type ResetPasswordProps = {
 const tokenFromLocation = () => {
   if (typeof window === "undefined") return undefined
 
-  return new URLSearchParams(window.location.search).get("token") ?? undefined
+  return new URLSearchParams(window.location.search).get("token")
 }
 
 export function ResetPassword(props: ResetPasswordProps) {
@@ -30,9 +29,7 @@ export function ResetPassword(props: ResetPasswordProps) {
   const [isPasswordVisible, setIsPasswordVisible] = createSignal(false)
   const [isConfirmPasswordVisible, setIsConfirmPasswordVisible] =
     createSignal(false)
-  const resetPassword = createMutation(() =>
-    resetPasswordOptions(auth.authClient)
-  )
+  const resetPassword = useResetPassword(auth.authClient)
 
   const submitPasswordReset = (event: SubmitEvent) => {
     event.preventDefault()

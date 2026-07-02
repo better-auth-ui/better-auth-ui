@@ -1,4 +1,4 @@
-import { deleteUserPlugin } from "@better-auth-ui/core/plugins"
+import { deleteUserPlugin } from "@better-auth-ui/core/plugins/delete-user"
 import type { QueryClient } from "@tanstack/solid-query"
 import { useNavigate, useParams } from "@tanstack/solid-router"
 import type { JSX } from "solid-js"
@@ -28,7 +28,7 @@ export function Providers(props: ProvidersProps) {
   const navigate = useNavigate()
   const params = useParams({ strict: false })
   const organizationSlug = () => {
-    const slug = params().slug
+    const slug = params()?.slug
 
     if (typeof slug === "string" && slug.length > 0) return slug
 

@@ -26,26 +26,66 @@
       "types": "./dist/plugins.d.ts",
       "import": "./dist/plugins.js"
     },
+    "./plugins/api-key": {
+      "src": "./src/plugins/api-key/index.ts",
+      "types": "./dist/plugins/api-key/index.d.ts",
+      "import": "./dist/plugins/api-key/index.js"
+    },
+    "./plugins/delete-user": {
+      "src": "./src/plugins/delete-user/index.ts",
+      "types": "./dist/plugins/delete-user/index.d.ts",
+      "import": "./dist/plugins/delete-user/index.js"
+    },
+    "./plugins/magic-link": {
+      "src": "./src/plugins/magic-link/index.ts",
+      "types": "./dist/plugins/magic-link/index.d.ts",
+      "import": "./dist/plugins/magic-link/index.js"
+    },
+    "./plugins/multi-session": {
+      "src": "./src/plugins/multi-session/index.ts",
+      "types": "./dist/plugins/multi-session/index.d.ts",
+      "import": "./dist/plugins/multi-session/index.js"
+    },
+    "./plugins/organization": {
+      "src": "./src/plugins/organization/index.ts",
+      "types": "./dist/plugins/organization/index.d.ts",
+      "import": "./dist/plugins/organization/index.js"
+    },
+    "./plugins/passkey": {
+      "src": "./src/plugins/passkey/index.ts",
+      "types": "./dist/plugins/passkey/index.d.ts",
+      "import": "./dist/plugins/passkey/index.js"
+    },
+    "./plugins/theme": {
+      "src": "./src/plugins/theme/index.ts",
+      "types": "./dist/plugins/theme/index.d.ts",
+      "import": "./dist/plugins/theme/index.js"
+    },
+    "./plugins/username": {
+      "src": "./src/plugins/username/index.ts",
+      "types": "./dist/plugins/username/index.d.ts",
+      "import": "./dist/plugins/username/index.js"
+    },
     "./styles": {
       "src": "./src/styles.css",
       "default": "./dist/styles.css"
     }
   },
   "devDependencies": {
-    "@gravity-ui/icons": "^2.18.0",
+    "@gravity-ui/icons": "^2.19.0",
     "@heroui/react": "^3.2.1",
     "@heroui/styles": "^3.2.1",
     "@internationalized/date": "^3.12.2",
     "@tanstack/react-pacer": "^0.22.1",
-    "@tanstack/react-query": "^5.100.14",
+    "@tanstack/react-query": "^5.101.2",
     "@testing-library/react": "^16.3.2",
     "@testing-library/user-event": "^14.5.2",
     "@types/react": "^19.2.15",
-    "@vitejs/plugin-react": "^6.0.2",
+    "@vitejs/plugin-react": "^6.0.3",
     "@vitest/browser-playwright": "^4.1.9",
-    "better-auth": "^1.6.19",
+    "better-auth": "1.7.0-rc.0",
     "bowser": "^2.11.0",
-    "playwright": "^1.61.0",
+    "playwright": "^1.61.1",
     "react": "^19.2.6",
     "react-dom": "^19.2.6",
     "vitest": "^4.1.9"
@@ -53,13 +93,13 @@
   "peerDependencies": {
     "@better-auth-ui/core": "*",
     "@better-auth-ui/react": "*",
-    "@gravity-ui/icons": ">=2.18.0",
+    "@gravity-ui/icons": ">=2.19.0",
     "@heroui/react": ">=3.2.1",
     "@heroui/styles": ">=3.2.1",
     "@internationalized/date": ">=3.12.2",
     "@tanstack/react-pacer": ">=0.22.1",
-    "@tanstack/react-query": ">=5.100.14",
-    "better-auth": ">=1.6.19",
+    "@tanstack/react-query": ">=5.101.2",
+    "better-auth": ">=1.7.0-rc.0",
     "react": ">=19.2.6",
     "react-dom": ">=19.2.6",
     "bowser": ">=2.11.0"

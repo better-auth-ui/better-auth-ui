@@ -1,0 +1,27 @@
+[
+  {
+    "id": "delete-user-plugin.ts-DeleteUserPluginOptions",
+    "name": "DeleteUserPluginOptions",
+    "description": "",
+    "entries": [
+      {
+        "name": "sendDeleteAccountVerification",
+        "description": "When `true`, matches server `sendDeleteAccountVerification`: deletion starts by sending a\nverification email instead of deleting immediately in this request.",
+        "tags": [],
+        "type": "boolean",
+        "simplifiedType": "boolean",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "localization",
+        "description": "Override the plugin's default localization strings.",
+        "tags": [{ "name": "remarks", "text": "`DeleteUserLocalization`" }],
+        "type": "Partial<{ deleteAccount: string; deleteAccountDescription: string; deleteUserVerificationSent: string; deleteUserSuccess: string; }>",
+        "simplifiedType": "DeleteUserLocalization",
+        "required": false,
+        "deprecated": false
+      }
+    ]
+  }
+]

@@ -1,19 +1,14 @@
+import type { MultiSessionAuthClient } from "@better-auth-ui/core/plugins/multi-session"
 import {
   multiSessionPlugin as coreMultiSessionPlugin,
   type MultiSessionLocalization,
   multiSessionLocalization
-} from "@better-auth-ui/core/plugins"
-import {
-  listDeviceSessionsOptions,
-  type MultiSessionAuthClient,
-  useAuth,
-  useSession
-} from "@better-auth-ui/solid"
-import { createQuery } from "@tanstack/solid-query"
+} from "@better-auth-ui/core/plugins/multi-session"
+import { useAuth, useSession } from "@better-auth-ui/solid"
+import { useListDeviceSessions } from "@better-auth-ui/solid/plugins/multi-session"
 import { Link } from "@tanstack/solid-router"
 import { Check, CirclePlus } from "lucide-solid"
 import { For, Show } from "solid-js"
-import { shouldLoadDeviceSessions } from "@/components/auth/settings/shared/helpers"
 import type { DeviceSession } from "@/components/auth/settings/shared/types"
 import { UserView } from "@/components/auth/user/user-view"
 import {
@@ -24,11 +19,8 @@ import {
 import { SwitchAccountSubmenuItem } from "./switch-account-submenu-item"
 
 export function SwitchAccountSubmenuContent() {
-  const auth = useAuth()
-  const session = useSession(auth.authClient, {
-    enabled: !import.meta.env.SSR
-  })
-  const userId = () => session.data?.user.id
+  const auth = useAuth<MultiSessionAuthClient>()
+  const session = useSession(auth.authClient)
   const multiSessionPluginConfig = () =>
     auth.plugins.find((plugin) => plugin.id === coreMultiSessionPlugin.id)
   const multiSessionLabels = (): MultiSessionLocalization => ({
@@ -37,16 +29,7 @@ export function SwitchAccountSubmenuContent() {
       | Partial<MultiSessionLocalization>
       | undefined)
   })
-  const deviceSessions = createQuery(() => ({
-    ...listDeviceSessionsOptions(
-      auth.authClient as MultiSessionAuthClient,
-      userId()
-    ),
-    enabled: shouldLoadDeviceSessions({
-      isSsr: import.meta.env.SSR,
-      userId: userId()
-    })
-  }))
+  const deviceSessions = useListDeviceSessions(auth.authClient)
   const otherDeviceSessions = () => {
     const sessions = (deviceSessions.data ?? []) as DeviceSession[]
 

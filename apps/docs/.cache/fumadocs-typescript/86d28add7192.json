@@ -1,0 +1,41 @@
+[
+  {
+    "id": "magic-link-localization.ts-MagicLinkLocalization",
+    "name": "MagicLinkLocalization",
+    "description": "",
+    "entries": [
+      {
+        "name": "magicLink",
+        "description": "",
+        "tags": [{ "name": "remarks", "text": "`\"Magic Link\"`" }],
+        "type": "string",
+        "simplifiedType": "\"Magic Link\"",
+        "required": true,
+        "deprecated": false
+      },
+      {
+        "name": "sendMagicLink",
+        "description": "",
+        "tags": [{ "name": "remarks", "text": "`\"Send Magic Link\"`" }],
+        "type": "string",
+        "simplifiedType": "\"Send Magic Link\"",
+        "required": true,
+        "deprecated": false
+      },
+      {
+        "name": "magicLinkSent",
+        "description": "",
+        "tags": [
+          {
+            "name": "remarks",
+            "text": "`\"Check your email for the magic link\"`"
+          }
+        ],
+        "type": "string",
+        "simplifiedType": "\"Check your email for the magic link\"",
+        "required": true,
+        "deprecated": false
+      }
+    ]
+  }
+]

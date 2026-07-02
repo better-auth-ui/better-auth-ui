@@ -1,0 +1,27 @@
+[
+  {
+    "id": "organization.tsx-OrganizationProps",
+    "name": "OrganizationProps",
+    "description": "",
+    "entries": [
+      {
+        "name": "path",
+        "description": "",
+        "tags": [],
+        "type": "string",
+        "simplifiedType": "string",
+        "required": true,
+        "deprecated": false
+      },
+      {
+        "name": "slug",
+        "description": "",
+        "tags": [],
+        "type": "string",
+        "simplifiedType": "string",
+        "required": false,
+        "deprecated": false
+      }
+    ]
+  }
+]

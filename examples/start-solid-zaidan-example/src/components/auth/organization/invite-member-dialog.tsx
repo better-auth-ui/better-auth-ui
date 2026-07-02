@@ -1,13 +1,13 @@
-import type { OrganizationLocalization } from "@better-auth-ui/core/plugins"
 import type {
   InviteMemberParams,
-  OrganizationAuthClient
-} from "@better-auth-ui/solid"
+  OrganizationAuthClient,
+  OrganizationLocalization
+} from "@better-auth-ui/core/plugins/organization"
+import { useAuth } from "@better-auth-ui/solid"
 import {
   useActiveOrganization,
-  useAuth,
   useInviteMember
-} from "@better-auth-ui/solid"
+} from "@better-auth-ui/solid/plugins/organization"
 import { createEffect, createMemo, createSignal, For } from "solid-js"
 import { toast } from "solid-sonner"
 import { Button } from "@/components/ui/button"
@@ -66,10 +66,8 @@ function pickDefaultRole(roles: RoleMap) {
 }
 
 export function InviteMemberDialog(props: InviteMemberDialogProps) {
-  const auth = useAuth()
-  const activeOrganization = useActiveOrganization(
-    auth.authClient as OrganizationAuthClient
-  )
+  const auth = useAuth<OrganizationAuthClient>()
+  const activeOrganization = useActiveOrganization(auth.authClient)
   const organizationPluginConfig = () =>
     auth.plugins.find((plugin) => plugin.id === organizationPlugin.id) as
       | {
@@ -90,15 +88,12 @@ export function InviteMemberDialog(props: InviteMemberDialogProps) {
   )
   const [email, setEmail] = createSignal("")
   const [role, setRole] = createSignal(pickDefaultRole(roles()))
-  const inviteMember = useInviteMember(
-    auth.authClient as OrganizationAuthClient,
-    {
-      onSuccess: () => {
-        props.onOpenChange(false)
-        toast.success(localization().inviteMemberSuccess)
-      }
+  const inviteMember = useInviteMember(auth.authClient, () => ({
+    onSuccess: () => {
+      props.onOpenChange(false)
+      toast.success(localization().inviteMemberSuccess)
     }
-  )
+  }))
 
   createEffect(() => {
     if (!props.open) {

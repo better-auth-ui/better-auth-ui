@@ -1,0 +1,54 @@
+[
+  {
+    "id": "user-view.tsx-UserViewProps",
+    "name": "UserViewProps",
+    "description": "",
+    "entries": [
+      {
+        "name": "className",
+        "description": "",
+        "tags": [],
+        "type": "string",
+        "simplifiedType": "string",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "isPending",
+        "description": "",
+        "tags": [],
+        "type": "boolean",
+        "simplifiedType": "boolean",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "size",
+        "description": "",
+        "tags": [],
+        "type": "\"lg\" | \"md\" | \"sm\"",
+        "simplifiedType": "\"lg\" | \"md\" | \"sm\"",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "hideSubtitle",
+        "description": "When true, the subtitle line (email when name/username is shown) is hidden.",
+        "tags": [{ "name": "default", "text": "false" }],
+        "type": "boolean",
+        "simplifiedType": "boolean",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "user",
+        "description": "",
+        "tags": [{ "name": "remarks", "text": "`User`" }],
+        "type": "(Partial<{ id: string; createdAt: Date; updatedAt: Date; email: string; emailVerified: boolean; name: string; image?: string | null; }> & { username?: string | null; displayUsername?: string | null; })",
+        "simplifiedType": "User",
+        "required": false,
+        "deprecated": false
+      }
+    ]
+  }
+]

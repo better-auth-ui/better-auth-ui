@@ -1,11 +1,8 @@
 "use client"
 
-import {
-  type OrganizationAuthClient,
-  useAuth,
-  useAuthPlugin,
-  useSetActiveOrganization
-} from "@better-auth-ui/react"
+import type { OrganizationAuthClient } from "@better-auth-ui/core/plugins/organization"
+import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
+import { useSetActiveOrganization } from "@better-auth-ui/react/plugins/organization"
 import type { Organization } from "better-auth/client"
 import { Settings as SettingsIcon } from "lucide-react"
 
@@ -22,7 +19,7 @@ export type OrganizationRowProps = {
  * Single organization row: logo and labels via `OrganizationView`, plus a Manage action.
  */
 export function OrganizationRow({ organization }: OrganizationRowProps) {
-  const { authClient, basePaths, navigate } = useAuth()
+  const { authClient, basePaths, navigate } = useAuth<OrganizationAuthClient>()
   const {
     localization: organizationLocalization,
     viewPaths: organizationViewPaths,
@@ -31,7 +28,7 @@ export function OrganizationRow({ organization }: OrganizationRowProps) {
   } = useAuthPlugin(organizationPlugin)
 
   const { mutate: setActiveOrganization, isPending: setActivePending } =
-    useSetActiveOrganization(authClient as OrganizationAuthClient, {
+    useSetActiveOrganization(authClient, {
       onSuccess: () => {
         navigate({
           to: `${basePaths.organization}/${organizationViewPaths.organization.settings}`

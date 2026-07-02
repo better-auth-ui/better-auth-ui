@@ -4,7 +4,7 @@ description: Solid package setup and runtime API boundaries.
 icon: Solid
 ---
 
-Solid package/runtime track: @better-auth-ui/solid owns provider wiring, Solid Query factories, mutation factories, and server helpers.
+Solid package/runtime track: `@better-auth-ui/solid` owns provider wiring and Solid hooks; core owns shared option factories/helpers, including plugin query helpers. Plugin hooks live under `@better-auth-ui/solid/plugins/*`, and server-boundary helpers live in `@better-auth-ui/core` or core plugin server entrypoints.
 
 Use [Zaidan](/docs/zaidan) when your job is installing copied Solid components or wiring TanStack Start app routes. Stay in this Solid section when your job is using package runtime APIs.
 
@@ -13,8 +13,8 @@ Use [Zaidan](/docs/zaidan) when your job is installing copied Solid components o
 1. Install the Solid package and Solid Query.
 2. Create a Better Auth client with `createAuthClient`.
 3. Wrap your app with `AuthProvider` and pass a `QueryClient`.
-4. Use query and mutation option factories from `@better-auth-ui/solid` in your components.
-5. Use `@better-auth-ui/solid/server` only at server boundaries that need server-side session data.
+4. Use base hooks from `@better-auth-ui/solid`, plugin hooks from `@better-auth-ui/solid/plugins/<plugin>`, and shared option factories/helpers from `@better-auth-ui/core`.
+5. Use `@better-auth-ui/core/server` and core plugin server entrypoints at server boundaries that need server-side auth data.
 
 ```package-install
 @better-auth-ui/solid @tanstack/solid-query better-auth solid-js
@@ -24,8 +24,11 @@ Use [Zaidan](/docs/zaidan) when your job is installing copied Solid components o
 
 | Export | Owns |
 | --- | --- |
-| `@better-auth-ui/solid` | `createAuthClient`, `AuthProvider`, `useAuth`, auth config types, provider icons, query factories, mutation factories, and hooks such as `useSession`. |
-| `@better-auth-ui/solid/server` | Server-safe query helpers and auth server types for SSR boundaries. |
+| `better-auth/solid` | Better Auth Solid client factory, including `createAuthClient`. |
+| `@better-auth-ui/solid` | `AuthProvider`, auth config types, provider icons, base query/mutation helpers, and hooks such as `useSession`. |
+| `@better-auth-ui/solid/plugins/<plugin>` | Optional plugin hooks such as API key, passkey, multi-session, organization, magic-link, and username APIs. |
+| `@better-auth-ui/core` / `@better-auth-ui/core/server` | Core-owned option factories plus client/server-safe query helpers and auth server types for SSR boundaries. |
+| `@better-auth-ui/core/plugins/<plugin>/server` | Plugin server-auth helpers for SSR boundaries that call your Better Auth server instance directly. |
 
 ## What belongs elsewhere
 

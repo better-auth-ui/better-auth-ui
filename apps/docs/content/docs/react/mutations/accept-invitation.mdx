@@ -8,9 +8,9 @@ Organization mutations require `organizationClient()` on the Better Auth client.
 ## Usage
 
 ```tsx
-import { useAuth, useAcceptInvitation } from "@better-auth-ui/react"
+import { authClient } from "@/lib/auth-client"
+import { useAcceptInvitation } from "@better-auth-ui/react/plugins/organization"
 
-const { authClient } = useAuth()
 const mutation = useAcceptInvitation(authClient)
 
 mutation.mutate(/* params */)
@@ -19,7 +19,7 @@ mutation.mutate(/* params */)
 ## Options factory
 
 ```tsx
-import { acceptInvitationOptions } from "@better-auth-ui/react"
+import { acceptInvitationOptions } from "@better-auth-ui/core/plugins/organization"
 import { useMutation } from "@tanstack/react-query"
 
 const mutation = useMutation(acceptInvitationOptions(authClient))
@@ -27,4 +27,4 @@ const mutation = useMutation(acceptInvitationOptions(authClient))
 
 ## Params
 
-<auto-type-table path="../../../../../../packages/react/src/mutations/organization/accept-invitation-mutation.ts" name="AcceptInvitationParams" />
+<auto-type-table path="../../../../../../packages/core/src/plugins/organization/accept-invitation-mutation.ts" name="AcceptInvitationParams" />

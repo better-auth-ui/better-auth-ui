@@ -1,11 +1,8 @@
 "use client"
 
-import {
-  type OrganizationAuthClient,
-  useAuth,
-  useAuthPlugin,
-  useListOrganizations
-} from "@better-auth-ui/react"
+import type { OrganizationAuthClient } from "@better-auth-ui/core/plugins/organization"
+import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
+import { useListOrganizations } from "@better-auth-ui/react/plugins/organization"
 import { useState } from "react"
 
 import { Button } from "@/components/ui/button"
@@ -27,14 +24,14 @@ export type OrganizationsProps = {
  * Owns `CreateOrganizationDialog` open state and the create actions.
  */
 export function Organizations({ className }: OrganizationsProps) {
-  const { authClient } = useAuth()
+  const { authClient } = useAuth<OrganizationAuthClient>()
   const { localization: organizationLocalization } =
     useAuthPlugin(organizationPlugin)
 
   const [createOpen, setCreateOpen] = useState(false)
 
   const { data: organizations, isPending: organizationsPending } =
-    useListOrganizations(authClient as OrganizationAuthClient)
+    useListOrganizations(authClient)
 
   return (
     <>

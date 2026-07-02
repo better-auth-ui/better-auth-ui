@@ -9,8 +9,14 @@ function readDocsFile(...segments: string[]) {
 }
 
 function readMeta(framework: "react" | "solid", area: "queries" | "mutations") {
-  return JSON.parse(readDocsFile(framework, area, "meta.json")) as {
-    pages: string[]
+  try {
+    return JSON.parse(readDocsFile(framework, area, "meta.json")) as {
+      pages: string[]
+    }
+  } catch (error) {
+    throw new Error(`Failed to read docs meta for ${framework}/${area}`, {
+      cause: error
+    })
   }
 }
 
@@ -208,21 +214,31 @@ describe("React/Solid docs parity", () => {
 
   it("keeps Solid settings query docs aligned with React invalidation guidance", () => {
     const solidSettingsQueries = [
-      ["list-accounts", "listAccountsOptions"],
-      ["account-info", "accountInfoOptions"],
-      ["list-sessions", "listSessionsOptions"],
-      ["list-device-sessions", "listDeviceSessionsOptions"],
-      ["list-passkeys", "listPasskeysOptions"],
-      ["list-api-keys", "listApiKeysOptions"]
+      ["list-accounts", "listAccountsOptions", "@better-auth-ui/core"],
+      ["account-info", "accountInfoOptions", "@better-auth-ui/core"],
+      ["list-sessions", "listSessionsOptions", "@better-auth-ui/core"],
+      [
+        "list-device-sessions",
+        "listDeviceSessionsOptions",
+        "@better-auth-ui/core/plugins/multi-session"
+      ],
+      [
+        "list-passkeys",
+        "listPasskeysOptions",
+        "@better-auth-ui/core/plugins/passkey"
+      ],
+      [
+        "list-api-keys",
+        "listApiKeysOptions",
+        "@better-auth-ui/core/plugins/api-key"
+      ]
     ] as const
 
-    for (const [page, factory] of solidSettingsQueries) {
+    for (const [page, factory, packageName] of solidSettingsQueries) {
       const content = readDocsFile("solid", "queries", `${page}.mdx`)
 
       expect(content).toContain("## Invalidation")
-      expect(content).toContain(
-        `import { ${factory} } from "@better-auth-ui/solid"`
-      )
+      expect(content).toContain(`import { ${factory} } from "${packageName}"`)
       expect(content).toContain(`${factory}(authClient, userId`)
     }
   })
@@ -245,6 +261,11 @@ describe("React/Solid docs parity", () => {
       expect(content).toContain("@better-auth-ui/solid")
       expect(content).toContain(`${helper}(queryClient, authClient, userId`)
       expect(content).toContain("client-shaped `authClient`/`userId` signature")
+      expect(content).toContain(
+        "@better-auth-ui/core/plugins/organization/server"
+      )
+      expect(content).toContain("server-auth Organization helpers")
+      expect(content).not.toContain("not currently exported")
     }
   })
 
@@ -269,28 +290,35 @@ describe("React/Solid docs parity", () => {
     const reactSsr = readDocsFile("react", "ssr.mdx")
     const solidSsr = readDocsFile("solid", "ssr.mdx")
 
-    expect(reactSession).toContain("@better-auth-ui/react/server")
-    expect(reactSession).toContain("ensureSession(queryClient, auth")
+    expect(reactSession).toContain("@better-auth-ui/core/server")
+    expect(reactSession).toContain("ensureSessionServer(queryClient, auth")
     expect(reactSession).toContain("headers: getRequestHeaders()")
     expect(reactSession).toContain(
-      "packages/react/src/server/queries/auth/session-query.ts"
+      "packages/core/src/server/queries/auth/session-query-server.ts"
     )
 
-    expect(solidSession).toContain("@better-auth-ui/solid/server")
-    expect(solidSession).toContain("ensureSession(queryClient, auth")
+    expect(solidSession).toContain("@better-auth-ui/core/server")
+    expect(solidSession).toContain("ensureSessionServer(queryClient, auth")
     expect(solidSession).toContain("headers: request.headers")
-    expect(solidSession).toContain("server-auth helpers for session")
+    expect(solidSession).toContain("canonical session server-auth entrypoint")
     expect(solidSession).toContain(
-      "packages/solid/src/server/queries/auth/session-query.ts"
+      "packages/core/src/server/queries/auth/session-query-server.ts"
     )
 
-    expect(reactListApiKeys).toContain("@better-auth-ui/react/server")
+    expect(reactListApiKeys).toContain(
+      "@better-auth-ui/core/plugins/api-key/server"
+    )
     expect(reactListApiKeys).toContain(
       "ensureListApiKeys(queryClient, auth, userId"
     )
-    expect(reactActiveOrganization).toContain("@better-auth-ui/react/server")
+    expect(reactActiveOrganization).toContain(
+      "@better-auth-ui/core/plugins/organization/server"
+    )
     expect(reactActiveOrganization).toContain(
       "ensureActiveOrganization(queryClient, auth, userId"
+    )
+    expect(reactHasPermission).toContain(
+      "@better-auth-ui/core/plugins/organization/server"
     )
     expect(reactHasPermission).toContain(
       "ensureHasPermission(queryClient, auth, userId"
@@ -300,6 +328,17 @@ describe("React/Solid docs parity", () => {
       'permissions: { organization: ["update"] }'
     )
 
+    expect(reactSsr).toContain(
+      "Available `@better-auth-ui/core/server` helper families include"
+    )
+    expect(reactSsr).toContain("@better-auth-ui/core/plugins/api-key/server")
+    expect(reactSsr).toContain(
+      "@better-auth-ui/core/plugins/multi-session/server"
+    )
+    expect(reactSsr).toContain("@better-auth-ui/core/plugins/passkey/server")
+    expect(reactSsr).toContain(
+      "@better-auth-ui/core/plugins/organization/server"
+    )
     expect(reactSsr).toContain("ensureListApiKeys")
     expect(reactSsr).toContain("listApiKeysOptions")
     expect(reactSsr).toContain("ensureAccountInfo")
@@ -308,6 +347,10 @@ describe("React/Solid docs parity", () => {
     expect(reactSsr).toContain("activeOrganizationOptions")
     expect(reactSsr).toContain("ensureFullOrganization")
     expect(reactSsr).toContain("hasPermissionOptions")
+    expect(reactSsr).not.toContain("Settings/passkey")
+    expect(reactSsr).not.toContain(
+      "Available server query helper families include"
+    )
     expect(reactSsr).not.toContain("pattern for `accountInfo`")
     expect(reactSsr).not.toContain("pattern for `fullOrganization`")
     expect(reactSsr).not.toContain("equivalents for `listAccounts`")
@@ -316,7 +359,23 @@ describe("React/Solid docs parity", () => {
     expect(reactSsr).not.toContain("equivalents for `hasPermission`")
     expect(reactSsr).toContain("Better Auth server instance (`auth`)")
 
-    expect(solidSsr).toContain("server-auth API is provided for session")
-    expect(solidSsr).toContain("client-shaped `authClient`/`userId` signatures")
+    expect(solidSsr).toContain(
+      "Available `@better-auth-ui/core/server` exports include"
+    )
+    expect(solidSsr).toContain("@better-auth-ui/core/plugins/api-key/server")
+    expect(solidSsr).toContain(
+      "@better-auth-ui/core/plugins/multi-session/server"
+    )
+    expect(solidSsr).toContain("@better-auth-ui/core/plugins/passkey/server")
+    expect(solidSsr).toContain(
+      "@better-auth-ui/core/plugins/organization/server"
+    )
+    expect(solidSsr).not.toContain("OrganizationAuthServer")
+    expect(solidSsr).toContain("ensureListSessions")
+    expect(solidSsr).toContain("ensureActiveOrganization")
+    expect(solidSsr).not.toContain("Settings/passkey")
+    expect(solidSsr).not.toContain("server-auth API is provided for session")
+    expect(solidSsr).not.toContain("intentionally narrower")
+    expect(solidSsr).not.toContain("client-shaped cache helpers re-exported")
   })
 })

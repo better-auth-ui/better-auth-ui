@@ -1,5 +1,6 @@
 import { viewPaths } from "@better-auth-ui/core"
-import { ensureSession } from "@better-auth-ui/react/server"
+import { organizationPlugin } from "@better-auth-ui/core/plugins/organization"
+import { ensureSessionServer } from "@better-auth-ui/core/server"
 import { dehydrate, HydrationBoundary } from "@tanstack/react-query"
 import { headers } from "next/headers"
 import { notFound, redirect } from "next/navigation"
@@ -7,6 +8,11 @@ import { notFound, redirect } from "next/navigation"
 import { Settings } from "@/components/auth/settings/settings"
 import { auth } from "@/lib/auth"
 import { getQueryClient } from "@/lib/query-client"
+
+const validSettingsPaths = new Set([
+  ...Object.values(viewPaths.settings),
+  ...Object.values(organizationPlugin().viewPaths.settings ?? {})
+])
 
 export default async function SettingsPage({
   params
@@ -17,14 +23,14 @@ export default async function SettingsPage({
 }) {
   const { path } = await params
 
-  if (!Object.values(viewPaths.settings).includes(path)) {
+  if (!validSettingsPaths.has(path)) {
     notFound()
   }
 
   const requestHeaders = await headers()
   const queryClient = getQueryClient()
 
-  const session = await ensureSession(queryClient, auth, {
+  const session = await ensureSessionServer(queryClient, auth, {
     headers: requestHeaders
   })
 

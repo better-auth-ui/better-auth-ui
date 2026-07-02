@@ -1,11 +1,8 @@
 "use client"
 
-import {
-  type OrganizationAuthClient,
-  useAuth,
-  useAuthPlugin,
-  useCreateOrganization
-} from "@better-auth-ui/react"
+import type { OrganizationAuthClient } from "@better-auth-ui/core/plugins/organization"
+import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
+import { useCreateOrganization } from "@better-auth-ui/react/plugins/organization"
 import { Briefcase } from "lucide-react"
 import { type SyntheticEvent, useEffect, useState } from "react"
 
@@ -37,7 +34,7 @@ export function CreateOrganizationDialog({
   open,
   onOpenChange
 }: CreateOrganizationDialogProps) {
-  const { authClient, localization } = useAuth()
+  const { authClient, localization } = useAuth<OrganizationAuthClient>()
   const { localization: organizationLocalization } =
     useAuthPlugin(organizationPlugin)
 
@@ -47,7 +44,7 @@ export function CreateOrganizationDialog({
   const [nameError, setNameError] = useState<string>()
 
   const { mutate: createOrganization, isPending: isCreating } =
-    useCreateOrganization(authClient as OrganizationAuthClient, {
+    useCreateOrganization(authClient, {
       onSuccess: () => onOpenChange(false)
     })
 

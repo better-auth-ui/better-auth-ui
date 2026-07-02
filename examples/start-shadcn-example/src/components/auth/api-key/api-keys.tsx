@@ -1,11 +1,8 @@
 "use client"
 
-import {
-  type ApiKeyAuthClient,
-  useAuth,
-  useAuthPlugin,
-  useListApiKeys
-} from "@better-auth-ui/react"
+import type { ApiKeyAuthClient } from "@better-auth-ui/core/plugins/api-key"
+import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
+import { useListApiKeys } from "@better-auth-ui/react/plugins/api-key"
 import { useState } from "react"
 
 import { Button } from "@/components/ui/button"
@@ -37,11 +34,11 @@ export function ApiKeys({
   hideCreate,
   hideDelete
 }: ApiKeysProps) {
-  const { authClient } = useAuth()
+  const { authClient } = useAuth<ApiKeyAuthClient>()
   const { localization: apiKeyLocalization } = useAuthPlugin(apiKeyPlugin)
 
   const { data: listData, isPending: isListPending } = useListApiKeys(
-    authClient as ApiKeyAuthClient,
+    authClient,
     {
       enabled: !isPendingProp,
       ...(organizationId

@@ -1,10 +1,12 @@
-import type { OrganizationLocalization } from "@better-auth-ui/core/plugins"
-import type { OrganizationAuthClient } from "@better-auth-ui/solid"
+import type {
+  OrganizationAuthClient,
+  OrganizationLocalization
+} from "@better-auth-ui/core/plugins/organization"
+import { useAuth } from "@better-auth-ui/solid"
 import {
   useActiveOrganization,
-  useAuth,
   useUpdateOrganization
-} from "@better-auth-ui/solid"
+} from "@better-auth-ui/solid/plugins/organization"
 import { createEffect, createSignal, Show } from "solid-js"
 import { toast } from "solid-sonner"
 import { Button } from "@/components/ui/button"
@@ -34,16 +36,11 @@ const fallbackLocalization = {
 >
 
 export function OrganizationProfile(props: OrganizationProfileProps) {
-  const auth = useAuth()
-  const activeOrganization = useActiveOrganization(
-    auth.authClient as OrganizationAuthClient
-  )
-  const updateOrganization = useUpdateOrganization(
-    auth.authClient as OrganizationAuthClient,
-    {
-      onSuccess: () => toast.success(localization().organizationUpdatedSuccess)
-    }
-  )
+  const auth = useAuth<OrganizationAuthClient>()
+  const activeOrganization = useActiveOrganization(auth.authClient)
+  const updateOrganization = useUpdateOrganization(auth.authClient, () => ({
+    onSuccess: () => toast.success(localization().organizationUpdatedSuccess)
+  }))
   const [name, setName] = createSignal("")
   const [slug, setSlug] = createSignal("")
   const organizationPluginConfig = () =>

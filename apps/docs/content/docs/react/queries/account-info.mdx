@@ -8,9 +8,9 @@ Keyed per-user; waits for the active session and `query.accountId` before firing
 ## Usage
 
 ```tsx
-import { useAccountInfo, useAuth } from "@better-auth-ui/react"
+import { authClient } from "@/lib/auth-client"
+import { useAccountInfo } from "@better-auth-ui/react"
 
-const { authClient } = useAuth()
 const { data: accountInfo } = useAccountInfo(authClient, {
   query: { accountId: "acc_123" }
 })
@@ -25,7 +25,7 @@ const { data: accountInfo } = useAccountInfo(authClient, {
 ## Options factory
 
 ```tsx
-import { accountInfoOptions } from "@better-auth-ui/react"
+import { accountInfoOptions } from "@better-auth-ui/core"
 import { useQuery } from "@tanstack/react-query"
 
 const { data: accountInfo } = useQuery(
@@ -38,7 +38,7 @@ const { data: accountInfo } = useQuery(
 ## Invalidation
 
 ```ts
-import { accountInfoOptions } from "@better-auth-ui/react"
+import { accountInfoOptions } from "@better-auth-ui/core"
 
 queryClient.invalidateQueries({
   queryKey: accountInfoOptions(authClient, userId, {
@@ -49,4 +49,4 @@ queryClient.invalidateQueries({
 
 ## Params
 
-<auto-type-table path="../../../../../../packages/react/src/queries/settings/account-info-query.ts" name="AccountInfoParams" />
+<auto-type-table path="../../../../../../packages/core/src/queries/account-info-query.ts" name="AccountInfoParams" />

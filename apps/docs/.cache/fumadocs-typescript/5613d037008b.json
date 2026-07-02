@@ -1,0 +1,57 @@
+[
+  {
+    "id": "delete-user-localization.ts-DeleteUserLocalization",
+    "name": "DeleteUserLocalization",
+    "description": "",
+    "entries": [
+      {
+        "name": "deleteAccount",
+        "description": "",
+        "tags": [{ "name": "remarks", "text": "`\"Delete account\"`" }],
+        "type": "string",
+        "simplifiedType": "\"Delete account\"",
+        "required": true,
+        "deprecated": false
+      },
+      {
+        "name": "deleteAccountDescription",
+        "description": "",
+        "tags": [
+          {
+            "name": "remarks",
+            "text": "`\"Permanently remove your account and all associated data. This cannot be undone.\"`"
+          }
+        ],
+        "type": "string",
+        "simplifiedType": "\"Permanently remove your account and all associated data. This cannot be undone.\"",
+        "required": true,
+        "deprecated": false
+      },
+      {
+        "name": "deleteUserVerificationSent",
+        "description": "",
+        "tags": [
+          {
+            "name": "remarks",
+            "text": "`\"Check your email to confirm account deletion.\"`"
+          }
+        ],
+        "type": "string",
+        "simplifiedType": "\"Check your email to confirm account deletion.\"",
+        "required": true,
+        "deprecated": false
+      },
+      {
+        "name": "deleteUserSuccess",
+        "description": "",
+        "tags": [
+          { "name": "remarks", "text": "`\"Your account has been deleted.\"`" }
+        ],
+        "type": "string",
+        "simplifiedType": "\"Your account has been deleted.\"",
+        "required": true,
+        "deprecated": false
+      }
+    ]
+  }
+]

@@ -1,0 +1,77 @@
+[
+  {
+    "id": "username-localization.ts-UsernameLocalization",
+    "name": "UsernameLocalization",
+    "description": "",
+    "entries": [
+      {
+        "name": "username",
+        "description": "",
+        "tags": [{ "name": "remarks", "text": "`\"Username\"`" }],
+        "type": "string",
+        "simplifiedType": "\"Username\"",
+        "required": true,
+        "deprecated": false
+      },
+      {
+        "name": "usernamePlaceholder",
+        "description": "",
+        "tags": [{ "name": "remarks", "text": "`\"Username\"`" }],
+        "type": "string",
+        "simplifiedType": "\"Username\"",
+        "required": true,
+        "deprecated": false
+      },
+      {
+        "name": "usernameOrEmailPlaceholder",
+        "description": "",
+        "tags": [{ "name": "remarks", "text": "`\"Username or Email\"`" }],
+        "type": "string",
+        "simplifiedType": "\"Username or Email\"",
+        "required": true,
+        "deprecated": false
+      },
+      {
+        "name": "usernameAvailable",
+        "description": "",
+        "tags": [{ "name": "remarks", "text": "`\"Username is available\"`" }],
+        "type": "string",
+        "simplifiedType": "\"Username is available\"",
+        "required": true,
+        "deprecated": false
+      },
+      {
+        "name": "usernameTaken",
+        "description": "",
+        "tags": [
+          {
+            "name": "remarks",
+            "text": "`\"Username is already taken. Please try another.\"`"
+          }
+        ],
+        "type": "string",
+        "simplifiedType": "\"Username is already taken. Please try another.\"",
+        "required": true,
+        "deprecated": false
+      },
+      {
+        "name": "displayUsername",
+        "description": "",
+        "tags": [{ "name": "remarks", "text": "`\"Display Username\"`" }],
+        "type": "string",
+        "simplifiedType": "\"Display Username\"",
+        "required": true,
+        "deprecated": false
+      },
+      {
+        "name": "displayUsernamePlaceholder",
+        "description": "",
+        "tags": [{ "name": "remarks", "text": "`\"Display Username\"`" }],
+        "type": "string",
+        "simplifiedType": "\"Display Username\"",
+        "required": true,
+        "deprecated": false
+      }
+    ]
+  }
+]

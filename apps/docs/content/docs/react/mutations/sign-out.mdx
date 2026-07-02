@@ -8,9 +8,9 @@ Removes every `["auth", ...]` query on success, clearing the session, linked acc
 ## Usage
 
 ```tsx
-import { useAuth, useSignOut } from "@better-auth-ui/react"
+import { authClient } from "@/lib/auth-client"
+import { useSignOut } from "@better-auth-ui/react"
 
-const { authClient } = useAuth()
 const { mutate: signOut } = useSignOut(authClient, {
   onSuccess: () => navigate("/")
 })
@@ -21,7 +21,7 @@ signOut()
 ## Options factory
 
 ```tsx
-import { signOutOptions } from "@better-auth-ui/react"
+import { signOutOptions } from "@better-auth-ui/core"
 import { useMutation } from "@tanstack/react-query"
 
 const { mutate } = useMutation(signOutOptions(authClient))
@@ -31,4 +31,4 @@ Note: using the raw factory skips the cache cleanup — prefer `useSignOut` unle
 
 ## Params
 
-<auto-type-table path="../../../../../../packages/react/src/mutations/auth/sign-out-mutation.ts" name="SignOutParams" />
+<auto-type-table path="../../../../../../packages/core/src/mutations/sign-out-mutation.ts" name="SignOutParams" />

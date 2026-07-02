@@ -1,0 +1,72 @@
+[
+  {
+    "id": "user-avatar.tsx-UserAvatarProps",
+    "name": "UserAvatarProps",
+    "description": "",
+    "entries": [
+      {
+        "name": "class",
+        "description": "",
+        "tags": [],
+        "type": "string",
+        "simplifiedType": "string",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "fallback",
+        "description": "",
+        "tags": [],
+        "type": "JSX.Element",
+        "simplifiedType": "Element",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "image",
+        "description": "",
+        "tags": [],
+        "type": "string | null",
+        "simplifiedType": "string | null",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "initials",
+        "description": "",
+        "tags": [],
+        "type": "string",
+        "simplifiedType": "string",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "isPending",
+        "description": "",
+        "tags": [],
+        "type": "boolean",
+        "simplifiedType": "boolean",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "label",
+        "description": "",
+        "tags": [],
+        "type": "string",
+        "simplifiedType": "string",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "user",
+        "description": "",
+        "tags": [],
+        "type": "AuthUser",
+        "simplifiedType": "AuthUser",
+        "required": false,
+        "deprecated": false
+      }
+    ]
+  }
+]

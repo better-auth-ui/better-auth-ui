@@ -1,0 +1,117 @@
+[
+  {
+    "id": "sign-in-social-mutation.ts-SignInSocialParams",
+    "name": "SignInSocialParams",
+    "description": "",
+    "entries": [
+      {
+        "name": "callbackURL",
+        "description": "",
+        "tags": [],
+        "type": "string",
+        "simplifiedType": "string",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "newUserCallbackURL",
+        "description": "",
+        "tags": [],
+        "type": "string",
+        "simplifiedType": "string",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "errorCallbackURL",
+        "description": "",
+        "tags": [],
+        "type": "string",
+        "simplifiedType": "string",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "provider",
+        "description": "",
+        "tags": [],
+        "type": "(string & {}) | \"linear\" | \"huggingface\" | \"github\" | \"apple\" | \"atlassian\" | \"cognito\" | \"discord\" | \"facebook\" | \"figma\" | \"microsoft\" | \"google\" | \"slack\" | \"spotify\" | \"twitch\" | \"twitter\" | \"dropbox\" | \"kick\" | \"linkedin\" | \"gitlab\" | \"tiktok\" | \"reddit\" | \"roblox\" | \"salesforce\" | \"vk\" | \"zoom\" | \"notion\" | \"kakao\" | \"naver\" | \"line\" | \"paybin\" | \"paypal\" | \"polar\" | \"railway\" | \"vercel\" | \"wechat\"",
+        "simplifiedType": "(string & {}) | \"linear\" | \"huggingface\" | \"github\" | \"apple\" | \"atlassian\" | \"cognito\" | \"discord\" | \"facebook\" | \"figma\" | \"microsoft\" | \"google\" | \"slack\" | \"spotify\" | \"twitch\" | \"twitter\" | \"dropbox\" | \"kick\" | \"linkedin\" | \"gitlab\" | \"tiktok\" | \"reddit\" | \"roblox\" | \"salesforce\" | \"vk\" | \"zoom\" | \"notion\" | \"kakao\" | \"naver\" | \"line\" | \"paybin\" | \"paypal\" | \"polar\" | \"railway\" | \"vercel\" | \"wechat\"",
+        "required": true,
+        "deprecated": false
+      },
+      {
+        "name": "disableRedirect",
+        "description": "",
+        "tags": [],
+        "type": "boolean",
+        "simplifiedType": "boolean",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "idToken",
+        "description": "",
+        "tags": [],
+        "type": "{ token: string; nonce?: string; accessToken?: string; refreshToken?: string; expiresAt?: number; user?: { name?: { firstName?: string; lastName?: string; }; email?: string; }; }",
+        "simplifiedType": "object",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "scopes",
+        "description": "",
+        "tags": [],
+        "type": "string[]",
+        "simplifiedType": "array",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "requestSignUp",
+        "description": "",
+        "tags": [],
+        "type": "boolean",
+        "simplifiedType": "boolean",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "loginHint",
+        "description": "",
+        "tags": [],
+        "type": "string",
+        "simplifiedType": "string",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "additionalParams",
+        "description": "",
+        "tags": [],
+        "type": "Record<string, string>",
+        "simplifiedType": "Record<string, string>",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "additionalData",
+        "description": "",
+        "tags": [],
+        "type": "Record<string, any>",
+        "simplifiedType": "Record<string, any>",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "fetchOptions",
+        "description": "",
+        "tags": [],
+        "type": "ClientFetchOption<Record<string, any> & Partial<object>, Record<string, any> & Partial<Record<string, any>>, union>",
+        "simplifiedType": "ClientFetchOption<Record<string, any> & Partial<object>, Record<string, any> & Partial<Record<string, any>>, union>",
+        "required": false,
+        "deprecated": false
+      }
+    ]
+  }
+]

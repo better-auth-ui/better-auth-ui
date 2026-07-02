@@ -1,4 +1,4 @@
-import { apiKeyLocalization } from "@better-auth-ui/core/plugins"
+import { apiKeyLocalization } from "@better-auth-ui/core/plugins/api-key"
 import { useAuth } from "@better-auth-ui/solid"
 import { Key, X } from "lucide-solid"
 import { createSignal, Show } from "solid-js"

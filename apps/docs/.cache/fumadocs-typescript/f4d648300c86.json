@@ -1,0 +1,72 @@
+[
+  {
+    "id": "user-button.tsx-UserButtonProps",
+    "name": "UserButtonProps",
+    "description": "",
+    "entries": [
+      {
+        "name": "className",
+        "description": "",
+        "tags": [],
+        "type": "string",
+        "simplifiedType": "string",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "align",
+        "description": "",
+        "tags": [],
+        "type": "\"start\" | \"center\" | \"end\"",
+        "simplifiedType": "\"start\" | \"center\" | \"end\"",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "sideOffset",
+        "description": "",
+        "tags": [],
+        "type": "number",
+        "simplifiedType": "number",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "size",
+        "description": "",
+        "tags": [],
+        "type": "\"default\" | \"icon\"",
+        "simplifiedType": "\"default\" | \"icon\"",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "variant",
+        "description": "",
+        "tags": [],
+        "type": "\"link\" | \"default\" | \"secondary\" | \"ghost\" | \"outline\" | \"destructive\"",
+        "simplifiedType": "\"link\" | \"default\" | \"secondary\" | \"ghost\" | \"outline\" | \"destructive\"",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "links",
+        "description": "Additional menu entries rendered above the built-in items.",
+        "tags": [],
+        "type": "(ReactElement<unknown, string | JSXElementConstructor<any>> | UserButtonLink)[]",
+        "simplifiedType": "array",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "hideSettings",
+        "description": "Hide the built-in \"Settings\" link. Useful when replacing it via `links`.",
+        "tags": [],
+        "type": "boolean",
+        "simplifiedType": "boolean",
+        "required": false,
+        "deprecated": false
+      }
+    ]
+  }
+]

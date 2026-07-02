@@ -14,7 +14,7 @@ export type OrganizationLogoProps = {
   className?: string
   fallback?: ReactNode
   isPending?: boolean
-  organization?: Partial<Organization>
+  organization?: Partial<Organization> | null
   size?: OrganizationLogoSize
 }
 

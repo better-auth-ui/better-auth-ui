@@ -1,10 +1,9 @@
+import type { OrganizationAuthClient } from "@better-auth-ui/core/plugins/organization"
+import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
 import {
-  type OrganizationAuthClient,
   useAcceptInvitation,
-  useAuth,
-  useAuthPlugin,
   useRejectInvitation
-} from "@better-auth-ui/react"
+} from "@better-auth-ui/react/plugins/organization"
 import { Check, Clock, Xmark } from "@gravity-ui/icons"
 import { Button, Chip, Spinner } from "@heroui/react"
 import type { Invitation } from "better-auth/client"

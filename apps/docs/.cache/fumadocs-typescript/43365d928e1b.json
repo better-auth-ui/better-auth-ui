@@ -1,0 +1,108 @@
+[
+  {
+    "id": "otp-email.tsx-OtpEmailProps",
+    "name": "OtpEmailProps",
+    "description": "",
+    "entries": [
+      {
+        "name": "verificationCode",
+        "description": "",
+        "tags": [],
+        "type": "string",
+        "simplifiedType": "string",
+        "required": true,
+        "deprecated": false
+      },
+      {
+        "name": "email",
+        "description": "",
+        "tags": [],
+        "type": "string",
+        "simplifiedType": "string",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "appName",
+        "description": "",
+        "tags": [],
+        "type": "string",
+        "simplifiedType": "string",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "expirationMinutes",
+        "description": "",
+        "tags": [],
+        "type": "number",
+        "simplifiedType": "number",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "logoURL",
+        "description": "",
+        "tags": [],
+        "type": "string | { light: string; dark: string; }",
+        "simplifiedType": "string | { light: string; dark: string; }",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "classNames",
+        "description": "",
+        "tags": [],
+        "type": "EmailClassNames",
+        "simplifiedType": "EmailClassNames",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "colors",
+        "description": "",
+        "tags": [],
+        "type": "EmailColors",
+        "simplifiedType": "EmailColors",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "poweredBy",
+        "description": "",
+        "tags": [],
+        "type": "boolean",
+        "simplifiedType": "boolean",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "darkMode",
+        "description": "",
+        "tags": [],
+        "type": "boolean",
+        "simplifiedType": "boolean",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "head",
+        "description": "",
+        "tags": [],
+        "type": "JSX.Element",
+        "simplifiedType": "Element",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "localization",
+        "description": "",
+        "tags": [],
+        "type": "Partial<{ YOUR_VERIFICATION_CODE_IS_CODE: string; LOGO: string; VERIFY_YOUR_EMAIL: string; WE_NEED_TO_VERIFY_YOUR_EMAIL_ADDRESS: string; THIS_CODE_EXPIRES_IN_MINUTES: string; EMAIL_SENT_BY: string; IF_YOU_DIDNT_REQUEST_THIS_EMAIL: string; POWERED_BY_BETTER_AUTH: string; }>",
+        "simplifiedType": "Partial<object>",
+        "required": false,
+        "deprecated": false
+      }
+    ]
+  }
+]

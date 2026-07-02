@@ -2,8 +2,7 @@ import {
   type AdditionalFieldValue,
   parseAdditionalFieldValue
 } from "@better-auth-ui/core"
-import { updateUserOptions, useAuth, useSession } from "@better-auth-ui/solid"
-import { createMutation } from "@tanstack/solid-query"
+import { useAuth, useSession, useUpdateUser } from "@better-auth-ui/solid"
 import { createSignal, For } from "solid-js"
 import { toast } from "solid-sonner"
 import { AdditionalField } from "@/components/auth/additional-field"
@@ -22,12 +21,13 @@ export function UserProfile(props: UserProfileProps = {}) {
   const auth = useAuth()
   const session = useSession(auth.authClient)
   const [name, setName] = createSignal("")
-  const updateUser = createMutation(() => ({
-    ...updateUserOptions(auth.authClient),
-    onSuccess: () =>
-      toast.success(auth.localization.settings.profileUpdatedSuccess)
-  }))
-  const isProfilePending = () => updateUser.isPending
+  const { mutate: updateUser, isPending: updateUserPending } = useUpdateUser(
+    auth.authClient,
+    () => ({
+      onSuccess: () =>
+        toast.success(auth.localization.settings.profileUpdatedSuccess)
+    })
+  )
 
   const profileFields = () =>
     auth.additionalFields?.filter((field) => field.profile !== false) ?? []
@@ -61,10 +61,10 @@ export function UserProfile(props: UserProfileProps = {}) {
       }
     }
 
-    updateUser.mutate({
+    updateUser({
       name,
       ...additionalFieldValues
-    } as Parameters<typeof updateUser.mutate>[0])
+    })
   }
 
   return (
@@ -81,7 +81,7 @@ export function UserProfile(props: UserProfileProps = {}) {
               <Label for="settings-name">{auth.localization.auth.name}</Label>
               <Input
                 autocomplete="name"
-                disabled={isProfilePending()}
+                disabled={updateUserPending}
                 id="settings-name"
                 name="name"
                 onInput={(event) => setName(event.currentTarget.value)}
@@ -104,7 +104,7 @@ export function UserProfile(props: UserProfileProps = {}) {
                       ...field,
                       defaultValue: value() as AdditionalFieldValue | null
                     }}
-                    isPending={isProfilePending() || !session.data}
+                    isPending={updateUserPending || !session.data}
                     name={field.name}
                   />
                 )
@@ -114,7 +114,7 @@ export function UserProfile(props: UserProfileProps = {}) {
           <CardFooter>
             <Button
               aria-label="Save changes"
-              disabled={isProfilePending() || !session.data}
+              disabled={updateUserPending || !session.data}
               size="sm"
               type="submit"
             >

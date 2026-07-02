@@ -1,6 +1,6 @@
 import { authQueryKeys } from "@better-auth-ui/core"
-import { multiSessionQueryKeys } from "@better-auth-ui/core/plugins"
-import type { MultiSessionAuthClient } from "@better-auth-ui/solid"
+import type { MultiSessionAuthClient } from "@better-auth-ui/core/plugins/multi-session"
+import { multiSessionQueryKeys } from "@better-auth-ui/core/plugins/multi-session"
 import { QueryClient } from "@tanstack/solid-query"
 import {
   createMemoryHistory,

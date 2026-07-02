@@ -1,11 +1,8 @@
 "use client"
 
-import {
-  type MultiSessionAuthClient,
-  useAuth,
-  useSession,
-  useSetActiveSession
-} from "@better-auth-ui/react"
+import type { MultiSessionAuthClient } from "@better-auth-ui/core/plugins/multi-session"
+import { useAuth, useSession } from "@better-auth-ui/react"
+import { useSetActiveSession } from "@better-auth-ui/react/plugins/multi-session"
 import {
   ChevronsUpDown,
   LogIn,
@@ -115,11 +112,9 @@ export function UserButton({
   hideSettings = false
 }: UserButtonProps) {
   const { authClient, basePaths, viewPaths, localization, plugins, navigate } =
-    useAuth()
+    useAuth<MultiSessionAuthClient>()
 
-  const { isPending: settingActiveSession } = useSetActiveSession(
-    authClient as MultiSessionAuthClient
-  )
+  const { isPending: settingActiveSession } = useSetActiveSession(authClient)
   const { data: session, isPending: sessionPending } = useSession(authClient)
 
   const userLinks = links?.flatMap((link, index) => {
