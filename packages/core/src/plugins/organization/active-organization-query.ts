@@ -13,14 +13,23 @@ import { organizationQueryKeys } from "./organization-query-keys"
 // fields are intentionally discarded by the `as Promise<TData>` cast in
 // `queryFn` below so that `setActive`'s optimistic update — which can only
 // produce a list-shaped org — never corrupts a full-detail cache entry.
+/**
+ * Cached data returned by active organization queries.
+ */
 export type ActiveOrganizationData<
   TAuthClient extends OrganizationAuthClient = OrganizationAuthClient
 > = ListOrganization<TAuthClient> | null
 
+/**
+ * Parameters forwarded to the active organization query factory.
+ */
 export type ActiveOrganizationParams<
   TAuthClient extends OrganizationAuthClient = OrganizationAuthClient
 > = FullOrganizationParams<TAuthClient>
 
+/**
+ * Consumer options for active organization query helpers and hooks.
+ */
 export type ActiveOrganizationOptions<
   TAuthClient extends OrganizationAuthClient = OrganizationAuthClient
 > = Omit<QueryOptions<ActiveOrganizationData<TAuthClient>>, "queryKey"> &

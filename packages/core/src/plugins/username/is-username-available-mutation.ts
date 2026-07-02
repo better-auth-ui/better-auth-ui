@@ -3,9 +3,15 @@ import type { BetterFetchError } from "better-auth/client"
 import type { UsernameAuthClient } from "./username-auth-client"
 import { usernameMutationKeys } from "./username-mutation-keys"
 
+/**
+ * Parameters accepted by the username availability mutation.
+ */
 export type IsUsernameAvailableParams<TAuthClient extends UsernameAuthClient> =
   Parameters<TAuthClient["isUsernameAvailable"]>[0]
 
+/**
+ * Consumer options for `isUsernameAvailableOptions`.
+ */
 export type IsUsernameAvailableOptions<TAuthClient extends UsernameAuthClient> =
   Omit<
     ReturnType<typeof isUsernameAvailableOptions<TAuthClient>>,
