@@ -2,6 +2,9 @@
   "name": "@better-auth-ui/solid",
   "version": "1.6.27",
   "type": "module",
+  "keywords": [
+    "tanstack-intent"
+  ],
   "scripts": {
     "build": "vite build && vite build --config vite.email.config.ts",
     "dev": "tsc --watch",
@@ -9,7 +12,8 @@
   },
   "files": [
     "src",
-    "dist"
+    "dist",
+    "skills"
   ],
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -55,6 +59,7 @@
     "@better-auth/api-key": "1.7.0-rc.0",
     "@better-auth/passkey": "1.7.0-rc.0",
     "@solidjs-email/main": "^2.0.0",
+    "@tanstack/intent": "^0.3.4",
     "@tanstack/solid-query": "^5.101.2",
     "@types/node": "^26.1.0",
     "better-auth": "1.7.0-rc.0",

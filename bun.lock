@@ -11,6 +11,7 @@
         "@swc-node/register": "~1.11.1",
         "@swc/core": "~1.15.43",
         "@swc/helpers": "~0.5.23",
+        "@tanstack/intent": "^0.3.4",
         "@vitejs/plugin-react": "^6.0.3",
         "lefthook": "^2.1.8",
         "nx": "23.0.1",
@@ -399,6 +400,7 @@
         "@better-auth/api-key": "1.7.0-rc.0",
         "@better-auth/passkey": "1.7.0-rc.0",
         "@mikkelscheike/email-provider-links": "^5.1.8",
+        "@tanstack/intent": "^0.3.4",
         "@tanstack/query-core": "^5.101.2",
         "better-auth": "1.7.0-rc.0",
         "vitest": "^4.1.9",
@@ -423,6 +425,7 @@
         "@heroui/react": "^3.2.1",
         "@heroui/styles": "^3.2.1",
         "@internationalized/date": "^3.12.2",
+        "@tanstack/intent": "^0.3.4",
         "@tanstack/react-pacer": "^0.22.1",
         "@tanstack/react-query": "^5.101.2",
         "@testing-library/react": "^16.3.2",
@@ -460,6 +463,7 @@
         "@better-auth/passkey": "1.7.0-rc.0",
         "@react-email/components": "^1.0.12",
         "@react-email/preview-server": "^5.2.10",
+        "@tanstack/intent": "^0.3.4",
         "@tanstack/query-core": "^5.101.2",
         "@tanstack/react-query": "^5.101.2",
         "@testing-library/react": "^16.3.2",
@@ -501,6 +505,7 @@
         "@better-auth/api-key": "1.7.0-rc.0",
         "@better-auth/passkey": "1.7.0-rc.0",
         "@solidjs-email/main": "^2.0.0",
+        "@tanstack/intent": "^0.3.4",
         "@tanstack/solid-query": "^5.101.2",
         "@types/node": "^26.1.0",
         "better-auth": "1.7.0-rc.0",
@@ -1598,6 +1603,8 @@
 
     "@tanstack/history": ["@tanstack/history@1.162.0", "", {}, "sha512-79pf/RkhteYZTRgcR4F9kbk84P2N8rugQJswxfIqovlbRiT3yI7eBE+5QorIrZaOKktsgzRlXh1l/du/xpl4iA=="],
 
+    "@tanstack/intent": ["@tanstack/intent@0.3.4", "", { "dependencies": { "cac": "^6.7.14", "jsonc-parser": "^3.3.1", "semver": "^7.8.4", "std-env": "^4.1.0", "yaml": "2.9.0" }, "bin": { "intent": "dist/cli.mjs" } }, "sha512-yK1VRa118Xdcj+YmuVPVVkSLtyabYnr7Wcn6sBMdHhFEfav/QHIP0G7NdNOA7qSHgbrXiKmLMyYJCQpJ8OLgfQ=="],
+
     "@tanstack/pacer": ["@tanstack/pacer@0.21.1", "", { "dependencies": { "@tanstack/devtools-event-client": "^0.4.3", "@tanstack/store": "^0.11.0" } }, "sha512-hB01dd4rlsYcTCNP7wK186jgAe6K5qimgM1Y5Jtvz+9PUaILvpmeLLjmQNUNSO1l23lIt+CeQR6mO1mjlPvRtQ=="],
 
     "@tanstack/query-core": ["@tanstack/query-core@5.101.2", "", {}, "sha512-hH5MLoJhF7KaIGd7q3xTXGXvslI+GYlM1Z/35aSHHWaCJWB7XvTSHYuV3eM7tw+aE0mT/xMro4M4Q9rCGHT0lw=="],
@@ -1859,6 +1866,8 @@
     "bundle-name": ["bundle-name@4.1.0", "", { "dependencies": { "run-applescript": "^7.0.0" } }, "sha512-tjwM5exMg6BGRI+kNmTntNsvdZS1X8BFYS6tnJ2hdH0kVxM6/eVZ2xy+FqStSWvYmtfFMDLIxurorHwDKfDz5Q=="],
 
     "bytes": ["bytes@3.1.2", "", {}, "sha512-/Nf7TyzTx6S3yRJObOAV7956r8cr2+Oj8AC5dt8wSP3BQAoeX58NoHyCU8P8zGkNXStjTSi6fzO6F0pBdcYbEg=="],
+
+    "cac": ["cac@6.7.14", "", {}, "sha512-b6Ilus+c3RrdDk+JhLKUAQfzzgLEPy6wcXqS7f/xe1EETvsDP6GORG7SFuOs6cID5YkqchW/LXZbX5bc8j7ZcQ=="],
 
     "call-bind-apply-helpers": ["call-bind-apply-helpers@1.0.2", "", { "dependencies": { "es-errors": "^1.3.0", "function-bind": "^1.1.2" } }, "sha512-Sp1ablJ0ivDkSzjcaJdxEunN5/XvksFJ2sMBFfq6x0ryhQV/2b/KwFe21cMpmHtPOSij8K99/wSfoEuTObmuMQ=="],
 
@@ -3379,6 +3388,8 @@
     "@tanstack/devtools-ui/solid-js": ["solid-js@1.9.13", "", { "dependencies": { "csstype": "^3.1.0", "seroval": "~1.5.0", "seroval-plugins": "~1.5.0" } }, "sha512-6hJeJMOcEX8ktqjpDoJZEmld3ijvcvWBDtiXBm7f4332SiFN66QeAQI1REQshvyUoISsSeJ4PHDauKYbwao9JQ=="],
 
     "@tanstack/devtools-vite/chalk": ["chalk@5.6.2", "", {}, "sha512-7NzBL0rN6fMUW+f7A6Io4h40qQlG+xGmtMxfbnH/K7TAtt8JQWVQK+6g0UXKMeVJoyV5EkkNsErQ8pVD3bLHbA=="],
+
+    "@tanstack/intent/semver": ["semver@7.8.5", "", { "bin": { "semver": "bin/semver.js" } }, "sha512-Y7/KDsb8LjooZpwaqGyulO6DQlksgCncchHGk+sZIY4SBvUocMBEFH5Ur1fI4dV+Jvl0w6cjvucaIi40puRioA=="],
 
     "@tanstack/react-router/@tanstack/react-store": ["@tanstack/react-store@0.9.3", "", { "dependencies": { "@tanstack/store": "0.9.3", "use-sync-external-store": "^1.6.0" }, "peerDependencies": { "react": "^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0", "react-dom": "^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0" } }, "sha512-y2iHd/N9OkoQbFJLUX1T9vbc2O9tjH0pQRgTcx1/Nz4IlwLvkgpuglXUx+mXt0g5ZDFrEeDnONPqkbfxXJKwRg=="],
 

@@ -2,13 +2,17 @@
   "name": "@better-auth-ui/core",
   "version": "1.6.27",
   "type": "module",
+  "keywords": [
+    "tanstack-intent"
+  ],
   "scripts": {
     "build": "vite build",
     "test": "vitest"
   },
   "files": [
     "src",
-    "dist"
+    "dist",
+    "skills"
   ],
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -98,6 +102,7 @@
     "@better-auth/api-key": "1.7.0-rc.0",
     "@better-auth/passkey": "1.7.0-rc.0",
     "@mikkelscheike/email-provider-links": "^5.1.8",
+    "@tanstack/intent": "^0.3.4",
     "@tanstack/query-core": "^5.101.2",
     "better-auth": "1.7.0-rc.0",
     "vitest": "^4.1.9"

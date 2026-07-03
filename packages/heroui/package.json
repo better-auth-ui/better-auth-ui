@@ -2,13 +2,17 @@
   "name": "@better-auth-ui/heroui",
   "version": "1.6.27",
   "type": "module",
+  "keywords": [
+    "tanstack-intent"
+  ],
   "scripts": {
     "build": "vite build",
     "test": "vitest"
   },
   "files": [
     "src",
-    "dist"
+    "dist",
+    "skills"
   ],
   "exports": {
     ".": {
@@ -76,6 +80,7 @@
     "@heroui/react": "^3.2.1",
     "@heroui/styles": "^3.2.1",
     "@internationalized/date": "^3.12.2",
+    "@tanstack/intent": "^0.3.4",
     "@tanstack/react-pacer": "^0.22.1",
     "@tanstack/react-query": "^5.101.2",
     "@testing-library/react": "^16.3.2",

@@ -37,11 +37,12 @@ Do not use it for generic Better Auth server setup unless Better Auth UI code, d
 ## Execution Steps
 
 1. Identify the requested framework/UI surface and read its docs from `llms.txt` markdown links.
-2. Read the smallest supporting reference for the task: repo map, framework surfaces, upstream Better Auth, common tasks, validation, or checklist.
-3. Inspect the matching package or copied component path; do not mix React and Solid APIs.
-4. For UI registry installation, fetch registry JSON only after choosing shadcn or Zaidan.
-5. For shared behavior, trace from core options/keys/factories into adapters and keep adapters thin.
-6. Validate with the narrowest relevant project script or framework command, then run formatting/lint checks when the project provides them.
+2. If the project has `@better-auth-ui/*` packages installed, read the versioned package skill shipped inside the package first: `node_modules/@better-auth-ui/<pkg>/skills/<skill>/SKILL.md` (`core/skills/core`, `react/skills/react`, `solid/skills/solid`, `heroui/skills/heroui`). No extra tooling is required; `npx @tanstack/intent@latest load @better-auth-ui/<pkg>#<skill>` is an equivalent alternative.
+3. Read the smallest supporting reference for the task: repo map, framework surfaces, upstream Better Auth, common tasks, validation, or checklist.
+4. Inspect the matching package or copied component path; do not mix React and Solid APIs.
+5. For UI registry installation, fetch registry JSON only after choosing shadcn or Zaidan.
+6. For shared behavior, trace from core options/keys/factories into adapters and keep adapters thin.
+7. Validate with the narrowest relevant project script or framework command, then run formatting/lint checks when the project provides them.
 
 ## Output Contract
 
