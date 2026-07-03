@@ -1,8 +1,8 @@
 # Better Auth UI
 
-Beautiful, ready-to-use authentication components for [Better Auth](https://better-auth.com).
+Beautiful, ready-to-use authentication components and framework adapters for [Better Auth](https://better-auth.com).
 
-Built with **shadcn/ui** and **HeroUI**. Drop in and go.
+Built for **React**, **Solid**, **shadcn/ui**, **HeroUI**, and **Zaidan**. Drop in and go.
 
 ## [better-auth-ui.com](https://better-auth-ui.com)
 
@@ -15,7 +15,7 @@ Built with **shadcn/ui** and **HeroUI**. Drop in and go.
 
 ---
 
-## Screenshots
+## Selected UI Options
 
 ### shadcn/ui
 
@@ -37,11 +37,14 @@ Built with **shadcn/ui** and **HeroUI**. Drop in and go.
 
 ## Features
 
-- **Fully Customizable** — Built on shadcn/ui and HeroUI. Own your code, style it your way.
+- **Framework adapters** — React and Solid hooks, queries, mutations, and auth helpers.
+- **UI choices** — shadcn/ui and Zaidan registries for copied components, plus packaged HeroUI components.
 - **Drop-in Ready** — Pre-built Sign In, Sign Up, Forgot Password, and more. Just add and configure.
-- **Better Auth Native** — Built specifically for Better Auth. Social logins, magic links, and more.
+- **Better Auth Native** — Built specifically for Better Auth. Social logins, magic links, organizations, passkeys, and more.
 
 ## Installation
+
+These are quick start entry points, not full framework setup. See the [documentation](https://better-auth-ui.com/docs) for peer dependencies, providers, plugins, and framework-specific configuration.
 
 ### shadcn/ui
 
@@ -52,7 +55,39 @@ bun x shadcn@latest add https://better-auth-ui.com/r/auth.json
 ### HeroUI
 
 ```bash
-bun add @better-auth-ui/heroui@latest
+bun add @better-auth-ui/heroui@latest @better-auth-ui/react@latest @better-auth-ui/core@latest
+```
+
+### React
+
+```bash
+bun add @better-auth-ui/react @better-auth-ui/core
+```
+
+### Solid
+
+```bash
+bun add @better-auth-ui/solid @better-auth-ui/core
+```
+
+### Zaidan
+
+```bash
+bun x shadcn@latest add https://better-auth-ui.com/r/solid/auth.json
+```
+
+## Agent Skill
+
+Install the Better Auth UI agent skill so coding assistants can route between React, Solid, shadcn/ui, HeroUI, Zaidan, core, and upstream Better Auth docs correctly.
+
+```bash
+npx skills add better-auth-ui/better-auth-ui
+```
+
+For upstream Better Auth conventions, also install the Better Auth skill pack:
+
+```bash
+npx skills add better-auth/skills
 ```
 
 ## License
