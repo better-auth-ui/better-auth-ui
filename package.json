@@ -3,17 +3,6 @@
   "license": "MIT",
   "homepage": "https://better-auth-ui.com",
   "description": "Plug & play UI components for Better Auth",
-  "keywords": [
-    "tanstack-intent"
-  ],
-  "intent": {
-    "skills": [
-      "workspace:@better-auth-ui/core",
-      "workspace:@better-auth-ui/react",
-      "workspace:@better-auth-ui/solid",
-      "workspace:@better-auth-ui/heroui"
-    ]
-  },
   "scripts": {
     "dev": "nx run-many -t dev",
     "build": "nx run-many -t build",
@@ -32,7 +21,6 @@
     "@swc-node/register": "~1.11.1",
     "@swc/core": "~1.15.43",
     "@swc/helpers": "~0.5.23",
-    "@tanstack/intent": "^0.3.4",
     "@vitejs/plugin-react": "^6.0.3",
     "lefthook": "^2.1.8",
     "nx": "23.0.1",

@@ -2,19 +2,6 @@
 
 Use this reference after loading `skills/better-auth-ui/SKILL.md`.
 
-## Package-shipped skills (TanStack Intent)
-
-Better Auth UI packages ship versioned TanStack Intent skills inside the npm packages. Prefer these when the consumer project has `@better-auth-ui/*` installed, since they always match the installed package version. Read them directly from `node_modules` — no extra tooling required:
-
-| Skill | Path |
-| --- | --- |
-| Core data layer | `node_modules/@better-auth-ui/core/skills/core/SKILL.md` |
-| React hooks | `node_modules/@better-auth-ui/react/skills/react/SKILL.md` |
-| Solid hooks | `node_modules/@better-auth-ui/solid/skills/solid/SKILL.md` |
-| HeroUI components | `node_modules/@better-auth-ui/heroui/skills/heroui/SKILL.md` |
-
-If the project uses TanStack Intent, `npx @tanstack/intent@latest load @better-auth-ui/<pkg>#<skill>` loads the same files.
-
 ## Canonical agent docs
 
 | Need | URL |
@@ -33,7 +20,6 @@ Use these when the task involves Better Auth server behavior, plugins, adapters,
 | Better Auth AI resources | `https://better-auth.com/docs/ai-resources` |
 | Better Auth MCP docs | `https://better-auth.com/docs/ai-resources/mcp` |
 | Better Auth skills docs | `https://better-auth.com/docs/ai-resources/skills` |
-| Better Auth UI package skills | Read `node_modules/@better-auth-ui/<pkg>/skills/<skill>/SKILL.md` directly |
 | Install upstream Better Auth skills | `npx skills add better-auth/skills` |
 | Configure Better Auth docs MCP | `npx auth@latest mcp` or endpoint `https://mcp.better-auth.com/mcp` |
 

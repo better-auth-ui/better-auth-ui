@@ -76,34 +76,7 @@ bun add @better-auth-ui/solid @better-auth-ui/core
 bun x shadcn@latest add https://better-auth-ui.com/r/solid/auth.json
 ```
 
-## Agent Skills
-
-### TanStack Intent (recommended)
-
-Better Auth UI packages ship [TanStack Intent](https://tanstack.com/intent) skills inside the npm packages, so installed skills always match your installed package version. After installing any `@better-auth-ui/*` package, wire up your agent once:
-
-```bash
-npx @tanstack/intent@latest install
-```
-
-Then agents discover and load skills automatically, or you can load one manually:
-
-```bash
-npx @tanstack/intent@latest list
-npx @tanstack/intent@latest load @better-auth-ui/react#react
-```
-
-Allowlist the packages in your `package.json` so their skills are surfaced:
-
-```json
-{
-  "intent": {
-    "skills": ["@better-auth-ui/core", "@better-auth-ui/react", "@better-auth-ui/solid", "@better-auth-ui/heroui"]
-  }
-}
-```
-
-### npx skills
+## Agent Skill
 
 Install the Better Auth UI agent skill so coding assistants can route between React, Solid, shadcn/ui, HeroUI, Zaidan, core, and upstream Better Auth docs correctly.
 

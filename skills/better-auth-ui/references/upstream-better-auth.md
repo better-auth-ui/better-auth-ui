@@ -22,7 +22,6 @@ Consult Better Auth docs, skills, or MCP before changing Better Auth UI when the
 | `https://better-auth.com/docs/ai-resources` | Official AI resources entry point |
 | `https://better-auth.com/docs/ai-resources/skills` | Better Auth skill pack install instructions |
 | `https://better-auth.com/docs/ai-resources/mcp` | Better Auth remote docs MCP setup |
-| `node_modules/@better-auth-ui/<pkg>/skills/<skill>/SKILL.md` | Versioned Better Auth UI package skills, readable directly |
 | `npx skills add better-auth/skills` | Install upstream Better Auth agent skills |
 | `https://mcp.better-auth.com/mcp` | Remote Better Auth documentation MCP endpoint |
 | `npx auth@latest mcp` | Better Auth CLI helper for configuring MCP clients |
