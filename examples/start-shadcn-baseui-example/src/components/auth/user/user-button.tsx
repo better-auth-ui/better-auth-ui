@@ -133,6 +133,14 @@ export function UserButton({
     ]
   })
 
+  // Whether anything renders between the user info label and the
+  // sign-out item, so the leading separator isn't shown with nothing
+  // to separate (see #439).
+  const hasSessionMenuItems =
+    (userLinks?.length ?? 0) > 0 ||
+    !hideSettings ||
+    plugins.some((plugin) => (plugin.userMenuItems?.length ?? 0) > 0)
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger
@@ -181,7 +189,7 @@ export function UserButton({
               </DropdownMenuLabel>
             </DropdownMenuGroup>
 
-            <DropdownMenuSeparator />
+            {hasSessionMenuItems && <DropdownMenuSeparator />}
           </>
         )}
 
