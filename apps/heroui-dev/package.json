@@ -33,8 +33,7 @@
     "@heroui/styles": "^3.2.1",
     "@marsidev/react-turnstile": "^1.5.0",
     "@neondatabase/serverless": "^1.0.2",
-    "@react-email/components": "^1.0.12",
-    "@react-email/render": "^2.0.9",
+    "@react-email/render": "^2.0.10",
     "@tailwindcss/vite": "^4.3.1",
     "@tanstack/react-devtools": "^0.10.5",
     "@tanstack/react-query": "^5.100.14",
@@ -49,7 +48,7 @@
     "nodemailer": "^9.0.1",
     "react": "^19.2.6",
     "react-dom": "^19.2.6",
-    "react-email": "^6.6.3",
+    "react-email": "^6.6.8",
     "tailwind-variants": "^3.2.2",
     "tailwindcss": "^4.3.1"
   }

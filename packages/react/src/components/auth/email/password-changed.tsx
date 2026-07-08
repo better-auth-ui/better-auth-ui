@@ -1,3 +1,4 @@
+import type { ReactNode } from "react"
 import {
   Body,
   Button,
@@ -13,8 +14,7 @@ import {
   Section,
   Tailwind,
   Text
-} from "@react-email/components"
-import type { ReactNode } from "react"
+} from "react-email"
 
 import { cn } from "../../../lib/utils"
 import {

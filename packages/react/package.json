@@ -38,8 +38,6 @@
   "devDependencies": {
     "@better-auth/api-key": "^1.6.19",
     "@better-auth/passkey": "^1.6.19",
-    "@react-email/components": "^1.0.12",
-    "@react-email/preview-server": "^5.2.10",
     "@tanstack/query-core": "^5.100.14",
     "@tanstack/react-query": "^5.100.14",
     "@testing-library/react": "^16.3.2",
@@ -52,7 +50,7 @@
     "playwright": "^1.61.0",
     "react": "^19.2.6",
     "react-dom": "^19.2.6",
-    "react-email": "^6.6.3",
+    "react-email": "^6.6.8",
     "tailwind-merge": "^3.5.0",
     "tailwindcss": "^4.3.1",
     "vitest": "^4.1.9",
@@ -62,16 +60,21 @@
     "@better-auth-ui/core": "*",
     "@better-auth/api-key": ">=1.6.19",
     "@better-auth/passkey": ">=1.6.19",
-    "@react-email/components": ">=1.0.12",
     "@tanstack/query-core": ">=5.100.14",
     "@tanstack/react-query": ">=5.100.14",
     "better-auth": ">=1.6.19",
     "clsx": ">=2.0.0",
     "react": ">=19.2.6",
     "react-dom": ">=19.2.6",
+    "react-email": ">=6.0.0",
     "tailwind-merge": ">=3.5.0",
     "tailwindcss": ">=4.3.1",
     "zod": ">=4.4.3"
+  },
+  "peerDependenciesMeta": {
+    "react-email": {
+      "optional": true
+    }
   },
   "repository": {
     "type": "git",
