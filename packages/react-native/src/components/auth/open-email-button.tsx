@@ -34,11 +34,11 @@ export function OpenEmailButton({ email, className }: OpenEmailButtonProps) {
       className={cn("w-full", className)}
       onPress={() => Linking.openURL(provider.loginUrl)}
     >
-      <ArrowUpRightFromSquare width={18} height={18} color="#ffffff" />
       {localization.auth.openEmailProvider.replace(
         "{{provider}}",
         provider.companyProvider
       )}
+      <ArrowUpRightFromSquare width={18} height={18} color="#ffffff" />
     </Button>
   )
 }

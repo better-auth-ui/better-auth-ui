@@ -6,7 +6,7 @@ import {
   type ReactNode,
   useState
 } from "react"
-import { Modal, Pressable, Text, View } from "react-native"
+import { Linking, Modal, Pressable, Text, View } from "react-native"
 import { cn } from "../../../lib/cn"
 import { useAuthNavigation } from "../../../navigation/navigation-context"
 import { Button, type ButtonProps } from "../../../primitives/button"
@@ -66,16 +66,21 @@ export type UserButtonProps = {
 function renderUserLink(
   link: UserButtonLink | ReactElement,
   fallbackKey: string,
-  onPress: () => void
+  close: () => void
 ): ReactNode {
   if (isValidElement(link)) return link
 
-  const { label, icon, variant } = link
+  const { label, icon, variant, href } = link
   return (
     <Pressable
       key={fallbackKey}
       className="flex-row items-center gap-2 px-3 py-2"
-      onPress={onPress}
+      onPress={() => {
+        close()
+        // The library only owns the auth navigation adapter, so plain-object
+        // links navigate to external URLs; for in-app routes pass a ReactElement.
+        if (/^https?:\/\//.test(href)) void Linking.openURL(href)
+      }}
     >
       {icon}
       <Text
@@ -108,7 +113,8 @@ export function UserButton({
   hideSettings,
   hideSubtitle
 }: UserButtonProps) {
-  const { authClient, localization, plugins } = useAuth()
+  const { authClient, basePaths, localization, plugins, viewPaths, navigate } =
+    useAuth()
   const navigation = useAuthNavigation()
 
   const { data: session, isPending: sessionPending } = useSession(authClient)
@@ -204,7 +210,12 @@ export function UserButton({
                 {!hideSettings && (
                   <Pressable
                     className="flex-row items-center gap-2 px-3 py-2"
-                    onPress={() => setOpen(false)}
+                    onPress={() => {
+                      setOpen(false)
+                      navigate({
+                        to: `${basePaths.settings}/${viewPaths.settings.account}`
+                      })
+                    }}
                   >
                     <Gear width={18} height={18} color="#a3a3a3" />
                     <Text className="text-sm text-neutral-900 dark:text-neutral-50">
