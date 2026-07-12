@@ -1,0 +1,58 @@
+{
+  "name": "@better-auth-ui/react-native",
+  "version": "1.6.27",
+  "type": "module",
+  "scripts": {
+    "build": "vite build",
+    "test": "vitest"
+  },
+  "files": [
+    "src",
+    "dist"
+  ],
+  "exports": {
+    ".": {
+      "src": "./src/index.ts",
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "react-native": "./src/index.ts",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "dependencies": {
+    "clsx": "^2.1.1",
+    "tailwind-merge": "^2.6.1"
+  },
+  "devDependencies": {
+    "@better-auth-ui/core": "workspace:*",
+    "@better-auth-ui/react": "workspace:*",
+    "@tanstack/react-query": "^5.101.0",
+    "@types/react": "^19.2.15",
+    "@vitejs/plugin-react": "^6.0.2",
+    "better-auth": "^1.6.19",
+    "nativewind": "^4.2.6",
+    "react": "^19.2.6",
+    "react-native": "0.86.0",
+    "react-native-svg": "^15.15.5",
+    "tailwindcss": "^3.4.19"
+  },
+  "peerDependencies": {
+    "@better-auth-ui/core": "*",
+    "@better-auth-ui/react": "*",
+    "@tanstack/react-query": ">=5.100.0",
+    "better-auth": ">=1.6.19",
+    "nativewind": ">=4.1.0",
+    "react": ">=19.0.0",
+    "react-native": ">=0.76.0",
+    "react-native-svg": ">=15.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/better-auth-ui/better-auth-ui",
+    "directory": "packages/react-native"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
