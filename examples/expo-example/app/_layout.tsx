@@ -41,6 +41,9 @@ function AuthGate() {
       <Stack.Protected guard={!session}>
         <Stack.Screen name="(auth)" />
       </Stack.Protected>
+      {/* Always reachable at /showcase — renders the full component surface for
+          UI verification (no session required). */}
+      <Stack.Screen name="showcase" />
     </Stack>
   )
 }
