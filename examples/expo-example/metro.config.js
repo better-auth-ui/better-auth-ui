@@ -1,6 +1,6 @@
-// Expo + nativewind Metro config for a bun/nx monorepo.
+// Expo Metro config for a bun/nx monorepo — NO nativewind (the
+// @better-auth-ui/react-native package styles itself with plain RN styles).
 const { getDefaultConfig } = require("expo/metro-config")
-const { withNativeWind } = require("nativewind/metro")
 const path = require("path")
 
 const projectRoot = __dirname
@@ -15,14 +15,14 @@ config.resolver.nodeModulesPaths = [
   path.resolve(workspaceRoot, "node_modules")
 ]
 
-// Resolve the workspace `src` export condition so @better-auth-ui/* load from
-// source — then nativewind's babel transform processes their className props.
+// Resolve the workspace `react-native`/`src` export condition so @better-auth-ui/*
+// load from source.
 config.resolver.unstable_enablePackageExports = true
 config.resolver.unstable_conditionNames = [
-  "src",
   "react-native",
+  "src",
   "require",
   "import"
 ]
 
-module.exports = withNativeWind(config, { input: "./global.css" })
+module.exports = config
