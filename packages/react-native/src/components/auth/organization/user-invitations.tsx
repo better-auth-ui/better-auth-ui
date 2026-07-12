@@ -6,8 +6,6 @@ import {
   useListUserInvitations,
   useRejectInvitation
 } from "@better-auth-ui/react"
-import { Text, View } from "react-native"
-
 import { organizationPlugin } from "../../../lib/auth/organization-plugin"
 import type { SettingsViewProps } from "../../../lib/auth-plugin"
 import { cn } from "../../../lib/cn"
@@ -16,6 +14,7 @@ import { useThemeColors } from "../../../lib/theme-colors"
 import { Button } from "../../../primitives/button"
 import { Card } from "../../../primitives/card"
 import { Skeleton } from "../../../primitives/skeleton"
+import { Box, Txt } from "../../../primitives/styled"
 import { Chip, EmptyState } from "../../../primitives/tabs"
 import { Check, Clock, Send, Xmark } from "../../../primitives/ui-icons"
 
@@ -41,13 +40,13 @@ export function UserInvitations({ className, variant }: UserInvitationsProps) {
   )
 
   return (
-    <View className={cn("flex-col gap-3", className)}>
-      <Text
+    <Box className={cn("flex-col gap-3", className)}>
+      <Txt
         className="shrink text-sm font-semibold text-foreground"
         numberOfLines={1}
       >
         {organizationLocalization.invitations}
-      </Text>
+      </Txt>
 
       <Card variant={variant}>
         <Card.Content>
@@ -57,18 +56,18 @@ export function UserInvitations({ className, variant }: UserInvitationsProps) {
             <UserInvitationsEmpty />
           ) : (
             invitations?.map((invitation, index) => (
-              <View key={invitation.id}>
+              <Box key={invitation.id}>
                 {index > 0 && (
-                  <View className="-mx-4 my-4 border-b border-dashed border-border" />
+                  <Box className="-mx-4 my-4 border-b border-dashed border-border" />
                 )}
 
                 <UserInvitationRow invitation={invitation} />
-              </View>
+              </Box>
             ))
           )}
         </Card.Content>
       </Card>
-    </View>
+    </Box>
   )
 }
 
@@ -95,31 +94,31 @@ function UserInvitationRow({ invitation }: UserInvitationRowProps) {
     useRejectInvitation(authClient as OrganizationAuthClient)
 
   return (
-    <View className="flex-row items-center gap-3">
-      <View className="size-10 shrink-0 items-center justify-center rounded-xl bg-surface-secondary">
+    <Box className="flex-row items-center gap-3">
+      <Box className="size-10 shrink-0 items-center justify-center rounded-xl bg-surface-secondary">
         <Clock width={18} height={18} color={colors.foreground} />
-      </View>
+      </Box>
 
-      <View className="min-w-0 flex-col">
-        <View className="flex-row items-center gap-1.5">
-          <Text
+      <Box className="min-w-0 flex-col">
+        <Box className="flex-row items-center gap-1.5">
+          <Txt
             className="shrink text-sm font-medium leading-tight text-foreground"
             numberOfLines={1}
           >
             {invitation.organizationName}
-          </Text>
+          </Txt>
 
           <Chip className="shrink-0">
             {roles?.[invitation.role] ?? invitation.role}
           </Chip>
-        </View>
+        </Box>
 
-        <Text className="text-xs text-muted" numberOfLines={1}>
+        <Txt className="text-xs text-muted" numberOfLines={1}>
           {formatDateTime(invitation.createdAt)}
-        </Text>
-      </View>
+        </Txt>
+      </Box>
 
-      <View className="ml-auto flex-row shrink-0 items-center gap-2">
+      <Box className="ml-auto flex-row shrink-0 items-center gap-2">
         <Button
           variant="outline"
           size="sm"
@@ -154,8 +153,8 @@ function UserInvitationRow({ invitation }: UserInvitationRowProps) {
             <Xmark width={16} height={16} color={colors.dangerForeground} />
           )}
         </Button>
-      </View>
-    </View>
+      </Box>
+    </Box>
   )
 }
 
@@ -165,14 +164,14 @@ function UserInvitationRow({ invitation }: UserInvitationRowProps) {
  */
 function UserInvitationRowSkeleton() {
   return (
-    <View className="flex-row items-center gap-3">
+    <Box className="flex-row items-center gap-3">
       <Skeleton className="size-10 shrink-0 rounded-xl" />
 
-      <View className="flex-col gap-1">
+      <Box className="flex-col gap-1">
         <Skeleton className="h-4 w-40 rounded-lg" />
         <Skeleton className="h-3 w-28 rounded-lg" />
-      </View>
-    </View>
+      </Box>
+    </Box>
   )
 }
 

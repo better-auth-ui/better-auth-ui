@@ -7,10 +7,10 @@ import {
   useSession
 } from "@better-auth-ui/react"
 import type { Organization } from "better-auth/client"
-import { Text, View } from "react-native"
 
 import { organizationPlugin } from "../../../lib/auth/organization-plugin"
 import { cn } from "../../../lib/cn"
+import { Box, Txt } from "../../../primitives/styled"
 import { Chip } from "../../../primitives/tabs"
 import { OrganizationLogo } from "./organization-logo"
 import { OrganizationViewSkeleton } from "./organization-view-skeleton"
@@ -77,39 +77,39 @@ export function OrganizationView({
   }
 
   return (
-    <View className={cn("flex-row min-w-0 items-center gap-2", className)}>
+    <Box className={cn("flex-row min-w-0 items-center gap-2", className)}>
       <OrganizationLogo
         organization={resolvedOrganization}
         className={size === "sm" ? "h-5 w-5" : undefined}
         size={size === "lg" ? "md" : "sm"}
       />
 
-      <View className="flex-col min-w-0">
-        <View className="flex-row min-w-0 items-center gap-2">
-          <Text
+      <Box className="flex-col min-w-0">
+        <Box className="flex-row min-w-0 items-center gap-2">
+          <Txt
             numberOfLines={1}
             className="text-foreground text-sm font-medium leading-tight"
           >
             {resolvedOrganization?.name}
-          </Text>
+          </Txt>
 
           {!hideRole && !!membership && (
             <Chip className="shrink-0 -my-0.5">
               {roles?.[membership.role] ?? membership.role}
             </Chip>
           )}
-        </View>
+        </Box>
 
         {!hideSlug && !!resolvedOrganization?.slug && (
-          <Text
+          <Txt
             numberOfLines={1}
             className="text-muted text-xs font-mono leading-tight"
           >
             {slugPrefix}
             {resolvedOrganization.slug}
-          </Text>
+          </Txt>
         )}
-      </View>
-    </View>
+      </Box>
+    </Box>
   )
 }

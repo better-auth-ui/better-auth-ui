@@ -5,13 +5,13 @@ import {
   useAuthPlugin,
   useDeleteApiKey
 } from "@better-auth-ui/react"
-import { Text } from "react-native"
 import { apiKeyPlugin } from "../../../lib/auth/api-key-plugin"
 import { useThemeColors } from "../../../lib/theme-colors"
 import { AlertDialog } from "../../../primitives/alert-dialog"
 import { Button } from "../../../primitives/button"
 import { Label, TextField } from "../../../primitives/field"
 import { InputGroup } from "../../../primitives/input"
+import { Txt } from "../../../primitives/styled"
 import { Key } from "../../../primitives/ui-icons"
 
 export type DeleteApiKeyDialogProps = {
@@ -63,20 +63,20 @@ export function DeleteApiKeyDialog({
       </AlertDialog.Header>
 
       <AlertDialog.Body>
-        <Text className="text-sm text-muted">
+        <Txt className="text-sm text-muted">
           {apiKeyLocalization.deleteApiKeyWarning}
-        </Text>
+        </Txt>
 
         <TextField value={preview} isDisabled className="gap-1.5">
           <Label>{apiKey.name || apiKeyLocalization.apiKey}</Label>
 
           <InputGroup>
-            <Text
+            <Txt
               className="flex-1 font-mono text-xs text-foreground"
               numberOfLines={1}
             >
               {preview}
-            </Text>
+            </Txt>
           </InputGroup>
         </TextField>
       </AlertDialog.Body>

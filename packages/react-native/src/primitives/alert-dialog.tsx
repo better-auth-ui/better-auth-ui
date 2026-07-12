@@ -1,15 +1,9 @@
 import { createContext, type ReactNode, useContext, useMemo } from "react"
-import {
-  KeyboardAvoidingView,
-  Modal,
-  Platform,
-  Pressable,
-  ScrollView,
-  Text,
-  View
-} from "react-native"
+import { KeyboardAvoidingView, Modal, Platform } from "react-native"
 import { cn } from "../lib/cn"
 import { useThemeColors } from "../lib/theme-colors"
+import { tw } from "../lib/tw"
+import { Box, Btn, ScrollBox, Txt } from "./styled"
 import { Xmark } from "./ui-icons"
 
 export type AlertDialogPlacement = "auto" | "top" | "center" | "bottom"
@@ -91,6 +85,7 @@ function AlertDialogBase({
   className,
   children
 }: AlertDialogProps) {
+  const colors = useThemeColors()
   const context = useMemo<AlertDialogContextValue>(
     () => ({ onOpenChange }),
     [onOpenChange]
@@ -109,16 +104,16 @@ function AlertDialogBase({
       <AlertDialogContext.Provider value={context}>
         <KeyboardAvoidingView
           behavior={Platform.OS === "ios" ? "padding" : "height"}
-          className="flex-1"
+          style={tw("flex-1", colors)}
         >
-          <Pressable
+          <Btn
             accessibilityViewIsModal
             className="flex-1 items-center justify-center bg-black/50 p-4"
             onPress={() => {
               if (isDismissable) onOpenChange(false)
             }}
           >
-            <Pressable
+            <Btn
               accessibilityRole="alert"
               onPress={(event) => event.stopPropagation()}
               className={cn(
@@ -127,8 +122,8 @@ function AlertDialogBase({
               )}
             >
               {children}
-            </Pressable>
-          </Pressable>
+            </Btn>
+          </Btn>
         </KeyboardAvoidingView>
       </AlertDialogContext.Provider>
     </Modal>
@@ -178,7 +173,7 @@ function AlertDialogContainer({
   children
 }: AlertDialogContainerProps) {
   return (
-    <View
+    <Box
       className={cn(
         "w-full flex-1",
         "items-center",
@@ -186,8 +181,8 @@ function AlertDialogContainer({
         className
       )}
     >
-      <View className={cn("w-full", SIZE_CLASSES[size])}>{children}</View>
-    </View>
+      <Box className={cn("w-full", SIZE_CLASSES[size])}>{children}</Box>
+    </Box>
   )
 }
 
@@ -203,7 +198,7 @@ export interface AlertDialogDialogProps {
  */
 function AlertDialogDialog({ className, children }: AlertDialogDialogProps) {
   return (
-    <View
+    <Box
       accessibilityRole="alert"
       className={cn(
         "gap-4 rounded-2xl border border-border bg-surface p-5",
@@ -211,7 +206,7 @@ function AlertDialogDialog({ className, children }: AlertDialogDialogProps) {
       )}
     >
       {children}
-    </View>
+    </Box>
   )
 }
 
@@ -222,7 +217,7 @@ export interface AlertDialogHeaderProps {
 
 /** Header row: typically an `Icon` + `Heading`. */
 function AlertDialogHeader({ className, children }: AlertDialogHeaderProps) {
-  return <View className={cn("gap-3 pr-6", className)}>{children}</View>
+  return <Box className={cn("gap-3 pr-6", className)}>{children}</Box>
 }
 
 const ICON_STATUS_CLASSES: Record<AlertDialogIconStatus, string> = {
@@ -259,7 +254,7 @@ function AlertDialogIcon({
   children
 }: AlertDialogIconProps) {
   return (
-    <View
+    <Box
       className={cn(
         "h-10 w-10 items-center justify-center rounded-full",
         ICON_STATUS_CLASSES[status],
@@ -267,7 +262,7 @@ function AlertDialogIcon({
       )}
     >
       {children}
-    </View>
+    </Box>
   )
 }
 
@@ -279,12 +274,12 @@ export interface AlertDialogHeadingProps {
 /** Dialog title text. */
 function AlertDialogHeading({ className, children }: AlertDialogHeadingProps) {
   return (
-    <Text
+    <Txt
       className={cn("text-lg font-semibold text-foreground", className)}
       accessibilityRole="header"
     >
       {children}
-    </Text>
+    </Txt>
   )
 }
 
@@ -303,13 +298,13 @@ function AlertDialogBody({
   children
 }: AlertDialogBodyProps) {
   return (
-    <ScrollView
+    <ScrollBox
       className={cn("max-h-96", className)}
       contentContainerClassName={cn("gap-3", contentClassName)}
       keyboardShouldPersistTaps="handled"
     >
       {children}
-    </ScrollView>
+    </ScrollBox>
   )
 }
 
@@ -321,9 +316,9 @@ export interface AlertDialogFooterProps {
 /** Button row, right-aligned by default. */
 function AlertDialogFooter({ className, children }: AlertDialogFooterProps) {
   return (
-    <View className={cn("flex-row justify-end gap-2", className)}>
+    <Box className={cn("flex-row justify-end gap-2", className)}>
       {children}
-    </View>
+    </Box>
   )
 }
 
@@ -348,7 +343,7 @@ function AlertDialogCloseTrigger({
   const colors = useThemeColors()
 
   return (
-    <Pressable
+    <Btn
       accessibilityRole="button"
       accessibilityLabel={ariaLabel}
       onPress={() => (onPress ? onPress() : onOpenChange(false))}
@@ -359,7 +354,7 @@ function AlertDialogCloseTrigger({
       hitSlop={8}
     >
       <Xmark width={16} height={16} color={colors.muted} />
-    </Pressable>
+    </Btn>
   )
 }
 

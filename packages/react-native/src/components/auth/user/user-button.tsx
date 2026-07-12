@@ -5,11 +5,12 @@ import {
   type ReactNode,
   useState
 } from "react"
-import { Linking, Modal, Pressable, Text, View } from "react-native"
+import { Linking, Modal } from "react-native"
 import { cn } from "../../../lib/cn"
 import { useThemeColors } from "../../../lib/theme-colors"
 import { useAuthNavigation } from "../../../navigation/navigation-context"
 import { Button, type ButtonProps } from "../../../primitives/button"
+import { Box, Btn, Txt } from "../../../primitives/styled"
 import {
   ArrowRightFromSquare,
   ArrowRightToSquare,
@@ -64,7 +65,7 @@ function renderUserLink(
 
   const { label, icon, variant, href } = link
   return (
-    <Pressable
+    <Btn
       key={fallbackKey}
       className="flex-row items-center gap-2 px-3 py-2"
       onPress={() => {
@@ -75,15 +76,15 @@ function renderUserLink(
       }}
     >
       {icon}
-      <Text
+      <Txt
         className={cn(
           "text-sm text-neutral-900 dark:text-neutral-50",
           variant === "danger" && "text-red-600 dark:text-red-400"
         )}
       >
         {label}
-      </Text>
-    </Pressable>
+      </Txt>
+    </Btn>
   )
 }
 
@@ -139,12 +140,12 @@ export function UserButton({
   return (
     <>
       {size === "icon" ? (
-        <Pressable
+        <Btn
           className={cn("rounded-full", className)}
           onPress={() => setOpen(true)}
         >
           <UserAvatar size="md" />
-        </Pressable>
+        </Btn>
       ) : (
         <Button
           variant={variant}
@@ -160,9 +161,9 @@ export function UserButton({
             <>
               <UserAvatar />
 
-              <Text className="text-sm font-medium">
+              <Txt className="text-sm font-medium">
                 {localization.auth.account}
-              </Text>
+              </Txt>
             </>
           )}
 
@@ -181,18 +182,18 @@ export function UserButton({
         animationType="fade"
         onRequestClose={() => setOpen(false)}
       >
-        <Pressable
+        <Btn
           className="flex-1 justify-end bg-black/30"
           onPress={() => setOpen(false)}
         >
-          <Pressable
+          <Btn
             className="gap-1 rounded-t-2xl border border-neutral-200 bg-white p-2 dark:border-neutral-800 dark:bg-neutral-900"
             onPress={(event) => event.stopPropagation()}
           >
             {session && (
-              <View className="px-3 pt-3 pb-1">
+              <Box className="px-3 pt-3 pb-1">
                 <UserView hideSubtitle={hideSubtitle} />
-              </View>
+              </Box>
             )}
 
             {session ? (
@@ -200,7 +201,7 @@ export function UserButton({
                 {userLinks}
 
                 {!hideSettings && (
-                  <Pressable
+                  <Btn
                     className="flex-row items-center gap-2 px-3 py-2"
                     onPress={() => {
                       setOpen(false)
@@ -208,15 +209,15 @@ export function UserButton({
                     }}
                   >
                     <Gear width={18} height={18} color={colors.muted} />
-                    <Text className="text-sm text-neutral-900 dark:text-neutral-50">
+                    <Txt className="text-sm text-neutral-900 dark:text-neutral-50">
                       {localization.settings.settings}
-                    </Text>
-                  </Pressable>
+                    </Txt>
+                  </Btn>
                 )}
 
                 {userMenuItems}
 
-                <Pressable
+                <Btn
                   className="flex-row items-center gap-2 px-3 py-2"
                   onPress={() => {
                     setOpen(false)
@@ -228,16 +229,16 @@ export function UserButton({
                     height={18}
                     color={colors.danger}
                   />
-                  <Text className="text-sm text-red-600 dark:text-red-400">
+                  <Txt className="text-sm text-red-600 dark:text-red-400">
                     {localization.auth.signOut}
-                  </Text>
-                </Pressable>
+                  </Txt>
+                </Btn>
               </>
             ) : (
               <>
                 {userLinks}
 
-                <Pressable
+                <Btn
                   className="flex-row items-center gap-2 px-3 py-2"
                   onPress={() => {
                     setOpen(false)
@@ -249,12 +250,12 @@ export function UserButton({
                     height={18}
                     color={colors.muted}
                   />
-                  <Text className="text-sm text-neutral-900 dark:text-neutral-50">
+                  <Txt className="text-sm text-neutral-900 dark:text-neutral-50">
                     {localization.auth.signIn}
-                  </Text>
-                </Pressable>
+                  </Txt>
+                </Btn>
 
-                <Pressable
+                <Btn
                   className="flex-row items-center gap-2 px-3 py-2"
                   onPress={() => {
                     setOpen(false)
@@ -262,16 +263,16 @@ export function UserButton({
                   }}
                 >
                   <PersonPlus width={18} height={18} color={colors.muted} />
-                  <Text className="text-sm text-neutral-900 dark:text-neutral-50">
+                  <Txt className="text-sm text-neutral-900 dark:text-neutral-50">
                     {localization.auth.signUp}
-                  </Text>
-                </Pressable>
+                  </Txt>
+                </Btn>
 
                 {userMenuItems}
               </>
             )}
-          </Pressable>
-        </Pressable>
+          </Btn>
+        </Btn>
       </Modal>
     </>
   )

@@ -1,6 +1,6 @@
-import { Text, View } from "react-native"
 import { cn } from "../lib/cn"
 import { formatDateTime } from "../lib/format-date"
+import { Box, Txt } from "./styled"
 
 export type DatePickerMode = "date" | "time" | "datetime"
 
@@ -24,20 +24,20 @@ export function DatePicker({
   className
 }: DatePickerProps) {
   return (
-    <View className={cn("w-full", className)}>
-      <View
+    <Box className={cn("w-full", className)}>
+      <Box
         className={cn(
           "h-11 justify-center rounded-lg border border-border px-3",
           isDisabled && "opacity-50"
         )}
       >
-        <Text
+        <Txt
           className={cn("text-base", value ? "text-foreground" : "text-muted")}
         >
           {value ? formatDateTime(value) : placeholder}
-        </Text>
-      </View>
-    </View>
+        </Txt>
+      </Box>
+    </Box>
   )
 }
 

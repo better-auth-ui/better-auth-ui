@@ -6,12 +6,12 @@ import {
   useRejectInvitation
 } from "@better-auth-ui/react"
 import type { Invitation } from "better-auth/client"
-import { Text, View } from "react-native"
 
 import { organizationPlugin } from "../../../lib/auth/organization-plugin"
 import { formatDateTime } from "../../../lib/format-date"
 import { useThemeColors } from "../../../lib/theme-colors"
 import { Button } from "../../../primitives/button"
+import { Box, Txt } from "../../../primitives/styled"
 import { Chip } from "../../../primitives/tabs"
 import { Check, Clock, Xmark } from "../../../primitives/ui-icons"
 
@@ -41,29 +41,29 @@ export function UserInvitationRow({ invitation }: UserInvitationRowProps) {
     useRejectInvitation(authClient as OrganizationAuthClient)
 
   return (
-    <View className="flex-row items-center gap-3">
-      <View className="h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-surface-secondary">
+    <Box className="flex-row items-center gap-3">
+      <Box className="h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-surface-secondary">
         <Clock width={18} height={18} color={colors.muted} />
-      </View>
+      </Box>
 
-      <View className="flex-1 gap-0.5">
-        <View className="flex-row items-center gap-1.5">
-          <Text
+      <Box className="flex-1 gap-0.5">
+        <Box className="flex-row items-center gap-1.5">
+          <Txt
             numberOfLines={1}
             className="shrink text-sm font-medium leading-tight text-foreground"
           >
             {invitation.organizationName}
-          </Text>
+          </Txt>
 
           <Chip>{roles?.[invitation.role] ?? invitation.role}</Chip>
-        </View>
+        </Box>
 
-        <Text numberOfLines={1} className="text-xs text-muted">
+        <Txt numberOfLines={1} className="text-xs text-muted">
           {formatDateTime(invitation.createdAt)}
-        </Text>
-      </View>
+        </Txt>
+      </Box>
 
-      <View className="ml-auto flex-row shrink-0 items-center gap-2">
+      <Box className="ml-auto flex-row shrink-0 items-center gap-2">
         <Button
           variant="outline"
           size="sm"
@@ -94,7 +94,7 @@ export function UserInvitationRow({ invitation }: UserInvitationRowProps) {
         >
           <Xmark width={16} height={16} color={colors.dangerForeground} />
         </Button>
-      </View>
-    </View>
+      </Box>
+    </Box>
   )
 }

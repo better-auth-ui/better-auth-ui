@@ -1,9 +1,9 @@
 import { useAuth, useRevokeSession, useSession } from "@better-auth-ui/react"
 import type { Session } from "better-auth"
-import { Text, View } from "react-native"
 import { useAuthNavigation } from "../../../../navigation/navigation-context"
 import { Button } from "../../../../primitives/button"
 import { Spinner } from "../../../../primitives/spinner"
+import { Box, Txt } from "../../../../primitives/styled"
 import { Chip } from "../../../../primitives/tabs"
 import { toast } from "../../../../primitives/toast"
 import {
@@ -111,20 +111,20 @@ export function ActiveSession({ activeSession }: ActiveSessionProps) {
   )
 
   return (
-    <View className="flex-row items-center gap-3">
-      <View className="size-10 shrink-0 items-center justify-center rounded-xl bg-surface-secondary">
+    <Box className="flex-row items-center gap-3">
+      <Box className="size-10 shrink-0 items-center justify-center rounded-xl bg-surface-secondary">
         {isMobile ? (
           <Smartphone width={18} height={18} />
         ) : (
           <Display width={18} height={18} />
         )}
-      </View>
+      </Box>
 
-      <View className="min-w-0 flex-1 flex-col">
-        <Text className="text-sm font-medium text-foreground" numberOfLines={1}>
+      <Box className="min-w-0 flex-1 flex-col">
+        <Txt className="text-sm font-medium text-foreground" numberOfLines={1}>
           {browserName || "Unknown Browser"}
           {osName ? `, ${osName}` : ""}
-        </Text>
+        </Txt>
 
         {isCurrentSession ? (
           <Chip color="accent" className="mt-1">
@@ -132,12 +132,12 @@ export function ActiveSession({ activeSession }: ActiveSessionProps) {
           </Chip>
         ) : (
           activeSession.createdAt && (
-            <Text className="text-xs capitalize text-muted">
+            <Txt className="text-xs capitalize text-muted">
               {timeAgo(activeSession.createdAt)}
-            </Text>
+            </Txt>
           )
         )}
-      </View>
+      </Box>
 
       <Button
         className="ml-auto shrink-0"
@@ -167,6 +167,6 @@ export function ActiveSession({ activeSession }: ActiveSessionProps) {
           ? localization.auth.signOut
           : localization.settings.revoke}
       </Button>
-    </View>
+    </Box>
   )
 }

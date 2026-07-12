@@ -2,7 +2,6 @@ import { authMutationKeys } from "@better-auth-ui/core"
 import { useAuth, useFetchOptions, useSignUpEmail } from "@better-auth-ui/react"
 import { useIsMutating } from "@tanstack/react-query"
 import { useState } from "react"
-import { View } from "react-native"
 import { cn } from "../../lib/cn"
 import { setPendingEmail } from "../../lib/pending-email"
 import { useAuthNavigation } from "../../navigation/navigation-context"
@@ -13,6 +12,7 @@ import { FieldError, Label, TextField } from "../../primitives/field"
 import { Form } from "../../primitives/form"
 import { Input, InputGroup } from "../../primitives/input"
 import { Link } from "../../primitives/link"
+import { Box } from "../../primitives/styled"
 import { toast } from "../../primitives/toast"
 import { Eye, EyeSlash } from "../../primitives/ui-icons"
 import { FieldSeparator } from "./field-separator"
@@ -288,7 +288,7 @@ export function SignUp({
 
             {captcha}
 
-            <View className="gap-3">
+            <Box className="gap-3">
               <Button
                 type="submit"
                 variant="primary"
@@ -306,7 +306,7 @@ export function SignUp({
                   />
                 ))
               )}
-            </View>
+            </Box>
           </Form>
         )}
 

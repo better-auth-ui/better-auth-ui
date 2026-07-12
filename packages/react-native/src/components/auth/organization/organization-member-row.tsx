@@ -10,7 +10,6 @@ import {
 } from "@better-auth-ui/react"
 import type { Member, Organization, User } from "better-auth/client"
 import { useState } from "react"
-import { Text, View } from "react-native"
 
 import { organizationPlugin } from "../../../lib/auth/organization-plugin"
 import { useThemeColors } from "../../../lib/theme-colors"
@@ -19,6 +18,7 @@ import { Button } from "../../../primitives/button"
 import { Card } from "../../../primitives/card"
 import { Menu } from "../../../primitives/menu"
 import { Spinner } from "../../../primitives/spinner"
+import { Box, Txt } from "../../../primitives/styled"
 import { Chip } from "../../../primitives/tabs"
 import { toast } from "../../../primitives/toast"
 import {
@@ -91,12 +91,12 @@ export function OrganizationMemberRow({
   }
 
   return (
-    <View className="flex-row items-center justify-between gap-2">
+    <Box className="flex-row items-center justify-between gap-2">
       <UserView className="min-w-0 flex-1" user={member.user} />
 
-      <Text className="shrink-0 text-sm text-muted">{roleLabel}</Text>
+      <Txt className="shrink-0 text-sm text-muted">{roleLabel}</Txt>
 
-      <View className="shrink-0 flex-row items-center gap-1">
+      <Box className="shrink-0 flex-row items-center gap-1">
         {hasUpdatePermission?.success && (
           <Button
             isIconOnly
@@ -137,7 +137,7 @@ export function OrganizationMemberRow({
             </Button>
           )
         )}
-      </View>
+      </Box>
 
       <Menu
         isOpen={roleMenuOpen}
@@ -167,7 +167,7 @@ export function OrganizationMemberRow({
           />
         )
       )}
-    </View>
+    </Box>
   )
 }
 
@@ -210,9 +210,9 @@ function RemoveMemberConfirmDialog({
       </AlertDialog.Header>
 
       <AlertDialog.Body>
-        <Text className="text-sm text-muted">
+        <Txt className="text-sm text-muted">
           {organizationLocalization.removeMemberWarning}
-        </Text>
+        </Txt>
 
         <Card variant="secondary">
           <Card.Content className="flex-row items-center justify-between gap-2">
@@ -290,9 +290,9 @@ function LeaveOrganizationConfirmDialog({
       </AlertDialog.Header>
 
       <AlertDialog.Body>
-        <Text className="text-sm text-muted">
+        <Txt className="text-sm text-muted">
           {organizationLocalization.leaveOrganizationDescription}
-        </Text>
+        </Txt>
       </AlertDialog.Body>
 
       <AlertDialog.Footer>

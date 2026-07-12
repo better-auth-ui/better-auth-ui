@@ -7,7 +7,6 @@ import {
 } from "@better-auth-ui/react"
 import type { Organization } from "better-auth/client"
 import { useState } from "react"
-import { Text, View } from "react-native"
 
 import { organizationPlugin } from "../../../lib/auth/organization-plugin"
 import type { SettingsViewProps } from "../../../lib/auth-plugin"
@@ -17,6 +16,7 @@ import { useAuthNavigation } from "../../../navigation/navigation-context"
 import { AlertDialog } from "../../../primitives/alert-dialog"
 import { Button } from "../../../primitives/button"
 import { Card } from "../../../primitives/card"
+import { Box, Txt } from "../../../primitives/styled"
 import { toast } from "../../../primitives/toast"
 import { ArrowRightFromSquare } from "../../../primitives/ui-icons"
 import { OrganizationView } from "./organization-view"
@@ -42,16 +42,16 @@ export function LeaveOrganization({ className }: LeaveOrganizationProps) {
   const [confirmOpen, setConfirmOpen] = useState(false)
 
   return (
-    <View className={cn("flex-col gap-4", className)}>
-      <View>
-        <Text className="text-sm font-medium leading-tight text-foreground">
+    <Box className={cn("flex-col gap-4", className)}>
+      <Box>
+        <Txt className="text-sm font-medium leading-tight text-foreground">
           {organizationLocalization.leaveOrganization}
-        </Text>
+        </Txt>
 
-        <Text className="mt-0.5 text-xs text-muted">
+        <Txt className="mt-0.5 text-xs text-muted">
           {organizationLocalization.leaveOrganizationDescription}
-        </Text>
-      </View>
+        </Txt>
+      </Box>
 
       <Button
         className="self-start"
@@ -70,7 +70,7 @@ export function LeaveOrganization({ className }: LeaveOrganizationProps) {
           organization={activeOrganization}
         />
       )}
-    </View>
+    </Box>
   )
 }
 
@@ -134,9 +134,9 @@ function LeaveOrganizationDialog({
       </AlertDialog.Header>
 
       <AlertDialog.Body>
-        <Text className="text-sm text-muted">
+        <Txt className="text-sm text-muted">
           {organizationLocalization.leaveOrganizationDescription}
-        </Text>
+        </Txt>
 
         <Card variant="secondary">
           <Card.Content>

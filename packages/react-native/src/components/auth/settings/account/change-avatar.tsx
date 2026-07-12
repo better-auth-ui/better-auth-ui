@@ -1,6 +1,5 @@
 import { useAuth, useSession, useUpdateUser } from "@better-auth-ui/react"
 import { useState } from "react"
-import { Pressable, View } from "react-native"
 import { cn } from "../../../../lib/cn"
 import { pickImage, resizeImage } from "../../../../lib/image"
 import { useThemeColors } from "../../../../lib/theme-colors"
@@ -8,6 +7,7 @@ import { Button } from "../../../../primitives/button"
 import { Label } from "../../../../primitives/field"
 import { Menu } from "../../../../primitives/menu"
 import { Spinner } from "../../../../primitives/spinner"
+import { Box, Btn } from "../../../../primitives/styled"
 import { toast } from "../../../../primitives/toast"
 import { Trash, Upload } from "../../../../primitives/ui-icons"
 import { UserAvatar } from "../../user/user-avatar"
@@ -92,17 +92,17 @@ export function ChangeAvatar({ className }: ChangeAvatarProps) {
   }
 
   return (
-    <View className={cn("gap-1", className)}>
+    <Box className={cn("gap-1", className)}>
       <Label isDisabled={!session}>{localization.settings.avatar}</Label>
 
-      <View className="flex-row items-center gap-4">
-        <Pressable
+      <Box className="flex-row items-center gap-4">
+        <Btn
           disabled={!session || isPending}
           onPress={handleUpload}
           className="rounded-full"
         >
           <UserAvatar size="lg" isPending={isPending} />
-        </Pressable>
+        </Btn>
 
         <Button
           isDisabled={!session || isPending}
@@ -131,7 +131,7 @@ export function ChangeAvatar({ className }: ChangeAvatarProps) {
             {localization.settings.deleteAvatar}
           </Menu.Item>
         </Menu>
-      </View>
-    </View>
+      </Box>
+    </Box>
   )
 }

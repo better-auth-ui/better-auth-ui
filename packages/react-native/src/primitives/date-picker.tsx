@@ -1,7 +1,8 @@
 import { type ComponentType, useMemo, useState } from "react"
-import { Platform, Pressable, Text, View } from "react-native"
+import { Platform } from "react-native"
 import { cn } from "../lib/cn"
 import { formatDateTime } from "../lib/format-date"
+import { Box, Btn, Txt } from "./styled"
 
 export type DatePickerMode = "date" | "time" | "datetime"
 
@@ -63,8 +64,8 @@ export function DatePicker({
   const disabled = isDisabled || !DateTimePicker
 
   return (
-    <View className={cn("w-full", className)}>
-      <Pressable
+    <Box className={cn("w-full", className)}>
+      <Btn
         disabled={disabled}
         onPress={() => setOpen(true)}
         className={cn(
@@ -72,12 +73,12 @@ export function DatePicker({
           disabled && "opacity-50"
         )}
       >
-        <Text
+        <Txt
           className={cn("text-base", value ? "text-foreground" : "text-muted")}
         >
           {value ? displayFor(value, mode) : placeholder}
-        </Text>
-      </Pressable>
+        </Txt>
+      </Btn>
 
       {open && DateTimePicker && (
         <DateTimePicker
@@ -89,7 +90,7 @@ export function DatePicker({
           }}
         />
       )}
-    </View>
+    </Box>
   )
 }
 

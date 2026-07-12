@@ -1,7 +1,7 @@
 import { type ComponentType, useMemo } from "react"
-import { View } from "react-native"
 import { cn } from "../lib/cn"
 import { useThemeColors } from "../lib/theme-colors"
+import { Box } from "./styled"
 
 export interface SliderProps {
   value: number
@@ -62,7 +62,7 @@ export function Slider({
   if (!RNSlider) {
     // Native module unavailable (e.g. Expo Go) — degrade to a static track.
     return (
-      <View
+      <Box
         className={cn(
           "h-2 w-full rounded-full bg-surface-secondary",
           className
@@ -72,7 +72,7 @@ export function Slider({
   }
 
   return (
-    <View className={cn("w-full", className)}>
+    <Box className={cn("w-full", className)}>
       <RNSlider
         value={value}
         onValueChange={onChange}
@@ -84,6 +84,6 @@ export function Slider({
         maximumTrackTintColor={colors.surfaceSecondary}
         thumbTintColor={colors.accent}
       />
-    </View>
+    </Box>
   )
 }

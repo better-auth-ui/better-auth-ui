@@ -1,9 +1,10 @@
 import type { AuthView } from "@better-auth-ui/core"
 import type { ReactNode } from "react"
-import { Linking, Text } from "react-native"
+import { Linking } from "react-native"
 import { cn } from "../lib/cn"
 import { useAuthNavigation } from "../navigation/navigation-context"
 import type { ViewTarget } from "../navigation/types"
+import { Txt } from "./styled"
 
 export interface LinkProps {
   /** Internal auth view to navigate to (shorthand for `{ section: "auth", view }`). */
@@ -60,7 +61,7 @@ export function Link({
   }
 
   return (
-    <Text
+    <Txt
       accessibilityRole="link"
       onPress={handlePress}
       className={cn(
@@ -70,6 +71,6 @@ export function Link({
       )}
     >
       {children}
-    </Text>
+    </Txt>
   )
 }
