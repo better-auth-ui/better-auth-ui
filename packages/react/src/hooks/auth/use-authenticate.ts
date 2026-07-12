@@ -23,11 +23,25 @@ export function useAuthenticate<TAuthClient extends AuthClient>(
   useEffect(() => {
     if (session.data || session.isPending) return
 
-    const currentURL = window.location.pathname + window.location.search
-    const redirectTo = encodeURIComponent(currentURL)
-    const signInPath = `${basePaths.auth}/${viewPaths.auth.signIn}?redirectTo=${redirectTo}`
+    const signInBase = `${basePaths.auth}/${viewPaths.auth.signIn}`
 
-    navigate({ to: signInPath, replace: true })
+    // `window.location` is web-only; under React Native there is no URL to
+    // preserve, so we redirect to sign-in by view identity instead.
+    const currentURL =
+      typeof window !== "undefined"
+        ? window.location.pathname + window.location.search
+        : undefined
+
+    const signInPath = currentURL
+      ? `${signInBase}?redirectTo=${encodeURIComponent(currentURL)}`
+      : signInBase
+
+    navigate({
+      to: signInPath,
+      view: "signIn",
+      params: currentURL ? { redirectTo: currentURL } : undefined,
+      replace: true
+    })
   }, [
     basePaths.auth,
     session.data,
