@@ -8,8 +8,8 @@ import { SafeAreaView } from "react-native-safe-area-context"
 import { authClient } from "../../src/auth-client"
 
 /**
- * The whole auth flow on one screen. With no router wiring, the built-in state
- * adapter switches between sign-in / sign-up / forgot-password / … in place.
+ * The whole auth flow on one screen. The app uses plain RN styles (no
+ * nativewind); the `@better-auth-ui/react-native` components style themselves.
  */
 export default function AuthScreen() {
   return (
@@ -18,8 +18,15 @@ export default function AuthScreen() {
       socialProviders={["github", "google"]}
       plugins={[magicLinkPlugin(), themePlugin()]}
     >
-      <SafeAreaView className="flex-1 bg-neutral-50 dark:bg-neutral-950">
-        <View className="flex-1 items-center justify-center p-6">
+      <SafeAreaView style={{ flex: 1 }}>
+        <View
+          style={{
+            flex: 1,
+            alignItems: "center",
+            justifyContent: "center",
+            padding: 24
+          }}
+        >
           <Auth />
         </View>
       </SafeAreaView>
