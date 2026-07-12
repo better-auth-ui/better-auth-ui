@@ -1,6 +1,7 @@
 import type { ReactNode } from "react"
-import { Text, View, type ViewProps } from "react-native"
+import type { ViewProps } from "react-native"
 import { cn } from "../lib/cn"
+import { Box, Txt } from "./styled"
 
 export type CardVariant =
   | "default"
@@ -16,7 +17,7 @@ export interface CardProps extends Omit<ViewProps, "style"> {
 
 function CardBase({ variant, className, children, ...props }: CardProps) {
   return (
-    <View
+    <Box
       className={cn(
         "rounded-2xl p-4",
         variant === "transparent"
@@ -27,7 +28,7 @@ function CardBase({ variant, className, children, ...props }: CardProps) {
       {...props}
     >
       {children}
-    </View>
+    </Box>
   )
 }
 
@@ -38,7 +39,7 @@ function CardHeader({
   className?: string
   children?: ReactNode
 }) {
-  return <View className={cn(className)}>{children}</View>
+  return <Box className={cn(className)}>{children}</Box>
 }
 
 function CardTitle({
@@ -49,9 +50,9 @@ function CardTitle({
   children?: ReactNode
 }) {
   return (
-    <Text className={cn("text-xl font-semibold text-foreground", className)}>
+    <Txt className={cn("text-xl font-semibold text-foreground", className)}>
       {children}
-    </Text>
+    </Txt>
   )
 }
 
@@ -62,7 +63,7 @@ function CardContent({
   className?: string
   children?: ReactNode
 }) {
-  return <View className={cn(className)}>{children}</View>
+  return <Box className={cn(className)}>{children}</Box>
 }
 
 function CardFooter({
@@ -72,7 +73,7 @@ function CardFooter({
   className?: string
   children?: ReactNode
 }) {
-  return <View className={cn(className)}>{children}</View>
+  return <Box className={cn(className)}>{children}</Box>
 }
 
 /**
