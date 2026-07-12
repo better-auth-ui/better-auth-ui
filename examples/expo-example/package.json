@@ -22,7 +22,6 @@
     "expo-router": "~57.0.4",
     "expo-secure-store": "~57.0.0",
     "expo-status-bar": "~57.0.0",
-    "nativewind": "^4.2.6",
     "react": "19.2.6",
     "react-dom": "19.2.6",
     "react-native": "0.86.0",
@@ -33,7 +32,6 @@
   },
   "devDependencies": {
     "@types/react": "~19.2.2",
-    "tailwindcss": "^3.4.19",
     "typescript": "~6.0.3"
   }
 }

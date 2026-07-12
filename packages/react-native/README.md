@@ -1,87 +1,29 @@
 # @better-auth-ui/react-native
 
-Beautiful, plug-and-play [Better Auth](https://better-auth.com) UI for **React Native & Expo**, styled with [nativewind](https://www.nativewind.dev). A native render target for [`better-auth-ui`](https://better-auth-ui.com) that mirrors the `@better-auth-ui/heroui` components — reusing the framework-agnostic logic from `@better-auth-ui/core` and `@better-auth-ui/react` unchanged.
+Beautiful, plug-and-play [Better Auth](https://better-auth.com) UI for **React Native & Expo**. A native render target for [`better-auth-ui`](https://better-auth-ui.com) that mirrors the `@better-auth-ui/heroui` components — reusing the framework-agnostic logic from `@better-auth-ui/core` and `@better-auth-ui/react` unchanged.
 
 > Full parity with `@better-auth-ui/heroui` **except passkey**: sign-in/up/out, forgot/reset/verify, social buttons, magic-link, username, the complete settings surface (account, security, sessions, linked accounts, appearance), delete-user, additional-fields, api-keys, multi-session, and the full organization surface. Passkey is deferred (WebAuthn needs a native module).
+
+## Zero styling setup
+
+The components **style themselves** with plain React Native styles. There is **no nativewind / uniwind / tailwind / babel plugin / metro config** to add — it drops into any RN app, whatever (if anything) you use for your own styling.
 
 ## Install
 
 ```sh
-npm install @better-auth-ui/react-native @better-auth-ui/core @better-auth-ui/react better-auth
-# peers
-npm install nativewind react-native-svg @tanstack/react-query
-npm install -D tailwindcss@^3.4
+npm install @better-auth-ui/react-native @better-auth-ui/core @better-auth-ui/react better-auth react-native-svg @tanstack/react-query
 ```
 
-> **pnpm users:** nativewind's babel transform emits `import "react-native-css-interop/jsx-runtime"`, which pnpm's strict, non-hoisted `node_modules` won't place where Metro looks. Add it as a direct dependency so it resolves:
-> ```sh
-> pnpm add react-native-css-interop
-> ```
+Some component features rely on **optional** native peers — install only the ones you use:
 
-## Setup
+| Feature | Peer |
+| --- | --- |
+| Avatar / org-logo upload | `expo-image-picker` `expo-image-manipulator` |
+| Copy (API keys, fields) | `expo-clipboard` |
+| Date / time additional fields | `@react-native-community/datetimepicker` |
+| Slider additional fields | `@react-native-community/slider` |
 
-The components ship as **source** so nativewind's babel transform styles them in your app, and they use semantic color tokens defined by this package's tailwind preset. Wire up four things (see the nativewind [installation guide](https://www.nativewind.dev/getting-started/installation) for the base setup, and `examples/expo-example` for a complete working reference):
-
-**1. Babel** — nativewind's preset:
-
-```js
-// babel.config.js
-module.exports = (api) => {
-  api.cache(true)
-  return {
-    presets: [
-      ["babel-preset-expo", { jsxImportSource: "nativewind" }],
-      "nativewind/babel"
-    ]
-  }
-}
-```
-
-**2. Metro** — consume the package as source so its `className`s are transformed:
-
-```js
-// metro.config.js
-const { getDefaultConfig } = require("expo/metro-config")
-const { withNativeWind } = require("nativewind/metro")
-
-const config = getDefaultConfig(__dirname)
-// Resolve the package's `src`/`react-native` export condition (its components
-// are shipped as source for nativewind to process).
-config.resolver.unstable_enablePackageExports = true
-config.resolver.unstable_conditionNames = ["react-native", "src", "require", "import"]
-
-module.exports = withNativeWind(config, { input: "./global.css" })
-```
-
-**3. Tailwind** — add this package's **preset** (the semantic color tokens the components use) and its source to `content` so classes aren't purged:
-
-```js
-// tailwind.config.js
-module.exports = {
-  darkMode: "class",
-  content: [
-    "./app/**/*.{ts,tsx}",
-    "./node_modules/@better-auth-ui/react-native/src/**/*.{ts,tsx}"
-  ],
-  presets: [
-    require("nativewind/preset"),
-    require("@better-auth-ui/react-native/preset")
-  ]
-}
-```
-
-**4. Theme tokens** — load the default `--bau-*` values (override any to re-theme; `--bau-accent` is the brand color, and `.dark` flips the palette):
-
-```css
-/* global.css */
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
-@import "@better-auth-ui/react-native/theme.css";
-```
-
-> If your pipeline doesn't process `@import` from `node_modules`, copy the `:root` / `.dark` blocks out of that file into your `global.css` instead.
+> These are lazily loaded — the package is import-safe without them (a slider degrades to a static track, etc.), so `<Auth />` works even in Expo Go.
 
 ## Usage
 
@@ -98,6 +40,28 @@ export default function SignInScreen() {
     </AuthProvider>
   )
 }
+```
+
+## Theming
+
+Colors come from a small semantic theme (light/dark, following the OS by default). Everything works with no setup; to re-theme, wrap your tree in `ThemeProvider` and override any token (e.g. your brand `accent`) or force a scheme:
+
+```tsx
+import { ThemeProvider } from "@better-auth-ui/react-native"
+
+<ThemeProvider light={{ accent: "#7c3aed" }} dark={{ accent: "#a78bfa" }}>
+  {/* … */}
+</ThemeProvider>
+```
+
+The `themePlugin`'s Appearance card + user-menu toggle (System / Light / Dark) drive a built-in theme store out of the box — pass a custom `useTheme` to the plugin to integrate an external theme source (e.g. next-themes) instead.
+
+## Overriding styles
+
+Every component accepts a **`style`** prop (any `ViewStyle`/`TextStyle`) and a **`className`** prop (this library's utility subset — `gap-4`, `px-3`, `bg-surface`, …, resolved by the package, not by any external engine). Use whichever you prefer:
+
+```tsx
+<UserButton style={{ marginTop: 12 }} />
 ```
 
 ### With expo-router
@@ -149,7 +113,7 @@ Use the [`@better-auth/expo`](https://www.better-auth.com/docs/integrations/expo
 ## How it works
 
 - **Logic is reused, not reimplemented.** All hooks/queries/mutations come from `@better-auth-ui/react`; view keys and localization from `@better-auth-ui/core`.
-- **Primitives** are the nativewind swap layer for `@heroui/react` (`Button`, `TextField`, `Card`, `Form`, …). Primitives own the visual theme; components pass only structural classes.
+- **Styling is self-contained.** Components author with compact class strings that a tiny in-package resolver turns into plain RN `StyleSheet` values against the active theme — so there's no app-wide styling engine to configure. The resolver + `Box`/`Txt`/`Btn` wrappers + `ThemeProvider` are exported if you want to reuse them.
 - **Navigation** is pluggable via the `AuthNavigation` adapter — state (default), expo-router, or React Navigation. The `navigate` options carry an optional `view`/`params` so name-based and state-only routers work without a URL.
 
 ## License
