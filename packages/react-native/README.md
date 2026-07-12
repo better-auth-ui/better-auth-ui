@@ -13,6 +13,11 @@ npm install nativewind react-native-svg @tanstack/react-query
 npm install -D tailwindcss@^3.4
 ```
 
+> **pnpm users:** nativewind's babel transform emits `import "react-native-css-interop/jsx-runtime"`, which pnpm's strict, non-hoisted `node_modules` won't place where Metro looks. Add it as a direct dependency so it resolves:
+> ```sh
+> pnpm add react-native-css-interop
+> ```
+
 Set up nativewind (babel preset, `tailwind.config.js`, and a `global.css`) per the [nativewind guide](https://www.nativewind.dev/getting-started/installation). Make sure your `tailwind.config.js` `content` globs include this package's source so its classes aren't purged:
 
 ```js
