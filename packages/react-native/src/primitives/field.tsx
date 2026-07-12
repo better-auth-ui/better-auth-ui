@@ -118,13 +118,21 @@ export function TextField({
 /** Field label. */
 export function Label({
   className,
+  isDisabled,
   children
 }: {
   className?: string
+  isDisabled?: boolean
   children?: ReactNode
 }) {
   return (
-    <Text className={cn("text-sm font-medium text-foreground", className)}>
+    <Text
+      className={cn(
+        "text-sm font-medium text-foreground",
+        isDisabled && "opacity-50",
+        className
+      )}
+    >
       {children}
     </Text>
   )
