@@ -30,6 +30,8 @@ import { OrganizationView } from "./organization-view"
 export type OrganizationSwitcherProps = {
   className?: string
   variant?: ButtonProps["variant"]
+  /** Avatar size for the trigger / rows. */
+  size?: "sm" | "md" | "lg"
   trigger?: ReactNode
   hideCreate?: boolean
   hidePersonal?: boolean
@@ -58,7 +60,7 @@ export function OrganizationSwitcher({
   size = "md",
   trigger,
   ...props
-}: OrganizationSwitcherProps & ButtonProps) {
+}: OrganizationSwitcherProps & Omit<ButtonProps, "size">) {
   const { authClient, localization } = useAuth()
   const { data: session, isPending: sessionPending } = useSession(authClient)
   const { localization: organizationLocalization, slug } =

@@ -2,6 +2,7 @@ import Svg, {
   Circle,
   Line,
   Path,
+  Polygon,
   Polyline,
   Rect,
   type SvgProps
@@ -380,6 +381,32 @@ export function CirclePlus(props: SvgProps) {
       <Circle cx="12" cy="12" r="10" />
       <Line x1="12" y1="8" x2="12" y2="16" />
       <Line x1="8" y1="12" x2="16" y2="12" />
+    </Base>
+  )
+}
+
+export function Filter(props: SvgProps) {
+  return (
+    <Base {...props}>
+      <Polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" />
+    </Base>
+  )
+}
+
+export function Send(props: SvgProps) {
+  return (
+    <Base {...props}>
+      <Line x1="22" y1="2" x2="11" y2="13" />
+      <Polygon points="22 2 15 22 11 13 2 9 22 2" />
+    </Base>
+  )
+}
+
+export function Clock(props: SvgProps) {
+  return (
+    <Base {...props}>
+      <Circle cx="12" cy="12" r="10" />
+      <Polyline points="12 6 12 12 16 14" />
     </Base>
   )
 }

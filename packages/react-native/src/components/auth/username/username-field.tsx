@@ -29,7 +29,6 @@ export function UsernameField({
 }: AdditionalFieldProps) {
   const { authClient } = useAuth()
   const {
-    localization,
     minUsernameLength,
     maxUsernameLength,
     isUsernameAvailable: checkAvailability,
