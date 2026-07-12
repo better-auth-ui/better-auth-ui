@@ -21,7 +21,7 @@ function CardBase({ variant, className, children, ...props }: CardProps) {
         "rounded-2xl p-4",
         variant === "transparent"
           ? "bg-transparent"
-          : "border border-neutral-200 bg-white dark:border-neutral-800 dark:bg-neutral-900",
+          : "border border-border bg-surface",
         className
       )}
       {...props}
@@ -49,12 +49,7 @@ function CardTitle({
   children?: ReactNode
 }) {
   return (
-    <Text
-      className={cn(
-        "text-xl font-semibold text-neutral-900 dark:text-neutral-50",
-        className
-      )}
-    >
+    <Text className={cn("text-xl font-semibold text-foreground", className)}>
       {children}
     </Text>
   )

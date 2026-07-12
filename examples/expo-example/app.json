@@ -7,6 +7,7 @@
     "orientation": "portrait",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
+    "web": { "bundler": "metro" },
     "plugins": ["expo-router", "expo-secure-store"]
   }
 }
