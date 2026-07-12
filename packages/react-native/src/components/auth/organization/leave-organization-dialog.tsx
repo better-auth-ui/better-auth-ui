@@ -5,7 +5,6 @@ import {
   useLeaveOrganization
 } from "@better-auth-ui/react"
 import type { Organization } from "better-auth/client"
-import { Text } from "react-native"
 
 import { organizationPlugin } from "../../../lib/auth/organization-plugin"
 import { useThemeColors } from "../../../lib/theme-colors"
@@ -13,6 +12,7 @@ import { useAuthNavigation } from "../../../navigation/navigation-context"
 import { AlertDialog } from "../../../primitives/alert-dialog"
 import { Button } from "../../../primitives/button"
 import { Card } from "../../../primitives/card"
+import { Txt } from "../../../primitives/styled"
 import { toast } from "../../../primitives/toast"
 import { ArrowRightFromSquare } from "../../../primitives/ui-icons"
 import { OrganizationView } from "./organization-view"
@@ -74,9 +74,9 @@ export function LeaveOrganizationDialog({
       </AlertDialog.Header>
 
       <AlertDialog.Body>
-        <Text className="text-sm text-muted">
+        <Txt className="text-sm text-muted">
           {organizationLocalization.leaveOrganizationDescription}
-        </Text>
+        </Txt>
 
         <Card variant="secondary">
           <Card.Content>

@@ -4,9 +4,9 @@ import {
   useSetActiveSession
 } from "@better-auth-ui/react"
 import type { Session, User } from "better-auth"
-import { View } from "react-native"
 import { Menu } from "../../../primitives/menu"
 import { Spinner } from "../../../primitives/spinner"
+import { Box } from "../../../primitives/styled"
 import { UserView } from "../user/user-view"
 
 type DeviceSession = {
@@ -42,11 +42,11 @@ export function SwitchAccountSubmenuItem({
         setActiveSession({ sessionToken: deviceSession.session.token })
       }
     >
-      <View className="flex-1 flex-row items-center">
+      <Box className="flex-1 flex-row items-center">
         <UserView user={deviceSession.user} hideSubtitle={hideSubtitle} />
 
         {isPending && <Spinner size="sm" color="current" className="ml-auto" />}
-      </View>
+      </Box>
     </Menu.Item>
   )
 }

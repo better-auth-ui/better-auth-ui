@@ -1,7 +1,6 @@
-import { View } from "react-native"
-
 import type { SettingsViewProps } from "../../../lib/auth-plugin"
 import { cn } from "../../../lib/cn"
+import { Box } from "../../../primitives/styled"
 import { Organizations } from "./organizations"
 import { UserInvitations } from "./user-invitations"
 
@@ -24,9 +23,9 @@ export function OrganizationsSettings({
   variant
 }: OrganizationsSettingsProps) {
   return (
-    <View className={cn("flex-col gap-4", className)}>
+    <Box className={cn("flex-col gap-4", className)}>
       <Organizations variant={variant} />
       <UserInvitations variant={variant} />
-    </View>
+    </Box>
   )
 }

@@ -6,7 +6,6 @@ import {
   useHasPermission
 } from "@better-auth-ui/react"
 import type { Invitation } from "better-auth/client"
-import { Text, View } from "react-native"
 
 import { organizationPlugin } from "../../../lib/auth/organization-plugin"
 import { formatDateTime } from "../../../lib/format-date"
@@ -14,6 +13,7 @@ import { useThemeColors } from "../../../lib/theme-colors"
 import { Button } from "../../../primitives/button"
 import { Skeleton } from "../../../primitives/skeleton"
 import { Spinner } from "../../../primitives/spinner"
+import { Box, Txt } from "../../../primitives/styled"
 import { Chip } from "../../../primitives/tabs"
 import { Xmark } from "../../../primitives/ui-icons"
 
@@ -24,14 +24,14 @@ export type OrganizationInvitationRowProps = {
 /** Placeholder row matching {@link OrganizationInvitationRow} while invitations load. */
 function OrganizationInvitationRowSkeleton() {
   return (
-    <View className="flex-row items-center justify-between gap-2 px-4 py-3">
-      <View className="min-w-0 flex-1 gap-1.5">
+    <Box className="flex-row items-center justify-between gap-2 px-4 py-3">
+      <Box className="min-w-0 flex-1 gap-1.5">
         <Skeleton className="h-4 w-48 rounded-lg" />
         <Skeleton className="h-3 w-36 rounded-lg" />
-      </View>
+      </Box>
 
       <Skeleton className="h-5 w-14 rounded-full" />
-    </View>
+    </Box>
   )
 }
 
@@ -81,16 +81,16 @@ export function OrganizationInvitationRow({
   }
 
   return (
-    <View className="flex-row items-center justify-between gap-2">
-      <View className="min-w-0 flex-1 gap-1">
-        <Text numberOfLines={1} className="text-sm font-medium text-foreground">
+    <Box className="flex-row items-center justify-between gap-2">
+      <Box className="min-w-0 flex-1 gap-1">
+        <Txt numberOfLines={1} className="text-sm font-medium text-foreground">
           {invitation.email}
-        </Text>
+        </Txt>
 
-        <Text numberOfLines={1} className="text-xs text-muted">
+        <Txt numberOfLines={1} className="text-xs text-muted">
           {formatDateTime(invitation.createdAt)} · {roleLabel}
-        </Text>
-      </View>
+        </Txt>
+      </Box>
 
       <Chip color={statusColor} className="shrink-0">
         {statusLabel}
@@ -113,6 +113,6 @@ export function OrganizationInvitationRow({
             )}
           </Button>
         )}
-    </View>
+    </Box>
   )
 }

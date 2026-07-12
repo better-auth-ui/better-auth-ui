@@ -7,7 +7,6 @@ import {
   useRef,
   useState
 } from "react"
-import { Text, View } from "react-native"
 import type { AdditionalFieldProps } from "../../lib/auth-plugin"
 import { copyText } from "../../lib/clipboard"
 import { Button } from "../../primitives/button"
@@ -20,6 +19,7 @@ import { Input, InputGroup } from "../../primitives/input"
 import { NumberField, TextArea } from "../../primitives/inputs-extra"
 import { Select } from "../../primitives/menu"
 import { Slider } from "../../primitives/slider"
+import { Box, Txt } from "../../primitives/styled"
 import { Switch } from "../../primitives/switch-radio"
 import { toast } from "../../primitives/toast"
 import { Check, Copy } from "../../primitives/ui-icons"
@@ -118,7 +118,7 @@ function useRequiredValidator(
  * `FieldError` slot of their own). */
 function RequiredError({ error }: { error?: string }) {
   if (!error) return null
-  return <Text className="text-sm text-danger">{error}</Text>
+  return <Txt className="text-sm text-danger">{error}</Txt>
 }
 
 /**
@@ -293,7 +293,7 @@ function TextAreaField({
   )
 
   return (
-    <View className="gap-1.5">
+    <Box className="gap-1.5">
       <Label>{field.label}</Label>
 
       <TextArea
@@ -308,7 +308,7 @@ function TextAreaField({
       />
 
       <RequiredError error={error} />
-    </View>
+    </Box>
   )
 }
 
@@ -328,7 +328,7 @@ function NumberInputField({
   )
 
   return (
-    <View className="gap-1.5">
+    <Box className="gap-1.5">
       <Label>{field.label}</Label>
 
       <NumberField
@@ -347,7 +347,7 @@ function NumberInputField({
         placeholder={field.placeholder}
         aria-label={typeof field.label === "string" ? field.label : name}
       />
-    </View>
+    </Box>
   )
 }
 
@@ -368,13 +368,13 @@ function SliderField({
   )
 
   return (
-    <View className="gap-2">
-      <View className="flex-row items-center justify-between gap-2">
+    <Box className="gap-2">
+      <Box className="flex-row items-center justify-between gap-2">
         <Label>{field.label}</Label>
-        <Text className="text-sm text-muted">
+        <Txt className="text-sm text-muted">
           {formatNumber(value, field.formatOptions)}
-        </Text>
-      </View>
+        </Txt>
+      </Box>
 
       <Slider
         value={value}
@@ -389,7 +389,7 @@ function SliderField({
         }
         isDisabled={isPending || field.readOnly}
       />
-    </View>
+    </Box>
   )
 }
 
@@ -434,7 +434,7 @@ function CheckboxField({
   )
 
   return (
-    <View className="gap-1.5">
+    <Box className="gap-1.5">
       <Checkbox
         isSelected={value}
         onChange={(next) => {
@@ -448,7 +448,7 @@ function CheckboxField({
       </Checkbox>
 
       <RequiredError error={error} />
-    </View>
+    </Box>
   )
 }
 
@@ -470,7 +470,7 @@ function SelectField({
   )
 
   return (
-    <View className="gap-1.5">
+    <Box className="gap-1.5">
       <Select
         label={typeof field.label === "string" ? field.label : undefined}
         placeholder={field.placeholder}
@@ -488,7 +488,7 @@ function SelectField({
       />
 
       <RequiredError error={error} />
-    </View>
+    </Box>
   )
 }
 
@@ -519,7 +519,7 @@ function ComboBoxField({
   )
 
   return (
-    <View className="gap-1.5">
+    <Box className="gap-1.5">
       <Label>{field.label}</Label>
 
       <ComboBox
@@ -538,7 +538,7 @@ function ComboBoxField({
       />
 
       <RequiredError error={error} />
-    </View>
+    </Box>
   )
 }
 
@@ -559,7 +559,7 @@ function DateInputField({
   )
 
   return (
-    <View className="w-full gap-1.5">
+    <Box className="w-full gap-1.5">
       <Label>{field.label}</Label>
 
       {isDateTime ? (
@@ -588,7 +588,7 @@ function DateInputField({
       )}
 
       <RequiredError error={error} />
-    </View>
+    </Box>
   )
 }
 
@@ -648,7 +648,7 @@ function HeroInputField({
           {hasPrefix && (
             <InputGroup.Prefix>
               {typeof field.prefix === "string" ? (
-                <Text className="text-sm text-muted">{field.prefix}</Text>
+                <Txt className="text-sm text-muted">{field.prefix}</Txt>
               ) : (
                 field.prefix
               )}
@@ -669,7 +669,7 @@ function HeroInputField({
             field.suffix != null && (
               <InputGroup.Suffix>
                 {typeof field.suffix === "string" ? (
-                  <Text className="text-sm text-muted">{field.suffix}</Text>
+                  <Txt className="text-sm text-muted">{field.suffix}</Txt>
                 ) : (
                   field.suffix
                 )}

@@ -4,18 +4,18 @@ import {
   type OrganizationLocalization,
   type OrganizationPluginOptions
 } from "@better-auth-ui/core/plugins"
-import { Text, View } from "react-native"
 import { OrganizationsSettings } from "../../components/auth/organization/organizations-settings"
+import { Box, Txt } from "../../primitives/styled"
 import { Briefcase } from "../../primitives/ui-icons"
 import { useThemeColors } from "../theme-colors"
 
 function OrganizationsTabLabel({ label }: { label: string }) {
   const colors = useThemeColors()
   return (
-    <View className="flex-row items-center gap-1.5">
+    <Box className="flex-row items-center gap-1.5">
       <Briefcase width={16} height={16} color={colors.muted} />
-      <Text className="text-muted">{label}</Text>
-    </View>
+      <Txt className="text-muted">{label}</Txt>
+    </Box>
   )
 }
 

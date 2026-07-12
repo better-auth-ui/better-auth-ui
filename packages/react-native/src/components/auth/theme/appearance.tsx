@@ -1,9 +1,9 @@
 import { useAuthPlugin } from "@better-auth-ui/react"
-import { Text, View } from "react-native"
 import { themePlugin } from "../../../lib/auth/theme-plugin"
 import { cn } from "../../../lib/cn"
 import { Card, type CardVariant } from "../../../primitives/card"
 import { Label } from "../../../primitives/field"
+import { Box, Txt } from "../../../primitives/styled"
 import { Radio, RadioGroup } from "../../../primitives/switch-radio"
 import { Display, Moon, Sun } from "../../../primitives/ui-icons"
 
@@ -25,10 +25,10 @@ export function Appearance({ className, variant }: AppearanceProps) {
   const { theme, setTheme, themes = [] } = useTheme()
 
   return (
-    <View className={cn("gap-3", className)}>
-      <Text className="mb-1 text-sm font-semibold text-foreground">
+    <Box className={cn("gap-3", className)}>
+      <Txt className="mb-1 text-sm font-semibold text-foreground">
         {localization.appearance}
-      </Text>
+      </Txt>
 
       <Card className="gap-4 p-4" variant={variant}>
         <Card.Content className="gap-3">
@@ -50,12 +50,12 @@ export function Appearance({ className, variant }: AppearanceProps) {
                     : "bg-surface-secondary"
                 )}
               >
-                <View className="flex-1 flex-row items-center gap-2">
+                <Box className="flex-1 flex-row items-center gap-2">
                   <Display className="text-muted" />
-                  <Text className="text-sm text-foreground">
+                  <Txt className="text-sm text-foreground">
                     {localization.system}
-                  </Text>
-                </View>
+                  </Txt>
+                </Box>
               </Radio>
             )}
 
@@ -69,12 +69,12 @@ export function Appearance({ className, variant }: AppearanceProps) {
                     : "bg-surface-secondary"
                 )}
               >
-                <View className="flex-1 flex-row items-center gap-2">
+                <Box className="flex-1 flex-row items-center gap-2">
                   <Sun className="text-muted" />
-                  <Text className="text-sm text-foreground">
+                  <Txt className="text-sm text-foreground">
                     {localization.light}
-                  </Text>
-                </View>
+                  </Txt>
+                </Box>
               </Radio>
             )}
 
@@ -88,17 +88,17 @@ export function Appearance({ className, variant }: AppearanceProps) {
                     : "bg-surface-secondary"
                 )}
               >
-                <View className="flex-1 flex-row items-center gap-2">
+                <Box className="flex-1 flex-row items-center gap-2">
                   <Moon className="text-muted" />
-                  <Text className="text-sm text-foreground">
+                  <Txt className="text-sm text-foreground">
                     {localization.dark}
-                  </Text>
-                </View>
+                  </Txt>
+                </Box>
               </Radio>
             )}
           </RadioGroup>
         </Card.Content>
       </Card>
-    </View>
+    </Box>
   )
 }

@@ -1,6 +1,5 @@
 import { useAuth, useChangeEmail, useSession } from "@better-auth-ui/react"
 import { useEffect, useState } from "react"
-import { Text, View } from "react-native"
 import { cn } from "../../../../lib/cn"
 import { Button } from "../../../../primitives/button"
 import { Card, type CardVariant } from "../../../../primitives/card"
@@ -8,6 +7,7 @@ import { FieldError, Label, TextField } from "../../../../primitives/field"
 import { Form } from "../../../../primitives/form"
 import { Input } from "../../../../primitives/input"
 import { Skeleton } from "../../../../primitives/skeleton"
+import { Box, Txt } from "../../../../primitives/styled"
 import { toast } from "../../../../primitives/toast"
 
 export interface ChangeEmailProps {
@@ -44,10 +44,10 @@ export function ChangeEmail({ className, variant }: ChangeEmailProps) {
   }
 
   return (
-    <View>
-      <Text className={cn("text-sm font-semibold mb-3 text-foreground")}>
+    <Box>
+      <Txt className={cn("text-sm font-semibold mb-3 text-foreground")}>
         {localization.settings.changeEmail}
-      </Text>
+      </Txt>
 
       <Card className={cn("gap-4", className)} variant={variant}>
         <Card.Content>
@@ -78,7 +78,7 @@ export function ChangeEmail({ className, variant }: ChangeEmailProps) {
               <FieldError />
             </TextField>
 
-            <View className="items-end">
+            <Box className="items-end">
               <Button
                 type="submit"
                 isPending={isPending}
@@ -87,10 +87,10 @@ export function ChangeEmail({ className, variant }: ChangeEmailProps) {
               >
                 {localization.settings.updateEmail}
               </Button>
-            </View>
+            </Box>
           </Form>
         </Card.Content>
       </Card>
-    </View>
+    </Box>
   )
 }

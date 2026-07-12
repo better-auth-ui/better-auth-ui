@@ -1,7 +1,9 @@
 import { useMemo, useState } from "react"
-import { FlatList, Modal, Pressable, Text, TextInput, View } from "react-native"
+import { FlatList, Modal, TextInput } from "react-native"
 import { cn } from "../lib/cn"
 import { useThemeColors } from "../lib/theme-colors"
+import { tw } from "../lib/tw"
+import { Box, Btn, Txt } from "./styled"
 import { Check, ChevronDown } from "./ui-icons"
 
 export interface ComboBoxOption {
@@ -67,7 +69,7 @@ export function ComboBox({
 
   return (
     <>
-      <Pressable
+      <Btn
         disabled={isDisabled}
         onPress={() => setOpen(true)}
         className={cn(
@@ -90,12 +92,12 @@ export function ComboBox({
           autoCapitalize="none"
           autoCorrect={false}
           accessibilityLabel={ariaLabel}
-          className="h-full flex-1 text-base text-foreground"
+          style={tw("h-full flex-1 text-base text-foreground", colors)}
         />
-        <View className="h-full items-center justify-center px-2">
+        <Box className="h-full items-center justify-center px-2">
           <ChevronDown width={16} height={16} color={colors.muted} />
-        </View>
-      </Pressable>
+        </Box>
+      </Btn>
 
       <Modal
         visible={open}
@@ -103,8 +105,8 @@ export function ComboBox({
         animationType="fade"
         onRequestClose={close}
       >
-        <Pressable className="flex-1 justify-end bg-black/30" onPress={close}>
-          <Pressable
+        <Btn className="flex-1 justify-end bg-black/30" onPress={close}>
+          <Btn
             className="max-h-[60%] gap-1 rounded-t-2xl border border-border bg-surface p-2"
             onPress={(event) => event.stopPropagation()}
           >
@@ -113,31 +115,31 @@ export function ComboBox({
               keyExtractor={(item) => item.key}
               keyboardShouldPersistTaps="handled"
               ListEmptyComponent={
-                <View className="items-center justify-center px-3 py-6">
-                  <Text className="text-sm text-muted">{noResultsText}</Text>
-                </View>
+                <Box className="items-center justify-center px-3 py-6">
+                  <Txt className="text-sm text-muted">{noResultsText}</Txt>
+                </Box>
               }
               renderItem={({ item }) => {
                 const isSelected = item.key === selectedKey
                 return (
-                  <Pressable
+                  <Btn
                     accessibilityRole="menuitem"
                     accessibilityState={{ selected: isSelected }}
                     onPress={() => handleSelect(item)}
                     className="flex-row items-center gap-2 rounded-lg px-3 py-2"
                   >
-                    <Text className="flex-1 text-sm text-foreground">
+                    <Txt className="flex-1 text-sm text-foreground">
                       {item.label}
-                    </Text>
+                    </Txt>
                     {isSelected && (
                       <Check width={16} height={16} color={colors.accent} />
                     )}
-                  </Pressable>
+                  </Btn>
                 )
               }}
             />
-          </Pressable>
-        </Pressable>
+          </Btn>
+        </Btn>
       </Modal>
     </>
   )

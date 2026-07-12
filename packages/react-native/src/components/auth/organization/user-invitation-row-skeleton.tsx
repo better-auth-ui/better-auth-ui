@@ -1,5 +1,5 @@
-import { View } from "react-native"
 import { Skeleton } from "../../../primitives/skeleton"
+import { Box } from "../../../primitives/styled"
 
 /**
  * Placeholder row matching {@link UserInvitationRow} while invitations load.
@@ -8,13 +8,13 @@ import { Skeleton } from "../../../primitives/skeleton"
  */
 export function UserInvitationRowSkeleton() {
   return (
-    <View className="flex-row items-center gap-3">
+    <Box className="flex-row items-center gap-3">
       <Skeleton className="size-10 shrink-0 rounded-xl" />
 
-      <View className="flex-col gap-1">
+      <Box className="flex-col gap-1">
         <Skeleton className="h-4 w-40 rounded-lg" />
         <Skeleton className="h-3 w-28 rounded-lg" />
-      </View>
-    </View>
+      </Box>
+    </Box>
   )
 }

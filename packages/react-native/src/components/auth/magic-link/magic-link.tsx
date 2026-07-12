@@ -7,7 +7,6 @@ import {
 } from "@better-auth-ui/react"
 import { useIsMutating } from "@tanstack/react-query"
 import { useState } from "react"
-import { View } from "react-native"
 import { magicLinkPlugin } from "../../../lib/auth/magic-link-plugin"
 import { cn } from "../../../lib/cn"
 import { Button } from "../../../primitives/button"
@@ -17,6 +16,7 @@ import { FieldError, Label, TextField } from "../../../primitives/field"
 import { Form } from "../../../primitives/form"
 import { Input } from "../../../primitives/input"
 import { Link } from "../../../primitives/link"
+import { Box } from "../../../primitives/styled"
 import { toast } from "../../../primitives/toast"
 import { FieldSeparator } from "../field-separator"
 import { ProviderButtons, type SocialLayout } from "../provider-buttons"
@@ -117,7 +117,7 @@ export function MagicLink({
             <FieldError />
           </TextField>
 
-          <View className="gap-3">
+          <Box className="gap-3">
             <Button type="submit" className="w-full" isPending={isPending}>
               {magicLinkLocalization.sendMagicLink}
             </Button>
@@ -130,7 +130,7 @@ export function MagicLink({
                 />
               ))
             )}
-          </View>
+          </Box>
         </Form>
 
         {socialPosition === "bottom" && (

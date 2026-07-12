@@ -8,7 +8,6 @@ import {
 } from "@better-auth-ui/react"
 import type { Invitation } from "better-auth/client"
 import { useMemo, useState } from "react"
-import { Text, View } from "react-native"
 import { organizationPlugin } from "../../../lib/auth/organization-plugin"
 import type { SettingsViewProps } from "../../../lib/auth-plugin"
 import { cn } from "../../../lib/cn"
@@ -20,6 +19,7 @@ import { SearchField } from "../../../primitives/inputs-extra"
 import { Menu } from "../../../primitives/menu"
 import { Skeleton } from "../../../primitives/skeleton"
 import { Spinner } from "../../../primitives/spinner"
+import { Box, Txt } from "../../../primitives/styled"
 import { Chip, EmptyState } from "../../../primitives/tabs"
 import { Filter, Send, Xmark } from "../../../primitives/ui-icons"
 import { InviteMemberDialog } from "./invite-member-dialog"
@@ -82,16 +82,16 @@ export function OrganizationInvitations({
   const [inviteOpen, setInviteOpen] = useState(false)
 
   return (
-    <View className={cn("flex-col gap-3", className)}>
-      <Text
+    <Box className={cn("flex-col gap-3", className)}>
+      <Txt
         numberOfLines={1}
         className="shrink text-sm font-semibold text-foreground"
       >
         {organizationLocalization.invitations}
-      </Text>
+      </Txt>
 
-      <View className="flex-col gap-4">
-        <View className="flex-row items-center gap-3">
+      <Box className="flex-col gap-4">
+        <Box className="flex-row items-center gap-3">
           <SearchField
             className="min-w-0 flex-1"
             aria-label={organizationLocalization.search}
@@ -150,10 +150,10 @@ export function OrganizationInvitations({
               </Menu.Item>
             ))}
           </Menu>
-        </View>
+        </Box>
 
         {(roleFilter !== "all" || statusFilter !== "all") && (
-          <View className="flex-row flex-wrap gap-2">
+          <Box className="flex-row flex-wrap gap-2">
             {roleFilter !== "all" && (
               <Chip className="w-fit flex-row items-center gap-1.5">
                 <Chip.Label>
@@ -194,7 +194,7 @@ export function OrganizationInvitations({
                 </Button>
               </Chip>
             )}
-          </View>
+          </Box>
         )}
 
         <Card variant={variant}>
@@ -202,7 +202,7 @@ export function OrganizationInvitations({
             {isPending ? (
               <>
                 <OrganizationInvitationRowSkeleton />
-                <View className="-mx-4 my-4 border-b border-dashed border-border" />
+                <Box className="-mx-4 my-4 border-b border-dashed border-border" />
                 <OrganizationInvitationRowSkeleton />
               </>
             ) : !filteredInvitations?.length ? (
@@ -211,35 +211,35 @@ export function OrganizationInvitations({
               />
             ) : (
               filteredInvitations.map((invitation, index) => (
-                <View key={invitation.id}>
+                <Box key={invitation.id}>
                   {index > 0 && (
-                    <View className="-mx-4 my-4 border-b border-dashed border-border" />
+                    <Box className="-mx-4 my-4 border-b border-dashed border-border" />
                   )}
 
                   <OrganizationInvitationRow invitation={invitation} />
-                </View>
+                </Box>
               ))
             )}
           </Card.Content>
         </Card>
-      </View>
+      </Box>
 
       <InviteMemberDialog isOpen={inviteOpen} onOpenChange={setInviteOpen} />
-    </View>
+    </Box>
   )
 }
 
 /** Placeholder row matching {@link OrganizationInvitationRow} while invitations load. */
 function OrganizationInvitationRowSkeleton() {
   return (
-    <View className="flex-row items-center justify-between gap-2 px-4 py-3">
-      <View className="min-w-0 flex-1 gap-1.5">
+    <Box className="flex-row items-center justify-between gap-2 px-4 py-3">
+      <Box className="min-w-0 flex-1 gap-1.5">
         <Skeleton className="h-4 w-48 rounded-lg" />
         <Skeleton className="h-3 w-36 rounded-lg" />
-      </View>
+      </Box>
 
       <Skeleton className="h-5 w-14 rounded-full" />
-    </View>
+    </Box>
   )
 }
 
@@ -279,16 +279,16 @@ function OrganizationInvitationRow({ invitation }: { invitation: Invitation }) {
   }
 
   return (
-    <View className="flex-row items-center justify-between gap-2">
-      <View className="min-w-0 flex-1 gap-1">
-        <Text numberOfLines={1} className="text-sm font-medium text-foreground">
+    <Box className="flex-row items-center justify-between gap-2">
+      <Box className="min-w-0 flex-1 gap-1">
+        <Txt numberOfLines={1} className="text-sm font-medium text-foreground">
           {invitation.email}
-        </Text>
+        </Txt>
 
-        <Text numberOfLines={1} className="text-xs text-muted">
+        <Txt numberOfLines={1} className="text-xs text-muted">
           {formatDateTime(invitation.createdAt)} · {roleLabel}
-        </Text>
-      </View>
+        </Txt>
+      </Box>
 
       <Chip color={statusColor} className="shrink-0">
         {statusLabel}
@@ -311,7 +311,7 @@ function OrganizationInvitationRow({ invitation }: { invitation: Invitation }) {
             )}
           </Button>
         )}
-    </View>
+    </Box>
   )
 }
 
