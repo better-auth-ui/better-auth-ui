@@ -1,9 +1,31 @@
 import type {
-  AuthPluginComponents,
-  AuthPlugin as AuthPluginPrimitive
+  AdditionalField as AdditionalFieldConfig,
+  AdditionalFieldValue
+} from "@better-auth-ui/core"
+import type {
+  AuthButtonProps,
+  AuthPlugin as AuthPluginPrimitive,
+  UserMenuItemProps
 } from "@better-auth-ui/react"
+import type { ComponentType, ReactNode } from "react"
 import type { SocialLayout } from "../components/auth/provider-buttons"
 import type { CardVariant } from "../primitives/card"
+
+/**
+ * Props for the RN `<AdditionalField>` component and `field.render` callbacks.
+ * Mirrors heroui's `AdditionalFieldProps` (`name`, `field`, `isPending`,
+ * `variant`) but adds `onChange`: RN has no `FormData` to read a submitted
+ * value from, so every additional-field renderer is a controlled component
+ * that owns its local input state and reports parsed value changes back up
+ * to the parent form (`SignUp`, `UserProfile`, …) via this callback.
+ */
+export type AdditionalFieldProps = {
+  name: string
+  field: AdditionalFieldConfig
+  isPending?: boolean
+  variant?: CardVariant
+  onChange?: (value: AdditionalFieldValue | null) => void
+}
 
 /**
  * Props the RN `<Auth>` router spreads onto plugin-provided auth views
@@ -26,10 +48,23 @@ export type SettingsViewProps = {
   variant?: CardVariant
 }
 
+/** RN card slot props — narrows the react base so cards accept `variant`. */
+type CardSlotProps = SettingsViewProps & { children?: ReactNode }
+
+/** RN plugin slot map (cards carry the RN `variant`, matching the hosts). */
+export type AuthPluginComponents = {
+  authButtons?: ComponentType<AuthButtonProps>[]
+  captchaComponent?: ReactNode
+  securityCards?: ComponentType<CardSlotProps>[]
+  accountCards?: ComponentType<CardSlotProps>[]
+  organizationCards?: ComponentType<CardSlotProps>[]
+  userMenuItems?: ComponentType<UserMenuItemProps>[]
+}
+
 /**
  * The React Native `AuthPlugin` shape: the renderer-agnostic slot contract from
- * `@better-auth-ui/react`, bound to the RN view-prop shapes. This is what
- * `useAuth().plugins` is typed as in the RN package.
+ * `@better-auth-ui/react`, bound to the RN view-prop + card-prop shapes. This is
+ * what `useAuth().plugins` is typed as in the RN package.
  */
 export type AuthPlugin = AuthPluginPrimitive<
   AuthPluginComponents,
