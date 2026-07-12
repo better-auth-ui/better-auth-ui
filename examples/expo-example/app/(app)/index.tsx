@@ -7,16 +7,28 @@ import { authClient } from "../../src/auth-client"
 export default function Dashboard() {
   return (
     <AuthProvider authClient={authClient}>
-      <SafeAreaView className="flex-1 bg-white dark:bg-neutral-950">
-        <View className="flex-row items-center justify-between p-4">
-          <Text className="text-xl font-semibold text-neutral-900 dark:text-neutral-50">
-            Dashboard
-          </Text>
+      <SafeAreaView style={{ flex: 1 }}>
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "space-between",
+            padding: 16
+          }}
+        >
+          <Text style={{ fontSize: 20, fontWeight: "600" }}>Dashboard</Text>
           <UserButton size="icon" />
         </View>
 
-        <View className="flex-1 items-center justify-center p-6">
-          <Text className="text-base text-neutral-500 dark:text-neutral-400">
+        <View
+          style={{
+            flex: 1,
+            alignItems: "center",
+            justifyContent: "center",
+            padding: 24
+          }}
+        >
+          <Text style={{ fontSize: 16, color: "#737373" }}>
             You're signed in 🎉
           </Text>
         </View>

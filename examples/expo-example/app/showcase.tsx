@@ -26,10 +26,9 @@ import { authClient } from "../src/auth-client"
 
 /**
  * Kitchen-sink screen: mounts every @better-auth-ui/react-native subsystem at
- * once so the full component surface can be rendered and eyeballed via
- * `expo start --web`. With no live backend / session the data-driven screens
- * render their pending / skeleton / empty states — enough to confirm every
- * component mounts, themes, and lays out without crashing.
+ * once. The app itself uses ONLY plain RN styles — there is NO nativewind /
+ * uniwind / tailwind / babel-transform / metro config anywhere in this project.
+ * The components style themselves, which proves zero-setup consumption.
  */
 export default function Showcase() {
   return (
@@ -46,18 +45,27 @@ export default function Showcase() {
         themePlugin()
       ]}
     >
-      <SafeAreaView className="flex-1 bg-neutral-50 dark:bg-neutral-950">
-        <View className="flex-row items-center justify-between border-b border-neutral-200 p-4 dark:border-neutral-800">
-          <Text className="text-xl font-semibold text-neutral-900 dark:text-neutral-50">
-            Showcase
-          </Text>
-          <View className="flex-row items-center gap-3">
+      <SafeAreaView style={{ flex: 1 }}>
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "space-between",
+            borderBottomWidth: 1,
+            borderColor: "#e5e5e5",
+            padding: 16
+          }}
+        >
+          <Text style={{ fontSize: 20, fontWeight: "600" }}>Showcase</Text>
+          <View style={{ flexDirection: "row", alignItems: "center", gap: 12 }}>
             <OrganizationSwitcher />
             <UserButton size="icon" />
           </View>
         </View>
 
-        <ScrollView contentContainerClassName="gap-8 p-4 pb-24">
+        <ScrollView
+          contentContainerStyle={{ gap: 32, padding: 16, paddingBottom: 96 }}
+        >
           <Section title="Settings (account + security)">
             <Settings />
           </Section>
@@ -93,8 +101,16 @@ export default function Showcase() {
 
 function Section({ title, children }: { title: string; children: ReactNode }) {
   return (
-    <View className="gap-3">
-      <Text className="text-xs font-semibold uppercase tracking-wide text-neutral-400">
+    <View style={{ gap: 12 }}>
+      <Text
+        style={{
+          fontSize: 12,
+          fontWeight: "600",
+          textTransform: "uppercase",
+          letterSpacing: 0.5,
+          color: "#a3a3a3"
+        }}
+      >
         {title}
       </Text>
       {children}
