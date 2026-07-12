@@ -28,7 +28,7 @@ export type ChangeAvatarProps = {
  * `Dropdown`.
  */
 export function ChangeAvatar({ className }: ChangeAvatarProps) {
-  const { authClient, localization } = useAuth()
+  const { authClient, localization, avatar } = useAuth()
   const { data: session } = useSession(authClient)
   const colors = useThemeColors()
 
@@ -36,9 +36,10 @@ export function ChangeAvatar({ className }: ChangeAvatarProps) {
     useUpdateUser(authClient)
 
   const [isUploading, setIsUploading] = useState(false)
+  const [isDeleting, setIsDeleting] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
 
-  const isPending = updatePending || isUploading
+  const isPending = updatePending || isUploading || isDeleting
 
   async function handleUpload() {
     setIsUploading(true)
@@ -69,10 +70,21 @@ export function ChangeAvatar({ className }: ChangeAvatarProps) {
   }
 
   async function handleDelete() {
+    const currentImage = session?.user.image
+
     updateUser(
       { image: null },
       {
-        onSuccess: () => {
+        onSuccess: async () => {
+          if (currentImage) {
+            setIsDeleting(true)
+            try {
+              await avatar.delete?.(currentImage)
+            } finally {
+              setIsDeleting(false)
+            }
+          }
+
           toast.success(localization.settings.avatarDeletedSuccess)
         }
       }
@@ -81,7 +93,7 @@ export function ChangeAvatar({ className }: ChangeAvatarProps) {
 
   return (
     <View className={cn("gap-1", className)}>
-      <Label>{localization.settings.avatar}</Label>
+      <Label isDisabled={!session}>{localization.settings.avatar}</Label>
 
       <View className="flex-row items-center gap-4">
         <Pressable

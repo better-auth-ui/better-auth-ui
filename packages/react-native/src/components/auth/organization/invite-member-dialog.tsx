@@ -96,7 +96,7 @@ export function InviteMemberDialog({
       </AlertDialog.Header>
 
       <Form onSubmit={handleSubmit} className="gap-4">
-        <AlertDialog.Body className="gap-4">
+        <AlertDialog.Body contentClassName="gap-4">
           <Text className="text-sm text-muted">
             {organizationLocalization.inviteMemberDescription}
           </Text>

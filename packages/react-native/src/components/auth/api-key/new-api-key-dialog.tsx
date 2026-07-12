@@ -1,5 +1,6 @@
 import { apiKeyPlugin } from "@better-auth-ui/core/plugins"
 import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
+import { useState } from "react"
 import { Text, View } from "react-native"
 import { copyText } from "../../../lib/clipboard"
 import { useThemeColors } from "../../../lib/theme-colors"
@@ -8,7 +9,7 @@ import { Button } from "../../../primitives/button"
 import { Label, TextField } from "../../../primitives/field"
 import { InputGroup } from "../../../primitives/input"
 import { toast } from "../../../primitives/toast"
-import { Copy, Key } from "../../../primitives/ui-icons"
+import { Check, Copy, Key } from "../../../primitives/ui-icons"
 
 export type NewApiKeyDialogProps = {
   isOpen: boolean
@@ -35,12 +36,15 @@ export function NewApiKeyDialog({
   const { localization: apiKeyLocalization } = useAuthPlugin(apiKeyPlugin)
   const colors = useThemeColors()
 
+  const [copied, setCopied] = useState(false)
+
   const copySecretKey = async () => {
     if (!secretKey) return
 
     try {
       await copyText(secretKey)
-      toast.success(localization.settings.copyToClipboard)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 1500)
     } catch (error) {
       toast.danger(error instanceof Error ? error.message : String(error))
     }
@@ -86,7 +90,11 @@ export function NewApiKeyDialog({
                 variant="ghost"
                 onPress={copySecretKey}
               >
-                <Copy width={16} height={16} color={colors.muted} />
+                {copied ? (
+                  <Check width={16} height={16} color={colors.muted} />
+                ) : (
+                  <Copy width={16} height={16} color={colors.muted} />
+                )}
               </Button>
             </InputGroup.Suffix>
           </InputGroup>
