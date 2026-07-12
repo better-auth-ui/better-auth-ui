@@ -191,3 +191,103 @@ export function Xmark(props: SvgProps) {
     </Base>
   )
 }
+
+export function Sun(props: SvgProps) {
+  return (
+    <Base {...props}>
+      <Circle cx="12" cy="12" r="5" />
+      <Line x1="12" y1="1" x2="12" y2="3" />
+      <Line x1="12" y1="21" x2="12" y2="23" />
+      <Line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+      <Line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+      <Line x1="1" y1="12" x2="3" y2="12" />
+      <Line x1="21" y1="12" x2="23" y2="12" />
+      <Line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
+      <Line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+    </Base>
+  )
+}
+
+export function Moon(props: SvgProps) {
+  return (
+    <Base {...props}>
+      <Path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+    </Base>
+  )
+}
+
+export function Display(props: SvgProps) {
+  return (
+    <Base {...props}>
+      <Rect x="2" y="3" width="20" height="14" rx="2" ry="2" />
+      <Line x1="8" y1="21" x2="16" y2="21" />
+      <Line x1="12" y1="17" x2="12" y2="21" />
+    </Base>
+  )
+}
+
+export function TriangleExclamation(props: SvgProps) {
+  return (
+    <Base {...props}>
+      <Path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+      <Line x1="12" y1="9" x2="12" y2="13" />
+      <Line x1="12" y1="17" x2="12.01" y2="17" />
+    </Base>
+  )
+}
+
+export function Briefcase(props: SvgProps) {
+  return (
+    <Base {...props}>
+      <Rect x="2" y="7" width="20" height="14" rx="2" ry="2" />
+      <Path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" />
+    </Base>
+  )
+}
+
+export function Trash(props: SvgProps) {
+  return (
+    <Base {...props}>
+      <Polyline points="3 6 5 6 21 6" />
+      <Path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+      <Line x1="10" y1="11" x2="10" y2="17" />
+      <Line x1="14" y1="11" x2="14" y2="17" />
+    </Base>
+  )
+}
+
+export function Pencil(props: SvgProps) {
+  return (
+    <Base {...props}>
+      <Path d="M12 20h9" />
+      <Path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
+    </Base>
+  )
+}
+
+export function ChevronRight(props: SvgProps) {
+  return (
+    <Base {...props}>
+      <Polyline points="9 18 15 12 9 6" />
+    </Base>
+  )
+}
+
+export function Key(props: SvgProps) {
+  return (
+    <Base {...props}>
+      <Path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4" />
+    </Base>
+  )
+}
+
+export function Users(props: SvgProps) {
+  return (
+    <Base {...props}>
+      <Path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+      <Circle cx="9" cy="7" r="4" />
+      <Path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+      <Path d="M16 3.13a4 4 0 0 1 0 7.75" />
+    </Base>
+  )
+}
