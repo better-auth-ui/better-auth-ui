@@ -5,13 +5,13 @@ import {
   useListApiKeys
 } from "@better-auth-ui/react"
 import { useState } from "react"
-import { Text, View } from "react-native"
 
 import { apiKeyPlugin } from "../../../lib/auth/api-key-plugin"
 import type { SettingsViewProps } from "../../../lib/auth-plugin"
 import { cn } from "../../../lib/cn"
 import { Button } from "../../../primitives/button"
 import { Card } from "../../../primitives/card"
+import { Box, Txt } from "../../../primitives/styled"
 import { ApiKey } from "./api-key"
 import { ApiKeySkeleton } from "./api-key-skeleton"
 import { ApiKeysEmpty } from "./api-keys-empty"
@@ -62,11 +62,11 @@ export function ApiKeys({
   const [createOpen, setCreateOpen] = useState(false)
 
   return (
-    <View className={cn("flex-col gap-3", className)}>
-      <View className="flex-row items-end justify-between gap-3">
-        <Text className="shrink text-sm font-semibold text-foreground">
+    <Box className={cn("flex-col gap-3", className)}>
+      <Box className="flex-row items-end justify-between gap-3">
+        <Txt className="shrink text-sm font-semibold text-foreground">
           {apiKeyLocalization.apiKeys}
-        </Text>
+        </Txt>
 
         {!hideCreate && (
           <Button
@@ -78,7 +78,7 @@ export function ApiKeys({
             {apiKeyLocalization.createApiKey}
           </Button>
         )}
-      </View>
+      </Box>
 
       <Card variant={variant}>
         <Card.Content>
@@ -91,9 +91,9 @@ export function ApiKeys({
             />
           ) : (
             listData?.apiKeys.map((key, index) => (
-              <View key={key.id}>
+              <Box key={key.id}>
                 {index > 0 && (
-                  <View className="-mx-4 my-4 border-b border-dashed border-border" />
+                  <Box className="-mx-4 my-4 border-b border-dashed border-border" />
                 )}
 
                 <ApiKey
@@ -101,7 +101,7 @@ export function ApiKeys({
                   hideDelete={hideDelete}
                   organizationId={organizationId}
                 />
-              </View>
+              </Box>
             ))
           )}
         </Card.Content>
@@ -114,6 +114,6 @@ export function ApiKeys({
           organizationId={organizationId}
         />
       )}
-    </View>
+    </Box>
   )
 }

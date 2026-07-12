@@ -1,7 +1,7 @@
 import { useAuth } from "@better-auth-ui/react"
 import { useMemo } from "react"
-import { View } from "react-native"
 import { cn } from "../../lib/cn"
+import { Box } from "../../primitives/styled"
 import { ProviderButton } from "./provider-button"
 
 export type SocialLayout = "auto" | "horizontal" | "vertical" | "grid"
@@ -30,7 +30,7 @@ export function ProviderButtons({
   }, [socialLayout, socialProviders?.length])
 
   return (
-    <View
+    <Box
       className={cn(
         "gap-3",
         resolvedSocialLayout === "grid" && "flex-row flex-wrap",
@@ -55,6 +55,6 @@ export function ProviderButtons({
           )}
         />
       ))}
-    </View>
+    </Box>
   )
 }

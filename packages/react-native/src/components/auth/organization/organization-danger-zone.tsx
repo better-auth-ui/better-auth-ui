@@ -8,7 +8,6 @@ import {
 } from "@better-auth-ui/react"
 import type { Organization } from "better-auth/client"
 import { useState } from "react"
-import { Text, View } from "react-native"
 
 import { organizationPlugin } from "../../../lib/auth/organization-plugin"
 import type { SettingsViewProps } from "../../../lib/auth-plugin"
@@ -17,6 +16,7 @@ import { useThemeColors } from "../../../lib/theme-colors"
 import { AlertDialog } from "../../../primitives/alert-dialog"
 import { Button } from "../../../primitives/button"
 import { Card } from "../../../primitives/card"
+import { Box, Txt } from "../../../primitives/styled"
 import { toast } from "../../../primitives/toast"
 import { ArrowRightFromSquare } from "../../../primitives/ui-icons"
 import { DeleteOrganization } from "./delete-organization"
@@ -50,10 +50,10 @@ export function OrganizationDangerZone({
   const canDelete = !!deletePermission?.success
 
   return (
-    <View className={cn("flex-col", className)}>
-      <Text className="mb-3 text-sm font-semibold text-danger">
+    <Box className={cn("flex-col", className)}>
+      <Txt className="mb-3 text-sm font-semibold text-danger">
         {localization.settings.dangerZone}
-      </Text>
+      </Txt>
 
       <Card variant={variant}>
         <Card.Content className="gap-0">
@@ -65,7 +65,7 @@ export function OrganizationDangerZone({
 
               {canDelete && (
                 <>
-                  <View className="-mx-4 my-4 border-b border-dashed border-border" />
+                  <Box className="-mx-4 my-4 border-b border-dashed border-border" />
 
                   <DeleteOrganization />
                 </>
@@ -74,7 +74,7 @@ export function OrganizationDangerZone({
           )}
         </Card.Content>
       </Card>
-    </View>
+    </Box>
   )
 }
 
@@ -96,16 +96,16 @@ function LeaveOrganization() {
   const [confirmOpen, setConfirmOpen] = useState(false)
 
   return (
-    <View className="flex-col gap-4">
-      <View>
-        <Text className="text-sm font-medium leading-tight text-foreground">
+    <Box className="flex-col gap-4">
+      <Box>
+        <Txt className="text-sm font-medium leading-tight text-foreground">
           {organizationLocalization.leaveOrganization}
-        </Text>
+        </Txt>
 
-        <Text className="mt-0.5 text-xs text-muted">
+        <Txt className="mt-0.5 text-xs text-muted">
           {organizationLocalization.leaveOrganizationDescription}
-        </Text>
-      </View>
+        </Txt>
+      </Box>
 
       <Button
         className="self-start"
@@ -124,7 +124,7 @@ function LeaveOrganization() {
           organization={activeOrganization}
         />
       )}
-    </View>
+    </Box>
   )
 }
 
@@ -186,9 +186,9 @@ function LeaveOrganizationDialog({
       </AlertDialog.Header>
 
       <AlertDialog.Body>
-        <Text className="text-sm text-muted">
+        <Txt className="text-sm text-muted">
           {organizationLocalization.leaveOrganizationDescription}
-        </Text>
+        </Txt>
 
         <Card variant="secondary">
           <Card.Content>

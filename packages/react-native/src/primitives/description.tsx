@@ -1,6 +1,6 @@
 import type { ReactNode } from "react"
-import { Text } from "react-native"
 import { cn } from "../lib/cn"
+import { Txt } from "./styled"
 
 /**
  * Muted body / helper text. Can contain inline `Link` (which renders as an
@@ -13,5 +13,5 @@ export function Description({
   className?: string
   children?: ReactNode
 }) {
-  return <Text className={cn("text-sm text-muted", className)}>{children}</Text>
+  return <Txt className={cn("text-sm text-muted", className)}>{children}</Txt>
 }

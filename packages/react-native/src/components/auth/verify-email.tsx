@@ -1,12 +1,12 @@
 import { useAuth, useSendVerificationEmail } from "@better-auth-ui/react"
 import { useEffect, useState } from "react"
-import { View } from "react-native"
 import { cn } from "../../lib/cn"
 import { getPendingEmail } from "../../lib/pending-email"
 import { Button } from "../../primitives/button"
 import { Card, type CardVariant } from "../../primitives/card"
 import { Description } from "../../primitives/description"
 import { Link } from "../../primitives/link"
+import { Box } from "../../primitives/styled"
 import { toast } from "../../primitives/toast"
 import { OpenEmailButton } from "./open-email-button"
 
@@ -77,7 +77,7 @@ export function VerifyEmail({ className, variant }: VerifyEmailProps) {
         </Description>
 
         {email && (
-          <View className="flex-col gap-3">
+          <Box className="flex-col gap-3">
             <OpenEmailButton email={email} />
 
             <Button
@@ -99,7 +99,7 @@ export function VerifyEmail({ className, variant }: VerifyEmailProps) {
                   )
                 : localization.auth.resend}
             </Button>
-          </View>
+          </Box>
         )}
       </Card.Content>
 

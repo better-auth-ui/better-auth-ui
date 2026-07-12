@@ -1,7 +1,7 @@
 import { useAuth } from "@better-auth-ui/react"
-import { View } from "react-native"
 import { cn } from "../../../../lib/cn"
 import type { CardVariant } from "../../../../primitives/card"
+import { Box } from "../../../../primitives/styled"
 import { ActiveSessions } from "./active-sessions"
 import { ChangePassword } from "./change-password"
 import { LinkedAccounts } from "./linked-accounts"
@@ -28,7 +28,7 @@ export function SecuritySettings({
   const { emailAndPassword, plugins, socialProviders } = useAuth()
 
   return (
-    <View className={cn("w-full flex-col gap-4", className)}>
+    <Box className={cn("w-full flex-col gap-4", className)}>
       {emailAndPassword?.enabled && <ChangePassword variant={variant} />}
       {!!socialProviders?.length && <LinkedAccounts variant={variant} />}
       <ActiveSessions variant={variant} />
@@ -37,6 +37,6 @@ export function SecuritySettings({
           <Card key={`${plugin.id}-${index.toString()}`} variant={variant} />
         ))
       )}
-    </View>
+    </Box>
   )
 }

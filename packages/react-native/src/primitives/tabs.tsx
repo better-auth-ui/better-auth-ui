@@ -1,7 +1,8 @@
 import { createContext, type ReactNode, useContext, useMemo } from "react"
-import { ScrollView, Text, View, type ViewProps } from "react-native"
+import type { ViewProps } from "react-native"
 import { cn } from "../lib/cn"
 import { Button } from "./button"
+import { Box, ScrollBox, Txt } from "./styled"
 
 /**
  * Tabs as a segmented control. RN has no URL-driven tab navigation, so unlike
@@ -49,9 +50,9 @@ function TabsBase({
 
   return (
     <TabsContext.Provider value={context}>
-      <View className={cn("gap-3", className)} {...props}>
+      <Box className={cn("gap-3", className)} {...props}>
         {children}
-      </View>
+      </Box>
     </TabsContext.Provider>
   )
 }
@@ -68,14 +69,14 @@ export interface TabsListProps {
  */
 function TabsList({ className, children }: TabsListProps) {
   return (
-    <ScrollView
+    <ScrollBox
       horizontal
       showsHorizontalScrollIndicator={false}
       contentContainerClassName="flex-row gap-1 rounded-xl bg-surface-secondary p-1"
       className={cn("flex-none", className)}
     >
       {children}
-    </ScrollView>
+    </ScrollBox>
   )
 }
 
@@ -130,7 +131,7 @@ export interface TabsPanelProps {
 function TabsPanel({ id, className, children }: TabsPanelProps) {
   const { selectedKey } = useTabsContext()
   if (selectedKey !== id) return null
-  return <View className={cn(className)}>{children}</View>
+  return <Box className={cn(className)}>{children}</Box>
 }
 
 /**
@@ -182,7 +183,7 @@ function ChipBase({
   ...props
 }: ChipProps) {
   return (
-    <View
+    <Box
       className={cn(
         "flex-row items-center self-start rounded-full px-2.5 py-1",
         CHIP_CONTAINER[color],
@@ -191,15 +192,15 @@ function ChipBase({
       {...props}
     >
       {typeof children === "string" || typeof children === "number" ? (
-        <Text
+        <Txt
           className={cn("text-xs font-medium", CHIP_TEXT[color], textClassName)}
         >
           {children}
-        </Text>
+        </Txt>
       ) : (
         children
       )}
-    </View>
+    </Box>
   )
 }
 
@@ -210,9 +211,7 @@ function ChipLabel({
   className?: string
   children?: ReactNode
 }) {
-  return (
-    <Text className={cn("text-xs font-medium", className)}>{children}</Text>
-  )
+  return <Txt className={cn("text-xs font-medium", className)}>{children}</Txt>
 }
 
 /**
@@ -254,26 +253,24 @@ export function EmptyState({
   children
 }: EmptyStateProps) {
   return (
-    <View
-      className={cn("items-center gap-3 rounded-2xl px-6 py-10", className)}
-    >
+    <Box className={cn("items-center gap-3 rounded-2xl px-6 py-10", className)}>
       {icon && (
-        <View className="h-12 w-12 items-center justify-center rounded-full bg-surface-secondary">
+        <Box className="h-12 w-12 items-center justify-center rounded-full bg-surface-secondary">
           {icon}
-        </View>
+        </Box>
       )}
 
-      <View className="items-center gap-1">
-        <Text className="text-center text-base font-semibold text-foreground">
+      <Box className="items-center gap-1">
+        <Txt className="text-center text-base font-semibold text-foreground">
           {title}
-        </Text>
+        </Txt>
         {description && (
-          <Text className="text-center text-sm text-muted">{description}</Text>
+          <Txt className="text-center text-sm text-muted">{description}</Txt>
         )}
-      </View>
+      </Box>
 
       {action}
       {children}
-    </View>
+    </Box>
   )
 }

@@ -1,6 +1,5 @@
-import { View } from "react-native"
-
 import { Skeleton } from "../../../primitives/skeleton"
+import { Box } from "../../../primitives/styled"
 
 /**
  * Placeholder row matching {@link OrganizationInvitationRow} while
@@ -11,7 +10,7 @@ import { Skeleton } from "../../../primitives/skeleton"
  */
 export function OrganizationInvitationRowSkeleton() {
   return (
-    <View className="flex-row items-center justify-between gap-2">
+    <Box className="flex-row items-center justify-between gap-2">
       <Skeleton className="h-4 w-48 rounded-lg" />
 
       <Skeleton className="h-4 w-36 rounded-lg" />
@@ -19,6 +18,6 @@ export function OrganizationInvitationRowSkeleton() {
       <Skeleton className="h-4 w-16 rounded-lg" />
 
       <Skeleton className="h-4 w-14 rounded-full" />
-    </View>
+    </Box>
   )
 }

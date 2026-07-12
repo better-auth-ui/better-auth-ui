@@ -6,12 +6,12 @@ import {
   useSession,
   useSetActiveSession
 } from "@better-auth-ui/react"
-import { View } from "react-native"
 import { multiSessionPlugin } from "../../../lib/auth/multi-session-plugin"
 import { useThemeColors } from "../../../lib/theme-colors"
 import { useAuthNavigation } from "../../../navigation/navigation-context"
 import { Menu } from "../../../primitives/menu"
 import { Spinner } from "../../../primitives/spinner"
+import { Box } from "../../../primitives/styled"
 import { Check, CirclePlus } from "../../../primitives/ui-icons"
 import { UserView } from "../user/user-view"
 
@@ -70,7 +70,7 @@ export function SwitchAccountSubmenuContent({
   return (
     <>
       <Menu.Item className="px-2" isDisabled>
-        <View className="flex-1 flex-row items-center">
+        <Box className="flex-1 flex-row items-center">
           <UserView isPending={isPending} hideSubtitle={hideSubtitle} />
 
           {!isPending && (
@@ -81,7 +81,7 @@ export function SwitchAccountSubmenuContent({
               className="ml-auto"
             />
           )}
-        </View>
+        </Box>
       </Menu.Item>
 
       {otherSessions?.map((deviceSession) => (
@@ -94,13 +94,13 @@ export function SwitchAccountSubmenuContent({
             onOpenChange?.(false)
           }}
         >
-          <View className="flex-1 flex-row items-center">
+          <Box className="flex-1 flex-row items-center">
             <UserView user={deviceSession.user} hideSubtitle={hideSubtitle} />
 
             {isSwitching && (
               <Spinner size="sm" color="current" className="ml-auto" />
             )}
-          </View>
+          </Box>
         </Menu.Item>
       ))}
 

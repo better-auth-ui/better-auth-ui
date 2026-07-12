@@ -1,7 +1,6 @@
 import type { AdditionalFieldValue } from "@better-auth-ui/core"
 import { useAuth, useSession, useUpdateUser } from "@better-auth-ui/react"
 import { useEffect, useState } from "react"
-import { Text, View } from "react-native"
 import { cn } from "../../../../lib/cn"
 import { Button } from "../../../../primitives/button"
 import { Card, type CardVariant } from "../../../../primitives/card"
@@ -10,6 +9,7 @@ import { Form } from "../../../../primitives/form"
 import { Input } from "../../../../primitives/input"
 import { Skeleton } from "../../../../primitives/skeleton"
 import { Spinner } from "../../../../primitives/spinner"
+import { Box, Txt } from "../../../../primitives/styled"
 import { toast } from "../../../../primitives/toast"
 import { AdditionalField } from "../../additional-field"
 import { ChangeAvatar } from "./change-avatar"
@@ -54,10 +54,10 @@ export function UserProfile({ className, variant }: UserProfileProps) {
   }
 
   return (
-    <View>
-      <Text className={cn("text-sm font-semibold mb-3 text-foreground")}>
+    <Box>
+      <Txt className={cn("text-sm font-semibold mb-3 text-foreground")}>
         {localization.settings.userProfile}
-      </Text>
+      </Txt>
 
       <Card className={cn("gap-4", className)} variant={variant}>
         <Card.Content>
@@ -144,6 +144,6 @@ export function UserProfile({ className, variant }: UserProfileProps) {
           </Form>
         </Card.Content>
       </Card>
-    </View>
+    </Box>
   )
 }

@@ -8,7 +8,6 @@ import {
 } from "@better-auth-ui/react"
 import { useDebouncer } from "@tanstack/react-pacer"
 import { useEffect, useState } from "react"
-import { Text, View } from "react-native"
 
 import { organizationPlugin } from "../../../lib/auth/organization-plugin"
 import type { SettingsViewProps } from "../../../lib/auth-plugin"
@@ -23,6 +22,7 @@ import { Input, InputGroup } from "../../../primitives/input"
 import { Menu } from "../../../primitives/menu"
 import { Skeleton } from "../../../primitives/skeleton"
 import { Spinner } from "../../../primitives/spinner"
+import { Box, Txt } from "../../../primitives/styled"
 import { toast } from "../../../primitives/toast"
 import { Check, Trash, Upload, Xmark } from "../../../primitives/ui-icons"
 import { OrganizationLogo } from "./organization-logo"
@@ -185,21 +185,21 @@ export function OrganizationProfile({
     !!slug.trim() && slug.trim() !== activeOrganization?.slug
 
   return (
-    <View className={cn(className)}>
-      <Text className="mb-3 text-sm font-semibold text-foreground">
+    <Box className={cn(className)}>
+      <Txt className="mb-3 text-sm font-semibold text-foreground">
         {organizationLocalization.organizationProfile}
-      </Text>
+      </Txt>
 
       <Card variant={variant}>
         <Card.Content>
           <Form onSubmit={handleSubmit} className="gap-4">
             {logo.enabled && (
-              <View className="gap-1.5">
+              <Box className="gap-1.5">
                 <Label isDisabled={!activeOrganization}>
                   {organizationLocalization.logo}
                 </Label>
 
-                <View className="flex-row items-center gap-4">
+                <Box className="flex-row items-center gap-4">
                   <Button
                     variant="ghost"
                     isIconOnly
@@ -245,8 +245,8 @@ export function OrganizationProfile({
                       {organizationLocalization.deleteLogo}
                     </Menu.Item>
                   </Menu>
-                </View>
-              </View>
+                </Box>
+              </Box>
             )}
 
             <TextField
@@ -328,6 +328,6 @@ export function OrganizationProfile({
           </Form>
         </Card.Content>
       </Card>
-    </View>
+    </Box>
   )
 }

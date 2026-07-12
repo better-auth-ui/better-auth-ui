@@ -1,5 +1,5 @@
-import { View } from "react-native"
 import { Skeleton } from "../../../primitives/skeleton"
+import { Box } from "../../../primitives/styled"
 
 /**
  * Loading placeholder for a single API key row. Mirrors the heroui
@@ -8,16 +8,16 @@ import { Skeleton } from "../../../primitives/skeleton"
  */
 export function ApiKeySkeleton() {
   return (
-    <View className="flex-row items-center justify-between">
-      <View className="flex-row items-center gap-3">
+    <Box className="flex-row items-center justify-between">
+      <Box className="flex-row items-center gap-3">
         <Skeleton className="size-10 rounded-xl" />
 
-        <View className="flex-col gap-1">
+        <Box className="flex-col gap-1">
           <Skeleton className="h-4 w-28 rounded-lg" />
           <Skeleton className="h-3 w-36 rounded-lg" />
           <Skeleton className="h-3 w-32 rounded-lg" />
-        </View>
-      </View>
-    </View>
+        </Box>
+      </Box>
+    </Box>
   )
 }

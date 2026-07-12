@@ -6,7 +6,6 @@ import {
 } from "@better-auth-ui/react"
 import { useDebouncer } from "@tanstack/react-pacer"
 import { useEffect } from "react"
-import { Text } from "react-native"
 
 import { organizationPlugin } from "../../../lib/auth/organization-plugin"
 import { useThemeColors } from "../../../lib/theme-colors"
@@ -18,6 +17,7 @@ import {
 } from "../../../primitives/field"
 import { InputGroup, type InputVariant } from "../../../primitives/input"
 import { Spinner } from "../../../primitives/spinner"
+import { Txt } from "../../../primitives/styled"
 import { Check, Xmark } from "../../../primitives/ui-icons"
 
 /** Props for the {@link SlugField} component. */
@@ -107,7 +107,7 @@ export function SlugField({
       <InputGroup variant={variant}>
         {slugPrefix && (
           <InputGroup.Prefix>
-            <Text className="text-muted">{slugPrefix}</Text>
+            <Txt className="text-muted">{slugPrefix}</Txt>
           </InputGroup.Prefix>
         )}
 

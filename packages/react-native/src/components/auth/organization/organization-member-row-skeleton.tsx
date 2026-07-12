@@ -1,6 +1,5 @@
-import { View } from "react-native"
-
 import { Skeleton } from "../../../primitives/skeleton"
+import { Box } from "../../../primitives/styled"
 import { UserView } from "../user/user-view"
 
 /**
@@ -8,12 +7,12 @@ import { UserView } from "../user/user-view"
  */
 export function OrganizationMemberRowSkeleton() {
   return (
-    <View className="flex-row items-center justify-between gap-2">
+    <Box className="flex-row items-center justify-between gap-2">
       <UserView isPending />
 
       <Skeleton className="h-4 w-18 rounded-lg" />
 
       <Skeleton className="size-8 rounded-full" />
-    </View>
+    </Box>
   )
 }

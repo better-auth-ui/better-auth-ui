@@ -5,17 +5,10 @@ import {
   useContext,
   useMemo
 } from "react"
-import {
-  FlatList,
-  type FlatListProps,
-  Pressable,
-  ScrollView,
-  Text,
-  View,
-  type ViewProps
-} from "react-native"
+import { FlatList, type FlatListProps, type ViewProps } from "react-native"
 import { cn } from "../lib/cn"
 import { useThemeColors } from "../lib/theme-colors"
+import { Box, Btn, ScrollBox, Txt } from "./styled"
 import { Check } from "./ui-icons"
 
 /* -------------------------------------------------------------------------
@@ -78,13 +71,13 @@ function ListBoxBase({
 
   return (
     <ListBoxContext.Provider value={context}>
-      <View
+      <Box
         accessibilityRole="menu"
         className={cn("gap-0.5", className)}
         {...props}
       >
         {children}
-      </View>
+      </Box>
     </ListBoxContext.Provider>
   )
 }
@@ -134,7 +127,7 @@ function ListBoxItem({
   }
 
   return (
-    <Pressable
+    <Btn
       accessibilityRole="menuitem"
       accessibilityState={{ disabled: isDisabled, selected: isSelected }}
       accessibilityLabel={textValue}
@@ -149,18 +142,18 @@ function ListBoxItem({
     >
       {icon}
 
-      <View className="flex-1">
+      <Box className="flex-1">
         {typeof children === "string" ? (
-          <Text className="text-sm text-foreground">{children}</Text>
+          <Txt className="text-sm text-foreground">{children}</Txt>
         ) : (
           (children ?? (
-            <Text className="text-sm text-foreground">{textValue}</Text>
+            <Txt className="text-sm text-foreground">{textValue}</Txt>
           ))
         )}
-      </View>
+      </Box>
 
       {isSelected && <ListBoxItemIndicator color={colors.accent} />}
-    </Pressable>
+    </Btn>
   )
 }
 
@@ -193,14 +186,14 @@ export interface ListBoxSectionProps {
 /** Groups `ListBox.Item`s under an optional heading. */
 function ListBoxSection({ heading, className, children }: ListBoxSectionProps) {
   return (
-    <View className={cn("gap-0.5", className)}>
+    <Box className={cn("gap-0.5", className)}>
       {heading && (
-        <Text className="px-3 pt-2 pb-1 text-xs font-medium text-muted">
+        <Txt className="px-3 pt-2 pb-1 text-xs font-medium text-muted">
           {heading}
-        </Text>
+        </Txt>
       )}
       {children}
-    </View>
+    </Box>
   )
 }
 
@@ -268,9 +261,9 @@ export function DataList<T>({
   ...props
 }: DataListProps<T>) {
   const header = columns && columns.length > 0 && (
-    <View className="flex-row items-center gap-2 border-border border-b px-4 py-2">
+    <Box className="flex-row items-center gap-2 border-border border-b px-4 py-2">
       {columns.map((column) => (
-        <Text
+        <Txt
           key={column.key}
           className={cn(
             "text-muted text-xs font-medium uppercase",
@@ -279,42 +272,42 @@ export function DataList<T>({
           style={{ flex: column.flex ?? 1 }}
         >
           {column.label}
-        </Text>
+        </Txt>
       ))}
-    </View>
+    </Box>
   )
 
   if (data.length === 0) {
     return (
-      <View
+      <Box
         className={cn("rounded-2xl border border-border bg-surface", className)}
       >
         {header}
         {renderEmptyState?.()}
-      </View>
+      </Box>
     )
   }
 
   if (!scrollEnabled) {
     return (
-      <View
+      <Box
         className={cn("rounded-2xl border border-border bg-surface", className)}
       >
         {header}
         {data.map((item, index) => (
           <Fragment key={keyExtractor(item, index)}>
-            {index > 0 && <View className="h-px bg-border" />}
-            <View className={cn("px-4 py-3", rowClassName)}>
+            {index > 0 && <Box className="h-px bg-border" />}
+            <Box className={cn("px-4 py-3", rowClassName)}>
               {renderItem(item, index)}
-            </View>
+            </Box>
           </Fragment>
         ))}
-      </View>
+      </Box>
     )
   }
 
   return (
-    <View
+    <Box
       className={cn(
         "overflow-hidden rounded-2xl border border-border bg-surface",
         className
@@ -325,14 +318,14 @@ export function DataList<T>({
         data={data as T[]}
         keyExtractor={keyExtractor}
         renderItem={({ item, index }) => (
-          <View className={cn("px-4 py-3", rowClassName)}>
+          <Box className={cn("px-4 py-3", rowClassName)}>
             {renderItem(item, index)}
-          </View>
+          </Box>
         )}
-        ItemSeparatorComponent={() => <View className="h-px bg-border" />}
+        ItemSeparatorComponent={() => <Box className="h-px bg-border" />}
         {...props}
       />
-    </View>
+    </Box>
   )
 }
 
@@ -345,8 +338,8 @@ export function DataListScrollContainer({
   children?: ReactNode
 }) {
   return (
-    <ScrollView horizontal className={cn(className)}>
+    <ScrollBox horizontal className={cn(className)}>
       {children}
-    </ScrollView>
+    </ScrollBox>
   )
 }

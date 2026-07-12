@@ -5,12 +5,12 @@ import {
   useListOrganizations
 } from "@better-auth-ui/react"
 import { useState } from "react"
-import { Text, View } from "react-native"
 
 import { organizationPlugin } from "../../../lib/auth/organization-plugin"
 import { cn } from "../../../lib/cn"
 import { Button } from "../../../primitives/button"
 import { Card, type CardVariant } from "../../../primitives/card"
+import { Box, Txt } from "../../../primitives/styled"
 import { CreateOrganizationDialog } from "./create-organization-dialog"
 import { OrganizationRow } from "./organization-row"
 import { OrganizationViewSkeleton } from "./organization-view-skeleton"
@@ -40,11 +40,11 @@ export function Organizations({ className, variant }: OrganizationsProps) {
 
   return (
     <>
-      <View className={cn("flex-col gap-3", className)}>
-        <View className="flex-row items-end justify-between gap-3">
-          <Text className="shrink truncate text-sm font-semibold text-foreground">
+      <Box className={cn("flex-col gap-3", className)}>
+        <Box className="flex-row items-end justify-between gap-3">
+          <Txt className="shrink truncate text-sm font-semibold text-foreground">
             {organizationLocalization.organizations}
-          </Text>
+          </Txt>
 
           <Button
             className="shrink-0"
@@ -54,7 +54,7 @@ export function Organizations({ className, variant }: OrganizationsProps) {
           >
             {organizationLocalization.createOrganization}
           </Button>
-        </View>
+        </Box>
 
         <Card variant={variant}>
           <Card.Content className="gap-0">
@@ -64,18 +64,18 @@ export function Organizations({ className, variant }: OrganizationsProps) {
               <OrganizationsEmpty onCreatePress={() => setCreateOpen(true)} />
             ) : (
               organizations.map((organization, index) => (
-                <View key={organization.id}>
+                <Box key={organization.id}>
                   {index > 0 && (
-                    <View className="-mx-4 my-4 border-b border-dashed border-border" />
+                    <Box className="-mx-4 my-4 border-b border-dashed border-border" />
                   )}
 
                   <OrganizationRow organization={organization} />
-                </View>
+                </Box>
               ))
             )}
           </Card.Content>
         </Card>
-      </View>
+      </Box>
 
       <CreateOrganizationDialog
         isOpen={createOpen}

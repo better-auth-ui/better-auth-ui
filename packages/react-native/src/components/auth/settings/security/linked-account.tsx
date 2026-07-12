@@ -7,12 +7,12 @@ import {
 } from "@better-auth-ui/react"
 import type { Account } from "better-auth"
 import type { SocialProvider } from "better-auth/social-providers"
-import { Text, View } from "react-native"
 import { cn } from "../../../../lib/cn"
 import { providerIcons } from "../../../../lib/provider-icons"
 import { useThemeColors } from "../../../../lib/theme-colors"
 import { Button } from "../../../../primitives/button"
 import { Skeleton } from "../../../../primitives/skeleton"
+import { Box, Txt } from "../../../../primitives/styled"
 import { toast } from "../../../../primitives/toast"
 import {
   LinkIcon as Link,
@@ -67,8 +67,8 @@ export function LinkedAccount({ account, provider }: LinkedAccountProps) {
     account?.accountId
 
   return (
-    <View className="flex-row items-center gap-3">
-      <View
+    <Box className="flex-row items-center gap-3">
+      <Box
         className={cn(
           "size-10 shrink-0 items-center justify-center rounded-xl bg-surface-secondary"
         )}
@@ -78,26 +78,26 @@ export function LinkedAccount({ account, provider }: LinkedAccountProps) {
         ) : (
           <PlugConnection width={18} height={18} color={colors.foreground} />
         )}
-      </View>
+      </Box>
 
-      <View className="flex-col min-w-0 shrink grow">
-        <Text className="text-sm font-medium leading-tight text-foreground">
+      <Box className="flex-col min-w-0 shrink grow">
+        <Txt className="text-sm font-medium leading-tight text-foreground">
           {providerName}
-        </Text>
+        </Txt>
 
         {account && isLoadingInfo ? (
           <Skeleton className="h-3 w-24 my-0.5 rounded-lg" />
         ) : (
-          <Text className="text-xs text-muted" numberOfLines={1}>
+          <Txt className="text-xs text-muted" numberOfLines={1}>
             {account
               ? displayName
               : localization.settings.linkProvider.replace(
                   "{{provider}}",
                   providerName
                 )}
-          </Text>
+          </Txt>
         )}
-      </View>
+      </Box>
 
       {account ? (
         <Button
@@ -137,6 +137,6 @@ export function LinkedAccount({ account, provider }: LinkedAccountProps) {
           {localization.settings.link}
         </Button>
       )}
-    </View>
+    </Box>
   )
 }
