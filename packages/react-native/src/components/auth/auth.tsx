@@ -54,7 +54,7 @@ export function Auth({
   view,
   token
 }: AuthProps) {
-  const { emailAndPassword } = useAuth()
+  const { emailAndPassword, plugins } = useAuth()
   const navigation = useAuthNavigation()
 
   const current = navigation.current()
@@ -72,6 +72,24 @@ export function Auth({
 
   if (shouldRedirectToSignIn) return null
 
+  const viewProps = { className, socialLayout, socialPosition, variant, token }
+
+  // 1. Plugin view overrides (first plugin wins, even over built-ins) — this is
+  //    how e.g. magic-link / username sign-in replace a view.
+  for (const plugin of plugins) {
+    const PluginView = plugin.views?.auth?.[authView]
+    if (PluginView) return <PluginView {...viewProps} />
+  }
+
+  // 2. Plugin fallback for signIn when email+password is disabled (e.g. magic
+  //    link becomes the primary passwordless sign-in surface).
+  if (authView === "signIn" && !emailAndPassword?.enabled) {
+    const Fallback = plugins.find(
+      (plugin) => plugin.fallbackViews?.auth?.signIn
+    )?.fallbackViews?.auth?.signIn
+    if (Fallback) return <Fallback {...viewProps} />
+  }
+
   const ViewComponent = AUTH_VIEWS[authView]
 
   if (!ViewComponent) {
@@ -82,13 +100,5 @@ export function Auth({
     )
   }
 
-  return (
-    <ViewComponent
-      className={className}
-      socialLayout={socialLayout}
-      socialPosition={socialPosition}
-      variant={variant}
-      token={token}
-    />
-  )
+  return <ViewComponent {...viewProps} />
 }

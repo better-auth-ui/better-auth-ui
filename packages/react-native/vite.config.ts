@@ -17,7 +17,8 @@ export default defineConfig({
   build: {
     lib: {
       entry: {
-        index: "src/index.ts"
+        index: "src/index.ts",
+        plugins: "src/plugins.ts"
       },
       formats: ["es"]
     },
