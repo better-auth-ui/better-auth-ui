@@ -1,5 +1,4 @@
-import DateTimePicker from "@react-native-community/datetimepicker"
-import { useState } from "react"
+import { type ComponentType, useMemo, useState } from "react"
 import { Platform, Pressable, Text, View } from "react-native"
 import { cn } from "../lib/cn"
 import { formatDateTime } from "../lib/format-date"
@@ -13,6 +12,29 @@ export interface DatePickerProps {
   placeholder?: string
   isDisabled?: boolean
   className?: string
+}
+
+type NativeDateTimePickerProps = {
+  value: Date
+  mode?: "date" | "time"
+  onChange?: (event: { type: string }, date?: Date) => void
+}
+
+/**
+ * Resolve the optional native peer lazily, at render time — never at module
+ * eval. The package barrel pulls this module in (additional-field → `<Auth/>`),
+ * so a top-level `import "@react-native-community/datetimepicker"` would bind to
+ * a native module at eval time and crash the whole app on import wherever that
+ * native module isn't linked (e.g. Expo Go), even on screens with no date
+ * field. The `require` sits in a try/catch so Metro treats it as an optional
+ * dependency: if it's absent the field renders but the picker won't open.
+ */
+function resolveNativePicker(): ComponentType<NativeDateTimePickerProps> | null {
+  try {
+    return require("@react-native-community/datetimepicker").default
+  } catch {
+    return null
+  }
 }
 
 function displayFor(value: Date, mode: DatePickerMode): string {
@@ -36,15 +58,18 @@ export function DatePicker({
   className
 }: DatePickerProps) {
   const [open, setOpen] = useState(false)
+  const DateTimePicker = useMemo(resolveNativePicker, [])
+
+  const disabled = isDisabled || !DateTimePicker
 
   return (
     <View className={cn("w-full", className)}>
       <Pressable
-        disabled={isDisabled}
+        disabled={disabled}
         onPress={() => setOpen(true)}
         className={cn(
           "h-11 justify-center rounded-lg border border-border px-3",
-          isDisabled && "opacity-50"
+          disabled && "opacity-50"
         )}
       >
         <Text
@@ -54,7 +79,7 @@ export function DatePicker({
         </Text>
       </Pressable>
 
-      {open && (
+      {open && DateTimePicker && (
         <DateTimePicker
           value={value ?? new Date()}
           mode={mode === "datetime" ? "date" : mode}
