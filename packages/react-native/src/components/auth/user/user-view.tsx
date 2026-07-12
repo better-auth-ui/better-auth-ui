@@ -55,7 +55,11 @@ export function UserView({
   if ((isPending || sessionPending) && !user) {
     return (
       <View className={cn("flex-row items-center gap-2", className)}>
-        <UserAvatar isPending size={size === "lg" ? "md" : "sm"} />
+        <UserAvatar
+          isPending
+          size={size === "lg" ? "md" : "sm"}
+          className={size === "sm" ? "size-5" : undefined}
+        />
 
         <View className="gap-1">
           <Skeleton className="h-3.5 w-24 rounded-lg" />
@@ -68,7 +72,11 @@ export function UserView({
 
   return (
     <View className={cn("flex-row items-center gap-2", className)}>
-      <UserAvatar user={resolvedUser} size={size === "lg" ? "md" : "sm"} />
+      <UserAvatar
+        user={resolvedUser}
+        size={size === "lg" ? "md" : "sm"}
+        className={size === "sm" ? "size-5" : undefined}
+      />
 
       <View>
         <Text className="text-sm font-medium leading-tight">
