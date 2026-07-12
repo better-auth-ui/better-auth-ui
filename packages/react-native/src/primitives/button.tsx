@@ -1,6 +1,7 @@
 import { Children, type ReactNode } from "react"
 import {
   ActivityIndicator,
+  type GestureResponderEvent,
   Pressable,
   type PressableProps,
   Text
@@ -12,6 +13,7 @@ import {
   buttonVariants
 } from "../lib/button-variants"
 import { cn } from "../lib/cn"
+import { useForm } from "./form"
 
 /** Concrete indicator color per variant (light-mode calibrated). */
 const SPINNER_COLOR: Record<ButtonVariant, string> = {
@@ -50,7 +52,7 @@ export function Button({
   isPending = false,
   isDisabled = false,
   isIconOnly = false,
-  type: _type,
+  type,
   className,
   textClassName,
   onPress,
@@ -59,6 +61,18 @@ export function Button({
   ...props
 }: ButtonProps) {
   const disabled = isDisabled || isPending
+  const form = useForm()
+
+  // A `type="submit"` button with no explicit handler drives the enclosing
+  // Form (validate all fields, then run its onSubmit) — the RN stand-in for a
+  // native form submit.
+  const handlePress = (event: GestureResponderEvent) => {
+    if (onPress) {
+      onPress(event)
+      return
+    }
+    if (type === "submit") form?.submit()
+  }
 
   return (
     <Pressable
@@ -66,7 +80,7 @@ export function Button({
       accessibilityLabel={ariaLabel}
       accessibilityState={{ disabled, busy: isPending }}
       disabled={disabled}
-      onPress={onPress}
+      onPress={handlePress}
       className={cn(
         buttonVariants({ variant, size, isIconOnly, disabled }),
         className
