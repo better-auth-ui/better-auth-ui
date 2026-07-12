@@ -35,13 +35,20 @@ export interface InputProps {
   className?: string
   /** Override password masking (used by the show/hide toggle). */
   secureTextEntry?: boolean
+  /** Forwarded autoComplete; overrides the enclosing field's. */
+  autoComplete?: string
 }
 
 /**
  * Text input bound to the enclosing `TextField` context (value, validation,
  * keyboard/masking derived from the field `type`).
  */
-export function Input({ placeholder, className, secureTextEntry }: InputProps) {
+export function Input({
+  placeholder,
+  className,
+  secureTextEntry,
+  autoComplete
+}: InputProps) {
   const field = useField()
   const colors = useThemeColors()
   const isPassword = field.type === "password"
@@ -55,7 +62,7 @@ export function Input({ placeholder, className, secureTextEntry }: InputProps) {
       placeholderTextColor={colors.muted}
       autoCapitalize={field.type === "text" ? "sentences" : "none"}
       autoCorrect={field.type === "text"}
-      autoComplete={autoCompleteFor(field.autoComplete)}
+      autoComplete={autoCompleteFor(autoComplete ?? field.autoComplete)}
       keyboardType={keyboardFor(field.type)}
       secureTextEntry={secureTextEntry ?? isPassword}
       className={cn(BASE_INPUT, field.isDisabled && "opacity-50", className)}
@@ -93,12 +100,14 @@ function InputGroupInput({
   placeholder,
   type = "text",
   required: _required,
+  autoComplete,
   className
 }: {
   name?: string
   placeholder?: string
   type?: "text" | "password"
   required?: boolean
+  autoComplete?: string
   className?: string
 }) {
   const field = useField()
@@ -111,7 +120,7 @@ function InputGroupInput({
       placeholder={placeholder}
       placeholderTextColor={colors.muted}
       autoCapitalize="none"
-      autoComplete={autoCompleteFor(field.autoComplete)}
+      autoComplete={autoCompleteFor(autoComplete ?? field.autoComplete)}
       secureTextEntry={type === "password"}
       className={cn("h-full flex-1 text-base text-foreground", className)}
     />
