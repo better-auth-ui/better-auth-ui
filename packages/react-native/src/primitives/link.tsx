@@ -3,10 +3,13 @@ import type { ReactNode } from "react"
 import { Linking, Text } from "react-native"
 import { cn } from "../lib/cn"
 import { useAuthNavigation } from "../navigation/navigation-context"
+import type { ViewTarget } from "../navigation/types"
 
 export interface LinkProps {
-  /** Internal auth view to navigate to (preferred for in-app links). */
+  /** Internal auth view to navigate to (shorthand for `{ section: "auth", view }`). */
   view?: AuthView
+  /** Section-qualified target (settings / organization). Takes precedence over `view`. */
+  target?: ViewTarget
   /** External URL — opened in the system browser. */
   href?: string
   params?: Record<string, string>
@@ -26,6 +29,7 @@ export interface LinkProps {
  */
 export function Link({
   view,
+  target,
   href,
   params,
   replace,
@@ -40,6 +44,10 @@ export function Link({
     if (isDisabled) return
     if (onPress) {
       onPress()
+      return
+    }
+    if (target) {
+      navigation.push(target, { params, replace })
       return
     }
     if (view) {

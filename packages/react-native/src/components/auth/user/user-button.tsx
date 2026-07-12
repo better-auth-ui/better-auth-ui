@@ -113,8 +113,7 @@ export function UserButton({
   hideSettings,
   hideSubtitle
 }: UserButtonProps) {
-  const { authClient, basePaths, localization, plugins, viewPaths, navigate } =
-    useAuth()
+  const { authClient, localization, plugins } = useAuth()
   const navigation = useAuthNavigation()
 
   const { data: session, isPending: sessionPending } = useSession(authClient)
@@ -212,9 +211,7 @@ export function UserButton({
                     className="flex-row items-center gap-2 px-3 py-2"
                     onPress={() => {
                       setOpen(false)
-                      navigate({
-                        to: `${basePaths.settings}/${viewPaths.settings.account}`
-                      })
+                      navigation.push({ section: "settings", view: "account" })
                     }}
                   >
                     <Gear width={18} height={18} color="#a3a3a3" />
