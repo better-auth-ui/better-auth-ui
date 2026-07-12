@@ -57,7 +57,9 @@ export function Auth({
   const { emailAndPassword } = useAuth()
   const navigation = useAuthNavigation()
 
-  const authView = view ?? navigation.current() ?? "signIn"
+  const current = navigation.current()
+  const authView =
+    view ?? (current?.section === "auth" ? current.view : undefined) ?? "signIn"
 
   const shouldRedirectToSignIn =
     !emailAndPassword?.enabled && PASSWORD_ONLY_VIEWS.includes(authView)
