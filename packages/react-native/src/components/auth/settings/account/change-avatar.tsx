@@ -36,10 +36,9 @@ export function ChangeAvatar({ className }: ChangeAvatarProps) {
     useUpdateUser(authClient)
 
   const [isUploading, setIsUploading] = useState(false)
-  const [isDeleting, setIsDeleting] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
 
-  const isPending = updatePending || isUploading || isDeleting
+  const isPending = updatePending || isUploading
 
   async function handleUpload() {
     setIsUploading(true)
