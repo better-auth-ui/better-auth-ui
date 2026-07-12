@@ -14,13 +14,15 @@
   ],
   "exports": {
     ".": {
-      "src": "./src/index.ts",
       "types": "./dist/index.d.ts",
+      "react-native": "./src/index.ts",
+      "src": "./src/index.ts",
       "import": "./dist/index.js"
     },
     "./plugins": {
-      "src": "./src/plugins.ts",
       "types": "./dist/plugins.d.ts",
+      "react-native": "./src/plugins.ts",
+      "src": "./src/plugins.ts",
       "import": "./dist/plugins.js"
     },
     "./preset": "./preset.js",
