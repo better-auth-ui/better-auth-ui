@@ -8,9 +8,9 @@ import {
   useRef,
   useState
 } from "react"
-import { Text, View } from "react-native"
 import { cn } from "../lib/cn"
 import { useForm } from "./form"
+import { Box, Txt } from "./styled"
 
 export type FieldType = "text" | "email" | "password"
 
@@ -110,7 +110,7 @@ export function TextField({
 
   return (
     <FieldContext.Provider value={context}>
-      <View className={cn("gap-1.5", className)}>{children}</View>
+      <Box className={cn("gap-1.5", className)}>{children}</Box>
     </FieldContext.Provider>
   )
 }
@@ -126,7 +126,7 @@ export function Label({
   children?: ReactNode
 }) {
   return (
-    <Text
+    <Txt
       className={cn(
         "text-sm font-medium text-foreground",
         isDisabled && "opacity-50",
@@ -134,7 +134,7 @@ export function Label({
       )}
     >
       {children}
-    </Text>
+    </Txt>
   )
 }
 
@@ -142,5 +142,5 @@ export function Label({
 export function FieldError({ className }: { className?: string }) {
   const { error } = useField()
   if (!error) return null
-  return <Text className={cn("text-sm text-danger", className)}>{error}</Text>
+  return <Txt className={cn("text-sm text-danger", className)}>{error}</Txt>
 }

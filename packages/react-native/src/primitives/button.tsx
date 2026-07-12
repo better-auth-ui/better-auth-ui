@@ -2,9 +2,7 @@ import { Children, type ReactNode } from "react"
 import {
   ActivityIndicator,
   type GestureResponderEvent,
-  Pressable,
-  type PressableProps,
-  Text
+  type PressableProps
 } from "react-native"
 import {
   type ButtonSize,
@@ -16,6 +14,7 @@ import {
 import { cn } from "../lib/cn"
 import { useThemeColors } from "../lib/theme-colors"
 import { useForm } from "./form"
+import { Btn, Txt } from "./styled"
 
 export interface ButtonProps
   extends Omit<PressableProps, "children" | "disabled" | "style"> {
@@ -69,7 +68,7 @@ export function Button({
   }
 
   return (
-    <Pressable
+    <Btn
       accessibilityRole="button"
       accessibilityLabel={ariaLabel}
       accessibilityState={{ disabled, busy: isPending }}
@@ -90,15 +89,15 @@ export function Button({
 
       {Children.map(children, (child) =>
         typeof child === "string" || typeof child === "number" ? (
-          <Text
+          <Txt
             className={cn(buttonTextVariants({ variant, size }), textClassName)}
           >
             {child}
-          </Text>
+          </Txt>
         ) : (
           child
         )
       )}
-    </Pressable>
+    </Btn>
   )
 }
