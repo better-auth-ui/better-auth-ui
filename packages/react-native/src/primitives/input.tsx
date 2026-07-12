@@ -37,6 +37,8 @@ export interface InputProps {
   secureTextEntry?: boolean
   /** Forwarded autoComplete; overrides the enclosing field's. */
   autoComplete?: string
+  /** Override the keyboard type (e.g. numeric for a number additional field). */
+  keyboardType?: TextInputProps["keyboardType"]
 }
 
 /**
@@ -47,7 +49,8 @@ export function Input({
   placeholder,
   className,
   secureTextEntry,
-  autoComplete
+  autoComplete,
+  keyboardType
 }: InputProps) {
   const field = useField()
   const colors = useThemeColors()
@@ -63,7 +66,7 @@ export function Input({
       autoCapitalize={field.type === "text" ? "sentences" : "none"}
       autoCorrect={field.type === "text"}
       autoComplete={autoCompleteFor(autoComplete ?? field.autoComplete)}
-      keyboardType={keyboardFor(field.type)}
+      keyboardType={keyboardType ?? keyboardFor(field.type)}
       secureTextEntry={secureTextEntry ?? isPassword}
       className={cn(BASE_INPUT, field.isDisabled && "opacity-50", className)}
     />
@@ -101,6 +104,7 @@ function InputGroupInput({
   type = "text",
   required: _required,
   autoComplete,
+  keyboardType,
   className
 }: {
   name?: string
@@ -108,6 +112,7 @@ function InputGroupInput({
   type?: "text" | "password"
   required?: boolean
   autoComplete?: string
+  keyboardType?: TextInputProps["keyboardType"]
   className?: string
 }) {
   const field = useField()
@@ -121,6 +126,7 @@ function InputGroupInput({
       placeholderTextColor={colors.muted}
       autoCapitalize="none"
       autoComplete={autoCompleteFor(autoComplete ?? field.autoComplete)}
+      keyboardType={keyboardType}
       secureTextEntry={type === "password"}
       className={cn("h-full flex-1 text-base text-foreground", className)}
     />

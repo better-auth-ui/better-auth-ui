@@ -77,7 +77,7 @@ export function DeleteAccount({ className, variant }: DeleteAccountProps) {
         } else {
           toast.success(deleteUserLocalization.deleteUserSuccess)
           queryClient.removeQueries({ queryKey: authQueryKeys.all })
-          navigation.push("signIn")
+          navigation.push("signIn", { replace: true })
         }
       }
     })
@@ -157,7 +157,7 @@ export function DeleteAccount({ className, variant }: DeleteAccountProps) {
               <Button
                 variant="tertiary"
                 isDisabled={isPending}
-                onPress={() => setConfirmOpen(false)}
+                onPress={() => handleDialogOpenChange(false)}
               >
                 {localization.settings.cancel}
               </Button>
