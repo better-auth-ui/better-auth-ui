@@ -11,7 +11,7 @@ export function Skeleton({
 }: Omit<ViewProps, "style"> & { className?: string }) {
   return (
     <View
-      className={cn("bg-neutral-200 opacity-70 dark:bg-neutral-800", className)}
+      className={cn("bg-surface-secondary opacity-80", className)}
       {...props}
     />
   )

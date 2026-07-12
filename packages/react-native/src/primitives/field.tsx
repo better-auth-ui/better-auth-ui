@@ -124,12 +124,7 @@ export function Label({
   children?: ReactNode
 }) {
   return (
-    <Text
-      className={cn(
-        "text-sm font-medium text-neutral-800 dark:text-neutral-200",
-        className
-      )}
-    >
+    <Text className={cn("text-sm font-medium text-foreground", className)}>
       {children}
     </Text>
   )
@@ -139,9 +134,5 @@ export function Label({
 export function FieldError({ className }: { className?: string }) {
   const { error } = useField()
   if (!error) return null
-  return (
-    <Text className={cn("text-sm text-red-600 dark:text-red-400", className)}>
-      {error}
-    </Text>
-  )
+  return <Text className={cn("text-sm text-danger", className)}>{error}</Text>
 }
