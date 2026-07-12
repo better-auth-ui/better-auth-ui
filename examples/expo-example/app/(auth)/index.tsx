@@ -1,4 +1,8 @@
 import { Auth, AuthProvider } from "@better-auth-ui/react-native"
+import {
+  magicLinkPlugin,
+  themePlugin
+} from "@better-auth-ui/react-native/plugins"
 import { View } from "react-native"
 import { SafeAreaView } from "react-native-safe-area-context"
 import { authClient } from "../../src/auth-client"
@@ -12,6 +16,7 @@ export default function AuthScreen() {
     <AuthProvider
       authClient={authClient}
       socialProviders={["github", "google"]}
+      plugins={[magicLinkPlugin(), themePlugin()]}
     >
       <SafeAreaView className="flex-1 bg-neutral-50 dark:bg-neutral-950">
         <View className="flex-1 items-center justify-center p-6">
