@@ -233,10 +233,9 @@ function OrganizationMemberRow({
   isOwner?: boolean
   organization?: Organization
 }) {
-  const { authClient, localization } = useAuth()
+  const { authClient } = useAuth()
   const { localization: organizationLocalization, roles } =
     useAuthPlugin(organizationPlugin)
-  const colors = useThemeColors()
 
   const { data: session } = useSession(authClient)
 
