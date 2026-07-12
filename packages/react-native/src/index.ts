@@ -21,6 +21,7 @@ export * from "./components/auth/user/user-view"
 export * from "./components/auth/verify-email"
 // Provider icons (react-native-svg)
 export * from "./components/icons"
+export * from "./lib/auth-plugin"
 export * from "./lib/button-variants"
 export * from "./lib/cn"
 export * from "./lib/pending-email"

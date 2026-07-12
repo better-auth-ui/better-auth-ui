@@ -18,6 +18,11 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
     },
+    "./plugins": {
+      "src": "./src/plugins.ts",
+      "types": "./dist/plugins.d.ts",
+      "import": "./dist/plugins.js"
+    },
     "./preset": "./preset.js",
     "./theme.css": "./theme.css"
   },
