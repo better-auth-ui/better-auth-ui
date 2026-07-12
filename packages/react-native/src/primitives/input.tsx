@@ -1,8 +1,10 @@
 import type { ReactNode } from "react"
-import { TextInput, type TextInputProps, View } from "react-native"
+import { TextInput, type TextInputProps } from "react-native"
 import { cn } from "../lib/cn"
 import { useThemeColors } from "../lib/theme-colors"
+import { tw } from "../lib/tw"
 import { type FieldType, useField } from "./field"
+import { Box } from "./styled"
 
 export type InputVariant = "primary" | "secondary"
 
@@ -68,7 +70,10 @@ export function Input({
       autoComplete={autoCompleteFor(autoComplete ?? field.autoComplete)}
       keyboardType={keyboardType ?? keyboardFor(field.type)}
       secureTextEntry={secureTextEntry ?? isPassword}
-      className={cn(BASE_INPUT, field.isDisabled && "opacity-50", className)}
+      style={tw(
+        cn(BASE_INPUT, field.isDisabled && "opacity-50", className),
+        colors
+      )}
     />
   )
 }
@@ -87,14 +92,14 @@ function InputGroupBase({
   children?: ReactNode
 }) {
   return (
-    <View
+    <Box
       className={cn(
         "h-11 flex-row items-center rounded-lg border border-border pl-3",
         className
       )}
     >
       {children}
-    </View>
+    </Box>
   )
 }
 
@@ -128,7 +133,10 @@ function InputGroupInput({
       autoComplete={autoCompleteFor(autoComplete ?? field.autoComplete)}
       keyboardType={keyboardType}
       secureTextEntry={type === "password"}
-      className={cn("h-full flex-1 text-base text-foreground", className)}
+      style={tw(
+        cn("h-full flex-1 text-base text-foreground", className),
+        colors
+      )}
     />
   )
 }
@@ -141,9 +149,9 @@ function InputGroupAdornment({
   children?: ReactNode
 }) {
   return (
-    <View className={cn("h-full items-center justify-center px-2", className)}>
+    <Box className={cn("h-full items-center justify-center px-2", className)}>
       {children}
-    </View>
+    </Box>
   )
 }
 
