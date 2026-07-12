@@ -1,4 +1,3 @@
-import type { AuthPlugin as ReactAuthPlugin } from "@better-auth-ui/react"
 import { useAuth, useSession } from "@better-auth-ui/react"
 import {
   isValidElement,
@@ -20,14 +19,6 @@ import {
 } from "../../../primitives/ui-icons"
 import { UserAvatar } from "./user-avatar"
 import { UserView } from "./user-view"
-
-// Widen the plugin type `useAuth().plugins` resolves to so RN plugins can
-// contribute `userMenuItems`, mirroring the heroui registration.
-declare module "@better-auth-ui/core" {
-  interface AuthPluginRegister {
-    reactNative: ReactAuthPlugin
-  }
-}
 
 /** Auth states a `UserButton` link can be visible in. */
 export type UserButtonLinkVisibility =

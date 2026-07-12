@@ -43,10 +43,15 @@ export function SignUp({
     authClient,
     emailAndPassword,
     localization,
+    plugins,
     redirectTo,
     socialProviders,
     navigate
   } = useAuth()
+
+  const captcha = plugins.find(
+    (plugin) => plugin.captchaComponent
+  )?.captchaComponent
 
   const navigation = useAuthNavigation()
   const { fetchOptions, resetFetchOptions } = useFetchOptions()
@@ -281,6 +286,8 @@ export function SignUp({
               </TextField>
             )}
 
+            {captcha}
+
             <View className="gap-3">
               <Button
                 type="submit"
@@ -290,6 +297,15 @@ export function SignUp({
               >
                 {localization.auth.signUp}
               </Button>
+
+              {plugins.flatMap((plugin) =>
+                (plugin.authButtons ?? []).map((AuthButton, index) => (
+                  <AuthButton
+                    key={`${plugin.id}-${index.toString()}`}
+                    view="signUp"
+                  />
+                ))
+              )}
             </View>
           </Form>
         )}

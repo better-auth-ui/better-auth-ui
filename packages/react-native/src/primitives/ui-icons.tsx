@@ -132,6 +132,14 @@ export function ChevronsExpandVertical(props: SvgProps) {
   )
 }
 
+export function ChevronDown(props: SvgProps) {
+  return (
+    <Base {...props}>
+      <Polyline points="6 9 12 15 18 9" />
+    </Base>
+  )
+}
+
 export function Check(props: SvgProps) {
   return (
     <Base {...props}>
@@ -145,6 +153,41 @@ export function Copy(props: SvgProps) {
     <Base {...props}>
       <Rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
       <Path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+    </Base>
+  )
+}
+
+export function Search(props: SvgProps) {
+  return (
+    <Base {...props}>
+      <Circle cx="11" cy="11" r="8" />
+      <Line x1="21" y1="21" x2="16.65" y2="16.65" />
+    </Base>
+  )
+}
+
+export function Minus(props: SvgProps) {
+  return (
+    <Base {...props}>
+      <Line x1="5" y1="12" x2="19" y2="12" />
+    </Base>
+  )
+}
+
+export function Plus(props: SvgProps) {
+  return (
+    <Base {...props}>
+      <Line x1="12" y1="5" x2="12" y2="19" />
+      <Line x1="5" y1="12" x2="19" y2="12" />
+    </Base>
+  )
+}
+
+export function Xmark(props: SvgProps) {
+  return (
+    <Base {...props}>
+      <Line x1="18" y1="6" x2="6" y2="18" />
+      <Line x1="6" y1="6" x2="18" y2="18" />
     </Base>
   )
 }
