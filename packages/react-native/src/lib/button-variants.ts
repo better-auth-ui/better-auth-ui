@@ -1,12 +1,10 @@
 import { cn } from "./cn"
+import type { ThemeColorName } from "./theme-colors"
 
 /**
- * Button visual variants, expressed as nativewind class strings. Shared by the
- * `Button` primitive and by `Link` when it renders as a button (mirrors the web
- * `buttonVariants` helper from `@heroui/styles`).
- *
- * The primitives own the visual theme with concrete Tailwind colors so that
- * component ports only ever pass structural/layout classes.
+ * Button visual variants as nativewind class strings, using the semantic theme
+ * tokens (see `preset.js` / `theme.css`). Shared by the `Button` primitive and
+ * by `Link` when it renders as a button.
  */
 export type ButtonVariant =
   | "primary"
@@ -14,23 +12,36 @@ export type ButtonVariant =
   | "tertiary"
   | "ghost"
   | "danger"
+  | "outline"
 
 export type ButtonSize = "default" | "sm"
 
 const VARIANT_CONTAINER: Record<ButtonVariant, string> = {
-  primary: "bg-neutral-900 dark:bg-white",
-  secondary: "bg-neutral-100 dark:bg-neutral-800",
-  tertiary: "bg-transparent border border-neutral-300 dark:border-neutral-700",
+  primary: "bg-accent",
+  secondary: "bg-surface-secondary",
+  tertiary: "bg-transparent border border-border",
+  outline: "bg-transparent border border-border",
   ghost: "bg-transparent",
-  danger: "bg-red-600"
+  danger: "bg-danger"
 }
 
 const VARIANT_TEXT: Record<ButtonVariant, string> = {
-  primary: "text-white dark:text-neutral-900",
-  secondary: "text-neutral-900 dark:text-neutral-50",
-  tertiary: "text-neutral-900 dark:text-neutral-50",
-  ghost: "text-neutral-900 dark:text-neutral-50",
-  danger: "text-white"
+  primary: "text-accent-foreground",
+  secondary: "text-foreground",
+  tertiary: "text-foreground",
+  outline: "text-foreground",
+  ghost: "text-foreground",
+  danger: "text-danger-foreground"
+}
+
+/** The theme-color token used for a variant's foreground (spinner/icon tint). */
+export const VARIANT_FOREGROUND: Record<ButtonVariant, ThemeColorName> = {
+  primary: "accentForeground",
+  secondary: "foreground",
+  tertiary: "foreground",
+  outline: "foreground",
+  ghost: "foreground",
+  danger: "dangerForeground"
 }
 
 const SIZE_CONTAINER: Record<ButtonSize, string> = {
@@ -43,9 +54,7 @@ const SIZE_TEXT: Record<ButtonSize, string> = {
   sm: "text-sm"
 }
 
-/**
- * Container (Pressable/View) classes for a button variant + size.
- */
+/** Container (Pressable/View) classes for a button variant + size. */
 export function buttonVariants({
   variant = "tertiary",
   size = "default",
@@ -66,9 +75,7 @@ export function buttonVariants({
   )
 }
 
-/**
- * Text (label) classes for a button variant + size.
- */
+/** Text (label) classes for a button variant + size. */
 export function buttonTextVariants({
   variant = "tertiary",
   size = "default"

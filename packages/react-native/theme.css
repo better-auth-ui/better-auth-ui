@@ -1,8 +1,9 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
-/* @better-auth-ui/react-native semantic theme tokens (see the package's theme.css) */
+/*
+ * Default semantic theme tokens for @better-auth-ui/react-native.
+ * Import into your app's global.css (or copy the blocks) so the nativewind
+ * preset's semantic colors resolve. Override any --bau-* variable to re-theme;
+ * `--bau-accent` is the brand color.
+ */
 :root {
   --bau-accent: 37 99 235;
   --bau-accent-foreground: 255 255 255;

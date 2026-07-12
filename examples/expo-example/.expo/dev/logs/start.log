@@ -1,0 +1,34 @@
+{"_e":"root:init","_t":1783846704711,"format":"v0-jsonl","version":"57.0.6"}
+{"_e":"env:mode","_t":1783846704712,"nodeEnv":"development","babelEnv":"development","mode":"development"}
+{"_e":"env:load","_t":1783846704713,"mode":"development","files":[],"env":{}}
+{"_e":"devserver:start","_t":1783846704850,"mode":"development","web":true,"baseUrl":"","asyncRoutes":false,"routerRoot":"../../../app","serverComponents":false,"serverActions":false,"serverRendering":false,"apiRoutes":false,"exporting":false}
+{"_e":"metro:config","_t":1783846705703,"serverRoot":"../../../../..","projectRoot":"../../..","exporting":false,"flags":{"autolinkingModuleResolution":true,"serverActions":false,"serverComponents":false,"reactCompiler":false,"optimizeGraph":false,"treeshaking":false,"logbox":false}}
+{"_e":"expo:dev-tools-plugin:load","_t":1783846705804,"plugins":[]}
+{"_e":"metro:instantiate","_t":1783846706509,"atlas":false,"workers":7,"host":"::","port":8081}
+{"_e":"metro:bundling:started","_t":1783846707705,"id":"1","platform":"web","environment":null,"entry":"node_modules/expo-router/entry.js"}
+{"_e":"metro:bundling:done","_t":1783846711340,"id":"1","total":1412,"ms":3635.208292}
+{"_e":"metro:client_log","_t":1783846711525,"level":"info","data":["%cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools","font-weight:bold"]}
+{"_e":"metro:client_log","_t":1783846711525,"level":"log","data":["Running application \"main\" with appParams:\n","{\"hydrate\": undefined, \"rootTag\": \"#root\"}","\nDevelopment-level warnings: ON.\nPerformance optimizations: OFF."]}
+{"_e":"metro:client_log","_t":1783846711595,"level":"error","data":["[Error: Cannot manually set color scheme, as dark mode is type 'media'. Please use StyleSheet.setFlag('darkMode', 'class')]","\n\n\u001b[1mCode: color-scheme.js\u001b[22m\n\u001b[0m \u001b[90m 44 |\u001b[39m     \u001b[36mset\u001b[39m(value) {\n \u001b[90m 45 |\u001b[39m         \u001b[36mif\u001b[39m (darkMode \u001b[33m===\u001b[39m \u001b[32m\"media\"\u001b[39m) {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 46 |\u001b[39m             \u001b[36mthrow\u001b[39m \u001b[36mnew\u001b[39m \u001b[33mError\u001b[39m(\u001b[32m\"Cannot manually set color scheme, as dark mode is type 'media'. Please use StyleSheet.setFlag('darkMode', 'class')\"\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                   \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 47 |\u001b[39m         }\n \u001b[90m 48 |\u001b[39m         \u001b[36mif\u001b[39m (\u001b[33m!\u001b[39mglobalThis\u001b[33m.\u001b[39mwindow) {\n \u001b[90m 49 |\u001b[39m             \u001b[36mthrow\u001b[39m \u001b[36mnew\u001b[39m \u001b[33mError\u001b[39m(\u001b[32m\"Cannot manually set color scheme while not in a browser environment.\"\u001b[39m)\u001b[33m;\u001b[39m\u001b[0m\n\u001b[1mCall Stack\u001b[22m\n\u001b[2m\u001b[90m  exports.colorScheme.set (node_modules/react-native-css-interop/dist/runtime/web/color-scheme.js:46:19)\u001b[39m\u001b[22m\n\u001b[2m\u001b[90m  MutationObserver$argument_0 (node_modules/react-native-css-interop/dist/runtime/web/color-scheme.js:36:29)\u001b[39m\u001b[22m"]}
+{"_e":"root:init","_t":1783846763971,"format":"v0-jsonl","version":"57.0.6"}
+{"_e":"env:mode","_t":1783846763971,"nodeEnv":"development","babelEnv":"development","mode":"development"}
+{"_e":"env:load","_t":1783846763973,"mode":"development","files":[],"env":{}}
+{"_e":"devserver:start","_t":1783846764159,"mode":"development","web":true,"baseUrl":"","asyncRoutes":false,"routerRoot":"../../../app","serverComponents":false,"serverActions":false,"serverRendering":false,"apiRoutes":false,"exporting":false}
+{"_e":"metro:config","_t":1783846765031,"serverRoot":"../../../../..","projectRoot":"../../..","exporting":false,"flags":{"autolinkingModuleResolution":true,"serverActions":false,"serverComponents":false,"reactCompiler":false,"optimizeGraph":false,"treeshaking":false,"logbox":false}}
+{"_e":"expo:dev-tools-plugin:load","_t":1783846765128,"plugins":[]}
+{"_e":"metro:instantiate","_t":1783846765786,"atlas":false,"workers":7,"host":"::","port":8081}
+{"_e":"metro:bundling:started","_t":1783846766936,"id":"1","platform":"web","environment":null,"entry":"node_modules/expo-router/entry.js"}
+{"_e":"metro:bundling:done","_t":1783846767435,"id":"1","total":1407,"ms":498.603333}
+{"_e":"metro:client_log","_t":1783846767612,"level":"info","data":["%cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools","font-weight:bold"]}
+{"_e":"metro:client_log","_t":1783846767613,"level":"log","data":["Running application \"main\" with appParams:\n","{\"hydrate\": undefined, \"rootTag\": \"#root\"}","\nDevelopment-level warnings: ON.\nPerformance optimizations: OFF."]}
+{"_e":"root:init","_t":1783850815573,"format":"v0-jsonl","version":"57.0.6"}
+{"_e":"env:mode","_t":1783850815573,"nodeEnv":"development","babelEnv":"development","mode":"development"}
+{"_e":"env:load","_t":1783850815575,"mode":"development","files":[],"env":{}}
+{"_e":"devserver:start","_t":1783850815776,"mode":"development","web":true,"baseUrl":"","asyncRoutes":false,"routerRoot":"../../../app","serverComponents":false,"serverActions":false,"serverRendering":false,"apiRoutes":false,"exporting":false}
+{"_e":"metro:config","_t":1783850816652,"serverRoot":"../../../../..","projectRoot":"../../..","exporting":false,"flags":{"autolinkingModuleResolution":true,"serverActions":false,"serverComponents":false,"reactCompiler":false,"optimizeGraph":false,"treeshaking":false,"logbox":false}}
+{"_e":"expo:dev-tools-plugin:load","_t":1783850816745,"plugins":[]}
+{"_e":"metro:instantiate","_t":1783850817535,"atlas":false,"workers":7,"host":"::","port":8081}
+{"_e":"metro:bundling:started","_t":1783850818506,"id":"1","platform":"web","environment":null,"entry":"node_modules/expo-router/entry.js"}
+{"_e":"metro:bundling:done","_t":1783850819613,"id":"1","total":1416,"ms":1106.515375}
+{"_e":"metro:client_log","_t":1783850819761,"level":"info","data":["%cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools","font-weight:bold"]}
+{"_e":"metro:client_log","_t":1783850819762,"level":"log","data":["Running application \"main\" with appParams:\n","{\"hydrate\": undefined, \"rootTag\": \"#root\"}","\nDevelopment-level warnings: ON.\nPerformance optimizations: OFF."]}

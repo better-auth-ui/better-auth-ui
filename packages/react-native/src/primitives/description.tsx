@@ -13,14 +13,5 @@ export function Description({
   className?: string
   children?: ReactNode
 }) {
-  return (
-    <Text
-      className={cn(
-        "text-sm text-neutral-500 dark:text-neutral-400",
-        className
-      )}
-    >
-      {children}
-    </Text>
-  )
+  return <Text className={cn("text-sm text-muted", className)}>{children}</Text>
 }

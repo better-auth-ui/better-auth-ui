@@ -1,6 +1,7 @@
 import type { ReactNode } from "react"
 import { Pressable, Text, View } from "react-native"
 import { cn } from "../lib/cn"
+import { useThemeColors } from "../lib/theme-colors"
 import { Check } from "./ui-icons"
 
 export interface CheckboxProps {
@@ -24,6 +25,7 @@ export function Checkbox({
   className,
   children
 }: CheckboxProps) {
+  const colors = useThemeColors()
   return (
     <Pressable
       accessibilityRole="checkbox"
@@ -39,18 +41,16 @@ export function Checkbox({
       <View
         className={cn(
           "h-5 w-5 items-center justify-center rounded border",
-          isSelected
-            ? "border-neutral-900 bg-neutral-900 dark:border-white dark:bg-white"
-            : "border-neutral-400 dark:border-neutral-600"
+          isSelected ? "border-accent bg-accent" : "border-border"
         )}
       >
-        {isSelected && <Check width={14} height={14} color="#ffffff" />}
+        {isSelected && (
+          <Check width={14} height={14} color={colors.accentForeground} />
+        )}
       </View>
 
       {typeof children === "string" ? (
-        <Text className="text-sm text-neutral-800 dark:text-neutral-200">
-          {children}
-        </Text>
+        <Text className="text-sm text-foreground">{children}</Text>
       ) : (
         children
       )}

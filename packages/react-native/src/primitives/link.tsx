@@ -64,7 +64,7 @@ export function Link({
       accessibilityRole="link"
       onPress={handlePress}
       className={cn(
-        "font-medium text-neutral-900 dark:text-neutral-50",
+        "font-medium text-accent",
         isDisabled && "opacity-50",
         className
       )}

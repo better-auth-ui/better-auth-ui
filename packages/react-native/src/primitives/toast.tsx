@@ -65,7 +65,7 @@ export function ToastHost() {
           key={item.id}
           className={cn(
             "max-w-sm rounded-xl px-4 py-3 shadow-lg",
-            item.type === "success" ? "bg-green-600" : "bg-red-600"
+            item.type === "success" ? "bg-green-600" : "bg-danger"
           )}
         >
           <Text className="text-center text-sm font-medium text-white">
