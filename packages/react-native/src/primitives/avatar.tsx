@@ -37,7 +37,7 @@ function AvatarBase({ size = "sm", className, children }: AvatarProps) {
     <AvatarContext.Provider value={context}>
       <View
         className={cn(
-          "items-center justify-center overflow-hidden rounded-full bg-neutral-200 dark:bg-neutral-800",
+          "items-center justify-center overflow-hidden rounded-full bg-surface-secondary",
           SIZE_CLASS[size],
           className
         )}
@@ -76,9 +76,7 @@ function AvatarFallback({
   return (
     <View className={cn("items-center justify-center", className)}>
       {typeof children === "string" ? (
-        <Text className="text-sm font-medium text-neutral-700 dark:text-neutral-200">
-          {children}
-        </Text>
+        <Text className="text-sm font-medium text-foreground">{children}</Text>
       ) : (
         children
       )}

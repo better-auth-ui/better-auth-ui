@@ -10,19 +10,12 @@ import {
   type ButtonSize,
   type ButtonVariant,
   buttonTextVariants,
-  buttonVariants
+  buttonVariants,
+  VARIANT_FOREGROUND
 } from "../lib/button-variants"
 import { cn } from "../lib/cn"
+import { useThemeColors } from "../lib/theme-colors"
 import { useForm } from "./form"
-
-/** Concrete indicator color per variant (light-mode calibrated). */
-const SPINNER_COLOR: Record<ButtonVariant, string> = {
-  primary: "#ffffff",
-  secondary: "#171717",
-  tertiary: "#171717",
-  ghost: "#171717",
-  danger: "#ffffff"
-}
 
 export interface ButtonProps
   extends Omit<PressableProps, "children" | "disabled" | "style"> {
@@ -62,6 +55,7 @@ export function Button({
 }: ButtonProps) {
   const disabled = isDisabled || isPending
   const form = useForm()
+  const colors = useThemeColors()
 
   // A `type="submit"` button with no explicit handler drives the enclosing
   // Form (validate all fields, then run its onSubmit) — the RN stand-in for a
@@ -88,7 +82,10 @@ export function Button({
       {...props}
     >
       {isPending && (
-        <ActivityIndicator size="small" color={SPINNER_COLOR[variant]} />
+        <ActivityIndicator
+          size="small"
+          color={colors[VARIANT_FOREGROUND[variant]]}
+        />
       )}
 
       {Children.map(children, (child) =>

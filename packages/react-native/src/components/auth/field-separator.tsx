@@ -11,9 +11,7 @@ export function FieldSeparator({ children }: { children: ReactNode }) {
     <View className="flex-row items-center gap-4">
       <Separator className="flex-1" />
 
-      <Text className="shrink-0 text-xs text-neutral-500 dark:text-neutral-400">
-        {children}
-      </Text>
+      <Text className="shrink-0 text-xs text-muted">{children}</Text>
 
       <Separator className="flex-1" />
     </View>

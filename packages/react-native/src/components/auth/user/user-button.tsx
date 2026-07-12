@@ -8,6 +8,7 @@ import {
 } from "react"
 import { Linking, Modal, Pressable, Text, View } from "react-native"
 import { cn } from "../../../lib/cn"
+import { useThemeColors } from "../../../lib/theme-colors"
 import { useAuthNavigation } from "../../../navigation/navigation-context"
 import { Button, type ButtonProps } from "../../../primitives/button"
 import {
@@ -115,6 +116,7 @@ export function UserButton({
 }: UserButtonProps) {
   const { authClient, localization, plugins } = useAuth()
   const navigation = useAuthNavigation()
+  const colors = useThemeColors()
 
   const { data: session, isPending: sessionPending } = useSession(authClient)
 
@@ -176,7 +178,7 @@ export function UserButton({
           <ChevronsExpandVertical
             width={12}
             height={12}
-            color="#a3a3a3"
+            color={colors.muted}
             className="ml-auto"
           />
         </Button>
@@ -214,7 +216,7 @@ export function UserButton({
                       navigation.push({ section: "settings", view: "account" })
                     }}
                   >
-                    <Gear width={18} height={18} color="#a3a3a3" />
+                    <Gear width={18} height={18} color={colors.muted} />
                     <Text className="text-sm text-neutral-900 dark:text-neutral-50">
                       {localization.settings.settings}
                     </Text>
@@ -233,7 +235,7 @@ export function UserButton({
                   <ArrowRightFromSquare
                     width={18}
                     height={18}
-                    color="#dc2626"
+                    color={colors.danger}
                   />
                   <Text className="text-sm text-red-600 dark:text-red-400">
                     {localization.auth.signOut}
@@ -251,7 +253,11 @@ export function UserButton({
                     navigation.push("signIn")
                   }}
                 >
-                  <ArrowRightToSquare width={18} height={18} color="#a3a3a3" />
+                  <ArrowRightToSquare
+                    width={18}
+                    height={18}
+                    color={colors.muted}
+                  />
                   <Text className="text-sm text-neutral-900 dark:text-neutral-50">
                     {localization.auth.signIn}
                   </Text>
@@ -264,7 +270,7 @@ export function UserButton({
                     navigation.push("signUp")
                   }}
                 >
-                  <PersonPlus width={18} height={18} color="#a3a3a3" />
+                  <PersonPlus width={18} height={18} color={colors.muted} />
                   <Text className="text-sm text-neutral-900 dark:text-neutral-50">
                     {localization.auth.signUp}
                   </Text>

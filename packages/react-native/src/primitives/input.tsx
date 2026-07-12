@@ -1,11 +1,10 @@
 import type { ReactNode } from "react"
 import { TextInput, type TextInputProps, View } from "react-native"
 import { cn } from "../lib/cn"
+import { useThemeColors } from "../lib/theme-colors"
 import { type FieldType, useField } from "./field"
 
 export type InputVariant = "primary" | "secondary"
-
-const PLACEHOLDER_COLOR = "#9ca3af"
 
 function keyboardFor(type: FieldType): TextInputProps["keyboardType"] {
   return type === "email" ? "email-address" : "default"
@@ -27,13 +26,7 @@ function autoCompleteFor(value?: string): TextInputProps["autoComplete"] {
 }
 
 const BASE_INPUT =
-  "h-11 rounded-lg border px-3 text-base text-neutral-900 dark:text-neutral-50"
-
-function variantBorder(variant: InputVariant): string {
-  return variant === "primary"
-    ? "border-neutral-400 dark:border-neutral-500"
-    : "border-neutral-300 dark:border-neutral-700"
-}
+  "h-11 rounded-lg border border-border px-3 text-base text-foreground"
 
 export interface InputProps {
   placeholder?: string
@@ -48,13 +41,9 @@ export interface InputProps {
  * Text input bound to the enclosing `TextField` context (value, validation,
  * keyboard/masking derived from the field `type`).
  */
-export function Input({
-  placeholder,
-  variant = "secondary",
-  className,
-  secureTextEntry
-}: InputProps) {
+export function Input({ placeholder, className, secureTextEntry }: InputProps) {
   const field = useField()
+  const colors = useThemeColors()
   const isPassword = field.type === "password"
 
   return (
@@ -63,18 +52,13 @@ export function Input({
       onChangeText={field.setValue}
       editable={!field.isDisabled}
       placeholder={placeholder}
-      placeholderTextColor={PLACEHOLDER_COLOR}
+      placeholderTextColor={colors.muted}
       autoCapitalize={field.type === "text" ? "sentences" : "none"}
       autoCorrect={field.type === "text"}
       autoComplete={autoCompleteFor(field.autoComplete)}
       keyboardType={keyboardFor(field.type)}
       secureTextEntry={secureTextEntry ?? isPassword}
-      className={cn(
-        BASE_INPUT,
-        variantBorder(variant),
-        field.isDisabled && "opacity-50",
-        className
-      )}
+      className={cn(BASE_INPUT, field.isDisabled && "opacity-50", className)}
     />
   )
 }
@@ -85,7 +69,6 @@ export function Input({
  * pattern: a masked `InputGroup.Input` with a toggle `Button` in the `Suffix`.
  */
 function InputGroupBase({
-  variant = "secondary",
   className,
   children
 }: {
@@ -96,8 +79,7 @@ function InputGroupBase({
   return (
     <View
       className={cn(
-        "h-11 flex-row items-center rounded-lg border pl-3",
-        variantBorder(variant),
+        "h-11 flex-row items-center rounded-lg border border-border pl-3",
         className
       )}
     >
@@ -120,20 +102,18 @@ function InputGroupInput({
   className?: string
 }) {
   const field = useField()
+  const colors = useThemeColors()
   return (
     <TextInput
       value={field.value}
       onChangeText={field.setValue}
       editable={!field.isDisabled}
       placeholder={placeholder}
-      placeholderTextColor={PLACEHOLDER_COLOR}
+      placeholderTextColor={colors.muted}
       autoCapitalize="none"
       autoComplete={autoCompleteFor(field.autoComplete)}
       secureTextEntry={type === "password"}
-      className={cn(
-        "h-full flex-1 text-base text-neutral-900 dark:text-neutral-50",
-        className
-      )}
+      className={cn("h-full flex-1 text-base text-foreground", className)}
     />
   )
 }

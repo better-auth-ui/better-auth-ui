@@ -3,6 +3,7 @@ import { useAuth, useSignInSocial } from "@better-auth-ui/react"
 import { useIsMutating } from "@tanstack/react-query"
 import type { SocialProvider } from "better-auth/social-providers"
 import { providerIcons } from "../../lib/provider-icons"
+import { useThemeColors } from "../../lib/theme-colors"
 import { Button, type ButtonProps } from "../../primitives/button"
 
 export type ProviderButtonProps = {
@@ -21,6 +22,7 @@ export function ProviderButton({
   ...props
 }: ProviderButtonProps) {
   const { authClient, baseURL, localization, redirectTo } = useAuth()
+  const colors = useThemeColors()
 
   const callbackURL = `${baseURL}${redirectTo}`
 
@@ -45,7 +47,7 @@ export function ProviderButton({
       {...props}
     >
       {ProviderIcon ? (
-        <ProviderIcon width={20} height={20} color="#171717" />
+        <ProviderIcon width={20} height={20} color={colors.foreground} />
       ) : null}
 
       {display === "full"
