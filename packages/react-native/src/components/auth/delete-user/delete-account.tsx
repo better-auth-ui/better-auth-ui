@@ -7,7 +7,6 @@ import {
 } from "@better-auth-ui/react"
 import { useQueryClient } from "@tanstack/react-query"
 import { useState } from "react"
-import { Text, View } from "react-native"
 
 import { deleteUserPlugin } from "../../../lib/auth/delete-user-plugin"
 import type { SettingsViewProps } from "../../../lib/auth-plugin"
@@ -19,6 +18,7 @@ import { Card } from "../../../primitives/card"
 import { FieldError, Label, TextField } from "../../../primitives/field"
 import { Form } from "../../../primitives/form"
 import { InputGroup } from "../../../primitives/input"
+import { Box, Txt } from "../../../primitives/styled"
 import { toast } from "../../../primitives/toast"
 import { TriangleExclamation } from "../../../primitives/ui-icons"
 
@@ -86,15 +86,15 @@ export function DeleteAccount({ className, variant }: DeleteAccountProps) {
   return (
     <Card className={className} variant={variant}>
       <Card.Content className="flex-row items-center justify-between gap-4">
-        <View className="flex-1">
-          <Text className="text-sm font-medium leading-tight text-foreground">
+        <Box className="flex-1">
+          <Txt className="text-sm font-medium leading-tight text-foreground">
             {deleteUserLocalization.deleteAccount}
-          </Text>
+          </Txt>
 
-          <Text className="mt-0.5 text-xs text-muted">
+          <Txt className="mt-0.5 text-xs text-muted">
             {deleteUserLocalization.deleteAccountDescription}
-          </Text>
-        </View>
+          </Txt>
+        </Box>
 
         <Button
           isDisabled={!accounts}
@@ -124,9 +124,9 @@ export function DeleteAccount({ className, variant }: DeleteAccountProps) {
             </AlertDialog.Header>
 
             <AlertDialog.Body>
-              <Text className="text-sm text-muted">
+              <Txt className="text-sm text-muted">
                 {deleteUserLocalization.deleteAccountDescription}
-              </Text>
+              </Txt>
 
               {needsPassword && (
                 <TextField

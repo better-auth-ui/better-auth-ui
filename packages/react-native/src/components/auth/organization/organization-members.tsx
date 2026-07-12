@@ -8,7 +8,6 @@ import {
   useSession
 } from "@better-auth-ui/react"
 import { useMemo, useState } from "react"
-import { Text, View } from "react-native"
 
 import { organizationPlugin } from "../../../lib/auth/organization-plugin"
 import type { SettingsViewProps } from "../../../lib/auth-plugin"
@@ -17,6 +16,7 @@ import { Button } from "../../../primitives/button"
 import { Card } from "../../../primitives/card"
 import { SearchField } from "../../../primitives/inputs-extra"
 import { Menu } from "../../../primitives/menu"
+import { Box, Txt } from "../../../primitives/styled"
 import { Chip } from "../../../primitives/tabs"
 import { Filter, Xmark } from "../../../primitives/ui-icons"
 import { InviteMemberDialog } from "./invite-member-dialog"
@@ -89,14 +89,14 @@ export function OrganizationMembers({
   )
 
   return (
-    <View className={cn("flex-col gap-3", className)}>
-      <View className="flex-row items-end justify-between gap-3">
-        <Text
+    <Box className={cn("flex-col gap-3", className)}>
+      <Box className="flex-row items-end justify-between gap-3">
+        <Txt
           numberOfLines={1}
           className="shrink text-sm font-semibold text-foreground"
         >
           {organizationLocalization.members}
-        </Text>
+        </Txt>
 
         <Button
           className="shrink-0"
@@ -106,10 +106,10 @@ export function OrganizationMembers({
         >
           {organizationLocalization.inviteMember}
         </Button>
-      </View>
+      </Box>
 
-      <View className="flex-col gap-3">
-        <View className="flex-row items-center gap-3">
+      <Box className="flex-col gap-3">
+        <Box className="flex-row items-center gap-3">
           <SearchField
             className="min-w-0 flex-1"
             aria-label={organizationLocalization.search}
@@ -143,7 +143,7 @@ export function OrganizationMembers({
               </Menu.Item>
             ))}
           </Menu>
-        </View>
+        </Box>
 
         {roleFilter !== "all" && (
           <Chip className="w-fit flex-row items-center gap-1.5">
@@ -170,15 +170,15 @@ export function OrganizationMembers({
             {isPending ? (
               <>
                 <OrganizationMemberRowSkeleton />
-                <View className="-mx-4 my-4 border-b border-dashed border-border" />
+                <Box className="-mx-4 my-4 border-b border-dashed border-border" />
                 <OrganizationMemberRowSkeleton />
               </>
             ) : (
               !!activeOrganization &&
               filteredMembers?.map((member, index) => (
-                <View key={member.id}>
+                <Box key={member.id}>
                   {index > 0 && (
-                    <View className="-mx-4 my-4 border-b border-dashed border-border" />
+                    <Box className="-mx-4 my-4 border-b border-dashed border-border" />
                   )}
 
                   <OrganizationMemberRow
@@ -186,14 +186,14 @@ export function OrganizationMembers({
                     isOwner={isOwner}
                     organization={activeOrganization}
                   />
-                </View>
+                </Box>
               ))
             )}
           </Card.Content>
         </Card>
-      </View>
+      </Box>
 
       <InviteMemberDialog isOpen={inviteOpen} onOpenChange={setInviteOpen} />
-    </View>
+    </Box>
   )
 }

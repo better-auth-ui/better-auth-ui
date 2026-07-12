@@ -1,8 +1,8 @@
 import { useAuth } from "@better-auth-ui/react"
-import { View } from "react-native"
 
 import type { SettingsViewProps } from "../../../lib/auth-plugin"
 import { cn } from "../../../lib/cn"
+import { Box } from "../../../primitives/styled"
 import { OrganizationDangerZone } from "./organization-danger-zone"
 import { OrganizationProfile } from "./organization-profile"
 
@@ -25,7 +25,7 @@ export function OrganizationSettings({
   const { plugins } = useAuth()
 
   return (
-    <View className={cn("flex-col gap-4", className)}>
+    <Box className={cn("flex-col gap-4", className)}>
       <OrganizationProfile variant={variant} />
 
       {plugins.flatMap((plugin) =>
@@ -35,6 +35,6 @@ export function OrganizationSettings({
       )}
 
       <OrganizationDangerZone variant={variant} />
-    </View>
+    </Box>
   )
 }

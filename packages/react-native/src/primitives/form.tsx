@@ -6,8 +6,8 @@ import {
   useMemo,
   useRef
 } from "react"
-import { View } from "react-native"
 import { cn } from "../lib/cn"
+import { Box } from "./styled"
 
 type Validator = () => string | undefined
 
@@ -56,7 +56,7 @@ export function Form({
 
   return (
     <FormContext.Provider value={value}>
-      <View className={cn(className)}>{children}</View>
+      <Box className={cn(className)}>{children}</Box>
     </FormContext.Provider>
   )
 }

@@ -9,7 +9,6 @@ import {
 } from "@better-auth-ui/react"
 import type { Organization } from "better-auth/client"
 import { type ReactNode, useState } from "react"
-import { Pressable, Text, View } from "react-native"
 
 import { organizationPlugin } from "../../../lib/auth/organization-plugin"
 import { cn } from "../../../lib/cn"
@@ -17,6 +16,7 @@ import { useThemeColors } from "../../../lib/theme-colors"
 import { useAuthNavigation } from "../../../navigation/navigation-context"
 import { Button, type ButtonProps } from "../../../primitives/button"
 import { Menu } from "../../../primitives/menu"
+import { Box, Btn, Txt } from "../../../primitives/styled"
 import {
   ChevronsExpandVertical,
   CirclePlus,
@@ -127,7 +127,7 @@ export function OrganizationSwitcher({
   return (
     <>
       {trigger ? (
-        <Pressable onPress={() => setMenuOpen(true)}>{trigger}</Pressable>
+        <Btn onPress={() => setMenuOpen(true)}>{trigger}</Btn>
       ) : (
         <Button
           variant={variant}
@@ -171,7 +171,7 @@ export function OrganizationSwitcher({
 
       <Menu isOpen={menuOpen} onOpenChange={setMenuOpen}>
         {activeOrganization ? (
-          <View className="flex-row items-center justify-between gap-4 px-2 pt-1 pb-2">
+          <Box className="flex-row items-center justify-between gap-4 px-2 pt-1 pb-2">
             <OrganizationView
               hideRole
               hideSlug={hideSlug}
@@ -189,9 +189,9 @@ export function OrganizationSwitcher({
                 {organizationLocalization.manage}
               </Button>
             )}
-          </View>
+          </Box>
         ) : !isPending && session?.user && !hidePersonal ? (
-          <View className="flex-row items-center justify-between gap-4 px-2 pt-1 pb-2">
+          <Box className="flex-row items-center justify-between gap-4 px-2 pt-1 pb-2">
             <UserView hideSubtitle={hideSlug} />
 
             {!hideSettings && (
@@ -205,7 +205,7 @@ export function OrganizationSwitcher({
                 {localization.settings.settings}
               </Button>
             )}
-          </View>
+          </Box>
         ) : null}
 
         {!!activeOrganization && !hidePersonal && (
@@ -232,9 +232,9 @@ export function OrganizationSwitcher({
             icon={<CirclePlus width={18} height={18} color={colors.muted} />}
             onPress={() => setCreateOpen(true)}
           >
-            <Text className="text-sm text-foreground">
+            <Txt className="text-sm text-foreground">
               {organizationLocalization.createOrganization}
-            </Text>
+            </Txt>
           </Menu.Item>
         )}
       </Menu>

@@ -1,4 +1,6 @@
 import { ActivityIndicator } from "react-native"
+import { useThemeColors } from "../lib/theme-colors"
+import { tw } from "../lib/tw"
 
 export interface SpinnerProps {
   /** `"sm"` inside buttons; default otherwise. */
@@ -17,11 +19,12 @@ export interface SpinnerProps {
  * and the odd inline case. Buttons render their own pending indicator.
  */
 export function Spinner({ size = "md", color, className }: SpinnerProps) {
+  const colors = useThemeColors()
   return (
     <ActivityIndicator
       size={size === "sm" ? 16 : 24}
       color={color && color !== "current" ? color : undefined}
-      className={className}
+      style={tw(className, colors)}
     />
   )
 }

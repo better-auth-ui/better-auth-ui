@@ -1,7 +1,8 @@
 import { Children, type ReactNode, useState } from "react"
-import { Modal, Pressable, ScrollView, Text, View } from "react-native"
+import { Modal } from "react-native"
 import { cn } from "../lib/cn"
 import { useThemeColors } from "../lib/theme-colors"
+import { Box, Btn, ScrollBox, Txt } from "./styled"
 import { Check, ChevronDown } from "./ui-icons"
 
 export type MenuItemVariant = "default" | "danger"
@@ -38,7 +39,7 @@ function MenuItem({
   const { isSelected } = injected as { isSelected?: boolean }
 
   return (
-    <Pressable
+    <Btn
       accessibilityRole="menuitem"
       accessibilityState={{ disabled: isDisabled, selected: isSelected }}
       disabled={isDisabled}
@@ -52,16 +53,16 @@ function MenuItem({
       {icon}
 
       {typeof children === "string" ? (
-        <Text
+        <Txt
           className={cn(
             "flex-1 text-sm text-foreground",
             variant === "danger" && "text-danger"
           )}
         >
           {children}
-        </Text>
+        </Txt>
       ) : (
-        <View className="flex-1">{children}</View>
+        <Box className="flex-1">{children}</Box>
       )}
 
       {isSelected && (
@@ -71,7 +72,7 @@ function MenuItem({
           color={variant === "danger" ? colors.danger : colors.accent}
         />
       )}
-    </Pressable>
+    </Btn>
   )
 }
 
@@ -139,21 +140,21 @@ function MenuBase({
       animationType="fade"
       onRequestClose={() => onOpenChange(false)}
     >
-      <Pressable
+      <Btn
         accessibilityRole="none"
         className="flex-1 justify-end bg-black/30"
         onPress={() => onOpenChange(false)}
       >
-        <Pressable
+        <Btn
           onPress={(event) => event.stopPropagation()}
           className={cn(
             "max-h-[70%] gap-1 rounded-t-2xl border border-border bg-surface p-2",
             className
           )}
         >
-          <ScrollView bounces={false}>{content}</ScrollView>
-        </Pressable>
-      </Pressable>
+          <ScrollBox bounces={false}>{content}</ScrollBox>
+        </Btn>
+      </Btn>
     </Modal>
   )
 }
@@ -203,12 +204,12 @@ export function Select({
   )?.label
 
   return (
-    <View className="gap-1.5">
+    <Box className="gap-1.5">
       {label && (
-        <Text className="text-sm font-medium text-foreground">{label}</Text>
+        <Txt className="text-sm font-medium text-foreground">{label}</Txt>
       )}
 
-      <Pressable
+      <Btn
         accessibilityRole="button"
         accessibilityState={{ disabled: isDisabled, expanded: open }}
         disabled={isDisabled}
@@ -219,17 +220,17 @@ export function Select({
           className
         )}
       >
-        <Text
+        <Txt
           className={cn(
             "text-base",
             selectedLabel ? "text-foreground" : "text-muted"
           )}
         >
           {selectedLabel ?? placeholder}
-        </Text>
+        </Txt>
 
         <ChevronDown width={16} height={16} color={colors.muted} />
-      </Pressable>
+      </Btn>
 
       <Menu
         isOpen={open}
@@ -243,6 +244,6 @@ export function Select({
           </Menu.Item>
         ))}
       </Menu>
-    </View>
+    </Box>
   )
 }

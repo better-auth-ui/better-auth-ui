@@ -1,13 +1,13 @@
 import { apiKeyPlugin } from "@better-auth-ui/core/plugins"
 import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
 import { useState } from "react"
-import { Text, View } from "react-native"
 import { copyText } from "../../../lib/clipboard"
 import { useThemeColors } from "../../../lib/theme-colors"
 import { AlertDialog } from "../../../primitives/alert-dialog"
 import { Button } from "../../../primitives/button"
 import { Label, TextField } from "../../../primitives/field"
 import { InputGroup } from "../../../primitives/input"
+import { Box, Txt } from "../../../primitives/styled"
 import { toast } from "../../../primitives/toast"
 import { Check, Copy, Key } from "../../../primitives/ui-icons"
 
@@ -65,22 +65,22 @@ export function NewApiKeyDialog({
       </AlertDialog.Header>
 
       <AlertDialog.Body>
-        <Text className="text-sm text-muted">
+        <Txt className="text-sm text-muted">
           {apiKeyLocalization.newApiKeyWarning}
-        </Text>
+        </Txt>
 
         <TextField value={secretKey ?? ""} className="gap-1.5">
           <Label>{name || apiKeyLocalization.apiKey}</Label>
 
           <InputGroup>
-            <View className="h-full flex-1 justify-center">
-              <Text
+            <Box className="h-full flex-1 justify-center">
+              <Txt
                 className="font-mono text-xs text-foreground"
                 numberOfLines={1}
               >
                 {secretKey ?? ""}
-              </Text>
-            </View>
+              </Txt>
+            </Box>
 
             <InputGroup.Suffix className="px-0">
               <Button

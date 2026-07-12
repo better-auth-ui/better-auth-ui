@@ -8,7 +8,6 @@ import {
 } from "@better-auth-ui/react"
 import type { Organization } from "better-auth/client"
 import { useState } from "react"
-import { Text, View } from "react-native"
 
 import { organizationPlugin } from "../../../lib/auth/organization-plugin"
 import type { SettingsViewProps } from "../../../lib/auth-plugin"
@@ -18,6 +17,7 @@ import { AlertDialog } from "../../../primitives/alert-dialog"
 import { Button } from "../../../primitives/button"
 import { Card } from "../../../primitives/card"
 import { Skeleton } from "../../../primitives/skeleton"
+import { Box, Txt } from "../../../primitives/styled"
 import { toast } from "../../../primitives/toast"
 import { TriangleExclamation } from "../../../primitives/ui-icons"
 import { OrganizationView } from "./organization-view"
@@ -61,16 +61,16 @@ export function DeleteOrganization({ className }: DeleteOrganizationProps) {
   }
 
   return (
-    <View className={cn("flex-col gap-4", className)}>
-      <View>
-        <Text className="text-sm font-medium leading-tight text-foreground">
+    <Box className={cn("flex-col gap-4", className)}>
+      <Box>
+        <Txt className="text-sm font-medium leading-tight text-foreground">
           {organizationLocalization.deleteOrganization}
-        </Text>
+        </Txt>
 
-        <Text className="mt-0.5 text-xs text-muted">
+        <Txt className="mt-0.5 text-xs text-muted">
           {organizationLocalization.deleteOrganizationDescription}
-        </Text>
-      </View>
+        </Txt>
+      </Box>
 
       <Button
         className="self-start"
@@ -89,7 +89,7 @@ export function DeleteOrganization({ className }: DeleteOrganizationProps) {
           organization={activeOrganization}
         />
       )}
-    </View>
+    </Box>
   )
 }
 
@@ -151,9 +151,9 @@ function DeleteOrganizationDialog({
       </AlertDialog.Header>
 
       <AlertDialog.Body>
-        <Text className="text-sm text-muted">
+        <Txt className="text-sm text-muted">
           {organizationLocalization.deleteOrganizationDescription}
-        </Text>
+        </Txt>
 
         <Card variant="secondary">
           <Card.Content>
@@ -182,13 +182,13 @@ function DeleteOrganizationDialog({
 /** Placeholder matching {@link DeleteOrganization} while the delete permission resolves. */
 function DeleteOrganizationSkeleton({ className }: { className?: string }) {
   return (
-    <View className={cn("flex-col gap-4", className)}>
-      <View className="flex-col gap-1">
+    <Box className={cn("flex-col gap-4", className)}>
+      <Box className="flex-col gap-1">
         <Skeleton className="h-3.5 w-40 rounded-lg" />
         <Skeleton className="h-3 w-64 rounded-lg" />
-      </View>
+      </Box>
 
       <Skeleton className="h-8 w-36 rounded-full" />
-    </View>
+    </Box>
   )
 }

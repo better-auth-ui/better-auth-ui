@@ -1,7 +1,7 @@
 import { useAuth } from "@better-auth-ui/react"
-import { View } from "react-native"
 import type { SettingsViewProps } from "../../../../lib/auth-plugin"
 import { cn } from "../../../../lib/cn"
+import { Box } from "../../../../primitives/styled"
 import { ChangeEmail } from "./change-email"
 import { UserProfile } from "./user-profile"
 
@@ -25,7 +25,7 @@ export function AccountSettings({ className, variant }: AccountSettingsProps) {
   const hasMagicLink = plugins.some((plugin) => plugin.id === "magicLink")
 
   return (
-    <View className={cn("flex w-full flex-col gap-4", className)}>
+    <Box className={cn("flex w-full flex-col gap-4", className)}>
       <UserProfile variant={variant} />
       {(emailAndPassword?.enabled || hasMagicLink) && (
         <ChangeEmail variant={variant} />
@@ -35,6 +35,6 @@ export function AccountSettings({ className, variant }: AccountSettingsProps) {
           <Card key={`${plugin.id}-${index.toString()}`} variant={variant} />
         ))
       )}
-    </View>
+    </Box>
   )
 }

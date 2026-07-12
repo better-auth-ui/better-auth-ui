@@ -5,7 +5,6 @@ import {
   useCreateApiKey
 } from "@better-auth-ui/react"
 import { useState } from "react"
-import { Text } from "react-native"
 import { apiKeyPlugin } from "../../../lib/auth/api-key-plugin"
 import { useThemeColors } from "../../../lib/theme-colors"
 import { AlertDialog } from "../../../primitives/alert-dialog"
@@ -13,6 +12,7 @@ import { Button } from "../../../primitives/button"
 import { FieldError, Label, TextField } from "../../../primitives/field"
 import { Form } from "../../../primitives/form"
 import { Input } from "../../../primitives/input"
+import { Txt } from "../../../primitives/styled"
 import { Key } from "../../../primitives/ui-icons"
 import { NewApiKeyDialog } from "./new-api-key-dialog"
 
@@ -100,9 +100,9 @@ export function CreateApiKeyDialog({
           </AlertDialog.Header>
 
           <AlertDialog.Body>
-            <Text className="text-sm text-muted">
+            <Txt className="text-sm text-muted">
               {apiKeyLocalization.apiKeysDescription}
-            </Text>
+            </Txt>
 
             <TextField
               className="mt-4"

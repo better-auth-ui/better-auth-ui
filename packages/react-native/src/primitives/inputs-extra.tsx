@@ -1,7 +1,9 @@
 import { useState } from "react"
-import { Pressable, TextInput, type TextInputProps, View } from "react-native"
+import { TextInput, type TextInputProps } from "react-native"
 import { cn } from "../lib/cn"
 import { useThemeColors } from "../lib/theme-colors"
+import { tw } from "../lib/tw"
+import { Box, Btn } from "./styled"
 import { Minus, Plus, Search, Xmark } from "./ui-icons"
 
 /* -------------------------------------------------------------------------
@@ -38,7 +40,7 @@ export function SearchField({
   const colors = useThemeColors()
 
   return (
-    <View
+    <Box
       className={cn(
         "h-11 flex-row items-center rounded-lg border border-border pl-3 pr-2",
         isDisabled && "opacity-50",
@@ -55,13 +57,13 @@ export function SearchField({
         autoCapitalize="none"
         autoCorrect={false}
         accessibilityLabel={ariaLabel ?? placeholder}
-        className={cn(
-          "h-full flex-1 px-2 text-base text-foreground",
-          inputClassName
+        style={tw(
+          cn("h-full flex-1 px-2 text-base text-foreground", inputClassName),
+          colors
         )}
       />
       {value.length > 0 && (
-        <Pressable
+        <Btn
           accessibilityRole="button"
           accessibilityLabel="Clear search"
           disabled={isDisabled}
@@ -70,9 +72,9 @@ export function SearchField({
           className="h-7 w-7 items-center justify-center rounded-full"
         >
           <Xmark width={14} height={14} color={colors.muted} />
-        </Pressable>
+        </Btn>
       )}
-    </View>
+    </Box>
   )
 }
 
@@ -119,10 +121,13 @@ export function TextArea({
       multiline
       numberOfLines={numberOfLines}
       textAlignVertical="top"
-      className={cn(
-        "min-h-24 rounded-lg border border-border px-3 py-2 text-base text-foreground",
-        isDisabled && "opacity-50",
-        className
+      style={tw(
+        cn(
+          "min-h-24 rounded-lg border border-border px-3 py-2 text-base text-foreground",
+          isDisabled && "opacity-50",
+          className
+        ),
+        colors
       )}
       {...props}
     />
@@ -192,14 +197,14 @@ export function NumberField({
     !isDisabled && !isReadOnly && (maxValue === undefined || value < maxValue)
 
   return (
-    <View
+    <Box
       className={cn(
         "h-11 flex-row items-center rounded-lg border border-border",
         isDisabled && "opacity-50",
         className
       )}
     >
-      <Pressable
+      <Btn
         accessibilityRole="button"
         accessibilityLabel="Decrement"
         disabled={!canDecrement}
@@ -211,7 +216,7 @@ export function NumberField({
         )}
       >
         <Minus width={16} height={16} color={colors.foreground} />
-      </Pressable>
+      </Btn>
 
       <TextInput
         value={text}
@@ -231,10 +236,13 @@ export function NumberField({
         placeholderTextColor={colors.muted}
         keyboardType="numeric"
         accessibilityLabel={ariaLabel}
-        className="h-full flex-1 px-2 text-center text-base text-foreground"
+        style={tw(
+          "h-full flex-1 px-2 text-center text-base text-foreground",
+          colors
+        )}
       />
 
-      <Pressable
+      <Btn
         accessibilityRole="button"
         accessibilityLabel="Increment"
         disabled={!canIncrement}
@@ -246,7 +254,7 @@ export function NumberField({
         )}
       >
         <Plus width={16} height={16} color={colors.foreground} />
-      </Pressable>
-    </View>
+      </Btn>
+    </Box>
   )
 }

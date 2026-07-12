@@ -1,5 +1,6 @@
-import { View, type ViewProps } from "react-native"
+import type { ViewProps } from "react-native"
 import { cn } from "../lib/cn"
+import { Box } from "./styled"
 
 /**
  * Loading placeholder. Shape/size come from `className` (e.g. `rounded-full`,
@@ -10,7 +11,7 @@ export function Skeleton({
   ...props
 }: Omit<ViewProps, "style"> & { className?: string }) {
   return (
-    <View
+    <Box
       className={cn("bg-surface-secondary opacity-80", className)}
       {...props}
     />

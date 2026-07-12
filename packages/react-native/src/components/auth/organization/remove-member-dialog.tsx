@@ -5,13 +5,13 @@ import {
   useRemoveMember
 } from "@better-auth-ui/react"
 import type { Member, User } from "better-auth/client"
-import { Text } from "react-native"
 
 import { organizationPlugin } from "../../../lib/auth/organization-plugin"
 import { useThemeColors } from "../../../lib/theme-colors"
 import { AlertDialog } from "../../../primitives/alert-dialog"
 import { Button } from "../../../primitives/button"
 import { Card } from "../../../primitives/card"
+import { Txt } from "../../../primitives/styled"
 import { Chip } from "../../../primitives/tabs"
 import { toast } from "../../../primitives/toast"
 import { Trash } from "../../../primitives/ui-icons"
@@ -66,9 +66,9 @@ export function RemoveMemberDialog({
       </AlertDialog.Header>
 
       <AlertDialog.Body>
-        <Text className="text-sm text-muted">
+        <Txt className="text-sm text-muted">
           {organizationLocalization.removeMemberWarning}
-        </Text>
+        </Txt>
 
         <Card variant="secondary">
           <Card.Content className="flex-row items-center justify-between gap-2">

@@ -5,11 +5,11 @@ import {
   useSetActiveOrganization
 } from "@better-auth-ui/react"
 import type { Organization } from "better-auth/client"
-import { View } from "react-native"
 
 import { organizationPlugin } from "../../../lib/auth/organization-plugin"
 import { Button } from "../../../primitives/button"
 import { Spinner } from "../../../primitives/spinner"
+import { Box } from "../../../primitives/styled"
 import { Gear } from "../../../primitives/ui-icons"
 import { OrganizationView } from "./organization-view"
 
@@ -52,7 +52,7 @@ export function OrganizationRow({ organization }: OrganizationRowProps) {
   }
 
   return (
-    <View className="flex-row items-center gap-3">
+    <Box className="flex-row items-center gap-3">
       <OrganizationView organization={organization} />
 
       <Button
@@ -71,6 +71,6 @@ export function OrganizationRow({ organization }: OrganizationRowProps) {
 
         {organizationLocalization.manage}
       </Button>
-    </View>
+    </Box>
   )
 }

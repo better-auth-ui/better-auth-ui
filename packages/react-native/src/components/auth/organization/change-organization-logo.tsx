@@ -6,7 +6,6 @@ import {
   useUpdateOrganization
 } from "@better-auth-ui/react"
 import { useState } from "react"
-import { View } from "react-native"
 
 import { organizationPlugin } from "../../../lib/auth/organization-plugin"
 import { cn } from "../../../lib/cn"
@@ -16,6 +15,7 @@ import { Button } from "../../../primitives/button"
 import { Label } from "../../../primitives/field"
 import { Menu } from "../../../primitives/menu"
 import { Spinner } from "../../../primitives/spinner"
+import { Box } from "../../../primitives/styled"
 import { toast } from "../../../primitives/toast"
 import { Trash, Upload } from "../../../primitives/ui-icons"
 import { OrganizationLogo } from "./organization-logo"
@@ -116,12 +116,12 @@ export function ChangeOrganizationLogo({
   }
 
   return (
-    <View className={cn("gap-1.5", className)}>
+    <Box className={cn("gap-1.5", className)}>
       <Label isDisabled={!activeOrganization}>
         {organizationLocalization.logo}
       </Label>
 
-      <View className="flex-row items-center gap-4">
+      <Box className="flex-row items-center gap-4">
         <Button
           variant="ghost"
           isIconOnly
@@ -163,7 +163,7 @@ export function ChangeOrganizationLogo({
             {organizationLocalization.deleteLogo}
           </Menu.Item>
         </Menu>
-      </View>
-    </View>
+      </Box>
+    </Box>
   )
 }

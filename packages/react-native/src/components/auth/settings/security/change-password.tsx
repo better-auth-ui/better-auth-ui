@@ -7,7 +7,6 @@ import {
   useSession
 } from "@better-auth-ui/react"
 import { useState } from "react"
-import { Text, View } from "react-native"
 import { cn } from "../../../../lib/cn"
 import { Button } from "../../../../primitives/button"
 import { Card, type CardVariant } from "../../../../primitives/card"
@@ -15,6 +14,7 @@ import { FieldError, Label, TextField } from "../../../../primitives/field"
 import { Form } from "../../../../primitives/form"
 import { Input, InputGroup } from "../../../../primitives/input"
 import { Skeleton } from "../../../../primitives/skeleton"
+import { Box, Txt } from "../../../../primitives/styled"
 import { toast } from "../../../../primitives/toast"
 import { Eye, EyeSlash } from "../../../../primitives/ui-icons"
 
@@ -81,25 +81,25 @@ function SetPassword({ className, variant }: ChangePasswordProps) {
   }
 
   return (
-    <View className={cn(className)}>
-      <Text className="mb-3 text-sm font-semibold text-foreground">
+    <Box className={cn(className)}>
+      <Txt className="mb-3 text-sm font-semibold text-foreground">
         {localization.settings.changePassword}
-      </Text>
+      </Txt>
 
       <Card variant={variant}>
         <Card.Content className="flex-col items-start justify-between gap-4">
-          <View>
-            <Text className="text-sm font-medium leading-tight text-foreground">
+          <Box>
+            <Txt className="text-sm font-medium leading-tight text-foreground">
               {localization.settings.setPassword}
-            </Text>
+            </Txt>
 
-            <Text className="mt-0.5 text-xs text-muted">
+            <Txt className="mt-0.5 text-xs text-muted">
               {localization.settings.setPasswordDescription}
-            </Text>
-          </View>
+            </Txt>
+          </Box>
 
-          <View className="items-start gap-3">
-            {Captcha && <View>{Captcha}</View>}
+          <Box className="items-start gap-3">
+            {Captcha && <Box>{Captcha}</Box>}
 
             <Button
               size="sm"
@@ -109,10 +109,10 @@ function SetPassword({ className, variant }: ChangePasswordProps) {
             >
               {localization.auth.sendResetLink}
             </Button>
-          </View>
+          </Box>
         </Card.Content>
       </Card>
-    </View>
+    </Box>
   )
 }
 
@@ -171,10 +171,10 @@ function ChangePasswordForm({
   const inputVariant = variant === "transparent" ? "primary" : "secondary"
 
   return (
-    <View className={cn(className)}>
-      <Text className="mb-3 text-sm font-semibold text-foreground">
+    <Box className={cn(className)}>
+      <Txt className="mb-3 text-sm font-semibold text-foreground">
         {localization.settings.changePassword}
-      </Text>
+      </Txt>
 
       <Card className="gap-4" variant={variant}>
         <Card.Content>
@@ -294,7 +294,7 @@ function ChangePasswordForm({
               </TextField>
             )}
 
-            <View className="items-start">
+            <Box className="items-start">
               <Button
                 type="submit"
                 isPending={isPending}
@@ -303,10 +303,10 @@ function ChangePasswordForm({
               >
                 {localization.settings.updatePassword}
               </Button>
-            </View>
+            </Box>
           </Form>
         </Card.Content>
       </Card>
-    </View>
+    </Box>
   )
 }

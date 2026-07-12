@@ -5,8 +5,11 @@ import {
   useMemo,
   useState
 } from "react"
-import { Image, Text, View } from "react-native"
+import { Image, type ImageStyle } from "react-native"
 import { cn } from "../lib/cn"
+import { useThemeColors } from "../lib/theme-colors"
+import { tw } from "../lib/tw"
+import { Box, Txt } from "./styled"
 
 export type AvatarSize = "sm" | "md" | "lg"
 
@@ -35,7 +38,7 @@ function AvatarBase({ size = "sm", className, children }: AvatarProps) {
 
   return (
     <AvatarContext.Provider value={context}>
-      <View
+      <Box
         className={cn(
           "items-center justify-center overflow-hidden rounded-full bg-surface-secondary",
           SIZE_CLASS[size],
@@ -43,13 +46,14 @@ function AvatarBase({ size = "sm", className, children }: AvatarProps) {
         )}
       >
         {children}
-      </View>
+      </Box>
     </AvatarContext.Provider>
   )
 }
 
 function AvatarImage({ src, alt }: { src?: string; alt?: string }) {
   const context = useContext(AvatarContext)
+  const colors = useThemeColors()
   if (!src) return null
 
   return (
@@ -59,7 +63,7 @@ function AvatarImage({ src, alt }: { src?: string; alt?: string }) {
       onLoad={() => context?.setLoaded(true)}
       onError={() => context?.setLoaded(false)}
       resizeMode="cover"
-      className="absolute inset-0 h-full w-full"
+      style={tw("absolute inset-0 h-full w-full", colors) as ImageStyle}
     />
   )
 }
@@ -74,13 +78,13 @@ function AvatarFallback({
   children?: ReactNode
 }) {
   return (
-    <View className={cn("items-center justify-center", className)}>
+    <Box className={cn("items-center justify-center", className)}>
       {typeof children === "string" ? (
-        <Text className="text-sm font-medium text-foreground">{children}</Text>
+        <Txt className="text-sm font-medium text-foreground">{children}</Txt>
       ) : (
         children
       )}
-    </View>
+    </Box>
   )
 }
 

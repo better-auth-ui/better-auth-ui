@@ -5,10 +5,10 @@ import {
   useListDeviceSessions,
   useSession
 } from "@better-auth-ui/react"
-import { Text, View } from "react-native"
 import { multiSessionPlugin } from "../../../lib/auth/multi-session-plugin"
 import { cn } from "../../../lib/cn"
 import { Card, type CardVariant } from "../../../primitives/card"
+import { Box, Txt } from "../../../primitives/styled"
 import { ManageAccount } from "./manage-account"
 
 export type ManageAccountsProps = {
@@ -52,27 +52,27 @@ export function ManageAccounts({ className, variant }: ManageAccountsProps) {
   ]
 
   return (
-    <View>
-      <Text className="mb-3 text-sm font-semibold text-foreground">
+    <Box>
+      <Txt className="mb-3 text-sm font-semibold text-foreground">
         {multiSessionLocalization.manageAccounts}
-      </Text>
+      </Txt>
 
       <Card className={cn(className)} variant={variant}>
         <Card.Content className="gap-0">
           {allRows.map((row, index) => (
-            <View key={row.key}>
+            <Box key={row.key}>
               {index > 0 && (
-                <View className="-mx-4 my-4 border-b border-dashed border-border" />
+                <Box className="-mx-4 my-4 border-b border-dashed border-border" />
               )}
 
               <ManageAccount
                 deviceSession={row.deviceSession}
                 isPending={row.isPending}
               />
-            </View>
+            </Box>
           ))}
         </Card.Content>
       </Card>
-    </View>
+    </Box>
   )
 }

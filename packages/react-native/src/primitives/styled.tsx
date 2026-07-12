@@ -50,16 +50,16 @@ export function Btn({ className, style, ...props }: WithClass<PressableProps>) {
 
 export function ScrollBox({
   className,
-  contentClassName,
+  contentContainerClassName,
   style,
   contentContainerStyle,
   ...props
-}: WithClass<ScrollViewProps> & { contentClassName?: string }) {
+}: WithClass<ScrollViewProps> & { contentContainerClassName?: string }) {
   const colors = useThemeColors()
   const s = useMemo(() => tw(className, colors), [className, colors])
   const cs = useMemo(
-    () => tw(contentClassName, colors),
-    [contentClassName, colors]
+    () => tw(contentContainerClassName, colors),
+    [contentContainerClassName, colors]
   )
   return (
     <ScrollView

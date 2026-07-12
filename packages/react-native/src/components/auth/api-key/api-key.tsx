@@ -4,11 +4,11 @@ import {
   useAuthPlugin
 } from "@better-auth-ui/react"
 import { useState } from "react"
-import { Text, View } from "react-native"
 import { apiKeyPlugin } from "../../../lib/auth/api-key-plugin"
 import { formatDateTime } from "../../../lib/format-date"
 import { useThemeColors } from "../../../lib/theme-colors"
 import { Button } from "../../../primitives/button"
+import { Box, Txt } from "../../../primitives/styled"
 import { Key, Xmark } from "../../../primitives/ui-icons"
 import { DeleteApiKeyDialog } from "./delete-api-key-dialog"
 
@@ -36,24 +36,24 @@ export function ApiKey({ apiKey, hideDelete, organizationId }: ApiKeyProps) {
   const preview = `${apiKey.start}${"*".repeat(16)}`
 
   return (
-    <View className="flex-row items-center gap-3">
-      <View className="size-10 shrink-0 items-center justify-center rounded-xl bg-surface-secondary">
+    <Box className="flex-row items-center gap-3">
+      <Box className="size-10 shrink-0 items-center justify-center rounded-xl bg-surface-secondary">
         <Key width={18} height={18} color={colors.foreground} />
-      </View>
+      </Box>
 
-      <View className="min-w-0 flex-col">
-        <Text className="text-sm font-medium leading-tight" numberOfLines={1}>
+      <Box className="min-w-0 flex-col">
+        <Txt className="text-sm font-medium leading-tight" numberOfLines={1}>
           {apiKey.name || apiKeyLocalization.apiKey}
-        </Text>
+        </Txt>
 
-        <Text className="text-xs text-muted font-mono" numberOfLines={1}>
+        <Txt className="text-xs text-muted font-mono" numberOfLines={1}>
           {preview}
-        </Text>
+        </Txt>
 
-        <Text className="text-xs text-muted">
+        <Txt className="text-xs text-muted">
           {formatDateTime(apiKey.createdAt)}
-        </Text>
-      </View>
+        </Txt>
+      </Box>
 
       {!hideDelete && (
         <>
@@ -77,6 +77,6 @@ export function ApiKey({ apiKey, hideDelete, organizationId }: ApiKeyProps) {
           />
         </>
       )}
-    </View>
+    </Box>
   )
 }

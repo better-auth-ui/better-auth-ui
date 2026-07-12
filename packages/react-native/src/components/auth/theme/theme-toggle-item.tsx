@@ -1,8 +1,8 @@
 import { useAuthPlugin } from "@better-auth-ui/react"
-import { Pressable, Text, View } from "react-native"
 import { themePlugin } from "../../../lib/auth/theme-plugin"
 import { cn } from "../../../lib/cn"
 import { useThemeColors } from "../../../lib/theme-colors"
+import { Box, Btn, Txt } from "../../../primitives/styled"
 import { Display, Moon, Palette, Sun } from "../../../primitives/ui-icons"
 
 export type ThemeToggleItemProps = {
@@ -42,14 +42,12 @@ export function ThemeToggleItem({ className }: ThemeToggleItemProps) {
   )
 
   return (
-    <View className={cn("flex-row items-center gap-2 px-3 py-2", className)}>
+    <Box className={cn("flex-row items-center gap-2 px-3 py-2", className)}>
       <Palette width={18} height={18} color={colors.muted} />
 
-      <Text className="flex-1 text-sm text-foreground">
-        {localization.theme}
-      </Text>
+      <Txt className="flex-1 text-sm text-foreground">{localization.theme}</Txt>
 
-      <View className="flex-row items-center gap-0.5 rounded-lg bg-surface-secondary p-0.5">
+      <Box className="flex-row items-center gap-0.5 rounded-lg bg-surface-secondary p-0.5">
         {availableOptions.map(({ id, Icon }) => {
           const isSelected = theme === id
           const label =
@@ -60,7 +58,7 @@ export function ThemeToggleItem({ className }: ThemeToggleItemProps) {
                 : localization.dark
 
           return (
-            <Pressable
+            <Btn
               key={id}
               accessibilityRole="tab"
               accessibilityState={{ selected: isSelected }}
@@ -76,10 +74,10 @@ export function ThemeToggleItem({ className }: ThemeToggleItemProps) {
                 height={12}
                 color={isSelected ? colors.foreground : colors.muted}
               />
-            </Pressable>
+            </Btn>
           )
         })}
-      </View>
-    </View>
+      </Box>
+    </Box>
   )
 }

@@ -5,7 +5,6 @@ import {
   useDeleteOrganization
 } from "@better-auth-ui/react"
 import type { Organization } from "better-auth/client"
-import { Text } from "react-native"
 
 import { organizationPlugin } from "../../../lib/auth/organization-plugin"
 import { useThemeColors } from "../../../lib/theme-colors"
@@ -14,6 +13,7 @@ import { AlertDialog } from "../../../primitives/alert-dialog"
 import { Button } from "../../../primitives/button"
 import { Card } from "../../../primitives/card"
 import { Form } from "../../../primitives/form"
+import { Txt } from "../../../primitives/styled"
 import { toast } from "../../../primitives/toast"
 import { TriangleExclamation } from "../../../primitives/ui-icons"
 import { OrganizationView } from "./organization-view"
@@ -80,9 +80,9 @@ export function DeleteOrganizationDialog({
         </AlertDialog.Header>
 
         <AlertDialog.Body>
-          <Text className="text-sm text-muted">
+          <Txt className="text-sm text-muted">
             {organizationLocalization.deleteOrganizationDescription}
-          </Text>
+          </Txt>
 
           <Card variant="secondary">
             <Card.Content>

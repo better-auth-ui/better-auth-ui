@@ -5,9 +5,10 @@ import {
   useMemo,
   useRef
 } from "react"
-import { Animated, Pressable, Text, View } from "react-native"
+import { Animated } from "react-native"
 import { cn } from "../lib/cn"
 import { useThemeColors } from "../lib/theme-colors"
+import { Box, Btn, Txt } from "./styled"
 
 /* -------------------------------------------------------------------------
  * Switch
@@ -56,7 +57,7 @@ export function Switch({
   })
 
   return (
-    <Pressable
+    <Btn
       accessibilityRole="switch"
       accessibilityState={{ checked: isSelected, disabled: isDisabled }}
       disabled={isDisabled}
@@ -78,11 +79,11 @@ export function Switch({
       </Animated.View>
 
       {typeof children === "string" ? (
-        <Text className="text-sm text-foreground">{children}</Text>
+        <Txt className="text-sm text-foreground">{children}</Txt>
       ) : (
         children
       )}
-    </Pressable>
+    </Btn>
   )
 }
 
@@ -95,13 +96,13 @@ export function SwitchContent({
   children?: ReactNode
 }) {
   return (
-    <View className={cn("flex-1", className)}>
+    <Box className={cn("flex-1", className)}>
       {typeof children === "string" ? (
-        <Text className="text-sm text-foreground">{children}</Text>
+        <Txt className="text-sm text-foreground">{children}</Txt>
       ) : (
         children
       )}
-    </View>
+    </Box>
   )
 }
 
@@ -157,7 +158,7 @@ export function RadioGroup({
 
   return (
     <RadioGroupContext.Provider value={context}>
-      <View className={cn("gap-2", className)}>{children}</View>
+      <Box className={cn("gap-2", className)}>{children}</Box>
     </RadioGroupContext.Provider>
   )
 }
@@ -185,7 +186,7 @@ export function Radio({
   const isDisabled = isItemDisabled || group.isDisabled
 
   return (
-    <Pressable
+    <Btn
       accessibilityRole="radio"
       accessibilityState={{ checked: isSelected, disabled: isDisabled }}
       disabled={isDisabled}
@@ -199,24 +200,24 @@ export function Radio({
       <RadioControl isSelected={isSelected} />
 
       {typeof children === "string" ? (
-        <Text className="text-sm text-foreground">{children}</Text>
+        <Txt className="text-sm text-foreground">{children}</Txt>
       ) : (
         children
       )}
-    </Pressable>
+    </Btn>
   )
 }
 
 function RadioControl({ isSelected }: { isSelected: boolean }) {
   return (
-    <View
+    <Box
       className={cn(
         "h-5 w-5 items-center justify-center rounded-full border",
         isSelected ? "border-accent" : "border-border"
       )}
     >
-      {isSelected && <View className="h-2.5 w-2.5 rounded-full bg-accent" />}
-    </View>
+      {isSelected && <Box className="h-2.5 w-2.5 rounded-full bg-accent" />}
+    </Box>
   )
 }
 
@@ -228,5 +229,5 @@ export function RadioContent({
   className?: string
   children?: ReactNode
 }) {
-  return <View className={cn("flex-1 gap-1", className)}>{children}</View>
+  return <Box className={cn("flex-1 gap-1", className)}>{children}</Box>
 }

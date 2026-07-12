@@ -1,4 +1,10 @@
-import { createContext, type ReactNode, useContext, useMemo } from "react"
+import {
+  createContext,
+  type ReactNode,
+  useContext,
+  useMemo,
+  useSyncExternalStore
+} from "react"
 import { useColorScheme } from "react-native"
 
 /**
@@ -70,12 +76,63 @@ export function ThemeProvider({
   return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>
 }
 
+/**
+ * Global theme preference store (`system` | `light` | `dark`). Backs the
+ * built-in Appearance toggle without requiring a provider — it's a tiny
+ * observable read via `useSyncExternalStore`. Default `system` follows the OS.
+ */
+export type ThemePreference = "system" | "light" | "dark"
+export const THEME_OPTIONS: ThemePreference[] = ["system", "light", "dark"]
+
+let currentPreference: ThemePreference = "system"
+const listeners = new Set<() => void>()
+
+function subscribePreference(listener: () => void) {
+  listeners.add(listener)
+  return () => listeners.delete(listener)
+}
+function getPreference() {
+  return currentPreference
+}
+
+/** Set the global theme preference (drives every component's colors). */
+export function setThemePreference(preference: ThemePreference) {
+  if (preference === currentPreference) return
+  currentPreference = preference
+  for (const listener of listeners) listener()
+}
+
+/** `{ theme, setTheme, themes }` for a theme toggle (matches `useTheme` shape). */
+export function useThemePreference() {
+  const theme = useSyncExternalStore(
+    subscribePreference,
+    getPreference,
+    getPreference
+  )
+  return {
+    theme,
+    setTheme: (next: string) => setThemePreference(next as ThemePreference),
+    themes: THEME_OPTIONS as string[]
+  }
+}
+
 /** Returns the active (light/dark) concrete token colors, honoring any override. */
 export function useThemeColors(): ThemeColors {
   const systemScheme = useColorScheme()
+  const preference = useSyncExternalStore(
+    subscribePreference,
+    getPreference,
+    getPreference
+  )
   const override = useContext(ThemeContext)
-  const scheme =
-    override?.scheme ?? (systemScheme === "dark" ? "dark" : "light")
+
+  const resolved =
+    preference === "system"
+      ? systemScheme === "dark"
+        ? "dark"
+        : "light"
+      : preference
+  const scheme = override?.scheme ?? resolved
 
   return useMemo(() => {
     const base = scheme === "dark" ? DARK_THEME : LIGHT_THEME

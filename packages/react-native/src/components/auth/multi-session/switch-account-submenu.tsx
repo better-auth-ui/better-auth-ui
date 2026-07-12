@@ -1,10 +1,10 @@
 import { useAuth, useAuthPlugin, useSession } from "@better-auth-ui/react"
 import { useState } from "react"
-import { Pressable, Text } from "react-native"
 import { multiSessionPlugin } from "../../../lib/auth/multi-session-plugin"
 import { cn } from "../../../lib/cn"
 import { useThemeColors } from "../../../lib/theme-colors"
 import { Menu } from "../../../primitives/menu"
+import { Btn, Txt } from "../../../primitives/styled"
 import { ArrowRightArrowLeft } from "../../../primitives/ui-icons"
 import { SwitchAccountSubmenuContent } from "./switch-account-submenu-content"
 
@@ -48,15 +48,15 @@ export function SwitchAccountSubmenu({
 
   return (
     <>
-      <Pressable
+      <Btn
         className={cn("flex-row items-center gap-2 px-3 py-2", className)}
         onPress={() => setOpen(true)}
       >
         <ArrowRightArrowLeft width={18} height={18} color={colors.muted} />
-        <Text className="text-sm text-foreground">
+        <Txt className="text-sm text-foreground">
           {multiSessionLocalization.switchAccount}
-        </Text>
-      </Pressable>
+        </Txt>
+      </Btn>
 
       <Menu isOpen={open} onOpenChange={setOpen}>
         {open && <SwitchAccountSubmenuContent hideSubtitle={hideSubtitle} />}

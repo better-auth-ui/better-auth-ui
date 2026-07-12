@@ -7,7 +7,6 @@ import {
 } from "@better-auth-ui/react"
 import { useDebouncer } from "@tanstack/react-pacer"
 import { useEffect, useState } from "react"
-import { Text } from "react-native"
 
 import { organizationPlugin } from "../../../lib/auth/organization-plugin"
 import { useThemeColors } from "../../../lib/theme-colors"
@@ -17,6 +16,7 @@ import { FieldError, Label, TextField } from "../../../primitives/field"
 import { Form } from "../../../primitives/form"
 import { Input, InputGroup } from "../../../primitives/input"
 import { Spinner } from "../../../primitives/spinner"
+import { Txt } from "../../../primitives/styled"
 import { Briefcase, Check, Xmark } from "../../../primitives/ui-icons"
 
 /** Props for the {@link CreateOrganizationDialog} component. */
@@ -128,9 +128,9 @@ export function CreateOrganizationDialog({
         </AlertDialog.Header>
 
         <AlertDialog.Body contentClassName="gap-4">
-          <Text className="text-sm text-muted">
+          <Txt className="text-sm text-muted">
             {organizationLocalization.organizationsDescription}
-          </Text>
+          </Txt>
 
           <TextField
             name="name"
@@ -169,7 +169,7 @@ export function CreateOrganizationDialog({
             <InputGroup variant="secondary">
               {slugPrefix && (
                 <InputGroup.Prefix>
-                  <Text className="text-muted">{slugPrefix}</Text>
+                  <Txt className="text-muted">{slugPrefix}</Txt>
                 </InputGroup.Prefix>
               )}
 

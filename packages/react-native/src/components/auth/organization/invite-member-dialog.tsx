@@ -5,7 +5,6 @@ import {
   useInviteMember
 } from "@better-auth-ui/react"
 import { useEffect, useState } from "react"
-import { Text, View } from "react-native"
 
 import { organizationPlugin } from "../../../lib/auth/organization-plugin"
 import { useThemeColors } from "../../../lib/theme-colors"
@@ -15,6 +14,7 @@ import { FieldError, Label, TextField } from "../../../primitives/field"
 import { Form } from "../../../primitives/form"
 import { Input } from "../../../primitives/input"
 import { Menu } from "../../../primitives/menu"
+import { Box, Txt } from "../../../primitives/styled"
 import { toast } from "../../../primitives/toast"
 import { ChevronDown, PersonPlus } from "../../../primitives/ui-icons"
 
@@ -97,9 +97,9 @@ export function InviteMemberDialog({
 
       <Form onSubmit={handleSubmit} className="gap-4">
         <AlertDialog.Body contentClassName="gap-4">
-          <Text className="text-sm text-muted">
+          <Txt className="text-sm text-muted">
             {organizationLocalization.inviteMemberDescription}
-          </Text>
+          </Txt>
 
           <TextField
             name="email"
@@ -121,7 +121,7 @@ export function InviteMemberDialog({
             <FieldError />
           </TextField>
 
-          <View className="gap-1.5">
+          <Box className="gap-1.5">
             <Label>{organizationLocalization.role}</Label>
 
             <Button
@@ -130,7 +130,7 @@ export function InviteMemberDialog({
               className="w-full flex-row items-center justify-between"
               onPress={() => setRoleMenuOpen(true)}
             >
-              <Text className="text-base text-foreground">{roleLabel}</Text>
+              <Txt className="text-base text-foreground">{roleLabel}</Txt>
 
               <ChevronDown width={16} height={16} color={colors.muted} />
             </Button>
@@ -147,7 +147,7 @@ export function InviteMemberDialog({
                 </Menu.Item>
               ))}
             </Menu>
-          </View>
+          </Box>
         </AlertDialog.Body>
 
         <AlertDialog.Footer>

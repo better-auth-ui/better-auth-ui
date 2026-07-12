@@ -1,5 +1,5 @@
-import { View } from "react-native"
 import { cn } from "../lib/cn"
+import { Box } from "./styled"
 
 export interface SliderProps {
   value: number
@@ -18,7 +18,7 @@ export interface SliderProps {
  */
 export function Slider({ className }: SliderProps) {
   return (
-    <View
+    <Box
       className={cn("h-2 w-full rounded-full bg-surface-secondary", className)}
     />
   )

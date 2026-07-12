@@ -4,7 +4,6 @@ import {
   useRequestPasswordReset
 } from "@better-auth-ui/react"
 import { useState } from "react"
-import { View } from "react-native"
 import { cn } from "../../lib/cn"
 import { useAuthNavigation } from "../../navigation/navigation-context"
 import { Button } from "../../primitives/button"
@@ -14,6 +13,7 @@ import { FieldError, Label, TextField } from "../../primitives/field"
 import { Form } from "../../primitives/form"
 import { Input } from "../../primitives/input"
 import { Link } from "../../primitives/link"
+import { Box } from "../../primitives/styled"
 import { toast } from "../../primitives/toast"
 
 export interface ForgotPasswordProps {
@@ -95,7 +95,7 @@ export function ForgotPassword({ className, variant }: ForgotPasswordProps) {
             <FieldError />
           </TextField>
 
-          <View className="gap-3">
+          <Box className="gap-3">
             <Button
               type="submit"
               variant="primary"
@@ -104,7 +104,7 @@ export function ForgotPassword({ className, variant }: ForgotPasswordProps) {
             >
               {localization.auth.sendResetLink}
             </Button>
-          </View>
+          </Box>
         </Form>
       </Card.Content>
 

@@ -1,9 +1,9 @@
 import { useAuth, useListAccounts } from "@better-auth-ui/react"
-import { Text, View } from "react-native"
 import { cn } from "../../../../lib/cn"
 import { Card, type CardVariant } from "../../../../primitives/card"
 import { Separator } from "../../../../primitives/separator"
 import { Skeleton } from "../../../../primitives/skeleton"
+import { Box, Txt } from "../../../../primitives/styled"
 import { LinkedAccount } from "./linked-account"
 
 export type LinkedAccountsProps = {
@@ -55,47 +55,47 @@ export function LinkedAccounts({ className, variant }: LinkedAccountsProps) {
   ]
 
   return (
-    <View>
-      <Text className={cn("text-sm font-semibold mb-3 text-foreground")}>
+    <Box>
+      <Txt className={cn("text-sm font-semibold mb-3 text-foreground")}>
         {localization.settings.linkedAccounts}
-      </Text>
+      </Txt>
 
       <Card className={cn(className)} variant={variant}>
         <Card.Content className="gap-0">
           {isPending
             ? socialProviders?.map((provider, index) => (
-                <View key={provider}>
+                <Box key={provider}>
                   {index > 0 && <Separator className="my-4" />}
                   <AccountRowSkeleton />
-                </View>
+                </Box>
               ))
             : allRows.map((row, index) => (
-                <View key={row.key}>
+                <Box key={row.key}>
                   {index > 0 && <Separator className="my-4" />}
 
                   <LinkedAccount
                     account={row.account}
                     provider={row.provider}
                   />
-                </View>
+                </Box>
               ))}
         </Card.Content>
       </Card>
-    </View>
+    </Box>
   )
 }
 
 function AccountRowSkeleton() {
   return (
-    <View className="flex-row items-center justify-between">
-      <View className="flex-row items-center gap-3">
+    <Box className="flex-row items-center justify-between">
+      <Box className="flex-row items-center gap-3">
         <Skeleton className="size-10 rounded-xl" />
 
-        <View className="flex-col gap-1">
+        <Box className="flex-col gap-1">
           <Skeleton className="h-4 w-20 rounded-lg" />
           <Skeleton className="h-3 w-32 rounded-lg" />
-        </View>
-      </View>
-    </View>
+        </Box>
+      </Box>
+    </Box>
   )
 }

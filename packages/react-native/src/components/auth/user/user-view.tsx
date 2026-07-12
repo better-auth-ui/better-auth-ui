@@ -4,10 +4,10 @@ import {
   useSession
 } from "@better-auth-ui/react"
 import type { User } from "better-auth"
-import { Text, View } from "react-native"
 import { cn } from "../../../lib/cn"
 import type { AvatarSize } from "../../../primitives/avatar"
 import { Skeleton } from "../../../primitives/skeleton"
+import { Box, Txt } from "../../../primitives/styled"
 import { UserAvatar } from "./user-avatar"
 
 export type UserViewProps = {
@@ -54,44 +54,44 @@ export function UserView({
 
   if ((isPending || sessionPending) && !user) {
     return (
-      <View className={cn("flex-row items-center gap-2", className)}>
+      <Box className={cn("flex-row items-center gap-2", className)}>
         <UserAvatar
           isPending
           size={size === "lg" ? "md" : "sm"}
           className={size === "sm" ? "size-5" : undefined}
         />
 
-        <View className="gap-1">
+        <Box className="gap-1">
           <Skeleton className="h-3.5 w-24 rounded-lg" />
 
           {!hideSubtitle ? <Skeleton className="h-3 w-32 rounded-lg" /> : null}
-        </View>
-      </View>
+        </Box>
+      </Box>
     )
   }
 
   return (
-    <View className={cn("flex-row items-center gap-2", className)}>
+    <Box className={cn("flex-row items-center gap-2", className)}>
       <UserAvatar
         user={resolvedUser}
         size={size === "lg" ? "md" : "sm"}
         className={size === "sm" ? "size-5" : undefined}
       />
 
-      <View>
-        <Text className="text-sm font-medium leading-tight">
+      <Box>
+        <Txt className="text-sm font-medium leading-tight">
           {resolvedUser?.displayUsername ||
             resolvedUser?.name ||
             resolvedUser?.email}
-        </Text>
+        </Txt>
 
         {!hideSubtitle &&
         (resolvedUser?.displayUsername || resolvedUser?.name) ? (
-          <Text className="text-xs leading-tight text-neutral-500">
+          <Txt className="text-xs leading-tight text-neutral-500">
             {resolvedUser?.email}
-          </Text>
+          </Txt>
         ) : null}
-      </View>
-    </View>
+      </Box>
+    </Box>
   )
 }

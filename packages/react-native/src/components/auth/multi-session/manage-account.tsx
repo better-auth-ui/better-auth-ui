@@ -7,9 +7,9 @@ import {
   useSetActiveSession,
   useUser
 } from "@better-auth-ui/react"
-import { View } from "react-native"
 import { multiSessionPlugin } from "../../../lib/auth/multi-session-plugin"
 import { Button } from "../../../primitives/button"
+import { Box } from "../../../primitives/styled"
 import {
   ArrowRightArrowLeft,
   ArrowRightFromSquare
@@ -51,7 +51,7 @@ export function ManageAccount({
   const isBusy = isSwitching || isRevoking
 
   return (
-    <View className="flex-row items-center justify-between gap-3">
+    <Box className="flex-row items-center justify-between gap-3">
       <UserView user={deviceSession?.user} isPending={isPending} size="md" />
 
       {deviceSession && isActive && (
@@ -71,7 +71,7 @@ export function ManageAccount({
       )}
 
       {deviceSession && !isActive && (
-        <View className="shrink-0 flex-row items-center gap-1">
+        <Box className="shrink-0 flex-row items-center gap-1">
           <Button
             isIconOnly
             variant="ghost"
@@ -99,8 +99,8 @@ export function ManageAccount({
           >
             <ArrowRightFromSquare width={16} height={16} />
           </Button>
-        </View>
+        </Box>
       )}
-    </View>
+    </Box>
   )
 }
