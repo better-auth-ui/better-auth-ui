@@ -8,9 +8,7 @@
   },
   "files": [
     "src",
-    "dist",
-    "preset.js",
-    "theme.css"
+    "dist"
   ],
   "exports": {
     ".": {
@@ -24,9 +22,7 @@
       "react-native": "./src/plugins.ts",
       "src": "./src/plugins.ts",
       "import": "./dist/plugins.js"
-    },
-    "./preset": "./preset.js",
-    "./theme.css": "./theme.css"
+    }
   },
   "react-native": "./src/index.ts",
   "main": "./dist/index.js",
@@ -49,11 +45,9 @@
     "expo-clipboard": "~8.0.8",
     "expo-image-manipulator": "~14.0.8",
     "expo-image-picker": "~17.0.11",
-    "nativewind": "^4.2.6",
     "react": "^19.2.6",
     "react-native": "0.86.0",
-    "react-native-svg": "^15.15.5",
-    "tailwindcss": "^3.4.19"
+    "react-native-svg": "^15.15.5"
   },
   "peerDependencies": {
     "@better-auth-ui/core": "*",
@@ -65,7 +59,6 @@
     "expo-clipboard": ">=7.0.0",
     "expo-image-manipulator": ">=13.0.0",
     "expo-image-picker": ">=16.0.0",
-    "nativewind": ">=4.1.0",
     "react": ">=19.0.0",
     "react-native": ">=0.76.0",
     "react-native-svg": ">=15.0.0"

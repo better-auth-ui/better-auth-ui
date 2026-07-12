@@ -21,4 +21,5 @@ The server must register the [`expo()`](https://www.better-auth.com/docs/integra
 - `app/(auth)/index.tsx` — `<AuthProvider><Auth /></AuthProvider>`, the entire flow.
 - `app/(app)/index.tsx` — protected dashboard with `<UserButton />`.
 - `src/auth-client.ts` — `@better-auth/expo` client + `expo-secure-store`.
-- `metro.config.js` / `tailwind.config.js` / `babel.config.js` — nativewind + monorepo wiring.
+- `metro.config.js` / `babel.config.js` — plain Expo + monorepo wiring. **No nativewind / tailwind** — `@better-auth-ui/react-native` styles itself, so this app has zero styling setup.
+- `app/showcase.tsx` — `/showcase`, mounts every subsystem at once for QA.
