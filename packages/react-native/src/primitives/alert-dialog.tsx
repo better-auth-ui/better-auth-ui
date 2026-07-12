@@ -289,16 +289,23 @@ function AlertDialogHeading({ className, children }: AlertDialogHeadingProps) {
 }
 
 export interface AlertDialogBodyProps {
+  /** Applied to the scroll container (outer sizing, e.g. max height). */
   className?: string
+  /** Applied to the scroll content (child spacing, e.g. `gap-4`). */
+  contentClassName?: string
   children?: ReactNode
 }
 
 /** Scrollable body area (description text, optional form fields). */
-function AlertDialogBody({ className, children }: AlertDialogBodyProps) {
+function AlertDialogBody({
+  className,
+  contentClassName,
+  children
+}: AlertDialogBodyProps) {
   return (
     <ScrollView
       className={cn("max-h-96", className)}
-      contentContainerClassName="gap-3"
+      contentContainerClassName={cn("gap-3", contentClassName)}
       keyboardShouldPersistTaps="handled"
     >
       {children}

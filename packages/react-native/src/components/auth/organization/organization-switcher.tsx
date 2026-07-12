@@ -134,8 +134,11 @@ export function OrganizationSwitcher({
           className={cn("h-auto flex-row items-center px-2 py-2", className)}
           isDisabled={!session || isPending}
           aria-label={organizationLocalization.organization}
-          onPress={() => setMenuOpen(true)}
           {...props}
+          onPress={(event) => {
+            props.onPress?.(event)
+            setMenuOpen(true)
+          }}
         >
           {isPending ? (
             <OrganizationView

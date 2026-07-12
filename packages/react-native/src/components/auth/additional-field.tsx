@@ -1,6 +1,12 @@
 import { resolveInputType } from "@better-auth-ui/core"
 import { useAuth } from "@better-auth-ui/react"
-import { type ComponentType, useState } from "react"
+import {
+  type ComponentType,
+  useCallback,
+  useEffect,
+  useRef,
+  useState
+} from "react"
 import { Text, View } from "react-native"
 import type { AdditionalFieldProps } from "../../lib/auth-plugin"
 import { copyText } from "../../lib/clipboard"
@@ -9,6 +15,7 @@ import { Checkbox } from "../../primitives/checkbox"
 import { ComboBox } from "../../primitives/combobox"
 import { DateField, DatePicker } from "../../primitives/date-picker"
 import { FieldError, Label, TextField } from "../../primitives/field"
+import { useForm } from "../../primitives/form"
 import { Input, InputGroup } from "../../primitives/input"
 import { NumberField, TextArea } from "../../primitives/inputs-extra"
 import { Select } from "../../primitives/menu"
@@ -48,6 +55,70 @@ function toDateValue(value: unknown): Date | undefined {
     return Number.isNaN(parsed.getTime()) ? undefined : parsed
   }
   return undefined
+}
+
+/** Format a numeric value with the field's `Intl.NumberFormat` options (mirrors
+ * heroui's `Slider.Output`/`NumberField` `formatOptions`), falling back to the
+ * raw string if `Intl` rejects the options. */
+function formatNumber(
+  value: number,
+  options?: Intl.NumberFormatOptions
+): string {
+  if (!options) return String(value)
+  try {
+    return new Intl.NumberFormat(undefined, options).format(value)
+  } catch {
+    return String(value)
+  }
+}
+
+/**
+ * Registers a `field.required` validator with the enclosing `Form` (when
+ * present) so an empty required field blocks submission and surfaces a
+ * localized error — mirroring heroui, which forwards `required`/`isRequired`
+ * on these branches. `isEmpty` reports whether the current value counts as
+ * missing; `notifyChange` clears/refreshes an already-visible error live
+ * (after a failed submit) so it disappears as soon as the field is filled.
+ */
+function useRequiredValidator(
+  required: boolean | undefined,
+  isEmpty: () => boolean
+) {
+  const { localization } = useAuth()
+  const form = useForm()
+  const [error, setError] = useState<string | undefined>(undefined)
+
+  const isEmptyRef = useRef(isEmpty)
+  isEmptyRef.current = isEmpty
+  const errorRef = useRef(error)
+  errorRef.current = error
+
+  const message = localization.auth.fieldRequired
+
+  useEffect(() => {
+    if (!form || !required) return
+    return form.register(() => {
+      const next = isEmptyRef.current() ? message : undefined
+      setError(next)
+      return next
+    })
+  }, [form, required, message])
+
+  const notifyChange = useCallback(
+    (empty: boolean) => {
+      if (errorRef.current) setError(empty ? message : undefined)
+    },
+    [message]
+  )
+
+  return { error, notifyChange }
+}
+
+/** Inline required-field error for the non-`TextField` branches (which have no
+ * `FieldError` slot of their own). */
+function RequiredError({ error }: { error?: string }) {
+  if (!error) return null
+  return <Text className="text-sm text-danger">{error}</Text>
 }
 
 /**
@@ -216,6 +287,10 @@ function TextAreaField({
   onChange
 }: Omit<AdditionalFieldProps, "name">) {
   const [value, setValue] = useState(() => toStringValue(field.defaultValue))
+  const { error, notifyChange } = useRequiredValidator(
+    field.required,
+    () => value.trim() === ""
+  )
 
   return (
     <View className="gap-1.5">
@@ -226,10 +301,13 @@ function TextAreaField({
         onChangeText={(next) => {
           setValue(next)
           onChange?.(next === "" ? null : next)
+          notifyChange(next.trim() === "")
         }}
         placeholder={field.placeholder}
         isDisabled={isPending || field.readOnly}
       />
+
+      <RequiredError error={error} />
     </View>
   )
 }
@@ -293,7 +371,9 @@ function SliderField({
     <View className="gap-2">
       <View className="flex-row items-center justify-between gap-2">
         <Label>{field.label}</Label>
-        <Text className="text-sm text-muted">{value}</Text>
+        <Text className="text-sm text-muted">
+          {formatNumber(value, field.formatOptions)}
+        </Text>
       </View>
 
       <Slider
@@ -348,18 +428,27 @@ function CheckboxField({
   onChange
 }: Omit<AdditionalFieldProps, "name">) {
   const [value, setValue] = useState(() => toBooleanValue(field.defaultValue))
+  const { error, notifyChange } = useRequiredValidator(
+    field.required,
+    () => !value
+  )
 
   return (
-    <Checkbox
-      isSelected={value}
-      onChange={(next) => {
-        setValue(next)
-        onChange?.(next)
-      }}
-      isDisabled={isPending || field.readOnly}
-    >
-      {field.label}
-    </Checkbox>
+    <View className="gap-1.5">
+      <Checkbox
+        isSelected={value}
+        onChange={(next) => {
+          setValue(next)
+          onChange?.(next)
+          notifyChange(!next)
+        }}
+        isDisabled={isPending || field.readOnly}
+      >
+        {field.label}
+      </Checkbox>
+
+      <RequiredError error={error} />
+    </View>
   )
 }
 
@@ -375,22 +464,31 @@ function SelectField({
   const [value, setValue] = useState<string | undefined>(
     field.defaultValue != null ? String(field.defaultValue) : undefined
   )
+  const { error, notifyChange } = useRequiredValidator(
+    field.required,
+    () => value == null || value === ""
+  )
 
   return (
-    <Select
-      label={typeof field.label === "string" ? field.label : undefined}
-      placeholder={field.placeholder}
-      options={(field.options ?? []).map((option) => ({
-        key: option.value,
-        label: typeof option.label === "string" ? option.label : option.value
-      }))}
-      selectedKey={value}
-      onSelectionChange={(key) => {
-        setValue(key)
-        onChange?.(key === "" ? null : key)
-      }}
-      isDisabled={isPending || field.readOnly}
-    />
+    <View className="gap-1.5">
+      <Select
+        label={typeof field.label === "string" ? field.label : undefined}
+        placeholder={field.placeholder}
+        options={(field.options ?? []).map((option) => ({
+          key: option.value,
+          label: typeof option.label === "string" ? option.label : option.value
+        }))}
+        selectedKey={value}
+        onSelectionChange={(key) => {
+          setValue(key)
+          onChange?.(key === "" ? null : key)
+          notifyChange(key == null || key === "")
+        }}
+        isDisabled={isPending || field.readOnly}
+      />
+
+      <RequiredError error={error} />
+    </View>
   )
 }
 
@@ -415,6 +513,10 @@ function ComboBoxField({
   const [inputValue, setInputValue] = useState(
     () => options.find((option) => option.key === selectedKey)?.label ?? ""
   )
+  const { error, notifyChange } = useRequiredValidator(
+    field.required,
+    () => selectedKey == null || selectedKey === ""
+  )
 
   return (
     <View className="gap-1.5">
@@ -428,11 +530,14 @@ function ComboBoxField({
         onSelectionChange={(key) => {
           setSelectedKey(key)
           onChange?.(key === "" ? null : key)
+          notifyChange(key == null || key === "")
         }}
         placeholder={field.placeholder}
         isDisabled={isPending || field.readOnly}
         aria-label={typeof field.label === "string" ? field.label : name}
       />
+
+      <RequiredError error={error} />
     </View>
   )
 }
@@ -448,6 +553,10 @@ function DateInputField({
   onChange
 }: Omit<AdditionalFieldProps, "name"> & { isDateTime: boolean }) {
   const [value, setValue] = useState(() => toDateValue(field.defaultValue))
+  const { error, notifyChange } = useRequiredValidator(
+    field.required,
+    () => value == null
+  )
 
   return (
     <View className="w-full gap-1.5">
@@ -459,6 +568,7 @@ function DateInputField({
           onChange={(next) => {
             setValue(next)
             onChange?.(next)
+            notifyChange(next == null)
           }}
           mode="datetime"
           placeholder={field.placeholder}
@@ -470,11 +580,14 @@ function DateInputField({
           onChange={(next) => {
             setValue(next)
             onChange?.(next)
+            notifyChange(next == null)
           }}
           placeholder={field.placeholder}
           isDisabled={isPending || field.readOnly}
         />
       )}
+
+      <RequiredError error={error} />
     </View>
   )
 }
@@ -490,10 +603,24 @@ function HeroInputField({
   variant,
   onChange
 }: AdditionalFieldProps) {
+  const { localization } = useAuth()
   const inputVariant = variant === "transparent" ? "primary" : "secondary"
 
   const hasPrefix = field.prefix != null
   const hasSuffix = field.suffix != null || field.copyable
+
+  // Numeric fields get a numeric keyboard (decimal pad when fractional digits
+  // are allowed), mirroring heroui's native `type`/`inputMode` on number inputs.
+  const isNumeric = field.type === "number"
+  const keyboardType = isNumeric
+    ? field.formatOptions?.maximumFractionDigits
+      ? "decimal-pad"
+      : "numeric"
+    : undefined
+
+  const validate = field.required
+    ? (next: string) => (!next ? localization.auth.fieldRequired : undefined)
+    : undefined
 
   const [value, setValue] = useState(() => toStringValue(field.defaultValue))
 
@@ -513,6 +640,7 @@ function HeroInputField({
         isDisabled={isPending}
         value={value}
         onChange={handleChange}
+        validate={validate}
       >
         <Label>{field.label}</Label>
 
@@ -530,6 +658,7 @@ function HeroInputField({
           <InputGroup.Input
             placeholder={field.placeholder}
             required={field.required}
+            keyboardType={keyboardType}
           />
 
           {field.copyable ? (
@@ -560,10 +689,15 @@ function HeroInputField({
       isDisabled={isPending}
       value={value}
       onChange={handleChange}
+      validate={validate}
     >
       <Label>{field.label}</Label>
 
-      <Input placeholder={field.placeholder} variant={inputVariant} />
+      <Input
+        placeholder={field.placeholder}
+        variant={inputVariant}
+        keyboardType={keyboardType}
+      />
 
       <FieldError />
     </TextField>
