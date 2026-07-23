@@ -20,9 +20,8 @@ import {
   AlertDialogTitle
 } from "@/components/ui/alert-dialog"
 import { Button } from "@/components/ui/button"
-import { Field } from "@/components/ui/field"
+import { Field, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
 import { Spinner } from "@/components/ui/spinner"
 import { apiKeyPlugin } from "@/lib/auth/api-key-plugin"
 
@@ -67,9 +66,9 @@ export function DeleteApiKeyDialog({
         </AlertDialogHeader>
 
         <Field>
-          <Label htmlFor={previewId}>
+          <FieldLabel htmlFor={previewId}>
             {apiKey.name || apiKeyLocalization.apiKey}
-          </Label>
+          </FieldLabel>
 
           <Input
             id={previewId}

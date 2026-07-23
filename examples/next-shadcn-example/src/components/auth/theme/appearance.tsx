@@ -16,7 +16,6 @@ import {
   FieldLabel,
   FieldTitle
 } from "@/components/ui/field"
-import { Label } from "@/components/ui/label"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { themePlugin } from "@/lib/auth/theme-plugin"
 import { cn } from "@/lib/utils"
@@ -48,7 +47,7 @@ export function Appearance({ className }: AppearanceProps) {
       <Card className={cn(className)}>
         <CardContent>
           <Field>
-            <Label>{localization.theme}</Label>
+            <FieldLabel>{localization.theme}</FieldLabel>
 
             <RadioGroup
               value={isMounted ? theme : ""}

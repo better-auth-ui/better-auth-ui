@@ -24,9 +24,8 @@ import {
 } from "@/components/ui/alert-dialog"
 import { Button, buttonVariants } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
-import { Field, FieldError } from "@/components/ui/field"
+import { Field, FieldError, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
 import { Spinner } from "@/components/ui/spinner"
 import { deleteUserPlugin } from "@/lib/auth/delete-user-plugin"
 import { cn } from "@/lib/utils"
@@ -132,9 +131,9 @@ export function DeleteAccount({ className }: DeleteAccountProps) {
 
               {needsPassword && (
                 <Field>
-                  <Label htmlFor="delete-password">
+                  <FieldLabel htmlFor="delete-password">
                     {localization.auth.password}
-                  </Label>
+                  </FieldLabel>
 
                   <Input
                     id="delete-password"

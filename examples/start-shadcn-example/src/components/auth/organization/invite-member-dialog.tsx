@@ -21,9 +21,8 @@ import {
   AlertDialogTitle
 } from "@/components/ui/alert-dialog"
 import { Button } from "@/components/ui/button"
-import { Field, FieldError } from "@/components/ui/field"
+import { Field, FieldError, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
 import {
   Select,
   SelectContent,
@@ -114,9 +113,9 @@ export function InviteMemberDialog({
 
           <div className="flex flex-col gap-4">
             <Field data-invalid={!!emailError}>
-              <Label htmlFor="invite-member-email">
+              <FieldLabel htmlFor="invite-member-email">
                 {localization.auth.email}
-              </Label>
+              </FieldLabel>
 
               <Input
                 id="invite-member-email"
@@ -142,9 +141,9 @@ export function InviteMemberDialog({
             </Field>
 
             <Field>
-              <Label htmlFor="invite-member-role">
+              <FieldLabel htmlFor="invite-member-role">
                 {organizationLocalization.role}
-              </Label>
+              </FieldLabel>
 
               <Select
                 value={role}

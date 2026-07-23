@@ -18,10 +18,10 @@ import {
   FieldDescription,
   FieldError,
   FieldGroup,
+  FieldLabel,
   FieldSeparator
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
 import { Spinner } from "@/components/ui/spinner"
 import { magicLinkPlugin } from "@/lib/auth/magic-link-plugin"
 import { cn } from "@/lib/utils"
@@ -114,7 +114,9 @@ export function MagicLink({
           <form onSubmit={handleSubmit}>
             <FieldGroup>
               <Field data-invalid={!!fieldErrors.email}>
-                <Label htmlFor="email">{localization.auth.email}</Label>
+                <FieldLabel htmlFor="email">
+                  {localization.auth.email}
+                </FieldLabel>
 
                 <Input
                   id="email"
