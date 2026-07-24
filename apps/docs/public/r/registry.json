@@ -77,6 +77,7 @@
         "button",
         "card",
         "input",
+        "input-group",
         "checkbox",
         "separator",
         "field",
@@ -710,6 +711,7 @@
         "card",
         "field",
         "input",
+        "input-group",
         "sonner",
         "spinner"
       ],

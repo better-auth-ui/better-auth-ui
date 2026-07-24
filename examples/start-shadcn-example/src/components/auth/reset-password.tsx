@@ -160,6 +160,7 @@ export function ResetPassword({ className }: ResetPasswordProps) {
 
                 <InputGroupAddon align="inline-end">
                   <InputGroupButton
+                    size="icon-xs"
                     aria-label={
                       isPasswordVisible
                         ? localization.auth.hidePassword
@@ -171,8 +172,9 @@ export function ResetPassword({ className }: ResetPasswordProps) {
                         : localization.auth.showPassword
                     }
                     onClick={() => {
-                      setIsPasswordVisible(!isPasswordVisible)
+                      setIsPasswordVisible((visible) => !visible)
                     }}
+                    disabled={isPending}
                   >
                     {isPasswordVisible ? <EyeOff /> : <Eye />}
                   </InputGroupButton>
@@ -232,6 +234,7 @@ export function ResetPassword({ className }: ResetPasswordProps) {
 
                   <InputGroupAddon align="inline-end">
                     <InputGroupButton
+                      size="icon-xs"
                       aria-label={
                         isConfirmPasswordVisible
                           ? localization.auth.hidePassword
@@ -243,8 +246,9 @@ export function ResetPassword({ className }: ResetPasswordProps) {
                           : localization.auth.showPassword
                       }
                       onClick={() => {
-                        setIsConfirmPasswordVisible(!isConfirmPasswordVisible)
+                        setIsConfirmPasswordVisible((visible) => !visible)
                       }}
+                      disabled={isPending}
                     >
                       {isConfirmPasswordVisible ? <EyeOff /> : <Eye />}
                     </InputGroupButton>

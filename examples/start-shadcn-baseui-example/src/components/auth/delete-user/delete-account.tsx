@@ -8,7 +8,7 @@ import {
   useListAccounts
 } from "@better-auth-ui/react"
 import { useQueryClient } from "@tanstack/react-query"
-import { TriangleAlert } from "lucide-react"
+import { Eye, EyeOff, TriangleAlert } from "lucide-react"
 import { type SyntheticEvent, useState } from "react"
 import { toast } from "sonner"
 import {
@@ -25,7 +25,12 @@ import {
 import { Button, buttonVariants } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Field, FieldError, FieldLabel } from "@/components/ui/field"
-import { Input } from "@/components/ui/input"
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupButton,
+  InputGroupInput
+} from "@/components/ui/input-group"
 import { Spinner } from "@/components/ui/spinner"
 import { deleteUserPlugin } from "@/lib/auth/delete-user-plugin"
 import { cn } from "@/lib/utils"
@@ -51,6 +56,7 @@ export function DeleteAccount({ className }: DeleteAccountProps) {
 
   const [confirmOpen, setConfirmOpen] = useState(false)
   const [password, setPassword] = useState("")
+  const [isPasswordVisible, setIsPasswordVisible] = useState(false)
 
   const hasCredentialAccount = accounts?.some(
     (account) => account.providerId === "credential"
@@ -62,6 +68,7 @@ export function DeleteAccount({ className }: DeleteAccountProps) {
   const handleDialogOpenChange = (open: boolean) => {
     setConfirmOpen(open)
     setPassword("")
+    setIsPasswordVisible(false)
   }
 
   const handleSubmit = async (e: SyntheticEvent<HTMLFormElement>) => {
@@ -135,17 +142,41 @@ export function DeleteAccount({ className }: DeleteAccountProps) {
                     {localization.auth.password}
                   </FieldLabel>
 
-                  <Input
-                    id="delete-password"
-                    name="password"
-                    type="password"
-                    autoComplete="current-password"
-                    placeholder={localization.auth.passwordPlaceholder}
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    disabled={isPending}
-                    required
-                  />
+                  <InputGroup>
+                    <InputGroupInput
+                      id="delete-password"
+                      name="password"
+                      type={isPasswordVisible ? "text" : "password"}
+                      autoComplete="current-password"
+                      placeholder={localization.auth.passwordPlaceholder}
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      disabled={isPending}
+                      required
+                    />
+
+                    <InputGroupAddon align="inline-end">
+                      <InputGroupButton
+                        size="icon-xs"
+                        aria-label={
+                          isPasswordVisible
+                            ? localization.auth.hidePassword
+                            : localization.auth.showPassword
+                        }
+                        title={
+                          isPasswordVisible
+                            ? localization.auth.hidePassword
+                            : localization.auth.showPassword
+                        }
+                        onClick={() => {
+                          setIsPasswordVisible((visible) => !visible)
+                        }}
+                        disabled={isPending}
+                      >
+                        {isPasswordVisible ? <EyeOff /> : <Eye />}
+                      </InputGroupButton>
+                    </InputGroupAddon>
+                  </InputGroup>
 
                   <FieldError />
                 </Field>
