@@ -58,6 +58,7 @@
     "react": "^19.2.6",
     "react-day-picker": "^10.0.1",
     "react-dom": "^19.2.6",
+    "react-email": "^6.6.8",
     "shadcn": "^4.8.2",
     "sonner": "^2.0.7",
     "tailwind-merge": "^3.5.0",
