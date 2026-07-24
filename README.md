@@ -1,5 +1,7 @@
 # Better Auth UI
 
+🇵🇸 Free Palestine
+
 Beautiful, ready-to-use authentication components for [Better Auth](https://better-auth.com).
 
 Built with **shadcn/ui** and **HeroUI**. Drop in and go.

@@ -21,7 +21,15 @@ Configure `AuthProvider` with TanStack Router's navigation.
 ```tsx title="components/providers.tsx" file=<rootDir>/../../examples/start-shadcn-example/src/components/providers.tsx
 ```
 
-The `navigate` and `Link` props integrate with TanStack Router's navigation system. For TanStack Router, you can pass the `navigate` function directly since it accepts `{ to, replace }` options.
+The `navigate` and `Link` props integrate with TanStack Router's navigation system. You can pass the `navigate` function directly since it accepts `{ to, replace }` options.
+
+`Link` requires a small wrapper. Better Auth UI passes its destination as an `href` prop (the Next.js convention), but TanStack Router's `Link` navigates via `to`. Map one to the other:
+
+```tsx
+Link={({ href, ...props }) => <Link to={href} {...props} />}
+```
+
+If you pass TanStack Router's `Link` directly (`Link={Link}`), it never receives a `to`, so it resolves the rendered anchor against the *current* route — links show the wrong URL on hover even though clicking still navigates correctly.
 
 </Step>
 <Step>

@@ -6,11 +6,17 @@ export const localization = {
     /** @remarks `"Already have an account?"` */
     alreadyHaveAnAccount: "Already have an account?",
 
+    /** @remarks `"Already verified your email?"` */
+    alreadyVerifiedYourEmail: "Already verified your email?",
+
     /** @remarks `"Confirm password"` */
     confirmPassword: "Confirm password",
 
     /** @remarks `"Confirm your password"` */
     confirmPasswordPlaceholder: "Confirm your password",
+
+    /** @remarks `"Check your email for a verification link"` */
+    checkYourEmail: "Check your email for a verification link",
 
     /** @remarks `"Continue with {{provider}}"` */
     continueWith: "Continue with {{provider}}",
@@ -18,8 +24,8 @@ export const localization = {
     /** @remarks `"Email"` */
     email: "Email",
 
-    /** @remarks `"Enter your email"` */
-    emailPlaceholder: "Enter your email",
+    /** @remarks `"m@example.com"` */
+    emailPlaceholder: "m@example.com",
 
     /** @remarks `"This field is required"` */
     fieldRequired: "This field is required",
@@ -42,8 +48,8 @@ export const localization = {
     /** @remarks `"Name"` */
     name: "Name",
 
-    /** @remarks `"Enter your name"` */
-    namePlaceholder: "Enter your name",
+    /** @remarks `"Name"` */
+    namePlaceholder: "Name",
 
     /** @remarks `"Need to create an account?"` */
     needToCreateAnAccount: "Need to create an account?",
@@ -51,8 +57,11 @@ export const localization = {
     /** @remarks `"New password"` */
     newPassword: "New password",
 
-    /** @remarks `"Enter your new password"` */
-    newPasswordPlaceholder: "Enter your new password",
+    /** @remarks `"New password"` */
+    newPasswordPlaceholder: "New password",
+
+    /** @remarks `"Open {{provider}}"` */
+    openEmailProvider: "Open {{provider}}",
 
     /** @remarks `"OR"` */
     or: "OR",
@@ -60,8 +69,8 @@ export const localization = {
     /** @remarks `"Password"` */
     password: "Password",
 
-    /** @remarks `"Enter your password"` */
-    passwordPlaceholder: "Enter your password",
+    /** @remarks `"Password"` */
+    passwordPlaceholder: "Password",
 
     /** @remarks `"Password reset email sent"` */
     passwordResetEmailSent: "Password reset email sent",
@@ -87,6 +96,9 @@ export const localization = {
     /** @remarks `"Resend"` */
     resend: "Resend",
 
+    /** @remarks `"Resend in {{seconds}}s"` */
+    resendIn: "Resend in {{seconds}}s",
+
     /** @remarks `"Reset Password"` */
     resetPassword: "Reset Password",
 
@@ -108,8 +120,8 @@ export const localization = {
     /** @remarks `"Verification email sent!"` */
     verificationEmailSent: "Verification email sent!",
 
-    /** @remarks `"Verify your email"` */
-    verifyYourEmail: "Verify your email"
+    /** @remarks `"Verify Email"` */
+    verifyEmail: "Verify Email"
   },
   settings: {
     /** @remarks `"Account"` */

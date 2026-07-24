@@ -8,6 +8,7 @@ describe("viewPaths.auth", () => {
     expect(viewPaths.auth).toHaveProperty("forgotPassword")
     expect(viewPaths.auth).toHaveProperty("resetPassword")
     expect(viewPaths.auth).toHaveProperty("signOut")
+    expect(viewPaths.auth).toHaveProperty("verifyEmail")
   })
 
   it("should have correct path values", () => {
@@ -16,6 +17,7 @@ describe("viewPaths.auth", () => {
     expect(viewPaths.auth.forgotPassword).toBe("forgot-password")
     expect(viewPaths.auth.resetPassword).toBe("reset-password")
     expect(viewPaths.auth.signOut).toBe("sign-out")
+    expect(viewPaths.auth.verifyEmail).toBe("verify-email")
   })
 
   it("should use kebab-case for all paths", () => {
@@ -44,6 +46,7 @@ describe("authViews (derived)", () => {
     expect(authViews).toContain("forgotPassword")
     expect(authViews).toContain("resetPassword")
     expect(authViews).toContain("signOut")
+    expect(authViews).toContain("verifyEmail")
   })
 
   it("should have valid AuthView type elements", () => {
@@ -59,7 +62,7 @@ describe("authPaths (derived)", () => {
   it("should be able to derive array of auth path values", () => {
     const authPaths = Object.values(viewPaths.auth)
     expect(Array.isArray(authPaths)).toBe(true)
-    expect(authPaths.length).toBe(5)
+    expect(authPaths.length).toBe(6)
   })
 
   it("should contain all built-in path values", () => {
@@ -69,6 +72,7 @@ describe("authPaths (derived)", () => {
     expect(authPaths).toContain("forgot-password")
     expect(authPaths).toContain("reset-password")
     expect(authPaths).toContain("sign-out")
+    expect(authPaths).toContain("verify-email")
   })
 
   it("should have no duplicates", () => {
@@ -89,6 +93,7 @@ describe("viewPaths", () => {
     expect(viewPaths.auth.forgotPassword).toBe("forgot-password")
     expect(viewPaths.auth.resetPassword).toBe("reset-password")
     expect(viewPaths.auth.signOut).toBe("sign-out")
+    expect(viewPaths.auth.verifyEmail).toBe("verify-email")
   })
 })
 
@@ -99,7 +104,8 @@ describe("type safety", () => {
       "signUp",
       "forgotPassword",
       "resetPassword",
-      "signOut"
+      "signOut",
+      "verifyEmail"
     ]
 
     validViews.forEach((view) => {

@@ -24,6 +24,7 @@ const solidDependencies = [
   "@better-auth-ui/solid@latest",
   "@better-auth-ui/core@latest",
   "@tanstack/solid-query",
+  "@tanstack/solid-router",
   "better-auth",
   "lucide-solid",
   "solid-sonner",
@@ -272,6 +273,18 @@ export const solidRegistryManifest = {
       ]
     }),
     item({
+      name: "verify-email",
+      type: "registry:component",
+      title: "Solid Verify Email",
+      description:
+        "Solid verify-email view with a button to open the user's email provider and a cooldown-limited resend button.",
+      files: [
+        componentFile("src/components/auth/verify-email.tsx"),
+        componentFile("src/components/auth/open-email-button.tsx"),
+        ...zaidanFormSupportFiles
+      ]
+    }),
+    item({
       name: "sign-out",
       type: "registry:component",
       title: "Solid Sign Out",
@@ -292,6 +305,7 @@ export const solidRegistryManifest = {
         betterAuthSolidRegistryDependency("sign-up"),
         betterAuthSolidRegistryDependency("forgot-password"),
         betterAuthSolidRegistryDependency("reset-password"),
+        betterAuthSolidRegistryDependency("verify-email"),
         betterAuthSolidRegistryDependency("sign-out")
       ],
       files: [componentFile("src/components/auth/auth.tsx")]

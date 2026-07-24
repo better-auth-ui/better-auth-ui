@@ -27,6 +27,11 @@ export interface AuthViewPaths {
    * @default "sign-out"
    */
   signOut: string
+  /**
+   * Path segment for the verify email view
+   * @default "verify-email"
+   */
+  verifyEmail: string
 }
 
 /**
@@ -61,7 +66,8 @@ export const viewPaths: ViewPaths = {
     signUp: "sign-up",
     forgotPassword: "forgot-password",
     resetPassword: "reset-password",
-    signOut: "sign-out"
+    signOut: "sign-out",
+    verifyEmail: "verify-email"
   },
   settings: {
     account: "account",

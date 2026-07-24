@@ -2,7 +2,12 @@ import {
   AuthProvider as AuthProviderPrimitive,
   type AuthProviderProps
 } from "@better-auth-ui/react"
-import type { ComponentType, PropsWithChildren, ReactNode } from "react"
+import type {
+  ComponentPropsWithoutRef,
+  ComponentType,
+  PropsWithChildren,
+  ReactNode
+} from "react"
 
 import { ErrorToaster } from "./error-toaster"
 
@@ -13,7 +18,12 @@ declare module "@better-auth-ui/core" {
      * Typically TanStack Router's `Link` or Next.js's `Link`.
      */
     Link: ComponentType<
-      PropsWithChildren<{ className?: string; href: string; to?: string }>
+      PropsWithChildren<
+        { className?: string; href: string; to?: string } & Pick<
+          ComponentPropsWithoutRef<"a">,
+          "aria-disabled" | "tabIndex" | "onClick"
+        >
+      >
     >
   }
 

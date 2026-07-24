@@ -1,6 +1,6 @@
 {
   "name": "@better-auth-ui/core",
-  "version": "1.6.20",
+  "version": "1.6.27",
   "type": "module",
   "scripts": {
     "build": "vite build",
@@ -25,11 +25,13 @@
     }
   },
   "devDependencies": {
-    "better-auth": "^1.6.17",
-    "vitest": "^4.1.7"
+    "@mikkelscheike/email-provider-links": "^5.1.8",
+    "better-auth": "^1.6.19",
+    "vitest": "^4.1.9"
   },
   "peerDependencies": {
-    "better-auth": ">=1.6.17"
+    "@mikkelscheike/email-provider-links": ">=5.1.8",
+    "better-auth": ">=1.6.19"
   },
   "repository": {
     "type": "git",

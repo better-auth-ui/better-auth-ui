@@ -60,7 +60,8 @@ export function OrganizationSwitcher({
   const {
     localization: organizationLocalization,
     viewPaths: organizationViewPaths,
-    slug
+    slug,
+    slugPrefix
   } = useAuthPlugin(organizationPlugin)
 
   const { data: activeOrganization, isPending: activeOrganizationPending } =
@@ -86,7 +87,7 @@ export function OrganizationSwitcher({
     } else if (slug !== undefined) {
       navigate({
         to: organization
-          ? `${basePaths.organization}/${organization.slug}/${organizationViewPaths.organization.settings}`
+          ? `${basePaths.organization}/${slugPrefix}${organization.slug}/${organizationViewPaths.organization.settings}`
           : `${basePaths.settings}/${viewPaths.settings.account}`
       })
     } else {
@@ -146,7 +147,7 @@ export function OrganizationSwitcher({
                 <Link
                   href={
                     slug
-                      ? `${basePaths.organization}/${slug}/${organizationViewPaths.organization.settings}`
+                      ? `${basePaths.organization}/${slugPrefix}${slug}/${organizationViewPaths.organization.settings}`
                       : `${basePaths.organization}/${organizationViewPaths.organization.settings}`
                   }
                   className={cn(

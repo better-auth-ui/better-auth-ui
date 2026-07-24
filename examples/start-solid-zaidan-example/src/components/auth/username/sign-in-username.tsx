@@ -13,6 +13,7 @@ import {
 import type { AuthPlugin } from "@better-auth-ui/solid/plugins"
 import { createMutation, useQueryClient } from "@tanstack/solid-query"
 import { Link } from "@tanstack/solid-router"
+import type { BetterFetchError } from "better-auth/client"
 import { Eye, EyeOff } from "lucide-solid"
 import { type Component, createSignal, For, Show } from "solid-js"
 import { Button } from "@/components/ui/button"
@@ -52,7 +53,14 @@ export function SignInUsername(props: SignInUsernameProps) {
   }
   const signIn = createMutation(() => ({
     ...signInEmailOptions(auth.authClient),
-    onError: () => {
+    onError: (error, variables) => {
+      if ((error as BetterFetchError).error?.code === "EMAIL_NOT_VERIFIED") {
+        sessionStorage.setItem("better-auth-ui.verify-email", variables.email)
+        auth.navigate({
+          to: `${auth.basePaths.auth}/${auth.viewPaths.auth.verifyEmail}`
+        })
+      }
+
       resetFetchOptions()
     },
     onSuccess: onSignInSuccess

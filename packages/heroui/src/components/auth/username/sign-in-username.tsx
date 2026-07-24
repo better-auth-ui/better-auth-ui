@@ -4,7 +4,6 @@ import {
   useAuth,
   useAuthPlugin,
   useFetchOptions,
-  useSendVerificationEmail,
   useSignInEmail,
   useSignInUsername
 } from "@better-auth-ui/react"
@@ -21,8 +20,7 @@ import {
   Label,
   Link,
   Spinner,
-  TextField,
-  toast
+  TextField
 } from "@heroui/react"
 import { useIsMutating } from "@tanstack/react-query"
 import { type SyntheticEvent, useState } from "react"
@@ -51,7 +49,6 @@ export function SignInUsername({
   const {
     authClient,
     basePaths,
-    baseURL,
     emailAndPassword,
     localization,
     plugins,
@@ -67,13 +64,6 @@ export function SignInUsername({
 
   const [password, setPassword] = useState("")
 
-  const { mutate: sendVerificationEmail } = useSendVerificationEmail(
-    authClient,
-    {
-      onSuccess: () => toast.success(localization.auth.verificationEmailSent)
-    }
-  )
-
   function isEmail(value: string): boolean {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)
   }
@@ -84,30 +74,39 @@ export function SignInUsername({
         setPassword("")
 
         if (error.error?.code === "EMAIL_NOT_VERIFIED") {
-          toast.danger(error.error?.message || error.message, {
-            actionProps: {
-              children: localization.auth.resend,
-              onClick: () =>
-                sendVerificationEmail({
-                  email,
-                  callbackURL: `${baseURL}${redirectTo}`
-                })
-            }
+          sessionStorage.setItem("better-auth-ui.verify-email", email)
+          navigate({
+            to: `${basePaths.auth}/${viewPaths.auth.verifyEmail}`
           })
         }
 
         resetFetchOptions()
       },
-      onSuccess: () => navigate({ to: redirectTo })
+      onSuccess: () => {
+        sessionStorage.removeItem("better-auth-ui.verify-email")
+        navigate({ to: redirectTo })
+      }
     })
 
   const { mutate: signInUsername, isPending: isSignInUsernamePending } =
     useSignInUsername(authClient as UsernameAuthClient, {
-      onError: () => {
+      onError: (error) => {
         setPassword("")
+
+        if (error.error?.code === "EMAIL_NOT_VERIFIED") {
+          sessionStorage.removeItem("better-auth-ui.verify-email")
+
+          navigate({
+            to: `${basePaths.auth}/${viewPaths.auth.verifyEmail}`
+          })
+        }
+
         resetFetchOptions()
       },
-      onSuccess: () => navigate({ to: redirectTo })
+      onSuccess: () => {
+        sessionStorage.removeItem("better-auth-ui.verify-email")
+        navigate({ to: redirectTo })
+      }
     })
 
   const handleSubmit = (e: SyntheticEvent<HTMLFormElement>) => {
@@ -237,12 +236,12 @@ export function SignInUsername({
                 isDisabled={isPending}
                 variant={variant === "transparent" ? "primary" : "secondary"}
               >
-                <Checkbox.Control>
-                  <Checkbox.Indicator />
-                </Checkbox.Control>
-
                 <Checkbox.Content>
-                  <Label>{localization.auth.rememberMe}</Label>
+                  <Checkbox.Control>
+                    <Checkbox.Indicator />
+                  </Checkbox.Control>
+
+                  {localization.auth.rememberMe}
                 </Checkbox.Content>
               </Checkbox>
             )}
@@ -289,7 +288,7 @@ export function SignInUsername({
         {emailAndPassword?.enabled && emailAndPassword?.forgotPassword && (
           <Link
             href={`${basePaths.auth}/${viewPaths.auth.forgotPassword}`}
-            className="no-underline hover:underline"
+            className="text-sm no-underline hover:underline"
           >
             {localization.auth.forgotPasswordLink}
           </Link>

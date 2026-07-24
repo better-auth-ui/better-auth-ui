@@ -10,13 +10,12 @@ import { useDebouncer } from "@tanstack/react-pacer"
 import { Check, X } from "lucide-react"
 import { useEffect, useState } from "react"
 
-import { Field, FieldError } from "@/components/ui/field"
+import { Field, FieldError, FieldLabel } from "@/components/ui/field"
 import {
   InputGroup,
   InputGroupAddon,
   InputGroupInput
 } from "@/components/ui/input-group"
-import { Label } from "@/components/ui/label"
 import { Spinner } from "@/components/ui/spinner"
 import { organizationPlugin } from "@/lib/auth/organization-plugin"
 
@@ -49,8 +48,11 @@ export function SlugField({
   id = "slug"
 }: SlugFieldProps) {
   const { authClient, localization: authLocalization } = useAuth()
-  const { localization, checkSlug: checkSlugEnabled } =
-    useAuthPlugin(organizationPlugin)
+  const {
+    localization,
+    checkSlug: checkSlugEnabled,
+    slugPrefix
+  } = useAuthPlugin(organizationPlugin)
 
   const [slugError, setSlugError] = useState<string>()
 
@@ -85,9 +87,13 @@ export function SlugField({
 
   return (
     <Field data-invalid={!!slugError}>
-      <Label htmlFor={id}>{localization.slug}</Label>
+      <FieldLabel htmlFor={id}>{localization.slug}</FieldLabel>
 
       <InputGroup>
+        {slugPrefix && (
+          <InputGroupAddon align="inline-start">{slugPrefix}</InputGroupAddon>
+        )}
+
         <InputGroupInput
           id={id}
           name="slug"

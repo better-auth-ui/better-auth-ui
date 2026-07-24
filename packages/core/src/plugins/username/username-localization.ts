@@ -2,11 +2,11 @@ export const usernameLocalization = {
   /** @remarks `"Username"` */
   username: "Username",
 
-  /** @remarks `"Enter your username"` */
-  usernamePlaceholder: "Enter your username",
+  /** @remarks `"Username"` */
+  usernamePlaceholder: "Username",
 
-  /** @remarks `"Enter your username or email"` */
-  usernameOrEmailPlaceholder: "Enter your username or email",
+  /** @remarks `"Username or Email"` */
+  usernameOrEmailPlaceholder: "Username or email",
 
   /** @remarks `"Username is available"` */
   usernameAvailable: "Username is available",
@@ -17,8 +17,8 @@ export const usernameLocalization = {
   /** @remarks `"Display Username"` */
   displayUsername: "Display Username",
 
-  /** @remarks `"Enter your display username"` */
-  displayUsernamePlaceholder: "Enter your display username"
+  /** @remarks `"Display Username"` */
+  displayUsernamePlaceholder: "Display Username"
 }
 
 export type UsernameLocalization = typeof usernameLocalization

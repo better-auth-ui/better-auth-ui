@@ -34,7 +34,8 @@ export function UsernameField({
     localization,
     minUsernameLength,
     maxUsernameLength,
-    isUsernameAvailable: checkAvailability
+    isUsernameAvailable: checkAvailability,
+    usernamePrefix
   } = useAuthPlugin(usernamePlugin)
 
   const currentUsername = String(field.defaultValue ?? "")
@@ -109,6 +110,12 @@ export function UsernameField({
       <Label>{field.label}</Label>
 
       <InputGroup variant={variant === "transparent" ? "primary" : "secondary"}>
+        {usernamePrefix && (
+          <InputGroup.Prefix className="pr-1.5 text-muted">
+            {usernamePrefix}
+          </InputGroup.Prefix>
+        )}
+
         <InputGroup.Input
           placeholder={field.placeholder}
           required={field.required}

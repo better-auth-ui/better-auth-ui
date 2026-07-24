@@ -1,6 +1,7 @@
 import { apiKey } from "@better-auth/api-key"
 import { passkey } from "@better-auth/passkey"
 import {
+  EmailVerificationEmail,
   MagicLinkEmail,
   ResetPasswordEmail
 } from "@better-auth-ui/heroui/email"
@@ -30,6 +31,7 @@ export const auth = betterAuth({
   }),
   emailAndPassword: {
     enabled: true,
+    requireEmailVerification: false,
     sendResetPassword: async ({ user, url }) => {
       const html = await render(
         <ResetPasswordEmail
@@ -45,6 +47,27 @@ export const auth = betterAuth({
         to: user.email,
         subject: "Reset your password",
         text: `Click the link to reset your password: ${url}`,
+        html
+      })
+    }
+  },
+  emailVerification: {
+    sendOnSignUp: true,
+    sendVerificationEmail: async ({ user, url }) => {
+      const html = await render(
+        <EmailVerificationEmail
+          url={url}
+          appName="Better Auth UI"
+          email={user.email}
+          poweredBy
+        />
+      )
+
+      await transporter.sendMail({
+        from: mailFrom,
+        to: user.email,
+        subject: "Verify your email",
+        text: `Click the link to verify your email: ${url}`,
         html
       })
     }

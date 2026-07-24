@@ -74,7 +74,6 @@ function ApiKeyStory() {
 const meta = {
   title: "Zaidan/Plugins/API Key",
   component: ApiKeyStory,
-  tags: ["autodocs"],
   parameters: {
     layout: "fullscreen"
   }

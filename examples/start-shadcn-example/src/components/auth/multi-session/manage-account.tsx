@@ -12,7 +12,7 @@ import {
 import { ArrowLeftRight, LogOut, MoreHorizontal } from "lucide-react"
 import { toast } from "sonner"
 import { UserView } from "@/components/auth/user/user-view"
-import { Button } from "@/components/ui/button"
+import { Button, buttonVariants } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import {
   DropdownMenu,
@@ -22,6 +22,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Spinner } from "@/components/ui/spinner"
 import { multiSessionPlugin } from "@/lib/auth/multi-session-plugin"
+import { cn } from "@/lib/utils"
 
 export type ManageAccountProps = {
   deviceSession?: ListDeviceSession | null
@@ -82,15 +83,14 @@ export function ManageAccount({
 
         {deviceSession && !isActive && (
           <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="ghost"
-                size="icon-sm"
-                className="shrink-0"
-                disabled={isBusy}
-              >
-                <MoreHorizontal />
-              </Button>
+            <DropdownMenuTrigger
+              className={cn(
+                buttonVariants({ variant: "ghost", size: "icon-sm" }),
+                "shrink-0"
+              )}
+              disabled={isBusy}
+            >
+              <MoreHorizontal />
             </DropdownMenuTrigger>
 
             <DropdownMenuContent align="end" className="min-w-fit">

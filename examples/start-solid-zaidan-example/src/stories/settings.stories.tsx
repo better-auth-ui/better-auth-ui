@@ -169,7 +169,6 @@ function SettingsPreviewStory(props: { children: JSX.Element }) {
 
 const meta = {
   title: "Zaidan/Components/Settings",
-  tags: ["autodocs"],
   parameters: {
     layout: "fullscreen"
   }

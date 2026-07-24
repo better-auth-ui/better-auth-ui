@@ -1,0 +1,45 @@
+[
+  {
+    "id": "user-avatar.tsx-UserAvatarProps",
+    "name": "UserAvatarProps",
+    "description": "",
+    "entries": [
+      {
+        "name": "className",
+        "description": "",
+        "tags": [],
+        "type": "string",
+        "simplifiedType": "string",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "fallback",
+        "description": "",
+        "tags": [],
+        "type": "ReactNode",
+        "simplifiedType": "ReactNode",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "isPending",
+        "description": "",
+        "tags": [],
+        "type": "boolean",
+        "simplifiedType": "boolean",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "user",
+        "description": "",
+        "tags": [{ "name": "remarks", "text": "`User`" }],
+        "type": "({ id: string; createdAt: Date; updatedAt: Date; email: string; emailVerified: boolean; name: string; image?: string | null; } & { username?: string | null; displayUsername?: string | null; })",
+        "simplifiedType": "User",
+        "required": false,
+        "deprecated": false
+      }
+    ]
+  }
+]

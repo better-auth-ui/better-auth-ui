@@ -44,10 +44,11 @@ export function SignUp(props: SignUpProps) {
     onError: () => {
       resetFetchOptions()
     },
-    onSuccess: () => {
+    onSuccess: (_data, variables) => {
       if (auth.emailAndPassword.requireEmailVerification) {
+        sessionStorage.setItem("better-auth-ui.verify-email", variables.email)
         auth.navigate({
-          to: `${auth.basePaths.auth}/${auth.viewPaths.auth.signIn}`
+          to: `${auth.basePaths.auth}/${auth.viewPaths.auth.verifyEmail}`
         })
         return
       }

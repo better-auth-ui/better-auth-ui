@@ -69,10 +69,10 @@ export function Appearance({
                 >
                   <Radio.Content className="gap-2">
                     <div className="flex gap-2 justify-between">
-                      <Label className="flex gap-2 items-center">
+                      <span className="flex gap-2 items-center">
                         <Display className="text-muted" />
                         {localization.system}
-                      </Label>
+                      </span>
 
                       <Radio.Control>
                         <Radio.Indicator />
@@ -98,10 +98,10 @@ export function Appearance({
                 >
                   <Radio.Content className="gap-2">
                     <div className="flex gap-2 justify-between">
-                      <Label className="flex gap-2 items-center">
+                      <span className="flex gap-2 items-center">
                         <Sun className="text-muted" />
                         {localization.light}
-                      </Label>
+                      </span>
 
                       <Radio.Control>
                         <Radio.Indicator />
@@ -127,10 +127,10 @@ export function Appearance({
                 >
                   <Radio.Content className="gap-2">
                     <div className="flex gap-2 justify-between">
-                      <Label className="flex gap-2 items-center">
+                      <span className="flex gap-2 items-center">
                         <Moon className="text-muted" />
                         {localization.dark}
-                      </Label>
+                      </span>
 
                       <Radio.Control>
                         <Radio.Indicator />

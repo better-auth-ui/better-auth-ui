@@ -61,3 +61,6 @@ Thumbs.db
 .cursor/
 .repos
 /apps/docs/public/storybook/
+.codex
+.opencode
+opencode.json

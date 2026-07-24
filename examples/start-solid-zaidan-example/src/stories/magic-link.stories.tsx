@@ -60,7 +60,6 @@ function MagicLinkStory() {
 const meta = {
   title: "Zaidan/Plugins/Magic Link",
   component: MagicLinkStory,
-  tags: ["autodocs"],
   parameters: {
     layout: "fullscreen"
   }

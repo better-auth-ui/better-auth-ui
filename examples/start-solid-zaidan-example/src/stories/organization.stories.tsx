@@ -441,7 +441,6 @@ function UserInvitationsPreviewContent() {
 
 const meta = {
   title: "Zaidan/Plugins/Organization",
-  tags: ["autodocs"],
   parameters: {
     layout: "fullscreen"
   }

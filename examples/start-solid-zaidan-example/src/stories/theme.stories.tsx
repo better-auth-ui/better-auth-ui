@@ -110,7 +110,6 @@ function AppearancePreviewStory() {
 
 const meta = {
   title: "Zaidan/Plugins/Theme",
-  tags: ["autodocs"],
   parameters: {
     layout: "fullscreen"
   }

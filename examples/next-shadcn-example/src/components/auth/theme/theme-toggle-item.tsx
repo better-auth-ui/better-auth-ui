@@ -37,7 +37,9 @@ export function ThemeToggleItem() {
     if (target.getAttribute("role") !== "tab") return
 
     const wrapper = target.closest<HTMLElement>('[role="menuitem"]')
-    const content = wrapper?.closest<HTMLElement>("[data-radix-menu-content]")
+    const content = wrapper?.closest<HTMLElement>(
+      '[data-slot="dropdown-menu-content"]'
+    )
     if (!wrapper || !content) return
 
     const items = Array.from(
@@ -57,7 +59,6 @@ export function ThemeToggleItem() {
 
   return (
     <DropdownMenuItem
-      asChild
       onSelect={(e) => e.preventDefault()}
       onFocus={(e) => {
         // onFocus bubbles in React, so guard against re-entry from focus
@@ -65,48 +66,46 @@ export function ThemeToggleItem() {
         if (e.target === e.currentTarget) focusActiveTab()
       }}
     >
-      <div>
-        <PaletteIcon className="text-muted-foreground" />
+      <PaletteIcon className="text-muted-foreground" />
 
-        <span>{localization.theme}</span>
+      <span>{localization.theme}</span>
 
-        <Tabs
-          className="ml-auto"
-          value={theme}
-          onValueChange={setTheme}
-          onKeyDown={handleTabsKeyDown}
-        >
-          <TabsList ref={tabsListRef} className="h-6!">
-            {themes.includes("system") && (
-              <TabsTrigger
-                value="system"
-                className="size-5 p-0"
-                aria-label={localization.system}
-              >
-                <Monitor className="size-3" />
-              </TabsTrigger>
-            )}
-            {themes.includes("light") && (
-              <TabsTrigger
-                value="light"
-                className="size-5 p-0"
-                aria-label={localization.light}
-              >
-                <Sun className="size-3" />
-              </TabsTrigger>
-            )}
-            {themes.includes("dark") && (
-              <TabsTrigger
-                value="dark"
-                className="size-5 p-0"
-                aria-label={localization.dark}
-              >
-                <Moon className="size-3" />
-              </TabsTrigger>
-            )}
-          </TabsList>
-        </Tabs>
-      </div>
+      <Tabs
+        className="ml-auto"
+        value={theme}
+        onValueChange={setTheme}
+        onKeyDown={handleTabsKeyDown}
+      >
+        <TabsList ref={tabsListRef} className="h-6!">
+          {themes.includes("system") && (
+            <TabsTrigger
+              value="system"
+              className="size-5 p-0"
+              aria-label={localization.system}
+            >
+              <Monitor className="size-3" />
+            </TabsTrigger>
+          )}
+          {themes.includes("light") && (
+            <TabsTrigger
+              value="light"
+              className="size-5 p-0"
+              aria-label={localization.light}
+            >
+              <Sun className="size-3" />
+            </TabsTrigger>
+          )}
+          {themes.includes("dark") && (
+            <TabsTrigger
+              value="dark"
+              className="size-5 p-0"
+              aria-label={localization.dark}
+            >
+              <Moon className="size-3" />
+            </TabsTrigger>
+          )}
+        </TabsList>
+      </Tabs>
     </DropdownMenuItem>
   )
 }

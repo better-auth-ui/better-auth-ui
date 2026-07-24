@@ -48,7 +48,6 @@
         "field",
         "input",
         "input-group",
-        "label",
         "popover",
         "select",
         "slider",
@@ -78,7 +77,6 @@
         "button",
         "card",
         "input",
-        "label",
         "checkbox",
         "separator",
         "field",
@@ -158,7 +156,6 @@
         "button",
         "card",
         "input",
-        "label",
         "field",
         "separator",
         "sonner",
@@ -216,7 +213,6 @@
         "field",
         "input",
         "input-group",
-        "label",
         "separator",
         "sonner",
         "spinner"
@@ -261,7 +257,6 @@
         "card",
         "field",
         "input",
-        "label",
         "separator",
         "skeleton",
         "spinner"
@@ -674,7 +669,7 @@
         "@better-auth-ui/core@latest",
         "lucide-react"
       ],
-      "registryDependencies": ["card", "field", "label", "radio-group", "tabs"],
+      "registryDependencies": ["card", "field", "radio-group", "tabs"],
       "files": [
         {
           "path": "src/lib/auth/auth-plugin.ts",
@@ -715,7 +710,6 @@
         "card",
         "field",
         "input",
-        "label",
         "sonner",
         "spinner"
       ],
@@ -796,6 +790,31 @@
       ]
     },
     {
+      "name": "verify-email",
+      "type": "registry:component",
+      "title": "Verify Email",
+      "description": "A page prompting the user to verify their email, with a button to open their email provider and a resend button rate-limited by a cooldown timer.",
+      "dependencies": [
+        "@better-auth-ui/react@latest",
+        "@better-auth-ui/core@latest",
+        "better-auth",
+        "lucide-react"
+      ],
+      "registryDependencies": ["button", "card", "field", "sonner", "spinner"],
+      "files": [
+        {
+          "path": "src/components/auth/verify-email.tsx",
+          "type": "registry:component",
+          "target": "@components/auth/verify-email.tsx"
+        },
+        {
+          "path": "src/components/auth/open-email-button.tsx",
+          "type": "registry:component",
+          "target": "@components/auth/open-email-button.tsx"
+        }
+      ]
+    },
+    {
       "name": "sign-out",
       "type": "registry:component",
       "title": "Sign Out",
@@ -829,6 +848,7 @@
         "https://better-auth-ui.com/r/sign-up.json",
         "https://better-auth-ui.com/r/forgot-password.json",
         "https://better-auth-ui.com/r/reset-password.json",
+        "https://better-auth-ui.com/r/verify-email.json",
         "https://better-auth-ui.com/r/sign-out.json"
       ],
       "files": [
@@ -925,7 +945,6 @@
         "field",
         "input",
         "input-group",
-        "label",
         "skeleton",
         "sonner",
         "spinner",
@@ -1137,7 +1156,7 @@
       "dependencies": [
         "@better-auth-ui/react@latest",
         "@better-auth-ui/core@latest",
-        "@react-email/components"
+        "react-email"
       ],
       "registryDependencies": [],
       "files": [
@@ -1161,7 +1180,7 @@
       "dependencies": [
         "@better-auth-ui/react@latest",
         "@better-auth-ui/core@latest",
-        "@react-email/components"
+        "react-email"
       ],
       "registryDependencies": [],
       "files": [
@@ -1185,7 +1204,7 @@
       "dependencies": [
         "@better-auth-ui/react@latest",
         "@better-auth-ui/core@latest",
-        "@react-email/components"
+        "react-email"
       ],
       "registryDependencies": [],
       "files": [
@@ -1209,7 +1228,7 @@
       "dependencies": [
         "@better-auth-ui/react@latest",
         "@better-auth-ui/core@latest",
-        "@react-email/components"
+        "react-email"
       ],
       "registryDependencies": [],
       "files": [
@@ -1233,7 +1252,7 @@
       "dependencies": [
         "@better-auth-ui/react@latest",
         "@better-auth-ui/core@latest",
-        "@react-email/components"
+        "react-email"
       ],
       "registryDependencies": [],
       "files": [
@@ -1257,7 +1276,7 @@
       "dependencies": [
         "@better-auth-ui/react@latest",
         "@better-auth-ui/core@latest",
-        "@react-email/components"
+        "react-email"
       ],
       "registryDependencies": [],
       "files": [
@@ -1281,7 +1300,7 @@
       "dependencies": [
         "@better-auth-ui/react@latest",
         "@better-auth-ui/core@latest",
-        "@react-email/components"
+        "react-email"
       ],
       "registryDependencies": [],
       "files": [
@@ -1305,7 +1324,7 @@
       "dependencies": [
         "@better-auth-ui/react@latest",
         "@better-auth-ui/core@latest",
-        "@react-email/components"
+        "react-email"
       ],
       "registryDependencies": [],
       "files": [
@@ -1341,6 +1360,7 @@
         "https://better-auth-ui.com/r/delete-user.json",
         "https://better-auth-ui.com/r/forgot-password.json",
         "https://better-auth-ui.com/r/reset-password.json",
+        "https://better-auth-ui.com/r/verify-email.json",
         "https://better-auth-ui.com/r/sign-out.json",
         "https://better-auth-ui.com/r/auth.json",
         "https://better-auth-ui.com/r/user-avatar.json",

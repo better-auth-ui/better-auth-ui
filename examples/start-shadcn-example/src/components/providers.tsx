@@ -28,9 +28,13 @@ export function Providers({ children }: { children: ReactNode }) {
         authClient={authClient}
         redirectTo="/settings/account"
         socialProviders={["github"]}
+        emailAndPassword={{ requireEmailVerification: false }}
         navigate={navigate}
         plugins={[
-          usernamePlugin(),
+          usernamePlugin({
+            usernamePrefix: "@",
+            localization: { usernamePlaceholder: "username" }
+          }),
           magicLinkPlugin(),
           passkeyPlugin(),
           apiKeyPlugin({ organization: true }),
@@ -38,10 +42,11 @@ export function Providers({ children }: { children: ReactNode }) {
           multiSessionPlugin(),
           deleteUserPlugin(),
           organizationPlugin({
+            slugPrefix: "@",
             slug: slug ?? null
           })
         ]}
-        Link={Link}
+        Link={({ href, ...props }) => <Link to={href} {...props} />}
       >
         {children}
 

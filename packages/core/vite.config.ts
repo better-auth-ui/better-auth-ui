@@ -9,8 +9,12 @@ export default defineConfig({
       formats: ["es"]
     },
     rolldownOptions: {
-      // All bare module IDs (not starting with `.` or `/` or `C:\`)
-      external: /^[^./](?!:[/\\])/
+      // Externalize all bare module IDs (not starting with `.` or `/` or `C:\`),
+      // except `.json` data files which must be inlined: the published package
+      // ships raw JSON that Node ESM only loads with an explicit
+      // `with { type: "json" }` attribute, and the bundler strips that attribute
+      // when externalizing. Inlining keeps the output browser-safe too.
+      external: (id) => /^[^./](?!:[/\\])/.test(id) && !id.endsWith(".json")
     }
   }
 })

@@ -71,6 +71,11 @@ export type OrganizationPluginOptions = {
    */
   additionalRoles?: Record<string, string>
   slug?: string | null
+  /**
+   * Prefix prepended to organization slugs.
+   * @default ""
+   */
+  slugPrefix?: string
 }
 
 export const organizationPlugin = createAuthPlugin(
@@ -83,6 +88,7 @@ export const organizationPlugin = createAuthPlugin(
 
     return {
       slug: options.slug,
+      slugPrefix: options.slugPrefix ?? "",
       checkSlug: options.checkSlug ?? true,
       localization,
       logo: {

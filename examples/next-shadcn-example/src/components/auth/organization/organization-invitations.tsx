@@ -12,7 +12,7 @@ import { ChevronUp, Filter, Search, X } from "lucide-react"
 import { type ComponentProps, type ReactNode, useMemo, useState } from "react"
 
 import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
+import { buttonVariants } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import {
   DropdownMenu,
@@ -150,12 +150,13 @@ export function OrganizationInvitations({
           </InputGroup>
 
           <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button size="sm" variant="outline" disabled={isPending}>
-                <Filter />
+            <DropdownMenuTrigger
+              className={cn(buttonVariants({ size: "sm", variant: "outline" }))}
+              disabled={isPending}
+            >
+              <Filter />
 
-                {organizationLocalization.role}
-              </Button>
+              {organizationLocalization.role}
             </DropdownMenuTrigger>
 
             <DropdownMenuContent align="start">
@@ -177,12 +178,13 @@ export function OrganizationInvitations({
           </DropdownMenu>
 
           <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button size="sm" variant="outline" disabled={isPending}>
-                <Filter />
+            <DropdownMenuTrigger
+              className={cn(buttonVariants({ size: "sm", variant: "outline" }))}
+              disabled={isPending}
+            >
+              <Filter />
 
-                {organizationLocalization.status}
-              </Button>
+              {organizationLocalization.status}
             </DropdownMenuTrigger>
 
             <DropdownMenuContent align="start">

@@ -143,7 +143,6 @@ function UserButtonLinksPreviewStory() {
 
 const meta = {
   title: "Zaidan/Components/User",
-  tags: ["autodocs"],
   parameters: {
     layout: "fullscreen"
   }

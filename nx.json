@@ -12,6 +12,7 @@
       "cache": true
     },
     "test": {
+      "dependsOn": ["^build"],
       "cache": true
     },
     "dev": {

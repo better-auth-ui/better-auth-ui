@@ -129,7 +129,6 @@ function PasskeysPreviewStory() {
 
 const meta = {
   title: "Zaidan/Plugins/Passkey",
-  tags: ["autodocs"],
   parameters: {
     layout: "fullscreen"
   }

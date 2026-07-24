@@ -5,7 +5,7 @@ import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
 import { useIsMutating } from "@tanstack/react-query"
 import { Lock, Mail } from "lucide-react"
 
-import { Button } from "@/components/ui/button"
+import { buttonVariants } from "@/components/ui/button"
 import { magicLinkPlugin } from "@/lib/auth/magic-link-plugin"
 import { cn } from "@/lib/utils"
 
@@ -43,25 +43,27 @@ export function MagicLinkButton({ view }: MagicLinkButtonProps) {
   if (isMagicLinkView && !emailAndPassword?.enabled) return null
 
   return (
-    <Button
-      type="button"
-      variant="outline"
-      disabled={isPending}
-      className={cn("w-full", isPending && "opacity-50 pointer-events-none")}
-      asChild
+    <Link
+      href={`${basePaths.auth}/${isMagicLinkView ? viewPaths.auth.signIn : magicLinkViewPaths.auth.magicLink}`}
+      aria-disabled={isPending || undefined}
+      tabIndex={isPending ? -1 : undefined}
+      onClick={(event) => {
+        if (isPending) event.preventDefault()
+      }}
+      className={cn(
+        buttonVariants({ variant: "outline" }),
+        "w-full",
+        isPending && "opacity-50 pointer-events-none"
+      )}
     >
-      <Link
-        href={`${basePaths.auth}/${isMagicLinkView ? viewPaths.auth.signIn : magicLinkViewPaths.auth.magicLink}`}
-      >
-        {isMagicLinkView ? <Lock /> : <Mail />}
+      {isMagicLinkView ? <Lock /> : <Mail />}
 
-        {localization.auth.continueWith.replace(
-          "{{provider}}",
-          isMagicLinkView
-            ? localization.auth.password
-            : magicLinkLocalization.magicLink
-        )}
-      </Link>
-    </Button>
+      {localization.auth.continueWith.replace(
+        "{{provider}}",
+        isMagicLinkView
+          ? localization.auth.password
+          : magicLinkLocalization.magicLink
+      )}
+    </Link>
   )
 }

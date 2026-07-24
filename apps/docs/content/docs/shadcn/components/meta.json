@@ -15,6 +15,7 @@
     "auth/sign-out",
     "auth/forgot-password",
     "auth/reset-password",
+    "auth/verify-email",
     "---Settings---",
     "settings/settings",
     "settings/account/account-settings",

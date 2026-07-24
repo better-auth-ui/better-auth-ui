@@ -67,7 +67,6 @@ function DeleteAccountStory() {
 const meta = {
   title: "Zaidan/Plugins/Delete User",
   component: DeleteAccountStory,
-  tags: ["autodocs"],
   parameters: {
     layout: "fullscreen"
   }

@@ -23,7 +23,8 @@ export function OrganizationRow({ organization }: OrganizationRowProps) {
   const {
     localization: organizationLocalization,
     viewPaths: organizationViewPaths,
-    slug
+    slug,
+    slugPrefix
   } = useAuthPlugin(organizationPlugin)
 
   const { mutate: setActiveOrganization, isPending: setActivePending } =
@@ -38,7 +39,7 @@ export function OrganizationRow({ organization }: OrganizationRowProps) {
   function manageOrganization() {
     if (slug !== undefined) {
       navigate({
-        to: `${basePaths.organization}/${organization.slug}/${organizationViewPaths.organization.settings}`
+        to: `${basePaths.organization}/${slugPrefix}${organization.slug}/${organizationViewPaths.organization.settings}`
       })
     } else {
       setActiveOrganization({ organizationId: organization.id })

@@ -26,6 +26,19 @@ TARGETS=(
   "$EXAMPLE_DIR/../next-shadcn-example/src"
 )
 
+# Library-agnostic subtrees mirrored into the Base UI example. The auth
+# components and plugin scaffolding are written to work against both Radix
+# and Base UI primitives, so they stay in sync here — but `components/ui`
+# is intentionally excluded since those primitives differ per library.
+AGNOSTIC_MIRRORS=(
+  components/auth
+  lib/auth
+)
+
+AGNOSTIC_TARGETS=(
+  "$EXAMPLE_DIR/../start-shadcn-baseui-example/src"
+)
+
 REGISTRY_OUTPUT="$EXAMPLE_DIR/../../apps/docs/public/r"
 
 # `shadcn build` writes one JSON per registry item but never deletes stale
@@ -43,6 +56,18 @@ echo "→ shadcn build → $REGISTRY_OUTPUT"
 for target in "${TARGETS[@]}"; do
   echo "→ syncing $target"
   for path in "${MIRRORS[@]}"; do
+    # Guard against empty variables so a misconfigured loop never does `rm -rf /`.
+    : "${target:?target is empty}"
+    : "${path:?mirror path entry is empty}"
+    rm -rf -- "$target/$path"
+    mkdir -p -- "$(dirname "$target/$path")"
+    cp -R -- "$SRC/$path" "$target/$path"
+  done
+done
+
+for target in "${AGNOSTIC_TARGETS[@]}"; do
+  echo "→ syncing $target (agnostic subtrees only)"
+  for path in "${AGNOSTIC_MIRRORS[@]}"; do
     # Guard against empty variables so a misconfigured loop never does `rm -rf /`.
     : "${target:?target is empty}"
     : "${path:?mirror path entry is empty}"

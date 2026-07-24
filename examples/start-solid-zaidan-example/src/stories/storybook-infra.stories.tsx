@@ -16,8 +16,7 @@ function StorybookInfra() {
 
 const meta = {
   title: "Zaidan/Infrastructure/Storybook",
-  component: StorybookInfra,
-  tags: ["autodocs"]
+  component: StorybookInfra
 } satisfies Meta<typeof StorybookInfra>
 
 export default meta

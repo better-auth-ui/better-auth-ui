@@ -2,7 +2,30 @@
 @import "@heroui/styles";
 @import "@better-auth-ui/heroui/styles";
 
+/*
+ * Dev-only: scan the package's live `src` for Tailwind classes.
+ *
+ * `@tailwindcss/vite` resolves the `@better-auth-ui/heroui/styles` import using
+ * the `default` export condition (`dist/styles.css`), not the `src` condition we
+ * use for JS in `vite.config.ts`. That `dist` CSS only scans the stale compiled
+ * `dist` output, so new utility classes added in `src` never get generated.
+ * Pointing `@source` at the real `src` makes class edits work during dev.
+ */
+@source "../../../../packages/heroui/src";
+
 html,
 body {
   @apply bg-background text-foreground;
+}
+
+.button {
+  @apply will-change-transform;
+}
+
+.menu-item {
+  @apply will-change-transform;
+}
+
+.dropdown__popover {
+  @apply will-change-transform;
 }

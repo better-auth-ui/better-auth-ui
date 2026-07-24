@@ -105,6 +105,7 @@ const expectedSolidRegistryPayloadNames = [
   "api-key",
   "forgot-password",
   "reset-password",
+  "verify-email",
   "sign-out",
   "auth",
   "user-button",
@@ -1804,6 +1805,7 @@ describe("Solid registry isolation", () => {
       solidRegistryUrl("sign-up"),
       solidRegistryUrl("forgot-password"),
       solidRegistryUrl("reset-password"),
+      solidRegistryUrl("verify-email"),
       solidRegistryUrl("sign-out")
     ])
     expect(auth.files).toEqual([
@@ -2534,6 +2536,7 @@ describe("Solid registry isolation", () => {
       "sign-out",
       "forgot-password",
       "reset-password",
+      "verify-email",
       "---Settings---",
       "settings",
       "account-settings",
@@ -2864,7 +2867,8 @@ describe("Solid registry isolation", () => {
       "user-avatar": "<UserAvatar />",
       "user-button": "<UserButton />",
       "user-profile": "<UserProfile />",
-      "user-view": "<UserView />"
+      "user-view": "<UserView />",
+      "verify-email": "<VerifyEmail />"
     }
 
     for (const [name, title] of Object.entries(expectedComponentTitles)) {
@@ -3357,7 +3361,7 @@ describe("Solid registry isolation", () => {
     expect(organizationRegistry).toContain("useCheckOrganizationSlug")
     expect(organizationRegistry).toContain("organization-row.tsx")
     expect(organizationPayload.registryDependencies).toEqual([
-      solidRegistryUrl("auth-provider")
+      solidRegistryUrl("user-view")
     ])
     const authProviderPayload = readJson<{
       registryDependencies: string[]

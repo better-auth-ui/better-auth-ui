@@ -6,6 +6,7 @@ import {
   useSession
 } from "@better-auth-ui/solid"
 import { createMutation, createQuery } from "@tanstack/solid-query"
+import type { BetterFetchError } from "better-auth/client"
 import { Eye, EyeOff } from "lucide-solid"
 import { createSignal, Show } from "solid-js"
 import { toast } from "solid-sonner"
@@ -55,7 +56,7 @@ export function ChangePasswordSettings(
   }))
   const changePassword = createMutation(() => ({
     ...changePasswordOptions(auth.authClient),
-    onError: (error) => {
+    onError: (error: BetterFetchError) => {
       setCurrentPassword("")
       setNewPassword("")
       setConfirmPassword("")

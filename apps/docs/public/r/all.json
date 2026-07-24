@@ -18,6 +18,7 @@
     "https://better-auth-ui.com/r/delete-user.json",
     "https://better-auth-ui.com/r/forgot-password.json",
     "https://better-auth-ui.com/r/reset-password.json",
+    "https://better-auth-ui.com/r/verify-email.json",
     "https://better-auth-ui.com/r/sign-out.json",
     "https://better-auth-ui.com/r/auth.json",
     "https://better-auth-ui.com/r/user-avatar.json",

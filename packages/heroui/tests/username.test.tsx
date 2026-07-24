@@ -95,9 +95,7 @@ describe("<SignInUsername />", () => {
   it("uses the plugin's username/email placeholder", () => {
     renderSignInUsername()
 
-    expect(
-      screen.getByPlaceholderText("Enter your username or email")
-    ).toBeInTheDocument()
+    expect(screen.getByPlaceholderText("Username or email")).toBeInTheDocument()
   })
 
   it("routes non-email input to authClient.signIn.username", async () => {

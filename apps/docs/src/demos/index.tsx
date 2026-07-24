@@ -6,6 +6,7 @@ import { ResetPasswordDemo as HeroUIResetPasswordDemo } from "./heroui/auth/rese
 import { SignInDemo as HeroUISignInDemo } from "./heroui/auth/sign-in"
 import { SignOutDemo as HeroUISignOutDemo } from "./heroui/auth/sign-out"
 import { SignUpDemo as HeroUISignUpDemo } from "./heroui/auth/sign-up"
+import { VerifyEmailDemo as HeroUIVerifyEmailDemo } from "./heroui/auth/verify-email"
 import { DangerZoneDemo as HeroUIDangerZoneDemo } from "./heroui/delete-user/danger-zone"
 import { EmailChangedEmailDemo as HeroUIEmailChangedEmailDemo } from "./heroui/email/email-changed-email"
 import { EmailVerificationEmailDemo as HeroUIEmailVerificationEmailDemo } from "./heroui/email/email-verification-email"
@@ -56,6 +57,7 @@ import { ResetPasswordDemo as ShadcnResetPasswordDemo } from "./shadcn/auth/rese
 import { SignInDemo as ShadcnSignInDemo } from "./shadcn/auth/sign-in"
 import { SignOutDemo as ShadcnSignOutDemo } from "./shadcn/auth/sign-out"
 import { SignUpDemo as ShadcnSignUpDemo } from "./shadcn/auth/sign-up"
+import { VerifyEmailDemo as ShadcnVerifyEmailDemo } from "./shadcn/auth/verify-email"
 import { DangerZoneDemo as ShadcnDangerZoneDemo } from "./shadcn/delete-user/danger-zone"
 import { EmailChangedEmailDemo as ShadcnEmailChangedEmailDemo } from "./shadcn/email/email-changed-email"
 import { EmailVerificationEmailDemo as ShadcnEmailVerificationEmailDemo } from "./shadcn/email/email-verification-email"
@@ -163,6 +165,7 @@ export const demos: Record<string, ComponentType> = {
   "heroui-username-sign-in": HeroUISignInUsernameDemo,
   "heroui-username-sign-up": HeroUISignUpUsernameDemo,
   "heroui-username-user-profile": HeroUIUserProfileUsernameDemo,
+  "heroui-verify-email": HeroUIVerifyEmailDemo,
   "shadcn-account-settings": ShadcnAccountSettingsDemo,
   "shadcn-active-sessions": ShadcnActiveSessionsDemo,
   "shadcn-api-keys": ShadcnApiKeysDemo,
@@ -212,6 +215,7 @@ export const demos: Record<string, ComponentType> = {
   "shadcn-username-sign-in": ShadcnSignInUsernameDemo,
   "shadcn-username-sign-up": ShadcnSignUpUsernameDemo,
   "shadcn-username-user-profile": ShadcnUserProfileUsernameDemo,
+  "shadcn-verify-email": ShadcnVerifyEmailDemo,
   "shadcn-theme-toggle-item": ShadcnThemeToggleItemDemo,
   "zaidan-email-changed-email": ZaidanEmailChangedEmailDemo,
   "zaidan-email-verification-email": ZaidanEmailVerificationEmailDemo,

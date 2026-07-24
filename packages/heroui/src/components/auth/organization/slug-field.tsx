@@ -48,8 +48,11 @@ export function SlugField({
   ...props
 }: SlugFieldProps & TextFieldProps) {
   const { authClient, localization: authLocalization } = useAuth()
-  const { localization, checkSlug: checkSlugEnabled } =
-    useAuthPlugin(organizationPlugin)
+  const {
+    localization,
+    checkSlug: checkSlugEnabled,
+    slugPrefix
+  } = useAuthPlugin(organizationPlugin)
 
   const {
     mutate: checkSlug,
@@ -93,6 +96,12 @@ export function SlugField({
       <Label>{localization.slug}</Label>
 
       <InputGroup variant={variant}>
+        {slugPrefix && (
+          <InputGroup.Prefix className="pr-1.5 text-muted">
+            {slugPrefix}
+          </InputGroup.Prefix>
+        )}
+
         <InputGroup.Input placeholder={localization.slugPlaceholder} required />
 
         {checkSlugEnabled && !!value.trim() && value.trim() !== currentSlug && (

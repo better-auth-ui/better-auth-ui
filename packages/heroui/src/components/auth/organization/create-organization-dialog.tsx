@@ -43,6 +43,7 @@ export function CreateOrganizationDialog({
 
   const [name, setName] = useState("")
   const [slug, setSlug] = useState("")
+  const [slugEdited, setSlugEdited] = useState(false)
 
   const { mutate: createOrganization, isPending: isCreating } =
     useCreateOrganization(authClient as OrganizationAuthClient, {
@@ -58,12 +59,14 @@ export function CreateOrganizationDialog({
     if (!isOpen) {
       setSlug("")
       setName("")
+      setSlugEdited(false)
     }
   }, [isOpen])
 
   useEffect(() => {
+    if (slugEdited) return
     setSlug(sanitizeSlug(name))
-  }, [name])
+  }, [name, slugEdited])
 
   return (
     <AlertDialog.Backdrop isOpen={isOpen} onOpenChange={onOpenChange}>
@@ -111,7 +114,10 @@ export function CreateOrganizationDialog({
 
               <SlugField
                 value={slug}
-                onChange={setSlug}
+                onChange={(value) => {
+                  setSlug(value)
+                  setSlugEdited(true)
+                }}
                 isDisabled={isCreating}
                 variant="secondary"
               />

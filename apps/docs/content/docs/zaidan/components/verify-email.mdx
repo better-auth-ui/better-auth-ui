@@ -1,0 +1,27 @@
+---
+title: <VerifyEmail />
+description: Renders a Solid view that prompts the user to verify their email, with an open-email button and a cooldown-limited resend button.
+---
+
+## Usage
+
+<ZaidanStory
+  storyId="zaidan-components-auth--verify-email-preview"
+  title="Zaidan VerifyEmail preview"
+  height={430}
+/>
+
+```tsx file=<rootDir>/../../examples/start-solid-zaidan-example/src/demos/auth/verify-email.tsx
+```
+
+## Installation
+
+```npm
+npx shadcn@latest add https://better-auth-ui.com/r/solid/verify-email.json
+```
+
+After install, `src/components/auth/verify-email.tsx` and the copied verify-email files are app-owned. The component reads the target email from `sessionStorage` (set on sign-up or sign-in redirect) and redirects back to sign-in when no email is stored.
+
+## Props
+
+<auto-type-table path="../../../../../../examples/start-solid-zaidan-example/src/components/auth/verify-email.tsx" name="VerifyEmailProps" />

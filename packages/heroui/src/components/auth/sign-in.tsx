@@ -1,10 +1,5 @@
 import { authMutationKeys } from "@better-auth-ui/core"
-import {
-  useAuth,
-  useFetchOptions,
-  useSendVerificationEmail,
-  useSignInEmail
-} from "@better-auth-ui/react"
+import { useAuth, useFetchOptions, useSignInEmail } from "@better-auth-ui/react"
 import {
   Button,
   Card,
@@ -18,8 +13,7 @@ import {
   Label,
   Link,
   Spinner,
-  TextField,
-  toast
+  TextField
 } from "@heroui/react"
 import { useIsMutating } from "@tanstack/react-query"
 import { type SyntheticEvent, useState } from "react"
@@ -48,7 +42,6 @@ export function SignIn({
   const {
     authClient,
     basePaths,
-    baseURL,
     emailAndPassword,
     localization,
     plugins,
@@ -62,13 +55,6 @@ export function SignIn({
 
   const [password, setPassword] = useState("")
 
-  const { mutate: sendVerificationEmail } = useSendVerificationEmail(
-    authClient,
-    {
-      onSuccess: () => toast.success(localization.auth.verificationEmailSent)
-    }
-  )
-
   const { mutate: signInEmail, isPending: signInEmailPending } = useSignInEmail(
     authClient,
     {
@@ -76,15 +62,9 @@ export function SignIn({
         setPassword("")
 
         if (error.error?.code === "EMAIL_NOT_VERIFIED") {
-          toast.danger(error.error?.message || error.message, {
-            actionProps: {
-              children: localization.auth.resend,
-              onClick: () =>
-                sendVerificationEmail({
-                  email,
-                  callbackURL: `${baseURL}${redirectTo}`
-                })
-            }
+          sessionStorage.setItem("better-auth-ui.verify-email", email)
+          navigate({
+            to: `${basePaths.auth}/${viewPaths.auth.verifyEmail}`
           })
         }
 
@@ -213,12 +193,12 @@ export function SignIn({
                 isDisabled={isPending}
                 variant={variant === "transparent" ? "primary" : "secondary"}
               >
-                <Checkbox.Control>
-                  <Checkbox.Indicator />
-                </Checkbox.Control>
-
                 <Checkbox.Content>
-                  <Label>{localization.auth.rememberMe}</Label>
+                  <Checkbox.Control>
+                    <Checkbox.Indicator />
+                  </Checkbox.Control>
+
+                  {localization.auth.rememberMe}
                 </Checkbox.Content>
               </Checkbox>
             )}
@@ -261,7 +241,7 @@ export function SignIn({
         {emailAndPassword?.enabled && emailAndPassword?.forgotPassword && (
           <Link
             href={`${basePaths.auth}/${viewPaths.auth.forgotPassword}`}
-            className="no-underline hover:underline"
+            className="text-sm no-underline hover:underline"
           >
             {localization.auth.forgotPasswordLink}
           </Link>

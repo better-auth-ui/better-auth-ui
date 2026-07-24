@@ -28,6 +28,11 @@ export type UsernamePluginOptions = {
    * @remarks `UsernameLocalization`
    */
   localization?: Partial<UsernameLocalization>
+  /**
+   * Prefix prepended to usernames.
+   * @default ""
+   */
+  usernamePrefix?: string
 }
 
 export const usernamePlugin = createAuthPlugin(
@@ -41,6 +46,7 @@ export const usernamePlugin = createAuthPlugin(
       ...options,
       minUsernameLength,
       maxUsernameLength,
+      usernamePrefix: options.usernamePrefix ?? "",
       localization,
       additionalFields: [
         {

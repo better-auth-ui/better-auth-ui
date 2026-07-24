@@ -6,13 +6,11 @@ import {
   useAuth,
   useAuthPlugin,
   useFetchOptions,
-  useSendVerificationEmail,
   useSignInEmail,
   useSignInUsername
 } from "@better-auth-ui/react"
 import { useIsMutating } from "@tanstack/react-query"
 import { type SyntheticEvent, useState } from "react"
-import { toast } from "sonner"
 import {
   ProviderButtons,
   type SocialLayout
@@ -25,10 +23,10 @@ import {
   FieldDescription,
   FieldError,
   FieldGroup,
+  FieldLabel,
   FieldSeparator
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
 import { Spinner } from "@/components/ui/spinner"
 import { usernamePlugin } from "@/lib/auth/username-plugin"
 import { cn } from "@/lib/utils"
@@ -56,7 +54,6 @@ export function SignInUsername({
   const {
     authClient,
     basePaths,
-    baseURL,
     emailAndPassword,
     localization,
     plugins,
@@ -73,43 +70,45 @@ export function SignInUsername({
 
   const [password, setPassword] = useState("")
 
-  const { mutate: sendVerificationEmail } = useSendVerificationEmail(
-    authClient,
-    {
-      onSuccess: () => toast.success(localization.auth.verificationEmailSent)
-    }
-  )
-
   const { mutate: signInEmail, isPending: isSignInEmailPending } =
     useSignInEmail(authClient, {
       onError: (error, { email }) => {
         setPassword("")
 
         if (error.error?.code === "EMAIL_NOT_VERIFIED") {
-          toast.error(error.error?.message || error.message, {
-            action: {
-              label: localization.auth.resend,
-              onClick: () =>
-                sendVerificationEmail({
-                  email,
-                  callbackURL: `${baseURL}${redirectTo}`
-                })
-            }
+          sessionStorage.setItem("better-auth-ui.verify-email", email)
+          navigate({
+            to: `${basePaths.auth}/${viewPaths.auth.verifyEmail}`
           })
         }
 
         resetFetchOptions()
       },
-      onSuccess: () => navigate({ to: redirectTo })
+      onSuccess: () => {
+        sessionStorage.removeItem("better-auth-ui.verify-email")
+        navigate({ to: redirectTo })
+      }
     })
 
   const { mutate: signInUsername, isPending: isSignInUsernamePending } =
     useSignInUsername(authClient as UsernameAuthClient, {
-      onError: () => {
+      onError: (error) => {
         setPassword("")
+
+        if (error.error?.code === "EMAIL_NOT_VERIFIED") {
+          sessionStorage.removeItem("better-auth-ui.verify-email")
+
+          navigate({
+            to: `${basePaths.auth}/${viewPaths.auth.verifyEmail}`
+          })
+        }
+
         resetFetchOptions()
       },
-      onSuccess: () => navigate({ to: redirectTo })
+      onSuccess: () => {
+        sessionStorage.removeItem("better-auth-ui.verify-email")
+        navigate({ to: redirectTo })
+      }
     })
 
   const signInMutating = useIsMutating({
@@ -185,7 +184,9 @@ export function SignInUsername({
             <form onSubmit={handleSubmit}>
               <FieldGroup>
                 <Field data-invalid={!!fieldErrors.email}>
-                  <Label htmlFor="email">{usernameLocalization.username}</Label>
+                  <FieldLabel htmlFor="email">
+                    {usernameLocalization.username}
+                  </FieldLabel>
 
                   <Input
                     id="email"
@@ -218,7 +219,9 @@ export function SignInUsername({
                 </Field>
 
                 <Field data-invalid={!!fieldErrors.password}>
-                  <Label htmlFor="password">{localization.auth.password}</Label>
+                  <FieldLabel htmlFor="password">
+                    {localization.auth.password}
+                  </FieldLabel>
 
                   <Input
                     id="password"
@@ -276,12 +279,12 @@ export function SignInUsername({
                         disabled={isPending}
                       />
 
-                      <Label
+                      <FieldLabel
                         htmlFor="rememberMe"
                         className="cursor-pointer text-sm font-normal"
                       >
                         {localization.auth.rememberMe}
-                      </Label>
+                      </FieldLabel>
                     </div>
                   </Field>
                 )}

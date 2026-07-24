@@ -1,16 +1,9 @@
 "use client"
 
 import { authMutationKeys } from "@better-auth-ui/core"
-import {
-  useAuth,
-  useFetchOptions,
-  useSendVerificationEmail,
-  useSignInEmail
-} from "@better-auth-ui/react"
+import { useAuth, useFetchOptions, useSignInEmail } from "@better-auth-ui/react"
 import { useIsMutating } from "@tanstack/react-query"
-import { Eye, EyeOff } from "lucide-react"
 import { type SyntheticEvent, useState } from "react"
-import { toast } from "sonner"
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -20,16 +13,10 @@ import {
   FieldDescription,
   FieldError,
   FieldGroup,
+  FieldLabel,
   FieldSeparator
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
-import {
-  InputGroup,
-  InputGroupAddon,
-  InputGroupButton,
-  InputGroupInput
-} from "@/components/ui/input-group"
-import { Label } from "@/components/ui/label"
 import { Spinner } from "@/components/ui/spinner"
 import { cn } from "@/lib/utils"
 import { ProviderButtons, type SocialLayout } from "./provider-buttons"
@@ -56,7 +43,6 @@ export function SignIn({
   const {
     authClient,
     basePaths,
-    baseURL,
     emailAndPassword,
     localization,
     plugins,
@@ -70,14 +56,6 @@ export function SignIn({
   const { fetchOptions, resetFetchOptions } = useFetchOptions()
 
   const [password, setPassword] = useState("")
-  const [isPasswordVisible, setIsPasswordVisible] = useState(false)
-
-  const { mutate: sendVerificationEmail } = useSendVerificationEmail(
-    authClient,
-    {
-      onSuccess: () => toast.success(localization.auth.verificationEmailSent)
-    }
-  )
 
   const { mutate: signInEmail, isPending: signInEmailPending } = useSignInEmail(
     authClient,
@@ -86,15 +64,9 @@ export function SignIn({
         setPassword("")
 
         if (error.error?.code === "EMAIL_NOT_VERIFIED") {
-          toast.error(error.error?.message || error.message, {
-            action: {
-              label: localization.auth.resend,
-              onClick: () =>
-                sendVerificationEmail({
-                  email,
-                  callbackURL: `${baseURL}${redirectTo}`
-                })
-            }
+          sessionStorage.setItem("better-auth-ui.verify-email", email)
+          navigate({
+            to: `${basePaths.auth}/${viewPaths.auth.verifyEmail}`
           })
         }
 
@@ -167,7 +139,9 @@ export function SignIn({
             <form onSubmit={handleSubmit}>
               <FieldGroup>
                 <Field data-invalid={!!fieldErrors.email}>
-                  <Label htmlFor="email">{localization.auth.email}</Label>
+                  <FieldLabel htmlFor="email">
+                    {localization.auth.email}
+                  </FieldLabel>
 
                   <Input
                     id="email"
@@ -202,74 +176,53 @@ export function SignIn({
                 </Field>
 
                 <Field data-invalid={!!fieldErrors.password}>
-                  <Label htmlFor="password">{localization.auth.password}</Label>
+                  <FieldLabel htmlFor="password">
+                    {localization.auth.password}
+                  </FieldLabel>
 
-                  <InputGroup>
-                    <InputGroupInput
-                      id="password"
-                      name="password"
-                      type={isPasswordVisible ? "text" : "password"}
-                      autoComplete="current-password"
-                      value={password}
-                      onChange={(e) => {
-                        setPassword(e.target.value)
+                  <Input
+                    id="password"
+                    name="password"
+                    type="password"
+                    autoComplete="current-password"
+                    value={password}
+                    onChange={(e) => {
+                      setPassword(e.target.value)
 
-                        setFieldErrors((prev) => ({
-                          ...prev,
-                          password: undefined
-                        }))
-                      }}
-                      placeholder={localization.auth.passwordPlaceholder}
-                      required
-                      minLength={emailAndPassword?.minPasswordLength}
-                      maxLength={emailAndPassword?.maxPasswordLength}
-                      disabled={isPending}
-                      onInvalid={(e) => {
-                        e.preventDefault()
-                        const el = e.target as HTMLInputElement
-                        const min = emailAndPassword?.minPasswordLength
-                        const max = emailAndPassword?.maxPasswordLength
-                        const msg = el.validity.valueMissing
-                          ? localization.auth.fieldRequired
-                          : el.validity.tooShort
-                            ? localization.auth.tooShort.replace(
-                                "{{min}}",
-                                String(min)
-                              )
-                            : localization.auth.tooLong.replace(
-                                "{{max}}",
-                                String(max)
-                              )
+                      setFieldErrors((prev) => ({
+                        ...prev,
+                        password: undefined
+                      }))
+                    }}
+                    placeholder={localization.auth.passwordPlaceholder}
+                    required
+                    minLength={emailAndPassword?.minPasswordLength}
+                    maxLength={emailAndPassword?.maxPasswordLength}
+                    disabled={isPending}
+                    onInvalid={(e) => {
+                      e.preventDefault()
+                      const el = e.target as HTMLInputElement
+                      const min = emailAndPassword?.minPasswordLength
+                      const max = emailAndPassword?.maxPasswordLength
+                      const msg = el.validity.valueMissing
+                        ? localization.auth.fieldRequired
+                        : el.validity.tooShort
+                          ? localization.auth.tooShort.replace(
+                              "{{min}}",
+                              String(min)
+                            )
+                          : localization.auth.tooLong.replace(
+                              "{{max}}",
+                              String(max)
+                            )
 
-                        setFieldErrors((prev) => ({
-                          ...prev,
-                          password: msg
-                        }))
-                      }}
-                      aria-invalid={!!fieldErrors.password}
-                    />
-
-                    <InputGroupAddon align="inline-end">
-                      <InputGroupButton
-                        aria-label={
-                          isPasswordVisible
-                            ? localization.auth.hidePassword
-                            : localization.auth.showPassword
-                        }
-                        title={
-                          isPasswordVisible
-                            ? localization.auth.hidePassword
-                            : localization.auth.showPassword
-                        }
-                        disabled={isPending}
-                        onClick={() => {
-                          setIsPasswordVisible(!isPasswordVisible)
-                        }}
-                      >
-                        {isPasswordVisible ? <EyeOff /> : <Eye />}
-                      </InputGroupButton>
-                    </InputGroupAddon>
-                  </InputGroup>
+                      setFieldErrors((prev) => ({
+                        ...prev,
+                        password: msg
+                      }))
+                    }}
+                    aria-invalid={!!fieldErrors.password}
+                  />
 
                   <FieldError>{fieldErrors.password}</FieldError>
                 </Field>
@@ -283,12 +236,12 @@ export function SignIn({
                         disabled={isPending}
                       />
 
-                      <Label
+                      <FieldLabel
                         htmlFor="rememberMe"
                         className="cursor-pointer text-sm font-normal"
                       >
                         {localization.auth.rememberMe}
-                      </Label>
+                      </FieldLabel>
                     </div>
                   </Field>
                 )}

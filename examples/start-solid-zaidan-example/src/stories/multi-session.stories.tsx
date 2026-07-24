@@ -141,7 +141,6 @@ function SwitchAccountPreviewStory() {
 
 const meta = {
   title: "Zaidan/Plugins/Multi Session",
-  tags: ["autodocs"],
   parameters: {
     layout: "fullscreen"
   }

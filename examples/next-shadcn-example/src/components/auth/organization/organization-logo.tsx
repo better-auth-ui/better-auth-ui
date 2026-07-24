@@ -2,7 +2,7 @@
 
 import type { Organization } from "better-auth/client"
 import { Briefcase } from "lucide-react"
-import type { ComponentProps, ReactNode } from "react"
+import type { ComponentProps, CSSProperties, ReactNode } from "react"
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Skeleton } from "@/components/ui/skeleton"
@@ -39,7 +39,9 @@ export function OrganizationLogo({
   style,
   ...props
 }: OrganizationLogoProps &
-  Omit<ComponentProps<typeof Avatar>, "size" | "children">) {
+  Omit<ComponentProps<typeof Avatar>, "children" | "size" | "style"> & {
+    style?: CSSProperties
+  }) {
   if (isPending && !organization) {
     return (
       <Skeleton
@@ -65,7 +67,6 @@ export function OrganizationLogo({
 
       <AvatarFallback
         className={cn("text-muted-foreground!", fallbackTextClasses[size])}
-        delayMs={normalizedLogo ? 600 : undefined}
       >
         {fallback || initials || <Briefcase className="size-4" />}
       </AvatarFallback>

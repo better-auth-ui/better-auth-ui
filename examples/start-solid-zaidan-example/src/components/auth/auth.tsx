@@ -10,6 +10,7 @@ import { ResetPassword } from "./reset-password"
 import { SignIn } from "./sign-in"
 import { SignOut } from "./sign-out"
 import { SignUp } from "./sign-up"
+import { VerifyEmail } from "./verify-email"
 
 type SupportedAuthRoute = {
   component: Component
@@ -59,6 +60,10 @@ const authRouteComponents: Partial<Record<string, SupportedAuthRoute>> = {
   [viewPaths.auth.resetPassword]: {
     component: ResetPassword,
     title: "Reset password"
+  },
+  [viewPaths.auth.verifyEmail]: {
+    component: VerifyEmail,
+    title: "Verify email"
   }
 }
 

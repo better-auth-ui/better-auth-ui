@@ -6,7 +6,7 @@ import {
   useHasPermission,
   useListOrganizationInvitations
 } from "@better-auth-ui/react"
-import { ChevronUp, Funnel, Xmark } from "@gravity-ui/icons"
+import { Funnel, Xmark } from "@gravity-ui/icons"
 import {
   Button,
   Chip,
@@ -17,7 +17,7 @@ import {
   type SortDescriptor,
   Table
 } from "@heroui/react"
-import { type ComponentProps, type ReactNode, useMemo, useState } from "react"
+import { type ComponentProps, useMemo, useState } from "react"
 
 import { organizationPlugin } from "../../../lib/auth/organization-plugin"
 import { InviteMemberDialog } from "./invite-member-dialog"
@@ -264,33 +264,33 @@ export function OrganizationInvitations({
               <Table.Header>
                 <Table.Column allowsSorting isRowHeader id="email">
                   {({ sortDirection }) => (
-                    <SortableColumnHeader sortDirection={sortDirection}>
+                    <Table.SortableColumnHeader sortDirection={sortDirection}>
                       {localization.auth.email}
-                    </SortableColumnHeader>
+                    </Table.SortableColumnHeader>
                   )}
                 </Table.Column>
 
                 <Table.Column allowsSorting id="createdAt">
                   {({ sortDirection }) => (
-                    <SortableColumnHeader sortDirection={sortDirection}>
+                    <Table.SortableColumnHeader sortDirection={sortDirection}>
                       {organizationLocalization.invitedAt}
-                    </SortableColumnHeader>
+                    </Table.SortableColumnHeader>
                   )}
                 </Table.Column>
 
                 <Table.Column allowsSorting id="role">
                   {({ sortDirection }) => (
-                    <SortableColumnHeader sortDirection={sortDirection}>
+                    <Table.SortableColumnHeader sortDirection={sortDirection}>
                       {organizationLocalization.role}
-                    </SortableColumnHeader>
+                    </Table.SortableColumnHeader>
                   )}
                 </Table.Column>
 
                 <Table.Column allowsSorting id="status">
                   {({ sortDirection }) => (
-                    <SortableColumnHeader sortDirection={sortDirection}>
+                    <Table.SortableColumnHeader sortDirection={sortDirection}>
                       {organizationLocalization.status}
-                    </SortableColumnHeader>
+                    </Table.SortableColumnHeader>
                   )}
                 </Table.Column>
 
@@ -324,28 +324,5 @@ export function OrganizationInvitations({
 
       <InviteMemberDialog isOpen={inviteOpen} onOpenChange={setInviteOpen} />
     </div>
-  )
-}
-
-function SortableColumnHeader({
-  children,
-  sortDirection
-}: {
-  children: ReactNode
-  sortDirection?: "ascending" | "descending"
-}) {
-  return (
-    <span className="flex items-center justify-between">
-      {children}
-
-      {!!sortDirection && (
-        <ChevronUp
-          className={cn(
-            "size-3 transform transition-transform duration-100 ease-out",
-            sortDirection === "descending" ? "rotate-180" : ""
-          )}
-        />
-      )}
-    </span>
   )
 }

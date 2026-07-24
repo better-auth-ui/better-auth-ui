@@ -115,7 +115,6 @@ function UserProfilePreviewContent() {
 
 const meta = {
   title: "Zaidan/Plugins/Username",
-  tags: ["autodocs"],
   parameters: {
     layout: "fullscreen"
   }

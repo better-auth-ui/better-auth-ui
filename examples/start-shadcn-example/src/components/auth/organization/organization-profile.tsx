@@ -12,9 +12,8 @@ import { toast } from "sonner"
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
-import { Field, FieldError } from "@/components/ui/field"
+import { Field, FieldError, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Spinner } from "@/components/ui/spinner"
 import { organizationPlugin } from "@/lib/auth/organization-plugin"
@@ -79,9 +78,9 @@ export function OrganizationProfile({ className }: OrganizationProfileProps) {
             <ChangeOrganizationLogo />
 
             <Field>
-              <Label htmlFor={nameInputId}>
+              <FieldLabel htmlFor={nameInputId}>
                 {organizationLocalization.name}
-              </Label>
+              </FieldLabel>
 
               {activeOrganization ? (
                 <Input
@@ -110,7 +109,7 @@ export function OrganizationProfile({ className }: OrganizationProfileProps) {
               />
             ) : (
               <Field>
-                <Label>{organizationLocalization.slug}</Label>
+                <FieldLabel>{organizationLocalization.slug}</FieldLabel>
                 <Skeleton className="h-8 w-full rounded-md" />
               </Field>
             )}

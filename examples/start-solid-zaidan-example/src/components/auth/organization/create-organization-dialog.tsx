@@ -38,6 +38,7 @@ export function CreateOrganizationDialog(props: CreateOrganizationDialogProps) {
   const auth = useAuth()
   const [name, setName] = createSignal("")
   const [slug, setSlug] = createSignal("")
+  const [slugEdited, setSlugEdited] = createSignal(false)
   const createOrganization = useCreateOrganization(
     auth.authClient as OrganizationAuthClient,
     {
@@ -55,8 +56,11 @@ export function CreateOrganizationDialog(props: CreateOrganizationDialogProps) {
     if (!props.open) {
       setName("")
       setSlug("")
+      setSlugEdited(false)
       return
     }
+
+    if (slugEdited()) return
 
     setSlug(sanitizeSlug(name()))
   })
@@ -101,7 +105,10 @@ export function CreateOrganizationDialog(props: CreateOrganizationDialogProps) {
           <SlugField
             disabled={createOrganization.isPending}
             id="create-organization-slug"
-            onChange={setSlug}
+            onChange={(value) => {
+              setSlug(value)
+              setSlugEdited(true)
+            }}
             value={slug()}
           />
 

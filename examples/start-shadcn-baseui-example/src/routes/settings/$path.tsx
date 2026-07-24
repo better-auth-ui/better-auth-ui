@@ -1,24 +1,23 @@
-import {
-  Organization,
-  organizationPlugin
-} from "@better-auth-ui/heroui/plugins"
+import { viewPaths } from "@better-auth-ui/core"
 import { ensureSession as ensureSessionClient } from "@better-auth-ui/react"
 import { ensureSession as ensureSessionServer } from "@better-auth-ui/react/server"
 import { createFileRoute, notFound, redirect } from "@tanstack/react-router"
 import { createIsomorphicFn } from "@tanstack/react-start"
 import { getRequestHeaders } from "@tanstack/react-start/server"
 
+import { Settings } from "@/components/auth/settings/settings"
 import { auth } from "@/lib/auth"
+import { organizationPlugin } from "@/lib/auth/organization-plugin"
 import { authClient } from "@/lib/auth-client"
 
-/** Segments from `organizationPlugin().viewPaths.organization` (same options as `<AuthProvider>`). */
-const validOrganizationPaths = Object.values(
-  organizationPlugin().viewPaths.organization
-)
+const validSettingsPaths = [
+  ...Object.values(viewPaths.settings),
+  ...Object.values(organizationPlugin().viewPaths.settings)
+]
 
-export const Route = createFileRoute("/organization/$slug/$path")({
+export const Route = createFileRoute("/settings/$path")({
   async beforeLoad({ params: { path }, context: { queryClient }, location }) {
-    if (!validOrganizationPaths.includes(path)) {
+    if (!validSettingsPaths.includes(path)) {
       throw notFound()
     }
 
@@ -40,15 +39,15 @@ export const Route = createFileRoute("/organization/$slug/$path")({
 
     return { session }
   },
-  component: OrganizationPage
+  component: SettingsPage
 })
 
-function OrganizationPage() {
+function SettingsPage() {
   const { path } = Route.useParams()
 
   return (
-    <div className="mx-auto w-full max-w-3xl p-4 md:p-6">
-      <Organization path={path} />
+    <div className="w-full max-w-3xl mx-auto p-4 md:p-6">
+      <Settings path={path} />
     </div>
   )
 }
