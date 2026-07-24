@@ -63,7 +63,7 @@ export function hasPermissionOptions<
 export const ensureHasPermission = <TAuthClient extends OrganizationAuthClient>(
   queryClient: QueryClient,
   authClient: TAuthClient,
-  userId?: string,
+  userId: string,
   options?: HasPermissionOptions<TAuthClient>
 ) => {
   const { fetchOptions, permissions, organizationId, ...queryOptions } =
@@ -87,7 +87,7 @@ export const prefetchHasPermission = <
 >(
   queryClient: QueryClient,
   authClient: TAuthClient,
-  userId?: string,
+  userId: string,
   options?: HasPermissionOptions<TAuthClient>
 ) => {
   const { fetchOptions, permissions, organizationId, ...queryOptions } =
@@ -109,7 +109,7 @@ export const prefetchHasPermission = <
 export const fetchHasPermission = <TAuthClient extends OrganizationAuthClient>(
   queryClient: QueryClient,
   authClient: TAuthClient,
-  userId?: string,
+  userId: string,
   options?: HasPermissionOptions<TAuthClient>
 ) => {
   const { fetchOptions, permissions, organizationId, ...queryOptions } =

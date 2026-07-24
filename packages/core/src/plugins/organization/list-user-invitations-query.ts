@@ -60,7 +60,7 @@ export const ensureListUserInvitations = <
 >(
   queryClient: QueryClient,
   authClient: TAuthClient,
-  userId?: string,
+  userId: string,
   options?: ListUserInvitationsOptions<TAuthClient>
 ) => {
   const { fetchOptions, query, ...queryOptions } = options ?? {}
@@ -79,7 +79,7 @@ export const prefetchListUserInvitations = <
 >(
   queryClient: QueryClient,
   authClient: TAuthClient,
-  userId?: string,
+  userId: string,
   options?: ListUserInvitationsOptions<TAuthClient>
 ) => {
   const { fetchOptions, query, ...queryOptions } = options ?? {}
@@ -98,7 +98,7 @@ export const fetchListUserInvitations = <
 >(
   queryClient: QueryClient,
   authClient: TAuthClient,
-  userId?: string,
+  userId: string,
   options?: ListUserInvitationsOptions<TAuthClient>
 ) => {
   const { fetchOptions, query, ...queryOptions } = options ?? {}

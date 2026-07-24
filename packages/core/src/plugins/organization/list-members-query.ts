@@ -59,7 +59,7 @@ export const ensureListOrganizationMembers = <
 >(
   queryClient: QueryClient,
   authClient: TAuthClient,
-  userId?: string,
+  userId: string,
   options?: ListOrganizationMembersOptions<TAuthClient>
 ) => {
   const { fetchOptions, query, ...queryOptions } = options ?? {}
@@ -81,7 +81,7 @@ export const prefetchListOrganizationMembers = <
 >(
   queryClient: QueryClient,
   authClient: TAuthClient,
-  userId?: string,
+  userId: string,
   options?: ListOrganizationMembersOptions<TAuthClient>
 ) => {
   const { fetchOptions, query, ...queryOptions } = options ?? {}
@@ -103,7 +103,7 @@ export const fetchListOrganizationMembers = <
 >(
   queryClient: QueryClient,
   authClient: TAuthClient,
-  userId?: string,
+  userId: string,
   options?: ListOrganizationMembersOptions<TAuthClient>
 ) => {
   const { fetchOptions, query, ...queryOptions } = options ?? {}

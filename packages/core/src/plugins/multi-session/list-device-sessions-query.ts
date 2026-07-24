@@ -73,7 +73,7 @@ export const ensureListDeviceSessions = <
 >(
   queryClient: QueryClient,
   authClient: TAuthClient,
-  userId?: string,
+  userId: string,
   options?: ListDeviceSessionsOptions<TAuthClient>
 ) => {
   const { fetchOptions, query, ...queryOptions } = options ?? {}
@@ -92,7 +92,7 @@ export const prefetchListDeviceSessions = <
 >(
   queryClient: QueryClient,
   authClient: TAuthClient,
-  userId?: string,
+  userId: string,
   options?: ListDeviceSessionsOptions<TAuthClient>
 ) => {
   const { fetchOptions, query, ...queryOptions } = options ?? {}
@@ -111,7 +111,7 @@ export const fetchListDeviceSessions = <
 >(
   queryClient: QueryClient,
   authClient: TAuthClient,
-  userId?: string,
+  userId: string,
   options?: ListDeviceSessionsOptions<TAuthClient>
 ) => {
   const { fetchOptions, query, ...queryOptions } = options ?? {}

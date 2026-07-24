@@ -69,7 +69,7 @@ export function listPasskeysOptions<TAuthClient extends PasskeyAuthClient>(
 export const ensureListPasskeys = <TAuthClient extends PasskeyAuthClient>(
   queryClient: QueryClient,
   authClient: TAuthClient,
-  userId?: string,
+  userId: string,
   options?: ListPasskeysOptions<TAuthClient>
 ) => {
   const { fetchOptions, query, ...queryOptions } = options ?? {}
@@ -86,7 +86,7 @@ export const ensureListPasskeys = <TAuthClient extends PasskeyAuthClient>(
 export const prefetchListPasskeys = <TAuthClient extends PasskeyAuthClient>(
   queryClient: QueryClient,
   authClient: TAuthClient,
-  userId?: string,
+  userId: string,
   options?: ListPasskeysOptions<TAuthClient>
 ) => {
   const { fetchOptions, query, ...queryOptions } = options ?? {}
@@ -103,7 +103,7 @@ export const prefetchListPasskeys = <TAuthClient extends PasskeyAuthClient>(
 export const fetchListPasskeys = <TAuthClient extends PasskeyAuthClient>(
   queryClient: QueryClient,
   authClient: TAuthClient,
-  userId?: string,
+  userId: string,
   options?: ListPasskeysOptions<TAuthClient>
 ) => {
   const { fetchOptions, query, ...queryOptions } = options ?? {}

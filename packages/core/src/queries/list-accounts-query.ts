@@ -52,7 +52,7 @@ export function listAccountsOptions<TAuthClient extends AuthClient>(
 export const ensureListAccounts = <TAuthClient extends AuthClient>(
   queryClient: QueryClient,
   authClient: TAuthClient,
-  userId?: string,
+  userId: string,
   options?: ListAccountsOptions<TAuthClient>
 ) => {
   const { fetchOptions, query, ...queryOptions } = options ?? {}
@@ -66,7 +66,7 @@ export const ensureListAccounts = <TAuthClient extends AuthClient>(
 export const prefetchListAccounts = <TAuthClient extends AuthClient>(
   queryClient: QueryClient,
   authClient: TAuthClient,
-  userId?: string,
+  userId: string,
   options?: ListAccountsOptions<TAuthClient>
 ) => {
   const { fetchOptions, query, ...queryOptions } = options ?? {}
@@ -80,7 +80,7 @@ export const prefetchListAccounts = <TAuthClient extends AuthClient>(
 export const fetchListAccounts = <TAuthClient extends AuthClient>(
   queryClient: QueryClient,
   authClient: TAuthClient,
-  userId?: string,
+  userId: string,
   options?: ListAccountsOptions<TAuthClient>
 ) => {
   const { fetchOptions, query, ...queryOptions } = options ?? {}

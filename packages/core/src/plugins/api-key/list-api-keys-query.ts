@@ -64,7 +64,7 @@ export function listApiKeysOptions<TAuthClient extends ApiKeyAuthClient>(
 export const ensureListApiKeys = <TAuthClient extends ApiKeyAuthClient>(
   queryClient: QueryClient,
   authClient: TAuthClient,
-  userId?: string,
+  userId: string,
   options?: ListApiKeysOptions<TAuthClient>
 ) => {
   const { fetchOptions, query, ...queryOptions } = options ?? {}
@@ -82,7 +82,7 @@ export const ensureListApiKeys = <TAuthClient extends ApiKeyAuthClient>(
 export const prefetchListApiKeys = <TAuthClient extends ApiKeyAuthClient>(
   queryClient: QueryClient,
   authClient: TAuthClient,
-  userId?: string,
+  userId: string,
   options?: ListApiKeysOptions<TAuthClient>
 ) => {
   const { fetchOptions, query, ...queryOptions } = options ?? {}
@@ -99,7 +99,7 @@ export const prefetchListApiKeys = <TAuthClient extends ApiKeyAuthClient>(
 export const fetchListApiKeys = <TAuthClient extends ApiKeyAuthClient>(
   queryClient: QueryClient,
   authClient: TAuthClient,
-  userId?: string,
+  userId: string,
   options?: ListApiKeysOptions<TAuthClient>
 ) => {
   const { fetchOptions, query, ...queryOptions } = options ?? {}

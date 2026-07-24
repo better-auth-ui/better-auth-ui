@@ -69,6 +69,28 @@ export function resolveActiveOrganizationQuery<
 }
 
 /**
+ * `organizationSlug: null` means "no active organization". It is normalized away
+ * before the cache key is built so the entry has a single identity, which every
+ * reader of that entry must reproduce. Otherwise, a null-slug read computes a
+ * different key and misses the cached value.
+ */
+const normalizeActiveOrganizationQuery = <
+  TAuthClient extends OrganizationAuthClient
+>(
+  params?: ActiveOrganizationParams<TAuthClient>
+) => {
+  const query = params?.query as
+    | { organizationSlug?: string | null }
+    | undefined
+  const hasNoActiveOrganization = query?.organizationSlug === null
+
+  return {
+    hasNoActiveOrganization,
+    effectiveQuery: hasNoActiveOrganization ? undefined : params?.query
+  }
+}
+
+/**
  * Query options factory for the current user's active organization.
  *
  * `organizationSlug: null` returns `null` without a network request, while a
@@ -86,11 +108,8 @@ export function activeOrganizationOptions<
   params?: ActiveOrganizationParams<TAuthClient>
 ) {
   type TData = ActiveOrganizationData<TAuthClient>
-  const query = params?.query as
-    | { organizationSlug?: string | null }
-    | undefined
-  const hasNoActiveOrganization = query?.organizationSlug === null
-  const effectiveQuery = hasNoActiveOrganization ? undefined : params?.query
+  const { hasNoActiveOrganization, effectiveQuery } =
+    normalizeActiveOrganizationQuery<TAuthClient>(params)
   const queryKey = organizationQueryKeys.activeOrganization(
     userId,
     effectiveQuery
@@ -122,7 +141,7 @@ export const ensureActiveOrganization = <
 >(
   queryClient: QueryClient,
   authClient: TAuthClient,
-  userId?: string,
+  userId: string,
   options?: ActiveOrganizationOptions<TAuthClient>
 ) => {
   const { fetchOptions, query, ...queryOptions } = options ?? {}
@@ -141,7 +160,7 @@ export const prefetchActiveOrganization = <
 >(
   queryClient: QueryClient,
   authClient: TAuthClient,
-  userId?: string,
+  userId: string,
   options?: ActiveOrganizationOptions<TAuthClient>
 ) => {
   const { fetchOptions, query, ...queryOptions } = options ?? {}
@@ -160,7 +179,7 @@ export const fetchActiveOrganization = <
 >(
   queryClient: QueryClient,
   authClient: TAuthClient,
-  userId?: string,
+  userId: string,
   options?: ActiveOrganizationOptions<TAuthClient>
 ) => {
   const { fetchOptions, query, ...queryOptions } = options ?? {}
@@ -181,9 +200,11 @@ export const getActiveOrganization = <
   userId?: string,
   params?: ActiveOrganizationParams<TAuthClient>
 ) => {
+  const { effectiveQuery } =
+    normalizeActiveOrganizationQuery<TAuthClient>(params)
   const queryKey = organizationQueryKeys.activeOrganization(
     userId,
-    params?.query
+    effectiveQuery
   )
   return queryClient.getQueryData<ActiveOrganizationData<TAuthClient>>(queryKey)
 }

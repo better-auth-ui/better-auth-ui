@@ -61,7 +61,7 @@ export function listSessionsOptions<TAuthClient extends AuthClient>(
 export const ensureListSessions = <TAuthClient extends AuthClient>(
   queryClient: QueryClient,
   authClient: TAuthClient,
-  userId?: string,
+  userId: string,
   options?: ListSessionsOptions<TAuthClient>
 ) => {
   const { fetchOptions, query, ...queryOptions } = options ?? {}
@@ -85,7 +85,7 @@ export const ensureListSessions = <TAuthClient extends AuthClient>(
 export const prefetchListSessions = <TAuthClient extends AuthClient>(
   queryClient: QueryClient,
   authClient: TAuthClient,
-  userId?: string,
+  userId: string,
   options?: ListSessionsOptions<TAuthClient>
 ) => {
   const { fetchOptions, query, ...queryOptions } = options ?? {}
@@ -110,7 +110,7 @@ export const prefetchListSessions = <TAuthClient extends AuthClient>(
 export const fetchListSessions = <TAuthClient extends AuthClient>(
   queryClient: QueryClient,
   authClient: TAuthClient,
-  userId?: string,
+  userId: string,
   options?: ListSessionsOptions<TAuthClient>
 ) => {
   const { fetchOptions, query, ...queryOptions } = options ?? {}
