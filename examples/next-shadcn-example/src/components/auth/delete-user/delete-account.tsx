@@ -171,7 +171,6 @@ export function DeleteAccount({ className }: DeleteAccountProps) {
                         onClick={() => {
                           setIsPasswordVisible((visible) => !visible)
                         }}
-                        disabled={isPending}
                       >
                         {isPasswordVisible ? <EyeOff /> : <Eye />}
                       </InputGroupButton>

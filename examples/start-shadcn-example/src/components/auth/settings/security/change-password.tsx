@@ -248,7 +248,6 @@ function ChangePasswordForm({
                       onClick={() => {
                         setIsCurrentPasswordVisible((visible) => !visible)
                       }}
-                      disabled={isPending}
                     >
                       {isCurrentPasswordVisible ? <EyeOff /> : <Eye />}
                     </InputGroupButton>
@@ -311,7 +310,6 @@ function ChangePasswordForm({
                       onClick={() =>
                         setIsNewPasswordVisible((visible) => !visible)
                       }
-                      disabled={isPending}
                     >
                       {isNewPasswordVisible ? <EyeOff /> : <Eye />}
                     </InputGroupButton>
@@ -376,7 +374,6 @@ function ChangePasswordForm({
                         onClick={() =>
                           setIsConfirmPasswordVisible((visible) => !visible)
                         }
-                        disabled={isPending}
                       >
                         {isConfirmPasswordVisible ? <EyeOff /> : <Eye />}
                       </InputGroupButton>

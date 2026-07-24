@@ -174,7 +174,6 @@ export function ResetPassword({ className }: ResetPasswordProps) {
                     onClick={() => {
                       setIsPasswordVisible((visible) => !visible)
                     }}
-                    disabled={isPending}
                   >
                     {isPasswordVisible ? <EyeOff /> : <Eye />}
                   </InputGroupButton>
@@ -248,7 +247,6 @@ export function ResetPassword({ className }: ResetPasswordProps) {
                       onClick={() => {
                         setIsConfirmPasswordVisible((visible) => !visible)
                       }}
-                      disabled={isPending}
                     >
                       {isConfirmPasswordVisible ? <EyeOff /> : <Eye />}
                     </InputGroupButton>

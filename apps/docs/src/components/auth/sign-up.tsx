@@ -345,7 +345,6 @@ export function SignUp({
                         onClick={() => {
                           setIsPasswordVisible((visible) => !visible)
                         }}
-                        disabled={isPending}
                       >
                         {isPasswordVisible ? <EyeOff /> : <Eye />}
                       </InputGroupButton>
@@ -424,7 +423,6 @@ export function SignUp({
                           onClick={() =>
                             setIsConfirmPasswordVisible((visible) => !visible)
                           }
-                          disabled={isPending}
                         >
                           {isConfirmPasswordVisible ? <EyeOff /> : <Eye />}
                         </InputGroupButton>

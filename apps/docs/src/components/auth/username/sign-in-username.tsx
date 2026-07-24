@@ -293,7 +293,6 @@ export function SignInUsername({
                         onClick={() => {
                           setIsPasswordVisible((visible) => !visible)
                         }}
-                        disabled={isPending}
                       >
                         {isPasswordVisible ? <EyeOff /> : <Eye />}
                       </InputGroupButton>

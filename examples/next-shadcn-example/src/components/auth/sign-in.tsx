@@ -250,7 +250,6 @@ export function SignIn({
                         onClick={() => {
                           setIsPasswordVisible((visible) => !visible)
                         }}
-                        disabled={isPending}
                       >
                         {isPasswordVisible ? <EyeOff /> : <Eye />}
                       </InputGroupButton>
