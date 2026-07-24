@@ -7,7 +7,13 @@ import {
 import type { BetterFetchError, BetterFetchOption } from "better-auth/client"
 import type { Accessor } from "solid-js"
 
-type AuthMutationFn = (variables: unknown) => Promise<unknown>
+// Function parameters are contravariant under `strictFunctionTypes`, so a
+// concrete endpoint such as `(variables: { email: string }) => Promise<...>` is
+// NOT assignable to `(variables: unknown) => ...`. `any` is the variance bridge
+// that keeps every Better Auth client method assignable while `TFn` still
+// infers the real parameter type for `AuthMutationFnVariables`.
+// biome-ignore lint/suspicious/noExplicitAny: variance bridge, see above
+type AuthMutationFn = (variables: any) => Promise<unknown>
 
 type AuthMutationFnData<TFn extends AuthMutationFn> = Awaited<ReturnType<TFn>>
 
