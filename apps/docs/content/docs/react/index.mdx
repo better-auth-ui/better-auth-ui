@@ -45,7 +45,7 @@ For Better Auth endpoints that don't have a purpose-built hook yet, use the gene
 - `useAuthQuery(authFn, queryKey, options?)` — read-style endpoints.
 - `useAuthMutation(authFn, mutationKey, options?)` — write-style endpoints.
 
-For loaders, prefetching, or other non-component usage, import the matching generic options factories from `@better-auth-ui/core`: `authQueryOptions(authFn, queryKey, params?)` and `authMutationOptions(authFn, mutationKey)`.
+For loaders, prefetching, or other non-component usage, import `authQueryOptions(authFn, queryKey, params?)` from `@better-auth-ui/core`. Write-style endpoints use their per-endpoint option factory from core (e.g. `changePasswordOptions(authClient)`).
 
 Both wire `throw: true` into `fetchOptions` so results reject with a `BetterFetchError` instead of resolving to `{ error }`.
 

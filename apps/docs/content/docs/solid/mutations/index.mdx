@@ -82,7 +82,7 @@ new MutationCache({
 
 ## Escape hatch
 
-For write-style endpoints without a purpose-built factory or hook, use `useAuthMutation` in components or `authMutationOptions` where Solid Query takes mutation options. Read-style endpoints should use `useAuthQuery` instead.
+For write-style endpoints without a purpose-built factory or hook, use `useAuthMutation` in components. Read-style endpoints should use `useAuthQuery` instead.
 
 ```tsx
 import { useAuthMutation } from "@better-auth-ui/solid"
@@ -97,14 +97,13 @@ mutation.mutate({ email: "user@example.com", type: "sign-in" })
 
 Variables are inferred from `authFn`'s parameter — required params reject `mutate()` at the type level, optional-param methods (e.g. `signOut`) allow it. `throw: true` is wired into `fetchOptions` so `onError` and `error` get a `BetterFetchError`.
 
-For shared mutation registration, global mutation state checks, a `MutationCache` observer, or manual `useMutation`, use the factory directly:
+For shared mutation registration, global mutation state checks, a `MutationCache` observer, or manual `useMutation`, use the endpoint's option factory from core directly:
 
 ```ts
-authMutationOptions(authClient.emailOtp.sendVerificationOtp, [
-  "auth",
-  "emailOtp",
-  "sendVerificationOtp"
-])
+import { changePasswordOptions } from "@better-auth-ui/core"
+import { useMutation } from "@tanstack/solid-query"
+
+const mutation = useMutation(() => changePasswordOptions(authClient))
 ```
 
 For endpoints that already have a key in `authMutationKeys`, prefer it over an inline tuple so cache observers and mutation state checks line up.
