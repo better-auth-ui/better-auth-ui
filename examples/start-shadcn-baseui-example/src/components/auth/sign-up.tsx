@@ -16,6 +16,7 @@ import {
   FieldDescription,
   FieldError,
   FieldGroup,
+  FieldLabel,
   FieldSeparator
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
@@ -25,7 +26,6 @@ import {
   InputGroupButton,
   InputGroupInput
 } from "@/components/ui/input-group"
-import { Label } from "@/components/ui/label"
 import { Spinner } from "@/components/ui/spinner"
 import { cn } from "@/lib/utils"
 import { AdditionalField } from "./additional-field"
@@ -198,7 +198,9 @@ export function SignUp({
               <FieldGroup>
                 {emailAndPassword.name !== false && (
                   <Field data-invalid={!!fieldErrors.name}>
-                    <Label htmlFor="name">{localization.auth.name}</Label>
+                    <FieldLabel htmlFor="name">
+                      {localization.auth.name}
+                    </FieldLabel>
 
                     <Input
                       id="name"
@@ -230,7 +232,9 @@ export function SignUp({
                 )}
 
                 <Field data-invalid={!!fieldErrors.email}>
-                  <Label htmlFor="email">{localization.auth.email}</Label>
+                  <FieldLabel htmlFor="email">
+                    {localization.auth.email}
+                  </FieldLabel>
 
                   <Input
                     id="email"
@@ -277,7 +281,9 @@ export function SignUp({
                 )}
 
                 <Field data-invalid={!!fieldErrors.password}>
-                  <Label htmlFor="password">{localization.auth.password}</Label>
+                  <FieldLabel htmlFor="password">
+                    {localization.auth.password}
+                  </FieldLabel>
 
                   <InputGroup>
                     <InputGroupInput
@@ -325,6 +331,7 @@ export function SignUp({
 
                     <InputGroupAddon align="inline-end">
                       <InputGroupButton
+                        size="icon-xs"
                         aria-label={
                           isPasswordVisible
                             ? localization.auth.hidePassword
@@ -336,7 +343,7 @@ export function SignUp({
                             : localization.auth.showPassword
                         }
                         onClick={() => {
-                          setIsPasswordVisible(!isPasswordVisible)
+                          setIsPasswordVisible((visible) => !visible)
                         }}
                       >
                         {isPasswordVisible ? <EyeOff /> : <Eye />}
@@ -349,9 +356,9 @@ export function SignUp({
 
                 {emailAndPassword?.confirmPassword && (
                   <Field data-invalid={!!fieldErrors.confirmPassword}>
-                    <Label htmlFor="confirmPassword">
+                    <FieldLabel htmlFor="confirmPassword">
                       {localization.auth.confirmPassword}
-                    </Label>
+                    </FieldLabel>
 
                     <InputGroup>
                       <InputGroupInput
@@ -402,6 +409,7 @@ export function SignUp({
 
                       <InputGroupAddon align="inline-end">
                         <InputGroupButton
+                          size="icon-xs"
                           aria-label={
                             isConfirmPasswordVisible
                               ? localization.auth.hidePassword
@@ -413,9 +421,7 @@ export function SignUp({
                               : localization.auth.showPassword
                           }
                           onClick={() =>
-                            setIsConfirmPasswordVisible(
-                              !isConfirmPasswordVisible
-                            )
+                            setIsConfirmPasswordVisible((visible) => !visible)
                           }
                         >
                           {isConfirmPasswordVisible ? <EyeOff /> : <Eye />}

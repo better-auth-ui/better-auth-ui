@@ -13,8 +13,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu"
-import { Field } from "@/components/ui/field"
-import { Label } from "@/components/ui/label"
+import { Field, FieldLabel } from "@/components/ui/field"
 import { Spinner } from "@/components/ui/spinner"
 import { cn } from "@/lib/utils"
 
@@ -90,7 +89,7 @@ export function ChangeAvatar({ className }: ChangeAvatarProps) {
 
   return (
     <Field className={className}>
-      <Label>{localization.settings.avatar}</Label>
+      <FieldLabel>{localization.settings.avatar}</FieldLabel>
 
       <input
         ref={fileInputRef}

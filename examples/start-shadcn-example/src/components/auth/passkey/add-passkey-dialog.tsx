@@ -17,9 +17,8 @@ import {
   AlertDialogTitle
 } from "@/components/ui/alert-dialog"
 import { Button } from "@/components/ui/button"
-import { Field, FieldError } from "@/components/ui/field"
+import { Field, FieldError, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
 import { Spinner } from "@/components/ui/spinner"
 import { passkeyPlugin } from "@/lib/auth/passkey-plugin"
 
@@ -67,7 +66,9 @@ export function AddPasskeyDialog({
           </AlertDialogHeader>
 
           <Field>
-            <Label htmlFor="passkey-name">{passkeyLocalization.name}</Label>
+            <FieldLabel htmlFor="passkey-name">
+              {passkeyLocalization.name}
+            </FieldLabel>
 
             <Input
               id="passkey-name"

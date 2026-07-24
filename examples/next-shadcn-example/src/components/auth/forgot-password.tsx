@@ -14,10 +14,10 @@ import {
   Field,
   FieldDescription,
   FieldError,
-  FieldGroup
+  FieldGroup,
+  FieldLabel
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
 import { Spinner } from "@/components/ui/spinner"
 import { cn } from "@/lib/utils"
 
@@ -87,7 +87,7 @@ export function ForgotPassword({ className }: ForgotPasswordProps) {
         <form onSubmit={handleSubmit}>
           <FieldGroup>
             <Field data-invalid={!!fieldErrors.email}>
-              <Label htmlFor="email">{localization.auth.email}</Label>
+              <FieldLabel htmlFor="email">{localization.auth.email}</FieldLabel>
 
               <Input
                 id="email"
