@@ -5,6 +5,7 @@
     "api-key",
     "captcha",
     "delete-user",
+    "last-login-method",
     "magic-link",
     "multi-session",
     "organization",

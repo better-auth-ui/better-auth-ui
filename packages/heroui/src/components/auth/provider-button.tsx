@@ -1,12 +1,18 @@
-import { authMutationKeys, getProviderName } from "@better-auth-ui/core"
+import {
+  type AuthView,
+  authMutationKeys,
+  getProviderName
+} from "@better-auth-ui/core"
 import { providerIcons, useAuth, useSignInSocial } from "@better-auth-ui/react"
-import { Button, type ButtonProps, Spinner } from "@heroui/react"
+import { Button, type ButtonProps, cn, Spinner } from "@heroui/react"
 import { useIsMutating } from "@tanstack/react-query"
 import type { SocialProvider } from "better-auth/social-providers"
+import { LastUsedBadge } from "./last-login-method/last-used-badge"
 
 export type ProviderButtonProps = {
   provider: SocialProvider
   display?: "full" | "name" | "icon"
+  view?: AuthView
 } & Omit<ButtonProps, "children" | "onPress" | "isPending" | "isDisabled">
 
 /**
@@ -18,7 +24,9 @@ export type ProviderButtonProps = {
 export function ProviderButton({
   provider,
   display = "full",
+  view = "signIn",
   variant = "tertiary",
+  className,
   ...props
 }: ProviderButtonProps) {
   const { authClient, baseURL, localization, redirectTo } = useAuth()
@@ -43,8 +51,8 @@ export function ProviderButton({
       variant={variant}
       isPending={isPending}
       onPress={() => signInSocial({ provider, callbackURL })}
+      className={cn("relative overflow-visible", className)}
       {...props}
-      aria-label={getProviderName(provider)}
     >
       {signInSocialPending ? (
         <Spinner color="current" size="sm" />
@@ -60,6 +68,12 @@ export function ProviderButton({
         : display === "name"
           ? getProviderName(provider)
           : null}
+
+      {display === "icon" && (
+        <span className="sr-only">{getProviderName(provider)}</span>
+      )}
+
+      {view !== "signUp" && <LastUsedBadge method={provider} floating />}
     </Button>
   )
 }

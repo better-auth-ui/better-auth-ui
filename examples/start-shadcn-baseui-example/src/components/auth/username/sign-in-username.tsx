@@ -37,6 +37,7 @@ import {
 import { Spinner } from "@/components/ui/spinner"
 import { usernamePlugin } from "@/lib/auth/username-plugin"
 import { cn } from "@/lib/utils"
+import { LastUsedBadge } from "../last-login-method/last-used-badge"
 
 export type SignInUsernameProps = {
   className?: string
@@ -178,7 +179,7 @@ export function SignInUsername({
           {socialPosition === "top" && (
             <>
               {socialProviders && socialProviders.length > 0 && (
-                <ProviderButtons socialLayout={socialLayout} />
+                <ProviderButtons socialLayout={socialLayout} view="signIn" />
               )}
 
               {showSeparator && (
@@ -326,10 +327,16 @@ export function SignInUsername({
                 )}
 
                 <div className="flex flex-col gap-3">
-                  <Button type="submit" disabled={isPending}>
+                  <Button
+                    type="submit"
+                    className="relative overflow-visible"
+                    disabled={isPending}
+                  >
                     {isSignInPending && <Spinner />}
 
                     {localization.auth.signIn}
+
+                    <LastUsedBadge method={["email", "username"]} floating />
                   </Button>
 
                   {plugins.flatMap((plugin) =>
@@ -354,7 +361,7 @@ export function SignInUsername({
               )}
 
               {socialProviders && socialProviders.length > 0 && (
-                <ProviderButtons socialLayout={socialLayout} />
+                <ProviderButtons socialLayout={socialLayout} view="signIn" />
               )}
             </>
           )}

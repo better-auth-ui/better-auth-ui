@@ -1,5 +1,6 @@
 "use client"
 
+import type { AuthView } from "@better-auth-ui/core"
 import { useAuth } from "@better-auth-ui/react"
 import { useMemo } from "react"
 
@@ -8,6 +9,7 @@ import { ProviderButton } from "./provider-button"
 
 export type ProviderButtonsProps = {
   socialLayout?: SocialLayout
+  view?: AuthView
 }
 
 export type SocialLayout = "auto" | "horizontal" | "vertical" | "grid"
@@ -19,7 +21,8 @@ export type SocialLayout = "auto" | "horizontal" | "vertical" | "grid"
  * @param socialLayout - Preferred layout for the provider buttons; `"auto"` chooses based on the number of providers.
  */
 export function ProviderButtons({
-  socialLayout = "auto"
+  socialLayout = "auto",
+  view = "signIn"
 }: ProviderButtonsProps) {
   const { socialProviders } = useAuth()
 
@@ -48,6 +51,7 @@ export function ProviderButtons({
         <ProviderButton
           key={provider}
           provider={provider}
+          view={view}
           display={
             resolvedSocialLayout === "vertical"
               ? "full"

@@ -19,6 +19,7 @@ import { useIsMutating } from "@tanstack/react-query"
 import { type SyntheticEvent, useState } from "react"
 
 import { FieldSeparator } from "./field-separator"
+import { LastUsedBadge } from "./last-login-method/last-used-badge"
 import { ProviderButtons, type SocialLayout } from "./provider-buttons"
 
 export interface SignInProps {
@@ -118,7 +119,7 @@ export function SignIn({
         {socialPosition === "top" && (
           <>
             {!!socialProviders?.length && (
-              <ProviderButtons socialLayout={socialLayout} />
+              <ProviderButtons socialLayout={socialLayout} view="signIn" />
             )}
 
             {showSeparator && (
@@ -206,10 +207,16 @@ export function SignIn({
             {Captcha && <div className="flex justify-center">{Captcha}</div>}
 
             <div className="flex flex-col gap-3">
-              <Button type="submit" className="w-full" isPending={isPending}>
+              <Button
+                type="submit"
+                className="relative w-full overflow-visible"
+                isPending={isPending}
+              >
                 {signInEmailPending && <Spinner color="current" size="sm" />}
 
                 {localization.auth.signIn}
+
+                <LastUsedBadge method="email" floating />
               </Button>
 
               {plugins.flatMap((plugin) =>
@@ -231,7 +238,7 @@ export function SignIn({
             )}
 
             {!!socialProviders?.length && (
-              <ProviderButtons socialLayout={socialLayout} />
+              <ProviderButtons socialLayout={socialLayout} view="signIn" />
             )}
           </>
         )}

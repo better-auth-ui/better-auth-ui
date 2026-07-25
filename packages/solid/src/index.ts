@@ -1,5 +1,6 @@
 export { createAuthClient } from "better-auth/solid"
 export * from "./hooks/auth/use-authenticate"
+export * from "./hooks/auth/use-last-login-method"
 export * from "./hooks/auth/use-sign-out"
 export * from "./hooks/auth/use-user"
 export * from "./hooks/use-auth-mutation"

@@ -1,0 +1,23 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "last-login-method",
+  "title": "Last Login Method",
+  "description": "Adds a localized last-used indicator to email and social sign-in methods tracked by Better Auth.",
+  "dependencies": [
+    "@better-auth-ui/react@latest",
+    "@better-auth-ui/core@latest",
+    "better-auth"
+  ],
+  "registryDependencies": [
+    "https://better-auth-ui.com/r/sign-in.json"
+  ],
+  "files": [
+    {
+      "path": "src/lib/auth/last-login-method-plugin.ts",
+      "content": "import { createAuthPlugin } from \"@better-auth-ui/core\"\nimport {\n  lastLoginMethodPlugin as coreLastLoginMethodPlugin,\n  type LastLoginMethodPluginOptions\n} from \"@better-auth-ui/core/plugins\"\n\nexport const lastLoginMethodPlugin = createAuthPlugin(\n  coreLastLoginMethodPlugin.id,\n  (options: LastLoginMethodPluginOptions = {}) => ({\n    ...coreLastLoginMethodPlugin(options)\n  })\n)\n",
+      "type": "registry:lib",
+      "target": "@lib/auth/last-login-method-plugin.ts"
+    }
+  ],
+  "type": "registry:component"
+}

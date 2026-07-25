@@ -21,6 +21,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { cn } from "@/lib/utils"
+import { LastUsedBadge } from "../last-login-method/last-used-badge"
 import type { SocialLayout } from "../provider-buttons"
 import { ProviderButtons } from "../provider-buttons"
 import { resolveSubmittedSignIn } from "../sign-in-path"
@@ -244,12 +245,15 @@ export function SignInUsername(props: SignInUsernameProps) {
             </Show>
 
             <Button
+              class="relative overflow-visible"
               disabled={signIn.isPending || signInUsername.isPending}
               type="submit"
             >
               {signIn.isPending || signInUsername.isPending
                 ? `${auth.localization.auth.signIn}…`
                 : auth.localization.auth.signIn}
+
+              <LastUsedBadge floating method={["email", "username"]} />
             </Button>
 
             <For
