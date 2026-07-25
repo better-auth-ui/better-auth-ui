@@ -101,7 +101,7 @@ export function ProviderButton(props: ProviderButtonProps) {
             ? providerName()
             : null}
       {display() === "icon" || isPending() ? (
-        <span class="sr-only">{providerName()}</span>
+        <span class="sr-only">{label()}</span>
       ) : null}
       {(props.view ?? "signIn") !== "signUp" ? (
         <LastUsedBadge floating method={props.provider} />
