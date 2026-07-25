@@ -19,6 +19,8 @@ import {
 } from "@heroui/react"
 import type { SyntheticEvent } from "react"
 
+import { RESET_LINK_SENT_STORAGE_KEY } from "./reset-link-sent"
+
 export type ForgotPasswordProps = {
   className?: string
   variant?: CardProps["variant"]
@@ -55,7 +57,7 @@ export function ForgotPassword({ className, variant }: ForgotPasswordProps) {
         resetFetchOptions()
       },
       onSuccess: (_data, { email }) => {
-        sessionStorage.setItem("better-auth-ui.reset-link-sent", email)
+        sessionStorage.setItem(RESET_LINK_SENT_STORAGE_KEY, email)
         navigate({ to: `${basePaths.auth}/${viewPaths.auth.resetLinkSent}` })
       }
     }

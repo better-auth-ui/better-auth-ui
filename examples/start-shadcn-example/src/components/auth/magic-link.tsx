@@ -24,6 +24,7 @@ import { Input } from "@/components/ui/input"
 import { Spinner } from "@/components/ui/spinner"
 import { magicLinkPlugin } from "@/lib/auth/magic-link-plugin"
 import { cn } from "@/lib/utils"
+import { MAGIC_LINK_SENT_STORAGE_KEY } from "./magic-link-sent"
 import { ProviderButtons, type SocialLayout } from "./provider-buttons"
 
 export type MagicLinkProps = {
@@ -66,10 +67,7 @@ export function MagicLink({
   const { mutate: signInMagicLink, isPending: signInMagicLinkPending } =
     useSignInMagicLink(authClient as MagicLinkAuthClient, {
       onSuccess: (_data, variables) => {
-        sessionStorage.setItem(
-          "better-auth-ui.magic-link-sent",
-          variables.email
-        )
+        sessionStorage.setItem(MAGIC_LINK_SENT_STORAGE_KEY, variables.email)
         navigate({
           to: `${basePaths.auth}/${magicLinkViewPaths.auth.magicLinkSent}`
         })

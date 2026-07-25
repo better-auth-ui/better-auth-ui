@@ -11,6 +11,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { cn } from "@/lib/utils"
 import { OpenEmailButton } from "./open-email-button"
 
+/** `sessionStorage` key the magic-link form stores the submitted email under. */
+export const MAGIC_LINK_SENT_STORAGE_KEY = "better-auth-ui.magic-link-sent"
+
 export type MagicLinkSentProps = {
   class?: string
 }
@@ -35,12 +38,11 @@ export function MagicLinkSent(props: MagicLinkSentProps) {
     magicLinkPluginConfig()?.viewPaths?.auth?.magicLink ?? "magic-link"
 
   const [email, setEmail] = createSignal(
-    (!isServer && sessionStorage.getItem("better-auth-ui.magic-link-sent")) ||
-      ""
+    (!isServer && sessionStorage.getItem(MAGIC_LINK_SENT_STORAGE_KEY)) || ""
   )
 
   onMount(() => {
-    const storedEmail = sessionStorage.getItem("better-auth-ui.magic-link-sent")
+    const storedEmail = sessionStorage.getItem(MAGIC_LINK_SENT_STORAGE_KEY)
 
     if (!storedEmail) {
       auth.navigate({

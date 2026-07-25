@@ -12,6 +12,9 @@ import { useEffect, useState } from "react"
 import { magicLinkPlugin } from "../../../lib/auth/magic-link-plugin"
 import { OpenEmailButton } from "../open-email-button"
 
+/** `sessionStorage` key the magic-link form stores the submitted email under. */
+export const MAGIC_LINK_SENT_STORAGE_KEY = "better-auth-ui.magic-link-sent"
+
 export type MagicLinkSentProps = {
   className?: string
   variant?: CardProps["variant"]
@@ -35,12 +38,11 @@ export function MagicLinkSent({ className, variant }: MagicLinkSentProps) {
 
   const isHydrated = useIsHydrated()
   const [email, setEmail] = useState(
-    (isHydrated && sessionStorage.getItem("better-auth-ui.magic-link-sent")) ||
-      ""
+    (isHydrated && sessionStorage.getItem(MAGIC_LINK_SENT_STORAGE_KEY)) || ""
   )
 
   useEffect(() => {
-    setEmail(sessionStorage.getItem("better-auth-ui.magic-link-sent") ?? "")
+    setEmail(sessionStorage.getItem(MAGIC_LINK_SENT_STORAGE_KEY) ?? "")
   }, [])
 
   return (

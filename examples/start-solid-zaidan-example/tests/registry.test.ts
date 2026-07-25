@@ -2133,7 +2133,7 @@ describe("Solid registry isolation", () => {
       "requestPasswordResetOptions"
     )
     expect(forgotPassword.files[0]?.content).toContain(
-      "better-auth-ui.reset-link-sent"
+      "RESET_LINK_SENT_STORAGE_KEY"
     )
     expect(forgotPassword.files[0]?.content).toContain(
       "Unable to send a reset link. Try again."

@@ -11,6 +11,9 @@ import { useEffect, useState } from "react"
 
 import { OpenEmailButton } from "./open-email-button"
 
+/** `sessionStorage` key the forgot-password form stores the submitted email under. */
+export const RESET_LINK_SENT_STORAGE_KEY = "better-auth-ui.reset-link-sent"
+
 export type ResetLinkSentProps = {
   className?: string
   variant?: CardProps["variant"]
@@ -33,12 +36,11 @@ export function ResetLinkSent({ className, variant }: ResetLinkSentProps) {
 
   const isHydrated = useIsHydrated()
   const [email, setEmail] = useState(
-    (isHydrated && sessionStorage.getItem("better-auth-ui.reset-link-sent")) ||
-      ""
+    (isHydrated && sessionStorage.getItem(RESET_LINK_SENT_STORAGE_KEY)) || ""
   )
 
   useEffect(() => {
-    setEmail(sessionStorage.getItem("better-auth-ui.reset-link-sent") ?? "")
+    setEmail(sessionStorage.getItem(RESET_LINK_SENT_STORAGE_KEY) ?? "")
   }, [])
 
   return (

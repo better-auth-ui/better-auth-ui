@@ -1,32 +1,20 @@
 "use client"
 
 import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
-import { useEffect, useState, useSyncExternalStore } from "react"
+import { useEffect, useState } from "react"
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { FieldDescription } from "@/components/ui/field"
 import { magicLinkPlugin } from "@/lib/auth/magic-link-plugin"
 import { cn } from "@/lib/utils"
 import { OpenEmailButton } from "./open-email-button"
+import { useIsHydrated } from "./use-is-hydrated"
+
+/** `sessionStorage` key the magic-link form stores the submitted email under. */
+export const MAGIC_LINK_SENT_STORAGE_KEY = "better-auth-ui.magic-link-sent"
 
 export type MagicLinkSentProps = {
   className?: string
-}
-
-/**
- * Returns `true` once the component is mounted on the client (hydrated) and
- * `false` while rendering on the server, so client-only reads (e.g.
- * `sessionStorage`) stay safe during SSR.
- *
- * @returns Whether the component has hydrated on the client.
- */
-function useIsHydrated() {
-  const subscribe = () => () => {}
-  return useSyncExternalStore(
-    subscribe,
-    () => true,
-    () => false
-  )
 }
 
 /**
@@ -47,12 +35,11 @@ export function MagicLinkSent({ className }: MagicLinkSentProps) {
 
   const isHydrated = useIsHydrated()
   const [email, setEmail] = useState(
-    (isHydrated && sessionStorage.getItem("better-auth-ui.magic-link-sent")) ||
-      ""
+    (isHydrated && sessionStorage.getItem(MAGIC_LINK_SENT_STORAGE_KEY)) || ""
   )
 
   useEffect(() => {
-    setEmail(sessionStorage.getItem("better-auth-ui.magic-link-sent") ?? "")
+    setEmail(sessionStorage.getItem(MAGIC_LINK_SENT_STORAGE_KEY) ?? "")
   }, [])
 
   return (

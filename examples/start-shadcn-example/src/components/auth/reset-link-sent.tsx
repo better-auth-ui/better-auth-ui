@@ -1,31 +1,19 @@
 "use client"
 
 import { useAuth } from "@better-auth-ui/react"
-import { useEffect, useState, useSyncExternalStore } from "react"
+import { useEffect, useState } from "react"
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { FieldDescription } from "@/components/ui/field"
 import { cn } from "@/lib/utils"
 import { OpenEmailButton } from "./open-email-button"
+import { useIsHydrated } from "./use-is-hydrated"
+
+/** `sessionStorage` key the forgot-password form stores the submitted email under. */
+export const RESET_LINK_SENT_STORAGE_KEY = "better-auth-ui.reset-link-sent"
 
 export type ResetLinkSentProps = {
   className?: string
-}
-
-/**
- * Returns `true` once the component is mounted on the client (hydrated) and
- * `false` while rendering on the server, so client-only reads (e.g.
- * `sessionStorage`) stay safe during SSR.
- *
- * @returns Whether the component has hydrated on the client.
- */
-function useIsHydrated() {
-  const subscribe = () => () => {}
-  return useSyncExternalStore(
-    subscribe,
-    () => true,
-    () => false
-  )
 }
 
 /**
@@ -44,12 +32,11 @@ export function ResetLinkSent({ className }: ResetLinkSentProps) {
 
   const isHydrated = useIsHydrated()
   const [email, setEmail] = useState(
-    (isHydrated && sessionStorage.getItem("better-auth-ui.reset-link-sent")) ||
-      ""
+    (isHydrated && sessionStorage.getItem(RESET_LINK_SENT_STORAGE_KEY)) || ""
   )
 
   useEffect(() => {
-    setEmail(sessionStorage.getItem("better-auth-ui.reset-link-sent") ?? "")
+    setEmail(sessionStorage.getItem(RESET_LINK_SENT_STORAGE_KEY) ?? "")
   }, [])
 
   return (

@@ -96,6 +96,7 @@ describe("viewPaths", () => {
     expect(viewPaths.auth.signUp).toBe("sign-up")
     expect(viewPaths.auth.forgotPassword).toBe("forgot-password")
     expect(viewPaths.auth.resetPassword).toBe("reset-password")
+    expect(viewPaths.auth.resetLinkSent).toBe("reset-link-sent")
     expect(viewPaths.auth.signOut).toBe("sign-out")
     expect(viewPaths.auth.verifyEmail).toBe("verify-email")
   })

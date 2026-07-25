@@ -6,6 +6,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { cn } from "@/lib/utils"
 import { OpenEmailButton } from "./open-email-button"
 
+/** `sessionStorage` key the forgot-password form stores the submitted email under. */
+export const RESET_LINK_SENT_STORAGE_KEY = "better-auth-ui.reset-link-sent"
+
 export type ResetLinkSentProps = {
   class?: string
 }
@@ -20,12 +23,11 @@ export function ResetLinkSent(props: ResetLinkSentProps) {
   const auth = useAuth()
 
   const [email, setEmail] = createSignal(
-    (!isServer && sessionStorage.getItem("better-auth-ui.reset-link-sent")) ||
-      ""
+    (!isServer && sessionStorage.getItem(RESET_LINK_SENT_STORAGE_KEY)) || ""
   )
 
   onMount(() => {
-    const storedEmail = sessionStorage.getItem("better-auth-ui.reset-link-sent")
+    const storedEmail = sessionStorage.getItem(RESET_LINK_SENT_STORAGE_KEY)
 
     if (!storedEmail) {
       auth.navigate({

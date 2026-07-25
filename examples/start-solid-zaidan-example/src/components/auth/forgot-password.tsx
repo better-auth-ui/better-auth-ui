@@ -7,6 +7,7 @@ import type { AuthPlugin } from "@better-auth-ui/solid/plugins"
 import { createMutation } from "@tanstack/solid-query"
 import { Link } from "@tanstack/solid-router"
 import { createSignal, Show } from "solid-js"
+import { RESET_LINK_SENT_STORAGE_KEY } from "@/components/auth/reset-link-sent"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -28,8 +29,8 @@ export function ForgotPassword(props: ForgotPasswordProps) {
     onError: () => {
       resetFetchOptions()
     },
-    onSuccess: () => {
-      sessionStorage.setItem("better-auth-ui.reset-link-sent", email())
+    onSuccess: (_data, variables) => {
+      sessionStorage.setItem(RESET_LINK_SENT_STORAGE_KEY, variables.email)
       auth.navigate({
         to: `${auth.basePaths.auth}/${auth.viewPaths.auth.resetLinkSent}`
       })

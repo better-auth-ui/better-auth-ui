@@ -202,6 +202,11 @@
           "path": "src/components/auth/open-email-button.tsx",
           "type": "registry:component",
           "target": "@components/auth/open-email-button.tsx"
+        },
+        {
+          "path": "src/components/auth/use-is-hydrated.ts",
+          "type": "registry:component",
+          "target": "@components/auth/use-is-hydrated.ts"
         }
       ]
     },
@@ -782,6 +787,11 @@
           "path": "src/components/auth/open-email-button.tsx",
           "type": "registry:component",
           "target": "@components/auth/open-email-button.tsx"
+        },
+        {
+          "path": "src/components/auth/use-is-hydrated.ts",
+          "type": "registry:component",
+          "target": "@components/auth/use-is-hydrated.ts"
         }
       ]
     },
@@ -834,6 +844,11 @@
           "path": "src/components/auth/open-email-button.tsx",
           "type": "registry:component",
           "target": "@components/auth/open-email-button.tsx"
+        },
+        {
+          "path": "src/components/auth/use-is-hydrated.ts",
+          "type": "registry:component",
+          "target": "@components/auth/use-is-hydrated.ts"
         }
       ]
     },

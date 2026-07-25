@@ -25,6 +25,7 @@ import { type SyntheticEvent, useState } from "react"
 import { magicLinkPlugin } from "../../../lib/auth/magic-link-plugin"
 import { FieldSeparator } from "../field-separator"
 import { ProviderButtons, type SocialLayout } from "../provider-buttons"
+import { MAGIC_LINK_SENT_STORAGE_KEY } from "./magic-link-sent"
 
 export type MagicLinkProps = {
   className?: string
@@ -66,10 +67,7 @@ export function MagicLink({
   const { mutate: signInMagicLink, isPending: signInMagicLinkPending } =
     useSignInMagicLink(authClient as MagicLinkAuthClient, {
       onSuccess: (_data, variables) => {
-        sessionStorage.setItem(
-          "better-auth-ui.magic-link-sent",
-          variables.email
-        )
+        sessionStorage.setItem(MAGIC_LINK_SENT_STORAGE_KEY, variables.email)
         navigate({
           to: `${basePaths.auth}/${magicLinkViewPaths.auth.magicLinkSent}`
         })

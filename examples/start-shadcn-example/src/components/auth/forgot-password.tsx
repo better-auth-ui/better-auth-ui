@@ -19,6 +19,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { Spinner } from "@/components/ui/spinner"
 import { cn } from "@/lib/utils"
+import { RESET_LINK_SENT_STORAGE_KEY } from "./reset-link-sent"
 
 export type ForgotPasswordProps = {
   className?: string
@@ -56,7 +57,7 @@ export function ForgotPassword({ className }: ForgotPasswordProps) {
         resetFetchOptions()
       },
       onSuccess: (_data, { email }) => {
-        sessionStorage.setItem("better-auth-ui.reset-link-sent", email)
+        sessionStorage.setItem(RESET_LINK_SENT_STORAGE_KEY, email)
         navigate({ to: `${basePaths.auth}/${viewPaths.auth.resetLinkSent}` })
       }
     }
