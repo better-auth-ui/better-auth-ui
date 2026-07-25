@@ -6,6 +6,7 @@ export * from "./components/auth/delete-user/danger-zone"
 export * from "./components/auth/delete-user/delete-account"
 // Plugin-contributed components that may be used standalone
 export * from "./components/auth/magic-link/magic-link"
+export * from "./components/auth/magic-link/magic-link-sent"
 export * from "./components/auth/multi-session/manage-account"
 export * from "./components/auth/multi-session/manage-accounts"
 export * from "./components/auth/multi-session/switch-account-submenu"

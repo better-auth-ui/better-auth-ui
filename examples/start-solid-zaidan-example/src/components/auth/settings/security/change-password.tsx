@@ -9,6 +9,7 @@ import type { BetterFetchError } from "better-auth/client"
 import { Eye, EyeOff } from "lucide-solid"
 import { createSignal, Show } from "solid-js"
 import { toast } from "solid-sonner"
+import { OpenEmailButton } from "@/components/auth/open-email-button"
 import type { ChangePasswordFieldErrors } from "@/components/auth/settings/shared/types"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter } from "@/components/ui/card"
@@ -35,15 +36,15 @@ export function ChangePasswordSettings(
 ) {
   const auth = useAuth()
   const session = useSession(auth.authClient)
-  const linkedAccounts = useListAccounts(auth.authClient)
+  const userId = () => session.data?.user.id
+  const linkedAccounts = useListAccounts(auth.authClient, () => ({
+    enabled: !import.meta.env.SSR && Boolean(userId())
+  }))
   const hasCredentialAccount = () =>
     linkedAccounts.data?.some(
       (account: { providerId?: string }) => account.providerId === "credential"
     )
-  const requestPasswordReset = useRequestPasswordReset(auth.authClient, () => ({
-    onSuccess: () =>
-      toast.success(auth.localization.auth.passwordResetEmailSent)
-  }))
+  const requestPasswordReset = useRequestPasswordReset(auth.authClient)
   const changePassword = useChangePassword(auth.authClient, () => ({
     onError: (error: BetterFetchError) => {
       setCurrentPassword("")
@@ -126,16 +127,35 @@ export function ChangePasswordSettings(
               </p>
             </div>
 
-            <Button
-              disabled={requestPasswordReset.isPending || !session.data}
-              onClick={sendResetLink}
-              size="sm"
-              type="button"
+            <Show
+              fallback={
+                <Button
+                  disabled={requestPasswordReset.isPending || !session.data}
+                  onClick={sendResetLink}
+                  size="sm"
+                  type="button"
+                >
+                  {requestPasswordReset.isPending
+                    ? `${auth.localization.auth.sendResetLink}…`
+                    : auth.localization.auth.sendResetLink}
+                </Button>
+              }
+              when={requestPasswordReset.isSuccess && session.data?.user.email}
+              keyed
             >
-              {requestPasswordReset.isPending
-                ? `${auth.localization.auth.sendResetLink}…`
-                : auth.localization.auth.sendResetLink}
-            </Button>
+              {(sentEmail) => (
+                <div class="flex flex-col items-start gap-3 sm:items-end">
+                  <p class="text-sm" role="status">
+                    {auth.localization.auth.resetLinkSentTo.replace(
+                      "{{email}}",
+                      sentEmail
+                    )}
+                  </p>
+
+                  <OpenEmailButton class="w-auto" email={sentEmail} />
+                </div>
+              )}
+            </Show>
           </CardContent>
         </Card>
       </div>

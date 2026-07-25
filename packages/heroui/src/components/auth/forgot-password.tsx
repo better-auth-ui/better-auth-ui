@@ -15,10 +15,11 @@ import {
   Label,
   Link,
   Spinner,
-  TextField,
-  toast
+  TextField
 } from "@heroui/react"
 import type { SyntheticEvent } from "react"
+
+import { RESET_LINK_SENT_STORAGE_KEY } from "./reset-link-sent"
 
 export type ForgotPasswordProps = {
   className?: string
@@ -29,7 +30,9 @@ export type ForgotPasswordProps = {
  * Render a card-based "Forgot Password" form that sends a password-reset email.
  *
  * The form displays an email input, submit button, and a link back to sign-in.
- * Success toasts are shown via `useRequestPasswordReset`; errors are handled globally by `ErrorToaster`.
+ * After a successful request the submitted email is stored in `sessionStorage`
+ * and the user is redirected to the reset-link-sent view, which offers to open
+ * their email provider. Errors are handled globally by `ErrorToaster`.
  *
  * @param className - Optional additional CSS class names applied to the card
  * @returns The forgot-password form UI as a JSX element
@@ -53,9 +56,9 @@ export function ForgotPassword({ className, variant }: ForgotPasswordProps) {
       onError: () => {
         resetFetchOptions()
       },
-      onSuccess: () => {
-        toast.success(localization.auth.passwordResetEmailSent)
-        navigate({ to: `${basePaths.auth}/${viewPaths.auth.signIn}` })
+      onSuccess: (_data, { email }) => {
+        sessionStorage.setItem(RESET_LINK_SENT_STORAGE_KEY, email)
+        navigate({ to: `${basePaths.auth}/${viewPaths.auth.resetLinkSent}` })
       }
     }
   )

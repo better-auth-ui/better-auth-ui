@@ -7,6 +7,7 @@ describe("viewPaths.auth", () => {
     expect(viewPaths.auth).toHaveProperty("signUp")
     expect(viewPaths.auth).toHaveProperty("forgotPassword")
     expect(viewPaths.auth).toHaveProperty("resetPassword")
+    expect(viewPaths.auth).toHaveProperty("resetLinkSent")
     expect(viewPaths.auth).toHaveProperty("signOut")
     expect(viewPaths.auth).toHaveProperty("verifyEmail")
   })
@@ -16,6 +17,7 @@ describe("viewPaths.auth", () => {
     expect(viewPaths.auth.signUp).toBe("sign-up")
     expect(viewPaths.auth.forgotPassword).toBe("forgot-password")
     expect(viewPaths.auth.resetPassword).toBe("reset-password")
+    expect(viewPaths.auth.resetLinkSent).toBe("reset-link-sent")
     expect(viewPaths.auth.signOut).toBe("sign-out")
     expect(viewPaths.auth.verifyEmail).toBe("verify-email")
   })
@@ -45,6 +47,7 @@ describe("authViews (derived)", () => {
     expect(authViews).toContain("signUp")
     expect(authViews).toContain("forgotPassword")
     expect(authViews).toContain("resetPassword")
+    expect(authViews).toContain("resetLinkSent")
     expect(authViews).toContain("signOut")
     expect(authViews).toContain("verifyEmail")
   })
@@ -62,7 +65,7 @@ describe("authPaths (derived)", () => {
   it("should be able to derive array of auth path values", () => {
     const authPaths = Object.values(viewPaths.auth)
     expect(Array.isArray(authPaths)).toBe(true)
-    expect(authPaths.length).toBe(6)
+    expect(authPaths.length).toBe(7)
   })
 
   it("should contain all built-in path values", () => {
@@ -71,6 +74,7 @@ describe("authPaths (derived)", () => {
     expect(authPaths).toContain("sign-up")
     expect(authPaths).toContain("forgot-password")
     expect(authPaths).toContain("reset-password")
+    expect(authPaths).toContain("reset-link-sent")
     expect(authPaths).toContain("sign-out")
     expect(authPaths).toContain("verify-email")
   })
@@ -92,6 +96,7 @@ describe("viewPaths", () => {
     expect(viewPaths.auth.signUp).toBe("sign-up")
     expect(viewPaths.auth.forgotPassword).toBe("forgot-password")
     expect(viewPaths.auth.resetPassword).toBe("reset-password")
+    expect(viewPaths.auth.resetLinkSent).toBe("reset-link-sent")
     expect(viewPaths.auth.signOut).toBe("sign-out")
     expect(viewPaths.auth.verifyEmail).toBe("verify-email")
   })
@@ -104,6 +109,7 @@ describe("type safety", () => {
       "signUp",
       "forgotPassword",
       "resetPassword",
+      "resetLinkSent",
       "signOut",
       "verifyEmail"
     ]

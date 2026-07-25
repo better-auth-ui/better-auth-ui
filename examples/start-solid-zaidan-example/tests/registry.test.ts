@@ -2141,11 +2141,16 @@ describe("Solid registry isolation", () => {
       "useRequestPasswordReset"
     )
     expect(forgotPassword.files[0]?.content).toContain(
-      "Check your email for the reset link."
+      "RESET_LINK_SENT_STORAGE_KEY"
     )
     expect(forgotPassword.files[0]?.content).toContain(
       "Unable to send a reset link. Try again."
     )
+    expect(forgotPassword.files[1]?.path).toBe(
+      "src/components/auth/reset-link-sent.tsx"
+    )
+    expect(forgotPassword.files[1]?.content).toContain("resetLinkSentTo")
+    expect(forgotPassword.files[1]?.content).toContain("OpenEmailButton")
 
     const resetPassword = readJson<{
       dependencies: string[]

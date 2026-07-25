@@ -6,6 +6,7 @@ import {
 } from "@better-auth-ui/solid"
 import { Link } from "@tanstack/solid-router"
 import { createSignal, Show } from "solid-js"
+import { RESET_LINK_SENT_STORAGE_KEY } from "@/components/auth/reset-link-sent"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -25,6 +26,12 @@ export function ForgotPassword(props: ForgotPasswordProps) {
   const requestReset = useRequestPasswordReset(auth.authClient, () => ({
     onError: () => {
       resetFetchOptions()
+    },
+    onSuccess: (_data, variables) => {
+      sessionStorage.setItem(RESET_LINK_SENT_STORAGE_KEY, variables.email)
+      auth.navigate({
+        to: `${auth.basePaths.auth}/${auth.viewPaths.auth.resetLinkSent}`
+      })
     }
   }))
 
@@ -91,9 +98,6 @@ export function ForgotPassword(props: ForgotPasswordProps) {
                 ? `${auth.localization.auth.sendResetLink}…`
                 : auth.localization.auth.sendResetLink}
             </Button>
-            <Show when={requestReset.isSuccess}>
-              <p role="status">Check your email for the reset link.</p>
-            </Show>
             <Show when={requestReset.isError}>
               <p role="alert">Unable to send a reset link. Try again.</p>
             </Show>

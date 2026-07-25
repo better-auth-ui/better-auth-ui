@@ -179,6 +179,11 @@
           "target": "@components/auth/magic-link.tsx"
         },
         {
+          "path": "src/components/auth/magic-link-sent.tsx",
+          "type": "registry:component",
+          "target": "@components/auth/magic-link-sent.tsx"
+        },
+        {
           "path": "src/components/auth/magic-link-button.tsx",
           "type": "registry:component",
           "target": "@components/auth/magic-link-button.tsx"
@@ -192,6 +197,16 @@
           "path": "src/components/auth/provider-buttons.tsx",
           "type": "registry:component",
           "target": "@components/auth/provider-buttons.tsx"
+        },
+        {
+          "path": "src/components/auth/open-email-button.tsx",
+          "type": "registry:component",
+          "target": "@components/auth/open-email-button.tsx"
+        },
+        {
+          "path": "src/components/auth/use-is-hydrated.ts",
+          "type": "registry:component",
+          "target": "@components/auth/use-is-hydrated.ts"
         }
       ]
     },
@@ -746,7 +761,8 @@
       "dependencies": [
         "@better-auth-ui/react@latest",
         "@better-auth-ui/core@latest",
-        "better-auth"
+        "better-auth",
+        "lucide-react"
       ],
       "registryDependencies": [
         "button",
@@ -761,6 +777,21 @@
           "path": "src/components/auth/forgot-password.tsx",
           "type": "registry:component",
           "target": "@components/auth/forgot-password.tsx"
+        },
+        {
+          "path": "src/components/auth/reset-link-sent.tsx",
+          "type": "registry:component",
+          "target": "@components/auth/reset-link-sent.tsx"
+        },
+        {
+          "path": "src/components/auth/open-email-button.tsx",
+          "type": "registry:component",
+          "target": "@components/auth/open-email-button.tsx"
+        },
+        {
+          "path": "src/components/auth/use-is-hydrated.ts",
+          "type": "registry:component",
+          "target": "@components/auth/use-is-hydrated.ts"
         }
       ]
     },
@@ -813,6 +844,11 @@
           "path": "src/components/auth/open-email-button.tsx",
           "type": "registry:component",
           "target": "@components/auth/open-email-button.tsx"
+        },
+        {
+          "path": "src/components/auth/use-is-hydrated.ts",
+          "type": "registry:component",
+          "target": "@components/auth/use-is-hydrated.ts"
         }
       ]
     },
@@ -1040,6 +1076,11 @@
           "path": "src/components/auth/settings/security/change-password.tsx",
           "type": "registry:component",
           "target": "@components/auth/settings/security/change-password.tsx"
+        },
+        {
+          "path": "src/components/auth/open-email-button.tsx",
+          "type": "registry:component",
+          "target": "@components/auth/open-email-button.tsx"
         }
       ]
     },

@@ -8,10 +8,12 @@ import {
 } from "./magic-link-localization"
 
 declare module "../../lib/view-paths" {
-  /** Widens `AuthViewPaths` by adding the `"magicLink"` path when this plugin is imported. */
+  /** Widens `AuthViewPaths` with the magic-link paths when this plugin is imported. */
   interface AuthViewPaths {
     /** @default "magic-link" */
     magicLink?: string
+    /** @default "magic-link-sent" */
+    magicLinkSent?: string
   }
 }
 
@@ -27,6 +29,12 @@ export type MagicLinkPluginOptions = {
    * @default "magic-link"
    */
   path?: string
+  /**
+   * URL segment for the magic-link-sent confirmation view.
+   * @remarks `string`
+   * @default "magic-link-sent"
+   */
+  sentPath?: string
 }
 
 export const magicLinkPlugin = createAuthPlugin(
@@ -34,7 +42,10 @@ export const magicLinkPlugin = createAuthPlugin(
   (options: MagicLinkPluginOptions = {}) => ({
     localization: { ...magicLinkLocalization, ...options.localization },
     viewPaths: {
-      auth: { magicLink: options.path ?? "magic-link" }
+      auth: {
+        magicLink: options.path ?? "magic-link",
+        magicLinkSent: options.sentPath ?? "magic-link-sent"
+      }
     }
   })
 )

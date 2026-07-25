@@ -9,7 +9,7 @@ import { useAuth } from "@better-auth-ui/solid"
 import { useSignInMagicLink } from "@better-auth-ui/solid/plugins/magic-link"
 import { Link } from "@tanstack/solid-router"
 import { type Component, createSignal, For, Show } from "solid-js"
-import { toast } from "solid-sonner"
+import { MAGIC_LINK_SENT_STORAGE_KEY } from "@/components/auth/magic-link-sent"
 import {
   ProviderButtons,
   type SocialLayout
@@ -44,10 +44,14 @@ export function MagicLink(props: MagicLinkProps) {
       | Partial<MagicLinkLocalization>
       | undefined)
   })
+  const magicLinkSentPath = () =>
+    magicLinkPluginConfig()?.viewPaths?.auth?.magicLinkSent ?? "magic-link-sent"
   const signInMagicLink = useSignInMagicLink(auth.authClient, () => ({
-    onSuccess: () => {
-      setEmail("")
-      toast.success(magicLinkLabels().magicLinkSent)
+    onSuccess: (_data, variables) => {
+      sessionStorage.setItem(MAGIC_LINK_SENT_STORAGE_KEY, variables.email)
+      auth.navigate({
+        to: `${auth.basePaths.auth}/${magicLinkSentPath()}`
+      })
     }
   }))
   const showSeparator = () => Boolean(auth.socialProviders?.length)

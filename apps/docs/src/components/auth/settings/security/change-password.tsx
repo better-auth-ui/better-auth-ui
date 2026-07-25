@@ -25,6 +25,7 @@ import {
 import { Skeleton } from "@/components/ui/skeleton"
 import { Spinner } from "@/components/ui/spinner"
 import { cn } from "@/lib/utils"
+import { OpenEmailButton } from "../../open-email-button"
 
 export type ChangePasswordProps = {
   className?: string
@@ -67,6 +68,7 @@ function SetPassword({ className }: { className?: string }) {
   const { authClient, localization, plugins } = useAuth()
   const { data: session } = useSession(authClient)
   const { fetchOptions, resetFetchOptions } = useFetchOptions()
+  const [sentEmail, setSentEmail] = useState("")
 
   const { mutate: requestPasswordReset, isPending } = useRequestPasswordReset(
     authClient,
@@ -74,7 +76,9 @@ function SetPassword({ className }: { className?: string }) {
       onError: () => {
         resetFetchOptions()
       },
-      onSuccess: () => toast.success(localization.auth.passwordResetEmailSent)
+      onSuccess: (_data, { email }) => {
+        setSentEmail(email)
+      }
     }
   )
 
@@ -106,19 +110,32 @@ function SetPassword({ className }: { className?: string }) {
             </p>
           </div>
 
-          <div className="flex flex-col gap-3 items-start sm:items-end">
-            {Captcha && <div>{Captcha}</div>}
+          {sentEmail ? (
+            <div className="flex flex-col gap-3 items-start sm:items-end">
+              <p className="text-sm" role="status">
+                {localization.auth.resetLinkSentTo.replace(
+                  "{{email}}",
+                  sentEmail
+                )}
+              </p>
 
-            <Button
-              size="sm"
-              disabled={isPending || !session?.user.email}
-              onClick={handleSetPassword}
-            >
-              {isPending && <Spinner />}
+              <OpenEmailButton email={sentEmail} className="w-auto" />
+            </div>
+          ) : (
+            <div className="flex flex-col gap-3 items-start sm:items-end">
+              {Captcha && <div>{Captcha}</div>}
 
-              {localization.auth.sendResetLink}
-            </Button>
-          </div>
+              <Button
+                size="sm"
+                disabled={isPending || !session?.user.email}
+                onClick={handleSetPassword}
+              >
+                {isPending && <Spinner />}
+
+                {localization.auth.sendResetLink}
+              </Button>
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>

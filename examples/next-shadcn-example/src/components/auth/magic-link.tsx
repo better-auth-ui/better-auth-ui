@@ -6,7 +6,6 @@ import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
 import { useSignInMagicLink } from "@better-auth-ui/react/plugins/magic-link"
 import { useIsMutating } from "@tanstack/react-query"
 import { type SyntheticEvent, useState } from "react"
-import { toast } from "sonner"
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -22,6 +21,7 @@ import { Input } from "@/components/ui/input"
 import { Spinner } from "@/components/ui/spinner"
 import { magicLinkPlugin } from "@/lib/auth/magic-link-plugin"
 import { cn } from "@/lib/utils"
+import { MAGIC_LINK_SENT_STORAGE_KEY } from "./magic-link-sent"
 import { ProviderButtons, type SocialLayout } from "./provider-buttons"
 
 export type MagicLinkProps = {
@@ -49,21 +49,25 @@ export function MagicLink({
     baseURL,
     emailAndPassword,
     localization,
+    navigate,
     plugins,
     redirectTo,
     socialProviders,
     viewPaths,
     Link
   } = useAuth<MagicLinkAuthClient>()
-  const { localization: magicLinkLocalization } = useAuthPlugin(magicLinkPlugin)
+  const { localization: magicLinkLocalization, viewPaths: magicLinkViewPaths } =
+    useAuthPlugin(magicLinkPlugin)
 
   const [email, setEmail] = useState("")
 
   const { mutate: signInMagicLink, isPending: signInMagicLinkPending } =
     useSignInMagicLink(authClient, {
-      onSuccess: () => {
-        setEmail("")
-        toast.success(magicLinkLocalization.magicLinkSent)
+      onSuccess: (_data, variables) => {
+        sessionStorage.setItem(MAGIC_LINK_SENT_STORAGE_KEY, variables.email)
+        navigate({
+          to: `${basePaths.auth}/${magicLinkViewPaths.auth.magicLinkSent}`
+        })
       }
     })
 

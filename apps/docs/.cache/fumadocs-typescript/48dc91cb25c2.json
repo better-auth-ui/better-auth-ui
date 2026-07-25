@@ -1,0 +1,117 @@
+[
+  {
+    "id": "new-device.tsx-NewDeviceEmailProps",
+    "name": "NewDeviceEmailProps",
+    "description": "Props for the NewDeviceEmail component.",
+    "entries": [
+      {
+        "name": "userEmail",
+        "description": "Email address of the user account",
+        "tags": [],
+        "type": "string",
+        "simplifiedType": "string",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "deviceInfo",
+        "description": "Information about the device that signed in",
+        "tags": [],
+        "type": "DeviceInfo",
+        "simplifiedType": "object",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "secureAccountLink",
+        "description": "URL to secure the account if unauthorized access is suspected",
+        "tags": [],
+        "type": "string",
+        "simplifiedType": "string",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "appName",
+        "description": "Name of the application sending the email",
+        "tags": [],
+        "type": "string",
+        "simplifiedType": "string",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "supportEmail",
+        "description": "Support email address for security concerns",
+        "tags": [],
+        "type": "string",
+        "simplifiedType": "string",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "logoURL",
+        "description": "Logo URL(s) - a single string or light/dark variants. If omitted, no logo is shown.",
+        "tags": [],
+        "type": "string | { light: string; dark: string; }",
+        "simplifiedType": "string | { light: string; dark: string; }",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "classNames",
+        "description": "Custom CSS class names for styling specific parts of the email",
+        "tags": [],
+        "type": "EmailClassNames",
+        "simplifiedType": "EmailClassNames",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "colors",
+        "description": "Custom color scheme for light and dark modes",
+        "tags": [],
+        "type": "EmailColors",
+        "simplifiedType": "EmailColors",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "poweredBy",
+        "description": "Whether to show the \"Powered by better-auth\" footer",
+        "tags": [],
+        "type": "boolean",
+        "simplifiedType": "boolean",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "darkMode",
+        "description": "Whether to enable dark mode support",
+        "tags": [],
+        "type": "boolean",
+        "simplifiedType": "boolean",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "head",
+        "description": "Additional React nodes to inject into the email head",
+        "tags": [],
+        "type": "ReactNode",
+        "simplifiedType": "ReactNode",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "localization",
+        "description": "Localization overrides for customizing email text",
+        "tags": [{ "name": "remarks", "text": "`NewDeviceEmailLocalization`" }],
+        "type": "Partial<{ NEW_SIGN_IN_DETECTED: string; LOGO: string; NEW_SIGN_IN_TO_YOUR_ACCOUNT: string; DEVICE_DETAILS: string; BROWSER: string; OPERATING_SYSTEM: string; LOCATION: string; IP_ADDRESS: string; TIME: string; IF_THIS_WAS_YOU: string; SECURE_MY_ACCOUNT: string; EMAIL_SENT_BY: string; IF_YOU_DIDNT_SIGN_IN: string; POWERED_BY_BETTER_AUTH: string; }>",
+        "simplifiedType": "NewDeviceEmailLocalization",
+        "required": false,
+        "deprecated": false
+      }
+    ]
+  }
+]
