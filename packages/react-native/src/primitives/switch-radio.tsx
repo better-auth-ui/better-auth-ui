@@ -8,6 +8,7 @@ import {
 import { Animated } from "react-native"
 import { cn } from "../lib/cn"
 import { useThemeColors } from "../lib/theme-colors"
+import { tw } from "../lib/tw"
 import { Box, Btn, Txt } from "./styled"
 
 /* -------------------------------------------------------------------------
@@ -68,13 +69,19 @@ export function Switch({
         className
       )}
     >
+      {/* `Animated.View` is not one of this library's `className`-aware
+          wrappers, so the classes are resolved to a style up front. */}
       <Animated.View
-        style={{ backgroundColor: trackColor }}
-        className="h-6 w-10 justify-center rounded-full"
+        style={[
+          tw("h-6 w-10 justify-center rounded-full", colors),
+          { backgroundColor: trackColor }
+        ]}
       >
         <Animated.View
-          style={{ transform: [{ translateX: thumbTranslate }] }}
-          className="h-5 w-5 rounded-full bg-surface"
+          style={[
+            tw("h-5 w-5 rounded-full bg-surface", colors),
+            { transform: [{ translateX: thumbTranslate }] }
+          ]}
         />
       </Animated.View>
 

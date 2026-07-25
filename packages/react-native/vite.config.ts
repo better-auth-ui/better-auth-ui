@@ -6,7 +6,7 @@ import dts from "vite-plugin-dts"
  * Library build for `@better-auth-ui/react-native`.
  *
  * Mirrors the other UI packages: a single ES entry with every bare module ID
- * left external (react, react-native, nativewind, react-native-svg, the
+ * left external (react, react-native, react-native-svg, the
  * `@better-auth-ui/*` logic packages, better-auth, tanstack-query, …). React
  * Native consumers resolve the `src` export condition and let Metro compile
  * the source directly, so this build primarily produces the published `dist`
