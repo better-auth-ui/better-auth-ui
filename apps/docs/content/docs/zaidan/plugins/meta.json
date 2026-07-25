@@ -2,6 +2,7 @@
   "icon": "Plug",
   "defaultOpen": true,
   "pages": [
+    "admin",
     "api-key",
     "captcha",
     "delete-user",

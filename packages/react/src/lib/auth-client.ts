@@ -1,6 +1,8 @@
 import type { apiKeyClient } from "@better-auth/api-key/client"
 import type { passkeyClient } from "@better-auth/passkey/client"
 import type {
+  AdminClientOptions,
+  adminClient,
   deviceAuthorizationClient,
   lastLoginMethodClient,
   magicLinkClient,
@@ -17,6 +19,12 @@ export type AuthClient = ReturnType<typeof createAuthClient>
 // being honoured by every downstream bundler (RSC graphs, dev builds,
 // Turbopack, older configs, etc.) and keeps the plugin packages out of
 // consumers' runtime bundles entirely.
+
+export type AdminAuthClient = ReturnType<
+  typeof createAuthClient<{
+    plugins: [ReturnType<typeof adminClient<AdminClientOptions>>]
+  }>
+>
 
 export type MagicLinkAuthClient = ReturnType<
   typeof createAuthClient<{ plugins: [ReturnType<typeof magicLinkClient>] }>

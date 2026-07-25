@@ -130,6 +130,7 @@ const expectedSolidRegistryPayloadNames = [
   "new-device-email",
   "organization-invitation-email",
   "delete-user",
+  "admin",
   "multi-session",
   "organization",
   "theme"
@@ -2522,6 +2523,7 @@ describe("Solid registry isolation", () => {
       "components"
     ])
     expect(zaidanPluginsMeta.pages).toEqual([
+      "admin",
       "api-key",
       "captcha",
       "delete-user",
@@ -2793,6 +2795,7 @@ describe("Solid registry isolation", () => {
     const integrations = readZaidanDoc("integrations/tanstack-start.mdx")
     const additionalFields = readZaidanDoc("concepts/additional-fields.mdx")
     const pluginPayloadNames = [
+      "admin",
       "username",
       "passkey",
       "multi-session",
@@ -2937,6 +2940,7 @@ describe("Solid registry isolation", () => {
           "This drops the following into your codebase:"
         )
       } else if (
+        name === "admin" ||
         name === "delete-user" ||
         name === "last-login-method" ||
         name === "magic-link" ||
