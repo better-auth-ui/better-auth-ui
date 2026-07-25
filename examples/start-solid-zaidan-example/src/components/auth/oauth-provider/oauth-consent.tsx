@@ -1,10 +1,5 @@
 import {
-  oauthProviderPlugin as coreOAuthProviderPlugin,
   type OAuthAuthorizationRequest,
-  type OAuthProviderLocalization,
-  type OAuthScopeMetadataMap,
-  oauthProviderLocalization,
-  oauthProviderScopeMetadata,
   parseOAuthAuthorizationRequest,
   sanitizeOAuthClientUrl
 } from "@better-auth-ui/core/plugins"
@@ -12,6 +7,7 @@ import {
   type OAuthProviderAuthClient,
   oauthConsentOptions,
   useAuth,
+  useAuthPlugin,
   usePublicOAuthClient,
   useSession
 } from "@better-auth-ui/solid"
@@ -32,6 +28,7 @@ import {
 import { Separator } from "@/components/ui/separator"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Spinner } from "@/components/ui/spinner"
+import { oauthProviderPlugin } from "@/lib/auth/oauth-provider-plugin"
 import { cn } from "@/lib/utils"
 import { UserAvatar } from "../user/user-avatar"
 
@@ -44,23 +41,10 @@ const interpolateClient = (template: string, clientName: string) =>
 
 export function OAuthConsent(props: OAuthConsentProps) {
   const auth = useAuth()
+  const { localization, scopeMetadata } = useAuthPlugin(oauthProviderPlugin)
   const oauthClient = auth.authClient as OAuthProviderAuthClient
   const session = useSession(oauthClient)
   const [request, setRequest] = createSignal<OAuthAuthorizationRequest>()
-  const plugin = () =>
-    auth.plugins.find(
-      (candidate) => candidate.id === coreOAuthProviderPlugin.id
-    )
-  const localization = (): OAuthProviderLocalization => ({
-    ...oauthProviderLocalization,
-    ...(plugin()?.localization as
-      | Partial<OAuthProviderLocalization>
-      | undefined)
-  })
-  const scopeMetadata = (): OAuthScopeMetadataMap => ({
-    ...oauthProviderScopeMetadata,
-    ...(plugin()?.scopeMetadata as OAuthScopeMetadataMap | undefined)
-  })
 
   onMount(() => {
     setRequest(parseOAuthAuthorizationRequest(window.location.search))
@@ -72,7 +56,7 @@ export function OAuthConsent(props: OAuthConsentProps) {
   )
   const consent = createMutation(() => oauthConsentOptions(oauthClient))
   const clientName = () =>
-    publicClient.data?.client_name || localization().application
+    publicClient.data?.client_name || localization.application
   const logoUrl = () => sanitizeOAuthClientUrl(publicClient.data?.logo_uri)
   const policyUrl = () => sanitizeOAuthClientUrl(publicClient.data?.policy_uri)
   const termsUrl = () => sanitizeOAuthClientUrl(publicClient.data?.tos_uri)
@@ -96,11 +80,9 @@ export function OAuthConsent(props: OAuthConsentProps) {
       fallback={
         <Card class={cn("w-full max-w-md", props.class)}>
           <CardHeader>
-            <CardTitle class="text-xl">
-              {localization().invalidRequest}
-            </CardTitle>
+            <CardTitle class="text-xl">{localization.invalidRequest}</CardTitle>
             <CardDescription>
-              {localization().invalidRequestDescription}
+              {localization.invalidRequestDescription}
             </CardDescription>
           </CardHeader>
         </Card>
@@ -150,11 +132,11 @@ export function OAuthConsent(props: OAuthConsentProps) {
 
           <div class="grid gap-1">
             <CardTitle class="text-xl">
-              {interpolateClient(localization().authorize, clientName())}
+              {interpolateClient(localization.authorize, clientName())}
             </CardTitle>
             <CardDescription>
               {interpolateClient(
-                localization().authorizationDescription,
+                localization.authorizationDescription,
                 clientName()
               )}
             </CardDescription>
@@ -165,7 +147,7 @@ export function OAuthConsent(props: OAuthConsentProps) {
           <div class="grid gap-3">
             <p class="text-sm font-medium">
               {interpolateClient(
-                localization().requestedPermissions,
+                localization.requestedPermissions,
                 clientName()
               )}
             </p>
@@ -186,7 +168,7 @@ export function OAuthConsent(props: OAuthConsentProps) {
                 <ul class="grid gap-3">
                   <For each={authorizationRequest().scopes}>
                     {(scope) => {
-                      const metadata = () => scopeMetadata()[scope]
+                      const metadata = () => scopeMetadata[scope]
 
                       return (
                         <li class="flex gap-3">
@@ -221,7 +203,7 @@ export function OAuthConsent(props: OAuthConsentProps) {
             />
             <div class="min-w-0 flex-1">
               <p class="text-muted-foreground text-xs">
-                {localization().signedInAs}
+                {localization.signedInAs}
               </p>
               <Show
                 when={session.data}
@@ -254,7 +236,7 @@ export function OAuthConsent(props: OAuthConsentProps) {
                     rel="noreferrer"
                     target="_blank"
                   >
-                    {localization().privacyPolicy}
+                    {localization.privacyPolicy}
                   </a>
                 )}
               </Show>
@@ -266,7 +248,7 @@ export function OAuthConsent(props: OAuthConsentProps) {
                     rel="noreferrer"
                     target="_blank"
                   >
-                    {localization().termsOfService}
+                    {localization.termsOfService}
                   </a>
                 )}
               </Show>
@@ -285,7 +267,7 @@ export function OAuthConsent(props: OAuthConsentProps) {
             >
               <Spinner />
             </Show>
-            {localization().cancel}
+            {localization.cancel}
           </Button>
           <Button
             disabled={!canRespond()}
@@ -296,7 +278,7 @@ export function OAuthConsent(props: OAuthConsentProps) {
             >
               <Spinner />
             </Show>
-            {localization().allow}
+            {localization.allow}
           </Button>
         </CardFooter>
       </Card>
