@@ -1,3 +1,4 @@
+import { useMemo } from "react"
 import Svg, {
   Circle,
   Line,
@@ -7,6 +8,14 @@ import Svg, {
   Rect,
   type SvgProps
 } from "react-native-svg"
+import { useThemeColors } from "../lib/theme-colors"
+import { tw } from "../lib/tw"
+
+/**
+ * Icon props: `SvgProps` plus this library's `className` subset, resolved to a
+ * plain style by {@link tw} so the icons need no styling engine in the app.
+ */
+export type UiIconProps = SvgProps & { className?: string }
 
 /**
  * UI glyphs used by the auth components (the heroui port uses `@gravity-ui/
@@ -23,13 +32,27 @@ const STROKE: Partial<SvgProps> = {
   strokeLinejoin: "round"
 }
 
-function Base(props: SvgProps) {
+function Base({ className, style, color, ...props }: UiIconProps) {
+  const colors = useThemeColors()
+  const resolved = useMemo(() => tw(className, colors), [className, colors])
+  // The glyphs stroke with `currentColor`, so a `text-*` class has to reach
+  // react-native-svg as the `color` prop rather than as a style rule.
+  const { color: classColor, ...layout } = resolved
+
   return (
-    <Svg width={20} height={20} viewBox="0 0 24 24" {...STROKE} {...props} />
+    <Svg
+      width={20}
+      height={20}
+      viewBox="0 0 24 24"
+      {...STROKE}
+      color={color ?? (classColor as string | undefined)}
+      style={style ? [layout, style] : layout}
+      {...props}
+    />
   )
 }
 
-export function Eye(props: SvgProps) {
+export function Eye(props: UiIconProps) {
   return (
     <Base {...props}>
       <Path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
@@ -38,7 +61,7 @@ export function Eye(props: SvgProps) {
   )
 }
 
-export function EyeSlash(props: SvgProps) {
+export function EyeSlash(props: UiIconProps) {
   return (
     <Base {...props}>
       <Path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" />
@@ -47,7 +70,7 @@ export function EyeSlash(props: SvgProps) {
   )
 }
 
-export function Person(props: SvgProps) {
+export function Person(props: UiIconProps) {
   return (
     <Base {...props}>
       <Path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
@@ -56,7 +79,7 @@ export function Person(props: SvgProps) {
   )
 }
 
-export function PersonPlus(props: SvgProps) {
+export function PersonPlus(props: UiIconProps) {
   return (
     <Base {...props}>
       <Path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
@@ -67,7 +90,7 @@ export function PersonPlus(props: SvgProps) {
   )
 }
 
-export function Envelope(props: SvgProps) {
+export function Envelope(props: UiIconProps) {
   return (
     <Base {...props}>
       <Path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
@@ -76,7 +99,7 @@ export function Envelope(props: SvgProps) {
   )
 }
 
-export function Lock(props: SvgProps) {
+export function Lock(props: UiIconProps) {
   return (
     <Base {...props}>
       <Rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
@@ -85,7 +108,7 @@ export function Lock(props: SvgProps) {
   )
 }
 
-export function ArrowUpRightFromSquare(props: SvgProps) {
+export function ArrowUpRightFromSquare(props: UiIconProps) {
   return (
     <Base {...props}>
       <Path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
@@ -95,7 +118,7 @@ export function ArrowUpRightFromSquare(props: SvgProps) {
   )
 }
 
-export function ArrowRightFromSquare(props: SvgProps) {
+export function ArrowRightFromSquare(props: UiIconProps) {
   return (
     <Base {...props}>
       <Path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
@@ -105,7 +128,7 @@ export function ArrowRightFromSquare(props: SvgProps) {
   )
 }
 
-export function ArrowRightToSquare(props: SvgProps) {
+export function ArrowRightToSquare(props: UiIconProps) {
   return (
     <Base {...props}>
       <Path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" />
@@ -115,7 +138,7 @@ export function ArrowRightToSquare(props: SvgProps) {
   )
 }
 
-export function Gear(props: SvgProps) {
+export function Gear(props: UiIconProps) {
   return (
     <Base {...props}>
       <Circle cx="12" cy="12" r="3" />
@@ -124,7 +147,7 @@ export function Gear(props: SvgProps) {
   )
 }
 
-export function ChevronsExpandVertical(props: SvgProps) {
+export function ChevronsExpandVertical(props: UiIconProps) {
   return (
     <Base {...props}>
       <Polyline points="7 15 12 20 17 15" />
@@ -133,7 +156,7 @@ export function ChevronsExpandVertical(props: SvgProps) {
   )
 }
 
-export function ChevronDown(props: SvgProps) {
+export function ChevronDown(props: UiIconProps) {
   return (
     <Base {...props}>
       <Polyline points="6 9 12 15 18 9" />
@@ -141,7 +164,7 @@ export function ChevronDown(props: SvgProps) {
   )
 }
 
-export function Check(props: SvgProps) {
+export function Check(props: UiIconProps) {
   return (
     <Base {...props}>
       <Polyline points="20 6 9 17 4 12" />
@@ -149,7 +172,7 @@ export function Check(props: SvgProps) {
   )
 }
 
-export function Copy(props: SvgProps) {
+export function Copy(props: UiIconProps) {
   return (
     <Base {...props}>
       <Rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
@@ -158,7 +181,7 @@ export function Copy(props: SvgProps) {
   )
 }
 
-export function Search(props: SvgProps) {
+export function Search(props: UiIconProps) {
   return (
     <Base {...props}>
       <Circle cx="11" cy="11" r="8" />
@@ -167,7 +190,7 @@ export function Search(props: SvgProps) {
   )
 }
 
-export function Minus(props: SvgProps) {
+export function Minus(props: UiIconProps) {
   return (
     <Base {...props}>
       <Line x1="5" y1="12" x2="19" y2="12" />
@@ -175,7 +198,7 @@ export function Minus(props: SvgProps) {
   )
 }
 
-export function Plus(props: SvgProps) {
+export function Plus(props: UiIconProps) {
   return (
     <Base {...props}>
       <Line x1="12" y1="5" x2="12" y2="19" />
@@ -184,7 +207,7 @@ export function Plus(props: SvgProps) {
   )
 }
 
-export function Xmark(props: SvgProps) {
+export function Xmark(props: UiIconProps) {
   return (
     <Base {...props}>
       <Line x1="18" y1="6" x2="6" y2="18" />
@@ -193,7 +216,7 @@ export function Xmark(props: SvgProps) {
   )
 }
 
-export function Sun(props: SvgProps) {
+export function Sun(props: UiIconProps) {
   return (
     <Base {...props}>
       <Circle cx="12" cy="12" r="5" />
@@ -209,7 +232,7 @@ export function Sun(props: SvgProps) {
   )
 }
 
-export function Moon(props: SvgProps) {
+export function Moon(props: UiIconProps) {
   return (
     <Base {...props}>
       <Path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
@@ -217,7 +240,7 @@ export function Moon(props: SvgProps) {
   )
 }
 
-export function Display(props: SvgProps) {
+export function Display(props: UiIconProps) {
   return (
     <Base {...props}>
       <Rect x="2" y="3" width="20" height="14" rx="2" ry="2" />
@@ -227,7 +250,7 @@ export function Display(props: SvgProps) {
   )
 }
 
-export function Smartphone(props: SvgProps) {
+export function Smartphone(props: UiIconProps) {
   return (
     <Base {...props}>
       <Rect x="5" y="2" width="14" height="20" rx="2" ry="2" />
@@ -236,7 +259,7 @@ export function Smartphone(props: SvgProps) {
   )
 }
 
-export function TriangleExclamation(props: SvgProps) {
+export function TriangleExclamation(props: UiIconProps) {
   return (
     <Base {...props}>
       <Path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
@@ -246,7 +269,7 @@ export function TriangleExclamation(props: SvgProps) {
   )
 }
 
-export function Palette(props: SvgProps) {
+export function Palette(props: UiIconProps) {
   return (
     <Base {...props}>
       <Path d="M12 22a10 10 0 1 1 0-20 8 8 0 0 1 8 8 4.5 4.5 0 0 1-4.5 4.5H14a1.5 1.5 0 0 0-1.06 2.56l.06.06A1.5 1.5 0 0 1 12 22z" />
@@ -258,7 +281,7 @@ export function Palette(props: SvgProps) {
   )
 }
 
-export function Briefcase(props: SvgProps) {
+export function Briefcase(props: UiIconProps) {
   return (
     <Base {...props}>
       <Rect x="2" y="7" width="20" height="14" rx="2" ry="2" />
@@ -267,7 +290,7 @@ export function Briefcase(props: SvgProps) {
   )
 }
 
-export function Upload(props: SvgProps) {
+export function Upload(props: UiIconProps) {
   return (
     <Base {...props}>
       <Path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
@@ -277,7 +300,7 @@ export function Upload(props: SvgProps) {
   )
 }
 
-export function Trash(props: SvgProps) {
+export function Trash(props: UiIconProps) {
   return (
     <Base {...props}>
       <Polyline points="3 6 5 6 21 6" />
@@ -288,7 +311,7 @@ export function Trash(props: SvgProps) {
   )
 }
 
-export function Pencil(props: SvgProps) {
+export function Pencil(props: UiIconProps) {
   return (
     <Base {...props}>
       <Path d="M12 20h9" />
@@ -297,7 +320,7 @@ export function Pencil(props: SvgProps) {
   )
 }
 
-export function ChevronRight(props: SvgProps) {
+export function ChevronRight(props: UiIconProps) {
   return (
     <Base {...props}>
       <Polyline points="9 18 15 12 9 6" />
@@ -305,7 +328,7 @@ export function ChevronRight(props: SvgProps) {
   )
 }
 
-export function Key(props: SvgProps) {
+export function Key(props: UiIconProps) {
   return (
     <Base {...props}>
       <Path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4" />
@@ -313,7 +336,7 @@ export function Key(props: SvgProps) {
   )
 }
 
-export function Users(props: SvgProps) {
+export function Users(props: UiIconProps) {
   return (
     <Base {...props}>
       <Path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
@@ -324,7 +347,7 @@ export function Users(props: SvgProps) {
   )
 }
 
-export function Shield(props: SvgProps) {
+export function Shield(props: UiIconProps) {
   return (
     <Base {...props}>
       <Path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
@@ -333,7 +356,7 @@ export function Shield(props: SvgProps) {
 }
 
 /** Named `LinkIcon` (not `Link`) to avoid colliding with the `Link` primitive component. */
-export function LinkIcon(props: SvgProps) {
+export function LinkIcon(props: UiIconProps) {
   return (
     <Base {...props}>
       <Path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
@@ -342,7 +365,7 @@ export function LinkIcon(props: SvgProps) {
   )
 }
 
-export function LinkSlash(props: SvgProps) {
+export function LinkSlash(props: UiIconProps) {
   return (
     <Base {...props}>
       <Path d="M9 17H7A5 5 0 0 1 7 7h1" />
@@ -353,7 +376,7 @@ export function LinkSlash(props: SvgProps) {
   )
 }
 
-export function PlugConnection(props: SvgProps) {
+export function PlugConnection(props: UiIconProps) {
   return (
     <Base {...props}>
       <Path d="M12 22v-5" />
@@ -364,7 +387,7 @@ export function PlugConnection(props: SvgProps) {
   )
 }
 
-export function ArrowRightArrowLeft(props: SvgProps) {
+export function ArrowRightArrowLeft(props: UiIconProps) {
   return (
     <Base {...props}>
       <Polyline points="17 1 21 5 17 9" />
@@ -375,7 +398,7 @@ export function ArrowRightArrowLeft(props: SvgProps) {
   )
 }
 
-export function CirclePlus(props: SvgProps) {
+export function CirclePlus(props: UiIconProps) {
   return (
     <Base {...props}>
       <Circle cx="12" cy="12" r="10" />
@@ -385,7 +408,7 @@ export function CirclePlus(props: SvgProps) {
   )
 }
 
-export function Filter(props: SvgProps) {
+export function Filter(props: UiIconProps) {
   return (
     <Base {...props}>
       <Polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" />
@@ -393,7 +416,7 @@ export function Filter(props: SvgProps) {
   )
 }
 
-export function Send(props: SvgProps) {
+export function Send(props: UiIconProps) {
   return (
     <Base {...props}>
       <Line x1="22" y1="2" x2="11" y2="13" />
@@ -402,7 +425,7 @@ export function Send(props: SvgProps) {
   )
 }
 
-export function Clock(props: SvgProps) {
+export function Clock(props: UiIconProps) {
   return (
     <Base {...props}>
       <Circle cx="12" cy="12" r="10" />
