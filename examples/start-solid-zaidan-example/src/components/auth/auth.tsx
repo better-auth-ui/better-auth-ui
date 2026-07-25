@@ -4,6 +4,7 @@ import type { Component } from "solid-js"
 import { createEffect } from "solid-js"
 import { Dynamic } from "solid-js/web"
 
+import { AuthRedirect } from "./auth-redirect"
 import { ForgotPassword } from "./forgot-password"
 import type { SocialLayout } from "./provider-buttons"
 import { ResetLinkSent } from "./reset-link-sent"
@@ -46,6 +47,10 @@ const passwordOnlyViews: AuthView[] = [
 ]
 
 const authRouteComponents: Partial<Record<string, SupportedAuthRoute>> = {
+  [viewPaths.auth.redirect]: {
+    component: AuthRedirect,
+    title: "Redirecting"
+  },
   [viewPaths.auth.signIn]: { component: SignIn, title: "Sign in" },
   [viewPaths.auth.signUp]: {
     component: SignUp,

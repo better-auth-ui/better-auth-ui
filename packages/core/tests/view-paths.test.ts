@@ -3,6 +3,7 @@ import { type AuthView, type ViewPaths, viewPaths } from "../src/lib/view-paths"
 
 describe("viewPaths.auth", () => {
   it("should contain all built-in view paths", () => {
+    expect(viewPaths.auth).toHaveProperty("redirect")
     expect(viewPaths.auth).toHaveProperty("signIn")
     expect(viewPaths.auth).toHaveProperty("signUp")
     expect(viewPaths.auth).toHaveProperty("forgotPassword")
@@ -13,6 +14,7 @@ describe("viewPaths.auth", () => {
   })
 
   it("should have correct path values", () => {
+    expect(viewPaths.auth.redirect).toBe("redirect")
     expect(viewPaths.auth.signIn).toBe("sign-in")
     expect(viewPaths.auth.signUp).toBe("sign-up")
     expect(viewPaths.auth.forgotPassword).toBe("forgot-password")
@@ -43,6 +45,7 @@ describe("authViews (derived)", () => {
 
   it("should contain all built-in view keys", () => {
     const authViews = Object.keys(viewPaths.auth)
+    expect(authViews).toContain("redirect")
     expect(authViews).toContain("signIn")
     expect(authViews).toContain("signUp")
     expect(authViews).toContain("forgotPassword")
@@ -65,11 +68,12 @@ describe("authPaths (derived)", () => {
   it("should be able to derive array of auth path values", () => {
     const authPaths = Object.values(viewPaths.auth)
     expect(Array.isArray(authPaths)).toBe(true)
-    expect(authPaths.length).toBe(7)
+    expect(authPaths.length).toBe(8)
   })
 
   it("should contain all built-in path values", () => {
     const authPaths = Object.values(viewPaths.auth)
+    expect(authPaths).toContain("redirect")
     expect(authPaths).toContain("sign-in")
     expect(authPaths).toContain("sign-up")
     expect(authPaths).toContain("forgot-password")
@@ -92,6 +96,7 @@ describe("viewPaths", () => {
   })
 
   it("should maintain all built-in auth view paths", () => {
+    expect(viewPaths.auth.redirect).toBe("redirect")
     expect(viewPaths.auth.signIn).toBe("sign-in")
     expect(viewPaths.auth.signUp).toBe("sign-up")
     expect(viewPaths.auth.forgotPassword).toBe("forgot-password")
@@ -105,6 +110,7 @@ describe("viewPaths", () => {
 describe("type safety", () => {
   it("should allow valid AuthView types", () => {
     const validViews: AuthView[] = [
+      "redirect",
       "signIn",
       "signUp",
       "forgotPassword",

@@ -1,0 +1,82 @@
+import { describe, expect, it } from "vitest"
+import {
+  getAuthRedirectAction,
+  getSafeRedirectTo
+} from "../src/lib/auth-redirect"
+
+const origin = "https://app.example.com"
+
+describe("getSafeRedirectTo", () => {
+  it("preserves root-relative paths, queries, and hashes", () => {
+    expect(
+      getSafeRedirectTo(
+        "/api/auth/delete-user/callback?token=abc#complete",
+        origin
+      )
+    ).toBe("/api/auth/delete-user/callback?token=abc#complete")
+  })
+
+  it("normalizes same-origin absolute URLs to paths", () => {
+    expect(
+      getSafeRedirectTo(
+        "https://app.example.com/settings/account?tab=security#sessions",
+        origin
+      )
+    ).toBe("/settings/account?tab=security#sessions")
+  })
+
+  it.each([
+    ["https://attacker.example/delete", "cross-origin URLs"],
+    ["//attacker.example/delete", "protocol-relative URLs"],
+    ["javascript:alert(1)", "non-HTTP schemes"],
+    ["settings/account", "relative paths"],
+    ["/\\attacker.example/delete", "backslashes"],
+    ["https://user:password@app.example.com/delete", "credentials"],
+    ["/settings\n/account", "control characters"]
+  ])("rejects %s (%s)", (target) => {
+    expect(getSafeRedirectTo(target, origin)).toBe("/")
+  })
+})
+
+describe("getAuthRedirectAction", () => {
+  it("continues authenticated users to the validated target", () => {
+    const action = getAuthRedirectAction(
+      new URL(
+        `${origin}/auth/redirect?redirectTo=%2Fapi%2Fauth%2Fdelete-user%2Fcallback%3Ftoken%3Dabc`
+      ),
+      true,
+      "/auth/sign-in"
+    )
+
+    expect(action).toEqual({
+      type: "redirect",
+      to: "/api/auth/delete-user/callback?token=abc"
+    })
+  })
+
+  it("returns signed-out users to the redirect view after sign in", () => {
+    const currentURL = new URL(
+      `${origin}/auth/redirect?redirectTo=%2Fsettings%2Faccount#security`
+    )
+    const action = getAuthRedirectAction(currentURL, false, "/auth/sign-in")
+
+    expect(action.type).toBe("signIn")
+    const signInURL = new URL(action.to, origin)
+    expect(signInURL.pathname).toBe("/auth/sign-in")
+    expect(signInURL.searchParams.get("redirectTo")).toBe(
+      "/auth/redirect?redirectTo=%2Fsettings%2Faccount#security"
+    )
+  })
+
+  it("prevents redirect-view loops", () => {
+    const action = getAuthRedirectAction(
+      new URL(
+        `${origin}/auth/redirect?redirectTo=%2Fauth%2Fredirect%3FredirectTo%3D%252Fsettings`
+      ),
+      true,
+      "/auth/sign-in"
+    )
+
+    expect(action).toEqual({ type: "redirect", to: "/" })
+  })
+})

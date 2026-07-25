@@ -3,6 +3,7 @@
 export * from "./components/auth/additional-field"
 export * from "./components/auth/auth"
 export * from "./components/auth/auth-provider"
+export * from "./components/auth/auth-redirect"
 export * from "./components/auth/forgot-password"
 export * from "./components/auth/open-email-button"
 export * from "./components/auth/provider-button"

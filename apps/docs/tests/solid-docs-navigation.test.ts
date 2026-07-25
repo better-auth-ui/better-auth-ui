@@ -80,6 +80,7 @@ describe("Solid docs navigation", () => {
       "sign-in",
       "sign-up",
       "sign-out",
+      "auth-redirect",
       "forgot-password",
       "reset-password",
       "verify-email",

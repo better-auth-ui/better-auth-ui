@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest"
 // Components surfaced by the main `@better-auth-ui/heroui` entry.
 const indexComponents = [
   "Auth",
+  "AuthRedirect",
   "ForgotPassword",
   "ProviderButtons",
   "ResetPassword",

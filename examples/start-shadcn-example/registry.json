@@ -896,6 +896,25 @@
       ]
     },
     {
+      "name": "auth-redirect",
+      "type": "registry:component",
+      "title": "Auth Redirect",
+      "description": "A session-aware redirect view that safely continues authenticated users to a same-origin target or sends them through sign in first.",
+      "dependencies": [
+        "@better-auth-ui/react@latest",
+        "@better-auth-ui/core@latest",
+        "better-auth"
+      ],
+      "registryDependencies": ["spinner"],
+      "files": [
+        {
+          "path": "src/components/auth/auth-redirect.tsx",
+          "type": "registry:component",
+          "target": "@components/auth/auth-redirect.tsx"
+        }
+      ]
+    },
+    {
       "name": "sign-out",
       "type": "registry:component",
       "title": "Sign Out",
@@ -930,6 +949,7 @@
         "https://better-auth-ui.com/r/forgot-password.json",
         "https://better-auth-ui.com/r/reset-password.json",
         "https://better-auth-ui.com/r/verify-email.json",
+        "https://better-auth-ui.com/r/auth-redirect.json",
         "https://better-auth-ui.com/r/sign-out.json"
       ],
       "files": [

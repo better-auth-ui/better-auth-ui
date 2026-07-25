@@ -3,6 +3,7 @@ import { resolve } from "node:path"
 import { viewPaths } from "@better-auth-ui/core"
 import { describe, expect, it } from "vitest"
 import { resolveAuthRoute } from "../src/components/auth/auth"
+import { AuthRedirect } from "../src/components/auth/auth-redirect"
 import { ForgotPassword } from "../src/components/auth/forgot-password"
 import { ResetPassword } from "../src/components/auth/reset-password"
 import { AccountSettings } from "../src/components/auth/settings/account/account-settings"
@@ -42,6 +43,10 @@ const isSimpleReExportOnly = (source: string) => {
 
 describe("Solid auth route component selection", () => {
   it("maps supported auth paths to their existing Solid components", () => {
+    expect(resolveAuthRoute(viewPaths.auth.redirect)).toEqual({
+      component: AuthRedirect,
+      title: "Redirecting"
+    })
     expect(resolveAuthRoute(viewPaths.auth.signIn)).toEqual({
       component: SignIn,
       title: "Sign in"

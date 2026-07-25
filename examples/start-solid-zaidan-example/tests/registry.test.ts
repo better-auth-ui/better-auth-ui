@@ -107,6 +107,7 @@ const expectedSolidRegistryPayloadNames = [
   "forgot-password",
   "reset-password",
   "verify-email",
+  "auth-redirect",
   "sign-out",
   "auth",
   "user-button",
@@ -1808,6 +1809,7 @@ describe("Solid registry isolation", () => {
       solidRegistryUrl("forgot-password"),
       solidRegistryUrl("reset-password"),
       solidRegistryUrl("verify-email"),
+      solidRegistryUrl("auth-redirect"),
       solidRegistryUrl("sign-out")
     ])
     expect(auth.files).toEqual([
@@ -2543,6 +2545,7 @@ describe("Solid registry isolation", () => {
       "sign-in",
       "sign-up",
       "sign-out",
+      "auth-redirect",
       "forgot-password",
       "reset-password",
       "verify-email",
@@ -2863,6 +2866,7 @@ describe("Solid registry isolation", () => {
       "account-settings": "<AccountSettings />",
       "active-sessions": "<ActiveSessions />",
       auth: "<Auth />",
+      "auth-redirect": "<AuthRedirect />",
       "auth-provider": "<AuthProvider />",
       "change-email": "<ChangeEmail />",
       "change-password": "<ChangePassword />",
@@ -3770,11 +3774,12 @@ describe("Solid registry isolation", () => {
       readFileSync(resolve(zaidanDocsRoot, "components/meta.json"), "utf8")
     ) as { pages: string[] }
     const authStart = meta.pages.indexOf("---Auth---")
-    expect(meta.pages.slice(authStart + 1, authStart + 7)).toEqual([
+    expect(meta.pages.slice(authStart + 1, authStart + 8)).toEqual([
       "auth",
       "sign-in",
       "sign-up",
       "sign-out",
+      "auth-redirect",
       "forgot-password",
       "reset-password"
     ])

@@ -310,6 +310,15 @@ export const solidRegistryManifest = {
       ]
     }),
     item({
+      name: "auth-redirect",
+      type: "registry:component",
+      title: "Solid Auth Redirect",
+      description:
+        "Solid session-aware redirect view that safely continues authenticated users to a same-origin target or sends them through sign in first.",
+      dependencies: solidDependencies,
+      files: [componentFile("src/components/auth/auth-redirect.tsx")]
+    }),
+    item({
       name: "sign-out",
       type: "registry:component",
       title: "Solid Sign Out",
@@ -331,6 +340,7 @@ export const solidRegistryManifest = {
         betterAuthSolidRegistryDependency("forgot-password"),
         betterAuthSolidRegistryDependency("reset-password"),
         betterAuthSolidRegistryDependency("verify-email"),
+        betterAuthSolidRegistryDependency("auth-redirect"),
         betterAuthSolidRegistryDependency("sign-out")
       ],
       files: [componentFile("src/components/auth/auth.tsx")]
