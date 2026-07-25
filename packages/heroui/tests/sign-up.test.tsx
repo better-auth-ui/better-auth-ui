@@ -1,5 +1,6 @@
 import { QueryClient } from "@tanstack/react-query"
-import { render, screen } from "@testing-library/react"
+import { render, screen, waitFor } from "@testing-library/react"
+import userEvent from "@testing-library/user-event"
 import { describe, expect, it, vi } from "vitest"
 
 import { AuthProvider } from "../src/components/auth/auth-provider"
@@ -29,6 +30,12 @@ function renderSignUp(optional: string) {
           type: "string",
           label: "Invite code",
           required: true,
+          signUp: true
+        },
+        {
+          name: "birthDate",
+          type: "date",
+          label: "Birth date",
           signUp: true
         }
       ]}
@@ -67,5 +74,28 @@ describe("<SignUp />", () => {
     expect(
       screen.queryByLabelText("Nickname (optional)")
     ).not.toBeInTheDocument()
+  })
+
+  it("uses the localized optional date label for the calendar", async () => {
+    const user = userEvent.setup()
+    renderSignUp(" [not required]")
+
+    await user.click(
+      screen.getByRole("button", {
+        name: "Calendar Birth date [not required]"
+      })
+    )
+
+    const calendar = await waitFor(() => {
+      const element = document.querySelector('[data-slot="calendar"]')
+
+      expect(element).toBeInTheDocument()
+      return element
+    })
+
+    expect(calendar).toHaveAttribute(
+      "aria-label",
+      expect.stringMatching(/^Birth date \[not required\],/)
+    )
   })
 })
