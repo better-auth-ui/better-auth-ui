@@ -39,6 +39,22 @@ describe("deviceAuthorizationPlugin", () => {
     })
   })
 
+  it("normalizes code length boundaries", () => {
+    expect(
+      deviceAuthorizationPlugin({ userCodeLength: Number.NaN }).userCodeLength
+    ).toBe(8)
+    expect(
+      deviceAuthorizationPlugin({ userCodeLength: Number.POSITIVE_INFINITY })
+        .userCodeLength
+    ).toBe(8)
+    expect(
+      deviceAuthorizationPlugin({ userCodeLength: 0 }).userCodeLength
+    ).toBe(1)
+    expect(
+      deviceAuthorizationPlugin({ userCodeLength: -4 }).userCodeLength
+    ).toBe(1)
+  })
+
   it("keeps mutation keys under the shared auth namespace", () => {
     expect(deviceAuthorizationMutationKeys).toEqual({
       all: ["auth", "deviceAuthorization"],

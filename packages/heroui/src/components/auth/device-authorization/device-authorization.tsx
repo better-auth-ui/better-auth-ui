@@ -118,6 +118,14 @@ export function DeviceAuthorization({
     deviceAuthorizationReducer,
     initialDeviceAuthorizationState
   )
+  const normalizedUserCode = normalizeDeviceCode(userCode)
+
+  const handleAuthorizationError = () => {
+    dispatch({
+      type: "verificationFailed",
+      message: localization.invalidDeviceCode
+    })
+  }
 
   useEffect(() => {
     const code = new URLSearchParams(window.location.search).get("user_code")
@@ -132,12 +140,7 @@ export function DeviceAuthorization({
 
   const { mutate: verifyDeviceCode, isPending: isVerifying } =
     useVerifyDeviceCode(deviceAuthClient, {
-      onError: () => {
-        dispatch({
-          type: "verificationFailed",
-          message: localization.invalidDeviceCode
-        })
-      },
+      onError: handleAuthorizationError,
       onSuccess: ({ status }) => {
         dispatch({ type: "verificationSucceeded", status })
       }
@@ -146,6 +149,7 @@ export function DeviceAuthorization({
   const { mutate: approveDevice, isPending: isApproving } = useApproveDevice(
     deviceAuthClient,
     {
+      onError: handleAuthorizationError,
       onSuccess: () => dispatch({ type: "approved" })
     }
   )
@@ -153,6 +157,7 @@ export function DeviceAuthorization({
   const { mutate: denyDevice, isPending: isDenying } = useDenyDevice(
     deviceAuthClient,
     {
+      onError: handleAuthorizationError,
       onSuccess: () => dispatch({ type: "denied" })
     }
   )
@@ -165,8 +170,7 @@ export function DeviceAuthorization({
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
 
-    const normalizedCode = normalizeDeviceCode(userCode)
-    if (normalizedCode.length !== userCodeLength) {
+    if (normalizedUserCode.length !== userCodeLength) {
       dispatch({
         type: "verificationFailed",
         message: localization.invalidDeviceCode
@@ -175,14 +179,14 @@ export function DeviceAuthorization({
     }
 
     if (!session) {
-      const verificationPath = `${basePaths.auth}/${deviceAuthorizationViewPaths.auth.deviceAuthorization}?user_code=${encodeURIComponent(normalizedCode)}`
+      const verificationPath = `${basePaths.auth}/${deviceAuthorizationViewPaths.auth.deviceAuthorization}?user_code=${encodeURIComponent(normalizedUserCode)}`
       const signInPath = `${basePaths.auth}/${viewPaths.auth.signIn}?redirectTo=${encodeURIComponent(verificationPath)}`
       navigate({ to: signInPath })
       return
     }
 
     verifyDeviceCode({
-      query: { user_code: normalizedCode }
+      query: { user_code: normalizedUserCode }
     })
   }
 
@@ -193,13 +197,13 @@ export function DeviceAuthorization({
       <DeviceApproval
         className={cardClassName}
         localization={localization}
-        userCode={userCode}
+        userCode={normalizedUserCode}
         user={session.user}
         variant={variant}
         isApproving={isApproving}
         isDenying={isDenying}
-        onApprove={() => approveDevice({ userCode })}
-        onDeny={() => denyDevice({ userCode })}
+        onApprove={() => approveDevice({ userCode: normalizedUserCode })}
+        onDeny={() => denyDevice({ userCode: normalizedUserCode })}
       />
     )
   }
