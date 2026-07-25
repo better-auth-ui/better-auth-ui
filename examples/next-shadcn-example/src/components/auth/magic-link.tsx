@@ -9,7 +9,6 @@ import {
 } from "@better-auth-ui/react"
 import { useIsMutating } from "@tanstack/react-query"
 import { type SyntheticEvent, useState } from "react"
-import { toast } from "sonner"
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -25,6 +24,7 @@ import { Input } from "@/components/ui/input"
 import { Spinner } from "@/components/ui/spinner"
 import { magicLinkPlugin } from "@/lib/auth/magic-link-plugin"
 import { cn } from "@/lib/utils"
+import { OpenEmailButton } from "./open-email-button"
 import { ProviderButtons, type SocialLayout } from "./provider-buttons"
 
 export type MagicLinkProps = {
@@ -61,12 +61,12 @@ export function MagicLink({
   const { localization: magicLinkLocalization } = useAuthPlugin(magicLinkPlugin)
 
   const [email, setEmail] = useState("")
+  const [sentEmail, setSentEmail] = useState("")
 
   const { mutate: signInMagicLink, isPending: signInMagicLinkPending } =
     useSignInMagicLink(authClient as MagicLinkAuthClient, {
-      onSuccess: () => {
-        setEmail("")
-        toast.success(magicLinkLocalization.magicLinkSent)
+      onSuccess: (_data, variables) => {
+        setSentEmail(variables.email)
       }
     })
 
@@ -92,96 +92,113 @@ export function MagicLink({
   return (
     <Card className={cn("w-full max-w-sm", className)}>
       <CardHeader>
-        <CardTitle className="text-xl">{localization.auth.signIn}</CardTitle>
+        <CardTitle className="text-xl">
+          {sentEmail
+            ? localization.auth.checkYourEmailTitle
+            : localization.auth.signIn}
+        </CardTitle>
       </CardHeader>
 
       <CardContent>
-        <div className="flex flex-col gap-6">
-          {socialPosition === "top" && (
-            <>
-              {socialProviders && socialProviders.length > 0 && (
-                <ProviderButtons socialLayout={socialLayout} />
+        {sentEmail ? (
+          <div className="flex flex-col gap-4">
+            <FieldDescription>
+              {magicLinkLocalization.magicLinkSentTo.replace(
+                "{{email}}",
+                sentEmail
               )}
+            </FieldDescription>
 
-              {showSeparator && (
-                <FieldSeparator className="*:data-[slot=field-separator-content]:bg-card m-0 text-xs flex items-center">
-                  {localization.auth.or}
-                </FieldSeparator>
-              )}
-            </>
-          )}
-
-          <form onSubmit={handleSubmit}>
-            <FieldGroup>
-              <Field data-invalid={!!fieldErrors.email}>
-                <FieldLabel htmlFor="email">
-                  {localization.auth.email}
-                </FieldLabel>
-
-                <Input
-                  id="email"
-                  name="email"
-                  type="email"
-                  autoComplete="email"
-                  value={email}
-                  onChange={(e) => {
-                    setEmail(e.target.value)
-
-                    setFieldErrors((prev) => ({
-                      ...prev,
-                      email: undefined
-                    }))
-                  }}
-                  placeholder={localization.auth.emailPlaceholder}
-                  required
-                  disabled={isPending}
-                  onInvalid={(e) => {
-                    e.preventDefault()
-
-                    setFieldErrors((prev) => ({
-                      ...prev,
-                      email: (e.target as HTMLInputElement).validationMessage
-                    }))
-                  }}
-                  aria-invalid={!!fieldErrors.email}
-                />
-
-                <FieldError>{fieldErrors.email}</FieldError>
-              </Field>
-
-              <div className="flex flex-col gap-3">
-                <Button type="submit" disabled={isPending}>
-                  {signInMagicLinkPending && <Spinner />}
-
-                  {magicLinkLocalization.sendMagicLink}
-                </Button>
-
-                {plugins.flatMap((plugin) =>
-                  (plugin.authButtons ?? []).map((AuthButton, index) => (
-                    <AuthButton
-                      key={`${plugin.id}-${index.toString()}`}
-                      view="magicLink"
-                    />
-                  ))
+            <OpenEmailButton email={sentEmail} />
+          </div>
+        ) : (
+          <div className="flex flex-col gap-6">
+            {socialPosition === "top" && (
+              <>
+                {socialProviders && socialProviders.length > 0 && (
+                  <ProviderButtons socialLayout={socialLayout} />
                 )}
-              </div>
-            </FieldGroup>
-          </form>
 
-          {socialPosition === "bottom" && (
-            <>
-              {showSeparator && (
-                <FieldSeparator className="*:data-[slot=field-separator-content]:bg-card text-xs flex items-center">
-                  {localization.auth.or}
-                </FieldSeparator>
-              )}
+                {showSeparator && (
+                  <FieldSeparator className="*:data-[slot=field-separator-content]:bg-card m-0 text-xs flex items-center">
+                    {localization.auth.or}
+                  </FieldSeparator>
+                )}
+              </>
+            )}
 
-              {socialProviders && socialProviders.length > 0 && (
-                <ProviderButtons socialLayout={socialLayout} />
-              )}
-            </>
-          )}
-        </div>
+            <form onSubmit={handleSubmit}>
+              <FieldGroup>
+                <Field data-invalid={!!fieldErrors.email}>
+                  <FieldLabel htmlFor="email">
+                    {localization.auth.email}
+                  </FieldLabel>
+
+                  <Input
+                    id="email"
+                    name="email"
+                    type="email"
+                    autoComplete="email"
+                    value={email}
+                    onChange={(e) => {
+                      setEmail(e.target.value)
+
+                      setFieldErrors((prev) => ({
+                        ...prev,
+                        email: undefined
+                      }))
+                    }}
+                    placeholder={localization.auth.emailPlaceholder}
+                    required
+                    disabled={isPending}
+                    onInvalid={(e) => {
+                      e.preventDefault()
+
+                      setFieldErrors((prev) => ({
+                        ...prev,
+                        email: (e.target as HTMLInputElement).validationMessage
+                      }))
+                    }}
+                    aria-invalid={!!fieldErrors.email}
+                  />
+
+                  <FieldError>{fieldErrors.email}</FieldError>
+                </Field>
+
+                <div className="flex flex-col gap-3">
+                  <Button type="submit" disabled={isPending}>
+                    {signInMagicLinkPending && <Spinner />}
+
+                    {magicLinkLocalization.sendMagicLink}
+                  </Button>
+
+                  {plugins.flatMap((plugin) =>
+                    (plugin.authButtons ?? []).map((AuthButton, index) => (
+                      <AuthButton
+                        key={`${plugin.id}-${index.toString()}`}
+                        view="magicLink"
+                      />
+                    ))
+                  )}
+                </div>
+              </FieldGroup>
+            </form>
+
+            {socialPosition === "bottom" && (
+              <>
+                {showSeparator && (
+                  <FieldSeparator className="*:data-[slot=field-separator-content]:bg-card text-xs flex items-center">
+                    {localization.auth.or}
+                  </FieldSeparator>
+                )}
+
+                {socialProviders && socialProviders.length > 0 && (
+                  <ProviderButtons socialLayout={socialLayout} />
+                )}
+              </>
+            )}
+          </div>
+        )}
 
         {emailAndPassword?.enabled && (
           <div className="flex flex-col gap-3 items-center w-full mt-4">

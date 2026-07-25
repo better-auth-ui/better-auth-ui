@@ -192,6 +192,7 @@ export const solidRegistryManifest = {
         libFile("src/lib/auth/magic-link-plugin.ts"),
         componentFile("src/components/auth/magic-link.tsx"),
         componentFile("src/components/auth/magic-link-button.tsx"),
+        componentFile("src/components/auth/open-email-button.tsx"),
         componentFile("src/components/auth/provider-buttons.tsx"),
         componentFile("src/components/auth/provider-button.tsx"),
         componentFile("src/components/auth/sign-in-path.ts"),
@@ -258,6 +259,7 @@ export const solidRegistryManifest = {
         "Solid forgot-password component using the Solid password reset mutation options.",
       files: [
         componentFile("src/components/auth/forgot-password.tsx"),
+        componentFile("src/components/auth/open-email-button.tsx"),
         ...zaidanFormSupportFiles
       ]
     }),
@@ -462,6 +464,7 @@ export const solidRegistryManifest = {
         componentFile(
           "src/components/auth/settings/security/change-password.tsx"
         ),
+        componentFile("src/components/auth/open-email-button.tsx"),
         componentFile("src/components/auth/settings/shared/helpers.ts"),
         componentFile("src/components/auth/settings/shared/types.ts"),
         ...zaidanFormSupportFiles

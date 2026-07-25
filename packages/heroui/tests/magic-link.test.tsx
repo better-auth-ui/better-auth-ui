@@ -62,18 +62,37 @@ describe("<MagicLink />", () => {
     )
   })
 
-  it("clears the email input on a successful send", async () => {
+  it("replaces the form with the email-sent view on success", async () => {
     const user = userEvent.setup()
     renderMagicLink()
 
-    const emailInput = screen.getByLabelText(/email/i) as HTMLInputElement
-    await user.type(emailInput, "user@example.com")
-    expect(emailInput.value).toBe("user@example.com")
+    await user.type(screen.getByLabelText(/email/i), "user@gmail.com")
+    await user.click(screen.getByRole("button", { name: /send magic link/i }))
 
+    expect(
+      await screen.findByRole("link", { name: /open gmail/i })
+    ).toHaveAttribute("href", "https://mail.google.com/mail/")
+    expect(screen.queryByLabelText(/email/i)).not.toBeInTheDocument()
+  })
+
+  it("keeps the form and entered email when sending fails", async () => {
+    const user = userEvent.setup()
+    const { authClient } = renderMagicLink(
+      createMockAuthClient(async () => {
+        throw new Error("network down")
+      })
+    )
+
+    await user.type(screen.getByLabelText(/email/i), "user@example.com")
     await user.click(screen.getByRole("button", { name: /send magic link/i }))
 
     await waitFor(() => {
-      expect(emailInput.value).toBe("")
+      expect(authClient.signIn.magicLink).toHaveBeenCalledTimes(1)
     })
+
+    expect(screen.getByLabelText(/email/i)).toHaveValue("user@example.com")
+    expect(
+      screen.getByRole("button", { name: /send magic link/i })
+    ).toBeInTheDocument()
   })
 })

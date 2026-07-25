@@ -6,7 +6,6 @@ import {
   useRequestPasswordReset
 } from "@better-auth-ui/react"
 import { type SyntheticEvent, useState } from "react"
-import { toast } from "sonner"
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -20,6 +19,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { Spinner } from "@/components/ui/spinner"
 import { cn } from "@/lib/utils"
+import { OpenEmailButton } from "./open-email-button"
 
 export type ForgotPasswordProps = {
   className?: string
@@ -29,7 +29,8 @@ export type ForgotPasswordProps = {
  * Render a card-based "Forgot Password" form that sends a password-reset email.
  *
  * The form displays an email input, submit button, and a link back to sign-in.
- * Toasts are displayed on success or error via the `useForgotPassword` hook.
+ * After a successful request the form is replaced with an email-sent view that
+ * keeps the submitted address and offers to open the user's email provider.
  *
  * @param className - Optional additional CSS class names applied to the card
  * @returns The forgot-password form UI as a JSX element
@@ -46,6 +47,7 @@ export function ForgotPassword({ className }: ForgotPasswordProps) {
   } = useAuth()
 
   const { fetchOptions, resetFetchOptions } = useFetchOptions()
+  const [sentEmail, setSentEmail] = useState("")
 
   const { mutate: requestPasswordReset, isPending } = useRequestPasswordReset(
     authClient,
@@ -53,7 +55,9 @@ export function ForgotPassword({ className }: ForgotPasswordProps) {
       onError: () => {
         resetFetchOptions()
       },
-      onSuccess: () => toast.success(localization.auth.passwordResetEmailSent)
+      onSuccess: (_data, { email }) => {
+        setSentEmail(email)
+      }
     }
   )
 
@@ -79,59 +83,76 @@ export function ForgotPassword({ className }: ForgotPasswordProps) {
     <Card className={cn("w-full max-w-sm", className)}>
       <CardHeader>
         <CardTitle className="text-xl font-semibold">
-          {localization.auth.forgotPassword}
+          {sentEmail
+            ? localization.auth.checkYourEmailTitle
+            : localization.auth.forgotPassword}
         </CardTitle>
       </CardHeader>
 
       <CardContent>
-        <form onSubmit={handleSubmit}>
-          <FieldGroup>
-            <Field data-invalid={!!fieldErrors.email}>
-              <FieldLabel htmlFor="email">{localization.auth.email}</FieldLabel>
+        {sentEmail ? (
+          <div className="flex flex-col gap-4">
+            <FieldDescription>
+              {localization.auth.resetLinkSentTo.replace(
+                "{{email}}",
+                sentEmail
+              )}
+            </FieldDescription>
 
-              <Input
-                id="email"
-                name="email"
-                type="email"
-                autoComplete="email"
-                placeholder={localization.auth.emailPlaceholder}
-                required
-                disabled={isPending}
-                onChange={() => {
-                  setFieldErrors((prev) => ({
-                    ...prev,
-                    email: undefined
-                  }))
-                }}
-                onInvalid={(e) => {
-                  e.preventDefault()
-                  const el = e.target as HTMLInputElement
-                  const msg = el.validity.valueMissing
-                    ? localization.auth.fieldRequired
-                    : localization.auth.invalidEmail
+            <OpenEmailButton email={sentEmail} />
+          </div>
+        ) : (
+          <form onSubmit={handleSubmit}>
+            <FieldGroup>
+              <Field data-invalid={!!fieldErrors.email}>
+                <FieldLabel htmlFor="email">
+                  {localization.auth.email}
+                </FieldLabel>
 
-                  setFieldErrors((prev) => ({
-                    ...prev,
-                    email: msg
-                  }))
-                }}
-                aria-invalid={!!fieldErrors.email}
-              />
+                <Input
+                  id="email"
+                  name="email"
+                  type="email"
+                  autoComplete="email"
+                  placeholder={localization.auth.emailPlaceholder}
+                  required
+                  disabled={isPending}
+                  onChange={() => {
+                    setFieldErrors((prev) => ({
+                      ...prev,
+                      email: undefined
+                    }))
+                  }}
+                  onInvalid={(e) => {
+                    e.preventDefault()
+                    const el = e.target as HTMLInputElement
+                    const msg = el.validity.valueMissing
+                      ? localization.auth.fieldRequired
+                      : localization.auth.invalidEmail
 
-              <FieldError>{fieldErrors.email}</FieldError>
-            </Field>
+                    setFieldErrors((prev) => ({
+                      ...prev,
+                      email: msg
+                    }))
+                  }}
+                  aria-invalid={!!fieldErrors.email}
+                />
 
-            {Captcha && <div className="flex justify-center">{Captcha}</div>}
+                <FieldError>{fieldErrors.email}</FieldError>
+              </Field>
 
-            <div className="flex flex-col gap-3">
-              <Button type="submit" disabled={isPending}>
-                {isPending && <Spinner />}
+              {Captcha && <div className="flex justify-center">{Captcha}</div>}
 
-                {localization.auth.sendResetLink}
-              </Button>
-            </div>
-          </FieldGroup>
-        </form>
+              <div className="flex flex-col gap-3">
+                <Button type="submit" disabled={isPending}>
+                  {isPending && <Spinner />}
+
+                  {localization.auth.sendResetLink}
+                </Button>
+              </div>
+            </FieldGroup>
+          </form>
+        )}
 
         <div className="flex flex-col gap-3 items-center w-full mt-4">
           <FieldDescription className="text-center">

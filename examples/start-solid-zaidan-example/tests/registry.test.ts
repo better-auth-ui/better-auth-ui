@@ -2132,9 +2132,8 @@ describe("Solid registry isolation", () => {
     expect(forgotPassword.files[0]?.content).toContain(
       "requestPasswordResetOptions"
     )
-    expect(forgotPassword.files[0]?.content).toContain(
-      "Check your email for the reset link."
-    )
+    expect(forgotPassword.files[0]?.content).toContain("resetLinkSentTo")
+    expect(forgotPassword.files[0]?.content).toContain("OpenEmailButton")
     expect(forgotPassword.files[0]?.content).toContain(
       "Unable to send a reset link. Try again."
     )

@@ -25,6 +25,8 @@ import {
 } from "@heroui/react"
 import { type SyntheticEvent, useState } from "react"
 
+import { OpenEmailButton } from "../../open-email-button"
+
 export type ChangePasswordProps = {
   className?: string
   variant?: CardProps["variant"]
@@ -77,6 +79,7 @@ function SetPassword({
   const { authClient, localization, plugins } = useAuth()
   const { data: session } = useSession(authClient)
   const { fetchOptions, resetFetchOptions } = useFetchOptions()
+  const [sentEmail, setSentEmail] = useState("")
 
   const { mutate: requestPasswordReset, isPending } = useRequestPasswordReset(
     authClient,
@@ -84,7 +87,9 @@ function SetPassword({
       onError: () => {
         resetFetchOptions()
       },
-      onSuccess: () => toast.success(localization.auth.passwordResetEmailSent)
+      onSuccess: (_data, { email }) => {
+        setSentEmail(email)
+      }
     }
   )
 
@@ -115,19 +120,32 @@ function SetPassword({
             </p>
           </div>
 
-          <div className="flex flex-col gap-3 items-start sm:items-end">
-            {Captcha && <div>{Captcha}</div>}
+          {sentEmail ? (
+            <div className="flex flex-col gap-3 items-start sm:items-end">
+              <p className="text-sm" role="status">
+                {localization.auth.resetLinkSentTo.replace(
+                  "{{email}}",
+                  sentEmail
+                )}
+              </p>
 
-            <Button
-              size="sm"
-              isPending={isPending}
-              isDisabled={!session?.user.email}
-              onPress={handleSetPassword}
-            >
-              {isPending && <Spinner color="current" size="sm" />}
-              {localization.auth.sendResetLink}
-            </Button>
-          </div>
+              <OpenEmailButton email={sentEmail} className="w-auto" />
+            </div>
+          ) : (
+            <div className="flex flex-col gap-3 items-start sm:items-end">
+              {Captcha && <div>{Captcha}</div>}
+
+              <Button
+                size="sm"
+                isPending={isPending}
+                isDisabled={!session?.user.email}
+                onPress={handleSetPassword}
+              >
+                {isPending && <Spinner color="current" size="sm" />}
+                {localization.auth.sendResetLink}
+              </Button>
+            </div>
+          )}
         </Card.Content>
       </Card>
     </div>

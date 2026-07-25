@@ -18,6 +18,9 @@ export const localization = {
     /** @remarks `"Check your email for a verification link"` */
     checkYourEmail: "Check your email for a verification link",
 
+    /** @remarks `"Check your email"` */
+    checkYourEmailTitle: "Check your email",
+
     /** @remarks `"Continue with {{provider}}"` */
     continueWith: "Continue with {{provider}}",
 
@@ -98,6 +101,9 @@ export const localization = {
 
     /** @remarks `"Resend in {{seconds}}s"` */
     resendIn: "Resend in {{seconds}}s",
+
+    /** @remarks `"We sent a password reset link to {{email}}"` */
+    resetLinkSentTo: "We sent a password reset link to {{email}}",
 
     /** @remarks `"Reset Password"` */
     resetPassword: "Reset Password",
