@@ -27,7 +27,8 @@ export function LastUsedBadge({
   return (
     <Chip
       className={cn(
-        floating && "pointer-events-none absolute -top-2 right-2 z-10 shadow-sm"
+        floating &&
+          "pointer-events-none absolute top-0 right-0 z-10 translate-x-1/4 -translate-y-1/2 shadow-sm"
       )}
       color={floating ? "accent" : "default"}
       size="sm"

@@ -43,9 +43,10 @@ describe("lastLoginMethodPlugin", () => {
 
     expect(indicator).toBeVisible()
     expect(indicator.closest(".chip")).toHaveClass(
-      "absolute",
-      "-top-2",
-      "right-2"
+      "top-0",
+      "right-0",
+      "translate-x-1/4",
+      "-translate-y-1/2"
     )
     expect(within(emailButton).queryByText("Last")).toBeNull()
   })
