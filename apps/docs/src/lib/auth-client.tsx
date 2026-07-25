@@ -1,6 +1,7 @@
 import { apiKeyClient } from "@better-auth/api-key/client"
 import { passkeyClient } from "@better-auth/passkey/client"
 import {
+  deviceAuthorizationClient,
   magicLinkClient,
   multiSessionClient,
   organizationClient,
@@ -18,6 +19,26 @@ const customFetchImpl: typeof fetch = async (input, _init) => {
       : input instanceof URL
         ? input.pathname
         : new URL(input.url).pathname
+
+  if (endpoint === "/api/auth/device") {
+    return new Response(
+      JSON.stringify({
+        user_code: "AB12CD34",
+        status: "pending"
+      }),
+      { status: 200, headers: { "Content-Type": "application/json" } }
+    )
+  }
+
+  if (
+    endpoint === "/api/auth/device/approve" ||
+    endpoint === "/api/auth/device/deny"
+  ) {
+    return new Response(JSON.stringify({ success: true }), {
+      status: 200,
+      headers: { "Content-Type": "application/json" }
+    })
+  }
 
   if (endpoint === "/api/auth/list-accounts") {
     const now = new Date().toISOString()
@@ -491,6 +512,7 @@ export const authClient = createAuthClient({
     apiKeyClient(),
     passkeyClient(),
     usernameClient(),
+    deviceAuthorizationClient(),
     magicLinkClient()
   ],
   fetchOptions: {

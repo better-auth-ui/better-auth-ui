@@ -1,6 +1,7 @@
 import { apiKeyClient } from "@better-auth/api-key/client"
 import { passkeyClient } from "@better-auth/passkey/client"
 import {
+  deviceAuthorizationClient,
   inferAdditionalFields,
   magicLinkClient,
   multiSessionClient,
@@ -19,6 +20,7 @@ export const authClient = createAuthClient({
     passkeyClient(),
     usernameClient(),
     organizationClient(),
+    deviceAuthorizationClient(),
     magicLinkClient()
   ]
 })

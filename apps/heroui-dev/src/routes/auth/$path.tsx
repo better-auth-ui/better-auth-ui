@@ -1,11 +1,15 @@
 import { viewPaths } from "@better-auth-ui/core"
 import { Auth } from "@better-auth-ui/heroui"
-import { magicLinkPlugin } from "@better-auth-ui/heroui/plugins"
+import {
+  deviceAuthorizationPlugin,
+  magicLinkPlugin
+} from "@better-auth-ui/heroui/plugins"
 import { createFileRoute, notFound } from "@tanstack/react-router"
 
-/** Keep in sync with `magicLinkPlugin(...)` in `providers.tsx` if you customize `path`. */
+/** Keep in sync with the auth-view plugins in `providers.tsx` if paths are customized. */
 const validAuthPathSegments = new Set([
   ...Object.values(viewPaths.auth),
+  deviceAuthorizationPlugin().viewPaths.auth.deviceAuthorization,
   magicLinkPlugin().viewPaths.auth.magicLink
 ])
 

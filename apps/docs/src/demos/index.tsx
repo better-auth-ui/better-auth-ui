@@ -8,6 +8,7 @@ import { SignOutDemo as HeroUISignOutDemo } from "./heroui/auth/sign-out"
 import { SignUpDemo as HeroUISignUpDemo } from "./heroui/auth/sign-up"
 import { VerifyEmailDemo as HeroUIVerifyEmailDemo } from "./heroui/auth/verify-email"
 import { DangerZoneDemo as HeroUIDangerZoneDemo } from "./heroui/delete-user/danger-zone"
+import { DeviceAuthorizationDemo as HeroUIDeviceAuthorizationDemo } from "./heroui/device-authorization/device-authorization"
 import { EmailChangedEmailDemo as HeroUIEmailChangedEmailDemo } from "./heroui/email/email-changed-email"
 import { EmailVerificationEmailDemo as HeroUIEmailVerificationEmailDemo } from "./heroui/email/email-verification-email"
 import { MagicLinkEmailDemo as HeroUIMagicLinkEmailDemo } from "./heroui/email/magic-link-email"
@@ -123,6 +124,7 @@ export const demos: Record<string, ComponentType> = {
   "heroui-change-email": HeroUIChangeEmailDemo,
   "heroui-change-password": HeroUIChangePasswordDemo,
   "heroui-delete-user-danger-zone": HeroUIDangerZoneDemo,
+  "heroui-device-authorization": HeroUIDeviceAuthorizationDemo,
   "heroui-email-changed-email": HeroUIEmailChangedEmailDemo,
   "heroui-email-verification-email": HeroUIEmailVerificationEmailDemo,
   "heroui-forgot-password": HeroUIForgotPasswordDemo,
