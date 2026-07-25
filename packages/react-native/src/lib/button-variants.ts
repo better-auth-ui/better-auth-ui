@@ -2,9 +2,9 @@ import { cn } from "./cn"
 import type { ThemeColorName } from "./theme-colors"
 
 /**
- * Button visual variants as nativewind class strings, using the semantic theme
- * tokens (see `preset.js` / `theme.css`). Shared by the `Button` primitive and
- * by `Link` when it renders as a button.
+ * Button visual variants as class strings, using the semantic theme tokens
+ * (see `theme-colors.tsx`) that this package's `tw` resolver understands.
+ * Shared by the `Button` primitive and by `Link` when it renders as a button.
  */
 export type ButtonVariant =
   | "primary"
