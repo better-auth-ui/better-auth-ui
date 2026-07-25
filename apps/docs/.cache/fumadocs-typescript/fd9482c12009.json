@@ -1,0 +1,36 @@
+[
+  {
+    "id": "has-permission-query.ts-HasPermissionParams",
+    "name": "HasPermissionParams",
+    "description": "",
+    "entries": [
+      {
+        "name": "organizationId",
+        "description": "",
+        "tags": [],
+        "type": "string",
+        "simplifiedType": "string",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "permissions",
+        "description": "",
+        "tags": [],
+        "type": "{ readonly organization?: (\"update\" | \"delete\")[]; readonly member?: (\"create\" | \"update\" | \"delete\")[]; readonly invitation?: (\"create\" | \"cancel\")[]; readonly team?: (\"create\" | \"update\" | \"delete\")[]; readonly ac?: (\"create\" | \"update\" | \"delete\" | \"read\")[]; }",
+        "simplifiedType": "object",
+        "required": true,
+        "deprecated": false
+      },
+      {
+        "name": "fetchOptions",
+        "description": "",
+        "tags": [],
+        "type": "ClientFetchOption<Partial<{ permissions: { readonly organization?: (\"update\" | \"delete\")[]; readonly member?: (\"create\" | \"update\" | \"delete\")[]; readonly invitation?: (\"create\" | \"cancel\")[]; readonly team?: (\"create\" | \"update\" | \"delete\")[]; readonly ac?: (\"create\" | \"update\" | \"delete\" | \"read\")[]; }; } & { organizationId?: string; }> & Record<string, any>, Partial<Record<string, any>> & Record<string, any>, Record<string, any>>",
+        "simplifiedType": "ClientFetchOption<Record<string, any> & Partial<object>, Record<string, any> & Partial<Record<string, any>>, union>",
+        "required": false,
+        "deprecated": false
+      }
+    ]
+  }
+]

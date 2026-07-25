@@ -219,6 +219,20 @@ export const solidRegistryManifest = {
       ]
     }),
     item({
+      name: "oauth-provider",
+      type: "registry:component",
+      title: "Solid OAuth Provider Consent",
+      description:
+        "Solid/Zaidan consent view for Better Auth OAuth Provider authorization requests.",
+      dependencies: [...solidAuthDependencies, "@better-auth/oauth-provider"],
+      files: [
+        libFile("src/lib/auth/oauth-provider-plugin.ts"),
+        componentFile("src/components/auth/oauth-provider/oauth-consent.tsx"),
+        componentFile("src/components/auth/user/user-avatar.tsx"),
+        ...zaidanInteractiveSupportFiles
+      ]
+    }),
+    item({
       name: "username",
       type: "registry:component",
       title: "Solid Username",
@@ -310,6 +324,15 @@ export const solidRegistryManifest = {
       ]
     }),
     item({
+      name: "auth-redirect",
+      type: "registry:component",
+      title: "Solid Auth Redirect",
+      description:
+        "Solid session-aware redirect view that safely continues authenticated users to a same-origin target or sends them through sign in first.",
+      dependencies: solidDependencies,
+      files: [componentFile("src/components/auth/auth-redirect.tsx")]
+    }),
+    item({
       name: "sign-out",
       type: "registry:component",
       title: "Solid Sign Out",
@@ -331,6 +354,7 @@ export const solidRegistryManifest = {
         betterAuthSolidRegistryDependency("forgot-password"),
         betterAuthSolidRegistryDependency("reset-password"),
         betterAuthSolidRegistryDependency("verify-email"),
+        betterAuthSolidRegistryDependency("auth-redirect"),
         betterAuthSolidRegistryDependency("sign-out")
       ],
       files: [componentFile("src/components/auth/auth.tsx")]
@@ -592,6 +616,24 @@ export const solidRegistryManifest = {
       files: [
         componentFile("src/components/auth/delete-user/danger-zone.tsx"),
         componentFile("src/components/auth/delete-user/delete-account.tsx"),
+        ...zaidanInteractiveSupportFiles
+      ]
+    }),
+    item({
+      name: "admin",
+      type: "registry:component",
+      title: "Solid Admin",
+      description:
+        "Adds a stop-impersonating action to the Solid user button while an administrator is impersonating another user.",
+      registryDependencies: [
+        betterAuthSolidRegistryDependency("auth-provider"),
+        betterAuthSolidRegistryDependency("user-button"),
+        "@zaidan/dropdown-menu",
+        "@zaidan/spinner"
+      ],
+      files: [
+        libFile("src/lib/auth/admin-plugin.ts"),
+        componentFile("src/components/auth/admin/stop-impersonating.tsx"),
         ...zaidanInteractiveSupportFiles
       ]
     }),

@@ -395,9 +395,10 @@
     },
     "packages/core": {
       "name": "@better-auth-ui/core",
-      "version": "1.6.30",
+      "version": "1.6.32",
       "devDependencies": {
         "@better-auth/api-key": "1.7.0-rc.0",
+        "@better-auth/oauth-provider": "1.7.0-rc.0",
         "@better-auth/passkey": "1.7.0-rc.0",
         "@mikkelscheike/email-provider-links": "^5.1.8",
         "@tanstack/query-core": "^5.101.2",
@@ -406,6 +407,7 @@
       },
       "peerDependencies": {
         "@better-auth/api-key": ">=1.7.0-rc.0",
+        "@better-auth/oauth-provider": ">=1.7.0-rc.0",
         "@better-auth/passkey": ">=1.7.0-rc.0",
         "@mikkelscheike/email-provider-links": ">=5.1.8",
         "@tanstack/query-core": ">=5.101.2",
@@ -413,12 +415,13 @@
       },
       "optionalPeers": [
         "@better-auth/api-key",
+        "@better-auth/oauth-provider",
         "@better-auth/passkey",
       ],
     },
     "packages/heroui": {
       "name": "@better-auth-ui/heroui",
-      "version": "1.6.30",
+      "version": "1.6.32",
       "devDependencies": {
         "@gravity-ui/icons": "^2.20.0",
         "@heroui/react": "^3.2.1",
@@ -455,7 +458,7 @@
     },
     "packages/react": {
       "name": "@better-auth-ui/react",
-      "version": "1.6.30",
+      "version": "1.6.32",
       "devDependencies": {
         "@better-auth/api-key": "1.7.0-rc.0",
         "@better-auth/passkey": "1.7.0-rc.0",
@@ -499,7 +502,7 @@
     },
     "packages/solid": {
       "name": "@better-auth-ui/solid",
-      "version": "1.6.30",
+      "version": "1.6.32",
       "devDependencies": {
         "@better-auth/api-key": "1.7.0-rc.0",
         "@better-auth/passkey": "1.7.0-rc.0",
@@ -754,6 +757,8 @@
     "@better-auth/memory-adapter": ["@better-auth/memory-adapter@1.7.0-rc.0", "", { "peerDependencies": { "@better-auth/core": "^1.7.0-rc.0", "@better-auth/utils": "0.4.2" } }, "sha512-0bKCqubtAhnwOMwACWPXkriTFwZtTeAM0P8zKWuZJA6+fHb6IH5W0pEDBuC4l9qYkyrLl4mB08y26KtJyRhPLQ=="],
 
     "@better-auth/mongo-adapter": ["@better-auth/mongo-adapter@1.7.0-rc.0", "", { "peerDependencies": { "@better-auth/core": "^1.7.0-rc.0", "@better-auth/utils": "0.4.2", "mongodb": "^6.0.0 || ^7.0.0" }, "optionalPeers": ["mongodb"] }, "sha512-3LKEMdW0fCc1J5j6UxJBzvRuHVSASfdRUqFVDzJPUQvsDmhPjrTWDk2n/a8dunu7dMhIOQHLb1y4zj0O8ihM2A=="],
+
+    "@better-auth/oauth-provider": ["@better-auth/oauth-provider@1.7.0-rc.0", "", { "dependencies": { "jose": "^6.2.3", "zod": "^4.3.6" }, "peerDependencies": { "@better-auth/core": "^1.7.0-rc.0", "@better-auth/utils": "0.4.2", "@better-fetch/fetch": "1.3.1", "better-auth": "^1.7.0-rc.0", "better-call": "1.3.7" } }, "sha512-Fqob1V+LABCUBfs9GZrPL2SwhpgNlZhLNhwkvYGxIeATTckAvzAlVRFOMN4J5G2EOxqBhRxPBcxXFmMXiwRwZQ=="],
 
     "@better-auth/passkey": ["@better-auth/passkey@1.7.0-rc.0", "", { "dependencies": { "@simplewebauthn/browser": "^13.3.0", "@simplewebauthn/server": "^13.3.1", "zod": "^4.3.6" }, "peerDependencies": { "@better-auth/core": "^1.7.0-rc.0", "@better-auth/utils": "0.4.2", "@better-fetch/fetch": "1.3.1", "better-auth": "^1.7.0-rc.0", "better-call": "1.3.7", "nanostores": "^1.0.1" } }, "sha512-8JPe6fAVv9+MZIARksppGkm3jUlX61ZkdjZJIp1p0rTeh6uqsEzpWxqnnEvX3WJ3TXKYuWdojQ3EeggmiuryFg=="],
 

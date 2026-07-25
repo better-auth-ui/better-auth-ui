@@ -40,6 +40,7 @@ const sharedQueryPages = [
   "session",
   "user",
   "authenticate",
+  "public-oauth-client",
   "list-accounts",
   "account-info",
   "list-sessions",
@@ -70,7 +71,8 @@ const sharedAuthMutationPages = [
   "request-password-reset",
   "reset-password",
   "send-verification-email",
-  "is-username-available"
+  "is-username-available",
+  "oauth-consent"
 ]
 
 const sharedMutationPages = [

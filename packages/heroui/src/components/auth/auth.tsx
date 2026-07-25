@@ -2,6 +2,7 @@ import type { AuthView } from "@better-auth-ui/core"
 import { useAuth } from "@better-auth-ui/react"
 import type { CardProps } from "@heroui/react"
 import { type ComponentType, useEffect } from "react"
+import { AuthRedirect } from "./auth-redirect"
 import { ForgotPassword } from "./forgot-password"
 import type { SocialLayout } from "./provider-buttons"
 import { ResetLinkSent } from "./reset-link-sent"
@@ -34,6 +35,7 @@ const PASSWORD_ONLY_VIEWS = [
 ]
 
 const AUTH_VIEWS: Partial<Record<AuthView, ComponentType<AuthProps>>> = {
+  redirect: AuthRedirect,
   signIn: SignIn,
   signOut: SignOut,
   signUp: SignUp,

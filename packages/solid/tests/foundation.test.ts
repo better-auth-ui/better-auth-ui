@@ -40,10 +40,13 @@ describe("@better-auth-ui/solid foundation", () => {
     expect(Object.keys(metadata.exports).sort()).toEqual([
       ".",
       "./email",
+      "./plugins/admin",
       "./plugins/api-key",
       "./plugins/captcha",
+      "./plugins/device-authorization",
       "./plugins/magic-link",
       "./plugins/multi-session",
+      "./plugins/oauth-provider",
       "./plugins/organization",
       "./plugins/passkey",
       "./plugins/username"

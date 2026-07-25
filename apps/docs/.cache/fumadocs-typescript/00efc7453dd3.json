@@ -1,0 +1,18 @@
+[
+  {
+    "id": "delete-account.tsx-DeleteAccountProps",
+    "name": "DeleteAccountProps",
+    "description": "",
+    "entries": [
+      {
+        "name": "className",
+        "description": "",
+        "tags": [],
+        "type": "string",
+        "simplifiedType": "string",
+        "required": false,
+        "deprecated": false
+      }
+    ]
+  }
+]

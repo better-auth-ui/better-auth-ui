@@ -2,6 +2,7 @@
   "icon": "Plug",
   "defaultOpen": true,
   "pages": [
+    "admin",
     "api-key",
     "captcha",
     "delete-user",
@@ -9,6 +10,7 @@
     "magic-link",
     "multi-session",
     "organization",
+    "oauth-provider",
     "passkey",
     "theme",
     "username"

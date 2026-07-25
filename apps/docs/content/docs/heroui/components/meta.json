@@ -13,6 +13,7 @@
     "auth/sign-in",
     "auth/sign-up",
     "auth/sign-out",
+    "auth/auth-redirect",
     "auth/forgot-password",
     "auth/reset-password",
     "auth/verify-email",

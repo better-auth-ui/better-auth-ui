@@ -9,6 +9,7 @@ import { render } from "@react-email/render"
 import { betterAuth } from "better-auth"
 import { drizzleAdapter } from "better-auth/adapters/drizzle"
 import {
+  deviceAuthorization,
   magicLink,
   multiSession,
   organization,
@@ -77,6 +78,9 @@ export const auth = betterAuth({
     multiSession(),
     passkey(),
     username(),
+    deviceAuthorization({
+      verificationUri: "/auth/device"
+    }),
     apiKey([
       { configId: "default", references: "user" },
       { configId: "organization", references: "organization" }

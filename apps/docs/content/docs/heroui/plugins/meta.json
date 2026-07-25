@@ -2,13 +2,16 @@
   "icon": "Plug",
   "defaultOpen": true,
   "pages": [
+    "admin",
     "api-key",
     "captcha",
     "delete-user",
+    "device-authorization",
     "last-login-method",
     "magic-link",
     "multi-session",
     "organization",
+    "oauth-provider",
     "passkey",
     "theme",
     "username"

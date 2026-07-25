@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest"
 // Components surfaced by the main `@better-auth-ui/heroui` entry.
 const indexComponents = [
   "Auth",
+  "AuthRedirect",
   "ForgotPassword",
   "ProviderButtons",
   "ResetPassword",
@@ -18,13 +19,19 @@ const indexComponents = [
 // `MagicLinkButton` and `PasskeyButton` are not re-exported — they're only
 // used as `authButtons` slot contributions on the plugin objects.
 const pluginsExports = [
+  "StopImpersonating",
+  "DeviceAuthorization",
   "MagicLink",
+  "OAuthConsent",
   "Passkeys",
   "SignInUsername",
   "LastUsedBadge",
   "UsernameField",
+  "adminPlugin",
+  "deviceAuthorizationPlugin",
   "lastLoginMethodPlugin",
   "magicLinkPlugin",
+  "oauthProviderPlugin",
   "passkeyPlugin",
   "usernamePlugin"
 ] as const

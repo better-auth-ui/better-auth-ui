@@ -1,0 +1,18 @@
+[
+  {
+    "id": "public-oauth-client-query.ts-PublicOAuthClientParams",
+    "name": "PublicOAuthClientParams",
+    "description": "",
+    "entries": [
+      {
+        "name": "fetchOptions",
+        "description": "",
+        "tags": [],
+        "type": "Omit<NonNullable<Parameters<TAuthClient[\"oauth2\"][\"publicClient\"]>[0]>, \"query\">[\"fetchOptions\"]",
+        "simplifiedType": "Omit<NonNullable<Parameters<TAuthClient[\"oauth2\"][\"publicClient\"]>[0]>, \"query\">[\"fetchOptions\"]",
+        "required": false,
+        "deprecated": false
+      }
+    ]
+  }
+]

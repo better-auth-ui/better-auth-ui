@@ -1,6 +1,6 @@
 {
   "name": "@better-auth-ui/solid",
-  "version": "1.6.30",
+  "version": "1.6.32",
   "type": "module",
   "scripts": {
     "build": "vite build && vite build --config vite.email.config.ts",
@@ -22,6 +22,10 @@
       "types": "./dist/email.d.ts",
       "import": "./dist/email.js"
     },
+    "./plugins/admin": {
+      "types": "./dist/plugins/admin/index.d.ts",
+      "import": "./dist/plugins/admin/index.js"
+    },
     "./plugins/api-key": {
       "types": "./dist/plugins/api-key/index.d.ts",
       "import": "./dist/plugins/api-key/index.js"
@@ -30,6 +34,10 @@
       "types": "./dist/plugins/captcha/index.d.ts",
       "import": "./dist/plugins/captcha/index.js"
     },
+    "./plugins/device-authorization": {
+      "types": "./dist/plugins/device-authorization/index.d.ts",
+      "import": "./dist/plugins/device-authorization/index.js"
+    },
     "./plugins/magic-link": {
       "types": "./dist/plugins/magic-link/index.d.ts",
       "import": "./dist/plugins/magic-link/index.js"
@@ -37,6 +45,10 @@
     "./plugins/multi-session": {
       "types": "./dist/plugins/multi-session/index.d.ts",
       "import": "./dist/plugins/multi-session/index.js"
+    },
+    "./plugins/oauth-provider": {
+      "types": "./dist/plugins/oauth-provider/index.d.ts",
+      "import": "./dist/plugins/oauth-provider/index.js"
     },
     "./plugins/organization": {
       "types": "./dist/plugins/organization/index.d.ts",

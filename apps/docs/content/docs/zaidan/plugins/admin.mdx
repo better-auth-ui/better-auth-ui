@@ -1,0 +1,124 @@
+---
+title: Admin
+description: Add a stop-impersonating user menu action to Solid and Zaidan.
+---
+
+import { Step, Steps } from "fumadocs-ui/components/steps"
+
+The Admin plugin adds a "Stop impersonating" action to the copied
+`<UserButton />`. The action appears only while Better Auth marks the current
+session as an impersonation session.
+
+## Setup
+
+<Steps>
+<Step>
+### Enable the Better Auth admin plugin
+
+```ts title="src/lib/auth.ts"
+import { betterAuth } from "better-auth"
+import { admin } from "better-auth/plugins" // [!code highlight]
+
+export const auth = betterAuth({
+  // ...
+  plugins: [
+    admin() // [!code highlight]
+  ]
+})
+```
+
+Update your database schema after enabling the plugin. Better Auth adds admin
+fields to users and an `impersonatedBy` field to sessions.
+
+</Step>
+<Step>
+### Add the matching Solid client plugin
+
+```ts title="src/lib/auth-client.ts"
+import { createAuthClient } from "@better-auth-ui/solid"
+import { adminClient } from "better-auth/client/plugins" // [!code highlight]
+
+export const authClient = createAuthClient({
+  plugins: [adminClient()] // [!code highlight]
+})
+```
+
+</Step>
+<Step>
+### Install the Solid and Zaidan integration
+
+```npm
+npx shadcn@latest add https://better-auth-ui.com/r/solid/admin.json
+```
+
+This copies:
+
+- `src/lib/auth/admin-plugin.ts`
+- `src/components/auth/admin/stop-impersonating.tsx`
+
+</Step>
+<Step>
+### Register the copied UI plugin
+
+```tsx title="src/components/providers.tsx"
+import { AuthProvider } from "@/components/auth/auth-provider"
+import { adminPlugin } from "@/lib/auth/admin-plugin" // [!code highlight]
+
+<AuthProvider
+  authClient={authClient}
+  plugins={[adminPlugin()]} // [!code highlight]
+>
+  {children}
+</AuthProvider>
+```
+
+</Step>
+</Steps>
+
+## User button behavior
+
+The copied `adminPlugin()` contributes `<StopImpersonating />` through the
+`userMenuItems` slot. `<UserButton />` places it above sign out.
+
+The action renders only when `session.session.impersonatedBy` is present.
+Selecting it calls `authClient.admin.stopImpersonating()` and refreshes the
+cached session before the pending state completes.
+
+```tsx
+import { StopImpersonating } from "@/components/auth/admin/stop-impersonating"
+
+<StopImpersonating />
+```
+
+<auto-type-table path="../../../../../../examples/start-solid-zaidan-example/src/components/auth/admin/stop-impersonating.tsx" name="StopImpersonatingProps" />
+
+## Options
+
+```ts
+adminPlugin({
+  localization: {
+    stopImpersonating: "Return to admin"
+  }
+})
+```
+
+<auto-type-table path="../../../../../../packages/core/src/plugins/admin/admin-plugin.ts" name="AdminPluginOptions" />
+
+## Localization
+
+<auto-type-table path="../../../../../../packages/core/src/plugins/admin/admin-localization.ts" name="AdminLocalization" />
+
+## Mutation API
+
+```tsx
+import { useStopImpersonating } from "@better-auth-ui/solid/plugins/admin"
+
+const stopImpersonating = useStopImpersonating(authClient)
+```
+
+Use the hook when you need the same behavior outside the copied user button.
+It restores the admin session and awaits invalidation of the shared session
+query.
+
+See the [Solid package reference](/docs/solid) for the shared query and
+mutation APIs.

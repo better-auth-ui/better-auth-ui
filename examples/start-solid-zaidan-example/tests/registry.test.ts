@@ -109,12 +109,14 @@ const expectedSolidRegistryPayloadNames = [
   "last-login-method",
   "sign-up",
   "magic-link",
+  "oauth-provider",
   "username",
   "passkey",
   "api-key",
   "forgot-password",
   "reset-password",
   "verify-email",
+  "auth-redirect",
   "sign-out",
   "auth",
   "user-button",
@@ -137,6 +139,7 @@ const expectedSolidRegistryPayloadNames = [
   "new-device-email",
   "organization-invitation-email",
   "delete-user",
+  "admin",
   "multi-session",
   "organization",
   "theme"
@@ -1816,6 +1819,7 @@ describe("Solid registry isolation", () => {
       solidRegistryUrl("forgot-password"),
       solidRegistryUrl("reset-password"),
       solidRegistryUrl("verify-email"),
+      solidRegistryUrl("auth-redirect"),
       solidRegistryUrl("sign-out")
     ])
     expect(auth.files).toEqual([
@@ -2250,10 +2254,13 @@ describe("Solid registry isolation", () => {
     expect(report.packageExports).toEqual([
       ".",
       "./email",
+      "./plugins/admin",
       "./plugins/api-key",
       "./plugins/captcha",
+      "./plugins/device-authorization",
       "./plugins/magic-link",
       "./plugins/multi-session",
+      "./plugins/oauth-provider",
       "./plugins/organization",
       "./plugins/passkey",
       "./plugins/username"
@@ -2315,6 +2322,7 @@ describe("Solid registry isolation", () => {
       "delete-user",
       "last-login-method",
       "magic-link",
+      "oauth-provider",
       "theme"
     ]
 
@@ -2462,6 +2470,7 @@ describe("Solid registry isolation", () => {
       "session",
       "user",
       "authenticate",
+      "public-oauth-client",
       "---Settings---",
       "list-accounts",
       "account-info",
@@ -2492,6 +2501,7 @@ describe("Solid registry isolation", () => {
       "reset-password",
       "send-verification-email",
       "is-username-available",
+      "oauth-consent",
       "---Settings---",
       "update-user",
       "change-email",
@@ -2533,6 +2543,7 @@ describe("Solid registry isolation", () => {
       "components"
     ])
     expect(zaidanPluginsMeta.pages).toEqual([
+      "admin",
       "api-key",
       "captcha",
       "delete-user",
@@ -2540,6 +2551,7 @@ describe("Solid registry isolation", () => {
       "magic-link",
       "multi-session",
       "organization",
+      "oauth-provider",
       "passkey",
       "theme",
       "username"
@@ -2556,6 +2568,7 @@ describe("Solid registry isolation", () => {
       "sign-in",
       "sign-up",
       "sign-out",
+      "auth-redirect",
       "forgot-password",
       "reset-password",
       "verify-email",
@@ -2803,6 +2816,7 @@ describe("Solid registry isolation", () => {
     const integrations = readZaidanDoc("integrations/tanstack-start.mdx")
     const additionalFields = readZaidanDoc("concepts/additional-fields.mdx")
     const pluginPayloadNames = [
+      "admin",
       "username",
       "passkey",
       "multi-session",
@@ -2810,6 +2824,7 @@ describe("Solid registry isolation", () => {
       "delete-user",
       "last-login-method",
       "magic-link",
+      "oauth-provider",
       "theme"
     ]
     const runtimeOnlyPluginNames = ["captcha"]
@@ -2876,6 +2891,7 @@ describe("Solid registry isolation", () => {
       "account-settings": "<AccountSettings />",
       "active-sessions": "<ActiveSessions />",
       auth: "<Auth />",
+      "auth-redirect": "<AuthRedirect />",
       "auth-provider": "<AuthProvider />",
       "change-email": "<ChangeEmail />",
       "change-password": "<ChangePassword />",
@@ -2946,9 +2962,11 @@ describe("Solid registry isolation", () => {
           "This drops the following into your codebase:"
         )
       } else if (
+        name === "admin" ||
         name === "delete-user" ||
         name === "last-login-method" ||
         name === "magic-link" ||
+        name === "oauth-provider" ||
         name === "multi-session" ||
         name === "theme" ||
         name === "username"
@@ -3785,11 +3803,12 @@ describe("Solid registry isolation", () => {
       metaPath
     )
     const authStart = meta.pages.indexOf("---Auth---")
-    expect(meta.pages.slice(authStart + 1, authStart + 7)).toEqual([
+    expect(meta.pages.slice(authStart + 1, authStart + 8)).toEqual([
       "auth",
       "sign-in",
       "sign-up",
       "sign-out",
+      "auth-redirect",
       "forgot-password",
       "reset-password"
     ])

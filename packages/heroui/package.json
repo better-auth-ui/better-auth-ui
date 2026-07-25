@@ -1,6 +1,6 @@
 {
   "name": "@better-auth-ui/heroui",
-  "version": "1.6.30",
+  "version": "1.6.32",
   "type": "module",
   "scripts": {
     "build": "vite build",
@@ -26,6 +26,11 @@
       "types": "./dist/plugins.d.ts",
       "import": "./dist/plugins.js"
     },
+    "./plugins/admin": {
+      "src": "./src/plugins/admin/index.ts",
+      "types": "./dist/plugins/admin/index.d.ts",
+      "import": "./dist/plugins/admin/index.js"
+    },
     "./plugins/api-key": {
       "src": "./src/plugins/api-key/index.ts",
       "types": "./dist/plugins/api-key/index.d.ts",
@@ -36,6 +41,11 @@
       "types": "./dist/plugins/delete-user/index.d.ts",
       "import": "./dist/plugins/delete-user/index.js"
     },
+    "./plugins/device-authorization": {
+      "src": "./src/plugins/device-authorization/index.ts",
+      "types": "./dist/plugins/device-authorization/index.d.ts",
+      "import": "./dist/plugins/device-authorization/index.js"
+    },
     "./plugins/magic-link": {
       "src": "./src/plugins/magic-link/index.ts",
       "types": "./dist/plugins/magic-link/index.d.ts",
@@ -45,6 +55,11 @@
       "src": "./src/plugins/multi-session/index.ts",
       "types": "./dist/plugins/multi-session/index.d.ts",
       "import": "./dist/plugins/multi-session/index.js"
+    },
+    "./plugins/oauth-provider": {
+      "src": "./src/plugins/oauth-provider/index.ts",
+      "types": "./dist/plugins/oauth-provider/index.d.ts",
+      "import": "./dist/plugins/oauth-provider/index.js"
     },
     "./plugins/organization": {
       "src": "./src/plugins/organization/index.ts",

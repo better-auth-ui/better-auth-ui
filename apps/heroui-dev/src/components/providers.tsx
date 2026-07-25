@@ -1,6 +1,7 @@
 import { AuthProvider } from "@better-auth-ui/heroui"
 import { apiKeyPlugin } from "@better-auth-ui/heroui/plugins/api-key"
 import { deleteUserPlugin } from "@better-auth-ui/heroui/plugins/delete-user"
+import { deviceAuthorizationPlugin } from "@better-auth-ui/heroui/plugins/device-authorization"
 import { magicLinkPlugin } from "@better-auth-ui/heroui/plugins/magic-link"
 import { multiSessionPlugin } from "@better-auth-ui/heroui/plugins/multi-session"
 import { organizationPlugin } from "@better-auth-ui/heroui/plugins/organization"
@@ -30,6 +31,7 @@ export function Providers({ children }: { children: ReactNode }) {
             usernamePrefix: "@",
             localization: { usernamePlaceholder: "username" }
           }),
+          deviceAuthorizationPlugin(),
           magicLinkPlugin(),
           passkeyPlugin(),
           apiKeyPlugin({ organization: true }),

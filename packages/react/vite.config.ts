@@ -9,10 +9,14 @@ export default defineConfig({
       entry: {
         index: "src/index.ts",
         email: "src/email.ts",
+        "plugins/admin/index": "src/plugins/admin/index.ts",
         "plugins/api-key/index": "src/plugins/api-key/index.ts",
         "plugins/captcha/index": "src/plugins/captcha/index.ts",
+        "plugins/device-authorization/index":
+          "src/plugins/device-authorization/index.ts",
         "plugins/magic-link/index": "src/plugins/magic-link/index.ts",
         "plugins/multi-session/index": "src/plugins/multi-session/index.ts",
+        "plugins/oauth-provider/index": "src/plugins/oauth-provider/index.ts",
         "plugins/organization/index": "src/plugins/organization/index.ts",
         "plugins/passkey/index": "src/plugins/passkey/index.ts",
         "plugins/username/index": "src/plugins/username/index.ts"

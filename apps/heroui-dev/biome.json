@@ -8,7 +8,12 @@
   },
   "files": {
     "ignoreUnknown": true,
-    "includes": ["**", "!**/src/routeTree.gen.ts", "!auth-schema.ts"]
+    "includes": [
+      "**",
+      "!**/src/routeTree.gen.ts",
+      "!auth-schema.ts",
+      "!drizzle"
+    ]
   },
   "formatter": {
     "enabled": true,

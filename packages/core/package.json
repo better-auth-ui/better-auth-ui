@@ -1,6 +1,6 @@
 {
   "name": "@better-auth-ui/core",
-  "version": "1.6.30",
+  "version": "1.6.32",
   "type": "module",
   "scripts": {
     "build": "vite build",
@@ -17,6 +17,11 @@
       "src": "./src/index.ts",
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
+    },
+    "./plugins/admin": {
+      "src": "./src/plugins/admin/index.ts",
+      "types": "./dist/plugins/admin/index.d.ts",
+      "import": "./dist/plugins/admin/index.js"
     },
     "./server": {
       "src": "./src/server.ts",
@@ -37,6 +42,11 @@
       "src": "./src/plugins/delete-user/index.ts",
       "types": "./dist/plugins/delete-user/index.d.ts",
       "import": "./dist/plugins/delete-user/index.js"
+    },
+    "./plugins/device-authorization": {
+      "src": "./src/plugins/device-authorization/index.ts",
+      "types": "./dist/plugins/device-authorization/index.d.ts",
+      "import": "./dist/plugins/device-authorization/index.js"
     },
     "./plugins/last-login-method": {
       "src": "./src/plugins/last-login-method/index.ts",
@@ -62,6 +72,11 @@
       "src": "./src/plugins/multi-session/server.ts",
       "types": "./dist/plugins/multi-session/server.d.ts",
       "import": "./dist/plugins/multi-session/server.js"
+    },
+    "./plugins/oauth-provider": {
+      "src": "./src/plugins/oauth-provider/index.ts",
+      "types": "./dist/plugins/oauth-provider/index.d.ts",
+      "import": "./dist/plugins/oauth-provider/index.js"
     },
     "./plugins/organization": {
       "src": "./src/plugins/organization/index.ts",
@@ -101,6 +116,7 @@
   },
   "devDependencies": {
     "@better-auth/api-key": "1.7.0-rc.0",
+    "@better-auth/oauth-provider": "1.7.0-rc.0",
     "@better-auth/passkey": "1.7.0-rc.0",
     "@mikkelscheike/email-provider-links": "^5.1.8",
     "@tanstack/query-core": "^5.101.2",
@@ -109,6 +125,7 @@
   },
   "peerDependencies": {
     "@better-auth/api-key": ">=1.7.0-rc.0",
+    "@better-auth/oauth-provider": ">=1.7.0-rc.0",
     "@better-auth/passkey": ">=1.7.0-rc.0",
     "@mikkelscheike/email-provider-links": ">=5.1.8",
     "@tanstack/query-core": ">=5.101.2",
@@ -116,6 +133,9 @@
   },
   "peerDependenciesMeta": {
     "@better-auth/api-key": {
+      "optional": true
+    },
+    "@better-auth/oauth-provider": {
       "optional": true
     },
     "@better-auth/passkey": {

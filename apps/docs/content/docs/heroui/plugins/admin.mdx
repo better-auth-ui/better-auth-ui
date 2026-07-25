@@ -1,0 +1,110 @@
+---
+title: Admin
+description: Let administrators stop impersonating a user from the user button.
+---
+
+import { Step, Steps } from "fumadocs-ui/components/steps"
+
+The Admin plugin adds a "Stop impersonating" action to `<UserButton />`. The
+action appears only while Better Auth marks the current session as an
+impersonation session.
+
+## Setup
+
+<Steps>
+<Step>
+### Enable the Better Auth admin plugin
+
+Add `admin()` to the server configuration:
+
+```ts title="lib/auth.ts"
+import { betterAuth } from "better-auth"
+import { admin } from "better-auth/plugins" // [!code highlight]
+
+export const auth = betterAuth({
+  // ...
+  plugins: [
+    admin() // [!code highlight]
+  ]
+})
+```
+
+Update your database schema after enabling the plugin. Better Auth adds admin
+fields to users and an `impersonatedBy` field to sessions.
+
+</Step>
+<Step>
+### Add the matching client plugin
+
+```ts title="lib/auth-client.ts"
+import { createAuthClient } from "better-auth/react"
+import { adminClient } from "better-auth/client/plugins" // [!code highlight]
+
+export const authClient = createAuthClient({
+  plugins: [adminClient()] // [!code highlight]
+})
+```
+
+</Step>
+<Step>
+### Register the UI plugin
+
+```tsx title="components/providers.tsx"
+import { AuthProvider } from "@better-auth-ui/heroui"
+import { adminPlugin } from "@better-auth-ui/heroui/plugins" // [!code highlight]
+
+<AuthProvider
+  authClient={authClient}
+  navigate={navigate}
+  plugins={[adminPlugin()]} // [!code highlight]
+>
+  {children}
+</AuthProvider>
+```
+
+</Step>
+</Steps>
+
+## User button behavior
+
+`adminPlugin()` contributes `<StopImpersonating />` through the
+`userMenuItems` slot. `<UserButton />` places it above sign out.
+
+The action renders only when `session.session.impersonatedBy` is present.
+Selecting it calls `authClient.admin.stopImpersonating()` and refreshes the
+cached session before the pending state completes.
+
+```tsx
+import { StopImpersonating } from "@better-auth-ui/heroui/plugins"
+
+<StopImpersonating />
+```
+
+<auto-type-table path="../../../../../../packages/heroui/src/components/auth/admin/stop-impersonating.tsx" name="StopImpersonatingProps" />
+
+## Options
+
+```ts
+adminPlugin({
+  localization: {
+    stopImpersonating: "Return to admin"
+  }
+})
+```
+
+<auto-type-table path="../../../../../../packages/core/src/plugins/admin/admin-plugin.ts" name="AdminPluginOptions" />
+
+## Localization
+
+<auto-type-table path="../../../../../../packages/core/src/plugins/admin/admin-localization.ts" name="AdminLocalization" />
+
+## Mutation API
+
+```tsx
+import { useStopImpersonating } from "@better-auth-ui/react/plugins/admin"
+
+const stopImpersonating = useStopImpersonating(authClient)
+```
+
+Use the hook when you need the same behavior outside the user button. It
+restores the admin session and awaits invalidation of the shared session query.

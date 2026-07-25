@@ -1,8 +1,11 @@
 import { describe, expect, it } from "vitest"
+import * as admin from "../src/plugins/admin"
 import * as apiKey from "../src/plugins/api-key"
 import * as captcha from "../src/plugins/captcha"
+import * as deviceAuthorization from "../src/plugins/device-authorization"
 import * as magicLink from "../src/plugins/magic-link"
 import * as multiSession from "../src/plugins/multi-session"
+import * as oauthProvider from "../src/plugins/oauth-provider"
 import * as organization from "../src/plugins/organization"
 import * as passkey from "../src/plugins/passkey"
 import * as username from "../src/plugins/username"
@@ -23,7 +26,13 @@ describe("React plugin subpath exports", () => {
     expect(multiSession).toHaveProperty("useListDeviceSessions")
 
     expect(captcha).toHaveProperty("captchaPlugin")
+    expect(admin).toHaveProperty("useStopImpersonating")
+    expect(deviceAuthorization).toHaveProperty("useApproveDevice")
+    expect(deviceAuthorization).toHaveProperty("useDenyDevice")
+    expect(deviceAuthorization).toHaveProperty("useVerifyDeviceCode")
     expect(magicLink).toHaveProperty("useSignInMagicLink")
+    expect(oauthProvider).toHaveProperty("useOAuthConsent")
+    expect(oauthProvider).toHaveProperty("usePublicOAuthClient")
     expect(username).toHaveProperty("useIsUsernameAvailable")
     expect(username).toHaveProperty("useSignInUsername")
 
@@ -35,10 +44,16 @@ describe("React plugin subpath exports", () => {
 
   it("keeps core-owned mutation factories out of framework plugin entrypoints", () => {
     expect(apiKey).not.toHaveProperty("createApiKeyOptions")
+    expect(admin).not.toHaveProperty("stopImpersonatingOptions")
+    expect(deviceAuthorization).not.toHaveProperty("approveDeviceOptions")
+    expect(deviceAuthorization).not.toHaveProperty("denyDeviceOptions")
+    expect(deviceAuthorization).not.toHaveProperty("verifyDeviceCodeOptions")
     expect(apiKey).not.toHaveProperty("deleteApiKeyOptions")
     expect(magicLink).not.toHaveProperty("signInMagicLinkOptions")
     expect(multiSession).not.toHaveProperty("revokeMultiSessionOptions")
     expect(multiSession).not.toHaveProperty("setActiveSessionOptions")
+    expect(oauthProvider).not.toHaveProperty("oauthConsentOptions")
+    expect(oauthProvider).not.toHaveProperty("publicOAuthClientOptions")
     expect(passkey).not.toHaveProperty("addPasskeyOptions")
     expect(passkey).not.toHaveProperty("deletePasskeyOptions")
     expect(passkey).not.toHaveProperty("signInPasskeyOptions")
@@ -62,5 +77,7 @@ describe("React plugin subpath exports", () => {
     expect(react).not.toHaveProperty("useCancelInvitation")
     expect(react).not.toHaveProperty("useListApiKeys")
     expect(react).not.toHaveProperty("useListPasskeys")
+    expect(react).not.toHaveProperty("useOAuthConsent")
+    expect(react).not.toHaveProperty("useStopImpersonating")
   })
 })

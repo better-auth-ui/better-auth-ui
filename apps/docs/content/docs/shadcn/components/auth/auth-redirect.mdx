@@ -1,0 +1,75 @@
+---
+title: <AuthRedirect />
+description: Require a session before redirecting to a same-origin page or API callback.
+---
+
+`<AuthRedirect />` powers the `/auth/redirect` view. It checks the current
+session, then continues to the `redirectTo` query parameter.
+
+## Installation
+
+```npm
+npx shadcn@latest add https://better-auth-ui.com/r/auth-redirect.json
+```
+
+Route it through the unified auth component:
+
+```tsx
+import { Auth } from "@/components/auth/auth"
+
+export default function AuthPage({ path }: { path: string }) {
+  return <Auth path={path} />
+}
+```
+
+Open the view with an encoded, same-origin destination:
+
+```text
+/auth/redirect?redirectTo=%2Fsettings%2Faccount
+```
+
+Authenticated users continue immediately. Signed-out users go to sign in and
+return to the redirect view after authentication. The final redirect uses a
+full-page request, so the destination can be an API callback.
+
+Only root-relative paths and same-origin HTTP(S) URLs are accepted. Unsafe,
+cross-origin, malformed, or self-referencing targets fall back to `/`.
+
+## Use with account deletion emails
+
+Better Auth requires the user who follows a deletion link to have a matching
+session. Wrap the generated deletion URL with the redirect view before sending
+the email:
+
+```ts
+import { betterAuth } from "better-auth"
+
+export const auth = betterAuth({
+  user: {
+    deleteUser: {
+      enabled: true,
+      sendDeleteAccountVerification: async ({ user, url }) => {
+        const appURL = new URL(process.env.BETTER_AUTH_URL!)
+        const deleteURL = new URL(url)
+        const redirectURL = new URL("/auth/redirect", appURL)
+
+        redirectURL.searchParams.set(
+          "redirectTo",
+          `${deleteURL.pathname}${deleteURL.search}${deleteURL.hash}`,
+        )
+
+        await sendDeleteAccountEmail({
+          to: user.email,
+          url: redirectURL.toString(),
+        })
+      },
+    },
+  },
+})
+```
+
+The Better Auth callback and the redirect view must share an origin.
+
+## Props
+
+<auto-type-table path="../../../../../../../examples/start-shadcn-example/src/components/auth/auth-redirect.tsx" name="AuthRedirectProps" />

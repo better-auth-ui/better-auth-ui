@@ -1,0 +1,108 @@
+[
+  {
+    "id": "otp-email.tsx-OtpEmailProps",
+    "name": "OtpEmailProps",
+    "description": "Props for the OtpEmail component.",
+    "entries": [
+      {
+        "name": "verificationCode",
+        "description": "The one-time verification code to display",
+        "tags": [],
+        "type": "string",
+        "simplifiedType": "string",
+        "required": true,
+        "deprecated": false
+      },
+      {
+        "name": "email",
+        "description": "Email address being verified",
+        "tags": [],
+        "type": "string",
+        "simplifiedType": "string",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "appName",
+        "description": "Name of the application sending the email",
+        "tags": [],
+        "type": "string",
+        "simplifiedType": "string",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "expirationMinutes",
+        "description": "Number of minutes until the verification code expires",
+        "tags": [],
+        "type": "number",
+        "simplifiedType": "number",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "logoURL",
+        "description": "Logo URL(s) - a single string or light/dark variants. If omitted, no logo is shown.",
+        "tags": [],
+        "type": "string | { light: string; dark: string; }",
+        "simplifiedType": "string | { light: string; dark: string; }",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "classNames",
+        "description": "Custom CSS class names for styling specific parts of the email",
+        "tags": [],
+        "type": "EmailClassNames",
+        "simplifiedType": "EmailClassNames",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "colors",
+        "description": "Custom color scheme for light and dark modes",
+        "tags": [],
+        "type": "EmailColors",
+        "simplifiedType": "EmailColors",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "poweredBy",
+        "description": "Whether to show the \"Powered by better-auth\" footer",
+        "tags": [],
+        "type": "boolean",
+        "simplifiedType": "boolean",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "darkMode",
+        "description": "Whether to enable dark mode support",
+        "tags": [],
+        "type": "boolean",
+        "simplifiedType": "boolean",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "head",
+        "description": "Additional React nodes to inject into the email head",
+        "tags": [],
+        "type": "ReactNode",
+        "simplifiedType": "ReactNode",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "localization",
+        "description": "Localization overrides for customizing email text",
+        "tags": [{ "name": "remarks", "text": "`OtpEmailEmailLocalization`" }],
+        "type": "Partial<{ YOUR_VERIFICATION_CODE_IS_CODE: string; LOGO: string; VERIFY_YOUR_EMAIL: string; WE_NEED_TO_VERIFY_YOUR_EMAIL_ADDRESS: string; THIS_CODE_EXPIRES_IN_MINUTES: string; EMAIL_SENT_BY: string; IF_YOU_DIDNT_REQUEST_THIS_EMAIL: string; POWERED_BY_BETTER_AUTH: string; }>",
+        "simplifiedType": "OtpEmailEmailLocalization",
+        "required": false,
+        "deprecated": false
+      }
+    ]
+  }
+]

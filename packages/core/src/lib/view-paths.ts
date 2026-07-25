@@ -3,6 +3,11 @@
  */
 export interface AuthViewPaths {
   /**
+   * Path segment for the authenticated redirect view
+   * @default "redirect"
+   */
+  redirect: string
+  /**
    * Path segment for the sign-in view
    * @default "sign-in"
    */
@@ -67,6 +72,7 @@ export type ViewPaths = {
 
 export const viewPaths: ViewPaths = {
   auth: {
+    redirect: "redirect",
     signIn: "sign-in",
     signUp: "sign-up",
     forgotPassword: "forgot-password",

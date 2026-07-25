@@ -248,6 +248,44 @@
       ]
     },
     {
+      "name": "oauth-provider",
+      "type": "registry:component",
+      "title": "OAuth Provider Consent",
+      "description": "OAuth Provider plugin: application identity, requested scopes, signed-in account, and approve or deny actions for Better Auth authorization requests.",
+      "dependencies": [
+        "@better-auth-ui/react@latest",
+        "@better-auth-ui/core@latest",
+        "@better-auth/oauth-provider",
+        "better-auth",
+        "lucide-react"
+      ],
+      "registryDependencies": [
+        "avatar",
+        "button",
+        "card",
+        "separator",
+        "skeleton",
+        "spinner"
+      ],
+      "files": [
+        {
+          "path": "src/lib/auth/oauth-provider-plugin.ts",
+          "type": "registry:lib",
+          "target": "@lib/auth/oauth-provider-plugin.ts"
+        },
+        {
+          "path": "src/components/auth/oauth-provider/oauth-consent.tsx",
+          "type": "registry:component",
+          "target": "@components/auth/oauth-provider/oauth-consent.tsx"
+        },
+        {
+          "path": "src/components/auth/user/user-avatar.tsx",
+          "type": "registry:component",
+          "target": "@components/auth/user/user-avatar.tsx"
+        }
+      ]
+    },
+    {
       "name": "username",
       "type": "registry:component",
       "title": "Username",
@@ -442,6 +480,40 @@
           "path": "src/components/auth/api-key/organization-api-keys.tsx",
           "type": "registry:component",
           "target": "@components/auth/api-key/organization-api-keys.tsx"
+        }
+      ]
+    },
+    {
+      "name": "admin",
+      "type": "registry:component",
+      "title": "Admin",
+      "description": "Admin plugin integration that adds a stop-impersonating action to the user button while an administrator is impersonating another user.",
+      "dependencies": [
+        "@better-auth-ui/react@latest",
+        "@better-auth-ui/core@latest",
+        "better-auth",
+        "lucide-react"
+      ],
+      "registryDependencies": [
+        "dropdown-menu",
+        "spinner",
+        "https://better-auth-ui.com/r/user-button.json"
+      ],
+      "files": [
+        {
+          "path": "src/lib/auth/auth-plugin.ts",
+          "type": "registry:lib",
+          "target": "@lib/auth/auth-plugin.ts"
+        },
+        {
+          "path": "src/lib/auth/admin-plugin.ts",
+          "type": "registry:lib",
+          "target": "@lib/auth/admin-plugin.ts"
+        },
+        {
+          "path": "src/components/auth/admin/stop-impersonating.tsx",
+          "type": "registry:component",
+          "target": "@components/auth/admin/stop-impersonating.tsx"
         }
       ]
     },
@@ -896,6 +968,25 @@
       ]
     },
     {
+      "name": "auth-redirect",
+      "type": "registry:component",
+      "title": "Auth Redirect",
+      "description": "A session-aware redirect view that safely continues authenticated users to a same-origin target or sends them through sign in first.",
+      "dependencies": [
+        "@better-auth-ui/react@latest",
+        "@better-auth-ui/core@latest",
+        "better-auth"
+      ],
+      "registryDependencies": ["spinner"],
+      "files": [
+        {
+          "path": "src/components/auth/auth-redirect.tsx",
+          "type": "registry:component",
+          "target": "@components/auth/auth-redirect.tsx"
+        }
+      ]
+    },
+    {
       "name": "sign-out",
       "type": "registry:component",
       "title": "Sign Out",
@@ -930,6 +1021,7 @@
         "https://better-auth-ui.com/r/forgot-password.json",
         "https://better-auth-ui.com/r/reset-password.json",
         "https://better-auth-ui.com/r/verify-email.json",
+        "https://better-auth-ui.com/r/auth-redirect.json",
         "https://better-auth-ui.com/r/sign-out.json"
       ],
       "files": [
@@ -1438,9 +1530,11 @@
         "https://better-auth-ui.com/r/last-login-method.json",
         "https://better-auth-ui.com/r/sign-up.json",
         "https://better-auth-ui.com/r/magic-link.json",
+        "https://better-auth-ui.com/r/oauth-provider.json",
         "https://better-auth-ui.com/r/username.json",
         "https://better-auth-ui.com/r/passkey.json",
         "https://better-auth-ui.com/r/api-key.json",
+        "https://better-auth-ui.com/r/admin.json",
         "https://better-auth-ui.com/r/multi-session.json",
         "https://better-auth-ui.com/r/organization.json",
         "https://better-auth-ui.com/r/theme.json",

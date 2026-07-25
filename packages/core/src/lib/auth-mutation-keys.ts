@@ -19,10 +19,11 @@
  * package the mutation options factory came from.
  *
  * Plugin-specific mutation keys live alongside their plugin (e.g.
- * `apiKeyMutationKeys`, `organizationMutationKeys`, `passkeyMutationKeys`,
- * `magicLinkMutationKeys`, `multiSessionMutationKeys`, `usernameMutationKeys`,
- * `deleteUserMutationKeys`). Plugin-contributed sign-in strategies stay
- * under the shared `["auth", "signIn", ...]` namespace so
+ * `apiKeyMutationKeys`, `deviceAuthorizationMutationKeys`,
+ * `organizationMutationKeys`, `passkeyMutationKeys`, `magicLinkMutationKeys`,
+ * `multiSessionMutationKeys`, `usernameMutationKeys`, `deleteUserMutationKeys`).
+ * Plugin-contributed sign-in strategies stay under the shared
+ * `["auth", "signIn", ...]` namespace so
  * `useIsMutating({ mutationKey: authMutationKeys.signIn.all })` still
  * matches them.
  *
