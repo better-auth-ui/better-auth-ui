@@ -2,8 +2,31 @@
   "name": "docs",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "targets": {
+    "dev": {
+      "dependsOn": [
+        "^dev",
+        "email",
+        {
+          "projects": ["start-shadcn-example", "start-solid-zaidan-example"],
+          "target": "registry:build"
+        }
+      ],
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "vite dev",
+        "cwd": "apps/docs"
+      },
+      "continuous": true
+    },
     "build": {
-      "dependsOn": ["^build", "build-storybook-zaidan"],
+      "dependsOn": [
+        "^build",
+        "build-storybook-zaidan",
+        {
+          "projects": ["start-shadcn-example", "start-solid-zaidan-example"],
+          "target": "registry:build"
+        }
+      ],
       "executor": "nx:run-commands",
       "options": {
         "command": "NODE_OPTIONS='--max-old-space-size=10240' vite build",

@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "nx run-many -t dev",
     "build": "nx run-many -t build",
-    "test": "nx run-many -t test"
+    "test": "nx run-many -t test",
+    "registry:build": "nx run-many -t registry:build -p start-shadcn-example start-solid-zaidan-example"
   },
   "workspaces": [
     "apps/*",

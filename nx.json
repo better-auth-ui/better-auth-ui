@@ -47,7 +47,7 @@
   "release": {
     "projects": ["packages/*"],
     "version": {
-      "preVersionCommand": "nx registry:build start-shadcn-example",
+      "preVersionCommand": "nx source:sync start-shadcn-example",
       "conventionalCommits": true
     },
     "changelog": {

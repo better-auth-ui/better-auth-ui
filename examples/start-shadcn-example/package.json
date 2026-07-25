@@ -2,6 +2,25 @@
   "name": "start-shadcn-example",
   "private": true,
   "type": "module",
+  "nx": {
+    "targets": {
+      "registry:build": {
+        "cache": true,
+        "inputs": [
+          "{projectRoot}/components.json",
+          "{projectRoot}/package.json",
+          "{projectRoot}/registry.json",
+          "{projectRoot}/scripts/build-registry.sh",
+          "{projectRoot}/src/**/*",
+          "{workspaceRoot}/packages/react/src/components/auth/email/**/*",
+          "{workspaceRoot}/bun.lock"
+        ],
+        "outputs": [
+          "{workspaceRoot}/apps/docs/public/r/*.json"
+        ]
+      }
+    }
+  },
   "scripts": {
     "dev": "vite dev",
     "build": "vite build",
@@ -9,7 +28,8 @@
     "preview": "vite preview",
     "deploy": "bun run build && wrangler deploy",
     "cf-typegen": "wrangler types",
-    "registry:build": "bash scripts/build-registry.sh"
+    "registry:build": "bash scripts/build-registry.sh",
+    "source:sync": "bash scripts/sync-consumers.sh"
   },
   "devDependencies": {
     "@cloudflare/vite-plugin": "^1.43.0",

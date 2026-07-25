@@ -6,12 +6,32 @@
     "targets": {
       "test": {
         "dependsOn": [
-          "^build"
+          "^build",
+          "registry:build",
+          {
+            "projects": [
+              "start-shadcn-example"
+            ],
+            "target": "registry:build"
+          }
         ]
       },
       "typecheck": {
         "dependsOn": [
           "^build"
+        ]
+      },
+      "registry:build": {
+        "cache": true,
+        "inputs": [
+          "{projectRoot}/package.json",
+          "{projectRoot}/registry.manifest.ts",
+          "{projectRoot}/scripts/build-registry.ts",
+          "{projectRoot}/src/**/*",
+          "{workspaceRoot}/bun.lock"
+        ],
+        "outputs": [
+          "{workspaceRoot}/apps/docs/public/r/solid/**/*"
         ]
       }
     }

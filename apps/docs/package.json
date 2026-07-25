@@ -4,8 +4,11 @@
   "sideEffects": false,
   "type": "module",
   "scripts": {
+    "predev": "bun run registry:build",
     "dev": "vite dev",
+    "prebuild": "bun run registry:build",
     "build": "vite build",
+    "registry:build": "bun nx run-many -t registry:build -p start-shadcn-example start-solid-zaidan-example",
     "typecheck": "fumadocs-mdx && tsr generate && tsc --noEmit",
     "start": "serve dist/client",
     "postinstall": "fumadocs-mdx",
