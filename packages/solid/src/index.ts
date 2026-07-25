@@ -1,4 +1,5 @@
 export * from "./hooks/auth/use-authenticate"
+export * from "./hooks/auth/use-last-login-method"
 export * from "./hooks/auth/use-user"
 export * from "./hooks/mutations/use-change-email"
 export * from "./hooks/mutations/use-change-password"

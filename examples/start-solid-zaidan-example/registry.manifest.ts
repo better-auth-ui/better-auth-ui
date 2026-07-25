@@ -162,8 +162,20 @@ export const solidRegistryManifest = {
         componentFile("src/components/auth/sign-in-path.ts"),
         componentFile("src/components/auth/provider-button.tsx"),
         componentFile("src/components/auth/provider-buttons.tsx"),
+        componentFile(
+          "src/components/auth/last-login-method/last-used-badge.tsx"
+        ),
         ...zaidanFormSupportFiles
       ]
+    }),
+    item({
+      name: "last-login-method",
+      type: "registry:component",
+      title: "Solid Last Login Method",
+      description:
+        "Adds a localized last-used indicator to email and social sign-in methods tracked by Better Auth.",
+      registryDependencies: [betterAuthSolidRegistryDependency("sign-in")],
+      files: [libFile("src/lib/auth/last-login-method-plugin.ts")]
     }),
     item({
       name: "sign-up",
@@ -179,6 +191,9 @@ export const solidRegistryManifest = {
         componentFile("src/components/auth/sign-up.tsx"),
         componentFile("src/components/auth/provider-button.tsx"),
         componentFile("src/components/auth/provider-buttons.tsx"),
+        componentFile(
+          "src/components/auth/last-login-method/last-used-badge.tsx"
+        ),
         ...zaidanFormSupportFiles
       ]
     }),
@@ -196,6 +211,9 @@ export const solidRegistryManifest = {
         componentFile("src/components/auth/open-email-button.tsx"),
         componentFile("src/components/auth/provider-buttons.tsx"),
         componentFile("src/components/auth/provider-button.tsx"),
+        componentFile(
+          "src/components/auth/last-login-method/last-used-badge.tsx"
+        ),
         componentFile("src/components/auth/sign-in-path.ts"),
         ...zaidanFormSupportFiles
       ]
@@ -210,6 +228,9 @@ export const solidRegistryManifest = {
         libFile("src/lib/auth/username-plugin.ts"),
         componentFile("src/components/auth/username/sign-in-username.tsx"),
         componentFile("src/components/auth/username/username-field.tsx"),
+        componentFile(
+          "src/components/auth/last-login-method/last-used-badge.tsx"
+        ),
         componentFile("src/components/auth/sign-in-path.ts"),
         ...zaidanFormSupportFiles
       ]

@@ -1,0 +1,117 @@
+---
+title: Last Login Method
+description: Show which sign-in method a user chose most recently.
+---
+
+import { Step, Steps } from 'fumadocs-ui/components/steps'
+
+The last-login-method integration floats a compact "Last" indicator over the matching username, email, or social sign-in control. It reads the method after hydration, so server-rendered auth pages do not produce a hydration mismatch.
+
+## Setup
+
+<Steps>
+<Step>
+### Add the Better Auth server plugin
+
+Add Better Auth's [Last Login Method](https://www.better-auth.com/docs/plugins/last-login-method) plugin to your server configuration:
+
+```ts title="lib/auth.ts"
+import { betterAuth } from "better-auth"
+import { lastLoginMethod } from "better-auth/plugins" // [!code highlight]
+
+export const auth = betterAuth({
+  // ...
+  plugins: [
+    lastLoginMethod() // [!code highlight]
+  ]
+})
+```
+
+</Step>
+<Step>
+### Add the matching client plugin
+
+Add `lastLoginMethodClient()` to the Solid client passed to `<AuthProvider>`:
+
+```ts title="lib/auth-client.ts"
+import { createAuthClient } from "@better-auth-ui/solid"
+import { lastLoginMethodClient } from "better-auth/client/plugins" // [!code highlight]
+
+export const authClient = createAuthClient({
+  plugins: [
+    lastLoginMethodClient() // [!code highlight]
+  ]
+})
+```
+
+</Step>
+<Step>
+### Install the UI integration
+
+Install the Solid registry item:
+
+```bash
+bunx --bun shadcn@latest add https://better-auth-ui.com/r/solid/last-login-method.json
+```
+
+</Step>
+<Step>
+### Register the UI plugin
+
+Register the copied UI plugin with your auth provider:
+
+```tsx title="components/providers.tsx"
+import { lastLoginMethodPlugin } from "@/lib/auth/last-login-method-plugin" // [!code highlight]
+
+<AuthProvider
+  authClient={authClient}
+  navigate={navigate}
+  plugins={[
+    lastLoginMethodPlugin() // [!code highlight]
+  ]}
+>
+  {children}
+</AuthProvider>
+```
+
+</Step>
+</Steps>
+
+The sign-in view now marks the username or email control, or the matching social provider, when Better Auth has stored a previous method. Sign-up controls do not show the indicator.
+
+## Localization
+
+Override the full and compact labels through the UI plugin:
+
+```tsx
+lastLoginMethodPlugin({
+  localization: {
+    lastUsed: "Previously used",
+    lastUsedShort: "Previous"
+  }
+})
+```
+
+<auto-type-table path="../../../../../../packages/core/src/plugins/last-login-method/last-login-method-plugin.ts" name="LastLoginMethodPluginOptions" />
+
+<auto-type-table path="../../../../../../packages/core/src/plugins/last-login-method/last-login-method-localization.ts" name="LastLoginMethodLocalization" />
+
+## Custom methods
+
+Better Auth tracks email and social providers by default. If `customResolveMethod` stores another method, place the copied `<LastUsedBadge />` beside its sign-in control:
+
+```tsx
+import { LastUsedBadge } from "@/components/auth/last-login-method/last-used-badge"
+
+<LastUsedBadge method="magic-link" />
+```
+
+Pass an array when one control represents more than one stored method:
+
+```tsx
+<LastUsedBadge method={["email", "username"]} />
+```
+
+## Cookie consent
+
+Whether the plugin's browser-readable cookie is non-essential and requires consent depends on your jurisdiction and how your application uses it. Consult qualified legal counsel for guidance. When consent is required, configure Better Auth's `beforeStoreCookie` option to return a stored user-consent flag or an equivalent condition. Authentication still works when the hook returns `false`.

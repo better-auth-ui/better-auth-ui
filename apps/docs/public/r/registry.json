@@ -74,6 +74,7 @@
         "lucide-react"
       ],
       "registryDependencies": [
+        "badge",
         "button",
         "card",
         "input",
@@ -99,6 +100,30 @@
           "path": "src/components/auth/provider-buttons.tsx",
           "type": "registry:component",
           "target": "@components/auth/provider-buttons.tsx"
+        },
+        {
+          "path": "src/components/auth/last-login-method/last-used-badge.tsx",
+          "type": "registry:component",
+          "target": "@components/auth/last-login-method/last-used-badge.tsx"
+        }
+      ]
+    },
+    {
+      "name": "last-login-method",
+      "type": "registry:component",
+      "title": "Last Login Method",
+      "description": "Adds a localized last-used indicator to email and social sign-in methods tracked by Better Auth.",
+      "dependencies": [
+        "@better-auth-ui/react@latest",
+        "@better-auth-ui/core@latest",
+        "better-auth"
+      ],
+      "registryDependencies": ["https://better-auth-ui.com/r/sign-in.json"],
+      "files": [
+        {
+          "path": "src/lib/auth/last-login-method-plugin.ts",
+          "type": "registry:lib",
+          "target": "@lib/auth/last-login-method-plugin.ts"
         }
       ]
     },
@@ -115,6 +140,7 @@
         "lucide-react"
       ],
       "registryDependencies": [
+        "badge",
         "button",
         "card",
         "input",
@@ -139,6 +165,11 @@
           "path": "src/components/auth/provider-buttons.tsx",
           "type": "registry:component",
           "target": "@components/auth/provider-buttons.tsx"
+        },
+        {
+          "path": "src/components/auth/last-login-method/last-used-badge.tsx",
+          "type": "registry:component",
+          "target": "@components/auth/last-login-method/last-used-badge.tsx"
         }
       ]
     },
@@ -154,6 +185,7 @@
         "lucide-react"
       ],
       "registryDependencies": [
+        "badge",
         "button",
         "card",
         "input",
@@ -207,6 +239,11 @@
           "path": "src/components/auth/use-is-hydrated.ts",
           "type": "registry:component",
           "target": "@components/auth/use-is-hydrated.ts"
+        },
+        {
+          "path": "src/components/auth/last-login-method/last-used-badge.tsx",
+          "type": "registry:component",
+          "target": "@components/auth/last-login-method/last-used-badge.tsx"
         }
       ]
     },
@@ -223,6 +260,7 @@
         "lucide-react"
       ],
       "registryDependencies": [
+        "badge",
         "button",
         "card",
         "checkbox",
@@ -253,6 +291,11 @@
           "path": "src/components/auth/username/sign-in-username.tsx",
           "type": "registry:component",
           "target": "@components/auth/username/sign-in-username.tsx"
+        },
+        {
+          "path": "src/components/auth/last-login-method/last-used-badge.tsx",
+          "type": "registry:component",
+          "target": "@components/auth/last-login-method/last-used-badge.tsx"
         }
       ]
     },
@@ -1392,6 +1435,7 @@
         "https://better-auth-ui.com/r/auth-provider.json",
         "https://better-auth-ui.com/r/additional-field.json",
         "https://better-auth-ui.com/r/sign-in.json",
+        "https://better-auth-ui.com/r/last-login-method.json",
         "https://better-auth-ui.com/r/sign-up.json",
         "https://better-auth-ui.com/r/magic-link.json",
         "https://better-auth-ui.com/r/username.json",

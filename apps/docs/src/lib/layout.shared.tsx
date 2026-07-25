@@ -1,5 +1,11 @@
 import type { BaseLayoutProps } from "fumadocs-ui/layouts/shared"
-import { ArrowUpRight, Book, ClockArrowDown, ListTodo } from "lucide-react"
+import {
+  ArrowUpRight,
+  Book,
+  BookOpen,
+  ClockArrowDown,
+  ListTodo
+} from "lucide-react"
 import { Logo } from "@/components/icons/logo"
 
 export function baseOptions(): BaseLayoutProps {
@@ -17,6 +23,12 @@ export function baseOptions(): BaseLayoutProps {
     },
     githubUrl: "https://github.com/better-auth-ui/better-auth-ui",
     links: [
+      {
+        icon: <BookOpen />,
+        text: "Docs",
+        url: "/docs",
+        secondary: false
+      },
       {
         icon: <ArrowUpRight />,
         text: "Demo",

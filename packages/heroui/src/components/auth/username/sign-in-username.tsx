@@ -26,6 +26,7 @@ import { useIsMutating } from "@tanstack/react-query"
 import { type SyntheticEvent, useState } from "react"
 import { usernamePlugin } from "../../../lib/auth/username-plugin"
 import { FieldSeparator } from "../field-separator"
+import { LastUsedBadge } from "../last-login-method/last-used-badge"
 import { ProviderButtons, type SocialLayout } from "../provider-buttons"
 
 export interface SignInUsernameProps {
@@ -163,7 +164,7 @@ export function SignInUsername({
         {socialPosition === "top" && (
           <>
             {!!socialProviders?.length && (
-              <ProviderButtons socialLayout={socialLayout} />
+              <ProviderButtons socialLayout={socialLayout} view="signIn" />
             )}
 
             {showSeparator && (
@@ -251,12 +252,14 @@ export function SignInUsername({
             <div className="flex flex-col gap-3">
               <Button
                 type="submit"
-                className="w-full"
+                className="relative w-full overflow-visible"
                 isPending={isSignInPending || isPending}
               >
                 {isSignInPending && <Spinner color="current" size="sm" />}
 
                 {localization.auth.signIn}
+
+                <LastUsedBadge method={["email", "username"]} floating />
               </Button>
 
               {plugins.flatMap((plugin) =>
@@ -278,7 +281,7 @@ export function SignInUsername({
             )}
 
             {!!socialProviders?.length && (
-              <ProviderButtons socialLayout={socialLayout} />
+              <ProviderButtons socialLayout={socialLayout} view="signIn" />
             )}
           </>
         )}

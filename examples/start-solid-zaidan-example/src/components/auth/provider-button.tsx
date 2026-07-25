@@ -5,6 +5,8 @@ import type { ComponentProps } from "solid-js"
 import { createSignal } from "solid-js"
 import { Button } from "@/components/ui/button"
 import { Spinner } from "@/components/ui/spinner"
+import { cn } from "@/lib/utils"
+import { LastUsedBadge } from "./last-login-method/last-used-badge"
 import { resolveSocialAuthParams, type SocialAuthView } from "./sign-in-path"
 
 export type ProviderButtonProps = {
@@ -84,8 +86,7 @@ export function ProviderButton(props: ProviderButtonProps) {
 
   return (
     <Button
-      aria-label={providerName()}
-      class={props.class}
+      class={cn("relative overflow-visible", props.class)}
       disabled={isPending()}
       onClick={signInSocial}
       type="button"
@@ -99,6 +100,12 @@ export function ProviderButton(props: ProviderButtonProps) {
           : display() === "name"
             ? providerName()
             : null}
+      {display() === "icon" || isPending() ? (
+        <span class="sr-only">{label()}</span>
+      ) : null}
+      {(props.view ?? "signIn") !== "signUp" ? (
+        <LastUsedBadge floating method={props.provider} />
+      ) : null}
     </Button>
   )
 }

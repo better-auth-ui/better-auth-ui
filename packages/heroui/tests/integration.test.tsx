@@ -21,7 +21,9 @@ const pluginsExports = [
   "MagicLink",
   "Passkeys",
   "SignInUsername",
+  "LastUsedBadge",
   "UsernameField",
+  "lastLoginMethodPlugin",
   "magicLinkPlugin",
   "passkeyPlugin",
   "usernamePlugin"

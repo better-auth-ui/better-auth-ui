@@ -106,6 +106,7 @@ const expectedSolidRegistryPayloadNames = [
   "auth-provider",
   "additional-field",
   "sign-in",
+  "last-login-method",
   "sign-up",
   "magic-link",
   "username",
@@ -733,6 +734,7 @@ describe("Solid registry isolation", () => {
       "src/components/auth/sign-up.tsx",
       "src/components/auth/provider-button.tsx",
       "src/components/auth/provider-buttons.tsx",
+      "src/components/auth/last-login-method/last-used-badge.tsx",
       "src/lib/utils.ts"
     ])
     expect(signUp.files.map((file) => file.path)).not.toEqual(
@@ -2311,6 +2313,7 @@ describe("Solid registry isolation", () => {
       "multi-session",
       "api-key",
       "delete-user",
+      "last-login-method",
       "magic-link",
       "theme"
     ]
@@ -2533,6 +2536,7 @@ describe("Solid registry isolation", () => {
       "api-key",
       "captcha",
       "delete-user",
+      "last-login-method",
       "magic-link",
       "multi-session",
       "organization",
@@ -2804,6 +2808,7 @@ describe("Solid registry isolation", () => {
       "multi-session",
       "api-key",
       "delete-user",
+      "last-login-method",
       "magic-link",
       "theme"
     ]
@@ -2942,6 +2947,7 @@ describe("Solid registry isolation", () => {
         )
       } else if (
         name === "delete-user" ||
+        name === "last-login-method" ||
         name === "magic-link" ||
         name === "multi-session" ||
         name === "theme" ||
@@ -2959,7 +2965,12 @@ describe("Solid registry isolation", () => {
         )
       }
 
-      if (name !== "delete-user" && name !== "theme" && name !== "username") {
+      if (
+        name !== "delete-user" &&
+        name !== "last-login-method" &&
+        name !== "theme" &&
+        name !== "username"
+      ) {
         expect(page, `plugin ${name} should link Solid runtime docs`).toContain(
           "/docs/solid"
         )

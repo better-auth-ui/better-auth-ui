@@ -1,23 +1,28 @@
 name: Release
 
-# Add manual trigger
 on:
-  workflow_dispatch:
+  workflow_call:
+    outputs:
+      sha:
+        description: Commit containing the released package versions
+        value: ${{ jobs.release.outputs.sha }}
 
 jobs:
   release:
-    # prevents this action from running on forks
     if: github.repository == 'better-auth-ui/better-auth-ui'
     name: Create Release
     runs-on: ubuntu-latest
+    outputs:
+      sha: ${{ steps.release-ref.outputs.sha }}
     permissions:
-      contents: write #allows to push commits to the repo
+      contents: write
     steps:
       - name: Checkout
         uses: actions/checkout@v5
         with:
           fetch-depth: 0
           filter: tree:0
+          ref: main
 
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2
@@ -33,7 +38,19 @@ jobs:
           git config --global user.email "${{ github.actor_id }}+${{ github.actor }}@users.noreply.github.com"
 
       - name: Release
-        run: |
-          bun nx release
+        run: bun nx release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Resolve release commit
+        id: release-ref
+        run: |
+          release_sha="$(git rev-parse HEAD)"
+          git fetch origin main
+
+          if ! git merge-base --is-ancestor "$release_sha" origin/main; then
+            echo "Release commit $release_sha is not available on main." >&2
+            exit 1
+          fi
+
+          echo "sha=$release_sha" >> "$GITHUB_OUTPUT"

@@ -101,7 +101,7 @@ export function MagicLink({
           {socialPosition === "top" && (
             <>
               {socialProviders && socialProviders.length > 0 && (
-                <ProviderButtons socialLayout={socialLayout} />
+                <ProviderButtons socialLayout={socialLayout} view="magicLink" />
               )}
 
               {showSeparator && (
@@ -178,7 +178,7 @@ export function MagicLink({
               )}
 
               {socialProviders && socialProviders.length > 0 && (
-                <ProviderButtons socialLayout={socialLayout} />
+                <ProviderButtons socialLayout={socialLayout} view="magicLink" />
               )}
             </>
           )}
