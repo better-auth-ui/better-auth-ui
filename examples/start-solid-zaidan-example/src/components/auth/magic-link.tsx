@@ -12,7 +12,6 @@ import type { AuthPlugin } from "@better-auth-ui/solid/plugins"
 import { createMutation } from "@tanstack/solid-query"
 import { Link } from "@tanstack/solid-router"
 import { type Component, createSignal, For, Show } from "solid-js"
-import { OpenEmailButton } from "@/components/auth/open-email-button"
 import {
   ProviderButtons,
   type SocialLayout
@@ -47,9 +46,17 @@ export function MagicLink(props: MagicLinkProps) {
       | Partial<MagicLinkLocalization>
       | undefined)
   })
-  const signInMagicLink = createMutation(() =>
-    signInMagicLinkOptions(auth.authClient as MagicLinkAuthClient)
-  )
+  const magicLinkSentPath = () =>
+    magicLinkPluginConfig()?.viewPaths?.auth?.magicLinkSent ?? "magic-link-sent"
+  const signInMagicLink = createMutation(() => ({
+    ...signInMagicLinkOptions(auth.authClient as MagicLinkAuthClient),
+    onSuccess: () => {
+      sessionStorage.setItem("better-auth-ui.magic-link-sent", email())
+      auth.navigate({
+        to: `${auth.basePaths.auth}/${magicLinkSentPath()}`
+      })
+    }
+  }))
   const showSeparator = () => Boolean(auth.socialProviders?.length)
   const socialPosition = () => props.socialPosition ?? "bottom"
 
@@ -67,93 +74,77 @@ export function MagicLink(props: MagicLinkProps) {
     <Card class={cn("w-full max-w-sm", props.class)}>
       <CardHeader>
         <CardTitle class="text-xl font-semibold">
-          {signInMagicLink.isSuccess
-            ? auth.localization.auth.checkYourEmailTitle
-            : auth.localization.auth.signIn}
+          {auth.localization.auth.signIn}
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <Show when={signInMagicLink.isSuccess}>
-          <div class="flex flex-col gap-4">
-            <p class="text-sm text-muted-foreground" role="status">
-              {magicLinkLabels().magicLinkSentTo.replace("{{email}}", email())}
-            </p>
-
-            <OpenEmailButton email={email()} />
-          </div>
-        </Show>
-
-        <Show when={!signInMagicLink.isSuccess}>
-          <div class="flex flex-col gap-6">
-            <Show
-              when={socialPosition() === "top" && auth.socialProviders?.length}
-            >
-              <ProviderButtons socialLayout={props.socialLayout} />
-              <Show when={showSeparator()}>
-                <div class="text-center text-muted-foreground text-xs">
-                  {auth.localization.auth.or}
-                </div>
-              </Show>
-            </Show>
-            <form aria-label="Magic link" onSubmit={submitMagicLink}>
-              <div class="grid gap-3">
-                <Label for="magic-link-email">
-                  {auth.localization.auth.email}
-                </Label>
-                <Input
-                  aria-invalid={Boolean(emailError())}
-                  autocomplete="email"
-                  disabled={signInMagicLink.isPending}
-                  id="magic-link-email"
-                  name="email"
-                  onInput={(event) => {
-                    setEmail(event.currentTarget.value)
-                    setEmailError(undefined)
-                  }}
-                  onInvalid={(event) => {
-                    event.preventDefault()
-                    setEmailError(event.currentTarget.validationMessage)
-                  }}
-                  placeholder={auth.localization.auth.emailPlaceholder}
-                  required
-                  type="email"
-                  value={email()}
-                />
-                <Show when={emailError()}>
-                  {(message) => <p role="alert">{message()}</p>}
-                </Show>
-                <div class="flex flex-col gap-3">
-                  <Button disabled={signInMagicLink.isPending} type="submit">
-                    {magicLinkLabels().sendMagicLink}
-                  </Button>
-
-                  <For
-                    each={(auth.plugins as AuthPluginWithButtons[]).flatMap(
-                      (plugin) =>
-                        (plugin.authButtons ?? []).map((AuthButton) => ({
-                          AuthButton
-                        }))
-                    )}
-                  >
-                    {({ AuthButton }) => <AuthButton view="magicLink" />}
-                  </For>
-                </div>
+        <div class="flex flex-col gap-6">
+          <Show
+            when={socialPosition() === "top" && auth.socialProviders?.length}
+          >
+            <ProviderButtons socialLayout={props.socialLayout} />
+            <Show when={showSeparator()}>
+              <div class="text-center text-muted-foreground text-xs">
+                {auth.localization.auth.or}
               </div>
-            </form>
-            <Show
-              when={
-                socialPosition() === "bottom" && auth.socialProviders?.length
-              }
-            >
-              <Show when={showSeparator()}>
-                <div class="text-center text-muted-foreground text-xs">
-                  {auth.localization.auth.or}
-                </div>
-              </Show>
-              <ProviderButtons socialLayout={props.socialLayout} />
             </Show>
-          </div>
-        </Show>
+          </Show>
+          <form aria-label="Magic link" onSubmit={submitMagicLink}>
+            <div class="grid gap-3">
+              <Label for="magic-link-email">
+                {auth.localization.auth.email}
+              </Label>
+              <Input
+                aria-invalid={Boolean(emailError())}
+                autocomplete="email"
+                disabled={signInMagicLink.isPending}
+                id="magic-link-email"
+                name="email"
+                onInput={(event) => {
+                  setEmail(event.currentTarget.value)
+                  setEmailError(undefined)
+                }}
+                onInvalid={(event) => {
+                  event.preventDefault()
+                  setEmailError(event.currentTarget.validationMessage)
+                }}
+                placeholder={auth.localization.auth.emailPlaceholder}
+                required
+                type="email"
+                value={email()}
+              />
+              <Show when={emailError()}>
+                {(message) => <p role="alert">{message()}</p>}
+              </Show>
+              <div class="flex flex-col gap-3">
+                <Button disabled={signInMagicLink.isPending} type="submit">
+                  {magicLinkLabels().sendMagicLink}
+                </Button>
+
+                <For
+                  each={(auth.plugins as AuthPluginWithButtons[]).flatMap(
+                    (plugin) =>
+                      (plugin.authButtons ?? []).map((AuthButton) => ({
+                        AuthButton
+                      }))
+                  )}
+                >
+                  {({ AuthButton }) => <AuthButton view="magicLink" />}
+                </For>
+              </div>
+            </div>
+          </form>
+          <Show
+            when={socialPosition() === "bottom" && auth.socialProviders?.length}
+          >
+            <Show when={showSeparator()}>
+              <div class="text-center text-muted-foreground text-xs">
+                {auth.localization.auth.or}
+              </div>
+            </Show>
+            <ProviderButtons socialLayout={props.socialLayout} />
+          </Show>
+        </div>
         <Show when={auth.emailAndPassword?.enabled}>
           <p class="mt-4 text-center text-muted-foreground text-sm">
             {auth.localization.auth.needToCreateAnAccount}{" "}

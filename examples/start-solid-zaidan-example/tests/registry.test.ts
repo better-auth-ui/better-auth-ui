@@ -2132,11 +2132,17 @@ describe("Solid registry isolation", () => {
     expect(forgotPassword.files[0]?.content).toContain(
       "requestPasswordResetOptions"
     )
-    expect(forgotPassword.files[0]?.content).toContain("resetLinkSentTo")
-    expect(forgotPassword.files[0]?.content).toContain("OpenEmailButton")
+    expect(forgotPassword.files[0]?.content).toContain(
+      "better-auth-ui.reset-link-sent"
+    )
     expect(forgotPassword.files[0]?.content).toContain(
       "Unable to send a reset link. Try again."
     )
+    expect(forgotPassword.files[1]?.path).toBe(
+      "src/components/auth/reset-link-sent.tsx"
+    )
+    expect(forgotPassword.files[1]?.content).toContain("resetLinkSentTo")
+    expect(forgotPassword.files[1]?.content).toContain("OpenEmailButton")
 
     const resetPassword = readJson<{
       dependencies: string[]

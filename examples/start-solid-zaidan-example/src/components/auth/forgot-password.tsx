@@ -7,7 +7,6 @@ import type { AuthPlugin } from "@better-auth-ui/solid/plugins"
 import { createMutation } from "@tanstack/solid-query"
 import { Link } from "@tanstack/solid-router"
 import { createSignal, Show } from "solid-js"
-import { OpenEmailButton } from "@/components/auth/open-email-button"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -28,6 +27,12 @@ export function ForgotPassword(props: ForgotPasswordProps) {
     ...requestPasswordResetOptions(auth.authClient),
     onError: () => {
       resetFetchOptions()
+    },
+    onSuccess: () => {
+      sessionStorage.setItem("better-auth-ui.reset-link-sent", email())
+      auth.navigate({
+        to: `${auth.basePaths.auth}/${auth.viewPaths.auth.resetLinkSent}`
+      })
     }
   }))
 
@@ -49,73 +54,56 @@ export function ForgotPassword(props: ForgotPasswordProps) {
     <Card class={cn("w-full max-w-sm", props.class)}>
       <CardHeader>
         <CardTitle class="text-xl font-semibold">
-          {requestReset.isSuccess
-            ? auth.localization.auth.checkYourEmailTitle
-            : auth.localization.auth.forgotPassword}
+          {auth.localization.auth.forgotPassword}
         </CardTitle>
       </CardHeader>
 
       <CardContent>
-        <Show when={requestReset.isSuccess}>
-          <div class="flex flex-col gap-4">
-            <p class="text-sm text-muted-foreground" role="status">
-              {auth.localization.auth.resetLinkSentTo.replace(
-                "{{email}}",
-                email()
-              )}
-            </p>
+        <form aria-label="Forgot password" onSubmit={submitPasswordReset}>
+          <div class="flex flex-col gap-6">
+            <div class="grid gap-3">
+              <Label for="forgot-password-email">
+                {auth.localization.auth.email}
+              </Label>
+              <Input
+                aria-invalid={Boolean(emailError())}
+                id="forgot-password-email"
+                name="email"
+                onInput={(event) => {
+                  setEmail(event.currentTarget.value)
+                  setEmailError(undefined)
+                }}
+                onInvalid={(event) => {
+                  event.preventDefault()
+                  setEmailError(event.currentTarget.validationMessage)
+                }}
+                placeholder={auth.localization.auth.emailPlaceholder}
+                required
+                type="email"
+                value={email()}
+              />
 
-            <OpenEmailButton email={email()} />
-          </div>
-        </Show>
-
-        <Show when={!requestReset.isSuccess}>
-          <form aria-label="Forgot password" onSubmit={submitPasswordReset}>
-            <div class="flex flex-col gap-6">
-              <div class="grid gap-3">
-                <Label for="forgot-password-email">
-                  {auth.localization.auth.email}
-                </Label>
-                <Input
-                  aria-invalid={Boolean(emailError())}
-                  id="forgot-password-email"
-                  name="email"
-                  onInput={(event) => {
-                    setEmail(event.currentTarget.value)
-                    setEmailError(undefined)
-                  }}
-                  onInvalid={(event) => {
-                    event.preventDefault()
-                    setEmailError(event.currentTarget.validationMessage)
-                  }}
-                  placeholder={auth.localization.auth.emailPlaceholder}
-                  required
-                  type="email"
-                  value={email()}
-                />
-
-                <Show when={emailError()}>
-                  {(message) => (
-                    <p class="text-sm text-destructive" role="alert">
-                      {message()}
-                    </p>
-                  )}
-                </Show>
-              </div>
-              <Show when={captchaComponent()} keyed>
-                {(Captcha) => <Captcha />}
-              </Show>
-              <Button disabled={requestReset.isPending} type="submit">
-                {requestReset.isPending
-                  ? `${auth.localization.auth.sendResetLink}…`
-                  : auth.localization.auth.sendResetLink}
-              </Button>
-              <Show when={requestReset.isError}>
-                <p role="alert">Unable to send a reset link. Try again.</p>
+              <Show when={emailError()}>
+                {(message) => (
+                  <p class="text-sm text-destructive" role="alert">
+                    {message()}
+                  </p>
+                )}
               </Show>
             </div>
-          </form>
-        </Show>
+            <Show when={captchaComponent()} keyed>
+              {(Captcha) => <Captcha />}
+            </Show>
+            <Button disabled={requestReset.isPending} type="submit">
+              {requestReset.isPending
+                ? `${auth.localization.auth.sendResetLink}…`
+                : auth.localization.auth.sendResetLink}
+            </Button>
+            <Show when={requestReset.isError}>
+              <p role="alert">Unable to send a reset link. Try again.</p>
+            </Show>
+          </div>
+        </form>
 
         <div class="mt-4 flex w-full flex-col items-center gap-3">
           <p class="text-center text-sm text-muted-foreground">

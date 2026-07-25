@@ -179,6 +179,11 @@
           "target": "@components/auth/magic-link.tsx"
         },
         {
+          "path": "src/components/auth/magic-link-sent.tsx",
+          "type": "registry:component",
+          "target": "@components/auth/magic-link-sent.tsx"
+        },
+        {
           "path": "src/components/auth/magic-link-button.tsx",
           "type": "registry:component",
           "target": "@components/auth/magic-link-button.tsx"
@@ -767,6 +772,11 @@
           "path": "src/components/auth/forgot-password.tsx",
           "type": "registry:component",
           "target": "@components/auth/forgot-password.tsx"
+        },
+        {
+          "path": "src/components/auth/reset-link-sent.tsx",
+          "type": "registry:component",
+          "target": "@components/auth/reset-link-sent.tsx"
         },
         {
           "path": "src/components/auth/open-email-button.tsx",

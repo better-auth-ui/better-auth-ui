@@ -4,6 +4,7 @@ import type { CardProps } from "@heroui/react"
 import { type ComponentType, useEffect } from "react"
 import { ForgotPassword } from "./forgot-password"
 import type { SocialLayout } from "./provider-buttons"
+import { ResetLinkSent } from "./reset-link-sent"
 import { ResetPassword } from "./reset-password"
 import { SignIn } from "./sign-in"
 import { SignOut } from "./sign-out"
@@ -25,7 +26,12 @@ export type AuthProps = {
  * When it's disabled, the `<Auth>` router redirects these to `signIn` so a
  * plugin's `fallbackViews.auth.signIn` (e.g. magic link) takes over.
  */
-const PASSWORD_ONLY_VIEWS = ["signUp", "forgotPassword", "resetPassword"]
+const PASSWORD_ONLY_VIEWS = [
+  "signUp",
+  "forgotPassword",
+  "resetPassword",
+  "resetLinkSent"
+]
 
 const AUTH_VIEWS: Partial<Record<AuthView, ComponentType<AuthProps>>> = {
   signIn: SignIn,
@@ -33,6 +39,7 @@ const AUTH_VIEWS: Partial<Record<AuthView, ComponentType<AuthProps>>> = {
   signUp: SignUp,
   forgotPassword: ForgotPassword,
   resetPassword: ResetPassword,
+  resetLinkSent: ResetLinkSent,
   verifyEmail: VerifyEmail
 }
 

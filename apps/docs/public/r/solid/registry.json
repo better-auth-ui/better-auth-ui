@@ -215,6 +215,10 @@
           "type": "registry:component"
         },
         {
+          "path": "src/components/auth/magic-link-sent.tsx",
+          "type": "registry:component"
+        },
+        {
           "path": "src/components/auth/magic-link-button.tsx",
           "type": "registry:component"
         },
@@ -442,6 +446,10 @@
       "files": [
         {
           "path": "src/components/auth/forgot-password.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/components/auth/reset-link-sent.tsx",
           "type": "registry:component"
         },
         {

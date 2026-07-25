@@ -19,7 +19,6 @@ import {
 import { Input } from "@/components/ui/input"
 import { Spinner } from "@/components/ui/spinner"
 import { cn } from "@/lib/utils"
-import { OpenEmailButton } from "./open-email-button"
 
 export type ForgotPasswordProps = {
   className?: string
@@ -29,8 +28,9 @@ export type ForgotPasswordProps = {
  * Render a card-based "Forgot Password" form that sends a password-reset email.
  *
  * The form displays an email input, submit button, and a link back to sign-in.
- * After a successful request the form is replaced with an email-sent view that
- * keeps the submitted address and offers to open the user's email provider.
+ * After a successful request the submitted email is stored in `sessionStorage`
+ * and the user is redirected to the reset-link-sent view, which offers to open
+ * their email provider.
  *
  * @param className - Optional additional CSS class names applied to the card
  * @returns The forgot-password form UI as a JSX element
@@ -41,13 +41,13 @@ export function ForgotPassword({ className }: ForgotPasswordProps) {
     baseURL,
     basePaths,
     localization,
+    navigate,
     plugins,
     viewPaths,
     Link
   } = useAuth()
 
   const { fetchOptions, resetFetchOptions } = useFetchOptions()
-  const [sentEmail, setSentEmail] = useState("")
 
   const { mutate: requestPasswordReset, isPending } = useRequestPasswordReset(
     authClient,
@@ -56,7 +56,8 @@ export function ForgotPassword({ className }: ForgotPasswordProps) {
         resetFetchOptions()
       },
       onSuccess: (_data, { email }) => {
-        setSentEmail(email)
+        sessionStorage.setItem("better-auth-ui.reset-link-sent", email)
+        navigate({ to: `${basePaths.auth}/${viewPaths.auth.resetLinkSent}` })
       }
     }
   )
@@ -83,76 +84,59 @@ export function ForgotPassword({ className }: ForgotPasswordProps) {
     <Card className={cn("w-full max-w-sm", className)}>
       <CardHeader>
         <CardTitle className="text-xl font-semibold">
-          {sentEmail
-            ? localization.auth.checkYourEmailTitle
-            : localization.auth.forgotPassword}
+          {localization.auth.forgotPassword}
         </CardTitle>
       </CardHeader>
 
       <CardContent>
-        {sentEmail ? (
-          <div className="flex flex-col gap-4">
-            <FieldDescription>
-              {localization.auth.resetLinkSentTo.replace(
-                "{{email}}",
-                sentEmail
-              )}
-            </FieldDescription>
+        <form onSubmit={handleSubmit}>
+          <FieldGroup>
+            <Field data-invalid={!!fieldErrors.email}>
+              <FieldLabel htmlFor="email">{localization.auth.email}</FieldLabel>
 
-            <OpenEmailButton email={sentEmail} />
-          </div>
-        ) : (
-          <form onSubmit={handleSubmit}>
-            <FieldGroup>
-              <Field data-invalid={!!fieldErrors.email}>
-                <FieldLabel htmlFor="email">
-                  {localization.auth.email}
-                </FieldLabel>
+              <Input
+                id="email"
+                name="email"
+                type="email"
+                autoComplete="email"
+                placeholder={localization.auth.emailPlaceholder}
+                required
+                disabled={isPending}
+                onChange={() => {
+                  setFieldErrors((prev) => ({
+                    ...prev,
+                    email: undefined
+                  }))
+                }}
+                onInvalid={(e) => {
+                  e.preventDefault()
+                  const el = e.target as HTMLInputElement
+                  const msg = el.validity.valueMissing
+                    ? localization.auth.fieldRequired
+                    : localization.auth.invalidEmail
 
-                <Input
-                  id="email"
-                  name="email"
-                  type="email"
-                  autoComplete="email"
-                  placeholder={localization.auth.emailPlaceholder}
-                  required
-                  disabled={isPending}
-                  onChange={() => {
-                    setFieldErrors((prev) => ({
-                      ...prev,
-                      email: undefined
-                    }))
-                  }}
-                  onInvalid={(e) => {
-                    e.preventDefault()
-                    const el = e.target as HTMLInputElement
-                    const msg = el.validity.valueMissing
-                      ? localization.auth.fieldRequired
-                      : localization.auth.invalidEmail
+                  setFieldErrors((prev) => ({
+                    ...prev,
+                    email: msg
+                  }))
+                }}
+                aria-invalid={!!fieldErrors.email}
+              />
 
-                    setFieldErrors((prev) => ({
-                      ...prev,
-                      email: msg
-                    }))
-                  }}
-                  aria-invalid={!!fieldErrors.email}
-                />
+              <FieldError>{fieldErrors.email}</FieldError>
+            </Field>
 
-                <FieldError>{fieldErrors.email}</FieldError>
-              </Field>
+            {Captcha && <div className="flex justify-center">{Captcha}</div>}
 
-              {Captcha && <div className="flex justify-center">{Captcha}</div>}
+            <div className="flex flex-col gap-3">
+              <Button type="submit" disabled={isPending}>
+                {isPending && <Spinner />}
 
-              <div className="flex flex-col gap-3">
-                <Button type="submit" disabled={isPending}>
-                  {isPending && <Spinner />}
-
-                  {localization.auth.sendResetLink}
-                </Button>
-              </div>
-            </FieldGroup>
-          </form>
-        )}
+                {localization.auth.sendResetLink}
+              </Button>
+            </div>
+          </FieldGroup>
+        </form>
 
         <div className="flex flex-col gap-3 items-center w-full mt-4">
           <FieldDescription className="text-center">

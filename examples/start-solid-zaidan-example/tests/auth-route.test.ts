@@ -1342,7 +1342,7 @@ describe("Solid auth route component selection", () => {
     expect(magicLink).not.toContain("className?: string")
     expect(magicLink).toContain('class={cn("w-full max-w-sm", props.class)}')
     expect(magicLink).toContain("magicLinkLabels().sendMagicLink")
-    expect(magicLink).toContain("magicLinkLabels().magicLinkSent")
+    expect(magicLink).toContain("better-auth-ui.magic-link-sent")
     expect(magicLink).toContain('view="magicLink"')
     expect(magicLink).toContain("auth.plugins as AuthPluginWithButtons[]")
     expect(magicLinkButton).toContain('view === "magicLink"')

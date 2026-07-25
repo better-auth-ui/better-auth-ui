@@ -17,9 +17,7 @@ import {
   Spinner,
   TextField
 } from "@heroui/react"
-import { type SyntheticEvent, useState } from "react"
-
-import { OpenEmailButton } from "./open-email-button"
+import type { SyntheticEvent } from "react"
 
 export type ForgotPasswordProps = {
   className?: string
@@ -30,19 +28,25 @@ export type ForgotPasswordProps = {
  * Render a card-based "Forgot Password" form that sends a password-reset email.
  *
  * The form displays an email input, submit button, and a link back to sign-in.
- * After a successful request the form is replaced with an email-sent view that
- * keeps the submitted address and offers to open the user's email provider.
- * Errors are handled globally by `ErrorToaster`.
+ * After a successful request the submitted email is stored in `sessionStorage`
+ * and the user is redirected to the reset-link-sent view, which offers to open
+ * their email provider. Errors are handled globally by `ErrorToaster`.
  *
  * @param className - Optional additional CSS class names applied to the card
  * @returns The forgot-password form UI as a JSX element
  */
 export function ForgotPassword({ className, variant }: ForgotPasswordProps) {
-  const { authClient, baseURL, basePaths, localization, viewPaths, plugins } =
-    useAuth()
+  const {
+    authClient,
+    baseURL,
+    basePaths,
+    localization,
+    viewPaths,
+    navigate,
+    plugins
+  } = useAuth()
 
   const { fetchOptions, resetFetchOptions } = useFetchOptions()
-  const [sentEmail, setSentEmail] = useState("")
 
   const { mutate: requestPasswordReset, isPending } = useRequestPasswordReset(
     authClient,
@@ -51,7 +55,8 @@ export function ForgotPassword({ className, variant }: ForgotPasswordProps) {
         resetFetchOptions()
       },
       onSuccess: (_data, { email }) => {
-        setSentEmail(email)
+        sessionStorage.setItem("better-auth-ui.reset-link-sent", email)
+        navigate({ to: `${basePaths.auth}/${viewPaths.auth.resetLinkSent}` })
       }
     }
   )
@@ -78,59 +83,44 @@ export function ForgotPassword({ className, variant }: ForgotPasswordProps) {
     >
       <Card.Header>
         <Card.Title className="text-xl font-semibold mb-1">
-          {sentEmail
-            ? localization.auth.checkYourEmailTitle
-            : localization.auth.forgotPassword}
+          {localization.auth.forgotPassword}
         </Card.Title>
       </Card.Header>
 
       <Card.Content className="gap-4">
-        {sentEmail ? (
-          <>
-            <Description className="text-sm">
-              {localization.auth.resetLinkSentTo.replace(
-                "{{email}}",
-                sentEmail
-              )}
-            </Description>
+        <Form onSubmit={handleSubmit} className="flex flex-col gap-4">
+          <TextField
+            name="email"
+            type="email"
+            autoComplete="email"
+            isDisabled={isPending}
+            validate={(value) => {
+              if (!value) return localization.auth.fieldRequired
+              if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value))
+                return localization.auth.invalidEmail
+            }}
+          >
+            <Label>{localization.auth.email}</Label>
 
-            <OpenEmailButton email={sentEmail} />
-          </>
-        ) : (
-          <Form onSubmit={handleSubmit} className="flex flex-col gap-4">
-            <TextField
-              name="email"
-              type="email"
-              autoComplete="email"
-              isDisabled={isPending}
-              validate={(value) => {
-                if (!value) return localization.auth.fieldRequired
-                if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value))
-                  return localization.auth.invalidEmail
-              }}
-            >
-              <Label>{localization.auth.email}</Label>
+            <Input
+              placeholder={localization.auth.emailPlaceholder}
+              required
+              variant={variant === "transparent" ? "primary" : "secondary"}
+            />
 
-              <Input
-                placeholder={localization.auth.emailPlaceholder}
-                required
-                variant={variant === "transparent" ? "primary" : "secondary"}
-              />
+            <FieldError />
+          </TextField>
 
-              <FieldError />
-            </TextField>
+          {Captcha && <div className="flex justify-center">{Captcha}</div>}
 
-            {Captcha && <div className="flex justify-center">{Captcha}</div>}
+          <div className="flex flex-col gap-3">
+            <Button type="submit" className="w-full" isPending={isPending}>
+              {isPending && <Spinner color="current" size="sm" />}
 
-            <div className="flex flex-col gap-3">
-              <Button type="submit" className="w-full" isPending={isPending}>
-                {isPending && <Spinner color="current" size="sm" />}
-
-                {localization.auth.sendResetLink}
-              </Button>
-            </div>
-          </Form>
-        )}
+              {localization.auth.sendResetLink}
+            </Button>
+          </div>
+        </Form>
       </Card.Content>
 
       <Card.Footer className="flex-col gap-3">

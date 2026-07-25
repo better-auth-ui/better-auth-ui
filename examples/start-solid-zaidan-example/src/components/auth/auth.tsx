@@ -6,6 +6,7 @@ import { Dynamic } from "solid-js/web"
 
 import { ForgotPassword } from "./forgot-password"
 import type { SocialLayout } from "./provider-buttons"
+import { ResetLinkSent } from "./reset-link-sent"
 import { ResetPassword } from "./reset-password"
 import { SignIn } from "./sign-in"
 import { SignOut } from "./sign-out"
@@ -40,7 +41,8 @@ type AuthPluginWithViews = {
 const passwordOnlyViews: AuthView[] = [
   "signUp",
   "forgotPassword",
-  "resetPassword"
+  "resetPassword",
+  "resetLinkSent"
 ]
 
 const authRouteComponents: Partial<Record<string, SupportedAuthRoute>> = {
@@ -60,6 +62,10 @@ const authRouteComponents: Partial<Record<string, SupportedAuthRoute>> = {
   [viewPaths.auth.resetPassword]: {
     component: ResetPassword,
     title: "Reset password"
+  },
+  [viewPaths.auth.resetLinkSent]: {
+    component: ResetLinkSent,
+    title: "Reset link sent"
   },
   [viewPaths.auth.verifyEmail]: {
     component: VerifyEmail,

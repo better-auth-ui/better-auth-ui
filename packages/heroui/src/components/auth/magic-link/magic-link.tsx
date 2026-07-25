@@ -24,7 +24,6 @@ import { type SyntheticEvent, useState } from "react"
 
 import { magicLinkPlugin } from "../../../lib/auth/magic-link-plugin"
 import { FieldSeparator } from "../field-separator"
-import { OpenEmailButton } from "../open-email-button"
 import { ProviderButtons, type SocialLayout } from "../provider-buttons"
 
 export type MagicLinkProps = {
@@ -53,20 +52,27 @@ export function MagicLink({
     baseURL,
     emailAndPassword,
     localization,
+    navigate,
     plugins,
     redirectTo,
     socialProviders,
     viewPaths
   } = useAuth()
-  const { localization: magicLinkLocalization } = useAuthPlugin(magicLinkPlugin)
+  const { localization: magicLinkLocalization, viewPaths: magicLinkViewPaths } =
+    useAuthPlugin(magicLinkPlugin)
 
   const [email, setEmail] = useState("")
-  const [sentEmail, setSentEmail] = useState("")
 
   const { mutate: signInMagicLink, isPending: signInMagicLinkPending } =
     useSignInMagicLink(authClient as MagicLinkAuthClient, {
       onSuccess: (_data, variables) => {
-        setSentEmail(variables.email)
+        sessionStorage.setItem(
+          "better-auth-ui.magic-link-sent",
+          variables.email
+        )
+        navigate({
+          to: `${basePaths.auth}/${magicLinkViewPaths.auth.magicLinkSent}`
+        })
       }
     })
 
@@ -92,90 +98,73 @@ export function MagicLink({
     >
       <Card.Header>
         <Card.Title className="text-xl font-semibold mb-1">
-          {sentEmail
-            ? localization.auth.checkYourEmailTitle
-            : localization.auth.signIn}
+          {localization.auth.signIn}
         </Card.Title>
       </Card.Header>
 
-      {sentEmail ? (
-        <Card.Content className="gap-4">
-          <Description className="text-sm">
-            {magicLinkLocalization.magicLinkSentTo.replace(
-              "{{email}}",
-              sentEmail
+      <Card.Content className="gap-4">
+        {socialPosition === "top" && (
+          <>
+            {!!socialProviders?.length && (
+              <ProviderButtons socialLayout={socialLayout} />
             )}
-          </Description>
 
-          <OpenEmailButton email={sentEmail} />
-        </Card.Content>
-      ) : (
-        <Card.Content className="gap-4">
-          {socialPosition === "top" && (
-            <>
-              {!!socialProviders?.length && (
-                <ProviderButtons socialLayout={socialLayout} />
-              )}
+            {showSeparator && (
+              <FieldSeparator>{localization.auth.or}</FieldSeparator>
+            )}
+          </>
+        )}
 
-              {showSeparator && (
-                <FieldSeparator>{localization.auth.or}</FieldSeparator>
-              )}
-            </>
-          )}
+        <Form onSubmit={handleSubmit} className="flex flex-col gap-4">
+          <TextField
+            name="email"
+            type="email"
+            autoComplete="email"
+            isDisabled={isPending}
+            value={email}
+            onChange={setEmail}
+          >
+            <Label>{localization.auth.email}</Label>
 
-          <Form onSubmit={handleSubmit} className="flex flex-col gap-4">
-            <TextField
-              name="email"
-              type="email"
-              autoComplete="email"
-              isDisabled={isPending}
-              value={email}
-              onChange={setEmail}
-            >
-              <Label>{localization.auth.email}</Label>
+            <Input
+              placeholder={localization.auth.emailPlaceholder}
+              required
+              variant={variant === "transparent" ? "primary" : "secondary"}
+            />
 
-              <Input
-                placeholder={localization.auth.emailPlaceholder}
-                required
-                variant={variant === "transparent" ? "primary" : "secondary"}
-              />
+            <FieldError />
+          </TextField>
 
-              <FieldError />
-            </TextField>
+          <div className="flex flex-col gap-3">
+            <Button type="submit" className="w-full" isPending={isPending}>
+              {signInMagicLinkPending && <Spinner color="current" size="sm" />}
 
-            <div className="flex flex-col gap-3">
-              <Button type="submit" className="w-full" isPending={isPending}>
-                {signInMagicLinkPending && (
-                  <Spinner color="current" size="sm" />
-                )}
+              {magicLinkLocalization.sendMagicLink}
+            </Button>
 
-                {magicLinkLocalization.sendMagicLink}
-              </Button>
+            {plugins.flatMap((plugin) =>
+              (plugin.authButtons ?? []).map((AuthButton, index) => (
+                <AuthButton
+                  key={`${plugin.id}-${index.toString()}`}
+                  view="magicLink"
+                />
+              ))
+            )}
+          </div>
+        </Form>
 
-              {plugins.flatMap((plugin) =>
-                (plugin.authButtons ?? []).map((AuthButton, index) => (
-                  <AuthButton
-                    key={`${plugin.id}-${index.toString()}`}
-                    view="magicLink"
-                  />
-                ))
-              )}
-            </div>
-          </Form>
+        {socialPosition === "bottom" && (
+          <>
+            {showSeparator && (
+              <FieldSeparator>{localization.auth.or}</FieldSeparator>
+            )}
 
-          {socialPosition === "bottom" && (
-            <>
-              {showSeparator && (
-                <FieldSeparator>{localization.auth.or}</FieldSeparator>
-              )}
-
-              {!!socialProviders?.length && (
-                <ProviderButtons socialLayout={socialLayout} />
-              )}
-            </>
-          )}
-        </Card.Content>
-      )}
+            {!!socialProviders?.length && (
+              <ProviderButtons socialLayout={socialLayout} />
+            )}
+          </>
+        )}
+      </Card.Content>
 
       {emailAndPassword?.enabled && (
         <Card.Footer className="flex-col gap-3">

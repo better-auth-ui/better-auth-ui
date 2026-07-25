@@ -1,10 +1,11 @@
 import { QueryClient } from "@tanstack/react-query"
 import { render, screen, waitFor } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
-import { describe, expect, it, vi } from "vitest"
+import { beforeEach, describe, expect, it, vi } from "vitest"
 
 import { AuthProvider } from "../src/components/auth/auth-provider"
 import { ForgotPassword } from "../src/components/auth/forgot-password"
+import { ResetLinkSent } from "../src/components/auth/reset-link-sent"
 
 function createMockAuthClient(
   impl: () => Promise<unknown> = async () => ({ data: null, error: null })
@@ -19,7 +20,10 @@ function createMockAuthClient(
   }
 }
 
-function renderForgotPassword(authClient = createMockAuthClient()) {
+function renderWithProvider(
+  children: React.ReactNode,
+  authClient = createMockAuthClient()
+) {
   const navigate = vi.fn()
 
   return {
@@ -38,16 +42,20 @@ function renderForgotPassword(authClient = createMockAuthClient()) {
           })
         }
       >
-        <ForgotPassword />
+        {children}
       </AuthProvider>
     )
   }
 }
 
+beforeEach(() => {
+  sessionStorage.clear()
+})
+
 describe("<ForgotPassword />", () => {
-  it("offers to open the email provider after sending the reset link", async () => {
+  it("stores the email and redirects to the reset-link-sent view on success", async () => {
     const user = userEvent.setup()
-    const { authClient, navigate } = renderForgotPassword()
+    const { authClient, navigate } = renderWithProvider(<ForgotPassword />)
 
     await user.type(screen.getByLabelText(/email/i), "user@gmail.com")
     await user.click(screen.getByRole("button", { name: /send reset link/i }))
@@ -63,31 +71,13 @@ describe("<ForgotPassword />", () => {
         fetchOptions: expect.objectContaining({ throw: true })
       })
     )
-    expect(
-      await screen.findByRole("link", { name: /open gmail/i })
-    ).toHaveAttribute("href", "https://mail.google.com/mail/")
-    expect(navigate).not.toHaveBeenCalled()
-  })
 
-  it("confirms the send without a provider link for unknown domains", async () => {
-    const user = userEvent.setup()
-    renderForgotPassword()
-
-    await user.type(screen.getByLabelText(/email/i), "user@internal-corp.dev")
-    await user.click(screen.getByRole("button", { name: /send reset link/i }))
-
-    // The form is replaced by the email-sent view even when no provider matches.
     await waitFor(() => {
-      expect(
-        screen.queryByRole("button", { name: /send reset link/i })
-      ).not.toBeInTheDocument()
+      expect(navigate).toHaveBeenCalledWith({ to: "/auth/reset-link-sent" })
     })
-    expect(
-      screen.queryByRole("link", { name: /open/i })
-    ).not.toBeInTheDocument()
-
-    // The sign-in footer stays available.
-    expect(screen.getByRole("link", { name: /sign in/i })).toBeInTheDocument()
+    expect(sessionStorage.getItem("better-auth-ui.reset-link-sent")).toBe(
+      "user@gmail.com"
+    )
   })
 
   it("keeps the form and entered email when the request fails", async () => {
@@ -95,7 +85,7 @@ describe("<ForgotPassword />", () => {
     const authClient = createMockAuthClient(async () => {
       throw new Error("network down")
     })
-    renderForgotPassword(authClient)
+    const { navigate } = renderWithProvider(<ForgotPassword />, authClient)
 
     await user.type(screen.getByLabelText(/email/i), "user@gmail.com")
     await user.click(screen.getByRole("button", { name: /send reset link/i }))
@@ -108,8 +98,37 @@ describe("<ForgotPassword />", () => {
     expect(
       screen.getByRole("button", { name: /send reset link/i })
     ).toBeInTheDocument()
+    expect(navigate).not.toHaveBeenCalled()
+  })
+})
+
+describe("<ResetLinkSent />", () => {
+  it("offers to open the email provider for the stored email", async () => {
+    sessionStorage.setItem("better-auth-ui.reset-link-sent", "user@gmail.com")
+
+    renderWithProvider(<ResetLinkSent />)
+
     expect(
-      screen.queryByRole("link", { name: /open/i })
-    ).not.toBeInTheDocument()
+      await screen.findByRole("link", { name: /open gmail/i })
+    ).toHaveAttribute("href", "https://mail.google.com/mail/")
+
+    // The sign-in footer stays available.
+    expect(screen.getByRole("link", { name: /sign in/i })).toBeInTheDocument()
+  })
+
+  it("still confirms the send without a provider link for unknown domains", async () => {
+    sessionStorage.setItem(
+      "better-auth-ui.reset-link-sent",
+      "user@internal-corp.dev"
+    )
+
+    renderWithProvider(<ResetLinkSent />)
+
+    await waitFor(() => {
+      expect(
+        screen.queryByRole("link", { name: /open/i })
+      ).not.toBeInTheDocument()
+    })
+    expect(screen.getByRole("link", { name: /sign in/i })).toBeInTheDocument()
   })
 })
