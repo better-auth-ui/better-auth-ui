@@ -70,9 +70,9 @@ import { adminPlugin } from "@better-auth-ui/heroui/plugins" // [!code highlight
 `adminPlugin()` contributes `<StopImpersonating />` through the
 `userMenuItems` slot. `<UserButton />` places it above sign out.
 
-The action renders only when `session.impersonatedBy` is present. Selecting it
-calls `authClient.admin.stopImpersonating()` and refreshes the cached session
-before the pending state completes.
+The action renders only when `session.session.impersonatedBy` is present.
+Selecting it calls `authClient.admin.stopImpersonating()` and refreshes the
+cached session before the pending state completes.
 
 ```tsx
 import { StopImpersonating } from "@better-auth-ui/heroui/plugins"
@@ -100,6 +100,11 @@ adminPlugin({
 
 ## Mutation API
 
-Use `useStopImpersonating()` from `@better-auth-ui/react` when you need the
-same behavior outside the user button. The hook restores the admin session and
-awaits invalidation of the shared session query.
+```tsx
+import { useStopImpersonating } from "@better-auth-ui/react"
+
+const stopImpersonating = useStopImpersonating(authClient)
+```
+
+Use the hook when you need the same behavior outside the user button. It
+restores the admin session and awaits invalidation of the shared session query.

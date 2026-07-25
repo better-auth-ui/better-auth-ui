@@ -36,7 +36,7 @@ export function StopImpersonating({ className }: StopImpersonatingProps) {
     <DropdownMenuItem
       className={className}
       disabled={stopImpersonating.isPending}
-      onSelect={() => stopImpersonating.mutate(undefined)}
+      onClick={() => stopImpersonating.mutate(undefined)}
     >
       {stopImpersonating.isPending ? (
         <Spinner />

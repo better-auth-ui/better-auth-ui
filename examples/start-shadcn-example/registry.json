@@ -1495,6 +1495,7 @@
         "https://better-auth-ui.com/r/username.json",
         "https://better-auth-ui.com/r/passkey.json",
         "https://better-auth-ui.com/r/api-key.json",
+        "https://better-auth-ui.com/r/admin.json",
         "https://better-auth-ui.com/r/multi-session.json",
         "https://better-auth-ui.com/r/organization.json",
         "https://better-auth-ui.com/r/theme.json",

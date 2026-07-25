@@ -80,9 +80,9 @@ import { adminPlugin } from "@/lib/auth/admin-plugin" // [!code highlight]
 The copied `adminPlugin()` contributes `<StopImpersonating />` through the
 `userMenuItems` slot. `<UserButton />` places it above sign out.
 
-The action renders only when `session.impersonatedBy` is present. Selecting it
-calls `authClient.admin.stopImpersonating()` and refreshes the cached session
-before the pending state completes.
+The action renders only when `session.session.impersonatedBy` is present.
+Selecting it calls `authClient.admin.stopImpersonating()` and refreshes the
+cached session before the pending state completes.
 
 ```tsx
 import { StopImpersonating } from "@/components/auth/admin/stop-impersonating"
@@ -110,9 +110,15 @@ adminPlugin({
 
 ## Mutation API
 
-Use `stopImpersonatingOptions()` from `@better-auth-ui/solid` when you need the
-same behavior outside the copied user button. The options restore the admin
-session and await invalidation of the shared session query.
+```tsx
+import { stopImpersonatingOptions } from "@better-auth-ui/solid"
+
+const stopImpersonating = stopImpersonatingOptions(authClient)
+```
+
+Use the options when you need the same behavior outside the copied user button.
+They restore the admin session and await invalidation of the shared session
+query.
 
 See the [Solid package reference](/docs/solid) for the shared query and
 mutation APIs.
