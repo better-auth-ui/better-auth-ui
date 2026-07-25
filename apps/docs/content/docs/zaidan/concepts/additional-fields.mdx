@@ -50,6 +50,8 @@ import { AuthProvider } from "@/components/auth/auth-provider"
 
 Fields default to rendering on the user profile only. Set `signUp: true` to also render the field on the sign-up form.
 
+Additional sign-up fields without `required: true` include an ` (optional)` suffix in their label. Override the complete suffix with `localization.auth.optional`, or set it to an empty string to remove the indicator.
+
 ## Install model
 
 The composed auth/profile registry entries include the additional field renderer when those forms need it. If you're building a smaller custom install, you can install the renderer by itself:

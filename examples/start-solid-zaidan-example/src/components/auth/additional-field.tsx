@@ -11,6 +11,8 @@ export type AdditionalFieldProps = {
   field: AdditionalFieldConfig
   isPending?: boolean
   name: string
+  /** Complete suffix appended to labels for fields that are not required. */
+  optionalLabel?: string
 }
 
 const valueToString = (value: AdditionalFieldConfig["defaultValue"]) =>
@@ -32,6 +34,10 @@ export function AdditionalField(props: AdditionalFieldProps) {
   const [copied, setCopied] = createSignal(false)
   let inputRef: HTMLInputElement | undefined
   const inputType = () => resolveInputType(props.field)
+  const label = () =>
+    props.optionalLabel && !props.field.required
+      ? `${String(props.field.label)}${props.optionalLabel}`
+      : props.field.label
   const defaultValue = () => valueToString(props.field.defaultValue)
   const isDisabled = () => props.isPending || props.field.readOnly
   const nativeType = () => {
@@ -57,7 +63,17 @@ export function AdditionalField(props: AdditionalFieldProps) {
   }
 
   if (props.field.render) {
-    return <>{props.field.render(props)}</>
+    return (
+      <>
+        {props.field.render({
+          ...props,
+          field:
+            label() === props.field.label
+              ? props.field
+              : { ...props.field, label: label() }
+        })}
+      </>
+    )
   }
 
   if (inputType() === "hidden") {
@@ -67,7 +83,7 @@ export function AdditionalField(props: AdditionalFieldProps) {
   if (inputType() === "textarea") {
     return (
       <div class="grid gap-2">
-        <Label for={props.name}>{props.field.label}</Label>
+        <Label for={props.name}>{label()}</Label>
         <textarea
           class="z-input min-h-24 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm outline-none placeholder:text-muted-foreground disabled:pointer-events-none disabled:opacity-50"
           disabled={props.isPending}
@@ -86,7 +102,7 @@ export function AdditionalField(props: AdditionalFieldProps) {
   if (inputType() === "select" || inputType() === "combobox") {
     return (
       <div class="grid gap-2">
-        <Label for={props.name}>{props.field.label}</Label>
+        <Label for={props.name}>{label()}</Label>
         <select
           class="z-input w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm outline-none disabled:pointer-events-none disabled:opacity-50"
           disabled={isDisabled()}
@@ -120,14 +136,14 @@ export function AdditionalField(props: AdditionalFieldProps) {
           required={props.field.required}
           type="checkbox"
         />
-        {props.field.label}
+        {label()}
       </label>
     )
   }
 
   return (
     <div class="grid gap-2">
-      <Label for={props.name}>{props.field.label}</Label>
+      <Label for={props.name}>{label()}</Label>
       <div class="flex items-center gap-2">
         <Show when={props.field.prefix}>
           <span class="text-muted-foreground text-sm">

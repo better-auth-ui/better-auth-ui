@@ -201,6 +201,7 @@ export function SignUp(props: SignUpProps) {
                   field={field}
                   isPending={signUp.isPending}
                   name={field.name}
+                  optionalLabel={auth.localization.auth.optional}
                 />
               )}
             </For>
@@ -339,6 +340,7 @@ export function SignUp(props: SignUpProps) {
                   field={field}
                   isPending={signUp.isPending}
                   name={field.name}
+                  optionalLabel={auth.localization.auth.optional}
                 />
               )}
             </For>

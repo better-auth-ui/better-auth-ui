@@ -69,6 +69,9 @@ export const localization = {
     /** @remarks `"OR"` */
     or: "OR",
 
+    /** @remarks `" (optional)"` */
+    optional: " (optional)",
+
     /** @remarks `"Password"` */
     password: "Password",
 

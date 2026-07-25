@@ -121,12 +121,29 @@ function CopyButton({
 /** Renders a single additional user field via HeroUI v3 components. */
 export function AdditionalField({
   name,
-  field,
+  field: configuredField,
   isPending,
+  optionalLabel,
   variant
 }: AdditionalFieldProps) {
   const { localization } = useAuth()
-  const inputType = resolveInputType(field)
+  const inputType = resolveInputType(configuredField)
+  const field =
+    optionalLabel && !configuredField.required
+      ? {
+          ...configuredField,
+          label:
+            (inputType === "date" || inputType === "datetime") &&
+            typeof configuredField.label === "string" ? (
+              `${configuredField.label}${optionalLabel}`
+            ) : (
+              <>
+                {configuredField.label}
+                {optionalLabel}
+              </>
+            )
+        }
+      : configuredField
   const inputVariant = variant === "transparent" ? "primary" : "secondary"
 
   if (field.render) {
@@ -136,6 +153,7 @@ export function AdditionalField({
         name={name}
         field={field}
         isPending={isPending}
+        optionalLabel={optionalLabel}
         variant={variant}
       />
     )

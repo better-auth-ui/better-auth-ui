@@ -42,6 +42,8 @@ import { AuthProvider } from "@better-auth-ui/heroui"
 
 Fields default to rendering on the user profile only. Set `signUp: true` to also render the field on the sign-up form.
 
+Additional sign-up fields without `required: true` include an ` (optional)` suffix in their label. Override the complete suffix with `localization.auth.optional`, or set it to an empty string to remove the indicator.
+
 ## Field types
 
 The `type` controls the data type of the field. The default `inputType` is inferred from `type`, but you can override it for a different look.
