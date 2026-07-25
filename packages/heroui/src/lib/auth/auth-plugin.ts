@@ -17,6 +17,8 @@ export type AdditionalFieldProps = {
   name: string
   field: AdditionalFieldConfig
   isPending?: boolean
+  /** Complete suffix appended to labels for fields that are not required. */
+  optionalLabel?: string
   variant?: CardProps["variant"]
 }
 

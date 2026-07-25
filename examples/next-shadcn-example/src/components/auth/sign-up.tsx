@@ -276,6 +276,7 @@ export function SignUp({
                         name={field.name}
                         field={field}
                         isPending={isPending}
+                        optionalLabel={localization.auth.optional}
                       />
                     )
                 )}
@@ -442,6 +443,7 @@ export function SignUp({
                         name={field.name}
                         field={field}
                         isPending={isPending}
+                        optionalLabel={localization.auth.optional}
                       />
                     )
                 )}

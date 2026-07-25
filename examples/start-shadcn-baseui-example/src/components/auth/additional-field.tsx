@@ -55,6 +55,8 @@ export type AdditionalFieldProps = {
   name: string
   field: AdditionalFieldConfig
   isPending?: boolean
+  /** Complete suffix appended to labels for fields that are not required. */
+  optionalLabel?: string
 }
 
 /** Convert a `defaultValue` into a `Date` for the calendar. */
@@ -116,14 +118,34 @@ function CopyButton({
 /** Renders a single additional user field via shadcn primitives. */
 export function AdditionalField({
   name,
-  field,
-  isPending
+  field: configuredField,
+  isPending,
+  optionalLabel
 }: AdditionalFieldProps) {
+  const field =
+    optionalLabel && !configuredField.required
+      ? {
+          ...configuredField,
+          label: (
+            <>
+              {configuredField.label}
+              {optionalLabel}
+            </>
+          )
+        }
+      : configuredField
   const inputType = resolveInputType(field)
 
   if (field.render) {
     const FieldRenderer = field.render as ComponentType<AdditionalFieldProps>
-    return <FieldRenderer name={name} field={field} isPending={isPending} />
+    return (
+      <FieldRenderer
+        name={name}
+        field={field}
+        isPending={isPending}
+        optionalLabel={optionalLabel}
+      />
+    )
   }
 
   if (inputType === "hidden") {
