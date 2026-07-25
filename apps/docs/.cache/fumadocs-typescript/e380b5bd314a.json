@@ -1,0 +1,169 @@
+[
+  {
+    "id": "device-authorization-localization.ts-DeviceAuthorizationLocalization",
+    "name": "DeviceAuthorizationLocalization",
+    "description": "",
+    "entries": [
+      {
+        "name": "deviceAuthorization",
+        "description": "",
+        "tags": [{ "name": "remarks", "text": "`\"Device Authorization\"`" }],
+        "type": "string",
+        "simplifiedType": "\"Device Authorization\"",
+        "required": true,
+        "deprecated": false
+      },
+      {
+        "name": "deviceAuthorizationDescription",
+        "description": "",
+        "tags": [
+          {
+            "name": "remarks",
+            "text": "`\"Enter the code displayed on your device.\"`"
+          }
+        ],
+        "type": "string",
+        "simplifiedType": "\"Enter the code displayed on your device.\"",
+        "required": true,
+        "deprecated": false
+      },
+      {
+        "name": "deviceCode",
+        "description": "",
+        "tags": [{ "name": "remarks", "text": "`\"Device code\"`" }],
+        "type": "string",
+        "simplifiedType": "\"Device code\"",
+        "required": true,
+        "deprecated": false
+      },
+      {
+        "name": "invalidDeviceCode",
+        "description": "",
+        "tags": [
+          {
+            "name": "remarks",
+            "text": "`\"The code is invalid or has expired.\"`"
+          }
+        ],
+        "type": "string",
+        "simplifiedType": "\"The code is invalid or has expired.\"",
+        "required": true,
+        "deprecated": false
+      },
+      {
+        "name": "continue",
+        "description": "",
+        "tags": [{ "name": "remarks", "text": "`\"Continue\"`" }],
+        "type": "string",
+        "simplifiedType": "\"Continue\"",
+        "required": true,
+        "deprecated": false
+      },
+      {
+        "name": "approveDevice",
+        "description": "",
+        "tags": [{ "name": "remarks", "text": "`\"Approve Device\"`" }],
+        "type": "string",
+        "simplifiedType": "\"Approve Device\"",
+        "required": true,
+        "deprecated": false
+      },
+      {
+        "name": "approveDeviceDescription",
+        "description": "",
+        "tags": [
+          {
+            "name": "remarks",
+            "text": "`\"A device is requesting access to your account.\"`"
+          }
+        ],
+        "type": "string",
+        "simplifiedType": "\"A device is requesting access to your account.\"",
+        "required": true,
+        "deprecated": false
+      },
+      {
+        "name": "signedInAs",
+        "description": "",
+        "tags": [{ "name": "remarks", "text": "`\"Signed in as\"`" }],
+        "type": "string",
+        "simplifiedType": "\"Signed in as\"",
+        "required": true,
+        "deprecated": false
+      },
+      {
+        "name": "approve",
+        "description": "",
+        "tags": [{ "name": "remarks", "text": "`\"Approve\"`" }],
+        "type": "string",
+        "simplifiedType": "\"Approve\"",
+        "required": true,
+        "deprecated": false
+      },
+      {
+        "name": "deny",
+        "description": "",
+        "tags": [{ "name": "remarks", "text": "`\"Deny\"`" }],
+        "type": "string",
+        "simplifiedType": "\"Deny\"",
+        "required": true,
+        "deprecated": false
+      },
+      {
+        "name": "deviceApproved",
+        "description": "",
+        "tags": [{ "name": "remarks", "text": "`\"Device Approved\"`" }],
+        "type": "string",
+        "simplifiedType": "\"Device Approved\"",
+        "required": true,
+        "deprecated": false
+      },
+      {
+        "name": "deviceApprovedDescription",
+        "description": "",
+        "tags": [
+          {
+            "name": "remarks",
+            "text": "`\"The device can now access your account. You can return to it and continue.\"`"
+          }
+        ],
+        "type": "string",
+        "simplifiedType": "\"The device can now access your account. You can return to it and continue.\"",
+        "required": true,
+        "deprecated": false
+      },
+      {
+        "name": "deviceDenied",
+        "description": "",
+        "tags": [{ "name": "remarks", "text": "`\"Device Denied\"`" }],
+        "type": "string",
+        "simplifiedType": "\"Device Denied\"",
+        "required": true,
+        "deprecated": false
+      },
+      {
+        "name": "deviceDeniedDescription",
+        "description": "",
+        "tags": [
+          {
+            "name": "remarks",
+            "text": "`\"The device was not granted access to your account.\"`"
+          }
+        ],
+        "type": "string",
+        "simplifiedType": "\"The device was not granted access to your account.\"",
+        "required": true,
+        "deprecated": false
+      },
+      {
+        "name": "returnToApplication",
+        "description": "",
+        "tags": [{ "name": "remarks", "text": "`\"Return to application\"`" }],
+        "type": "string",
+        "simplifiedType": "\"Return to application\"",
+        "required": true,
+        "deprecated": false
+      }
+    ]
+  }
+]

@@ -1,0 +1,31 @@
+---
+title: useOAuthConsent
+description: Accept or deny the current OAuth authorization request.
+---
+
+Requires `oauthProviderClient()` from `@better-auth/oauth-provider/client`. Better Auth reads and validates the signed authorization query from the current browser URL before completing the redirect.
+
+## Usage
+
+```tsx
+import { useOAuthConsent } from "@better-auth-ui/react"
+
+const consent = useOAuthConsent(authClient)
+
+consent.mutate({ accept: true })
+consent.mutate({ accept: false })
+```
+
+Pass only the user's decision to accept the full requested scope set. The OAuth Provider plugin handles the redirect, so the application should not navigate to `redirect_uri` itself.
+
+## Options factory
+
+```ts
+import { oauthConsentOptions } from "@better-auth-ui/react"
+
+const options = oauthConsentOptions(authClient)
+```
+
+## Params
+
+<auto-type-table path="../../../../../../packages/react/src/mutations/oauth-provider/oauth-consent-mutation.ts" name="OAuthConsentParams" />

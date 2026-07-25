@@ -1,0 +1,165 @@
+---
+title: OAuth Provider
+description: Add an OAuth 2.1 authorization consent screen to your authentication flow.
+---
+
+import { Step, Steps } from "fumadocs-ui/components/steps"
+
+The OAuth Provider plugin adds the user-facing consent step for Better Auth's [OAuth 2.1 Provider](https://better-auth.com/docs/plugins/oauth-provider). It identifies the requesting application, explains the requested scopes, shows the signed-in account, and lets the user allow or cancel the request.
+
+It contributes:
+
+- An `<OAuthConsent />` view at `/auth/consent`
+- Public OAuth client metadata loading
+- Allow and cancel actions through `useOAuthConsent`
+- Default labels for `openid`, `profile`, `email`, and `offline_access`
+- Custom metadata for application-specific scopes
+
+## Setup
+
+<Steps>
+<Step>
+### Configure the Better Auth server
+
+Install the provider package:
+
+```bash
+bun add @better-auth/oauth-provider
+```
+
+Add the JWT and OAuth Provider plugins. Point `consentPage` at the route that renders the consent view:
+
+```ts title="lib/auth.ts"
+import { oauthProvider } from "@better-auth/oauth-provider"
+import { betterAuth } from "better-auth"
+import { jwt } from "better-auth/plugins"
+
+export const auth = betterAuth({
+  disabledPaths: ["/token"],
+  plugins: [
+    jwt(),
+    oauthProvider({
+      loginPage: "/auth/sign-in",
+      consentPage: "/auth/consent"
+    })
+  ]
+})
+```
+
+Generate or migrate your Better Auth schema after enabling the server plugin:
+
+```bash
+bunx auth@latest migrate
+```
+
+</Step>
+<Step>
+### Configure the browser client
+
+Add `oauthProviderClient()` to the auth client. It preserves Better Auth's signed authorization query when the user responds:
+
+```ts title="lib/auth-client.ts"
+import { oauthProviderClient } from "@better-auth/oauth-provider/client"
+import { createAuthClient } from "better-auth/react"
+
+export const authClient = createAuthClient({
+  plugins: [oauthProviderClient()]
+})
+```
+
+</Step>
+<Step>
+### Install the consent view
+
+```bash
+bunx shadcn@latest add https://better-auth-ui.com/r/oauth-provider.json
+```
+
+This installs:
+
+- `src/lib/auth/oauth-provider-plugin.ts`
+- `src/components/auth/oauth-provider/oauth-consent.tsx`
+- `src/components/auth/user/user-avatar.tsx`
+
+</Step>
+<Step>
+### Register the UI plugin
+
+```tsx title="components/providers.tsx"
+import { AuthProvider } from "@/components/auth/auth-provider"
+import { oauthProviderPlugin } from "@/lib/auth/oauth-provider-plugin"
+
+<AuthProvider
+  authClient={authClient}
+  navigate={navigate}
+  plugins={[oauthProviderPlugin()]}
+>
+  {children}
+</AuthProvider>
+```
+
+</Step>
+<Step>
+### Allow the consent route
+
+Include the plugin path in the route that renders `<Auth />`:
+
+```tsx title="routes/auth/$path.tsx"
+import { viewPaths } from "@better-auth-ui/core"
+import { oauthProviderPlugin } from "@/lib/auth/oauth-provider-plugin"
+
+const validAuthPathSegments = new Set([
+  ...Object.values(viewPaths.auth),
+  oauthProviderPlugin().viewPaths.auth.oauthConsent
+])
+```
+
+Keep this path aligned with the server's `consentPage`. If your route already resolves plugin paths without an allowlist, no additional route change is needed.
+
+</Step>
+</Steps>
+
+## Custom scopes
+
+Add labels and short descriptions for application-specific scopes:
+
+```tsx title="components/providers.tsx"
+oauthProviderPlugin({
+  path: "authorize",
+  scopeMetadata: {
+    calendar: {
+      label: "View your calendar",
+      description: "Read your calendar events and availability."
+    }
+  },
+  localization: {
+    allow: "Authorize"
+  }
+})
+```
+
+Unknown scopes remain visible using their raw scope value.
+
+## Consent behavior
+
+This first consent view accepts or denies the complete requested scope set. It does not render per-scope controls. Omitting `scope` from the consent mutation tells Better Auth to accept the scopes from the original signed request.
+
+Keep the authorization query string on the consent page. Do not strip it, rebuild it from `redirect_uri`, or navigate to the requested redirect yourself. `oauthProviderClient()` forwards the signed query to Better Auth, and Better Auth validates and completes the redirect.
+
+The public client endpoint requires a signed-in session. Direct visits with missing request data, no session, or an unknown client render an invalid-request state.
+
+Login reuses the existing `signIn` view and resumes automatically when Better Auth creates the session. Optional `prompt=create`, account-selection, and post-login screens require application-specific continuation logic and are not registered by this base plugin.
+
+## Component
+
+```tsx
+import { OAuthConsent } from "@/components/auth/oauth-provider/oauth-consent"
+
+<OAuthConsent />
+```
+
+<auto-type-table path="../../../../../../examples/start-shadcn-example/src/components/auth/oauth-provider/oauth-consent.tsx" name="OAuthConsentProps" />
+
+## React APIs
+
+Use [`usePublicOAuthClient`](/docs/react/queries/public-oauth-client) to load application metadata and [`useOAuthConsent`](/docs/react/mutations/oauth-consent) to submit the user's decision. Both APIs also export their TanStack Query options factories.

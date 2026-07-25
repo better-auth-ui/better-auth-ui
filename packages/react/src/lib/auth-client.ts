@@ -1,4 +1,5 @@
 import type { apiKeyClient } from "@better-auth/api-key/client"
+import type { oauthProviderClient } from "@better-auth/oauth-provider/client"
 import type { passkeyClient } from "@better-auth/passkey/client"
 import type {
   deviceAuthorizationClient,
@@ -44,6 +45,12 @@ export type PasskeyAuthClient = ReturnType<
 
 export type ApiKeyAuthClient = ReturnType<
   typeof createAuthClient<{ plugins: [ReturnType<typeof apiKeyClient>] }>
+>
+
+export type OAuthProviderAuthClient = ReturnType<
+  typeof createAuthClient<{
+    plugins: [ReturnType<typeof oauthProviderClient>]
+  }>
 >
 
 export type UsernameAuthClient = ReturnType<

@@ -1,0 +1,40 @@
+---
+title: usePublicOAuthClient
+description: Load public metadata for the application requesting OAuth authorization.
+---
+
+Requires `oauthProviderClient()` from `@better-auth/oauth-provider/client`. Read the client ID from the signed authorization query and leave the complete query string in the browser URL.
+
+## Usage
+
+```tsx
+import { parseOAuthAuthorizationRequest } from "@better-auth-ui/core/plugins"
+import { usePublicOAuthClient } from "@better-auth-ui/solid"
+
+const client = usePublicOAuthClient(
+  authClient,
+  () => parseOAuthAuthorizationRequest(window.location.search).clientId
+)
+```
+
+The query remains disabled until the client ID accessor returns a value.
+
+## Options factory and loader helpers
+
+```ts
+import {
+  ensurePublicOAuthClient,
+  fetchPublicOAuthClient,
+  prefetchPublicOAuthClient,
+  publicOAuthClientOptions
+} from "@better-auth-ui/solid"
+
+const options = publicOAuthClientOptions(authClient, clientId)
+await ensurePublicOAuthClient(queryClient, authClient, clientId)
+await prefetchPublicOAuthClient(queryClient, authClient, clientId)
+const client = await fetchPublicOAuthClient(queryClient, authClient, clientId)
+```
+
+## Params
+
+<auto-type-table path="../../../../../../packages/solid/src/queries/oauth-provider/public-oauth-client-query.ts" name="PublicOAuthClientParams" />

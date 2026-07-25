@@ -37,6 +37,7 @@
   },
   "devDependencies": {
     "@better-auth/api-key": "^1.6.19",
+    "@better-auth/oauth-provider": "1.6.19",
     "@better-auth/passkey": "^1.6.19",
     "@react-email/ui": "6.6.8",
     "@tanstack/query-core": "^5.100.14",
@@ -60,6 +61,7 @@
   "peerDependencies": {
     "@better-auth-ui/core": "*",
     "@better-auth/api-key": ">=1.6.19",
+    "@better-auth/oauth-provider": ">=1.6.19",
     "@better-auth/passkey": ">=1.6.19",
     "@tanstack/query-core": ">=5.100.14",
     "@tanstack/react-query": ">=5.100.14",

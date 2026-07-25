@@ -101,6 +101,7 @@ const expectedSolidRegistryPayloadNames = [
   "last-login-method",
   "sign-up",
   "magic-link",
+  "oauth-provider",
   "username",
   "passkey",
   "api-key",
@@ -2304,6 +2305,7 @@ describe("Solid registry isolation", () => {
       "delete-user",
       "last-login-method",
       "magic-link",
+      "oauth-provider",
       "theme"
     ]
 
@@ -2451,6 +2453,7 @@ describe("Solid registry isolation", () => {
       "session",
       "user",
       "authenticate",
+      "public-oauth-client",
       "---Settings---",
       "list-accounts",
       "account-info",
@@ -2481,6 +2484,7 @@ describe("Solid registry isolation", () => {
       "reset-password",
       "send-verification-email",
       "is-username-available",
+      "oauth-consent",
       "---Settings---",
       "update-user",
       "change-email",
@@ -2529,6 +2533,7 @@ describe("Solid registry isolation", () => {
       "magic-link",
       "multi-session",
       "organization",
+      "oauth-provider",
       "passkey",
       "theme",
       "username"
@@ -2800,6 +2805,7 @@ describe("Solid registry isolation", () => {
       "delete-user",
       "last-login-method",
       "magic-link",
+      "oauth-provider",
       "theme"
     ]
     const runtimeOnlyPluginNames = ["captcha"]
@@ -2940,6 +2946,7 @@ describe("Solid registry isolation", () => {
         name === "delete-user" ||
         name === "last-login-method" ||
         name === "magic-link" ||
+        name === "oauth-provider" ||
         name === "multi-session" ||
         name === "theme" ||
         name === "username"

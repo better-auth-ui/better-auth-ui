@@ -219,6 +219,20 @@ export const solidRegistryManifest = {
       ]
     }),
     item({
+      name: "oauth-provider",
+      type: "registry:component",
+      title: "Solid OAuth Provider Consent",
+      description:
+        "Solid/Zaidan consent view for Better Auth OAuth Provider authorization requests.",
+      dependencies: [...solidAuthDependencies, "@better-auth/oauth-provider"],
+      files: [
+        libFile("src/lib/auth/oauth-provider-plugin.ts"),
+        componentFile("src/components/auth/oauth-provider/oauth-consent.tsx"),
+        componentFile("src/components/auth/user/user-avatar.tsx"),
+        ...zaidanInteractiveSupportFiles
+      ]
+    }),
+    item({
       name: "username",
       type: "registry:component",
       title: "Solid Username",

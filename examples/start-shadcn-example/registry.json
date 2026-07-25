@@ -248,6 +248,44 @@
       ]
     },
     {
+      "name": "oauth-provider",
+      "type": "registry:component",
+      "title": "OAuth Provider Consent",
+      "description": "OAuth Provider plugin: application identity, requested scopes, signed-in account, and approve or deny actions for Better Auth authorization requests.",
+      "dependencies": [
+        "@better-auth-ui/react@latest",
+        "@better-auth-ui/core@latest",
+        "@better-auth/oauth-provider",
+        "better-auth",
+        "lucide-react"
+      ],
+      "registryDependencies": [
+        "avatar",
+        "button",
+        "card",
+        "separator",
+        "skeleton",
+        "spinner"
+      ],
+      "files": [
+        {
+          "path": "src/lib/auth/oauth-provider-plugin.ts",
+          "type": "registry:lib",
+          "target": "@lib/auth/oauth-provider-plugin.ts"
+        },
+        {
+          "path": "src/components/auth/oauth-provider/oauth-consent.tsx",
+          "type": "registry:component",
+          "target": "@components/auth/oauth-provider/oauth-consent.tsx"
+        },
+        {
+          "path": "src/components/auth/user/user-avatar.tsx",
+          "type": "registry:component",
+          "target": "@components/auth/user/user-avatar.tsx"
+        }
+      ]
+    },
+    {
       "name": "username",
       "type": "registry:component",
       "title": "Username",
@@ -1458,6 +1496,7 @@
         "https://better-auth-ui.com/r/last-login-method.json",
         "https://better-auth-ui.com/r/sign-up.json",
         "https://better-auth-ui.com/r/magic-link.json",
+        "https://better-auth-ui.com/r/oauth-provider.json",
         "https://better-auth-ui.com/r/username.json",
         "https://better-auth-ui.com/r/passkey.json",
         "https://better-auth-ui.com/r/api-key.json",

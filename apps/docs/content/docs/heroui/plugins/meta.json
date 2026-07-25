@@ -10,6 +10,7 @@
     "magic-link",
     "multi-session",
     "organization",
+    "oauth-provider",
     "passkey",
     "theme",
     "username"

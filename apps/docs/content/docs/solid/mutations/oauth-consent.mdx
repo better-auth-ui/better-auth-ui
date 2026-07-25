@@ -1,0 +1,24 @@
+---
+title: oauthConsentOptions
+description: Accept or deny the current OAuth authorization request.
+---
+
+Requires `oauthProviderClient()` from `@better-auth/oauth-provider/client`. Better Auth reads and validates the signed authorization query from the current browser URL before completing the redirect.
+
+## Options factory
+
+```tsx
+import { oauthConsentOptions } from "@better-auth-ui/solid"
+import { createMutation } from "@tanstack/solid-query"
+
+const consent = createMutation(() => oauthConsentOptions(authClient))
+
+consent.mutate({ accept: true })
+consent.mutate({ accept: false })
+```
+
+Pass only the user's decision to accept the full requested scope set. The OAuth Provider plugin handles the redirect, so the application should not navigate to `redirect_uri` itself.
+
+## Params
+
+<auto-type-table path="../../../../../../packages/solid/src/mutations/oauth-provider/oauth-consent-mutation.ts" name="OAuthConsentParams" />

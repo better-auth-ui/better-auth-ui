@@ -33,6 +33,7 @@
   },
   "devDependencies": {
     "@better-auth/api-key": "^1.6.19",
+    "@better-auth/oauth-provider": "1.6.19",
     "@better-auth/passkey": "^1.6.19",
     "@solidjs-email/main": "^2.0.0",
     "@tanstack/solid-query": "^5.100.9",
@@ -46,6 +47,7 @@
   "peerDependencies": {
     "@better-auth-ui/core": "*",
     "@better-auth/api-key": ">=1.6.19",
+    "@better-auth/oauth-provider": ">=1.6.19",
     "@better-auth/passkey": ">=1.6.19",
     "@solidjs-email/main": ">=2.0.0",
     "@tanstack/solid-query": ">=5.100.9",

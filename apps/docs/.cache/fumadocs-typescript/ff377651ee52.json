@@ -1,0 +1,41 @@
+[
+  {
+    "id": "device-authorization-plugin.ts-DeviceAuthorizationPluginOptions",
+    "name": "DeviceAuthorizationPluginOptions",
+    "description": "",
+    "entries": [
+      {
+        "name": "localization",
+        "description": "Override the plugin's default localization strings.",
+        "tags": [
+          { "name": "remarks", "text": "`DeviceAuthorizationLocalization`" }
+        ],
+        "type": "Partial<{ deviceAuthorization: string; deviceAuthorizationDescription: string; deviceCode: string; invalidDeviceCode: string; continue: string; approveDevice: string; approveDeviceDescription: string; signedInAs: string; approve: string; deny: string; deviceApproved: string; deviceApprovedDescription: string; deviceDenied: string; deviceDeniedDescription: string; returnToApplication: string; }>",
+        "simplifiedType": "DeviceAuthorizationLocalization",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "path",
+        "description": "URL segment for the device-authorization view.",
+        "tags": [
+          { "name": "remarks", "text": "`string`" },
+          { "name": "default", "text": "\"device\"" }
+        ],
+        "type": "string",
+        "simplifiedType": "string",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "userCodeLength",
+        "description": "Number of characters rendered by the device-code input.\n\nKeep this in sync with Better Auth's `deviceAuthorization({ userCodeLength })`\nserver option.",
+        "tags": [{ "name": "default", "text": "8" }],
+        "type": "number",
+        "simplifiedType": "number",
+        "required": false,
+        "deprecated": false
+      }
+    ]
+  }
+]
