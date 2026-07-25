@@ -22,8 +22,9 @@ export type LastLoginMethodState = {
 /**
  * Reads Better Auth's last-login-method cookie after hydration.
  *
- * Returns `null` until `lastLoginMethodPlugin()` is registered and the
- * matching Better Auth client plugin has a stored method.
+ * Always returns an object containing `method` and `localization`. Only
+ * `method` is `null` when the UI plugin is not registered or the matching
+ * Better Auth client plugin has no stored method.
  */
 export function useLastLoginMethod(): LastLoginMethodState {
   const { authClient, plugins } = useAuth()

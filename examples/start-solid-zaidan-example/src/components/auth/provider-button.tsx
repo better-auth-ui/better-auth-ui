@@ -100,7 +100,7 @@ export function ProviderButton(props: ProviderButtonProps) {
           : display() === "name"
             ? providerName()
             : null}
-      {display() === "icon" ? (
+      {display() === "icon" || isPending() ? (
         <span class="sr-only">{providerName()}</span>
       ) : null}
       {(props.view ?? "signIn") !== "signUp" ? (

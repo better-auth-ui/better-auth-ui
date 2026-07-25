@@ -5,7 +5,7 @@ description: Show which sign-in method a user chose most recently.
 
 import { Step, Steps } from 'fumadocs-ui/components/steps'
 
-The last-login-method integration floats a compact "Last" indicator over the matching email or social sign-in control. It reads the method after hydration, so server-rendered auth pages do not produce a hydration mismatch.
+The last-login-method integration floats a compact "Last" indicator over the matching username, email, or social sign-in control. It reads the method after hydration, so server-rendered auth pages do not produce a hydration mismatch.
 
 ## Setup
 
@@ -77,7 +77,7 @@ import { lastLoginMethodPlugin } from "@/lib/auth/last-login-method-plugin" // [
 </Step>
 </Steps>
 
-The sign-in view now marks email or the matching social provider when Better Auth has stored a previous method. Sign-up controls do not show the indicator.
+The sign-in view now marks the username or email control, or the matching social provider, when Better Auth has stored a previous method. Sign-up controls do not show the indicator.
 
 ## Localization
 
@@ -114,4 +114,4 @@ Pass an array when one control represents more than one stored method:
 
 ## Cookie consent
 
-The plugin's browser-readable cookie is non-essential under GDPR and similar privacy rules. Use Better Auth's `beforeStoreCookie` option to store it only after the user grants the required consent. Authentication still works when the hook returns `false`.
+Whether the plugin's browser-readable cookie is non-essential and requires consent depends on your jurisdiction and how your application uses it. Consult qualified legal counsel for guidance. When consent is required, configure Better Auth's `beforeStoreCookie` option to return a stored user-consent flag or an equivalent condition. Authentication still works when the hook returns `false`.
