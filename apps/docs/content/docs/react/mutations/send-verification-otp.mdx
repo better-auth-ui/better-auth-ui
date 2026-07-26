@@ -1,0 +1,41 @@
+---
+title: useSendVerificationOtp
+description: Email a one-time code for any email-OTP flow.
+---
+
+One endpoint backs every email-OTP flow. `type` picks which one: `"sign-in"`, `"email-verification"`, `"forget-password"`, or `"change-email"`.
+
+## Usage
+
+```tsx
+import {
+  type EmailOtpAuthClient,
+  useAuth,
+  useSendVerificationOtp
+} from "@better-auth-ui/react"
+
+const { authClient } = useAuth()
+const { mutate: sendVerificationOtp } = useSendVerificationOtp(
+  authClient as EmailOtpAuthClient
+)
+
+sendVerificationOtp({
+  email: "alice@example.com",
+  type: "sign-in"
+})
+```
+
+`useSendVerificationOtp` requires the Better Auth `emailOTP` plugin. Cast `authClient` to `EmailOtpAuthClient` so TypeScript picks up the plugin-extended method signature.
+
+## Options factory
+
+```tsx
+import { sendVerificationOtpOptions } from "@better-auth-ui/react"
+import { useMutation } from "@tanstack/react-query"
+
+const { mutate } = useMutation(sendVerificationOtpOptions(authClient))
+```
+
+## Params
+
+<auto-type-table path="../../../../../../packages/react/src/mutations/email-otp/send-verification-otp-mutation.ts" name="SendVerificationOtpParams" />

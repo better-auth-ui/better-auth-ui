@@ -1,0 +1,38 @@
+---
+title: useVerifyTotp
+description: Verify an authenticator code.
+---
+
+Used both to finish a pending sign-in challenge and to confirm enrollment. Verification is what creates the session, so it refetches the session query.
+
+## Usage
+
+```tsx
+import {
+  type TwoFactorAuthClient,
+  useAuth,
+  useVerifyTotp
+} from "@better-auth-ui/react"
+
+const { authClient } = useAuth()
+const { mutate: verifyTotp } = useVerifyTotp(
+  authClient as TwoFactorAuthClient
+)
+
+verifyTotp({ code: "123456", trustDevice: true })
+```
+
+`useVerifyTotp` requires the Better Auth `twoFactor` plugin. Cast `authClient` to `TwoFactorAuthClient` so TypeScript picks up the plugin-extended method signature.
+
+## Options factory
+
+```tsx
+import { verifyTotpOptions } from "@better-auth-ui/react"
+import { useMutation } from "@tanstack/react-query"
+
+const { mutate } = useMutation(verifyTotpOptions(authClient))
+```
+
+## Params
+
+<auto-type-table path="../../../../../../packages/react/src/mutations/two-factor/verify-totp-mutation.ts" name="VerifyTotpParams" />

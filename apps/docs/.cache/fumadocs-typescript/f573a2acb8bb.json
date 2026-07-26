@@ -1,0 +1,27 @@
+[
+  {
+    "id": "two-factor-settings.tsx-TwoFactorSettingsProps",
+    "name": "TwoFactorSettingsProps",
+    "description": "",
+    "entries": [
+      {
+        "name": "className",
+        "description": "",
+        "tags": [],
+        "type": "string",
+        "simplifiedType": "string",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "variant",
+        "description": "",
+        "tags": [],
+        "type": "\"default\" | \"secondary\" | \"tertiary\" | \"transparent\"",
+        "simplifiedType": "\"default\" | \"secondary\" | \"tertiary\" | \"transparent\"",
+        "required": false,
+        "deprecated": false
+      }
+    ]
+  }
+]

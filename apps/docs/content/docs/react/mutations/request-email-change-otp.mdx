@@ -1,0 +1,38 @@
+---
+title: useRequestEmailChangeOtp
+description: Start an email change with a code.
+---
+
+Sends a code to the new address. When the server runs with `changeEmail: { verifyCurrentEmail: true }`, pass the `otp` the user received at their current address too.
+
+## Usage
+
+```tsx
+import {
+  type EmailOtpAuthClient,
+  useAuth,
+  useRequestEmailChangeOtp
+} from "@better-auth-ui/react"
+
+const { authClient } = useAuth()
+const { mutate: requestEmailChangeOtp } = useRequestEmailChangeOtp(
+  authClient as EmailOtpAuthClient
+)
+
+requestEmailChangeOtp({ newEmail: "new@example.com" })
+```
+
+`useRequestEmailChangeOtp` requires the Better Auth `emailOTP` plugin. Cast `authClient` to `EmailOtpAuthClient` so TypeScript picks up the plugin-extended method signature.
+
+## Options factory
+
+```tsx
+import { requestEmailChangeOtpOptions } from "@better-auth-ui/react"
+import { useMutation } from "@tanstack/react-query"
+
+const { mutate } = useMutation(requestEmailChangeOtpOptions(authClient))
+```
+
+## Params
+
+<auto-type-table path="../../../../../../packages/react/src/mutations/email-otp/request-email-change-otp-mutation.ts" name="RequestEmailChangeOtpParams" />

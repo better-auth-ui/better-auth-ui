@@ -68,23 +68,42 @@ export type AuthPluginFallbackViews<TAuthViewProps> = {
 }
 
 /**
+ * Built-in settings cards a plugin replaces outright.
+ *
+ * `accountCards` and `securityCards` are additive, which isn't enough for
+ * flows that change how an existing card works — e.g. the email-OTP plugin
+ * swaps the link-based change-email card for its code-based one. First plugin
+ * declaring an override wins, matching how `views` resolve in `<Auth>`.
+ */
+export type AuthPluginCardOverrides<TAccountCardProps = AccountCardProps> = {
+  account?: {
+    /** Replaces the built-in `<ChangeEmail />` card. */
+    changeEmail?: ComponentType<TAccountCardProps>
+  }
+}
+
+/**
  * UI-aware plugin definition. UI packages bind the generics in their own
  * `AuthPlugin` re-export so plugin authors don't have to.
  *
  * @typeParam TComponents - Slot component shapes (e.g. heroui variant unions).
  * @typeParam TAuthViewProps - Props the `<Auth>` router spreads onto plugin auth views.
  * @typeParam TSettingsViewProps - Props the `<Settings>` router spreads onto plugin settings views.
+ * @typeParam TAccountCardProps - Props account-settings cards receive from the host.
  */
 export type AuthPlugin<
   TComponents = AuthPluginComponents,
   // biome-ignore lint/suspicious/noExplicitAny: any
   TAuthViewProps = any,
   // biome-ignore lint/suspicious/noExplicitAny: any
-  TSettingsViewProps = any
+  TSettingsViewProps = any,
+  TAccountCardProps = AccountCardProps
 > = AuthPluginBase &
   TComponents & {
     views?: AuthPluginViews<TAuthViewProps, TSettingsViewProps>
     fallbackViews?: AuthPluginFallbackViews<TAuthViewProps>
+    /** Built-in settings cards this plugin replaces. See {@link AuthPluginCardOverrides}. */
+    cardOverrides?: AuthPluginCardOverrides<TAccountCardProps>
     /**
      * Tabs the plugin contributes to the settings page. Each entry is a
      * {@link SettingsTab} (`view`, `label`, `component`). Read at runtime via

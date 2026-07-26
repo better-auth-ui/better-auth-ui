@@ -1,0 +1,23 @@
+---
+title: getTotpUriOptions
+description: Re-read the TOTP URI of an enrolled user.
+---
+
+Requires the Better Auth two-factor plugin. If TypeScript cannot infer the plugin methods from your client, type or cast `authClient` as `TwoFactorAuthClient` from `@better-auth-ui/solid`.
+
+A mutation rather than a query: the endpoint is a POST that takes the password and returns a secret that should not be cached.
+
+## Options factory
+
+```tsx
+import { getTotpUriOptions } from "@better-auth-ui/solid"
+import { createMutation } from "@tanstack/solid-query"
+
+const getTotpUri = createMutation(() => getTotpUriOptions(authClient))
+
+getTotpUri.mutate({ password: "current-password" })
+```
+
+## Params
+
+<auto-type-table path="../../../../../../packages/solid/src/mutations/two-factor/get-totp-uri-mutation.ts" name="GetTotpUriParams" />

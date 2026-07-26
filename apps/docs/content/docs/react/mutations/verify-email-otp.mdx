@@ -1,0 +1,41 @@
+---
+title: useVerifyEmailOtp
+description: Verify an email address with a code instead of a link.
+---
+
+Verification signs the user in, so the session query is refetched on success.
+
+## Usage
+
+```tsx
+import {
+  type EmailOtpAuthClient,
+  useAuth,
+  useVerifyEmailOtp
+} from "@better-auth-ui/react"
+
+const { authClient } = useAuth()
+const { mutate: verifyEmailOtp } = useVerifyEmailOtp(
+  authClient as EmailOtpAuthClient
+)
+
+verifyEmailOtp({
+  email: "alice@example.com",
+  otp: "123456"
+})
+```
+
+`useVerifyEmailOtp` requires the Better Auth `emailOTP` plugin. Cast `authClient` to `EmailOtpAuthClient` so TypeScript picks up the plugin-extended method signature.
+
+## Options factory
+
+```tsx
+import { verifyEmailOtpOptions } from "@better-auth-ui/react"
+import { useMutation } from "@tanstack/react-query"
+
+const { mutate } = useMutation(verifyEmailOtpOptions(authClient))
+```
+
+## Params
+
+<auto-type-table path="../../../../../../packages/react/src/mutations/email-otp/verify-email-otp-mutation.ts" name="VerifyEmailOtpParams" />

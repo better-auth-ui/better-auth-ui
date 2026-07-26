@@ -1,0 +1,38 @@
+---
+title: useGetTotpUri
+description: Re-read the TOTP URI of an enrolled user.
+---
+
+A mutation rather than a query: the endpoint is a POST that takes the password and returns a secret that should not be cached.
+
+## Usage
+
+```tsx
+import {
+  type TwoFactorAuthClient,
+  useAuth,
+  useGetTotpUri
+} from "@better-auth-ui/react"
+
+const { authClient } = useAuth()
+const { mutate: getTotpUri } = useGetTotpUri(
+  authClient as TwoFactorAuthClient
+)
+
+getTotpUri({ password: "current-password" })
+```
+
+`useGetTotpUri` requires the Better Auth `twoFactor` plugin. Cast `authClient` to `TwoFactorAuthClient` so TypeScript picks up the plugin-extended method signature.
+
+## Options factory
+
+```tsx
+import { getTotpUriOptions } from "@better-auth-ui/react"
+import { useMutation } from "@tanstack/react-query"
+
+const { mutate } = useMutation(getTotpUriOptions(authClient))
+```
+
+## Params
+
+<auto-type-table path="../../../../../../packages/react/src/mutations/two-factor/get-totp-uri-mutation.ts" name="GetTotpUriParams" />

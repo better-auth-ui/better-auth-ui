@@ -3,11 +3,13 @@ import {
   apiKeyPlugin,
   deleteUserPlugin,
   deviceAuthorizationPlugin,
+  emailOtpPlugin,
   magicLinkPlugin,
   multiSessionPlugin,
   organizationPlugin,
   passkeyPlugin,
   themePlugin,
+  twoFactorPlugin,
   usernamePlugin
 } from "@better-auth-ui/heroui/plugins"
 import { Toast } from "@heroui/react"
@@ -35,6 +37,12 @@ export function Providers({ children }: { children: ReactNode }) {
           }),
           deviceAuthorizationPlugin(),
           magicLinkPlugin(),
+          emailOtpPlugin({
+            emailVerification: true,
+            passwordReset: true,
+            changeEmail: true
+          }),
+          twoFactorPlugin(),
           passkeyPlugin(),
           apiKeyPlugin({ organization: true }),
           themePlugin({ useTheme }),

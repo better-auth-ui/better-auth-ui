@@ -1,0 +1,23 @@
+---
+title: disableTwoFactorOptions
+description: Turn two-factor off.
+---
+
+Requires the Better Auth two-factor plugin. If TypeScript cannot infer the plugin methods from your client, type or cast `authClient` as `TwoFactorAuthClient` from `@better-auth-ui/solid`.
+
+Refetches the session so `user.twoFactorEnabled` is up to date.
+
+## Options factory
+
+```tsx
+import { disableTwoFactorOptions } from "@better-auth-ui/solid"
+import { createMutation } from "@tanstack/solid-query"
+
+const disable = createMutation(() => disableTwoFactorOptions(authClient))
+
+disable.mutate({ password: "current-password" })
+```
+
+## Params
+
+<auto-type-table path="../../../../../../packages/solid/src/mutations/two-factor/disable-two-factor-mutation.ts" name="DisableTwoFactorParams" />

@@ -1,0 +1,41 @@
+---
+title: useSignInEmailOtp
+description: Complete passwordless sign-in with an emailed code.
+---
+
+Refetches the session on success. Send the code with `useSendVerificationOtp({ type: "sign-in" })` first.
+
+## Usage
+
+```tsx
+import {
+  type EmailOtpAuthClient,
+  useAuth,
+  useSignInEmailOtp
+} from "@better-auth-ui/react"
+
+const { authClient } = useAuth()
+const { mutate: signInEmailOtp } = useSignInEmailOtp(
+  authClient as EmailOtpAuthClient
+)
+
+signInEmailOtp({
+  email: "alice@example.com",
+  otp: "123456"
+})
+```
+
+`useSignInEmailOtp` requires the Better Auth `emailOTP` plugin. Cast `authClient` to `EmailOtpAuthClient` so TypeScript picks up the plugin-extended method signature.
+
+## Options factory
+
+```tsx
+import { signInEmailOtpOptions } from "@better-auth-ui/react"
+import { useMutation } from "@tanstack/react-query"
+
+const { mutate } = useMutation(signInEmailOtpOptions(authClient))
+```
+
+## Params
+
+<auto-type-table path="../../../../../../packages/react/src/mutations/email-otp/sign-in-email-otp-mutation.ts" name="SignInEmailOtpParams" />

@@ -1,0 +1,45 @@
+---
+title: useEnableTwoFactor
+description: Start two-factor enrollment.
+---
+
+Resolves with the TOTP URI and the backup codes. Unless the server sets `skipVerificationOnEnable`, two-factor only becomes active once `useVerifyTotp` succeeds.
+
+## Usage
+
+```tsx
+import {
+  type TwoFactorAuthClient,
+  useAuth,
+  useEnableTwoFactor
+} from "@better-auth-ui/react"
+
+const { authClient } = useAuth()
+const { mutate: enableTwoFactor } = useEnableTwoFactor(
+  authClient as TwoFactorAuthClient
+)
+
+enableTwoFactor(
+  { password: "current-password" },
+  {
+    onSuccess: ({ totpURI, backupCodes }) => {
+      // Render the QR code and show the backup codes once.
+    }
+  }
+)
+```
+
+`useEnableTwoFactor` requires the Better Auth `twoFactor` plugin. Cast `authClient` to `TwoFactorAuthClient` so TypeScript picks up the plugin-extended method signature.
+
+## Options factory
+
+```tsx
+import { enableTwoFactorOptions } from "@better-auth-ui/react"
+import { useMutation } from "@tanstack/react-query"
+
+const { mutate } = useMutation(enableTwoFactorOptions(authClient))
+```
+
+## Params
+
+<auto-type-table path="../../../../../../packages/react/src/mutations/two-factor/enable-two-factor-mutation.ts" name="EnableTwoFactorParams" />

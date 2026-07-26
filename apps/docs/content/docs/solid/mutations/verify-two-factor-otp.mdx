@@ -1,0 +1,23 @@
+---
+title: verifyTwoFactorOtpOptions
+description: Verify the emailed second-factor code.
+---
+
+Requires the Better Auth two-factor plugin. If TypeScript cannot infer the plugin methods from your client, type or cast `authClient` as `TwoFactorAuthClient` from `@better-auth-ui/solid`.
+
+Send the code with `sendTwoFactorOtpOptions` first. Refetches the session on success.
+
+## Options factory
+
+```tsx
+import { verifyTwoFactorOtpOptions } from "@better-auth-ui/solid"
+import { createMutation } from "@tanstack/solid-query"
+
+const verifyOtp = createMutation(() => verifyTwoFactorOtpOptions(authClient))
+
+verifyOtp.mutate({ code: "123456", trustDevice: true })
+```
+
+## Params
+
+<auto-type-table path="../../../../../../packages/solid/src/mutations/two-factor/verify-two-factor-otp-mutation.ts" name="VerifyTwoFactorOtpParams" />

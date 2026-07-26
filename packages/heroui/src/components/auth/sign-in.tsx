@@ -20,6 +20,7 @@ import {
 import { useIsMutating } from "@tanstack/react-query"
 import { type SyntheticEvent, useState } from "react"
 
+import { useSignInContinuation } from "../../lib/auth/use-sign-in-continuation"
 import { FieldSeparator } from "./field-separator"
 import { LastUsedBadge } from "./last-login-method/last-used-badge"
 import { ProviderButtons, type SocialLayout } from "./provider-buttons"
@@ -48,13 +49,13 @@ export function SignIn({
     emailAndPassword,
     localization,
     plugins,
-    redirectTo,
     socialProviders,
     viewPaths,
     navigate
   } = useAuth()
 
   const { fetchOptions, resetFetchOptions } = useFetchOptions()
+  const continueSignIn = useSignInContinuation()
 
   const [password, setPassword] = useState("")
   const [isPasswordVisible, setIsPasswordVisible] = useState(false)
@@ -74,7 +75,7 @@ export function SignIn({
 
         resetFetchOptions()
       },
-      onSuccess: () => navigate({ to: redirectTo })
+      onSuccess: (data) => continueSignIn(data)
     }
   )
 

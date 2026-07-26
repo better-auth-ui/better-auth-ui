@@ -1,0 +1,38 @@
+---
+title: useDisableTwoFactor
+description: Turn two-factor off.
+---
+
+Refetches the session so `user.twoFactorEnabled` is up to date.
+
+## Usage
+
+```tsx
+import {
+  type TwoFactorAuthClient,
+  useAuth,
+  useDisableTwoFactor
+} from "@better-auth-ui/react"
+
+const { authClient } = useAuth()
+const { mutate: disableTwoFactor } = useDisableTwoFactor(
+  authClient as TwoFactorAuthClient
+)
+
+disableTwoFactor({ password: "current-password" })
+```
+
+`useDisableTwoFactor` requires the Better Auth `twoFactor` plugin. Cast `authClient` to `TwoFactorAuthClient` so TypeScript picks up the plugin-extended method signature.
+
+## Options factory
+
+```tsx
+import { disableTwoFactorOptions } from "@better-auth-ui/react"
+import { useMutation } from "@tanstack/react-query"
+
+const { mutate } = useMutation(disableTwoFactorOptions(authClient))
+```
+
+## Params
+
+<auto-type-table path="../../../../../../packages/react/src/mutations/two-factor/disable-two-factor-mutation.ts" name="DisableTwoFactorParams" />

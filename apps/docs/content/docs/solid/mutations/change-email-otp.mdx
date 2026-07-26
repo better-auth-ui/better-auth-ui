@@ -1,0 +1,23 @@
+---
+title: changeEmailOtpOptions
+description: Confirm an email change with a code.
+---
+
+Requires the Better Auth email-OTP plugin. If TypeScript cannot infer the plugin methods from your client, type or cast `authClient` as `EmailOtpAuthClient` from `@better-auth-ui/solid`.
+
+The address on the session changes, so the session query is refetched on success.
+
+## Options factory
+
+```tsx
+import { changeEmailOtpOptions } from "@better-auth-ui/solid"
+import { createMutation } from "@tanstack/solid-query"
+
+const changeEmail = createMutation(() => changeEmailOtpOptions(authClient))
+
+changeEmail.mutate({ newEmail: "new@example.com", otp: "123456" })
+```
+
+## Params
+
+<auto-type-table path="../../../../../../packages/solid/src/mutations/email-otp/change-email-otp-mutation.ts" name="ChangeEmailOtpParams" />

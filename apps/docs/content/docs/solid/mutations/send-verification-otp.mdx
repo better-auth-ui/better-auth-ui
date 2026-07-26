@@ -1,0 +1,23 @@
+---
+title: sendVerificationOtpOptions
+description: Email a one-time code for any email-OTP flow.
+---
+
+Requires the Better Auth email-OTP plugin. If TypeScript cannot infer the plugin methods from your client, type or cast `authClient` as `EmailOtpAuthClient` from `@better-auth-ui/solid`.
+
+One endpoint backs every email-OTP flow. `type` picks which one: `"sign-in"`, `"email-verification"`, `"forget-password"`, or `"change-email"`.
+
+## Options factory
+
+```tsx
+import { sendVerificationOtpOptions } from "@better-auth-ui/solid"
+import { createMutation } from "@tanstack/solid-query"
+
+const sendCode = createMutation(() => sendVerificationOtpOptions(authClient))
+
+sendCode.mutate({ email: "alice@example.com", type: "sign-in" })
+```
+
+## Params
+
+<auto-type-table path="../../../../../../packages/solid/src/mutations/email-otp/send-verification-otp-mutation.ts" name="SendVerificationOtpParams" />

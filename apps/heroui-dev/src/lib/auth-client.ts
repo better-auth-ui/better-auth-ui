@@ -2,10 +2,12 @@ import { apiKeyClient } from "@better-auth/api-key/client"
 import { passkeyClient } from "@better-auth/passkey/client"
 import {
   deviceAuthorizationClient,
+  emailOTPClient,
   inferAdditionalFields,
   magicLinkClient,
   multiSessionClient,
   organizationClient,
+  twoFactorClient,
   usernameClient
 } from "better-auth/client/plugins"
 import { createAuthClient } from "better-auth/react"
@@ -21,6 +23,8 @@ export const authClient = createAuthClient({
     usernameClient(),
     organizationClient(),
     deviceAuthorizationClient(),
-    magicLinkClient()
+    magicLinkClient(),
+    emailOTPClient(),
+    twoFactorClient()
   ]
 })

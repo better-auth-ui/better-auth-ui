@@ -1,0 +1,23 @@
+---
+title: verifyEmailOtpOptions
+description: Verify an email address with a code instead of a link.
+---
+
+Requires the Better Auth email-OTP plugin. If TypeScript cannot infer the plugin methods from your client, type or cast `authClient` as `EmailOtpAuthClient` from `@better-auth-ui/solid`.
+
+Verification signs the user in, so the session query is refetched on success.
+
+## Options factory
+
+```tsx
+import { verifyEmailOtpOptions } from "@better-auth-ui/solid"
+import { createMutation } from "@tanstack/solid-query"
+
+const verifyEmail = createMutation(() => verifyEmailOtpOptions(authClient))
+
+verifyEmail.mutate({ email: "alice@example.com", otp: "123456" })
+```
+
+## Params
+
+<auto-type-table path="../../../../../../packages/solid/src/mutations/email-otp/verify-email-otp-mutation.ts" name="VerifyEmailOtpParams" />

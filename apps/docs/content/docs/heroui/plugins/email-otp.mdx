@@ -1,0 +1,260 @@
+---
+title: Email OTP
+description: Replace emailed links with one-time codes for sign-in, verification, password reset, and email changes.
+---
+
+import { Callout } from 'fumadocs-ui/components/callout'
+import { Step, Steps } from 'fumadocs-ui/components/steps'
+import { Tab, Tabs, TabsList, TabsTrigger } from 'fumadocs-ui/components/tabs'
+
+The email-OTP plugin swaps emailed links for short codes the user types back into the app. Every flow is opt-in, so you can keep the link-based views you like and replace only the ones you don't.
+
+It contributes:
+
+- An `<EmailOtp />` sign-in view at `/auth/email-otp` plus a "Continue with Email Code" button
+- Code-based replacements for the verify-email, forgot-password, reset-password, and change-email surfaces
+- Mutation hooks for every email-OTP endpoint (`useSendVerificationOtp`, `useSignInEmailOtp`, `useVerifyEmailOtp`, `useRequestPasswordResetOtp`, `useResetPasswordOtp`, `useRequestEmailChangeOtp`, `useChangeEmailOtp`)
+
+When `emailAndPassword.enabled === false`, `<EmailOtp />` takes over `/auth/sign-in` as the primary passwordless surface.
+
+<Callout type="warn">
+Email-OTP sign-in **replaces** the password, it doesn't add a step after it. If you want "password, then an emailed code", that's the [two-factor plugin](/docs/heroui/plugins/two-factor) with `otpOptions`. Better Auth does not apply 2FA to passwordless methods, so email-OTP sign-in bypasses a configured second factor.
+</Callout>
+
+## Setup
+
+<Steps>
+<Step>
+### Install the Better Auth plugin
+
+Add the [Email OTP](https://www.better-auth.com/docs/plugins/email-otp) plugin to your server config and wire `sendVerificationOTP` to your email provider. One callback serves all four flows — `type` tells you which one:
+
+```ts title="lib/auth.ts"
+import { betterAuth } from "better-auth"
+import { emailOTP } from "better-auth/plugins" // [!code highlight]
+
+export const auth = betterAuth({
+  // ...
+  plugins: [
+    emailOTP({ // [!code highlight]
+      disableSignUp: true, // [!code highlight]
+      sendVerificationOTP: async ({ email, otp, type }) => { // [!code highlight]
+        // Send `otp` to `email`. `type` is "sign-in", "email-verification", // [!code highlight]
+        // "forget-password", or "change-email". // [!code highlight]
+      } // [!code highlight]
+    }) // [!code highlight]
+  ]
+})
+```
+
+</Step>
+<Step>
+### Install the matching client plugin
+
+```ts title="lib/auth-client.ts"
+import { createAuthClient } from "better-auth/react"
+import { emailOTPClient } from "better-auth/client/plugins" // [!code highlight]
+
+export const authClient = createAuthClient({
+  plugins: [emailOTPClient()] // [!code highlight]
+})
+```
+
+</Step>
+<Step>
+### Register the UI plugin
+
+Pass `emailOtpPlugin()` to `<AuthProvider>` and turn on the flows you want:
+
+```tsx title="components/providers.tsx"
+import { AuthProvider } from "@better-auth-ui/heroui"
+import { emailOtpPlugin } from "@better-auth-ui/heroui/plugins" // [!code highlight]
+
+<AuthProvider
+  authClient={authClient}
+  navigate={navigate}
+  plugins={[emailOtpPlugin()]} // [!code highlight]
+>
+  {children}
+</AuthProvider>
+```
+
+</Step>
+<Step>
+### Allow the new view path
+
+The plugin contributes an `email-otp` segment to `viewPaths.auth`. Spread `emailOtpPlugin().viewPaths?.auth` into your auth route's allowed-paths set:
+
+<Tabs defaultValue="tanstack-start">
+<TabsList>
+<TabsTrigger value="tanstack-start"><TanStackStart />TanStack Start</TabsTrigger>
+<TabsTrigger value="next.js"><NextJS />Next.js</TabsTrigger>
+</TabsList>
+<Tab value="tanstack-start">
+
+```tsx title="routes/auth/$path.tsx"
+import { viewPaths } from "@better-auth-ui/core"
+import { Auth } from "@better-auth-ui/heroui"
+import { emailOtpPlugin } from "@better-auth-ui/heroui/plugins" // [!code highlight]
+import { createFileRoute, notFound } from "@tanstack/react-router"
+
+export const Route = createFileRoute("/auth/$path")({
+  beforeLoad({ params: { path } }) {
+    if (
+      !Object.values({
+        ...viewPaths.auth,
+        ...emailOtpPlugin().viewPaths?.auth // [!code highlight]
+      }).includes(path)
+    ) {
+      throw notFound()
+    }
+  },
+  component: AuthPage
+})
+
+function AuthPage() {
+  const { path } = Route.useParams()
+  return <Auth path={path} />
+}
+```
+
+</Tab>
+<Tab value="next.js">
+
+```tsx title="app/auth/[path]/page.tsx"
+import { viewPaths } from "@better-auth-ui/core"
+import { Auth } from "@better-auth-ui/heroui"
+import { emailOtpPlugin } from "@better-auth-ui/heroui/plugins" // [!code highlight]
+import { notFound } from "next/navigation"
+
+export default async function AuthPage({
+  params
+}: {
+  params: Promise<{ path: string }>
+}) {
+  const { path } = await params
+
+  if (
+    !Object.values({
+      ...viewPaths.auth,
+      ...emailOtpPlugin().viewPaths?.auth // [!code highlight]
+    }).includes(path)
+  ) {
+    notFound()
+  }
+
+  return <Auth path={path} />
+}
+```
+
+</Tab>
+</Tabs>
+
+</Step>
+</Steps>
+
+## Choosing which flows use codes
+
+Each option replaces one link-based surface. Turn a flow on in the UI only when the matching server option is set, otherwise the user waits for a code that never arrives.
+
+| Option | Replaces | Server option it needs |
+|---|---|---|
+| `signIn` (default `true`) | adds `/auth/email-otp` | none |
+| `emailVerification` | `<VerifyEmail />` | `overrideDefaultEmailVerification: true` |
+| `passwordReset` | `<ForgotPassword />` and `<ResetPassword />` | none |
+| `changeEmail` | the change-email card in account settings | `changeEmail: { enabled: true }` |
+| `verifyCurrentEmail` | adds a step to the change-email flow | `changeEmail: { verifyCurrentEmail: true }` |
+
+```tsx
+emailOtpPlugin({
+  // Keep the emailed sign-in link, use codes for everything else.
+  signIn: false,
+  emailVerification: true,
+  passwordReset: true,
+  changeEmail: true
+})
+```
+
+## Sign-up and account creation
+
+Better Auth creates an account for any address that completes an email-OTP sign-in, unless you set `disableSignUp: true` on the server. The UI mirrors that with `disableSignUp` defaulting to `true`.
+
+The reason is account enumeration: collecting a name only for addresses that don't exist yet would tell an attacker which addresses are registered. Keep sign-up on the password or magic-link path, or build a combined flow that asks every user for the same fields.
+
+## Components
+
+### `<EmailOtp />`
+
+A two-state form on one route — enter an email, then enter the code:
+
+```tsx
+import { EmailOtp } from "@better-auth-ui/heroui/plugins"
+
+<EmailOtp />
+```
+
+<auto-type-table path="../../../../../../packages/heroui/src/components/auth/email-otp/email-otp.tsx" name="EmailOtpProps" />
+
+### `<VerifyEmailOtp />`
+
+Rendered at `/auth/verify-email` when `emailVerification` is on. Reads the pending address from session storage (sign-up and sign-in put it there) and asks for it when it's missing.
+
+```tsx
+import { VerifyEmailOtp } from "@better-auth-ui/heroui/plugins"
+
+<VerifyEmailOtp />
+```
+
+<auto-type-table path="../../../../../../packages/heroui/src/components/auth/email-otp/verify-email-otp.tsx" name="VerifyEmailOtpProps" />
+
+### `<ForgotPasswordOtp />` and `<ResetPasswordOtp />`
+
+With `passwordReset` on, `/auth/forgot-password` emails a code and sends the user straight to `/auth/reset-password`, which takes the code and the new password together. The reset-link-sent view is skipped.
+
+```tsx
+import {
+  ForgotPasswordOtp,
+  ResetPasswordOtp
+} from "@better-auth-ui/heroui/plugins"
+```
+
+<auto-type-table path="../../../../../../packages/heroui/src/components/auth/email-otp/reset-password-otp.tsx" name="ResetPasswordOtpProps" />
+
+### `<ChangeEmailOtp />`
+
+With `changeEmail` on, this replaces the built-in change-email card inside `<AccountSettings />` — no extra wiring needed. With `verifyCurrentEmail` it becomes a three-step flow: confirm the current address, then the new one.
+
+```tsx
+import { ChangeEmailOtp } from "@better-auth-ui/heroui/plugins"
+
+<ChangeEmailOtp />
+```
+
+<auto-type-table path="../../../../../../packages/heroui/src/components/auth/email-otp/change-email-otp.tsx" name="ChangeEmailOtpProps" />
+
+## Options
+
+```ts
+emailOtpPlugin({
+  // Override the URL segment. Default: "email-otp"
+  path: "code",
+  // Match the server's `otpLength`. Default: 6
+  otpLength: 6,
+  // Override any of the plugin's localization strings.
+  localization: {
+    sendCode: "Email me a code"
+  }
+})
+```
+
+<auto-type-table path="../../../../../../packages/core/src/plugins/email-otp/email-otp-plugin.ts" name="EmailOtpPluginOptions" />
+
+## Localization
+
+<auto-type-table path="../../../../../../packages/core/src/plugins/email-otp/email-otp-localization.ts" name="EmailOtpLocalization" />
+
+Read these from `useAuthPlugin(emailOtpPlugin).localization` inside custom slot components.
+
+## Email template
+
+Pair the plugin with the [`<OtpEmail />`](/docs/heroui/components/email/otp-email) component to send a styled code from your `sendVerificationOTP` callback.

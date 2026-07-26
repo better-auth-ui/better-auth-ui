@@ -1,0 +1,23 @@
+---
+title: generateBackupCodesOptions
+description: Replace the existing backup codes.
+---
+
+Requires the Better Auth two-factor plugin. If TypeScript cannot infer the plugin methods from your client, type or cast `authClient` as `TwoFactorAuthClient` from `@better-auth-ui/solid`.
+
+The new codes are returned once. Keep them in component state and let the user copy them — they are never returned again.
+
+## Options factory
+
+```tsx
+import { generateBackupCodesOptions } from "@better-auth-ui/solid"
+import { createMutation } from "@tanstack/solid-query"
+
+const generateCodes = createMutation(() => generateBackupCodesOptions(authClient))
+
+generateCodes.mutate({ password: "current-password" })
+```
+
+## Params
+
+<auto-type-table path="../../../../../../packages/solid/src/mutations/two-factor/generate-backup-codes-mutation.ts" name="GenerateBackupCodesParams" />

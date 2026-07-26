@@ -1,0 +1,38 @@
+---
+title: useSendTwoFactorOtp
+description: Email the second-factor code.
+---
+
+Authenticated by the two-factor cookie Better Auth set during sign-in, so it only works while a challenge is pending.
+
+## Usage
+
+```tsx
+import {
+  type TwoFactorAuthClient,
+  useAuth,
+  useSendTwoFactorOtp
+} from "@better-auth-ui/react"
+
+const { authClient } = useAuth()
+const { mutate: sendTwoFactorOtp } = useSendTwoFactorOtp(
+  authClient as TwoFactorAuthClient
+)
+
+sendTwoFactorOtp()
+```
+
+`useSendTwoFactorOtp` requires the Better Auth `twoFactor` plugin. Cast `authClient` to `TwoFactorAuthClient` so TypeScript picks up the plugin-extended method signature.
+
+## Options factory
+
+```tsx
+import { sendTwoFactorOtpOptions } from "@better-auth-ui/react"
+import { useMutation } from "@tanstack/react-query"
+
+const { mutate } = useMutation(sendTwoFactorOtpOptions(authClient))
+```
+
+## Params
+
+<auto-type-table path="../../../../../../packages/react/src/mutations/two-factor/send-two-factor-otp-mutation.ts" name="SendTwoFactorOtpParams" />

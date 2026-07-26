@@ -10,6 +10,7 @@ import {
   apiKeyMutationKeys,
   apiKeyQueryKeys,
   deleteUserMutationKeys,
+  emailOtpMutationKeys,
   magicLinkMutationKeys,
   multiSessionMutationKeys,
   multiSessionQueryKeys,
@@ -17,6 +18,7 @@ import {
   organizationQueryKeys,
   passkeyMutationKeys,
   passkeyQueryKeys,
+  twoFactorMutationKeys,
   usernameMutationKeys
 } from "@better-auth-ui/core/plugins"
 import { afterEach, describe, expect, it, vi } from "vitest"
@@ -24,6 +26,7 @@ import {
   accountInfoOptions,
   addPasskeyOptions,
   changeEmailOptions,
+  changeEmailOtpOptions,
   changePasswordOptions,
   createApiKeyOptions,
   createOrganizationMeta,
@@ -31,6 +34,10 @@ import {
   deleteApiKeyOptions,
   deletePasskeyOptions,
   deleteUserOptions,
+  disableTwoFactorOptions,
+  enableTwoFactorOptions,
+  generateBackupCodesOptions,
+  getTotpUriOptions,
   hasPermissionOptions,
   isUsernameAvailableOptions,
   linkSocialOptions,
@@ -40,14 +47,20 @@ import {
   listOrganizationMembersOptions,
   listOrganizationsOptions,
   listPasskeysOptions,
+  requestEmailChangeOtpOptions,
   requestPasswordResetOptions,
+  requestPasswordResetOtpOptions,
   resetPasswordOptions,
+  resetPasswordOtpOptions,
   resolveAuthConfig,
   revokeMultiSessionOptions,
   revokeSessionOptions,
+  sendTwoFactorOtpOptions,
   sendVerificationEmailOptions,
+  sendVerificationOtpOptions,
   setActiveSessionOptions,
   signInEmailOptions,
+  signInEmailOtpOptions,
   signInMagicLinkOptions,
   signInPasskeyOptions,
   signInSocialOptions,
@@ -55,7 +68,11 @@ import {
   signOutOptions,
   signUpEmailOptions,
   unlinkAccountOptions,
-  updateUserOptions
+  updateUserOptions,
+  verifyBackupCodeOptions,
+  verifyEmailOtpOptions,
+  verifyTotpOptions,
+  verifyTwoFactorOtpOptions
 } from "../src"
 import { invalidateAuthMutationMeta } from "../src/lib/mutation-invalidator"
 import { getSessionUserId } from "../src/queries/create-user-scoped-query"
@@ -298,6 +315,77 @@ describe("Solid auth behavior parity", () => {
       name: "CLI",
       fetchOptions: { credentials: "include", throw: true }
     })
+  })
+
+  it("mirrors the React email-OTP and two-factor mutation keys", () => {
+    const authClient = {
+      emailOtp: {
+        sendVerificationOtp: vi.fn(async () => ({ data: "sent" })),
+        verifyEmail: vi.fn(async () => ({ data: "verified" })),
+        requestPasswordReset: vi.fn(async () => ({ data: "requested" })),
+        resetPassword: vi.fn(async () => ({ data: "reset" })),
+        requestEmailChange: vi.fn(async () => ({ data: "requested" })),
+        changeEmail: vi.fn(async () => ({ data: "changed" }))
+      },
+      signIn: { emailOtp: vi.fn(async (params) => ({ data: params.email })) },
+      twoFactor: {
+        enable: vi.fn(async () => ({ data: "enabled" })),
+        disable: vi.fn(async () => ({ data: "disabled" })),
+        getTotpUri: vi.fn(async () => ({ data: "otpauth://" })),
+        generateBackupCodes: vi.fn(async () => ({ data: ["code"] })),
+        sendOtp: vi.fn(async () => ({ data: "sent" })),
+        verifyTotp: vi.fn(async () => ({ data: "verified" })),
+        verifyOtp: vi.fn(async () => ({ data: "verified" })),
+        verifyBackupCode: vi.fn(async () => ({ data: "verified" }))
+      }
+    }
+
+    expect(sendVerificationOtpOptions(authClient as never).mutationKey).toEqual(
+      emailOtpMutationKeys.sendVerificationOtp
+    )
+    expect(signInEmailOtpOptions(authClient as never).mutationKey).toEqual(
+      emailOtpMutationKeys.signIn
+    )
+    expect(verifyEmailOtpOptions(authClient as never).mutationKey).toEqual(
+      emailOtpMutationKeys.verifyEmail
+    )
+    expect(
+      requestPasswordResetOtpOptions(authClient as never).mutationKey
+    ).toEqual(emailOtpMutationKeys.requestPasswordReset)
+    expect(resetPasswordOtpOptions(authClient as never).mutationKey).toEqual(
+      emailOtpMutationKeys.resetPassword
+    )
+    expect(
+      requestEmailChangeOtpOptions(authClient as never).mutationKey
+    ).toEqual(emailOtpMutationKeys.requestEmailChange)
+    expect(changeEmailOtpOptions(authClient as never).mutationKey).toEqual(
+      emailOtpMutationKeys.changeEmail
+    )
+
+    expect(enableTwoFactorOptions(authClient as never).mutationKey).toEqual(
+      twoFactorMutationKeys.enable
+    )
+    expect(disableTwoFactorOptions(authClient as never).mutationKey).toEqual(
+      twoFactorMutationKeys.disable
+    )
+    expect(getTotpUriOptions(authClient as never).mutationKey).toEqual(
+      twoFactorMutationKeys.getTotpUri
+    )
+    expect(generateBackupCodesOptions(authClient as never).mutationKey).toEqual(
+      twoFactorMutationKeys.generateBackupCodes
+    )
+    expect(sendTwoFactorOtpOptions(authClient as never).mutationKey).toEqual(
+      twoFactorMutationKeys.sendOtp
+    )
+    expect(verifyTotpOptions(authClient as never).mutationKey).toEqual(
+      twoFactorMutationKeys.verifyTotp
+    )
+    expect(verifyTwoFactorOtpOptions(authClient as never).mutationKey).toEqual(
+      twoFactorMutationKeys.verifyOtp
+    )
+    expect(verifyBackupCodeOptions(authClient as never).mutationKey).toEqual(
+      twoFactorMutationKeys.verifyBackupCode
+    )
   })
 
   it("creates organization query and mutation options with plugin-scoped keys", () => {

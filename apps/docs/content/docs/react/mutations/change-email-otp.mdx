@@ -1,0 +1,41 @@
+---
+title: useChangeEmailOtp
+description: Confirm an email change with a code.
+---
+
+The address on the session changes, so the session query is refetched on success.
+
+## Usage
+
+```tsx
+import {
+  type EmailOtpAuthClient,
+  useAuth,
+  useChangeEmailOtp
+} from "@better-auth-ui/react"
+
+const { authClient } = useAuth()
+const { mutate: changeEmailOtp } = useChangeEmailOtp(
+  authClient as EmailOtpAuthClient
+)
+
+changeEmailOtp({
+  newEmail: "new@example.com",
+  otp: "123456"
+})
+```
+
+`useChangeEmailOtp` requires the Better Auth `emailOTP` plugin. Cast `authClient` to `EmailOtpAuthClient` so TypeScript picks up the plugin-extended method signature.
+
+## Options factory
+
+```tsx
+import { changeEmailOtpOptions } from "@better-auth-ui/react"
+import { useMutation } from "@tanstack/react-query"
+
+const { mutate } = useMutation(changeEmailOtpOptions(authClient))
+```
+
+## Params
+
+<auto-type-table path="../../../../../../packages/react/src/mutations/email-otp/change-email-otp-mutation.ts" name="ChangeEmailOtpParams" />

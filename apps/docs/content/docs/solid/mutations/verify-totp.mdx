@@ -1,0 +1,23 @@
+---
+title: verifyTotpOptions
+description: Verify an authenticator code.
+---
+
+Requires the Better Auth two-factor plugin. If TypeScript cannot infer the plugin methods from your client, type or cast `authClient` as `TwoFactorAuthClient` from `@better-auth-ui/solid`.
+
+Used both to finish a pending sign-in challenge and to confirm enrollment. Verification is what creates the session, so it refetches the session query.
+
+## Options factory
+
+```tsx
+import { verifyTotpOptions } from "@better-auth-ui/solid"
+import { createMutation } from "@tanstack/solid-query"
+
+const verifyTotp = createMutation(() => verifyTotpOptions(authClient))
+
+verifyTotp.mutate({ code: "123456", trustDevice: true })
+```
+
+## Params
+
+<auto-type-table path="../../../../../../packages/solid/src/mutations/two-factor/verify-totp-mutation.ts" name="VerifyTotpParams" />

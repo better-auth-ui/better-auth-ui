@@ -1,0 +1,23 @@
+---
+title: verifyBackupCodeOptions
+description: Recover with a backup code.
+---
+
+Requires the Better Auth two-factor plugin. If TypeScript cannot infer the plugin methods from your client, type or cast `authClient` as `TwoFactorAuthClient` from `@better-auth-ui/solid`.
+
+Each code works once — the server consumes it on success. Refetches the session.
+
+## Options factory
+
+```tsx
+import { verifyBackupCodeOptions } from "@better-auth-ui/solid"
+import { createMutation } from "@tanstack/solid-query"
+
+const verifyBackupCode = createMutation(() => verifyBackupCodeOptions(authClient))
+
+verifyBackupCode.mutate({ code: "a1b2-c3d4" })
+```
+
+## Params
+
+<auto-type-table path="../../../../../../packages/solid/src/mutations/two-factor/verify-backup-code-mutation.ts" name="VerifyBackupCodeParams" />

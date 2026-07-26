@@ -1,0 +1,114 @@
+[
+  {
+    "id": "email-otp-plugin.ts-EmailOtpPluginOptions",
+    "name": "EmailOtpPluginOptions",
+    "description": "",
+    "entries": [
+      {
+        "name": "localization",
+        "description": "Override the plugin's default localization strings.",
+        "tags": [{ "name": "remarks", "text": "`EmailOtpLocalization`" }],
+        "type": "Partial<{ emailOtp: string; sendCode: string; code: string; verifyCode: string; codeSentTo: string; codeLengthMismatch: string; useDifferentEmail: string; codeSent: string; emailVerified: string; confirmCurrentEmail: string; confirmNewEmail: string; confirmEmailDescription: string; }>",
+        "simplifiedType": "EmailOtpLocalization",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "path",
+        "description": "URL segment for the email-OTP sign-in view.",
+        "tags": [
+          { "name": "remarks", "text": "`string`" },
+          { "name": "default", "text": "\"email-otp\"" }
+        ],
+        "type": "string",
+        "simplifiedType": "string",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "otpLength",
+        "description": "Number of characters rendered by the code inputs.\n\nKeep this in sync with Better Auth's `emailOTP({ otpLength })` server\noption.",
+        "tags": [
+          { "name": "remarks", "text": "`number`" },
+          { "name": "default", "text": "6" }
+        ],
+        "type": "number",
+        "simplifiedType": "number",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "signIn",
+        "description": "Offer passwordless sign-in with an emailed code.\n\nAdds the `/auth/email-otp` view plus a \"Continue with Email Code\" button,\nand takes over `/auth/sign-in` when `emailAndPassword.enabled === false`.",
+        "tags": [
+          { "name": "remarks", "text": "`boolean`" },
+          { "name": "default", "text": "true" }
+        ],
+        "type": "boolean",
+        "simplifiedType": "boolean",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "emailVerification",
+        "description": "Replace the link-based verify-email view with a code form.\n\nRequires `emailOTP({ overrideDefaultEmailVerification: true })` on the\nserver so sign-up sends a code instead of a link.",
+        "tags": [
+          { "name": "remarks", "text": "`boolean`" },
+          { "name": "default", "text": "false" }
+        ],
+        "type": "boolean",
+        "simplifiedType": "boolean",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "passwordReset",
+        "description": "Replace the link-based password reset views with code forms.\n\n`/auth/forgot-password` sends a code and `/auth/reset-password` takes the\ncode plus the new password, so the emailed reset link is never used.",
+        "tags": [
+          { "name": "remarks", "text": "`boolean`" },
+          { "name": "default", "text": "false" }
+        ],
+        "type": "boolean",
+        "simplifiedType": "boolean",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "changeEmail",
+        "description": "Replace the change-email card in account settings with the code flow.\n\nRequires `emailOTP({ changeEmail: { enabled: true } })` on the server.",
+        "tags": [
+          { "name": "remarks", "text": "`boolean`" },
+          { "name": "default", "text": "false" }
+        ],
+        "type": "boolean",
+        "simplifiedType": "boolean",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "verifyCurrentEmail",
+        "description": "Ask for a code sent to the current address before changing the email.\n\nMirrors Better Auth's `emailOTP({ changeEmail: { verifyCurrentEmail } })`\nserver option — set both or neither.",
+        "tags": [
+          { "name": "remarks", "text": "`boolean`" },
+          { "name": "default", "text": "false" }
+        ],
+        "type": "boolean",
+        "simplifiedType": "boolean",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "disableSignUp",
+        "description": "Mirrors Better Auth's `emailOTP({ disableSignUp })` server option.\n\nLeft on by default: with sign-up enabled the server creates an account for\nany address that completes the code flow, and collecting a name only for\nunknown addresses would leak whether an account exists.",
+        "tags": [
+          { "name": "remarks", "text": "`boolean`" },
+          { "name": "default", "text": "true" }
+        ],
+        "type": "boolean",
+        "simplifiedType": "boolean",
+        "required": false,
+        "deprecated": false
+      }
+    ]
+  }
+]

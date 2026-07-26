@@ -1,0 +1,38 @@
+---
+title: useVerifyBackupCode
+description: Recover with a backup code.
+---
+
+Each code works once — the server consumes it on success. Refetches the session.
+
+## Usage
+
+```tsx
+import {
+  type TwoFactorAuthClient,
+  useAuth,
+  useVerifyBackupCode
+} from "@better-auth-ui/react"
+
+const { authClient } = useAuth()
+const { mutate: verifyBackupCode } = useVerifyBackupCode(
+  authClient as TwoFactorAuthClient
+)
+
+verifyBackupCode({ code: "a1b2-c3d4" })
+```
+
+`useVerifyBackupCode` requires the Better Auth `twoFactor` plugin. Cast `authClient` to `TwoFactorAuthClient` so TypeScript picks up the plugin-extended method signature.
+
+## Options factory
+
+```tsx
+import { verifyBackupCodeOptions } from "@better-auth-ui/react"
+import { useMutation } from "@tanstack/react-query"
+
+const { mutate } = useMutation(verifyBackupCodeOptions(authClient))
+```
+
+## Params
+
+<auto-type-table path="../../../../../../packages/react/src/mutations/two-factor/verify-backup-code-mutation.ts" name="VerifyBackupCodeParams" />

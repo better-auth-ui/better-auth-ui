@@ -1,0 +1,23 @@
+---
+title: sendTwoFactorOtpOptions
+description: Email the second-factor code.
+---
+
+Requires the Better Auth two-factor plugin. If TypeScript cannot infer the plugin methods from your client, type or cast `authClient` as `TwoFactorAuthClient` from `@better-auth-ui/solid`.
+
+Authenticated by the two-factor cookie Better Auth set during sign-in, so it only works while a challenge is pending.
+
+## Options factory
+
+```tsx
+import { sendTwoFactorOtpOptions } from "@better-auth-ui/solid"
+import { createMutation } from "@tanstack/solid-query"
+
+const sendOtp = createMutation(() => sendTwoFactorOtpOptions(authClient))
+
+sendOtp.mutate({})
+```
+
+## Params
+
+<auto-type-table path="../../../../../../packages/solid/src/mutations/two-factor/send-two-factor-otp-mutation.ts" name="SendTwoFactorOtpParams" />

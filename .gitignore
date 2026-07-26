@@ -46,6 +46,10 @@ Thumbs.db
 
 .nx
 
+# Vitest browser-mode failure artifacts
+.vitest-attachments/
+__screenshots__/
+
 # Environment variables
 .env
 .env.local

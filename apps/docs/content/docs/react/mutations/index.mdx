@@ -30,7 +30,10 @@ Hooks that change auth state update the cache for you. Override `onSuccess` in t
 - `useSignOut` — remove every `["auth", ...]` query.
 - `useUpdateUser` — optimistically merge the update into the cached session, then refetch.
 - `useSetActiveSession` — optimistically swap the cached session, scroll to top, and refetch both the session and device-session queries.
-- `useChangeEmail` — refetch the session.
+- `useChangeEmail` / `useChangeEmailOtp` — refetch the session.
+- `useSignInEmailOtp` / `useVerifyEmailOtp` — refetch the session, since both establish one.
+- `useVerifyTotp` / `useVerifyTwoFactorOtp` / `useVerifyBackupCode` — refetch the session; the second factor is what creates it.
+- `useEnableTwoFactor` / `useDisableTwoFactor` — refetch the session so `user.twoFactorEnabled` stays accurate.
 - `useAddPasskey` / `useDeletePasskey` — refetch the passkey list.
 - `useRevokeSession` — refetch the sessions list.
 - `useRevokeMultiSession` — refetch the device sessions list.

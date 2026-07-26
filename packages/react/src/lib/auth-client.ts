@@ -5,10 +5,12 @@ import type {
   AdminClientOptions,
   adminClient,
   deviceAuthorizationClient,
+  emailOTPClient,
   lastLoginMethodClient,
   magicLinkClient,
   multiSessionClient,
   organizationClient,
+  twoFactorClient,
   usernameClient
 } from "better-auth/client/plugins"
 import type { createAuthClient } from "better-auth/react"
@@ -29,6 +31,14 @@ export type AdminAuthClient = ReturnType<
 
 export type MagicLinkAuthClient = ReturnType<
   typeof createAuthClient<{ plugins: [ReturnType<typeof magicLinkClient>] }>
+>
+
+export type EmailOtpAuthClient = ReturnType<
+  typeof createAuthClient<{ plugins: [ReturnType<typeof emailOTPClient>] }>
+>
+
+export type TwoFactorAuthClient = ReturnType<
+  typeof createAuthClient<{ plugins: [ReturnType<typeof twoFactorClient>] }>
 >
 
 export type DeviceAuthorizationAuthClient = ReturnType<
