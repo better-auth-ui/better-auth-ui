@@ -225,13 +225,36 @@ export const solidRegistryManifest = {
     item({
       name: "oauth-provider",
       type: "registry:component",
-      title: "Solid OAuth Provider Consent",
+      title: "Solid OAuth Provider",
       description:
-        "Solid/Zaidan consent view for Better Auth OAuth Provider authorization requests.",
+        "Solid/Zaidan consent view, prompt=create sign-up continuation, account chooser, and connected applications card for Better Auth OAuth Provider authorization requests.",
       dependencies: [...solidAuthDependencies, "@better-auth/oauth-provider"],
+      registryDependencies: [
+        betterAuthSolidRegistryDependency("auth-provider"),
+        betterAuthSolidRegistryDependency("sign-up")
+      ],
       files: [
         libFile("src/lib/auth/oauth-provider-plugin.ts"),
         componentFile("src/components/auth/oauth-provider/oauth-consent.tsx"),
+        componentFile("src/components/auth/oauth-provider/oauth-sign-up.tsx"),
+        componentFile(
+          "src/components/auth/oauth-provider/oauth-select-account.tsx"
+        ),
+        componentFile(
+          "src/components/auth/oauth-provider/authorized-applications.tsx"
+        ),
+        componentFile(
+          "src/components/auth/oauth-provider/authorized-application.tsx"
+        ),
+        componentFile(
+          "src/components/auth/oauth-provider/authorized-applications-empty.tsx"
+        ),
+        componentFile(
+          "src/components/auth/oauth-provider/authorized-application-skeleton.tsx"
+        ),
+        componentFile(
+          "src/components/auth/oauth-provider/remove-authorization-dialog.tsx"
+        ),
         componentFile("src/components/auth/user/user-avatar.tsx"),
         ...zaidanInteractiveSupportFiles
       ]

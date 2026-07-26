@@ -1,0 +1,18 @@
+[
+  {
+    "id": "device-authorization.tsx-DeviceAuthorizationProps",
+    "name": "DeviceAuthorizationProps",
+    "description": "",
+    "entries": [
+      {
+        "name": "className",
+        "description": "",
+        "tags": [],
+        "type": "string",
+        "simplifiedType": "string",
+        "required": false,
+        "deprecated": false
+      }
+    ]
+  }
+]

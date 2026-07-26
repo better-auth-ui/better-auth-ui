@@ -1,0 +1,41 @@
+---
+title: useDeleteOAuthConsent
+description: Remove a stored OAuth consent record.
+---
+
+Requires `oauthProviderClient()` from `@better-auth/oauth-provider/client`.
+
+## Usage
+
+```tsx
+import { useDeleteOAuthConsent } from "@better-auth-ui/solid"
+
+const deleteConsent = useDeleteOAuthConsent(authClient)
+
+for (const id of application.consentIds) {
+  await deleteConsent.mutateAsync({ id })
+}
+```
+
+Better Auth can store more than one consent record per OAuth client. Group the records with `groupOAuthConsents` and delete every ID in the group so the application really has to ask again.
+
+<Callout type="warn">
+Deleting a consent removes the stored approval, so the application needs the user's approval before it receives new access. It does not revoke access tokens or refresh tokens that were already issued — those stay valid until they expire. Better Auth's consent deletion endpoint does not offer complete token revocation semantics, so don't tell users their access was cut off.
+</Callout>
+
+On success the user's consent list is invalidated and refetched, so a removal that fails halfway still shows the server's real state.
+
+## Options factory
+
+```ts
+import { deleteOAuthConsentOptions } from "@better-auth-ui/solid"
+import { createMutation } from "@tanstack/solid-query"
+
+const deleteConsent = createMutation(() =>
+  deleteOAuthConsentOptions(authClient)
+)
+```
+
+## Params
+
+<auto-type-table path="../../../../../../packages/solid/src/mutations/oauth-provider/delete-oauth-consent-mutation.ts" name="DeleteOAuthConsentParams" />

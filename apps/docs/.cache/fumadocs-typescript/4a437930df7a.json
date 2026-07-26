@@ -1,0 +1,27 @@
+[
+  {
+    "id": "verify-device-code-mutation.ts-VerifyDeviceCodeParams",
+    "name": "VerifyDeviceCodeParams",
+    "description": "",
+    "entries": [
+      {
+        "name": "query",
+        "description": "",
+        "tags": [],
+        "type": "{ user_code: string; }",
+        "simplifiedType": "object",
+        "required": true,
+        "deprecated": false
+      },
+      {
+        "name": "fetchOptions",
+        "description": "",
+        "tags": [],
+        "type": "ClientFetchOption<never, Partial<{ user_code: string; }> & Record<string, any>, Record<string, any>>",
+        "simplifiedType": "ClientFetchOption<never, Record<string, any> & Partial<object>, union>",
+        "required": false,
+        "deprecated": false
+      }
+    ]
+  }
+]

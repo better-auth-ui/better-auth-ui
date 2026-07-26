@@ -1,3 +1,5 @@
+import { authQueryKeys } from "../../lib/auth-query-keys"
+
 /** Query keys contributed by the OAuth provider plugin. */
 export const oauthProviderQueryKeys = {
   /** Prefix matching every OAuth provider query. */
@@ -6,5 +8,19 @@ export const oauthProviderQueryKeys = {
   publicClients: ["auth", "oauthProvider", "publicClient"] as const,
   /** Key for the public metadata of a specific OAuth client. */
   publicClient: (clientId: string | undefined) =>
-    [...oauthProviderQueryKeys.publicClients, clientId ?? null] as const
+    [...oauthProviderQueryKeys.publicClients, clientId ?? null] as const,
+
+  /**
+   * Prefix for the signed-in user's OAuth consent queries.
+   *
+   * Scoped under `authQueryKeys.user(userId)` so one account's authorized
+   * applications can never surface in another account's view.
+   */
+  consents: (userId: string | undefined) =>
+    [...authQueryKeys.user(userId), "oauthProvider", "consents"] as const,
+  /** Key for the signed-in user's consent list. */
+  listConsents: <TQuery = undefined>(
+    userId: string | undefined,
+    query?: TQuery
+  ) => [...oauthProviderQueryKeys.consents(userId), query ?? null] as const
 } as const

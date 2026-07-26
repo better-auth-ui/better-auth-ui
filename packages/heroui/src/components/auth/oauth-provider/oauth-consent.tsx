@@ -3,6 +3,7 @@
 import {
   type OAuthAuthorizationRequest,
   parseOAuthAuthorizationRequest,
+  resolveOAuthScopeMetadata,
   sanitizeOAuthClientUrl
 } from "@better-auth-ui/core/plugins"
 import {
@@ -137,16 +138,21 @@ export function OAuthConsent({ className, variant }: OAuthConsentProps) {
           {request ? (
             <ul className="flex flex-col gap-3">
               {request.scopes.map((scope) => {
-                const metadata = scopeMetadata[scope]
+                const metadata = resolveOAuthScopeMetadata(
+                  scopeMetadata,
+                  scope,
+                  {
+                    clientId: request.clientId,
+                    requestedScopes: request.scopes
+                  }
+                )
 
                 return (
                   <li className="flex gap-3" key={scope}>
                     <Check className="mt-0.5 size-4 shrink-0 text-accent" />
                     <div className="flex flex-col gap-0.5">
-                      <p className="text-sm font-medium">
-                        {metadata?.label ?? scope}
-                      </p>
-                      {metadata?.description ? (
+                      <p className="text-sm font-medium">{metadata.label}</p>
+                      {metadata.description ? (
                         <p className="text-xs text-muted">
                           {metadata.description}
                         </p>

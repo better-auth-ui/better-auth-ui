@@ -15,6 +15,7 @@
     "list-device-sessions",
     "list-passkeys",
     "list-api-keys",
+    "list-oauth-consents",
     "---Organization---",
     "active-organization",
     "full-organization",

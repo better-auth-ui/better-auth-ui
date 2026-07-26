@@ -44,6 +44,8 @@ const sharedQueryPages = [
 
 const apiKeyQueryPages = ["list-api-keys"]
 
+const oauthProviderQueryPages = ["list-oauth-consents"]
+
 const organizationQueryPages = [
   "active-organization",
   "full-organization",
@@ -67,6 +69,7 @@ const sharedAuthMutationPages = [
   "send-verification-email",
   "is-username-available",
   "oauth-consent",
+  "oauth-continue",
   "verify-device-code",
   "approve-device",
   "deny-device"
@@ -88,6 +91,8 @@ const sharedMutationPages = [
 ]
 
 const apiKeyMutationPages = ["create-api-key", "delete-api-key"]
+
+const oauthProviderMutationPages = ["delete-oauth-consent"]
 
 const organizationMutationPagesReact = [
   "create-organization",
@@ -127,11 +132,13 @@ describe("React/Solid docs parity", () => {
     const expectedReact = [
       ...sharedQueryPages,
       ...apiKeyQueryPages,
+      ...oauthProviderQueryPages,
       ...organizationQueryPages
     ]
     const expectedSolid = [
       ...sharedQueryPages,
       ...apiKeyQueryPages,
+      ...oauthProviderQueryPages,
       ...organizationQueryPages
     ]
 
@@ -153,11 +160,13 @@ describe("React/Solid docs parity", () => {
     const expectedReact = [
       ...sharedMutationPages,
       ...apiKeyMutationPages,
+      ...oauthProviderMutationPages,
       ...organizationMutationPagesReact
     ]
     const expectedSolid = [
       ...sharedMutationPages,
       ...apiKeyMutationPages,
+      ...oauthProviderMutationPages,
       ...organizationMutationPagesSolid
     ]
 

@@ -55,6 +55,22 @@ export type OAuthProviderAuthClient = ReturnType<
   }>
 >
 
+/**
+ * Auth client typed with both plugins the OAuth account chooser needs.
+ *
+ * `oauthProviderClient()` forwards the signed authorization query and
+ * `multiSessionClient()` lists and switches device sessions, so the chooser
+ * gets exact endpoint types instead of a widening cast.
+ */
+export type OAuthProviderMultiSessionAuthClient = ReturnType<
+  typeof createAuthClient<{
+    plugins: [
+      ReturnType<typeof oauthProviderClient>,
+      ReturnType<typeof multiSessionClient>
+    ]
+  }>
+>
+
 export type UsernameAuthClient = ReturnType<
   typeof createAuthClient<{ plugins: [ReturnType<typeof usernameClient>] }>
 >

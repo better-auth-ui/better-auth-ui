@@ -1,0 +1,43 @@
+---
+title: useOAuthContinue
+description: Resume a signed OAuth authorization request after a redirect screen.
+---
+
+Requires `oauthProviderClient()` from `@better-auth/oauth-provider/client`.
+
+Better Auth's [redirect screens](https://better-auth.com/docs/plugins/oauth-provider#redirect-screens) hand control to your app so it can create an account, pick an account, or run its own post-login step. When that step finishes, this mutation tells Better Auth to pick the authorization back up.
+
+## Usage
+
+```tsx
+import { useOAuthContinue } from "@better-auth-ui/react"
+
+const oauthContinue = useOAuthContinue(authClient)
+
+// After the account was created during this flow (`prompt=create`)
+oauthContinue.mutate({ created: true })
+
+// After the user picked an account (`prompt=select_account`)
+oauthContinue.mutate({ selected: true })
+
+// After your own post-login selection screen
+await oauthContinue.mutateAsync({ postLogin: true })
+```
+
+Set exactly one flag per call — the one matching the screen that just finished.
+
+The signed authorization query has to stay in the browser URL. `oauthProviderClient()` reads it from there and forwards it, so never rebuild the query string or navigate to `redirect_uri` yourself.
+
+Only call `{ created: true }` when the account was created during the current flow and the sign-up left a usable session. An already signed-in user is not a newly created one, and email verification or a social sign-up needs its own resume step.
+
+## Options factory
+
+```ts
+import { oauthContinueOptions } from "@better-auth-ui/react"
+
+const options = oauthContinueOptions(authClient)
+```
+
+## Params
+
+<auto-type-table path="../../../../../../packages/react/src/mutations/oauth-provider/oauth-continue-mutation.ts" name="OAuthContinueParams" />

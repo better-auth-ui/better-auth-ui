@@ -1,0 +1,18 @@
+[
+  {
+    "id": "oauth-select-account.tsx-OAuthSelectAccountProps",
+    "name": "OAuthSelectAccountProps",
+    "description": "",
+    "entries": [
+      {
+        "name": "className",
+        "description": "",
+        "tags": [],
+        "type": "string",
+        "simplifiedType": "string",
+        "required": false,
+        "deprecated": false
+      }
+    ]
+  }
+]

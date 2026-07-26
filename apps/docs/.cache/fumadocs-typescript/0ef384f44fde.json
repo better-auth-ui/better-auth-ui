@@ -1,0 +1,18 @@
+[
+  {
+    "id": "admin-localization.ts-AdminLocalization",
+    "name": "AdminLocalization",
+    "description": "",
+    "entries": [
+      {
+        "name": "stopImpersonating",
+        "description": "",
+        "tags": [{ "name": "remarks", "text": "`\"Stop impersonating\"`" }],
+        "type": "string",
+        "simplifiedType": "\"Stop impersonating\"",
+        "required": true,
+        "deprecated": false
+      }
+    ]
+  }
+]

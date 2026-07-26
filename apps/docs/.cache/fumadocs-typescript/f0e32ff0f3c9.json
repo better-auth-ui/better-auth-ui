@@ -1,0 +1,18 @@
+[
+  {
+    "id": "admin-plugin.ts-AdminPluginOptions",
+    "name": "AdminPluginOptions",
+    "description": "",
+    "entries": [
+      {
+        "name": "localization",
+        "description": "Override the plugin's default localization strings.",
+        "tags": [{ "name": "remarks", "text": "`AdminLocalization`" }],
+        "type": "Partial<{ stopImpersonating: string; }>",
+        "simplifiedType": "AdminLocalization",
+        "required": false,
+        "deprecated": false
+      }
+    ]
+  }
+]

@@ -1,6 +1,7 @@
 import {
   type OAuthAuthorizationRequest,
   parseOAuthAuthorizationRequest,
+  resolveOAuthScopeMetadata,
   sanitizeOAuthClientUrl
 } from "@better-auth-ui/core/plugins"
 import {
@@ -168,16 +169,20 @@ export function OAuthConsent(props: OAuthConsentProps) {
                 <ul class="grid gap-3">
                   <For each={authorizationRequest().scopes}>
                     {(scope) => {
-                      const metadata = () => scopeMetadata[scope]
+                      const metadata = () =>
+                        resolveOAuthScopeMetadata(scopeMetadata, scope, {
+                          clientId: authorizationRequest().clientId,
+                          requestedScopes: authorizationRequest().scopes
+                        })
 
                       return (
                         <li class="flex gap-3">
                           <Check class="mt-0.5 size-4 shrink-0 text-primary" />
                           <div class="grid gap-0.5">
                             <p class="text-sm font-medium">
-                              {metadata()?.label ?? scope}
+                              {metadata().label}
                             </p>
-                            <Show when={metadata()?.description}>
+                            <Show when={metadata().description}>
                               {(description) => (
                                 <p class="text-muted-foreground text-xs">
                                   {description()}

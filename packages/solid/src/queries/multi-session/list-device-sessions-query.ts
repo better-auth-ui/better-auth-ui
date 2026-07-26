@@ -13,6 +13,9 @@ import {
 
 export type ListDeviceSessionsData<TAuthClient extends MultiSessionAuthClient> =
   InferData<TAuthClient["multiSession"]["listDeviceSessions"]>
+export type ListDeviceSession<
+  TAuthClient extends MultiSessionAuthClient = MultiSessionAuthClient
+> = NonNullable<ListDeviceSessionsData<TAuthClient>>[number]
 export type ListDeviceSessionsParams<
   TAuthClient extends MultiSessionAuthClient
 > = Parameters<TAuthClient["multiSession"]["listDeviceSessions"]>[0]

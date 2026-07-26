@@ -4,7 +4,15 @@ import {
 } from "@better-auth-ui/core/plugins"
 import { describe, expect, it, vi } from "vitest"
 
-import { oauthConsentOptions, publicOAuthClientOptions } from "../src"
+import {
+  deleteOAuthConsentOptions,
+  listOAuthConsentsOptions,
+  oauthConsentOptions,
+  oauthContinueOptions,
+  publicOAuthClientOptions
+} from "../src"
+
+type MutationOptions = { mutationFn: (variables: unknown) => Promise<unknown> }
 
 describe("OAuth provider query and mutation options", () => {
   it("loads public client metadata with a stable key", async () => {
@@ -38,14 +46,64 @@ describe("OAuth provider query and mutation options", () => {
 
     expect(options.mutationKey).toEqual(oauthProviderMutationKeys.consent)
 
-    await (
-      options as {
-        mutationFn: (variables: unknown) => Promise<unknown>
-      }
-    ).mutationFn({ accept: false })
+    await (options as MutationOptions).mutationFn({ accept: false })
 
     expect(consent).toHaveBeenCalledWith({
       accept: false,
+      fetchOptions: { throw: true }
+    })
+  })
+
+  it("forwards the exact continue payload without rebuilding the OAuth query", async () => {
+    const oauthContinue = vi.fn(async () => ({ redirect: true, url: "/done" }))
+    const authClient = { oauth2: { continue: oauthContinue } }
+    const options = oauthContinueOptions(authClient as never)
+
+    expect(options.mutationKey).toEqual(oauthProviderMutationKeys.continue)
+
+    await (options as MutationOptions).mutationFn({ created: true })
+    await (options as MutationOptions).mutationFn({ selected: true })
+    await (options as MutationOptions).mutationFn({ postLogin: true })
+
+    expect(oauthContinue.mock.calls).toEqual([
+      [{ created: true, fetchOptions: { throw: true } }],
+      [{ selected: true, fetchOptions: { throw: true } }],
+      [{ postLogin: true, fetchOptions: { throw: true } }]
+    ])
+  })
+
+  it("lists consents under a user-scoped key", async () => {
+    const getConsents = vi.fn(async () => [])
+    const authClient = { oauth2: { getConsents } }
+    const options = listOAuthConsentsOptions(authClient as never, "user-1")
+
+    expect(options.queryKey).toEqual(
+      oauthProviderQueryKeys.listConsents("user-1")
+    )
+    expect(options.queryKey).not.toEqual(
+      listOAuthConsentsOptions(authClient as never, "user-2").queryKey
+    )
+
+    await (options.queryFn as NonNullable<typeof options.queryFn>)({
+      signal: new AbortController().signal
+    } as never)
+
+    expect(getConsents).toHaveBeenCalledWith({
+      fetchOptions: expect.objectContaining({ throw: true })
+    })
+  })
+
+  it("deletes a consent record by id", async () => {
+    const deleteConsent = vi.fn(async () => undefined)
+    const authClient = { oauth2: { deleteConsent } }
+    const options = deleteOAuthConsentOptions(authClient as never)
+
+    expect(options.mutationKey).toEqual(oauthProviderMutationKeys.deleteConsent)
+
+    await (options as MutationOptions).mutationFn({ id: "consent-1" })
+
+    expect(deleteConsent).toHaveBeenCalledWith({
+      id: "consent-1",
       fetchOptions: { throw: true }
     })
   })
