@@ -1,0 +1,53 @@
+---
+title: <ChangeEmailConfirmationEmail />
+description: Email template for approving an email address change from the current address.
+---
+
+## Usage
+
+<ComponentPreview name="shadcn-change-email-confirmation-email" />
+
+```tsx file=<rootDir>/src/demos/shadcn/email/change-email-confirmation-email.tsx#L13-
+```
+
+## Better Auth setup
+
+Render this template from `user.changeEmail.sendChangeEmailConfirmation` and send it to `user.email`. Better Auth supplies the approval URL and requested address.
+
+```tsx
+sendChangeEmailConfirmation: async ({ user, newEmail, url }) => {
+  const html = await render(
+    <ChangeEmailConfirmationEmail
+      url={url}
+      currentEmail={user.email}
+      newEmail={newEmail}
+      appName="My App"
+    />
+  )
+
+  await sendEmail({
+    to: user.email,
+    subject: "Approve your email change",
+    html
+  })
+}
+```
+
+Use `<EmailChangedEmail />` separately if you also send a notification after the address has changed.
+
+## Installation
+
+```npm
+npx shadcn@latest add https://better-auth-ui.com/r/change-email-confirmation-email.json
+```
+
+## Props
+
+<auto-type-table path="../../../../../../../packages/react/src/components/auth/email/change-email-confirmation.tsx" name="ChangeEmailConfirmationEmailProps" />
+
+## Features
+
+- Shows the current and requested email addresses
+- Includes an approval button and fallback URL
+- Explains that ignoring the message leaves the address unchanged
+- Supports expiration details, theming, branding, and localization

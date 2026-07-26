@@ -1,4 +1,14 @@
 export type {
+  ChangeEmailConfirmationEmailLocalization,
+  ChangeEmailConfirmationEmailProps
+} from "./components/auth/email/change-email-confirmation.js"
+export { default as ChangeEmailConfirmationEmail } from "./components/auth/email/change-email-confirmation.js"
+export type {
+  DeleteAccountVerificationEmailLocalization,
+  DeleteAccountVerificationEmailProps
+} from "./components/auth/email/delete-account-verification.js"
+export { default as DeleteAccountVerificationEmail } from "./components/auth/email/delete-account-verification.js"
+export type {
   EmailChangedEmailLocalization,
   EmailChangedEmailProps
 } from "./components/auth/email/email-changed.js"
