@@ -40,8 +40,8 @@ jobs:
       - name: Get Playwright version
         id: playwright-version
         run: |
-          VERSION=$(jq -r '.devDependencies.playwright // empty' packages/react/package.json 2>/dev/null | sed 's/[\^~]//')
-          echo "version=${VERSION:-latest}" >> $GITHUB_OUTPUT
+          VERSION=$(bunx playwright --version | sed 's/^Version //')
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
 
       - name: Cache Playwright browsers
         id: playwright-cache
