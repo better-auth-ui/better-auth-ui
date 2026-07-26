@@ -16,7 +16,7 @@ import {
 const context = { clientId: "client-123", requestedScopes: ["openid"] }
 
 describe("oauthProviderPlugin", () => {
-  it("registers consent and account selection paths by default", () => {
+  it("registers its own routes without touching the built-in sign-up path", () => {
     const plugin = oauthProviderPlugin()
 
     expect(oauthProviderPlugin.id).toBe("oauthProvider")
@@ -27,21 +27,31 @@ describe("oauthProviderPlugin", () => {
       viewPaths: {
         auth: {
           oauthConsent: "oauth-consent",
+          oauthSignUp: "oauth-sign-up",
           oauthSelectAccount: "select-account"
         }
       }
     })
+    // Every contributed path is namespaced — the plugin never claims a
+    // built-in view key like `signUp`.
+    expect(Object.keys(plugin.viewPaths.auth)).toEqual([
+      "oauthConsent",
+      "oauthSignUp",
+      "oauthSelectAccount"
+    ])
   })
 
   it("merges paths, localization, and connected application visibility", () => {
     const plugin = oauthProviderPlugin({
       path: "authorize",
+      signUpPath: "register",
       selectAccountPath: "accounts",
       showConnectedApplications: false,
       localization: { allow: "Approve" }
     })
 
     expect(plugin.viewPaths.auth.oauthConsent).toBe("authorize")
+    expect(plugin.viewPaths.auth.oauthSignUp).toBe("register")
     expect(plugin.viewPaths.auth.oauthSelectAccount).toBe("accounts")
     expect(plugin.showConnectedApplications).toBe(false)
     expect(plugin.localization).toMatchObject({

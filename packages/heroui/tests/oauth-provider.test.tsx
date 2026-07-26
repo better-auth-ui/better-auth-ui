@@ -147,12 +147,27 @@ describe("oauthProviderPlugin (heroui)", () => {
   it("registers sign-up, consent, account selection, and the security card", () => {
     const plugin = oauthProviderPlugin()
 
-    expect(plugin.views?.auth?.signUp).toBe(OAuthSignUp)
     expect(plugin.views?.auth?.oauthConsent).toBe(OAuthConsent)
+    expect(plugin.views?.auth?.oauthSignUp).toBe(OAuthSignUp)
     expect(plugin.views?.auth?.oauthSelectAccount).toBe(OAuthSelectAccount)
     expect(plugin.securityCards).toEqual([AuthorizedApplications])
     expect(plugin.viewPaths.auth.oauthConsent).toBe("oauth-consent")
+    expect(plugin.viewPaths.auth.oauthSignUp).toBe("oauth-sign-up")
     expect(plugin.viewPaths.auth.oauthSelectAccount).toBe("select-account")
+  })
+
+  it("leaves the built-in sign-up view alone", async () => {
+    const plugin = oauthProviderPlugin()
+
+    expect(plugin.views?.auth?.signUp).toBeUndefined()
+
+    // The `Auth` dispatcher resolves plugin overrides before built-ins, so a
+    // claimed `signUp` key would silently replace ordinary sign-up.
+    renderWithAuth(<Auth path="sign-up" />, { plugin })
+
+    expect(
+      await screen.findByRole("button", { name: "Sign Up" })
+    ).toBeInTheDocument()
   })
 
   it("omits the security card when connected applications are disabled", () => {
@@ -266,8 +281,8 @@ describe("<OAuthConsent />", () => {
 })
 
 describe("<OAuthSignUp />", () => {
-  it("leaves ordinary sign-up untouched without prompt=create", async () => {
-    window.history.pushState({}, "", "/auth/sign-up")
+  it("falls back to plain sign-up on a direct visit without prompt=create", async () => {
+    window.history.pushState({}, "", "/auth/oauth-sign-up")
     const user = userEvent.setup()
     const { authClient, navigate } = renderWithAuth(<OAuthSignUp />)
 
@@ -281,7 +296,7 @@ describe("<OAuthSignUp />", () => {
     window.history.pushState(
       {},
       "",
-      "/auth/sign-up?client_id=desktop-client&prompt=create&sig=signed"
+      "/auth/oauth-sign-up?client_id=desktop-client&prompt=create&sig=signed"
     )
     const user = userEvent.setup()
     const { authClient, navigate } = renderWithAuth(<OAuthSignUp />)
@@ -301,7 +316,7 @@ describe("<OAuthSignUp />", () => {
     window.history.pushState(
       {},
       "",
-      "/auth/sign-up?client_id=desktop-client&prompt=create&sig=signed"
+      "/auth/oauth-sign-up?client_id=desktop-client&prompt=create&sig=signed"
     )
     const oauthContinue = vi
       .fn()

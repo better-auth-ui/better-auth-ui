@@ -13,6 +13,8 @@ declare module "../../lib/view-paths" {
   interface AuthViewPaths {
     /** @default "oauth-consent" */
     oauthConsent?: string
+    /** @default "oauth-sign-up" */
+    oauthSignUp?: string
     /** @default "select-account" */
     oauthSelectAccount?: string
   }
@@ -114,6 +116,16 @@ export type OAuthProviderPluginOptions = {
    */
   path?: string
   /**
+   * URL segment for the OAuth-aware sign-up view.
+   *
+   * This is a route of its own rather than an override of the built-in
+   * `signUp` view, so ordinary sign-up stays untouched. Point Better Auth's
+   * `signup.page` at it.
+   * @remarks `string`
+   * @default "oauth-sign-up"
+   */
+  signUpPath?: string
+  /**
    * URL segment for the OAuth account selection view.
    * @remarks `string`
    * @default "select-account"
@@ -149,6 +161,7 @@ export const oauthProviderPlugin = createAuthPlugin(
     viewPaths: {
       auth: {
         oauthConsent: options.path ?? "oauth-consent",
+        oauthSignUp: options.signUpPath ?? "oauth-sign-up",
         oauthSelectAccount: options.selectAccountPath ?? "select-account"
       }
     }

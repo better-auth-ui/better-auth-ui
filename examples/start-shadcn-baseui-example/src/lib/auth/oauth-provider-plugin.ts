@@ -18,10 +18,10 @@ export const oauthProviderPlugin = createAuthPlugin(
       ...core,
       views: {
         auth: {
-          // Overrides the built-in sign-up view so `prompt=create` requests
-          // can resume the authorization once the account exists.
-          signUp: OAuthSignUp,
           oauthConsent: OAuthConsent,
+          // A route of its own rather than an override of the built-in
+          // `signUp` view — ordinary sign-up stays untouched.
+          oauthSignUp: OAuthSignUp,
           oauthSelectAccount: OAuthSelectAccount
         }
       },

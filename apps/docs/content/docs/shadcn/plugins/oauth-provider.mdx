@@ -11,7 +11,7 @@ The OAuth Provider plugin covers the user-facing screens Better Auth's [OAuth 2.
 It contributes:
 
 - An `<OAuthConsent />` view at `/auth/oauth-consent`
-- An `<OAuthSignUp />` override of the built-in sign-up view, for `prompt=create`
+- An `<OAuthSignUp />` view at `/auth/oauth-sign-up`, for `prompt=create`
 - An `<OAuthSelectAccount />` view at `/auth/select-account`, for `prompt=select_account`
 - An `<AuthorizedApplications />` card in security settings
 - Public OAuth client metadata loading
@@ -59,7 +59,7 @@ export const auth = betterAuth({
       loginPage: "/auth/sign-in",
       consentPage: "/auth/oauth-consent",
       signup: {
-        page: "/auth/sign-up"
+        page: "/auth/oauth-sign-up"
       },
       selectAccount: {
         page: "/auth/select-account",
@@ -70,7 +70,7 @@ export const auth = betterAuth({
 })
 ```
 
-`signup` and `selectAccount` both default their `page` to `loginPage`, so set them explicitly. `selectAccount.shouldRedirect` decides when the chooser is needed — return `true` to always let the user pick, or inspect the session and scopes to decide.
+`signup` and `selectAccount` both default their `page` to `loginPage`, so set them explicitly. Each points at a route of the plugin's own — the built-in `/auth/sign-up` view is left exactly as it was. `selectAccount.shouldRedirect` decides when the chooser is needed — return `true` to always let the user pick, or inspect the session and scopes to decide.
 
 Generate or migrate your Better Auth schema after enabling the server plugin:
 
@@ -145,7 +145,7 @@ const validAuthPathSegments = new Set([
 ])
 ```
 
-Keep these paths aligned with the server's `consentPage` and `selectAccount.page`. If your route already resolves plugin paths without an allowlist, no route change is needed.
+Keep these paths aligned with the server's `consentPage`, `signup.page`, and `selectAccount.page`. If your route already resolves plugin paths without an allowlist, no route change is needed.
 
 </Step>
 </Steps>
@@ -212,7 +212,9 @@ Resolvers stay synchronous, so rendering is deterministic and behaves the same u
 
 ## Sign-up continuation
 
-When Better Auth redirects with `prompt=create`, `<OAuthSignUp />` renders the ordinary sign-up form. The normal sign-up implementation creates the account, and only after that succeeds does the view call:
+`<OAuthSignUp />` lives at its own route and wraps the same `<SignUp />` component your app already uses — it does not replace the built-in sign-up view. Users who never go through OAuth never touch it.
+
+When Better Auth redirects there with `prompt=create`, the ordinary sign-up implementation creates the account, and only after that succeeds does the view call:
 
 ```ts
 authClient.oauth2.continue({ created: true })
@@ -220,7 +222,7 @@ authClient.oauth2.continue({ created: true })
 
 If the continuation request itself fails, the form is replaced with a retry — the account already exists, so asking the user to submit it again would be wrong.
 
-Outside an OAuth request, sign-up behaves exactly as before.
+Reached without `prompt=create`, it renders plain sign-up and redirects the way sign-up normally does.
 
 ### Limitations
 
