@@ -1,0 +1,30 @@
+---
+title: useApproveDevice
+description: Approve a verified device authorization request.
+---
+
+Requires `deviceAuthorizationClient()` from `better-auth/client/plugins`. Call this mutation only after the current session has verified and claimed the user code.
+
+## Usage
+
+```tsx
+import { useApproveDevice } from "@better-auth-ui/react/plugins/device-authorization"
+
+const approveDevice = useApproveDevice(authClient)
+
+approveDevice.mutate({
+  userCode: "ABCD1234"
+})
+```
+
+## Options factory
+
+```ts
+import { approveDeviceOptions } from "@better-auth-ui/core/plugins/device-authorization"
+
+const options = approveDeviceOptions(authClient)
+```
+
+## Params
+
+<auto-type-table path="../../../../../../packages/core/src/plugins/device-authorization/approve-device-mutation.ts" name="ApproveDeviceParams" />

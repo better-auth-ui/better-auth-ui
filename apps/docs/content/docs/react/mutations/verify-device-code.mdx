@@ -1,0 +1,34 @@
+---
+title: useVerifyDeviceCode
+description: Verify and claim a device user code for the current session.
+---
+
+Requires `deviceAuthorizationClient()` from `better-auth/client/plugins`. Verification is modeled as a mutation because it claims the code for the signed-in session, even though Better Auth exposes the underlying endpoint through `authClient.device`.
+
+## Usage
+
+```tsx
+import { useVerifyDeviceCode } from "@better-auth-ui/react/plugins/device-authorization"
+
+const verifyDeviceCode = useVerifyDeviceCode(authClient)
+
+verifyDeviceCode.mutate({
+  query: {
+    user_code: "ABCD1234"
+  }
+})
+```
+
+The returned `status` indicates whether the request still needs approval or has already been approved or denied.
+
+## Options factory
+
+```ts
+import { verifyDeviceCodeOptions } from "@better-auth-ui/core/plugins/device-authorization"
+
+const options = verifyDeviceCodeOptions(authClient)
+```
+
+## Params
+
+<auto-type-table path="../../../../../../packages/core/src/plugins/device-authorization/verify-device-code-mutation.ts" name="VerifyDeviceCodeParams" />

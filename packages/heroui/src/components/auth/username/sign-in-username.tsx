@@ -7,6 +7,7 @@ import {
   useSignInEmail
 } from "@better-auth-ui/react"
 import { useSignInUsername } from "@better-auth-ui/react/plugins/username"
+import { Eye, EyeSlash } from "@gravity-ui/icons"
 import {
   Button,
   Card,
@@ -17,6 +18,7 @@ import {
   FieldError,
   Form,
   Input,
+  InputGroup,
   Label,
   Link,
   Spinner,
@@ -64,6 +66,7 @@ export function SignInUsername({
   const { localization: usernameLocalization } = useAuthPlugin(usernamePlugin)
 
   const [password, setPassword] = useState("")
+  const [isPasswordVisible, setIsPasswordVisible] = useState(false)
 
   function isEmail(value: string): boolean {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)
@@ -199,7 +202,6 @@ export function SignInUsername({
               minLength={emailAndPassword?.minPasswordLength}
               maxLength={emailAndPassword?.maxPasswordLength}
               name="password"
-              type="password"
               autoComplete="current-password"
               isDisabled={isPending}
               value={password}
@@ -222,11 +224,32 @@ export function SignInUsername({
             >
               <Label>{localization.auth.password}</Label>
 
-              <Input
-                placeholder={localization.auth.passwordPlaceholder}
+              <InputGroup
                 variant={variant === "transparent" ? "primary" : "secondary"}
-                required
-              />
+              >
+                <InputGroup.Input
+                  placeholder={localization.auth.passwordPlaceholder}
+                  type={isPasswordVisible ? "text" : "password"}
+                  required
+                />
+
+                <InputGroup.Suffix className="px-0">
+                  <Button
+                    isIconOnly
+                    aria-label={
+                      isPasswordVisible
+                        ? localization.auth.hidePassword
+                        : localization.auth.showPassword
+                    }
+                    size="sm"
+                    variant="ghost"
+                    onPress={() => setIsPasswordVisible(!isPasswordVisible)}
+                    isDisabled={isPending}
+                  >
+                    {isPasswordVisible ? <EyeSlash /> : <Eye />}
+                  </Button>
+                </InputGroup.Suffix>
+              </InputGroup>
 
               <FieldError />
             </TextField>

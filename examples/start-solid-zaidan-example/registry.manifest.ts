@@ -203,6 +203,10 @@ export const solidRegistryManifest = {
       title: "Solid Magic Link",
       description:
         "Solid/Zaidan passwordless magic-link sign-in view, toggle button, and UI plugin factory.",
+      registryDependencies: [
+        betterAuthSolidRegistryDependency("auth-provider"),
+        "@zaidan/tooltip"
+      ],
       files: [
         libFile("src/lib/auth/magic-link-plugin.ts"),
         componentFile("src/components/auth/magic-link.tsx"),
@@ -221,14 +225,51 @@ export const solidRegistryManifest = {
     item({
       name: "oauth-provider",
       type: "registry:component",
-      title: "Solid OAuth Provider Consent",
+      title: "Solid OAuth Provider",
       description:
-        "Solid/Zaidan consent view for Better Auth OAuth Provider authorization requests.",
+        "Solid/Zaidan consent view, prompt=create sign-up continuation, account chooser, and connected applications card for Better Auth OAuth Provider authorization requests.",
       dependencies: [...solidAuthDependencies, "@better-auth/oauth-provider"],
+      registryDependencies: [
+        betterAuthSolidRegistryDependency("auth-provider"),
+        betterAuthSolidRegistryDependency("sign-up")
+      ],
       files: [
         libFile("src/lib/auth/oauth-provider-plugin.ts"),
         componentFile("src/components/auth/oauth-provider/oauth-consent.tsx"),
+        componentFile("src/components/auth/oauth-provider/oauth-sign-up.tsx"),
+        componentFile(
+          "src/components/auth/oauth-provider/oauth-select-account.tsx"
+        ),
+        componentFile(
+          "src/components/auth/oauth-provider/authorized-applications.tsx"
+        ),
+        componentFile(
+          "src/components/auth/oauth-provider/authorized-application.tsx"
+        ),
+        componentFile(
+          "src/components/auth/oauth-provider/authorized-applications-empty.tsx"
+        ),
+        componentFile(
+          "src/components/auth/oauth-provider/authorized-application-skeleton.tsx"
+        ),
+        componentFile(
+          "src/components/auth/oauth-provider/remove-authorization-dialog.tsx"
+        ),
         componentFile("src/components/auth/user/user-avatar.tsx"),
+        ...zaidanInteractiveSupportFiles
+      ]
+    }),
+    item({
+      name: "device-authorization",
+      type: "registry:component",
+      title: "Solid Device Authorization",
+      description:
+        "Solid/Zaidan code verification and approval view for Better Auth device authorization requests.",
+      files: [
+        libFile("src/lib/auth/device-authorization-plugin.ts"),
+        componentFile(
+          "src/components/auth/device-authorization/device-authorization.tsx"
+        ),
         ...zaidanInteractiveSupportFiles
       ]
     }),
@@ -293,6 +334,10 @@ export const solidRegistryManifest = {
       title: "Solid Forgot Password",
       description:
         "Solid forgot-password component using the Solid password reset mutation options.",
+      registryDependencies: [
+        betterAuthSolidRegistryDependency("auth-provider"),
+        "@zaidan/tooltip"
+      ],
       files: [
         componentFile("src/components/auth/forgot-password.tsx"),
         componentFile("src/components/auth/reset-link-sent.tsx"),
@@ -317,6 +362,10 @@ export const solidRegistryManifest = {
       title: "Solid Verify Email",
       description:
         "Solid verify-email view with a button to open the user's email provider and a cooldown-limited resend button.",
+      registryDependencies: [
+        betterAuthSolidRegistryDependency("auth-provider"),
+        "@zaidan/tooltip"
+      ],
       files: [
         componentFile("src/components/auth/verify-email.tsx"),
         componentFile("src/components/auth/open-email-button.tsx"),
@@ -507,6 +556,10 @@ export const solidRegistryManifest = {
       type: "registry:component",
       title: "Solid Change Password",
       description: "Solid change-password settings card.",
+      registryDependencies: [
+        betterAuthSolidRegistryDependency("auth-provider"),
+        "@zaidan/tooltip"
+      ],
       files: [
         componentFile(
           "src/components/auth/settings/security/change-password.tsx"
@@ -744,6 +797,7 @@ export const solidRegistryManifest = {
         componentFile(
           "src/components/auth/organization/organization-switcher.tsx"
         ),
+        componentFile("src/components/auth/organization/organization-path.ts"),
         componentFile("src/components/auth/organization/organization-view.tsx"),
         componentFile(
           "src/components/auth/organization/organization-view-skeleton.tsx"
@@ -752,7 +806,7 @@ export const solidRegistryManifest = {
           "src/components/auth/organization/organizations-empty.tsx"
         ),
         componentFile("src/components/auth/organization/organization.tsx"),
-        componentFile("src/routes/organization/$slug/$path.tsx"),
+        componentFile("src/routes/organization/@{$slug}/$path.tsx"),
         ...zaidanInteractiveSupportFiles
       ]
     }),

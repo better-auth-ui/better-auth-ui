@@ -192,7 +192,8 @@
         "field",
         "separator",
         "sonner",
-        "spinner"
+        "spinner",
+        "tooltip"
       ],
       "files": [
         {
@@ -250,8 +251,8 @@
     {
       "name": "oauth-provider",
       "type": "registry:component",
-      "title": "OAuth Provider Consent",
-      "description": "OAuth Provider plugin: application identity, requested scopes, signed-in account, and approve or deny actions for Better Auth authorization requests.",
+      "title": "OAuth Provider",
+      "description": "OAuth Provider plugin: authorization consent screen, prompt=create sign-up continuation, account chooser, and a connected applications security card for Better Auth authorization requests.",
       "dependencies": [
         "@better-auth-ui/react@latest",
         "@better-auth-ui/core@latest",
@@ -260,14 +261,24 @@
         "lucide-react"
       ],
       "registryDependencies": [
+        "alert-dialog",
         "avatar",
+        "badge",
         "button",
         "card",
+        "item",
         "separator",
         "skeleton",
-        "spinner"
+        "spinner",
+        "https://better-auth-ui.com/r/sign-up.json",
+        "https://better-auth-ui.com/r/user-avatar.json"
       ],
       "files": [
+        {
+          "path": "src/lib/auth/auth-plugin.ts",
+          "type": "registry:lib",
+          "target": "@lib/auth/auth-plugin.ts"
+        },
         {
           "path": "src/lib/auth/oauth-provider-plugin.ts",
           "type": "registry:lib",
@@ -279,9 +290,71 @@
           "target": "@components/auth/oauth-provider/oauth-consent.tsx"
         },
         {
-          "path": "src/components/auth/user/user-avatar.tsx",
+          "path": "src/components/auth/oauth-provider/oauth-sign-up.tsx",
           "type": "registry:component",
-          "target": "@components/auth/user/user-avatar.tsx"
+          "target": "@components/auth/oauth-provider/oauth-sign-up.tsx"
+        },
+        {
+          "path": "src/components/auth/oauth-provider/oauth-select-account.tsx",
+          "type": "registry:component",
+          "target": "@components/auth/oauth-provider/oauth-select-account.tsx"
+        },
+        {
+          "path": "src/components/auth/oauth-provider/authorized-applications.tsx",
+          "type": "registry:component",
+          "target": "@components/auth/oauth-provider/authorized-applications.tsx"
+        },
+        {
+          "path": "src/components/auth/oauth-provider/authorized-application.tsx",
+          "type": "registry:component",
+          "target": "@components/auth/oauth-provider/authorized-application.tsx"
+        },
+        {
+          "path": "src/components/auth/oauth-provider/authorized-applications-empty.tsx",
+          "type": "registry:component",
+          "target": "@components/auth/oauth-provider/authorized-applications-empty.tsx"
+        },
+        {
+          "path": "src/components/auth/oauth-provider/authorized-application-skeleton.tsx",
+          "type": "registry:component",
+          "target": "@components/auth/oauth-provider/authorized-application-skeleton.tsx"
+        },
+        {
+          "path": "src/components/auth/oauth-provider/remove-authorization-dialog.tsx",
+          "type": "registry:component",
+          "target": "@components/auth/oauth-provider/remove-authorization-dialog.tsx"
+        }
+      ]
+    },
+    {
+      "name": "device-authorization",
+      "type": "registry:component",
+      "title": "Device Authorization",
+      "description": "Device authorization plugin: code entry, sign-in continuation, and approve or deny actions for Better Auth device requests.",
+      "dependencies": [
+        "@better-auth-ui/react@latest",
+        "@better-auth-ui/core@latest",
+        "better-auth",
+        "lucide-react"
+      ],
+      "registryDependencies": [
+        "button",
+        "card",
+        "field",
+        "input-otp",
+        "separator",
+        "spinner"
+      ],
+      "files": [
+        {
+          "path": "src/lib/auth/device-authorization-plugin.ts",
+          "type": "registry:lib",
+          "target": "@lib/auth/device-authorization-plugin.ts"
+        },
+        {
+          "path": "src/components/auth/device-authorization/device-authorization.tsx",
+          "type": "registry:component",
+          "target": "@components/auth/device-authorization/device-authorization.tsx"
         }
       ]
     },
@@ -885,7 +958,8 @@
         "input",
         "field",
         "sonner",
-        "spinner"
+        "spinner",
+        "tooltip"
       ],
       "files": [
         {
@@ -948,7 +1022,14 @@
         "better-auth",
         "lucide-react"
       ],
-      "registryDependencies": ["button", "card", "field", "sonner", "spinner"],
+      "registryDependencies": [
+        "button",
+        "card",
+        "field",
+        "sonner",
+        "spinner",
+        "tooltip"
+      ],
       "files": [
         {
           "path": "src/components/auth/verify-email.tsx",
@@ -1204,7 +1285,8 @@
         "input-group",
         "skeleton",
         "sonner",
-        "spinner"
+        "spinner",
+        "tooltip"
       ],
       "files": [
         {
@@ -1531,6 +1613,7 @@
         "https://better-auth-ui.com/r/sign-up.json",
         "https://better-auth-ui.com/r/magic-link.json",
         "https://better-auth-ui.com/r/oauth-provider.json",
+        "https://better-auth-ui.com/r/device-authorization.json",
         "https://better-auth-ui.com/r/username.json",
         "https://better-auth-ui.com/r/passkey.json",
         "https://better-auth-ui.com/r/api-key.json",

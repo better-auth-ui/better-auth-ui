@@ -15,6 +15,7 @@
     "auth/sign-out",
     "auth/auth-redirect",
     "auth/forgot-password",
+    "auth/reset-link-sent",
     "auth/reset-password",
     "auth/verify-email",
     "---Settings---",

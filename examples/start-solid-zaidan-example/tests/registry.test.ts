@@ -110,6 +110,7 @@ const expectedSolidRegistryPayloadNames = [
   "sign-up",
   "magic-link",
   "oauth-provider",
+  "device-authorization",
   "username",
   "passkey",
   "api-key",
@@ -216,6 +217,16 @@ describe("Solid registry isolation", () => {
         "src/components/auth/sign-in-path.ts",
         "src/components/auth/provider-button.tsx",
         "src/components/auth/provider-buttons.tsx"
+      ])
+    )
+
+    const deviceAuthorizationPayload = solidRegistryManifest.items.find(
+      (item) => item.name === "device-authorization"
+    )
+    expect(deviceAuthorizationPayload?.files.map((file) => file.path)).toEqual(
+      expect.arrayContaining([
+        "src/lib/auth/device-authorization-plugin.ts",
+        "src/components/auth/device-authorization/device-authorization.tsx"
       ])
     )
   })
@@ -792,7 +803,8 @@ describe("Solid registry isolation", () => {
       spinner: "@zaidan/spinner",
       table: "@zaidan/table",
       tabs: "@zaidan/tabs",
-      textarea: "@zaidan/textarea"
+      textarea: "@zaidan/textarea",
+      tooltip: "@zaidan/tooltip"
     }
     const outputRoot = makeTempRoot()
 
@@ -2133,7 +2145,8 @@ describe("Solid registry isolation", () => {
       "@better-auth-ui/solid@latest"
     )
     expect(forgotPassword.registryDependencies).toEqual([
-      solidRegistryUrl("auth-provider")
+      solidRegistryUrl("auth-provider"),
+      "@zaidan/tooltip"
     ])
     expect(forgotPassword.files).toEqual(
       expect.arrayContaining([
@@ -2323,6 +2336,7 @@ describe("Solid registry isolation", () => {
       "last-login-method",
       "magic-link",
       "oauth-provider",
+      "device-authorization",
       "theme"
     ]
 
@@ -2478,6 +2492,7 @@ describe("Solid registry isolation", () => {
       "list-device-sessions",
       "list-passkeys",
       "list-api-keys",
+      "list-oauth-consents",
       "---Organization---",
       "active-organization",
       "full-organization",
@@ -2502,6 +2517,10 @@ describe("Solid registry isolation", () => {
       "send-verification-email",
       "is-username-available",
       "oauth-consent",
+      "oauth-continue",
+      "verify-device-code",
+      "approve-device",
+      "deny-device",
       "---Settings---",
       "update-user",
       "change-email",
@@ -2516,6 +2535,7 @@ describe("Solid registry isolation", () => {
       "set-active-session",
       "create-api-key",
       "delete-api-key",
+      "delete-oauth-consent",
       "---Organization---",
       "create-organization",
       "update-organization",
@@ -2547,6 +2567,7 @@ describe("Solid registry isolation", () => {
       "api-key",
       "captcha",
       "delete-user",
+      "device-authorization",
       "last-login-method",
       "magic-link",
       "multi-session",
@@ -2570,6 +2591,7 @@ describe("Solid registry isolation", () => {
       "sign-out",
       "auth-redirect",
       "forgot-password",
+      "reset-link-sent",
       "reset-password",
       "verify-email",
       "---Settings---",
@@ -2825,6 +2847,7 @@ describe("Solid registry isolation", () => {
       "last-login-method",
       "magic-link",
       "oauth-provider",
+      "device-authorization",
       "theme"
     ]
     const runtimeOnlyPluginNames = ["captcha"]
@@ -2967,6 +2990,7 @@ describe("Solid registry isolation", () => {
         name === "last-login-method" ||
         name === "magic-link" ||
         name === "oauth-provider" ||
+        name === "device-authorization" ||
         name === "multi-session" ||
         name === "theme" ||
         name === "username"
@@ -3310,9 +3334,10 @@ describe("Solid registry isolation", () => {
     )
     expect(organizationPluginDoc).toContain("authClient={authClient}")
     expect(organizationPluginDoc).toContain("queryClient={props.queryClient}")
-    expect(organizationPluginDoc).toContain("organizationPlugin({ slug")
+    expect(organizationPluginDoc).toContain("organizationPlugin({")
+    expect(organizationPluginDoc).toContain('slugPrefix: "@"')
     expect(organizationPluginDoc).toContain(
-      'createFileRoute("/organization/$slug/$path")'
+      'createFileRoute("/organization/@{$slug}/$path")'
     )
     expect(organizationPluginDoc).toContain(
       "ensureSessionServer(queryClient, auth"
@@ -3323,7 +3348,7 @@ describe("Solid registry isolation", () => {
     expect(organizationPluginDoc).toContain(
       "validOrganizationPaths.includes(path)"
     )
-    expect(organizationPluginDoc).toContain("/organization/$slug/$path")
+    expect(organizationPluginDoc).toContain("/organization/@{$slug}/$path")
     expect(organizationPluginDoc).toContain("non-slug page")
     expect(organizationPluginDoc).toContain("`null`")
     expect(organizationPluginDoc).toContain(
@@ -3803,14 +3828,17 @@ describe("Solid registry isolation", () => {
       metaPath
     )
     const authStart = meta.pages.indexOf("---Auth---")
-    expect(meta.pages.slice(authStart + 1, authStart + 8)).toEqual([
+    const authEnd = meta.pages.indexOf("---Settings---")
+    expect(meta.pages.slice(authStart + 1, authEnd)).toEqual([
       "auth",
       "sign-in",
       "sign-up",
       "sign-out",
       "auth-redirect",
       "forgot-password",
-      "reset-password"
+      "reset-link-sent",
+      "reset-password",
+      "verify-email"
     ])
 
     const authStories = readFileSync(

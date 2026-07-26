@@ -52,12 +52,18 @@ export function Providers(props: ProvidersProps) {
         plugins={[
           multiSessionPlugin(),
           apiKeyPlugin({ organization: true }),
-          usernamePlugin(),
+          usernamePlugin({
+            usernamePrefix: "@",
+            localization: { usernamePlaceholder: "username" }
+          }),
           magicLinkPlugin(),
           passkeyPlugin(),
           themePlugin(),
           deleteUserPlugin(),
-          organizationPlugin({ slug: organizationSlug() })
+          organizationPlugin({
+            slugPrefix: "@",
+            slug: organizationSlug()
+          })
         ]}
       >
         {() => (

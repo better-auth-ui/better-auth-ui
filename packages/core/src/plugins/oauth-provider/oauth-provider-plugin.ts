@@ -6,47 +6,40 @@ import {
   type OAuthProviderLocalization,
   oauthProviderLocalization
 } from "./oauth-provider-localization"
+import type { OAuthScopeMetadataSource } from "./oauth-scope-metadata"
 
 declare module "../../lib/view-paths" {
-  /** Widens `AuthViewPaths` with the OAuth consent path when this plugin is imported. */
+  /** Widens `AuthViewPaths` with the OAuth paths when this plugin is imported. */
   interface AuthViewPaths {
-    /** @default "consent" */
+    /** @default "oauth-consent" */
     oauthConsent?: string
+    /** @default "oauth-sign-up" */
+    oauthSignUp?: string
+    /** @default "select-account" */
+    oauthSelectAccount?: string
   }
 }
 
-export type OAuthScopeMetadata = {
-  /** Short permission label displayed to the user. */
-  label: string
-  /** Optional explanation of the data or access represented by the scope. */
-  description?: string
-}
-
-export type OAuthScopeMetadataMap = Record<string, OAuthScopeMetadata>
-
-export const oauthProviderScopeMetadata: OAuthScopeMetadataMap = {
-  openid: {
-    label: "Verify your identity",
-    description: "Access your unique account identifier."
-  },
-  profile: {
-    label: "View your profile",
-    description: "View your name and profile picture."
-  },
-  email: {
-    label: "View your email address",
-    description: "View your email address and whether it is verified."
-  },
-  offline_access: {
-    label: "Maintain access",
-    description:
-      "Access your data when you are not actively using the application."
-  }
-}
-
+/**
+ * The display-safe parts of Better Auth's signed authorization query.
+ */
 export type OAuthAuthorizationRequest = {
   clientId?: string
   scopes: string[]
+  prompts: string[]
+}
+
+/**
+ * Variables accepted by Better Auth's `oauth2.continue` endpoint.
+ *
+ * Exactly one flag is set per call, matching the redirect screen that just
+ * finished: signup (`created`), account selection (`selected`), or an
+ * application-owned post-login screen (`postLogin`).
+ */
+export interface OAuthContinueVariables {
+  created?: true
+  selected?: true
+  postLogin?: true
 }
 
 /**
@@ -68,6 +61,16 @@ export function sanitizeOAuthClientUrl(
   }
 }
 
+const splitSpaceDelimited = (value: string | null) =>
+  Array.from(
+    new Set(
+      (value ?? "")
+        .split(/\s+/)
+        .map((entry) => entry.trim())
+        .filter(Boolean)
+    )
+  )
+
 /**
  * Read the display-safe parts of Better Auth's signed authorization query.
  *
@@ -79,16 +82,25 @@ export function parseOAuthAuthorizationRequest(
 ): OAuthAuthorizationRequest {
   const params = new URLSearchParams(search)
   const clientId = params.get("client_id")?.trim() || undefined
-  const scopes = Array.from(
-    new Set(
-      (params.get("scope") ?? "")
-        .split(/\s+/)
-        .map((scope) => scope.trim())
-        .filter(Boolean)
-    )
-  )
 
-  return { clientId, scopes }
+  return {
+    clientId,
+    scopes: splitSpaceDelimited(params.get("scope")),
+    prompts: splitSpaceDelimited(params.get("prompt"))
+  }
+}
+
+/**
+ * Check whether the authorization request asked for a specific prompt.
+ *
+ * OAuth sends `prompt` as a space-separated set, so `prompt=login consent`
+ * matches both `"login"` and `"consent"`.
+ */
+export function hasOAuthPrompt(
+  request: OAuthAuthorizationRequest,
+  prompt: string
+): boolean {
+  return request.prompts.includes(prompt)
 }
 
 export type OAuthProviderPluginOptions = {
@@ -100,16 +112,41 @@ export type OAuthProviderPluginOptions = {
   /**
    * URL segment for the OAuth consent view.
    * @remarks `string`
-   * @default "consent"
+   * @default "oauth-consent"
    */
   path?: string
   /**
-   * Labels and descriptions for custom OAuth scopes.
+   * URL segment for the OAuth-aware sign-up view.
+   *
+   * This is a route of its own rather than an override of the built-in
+   * `signUp` view, so ordinary sign-up stays untouched. Point Better Auth's
+   * `signup.page` at it.
+   * @remarks `string`
+   * @default "oauth-sign-up"
+   */
+  signUpPath?: string
+  /**
+   * URL segment for the OAuth account selection view.
+   * @remarks `string`
+   * @default "select-account"
+   */
+  selectAccountPath?: string
+  /**
+   * Labels and descriptions for OAuth scopes, as a keyed record, a static
+   * list, or a synchronous resolver.
    *
    * Entries override the built-in metadata for `openid`, `profile`, `email`,
-   * and `offline_access`. Unknown scopes remain visible using their raw value.
+   * and `offline_access`. Unresolved scopes remain visible using their raw
+   * value.
+   * @remarks `OAuthScopeMetadataSource`
    */
-  scopeMetadata?: OAuthScopeMetadataMap
+  scopeMetadata?: OAuthScopeMetadataSource
+  /**
+   * Register the connected applications card in security settings.
+   * @remarks `boolean`
+   * @default true
+   */
+  showConnectedApplications?: boolean
 }
 
 export const oauthProviderPlugin = createAuthPlugin(
@@ -119,13 +156,13 @@ export const oauthProviderPlugin = createAuthPlugin(
       ...oauthProviderLocalization,
       ...options.localization
     },
-    scopeMetadata: {
-      ...oauthProviderScopeMetadata,
-      ...options.scopeMetadata
-    },
+    scopeMetadata: options.scopeMetadata,
+    showConnectedApplications: options.showConnectedApplications ?? true,
     viewPaths: {
       auth: {
-        oauthConsent: options.path ?? "consent"
+        oauthConsent: options.path ?? "oauth-consent",
+        oauthSignUp: options.signUpPath ?? "oauth-sign-up",
+        oauthSelectAccount: options.selectAccountPath ?? "select-account"
       }
     }
   })

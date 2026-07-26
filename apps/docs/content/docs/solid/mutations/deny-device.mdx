@@ -1,0 +1,23 @@
+---
+title: denyDeviceOptions
+description: Deny a verified device authorization request.
+---
+
+Requires `deviceAuthorizationClient()` from `better-auth/client/plugins`. Call this mutation after the current session has verified and claimed the user code.
+
+## Options factory
+
+```tsx
+import { denyDeviceOptions } from "@better-auth-ui/core/plugins/device-authorization"
+import { createMutation } from "@tanstack/solid-query"
+
+const denyDevice = createMutation(() => denyDeviceOptions(authClient))
+
+denyDevice.mutate({
+  userCode: "ABCD1234"
+})
+```
+
+## Params
+
+<auto-type-table path="../../../../../../packages/core/src/plugins/device-authorization/deny-device-mutation.ts" name="DenyDeviceParams" />

@@ -12,7 +12,7 @@ const validOrganizationPaths = Object.values(
   organizationPlugin().viewPaths.organization ?? {}
 )
 
-export const Route = createFileRoute("/organization/$slug/$path")({
+export const Route = createFileRoute("/organization/@{$slug}/$path")({
   async beforeLoad({ params: { path }, context: { queryClient }, location }) {
     if (!validOrganizationPaths.includes(path)) {
       throw notFound()

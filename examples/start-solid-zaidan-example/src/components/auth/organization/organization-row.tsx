@@ -5,13 +5,13 @@ import type {
 import { organizationLocalization } from "@better-auth-ui/core/plugins/organization"
 import { useAuth } from "@better-auth-ui/solid"
 import { useSetActiveOrganization } from "@better-auth-ui/solid/plugins/organization"
-import { useNavigate } from "@tanstack/solid-router"
 import type { Organization } from "better-auth/client"
 import { Settings as SettingsIcon } from "lucide-solid"
 import { Show } from "solid-js"
 import { Button } from "@/components/ui/button"
 import { Spinner } from "@/components/ui/spinner"
 import { organizationPlugin } from "@/lib/auth/organization-plugin"
+import { createOrganizationPath } from "./organization-path"
 import { OrganizationView } from "./organization-view"
 
 export type OrganizationRowProps = {
@@ -20,13 +20,13 @@ export type OrganizationRowProps = {
 
 type OrganizationPluginConfig = {
   slug?: string | null
+  slugPrefix?: string
   localization?: Pick<OrganizationLocalization, "manage">
 }
 
 export function OrganizationRow(props: OrganizationRowProps) {
   const auth = useAuth<OrganizationAuthClient>()
   const client = auth.authClient
-  const navigate = useNavigate()
   const organizationPluginConfig = () =>
     auth.plugins.find((plugin) => plugin.id === organizationPlugin.id) as
       | OrganizationPluginConfig
@@ -44,16 +44,21 @@ export function OrganizationRow(props: OrganizationRowProps) {
     organizationPlugin().viewPaths.organization ?? { settings: "settings" }
 
   const navigateToOrganization = () => {
-    navigate({
-      to: "/organization/$slug/$path",
-      params: {
+    auth.navigate({
+      to: createOrganizationPath({
+        basePath: auth.basePaths.organization,
+        slugPrefix: organizationPluginConfig()?.slugPrefix,
         slug: props.organization.slug,
         path: organizationViewPaths().settings
-      }
+      })
     })
   }
   const setActiveOrganization = useSetActiveOrganization(client, () => ({
-    onSuccess: navigateToOrganization
+    onSuccess: () => {
+      auth.navigate({
+        to: `${auth.basePaths.organization}/${organizationViewPaths().settings}`
+      })
+    }
   }))
 
   const manageOrganization = () => {

@@ -1,19 +1,35 @@
 ---
 title: OAuth Provider
-description: Add an OAuth 2.1 authorization consent screen to Solid and Zaidan.
+description: Add OAuth 2.1 consent, sign-up, account selection, and connected application management to Solid and Zaidan.
 ---
 
+import { Callout } from "fumadocs-ui/components/callout"
 import { Step, Steps } from "fumadocs-ui/components/steps"
 
-The OAuth Provider plugin adds the user-facing consent step for Better Auth's [OAuth 2.1 Provider](https://better-auth.com/docs/plugins/oauth-provider). It identifies the requesting application, explains the requested scopes, shows the signed-in account, and lets the user allow or cancel the request.
+The OAuth Provider plugin covers the user-facing screens Better Auth's [OAuth 2.1 Provider](https://better-auth.com/docs/plugins/oauth-provider) redirects to, plus the security settings card for managing what the user has already authorized.
 
 It contributes:
 
-- A copied `<OAuthConsent />` view at `/auth/consent`
+- A copied `<OAuthConsent />` view at `/auth/oauth-consent`
+- A copied `<OAuthSignUp />` view at `/auth/oauth-sign-up`, for `prompt=create`
+- A copied `<OAuthSelectAccount />` view at `/auth/select-account`, for `prompt=select_account`
+- A copied `<AuthorizedApplications />` card in security settings
 - Public OAuth client metadata loading
-- Allow and cancel actions through `oauthConsentOptions`
-- Default labels for `openid`, `profile`, `email`, and `offline_access`
-- Custom metadata for application-specific scopes
+- Scope labels as a map, a list, or a resolver
+- Headless continuation through `oauthContinueOptions`, for your own post-login screens
+
+## How the redirect screens fit together
+
+Better Auth owns the authorization request. When it needs something from the user it redirects to one of your pages with the signed authorization query attached, and waits for you to call `oauth2.continue`:
+
+| Prompt | Page | Continuation |
+| --- | --- | --- |
+| `consent` | `consentPage` | `oauth2.consent({ accept })` |
+| `create` | `signup.page` | `oauth2.continue({ created: true })` |
+| `select_account` | `selectAccount.page` | `oauth2.continue({ selected: true })` |
+| — | `postLogin.page` | `oauth2.continue({ postLogin: true })` |
+
+Keep the query string on every one of those pages. Do not strip it, rebuild it from `redirect_uri`, or navigate to the requested redirect yourself. `oauthProviderClient()` forwards the signed query to Better Auth, and Better Auth validates it and completes the redirect.
 
 ## Setup
 
@@ -27,24 +43,34 @@ Install the provider package:
 bun add @better-auth/oauth-provider
 ```
 
-Add the JWT and OAuth Provider plugins. Point `consentPage` at the route that renders the consent view:
+Add the JWT and OAuth Provider plugins, and point each page option at the route that renders the matching view:
 
 ```ts title="src/lib/auth.ts"
 import { oauthProvider } from "@better-auth/oauth-provider"
 import { betterAuth } from "better-auth"
-import { jwt } from "better-auth/plugins"
+import { jwt, multiSession } from "better-auth/plugins"
 
 export const auth = betterAuth({
   disabledPaths: ["/token"],
   plugins: [
     jwt(),
+    multiSession(),
     oauthProvider({
       loginPage: "/auth/sign-in",
-      consentPage: "/auth/consent"
+      consentPage: "/auth/oauth-consent",
+      signup: {
+        page: "/auth/oauth-sign-up"
+      },
+      selectAccount: {
+        page: "/auth/select-account",
+        shouldRedirect: async () => true
+      }
     })
   ]
 })
 ```
+
+`signup` and `selectAccount` both default their `page` to `loginPage`, so set them explicitly. Each points at a route of the plugin's own — the built-in `/auth/sign-up` view is left exactly as it was. `selectAccount.shouldRedirect` decides when the chooser is needed — return `true` to always let the user pick, or inspect the session and scopes to decide.
 
 Generate or migrate your Better Auth schema after enabling the server plugin:
 
@@ -61,15 +87,18 @@ Add `oauthProviderClient()` to the auth client. It preserves Better Auth's signe
 ```ts title="src/lib/auth-client.ts"
 import { oauthProviderClient } from "@better-auth/oauth-provider/client"
 import { createAuthClient } from "@better-auth-ui/solid"
+import { multiSessionClient } from "better-auth/client/plugins"
 
 export const authClient = createAuthClient({
-  plugins: [oauthProviderClient()]
+  plugins: [oauthProviderClient(), multiSessionClient()]
 })
 ```
 
+`multiSessionClient()` is what makes the account chooser work — it lists the device sessions and switches the active one. Skip it if you don't use `prompt=select_account`.
+
 </Step>
 <Step>
-### Install the Solid and Zaidan view
+### Install the Solid and Zaidan views
 
 ```bash
 bunx shadcn@latest add https://better-auth-ui.com/r/solid/oauth-provider.json
@@ -79,6 +108,9 @@ This installs:
 
 - `src/lib/auth/oauth-provider-plugin.ts`
 - `src/components/auth/oauth-provider/oauth-consent.tsx`
+- `src/components/auth/oauth-provider/oauth-sign-up.tsx`
+- `src/components/auth/oauth-provider/oauth-select-account.tsx`
+- `src/components/auth/oauth-provider/authorized-applications.tsx` and its row, empty-state, loading, and confirmation-dialog components
 - `src/components/auth/user/user-avatar.tsx`
 
 </Step>
@@ -99,9 +131,9 @@ import { oauthProviderPlugin } from "@/lib/auth/oauth-provider-plugin"
 
 </Step>
 <Step>
-### Allow the consent route
+### Allow the OAuth routes
 
-Include the plugin path in the route that renders `<Auth />`:
+Include the plugin paths in the route that renders `<Auth />`:
 
 ```tsx title="src/routes/auth/$path.tsx"
 import { viewPaths } from "@better-auth-ui/core"
@@ -109,18 +141,22 @@ import { oauthProviderPlugin } from "@/lib/auth/oauth-provider-plugin"
 
 const validAuthPathSegments = new Set([
   ...Object.values(viewPaths.auth),
-  oauthProviderPlugin().viewPaths.auth.oauthConsent
+  ...Object.values(oauthProviderPlugin().viewPaths.auth)
 ])
 ```
 
-Keep this path aligned with the server's `consentPage`.
+Keep these paths aligned with the server's `consentPage`, `signup.page`, and `selectAccount.page`.
 
 </Step>
 </Steps>
 
-## Custom scopes
+## Scope metadata
 
-Add labels and short descriptions for application-specific scopes:
+`scopeMetadata` accepts three shapes. Every requested scope stays visible no matter which one you use — a scope that doesn't resolve falls back to built-in metadata, then to its own raw value.
+
+### Map
+
+The original form. Good when the scope set is known up front:
 
 ```tsx title="src/components/providers.tsx"
 oauthProviderPlugin({
@@ -129,25 +165,183 @@ oauthProviderPlugin({
       label: "View your calendar",
       description: "Read your calendar events and availability."
     }
-  },
-  localization: {
-    allow: "Authorize"
   }
 })
 ```
 
-Unknown scopes remain visible using their raw scope value.
+### List
+
+Convenient when metadata comes out of a database or an API and arrives as an array:
+
+```tsx title="src/components/providers.tsx"
+oauthProviderPlugin({
+  scopeMetadata: [
+    { scope: "calendar", label: "View your calendar" },
+    { scope: "files", label: "View your files" }
+  ]
+})
+```
+
+### Resolver
+
+For labels that depend on the requesting client or the rest of the scope set:
+
+```tsx title="src/components/providers.tsx"
+oauthProviderPlugin({
+  scopeMetadata: (scope, { clientId, requestedScopes }) => {
+    if (scope.startsWith("project:")) {
+      return { label: `Access ${scope.slice("project:".length)}` }
+    }
+
+    if (scope === "admin" && requestedScopes.includes("offline_access")) {
+      return {
+        label: "Administer your workspace",
+        description: `${clientId} can act on your behalf indefinitely.`
+      }
+    }
+
+    // Fall back to the built-in or raw label.
+    return undefined
+  }
+})
+```
+
+Returning `undefined` means "use the fallback", not "hide this scope".
+
+Resolvers stay synchronous, so rendering is deterministic and behaves the same under SSR. If you need remote metadata, load it before render and pass a map or a list.
+
+## Sign-up continuation
+
+`<OAuthSignUp />` lives at its own route and wraps the same `<SignUp />` component your app already uses — it does not replace the built-in sign-up view. Users who never go through OAuth never touch it.
+
+When Better Auth redirects there with `prompt=create`, the ordinary sign-up implementation creates the account, and only after that succeeds does the view call:
+
+```ts
+authClient.oauth2.continue({ created: true })
+```
+
+If the continuation request itself fails, the form is replaced with a retry — the account already exists, so asking the user to submit it again would be wrong.
+
+Reached without `prompt=create`, it renders plain sign-up and redirects the way sign-up normally does.
+
+### Limitations
+
+Two flows deliberately do not continue on their own:
+
+- **Email verification.** When `requireEmailVerification` is on, sign-up has no usable session yet, so the view sends the user to the verify-email screen instead. Resume after verification yourself with [`oauthContinueOptions`](/docs/solid/mutations/oauth-continue).
+- **Social sign-up.** The provider redirect leaves and re-enters your app, so there is no "sign-up just succeeded" moment to hook into. Resume from your social callback route instead.
+
+In both cases only call `{ created: true }` if the account really was created during this flow. An already signed-in user is not a newly created one.
+
+## Account selection
+
+`<OAuthSelectAccount />` lists the device sessions from `multiSession` using the Zaidan `Item` primitives. Choosing the account that is already active continues directly. Choosing a different one calls `multiSession.setActive()` first, then continues — the switch always lands before Better Auth resumes.
+
+Sessions are compared by session ID, never by user ID or list position.
+
+The chooser has no sign-out or revoke actions on purpose. Session management belongs in security settings, not in the middle of an authorization request.
+
+## Post-login selection
+
+There is no post-login view to install. What an application selects after login differs too much — a workspace, a tenant, a team, a project, a role — so this stays yours to build. Use the headless continuation helper when your selector is done:
+
+```tsx title="src/routes/auth/select-workspace.tsx"
+import { oauthContinueOptions } from "@better-auth-ui/core/plugins/oauth-provider"
+import { useAuth } from "@better-auth-ui/solid"
+import { createMutation } from "@tanstack/solid-query"
+import { For } from "solid-js"
+
+type Workspace = { slug: string; name: string }
+
+function SelectWorkspace(props: { workspaces: Workspace[] }) {
+  const auth = useAuth()
+  const oauthContinue = createMutation(() =>
+    oauthContinueOptions(auth.authClient)
+  )
+
+  const select = async (slug: string) => {
+    // Persist the selection the way your app normally does — by slug or ID.
+    await setActiveWorkspaceSlug(slug)
+
+    await oauthContinue.mutateAsync({ postLogin: true })
+  }
+
+  return (
+    <For each={props.workspaces}>
+      {(workspace) => (
+        <button onClick={() => select(workspace.slug)} type="button">
+          {workspace.name}
+        </button>
+      )}
+    </For>
+  )
+}
+```
+
+Point the server's `postLogin.page` at that route.
+
+<Callout type="warn">
+Don't reach for Better Auth active organizations here. Persist the selection with your own slug- or ID-based mechanism.
+</Callout>
+
+## Connected applications
+
+`<AuthorizedApplications />` is registered as a security card and lists everything the user has authorized: client name and logo, granted scopes through the same scope resolver, the latest authorization date, and a "Remove authorization" action.
+
+Better Auth can store several consent records for one client, so records are grouped by client ID and rendered as a single application. Removing an application deletes every consent ID in that group. Each row loads its own client metadata, so one slow or missing application never blocks the rest of the card.
+
+Turn the card off with:
+
+```tsx
+oauthProviderPlugin({ showConnectedApplications: false })
+```
+
+<Callout type="warn">
+Removing an authorization deletes the stored consent record. The application will need the user's approval before it receives new access, but access tokens and refresh tokens that were already issued stay valid until they expire. Better Auth's consent deletion endpoint does not provide complete token revocation, so the UI does not claim otherwise — and neither should any copy you write around it.
+</Callout>
+
+The card manages consent records only. It is not a session list and not a token list, and it intentionally has no revoke-all control, because Better Auth does not expose the list-and-revoke-all token semantics that would need.
 
 ## Consent behavior
 
-This first consent view accepts or denies the complete requested scope set. It does not render per-scope controls. Omitting `scope` from the consent mutation tells Better Auth to accept the scopes from the original signed request.
-
-Keep the authorization query string on the consent page. Do not strip it, rebuild it from `redirect_uri`, or navigate to the requested redirect yourself. `oauthProviderClient()` forwards the signed query to Better Auth, and Better Auth validates and completes the redirect.
+The consent view accepts or denies the complete requested scope set. It does not render per-scope controls. Omitting `scope` from the consent mutation tells Better Auth to accept the scopes from the original signed request.
 
 The public client endpoint requires a signed-in session. Direct visits with missing request data, no session, or an unknown client render an invalid-request state.
 
-Login reuses the existing `signIn` view and resumes automatically when Better Auth creates the session. Optional `prompt=create`, account-selection, and post-login screens require application-specific continuation logic and are not registered by this base plugin.
+Login reuses the existing `signIn` view and resumes automatically when Better Auth creates the session.
+
+## Components
+
+```tsx
+import { AuthorizedApplications } from "@/components/auth/oauth-provider/authorized-applications"
+import { OAuthConsent } from "@/components/auth/oauth-provider/oauth-consent"
+import { OAuthSelectAccount } from "@/components/auth/oauth-provider/oauth-select-account"
+import { OAuthSignUp } from "@/components/auth/oauth-provider/oauth-sign-up"
+
+<OAuthConsent />
+<OAuthSignUp />
+<OAuthSelectAccount />
+<AuthorizedApplications />
+```
+
+<auto-type-table path="../../../../../../examples/start-solid-zaidan-example/src/components/auth/oauth-provider/oauth-consent.tsx" name="OAuthConsentProps" />
+
+<auto-type-table path="../../../../../../examples/start-solid-zaidan-example/src/components/auth/oauth-provider/oauth-sign-up.tsx" name="OAuthSignUpProps" />
+
+<auto-type-table path="../../../../../../examples/start-solid-zaidan-example/src/components/auth/oauth-provider/oauth-select-account.tsx" name="OAuthSelectAccountProps" />
+
+<auto-type-table path="../../../../../../examples/start-solid-zaidan-example/src/components/auth/oauth-provider/authorized-applications.tsx" name="AuthorizedApplicationsProps" />
+
+## Plugin options
+
+<auto-type-table path="../../../../../../packages/core/src/plugins/oauth-provider/oauth-provider-plugin.ts" name="OAuthProviderPluginOptions" />
+
+<auto-type-table path="../../../../../../packages/core/src/plugins/oauth-provider/oauth-scope-metadata.ts" name="OAuthScopeMetadataContext" />
 
 ## Solid APIs
 
-Use [`usePublicOAuthClient`](/docs/solid/queries/public-oauth-client) to load application metadata and [`useOAuthConsent`](/docs/solid/mutations/oauth-consent) to submit the user's decision. Both hooks are available from `@better-auth-ui/solid/plugins/oauth-provider`.
+- [`usePublicOAuthClient`](/docs/solid/queries/public-oauth-client) loads application metadata
+- [`useOAuthConsent`](/docs/solid/mutations/oauth-consent) submits the user's decision
+- [`oauthContinueOptions`](/docs/solid/mutations/oauth-continue) resumes the request after a redirect screen
+- [`useListOAuthConsents`](/docs/solid/queries/list-oauth-consents) lists authorized applications
+- [`useDeleteOAuthConsent`](/docs/solid/mutations/delete-oauth-consent) removes a stored consent

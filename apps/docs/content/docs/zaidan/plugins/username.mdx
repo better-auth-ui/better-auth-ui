@@ -73,7 +73,10 @@ export function Providers(props: { children?: JSX.Element }) {
     <AuthProvider
       authClient={authClient}
       plugins={[
-        usernamePlugin() // [!code highlight]
+        usernamePlugin({ // [!code highlight]
+          usernamePrefix: "@", // [!code highlight]
+          localization: { usernamePlaceholder: "username" } // [!code highlight]
+        }) // [!code highlight]
       ]}
     >
       {props.children}
@@ -114,6 +117,17 @@ These previews use mocked auth clients and do not call live Better Auth endpoint
 />
 
 ## Options
+
+Use `usernamePrefix` when usernames are displayed with a marker such as `@`. The prefix appears inside copied Solid username fields but is not included in the value sent to Better Auth.
+
+```tsx
+usernamePlugin({
+  usernamePrefix: "@",
+  localization: {
+    usernamePlaceholder: "username"
+  }
+})
+```
 
 <auto-type-table path="../../../../../../packages/core/src/plugins/username/username-plugin.ts" name="UsernamePluginOptions" />
 

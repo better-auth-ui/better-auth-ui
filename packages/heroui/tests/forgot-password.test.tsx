@@ -104,13 +104,30 @@ describe("<ForgotPassword />", () => {
 
 describe("<ResetLinkSent />", () => {
   it("offers to open the email provider for the stored email", async () => {
+    const user = userEvent.setup()
     sessionStorage.setItem("better-auth-ui.reset-link-sent", "user@gmail.com")
 
     renderWithProvider(<ResetLinkSent />)
 
+    const openEmailLink = await screen.findByRole("link", {
+      name: /open gmail/i
+    })
+    expect(openEmailLink).toHaveAttribute(
+      "href",
+      "https://mail.google.com/mail/"
+    )
+
+    await user.hover(openEmailLink)
+
+    const tooltip = await screen.findByRole("tooltip")
+    const qrCode = tooltip.querySelector("svg.size-40")
+
+    expect(tooltip).toHaveTextContent(/scan to open gmail on your phone/i)
+    expect(qrCode).not.toBeNull()
+    expect(qrCode?.querySelectorAll(":scope > path")).toHaveLength(2)
     expect(
-      await screen.findByRole("link", { name: /open gmail/i })
-    ).toHaveAttribute("href", "https://mail.google.com/mail/")
+      qrCode?.querySelector(":scope > path:last-child")?.getAttribute("d")
+    ).toMatch(/^(?:M\d+ \d+h\d+v1H\d+z)+$/)
 
     // The sign-in footer stays available.
     expect(screen.getByRole("link", { name: /sign in/i })).toBeInTheDocument()

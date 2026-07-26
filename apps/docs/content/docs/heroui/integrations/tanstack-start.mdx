@@ -41,7 +41,7 @@ Create a dynamic auth page that renders the appropriate authentication view base
 ```tsx title="routes/auth/$path.tsx" file=<rootDir>/../../examples/start-heroui-example/src/routes/auth/$path.tsx
 ```
 
-The built-in `viewPaths.auth` object contains `sign-in`, `sign-up`, `sign-out`, `forgot-password`, and `reset-password`. If you register plugins that contribute their own auth paths, spread each plugin's `viewPaths.auth` into the validation set — see the per-plugin docs (e.g. [Magic Link](/docs/heroui/plugins/magic-link)).
+The built-in `viewPaths.auth` object contains `redirect`, `sign-in`, `sign-up`, `sign-out`, `forgot-password`, `reset-password`, `reset-link-sent`, and `verify-email`. If you register plugins that contribute their own auth paths, spread each plugin's `viewPaths.auth` into the validation set. See the per-plugin docs, such as [Magic Link](/docs/heroui/plugins/magic-link).
 
 </Step>
 <Step>

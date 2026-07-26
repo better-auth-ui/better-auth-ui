@@ -1,0 +1,29 @@
+---
+title: verifyDeviceCodeOptions
+description: Verify and claim a device user code for the current session.
+---
+
+Requires `deviceAuthorizationClient()` from `better-auth/client/plugins`. Verification is modeled as a mutation because it claims the code for the signed-in session, even though Better Auth exposes the underlying endpoint through `authClient.device`.
+
+## Options factory
+
+```tsx
+import { verifyDeviceCodeOptions } from "@better-auth-ui/core/plugins/device-authorization"
+import { createMutation } from "@tanstack/solid-query"
+
+const verifyDeviceCode = createMutation(() =>
+  verifyDeviceCodeOptions(authClient)
+)
+
+verifyDeviceCode.mutate({
+  query: {
+    user_code: "ABCD1234"
+  }
+})
+```
+
+The returned `status` indicates whether the request still needs approval or has already been approved or denied.
+
+## Params
+
+<auto-type-table path="../../../../../../packages/core/src/plugins/device-authorization/verify-device-code-mutation.ts" name="VerifyDeviceCodeParams" />

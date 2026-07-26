@@ -14,6 +14,21 @@ description: Renders the Solid auth component for the current path or explicit v
 ```tsx file=<rootDir>/../../examples/start-solid-zaidan-example/src/demos/auth/auth.tsx
 ```
 
+### Built-in views
+
+| `view` | Default path |
+| --- | --- |
+| `redirect` | `/auth/redirect` |
+| `signIn` | `/auth/sign-in` |
+| `signUp` | `/auth/sign-up` |
+| `signOut` | `/auth/sign-out` |
+| `forgotPassword` | `/auth/forgot-password` |
+| `resetPassword` | `/auth/reset-password` |
+| `resetLinkSent` | `/auth/reset-link-sent` |
+| `verifyEmail` | `/auth/verify-email` |
+
+Registered plugins can contribute more views through their own `viewPaths.auth`, such as `magicLink` and `magicLinkSent`.
+
 ## Installation
 
 ```npm

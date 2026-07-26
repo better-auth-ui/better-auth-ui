@@ -367,6 +367,8 @@ You wire this up by passing the URL slug into `organizationPlugin({ slug })`. Th
 2. Rewrites every link from `<OrganizationSwitcher />`, `<Organizations />`, and the `<Organization />` tabs to include `/<slug>/`
 3. Swaps the switcher's behavior from `setActive` to `navigate` — clicking an organization takes the user to its slug-prefixed route
 
+Set `slugPrefix` when the visible route should include a marker, such as `/organization/@acme/settings`. Keep `slug` itself unprefixed. For example, a TanStack route named `/organization/@{$slug}/$path` captures `acme`, while `organizationPlugin({ slug, slugPrefix: "@" })` renders the prefix in fields and labels and includes it in generated links.
+
 <Steps>
 <Step>
 ### Read the slug from the URL in your providers
@@ -635,6 +637,8 @@ export function Header() {
 
 ```ts
 organizationPlugin({
+  // Display slugs as @acme and include the prefix in generated URLs.
+  slugPrefix: "@",
   // Disable the slug-availability check that runs while typing a slug.
   checkSlug: false,
   // Override path segments (defaults shown).

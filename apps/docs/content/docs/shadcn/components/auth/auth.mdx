@@ -10,6 +10,21 @@ description: A dynamic authentication component that renders the appropriate aut
 ```tsx file=<rootDir>/src/demos/shadcn/auth/auth.tsx
 ```
 
+### Built-in views
+
+| `view` | Default path |
+| --- | --- |
+| `redirect` | `/auth/redirect` |
+| `signIn` | `/auth/sign-in` |
+| `signUp` | `/auth/sign-up` |
+| `signOut` | `/auth/sign-out` |
+| `forgotPassword` | `/auth/forgot-password` |
+| `resetPassword` | `/auth/reset-password` |
+| `resetLinkSent` | `/auth/reset-link-sent` |
+| `verifyEmail` | `/auth/verify-email` |
+
+Registered plugins can contribute more views through their own `viewPaths.auth`, such as `magicLink` and `magicLinkSent`.
+
 ## Installation
 
 ```npm

@@ -10,6 +10,7 @@ The Magic Link plugin adds a passwordless email sign-in flow to the copied Solid
 It contributes:
 
 - A copied `<MagicLink />` view rendered at `/auth/magic-link`
+- A copied `<MagicLinkSent />` confirmation view rendered at `/auth/magic-link-sent`
 - A Magic Link toggle button that links between password sign-in and the magic-link view
 - Solid runtime wiring through [`signInMagicLinkOptions`](/docs/solid/mutations/sign-in-magic-link)
 
@@ -68,7 +69,9 @@ This copies the following files into your project:
 
 - `src/lib/auth/magic-link-plugin.ts`
 - `src/components/auth/magic-link.tsx`
+- `src/components/auth/magic-link-sent.tsx`
 - `src/components/auth/magic-link-button.tsx`
+- `src/components/auth/open-email-button.tsx`
 - local form UI primitives under `src/components/ui/**`
 
 </Step>
@@ -122,7 +125,7 @@ function AuthPage() {
 }
 ```
 
-`/auth/magic-link` works after both the provider registration step and the route-wiring step are in place.
+`/auth/magic-link` and `/auth/magic-link-sent` work after both the provider registration step and the route-wiring step are in place.
 
 </Step>
 </Steps>
@@ -147,6 +150,18 @@ import { MagicLink } from "@/components/auth/magic-link"
 
 <auto-type-table path="../../../../../../examples/start-solid-zaidan-example/src/components/auth/magic-link.tsx" name="MagicLinkProps" />
 
+### `<MagicLinkSent />`
+
+After a magic-link request succeeds, the form stores the submitted email in session storage and navigates to this confirmation view. It redirects back to the magic-link form when that state is missing and shows an email-provider shortcut when one is available. Hover or focus the button to show a QR code for opening the same provider URL on another device.
+
+```tsx
+import { MagicLinkSent } from "@/components/auth/magic-link-sent"
+
+<MagicLinkSent />
+```
+
+<auto-type-table path="../../../../../../examples/start-solid-zaidan-example/src/components/auth/magic-link-sent.tsx" name="MagicLinkSentProps" />
+
 ## Options
 
 Override the route segment or localization by configuring the copied `magicLinkPlugin()` factory:
@@ -154,13 +169,14 @@ Override the route segment or localization by configuring the copied `magicLinkP
 ```ts title="src/lib/auth/magic-link-plugin.ts"
 magicLinkPlugin({
   path: "email-link",
+  sentPath: "email-link-sent",
   localization: {
     sendMagicLink: "Email me a link"
   }
 })
 ```
 
-If you override `path`, use the same plugin options in both your provider registration and your auth-route validation.
+If you override `path` or `sentPath`, use the same plugin options in both your provider registration and your auth-route validation.
 
 <auto-type-table path="../../../../../../packages/core/src/plugins/magic-link/magic-link-plugin.ts" name="MagicLinkPluginOptions" />
 
@@ -188,4 +204,4 @@ If your app disables email and password auth, you can keep the Magic Link flow a
 </AuthProvider>
 ```
 
-The copied plugin already provides `fallbackViews.auth.signIn`, but route behavior still depends on the setup steps above: register `magicLinkPlugin()` and allow the plugin auth path in `/auth/$path`.
+The copied plugin already provides `fallbackViews.auth.signIn`. The `signUp`, `forgotPassword`, `resetPassword`, and `resetLinkSent` views redirect there when password auth is disabled. Route behavior still depends on the setup steps above: register `magicLinkPlugin()` and allow both plugin auth paths in `/auth/$path`.

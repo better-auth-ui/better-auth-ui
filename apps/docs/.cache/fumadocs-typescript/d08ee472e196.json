@@ -1,0 +1,63 @@
+[
+  {
+    "id": "oauth-provider-plugin.ts-OAuthProviderPluginOptions",
+    "name": "OAuthProviderPluginOptions",
+    "description": "",
+    "entries": [
+      {
+        "name": "localization",
+        "description": "Override the plugin's default localization strings.",
+        "tags": [{ "name": "remarks", "text": "`OAuthProviderLocalization`" }],
+        "type": "OAuthProviderLocalization",
+        "simplifiedType": "OAuthProviderLocalization",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "path",
+        "description": "URL segment for the OAuth consent view.",
+        "tags": [
+          { "name": "remarks", "text": "`string`" },
+          { "name": "default", "text": "\"oauth-consent\"" }
+        ],
+        "type": "string",
+        "simplifiedType": "string",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "selectAccountPath",
+        "description": "URL segment for the OAuth account selection view.",
+        "tags": [
+          { "name": "remarks", "text": "`string`" },
+          { "name": "default", "text": "\"select-account\"" }
+        ],
+        "type": "string",
+        "simplifiedType": "string",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "scopeMetadata",
+        "description": "Labels and descriptions for OAuth scopes, as a keyed record, a static\nlist, or a synchronous resolver.\n\nEntries override the built-in metadata for `openid`, `profile`, `email`,\nand `offline_access`. Unresolved scopes remain visible using their raw\nvalue.",
+        "tags": [{ "name": "remarks", "text": "`OAuthScopeMetadataSource`" }],
+        "type": "OAuthScopeMetadataSource",
+        "simplifiedType": "OAuthScopeMetadataSource",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "showConnectedApplications",
+        "description": "Register the connected applications card in security settings.",
+        "tags": [
+          { "name": "remarks", "text": "`boolean`" },
+          { "name": "default", "text": "true" }
+        ],
+        "type": "boolean",
+        "simplifiedType": "boolean",
+        "required": false,
+        "deprecated": false
+      }
+    ]
+  }
+]

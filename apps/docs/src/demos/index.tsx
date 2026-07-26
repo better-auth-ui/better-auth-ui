@@ -60,6 +60,7 @@ import { SignOutDemo as ShadcnSignOutDemo } from "./shadcn/auth/sign-out"
 import { SignUpDemo as ShadcnSignUpDemo } from "./shadcn/auth/sign-up"
 import { VerifyEmailDemo as ShadcnVerifyEmailDemo } from "./shadcn/auth/verify-email"
 import { DangerZoneDemo as ShadcnDangerZoneDemo } from "./shadcn/delete-user/danger-zone"
+import { DeviceAuthorizationDemo as ShadcnDeviceAuthorizationDemo } from "./shadcn/device-authorization/device-authorization"
 import { EmailChangedEmailDemo as ShadcnEmailChangedEmailDemo } from "./shadcn/email/email-changed-email"
 import { EmailVerificationEmailDemo as ShadcnEmailVerificationEmailDemo } from "./shadcn/email/email-verification-email"
 import { MagicLinkEmailDemo as ShadcnMagicLinkEmailDemo } from "./shadcn/email/magic-link-email"
@@ -176,6 +177,7 @@ export const demos: Record<string, ComponentType> = {
   "shadcn-change-email": ShadcnChangeEmailDemo,
   "shadcn-change-password": ShadcnChangePasswordDemo,
   "shadcn-delete-user-danger-zone": ShadcnDangerZoneDemo,
+  "shadcn-device-authorization": ShadcnDeviceAuthorizationDemo,
   "shadcn-email-changed-email": ShadcnEmailChangedEmailDemo,
   "shadcn-email-verification-email": ShadcnEmailVerificationEmailDemo,
   "shadcn-forgot-password": ShadcnForgotPasswordDemo,

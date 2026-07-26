@@ -1,0 +1,182 @@
+---
+title: Device Authorization
+description: Approve CLI, TV, and limited-input device sign-ins from an authenticated browser.
+---
+
+import { Step, Steps } from "fumadocs-ui/components/steps"
+
+The Device Authorization plugin adds the browser half of Better Auth's device authorization flow. A user enters the short code shown by a CLI, TV, or another limited-input device, signs in if needed, then approves or denies access.
+
+It contributes:
+
+- A `<DeviceAuthorization />` view at `/auth/device`
+- Code verification with the `user_code` query parameter prefilled when present
+- Sign-in redirection that preserves the pending code
+- Approve and deny confirmation states
+- React Query hooks for verifying, approving, and denying device requests
+
+The requesting device remains responsible for calling Better Auth's `/device/code` endpoint and polling `/device/token`.
+
+## Setup
+
+<Steps>
+<Step>
+### Configure the Better Auth server
+
+Add the [Device Authorization](https://www.better-auth.com/docs/plugins/device-authorization) plugin to your Better Auth server. Set `verificationUri` to the public route that renders the UI view:
+
+```ts title="lib/auth.ts"
+import { betterAuth } from "better-auth"
+import { deviceAuthorization } from "better-auth/plugins" // [!code highlight]
+
+export const auth = betterAuth({
+  // ...
+  plugins: [
+    deviceAuthorization({ // [!code highlight]
+      verificationUri: "/auth/device" // [!code highlight]
+    }) // [!code highlight]
+  ]
+})
+```
+
+Generate or migrate your Better Auth schema after enabling the plugin:
+
+```bash
+bunx auth@latest migrate
+```
+
+The plugin adds the `deviceCode` model used to track pending requests.
+
+</Step>
+<Step>
+### Configure the browser client
+
+Add `deviceAuthorizationClient()` to your browser auth client:
+
+```ts title="lib/auth-client.ts"
+import { createAuthClient } from "better-auth/react"
+import { deviceAuthorizationClient } from "better-auth/client/plugins" // [!code highlight]
+
+export const authClient = createAuthClient({
+  plugins: [deviceAuthorizationClient()] // [!code highlight]
+})
+```
+
+</Step>
+<Step>
+### Install the device authorization view
+
+```bash
+bunx --bun shadcn@latest add https://better-auth-ui.com/r/device-authorization.json
+```
+
+This installs:
+
+- `src/lib/auth/device-authorization-plugin.ts`
+- `src/components/auth/device-authorization/device-authorization.tsx`
+- The required shadcn UI primitives
+
+</Step>
+<Step>
+### Register the UI plugin
+
+Pass `deviceAuthorizationPlugin()` to `<AuthProvider>`:
+
+```tsx title="components/providers.tsx"
+import { AuthProvider } from "@/components/auth/auth-provider"
+import { deviceAuthorizationPlugin } from "@/lib/auth/device-authorization-plugin" // [!code highlight]
+
+<AuthProvider
+  authClient={authClient}
+  navigate={navigate}
+  plugins={[deviceAuthorizationPlugin()]} // [!code highlight]
+>
+  {children}
+</AuthProvider>
+```
+
+</Step>
+<Step>
+### Allow the device route
+
+Include the plugin path in the route that renders `<Auth />`. Keep it aligned with the server's `verificationUri`:
+
+```tsx title="routes/auth/$path.tsx"
+import { viewPaths } from "@better-auth-ui/core"
+import { createFileRoute, notFound } from "@tanstack/react-router"
+
+import { Auth } from "@/components/auth/auth"
+import { deviceAuthorizationPlugin } from "@/lib/auth/device-authorization-plugin"
+
+const validAuthPathSegments = new Set([
+  ...Object.values(viewPaths.auth),
+  deviceAuthorizationPlugin().viewPaths.auth.deviceAuthorization
+])
+
+export const Route = createFileRoute("/auth/$path")({
+  beforeLoad({ params: { path } }) {
+    if (!validAuthPathSegments.has(path)) {
+      throw notFound()
+    }
+  },
+  component: AuthPage
+})
+
+function AuthPage() {
+  const { path } = Route.useParams()
+  return <Auth path={path} />
+}
+```
+
+</Step>
+</Steps>
+
+## Component
+
+<ComponentPreview name="shadcn-device-authorization" />
+
+Enter any eight-character code in the preview to exercise the approval flow.
+
+The component is rendered automatically at `/auth/device` when the plugin is registered. You can also render it directly:
+
+```tsx
+import { DeviceAuthorization } from "@/components/auth/device-authorization/device-authorization"
+
+<DeviceAuthorization />
+```
+
+<auto-type-table path="../../../../../../examples/start-shadcn-example/src/components/auth/device-authorization/device-authorization.tsx" name="DeviceAuthorizationProps" />
+
+## Options
+
+```ts
+deviceAuthorizationPlugin({
+  // Override the URL segment. Default: "device"
+  path: "activate",
+  // Match Better Auth's server-side userCodeLength. Default: 8
+  userCodeLength: 8,
+  localization: {
+    approveDevice: "Allow this device?"
+  }
+})
+```
+
+<auto-type-table path="../../../../../../packages/core/src/plugins/device-authorization/device-authorization-plugin.ts" name="DeviceAuthorizationPluginOptions" />
+
+Keep `userCodeLength` equal to the value passed to Better Auth's server plugin. A mismatched length prevents valid codes from being submitted.
+
+## Localization
+
+<auto-type-table path="../../../../../../packages/core/src/plugins/device-authorization/device-authorization-localization.ts" name="DeviceAuthorizationLocalization" />
+
+## React APIs
+
+The view uses these React Query hooks:
+
+- [`useVerifyDeviceCode`](/docs/react/mutations/verify-device-code) verifies and claims the submitted code for the current session.
+- [`useApproveDevice`](/docs/react/mutations/approve-device) grants the requesting device access.
+- [`useDenyDevice`](/docs/react/mutations/deny-device) rejects the request.
+
+## Sessions and revocation
+
+An approved device token creates an ordinary Better Auth session. There is no separate device registry in the Device Authorization plugin. Use [`<ActiveSessions />`](/docs/shadcn/components/settings/security/active-sessions) to list sessions and revoke access for an approved device.

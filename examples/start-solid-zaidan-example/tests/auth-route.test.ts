@@ -144,7 +144,7 @@ describe("Solid auth route component selection", () => {
     expect(providers).toContain('from "@/lib/auth/api-key-plugin"')
     expect(providers).toContain('from "@/lib/auth/passkey-plugin"')
     expect(providers).toContain("deleteUserPlugin()")
-    expect(providers).toContain("usernamePlugin()")
+    expect(providers).toContain('usernamePrefix: "@"')
     expect(providers).toContain("magicLinkPlugin()")
     expect(providers).toContain('from "@/lib/auth/magic-link-plugin"')
     expect(authClient).toContain("export const authClient")
@@ -176,9 +176,8 @@ describe("Solid auth route component selection", () => {
     expect(providers).toContain("useParams({ strict: false })")
     expect(providers).toContain('typeof slug === "string"')
     expect(providers).toContain("return null")
-    expect(providers).toContain(
-      "organizationPlugin({ slug: organizationSlug() })"
-    )
+    expect(providers).toContain("slug: organizationSlug()")
+    expect(providers).toContain('slugPrefix: "@"')
     expect(providers).not.toContain("organizationPlugin()}")
     expect(providers).toContain(
       '<Show keyed when={organizationSlug() ?? "personal"}>'
@@ -2973,12 +2972,14 @@ describe("Solid auth route component selection", () => {
 
     expect(organization).toContain("OrganizationSettings")
     expect(organization).not.toContain("organizationSlug: props.slug")
-    expect(organization).toContain("/organization/$slug/$path")
+    expect(organization).toContain("createOrganizationPath")
+    expect(organization).toContain("slugPrefix")
 
     for (const source of [organizationSwitcher, organizationRow]) {
       expect(source).toContain("organizationPlugin.id")
       expect(source).toContain("plugin.slug !== undefined")
-      expect(source).toContain('to: "/organization/$slug/$path"')
+      expect(source).toContain("createOrganizationPath")
+      expect(source).toContain("auth.navigate")
       expect(source).toContain("setActiveOrganization.mutate")
     }
 
@@ -3566,11 +3567,10 @@ describe("Solid auth route component selection", () => {
     expect(organizationSwitcher).toContain(
       "organization.id !== activeOrganization.data?.id"
     )
-    expect(organizationSwitcher).toContain(
-      "params: { path: auth.viewPaths.settings.account }"
-    )
-    expect(organizationSwitcher).toContain('to: "/settings/$path"')
-    expect(organizationSwitcher).toContain('to: "/organization/$slug/$path"')
+    expect(organizationSwitcher).toContain("auth.basePaths.settings")
+    expect(organizationSwitcher).toContain("auth.viewPaths.settings.account")
+    expect(organizationSwitcher).toContain("createOrganizationPath")
+    expect(organizationSwitcher).toContain("slugPrefix")
     expect(organizationSwitcher).toContain("setActiveOrganization.mutate")
   })
 

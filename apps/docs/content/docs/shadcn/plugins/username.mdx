@@ -89,6 +89,17 @@ import { AuthProvider } from "@/components/auth/auth-provider"
 
 ## Options
 
+Use `usernamePrefix` when usernames are displayed with a marker such as `@`. The prefix appears inside username fields but is not included in the value sent to Better Auth.
+
+```tsx
+usernamePlugin({
+  usernamePrefix: "@",
+  localization: {
+    usernamePlaceholder: "username"
+  }
+})
+```
+
 <auto-type-table path="../../../../../../packages/core/src/plugins/username/username-plugin.ts" name="UsernamePluginOptions" />
 
 ## Localization

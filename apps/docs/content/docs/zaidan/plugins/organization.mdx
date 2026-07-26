@@ -10,7 +10,7 @@ The organization plugin adds multi-tenant organization management to your Solid/
 It contributes:
 
 - An `organizations` tab to `<Settings />` listing every organization the user belongs to plus pending invitations to them
-- An `<Organization />` shell mounted at `/organization/$slug/$path` with `settings` and `people` tabs
+- An `<Organization />` shell mounted at `/organization/@<slug>/<path>` with `settings` and `people` tabs
 - An `<OrganizationSwitcher />` dropdown to switch the active organization, manage it, or create a new one
 - An `organizationCards` plugin slot rendered inside `<OrganizationSettings />` so other plugins (e.g. [api-key](/docs/zaidan/plugins/api-key)) can attach org-scoped cards
 - Solid hooks and mutations for organization endpoints such as `useActiveOrganization`, `useListOrganizations`, `useInviteMember`, and `useUpdateMemberRole`
@@ -63,7 +63,7 @@ npx shadcn@latest add https://better-auth-ui.com/r/solid/organization.json
 This drops the following into your codebase:
 
 - `src/lib/auth/organization-plugin.tsx` — `organizationPlugin()` factory
-- `src/components/auth/organization/organization.tsx` — the `/organization/$slug/$path` shell
+- `src/components/auth/organization/organization.tsx`: the prefixed organization route shell
 - `src/components/auth/organization/organization-switcher.tsx` — header dropdown for switching organizations
 - `src/components/auth/organization/organization-settings.tsx` — settings tab contents (profile + danger zone + plugin cards)
 - `src/components/auth/organization/organization-people.tsx` — people tab contents (members + invitations)
@@ -126,7 +126,10 @@ export function Providers(props: ProvidersProps) {
         navigate={navigate}
         queryClient={props.queryClient}
         plugins={[
-          organizationPlugin({ slug: organizationSlug() }) // [!code highlight]
+          organizationPlugin({ // [!code highlight]
+            slug: organizationSlug(), // [!code highlight]
+            slugPrefix: "@" // [!code highlight]
+          }) // [!code highlight]
         ]}
       >
         {props.children}
@@ -226,9 +229,9 @@ function SettingsPage() {
 <Step>
 ### Create the organization page
 
-Mount a dynamic route at `/organization/$slug/$path` that renders `<Organization />` for the matching tab. `<Organization />` is the shell — it shows the `settings` (profile + danger zone) and `people` (members + invitations) tabs for the organization identified by the URL slug.
+Mount a dynamic route at `/organization/@{$slug}/$path` that renders `<Organization />` for the matching tab. The literal `@` stays in the URL while the router captures the unprefixed slug. `<Organization />` shows the `settings` and `people` tabs for that organization.
 
-```tsx title="src/routes/organization/$slug/$path.tsx"
+```tsx title="src/routes/organization/@{$slug}/$path.tsx"
 import { ensureSession } from "@better-auth-ui/core"
 import { ensureSessionServer } from "@better-auth-ui/core/server"
 import { createFileRoute, notFound, redirect } from "@tanstack/solid-router"
@@ -244,7 +247,7 @@ const validOrganizationPaths = Object.values(
   organizationPlugin().viewPaths.organization ?? {}
 )
 
-export const Route = createFileRoute("/organization/$slug/$path")({
+export const Route = createFileRoute("/organization/@{$slug}/$path")({
   async beforeLoad({ params: { path }, context: { queryClient }, location }) {
     if (!validOrganizationPaths.includes(path)) {
       throw notFound()
@@ -282,12 +285,12 @@ function OrganizationPage() {
 }
 ```
 
-`/organization/acme/settings` and `/organization/acme/people` now render the organization management UI. Internal links from `<OrganizationSwitcher />` and `<Organizations />` wire up automatically.
+`/organization/@acme/settings` and `/organization/@acme/people` now render the organization management UI. Internal links from `<OrganizationSwitcher />` and `<Organizations />` wire up automatically.
 
 </Step>
 </Steps>
 
-That's it — users can now create organizations from `/settings/organizations`, switch between them via the header switcher, and manage members and invitations at `/organization/$slug/$path`.
+Users can now create organizations from `/settings/organizations`, switch between them from the header, and manage members and invitations at prefixed organization URLs.
 
 ## Slug-based routes
 
@@ -304,6 +307,8 @@ You wire this up by passing the URL slug into `organizationPlugin({ slug })`. Th
 1. Drives `useActiveOrganization()` to fetch the org matching that slug
 2. Rewrites links from `<OrganizationSwitcher />`, `<Organizations />`, and the `<Organization />` tabs to include `/$slug/`
 3. Swaps the switcher's behavior from `setActive` to `navigate` — clicking an organization takes the user to its slug-prefixed route
+
+The example also passes `slugPrefix: "@"`. Solid fields and organization labels display `@acme`, generated links use `/organization/@acme/...`, and the router still passes the raw `acme` slug to Better Auth.
 
 <Steps>
 <Step>
@@ -336,7 +341,12 @@ export function Providers(props: ProvidersProps) {
         authClient={authClient}
         navigate={navigate}
         queryClient={props.queryClient}
-        plugins={[organizationPlugin({ slug: organizationSlug() })]} // [!code highlight]
+        plugins={[ // [!code highlight]
+          organizationPlugin({ // [!code highlight]
+            slug: organizationSlug(), // [!code highlight]
+            slugPrefix: "@" // [!code highlight]
+          }) // [!code highlight]
+        ]} // [!code highlight]
       >
         {props.children}
       </AuthProvider>
@@ -351,9 +361,9 @@ When the user is on a non-slug page (`/settings/organizations`, `/dashboard`, et
 <Step>
 ### Add the slug-prefixed organization route
 
-Move `/organization/$path` to `/organization/$slug/$path`. Validate the path segment and gate on the signed-in session as before.
+Move `/organization/$path` to `/organization/@{$slug}/$path`. Validate the path segment and gate on the signed-in session as before.
 
-```tsx title="src/routes/organization/$slug/$path.tsx"
+```tsx title="src/routes/organization/@{$slug}/$path.tsx"
 import { ensureSession } from "@better-auth-ui/core"
 import { ensureSessionServer } from "@better-auth-ui/core/server"
 import { createFileRoute, notFound, redirect } from "@tanstack/solid-router"
@@ -369,7 +379,7 @@ const validOrganizationPaths = Object.values(
   organizationPlugin().viewPaths.organization ?? {}
 )
 
-export const Route = createFileRoute("/organization/$slug/$path")({
+export const Route = createFileRoute("/organization/@{$slug}/$path")({
   async beforeLoad({ params: { path }, context: { queryClient }, location }) {
     if (!validOrganizationPaths.includes(path)) {
       throw notFound()
@@ -410,11 +420,11 @@ function OrganizationPage() {
 </Step>
 </Steps>
 
-Internal links — the switcher, organization rows in `/settings/organizations`, and the tab bar inside `<Organization />` — automatically include `/$slug/` once `organizationPlugin({ slug })` is wired in.
+The switcher, organization rows, and tabs automatically include `/@<slug>/` once `organizationPlugin({ slug, slugPrefix: "@" })` is wired in.
 
 ### Customize where the switcher navigates
 
-When slug-based routing is enabled, clicking an organization in `<OrganizationSwitcher />` navigates to `/organization/$slug/settings` by default, and clicking the personal account navigates to `auth.basePaths.settings`.
+When slug-based routing is enabled, clicking an organization in `<OrganizationSwitcher />` navigates to `/organization/@<slug>/settings` by default. Clicking the personal account navigates to `auth.basePaths.settings`.
 
 If you'd rather land on a custom route, pass the `setActive` prop to take over navigation entirely. The plugin's default navigation is skipped — you receive the picked organization (or `null` for personal) and own what happens next:
 
@@ -446,6 +456,8 @@ export function Header() {
 organizationPlugin({
   // Pass a string slug for org routes, null for non-org routes, or omit it to use session fallback.
   slug: "acme",
+  // Display slugs as @acme and include the prefix in generated URLs.
+  slugPrefix: "@",
   // Disable the slug-availability check that runs while typing a slug.
   checkSlug: false,
   // Override path segments (defaults shown).
@@ -519,7 +531,7 @@ Dropdown that shows the active organization, lets the user switch between organi
 
 ### `<Organization />`
 
-The full organization management shell mounted at `/organization/$slug/$path`. Renders `settings` (profile + danger zone) and `people` (members + invitations) tabs for the organization identified by the slug.
+The full organization management shell mounted at `/organization/@<slug>/<path>`. It renders `settings` and `people` tabs for the organization identified by the raw slug.
 
 <ZaidanStory
   storyId="zaidan-plugins-organization--organization-preview"

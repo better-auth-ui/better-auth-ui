@@ -15,7 +15,6 @@ import {
   FieldError,
   Fieldset,
   Form,
-  Input,
   InputGroup,
   Label,
   Skeleton,
@@ -168,6 +167,8 @@ function ChangePasswordForm({
   const [currentPassword, setCurrentPassword] = useState("")
   const [newPassword, setNewPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
+  const [isCurrentPasswordVisible, setIsCurrentPasswordVisible] =
+    useState(false)
 
   const { mutate: changePassword, isPending } = useChangePassword(authClient, {
     onError: () => {
@@ -218,7 +219,6 @@ function ChangePasswordForm({
               <Fieldset.Group>
                 <TextField
                   name="currentPassword"
-                  type="password"
                   isDisabled={isPending || !session}
                   defaultValue=""
                   value={currentPassword}
@@ -226,17 +226,41 @@ function ChangePasswordForm({
                 >
                   <Label>{localization.settings.currentPassword}</Label>
 
-                  <Input
+                  <InputGroup
                     className={cn(!session && "hidden")}
-                    autoComplete="current-password"
-                    placeholder={
-                      localization.settings.currentPasswordPlaceholder
-                    }
-                    required
                     variant={
                       variant === "transparent" ? "primary" : "secondary"
                     }
-                  />
+                  >
+                    <InputGroup.Input
+                      autoComplete="current-password"
+                      name="currentPassword"
+                      placeholder={
+                        localization.settings.currentPasswordPlaceholder
+                      }
+                      required
+                      type={isCurrentPasswordVisible ? "text" : "password"}
+                    />
+
+                    <InputGroup.Suffix className="px-0">
+                      <Button
+                        isIconOnly
+                        aria-label={
+                          isCurrentPasswordVisible
+                            ? localization.auth.hidePassword
+                            : localization.auth.showPassword
+                        }
+                        size="sm"
+                        variant="ghost"
+                        onPress={() =>
+                          setIsCurrentPasswordVisible(!isCurrentPasswordVisible)
+                        }
+                        isDisabled={isPending}
+                      >
+                        {isCurrentPasswordVisible ? <EyeSlash /> : <Eye />}
+                      </Button>
+                    </InputGroup.Suffix>
+                  </InputGroup>
 
                   {!session && (
                     <Skeleton className="h-10 md:h-9 w-full rounded-xl" />

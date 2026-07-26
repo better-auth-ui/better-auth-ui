@@ -11,6 +11,7 @@ The magic-link plugin adds a passwordless email sign-in flow. The user enters th
 It contributes:
 
 - A `<MagicLink />` view at `/auth/magic-link`
+- A `<MagicLinkSent />` confirmation view at `/auth/magic-link-sent`
 - A "Continue with Magic Link" button rendered alongside the password sign-in button
 - A `useSignInMagicLink` mutation hook
 
@@ -70,7 +71,9 @@ This drops the following into your codebase:
 - `src/lib/auth/auth-plugin.ts` — local `AuthPlugin` typing widener
 - `src/lib/auth/magic-link-plugin.ts` — `magicLinkPlugin()` factory
 - `src/components/auth/magic-link.tsx` — the magic-link form
+- `src/components/auth/magic-link-sent.tsx`: the sent confirmation view
 - `src/components/auth/magic-link-button.tsx` — the toggle button
+- `src/components/auth/open-email-button.tsx`: the email-provider shortcut
 - `src/components/auth/provider-button(s).tsx` — social provider buttons used by the form
 
 </Step>
@@ -96,7 +99,7 @@ import { AuthProvider } from "@/components/auth/auth-provider"
 <Step>
 ### Allow the new view path
 
-The plugin contributes a `magic-link` segment to `viewPaths.auth`. Spread `magicLinkPlugin().viewPaths?.auth` into your auth route's allowed-paths set so `/auth/magic-link` resolves correctly:
+The plugin contributes `magic-link` and `magic-link-sent` segments to `viewPaths.auth`. Spread `magicLinkPlugin().viewPaths?.auth` into your auth route's allowed-paths set so both views resolve correctly:
 
 <Tabs defaultValue="tanstack-start">
 <TabsList>
@@ -188,12 +191,26 @@ import { MagicLink } from "@/components/auth/magic-link"
 
 <auto-type-table path="../../../../../../examples/start-shadcn-example/src/components/auth/magic-link.tsx" name="MagicLinkProps" />
 
+### `<MagicLinkSent />`
+
+After a magic-link request succeeds, the form stores the submitted email in session storage and navigates to this confirmation view. It shows an email-provider shortcut when one is available. Hover or focus the button to show a QR code for opening the same provider URL on another device.
+
+```tsx
+import { MagicLinkSent } from "@/components/auth/magic-link-sent"
+
+<MagicLinkSent />
+```
+
+<auto-type-table path="../../../../../../examples/start-shadcn-example/src/components/auth/magic-link-sent.tsx" name="MagicLinkSentProps" />
+
 ## Options
 
 ```ts
 magicLinkPlugin({
   // Override the URL segment. Default: "magic-link"
   path: "email-link",
+  // Override the confirmation segment. Default: "magic-link-sent"
+  sentPath: "email-link-sent",
   // Override any of the plugin's localization strings.
   localization: {
     sendMagicLink: "Email me a link"
@@ -228,4 +245,4 @@ If you disable email + password auth entirely, the magic-link form is promoted t
 </AuthProvider>
 ```
 
-`/auth/sign-in` now renders `<MagicLink />`, and the `signUp` / `forgotPassword` / `resetPassword` routes redirect to it.
+`/auth/sign-in` now renders `<MagicLink />`, and the `signUp`, `forgotPassword`, `resetPassword`, and `resetLinkSent` routes redirect to it.

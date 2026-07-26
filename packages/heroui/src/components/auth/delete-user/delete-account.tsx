@@ -5,7 +5,7 @@ import {
   useDeleteUser,
   useListAccounts
 } from "@better-auth-ui/react"
-import { TriangleExclamation } from "@gravity-ui/icons"
+import { Eye, EyeSlash, TriangleExclamation } from "@gravity-ui/icons"
 import {
   AlertDialog,
   Button,
@@ -13,7 +13,7 @@ import {
   type CardProps,
   FieldError,
   Form,
-  Input,
+  InputGroup,
   Label,
   Spinner,
   TextField,
@@ -50,6 +50,7 @@ export function DeleteAccount({
 
   const [confirmOpen, setConfirmOpen] = useState(false)
   const [password, setPassword] = useState("")
+  const [isPasswordVisible, setIsPasswordVisible] = useState(false)
 
   const hasCredentialAccount = accounts?.some(
     (account) => account.providerId === "credential"
@@ -61,6 +62,7 @@ export function DeleteAccount({
   const handleDialogOpenChange = (open: boolean) => {
     setConfirmOpen(open)
     setPassword("")
+    setIsPasswordVisible(false)
   }
 
   const handleSubmit = async (e: SyntheticEvent<HTMLFormElement>) => {
@@ -74,6 +76,7 @@ export function DeleteAccount({
       onSuccess: () => {
         setConfirmOpen(false)
         setPassword("")
+        setIsPasswordVisible(false)
 
         if (sendDeleteAccountVerification) {
           toast.success(deleteUserLocalization.deleteUserVerificationSent)
@@ -140,19 +143,39 @@ export function DeleteAccount({
                       <TextField
                         className="mt-4"
                         name="password"
-                        type="password"
                         isDisabled={isPending}
                         value={password}
                         onChange={setPassword}
                       >
                         <Label>{localization.auth.password}</Label>
 
-                        <Input
-                          autoComplete="current-password"
-                          placeholder={localization.auth.passwordPlaceholder}
-                          required
-                          variant="secondary"
-                        />
+                        <InputGroup variant="secondary">
+                          <InputGroup.Input
+                            autoComplete="current-password"
+                            placeholder={localization.auth.passwordPlaceholder}
+                            required
+                            type={isPasswordVisible ? "text" : "password"}
+                          />
+
+                          <InputGroup.Suffix className="px-0">
+                            <Button
+                              isIconOnly
+                              aria-label={
+                                isPasswordVisible
+                                  ? localization.auth.hidePassword
+                                  : localization.auth.showPassword
+                              }
+                              isDisabled={isPending}
+                              onPress={() =>
+                                setIsPasswordVisible(!isPasswordVisible)
+                              }
+                              size="sm"
+                              variant="ghost"
+                            >
+                              {isPasswordVisible ? <EyeSlash /> : <Eye />}
+                            </Button>
+                          </InputGroup.Suffix>
+                        </InputGroup>
 
                         <FieldError />
                       </TextField>

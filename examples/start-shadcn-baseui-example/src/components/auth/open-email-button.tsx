@@ -1,10 +1,17 @@
 "use client"
 
-import { getEmailProviderLink } from "@better-auth-ui/core"
+import { createQrCodeSvgData, getEmailProviderLink } from "@better-auth-ui/core"
 import { useAuth } from "@better-auth-ui/react"
-import { SquareArrowOutUpRight } from "lucide-react"
+import { QrCode } from "lucide-react"
+import { useMemo } from "react"
 
 import { buttonVariants } from "@/components/ui/button"
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger
+} from "@/components/ui/tooltip"
 import { cn } from "@/lib/utils"
 
 export type OpenEmailButtonProps = {
@@ -14,36 +21,67 @@ export type OpenEmailButtonProps = {
 }
 
 /**
- * Render a link styled as a button that opens the user's email provider login
- * page in a new tab.
+ * Render a button that opens the user's email provider login page in a new
+ * tab. Hovering or focusing the button reveals a QR code for opening the same
+ * provider on another device.
  *
  * The provider is resolved from the email domain via the curated
  * `@mikkelscheike/email-provider-links` dataset (Gmail, Outlook, GMX, etc.).
  * Renders nothing when the domain is empty or not a known provider.
  *
  * @param email - Email address to resolve the provider from.
- * @param className - Additional CSS classes applied to the link.
- * @returns The open-email link element, or `null` when no provider matches.
+ * @param className - Additional CSS classes applied to the button.
+ * @returns The open-email button, or `null` when no provider matches.
  */
 export function OpenEmailButton({ email, className }: OpenEmailButtonProps) {
   const { localization } = useAuth()
 
   const provider = getEmailProviderLink(email)
-  if (!provider) return null
+  const loginUrl = provider?.loginUrl
+  const qrCode = useMemo(
+    () => (loginUrl ? createQrCodeSvgData(loginUrl) : null),
+    [loginUrl]
+  )
+
+  if (!provider || !qrCode) return null
+
+  const scanLabel = localization.auth.scanToOpenEmailProvider.replace(
+    "{{provider}}",
+    provider.companyProvider
+  )
 
   return (
-    <a
-      href={provider.loginUrl}
-      target="_blank"
-      rel="noopener noreferrer"
-      className={cn(buttonVariants(), "w-full", className)}
-    >
-      {localization.auth.openEmailProvider.replace(
-        "{{provider}}",
-        provider.companyProvider
-      )}
-
-      <SquareArrowOutUpRight />
-    </a>
+    <TooltipProvider>
+      <Tooltip>
+        <TooltipTrigger
+          type="button"
+          className={cn(buttonVariants(), "w-full", className)}
+          onClick={() =>
+            window.open(provider.loginUrl, "_blank", "noopener,noreferrer")
+          }
+        >
+          {localization.auth.openEmailProvider.replace(
+            "{{provider}}",
+            provider.companyProvider
+          )}
+          <QrCode />
+        </TooltipTrigger>
+        <TooltipContent
+          sideOffset={8}
+          className="flex-col items-center gap-2 p-3"
+        >
+          <svg
+            viewBox={`0 0 ${qrCode.size} ${qrCode.size}`}
+            aria-hidden="true"
+            focusable="false"
+            className="size-40"
+          >
+            <path fill="white" d={`M0 0h${qrCode.size}v${qrCode.size}H0z`} />
+            <path fill="black" d={qrCode.path} shapeRendering="crispEdges" />
+          </svg>
+          <p className="max-w-40 text-center leading-snug">{scanLabel}</p>
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
   )
 }

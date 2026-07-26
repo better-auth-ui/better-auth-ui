@@ -18,6 +18,12 @@ export type SignUpProps = {
   class?: string
   socialLayout?: SocialLayout
   socialPosition?: "top" | "bottom"
+  /**
+   * Runs instead of the post-sign-up redirect, but only when the sign-up
+   * created an immediately usable session. Email verification still takes
+   * priority, and social sign-ups are unaffected.
+   */
+  onSignUpSuccess?: () => void
 }
 
 export function SignUp(props: SignUpProps) {
@@ -49,6 +55,12 @@ export function SignUp(props: SignUpProps) {
       }
 
       queryClient.invalidateQueries({ queryKey: authQueryKeys.session })
+
+      if (props.onSignUpSuccess) {
+        props.onSignUpSuccess()
+        return
+      }
+
       auth.navigate({ to: auth.redirectTo })
     }
   }))

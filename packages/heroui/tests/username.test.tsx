@@ -98,6 +98,23 @@ describe("<SignInUsername />", () => {
     expect(screen.getByPlaceholderText("Username or email")).toBeInTheDocument()
   })
 
+  it("lets the user reveal and mask the password without clearing it", async () => {
+    const user = userEvent.setup()
+    renderSignInUsername()
+
+    const password = screen.getByLabelText("Password")
+    await user.type(password, "password123")
+
+    expect(password).toHaveAttribute("type", "password")
+    await user.click(screen.getByRole("button", { name: "Show password" }))
+    expect(password).toHaveAttribute("type", "text")
+    expect(password).toHaveValue("password123")
+
+    await user.click(screen.getByRole("button", { name: "Hide password" }))
+    expect(password).toHaveAttribute("type", "password")
+    expect(password).toHaveValue("password123")
+  })
+
   it("routes non-email input to authClient.signIn.username", async () => {
     const user = userEvent.setup()
     const { authClient } = renderSignInUsername()
