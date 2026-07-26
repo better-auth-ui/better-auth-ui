@@ -1,3 +1,5 @@
+export * from "./change-email-confirmation"
+export * from "./delete-account-verification"
 export * from "./email-changed"
 export * from "./email-localization"
 export * from "./email-styles"

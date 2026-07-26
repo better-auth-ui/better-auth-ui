@@ -1481,6 +1481,54 @@
       ]
     },
     {
+      "name": "change-email-confirmation-email",
+      "type": "registry:component",
+      "title": "Change Email Confirmation Email",
+      "description": "Email template component for approving an email address change from the current address.",
+      "dependencies": [
+        "@better-auth-ui/react@latest",
+        "@better-auth-ui/core@latest",
+        "react-email"
+      ],
+      "registryDependencies": [],
+      "files": [
+        {
+          "path": "../../packages/react/src/components/auth/email/change-email-confirmation.tsx",
+          "type": "registry:component",
+          "target": "@components/auth/email/change-email-confirmation.tsx"
+        },
+        {
+          "path": "../../packages/react/src/components/auth/email/email-styles.tsx",
+          "type": "registry:component",
+          "target": "@components/auth/email/email-styles.tsx"
+        }
+      ]
+    },
+    {
+      "name": "delete-account-verification-email",
+      "type": "registry:component",
+      "title": "Delete Account Verification Email",
+      "description": "Email template component for verifying a permanent account deletion request.",
+      "dependencies": [
+        "@better-auth-ui/react@latest",
+        "@better-auth-ui/core@latest",
+        "react-email"
+      ],
+      "registryDependencies": [],
+      "files": [
+        {
+          "path": "../../packages/react/src/components/auth/email/delete-account-verification.tsx",
+          "type": "registry:component",
+          "target": "@components/auth/email/delete-account-verification.tsx"
+        },
+        {
+          "path": "../../packages/react/src/components/auth/email/email-styles.tsx",
+          "type": "registry:component",
+          "target": "@components/auth/email/email-styles.tsx"
+        }
+      ]
+    },
+    {
       "name": "password-changed-email",
       "type": "registry:component",
       "title": "Password Changed Email",
@@ -1641,6 +1689,8 @@
         "https://better-auth-ui.com/r/email-verification-email.json",
         "https://better-auth-ui.com/r/magic-link-email.json",
         "https://better-auth-ui.com/r/reset-password-email.json",
+        "https://better-auth-ui.com/r/change-email-confirmation-email.json",
+        "https://better-auth-ui.com/r/delete-account-verification-email.json",
         "https://better-auth-ui.com/r/password-changed-email.json",
         "https://better-auth-ui.com/r/email-changed-email.json",
         "https://better-auth-ui.com/r/otp-email.json",

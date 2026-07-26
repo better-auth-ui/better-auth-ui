@@ -31,6 +31,8 @@
     "email/email-verification-email",
     "email/magic-link-email",
     "email/reset-password-email",
+    "email/change-email-confirmation-email",
+    "email/delete-account-verification-email",
     "email/password-changed-email",
     "email/email-changed-email",
     "email/otp-email",

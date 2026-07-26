@@ -1,6 +1,8 @@
 import { render } from "@solidjs-email/main"
 import { describe, expect, it } from "vitest"
 import {
+  ChangeEmailConfirmationEmail,
+  DeleteAccountVerificationEmail,
   EmailChangedEmail,
   EmailVerificationEmail,
   MagicLinkEmail,
@@ -128,6 +130,86 @@ describe("Solid email templates", () => {
     expect(html).toContain("Continue reset")
     expect(html).toContain("Manual reset link:")
     expect(html).toContain("https://example.com/reset")
+  })
+
+  it("renders the current-address approval step for an email change", async () => {
+    const html = await render(() => (
+      <ChangeEmailConfirmationEmail
+        appName="Better Auth UI"
+        currentEmail="current@example.com"
+        expirationMinutes={30}
+        newEmail="new@example.com"
+        url="https://example.com/auth/approve-email-change"
+      />
+    ))
+
+    expect(html).toContain("Confirm your email change")
+    expect(html).toContain("Current email:")
+    expect(html).toContain("current@example.com")
+    expect(html).toContain("New email:")
+    expect(html).toContain("new@example.com")
+    expect(html).toContain("https://example.com/auth/approve-email-change")
+    expect(html).toContain("This link expires in 30 minutes")
+    expect(html).toContain("Email sent by Better Auth UI.")
+    expect(html).toContain("Your email address will stay the same")
+  })
+
+  it("applies ChangeEmailConfirmationEmail localization overrides", async () => {
+    const html = await render(() => (
+      <ChangeEmailConfirmationEmail
+        appName="Better Auth UI"
+        localization={{
+          CONFIRM_EMAIL_CHANGE: "Approve address update",
+          APPROVE_EMAIL_CHANGE: "Confirm update",
+          EMAIL_SENT_BY: "Delivered by {appName}."
+        }}
+        url="https://example.com/auth/confirm-email-update"
+      />
+    ))
+
+    expect(html).toContain("Approve address update")
+    expect(html).toContain("Confirm update")
+    expect(html).toContain("Delivered by Better Auth UI.")
+    expect(html).toContain("https://example.com/auth/confirm-email-update")
+  })
+
+  it("renders the irreversible account deletion verification step", async () => {
+    const html = await render(() => (
+      <DeleteAccountVerificationEmail
+        appName="Better Auth UI"
+        email="user@example.com"
+        expirationHours={12}
+        url="https://example.com/auth/verify-account-deletion"
+      />
+    ))
+
+    expect(html).toContain("Confirm account deletion")
+    expect(html).toContain("user@example.com")
+    expect(html).toContain("This action cannot be undone")
+    expect(html).toContain("Delete my account")
+    expect(html).toContain("https://example.com/auth/verify-account-deletion")
+    expect(html).toContain("This link expires in 12 hours")
+    expect(html).toContain("Email sent by Better Auth UI.")
+    expect(html).toContain("Your account will remain active")
+  })
+
+  it("applies DeleteAccountVerificationEmail localization overrides", async () => {
+    const html = await render(() => (
+      <DeleteAccountVerificationEmail
+        appName="Better Auth UI"
+        localization={{
+          CONFIRM_ACCOUNT_DELETION: "Verify account removal",
+          DELETE_MY_ACCOUNT: "Permanently remove account",
+          EMAIL_SENT_BY: "Delivered by {appName}."
+        }}
+        url="https://example.com/auth/confirm-account-removal"
+      />
+    ))
+
+    expect(html).toContain("Verify account removal")
+    expect(html).toContain("Permanently remove account")
+    expect(html).toContain("Delivered by Better Auth UI.")
+    expect(html).toContain("https://example.com/auth/confirm-account-removal")
   })
 
   it("renders PasswordChangedEmail with key security content", async () => {

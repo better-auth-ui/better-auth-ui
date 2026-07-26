@@ -98,6 +98,8 @@ describe("Solid docs navigation", () => {
       "email/email-verification-email",
       "email/magic-link-email",
       "email/reset-password-email",
+      "email/change-email-confirmation-email",
+      "email/delete-account-verification-email",
       "email/password-changed-email",
       "email/email-changed-email",
       "email/otp-email",
@@ -294,6 +296,18 @@ describe("Solid docs navigation", () => {
         "zaidan-reset-password-email",
         "reset-password.tsx",
         "ResetPasswordEmailProps"
+      ],
+      [
+        "change-email-confirmation-email",
+        "zaidan-change-email-confirmation-email",
+        "change-email-confirmation.tsx",
+        "ChangeEmailConfirmationEmailProps"
+      ],
+      [
+        "delete-account-verification-email",
+        "zaidan-delete-account-verification-email",
+        "delete-account-verification.tsx",
+        "DeleteAccountVerificationEmailProps"
       ],
       [
         "password-changed-email",

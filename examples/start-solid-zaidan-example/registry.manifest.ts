@@ -611,6 +611,30 @@ export const solidRegistryManifest = {
       files: emailFiles("src/components/auth/email/reset-password.tsx")
     }),
     item({
+      name: "change-email-confirmation-email",
+      type: "registry:component",
+      title: "Solid Change Email Confirmation Email",
+      description:
+        "Solid email template component for approving an email address change from the current address.",
+      dependencies: solidEmailDependencies,
+      registryDependencies: [],
+      files: emailFiles(
+        "src/components/auth/email/change-email-confirmation.tsx"
+      )
+    }),
+    item({
+      name: "delete-account-verification-email",
+      type: "registry:component",
+      title: "Solid Delete Account Verification Email",
+      description:
+        "Solid email template component for verifying a permanent account deletion request.",
+      dependencies: solidEmailDependencies,
+      registryDependencies: [],
+      files: emailFiles(
+        "src/components/auth/email/delete-account-verification.tsx"
+      )
+    }),
+    item({
       name: "password-changed-email",
       type: "registry:component",
       title: "Solid Password Changed Email",

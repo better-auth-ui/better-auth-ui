@@ -1,5 +1,7 @@
 "use client"
 
+export * from "./components/auth/email/change-email-confirmation-email"
+export * from "./components/auth/email/delete-account-verification-email"
 export * from "./components/auth/email/email-changed-email"
 export * from "./components/auth/email/email-verification-email"
 export * from "./components/auth/email/magic-link-email"

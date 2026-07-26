@@ -9,6 +9,8 @@ import { SignUpDemo as HeroUISignUpDemo } from "./heroui/auth/sign-up"
 import { VerifyEmailDemo as HeroUIVerifyEmailDemo } from "./heroui/auth/verify-email"
 import { DangerZoneDemo as HeroUIDangerZoneDemo } from "./heroui/delete-user/danger-zone"
 import { DeviceAuthorizationDemo as HeroUIDeviceAuthorizationDemo } from "./heroui/device-authorization/device-authorization"
+import { ChangeEmailConfirmationEmailDemo as HeroUIChangeEmailConfirmationEmailDemo } from "./heroui/email/change-email-confirmation-email"
+import { DeleteAccountVerificationEmailDemo as HeroUIDeleteAccountVerificationEmailDemo } from "./heroui/email/delete-account-verification-email"
 import { EmailChangedEmailDemo as HeroUIEmailChangedEmailDemo } from "./heroui/email/email-changed-email"
 import { EmailVerificationEmailDemo as HeroUIEmailVerificationEmailDemo } from "./heroui/email/email-verification-email"
 import { MagicLinkEmailDemo as HeroUIMagicLinkEmailDemo } from "./heroui/email/magic-link-email"
@@ -61,6 +63,8 @@ import { SignUpDemo as ShadcnSignUpDemo } from "./shadcn/auth/sign-up"
 import { VerifyEmailDemo as ShadcnVerifyEmailDemo } from "./shadcn/auth/verify-email"
 import { DangerZoneDemo as ShadcnDangerZoneDemo } from "./shadcn/delete-user/danger-zone"
 import { DeviceAuthorizationDemo as ShadcnDeviceAuthorizationDemo } from "./shadcn/device-authorization/device-authorization"
+import { ChangeEmailConfirmationEmailDemo as ShadcnChangeEmailConfirmationEmailDemo } from "./shadcn/email/change-email-confirmation-email"
+import { DeleteAccountVerificationEmailDemo as ShadcnDeleteAccountVerificationEmailDemo } from "./shadcn/email/delete-account-verification-email"
 import { EmailChangedEmailDemo as ShadcnEmailChangedEmailDemo } from "./shadcn/email/email-changed-email"
 import { EmailVerificationEmailDemo as ShadcnEmailVerificationEmailDemo } from "./shadcn/email/email-verification-email"
 import { MagicLinkEmailDemo as ShadcnMagicLinkEmailDemo } from "./shadcn/email/magic-link-email"
@@ -103,6 +107,8 @@ import { UserViewDemo as ShadcnUserViewDemo } from "./shadcn/user/user-view"
 import { SignInUsernameDemo as ShadcnSignInUsernameDemo } from "./shadcn/username/sign-in"
 import { SignUpUsernameDemo as ShadcnSignUpUsernameDemo } from "./shadcn/username/sign-up"
 import { UserProfileUsernameDemo as ShadcnUserProfileUsernameDemo } from "./shadcn/username/user-profile"
+import { ChangeEmailConfirmationEmailDemo as ZaidanChangeEmailConfirmationEmailDemo } from "./zaidan/email/change-email-confirmation-email"
+import { DeleteAccountVerificationEmailDemo as ZaidanDeleteAccountVerificationEmailDemo } from "./zaidan/email/delete-account-verification-email"
 import { EmailChangedEmailDemo as ZaidanEmailChangedEmailDemo } from "./zaidan/email/email-changed-email"
 import { EmailVerificationEmailDemo as ZaidanEmailVerificationEmailDemo } from "./zaidan/email/email-verification-email"
 import { MagicLinkEmailDemo as ZaidanMagicLinkEmailDemo } from "./zaidan/email/magic-link-email"
@@ -126,6 +132,10 @@ export const demos: Record<string, ComponentType> = {
   "heroui-change-password": HeroUIChangePasswordDemo,
   "heroui-delete-user-danger-zone": HeroUIDangerZoneDemo,
   "heroui-device-authorization": HeroUIDeviceAuthorizationDemo,
+  "heroui-change-email-confirmation-email":
+    HeroUIChangeEmailConfirmationEmailDemo,
+  "heroui-delete-account-verification-email":
+    HeroUIDeleteAccountVerificationEmailDemo,
   "heroui-email-changed-email": HeroUIEmailChangedEmailDemo,
   "heroui-email-verification-email": HeroUIEmailVerificationEmailDemo,
   "heroui-forgot-password": HeroUIForgotPasswordDemo,
@@ -178,6 +188,10 @@ export const demos: Record<string, ComponentType> = {
   "shadcn-change-password": ShadcnChangePasswordDemo,
   "shadcn-delete-user-danger-zone": ShadcnDangerZoneDemo,
   "shadcn-device-authorization": ShadcnDeviceAuthorizationDemo,
+  "shadcn-change-email-confirmation-email":
+    ShadcnChangeEmailConfirmationEmailDemo,
+  "shadcn-delete-account-verification-email":
+    ShadcnDeleteAccountVerificationEmailDemo,
   "shadcn-email-changed-email": ShadcnEmailChangedEmailDemo,
   "shadcn-email-verification-email": ShadcnEmailVerificationEmailDemo,
   "shadcn-forgot-password": ShadcnForgotPasswordDemo,
@@ -221,6 +235,10 @@ export const demos: Record<string, ComponentType> = {
   "shadcn-username-user-profile": ShadcnUserProfileUsernameDemo,
   "shadcn-verify-email": ShadcnVerifyEmailDemo,
   "shadcn-theme-toggle-item": ShadcnThemeToggleItemDemo,
+  "zaidan-change-email-confirmation-email":
+    ZaidanChangeEmailConfirmationEmailDemo,
+  "zaidan-delete-account-verification-email":
+    ZaidanDeleteAccountVerificationEmailDemo,
   "zaidan-email-changed-email": ZaidanEmailChangedEmailDemo,
   "zaidan-email-verification-email": ZaidanEmailVerificationEmailDemo,
   "zaidan-magic-link-email": ZaidanMagicLinkEmailDemo,
