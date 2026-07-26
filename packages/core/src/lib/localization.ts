@@ -114,6 +114,9 @@ export const localization = {
     /** @remarks `"Send reset link"` */
     sendResetLink: "Send reset link",
 
+    /** @remarks `"Scan to open {{provider}} on your phone"` */
+    scanToOpenEmailProvider: "Scan to open {{provider}} on your phone",
+
     /** @remarks `"Show password"` */
     showPassword: "Show password",
 

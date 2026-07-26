@@ -40,5 +40,8 @@
   },
   "publishConfig": {
     "access": "public"
+  },
+  "dependencies": {
+    "uqr": "^0.1.3"
   }
 }

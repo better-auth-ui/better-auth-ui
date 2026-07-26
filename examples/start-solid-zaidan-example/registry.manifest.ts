@@ -203,6 +203,10 @@ export const solidRegistryManifest = {
       title: "Solid Magic Link",
       description:
         "Solid/Zaidan passwordless magic-link sign-in view, toggle button, and UI plugin factory.",
+      registryDependencies: [
+        betterAuthSolidRegistryDependency("auth-provider"),
+        "@zaidan/tooltip"
+      ],
       files: [
         libFile("src/lib/auth/magic-link-plugin.ts"),
         componentFile("src/components/auth/magic-link.tsx"),
@@ -307,6 +311,10 @@ export const solidRegistryManifest = {
       title: "Solid Forgot Password",
       description:
         "Solid forgot-password component using the Solid password reset mutation options.",
+      registryDependencies: [
+        betterAuthSolidRegistryDependency("auth-provider"),
+        "@zaidan/tooltip"
+      ],
       files: [
         componentFile("src/components/auth/forgot-password.tsx"),
         componentFile("src/components/auth/reset-link-sent.tsx"),
@@ -331,6 +339,10 @@ export const solidRegistryManifest = {
       title: "Solid Verify Email",
       description:
         "Solid verify-email view with a button to open the user's email provider and a cooldown-limited resend button.",
+      registryDependencies: [
+        betterAuthSolidRegistryDependency("auth-provider"),
+        "@zaidan/tooltip"
+      ],
       files: [
         componentFile("src/components/auth/verify-email.tsx"),
         componentFile("src/components/auth/open-email-button.tsx"),
@@ -521,6 +533,10 @@ export const solidRegistryManifest = {
       type: "registry:component",
       title: "Solid Change Password",
       description: "Solid change-password settings card.",
+      registryDependencies: [
+        betterAuthSolidRegistryDependency("auth-provider"),
+        "@zaidan/tooltip"
+      ],
       files: [
         componentFile(
           "src/components/auth/settings/security/change-password.tsx"

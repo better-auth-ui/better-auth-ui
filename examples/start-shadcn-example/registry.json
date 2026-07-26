@@ -192,7 +192,8 @@
         "field",
         "separator",
         "sonner",
-        "spinner"
+        "spinner",
+        "tooltip"
       ],
       "files": [
         {
@@ -917,7 +918,8 @@
         "input",
         "field",
         "sonner",
-        "spinner"
+        "spinner",
+        "tooltip"
       ],
       "files": [
         {
@@ -980,7 +982,14 @@
         "better-auth",
         "lucide-react"
       ],
-      "registryDependencies": ["button", "card", "field", "sonner", "spinner"],
+      "registryDependencies": [
+        "button",
+        "card",
+        "field",
+        "sonner",
+        "spinner",
+        "tooltip"
+      ],
       "files": [
         {
           "path": "src/components/auth/verify-email.tsx",
@@ -1236,7 +1245,8 @@
         "input-group",
         "skeleton",
         "sonner",
-        "spinner"
+        "spinner",
+        "tooltip"
       ],
       "files": [
         {

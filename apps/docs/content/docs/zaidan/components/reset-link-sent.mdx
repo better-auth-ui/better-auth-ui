@@ -5,6 +5,8 @@ description: Confirms that a password reset link was sent in a Solid auth flow.
 
 `<Auth />` renders this view at `/auth/reset-link-sent` after `<ForgotPassword />` successfully requests a reset link. It reads the submitted email from session storage, redirects back to forgot-password when that state is missing, and shows an email-provider shortcut when one is available.
 
+Hover or focus the email-provider button to show a QR code for the same provider URL. Users can scan it when their email account is available on another device.
+
 ## Installation
 
 The view is included with the Solid forgot-password registry entry.

@@ -795,7 +795,8 @@ describe("Solid registry isolation", () => {
       spinner: "@zaidan/spinner",
       table: "@zaidan/table",
       tabs: "@zaidan/tabs",
-      textarea: "@zaidan/textarea"
+      textarea: "@zaidan/textarea",
+      tooltip: "@zaidan/tooltip"
     }
     const outputRoot = makeTempRoot()
 
@@ -2136,7 +2137,8 @@ describe("Solid registry isolation", () => {
       "@better-auth-ui/solid@latest"
     )
     expect(forgotPassword.registryDependencies).toEqual([
-      solidRegistryUrl("auth-provider")
+      solidRegistryUrl("auth-provider"),
+      "@zaidan/tooltip"
     ])
     expect(forgotPassword.files).toEqual(
       expect.arrayContaining([
