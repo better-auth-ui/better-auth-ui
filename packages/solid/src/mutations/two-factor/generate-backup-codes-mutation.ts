@@ -14,13 +14,8 @@ export type GenerateBackupCodesParams<TAuthClient extends TwoFactorAuthClient> =
 export function generateBackupCodesOptions<
   TAuthClient extends TwoFactorAuthClient
 >(authClient: TAuthClient) {
-  // The response carries a secret (TOTP URI and/or backup codes). Dropping it
-  // from the mutation cache immediately keeps it out of devtools and
-  // `MutationCache` lookups once the flow is done.
   return createAuthMutationOptions(
     authClient.twoFactor.generateBackupCodes,
-    twoFactorMutationKeys.generateBackupCodes,
-    undefined,
-    0
+    twoFactorMutationKeys.generateBackupCodes
   )
 }

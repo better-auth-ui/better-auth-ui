@@ -22,17 +22,7 @@ export type AuthMutationMeta = {
 export function createAuthMutationOptions<
   TMethod extends MutationMethod,
   const TMutationKey extends MutationKey
->(
-  authFn: TMethod,
-  mutationKey: TMutationKey,
-  meta?: AuthMutationMeta,
-  /**
-   * How long the settled mutation stays in the cache. Pass `0` for endpoints
-   * that resolve with a secret so the payload is dropped as soon as the
-   * caller unmounts.
-   */
-  gcTime?: number
-) {
+>(authFn: TMethod, mutationKey: TMutationKey, meta?: AuthMutationMeta) {
   const mutationFn = (params: MutationParams<TMethod>) => {
     const input = (params ?? {}) as { fetchOptions?: BetterFetchOption }
 
@@ -49,7 +39,6 @@ export function createAuthMutationOptions<
   >({
     mutationKey,
     mutationFn,
-    ...(meta ? { meta } : {}),
-    ...(gcTime === undefined ? {} : { gcTime })
+    ...(meta ? { meta } : {})
   })
 }
