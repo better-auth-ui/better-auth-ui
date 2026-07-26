@@ -79,6 +79,21 @@ export const oauthProviderScopeMetadata: OAuthScopeMetadataMap = {
   }
 }
 
+/**
+ * Read a scope key without ever reaching `Object.prototype`.
+ *
+ * Scopes come from the OAuth client, so `constructor`, `toString`, and the
+ * like are attacker-controlled input. A plain index would hand back the
+ * inherited value — an unlabelled row on the consent screen for a scope the
+ * user is still about to grant.
+ */
+function readScopeKey(
+  map: OAuthScopeMetadataMap,
+  scope: string
+): OAuthScopeMetadata | undefined {
+  return Object.hasOwn(map, scope) ? map[scope] : undefined
+}
+
 function lookup(
   source: OAuthScopeMetadataSource,
   scope: string,
@@ -92,7 +107,7 @@ function lookup(
     )
   }
 
-  return (source as OAuthScopeMetadataMap)[scope]
+  return readScopeKey(source as OAuthScopeMetadataMap, scope)
 }
 
 /**
@@ -113,5 +128,8 @@ export function resolveOAuthScopeMetadata(
 ): OAuthScopeMetadata {
   const resolved = source ? lookup(source, scope, context) : undefined
 
-  return resolved ?? oauthProviderScopeMetadata[scope] ?? { label: scope }
+  return (
+    resolved ??
+    readScopeKey(oauthProviderScopeMetadata, scope) ?? { label: scope }
+  )
 }

@@ -250,6 +250,8 @@ import { oauthContinueOptions, useAuth } from "@better-auth-ui/solid"
 import { createMutation } from "@tanstack/solid-query"
 import { For } from "solid-js"
 
+type Workspace = { slug: string; name: string }
+
 function SelectWorkspace(props: { workspaces: Workspace[] }) {
   const auth = useAuth()
   const oauthContinue = createMutation(() =>

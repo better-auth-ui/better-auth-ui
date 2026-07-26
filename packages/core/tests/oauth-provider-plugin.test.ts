@@ -208,6 +208,35 @@ describe("resolveOAuthScopeMetadata", () => {
     ).toEqual({ label: "custom:scope" })
   })
 
+  it("never resolves a scope through Object.prototype", () => {
+    // Scopes are attacker-controlled, so a plain index would hand back the
+    // inherited value and render an unlabelled row for a scope the user is
+    // still about to grant.
+    for (const scope of [
+      "constructor",
+      "toString",
+      "hasOwnProperty",
+      "__proto__",
+      "valueOf"
+    ]) {
+      for (const source of [undefined, {}, [] as const, () => undefined]) {
+        expect(resolveOAuthScopeMetadata(source, scope, context)).toEqual({
+          label: scope
+        })
+      }
+    }
+  })
+
+  it("still resolves own keys that shadow prototype members", () => {
+    expect(
+      resolveOAuthScopeMetadata(
+        { constructor: { label: "Build things" } },
+        "constructor",
+        context
+      )
+    ).toEqual({ label: "Build things" })
+  })
+
   it("lets a consumer source override built-in metadata", () => {
     expect(
       resolveOAuthScopeMetadata(

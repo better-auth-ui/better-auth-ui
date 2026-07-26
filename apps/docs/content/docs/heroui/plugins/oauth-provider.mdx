@@ -248,7 +248,9 @@ There is no post-login view to install. What an application selects after login 
 ```tsx title="routes/auth/select-workspace.tsx"
 import { useAuth, useOAuthContinue } from "@better-auth-ui/react"
 
-function SelectWorkspace({ workspaces }) {
+type Workspace = { slug: string; name: string }
+
+function SelectWorkspace({ workspaces }: { workspaces: Workspace[] }) {
   const { authClient } = useAuth()
   const oauthContinue = useOAuthContinue(authClient)
 

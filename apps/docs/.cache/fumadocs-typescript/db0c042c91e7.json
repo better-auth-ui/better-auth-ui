@@ -1,0 +1,27 @@
+[
+  {
+    "id": "oauth-scope-metadata.ts-OAuthScopeMetadataContext",
+    "name": "OAuthScopeMetadataContext",
+    "description": "Context handed to an {@link OAuthScopeMetadataResolver} so applications can\nvary labels per requesting client or per scope set.",
+    "entries": [
+      {
+        "name": "clientId",
+        "description": "The OAuth client ID from the signed authorization request, if known.",
+        "tags": [],
+        "type": "string",
+        "simplifiedType": "string",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "requestedScopes",
+        "description": "Every scope being displayed alongside this one.",
+        "tags": [],
+        "type": "readonly string[]",
+        "simplifiedType": "array",
+        "required": true,
+        "deprecated": false
+      }
+    ]
+  }
+]
