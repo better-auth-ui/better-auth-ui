@@ -55,7 +55,8 @@ export function EnableTwoFactorDialog({
   const { authClient, localization } = useAuth()
   const { codeLength, localization: twoFactorLocalization } =
     useAuthPlugin(twoFactorPlugin)
-  const { requiresPassword } = useTwoFactorPasswordRequirement()
+  const { isPending: isResolvingPasswordRequirement, requiresPassword } =
+    useTwoFactorPasswordRequirement()
 
   const twoFactorClient = authClient as TwoFactorAuthClient
 
@@ -81,16 +82,17 @@ export function EnableTwoFactorDialog({
     }
   }, [totpUri])
 
-  const { mutate: enableTwoFactor, isPending: isEnabling } = useEnableTwoFactor(
-    twoFactorClient,
-    {
-      onSuccess: (data) => {
-        setTotpUri(data.totpURI)
-        setBackupCodes(data.backupCodes)
-        setStep("verify")
-      }
+  const {
+    mutate: enableTwoFactor,
+    isPending: isEnabling,
+    reset: resetEnrollment
+  } = useEnableTwoFactor(twoFactorClient, {
+    onSuccess: (data) => {
+      setTotpUri(data.totpURI)
+      setBackupCodes(data.backupCodes)
+      setStep("verify")
     }
-  )
+  })
 
   const { mutate: verifyTotp, isPending: isVerifying } = useVerifyTotp(
     twoFactorClient,
@@ -103,7 +105,7 @@ export function EnableTwoFactorDialog({
     }
   )
 
-  const isPending = isEnabling || isVerifying
+  const isPending = isEnabling || isVerifying || isResolvingPasswordRequirement
 
   const handleOpenChange = (nextOpen: boolean) => {
     onOpenChange(nextOpen)
@@ -113,6 +115,8 @@ export function EnableTwoFactorDialog({
       setTotpUri("")
       setBackupCodes([])
       setCode("")
+      // Clears the resolved TOTP URI and backup codes from the mutation cache.
+      resetEnrollment()
     }
   }
 

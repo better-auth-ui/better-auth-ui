@@ -70,13 +70,17 @@ export function VerifyEmailOtp({ className, variant }: VerifyEmailOtpProps) {
   )
   const [code, setCode] = useState("")
 
-  useEffect(() => {
-    setEmail(sessionStorage.getItem(VERIFY_EMAIL_STORAGE_KEY) ?? "")
-  }, [])
+  const { cooldown, isCoolingDown, startCooldown } = useResendCooldown()
 
-  const { cooldown, isCoolingDown, startCooldown } = useResendCooldown(
-    email ? RESEND_COOLDOWN_SECONDS : 0
-  )
+  // Sign-up already sent a code to this address, so restoring it also starts
+  // the cooldown — otherwise the hydrated render would offer an immediate
+  // resend and walk straight into the server's rate limit.
+  useEffect(() => {
+    const pendingEmail = sessionStorage.getItem(VERIFY_EMAIL_STORAGE_KEY) ?? ""
+    setEmail(pendingEmail)
+
+    if (pendingEmail) startCooldown(RESEND_COOLDOWN_SECONDS)
+  }, [startCooldown])
 
   const { mutate: sendVerificationOtp, isPending: isSending } =
     useSendVerificationOtp(otpClient, {

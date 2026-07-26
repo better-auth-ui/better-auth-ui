@@ -83,4 +83,19 @@ describe("two-factor challenge helpers", () => {
     storeTwoFactorMethods(["sms"])
     expect(readTwoFactorMethods()).toEqual(["totp", "otp"])
   })
+
+  it("survives storage that throws, so sign-in still reaches the challenge", () => {
+    const throwing = () => {
+      throw new Error("storage disabled")
+    }
+    vi.stubGlobal("sessionStorage", {
+      getItem: throwing,
+      setItem: throwing,
+      removeItem: throwing
+    })
+
+    expect(() => storeTwoFactorMethods(["totp"])).not.toThrow()
+    expect(() => clearTwoFactorMethods()).not.toThrow()
+    expect(readTwoFactorMethods()).toEqual(["totp", "otp"])
+  })
 })

@@ -32,7 +32,6 @@ type ChangeEmailState = {
 type ChangeEmailAction =
   | { type: "currentEmailChallenged"; newEmail: string }
   | { type: "changeRequested"; newEmail: string }
-  | { type: "changeConfirmed" }
   | { type: "restarted" }
 
 const initialChangeEmailState: ChangeEmailState = {
@@ -51,7 +50,6 @@ function changeEmailReducer(
       return { step: "currentCode", newEmail: action.newEmail }
     case "changeRequested":
       return { step: "newCode", newEmail: action.newEmail }
-    case "changeConfirmed":
     case "restarted":
       return initialChangeEmailState
   }

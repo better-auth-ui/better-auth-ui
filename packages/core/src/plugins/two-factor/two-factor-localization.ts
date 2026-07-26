@@ -40,6 +40,9 @@ export const twoFactorLocalization = {
     "Save these somewhere safe. Each code works once if you lose your authenticator.",
   /** @remarks `"Backup codes copied"` */
   backupCodesCopied: "Backup codes copied",
+  /** @remarks `"Couldn't copy the backup codes. Select and copy them manually."` */
+  backupCodesCopyFailed:
+    "Couldn't copy the backup codes. Select and copy them manually.",
   /** @remarks `"Regenerate backup codes"` */
   regenerateBackupCodes: "Regenerate backup codes",
   /** @remarks `"New backup codes generated. The old ones no longer work."` */

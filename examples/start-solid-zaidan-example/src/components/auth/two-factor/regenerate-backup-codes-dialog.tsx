@@ -36,7 +36,11 @@ export function RegenerateBackupCodesDialog(props: {
 }) {
   const auth = useAuth()
   const { localization: twoFactorLocalization } = useAuthPlugin(twoFactorPlugin)
-  const { requiresPassword } = useTwoFactorPasswordRequirement()
+  const { isPending: isResolvingPasswordRequirement, requiresPassword } =
+    useTwoFactorPasswordRequirement()
+
+  const isPending = () =>
+    generateBackupCodes.isPending || isResolvingPasswordRequirement()
 
   const [codes, setCodes] = createSignal<string[]>([])
 
@@ -95,7 +99,7 @@ export function RegenerateBackupCodesDialog(props: {
                 <Input
                   autocomplete="current-password"
                   autofocus
-                  disabled={generateBackupCodes.isPending}
+                  disabled={isPending()}
                   id="regenerate-backup-codes-password"
                   name="password"
                   placeholder={auth.localization.auth.passwordPlaceholder}
@@ -113,7 +117,7 @@ export function RegenerateBackupCodesDialog(props: {
           <Show when={!codes().length}>
             <DialogClose
               as={Button}
-              disabled={generateBackupCodes.isPending}
+              disabled={isPending()}
               type="button"
               variant="outline"
             >
@@ -121,8 +125,8 @@ export function RegenerateBackupCodesDialog(props: {
             </DialogClose>
           </Show>
 
-          <Button disabled={generateBackupCodes.isPending} type="submit">
-            <Show when={generateBackupCodes.isPending}>
+          <Button disabled={isPending()} type="submit">
+            <Show when={isPending()}>
               <Spinner />
             </Show>
 

@@ -48,23 +48,32 @@ export function RegenerateBackupCodesDialog({
 }: RegenerateBackupCodesDialogProps) {
   const { authClient, localization } = useAuth()
   const { localization: twoFactorLocalization } = useAuthPlugin(twoFactorPlugin)
-  const { requiresPassword } = useTwoFactorPasswordRequirement()
+  const { isPending: isResolvingPasswordRequirement, requiresPassword } =
+    useTwoFactorPasswordRequirement()
 
   const [codes, setCodes] = useState<string[]>([])
 
-  const { mutate: generateBackupCodes, isPending } = useGenerateBackupCodes(
-    authClient as TwoFactorAuthClient,
-    {
-      onSuccess: (data) => {
-        setCodes(data.backupCodes)
-        toast.success(twoFactorLocalization.backupCodesRegenerated)
-      }
+  const {
+    mutate: generateBackupCodes,
+    isPending: isGenerating,
+    reset: resetGeneration
+  } = useGenerateBackupCodes(authClient as TwoFactorAuthClient, {
+    onSuccess: (data) => {
+      setCodes(data.backupCodes)
+      toast.success(twoFactorLocalization.backupCodesRegenerated)
     }
-  )
+  })
+
+  const isPending = isGenerating || isResolvingPasswordRequirement
 
   const handleOpenChange = (nextOpen: boolean) => {
     onOpenChange(nextOpen)
-    if (!nextOpen) setCodes([])
+
+    if (!nextOpen) {
+      setCodes([])
+      // Clears the resolved backup codes from the mutation cache.
+      resetGeneration()
+    }
   }
 
   const handleSubmit = (e: SyntheticEvent<HTMLFormElement>) => {

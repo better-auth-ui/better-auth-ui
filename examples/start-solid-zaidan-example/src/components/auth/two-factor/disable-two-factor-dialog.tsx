@@ -30,7 +30,11 @@ export function DisableTwoFactorDialog(props: {
 }) {
   const auth = useAuth()
   const { localization: twoFactorLocalization } = useAuthPlugin(twoFactorPlugin)
-  const { requiresPassword } = useTwoFactorPasswordRequirement()
+  const { isPending: isResolvingPasswordRequirement, requiresPassword } =
+    useTwoFactorPasswordRequirement()
+
+  const isPending = () =>
+    disableTwoFactor.isPending || isResolvingPasswordRequirement()
 
   const disableTwoFactor = createMutation(() => ({
     ...disableTwoFactorOptions(auth.authClient as TwoFactorAuthClient),
@@ -79,7 +83,7 @@ export function DisableTwoFactorDialog(props: {
             <Input
               autocomplete="current-password"
               autofocus
-              disabled={disableTwoFactor.isPending}
+              disabled={isPending()}
               id="disable-two-factor-password"
               name="password"
               placeholder={auth.localization.auth.passwordPlaceholder}
@@ -92,19 +96,15 @@ export function DisableTwoFactorDialog(props: {
         <DialogFooter>
           <DialogClose
             as={Button}
-            disabled={disableTwoFactor.isPending}
+            disabled={isPending()}
             type="button"
             variant="outline"
           >
             {auth.localization.settings.cancel}
           </DialogClose>
 
-          <Button
-            disabled={disableTwoFactor.isPending}
-            type="submit"
-            variant="destructive"
-          >
-            <Show when={disableTwoFactor.isPending}>
+          <Button disabled={isPending()} type="submit" variant="destructive">
+            <Show when={isPending()}>
               <Spinner />
             </Show>
 

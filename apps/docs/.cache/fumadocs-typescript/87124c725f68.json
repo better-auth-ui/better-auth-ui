@@ -1,0 +1,27 @@
+[
+  {
+    "id": "generate-backup-codes-mutation.ts-GenerateBackupCodesParams",
+    "name": "GenerateBackupCodesParams",
+    "description": "",
+    "entries": [
+      {
+        "name": "password",
+        "description": "",
+        "tags": [],
+        "type": "string",
+        "simplifiedType": "string",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "fetchOptions",
+        "description": "",
+        "tags": [],
+        "type": "ClientFetchOption<Partial<{ password?: string; } | { password: string; }> & Record<string, any>, Partial<Record<string, any>> & Record<string, any>, Record<string, any>>",
+        "simplifiedType": "ClientFetchOption<union, Record<string, any> & Partial<Record<string, any>>, union>",
+        "required": false,
+        "deprecated": false
+      }
+    ]
+  }
+]

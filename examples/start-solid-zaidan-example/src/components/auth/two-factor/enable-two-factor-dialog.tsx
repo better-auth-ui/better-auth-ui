@@ -42,7 +42,8 @@ export function EnableTwoFactorDialog(props: {
   const auth = useAuth()
   const { codeLength, localization: twoFactorLocalization } =
     useAuthPlugin(twoFactorPlugin)
-  const { requiresPassword } = useTwoFactorPasswordRequirement()
+  const { isPending: isResolvingPasswordRequirement, requiresPassword } =
+    useTwoFactorPasswordRequirement()
 
   const [step, setStep] = createSignal<EnrollmentStep>("password")
   const [totpUri, setTotpUri] = createSignal("")
@@ -83,7 +84,10 @@ export function EnableTwoFactorDialog(props: {
     }
   }))
 
-  const isPending = () => enableTwoFactor.isPending || verifyTotp.isPending
+  const isPending = () =>
+    enableTwoFactor.isPending ||
+    verifyTotp.isPending ||
+    isResolvingPasswordRequirement()
 
   const submit = (event: SubmitEvent & { currentTarget: HTMLFormElement }) => {
     event.preventDefault()

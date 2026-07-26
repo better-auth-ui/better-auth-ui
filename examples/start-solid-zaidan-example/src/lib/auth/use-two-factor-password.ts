@@ -33,7 +33,13 @@ export function useTwoFactorPasswordRequirement() {
 
   return {
     isPending: () => allowPasswordless && accounts.isPending,
+    // Default to asking while the account list loads. Guessing "no password"
+    // early would submit an empty body for a credential user and fail the
+    // request; guessing "password" costs a passkey-only user nothing, because
+    // the field disappears as soon as the list resolves.
     requiresPassword: () =>
-      !allowPasswordless || Boolean(hasCredentialAccount())
+      !allowPasswordless ||
+      accounts.isPending ||
+      Boolean(hasCredentialAccount())
   }
 }

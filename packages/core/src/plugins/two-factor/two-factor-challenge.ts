@@ -24,7 +24,12 @@ export const TWO_FACTOR_METHODS_STORAGE_KEY =
  */
 export type TwoFactorRedirect = {
   twoFactorRedirect: true
-  twoFactorMethods?: string[]
+  /**
+   * Left as `unknown` on purpose: the redirect flag is what decides the
+   * navigation, and a malformed method list must never turn into a claim the
+   * caller can trust. {@link parseTwoFactorMethods} does the narrowing.
+   */
+  twoFactorMethods?: unknown
 }
 
 /**
@@ -64,10 +69,18 @@ export function parseTwoFactorMethods(methods?: unknown): TwoFactorMethod[] {
 export function storeTwoFactorMethods(methods?: unknown) {
   if (typeof sessionStorage === "undefined") return
 
-  sessionStorage.setItem(
-    TWO_FACTOR_METHODS_STORAGE_KEY,
-    JSON.stringify(parseTwoFactorMethods(methods))
-  )
+  // Storage can throw outright — Safari private mode and hardened browser
+  // settings both do it. Losing the method hints costs the user nothing
+  // (the challenge falls back to offering every method); failing the
+  // navigation to the challenge would cost them the sign-in.
+  try {
+    sessionStorage.setItem(
+      TWO_FACTOR_METHODS_STORAGE_KEY,
+      JSON.stringify(parseTwoFactorMethods(methods))
+    )
+  } catch {
+    // Ignored: the challenge view degrades to offering every method.
+  }
 }
 
 /**
@@ -79,13 +92,14 @@ export function storeTwoFactorMethods(methods?: unknown) {
 export function readTwoFactorMethods(): TwoFactorMethod[] {
   if (typeof sessionStorage === "undefined") return TWO_FACTOR_METHODS
 
-  const stored = sessionStorage.getItem(TWO_FACTOR_METHODS_STORAGE_KEY)
-  if (!stored) return TWO_FACTOR_METHODS
-
   try {
+    const stored = sessionStorage.getItem(TWO_FACTOR_METHODS_STORAGE_KEY)
+    if (!stored) return TWO_FACTOR_METHODS
+
     const methods = parseTwoFactorMethods(JSON.parse(stored))
     return methods.length ? methods : TWO_FACTOR_METHODS
   } catch {
+    // Unreadable or unparseable storage falls back to every method.
     return TWO_FACTOR_METHODS
   }
 }
@@ -94,5 +108,10 @@ export function readTwoFactorMethods(): TwoFactorMethod[] {
 export function clearTwoFactorMethods() {
   if (typeof sessionStorage === "undefined") return
 
-  sessionStorage.removeItem(TWO_FACTOR_METHODS_STORAGE_KEY)
+  try {
+    sessionStorage.removeItem(TWO_FACTOR_METHODS_STORAGE_KEY)
+  } catch {
+    // Ignored: stale hints are harmless, and this runs right before a
+    // navigation that must not be blocked.
+  }
 }

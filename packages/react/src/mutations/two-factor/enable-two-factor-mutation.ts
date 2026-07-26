@@ -43,6 +43,10 @@ export function enableTwoFactorOptions<TAuthClient extends TwoFactorAuthClient>(
     BetterFetchError,
     Parameters<typeof mutationFn>[0]
   >({
+    // The response carries a secret (TOTP URI and/or backup codes). Dropping
+    // it from the mutation cache immediately keeps it out of devtools and
+    // `MutationCache` lookups once the flow is done.
+    gcTime: 0,
     mutationKey,
     mutationFn
   })

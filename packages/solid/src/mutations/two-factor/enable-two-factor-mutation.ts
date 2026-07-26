@@ -16,9 +16,13 @@ export type EnableTwoFactorParams<TAuthClient extends TwoFactorAuthClient> =
 export function enableTwoFactorOptions<TAuthClient extends TwoFactorAuthClient>(
   authClient: TAuthClient
 ) {
+  // The response carries a secret (TOTP URI and/or backup codes). Dropping it
+  // from the mutation cache immediately keeps it out of devtools and
+  // `MutationCache` lookups once the flow is done.
   return createAuthMutationOptions(
     authClient.twoFactor.enable,
     twoFactorMutationKeys.enable,
-    { awaits: [authQueryKeys.session] }
+    { awaits: [authQueryKeys.session] },
+    0
   )
 }

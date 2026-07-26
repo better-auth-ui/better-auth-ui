@@ -44,17 +44,18 @@ export function DisableTwoFactorDialog({
 }: DisableTwoFactorDialogProps) {
   const { authClient, localization } = useAuth()
   const { localization: twoFactorLocalization } = useAuthPlugin(twoFactorPlugin)
-  const { requiresPassword } = useTwoFactorPasswordRequirement()
+  const { isPending: isResolvingPasswordRequirement, requiresPassword } =
+    useTwoFactorPasswordRequirement()
 
-  const { mutate: disableTwoFactor, isPending } = useDisableTwoFactor(
-    authClient as TwoFactorAuthClient,
-    {
+  const { mutate: disableTwoFactor, isPending: isDisabling } =
+    useDisableTwoFactor(authClient as TwoFactorAuthClient, {
       onSuccess: () => {
         toast.success(twoFactorLocalization.twoFactorDisabled)
         onOpenChange(false)
       }
-    }
-  )
+    })
+
+  const isPending = isDisabling || isResolvingPasswordRequirement
 
   const handleSubmit = (e: SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault()

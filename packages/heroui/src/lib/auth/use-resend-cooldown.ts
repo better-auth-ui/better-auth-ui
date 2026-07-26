@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useCallback, useEffect, useState } from "react"
 
 /** Seconds a resend button stays disabled to keep users off the rate limit. */
 export const RESEND_COOLDOWN_SECONDS = 60
@@ -22,9 +22,16 @@ export function useResendCooldown(initialSeconds = 0) {
     return () => clearInterval(interval)
   }, [cooldown])
 
+  // Stable so callers can start the cooldown from an effect without
+  // re-running it on every render.
+  const startCooldown = useCallback(
+    (seconds = RESEND_COOLDOWN_SECONDS) => setCooldown(seconds),
+    []
+  )
+
   return {
     cooldown,
     isCoolingDown: cooldown > 0,
-    startCooldown: (seconds = RESEND_COOLDOWN_SECONDS) => setCooldown(seconds)
+    startCooldown
   }
 }

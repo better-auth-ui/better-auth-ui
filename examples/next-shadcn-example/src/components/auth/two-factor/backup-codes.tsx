@@ -24,9 +24,16 @@ export function BackupCodes({ codes }: BackupCodesProps) {
   const { localization } = useAuth()
   const { localization: twoFactorLocalization } = useAuthPlugin(twoFactorPlugin)
 
+  // Clipboard writes reject on insecure origins and when the user denies the
+  // permission, so the codes stay on screen and the toast tells them to copy
+  // by hand rather than leaving a rejected promise behind.
   const copyCodes = async () => {
-    await navigator.clipboard.writeText(codes.join("\n"))
-    toast.success(twoFactorLocalization.backupCodesCopied)
+    try {
+      await navigator.clipboard.writeText(codes.join("\n"))
+      toast.success(twoFactorLocalization.backupCodesCopied)
+    } catch {
+      toast.error(twoFactorLocalization.backupCodesCopyFailed)
+    }
   }
 
   return (

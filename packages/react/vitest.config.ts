@@ -15,6 +15,9 @@ export default defineConfig({
     browser: {
       enabled: true,
       headless: true,
+      // Keep failure screenshots out of `__screenshots__/`, which is reserved
+      // for tracked `toMatchScreenshot()` reference images.
+      screenshotDirectory: ".vitest-attachments/screenshots",
       provider: playwright(),
       instances: [{ browser: "chromium" }]
     },
