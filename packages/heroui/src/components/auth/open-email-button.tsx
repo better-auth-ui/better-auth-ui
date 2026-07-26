@@ -3,6 +3,7 @@ import { useAuth } from "@better-auth-ui/react"
 import { QrCode } from "@gravity-ui/icons"
 import { cn, Tooltip } from "@heroui/react"
 import { buttonVariants } from "@heroui/styles"
+import { useMemo } from "react"
 
 export type OpenEmailButtonProps = {
   /** Email address used to detect the provider, e.g. from the verify-email flow. */
@@ -27,13 +28,18 @@ export function OpenEmailButton({ email, className }: OpenEmailButtonProps) {
   const { localization } = useAuth()
 
   const provider = getEmailProviderLink(email)
-  if (!provider) return null
+  const loginUrl = provider?.loginUrl
+  const qrCode = useMemo(
+    () => (loginUrl ? createQrCodeSvgData(loginUrl) : null),
+    [loginUrl]
+  )
+
+  if (!provider || !qrCode) return null
 
   const scanLabel = localization.auth.scanToOpenEmailProvider.replace(
     "{{provider}}",
     provider.companyProvider
   )
-  const qrCode = createQrCodeSvgData(provider.loginUrl)
 
   return (
     <Tooltip delay={0}>

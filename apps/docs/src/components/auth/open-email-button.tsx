@@ -3,6 +3,7 @@
 import { createQrCodeSvgData, getEmailProviderLink } from "@better-auth-ui/core"
 import { useAuth } from "@better-auth-ui/react"
 import { QrCode } from "lucide-react"
+import { useMemo } from "react"
 
 import { buttonVariants } from "@/components/ui/button"
 import {
@@ -36,13 +37,18 @@ export function OpenEmailButton({ email, className }: OpenEmailButtonProps) {
   const { localization } = useAuth()
 
   const provider = getEmailProviderLink(email)
-  if (!provider) return null
+  const loginUrl = provider?.loginUrl
+  const qrCode = useMemo(
+    () => (loginUrl ? createQrCodeSvgData(loginUrl) : null),
+    [loginUrl]
+  )
+
+  if (!provider || !qrCode) return null
 
   const scanLabel = localization.auth.scanToOpenEmailProvider.replace(
     "{{provider}}",
     provider.companyProvider
   )
-  const qrCode = createQrCodeSvgData(provider.loginUrl)
 
   return (
     <TooltipProvider>
