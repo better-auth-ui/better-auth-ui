@@ -39,9 +39,6 @@ export function RegenerateBackupCodesDialog(props: {
   const { isPending: isResolvingPasswordRequirement, requiresPassword } =
     useTwoFactorPasswordRequirement()
 
-  const isPending = () =>
-    generateBackupCodes.isPending || isResolvingPasswordRequirement()
-
   const [codes, setCodes] = createSignal<string[]>([])
 
   const generateBackupCodes = createMutation(() => ({
@@ -51,6 +48,9 @@ export function RegenerateBackupCodesDialog(props: {
       toast.success(twoFactorLocalization.backupCodesRegenerated)
     }
   }))
+
+  const isPending = () =>
+    generateBackupCodes.isPending || isResolvingPasswordRequirement()
 
   const submit = (event: SubmitEvent & { currentTarget: HTMLFormElement }) => {
     event.preventDefault()

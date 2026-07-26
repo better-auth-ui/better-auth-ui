@@ -33,9 +33,6 @@ export function DisableTwoFactorDialog(props: {
   const { isPending: isResolvingPasswordRequirement, requiresPassword } =
     useTwoFactorPasswordRequirement()
 
-  const isPending = () =>
-    disableTwoFactor.isPending || isResolvingPasswordRequirement()
-
   const disableTwoFactor = createMutation(() => ({
     ...disableTwoFactorOptions(auth.authClient as TwoFactorAuthClient),
     onSuccess: () => {
@@ -43,6 +40,9 @@ export function DisableTwoFactorDialog(props: {
       props.onOpenChange(false)
     }
   }))
+
+  const isPending = () =>
+    disableTwoFactor.isPending || isResolvingPasswordRequirement()
 
   const submit = (event: SubmitEvent & { currentTarget: HTMLFormElement }) => {
     event.preventDefault()
