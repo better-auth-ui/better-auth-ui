@@ -382,9 +382,23 @@ describe("Solid auth route component selection", () => {
     expect(signIn).toContain("useQueryClient")
     expect(signIn).toContain("queryClient.invalidateQueries({")
     expect(signIn).toContain("queryKey: authQueryKeys.session")
-    expect(signIn).toContain("auth.navigate({ to: auth.redirectTo })")
     expect(signIn).toContain("<ProviderButtons")
     expect(signIn).toContain('view="signIn"')
+
+    // The redirect itself moved into the shared continuation so a pending
+    // second factor can take over before `redirectTo` runs.
+    expect(signIn).toContain("continueSignIn(data)")
+
+    const continuation = readFileSync(
+      resolve(__dirname, "../src/lib/auth/use-sign-in-continuation.ts"),
+      "utf8"
+    )
+
+    expect(continuation).toContain("isTwoFactorRedirect(data)")
+    expect(continuation).toContain(
+      "storeTwoFactorMethods(data.twoFactorMethods)"
+    )
+    expect(continuation).toContain("auth.navigate({ to: auth.redirectTo })")
   })
 
   it("selects Better Auth email sign-in for email identifiers even when username auth is enabled", () => {

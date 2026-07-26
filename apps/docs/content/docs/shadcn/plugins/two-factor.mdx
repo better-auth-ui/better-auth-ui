@@ -1,0 +1,222 @@
+---
+title: Two-Factor
+description: Add a second step after the password — authenticator codes, emailed codes, and backup codes.
+---
+
+import { Callout } from 'fumadocs-ui/components/callout'
+import { Step, Steps } from 'fumadocs-ui/components/steps'
+
+The two-factor plugin adds a second step to password sign-in. Better Auth withholds the session until that step succeeds, answering the sign-in request with `{ twoFactorRedirect: true, twoFactorMethods }` instead.
+
+It contributes:
+
+- A `<TwoFactorChallenge />` view at `/auth/two-factor` covering authenticator codes, emailed codes, backup codes, and "trust this device"
+- A `<TwoFactorSettings />` card in security settings for enrolling, showing the QR code, and managing backup codes
+- Mutation hooks for every two-factor endpoint (`useEnableTwoFactor`, `useDisableTwoFactor`, `useVerifyTotp`, `useSendTwoFactorOtp`, `useVerifyTwoFactorOtp`, `useVerifyBackupCode`, `useGenerateBackupCodes`, `useGetTotpUri`)
+
+The copied sign-in forms detect `twoFactorRedirect` for you and route to the challenge with `redirectTo` preserved.
+
+<Callout type="warn">
+Better Auth doesn't apply two-factor to passwordless sign-in. Magic link, email OTP, passkeys, and OAuth all bypass the challenge — the second factor only guards password (and username) sign-in.
+</Callout>
+
+## Setup
+
+<Steps>
+<Step>
+### Install the Better Auth plugin
+
+Add the [2FA](https://www.better-auth.com/docs/plugins/2fa) plugin to your server config. Wire `otpOptions.sendOTP` if you want to offer emailed codes as a second factor:
+
+```ts title="lib/auth.ts"
+import { betterAuth } from "better-auth"
+import { twoFactor } from "better-auth/plugins" // [!code highlight]
+
+export const auth = betterAuth({
+  // ...
+  plugins: [
+    twoFactor({ // [!code highlight]
+      issuer: "My App", // [!code highlight]
+      otpOptions: { // [!code highlight]
+        sendOTP: async ({ user, otp }) => { // [!code highlight]
+          // Email `otp` to `user.email`. // [!code highlight]
+        } // [!code highlight]
+      } // [!code highlight]
+    }) // [!code highlight]
+  ]
+})
+```
+
+</Step>
+<Step>
+### Migrate your database
+
+The plugin adds a `twoFactor` table and a `twoFactorEnabled` field on `user`:
+
+```bash
+npx @better-auth/cli generate
+npx @better-auth/cli migrate
+```
+
+</Step>
+<Step>
+### Install the matching client plugin
+
+```ts title="lib/auth-client.ts"
+import { createAuthClient } from "better-auth/react"
+import { twoFactorClient } from "better-auth/client/plugins" // [!code highlight]
+
+export const authClient = createAuthClient({
+  plugins: [twoFactorClient()] // [!code highlight]
+})
+```
+
+Leave `twoFactorPage` and `onTwoFactorRedirect` unset — the copied components handle the redirect themselves and keep `redirectTo` intact, while `twoFactorPage` forces a full page reload.
+
+</Step>
+<Step>
+### Install the UI plugin
+
+```npm
+npx shadcn@latest add https://better-auth-ui.com/r/two-factor.json
+```
+
+This drops the following into your codebase:
+
+- `src/lib/auth/two-factor-plugin.ts` — the `twoFactorPlugin()` factory
+- `src/lib/auth/use-sign-in-continuation.ts` — shared post-sign-in handler
+- `src/lib/auth/use-two-factor-password.ts` — decides whether to ask for a password
+- `src/components/auth/otp-field.tsx` — the shared code input
+- `src/components/auth/two-factor/two-factor-challenge.tsx` — the challenge view
+- `src/components/auth/two-factor/two-factor-settings.tsx` — the settings card
+- `src/components/auth/two-factor/*-dialog.tsx` — enable, disable, and regenerate dialogs
+- `src/components/auth/two-factor/backup-codes.tsx` — the one-time code display
+
+</Step>
+<Step>
+### Register the plugin
+
+```tsx title="components/providers.tsx"
+import { twoFactorPlugin } from "@/lib/auth/two-factor-plugin" // [!code highlight]
+import { AuthProvider } from "@/components/auth/auth-provider"
+
+<AuthProvider
+  authClient={authClient}
+  navigate={navigate}
+  plugins={[twoFactorPlugin()]} // [!code highlight]
+>
+  {children}
+</AuthProvider>
+```
+
+</Step>
+<Step>
+### Allow the new view path
+
+```tsx title="routes/auth/$path.tsx"
+import { viewPaths } from "@better-auth-ui/core"
+import { createFileRoute, notFound } from "@tanstack/react-router"
+
+import { Auth } from "@/components/auth/auth"
+import { twoFactorPlugin } from "@/lib/auth/two-factor-plugin" // [!code highlight]
+
+export const Route = createFileRoute("/auth/$path")({
+  beforeLoad({ params: { path } }) {
+    if (
+      !Object.values({
+        ...viewPaths.auth,
+        ...twoFactorPlugin().viewPaths?.auth // [!code highlight]
+      }).includes(path)
+    ) {
+      throw notFound()
+    }
+  },
+  component: AuthPage
+})
+
+function AuthPage() {
+  const { path } = Route.useParams()
+  return <Auth path={path} />
+}
+```
+
+</Step>
+</Steps>
+
+## The sign-in flow
+
+```text
+email/password or username/password
+    ↓
+{ twoFactorRedirect: true, twoFactorMethods: ["totp", "otp"] }
+    ↓
+/auth/two-factor?redirectTo=…
+    ↓ authenticator code, emailed code, or backup code
+authenticated session
+```
+
+The method names ride along in session storage — names only, never a code or token. The two-factor cookie that authorizes the challenge stays HTTP-only, exactly as Better Auth set it.
+
+Building a custom sign-in form? Check for the redirect yourself:
+
+```tsx
+import { isTwoFactorRedirect, storeTwoFactorMethods } from "@better-auth-ui/core/plugins"
+
+const { mutate: signInEmail } = useSignInEmail(authClient, {
+  onSuccess: (data) => {
+    if (isTwoFactorRedirect(data)) {
+      storeTwoFactorMethods(data.twoFactorMethods)
+      navigate({ to: "/auth/two-factor" })
+      return
+    }
+
+    navigate({ to: redirectTo })
+  }
+})
+```
+
+## Components
+
+### `<TwoFactorChallenge />`
+
+Offers the methods the sign-in response reported, plus backup-code recovery and an optional "trust this device" checkbox. Emailed codes are sent on request rather than automatically, so a user with an authenticator app never triggers a pointless email.
+
+<auto-type-table path="../../../../../../examples/start-shadcn-example/src/components/auth/two-factor/two-factor-challenge.tsx" name="TwoFactorChallengeProps" />
+
+### `<TwoFactorSettings />`
+
+Added to `<SecuritySettings />` automatically. Enrollment asks for the password, shows the QR code and setup key, requires one verified code, then displays the backup codes once. Enrolled users can regenerate backup codes or turn two-factor off.
+
+<auto-type-table path="../../../../../../examples/start-shadcn-example/src/components/auth/two-factor/two-factor-settings.tsx" name="TwoFactorSettingsProps" />
+
+Backup codes live in component state and are never written to storage or the query cache — once the dialog closes they're gone.
+
+## Passwordless accounts
+
+Set `allowPasswordless` on both sides to let passkey-only users manage two-factor without a password:
+
+```ts
+// Server
+twoFactor({ allowPasswordless: true })
+```
+
+```tsx
+// UI
+twoFactorPlugin({ allowPasswordless: true })
+```
+
+The UI still asks for a password when the account has a credential account, matching the server's rule. It reads the linked accounts to decide, so users who do have a password aren't offered a shortcut around it.
+
+## Options
+
+<auto-type-table path="../../../../../../packages/core/src/plugins/two-factor/two-factor-plugin.ts" name="TwoFactorPluginOptions" />
+
+## Localization
+
+<auto-type-table path="../../../../../../packages/core/src/plugins/two-factor/two-factor-localization.ts" name="TwoFactorLocalization" />
+
+Read these from `useAuthPlugin(twoFactorPlugin).localization` inside custom slot components.
+
+## Email template
+
+Pair `otpOptions.sendOTP` with the [`<OtpEmail />`](/docs/shadcn/components/email/otp-email) component for a styled code email.

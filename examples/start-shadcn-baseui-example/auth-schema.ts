@@ -22,6 +22,7 @@ export const users = pgTable("users", {
     .notNull(),
   username: text("username").unique(),
   displayUsername: text("display_username"),
+  twoFactorEnabled: boolean("two_factor_enabled").default(false),
 });
 
 export const sessions = pgTable(
@@ -104,6 +105,23 @@ export const passkeys = pgTable(
   (table) => [
     index("passkeys_userId_idx").on(table.userId),
     index("passkeys_credentialID_idx").on(table.credentialID),
+  ],
+);
+
+export const twoFactors = pgTable(
+  "two_factors",
+  {
+    id: text("id").primaryKey(),
+    secret: text("secret").notNull(),
+    backupCodes: text("backup_codes").notNull(),
+    userId: text("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    verified: boolean("verified").default(true),
+  },
+  (table) => [
+    index("two_factors_secret_idx").on(table.secret),
+    index("two_factors_userId_idx").on(table.userId),
   ],
 );
 
@@ -198,6 +216,7 @@ export const usersRelations = relations(users, ({ many }) => ({
   sessions: many(sessions),
   accounts: many(accounts),
   passkeys: many(passkeys),
+  twoFactors: many(twoFactors),
   members: many(members),
   invitations: many(invitations),
 }));
@@ -219,6 +238,13 @@ export const accountsRelations = relations(accounts, ({ one }) => ({
 export const passkeysRelations = relations(passkeys, ({ one }) => ({
   users: one(users, {
     fields: [passkeys.userId],
+    references: [users.id],
+  }),
+}));
+
+export const twoFactorsRelations = relations(twoFactors, ({ one }) => ({
+  users: one(users, {
+    fields: [twoFactors.userId],
     references: [users.id],
   }),
 }));

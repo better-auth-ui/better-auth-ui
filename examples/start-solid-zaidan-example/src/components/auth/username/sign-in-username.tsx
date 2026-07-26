@@ -20,6 +20,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { useSignInContinuation } from "@/lib/auth/use-sign-in-continuation"
 import { cn } from "@/lib/utils"
 import { LastUsedBadge } from "../last-login-method/last-used-badge"
 import type { SocialLayout } from "../provider-buttons"
@@ -48,9 +49,10 @@ export function SignInUsername(props: SignInUsernameProps) {
   const [password, setPassword] = createSignal("")
   const [passwordError, setPasswordError] = createSignal<string>()
   const [isPasswordVisible, setIsPasswordVisible] = createSignal(false)
-  const onSignInSuccess = () => {
+  const continueSignIn = useSignInContinuation()
+  const onSignInSuccess = (data: unknown) => {
     queryClient.invalidateQueries({ queryKey: authQueryKeys.session })
-    auth.navigate({ to: auth.redirectTo })
+    continueSignIn(data)
   }
   const signIn = createMutation(() => ({
     ...signInEmailOptions(auth.authClient),

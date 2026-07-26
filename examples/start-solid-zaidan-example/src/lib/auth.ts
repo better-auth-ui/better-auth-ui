@@ -4,9 +4,11 @@ import type { AuthServer } from "@better-auth-ui/solid/server"
 import { betterAuth } from "better-auth"
 import { drizzleAdapter } from "better-auth/adapters/drizzle"
 import {
+  emailOTP,
   magicLink,
   multiSession,
   organization,
+  twoFactor,
   username
 } from "better-auth/plugins"
 import { db } from "./db"
@@ -39,6 +41,24 @@ const sendMagicLinkEmail = async ({
   console.info(`[auth] Magic link for ${email}: ${url}`)
 }
 
+const sendOtpEmail = async ({
+  email,
+  otp,
+  purpose
+}: {
+  email: string
+  otp: string
+  purpose: string
+}) => {
+  if (process.env.NODE_ENV === "production") {
+    throw new Error(
+      "One-time code delivery is not configured. Replace sendOtpEmail with a real transactional email provider before enabling email OTP or two-factor in production."
+    )
+  }
+
+  console.info(`[auth] ${purpose} code for ${email}: ${otp}`)
+}
+
 const authOptions = {
   baseURL: process.env.BETTER_AUTH_URL,
   database: drizzleAdapter(db, {
@@ -66,6 +86,28 @@ const authOptions = {
     ]),
     magicLink({
       sendMagicLink: sendMagicLinkEmail
+    }),
+    twoFactor({
+      issuer: "Better Auth UI",
+      otpOptions: {
+        sendOTP: async ({ user, otp }) => {
+          await sendOtpEmail({
+            email: user.email,
+            otp,
+            purpose: "Two-factor"
+          })
+        }
+      }
+    }),
+    emailOTP({
+      // Sign-up stays on the password and magic-link paths, matching
+      // `emailOtpPlugin({ disableSignUp: true })` on the client.
+      disableSignUp: true,
+      overrideDefaultEmailVerification: true,
+      changeEmail: { enabled: true },
+      sendVerificationOTP: async ({ email, otp, type }) => {
+        await sendOtpEmail({ email, otp, purpose: type })
+      }
     })
   ],
   secret: process.env.BETTER_AUTH_SECRET as string,

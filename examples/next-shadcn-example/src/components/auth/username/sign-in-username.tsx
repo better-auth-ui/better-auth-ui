@@ -35,6 +35,7 @@ import {
   InputGroupInput
 } from "@/components/ui/input-group"
 import { Spinner } from "@/components/ui/spinner"
+import { useSignInContinuation } from "@/lib/auth/use-sign-in-continuation"
 import { usernamePlugin } from "@/lib/auth/username-plugin"
 import { cn } from "@/lib/utils"
 import { LastUsedBadge } from "../last-login-method/last-used-badge"
@@ -65,7 +66,6 @@ export function SignInUsername({
     emailAndPassword,
     localization,
     plugins,
-    redirectTo,
     socialProviders,
     viewPaths,
     navigate,
@@ -73,6 +73,7 @@ export function SignInUsername({
   } = useAuth()
 
   const { fetchOptions, resetFetchOptions } = useFetchOptions()
+  const continueSignIn = useSignInContinuation()
 
   const { localization: usernameLocalization } = useAuthPlugin(usernamePlugin)
 
@@ -92,9 +93,9 @@ export function SignInUsername({
 
         resetFetchOptions()
       },
-      onSuccess: () => {
+      onSuccess: (data) => {
         sessionStorage.removeItem("better-auth-ui.verify-email")
-        navigate({ to: redirectTo })
+        continueSignIn(data)
       }
     })
 
@@ -113,9 +114,9 @@ export function SignInUsername({
 
         resetFetchOptions()
       },
-      onSuccess: () => {
+      onSuccess: (data) => {
         sessionStorage.removeItem("better-auth-ui.verify-email")
-        navigate({ to: redirectTo })
+        continueSignIn(data)
       }
     })
 

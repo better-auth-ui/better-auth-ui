@@ -158,6 +158,7 @@ export const solidRegistryManifest = {
         "Solid sign-in surface with email/password, username, and provider button support.",
       files: [
         componentFile("src/components/auth/sign-in.tsx"),
+        libFile("src/lib/auth/use-sign-in-continuation.ts"),
         componentFile("src/components/auth/username/sign-in-username.tsx"),
         componentFile("src/components/auth/sign-in-path.ts"),
         componentFile("src/components/auth/provider-button.tsx"),
@@ -194,6 +195,29 @@ export const solidRegistryManifest = {
         componentFile(
           "src/components/auth/last-login-method/last-used-badge.tsx"
         ),
+        ...zaidanFormSupportFiles
+      ]
+    }),
+    item({
+      name: "email-otp",
+      type: "registry:component",
+      title: "Solid Email OTP",
+      description:
+        "Solid/Zaidan passwordless sign-in with an emailed code, plus code-based email verification, password reset, and email change views.",
+      files: [
+        libFile("src/lib/auth/email-otp-plugin.ts"),
+        libFile("src/lib/auth/use-resend-cooldown.ts"),
+        libFile("src/lib/auth/use-sign-in-continuation.ts"),
+        componentFile("src/components/auth/otp-field.tsx"),
+        componentFile("src/components/auth/email-otp/email-otp.tsx"),
+        componentFile("src/components/auth/email-otp/email-otp-button.tsx"),
+        componentFile("src/components/auth/email-otp/verify-email-otp.tsx"),
+        componentFile("src/components/auth/email-otp/forgot-password-otp.tsx"),
+        componentFile("src/components/auth/email-otp/reset-password-otp.tsx"),
+        componentFile("src/components/auth/email-otp/change-email-otp.tsx"),
+        componentFile("src/components/auth/provider-buttons.tsx"),
+        componentFile("src/components/auth/provider-button.tsx"),
+        componentFile("src/components/auth/sign-in-path.ts"),
         ...zaidanFormSupportFiles
       ]
     }),
@@ -281,6 +305,7 @@ export const solidRegistryManifest = {
         "Solid username UI plugin, sign-in form, and username availability field.",
       files: [
         libFile("src/lib/auth/username-plugin.ts"),
+        libFile("src/lib/auth/use-sign-in-continuation.ts"),
         componentFile("src/components/auth/username/sign-in-username.tsx"),
         componentFile("src/components/auth/username/username-field.tsx"),
         componentFile(
@@ -306,6 +331,35 @@ export const solidRegistryManifest = {
         componentFile("src/components/auth/passkey/passkey-skeleton.tsx"),
         componentFile("src/components/auth/passkey/add-passkey-dialog.tsx"),
         componentFile("src/components/auth/passkey/delete-passkey-dialog.tsx"),
+        ...zaidanInteractiveSupportFiles
+      ]
+    }),
+    item({
+      name: "two-factor",
+      type: "registry:component",
+      title: "Solid Two-Factor",
+      description:
+        "Solid/Zaidan post-password challenge for authenticator, emailed, and backup codes, plus the settings card for enrollment and backup-code management.",
+      files: [
+        libFile("src/lib/auth/two-factor-plugin.ts"),
+        libFile("src/lib/auth/use-resend-cooldown.ts"),
+        libFile("src/lib/auth/use-sign-in-continuation.ts"),
+        libFile("src/lib/auth/use-two-factor-password.ts"),
+        componentFile("src/components/auth/otp-field.tsx"),
+        componentFile(
+          "src/components/auth/two-factor/two-factor-challenge.tsx"
+        ),
+        componentFile("src/components/auth/two-factor/two-factor-settings.tsx"),
+        componentFile(
+          "src/components/auth/two-factor/enable-two-factor-dialog.tsx"
+        ),
+        componentFile(
+          "src/components/auth/two-factor/disable-two-factor-dialog.tsx"
+        ),
+        componentFile(
+          "src/components/auth/two-factor/regenerate-backup-codes-dialog.tsx"
+        ),
+        componentFile("src/components/auth/two-factor/backup-codes.tsx"),
         ...zaidanInteractiveSupportFiles
       ]
     }),

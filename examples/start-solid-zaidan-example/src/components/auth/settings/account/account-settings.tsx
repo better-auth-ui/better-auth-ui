@@ -13,6 +13,7 @@ export type AccountSettingsProps = {
 type AccountCardPlugin = {
   id: string
   accountCards?: Component[]
+  cardOverrides?: { account?: { changeEmail?: Component } }
 }
 
 export function AccountSettings(props: AccountSettingsProps = {}) {
@@ -24,10 +25,18 @@ export function AccountSettings(props: AccountSettingsProps = {}) {
         id: `${plugin.id}-${index.toString()}`
       }))
     )
+  const changeEmailOverride = () =>
+    (auth.plugins as AccountCardPlugin[]).find(
+      (plugin) => plugin.cardOverrides?.account?.changeEmail
+    )?.cardOverrides?.account?.changeEmail
+  const ChangeEmailCard = () => changeEmailOverride() ?? ChangeEmail
+  // A plugin that replaces the card brings its own way to confirm the change,
+  // so it can stand on its own without password or magic-link auth.
   const showChangeEmail = () =>
     Boolean(
       auth.emailAndPassword?.enabled ||
-        auth.plugins.some((plugin) => plugin.id === "magicLink")
+        auth.plugins.some((plugin) => plugin.id === "magicLink") ||
+        changeEmailOverride()
     )
 
   return (
@@ -35,7 +44,7 @@ export function AccountSettings(props: AccountSettingsProps = {}) {
       <UserProfile />
 
       <Show when={showChangeEmail()}>
-        <ChangeEmail />
+        <Dynamic component={ChangeEmailCard()} />
       </Show>
 
       <For each={pluginAccountCards()}>

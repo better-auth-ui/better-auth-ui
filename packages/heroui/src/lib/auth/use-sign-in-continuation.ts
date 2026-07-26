@@ -1,11 +1,10 @@
 import {
   isTwoFactorRedirect,
-  storeTwoFactorMethods
+  storeTwoFactorMethods,
+  twoFactorPlugin
 } from "@better-auth-ui/core/plugins"
 import { useAuth } from "@better-auth-ui/react"
 import { useCallback } from "react"
-
-import { twoFactorPlugin } from "./two-factor-plugin"
 
 /**
  * Resolve what happens after a sign-in request succeeds.
@@ -19,6 +18,9 @@ import { twoFactorPlugin } from "./two-factor-plugin"
  * The enabled methods are stashed in session storage (names only, never a
  * code or token) and `redirectTo` rides along in the query string so the
  * challenge view can finish the original navigation.
+ *
+ * The two-factor plugin is looked up by id from `@better-auth-ui/core`, so
+ * sign-in forms stay installable without the two-factor components.
  *
  * @returns A callback taking the resolved data of a sign-in mutation.
  */

@@ -4,11 +4,13 @@ import { useNavigate, useParams } from "@tanstack/solid-router"
 import type { JSX } from "solid-js"
 import { onCleanup, onMount, Show } from "solid-js"
 import { apiKeyPlugin } from "@/lib/auth/api-key-plugin"
+import { emailOtpPlugin } from "@/lib/auth/email-otp-plugin"
 import { magicLinkPlugin } from "@/lib/auth/magic-link-plugin"
 import { multiSessionPlugin } from "@/lib/auth/multi-session-plugin"
 import { organizationPlugin } from "@/lib/auth/organization-plugin"
 import { passkeyPlugin } from "@/lib/auth/passkey-plugin"
 import { themePlugin } from "@/lib/auth/theme-plugin"
+import { twoFactorPlugin } from "@/lib/auth/two-factor-plugin"
 import { usernamePlugin } from "@/lib/auth/username-plugin"
 import { authClient } from "@/lib/auth-client"
 import { syncDocumentThemePreference } from "@/lib/theme"
@@ -57,6 +59,12 @@ export function Providers(props: ProvidersProps) {
             localization: { usernamePlaceholder: "username" }
           }),
           magicLinkPlugin(),
+          emailOtpPlugin({
+            emailVerification: true,
+            passwordReset: true,
+            changeEmail: true
+          }),
+          twoFactorPlugin(),
           passkeyPlugin(),
           themePlugin(),
           deleteUserPlugin(),
