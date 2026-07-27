@@ -1,5 +1,9 @@
 import { createAuthPlugin } from "../../lib/create-auth-plugin"
 import {
+  type ApiKeyExpirationOptions,
+  resolveApiKeyExpirationOptions
+} from "./api-key-expiration"
+import {
   type ApiKeyLocalization,
   apiKeyLocalization
 } from "./api-key-localization"
@@ -30,12 +34,30 @@ export type ApiKeyPluginOptions = {
    * @default false
    */
   organization?: boolean
+  /**
+   * Configure the expiration choices shown when a user creates an API key.
+   *
+   * Set this to `false` to hide the expiration field and preserve the Better
+   * Auth server default. Intervals are configured in days and sent to Better
+   * Auth as seconds.
+   *
+   * @default { intervals: [30, 90], defaultInterval: 30, allowNever: true }
+   */
+  keyExpiration?: ApiKeyExpirationOptions | false
 }
 
 export const apiKeyPlugin = createAuthPlugin(
   "apiKey",
-  (options: ApiKeyPluginOptions = {}) => ({
-    localization: { ...apiKeyLocalization, ...options.localization },
-    organization: options.organization ?? false
-  })
+  (options: ApiKeyPluginOptions = {}) => {
+    const keyExpiration =
+      options.keyExpiration === false
+        ? false
+        : resolveApiKeyExpirationOptions(options.keyExpiration)
+
+    return {
+      localization: { ...apiKeyLocalization, ...options.localization },
+      organization: options.organization ?? false,
+      keyExpiration
+    }
+  }
 )

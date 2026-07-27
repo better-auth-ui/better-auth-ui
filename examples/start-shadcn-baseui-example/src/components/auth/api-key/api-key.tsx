@@ -44,10 +44,21 @@ export function ApiKey({ apiKey, hideDelete, organizationId }: ApiKeyProps) {
         <ItemTitle>{apiKey.name || apiKeyLocalization.apiKey}</ItemTitle>
         <ItemDescription className="font-mono">{preview}</ItemDescription>
         <ItemDescription>
+          {apiKeyLocalization.created}{" "}
           {new Date(apiKey.createdAt).toLocaleString(undefined, {
             dateStyle: "medium",
             timeStyle: "short"
           })}
+        </ItemDescription>
+        <ItemDescription>
+          {apiKey.expiresAt
+            ? `${apiKeyLocalization.expires} ${new Date(
+                apiKey.expiresAt
+              ).toLocaleString(undefined, {
+                dateStyle: "medium",
+                timeStyle: "short"
+              })}`
+            : apiKeyLocalization.neverExpires}
         </ItemDescription>
       </ItemContent>
       <ItemActions>

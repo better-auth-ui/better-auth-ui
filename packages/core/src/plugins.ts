@@ -1,6 +1,7 @@
 export * from "./plugins/admin/admin-localization"
 export * from "./plugins/admin/admin-mutation-keys"
 export * from "./plugins/admin/admin-plugin"
+export * from "./plugins/api-key/api-key-expiration"
 export * from "./plugins/api-key/api-key-localization"
 export * from "./plugins/api-key/api-key-mutation-keys"
 export * from "./plugins/api-key/api-key-plugin"

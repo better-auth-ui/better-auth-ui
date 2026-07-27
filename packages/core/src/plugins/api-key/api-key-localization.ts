@@ -12,6 +12,20 @@ export const apiKeyLocalization = {
   noApiKeys: "No API keys",
   /** @remarks `"Name"` */
   name: "Name",
+  /** @remarks `"Expiration"` */
+  expiration: "Expiration",
+  /** @remarks `"day"` */
+  day: "day",
+  /** @remarks `"days"` */
+  days: "days",
+  /** @remarks `"Never"` */
+  never: "Never",
+  /** @remarks `"Created"` */
+  created: "Created",
+  /** @remarks `"Expires"` */
+  expires: "Expires",
+  /** @remarks `"Never expires"` */
+  neverExpires: "Never expires",
   /** @remarks `"New API key"` */
   newApiKey: "New API key",
   /** @remarks `"Copy this key now. For security reasons you will not be able to see it again."` */

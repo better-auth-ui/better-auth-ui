@@ -1,5 +1,6 @@
 "use client"
 
+import { apiKeyExpirationDaysToSeconds } from "@better-auth-ui/core/plugins"
 import {
   type ApiKeyAuthClient,
   useAuth,
@@ -18,8 +19,21 @@ import {
   DialogHeader,
   DialogTitle
 } from "@/components/ui/dialog"
-import { Field, FieldError, FieldLabel } from "@/components/ui/field"
+import {
+  Field,
+  FieldError,
+  FieldGroup,
+  FieldLabel
+} from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
+} from "@/components/ui/select"
 import { Spinner } from "@/components/ui/spinner"
 import { apiKeyPlugin } from "@/lib/auth/api-key-plugin"
 import { NewApiKeyDialog } from "./new-api-key-dialog"
@@ -37,7 +51,8 @@ export function CreateApiKeyDialog({
   organizationId
 }: CreateApiKeyDialogProps) {
   const { authClient, localization } = useAuth()
-  const { localization: apiKeyLocalization } = useAuthPlugin(apiKeyPlugin)
+  const { keyExpiration, localization: apiKeyLocalization } =
+    useAuthPlugin(apiKeyPlugin)
 
   const { mutate: createApiKey, isPending: isCreating } = useCreateApiKey(
     authClient as ApiKeyAuthClient
@@ -70,18 +85,22 @@ export function CreateApiKeyDialog({
 
     const formData = new FormData(e.target as HTMLFormElement)
     const name = (formData.get("name") as string).trim()
-
-    const payload =
-      name || organizationId
-        ? {
-            ...(name ? { name } : {}),
-            ...(organizationId
-              ? { organizationId, configId: "organization" }
-              : {})
-          }
+    const expiration = formData.get("expiration")
+    const expirationDays =
+      typeof expiration === "string" && expiration !== "never"
+        ? Number(expiration)
         : undefined
+    const expiresIn = expirationDays
+      ? apiKeyExpirationDaysToSeconds(expirationDays)
+      : undefined
 
-    createApiKey(payload, {
+    const payload = {
+      ...(name ? { name } : {}),
+      ...(expiresIn ? { expiresIn } : {}),
+      ...(organizationId ? { organizationId, configId: "organization" } : {})
+    }
+
+    createApiKey(Object.keys(payload).length > 0 ? payload : undefined, {
       onSuccess: (result) => {
         handleOpenChange(false)
         setKeyName(name)
@@ -107,21 +126,64 @@ export function CreateApiKeyDialog({
               </DialogDescription>
             </DialogHeader>
 
-            <Field>
-              <FieldLabel htmlFor="api-key-name">
-                {apiKeyLocalization.name}
-              </FieldLabel>
+            <FieldGroup>
+              <Field>
+                <FieldLabel htmlFor="api-key-name">
+                  {apiKeyLocalization.name}
+                </FieldLabel>
 
-              <Input
-                id="api-key-name"
-                name="name"
-                autoFocus
-                placeholder={localization.settings.optional}
-                disabled={isCreating}
-              />
+                <Input
+                  id="api-key-name"
+                  name="name"
+                  autoFocus
+                  placeholder={localization.settings.optional}
+                  disabled={isCreating}
+                />
 
-              <FieldError />
-            </Field>
+                <FieldError />
+              </Field>
+
+              {keyExpiration ? (
+                <Field>
+                  <FieldLabel htmlFor="api-key-expiration">
+                    {apiKeyLocalization.expiration}
+                  </FieldLabel>
+
+                  <Select
+                    name="expiration"
+                    defaultValue={
+                      keyExpiration.defaultInterval === null
+                        ? "never"
+                        : String(keyExpiration.defaultInterval)
+                    }
+                    disabled={isCreating}
+                  >
+                    <SelectTrigger id="api-key-expiration" className="w-full">
+                      <SelectValue />
+                    </SelectTrigger>
+
+                    <SelectContent>
+                      <SelectGroup>
+                        {keyExpiration.intervals.map((days) => (
+                          <SelectItem key={days} value={String(days)}>
+                            {days.toLocaleString()}{" "}
+                            {days === 1
+                              ? apiKeyLocalization.day
+                              : apiKeyLocalization.days}
+                          </SelectItem>
+                        ))}
+
+                        {keyExpiration.allowNever ? (
+                          <SelectItem value="never">
+                            {apiKeyLocalization.never}
+                          </SelectItem>
+                        ) : null}
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
+                </Field>
+              ) : null}
+            </FieldGroup>
 
             <DialogFooter>
               <DialogClose

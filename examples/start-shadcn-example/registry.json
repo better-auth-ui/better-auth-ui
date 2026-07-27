@@ -741,6 +741,7 @@
         "input-group",
         "item",
         "label",
+        "select",
         "separator",
         "skeleton",
         "sonner",

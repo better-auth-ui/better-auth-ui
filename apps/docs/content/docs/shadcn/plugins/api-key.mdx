@@ -5,7 +5,7 @@ description: Add programmatic API key management with create, copy, and revoke f
 
 import { Step, Steps } from 'fumadocs-ui/components/steps'
 
-The API key plugin adds programmatic API key management to your authentication UI. Users can create, copy, and revoke API keys from a security card in account settings.
+The API key plugin adds programmatic API key management to your authentication UI. Users can create, copy, and revoke API keys from a security card in account settings. New keys can use a configurable expiration interval, and each listed key shows when it expires.
 
 It contributes:
 
@@ -94,6 +94,42 @@ import { authClient } from "@/lib/auth-client"
 
 </Step>
 </Steps>
+
+## Configure expiration
+
+The create dialog offers 30 days, 90 days, and Never by default. It initially selects 30 days. Configure the choices through `apiKeyPlugin()`:
+
+```tsx title="components/providers.tsx"
+apiKeyPlugin({
+  keyExpiration: {
+    intervals: [7, 30, 90],
+    defaultInterval: 30,
+    allowNever: true
+  }
+})
+```
+
+`intervals` and `defaultInterval` use days. Better Auth receives the selected lifetime as seconds.
+
+Keep the UI choices within the limits in your Better Auth server configuration:
+
+```ts title="lib/auth.ts"
+apiKey({
+  keyExpiration: {
+    minExpiresIn: 7,
+    maxExpiresIn: 90,
+    defaultExpiresIn: null
+  }
+})
+```
+
+When `allowNever` is enabled, selecting Never sends no custom interval. Better Auth will still apply `defaultExpiresIn` if the server defines one, so set `allowNever: false` in the UI when your server always requires expiration.
+
+To remove the expiration field and rely entirely on the server default:
+
+```tsx title="components/providers.tsx"
+apiKeyPlugin({ keyExpiration: false })
+```
 
 ## Components
 

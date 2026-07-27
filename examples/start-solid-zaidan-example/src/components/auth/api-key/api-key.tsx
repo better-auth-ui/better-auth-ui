@@ -1,5 +1,4 @@
-import { apiKeyLocalization } from "@better-auth-ui/core/plugins"
-import { useAuth } from "@better-auth-ui/solid"
+import { useAuth, useAuthPlugin } from "@better-auth-ui/solid"
 import { Key, X } from "lucide-solid"
 import { createSignal, Show } from "solid-js"
 import { DeleteApiKeyDialog } from "@/components/auth/api-key/delete-api-key-dialog"
@@ -14,6 +13,7 @@ import {
   ItemMedia,
   ItemTitle
 } from "@/components/ui/item"
+import { apiKeyPlugin } from "@/lib/auth/api-key-plugin"
 
 export function ApiKey(props: {
   apiKey: ListedApiKey
@@ -21,6 +21,7 @@ export function ApiKey(props: {
   hideDelete?: boolean
 }) {
   const auth = useAuth()
+  const { localization: apiKeyLocalization } = useAuthPlugin(apiKeyPlugin)
   const [deleteOpen, setDeleteOpen] = createSignal(false)
   const preview = () => `${props.apiKey.start}${"*".repeat(16)}`
 
@@ -33,10 +34,21 @@ export function ApiKey(props: {
         <ItemTitle>{props.apiKey.name || apiKeyLocalization.apiKey}</ItemTitle>
         <ItemDescription class="font-mono">{preview()}</ItemDescription>
         <ItemDescription>
+          {apiKeyLocalization.created}{" "}
           {new Date(props.apiKey.createdAt).toLocaleString(undefined, {
             dateStyle: "medium",
             timeStyle: "short"
           })}
+        </ItemDescription>
+        <ItemDescription>
+          {props.apiKey.expiresAt
+            ? `${apiKeyLocalization.expires} ${new Date(
+                props.apiKey.expiresAt
+              ).toLocaleString(undefined, {
+                dateStyle: "medium",
+                timeStyle: "short"
+              })}`
+            : apiKeyLocalization.neverExpires}
         </ItemDescription>
       </ItemContent>
       <ItemActions>

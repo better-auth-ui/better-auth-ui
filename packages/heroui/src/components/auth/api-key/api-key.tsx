@@ -39,10 +39,22 @@ export function ApiKey({ apiKey, hideDelete, organizationId }: ApiKeyProps) {
         <span className="text-xs text-muted font-mono truncate">{preview}</span>
 
         <span className="text-xs text-muted">
+          {apiKeyLocalization.created}{" "}
           {new Date(apiKey.createdAt).toLocaleString(undefined, {
             dateStyle: "medium",
             timeStyle: "short"
           })}
+        </span>
+
+        <span className="text-xs text-muted">
+          {apiKey.expiresAt
+            ? `${apiKeyLocalization.expires} ${new Date(
+                apiKey.expiresAt
+              ).toLocaleString(undefined, {
+                dateStyle: "medium",
+                timeStyle: "short"
+              })}`
+            : apiKeyLocalization.neverExpires}
         </span>
       </div>
 
