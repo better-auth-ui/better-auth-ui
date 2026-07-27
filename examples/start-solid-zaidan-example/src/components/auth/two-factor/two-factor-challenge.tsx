@@ -21,8 +21,14 @@ import {
   CardHeader,
   CardTitle
 } from "@/components/ui/card"
+import { Checkbox } from "@/components/ui/checkbox"
+import {
+  Field,
+  FieldContent,
+  FieldGroup,
+  FieldLabel
+} from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
 import { Spinner } from "@/components/ui/spinner"
 import {
   clearTwoFactorMethods,
@@ -189,7 +195,7 @@ export function TwoFactorChallenge(props: TwoFactorChallengeProps) {
 
       <CardContent>
         <form aria-label={twoFactorLocalization.twoFactor} onSubmit={submit}>
-          <div class="grid gap-3">
+          <FieldGroup>
             <Show
               when={method() === "backup"}
               fallback={
@@ -210,39 +216,36 @@ export function TwoFactorChallenge(props: TwoFactorChallengeProps) {
                 />
               }
             >
-              <Label for="two-factor-backup-code">
-                {twoFactorLocalization.backupCode}
-              </Label>
-
-              <Input
-                autocomplete="one-time-code"
-                autofocus
-                disabled={isPending()}
-                id="two-factor-backup-code"
-                name="backupCode"
-                required
-              />
+              <Field>
+                <FieldLabel for="two-factor-backup-code">
+                  {twoFactorLocalization.backupCode}
+                </FieldLabel>
+                <Input
+                  autocomplete="one-time-code"
+                  autofocus
+                  disabled={isPending()}
+                  id="two-factor-backup-code"
+                  name="backupCode"
+                  required
+                />
+              </Field>
             </Show>
 
             <Show when={trustDeviceEnabled}>
-              <label
-                class="flex items-center gap-2 text-sm"
-                for="two-factor-trust-device"
-              >
-                <input
+              <Field orientation="horizontal">
+                <Checkbox
                   checked={trustDevice()}
-                  class="size-4 rounded border-input"
                   disabled={isPending()}
                   id="two-factor-trust-device"
                   name="trustDevice"
-                  onChange={(event) =>
-                    setTrustDevice(event.currentTarget.checked)
-                  }
-                  type="checkbox"
+                  onChange={(event) => setTrustDevice(event)}
                 />
-
-                {twoFactorLocalization.trustDevice}
-              </label>
+                <FieldContent>
+                  <FieldLabel for="two-factor-trust-device">
+                    {twoFactorLocalization.trustDevice}
+                  </FieldLabel>
+                </FieldContent>
+              </Field>
             </Show>
 
             <div class="flex flex-col gap-3">
@@ -317,7 +320,7 @@ export function TwoFactorChallenge(props: TwoFactorChallengeProps) {
                 )}
               </For>
             </div>
-          </div>
+          </FieldGroup>
         </form>
       </CardContent>
 

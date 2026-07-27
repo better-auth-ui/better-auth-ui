@@ -11,18 +11,16 @@ import {
 import { ShieldCheck } from "lucide-react"
 import { type SyntheticEvent, useMemo, useState } from "react"
 import { toast } from "sonner"
-
+import { Button, buttonVariants } from "@/components/ui/button"
 import {
-  AlertDialog,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogMedia,
-  AlertDialogTitle
-} from "@/components/ui/alert-dialog"
-import { Button } from "@/components/ui/button"
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle
+} from "@/components/ui/dialog"
 import { Field, FieldError, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import { Spinner } from "@/components/ui/spinner"
@@ -155,26 +153,23 @@ export function EnableTwoFactorDialog({
         : twoFactorLocalization.enableTwoFactor
 
   return (
-    <AlertDialog open={open} onOpenChange={handleOpenChange}>
-      <AlertDialogContent>
+    <Dialog open={open} onOpenChange={handleOpenChange}>
+      <DialogContent>
         <form onSubmit={handleSubmit} className="flex flex-col gap-6">
-          <AlertDialogHeader>
-            <AlertDialogMedia>
+          <DialogHeader>
+            <DialogTitle>
               <ShieldCheck />
-            </AlertDialogMedia>
-
-            <AlertDialogTitle>
               {twoFactorLocalization.twoFactor}
-            </AlertDialogTitle>
+            </DialogTitle>
 
-            <AlertDialogDescription>
+            <DialogDescription>
               {step === "password" && requiresPassword
                 ? twoFactorLocalization.passwordConfirmation
                 : step === "verify"
                   ? twoFactorLocalization.scanQrCode
                   : twoFactorLocalization.twoFactorDescription}
-            </AlertDialogDescription>
-          </AlertDialogHeader>
+            </DialogDescription>
+          </DialogHeader>
 
           {step === "password" && requiresPassword && (
             <Field>
@@ -245,11 +240,15 @@ export function EnableTwoFactorDialog({
 
           {step === "backupCodes" && <BackupCodes codes={backupCodes} />}
 
-          <AlertDialogFooter>
+          <DialogFooter>
             {step !== "backupCodes" && (
-              <AlertDialogCancel disabled={isPending}>
+              <DialogClose
+                className={buttonVariants({ variant: "outline" })}
+                disabled={isPending}
+                type="button"
+              >
                 {localization.settings.cancel}
-              </AlertDialogCancel>
+              </DialogClose>
             )}
 
             <Button
@@ -262,9 +261,9 @@ export function EnableTwoFactorDialog({
 
               {submitLabel}
             </Button>
-          </AlertDialogFooter>
+          </DialogFooter>
         </form>
-      </AlertDialogContent>
-    </AlertDialog>
+      </DialogContent>
+    </Dialog>
   )
 }

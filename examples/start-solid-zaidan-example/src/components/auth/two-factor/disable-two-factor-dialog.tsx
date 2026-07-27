@@ -9,17 +9,18 @@ import { ShieldAlert } from "lucide-solid"
 import { Show } from "solid-js"
 import { toast } from "solid-sonner"
 
-import { Button } from "@/components/ui/button"
 import {
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle
-} from "@/components/ui/dialog"
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogMedia,
+  AlertDialogTitle
+} from "@/components/ui/alert-dialog"
+import { Button } from "@/components/ui/button"
+import { Field, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
 import { Spinner } from "@/components/ui/spinner"
 import { twoFactorPlugin } from "@/lib/auth/two-factor-plugin"
 import { useTwoFactorPasswordRequirement } from "@/lib/auth/use-two-factor-password"
@@ -58,27 +59,29 @@ export function DisableTwoFactorDialog(props: {
   }
 
   return (
-    <DialogContent>
+    <AlertDialogContent>
       <form class="flex flex-col gap-6" onSubmit={submit}>
-        <DialogHeader>
-          <div class="flex size-10 items-center justify-center rounded-md bg-destructive/10 text-destructive">
-            <ShieldAlert class="size-4.5" />
-          </div>
+        <AlertDialogHeader>
+          <AlertDialogMedia>
+            <ShieldAlert />
+          </AlertDialogMedia>
 
-          <DialogTitle>{twoFactorLocalization.disableTwoFactor}</DialogTitle>
+          <AlertDialogTitle>
+            {twoFactorLocalization.disableTwoFactor}
+          </AlertDialogTitle>
 
-          <DialogDescription>
+          <AlertDialogDescription>
             {requiresPassword()
               ? twoFactorLocalization.passwordConfirmation
               : twoFactorLocalization.twoFactorDescription}
-          </DialogDescription>
-        </DialogHeader>
+          </AlertDialogDescription>
+        </AlertDialogHeader>
 
         <Show when={requiresPassword()}>
-          <div class="grid gap-2">
-            <Label for="disable-two-factor-password">
+          <Field>
+            <FieldLabel for="disable-two-factor-password">
               {auth.localization.auth.password}
-            </Label>
+            </FieldLabel>
 
             <Input
               autocomplete="current-password"
@@ -90,18 +93,13 @@ export function DisableTwoFactorDialog(props: {
               required
               type="password"
             />
-          </div>
+          </Field>
         </Show>
 
-        <DialogFooter>
-          <DialogClose
-            as={Button}
-            disabled={isPending()}
-            type="button"
-            variant="outline"
-          >
+        <AlertDialogFooter>
+          <AlertDialogCancel disabled={isPending()} type="button">
             {auth.localization.settings.cancel}
-          </DialogClose>
+          </AlertDialogCancel>
 
           <Button disabled={isPending()} type="submit" variant="destructive">
             <Show when={isPending()}>
@@ -110,8 +108,8 @@ export function DisableTwoFactorDialog(props: {
 
             {twoFactorLocalization.disableTwoFactor}
           </Button>
-        </DialogFooter>
+        </AlertDialogFooter>
       </form>
-    </DialogContent>
+    </AlertDialogContent>
   )
 }

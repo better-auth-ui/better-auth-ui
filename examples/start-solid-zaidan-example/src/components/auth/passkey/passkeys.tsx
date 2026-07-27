@@ -16,7 +16,7 @@ import type { ListedPasskey } from "@/components/auth/settings/shared/types"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Dialog, DialogTrigger } from "@/components/ui/dialog"
-import { ItemSeparator } from "@/components/ui/item"
+import { ItemGroup, ItemSeparator } from "@/components/ui/item"
 import { cn } from "@/lib/utils"
 
 export type PasskeysSettingsProps = {
@@ -67,16 +67,18 @@ export function PasskeysSettings(props: PasskeysSettingsProps) {
                 <PasskeysEmpty onAddPress={() => setIsAddDialogOpen(true)} />
               }
             >
-              <For each={items()}>
-                {(passkey, index) => (
-                  <>
-                    <Show when={index() > 0}>
-                      <ItemSeparator />
-                    </Show>
-                    <Passkey passkey={passkey as ListedPasskey} />
-                  </>
-                )}
-              </For>
+              <ItemGroup class="gap-0">
+                <For each={items()}>
+                  {(passkey, index) => (
+                    <>
+                      <Show when={index() > 0}>
+                        <ItemSeparator />
+                      </Show>
+                      <Passkey passkey={passkey as ListedPasskey} />
+                    </>
+                  )}
+                </For>
+              </ItemGroup>
             </Show>
           </Show>
         </CardContent>

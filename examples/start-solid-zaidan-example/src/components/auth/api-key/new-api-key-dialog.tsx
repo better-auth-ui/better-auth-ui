@@ -12,8 +12,13 @@ import {
   DialogHeader,
   DialogTitle
 } from "@/components/ui/dialog"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
+import { Field, FieldLabel } from "@/components/ui/field"
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupButton,
+  InputGroupInput
+} from "@/components/ui/input-group"
 
 export function NewApiKeyDialog(props: {
   name: string | null
@@ -46,30 +51,32 @@ export function NewApiKeyDialog(props: {
         </DialogDescription>
       </DialogHeader>
 
-      <div class="flex flex-col gap-2">
-        <Label for="new-api-key-secret">
+      <Field>
+        <FieldLabel for="new-api-key-secret">
           {props.name || apiKeyLocalization.apiKey}
-        </Label>
-        <div class="flex rounded-md border bg-background">
-          <Input
-            class="rounded-r-none border-0 font-mono text-xs"
+        </FieldLabel>
+        <InputGroup>
+          <InputGroupInput
+            class="font-mono text-xs"
             id="new-api-key-secret"
             readonly
             value={props.secretKey ?? ""}
           />
-          <Button
-            aria-label={auth.localization.settings.copyToClipboard}
-            onClick={copySecretKey}
-            size="icon-xs"
-            type="button"
-            variant="ghost"
-          >
-            <Show fallback={<Copy />} when={isCopied()}>
-              <Check />
-            </Show>
-          </Button>
-        </div>
-      </div>
+          <InputGroupAddon align="inline-end">
+            <InputGroupButton
+              aria-label={auth.localization.settings.copyToClipboard}
+              onClick={copySecretKey}
+              size="icon-xs"
+              type="button"
+              variant="ghost"
+            >
+              <Show fallback={<Copy />} when={isCopied()}>
+                <Check />
+              </Show>
+            </InputGroupButton>
+          </InputGroupAddon>
+        </InputGroup>
+      </Field>
 
       <DialogFooter>
         <DialogClose as={Button}>

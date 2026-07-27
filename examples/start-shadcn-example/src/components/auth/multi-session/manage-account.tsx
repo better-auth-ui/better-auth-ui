@@ -13,13 +13,13 @@ import { ArrowLeftRight, LogOut, MoreHorizontal } from "lucide-react"
 import { toast } from "sonner"
 import { UserView } from "@/components/auth/user/user-view"
 import { Button, buttonVariants } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu"
+import { Item, ItemActions } from "@/components/ui/item"
 import { Spinner } from "@/components/ui/spinner"
 import { multiSessionPlugin } from "@/lib/auth/multi-session-plugin"
 import { cn } from "@/lib/utils"
@@ -62,10 +62,9 @@ export function ManageAccount({
   const isBusy = isSwitching || isRevoking
 
   return (
-    <Card className="bg-transparent border-0 ring-0 shadow-none">
-      <CardContent className="flex items-center justify-between gap-3">
-        <UserView user={deviceSession?.user} isPending={isPending} />
-
+    <Item>
+      <UserView user={deviceSession?.user} isPending={isPending} />
+      <ItemActions>
         {deviceSession && isActive && (
           <Button
             className="shrink-0"
@@ -118,7 +117,7 @@ export function ManageAccount({
             </DropdownMenuContent>
           </DropdownMenu>
         )}
-      </CardContent>
-    </Card>
+      </ItemActions>
+    </Item>
   )
 }

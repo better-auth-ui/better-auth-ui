@@ -17,6 +17,14 @@ import type {
   LinkedProvider
 } from "@/components/auth/settings/shared/types"
 import { Button } from "@/components/ui/button"
+import {
+  Item,
+  ItemActions,
+  ItemContent,
+  ItemDescription,
+  ItemMedia,
+  ItemTitle
+} from "@/components/ui/item"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Spinner } from "@/components/ui/spinner"
 import { cn } from "@/lib/utils"
@@ -59,7 +67,7 @@ function ProviderIcon(props: {
   account?: LinkedAccount
   provider: LinkedProvider
 }) {
-  const iconClass = () => cn("size-4.5", !props.account && "opacity-50")
+  const iconClass = () => cn(!props.account && "opacity-50")
 
   if (props.provider === "github") return <GitHubIcon class={iconClass()} />
   if (props.provider === "google") return <GoogleIcon class={iconClass()} />
@@ -118,75 +126,75 @@ export function LinkedAccountRow(props: {
   }
 
   return (
-    <div class="flex items-center justify-between gap-3">
-      <div class="flex size-10 shrink-0 items-center justify-center rounded-md bg-muted">
+    <Item>
+      <ItemMedia variant="icon">
         <ProviderIcon account={props.account} provider={props.provider} />
-      </div>
-
-      <div class="flex min-w-0 flex-col">
-        <span class="font-medium text-sm leading-tight">{providerName()}</span>
+      </ItemMedia>
+      <ItemContent>
+        <ItemTitle>{providerName()}</ItemTitle>
         <Show
           fallback={
-            <span class="truncate text-muted-foreground text-xs">
+            <ItemDescription>
               {props.account ? displayName() : linkProviderLabel()}
-            </span>
+            </ItemDescription>
           }
           when={props.account && accountInfo.isPending}
         >
           <Skeleton class="my-0.5 h-3 w-24" />
         </Show>
-      </div>
-
-      <Show
-        fallback={
-          <Button
-            aria-label={linkProviderLabel()}
-            class="ml-auto shrink-0"
-            disabled={linkSocial.isPending}
-            onClick={linkProvider}
-            size="sm"
-            type="button"
-            variant="outline"
-          >
-            <Show fallback={<Link2 />} when={linkSocial.isPending}>
-              <Spinner />
-            </Show>
-            {auth.localization.settings.link}
-          </Button>
-        }
-        when={props.account}
-      >
-        {(account) => (
-          <Button
-            aria-label={unlinkProviderLabel()}
-            class="ml-auto shrink-0"
-            disabled={unlinkAccount.isPending}
-            onClick={() => unlinkProvider(account())}
-            size="sm"
-            type="button"
-            variant="outline"
-          >
-            <Show fallback={<Link2Off />} when={unlinkAccount.isPending}>
-              <Spinner />
-            </Show>
-            {auth.localization.settings.unlinkProvider
-              .replace("{{provider}}", "")
-              .trim()}
-          </Button>
-        )}
-      </Show>
-    </div>
+      </ItemContent>
+      <ItemActions>
+        <Show
+          fallback={
+            <Button
+              aria-label={linkProviderLabel()}
+              disabled={linkSocial.isPending}
+              onClick={linkProvider}
+              size="sm"
+              type="button"
+              variant="outline"
+            >
+              <Show fallback={<Link2 />} when={linkSocial.isPending}>
+                <Spinner />
+              </Show>
+              {auth.localization.settings.link}
+            </Button>
+          }
+          when={props.account}
+        >
+          {(account) => (
+            <Button
+              aria-label={unlinkProviderLabel()}
+              disabled={unlinkAccount.isPending}
+              onClick={() => unlinkProvider(account())}
+              size="sm"
+              type="button"
+              variant="outline"
+            >
+              <Show fallback={<Link2Off />} when={unlinkAccount.isPending}>
+                <Spinner />
+              </Show>
+              {auth.localization.settings.unlinkProvider
+                .replace("{{provider}}", "")
+                .trim()}
+            </Button>
+          )}
+        </Show>
+      </ItemActions>
+    </Item>
   )
 }
 
 export function LinkedAccountRowSkeleton() {
   return (
-    <div class="flex items-center gap-3">
-      <Skeleton class="size-10 rounded-md" />
-      <div class="flex flex-col gap-1">
+    <Item>
+      <ItemMedia>
+        <Skeleton class="size-10 rounded-md" />
+      </ItemMedia>
+      <ItemContent>
         <Skeleton class="h-4 w-20" />
         <Skeleton class="h-3 w-32" />
-      </div>
-    </div>
+      </ItemContent>
+    </Item>
   )
 }

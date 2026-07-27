@@ -16,7 +16,7 @@ import type { ListedApiKey } from "@/components/auth/settings/shared/types"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Dialog, DialogTrigger } from "@/components/ui/dialog"
-import { ItemSeparator } from "@/components/ui/item"
+import { ItemGroup, ItemSeparator } from "@/components/ui/item"
 import { cn } from "@/lib/utils"
 
 export type ApiKeysProps = {
@@ -96,20 +96,22 @@ export function ApiKeys(props: ApiKeysProps = {}) {
                 />
               }
             >
-              <For each={keys()}>
-                {(apiKey, index) => (
-                  <>
-                    <Show when={index() > 0}>
-                      <ItemSeparator />
-                    </Show>
-                    <ApiKey
-                      apiKey={apiKey as ListedApiKey}
-                      hideDelete={props.hideDelete}
-                      organizationId={props.organizationId}
-                    />
-                  </>
-                )}
-              </For>
+              <ItemGroup class="gap-0">
+                <For each={keys()}>
+                  {(apiKey, index) => (
+                    <>
+                      <Show when={index() > 0}>
+                        <ItemSeparator />
+                      </Show>
+                      <ApiKey
+                        apiKey={apiKey as ListedApiKey}
+                        hideDelete={props.hideDelete}
+                        organizationId={props.organizationId}
+                      />
+                    </>
+                  )}
+                </For>
+              </ItemGroup>
             </Show>
           </Show>
         </CardContent>

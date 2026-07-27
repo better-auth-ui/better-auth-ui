@@ -111,10 +111,12 @@ function SortableTableHead(props: {
 }) {
   return (
     <TableHead aria-sort={props.sortDirection ?? "none"}>
-      <button
-        class="flex w-full items-center gap-2 text-left font-medium"
+      <Button
+        class="h-auto w-full justify-start p-0 font-medium hover:bg-transparent"
         onClick={props.onClick}
+        size="sm"
         type="button"
+        variant="ghost"
       >
         {props.children}
         <Show when={props.sortDirection}>
@@ -125,7 +127,7 @@ function SortableTableHead(props: {
             )}
           />
         </Show>
-      </button>
+      </Button>
     </TableHead>
   )
 }
@@ -319,14 +321,16 @@ export function OrganizationMembers(props: OrganizationMembersProps) {
               <Show when={memberRoleFilter() !== "all"}>
                 <Badge class="gap-1 pr-1" variant="secondary">
                   {localization().role}: {selectedRoleLabel()}
-                  <button
+                  <Button
                     aria-label={`${localization().clear} member role filter`}
-                    class="rounded-sm p-0.5 hover:bg-muted"
+                    class="size-4 rounded-sm"
                     onClick={() => setMemberRoleFilter("all")}
+                    size="icon-xs"
                     type="button"
+                    variant="ghost"
                   >
                     <X class="size-3" />
-                  </button>
+                  </Button>
                 </Badge>
               </Show>
             </div>

@@ -3,7 +3,7 @@ import type { OrganizationAuthClient } from "@better-auth-ui/solid"
 import { useAuth, useListUserInvitations } from "@better-auth-ui/solid"
 import { For, Show } from "solid-js"
 import { Card, CardContent } from "@/components/ui/card"
-import { Separator } from "@/components/ui/separator"
+import { ItemGroup, ItemSeparator } from "@/components/ui/item"
 import { UserInvitationRow } from "./user-invitation-row"
 import { UserInvitationRowSkeleton } from "./user-invitation-row-skeleton"
 import { UserInvitationsEmpty } from "./user-invitations-empty"
@@ -37,28 +37,27 @@ export function UserInvitations(props: UserInvitationsProps = {}) {
             <Show
               when={!invitations.isPending}
               fallback={
-                <div class="p-4">
+                <ItemGroup>
                   <UserInvitationRowSkeleton />
-                </div>
+                </ItemGroup>
               }
             >
               <Show
                 when={invitationRows().length > 0}
                 fallback={<UserInvitationsEmpty />}
               >
-                <For each={invitationRows()}>
-                  {(invitation, index) => (
-                    <>
-                      <Show when={index() > 0}>
-                        <Separator />
-                      </Show>
-
-                      <div class="p-4">
+                <ItemGroup class="gap-0">
+                  <For each={invitationRows()}>
+                    {(invitation, index) => (
+                      <>
+                        <Show when={index() > 0}>
+                          <ItemSeparator />
+                        </Show>
                         <UserInvitationRow invitation={invitation} />
-                      </div>
-                    </>
-                  )}
-                </For>
+                      </>
+                    )}
+                  </For>
+                </ItemGroup>
               </Show>
             </Show>
           </CardContent>

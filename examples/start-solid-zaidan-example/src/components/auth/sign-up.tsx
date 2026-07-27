@@ -10,10 +10,11 @@ import { Link } from "@tanstack/solid-router"
 import { Eye, EyeOff } from "lucide-solid"
 import { createSignal, For, Show } from "solid-js"
 import { toast } from "solid-sonner"
+import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Field, FieldError, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
 import { cn } from "@/lib/utils"
 import { AdditionalField } from "./additional-field"
 import { ProviderButtons, type SocialLayout } from "./provider-buttons"
@@ -153,8 +154,10 @@ export function SignUp(props: SignUpProps) {
         <form aria-label="Sign up" onSubmit={submitSignUp}>
           <div class="flex flex-col gap-6">
             <Show when={auth.emailAndPassword.name}>
-              <div class="grid gap-3">
-                <Label for="sign-up-name">{auth.localization.auth.name}</Label>
+              <Field>
+                <FieldLabel for="sign-up-name">
+                  {auth.localization.auth.name}
+                </FieldLabel>
                 <Input
                   aria-invalid={Boolean(nameError())}
                   autocomplete="name"
@@ -175,16 +178,14 @@ export function SignUp(props: SignUpProps) {
                 />
 
                 <Show when={nameError()}>
-                  {(message) => (
-                    <p class="text-sm text-destructive" role="alert">
-                      {message()}
-                    </p>
-                  )}
+                  {(message) => <FieldError>{message()}</FieldError>}
                 </Show>
-              </div>
+              </Field>
             </Show>
-            <div class="grid gap-3">
-              <Label for="sign-up-email">{auth.localization.auth.email}</Label>
+            <Field>
+              <FieldLabel for="sign-up-email">
+                {auth.localization.auth.email}
+              </FieldLabel>
               <Input
                 aria-invalid={Boolean(emailError())}
                 autocomplete="email"
@@ -205,13 +206,9 @@ export function SignUp(props: SignUpProps) {
               />
 
               <Show when={emailError()}>
-                {(message) => (
-                  <p class="text-sm text-destructive" role="alert">
-                    {message()}
-                  </p>
-                )}
+                {(message) => <FieldError>{message()}</FieldError>}
               </Show>
-            </div>
+            </Field>
             <For each={signUpFieldsAbove()}>
               {(field) => (
                 <AdditionalField
@@ -222,10 +219,10 @@ export function SignUp(props: SignUpProps) {
                 />
               )}
             </For>
-            <div class="grid gap-3">
-              <Label for="sign-up-password">
+            <Field>
+              <FieldLabel for="sign-up-password">
                 {auth.localization.auth.password}
-              </Label>
+              </FieldLabel>
               <div class="relative">
                 <Input
                   aria-invalid={Boolean(passwordError())}
@@ -276,18 +273,14 @@ export function SignUp(props: SignUpProps) {
               </div>
 
               <Show when={passwordError()}>
-                {(message) => (
-                  <p class="text-sm text-destructive" role="alert">
-                    {message()}
-                  </p>
-                )}
+                {(message) => <FieldError>{message()}</FieldError>}
               </Show>
-            </div>
+            </Field>
             <Show when={auth.emailAndPassword.confirmPassword}>
-              <div class="grid gap-3">
-                <Label for="sign-up-confirm-password">
+              <Field>
+                <FieldLabel for="sign-up-confirm-password">
                   {auth.localization.auth.confirmPassword}
-                </Label>
+                </FieldLabel>
                 <div class="relative">
                   <Input
                     aria-invalid={Boolean(confirmPasswordError())}
@@ -343,13 +336,9 @@ export function SignUp(props: SignUpProps) {
                 </div>
 
                 <Show when={confirmPasswordError()}>
-                  {(message) => (
-                    <p class="text-sm text-destructive" role="alert">
-                      {message()}
-                    </p>
-                  )}
+                  {(message) => <FieldError>{message()}</FieldError>}
                 </Show>
-              </div>
+              </Field>
             </Show>
             <For each={signUpFieldsBelow()}>
               {(field) => (
@@ -370,12 +359,18 @@ export function SignUp(props: SignUpProps) {
                 : auth.localization.auth.signUp}
             </Button>
             <Show when={signUp.isSuccess}>
-              <p role="status">
-                Account created. Check your email if verification is required.
-              </p>
+              <Alert>
+                <AlertDescription role="status">
+                  Account created. Check your email if verification is required.
+                </AlertDescription>
+              </Alert>
             </Show>
             <Show when={signUp.isError}>
-              <p role="alert">Unable to create an account. Try again.</p>
+              <Alert variant="destructive">
+                <AlertDescription>
+                  Unable to create an account. Try again.
+                </AlertDescription>
+              </Alert>
             </Show>
           </div>
         </form>

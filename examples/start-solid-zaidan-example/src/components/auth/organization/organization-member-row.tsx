@@ -18,16 +18,16 @@ import { LogOut, Pencil, Trash2 } from "lucide-solid"
 import { createSignal, For, Show } from "solid-js"
 import { toast } from "solid-sonner"
 import { UserView } from "@/components/auth/user/user-view"
-import { Button } from "@/components/ui/button"
 import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle
-} from "@/components/ui/dialog"
+  AlertDialog,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle
+} from "@/components/ui/alert-dialog"
+import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -97,23 +97,18 @@ function RemoveMemberDialog(props: {
   )
 
   return (
-    <Dialog open={props.open} onOpenChange={props.onOpenChange}>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>{props.localization.removeMember}</DialogTitle>
-          <DialogDescription>
+    <AlertDialog open={props.open} onOpenChange={props.onOpenChange}>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>{props.localization.removeMember}</AlertDialogTitle>
+          <AlertDialogDescription>
             {props.localization.removeMemberWarning}
-          </DialogDescription>
-        </DialogHeader>
-        <DialogFooter>
-          <DialogClose
-            as={Button}
-            disabled={removeMember.isPending}
-            type="button"
-            variant="outline"
-          >
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel disabled={removeMember.isPending} type="button">
             {auth.localization.settings.cancel}
-          </DialogClose>
+          </AlertDialogCancel>
           <Button
             disabled={removeMember.isPending}
             onClick={() =>
@@ -127,9 +122,9 @@ function RemoveMemberDialog(props: {
           >
             {props.localization.removeMember}
           </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
   )
 }
 
@@ -170,23 +165,23 @@ function LeaveOrganizationDialog(props: {
   }
 
   return (
-    <Dialog open={props.open} onOpenChange={props.onOpenChange}>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>{props.localization.leaveOrganization}</DialogTitle>
-          <DialogDescription>
+    <AlertDialog open={props.open} onOpenChange={props.onOpenChange}>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>
+            {props.localization.leaveOrganization}
+          </AlertDialogTitle>
+          <AlertDialogDescription>
             {props.localization.leaveOrganizationDescription}
-          </DialogDescription>
-        </DialogHeader>
-        <DialogFooter>
-          <DialogClose
-            as={Button}
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel
             disabled={leaveOrganization.isPending}
             type="button"
-            variant="outline"
           >
             {auth.localization.settings.cancel}
-          </DialogClose>
+          </AlertDialogCancel>
           <Button
             disabled={leaveOrganization.isPending || !activeOrganization.data}
             onClick={handleLeave}
@@ -195,9 +190,9 @@ function LeaveOrganizationDialog(props: {
           >
             {props.localization.leaveOrganization}
           </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
   )
 }
 

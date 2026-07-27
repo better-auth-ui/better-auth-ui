@@ -3,6 +3,14 @@ import { organizationLocalization } from "@better-auth-ui/core/plugins"
 import { useAuth } from "@better-auth-ui/solid"
 import { Briefcase } from "lucide-solid"
 import { Button } from "@/components/ui/button"
+import {
+  Empty,
+  EmptyContent,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle
+} from "@/components/ui/empty"
 import { organizationPlugin } from "@/lib/auth/organization-plugin"
 
 export type OrganizationsEmptyProps = {
@@ -23,24 +31,21 @@ export function OrganizationsEmpty(props: OrganizationsEmptyProps) {
     )?.localization ?? organizationLocalization
 
   return (
-    <div class="flex flex-col items-center gap-4 p-4 text-center">
-      <div class="flex size-12 items-center justify-center rounded-full bg-muted">
-        <Briefcase class="size-5" />
-      </div>
-
-      <div class="flex flex-col gap-2">
-        <p class="font-semibold text-foreground text-sm">
-          {localization().noOrganizations}
-        </p>
-
-        <span class="text-muted-foreground text-sm">
+    <Empty>
+      <EmptyHeader>
+        <EmptyMedia variant="icon">
+          <Briefcase />
+        </EmptyMedia>
+        <EmptyTitle>{localization().noOrganizations}</EmptyTitle>
+        <EmptyDescription>
           {localization().organizationsDescription}
-        </span>
-      </div>
-
-      <Button size="sm" onClick={props.onCreatePress}>
-        {localization().createOrganization}
-      </Button>
-    </div>
+        </EmptyDescription>
+      </EmptyHeader>
+      <EmptyContent>
+        <Button size="sm" onClick={props.onCreatePress}>
+          {localization().createOrganization}
+        </Button>
+      </EmptyContent>
+    </Empty>
   )
 }

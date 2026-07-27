@@ -7,12 +7,12 @@ import { createMutation } from "@tanstack/solid-query"
 import { Check, X } from "lucide-solid"
 import { createSignal, Show } from "solid-js"
 import type { AdditionalFieldProps } from "@/components/auth/additional-field"
+import { Field, FieldError, FieldLabel } from "@/components/ui/field"
 import {
   InputGroup,
   InputGroupAddon,
   InputGroupInput
 } from "@/components/ui/input-group"
-import { Label } from "@/components/ui/label"
 import { Spinner } from "@/components/ui/spinner"
 
 export function UsernameField(props: AdditionalFieldProps) {
@@ -54,8 +54,8 @@ export function UsernameField(props: AdditionalFieldProps) {
   }
 
   return (
-    <div class="grid gap-2">
-      <Label for={props.name}>{props.field.label}</Label>
+    <Field data-invalid={Boolean(error())}>
+      <FieldLabel for={props.name}>{props.field.label}</FieldLabel>
       <InputGroup>
         <InputGroupInput
           aria-invalid={Boolean(error())}
@@ -105,7 +105,9 @@ export function UsernameField(props: AdditionalFieldProps) {
           </InputGroupAddon>
         </Show>
       </InputGroup>
-      <Show when={error()}>{(message) => <p role="alert">{message()}</p>}</Show>
-    </div>
+      <Show when={error()}>
+        {(message) => <FieldError>{message()}</FieldError>}
+      </Show>
+    </Field>
   )
 }

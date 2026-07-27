@@ -15,8 +15,8 @@ import {
   DialogHeader,
   DialogTitle
 } from "@/components/ui/dialog"
+import { Field, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
 import { Spinner } from "@/components/ui/spinner"
 
 export function AddPasskeyDialog(props: {
@@ -55,8 +55,8 @@ export function AddPasskeyDialog(props: {
           <DialogDescription>{labels().passkeysDescription}</DialogDescription>
         </DialogHeader>
 
-        <div class="grid gap-2">
-          <Label for="passkey-name">{labels().name}</Label>
+        <Field>
+          <FieldLabel for="passkey-name">{labels().name}</FieldLabel>
           <Input
             autofocus
             disabled={addPasskey.isPending}
@@ -64,7 +64,7 @@ export function AddPasskeyDialog(props: {
             name="name"
             placeholder={auth.localization.settings.optional}
           />
-        </div>
+        </Field>
 
         <DialogFooter>
           <DialogClose

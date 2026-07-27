@@ -4,6 +4,7 @@ import { createSignal, Show } from "solid-js"
 import { DisableTwoFactorDialog } from "@/components/auth/two-factor/disable-two-factor-dialog"
 import { EnableTwoFactorDialog } from "@/components/auth/two-factor/enable-two-factor-dialog"
 import { RegenerateBackupCodesDialog } from "@/components/auth/two-factor/regenerate-backup-codes-dialog"
+import { AlertDialog, AlertDialogTrigger } from "@/components/ui/alert-dialog"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Dialog, DialogTrigger } from "@/components/ui/dialog"
@@ -64,8 +65,8 @@ export function TwoFactorSettings(props: TwoFactorSettingsProps = {}) {
             </Dialog>
           }
         >
-          <Dialog open={isDisableOpen()} onOpenChange={setIsDisableOpen}>
-            <DialogTrigger
+          <AlertDialog open={isDisableOpen()} onOpenChange={setIsDisableOpen}>
+            <AlertDialogTrigger
               as={Button}
               class="shrink-0"
               disabled={session.isPending}
@@ -73,10 +74,10 @@ export function TwoFactorSettings(props: TwoFactorSettingsProps = {}) {
               variant="destructive"
             >
               {twoFactorLocalization.disableTwoFactor}
-            </DialogTrigger>
+            </AlertDialogTrigger>
 
             <DisableTwoFactorDialog onOpenChange={setIsDisableOpen} />
-          </Dialog>
+          </AlertDialog>
         </Show>
       </div>
 
@@ -98,21 +99,21 @@ export function TwoFactorSettings(props: TwoFactorSettingsProps = {}) {
           </p>
 
           <Show when={isEnabled() && backupCodesEnabled}>
-            <Dialog
+            <AlertDialog
               open={isRegenerateOpen()}
               onOpenChange={setIsRegenerateOpen}
             >
-              <DialogTrigger
+              <AlertDialogTrigger
                 as={Button}
                 class="self-start"
                 size="sm"
                 variant="outline"
               >
                 {twoFactorLocalization.regenerateBackupCodes}
-              </DialogTrigger>
+              </AlertDialogTrigger>
 
               <RegenerateBackupCodesDialog onOpenChange={setIsRegenerateOpen} />
-            </Dialog>
+            </AlertDialog>
           </Show>
         </CardContent>
       </Card>

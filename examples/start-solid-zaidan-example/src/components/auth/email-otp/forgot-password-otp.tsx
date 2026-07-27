@@ -17,8 +17,13 @@ import {
   CardHeader,
   CardTitle
 } from "@/components/ui/card"
+import {
+  Field,
+  FieldError,
+  FieldGroup,
+  FieldLabel
+} from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
 import { Spinner } from "@/components/ui/spinner"
 import { emailOtpPlugin } from "@/lib/auth/email-otp-plugin"
 import { cn } from "@/lib/utils"
@@ -83,34 +88,32 @@ export function ForgotPasswordOtp(props: ForgotPasswordOtpProps) {
           aria-label={auth.localization.auth.forgotPassword}
           onSubmit={submit}
         >
-          <div class="grid gap-3">
-            <Label for="forgot-password-email">
-              {auth.localization.auth.email}
-            </Label>
+          <FieldGroup>
+            <Field data-invalid={Boolean(emailError())}>
+              <FieldLabel for="forgot-password-email">
+                {auth.localization.auth.email}
+              </FieldLabel>
 
-            <Input
-              aria-invalid={Boolean(emailError())}
-              autocomplete="email"
-              disabled={requestReset.isPending}
-              id="forgot-password-email"
-              name="email"
-              onInput={() => setEmailError(undefined)}
-              onInvalid={(event) => {
-                event.preventDefault()
-                setEmailError(event.currentTarget.validationMessage)
-              }}
-              placeholder={auth.localization.auth.emailPlaceholder}
-              required
-              type="email"
-            />
+              <Input
+                aria-invalid={Boolean(emailError())}
+                autocomplete="email"
+                disabled={requestReset.isPending}
+                id="forgot-password-email"
+                name="email"
+                onInput={() => setEmailError(undefined)}
+                onInvalid={(event) => {
+                  event.preventDefault()
+                  setEmailError(event.currentTarget.validationMessage)
+                }}
+                placeholder={auth.localization.auth.emailPlaceholder}
+                required
+                type="email"
+              />
 
-            <Show when={emailError()}>
-              {(message) => (
-                <p class="text-sm text-destructive" role="alert">
-                  {message()}
-                </p>
-              )}
-            </Show>
+              <Show when={emailError()}>
+                {(message) => <FieldError>{message()}</FieldError>}
+              </Show>
+            </Field>
 
             <Button
               class="w-full"
@@ -123,7 +126,7 @@ export function ForgotPasswordOtp(props: ForgotPasswordOtpProps) {
 
               {emailOtpLocalization.sendCode}
             </Button>
-          </div>
+          </FieldGroup>
         </form>
       </CardContent>
 

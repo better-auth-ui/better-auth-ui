@@ -7,9 +7,10 @@ import {
   useListDeviceSessions,
   useSession
 } from "@better-auth-ui/react"
+import { Fragment } from "react"
 
 import { Card, CardContent } from "@/components/ui/card"
-import { Separator } from "@/components/ui/separator"
+import { ItemGroup, ItemSeparator } from "@/components/ui/item"
 import { multiSessionPlugin } from "@/lib/auth/multi-session-plugin"
 import { cn } from "@/lib/utils"
 import { ManageAccount } from "./manage-account"
@@ -61,16 +62,17 @@ export function ManageAccounts({ className }: ManageAccountsProps) {
 
       <Card className={cn("p-0", className)}>
         <CardContent className="p-0">
-          {allRows.map((row, index) => (
-            <div key={row.key}>
-              {index > 0 && <Separator />}
-
-              <ManageAccount
-                deviceSession={row.deviceSession}
-                isPending={row.isPending}
-              />
-            </div>
-          ))}
+          <ItemGroup className="gap-0">
+            {allRows.map((row, index) => (
+              <Fragment key={row.key}>
+                {index > 0 && <ItemSeparator />}
+                <ManageAccount
+                  deviceSession={row.deviceSession}
+                  isPending={row.isPending}
+                />
+              </Fragment>
+            ))}
+          </ItemGroup>
         </CardContent>
       </Card>
     </div>

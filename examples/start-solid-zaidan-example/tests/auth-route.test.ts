@@ -2109,21 +2109,18 @@ describe("Solid auth route component selection", () => {
     expect(securitySettings).toContain("!!auth.socialProviders?.length")
     expect(securitySettings).toContain("<LinkedAccountsSettings")
     expect(securitySettings).toContain("<ActiveSessionsSettings")
-    expect(linkedAccounts).toContain("<Separator")
-    expect(linkedAccounts).not.toContain("<ItemSeparator")
+    expect(linkedAccounts).toContain("<ItemGroup")
+    expect(linkedAccounts).toContain("<ItemSeparator")
     expect(activeSessions).toContain("<ActiveSessionRow")
-    expect(activeSessions).toContain("<Separator")
-    expect(activeSessions).not.toContain("<ItemGroup")
+    expect(activeSessions).toContain("<ItemGroup")
+    expect(activeSessions).toContain("<ItemSeparator")
     expect(activeSessions).toContain('<Card class="z-card-padding-none">')
     expect(activeSessions).toContain(
       '<CardContent class="z-card-content-padding-none">'
     )
-    expect(activeSessions).toContain('<div class="p-4">')
     expect(activeSession).not.toContain("<Card")
     expect(activeSession).not.toContain("<CardContent")
-    expect(activeSession).toContain("flex items-center justify-between gap-3")
-    expect(activeSession).not.toContain("z-card")
-    expect(activeSessions).not.toContain("<ItemSeparator")
+    expect(activeSession).toContain("<Item")
     expect(activeSession).toContain("auth.localization.settings.currentSession")
     expect(activeSession).toContain("auth.localization.auth.signOut")
     expect(securitySettings).toContain("auth.plugins.flatMap")
@@ -2357,11 +2354,11 @@ describe("Solid auth route component selection", () => {
     expect(linkedAccounts).toContain(
       '<CardContent class="z-card-content-padding-none">'
     )
-    expect(linkedAccounts).toContain('<div class="p-4">')
+    expect(linkedAccounts).toContain("<ItemGroup")
+    expect(linkedAccounts).toContain("<ItemSeparator")
     expect(linkedAccount).not.toContain("<Card")
     expect(linkedAccount).not.toContain("<CardContent")
-    expect(linkedAccount).toContain("flex items-center justify-between gap-3")
-    expect(linkedAccount).not.toContain("z-card")
+    expect(linkedAccount).toContain("<Item")
     expect(linkedAccount).toContain("<Spinner")
     expect(linkedAccount).not.toContain(
       "link and unlink mutations are not wired in this Solid slice yet."
@@ -2614,8 +2611,12 @@ describe("Solid auth route component selection", () => {
     )
   })
 
-  it("provides the local Solid Zaidan Dialog primitive for extracted auth dialogs", () => {
+  it("provides local Solid Zaidan Dialog primitives for auth dialogs", () => {
     const dialogPath = resolve(__dirname, "../src/components/ui/dialog.tsx")
+    const alertDialogPath = resolve(
+      __dirname,
+      "../src/components/ui/alert-dialog.tsx"
+    )
     const createApiKeyDialog = readFileSync(
       resolve(
         __dirname,
@@ -2632,8 +2633,10 @@ describe("Solid auth route component selection", () => {
     )
 
     expect(existsSync(dialogPath)).toBe(true)
+    expect(existsSync(alertDialogPath)).toBe(true)
 
     const dialog = readFileSync(dialogPath, "utf8")
+    const alertDialog = readFileSync(alertDialogPath, "utf8")
 
     expect(dialog).toContain('from "@kobalte/core/dialog"')
     expect(dialog).toContain("DialogPrimitive.Root")
@@ -2648,7 +2651,9 @@ describe("Solid auth route component selection", () => {
       /export \{[\s\S]*Dialog[\s\S]*DialogClose[\s\S]*DialogContent[\s\S]*DialogDescription[\s\S]*DialogFooter[\s\S]*DialogHeader[\s\S]*DialogTitle[\s\S]*DialogTrigger/
     )
     expect(createApiKeyDialog).toContain('from "@/components/ui/dialog"')
-    expect(deleteAccount).toContain('from "@/components/ui/dialog"')
+    expect(alertDialog).toContain('from "@kobalte/core/alert-dialog"')
+    expect(alertDialog).toContain("AlertDialogPrimitive.CloseButton")
+    expect(deleteAccount).toContain('from "@/components/ui/alert-dialog"')
   })
 
   it("wires API key create, new-key reveal, copy, and delete dialogs to Solid mutations", () => {
@@ -3197,7 +3202,8 @@ describe("Solid auth route component selection", () => {
     expect(userInvitationRow).toContain(
       "organizationLocalization().rejectInvitation"
     )
-    expect(userInvitationRow).not.toContain("Badge")
+    expect(userInvitationRow).toContain("<Badge")
+    expect(userInvitationRow).toContain("<Item")
     expect(userInvitationRow).not.toContain("Spinner")
     expect(userInvitations).not.toContain("<Table")
     expect(userInvitations).not.toContain("InputGroup")

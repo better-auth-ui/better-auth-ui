@@ -10,17 +10,18 @@ import { createSignal, Show } from "solid-js"
 import { toast } from "solid-sonner"
 
 import { BackupCodes } from "@/components/auth/two-factor/backup-codes"
-import { Button } from "@/components/ui/button"
 import {
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle
-} from "@/components/ui/dialog"
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogMedia,
+  AlertDialogTitle
+} from "@/components/ui/alert-dialog"
+import { Button } from "@/components/ui/button"
+import { Field, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
 import { Spinner } from "@/components/ui/spinner"
 import { twoFactorPlugin } from "@/lib/auth/two-factor-plugin"
 import { useTwoFactorPasswordRequirement } from "@/lib/auth/use-two-factor-password"
@@ -71,30 +72,32 @@ export function RegenerateBackupCodesDialog(props: {
   }
 
   return (
-    <DialogContent>
+    <AlertDialogContent>
       <form class="flex flex-col gap-6" onSubmit={submit}>
-        <DialogHeader>
-          <div class="flex size-10 items-center justify-center rounded-md bg-muted">
-            <KeyRound class="size-4.5" />
-          </div>
+        <AlertDialogHeader>
+          <AlertDialogMedia>
+            <KeyRound />
+          </AlertDialogMedia>
 
-          <DialogTitle>{twoFactorLocalization.backupCodes}</DialogTitle>
+          <AlertDialogTitle>
+            {twoFactorLocalization.backupCodes}
+          </AlertDialogTitle>
 
-          <DialogDescription>
+          <AlertDialogDescription>
             {codes().length || !requiresPassword()
               ? twoFactorLocalization.backupCodesDescription
               : twoFactorLocalization.passwordConfirmation}
-          </DialogDescription>
-        </DialogHeader>
+          </AlertDialogDescription>
+        </AlertDialogHeader>
 
         <Show
           when={codes().length}
           fallback={
             <Show when={requiresPassword()}>
-              <div class="grid gap-2">
-                <Label for="regenerate-backup-codes-password">
+              <Field>
+                <FieldLabel for="regenerate-backup-codes-password">
                   {auth.localization.auth.password}
-                </Label>
+                </FieldLabel>
 
                 <Input
                   autocomplete="current-password"
@@ -106,23 +109,18 @@ export function RegenerateBackupCodesDialog(props: {
                   required
                   type="password"
                 />
-              </div>
+              </Field>
             </Show>
           }
         >
           <BackupCodes codes={codes()} />
         </Show>
 
-        <DialogFooter>
+        <AlertDialogFooter>
           <Show when={!codes().length}>
-            <DialogClose
-              as={Button}
-              disabled={isPending()}
-              type="button"
-              variant="outline"
-            >
+            <AlertDialogCancel disabled={isPending()} type="button">
               {auth.localization.settings.cancel}
-            </DialogClose>
+            </AlertDialogCancel>
           </Show>
 
           <Button disabled={isPending()} type="submit">
@@ -134,8 +132,8 @@ export function RegenerateBackupCodesDialog(props: {
               ? twoFactorLocalization.done
               : twoFactorLocalization.regenerateBackupCodes}
           </Button>
-        </DialogFooter>
+        </AlertDialogFooter>
       </form>
-    </DialogContent>
+    </AlertDialogContent>
   )
 }

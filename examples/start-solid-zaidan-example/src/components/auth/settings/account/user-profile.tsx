@@ -10,8 +10,8 @@ import { AdditionalField } from "@/components/auth/additional-field"
 import { ChangeAvatar } from "@/components/auth/settings/account/change-avatar"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter } from "@/components/ui/card"
+import { Field, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
 import { cn } from "@/lib/utils"
 
 export type UserProfileProps = {
@@ -77,8 +77,10 @@ export function UserProfile(props: UserProfileProps = {}) {
           <CardContent class="flex flex-col gap-6">
             <ChangeAvatar />
 
-            <div class="grid gap-2">
-              <Label for="settings-name">{auth.localization.auth.name}</Label>
+            <Field>
+              <FieldLabel for="settings-name">
+                {auth.localization.auth.name}
+              </FieldLabel>
               <Input
                 autocomplete="name"
                 disabled={isProfilePending()}
@@ -89,7 +91,7 @@ export function UserProfile(props: UserProfileProps = {}) {
                 required
                 value={name() || (session.data?.user.name ?? "")}
               />
-            </div>
+            </Field>
 
             <For each={profileFields()}>
               {(field) => {

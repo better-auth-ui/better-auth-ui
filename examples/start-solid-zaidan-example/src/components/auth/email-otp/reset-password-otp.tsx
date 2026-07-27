@@ -20,8 +20,13 @@ import {
   CardHeader,
   CardTitle
 } from "@/components/ui/card"
+import {
+  Field,
+  FieldError,
+  FieldGroup,
+  FieldLabel
+} from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
 import { Spinner } from "@/components/ui/spinner"
 import { emailOtpPlugin } from "@/lib/auth/email-otp-plugin"
 import { cn } from "@/lib/utils"
@@ -147,23 +152,25 @@ export function ResetPasswordOtp(props: ResetPasswordOtpProps) {
           aria-label={auth.localization.auth.resetPassword}
           onSubmit={submit}
         >
-          <div class="grid gap-3">
+          <FieldGroup>
             <Show when={!hasStoredEmail}>
-              <Label for="reset-password-email">
-                {auth.localization.auth.email}
-              </Label>
+              <Field>
+                <FieldLabel for="reset-password-email">
+                  {auth.localization.auth.email}
+                </FieldLabel>
 
-              <Input
-                autocomplete="email"
-                disabled={resetPassword.isPending}
-                id="reset-password-email"
-                name="email"
-                onInput={(event) => setEmail(event.currentTarget.value)}
-                placeholder={auth.localization.auth.emailPlaceholder}
-                required
-                type="email"
-                value={email()}
-              />
+                <Input
+                  autocomplete="email"
+                  disabled={resetPassword.isPending}
+                  id="reset-password-email"
+                  name="email"
+                  onInput={(event) => setEmail(event.currentTarget.value)}
+                  placeholder={auth.localization.auth.emailPlaceholder}
+                  required
+                  type="email"
+                  value={email()}
+                />
+              </Field>
             </Show>
 
             <OtpField
@@ -178,52 +185,54 @@ export function ResetPasswordOtp(props: ResetPasswordOtpProps) {
               value={code()}
             />
 
-            <Label for="reset-password-password">
-              {auth.localization.auth.newPassword}
-            </Label>
-
-            <Input
-              aria-invalid={Boolean(passwordError())}
-              autocomplete="new-password"
-              disabled={resetPassword.isPending}
-              id="reset-password-password"
-              maxLength={auth.emailAndPassword?.maxPasswordLength}
-              minLength={auth.emailAndPassword?.minPasswordLength}
-              name="password"
-              onInput={() => setPasswordError(undefined)}
-              onInvalid={(event) => {
-                event.preventDefault()
-                setPasswordError(event.currentTarget.validationMessage)
-              }}
-              placeholder={auth.localization.auth.newPasswordPlaceholder}
-              required
-              type="password"
-            />
-
-            <Show when={passwordError()}>
-              {(message) => (
-                <p class="text-sm text-destructive" role="alert">
-                  {message()}
-                </p>
-              )}
-            </Show>
-
-            <Show when={auth.emailAndPassword?.confirmPassword}>
-              <Label for="reset-password-confirm">
-                {auth.localization.auth.confirmPassword}
-              </Label>
+            <Field data-invalid={Boolean(passwordError())}>
+              <FieldLabel for="reset-password-password">
+                {auth.localization.auth.newPassword}
+              </FieldLabel>
 
               <Input
+                aria-invalid={Boolean(passwordError())}
                 autocomplete="new-password"
                 disabled={resetPassword.isPending}
-                id="reset-password-confirm"
+                id="reset-password-password"
                 maxLength={auth.emailAndPassword?.maxPasswordLength}
                 minLength={auth.emailAndPassword?.minPasswordLength}
-                name="confirmPassword"
-                placeholder={auth.localization.auth.confirmPasswordPlaceholder}
+                name="password"
+                onInput={() => setPasswordError(undefined)}
+                onInvalid={(event) => {
+                  event.preventDefault()
+                  setPasswordError(event.currentTarget.validationMessage)
+                }}
+                placeholder={auth.localization.auth.newPasswordPlaceholder}
                 required
                 type="password"
               />
+
+              <Show when={passwordError()}>
+                {(message) => <FieldError>{message()}</FieldError>}
+              </Show>
+            </Field>
+
+            <Show when={auth.emailAndPassword?.confirmPassword}>
+              <Field>
+                <FieldLabel for="reset-password-confirm">
+                  {auth.localization.auth.confirmPassword}
+                </FieldLabel>
+
+                <Input
+                  autocomplete="new-password"
+                  disabled={resetPassword.isPending}
+                  id="reset-password-confirm"
+                  maxLength={auth.emailAndPassword?.maxPasswordLength}
+                  minLength={auth.emailAndPassword?.minPasswordLength}
+                  name="confirmPassword"
+                  placeholder={
+                    auth.localization.auth.confirmPasswordPlaceholder
+                  }
+                  required
+                  type="password"
+                />
+              </Field>
             </Show>
 
             <Button
@@ -241,7 +250,7 @@ export function ResetPasswordOtp(props: ResetPasswordOtpProps) {
             <Show when={email()}>
               <OpenEmailButton email={email()} variant="secondary" />
             </Show>
-          </div>
+          </FieldGroup>
         </form>
       </CardContent>
 

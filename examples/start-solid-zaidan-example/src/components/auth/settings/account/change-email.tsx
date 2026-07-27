@@ -4,8 +4,8 @@ import { createSignal, Show } from "solid-js"
 import { toast } from "solid-sonner"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter } from "@/components/ui/card"
+import { Field, FieldError, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
 import { cn } from "@/lib/utils"
 
 export type ChangeEmailProps = {
@@ -41,8 +41,10 @@ export function ChangeEmail(props: ChangeEmailProps = {}) {
       <form onSubmit={submitChangeEmail}>
         <Card>
           <CardContent class="flex flex-col gap-6">
-            <div class="grid gap-2">
-              <Label for="settings-email">{auth.localization.auth.email}</Label>
+            <Field data-invalid={Boolean(emailFieldError())}>
+              <FieldLabel for="settings-email">
+                {auth.localization.auth.email}
+              </FieldLabel>
               <Input
                 aria-invalid={!!emailFieldError()}
                 autocomplete="email"
@@ -60,11 +62,9 @@ export function ChangeEmail(props: ChangeEmailProps = {}) {
                 value={session.data?.user.email ?? ""}
               />
               <Show when={emailFieldError()}>
-                {(message) => (
-                  <p class="text-destructive text-sm">{message()}</p>
-                )}
+                {(message) => <FieldError>{message()}</FieldError>}
               </Show>
-            </div>
+            </Field>
           </CardContent>
           <CardFooter>
             <Button

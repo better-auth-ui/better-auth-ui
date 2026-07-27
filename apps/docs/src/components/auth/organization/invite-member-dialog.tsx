@@ -9,18 +9,16 @@ import {
 import { UserPlus } from "lucide-react"
 import { type SyntheticEvent, useEffect, useState } from "react"
 import { toast } from "sonner"
-
+import { Button, buttonVariants } from "@/components/ui/button"
 import {
-  AlertDialog,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogMedia,
-  AlertDialogTitle
-} from "@/components/ui/alert-dialog"
-import { Button } from "@/components/ui/button"
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle
+} from "@/components/ui/dialog"
 import { Field, FieldError, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import {
@@ -94,22 +92,19 @@ export function InviteMemberDialog({
   }
 
   return (
-    <AlertDialog open={open} onOpenChange={onOpenChange}>
-      <AlertDialogContent>
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent>
         <form onSubmit={handleSubmit} className="flex flex-col gap-6">
-          <AlertDialogHeader>
-            <AlertDialogMedia>
+          <DialogHeader>
+            <DialogTitle>
               <UserPlus />
-            </AlertDialogMedia>
-
-            <AlertDialogTitle>
               {organizationLocalization.inviteMember}
-            </AlertDialogTitle>
+            </DialogTitle>
 
-            <AlertDialogDescription>
+            <DialogDescription>
               {organizationLocalization.inviteMemberDescription}
-            </AlertDialogDescription>
-          </AlertDialogHeader>
+            </DialogDescription>
+          </DialogHeader>
 
           <div className="flex flex-col gap-4">
             <Field data-invalid={!!emailError}>
@@ -167,19 +162,23 @@ export function InviteMemberDialog({
             </Field>
           </div>
 
-          <AlertDialogFooter>
-            <AlertDialogCancel disabled={isInviting}>
+          <DialogFooter>
+            <DialogClose
+              className={buttonVariants({ variant: "outline" })}
+              disabled={isInviting}
+              type="button"
+            >
               {localization.settings.cancel}
-            </AlertDialogCancel>
+            </DialogClose>
 
             <Button type="submit" disabled={isInviting || !isRoleValid}>
               {isInviting && <Spinner />}
 
               {organizationLocalization.inviteMember}
             </Button>
-          </AlertDialogFooter>
+          </DialogFooter>
         </form>
-      </AlertDialogContent>
-    </AlertDialog>
+      </DialogContent>
+    </Dialog>
   )
 }

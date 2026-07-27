@@ -19,8 +19,13 @@ import {
 } from "@/components/auth/provider-buttons"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import {
+  Field,
+  FieldError,
+  FieldGroup,
+  FieldLabel
+} from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
 import { cn } from "@/lib/utils"
 
 export type MagicLinkProps = {
@@ -91,32 +96,34 @@ export function MagicLink(props: MagicLinkProps) {
             </Show>
           </Show>
           <form aria-label="Magic link" onSubmit={submitMagicLink}>
-            <div class="grid gap-3">
-              <Label for="magic-link-email">
-                {auth.localization.auth.email}
-              </Label>
-              <Input
-                aria-invalid={Boolean(emailError())}
-                autocomplete="email"
-                disabled={signInMagicLink.isPending}
-                id="magic-link-email"
-                name="email"
-                onInput={(event) => {
-                  setEmail(event.currentTarget.value)
-                  setEmailError(undefined)
-                }}
-                onInvalid={(event) => {
-                  event.preventDefault()
-                  setEmailError(event.currentTarget.validationMessage)
-                }}
-                placeholder={auth.localization.auth.emailPlaceholder}
-                required
-                type="email"
-                value={email()}
-              />
-              <Show when={emailError()}>
-                {(message) => <p role="alert">{message()}</p>}
-              </Show>
+            <FieldGroup>
+              <Field data-invalid={Boolean(emailError())}>
+                <FieldLabel for="magic-link-email">
+                  {auth.localization.auth.email}
+                </FieldLabel>
+                <Input
+                  aria-invalid={Boolean(emailError())}
+                  autocomplete="email"
+                  disabled={signInMagicLink.isPending}
+                  id="magic-link-email"
+                  name="email"
+                  onInput={(event) => {
+                    setEmail(event.currentTarget.value)
+                    setEmailError(undefined)
+                  }}
+                  onInvalid={(event) => {
+                    event.preventDefault()
+                    setEmailError(event.currentTarget.validationMessage)
+                  }}
+                  placeholder={auth.localization.auth.emailPlaceholder}
+                  required
+                  type="email"
+                  value={email()}
+                />
+                <Show when={emailError()}>
+                  {(message) => <FieldError>{message()}</FieldError>}
+                </Show>
+              </Field>
               <div class="flex flex-col gap-3">
                 <Button disabled={signInMagicLink.isPending} type="submit">
                   {magicLinkLabels().sendMagicLink}
@@ -133,7 +140,7 @@ export function MagicLink(props: MagicLinkProps) {
                   {({ AuthButton }) => <AuthButton view="magicLink" />}
                 </For>
               </div>
-            </div>
+            </FieldGroup>
           </form>
           <Show
             when={socialPosition() === "bottom" && auth.socialProviders?.length}

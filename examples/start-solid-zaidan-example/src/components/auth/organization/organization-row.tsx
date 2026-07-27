@@ -6,6 +6,7 @@ import type { Organization } from "better-auth/client"
 import { Settings as SettingsIcon } from "lucide-solid"
 import { Show } from "solid-js"
 import { Button } from "@/components/ui/button"
+import { Item, ItemActions } from "@/components/ui/item"
 import { Spinner } from "@/components/ui/spinner"
 import { organizationPlugin } from "@/lib/auth/organization-plugin"
 import { createOrganizationPath } from "./organization-path"
@@ -70,26 +71,26 @@ export function OrganizationRow(props: OrganizationRowProps) {
   }
 
   return (
-    <div class="flex items-center gap-3">
+    <Item>
       <OrganizationView organization={props.organization} />
-
-      <Button
-        class="ml-auto shrink-0"
-        variant="outline"
-        size="sm"
-        disabled={setActiveOrganization.isPending}
-        onClick={manageOrganization}
-        aria-label={localization().manage}
-      >
-        <Show
-          when={setActiveOrganization.isPending}
-          fallback={<SettingsIcon />}
+      <ItemActions>
+        <Button
+          variant="outline"
+          size="sm"
+          disabled={setActiveOrganization.isPending}
+          onClick={manageOrganization}
+          aria-label={localization().manage}
         >
-          <Spinner />
-        </Show>
+          <Show
+            when={setActiveOrganization.isPending}
+            fallback={<SettingsIcon />}
+          >
+            <Spinner />
+          </Show>
 
-        {localization().manage}
-      </Button>
-    </div>
+          {localization().manage}
+        </Button>
+      </ItemActions>
+    </Item>
   )
 }

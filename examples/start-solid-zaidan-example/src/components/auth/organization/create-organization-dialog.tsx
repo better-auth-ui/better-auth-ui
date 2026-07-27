@@ -13,8 +13,8 @@ import {
   DialogHeader,
   DialogTitle
 } from "@/components/ui/dialog"
+import { Field, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
 import { organizationPlugin } from "@/lib/auth/organization-plugin"
 import { SlugField, sanitizeSlug } from "./slug-field"
 
@@ -88,8 +88,10 @@ export function CreateOrganizationDialog(props: CreateOrganizationDialogProps) {
             </DialogDescription>
           </DialogHeader>
 
-          <div class="grid gap-2">
-            <Label for="create-organization-name">{localization().name}</Label>
+          <Field>
+            <FieldLabel for="create-organization-name">
+              {localization().name}
+            </FieldLabel>
             <Input
               autofocus
               disabled={createOrganization.isPending}
@@ -100,7 +102,7 @@ export function CreateOrganizationDialog(props: CreateOrganizationDialogProps) {
               required
               value={name()}
             />
-          </div>
+          </Field>
 
           <SlugField
             disabled={createOrganization.isPending}

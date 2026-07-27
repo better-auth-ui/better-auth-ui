@@ -9,15 +9,16 @@ import { createMutation } from "@tanstack/solid-query"
 import { ShieldOff } from "lucide-solid"
 import { createSignal, Show } from "solid-js"
 
-import { Button } from "@/components/ui/button"
 import {
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle
-} from "@/components/ui/dialog"
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogMedia,
+  AlertDialogTitle
+} from "@/components/ui/alert-dialog"
+import { Button } from "@/components/ui/button"
 import { Spinner } from "@/components/ui/spinner"
 import { oauthProviderPlugin } from "@/lib/auth/oauth-provider-plugin"
 
@@ -66,28 +67,25 @@ export function RemoveAuthorizationDialog(
   }
 
   return (
-    <DialogContent>
-      <DialogHeader>
-        <div class="flex size-10 items-center justify-center rounded-md bg-muted">
-          <ShieldOff class="size-4.5" />
-        </div>
-        <DialogTitle>{localization.removeAuthorizationTitle}</DialogTitle>
-        <DialogDescription>
+    <AlertDialogContent>
+      <AlertDialogHeader>
+        <AlertDialogMedia>
+          <ShieldOff />
+        </AlertDialogMedia>
+        <AlertDialogTitle>
+          {localization.removeAuthorizationTitle}
+        </AlertDialogTitle>
+        <AlertDialogDescription>
           {localization.removeAuthorizationDescription}
-        </DialogDescription>
-      </DialogHeader>
+        </AlertDialogDescription>
+      </AlertDialogHeader>
 
       <p class="font-medium text-sm">{props.clientName}</p>
 
-      <DialogFooter>
-        <DialogClose
-          as={Button}
-          disabled={isRemoving()}
-          type="button"
-          variant="outline"
-        >
+      <AlertDialogFooter>
+        <AlertDialogCancel disabled={isRemoving()} type="button">
           {auth.localization.settings.cancel}
-        </DialogClose>
+        </AlertDialogCancel>
 
         <Button
           disabled={isRemoving()}
@@ -100,7 +98,7 @@ export function RemoveAuthorizationDialog(
           </Show>
           {localization.remove}
         </Button>
-      </DialogFooter>
-    </DialogContent>
+      </AlertDialogFooter>
+    </AlertDialogContent>
   )
 }

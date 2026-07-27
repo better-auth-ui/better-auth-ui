@@ -10,6 +10,7 @@ import type { Organization } from "better-auth/client"
 import { Settings as SettingsIcon } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
+import { Item, ItemActions } from "@/components/ui/item"
 import { Spinner } from "@/components/ui/spinner"
 import { organizationPlugin } from "@/lib/auth/organization-plugin"
 import { OrganizationView } from "./organization-view"
@@ -50,21 +51,21 @@ export function OrganizationRow({ organization }: OrganizationRowProps) {
   }
 
   return (
-    <div className="flex items-center gap-3">
+    <Item>
       <OrganizationView organization={organization} />
+      <ItemActions>
+        <Button
+          variant="outline"
+          size="sm"
+          disabled={setActivePending}
+          onClick={manageOrganization}
+          aria-label={organizationLocalization.manage}
+        >
+          {setActivePending ? <Spinner /> : <SettingsIcon />}
 
-      <Button
-        className="ml-auto shrink-0"
-        variant="outline"
-        size="sm"
-        disabled={setActivePending}
-        onClick={manageOrganization}
-        aria-label={organizationLocalization.manage}
-      >
-        {setActivePending ? <Spinner /> : <SettingsIcon />}
-
-        {organizationLocalization.manage}
-      </Button>
-    </div>
+          {organizationLocalization.manage}
+        </Button>
+      </ItemActions>
+    </Item>
   )
 }

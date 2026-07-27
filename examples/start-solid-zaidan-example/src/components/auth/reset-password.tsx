@@ -3,10 +3,11 @@ import { createMutation } from "@tanstack/solid-query"
 import { Link } from "@tanstack/solid-router"
 import { Eye, EyeOff } from "lucide-solid"
 import { createSignal, Show } from "solid-js"
+import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Field, FieldError, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
 import { cn } from "@/lib/utils"
 
 export type ResetPasswordProps = {
@@ -63,10 +64,10 @@ export function ResetPassword(props: ResetPasswordProps) {
       <CardContent>
         <form aria-label="Reset password" onSubmit={submitPasswordReset}>
           <div class="flex flex-col gap-6">
-            <div class="grid gap-3">
-              <Label for="reset-password-new">
+            <Field>
+              <FieldLabel for="reset-password-new">
                 {auth.localization.auth.newPassword}
-              </Label>
+              </FieldLabel>
               <div class="relative">
                 <Input
                   aria-invalid={Boolean(passwordError())}
@@ -117,17 +118,13 @@ export function ResetPassword(props: ResetPasswordProps) {
               </div>
 
               <Show when={passwordError()}>
-                {(message) => (
-                  <p class="text-sm text-destructive" role="alert">
-                    {message()}
-                  </p>
-                )}
+                {(message) => <FieldError>{message()}</FieldError>}
               </Show>
-            </div>
-            <div class="grid gap-3">
-              <Label for="reset-password-confirm">
+            </Field>
+            <Field>
+              <FieldLabel for="reset-password-confirm">
                 {auth.localization.auth.confirmPassword}
-              </Label>
+              </FieldLabel>
               <div class="relative">
                 <Input
                   aria-invalid={Boolean(confirmPasswordError())}
@@ -183,29 +180,35 @@ export function ResetPassword(props: ResetPasswordProps) {
               </div>
 
               <Show when={confirmPasswordError()}>
-                {(message) => (
-                  <p class="text-sm text-destructive" role="alert">
-                    {message()}
-                  </p>
-                )}
+                {(message) => <FieldError>{message()}</FieldError>}
               </Show>
-            </div>
+            </Field>
             <Button disabled={resetPassword.isPending} type="submit">
               {resetPassword.isPending
                 ? `${auth.localization.auth.resetPassword}…`
                 : auth.localization.auth.resetPassword}
             </Button>
             <Show when={tokenError()}>
-              {(message) => <p role="alert">{message()}</p>}
+              {(message) => (
+                <Alert variant="destructive">
+                  <AlertDescription>{message()}</AlertDescription>
+                </Alert>
+              )}
             </Show>
             <Show when={resetPassword.isSuccess}>
-              <p role="status">
-                Password reset successfully. You can sign in with your new
-                password.
-              </p>
+              <Alert>
+                <AlertDescription role="status">
+                  Password reset successfully. You can sign in with your new
+                  password.
+                </AlertDescription>
+              </Alert>
             </Show>
             <Show when={resetPassword.isError}>
-              <p role="alert">Unable to reset your password. Try again.</p>
+              <Alert variant="destructive">
+                <AlertDescription>
+                  Unable to reset your password. Try again.
+                </AlertDescription>
+              </Alert>
             </Show>
           </div>
         </form>

@@ -16,10 +16,11 @@ import { Link } from "@tanstack/solid-router"
 import type { BetterFetchError } from "better-auth/client"
 import { Eye, EyeOff } from "lucide-solid"
 import { type Component, createSignal, For, Show } from "solid-js"
+import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Field, FieldError, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
 import { useSignInContinuation } from "@/lib/auth/use-sign-in-continuation"
 import { cn } from "@/lib/utils"
 import { LastUsedBadge } from "../last-login-method/last-used-badge"
@@ -143,12 +144,12 @@ export function SignInUsername(props: SignInUsernameProps) {
 
         <form aria-label="Sign in" onSubmit={submitSignIn}>
           <div class="flex flex-col gap-6">
-            <div class="grid gap-3">
-              <Label for="sign-in-email">
+            <Field>
+              <FieldLabel for="sign-in-email">
                 {usernameAuth
                   ? usernameLabels.username
                   : auth.localization.auth.email}
-              </Label>
+              </FieldLabel>
               <Input
                 aria-invalid={Boolean(identifierError())}
                 autocomplete={usernameAuth ? "username" : "email"}
@@ -173,18 +174,14 @@ export function SignInUsername(props: SignInUsernameProps) {
               />
 
               <Show when={identifierError()}>
-                {(message) => (
-                  <p class="text-sm text-destructive" role="alert">
-                    {message()}
-                  </p>
-                )}
+                {(message) => <FieldError>{message()}</FieldError>}
               </Show>
-            </div>
+            </Field>
 
-            <div class="grid gap-3">
-              <Label for="sign-in-password">
+            <Field>
+              <FieldLabel for="sign-in-password">
                 {auth.localization.auth.password}
-              </Label>
+              </FieldLabel>
               <div class="relative">
                 <Input
                   aria-invalid={Boolean(passwordError())}
@@ -234,13 +231,9 @@ export function SignInUsername(props: SignInUsernameProps) {
               </div>
 
               <Show when={passwordError()}>
-                {(message) => (
-                  <p class="text-sm text-destructive" role="alert">
-                    {message()}
-                  </p>
-                )}
+                {(message) => <FieldError>{message()}</FieldError>}
               </Show>
-            </div>
+            </Field>
 
             <Show when={captchaComponent()} keyed>
               {(Captcha) => <Captcha />}
@@ -271,7 +264,11 @@ export function SignInUsername(props: SignInUsernameProps) {
             </For>
 
             <Show when={signIn.isError || signInUsername.isError}>
-              <p role="alert">Unable to sign in. Try again.</p>
+              <Alert variant="destructive">
+                <AlertDescription>
+                  Unable to sign in. Try again.
+                </AlertDescription>
+              </Alert>
             </Show>
           </div>
         </form>

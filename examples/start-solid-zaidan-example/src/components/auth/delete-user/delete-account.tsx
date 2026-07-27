@@ -16,25 +16,26 @@ import { createSignal, Show } from "solid-js"
 import { toast } from "solid-sonner"
 import { shouldLoadAccounts } from "@/components/auth/settings/shared/helpers"
 import type { DeleteUserPluginConfig } from "@/components/auth/settings/shared/types"
+import {
+  AlertDialog,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogMedia,
+  AlertDialogTitle,
+  AlertDialogTrigger
+} from "@/components/ui/alert-dialog"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
-import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger
-} from "@/components/ui/dialog"
+import { Field, FieldLabel } from "@/components/ui/field"
 import {
   InputGroup,
   InputGroupAddon,
   InputGroupButton,
   InputGroupInput
 } from "@/components/ui/input-group"
-import { Label } from "@/components/ui/label"
 import { cn } from "@/lib/utils"
 
 const defaultDeleteAccountLabel = "Delete account"
@@ -138,33 +139,35 @@ export function DeleteAccount(props: DeleteAccountProps = {}) {
           </p>
         </div>
 
-        <Dialog open={confirmOpen()} onOpenChange={handleDialogOpenChange}>
-          <DialogTrigger
+        <AlertDialog open={confirmOpen()} onOpenChange={handleDialogOpenChange}>
+          <AlertDialogTrigger
             as={Button}
             disabled={!accounts.data || accounts.isPending}
             size="sm"
             variant="destructive"
           >
             {deleteUserLabels().deleteUser}
-          </DialogTrigger>
+          </AlertDialogTrigger>
 
-          <DialogContent>
+          <AlertDialogContent>
             <form class="flex flex-col gap-6" onSubmit={submitDeleteUser}>
-              <DialogHeader>
-                <div class="flex size-10 items-center justify-center rounded-md bg-destructive/10 text-destructive dark:bg-destructive/20">
-                  <TriangleAlert class="size-4.5" />
-                </div>
-                <DialogTitle>{deleteUserLabels().deleteUser}</DialogTitle>
-                <DialogDescription>
+              <AlertDialogHeader>
+                <AlertDialogMedia class="bg-destructive/10 text-destructive dark:bg-destructive/20 dark:text-destructive">
+                  <TriangleAlert />
+                </AlertDialogMedia>
+                <AlertDialogTitle>
+                  {deleteUserLabels().deleteUser}
+                </AlertDialogTitle>
+                <AlertDialogDescription>
                   {deleteUserLabels().deleteUserDescription}
-                </DialogDescription>
-              </DialogHeader>
+                </AlertDialogDescription>
+              </AlertDialogHeader>
 
               <Show when={needsPassword()}>
-                <div class="grid gap-2">
-                  <Label for="delete-password">
+                <Field>
+                  <FieldLabel for="delete-password">
                     {auth.localization.auth.password}
-                  </Label>
+                  </FieldLabel>
                   <InputGroup>
                     <InputGroupInput
                       autocomplete="current-password"
@@ -206,18 +209,16 @@ export function DeleteAccount(props: DeleteAccountProps = {}) {
                       </InputGroupButton>
                     </InputGroupAddon>
                   </InputGroup>
-                </div>
+                </Field>
               </Show>
 
-              <DialogFooter>
-                <DialogClose
-                  as={Button}
+              <AlertDialogFooter>
+                <AlertDialogCancel
                   disabled={deleteUser.isPending}
                   type="button"
-                  variant="outline"
                 >
                   {auth.localization.settings.cancel}
-                </DialogClose>
+                </AlertDialogCancel>
                 <Button
                   disabled={deleteUser.isPending}
                   type="submit"
@@ -227,10 +228,10 @@ export function DeleteAccount(props: DeleteAccountProps = {}) {
                     ? `${deleteUserLabels().deleteUser}…`
                     : deleteUserLabels().deleteUser}
                 </Button>
-              </DialogFooter>
+              </AlertDialogFooter>
             </form>
-          </DialogContent>
-        </Dialog>
+          </AlertDialogContent>
+        </AlertDialog>
       </CardContent>
     </Card>
   )

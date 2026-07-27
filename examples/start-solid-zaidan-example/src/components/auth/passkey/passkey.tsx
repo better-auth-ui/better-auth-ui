@@ -4,8 +4,16 @@ import { createSignal } from "solid-js"
 import { DeletePasskeyDialog } from "@/components/auth/passkey/delete-passkey-dialog"
 import { passkeyLabels } from "@/components/auth/passkey/passkey-localization"
 import type { ListedPasskey } from "@/components/auth/settings/shared/types"
+import { AlertDialog, AlertDialogTrigger } from "@/components/ui/alert-dialog"
 import { Button } from "@/components/ui/button"
-import { Dialog, DialogTrigger } from "@/components/ui/dialog"
+import {
+  Item,
+  ItemActions,
+  ItemContent,
+  ItemDescription,
+  ItemMedia,
+  ItemTitle
+} from "@/components/ui/item"
 
 export function Passkey(props: { passkey: ListedPasskey }) {
   const auth = useAuth()
@@ -14,37 +22,39 @@ export function Passkey(props: { passkey: ListedPasskey }) {
   const passkeyName = () => props.passkey.name || labels().passkey
 
   return (
-    <div class="flex items-center gap-3 p-4 text-sm">
-      <div class="flex size-10 shrink-0 items-center justify-center rounded-md bg-muted">
-        <Fingerprint class="size-4.5" />
-      </div>
-
-      <div class="flex min-w-0 flex-col">
-        <span class="truncate font-medium leading-tight">{passkeyName()}</span>
-        <span class="text-muted-foreground text-xs">
+    <Item>
+      <ItemMedia variant="icon">
+        <Fingerprint />
+      </ItemMedia>
+      <ItemContent>
+        <ItemTitle>{passkeyName()}</ItemTitle>
+        <ItemDescription>
           {new Date(props.passkey.createdAt).toLocaleString(undefined, {
             dateStyle: "medium",
             timeStyle: "short"
           })}
-        </span>
-      </div>
-
-      <Dialog open={deleteOpen()} onOpenChange={setDeleteOpen}>
-        <DialogTrigger
-          as={Button}
-          aria-label={labels().deletePasskey.replace("{{name}}", passkeyName())}
-          class="ml-auto shrink-0"
-          size="sm"
-          variant="outline"
-        >
-          <X />
-          {auth.localization.settings.delete}
-        </DialogTrigger>
-        <DeletePasskeyDialog
-          onOpenChange={setDeleteOpen}
-          passkey={props.passkey}
-        />
-      </Dialog>
-    </div>
+        </ItemDescription>
+      </ItemContent>
+      <ItemActions>
+        <AlertDialog open={deleteOpen()} onOpenChange={setDeleteOpen}>
+          <AlertDialogTrigger
+            as={Button}
+            aria-label={labels().deletePasskey.replace(
+              "{{name}}",
+              passkeyName()
+            )}
+            size="sm"
+            variant="outline"
+          >
+            <X />
+            {auth.localization.settings.delete}
+          </AlertDialogTrigger>
+          <DeletePasskeyDialog
+            onOpenChange={setDeleteOpen}
+            passkey={props.passkey}
+          />
+        </AlertDialog>
+      </ItemActions>
+    </Item>
   )
 }

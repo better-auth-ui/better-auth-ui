@@ -15,8 +15,8 @@ import { OpenEmailButton } from "@/components/auth/open-email-button"
 import { OtpField } from "@/components/auth/otp-field"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter } from "@/components/ui/card"
+import { Field, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
 import { Spinner } from "@/components/ui/spinner"
 import { emailOtpPlugin } from "@/lib/auth/email-otp-plugin"
 import { cn } from "@/lib/utils"
@@ -178,10 +178,10 @@ export function ChangeEmailOtp(props: ChangeEmailOtpProps = {}) {
                 </div>
               }
             >
-              <div class="grid gap-2">
-                <Label for="settings-email">
+              <Field>
+                <FieldLabel for="settings-email">
                   {auth.localization.auth.email}
-                </Label>
+                </FieldLabel>
 
                 <Input
                   autocomplete="email"
@@ -193,7 +193,7 @@ export function ChangeEmailOtp(props: ChangeEmailOtpProps = {}) {
                   type="email"
                   value={currentEmail() ?? ""}
                 />
-              </div>
+              </Field>
             </Show>
           </CardContent>
 

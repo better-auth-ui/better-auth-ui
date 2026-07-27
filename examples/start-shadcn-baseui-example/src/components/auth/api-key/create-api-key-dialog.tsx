@@ -8,18 +8,16 @@ import {
 } from "@better-auth-ui/react"
 import { Key } from "lucide-react"
 import { type SyntheticEvent, useState } from "react"
-
+import { Button, buttonVariants } from "@/components/ui/button"
 import {
-  AlertDialog,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogMedia,
-  AlertDialogTitle
-} from "@/components/ui/alert-dialog"
-import { Button } from "@/components/ui/button"
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle
+} from "@/components/ui/dialog"
 import { Field, FieldError, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import { Spinner } from "@/components/ui/spinner"
@@ -86,22 +84,19 @@ export function CreateApiKeyDialog({
 
   return (
     <>
-      <AlertDialog open={open} onOpenChange={handleOpenChange}>
-        <AlertDialogContent>
+      <Dialog open={open} onOpenChange={handleOpenChange}>
+        <DialogContent>
           <form onSubmit={handleSubmit} className="flex flex-col gap-6">
-            <AlertDialogHeader>
-              <AlertDialogMedia>
+            <DialogHeader>
+              <DialogTitle>
                 <Key />
-              </AlertDialogMedia>
-
-              <AlertDialogTitle>
                 {apiKeyLocalization.createApiKey}
-              </AlertDialogTitle>
+              </DialogTitle>
 
-              <AlertDialogDescription>
+              <DialogDescription>
                 {apiKeyLocalization.apiKeysDescription}
-              </AlertDialogDescription>
-            </AlertDialogHeader>
+              </DialogDescription>
+            </DialogHeader>
 
             <Field>
               <FieldLabel htmlFor="api-key-name">
@@ -119,20 +114,24 @@ export function CreateApiKeyDialog({
               <FieldError />
             </Field>
 
-            <AlertDialogFooter>
-              <AlertDialogCancel disabled={isCreating}>
+            <DialogFooter>
+              <DialogClose
+                className={buttonVariants({ variant: "outline" })}
+                disabled={isCreating}
+                type="button"
+              >
                 {localization.settings.cancel}
-              </AlertDialogCancel>
+              </DialogClose>
 
               <Button type="submit" disabled={isCreating}>
                 {isCreating && <Spinner />}
 
                 {apiKeyLocalization.createApiKey}
               </Button>
-            </AlertDialogFooter>
+            </DialogFooter>
           </form>
-        </AlertDialogContent>
-      </AlertDialog>
+        </DialogContent>
+      </Dialog>
 
       <NewApiKeyDialog
         open={isNewKeyDialogOpen}

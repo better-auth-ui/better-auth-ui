@@ -7,17 +7,18 @@ import { createMutation } from "@tanstack/solid-query"
 import { Fingerprint } from "lucide-solid"
 import { passkeyLabels } from "@/components/auth/passkey/passkey-localization"
 import type { ListedPasskey } from "@/components/auth/settings/shared/types"
-import { Button } from "@/components/ui/button"
 import {
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle
-} from "@/components/ui/dialog"
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogMedia,
+  AlertDialogTitle
+} from "@/components/ui/alert-dialog"
+import { Button } from "@/components/ui/button"
+import { Field, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
 import { Spinner } from "@/components/ui/spinner"
 
 export function DeletePasskeyDialog(props: {
@@ -40,29 +41,26 @@ export function DeletePasskeyDialog(props: {
   }
 
   return (
-    <DialogContent>
-      <DialogHeader>
-        <div class="flex size-10 items-center justify-center rounded-md bg-muted">
-          <Fingerprint class="size-4.5" />
-        </div>
-        <DialogTitle>{labels().deletePasskeyTitle}</DialogTitle>
-        <DialogDescription>{labels().deletePasskeyWarning}</DialogDescription>
-      </DialogHeader>
+    <AlertDialogContent>
+      <AlertDialogHeader>
+        <AlertDialogMedia>
+          <Fingerprint />
+        </AlertDialogMedia>
+        <AlertDialogTitle>{labels().deletePasskeyTitle}</AlertDialogTitle>
+        <AlertDialogDescription>
+          {labels().deletePasskeyWarning}
+        </AlertDialogDescription>
+      </AlertDialogHeader>
 
-      <div class="grid gap-2">
-        <Label for={previewId()}>{passkeyName()}</Label>
+      <Field>
+        <FieldLabel for={previewId()}>{passkeyName()}</FieldLabel>
         <Input disabled id={previewId()} readonly value={passkeyName()} />
-      </div>
+      </Field>
 
-      <DialogFooter>
-        <DialogClose
-          as={Button}
-          disabled={deletePasskey.isPending}
-          type="button"
-          variant="outline"
-        >
+      <AlertDialogFooter>
+        <AlertDialogCancel disabled={deletePasskey.isPending} type="button">
           {auth.localization.settings.cancel}
-        </DialogClose>
+        </AlertDialogCancel>
         <Button
           disabled={deletePasskey.isPending}
           onClick={deleteKey}
@@ -72,7 +70,7 @@ export function DeletePasskeyDialog(props: {
           {deletePasskey.isPending ? <Spinner /> : null}
           {labels().deletePasskeyTitle}
         </Button>
-      </DialogFooter>
-    </DialogContent>
+      </AlertDialogFooter>
+    </AlertDialogContent>
   )
 }

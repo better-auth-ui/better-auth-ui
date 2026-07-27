@@ -4,6 +4,14 @@ import { useAuthPlugin } from "@better-auth-ui/react"
 import { Send } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
+import {
+  Empty,
+  EmptyContent,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle
+} from "@/components/ui/empty"
 import { organizationPlugin } from "@/lib/auth/organization-plugin"
 
 export type OrganizationInvitationsEmptyProps = {
@@ -20,22 +28,21 @@ export function OrganizationInvitationsEmpty({
     useAuthPlugin(organizationPlugin)
 
   return (
-    <div className="flex flex-col items-center gap-4 p-4 text-center">
-      <Send className="size-6 text-muted-foreground" />
-
-      <div className="flex flex-col gap-2">
-        <p className="text-sm font-semibold text-foreground">
-          {organizationLocalization.noInvitations}
-        </p>
-
-        <span className="text-sm text-muted-foreground">
+    <Empty>
+      <EmptyHeader>
+        <EmptyMedia variant="icon">
+          <Send />
+        </EmptyMedia>
+        <EmptyTitle>{organizationLocalization.noInvitations}</EmptyTitle>
+        <EmptyDescription>
           {organizationLocalization.organizationInvitationsEmptyDescription}
-        </span>
-      </div>
-
-      <Button size="sm" onClick={onInvitePress}>
-        {organizationLocalization.inviteMember}
-      </Button>
-    </div>
+        </EmptyDescription>
+      </EmptyHeader>
+      <EmptyContent>
+        <Button size="sm" onClick={onInvitePress}>
+          {organizationLocalization.inviteMember}
+        </Button>
+      </EmptyContent>
+    </Empty>
   )
 }

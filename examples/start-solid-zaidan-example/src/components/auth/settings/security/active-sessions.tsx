@@ -13,7 +13,7 @@ import {
   shouldLoadDeviceSessions
 } from "@/components/auth/settings/shared/helpers"
 import { Card, CardContent } from "@/components/ui/card"
-import { Separator } from "@/components/ui/separator"
+import { ItemGroup, ItemSeparator } from "@/components/ui/item"
 import { cn } from "@/lib/utils"
 import { ActiveSessionRow, ActiveSessionRowSkeleton } from "./active-session"
 
@@ -66,19 +66,19 @@ export function ActiveSessionsSettings(
         <CardContent class="z-card-content-padding-none">
           <Show
             fallback={
-              <div class="p-4">
+              <ItemGroup class="gap-0">
                 <ActiveSessionRowSkeleton />
-              </div>
+              </ItemGroup>
             }
             when={!activeSessions.isPending && session.data}
           >
-            <For each={sessions()}>
-              {(activeSession, index) => (
-                <>
-                  <Show when={index() > 0}>
-                    <Separator />
-                  </Show>
-                  <div class="p-4">
+            <ItemGroup class="gap-0">
+              <For each={sessions()}>
+                {(activeSession, index) => (
+                  <>
+                    <Show when={index() > 0}>
+                      <ItemSeparator />
+                    </Show>
                     <ActiveSessionRow
                       activeSession={activeSession}
                       displayName={displayName()}
@@ -89,10 +89,10 @@ export function ActiveSessionsSettings(
                       onRevoke={revoke}
                       onSignOut={signOut}
                     />
-                  </div>
-                </>
-              )}
-            </For>
+                  </>
+                )}
+              </For>
+            </ItemGroup>
           </Show>
         </CardContent>
       </Card>

@@ -31,12 +31,17 @@ import {
   CardTitle
 } from "@/components/ui/card"
 import {
+  Field,
+  FieldError,
+  FieldGroup,
+  FieldLabel
+} from "@/components/ui/field"
+import {
   InputOTP,
   InputOTPGroup,
   InputOTPSeparator,
   InputOTPSlot
 } from "@/components/ui/input-otp"
-import { Label } from "@/components/ui/label"
 import { Separator } from "@/components/ui/separator"
 import { Spinner } from "@/components/ui/spinner"
 import { deviceAuthorizationPlugin } from "@/lib/auth/device-authorization-plugin"
@@ -295,9 +300,11 @@ function DeviceCodeForm(props: DeviceCodeFormProps) {
           aria-label={props.localization.deviceAuthorization}
           onSubmit={props.onSubmit}
         >
-          <div class="flex flex-col gap-5">
-            <div class="flex flex-col gap-2">
-              <Label for="device-code">{props.localization.deviceCode}</Label>
+          <FieldGroup>
+            <Field data-invalid={Boolean(props.codeError)}>
+              <FieldLabel for="device-code">
+                {props.localization.deviceCode}
+              </FieldLabel>
 
               <InputOTP
                 maxLength={props.userCodeLength}
@@ -332,11 +339,9 @@ function DeviceCodeForm(props: DeviceCodeFormProps) {
               </InputOTP>
 
               <Show when={props.codeError}>
-                <p class="text-sm text-destructive" id={errorId} role="alert">
-                  {props.codeError}
-                </p>
+                <FieldError id={errorId}>{props.codeError}</FieldError>
               </Show>
-            </div>
+            </Field>
 
             <Button
               class="w-full"
@@ -352,7 +357,7 @@ function DeviceCodeForm(props: DeviceCodeFormProps) {
               </Show>
               {props.localization.continue}
             </Button>
-          </div>
+          </FieldGroup>
         </form>
       </CardContent>
     </Card>

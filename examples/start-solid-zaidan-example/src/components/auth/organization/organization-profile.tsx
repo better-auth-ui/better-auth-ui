@@ -9,8 +9,8 @@ import { createEffect, createSignal, Show } from "solid-js"
 import { toast } from "solid-sonner"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
+import { Field, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
 import { Skeleton } from "@/components/ui/skeleton"
 import { organizationPlugin } from "@/lib/auth/organization-plugin"
 import { ChangeOrganizationLogo } from "./change-organization-logo"
@@ -24,12 +24,14 @@ const fallbackLocalization = {
   organizationProfile: "Organization profile",
   name: "Name",
   namePlaceholder: "Enter the organization name",
+  slug: "Slug",
   organizationUpdatedSuccess: "Organization updated successfully"
 } satisfies Pick<
   OrganizationLocalization,
   | "organizationProfile"
   | "name"
   | "namePlaceholder"
+  | "slug"
   | "organizationUpdatedSuccess"
 >
 
@@ -76,42 +78,45 @@ export function OrganizationProfile(props: OrganizationProfileProps) {
       <Card>
         <CardContent>
           <form class="flex flex-col gap-4" onSubmit={handleSubmit}>
-            <ChangeOrganizationLogo class="-ml-1 grid gap-2" />
+            <ChangeOrganizationLogo class="-ml-1" />
+
+            <Field>
+              <FieldLabel for="organization-profile-name">
+                {localization().name}
+              </FieldLabel>
+              <Show
+                when={activeOrganization.data}
+                fallback={<Skeleton class="h-8 w-full rounded-md" />}
+              >
+                <Input
+                  disabled={updateOrganization.isPending}
+                  id="organization-profile-name"
+                  name="name"
+                  onInput={(event) => setName(event.currentTarget.value)}
+                  placeholder={localization().namePlaceholder}
+                  required
+                  value={name()}
+                />
+              </Show>
+            </Field>
 
             <Show
               when={activeOrganization.data}
               fallback={
-                <div class="grid gap-4">
-                  <Skeleton class="h-10 rounded-md" />
-                  <Skeleton class="h-10 rounded-md" />
-                </div>
+                <Field>
+                  <FieldLabel>{localization().slug}</FieldLabel>
+                  <Skeleton class="h-8 w-full rounded-md" />
+                </Field>
               }
             >
               {(organization) => (
-                <>
-                  <div class="grid gap-2">
-                    <Label for="organization-profile-name">
-                      {localization().name}
-                    </Label>
-                    <Input
-                      disabled={updateOrganization.isPending}
-                      id="organization-profile-name"
-                      name="name"
-                      onInput={(event) => setName(event.currentTarget.value)}
-                      placeholder={localization().namePlaceholder}
-                      required
-                      value={name()}
-                    />
-                  </div>
-
-                  <SlugField
-                    currentSlug={organization().slug}
-                    disabled={updateOrganization.isPending}
-                    id="organization-profile-slug"
-                    onChange={setSlug}
-                    value={slug()}
-                  />
-                </>
+                <SlugField
+                  currentSlug={organization().slug}
+                  disabled={updateOrganization.isPending}
+                  id="organization-profile-slug"
+                  onChange={setSlug}
+                  value={slug()}
+                />
               )}
             </Show>
 

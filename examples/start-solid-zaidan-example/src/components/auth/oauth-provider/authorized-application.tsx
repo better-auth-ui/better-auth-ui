@@ -11,11 +11,18 @@ import {
 } from "@better-auth-ui/solid"
 import { ShieldCheck } from "lucide-solid"
 import { createSignal, For, Show } from "solid-js"
-
+import { AlertDialog, AlertDialogTrigger } from "@/components/ui/alert-dialog"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { Dialog, DialogTrigger } from "@/components/ui/dialog"
+import {
+  Item,
+  ItemActions,
+  ItemContent,
+  ItemDescription,
+  ItemMedia,
+  ItemTitle
+} from "@/components/ui/item"
 import { Skeleton } from "@/components/ui/skeleton"
 import { oauthProviderPlugin } from "@/lib/auth/oauth-provider-plugin"
 import { RemoveAuthorizationDialog } from "./remove-authorization-dialog"
@@ -47,36 +54,35 @@ export function AuthorizedApplication(props: AuthorizedApplicationProps) {
   const websiteUrl = () => sanitizeOAuthClientUrl(publicClient.data?.client_uri)
 
   return (
-    <div class="flex flex-wrap items-start gap-3 p-6">
-      <Show
-        when={!publicClient.isPending}
-        fallback={<Skeleton class="size-10 shrink-0 rounded-md" />}
-      >
-        <Avatar class="size-10 shrink-0 rounded-md">
-          <AvatarImage
-            alt={clientName()}
-            referrerpolicy="no-referrer"
-            src={logoUrl()}
-          />
-          <AvatarFallback class="rounded-md">
-            <ShieldCheck class="size-4.5" />
-          </AvatarFallback>
-        </Avatar>
-      </Show>
+    <Item>
+      <ItemMedia variant="image">
+        <Show
+          when={!publicClient.isPending}
+          fallback={<Skeleton class="size-10 shrink-0 rounded-md" />}
+        >
+          <Avatar class="size-10 shrink-0 rounded-md">
+            <AvatarImage
+              alt={clientName()}
+              referrerpolicy="no-referrer"
+              src={logoUrl()}
+            />
+            <AvatarFallback class="rounded-md">
+              <ShieldCheck class="size-4.5" />
+            </AvatarFallback>
+          </Avatar>
+        </Show>
+      </ItemMedia>
+      <ItemContent>
+        <Show
+          when={!publicClient.isPending}
+          fallback={<Skeleton class="h-4 w-32" />}
+        >
+          <ItemTitle>{clientName()}</ItemTitle>
+        </Show>
 
-      <div class="flex min-w-0 flex-1 flex-col gap-2">
-        <div class="flex min-w-0 flex-col">
-          <Show
-            when={!publicClient.isPending}
-            fallback={<Skeleton class="h-4 w-32" />}
-          >
-            <span class="truncate font-medium text-sm leading-tight">
-              {clientName()}
-            </span>
-          </Show>
-
-          <Show when={websiteUrl()}>
-            {(uri) => (
+        <Show when={websiteUrl()}>
+          {(uri) => (
+            <ItemDescription>
               <a
                 class="truncate text-muted-foreground text-xs underline-offset-4 hover:underline"
                 href={uri()}
@@ -85,20 +91,20 @@ export function AuthorizedApplication(props: AuthorizedApplicationProps) {
               >
                 {uri()}
               </a>
-            )}
-          </Show>
+            </ItemDescription>
+          )}
+        </Show>
 
-          <Show when={props.application.updatedAt}>
-            {(updatedAt) => (
-              <span class="text-muted-foreground text-xs">
-                {`${localization.lastAuthorized} ${updatedAt().toLocaleDateString(
-                  undefined,
-                  { dateStyle: "medium" }
-                )}`}
-              </span>
-            )}
-          </Show>
-        </div>
+        <Show when={props.application.updatedAt}>
+          {(updatedAt) => (
+            <ItemDescription>
+              {`${localization.lastAuthorized} ${updatedAt().toLocaleDateString(
+                undefined,
+                { dateStyle: "medium" }
+              )}`}
+            </ItemDescription>
+          )}
+        </Show>
 
         <Show when={props.application.scopes.length > 0}>
           <div class="flex flex-wrap gap-1.5">
@@ -116,19 +122,20 @@ export function AuthorizedApplication(props: AuthorizedApplicationProps) {
             </For>
           </div>
         </Show>
-      </div>
+      </ItemContent>
+      <ItemActions>
+        <AlertDialog open={removeOpen()} onOpenChange={setRemoveOpen}>
+          <AlertDialogTrigger as={Button} size="sm" variant="outline">
+            {localization.removeAuthorization}
+          </AlertDialogTrigger>
 
-      <Dialog open={removeOpen()} onOpenChange={setRemoveOpen}>
-        <DialogTrigger as={Button} class="shrink-0" size="sm" variant="outline">
-          {localization.removeAuthorization}
-        </DialogTrigger>
-
-        <RemoveAuthorizationDialog
-          application={props.application}
-          clientName={clientName()}
-          onOpenChange={setRemoveOpen}
-        />
-      </Dialog>
-    </div>
+          <RemoveAuthorizationDialog
+            application={props.application}
+            clientName={clientName()}
+            onOpenChange={setRemoveOpen}
+          />
+        </AlertDialog>
+      </ItemActions>
+    </Item>
   )
 }

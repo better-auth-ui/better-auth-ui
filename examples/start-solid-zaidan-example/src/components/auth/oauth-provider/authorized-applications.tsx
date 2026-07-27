@@ -10,7 +10,7 @@ import { createQuery } from "@tanstack/solid-query"
 import { For, Show } from "solid-js"
 
 import { Card, CardContent } from "@/components/ui/card"
-import { ItemSeparator } from "@/components/ui/item"
+import { ItemGroup, ItemSeparator } from "@/components/ui/item"
 import { oauthProviderPlugin } from "@/lib/auth/oauth-provider-plugin"
 import { cn } from "@/lib/utils"
 import { AuthorizedApplication } from "./authorized-application"
@@ -59,16 +59,18 @@ export function AuthorizedApplications(
               when={applications().length > 0}
               fallback={<AuthorizedApplicationsEmpty />}
             >
-              <For each={applications()}>
-                {(application, index) => (
-                  <>
-                    <Show when={index() > 0}>
-                      <ItemSeparator />
-                    </Show>
-                    <AuthorizedApplication application={application} />
-                  </>
-                )}
-              </For>
+              <ItemGroup class="gap-0">
+                <For each={applications()}>
+                  {(application, index) => (
+                    <>
+                      <Show when={index() > 0}>
+                        <ItemSeparator />
+                      </Show>
+                      <AuthorizedApplication application={application} />
+                    </>
+                  )}
+                </For>
+              </ItemGroup>
             </Show>
           </Show>
         </CardContent>

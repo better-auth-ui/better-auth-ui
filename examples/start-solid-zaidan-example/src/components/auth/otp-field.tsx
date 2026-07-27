@@ -1,11 +1,11 @@
 import { createMemo, For, Show } from "solid-js"
 
+import { Field, FieldError, FieldLabel } from "@/components/ui/field"
 import {
   InputOTP,
   InputOTPGroup,
   InputOTPSlot
 } from "@/components/ui/input-otp"
-import { Label } from "@/components/ui/label"
 import { cn } from "@/lib/utils"
 
 export type OtpFieldProps = {
@@ -49,8 +49,8 @@ export function OtpField(props: OtpFieldProps) {
   const slots = createMemo(() => createOtpSlots(props.length))
 
   return (
-    <div class={cn("flex flex-col gap-2", props.class)}>
-      <Label for={inputId()}>{props.label}</Label>
+    <Field class={cn(props.class)} data-invalid={Boolean(props.errorMessage)}>
+      <FieldLabel for={inputId()}>{props.label}</FieldLabel>
 
       <InputOTP
         maxLength={props.length}
@@ -79,12 +79,8 @@ export function OtpField(props: OtpFieldProps) {
       </InputOTP>
 
       <Show when={props.errorMessage}>
-        {(message) => (
-          <p class="text-sm text-destructive" id={errorId()} role="alert">
-            {message()}
-          </p>
-        )}
+        {(message) => <FieldError id={errorId()}>{message()}</FieldError>}
       </Show>
-    </div>
+    </Field>
   )
 }

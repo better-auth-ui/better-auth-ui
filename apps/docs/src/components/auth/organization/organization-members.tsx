@@ -209,14 +209,16 @@ export function OrganizationMembers({
             <span className="capitalize">
               {roles?.[roleFilter] ?? roleFilter}
             </span>
-            <button
-              type="button"
+            <Button
               aria-label={organizationLocalization.clear}
-              className="inline-flex cursor-pointer items-center text-muted-foreground hover:text-foreground"
+              className="size-4 rounded-sm text-muted-foreground"
               onClick={() => setRoleFilter("all")}
+              size="icon-xs"
+              type="button"
+              variant="ghost"
             >
               <X className="size-3" />
-            </button>
+            </Button>
           </Badge>
         )}
 
@@ -287,10 +289,12 @@ function SortableTableHead({
 }) {
   return (
     <TableHead aria-sort={sortDirection ?? "none"}>
-      <button
-        type="button"
+      <Button
+        className="h-auto w-full justify-start p-0 font-medium hover:bg-transparent"
         onClick={onClick}
-        className="flex w-full items-center gap-2 text-left font-medium"
+        size="sm"
+        type="button"
+        variant="ghost"
       >
         {children}
 
@@ -302,7 +306,7 @@ function SortableTableHead({
             )}
           />
         )}
-      </button>
+      </Button>
     </TableHead>
   )
 }

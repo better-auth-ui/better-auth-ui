@@ -390,6 +390,7 @@
         "badge",
         "button",
         "card",
+        "empty",
         "item",
         "separator",
         "skeleton",
@@ -560,8 +561,11 @@
         "alert-dialog",
         "button",
         "card",
+        "dialog",
+        "empty",
         "field",
         "input",
+        "item",
         "separator",
         "skeleton",
         "spinner"
@@ -631,6 +635,7 @@
         "button",
         "card",
         "checkbox",
+        "dialog",
         "field",
         "input",
         "input-otp",
@@ -728,9 +733,12 @@
         "alert-dialog",
         "button",
         "card",
+        "dialog",
+        "empty",
         "field",
         "input",
         "input-group",
+        "item",
         "label",
         "separator",
         "skeleton",
@@ -839,6 +847,7 @@
         "button",
         "card",
         "dropdown-menu",
+        "item",
         "separator",
         "sonner",
         "spinner",
@@ -900,10 +909,13 @@
         "badge",
         "button",
         "card",
+        "dialog",
         "dropdown-menu",
+        "empty",
         "field",
         "input",
         "input-group",
+        "item",
         "label",
         "select",
         "separator",
@@ -1107,7 +1119,13 @@
         "@better-auth-ui/core@latest",
         "lucide-react"
       ],
-      "registryDependencies": ["card", "field", "radio-group", "tabs"],
+      "registryDependencies": [
+        "card",
+        "dropdown-menu",
+        "field",
+        "radio-group",
+        "tabs"
+      ],
       "files": [
         {
           "path": "src/lib/auth/auth-plugin.ts",
@@ -1549,6 +1567,7 @@
       "registryDependencies": [
         "button",
         "card",
+        "item",
         "skeleton",
         "sonner",
         "spinner"
@@ -1579,8 +1598,10 @@
         "lucide-react"
       ],
       "registryDependencies": [
+        "badge",
         "button",
         "card",
+        "item",
         "skeleton",
         "sonner",
         "spinner"

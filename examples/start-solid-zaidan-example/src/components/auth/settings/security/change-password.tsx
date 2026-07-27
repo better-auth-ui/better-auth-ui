@@ -15,6 +15,7 @@ import { shouldLoadAccounts } from "@/components/auth/settings/shared/helpers"
 import type { ChangePasswordFieldErrors } from "@/components/auth/settings/shared/types"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter } from "@/components/ui/card"
+import { Field, FieldError, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import {
   InputGroup,
@@ -22,7 +23,6 @@ import {
   InputGroupButton,
   InputGroupInput
 } from "@/components/ui/input-group"
-import { Label } from "@/components/ui/label"
 import { Skeleton } from "@/components/ui/skeleton"
 import { cn } from "@/lib/utils"
 
@@ -188,10 +188,10 @@ export function ChangePasswordSettings(
       <form onSubmit={submitChangePassword}>
         <Card>
           <CardContent class="flex flex-col gap-6">
-            <div class="grid gap-2">
-              <Label for="currentPassword">
+            <Field data-invalid={Boolean(fieldErrors().currentPassword)}>
+              <FieldLabel for="currentPassword">
                 {auth.localization.settings.currentPassword}
-              </Label>
+              </FieldLabel>
               <Show
                 fallback={<ChangePasswordSkeletonInput />}
                 when={session.data && !linkedAccounts.isPending}
@@ -250,18 +250,14 @@ export function ChangePasswordSettings(
                 </InputGroup>
               </Show>
               <Show when={fieldErrors().currentPassword}>
-                {(message) => (
-                  <p class="text-destructive text-sm" role="alert">
-                    {message()}
-                  </p>
-                )}
+                {(message) => <FieldError>{message()}</FieldError>}
               </Show>
-            </div>
+            </Field>
 
-            <div class="grid gap-2">
-              <Label for="newPassword">
+            <Field data-invalid={Boolean(fieldErrors().newPassword)}>
+              <FieldLabel for="newPassword">
                 {auth.localization.auth.newPassword}
-              </Label>
+              </FieldLabel>
               <Show
                 fallback={<ChangePasswordSkeletonInput />}
                 when={session.data && !linkedAccounts.isPending}
@@ -320,19 +316,15 @@ export function ChangePasswordSettings(
                 </InputGroup>
               </Show>
               <Show when={fieldErrors().newPassword}>
-                {(message) => (
-                  <p class="text-destructive text-sm" role="alert">
-                    {message()}
-                  </p>
-                )}
+                {(message) => <FieldError>{message()}</FieldError>}
               </Show>
-            </div>
+            </Field>
 
             <Show when={props.confirmPassword}>
-              <div class="grid gap-2">
-                <Label for="confirmPassword">
+              <Field data-invalid={Boolean(fieldErrors().confirmPassword)}>
+                <FieldLabel for="confirmPassword">
                   {auth.localization.auth.confirmPassword}
-                </Label>
+                </FieldLabel>
                 <Show
                   fallback={<ChangePasswordSkeletonInput />}
                   when={session.data && !linkedAccounts.isPending}
@@ -393,13 +385,9 @@ export function ChangePasswordSettings(
                   </InputGroup>
                 </Show>
                 <Show when={fieldErrors().confirmPassword}>
-                  {(message) => (
-                    <p class="text-destructive text-sm" role="alert">
-                      {message()}
-                    </p>
-                  )}
+                  {(message) => <FieldError>{message()}</FieldError>}
                 </Show>
-              </div>
+              </Field>
             </Show>
           </CardContent>
 

@@ -5,7 +5,7 @@ import { useAuth, useListOrganizations } from "@better-auth-ui/solid"
 import { createSignal, For, Show } from "solid-js"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
-import { Separator } from "@/components/ui/separator"
+import { Item, ItemGroup, ItemSeparator } from "@/components/ui/item"
 import { organizationPlugin } from "@/lib/auth/organization-plugin"
 import { CreateOrganizationDialog } from "./create-organization-dialog"
 import { OrganizationRow } from "./organization-row"
@@ -56,9 +56,11 @@ export function Organizations(props: OrganizationsProps = {}) {
               <Show
                 when={!organizations.isPending}
                 fallback={
-                  <div class="p-4">
-                    <OrganizationViewSkeleton />
-                  </div>
+                  <ItemGroup>
+                    <Item>
+                      <OrganizationViewSkeleton />
+                    </Item>
+                  </ItemGroup>
                 }
               >
                 <Show
@@ -69,19 +71,18 @@ export function Organizations(props: OrganizationsProps = {}) {
                     />
                   }
                 >
-                  <For each={organizations.data ?? []}>
-                    {(organization, index) => (
-                      <>
-                        <Show when={index() > 0}>
-                          <Separator />
-                        </Show>
-
-                        <div class="p-4">
+                  <ItemGroup class="gap-0">
+                    <For each={organizations.data ?? []}>
+                      {(organization, index) => (
+                        <>
+                          <Show when={index() > 0}>
+                            <ItemSeparator />
+                          </Show>
                           <OrganizationRow organization={organization} />
-                        </div>
-                      </>
-                    )}
-                  </For>
+                        </>
+                      )}
+                    </For>
+                  </ItemGroup>
                 </Show>
               </Show>
             </CardContent>

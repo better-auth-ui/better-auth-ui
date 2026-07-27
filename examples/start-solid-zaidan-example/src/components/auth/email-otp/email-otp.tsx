@@ -22,8 +22,13 @@ import {
   CardHeader,
   CardTitle
 } from "@/components/ui/card"
+import {
+  Field,
+  FieldError,
+  FieldGroup,
+  FieldLabel
+} from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
 import { Spinner } from "@/components/ui/spinner"
 import { emailOtpPlugin } from "@/lib/auth/email-otp-plugin"
 import { useResendCooldown } from "@/lib/auth/use-resend-cooldown"
@@ -133,14 +138,14 @@ export function EmailOtp(props: EmailOtpProps) {
           </Show>
 
           <form aria-label={auth.localization.auth.signIn} onSubmit={submit}>
-            <div class="grid gap-3">
+            <FieldGroup>
               <Show
                 when={codeSent()}
                 fallback={
-                  <>
-                    <Label for="email-otp-email">
+                  <Field data-invalid={Boolean(emailError())}>
+                    <FieldLabel for="email-otp-email">
                       {auth.localization.auth.email}
-                    </Label>
+                    </FieldLabel>
 
                     <Input
                       aria-invalid={Boolean(emailError())}
@@ -163,13 +168,9 @@ export function EmailOtp(props: EmailOtpProps) {
                     />
 
                     <Show when={emailError()}>
-                      {(message) => (
-                        <p class="text-sm text-destructive" role="alert">
-                          {message()}
-                        </p>
-                      )}
+                      {(message) => <FieldError>{message()}</FieldError>}
                     </Show>
-                  </>
+                  </Field>
                 }
               >
                 <OtpField
@@ -234,7 +235,7 @@ export function EmailOtp(props: EmailOtpProps) {
                   </Button>
                 </Show>
               </div>
-            </div>
+            </FieldGroup>
           </form>
 
           <Show

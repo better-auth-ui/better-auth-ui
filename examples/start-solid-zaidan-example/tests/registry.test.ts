@@ -743,15 +743,19 @@ describe("Solid registry isolation", () => {
 
   it("uses upstream Zaidan UI primitive dependencies in registry payloads", () => {
     const uiFiles = [
+      "src/components/ui/alert.tsx",
       "src/components/ui/button.tsx",
       "src/components/ui/card.tsx",
+      "src/components/ui/field.tsx",
       "src/components/ui/input.tsx",
       "src/components/ui/label.tsx",
       "src/lib/utils.ts"
     ]
     const upstreamFormUiDependencies = [
+      "@zaidan/alert",
       "@zaidan/button",
       "@zaidan/card",
+      "@zaidan/field",
       "@zaidan/input",
       "@zaidan/label"
     ]
@@ -759,35 +763,41 @@ describe("Solid registry isolation", () => {
       {
         path: "src/components/auth/username/sign-in-username.tsx",
         imports: [
+          'from "@/components/ui/alert"',
           'from "@/components/ui/button"',
-          'from "@/components/ui/card"'
+          'from "@/components/ui/card"',
+          'from "@/components/ui/field"',
+          'from "@/components/ui/input"'
         ]
       },
       {
         path: "src/components/auth/sign-up.tsx",
         imports: [
+          'from "@/components/ui/alert"',
           'from "@/components/ui/button"',
           'from "@/components/ui/card"',
-          'from "@/components/ui/input"',
-          'from "@/components/ui/label"'
+          'from "@/components/ui/field"',
+          'from "@/components/ui/input"'
         ]
       },
       {
         path: "src/components/auth/forgot-password.tsx",
         imports: [
+          'from "@/components/ui/alert"',
           'from "@/components/ui/button"',
           'from "@/components/ui/card"',
-          'from "@/components/ui/input"',
-          'from "@/components/ui/label"'
+          'from "@/components/ui/field"',
+          'from "@/components/ui/input"'
         ]
       },
       {
         path: "src/components/auth/reset-password.tsx",
         imports: [
+          'from "@/components/ui/alert"',
           'from "@/components/ui/button"',
           'from "@/components/ui/card"',
-          'from "@/components/ui/input"',
-          'from "@/components/ui/label"'
+          'from "@/components/ui/field"',
+          'from "@/components/ui/input"'
         ]
       }
     ]
@@ -886,20 +896,33 @@ describe("Solid registry isolation", () => {
 
   it("resolves generated UI primitive imports from bundled files or Zaidan dependencies", () => {
     const uiPrimitiveDependencies = {
+      alert: "@zaidan/alert",
+      "alert-dialog": "@zaidan/alert-dialog",
       avatar: "@zaidan/avatar",
       badge: "@zaidan/badge",
       button: "@zaidan/button",
+      calendar: "@zaidan/calendar",
       card: "@zaidan/card",
+      checkbox: "@zaidan/checkbox",
+      combobox: "@zaidan/combobox",
       dialog: "@zaidan/dialog",
       "dropdown-menu": "@zaidan/dropdown-menu",
+      empty: "@zaidan/empty",
+      field: "@zaidan/field",
       "input-group": "@zaidan/input-group",
       input: "@zaidan/input",
       item: "@zaidan/item",
       label: "@zaidan/label",
+      "native-select": "@zaidan/native-select",
+      popover: "@zaidan/popover",
+      "radio-group": "@zaidan/radio-group",
+      select: "@zaidan/select",
       separator: "@zaidan/separator",
       skeleton: "@zaidan/skeleton",
+      slider: "@zaidan/slider",
       sonner: "@zaidan/sonner",
       spinner: "@zaidan/spinner",
+      switch: "@zaidan/switch",
       table: "@zaidan/table",
       tabs: "@zaidan/tabs",
       textarea: "@zaidan/textarea",

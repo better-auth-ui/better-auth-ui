@@ -20,8 +20,9 @@ import {
   DialogHeader,
   DialogTitle
 } from "@/components/ui/dialog"
+import { Field, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
+import { NativeSelect, NativeSelectOption } from "@/components/ui/native-select"
 import { organizationPlugin } from "@/lib/auth/organization-plugin"
 
 export type InviteMemberDialogProps = {
@@ -135,10 +136,10 @@ export function InviteMemberDialog(props: InviteMemberDialogProps) {
             </DialogDescription>
           </DialogHeader>
 
-          <div class="grid gap-2">
-            <Label for="invite-member-email">
+          <Field>
+            <FieldLabel for="invite-member-email">
               {auth.localization.auth.email}
-            </Label>
+            </FieldLabel>
             <Input
               autofocus
               disabled={inviteMember.isPending}
@@ -149,22 +150,26 @@ export function InviteMemberDialog(props: InviteMemberDialogProps) {
               type="email"
               value={email()}
             />
-          </div>
+          </Field>
 
-          <div class="grid gap-2">
-            <Label for="invite-member-role">{localization().role}</Label>
-            <select
-              class="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm outline-none transition-colors focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50"
+          <Field>
+            <FieldLabel for="invite-member-role">
+              {localization().role}
+            </FieldLabel>
+            <NativeSelect
+              class="w-full"
               disabled={inviteMember.isPending}
               id="invite-member-role"
               onChange={(event) => setRole(event.currentTarget.value)}
               value={role()}
             >
               <For each={Object.entries(roles())}>
-                {([value, label]) => <option value={value}>{label}</option>}
+                {([value, label]) => (
+                  <NativeSelectOption value={value}>{label}</NativeSelectOption>
+                )}
               </For>
-            </select>
-          </div>
+            </NativeSelect>
+          </Field>
 
           <DialogFooter>
             <DialogClose

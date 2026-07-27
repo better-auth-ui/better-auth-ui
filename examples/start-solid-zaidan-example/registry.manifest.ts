@@ -32,10 +32,12 @@ const solidDependencies = [
 ]
 
 const zaidanUiDependencies = [
+  "@corvu/calendar",
   "@corvu/otp-field",
   "@kobalte/core",
   "class-variance-authority",
   "clsx",
+  "date-fns",
   "tailwind-merge"
 ]
 
@@ -54,24 +56,39 @@ const zaidanThemeUiRegistryDependencies = [
   ...zaidanStyleSetupRegistryDependencies,
   "@zaidan/card",
   "@zaidan/dropdown-menu",
+  "@zaidan/field",
+  "@zaidan/radio-group",
   "@zaidan/tabs"
 ]
 
 const zaidanUiRegistryDependencies = [
+  "@zaidan/alert",
+  "@zaidan/alert-dialog",
   "@zaidan/avatar",
   "@zaidan/badge",
   "@zaidan/button",
+  "@zaidan/calendar",
   "@zaidan/card",
+  "@zaidan/checkbox",
+  "@zaidan/combobox",
   "@zaidan/dialog",
   "@zaidan/dropdown-menu",
+  "@zaidan/empty",
+  "@zaidan/field",
   "@zaidan/input-group",
   "@zaidan/input",
   "@zaidan/item",
   "@zaidan/label",
+  "@zaidan/native-select",
+  "@zaidan/popover",
+  "@zaidan/radio-group",
+  "@zaidan/select",
   "@zaidan/separator",
   "@zaidan/skeleton",
+  "@zaidan/slider",
   "@zaidan/sonner",
   "@zaidan/spinner",
+  "@zaidan/switch",
   "@zaidan/table",
   "@zaidan/tabs",
   "@zaidan/textarea"

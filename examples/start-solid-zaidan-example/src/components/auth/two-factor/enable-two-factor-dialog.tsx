@@ -21,8 +21,8 @@ import {
   DialogHeader,
   DialogTitle
 } from "@/components/ui/dialog"
+import { Field, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
 import { Spinner } from "@/components/ui/spinner"
 import { twoFactorPlugin } from "@/lib/auth/two-factor-plugin"
 import { useTwoFactorPasswordRequirement } from "@/lib/auth/use-two-factor-password"
@@ -154,10 +154,10 @@ export function EnableTwoFactorDialog(props: {
         </DialogHeader>
 
         <Show when={step() === "password" && requiresPassword()}>
-          <div class="grid gap-2">
-            <Label for="enable-two-factor-password">
+          <Field>
+            <FieldLabel for="enable-two-factor-password">
               {auth.localization.auth.password}
-            </Label>
+            </FieldLabel>
 
             <Input
               autocomplete="current-password"
@@ -169,7 +169,7 @@ export function EnableTwoFactorDialog(props: {
               required
               type="password"
             />
-          </div>
+          </Field>
         </Show>
 
         <Show when={step() === "verify"}>

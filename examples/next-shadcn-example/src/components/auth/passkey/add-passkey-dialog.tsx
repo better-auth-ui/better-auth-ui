@@ -8,18 +8,16 @@ import {
 } from "@better-auth-ui/react"
 import { Fingerprint } from "lucide-react"
 import type { SyntheticEvent } from "react"
-
+import { Button, buttonVariants } from "@/components/ui/button"
 import {
-  AlertDialog,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogMedia,
-  AlertDialogTitle
-} from "@/components/ui/alert-dialog"
-import { Button } from "@/components/ui/button"
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle
+} from "@/components/ui/dialog"
 import { Field, FieldError, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import { Spinner } from "@/components/ui/spinner"
@@ -53,22 +51,19 @@ export function AddPasskeyDialog({
   }
 
   return (
-    <AlertDialog open={open} onOpenChange={onOpenChange}>
-      <AlertDialogContent>
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent>
         <form onSubmit={handleSubmit} className="flex flex-col gap-6">
-          <AlertDialogHeader>
-            <AlertDialogMedia>
+          <DialogHeader>
+            <DialogTitle>
               <Fingerprint />
-            </AlertDialogMedia>
-
-            <AlertDialogTitle>
               {passkeyLocalization.addPasskey}
-            </AlertDialogTitle>
+            </DialogTitle>
 
-            <AlertDialogDescription>
+            <DialogDescription>
               {passkeyLocalization.passkeysDescription}
-            </AlertDialogDescription>
-          </AlertDialogHeader>
+            </DialogDescription>
+          </DialogHeader>
 
           <Field>
             <FieldLabel htmlFor="passkey-name">
@@ -86,19 +81,23 @@ export function AddPasskeyDialog({
             <FieldError />
           </Field>
 
-          <AlertDialogFooter>
-            <AlertDialogCancel disabled={isAdding}>
+          <DialogFooter>
+            <DialogClose
+              className={buttonVariants({ variant: "outline" })}
+              disabled={isAdding}
+              type="button"
+            >
               {localization.settings.cancel}
-            </AlertDialogCancel>
+            </DialogClose>
 
             <Button type="submit" disabled={isAdding}>
               {isAdding && <Spinner />}
 
               {passkeyLocalization.addPasskey}
             </Button>
-          </AlertDialogFooter>
+          </DialogFooter>
         </form>
-      </AlertDialogContent>
-    </AlertDialog>
+      </DialogContent>
+    </Dialog>
   )
 }

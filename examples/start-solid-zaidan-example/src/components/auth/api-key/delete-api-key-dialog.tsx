@@ -7,17 +7,18 @@ import {
 import { createMutation } from "@tanstack/solid-query"
 import { Key } from "lucide-solid"
 import type { ListedApiKey } from "@/components/auth/settings/shared/types"
-import { Button } from "@/components/ui/button"
 import {
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle
-} from "@/components/ui/dialog"
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogMedia,
+  AlertDialogTitle
+} from "@/components/ui/alert-dialog"
+import { Button } from "@/components/ui/button"
+import { Field, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
 
 export function DeleteApiKeyDialog(props: {
   apiKey: ListedApiKey
@@ -40,21 +41,21 @@ export function DeleteApiKeyDialog(props: {
   }
 
   return (
-    <DialogContent>
-      <DialogHeader>
-        <div class="flex size-10 items-center justify-center rounded-md bg-muted">
-          <Key class="size-4.5" />
-        </div>
-        <DialogTitle>{apiKeyLocalization.deleteApiKey}</DialogTitle>
-        <DialogDescription>
+    <AlertDialogContent>
+      <AlertDialogHeader>
+        <AlertDialogMedia>
+          <Key />
+        </AlertDialogMedia>
+        <AlertDialogTitle>{apiKeyLocalization.deleteApiKey}</AlertDialogTitle>
+        <AlertDialogDescription>
           {apiKeyLocalization.deleteApiKeyWarning}
-        </DialogDescription>
-      </DialogHeader>
+        </AlertDialogDescription>
+      </AlertDialogHeader>
 
-      <div class="grid gap-2">
-        <Label for={previewId()}>
+      <Field>
+        <FieldLabel for={previewId()}>
           {props.apiKey.name || apiKeyLocalization.apiKey}
-        </Label>
+        </FieldLabel>
         <Input
           class="font-mono text-xs"
           disabled
@@ -62,17 +63,12 @@ export function DeleteApiKeyDialog(props: {
           readonly
           value={preview()}
         />
-      </div>
+      </Field>
 
-      <DialogFooter>
-        <DialogClose
-          as={Button}
-          disabled={deleteApiKey.isPending}
-          type="button"
-          variant="outline"
-        >
+      <AlertDialogFooter>
+        <AlertDialogCancel disabled={deleteApiKey.isPending} type="button">
           {auth.localization.settings.cancel}
-        </DialogClose>
+        </AlertDialogCancel>
         <Button
           disabled={deleteApiKey.isPending}
           onClick={deleteKey}
@@ -83,7 +79,7 @@ export function DeleteApiKeyDialog(props: {
             ? `${apiKeyLocalization.deleteApiKey}…`
             : apiKeyLocalization.deleteApiKey}
         </Button>
-      </DialogFooter>
-    </DialogContent>
+      </AlertDialogFooter>
+    </AlertDialogContent>
   )
 }

@@ -10,16 +10,16 @@ import {
 } from "@better-auth-ui/solid"
 import { createSignal, Show } from "solid-js"
 import { toast } from "solid-sonner"
-import { Button } from "@/components/ui/button"
 import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle
-} from "@/components/ui/dialog"
+  AlertDialog,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle
+} from "@/components/ui/alert-dialog"
+import { Button } from "@/components/ui/button"
 import { organizationPlugin } from "@/lib/auth/organization-plugin"
 
 export type LeaveOrganizationProps = {
@@ -63,23 +63,23 @@ function LeaveOrganizationDialog(props: {
   }
 
   return (
-    <Dialog open={props.open} onOpenChange={props.onOpenChange}>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>{props.localization.leaveOrganization}</DialogTitle>
-          <DialogDescription>
+    <AlertDialog open={props.open} onOpenChange={props.onOpenChange}>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>
+            {props.localization.leaveOrganization}
+          </AlertDialogTitle>
+          <AlertDialogDescription>
             {props.localization.leaveOrganizationDescription}
-          </DialogDescription>
-        </DialogHeader>
-        <DialogFooter>
-          <DialogClose
-            as={Button}
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel
             disabled={leaveOrganization.isPending}
             type="button"
-            variant="outline"
           >
             {auth.localization.settings.cancel}
-          </DialogClose>
+          </AlertDialogCancel>
           <Button
             disabled={leaveOrganization.isPending || !activeOrganization.data}
             onClick={handleLeave}
@@ -88,9 +88,9 @@ function LeaveOrganizationDialog(props: {
           >
             {props.localization.leaveOrganization}
           </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
   )
 }
 

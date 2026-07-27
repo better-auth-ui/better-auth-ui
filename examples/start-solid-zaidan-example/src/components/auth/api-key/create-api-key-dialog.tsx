@@ -18,8 +18,8 @@ import {
   DialogHeader,
   DialogTitle
 } from "@/components/ui/dialog"
+import { Field, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
 
 export function CreateApiKeyDialog(props: {
   organizationId?: string
@@ -74,8 +74,10 @@ export function CreateApiKeyDialog(props: {
             </DialogDescription>
           </DialogHeader>
 
-          <div class="grid gap-2">
-            <Label for="api-key-name">{apiKeyLocalization.name}</Label>
+          <Field>
+            <FieldLabel for="api-key-name">
+              {apiKeyLocalization.name}
+            </FieldLabel>
             <Input
               autofocus
               disabled={createApiKey.isPending}
@@ -83,7 +85,7 @@ export function CreateApiKeyDialog(props: {
               name="name"
               placeholder={auth.localization.settings.optional}
             />
-          </div>
+          </Field>
 
           <DialogFooter>
             <DialogClose

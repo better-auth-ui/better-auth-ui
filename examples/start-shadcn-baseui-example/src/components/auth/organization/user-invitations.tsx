@@ -6,9 +6,10 @@ import {
   useAuthPlugin,
   useListUserInvitations
 } from "@better-auth-ui/react"
+import { Fragment } from "react"
 
 import { Card, CardContent } from "@/components/ui/card"
-import { Separator } from "@/components/ui/separator"
+import { ItemGroup, ItemSeparator } from "@/components/ui/item"
 import { organizationPlugin } from "@/lib/auth/organization-plugin"
 import { UserInvitationRow } from "./user-invitation-row"
 import { UserInvitationRowSkeleton } from "./user-invitation-row-skeleton"
@@ -41,21 +42,20 @@ export function UserInvitations({ className }: UserInvitationsProps) {
         <Card className="p-0">
           <CardContent className="p-0">
             {isPending ? (
-              <div className="p-4">
+              <ItemGroup>
                 <UserInvitationRowSkeleton />
-              </div>
+              </ItemGroup>
             ) : !invitations?.length ? (
               <UserInvitationsEmpty />
             ) : (
-              invitations.map((invitation, index) => (
-                <div key={invitation.id}>
-                  {index > 0 && <Separator />}
-
-                  <div className="p-4">
+              <ItemGroup className="gap-0">
+                {invitations.map((invitation, index) => (
+                  <Fragment key={invitation.id}>
+                    {index > 0 && <ItemSeparator />}
                     <UserInvitationRow invitation={invitation} />
-                  </div>
-                </div>
-              ))
+                  </Fragment>
+                ))}
+              </ItemGroup>
             )}
           </CardContent>
         </Card>

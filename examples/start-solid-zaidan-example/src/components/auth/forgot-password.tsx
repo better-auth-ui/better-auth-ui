@@ -8,10 +8,11 @@ import { createMutation } from "@tanstack/solid-query"
 import { Link } from "@tanstack/solid-router"
 import { createSignal, Show } from "solid-js"
 import { RESET_LINK_SENT_STORAGE_KEY } from "@/components/auth/reset-link-sent"
+import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Field, FieldError, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
 import { cn } from "@/lib/utils"
 
 export type ForgotPasswordProps = {
@@ -62,10 +63,10 @@ export function ForgotPassword(props: ForgotPasswordProps) {
       <CardContent>
         <form aria-label="Forgot password" onSubmit={submitPasswordReset}>
           <div class="flex flex-col gap-6">
-            <div class="grid gap-3">
-              <Label for="forgot-password-email">
+            <Field>
+              <FieldLabel for="forgot-password-email">
                 {auth.localization.auth.email}
-              </Label>
+              </FieldLabel>
               <Input
                 aria-invalid={Boolean(emailError())}
                 id="forgot-password-email"
@@ -85,13 +86,9 @@ export function ForgotPassword(props: ForgotPasswordProps) {
               />
 
               <Show when={emailError()}>
-                {(message) => (
-                  <p class="text-sm text-destructive" role="alert">
-                    {message()}
-                  </p>
-                )}
+                {(message) => <FieldError>{message()}</FieldError>}
               </Show>
-            </div>
+            </Field>
             <Show when={captchaComponent()} keyed>
               {(Captcha) => <Captcha />}
             </Show>
@@ -101,7 +98,11 @@ export function ForgotPassword(props: ForgotPasswordProps) {
                 : auth.localization.auth.sendResetLink}
             </Button>
             <Show when={requestReset.isError}>
-              <p role="alert">Unable to send a reset link. Try again.</p>
+              <Alert variant="destructive">
+                <AlertDescription>
+                  Unable to send a reset link. Try again.
+                </AlertDescription>
+              </Alert>
             </Show>
           </div>
         </form>

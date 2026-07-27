@@ -7,17 +7,18 @@ import { useAuth, useDeleteOrganization } from "@better-auth-ui/solid"
 import type { Organization } from "better-auth/client"
 import { TriangleAlert } from "lucide-solid"
 import { toast } from "solid-sonner"
+import {
+  AlertDialog,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogMedia,
+  AlertDialogTitle
+} from "@/components/ui/alert-dialog"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
-import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle
-} from "@/components/ui/dialog"
 import { organizationPlugin } from "@/lib/auth/organization-plugin"
 import { OrganizationLogo } from "./organization-logo"
 
@@ -60,18 +61,20 @@ export function DeleteOrganizationDialog(props: DeleteOrganizationDialogProps) {
   }
 
   return (
-    <Dialog open={props.open} onOpenChange={props.onOpenChange}>
-      <DialogContent>
+    <AlertDialog open={props.open} onOpenChange={props.onOpenChange}>
+      <AlertDialogContent>
         <form class="flex flex-col gap-6" onSubmit={handleSubmit}>
-          <DialogHeader>
-            <div class="flex size-10 items-center justify-center rounded-md bg-destructive/10 text-destructive">
-              <TriangleAlert class="size-4.5" />
-            </div>
-            <DialogTitle>{props.localization.deleteOrganization}</DialogTitle>
-            <DialogDescription>
+          <AlertDialogHeader>
+            <AlertDialogMedia>
+              <TriangleAlert />
+            </AlertDialogMedia>
+            <AlertDialogTitle>
+              {props.localization.deleteOrganization}
+            </AlertDialogTitle>
+            <AlertDialogDescription>
               {props.localization.deleteOrganizationDescription}
-            </DialogDescription>
-          </DialogHeader>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
 
           <Card>
             <CardContent>
@@ -89,15 +92,13 @@ export function DeleteOrganizationDialog(props: DeleteOrganizationDialogProps) {
             </CardContent>
           </Card>
 
-          <DialogFooter>
-            <DialogClose
-              as={Button}
+          <AlertDialogFooter>
+            <AlertDialogCancel
               disabled={deleteOrganization.isPending}
               type="button"
-              variant="outline"
             >
               {auth.localization.settings.cancel}
-            </DialogClose>
+            </AlertDialogCancel>
             <Button
               disabled={deleteOrganization.isPending}
               type="submit"
@@ -105,9 +106,9 @@ export function DeleteOrganizationDialog(props: DeleteOrganizationDialogProps) {
             >
               {props.localization.deleteOrganization}
             </Button>
-          </DialogFooter>
+          </AlertDialogFooter>
         </form>
-      </DialogContent>
-    </Dialog>
+      </AlertDialogContent>
+    </AlertDialog>
   )
 }
