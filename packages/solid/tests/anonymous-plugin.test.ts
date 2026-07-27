@@ -1,3 +1,4 @@
+import { authQueryKeys } from "@better-auth-ui/core"
 import { anonymousMutationKeys } from "@better-auth-ui/core/plugins"
 import { describe, expect, it, vi } from "vitest"
 import { signInAnonymousOptions } from "../src/mutations/anonymous/sign-in-anonymous-mutation"
@@ -10,6 +11,7 @@ describe("anonymous mutation (Solid)", () => {
     } as never)
 
     expect(options.mutationKey).toEqual(anonymousMutationKeys.signIn)
+    expect(options.meta?.awaits).toEqual([authQueryKeys.session])
 
     await expect(
       options.mutationFn?.({
