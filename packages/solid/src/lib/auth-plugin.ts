@@ -1,9 +1,20 @@
-import type { AuthPluginBase } from "@better-auth-ui/core"
+import type { AuthPluginBase, AuthView } from "@better-auth-ui/core"
 import type { Component } from "solid-js"
 
 export type CaptchaComponent = Component
 
+export type AuthPromptProps = {
+  view: AuthView
+}
+
+export type AuthPrompt = {
+  id: string
+  component: Component<AuthPromptProps>
+}
+
 export type SolidAuthPlugin = AuthPluginBase & {
+  /** Headless prompts mounted by authentication views. */
+  authPrompts?: AuthPrompt[]
   /** Captcha widget rendered above submit buttons in auth forms. */
   captchaComponent?: CaptchaComponent
   /** Allow app-owned copied components to add Solid-specific plugin slots. */

@@ -1,4 +1,7 @@
-import type { ApiKeyAuthClient } from "@better-auth-ui/core/plugins/api-key"
+import {
+  type ApiKeyAuthClient,
+  apiKeyExpirationDaysToSeconds
+} from "@better-auth-ui/core/plugins/api-key"
 import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
 import { useCreateApiKey } from "@better-auth-ui/react/plugins/api-key"
 import { Key } from "@gravity-ui/icons"
@@ -9,6 +12,8 @@ import {
   Form,
   Input,
   Label,
+  ListBox,
+  Select,
   Spinner,
   TextField
 } from "@heroui/react"
@@ -31,7 +36,8 @@ export function CreateApiKeyDialog({
   organizationId
 }: CreateApiKeyDialogProps) {
   const { authClient, localization } = useAuth()
-  const { localization: apiKeyLocalization } = useAuthPlugin(apiKeyPlugin)
+  const { keyExpiration, localization: apiKeyLocalization } =
+    useAuthPlugin(apiKeyPlugin)
 
   const { mutate: createApiKey, isPending: isCreating } = useCreateApiKey(
     authClient as ApiKeyAuthClient
@@ -64,18 +70,22 @@ export function CreateApiKeyDialog({
 
     const formData = new FormData(e.target as HTMLFormElement)
     const name = (formData.get("name") as string)?.trim()
-
-    const payload =
-      name || organizationId
-        ? {
-            ...(name ? { name } : {}),
-            ...(organizationId
-              ? { organizationId, configId: "organization" }
-              : {})
-          }
+    const expiration = formData.get("expiration")
+    const expirationDays =
+      typeof expiration === "string" && expiration !== "never"
+        ? Number(expiration)
         : undefined
+    const expiresIn = expirationDays
+      ? apiKeyExpirationDaysToSeconds(expirationDays)
+      : undefined
 
-    createApiKey(payload, {
+    const payload = {
+      ...(name ? { name } : {}),
+      ...(expiresIn ? { expiresIn } : {}),
+      ...(organizationId ? { organizationId, configId: "organization" } : {})
+    }
+
+    createApiKey(Object.keys(payload).length > 0 ? payload : undefined, {
       onSuccess: (result) => {
         handleOpenChange(false)
         setKeyName(name)
@@ -108,22 +118,72 @@ export function CreateApiKeyDialog({
                   {apiKeyLocalization.apiKeysDescription}
                 </p>
 
-                <TextField
-                  className="mt-4"
-                  id="name"
-                  name="name"
-                  isDisabled={isCreating}
-                >
-                  <Label>{apiKeyLocalization.name}</Label>
+                <div className="mt-4 flex flex-col gap-4">
+                  <TextField id="name" name="name" isDisabled={isCreating}>
+                    <Label>{apiKeyLocalization.name}</Label>
 
-                  <Input
-                    autoFocus
-                    placeholder={localization.settings.optional}
-                    variant="secondary"
-                  />
+                    <Input
+                      autoFocus
+                      placeholder={localization.settings.optional}
+                      variant="secondary"
+                    />
 
-                  <FieldError />
-                </TextField>
+                    <FieldError />
+                  </TextField>
+
+                  {keyExpiration ? (
+                    <Select
+                      defaultValue={
+                        keyExpiration.defaultInterval === null
+                          ? "never"
+                          : String(keyExpiration.defaultInterval)
+                      }
+                      fullWidth
+                      isDisabled={isCreating}
+                      name="expiration"
+                      variant="secondary"
+                    >
+                      <Label>{apiKeyLocalization.expiration}</Label>
+
+                      <Select.Trigger>
+                        <Select.Value />
+                        <Select.Indicator />
+                      </Select.Trigger>
+
+                      <Select.Popover>
+                        <ListBox>
+                          {keyExpiration.intervals.map((days) => (
+                            <ListBox.Item
+                              id={String(days)}
+                              key={days}
+                              textValue={`${days.toLocaleString()} ${
+                                days === 1
+                                  ? apiKeyLocalization.day
+                                  : apiKeyLocalization.days
+                              }`}
+                            >
+                              {days.toLocaleString()}{" "}
+                              {days === 1
+                                ? apiKeyLocalization.day
+                                : apiKeyLocalization.days}
+                              <ListBox.ItemIndicator />
+                            </ListBox.Item>
+                          ))}
+
+                          {keyExpiration.allowNever ? (
+                            <ListBox.Item
+                              id="never"
+                              textValue={apiKeyLocalization.never}
+                            >
+                              {apiKeyLocalization.never}
+                              <ListBox.ItemIndicator />
+                            </ListBox.Item>
+                          ) : null}
+                        </ListBox>
+                      </Select.Popover>
+                    </Select>
+                  ) : null}
+                </div>
               </AlertDialog.Body>
 
               <AlertDialog.Footer>

@@ -2,7 +2,12 @@ import {
   authMutationKeys,
   parseAdditionalFieldValue
 } from "@better-auth-ui/core"
-import { useAuth, useFetchOptions, useSignUpEmail } from "@better-auth-ui/react"
+import {
+  AuthPrompts,
+  useAuth,
+  useFetchOptions,
+  useSignUpEmail
+} from "@better-auth-ui/react"
 import { Eye, EyeSlash } from "@gravity-ui/icons"
 import {
   Button,
@@ -168,6 +173,7 @@ export function SignUp({
       className={cn("w-full max-w-sm gap-4 md:p-6", className)}
       variant={variant}
     >
+      <AuthPrompts view="signUp" />
       <Card.Header>
         <Card.Title className="text-xl font-semibold mb-1">
           {localization.auth.signUp}

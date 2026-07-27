@@ -209,7 +209,9 @@ const expectedSolidRegistryPayloadNames = [
   "auth-provider",
   "additional-field",
   "sign-in",
+  "anonymous",
   "last-login-method",
+  "one-tap",
   "sign-up",
   "email-otp",
   "magic-link",
@@ -2481,6 +2483,7 @@ describe("Solid registry isolation", () => {
       ".",
       "./email",
       "./plugins/admin",
+      "./plugins/anonymous",
       "./plugins/api-key",
       "./plugins/captcha",
       "./plugins/device-authorization",
@@ -2488,6 +2491,7 @@ describe("Solid registry isolation", () => {
       "./plugins/magic-link",
       "./plugins/multi-session",
       "./plugins/oauth-provider",
+      "./plugins/one-tap",
       "./plugins/organization",
       "./plugins/passkey",
       "./plugins/two-factor",
@@ -2794,6 +2798,7 @@ describe("Solid registry isolation", () => {
     ])
     expect(zaidanPluginsMeta.pages).toEqual([
       "admin",
+      "anonymous",
       "api-key",
       "captcha",
       "delete-user",
@@ -2802,6 +2807,7 @@ describe("Solid registry isolation", () => {
       "last-login-method",
       "magic-link",
       "multi-session",
+      "one-tap",
       "organization",
       "oauth-provider",
       "passkey",
@@ -3084,7 +3090,9 @@ describe("Solid registry isolation", () => {
       "magic-link",
       "oauth-provider",
       "device-authorization",
-      "theme"
+      "theme",
+      "anonymous",
+      "one-tap"
     ]
     const runtimeOnlyPluginNames = ["captcha"]
     const hiddenComponentDocNames = ["organization"]
@@ -3233,7 +3241,9 @@ describe("Solid registry isolation", () => {
         name === "device-authorization" ||
         name === "multi-session" ||
         name === "theme" ||
-        name === "username"
+        name === "username" ||
+        name === "anonymous" ||
+        name === "one-tap"
       ) {
         expect(page, `${name} should keep setup-driven structure`).toContain(
           "## Setup"
@@ -3251,7 +3261,8 @@ describe("Solid registry isolation", () => {
         name !== "delete-user" &&
         name !== "last-login-method" &&
         name !== "theme" &&
-        name !== "username"
+        name !== "username" &&
+        name !== "one-tap"
       ) {
         expect(page, `plugin ${name} should link Solid runtime docs`).toContain(
           "/docs/solid"

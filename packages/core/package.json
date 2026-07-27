@@ -1,6 +1,6 @@
 {
   "name": "@better-auth-ui/core",
-  "version": "1.6.37",
+  "version": "1.6.39",
   "type": "module",
   "scripts": {
     "build": "vite build",
@@ -22,6 +22,11 @@
       "src": "./src/plugins/admin/index.ts",
       "types": "./dist/plugins/admin/index.d.ts",
       "import": "./dist/plugins/admin/index.js"
+    },
+    "./plugins/anonymous": {
+      "src": "./src/plugins/anonymous/index.ts",
+      "types": "./dist/plugins/anonymous/index.d.ts",
+      "import": "./dist/plugins/anonymous/index.js"
     },
     "./server": {
       "src": "./src/server.ts",
@@ -82,6 +87,11 @@
       "src": "./src/plugins/oauth-provider/index.ts",
       "types": "./dist/plugins/oauth-provider/index.d.ts",
       "import": "./dist/plugins/oauth-provider/index.js"
+    },
+    "./plugins/one-tap": {
+      "src": "./src/plugins/one-tap/index.ts",
+      "types": "./dist/plugins/one-tap/index.d.ts",
+      "import": "./dist/plugins/one-tap/index.js"
     },
     "./plugins/organization": {
       "src": "./src/plugins/organization/index.ts",

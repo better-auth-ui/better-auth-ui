@@ -6,6 +6,7 @@ import { AuthProvider } from "@/components/auth/auth-provider"
 import type { ListedApiKey } from "@/components/auth/settings/shared/types"
 import { Card, CardContent } from "@/components/ui/card"
 import { ItemSeparator } from "@/components/ui/item"
+import { apiKeyPlugin } from "@/lib/auth/api-key-plugin"
 
 const mockAuthClient = {
   apiKey: {
@@ -18,19 +19,21 @@ const apiKeys = [
     id: "key_live_docs",
     name: "Production API",
     start: "bau_live_",
-    createdAt: new Date("2026-01-12T10:30:00Z")
+    createdAt: new Date("2026-01-12T10:30:00Z"),
+    expiresAt: new Date("2026-10-10T10:30:00Z")
   },
   {
     id: "key_test_docs",
     name: "Test integration",
     start: "bau_test_",
-    createdAt: new Date("2026-02-04T16:45:00Z")
+    createdAt: new Date("2026-02-04T16:45:00Z"),
+    expiresAt: null
   }
 ] as unknown as ListedApiKey[]
 
 function ApiKeyStory() {
   return (
-    <AuthProvider authClient={mockAuthClient}>
+    <AuthProvider authClient={mockAuthClient} plugins={[apiKeyPlugin()]}>
       {() => (
         <main class="mx-auto flex min-h-[420px] w-full max-w-xl items-center justify-center bg-background p-6 text-foreground">
           <div class="flex w-full flex-col gap-6">

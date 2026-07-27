@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest"
 import * as admin from "../src/plugins/admin"
+import * as anonymous from "../src/plugins/anonymous"
 import * as apiKey from "../src/plugins/api-key"
 import * as captcha from "../src/plugins/captcha"
 import * as deviceAuthorization from "../src/plugins/device-authorization"
@@ -7,6 +8,7 @@ import * as emailOtp from "../src/plugins/email-otp"
 import * as magicLink from "../src/plugins/magic-link"
 import * as multiSession from "../src/plugins/multi-session"
 import * as oauthProvider from "../src/plugins/oauth-provider"
+import * as oneTap from "../src/plugins/one-tap"
 import * as organization from "../src/plugins/organization"
 import * as passkey from "../src/plugins/passkey"
 import * as twoFactor from "../src/plugins/two-factor"
@@ -28,6 +30,9 @@ describe("Solid plugin subpath exports", () => {
     expect(multiSession).toHaveProperty("useListDeviceSessions")
 
     expect(captcha).toHaveProperty("captchaPlugin")
+    expect(anonymous).toHaveProperty("useSignInAnonymous")
+    expect(oneTap).toHaveProperty("oneTapPlugin")
+    expect(oneTap).toHaveProperty("usePromptOneTap")
     expect(admin).toHaveProperty("useStopImpersonating")
     expect(deviceAuthorization).toHaveProperty("useApproveDevice")
     expect(deviceAuthorization).toHaveProperty("useDenyDevice")
@@ -52,6 +57,8 @@ describe("Solid plugin subpath exports", () => {
 
   it("keeps core-owned mutation factories out of framework plugin entrypoints", () => {
     expect(apiKey).not.toHaveProperty("createApiKeyOptions")
+    expect(anonymous).not.toHaveProperty("signInAnonymousOptions")
+    expect(oneTap).not.toHaveProperty("promptOneTapOptions")
     expect(admin).not.toHaveProperty("stopImpersonatingOptions")
     expect(deviceAuthorization).not.toHaveProperty("approveDeviceOptions")
     expect(deviceAuthorization).not.toHaveProperty("denyDeviceOptions")
@@ -86,6 +93,8 @@ describe("Solid plugin subpath exports", () => {
     const solid = await import("../src")
 
     expect(solid).not.toHaveProperty("useAddPasskey")
+    expect(solid).not.toHaveProperty("useSignInAnonymous")
+    expect(solid).not.toHaveProperty("oneTapPlugin")
     expect(solid).not.toHaveProperty("useCancelInvitation")
     expect(solid).not.toHaveProperty("useListApiKeys")
     expect(solid).not.toHaveProperty("useListPasskeys")

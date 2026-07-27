@@ -186,7 +186,7 @@ const customFetchImpl: typeof fetch = async (input, _init) => {
             requestCount: 0,
             remaining: null,
             lastRequest: null,
-            expiresAt: null,
+            expiresAt: new Date(now + 86_400_000 * 30).toISOString(),
             createdAt: new Date(now - 86_400_000 * 7).toISOString(),
             updatedAt: new Date(now - 86_400_000 * 7).toISOString(),
             permissions: null,

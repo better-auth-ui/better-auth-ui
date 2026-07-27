@@ -5,7 +5,12 @@ import {
   usernameLocalization
 } from "@better-auth-ui/core/plugins/username"
 import type { AuthPlugin } from "@better-auth-ui/solid"
-import { useAuth, useFetchOptions, useSignInEmail } from "@better-auth-ui/solid"
+import {
+  AuthPrompts,
+  useAuth,
+  useFetchOptions,
+  useSignInEmail
+} from "@better-auth-ui/solid"
 import { useSignInUsername } from "@better-auth-ui/solid/plugins/username"
 import { useQueryClient } from "@tanstack/solid-query"
 import { Link } from "@tanstack/solid-router"
@@ -118,6 +123,7 @@ export function SignInUsername(props: SignInUsernameProps) {
 
   return (
     <Card class={cn("w-full max-w-sm", props.class)}>
+      <AuthPrompts view="signIn" />
       <CardHeader>
         <CardTitle class="text-xl font-semibold">
           {auth.localization.auth.signIn}

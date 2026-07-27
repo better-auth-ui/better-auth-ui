@@ -1,9 +1,11 @@
-import type { ApiKeyAuthClient } from "@better-auth-ui/core/plugins/api-key"
-import { apiKeyLocalization } from "@better-auth-ui/core/plugins/api-key"
-import { useAuth } from "@better-auth-ui/solid"
+import {
+  type ApiKeyAuthClient,
+  apiKeyExpirationDaysToSeconds
+} from "@better-auth-ui/core/plugins/api-key"
+import { useAuth, useAuthPlugin } from "@better-auth-ui/solid"
 import { useCreateApiKey } from "@better-auth-ui/solid/plugins/api-key"
 import { Key } from "lucide-solid"
-import { createSignal } from "solid-js"
+import { createSignal, Show } from "solid-js"
 import { NewApiKeyDialog } from "@/components/auth/api-key/new-api-key-dialog"
 import { Button } from "@/components/ui/button"
 import {
@@ -15,14 +17,58 @@ import {
   DialogHeader,
   DialogTitle
 } from "@/components/ui/dialog"
-import { Field, FieldLabel } from "@/components/ui/field"
+import { Field, FieldGroup, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
+} from "@/components/ui/select"
+import { apiKeyPlugin } from "@/lib/auth/api-key-plugin"
+
+type ExpirationOption = {
+  id: string
+  label: string
+  days: number | null
+}
 
 export function CreateApiKeyDialog(props: {
   organizationId?: string
   onOpenChange: (open: boolean) => void
 }) {
   const auth = useAuth<ApiKeyAuthClient>()
+  const { keyExpiration, localization: apiKeyLocalization } =
+    useAuthPlugin(apiKeyPlugin)
+  const expirationOptions: ExpirationOption[] = keyExpiration
+    ? [
+        ...keyExpiration.intervals.map((days) => ({
+          id: String(days),
+          label: `${days.toLocaleString()} ${
+            days === 1 ? apiKeyLocalization.day : apiKeyLocalization.days
+          }`,
+          days
+        })),
+        ...(keyExpiration.allowNever
+          ? [
+              {
+                id: "never",
+                label: apiKeyLocalization.never,
+                days: null
+              }
+            ]
+          : [])
+      ]
+    : []
+  const defaultExpirationInterval = keyExpiration
+    ? keyExpiration.defaultInterval
+    : undefined
+  const [expiration, setExpiration] = createSignal(
+    expirationOptions.find(
+      (option) => option.days === defaultExpirationInterval
+    )
+  )
   const [isNewKeyDialogOpen, setIsNewKeyDialogOpen] = createSignal(false)
   const [newApiKeyName, setNewApiKeyName] = createSignal<string | null>(null)
   const [newApiKeySecret, setNewApiKeySecret] = createSignal<string | null>(
@@ -51,8 +97,13 @@ export function CreateApiKeyDialog(props: {
 
     const formData = new FormData(event.currentTarget as HTMLFormElement)
     const name = String(formData.get("name") ?? "").trim()
+    const expirationDays = expiration()?.days
+    const expiresIn = expirationDays
+      ? apiKeyExpirationDaysToSeconds(expirationDays)
+      : undefined
     const payload = {
       ...(name ? { name } : {}),
+      ...(expiresIn ? { expiresIn } : {}),
       ...(props.organizationId
         ? { organizationId: props.organizationId, configId: "organization" }
         : {})
@@ -79,18 +130,48 @@ export function CreateApiKeyDialog(props: {
             </DialogDescription>
           </DialogHeader>
 
-          <Field>
-            <FieldLabel for="api-key-name">
-              {apiKeyLocalization.name}
-            </FieldLabel>
-            <Input
-              autofocus
-              disabled={createApiKey.isPending}
-              id="api-key-name"
-              name="name"
-              placeholder={auth.localization.settings.optional}
-            />
-          </Field>
+          <FieldGroup>
+            <Field>
+              <FieldLabel for="api-key-name">
+                {apiKeyLocalization.name}
+              </FieldLabel>
+              <Input
+                autofocus
+                disabled={createApiKey.isPending}
+                id="api-key-name"
+                name="name"
+                placeholder={auth.localization.settings.optional}
+              />
+            </Field>
+
+            <Show when={keyExpiration}>
+              <Field>
+                <FieldLabel for="api-key-expiration">
+                  {apiKeyLocalization.expiration}
+                </FieldLabel>
+                <Select<ExpirationOption>
+                  disabled={createApiKey.isPending}
+                  itemComponent={(itemProps) => (
+                    <SelectItem item={itemProps.item}>
+                      {itemProps.item.rawValue.label}
+                    </SelectItem>
+                  )}
+                  onChange={(option) => setExpiration(option ?? undefined)}
+                  options={expirationOptions}
+                  optionTextValue="label"
+                  optionValue="id"
+                  value={expiration()}
+                >
+                  <SelectTrigger id="api-key-expiration" class="w-full">
+                    <SelectValue<ExpirationOption>>
+                      {(state) => state.selectedOption().label}
+                    </SelectValue>
+                  </SelectTrigger>
+                  <SelectContent />
+                </Select>
+              </Field>
+            </Show>
+          </FieldGroup>
 
           <DialogFooter>
             <DialogClose

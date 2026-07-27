@@ -1,3 +1,4 @@
+export * from "./components/auth/auth-prompts"
 export * from "./hooks/auth/use-authenticate"
 export * from "./hooks/auth/use-last-login-method"
 export * from "./hooks/auth/use-user"

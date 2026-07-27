@@ -5,7 +5,7 @@ export type SolidRegistryFile = {
 
 export type SolidRegistryItem = {
   name: string
-  type: "registry:component" | "registry:lib"
+  type: "registry:component" | "registry:item" | "registry:lib"
   title: string
   description: string
   dependencies: string[]
@@ -193,6 +193,17 @@ export const solidRegistryManifest = {
       ]
     }),
     item({
+      name: "anonymous",
+      type: "registry:component",
+      title: "Solid Anonymous",
+      description:
+        "Adds a Continue as guest button backed by Better Auth's anonymous plugin.",
+      files: [
+        libFile("src/lib/auth/anonymous-plugin.ts"),
+        componentFile("src/components/auth/anonymous/anonymous-button.tsx")
+      ]
+    }),
+    item({
       name: "last-login-method",
       type: "registry:component",
       title: "Solid Last Login Method",
@@ -200,6 +211,18 @@ export const solidRegistryManifest = {
         "Adds a localized last-used indicator to email and social sign-in methods tracked by Better Auth.",
       registryDependencies: [betterAuthSolidRegistryDependency("sign-in")],
       files: [libFile("src/lib/auth/last-login-method-plugin.ts")]
+    }),
+    item({
+      name: "one-tap",
+      type: "registry:item",
+      title: "Solid Google One Tap",
+      description:
+        "Updates the authentication surfaces with the headless prompt slot used by the Google One Tap UI plugin.",
+      registryDependencies: [
+        betterAuthSolidRegistryDependency("sign-in"),
+        betterAuthSolidRegistryDependency("sign-up")
+      ],
+      files: []
     }),
     item({
       name: "sign-up",

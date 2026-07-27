@@ -1,6 +1,6 @@
 {
   "name": "@better-auth-ui/solid",
-  "version": "1.6.37",
+  "version": "1.6.39",
   "type": "module",
   "scripts": {
     "build": "vite build && vite build --config vite.email.config.ts",
@@ -25,6 +25,10 @@
     "./plugins/admin": {
       "types": "./dist/plugins/admin/index.d.ts",
       "import": "./dist/plugins/admin/index.js"
+    },
+    "./plugins/anonymous": {
+      "types": "./dist/plugins/anonymous/index.d.ts",
+      "import": "./dist/plugins/anonymous/index.js"
     },
     "./plugins/api-key": {
       "types": "./dist/plugins/api-key/index.d.ts",
@@ -53,6 +57,10 @@
     "./plugins/oauth-provider": {
       "types": "./dist/plugins/oauth-provider/index.d.ts",
       "import": "./dist/plugins/oauth-provider/index.js"
+    },
+    "./plugins/one-tap": {
+      "types": "./dist/plugins/one-tap/index.d.ts",
+      "import": "./dist/plugins/one-tap/index.js"
     },
     "./plugins/organization": {
       "types": "./dist/plugins/organization/index.d.ts",

@@ -8,6 +8,7 @@ export default defineConfig({
       entry: {
         index: "src/index.ts",
         "plugins/admin/index": "src/plugins/admin/index.ts",
+        "plugins/anonymous/index": "src/plugins/anonymous/index.ts",
         "plugins/api-key/index": "src/plugins/api-key/index.ts",
         "plugins/api-key/server": "src/plugins/api-key/server.ts",
         "plugins/delete-user/index": "src/plugins/delete-user/index.ts",
@@ -21,6 +22,7 @@ export default defineConfig({
         "plugins/multi-session/index": "src/plugins/multi-session/index.ts",
         "plugins/multi-session/server": "src/plugins/multi-session/server.ts",
         "plugins/oauth-provider/index": "src/plugins/oauth-provider/index.ts",
+        "plugins/one-tap/index": "src/plugins/one-tap/index.ts",
         "plugins/organization/index": "src/plugins/organization/index.ts",
         "plugins/organization/server": "src/plugins/organization/server.ts",
         "plugins/passkey/index": "src/plugins/passkey/index.ts",

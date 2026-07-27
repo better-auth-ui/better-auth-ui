@@ -3,6 +3,7 @@
 import { authMutationKeys } from "@better-auth-ui/core"
 import type { UsernameAuthClient } from "@better-auth-ui/core/plugins/username"
 import {
+  AuthPrompts,
   useAuth,
   useAuthPlugin,
   useFetchOptions,
@@ -169,6 +170,7 @@ export function SignInUsername({
 
   return (
     <Card className={cn("w-full max-w-sm", className)}>
+      <AuthPrompts view="signIn" />
       <CardHeader>
         <CardTitle className="text-xl font-semibold">
           {localization.auth.signIn}

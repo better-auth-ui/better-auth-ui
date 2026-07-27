@@ -3,6 +3,7 @@
   "defaultOpen": true,
   "pages": [
     "admin",
+    "anonymous",
     "api-key",
     "captcha",
     "delete-user",
@@ -11,6 +12,7 @@
     "last-login-method",
     "magic-link",
     "multi-session",
+    "one-tap",
     "organization",
     "oauth-provider",
     "passkey",

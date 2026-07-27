@@ -12,6 +12,19 @@ export type AuthButtonProps = {
   view?: AuthView
 }
 
+/** Props for plugin-contributed headless authentication prompts. */
+export type AuthPromptProps = {
+  /** Current auth view. */
+  view: AuthView
+}
+
+/** A keyed headless prompt contributed to authentication views. */
+export type AuthPrompt = {
+  /** Stable identity within the owning plugin. */
+  id: string
+  component: ComponentType<AuthPromptProps>
+}
+
 /** Props for plugin-contributed cards under `/settings/security`. */
 export type SecurityCardProps = {
   className?: string
@@ -41,6 +54,8 @@ export type UserMenuItemProps = {
 export type AuthPluginComponents = {
   /** Rendered below the submit button in auth forms. */
   authButtons?: ComponentType<AuthButtonProps>[]
+  /** Headless prompts mounted by authentication views. */
+  authPrompts?: AuthPrompt[]
   /** Captcha widget rendered above the submit button, below additionalFields. Singular — only one captcha can be active at a time. */
   captchaComponent?: ReactNode
   /** Rendered as cards inside security settings. */
