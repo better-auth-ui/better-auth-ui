@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/alert-dialog"
 import {
   InputGroup,
+  InputGroupAddon,
   InputGroupButton,
   InputGroupInput
 } from "@/components/ui/input-group"
@@ -81,13 +82,15 @@ export function NewApiKeyDialog({
               className="font-mono text-xs"
             />
 
-            <InputGroupButton
-              size="icon-xs"
-              aria-label={localization.settings.copyToClipboard}
-              onClick={copySecretKey}
-            >
-              {copied ? <Check /> : <Copy />}
-            </InputGroupButton>
+            <InputGroupAddon align="inline-end">
+              <InputGroupButton
+                size="icon-xs"
+                aria-label={localization.settings.copyToClipboard}
+                onClick={copySecretKey}
+              >
+                {copied ? <Check /> : <Copy />}
+              </InputGroupButton>
+            </InputGroupAddon>
           </InputGroup>
         </div>
 

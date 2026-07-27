@@ -638,6 +638,7 @@
         "dialog",
         "field",
         "input",
+        "input-group",
         "input-otp",
         "skeleton",
         "sonner",

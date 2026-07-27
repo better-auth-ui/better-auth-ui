@@ -1,6 +1,6 @@
 import { render, screen, waitFor, within } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
-import { beforeEach, describe, expect, it, vi } from "vitest"
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 
 import { AuthProvider } from "../src/components/auth/auth-provider"
 import { SignIn } from "../src/components/auth/sign-in"
@@ -81,12 +81,22 @@ async function typeCode(
   user: ReturnType<typeof userEvent.setup>,
   code: string
 ) {
-  await user.click(screen.getAllByRole("textbox")[0])
+  const input = screen
+    .getAllByRole("textbox")
+    .find((element) => !(element as HTMLInputElement).readOnly)
+
+  if (!input) throw new Error("Expected an editable code input")
+
+  await user.click(input)
   await user.keyboard(code)
 }
 
 beforeEach(() => {
   sessionStorage.clear()
+})
+
+afterEach(() => {
+  vi.restoreAllMocks()
 })
 
 describe("sign-in continuation", () => {
@@ -196,6 +206,9 @@ describe("<TwoFactorChallenge />", () => {
 describe("<TwoFactorSettings />", () => {
   it("auto-verifies enrollment codes before showing backup codes", async () => {
     const user = userEvent.setup()
+    const writeText = vi
+      .spyOn(navigator.clipboard, "writeText")
+      .mockResolvedValue()
     const { authClient } = renderWithProvider(<TwoFactorSettings />)
 
     await user.click(screen.getByRole("button", { name: /enable two-factor/i }))
@@ -212,6 +225,15 @@ describe("<TwoFactorSettings />", () => {
       )
     })
 
+    await user.click(
+      within(dialog).getByRole("button", { name: /copy to clipboard/i })
+    )
+
+    expect(writeText).toHaveBeenCalledWith("SECRET123")
+    expect(
+      within(dialog).getByRole("button", { name: /setup key copied/i })
+    ).toBeInTheDocument()
+
     await typeCode(user, "246810")
 
     await waitFor(() => {
@@ -220,5 +242,19 @@ describe("<TwoFactorSettings />", () => {
       )
     })
     expect(await screen.findByText("code-1")).toBeInTheDocument()
+
+    await user.click(
+      within(dialog).getByRole("button", { name: /copy to clipboard/i })
+    )
+
+    expect(writeText).toHaveBeenLastCalledWith(
+      [
+        `Backup codes for ${window.location.origin}`,
+        "Save these somewhere safe. Each code works once if you lose your authenticator.",
+        "",
+        "code-1",
+        "code-2"
+      ].join("\n")
+    )
   })
 })

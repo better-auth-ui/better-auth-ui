@@ -1,7 +1,8 @@
 "use client"
 
+import { downloadTextFile, printTextFile } from "@better-auth-ui/core"
 import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
-import { Copy } from "lucide-react"
+import { Copy, Download, Printer } from "lucide-react"
 import { toast } from "sonner"
 
 import { Button } from "@/components/ui/button"
@@ -14,22 +15,32 @@ export type BackupCodesProps = {
 /**
  * One-time display of freshly generated backup codes.
  *
- * The codes are never persisted anywhere on the client — they live in the
- * calling component's state until the dialog closes, which is why the copy
- * button matters.
+ * The codes are never persisted anywhere on the client. They live in the
+ * calling component's state until the dialog closes, so the save actions
+ * matter.
  *
  * @param codes - Backup codes returned by enable or regenerate.
  */
 export function BackupCodes({ codes }: BackupCodesProps) {
   const { localization } = useAuth()
   const { localization: twoFactorLocalization } = useAuthPlugin(twoFactorPlugin)
+  const getBackupCodesText = () =>
+    [
+      twoFactorLocalization.backupCodesForWebsite.replace(
+        "{{website}}",
+        window.location.origin
+      ),
+      twoFactorLocalization.backupCodesDescription,
+      "",
+      ...codes
+    ].join("\n")
 
   // Clipboard writes reject on insecure origins and when the user denies the
   // permission, so the codes stay on screen and the toast tells them to copy
   // by hand rather than leaving a rejected promise behind.
   const copyCodes = async () => {
     try {
-      await navigator.clipboard.writeText(codes.join("\n"))
+      await navigator.clipboard.writeText(getBackupCodesText())
       toast.success(twoFactorLocalization.backupCodesCopied)
     } catch {
       toast.error(twoFactorLocalization.backupCodesCopyFailed)
@@ -50,10 +61,34 @@ export function BackupCodes({ codes }: BackupCodesProps) {
         ))}
       </ul>
 
-      <Button type="button" size="sm" variant="outline" onClick={copyCodes}>
-        <Copy />
-        {localization.settings.copyToClipboard}
-      </Button>
+      <div className="flex flex-wrap gap-2">
+        <Button type="button" size="sm" variant="outline" onClick={copyCodes}>
+          <Copy data-icon="inline-start" />
+          {localization.settings.copyToClipboard}
+        </Button>
+
+        <Button
+          type="button"
+          size="sm"
+          variant="outline"
+          onClick={() =>
+            downloadTextFile(getBackupCodesText(), "backup-codes.txt")
+          }
+        >
+          <Download data-icon="inline-start" />
+          {twoFactorLocalization.downloadBackupCodes}
+        </Button>
+
+        <Button
+          type="button"
+          size="sm"
+          variant="outline"
+          onClick={() => printTextFile(getBackupCodesText())}
+        >
+          <Printer data-icon="inline-start" />
+          {twoFactorLocalization.printBackupCodes}
+        </Button>
+      </div>
     </div>
   )
 }

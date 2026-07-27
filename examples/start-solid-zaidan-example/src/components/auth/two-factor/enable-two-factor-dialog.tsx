@@ -7,8 +7,8 @@ import {
   verifyTotpOptions
 } from "@better-auth-ui/solid"
 import { createMutation } from "@tanstack/solid-query"
-import { ShieldCheck } from "lucide-solid"
-import { createSignal, Show } from "solid-js"
+import { Check, Copy, ShieldCheck } from "lucide-solid"
+import { createSignal, onCleanup, Show } from "solid-js"
 import { toast } from "solid-sonner"
 import { OtpField } from "@/components/auth/otp-field"
 import { BackupCodes } from "@/components/auth/two-factor/backup-codes"
@@ -23,6 +23,12 @@ import {
 } from "@/components/ui/dialog"
 import { Field, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupButton,
+  InputGroupInput
+} from "@/components/ui/input-group"
 import { Spinner } from "@/components/ui/spinner"
 import { twoFactorPlugin } from "@/lib/auth/two-factor-plugin"
 import { useTwoFactorPasswordRequirement } from "@/lib/auth/use-two-factor-password"
@@ -49,6 +55,8 @@ export function EnableTwoFactorDialog(props: {
   const [totpUri, setTotpUri] = createSignal("")
   const [backupCodes, setBackupCodes] = createSignal<string[]>([])
   const [code, setCode] = createSignal("")
+  const [setupKeyCopied, setSetupKeyCopied] = createSignal(false)
+  let copyResetTimeout: ReturnType<typeof setTimeout> | undefined
 
   const qrCode = () => (totpUri() ? createQrCodeSvgData(totpUri()) : null)
 
@@ -61,6 +69,23 @@ export function EnableTwoFactorDialog(props: {
       return new URL(totpUri()).searchParams.get("secret")
     } catch {
       return null
+    }
+  }
+
+  onCleanup(() => clearTimeout(copyResetTimeout))
+
+  const copySetupKey = async (key: string) => {
+    try {
+      await navigator.clipboard.writeText(key)
+      setSetupKeyCopied(true)
+      clearTimeout(copyResetTimeout)
+
+      copyResetTimeout = setTimeout(() => {
+        setSetupKeyCopied(false)
+        copyResetTimeout = undefined
+      }, 2000)
+    } catch {
+      toast.error(twoFactorLocalization.setupKeyCopyFailed)
     }
   }
 
@@ -196,15 +221,40 @@ export function EnableTwoFactorDialog(props: {
 
             <Show when={setupKey()}>
               {(key) => (
-                <div class="flex w-full flex-col gap-1">
-                  <p class="text-muted-foreground text-xs">
+                <Field class="w-full gap-1">
+                  <FieldLabel
+                    class="text-muted-foreground text-xs"
+                    for="two-factor-setup-key"
+                  >
                     {twoFactorLocalization.setupKey}
-                  </p>
+                  </FieldLabel>
 
-                  <code class="break-all rounded-md border bg-muted/40 p-2 text-xs">
-                    {key()}
-                  </code>
-                </div>
+                  <InputGroup>
+                    <InputGroupInput
+                      class="font-mono text-xs"
+                      id="two-factor-setup-key"
+                      readonly
+                      value={key()}
+                    />
+
+                    <InputGroupAddon align="inline-end">
+                      <InputGroupButton
+                        aria-label={
+                          setupKeyCopied()
+                            ? twoFactorLocalization.setupKeyCopied
+                            : auth.localization.settings.copyToClipboard
+                        }
+                        onClick={() => copySetupKey(key())}
+                        size="icon-xs"
+                        type="button"
+                      >
+                        <Show fallback={<Copy />} when={setupKeyCopied()}>
+                          <Check />
+                        </Show>
+                      </InputGroupButton>
+                    </InputGroupAddon>
+                  </InputGroup>
+                </Field>
               )}
             </Show>
 

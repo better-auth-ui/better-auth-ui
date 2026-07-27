@@ -18,6 +18,11 @@ export const twoFactorLocalization = {
   scanQrCode: "Scan this with your authenticator app",
   /** @remarks `"Can't scan? Enter this setup key instead"` */
   setupKey: "Can't scan? Enter this setup key instead",
+  /** @remarks `"Setup key copied"` */
+  setupKeyCopied: "Setup key copied",
+  /** @remarks `"Couldn't copy the setup key. Select and copy it manually."` */
+  setupKeyCopyFailed:
+    "Couldn't copy the setup key. Select and copy it manually.",
   /** @remarks `"Authenticator code"` */
   authenticatorCode: "Authenticator code",
   /** @remarks `"Enter the code from your authenticator app"` */
@@ -35,6 +40,8 @@ export const twoFactorLocalization = {
   backupCodeDescription: "Enter one of the backup codes you saved",
   /** @remarks `"Backup codes"` */
   backupCodes: "Backup codes",
+  /** @remarks `"Backup codes for {{website}}"` */
+  backupCodesForWebsite: "Backup codes for {{website}}",
   /** @remarks `"Save these somewhere safe. Each code works once if you lose your authenticator."` */
   backupCodesDescription:
     "Save these somewhere safe. Each code works once if you lose your authenticator.",
@@ -43,6 +50,10 @@ export const twoFactorLocalization = {
   /** @remarks `"Couldn't copy the backup codes. Select and copy them manually."` */
   backupCodesCopyFailed:
     "Couldn't copy the backup codes. Select and copy them manually.",
+  /** @remarks `"Download .txt"` */
+  downloadBackupCodes: "Download .txt",
+  /** @remarks `"Print"` */
+  printBackupCodes: "Print",
   /** @remarks `"Regenerate backup codes"` */
   regenerateBackupCodes: "Regenerate backup codes",
   /** @remarks `"New backup codes generated. The old ones no longer work."` */

@@ -8,8 +8,14 @@ import {
   useEnableTwoFactor,
   useVerifyTotp
 } from "@better-auth-ui/react"
-import { ShieldCheck } from "lucide-react"
-import { type SyntheticEvent, useMemo, useState } from "react"
+import { Check, Copy, ShieldCheck } from "lucide-react"
+import {
+  type SyntheticEvent,
+  useEffect,
+  useMemo,
+  useRef,
+  useState
+} from "react"
 import { toast } from "sonner"
 import { Button, buttonVariants } from "@/components/ui/button"
 import {
@@ -23,6 +29,12 @@ import {
 } from "@/components/ui/dialog"
 import { Field, FieldError, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupButton,
+  InputGroupInput
+} from "@/components/ui/input-group"
 import { Spinner } from "@/components/ui/spinner"
 import { twoFactorPlugin } from "@/lib/auth/two-factor-plugin"
 import { useTwoFactorPasswordRequirement } from "@/lib/auth/use-two-factor-password"
@@ -62,6 +74,8 @@ export function EnableTwoFactorDialog({
   const [totpUri, setTotpUri] = useState("")
   const [backupCodes, setBackupCodes] = useState<string[]>([])
   const [code, setCode] = useState("")
+  const [setupKeyCopied, setSetupKeyCopied] = useState(false)
+  const copyResetTimeout = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const qrCode = useMemo(
     () => (totpUri ? createQrCodeSvgData(totpUri) : null),
@@ -79,6 +93,35 @@ export function EnableTwoFactorDialog({
       return null
     }
   }, [totpUri])
+
+  useEffect(
+    () => () => {
+      if (copyResetTimeout.current !== null) {
+        clearTimeout(copyResetTimeout.current)
+      }
+    },
+    []
+  )
+
+  const copySetupKey = async () => {
+    if (!setupKey) return
+
+    try {
+      await navigator.clipboard.writeText(setupKey)
+      setSetupKeyCopied(true)
+
+      if (copyResetTimeout.current !== null) {
+        clearTimeout(copyResetTimeout.current)
+      }
+
+      copyResetTimeout.current = setTimeout(() => {
+        setSetupKeyCopied(false)
+        copyResetTimeout.current = null
+      }, 2000)
+    } catch {
+      toast.error(twoFactorLocalization.setupKeyCopyFailed)
+    }
+  }
 
   const {
     mutate: enableTwoFactor,
@@ -121,6 +164,11 @@ export function EnableTwoFactorDialog({
       setTotpUri("")
       setBackupCodes([])
       setCode("")
+      setSetupKeyCopied(false)
+      if (copyResetTimeout.current !== null) {
+        clearTimeout(copyResetTimeout.current)
+        copyResetTimeout.current = null
+      }
       // Clears the resolved TOTP URI and backup codes from the mutation cache.
       resetEnrollment()
     }
@@ -213,15 +261,37 @@ export function EnableTwoFactorDialog({
               )}
 
               {setupKey && (
-                <div className="flex w-full flex-col gap-1">
-                  <p className="text-muted-foreground text-xs">
+                <Field className="w-full gap-1">
+                  <FieldLabel
+                    className="text-muted-foreground text-xs"
+                    htmlFor="two-factor-setup-key"
+                  >
                     {twoFactorLocalization.setupKey}
-                  </p>
+                  </FieldLabel>
 
-                  <code className="break-all rounded-md border bg-muted/40 p-2 text-xs">
-                    {setupKey}
-                  </code>
-                </div>
+                  <InputGroup>
+                    <InputGroupInput
+                      className="font-mono text-xs"
+                      id="two-factor-setup-key"
+                      readOnly
+                      value={setupKey}
+                    />
+
+                    <InputGroupAddon align="inline-end">
+                      <InputGroupButton
+                        aria-label={
+                          setupKeyCopied
+                            ? twoFactorLocalization.setupKeyCopied
+                            : localization.settings.copyToClipboard
+                        }
+                        onClick={copySetupKey}
+                        size="icon-xs"
+                      >
+                        {setupKeyCopied ? <Check /> : <Copy />}
+                      </InputGroupButton>
+                    </InputGroupAddon>
+                  </InputGroup>
+                </Field>
               )}
 
               <OtpField

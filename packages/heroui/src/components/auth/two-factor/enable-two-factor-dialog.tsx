@@ -6,19 +6,26 @@ import {
   useEnableTwoFactor,
   useVerifyTotp
 } from "@better-auth-ui/react"
-import { ShieldCheck } from "@gravity-ui/icons"
+import { Check, Copy, ShieldCheck } from "@gravity-ui/icons"
 import {
   AlertDialog,
   Button,
   FieldError,
   Form,
   Input,
+  InputGroup,
   Label,
   Spinner,
   TextField,
   toast
 } from "@heroui/react"
-import { type SyntheticEvent, useMemo, useState } from "react"
+import {
+  type SyntheticEvent,
+  useEffect,
+  useMemo,
+  useRef,
+  useState
+} from "react"
 
 import { twoFactorPlugin } from "../../../lib/auth/two-factor-plugin"
 import { useTwoFactorPasswordRequirement } from "../../../lib/auth/use-two-factor-password"
@@ -58,6 +65,8 @@ export function EnableTwoFactorDialog({
   const [totpUri, setTotpUri] = useState("")
   const [backupCodes, setBackupCodes] = useState<string[]>([])
   const [code, setCode] = useState("")
+  const [setupKeyCopied, setSetupKeyCopied] = useState(false)
+  const copyResetTimeout = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const qrCode = useMemo(
     () => (totpUri ? createQrCodeSvgData(totpUri) : null),
@@ -74,6 +83,35 @@ export function EnableTwoFactorDialog({
       return null
     }
   }, [totpUri])
+
+  useEffect(
+    () => () => {
+      if (copyResetTimeout.current !== null) {
+        clearTimeout(copyResetTimeout.current)
+      }
+    },
+    []
+  )
+
+  const copySetupKey = async () => {
+    if (!setupKey) return
+
+    try {
+      await navigator.clipboard.writeText(setupKey)
+      setSetupKeyCopied(true)
+
+      if (copyResetTimeout.current !== null) {
+        clearTimeout(copyResetTimeout.current)
+      }
+
+      copyResetTimeout.current = setTimeout(() => {
+        setSetupKeyCopied(false)
+        copyResetTimeout.current = null
+      }, 2000)
+    } catch {
+      toast.danger(twoFactorLocalization.setupKeyCopyFailed)
+    }
+  }
 
   const {
     mutate: enableTwoFactor,
@@ -116,6 +154,11 @@ export function EnableTwoFactorDialog({
       setTotpUri("")
       setBackupCodes([])
       setCode("")
+      setSetupKeyCopied(false)
+      if (copyResetTimeout.current !== null) {
+        clearTimeout(copyResetTimeout.current)
+        copyResetTimeout.current = null
+      }
       // Clears the resolved TOTP URI and backup codes from the mutation cache.
       resetEnrollment()
     }
@@ -221,14 +264,35 @@ export function EnableTwoFactorDialog({
                   )}
 
                   {setupKey && (
-                    <div className="flex w-full flex-col gap-1">
-                      <p className="text-muted text-xs">
+                    <TextField fullWidth value={setupKey}>
+                      <Label className="text-muted text-xs">
                         {twoFactorLocalization.setupKey}
-                      </p>
-                      <code className="break-all rounded-lg border border-border bg-surface-secondary p-2 text-xs">
-                        {setupKey}
-                      </code>
-                    </div>
+                      </Label>
+
+                      <InputGroup fullWidth variant="secondary">
+                        <InputGroup.Input
+                          readOnly
+                          className="font-mono text-xs"
+                        />
+
+                        <InputGroup.Suffix className="px-0">
+                          <Button
+                            isIconOnly
+                            aria-label={
+                              setupKeyCopied
+                                ? twoFactorLocalization.setupKeyCopied
+                                : localization.settings.copyToClipboard
+                            }
+                            size="sm"
+                            type="button"
+                            variant="ghost"
+                            onPress={copySetupKey}
+                          >
+                            {setupKeyCopied ? <Check /> : <Copy />}
+                          </Button>
+                        </InputGroup.Suffix>
+                      </InputGroup>
+                    </TextField>
                   )}
 
                   <OtpField
