@@ -1,0 +1,104 @@
+---
+title: Anonymous
+description: Add a Continue as guest action to copied shadcn authentication forms.
+---
+
+import { Step, Steps } from 'fumadocs-ui/components/steps'
+
+The anonymous UI plugin contributes one "Continue as guest" button to the copied authentication forms. A successful sign-in refreshes the session and follows the `redirectTo` configured on `<AuthProvider>`.
+
+## Setup
+
+<Steps>
+<Step>
+### Configure the Better Auth server plugin
+
+Add Better Auth's [Anonymous](https://www.better-auth.com/docs/plugins/anonymous) plugin:
+
+```ts title="lib/auth.ts"
+import { betterAuth } from "better-auth"
+import { anonymous } from "better-auth/plugins" // [!code highlight]
+
+export const auth = betterAuth({
+  // ...
+  plugins: [
+    anonymous() // [!code highlight]
+  ]
+})
+```
+
+Run the Better Auth migration command so the user table includes `isAnonymous`:
+
+```bash
+bunx @better-auth/cli migrate
+```
+
+</Step>
+<Step>
+### Configure the Better Auth client plugin
+
+Add `anonymousClient()` to the browser client:
+
+```ts title="lib/auth-client.ts"
+import { createAuthClient } from "better-auth/react"
+import { anonymousClient } from "better-auth/client/plugins" // [!code highlight]
+
+export const authClient = createAuthClient({
+  plugins: [
+    anonymousClient() // [!code highlight]
+  ]
+})
+```
+
+</Step>
+<Step>
+### Install the UI plugin
+
+Install the button and local plugin factory:
+
+```bash
+bunx --bun shadcn@latest add https://better-auth-ui.com/r/anonymous.json
+```
+
+The registry item adds:
+
+- `src/lib/auth/anonymous-plugin.ts`
+- `src/components/auth/anonymous/anonymous-button.tsx`
+
+</Step>
+<Step>
+### Register the plugin
+
+Pass `anonymousPlugin()` to the copied `<AuthProvider>`:
+
+```tsx title="components/providers.tsx"
+import { AuthProvider } from "@/components/auth/auth-provider"
+import { anonymousPlugin } from "@/lib/auth/anonymous-plugin" // [!code highlight]
+
+<AuthProvider
+  authClient={authClient}
+  navigate={navigate}
+  plugins={[
+    anonymousPlugin() // [!code highlight]
+  ]}
+>
+  {children}
+</AuthProvider>
+```
+
+</Step>
+</Steps>
+
+## Change the label
+
+```tsx
+anonymousPlugin({
+  localization: {
+    continueAsGuest: "Explore as a guest"
+  }
+})
+```
+
+<auto-type-table path="../../../../../../packages/core/src/plugins/anonymous/anonymous-plugin.ts" name="AnonymousPluginOptions" />
+
+This integration only adds guest entry. If your application later lets guests create a permanent account, configure Better Auth's server-side `onLinkAccount` callback to move application data to the new user.

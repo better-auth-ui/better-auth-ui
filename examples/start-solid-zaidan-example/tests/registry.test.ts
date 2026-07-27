@@ -201,6 +201,7 @@ const expectedSolidRegistryPayloadNames = [
   "auth-provider",
   "additional-field",
   "sign-in",
+  "anonymous",
   "last-login-method",
   "one-tap",
   "sign-up",
@@ -2777,6 +2778,7 @@ describe("Solid registry isolation", () => {
     ])
     expect(zaidanPluginsMeta.pages).toEqual([
       "admin",
+      "anonymous",
       "api-key",
       "captcha",
       "delete-user",
@@ -3069,6 +3071,7 @@ describe("Solid registry isolation", () => {
       "oauth-provider",
       "device-authorization",
       "theme",
+      "anonymous",
       "one-tap"
     ]
     const runtimeOnlyPluginNames = ["captcha"]
@@ -3219,6 +3222,7 @@ describe("Solid registry isolation", () => {
         name === "multi-session" ||
         name === "theme" ||
         name === "username" ||
+        name === "anonymous" ||
         name === "one-tap"
       ) {
         expect(page, `${name} should keep setup-driven structure`).toContain(

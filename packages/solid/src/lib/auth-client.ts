@@ -4,6 +4,7 @@ import type { passkeyClient } from "@better-auth/passkey/client"
 import type {
   AdminClientOptions,
   adminClient,
+  anonymousClient,
   deviceAuthorizationClient,
   emailOTPClient,
   lastLoginMethodClient,
@@ -22,6 +23,10 @@ export type AdminAuthClient = ReturnType<
   typeof createAuthClient<{
     plugins: [ReturnType<typeof adminClient<AdminClientOptions>>]
   }>
+>
+
+export type AnonymousAuthClient = ReturnType<
+  typeof createAuthClient<{ plugins: [ReturnType<typeof anonymousClient>] }>
 >
 
 export type MagicLinkAuthClient = ReturnType<

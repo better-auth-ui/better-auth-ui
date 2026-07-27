@@ -3,6 +3,7 @@
   "defaultOpen": true,
   "pages": [
     "admin",
+    "anonymous",
     "api-key",
     "captcha",
     "delete-user",

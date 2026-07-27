@@ -28,6 +28,7 @@ const pluginsExports = [
   "LastUsedBadge",
   "UsernameField",
   "adminPlugin",
+  "anonymousPlugin",
   "deviceAuthorizationPlugin",
   "lastLoginMethodPlugin",
   "magicLinkPlugin",

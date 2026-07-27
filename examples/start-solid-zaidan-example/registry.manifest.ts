@@ -193,6 +193,17 @@ export const solidRegistryManifest = {
       ]
     }),
     item({
+      name: "anonymous",
+      type: "registry:component",
+      title: "Solid Anonymous",
+      description:
+        "Adds a Continue as guest button backed by Better Auth's anonymous plugin.",
+      files: [
+        libFile("src/lib/auth/anonymous-plugin.ts"),
+        componentFile("src/components/auth/anonymous/anonymous-button.tsx")
+      ]
+    }),
+    item({
       name: "last-login-method",
       type: "registry:component",
       title: "Solid Last Login Method",

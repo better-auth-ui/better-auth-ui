@@ -119,6 +119,36 @@
       ]
     },
     {
+      "name": "anonymous",
+      "type": "registry:component",
+      "title": "Anonymous",
+      "description": "Adds a Continue as guest button backed by Better Auth's anonymous plugin.",
+      "dependencies": [
+        "@better-auth-ui/react@latest",
+        "@better-auth-ui/core@latest",
+        "better-auth",
+        "lucide-react"
+      ],
+      "registryDependencies": ["button", "spinner"],
+      "files": [
+        {
+          "path": "src/lib/auth/auth-plugin.ts",
+          "type": "registry:lib",
+          "target": "@lib/auth/auth-plugin.ts"
+        },
+        {
+          "path": "src/lib/auth/anonymous-plugin.ts",
+          "type": "registry:lib",
+          "target": "@lib/auth/anonymous-plugin.ts"
+        },
+        {
+          "path": "src/components/auth/anonymous/anonymous-button.tsx",
+          "type": "registry:component",
+          "target": "@components/auth/anonymous/anonymous-button.tsx"
+        }
+      ]
+    },
+    {
       "name": "last-login-method",
       "type": "registry:component",
       "title": "Last Login Method",
@@ -1930,6 +1960,7 @@
         "https://better-auth-ui.com/r/auth-provider.json",
         "https://better-auth-ui.com/r/additional-field.json",
         "https://better-auth-ui.com/r/sign-in.json",
+        "https://better-auth-ui.com/r/anonymous.json",
         "https://better-auth-ui.com/r/last-login-method.json",
         "https://better-auth-ui.com/r/one-tap.json",
         "https://better-auth-ui.com/r/sign-up.json",
