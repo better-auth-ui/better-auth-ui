@@ -64,7 +64,7 @@ export function ResetPassword(props: ResetPasswordProps) {
       <CardContent>
         <form aria-label="Reset password" onSubmit={submitPasswordReset}>
           <div class="flex flex-col gap-6">
-            <Field>
+            <Field data-invalid={Boolean(passwordError())}>
               <FieldLabel for="reset-password-new">
                 {auth.localization.auth.newPassword}
               </FieldLabel>
@@ -121,7 +121,7 @@ export function ResetPassword(props: ResetPasswordProps) {
                 {(message) => <FieldError>{message()}</FieldError>}
               </Show>
             </Field>
-            <Field>
+            <Field data-invalid={Boolean(confirmPasswordError())}>
               <FieldLabel for="reset-password-confirm">
                 {auth.localization.auth.confirmPassword}
               </FieldLabel>
@@ -198,15 +198,14 @@ export function ResetPassword(props: ResetPasswordProps) {
             <Show when={resetPassword.isSuccess}>
               <Alert>
                 <AlertDescription role="status">
-                  Password reset successfully. You can sign in with your new
-                  password.
+                  {auth.localization.auth.passwordResetSuccessDescription}
                 </AlertDescription>
               </Alert>
             </Show>
             <Show when={resetPassword.isError}>
               <Alert variant="destructive">
                 <AlertDescription>
-                  Unable to reset your password. Try again.
+                  {auth.localization.auth.passwordResetErrorDescription}
                 </AlertDescription>
               </Alert>
             </Show>

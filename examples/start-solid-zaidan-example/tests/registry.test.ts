@@ -2323,9 +2323,11 @@ describe("Solid registry isolation", () => {
     )
     expect(resetPassword.files[0]?.content).toContain("resetPasswordOptions")
     expect(resetPassword.files[0]?.content).toContain(
-      "Password reset successfully. You can sign in with your new"
+      "auth.localization.auth.passwordResetSuccessDescription"
     )
-    expect(resetPassword.files[0]?.content).toContain("password.")
+    expect(resetPassword.files[0]?.content).toContain(
+      "auth.localization.auth.passwordResetErrorDescription"
+    )
     expect(resetPassword.files[0]?.content).toContain(
       "auth.localization.auth.invalidResetPasswordToken"
     )

@@ -2120,7 +2120,7 @@ describe("Solid auth route component selection", () => {
     )
     expect(activeSession).not.toContain("<Card")
     expect(activeSession).not.toContain("<CardContent")
-    expect(activeSession).toContain("<Item")
+    expect(activeSession).toMatch(/<Item(?:\s|>)/)
     expect(activeSession).toContain("auth.localization.settings.currentSession")
     expect(activeSession).toContain("auth.localization.auth.signOut")
     expect(securitySettings).toContain("auth.plugins.flatMap")
@@ -2358,7 +2358,7 @@ describe("Solid auth route component selection", () => {
     expect(linkedAccounts).toContain("<ItemSeparator")
     expect(linkedAccount).not.toContain("<Card")
     expect(linkedAccount).not.toContain("<CardContent")
-    expect(linkedAccount).toContain("<Item")
+    expect(linkedAccount).toMatch(/<Item(?:\s|>)/)
     expect(linkedAccount).toContain("<Spinner")
     expect(linkedAccount).not.toContain(
       "link and unlink mutations are not wired in this Solid slice yet."
@@ -2654,6 +2654,7 @@ describe("Solid auth route component selection", () => {
     expect(alertDialog).toContain('from "@kobalte/core/alert-dialog"')
     expect(alertDialog).toContain("AlertDialogPrimitive.CloseButton")
     expect(deleteAccount).toContain('from "@/components/ui/alert-dialog"')
+    expect(deleteAccount).not.toContain('from "@/components/ui/dialog"')
   })
 
   it("wires API key create, new-key reveal, copy, and delete dialogs to Solid mutations", () => {
@@ -3203,7 +3204,7 @@ describe("Solid auth route component selection", () => {
       "organizationLocalization().rejectInvitation"
     )
     expect(userInvitationRow).toContain("<Badge")
-    expect(userInvitationRow).toContain("<Item")
+    expect(userInvitationRow).toMatch(/<Item(?:\s|>)/)
     expect(userInvitationRow).not.toContain("Spinner")
     expect(userInvitations).not.toContain("<Table")
     expect(userInvitations).not.toContain("InputGroup")

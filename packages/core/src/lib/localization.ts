@@ -81,8 +81,15 @@ export const localization = {
     /** @remarks `"Password reset email sent"` */
     passwordResetEmailSent: "Password reset email sent",
 
+    /** @remarks `"Unable to reset your password. Try again."` */
+    passwordResetErrorDescription: "Unable to reset your password. Try again.",
+
     /** @remarks `"Password reset successfully"` */
     passwordResetSuccess: "Password reset successfully",
+
+    /** @remarks `"Password reset successfully. You can sign in with your new password."` */
+    passwordResetSuccessDescription:
+      "Password reset successfully. You can sign in with your new password.",
 
     /** @remarks `"Passwords do not match"` */
     passwordsDoNotMatch: "Passwords do not match",

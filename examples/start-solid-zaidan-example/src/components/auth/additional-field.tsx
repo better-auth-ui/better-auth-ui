@@ -4,7 +4,7 @@ import {
 } from "@better-auth-ui/core"
 import { useAuth } from "@better-auth-ui/solid"
 import { CalendarIcon, Check, Copy } from "lucide-solid"
-import { createMemo, createSignal, For, Show } from "solid-js"
+import { createEffect, createMemo, createSignal, For, Show } from "solid-js"
 import { toast } from "solid-sonner"
 import { Button } from "@/components/ui/button"
 import { Calendar } from "@/components/ui/calendar"
@@ -152,7 +152,7 @@ export function AdditionalField(props: AdditionalFieldProps) {
     return (
       <Field orientation="horizontal">
         <Switch
-          checked={
+          defaultChecked={
             props.field.defaultValue === true ||
             valueToString(props.field.defaultValue) === "true"
           }
@@ -172,7 +172,7 @@ export function AdditionalField(props: AdditionalFieldProps) {
     return (
       <Field orientation="horizontal">
         <Checkbox
-          checked={
+          defaultChecked={
             props.field.defaultValue === true ||
             valueToString(props.field.defaultValue) === "true"
           }
@@ -360,15 +360,21 @@ function SliderField(props: LabeledAdditionalFieldProps) {
   const max = props.field.max ?? 100
   const step =
     props.field.step ?? (maxFractionDigits ? 1 / 10 ** maxFractionDigits : 1)
-  const initial =
+  const defaultValue = () =>
     typeof props.field.defaultValue === "number"
       ? props.field.defaultValue
       : props.field.defaultValue != null &&
           !Number.isNaN(Number(props.field.defaultValue))
         ? Number(props.field.defaultValue)
         : min
-  const [value, setValue] = createSignal(initial)
+  const [value, setValue] = createSignal(defaultValue())
+  const [isDirty, setIsDirty] = createSignal(false)
   const formatter = new Intl.NumberFormat(undefined, props.field.formatOptions)
+
+  createEffect(() => {
+    const nextValue = defaultValue()
+    if (!isDirty()) setValue(nextValue)
+  })
 
   return (
     <Field>
@@ -384,7 +390,10 @@ function SliderField(props: LabeledAdditionalFieldProps) {
         maxValue={max}
         minValue={min}
         name={props.name}
-        onChange={(values) => setValue(values[0] ?? min)}
+        onChange={(values) => {
+          setIsDirty(true)
+          setValue(values[0] ?? min)
+        }}
         step={step}
         value={[value()]}
       />
@@ -396,13 +405,25 @@ function SliderField(props: LabeledAdditionalFieldProps) {
 function DateInput(props: LabeledAdditionalFieldProps) {
   const auth = useAuth()
   const isDateTime = () => resolveInputType(props.field) === "datetime"
-  const initialDate = toDate(props.field.defaultValue)
+  const defaultDate = () => toDate(props.field.defaultValue)
+  const initialDate = defaultDate()
   const [date, setDate] = createSignal<Date | undefined>(initialDate)
   const [time, setTime] = createSignal(
     initialDate && isDateTime() ? formatTime(initialDate) : ""
   )
+  const [isDirty, setIsDirty] = createSignal(false)
   const [open, setOpen] = createSignal(false)
   const [error, setError] = createSignal<string>()
+
+  createEffect(() => {
+    const nextDate = defaultDate()
+    if (isDirty()) return
+
+    setDate(nextDate)
+    setTime(nextDate && isDateTime() ? formatTime(nextDate) : "")
+    if (nextDate) setError(undefined)
+  })
+
   const formValue = createMemo(() => {
     const selectedDate = date()
     if (!selectedDate) return ""
@@ -456,6 +477,7 @@ function DateInput(props: LabeledAdditionalFieldProps) {
               mode="single"
               monthYearSelection
               onValueChange={(value) => {
+                setIsDirty(true)
                 setDate(value ?? undefined)
                 if (value) setError(undefined)
                 if (!isDateTime()) setOpen(false)
@@ -473,7 +495,10 @@ function DateInput(props: LabeledAdditionalFieldProps) {
               class="appearance-none bg-background [&::-webkit-calendar-picker-indicator]:hidden"
               disabled={props.isPending || props.field.readOnly}
               id={`${props.name}-time`}
-              onInput={(event) => setTime(event.currentTarget.value)}
+              onInput={(event) => {
+                setIsDirty(true)
+                setTime(event.currentTarget.value)
+              }}
               step="1"
               type="time"
               value={time()}

@@ -63,7 +63,7 @@ export function ForgotPassword(props: ForgotPasswordProps) {
       <CardContent>
         <form aria-label="Forgot password" onSubmit={submitPasswordReset}>
           <div class="flex flex-col gap-6">
-            <Field>
+            <Field data-invalid={Boolean(emailError())}>
               <FieldLabel for="forgot-password-email">
                 {auth.localization.auth.email}
               </FieldLabel>
