@@ -1,5 +1,6 @@
 "use client"
 
+export * from "./components/auth/auth-prompts"
 export * from "./components/auth/auth-provider"
 export * from "./components/auth/fetch-options-provider"
 export * from "./components/icons"

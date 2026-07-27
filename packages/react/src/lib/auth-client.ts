@@ -9,6 +9,7 @@ import type {
   lastLoginMethodClient,
   magicLinkClient,
   multiSessionClient,
+  oneTapClient,
   organizationClient,
   twoFactorClient,
   usernameClient
@@ -55,6 +56,10 @@ export type LastLoginMethodAuthClient = ReturnType<
 
 export type MultiSessionAuthClient = ReturnType<
   typeof createAuthClient<{ plugins: [ReturnType<typeof multiSessionClient>] }>
+>
+
+export type OneTapAuthClient = ReturnType<
+  typeof createAuthClient<{ plugins: [ReturnType<typeof oneTapClient>] }>
 >
 
 export type PasskeyAuthClient = ReturnType<

@@ -1,0 +1,130 @@
+---
+title: Google One Tap
+description: Open Google's One Tap prompt from Better Auth UI sign-in and sign-up views.
+---
+
+import { Callout } from 'fumadocs-ui/components/callout'
+import { Step, Steps } from 'fumadocs-ui/components/steps'
+
+The Google One Tap UI plugin opens Better Auth's native One Tap flow when an authentication view mounts. It refreshes the session after success, follows the configured `redirectTo`, and continues into the two-factor view when the server requests a second factor.
+
+Keep Google in `socialProviders` as a visible fallback. One Tap is a passive prompt and browsers may decide not to show it.
+
+## Setup
+
+<Steps>
+<Step>
+### Configure the Better Auth server plugin
+
+Add Better Auth's [One Tap](https://www.better-auth.com/docs/plugins/one-tap) plugin with the OAuth client ID from your Google Cloud project:
+
+```ts title="lib/auth.ts"
+import { betterAuth } from "better-auth"
+import { oneTap } from "better-auth/plugins" // [!code highlight]
+
+export const auth = betterAuth({
+  // ...
+  plugins: [
+    oneTap({
+      clientId: process.env.GOOGLE_CLIENT_ID as string
+    }) // [!code highlight]
+  ]
+})
+```
+
+</Step>
+<Step>
+### Configure the Better Auth client plugin
+
+Use the same client ID in the browser client:
+
+```ts title="lib/auth-client.ts"
+import { createAuthClient } from "better-auth/react"
+import { oneTapClient } from "better-auth/client/plugins" // [!code highlight]
+
+export const authClient = createAuthClient({
+  plugins: [
+    oneTapClient({
+      clientId: import.meta.env.VITE_GOOGLE_CLIENT_ID,
+      promptOptions: {
+        baseDelay: 1_000,
+        maxAttempts: 3
+      }
+    }) // [!code highlight]
+  ]
+})
+```
+
+</Step>
+<Step>
+### Register the Better Auth UI plugin
+
+Pass `oneTapPlugin()` to `<AuthProvider>`. The prompt opens on sign-in by default.
+
+```tsx title="components/providers.tsx"
+import { AuthProvider } from "@better-auth-ui/heroui"
+import { oneTapPlugin } from "@better-auth-ui/react/plugins" // [!code highlight]
+
+<AuthProvider
+  authClient={authClient}
+  navigate={navigate}
+  plugins={[
+    oneTapPlugin() // [!code highlight]
+  ]}
+  socialProviders={["google"]}
+>
+  {children}
+</AuthProvider>
+```
+
+</Step>
+<Step>
+### Add your authorized origins
+
+Add every application origin that can render the prompt to the OAuth client's **Authorized JavaScript origins** in Google Cloud. Include the exact protocol, host, and development port, such as `http://localhost:3000`.
+
+</Step>
+</Steps>
+
+## Show One Tap on sign-up
+
+Pass both auth views when you also want the prompt on sign-up:
+
+```tsx
+oneTapPlugin({
+  views: ["signIn", "signUp"]
+})
+```
+
+The plugin sends the matching `signin` or `signup` context to Better Auth. This preserves server-side sign-up controls and redirects.
+
+## Prompt options
+
+Better Auth's prompt settings can be passed directly to the UI plugin:
+
+```tsx
+oneTapPlugin({
+  autoSelect: true,
+  cancelOnTapOutside: false,
+  onPromptNotification: (notification) => {
+    // Track when Google skips or dismisses the prompt.
+  }
+})
+```
+
+<auto-type-table path="../../../../../../packages/react/src/plugins/one-tap-plugin.tsx" name="OneTapPluginOptions" />
+
+<Callout title="Better Auth 1.7">
+The integration supports the stricter One Tap responses in Better Auth 1.7. Errors such as `EMAIL_NOT_VERIFIED` are sent through the normal authentication error handler instead of being hidden.
+</Callout>
+
+## Last login method
+
+Better Auth's last-login-method plugin does not classify the One Tap callback as Google by default. If you use its badge, resolve the callback explicitly:
+
+```ts title="lib/auth.ts"
+lastLoginMethod({
+  customResolveMethod: (context) =>
+    context.path === "/one-tap/callback" ? "google" : null
+})
+```

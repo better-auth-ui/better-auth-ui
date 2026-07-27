@@ -1,5 +1,10 @@
 import { authMutationKeys } from "@better-auth-ui/core"
-import { useAuth, useFetchOptions, useSignInEmail } from "@better-auth-ui/react"
+import {
+  AuthPrompts,
+  useAuth,
+  useFetchOptions,
+  useSignInEmail
+} from "@better-auth-ui/react"
 import { Eye, EyeSlash } from "@gravity-ui/icons"
 import {
   Button,
@@ -113,6 +118,7 @@ export function SignIn({
       className={cn("w-full max-w-sm gap-4 md:p-6", className)}
       variant={variant}
     >
+      <AuthPrompts view="signIn" />
       <Card.Header>
         <Card.Title className="text-xl font-semibold mb-1">
           {localization.auth.signIn}

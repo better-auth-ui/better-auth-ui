@@ -1,4 +1,5 @@
 import { authMutationKeys, authQueryKeys } from "@better-auth-ui/core"
+import { oneTapMutationKeys } from "@better-auth-ui/core/plugins"
 import { toast } from "@heroui/react"
 import {
   matchMutation,
@@ -48,7 +49,12 @@ export function ErrorToaster() {
       }
 
       const err = error as BetterFetchError
-      if (err.error?.code === "EMAIL_NOT_VERIFIED") return
+      if (
+        err.error?.code === "EMAIL_NOT_VERIFIED" &&
+        !matchMutation({ mutationKey: oneTapMutationKeys.prompt }, mutation)
+      ) {
+        return
+      }
       toast.danger(err.error?.message || err.message)
     }
 

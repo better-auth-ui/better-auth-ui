@@ -1,5 +1,6 @@
 import { authQueryKeys, parseAdditionalFieldValue } from "@better-auth-ui/core"
 import {
+  AuthPrompts,
   signUpEmailOptions,
   useAuth,
   useFetchOptions
@@ -133,6 +134,7 @@ export function SignUp(props: SignUpProps) {
 
   return (
     <Card class={cn("w-full max-w-sm", props.class)}>
+      <AuthPrompts view="signUp" />
       <CardHeader>
         <CardTitle class="text-xl font-semibold">
           {auth.localization.auth.signUp}

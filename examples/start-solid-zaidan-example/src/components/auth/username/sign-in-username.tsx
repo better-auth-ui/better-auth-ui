@@ -4,6 +4,7 @@ import {
   usernameLocalization
 } from "@better-auth-ui/core/plugins"
 import {
+  AuthPrompts,
   signInEmailOptions,
   signInUsernameOptions,
   type UsernameAuthClient,
@@ -124,6 +125,7 @@ export function SignInUsername(props: SignInUsernameProps) {
 
   return (
     <Card class={cn("w-full max-w-sm", props.class)}>
+      <AuthPrompts view="signIn" />
       <CardHeader>
         <CardTitle class="text-xl font-semibold">
           {auth.localization.auth.signIn}

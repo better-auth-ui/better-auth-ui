@@ -11,6 +11,7 @@
     "last-login-method",
     "magic-link",
     "multi-session",
+    "one-tap",
     "organization",
     "oauth-provider",
     "passkey",

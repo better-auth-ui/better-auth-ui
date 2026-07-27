@@ -138,6 +138,22 @@
       ]
     },
     {
+      "name": "one-tap",
+      "type": "registry:item",
+      "title": "Google One Tap",
+      "description": "Updates the authentication surfaces with the headless prompt slot used by the Google One Tap UI plugin.",
+      "dependencies": [
+        "@better-auth-ui/react@latest",
+        "@better-auth-ui/core@latest",
+        "better-auth"
+      ],
+      "registryDependencies": [
+        "https://better-auth-ui.com/r/sign-in.json",
+        "https://better-auth-ui.com/r/sign-up.json"
+      ],
+      "files": []
+    },
+    {
       "name": "sign-up",
       "type": "registry:component",
       "title": "Sign Up",
@@ -1915,6 +1931,7 @@
         "https://better-auth-ui.com/r/additional-field.json",
         "https://better-auth-ui.com/r/sign-in.json",
         "https://better-auth-ui.com/r/last-login-method.json",
+        "https://better-auth-ui.com/r/one-tap.json",
         "https://better-auth-ui.com/r/sign-up.json",
         "https://better-auth-ui.com/r/email-otp.json",
         "https://better-auth-ui.com/r/magic-link.json",
