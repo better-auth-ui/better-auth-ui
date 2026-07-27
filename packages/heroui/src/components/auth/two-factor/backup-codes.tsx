@@ -1,4 +1,8 @@
-import { downloadTextFile, printTextFile } from "@better-auth-ui/core"
+import {
+  downloadTextFile,
+  formatBackupCodesText,
+  printTextFile
+} from "@better-auth-ui/core"
 import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
 import { ArrowDownToLine, Copy, Printer } from "@gravity-ui/icons"
 import { Button, toast } from "@heroui/react"
@@ -22,15 +26,7 @@ export function BackupCodes({ codes }: BackupCodesProps) {
   const { localization } = useAuth()
   const { localization: twoFactorLocalization } = useAuthPlugin(twoFactorPlugin)
   const getBackupCodesText = () =>
-    [
-      twoFactorLocalization.backupCodesForWebsite.replace(
-        "{{website}}",
-        window.location.origin
-      ),
-      twoFactorLocalization.backupCodesDescription,
-      "",
-      ...codes
-    ].join("\n")
+    formatBackupCodesText(codes, twoFactorLocalization, window.location.origin)
 
   // Clipboard writes reject on insecure origins and when the user denies the
   // permission, so the codes stay on screen and the toast tells them to copy

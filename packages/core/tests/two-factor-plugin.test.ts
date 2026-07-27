@@ -1,4 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
+import { formatBackupCodesText } from "../src"
 import {
   clearTwoFactorMethods,
   isTwoFactorRedirect,
@@ -6,6 +7,7 @@ import {
   readTwoFactorMethods,
   storeTwoFactorMethods,
   TWO_FACTOR_METHODS_STORAGE_KEY,
+  twoFactorLocalization,
   twoFactorPlugin
 } from "../src/plugins"
 
@@ -45,6 +47,26 @@ describe("twoFactorPlugin", () => {
     expect(twoFactorPlugin({ codeLength: 8.7 }).codeLength).toBe(8)
     expect(twoFactorPlugin({ codeLength: Number.NaN }).codeLength).toBe(6)
     expect(twoFactorPlugin({ codeLength: 0 }).codeLength).toBe(1)
+  })
+})
+
+describe("formatBackupCodesText", () => {
+  it("includes the website, description, and codes in the exported text", () => {
+    expect(
+      formatBackupCodesText(
+        ["code-1", "code-2"],
+        twoFactorLocalization,
+        "https://example.com"
+      )
+    ).toBe(
+      [
+        "Backup codes for https://example.com",
+        "Save these somewhere safe. Each code works once if you lose your authenticator.",
+        "",
+        "code-1",
+        "code-2"
+      ].join("\n")
+    )
   })
 })
 

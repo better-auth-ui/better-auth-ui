@@ -1,4 +1,8 @@
-import { downloadTextFile, printTextFile } from "@better-auth-ui/core"
+import {
+  downloadTextFile,
+  formatBackupCodesText,
+  printTextFile
+} from "@better-auth-ui/core"
 import { useAuth, useAuthPlugin } from "@better-auth-ui/solid"
 import { Copy, Download, Printer } from "lucide-solid"
 import { For } from "solid-js"
@@ -22,15 +26,11 @@ export function BackupCodes(props: BackupCodesProps) {
   const auth = useAuth()
   const { localization: twoFactorLocalization } = useAuthPlugin(twoFactorPlugin)
   const getBackupCodesText = () =>
-    [
-      twoFactorLocalization.backupCodesForWebsite.replace(
-        "{{website}}",
-        window.location.origin
-      ),
-      twoFactorLocalization.backupCodesDescription,
-      "",
-      ...props.codes
-    ].join("\n")
+    formatBackupCodesText(
+      props.codes,
+      twoFactorLocalization,
+      window.location.origin
+    )
 
   // Clipboard writes reject on insecure origins and when the user denies the
   // permission, so the codes stay on screen and the toast tells them to copy
