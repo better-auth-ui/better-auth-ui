@@ -66,19 +66,22 @@ describe("text file browser actions", () => {
   it("downloads the exact plain-text contents with the requested filename", async () => {
     vi.useFakeTimers()
 
-    downloadTextFile("code-1\ncode-2", "backup-codes.txt")
+    try {
+      downloadTextFile("code-1\ncode-2", "backup-codes.txt")
 
-    expect(appendedElement).toMatchObject({
-      download: "backup-codes.txt",
-      href: "blob:text-file"
-    })
-    expect(appendedElement?.click).toHaveBeenCalledOnce()
-    expect(createdBlob?.type).toBe("text/plain;charset=utf-8")
-    await expect(createdBlob?.text()).resolves.toBe("code-1\ncode-2")
+      expect(appendedElement).toMatchObject({
+        download: "backup-codes.txt",
+        href: "blob:text-file"
+      })
+      expect(appendedElement?.click).toHaveBeenCalledOnce()
+      expect(createdBlob?.type).toBe("text/plain;charset=utf-8")
+      await expect(createdBlob?.text()).resolves.toBe("code-1\ncode-2")
 
-    await vi.runAllTimersAsync()
-    expect(URL.revokeObjectURL).toHaveBeenCalledWith("blob:text-file")
-    vi.useRealTimers()
+      await vi.runAllTimersAsync()
+      expect(URL.revokeObjectURL).toHaveBeenCalledWith("blob:text-file")
+    } finally {
+      vi.useRealTimers()
+    }
   })
 
   it("prints only the exact plain-text file in an isolated frame", async () => {
