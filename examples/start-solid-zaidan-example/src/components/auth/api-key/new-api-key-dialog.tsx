@@ -5,7 +5,6 @@ import { createSignal, Show } from "solid-js"
 import { toast } from "solid-sonner"
 import { Button } from "@/components/ui/button"
 import {
-  DialogClose,
   DialogContent,
   DialogDescription,
   DialogFooter,
@@ -22,6 +21,7 @@ import {
 
 export function NewApiKeyDialog(props: {
   name: string | null
+  onDismiss: () => void
   secretKey: string | null
 }) {
   const auth = useAuth()
@@ -40,7 +40,7 @@ export function NewApiKeyDialog(props: {
   }
 
   return (
-    <DialogContent>
+    <DialogContent showCloseButton={false}>
       <DialogHeader>
         <div class="flex size-10 items-center justify-center rounded-md bg-muted">
           <Key class="size-4.5" />
@@ -79,9 +79,9 @@ export function NewApiKeyDialog(props: {
       </Field>
 
       <DialogFooter>
-        <DialogClose as={Button}>
+        <Button onClick={props.onDismiss} type="button">
           {apiKeyLocalization.dismissNewKey}
-        </DialogClose>
+        </Button>
       </DialogFooter>
     </DialogContent>
   )

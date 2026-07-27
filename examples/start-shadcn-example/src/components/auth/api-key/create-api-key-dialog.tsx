@@ -56,6 +56,15 @@ export function CreateApiKeyDialog({
     onOpenChange(nextOpen)
   }
 
+  const handleNewKeyDialogOpenChange = (nextOpen: boolean) => {
+    setIsNewKeyDialogOpen(nextOpen)
+
+    if (!nextOpen) {
+      setKeyName(null)
+      setSecretKey(null)
+    }
+  }
+
   const handleSubmit = (e: SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault()
 
@@ -135,7 +144,7 @@ export function CreateApiKeyDialog({
 
       <NewApiKeyDialog
         open={isNewKeyDialogOpen}
-        onOpenChange={setIsNewKeyDialogOpen}
+        onOpenChange={handleNewKeyDialogOpenChange}
         secretKey={secretKey}
         name={keyName}
       />

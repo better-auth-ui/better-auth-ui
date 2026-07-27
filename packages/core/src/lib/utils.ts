@@ -1,5 +1,10 @@
 import type { DeepPartial } from "./deep-partial"
 
+const EMBEDDED_AVATAR_MAX_BYTES = 4_096
+const EMBEDDED_AVATAR_MAX_DIMENSION = 96
+const EMBEDDED_AVATAR_MIN_DIMENSION = 16
+const EMBEDDED_AVATAR_QUALITIES = [0.82, 0.68, 0.54, 0.4] as const
+
 /**
  * Type guard that checks whether a value is a non-null, non-array object.
  */
@@ -109,12 +114,123 @@ export function resizeAvatar(
  * @returns A promise that resolves to the base64 data URL.
  */
 export function fileToBase64(file: File): Promise<string> {
+  return blobToDataUrl(file)
+}
+
+function blobToDataUrl(blob: Blob): Promise<string> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader()
-    reader.onload = () => resolve(reader.result as string)
+    reader.onload = () => {
+      if (typeof reader.result === "string") {
+        resolve(reader.result)
+        return
+      }
+
+      reject(new Error("Failed to read file"))
+    }
     reader.onerror = () => reject(new Error("Failed to read file"))
-    reader.readAsDataURL(file)
+    reader.readAsDataURL(blob)
   })
+}
+
+function canvasToBlob(
+  canvas: HTMLCanvasElement,
+  type: string,
+  quality: number
+): Promise<Blob> {
+  return new Promise((resolve, reject) => {
+    canvas.toBlob(
+      (blob) => {
+        if (blob) {
+          resolve(blob)
+          return
+        }
+
+        reject(new Error("Could not encode avatar"))
+      },
+      type,
+      quality
+    )
+  })
+}
+
+function embeddedAvatarDimensions(maxDimension: number) {
+  const dimensions: number[] = []
+  let dimension = maxDimension
+
+  while (dimension > EMBEDDED_AVATAR_MIN_DIMENSION) {
+    dimensions.push(dimension)
+    dimension = Math.floor(dimension * 0.75)
+  }
+
+  dimensions.push(Math.min(maxDimension, EMBEDDED_AVATAR_MIN_DIMENSION))
+
+  return dimensions
+}
+
+/**
+ * Convert an avatar to a compact data URL for the no-uploader fallback.
+ *
+ * Better Auth can cache the complete session user in a response cookie. Keeping
+ * embedded avatars below a conservative byte limit prevents the image from
+ * overflowing HTTP response headers while preserving higher-quality files for
+ * configured upload providers.
+ *
+ * @param file - The resized avatar file to encode.
+ * @returns A promise that resolves to a compact WebP data URL.
+ */
+export async function fileToAvatarDataUrl(file: File): Promise<string> {
+  const sourceUrl = URL.createObjectURL(file)
+  const image = new Image()
+
+  try {
+    await new Promise<void>((resolve, reject) => {
+      image.onload = () => resolve()
+      image.onerror = () => reject(new Error("Failed to load avatar"))
+      image.src = sourceUrl
+    })
+
+    const sourceSide = Math.min(image.naturalWidth, image.naturalHeight)
+    const maxDimension = Math.min(sourceSide, EMBEDDED_AVATAR_MAX_DIMENSION)
+    const cropX = (image.naturalWidth - sourceSide) / 2
+    const cropY = (image.naturalHeight - sourceSide) / 2
+    const canvas = document.createElement("canvas")
+    const context = canvas.getContext("2d")
+
+    if (!context) {
+      throw new Error("Could not get canvas context")
+    }
+
+    for (const dimension of embeddedAvatarDimensions(maxDimension)) {
+      canvas.width = dimension
+      canvas.height = dimension
+      context.clearRect(0, 0, dimension, dimension)
+      context.drawImage(
+        image,
+        cropX,
+        cropY,
+        sourceSide,
+        sourceSide,
+        0,
+        0,
+        dimension,
+        dimension
+      )
+
+      for (const quality of EMBEDDED_AVATAR_QUALITIES) {
+        const blob = await canvasToBlob(canvas, "image/webp", quality)
+        const dataUrl = await blobToDataUrl(blob)
+
+        if (dataUrl.length <= EMBEDDED_AVATAR_MAX_BYTES) {
+          return dataUrl
+        }
+      }
+    }
+
+    throw new Error("Could not reduce avatar to a safe embedded size")
+  } finally {
+    URL.revokeObjectURL(sourceUrl)
+  }
 }
 
 /**

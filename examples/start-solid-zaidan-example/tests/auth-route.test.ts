@@ -1340,7 +1340,7 @@ describe("Solid auth route component selection", () => {
     )
     expect(userProfile).toContain("<ChangeAvatar")
     expect(userProfile).not.toContain("handleAvatarFileChange")
-    expect(changeAvatar).toContain("fileToBase64")
+    expect(changeAvatar).toContain("fileToAvatarDataUrl")
     expect(changeAvatar).toContain("updateUserOptions")
     expect(changeAvatar).toContain("avatarChangedSuccess")
     expect(providerButton).toContain("auth.authClient.signIn.social")
@@ -1957,7 +1957,7 @@ describe("Solid auth route component selection", () => {
       "utf8"
     )
 
-    expect(changeAvatar).toContain("fileToBase64")
+    expect(changeAvatar).toContain("fileToAvatarDataUrl")
     expect(changeAvatar).toContain('import { toast } from "solid-sonner"')
     expect(changeAvatar).toContain("DropdownMenu")
     expect(changeAvatar).toContain("DropdownMenuContent")

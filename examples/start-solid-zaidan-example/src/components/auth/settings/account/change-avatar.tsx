@@ -1,4 +1,4 @@
-import { fileToBase64 } from "@better-auth-ui/core"
+import { fileToAvatarDataUrl } from "@better-auth-ui/core"
 import { updateUserOptions, useAuth, useSession } from "@better-auth-ui/solid"
 import { createMutation } from "@tanstack/solid-query"
 import { Trash2, Upload } from "lucide-solid"
@@ -50,7 +50,8 @@ export function ChangeAvatar(props: ChangeAvatarProps) {
           auth.avatar.extension
         )) || file
       const image =
-        (await auth.avatar.upload?.(resized)) || (await fileToBase64(resized))
+        (await auth.avatar.upload?.(resized)) ||
+        (await fileToAvatarDataUrl(resized))
 
       updateUser.mutate(
         { image },
