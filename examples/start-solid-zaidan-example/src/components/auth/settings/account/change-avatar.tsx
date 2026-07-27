@@ -1,4 +1,4 @@
-import { fileToBase64 } from "@better-auth-ui/core"
+import { fileToAvatarDataUrl } from "@better-auth-ui/core"
 import { useAuth, useSession, useUpdateUser } from "@better-auth-ui/solid"
 import { Trash2, Upload } from "lucide-solid"
 import { createSignal } from "solid-js"
@@ -11,7 +11,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu"
-import { Label } from "@/components/ui/label"
+import { Field, FieldLabel } from "@/components/ui/field"
 import { resolveUserInitials, resolveUserLabel } from "../shared/helpers"
 
 export type ChangeAvatarProps = {
@@ -47,7 +47,8 @@ export function ChangeAvatar(props: ChangeAvatarProps) {
           auth.avatar.extension
         )) || file
       const image =
-        (await auth.avatar.upload?.(resized)) || (await fileToBase64(resized))
+        (await auth.avatar.upload?.(resized)) ||
+        (await fileToAvatarDataUrl(resized))
 
       updateUser.mutate(
         { image },
@@ -88,8 +89,8 @@ export function ChangeAvatar(props: ChangeAvatarProps) {
   }
 
   return (
-    <div class={props.className ?? "grid gap-2"}>
-      <Label>{auth.localization.settings.avatar}</Label>
+    <Field class={props.className}>
+      <FieldLabel>{auth.localization.settings.avatar}</FieldLabel>
       <input
         accept="image/*"
         class="hidden"
@@ -146,6 +147,6 @@ export function ChangeAvatar(props: ChangeAvatarProps) {
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
-    </div>
+    </Field>
   )
 }

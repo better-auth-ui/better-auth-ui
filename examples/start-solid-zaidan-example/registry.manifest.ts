@@ -32,9 +32,12 @@ const solidDependencies = [
 ]
 
 const zaidanUiDependencies = [
+  "@corvu/calendar",
+  "@corvu/otp-field",
   "@kobalte/core",
   "class-variance-authority",
   "clsx",
+  "date-fns",
   "tailwind-merge"
 ]
 
@@ -53,24 +56,39 @@ const zaidanThemeUiRegistryDependencies = [
   ...zaidanStyleSetupRegistryDependencies,
   "@zaidan/card",
   "@zaidan/dropdown-menu",
+  "@zaidan/field",
+  "@zaidan/radio-group",
   "@zaidan/tabs"
 ]
 
 const zaidanUiRegistryDependencies = [
+  "@zaidan/alert",
+  "@zaidan/alert-dialog",
   "@zaidan/avatar",
   "@zaidan/badge",
   "@zaidan/button",
+  "@zaidan/calendar",
   "@zaidan/card",
+  "@zaidan/checkbox",
+  "@zaidan/combobox",
   "@zaidan/dialog",
   "@zaidan/dropdown-menu",
+  "@zaidan/empty",
+  "@zaidan/field",
   "@zaidan/input-group",
   "@zaidan/input",
   "@zaidan/item",
   "@zaidan/label",
+  "@zaidan/native-select",
+  "@zaidan/popover",
+  "@zaidan/radio-group",
+  "@zaidan/select",
   "@zaidan/separator",
   "@zaidan/skeleton",
+  "@zaidan/slider",
   "@zaidan/sonner",
   "@zaidan/spinner",
+  "@zaidan/switch",
   "@zaidan/table",
   "@zaidan/tabs",
   "@zaidan/textarea"
@@ -88,6 +106,9 @@ const componentFile = (path: SolidRegistryFile["path"]) =>
 
 const libFile = (path: SolidRegistryFile["path"]) =>
   ({ path, type: "registry:lib" }) satisfies SolidRegistryFile
+
+const uiFile = (path: SolidRegistryFile["path"]) =>
+  ({ path, type: "registry:ui" }) satisfies SolidRegistryFile
 
 const zaidanFormSupportFiles = [
   libFile("src/lib/utils.ts")
@@ -136,6 +157,7 @@ export const solidRegistryManifest = {
       files: [
         componentFile("src/components/auth/auth-provider.tsx"),
         componentFile("src/components/auth/error-toaster.tsx"),
+        uiFile("src/components/ui/input-otp.tsx"),
         libFile("src/lib/theme.ts")
       ]
     }),
@@ -158,6 +180,8 @@ export const solidRegistryManifest = {
         "Solid sign-in surface with email/password, username, and provider button support.",
       files: [
         componentFile("src/components/auth/sign-in.tsx"),
+        libFile("src/lib/auth/use-sign-in-continuation.ts"),
+        libFile("src/lib/auth/two-factor-methods.ts"),
         componentFile("src/components/auth/username/sign-in-username.tsx"),
         componentFile("src/components/auth/sign-in-path.ts"),
         componentFile("src/components/auth/provider-button.tsx"),
@@ -194,6 +218,39 @@ export const solidRegistryManifest = {
         componentFile(
           "src/components/auth/last-login-method/last-used-badge.tsx"
         ),
+        ...zaidanFormSupportFiles
+      ]
+    }),
+    item({
+      name: "email-otp",
+      type: "registry:component",
+      title: "Solid Email OTP",
+      description:
+        "Solid/Zaidan passwordless sign-in with an emailed code, plus code-based email verification, password reset, and email change views.",
+      registryDependencies: [
+        betterAuthSolidRegistryDependency("auth-provider"),
+        betterAuthSolidRegistryDependency("account-settings"),
+        "@zaidan/tooltip"
+      ],
+      files: [
+        libFile("src/lib/auth/email-otp-plugin.ts"),
+        libFile("src/lib/auth/use-resend-cooldown.ts"),
+        libFile("src/lib/auth/use-sign-in-continuation.ts"),
+        libFile("src/lib/auth/two-factor-methods.ts"),
+        componentFile("src/components/auth/otp-field.tsx"),
+        componentFile("src/components/auth/email-otp/email-otp.tsx"),
+        componentFile("src/components/auth/email-otp/email-otp-button.tsx"),
+        componentFile("src/components/auth/email-otp/verify-email-otp.tsx"),
+        componentFile("src/components/auth/email-otp/forgot-password-otp.tsx"),
+        componentFile("src/components/auth/email-otp/reset-password-otp.tsx"),
+        componentFile("src/components/auth/email-otp/change-email-otp.tsx"),
+        componentFile("src/components/auth/open-email-button.tsx"),
+        componentFile("src/components/auth/provider-buttons.tsx"),
+        componentFile("src/components/auth/provider-button.tsx"),
+        componentFile(
+          "src/components/auth/last-login-method/last-used-badge.tsx"
+        ),
+        componentFile("src/components/auth/sign-in-path.ts"),
         ...zaidanFormSupportFiles
       ]
     }),
@@ -281,6 +338,8 @@ export const solidRegistryManifest = {
         "Solid username UI plugin, sign-in form, and username availability field.",
       files: [
         libFile("src/lib/auth/username-plugin.ts"),
+        libFile("src/lib/auth/use-sign-in-continuation.ts"),
+        libFile("src/lib/auth/two-factor-methods.ts"),
         componentFile("src/components/auth/username/sign-in-username.tsx"),
         componentFile("src/components/auth/username/username-field.tsx"),
         componentFile(
@@ -306,6 +365,37 @@ export const solidRegistryManifest = {
         componentFile("src/components/auth/passkey/passkey-skeleton.tsx"),
         componentFile("src/components/auth/passkey/add-passkey-dialog.tsx"),
         componentFile("src/components/auth/passkey/delete-passkey-dialog.tsx"),
+        ...zaidanInteractiveSupportFiles
+      ]
+    }),
+    item({
+      name: "two-factor",
+      type: "registry:component",
+      title: "Solid Two-Factor",
+      description:
+        "Solid/Zaidan post-password challenge for authenticator, emailed, and backup codes, plus the settings card for enrollment and backup-code management.",
+      registryDependencies: [betterAuthSolidRegistryDependency("sign-in")],
+      files: [
+        libFile("src/lib/auth/two-factor-plugin.ts"),
+        libFile("src/lib/auth/use-resend-cooldown.ts"),
+        libFile("src/lib/auth/use-sign-in-continuation.ts"),
+        libFile("src/lib/auth/two-factor-methods.ts"),
+        libFile("src/lib/auth/use-two-factor-password.ts"),
+        componentFile("src/components/auth/otp-field.tsx"),
+        componentFile(
+          "src/components/auth/two-factor/two-factor-challenge.tsx"
+        ),
+        componentFile("src/components/auth/two-factor/two-factor-settings.tsx"),
+        componentFile(
+          "src/components/auth/two-factor/enable-two-factor-dialog.tsx"
+        ),
+        componentFile(
+          "src/components/auth/two-factor/disable-two-factor-dialog.tsx"
+        ),
+        componentFile(
+          "src/components/auth/two-factor/regenerate-backup-codes-dialog.tsx"
+        ),
+        componentFile("src/components/auth/two-factor/backup-codes.tsx"),
         ...zaidanInteractiveSupportFiles
       ]
     }),
@@ -459,6 +549,7 @@ export const solidRegistryManifest = {
         componentFile("src/components/auth/settings/account/user-profile.tsx"),
         componentFile("src/components/auth/settings/account/change-avatar.tsx"),
         componentFile("src/components/auth/additional-field.tsx"),
+        componentFile("src/components/auth/settings/shared/helpers.ts"),
         ...zaidanInteractiveSupportFiles
       ]
     }),
@@ -693,6 +784,8 @@ export const solidRegistryManifest = {
       files: [
         componentFile("src/components/auth/delete-user/danger-zone.tsx"),
         componentFile("src/components/auth/delete-user/delete-account.tsx"),
+        componentFile("src/components/auth/settings/shared/helpers.ts"),
+        componentFile("src/components/auth/settings/shared/types.ts"),
         ...zaidanInteractiveSupportFiles
       ]
     }),

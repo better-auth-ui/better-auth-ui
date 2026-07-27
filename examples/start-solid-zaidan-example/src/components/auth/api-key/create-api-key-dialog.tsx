@@ -15,8 +15,8 @@ import {
   DialogHeader,
   DialogTitle
 } from "@/components/ui/dialog"
+import { Field, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
 
 export function CreateApiKeyDialog(props: {
   organizationId?: string
@@ -36,6 +36,15 @@ export function CreateApiKeyDialog(props: {
       setIsNewKeyDialogOpen(true)
     }
   }))
+
+  const handleNewKeyDialogOpenChange = (open: boolean) => {
+    setIsNewKeyDialogOpen(open)
+
+    if (!open) {
+      setNewApiKeyName(null)
+      setNewApiKeySecret(null)
+    }
+  }
 
   const submitCreateApiKey = (event: SubmitEvent) => {
     event.preventDefault()
@@ -70,8 +79,10 @@ export function CreateApiKeyDialog(props: {
             </DialogDescription>
           </DialogHeader>
 
-          <div class="grid gap-2">
-            <Label for="api-key-name">{apiKeyLocalization.name}</Label>
+          <Field>
+            <FieldLabel for="api-key-name">
+              {apiKeyLocalization.name}
+            </FieldLabel>
             <Input
               autofocus
               disabled={createApiKey.isPending}
@@ -79,7 +90,7 @@ export function CreateApiKeyDialog(props: {
               name="name"
               placeholder={auth.localization.settings.optional}
             />
-          </div>
+          </Field>
 
           <DialogFooter>
             <DialogClose
@@ -99,8 +110,16 @@ export function CreateApiKeyDialog(props: {
         </form>
       </DialogContent>
 
-      <Dialog open={isNewKeyDialogOpen()} onOpenChange={setIsNewKeyDialogOpen}>
-        <NewApiKeyDialog name={newApiKeyName()} secretKey={newApiKeySecret()} />
+      <Dialog
+        open={isNewKeyDialogOpen()}
+        onOpenChange={handleNewKeyDialogOpenChange}
+      >
+        <NewApiKeyDialog
+          name={newApiKeyName()}
+          onDismiss={() => handleNewKeyDialogOpenChange(false)}
+          open={isNewKeyDialogOpen()}
+          secretKey={newApiKeySecret()}
+        />
       </Dialog>
     </>
   )

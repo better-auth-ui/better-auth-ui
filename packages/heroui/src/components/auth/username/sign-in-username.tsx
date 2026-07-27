@@ -26,6 +26,7 @@ import {
 } from "@heroui/react"
 import { useIsMutating } from "@tanstack/react-query"
 import { type SyntheticEvent, useState } from "react"
+import { useSignInContinuation } from "../../../lib/auth/use-sign-in-continuation"
 import { usernamePlugin } from "../../../lib/auth/username-plugin"
 import { FieldSeparator } from "../field-separator"
 import { LastUsedBadge } from "../last-login-method/last-used-badge"
@@ -55,13 +56,13 @@ export function SignInUsername({
     emailAndPassword,
     localization,
     plugins,
-    redirectTo,
     socialProviders,
     viewPaths,
     navigate
   } = useAuth()
 
   const { fetchOptions, resetFetchOptions } = useFetchOptions()
+  const continueSignIn = useSignInContinuation()
 
   const { localization: usernameLocalization } = useAuthPlugin(usernamePlugin)
 
@@ -86,9 +87,9 @@ export function SignInUsername({
 
         resetFetchOptions()
       },
-      onSuccess: () => {
+      onSuccess: (data) => {
         sessionStorage.removeItem("better-auth-ui.verify-email")
-        navigate({ to: redirectTo })
+        continueSignIn(data)
       }
     })
 
@@ -107,9 +108,9 @@ export function SignInUsername({
 
         resetFetchOptions()
       },
-      onSuccess: () => {
+      onSuccess: (data) => {
         sessionStorage.removeItem("better-auth-ui.verify-email")
-        navigate({ to: redirectTo })
+        continueSignIn(data)
       }
     })
 

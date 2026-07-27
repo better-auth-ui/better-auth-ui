@@ -1,0 +1,128 @@
+[
+  {
+    "id": "email-otp-localization.ts-EmailOtpLocalization",
+    "name": "EmailOtpLocalization",
+    "description": "",
+    "entries": [
+      {
+        "name": "emailOtp",
+        "description": "",
+        "tags": [{ "name": "remarks", "text": "`\"Email Code\"`" }],
+        "type": "string",
+        "simplifiedType": "\"Email Code\"",
+        "required": true,
+        "deprecated": false
+      },
+      {
+        "name": "sendCode",
+        "description": "",
+        "tags": [{ "name": "remarks", "text": "`\"Send code\"`" }],
+        "type": "string",
+        "simplifiedType": "\"Send code\"",
+        "required": true,
+        "deprecated": false
+      },
+      {
+        "name": "code",
+        "description": "",
+        "tags": [{ "name": "remarks", "text": "`\"Code\"`" }],
+        "type": "string",
+        "simplifiedType": "\"Code\"",
+        "required": true,
+        "deprecated": false
+      },
+      {
+        "name": "verifyCode",
+        "description": "",
+        "tags": [{ "name": "remarks", "text": "`\"Verify code\"`" }],
+        "type": "string",
+        "simplifiedType": "\"Verify code\"",
+        "required": true,
+        "deprecated": false
+      },
+      {
+        "name": "codeSentTo",
+        "description": "",
+        "tags": [
+          { "name": "remarks", "text": "`\"We sent a code to {{email}}\"`" }
+        ],
+        "type": "string",
+        "simplifiedType": "\"We sent a code to {{email}}\"",
+        "required": true,
+        "deprecated": false
+      },
+      {
+        "name": "codeLengthMismatch",
+        "description": "",
+        "tags": [
+          { "name": "remarks", "text": "`\"Enter the {{length}}-digit code\"`" }
+        ],
+        "type": "string",
+        "simplifiedType": "\"Enter the {{length}}-digit code\"",
+        "required": true,
+        "deprecated": false
+      },
+      {
+        "name": "useDifferentEmail",
+        "description": "",
+        "tags": [{ "name": "remarks", "text": "`\"Use a different email\"`" }],
+        "type": "string",
+        "simplifiedType": "\"Use a different email\"",
+        "required": true,
+        "deprecated": false
+      },
+      {
+        "name": "codeSent",
+        "description": "",
+        "tags": [{ "name": "remarks", "text": "`\"Code sent\"`" }],
+        "type": "string",
+        "simplifiedType": "\"Code sent\"",
+        "required": true,
+        "deprecated": false
+      },
+      {
+        "name": "emailVerified",
+        "description": "",
+        "tags": [{ "name": "remarks", "text": "`\"Email verified\"`" }],
+        "type": "string",
+        "simplifiedType": "\"Email verified\"",
+        "required": true,
+        "deprecated": false
+      },
+      {
+        "name": "confirmCurrentEmail",
+        "description": "",
+        "tags": [
+          { "name": "remarks", "text": "`\"Confirm your current email\"`" }
+        ],
+        "type": "string",
+        "simplifiedType": "\"Confirm your current email\"",
+        "required": true,
+        "deprecated": false
+      },
+      {
+        "name": "confirmNewEmail",
+        "description": "",
+        "tags": [{ "name": "remarks", "text": "`\"Confirm your new email\"`" }],
+        "type": "string",
+        "simplifiedType": "\"Confirm your new email\"",
+        "required": true,
+        "deprecated": false
+      },
+      {
+        "name": "confirmEmailDescription",
+        "description": "",
+        "tags": [
+          {
+            "name": "remarks",
+            "text": "`\"Enter the code we sent to {{email}} to finish the change\"`"
+          }
+        ],
+        "type": "string",
+        "simplifiedType": "\"Enter the code we sent to {{email}} to finish the change\"",
+        "required": true,
+        "deprecated": false
+      }
+    ]
+  }
+]

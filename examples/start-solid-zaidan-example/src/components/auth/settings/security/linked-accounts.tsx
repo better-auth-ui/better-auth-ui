@@ -5,7 +5,7 @@ import type {
   LinkedProvider
 } from "@/components/auth/settings/shared/types"
 import { Card, CardContent } from "@/components/ui/card"
-import { Separator } from "@/components/ui/separator"
+import { ItemGroup, ItemSeparator } from "@/components/ui/item"
 import { cn } from "@/lib/utils"
 import { LinkedAccountRow, LinkedAccountRowSkeleton } from "./linked-account"
 
@@ -61,36 +61,36 @@ export function LinkedAccountsSettings(
         <CardContent class="z-card-content-padding-none">
           <Show
             fallback={
-              <For each={socialProviders()}>
-                {(_, index) => (
-                  <>
-                    <Show when={index() > 0}>
-                      <Separator />
-                    </Show>
-                    <div class="p-4">
+              <ItemGroup class="gap-0">
+                <For each={socialProviders()}>
+                  {(_, index) => (
+                    <>
+                      <Show when={index() > 0}>
+                        <ItemSeparator />
+                      </Show>
                       <LinkedAccountRowSkeleton />
-                    </div>
-                  </>
-                )}
-              </For>
+                    </>
+                  )}
+                </For>
+              </ItemGroup>
             }
             when={!linkedAccounts.isPending}
           >
-            <For each={accountRows()}>
-              {(row, index) => (
-                <>
-                  <Show when={index() > 0}>
-                    <Separator />
-                  </Show>
-                  <div class="p-4">
+            <ItemGroup class="gap-0">
+              <For each={accountRows()}>
+                {(row, index) => (
+                  <>
+                    <Show when={index() > 0}>
+                      <ItemSeparator />
+                    </Show>
                     <LinkedAccountRow
                       account={row.account}
                       provider={row.provider}
                     />
-                  </div>
-                </>
-              )}
-            </For>
+                  </>
+                )}
+              </For>
+            </ItemGroup>
           </Show>
         </CardContent>
       </Card>

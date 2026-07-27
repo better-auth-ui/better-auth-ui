@@ -77,10 +77,6 @@ function renderDeviceAuthorization(
 async function enterDeviceCode(user: ReturnType<typeof userEvent.setup>) {
   const input = screen.getByRole("textbox", { name: "Device code" })
   await user.type(input, "ab12cd34")
-  await waitFor(() => {
-    expect(screen.getByRole("button", { name: "Continue" })).toBeEnabled()
-  })
-  await user.click(screen.getByRole("button", { name: "Continue" }))
 }
 
 afterEach(() => {
@@ -105,19 +101,22 @@ describe("deviceAuthorizationPlugin (heroui)", () => {
 })
 
 describe("<DeviceAuthorization />", () => {
-  it("prefills and normalizes codes from complete verification links", async () => {
+  it("auto-verifies normalized codes from complete verification links", async () => {
     window.history.pushState({}, "", "/auth/device?user_code=ab12-cd34")
-    renderDeviceAuthorization()
+    const { authClient } = renderDeviceAuthorization()
 
     await waitFor(() => {
-      expect(screen.getByRole("textbox", { name: "Device code" })).toHaveValue(
-        "AB12CD34"
-      )
-      expect(screen.getByRole("button", { name: "Continue" })).toBeEnabled()
+      expect(authClient.device).toHaveBeenCalledWith({
+        query: { user_code: "AB12CD34" },
+        fetchOptions: expect.objectContaining({ throw: true })
+      })
     })
+    expect(
+      await screen.findByRole("heading", { name: "Approve Device" })
+    ).toBeInTheDocument()
   })
 
-  it("verifies the normalized code and approves the device", async () => {
+  it("auto-verifies the normalized code and approves the device", async () => {
     const user = userEvent.setup()
     const { authClient } = renderDeviceAuthorization()
 

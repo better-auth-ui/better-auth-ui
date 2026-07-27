@@ -1,0 +1,78 @@
+[
+  {
+    "id": "two-factor-plugin.ts-TwoFactorPluginOptions",
+    "name": "TwoFactorPluginOptions",
+    "description": "",
+    "entries": [
+      {
+        "name": "localization",
+        "description": "Override the plugin's default localization strings.",
+        "tags": [{ "name": "remarks", "text": "`TwoFactorLocalization`" }],
+        "type": "TwoFactorLocalization",
+        "simplifiedType": "TwoFactorLocalization",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "path",
+        "description": "URL segment for the two-factor challenge view.",
+        "tags": [
+          { "name": "remarks", "text": "`string`" },
+          { "name": "default", "text": "\"two-factor\"" }
+        ],
+        "type": "string",
+        "simplifiedType": "string",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "codeLength",
+        "description": "Number of characters rendered by the TOTP and OTP inputs.\n\nKeep this in sync with Better Auth's `twoFactor({ totpOptions: { digits } })`\nand `twoFactor({ otpOptions: { digits } })` server options.",
+        "tags": [
+          { "name": "remarks", "text": "`number`" },
+          { "name": "default", "text": "6" }
+        ],
+        "type": "number",
+        "simplifiedType": "number",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "backupCodes",
+        "description": "Offer backup-code recovery on the challenge view and expose backup-code\nmanagement in settings.\n\nTurn this off when the server sets `backupCodeOptions: { enabled: false }`.",
+        "tags": [
+          { "name": "remarks", "text": "`boolean`" },
+          { "name": "default", "text": "true" }
+        ],
+        "type": "boolean",
+        "simplifiedType": "boolean",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "trustDevice",
+        "description": "Show the \"Trust this device\" checkbox on the challenge view.",
+        "tags": [
+          { "name": "remarks", "text": "`boolean`" },
+          { "name": "default", "text": "true" }
+        ],
+        "type": "boolean",
+        "simplifiedType": "boolean",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "allowPasswordless",
+        "description": "Manage two-factor without asking for a password.\n\nMirrors Better Auth's `twoFactor({ allowPasswordless })` server option,\nwhich only skips the password for accounts that have no credential\naccount (e.g. passkey-only users) — set both or neither.",
+        "tags": [
+          { "name": "remarks", "text": "`boolean`" },
+          { "name": "default", "text": "false" }
+        ],
+        "type": "boolean",
+        "simplifiedType": "boolean",
+        "required": false,
+        "deprecated": false
+      }
+    ]
+  }
+]

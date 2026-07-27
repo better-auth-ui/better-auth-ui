@@ -18,7 +18,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu"
-import { Label } from "@/components/ui/label"
+import { Field, FieldLabel } from "@/components/ui/field"
 import { organizationPlugin } from "@/lib/auth/organization-plugin"
 import { OrganizationLogo } from "./organization-logo"
 
@@ -124,8 +124,8 @@ export function ChangeOrganizationLogo(props: ChangeOrganizationLogoProps) {
 
   return (
     <Show when={logo().enabled !== false}>
-      <div class={props.class ?? "grid gap-2"}>
-        <Label>{localization().logo}</Label>
+      <Field class={props.class}>
+        <FieldLabel>{localization().logo}</FieldLabel>
         <input
           accept="image/*"
           class="hidden"
@@ -174,7 +174,7 @@ export function ChangeOrganizationLogo(props: ChangeOrganizationLogoProps) {
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
-      </div>
+      </Field>
     </Show>
   )
 }

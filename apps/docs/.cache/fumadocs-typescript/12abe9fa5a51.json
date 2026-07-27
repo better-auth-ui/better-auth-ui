@@ -1,0 +1,18 @@
+[
+  {
+    "id": "two-factor-settings.tsx-TwoFactorSettingsProps",
+    "name": "TwoFactorSettingsProps",
+    "description": "",
+    "entries": [
+      {
+        "name": "class",
+        "description": "",
+        "tags": [],
+        "type": "string",
+        "simplifiedType": "string",
+        "required": false,
+        "deprecated": false
+      }
+    ]
+  }
+]

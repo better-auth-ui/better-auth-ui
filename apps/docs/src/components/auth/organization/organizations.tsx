@@ -3,11 +3,11 @@
 import type { OrganizationAuthClient } from "@better-auth-ui/core/plugins/organization"
 import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
 import { useListOrganizations } from "@better-auth-ui/react/plugins/organization"
-import { useState } from "react"
+import { Fragment, useState } from "react"
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
-import { Separator } from "@/components/ui/separator"
+import { Item, ItemGroup, ItemSeparator } from "@/components/ui/item"
 import { organizationPlugin } from "@/lib/auth/organization-plugin"
 import { CreateOrganizationDialog } from "./create-organization-dialog"
 import { OrganizationRow } from "./organization-row"
@@ -55,21 +55,22 @@ export function Organizations({ className }: OrganizationsProps) {
           <Card className="p-0">
             <CardContent className="p-0">
               {organizationsPending ? (
-                <div className="p-4">
-                  <OrganizationViewSkeleton />
-                </div>
+                <ItemGroup>
+                  <Item>
+                    <OrganizationViewSkeleton />
+                  </Item>
+                </ItemGroup>
               ) : !organizations?.length ? (
                 <OrganizationsEmpty onCreatePress={() => setCreateOpen(true)} />
               ) : (
-                organizations.map((organization, index) => (
-                  <div key={organization.id}>
-                    {index > 0 && <Separator />}
-
-                    <div className="p-4">
+                <ItemGroup className="gap-0">
+                  {organizations.map((organization, index) => (
+                    <Fragment key={organization.id}>
+                      {index > 0 && <ItemSeparator />}
                       <OrganizationRow organization={organization} />
-                    </div>
-                  </div>
-                ))
+                    </Fragment>
+                  ))}
+                </ItemGroup>
               )}
             </CardContent>
           </Card>

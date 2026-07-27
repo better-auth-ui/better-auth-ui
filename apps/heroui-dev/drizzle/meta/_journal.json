@@ -8,6 +8,13 @@
       "when": 1784996211860,
       "tag": "0000_add-device-codes",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1785089022808,
+      "tag": "0001_add-two-factor",
+      "breakpoints": true
     }
   ]
 }

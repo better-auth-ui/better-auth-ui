@@ -2,7 +2,7 @@ import { createQrCodeSvgData, getEmailProviderLink } from "@better-auth-ui/core"
 import { useAuth } from "@better-auth-ui/solid"
 import { QrCode } from "lucide-solid"
 import { Show } from "solid-js"
-import { buttonVariants } from "@/components/ui/button"
+import { type ButtonProps, buttonVariants } from "@/components/ui/button"
 import {
   Tooltip,
   TooltipContent,
@@ -13,6 +13,12 @@ import { cn } from "@/lib/utils"
 export type OpenEmailButtonProps = {
   email: string
   class?: string
+  /**
+   * Button variant. Defaults to the primary style for dead-end views where
+   * opening the inbox is the only action; pass `"secondary"` where it sits
+   * beside a submit button that should stay the primary call to action.
+   */
+  variant?: ButtonProps["variant"]
 }
 
 /**
@@ -41,7 +47,11 @@ export function OpenEmailButton(props: OpenEmailButtonProps) {
           <Tooltip>
             <TooltipTrigger
               type="button"
-              class={cn(buttonVariants(), "w-full", props.class)}
+              class={cn(
+                buttonVariants({ variant: props.variant }),
+                "w-full",
+                props.class
+              )}
               onClick={() =>
                 window.open(
                   emailProvider.loginUrl,

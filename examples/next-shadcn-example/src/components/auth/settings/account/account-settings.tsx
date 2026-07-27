@@ -17,8 +17,10 @@ export type AccountSettingsProps = {
  * Uses `emailAndPassword` and `plugins` from `useAuth()` to conditionally
  * show sections:
  * - `UserProfile` always renders.
- * - `ChangeEmail` renders when `emailAndPassword?.enabled` is truthy or the
- *   `magicLink` plugin is registered.
+ * - The change-email card renders when `emailAndPassword?.enabled` is truthy
+ *   or the `magicLink` plugin is registered, and a plugin may replace it via
+ *   `cardOverrides.account.changeEmail` (the email-OTP plugin swaps in its
+ *   code-based flow).
  * - Plugin-contributed account cards are rendered via the plugins array
  *   (e.g. `Appearance` from the theme plugin, multi-session accounts).
  */
@@ -30,13 +32,23 @@ export function AccountSettings({
 
   const hasMagicLink = plugins.some((plugin) => plugin.id === "magicLink")
 
+  const ChangeEmailOverride = plugins.find(
+    (plugin) => plugin.cardOverrides?.account?.changeEmail
+  )?.cardOverrides?.account?.changeEmail
+  const ChangeEmailCard = ChangeEmailOverride ?? ChangeEmail
+
+  // A plugin that replaces the card brings its own way to confirm the change,
+  // so it can stand on its own without password or magic-link auth.
+  const showChangeEmail =
+    emailAndPassword?.enabled || hasMagicLink || Boolean(ChangeEmailOverride)
+
   return (
     <div
       className={cn("flex w-full flex-col gap-4 md:gap-6", className)}
       {...props}
     >
       <UserProfile />
-      {(emailAndPassword?.enabled || hasMagicLink) && <ChangeEmail />}
+      {showChangeEmail && <ChangeEmailCard />}
       {plugins.flatMap(
         (plugin) =>
           plugin.accountCards?.map((Card, index) => (

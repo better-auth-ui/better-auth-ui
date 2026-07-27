@@ -33,7 +33,9 @@ export type AvatarConfig = {
   size: number
   /**
    * Upload a file and return the URL where it was stored.
-   * When undefined, the image is base64-encoded and saved directly to `user.image`.
+   * When undefined, a compact data URL is saved directly to `user.image`.
+   * The fallback is optimized for session cookie caches, while uploaded files
+   * keep the size and format produced by {@link resize}.
    */
   upload?: (file: File) => Promise<string>
 }

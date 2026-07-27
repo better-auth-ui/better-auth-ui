@@ -1,7 +1,7 @@
 import { createQrCodeSvgData, getEmailProviderLink } from "@better-auth-ui/core"
 import { useAuth } from "@better-auth-ui/react"
 import { QrCode } from "@gravity-ui/icons"
-import { cn, Tooltip } from "@heroui/react"
+import { type ButtonProps, cn, Tooltip } from "@heroui/react"
 import { buttonVariants } from "@heroui/styles"
 import { useMemo } from "react"
 
@@ -9,6 +9,13 @@ export type OpenEmailButtonProps = {
   /** Email address used to detect the provider, e.g. from the verify-email flow. */
   email: string
   className?: string
+  /**
+   * Button variant. Defaults to `"primary"` for dead-end views where opening
+   * the inbox is the only action; pass `"secondary"` where it sits beside a
+   * submit button that should stay the primary call to action.
+   * @remarks `ButtonProps["variant"]`
+   */
+  variant?: ButtonProps["variant"]
 }
 
 /**
@@ -22,9 +29,14 @@ export type OpenEmailButtonProps = {
  *
  * @param email - Email address to resolve the provider from.
  * @param className - Additional CSS classes applied to the link.
+ * @param variant - Button variant. Defaults to `"primary"`.
  * @returns The open-email link element, or `null` when no provider matches.
  */
-export function OpenEmailButton({ email, className }: OpenEmailButtonProps) {
+export function OpenEmailButton({
+  email,
+  className,
+  variant = "primary"
+}: OpenEmailButtonProps) {
   const { localization } = useAuth()
 
   const provider = getEmailProviderLink(email)
@@ -52,7 +64,7 @@ export function OpenEmailButton({ email, className }: OpenEmailButtonProps) {
             rel="noopener noreferrer"
             className={cn(
               triggerProps.className,
-              buttonVariants({ variant: "primary" }),
+              buttonVariants({ variant }),
               "w-full gap-2",
               className
             )}

@@ -9,7 +9,7 @@ import {
   writeFileSync
 } from "node:fs"
 import { tmpdir } from "node:os"
-import { join, resolve } from "node:path"
+import { join, posix, resolve } from "node:path"
 import { afterEach, describe, expect, it } from "vitest"
 import {
   type SolidRegistryManifest,
@@ -42,6 +42,109 @@ const parseJson = <T>(source: string, path: string) => {
 
 const readJson = <T>(path: string) =>
   parseJson<T>(readFileSync(path, "utf8"), path)
+
+type GeneratedRegistryFile = {
+  content: string
+  path: string
+}
+
+type GeneratedRegistryItem = {
+  files: GeneratedRegistryFile[]
+  registryDependencies?: string[]
+}
+
+const extractModuleSpecifiers = (content: string) =>
+  [...content.matchAll(/\b(?:from|import)\s*(?:\(\s*)?["']([^"']+)["']/g)].map(
+    ([, specifier]) => specifier
+  )
+
+const registryDependencyName = (dependency: string, solid: boolean) => {
+  const pattern = solid
+    ? /^https:\/\/better-auth-ui\.com\/r\/solid\/([a-z0-9-]+)\.json$/
+    : /^https:\/\/better-auth-ui\.com\/r\/([a-z0-9-]+)\.json$/
+
+  return dependency.match(pattern)?.[1]
+}
+
+const collectRegistryInstall = ({
+  entry,
+  registryRoot,
+  solid
+}: {
+  entry: string
+  registryRoot: string
+  solid: boolean
+}) => {
+  const files = new Map<string, string>()
+  const itemNames = new Set<string>()
+  const registryDependencies = new Set<string>()
+  const queue = [entry]
+
+  while (queue.length > 0) {
+    const name = queue.pop()
+    if (!name || itemNames.has(name)) {
+      continue
+    }
+
+    itemNames.add(name)
+    const item = readJson<GeneratedRegistryItem>(
+      resolve(registryRoot, `${name}.json`)
+    )
+
+    for (const file of item.files) {
+      files.set(file.path, file.content)
+    }
+
+    for (const dependency of item.registryDependencies ?? []) {
+      registryDependencies.add(dependency)
+      const dependencyName = registryDependencyName(dependency, solid)
+      if (dependencyName) {
+        queue.push(dependencyName)
+      }
+    }
+  }
+
+  const fileCandidates = (path: string) => [
+    path,
+    `${path}.ts`,
+    `${path}.tsx`,
+    `${path}/index.ts`,
+    `${path}/index.tsx`
+  ]
+  const unresolvedImports: string[] = []
+
+  for (const [path, content] of files) {
+    for (const specifier of extractModuleSpecifiers(content)) {
+      if (
+        specifier.startsWith("@/components/ui/") ||
+        specifier.startsWith("@/hooks/") ||
+        specifier === "@/lib/utils"
+      ) {
+        continue
+      }
+
+      const importedPath = specifier.startsWith("@/")
+        ? `src/${specifier.slice(2)}`
+        : specifier.startsWith(".")
+          ? posix.normalize(posix.join(posix.dirname(path), specifier))
+          : undefined
+
+      if (
+        importedPath &&
+        !fileCandidates(importedPath).some((candidate) => files.has(candidate))
+      ) {
+        unresolvedImports.push(`${path} imports ${specifier}`)
+      }
+    }
+  }
+
+  return {
+    files,
+    itemNames,
+    registryDependencies,
+    unresolvedImports
+  }
+}
 
 const collectFiles = (root: string): string[] =>
   readdirSync(root, { withFileTypes: true }).flatMap((entry) => {
@@ -108,11 +211,13 @@ const expectedSolidRegistryPayloadNames = [
   "sign-in",
   "last-login-method",
   "sign-up",
+  "email-otp",
   "magic-link",
   "oauth-provider",
   "device-authorization",
   "username",
   "passkey",
+  "two-factor",
   "api-key",
   "forgot-password",
   "reset-password",
@@ -646,15 +751,19 @@ describe("Solid registry isolation", () => {
 
   it("uses upstream Zaidan UI primitive dependencies in registry payloads", () => {
     const uiFiles = [
+      "src/components/ui/alert.tsx",
       "src/components/ui/button.tsx",
       "src/components/ui/card.tsx",
+      "src/components/ui/field.tsx",
       "src/components/ui/input.tsx",
       "src/components/ui/label.tsx",
       "src/lib/utils.ts"
     ]
     const upstreamFormUiDependencies = [
+      "@zaidan/alert",
       "@zaidan/button",
       "@zaidan/card",
+      "@zaidan/field",
       "@zaidan/input",
       "@zaidan/label"
     ]
@@ -662,35 +771,41 @@ describe("Solid registry isolation", () => {
       {
         path: "src/components/auth/username/sign-in-username.tsx",
         imports: [
+          'from "@/components/ui/alert"',
           'from "@/components/ui/button"',
-          'from "@/components/ui/card"'
+          'from "@/components/ui/card"',
+          'from "@/components/ui/field"',
+          'from "@/components/ui/input"'
         ]
       },
       {
         path: "src/components/auth/sign-up.tsx",
         imports: [
+          'from "@/components/ui/alert"',
           'from "@/components/ui/button"',
           'from "@/components/ui/card"',
-          'from "@/components/ui/input"',
-          'from "@/components/ui/label"'
+          'from "@/components/ui/field"',
+          'from "@/components/ui/input"'
         ]
       },
       {
         path: "src/components/auth/forgot-password.tsx",
         imports: [
+          'from "@/components/ui/alert"',
           'from "@/components/ui/button"',
           'from "@/components/ui/card"',
-          'from "@/components/ui/input"',
-          'from "@/components/ui/label"'
+          'from "@/components/ui/field"',
+          'from "@/components/ui/input"'
         ]
       },
       {
         path: "src/components/auth/reset-password.tsx",
         imports: [
+          'from "@/components/ui/alert"',
           'from "@/components/ui/button"',
           'from "@/components/ui/card"',
-          'from "@/components/ui/input"',
-          'from "@/components/ui/label"'
+          'from "@/components/ui/field"',
+          'from "@/components/ui/input"'
         ]
       }
     ]
@@ -787,22 +902,35 @@ describe("Solid registry isolation", () => {
     }
   })
 
-  it("requires upstream Zaidan dependencies for generated UI primitive imports", () => {
+  it("resolves generated UI primitive imports from bundled files or Zaidan dependencies", () => {
     const uiPrimitiveDependencies = {
+      alert: "@zaidan/alert",
+      "alert-dialog": "@zaidan/alert-dialog",
       avatar: "@zaidan/avatar",
       badge: "@zaidan/badge",
       button: "@zaidan/button",
+      calendar: "@zaidan/calendar",
       card: "@zaidan/card",
+      checkbox: "@zaidan/checkbox",
+      combobox: "@zaidan/combobox",
       dialog: "@zaidan/dialog",
       "dropdown-menu": "@zaidan/dropdown-menu",
+      empty: "@zaidan/empty",
+      field: "@zaidan/field",
       "input-group": "@zaidan/input-group",
       input: "@zaidan/input",
       item: "@zaidan/item",
       label: "@zaidan/label",
+      "native-select": "@zaidan/native-select",
+      popover: "@zaidan/popover",
+      "radio-group": "@zaidan/radio-group",
+      select: "@zaidan/select",
       separator: "@zaidan/separator",
       skeleton: "@zaidan/skeleton",
+      slider: "@zaidan/slider",
       sonner: "@zaidan/sonner",
       spinner: "@zaidan/spinner",
+      switch: "@zaidan/switch",
       table: "@zaidan/table",
       tabs: "@zaidan/tabs",
       textarea: "@zaidan/textarea",
@@ -823,7 +951,7 @@ describe("Solid registry isolation", () => {
       registryFiles.map((registryFile) => [
         registryFile.replace(/\.json$/, ""),
         readJson<{
-          files: Array<{ content?: string }>
+          files: Array<{ content?: string; path: string }>
           registryDependencies: string[]
         }>(join(outputRoot, "solid", registryFile))
       ])
@@ -874,6 +1002,15 @@ describe("Solid registry isolation", () => {
       const registryDependencies = collectRegistryDependencies(name)
 
       for (const primitive of importedUiPrimitives) {
+        const bundledPrimitivePath = `src/components/ui/${primitive}.tsx`
+        const isBundled = [...registryDependencies].some((dependency) =>
+          registryPayloads[dependency]?.files.some(
+            (file) => file.path === bundledPrimitivePath
+          )
+        )
+
+        if (isBundled) continue
+
         const dependency =
           uiPrimitiveDependencies[
             primitive as keyof typeof uiPrimitiveDependencies
@@ -2194,9 +2331,11 @@ describe("Solid registry isolation", () => {
     )
     expect(resetPassword.files[0]?.content).toContain("useResetPassword")
     expect(resetPassword.files[0]?.content).toContain(
-      "Password reset successfully. You can sign in with your new"
+      "auth.localization.auth.passwordResetSuccessDescription"
     )
-    expect(resetPassword.files[0]?.content).toContain("password.")
+    expect(resetPassword.files[0]?.content).toContain(
+      "auth.localization.auth.passwordResetErrorDescription"
+    )
     expect(resetPassword.files[0]?.content).toContain(
       "auth.localization.auth.invalidResetPasswordToken"
     )
@@ -2233,6 +2372,78 @@ describe("Solid registry isolation", () => {
       "Unable to create an account. Try again."
     )
     expect(signUp.files[0]?.content).toContain("auth.emailAndPassword.name")
+  })
+
+  it("installs complete Email OTP and Two-Factor dependency closures", () => {
+    const registryRoot = resolve(__dirname, "../../../apps/docs/public/r")
+    const registries = [
+      {
+        root: registryRoot,
+        solid: false
+      },
+      {
+        root: resolve(registryRoot, "solid"),
+        solid: true
+      }
+    ]
+
+    for (const registry of registries) {
+      const emailOtpInstall = collectRegistryInstall({
+        entry: "email-otp",
+        registryRoot: registry.root,
+        solid: registry.solid
+      })
+      const twoFactorInstall = collectRegistryInstall({
+        entry: "two-factor",
+        registryRoot: registry.root,
+        solid: registry.solid
+      })
+
+      expect(emailOtpInstall.unresolvedImports).toEqual([])
+      expect(twoFactorInstall.unresolvedImports).toEqual([])
+      expect(emailOtpInstall.itemNames).toContain("account-settings")
+      expect(emailOtpInstall.registryDependencies).toContain(
+        registry.solid ? "@zaidan/tooltip" : "tooltip"
+      )
+      expect(twoFactorInstall.itemNames).toContain("sign-in")
+      expect(
+        emailOtpInstall.files.has("src/components/auth/open-email-button.tsx")
+      ).toBe(true)
+      expect(
+        emailOtpInstall.files.has(
+          "src/components/auth/last-login-method/last-used-badge.tsx"
+        )
+      ).toBe(true)
+      expect(
+        emailOtpInstall.files.has("src/lib/auth/two-factor-methods.ts")
+      ).toBe(true)
+      expect(
+        twoFactorInstall.files.has("src/lib/auth/two-factor-methods.ts")
+      ).toBe(true)
+
+      const continuation = twoFactorInstall.files.get(
+        "src/lib/auth/use-sign-in-continuation.ts"
+      )
+      expect(continuation).toBeDefined()
+      const continuationImports = extractModuleSpecifiers(continuation ?? "")
+      expect(continuationImports).toContain("./two-factor-methods")
+      expect(continuationImports).not.toContain("@better-auth-ui/core/plugins")
+    }
+
+    const shadcnEmailOtpInstall = collectRegistryInstall({
+      entry: "email-otp",
+      registryRoot,
+      solid: false
+    })
+    const shadcnTwoFactorInstall = collectRegistryInstall({
+      entry: "two-factor",
+      registryRoot,
+      solid: false
+    })
+
+    expect(shadcnEmailOtpInstall.registryDependencies).toContain("badge")
+    expect(shadcnTwoFactorInstall.itemNames).toContain("username")
+    expect(shadcnTwoFactorInstall.itemNames).toContain("additional-field")
   })
 
   it("rejects manifest files that escape the Solid example source tree", () => {
@@ -2273,11 +2484,13 @@ describe("Solid registry isolation", () => {
       "./plugins/api-key",
       "./plugins/captcha",
       "./plugins/device-authorization",
+      "./plugins/email-otp",
       "./plugins/magic-link",
       "./plugins/multi-session",
       "./plugins/oauth-provider",
       "./plugins/organization",
       "./plugins/passkey",
+      "./plugins/two-factor",
       "./plugins/username"
     ])
     expect(report.exampleSolidDependency).toBe("*")
@@ -2510,6 +2723,7 @@ describe("Solid registry isolation", () => {
       "sign-in-email",
       "sign-in-username",
       "sign-in-magic-link",
+      "sign-in-email-otp",
       "sign-in-passkey",
       "sign-in-social",
       "sign-up-email",
@@ -2517,21 +2731,35 @@ describe("Solid registry isolation", () => {
       "request-password-reset",
       "reset-password",
       "send-verification-email",
+      "send-verification-otp",
+      "verify-email-otp",
+      "request-password-reset-otp",
+      "reset-password-otp",
       "is-username-available",
       "oauth-consent",
       "oauth-continue",
       "verify-device-code",
       "approve-device",
       "deny-device",
+      "send-two-factor-otp",
+      "verify-totp",
+      "verify-two-factor-otp",
+      "verify-backup-code",
       "---Settings---",
       "update-user",
       "change-email",
+      "request-email-change-otp",
+      "change-email-otp",
       "change-password",
       "delete-user",
       "link-social",
       "unlink-account",
       "add-passkey",
       "delete-passkey",
+      "enable-two-factor",
+      "disable-two-factor",
+      "get-totp-uri",
+      "generate-backup-codes",
       "revoke-session",
       "revoke-multi-session",
       "set-active-session",
@@ -2570,6 +2798,7 @@ describe("Solid registry isolation", () => {
       "captcha",
       "delete-user",
       "device-authorization",
+      "email-otp",
       "last-login-method",
       "magic-link",
       "multi-session",
@@ -2577,6 +2806,7 @@ describe("Solid registry isolation", () => {
       "oauth-provider",
       "passkey",
       "theme",
+      "two-factor",
       "username"
     ])
     expect(zaidanComponentsMeta.pages).toEqual([
@@ -2845,6 +3075,8 @@ describe("Solid registry isolation", () => {
       "admin",
       "username",
       "passkey",
+      "two-factor",
+      "email-otp",
       "multi-session",
       "api-key",
       "delete-user",
@@ -2993,9 +3225,11 @@ describe("Solid registry isolation", () => {
       } else if (
         name === "admin" ||
         name === "delete-user" ||
+        name === "email-otp" ||
         name === "last-login-method" ||
         name === "magic-link" ||
         name === "oauth-provider" ||
+        name === "two-factor" ||
         name === "device-authorization" ||
         name === "multi-session" ||
         name === "theme" ||

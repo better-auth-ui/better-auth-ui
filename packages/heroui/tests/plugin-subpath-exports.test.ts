@@ -1,11 +1,13 @@
 import { describe, expect, it } from "vitest"
 import * as apiKey from "../src/plugins/api-key"
 import * as deleteUser from "../src/plugins/delete-user"
+import * as emailOtp from "../src/plugins/email-otp"
 import * as magicLink from "../src/plugins/magic-link"
 import * as multiSession from "../src/plugins/multi-session"
 import * as organization from "../src/plugins/organization"
 import * as passkey from "../src/plugins/passkey"
 import * as theme from "../src/plugins/theme"
+import * as twoFactor from "../src/plugins/two-factor"
 import * as username from "../src/plugins/username"
 
 describe("HeroUI plugin subpath exports", () => {
@@ -17,6 +19,10 @@ describe("HeroUI plugin subpath exports", () => {
     expect(deleteUser).toHaveProperty("DangerZone")
     expect(deleteUser).toHaveProperty("DeleteAccount")
     expect(deleteUser).toHaveProperty("deleteUserPlugin")
+
+    expect(emailOtp).toHaveProperty("EmailOtp")
+    expect(emailOtp).toHaveProperty("VerifyEmailOtp")
+    expect(emailOtp).toHaveProperty("emailOtpPlugin")
 
     expect(magicLink).toHaveProperty("MagicLink")
     expect(magicLink).toHaveProperty("magicLinkPlugin")
@@ -36,6 +42,10 @@ describe("HeroUI plugin subpath exports", () => {
     expect(theme).toHaveProperty("Appearance")
     expect(theme).toHaveProperty("ThemeToggleItem")
     expect(theme).toHaveProperty("themePlugin")
+
+    expect(twoFactor).toHaveProperty("TwoFactorChallenge")
+    expect(twoFactor).toHaveProperty("TwoFactorSettings")
+    expect(twoFactor).toHaveProperty("twoFactorPlugin")
 
     expect(username).toHaveProperty("SignInUsername")
     expect(username).toHaveProperty("UsernameField")

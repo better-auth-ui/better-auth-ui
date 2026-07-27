@@ -6,9 +6,10 @@ import {
 } from "@better-auth-ui/core/plugins/oauth-provider"
 import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
 import { useListOAuthConsents } from "@better-auth-ui/react/plugins/oauth-provider"
+import { Fragment } from "react"
 
 import { Card, CardContent } from "@/components/ui/card"
-import { Separator } from "@/components/ui/separator"
+import { ItemGroup, ItemSeparator } from "@/components/ui/item"
 import { oauthProviderPlugin } from "@/lib/auth/oauth-provider-plugin"
 import { cn } from "@/lib/utils"
 import { AuthorizedApplication } from "./authorized-application"
@@ -51,13 +52,14 @@ export function AuthorizedApplications({
           ) : !applications.length ? (
             <AuthorizedApplicationsEmpty />
           ) : (
-            applications.map((application, index) => (
-              <div key={application.clientId}>
-                {index > 0 && <Separator />}
-
-                <AuthorizedApplication application={application} />
-              </div>
-            ))
+            <ItemGroup className="gap-0">
+              {applications.map((application, index) => (
+                <Fragment key={application.clientId}>
+                  {index > 0 && <ItemSeparator />}
+                  <AuthorizedApplication application={application} />
+                </Fragment>
+              ))}
+            </ItemGroup>
           )}
         </CardContent>
       </Card>

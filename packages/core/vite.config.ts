@@ -13,6 +13,7 @@ export default defineConfig({
         "plugins/delete-user/index": "src/plugins/delete-user/index.ts",
         "plugins/device-authorization/index":
           "src/plugins/device-authorization/index.ts",
+        "plugins/email-otp/index": "src/plugins/email-otp/index.ts",
         "plugins/last-login-method/index":
           "src/plugins/last-login-method/index.ts",
         "plugins/magic-link/index": "src/plugins/magic-link/index.ts",
@@ -25,6 +26,7 @@ export default defineConfig({
         "plugins/passkey/index": "src/plugins/passkey/index.ts",
         "plugins/passkey/server": "src/plugins/passkey/server.ts",
         "plugins/theme/index": "src/plugins/theme/index.ts",
+        "plugins/two-factor/index": "src/plugins/two-factor/index.ts",
         "plugins/username/index": "src/plugins/username/index.ts",
         "plugins/username/server": "src/plugins/username/server.ts",
         server: "src/server.ts"

@@ -1,6 +1,6 @@
 {
   "name": "@better-auth-ui/solid",
-  "version": "1.6.34",
+  "version": "1.6.37",
   "type": "module",
   "scripts": {
     "build": "vite build && vite build --config vite.email.config.ts",
@@ -38,6 +38,10 @@
       "types": "./dist/plugins/device-authorization/index.d.ts",
       "import": "./dist/plugins/device-authorization/index.js"
     },
+    "./plugins/email-otp": {
+      "types": "./dist/plugins/email-otp/index.d.ts",
+      "import": "./dist/plugins/email-otp/index.js"
+    },
     "./plugins/magic-link": {
       "types": "./dist/plugins/magic-link/index.d.ts",
       "import": "./dist/plugins/magic-link/index.js"
@@ -57,6 +61,10 @@
     "./plugins/passkey": {
       "types": "./dist/plugins/passkey/index.d.ts",
       "import": "./dist/plugins/passkey/index.js"
+    },
+    "./plugins/two-factor": {
+      "types": "./dist/plugins/two-factor/index.d.ts",
+      "import": "./dist/plugins/two-factor/index.js"
     },
     "./plugins/username": {
       "types": "./dist/plugins/username/index.d.ts",

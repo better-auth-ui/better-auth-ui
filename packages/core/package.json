@@ -1,6 +1,6 @@
 {
   "name": "@better-auth-ui/core",
-  "version": "1.6.34",
+  "version": "1.6.37",
   "type": "module",
   "scripts": {
     "build": "vite build",
@@ -47,6 +47,11 @@
       "src": "./src/plugins/device-authorization/index.ts",
       "types": "./dist/plugins/device-authorization/index.d.ts",
       "import": "./dist/plugins/device-authorization/index.js"
+    },
+    "./plugins/email-otp": {
+      "src": "./src/plugins/email-otp/index.ts",
+      "types": "./dist/plugins/email-otp/index.d.ts",
+      "import": "./dist/plugins/email-otp/index.js"
     },
     "./plugins/last-login-method": {
       "src": "./src/plugins/last-login-method/index.ts",
@@ -102,6 +107,11 @@
       "src": "./src/plugins/theme/index.ts",
       "types": "./dist/plugins/theme/index.d.ts",
       "import": "./dist/plugins/theme/index.js"
+    },
+    "./plugins/two-factor": {
+      "src": "./src/plugins/two-factor/index.ts",
+      "types": "./dist/plugins/two-factor/index.d.ts",
+      "import": "./dist/plugins/two-factor/index.js"
     },
     "./plugins/username": {
       "src": "./src/plugins/username/index.ts",

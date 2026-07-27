@@ -24,7 +24,10 @@
     }
   },
   "namedInputs": {
-    "sharedGlobals": ["{workspaceRoot}/.github/workflows/ci.yml"],
+    "sharedGlobals": [
+      "{workspaceRoot}/.github/workflows/ci.yml",
+      "{workspaceRoot}/bun.lock"
+    ],
     "default": ["{projectRoot}/**/*", "sharedGlobals"]
   },
   "nxCloudId": "691fe786e56af5ab30ac4788",

@@ -362,6 +362,8 @@
         "@better-auth-ui/solid": "*",
         "@better-auth/api-key": "1.7.0-rc.0",
         "@better-auth/passkey": "1.7.0-rc.0",
+        "@corvu/calendar": "^0.1.2",
+        "@corvu/otp-field": "^0.1.4",
         "@fontsource-variable/geist": "^5.2.8",
         "@fontsource-variable/inter": "^5.2.8",
         "@kobalte/core": "^0.13.12",
@@ -375,6 +377,7 @@
         "bowser": "^2.11.0",
         "class-variance-authority": "^0.7.1",
         "clsx": "^2.1.1",
+        "date-fns": "^4.4.0",
         "drizzle-orm": "^0.45.2",
         "lucide-solid": "^1.23.0",
         "shadcn": "^4.12.0",
@@ -399,7 +402,7 @@
     },
     "packages/core": {
       "name": "@better-auth-ui/core",
-      "version": "1.6.34",
+      "version": "1.6.37",
       "dependencies": {
         "uqr": "^0.1.3",
       },
@@ -428,7 +431,7 @@
     },
     "packages/heroui": {
       "name": "@better-auth-ui/heroui",
-      "version": "1.6.34",
+      "version": "1.6.37",
       "devDependencies": {
         "@gravity-ui/icons": "^2.20.0",
         "@heroui/react": "^3.2.1",
@@ -465,7 +468,7 @@
     },
     "packages/react": {
       "name": "@better-auth-ui/react",
-      "version": "1.6.34",
+      "version": "1.6.37",
       "devDependencies": {
         "@better-auth/api-key": "1.7.0-rc.0",
         "@better-auth/passkey": "1.7.0-rc.0",
@@ -509,7 +512,7 @@
     },
     "packages/solid": {
       "name": "@better-auth-ui/solid",
-      "version": "1.6.34",
+      "version": "1.6.37",
       "devDependencies": {
         "@better-auth/api-key": "1.7.0-rc.0",
         "@better-auth/passkey": "1.7.0-rc.0",
@@ -815,6 +818,10 @@
     "@cloudflare/workerd-linux-arm64": ["@cloudflare/workerd-linux-arm64@1.20260722.1", "", { "os": "linux", "cpu": "arm64" }, "sha512-BOSB55SMNdy+DA5uj2WirgiNanpHGis5PVvXH1wSfvjRKr4JGgWK+EZzxz0RFUo6QjjQQC/NimEzNZ7va7jmKg=="],
 
     "@cloudflare/workerd-windows-64": ["@cloudflare/workerd-windows-64@1.20260722.1", "", { "os": "win32", "cpu": "x64" }, "sha512-sYM8YgUpKnRz2xjvdJLX1Ojzoi4MlA4gk8WTTExhGydjYB2UTs5NIbv0ZmpKgMoK9io3ixgmiW56ZnTbcWOdiA=="],
+
+    "@corvu/calendar": ["@corvu/calendar@0.1.2", "", { "dependencies": { "@corvu/utils": "~0.4.2" }, "peerDependencies": { "solid-js": "^1.8" } }, "sha512-Vbdns1iNNI0WTIwDZS7m9pHWtr/YTz7yrisXhHUCfl4mxDvb9W8MMmun651wiEjhL7+OrcNbbl2kTOmYSFIf4g=="],
+
+    "@corvu/otp-field": ["@corvu/otp-field@0.1.4", "", { "dependencies": { "@corvu/utils": "~0.4.2" }, "peerDependencies": { "solid-js": "^1.8" } }, "sha512-3eG7OoUt6CfVqGujIYfqImdrhGR/s4DpKr5ZQT10zzw3nawIlcwVpqoHTam0v4cgv+NXXvl6I8DoA3J+WgW2YA=="],
 
     "@corvu/utils": ["@corvu/utils@0.4.2", "", { "dependencies": { "@floating-ui/dom": "^1.6.11" }, "peerDependencies": { "solid-js": "^1.8" } }, "sha512-Ox2kYyxy7NoXdKWdHeDEjZxClwzO4SKM8plAaVwmAJPxHMqA0rLOoAsa+hBDwRLpctf+ZRnAd/ykguuJidnaTA=="],
 

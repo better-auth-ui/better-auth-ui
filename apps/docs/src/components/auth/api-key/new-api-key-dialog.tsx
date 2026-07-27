@@ -5,18 +5,18 @@ import { Check, Copy, Key } from "lucide-react"
 import { useState } from "react"
 import { toast } from "sonner"
 
+import { Button } from "@/components/ui/button"
 import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogMedia,
-  AlertDialogTitle
-} from "@/components/ui/alert-dialog"
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle
+} from "@/components/ui/dialog"
 import {
   InputGroup,
+  InputGroupAddon,
   InputGroupButton,
   InputGroupInput
 } from "@/components/ui/input-group"
@@ -41,6 +41,14 @@ export function NewApiKeyDialog({
 
   const [copied, setCopied] = useState(false)
 
+  const handleOpenChange = (nextOpen: boolean) => {
+    if (!nextOpen) {
+      setCopied(false)
+    }
+
+    onOpenChange(nextOpen)
+  }
+
   const copySecretKey = async () => {
     if (!secretKey) return
 
@@ -54,19 +62,18 @@ export function NewApiKeyDialog({
   }
 
   return (
-    <AlertDialog open={open} onOpenChange={onOpenChange}>
-      <AlertDialogContent>
-        <AlertDialogHeader>
-          <AlertDialogMedia>
+    <Dialog open={open} onOpenChange={handleOpenChange}>
+      <DialogContent showCloseButton={false}>
+        <DialogHeader>
+          <DialogTitle>
             <Key />
-          </AlertDialogMedia>
+            {apiKeyLocalization.newApiKey}
+          </DialogTitle>
 
-          <AlertDialogTitle>{apiKeyLocalization.newApiKey}</AlertDialogTitle>
-
-          <AlertDialogDescription>
+          <DialogDescription>
             {apiKeyLocalization.newApiKeyWarning}
-          </AlertDialogDescription>
-        </AlertDialogHeader>
+          </DialogDescription>
+        </DialogHeader>
 
         <div className="flex flex-col gap-2">
           <Label htmlFor="new-api-key-secret">
@@ -81,22 +88,24 @@ export function NewApiKeyDialog({
               className="font-mono text-xs"
             />
 
-            <InputGroupButton
-              size="icon-xs"
-              aria-label={localization.settings.copyToClipboard}
-              onClick={copySecretKey}
-            >
-              {copied ? <Check /> : <Copy />}
-            </InputGroupButton>
+            <InputGroupAddon align="inline-end">
+              <InputGroupButton
+                size="icon-xs"
+                aria-label={localization.settings.copyToClipboard}
+                onClick={copySecretKey}
+              >
+                {copied ? <Check /> : <Copy />}
+              </InputGroupButton>
+            </InputGroupAddon>
           </InputGroup>
         </div>
 
-        <AlertDialogFooter>
-          <AlertDialogAction>
+        <DialogFooter>
+          <Button type="button" onClick={() => handleOpenChange(false)}>
             {apiKeyLocalization.dismissNewKey}
-          </AlertDialogAction>
-        </AlertDialogFooter>
-      </AlertDialogContent>
-    </AlertDialog>
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   )
 }

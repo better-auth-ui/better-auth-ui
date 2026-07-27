@@ -1,5 +1,6 @@
 "use client"
 
+import { Item, ItemContent, ItemMedia } from "@/components/ui/item"
 import { Skeleton } from "@/components/ui/skeleton"
 
 /**
@@ -7,13 +8,14 @@ import { Skeleton } from "@/components/ui/skeleton"
  */
 export function UserInvitationRowSkeleton() {
   return (
-    <div className="flex items-center gap-3">
-      <Skeleton className="size-10 shrink-0 rounded-md" />
-
-      <div className="flex flex-col gap-1">
+    <Item>
+      <ItemMedia>
+        <Skeleton className="size-10 shrink-0 rounded-md" />
+      </ItemMedia>
+      <ItemContent>
         <Skeleton className="h-4 w-40 rounded-md" />
         <Skeleton className="h-3 w-28 rounded-md" />
-      </div>
-    </div>
+      </ItemContent>
+    </Item>
   )
 }

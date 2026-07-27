@@ -3,11 +3,13 @@ import * as admin from "../src/plugins/admin"
 import * as apiKey from "../src/plugins/api-key"
 import * as captcha from "../src/plugins/captcha"
 import * as deviceAuthorization from "../src/plugins/device-authorization"
+import * as emailOtp from "../src/plugins/email-otp"
 import * as magicLink from "../src/plugins/magic-link"
 import * as multiSession from "../src/plugins/multi-session"
 import * as oauthProvider from "../src/plugins/oauth-provider"
 import * as organization from "../src/plugins/organization"
 import * as passkey from "../src/plugins/passkey"
+import * as twoFactor from "../src/plugins/two-factor"
 import * as username from "../src/plugins/username"
 
 describe("React plugin subpath exports", () => {
@@ -30,11 +32,17 @@ describe("React plugin subpath exports", () => {
     expect(deviceAuthorization).toHaveProperty("useApproveDevice")
     expect(deviceAuthorization).toHaveProperty("useDenyDevice")
     expect(deviceAuthorization).toHaveProperty("useVerifyDeviceCode")
+    expect(emailOtp).toHaveProperty("useChangeEmailOtp")
+    expect(emailOtp).toHaveProperty("useSignInEmailOtp")
+    expect(emailOtp).toHaveProperty("useVerifyEmailOtp")
     expect(magicLink).toHaveProperty("useSignInMagicLink")
     expect(oauthProvider).toHaveProperty("useOAuthConsent")
     expect(oauthProvider).toHaveProperty("usePublicOAuthClient")
     expect(username).toHaveProperty("useIsUsernameAvailable")
     expect(username).toHaveProperty("useSignInUsername")
+    expect(twoFactor).toHaveProperty("useDisableTwoFactor")
+    expect(twoFactor).toHaveProperty("useEnableTwoFactor")
+    expect(twoFactor).toHaveProperty("useVerifyTotp")
 
     expect(organization).toHaveProperty("useAcceptInvitation")
     expect(organization).toHaveProperty("useCancelInvitation")
@@ -48,6 +56,8 @@ describe("React plugin subpath exports", () => {
     expect(deviceAuthorization).not.toHaveProperty("approveDeviceOptions")
     expect(deviceAuthorization).not.toHaveProperty("denyDeviceOptions")
     expect(deviceAuthorization).not.toHaveProperty("verifyDeviceCodeOptions")
+    expect(emailOtp).not.toHaveProperty("changeEmailOtpOptions")
+    expect(emailOtp).not.toHaveProperty("signInEmailOtpOptions")
     expect(apiKey).not.toHaveProperty("deleteApiKeyOptions")
     expect(magicLink).not.toHaveProperty("signInMagicLinkOptions")
     expect(multiSession).not.toHaveProperty("revokeMultiSessionOptions")
@@ -59,6 +69,8 @@ describe("React plugin subpath exports", () => {
     expect(passkey).not.toHaveProperty("signInPasskeyOptions")
     expect(username).not.toHaveProperty("signInUsernameOptions")
     expect(username).not.toHaveProperty("isUsernameAvailableOptions")
+    expect(twoFactor).not.toHaveProperty("enableTwoFactorOptions")
+    expect(twoFactor).not.toHaveProperty("verifyTotpOptions")
     expect(organization).not.toHaveProperty("createOrganizationOptions")
     expect(organization).not.toHaveProperty("setActiveOrganizationOptions")
     expect(apiKey).not.toHaveProperty("listApiKeysOptions")
@@ -77,7 +89,9 @@ describe("React plugin subpath exports", () => {
     expect(react).not.toHaveProperty("useCancelInvitation")
     expect(react).not.toHaveProperty("useListApiKeys")
     expect(react).not.toHaveProperty("useListPasskeys")
+    expect(react).not.toHaveProperty("useSignInEmailOtp")
     expect(react).not.toHaveProperty("useOAuthConsent")
     expect(react).not.toHaveProperty("useStopImpersonating")
+    expect(react).not.toHaveProperty("useVerifyTotp")
   })
 })

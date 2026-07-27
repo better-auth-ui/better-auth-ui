@@ -1,14 +1,18 @@
 import { viewPaths } from "@better-auth-ui/core"
 import { Auth } from "@better-auth-ui/heroui"
 import { deviceAuthorizationPlugin } from "@better-auth-ui/heroui/plugins/device-authorization"
+import { emailOtpPlugin } from "@better-auth-ui/heroui/plugins/email-otp"
 import { magicLinkPlugin } from "@better-auth-ui/heroui/plugins/magic-link"
+import { twoFactorPlugin } from "@better-auth-ui/heroui/plugins/two-factor"
 import { createFileRoute, notFound } from "@tanstack/react-router"
 
 /** Keep in sync with the auth-view plugins in `providers.tsx` if paths are customized. */
 const validAuthPathSegments = new Set([
   ...Object.values(viewPaths.auth),
   deviceAuthorizationPlugin().viewPaths.auth.deviceAuthorization,
-  magicLinkPlugin().viewPaths.auth.magicLink
+  magicLinkPlugin().viewPaths.auth.magicLink,
+  emailOtpPlugin().viewPaths.auth.emailOtp,
+  twoFactorPlugin().viewPaths.auth.twoFactor
 ])
 
 export const Route = createFileRoute("/auth/$path")({

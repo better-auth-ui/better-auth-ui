@@ -31,6 +31,16 @@ import {
 } from "@better-auth-ui/core/plugins/api-key"
 import { deleteUserMutationKeys } from "@better-auth-ui/core/plugins/delete-user"
 import {
+  changeEmailOtpOptions,
+  emailOtpMutationKeys,
+  requestEmailChangeOtpOptions,
+  requestPasswordResetOtpOptions,
+  resetPasswordOtpOptions,
+  sendVerificationOtpOptions,
+  signInEmailOtpOptions,
+  verifyEmailOtpOptions
+} from "@better-auth-ui/core/plugins/email-otp"
+import {
   magicLinkMutationKeys,
   signInMagicLinkOptions
 } from "@better-auth-ui/core/plugins/magic-link"
@@ -57,6 +67,17 @@ import {
   passkeyQueryKeys,
   signInPasskeyOptions
 } from "@better-auth-ui/core/plugins/passkey"
+import {
+  disableTwoFactorOptions,
+  enableTwoFactorOptions,
+  generateBackupCodesOptions,
+  getTotpUriOptions,
+  sendTwoFactorOtpOptions,
+  twoFactorMutationKeys,
+  verifyBackupCodeOptions,
+  verifyTotpOptions,
+  verifyTwoFactorOtpOptions
+} from "@better-auth-ui/core/plugins/two-factor"
 import {
   isUsernameAvailableOptions,
   signInUsernameOptions,
@@ -534,6 +555,77 @@ describe("Solid auth behavior parity", () => {
       name: "CLI",
       fetchOptions: { credentials: "include", throw: true }
     })
+  })
+
+  it("mirrors the React email-OTP and two-factor mutation keys", () => {
+    const authClient = {
+      emailOtp: {
+        sendVerificationOtp: vi.fn(async () => ({ data: "sent" })),
+        verifyEmail: vi.fn(async () => ({ data: "verified" })),
+        requestPasswordReset: vi.fn(async () => ({ data: "requested" })),
+        resetPassword: vi.fn(async () => ({ data: "reset" })),
+        requestEmailChange: vi.fn(async () => ({ data: "requested" })),
+        changeEmail: vi.fn(async () => ({ data: "changed" }))
+      },
+      signIn: { emailOtp: vi.fn(async (params) => ({ data: params.email })) },
+      twoFactor: {
+        enable: vi.fn(async () => ({ data: "enabled" })),
+        disable: vi.fn(async () => ({ data: "disabled" })),
+        getTotpUri: vi.fn(async () => ({ data: "otpauth://" })),
+        generateBackupCodes: vi.fn(async () => ({ data: ["code"] })),
+        sendOtp: vi.fn(async () => ({ data: "sent" })),
+        verifyTotp: vi.fn(async () => ({ data: "verified" })),
+        verifyOtp: vi.fn(async () => ({ data: "verified" })),
+        verifyBackupCode: vi.fn(async () => ({ data: "verified" }))
+      }
+    }
+
+    expect(sendVerificationOtpOptions(authClient as never).mutationKey).toEqual(
+      emailOtpMutationKeys.sendVerificationOtp
+    )
+    expect(signInEmailOtpOptions(authClient as never).mutationKey).toEqual(
+      emailOtpMutationKeys.signIn
+    )
+    expect(verifyEmailOtpOptions(authClient as never).mutationKey).toEqual(
+      emailOtpMutationKeys.verifyEmail
+    )
+    expect(
+      requestPasswordResetOtpOptions(authClient as never).mutationKey
+    ).toEqual(emailOtpMutationKeys.requestPasswordReset)
+    expect(resetPasswordOtpOptions(authClient as never).mutationKey).toEqual(
+      emailOtpMutationKeys.resetPassword
+    )
+    expect(
+      requestEmailChangeOtpOptions(authClient as never).mutationKey
+    ).toEqual(emailOtpMutationKeys.requestEmailChange)
+    expect(changeEmailOtpOptions(authClient as never).mutationKey).toEqual(
+      emailOtpMutationKeys.changeEmail
+    )
+
+    expect(enableTwoFactorOptions(authClient as never).mutationKey).toEqual(
+      twoFactorMutationKeys.enable
+    )
+    expect(disableTwoFactorOptions(authClient as never).mutationKey).toEqual(
+      twoFactorMutationKeys.disable
+    )
+    expect(getTotpUriOptions(authClient as never).mutationKey).toEqual(
+      twoFactorMutationKeys.getTotpUri
+    )
+    expect(generateBackupCodesOptions(authClient as never).mutationKey).toEqual(
+      twoFactorMutationKeys.generateBackupCodes
+    )
+    expect(sendTwoFactorOtpOptions(authClient as never).mutationKey).toEqual(
+      twoFactorMutationKeys.sendOtp
+    )
+    expect(verifyTotpOptions(authClient as never).mutationKey).toEqual(
+      twoFactorMutationKeys.verifyTotp
+    )
+    expect(verifyTwoFactorOtpOptions(authClient as never).mutationKey).toEqual(
+      twoFactorMutationKeys.verifyOtp
+    )
+    expect(verifyBackupCodeOptions(authClient as never).mutationKey).toEqual(
+      twoFactorMutationKeys.verifyBackupCode
+    )
   })
 
   it("creates organization query and mutation options with plugin-scoped keys", () => {

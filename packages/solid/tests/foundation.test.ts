@@ -44,11 +44,13 @@ describe("@better-auth-ui/solid foundation", () => {
       "./plugins/api-key",
       "./plugins/captcha",
       "./plugins/device-authorization",
+      "./plugins/email-otp",
       "./plugins/magic-link",
       "./plugins/multi-session",
       "./plugins/oauth-provider",
       "./plugins/organization",
       "./plugins/passkey",
+      "./plugins/two-factor",
       "./plugins/username"
     ])
     expect(metadata.exports).toHaveProperty("./email")

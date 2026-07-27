@@ -3,11 +3,11 @@
 import type { ApiKeyAuthClient } from "@better-auth-ui/core/plugins/api-key"
 import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
 import { useListApiKeys } from "@better-auth-ui/react/plugins/api-key"
-import { useState } from "react"
+import { Fragment, useState } from "react"
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
-import { Separator } from "@/components/ui/separator"
+import { ItemGroup, ItemSeparator } from "@/components/ui/item"
 import { apiKeyPlugin } from "@/lib/auth/api-key-plugin"
 import { cn } from "@/lib/utils"
 import { ApiKey } from "./api-key"
@@ -80,17 +80,18 @@ export function ApiKeys({
               hideCreate={hideCreate}
             />
           ) : (
-            listData.apiKeys.map((key, index) => (
-              <div key={key.id}>
-                {index > 0 && <Separator />}
-
-                <ApiKey
-                  apiKey={key}
-                  hideDelete={hideDelete}
-                  organizationId={organizationId}
-                />
-              </div>
-            ))
+            <ItemGroup className="gap-0">
+              {listData.apiKeys.map((key, index) => (
+                <Fragment key={key.id}>
+                  {index > 0 && <ItemSeparator />}
+                  <ApiKey
+                    apiKey={key}
+                    hideDelete={hideDelete}
+                    organizationId={organizationId}
+                  />
+                </Fragment>
+              ))}
+            </ItemGroup>
           )}
         </CardContent>
       </Card>

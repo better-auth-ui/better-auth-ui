@@ -2,9 +2,11 @@ import { apiKeyClient } from "@better-auth/api-key/client"
 import { passkeyClient } from "@better-auth/passkey/client"
 import type { AuthClient } from "@better-auth-ui/core"
 import {
+  emailOTPClient,
   magicLinkClient,
   multiSessionClient,
   organizationClient,
+  twoFactorClient,
   usernameClient
 } from "better-auth/client/plugins"
 import { createAuthClient } from "better-auth/solid"
@@ -27,6 +29,8 @@ export const authClient: AuthClient = createAuthClient({
     passkeyClient(),
     usernameClient(),
     magicLinkClient(),
+    emailOTPClient(),
+    twoFactorClient(),
     organizationClient()
   ]
 })

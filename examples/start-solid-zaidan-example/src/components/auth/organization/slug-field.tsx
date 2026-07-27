@@ -7,12 +7,12 @@ import { useCheckSlug } from "@better-auth-ui/solid/plugins/organization"
 import { createDebounce } from "@solid-primitives/debounce"
 import { Check, X } from "lucide-solid"
 import { createEffect } from "solid-js"
+import { Field, FieldError, FieldLabel } from "@/components/ui/field"
 import {
   InputGroup,
   InputGroupAddon,
   InputGroupInput
 } from "@/components/ui/input-group"
-import { Label } from "@/components/ui/label"
 import { Spinner } from "@/components/ui/spinner"
 import { organizationPlugin } from "@/lib/auth/organization-plugin"
 
@@ -70,8 +70,8 @@ export function SlugField(props: SlugFieldProps) {
   })
 
   return (
-    <div class="grid gap-2">
-      <Label for={props.id ?? "slug"}>{localization().slug}</Label>
+    <Field data-invalid={Boolean(slugAvailability.error)}>
+      <FieldLabel for={props.id ?? "slug"}>{localization().slug}</FieldLabel>
       <InputGroup>
         <InputGroupInput
           id={props.id ?? "slug"}
@@ -99,6 +99,10 @@ export function SlugField(props: SlugFieldProps) {
           </InputGroupAddon>
         ) : null}
       </InputGroup>
-    </div>
+      <FieldError>
+        {slugAvailability.error?.error?.message ??
+          slugAvailability.error?.message}
+      </FieldError>
+    </Field>
   )
 }

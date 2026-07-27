@@ -1,13 +1,19 @@
 import { apiKey } from "@better-auth/api-key"
 import { passkey } from "@better-auth/passkey"
-import { MagicLinkEmail, ResetPasswordEmail } from "@better-auth-ui/react/email"
+import {
+  MagicLinkEmail,
+  OtpEmail,
+  ResetPasswordEmail
+} from "@better-auth-ui/react/email"
 import { render } from "@react-email/render"
 import { betterAuth } from "better-auth"
 import { drizzleAdapter } from "better-auth/adapters/drizzle"
 import {
+  emailOTP,
   magicLink,
   multiSession,
   organization,
+  twoFactor,
   username
 } from "better-auth/plugins"
 
@@ -18,6 +24,44 @@ import * as schema from "./schema"
 const mailFrom = process.env.MAIL_FROM ?? "Better Auth UI <noreply@localhost>"
 
 const MAGIC_LINK_EXPIRES_SECONDS = 300
+
+const OTP_EXPIRES_SECONDS = 300
+
+/** Subject line differs per flow, the code layout doesn't. */
+const otpSubjects = {
+  "sign-in": "Your sign-in code",
+  "email-verification": "Verify your email",
+  "forget-password": "Reset your password",
+  "change-email": "Confirm your new email"
+} as const
+
+async function sendOtpEmail({
+  email,
+  otp,
+  subject
+}: {
+  email: string
+  otp: string
+  subject: string
+}) {
+  const html = await render(
+    <OtpEmail
+      verificationCode={otp}
+      appName="Better Auth UI"
+      email={email}
+      expirationMinutes={OTP_EXPIRES_SECONDS / 60}
+      poweredBy
+    />
+  )
+
+  await transporter.sendMail({
+    from: mailFrom,
+    to: email,
+    subject,
+    text: `Your code is ${otp}. It expires in ${String(OTP_EXPIRES_SECONDS / 60)} minutes.`,
+    html
+  })
+}
 
 export const auth = betterAuth({
   database: drizzleAdapter(db, {
@@ -49,6 +93,29 @@ export const auth = betterAuth({
   secret: process.env.BETTER_AUTH_SECRET as string,
   plugins: [
     multiSession(),
+    twoFactor({
+      issuer: "Better Auth UI",
+      otpOptions: {
+        sendOTP: async ({ user, otp }) => {
+          await sendOtpEmail({
+            email: user.email,
+            otp,
+            subject: "Your sign-in code"
+          })
+        }
+      }
+    }),
+    emailOTP({
+      expiresIn: OTP_EXPIRES_SECONDS,
+      // Sign-up stays on the password and magic-link paths, matching
+      // `emailOtpPlugin({ disableSignUp: true })` on the client.
+      disableSignUp: true,
+      overrideDefaultEmailVerification: true,
+      changeEmail: { enabled: true },
+      sendVerificationOTP: async ({ email, otp, type }) => {
+        await sendOtpEmail({ email, otp, subject: otpSubjects[type] })
+      }
+    }),
     passkey(),
     username(),
     apiKey([

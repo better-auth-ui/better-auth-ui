@@ -46,6 +46,11 @@ Thumbs.db
 
 .nx
 
+# Vitest browser-mode failure artifacts. `__screenshots__/` stays tracked so
+# `toMatchScreenshot()` reference images can be committed — the browser
+# configs point failure screenshots at `.vitest-attachments/` instead.
+.vitest-attachments/
+
 # Environment variables
 .env
 .env.local

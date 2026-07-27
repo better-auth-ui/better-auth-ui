@@ -1,6 +1,6 @@
 {
   "name": "@better-auth-ui/react",
-  "version": "1.6.34",
+  "version": "1.6.37",
   "type": "module",
   "scripts": {
     "build": "vite build",
@@ -44,6 +44,11 @@
       "types": "./dist/plugins/device-authorization/index.d.ts",
       "import": "./dist/plugins/device-authorization/index.js"
     },
+    "./plugins/email-otp": {
+      "src": "./src/plugins/email-otp/index.ts",
+      "types": "./dist/plugins/email-otp/index.d.ts",
+      "import": "./dist/plugins/email-otp/index.js"
+    },
     "./plugins/magic-link": {
       "src": "./src/plugins/magic-link/index.ts",
       "types": "./dist/plugins/magic-link/index.d.ts",
@@ -68,6 +73,11 @@
       "src": "./src/plugins/passkey/index.ts",
       "types": "./dist/plugins/passkey/index.d.ts",
       "import": "./dist/plugins/passkey/index.js"
+    },
+    "./plugins/two-factor": {
+      "src": "./src/plugins/two-factor/index.ts",
+      "types": "./dist/plugins/two-factor/index.d.ts",
+      "import": "./dist/plugins/two-factor/index.js"
     },
     "./plugins/username": {
       "src": "./src/plugins/username/index.ts",

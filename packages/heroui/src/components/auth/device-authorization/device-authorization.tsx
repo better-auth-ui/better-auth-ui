@@ -23,8 +23,10 @@ import {
 import {
   type FormEvent,
   type ReactNode,
+  useCallback,
   useEffect,
   useReducer,
+  useRef,
   useState
 } from "react"
 
@@ -118,6 +120,7 @@ export function DeviceAuthorization({
     deviceAuthorizationReducer,
     initialDeviceAuthorizationState
   )
+  const submittedCodeRef = useRef<string | null>(null)
   const normalizedUserCode = normalizeDeviceCode(userCode)
 
   const handleAuthorizationError = () => {
@@ -163,9 +166,62 @@ export function DeviceAuthorization({
   )
 
   const handleCodeChange = (value: string) => {
-    setUserCode(value.toUpperCase())
+    const nextCode = normalizeDeviceCode(value)
+      .replace(/[^A-Z0-9]/g, "")
+      .slice(0, userCodeLength)
+
+    if (nextCode !== submittedCodeRef.current) {
+      submittedCodeRef.current = null
+    }
+
+    setUserCode(nextCode)
     dispatch({ type: "codeChanged" })
   }
+
+  const submitCode = useCallback(
+    (completedCode: string) => {
+      const normalizedCode = normalizeDeviceCode(completedCode)
+
+      if (
+        isSessionPending ||
+        isVerifying ||
+        normalizedCode.length !== userCodeLength ||
+        normalizedCode === submittedCodeRef.current
+      ) {
+        return
+      }
+
+      submittedCodeRef.current = normalizedCode
+
+      if (!session) {
+        const verificationPath = `${basePaths.auth}/${deviceAuthorizationViewPaths.auth.deviceAuthorization}?user_code=${encodeURIComponent(normalizedCode)}`
+        const signInPath = `${basePaths.auth}/${viewPaths.auth.signIn}?redirectTo=${encodeURIComponent(verificationPath)}`
+        navigate({ to: signInPath })
+        return
+      }
+
+      verifyDeviceCode({
+        query: { user_code: normalizedCode }
+      })
+    },
+    [
+      basePaths.auth,
+      deviceAuthorizationViewPaths.auth.deviceAuthorization,
+      isSessionPending,
+      isVerifying,
+      navigate,
+      session,
+      userCodeLength,
+      verifyDeviceCode,
+      viewPaths.auth.signIn
+    ]
+  )
+
+  useEffect(() => {
+    if (normalizedUserCode.length === userCodeLength) {
+      submitCode(normalizedUserCode)
+    }
+  }, [normalizedUserCode, submitCode, userCodeLength])
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -178,16 +234,7 @@ export function DeviceAuthorization({
       return
     }
 
-    if (!session) {
-      const verificationPath = `${basePaths.auth}/${deviceAuthorizationViewPaths.auth.deviceAuthorization}?user_code=${encodeURIComponent(normalizedUserCode)}`
-      const signInPath = `${basePaths.auth}/${viewPaths.auth.signIn}?redirectTo=${encodeURIComponent(verificationPath)}`
-      navigate({ to: signInPath })
-      return
-    }
-
-    verifyDeviceCode({
-      query: { user_code: normalizedUserCode }
-    })
+    submitCode(normalizedUserCode)
   }
 
   const cardClassName = cn("w-full max-w-sm gap-4 md:p-6", className) ?? ""

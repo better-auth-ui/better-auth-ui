@@ -7,8 +7,14 @@ import {
   type ThemeOption
 } from "@/components/auth/theme/theme-plugin-state"
 import { Card, CardContent } from "@/components/ui/card"
+import {
+  Field,
+  FieldContent,
+  FieldLabel,
+  FieldTitle
+} from "@/components/ui/field"
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { applyThemePreference, type ThemeMode } from "@/lib/theme"
-import { cn } from "@/lib/utils"
 
 type ThemePreviewSvgProps = JSX.SvgSVGAttributes<SVGSVGElement>
 
@@ -238,38 +244,41 @@ export function Appearance(props: AppearanceProps = {}) {
         {themeState().localization.appearance}
       </h2>
       <Card>
-        <CardContent class="grid gap-3 sm:grid-cols-3">
-          <For each={themeState().themes}>
-            {(option) => {
-              const Icon = themeIcon(option.value)
+        <CardContent>
+          <Field>
+            <FieldLabel>{themeState().localization.theme}</FieldLabel>
+            <RadioGroup
+              class="grid grid-cols-2 gap-3 sm:grid-cols-3"
+              onChange={(value) => selectTheme(value as ThemeMode)}
+              value={theme()}
+            >
+              <For each={themeState().themes}>
+                {(option) => {
+                  const Icon = themeIcon(option.value)
 
-              return (
-                <button
-                  aria-pressed={theme() === option.value}
-                  class={cn(
-                    "rounded-lg border p-3 text-left transition-colors hover:bg-muted/50",
-                    theme() === option.value && "border-foreground"
-                  )}
-                  onClick={() => selectTheme(option.value)}
-                  type="button"
-                >
-                  <div class="mb-3 flex items-center justify-between gap-2 text-sm font-medium">
-                    <span class="flex items-center gap-2">
-                      <Icon class="size-4 text-muted-foreground" />
-                      {themeLabel(themeState().localization, option)}
-                    </span>
-                    <span
-                      class={cn(
-                        "size-3 rounded-full border",
-                        theme() === option.value && "bg-foreground"
-                      )}
-                    />
-                  </div>
-                  <ThemePreview mode={option.value} />
-                </button>
-              )
-            }}
-          </For>
+                  return (
+                    <FieldLabel for={`theme-${option.value}`}>
+                      <Field orientation="horizontal">
+                        <FieldContent>
+                          <div class="flex items-center justify-between gap-2">
+                            <FieldTitle>
+                              <Icon class="text-muted-foreground" />
+                              {themeLabel(themeState().localization, option)}
+                            </FieldTitle>
+                            <RadioGroupItem
+                              id={`theme-${option.value}`}
+                              value={option.value}
+                            />
+                          </div>
+                          <ThemePreview mode={option.value} />
+                        </FieldContent>
+                      </Field>
+                    </FieldLabel>
+                  )
+                }}
+              </For>
+            </RadioGroup>
+          </Field>
         </CardContent>
       </Card>
     </div>

@@ -105,6 +105,16 @@
           "path": "src/components/auth/last-login-method/last-used-badge.tsx",
           "type": "registry:component",
           "target": "@components/auth/last-login-method/last-used-badge.tsx"
+        },
+        {
+          "path": "src/lib/auth/use-sign-in-continuation.ts",
+          "type": "registry:lib",
+          "target": "@lib/auth/use-sign-in-continuation.ts"
+        },
+        {
+          "path": "src/lib/auth/two-factor-methods.ts",
+          "type": "registry:lib",
+          "target": "@lib/auth/two-factor-methods.ts"
         }
       ]
     },
@@ -170,6 +180,120 @@
           "path": "src/components/auth/last-login-method/last-used-badge.tsx",
           "type": "registry:component",
           "target": "@components/auth/last-login-method/last-used-badge.tsx"
+        }
+      ]
+    },
+    {
+      "name": "email-otp",
+      "type": "registry:component",
+      "title": "Email OTP",
+      "description": "Email OTP plugin: passwordless sign-in with an emailed code, plus code-based replacements for email verification, password reset, and email changes.",
+      "dependencies": [
+        "@better-auth-ui/react@latest",
+        "@better-auth-ui/core@latest",
+        "better-auth",
+        "input-otp",
+        "lucide-react"
+      ],
+      "registryDependencies": [
+        "badge",
+        "button",
+        "card",
+        "field",
+        "https://better-auth-ui.com/r/account-settings.json",
+        "input",
+        "input-group",
+        "input-otp",
+        "skeleton",
+        "sonner",
+        "spinner",
+        "tooltip"
+      ],
+      "files": [
+        {
+          "path": "src/lib/auth/auth-plugin.ts",
+          "type": "registry:lib",
+          "target": "@lib/auth/auth-plugin.ts"
+        },
+        {
+          "path": "src/lib/auth/email-otp-plugin.ts",
+          "type": "registry:lib",
+          "target": "@lib/auth/email-otp-plugin.ts"
+        },
+        {
+          "path": "src/lib/auth/use-resend-cooldown.ts",
+          "type": "registry:lib",
+          "target": "@lib/auth/use-resend-cooldown.ts"
+        },
+        {
+          "path": "src/lib/auth/use-sign-in-continuation.ts",
+          "type": "registry:lib",
+          "target": "@lib/auth/use-sign-in-continuation.ts"
+        },
+        {
+          "path": "src/lib/auth/two-factor-methods.ts",
+          "type": "registry:lib",
+          "target": "@lib/auth/two-factor-methods.ts"
+        },
+        {
+          "path": "src/components/auth/otp-field.tsx",
+          "type": "registry:component",
+          "target": "@components/auth/otp-field.tsx"
+        },
+        {
+          "path": "src/components/auth/email-otp/email-otp.tsx",
+          "type": "registry:component",
+          "target": "@components/auth/email-otp/email-otp.tsx"
+        },
+        {
+          "path": "src/components/auth/email-otp/email-otp-button.tsx",
+          "type": "registry:component",
+          "target": "@components/auth/email-otp/email-otp-button.tsx"
+        },
+        {
+          "path": "src/components/auth/email-otp/verify-email-otp.tsx",
+          "type": "registry:component",
+          "target": "@components/auth/email-otp/verify-email-otp.tsx"
+        },
+        {
+          "path": "src/components/auth/email-otp/forgot-password-otp.tsx",
+          "type": "registry:component",
+          "target": "@components/auth/email-otp/forgot-password-otp.tsx"
+        },
+        {
+          "path": "src/components/auth/email-otp/reset-password-otp.tsx",
+          "type": "registry:component",
+          "target": "@components/auth/email-otp/reset-password-otp.tsx"
+        },
+        {
+          "path": "src/components/auth/email-otp/change-email-otp.tsx",
+          "type": "registry:component",
+          "target": "@components/auth/email-otp/change-email-otp.tsx"
+        },
+        {
+          "path": "src/components/auth/open-email-button.tsx",
+          "type": "registry:component",
+          "target": "@components/auth/open-email-button.tsx"
+        },
+        {
+          "path": "src/components/auth/provider-button.tsx",
+          "type": "registry:component",
+          "target": "@components/auth/provider-button.tsx"
+        },
+        {
+          "path": "src/components/auth/provider-buttons.tsx",
+          "type": "registry:component",
+          "target": "@components/auth/provider-buttons.tsx"
+        },
+        {
+          "path": "src/components/auth/last-login-method/last-used-badge.tsx",
+          "type": "registry:component",
+          "target": "@components/auth/last-login-method/last-used-badge.tsx"
+        },
+        {
+          "path": "src/components/auth/use-is-hydrated.ts",
+          "type": "registry:component",
+          "target": "@components/auth/use-is-hydrated.ts"
         }
       ]
     },
@@ -266,6 +390,7 @@
         "badge",
         "button",
         "card",
+        "empty",
         "item",
         "separator",
         "skeleton",
@@ -380,7 +505,8 @@
         "input-group",
         "separator",
         "sonner",
-        "spinner"
+        "spinner",
+        "https://better-auth-ui.com/r/additional-field.json"
       ],
       "files": [
         {
@@ -407,6 +533,16 @@
           "path": "src/components/auth/last-login-method/last-used-badge.tsx",
           "type": "registry:component",
           "target": "@components/auth/last-login-method/last-used-badge.tsx"
+        },
+        {
+          "path": "src/lib/auth/use-sign-in-continuation.ts",
+          "type": "registry:lib",
+          "target": "@lib/auth/use-sign-in-continuation.ts"
+        },
+        {
+          "path": "src/lib/auth/two-factor-methods.ts",
+          "type": "registry:lib",
+          "target": "@lib/auth/two-factor-methods.ts"
         }
       ]
     },
@@ -425,8 +561,11 @@
         "alert-dialog",
         "button",
         "card",
+        "dialog",
+        "empty",
         "field",
         "input",
+        "item",
         "separator",
         "skeleton",
         "spinner"
@@ -480,6 +619,107 @@
       ]
     },
     {
+      "name": "two-factor",
+      "type": "registry:component",
+      "title": "Two-Factor",
+      "description": "Two-factor plugin: the post-password challenge for authenticator, emailed, and backup codes, plus the settings card for enrollment and backup-code management.",
+      "dependencies": [
+        "@better-auth-ui/react@latest",
+        "@better-auth-ui/core@latest",
+        "better-auth",
+        "input-otp",
+        "lucide-react"
+      ],
+      "registryDependencies": [
+        "alert-dialog",
+        "button",
+        "card",
+        "checkbox",
+        "dialog",
+        "field",
+        "input",
+        "input-group",
+        "input-otp",
+        "skeleton",
+        "sonner",
+        "spinner",
+        "https://better-auth-ui.com/r/sign-in.json",
+        "https://better-auth-ui.com/r/username.json"
+      ],
+      "files": [
+        {
+          "path": "src/lib/auth/auth-plugin.ts",
+          "type": "registry:lib",
+          "target": "@lib/auth/auth-plugin.ts"
+        },
+        {
+          "path": "src/lib/auth/two-factor-plugin.ts",
+          "type": "registry:lib",
+          "target": "@lib/auth/two-factor-plugin.ts"
+        },
+        {
+          "path": "src/lib/auth/use-resend-cooldown.ts",
+          "type": "registry:lib",
+          "target": "@lib/auth/use-resend-cooldown.ts"
+        },
+        {
+          "path": "src/lib/auth/use-sign-in-continuation.ts",
+          "type": "registry:lib",
+          "target": "@lib/auth/use-sign-in-continuation.ts"
+        },
+        {
+          "path": "src/lib/auth/two-factor-methods.ts",
+          "type": "registry:lib",
+          "target": "@lib/auth/two-factor-methods.ts"
+        },
+        {
+          "path": "src/lib/auth/use-two-factor-password.ts",
+          "type": "registry:lib",
+          "target": "@lib/auth/use-two-factor-password.ts"
+        },
+        {
+          "path": "src/components/auth/otp-field.tsx",
+          "type": "registry:component",
+          "target": "@components/auth/otp-field.tsx"
+        },
+        {
+          "path": "src/components/auth/two-factor/two-factor-challenge.tsx",
+          "type": "registry:component",
+          "target": "@components/auth/two-factor/two-factor-challenge.tsx"
+        },
+        {
+          "path": "src/components/auth/two-factor/two-factor-settings.tsx",
+          "type": "registry:component",
+          "target": "@components/auth/two-factor/two-factor-settings.tsx"
+        },
+        {
+          "path": "src/components/auth/two-factor/enable-two-factor-dialog.tsx",
+          "type": "registry:component",
+          "target": "@components/auth/two-factor/enable-two-factor-dialog.tsx"
+        },
+        {
+          "path": "src/components/auth/two-factor/disable-two-factor-dialog.tsx",
+          "type": "registry:component",
+          "target": "@components/auth/two-factor/disable-two-factor-dialog.tsx"
+        },
+        {
+          "path": "src/components/auth/two-factor/regenerate-backup-codes-dialog.tsx",
+          "type": "registry:component",
+          "target": "@components/auth/two-factor/regenerate-backup-codes-dialog.tsx"
+        },
+        {
+          "path": "src/components/auth/two-factor/backup-codes.tsx",
+          "type": "registry:component",
+          "target": "@components/auth/two-factor/backup-codes.tsx"
+        },
+        {
+          "path": "src/components/auth/use-is-hydrated.ts",
+          "type": "registry:component",
+          "target": "@components/auth/use-is-hydrated.ts"
+        }
+      ]
+    },
+    {
       "name": "api-key",
       "type": "registry:component",
       "title": "API Key",
@@ -494,9 +734,12 @@
         "alert-dialog",
         "button",
         "card",
+        "dialog",
+        "empty",
         "field",
         "input",
         "input-group",
+        "item",
         "label",
         "separator",
         "skeleton",
@@ -605,6 +848,7 @@
         "button",
         "card",
         "dropdown-menu",
+        "item",
         "separator",
         "sonner",
         "spinner",
@@ -666,10 +910,13 @@
         "badge",
         "button",
         "card",
+        "dialog",
         "dropdown-menu",
+        "empty",
         "field",
         "input",
         "input-group",
+        "item",
         "label",
         "select",
         "separator",
@@ -873,7 +1120,13 @@
         "@better-auth-ui/core@latest",
         "lucide-react"
       ],
-      "registryDependencies": ["card", "field", "radio-group", "tabs"],
+      "registryDependencies": [
+        "card",
+        "dropdown-menu",
+        "field",
+        "radio-group",
+        "tabs"
+      ],
       "files": [
         {
           "path": "src/lib/auth/auth-plugin.ts",
@@ -1315,6 +1568,7 @@
       "registryDependencies": [
         "button",
         "card",
+        "item",
         "skeleton",
         "sonner",
         "spinner"
@@ -1345,8 +1599,10 @@
         "lucide-react"
       ],
       "registryDependencies": [
+        "badge",
         "button",
         "card",
+        "item",
         "skeleton",
         "sonner",
         "spinner"
@@ -1659,11 +1915,13 @@
         "https://better-auth-ui.com/r/sign-in.json",
         "https://better-auth-ui.com/r/last-login-method.json",
         "https://better-auth-ui.com/r/sign-up.json",
+        "https://better-auth-ui.com/r/email-otp.json",
         "https://better-auth-ui.com/r/magic-link.json",
         "https://better-auth-ui.com/r/oauth-provider.json",
         "https://better-auth-ui.com/r/device-authorization.json",
         "https://better-auth-ui.com/r/username.json",
         "https://better-auth-ui.com/r/passkey.json",
+        "https://better-auth-ui.com/r/two-factor.json",
         "https://better-auth-ui.com/r/api-key.json",
         "https://better-auth-ui.com/r/admin.json",
         "https://better-auth-ui.com/r/multi-session.json",

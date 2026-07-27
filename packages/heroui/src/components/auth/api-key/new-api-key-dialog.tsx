@@ -1,10 +1,10 @@
 import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
 import { Check, Copy, Key } from "@gravity-ui/icons"
 import {
-  AlertDialog,
   Button,
   InputGroup,
   Label,
+  Modal,
   TextField,
   toast
 } from "@heroui/react"
@@ -30,6 +30,14 @@ export function NewApiKeyDialog({
 
   const [copied, setCopied] = useState(false)
 
+  const handleOpenChange = (open: boolean) => {
+    if (!open) {
+      setCopied(false)
+    }
+
+    onOpenChange(open)
+  }
+
   const copySecretKey = async () => {
     if (!secretKey) return
 
@@ -43,22 +51,20 @@ export function NewApiKeyDialog({
   }
 
   return (
-    <AlertDialog.Backdrop isOpen={isOpen} onOpenChange={onOpenChange}>
-      <AlertDialog.Container>
-        <AlertDialog.Dialog>
-          <AlertDialog.CloseTrigger />
+    <Modal.Backdrop isOpen={isOpen} onOpenChange={handleOpenChange}>
+      <Modal.Container>
+        <Modal.Dialog>
+          <Modal.CloseTrigger />
 
-          <AlertDialog.Header>
-            <AlertDialog.Icon status="warning">
+          <Modal.Header>
+            <Modal.Icon className="bg-warning-soft text-warning-soft-foreground">
               <Key />
-            </AlertDialog.Icon>
+            </Modal.Icon>
 
-            <AlertDialog.Heading>
-              {apiKeyLocalization.newApiKey}
-            </AlertDialog.Heading>
-          </AlertDialog.Header>
+            <Modal.Heading>{apiKeyLocalization.newApiKey}</Modal.Heading>
+          </Modal.Header>
 
-          <AlertDialog.Body className="flex flex-col gap-4 overflow-visible">
+          <Modal.Body className="flex flex-col gap-4 overflow-visible">
             <p className="text-muted text-sm">
               {apiKeyLocalization.newApiKeyWarning}
             </p>
@@ -82,13 +88,15 @@ export function NewApiKeyDialog({
                 </InputGroup.Suffix>
               </InputGroup>
             </TextField>
-          </AlertDialog.Body>
+          </Modal.Body>
 
-          <AlertDialog.Footer>
-            <Button slot="close">{apiKeyLocalization.dismissNewKey}</Button>
-          </AlertDialog.Footer>
-        </AlertDialog.Dialog>
-      </AlertDialog.Container>
-    </AlertDialog.Backdrop>
+          <Modal.Footer>
+            <Button onPress={() => handleOpenChange(false)}>
+              {apiKeyLocalization.dismissNewKey}
+            </Button>
+          </Modal.Footer>
+        </Modal.Dialog>
+      </Modal.Container>
+    </Modal.Backdrop>
   )
 }

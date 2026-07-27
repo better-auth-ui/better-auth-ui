@@ -8,7 +8,16 @@ import {
   useRejectInvitation
 } from "@better-auth-ui/solid/plugins/organization"
 import { Check, Clock, X } from "lucide-solid"
+import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
+import {
+  Item,
+  ItemActions,
+  ItemContent,
+  ItemDescription,
+  ItemMedia,
+  ItemTitle
+} from "@/components/ui/item"
 import { organizationPlugin } from "@/lib/auth/organization-plugin"
 
 type RoleMap = Record<string, string>
@@ -36,11 +45,11 @@ const fallbackLocalization = {
 } satisfies Pick<OrganizationLocalization, "accept" | "rejectInvitation">
 
 function formatInvitationDate(createdAt?: Date | string | null) {
-  if (!createdAt) return "—"
+  if (!createdAt) return "-"
 
   const date = createdAt instanceof Date ? createdAt : new Date(createdAt)
 
-  if (Number.isNaN(date.getTime())) return "—"
+  if (Number.isNaN(date.getTime())) return "-"
 
   return date.toLocaleString(undefined, {
     dateStyle: "medium",
@@ -71,24 +80,20 @@ export function UserInvitationRow(props: UserInvitationRowProps) {
     roles()[props.invitation.role ?? ""] ?? props.invitation.role ?? "Member"
 
   return (
-    <div class="flex items-center gap-3">
-      <div class="flex size-10 shrink-0 items-center justify-center rounded-md bg-muted">
-        <Clock class="size-4" />
-      </div>
-      <div class="flex min-w-0 flex-col">
-        <div class="flex items-center gap-1.5">
-          <span class="truncate font-medium text-sm leading-tight">
-            {props.invitation.organizationName ?? "Organization"}
-          </span>
-          <span class="rounded-md bg-muted px-2 py-1 font-medium text-muted-foreground text-xs">
-            {roleLabel()}
-          </span>
-        </div>
-        <span class="truncate text-muted-foreground text-xs">
+    <Item>
+      <ItemMedia variant="icon">
+        <Clock />
+      </ItemMedia>
+      <ItemContent>
+        <ItemTitle>
+          {props.invitation.organizationName ?? "Organization"}
+          <Badge variant="secondary">{roleLabel()}</Badge>
+        </ItemTitle>
+        <ItemDescription>
           {formatInvitationDate(props.invitation.createdAt)}
-        </span>
-      </div>
-      <div class="ml-auto flex shrink-0 items-center gap-2">
+        </ItemDescription>
+      </ItemContent>
+      <ItemActions>
         <Button
           disabled={isPending()}
           onClick={() =>
@@ -98,7 +103,7 @@ export function UserInvitationRow(props: UserInvitationRowProps) {
           type="button"
           variant="outline"
         >
-          <Check class="size-4" />
+          <Check />
           {organizationLocalization().accept}
         </Button>
         <Button
@@ -112,9 +117,9 @@ export function UserInvitationRow(props: UserInvitationRowProps) {
           type="button"
           variant="outline"
         >
-          <X class="size-4" />
+          <X />
         </Button>
-      </div>
-    </div>
+      </ItemActions>
+    </Item>
   )
 }

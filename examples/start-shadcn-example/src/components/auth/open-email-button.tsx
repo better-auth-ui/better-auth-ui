@@ -2,6 +2,7 @@
 
 import { createQrCodeSvgData, getEmailProviderLink } from "@better-auth-ui/core"
 import { useAuth } from "@better-auth-ui/react"
+import type { VariantProps } from "class-variance-authority"
 import { QrCode } from "lucide-react"
 import { useMemo } from "react"
 
@@ -18,6 +19,12 @@ export type OpenEmailButtonProps = {
   /** Email address used to detect the provider, e.g. from the verify-email flow. */
   email: string
   className?: string
+  /**
+   * Button variant. Defaults to the primary style for dead-end views where
+   * opening the inbox is the only action; pass `"secondary"` where it sits
+   * beside a submit button that should stay the primary call to action.
+   */
+  variant?: VariantProps<typeof buttonVariants>["variant"]
 }
 
 /**
@@ -31,9 +38,14 @@ export type OpenEmailButtonProps = {
  *
  * @param email - Email address to resolve the provider from.
  * @param className - Additional CSS classes applied to the button.
+ * @param variant - Button variant. Defaults to the primary style.
  * @returns The open-email button, or `null` when no provider matches.
  */
-export function OpenEmailButton({ email, className }: OpenEmailButtonProps) {
+export function OpenEmailButton({
+  email,
+  className,
+  variant
+}: OpenEmailButtonProps) {
   const { localization } = useAuth()
 
   const provider = getEmailProviderLink(email)
@@ -55,7 +67,7 @@ export function OpenEmailButton({ email, className }: OpenEmailButtonProps) {
       <Tooltip>
         <TooltipTrigger
           type="button"
-          className={cn(buttonVariants(), "w-full", className)}
+          className={cn(buttonVariants({ variant }), "w-full", className)}
           onClick={() =>
             window.open(provider.loginUrl, "_blank", "noopener,noreferrer")
           }
@@ -64,7 +76,7 @@ export function OpenEmailButton({ email, className }: OpenEmailButtonProps) {
             "{{provider}}",
             provider.companyProvider
           )}
-          <QrCode />
+          <QrCode data-icon="inline-end" />
         </TooltipTrigger>
         <TooltipContent
           sideOffset={8}

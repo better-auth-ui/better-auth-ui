@@ -72,5 +72,6 @@ export type SettingsViewProps = Omit<CardProps, "children">
 export type AuthPlugin = AuthPluginPrimitive<
   AuthPluginComponents,
   AuthViewProps,
-  SettingsViewProps
+  SettingsViewProps,
+  AccountCardProps & { variant?: CardProps["variant"] }
 >
