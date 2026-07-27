@@ -121,6 +121,7 @@ export function CreateApiKeyDialog(props: {
         <NewApiKeyDialog
           name={newApiKeyName()}
           onDismiss={() => handleNewKeyDialogOpenChange(false)}
+          open={isNewKeyDialogOpen()}
           secretKey={newApiKeySecret()}
         />
       </Dialog>

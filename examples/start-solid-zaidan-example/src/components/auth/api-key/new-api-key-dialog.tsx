@@ -1,7 +1,7 @@
 import { apiKeyLocalization } from "@better-auth-ui/core/plugins"
 import { useAuth } from "@better-auth-ui/solid"
 import { Check, Copy, Key } from "lucide-solid"
-import { createSignal, Show } from "solid-js"
+import { createEffect, createSignal, Show } from "solid-js"
 import { toast } from "solid-sonner"
 import { Button } from "@/components/ui/button"
 import {
@@ -22,10 +22,22 @@ import {
 export function NewApiKeyDialog(props: {
   name: string | null
   onDismiss: () => void
+  open: boolean
   secretKey: string | null
 }) {
   const auth = useAuth()
   const [isCopied, setIsCopied] = createSignal(false)
+
+  createEffect(() => {
+    if (!props.open) {
+      setIsCopied(false)
+    }
+  })
+
+  const handleDismiss = () => {
+    setIsCopied(false)
+    props.onDismiss()
+  }
 
   const copySecretKey = async () => {
     if (!props.secretKey) return
@@ -79,7 +91,7 @@ export function NewApiKeyDialog(props: {
       </Field>
 
       <DialogFooter>
-        <Button onClick={props.onDismiss} type="button">
+        <Button onClick={handleDismiss} type="button">
           {apiKeyLocalization.dismissNewKey}
         </Button>
       </DialogFooter>
