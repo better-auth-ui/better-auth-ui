@@ -1,0 +1,22 @@
+---
+title: useSignInPhoneNumber
+description: Sign in with a phone number and password.
+---
+
+```tsx
+const { mutate: signInPhoneNumber } = useSignInPhoneNumber(
+  authClient as PhoneNumberAuthClient
+)
+
+signInPhoneNumber({
+  phoneNumber: "+12025550123",
+  password,
+  rememberMe: true
+})
+```
+
+With Better Auth `requireVerification`, an unverified credential returns `PHONE_NUMBER_NOT_VERIFIED` and starts phone verification. This password-based method follows configured 2FA.
+
+## Params
+
+<auto-type-table path="../../../../../../packages/react/src/mutations/phone-number/sign-in-phone-number-mutation.ts" name="SignInPhoneNumberParams" />

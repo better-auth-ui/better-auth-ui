@@ -16,6 +16,7 @@
     "organization",
     "oauth-provider",
     "passkey",
+    "phone-number",
     "theme",
     "two-factor",
     "username"

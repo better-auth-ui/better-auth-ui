@@ -12,6 +12,7 @@ import type {
   multiSessionClient,
   oneTapClient,
   organizationClient,
+  phoneNumberClient,
   twoFactorClient,
   usernameClient
 } from "better-auth/client/plugins"
@@ -99,6 +100,10 @@ export type OAuthProviderMultiSessionAuthClient = ReturnType<
 
 export type UsernameAuthClient = ReturnType<
   typeof createAuthClient<{ plugins: [ReturnType<typeof usernameClient>] }>
+>
+
+export type PhoneNumberAuthClient = ReturnType<
+  typeof createAuthClient<{ plugins: [ReturnType<typeof phoneNumberClient>] }>
 >
 
 export type OrganizationAuthClient = ReturnType<

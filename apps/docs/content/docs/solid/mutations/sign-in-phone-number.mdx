@@ -1,0 +1,22 @@
+---
+title: signInPhoneNumberOptions
+description: Create a Solid mutation for phone number and password sign-in.
+---
+
+```tsx
+const signIn = createMutation(() =>
+  signInPhoneNumberOptions(authClient as PhoneNumberAuthClient)
+)
+
+signIn.mutate({
+  phoneNumber: "+12025550123",
+  password,
+  rememberMe: true
+})
+```
+
+With Better Auth `requireVerification`, an unverified credential returns `PHONE_NUMBER_NOT_VERIFIED` and starts verification.
+
+## Params
+
+<auto-type-table path="../../../../../../packages/solid/src/mutations/phone-number/sign-in-phone-number-mutation.ts" name="SignInPhoneNumberParams" />

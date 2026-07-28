@@ -344,6 +344,105 @@
       ]
     },
     {
+      "name": "phone-number",
+      "type": "registry:component",
+      "title": "Phone Number",
+      "description": "Phone-number plugin with verification-code and password sign-in, password recovery, and verified phone-number management.",
+      "dependencies": [
+        "@better-auth-ui/react@latest",
+        "@better-auth-ui/core@latest",
+        "better-auth",
+        "input-otp",
+        "lucide-react"
+      ],
+      "registryDependencies": [
+        "alert-dialog",
+        "button",
+        "card",
+        "checkbox",
+        "field",
+        "https://better-auth-ui.com/r/account-settings.json",
+        "input",
+        "input-group",
+        "input-otp",
+        "skeleton",
+        "sonner",
+        "spinner"
+      ],
+      "files": [
+        {
+          "path": "src/lib/auth/auth-plugin.ts",
+          "type": "registry:lib",
+          "target": "@lib/auth/auth-plugin.ts"
+        },
+        {
+          "path": "src/lib/auth/phone-number-plugin.ts",
+          "type": "registry:lib",
+          "target": "@lib/auth/phone-number-plugin.ts"
+        },
+        {
+          "path": "src/lib/auth/use-resend-cooldown.ts",
+          "type": "registry:lib",
+          "target": "@lib/auth/use-resend-cooldown.ts"
+        },
+        {
+          "path": "src/lib/auth/use-sign-in-continuation.ts",
+          "type": "registry:lib",
+          "target": "@lib/auth/use-sign-in-continuation.ts"
+        },
+        {
+          "path": "src/components/auth/otp-field.tsx",
+          "type": "registry:component",
+          "target": "@components/auth/otp-field.tsx"
+        },
+        {
+          "path": "src/components/auth/phone-number/phone-number.tsx",
+          "type": "registry:component",
+          "target": "@components/auth/phone-number/phone-number.tsx"
+        },
+        {
+          "path": "src/components/auth/phone-number/phone-number-button.tsx",
+          "type": "registry:component",
+          "target": "@components/auth/phone-number/phone-number-button.tsx"
+        },
+        {
+          "path": "src/components/auth/phone-number/forgot-phone-number-password.tsx",
+          "type": "registry:component",
+          "target": "@components/auth/phone-number/forgot-phone-number-password.tsx"
+        },
+        {
+          "path": "src/components/auth/phone-number/reset-phone-number-password.tsx",
+          "type": "registry:component",
+          "target": "@components/auth/phone-number/reset-phone-number-password.tsx"
+        },
+        {
+          "path": "src/components/auth/phone-number/change-phone-number.tsx",
+          "type": "registry:component",
+          "target": "@components/auth/phone-number/change-phone-number.tsx"
+        },
+        {
+          "path": "src/components/auth/phone-number/remove-phone-number-dialog.tsx",
+          "type": "registry:component",
+          "target": "@components/auth/phone-number/remove-phone-number-dialog.tsx"
+        },
+        {
+          "path": "src/components/auth/provider-button.tsx",
+          "type": "registry:component",
+          "target": "@components/auth/provider-button.tsx"
+        },
+        {
+          "path": "src/components/auth/provider-buttons.tsx",
+          "type": "registry:component",
+          "target": "@components/auth/provider-buttons.tsx"
+        },
+        {
+          "path": "src/components/auth/use-is-hydrated.ts",
+          "type": "registry:component",
+          "target": "@components/auth/use-is-hydrated.ts"
+        }
+      ]
+    },
+    {
       "name": "magic-link",
       "type": "registry:component",
       "title": "Magic Link",

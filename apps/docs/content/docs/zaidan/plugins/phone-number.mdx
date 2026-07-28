@@ -1,0 +1,124 @@
+---
+title: Phone Number
+description: Add phone verification-code and password sign-in to Solid and Zaidan applications.
+---
+
+import { Callout } from "fumadocs-ui/components/callout"
+import { Step, Steps } from "fumadocs-ui/components/steps"
+
+The Solid/Zaidan registry item adds phone verification-code and password sign-in, phone password recovery, and verified phone-number management.
+
+## Setup
+
+<Steps>
+<Step>
+### Configure Better Auth
+
+```ts title="src/lib/auth.ts"
+import { betterAuth } from "better-auth"
+import { phoneNumber } from "better-auth/plugins"
+
+export const auth = betterAuth({
+  plugins: [
+    phoneNumber({
+      otpLength: 6,
+      requireVerification: true,
+      sendOTP: ({ phoneNumber, code }) => {
+        void sms.send({ to: phoneNumber, body: `Your code is ${code}` })
+      },
+      sendPasswordResetOTP: ({ phoneNumber, code }) => {
+        void sms.send({ to: phoneNumber, body: `Your reset code is ${code}` })
+      }
+    })
+  ]
+})
+```
+
+Normalize numbers on the server and do not log codes in production.
+
+</Step>
+<Step>
+### Update the schema and client
+
+Generate or migrate the Better Auth schema so the user model has nullable `phoneNumber` and `phoneNumberVerified` fields. Keep `phoneNumber` unique.
+
+```ts title="src/lib/auth-client.ts"
+import { createAuthClient } from "@better-auth-ui/solid"
+import { phoneNumberClient } from "better-auth/client/plugins"
+
+export const authClient = createAuthClient({
+  plugins: [phoneNumberClient()]
+})
+```
+
+</Step>
+<Step>
+### Add the registry item
+
+```bash
+bunx --bun shadcn@latest add https://better-auth-ui.com/r/solid/phone-number.json
+```
+
+</Step>
+<Step>
+### Register the UI plugin
+
+```tsx title="src/components/providers.tsx"
+import { phoneNumberPlugin } from "@/lib/auth/phone-number-plugin"
+
+<AuthProvider
+  authClient={authClient}
+  navigate={navigate}
+  plugins={[
+    phoneNumberPlugin({
+      signIn: true,
+      passwordSignIn: true,
+      passwordReset: true,
+      changePhoneNumber: true
+    })
+  ]}
+>
+  {props.children}
+</AuthProvider>
+```
+
+</Step>
+<Step>
+### Allow the plugin route segments
+
+```ts title="src/routes/auth/$path.tsx"
+import { viewPaths } from "@better-auth-ui/core"
+import { phoneNumberPlugin } from "@/lib/auth/phone-number-plugin"
+
+const validAuthPathSegments = new Set([
+  ...Object.values(viewPaths.auth),
+  ...Object.values(phoneNumberPlugin().viewPaths.auth)
+])
+```
+
+</Step>
+</Steps>
+
+## Flow options
+
+| UI option | Default | Server requirement |
+|---|---:|---|
+| `signIn` | `true` | `sendOTP` |
+| `passwordSignIn` | `false` | A password credential |
+| `passwordReset` | `false` | `sendPasswordResetOTP` |
+| `changePhoneNumber` | `true` | `sendOTP` |
+| `otpLength` | `6` | Must match Better Auth `otpLength` |
+
+<Callout type="warn">
+Passwordless phone verification bypasses Better Auth 2FA. Phone number and password sign-in still follows the configured second-factor flow.
+</Callout>
+
+Set Better Auth `signUpOnVerification` when an unknown verified number should create an account. Build a custom view when verification also needs other required user fields.
+
+## Options and localization
+
+<auto-type-table path="../../../../../../packages/core/src/plugins/phone-number/phone-number-plugin.ts" name="PhoneNumberPluginOptions" />
+
+<auto-type-table path="../../../../../../packages/core/src/plugins/phone-number/phone-number-localization.ts" name="PhoneNumberLocalization" />
+
+The copied components use [`sendPhoneNumberOtpOptions`](/docs/solid/mutations/send-phone-number-otp) and the other Solid phone-number mutation factories. See the [Better Auth phone-number plugin](https://better-auth.com/docs/plugins/phone-number) for server behavior and advanced options.

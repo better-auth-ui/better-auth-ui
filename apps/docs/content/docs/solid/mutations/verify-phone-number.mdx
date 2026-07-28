@@ -1,0 +1,21 @@
+---
+title: verifyPhoneNumberOptions
+description: Verify a phone code or update the current user's phone number.
+---
+
+```tsx
+const verify = createMutation(() =>
+  verifyPhoneNumberOptions(authClient as PhoneNumberAuthClient)
+)
+
+verify.mutate({
+  phoneNumber: "+12025550123",
+  code: "123456"
+})
+```
+
+Pass `updatePhoneNumber: true` while authenticated to replace the current phone number. Session data refreshes after success.
+
+## Params
+
+<auto-type-table path="../../../../../../packages/solid/src/mutations/phone-number/verify-phone-number-mutation.ts" name="VerifyPhoneNumberParams" />

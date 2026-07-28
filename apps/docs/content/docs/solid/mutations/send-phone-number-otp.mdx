@@ -1,0 +1,22 @@
+---
+title: sendPhoneNumberOtpOptions
+description: Create a Solid mutation that sends a phone verification code.
+---
+
+```tsx
+import {
+  sendPhoneNumberOtpOptions,
+  type PhoneNumberAuthClient
+} from "@better-auth-ui/solid"
+import { createMutation } from "@tanstack/solid-query"
+
+const sendOtp = createMutation(() =>
+  sendPhoneNumberOtpOptions(authClient as PhoneNumberAuthClient)
+)
+
+sendOtp.mutate({ phoneNumber: "+12025550123" })
+```
+
+## Params
+
+<auto-type-table path="../../../../../../packages/solid/src/mutations/phone-number/send-phone-number-otp-mutation.ts" name="SendPhoneNumberOtpParams" />

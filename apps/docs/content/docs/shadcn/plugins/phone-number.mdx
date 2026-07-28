@@ -1,0 +1,150 @@
+---
+title: Phone Number
+description: Add phone verification-code and password sign-in, recovery, and verified phone management.
+---
+
+import { Callout } from "fumadocs-ui/components/callout"
+import { Step, Steps } from "fumadocs-ui/components/steps"
+
+The phone-number plugin adds a dedicated `/auth/phone-number` view. It supports passwordless verification codes, phone number and password sign-in, password recovery, and a verified phone-number card in account settings.
+
+<Callout type="warn">
+Treat phone numbers as normalized identifiers. Validate and convert them to one canonical format, usually E.164, before sending an SMS. The UI intentionally accepts international input and leaves provider-specific parsing to your server.
+</Callout>
+
+## Setup
+
+<Steps>
+<Step>
+### Configure Better Auth
+
+```ts title="lib/auth.ts"
+import { betterAuth } from "better-auth"
+import { phoneNumber } from "better-auth/plugins"
+
+export const auth = betterAuth({
+  plugins: [
+    phoneNumber({
+      otpLength: 6,
+      requireVerification: true,
+      sendOTP: ({ phoneNumber, code }) => {
+        void sms.send({ to: phoneNumber, body: `Your code is ${code}` })
+      },
+      sendPasswordResetOTP: ({ phoneNumber, code }) => {
+        void sms.send({ to: phoneNumber, body: `Your reset code is ${code}` })
+      }
+    })
+  ]
+})
+```
+
+Do not log codes in production. Better Auth recommends returning from `sendOTP` without waiting for the SMS provider. Use your runtime's background-task primitive when delivery must outlive the request.
+
+</Step>
+<Step>
+### Update the database
+
+Generate or migrate the Better Auth schema using your existing database workflow. The plugin adds nullable `phoneNumber` and `phoneNumberVerified` fields to the user model. Keep `phoneNumber` unique.
+
+For Drizzle projects, regenerate the Better Auth schema first, then generate the Drizzle migration from that schema. Do not hand-edit generated migration metadata.
+
+</Step>
+<Step>
+### Add the client plugin
+
+```ts title="lib/auth-client.ts"
+import { createAuthClient } from "better-auth/react"
+import { phoneNumberClient } from "better-auth/client/plugins"
+
+export const authClient = createAuthClient({
+  plugins: [phoneNumberClient()]
+})
+```
+
+</Step>
+<Step>
+### Install and register the UI plugin
+
+```bash
+bunx --bun shadcn@latest add https://better-auth-ui.com/r/phone-number.json
+```
+
+```tsx title="components/providers.tsx"
+import { phoneNumberPlugin } from "@/lib/auth/phone-number-plugin"
+
+<AuthProvider
+  authClient={authClient}
+  navigate={navigate}
+  plugins={[
+    phoneNumberPlugin({
+      signIn: true,
+      passwordSignIn: true,
+      passwordReset: true,
+      changePhoneNumber: true
+    })
+  ]}
+>
+  {children}
+</AuthProvider>
+```
+
+</Step>
+<Step>
+### Allow the plugin routes
+
+```tsx title="routes/auth/$path.tsx"
+import { viewPaths } from "@better-auth-ui/core"
+import { phoneNumberPlugin } from "@/lib/auth/phone-number-plugin"
+
+const validAuthPaths = new Set([
+  ...Object.values(viewPaths.auth),
+  ...Object.values(phoneNumberPlugin().viewPaths.auth)
+])
+```
+
+Use `validAuthPaths` in the route guard that renders `<Auth path={path} />`.
+
+</Step>
+</Steps>
+
+## Match UI options to server options
+
+| UI option | Default | Server requirement |
+|---|---:|---|
+| `signIn` | `true` | `sendOTP` |
+| `passwordSignIn` | `false` | A password credential; use `requireVerification` when appropriate |
+| `passwordReset` | `false` | `sendPasswordResetOTP` |
+| `changePhoneNumber` | `true` | `sendOTP`; verification uses `updatePhoneNumber: true` |
+| `otpLength` | `6` | Must match Better Auth `otpLength` |
+
+When both sign-in modes are enabled, the form lets users switch between a code and a password. If password sign-in returns `PHONE_NUMBER_NOT_VERIFIED`, it moves directly to the code step because Better Auth has already started verification.
+
+<Callout type="warn">
+Passwordless verification is not a second factor. Better Auth applies 2FA to phone number and password sign-in, but not to passwordless phone verification.
+</Callout>
+
+## Account creation
+
+Set Better Auth `signUpOnVerification` when a verified unknown number should create a user. It requires a temporary email generator because the Better Auth user model still requires an email.
+
+If your user schema has other required fields, replace the plugin's `phoneNumber` auth view with a custom component that collects those values and passes them to `authClient.phoneNumber.verify`.
+
+## Components
+
+- `<PhoneNumber />` handles code and password sign-in.
+- `<ForgotPhoneNumberPassword />` and `<ResetPhoneNumberPassword />` handle phone password recovery.
+- `<ChangePhoneNumber />` adds, replaces, verifies, and removes the current user's phone number.
+
+## Options
+
+<auto-type-table path="../../../../../../packages/core/src/plugins/phone-number/phone-number-plugin.ts" name="PhoneNumberPluginOptions" />
+
+## Localization
+
+<auto-type-table path="../../../../../../packages/core/src/plugins/phone-number/phone-number-localization.ts" name="PhoneNumberLocalization" />
+
+## Headless mutations
+
+The UI uses [`useSendPhoneNumberOtp`](/docs/react/mutations/send-phone-number-otp), [`useVerifyPhoneNumber`](/docs/react/mutations/verify-phone-number), [`useSignInPhoneNumber`](/docs/react/mutations/sign-in-phone-number), [`useRequestPhoneNumberPasswordReset`](/docs/react/mutations/request-phone-number-password-reset), and [`useResetPhoneNumberPassword`](/docs/react/mutations/reset-phone-number-password).
+
+See the [Better Auth phone-number plugin](https://better-auth.com/docs/plugins/phone-number) for server options, external OTP verification, attempt limits, and endpoint behavior.
