@@ -103,5 +103,11 @@ describe("phone-number mutation options", () => {
     expect(signInPhoneNumberOptions(authClient as never).mutationKey).toEqual(
       phoneNumberMutationKeys.signIn
     )
+    expect(
+      requestPhoneNumberPasswordResetOptions(authClient as never).mutationKey
+    ).toEqual(phoneNumberMutationKeys.requestPasswordReset)
+    expect(
+      resetPhoneNumberPasswordOptions(authClient as never).mutationKey
+    ).toEqual(phoneNumberMutationKeys.resetPassword)
   })
 })

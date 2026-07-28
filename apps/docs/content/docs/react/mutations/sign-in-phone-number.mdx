@@ -4,6 +4,13 @@ description: Sign in with a phone number and password.
 ---
 
 ```tsx
+import {
+  type PhoneNumberAuthClient,
+  useAuth,
+  useSignInPhoneNumber
+} from "@better-auth-ui/react"
+
+const { authClient } = useAuth()
 const { mutate: signInPhoneNumber } = useSignInPhoneNumber(
   authClient as PhoneNumberAuthClient
 )

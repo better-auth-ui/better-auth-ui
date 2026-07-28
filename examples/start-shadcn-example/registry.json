@@ -436,6 +436,11 @@
           "target": "@components/auth/provider-buttons.tsx"
         },
         {
+          "path": "src/components/auth/last-login-method/last-used-badge.tsx",
+          "type": "registry:component",
+          "target": "@components/auth/last-login-method/last-used-badge.tsx"
+        },
+        {
           "path": "src/components/auth/use-is-hydrated.ts",
           "type": "registry:component",
           "target": "@components/auth/use-is-hydrated.ts"

@@ -4,6 +4,13 @@ description: Verify a phone code or update the current user's phone number.
 ---
 
 ```tsx
+import {
+  type PhoneNumberAuthClient,
+  useAuth,
+  useVerifyPhoneNumber
+} from "@better-auth-ui/react"
+
+const { authClient } = useAuth()
 const { mutate: verifyPhoneNumber } = useVerifyPhoneNumber(
   authClient as PhoneNumberAuthClient
 )

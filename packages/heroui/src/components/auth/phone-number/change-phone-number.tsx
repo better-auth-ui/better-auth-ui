@@ -54,8 +54,8 @@ export function ChangePhoneNumber({
   const [codeSent, setCodeSent] = useState(false)
 
   useEffect(() => {
-    if (session) setPhoneNumber(currentPhoneNumber)
-  }, [currentPhoneNumber, session])
+    setPhoneNumber(currentPhoneNumber)
+  }, [currentPhoneNumber])
 
   const { mutate: sendOtp, isPending: isSending } = useSendPhoneNumberOtp(
     phoneClient,

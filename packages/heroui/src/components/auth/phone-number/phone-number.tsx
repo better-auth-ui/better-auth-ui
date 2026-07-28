@@ -133,8 +133,7 @@ export function PhoneNumber({
     (plugin) => plugin.captchaComponent
   )?.captchaComponent
 
-  const sendCode = () =>
-    sendOtp({ phoneNumber, fetchOptions } as Parameters<typeof sendOtp>[0])
+  const sendCode = () => sendOtp({ phoneNumber, fetchOptions })
   const verifyCode = (completedCode: string) => {
     if (isPending || completedCode.length !== otpLength) return
     verify({ phoneNumber, code: completedCode })

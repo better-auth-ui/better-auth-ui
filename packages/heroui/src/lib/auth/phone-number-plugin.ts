@@ -22,7 +22,7 @@ export const phoneNumberPlugin = createAuthPlugin(
       views: {
         auth: {
           ...(hasSignIn ? { phoneNumber: PhoneNumber } : {}),
-          ...(plugin.passwordReset
+          ...(hasSignIn && plugin.passwordReset
             ? {
                 phoneNumberForgotPassword: ForgotPhoneNumberPassword,
                 phoneNumberResetPassword: ResetPhoneNumberPassword

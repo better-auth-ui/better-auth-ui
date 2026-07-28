@@ -311,6 +311,10 @@ export const solidRegistryManifest = {
         ),
         componentFile("src/components/auth/provider-buttons.tsx"),
         componentFile("src/components/auth/provider-button.tsx"),
+        componentFile(
+          "src/components/auth/last-login-method/last-used-badge.tsx"
+        ),
+        componentFile("src/components/auth/sign-in-path.ts"),
         ...zaidanFormSupportFiles
       ]
     }),

@@ -92,6 +92,12 @@ describe("phone-number mutation options", () => {
       phoneNumberMutationKeys.sendOtp
     )
     expect(
+      requestPhoneNumberPasswordResetOptions(authClient as never).mutationKey
+    ).toEqual(phoneNumberMutationKeys.requestPasswordReset)
+    expect(
+      resetPhoneNumberPasswordOptions(authClient as never).mutationKey
+    ).toEqual(phoneNumberMutationKeys.resetPassword)
+    expect(
       (
         verifyPhoneNumberOptions(authClient as never)
           .meta as MutationOptions["meta"]

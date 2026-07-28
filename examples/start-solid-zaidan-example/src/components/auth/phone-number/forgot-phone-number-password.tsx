@@ -62,7 +62,7 @@ export function ForgotPhoneNumberPassword(
     const formData = new FormData(event.currentTarget)
     requestReset.mutate({
       phoneNumber: String(formData.get("phoneNumber") ?? ""),
-      fetchOptions
+      fetchOptions: fetchOptions()
     } as Parameters<typeof requestReset.mutate>[0])
   }
 

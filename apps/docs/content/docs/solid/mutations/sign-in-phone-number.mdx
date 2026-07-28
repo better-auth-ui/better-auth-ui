@@ -3,7 +3,17 @@ title: signInPhoneNumberOptions
 description: Create a Solid mutation for phone number and password sign-in.
 ---
 
+## Options factory
+
 ```tsx
+import {
+  type PhoneNumberAuthClient,
+  signInPhoneNumberOptions,
+  useAuth
+} from "@better-auth-ui/solid"
+import { createMutation } from "@tanstack/solid-query"
+
+const { authClient } = useAuth()
 const signIn = createMutation(() =>
   signInPhoneNumberOptions(authClient as PhoneNumberAuthClient)
 )

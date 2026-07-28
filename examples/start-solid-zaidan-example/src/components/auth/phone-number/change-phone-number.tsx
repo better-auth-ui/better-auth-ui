@@ -43,8 +43,11 @@ export function ChangePhoneNumber(props: ChangePhoneNumberProps = {}) {
   const [code, setCode] = createSignal("")
   const [codeSent, setCodeSent] = createSignal(false)
 
+  let initialized = false
   createEffect(() => {
-    if (session.data) setPhoneNumber(currentPhoneNumber())
+    if (!session.data || initialized) return
+    initialized = true
+    setPhoneNumber(currentPhoneNumber())
   })
 
   const sendOtp = createMutation(() => ({

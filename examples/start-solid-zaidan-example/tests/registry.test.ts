@@ -206,6 +206,7 @@ const expectedSolidRegistryPayloadNames = [
   "one-tap",
   "sign-up",
   "email-otp",
+  "phone-number",
   "magic-link",
   "oauth-provider",
   "device-authorization",
@@ -2708,6 +2709,7 @@ describe("Solid registry isolation", () => {
       "sign-in-username",
       "sign-in-magic-link",
       "sign-in-email-otp",
+      "sign-in-phone-number",
       "sign-in-passkey",
       "sign-in-social",
       "sign-up-email",
@@ -2719,6 +2721,10 @@ describe("Solid registry isolation", () => {
       "verify-email-otp",
       "request-password-reset-otp",
       "reset-password-otp",
+      "send-phone-number-otp",
+      "verify-phone-number",
+      "request-phone-number-password-reset",
+      "reset-phone-number-password",
       "is-username-available",
       "oauth-consent",
       "oauth-continue",
@@ -2791,6 +2797,7 @@ describe("Solid registry isolation", () => {
       "organization",
       "oauth-provider",
       "passkey",
+      "phone-number",
       "theme",
       "two-factor",
       "username"
@@ -3063,6 +3070,7 @@ describe("Solid registry isolation", () => {
       "passkey",
       "two-factor",
       "email-otp",
+      "phone-number",
       "multi-session",
       "api-key",
       "delete-user",
@@ -3217,6 +3225,7 @@ describe("Solid registry isolation", () => {
         name === "last-login-method" ||
         name === "magic-link" ||
         name === "oauth-provider" ||
+        name === "phone-number" ||
         name === "two-factor" ||
         name === "device-authorization" ||
         name === "multi-session" ||

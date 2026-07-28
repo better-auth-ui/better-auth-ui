@@ -3,7 +3,17 @@ title: verifyPhoneNumberOptions
 description: Verify a phone code or update the current user's phone number.
 ---
 
+## Options factory
+
 ```tsx
+import {
+  type PhoneNumberAuthClient,
+  useAuth,
+  verifyPhoneNumberOptions
+} from "@better-auth-ui/solid"
+import { createMutation } from "@tanstack/solid-query"
+
+const { authClient } = useAuth()
 const verify = createMutation(() =>
   verifyPhoneNumberOptions(authClient as PhoneNumberAuthClient)
 )
