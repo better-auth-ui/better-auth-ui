@@ -1,12 +1,12 @@
 ---
-title: Google One Tap
+title: One Tap
 description: Open Google's One Tap prompt from copied Solid and Zaidan authentication views.
 ---
 
 import { Callout } from 'fumadocs-ui/components/callout'
 import { Step, Steps } from 'fumadocs-ui/components/steps'
 
-The Google One Tap UI plugin opens Better Auth's native One Tap flow when an authentication view mounts. It refreshes the session after success, follows the configured `redirectTo`, and continues into the two-factor view when the server requests a second factor.
+The One Tap UI plugin opens Better Auth's native One Tap flow when an authentication view mounts. It refreshes the session after success, follows the configured `redirectTo`, and continues into the two-factor view when the server requests a second factor.
 
 Keep Google in `socialProviders` as a visible fallback. One Tap is a passive prompt and browsers may decide not to show it.
 

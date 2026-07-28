@@ -1,5 +1,7 @@
 # Better Auth UI
 
+[![discord](https://cdn.jsdelivr.net/npm/@intergrav/devins-badges@3/assets/cozy/social/discord-plural_vector.svg)](https://discord.gg/GKPC4npz8K)
+
 🇵🇸 Free Palestine
 
 Beautiful, ready-to-use authentication components for [Better Auth](https://better-auth.com).
@@ -9,6 +11,8 @@ Built with **shadcn/ui** and **HeroUI**. Drop in and go.
 ## [better-auth-ui.com](https://better-auth-ui.com)
 
 [Documentation](https://better-auth-ui.com/docs) • [Demo](https://demo.better-auth-ui.com)
+
+[![Discord Banner](https://discord.com/api/guilds/1531733072037412944/widget.png?style=banner2)](https://discord.gg/GKPC4npz8K)
 
 ---
 

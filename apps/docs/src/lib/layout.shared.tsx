@@ -1,3 +1,4 @@
+import { Discord } from "@better-auth-ui/react"
 import type { BaseLayoutProps } from "fumadocs-ui/layouts/shared"
 import {
   ArrowUpRight,
@@ -30,6 +31,13 @@ export function baseOptions(): BaseLayoutProps {
         secondary: false
       },
       {
+        icon: <Discord />,
+        text: "Discord",
+        url: "https://better-auth-ui.com/discord",
+        external: true,
+        secondary: false
+      },
+      {
         icon: <ArrowUpRight />,
         text: "Demo",
         url: "https://demo.better-auth-ui.com",
@@ -39,7 +47,7 @@ export function baseOptions(): BaseLayoutProps {
       {
         icon: <ListTodo />,
         text: "Roadmap",
-        url: "https://betterauthui.featurebase.app/roadmap",
+        url: "https://github.com/orgs/better-auth-ui/projects/1",
         external: true,
         secondary: false
       },
