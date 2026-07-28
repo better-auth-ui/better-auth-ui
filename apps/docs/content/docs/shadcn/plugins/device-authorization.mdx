@@ -67,7 +67,11 @@ export const authClient = createAuthClient({
 ### Install the device authorization view
 
 ```bash
-bunx --bun shadcn@latest add https://better-auth-ui.com/r/device-authorization.json
+bun x shadcn@latest registry add @better-auth-ui=https://better-auth-ui.com/r/{style}/{name}.json
+```
+
+```bash
+bunx --bun shadcn@latest add @better-auth-ui/device-authorization
 ```
 
 This installs:

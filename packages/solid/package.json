@@ -1,6 +1,6 @@
 {
   "name": "@better-auth-ui/solid",
-  "version": "1.6.39",
+  "version": "1.6.40",
   "type": "module",
   "scripts": {
     "build": "vite build && vite build --config vite.email.config.ts",
@@ -69,6 +69,10 @@
     "./plugins/passkey": {
       "types": "./dist/plugins/passkey/index.d.ts",
       "import": "./dist/plugins/passkey/index.js"
+    },
+    "./plugins/phone-number": {
+      "types": "./dist/plugins/phone-number/index.d.ts",
+      "import": "./dist/plugins/phone-number/index.js"
     },
     "./plugins/two-factor": {
       "types": "./dist/plugins/two-factor/index.d.ts",

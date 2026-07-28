@@ -48,7 +48,11 @@ Built with **shadcn/ui** and **HeroUI**. Drop in and go.
 ### shadcn/ui
 
 ```bash
-bun x shadcn@latest add https://better-auth-ui.com/r/auth.json
+bun x shadcn@latest registry add @better-auth-ui=https://better-auth-ui.com/r/{style}/{name}.json
+```
+
+```bash
+bun x shadcn@latest add @better-auth-ui/auth
 ```
 
 ### HeroUI

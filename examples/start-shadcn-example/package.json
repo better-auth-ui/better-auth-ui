@@ -10,13 +10,17 @@
           "{projectRoot}/components.json",
           "{projectRoot}/package.json",
           "{projectRoot}/registry.json",
-          "{projectRoot}/scripts/build-registry.sh",
+          "{projectRoot}/scripts/build-registry.ts",
           "{projectRoot}/src/**/*",
+          "{workspaceRoot}/examples/start-shadcn-baseui-example/components.json",
+          "{workspaceRoot}/examples/start-shadcn-baseui-example/package.json",
+          "{workspaceRoot}/examples/start-shadcn-baseui-example/src/**/*",
           "{workspaceRoot}/packages/react/src/components/auth/email/**/*",
           "{workspaceRoot}/bun.lock"
         ],
         "outputs": [
-          "{workspaceRoot}/apps/docs/public/r/*.json"
+          "{workspaceRoot}/apps/docs/public/r/base-*/*.json",
+          "{workspaceRoot}/apps/docs/public/r/radix-*/*.json"
         ]
       }
     }
@@ -28,7 +32,7 @@
     "preview": "vite preview",
     "deploy": "bun run build && wrangler deploy",
     "cf-typegen": "wrangler types",
-    "registry:build": "bash scripts/build-registry.sh",
+    "registry:build": "bun scripts/build-registry.ts",
     "source:sync": "bash scripts/sync-consumers.sh"
   },
   "devDependencies": {

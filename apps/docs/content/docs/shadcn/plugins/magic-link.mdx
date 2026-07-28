@@ -63,7 +63,11 @@ export const authClient = createAuthClient({
 Run the shadcn CLI to install the magic-link form, the toggle button, and the `magicLinkPlugin()` factory into your project:
 
 ```npm
-npx shadcn@latest add https://better-auth-ui.com/r/magic-link.json
+npx shadcn@latest registry add @better-auth-ui=https://better-auth-ui.com/r/{style}/{name}.json
+```
+
+```npm
+npx shadcn@latest add @better-auth-ui/magic-link
 ```
 
 This drops the following into your codebase:

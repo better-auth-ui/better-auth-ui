@@ -54,7 +54,11 @@ export const authClient = createAuthClient({
 Run the shadcn CLI to install the API key components and the `apiKeyPlugin()` factory into your project:
 
 ```npm
-npx shadcn@latest add https://better-auth-ui.com/r/api-key.json
+npx shadcn@latest registry add @better-auth-ui=https://better-auth-ui.com/r/{style}/{name}.json
+```
+
+```npm
+npx shadcn@latest add @better-auth-ui/api-key
 ```
 
 This drops the following into your codebase:

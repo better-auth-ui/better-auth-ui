@@ -22,6 +22,7 @@ export default defineConfig({
         "plugins/one-tap/index": "src/plugins/one-tap/index.ts",
         "plugins/organization/index": "src/plugins/organization/index.ts",
         "plugins/passkey/index": "src/plugins/passkey/index.ts",
+        "plugins/phone-number/index": "src/plugins/phone-number/index.ts",
         "plugins/two-factor/index": "src/plugins/two-factor/index.ts",
         "plugins/username/index": "src/plugins/username/index.ts"
       },

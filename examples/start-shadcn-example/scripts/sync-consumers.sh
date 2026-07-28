@@ -23,17 +23,29 @@ TARGETS=(
   "$EXAMPLE_DIR/../next-shadcn-example/src"
 )
 
-# The auth components and plugin scaffolding work with both Radix and Base UI.
-# UI primitives remain owned by each example because their implementations
-# differ.
+# Most auth components and plugin scaffolding work with both Radix and Base UI.
+# Keep the few primitive-specific consumers owned by the Base UI example.
 AGNOSTIC_MIRRORS=(
   components/auth
   lib/auth
 )
 
-AGNOSTIC_TARGETS=(
-  "$EXAMPLE_DIR/../start-shadcn-baseui-example/src"
+BASE_UI_TARGET="$EXAMPLE_DIR/../start-shadcn-baseui-example/src"
+BASE_UI_OVERRIDES=(
+  components/auth/additional-field.tsx
+  components/auth/api-key/create-api-key-dialog.tsx
+  components/auth/organization/invite-member-dialog.tsx
+  components/auth/phone-number/remove-phone-number-dialog.tsx
 )
+
+OVERRIDE_BACKUP="$(mktemp -d)"
+trap 'rm -rf -- "$OVERRIDE_BACKUP"' EXIT
+
+for path in "${BASE_UI_OVERRIDES[@]}"; do
+  : "${path:?override path entry is empty}"
+  mkdir -p -- "$OVERRIDE_BACKUP/$(dirname "$path")"
+  cp -- "$BASE_UI_TARGET/$path" "$OVERRIDE_BACKUP/$path"
+done
 
 for target in "${TARGETS[@]}"; do
   echo "→ syncing $target"
@@ -46,15 +58,17 @@ for target in "${TARGETS[@]}"; do
   done
 done
 
-for target in "${AGNOSTIC_TARGETS[@]}"; do
-  echo "→ syncing $target (agnostic subtrees only)"
-  for path in "${AGNOSTIC_MIRRORS[@]}"; do
-    : "${target:?target is empty}"
-    : "${path:?mirror path entry is empty}"
-    rm -rf -- "$target/$path"
-    mkdir -p -- "$(dirname "$target/$path")"
-    cp -R -- "$SRC/$path" "$target/$path"
-  done
+echo "→ syncing $BASE_UI_TARGET (shared files with Base UI overrides)"
+for path in "${AGNOSTIC_MIRRORS[@]}"; do
+  : "${path:?mirror path entry is empty}"
+  rm -rf -- "$BASE_UI_TARGET/$path"
+  mkdir -p -- "$(dirname "$BASE_UI_TARGET/$path")"
+  cp -R -- "$SRC/$path" "$BASE_UI_TARGET/$path"
+done
+
+for path in "${BASE_UI_OVERRIDES[@]}"; do
+  mkdir -p -- "$(dirname "$BASE_UI_TARGET/$path")"
+  cp -- "$OVERRIDE_BACKUP/$path" "$BASE_UI_TARGET/$path"
 done
 
 echo "✓ source sync complete"

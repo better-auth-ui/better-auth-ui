@@ -61,7 +61,7 @@ const extractModuleSpecifiers = (content: string) =>
 const registryDependencyName = (dependency: string, solid: boolean) => {
   const pattern = solid
     ? /^https:\/\/better-auth-ui\.com\/r\/solid\/([a-z0-9-]+)\.json$/
-    : /^https:\/\/better-auth-ui\.com\/r\/([a-z0-9-]+)\.json$/
+    : /^https:\/\/better-auth-ui\.com\/r\/(?:base|radix)-[a-z0-9-]+\/([a-z0-9-]+)\.json$/
 
   return dependency.match(pattern)?.[1]
 }
@@ -214,6 +214,7 @@ const expectedSolidRegistryPayloadNames = [
   "one-tap",
   "sign-up",
   "email-otp",
+  "phone-number",
   "magic-link",
   "oauth-provider",
   "device-authorization",
@@ -2378,9 +2379,10 @@ describe("Solid registry isolation", () => {
 
   it("installs complete Email OTP and Two-Factor dependency closures", () => {
     const registryRoot = resolve(__dirname, "../../../apps/docs/public/r")
+    const shadcnRegistryRoot = resolve(registryRoot, "radix-nova")
     const registries = [
       {
-        root: registryRoot,
+        root: shadcnRegistryRoot,
         solid: false
       },
       {
@@ -2434,12 +2436,12 @@ describe("Solid registry isolation", () => {
 
     const shadcnEmailOtpInstall = collectRegistryInstall({
       entry: "email-otp",
-      registryRoot,
+      registryRoot: shadcnRegistryRoot,
       solid: false
     })
     const shadcnTwoFactorInstall = collectRegistryInstall({
       entry: "two-factor",
-      registryRoot,
+      registryRoot: shadcnRegistryRoot,
       solid: false
     })
 
@@ -2494,6 +2496,7 @@ describe("Solid registry isolation", () => {
       "./plugins/one-tap",
       "./plugins/organization",
       "./plugins/passkey",
+      "./plugins/phone-number",
       "./plugins/two-factor",
       "./plugins/username"
     ])
@@ -2728,6 +2731,7 @@ describe("Solid registry isolation", () => {
       "sign-in-username",
       "sign-in-magic-link",
       "sign-in-email-otp",
+      "sign-in-phone-number",
       "sign-in-passkey",
       "sign-in-social",
       "sign-up-email",
@@ -2739,6 +2743,10 @@ describe("Solid registry isolation", () => {
       "verify-email-otp",
       "request-password-reset-otp",
       "reset-password-otp",
+      "send-phone-number-otp",
+      "verify-phone-number",
+      "request-phone-number-password-reset",
+      "reset-phone-number-password",
       "is-username-available",
       "oauth-consent",
       "oauth-continue",
@@ -2811,6 +2819,7 @@ describe("Solid registry isolation", () => {
       "organization",
       "oauth-provider",
       "passkey",
+      "phone-number",
       "theme",
       "two-factor",
       "username"
@@ -3083,6 +3092,7 @@ describe("Solid registry isolation", () => {
       "passkey",
       "two-factor",
       "email-otp",
+      "phone-number",
       "multi-session",
       "api-key",
       "delete-user",
@@ -3237,6 +3247,7 @@ describe("Solid registry isolation", () => {
         name === "last-login-method" ||
         name === "magic-link" ||
         name === "oauth-provider" ||
+        name === "phone-number" ||
         name === "two-factor" ||
         name === "device-authorization" ||
         name === "multi-session" ||

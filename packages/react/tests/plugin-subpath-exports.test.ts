@@ -11,6 +11,7 @@ import * as oauthProvider from "../src/plugins/oauth-provider"
 import * as oneTap from "../src/plugins/one-tap"
 import * as organization from "../src/plugins/organization"
 import * as passkey from "../src/plugins/passkey"
+import * as phoneNumber from "../src/plugins/phone-number"
 import * as twoFactor from "../src/plugins/two-factor"
 import * as username from "../src/plugins/username"
 
@@ -24,6 +25,12 @@ describe("React plugin subpath exports", () => {
     expect(passkey).toHaveProperty("useDeletePasskey")
     expect(passkey).toHaveProperty("useSignInPasskey")
     expect(passkey).toHaveProperty("useListPasskeys")
+
+    expect(phoneNumber).toHaveProperty("useRequestPhoneNumberPasswordReset")
+    expect(phoneNumber).toHaveProperty("useResetPhoneNumberPassword")
+    expect(phoneNumber).toHaveProperty("useSendPhoneNumberOtp")
+    expect(phoneNumber).toHaveProperty("useSignInPhoneNumber")
+    expect(phoneNumber).toHaveProperty("useVerifyPhoneNumber")
 
     expect(multiSession).toHaveProperty("useRevokeMultiSession")
     expect(multiSession).toHaveProperty("useSetActiveSession")
@@ -74,6 +81,13 @@ describe("React plugin subpath exports", () => {
     expect(passkey).not.toHaveProperty("addPasskeyOptions")
     expect(passkey).not.toHaveProperty("deletePasskeyOptions")
     expect(passkey).not.toHaveProperty("signInPasskeyOptions")
+    expect(phoneNumber).not.toHaveProperty(
+      "requestPhoneNumberPasswordResetOptions"
+    )
+    expect(phoneNumber).not.toHaveProperty("resetPhoneNumberPasswordOptions")
+    expect(phoneNumber).not.toHaveProperty("sendPhoneNumberOtpOptions")
+    expect(phoneNumber).not.toHaveProperty("signInPhoneNumberOptions")
+    expect(phoneNumber).not.toHaveProperty("verifyPhoneNumberOptions")
     expect(username).not.toHaveProperty("signInUsernameOptions")
     expect(username).not.toHaveProperty("isUsernameAvailableOptions")
     expect(twoFactor).not.toHaveProperty("enableTwoFactorOptions")
@@ -102,5 +116,6 @@ describe("React plugin subpath exports", () => {
     expect(react).not.toHaveProperty("useOAuthConsent")
     expect(react).not.toHaveProperty("useStopImpersonating")
     expect(react).not.toHaveProperty("useVerifyTotp")
+    expect(react).not.toHaveProperty("useVerifyPhoneNumber")
   })
 })

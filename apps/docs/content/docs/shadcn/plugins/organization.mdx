@@ -58,7 +58,11 @@ export const authClient = createAuthClient({
 Run the shadcn CLI to install every organization component and the `organizationPlugin()` factory into your project:
 
 ```npm
-npx shadcn@latest add https://better-auth-ui.com/r/organization.json
+npx shadcn@latest registry add @better-auth-ui=https://better-auth-ui.com/r/{style}/{name}.json
+```
+
+```npm
+npx shadcn@latest add @better-auth-ui/organization
 ```
 
 This drops the following into your codebase:

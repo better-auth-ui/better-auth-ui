@@ -24,7 +24,11 @@ Before you start, make sure you have the following prerequisites integrated into
 Install the authentication page components using shadcn CLI.
 
 ```npm
-npx shadcn@latest add https://better-auth-ui.com/r/auth.json
+npx shadcn@latest registry add @better-auth-ui=https://better-auth-ui.com/r/{style}/{name}.json
+```
+
+```npm
+npx shadcn@latest add @better-auth-ui/auth
 ```
 
 This installs the `<Auth />` component and its built-in views: authenticated redirect, sign-in, sign-up, sign-out, forgot-password, reset-password, reset-link-sent, and verify-email.
@@ -35,7 +39,11 @@ This installs the `<Auth />` component and its built-in views: authenticated red
 If you need the settings page and user button, install them separately.
 
 ```npm
-npx shadcn@latest add https://better-auth-ui.com/r/settings.json https://better-auth-ui.com/r/user-button.json
+npx shadcn@latest registry add @better-auth-ui=https://better-auth-ui.com/r/{style}/{name}.json
+```
+
+```npm
+npx shadcn@latest add @better-auth-ui/settings @better-auth-ui/user-button
 ```
 </Step>
 <Step>
@@ -44,7 +52,11 @@ npx shadcn@latest add https://better-auth-ui.com/r/settings.json https://better-
 Alternatively, install every component, plugin, and email template in one shot.
 
 ```npm
-npx shadcn@latest add https://better-auth-ui.com/r/all.json
+npx shadcn@latest registry add @better-auth-ui=https://better-auth-ui.com/r/{style}/{name}.json
+```
+
+```npm
+npx shadcn@latest add @better-auth-ui/all
 ```
 </Step>
 </Steps>

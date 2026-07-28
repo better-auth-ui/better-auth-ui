@@ -55,7 +55,11 @@ export const authClient = createAuthClient({
 Run the shadcn CLI to install the multi-session management components and the `multiSessionPlugin()` factory into your project:
 
 ```npm
-npx shadcn@latest add https://better-auth-ui.com/r/multi-session.json
+npx shadcn@latest registry add @better-auth-ui=https://better-auth-ui.com/r/{style}/{name}.json
+```
+
+```npm
+npx shadcn@latest add @better-auth-ui/multi-session
 ```
 
 This drops the following into your codebase:

@@ -1,6 +1,6 @@
 {
   "name": "@better-auth-ui/react",
-  "version": "1.6.39",
+  "version": "1.6.40",
   "type": "module",
   "scripts": {
     "build": "vite build",
@@ -83,6 +83,11 @@
       "src": "./src/plugins/passkey/index.ts",
       "types": "./dist/plugins/passkey/index.d.ts",
       "import": "./dist/plugins/passkey/index.js"
+    },
+    "./plugins/phone-number": {
+      "src": "./src/plugins/phone-number/index.ts",
+      "types": "./dist/plugins/phone-number/index.d.ts",
+      "import": "./dist/plugins/phone-number/index.js"
     },
     "./plugins/two-factor": {
       "src": "./src/plugins/two-factor/index.ts",

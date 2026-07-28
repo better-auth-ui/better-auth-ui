@@ -158,7 +158,9 @@
         "@better-auth-ui/core@latest",
         "better-auth"
       ],
-      "registryDependencies": ["https://better-auth-ui.com/r/sign-in.json"],
+      "registryDependencies": [
+        "https://better-auth-ui.com/r/radix-nova/sign-in.json"
+      ],
       "files": [
         {
           "path": "src/lib/auth/last-login-method-plugin.ts",
@@ -178,8 +180,8 @@
         "better-auth"
       ],
       "registryDependencies": [
-        "https://better-auth-ui.com/r/sign-in.json",
-        "https://better-auth-ui.com/r/sign-up.json"
+        "https://better-auth-ui.com/r/radix-nova/sign-in.json",
+        "https://better-auth-ui.com/r/radix-nova/sign-up.json"
       ],
       "files": []
     },
@@ -204,7 +206,7 @@
         "input-group",
         "sonner",
         "spinner",
-        "https://better-auth-ui.com/r/additional-field.json"
+        "https://better-auth-ui.com/r/radix-nova/additional-field.json"
       ],
       "files": [
         {
@@ -246,7 +248,7 @@
         "button",
         "card",
         "field",
-        "https://better-auth-ui.com/r/account-settings.json",
+        "https://better-auth-ui.com/r/radix-nova/account-settings.json",
         "input",
         "input-group",
         "input-otp",
@@ -320,6 +322,110 @@
           "path": "src/components/auth/open-email-button.tsx",
           "type": "registry:component",
           "target": "@components/auth/open-email-button.tsx"
+        },
+        {
+          "path": "src/components/auth/provider-button.tsx",
+          "type": "registry:component",
+          "target": "@components/auth/provider-button.tsx"
+        },
+        {
+          "path": "src/components/auth/provider-buttons.tsx",
+          "type": "registry:component",
+          "target": "@components/auth/provider-buttons.tsx"
+        },
+        {
+          "path": "src/components/auth/last-login-method/last-used-badge.tsx",
+          "type": "registry:component",
+          "target": "@components/auth/last-login-method/last-used-badge.tsx"
+        },
+        {
+          "path": "src/components/auth/use-is-hydrated.ts",
+          "type": "registry:component",
+          "target": "@components/auth/use-is-hydrated.ts"
+        }
+      ]
+    },
+    {
+      "name": "phone-number",
+      "type": "registry:component",
+      "title": "Phone Number",
+      "description": "Phone-number plugin with verification-code and password sign-in, password recovery, and verified phone-number management.",
+      "dependencies": [
+        "@better-auth-ui/react@latest",
+        "@better-auth-ui/core@latest",
+        "better-auth",
+        "input-otp",
+        "lucide-react"
+      ],
+      "registryDependencies": [
+        "alert-dialog",
+        "button",
+        "card",
+        "checkbox",
+        "field",
+        "https://better-auth-ui.com/r/radix-nova/account-settings.json",
+        "input",
+        "input-group",
+        "input-otp",
+        "skeleton",
+        "sonner",
+        "spinner"
+      ],
+      "files": [
+        {
+          "path": "src/lib/auth/auth-plugin.ts",
+          "type": "registry:lib",
+          "target": "@lib/auth/auth-plugin.ts"
+        },
+        {
+          "path": "src/lib/auth/phone-number-plugin.ts",
+          "type": "registry:lib",
+          "target": "@lib/auth/phone-number-plugin.ts"
+        },
+        {
+          "path": "src/lib/auth/use-resend-cooldown.ts",
+          "type": "registry:lib",
+          "target": "@lib/auth/use-resend-cooldown.ts"
+        },
+        {
+          "path": "src/lib/auth/use-sign-in-continuation.ts",
+          "type": "registry:lib",
+          "target": "@lib/auth/use-sign-in-continuation.ts"
+        },
+        {
+          "path": "src/components/auth/otp-field.tsx",
+          "type": "registry:component",
+          "target": "@components/auth/otp-field.tsx"
+        },
+        {
+          "path": "src/components/auth/phone-number/phone-number.tsx",
+          "type": "registry:component",
+          "target": "@components/auth/phone-number/phone-number.tsx"
+        },
+        {
+          "path": "src/components/auth/phone-number/phone-number-button.tsx",
+          "type": "registry:component",
+          "target": "@components/auth/phone-number/phone-number-button.tsx"
+        },
+        {
+          "path": "src/components/auth/phone-number/forgot-phone-number-password.tsx",
+          "type": "registry:component",
+          "target": "@components/auth/phone-number/forgot-phone-number-password.tsx"
+        },
+        {
+          "path": "src/components/auth/phone-number/reset-phone-number-password.tsx",
+          "type": "registry:component",
+          "target": "@components/auth/phone-number/reset-phone-number-password.tsx"
+        },
+        {
+          "path": "src/components/auth/phone-number/change-phone-number.tsx",
+          "type": "registry:component",
+          "target": "@components/auth/phone-number/change-phone-number.tsx"
+        },
+        {
+          "path": "src/components/auth/phone-number/remove-phone-number-dialog.tsx",
+          "type": "registry:component",
+          "target": "@components/auth/phone-number/remove-phone-number-dialog.tsx"
         },
         {
           "path": "src/components/auth/provider-button.tsx",
@@ -441,8 +547,8 @@
         "separator",
         "skeleton",
         "spinner",
-        "https://better-auth-ui.com/r/sign-up.json",
-        "https://better-auth-ui.com/r/user-avatar.json"
+        "https://better-auth-ui.com/r/radix-nova/sign-up.json",
+        "https://better-auth-ui.com/r/radix-nova/user-avatar.json"
       ],
       "files": [
         {
@@ -552,7 +658,7 @@
         "separator",
         "sonner",
         "spinner",
-        "https://better-auth-ui.com/r/additional-field.json"
+        "https://better-auth-ui.com/r/radix-nova/additional-field.json"
       ],
       "files": [
         {
@@ -689,8 +795,8 @@
         "skeleton",
         "sonner",
         "spinner",
-        "https://better-auth-ui.com/r/sign-in.json",
-        "https://better-auth-ui.com/r/username.json"
+        "https://better-auth-ui.com/r/radix-nova/sign-in.json",
+        "https://better-auth-ui.com/r/radix-nova/username.json"
       ],
       "files": [
         {
@@ -860,7 +966,7 @@
       "registryDependencies": [
         "dropdown-menu",
         "spinner",
-        "https://better-auth-ui.com/r/user-button.json"
+        "https://better-auth-ui.com/r/radix-nova/user-button.json"
       ],
       "files": [
         {
@@ -899,7 +1005,7 @@
         "separator",
         "sonner",
         "spinner",
-        "https://better-auth-ui.com/r/user-view.json"
+        "https://better-auth-ui.com/r/radix-nova/user-view.json"
       ],
       "files": [
         {
@@ -972,7 +1078,7 @@
         "spinner",
         "table",
         "tabs",
-        "https://better-auth-ui.com/r/user-view.json"
+        "https://better-auth-ui.com/r/radix-nova/user-view.json"
       ],
       "files": [
         {
@@ -1396,14 +1502,14 @@
         "@better-auth-ui/core@latest"
       ],
       "registryDependencies": [
-        "https://better-auth-ui.com/r/auth-provider.json",
-        "https://better-auth-ui.com/r/sign-in.json",
-        "https://better-auth-ui.com/r/sign-up.json",
-        "https://better-auth-ui.com/r/forgot-password.json",
-        "https://better-auth-ui.com/r/reset-password.json",
-        "https://better-auth-ui.com/r/verify-email.json",
-        "https://better-auth-ui.com/r/auth-redirect.json",
-        "https://better-auth-ui.com/r/sign-out.json"
+        "https://better-auth-ui.com/r/radix-nova/auth-provider.json",
+        "https://better-auth-ui.com/r/radix-nova/sign-in.json",
+        "https://better-auth-ui.com/r/radix-nova/sign-up.json",
+        "https://better-auth-ui.com/r/radix-nova/forgot-password.json",
+        "https://better-auth-ui.com/r/radix-nova/reset-password.json",
+        "https://better-auth-ui.com/r/radix-nova/verify-email.json",
+        "https://better-auth-ui.com/r/radix-nova/auth-redirect.json",
+        "https://better-auth-ui.com/r/radix-nova/sign-out.json"
       ],
       "files": [
         {
@@ -1445,7 +1551,7 @@
       ],
       "registryDependencies": [
         "skeleton",
-        "https://better-auth-ui.com/r/user-avatar.json"
+        "https://better-auth-ui.com/r/radix-nova/user-avatar.json"
       ],
       "files": [
         {
@@ -1470,7 +1576,7 @@
         "button",
         "dropdown-menu",
         "spinner",
-        "https://better-auth-ui.com/r/user-view.json"
+        "https://better-auth-ui.com/r/radix-nova/user-view.json"
       ],
       "files": [
         {
@@ -1502,8 +1608,8 @@
         "skeleton",
         "sonner",
         "spinner",
-        "https://better-auth-ui.com/r/additional-field.json",
-        "https://better-auth-ui.com/r/user-avatar.json"
+        "https://better-auth-ui.com/r/radix-nova/additional-field.json",
+        "https://better-auth-ui.com/r/radix-nova/user-avatar.json"
       ],
       "files": [
         {
@@ -1555,8 +1661,8 @@
         "@better-auth-ui/core@latest"
       ],
       "registryDependencies": [
-        "https://better-auth-ui.com/r/user-profile.json",
-        "https://better-auth-ui.com/r/change-email.json"
+        "https://better-auth-ui.com/r/radix-nova/user-profile.json",
+        "https://better-auth-ui.com/r/radix-nova/change-email.json"
       ],
       "files": [
         {
@@ -1677,9 +1783,9 @@
         "@better-auth-ui/core@latest"
       ],
       "registryDependencies": [
-        "https://better-auth-ui.com/r/change-password.json",
-        "https://better-auth-ui.com/r/linked-accounts.json",
-        "https://better-auth-ui.com/r/active-sessions.json"
+        "https://better-auth-ui.com/r/radix-nova/change-password.json",
+        "https://better-auth-ui.com/r/radix-nova/linked-accounts.json",
+        "https://better-auth-ui.com/r/radix-nova/active-sessions.json"
       ],
       "files": [
         {
@@ -1700,8 +1806,8 @@
       ],
       "registryDependencies": [
         "tabs",
-        "https://better-auth-ui.com/r/account-settings.json",
-        "https://better-auth-ui.com/r/security-settings.json"
+        "https://better-auth-ui.com/r/radix-nova/account-settings.json",
+        "https://better-auth-ui.com/r/radix-nova/security-settings.json"
       ],
       "files": [
         {
@@ -1957,52 +2063,52 @@
       "title": "All",
       "description": "Installs every Better Auth UI component, plugin, and email template in one shot.",
       "registryDependencies": [
-        "https://better-auth-ui.com/r/auth-provider.json",
-        "https://better-auth-ui.com/r/additional-field.json",
-        "https://better-auth-ui.com/r/sign-in.json",
-        "https://better-auth-ui.com/r/anonymous.json",
-        "https://better-auth-ui.com/r/last-login-method.json",
-        "https://better-auth-ui.com/r/one-tap.json",
-        "https://better-auth-ui.com/r/sign-up.json",
-        "https://better-auth-ui.com/r/email-otp.json",
-        "https://better-auth-ui.com/r/magic-link.json",
-        "https://better-auth-ui.com/r/oauth-provider.json",
-        "https://better-auth-ui.com/r/device-authorization.json",
-        "https://better-auth-ui.com/r/username.json",
-        "https://better-auth-ui.com/r/passkey.json",
-        "https://better-auth-ui.com/r/two-factor.json",
-        "https://better-auth-ui.com/r/api-key.json",
-        "https://better-auth-ui.com/r/admin.json",
-        "https://better-auth-ui.com/r/multi-session.json",
-        "https://better-auth-ui.com/r/organization.json",
-        "https://better-auth-ui.com/r/theme.json",
-        "https://better-auth-ui.com/r/delete-user.json",
-        "https://better-auth-ui.com/r/forgot-password.json",
-        "https://better-auth-ui.com/r/reset-password.json",
-        "https://better-auth-ui.com/r/verify-email.json",
-        "https://better-auth-ui.com/r/sign-out.json",
-        "https://better-auth-ui.com/r/auth.json",
-        "https://better-auth-ui.com/r/user-avatar.json",
-        "https://better-auth-ui.com/r/user-view.json",
-        "https://better-auth-ui.com/r/user-button.json",
-        "https://better-auth-ui.com/r/user-profile.json",
-        "https://better-auth-ui.com/r/change-email.json",
-        "https://better-auth-ui.com/r/account-settings.json",
-        "https://better-auth-ui.com/r/change-password.json",
-        "https://better-auth-ui.com/r/linked-accounts.json",
-        "https://better-auth-ui.com/r/active-sessions.json",
-        "https://better-auth-ui.com/r/security-settings.json",
-        "https://better-auth-ui.com/r/settings.json",
-        "https://better-auth-ui.com/r/email-verification-email.json",
-        "https://better-auth-ui.com/r/magic-link-email.json",
-        "https://better-auth-ui.com/r/reset-password-email.json",
-        "https://better-auth-ui.com/r/change-email-confirmation-email.json",
-        "https://better-auth-ui.com/r/delete-account-verification-email.json",
-        "https://better-auth-ui.com/r/password-changed-email.json",
-        "https://better-auth-ui.com/r/email-changed-email.json",
-        "https://better-auth-ui.com/r/otp-email.json",
-        "https://better-auth-ui.com/r/new-device-email.json",
-        "https://better-auth-ui.com/r/organization-invitation-email.json"
+        "https://better-auth-ui.com/r/radix-nova/auth-provider.json",
+        "https://better-auth-ui.com/r/radix-nova/additional-field.json",
+        "https://better-auth-ui.com/r/radix-nova/sign-in.json",
+        "https://better-auth-ui.com/r/radix-nova/anonymous.json",
+        "https://better-auth-ui.com/r/radix-nova/last-login-method.json",
+        "https://better-auth-ui.com/r/radix-nova/one-tap.json",
+        "https://better-auth-ui.com/r/radix-nova/sign-up.json",
+        "https://better-auth-ui.com/r/radix-nova/email-otp.json",
+        "https://better-auth-ui.com/r/radix-nova/magic-link.json",
+        "https://better-auth-ui.com/r/radix-nova/oauth-provider.json",
+        "https://better-auth-ui.com/r/radix-nova/device-authorization.json",
+        "https://better-auth-ui.com/r/radix-nova/username.json",
+        "https://better-auth-ui.com/r/radix-nova/passkey.json",
+        "https://better-auth-ui.com/r/radix-nova/two-factor.json",
+        "https://better-auth-ui.com/r/radix-nova/api-key.json",
+        "https://better-auth-ui.com/r/radix-nova/admin.json",
+        "https://better-auth-ui.com/r/radix-nova/multi-session.json",
+        "https://better-auth-ui.com/r/radix-nova/organization.json",
+        "https://better-auth-ui.com/r/radix-nova/theme.json",
+        "https://better-auth-ui.com/r/radix-nova/delete-user.json",
+        "https://better-auth-ui.com/r/radix-nova/forgot-password.json",
+        "https://better-auth-ui.com/r/radix-nova/reset-password.json",
+        "https://better-auth-ui.com/r/radix-nova/verify-email.json",
+        "https://better-auth-ui.com/r/radix-nova/sign-out.json",
+        "https://better-auth-ui.com/r/radix-nova/auth.json",
+        "https://better-auth-ui.com/r/radix-nova/user-avatar.json",
+        "https://better-auth-ui.com/r/radix-nova/user-view.json",
+        "https://better-auth-ui.com/r/radix-nova/user-button.json",
+        "https://better-auth-ui.com/r/radix-nova/user-profile.json",
+        "https://better-auth-ui.com/r/radix-nova/change-email.json",
+        "https://better-auth-ui.com/r/radix-nova/account-settings.json",
+        "https://better-auth-ui.com/r/radix-nova/change-password.json",
+        "https://better-auth-ui.com/r/radix-nova/linked-accounts.json",
+        "https://better-auth-ui.com/r/radix-nova/active-sessions.json",
+        "https://better-auth-ui.com/r/radix-nova/security-settings.json",
+        "https://better-auth-ui.com/r/radix-nova/settings.json",
+        "https://better-auth-ui.com/r/radix-nova/email-verification-email.json",
+        "https://better-auth-ui.com/r/radix-nova/magic-link-email.json",
+        "https://better-auth-ui.com/r/radix-nova/reset-password-email.json",
+        "https://better-auth-ui.com/r/radix-nova/change-email-confirmation-email.json",
+        "https://better-auth-ui.com/r/radix-nova/delete-account-verification-email.json",
+        "https://better-auth-ui.com/r/radix-nova/password-changed-email.json",
+        "https://better-auth-ui.com/r/radix-nova/email-changed-email.json",
+        "https://better-auth-ui.com/r/radix-nova/otp-email.json",
+        "https://better-auth-ui.com/r/radix-nova/new-device-email.json",
+        "https://better-auth-ui.com/r/radix-nova/organization-invitation-email.json"
       ],
       "files": []
     }

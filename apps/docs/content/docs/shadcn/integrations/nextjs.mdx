@@ -50,7 +50,11 @@ Wrap your application with the `Providers` component in your root layout.
 Install the auth components and create a dynamic auth page that renders the appropriate authentication view based on the path.
 
 ```npm
-npx shadcn@latest add https://better-auth-ui.com/r/auth.json
+npx shadcn@latest registry add @better-auth-ui=https://better-auth-ui.com/r/{style}/{name}.json
+```
+
+```npm
+npx shadcn@latest add @better-auth-ui/auth
 ```
 
 ```tsx title="app/auth/[path]/page.tsx" file=<rootDir>/../../examples/next-shadcn-example/src/app/auth/[path]/page.tsx
@@ -65,7 +69,11 @@ The `viewPaths.auth` object contains the built-in auth paths: `redirect`, `sign-
 If you installed the `settings` component, create a dynamic settings route that renders the `Settings` component for the URL segment. This page is an async server component that validates the path, checks the session with `ensureSession` (redirecting unauthenticated users before any HTML is sent), and dehydrates the session query into the client via `HydrationBoundary` so child hooks skip their loading state on hydration.
 
 ```npm
-npx shadcn@latest add https://better-auth-ui.com/r/settings.json
+npx shadcn@latest registry add @better-auth-ui=https://better-auth-ui.com/r/{style}/{name}.json
+```
+
+```npm
+npx shadcn@latest add @better-auth-ui/settings
 ```
 
 ```tsx title="app/settings/[path]/page.tsx" file=<rootDir>/../../examples/next-shadcn-example/src/app/settings/[path]/page.tsx

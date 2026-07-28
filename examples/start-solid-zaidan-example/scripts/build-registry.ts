@@ -1,4 +1,5 @@
 import {
+  cpSync,
   existsSync,
   mkdirSync,
   readdirSync,
@@ -156,7 +157,7 @@ export const verifySolidRegistryCoherence = ({
     resolve(publicSolidRegistryRoot, "registry.json")
   )
   const shadcnRegistry = readJson<ShadcnRegistryJson>(
-    resolve(repoRoot, "apps/docs/public/r/registry.json")
+    resolve(repoRoot, "apps/docs/public/r/radix-nova/registry.json")
   )
 
   const expectedStaticFiles = [
@@ -248,6 +249,16 @@ if (isDirectExecution()) {
     exampleRoot,
     manifest: solidRegistryManifest,
     outputRoot
+  })
+  const rewriteOutput = resolve(
+    outputRoot,
+    "styles",
+    solidRegistryManifest.namespace
+  )
+
+  rmSync(rewriteOutput, { force: true, recursive: true })
+  cpSync(resolve(outputRoot, solidRegistryManifest.namespace), rewriteOutput, {
+    recursive: true
   })
 
   for (const file of result.files) {

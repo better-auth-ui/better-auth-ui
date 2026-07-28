@@ -59,6 +59,19 @@ export function CreateApiKeyDialog({
   const [isNewKeyDialogOpen, setIsNewKeyDialogOpen] = useState(false)
   const [keyName, setKeyName] = useState<string | null>(null)
   const [secretKey, setSecretKey] = useState<string | null>(null)
+  const expirationItems = keyExpiration
+    ? [
+        ...keyExpiration.intervals.map((days) => ({
+          label: `${days.toLocaleString()} ${
+            days === 1 ? apiKeyLocalization.day : apiKeyLocalization.days
+          }`,
+          value: String(days)
+        })),
+        ...(keyExpiration.allowNever
+          ? [{ label: apiKeyLocalization.never, value: "never" }]
+          : [])
+      ]
+    : []
 
   const handleOpenChange = (nextOpen: boolean) => {
     if (!nextOpen) {
@@ -148,6 +161,7 @@ export function CreateApiKeyDialog({
                   </FieldLabel>
 
                   <Select
+                    items={expirationItems}
                     name="expiration"
                     defaultValue={
                       keyExpiration.defaultInterval === null
@@ -162,20 +176,11 @@ export function CreateApiKeyDialog({
 
                     <SelectContent>
                       <SelectGroup>
-                        {keyExpiration.intervals.map((days) => (
-                          <SelectItem key={days} value={String(days)}>
-                            {days.toLocaleString()}{" "}
-                            {days === 1
-                              ? apiKeyLocalization.day
-                              : apiKeyLocalization.days}
+                        {expirationItems.map((item) => (
+                          <SelectItem key={item.value} value={item.value}>
+                            {item.label}
                           </SelectItem>
                         ))}
-
-                        {keyExpiration.allowNever ? (
-                          <SelectItem value="never">
-                            {apiKeyLocalization.never}
-                          </SelectItem>
-                        ) : null}
                       </SelectGroup>
                     </SelectContent>
                   </Select>

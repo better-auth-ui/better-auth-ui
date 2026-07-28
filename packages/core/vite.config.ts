@@ -27,6 +27,7 @@ export default defineConfig({
         "plugins/organization/server": "src/plugins/organization/server.ts",
         "plugins/passkey/index": "src/plugins/passkey/index.ts",
         "plugins/passkey/server": "src/plugins/passkey/server.ts",
+        "plugins/phone-number/index": "src/plugins/phone-number/index.ts",
         "plugins/theme/index": "src/plugins/theme/index.ts",
         "plugins/two-factor/index": "src/plugins/two-factor/index.ts",
         "plugins/username/index": "src/plugins/username/index.ts",

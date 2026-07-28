@@ -52,6 +52,7 @@ describe("@better-auth-ui/solid foundation", () => {
       "./plugins/one-tap",
       "./plugins/organization",
       "./plugins/passkey",
+      "./plugins/phone-number",
       "./plugins/two-factor",
       "./plugins/username"
     ])

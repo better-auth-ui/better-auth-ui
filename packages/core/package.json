@@ -1,6 +1,6 @@
 {
   "name": "@better-auth-ui/core",
-  "version": "1.6.39",
+  "version": "1.6.40",
   "type": "module",
   "scripts": {
     "build": "vite build",
@@ -112,6 +112,11 @@
       "src": "./src/plugins/passkey/server.ts",
       "types": "./dist/plugins/passkey/server.d.ts",
       "import": "./dist/plugins/passkey/server.js"
+    },
+    "./plugins/phone-number": {
+      "src": "./src/plugins/phone-number/index.ts",
+      "types": "./dist/plugins/phone-number/index.d.ts",
+      "import": "./dist/plugins/phone-number/index.js"
     },
     "./plugins/theme": {
       "src": "./src/plugins/theme/index.ts",

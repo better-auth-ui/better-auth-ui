@@ -51,7 +51,11 @@ export const authClient = createAuthClient({
 Install the registry item. It includes the updated sign-in components and the UI plugin factory:
 
 ```bash
-bunx --bun shadcn@latest add https://better-auth-ui.com/r/last-login-method.json
+bun x shadcn@latest registry add @better-auth-ui=https://better-auth-ui.com/r/{style}/{name}.json
+```
+
+```bash
+bunx --bun shadcn@latest add @better-auth-ui/last-login-method
 ```
 
 </Step>

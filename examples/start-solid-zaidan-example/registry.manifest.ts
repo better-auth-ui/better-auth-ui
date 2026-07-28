@@ -278,6 +278,47 @@ export const solidRegistryManifest = {
       ]
     }),
     item({
+      name: "phone-number",
+      type: "registry:component",
+      title: "Solid Phone Number",
+      description:
+        "Solid/Zaidan phone verification-code and password sign-in, password recovery, and verified phone-number management.",
+      registryDependencies: [
+        betterAuthSolidRegistryDependency("auth-provider"),
+        betterAuthSolidRegistryDependency("account-settings"),
+        "@zaidan/alert-dialog"
+      ],
+      files: [
+        libFile("src/lib/auth/phone-number-plugin.ts"),
+        libFile("src/lib/auth/use-resend-cooldown.ts"),
+        libFile("src/lib/auth/use-sign-in-continuation.ts"),
+        componentFile("src/components/auth/otp-field.tsx"),
+        componentFile("src/components/auth/phone-number/phone-number.tsx"),
+        componentFile(
+          "src/components/auth/phone-number/phone-number-button.tsx"
+        ),
+        componentFile(
+          "src/components/auth/phone-number/forgot-phone-number-password.tsx"
+        ),
+        componentFile(
+          "src/components/auth/phone-number/reset-phone-number-password.tsx"
+        ),
+        componentFile(
+          "src/components/auth/phone-number/change-phone-number.tsx"
+        ),
+        componentFile(
+          "src/components/auth/phone-number/remove-phone-number-dialog.tsx"
+        ),
+        componentFile("src/components/auth/provider-buttons.tsx"),
+        componentFile("src/components/auth/provider-button.tsx"),
+        componentFile(
+          "src/components/auth/last-login-method/last-used-badge.tsx"
+        ),
+        componentFile("src/components/auth/sign-in-path.ts"),
+        ...zaidanFormSupportFiles
+      ]
+    }),
+    item({
       name: "magic-link",
       type: "registry:component",
       title: "Solid Magic Link",
