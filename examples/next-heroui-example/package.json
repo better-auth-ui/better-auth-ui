@@ -2,6 +2,15 @@
   "name": "next-heroui-example",
   "version": "0.1.0",
   "private": true,
+  "nx": {
+    "targets": {
+      "build": {
+        "outputs": [
+          "{projectRoot}/.next"
+        ]
+      }
+    }
+  },
   "scripts": {
     "dev": "next dev --turbo",
     "build": "next build",

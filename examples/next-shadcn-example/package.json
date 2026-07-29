@@ -2,6 +2,15 @@
   "name": "next-shadcn-example",
   "version": "0.1.0",
   "private": true,
+  "nx": {
+    "targets": {
+      "build": {
+        "outputs": [
+          "{projectRoot}/.next"
+        ]
+      }
+    }
+  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",

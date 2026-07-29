@@ -27,6 +27,13 @@
           "target": "registry:build"
         }
       ],
+      "inputs": [
+        "default",
+        "^default",
+        {
+          "dependentTasksOutputFiles": "apps/docs/public/**/*"
+        }
+      ],
       "executor": "nx:run-commands",
       "options": {
         "command": "NODE_OPTIONS='--max-old-space-size=16384' vite build",
@@ -49,7 +56,11 @@
         "{workspaceRoot}/examples/start-solid-zaidan-example/src/lib/**",
         "{workspaceRoot}/examples/start-solid-zaidan-example/src/stories/**",
         "{workspaceRoot}/examples/start-solid-zaidan-example/src/components/**",
-        "{workspaceRoot}/examples/start-solid-zaidan-example/src/routes/**"
+        "{workspaceRoot}/examples/start-solid-zaidan-example/src/routes/**",
+        "{workspaceRoot}/bun.lock",
+        {
+          "dependentTasksOutputFiles": "packages/{core,solid}/dist/**/*"
+        }
       ],
       "options": {
         "command": "bun ../../examples/start-solid-zaidan-example/scripts/build-docs-storybook.ts",

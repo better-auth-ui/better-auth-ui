@@ -20,7 +20,9 @@
         ],
         "outputs": [
           "{workspaceRoot}/apps/docs/public/r/base-*/*.json",
-          "{workspaceRoot}/apps/docs/public/r/radix-*/*.json"
+          "{workspaceRoot}/apps/docs/public/r/radix-*/*.json",
+          "{workspaceRoot}/apps/docs/public/r/styles/base-*/*.json",
+          "{workspaceRoot}/apps/docs/public/r/styles/radix-*/*.json"
         ]
       }
     }

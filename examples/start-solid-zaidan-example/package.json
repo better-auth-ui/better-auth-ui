@@ -7,12 +7,14 @@
       "test": {
         "dependsOn": [
           "^build",
-          "registry:build",
+          "registry:build"
+        ],
+        "inputs": [
+          "default",
+          "^default",
           {
-            "projects": [
-              "start-shadcn-example"
-            ],
-            "target": "registry:build"
+            "dependentTasksOutputFiles": "apps/docs/public/r/**/*",
+            "transitive": true
           }
         ]
       },
@@ -23,15 +25,27 @@
       },
       "registry:build": {
         "cache": true,
+        "dependsOn": [
+          {
+            "projects": [
+              "start-shadcn-example"
+            ],
+            "target": "registry:build"
+          }
+        ],
         "inputs": [
           "{projectRoot}/package.json",
           "{projectRoot}/registry.manifest.ts",
           "{projectRoot}/scripts/build-registry.ts",
           "{projectRoot}/src/**/*",
-          "{workspaceRoot}/bun.lock"
+          "{workspaceRoot}/bun.lock",
+          {
+            "dependentTasksOutputFiles": "apps/docs/public/r/radix-nova/registry.json"
+          }
         ],
         "outputs": [
-          "{workspaceRoot}/apps/docs/public/r/solid/**/*"
+          "{workspaceRoot}/apps/docs/public/r/solid/**/*",
+          "{workspaceRoot}/apps/docs/public/r/styles/solid/**/*"
         ]
       }
     }

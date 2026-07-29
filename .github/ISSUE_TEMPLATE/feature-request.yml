@@ -1,0 +1,72 @@
+name: 💡 Feature request
+description: Suggest an improvement for Better Auth UI
+title: "[Feature]: "
+labels:
+  - enhancement
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for sharing an idea. Please focus on the problem you want Better Auth UI to solve and the people who would benefit.
+
+  - type: checkboxes
+    id: existing-requests
+    attributes:
+      label: Is there an existing request for this?
+      description: Search the open and closed issues before filing a new request.
+      options:
+        - label: I have searched the existing issues.
+          required: true
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Affected area
+      description: Select the package or part of the project this request concerns.
+      options:
+        - "@better-auth-ui/core"
+        - "@better-auth-ui/react"
+        - "@better-auth-ui/heroui"
+        - "@better-auth-ui/solid"
+        - shadcn registry
+        - Documentation or website
+        - New integration
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem would this solve?
+      description: Describe the use case, current limitation, and who encounters it.
+      placeholder: When building ..., I need ... because ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed solution
+      description: Describe the behavior or API you would like to see.
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Share any workarounds or alternative approaches you have tried.
+
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional context
+      description: Add examples, mockups, links, or other details that help explain the request.
+
+  - type: checkboxes
+    id: contribution
+    attributes:
+      label: Are you willing to help?
+      options:
+        - label: I would be willing to submit a pull request for this feature.

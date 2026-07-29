@@ -31,11 +31,12 @@ export function baseOptions(): BaseLayoutProps {
         secondary: false
       },
       {
+        type: "icon",
         icon: <Discord />,
+        label: "Discord",
         text: "Discord",
         url: "https://better-auth-ui.com/discord",
-        external: true,
-        secondary: false
+        external: true
       },
       {
         icon: <ArrowUpRight />,
