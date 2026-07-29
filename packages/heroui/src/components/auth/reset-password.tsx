@@ -1,3 +1,4 @@
+import { getAuthLinkURL } from "@better-auth-ui/core"
 import { useAuth, useResetPassword } from "@better-auth-ui/react"
 import { Eye, EyeSlash } from "@gravity-ui/icons"
 import {
@@ -33,8 +34,9 @@ export function ResetPassword({ className, variant }: ResetPasswordProps) {
     basePaths,
     emailAndPassword,
     localization,
-    viewPaths,
-    navigate
+    navigate,
+    redirectTo,
+    viewPaths
   } = useAuth()
 
   const { mutate: resetPassword, isPending } = useResetPassword(authClient, {
@@ -225,7 +227,10 @@ export function ResetPassword({ className, variant }: ResetPasswordProps) {
         <Description className="text-sm">
           {localization.auth.rememberYourPassword}{" "}
           <Link
-            href={`${basePaths.auth}/${viewPaths.auth.signIn}`}
+            href={getAuthLinkURL(
+              `${basePaths.auth}/${viewPaths.auth.signIn}`,
+              redirectTo
+            )}
             className="text-accent no-underline hover:underline decoration-accent-hover"
           >
             {localization.auth.signIn}

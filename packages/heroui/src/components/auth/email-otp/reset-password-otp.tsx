@@ -1,3 +1,4 @@
+import { getAuthLinkURL } from "@better-auth-ui/core"
 import {
   type EmailOtpAuthClient,
   useAuth,
@@ -56,6 +57,7 @@ export function ResetPasswordOtp({
     emailAndPassword,
     localization,
     navigate,
+    redirectTo,
     viewPaths
   } = useAuth()
   const { localization: emailOtpLocalization, otpLength } =
@@ -321,7 +323,10 @@ export function ResetPasswordOtp({
         <Description className="text-sm">
           {localization.auth.rememberYourPassword}{" "}
           <Link
-            href={`${basePaths.auth}/${viewPaths.auth.signIn}`}
+            href={getAuthLinkURL(
+              `${basePaths.auth}/${viewPaths.auth.signIn}`,
+              redirectTo
+            )}
             className="text-accent no-underline hover:underline decoration-accent-hover"
           >
             {localization.auth.signIn}

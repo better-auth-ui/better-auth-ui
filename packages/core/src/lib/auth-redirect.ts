@@ -21,6 +21,25 @@ export function getViewURL(
   return `${origin}/${path}`
 }
 
+/**
+ * Add the current post-authentication destination to an internal auth link.
+ */
+export function getAuthLinkURL(href: string, redirectTo: string): string {
+  const hashIndex = href.indexOf("#")
+  const hash = hashIndex === -1 ? "" : href.slice(hashIndex)
+  const hrefWithoutHash = hashIndex === -1 ? href : href.slice(0, hashIndex)
+  const queryIndex = hrefWithoutHash.indexOf("?")
+  const pathname =
+    queryIndex === -1 ? hrefWithoutHash : hrefWithoutHash.slice(0, queryIndex)
+  const searchParams = new URLSearchParams(
+    queryIndex === -1 ? "" : hrefWithoutHash.slice(queryIndex + 1)
+  )
+
+  searchParams.set("redirectTo", redirectTo)
+
+  return `${pathname}?${searchParams}${hash}`
+}
+
 function hasUnsafeRedirectCharacters(value: string): boolean {
   for (const character of value) {
     const codePoint = character.codePointAt(0)

@@ -1,6 +1,10 @@
 "use client"
 
-import { type AuthView, authMutationKeys } from "@better-auth-ui/core"
+import {
+  type AuthView,
+  authMutationKeys,
+  getAuthLinkURL
+} from "@better-auth-ui/core"
 import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
 import { useIsMutating } from "@tanstack/react-query"
 import { KeyRound, Lock } from "lucide-react"
@@ -20,8 +24,14 @@ export type EmailOtpButtonProps = {
  * @param view - Current auth view. On `"emailOtp"` this links back to password sign-in.
  */
 export function EmailOtpButton({ view }: EmailOtpButtonProps) {
-  const { basePaths, emailAndPassword, localization, viewPaths, Link } =
-    useAuth()
+  const {
+    basePaths,
+    emailAndPassword,
+    localization,
+    redirectTo,
+    viewPaths,
+    Link
+  } = useAuth()
   const { localization: emailOtpLocalization, viewPaths: emailOtpViewPaths } =
     useAuthPlugin(emailOtpPlugin)
 
@@ -41,7 +51,10 @@ export function EmailOtpButton({ view }: EmailOtpButtonProps) {
 
   return (
     <Link
-      href={`${basePaths.auth}/${isEmailOtpView ? viewPaths.auth.signIn : emailOtpViewPaths.auth.emailOtp}`}
+      href={getAuthLinkURL(
+        `${basePaths.auth}/${isEmailOtpView ? viewPaths.auth.signIn : emailOtpViewPaths.auth.emailOtp}`,
+        redirectTo
+      )}
       aria-disabled={isPending || undefined}
       tabIndex={isPending ? -1 : undefined}
       onClick={(event) => {

@@ -1,5 +1,6 @@
 "use client"
 
+import { getAuthLinkURL } from "@better-auth-ui/core"
 import { useAuth } from "@better-auth-ui/react"
 import { useEffect, useState } from "react"
 
@@ -28,7 +29,7 @@ export type ResetLinkSentProps = {
  * @returns The reset-link-sent card React element
  */
 export function ResetLinkSent({ className }: ResetLinkSentProps) {
-  const { basePaths, localization, viewPaths, Link } = useAuth()
+  const { basePaths, localization, redirectTo, viewPaths, Link } = useAuth()
 
   const isHydrated = useIsHydrated()
   const [email, setEmail] = useState(
@@ -62,7 +63,10 @@ export function ResetLinkSent({ className }: ResetLinkSentProps) {
           <FieldDescription className="text-center">
             {localization.auth.rememberYourPassword}{" "}
             <Link
-              href={`${basePaths.auth}/${viewPaths.auth.signIn}`}
+              href={getAuthLinkURL(
+                `${basePaths.auth}/${viewPaths.auth.signIn}`,
+                redirectTo
+              )}
               className="underline underline-offset-4"
             >
               {localization.auth.signIn}

@@ -1,3 +1,4 @@
+import { getAuthLinkURL } from "@better-auth-ui/core"
 import { AuthLink, resetPasswordOptions, useAuth } from "@better-auth-ui/solid"
 import { createMutation } from "@tanstack/solid-query"
 import { Eye, EyeOff } from "lucide-solid"
@@ -216,7 +217,10 @@ export function ResetPassword(props: ResetPasswordProps) {
             {auth.localization.auth.rememberYourPassword}{" "}
             <AuthLink
               class="underline underline-offset-4"
-              href={`${auth.basePaths.auth}/${auth.viewPaths.auth.signIn}`}
+              href={getAuthLinkURL(
+                `${auth.basePaths.auth}/${auth.viewPaths.auth.signIn}`,
+                auth.redirectTo
+              )}
             >
               {auth.localization.auth.signIn}
             </AuthLink>

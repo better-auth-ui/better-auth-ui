@@ -1,11 +1,25 @@
 import { describe, expect, it } from "vitest"
 import {
+  getAuthLinkURL,
   getAuthRedirectAction,
   getSafeRedirectTo,
   getViewURL
 } from "../src/lib/auth-redirect"
 
 const origin = "https://app.example.com"
+
+describe("getAuthLinkURL", () => {
+  it("preserves redirect targets and existing URL details", () => {
+    expect(
+      getAuthLinkURL(
+        "/auth/sign-in?mode=password#form",
+        "/projects/acme?tab=members"
+      )
+    ).toBe(
+      "/auth/sign-in?mode=password&redirectTo=%2Fprojects%2Facme%3Ftab%3Dmembers#form"
+    )
+  })
+})
 
 describe("getSafeRedirectTo", () => {
   it("preserves root-relative paths, queries, and hashes", () => {

@@ -1,3 +1,4 @@
+import { getAuthLinkURL } from "@better-auth-ui/core"
 import {
   type EmailOtpAuthClient,
   useAuth,
@@ -224,7 +225,10 @@ export function VerifyEmailOtp({ className, variant }: VerifyEmailOtpProps) {
         <Description className="text-sm">
           {localization.auth.alreadyVerifiedYourEmail}{" "}
           <Link
-            href={`${basePaths.auth}/${viewPaths.auth.signIn}`}
+            href={getAuthLinkURL(
+              `${basePaths.auth}/${viewPaths.auth.signIn}`,
+              redirectTo
+            )}
             className="text-accent no-underline hover:underline decoration-accent-hover"
           >
             {localization.auth.signIn}

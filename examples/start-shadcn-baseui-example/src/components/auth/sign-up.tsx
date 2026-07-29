@@ -2,6 +2,7 @@
 
 import {
   authMutationKeys,
+  getAuthLinkURL,
   parseAdditionalFieldValue
 } from "@better-auth-ui/core"
 import {
@@ -508,7 +509,10 @@ export function SignUp({
             <FieldDescription className="text-center">
               {localization.auth.alreadyHaveAnAccount}{" "}
               <Link
-                href={`${basePaths.auth}/${viewPaths.auth.signIn}`}
+                href={getAuthLinkURL(
+                  `${basePaths.auth}/${viewPaths.auth.signIn}`,
+                  redirectTo
+                )}
                 className="underline underline-offset-4"
               >
                 {localization.auth.signIn}

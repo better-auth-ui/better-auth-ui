@@ -1,4 +1,8 @@
-import { type AuthView, authMutationKeys } from "@better-auth-ui/core"
+import {
+  type AuthView,
+  authMutationKeys,
+  getAuthLinkURL
+} from "@better-auth-ui/core"
 import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
 import { Keyboard, Lock } from "@gravity-ui/icons"
 import { cn, Link } from "@heroui/react"
@@ -18,7 +22,8 @@ export type EmailOtpButtonProps = {
  * @param view - Current auth view. On `"emailOtp"` this links back to password sign-in.
  */
 export function EmailOtpButton({ view }: EmailOtpButtonProps) {
-  const { basePaths, emailAndPassword, localization, viewPaths } = useAuth()
+  const { basePaths, emailAndPassword, localization, redirectTo, viewPaths } =
+    useAuth()
   const { localization: emailOtpLocalization, viewPaths: emailOtpViewPaths } =
     useAuthPlugin(emailOtpPlugin)
 
@@ -38,7 +43,10 @@ export function EmailOtpButton({ view }: EmailOtpButtonProps) {
 
   return (
     <Link
-      href={`${basePaths.auth}/${isEmailOtpView ? viewPaths.auth.signIn : emailOtpViewPaths.auth.emailOtp}`}
+      href={getAuthLinkURL(
+        `${basePaths.auth}/${isEmailOtpView ? viewPaths.auth.signIn : emailOtpViewPaths.auth.emailOtp}`,
+        redirectTo
+      )}
       isDisabled={isPending}
       className={cn(
         buttonVariants({ variant: "tertiary" }),

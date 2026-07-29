@@ -1,3 +1,4 @@
+import { getAuthLinkURL } from "@better-auth-ui/core"
 import { AuthLink, useAuth } from "@better-auth-ui/solid"
 import { createSignal, onMount, Show } from "solid-js"
 import { isServer } from "solid-js/web"
@@ -67,7 +68,10 @@ export function ResetLinkSent(props: ResetLinkSentProps) {
             {auth.localization.auth.rememberYourPassword}{" "}
             <AuthLink
               class="underline underline-offset-4"
-              href={`${auth.basePaths.auth}/${auth.viewPaths.auth.signIn}`}
+              href={getAuthLinkURL(
+                `${auth.basePaths.auth}/${auth.viewPaths.auth.signIn}`,
+                auth.redirectTo
+              )}
             >
               {auth.localization.auth.signIn}
             </AuthLink>

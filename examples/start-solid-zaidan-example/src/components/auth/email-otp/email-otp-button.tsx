@@ -1,4 +1,4 @@
-import type { AuthView } from "@better-auth-ui/core"
+import { type AuthView, getAuthLinkURL } from "@better-auth-ui/core"
 import { AuthLink, useAuth, useAuthPlugin } from "@better-auth-ui/solid"
 import { KeyRound, Lock } from "lucide-solid"
 import { Show } from "solid-js"
@@ -28,11 +28,14 @@ export function EmailOtpButton(props: EmailOtpButtonProps) {
     <Show when={isVisible()}>
       <AuthLink
         class={cn(buttonVariants({ variant: "outline" }), "w-full")}
-        href={`${auth.basePaths.auth}/${
-          isEmailOtpView()
-            ? auth.viewPaths.auth.signIn
-            : (emailOtpViewPaths.auth.emailOtp as string)
-        }`}
+        href={getAuthLinkURL(
+          `${auth.basePaths.auth}/${
+            isEmailOtpView()
+              ? auth.viewPaths.auth.signIn
+              : (emailOtpViewPaths.auth.emailOtp as string)
+          }`,
+          auth.redirectTo
+        )}
       >
         <Show fallback={<KeyRound />} when={isEmailOtpView()}>
           <Lock />

@@ -43,7 +43,7 @@ export function AuthLink(props: AuthLinkProps) {
       event.ctrlKey ||
       event.shiftKey ||
       event.altKey ||
-      linkProps.target === "_blank" ||
+      (linkProps.target && linkProps.target !== "_self") ||
       linkProps.download
     ) {
       return

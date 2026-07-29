@@ -1,5 +1,6 @@
 "use client"
 
+import { getAuthLinkURL } from "@better-auth-ui/core"
 import { useAuth, useResetPassword } from "@better-auth-ui/react"
 import { Eye, EyeOff } from "lucide-react"
 import { type SyntheticEvent, useEffect, useState } from "react"
@@ -40,8 +41,9 @@ export function ResetPassword({ className }: ResetPasswordProps) {
     basePaths,
     emailAndPassword,
     localization,
-    viewPaths,
     navigate,
+    redirectTo,
+    viewPaths,
     Link
   } = useAuth()
 
@@ -271,7 +273,10 @@ export function ResetPassword({ className }: ResetPasswordProps) {
           <FieldDescription className="text-center">
             {localization.auth.rememberYourPassword}{" "}
             <Link
-              href={`${basePaths.auth}/${viewPaths.auth.signIn}`}
+              href={getAuthLinkURL(
+                `${basePaths.auth}/${viewPaths.auth.signIn}`,
+                redirectTo
+              )}
               className="underline underline-offset-4"
             >
               {localization.auth.signIn}

@@ -1,4 +1,8 @@
-import { authQueryKeys, parseAdditionalFieldValue } from "@better-auth-ui/core"
+import {
+  authQueryKeys,
+  getAuthLinkURL,
+  parseAdditionalFieldValue
+} from "@better-auth-ui/core"
 import {
   AuthLink,
   AuthPrompts,
@@ -391,7 +395,10 @@ export function SignUp(props: SignUpProps) {
             {auth.localization.auth.alreadyHaveAnAccount}{" "}
             <AuthLink
               class="underline underline-offset-4"
-              href={`${auth.basePaths.auth}/${auth.viewPaths.auth.signIn}`}
+              href={getAuthLinkURL(
+                `${auth.basePaths.auth}/${auth.viewPaths.auth.signIn}`,
+                auth.redirectTo
+              )}
             >
               {auth.localization.auth.signIn}
             </AuthLink>
