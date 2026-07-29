@@ -1,3 +1,4 @@
+export * from "./components/auth/auth-link"
 export * from "./components/auth/auth-prompts"
 export * from "./hooks/auth/use-authenticate"
 export * from "./hooks/auth/use-last-login-method"

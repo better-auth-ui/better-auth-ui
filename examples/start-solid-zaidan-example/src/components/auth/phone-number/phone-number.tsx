@@ -1,5 +1,6 @@
 import type { PhoneNumberAuthClient } from "@better-auth-ui/core/plugins/phone-number"
 import {
+  AuthLink,
   type AuthPlugin,
   AuthPrompts,
   useAuth,
@@ -11,7 +12,6 @@ import {
   useSignInPhoneNumber,
   useVerifyPhoneNumber
 } from "@better-auth-ui/solid/plugins/phone-number"
-import { Link } from "@tanstack/solid-router"
 import type { BetterFetchError } from "better-auth/client"
 import { type Component, createSignal, For, Show } from "solid-js"
 
@@ -349,26 +349,22 @@ export function PhoneNumber(props: PhoneNumberProps) {
         </div>
         <div class="mt-4 flex w-full flex-col items-center gap-3">
           <Show when={mode() === "password" && passwordReset}>
-            <Link
+            <AuthLink
               class="text-sm underline-offset-4 hover:underline"
-              params={{
-                path: phoneNumberViewPaths.auth.phoneNumberForgotPassword
-              }}
-              to="/auth/$path"
+              href={`${auth.basePaths.auth}/${phoneNumberViewPaths.auth.phoneNumberForgotPassword}`}
             >
               {localization.forgotPassword}
-            </Link>
+            </AuthLink>
           </Show>
           <Show when={auth.emailAndPassword?.enabled}>
             <p class="text-center text-sm text-muted-foreground">
               {auth.localization.auth.needToCreateAnAccount}{" "}
-              <Link
+              <AuthLink
                 class="underline underline-offset-4"
-                params={{ path: auth.viewPaths.auth.signUp }}
-                to="/auth/$path"
+                href={`${auth.basePaths.auth}/${auth.viewPaths.auth.signUp}`}
               >
                 {auth.localization.auth.signUp}
-              </Link>
+              </AuthLink>
             </p>
           </Show>
         </div>

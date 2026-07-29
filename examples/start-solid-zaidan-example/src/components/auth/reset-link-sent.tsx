@@ -1,5 +1,5 @@
-import { useAuth } from "@better-auth-ui/solid"
-import { Link } from "@tanstack/solid-router"
+import { getAuthLinkURL } from "@better-auth-ui/core"
+import { AuthLink, useAuth } from "@better-auth-ui/solid"
 import { createSignal, onMount, Show } from "solid-js"
 import { isServer } from "solid-js/web"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -66,13 +66,15 @@ export function ResetLinkSent(props: ResetLinkSentProps) {
         <div class="mt-4 flex w-full flex-col items-center gap-3">
           <p class="text-center text-sm text-muted-foreground">
             {auth.localization.auth.rememberYourPassword}{" "}
-            <Link
+            <AuthLink
               class="underline underline-offset-4"
-              params={{ path: auth.viewPaths.auth.signIn }}
-              to="/auth/$path"
+              href={getAuthLinkURL(
+                `${auth.basePaths.auth}/${auth.viewPaths.auth.signIn}`,
+                auth.redirectTo
+              )}
             >
               {auth.localization.auth.signIn}
-            </Link>
+            </AuthLink>
           </p>
         </div>
       </CardContent>

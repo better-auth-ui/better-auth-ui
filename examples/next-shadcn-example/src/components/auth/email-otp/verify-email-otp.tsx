@@ -1,5 +1,6 @@
 "use client"
 
+import { getAuthLinkURL } from "@better-auth-ui/core"
 import type { EmailOtpAuthClient } from "@better-auth-ui/core/plugins/email-otp"
 import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
 import {
@@ -234,7 +235,10 @@ export function VerifyEmailOtp({ className }: VerifyEmailOtpProps) {
           <FieldDescription className="text-center">
             {localization.auth.alreadyVerifiedYourEmail}{" "}
             <Link
-              href={`${basePaths.auth}/${viewPaths.auth.signIn}`}
+              href={getAuthLinkURL(
+                `${basePaths.auth}/${viewPaths.auth.signIn}`,
+                redirectTo
+              )}
               className="underline underline-offset-4"
             >
               {localization.auth.signIn}

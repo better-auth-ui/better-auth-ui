@@ -25,8 +25,13 @@ export function resolveAuthConfig<TAuthClient extends AuthClient>(
       }
     }
   } as AuthConfig<TAuthClient>)
+  const configuredRedirectTo = mergedConfig.redirectTo
 
-  mergedConfig.redirectTo = resolveRedirectTo(mergedConfig.redirectTo)
+  Object.defineProperty(mergedConfig, "redirectTo", {
+    configurable: true,
+    enumerable: true,
+    get: () => resolveRedirectTo(configuredRedirectTo)
+  })
   mergedConfig.additionalFields = mergeAdditionalFields(
     mergedConfig.plugins?.flatMap((plugin) => plugin.additionalFields ?? []),
     mergedConfig.additionalFields

@@ -4,19 +4,48 @@ import {
   type AdditionalField,
   type AuthClient,
   type AuthConfig,
+  authQueryKeys,
   type DeepPartial,
   deepmerge,
   defaultAuthConfig
 } from "@better-auth-ui/core"
 import {
+  environmentManager,
   QueryClient,
   QueryClientContext,
   QueryClientProvider
 } from "@tanstack/react-query"
-import { type PropsWithChildren, type ReactNode, useContext } from "react"
+import {
+  type PropsWithChildren,
+  type ReactNode,
+  useContext,
+  useMemo
+} from "react"
 import { MutationInvalidator } from "../mutation-invalidator"
 import { AuthContext } from "./auth-context"
 import { FetchOptionsProvider } from "./fetch-options-provider"
+
+const DEFAULT_AUTH_QUERY_RETRY_COUNT = 3
+
+function retryAuthQuery(failureCount: number, error: unknown) {
+  if (environmentManager.isServer()) {
+    return false
+  }
+
+  const status =
+    typeof error === "object" &&
+    error !== null &&
+    "status" in error &&
+    typeof error.status === "number"
+      ? error.status
+      : undefined
+
+  if (status !== undefined && status >= 400 && status < 500) {
+    return false
+  }
+
+  return failureCount < DEFAULT_AUTH_QUERY_RETRY_COUNT
+}
 
 const fallbackQueryClient = new QueryClient({
   defaultOptions: {
@@ -46,10 +75,12 @@ export type AuthProviderProps<TAuthClient extends AuthClient = AuthClient> =
 /**
  * Provides merged authentication configuration and a resolved React Query client to descendant components.
  *
- * The component merges the provided auth config with the library defaults, updates `redirectTo` from the
- * current URL when the app is hydrated, wires a QueryClient (prop, context, or fallback) and installs an
- * error handler that surfaces query errors via the configured toast. It then supplies the merged config
- * via AuthContext and wraps children with QueryClientProvider.
+ * The component merges the provided auth config with the library defaults,
+ * resolves `redirectTo` from the current URL whenever it is read, wires a
+ * QueryClient (prop, context, or fallback), applies retry defaults for auth
+ * queries, and installs an error handler that surfaces query errors via the
+ * configured toast. It then supplies the merged config via AuthContext and
+ * wraps children with QueryClientProvider.
  *
  * @returns The children wrapped with AuthContext.Provider and QueryClientProvider configured for auth.
  */
@@ -62,12 +93,19 @@ export function AuthProvider<TAuthClient extends AuthClient = AuthClient>({
   const mergedConfig = {
     ...deepmerge(defaultAuthConfig, partialConfig),
     authClient
-  } as AuthConfig
+  } as AuthConfig<TAuthClient>
+  const configuredRedirectTo = mergedConfig.redirectTo
 
-  mergedConfig.redirectTo =
-    (typeof window !== "undefined" &&
-      new URLSearchParams(window.location.search).get("redirectTo")?.trim()) ||
-    mergedConfig.redirectTo
+  Object.defineProperty(mergedConfig, "redirectTo", {
+    configurable: true,
+    enumerable: true,
+    get: () =>
+      (typeof window !== "undefined" &&
+        new URLSearchParams(window.location.search)
+          .get("redirectTo")
+          ?.trim()) ||
+      configuredRedirectTo
+  })
 
   // Merge plugin-contributed `additionalFields` with user-supplied ones.
   // Plugin order is preserved; user-supplied entries with the same `name`
@@ -84,11 +122,21 @@ export function AuthProvider<TAuthClient extends AuthClient = AuthClient>({
   mergedConfig.additionalFields = Array.from(fieldsByName.values())
 
   const contextQueryClient = useContext(QueryClientContext)
+  const resolvedQueryClient =
+    queryClient ?? contextQueryClient ?? fallbackQueryClient
+
+  const configuredQueryClient = useMemo(() => {
+    // Descendant queries resolve their defaults during render, so this
+    // idempotent initialization must happen before they render.
+    resolvedQueryClient.setQueryDefaults(authQueryKeys.all, {
+      retry: retryAuthQuery
+    })
+
+    return resolvedQueryClient
+  }, [resolvedQueryClient])
 
   return (
-    <QueryClientProvider
-      client={queryClient || contextQueryClient || fallbackQueryClient}
-    >
+    <QueryClientProvider client={configuredQueryClient}>
       <AuthContext.Provider value={mergedConfig}>
         <FetchOptionsProvider>
           <MutationInvalidator />

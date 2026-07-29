@@ -1,6 +1,6 @@
 {
   "name": "@better-auth-ui/heroui",
-  "version": "1.6.40",
+  "version": "1.6.42",
   "type": "module",
   "scripts": {
     "build": "vite build",

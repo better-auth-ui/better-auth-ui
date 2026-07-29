@@ -1,10 +1,15 @@
+import { getAuthLinkURL } from "@better-auth-ui/core"
 import {
   type EmailOtpAuthClient,
   requestPasswordResetOtpOptions
 } from "@better-auth-ui/core/plugins/email-otp"
-import { useAuth, useAuthPlugin, useFetchOptions } from "@better-auth-ui/solid"
+import {
+  AuthLink,
+  useAuth,
+  useAuthPlugin,
+  useFetchOptions
+} from "@better-auth-ui/solid"
 import { createMutation } from "@tanstack/solid-query"
-import { Link } from "@tanstack/solid-router"
 import { createSignal, Show } from "solid-js"
 
 import { Button } from "@/components/ui/button"
@@ -131,13 +136,15 @@ export function ForgotPasswordOtp(props: ForgotPasswordOtpProps) {
       <CardFooter class="justify-center">
         <p class="text-sm text-muted-foreground">
           {auth.localization.auth.rememberYourPassword}{" "}
-          <Link
+          <AuthLink
             class="underline underline-offset-4"
-            params={{ path: auth.viewPaths.auth.signIn }}
-            to="/auth/$path"
+            href={getAuthLinkURL(
+              `${auth.basePaths.auth}/${auth.viewPaths.auth.signIn}`,
+              auth.redirectTo
+            )}
           >
             {auth.localization.auth.signIn}
-          </Link>
+          </AuthLink>
         </p>
       </CardFooter>
     </Card>

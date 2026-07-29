@@ -1,6 +1,5 @@
 import type { AuthView } from "@better-auth-ui/core"
-import { useAuth, useAuthPlugin } from "@better-auth-ui/solid"
-import { Link } from "@tanstack/solid-router"
+import { AuthLink, useAuth, useAuthPlugin } from "@better-auth-ui/solid"
 import { Lock, Smartphone } from "lucide-solid"
 import { Show } from "solid-js"
 
@@ -22,14 +21,13 @@ export function PhoneNumberButton(props: PhoneNumberButtonProps) {
 
   return (
     <Show when={isVisible()}>
-      <Link
+      <AuthLink
         class={cn(buttonVariants({ variant: "outline" }), "w-full")}
-        params={{
-          path: isPhoneNumberView()
+        href={`${auth.basePaths.auth}/${
+          isPhoneNumberView()
             ? auth.viewPaths.auth.signIn
             : phoneNumberViewPaths.auth.phoneNumber
-        }}
-        to="/auth/$path"
+        }`}
       >
         <Show fallback={<Smartphone />} when={isPhoneNumberView()}>
           <Lock />
@@ -40,7 +38,7 @@ export function PhoneNumberButton(props: PhoneNumberButtonProps) {
             ? auth.localization.auth.password
             : phoneLocalization.phoneNumber
         )}
-      </Link>
+      </AuthLink>
     </Show>
   )
 }

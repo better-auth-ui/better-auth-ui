@@ -1,0 +1,18 @@
+[
+  {
+    "id": "reset-password-otp.tsx-ResetPasswordOtpProps",
+    "name": "ResetPasswordOtpProps",
+    "description": "",
+    "entries": [
+      {
+        "name": "className",
+        "description": "",
+        "tags": [],
+        "type": "string",
+        "simplifiedType": "string",
+        "required": false,
+        "deprecated": false
+      }
+    ]
+  }
+]

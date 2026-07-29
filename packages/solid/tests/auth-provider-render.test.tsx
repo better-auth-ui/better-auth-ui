@@ -2,7 +2,13 @@ import { basePaths, createAuthPlugin } from "@better-auth-ui/core"
 import { renderToString } from "solid-js/web"
 import { describe, expect, it, vi } from "vitest"
 
-import { AuthProvider, useAuth, useAuthPlugin } from "../src"
+import {
+  AuthLink,
+  type AuthLinkProps,
+  AuthProvider,
+  useAuth,
+  useAuthPlugin
+} from "../src"
 
 function AuthConsumer() {
   const auth = useAuth()
@@ -45,5 +51,23 @@ describe("Solid AuthProvider render context", () => {
     ))
 
     expect(resolvedPlugin).toBe(registeredPlugin)
+  })
+
+  it("renders internal links through the configured router adapter", () => {
+    const authClient = { getSession: vi.fn() }
+    let receivedHref: string | undefined
+
+    function Link(props: AuthLinkProps) {
+      receivedHref = props.href
+      return props.children
+    }
+
+    renderToString(() => (
+      <AuthProvider authClient={authClient as never} Link={Link}>
+        {() => <AuthLink href="/login/sign-in">Sign in</AuthLink>}
+      </AuthProvider>
+    ))
+
+    expect(receivedHref).toBe("/login/sign-in")
   })
 })

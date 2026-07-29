@@ -1,3 +1,4 @@
+import { getAuthLinkURL } from "@better-auth-ui/core"
 import type { EmailOtpAuthClient } from "@better-auth-ui/core/plugins/email-otp"
 import { useAuth, useAuthPlugin, useFetchOptions } from "@better-auth-ui/react"
 import { useRequestPasswordResetOtp } from "@better-auth-ui/react/plugins/email-otp"
@@ -43,8 +44,15 @@ export function ForgotPasswordOtp({
   className,
   variant
 }: ForgotPasswordOtpProps) {
-  const { authClient, basePaths, localization, navigate, plugins, viewPaths } =
-    useAuth()
+  const {
+    authClient,
+    basePaths,
+    localization,
+    navigate,
+    plugins,
+    redirectTo,
+    viewPaths
+  } = useAuth()
   const { localization: emailOtpLocalization } = useAuthPlugin(emailOtpPlugin)
 
   const { fetchOptions, resetFetchOptions } = useFetchOptions()
@@ -121,7 +129,10 @@ export function ForgotPasswordOtp({
         <Description className="text-sm">
           {localization.auth.rememberYourPassword}{" "}
           <Link
-            href={`${basePaths.auth}/${viewPaths.auth.signIn}`}
+            href={getAuthLinkURL(
+              `${basePaths.auth}/${viewPaths.auth.signIn}`,
+              redirectTo
+            )}
             className="text-accent no-underline hover:underline decoration-accent-hover"
           >
             {localization.auth.signIn}

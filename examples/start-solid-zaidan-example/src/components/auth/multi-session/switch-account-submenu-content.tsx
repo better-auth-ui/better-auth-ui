@@ -4,9 +4,8 @@ import {
   type MultiSessionLocalization,
   multiSessionLocalization
 } from "@better-auth-ui/core/plugins/multi-session"
-import { useAuth, useSession } from "@better-auth-ui/solid"
+import { AuthLink, useAuth, useSession } from "@better-auth-ui/solid"
 import { useListDeviceSessions } from "@better-auth-ui/solid/plugins/multi-session"
-import { Link } from "@tanstack/solid-router"
 import { Check, CirclePlus } from "lucide-solid"
 import { For, Show } from "solid-js"
 import type { DeviceSession } from "@/components/auth/settings/shared/types"
@@ -59,14 +58,13 @@ export function SwitchAccountSubmenuContent() {
       <DropdownMenuSeparator />
 
       <DropdownMenuItem class="gap-1.5 rounded-md px-1.5 py-1 text-sm focus:bg-accent focus:text-accent-foreground">
-        <Link
+        <AuthLink
           class="flex w-full items-center gap-1.5"
-          params={{ path: auth.viewPaths.auth.signIn }}
-          to="/auth/$path"
+          href={`${auth.basePaths.auth}/${auth.viewPaths.auth.signIn}`}
         >
           <CirclePlus class="size-4 text-muted-foreground" />
           {multiSessionLabels().addAccount}
-        </Link>
+        </AuthLink>
       </DropdownMenuItem>
     </DropdownMenuSubContent>
   )

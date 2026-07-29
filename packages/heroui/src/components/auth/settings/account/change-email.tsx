@@ -1,3 +1,4 @@
+import { getViewURL } from "@better-auth-ui/core"
 import { useAuth, useChangeEmail, useSession } from "@better-auth-ui/react"
 import {
   Button,
@@ -35,7 +36,7 @@ export function ChangeEmail({
   variant,
   ...props
 }: ChangeEmailProps & Omit<CardProps, "children">) {
-  const { authClient, localization, baseURL, viewPaths } = useAuth()
+  const { authClient, basePaths, baseURL, localization, viewPaths } = useAuth()
   const { data: session } = useSession(authClient)
 
   const { mutate: changeEmail, isPending } = useChangeEmail(authClient, {
@@ -48,7 +49,11 @@ export function ChangeEmail({
 
     changeEmail({
       newEmail: formData.get("email") as string,
-      callbackURL: `${baseURL}/${viewPaths.settings.account}`
+      callbackURL: getViewURL(
+        baseURL,
+        basePaths.settings,
+        viewPaths.settings.account
+      )
     })
   }
 

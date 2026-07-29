@@ -1,5 +1,6 @@
 import {
   authMutationKeys,
+  getAuthLinkURL,
   parseAdditionalFieldValue
 } from "@better-auth-ui/core"
 import {
@@ -92,7 +93,10 @@ export function SignUp({
         if (emailAndPassword?.requireEmailVerification) {
           sessionStorage.setItem("better-auth-ui.verify-email", email)
           navigate({
-            to: `${basePaths.auth}/${viewPaths.auth.verifyEmail}`
+            to: getAuthLinkURL(
+              `${basePaths.auth}/${viewPaths.auth.verifyEmail}`,
+              redirectTo
+            )
           })
         } else if (onSignUpSuccess) {
           onSignUpSuccess()
@@ -424,7 +428,10 @@ export function SignUp({
         <Description className="text-sm">
           {localization.auth.alreadyHaveAnAccount}{" "}
           <Link
-            href={`${basePaths.auth}/${viewPaths.auth.signIn}`}
+            href={getAuthLinkURL(
+              `${basePaths.auth}/${viewPaths.auth.signIn}`,
+              redirectTo
+            )}
             className="text-accent no-underline hover:underline decoration-accent-hover"
           >
             {localization.auth.signIn}

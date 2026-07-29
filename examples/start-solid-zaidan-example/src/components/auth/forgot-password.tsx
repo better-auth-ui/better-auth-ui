@@ -1,10 +1,11 @@
-import type { AuthPlugin } from "@better-auth-ui/solid"
+import { getViewURL } from "@better-auth-ui/core"
 import {
+  AuthLink,
+  type AuthPlugin,
   useAuth,
   useFetchOptions,
   useRequestPasswordReset
 } from "@better-auth-ui/solid"
-import { Link } from "@tanstack/solid-router"
 import { createSignal, Show } from "solid-js"
 import { RESET_LINK_SENT_STORAGE_KEY } from "@/components/auth/reset-link-sent"
 import { Alert, AlertDescription } from "@/components/ui/alert"
@@ -46,7 +47,13 @@ export function ForgotPassword(props: ForgotPasswordProps) {
     requestReset.mutate({
       email: email(),
       fetchOptions: fetchOptions(),
-      redirectTo: props.redirectTo
+      redirectTo:
+        props.redirectTo ??
+        getViewURL(
+          auth.baseURL,
+          auth.basePaths.auth,
+          auth.viewPaths.auth.resetPassword
+        )
     } as Parameters<typeof requestReset.mutate>[0])
   }
 
@@ -108,13 +115,12 @@ export function ForgotPassword(props: ForgotPasswordProps) {
         <div class="mt-4 flex w-full flex-col items-center gap-3">
           <p class="text-center text-sm text-muted-foreground">
             {auth.localization.auth.rememberYourPassword}{" "}
-            <Link
+            <AuthLink
               class="underline underline-offset-4"
-              params={{ path: auth.viewPaths.auth.signIn }}
-              to="/auth/$path"
+              href={`${auth.basePaths.auth}/${auth.viewPaths.auth.signIn}`}
             >
               {auth.localization.auth.signIn}
-            </Link>
+            </AuthLink>
           </p>
         </div>
       </CardContent>

@@ -1,7 +1,11 @@
 import type { PhoneNumberAuthClient } from "@better-auth-ui/core/plugins/phone-number"
-import { useAuth, useAuthPlugin, useFetchOptions } from "@better-auth-ui/solid"
+import {
+  AuthLink,
+  useAuth,
+  useAuthPlugin,
+  useFetchOptions
+} from "@better-auth-ui/solid"
 import { useRequestPhoneNumberPasswordReset } from "@better-auth-ui/solid/plugins/phone-number"
-import { Link } from "@tanstack/solid-router"
 import { createSignal, Show } from "solid-js"
 
 import { Button } from "@/components/ui/button"
@@ -111,13 +115,12 @@ export function ForgotPhoneNumberPassword(
       <CardFooter class="justify-center">
         <p class="text-sm text-muted-foreground">
           {auth.localization.auth.rememberYourPassword}{" "}
-          <Link
+          <AuthLink
             class="underline underline-offset-4"
-            params={{ path: phoneNumberViewPaths.auth.phoneNumber }}
-            to="/auth/$path"
+            href={`${auth.basePaths.auth}/${phoneNumberViewPaths.auth.phoneNumber}`}
           >
             {auth.localization.auth.signIn}
-          </Link>
+          </AuthLink>
         </p>
       </CardFooter>
     </Card>

@@ -1,10 +1,21 @@
 import { existsSync, readFileSync } from "node:fs"
 import { resolve } from "node:path"
 import { viewPaths } from "@better-auth-ui/core"
-import { describe, expect, it } from "vitest"
+import {
+  type AuthLinkProps,
+  AuthProvider as SolidAuthProvider
+} from "@better-auth-ui/solid"
+import { createComponent, type JSX } from "solid-js"
+import { renderToString } from "solid-js/web"
+import { afterEach, describe, expect, it, vi } from "vitest"
 import { resolveAuthRoute } from "../src/components/auth/auth"
 import { AuthRedirect } from "../src/components/auth/auth-redirect"
+import { EmailOtpButton } from "../src/components/auth/email-otp/email-otp-button"
+import { ForgotPasswordOtp } from "../src/components/auth/email-otp/forgot-password-otp"
+import { ResetPasswordOtp } from "../src/components/auth/email-otp/reset-password-otp"
+import { VerifyEmailOtp } from "../src/components/auth/email-otp/verify-email-otp"
 import { ForgotPassword } from "../src/components/auth/forgot-password"
+import { ResetLinkSent } from "../src/components/auth/reset-link-sent"
 import { ResetPassword } from "../src/components/auth/reset-password"
 import { AccountSettings } from "../src/components/auth/settings/account/account-settings"
 import {
@@ -25,6 +36,11 @@ import {
 } from "../src/components/auth/sign-in-path"
 import { SignOut } from "../src/components/auth/sign-out"
 import { SignUp } from "../src/components/auth/sign-up"
+import { emailOtpPlugin } from "../src/lib/auth/email-otp-plugin"
+
+afterEach(() => {
+  vi.unstubAllGlobals()
+})
 
 const isSimpleReExportOnly = (source: string) => {
   const statement = source
@@ -164,15 +180,90 @@ describe("Solid auth route component selection", () => {
     expect(authProvider).not.toContain("createAuthClient")
   })
 
+  it("preserves the current redirect target across auth-page link transitions", () => {
+    const redirectTo = "/projects/acme?tab=members"
+    vi.stubGlobal("window", {
+      location: {
+        search: `?redirectTo=${encodeURIComponent(redirectTo)}`
+      }
+    })
+
+    const authClient = {
+      emailOtp: {
+        requestPasswordReset: vi.fn(),
+        resetPassword: vi.fn(),
+        sendVerificationOtp: vi.fn(),
+        verifyEmail: vi.fn()
+      },
+      getSession: vi.fn(),
+      resetPassword: vi.fn(),
+      signUp: { email: vi.fn() }
+    }
+    const plugin = emailOtpPlugin({
+      emailVerification: true,
+      passwordReset: true,
+      signIn: true
+    })
+    const signInURL = `/auth/${viewPaths.auth.signIn}?redirectTo=${encodeURIComponent(redirectTo)}`
+    const emailOtpURL = `/auth/${plugin.viewPaths.auth.emailOtp}?redirectTo=${encodeURIComponent(redirectTo)}`
+
+    const captureLink = (
+      renderPage: () => JSX.Element,
+      plugins: [typeof plugin] | [] = []
+    ) => {
+      const hrefs: string[] = []
+      const Link = (props: AuthLinkProps) => {
+        hrefs.push(props.href)
+        return null
+      }
+
+      renderToString(() =>
+        createComponent(SolidAuthProvider, {
+          authClient: authClient as never,
+          Link,
+          navigate: vi.fn(),
+          plugins,
+          children: renderPage
+        })
+      )
+
+      expect(hrefs).toHaveLength(1)
+      return hrefs[0]
+    }
+
+    expect(
+      captureLink(() => createComponent(EmailOtpButton, {}), [plugin])
+    ).toBe(emailOtpURL)
+    expect(
+      captureLink(
+        () => createComponent(EmailOtpButton, { view: "emailOtp" }),
+        [plugin]
+      )
+    ).toBe(signInURL)
+    expect(
+      captureLink(() => createComponent(ForgotPasswordOtp, {}), [plugin])
+    ).toBe(signInURL)
+    expect(
+      captureLink(() => createComponent(ResetPasswordOtp, {}), [plugin])
+    ).toBe(signInURL)
+    expect(
+      captureLink(() => createComponent(VerifyEmailOtp, {}), [plugin])
+    ).toBe(signInURL)
+    expect(captureLink(() => createComponent(ResetLinkSent, {}))).toBe(
+      signInURL
+    )
+    expect(captureLink(() => createComponent(ResetPassword, {}))).toBe(
+      signInURL
+    )
+    expect(captureLink(() => createComponent(SignUp, {}))).toBe(signInURL)
+  })
+
   it("drives the organization plugin from the current route slug", () => {
     const providers = readFileSync(
       resolve(__dirname, "../src/components/providers.tsx"),
       "utf8"
     )
 
-    expect(providers).toContain(
-      'import { useNavigate, useParams } from "@tanstack/solid-router"'
-    )
     expect(providers).toContain("useParams({ strict: false })")
     expect(providers).toContain('typeof slug === "string"')
     expect(providers).toContain("return null")
@@ -786,27 +877,6 @@ describe("Solid auth route component selection", () => {
     )
   })
 
-  it("uses TanStack Link for UserButton auth/settings menu navigation", () => {
-    const userButton = readFileSync(
-      resolve(__dirname, "../src/components/auth/user/user-button.tsx"),
-      "utf8"
-    )
-
-    expect(userButton).toContain(
-      'import { Link } from "@tanstack/solid-router"'
-    )
-    expect(userButton).toContain('to="/auth/$path"')
-    expect(userButton).toContain('to="/settings/$path"')
-    expect(userButton).toContain("params={{ path: signInPath }}")
-    expect(userButton).toContain("params={{ path: signUpPath }}")
-    expect(userButton).toContain("params={{ path: settingsPath }}")
-    expect(userButton).toContain("params={{ path: signOutPath }}")
-    expect(userButton).not.toContain('as="a"')
-    expect(userButton).not.toMatch(
-      /href=\{(?:signInHref|signUpHref|settingsHref|signOutHref)\}/
-    )
-  })
-
   it("wires Theme through the local plugin instead of hard-coded user/account surfaces", () => {
     const providers = readFileSync(
       resolve(__dirname, "../src/components/providers.tsx"),
@@ -1131,7 +1201,6 @@ describe("Solid auth route component selection", () => {
     )
     expect(switchAccountSubmenuContent).toContain("DropdownMenuSubContent")
     expect(switchAccountSubmenuContent).toContain("SwitchAccountSubmenuItem")
-    expect(switchAccountSubmenuContent).toContain('to="/auth/$path"')
     expect(switchAccountSubmenuContent).toContain("auth.viewPaths.auth.signIn")
     expect(switchAccountSubmenuContent).toContain("CirclePlus")
 
@@ -1382,31 +1451,6 @@ describe("Solid auth route component selection", () => {
 
       expect(source, implementation.file).toContain(implementation.expected)
       expect(isSimpleReExportOnly(source), implementation.file).toBe(false)
-    }
-  })
-
-  it("uses TanStack Link for auth form helper navigation", () => {
-    const helperLinkFiles = [
-      "username/sign-in-username.tsx",
-      "sign-up.tsx",
-      "forgot-password.tsx",
-      "reset-password.tsx"
-    ]
-
-    for (const file of helperLinkFiles) {
-      const source = readFileSync(
-        resolve(__dirname, `../src/components/auth/${file}`),
-        "utf8"
-      )
-
-      expect(source, file).toContain(
-        'import { Link } from "@tanstack/solid-router"'
-      )
-      expect(source, file).toContain("<Link")
-      expect(source, file).toContain('to="/auth/$path"')
-      expect(source, file).toContain("params={{ path: auth.viewPaths.auth.")
-      expect(source, file).not.toMatch(/<a\s/)
-      expect(source, file).not.toMatch(/href=\{?`?\$?\{?auth\.basePaths\.auth/)
     }
   })
 

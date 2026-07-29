@@ -36,6 +36,8 @@ function renderChangePassword(authClient = createMockAuthClient()) {
     ...render(
       <AuthProvider
         authClient={authClient}
+        basePaths={{ auth: "/login/" }}
+        baseURL="https://example.com/"
         navigate={() => {}}
         queryClient={
           new QueryClient({
@@ -45,6 +47,7 @@ function renderChangePassword(authClient = createMockAuthClient()) {
             }
           })
         }
+        viewPaths={{ auth: { resetPassword: "/new-password/" } }}
       >
         <ChangePassword />
       </AuthProvider>
@@ -67,6 +70,7 @@ describe("<ChangePassword /> without a credential account", () => {
     expect(authClient.requestPasswordReset).toHaveBeenCalledWith(
       expect.objectContaining({
         email: "user@gmail.com",
+        redirectTo: "https://example.com/login/new-password",
         fetchOptions: expect.objectContaining({ throw: true })
       })
     )

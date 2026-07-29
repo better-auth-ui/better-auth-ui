@@ -1,13 +1,17 @@
-import { authQueryKeys, parseAdditionalFieldValue } from "@better-auth-ui/core"
-import type { AuthPlugin } from "@better-auth-ui/solid"
 import {
+  authQueryKeys,
+  getAuthLinkURL,
+  parseAdditionalFieldValue
+} from "@better-auth-ui/core"
+import {
+  AuthLink,
+  type AuthPlugin,
   AuthPrompts,
   useAuth,
   useFetchOptions,
   useSignUpEmail
 } from "@better-auth-ui/solid"
 import { useQueryClient } from "@tanstack/solid-query"
-import { Link } from "@tanstack/solid-router"
 import { Eye, EyeOff } from "lucide-solid"
 import { createSignal, For, Show } from "solid-js"
 import { toast } from "solid-sonner"
@@ -55,7 +59,10 @@ export function SignUp(props: SignUpProps) {
       if (auth.emailAndPassword.requireEmailVerification) {
         sessionStorage.setItem("better-auth-ui.verify-email", variables.email)
         auth.navigate({
-          to: `${auth.basePaths.auth}/${auth.viewPaths.auth.verifyEmail}`
+          to: getAuthLinkURL(
+            `${auth.basePaths.auth}/${auth.viewPaths.auth.verifyEmail}`,
+            auth.redirectTo
+          )
         })
         return
       }
@@ -388,13 +395,15 @@ export function SignUp(props: SignUpProps) {
         <div class="mt-4 flex w-full flex-col items-center gap-3">
           <p class="text-center text-sm text-muted-foreground">
             {auth.localization.auth.alreadyHaveAnAccount}{" "}
-            <Link
+            <AuthLink
               class="underline underline-offset-4"
-              params={{ path: auth.viewPaths.auth.signIn }}
-              to="/auth/$path"
+              href={getAuthLinkURL(
+                `${auth.basePaths.auth}/${auth.viewPaths.auth.signIn}`,
+                auth.redirectTo
+              )}
             >
               {auth.localization.auth.signIn}
-            </Link>
+            </AuthLink>
           </p>
         </div>
       </CardContent>
