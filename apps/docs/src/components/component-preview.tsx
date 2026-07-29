@@ -1,3 +1,5 @@
+import { Suspense } from "react"
+import { Skeleton } from "@/components/ui/skeleton"
 import { demos } from "@/demos"
 import { cn } from "@/lib/utils"
 import { ComponentPreviewContainer } from "./component-preview-container"
@@ -50,7 +52,17 @@ export function ComponentPreview({
       name={name}
       {...props}
     >
-      <Component />
+      <Suspense
+        fallback={
+          <Skeleton
+            aria-label="Loading demo"
+            className="h-32 w-full max-w-md"
+            role="status"
+          />
+        }
+      >
+        <Component />
+      </Suspense>
     </ComponentPreviewContainer>
   )
 }

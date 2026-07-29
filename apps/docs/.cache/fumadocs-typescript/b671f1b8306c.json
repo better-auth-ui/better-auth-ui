@@ -1,0 +1,210 @@
+[
+  {
+    "id": "phone-number-localization.ts-PhoneNumberLocalization",
+    "name": "PhoneNumberLocalization",
+    "description": "",
+    "entries": [
+      {
+        "name": "phoneNumber",
+        "description": "",
+        "tags": [{ "name": "remarks", "text": "`\"Phone number\"`" }],
+        "type": "string",
+        "simplifiedType": "\"Phone number\"",
+        "required": true,
+        "deprecated": false
+      },
+      {
+        "name": "phoneNumberPlaceholder",
+        "description": "",
+        "tags": [{ "name": "remarks", "text": "`\"+1 555 123 4567\"`" }],
+        "type": "string",
+        "simplifiedType": "\"+1 555 123 4567\"",
+        "required": true,
+        "deprecated": false
+      },
+      {
+        "name": "phoneCode",
+        "description": "",
+        "tags": [{ "name": "remarks", "text": "`\"Phone code\"`" }],
+        "type": "string",
+        "simplifiedType": "\"Phone code\"",
+        "required": true,
+        "deprecated": false
+      },
+      {
+        "name": "sendCode",
+        "description": "",
+        "tags": [{ "name": "remarks", "text": "`\"Send code\"`" }],
+        "type": "string",
+        "simplifiedType": "\"Send code\"",
+        "required": true,
+        "deprecated": false
+      },
+      {
+        "name": "verifyCode",
+        "description": "",
+        "tags": [{ "name": "remarks", "text": "`\"Verify code\"`" }],
+        "type": "string",
+        "simplifiedType": "\"Verify code\"",
+        "required": true,
+        "deprecated": false
+      },
+      {
+        "name": "codeSentTo",
+        "description": "",
+        "tags": [
+          {
+            "name": "remarks",
+            "text": "`\"We sent a code to {{phoneNumber}}\"`"
+          }
+        ],
+        "type": "string",
+        "simplifiedType": "\"We sent a code to {{phoneNumber}}\"",
+        "required": true,
+        "deprecated": false
+      },
+      {
+        "name": "codeLengthMismatch",
+        "description": "",
+        "tags": [
+          { "name": "remarks", "text": "`\"Enter the {{length}}-digit code\"`" }
+        ],
+        "type": "string",
+        "simplifiedType": "\"Enter the {{length}}-digit code\"",
+        "required": true,
+        "deprecated": false
+      },
+      {
+        "name": "useDifferentPhoneNumber",
+        "description": "",
+        "tags": [
+          { "name": "remarks", "text": "`\"Use a different phone number\"`" }
+        ],
+        "type": "string",
+        "simplifiedType": "\"Use a different phone number\"",
+        "required": true,
+        "deprecated": false
+      },
+      {
+        "name": "usePassword",
+        "description": "",
+        "tags": [{ "name": "remarks", "text": "`\"Use a password\"`" }],
+        "type": "string",
+        "simplifiedType": "\"Use a password\"",
+        "required": true,
+        "deprecated": false
+      },
+      {
+        "name": "useVerificationCode",
+        "description": "",
+        "tags": [
+          { "name": "remarks", "text": "`\"Use a verification code\"`" }
+        ],
+        "type": "string",
+        "simplifiedType": "\"Use a verification code\"",
+        "required": true,
+        "deprecated": false
+      },
+      {
+        "name": "forgotPassword",
+        "description": "",
+        "tags": [{ "name": "remarks", "text": "`\"Forgot your password?\"`" }],
+        "type": "string",
+        "simplifiedType": "\"Forgot your password?\"",
+        "required": true,
+        "deprecated": false
+      },
+      {
+        "name": "resetPassword",
+        "description": "",
+        "tags": [{ "name": "remarks", "text": "`\"Reset password\"`" }],
+        "type": "string",
+        "simplifiedType": "\"Reset password\"",
+        "required": true,
+        "deprecated": false
+      },
+      {
+        "name": "changePhoneNumber",
+        "description": "",
+        "tags": [{ "name": "remarks", "text": "`\"Change phone number\"`" }],
+        "type": "string",
+        "simplifiedType": "\"Change phone number\"",
+        "required": true,
+        "deprecated": false
+      },
+      {
+        "name": "updatePhoneNumber",
+        "description": "",
+        "tags": [{ "name": "remarks", "text": "`\"Update phone number\"`" }],
+        "type": "string",
+        "simplifiedType": "\"Update phone number\"",
+        "required": true,
+        "deprecated": false
+      },
+      {
+        "name": "phoneNumberUpdated",
+        "description": "",
+        "tags": [{ "name": "remarks", "text": "`\"Phone number updated\"`" }],
+        "type": "string",
+        "simplifiedType": "\"Phone number updated\"",
+        "required": true,
+        "deprecated": false
+      },
+      {
+        "name": "removePhoneNumber",
+        "description": "",
+        "tags": [{ "name": "remarks", "text": "`\"Remove phone number\"`" }],
+        "type": "string",
+        "simplifiedType": "\"Remove phone number\"",
+        "required": true,
+        "deprecated": false
+      },
+      {
+        "name": "phoneNumberRemoved",
+        "description": "",
+        "tags": [{ "name": "remarks", "text": "`\"Phone number removed\"`" }],
+        "type": "string",
+        "simplifiedType": "\"Phone number removed\"",
+        "required": true,
+        "deprecated": false
+      },
+      {
+        "name": "removePhoneNumberTitle",
+        "description": "",
+        "tags": [
+          {
+            "name": "remarks",
+            "text": "`\"Remove this phone number from your account?\"`"
+          }
+        ],
+        "type": "string",
+        "simplifiedType": "\"Remove this phone number from your account?\"",
+        "required": true,
+        "deprecated": false
+      },
+      {
+        "name": "removePhoneNumberDescription",
+        "description": "",
+        "tags": [
+          {
+            "name": "remarks",
+            "text": "`\"You will no longer be able to use it to sign in or reset your password.\"`"
+          }
+        ],
+        "type": "string",
+        "simplifiedType": "\"You will no longer be able to use it to sign in or reset your password.\"",
+        "required": true,
+        "deprecated": false
+      },
+      {
+        "name": "cancel",
+        "description": "",
+        "tags": [{ "name": "remarks", "text": "`\"Cancel\"`" }],
+        "type": "string",
+        "simplifiedType": "\"Cancel\"",
+        "required": true,
+        "deprecated": false
+      }
+    ]
+  }
+]

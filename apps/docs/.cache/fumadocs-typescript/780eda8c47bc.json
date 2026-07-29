@@ -1,0 +1,72 @@
+[
+  {
+    "id": "one-tap-plugin.tsx-OneTapPluginOptions",
+    "name": "OneTapPluginOptions",
+    "description": "",
+    "entries": [
+      {
+        "name": "nonce",
+        "description": "",
+        "tags": [],
+        "type": "string",
+        "simplifiedType": "string",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "autoSelect",
+        "description": "Auto select the account if the user is already signed in",
+        "tags": [],
+        "type": "boolean",
+        "simplifiedType": "boolean",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "cancelOnTapOutside",
+        "description": "Cancel the flow when the user taps outside the prompt\n\nNote: To use this option, disable `promptOptions.fedCM`",
+        "tags": [],
+        "type": "boolean",
+        "simplifiedType": "boolean",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "uxMode",
+        "description": "The mode to use for the Google One Tap flow\n\npopup: Use a popup window\nredirect: Redirect the user to the Google One Tap flow",
+        "tags": [{ "name": "default", "text": "\"popup\"" }],
+        "type": "\"redirect\" | \"popup\"",
+        "simplifiedType": "\"redirect\" | \"popup\"",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "additionalOptions",
+        "description": "Additional configuration options to pass to the Google One Tap API.",
+        "tags": [],
+        "type": "Record<string, any>",
+        "simplifiedType": "Record<string, any>",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "onPromptNotification",
+        "description": "Optional callback that receives the prompt notification if (or when) the prompt is dismissed or skipped.\nThis lets you render an alternative UI (e.g. a Google Sign-In button) to restart the process.",
+        "tags": [],
+        "type": "((notification?: any) => void)",
+        "simplifiedType": "function",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "views",
+        "description": "Auth views that may open the prompt.",
+        "tags": [{ "name": "default", "text": "[\"signIn\"]" }],
+        "type": "readonly OneTapView[]",
+        "simplifiedType": "array",
+        "required": false,
+        "deprecated": false
+      }
+    ]
+  }
+]

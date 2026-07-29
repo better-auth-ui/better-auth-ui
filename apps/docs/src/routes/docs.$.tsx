@@ -22,7 +22,6 @@ import { slugsToMarkdownPath, source } from "@/lib/source"
 const owner = "better-auth-ui"
 const repo = "better-auth-ui"
 
-import appCss from "@/styles/app.css?url"
 import herouiCss from "@/styles/heroui.css?url"
 import shadcnCss from "@/styles/shadcn.css?url"
 
@@ -36,9 +35,7 @@ export const Route = createFileRoute("/docs/$")({
   },
   head: ({ params }) => {
     const slugs = params._splat?.split("/") ?? []
-    const links: Array<{ id?: string; rel: string; href: string }> = [
-      { rel: "stylesheet", href: appCss }
-    ]
+    const links: Array<{ id?: string; rel: string; href: string }> = []
 
     if (slugs.includes("heroui")) {
       links.push({

@@ -1,0 +1,27 @@
+[
+  {
+    "id": "request-phone-number-password-reset-mutation.ts-RequestPhoneNumberPasswordResetParams",
+    "name": "RequestPhoneNumberPasswordResetParams",
+    "description": "",
+    "entries": [
+      {
+        "name": "phoneNumber",
+        "description": "",
+        "tags": [],
+        "type": "string",
+        "simplifiedType": "string",
+        "required": true,
+        "deprecated": false
+      },
+      {
+        "name": "fetchOptions",
+        "description": "",
+        "tags": [],
+        "type": "ClientFetchOption<Partial<{ phoneNumber: string; }> & Record<string, any>, Partial<Record<string, any>> & Record<string, any>, Record<string, any>>",
+        "simplifiedType": "ClientFetchOption<Record<string, any> & Partial<object>, Record<string, any> & Partial<Record<string, any>>, union>",
+        "required": false,
+        "deprecated": false
+      }
+    ]
+  }
+]

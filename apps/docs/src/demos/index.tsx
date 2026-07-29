@@ -1,128 +1,603 @@
-import type { ComponentType } from "react"
-import { ApiKeysDemo as HeroUIApiKeysDemo } from "./heroui/api-key/api-keys"
-import { AuthDemo as HeroUIAuthDemo } from "./heroui/auth/auth"
-import { ForgotPasswordDemo as HeroUIForgotPasswordDemo } from "./heroui/auth/forgot-password"
-import { ResetPasswordDemo as HeroUIResetPasswordDemo } from "./heroui/auth/reset-password"
-import { SignInDemo as HeroUISignInDemo } from "./heroui/auth/sign-in"
-import { SignOutDemo as HeroUISignOutDemo } from "./heroui/auth/sign-out"
-import { SignUpDemo as HeroUISignUpDemo } from "./heroui/auth/sign-up"
-import { VerifyEmailDemo as HeroUIVerifyEmailDemo } from "./heroui/auth/verify-email"
-import { DangerZoneDemo as HeroUIDangerZoneDemo } from "./heroui/delete-user/danger-zone"
-import { DeviceAuthorizationDemo as HeroUIDeviceAuthorizationDemo } from "./heroui/device-authorization/device-authorization"
-import { ChangeEmailConfirmationEmailDemo as HeroUIChangeEmailConfirmationEmailDemo } from "./heroui/email/change-email-confirmation-email"
-import { DeleteAccountVerificationEmailDemo as HeroUIDeleteAccountVerificationEmailDemo } from "./heroui/email/delete-account-verification-email"
-import { EmailChangedEmailDemo as HeroUIEmailChangedEmailDemo } from "./heroui/email/email-changed-email"
-import { EmailVerificationEmailDemo as HeroUIEmailVerificationEmailDemo } from "./heroui/email/email-verification-email"
-import { MagicLinkEmailDemo as HeroUIMagicLinkEmailDemo } from "./heroui/email/magic-link-email"
-import { NewDeviceEmailDemo as HeroUINewDeviceEmailDemo } from "./heroui/email/new-device-email"
-import { OrganizationInvitationEmailDemo as HeroUIOrganizationInvitationEmailDemo } from "./heroui/email/organization-invitation-email"
-import { OtpEmailDemo as HeroUIOtpEmailDemo } from "./heroui/email/otp-email"
-import { PasswordChangedEmailDemo as HeroUIPasswordChangedEmailDemo } from "./heroui/email/password-changed-email"
-import { ResetPasswordEmailDemo as HeroUIResetPasswordEmailDemo } from "./heroui/email/reset-password-email"
-import { MagicLinkDemo as HeroUIMagicLinkDemo } from "./heroui/magic-link/magic-link"
-import { ManageAccountsDemo as HeroUIManageAccountsDemo } from "./heroui/multi-session/manage-accounts"
-import { SwitchAccountSubmenuDemo as HeroUISwitchAccountSubmenuDemo } from "./heroui/multi-session/switch-account-submenu"
-import { OrganizationDemo as HeroUIOrganizationDemo } from "./heroui/organization/organization"
-import { OrganizationDangerZoneDemo as HeroUIOrganizationDangerZoneDemo } from "./heroui/organization/organization-danger-zone"
-import { OrganizationInvitationsDemo as HeroUIOrganizationInvitationsDemo } from "./heroui/organization/organization-invitations"
-import { OrganizationMembersDemo as HeroUIOrganizationMembersDemo } from "./heroui/organization/organization-members"
-import { OrganizationPeopleDemo as HeroUIOrganizationPeopleDemo } from "./heroui/organization/organization-people"
-import { OrganizationProfileDemo as HeroUIOrganizationProfileDemo } from "./heroui/organization/organization-profile"
-import { OrganizationSettingsDemo as HeroUIOrganizationSettingsDemo } from "./heroui/organization/organization-settings"
-import { OrganizationSwitcherDemo as HeroUIOrganizationSwitcherDemo } from "./heroui/organization/organization-switcher"
-import { OrganizationsDemo as HeroUIOrganizationsDemo } from "./heroui/organization/organizations"
-import { OrganizationsSettingsDemo as HeroUIOrganizationsSettingsDemo } from "./heroui/organization/organizations-settings"
-import { UserInvitationsDemo as HeroUIUserInvitationsDemo } from "./heroui/organization/user-invitations"
-import { PasskeySignInDemo as HeroUIPasskeySignInDemo } from "./heroui/passkey/passkey-sign-in"
-import { AccountSettingsDemo as HeroUIAccountSettingsDemo } from "./heroui/settings/account/account-settings"
-import { ChangeEmailDemo as HeroUIChangeEmailDemo } from "./heroui/settings/account/change-email"
-import { UserProfileDemo as HeroUIUserProfileDemo } from "./heroui/settings/account/user-profile"
-import { ActiveSessionsDemo as HeroUIActiveSessionsDemo } from "./heroui/settings/security/active-sessions"
-import { ChangePasswordDemo as HeroUIChangePasswordDemo } from "./heroui/settings/security/change-password"
-import { LinkedAccountsDemo as HeroUILinkedAccountsDemo } from "./heroui/settings/security/linked-accounts"
-import { PasskeysDemo as HeroUIPasskeysDemo } from "./heroui/settings/security/passkeys"
-import { SecuritySettingsDemo as HeroUISecuritySettingsDemo } from "./heroui/settings/security/security-settings"
-import { SettingsDemo as HeroUISettingsDemo } from "./heroui/settings/settings"
-import { AppearanceDemo as HeroUIAppearanceDemo } from "./heroui/theme/appearance"
-import { ThemeToggleItemDemo as HeroUIThemeToggleItemDemo } from "./heroui/theme/theme-toggle-item"
-import { UserAvatarDemo as HeroUIUserAvatarDemo } from "./heroui/user/user-avatar"
-import { UserButtonDemo as HeroUIUserButtonDemo } from "./heroui/user/user-button"
-import { UserButtonIconDemo as HeroUIUserButtonIconDemo } from "./heroui/user/user-button-icon"
-import { UserButtonLinksDemo as HeroUIUserButtonLinksDemo } from "./heroui/user/user-button-links"
-import { UserViewDemo as HeroUIUserViewDemo } from "./heroui/user/user-view"
-import { SignInUsernameDemo as HeroUISignInUsernameDemo } from "./heroui/username/sign-in"
-import { SignUpUsernameDemo as HeroUISignUpUsernameDemo } from "./heroui/username/sign-up"
-import { UserProfileUsernameDemo as HeroUIUserProfileUsernameDemo } from "./heroui/username/user-profile"
-import { ApiKeysDemo as ShadcnApiKeysDemo } from "./shadcn/api-key/api-keys"
-import { AuthDemo as ShadcnAuthDemo } from "./shadcn/auth/auth"
-import { ForgotPasswordDemo as ShadcnForgotPasswordDemo } from "./shadcn/auth/forgot-password"
-import { ResetPasswordDemo as ShadcnResetPasswordDemo } from "./shadcn/auth/reset-password"
-import { SignInDemo as ShadcnSignInDemo } from "./shadcn/auth/sign-in"
-import { SignOutDemo as ShadcnSignOutDemo } from "./shadcn/auth/sign-out"
-import { SignUpDemo as ShadcnSignUpDemo } from "./shadcn/auth/sign-up"
-import { VerifyEmailDemo as ShadcnVerifyEmailDemo } from "./shadcn/auth/verify-email"
-import { DangerZoneDemo as ShadcnDangerZoneDemo } from "./shadcn/delete-user/danger-zone"
-import { DeviceAuthorizationDemo as ShadcnDeviceAuthorizationDemo } from "./shadcn/device-authorization/device-authorization"
-import { ChangeEmailConfirmationEmailDemo as ShadcnChangeEmailConfirmationEmailDemo } from "./shadcn/email/change-email-confirmation-email"
-import { DeleteAccountVerificationEmailDemo as ShadcnDeleteAccountVerificationEmailDemo } from "./shadcn/email/delete-account-verification-email"
-import { EmailChangedEmailDemo as ShadcnEmailChangedEmailDemo } from "./shadcn/email/email-changed-email"
-import { EmailVerificationEmailDemo as ShadcnEmailVerificationEmailDemo } from "./shadcn/email/email-verification-email"
-import { MagicLinkEmailDemo as ShadcnMagicLinkEmailDemo } from "./shadcn/email/magic-link-email"
-import { NewDeviceEmailDemo as ShadcnNewDeviceEmailDemo } from "./shadcn/email/new-device-email"
-import { OrganizationInvitationEmailDemo as ShadcnOrganizationInvitationEmailDemo } from "./shadcn/email/organization-invitation-email"
-import { OtpEmailDemo as ShadcnOtpEmailDemo } from "./shadcn/email/otp-email"
-import { PasswordChangedEmailDemo as ShadcnPasswordChangedEmailDemo } from "./shadcn/email/password-changed-email"
-import { ResetPasswordEmailDemo as ShadcnResetPasswordEmailDemo } from "./shadcn/email/reset-password-email"
-import { MagicLinkDemo as ShadcnMagicLinkDemo } from "./shadcn/magic-link/magic-link"
-import { ManageAccountsDemo as ShadcnManageAccountsDemo } from "./shadcn/multi-session/manage-accounts"
-import { SwitchAccountSubmenuDemo as ShadcnSwitchAccountSubmenuDemo } from "./shadcn/multi-session/switch-account-submenu"
-import { OrganizationDemo as ShadcnOrganizationDemo } from "./shadcn/organization/organization"
-import { OrganizationDangerZoneDemo as ShadcnOrganizationDangerZoneDemo } from "./shadcn/organization/organization-danger-zone"
-import { OrganizationInvitationsDemo as ShadcnOrganizationInvitationsDemo } from "./shadcn/organization/organization-invitations"
-import { OrganizationMembersDemo as ShadcnOrganizationMembersDemo } from "./shadcn/organization/organization-members"
-import { OrganizationPeopleDemo as ShadcnOrganizationPeopleDemo } from "./shadcn/organization/organization-people"
-import { OrganizationProfileDemo as ShadcnOrganizationProfileDemo } from "./shadcn/organization/organization-profile"
-import { OrganizationSettingsDemo as ShadcnOrganizationSettingsDemo } from "./shadcn/organization/organization-settings"
-import { OrganizationSwitcherDemo as ShadcnOrganizationSwitcherDemo } from "./shadcn/organization/organization-switcher"
-import { OrganizationsDemo as ShadcnOrganizationsDemo } from "./shadcn/organization/organizations"
-import { OrganizationsSettingsDemo as ShadcnOrganizationsSettingsDemo } from "./shadcn/organization/organizations-settings"
-import { UserInvitationsDemo as ShadcnUserInvitationsDemo } from "./shadcn/organization/user-invitations"
-import { PasskeySignInDemo as ShadcnPasskeySignInDemo } from "./shadcn/passkey/passkey-sign-in"
-import { AccountSettingsDemo as ShadcnAccountSettingsDemo } from "./shadcn/settings/account/account-settings"
-import { ChangeEmailDemo as ShadcnChangeEmailDemo } from "./shadcn/settings/account/change-email"
-import { UserProfileDemo as ShadcnUserProfileDemo } from "./shadcn/settings/account/user-profile"
-import { ActiveSessionsDemo as ShadcnActiveSessionsDemo } from "./shadcn/settings/security/active-sessions"
-import { ChangePasswordDemo as ShadcnChangePasswordDemo } from "./shadcn/settings/security/change-password"
-import { LinkedAccountsDemo as ShadcnLinkedAccountsDemo } from "./shadcn/settings/security/linked-accounts"
-import { PasskeysDemo as ShadcnPasskeysDemo } from "./shadcn/settings/security/passkeys"
-import { SecuritySettingsDemo as ShadcnSecuritySettingsDemo } from "./shadcn/settings/security/security-settings"
-import { SettingsDemo as ShadcnSettingsDemo } from "./shadcn/settings/settings"
-import { AppearanceDemo as ShadcnAppearanceDemo } from "./shadcn/theme/appearance"
-import { ThemeToggleItemDemo as ShadcnThemeToggleItemDemo } from "./shadcn/theme/theme-toggle-item"
-import { UserAvatarDemo as ShadcnUserAvatarDemo } from "./shadcn/user/user-avatar"
-import { UserButtonDemo as ShadcnUserButtonDemo } from "./shadcn/user/user-button"
-import { UserButtonIconDemo as ShadcnUserButtonIconDemo } from "./shadcn/user/user-button-icon"
-import { UserButtonLinksDemo as ShadcnUserButtonLinksDemo } from "./shadcn/user/user-button-links"
-import { UserViewDemo as ShadcnUserViewDemo } from "./shadcn/user/user-view"
-import { SignInUsernameDemo as ShadcnSignInUsernameDemo } from "./shadcn/username/sign-in"
-import { SignUpUsernameDemo as ShadcnSignUpUsernameDemo } from "./shadcn/username/sign-up"
-import { UserProfileUsernameDemo as ShadcnUserProfileUsernameDemo } from "./shadcn/username/user-profile"
-import { ChangeEmailConfirmationEmailDemo as ZaidanChangeEmailConfirmationEmailDemo } from "./zaidan/email/change-email-confirmation-email"
-import { DeleteAccountVerificationEmailDemo as ZaidanDeleteAccountVerificationEmailDemo } from "./zaidan/email/delete-account-verification-email"
-import { EmailChangedEmailDemo as ZaidanEmailChangedEmailDemo } from "./zaidan/email/email-changed-email"
-import { EmailVerificationEmailDemo as ZaidanEmailVerificationEmailDemo } from "./zaidan/email/email-verification-email"
-import { MagicLinkEmailDemo as ZaidanMagicLinkEmailDemo } from "./zaidan/email/magic-link-email"
-import { NewDeviceEmailDemo as ZaidanNewDeviceEmailDemo } from "./zaidan/email/new-device-email"
-import { OrganizationInvitationEmailDemo as ZaidanOrganizationInvitationEmailDemo } from "./zaidan/email/organization-invitation-email"
-import { OtpEmailDemo as ZaidanOtpEmailDemo } from "./zaidan/email/otp-email"
-import { PasswordChangedEmailDemo as ZaidanPasswordChangedEmailDemo } from "./zaidan/email/password-changed-email"
-import { ResetPasswordEmailDemo as ZaidanResetPasswordEmailDemo } from "./zaidan/email/reset-password-email"
+import { type ComponentType, type LazyExoticComponent, lazy } from "react"
 
-export interface DemoItem {
-  component: ComponentType
+function lazyDemo<TModule, TComponent extends ComponentType>(
+  load: () => Promise<TModule>,
+  select: (module: TModule) => TComponent
+): LazyExoticComponent<TComponent> {
+  return lazy(async () => ({ default: select(await load()) }))
 }
 
-export const demos: Record<string, ComponentType> = {
+const HeroUIApiKeysDemo = lazyDemo(
+  () => import("./heroui/api-key/api-keys"),
+  ({ ApiKeysDemo }) => ApiKeysDemo
+)
+
+const HeroUIAuthDemo = lazyDemo(
+  () => import("./heroui/auth/auth"),
+  ({ AuthDemo }) => AuthDemo
+)
+
+const HeroUIForgotPasswordDemo = lazyDemo(
+  () => import("./heroui/auth/forgot-password"),
+  ({ ForgotPasswordDemo }) => ForgotPasswordDemo
+)
+
+const HeroUIResetPasswordDemo = lazyDemo(
+  () => import("./heroui/auth/reset-password"),
+  ({ ResetPasswordDemo }) => ResetPasswordDemo
+)
+
+const HeroUISignInDemo = lazyDemo(
+  () => import("./heroui/auth/sign-in"),
+  ({ SignInDemo }) => SignInDemo
+)
+
+const HeroUISignOutDemo = lazyDemo(
+  () => import("./heroui/auth/sign-out"),
+  ({ SignOutDemo }) => SignOutDemo
+)
+
+const HeroUISignUpDemo = lazyDemo(
+  () => import("./heroui/auth/sign-up"),
+  ({ SignUpDemo }) => SignUpDemo
+)
+
+const HeroUIVerifyEmailDemo = lazyDemo(
+  () => import("./heroui/auth/verify-email"),
+  ({ VerifyEmailDemo }) => VerifyEmailDemo
+)
+
+const HeroUIDangerZoneDemo = lazyDemo(
+  () => import("./heroui/delete-user/danger-zone"),
+  ({ DangerZoneDemo }) => DangerZoneDemo
+)
+
+const HeroUIDeviceAuthorizationDemo = lazyDemo(
+  () => import("./heroui/device-authorization/device-authorization"),
+  ({ DeviceAuthorizationDemo }) => DeviceAuthorizationDemo
+)
+
+const HeroUIChangeEmailConfirmationEmailDemo = lazyDemo(
+  () => import("./heroui/email/change-email-confirmation-email"),
+  ({ ChangeEmailConfirmationEmailDemo }) => ChangeEmailConfirmationEmailDemo
+)
+
+const HeroUIDeleteAccountVerificationEmailDemo = lazyDemo(
+  () => import("./heroui/email/delete-account-verification-email"),
+  ({ DeleteAccountVerificationEmailDemo }) => DeleteAccountVerificationEmailDemo
+)
+
+const HeroUIEmailChangedEmailDemo = lazyDemo(
+  () => import("./heroui/email/email-changed-email"),
+  ({ EmailChangedEmailDemo }) => EmailChangedEmailDemo
+)
+
+const HeroUIEmailVerificationEmailDemo = lazyDemo(
+  () => import("./heroui/email/email-verification-email"),
+  ({ EmailVerificationEmailDemo }) => EmailVerificationEmailDemo
+)
+
+const HeroUIMagicLinkEmailDemo = lazyDemo(
+  () => import("./heroui/email/magic-link-email"),
+  ({ MagicLinkEmailDemo }) => MagicLinkEmailDemo
+)
+
+const HeroUINewDeviceEmailDemo = lazyDemo(
+  () => import("./heroui/email/new-device-email"),
+  ({ NewDeviceEmailDemo }) => NewDeviceEmailDemo
+)
+
+const HeroUIOrganizationInvitationEmailDemo = lazyDemo(
+  () => import("./heroui/email/organization-invitation-email"),
+  ({ OrganizationInvitationEmailDemo }) => OrganizationInvitationEmailDemo
+)
+
+const HeroUIOtpEmailDemo = lazyDemo(
+  () => import("./heroui/email/otp-email"),
+  ({ OtpEmailDemo }) => OtpEmailDemo
+)
+
+const HeroUIPasswordChangedEmailDemo = lazyDemo(
+  () => import("./heroui/email/password-changed-email"),
+  ({ PasswordChangedEmailDemo }) => PasswordChangedEmailDemo
+)
+
+const HeroUIResetPasswordEmailDemo = lazyDemo(
+  () => import("./heroui/email/reset-password-email"),
+  ({ ResetPasswordEmailDemo }) => ResetPasswordEmailDemo
+)
+
+const HeroUIMagicLinkDemo = lazyDemo(
+  () => import("./heroui/magic-link/magic-link"),
+  ({ MagicLinkDemo }) => MagicLinkDemo
+)
+
+const HeroUIManageAccountsDemo = lazyDemo(
+  () => import("./heroui/multi-session/manage-accounts"),
+  ({ ManageAccountsDemo }) => ManageAccountsDemo
+)
+
+const HeroUISwitchAccountSubmenuDemo = lazyDemo(
+  () => import("./heroui/multi-session/switch-account-submenu"),
+  ({ SwitchAccountSubmenuDemo }) => SwitchAccountSubmenuDemo
+)
+
+const HeroUIOrganizationDemo = lazyDemo(
+  () => import("./heroui/organization/organization"),
+  ({ OrganizationDemo }) => OrganizationDemo
+)
+
+const HeroUIOrganizationDangerZoneDemo = lazyDemo(
+  () => import("./heroui/organization/organization-danger-zone"),
+  ({ OrganizationDangerZoneDemo }) => OrganizationDangerZoneDemo
+)
+
+const HeroUIOrganizationInvitationsDemo = lazyDemo(
+  () => import("./heroui/organization/organization-invitations"),
+  ({ OrganizationInvitationsDemo }) => OrganizationInvitationsDemo
+)
+
+const HeroUIOrganizationMembersDemo = lazyDemo(
+  () => import("./heroui/organization/organization-members"),
+  ({ OrganizationMembersDemo }) => OrganizationMembersDemo
+)
+
+const HeroUIOrganizationPeopleDemo = lazyDemo(
+  () => import("./heroui/organization/organization-people"),
+  ({ OrganizationPeopleDemo }) => OrganizationPeopleDemo
+)
+
+const HeroUIOrganizationProfileDemo = lazyDemo(
+  () => import("./heroui/organization/organization-profile"),
+  ({ OrganizationProfileDemo }) => OrganizationProfileDemo
+)
+
+const HeroUIOrganizationSettingsDemo = lazyDemo(
+  () => import("./heroui/organization/organization-settings"),
+  ({ OrganizationSettingsDemo }) => OrganizationSettingsDemo
+)
+
+const HeroUIOrganizationSwitcherDemo = lazyDemo(
+  () => import("./heroui/organization/organization-switcher"),
+  ({ OrganizationSwitcherDemo }) => OrganizationSwitcherDemo
+)
+
+const HeroUIOrganizationsDemo = lazyDemo(
+  () => import("./heroui/organization/organizations"),
+  ({ OrganizationsDemo }) => OrganizationsDemo
+)
+
+const HeroUIOrganizationsSettingsDemo = lazyDemo(
+  () => import("./heroui/organization/organizations-settings"),
+  ({ OrganizationsSettingsDemo }) => OrganizationsSettingsDemo
+)
+
+const HeroUIUserInvitationsDemo = lazyDemo(
+  () => import("./heroui/organization/user-invitations"),
+  ({ UserInvitationsDemo }) => UserInvitationsDemo
+)
+
+const HeroUIPasskeySignInDemo = lazyDemo(
+  () => import("./heroui/passkey/passkey-sign-in"),
+  ({ PasskeySignInDemo }) => PasskeySignInDemo
+)
+
+const HeroUIAccountSettingsDemo = lazyDemo(
+  () => import("./heroui/settings/account/account-settings"),
+  ({ AccountSettingsDemo }) => AccountSettingsDemo
+)
+
+const HeroUIChangeEmailDemo = lazyDemo(
+  () => import("./heroui/settings/account/change-email"),
+  ({ ChangeEmailDemo }) => ChangeEmailDemo
+)
+
+const HeroUIUserProfileDemo = lazyDemo(
+  () => import("./heroui/settings/account/user-profile"),
+  ({ UserProfileDemo }) => UserProfileDemo
+)
+
+const HeroUIActiveSessionsDemo = lazyDemo(
+  () => import("./heroui/settings/security/active-sessions"),
+  ({ ActiveSessionsDemo }) => ActiveSessionsDemo
+)
+
+const HeroUIChangePasswordDemo = lazyDemo(
+  () => import("./heroui/settings/security/change-password"),
+  ({ ChangePasswordDemo }) => ChangePasswordDemo
+)
+
+const HeroUILinkedAccountsDemo = lazyDemo(
+  () => import("./heroui/settings/security/linked-accounts"),
+  ({ LinkedAccountsDemo }) => LinkedAccountsDemo
+)
+
+const HeroUIPasskeysDemo = lazyDemo(
+  () => import("./heroui/settings/security/passkeys"),
+  ({ PasskeysDemo }) => PasskeysDemo
+)
+
+const HeroUISecuritySettingsDemo = lazyDemo(
+  () => import("./heroui/settings/security/security-settings"),
+  ({ SecuritySettingsDemo }) => SecuritySettingsDemo
+)
+
+const HeroUISettingsDemo = lazyDemo(
+  () => import("./heroui/settings/settings"),
+  ({ SettingsDemo }) => SettingsDemo
+)
+
+const HeroUIAppearanceDemo = lazyDemo(
+  () => import("./heroui/theme/appearance"),
+  ({ AppearanceDemo }) => AppearanceDemo
+)
+
+const HeroUIThemeToggleItemDemo = lazyDemo(
+  () => import("./heroui/theme/theme-toggle-item"),
+  ({ ThemeToggleItemDemo }) => ThemeToggleItemDemo
+)
+
+const HeroUIUserAvatarDemo = lazyDemo(
+  () => import("./heroui/user/user-avatar"),
+  ({ UserAvatarDemo }) => UserAvatarDemo
+)
+
+const HeroUIUserButtonDemo = lazyDemo(
+  () => import("./heroui/user/user-button"),
+  ({ UserButtonDemo }) => UserButtonDemo
+)
+
+const HeroUIUserButtonIconDemo = lazyDemo(
+  () => import("./heroui/user/user-button-icon"),
+  ({ UserButtonIconDemo }) => UserButtonIconDemo
+)
+
+const HeroUIUserButtonLinksDemo = lazyDemo(
+  () => import("./heroui/user/user-button-links"),
+  ({ UserButtonLinksDemo }) => UserButtonLinksDemo
+)
+
+const HeroUIUserViewDemo = lazyDemo(
+  () => import("./heroui/user/user-view"),
+  ({ UserViewDemo }) => UserViewDemo
+)
+
+const HeroUISignInUsernameDemo = lazyDemo(
+  () => import("./heroui/username/sign-in"),
+  ({ SignInUsernameDemo }) => SignInUsernameDemo
+)
+
+const HeroUISignUpUsernameDemo = lazyDemo(
+  () => import("./heroui/username/sign-up"),
+  ({ SignUpUsernameDemo }) => SignUpUsernameDemo
+)
+
+const HeroUIUserProfileUsernameDemo = lazyDemo(
+  () => import("./heroui/username/user-profile"),
+  ({ UserProfileUsernameDemo }) => UserProfileUsernameDemo
+)
+
+const ShadcnApiKeysDemo = lazyDemo(
+  () => import("./shadcn/api-key/api-keys"),
+  ({ ApiKeysDemo }) => ApiKeysDemo
+)
+
+const ShadcnAuthDemo = lazyDemo(
+  () => import("./shadcn/auth/auth"),
+  ({ AuthDemo }) => AuthDemo
+)
+
+const ShadcnForgotPasswordDemo = lazyDemo(
+  () => import("./shadcn/auth/forgot-password"),
+  ({ ForgotPasswordDemo }) => ForgotPasswordDemo
+)
+
+const ShadcnResetPasswordDemo = lazyDemo(
+  () => import("./shadcn/auth/reset-password"),
+  ({ ResetPasswordDemo }) => ResetPasswordDemo
+)
+
+const ShadcnSignInDemo = lazyDemo(
+  () => import("./shadcn/auth/sign-in"),
+  ({ SignInDemo }) => SignInDemo
+)
+
+const ShadcnSignOutDemo = lazyDemo(
+  () => import("./shadcn/auth/sign-out"),
+  ({ SignOutDemo }) => SignOutDemo
+)
+
+const ShadcnSignUpDemo = lazyDemo(
+  () => import("./shadcn/auth/sign-up"),
+  ({ SignUpDemo }) => SignUpDemo
+)
+
+const ShadcnVerifyEmailDemo = lazyDemo(
+  () => import("./shadcn/auth/verify-email"),
+  ({ VerifyEmailDemo }) => VerifyEmailDemo
+)
+
+const ShadcnDangerZoneDemo = lazyDemo(
+  () => import("./shadcn/delete-user/danger-zone"),
+  ({ DangerZoneDemo }) => DangerZoneDemo
+)
+
+const ShadcnDeviceAuthorizationDemo = lazyDemo(
+  () => import("./shadcn/device-authorization/device-authorization"),
+  ({ DeviceAuthorizationDemo }) => DeviceAuthorizationDemo
+)
+
+const ShadcnChangeEmailConfirmationEmailDemo = lazyDemo(
+  () => import("./shadcn/email/change-email-confirmation-email"),
+  ({ ChangeEmailConfirmationEmailDemo }) => ChangeEmailConfirmationEmailDemo
+)
+
+const ShadcnDeleteAccountVerificationEmailDemo = lazyDemo(
+  () => import("./shadcn/email/delete-account-verification-email"),
+  ({ DeleteAccountVerificationEmailDemo }) => DeleteAccountVerificationEmailDemo
+)
+
+const ShadcnEmailChangedEmailDemo = lazyDemo(
+  () => import("./shadcn/email/email-changed-email"),
+  ({ EmailChangedEmailDemo }) => EmailChangedEmailDemo
+)
+
+const ShadcnEmailVerificationEmailDemo = lazyDemo(
+  () => import("./shadcn/email/email-verification-email"),
+  ({ EmailVerificationEmailDemo }) => EmailVerificationEmailDemo
+)
+
+const ShadcnMagicLinkEmailDemo = lazyDemo(
+  () => import("./shadcn/email/magic-link-email"),
+  ({ MagicLinkEmailDemo }) => MagicLinkEmailDemo
+)
+
+const ShadcnNewDeviceEmailDemo = lazyDemo(
+  () => import("./shadcn/email/new-device-email"),
+  ({ NewDeviceEmailDemo }) => NewDeviceEmailDemo
+)
+
+const ShadcnOrganizationInvitationEmailDemo = lazyDemo(
+  () => import("./shadcn/email/organization-invitation-email"),
+  ({ OrganizationInvitationEmailDemo }) => OrganizationInvitationEmailDemo
+)
+
+const ShadcnOtpEmailDemo = lazyDemo(
+  () => import("./shadcn/email/otp-email"),
+  ({ OtpEmailDemo }) => OtpEmailDemo
+)
+
+const ShadcnPasswordChangedEmailDemo = lazyDemo(
+  () => import("./shadcn/email/password-changed-email"),
+  ({ PasswordChangedEmailDemo }) => PasswordChangedEmailDemo
+)
+
+const ShadcnResetPasswordEmailDemo = lazyDemo(
+  () => import("./shadcn/email/reset-password-email"),
+  ({ ResetPasswordEmailDemo }) => ResetPasswordEmailDemo
+)
+
+const ShadcnMagicLinkDemo = lazyDemo(
+  () => import("./shadcn/magic-link/magic-link"),
+  ({ MagicLinkDemo }) => MagicLinkDemo
+)
+
+const ShadcnManageAccountsDemo = lazyDemo(
+  () => import("./shadcn/multi-session/manage-accounts"),
+  ({ ManageAccountsDemo }) => ManageAccountsDemo
+)
+
+const ShadcnSwitchAccountSubmenuDemo = lazyDemo(
+  () => import("./shadcn/multi-session/switch-account-submenu"),
+  ({ SwitchAccountSubmenuDemo }) => SwitchAccountSubmenuDemo
+)
+
+const ShadcnOrganizationDemo = lazyDemo(
+  () => import("./shadcn/organization/organization"),
+  ({ OrganizationDemo }) => OrganizationDemo
+)
+
+const ShadcnOrganizationDangerZoneDemo = lazyDemo(
+  () => import("./shadcn/organization/organization-danger-zone"),
+  ({ OrganizationDangerZoneDemo }) => OrganizationDangerZoneDemo
+)
+
+const ShadcnOrganizationInvitationsDemo = lazyDemo(
+  () => import("./shadcn/organization/organization-invitations"),
+  ({ OrganizationInvitationsDemo }) => OrganizationInvitationsDemo
+)
+
+const ShadcnOrganizationMembersDemo = lazyDemo(
+  () => import("./shadcn/organization/organization-members"),
+  ({ OrganizationMembersDemo }) => OrganizationMembersDemo
+)
+
+const ShadcnOrganizationPeopleDemo = lazyDemo(
+  () => import("./shadcn/organization/organization-people"),
+  ({ OrganizationPeopleDemo }) => OrganizationPeopleDemo
+)
+
+const ShadcnOrganizationProfileDemo = lazyDemo(
+  () => import("./shadcn/organization/organization-profile"),
+  ({ OrganizationProfileDemo }) => OrganizationProfileDemo
+)
+
+const ShadcnOrganizationSettingsDemo = lazyDemo(
+  () => import("./shadcn/organization/organization-settings"),
+  ({ OrganizationSettingsDemo }) => OrganizationSettingsDemo
+)
+
+const ShadcnOrganizationSwitcherDemo = lazyDemo(
+  () => import("./shadcn/organization/organization-switcher"),
+  ({ OrganizationSwitcherDemo }) => OrganizationSwitcherDemo
+)
+
+const ShadcnOrganizationsDemo = lazyDemo(
+  () => import("./shadcn/organization/organizations"),
+  ({ OrganizationsDemo }) => OrganizationsDemo
+)
+
+const ShadcnOrganizationsSettingsDemo = lazyDemo(
+  () => import("./shadcn/organization/organizations-settings"),
+  ({ OrganizationsSettingsDemo }) => OrganizationsSettingsDemo
+)
+
+const ShadcnUserInvitationsDemo = lazyDemo(
+  () => import("./shadcn/organization/user-invitations"),
+  ({ UserInvitationsDemo }) => UserInvitationsDemo
+)
+
+const ShadcnPasskeySignInDemo = lazyDemo(
+  () => import("./shadcn/passkey/passkey-sign-in"),
+  ({ PasskeySignInDemo }) => PasskeySignInDemo
+)
+
+const ShadcnAccountSettingsDemo = lazyDemo(
+  () => import("./shadcn/settings/account/account-settings"),
+  ({ AccountSettingsDemo }) => AccountSettingsDemo
+)
+
+const ShadcnChangeEmailDemo = lazyDemo(
+  () => import("./shadcn/settings/account/change-email"),
+  ({ ChangeEmailDemo }) => ChangeEmailDemo
+)
+
+const ShadcnUserProfileDemo = lazyDemo(
+  () => import("./shadcn/settings/account/user-profile"),
+  ({ UserProfileDemo }) => UserProfileDemo
+)
+
+const ShadcnActiveSessionsDemo = lazyDemo(
+  () => import("./shadcn/settings/security/active-sessions"),
+  ({ ActiveSessionsDemo }) => ActiveSessionsDemo
+)
+
+const ShadcnChangePasswordDemo = lazyDemo(
+  () => import("./shadcn/settings/security/change-password"),
+  ({ ChangePasswordDemo }) => ChangePasswordDemo
+)
+
+const ShadcnLinkedAccountsDemo = lazyDemo(
+  () => import("./shadcn/settings/security/linked-accounts"),
+  ({ LinkedAccountsDemo }) => LinkedAccountsDemo
+)
+
+const ShadcnPasskeysDemo = lazyDemo(
+  () => import("./shadcn/settings/security/passkeys"),
+  ({ PasskeysDemo }) => PasskeysDemo
+)
+
+const ShadcnSecuritySettingsDemo = lazyDemo(
+  () => import("./shadcn/settings/security/security-settings"),
+  ({ SecuritySettingsDemo }) => SecuritySettingsDemo
+)
+
+const ShadcnSettingsDemo = lazyDemo(
+  () => import("./shadcn/settings/settings"),
+  ({ SettingsDemo }) => SettingsDemo
+)
+
+const ShadcnAppearanceDemo = lazyDemo(
+  () => import("./shadcn/theme/appearance"),
+  ({ AppearanceDemo }) => AppearanceDemo
+)
+
+const ShadcnThemeToggleItemDemo = lazyDemo(
+  () => import("./shadcn/theme/theme-toggle-item"),
+  ({ ThemeToggleItemDemo }) => ThemeToggleItemDemo
+)
+
+const ShadcnUserAvatarDemo = lazyDemo(
+  () => import("./shadcn/user/user-avatar"),
+  ({ UserAvatarDemo }) => UserAvatarDemo
+)
+
+const ShadcnUserButtonDemo = lazyDemo(
+  () => import("./shadcn/user/user-button"),
+  ({ UserButtonDemo }) => UserButtonDemo
+)
+
+const ShadcnUserButtonIconDemo = lazyDemo(
+  () => import("./shadcn/user/user-button-icon"),
+  ({ UserButtonIconDemo }) => UserButtonIconDemo
+)
+
+const ShadcnUserButtonLinksDemo = lazyDemo(
+  () => import("./shadcn/user/user-button-links"),
+  ({ UserButtonLinksDemo }) => UserButtonLinksDemo
+)
+
+const ShadcnUserViewDemo = lazyDemo(
+  () => import("./shadcn/user/user-view"),
+  ({ UserViewDemo }) => UserViewDemo
+)
+
+const ShadcnSignInUsernameDemo = lazyDemo(
+  () => import("./shadcn/username/sign-in"),
+  ({ SignInUsernameDemo }) => SignInUsernameDemo
+)
+
+const ShadcnSignUpUsernameDemo = lazyDemo(
+  () => import("./shadcn/username/sign-up"),
+  ({ SignUpUsernameDemo }) => SignUpUsernameDemo
+)
+
+const ShadcnUserProfileUsernameDemo = lazyDemo(
+  () => import("./shadcn/username/user-profile"),
+  ({ UserProfileUsernameDemo }) => UserProfileUsernameDemo
+)
+
+const ZaidanChangeEmailConfirmationEmailDemo = lazyDemo(
+  () => import("./zaidan/email/change-email-confirmation-email"),
+  ({ ChangeEmailConfirmationEmailDemo }) => ChangeEmailConfirmationEmailDemo
+)
+
+const ZaidanDeleteAccountVerificationEmailDemo = lazyDemo(
+  () => import("./zaidan/email/delete-account-verification-email"),
+  ({ DeleteAccountVerificationEmailDemo }) => DeleteAccountVerificationEmailDemo
+)
+
+const ZaidanEmailChangedEmailDemo = lazyDemo(
+  () => import("./zaidan/email/email-changed-email"),
+  ({ EmailChangedEmailDemo }) => EmailChangedEmailDemo
+)
+
+const ZaidanEmailVerificationEmailDemo = lazyDemo(
+  () => import("./zaidan/email/email-verification-email"),
+  ({ EmailVerificationEmailDemo }) => EmailVerificationEmailDemo
+)
+
+const ZaidanMagicLinkEmailDemo = lazyDemo(
+  () => import("./zaidan/email/magic-link-email"),
+  ({ MagicLinkEmailDemo }) => MagicLinkEmailDemo
+)
+
+const ZaidanNewDeviceEmailDemo = lazyDemo(
+  () => import("./zaidan/email/new-device-email"),
+  ({ NewDeviceEmailDemo }) => NewDeviceEmailDemo
+)
+
+const ZaidanOrganizationInvitationEmailDemo = lazyDemo(
+  () => import("./zaidan/email/organization-invitation-email"),
+  ({ OrganizationInvitationEmailDemo }) => OrganizationInvitationEmailDemo
+)
+
+const ZaidanOtpEmailDemo = lazyDemo(
+  () => import("./zaidan/email/otp-email"),
+  ({ OtpEmailDemo }) => OtpEmailDemo
+)
+
+const ZaidanPasswordChangedEmailDemo = lazyDemo(
+  () => import("./zaidan/email/password-changed-email"),
+  ({ PasswordChangedEmailDemo }) => PasswordChangedEmailDemo
+)
+
+const ZaidanResetPasswordEmailDemo = lazyDemo(
+  () => import("./zaidan/email/reset-password-email"),
+  ({ ResetPasswordEmailDemo }) => ResetPasswordEmailDemo
+)
+
+export const demos: Record<string, LazyExoticComponent<ComponentType>> = {
   "heroui-account-settings": HeroUIAccountSettingsDemo,
   "heroui-active-sessions": HeroUIActiveSessionsDemo,
   "heroui-api-keys": HeroUIApiKeysDemo,

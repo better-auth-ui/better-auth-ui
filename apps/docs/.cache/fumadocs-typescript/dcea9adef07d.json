@@ -1,0 +1,407 @@
+[
+  {
+    "id": "two-factor-localization.ts-TwoFactorLocalization",
+    "name": "TwoFactorLocalization",
+    "description": "",
+    "entries": [
+      {
+        "name": "twoFactor",
+        "description": "",
+        "tags": [
+          { "name": "remarks", "text": "`\"Two-Factor Authentication\"`" }
+        ],
+        "type": "string",
+        "simplifiedType": "\"Two-Factor Authentication\"",
+        "required": true,
+        "deprecated": false
+      },
+      {
+        "name": "twoFactorDescription",
+        "description": "",
+        "tags": [
+          {
+            "name": "remarks",
+            "text": "`\"Add a second step to sign-in so a stolen password isn't enough\"`"
+          }
+        ],
+        "type": "string",
+        "simplifiedType": "\"Add a second step to sign-in so a stolen password isn't enough\"",
+        "required": true,
+        "deprecated": false
+      },
+      {
+        "name": "enableTwoFactor",
+        "description": "",
+        "tags": [{ "name": "remarks", "text": "`\"Enable two-factor\"`" }],
+        "type": "string",
+        "simplifiedType": "\"Enable two-factor\"",
+        "required": true,
+        "deprecated": false
+      },
+      {
+        "name": "disableTwoFactor",
+        "description": "",
+        "tags": [{ "name": "remarks", "text": "`\"Disable two-factor\"`" }],
+        "type": "string",
+        "simplifiedType": "\"Disable two-factor\"",
+        "required": true,
+        "deprecated": false
+      },
+      {
+        "name": "twoFactorEnabled",
+        "description": "",
+        "tags": [
+          { "name": "remarks", "text": "`\"Two-factor authentication is on\"`" }
+        ],
+        "type": "string",
+        "simplifiedType": "\"Two-factor authentication is on\"",
+        "required": true,
+        "deprecated": false
+      },
+      {
+        "name": "twoFactorDisabled",
+        "description": "",
+        "tags": [
+          {
+            "name": "remarks",
+            "text": "`\"Two-factor authentication is off\"`"
+          }
+        ],
+        "type": "string",
+        "simplifiedType": "\"Two-factor authentication is off\"",
+        "required": true,
+        "deprecated": false
+      },
+      {
+        "name": "passwordConfirmation",
+        "description": "",
+        "tags": [
+          { "name": "remarks", "text": "`\"Enter your password to continue\"`" }
+        ],
+        "type": "string",
+        "simplifiedType": "\"Enter your password to continue\"",
+        "required": true,
+        "deprecated": false
+      },
+      {
+        "name": "scanQrCode",
+        "description": "",
+        "tags": [
+          {
+            "name": "remarks",
+            "text": "`\"Scan this with your authenticator app\"`"
+          }
+        ],
+        "type": "string",
+        "simplifiedType": "\"Scan this with your authenticator app\"",
+        "required": true,
+        "deprecated": false
+      },
+      {
+        "name": "setupKey",
+        "description": "",
+        "tags": [
+          {
+            "name": "remarks",
+            "text": "`\"Can't scan? Enter this setup key instead\"`"
+          }
+        ],
+        "type": "string",
+        "simplifiedType": "\"Can't scan? Enter this setup key instead\"",
+        "required": true,
+        "deprecated": false
+      },
+      {
+        "name": "setupKeyCopied",
+        "description": "",
+        "tags": [{ "name": "remarks", "text": "`\"Setup key copied\"`" }],
+        "type": "string",
+        "simplifiedType": "\"Setup key copied\"",
+        "required": true,
+        "deprecated": false
+      },
+      {
+        "name": "setupKeyCopyFailed",
+        "description": "",
+        "tags": [
+          {
+            "name": "remarks",
+            "text": "`\"Couldn't copy the setup key. Select and copy it manually.\"`"
+          }
+        ],
+        "type": "string",
+        "simplifiedType": "\"Couldn't copy the setup key. Select and copy it manually.\"",
+        "required": true,
+        "deprecated": false
+      },
+      {
+        "name": "authenticatorCode",
+        "description": "",
+        "tags": [{ "name": "remarks", "text": "`\"Authenticator code\"`" }],
+        "type": "string",
+        "simplifiedType": "\"Authenticator code\"",
+        "required": true,
+        "deprecated": false
+      },
+      {
+        "name": "authenticatorCodeDescription",
+        "description": "",
+        "tags": [
+          {
+            "name": "remarks",
+            "text": "`\"Enter the code from your authenticator app\"`"
+          }
+        ],
+        "type": "string",
+        "simplifiedType": "\"Enter the code from your authenticator app\"",
+        "required": true,
+        "deprecated": false
+      },
+      {
+        "name": "emailedCode",
+        "description": "",
+        "tags": [{ "name": "remarks", "text": "`\"Emailed code\"`" }],
+        "type": "string",
+        "simplifiedType": "\"Emailed code\"",
+        "required": true,
+        "deprecated": false
+      },
+      {
+        "name": "emailedCodeDescription",
+        "description": "",
+        "tags": [
+          {
+            "name": "remarks",
+            "text": "`\"We emailed you a code. Enter it to finish signing in\"`"
+          }
+        ],
+        "type": "string",
+        "simplifiedType": "\"We emailed you a code. Enter it to finish signing in\"",
+        "required": true,
+        "deprecated": false
+      },
+      {
+        "name": "sendEmailCode",
+        "description": "",
+        "tags": [{ "name": "remarks", "text": "`\"Email me a code\"`" }],
+        "type": "string",
+        "simplifiedType": "\"Email me a code\"",
+        "required": true,
+        "deprecated": false
+      },
+      {
+        "name": "backupCode",
+        "description": "",
+        "tags": [{ "name": "remarks", "text": "`\"Backup code\"`" }],
+        "type": "string",
+        "simplifiedType": "\"Backup code\"",
+        "required": true,
+        "deprecated": false
+      },
+      {
+        "name": "backupCodeDescription",
+        "description": "",
+        "tags": [
+          {
+            "name": "remarks",
+            "text": "`\"Enter one of the backup codes you saved\"`"
+          }
+        ],
+        "type": "string",
+        "simplifiedType": "\"Enter one of the backup codes you saved\"",
+        "required": true,
+        "deprecated": false
+      },
+      {
+        "name": "backupCodes",
+        "description": "",
+        "tags": [{ "name": "remarks", "text": "`\"Backup codes\"`" }],
+        "type": "string",
+        "simplifiedType": "\"Backup codes\"",
+        "required": true,
+        "deprecated": false
+      },
+      {
+        "name": "backupCodesForWebsite",
+        "description": "",
+        "tags": [
+          { "name": "remarks", "text": "`\"Backup codes for {{website}}\"`" }
+        ],
+        "type": "string",
+        "simplifiedType": "\"Backup codes for {{website}}\"",
+        "required": true,
+        "deprecated": false
+      },
+      {
+        "name": "backupCodesDescription",
+        "description": "",
+        "tags": [
+          {
+            "name": "remarks",
+            "text": "`\"Save these somewhere safe. Each code works once if you lose your authenticator.\"`"
+          }
+        ],
+        "type": "string",
+        "simplifiedType": "\"Save these somewhere safe. Each code works once if you lose your authenticator.\"",
+        "required": true,
+        "deprecated": false
+      },
+      {
+        "name": "backupCodesCopied",
+        "description": "",
+        "tags": [{ "name": "remarks", "text": "`\"Backup codes copied\"`" }],
+        "type": "string",
+        "simplifiedType": "\"Backup codes copied\"",
+        "required": true,
+        "deprecated": false
+      },
+      {
+        "name": "backupCodesCopyFailed",
+        "description": "",
+        "tags": [
+          {
+            "name": "remarks",
+            "text": "`\"Couldn't copy the backup codes. Select and copy them manually.\"`"
+          }
+        ],
+        "type": "string",
+        "simplifiedType": "\"Couldn't copy the backup codes. Select and copy them manually.\"",
+        "required": true,
+        "deprecated": false
+      },
+      {
+        "name": "downloadBackupCodes",
+        "description": "",
+        "tags": [{ "name": "remarks", "text": "`\"Download .txt\"`" }],
+        "type": "string",
+        "simplifiedType": "\"Download .txt\"",
+        "required": true,
+        "deprecated": false
+      },
+      {
+        "name": "printBackupCodes",
+        "description": "",
+        "tags": [{ "name": "remarks", "text": "`\"Print\"`" }],
+        "type": "string",
+        "simplifiedType": "\"Print\"",
+        "required": true,
+        "deprecated": false
+      },
+      {
+        "name": "regenerateBackupCodes",
+        "description": "",
+        "tags": [
+          { "name": "remarks", "text": "`\"Regenerate backup codes\"`" }
+        ],
+        "type": "string",
+        "simplifiedType": "\"Regenerate backup codes\"",
+        "required": true,
+        "deprecated": false
+      },
+      {
+        "name": "backupCodesRegenerated",
+        "description": "",
+        "tags": [
+          {
+            "name": "remarks",
+            "text": "`\"New backup codes generated. The old ones no longer work.\"`"
+          }
+        ],
+        "type": "string",
+        "simplifiedType": "\"New backup codes generated. The old ones no longer work.\"",
+        "required": true,
+        "deprecated": false
+      },
+      {
+        "name": "useAuthenticator",
+        "description": "",
+        "tags": [
+          { "name": "remarks", "text": "`\"Use your authenticator app\"`" }
+        ],
+        "type": "string",
+        "simplifiedType": "\"Use your authenticator app\"",
+        "required": true,
+        "deprecated": false
+      },
+      {
+        "name": "useEmailedCode",
+        "description": "",
+        "tags": [{ "name": "remarks", "text": "`\"Use an emailed code\"`" }],
+        "type": "string",
+        "simplifiedType": "\"Use an emailed code\"",
+        "required": true,
+        "deprecated": false
+      },
+      {
+        "name": "useBackupCode",
+        "description": "",
+        "tags": [{ "name": "remarks", "text": "`\"Use a backup code\"`" }],
+        "type": "string",
+        "simplifiedType": "\"Use a backup code\"",
+        "required": true,
+        "deprecated": false
+      },
+      {
+        "name": "trustDevice",
+        "description": "",
+        "tags": [{ "name": "remarks", "text": "`\"Trust this device\"`" }],
+        "type": "string",
+        "simplifiedType": "\"Trust this device\"",
+        "required": true,
+        "deprecated": false
+      },
+      {
+        "name": "trustDeviceDescription",
+        "description": "",
+        "tags": [
+          {
+            "name": "remarks",
+            "text": "`\"Skip the second step on this device from now on\"`"
+          }
+        ],
+        "type": "string",
+        "simplifiedType": "\"Skip the second step on this device from now on\"",
+        "required": true,
+        "deprecated": false
+      },
+      {
+        "name": "verify",
+        "description": "",
+        "tags": [{ "name": "remarks", "text": "`\"Verify\"`" }],
+        "type": "string",
+        "simplifiedType": "\"Verify\"",
+        "required": true,
+        "deprecated": false
+      },
+      {
+        "name": "codeLengthMismatch",
+        "description": "",
+        "tags": [
+          { "name": "remarks", "text": "`\"Enter the {{length}}-digit code\"`" }
+        ],
+        "type": "string",
+        "simplifiedType": "\"Enter the {{length}}-digit code\"",
+        "required": true,
+        "deprecated": false
+      },
+      {
+        "name": "backToSignIn",
+        "description": "",
+        "tags": [{ "name": "remarks", "text": "`\"Back to sign in\"`" }],
+        "type": "string",
+        "simplifiedType": "\"Back to sign in\"",
+        "required": true,
+        "deprecated": false
+      },
+      {
+        "name": "done",
+        "description": "",
+        "tags": [{ "name": "remarks", "text": "`\"Done\"`" }],
+        "type": "string",
+        "simplifiedType": "\"Done\"",
+        "required": true,
+        "deprecated": false
+      }
+    ]
+  }
+]

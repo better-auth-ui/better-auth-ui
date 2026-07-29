@@ -1,0 +1,94 @@
+[
+  {
+    "id": "phone-number-plugin.ts-PhoneNumberPluginOptions",
+    "name": "PhoneNumberPluginOptions",
+    "description": "",
+    "entries": [
+      {
+        "name": "localization",
+        "description": "Override the plugin's default localization strings.",
+        "tags": [{ "name": "remarks", "text": "`PhoneNumberLocalization`" }],
+        "type": "PhoneNumberLocalization",
+        "simplifiedType": "PhoneNumberLocalization",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "path",
+        "description": "URL segment for the phone-number sign-in view.",
+        "tags": [{ "name": "default", "text": "\"phone-number\"" }],
+        "type": "string",
+        "simplifiedType": "string",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "forgotPasswordPath",
+        "description": "URL segment for requesting a phone password reset.",
+        "tags": [
+          { "name": "default", "text": "\"phone-number-forgot-password\"" }
+        ],
+        "type": "string",
+        "simplifiedType": "string",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "resetPasswordPath",
+        "description": "URL segment for completing a phone password reset.",
+        "tags": [
+          { "name": "default", "text": "\"phone-number-reset-password\"" }
+        ],
+        "type": "string",
+        "simplifiedType": "string",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "otpLength",
+        "description": "Number of characters rendered by the code input.\n\nKeep this in sync with Better Auth's `phoneNumber({ otpLength })` option.",
+        "tags": [{ "name": "default", "text": "6" }],
+        "type": "number",
+        "simplifiedType": "number",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "signIn",
+        "description": "Offer passwordless sign-in by sending a verification code.",
+        "tags": [{ "name": "default", "text": "true" }],
+        "type": "boolean",
+        "simplifiedType": "boolean",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "passwordSignIn",
+        "description": "Offer phone-number and password sign-in.\n\nUsers need a Better Auth credential account before this strategy can\nauthenticate them.",
+        "tags": [{ "name": "default", "text": "false" }],
+        "type": "boolean",
+        "simplifiedType": "boolean",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "passwordReset",
+        "description": "Add the phone-number password-reset routes and link.\n\nRequires `sendPasswordResetOTP` in the Better Auth server plugin.",
+        "tags": [{ "name": "default", "text": "false" }],
+        "type": "boolean",
+        "simplifiedType": "boolean",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "changePhoneNumber",
+        "description": "Add a verified phone-number card to account settings.",
+        "tags": [{ "name": "default", "text": "true" }],
+        "type": "boolean",
+        "simplifiedType": "boolean",
+        "required": false,
+        "deprecated": false
+      }
+    ]
+  }
+]

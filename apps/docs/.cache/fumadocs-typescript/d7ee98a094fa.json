@@ -1,0 +1,18 @@
+[
+  {
+    "id": "user-invitations.tsx-UserInvitationsProps",
+    "name": "UserInvitationsProps",
+    "description": "",
+    "entries": [
+      {
+        "name": "className",
+        "description": "",
+        "tags": [],
+        "type": "string",
+        "simplifiedType": "string",
+        "required": false,
+        "deprecated": false
+      }
+    ]
+  }
+]
