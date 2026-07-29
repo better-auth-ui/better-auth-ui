@@ -60,7 +60,10 @@ export function SignUp(props: SignUpProps) {
       if (auth.emailAndPassword.requireEmailVerification) {
         sessionStorage.setItem("better-auth-ui.verify-email", variables.email)
         auth.navigate({
-          to: `${auth.basePaths.auth}/${auth.viewPaths.auth.verifyEmail}`
+          to: getAuthLinkURL(
+            `${auth.basePaths.auth}/${auth.viewPaths.auth.verifyEmail}`,
+            auth.redirectTo
+          )
         })
         return
       }

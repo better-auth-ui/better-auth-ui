@@ -1,0 +1,45 @@
+[
+  {
+    "id": "sign-up.tsx-SignUpProps",
+    "name": "SignUpProps",
+    "description": "",
+    "entries": [
+      {
+        "name": "className",
+        "description": "",
+        "tags": [],
+        "type": "string",
+        "simplifiedType": "string",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "socialLayout",
+        "description": "",
+        "tags": [],
+        "type": "SocialLayout",
+        "simplifiedType": "SocialLayout",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "socialPosition",
+        "description": "",
+        "tags": [],
+        "type": "\"top\" | \"bottom\"",
+        "simplifiedType": "\"top\" | \"bottom\"",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "onSignUpSuccess",
+        "description": "Runs instead of the post-sign-up redirect, but only when the sign-up\ncreated an immediately usable session. Email verification still takes\npriority, and social sign-ups are unaffected.",
+        "tags": [],
+        "type": "(() => void)",
+        "simplifiedType": "function",
+        "required": false,
+        "deprecated": false
+      }
+    ]
+  }
+]

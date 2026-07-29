@@ -38,11 +38,15 @@ export function ResetPassword({ className, variant }: ResetPasswordProps) {
     redirectTo,
     viewPaths
   } = useAuth()
+  const signInURL = getAuthLinkURL(
+    `${basePaths.auth}/${viewPaths.auth.signIn}`,
+    redirectTo
+  )
 
   const { mutate: resetPassword, isPending } = useResetPassword(authClient, {
     onSuccess: () => {
       toast.success(localization.auth.passwordResetSuccess)
-      navigate({ to: `${basePaths.auth}/${viewPaths.auth.signIn}` })
+      navigate({ to: signInURL })
     }
   })
 
@@ -56,14 +60,9 @@ export function ResetPassword({ className, variant }: ResetPasswordProps) {
 
     if (!token) {
       toast.danger(localization.auth.invalidResetPasswordToken)
-      navigate({ to: `${basePaths.auth}/${viewPaths.auth.signIn}` })
+      navigate({ to: signInURL })
     }
-  }, [
-    basePaths.auth,
-    localization.auth.invalidResetPasswordToken,
-    viewPaths.auth.signIn,
-    navigate
-  ])
+  }, [localization.auth.invalidResetPasswordToken, navigate, signInURL])
 
   function handleSubmit(e: SyntheticEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -73,7 +72,7 @@ export function ResetPassword({ className, variant }: ResetPasswordProps) {
 
     if (!token) {
       toast.danger(localization.auth.invalidResetPasswordToken)
-      navigate({ to: `${basePaths.auth}/${viewPaths.auth.signIn}` })
+      navigate({ to: signInURL })
       return
     }
 

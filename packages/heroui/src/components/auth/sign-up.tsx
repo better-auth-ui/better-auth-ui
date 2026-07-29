@@ -93,7 +93,10 @@ export function SignUp({
         if (emailAndPassword?.requireEmailVerification) {
           sessionStorage.setItem("better-auth-ui.verify-email", email)
           navigate({
-            to: `${basePaths.auth}/${viewPaths.auth.verifyEmail}`
+            to: getAuthLinkURL(
+              `${basePaths.auth}/${viewPaths.auth.verifyEmail}`,
+              redirectTo
+            )
           })
         } else if (onSignUpSuccess) {
           onSignUpSuccess()

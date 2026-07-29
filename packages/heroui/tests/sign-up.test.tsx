@@ -1,7 +1,7 @@
 import { QueryClient } from "@tanstack/react-query"
 import { render, screen, waitFor } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
-import { describe, expect, it, vi } from "vitest"
+import { afterEach, describe, expect, it, vi } from "vitest"
 
 import { AuthProvider } from "../src/components/auth/auth-provider"
 import { SignUp } from "../src/components/auth/sign-up"
@@ -56,7 +56,52 @@ function renderSignUp(optional: string) {
   )
 }
 
+afterEach(() => {
+  sessionStorage.clear()
+  window.history.pushState({}, "", "/")
+})
+
 describe("<SignUp />", () => {
+  it("preserves the redirect target when continuing to email verification", async () => {
+    const user = userEvent.setup()
+    const navigate = vi.fn()
+    const redirectTo = "/projects/acme?tab=members"
+    window.history.pushState(
+      {},
+      "",
+      `/auth/sign-up?redirectTo=${encodeURIComponent(redirectTo)}`
+    )
+
+    render(
+      <AuthProvider
+        authClient={createMockAuthClient()}
+        emailAndPassword={{ requireEmailVerification: true }}
+        navigate={navigate}
+        queryClient={
+          new QueryClient({
+            defaultOptions: {
+              queries: { retry: false },
+              mutations: { retry: false }
+            }
+          })
+        }
+      >
+        <SignUp />
+      </AuthProvider>
+    )
+
+    await user.type(screen.getByLabelText("Name"), "Ada Lovelace")
+    await user.type(screen.getByLabelText("Email"), "ada@example.com")
+    await user.type(screen.getByLabelText("Password"), "correct horse battery")
+    await user.click(screen.getByRole("button", { name: "Sign Up" }))
+
+    await waitFor(() => {
+      expect(navigate).toHaveBeenCalledWith({
+        to: `/auth/verify-email?redirectTo=${encodeURIComponent(redirectTo)}`
+      })
+    })
+  })
+
   it("labels optional additional fields without marking required fields", () => {
     renderSignUp(" [not required]")
 
