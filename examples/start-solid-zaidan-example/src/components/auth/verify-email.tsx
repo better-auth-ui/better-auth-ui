@@ -1,6 +1,9 @@
-import { sendVerificationEmailOptions, useAuth } from "@better-auth-ui/solid"
+import {
+  AuthLink,
+  sendVerificationEmailOptions,
+  useAuth
+} from "@better-auth-ui/solid"
 import { createMutation } from "@tanstack/solid-query"
-import { Link } from "@tanstack/solid-router"
 import { createSignal, onCleanup, onMount } from "solid-js"
 import { isServer } from "solid-js/web"
 import { toast } from "solid-sonner"
@@ -104,13 +107,12 @@ export function VerifyEmail(props: VerifyEmailProps) {
         <div class="mt-4 flex w-full flex-col items-center gap-3">
           <p class="text-center text-sm text-muted-foreground">
             {auth.localization.auth.alreadyVerifiedYourEmail}{" "}
-            <Link
+            <AuthLink
               class="underline underline-offset-4"
-              params={{ path: auth.viewPaths.auth.signIn }}
-              to="/auth/$path"
+              href={`${auth.basePaths.auth}/${auth.viewPaths.auth.signIn}`}
             >
               {auth.localization.auth.signIn}
-            </Link>
+            </AuthLink>
           </p>
         </div>
       </CardContent>

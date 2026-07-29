@@ -1,5 +1,26 @@
 const ABSOLUTE_HTTP_URL = /^https?:\/\//i
 
+/**
+ * Build a callback URL from an optional origin, a configured base path, and a
+ * view path.
+ *
+ * Separators are normalized so custom paths work whether callers include
+ * leading or trailing slashes.
+ */
+export function getViewURL(
+  baseURL: string,
+  basePath: string,
+  viewPath: string
+): string {
+  const origin = baseURL.replace(/\/+$/, "")
+  const path = [basePath, viewPath]
+    .map((segment) => segment.replace(/^\/+|\/+$/g, ""))
+    .filter(Boolean)
+    .join("/")
+
+  return `${origin}/${path}`
+}
+
 function hasUnsafeRedirectCharacters(value: string): boolean {
   for (const character of value) {
     const codePoint = character.codePointAt(0)

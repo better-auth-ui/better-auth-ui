@@ -1,5 +1,6 @@
 "use client"
 
+import { getViewURL } from "@better-auth-ui/core"
 import {
   useAuth,
   useChangePassword,
@@ -65,7 +66,8 @@ export function ChangePassword({ className }: ChangePasswordProps) {
 }
 
 function SetPassword({ className }: { className?: string }) {
-  const { authClient, localization, plugins } = useAuth()
+  const { authClient, basePaths, baseURL, localization, plugins, viewPaths } =
+    useAuth()
   const { data: session } = useSession(authClient)
   const { fetchOptions, resetFetchOptions } = useFetchOptions()
   const [sentEmail, setSentEmail] = useState("")
@@ -89,7 +91,15 @@ function SetPassword({ className }: { className?: string }) {
   const handleSetPassword = () => {
     if (!session) return
 
-    requestPasswordReset({ email: session.user.email, fetchOptions })
+    requestPasswordReset({
+      email: session.user.email,
+      redirectTo: getViewURL(
+        baseURL,
+        basePaths.auth,
+        viewPaths.auth.resetPassword
+      ),
+      fetchOptions
+    })
   }
 
   return (

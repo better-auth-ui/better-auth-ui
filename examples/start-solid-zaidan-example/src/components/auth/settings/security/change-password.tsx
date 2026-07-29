@@ -1,3 +1,4 @@
+import { getViewURL } from "@better-auth-ui/core"
 import {
   changePasswordOptions,
   listAccountsOptions,
@@ -103,7 +104,12 @@ export function ChangePasswordSettings(
     if (!session.data) return
 
     requestPasswordReset.mutate({
-      email: session.data.user.email
+      email: session.data.user.email,
+      redirectTo: getViewURL(
+        auth.baseURL,
+        auth.basePaths.auth,
+        auth.viewPaths.auth.resetPassword
+      )
     } as Parameters<typeof requestPasswordReset.mutate>[0])
   }
 

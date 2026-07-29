@@ -1,8 +1,13 @@
 import { deleteUserPlugin } from "@better-auth-ui/core/plugins"
+import type { AuthLinkProps } from "@better-auth-ui/solid"
 import type { QueryClient } from "@tanstack/solid-query"
-import { useNavigate, useParams } from "@tanstack/solid-router"
+import {
+  Link as RouterLink,
+  useNavigate,
+  useParams
+} from "@tanstack/solid-router"
 import type { JSX } from "solid-js"
-import { onCleanup, onMount, Show } from "solid-js"
+import { onCleanup, onMount, Show, splitProps } from "solid-js"
 import { apiKeyPlugin } from "@/lib/auth/api-key-plugin"
 import { emailOtpPlugin } from "@/lib/auth/email-otp-plugin"
 import { magicLinkPlugin } from "@/lib/auth/magic-link-plugin"
@@ -26,6 +31,12 @@ export type ProvidersProps = {
 const resolveProviderChildren = (children: ProvidersProps["children"]) =>
   typeof children === "function" ? children() : children
 
+function AuthLink(props: AuthLinkProps) {
+  const [local, linkProps] = splitProps(props, ["href"])
+
+  return <RouterLink {...linkProps} to={local.href} />
+}
+
 export function Providers(props: ProvidersProps) {
   const navigate = useNavigate()
   const params = useParams({ strict: false })
@@ -47,6 +58,7 @@ export function Providers(props: ProvidersProps) {
     <Show keyed when={organizationSlug() ?? "personal"}>
       <AuthProvider
         authClient={authClient}
+        Link={AuthLink}
         redirectTo="/settings/account"
         navigate={navigate}
         queryClient={props.queryClient}

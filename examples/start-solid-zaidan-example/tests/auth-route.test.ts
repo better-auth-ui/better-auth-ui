@@ -173,9 +173,6 @@ describe("Solid auth route component selection", () => {
       "utf8"
     )
 
-    expect(providers).toContain(
-      'import { useNavigate, useParams } from "@tanstack/solid-router"'
-    )
     expect(providers).toContain("useParams({ strict: false })")
     expect(providers).toContain('typeof slug === "string"')
     expect(providers).toContain("return null")
@@ -827,27 +824,6 @@ describe("Solid auth route component selection", () => {
     )
   })
 
-  it("uses TanStack Link for UserButton auth/settings menu navigation", () => {
-    const userButton = readFileSync(
-      resolve(__dirname, "../src/components/auth/user/user-button.tsx"),
-      "utf8"
-    )
-
-    expect(userButton).toContain(
-      'import { Link } from "@tanstack/solid-router"'
-    )
-    expect(userButton).toContain('to="/auth/$path"')
-    expect(userButton).toContain('to="/settings/$path"')
-    expect(userButton).toContain("params={{ path: signInPath }}")
-    expect(userButton).toContain("params={{ path: signUpPath }}")
-    expect(userButton).toContain("params={{ path: settingsPath }}")
-    expect(userButton).toContain("params={{ path: signOutPath }}")
-    expect(userButton).not.toContain('as="a"')
-    expect(userButton).not.toMatch(
-      /href=\{(?:signInHref|signUpHref|settingsHref|signOutHref)\}/
-    )
-  })
-
   it("wires Theme through the local plugin instead of hard-coded user/account surfaces", () => {
     const providers = readFileSync(
       resolve(__dirname, "../src/components/providers.tsx"),
@@ -1170,7 +1146,6 @@ describe("Solid auth route component selection", () => {
     expect(switchAccountSubmenuContent).toContain("shouldLoadDeviceSessions")
     expect(switchAccountSubmenuContent).toContain("DropdownMenuSubContent")
     expect(switchAccountSubmenuContent).toContain("SwitchAccountSubmenuItem")
-    expect(switchAccountSubmenuContent).toContain('to="/auth/$path"')
     expect(switchAccountSubmenuContent).toContain("auth.viewPaths.auth.signIn")
     expect(switchAccountSubmenuContent).toContain("CirclePlus")
 
@@ -1421,31 +1396,6 @@ describe("Solid auth route component selection", () => {
 
       expect(source, implementation.file).toContain(implementation.expected)
       expect(isSimpleReExportOnly(source), implementation.file).toBe(false)
-    }
-  })
-
-  it("uses TanStack Link for auth form helper navigation", () => {
-    const helperLinkFiles = [
-      "username/sign-in-username.tsx",
-      "sign-up.tsx",
-      "forgot-password.tsx",
-      "reset-password.tsx"
-    ]
-
-    for (const file of helperLinkFiles) {
-      const source = readFileSync(
-        resolve(__dirname, `../src/components/auth/${file}`),
-        "utf8"
-      )
-
-      expect(source, file).toContain(
-        'import { Link } from "@tanstack/solid-router"'
-      )
-      expect(source, file).toContain("<Link")
-      expect(source, file).toContain('to="/auth/$path"')
-      expect(source, file).toContain("params={{ path: auth.viewPaths.auth.")
-      expect(source, file).not.toMatch(/<a\s/)
-      expect(source, file).not.toMatch(/href=\{?`?\$?\{?auth\.basePaths\.auth/)
     }
   })
 

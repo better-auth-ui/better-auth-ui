@@ -1,0 +1,18 @@
+[
+  {
+    "id": "verify-email.tsx-VerifyEmailProps",
+    "name": "VerifyEmailProps",
+    "description": "",
+    "entries": [
+      {
+        "name": "class",
+        "description": "",
+        "tags": [],
+        "type": "string",
+        "simplifiedType": "string",
+        "required": false,
+        "deprecated": false
+      }
+    ]
+  }
+]

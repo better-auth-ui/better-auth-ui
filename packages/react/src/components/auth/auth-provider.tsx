@@ -53,10 +53,11 @@ export type AuthProviderProps<TAuthClient = AuthClient> = PropsWithChildren<
 /**
  * Provides merged authentication configuration and a resolved React Query client to descendant components.
  *
- * The component merges the provided auth config with the library defaults, updates `redirectTo` from the
- * current URL when the app is hydrated, wires a QueryClient (prop, context, or fallback) and installs an
- * error handler that surfaces query errors via the configured toast. It then supplies the merged config
- * via AuthContext and wraps children with QueryClientProvider.
+ * The component merges the provided auth config with the library defaults,
+ * resolves `redirectTo` from the current URL whenever it is read, wires a
+ * QueryClient (prop, context, or fallback), and installs an error handler that
+ * surfaces query errors via the configured toast. It then supplies the merged
+ * config via AuthContext and wraps children with QueryClientProvider.
  *
  * @returns The children wrapped with AuthContext.Provider and QueryClientProvider configured for auth.
  */
@@ -73,11 +74,18 @@ export function AuthProvider({
     ),
     authClient
   }
+  const configuredRedirectTo = mergedConfig.redirectTo
 
-  mergedConfig.redirectTo =
-    (typeof window !== "undefined" &&
-      new URLSearchParams(window.location.search).get("redirectTo")?.trim()) ||
-    mergedConfig.redirectTo
+  Object.defineProperty(mergedConfig, "redirectTo", {
+    configurable: true,
+    enumerable: true,
+    get: () =>
+      (typeof window !== "undefined" &&
+        new URLSearchParams(window.location.search)
+          .get("redirectTo")
+          ?.trim()) ||
+      configuredRedirectTo
+  })
 
   // Merge plugin-contributed `additionalFields` with user-supplied ones.
   // Plugin order is preserved; user-supplied entries with the same `name`

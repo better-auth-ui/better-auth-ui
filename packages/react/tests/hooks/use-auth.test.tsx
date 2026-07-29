@@ -108,6 +108,28 @@ describe("useAuth", () => {
       expect(result.current.redirectTo).toBe("/dashboard")
     })
 
+    it("reads redirectTo from the current URL after client navigation", () => {
+      const wrapper = ({ children }: { children: ReactNode }) => (
+        <AuthProvider
+          authClient={mockAuthClient}
+          redirectTo="/fallback"
+          navigate={() => {}}
+        >
+          {children}
+        </AuthProvider>
+      )
+
+      const { result } = renderHook(() => useAuth(), { wrapper })
+
+      expect(result.current.redirectTo).toBe("/fallback")
+
+      window.history.pushState({}, "", "/auth/sign-in?redirectTo=%2Fdashboard")
+      expect(result.current.redirectTo).toBe("/dashboard")
+
+      window.history.pushState({}, "", "/auth/sign-in")
+      expect(result.current.redirectTo).toBe("/fallback")
+    })
+
     it("should merge nested configurations from AuthProvider", () => {
       const wrapper = ({ children }: { children: ReactNode }) => (
         <AuthProvider

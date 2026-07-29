@@ -4,6 +4,7 @@ import {
   usernameLocalization
 } from "@better-auth-ui/core/plugins"
 import {
+  AuthLink,
   AuthPrompts,
   signInEmailOptions,
   signInUsernameOptions,
@@ -13,7 +14,6 @@ import {
 } from "@better-auth-ui/solid"
 import type { AuthPlugin } from "@better-auth-ui/solid/plugins"
 import { createMutation, useQueryClient } from "@tanstack/solid-query"
-import { Link } from "@tanstack/solid-router"
 import type { BetterFetchError } from "better-auth/client"
 import { Eye, EyeOff } from "lucide-solid"
 import { type Component, createSignal, For, Show } from "solid-js"
@@ -286,24 +286,22 @@ export function SignInUsername(props: SignInUsernameProps) {
 
         <div class="mt-4 flex w-full flex-col items-center gap-3">
           <Show when={auth.emailAndPassword.forgotPassword}>
-            <Link
+            <AuthLink
               class="text-sm underline-offset-4 hover:underline"
-              params={{ path: auth.viewPaths.auth.forgotPassword }}
-              to="/auth/$path"
+              href={`${auth.basePaths.auth}/${auth.viewPaths.auth.forgotPassword}`}
             >
               {auth.localization.auth.forgotPasswordLink}
-            </Link>
+            </AuthLink>
           </Show>
 
           <p class="text-center text-sm text-muted-foreground">
             {auth.localization.auth.needToCreateAnAccount}{" "}
-            <Link
+            <AuthLink
               class="underline underline-offset-4"
-              params={{ path: auth.viewPaths.auth.signUp }}
-              to="/auth/$path"
+              href={`${auth.basePaths.auth}/${auth.viewPaths.auth.signUp}`}
             >
               {auth.localization.auth.signUp}
-            </Link>
+            </AuthLink>
           </p>
         </div>
       </CardContent>

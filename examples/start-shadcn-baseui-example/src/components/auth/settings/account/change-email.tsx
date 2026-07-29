@@ -1,5 +1,6 @@
 "use client"
 
+import { getViewURL } from "@better-auth-ui/core"
 import { useAuth, useChangeEmail, useSession } from "@better-auth-ui/react"
 import { type SyntheticEvent, useState } from "react"
 import { toast } from "sonner"
@@ -26,7 +27,7 @@ export type ChangeEmailProps = {
  * @returns A JSX element rendering the change-email card and form
  */
 export function ChangeEmail({ className }: ChangeEmailProps) {
-  const { authClient, baseURL, localization, viewPaths } = useAuth()
+  const { authClient, basePaths, baseURL, localization, viewPaths } = useAuth()
   const { data: session } = useSession(authClient)
 
   const { mutate: changeEmail, isPending } = useChangeEmail(authClient, {
@@ -43,7 +44,11 @@ export function ChangeEmail({ className }: ChangeEmailProps) {
     const formData = new FormData(e.currentTarget)
     changeEmail({
       newEmail: formData.get("email") as string,
-      callbackURL: `${baseURL}/${viewPaths.settings.account}`
+      callbackURL: getViewURL(
+        baseURL,
+        basePaths.settings,
+        viewPaths.settings.account
+      )
     })
   }
 

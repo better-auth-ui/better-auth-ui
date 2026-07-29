@@ -36,6 +36,7 @@ BASE_UI_OVERRIDES=(
   components/auth/api-key/create-api-key-dialog.tsx
   components/auth/organization/invite-member-dialog.tsx
   components/auth/phone-number/remove-phone-number-dialog.tsx
+  components/auth/theme/theme-toggle-item.tsx
 )
 
 OVERRIDE_BACKUP="$(mktemp -d)"

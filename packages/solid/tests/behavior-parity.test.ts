@@ -92,6 +92,7 @@ describe("Solid auth behavior parity", () => {
     const config = resolveAuthConfig({
       authClient,
       navigate,
+      redirectTo: "/fallback",
       viewPaths: { auth: { signIn: "custom-sign-in" } }
     } as never)
 
@@ -102,6 +103,12 @@ describe("Solid auth behavior parity", () => {
     })
     expect(config.viewPaths.settings).toEqual(viewPaths.settings)
     expect(config.redirectTo).toBe("/settings")
+
+    window.location.search = "?redirectTo=%2Fdashboard"
+    expect(config.redirectTo).toBe("/dashboard")
+
+    window.location.search = ""
+    expect(config.redirectTo).toBe("/fallback")
     expect(config.navigate).toBe(navigate)
   })
 

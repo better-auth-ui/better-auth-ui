@@ -1,3 +1,4 @@
+import { getViewURL } from "@better-auth-ui/core"
 import {
   useAuth,
   useChangePassword,
@@ -75,7 +76,8 @@ function SetPassword({
   variant,
   ...props
 }: Omit<CardProps, "children">) {
-  const { authClient, localization, plugins } = useAuth()
+  const { authClient, basePaths, baseURL, localization, plugins, viewPaths } =
+    useAuth()
   const { data: session } = useSession(authClient)
   const { fetchOptions, resetFetchOptions } = useFetchOptions()
   const [sentEmail, setSentEmail] = useState("")
@@ -98,7 +100,15 @@ function SetPassword({
 
   const handleSetPassword = () => {
     if (!session?.user.email) return
-    requestPasswordReset({ email: session.user.email, fetchOptions })
+    requestPasswordReset({
+      email: session.user.email,
+      redirectTo: getViewURL(
+        baseURL,
+        basePaths.auth,
+        viewPaths.auth.resetPassword
+      ),
+      fetchOptions
+    })
   }
 
   return (

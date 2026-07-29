@@ -1,6 +1,5 @@
 import type { AuthView } from "@better-auth-ui/core"
-import { useAuth, useAuthPlugin } from "@better-auth-ui/solid"
-import { Link } from "@tanstack/solid-router"
+import { AuthLink, useAuth, useAuthPlugin } from "@better-auth-ui/solid"
 import { KeyRound, Lock } from "lucide-solid"
 import { Show } from "solid-js"
 
@@ -27,14 +26,13 @@ export function EmailOtpButton(props: EmailOtpButtonProps) {
 
   return (
     <Show when={isVisible()}>
-      <Link
+      <AuthLink
         class={cn(buttonVariants({ variant: "outline" }), "w-full")}
-        params={{
-          path: isEmailOtpView()
+        href={`${auth.basePaths.auth}/${
+          isEmailOtpView()
             ? auth.viewPaths.auth.signIn
             : (emailOtpViewPaths.auth.emailOtp as string)
-        }}
-        to="/auth/$path"
+        }`}
       >
         <Show fallback={<KeyRound />} when={isEmailOtpView()}>
           <Lock />
@@ -46,7 +44,7 @@ export function EmailOtpButton(props: EmailOtpButtonProps) {
             ? auth.localization.auth.password
             : emailOtpLocalization.emailOtp
         )}
-      </Link>
+      </AuthLink>
     </Show>
   )
 }

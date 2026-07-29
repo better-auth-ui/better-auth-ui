@@ -1,0 +1,27 @@
+[
+  {
+    "id": "change-password.tsx-ChangePasswordSettingsProps",
+    "name": "ChangePasswordSettingsProps",
+    "description": "",
+    "entries": [
+      {
+        "name": "class",
+        "description": "",
+        "tags": [],
+        "type": "string",
+        "simplifiedType": "string",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "confirmPassword",
+        "description": "",
+        "tags": [],
+        "type": "boolean",
+        "simplifiedType": "boolean",
+        "required": false,
+        "deprecated": false
+      }
+    ]
+  }
+]

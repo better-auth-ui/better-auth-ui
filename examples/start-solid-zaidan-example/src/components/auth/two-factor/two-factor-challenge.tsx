@@ -1,4 +1,5 @@
 import {
+  AuthLink,
   sendTwoFactorOtpOptions,
   type TwoFactorAuthClient,
   useAuth,
@@ -8,7 +9,6 @@ import {
   verifyTwoFactorOtpOptions
 } from "@better-auth-ui/solid"
 import { createMutation } from "@tanstack/solid-query"
-import { Link } from "@tanstack/solid-router"
 import { createSignal, For, Show } from "solid-js"
 
 import { OtpField } from "@/components/auth/otp-field"
@@ -325,13 +325,12 @@ export function TwoFactorChallenge(props: TwoFactorChallengeProps) {
       </CardContent>
 
       <CardFooter class="justify-center">
-        <Link
+        <AuthLink
           class="text-sm underline underline-offset-4"
-          params={{ path: auth.viewPaths.auth.signIn }}
-          to="/auth/$path"
+          href={`${auth.basePaths.auth}/${auth.viewPaths.auth.signIn}`}
         >
           {twoFactorLocalization.backToSignIn}
-        </Link>
+        </AuthLink>
       </CardFooter>
     </Card>
   )

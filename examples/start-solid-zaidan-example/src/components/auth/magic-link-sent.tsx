@@ -3,8 +3,7 @@ import {
   type MagicLinkLocalization,
   magicLinkLocalization
 } from "@better-auth-ui/core/plugins"
-import { useAuth } from "@better-auth-ui/solid"
-import { Link } from "@tanstack/solid-router"
+import { AuthLink, useAuth } from "@better-auth-ui/solid"
 import { createSignal, onMount, Show } from "solid-js"
 import { isServer } from "solid-js/web"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -78,12 +77,11 @@ export function MagicLinkSent(props: MagicLinkSentProps) {
         <Show when={auth.emailAndPassword?.enabled}>
           <p class="mt-4 text-center text-muted-foreground text-sm">
             {auth.localization.auth.needToCreateAnAccount}{" "}
-            <Link
-              params={{ path: auth.viewPaths.auth.signUp }}
-              to="/auth/$path"
+            <AuthLink
+              href={`${auth.basePaths.auth}/${auth.viewPaths.auth.signUp}`}
             >
               {auth.localization.auth.signUp}
-            </Link>
+            </AuthLink>
           </p>
         </Show>
       </CardContent>

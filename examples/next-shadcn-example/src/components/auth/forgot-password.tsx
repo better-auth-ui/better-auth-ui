@@ -1,5 +1,6 @@
 "use client"
 
+import { getViewURL } from "@better-auth-ui/core"
 import {
   useAuth,
   useFetchOptions,
@@ -68,7 +69,11 @@ export function ForgotPassword({ className }: ForgotPasswordProps) {
     const formData = new FormData(e.currentTarget)
     requestPasswordReset({
       email: formData.get("email") as string,
-      redirectTo: `${baseURL}${basePaths.auth}/${viewPaths.auth.resetPassword}`,
+      redirectTo: getViewURL(
+        baseURL,
+        basePaths.auth,
+        viewPaths.auth.resetPassword
+      ),
       fetchOptions
     })
   }

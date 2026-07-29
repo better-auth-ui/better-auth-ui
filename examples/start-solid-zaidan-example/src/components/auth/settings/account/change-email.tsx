@@ -1,3 +1,4 @@
+import { getViewURL } from "@better-auth-ui/core"
 import { changeEmailOptions, useAuth, useSession } from "@better-auth-ui/solid"
 import { createMutation } from "@tanstack/solid-query"
 import { createSignal, Show } from "solid-js"
@@ -28,7 +29,11 @@ export function ChangeEmail(props: ChangeEmailProps = {}) {
     const formData = new FormData(event.currentTarget as HTMLFormElement)
 
     changeEmail.mutate({
-      callbackURL: `${auth.baseURL}/${auth.viewPaths.settings.account}`,
+      callbackURL: getViewURL(
+        auth.baseURL,
+        auth.basePaths.settings,
+        auth.viewPaths.settings.account
+      ),
       newEmail: String(formData.get("email") ?? "")
     } as Parameters<typeof changeEmail.mutate>[0])
   }

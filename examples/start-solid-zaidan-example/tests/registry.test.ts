@@ -1864,11 +1864,6 @@ describe("Solid registry isolation", () => {
     expect(userButton).toContain('width: "max-content"')
     expect(userButton).toContain("<Show when={session.data}>")
     expect(userButton).toContain("when={!session.isPending}")
-    expect(userButton).toContain(
-      'import { Link } from "@tanstack/solid-router"'
-    )
-    expect(userButton).toContain('to="/settings/$path"')
-    expect(userButton).toContain("params={{ path: settingsPath }}")
     expect(userButton).not.toContain('as="a"')
     expect(userButton).not.toContain(
       "disabled\n            >\n              <Settings"

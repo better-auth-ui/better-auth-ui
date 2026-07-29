@@ -1,7 +1,8 @@
 import { describe, expect, it } from "vitest"
 import {
   getAuthRedirectAction,
-  getSafeRedirectTo
+  getSafeRedirectTo,
+  getViewURL
 } from "../src/lib/auth-redirect"
 
 const origin = "https://app.example.com"
@@ -35,6 +36,18 @@ describe("getSafeRedirectTo", () => {
     ["/settings\n/account", "control characters"]
   ])("rejects %s (%s)", (target) => {
     expect(getSafeRedirectTo(target, origin)).toBe("/")
+  })
+})
+
+describe("getViewURL", () => {
+  it("combines an origin, custom base path, and view path", () => {
+    expect(getViewURL("https://example.com/", "/profile/", "/personal/")).toBe(
+      "https://example.com/profile/personal"
+    )
+  })
+
+  it("returns a root-relative path when no origin is configured", () => {
+    expect(getViewURL("", "/login", "new-password")).toBe("/login/new-password")
   })
 })
 

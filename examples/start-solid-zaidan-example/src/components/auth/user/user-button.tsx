@@ -1,5 +1,4 @@
-import { useAuth, useSession } from "@better-auth-ui/solid"
-import { Link } from "@tanstack/solid-router"
+import { AuthLink, useAuth, useSession } from "@better-auth-ui/solid"
 import {
   ChevronsUpDown,
   LogIn,
@@ -307,25 +306,23 @@ function MountedUserButton(rawProps: UserButtonProps = {}) {
                   <For each={userLinks()}>{renderUserLink}</For>
 
                   <DropdownMenuItem class="z-dropdown-menu-item-auth hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground data-expanded:bg-accent data-expanded:text-accent-foreground">
-                    <Link
+                    <AuthLink
                       class={menuLinkClass}
-                      params={{ path: signInPath }}
-                      to="/auth/$path"
+                      href={`${auth.basePaths.auth}/${signInPath}`}
                     >
                       <LogIn class="size-4 text-muted-foreground" />
                       {auth.localization.auth.signIn}
-                    </Link>
+                    </AuthLink>
                   </DropdownMenuItem>
 
                   <DropdownMenuItem class="z-dropdown-menu-item-auth hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground data-expanded:bg-accent data-expanded:text-accent-foreground">
-                    <Link
+                    <AuthLink
                       class={menuLinkClass}
-                      params={{ path: signUpPath }}
-                      to="/auth/$path"
+                      href={`${auth.basePaths.auth}/${signUpPath}`}
                     >
                       <UserPlus2 class="size-4 text-muted-foreground" />
                       {auth.localization.auth.signUp}
-                    </Link>
+                    </AuthLink>
                   </DropdownMenuItem>
                 </>
               }
@@ -334,14 +331,13 @@ function MountedUserButton(rawProps: UserButtonProps = {}) {
 
               <Show when={!props.hideSettings}>
                 <DropdownMenuItem class="z-dropdown-menu-item-auth hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground data-expanded:bg-accent data-expanded:text-accent-foreground">
-                  <Link
+                  <AuthLink
                     class={menuLinkClass}
-                    params={{ path: settingsPath }}
-                    to="/settings/$path"
+                    href={`${auth.basePaths.settings}/${settingsPath}`}
                   >
                     <Settings class="size-4 text-muted-foreground" />
                     {settingsLabel()}
-                  </Link>
+                  </AuthLink>
                 </DropdownMenuItem>
               </Show>
 
@@ -357,14 +353,13 @@ function MountedUserButton(rawProps: UserButtonProps = {}) {
               <DropdownMenuSeparator class="my-1 bg-border" />
 
               <DropdownMenuItem class="z-dropdown-menu-item-auth hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground data-expanded:bg-accent data-expanded:text-accent-foreground">
-                <Link
+                <AuthLink
                   class={menuLinkClass}
-                  params={{ path: signOutPath }}
-                  to="/auth/$path"
+                  href={`${auth.basePaths.auth}/${signOutPath}`}
                 >
                   <LogOut class="size-4 text-muted-foreground" />
                   {auth.localization.auth.signOut}
-                </Link>
+                </AuthLink>
               </DropdownMenuItem>
             </Show>
           </Show>
