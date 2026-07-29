@@ -19,7 +19,8 @@ const authClient = {} as AuthProviderProps["authClient"]
 function RetryQuery({ queryFn }: { queryFn: () => Promise<unknown> }) {
   useQuery({
     queryKey: retryQueryKey,
-    queryFn
+    queryFn,
+    retryDelay: 0
   })
 
   return null
@@ -48,7 +49,7 @@ function createQueryClient() {
 }
 
 describe("AuthProvider query defaults", () => {
-  it("does not retry auth queries that fail with a 4xx status", async () => {
+  it("does not retry permanent auth query failures", async () => {
     const queryClient = createQueryClient()
     const queryFn = vi
       .fn<() => Promise<unknown>>()
@@ -65,12 +66,14 @@ describe("AuthProvider query defaults", () => {
     expect(queryFn).toHaveBeenCalledOnce()
   })
 
-  it("retries other auth query failures three times", async () => {
+  it.each([
+    429, 500
+  ])("retries transient auth query status %s three times", async (status) => {
     const queryClient = createQueryClient()
     const queryFn = vi
       .fn<() => Promise<unknown>>()
       .mockRejectedValue(
-        Object.assign(new Error("Internal Server Error"), { status: 500 })
+        Object.assign(new Error("Transient error"), { status })
       )
 
     render(<RetryQuery queryFn={queryFn} />, {

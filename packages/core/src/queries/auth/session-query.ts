@@ -1,6 +1,7 @@
 import type { QueryClient, QueryOptions } from "@tanstack/query-core"
 import type { AuthClient, InferData } from "../../lib/auth-client"
 import { authQueryKeys } from "../../lib/auth-query-keys"
+import { createAuthQueryFetchOptions } from "../../lib/auth-query-retry"
 
 export type SessionData<TAuthClient extends AuthClient> = InferData<
   TAuthClient["getSession"]
@@ -36,7 +37,7 @@ export function sessionOptions<TAuthClient extends AuthClient>(
     queryFn: ({ signal }) =>
       authClient.getSession({
         ...params,
-        fetchOptions: { ...params?.fetchOptions, signal, throw: true }
+        fetchOptions: createAuthQueryFetchOptions(params?.fetchOptions, signal)
       }) as Promise<TData>
   } satisfies QueryOptions
 }

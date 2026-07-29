@@ -4,6 +4,7 @@ import {
   skipToken
 } from "@tanstack/query-core"
 import type { InferData } from "../../lib/auth-client"
+import { createAuthQueryFetchOptions } from "../../lib/auth-query-retry"
 import type { OAuthProviderAuthClient } from "./oauth-provider-auth-client"
 import { oauthProviderQueryKeys } from "./oauth-provider-query-keys"
 
@@ -49,7 +50,10 @@ export function publicOAuthClientOptions<
           authClient.oauth2.publicClient({
             ...params,
             query: { client_id: clientId },
-            fetchOptions: { ...params?.fetchOptions, signal, throw: true }
+            fetchOptions: createAuthQueryFetchOptions(
+              params?.fetchOptions,
+              signal
+            )
           }) as Promise<TData>
       : skipToken
   } satisfies QueryOptions

@@ -4,6 +4,7 @@ import {
   skipToken
 } from "@tanstack/query-core"
 import type { InferData } from "../../lib/auth-client"
+import { createAuthQueryFetchOptions } from "../../lib/auth-query-retry"
 import type { PasskeyAuthClient } from "./passkey-auth-client"
 import { passkeyQueryKeys } from "./passkey-query-keys"
 
@@ -57,7 +58,10 @@ export function listPasskeysOptions<TAuthClient extends PasskeyAuthClient>(
       ? ({ signal }) =>
           authClient.passkey.listUserPasskeys({
             ...params,
-            fetchOptions: { ...params?.fetchOptions, signal, throw: true }
+            fetchOptions: createAuthQueryFetchOptions(
+              params?.fetchOptions,
+              signal
+            )
           }) as Promise<TData>
       : skipToken
   } satisfies QueryOptions

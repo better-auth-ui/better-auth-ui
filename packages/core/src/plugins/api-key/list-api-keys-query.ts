@@ -4,6 +4,7 @@ import {
   skipToken
 } from "@tanstack/query-core"
 import type { InferData } from "../../lib/auth-client"
+import { createAuthQueryFetchOptions } from "../../lib/auth-query-retry"
 import type { ApiKeyAuthClient } from "./api-key-auth-client"
 import { apiKeyQueryKeys } from "./api-key-query-keys"
 
@@ -51,7 +52,10 @@ export function listApiKeysOptions<TAuthClient extends ApiKeyAuthClient>(
         ? ({ signal }) =>
             authClient.apiKey.list({
               ...params,
-              fetchOptions: { ...params?.fetchOptions, signal, throw: true }
+              fetchOptions: createAuthQueryFetchOptions(
+                params?.fetchOptions,
+                signal
+              )
             }) as Promise<TData>
         : skipToken
   } satisfies QueryOptions

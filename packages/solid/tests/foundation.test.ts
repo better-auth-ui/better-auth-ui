@@ -148,7 +148,11 @@ describe("@better-auth-ui/solid foundation", () => {
     ).resolves.toEqual({
       data: {
         query: { fresh: true },
-        fetchOptions: { credentials: "include", signal, throw: true }
+        fetchOptions: expect.objectContaining({
+          credentials: "include",
+          signal,
+          throw: true
+        })
       }
     })
   })

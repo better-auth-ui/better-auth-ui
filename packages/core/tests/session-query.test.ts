@@ -35,7 +35,11 @@ describe("core session query helpers", () => {
     ).resolves.toBe(data)
     expect(authClient.getSession).toHaveBeenCalledWith({
       query: { fresh: true },
-      fetchOptions: { credentials: "include", signal, throw: true }
+      fetchOptions: expect.objectContaining({
+        credentials: "include",
+        signal,
+        throw: true
+      })
     })
 
     const queryClient = {

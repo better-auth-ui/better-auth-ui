@@ -1,4 +1,9 @@
-import { basePaths, createAuthPlugin } from "@better-auth-ui/core"
+import {
+  authQueryKeys,
+  basePaths,
+  createAuthPlugin
+} from "@better-auth-ui/core"
+import { QueryClient } from "@tanstack/solid-query"
 import { renderToString } from "solid-js/web"
 import { describe, expect, it, vi } from "vitest"
 
@@ -19,6 +24,39 @@ function AuthConsumer() {
 const testPlugin = createAuthPlugin("test", (label: string) => ({ label }))
 
 describe("Solid AuthProvider render context", () => {
+  it("disables auth query retries during server rendering", () => {
+    const authClient = { getSession: vi.fn() }
+    const queryClient = new QueryClient()
+
+    renderToString(() => (
+      <AuthProvider
+        authClient={authClient as never}
+        queryClient={queryClient}
+      />
+    ))
+
+    const defaults = queryClient.getQueryDefaults(authQueryKeys.all)
+    const retry = defaults.retry
+
+    expect(typeof retry).toBe("function")
+    expect(
+      typeof retry === "function" &&
+        retry(0, Object.assign(new Error("Rate limited"), { status: 429 }))
+    ).toBe(false)
+
+    const retryDelay = defaults.retryDelay
+
+    expect(
+      typeof retryDelay === "function" &&
+        retryDelay(
+          0,
+          Object.assign(new Error("Rate limited"), {
+            retryAfterMs: 12_000
+          })
+        )
+    ).toBe(12_000)
+  })
+
   it("provides auth context to children that consume useAuth during SSR", () => {
     const authClient = { getSession: vi.fn() }
 

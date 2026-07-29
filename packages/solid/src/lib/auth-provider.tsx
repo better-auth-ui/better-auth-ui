@@ -1,5 +1,15 @@
-import type { AuthClient, AuthConfig, DeepPartial } from "@better-auth-ui/core"
-import { QueryClient, QueryClientProvider } from "@tanstack/solid-query"
+import {
+  type AuthClient,
+  type AuthConfig,
+  authQueryKeys,
+  createAuthQueryRetryOptions,
+  type DeepPartial
+} from "@better-auth-ui/core"
+import {
+  environmentManager,
+  QueryClient,
+  QueryClientProvider
+} from "@tanstack/solid-query"
 import { createContext, type JSX, useContext } from "solid-js"
 import { resolveAuthConfig } from "./auth-config"
 import { FetchOptionsProvider } from "./fetch-options-provider"
@@ -8,6 +18,10 @@ import { MutationInvalidator } from "./mutation-invalidator"
 const AuthContext = createContext<AuthConfig>()
 /** Provider-instance scoped config fallback for SSR — replaces the former module-level global. */
 const RenderingAuthConfigContext = createContext<AuthConfig>()
+
+const authQueryRetryOptions = createAuthQueryRetryOptions(() =>
+  environmentManager.isServer()
+)
 
 const fallbackQueryClient = new QueryClient({
   defaultOptions: {
@@ -34,6 +48,8 @@ export function AuthProvider<TAuthClient extends AuthClient = AuthClient>(
   const { children, queryClient: qc, ...configInput } = props
   const config = resolveAuthConfig(configInput)
   const queryClient = qc || fallbackQueryClient
+
+  queryClient.setQueryDefaults(authQueryKeys.all, authQueryRetryOptions)
 
   return (
     <AuthContext.Provider value={config}>

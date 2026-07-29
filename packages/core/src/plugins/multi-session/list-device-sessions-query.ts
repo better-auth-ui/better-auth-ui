@@ -4,6 +4,7 @@ import {
   skipToken
 } from "@tanstack/query-core"
 import type { InferData } from "../../lib/auth-client"
+import { createAuthQueryFetchOptions } from "../../lib/auth-query-retry"
 import type { MultiSessionAuthClient } from "./multi-session-auth-client"
 import { multiSessionQueryKeys } from "./multi-session-query-keys"
 
@@ -59,7 +60,10 @@ export function listDeviceSessionsOptions<
       ? ({ signal }) =>
           authClient.multiSession.listDeviceSessions({
             ...params,
-            fetchOptions: { ...params?.fetchOptions, signal, throw: true }
+            fetchOptions: createAuthQueryFetchOptions(
+              params?.fetchOptions,
+              signal
+            )
           }) as Promise<TData>
       : skipToken
   } satisfies QueryOptions

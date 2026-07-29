@@ -96,7 +96,11 @@ describe("core base endpoint option factories", () => {
     ).resolves.toEqual({ data: "acct-1" })
     expect(authClient.accountInfo).toHaveBeenCalledWith({
       query: { accountId: "acct-1" },
-      fetchOptions: { credentials: "include", signal, throw: true }
+      fetchOptions: expect.objectContaining({
+        credentials: "include",
+        signal,
+        throw: true
+      })
     })
 
     expect(accountInfoOptions(authClient as never).queryFn).toBe(skipToken)

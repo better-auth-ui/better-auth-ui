@@ -4,6 +4,7 @@ import {
   skipToken
 } from "@tanstack/query-core"
 import type { InferData } from "../../lib/auth-client"
+import { createAuthQueryFetchOptions } from "../../lib/auth-query-retry"
 import type { OrganizationAuthClient } from "./organization-auth-client"
 import { organizationQueryKeys } from "./organization-query-keys"
 
@@ -51,7 +52,7 @@ export function hasPermissionOptions<
         ? ({ signal }) =>
             authClient.organization.hasPermission({
               ...query,
-              fetchOptions: { ...fetchOptions, signal, throw: true }
+              fetchOptions: createAuthQueryFetchOptions(fetchOptions, signal)
             }) as Promise<TData>
         : skipToken
   } satisfies QueryOptions

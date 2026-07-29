@@ -3,6 +3,7 @@ import {
   type QueryOptions,
   skipToken
 } from "@tanstack/query-core"
+import { createAuthQueryFetchOptions } from "../../lib/auth-query-retry"
 import type { FullOrganizationParams } from "./full-organization-query"
 import type { ListOrganization } from "./list-organizations-query"
 import type { OrganizationAuthClient } from "./organization-auth-client"
@@ -123,7 +124,7 @@ export function activeOrganizationOptions<
       authClient.organization.getFullOrganization({
         ...params,
         query: effectiveQuery,
-        fetchOptions: { ...params?.fetchOptions, signal, throw: true }
+        fetchOptions: createAuthQueryFetchOptions(params?.fetchOptions, signal)
       } as ActiveOrganizationParams<TAuthClient>) as unknown as Promise<TData>
   })()
 

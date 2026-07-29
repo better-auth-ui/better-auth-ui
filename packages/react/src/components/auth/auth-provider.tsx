@@ -5,6 +5,7 @@ import {
   type AuthClient,
   type AuthConfig,
   authQueryKeys,
+  createAuthQueryRetryOptions,
   type DeepPartial,
   deepmerge,
   defaultAuthConfig
@@ -25,27 +26,9 @@ import { MutationInvalidator } from "../mutation-invalidator"
 import { AuthContext } from "./auth-context"
 import { FetchOptionsProvider } from "./fetch-options-provider"
 
-const DEFAULT_AUTH_QUERY_RETRY_COUNT = 3
-
-function retryAuthQuery(failureCount: number, error: unknown) {
-  if (environmentManager.isServer()) {
-    return false
-  }
-
-  const status =
-    typeof error === "object" &&
-    error !== null &&
-    "status" in error &&
-    typeof error.status === "number"
-      ? error.status
-      : undefined
-
-  if (status !== undefined && status >= 400 && status < 500) {
-    return false
-  }
-
-  return failureCount < DEFAULT_AUTH_QUERY_RETRY_COUNT
-}
+const authQueryRetryOptions = createAuthQueryRetryOptions(() =>
+  environmentManager.isServer()
+)
 
 const fallbackQueryClient = new QueryClient({
   defaultOptions: {
@@ -128,9 +111,10 @@ export function AuthProvider<TAuthClient extends AuthClient = AuthClient>({
   const configuredQueryClient = useMemo(() => {
     // Descendant queries resolve their defaults during render, so this
     // idempotent initialization must happen before they render.
-    resolvedQueryClient.setQueryDefaults(authQueryKeys.all, {
-      retry: retryAuthQuery
-    })
+    resolvedQueryClient.setQueryDefaults(
+      authQueryKeys.all,
+      authQueryRetryOptions
+    )
 
     return resolvedQueryClient
   }, [resolvedQueryClient])
