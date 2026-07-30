@@ -1,4 +1,7 @@
 export type * from "./lib/auth-server"
+export * from "./server/phone-verification/phone-verif-provider"
+export * from "./server/phone-verification/phone-verification-handler"
+export * from "./server/phone-verification/phone-verification-store"
 export * from "./server/queries/api-key/list-api-keys-query"
 export * from "./server/queries/auth/session-query"
 export * from "./server/queries/multi-session/list-device-sessions-query"

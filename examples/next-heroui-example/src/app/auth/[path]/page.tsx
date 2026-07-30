@@ -11,7 +11,14 @@ export default async function AuthPage({
 }) {
   const { path } = await params
 
-  if (!Object.values(viewPaths.auth).includes(path)) {
+  // Plugin-contributed views (e.g. phone-verification) aren't in the static
+  // viewPaths, so allow them explicitly.
+  const pluginPaths = ["phone-verification"]
+
+  if (
+    !Object.values(viewPaths.auth).includes(path) &&
+    !pluginPaths.includes(path)
+  ) {
     notFound()
   }
 

@@ -1,0 +1,205 @@
+---
+title: Phone Verification
+description: Add WhatsApp-based phone verification to your authentication flow.
+---
+
+import { Step, Steps } from 'fumadocs-ui/components/steps'
+
+The phone-verification plugin verifies phone number ownership without sending an SMS. The user sends a pre-filled WhatsApp message to a verification bot — via a QR code on desktop or a direct deep link on mobile — and the verified number is delivered to your backend through a signed webhook or polling.
+
+It contributes:
+
+- A `<PhoneVerification />` view at `/auth/phone-verification`
+- Composable `<PhoneVerificationStep />` and `<PhoneVerificationDialog />` components to insert verification anywhere in your flow
+- A `usePhoneVerification` hook orchestrating create → poll → success with timeout and retry
+- A server-side handler and provider (`@better-auth-ui/react/server`) that keep your API key off the client
+
+The default provider is [Phone Verif](https://phone-verif.com), but any service can be plugged in by implementing the `PhoneVerificationProvider` interface.
+
+## Setup
+
+<Steps>
+<Step>
+### Create the backend endpoint
+
+The browser never talks to the verification service directly — mount the handler on your backend and keep `PHONE_VERIF_API_KEY` as a server-side secret:
+
+```ts title="app/api/phone-verification/[[...route]]/route.ts"
+import {
+  createPhoneVerificationHandler, // [!code highlight]
+  phoneVerif // [!code highlight]
+} from "@better-auth-ui/react/server"
+
+export const { GET, POST, DELETE } = createPhoneVerificationHandler({
+  provider: phoneVerif({ apiKey: process.env.PHONE_VERIF_API_KEY }), // [!code highlight]
+  onVerified: async ({ sessionId, phoneNumber }) => {
+    // Persist the verified phone number (e.g. on the Better Auth user).
+  }
+})
+```
+
+The handler is built on Web `Request`/`Response`, so the same code works in Next.js route handlers, TanStack Start server routes, and any other Fetch-API runtime.
+
+</Step>
+<Step>
+### Register the UI plugin
+
+Pass `phoneVerificationPlugin()` to `<AuthProvider>`:
+
+```tsx title="components/providers.tsx"
+import { AuthProvider } from "@better-auth-ui/heroui"
+import { phoneVerificationPlugin } from "@better-auth-ui/heroui/plugins" // [!code highlight]
+
+<AuthProvider
+  authClient={authClient}
+  navigate={navigate}
+  plugins={[phoneVerificationPlugin()]} // [!code highlight]
+>
+  {children}
+</AuthProvider>
+```
+
+</Step>
+<Step>
+### Configure webhooks (recommended for production)
+
+Point your Phone Verif dashboard's webhook URL at `<endpoint>/webhook` (e.g. `/api/phone-verification/webhook`) and pass the signing secret so deliveries are verified with a timing-safe HMAC-SHA256 comparison:
+
+```ts title="app/api/phone-verification/[[...route]]/route.ts"
+export const { GET, POST, DELETE } = createPhoneVerificationHandler({
+  provider: phoneVerif({ apiKey: process.env.PHONE_VERIF_API_KEY }),
+  webhook: { secret: process.env.PHONE_VERIF_WEBHOOK_SECRET } // [!code highlight]
+})
+```
+
+With webhooks configured, status polls are answered from the handler's store as soon as the webhook lands. Without them, the handler transparently falls back to proxying polls to the provider — no client changes needed either way.
+
+The default store is in-memory; multi-instance deployments should pass a shared `store` implementation (e.g. Redis) so webhooks received by one instance are visible to the others.
+
+</Step>
+</Steps>
+
+## Components
+
+### `<PhoneVerification />`
+
+The card view rendered at `/auth/phone-verification` when the plugin is registered. Also usable standalone:
+
+```tsx
+import { PhoneVerification } from "@better-auth-ui/heroui/plugins"
+
+<PhoneVerification onVerified={({ phoneNumber }) => savePhone(phoneNumber)} />
+```
+
+<auto-type-table path="../../../../../../packages/heroui/src/components/auth/phone-verification/phone-verification.tsx" name="PhoneVerificationProps" />
+
+### `<PhoneVerificationStep />`
+
+The composable core — drop it after email sign-up, after social login, before account creation, or as an MFA challenge. It renders the full lifecycle: loading, pending (QR code on desktop, "Continue with WhatsApp" on mobile with automatic device detection), success with a reduced-motion-aware animation, and failure states with retry.
+
+```tsx
+import { PhoneVerificationStep } from "@better-auth-ui/heroui/plugins"
+
+<PhoneVerificationStep
+  onVerified={({ phoneNumber }) => savePhone(phoneNumber)}
+  onContinue={() => navigate("/welcome")}
+/>
+```
+
+<auto-type-table path="../../../../../../packages/heroui/src/components/auth/phone-verification/phone-verification-step.tsx" name="PhoneVerificationStepProps" />
+
+### `<PhoneVerificationDialog />`
+
+Verification in a dialog for mid-session flows (after social login, before a sensitive action). The session is only created while the dialog is open:
+
+```tsx
+import { PhoneVerificationDialog } from "@better-auth-ui/heroui/plugins"
+
+<PhoneVerificationDialog isOpen={isOpen} onOpenChange={setIsOpen} />
+```
+
+### `<PhoneVerificationPending />` / `<PhoneVerificationSuccess />`
+
+The individual states, exported for fully custom layouts driven by `usePhoneVerification`.
+
+## Hook
+
+`usePhoneVerification` powers all the components and is available for headless use:
+
+```tsx
+import { usePhoneVerification } from "@better-auth-ui/react"
+
+const {
+  status, // "idle" | "starting" | "pending" | "verified" | "expired" | "cancelled" | "timeout" | "failed"
+  session, // WhatsApp links once created
+  phoneNumber, // verified E.164 number
+  start,
+  retry,
+  cancel,
+  openWhatsApp
+} = usePhoneVerification({
+  onVerified: ({ phoneNumber }) => console.log(phoneNumber)
+})
+```
+
+Polling stops automatically once a terminal status is reached, keeps running while the page is backgrounded (the user is in WhatsApp), and resolves to `"timeout"` if the configured timeout elapses.
+
+## Flows
+
+Phone Verif supports three flow variants, selected via the plugin's `flow` option or per `<PhoneVerificationStep flow="...">`:
+
+- `phone` (default) — returns the verified phone number.
+- `login` — passwordless login; returns a stable provider `userId` and `isNewUser`.
+- `2fa` — second factor; pass the `userId` to match and read `matched` from the result.
+
+Enable non-default flows on the server too:
+
+```ts
+createPhoneVerificationHandler({
+  provider: phoneVerif({ apiKey: process.env.PHONE_VERIF_API_KEY }),
+  flows: ["phone", "2fa"]
+})
+```
+
+## Options
+
+```ts
+phoneVerificationPlugin({
+  // Backend endpoint the default client talks to. Default: "/api/phone-verification"
+  endpoint: "/api/phone-verification",
+  // Poll every 3 seconds while pending.
+  pollingInterval: 3000,
+  // Resolve to "timeout" after 5 minutes.
+  timeout: 300_000,
+  // QR code size in pixels.
+  qrSize: 192,
+  // Override any of the plugin's localization strings.
+  localization: {
+    continueWithWhatsApp: "Verify via WhatsApp"
+  }
+})
+```
+
+<auto-type-table path="../../../../../../packages/core/src/plugins/phone-verification/phone-verification-plugin.ts" name="PhoneVerificationPluginOptions" />
+
+## Localization
+
+<auto-type-table path="../../../../../../packages/core/src/plugins/phone-verification/phone-verification-localization.ts" name="PhoneVerificationLocalization" />
+
+Read these from `useAuthPlugin(phoneVerificationPlugin).localization` inside custom slot components.
+
+## Custom providers
+
+Implement `PhoneVerificationProvider` to integrate any verification service — or to mock the flow in demos and tests:
+
+```ts
+import type { PhoneVerificationProvider } from "@better-auth-ui/core/plugins"
+
+const myProvider: PhoneVerificationProvider = {
+  createVerification: async ({ sessionId }) => ({ /* ... */ }),
+  getVerificationStatus: async ({ sessionId }) => ({ /* ... */ }),
+  cancelVerification: async ({ sessionId }) => ({ sessionId, status: "cancelled" })
+}
+```
+
+Pass it to `createPhoneVerificationHandler({ provider })` on the server, or directly to `phoneVerificationPlugin({ client })` to replace the browser transport entirely.

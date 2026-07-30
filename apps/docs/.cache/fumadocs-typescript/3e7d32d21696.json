@@ -1,0 +1,99 @@
+[
+  {
+    "id": "phone-verification-step.tsx-PhoneVerificationStepProps",
+    "name": "PhoneVerificationStepProps",
+    "description": "",
+    "entries": [
+      {
+        "name": "className",
+        "description": "",
+        "tags": [],
+        "type": "string",
+        "simplifiedType": "string",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "flow",
+        "description": "Override the plugin's configured flow.",
+        "tags": [],
+        "type": "PhoneVerificationFlow",
+        "simplifiedType": "PhoneVerificationFlow",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "userId",
+        "description": "Provider user id (or linked external id) — required for the `\"2fa\"` flow.",
+        "tags": [],
+        "type": "string",
+        "simplifiedType": "string",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "callbackURL",
+        "description": "URL the user is sent back to after completing verification in WhatsApp.",
+        "tags": [],
+        "type": "string",
+        "simplifiedType": "string",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "qrSize",
+        "description": "Rendered size of the QR code in pixels. Defaults to the plugin's `qrSize`.",
+        "tags": [],
+        "type": "number",
+        "simplifiedType": "number",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "autoStart",
+        "description": "Start a verification session on mount.",
+        "tags": [{ "name": "default", "text": "true" }],
+        "type": "boolean",
+        "simplifiedType": "boolean",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "showCancel",
+        "description": "Show a cancel action while pending.",
+        "tags": [{ "name": "default", "text": "false" }],
+        "type": "boolean",
+        "simplifiedType": "boolean",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "onVerified",
+        "description": "Called once when the session reaches `\"verified\"`.",
+        "tags": [],
+        "type": "((result: PhoneVerificationResult) => void)",
+        "simplifiedType": "function",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "onError",
+        "description": "Called when a request fails (network, API, or provider error).",
+        "tags": [],
+        "type": "((error: PhoneVerificationError) => void)",
+        "simplifiedType": "function",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "onContinue",
+        "description": "Rendered as a \"Continue\" action on the success state.",
+        "tags": [],
+        "type": "(() => void)",
+        "simplifiedType": "function",
+        "required": false,
+        "deprecated": false
+      }
+    ]
+  }
+]

@@ -1,0 +1,101 @@
+[
+  {
+    "id": "phone-verification-plugin.ts-PhoneVerificationPluginOptions",
+    "name": "PhoneVerificationPluginOptions",
+    "description": "",
+    "entries": [
+      {
+        "name": "client",
+        "description": "Client used by hooks and components for all verification calls. Defaults\nto `createPhoneVerificationClient({ endpoint })`, which proxies through\nthe developer's backend — provide your own to swap the transport.",
+        "tags": [{ "name": "remarks", "text": "`PhoneVerificationProvider`" }],
+        "type": "PhoneVerificationProvider",
+        "simplifiedType": "PhoneVerificationProvider",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "endpoint",
+        "description": "Backend endpoint the default client talks to.",
+        "tags": [
+          { "name": "remarks", "text": "`string`" },
+          { "name": "default", "text": "\"/api/phone-verification\"" }
+        ],
+        "type": "string",
+        "simplifiedType": "string",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "flow",
+        "description": "Verification flow variant.",
+        "tags": [
+          { "name": "remarks", "text": "`\"phone\" | \"login\" | \"2fa\"`" },
+          { "name": "default", "text": "\"phone\"" }
+        ],
+        "type": "PhoneVerificationFlow",
+        "simplifiedType": "\"phone\" | \"login\" | \"2fa\"",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "pollingInterval",
+        "description": "Interval in milliseconds between status polls while pending.",
+        "tags": [
+          { "name": "remarks", "text": "`number`" },
+          { "name": "default", "text": "3000" }
+        ],
+        "type": "number",
+        "simplifiedType": "number",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "timeout",
+        "description": "Milliseconds before a pending verification resolves to `\"timeout\"`.",
+        "tags": [
+          { "name": "remarks", "text": "`number`" },
+          { "name": "default", "text": "300000" }
+        ],
+        "type": "number",
+        "simplifiedType": "number",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "qrSize",
+        "description": "Rendered size of the QR code in pixels.",
+        "tags": [
+          { "name": "remarks", "text": "`number`" },
+          { "name": "default", "text": "192" }
+        ],
+        "type": "number",
+        "simplifiedType": "number",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "localization",
+        "description": "Override the plugin's default localization strings.",
+        "tags": [
+          { "name": "remarks", "text": "`PhoneVerificationLocalization`" }
+        ],
+        "type": "PhoneVerificationLocalization",
+        "simplifiedType": "PhoneVerificationLocalization",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "path",
+        "description": "URL segment for the phone-verification view.",
+        "tags": [
+          { "name": "remarks", "text": "`string`" },
+          { "name": "default", "text": "\"phone-verification\"" }
+        ],
+        "type": "string",
+        "simplifiedType": "string",
+        "required": false,
+        "deprecated": false
+      }
+    ]
+  }
+]

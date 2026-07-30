@@ -1,0 +1,231 @@
+[
+  {
+    "id": "phone-verification-localization.ts-PhoneVerificationLocalization",
+    "name": "PhoneVerificationLocalization",
+    "description": "",
+    "entries": [
+      {
+        "name": "phoneVerification",
+        "description": "",
+        "tags": [{ "name": "remarks", "text": "`\"Phone verification\"`" }],
+        "type": "string",
+        "simplifiedType": "\"Phone verification\"",
+        "required": true,
+        "deprecated": false
+      },
+      {
+        "name": "whatsApp",
+        "description": "",
+        "tags": [{ "name": "remarks", "text": "`\"WhatsApp\"`" }],
+        "type": "string",
+        "simplifiedType": "\"WhatsApp\"",
+        "required": true,
+        "deprecated": false
+      },
+      {
+        "name": "verifyYourPhoneNumber",
+        "description": "",
+        "tags": [
+          { "name": "remarks", "text": "`\"Verify your phone number\"`" }
+        ],
+        "type": "string",
+        "simplifiedType": "\"Verify your phone number\"",
+        "required": true,
+        "deprecated": false
+      },
+      {
+        "name": "scanQrCodeDescription",
+        "description": "",
+        "tags": [
+          {
+            "name": "remarks",
+            "text": "`\"Scan the QR code with your phone, then send the pre-filled WhatsApp message to verify your number. No SMS needed.\"`"
+          }
+        ],
+        "type": "string",
+        "simplifiedType": "\"Scan the QR code with your phone, then send the pre-filled WhatsApp message to verify your number. No SMS needed.\"",
+        "required": true,
+        "deprecated": false
+      },
+      {
+        "name": "openWhatsAppDescription",
+        "description": "",
+        "tags": [
+          {
+            "name": "remarks",
+            "text": "`\"Tap the button below, then send the pre-filled WhatsApp message to verify your number. No SMS needed.\"`"
+          }
+        ],
+        "type": "string",
+        "simplifiedType": "\"Tap the button below, then send the pre-filled WhatsApp message to verify your number. No SMS needed.\"",
+        "required": true,
+        "deprecated": false
+      },
+      {
+        "name": "qrCodeLabel",
+        "description": "",
+        "tags": [
+          { "name": "remarks", "text": "`\"WhatsApp verification QR code\"`" }
+        ],
+        "type": "string",
+        "simplifiedType": "\"WhatsApp verification QR code\"",
+        "required": true,
+        "deprecated": false
+      },
+      {
+        "name": "continueWithWhatsApp",
+        "description": "",
+        "tags": [{ "name": "remarks", "text": "`\"Continue with WhatsApp\"`" }],
+        "type": "string",
+        "simplifiedType": "\"Continue with WhatsApp\"",
+        "required": true,
+        "deprecated": false
+      },
+      {
+        "name": "openWhatsApp",
+        "description": "",
+        "tags": [{ "name": "remarks", "text": "`\"Open WhatsApp\"`" }],
+        "type": "string",
+        "simplifiedType": "\"Open WhatsApp\"",
+        "required": true,
+        "deprecated": false
+      },
+      {
+        "name": "waitingForVerification",
+        "description": "",
+        "tags": [
+          {
+            "name": "remarks",
+            "text": "`\"Waiting for your WhatsApp message…\"`"
+          }
+        ],
+        "type": "string",
+        "simplifiedType": "\"Waiting for your WhatsApp message…\"",
+        "required": true,
+        "deprecated": false
+      },
+      {
+        "name": "phoneNumberVerified",
+        "description": "",
+        "tags": [{ "name": "remarks", "text": "`\"Phone number verified\"`" }],
+        "type": "string",
+        "simplifiedType": "\"Phone number verified\"",
+        "required": true,
+        "deprecated": false
+      },
+      {
+        "name": "phoneNumberVerifiedDescription",
+        "description": "",
+        "tags": [
+          {
+            "name": "remarks",
+            "text": "`\"Your phone number has been verified successfully.\"`"
+          }
+        ],
+        "type": "string",
+        "simplifiedType": "\"Your phone number has been verified successfully.\"",
+        "required": true,
+        "deprecated": false
+      },
+      {
+        "name": "verificationExpired",
+        "description": "",
+        "tags": [
+          { "name": "remarks", "text": "`\"This verification has expired\"`" }
+        ],
+        "type": "string",
+        "simplifiedType": "\"This verification has expired\"",
+        "required": true,
+        "deprecated": false
+      },
+      {
+        "name": "verificationFailed",
+        "description": "",
+        "tags": [
+          { "name": "remarks", "text": "`\"The verification failed\"`" }
+        ],
+        "type": "string",
+        "simplifiedType": "\"The verification failed\"",
+        "required": true,
+        "deprecated": false
+      },
+      {
+        "name": "verificationCancelled",
+        "description": "",
+        "tags": [
+          { "name": "remarks", "text": "`\"The verification was cancelled\"`" }
+        ],
+        "type": "string",
+        "simplifiedType": "\"The verification was cancelled\"",
+        "required": true,
+        "deprecated": false
+      },
+      {
+        "name": "verificationTimedOut",
+        "description": "",
+        "tags": [
+          { "name": "remarks", "text": "`\"The verification timed out\"`" }
+        ],
+        "type": "string",
+        "simplifiedType": "\"The verification timed out\"",
+        "required": true,
+        "deprecated": false
+      },
+      {
+        "name": "verificationError",
+        "description": "",
+        "tags": [
+          {
+            "name": "remarks",
+            "text": "`\"Something went wrong. Check your connection and try again.\"`"
+          }
+        ],
+        "type": "string",
+        "simplifiedType": "\"Something went wrong. Check your connection and try again.\"",
+        "required": true,
+        "deprecated": false
+      },
+      {
+        "name": "startNewVerification",
+        "description": "",
+        "tags": [
+          {
+            "name": "remarks",
+            "text": "`\"Start a new verification to continue.\"`"
+          }
+        ],
+        "type": "string",
+        "simplifiedType": "\"Start a new verification to continue.\"",
+        "required": true,
+        "deprecated": false
+      },
+      {
+        "name": "tryAgain",
+        "description": "",
+        "tags": [{ "name": "remarks", "text": "`\"Try again\"`" }],
+        "type": "string",
+        "simplifiedType": "\"Try again\"",
+        "required": true,
+        "deprecated": false
+      },
+      {
+        "name": "cancel",
+        "description": "",
+        "tags": [{ "name": "remarks", "text": "`\"Cancel\"`" }],
+        "type": "string",
+        "simplifiedType": "\"Cancel\"",
+        "required": true,
+        "deprecated": false
+      },
+      {
+        "name": "continue",
+        "description": "",
+        "tags": [{ "name": "remarks", "text": "`\"Continue\"`" }],
+        "type": "string",
+        "simplifiedType": "\"Continue\"",
+        "required": true,
+        "deprecated": false
+      }
+    ]
+  }
+]
