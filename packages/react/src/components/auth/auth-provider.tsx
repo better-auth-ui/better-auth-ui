@@ -7,7 +7,8 @@ import {
   createAuthQueryRetryOptions,
   type DeepPartial,
   deepmerge,
-  defaultAuthConfig
+  defaultAuthConfig,
+  type NavigateFn
 } from "@better-auth-ui/core"
 import {
   environmentManager,
@@ -57,7 +58,7 @@ export type AuthProviderProps<TAuthClient = AuthClient> = PropsWithChildren<
   DeepPartial<AuthConfig>
 > & {
   authClient: TAuthClient
-  navigate: (options: { to: string; replace?: boolean }) => void
+  navigate: NavigateFn
   /** TanStack QueryClient to use for your application's queries */
   queryClient?: QueryClient
 }
