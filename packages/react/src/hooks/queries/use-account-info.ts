@@ -22,7 +22,7 @@ export type UseAccountInfoOptions<TAuthClient extends AuthClient> = Omit<
  */
 export function useAccountInfo<TAuthClient extends AuthClient>(
   authClient: TAuthClient,
-  options: UseAccountInfoOptions<TAuthClient> = {},
+  options: UseAccountInfoOptions<TAuthClient>,
   queryClient?: QueryClient
 ) {
   const { data: session } = useSession(authClient, undefined, queryClient)

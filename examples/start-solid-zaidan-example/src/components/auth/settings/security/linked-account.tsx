@@ -80,7 +80,7 @@ export function LinkedAccountRow(props: {
   const auth = useAuth()
   const providerName = () => getProviderName(props.provider)
   const accountInfo = useAccountInfo(auth.authClient, () => ({
-    query: { accountId: props.account?.accountId ?? "" }
+    query: { accountId: props.account?.id ?? "" }
   }))
   const linkSocial = useLinkSocial(auth.authClient)
   const unlinkAccount = useUnlinkAccount(auth.authClient, () => ({
@@ -112,7 +112,7 @@ export function LinkedAccountRow(props: {
   }
   const unlinkProvider = (account: LinkedAccount) => {
     unlinkAccount.mutate({
-      providerId: account.providerId
+      accountId: account.id
     } as Parameters<typeof unlinkAccount.mutate>[0])
   }
 

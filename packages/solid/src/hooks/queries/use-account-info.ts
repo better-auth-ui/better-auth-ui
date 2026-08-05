@@ -19,15 +19,14 @@ export type UseAccountInfoOptions<TAuthClient extends AuthClient> = Accessor<
 
 export function useAccountInfo<TAuthClient extends AuthClient>(
   authClient: TAuthClient,
-  options?: UseAccountInfoOptions<TAuthClient>,
+  options: UseAccountInfoOptions<TAuthClient>,
   queryClient?: Accessor<QueryClient>
 ) {
   const session = useSession(authClient, undefined, queryClient)
   const userId = () => session.data?.user.id
 
   return useQuery(() => {
-    const { query, fetchOptions, initialData, ...queryOptions } =
-      options?.() ?? {}
+    const { query, fetchOptions, initialData, ...queryOptions } = options()
 
     return {
       ...accountInfoOptions(authClient, userId(), {

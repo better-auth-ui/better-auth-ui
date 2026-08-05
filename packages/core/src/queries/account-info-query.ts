@@ -33,22 +33,25 @@ export function accountInfoOptions<TAuthClient extends AuthClient>(
   params?: AccountInfoParams<TAuthClient>
 ) {
   type TData = AccountInfoData<TAuthClient>
-  const queryKey = authQueryKeys.accountInfo(userId, params?.query)
-
-  const canFetch = Boolean(userId && params?.query?.accountId)
+  const query = params?.query
+  const queryKey = authQueryKeys.accountInfo(userId, query)
 
   return {
     queryKey,
-    queryFn: canFetch
-      ? ({ signal }) =>
-          authClient.accountInfo({
-            ...params,
-            fetchOptions: createAuthQueryFetchOptions(
-              params?.fetchOptions,
-              signal
-            )
-          }) as Promise<TData>
-      : skipToken
+    queryFn:
+      userId &&
+      query &&
+      ("useAccountCookie" in query || Boolean(query.accountId))
+        ? ({ signal }) =>
+            authClient.accountInfo({
+              ...params,
+              query,
+              fetchOptions: createAuthQueryFetchOptions(
+                params?.fetchOptions,
+                signal
+              )
+            }) as Promise<TData>
+        : skipToken
   } satisfies QueryOptions
 }
 
@@ -61,7 +64,11 @@ export const ensureAccountInfo = <TAuthClient extends AuthClient>(
   const { fetchOptions, query, ...queryOptions } = options ?? {}
 
   return queryClient.ensureQueryData({
-    ...accountInfoOptions(authClient, userId, { query, fetchOptions }),
+    ...accountInfoOptions(
+      authClient,
+      userId,
+      query ? { query, fetchOptions } : undefined
+    ),
     ...queryOptions
   })
 }
@@ -75,7 +82,11 @@ export const prefetchAccountInfo = <TAuthClient extends AuthClient>(
   const { fetchOptions, query, ...queryOptions } = options ?? {}
 
   return queryClient.prefetchQuery({
-    ...accountInfoOptions(authClient, userId, { query, fetchOptions }),
+    ...accountInfoOptions(
+      authClient,
+      userId,
+      query ? { query, fetchOptions } : undefined
+    ),
     ...queryOptions
   })
 }
@@ -89,7 +100,11 @@ export const fetchAccountInfo = <TAuthClient extends AuthClient>(
   const { fetchOptions, query, ...queryOptions } = options ?? {}
 
   return queryClient.fetchQuery({
-    ...accountInfoOptions(authClient, userId, { query, fetchOptions }),
+    ...accountInfoOptions(
+      authClient,
+      userId,
+      query ? { query, fetchOptions } : undefined
+    ),
     ...queryOptions
   })
 }
