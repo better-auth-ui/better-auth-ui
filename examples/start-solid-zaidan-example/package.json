@@ -92,7 +92,7 @@
   "devDependencies": {
     "@tailwindcss/vite": "^4.3.2",
     "@testing-library/jest-dom": "^6.9.1",
-    "@types/node": "^26.1.0",
+    "@types/node": "^26.1.2",
     "drizzle-kit": "^0.31.10",
     "storybook": "^10.4.6",
     "storybook-solidjs-vite": "^10.5.2",

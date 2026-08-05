@@ -88,7 +88,7 @@
     "@better-auth/passkey": "1.7.0-rc.4",
     "@solidjs-email/main": "^2.0.0",
     "@tanstack/solid-query": "^5.101.2",
-    "@types/node": "^26.1.0",
+    "@types/node": "^26.1.2",
     "better-auth": "1.7.0-rc.4",
     "solid-js": "^1.9.14",
     "vite-plugin-solid": "^2.11.8",
