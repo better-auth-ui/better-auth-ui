@@ -32,7 +32,6 @@
     "@tanstack/react-pacer": "^0.22.1",
     "@tanstack/react-query": "^5.101.2",
     "@tanstack/react-router": "^1.170.21",
-    "@tanstack/react-router-devtools": "^1.167.1",
     "@tanstack/react-start": "^1.168.38",
     "@tanstack/start-static-server-functions": "^1.167.22",
     "better-auth": "1.7.0-rc.4",
