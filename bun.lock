@@ -93,7 +93,7 @@
         "@better-auth/passkey": "1.7.0-rc.4",
         "@heroui/react": "^3.2.1",
         "@heroui/styles": "^3.2.1",
-        "@marsidev/react-turnstile": "^1.5.0",
+        "@marsidev/react-turnstile": "^1.5.5",
         "@neondatabase/serverless": "^1.0.2",
         "@react-email/render": "^2.0.10",
         "@tailwindcss/vite": "^4.3.2",
@@ -107,7 +107,7 @@
         "better-auth": "1.7.0-rc.4",
         "drizzle-orm": "^0.45.2",
         "next-themes": "^0.4.6",
-        "nodemailer": "^9.0.3",
+        "nodemailer": "^9.0.4",
         "react": "^19.2.6",
         "react-dom": "^19.2.6",
         "react-email": "^6.6.8",
@@ -180,7 +180,7 @@
         "lucide-react": "^1.23.0",
         "next": "^16.2.10",
         "next-themes": "^0.4.6",
-        "nodemailer": "^9.0.3",
+        "nodemailer": "^9.0.4",
         "radix-ui": "^1.6.1",
         "react": "^19.2.6",
         "react-day-picker": "^10.0.1",
@@ -250,7 +250,7 @@
         "@better-auth/passkey": "1.7.0-rc.4",
         "@fontsource-variable/geist": "^5.2.9",
         "@fontsource-variable/inter": "^5.2.8",
-        "@marsidev/react-turnstile": "^1.5.0",
+        "@marsidev/react-turnstile": "^1.5.5",
         "@neondatabase/serverless": "^1.0.2",
         "@react-email/render": "^2.0.9",
         "@tailwindcss/vite": "^4.3.2",
@@ -271,7 +271,7 @@
         "input-otp": "^1.4.2",
         "lucide-react": "^1.23.0",
         "next-themes": "^0.4.6",
-        "nodemailer": "^9.0.3",
+        "nodemailer": "^9.0.4",
         "react": "^19.2.6",
         "react-day-picker": "^10.0.1",
         "react-dom": "^19.2.6",
@@ -307,7 +307,7 @@
         "@better-auth/passkey": "1.7.0-rc.4",
         "@fontsource-variable/geist": "^5.2.9",
         "@fontsource-variable/inter": "^5.2.8",
-        "@marsidev/react-turnstile": "^1.5.0",
+        "@marsidev/react-turnstile": "^1.5.5",
         "@neondatabase/serverless": "^1.0.2",
         "@react-email/render": "^2.0.9",
         "@tailwindcss/vite": "^4.3.2",
@@ -328,7 +328,7 @@
         "input-otp": "^1.4.2",
         "lucide-react": "^1.23.0",
         "next-themes": "^0.4.6",
-        "nodemailer": "^9.0.3",
+        "nodemailer": "^9.0.4",
         "radix-ui": "^1.6.1",
         "react": "^19.2.6",
         "react-day-picker": "^10.0.1",
@@ -1013,7 +1013,7 @@
 
     "@levischuck/tiny-cbor": ["@levischuck/tiny-cbor@0.2.11", "", {}, "sha512-llBRm4dT4Z89aRsm6u2oEZ8tfwL/2l6BwpZ7JcyieouniDECM5AqNgr/y08zalEIvW3RSK4upYyybDcmjXqAow=="],
 
-    "@marsidev/react-turnstile": ["@marsidev/react-turnstile@1.5.3", "", { "peerDependencies": { "react": "^17.0.2 || ^18.0.0 || ^19.0", "react-dom": "^17.0.2 || ^18.0.0 || ^19.0" } }, "sha512-8Dij2jiNGNczq1U4EKpO4do2XepcTPxSMc2ZzvHndO+gcp68tvMULm27z2P99rGkdB89hc3452NZeu2Rti4g6A=="],
+    "@marsidev/react-turnstile": ["@marsidev/react-turnstile@1.5.5", "", { "peerDependencies": { "react": "^17.0.2 || ^18.0.0 || ^19.0", "react-dom": "^17.0.2 || ^18.0.0 || ^19.0" } }, "sha512-+EtXbmsJwlRuIUruLb3UBAakpW0wFGeA17QQp0uG8Mv+Zh8MXktZT68P5HS2g1ssfeRd2+BZGupOE/F4KGajFQ=="],
 
     "@mdx-js/mdx": ["@mdx-js/mdx@3.1.1", "", { "dependencies": { "@types/estree": "^1.0.0", "@types/estree-jsx": "^1.0.0", "@types/hast": "^3.0.0", "@types/mdx": "^2.0.0", "acorn": "^8.0.0", "collapse-white-space": "^2.0.0", "devlop": "^1.0.0", "estree-util-is-identifier-name": "^3.0.0", "estree-util-scope": "^1.0.0", "estree-walker": "^3.0.0", "hast-util-to-jsx-runtime": "^2.0.0", "markdown-extensions": "^2.0.0", "recma-build-jsx": "^1.0.0", "recma-jsx": "^1.0.0", "recma-stringify": "^1.0.0", "rehype-recma": "^1.0.0", "remark-mdx": "^3.0.0", "remark-parse": "^11.0.0", "remark-rehype": "^11.0.0", "source-map": "^0.7.0", "unified": "^11.0.0", "unist-util-position-from-estree": "^2.0.0", "unist-util-stringify-position": "^4.0.0", "unist-util-visit": "^5.0.0", "vfile": "^6.0.0" } }, "sha512-f6ZO2ifpwAQIpzGWaBQT2TXxPv6z3RBzQKpVftEWN78Vl/YweF1uwussDx8ECAXVtr3Rs89fKyG9YlzUs9DyGQ=="],
 
@@ -2603,7 +2603,7 @@
 
     "node-releases": ["node-releases@2.0.51", "", {}, "sha512-wRNIrw4DmVLKQlbgOMdkMx27Wrpzes2hh5Jtbi2bjPd+4wJstWIqP5A+lscnqbm0xxmT5Bpg8Lec5ItEBwx6BQ=="],
 
-    "nodemailer": ["nodemailer@9.0.3", "", {}, "sha512-n+YP+NKwR5zRWa60k3GiQ6Q3B4KXCoAw40dAKeCtYn020iNN74aWK2liXIC3ZEATeGql7we3tE3t8QwhY0eskw=="],
+    "nodemailer": ["nodemailer@9.0.4", "", {}, "sha512-LmJNRVRtfSCULxcZpy0Cpg4WWenlUZ9+zbmTO+S7v9wD6XreYLjXRFtDjtV/4F0HT5p1GyZfA0Ux/myxHb18CQ=="],
 
     "normalize-path": ["normalize-path@3.0.0", "", {}, "sha512-6eZs5Ls3WtCisHWp9S2GUy8dqkpGi4BVSz3GaqiE6ezub0512ESztXUwUB6C6IKbQkY2Pnb/mD4WYojCRwcwLA=="],
 
