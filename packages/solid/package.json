@@ -91,7 +91,7 @@
     "@types/node": "^26.1.2",
     "better-auth": "1.7.0-rc.4",
     "solid-js": "^1.9.14",
-    "vite-plugin-solid": "^2.11.8",
+    "vite-plugin-solid": "^2.11.14",
     "vitest": "^4.1.9",
     "zod": "^4.4.3"
   },
