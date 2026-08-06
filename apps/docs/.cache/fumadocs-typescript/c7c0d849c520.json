@@ -1,0 +1,81 @@
+[
+  {
+    "id": "user-view.tsx-UserViewProps",
+    "name": "UserViewProps",
+    "description": "",
+    "entries": [
+      {
+        "name": "class",
+        "description": "",
+        "tags": [],
+        "type": "string",
+        "simplifiedType": "string",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "hideSubtitle",
+        "description": "",
+        "tags": [],
+        "type": "boolean",
+        "simplifiedType": "boolean",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "image",
+        "description": "",
+        "tags": [],
+        "type": "string | null",
+        "simplifiedType": "string | null",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "initials",
+        "description": "",
+        "tags": [],
+        "type": "string",
+        "simplifiedType": "string",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "isPending",
+        "description": "",
+        "tags": [],
+        "type": "boolean",
+        "simplifiedType": "boolean",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "label",
+        "description": "",
+        "tags": [],
+        "type": "string",
+        "simplifiedType": "string",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "secondaryLabel",
+        "description": "",
+        "tags": [],
+        "type": "string | null",
+        "simplifiedType": "string | null",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "user",
+        "description": "",
+        "tags": [],
+        "type": "AuthUser",
+        "simplifiedType": "AuthUser",
+        "required": false,
+        "deprecated": false
+      }
+    ]
+  }
+]

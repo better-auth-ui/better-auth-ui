@@ -1,0 +1,119 @@
+[
+  {
+    "id": "password-changed.tsx-PasswordChangedEmailProps",
+    "name": "PasswordChangedEmailProps",
+    "description": "Props for the PasswordChangedEmail component.",
+    "entries": [
+      {
+        "name": "email",
+        "description": "Email address of the user account",
+        "tags": [],
+        "type": "string",
+        "simplifiedType": "string",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "timestamp",
+        "description": "Timestamp when the password was changed",
+        "tags": [],
+        "type": "string",
+        "simplifiedType": "string",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "secureAccountURL",
+        "description": "URL to secure the account if unauthorized change occurred",
+        "tags": [],
+        "type": "string",
+        "simplifiedType": "string",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "appName",
+        "description": "Name of the application sending the email",
+        "tags": [],
+        "type": "string",
+        "simplifiedType": "string",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "supportEmail",
+        "description": "Support email address for security concerns",
+        "tags": [],
+        "type": "string",
+        "simplifiedType": "string",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "logoURL",
+        "description": "Logo URL(s) - a single string or light/dark variants. If omitted, no logo is shown.",
+        "tags": [],
+        "type": "string | { light: string; dark: string; }",
+        "simplifiedType": "string | { light: string; dark: string; }",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "classNames",
+        "description": "Custom CSS class names for styling specific parts of the email",
+        "tags": [],
+        "type": "EmailClassNames",
+        "simplifiedType": "EmailClassNames",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "colors",
+        "description": "Custom color scheme for light and dark modes",
+        "tags": [],
+        "type": "EmailColors",
+        "simplifiedType": "EmailColors",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "poweredBy",
+        "description": "Whether to show the \"Powered by better-auth\" footer",
+        "tags": [],
+        "type": "boolean",
+        "simplifiedType": "boolean",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "darkMode",
+        "description": "Whether to enable dark mode support",
+        "tags": [],
+        "type": "boolean",
+        "simplifiedType": "boolean",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "head",
+        "description": "Additional React nodes to inject into the email head",
+        "tags": [],
+        "type": "ReactNode",
+        "simplifiedType": "ReactNode",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "localization",
+        "description": "Localization overrides for customizing email text",
+        "tags": [
+          { "name": "remarks", "text": "`PasswordChangedEmailLocalization`" }
+        ],
+        "type": "Partial<{ YOUR_PASSWORD_HAS_BEEN_CHANGED: string; LOGO: string; PASSWORD_CHANGED_SUCCESSFULLY: string; PASSWORD_FOR_YOUR_ACCOUNT_CHANGED: string; CHANGED_AT: string; IF_YOU_MADE_THIS_CHANGE: string; I_DIDNT_MAKE_THIS_CHANGE: string; EMAIL_SENT_BY: string; IF_YOU_DIDNT_AUTHORIZE_THIS_CHANGE: string; POWERED_BY_BETTER_AUTH: string; }>",
+        "simplifiedType": "PasswordChangedEmailLocalization",
+        "required": false,
+        "deprecated": false
+      }
+    ]
+  }
+]

@@ -1,4 +1,4 @@
-import { OrganizationInvitations } from "@better-auth-ui/heroui/plugins"
+import { OrganizationInvitations } from "@better-auth-ui/heroui/plugins/organization"
 
 import { OrganizationDemoWrapper } from "./organization-demo-wrapper"
 

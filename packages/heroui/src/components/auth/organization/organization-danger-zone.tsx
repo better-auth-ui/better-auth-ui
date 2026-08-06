@@ -1,8 +1,6 @@
-import {
-  type OrganizationAuthClient,
-  useAuth,
-  useHasPermission
-} from "@better-auth-ui/react"
+import type { OrganizationAuthClient } from "@better-auth-ui/core/plugins/organization"
+import { useAuth } from "@better-auth-ui/react"
+import { useHasPermission } from "@better-auth-ui/react/plugins/organization"
 import { Card, type CardProps, cn } from "@heroui/react"
 import type { ComponentProps } from "react"
 

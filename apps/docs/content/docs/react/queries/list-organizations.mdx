@@ -8,9 +8,9 @@ Organization queries require `organizationClient()` on your Better Auth client. 
 ## Usage
 
 ```tsx
-import { useAuth, useListOrganizations } from "@better-auth-ui/react"
+import { authClient } from "@/lib/auth-client"
+import { useListOrganizations } from "@better-auth-ui/react/plugins/organization"
 
-const { authClient } = useAuth()
 const result = useListOrganizations(authClient)
 ```
 
@@ -22,7 +22,7 @@ import {
   fetchListOrganizations,
   listOrganizationsOptions,
   prefetchListOrganizations
-} from "@better-auth-ui/react"
+} from "@better-auth-ui/core/plugins/organization"
 
 const options = listOrganizationsOptions(authClient, userId)
 await ensureListOrganizations(queryClient, authClient, userId)
@@ -38,10 +38,10 @@ const organizations = await fetchListOrganizations(queryClient, authClient, user
 
 ## Server-side prefetching
 
-For server loaders, import from `@better-auth-ui/react/server`. The server helper uses your Better Auth server instance and the signed-in `userId` so the cache key stays partitioned per user.
+For server loaders, import from `@better-auth-ui/core/plugins/organization/server`. The server helper uses your Better Auth server instance and the signed-in `userId` so the cache key stays partitioned per user.
 
 ```ts
-import { ensureListOrganizations } from "@better-auth-ui/react/server"
+import { ensureListOrganizations } from "@better-auth-ui/core/plugins/organization/server"
 import { getRequestHeaders } from "@tanstack/react-start/server"
 
 import { auth } from "@/lib/auth"
@@ -53,4 +53,4 @@ await ensureListOrganizations(queryClient, auth, userId, {
 
 ## Params
 
-<auto-type-table path="../../../../../../packages/react/src/queries/organization/list-organizations-query.ts" name="ListOrganizationsParams" />
+<auto-type-table path="../../../../../../packages/core/src/plugins/organization/list-organizations-query.ts" name="ListOrganizationsParams" />

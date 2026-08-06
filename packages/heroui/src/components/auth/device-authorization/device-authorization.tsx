@@ -1,13 +1,13 @@
-import type { DeviceAuthorizationLocalization } from "@better-auth-ui/core/plugins"
+import type {
+  DeviceAuthorizationAuthClient,
+  DeviceAuthorizationLocalization
+} from "@better-auth-ui/core/plugins/device-authorization"
+import { useAuth, useAuthPlugin, useSession } from "@better-auth-ui/react"
 import {
-  type DeviceAuthorizationAuthClient,
   useApproveDevice,
-  useAuth,
-  useAuthPlugin,
   useDenyDevice,
-  useSession,
   useVerifyDeviceCode
-} from "@better-auth-ui/react"
+} from "@better-auth-ui/react/plugins/device-authorization"
 import { Check, CircleCheck, CircleXmark, Xmark } from "@gravity-ui/icons"
 import {
   Button,

@@ -8,7 +8,7 @@ Requires `deviceAuthorizationClient()` from `better-auth/client/plugins`. Verifi
 ## Usage
 
 ```tsx
-import { useVerifyDeviceCode } from "@better-auth-ui/react"
+import { useVerifyDeviceCode } from "@better-auth-ui/react/plugins/device-authorization"
 
 const verifyDeviceCode = useVerifyDeviceCode(authClient)
 
@@ -24,11 +24,11 @@ The returned `status` indicates whether the request still needs approval or has 
 ## Options factory
 
 ```ts
-import { verifyDeviceCodeOptions } from "@better-auth-ui/react"
+import { verifyDeviceCodeOptions } from "@better-auth-ui/core/plugins/device-authorization"
 
 const options = verifyDeviceCodeOptions(authClient)
 ```
 
 ## Params
 
-<auto-type-table path="../../../../../../packages/react/src/mutations/device-authorization/verify-device-code-mutation.ts" name="VerifyDeviceCodeParams" />
+<auto-type-table path="../../../../../../packages/core/src/plugins/device-authorization/verify-device-code-mutation.ts" name="VerifyDeviceCodeParams" />

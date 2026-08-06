@@ -1,0 +1,36 @@
+[
+  {
+    "id": "reset-password-mutation.ts-ResetPasswordParams",
+    "name": "ResetPasswordParams",
+    "description": "",
+    "entries": [
+      {
+        "name": "token",
+        "description": "",
+        "tags": [],
+        "type": "string",
+        "simplifiedType": "string",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "newPassword",
+        "description": "",
+        "tags": [],
+        "type": "string",
+        "simplifiedType": "string",
+        "required": true,
+        "deprecated": false
+      },
+      {
+        "name": "fetchOptions",
+        "description": "",
+        "tags": [],
+        "type": "ClientFetchOption<Partial<{ newPassword: string; token?: string; }> & Record<string, any>, Partial<{ token?: string; }> & Record<string, any>, Record<string, any>>",
+        "simplifiedType": "ClientFetchOption<Record<string, any> & Partial<object>, Record<string, any> & Partial<object>, union>",
+        "required": false,
+        "deprecated": false
+      }
+    ]
+  }
+]

@@ -2,7 +2,7 @@ import { renderToString } from "solid-js/web"
 import { describe, expect, it, vi } from "vitest"
 
 import { AuthProvider, useFetchOptions } from "../src"
-import { type CaptchaRenderProps, captchaPlugin } from "../src/plugins"
+import { type CaptchaRenderProps, captchaPlugin } from "../src/plugins/captcha"
 
 function FetchOptionsConsumer() {
   const { fetchOptions, setFetchOptions, registerReset, resetFetchOptions } =

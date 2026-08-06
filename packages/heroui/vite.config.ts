@@ -28,7 +28,21 @@ export default defineConfig({
       entry: {
         index: "src/index.tsx",
         email: "src/email.ts",
-        plugins: "src/plugins.ts"
+        plugins: "src/plugins.ts",
+        "plugins/admin/index": "src/plugins/admin/index.ts",
+        "plugins/api-key/index": "src/plugins/api-key/index.ts",
+        "plugins/delete-user/index": "src/plugins/delete-user/index.ts",
+        "plugins/device-authorization/index":
+          "src/plugins/device-authorization/index.ts",
+        "plugins/email-otp/index": "src/plugins/email-otp/index.ts",
+        "plugins/magic-link/index": "src/plugins/magic-link/index.ts",
+        "plugins/multi-session/index": "src/plugins/multi-session/index.ts",
+        "plugins/oauth-provider/index": "src/plugins/oauth-provider/index.ts",
+        "plugins/organization/index": "src/plugins/organization/index.ts",
+        "plugins/passkey/index": "src/plugins/passkey/index.ts",
+        "plugins/theme/index": "src/plugins/theme/index.ts",
+        "plugins/two-factor/index": "src/plugins/two-factor/index.ts",
+        "plugins/username/index": "src/plugins/username/index.ts"
       },
       formats: ["es"]
     },

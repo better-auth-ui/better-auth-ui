@@ -1,0 +1,50 @@
+import type { MutationOptions } from "@tanstack/query-core"
+import type { BetterFetchError } from "better-auth/client"
+import type { OrganizationAuthClient } from "./organization-auth-client"
+import { organizationMutationKeys } from "./organization-mutation-keys"
+import { organizationQueryKeys } from "./organization-query-keys"
+
+export type CreateOrganizationParams<
+  TAuthClient extends OrganizationAuthClient = OrganizationAuthClient
+> = Parameters<TAuthClient["organization"]["create"]>[0]
+
+export type CreateOrganizationOptions<
+  TAuthClient extends OrganizationAuthClient = OrganizationAuthClient
+> = Omit<
+  ReturnType<typeof createOrganizationOptions<TAuthClient>>,
+  "mutationKey" | "mutationFn" | "meta"
+>
+
+/**
+ * Mutation options factory for creating an organization.
+ *
+ * @param authClient - The Better Auth organization client.
+ * @param userId - The current signed-in user's ID. Used for cache invalidation.
+ */
+export function createOrganizationOptions<
+  TAuthClient extends OrganizationAuthClient
+>(authClient: TAuthClient, userId?: string) {
+  const mutationKey = organizationMutationKeys.create
+
+  const mutationFn = (params: CreateOrganizationParams<TAuthClient>) =>
+    authClient.organization.create({
+      ...params,
+      fetchOptions: { ...params?.fetchOptions, throw: true }
+    })
+
+  return {
+    mutationKey,
+    mutationFn,
+    meta: {
+      awaits: [organizationQueryKeys.lists(userId)],
+      invalidates: [
+        organizationQueryKeys.fullDetails(userId),
+        organizationQueryKeys.activeOrganizations(userId)
+      ]
+    }
+  } as MutationOptions<
+    Awaited<ReturnType<typeof mutationFn>>,
+    BetterFetchError,
+    Parameters<typeof mutationFn>[0]
+  >
+}

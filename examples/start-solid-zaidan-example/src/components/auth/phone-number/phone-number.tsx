@@ -1,16 +1,17 @@
+import type { PhoneNumberAuthClient } from "@better-auth-ui/core/plugins/phone-number"
 import {
   AuthLink,
+  type AuthPlugin,
   AuthPrompts,
-  type PhoneNumberAuthClient,
-  sendPhoneNumberOtpOptions,
-  signInPhoneNumberOptions,
   useAuth,
   useAuthPlugin,
-  useFetchOptions,
-  verifyPhoneNumberOptions
+  useFetchOptions
 } from "@better-auth-ui/solid"
-import type { AuthPlugin } from "@better-auth-ui/solid/plugins"
-import { createMutation } from "@tanstack/solid-query"
+import {
+  useSendPhoneNumberOtp,
+  useSignInPhoneNumber,
+  useVerifyPhoneNumber
+} from "@better-auth-ui/solid/plugins/phone-number"
 import type { BetterFetchError } from "better-auth/client"
 import { type Component, createSignal, For, Show } from "solid-js"
 
@@ -77,21 +78,18 @@ export function PhoneNumber(props: PhoneNumberProps) {
   const [passwordError, setPasswordError] = createSignal<string>()
   const [code, setCode] = createSignal("")
   const [codeSent, setCodeSent] = createSignal(false)
-  const sendOtp = createMutation(() => ({
-    ...sendPhoneNumberOtpOptions(phoneClient()),
+  const sendOtp = useSendPhoneNumberOtp(phoneClient(), () => ({
     onError: () => resetFetchOptions(),
     onSuccess: () => {
       setCodeSent(true)
       startCooldown()
     }
   }))
-  const verify = createMutation(() => ({
-    ...verifyPhoneNumberOptions(phoneClient()),
+  const verify = useVerifyPhoneNumber(phoneClient(), () => ({
     onError: () => setCode(""),
     onSuccess: (data) => continueSignIn(data)
   }))
-  const signInWithPassword = createMutation(() => ({
-    ...signInPhoneNumberOptions(phoneClient()),
+  const signInWithPassword = useSignInPhoneNumber(phoneClient(), () => ({
     onError: (error) => {
       setPassword("")
       resetFetchOptions()

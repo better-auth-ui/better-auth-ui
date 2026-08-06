@@ -1,9 +1,8 @@
 import {
   generateBackupCodesOptions,
-  type TwoFactorAuthClient,
-  useAuth,
-  useAuthPlugin
-} from "@better-auth-ui/solid"
+  type TwoFactorAuthClient
+} from "@better-auth-ui/core/plugins/two-factor"
+import { useAuth, useAuthPlugin } from "@better-auth-ui/solid"
 import { createMutation } from "@tanstack/solid-query"
 import { KeyRound } from "lucide-solid"
 import { createSignal, Show } from "solid-js"

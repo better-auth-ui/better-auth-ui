@@ -6,24 +6,24 @@ description: Invite a member to an organization.
 ## Usage
 
 ```tsx
-import { useInviteMember } from "@better-auth-ui/solid"
+import { useInviteMember } from "@better-auth-ui/solid/plugins/organization"
 
 const mutation = useInviteMember(authClient)
 
 mutation.mutate(/* params */)
 ```
 
-Organization mutations require `organizationClient()` on the Better Auth client. They attach the same `meta.invalidates` / `meta.awaits` cache metadata used by upstream React, and the Solid `AuthProvider` installs a mutation invalidator that refreshes affected organization/session caches after successful auth mutations.
+Organization mutations require `organizationClient()` on the Better Auth client. They attach the same `meta.invalidates` / `meta.awaits` cache metadata used by the shared React implementation, and the Solid `AuthProvider` installs a mutation invalidator that refreshes affected organization/session caches after successful auth mutations.
 
 ## Options factory
 
 ```tsx
-import { inviteMemberOptions } from "@better-auth-ui/solid"
-import { createMutation } from "@tanstack/solid-query"
+import { inviteMemberOptions } from "@better-auth-ui/core/plugins/organization"
+import { useMutation } from "@tanstack/solid-query"
 
-const mutation = createMutation(() => inviteMemberOptions(authClient))
+const mutation = useMutation(() => inviteMemberOptions(authClient))
 ```
 
 ## Params
 
-<auto-type-table path="../../../../../../packages/solid/src/mutations/organization/invite-member-mutation.ts" name="InviteMemberParams" />
+<auto-type-table path="../../../../../../packages/core/src/plugins/organization/invite-member-mutation.ts" name="InviteMemberParams" />

@@ -8,11 +8,9 @@ Refetches the session on success. Send the code with `useSendVerificationOtp({ t
 ## Usage
 
 ```tsx
-import {
-  type EmailOtpAuthClient,
-  useAuth,
-  useSignInEmailOtp
-} from "@better-auth-ui/react"
+import type { EmailOtpAuthClient } from "@better-auth-ui/core/plugins/email-otp"
+import { useAuth } from "@better-auth-ui/react"
+import { useSignInEmailOtp } from "@better-auth-ui/react/plugins/email-otp"
 
 const { authClient } = useAuth()
 const { mutate: signInEmailOtp } = useSignInEmailOtp(
@@ -30,7 +28,7 @@ signInEmailOtp({
 ## Options factory
 
 ```tsx
-import { signInEmailOtpOptions } from "@better-auth-ui/react"
+import { signInEmailOtpOptions } from "@better-auth-ui/core/plugins/email-otp"
 import { useMutation } from "@tanstack/react-query"
 
 const { mutate } = useMutation(signInEmailOtpOptions(authClient))
@@ -38,4 +36,4 @@ const { mutate } = useMutation(signInEmailOtpOptions(authClient))
 
 ## Params
 
-<auto-type-table path="../../../../../../packages/react/src/mutations/email-otp/sign-in-email-otp-mutation.ts" name="SignInEmailOtpParams" />
+<auto-type-table path="../../../../../../packages/core/src/plugins/email-otp/sign-in-email-otp-mutation.ts" name="SignInEmailOtpParams" />

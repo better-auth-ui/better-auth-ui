@@ -1,5 +1,5 @@
 import { UserButton } from "@better-auth-ui/heroui"
-import { OrganizationSwitcher } from "@better-auth-ui/heroui/plugins"
+import { OrganizationSwitcher } from "@better-auth-ui/heroui/plugins/organization"
 import { Link } from "@heroui/react"
 
 import { Logo } from "./logo"

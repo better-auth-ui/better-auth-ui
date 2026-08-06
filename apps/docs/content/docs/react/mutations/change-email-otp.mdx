@@ -8,11 +8,9 @@ The address on the session changes, so the session query is refetched on success
 ## Usage
 
 ```tsx
-import {
-  type EmailOtpAuthClient,
-  useAuth,
-  useChangeEmailOtp
-} from "@better-auth-ui/react"
+import type { EmailOtpAuthClient } from "@better-auth-ui/core/plugins/email-otp"
+import { useAuth } from "@better-auth-ui/react"
+import { useChangeEmailOtp } from "@better-auth-ui/react/plugins/email-otp"
 
 const { authClient } = useAuth()
 const { mutate: changeEmailOtp } = useChangeEmailOtp(
@@ -30,7 +28,7 @@ changeEmailOtp({
 ## Options factory
 
 ```tsx
-import { changeEmailOtpOptions } from "@better-auth-ui/react"
+import { changeEmailOtpOptions } from "@better-auth-ui/core/plugins/email-otp"
 import { useMutation } from "@tanstack/react-query"
 
 const { mutate } = useMutation(changeEmailOtpOptions(authClient))
@@ -38,4 +36,4 @@ const { mutate } = useMutation(changeEmailOtpOptions(authClient))
 
 ## Params
 
-<auto-type-table path="../../../../../../packages/react/src/mutations/email-otp/change-email-otp-mutation.ts" name="ChangeEmailOtpParams" />
+<auto-type-table path="../../../../../../packages/core/src/plugins/email-otp/change-email-otp-mutation.ts" name="ChangeEmailOtpParams" />

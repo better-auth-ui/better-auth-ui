@@ -111,13 +111,13 @@ adminPlugin({
 ## Mutation API
 
 ```tsx
-import { stopImpersonatingOptions } from "@better-auth-ui/solid"
+import { useStopImpersonating } from "@better-auth-ui/solid/plugins/admin"
 
-const stopImpersonating = stopImpersonatingOptions(authClient)
+const stopImpersonating = useStopImpersonating(authClient)
 ```
 
-Use the options when you need the same behavior outside the copied user button.
-They restore the admin session and await invalidation of the shared session
+Use the hook when you need the same behavior outside the copied user button.
+It restores the admin session and awaits invalidation of the shared session
 query.
 
 See the [Solid package reference](/docs/solid) for the shared query and

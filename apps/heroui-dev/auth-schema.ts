@@ -49,6 +49,7 @@ export const accounts = pgTable(
   "accounts",
   {
     id: text("id").primaryKey(),
+    issuer: text("issuer").notNull(),
     accountId: text("account_id").notNull(),
     providerId: text("provider_id").notNull(),
     userId: text("user_id")
@@ -66,7 +67,13 @@ export const accounts = pgTable(
       .$onUpdate(() => /* @__PURE__ */ new Date())
       .notNull(),
   },
-  (table) => [index("accounts_userId_idx").on(table.userId)],
+  (table) => [
+    uniqueIndex("accounts_issuer_accountId_uidx").on(
+      table.issuer,
+      table.accountId,
+    ),
+    index("accounts_userId_idx").on(table.userId),
+  ],
 );
 
 export const verifications = pgTable(
@@ -125,18 +132,26 @@ export const twoFactors = pgTable(
   ],
 );
 
-export const deviceCodes = pgTable("device_codes", {
-  id: text("id").primaryKey(),
-  deviceCode: text("device_code").notNull(),
-  userCode: text("user_code").notNull(),
-  userId: text("user_id"),
-  expiresAt: timestamp("expires_at").notNull(),
-  status: text("status").notNull(),
-  lastPolledAt: timestamp("last_polled_at"),
-  pollingInterval: integer("polling_interval"),
-  clientId: text("client_id"),
-  scope: text("scope"),
-});
+export const deviceCodes = pgTable(
+  "device_codes",
+  {
+    id: text("id").primaryKey(),
+    deviceCode: text("device_code").notNull(),
+    userCode: text("user_code").notNull(),
+    userId: text("user_id"),
+    expiresAt: timestamp("expires_at").notNull(),
+    status: text("status").notNull(),
+    lastPolledAt: timestamp("last_polled_at"),
+    pollingInterval: integer("polling_interval"),
+    clientId: text("client_id"),
+    scope: text("scope"),
+    resource: text("resource"),
+  },
+  (table) => [
+    index("device_codes_deviceCode_idx").on(table.deviceCode),
+    index("device_codes_userCode_idx").on(table.userCode),
+  ],
+);
 
 export const apikeys = pgTable(
   "apikeys",

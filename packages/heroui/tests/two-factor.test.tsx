@@ -18,6 +18,7 @@ function createMockAuthClient(signInResult: SignInResult = {}) {
   const verifyOtp = vi.fn(async () => ({ token: "session-token" }))
   const verifyBackupCode = vi.fn(async () => ({ token: "session-token" }))
   const enable = vi.fn(async () => ({
+    method: "totp" as const,
     totpURI: "otpauth://totp/App:user@example.com?secret=SECRET123&issuer=App",
     backupCodes: ["code-1", "code-2"]
   }))
@@ -221,7 +222,7 @@ describe("<TwoFactorSettings />", () => {
 
     await waitFor(() => {
       expect(authClient.twoFactor.enable).toHaveBeenCalledWith(
-        expect.objectContaining({ password: "password123" })
+        expect.objectContaining({ method: "totp", password: "password123" })
       )
     })
 

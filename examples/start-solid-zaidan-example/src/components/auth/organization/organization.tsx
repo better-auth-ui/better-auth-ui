@@ -1,5 +1,6 @@
-import type { OrganizationAuthClient } from "@better-auth-ui/solid"
-import { useActiveOrganization, useAuth } from "@better-auth-ui/solid"
+import type { OrganizationAuthClient } from "@better-auth-ui/core/plugins/organization"
+import { useAuth } from "@better-auth-ui/solid"
+import { useActiveOrganization } from "@better-auth-ui/solid/plugins/organization"
 import { Settings as SettingsIcon, Users as UsersIcon } from "lucide-solid"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -14,14 +15,12 @@ export type OrganizationProps = {
 }
 
 export function Organization(props: OrganizationProps) {
-  const auth = useAuth()
+  const auth = useAuth<OrganizationAuthClient>()
   const organizationPluginConfig = () =>
     auth.plugins.find((plugin) => plugin.id === organizationPlugin.id) as
       | { slugPrefix?: string }
       | undefined
-  const activeOrganization = useActiveOrganization(
-    auth.authClient as OrganizationAuthClient
-  )
+  const activeOrganization = useActiveOrganization(auth.authClient)
 
   const handlePathChange = (path: string) => {
     if (!props.slug) return

@@ -1,0 +1,18 @@
+[
+  {
+    "id": "organizations.tsx-OrganizationsProps",
+    "name": "OrganizationsProps",
+    "description": "",
+    "entries": [
+      {
+        "name": "variant",
+        "description": "",
+        "tags": [],
+        "type": "\"default\" | \"secondary\" | \"tertiary\" | \"transparent\"",
+        "simplifiedType": "\"default\" | \"secondary\" | \"tertiary\" | \"transparent\"",
+        "required": false,
+        "deprecated": false
+      }
+    ]
+  }
+]

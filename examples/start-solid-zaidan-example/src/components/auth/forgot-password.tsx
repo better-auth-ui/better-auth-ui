@@ -1,12 +1,11 @@
 import { getViewURL } from "@better-auth-ui/core"
 import {
   AuthLink,
-  requestPasswordResetOptions,
+  type AuthPlugin,
   useAuth,
-  useFetchOptions
+  useFetchOptions,
+  useRequestPasswordReset
 } from "@better-auth-ui/solid"
-import type { AuthPlugin } from "@better-auth-ui/solid/plugins"
-import { createMutation } from "@tanstack/solid-query"
 import { createSignal, Show } from "solid-js"
 import { RESET_LINK_SENT_STORAGE_KEY } from "@/components/auth/reset-link-sent"
 import { Alert, AlertDescription } from "@/components/ui/alert"
@@ -26,8 +25,7 @@ export function ForgotPassword(props: ForgotPasswordProps) {
   const { fetchOptions, resetFetchOptions } = useFetchOptions()
   const [email, setEmail] = createSignal("")
   const [emailError, setEmailError] = createSignal<string>()
-  const requestReset = createMutation(() => ({
-    ...requestPasswordResetOptions(auth.authClient),
+  const requestReset = useRequestPasswordReset(auth.authClient, () => ({
     onError: () => {
       resetFetchOptions()
     },

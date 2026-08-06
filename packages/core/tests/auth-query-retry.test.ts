@@ -10,17 +10,19 @@ import {
 type ErrorContext = Parameters<NonNullable<BetterFetchOption["onError"]>>[0]
 
 describe("auth query retry policy", () => {
-  it.each([
-    408, 429, 500, 502, 503, 504
-  ])("retries transient HTTP status %s", (status) => {
-    expect(isRetryableAuthQueryError({ status })).toBe(true)
-  })
+  it.each([408, 429, 500, 502, 503, 504])(
+    "retries transient HTTP status %s",
+    (status) => {
+      expect(isRetryableAuthQueryError({ status })).toBe(true)
+    }
+  )
 
-  it.each([
-    400, 401, 403, 404, 409, 422, 501
-  ])("does not retry permanent HTTP status %s", (status) => {
-    expect(isRetryableAuthQueryError({ status })).toBe(false)
-  })
+  it.each([400, 401, 403, 404, 409, 422, 501])(
+    "does not retry permanent HTTP status %s",
+    (status) => {
+      expect(isRetryableAuthQueryError({ status })).toBe(false)
+    }
+  )
 
   it("retries failures without an HTTP response", () => {
     expect(isRetryableAuthQueryError(new TypeError("Failed to fetch"))).toBe(

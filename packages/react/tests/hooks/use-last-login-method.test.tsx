@@ -1,4 +1,4 @@
-import { lastLoginMethodPlugin } from "@better-auth-ui/core/plugins"
+import { lastLoginMethodPlugin } from "@better-auth-ui/core/plugins/last-login-method"
 import { renderHook } from "@testing-library/react"
 import type { PropsWithChildren } from "react"
 import { describe, expect, it, vi } from "vitest"

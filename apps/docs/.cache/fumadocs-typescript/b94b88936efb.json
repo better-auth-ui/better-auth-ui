@@ -1,0 +1,54 @@
+[
+  {
+    "id": "invite-member-mutation.ts-InviteMemberParams",
+    "name": "InviteMemberParams",
+    "description": "",
+    "entries": [
+      {
+        "name": "email",
+        "description": "The email address of the user\nto invite",
+        "tags": [],
+        "type": "string",
+        "simplifiedType": "string",
+        "required": true,
+        "deprecated": false
+      },
+      {
+        "name": "organizationId",
+        "description": "The organization ID to invite\nthe user to",
+        "tags": [],
+        "type": "string",
+        "simplifiedType": "string",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "role",
+        "description": "The role to assign to the user",
+        "tags": [],
+        "type": "OrganizationInvitationRole<{ ac: AccessControl<{ readonly organization: readonly [\"update\", \"delete\"]; readonly member: readonly [\"create\", \"update\", \"delete\"]; readonly invitation: readonly [\"create\", \"cancel\"]; readonly team: readonly [\"create\", \"update\", \"delete\"]; readonly ac: readonly [\"create\", \"read\", \"update\", \"delete\"]; }>; roles: { admin: Role; member: Role; owner: Role; }; teams: { enabled: false; }; schema: unknown; dynamicAccessControl: { enabled: false; }; }> | OrganizationInvitationRole<{ ac: AccessControl<{ readonly organization: readonly [\"update\", \"delete\"]; readonly member: readonly [\"create\", \"update\", \"delete\"]; readonly invitation: readonly [\"create\", \"cancel\"]; readonly team: readonly [\"create\", \"update\", \"delete\"]; readonly ac: readonly [\"create\", \"read\", \"update\", \"delete\"]; }>; roles: { admin: Role; member: Role; owner: Role; }; teams: { enabled: false; }; schema: unknown; dynamicAccessControl: { enabled: false; }; }>[]",
+        "simplifiedType": "OrganizationInvitationRole<{ ac: AccessControl<{ readonly organization: readonly [\"update\", \"delete\"]; readonly member: readonly [\"create\", \"update\", \"delete\"]; readonly invitation: readonly [\"create\", \"cancel\"]; readonly team: readonly [\"create\", \"update\", \"delete\"]; readonly ac: readonly [\"create\", \"read\", \"update\", \"delete\"]; }>; roles: { admin: Role; member: Role; owner: Role; }; teams: { enabled: false; }; schema: unknown; dynamicAccessControl: { enabled: false; }; }> | OrganizationInvitationRole<{ ac: AccessControl<{ readonly organization: readonly [\"update\", \"delete\"]; readonly member: readonly [\"create\", \"update\", \"delete\"]; readonly invitation: readonly [\"create\", \"cancel\"]; readonly team: readonly [\"create\", \"update\", \"delete\"]; readonly ac: readonly [\"create\", \"read\", \"update\", \"delete\"]; }>; roles: { admin: Role; member: Role; owner: Role; }; teams: { enabled: false; }; schema: unknown; dynamicAccessControl: { enabled: false; }; }>[]",
+        "required": true,
+        "deprecated": false
+      },
+      {
+        "name": "resend",
+        "description": "Resend the invitation email, if\nthe user is already invited",
+        "tags": [],
+        "type": "boolean",
+        "simplifiedType": "boolean",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "fetchOptions",
+        "description": "",
+        "tags": [],
+        "type": "ClientFetchOption<Record<string, any> & Partial<object>, Record<string, any> & Partial<Record<string, any>>, union>",
+        "simplifiedType": "ClientFetchOption<Record<string, any> & Partial<object>, Record<string, any> & Partial<Record<string, any>>, union>",
+        "required": false,
+        "deprecated": false
+      }
+    ]
+  }
+]

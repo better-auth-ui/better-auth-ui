@@ -1,12 +1,9 @@
 "use client"
 
 import { getAuthLinkURL } from "@better-auth-ui/core"
-import {
-  type EmailOtpAuthClient,
-  useAuth,
-  useAuthPlugin,
-  useResetPasswordOtp
-} from "@better-auth-ui/react"
+import type { EmailOtpAuthClient } from "@better-auth-ui/core/plugins/email-otp"
+import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
+import { useResetPasswordOtp } from "@better-auth-ui/react/plugins/email-otp"
 import { Eye, EyeOff } from "lucide-react"
 import { type SyntheticEvent, useEffect, useRef, useState } from "react"
 import { toast } from "sonner"

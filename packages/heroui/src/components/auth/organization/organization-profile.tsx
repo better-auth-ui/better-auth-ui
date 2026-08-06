@@ -1,10 +1,9 @@
+import type { OrganizationAuthClient } from "@better-auth-ui/core/plugins/organization"
+import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
 import {
-  type OrganizationAuthClient,
   useActiveOrganization,
-  useAuth,
-  useAuthPlugin,
   useUpdateOrganization
-} from "@better-auth-ui/react"
+} from "@better-auth-ui/react/plugins/organization"
 import {
   Button,
   Card,

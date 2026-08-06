@@ -1,11 +1,8 @@
 "use client"
 
-import {
-  type PasskeyAuthClient,
-  useAddPasskey,
-  useAuth,
-  useAuthPlugin
-} from "@better-auth-ui/react"
+import type { PasskeyAuthClient } from "@better-auth-ui/core/plugins/passkey"
+import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
+import { useAddPasskey } from "@better-auth-ui/react/plugins/passkey"
 import { Fingerprint } from "lucide-react"
 import type { SyntheticEvent } from "react"
 import { Button, buttonVariants } from "@/components/ui/button"
@@ -32,12 +29,10 @@ export function AddPasskeyDialog({
   open,
   onOpenChange
 }: AddPasskeyDialogProps) {
-  const { authClient, localization } = useAuth()
+  const { authClient, localization } = useAuth<PasskeyAuthClient>()
   const { localization: passkeyLocalization } = useAuthPlugin(passkeyPlugin)
 
-  const { mutate: addPasskey, isPending: isAdding } = useAddPasskey(
-    authClient as PasskeyAuthClient
-  )
+  const { mutate: addPasskey, isPending: isAdding } = useAddPasskey(authClient)
 
   const handleSubmit = (e: SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault()

@@ -1,12 +1,9 @@
 "use client"
 
 import { authMutationKeys } from "@better-auth-ui/core"
-import {
-  type AnonymousAuthClient,
-  useAuth,
-  useAuthPlugin,
-  useSignInAnonymous
-} from "@better-auth-ui/react"
+import type { AnonymousAuthClient } from "@better-auth-ui/core/plugins/anonymous"
+import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
+import { useSignInAnonymous } from "@better-auth-ui/react/plugins/anonymous"
 import { useIsMutating } from "@tanstack/react-query"
 import { UserRound } from "lucide-react"
 

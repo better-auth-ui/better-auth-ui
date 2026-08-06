@@ -1,21 +1,25 @@
-import { twoFactorMutationKeys } from "@better-auth-ui/core/plugins"
-import type { TwoFactorAuthClient } from "../../lib/auth-client"
-import { createAuthMutationOptions } from "../create-auth-mutation"
+import {
+  type SendTwoFactorOtpOptions,
+  sendTwoFactorOtpOptions,
+  type TwoFactorAuthClient
+} from "@better-auth-ui/core/plugins/two-factor"
+import { type QueryClient, useMutation } from "@tanstack/solid-query"
+import type { Accessor } from "solid-js"
 
-export type SendTwoFactorOtpParams<TAuthClient extends TwoFactorAuthClient> =
-  Parameters<TAuthClient["twoFactor"]["sendOtp"]>[0]
-
-/**
- * Mutation options factory for emailing the second-factor code.
- *
- * Authenticated by the two-factor cookie Better Auth set during sign-in, so
- * it only works while a challenge is pending.
- */
-export function sendTwoFactorOtpOptions<
+export type UseSendTwoFactorOtpOptions<
   TAuthClient extends TwoFactorAuthClient
->(authClient: TAuthClient) {
-  return createAuthMutationOptions(
-    authClient.twoFactor.sendOtp,
-    twoFactorMutationKeys.sendOtp
+> = Accessor<SendTwoFactorOtpOptions<TAuthClient>>
+
+export function useSendTwoFactorOtp<TAuthClient extends TwoFactorAuthClient>(
+  authClient: TAuthClient,
+  options?: UseSendTwoFactorOtpOptions<TAuthClient>,
+  queryClient?: Accessor<QueryClient>
+) {
+  return useMutation(
+    () => ({
+      ...sendTwoFactorOtpOptions(authClient),
+      ...(options?.() ?? {})
+    }),
+    queryClient
   )
 }

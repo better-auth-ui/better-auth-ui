@@ -2,18 +2,16 @@
 
 import {
   type OAuthAuthorizationRequest,
+  type OAuthProviderAuthClient,
   parseOAuthAuthorizationRequest,
   resolveOAuthScopeMetadata,
   sanitizeOAuthClientUrl
-} from "@better-auth-ui/core/plugins"
+} from "@better-auth-ui/core/plugins/oauth-provider"
+import { useAuth, useAuthPlugin, useSession } from "@better-auth-ui/react"
 import {
-  type OAuthProviderAuthClient,
-  useAuth,
-  useAuthPlugin,
   useOAuthConsent,
-  usePublicOAuthClient,
-  useSession
-} from "@better-auth-ui/react"
+  usePublicOAuthClient
+} from "@better-auth-ui/react/plugins/oauth-provider"
 import { Check, Shield } from "@gravity-ui/icons"
 import {
   Avatar,

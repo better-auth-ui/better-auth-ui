@@ -76,7 +76,7 @@ bunx --bun shadcn@latest add @better-auth-ui/one-tap
 Pass `oneTapPlugin()` to your copied `<AuthProvider>`. The prompt opens on sign-in by default.
 
 ```tsx title="components/providers.tsx"
-import { oneTapPlugin } from "@better-auth-ui/react/plugins" // [!code highlight]
+import { oneTapPlugin } from "@better-auth-ui/react/plugins/one-tap" // [!code highlight]
 
 <AuthProvider
   authClient={authClient}
@@ -125,7 +125,7 @@ oneTapPlugin({
 })
 ```
 
-<auto-type-table path="../../../../../../packages/react/src/plugins/one-tap-plugin.tsx" name="OneTapPluginOptions" />
+<auto-type-table path="../../../../../../packages/react/src/plugins/one-tap/one-tap-plugin.tsx" name="OneTapPluginOptions" />
 
 <Callout title="Better Auth 1.7">
 The integration supports the stricter One Tap responses in Better Auth 1.7. Errors such as `EMAIL_NOT_VERIFIED` are sent through the normal authentication error handler instead of being hidden.

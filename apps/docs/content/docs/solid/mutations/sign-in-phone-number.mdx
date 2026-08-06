@@ -1,21 +1,18 @@
 ---
-title: signInPhoneNumberOptions
-description: Create a Solid mutation for phone number and password sign-in.
+title: useSignInPhoneNumber
+description: Sign in with a phone number and password.
 ---
 
-## Options factory
+## Usage
 
 ```tsx
-import {
-  type PhoneNumberAuthClient,
-  signInPhoneNumberOptions,
-  useAuth
-} from "@better-auth-ui/solid"
-import { createMutation } from "@tanstack/solid-query"
+import type { PhoneNumberAuthClient } from "@better-auth-ui/core/plugins/phone-number"
+import { useAuth } from "@better-auth-ui/solid"
+import { useSignInPhoneNumber } from "@better-auth-ui/solid/plugins/phone-number"
 
 const { authClient } = useAuth()
-const signIn = createMutation(() =>
-  signInPhoneNumberOptions(authClient as PhoneNumberAuthClient)
+const signIn = useSignInPhoneNumber(
+  authClient as PhoneNumberAuthClient
 )
 
 signIn.mutate({
@@ -27,6 +24,15 @@ signIn.mutate({
 
 With Better Auth `requireVerification`, an unverified credential returns `PHONE_NUMBER_NOT_VERIFIED` and starts verification.
 
+## Options factory
+
+```tsx
+import { signInPhoneNumberOptions } from "@better-auth-ui/core/plugins/phone-number"
+import { useMutation } from "@tanstack/solid-query"
+
+const signIn = useMutation(() => signInPhoneNumberOptions(authClient))
+```
+
 ## Params
 
-<auto-type-table path="../../../../../../packages/solid/src/mutations/phone-number/sign-in-phone-number-mutation.ts" name="SignInPhoneNumberParams" />
+<auto-type-table path="../../../../../../packages/core/src/plugins/phone-number/sign-in-phone-number-mutation.ts" name="SignInPhoneNumberParams" />

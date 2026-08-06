@@ -1,0 +1,18 @@
+[
+  {
+    "id": "organization-people.tsx-OrganizationPeopleProps",
+    "name": "OrganizationPeopleProps",
+    "description": "",
+    "entries": [
+      {
+        "name": "class",
+        "description": "",
+        "tags": [],
+        "type": "string",
+        "simplifiedType": "string",
+        "required": false,
+        "deprecated": false
+      }
+    ]
+  }
+]

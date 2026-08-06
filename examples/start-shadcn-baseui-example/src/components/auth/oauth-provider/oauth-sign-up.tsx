@@ -1,17 +1,16 @@
 "use client"
 
+import type { OAuthProviderAuthClient } from "@better-auth-ui/core/plugins/oauth-provider"
 import {
   hasOAuthPrompt,
   type OAuthAuthorizationRequest,
   parseOAuthAuthorizationRequest
-} from "@better-auth-ui/core/plugins"
+} from "@better-auth-ui/core/plugins/oauth-provider"
+import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
 import {
-  type OAuthProviderAuthClient,
-  useAuth,
-  useAuthPlugin,
   useOAuthContinue,
   usePublicOAuthClient
-} from "@better-auth-ui/react"
+} from "@better-auth-ui/react/plugins/oauth-provider"
 import { useEffect, useState } from "react"
 
 import { Button } from "@/components/ui/button"

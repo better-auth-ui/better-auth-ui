@@ -8,11 +8,9 @@ One endpoint backs every email-OTP flow. `type` picks which one: `"sign-in"`, `"
 ## Usage
 
 ```tsx
-import {
-  type EmailOtpAuthClient,
-  useAuth,
-  useSendVerificationOtp
-} from "@better-auth-ui/react"
+import type { EmailOtpAuthClient } from "@better-auth-ui/core/plugins/email-otp"
+import { useAuth } from "@better-auth-ui/react"
+import { useSendVerificationOtp } from "@better-auth-ui/react/plugins/email-otp"
 
 const { authClient } = useAuth()
 const { mutate: sendVerificationOtp } = useSendVerificationOtp(
@@ -30,7 +28,7 @@ sendVerificationOtp({
 ## Options factory
 
 ```tsx
-import { sendVerificationOtpOptions } from "@better-auth-ui/react"
+import { sendVerificationOtpOptions } from "@better-auth-ui/core/plugins/email-otp"
 import { useMutation } from "@tanstack/react-query"
 
 const { mutate } = useMutation(sendVerificationOtpOptions(authClient))
@@ -38,4 +36,4 @@ const { mutate } = useMutation(sendVerificationOtpOptions(authClient))
 
 ## Params
 
-<auto-type-table path="../../../../../../packages/react/src/mutations/email-otp/send-verification-otp-mutation.ts" name="SendVerificationOtpParams" />
+<auto-type-table path="../../../../../../packages/core/src/plugins/email-otp/send-verification-otp-mutation.ts" name="SendVerificationOtpParams" />

@@ -1,4 +1,4 @@
-import { API_KEY_EXPIRATION_SECONDS_PER_DAY } from "@better-auth-ui/core/plugins"
+import { API_KEY_EXPIRATION_SECONDS_PER_DAY } from "@better-auth-ui/core/plugins/api-key"
 import { render, screen, waitFor } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { useState } from "react"

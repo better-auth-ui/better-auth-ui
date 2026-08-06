@@ -40,9 +40,9 @@ const resolveSecondaryLabel = (
 
 export function UserView(props: UserViewProps) {
   const auth = useAuth()
-  const session = useSession(auth.authClient, {
+  const session = useSession(auth.authClient, () => ({
     enabled: !props.user && !props.isPending && !props.label
-  })
+  }))
   const sessionPending = () => session.isPending
   const resolvedUser = () =>
     props.user ?? (session.data?.user as AuthUser | undefined)

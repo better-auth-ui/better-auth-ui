@@ -11,7 +11,6 @@ const config = defineConfig({
   },
   resolve: {
     tsconfigPaths: true,
-    noExternal: ["@gravity-ui/icons"],
     // Resolve workspace `@better-auth-ui/*` packages to their `src/` entrypoints
     // via the `src` export condition for hot reload during local development.
     // This mirrors `customConditions: ["src"]` in the monorepo's tsconfig and

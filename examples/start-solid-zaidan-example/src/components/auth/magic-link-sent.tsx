@@ -2,7 +2,7 @@ import {
   magicLinkPlugin as coreMagicLinkPlugin,
   type MagicLinkLocalization,
   magicLinkLocalization
-} from "@better-auth-ui/core/plugins"
+} from "@better-auth-ui/core/plugins/magic-link"
 import { AuthLink, useAuth } from "@better-auth-ui/solid"
 import { createSignal, onMount, Show } from "solid-js"
 import { isServer } from "solid-js/web"

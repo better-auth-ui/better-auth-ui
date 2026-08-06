@@ -8,8 +8,8 @@ Requires `oauthProviderClient()` from `@better-auth/oauth-provider/client`. Read
 ## Usage
 
 ```tsx
-import { parseOAuthAuthorizationRequest } from "@better-auth-ui/core/plugins"
-import { usePublicOAuthClient } from "@better-auth-ui/react"
+import { parseOAuthAuthorizationRequest } from "@better-auth-ui/core/plugins/oauth-provider"
+import { usePublicOAuthClient } from "@better-auth-ui/react/plugins/oauth-provider"
 
 const { clientId } = parseOAuthAuthorizationRequest(window.location.search)
 const client = usePublicOAuthClient(authClient, clientId)
@@ -25,7 +25,7 @@ import {
   fetchPublicOAuthClient,
   prefetchPublicOAuthClient,
   publicOAuthClientOptions
-} from "@better-auth-ui/react"
+} from "@better-auth-ui/core/plugins/oauth-provider"
 
 const options = publicOAuthClientOptions(authClient, clientId)
 await ensurePublicOAuthClient(queryClient, authClient, clientId)
@@ -35,4 +35,4 @@ const client = await fetchPublicOAuthClient(queryClient, authClient, clientId)
 
 ## Params
 
-<auto-type-table path="../../../../../../packages/react/src/queries/oauth-provider/public-oauth-client-query.ts" name="PublicOAuthClientParams" />
+<auto-type-table path="../../../../../../packages/core/src/plugins/oauth-provider/public-oauth-client-query.ts" name="PublicOAuthClientParams" />

@@ -8,11 +8,9 @@ Authenticated by the two-factor cookie Better Auth set during sign-in, so it onl
 ## Usage
 
 ```tsx
-import {
-  type TwoFactorAuthClient,
-  useAuth,
-  useSendTwoFactorOtp
-} from "@better-auth-ui/react"
+import type { TwoFactorAuthClient } from "@better-auth-ui/core/plugins/two-factor"
+import { useAuth } from "@better-auth-ui/react"
+import { useSendTwoFactorOtp } from "@better-auth-ui/react/plugins/two-factor"
 
 const { authClient } = useAuth()
 const { mutate: sendTwoFactorOtp } = useSendTwoFactorOtp(
@@ -27,7 +25,7 @@ sendTwoFactorOtp()
 ## Options factory
 
 ```tsx
-import { sendTwoFactorOtpOptions } from "@better-auth-ui/react"
+import { sendTwoFactorOtpOptions } from "@better-auth-ui/core/plugins/two-factor"
 import { useMutation } from "@tanstack/react-query"
 
 const { mutate } = useMutation(sendTwoFactorOtpOptions(authClient))
@@ -35,4 +33,4 @@ const { mutate } = useMutation(sendTwoFactorOtpOptions(authClient))
 
 ## Params
 
-<auto-type-table path="../../../../../../packages/react/src/mutations/two-factor/send-two-factor-otp-mutation.ts" name="SendTwoFactorOtpParams" />
+<auto-type-table path="../../../../../../packages/core/src/plugins/two-factor/send-two-factor-otp-mutation.ts" name="SendTwoFactorOtpParams" />

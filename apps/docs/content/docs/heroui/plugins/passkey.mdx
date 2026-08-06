@@ -56,7 +56,7 @@ Pass `passkeyPlugin()` to `<AuthProvider>`:
 
 ```tsx title="components/providers.tsx"
 import { AuthProvider } from "@better-auth-ui/heroui"
-import { passkeyPlugin } from "@better-auth-ui/heroui/plugins" // [!code highlight]
+import { passkeyPlugin } from "@better-auth-ui/heroui/plugins/passkey" // [!code highlight]
 
 <AuthProvider
   authClient={authClient}
@@ -81,7 +81,7 @@ A "Continue with Passkey" button is automatically rendered on the `<SignIn />` a
 **Usage**
 
 ```tsx
-import { PasskeyButton } from "@better-auth-ui/heroui/plugins"
+import { PasskeyButton } from "@better-auth-ui/heroui/plugins/passkey"
 
 <PasskeyButton />
 ```
@@ -99,7 +99,7 @@ The `<Passkeys />` security card is automatically rendered on the security setti
 **Usage**
 
 ```tsx
-import { Passkeys } from "@better-auth-ui/heroui/plugins"
+import { Passkeys } from "@better-auth-ui/heroui/plugins/passkey"
 
 <Passkeys />
 ```

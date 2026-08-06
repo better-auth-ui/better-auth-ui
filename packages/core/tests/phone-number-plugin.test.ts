@@ -1,9 +1,21 @@
-import { describe, expect, it } from "vitest"
+import { describe, expect, it, vi } from "vitest"
+import { authQueryKeys } from "../src"
 import {
   phoneNumberLocalization,
   phoneNumberMutationKeys,
-  phoneNumberPlugin
-} from "../src/plugins"
+  phoneNumberPlugin,
+  requestPhoneNumberPasswordResetOptions,
+  resetPhoneNumberPasswordOptions,
+  sendPhoneNumberOtpOptions,
+  signInPhoneNumberOptions,
+  verifyPhoneNumberOptions
+} from "../src/plugins/phone-number"
+
+type MutationOptions = {
+  meta?: { awaits?: readonly unknown[] }
+  mutationFn: (variables: unknown) => Promise<unknown>
+  mutationKey: readonly unknown[]
+}
 
 describe("phoneNumberPlugin", () => {
   it("enables code sign-in and account settings by default", () => {
@@ -67,5 +79,89 @@ describe("phoneNumberPlugin", () => {
       "signIn",
       "phoneNumber"
     ])
+  })
+
+  it("routes every mutation payload to the matching Better Auth method", async () => {
+    const sendOtp = vi.fn(async () => ({ status: true }))
+    const verify = vi.fn(async () => ({ token: "session" }))
+    const requestPasswordReset = vi.fn(async () => ({ status: true }))
+    const resetPassword = vi.fn(async () => ({ status: true }))
+    const signIn = vi.fn(async () => ({ token: "session" }))
+    const authClient = {
+      phoneNumber: {
+        requestPasswordReset,
+        resetPassword,
+        sendOtp,
+        verify
+      },
+      signIn: { phoneNumber: signIn }
+    }
+    const mutations = [
+      [
+        sendPhoneNumberOtpOptions(authClient as never),
+        { phoneNumber: "+12025550123" },
+        sendOtp
+      ],
+      [
+        verifyPhoneNumberOptions(authClient as never),
+        { phoneNumber: "+12025550123", code: "123456" },
+        verify
+      ],
+      [
+        requestPhoneNumberPasswordResetOptions(authClient as never),
+        { phoneNumber: "+12025550123" },
+        requestPasswordReset
+      ],
+      [
+        resetPhoneNumberPasswordOptions(authClient as never),
+        {
+          phoneNumber: "+12025550123",
+          otp: "123456",
+          newPassword: "correct horse battery staple"
+        },
+        resetPassword
+      ],
+      [
+        signInPhoneNumberOptions(authClient as never),
+        {
+          phoneNumber: "+12025550123",
+          password: "correct horse battery staple"
+        },
+        signIn
+      ]
+    ] as const
+
+    for (const [mutation, variables, method] of mutations) {
+      await (mutation as MutationOptions).mutationFn(variables)
+      expect(method).toHaveBeenCalledWith({
+        ...variables,
+        fetchOptions: { throw: true }
+      })
+    }
+  })
+
+  it("marks session-producing mutations for awaited refresh", () => {
+    const authClient = {
+      phoneNumber: {
+        requestPasswordReset: vi.fn(),
+        resetPassword: vi.fn(),
+        sendOtp: vi.fn(),
+        verify: vi.fn()
+      },
+      signIn: { phoneNumber: vi.fn() }
+    }
+
+    expect(
+      (
+        verifyPhoneNumberOptions(authClient as never)
+          .meta as MutationOptions["meta"]
+      )?.awaits
+    ).toEqual([authQueryKeys.session])
+    expect(
+      (
+        signInPhoneNumberOptions(authClient as never)
+          .meta as MutationOptions["meta"]
+      )?.awaits
+    ).toEqual([authQueryKeys.session])
   })
 })

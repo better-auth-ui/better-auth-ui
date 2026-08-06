@@ -1,7 +1,9 @@
-import { oneTapMutationKeys } from "@better-auth-ui/core/plugins"
+import {
+  oneTapMutationKeys,
+  promptOneTapOptions
+} from "@better-auth-ui/core/plugins/one-tap"
 import { describe, expect, it, vi } from "vitest"
-import { promptOneTapOptions } from "../src/mutations/one-tap/prompt-one-tap-mutation"
-import { oneTapPlugin } from "../src/plugins"
+import { oneTapPlugin } from "../src/plugins/one-tap"
 
 describe("oneTapPlugin (Solid)", () => {
   it("registers a stable headless prompt for the selected views", () => {

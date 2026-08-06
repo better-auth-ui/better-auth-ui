@@ -1,13 +1,14 @@
+import type { PhoneNumberAuthClient } from "@better-auth-ui/core/plugins/phone-number"
 import {
-  type PhoneNumberAuthClient,
-  sendPhoneNumberOtpOptions,
-  updateUserOptions,
   useAuth,
   useAuthPlugin,
   useSession,
-  verifyPhoneNumberOptions
+  useUpdateUser
 } from "@better-auth-ui/solid"
-import { createMutation } from "@tanstack/solid-query"
+import {
+  useSendPhoneNumberOtp,
+  useVerifyPhoneNumber
+} from "@better-auth-ui/solid/plugins/phone-number"
 import { createEffect, createSignal, Show } from "solid-js"
 import { toast } from "solid-sonner"
 
@@ -50,12 +51,10 @@ export function ChangePhoneNumber(props: ChangePhoneNumberProps = {}) {
     setPhoneNumber(currentPhoneNumber())
   })
 
-  const sendOtp = createMutation(() => ({
-    ...sendPhoneNumberOtpOptions(phoneClient()),
+  const sendOtp = useSendPhoneNumberOtp(phoneClient(), () => ({
     onSuccess: () => setCodeSent(true)
   }))
-  const verify = createMutation(() => ({
-    ...verifyPhoneNumberOptions(phoneClient()),
+  const verify = useVerifyPhoneNumber(phoneClient(), () => ({
     onError: () => setCode(""),
     onSuccess: () => {
       setCode("")
@@ -63,8 +62,7 @@ export function ChangePhoneNumber(props: ChangePhoneNumberProps = {}) {
       toast.success(localization.phoneNumberUpdated)
     }
   }))
-  const remove = createMutation(() => ({
-    ...updateUserOptions(phoneClient()),
+  const remove = useUpdateUser(phoneClient(), () => ({
     onSuccess: () => {
       setPhoneNumber("")
       toast.success(localization.phoneNumberRemoved)

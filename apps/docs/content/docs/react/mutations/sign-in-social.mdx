@@ -8,9 +8,9 @@ Initiates the OAuth redirect flow — the session lands once the provider redire
 ## Usage
 
 ```tsx
-import { useAuth, useSignInSocial } from "@better-auth-ui/react"
+import { authClient } from "@/lib/auth-client"
+import { useSignInSocial } from "@better-auth-ui/react"
 
-const { authClient } = useAuth()
 const { mutate: signInSocial } = useSignInSocial(authClient)
 
 signInSocial({
@@ -22,7 +22,7 @@ signInSocial({
 ## Options factory
 
 ```tsx
-import { signInSocialOptions } from "@better-auth-ui/react"
+import { signInSocialOptions } from "@better-auth-ui/core"
 import { useMutation } from "@tanstack/react-query"
 
 const { mutate } = useMutation(signInSocialOptions(authClient))
@@ -30,4 +30,4 @@ const { mutate } = useMutation(signInSocialOptions(authClient))
 
 ## Params
 
-<auto-type-table path="../../../../../../packages/react/src/mutations/auth/sign-in-social-mutation.ts" name="SignInSocialParams" />
+<auto-type-table path="../../../../../../packages/core/src/mutations/sign-in-social-mutation.ts" name="SignInSocialParams" />

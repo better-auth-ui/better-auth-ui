@@ -8,8 +8,8 @@ Requires `oauthProviderClient()` from `@better-auth/oauth-provider/client`. Read
 ## Usage
 
 ```tsx
-import { parseOAuthAuthorizationRequest } from "@better-auth-ui/core/plugins"
-import { usePublicOAuthClient } from "@better-auth-ui/solid"
+import { parseOAuthAuthorizationRequest } from "@better-auth-ui/core/plugins/oauth-provider"
+import { usePublicOAuthClient } from "@better-auth-ui/solid/plugins/oauth-provider"
 
 const client = usePublicOAuthClient(
   authClient,
@@ -27,7 +27,7 @@ import {
   fetchPublicOAuthClient,
   prefetchPublicOAuthClient,
   publicOAuthClientOptions
-} from "@better-auth-ui/solid"
+} from "@better-auth-ui/core/plugins/oauth-provider"
 
 const options = publicOAuthClientOptions(authClient, clientId)
 await ensurePublicOAuthClient(queryClient, authClient, clientId)
@@ -37,4 +37,4 @@ const client = await fetchPublicOAuthClient(queryClient, authClient, clientId)
 
 ## Params
 
-<auto-type-table path="../../../../../../packages/solid/src/queries/oauth-provider/public-oauth-client-query.ts" name="PublicOAuthClientParams" />
+<auto-type-table path="../../../../../../packages/core/src/plugins/oauth-provider/public-oauth-client-query.ts" name="PublicOAuthClientParams" />

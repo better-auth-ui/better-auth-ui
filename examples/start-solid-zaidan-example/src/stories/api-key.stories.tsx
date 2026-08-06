@@ -1,4 +1,4 @@
-import type { ApiKeyAuthClient } from "@better-auth-ui/solid"
+import type { ApiKeyAuthClient } from "@better-auth-ui/core/plugins/api-key"
 import type { Meta, StoryObj } from "storybook-solidjs-vite"
 import { ApiKey } from "@/components/auth/api-key/api-key"
 import { ApiKeysEmpty } from "@/components/auth/api-key/api-keys-empty"

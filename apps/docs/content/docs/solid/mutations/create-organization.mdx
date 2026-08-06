@@ -6,24 +6,24 @@ description: Create an organization.
 ## Usage
 
 ```tsx
-import { useCreateOrganization } from "@better-auth-ui/solid"
+import { useCreateOrganization } from "@better-auth-ui/solid/plugins/organization"
 
 const mutation = useCreateOrganization(authClient)
 
 mutation.mutate(/* params */)
 ```
 
-Organization mutations require `organizationClient()` on the Better Auth client. They attach the same `meta.invalidates` / `meta.awaits` cache metadata used by upstream React, and the Solid `AuthProvider` installs a mutation invalidator that refreshes affected organization/session caches after successful auth mutations.
+Organization mutations require `organizationClient()` on the Better Auth client. They attach the same `meta.invalidates` / `meta.awaits` cache metadata used by the shared React implementation, and the Solid `AuthProvider` installs a mutation invalidator that refreshes affected organization/session caches after successful auth mutations.
 
 ## Options factory
 
 ```tsx
-import { createOrganizationOptions } from "@better-auth-ui/solid"
-import { createMutation } from "@tanstack/solid-query"
+import { createOrganizationOptions } from "@better-auth-ui/core/plugins/organization"
+import { useMutation } from "@tanstack/solid-query"
 
-const mutation = createMutation(() => createOrganizationOptions(authClient))
+const mutation = useMutation(() => createOrganizationOptions(authClient))
 ```
 
 ## Params
 
-<auto-type-table path="../../../../../../packages/solid/src/mutations/organization/create-organization-mutation.ts" name="CreateOrganizationParams" />
+<auto-type-table path="../../../../../../packages/core/src/plugins/organization/create-organization-mutation.ts" name="CreateOrganizationParams" />

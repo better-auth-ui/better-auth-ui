@@ -1,0 +1,123 @@
+[
+  {
+    "id": "api-key-localization.ts-ApiKeyLocalization",
+    "name": "ApiKeyLocalization",
+    "description": "",
+    "entries": [
+      {
+        "name": "apiKey",
+        "description": "",
+        "tags": [{ "name": "remarks", "text": "`\"API key\"`" }],
+        "type": "string",
+        "simplifiedType": "\"API key\"",
+        "required": true,
+        "deprecated": false
+      },
+      {
+        "name": "apiKeys",
+        "description": "",
+        "tags": [{ "name": "remarks", "text": "`\"API keys\"`" }],
+        "type": "string",
+        "simplifiedType": "\"API keys\"",
+        "required": true,
+        "deprecated": false
+      },
+      {
+        "name": "apiKeysDescription",
+        "description": "",
+        "tags": [
+          {
+            "name": "remarks",
+            "text": "`\"Create an API key for programmatic access to your account.\"`"
+          }
+        ],
+        "type": "string",
+        "simplifiedType": "\"Create an API key for programmatic access to your account.\"",
+        "required": true,
+        "deprecated": false
+      },
+      {
+        "name": "createApiKey",
+        "description": "",
+        "tags": [{ "name": "remarks", "text": "`\"Create API key\"`" }],
+        "type": "string",
+        "simplifiedType": "\"Create API key\"",
+        "required": true,
+        "deprecated": false
+      },
+      {
+        "name": "noApiKeys",
+        "description": "",
+        "tags": [{ "name": "remarks", "text": "`\"No API keys\"`" }],
+        "type": "string",
+        "simplifiedType": "\"No API keys\"",
+        "required": true,
+        "deprecated": false
+      },
+      {
+        "name": "name",
+        "description": "",
+        "tags": [{ "name": "remarks", "text": "`\"Name\"`" }],
+        "type": "string",
+        "simplifiedType": "\"Name\"",
+        "required": true,
+        "deprecated": false
+      },
+      {
+        "name": "newApiKey",
+        "description": "",
+        "tags": [{ "name": "remarks", "text": "`\"New API key\"`" }],
+        "type": "string",
+        "simplifiedType": "\"New API key\"",
+        "required": true,
+        "deprecated": false
+      },
+      {
+        "name": "newApiKeyWarning",
+        "description": "",
+        "tags": [
+          {
+            "name": "remarks",
+            "text": "`\"Copy this key now. For security reasons you will not be able to see it again.\"`"
+          }
+        ],
+        "type": "string",
+        "simplifiedType": "\"Copy this key now. For security reasons you will not be able to see it again.\"",
+        "required": true,
+        "deprecated": false
+      },
+      {
+        "name": "deleteApiKey",
+        "description": "",
+        "tags": [{ "name": "remarks", "text": "`\"Delete API key\"`" }],
+        "type": "string",
+        "simplifiedType": "\"Delete API key\"",
+        "required": true,
+        "deprecated": false
+      },
+      {
+        "name": "deleteApiKeyWarning",
+        "description": "",
+        "tags": [
+          {
+            "name": "remarks",
+            "text": "`\"This action cannot be undone. Any service using this API key will stop working immediately.\"`"
+          }
+        ],
+        "type": "string",
+        "simplifiedType": "\"This action cannot be undone. Any service using this API key will stop working immediately.\"",
+        "required": true,
+        "deprecated": false
+      },
+      {
+        "name": "dismissNewKey",
+        "description": "",
+        "tags": [{ "name": "remarks", "text": "`\"I've saved my key\"`" }],
+        "type": "string",
+        "simplifiedType": "\"I've saved my key\"",
+        "required": true,
+        "deprecated": false
+      }
+    ]
+  }
+]

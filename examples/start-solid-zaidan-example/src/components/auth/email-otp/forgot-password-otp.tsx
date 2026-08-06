@@ -1,8 +1,10 @@
 import { getAuthLinkURL } from "@better-auth-ui/core"
 import {
-  AuthLink,
   type EmailOtpAuthClient,
-  requestPasswordResetOtpOptions,
+  requestPasswordResetOtpOptions
+} from "@better-auth-ui/core/plugins/email-otp"
+import {
+  AuthLink,
   useAuth,
   useAuthPlugin,
   useFetchOptions

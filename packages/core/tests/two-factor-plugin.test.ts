@@ -9,7 +9,7 @@ import {
   TWO_FACTOR_METHODS_STORAGE_KEY,
   twoFactorLocalization,
   twoFactorPlugin
-} from "../src/plugins"
+} from "../src/plugins/two-factor"
 
 /** Minimal `sessionStorage` stand-in — this package is tested in Node. */
 function createStorageStub() {

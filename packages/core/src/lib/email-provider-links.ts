@@ -1,4 +1,4 @@
-import emailProviderData from "@mikkelscheike/email-provider-links/providers/emailproviders.json" with {
+import emailProviderData from "@mikkelscheike/email-provider-links/dist/providers/emailproviders.json" with {
   type: "json"
 }
 

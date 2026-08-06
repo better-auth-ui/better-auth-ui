@@ -1,9 +1,5 @@
-import {
-  listAccountsOptions,
-  useAuth,
-  useAuthPlugin,
-  useSession
-} from "@better-auth-ui/solid"
+import { listAccountsOptions } from "@better-auth-ui/core"
+import { useAuth, useAuthPlugin, useSession } from "@better-auth-ui/solid"
 import { createQuery } from "@tanstack/solid-query"
 
 import { twoFactorPlugin } from "./two-factor-plugin"

@@ -2,7 +2,7 @@ import {
   isTwoFactorRedirect,
   storeTwoFactorMethods,
   twoFactorPlugin
-} from "@better-auth-ui/core/plugins"
+} from "@better-auth-ui/core/plugins/two-factor"
 import { useAuth } from "@better-auth-ui/react"
 import { useCallback } from "react"
 

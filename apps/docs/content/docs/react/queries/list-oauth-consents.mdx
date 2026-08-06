@@ -5,13 +5,14 @@ description: List the OAuth applications the current user has authorized.
 
 Requires `oauthProviderClient()` from `@better-auth/oauth-provider/client`.
 
-Returns the raw consent records Better Auth stores for the signed-in user. One OAuth client can have several records, so pair this with `groupOAuthConsents` from `@better-auth-ui/core/plugins` before rendering.
+Returns the raw consent records Better Auth stores for the signed-in user. One OAuth client can have several records, so pair this with `groupOAuthConsents` from `@better-auth-ui/core/plugins/oauth-provider` before rendering.
 
 ## Usage
 
 ```tsx
-import { groupOAuthConsents } from "@better-auth-ui/core/plugins"
-import { useAuth, useListOAuthConsents } from "@better-auth-ui/react"
+import { groupOAuthConsents } from "@better-auth-ui/core/plugins/oauth-provider"
+import { useAuth } from "@better-auth-ui/react"
+import { useListOAuthConsents } from "@better-auth-ui/react/plugins/oauth-provider"
 
 const { authClient } = useAuth()
 const { data: consents } = useListOAuthConsents(authClient)
@@ -29,7 +30,7 @@ import {
   fetchListOAuthConsents,
   listOAuthConsentsOptions,
   prefetchListOAuthConsents
-} from "@better-auth-ui/react"
+} from "@better-auth-ui/core/plugins/oauth-provider"
 
 const options = listOAuthConsentsOptions(authClient, userId)
 await ensureListOAuthConsents(queryClient, authClient, userId)
@@ -40,7 +41,7 @@ const consents = await fetchListOAuthConsents(queryClient, authClient, userId)
 ## Invalidation
 
 ```ts
-import { oauthProviderQueryKeys } from "@better-auth-ui/core/plugins"
+import { oauthProviderQueryKeys } from "@better-auth-ui/core/plugins/oauth-provider"
 
 queryClient.invalidateQueries({
   queryKey: oauthProviderQueryKeys.consents(userId)
@@ -51,4 +52,4 @@ queryClient.invalidateQueries({
 
 ## Params
 
-<auto-type-table path="../../../../../../packages/react/src/queries/oauth-provider/list-oauth-consents-query.ts" name="ListOAuthConsentsParams" />
+<auto-type-table path="../../../../../../packages/core/src/plugins/oauth-provider/list-oauth-consents-query.ts" name="ListOAuthConsentsParams" />

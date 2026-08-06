@@ -1,21 +1,25 @@
-import { twoFactorMutationKeys } from "@better-auth-ui/core/plugins"
-import type { TwoFactorAuthClient } from "../../lib/auth-client"
-import { createAuthMutationOptions } from "../create-auth-mutation"
+import {
+  type GenerateBackupCodesOptions,
+  generateBackupCodesOptions,
+  type TwoFactorAuthClient
+} from "@better-auth-ui/core/plugins/two-factor"
+import { type QueryClient, useMutation } from "@tanstack/solid-query"
+import type { Accessor } from "solid-js"
 
-export type GenerateBackupCodesParams<TAuthClient extends TwoFactorAuthClient> =
-  Parameters<TAuthClient["twoFactor"]["generateBackupCodes"]>[0]
-
-/**
- * Mutation options factory for regenerating backup codes.
- *
- * Resolves with the new codes — they are shown once and never returned
- * again, so keep them in component state rather than the query cache.
- */
-export function generateBackupCodesOptions<
+export type UseGenerateBackupCodesOptions<
   TAuthClient extends TwoFactorAuthClient
->(authClient: TAuthClient) {
-  return createAuthMutationOptions(
-    authClient.twoFactor.generateBackupCodes,
-    twoFactorMutationKeys.generateBackupCodes
+> = Accessor<GenerateBackupCodesOptions<TAuthClient>>
+
+export function useGenerateBackupCodes<TAuthClient extends TwoFactorAuthClient>(
+  authClient: TAuthClient,
+  options?: UseGenerateBackupCodesOptions<TAuthClient>,
+  queryClient?: Accessor<QueryClient>
+) {
+  return useMutation(
+    () => ({
+      ...generateBackupCodesOptions(authClient),
+      ...(options?.() ?? {})
+    }),
+    queryClient
   )
 }

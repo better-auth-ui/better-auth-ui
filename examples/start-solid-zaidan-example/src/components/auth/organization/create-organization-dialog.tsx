@@ -1,6 +1,9 @@
-import type { OrganizationLocalization } from "@better-auth-ui/core/plugins"
-import type { OrganizationAuthClient } from "@better-auth-ui/solid"
-import { useAuth, useCreateOrganization } from "@better-auth-ui/solid"
+import type {
+  OrganizationAuthClient,
+  OrganizationLocalization
+} from "@better-auth-ui/core/plugins/organization"
+import { useAuth } from "@better-auth-ui/solid"
+import { useCreateOrganization } from "@better-auth-ui/solid/plugins/organization"
 import { BriefcaseBusiness, LoaderCircle } from "lucide-solid"
 import { createEffect, createSignal } from "solid-js"
 import { Button } from "@/components/ui/button"
@@ -35,16 +38,13 @@ const organizationFallbackLocalization = {
 >
 
 export function CreateOrganizationDialog(props: CreateOrganizationDialogProps) {
-  const auth = useAuth()
+  const auth = useAuth<OrganizationAuthClient>()
   const [name, setName] = createSignal("")
   const [slug, setSlug] = createSignal("")
   const [slugEdited, setSlugEdited] = createSignal(false)
-  const createOrganization = useCreateOrganization(
-    auth.authClient as OrganizationAuthClient,
-    {
-      onSuccess: () => props.onOpenChange(false)
-    }
-  )
+  const createOrganization = useCreateOrganization(auth.authClient, () => ({
+    onSuccess: () => props.onOpenChange(false)
+  }))
   const organizationPluginConfig = () =>
     auth.plugins.find((plugin) => plugin.id === organizationPlugin.id) as
       | { localization?: OrganizationLocalization }

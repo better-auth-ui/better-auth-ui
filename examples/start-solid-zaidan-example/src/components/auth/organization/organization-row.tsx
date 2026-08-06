@@ -1,7 +1,10 @@
-import type { OrganizationLocalization } from "@better-auth-ui/core/plugins"
-import { organizationLocalization } from "@better-auth-ui/core/plugins"
-import type { OrganizationAuthClient } from "@better-auth-ui/solid"
-import { useAuth, useSetActiveOrganization } from "@better-auth-ui/solid"
+import type {
+  OrganizationAuthClient,
+  OrganizationLocalization
+} from "@better-auth-ui/core/plugins/organization"
+import { organizationLocalization } from "@better-auth-ui/core/plugins/organization"
+import { useAuth } from "@better-auth-ui/solid"
+import { useSetActiveOrganization } from "@better-auth-ui/solid/plugins/organization"
 import type { Organization } from "better-auth/client"
 import { Settings as SettingsIcon } from "lucide-solid"
 import { Show } from "solid-js"
@@ -23,8 +26,8 @@ type OrganizationPluginConfig = {
 }
 
 export function OrganizationRow(props: OrganizationRowProps) {
-  const auth = useAuth()
-  const client = auth.authClient as OrganizationAuthClient
+  const auth = useAuth<OrganizationAuthClient>()
+  const client = auth.authClient
   const organizationPluginConfig = () =>
     auth.plugins.find((plugin) => plugin.id === organizationPlugin.id) as
       | OrganizationPluginConfig
@@ -51,13 +54,13 @@ export function OrganizationRow(props: OrganizationRowProps) {
       })
     })
   }
-  const setActiveOrganization = useSetActiveOrganization(client, {
+  const setActiveOrganization = useSetActiveOrganization(client, () => ({
     onSuccess: () => {
       auth.navigate({
         to: `${auth.basePaths.organization}/${organizationViewPaths().settings}`
       })
     }
-  })
+  }))
 
   const manageOrganization = () => {
     if (isSlugMode()) {

@@ -1,29 +1,29 @@
 ---
-title: useCheckOrganizationSlug
+title: useCheckSlug
 description: Check whether an organization slug is available.
 ---
 
 ## Usage
 
 ```tsx
-import { useCheckOrganizationSlug } from "@better-auth-ui/solid"
+import { useCheckSlug } from "@better-auth-ui/solid/plugins/organization"
 
-const mutation = useCheckOrganizationSlug(authClient)
+const mutation = useCheckSlug(authClient)
 
 mutation.mutate(/* params */)
 ```
 
-Organization mutations require `organizationClient()` on the Better Auth client. They attach the same `meta.invalidates` / `meta.awaits` cache metadata used by upstream React, and the Solid `AuthProvider` installs a mutation invalidator that refreshes affected organization/session caches after successful auth mutations.
+Organization mutations require `organizationClient()` on the Better Auth client. They attach the same `meta.invalidates` / `meta.awaits` cache metadata used by the shared React implementation, and the Solid `AuthProvider` installs a mutation invalidator that refreshes affected organization/session caches after successful auth mutations.
 
 ## Options factory
 
 ```tsx
-import { checkOrganizationSlugOptions } from "@better-auth-ui/solid"
-import { createMutation } from "@tanstack/solid-query"
+import { checkSlugOptions } from "@better-auth-ui/core/plugins/organization"
+import { useMutation } from "@tanstack/solid-query"
 
-const mutation = createMutation(() => checkOrganizationSlugOptions(authClient))
+const mutation = useMutation(() => checkSlugOptions(authClient))
 ```
 
 ## Params
 
-<auto-type-table path="../../../../../../packages/solid/src/mutations/organization/check-slug-mutation.ts" name="CheckOrganizationSlugParams" />
+<auto-type-table path="../../../../../../packages/core/src/plugins/organization/check-slug-mutation.ts" name="CheckSlugParams" />

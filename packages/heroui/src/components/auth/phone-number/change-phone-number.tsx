@@ -1,12 +1,14 @@
+import type { PhoneNumberAuthClient } from "@better-auth-ui/core/plugins/phone-number"
 import {
-  type PhoneNumberAuthClient,
   useAuth,
   useAuthPlugin,
-  useSendPhoneNumberOtp,
   useSession,
-  useUpdateUser,
-  useVerifyPhoneNumber
+  useUpdateUser
 } from "@better-auth-ui/react"
+import {
+  useSendPhoneNumberOtp,
+  useVerifyPhoneNumber
+} from "@better-auth-ui/react/plugins/phone-number"
 import {
   Button,
   Card,

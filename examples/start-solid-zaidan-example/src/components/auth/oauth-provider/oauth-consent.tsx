@@ -1,18 +1,15 @@
 import {
   type OAuthAuthorizationRequest,
+  type OAuthProviderAuthClient,
   parseOAuthAuthorizationRequest,
   resolveOAuthScopeMetadata,
   sanitizeOAuthClientUrl
-} from "@better-auth-ui/core/plugins"
+} from "@better-auth-ui/core/plugins/oauth-provider"
+import { useAuth, useAuthPlugin, useSession } from "@better-auth-ui/solid"
 import {
-  type OAuthProviderAuthClient,
-  oauthConsentOptions,
-  useAuth,
-  useAuthPlugin,
-  usePublicOAuthClient,
-  useSession
-} from "@better-auth-ui/solid"
-import { createMutation } from "@tanstack/solid-query"
+  useOAuthConsent,
+  usePublicOAuthClient
+} from "@better-auth-ui/solid/plugins/oauth-provider"
 import { Check, ShieldCheck } from "lucide-solid"
 import { createSignal, For, onMount, Show } from "solid-js"
 
@@ -55,7 +52,7 @@ export function OAuthConsent(props: OAuthConsentProps) {
     oauthClient,
     () => request()?.clientId
   )
-  const consent = createMutation(() => oauthConsentOptions(oauthClient))
+  const consent = useOAuthConsent(oauthClient)
   const clientName = () =>
     publicClient.data?.client_name || localization.application
   const logoUrl = () => sanitizeOAuthClientUrl(publicClient.data?.logo_uri)

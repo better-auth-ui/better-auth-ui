@@ -1,6 +1,6 @@
 import { apiKey } from "@better-auth/api-key"
 import { passkey } from "@better-auth/passkey"
-import type { AuthServer } from "@better-auth-ui/solid/server"
+import type { AuthServer } from "@better-auth-ui/core/server"
 import { betterAuth } from "better-auth"
 import { drizzleAdapter } from "better-auth/adapters/drizzle"
 import {

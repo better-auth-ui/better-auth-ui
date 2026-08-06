@@ -1,0 +1,30 @@
+[
+  {
+    "id": "magic-link-plugin.ts-MagicLinkPluginOptions",
+    "name": "MagicLinkPluginOptions",
+    "description": "",
+    "entries": [
+      {
+        "name": "localization",
+        "description": "Override the plugin's default localization strings.",
+        "tags": [{ "name": "remarks", "text": "`MagicLinkLocalization`" }],
+        "type": "Partial<{ magicLink: string; sendMagicLink: string; magicLinkSent: string; }>",
+        "simplifiedType": "MagicLinkLocalization",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "path",
+        "description": "URL segment for the magic-link view.",
+        "tags": [
+          { "name": "remarks", "text": "`string`" },
+          { "name": "default", "text": "\"magic-link\"" }
+        ],
+        "type": "string",
+        "simplifiedType": "string",
+        "required": false,
+        "deprecated": false
+      }
+    ]
+  }
+]

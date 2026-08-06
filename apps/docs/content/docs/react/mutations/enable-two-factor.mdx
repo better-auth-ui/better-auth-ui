@@ -8,11 +8,9 @@ Resolves with the TOTP URI and the backup codes. Unless the server sets `skipVer
 ## Usage
 
 ```tsx
-import {
-  type TwoFactorAuthClient,
-  useAuth,
-  useEnableTwoFactor
-} from "@better-auth-ui/react"
+import type { TwoFactorAuthClient } from "@better-auth-ui/core/plugins/two-factor"
+import { useAuth } from "@better-auth-ui/react"
+import { useEnableTwoFactor } from "@better-auth-ui/react/plugins/two-factor"
 
 const { authClient } = useAuth()
 const { mutate: enableTwoFactor } = useEnableTwoFactor(
@@ -34,7 +32,7 @@ enableTwoFactor(
 ## Options factory
 
 ```tsx
-import { enableTwoFactorOptions } from "@better-auth-ui/react"
+import { enableTwoFactorOptions } from "@better-auth-ui/core/plugins/two-factor"
 import { useMutation } from "@tanstack/react-query"
 
 const { mutate } = useMutation(enableTwoFactorOptions(authClient))
@@ -42,4 +40,4 @@ const { mutate } = useMutation(enableTwoFactorOptions(authClient))
 
 ## Params
 
-<auto-type-table path="../../../../../../packages/react/src/mutations/two-factor/enable-two-factor-mutation.ts" name="EnableTwoFactorParams" />
+<auto-type-table path="../../../../../../packages/core/src/plugins/two-factor/enable-two-factor-mutation.ts" name="EnableTwoFactorParams" />

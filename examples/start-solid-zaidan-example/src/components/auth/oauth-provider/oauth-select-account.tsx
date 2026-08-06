@@ -1,19 +1,17 @@
 import {
-  type OAuthAuthorizationRequest,
-  parseOAuthAuthorizationRequest,
-  sanitizeOAuthClientUrl
-} from "@better-auth-ui/core/plugins"
-import {
   type ListDeviceSession,
   listDeviceSessionsOptions,
+  setActiveSessionOptions
+} from "@better-auth-ui/core/plugins/multi-session"
+import {
+  type OAuthAuthorizationRequest,
   type OAuthProviderMultiSessionAuthClient,
   oauthContinueOptions,
-  setActiveSessionOptions,
-  useAuth,
-  useAuthPlugin,
-  usePublicOAuthClient,
-  useSession
-} from "@better-auth-ui/solid"
+  parseOAuthAuthorizationRequest,
+  sanitizeOAuthClientUrl
+} from "@better-auth-ui/core/plugins/oauth-provider"
+import { useAuth, useAuthPlugin, useSession } from "@better-auth-ui/solid"
+import { usePublicOAuthClient } from "@better-auth-ui/solid/plugins/oauth-provider"
 import { createMutation, createQuery } from "@tanstack/solid-query"
 import { ShieldCheck } from "lucide-solid"
 import { createSignal, For, onMount, Show } from "solid-js"

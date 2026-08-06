@@ -8,9 +8,9 @@ Organization mutations require `organizationClient()` on the Better Auth client.
 ## Usage
 
 ```tsx
-import { useAuth, useSetActiveOrganization } from "@better-auth-ui/react"
+import { authClient } from "@/lib/auth-client"
+import { useSetActiveOrganization } from "@better-auth-ui/react/plugins/organization"
 
-const { authClient } = useAuth()
 const mutation = useSetActiveOrganization(authClient)
 
 mutation.mutate(/* params */)
@@ -19,7 +19,7 @@ mutation.mutate(/* params */)
 ## Options factory
 
 ```tsx
-import { setActiveOrganizationOptions } from "@better-auth-ui/react"
+import { setActiveOrganizationOptions } from "@better-auth-ui/core/plugins/organization"
 import { useMutation } from "@tanstack/react-query"
 
 const mutation = useMutation(setActiveOrganizationOptions(authClient))
@@ -27,4 +27,4 @@ const mutation = useMutation(setActiveOrganizationOptions(authClient))
 
 ## Params
 
-<auto-type-table path="../../../../../../packages/react/src/mutations/organization/set-active-organization-mutation.ts" name="SetActiveOrganizationParams" />
+<auto-type-table path="../../../../../../packages/core/src/plugins/organization/set-active-organization-mutation.ts" name="SetActiveOrganizationParams" />

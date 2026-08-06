@@ -10,8 +10,8 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as SettingsPathRouteImport } from './routes/settings/$path'
 import { Route as AuthPathRouteImport } from './routes/auth/$path'
+import { Route as SettingsPathRouteImport } from './routes/settings/$path'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 
 const IndexRoute = IndexRouteImport.update({
@@ -19,14 +19,14 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const SettingsPathRoute = SettingsPathRouteImport.update({
-  id: '/settings/$path',
-  path: '/settings/$path',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const AuthPathRoute = AuthPathRouteImport.update({
   id: '/auth/$path',
   path: '/auth/$path',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SettingsPathRoute = SettingsPathRouteImport.update({
+  id: '/settings/$path',
+  path: '/settings/$path',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
@@ -78,18 +78,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/settings/$path': {
-      id: '/settings/$path'
-      path: '/settings/$path'
-      fullPath: '/settings/$path'
-      preLoaderRoute: typeof SettingsPathRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/auth/$path': {
       id: '/auth/$path'
       path: '/auth/$path'
       fullPath: '/auth/$path'
       preLoaderRoute: typeof AuthPathRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/settings/$path': {
+      id: '/settings/$path'
+      path: '/settings/$path'
+      fullPath: '/settings/$path'
+      preLoaderRoute: typeof SettingsPathRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/auth/$': {

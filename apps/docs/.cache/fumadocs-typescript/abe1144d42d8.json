@@ -1,0 +1,18 @@
+[
+  {
+    "id": "organization-invitations.tsx-OrganizationInvitationsProps",
+    "name": "OrganizationInvitationsProps",
+    "description": "Props for the `OrganizationInvitations` component.",
+    "entries": [
+      {
+        "name": "className",
+        "description": "",
+        "tags": [],
+        "type": "string",
+        "simplifiedType": "string",
+        "required": false,
+        "deprecated": false
+      }
+    ]
+  }
+]

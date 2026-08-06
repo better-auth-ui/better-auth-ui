@@ -3,7 +3,7 @@ import {
   passkeyPlugin as corePasskeyPlugin,
   type PasskeyLocalization,
   passkeyLocalization
-} from "@better-auth-ui/core/plugins"
+} from "@better-auth-ui/core/plugins/passkey"
 
 export function passkeyLabels(auth: { plugins: AuthPlugin[] }) {
   const plugin = auth.plugins.find(

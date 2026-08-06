@@ -2,7 +2,7 @@ import { createAuthPlugin } from "@better-auth-ui/core"
 import {
   phoneNumberPlugin as corePhoneNumberPlugin,
   type PhoneNumberPluginOptions
-} from "@better-auth-ui/core/plugins"
+} from "@better-auth-ui/core/plugins/phone-number"
 
 import { ChangePhoneNumber } from "@/components/auth/phone-number/change-phone-number"
 import { ForgotPhoneNumberPassword } from "@/components/auth/phone-number/forgot-phone-number-password"

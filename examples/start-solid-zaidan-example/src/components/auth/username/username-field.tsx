@@ -1,9 +1,6 @@
-import {
-  isUsernameAvailableOptions,
-  type UsernameAuthClient,
-  useAuth
-} from "@better-auth-ui/solid"
-import { createMutation } from "@tanstack/solid-query"
+import type { UsernameAuthClient } from "@better-auth-ui/core/plugins/username"
+import { useAuth } from "@better-auth-ui/solid"
+import { useIsUsernameAvailable } from "@better-auth-ui/solid/plugins/username"
 import { Check, X } from "lucide-solid"
 import { createSignal, Show } from "solid-js"
 import type { AdditionalFieldProps } from "@/components/auth/additional-field"
@@ -16,7 +13,7 @@ import {
 import { Spinner } from "@/components/ui/spinner"
 
 export function UsernameField(props: AdditionalFieldProps) {
-  const auth = useAuth()
+  const auth = useAuth<UsernameAuthClient>()
   const usernamePlugin = () =>
     auth.plugins.find((plugin) => plugin.id === "username") as
       | {
@@ -33,8 +30,7 @@ export function UsernameField(props: AdditionalFieldProps) {
   const currentUsername = String(props.field.defaultValue ?? "")
   const [value, setValue] = createSignal(currentUsername)
   const [error, setError] = createSignal<string>()
-  const availability = createMutation(() => ({
-    ...isUsernameAvailableOptions(auth.authClient as UsernameAuthClient),
+  const availability = useIsUsernameAvailable(auth.authClient, () => ({
     onError: () => undefined
   }))
   const shouldCheckAvailability = () =>

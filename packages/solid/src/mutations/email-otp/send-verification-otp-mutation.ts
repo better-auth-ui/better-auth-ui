@@ -1,22 +1,25 @@
-import { emailOtpMutationKeys } from "@better-auth-ui/core/plugins"
-import type { EmailOtpAuthClient } from "../../lib/auth-client"
-import { createAuthMutationOptions } from "../create-auth-mutation"
+import {
+  type EmailOtpAuthClient,
+  type SendVerificationOtpOptions,
+  sendVerificationOtpOptions
+} from "@better-auth-ui/core/plugins/email-otp"
+import { type QueryClient, useMutation } from "@tanstack/solid-query"
+import type { Accessor } from "solid-js"
 
-export type SendVerificationOtpParams<TAuthClient extends EmailOtpAuthClient> =
-  Parameters<TAuthClient["emailOtp"]["sendVerificationOtp"]>[0]
-
-/**
- * Mutation options factory for emailing a one-time code.
- *
- * The same endpoint backs every email-OTP flow — pass `type` to pick between
- * `"sign-in"`, `"email-verification"`, `"forget-password"`, and
- * `"change-email"`.
- */
-export function sendVerificationOtpOptions<
+export type UseSendVerificationOtpOptions<
   TAuthClient extends EmailOtpAuthClient
->(authClient: TAuthClient) {
-  return createAuthMutationOptions(
-    authClient.emailOtp.sendVerificationOtp,
-    emailOtpMutationKeys.sendVerificationOtp
+> = Accessor<SendVerificationOtpOptions<TAuthClient>>
+
+export function useSendVerificationOtp<TAuthClient extends EmailOtpAuthClient>(
+  authClient: TAuthClient,
+  options?: UseSendVerificationOtpOptions<TAuthClient>,
+  queryClient?: Accessor<QueryClient>
+) {
+  return useMutation(
+    () => ({
+      ...sendVerificationOtpOptions(authClient),
+      ...(options?.() ?? {})
+    }),
+    queryClient
   )
 }

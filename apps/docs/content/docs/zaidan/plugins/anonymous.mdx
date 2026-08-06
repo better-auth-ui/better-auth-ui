@@ -40,7 +40,7 @@ bunx @better-auth/cli migrate
 Add `anonymousClient()` to the Solid client:
 
 ```ts title="src/lib/auth-client.ts"
-import { createAuthClient } from "@better-auth-ui/solid"
+import { createAuthClient } from "better-auth/solid"
 import { anonymousClient } from "better-auth/client/plugins" // [!code highlight]
 
 export const authClient = createAuthClient({
@@ -101,6 +101,7 @@ anonymousPlugin({
 
 <auto-type-table path="../../../../../../packages/core/src/plugins/anonymous/anonymous-plugin.ts" name="AnonymousPluginOptions" />
 
-For custom Solid surfaces, use [`signInAnonymousOptions`](/docs/solid/mutations) with Solid Query.
+For custom Solid surfaces, use `useSignInAnonymous` from `@better-auth-ui/solid/plugins/anonymous`.
+See the [Solid package reference](/docs/solid) for the shared runtime APIs.
 
 This integration only adds guest entry. If your application later lets guests create a permanent account, configure Better Auth's server-side `onLinkAccount` callback to move application data to the new user.

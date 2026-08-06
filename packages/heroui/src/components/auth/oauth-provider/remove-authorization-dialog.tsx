@@ -1,12 +1,11 @@
 "use client"
 
-import type { AuthorizedOAuthApplication } from "@better-auth-ui/core/plugins"
-import {
-  type OAuthProviderAuthClient,
-  useAuth,
-  useAuthPlugin,
-  useDeleteOAuthConsent
-} from "@better-auth-ui/react"
+import type {
+  AuthorizedOAuthApplication,
+  OAuthProviderAuthClient
+} from "@better-auth-ui/core/plugins/oauth-provider"
+import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
+import { useDeleteOAuthConsent } from "@better-auth-ui/react/plugins/oauth-provider"
 import { ShieldExclamation } from "@gravity-ui/icons"
 import { AlertDialog, Button, Spinner } from "@heroui/react"
 import { useState } from "react"

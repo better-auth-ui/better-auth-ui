@@ -8,7 +8,7 @@ Requires `deviceAuthorizationClient()` from `better-auth/client/plugins`. Call t
 ## Usage
 
 ```tsx
-import { useApproveDevice } from "@better-auth-ui/react"
+import { useApproveDevice } from "@better-auth-ui/react/plugins/device-authorization"
 
 const approveDevice = useApproveDevice(authClient)
 
@@ -20,11 +20,11 @@ approveDevice.mutate({
 ## Options factory
 
 ```ts
-import { approveDeviceOptions } from "@better-auth-ui/react"
+import { approveDeviceOptions } from "@better-auth-ui/core/plugins/device-authorization"
 
 const options = approveDeviceOptions(authClient)
 ```
 
 ## Params
 
-<auto-type-table path="../../../../../../packages/react/src/mutations/device-authorization/approve-device-mutation.ts" name="ApproveDeviceParams" />
+<auto-type-table path="../../../../../../packages/core/src/plugins/device-authorization/approve-device-mutation.ts" name="ApproveDeviceParams" />

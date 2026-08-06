@@ -42,7 +42,7 @@ Configure the WebAuthn origin and trusted origins before production so browser a
 Add `passkeyClient()` to your auth client so `authClient.signIn.passkey` and `authClient.passkey.*` are available:
 
 ```ts title="src/lib/auth-client.ts"
-import { createAuthClient } from "@better-auth-ui/solid"
+import { createAuthClient } from "better-auth/solid"
 import { passkeyClient } from "@better-auth/passkey/client" // [!code highlight]
 
 export const authClient = createAuthClient({

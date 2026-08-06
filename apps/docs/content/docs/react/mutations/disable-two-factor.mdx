@@ -8,11 +8,9 @@ Refetches the session so `user.twoFactorEnabled` is up to date.
 ## Usage
 
 ```tsx
-import {
-  type TwoFactorAuthClient,
-  useAuth,
-  useDisableTwoFactor
-} from "@better-auth-ui/react"
+import type { TwoFactorAuthClient } from "@better-auth-ui/core/plugins/two-factor"
+import { useAuth } from "@better-auth-ui/react"
+import { useDisableTwoFactor } from "@better-auth-ui/react/plugins/two-factor"
 
 const { authClient } = useAuth()
 const { mutate: disableTwoFactor } = useDisableTwoFactor(
@@ -27,7 +25,7 @@ disableTwoFactor({ password: "current-password" })
 ## Options factory
 
 ```tsx
-import { disableTwoFactorOptions } from "@better-auth-ui/react"
+import { disableTwoFactorOptions } from "@better-auth-ui/core/plugins/two-factor"
 import { useMutation } from "@tanstack/react-query"
 
 const { mutate } = useMutation(disableTwoFactorOptions(authClient))
@@ -35,4 +33,4 @@ const { mutate } = useMutation(disableTwoFactorOptions(authClient))
 
 ## Params
 
-<auto-type-table path="../../../../../../packages/react/src/mutations/two-factor/disable-two-factor-mutation.ts" name="DisableTwoFactorParams" />
+<auto-type-table path="../../../../../../packages/core/src/plugins/two-factor/disable-two-factor-mutation.ts" name="DisableTwoFactorParams" />

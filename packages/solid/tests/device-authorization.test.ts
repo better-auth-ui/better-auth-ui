@@ -1,11 +1,10 @@
-import { deviceAuthorizationMutationKeys } from "@better-auth-ui/core/plugins"
-import { describe, expect, it, vi } from "vitest"
-
 import {
   approveDeviceOptions,
   denyDeviceOptions,
+  deviceAuthorizationMutationKeys,
   verifyDeviceCodeOptions
-} from "../src"
+} from "@better-auth-ui/core/plugins/device-authorization"
+import { describe, expect, it, vi } from "vitest"
 
 describe("device authorization mutation options", () => {
   it("uses shared keys and enables thrown Better Auth errors", async () => {

@@ -5,10 +5,10 @@ description: Sign in with a phone number and password.
 
 ```tsx
 import {
-  type PhoneNumberAuthClient,
-  useAuth,
-  useSignInPhoneNumber
-} from "@better-auth-ui/react"
+  type PhoneNumberAuthClient
+} from "@better-auth-ui/core/plugins/phone-number"
+import { useAuth } from "@better-auth-ui/react"
+import { useSignInPhoneNumber } from "@better-auth-ui/react/plugins/phone-number"
 
 const { authClient } = useAuth()
 const { mutate: signInPhoneNumber } = useSignInPhoneNumber(
@@ -24,6 +24,15 @@ signInPhoneNumber({
 
 With Better Auth `requireVerification`, an unverified credential returns `PHONE_NUMBER_NOT_VERIFIED` and starts phone verification. This password-based method follows configured 2FA.
 
+## Options factory
+
+```tsx
+import { signInPhoneNumberOptions } from "@better-auth-ui/core/plugins/phone-number"
+import { useMutation } from "@tanstack/react-query"
+
+const { mutate } = useMutation(signInPhoneNumberOptions(authClient))
+```
+
 ## Params
 
-<auto-type-table path="../../../../../../packages/react/src/mutations/phone-number/sign-in-phone-number-mutation.ts" name="SignInPhoneNumberParams" />
+<auto-type-table path="../../../../../../packages/core/src/plugins/phone-number/sign-in-phone-number-mutation.ts" name="SignInPhoneNumberParams" />

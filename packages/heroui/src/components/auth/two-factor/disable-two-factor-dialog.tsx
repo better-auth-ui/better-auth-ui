@@ -1,9 +1,6 @@
-import {
-  type TwoFactorAuthClient,
-  useAuth,
-  useAuthPlugin,
-  useDisableTwoFactor
-} from "@better-auth-ui/react"
+import type { TwoFactorAuthClient } from "@better-auth-ui/core/plugins/two-factor"
+import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
+import { useDisableTwoFactor } from "@better-auth-ui/react/plugins/two-factor"
 import { ShieldExclamation } from "@gravity-ui/icons"
 import {
   AlertDialog,

@@ -1,17 +1,27 @@
-import { emailOtpMutationKeys } from "@better-auth-ui/core/plugins"
-import type { EmailOtpAuthClient } from "../../lib/auth-client"
-import { createAuthMutationOptions } from "../create-auth-mutation"
+import {
+  type EmailOtpAuthClient,
+  type RequestPasswordResetOtpOptions,
+  requestPasswordResetOtpOptions
+} from "@better-auth-ui/core/plugins/email-otp"
+import { type QueryClient, useMutation } from "@tanstack/solid-query"
+import type { Accessor } from "solid-js"
 
-export type RequestPasswordResetOtpParams<
+export type UseRequestPasswordResetOtpOptions<
   TAuthClient extends EmailOtpAuthClient
-> = Parameters<TAuthClient["emailOtp"]["requestPasswordReset"]>[0]
+> = Accessor<RequestPasswordResetOtpOptions<TAuthClient>>
 
-/** Mutation options factory for emailing a password-reset code. */
-export function requestPasswordResetOtpOptions<
+export function useRequestPasswordResetOtp<
   TAuthClient extends EmailOtpAuthClient
->(authClient: TAuthClient) {
-  return createAuthMutationOptions(
-    authClient.emailOtp.requestPasswordReset,
-    emailOtpMutationKeys.requestPasswordReset
+>(
+  authClient: TAuthClient,
+  options?: UseRequestPasswordResetOtpOptions<TAuthClient>,
+  queryClient?: Accessor<QueryClient>
+) {
+  return useMutation(
+    () => ({
+      ...requestPasswordResetOtpOptions(authClient),
+      ...(options?.() ?? {})
+    }),
+    queryClient
   )
 }

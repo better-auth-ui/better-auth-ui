@@ -1,9 +1,11 @@
-import { describe, expect, it } from "vitest"
+import { describe, expect, it, vi } from "vitest"
+import { authQueryKeys } from "../src"
 import {
   anonymousLocalization,
   anonymousMutationKeys,
-  anonymousPlugin
-} from "../src/plugins"
+  anonymousPlugin,
+  signInAnonymousOptions
+} from "../src/plugins/anonymous"
 
 describe("anonymousPlugin", () => {
   it("provides stable identity and merges localization overrides", () => {
@@ -27,5 +29,24 @@ describe("anonymousPlugin", () => {
       "signIn",
       "anonymous"
     ])
+  })
+
+  it("signs in with throwing fetch options and refreshes the session", async () => {
+    const anonymous = vi.fn(async () => undefined)
+    const options = signInAnonymousOptions({
+      signIn: { anonymous }
+    } as never)
+
+    expect(options.meta?.awaits).toEqual([authQueryKeys.session])
+
+    await expect(
+      options.mutationFn?.({
+        fetchOptions: { credentials: "include" }
+      } as never)
+    ).resolves.toBeUndefined()
+
+    expect(anonymous).toHaveBeenCalledWith({
+      fetchOptions: { credentials: "include", throw: true }
+    })
   })
 })

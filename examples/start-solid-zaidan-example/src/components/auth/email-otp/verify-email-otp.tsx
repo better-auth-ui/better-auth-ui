@@ -1,12 +1,10 @@
 import { getAuthLinkURL } from "@better-auth-ui/core"
 import {
-  AuthLink,
   type EmailOtpAuthClient,
   sendVerificationOtpOptions,
-  useAuth,
-  useAuthPlugin,
   verifyEmailOtpOptions
-} from "@better-auth-ui/solid"
+} from "@better-auth-ui/core/plugins/email-otp"
+import { AuthLink, useAuth, useAuthPlugin } from "@better-auth-ui/solid"
 import { createMutation } from "@tanstack/solid-query"
 import { createSignal, Show } from "solid-js"
 import { toast } from "solid-sonner"

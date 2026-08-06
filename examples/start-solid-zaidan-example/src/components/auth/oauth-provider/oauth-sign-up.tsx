@@ -1,15 +1,12 @@
 import {
   hasOAuthPrompt,
   type OAuthAuthorizationRequest,
-  parseOAuthAuthorizationRequest
-} from "@better-auth-ui/core/plugins"
-import {
   type OAuthProviderAuthClient,
   oauthContinueOptions,
-  useAuth,
-  useAuthPlugin,
-  usePublicOAuthClient
-} from "@better-auth-ui/solid"
+  parseOAuthAuthorizationRequest
+} from "@better-auth-ui/core/plugins/oauth-provider"
+import { useAuth, useAuthPlugin } from "@better-auth-ui/solid"
+import { usePublicOAuthClient } from "@better-auth-ui/solid/plugins/oauth-provider"
 import { createMutation } from "@tanstack/solid-query"
 import { createSignal, onMount, Show } from "solid-js"
 

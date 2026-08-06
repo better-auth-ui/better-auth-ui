@@ -1,11 +1,10 @@
 import { getAuthLinkURL } from "@better-auth-ui/core"
+import type { EmailOtpAuthClient } from "@better-auth-ui/core/plugins/email-otp"
+import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
 import {
-  type EmailOtpAuthClient,
-  useAuth,
-  useAuthPlugin,
   useSendVerificationOtp,
   useVerifyEmailOtp
-} from "@better-auth-ui/react"
+} from "@better-auth-ui/react/plugins/email-otp"
 import {
   Button,
   Card,

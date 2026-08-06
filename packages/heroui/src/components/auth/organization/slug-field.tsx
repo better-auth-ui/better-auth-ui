@@ -1,9 +1,6 @@
-import {
-  type OrganizationAuthClient,
-  useAuth,
-  useAuthPlugin,
-  useCheckSlug
-} from "@better-auth-ui/react"
+import type { OrganizationAuthClient } from "@better-auth-ui/core/plugins/organization"
+import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
+import { useCheckSlug } from "@better-auth-ui/react/plugins/organization"
 import { Check, Xmark } from "@gravity-ui/icons"
 import {
   FieldError,

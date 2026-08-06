@@ -1,23 +1,24 @@
-import { authQueryKeys } from "@better-auth-ui/core"
-import { twoFactorMutationKeys } from "@better-auth-ui/core/plugins"
-import type { TwoFactorAuthClient } from "../../lib/auth-client"
-import { createAuthMutationOptions } from "../create-auth-mutation"
+import {
+  type TwoFactorAuthClient,
+  type VerifyTotpOptions,
+  verifyTotpOptions
+} from "@better-auth-ui/core/plugins/two-factor"
+import { type QueryClient, useMutation } from "@tanstack/solid-query"
+import type { Accessor } from "solid-js"
 
-export type VerifyTotpParams<TAuthClient extends TwoFactorAuthClient> =
-  Parameters<TAuthClient["twoFactor"]["verifyTotp"]>[0]
+export type UseVerifyTotpOptions<TAuthClient extends TwoFactorAuthClient> =
+  Accessor<VerifyTotpOptions<TAuthClient>>
 
-/**
- * Mutation options factory for verifying an authenticator code.
- *
- * Used both to finish a pending sign-in challenge and to confirm enrollment
- * right after enabling two-factor.
- */
-export function verifyTotpOptions<TAuthClient extends TwoFactorAuthClient>(
-  authClient: TAuthClient
+export function useVerifyTotp<TAuthClient extends TwoFactorAuthClient>(
+  authClient: TAuthClient,
+  options?: UseVerifyTotpOptions<TAuthClient>,
+  queryClient?: Accessor<QueryClient>
 ) {
-  return createAuthMutationOptions(
-    authClient.twoFactor.verifyTotp,
-    twoFactorMutationKeys.verifyTotp,
-    { awaits: [authQueryKeys.session] }
+  return useMutation(
+    () => ({
+      ...verifyTotpOptions(authClient),
+      ...(options?.() ?? {})
+    }),
+    queryClient
   )
 }

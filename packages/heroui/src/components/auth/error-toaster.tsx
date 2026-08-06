@@ -1,5 +1,5 @@
 import { authMutationKeys, authQueryKeys } from "@better-auth-ui/core"
-import { oneTapMutationKeys } from "@better-auth-ui/core/plugins"
+import { oneTapMutationKeys } from "@better-auth-ui/core/plugins/one-tap"
 import { toast } from "@heroui/react"
 import {
   matchMutation,

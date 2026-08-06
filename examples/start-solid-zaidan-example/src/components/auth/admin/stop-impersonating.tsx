@@ -1,16 +1,12 @@
 import {
+  type AdminAuthClient,
   type AdminLocalization,
   adminLocalization,
   adminPlugin,
   isImpersonatingSession
-} from "@better-auth-ui/core/plugins"
-import {
-  type AdminAuthClient,
-  stopImpersonatingOptions,
-  useAuth,
-  useSession
-} from "@better-auth-ui/solid"
-import { createMutation } from "@tanstack/solid-query"
+} from "@better-auth-ui/core/plugins/admin"
+import { useAuth, useSession } from "@better-auth-ui/solid"
+import { useStopImpersonating } from "@better-auth-ui/solid/plugins/admin"
 import { UserRoundCheck } from "lucide-solid"
 import { Show } from "solid-js"
 import { DropdownMenuItem } from "@/components/ui/dropdown-menu"
@@ -34,9 +30,7 @@ export function StopImpersonating(props: StopImpersonatingProps = {}) {
   const auth = useAuth()
   const authClient = auth.authClient as AdminAuthClient
   const session = useSession(auth.authClient)
-  const stopImpersonating = createMutation(() =>
-    stopImpersonatingOptions(authClient)
-  )
+  const stopImpersonating = useStopImpersonating(authClient)
   const localization = () => {
     const plugin = (auth.plugins as AdminPluginConfig[]).find(
       (candidate) => candidate.id === adminPlugin.id

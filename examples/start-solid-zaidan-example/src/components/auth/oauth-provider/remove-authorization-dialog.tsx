@@ -1,11 +1,9 @@
-import type { AuthorizedOAuthApplication } from "@better-auth-ui/core/plugins"
-import {
-  deleteOAuthConsentOptions,
-  type OAuthProviderAuthClient,
-  useAuth,
-  useAuthPlugin
-} from "@better-auth-ui/solid"
-import { createMutation } from "@tanstack/solid-query"
+import type {
+  AuthorizedOAuthApplication,
+  OAuthProviderAuthClient
+} from "@better-auth-ui/core/plugins/oauth-provider"
+import { useAuth, useAuthPlugin } from "@better-auth-ui/solid"
+import { useDeleteOAuthConsent } from "@better-auth-ui/solid/plugins/oauth-provider"
 import { ShieldOff } from "lucide-solid"
 import { createSignal, Show } from "solid-js"
 
@@ -43,8 +41,8 @@ export function RemoveAuthorizationDialog(
   const { localization } = useAuthPlugin(oauthProviderPlugin)
   const [isRemoving, setIsRemoving] = createSignal(false)
 
-  const deleteConsent = createMutation(() =>
-    deleteOAuthConsentOptions(auth.authClient as OAuthProviderAuthClient)
+  const deleteConsent = useDeleteOAuthConsent(
+    auth.authClient as OAuthProviderAuthClient
   )
 
   const removeAuthorization = async () => {

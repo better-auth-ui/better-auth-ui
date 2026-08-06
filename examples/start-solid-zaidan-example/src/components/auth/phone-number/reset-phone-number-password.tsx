@@ -1,10 +1,6 @@
-import {
-  type PhoneNumberAuthClient,
-  resetPhoneNumberPasswordOptions,
-  useAuth,
-  useAuthPlugin
-} from "@better-auth-ui/solid"
-import { createMutation } from "@tanstack/solid-query"
+import type { PhoneNumberAuthClient } from "@better-auth-ui/core/plugins/phone-number"
+import { useAuth, useAuthPlugin } from "@better-auth-ui/solid"
+import { useResetPhoneNumberPassword } from "@better-auth-ui/solid/plugins/phone-number"
 import { createSignal, Show } from "solid-js"
 import { toast } from "solid-sonner"
 
@@ -42,19 +38,19 @@ export function ResetPhoneNumberPassword(props: ResetPhoneNumberPasswordProps) {
       : (sessionStorage.getItem(PHONE_NUMBER_RESET_STORAGE_KEY) ?? "")
   const [phoneNumber, setPhoneNumber] = createSignal(storedPhoneNumber)
   const [code, setCode] = createSignal("")
-  const resetPassword = createMutation(() => ({
-    ...resetPhoneNumberPasswordOptions(
-      auth.authClient as PhoneNumberAuthClient
-    ),
-    onError: () => setCode(""),
-    onSuccess: () => {
-      sessionStorage.removeItem(PHONE_NUMBER_RESET_STORAGE_KEY)
-      toast.success(auth.localization.auth.passwordResetSuccess)
-      auth.navigate({
-        to: `${auth.basePaths.auth}/${phoneNumberViewPaths.auth.phoneNumber}`
-      })
-    }
-  }))
+  const resetPassword = useResetPhoneNumberPassword(
+    auth.authClient as PhoneNumberAuthClient,
+    () => ({
+      onError: () => setCode(""),
+      onSuccess: () => {
+        sessionStorage.removeItem(PHONE_NUMBER_RESET_STORAGE_KEY)
+        toast.success(auth.localization.auth.passwordResetSuccess)
+        auth.navigate({
+          to: `${auth.basePaths.auth}/${phoneNumberViewPaths.auth.phoneNumber}`
+        })
+      }
+    })
+  )
   const submit = (event: SubmitEvent & { currentTarget: HTMLFormElement }) => {
     event.preventDefault()
     const formData = new FormData(event.currentTarget)

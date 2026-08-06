@@ -2,7 +2,7 @@ import { AuthProvider } from "@better-auth-ui/heroui"
 import {
   OrganizationSwitcher,
   organizationPlugin
-} from "@better-auth-ui/heroui/plugins"
+} from "@better-auth-ui/heroui/plugins/organization"
 
 import { authClient } from "@/lib/auth-client"
 

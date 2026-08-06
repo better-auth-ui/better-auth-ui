@@ -17,7 +17,7 @@ The plugin is theme-library agnostic. The recommended setup is to pass your them
 
 ```tsx title="components/providers.tsx"
 import { AuthProvider } from "@better-auth-ui/heroui"
-import { themePlugin } from "@better-auth-ui/heroui/plugins" // [!code highlight]
+import { themePlugin } from "@better-auth-ui/heroui/plugins/theme" // [!code highlight]
 import { ThemeProvider, useTheme } from "next-themes"
 import type { ReactNode } from "react"
 
@@ -84,7 +84,7 @@ The `<Appearance />` card is automatically rendered in `<AccountSettings />` whe
 **Usage**
 
 ```tsx
-import { Appearance } from "@better-auth-ui/heroui/plugins"
+import { Appearance } from "@better-auth-ui/heroui/plugins/theme"
 
 <Appearance />
 ```

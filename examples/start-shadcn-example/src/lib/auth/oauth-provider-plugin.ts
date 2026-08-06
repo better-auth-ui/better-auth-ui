@@ -2,7 +2,7 @@ import { createAuthPlugin } from "@better-auth-ui/core"
 import {
   oauthProviderPlugin as coreOAuthProviderPlugin,
   type OAuthProviderPluginOptions
-} from "@better-auth-ui/core/plugins"
+} from "@better-auth-ui/core/plugins/oauth-provider"
 
 import { AuthorizedApplications } from "@/components/auth/oauth-provider/authorized-applications"
 import { OAuthConsent } from "@/components/auth/oauth-provider/oauth-consent"

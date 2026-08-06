@@ -33,7 +33,7 @@ export default defineConfig(async ({ command }) => ({
       "solid-js/web": solidJsWebServer
     },
     tsconfigPaths: true,
-    noExternal: [...FumadocsDeps, "@gravity-ui/icons"]
+    noExternal: [...FumadocsDeps]
   },
   plugins: [
     mdx(await import("./source.config")),

@@ -3,7 +3,7 @@ import {
   deviceAuthorizationLocalization,
   deviceAuthorizationMutationKeys,
   deviceAuthorizationPlugin
-} from "../src/plugins"
+} from "../src/plugins/device-authorization"
 
 describe("deviceAuthorizationPlugin", () => {
   it("provides a stable auth view and matching defaults", () => {

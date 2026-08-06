@@ -1,12 +1,11 @@
 "use client"
 
-import { groupOAuthConsents } from "@better-auth-ui/core/plugins"
 import {
-  type OAuthProviderAuthClient,
-  useAuth,
-  useAuthPlugin,
-  useListOAuthConsents
-} from "@better-auth-ui/react"
+  groupOAuthConsents,
+  type OAuthProviderAuthClient
+} from "@better-auth-ui/core/plugins/oauth-provider"
+import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
+import { useListOAuthConsents } from "@better-auth-ui/react/plugins/oauth-provider"
 import { Fragment } from "react"
 
 import { Card, CardContent } from "@/components/ui/card"

@@ -1,7 +1,9 @@
 import {
+  type AuthClient,
   type AuthConfig,
   authQueryKeys,
-  createAuthQueryRetryOptions
+  createAuthQueryRetryOptions,
+  type DeepPartial
 } from "@better-auth-ui/core"
 import {
   environmentManager,
@@ -9,8 +11,7 @@ import {
   QueryClientProvider
 } from "@tanstack/solid-query"
 import { createContext, type JSX, useContext } from "solid-js"
-import type { AuthClient } from "./auth-client"
-import { resolveAuthConfig, type SolidAuthConfigInput } from "./auth-config"
+import { resolveAuthConfig } from "./auth-config"
 import { FetchOptionsProvider } from "./fetch-options-provider"
 import { MutationInvalidator } from "./mutation-invalidator"
 
@@ -30,8 +31,9 @@ const fallbackQueryClient = new QueryClient({
   }
 })
 
-export type AuthProviderProps<TAuthClient = AuthClient> =
-  SolidAuthConfigInput<TAuthClient> & {
+export type AuthProviderProps<TAuthClient extends AuthClient = AuthClient> =
+  DeepPartial<Omit<AuthConfig, "authClient">> & {
+    authClient: TAuthClient
     children?: JSX.Element | (() => JSX.Element)
     /** TanStack QueryClient to use for your application's queries. */
     queryClient?: QueryClient
@@ -40,9 +42,11 @@ export type AuthProviderProps<TAuthClient = AuthClient> =
 const resolveProviderChildren = (children: AuthProviderProps["children"]) =>
   typeof children === "function" ? children() : children
 
-export function AuthProvider(props: AuthProviderProps) {
+export function AuthProvider<TAuthClient extends AuthClient = AuthClient>(
+  props: AuthProviderProps<TAuthClient>
+) {
   const { children, queryClient: qc, ...configInput } = props
-  const config = resolveAuthConfig(configInput as AuthProviderProps<AuthClient>)
+  const config = resolveAuthConfig(configInput)
   const queryClient = qc || fallbackQueryClient
 
   queryClient.setQueryDefaults(authQueryKeys.all, authQueryRetryOptions)
@@ -61,7 +65,9 @@ export function AuthProvider(props: AuthProviderProps) {
   )
 }
 
-export function useAuth(): AuthConfig {
+export function useAuth<
+  TAuthClient extends AuthClient = AuthClient
+>(): AuthConfig<TAuthClient> {
   const context = useContext(AuthContext)
   const renderingConfig = useContext(RenderingAuthConfigContext)
   const auth = context ?? renderingConfig
@@ -70,5 +76,5 @@ export function useAuth(): AuthConfig {
     throw new Error("[Better Auth UI] AuthProvider is required")
   }
 
-  return auth
+  return auth as AuthConfig<TAuthClient>
 }

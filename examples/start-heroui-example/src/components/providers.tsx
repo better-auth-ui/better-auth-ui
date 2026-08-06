@@ -1,5 +1,5 @@
 import { AuthProvider } from "@better-auth-ui/heroui"
-import { themePlugin } from "@better-auth-ui/heroui/plugins"
+import { themePlugin } from "@better-auth-ui/heroui/plugins/theme"
 import { Toast } from "@heroui/react"
 import { useNavigate } from "@tanstack/react-router"
 import { ThemeProvider, useTheme } from "next-themes"

@@ -1,4 +1,4 @@
-import { apiKeyLocalization } from "@better-auth-ui/core/plugins"
+import { apiKeyLocalization } from "@better-auth-ui/core/plugins/api-key"
 import { Key } from "lucide-solid"
 import { Show } from "solid-js"
 import { Button } from "@/components/ui/button"

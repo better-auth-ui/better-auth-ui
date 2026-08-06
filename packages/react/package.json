@@ -24,54 +24,116 @@
       "types": "./dist/email.d.ts",
       "import": "./dist/email.js"
     },
-    "./server": {
-      "src": "./src/server.ts",
-      "types": "./dist/server.d.ts",
-      "import": "./dist/server.js"
+    "./plugins/admin": {
+      "src": "./src/plugins/admin/index.ts",
+      "types": "./dist/plugins/admin/index.d.ts",
+      "import": "./dist/plugins/admin/index.js"
     },
-    "./plugins": {
-      "src": "./src/plugins.ts",
-      "types": "./dist/plugins.d.ts",
-      "import": "./dist/plugins.js"
+    "./plugins/anonymous": {
+      "src": "./src/plugins/anonymous/index.ts",
+      "types": "./dist/plugins/anonymous/index.d.ts",
+      "import": "./dist/plugins/anonymous/index.js"
+    },
+    "./plugins/api-key": {
+      "src": "./src/plugins/api-key/index.ts",
+      "types": "./dist/plugins/api-key/index.d.ts",
+      "import": "./dist/plugins/api-key/index.js"
+    },
+    "./plugins/captcha": {
+      "src": "./src/plugins/captcha/index.ts",
+      "types": "./dist/plugins/captcha/index.d.ts",
+      "import": "./dist/plugins/captcha/index.js"
+    },
+    "./plugins/device-authorization": {
+      "src": "./src/plugins/device-authorization/index.ts",
+      "types": "./dist/plugins/device-authorization/index.d.ts",
+      "import": "./dist/plugins/device-authorization/index.js"
+    },
+    "./plugins/email-otp": {
+      "src": "./src/plugins/email-otp/index.ts",
+      "types": "./dist/plugins/email-otp/index.d.ts",
+      "import": "./dist/plugins/email-otp/index.js"
+    },
+    "./plugins/magic-link": {
+      "src": "./src/plugins/magic-link/index.ts",
+      "types": "./dist/plugins/magic-link/index.d.ts",
+      "import": "./dist/plugins/magic-link/index.js"
+    },
+    "./plugins/multi-session": {
+      "src": "./src/plugins/multi-session/index.ts",
+      "types": "./dist/plugins/multi-session/index.d.ts",
+      "import": "./dist/plugins/multi-session/index.js"
+    },
+    "./plugins/oauth-provider": {
+      "src": "./src/plugins/oauth-provider/index.ts",
+      "types": "./dist/plugins/oauth-provider/index.d.ts",
+      "import": "./dist/plugins/oauth-provider/index.js"
+    },
+    "./plugins/one-tap": {
+      "src": "./src/plugins/one-tap/index.ts",
+      "types": "./dist/plugins/one-tap/index.d.ts",
+      "import": "./dist/plugins/one-tap/index.js"
+    },
+    "./plugins/organization": {
+      "src": "./src/plugins/organization/index.ts",
+      "types": "./dist/plugins/organization/index.d.ts",
+      "import": "./dist/plugins/organization/index.js"
+    },
+    "./plugins/passkey": {
+      "src": "./src/plugins/passkey/index.ts",
+      "types": "./dist/plugins/passkey/index.d.ts",
+      "import": "./dist/plugins/passkey/index.js"
+    },
+    "./plugins/phone-number": {
+      "src": "./src/plugins/phone-number/index.ts",
+      "types": "./dist/plugins/phone-number/index.d.ts",
+      "import": "./dist/plugins/phone-number/index.js"
+    },
+    "./plugins/two-factor": {
+      "src": "./src/plugins/two-factor/index.ts",
+      "types": "./dist/plugins/two-factor/index.d.ts",
+      "import": "./dist/plugins/two-factor/index.js"
+    },
+    "./plugins/username": {
+      "src": "./src/plugins/username/index.ts",
+      "types": "./dist/plugins/username/index.d.ts",
+      "import": "./dist/plugins/username/index.js"
     }
   },
   "devDependencies": {
-    "@better-auth/api-key": "^1.6.19",
-    "@better-auth/oauth-provider": "1.6.19",
-    "@better-auth/passkey": "^1.6.19",
-    "@react-email/ui": "6.6.8",
-    "@tanstack/query-core": "^5.100.14",
-    "@tanstack/react-query": "^5.100.14",
+    "@better-auth/api-key": "1.7.0-rc.4",
+    "@better-auth/passkey": "1.7.0-rc.4",
+    "@react-email/ui": "6.9.1",
+    "@tanstack/query-core": "^5.101.2",
+    "@tanstack/react-query": "^5.101.2",
     "@testing-library/react": "^16.3.2",
-    "@testing-library/user-event": "^14.5.2",
-    "@types/react": "^19.2.15",
-    "@vitejs/plugin-react": "^6.0.2",
+    "@types/react": "^19.2.18",
+    "@vitejs/plugin-react": "^6.0.5",
     "@vitest/browser-playwright": "^4.1.9",
-    "better-auth": "^1.6.19",
+    "better-auth": "1.7.0-rc.4",
     "clsx": "^2.1.1",
-    "playwright": "^1.61.0",
+    "playwright": "^1.62.1",
     "react": "^19.2.6",
     "react-dom": "^19.2.6",
     "react-email": "^6.6.8",
     "tailwind-merge": "^3.5.0",
-    "tailwindcss": "^4.3.1",
+    "tailwindcss": "^4.3.2",
     "vitest": "^4.1.9",
     "zod": "^4.4.3"
   },
   "peerDependencies": {
     "@better-auth-ui/core": "*",
-    "@better-auth/api-key": ">=1.6.19",
-    "@better-auth/oauth-provider": ">=1.6.19",
-    "@better-auth/passkey": ">=1.6.19",
-    "@tanstack/query-core": ">=5.100.14",
-    "@tanstack/react-query": ">=5.100.14",
-    "better-auth": ">=1.6.19",
+    "@better-auth/api-key": ">=1.7.0-rc.4",
+    "@better-auth/passkey": ">=1.7.0-rc.4",
+    "@tanstack/query-core": ">=5.101.2",
+    "@tanstack/react-query": ">=5.101.2",
+    "better-auth": ">=1.7.0-rc.4",
     "clsx": ">=2.0.0",
     "react": ">=19.2.6",
     "react-dom": ">=19.2.6",
     "react-email": ">=6.0.0",
     "tailwind-merge": ">=3.5.0",
-    "tailwindcss": ">=4.3.1",
+    "tailwindcss": ">=4.3.2",
     "zod": ">=4.4.3"
   },
   "peerDependenciesMeta": {

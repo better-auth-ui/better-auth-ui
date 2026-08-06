@@ -4,7 +4,7 @@ import {
   adminMutationKeys,
   adminPlugin,
   isImpersonatingSession
-} from "../src/plugins"
+} from "../src/plugins/admin"
 
 describe("adminPlugin", () => {
   it("provides stable identity and merges localization overrides", () => {

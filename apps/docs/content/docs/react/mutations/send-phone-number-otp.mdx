@@ -7,10 +7,10 @@ Requires Better Auth `phoneNumber()` on the server and `phoneNumberClient()` on 
 
 ```tsx
 import {
-  type PhoneNumberAuthClient,
-  useAuth,
-  useSendPhoneNumberOtp
-} from "@better-auth-ui/react"
+  type PhoneNumberAuthClient
+} from "@better-auth-ui/core/plugins/phone-number"
+import { useAuth } from "@better-auth-ui/react"
+import { useSendPhoneNumberOtp } from "@better-auth-ui/react/plugins/phone-number"
 
 const { authClient } = useAuth()
 const { mutate: sendOtp } = useSendPhoneNumberOtp(
@@ -20,8 +20,15 @@ const { mutate: sendOtp } = useSendPhoneNumberOtp(
 sendOtp({ phoneNumber: "+12025550123" })
 ```
 
-Use `sendPhoneNumberOtpOptions(authClient)` with `useMutation` when you need the options factory directly.
+## Options factory
+
+```tsx
+import { sendPhoneNumberOtpOptions } from "@better-auth-ui/core/plugins/phone-number"
+import { useMutation } from "@tanstack/react-query"
+
+const { mutate } = useMutation(sendPhoneNumberOtpOptions(authClient))
+```
 
 ## Params
 
-<auto-type-table path="../../../../../../packages/react/src/mutations/phone-number/send-phone-number-otp-mutation.ts" name="SendPhoneNumberOtpParams" />
+<auto-type-table path="../../../../../../packages/core/src/plugins/phone-number/send-phone-number-otp-mutation.ts" name="SendPhoneNumberOtpParams" />

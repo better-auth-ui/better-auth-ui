@@ -8,7 +8,8 @@ Requires `oauthProviderClient()` from `@better-auth/oauth-provider/client`.
 ## Usage
 
 ```tsx
-import { useAuth, useDeleteOAuthConsent } from "@better-auth-ui/react"
+import { useAuth } from "@better-auth-ui/react"
+import { useDeleteOAuthConsent } from "@better-auth-ui/react/plugins/oauth-provider"
 
 const { authClient } = useAuth()
 const { mutateAsync: deleteConsent } = useDeleteOAuthConsent(authClient)
@@ -29,11 +30,11 @@ On success the user's consent list is invalidated and refetched, so a removal th
 ## Options factory
 
 ```ts
-import { deleteOAuthConsentOptions } from "@better-auth-ui/react"
+import { deleteOAuthConsentOptions } from "@better-auth-ui/core/plugins/oauth-provider"
 
 const options = deleteOAuthConsentOptions(authClient)
 ```
 
 ## Params
 
-<auto-type-table path="../../../../../../packages/react/src/mutations/oauth-provider/delete-oauth-consent-mutation.ts" name="DeleteOAuthConsentParams" />
+<auto-type-table path="../../../../../../packages/core/src/plugins/oauth-provider/delete-oauth-consent-mutation.ts" name="DeleteOAuthConsentParams" />

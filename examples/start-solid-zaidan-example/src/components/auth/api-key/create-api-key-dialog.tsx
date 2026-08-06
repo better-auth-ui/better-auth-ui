@@ -1,11 +1,9 @@
-import { apiKeyExpirationDaysToSeconds } from "@better-auth-ui/core/plugins"
 import {
   type ApiKeyAuthClient,
-  createApiKeyOptions,
-  useAuth,
-  useAuthPlugin
-} from "@better-auth-ui/solid"
-import { createMutation } from "@tanstack/solid-query"
+  apiKeyExpirationDaysToSeconds
+} from "@better-auth-ui/core/plugins/api-key"
+import { useAuth, useAuthPlugin } from "@better-auth-ui/solid"
+import { useCreateApiKey } from "@better-auth-ui/solid/plugins/api-key"
 import { Key } from "lucide-solid"
 import { createSignal, Show } from "solid-js"
 import { NewApiKeyDialog } from "@/components/auth/api-key/new-api-key-dialog"
@@ -40,7 +38,7 @@ export function CreateApiKeyDialog(props: {
   organizationId?: string
   onOpenChange: (open: boolean) => void
 }) {
-  const auth = useAuth()
+  const auth = useAuth<ApiKeyAuthClient>()
   const { keyExpiration, localization: apiKeyLocalization } =
     useAuthPlugin(apiKeyPlugin)
   const expirationOptions: ExpirationOption[] = keyExpiration
@@ -76,12 +74,11 @@ export function CreateApiKeyDialog(props: {
   const [newApiKeySecret, setNewApiKeySecret] = createSignal<string | null>(
     null
   )
-  const createApiKey = createMutation(() => ({
-    ...createApiKeyOptions(auth.authClient as ApiKeyAuthClient),
-    onSuccess: (result) => {
+  const createApiKey = useCreateApiKey(auth.authClient, () => ({
+    onSuccess: (apiKey) => {
       props.onOpenChange(false)
-      setNewApiKeyName(result.name ?? null)
-      setNewApiKeySecret(result.key)
+      setNewApiKeyName(apiKey.name ?? null)
+      setNewApiKeySecret(apiKey.key)
       setIsNewKeyDialogOpen(true)
     }
   }))

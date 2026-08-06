@@ -1,5 +1,5 @@
 import { AuthProvider, UserButton } from "@better-auth-ui/heroui"
-import { multiSessionPlugin } from "@better-auth-ui/heroui/plugins"
+import { multiSessionPlugin } from "@better-auth-ui/heroui/plugins/multi-session"
 import { authClient } from "@/lib/auth-client"
 
 export function SwitchAccountSubmenuDemo() {

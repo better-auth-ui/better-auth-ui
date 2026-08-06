@@ -8,11 +8,9 @@ Verification signs the user in, so the session query is refetched on success.
 ## Usage
 
 ```tsx
-import {
-  type EmailOtpAuthClient,
-  useAuth,
-  useVerifyEmailOtp
-} from "@better-auth-ui/react"
+import type { EmailOtpAuthClient } from "@better-auth-ui/core/plugins/email-otp"
+import { useAuth } from "@better-auth-ui/react"
+import { useVerifyEmailOtp } from "@better-auth-ui/react/plugins/email-otp"
 
 const { authClient } = useAuth()
 const { mutate: verifyEmailOtp } = useVerifyEmailOtp(
@@ -30,7 +28,7 @@ verifyEmailOtp({
 ## Options factory
 
 ```tsx
-import { verifyEmailOtpOptions } from "@better-auth-ui/react"
+import { verifyEmailOtpOptions } from "@better-auth-ui/core/plugins/email-otp"
 import { useMutation } from "@tanstack/react-query"
 
 const { mutate } = useMutation(verifyEmailOtpOptions(authClient))
@@ -38,4 +36,4 @@ const { mutate } = useMutation(verifyEmailOtpOptions(authClient))
 
 ## Params
 
-<auto-type-table path="../../../../../../packages/react/src/mutations/email-otp/verify-email-otp-mutation.ts" name="VerifyEmailOtpParams" />
+<auto-type-table path="../../../../../../packages/core/src/plugins/email-otp/verify-email-otp-mutation.ts" name="VerifyEmailOtpParams" />

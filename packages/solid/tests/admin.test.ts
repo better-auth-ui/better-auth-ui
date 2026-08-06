@@ -1,8 +1,9 @@
 import { authQueryKeys } from "@better-auth-ui/core"
-import { adminMutationKeys } from "@better-auth-ui/core/plugins"
+import {
+  adminMutationKeys,
+  stopImpersonatingOptions
+} from "@better-auth-ui/core/plugins/admin"
 import { describe, expect, it, vi } from "vitest"
-
-import { stopImpersonatingOptions } from "../src"
 
 describe("admin mutation options", () => {
   it("stops impersonating with throwing fetch options and refreshes the session", async () => {

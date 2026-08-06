@@ -1,13 +1,11 @@
 import {
-  AuthLink,
   sendTwoFactorOtpOptions,
   type TwoFactorAuthClient,
-  useAuth,
-  useAuthPlugin,
   verifyBackupCodeOptions,
   verifyTotpOptions,
   verifyTwoFactorOtpOptions
-} from "@better-auth-ui/solid"
+} from "@better-auth-ui/core/plugins/two-factor"
+import { AuthLink, useAuth, useAuthPlugin } from "@better-auth-ui/solid"
 import { createMutation } from "@tanstack/solid-query"
 import { createSignal, For, Show } from "solid-js"
 

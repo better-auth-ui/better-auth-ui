@@ -1,18 +1,24 @@
-import { authQueryKeys } from "@better-auth-ui/core"
-import { emailOtpMutationKeys } from "@better-auth-ui/core/plugins"
-import type { EmailOtpAuthClient } from "../../lib/auth-client"
-import { createAuthMutationOptions } from "../create-auth-mutation"
+import {
+  type EmailOtpAuthClient,
+  type VerifyEmailOtpOptions,
+  verifyEmailOtpOptions
+} from "@better-auth-ui/core/plugins/email-otp"
+import { type QueryClient, useMutation } from "@tanstack/solid-query"
+import type { Accessor } from "solid-js"
 
-export type VerifyEmailOtpParams<TAuthClient extends EmailOtpAuthClient> =
-  Parameters<TAuthClient["emailOtp"]["verifyEmail"]>[0]
+export type UseVerifyEmailOtpOptions<TAuthClient extends EmailOtpAuthClient> =
+  Accessor<VerifyEmailOtpOptions<TAuthClient>>
 
-/** Mutation options factory for verifying an email address with a code. */
-export function verifyEmailOtpOptions<TAuthClient extends EmailOtpAuthClient>(
-  authClient: TAuthClient
+export function useVerifyEmailOtp<TAuthClient extends EmailOtpAuthClient>(
+  authClient: TAuthClient,
+  options?: UseVerifyEmailOtpOptions<TAuthClient>,
+  queryClient?: Accessor<QueryClient>
 ) {
-  return createAuthMutationOptions(
-    authClient.emailOtp.verifyEmail,
-    emailOtpMutationKeys.verifyEmail,
-    { awaits: [authQueryKeys.session] }
+  return useMutation(
+    () => ({
+      ...verifyEmailOtpOptions(authClient),
+      ...(options?.() ?? {})
+    }),
+    queryClient
   )
 }

@@ -1,4 +1,7 @@
-import { themeLocalization, themePlugin } from "@better-auth-ui/core/plugins"
+import {
+  themeLocalization,
+  themePlugin
+} from "@better-auth-ui/core/plugins/theme"
 import {
   applyThemePreference,
   isThemeMode,

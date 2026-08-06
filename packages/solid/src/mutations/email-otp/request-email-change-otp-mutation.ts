@@ -1,23 +1,27 @@
-import { emailOtpMutationKeys } from "@better-auth-ui/core/plugins"
-import type { EmailOtpAuthClient } from "../../lib/auth-client"
-import { createAuthMutationOptions } from "../create-auth-mutation"
+import {
+  type EmailOtpAuthClient,
+  type RequestEmailChangeOtpOptions,
+  requestEmailChangeOtpOptions
+} from "@better-auth-ui/core/plugins/email-otp"
+import { type QueryClient, useMutation } from "@tanstack/solid-query"
+import type { Accessor } from "solid-js"
 
-export type RequestEmailChangeOtpParams<
+export type UseRequestEmailChangeOtpOptions<
   TAuthClient extends EmailOtpAuthClient
-> = Parameters<TAuthClient["emailOtp"]["requestEmailChange"]>[0]
+> = Accessor<RequestEmailChangeOtpOptions<TAuthClient>>
 
-/**
- * Mutation options factory for starting an email change with a code.
- *
- * Sends a code to the new address. When the server runs with
- * `changeEmail: { verifyCurrentEmail: true }`, pass the `otp` the user
- * received at their current address as well.
- */
-export function requestEmailChangeOtpOptions<
+export function useRequestEmailChangeOtp<
   TAuthClient extends EmailOtpAuthClient
->(authClient: TAuthClient) {
-  return createAuthMutationOptions(
-    authClient.emailOtp.requestEmailChange,
-    emailOtpMutationKeys.requestEmailChange
+>(
+  authClient: TAuthClient,
+  options?: UseRequestEmailChangeOtpOptions<TAuthClient>,
+  queryClient?: Accessor<QueryClient>
+) {
+  return useMutation(
+    () => ({
+      ...requestEmailChangeOtpOptions(authClient),
+      ...(options?.() ?? {})
+    }),
+    queryClient
   )
 }

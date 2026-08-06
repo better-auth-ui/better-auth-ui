@@ -1,11 +1,8 @@
 "use client"
 
-import {
-  type PhoneNumberAuthClient,
-  useAuth,
-  useAuthPlugin,
-  useResetPhoneNumberPassword
-} from "@better-auth-ui/react"
+import type { PhoneNumberAuthClient } from "@better-auth-ui/core/plugins/phone-number"
+import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
+import { useResetPhoneNumberPassword } from "@better-auth-ui/react/plugins/phone-number"
 import { Eye, EyeOff } from "lucide-react"
 import { type SyntheticEvent, useEffect, useState } from "react"
 import { toast } from "sonner"

@@ -250,7 +250,8 @@ The chooser has no sign-out or revoke actions on purpose. Session management bel
 There is no post-login view to install. What an application selects after login differs too much — a workspace, a tenant, a team, a project, a role — so this stays yours to build. Use the headless continuation helper when your selector is done:
 
 ```tsx title="routes/auth/select-workspace.tsx"
-import { useAuth, useOAuthContinue } from "@better-auth-ui/react"
+import { useAuth } from "@better-auth-ui/react"
+import { useOAuthContinue } from "@better-auth-ui/react/plugins/oauth-provider"
 
 type Workspace = { slug: string; name: string }
 

@@ -21,7 +21,7 @@ import {
   fetchListSessions,
   listSessionsOptions,
   prefetchListSessions
-} from "@better-auth-ui/solid"
+} from "@better-auth-ui/core"
 
 const options = listSessionsOptions(authClient, userId)
 await ensureListSessions(queryClient, authClient, userId)
@@ -32,7 +32,7 @@ const sessions = await fetchListSessions(queryClient, authClient, userId)
 ## Invalidation
 
 ```ts
-import { listSessionsOptions } from "@better-auth-ui/solid"
+import { listSessionsOptions } from "@better-auth-ui/core"
 
 queryClient.invalidateQueries({
   queryKey: listSessionsOptions(authClient, userId).queryKey
@@ -41,4 +41,4 @@ queryClient.invalidateQueries({
 
 ## Params
 
-<auto-type-table path="../../../../../../packages/solid/src/queries/settings/list-sessions-query.ts" name="ListSessionsParams" />
+<auto-type-table path="../../../../../../packages/core/src/queries/list-sessions-query.ts" name="ListSessionsParams" />

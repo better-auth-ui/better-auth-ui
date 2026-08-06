@@ -1,15 +1,15 @@
 "use client"
 
-import type { DeviceAuthorizationLocalization } from "@better-auth-ui/core/plugins"
+import type {
+  DeviceAuthorizationAuthClient,
+  DeviceAuthorizationLocalization
+} from "@better-auth-ui/core/plugins/device-authorization"
+import { useAuth, useAuthPlugin, useSession } from "@better-auth-ui/react"
 import {
-  type DeviceAuthorizationAuthClient,
   useApproveDevice,
-  useAuth,
-  useAuthPlugin,
   useDenyDevice,
-  useSession,
   useVerifyDeviceCode
-} from "@better-auth-ui/react"
+} from "@better-auth-ui/react/plugins/device-authorization"
 import { REGEXP_ONLY_DIGITS_AND_CHARS } from "input-otp"
 import { CheckIcon, CircleCheckIcon, CircleXIcon, XIcon } from "lucide-react"
 import {

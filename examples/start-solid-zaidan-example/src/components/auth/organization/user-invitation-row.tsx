@@ -1,10 +1,12 @@
-import type { OrganizationLocalization } from "@better-auth-ui/core/plugins"
-import type { OrganizationAuthClient } from "@better-auth-ui/solid"
+import type {
+  OrganizationAuthClient,
+  OrganizationLocalization
+} from "@better-auth-ui/core/plugins/organization"
+import { useAuth } from "@better-auth-ui/solid"
 import {
   useAcceptInvitation,
-  useAuth,
   useRejectInvitation
-} from "@better-auth-ui/solid"
+} from "@better-auth-ui/solid/plugins/organization"
 import { Check, Clock, X } from "lucide-solid"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -56,7 +58,7 @@ function formatInvitationDate(createdAt?: Date | string | null) {
 }
 
 export function UserInvitationRow(props: UserInvitationRowProps) {
-  const auth = useAuth()
+  const auth = useAuth<OrganizationAuthClient>()
   const organizationPluginConfig = () =>
     auth.plugins.find((plugin) => plugin.id === organizationPlugin.id) as
       | {
@@ -70,12 +72,8 @@ export function UserInvitationRow(props: UserInvitationRowProps) {
   const organizationLocalization = () =>
     organizationPluginConfig()?.localization ?? fallbackLocalization
   const roles = () => organizationPluginConfig()?.roles ?? fallbackRoles
-  const acceptInvitation = useAcceptInvitation(
-    auth.authClient as OrganizationAuthClient
-  )
-  const rejectInvitation = useRejectInvitation(
-    auth.authClient as OrganizationAuthClient
-  )
+  const acceptInvitation = useAcceptInvitation(auth.authClient)
+  const rejectInvitation = useRejectInvitation(auth.authClient)
   const isPending = () =>
     acceptInvitation.isPending || rejectInvitation.isPending
   const roleLabel = () =>

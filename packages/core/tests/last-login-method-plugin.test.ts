@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest"
 import {
   lastLoginMethodLocalization,
   lastLoginMethodPlugin
-} from "../src/plugins"
+} from "../src/plugins/last-login-method"
 
 describe("lastLoginMethodPlugin", () => {
   it("provides stable identity and merges localization overrides", () => {

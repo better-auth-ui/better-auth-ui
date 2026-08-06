@@ -1,21 +1,21 @@
 "use client"
 
+import type { ListDeviceSession } from "@better-auth-ui/core/plugins/multi-session"
 import {
   type OAuthAuthorizationRequest,
+  type OAuthProviderMultiSessionAuthClient,
   parseOAuthAuthorizationRequest,
   sanitizeOAuthClientUrl
-} from "@better-auth-ui/core/plugins"
+} from "@better-auth-ui/core/plugins/oauth-provider"
+import { useAuth, useAuthPlugin, useSession } from "@better-auth-ui/react"
 import {
-  type ListDeviceSession,
-  type OAuthProviderMultiSessionAuthClient,
-  useAuth,
-  useAuthPlugin,
   useListDeviceSessions,
-  useOAuthContinue,
-  usePublicOAuthClient,
-  useSession,
   useSetActiveSession
-} from "@better-auth-ui/react"
+} from "@better-auth-ui/react/plugins/multi-session"
+import {
+  useOAuthContinue,
+  usePublicOAuthClient
+} from "@better-auth-ui/react/plugins/oauth-provider"
 import { ShieldCheck } from "lucide-react"
 import { useEffect, useState } from "react"
 

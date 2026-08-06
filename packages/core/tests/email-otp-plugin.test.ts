@@ -3,7 +3,7 @@ import {
   emailOtpLocalization,
   emailOtpMutationKeys,
   emailOtpPlugin
-} from "../src/plugins"
+} from "../src/plugins/email-otp"
 
 describe("emailOtpPlugin", () => {
   it("enables sign-in only and leaves link-based flows alone", () => {

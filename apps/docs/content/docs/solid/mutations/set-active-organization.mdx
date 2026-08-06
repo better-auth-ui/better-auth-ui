@@ -6,24 +6,24 @@ description: Set the active organization on the session.
 ## Usage
 
 ```tsx
-import { useSetActiveOrganization } from "@better-auth-ui/solid"
+import { useSetActiveOrganization } from "@better-auth-ui/solid/plugins/organization"
 
 const mutation = useSetActiveOrganization(authClient)
 
 mutation.mutate(/* params */)
 ```
 
-Organization mutations require `organizationClient()` on the Better Auth client. They attach the same `meta.invalidates` / `meta.awaits` cache metadata used by upstream React, and the Solid `AuthProvider` installs a mutation invalidator that refreshes affected organization/session caches after successful auth mutations.
+Organization mutations require `organizationClient()` on the Better Auth client. They attach the same `meta.invalidates` / `meta.awaits` cache metadata used by the shared React implementation, and the Solid `AuthProvider` installs a mutation invalidator that refreshes affected organization/session caches after successful auth mutations.
 
 ## Options factory
 
 ```tsx
-import { setActiveOrganizationOptions } from "@better-auth-ui/solid"
-import { createMutation } from "@tanstack/solid-query"
+import { setActiveOrganizationOptions } from "@better-auth-ui/core/plugins/organization"
+import { useMutation } from "@tanstack/solid-query"
 
-const mutation = createMutation(() => setActiveOrganizationOptions(authClient))
+const mutation = useMutation(() => setActiveOrganizationOptions(authClient))
 ```
 
 ## Params
 
-<auto-type-table path="../../../../../../packages/solid/src/mutations/organization/set-active-organization-mutation.ts" name="SetActiveOrganizationParams" />
+<auto-type-table path="../../../../../../packages/core/src/plugins/organization/set-active-organization-mutation.ts" name="SetActiveOrganizationParams" />

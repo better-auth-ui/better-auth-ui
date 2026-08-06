@@ -1,4 +1,4 @@
-import type { ListSession } from "@better-auth-ui/solid"
+import type { ListSession } from "@better-auth-ui/core"
 import { useAuth } from "@better-auth-ui/solid"
 import Bowser from "bowser"
 import { LogOut, Monitor, Smartphone, X } from "lucide-solid"

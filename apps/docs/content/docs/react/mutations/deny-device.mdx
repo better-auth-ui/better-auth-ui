@@ -8,7 +8,7 @@ Requires `deviceAuthorizationClient()` from `better-auth/client/plugins`. Call t
 ## Usage
 
 ```tsx
-import { useDenyDevice } from "@better-auth-ui/react"
+import { useDenyDevice } from "@better-auth-ui/react/plugins/device-authorization"
 
 const denyDevice = useDenyDevice(authClient)
 
@@ -20,11 +20,11 @@ denyDevice.mutate({
 ## Options factory
 
 ```ts
-import { denyDeviceOptions } from "@better-auth-ui/react"
+import { denyDeviceOptions } from "@better-auth-ui/core/plugins/device-authorization"
 
 const options = denyDeviceOptions(authClient)
 ```
 
 ## Params
 
-<auto-type-table path="../../../../../../packages/react/src/mutations/device-authorization/deny-device-mutation.ts" name="DenyDeviceParams" />
+<auto-type-table path="../../../../../../packages/core/src/plugins/device-authorization/deny-device-mutation.ts" name="DenyDeviceParams" />

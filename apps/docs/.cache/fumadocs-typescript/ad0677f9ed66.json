@@ -1,0 +1,117 @@
+[
+  {
+    "id": "new-device.tsx-NewDeviceEmailProps",
+    "name": "NewDeviceEmailProps",
+    "description": "",
+    "entries": [
+      {
+        "name": "userEmail",
+        "description": "",
+        "tags": [],
+        "type": "string",
+        "simplifiedType": "string",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "deviceInfo",
+        "description": "",
+        "tags": [],
+        "type": "DeviceInfo",
+        "simplifiedType": "object",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "secureAccountLink",
+        "description": "",
+        "tags": [],
+        "type": "string",
+        "simplifiedType": "string",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "appName",
+        "description": "",
+        "tags": [],
+        "type": "string",
+        "simplifiedType": "string",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "supportEmail",
+        "description": "",
+        "tags": [],
+        "type": "string",
+        "simplifiedType": "string",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "logoURL",
+        "description": "",
+        "tags": [],
+        "type": "string | { light: string; dark: string; }",
+        "simplifiedType": "string | { light: string; dark: string; }",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "classNames",
+        "description": "",
+        "tags": [],
+        "type": "EmailClassNames",
+        "simplifiedType": "EmailClassNames",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "colors",
+        "description": "",
+        "tags": [],
+        "type": "EmailColors",
+        "simplifiedType": "EmailColors",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "poweredBy",
+        "description": "",
+        "tags": [],
+        "type": "boolean",
+        "simplifiedType": "boolean",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "darkMode",
+        "description": "",
+        "tags": [],
+        "type": "boolean",
+        "simplifiedType": "boolean",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "head",
+        "description": "",
+        "tags": [],
+        "type": "JSX.Element",
+        "simplifiedType": "Element",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "localization",
+        "description": "",
+        "tags": [],
+        "type": "Partial<{ NEW_SIGN_IN_DETECTED: string; LOGO: string; NEW_SIGN_IN_TO_YOUR_ACCOUNT: string; DEVICE_DETAILS: string; BROWSER: string; OPERATING_SYSTEM: string; LOCATION: string; IP_ADDRESS: string; TIME: string; IF_THIS_WAS_YOU: string; SECURE_MY_ACCOUNT: string; EMAIL_SENT_BY: string; IF_YOU_DIDNT_SIGN_IN: string; POWERED_BY_BETTER_AUTH: string; }>",
+        "simplifiedType": "Partial<object>",
+        "required": false,
+        "deprecated": false
+      }
+    ]
+  }
+]

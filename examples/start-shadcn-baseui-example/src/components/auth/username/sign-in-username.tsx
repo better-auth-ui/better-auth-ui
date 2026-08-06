@@ -1,15 +1,15 @@
 "use client"
 
 import { authMutationKeys } from "@better-auth-ui/core"
+import type { UsernameAuthClient } from "@better-auth-ui/core/plugins/username"
 import {
   AuthPrompts,
-  type UsernameAuthClient,
   useAuth,
   useAuthPlugin,
   useFetchOptions,
-  useSignInEmail,
-  useSignInUsername
+  useSignInEmail
 } from "@better-auth-ui/react"
+import { useSignInUsername } from "@better-auth-ui/react/plugins/username"
 import { useIsMutating } from "@tanstack/react-query"
 import { Eye, EyeOff } from "lucide-react"
 import { type SyntheticEvent, useState } from "react"
@@ -71,7 +71,7 @@ export function SignInUsername({
     viewPaths,
     navigate,
     Link
-  } = useAuth()
+  } = useAuth<UsernameAuthClient>()
 
   const { fetchOptions, resetFetchOptions } = useFetchOptions()
   const continueSignIn = useSignInContinuation()
@@ -101,7 +101,7 @@ export function SignInUsername({
     })
 
   const { mutate: signInUsername, isPending: isSignInUsernamePending } =
-    useSignInUsername(authClient as UsernameAuthClient, {
+    useSignInUsername(authClient, {
       onError: (error) => {
         setPassword("")
 

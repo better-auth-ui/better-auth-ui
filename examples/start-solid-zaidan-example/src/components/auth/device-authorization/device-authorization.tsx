@@ -1,13 +1,11 @@
-import type { DeviceAuthorizationLocalization } from "@better-auth-ui/core/plugins"
 import {
   approveDeviceOptions,
   type DeviceAuthorizationAuthClient,
+  type DeviceAuthorizationLocalization,
   denyDeviceOptions,
-  useAuth,
-  useAuthPlugin,
-  useSession,
   verifyDeviceCodeOptions
-} from "@better-auth-ui/solid"
+} from "@better-auth-ui/core/plugins/device-authorization"
+import { useAuth, useAuthPlugin, useSession } from "@better-auth-ui/solid"
 import { createMutation } from "@tanstack/solid-query"
 import type { BetterFetchError } from "better-auth/client"
 import { Check, CircleCheck, CircleX, X } from "lucide-solid"

@@ -10,10 +10,10 @@ Use this as the primary guard inside protected route components.
 ## Usage
 
 ```tsx
-import { useAuth, useAuthenticate } from "@better-auth-ui/react"
+import { authClient } from "@/lib/auth-client"
+import { useAuthenticate } from "@better-auth-ui/react"
 
 export function AccountPage() {
-  const { authClient } = useAuth()
   const { data: session, isPending } = useAuthenticate(authClient)
 
   if (isPending) return <Spinner />

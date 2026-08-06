@@ -8,7 +8,7 @@ Requires `deviceAuthorizationClient()` from `better-auth/client/plugins`. Call t
 ## Options factory
 
 ```tsx
-import { denyDeviceOptions } from "@better-auth-ui/solid"
+import { denyDeviceOptions } from "@better-auth-ui/core/plugins/device-authorization"
 import { createMutation } from "@tanstack/solid-query"
 
 const denyDevice = createMutation(() => denyDeviceOptions(authClient))
@@ -20,4 +20,4 @@ denyDevice.mutate({
 
 ## Params
 
-<auto-type-table path="../../../../../../packages/solid/src/mutations/device-authorization/deny-device-mutation.ts" name="DenyDeviceParams" />
+<auto-type-table path="../../../../../../packages/core/src/plugins/device-authorization/deny-device-mutation.ts" name="DenyDeviceParams" />

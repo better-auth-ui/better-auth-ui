@@ -1,6 +1,6 @@
 import { viewPaths } from "@better-auth-ui/core"
 import { Auth } from "@better-auth-ui/heroui"
-import { magicLinkPlugin } from "@better-auth-ui/heroui/plugins"
+import { magicLinkPlugin } from "@better-auth-ui/heroui/plugins/magic-link"
 import { createFileRoute, notFound } from "@tanstack/react-router"
 
 /** Keep in sync with `magicLinkPlugin(...)` in `providers.tsx` if you customize `path`. */

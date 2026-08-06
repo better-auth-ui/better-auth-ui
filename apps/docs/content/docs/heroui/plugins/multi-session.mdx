@@ -56,7 +56,7 @@ Pass `multiSessionPlugin()` to `<AuthProvider>`:
 
 ```tsx title="components/providers.tsx"
 import { AuthProvider } from "@better-auth-ui/heroui"
-import { multiSessionPlugin } from "@better-auth-ui/heroui/plugins" // [!code highlight]
+import { multiSessionPlugin } from "@better-auth-ui/heroui/plugins/multi-session" // [!code highlight]
 
 <AuthProvider
   authClient={authClient}
@@ -81,7 +81,7 @@ The "Switch Account" submenu is automatically added to the `<UserButton />` drop
 **Usage**
 
 ```tsx
-import { SwitchAccountSubmenu } from "@better-auth-ui/heroui/plugins"
+import { SwitchAccountSubmenu } from "@better-auth-ui/heroui/plugins/multi-session"
 
 <SwitchAccountSubmenu />
 ```
@@ -99,7 +99,7 @@ The `<ManageAccounts />` card is automatically rendered in account settings when
 **Usage**
 
 ```tsx
-import { ManageAccounts } from "@better-auth-ui/heroui/plugins"
+import { ManageAccounts } from "@better-auth-ui/heroui/plugins/multi-session"
 
 <ManageAccounts />
 ```

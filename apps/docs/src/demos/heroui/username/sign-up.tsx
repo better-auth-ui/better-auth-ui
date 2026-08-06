@@ -1,5 +1,5 @@
 import { AuthProvider, SignUp } from "@better-auth-ui/heroui"
-import { usernamePlugin } from "@better-auth-ui/heroui/plugins"
+import { usernamePlugin } from "@better-auth-ui/heroui/plugins/username"
 
 import { authClient } from "@/lib/auth-client"
 

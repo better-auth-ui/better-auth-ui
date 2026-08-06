@@ -1,14 +1,11 @@
 import {
   type AuthorizedOAuthApplication,
+  type OAuthProviderAuthClient,
   resolveOAuthScopeMetadata,
   sanitizeOAuthClientUrl
-} from "@better-auth-ui/core/plugins"
-import {
-  type OAuthProviderAuthClient,
-  useAuth,
-  useAuthPlugin,
-  usePublicOAuthClient
-} from "@better-auth-ui/solid"
+} from "@better-auth-ui/core/plugins/oauth-provider"
+import { useAuth, useAuthPlugin } from "@better-auth-ui/solid"
+import { usePublicOAuthClient } from "@better-auth-ui/solid/plugins/oauth-provider"
 import { ShieldCheck } from "lucide-solid"
 import { createSignal, For, Show } from "solid-js"
 import { AlertDialog, AlertDialogTrigger } from "@/components/ui/alert-dialog"

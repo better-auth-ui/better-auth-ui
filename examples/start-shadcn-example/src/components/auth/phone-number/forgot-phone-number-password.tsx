@@ -1,12 +1,8 @@
 "use client"
 
-import {
-  type PhoneNumberAuthClient,
-  useAuth,
-  useAuthPlugin,
-  useFetchOptions,
-  useRequestPhoneNumberPasswordReset
-} from "@better-auth-ui/react"
+import type { PhoneNumberAuthClient } from "@better-auth-ui/core/plugins/phone-number"
+import { useAuth, useAuthPlugin, useFetchOptions } from "@better-auth-ui/react"
+import { useRequestPhoneNumberPasswordReset } from "@better-auth-ui/react/plugins/phone-number"
 import { type SyntheticEvent, useState } from "react"
 
 import { Button } from "@/components/ui/button"

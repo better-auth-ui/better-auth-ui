@@ -1,24 +1,24 @@
-import { authQueryKeys } from "@better-auth-ui/core"
-import { twoFactorMutationKeys } from "@better-auth-ui/core/plugins"
-import type { TwoFactorAuthClient } from "../../lib/auth-client"
-import { createAuthMutationOptions } from "../create-auth-mutation"
+import {
+  type EnableTwoFactorOptions,
+  enableTwoFactorOptions,
+  type TwoFactorAuthClient
+} from "@better-auth-ui/core/plugins/two-factor"
+import { type QueryClient, useMutation } from "@tanstack/solid-query"
+import type { Accessor } from "solid-js"
 
-export type EnableTwoFactorParams<TAuthClient extends TwoFactorAuthClient> =
-  Parameters<TAuthClient["twoFactor"]["enable"]>[0]
+export type UseEnableTwoFactorOptions<TAuthClient extends TwoFactorAuthClient> =
+  Accessor<EnableTwoFactorOptions<TAuthClient>>
 
-/**
- * Mutation options factory for enabling two-factor authentication.
- *
- * Resolves with the TOTP URI and the generated backup codes. Unless the
- * server sets `skipVerificationOnEnable`, two-factor only becomes active once
- * the user verifies a TOTP code.
- */
-export function enableTwoFactorOptions<TAuthClient extends TwoFactorAuthClient>(
-  authClient: TAuthClient
+export function useEnableTwoFactor<TAuthClient extends TwoFactorAuthClient>(
+  authClient: TAuthClient,
+  options?: UseEnableTwoFactorOptions<TAuthClient>,
+  queryClient?: Accessor<QueryClient>
 ) {
-  return createAuthMutationOptions(
-    authClient.twoFactor.enable,
-    twoFactorMutationKeys.enable,
-    { awaits: [authQueryKeys.session] }
+  return useMutation(
+    () => ({
+      ...enableTwoFactorOptions(authClient),
+      ...(options?.() ?? {})
+    }),
+    queryClient
   )
 }

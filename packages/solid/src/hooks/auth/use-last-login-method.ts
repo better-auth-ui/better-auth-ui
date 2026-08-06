@@ -1,10 +1,10 @@
 import {
+  type LastLoginMethodAuthClient,
   type LastLoginMethodLocalization,
   lastLoginMethodLocalization,
   lastLoginMethodPlugin
-} from "@better-auth-ui/core/plugins"
+} from "@better-auth-ui/core/plugins/last-login-method"
 import { type Accessor, createSignal, onMount } from "solid-js"
-import type { LastLoginMethodAuthClient } from "../../lib/auth-client"
 import { useAuth } from "../../lib/auth-provider"
 
 export type LastLoginMethodState = {

@@ -1,16 +1,13 @@
 import {
-  oauthProviderMutationKeys,
-  oauthProviderQueryKeys
-} from "@better-auth-ui/core/plugins"
-import { describe, expect, it, vi } from "vitest"
-
-import {
   deleteOAuthConsentOptions,
   listOAuthConsentsOptions,
   oauthConsentOptions,
   oauthContinueOptions,
+  oauthProviderMutationKeys,
+  oauthProviderQueryKeys,
   publicOAuthClientOptions
-} from "../src"
+} from "@better-auth-ui/core/plugins/oauth-provider"
+import { describe, expect, it, vi } from "vitest"
 
 type MutationOptions = { mutationFn: (variables: unknown) => Promise<unknown> }
 

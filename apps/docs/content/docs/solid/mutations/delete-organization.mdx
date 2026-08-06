@@ -6,24 +6,24 @@ description: Delete an organization.
 ## Usage
 
 ```tsx
-import { useDeleteOrganization } from "@better-auth-ui/solid"
+import { useDeleteOrganization } from "@better-auth-ui/solid/plugins/organization"
 
 const mutation = useDeleteOrganization(authClient)
 
 mutation.mutate(/* params */)
 ```
 
-Organization mutations require `organizationClient()` on the Better Auth client. They attach the same `meta.invalidates` / `meta.awaits` cache metadata used by upstream React, and the Solid `AuthProvider` installs a mutation invalidator that refreshes affected organization/session caches after successful auth mutations.
+Organization mutations require `organizationClient()` on the Better Auth client. They attach the same `meta.invalidates` / `meta.awaits` cache metadata used by the shared React implementation, and the Solid `AuthProvider` installs a mutation invalidator that refreshes affected organization/session caches after successful auth mutations.
 
 ## Options factory
 
 ```tsx
-import { deleteOrganizationOptions } from "@better-auth-ui/solid"
-import { createMutation } from "@tanstack/solid-query"
+import { deleteOrganizationOptions } from "@better-auth-ui/core/plugins/organization"
+import { useMutation } from "@tanstack/solid-query"
 
-const mutation = createMutation(() => deleteOrganizationOptions(authClient))
+const mutation = useMutation(() => deleteOrganizationOptions(authClient))
 ```
 
 ## Params
 
-<auto-type-table path="../../../../../../packages/solid/src/mutations/organization/delete-organization-mutation.ts" name="DeleteOrganizationParams" />
+<auto-type-table path="../../../../../../packages/core/src/plugins/organization/delete-organization-mutation.ts" name="DeleteOrganizationParams" />

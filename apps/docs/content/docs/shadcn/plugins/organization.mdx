@@ -151,8 +151,8 @@ The plugin contributes an `organizations` segment to `viewPaths.settings`. Sprea
 
 ```tsx title="routes/settings/$path.tsx"
 import { viewPaths } from "@better-auth-ui/core"
-import { ensureSession as ensureSessionClient } from "@better-auth-ui/react"
-import { ensureSession as ensureSessionServer } from "@better-auth-ui/react/server"
+import { ensureSession } from "@better-auth-ui/core"
+import { ensureSessionServer } from "@better-auth-ui/core/server"
 import { createFileRoute, notFound, redirect } from "@tanstack/react-router"
 import { createIsomorphicFn } from "@tanstack/react-start"
 import { getRequestHeaders } from "@tanstack/react-start/server"
@@ -173,13 +173,13 @@ export const Route = createFileRoute("/settings/$path")({
       throw notFound()
     }
 
-    const ensureSession = createIsomorphicFn()
+    const ensureSessionIso = createIsomorphicFn()
       .server(() =>
         ensureSessionServer(queryClient, auth, { headers: getRequestHeaders() })
       )
-      .client(() => ensureSessionClient(queryClient, authClient))
+      .client(() => ensureSession(queryClient, authClient))
 
-    const session = await ensureSession()
+    const session = await ensureSessionIso()
 
     if (!session) {
       throw redirect({
@@ -209,7 +209,7 @@ function SettingsPage() {
 
 ```tsx title="app/settings/[path]/page.tsx"
 import { viewPaths } from "@better-auth-ui/core"
-import { ensureSession } from "@better-auth-ui/react/server"
+import { ensureSessionServer } from "@better-auth-ui/core/server"
 import { dehydrate, HydrationBoundary } from "@tanstack/react-query"
 import { headers } from "next/headers"
 import { notFound, redirect } from "next/navigation"
@@ -237,7 +237,7 @@ export default async function SettingsPage({
 
   const queryClient = getQueryClient()
 
-  const session = await ensureSession(queryClient, auth, {
+  const session = await ensureSessionServer(queryClient, auth, {
     headers: await headers()
   })
 
@@ -276,8 +276,8 @@ Mount a dynamic route at `/organization/<path>` that renders `<Organization />` 
 <Tab value="tanstack-start">
 
 ```tsx title="routes/organization/$path.tsx"
-import { ensureSession as ensureSessionClient } from "@better-auth-ui/react"
-import { ensureSession as ensureSessionServer } from "@better-auth-ui/react/server"
+import { ensureSession } from "@better-auth-ui/core"
+import { ensureSessionServer } from "@better-auth-ui/core/server"
 import { createFileRoute, notFound, redirect } from "@tanstack/react-router"
 import { createIsomorphicFn } from "@tanstack/react-start"
 import { getRequestHeaders } from "@tanstack/react-start/server"
@@ -297,13 +297,13 @@ export const Route = createFileRoute("/organization/$path")({
       throw notFound()
     }
 
-    const ensureSession = createIsomorphicFn()
+    const ensureSessionIso = createIsomorphicFn()
       .server(() =>
         ensureSessionServer(queryClient, auth, { headers: getRequestHeaders() })
       )
-      .client(() => ensureSessionClient(queryClient, authClient))
+      .client(() => ensureSession(queryClient, authClient))
 
-    const session = await ensureSession()
+    const session = await ensureSessionIso()
 
     if (!session) {
       throw redirect({
@@ -332,7 +332,7 @@ function OrganizationPage() {
 <Tab value="next.js">
 
 ```tsx title="app/organization/[path]/page.tsx"
-import { ensureSession } from "@better-auth-ui/react/server"
+import { ensureSessionServer } from "@better-auth-ui/core/server"
 import { dehydrate, HydrationBoundary } from "@tanstack/react-query"
 import { headers } from "next/headers"
 import { notFound, redirect } from "next/navigation"
@@ -359,7 +359,7 @@ export default async function OrganizationPage({
 
   const queryClient = getQueryClient()
 
-  const session = await ensureSession(queryClient, auth, {
+  const session = await ensureSessionServer(queryClient, auth, {
     headers: await headers()
   })
 
@@ -495,8 +495,8 @@ Move `/organization/$path` → `/organization/$slug/$path`. Validate both segmen
 <Tab value="tanstack-start">
 
 ```tsx title="routes/organization/$slug/$path.tsx"
-import { ensureSession as ensureSessionClient } from "@better-auth-ui/react"
-import { ensureSession as ensureSessionServer } from "@better-auth-ui/react/server"
+import { ensureSession } from "@better-auth-ui/core"
+import { ensureSessionServer } from "@better-auth-ui/core/server"
 import { createFileRoute, notFound, redirect } from "@tanstack/react-router"
 import { createIsomorphicFn } from "@tanstack/react-start"
 import { getRequestHeaders } from "@tanstack/react-start/server"
@@ -516,13 +516,13 @@ export const Route = createFileRoute("/organization/$slug/$path")({
       throw notFound()
     }
 
-    const ensureSession = createIsomorphicFn()
+    const ensureSessionIso = createIsomorphicFn()
       .server(() =>
         ensureSessionServer(queryClient, auth, { headers: getRequestHeaders() })
       )
-      .client(() => ensureSessionClient(queryClient, authClient))
+      .client(() => ensureSession(queryClient, authClient))
 
-    const session = await ensureSession()
+    const session = await ensureSessionIso()
 
     if (!session) {
       throw redirect({
@@ -551,7 +551,7 @@ function OrganizationPage() {
 <Tab value="next.js">
 
 ```tsx title="app/organization/[slug]/[path]/page.tsx"
-import { ensureSession } from "@better-auth-ui/react/server"
+import { ensureSessionServer } from "@better-auth-ui/core/server"
 import { dehydrate, HydrationBoundary } from "@tanstack/react-query"
 import { headers } from "next/headers"
 import { notFound, redirect } from "next/navigation"
@@ -578,7 +578,7 @@ export default async function OrganizationPage({
 
   const queryClient = getQueryClient()
 
-  const session = await ensureSession(queryClient, auth, {
+  const session = await ensureSessionServer(queryClient, auth, {
     headers: await headers()
   })
 

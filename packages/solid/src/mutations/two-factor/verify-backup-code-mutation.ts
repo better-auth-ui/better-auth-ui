@@ -1,22 +1,25 @@
-import { authQueryKeys } from "@better-auth-ui/core"
-import { twoFactorMutationKeys } from "@better-auth-ui/core/plugins"
-import type { TwoFactorAuthClient } from "../../lib/auth-client"
-import { createAuthMutationOptions } from "../create-auth-mutation"
+import {
+  type TwoFactorAuthClient,
+  type VerifyBackupCodeOptions,
+  verifyBackupCodeOptions
+} from "@better-auth-ui/core/plugins/two-factor"
+import { type QueryClient, useMutation } from "@tanstack/solid-query"
+import type { Accessor } from "solid-js"
 
-export type VerifyBackupCodeParams<TAuthClient extends TwoFactorAuthClient> =
-  Parameters<TAuthClient["twoFactor"]["verifyBackupCode"]>[0]
-
-/**
- * Mutation options factory for recovering with a backup code.
- *
- * Each code works once — the server consumes it on success.
- */
-export function verifyBackupCodeOptions<
+export type UseVerifyBackupCodeOptions<
   TAuthClient extends TwoFactorAuthClient
->(authClient: TAuthClient) {
-  return createAuthMutationOptions(
-    authClient.twoFactor.verifyBackupCode,
-    twoFactorMutationKeys.verifyBackupCode,
-    { awaits: [authQueryKeys.session] }
+> = Accessor<VerifyBackupCodeOptions<TAuthClient>>
+
+export function useVerifyBackupCode<TAuthClient extends TwoFactorAuthClient>(
+  authClient: TAuthClient,
+  options?: UseVerifyBackupCodeOptions<TAuthClient>,
+  queryClient?: Accessor<QueryClient>
+) {
+  return useMutation(
+    () => ({
+      ...verifyBackupCodeOptions(authClient),
+      ...(options?.() ?? {})
+    }),
+    queryClient
   )
 }

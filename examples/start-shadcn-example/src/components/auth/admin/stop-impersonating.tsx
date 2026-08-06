@@ -1,13 +1,11 @@
 "use client"
 
-import { isImpersonatingSession } from "@better-auth-ui/core/plugins"
 import {
   type AdminAuthClient,
-  useAuth,
-  useAuthPlugin,
-  useSession,
-  useStopImpersonating
-} from "@better-auth-ui/react"
+  isImpersonatingSession
+} from "@better-auth-ui/core/plugins/admin"
+import { useAuth, useAuthPlugin, useSession } from "@better-auth-ui/react"
+import { useStopImpersonating } from "@better-auth-ui/react/plugins/admin"
 import { UserRoundCheck } from "lucide-react"
 
 import { DropdownMenuItem } from "@/components/ui/dropdown-menu"

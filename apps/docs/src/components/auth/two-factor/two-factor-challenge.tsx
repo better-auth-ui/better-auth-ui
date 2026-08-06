@@ -1,14 +1,13 @@
 "use client"
 
+import type { TwoFactorAuthClient } from "@better-auth-ui/core/plugins/two-factor"
+import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
 import {
-  type TwoFactorAuthClient,
-  useAuth,
-  useAuthPlugin,
   useSendTwoFactorOtp,
   useVerifyBackupCode,
   useVerifyTotp,
   useVerifyTwoFactorOtp
-} from "@better-auth-ui/react"
+} from "@better-auth-ui/react/plugins/two-factor"
 import { type SyntheticEvent, useEffect, useState } from "react"
 
 import { Button } from "@/components/ui/button"

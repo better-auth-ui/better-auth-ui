@@ -1,16 +1,18 @@
 "use client"
 
 import { authMutationKeys } from "@better-auth-ui/core"
+import type { PhoneNumberAuthClient } from "@better-auth-ui/core/plugins/phone-number"
 import {
   AuthPrompts,
-  type PhoneNumberAuthClient,
   useAuth,
   useAuthPlugin,
-  useFetchOptions,
+  useFetchOptions
+} from "@better-auth-ui/react"
+import {
   useSendPhoneNumberOtp,
   useSignInPhoneNumber,
   useVerifyPhoneNumber
-} from "@better-auth-ui/react"
+} from "@better-auth-ui/react/plugins/phone-number"
 import { useIsMutating } from "@tanstack/react-query"
 import { Eye, EyeOff } from "lucide-react"
 import { type SyntheticEvent, useState } from "react"

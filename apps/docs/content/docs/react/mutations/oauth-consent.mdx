@@ -8,7 +8,7 @@ Requires `oauthProviderClient()` from `@better-auth/oauth-provider/client`. Bett
 ## Usage
 
 ```tsx
-import { useOAuthConsent } from "@better-auth-ui/react"
+import { useOAuthConsent } from "@better-auth-ui/react/plugins/oauth-provider"
 
 const consent = useOAuthConsent(authClient)
 
@@ -21,11 +21,11 @@ Pass only the user's decision to accept the full requested scope set. The OAuth 
 ## Options factory
 
 ```ts
-import { oauthConsentOptions } from "@better-auth-ui/react"
+import { oauthConsentOptions } from "@better-auth-ui/core/plugins/oauth-provider"
 
 const options = oauthConsentOptions(authClient)
 ```
 
 ## Params
 
-<auto-type-table path="../../../../../../packages/react/src/mutations/oauth-provider/oauth-consent-mutation.ts" name="OAuthConsentParams" />
+<auto-type-table path="../../../../../../packages/core/src/plugins/oauth-provider/oauth-consent-mutation.ts" name="OAuthConsentParams" />

@@ -1,0 +1,166 @@
+[
+  {
+    "id": "auth-provider.tsx-AuthProviderProps",
+    "name": "AuthProviderProps",
+    "description": "",
+    "entries": [
+      {
+        "name": "plugins",
+        "description": "Registered auth plugins. UI packages widen the element type via the\n`AuthPluginRegister` module-augmentation slot.",
+        "tags": [
+          { "name": "remarks", "text": "`AuthPlugin[]`" },
+          { "name": "default", "text": "[]" }
+        ],
+        "type": "SolidAuthPlugin[]",
+        "simplifiedType": "AuthPlugin[]",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "additionalFields",
+        "description": "Additional user fields rendered on sign-up and the user profile.",
+        "tags": [{ "name": "remarks", "text": "`AdditionalFields`" }],
+        "type": "AdditionalFields",
+        "simplifiedType": "AdditionalFields",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "redirectTo",
+        "description": "Default redirect path after successful authentication",
+        "tags": [{ "name": "default", "text": "\"/\"" }],
+        "type": "string",
+        "simplifiedType": "string",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "baseURL",
+        "description": "Base URL for API endpoints (optional)",
+        "tags": [{ "name": "default", "text": "\"\"" }],
+        "type": "string",
+        "simplifiedType": "string",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "avatar",
+        "description": "Avatar upload, optimization, and deletion configuration.",
+        "tags": [
+          { "name": "remarks", "text": "`AvatarConfig`" },
+          {
+            "name": "default",
+            "text": "{ enabled: true, resize: resizeAvatar, size: 256, extension: \"png\" }"
+          }
+        ],
+        "type": "{ delete?: ((url: string) => Promise<void>); enabled?: boolean; extension?: \"png\" | \"jpg\" | \"webp\" | \"inherit\"; resize?: ((file: File, size?: number, extension?: \"png\" | \"jpg\" | \"webp\" | \"inherit\") => Promise<File>); size?: number; upload?: ((file: File) => Promise<string>); }",
+        "simplifiedType": "AvatarConfig",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "basePaths",
+        "description": "Base paths for different application sections",
+        "tags": [{ "name": "remarks", "text": "`BasePaths`" }],
+        "type": "{ auth?: string; settings?: string; organization?: string; }",
+        "simplifiedType": "BasePaths",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "emailAndPassword",
+        "description": "Email and password authentication configuration",
+        "tags": [{ "name": "remarks", "text": "`EmailAndPasswordConfig`" }],
+        "type": "{ enabled?: boolean; confirmPassword?: boolean; forgotPassword?: boolean; maxPasswordLength?: number; minPasswordLength?: number; name?: boolean; rememberMe?: boolean; requireEmailVerification?: boolean; }",
+        "simplifiedType": "EmailAndPasswordConfig",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "localization",
+        "description": "Localization strings for UI components",
+        "tags": [{ "name": "remarks", "text": "`Localization`" }],
+        "type": "Localization",
+        "simplifiedType": "Localization",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "multipleAccountsPerProvider",
+        "description": "Allow users to link multiple accounts from the same social provider.\nWhen false, providers already linked to the account are hidden from the available-to-link list.",
+        "tags": [{ "name": "default", "text": "true" }],
+        "type": "boolean",
+        "simplifiedType": "boolean",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "socialProviders",
+        "description": "List of enabled social authentication providers",
+        "tags": [{ "name": "remarks", "text": "`SocialProvider[]`" }],
+        "type": "SocialProvider[]",
+        "simplifiedType": "SocialProvider[]",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "viewPaths",
+        "description": "View path mappings for different authentication views",
+        "tags": [{ "name": "remarks", "text": "`ViewPaths`" }],
+        "type": "{ auth?: { signIn?: string; signUp?: string; forgotPassword?: string; resetPassword?: string; signOut?: string; verifyEmail?: string; magicLink?: string; }; settings?: { account?: string; security?: string; organizations?: string; }; }",
+        "simplifiedType": "ViewPaths",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "navigate",
+        "description": "Function to navigate to a new path",
+        "tags": [
+          {
+            "name": "param",
+            "text": "options - Navigation options with href and optional replace flag"
+          },
+          {
+            "name": "default",
+            "text": "window.location.href = href (or window.location.replace if replace: true)"
+          },
+          {
+            "name": "example",
+            "text": "// TanStack Router\nnavigate={navigate}\n// Next.js\nnavigate={({href, replace}) => replace ? router.replace(href) : router.push(href)}"
+          }
+        ],
+        "type": "((options: { to: string; replace?: boolean; }) => void) & ((options: { to: string; replace?: boolean; }) => void)",
+        "simplifiedType": "function",
+        "required": true,
+        "deprecated": false
+      },
+      {
+        "name": "authClient",
+        "description": "",
+        "tags": [],
+        "type": "TAuthClient",
+        "simplifiedType": "TAuthClient",
+        "required": true,
+        "deprecated": false
+      },
+      {
+        "name": "queryClient",
+        "description": "TanStack QueryClient to use for your application's queries",
+        "tags": [],
+        "type": "QueryClient",
+        "simplifiedType": "object",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "children",
+        "description": "",
+        "tags": [],
+        "type": "ReactNode",
+        "simplifiedType": "ReactNode",
+        "required": false,
+        "deprecated": false
+      }
+    ]
+  }
+]

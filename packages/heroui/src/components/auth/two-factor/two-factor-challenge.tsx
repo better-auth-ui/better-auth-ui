@@ -1,17 +1,16 @@
 import {
   clearTwoFactorMethods,
   readTwoFactorMethods,
-  type TwoFactorMethod
-} from "@better-auth-ui/core/plugins"
-import {
   type TwoFactorAuthClient,
-  useAuth,
-  useAuthPlugin,
+  type TwoFactorMethod
+} from "@better-auth-ui/core/plugins/two-factor"
+import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
+import {
   useSendTwoFactorOtp,
   useVerifyBackupCode,
   useVerifyTotp,
   useVerifyTwoFactorOtp
-} from "@better-auth-ui/react"
+} from "@better-auth-ui/react/plugins/two-factor"
 import {
   Button,
   Card,

@@ -8,11 +8,9 @@ The new codes are returned once. Keep them in component state and let the user c
 ## Usage
 
 ```tsx
-import {
-  type TwoFactorAuthClient,
-  useAuth,
-  useGenerateBackupCodes
-} from "@better-auth-ui/react"
+import type { TwoFactorAuthClient } from "@better-auth-ui/core/plugins/two-factor"
+import { useAuth } from "@better-auth-ui/react"
+import { useGenerateBackupCodes } from "@better-auth-ui/react/plugins/two-factor"
 
 const { authClient } = useAuth()
 const { mutate: generateBackupCodes } = useGenerateBackupCodes(
@@ -27,7 +25,7 @@ generateBackupCodes({ password: "current-password" })
 ## Options factory
 
 ```tsx
-import { generateBackupCodesOptions } from "@better-auth-ui/react"
+import { generateBackupCodesOptions } from "@better-auth-ui/core/plugins/two-factor"
 import { useMutation } from "@tanstack/react-query"
 
 const { mutate } = useMutation(generateBackupCodesOptions(authClient))
@@ -35,4 +33,4 @@ const { mutate } = useMutation(generateBackupCodesOptions(authClient))
 
 ## Params
 
-<auto-type-table path="../../../../../../packages/react/src/mutations/two-factor/generate-backup-codes-mutation.ts" name="GenerateBackupCodesParams" />
+<auto-type-table path="../../../../../../packages/core/src/plugins/two-factor/generate-backup-codes-mutation.ts" name="GenerateBackupCodesParams" />

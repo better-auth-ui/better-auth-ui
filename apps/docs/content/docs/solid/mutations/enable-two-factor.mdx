@@ -3,14 +3,14 @@ title: enableTwoFactorOptions
 description: Start two-factor enrollment.
 ---
 
-Requires the Better Auth two-factor plugin. If TypeScript cannot infer the plugin methods from your client, type or cast `authClient` as `TwoFactorAuthClient` from `@better-auth-ui/solid`.
+Requires the Better Auth two-factor plugin. If TypeScript cannot infer the plugin methods from your client, type or cast `authClient` as `TwoFactorAuthClient` from `@better-auth-ui/core/plugins/two-factor`.
 
 Resolves with the TOTP URI and the backup codes. Unless the server sets `skipVerificationOnEnable`, two-factor only becomes active once a TOTP code verifies.
 
 ## Options factory
 
 ```tsx
-import { enableTwoFactorOptions } from "@better-auth-ui/solid"
+import { enableTwoFactorOptions } from "@better-auth-ui/core/plugins/two-factor"
 import { createMutation } from "@tanstack/solid-query"
 
 const enable = createMutation(() => enableTwoFactorOptions(authClient))
@@ -20,4 +20,4 @@ enable.mutate({ password: "current-password" })
 
 ## Params
 
-<auto-type-table path="../../../../../../packages/solid/src/mutations/two-factor/enable-two-factor-mutation.ts" name="EnableTwoFactorParams" />
+<auto-type-table path="../../../../../../packages/core/src/plugins/two-factor/enable-two-factor-mutation.ts" name="EnableTwoFactorParams" />

@@ -1,11 +1,8 @@
 import { authMutationKeys } from "@better-auth-ui/core"
-import {
-  type AnonymousAuthClient,
-  signInAnonymousOptions,
-  useAuth,
-  useAuthPlugin
-} from "@better-auth-ui/solid"
-import { createMutation, useIsMutating } from "@tanstack/solid-query"
+import type { AnonymousAuthClient } from "@better-auth-ui/core/plugins/anonymous"
+import { useAuth, useAuthPlugin } from "@better-auth-ui/solid"
+import { useSignInAnonymous } from "@better-auth-ui/solid/plugins/anonymous"
+import { useIsMutating } from "@tanstack/solid-query"
 import { UserRound } from "lucide-solid"
 import { Show } from "solid-js"
 
@@ -18,10 +15,12 @@ import { cn } from "@/lib/utils"
 export function AnonymousButton() {
   const auth = useAuth()
   const { localization } = useAuthPlugin(anonymousPlugin)
-  const signInAnonymous = createMutation(() => ({
-    ...signInAnonymousOptions(auth.authClient as AnonymousAuthClient),
-    onSuccess: () => auth.navigate({ to: auth.redirectTo })
-  }))
+  const signInAnonymous = useSignInAnonymous(
+    auth.authClient as AnonymousAuthClient,
+    () => ({
+      onSuccess: () => auth.navigate({ to: auth.redirectTo })
+    })
+  )
 
   const signInMutating = useIsMutating(() => ({
     mutationKey: authMutationKeys.signIn.all

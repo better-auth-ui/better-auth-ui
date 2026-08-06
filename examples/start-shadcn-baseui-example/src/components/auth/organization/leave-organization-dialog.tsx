@@ -1,11 +1,8 @@
 "use client"
 
-import {
-  type OrganizationAuthClient,
-  useAuth,
-  useAuthPlugin,
-  useLeaveOrganization
-} from "@better-auth-ui/react"
+import type { OrganizationAuthClient } from "@better-auth-ui/core/plugins/organization"
+import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
+import { useLeaveOrganization } from "@better-auth-ui/react/plugins/organization"
 import type { Organization } from "better-auth/client"
 import { LogOut } from "lucide-react"
 import { toast } from "sonner"
@@ -37,14 +34,15 @@ export function LeaveOrganizationDialog({
   onOpenChange,
   organization
 }: LeaveOrganizationDialogProps) {
-  const { authClient, basePaths, localization, navigate } = useAuth()
+  const { authClient, basePaths, localization, navigate } =
+    useAuth<OrganizationAuthClient>()
   const {
     localization: organizationLocalization,
     viewPaths: organizationPluginViewPaths
   } = useAuthPlugin(organizationPlugin)
 
   const { mutate: leaveOrganization, isPending } = useLeaveOrganization(
-    authClient as OrganizationAuthClient,
+    authClient,
     {
       onSuccess: () => {
         onOpenChange(false)

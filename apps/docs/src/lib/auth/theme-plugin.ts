@@ -2,7 +2,7 @@ import { createAuthPlugin } from "@better-auth-ui/core"
 import {
   themePlugin as coreThemePlugin,
   type ThemeLocalization
-} from "@better-auth-ui/core/plugins"
+} from "@better-auth-ui/core/plugins/theme"
 
 import { Appearance } from "@/components/auth/theme/appearance"
 import { ThemeToggleItem } from "@/components/auth/theme/theme-toggle-item"

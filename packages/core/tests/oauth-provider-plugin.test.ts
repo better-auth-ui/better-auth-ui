@@ -11,7 +11,7 @@ import {
   parseOAuthAuthorizationRequest,
   resolveOAuthScopeMetadata,
   sanitizeOAuthClientUrl
-} from "../src/plugins"
+} from "../src/plugins/oauth-provider"
 
 const context = { clientId: "client-123", requestedScopes: ["openid"] }
 

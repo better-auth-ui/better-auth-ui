@@ -1,5 +1,8 @@
 import { AuthProvider } from "@better-auth-ui/heroui"
-import { MagicLink, magicLinkPlugin } from "@better-auth-ui/heroui/plugins"
+import {
+  MagicLink,
+  magicLinkPlugin
+} from "@better-auth-ui/heroui/plugins/magic-link"
 
 import { authClient } from "@/lib/auth-client"
 

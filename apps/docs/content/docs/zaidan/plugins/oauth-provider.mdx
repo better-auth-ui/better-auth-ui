@@ -246,7 +246,8 @@ The chooser has no sign-out or revoke actions on purpose. Session management bel
 There is no post-login view to install. What an application selects after login differs too much — a workspace, a tenant, a team, a project, a role — so this stays yours to build. Use the headless continuation helper when your selector is done:
 
 ```tsx title="src/routes/auth/select-workspace.tsx"
-import { oauthContinueOptions, useAuth } from "@better-auth-ui/solid"
+import { oauthContinueOptions } from "@better-auth-ui/core/plugins/oauth-provider"
+import { useAuth } from "@better-auth-ui/solid"
 import { createMutation } from "@tanstack/solid-query"
 import { For } from "solid-js"
 
@@ -340,7 +341,7 @@ import { OAuthSignUp } from "@/components/auth/oauth-provider/oauth-sign-up"
 ## Solid APIs
 
 - [`usePublicOAuthClient`](/docs/solid/queries/public-oauth-client) loads application metadata
-- [`oauthConsentOptions`](/docs/solid/mutations/oauth-consent) submits the user's decision
+- [`useOAuthConsent`](/docs/solid/mutations/oauth-consent) submits the user's decision
 - [`oauthContinueOptions`](/docs/solid/mutations/oauth-continue) resumes the request after a redirect screen
 - [`useListOAuthConsents`](/docs/solid/queries/list-oauth-consents) lists authorized applications
 - [`useDeleteOAuthConsent`](/docs/solid/mutations/delete-oauth-consent) removes a stored consent

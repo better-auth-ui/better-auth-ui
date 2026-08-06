@@ -1,16 +1,11 @@
+import type { MagicLinkAuthClient } from "@better-auth-ui/core/plugins/magic-link"
 import {
   magicLinkPlugin as coreMagicLinkPlugin,
   type MagicLinkLocalization,
   magicLinkLocalization
-} from "@better-auth-ui/core/plugins"
-import {
-  AuthLink,
-  type MagicLinkAuthClient,
-  signInMagicLinkOptions,
-  useAuth
-} from "@better-auth-ui/solid"
-import type { AuthPlugin } from "@better-auth-ui/solid/plugins"
-import { createMutation } from "@tanstack/solid-query"
+} from "@better-auth-ui/core/plugins/magic-link"
+import { AuthLink, type AuthPlugin, useAuth } from "@better-auth-ui/solid"
+import { useSignInMagicLink } from "@better-auth-ui/solid/plugins/magic-link"
 import { type Component, createSignal, For, Show } from "solid-js"
 import { MAGIC_LINK_SENT_STORAGE_KEY } from "@/components/auth/magic-link-sent"
 import {
@@ -41,7 +36,7 @@ type AuthPluginWithButtons = AuthPlugin & {
 }
 
 export function MagicLink(props: MagicLinkProps) {
-  const auth = useAuth()
+  const auth = useAuth<MagicLinkAuthClient>()
   const [email, setEmail] = createSignal("")
   const [emailError, setEmailError] = createSignal<string>()
   const magicLinkPluginConfig = () =>
@@ -54,8 +49,7 @@ export function MagicLink(props: MagicLinkProps) {
   })
   const magicLinkSentPath = () =>
     magicLinkPluginConfig()?.viewPaths?.auth?.magicLinkSent ?? "magic-link-sent"
-  const signInMagicLink = createMutation(() => ({
-    ...signInMagicLinkOptions(auth.authClient as MagicLinkAuthClient),
+  const signInMagicLink = useSignInMagicLink(auth.authClient, () => ({
     onSuccess: (_data, variables) => {
       sessionStorage.setItem(MAGIC_LINK_SENT_STORAGE_KEY, variables.email)
       auth.navigate({

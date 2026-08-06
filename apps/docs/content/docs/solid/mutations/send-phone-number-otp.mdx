@@ -1,26 +1,32 @@
 ---
-title: sendPhoneNumberOtpOptions
-description: Create a Solid mutation that sends a phone verification code.
+title: useSendPhoneNumberOtp
+description: Send a phone verification code.
 ---
 
-## Options factory
+## Usage
 
 ```tsx
-import {
-  sendPhoneNumberOtpOptions,
-  type PhoneNumberAuthClient,
-  useAuth
-} from "@better-auth-ui/solid"
-import { createMutation } from "@tanstack/solid-query"
+import type { PhoneNumberAuthClient } from "@better-auth-ui/core/plugins/phone-number"
+import { useAuth } from "@better-auth-ui/solid"
+import { useSendPhoneNumberOtp } from "@better-auth-ui/solid/plugins/phone-number"
 
 const { authClient } = useAuth()
-const sendOtp = createMutation(() =>
-  sendPhoneNumberOtpOptions(authClient as PhoneNumberAuthClient)
+const sendOtp = useSendPhoneNumberOtp(
+  authClient as PhoneNumberAuthClient
 )
 
 sendOtp.mutate({ phoneNumber: "+12025550123" })
 ```
 
+## Options factory
+
+```tsx
+import { sendPhoneNumberOtpOptions } from "@better-auth-ui/core/plugins/phone-number"
+import { useMutation } from "@tanstack/solid-query"
+
+const sendOtp = useMutation(() => sendPhoneNumberOtpOptions(authClient))
+```
+
 ## Params
 
-<auto-type-table path="../../../../../../packages/solid/src/mutations/phone-number/send-phone-number-otp-mutation.ts" name="SendPhoneNumberOtpParams" />
+<auto-type-table path="../../../../../../packages/core/src/plugins/phone-number/send-phone-number-otp-mutation.ts" name="SendPhoneNumberOtpParams" />

@@ -1,11 +1,9 @@
-import type { OrganizationView } from "@better-auth-ui/core/plugins"
-import {
-  type OrganizationAuthClient,
-  useActiveOrganization,
-  useAuth,
-  useAuthenticate,
-  useAuthPlugin
-} from "@better-auth-ui/react"
+import type {
+  OrganizationAuthClient,
+  OrganizationView
+} from "@better-auth-ui/core/plugins/organization"
+import { useAuth, useAuthenticate, useAuthPlugin } from "@better-auth-ui/react"
+import { useActiveOrganization } from "@better-auth-ui/react/plugins/organization"
 import { Gear, Person } from "@gravity-ui/icons"
 import { type CardProps, cn, Tabs } from "@heroui/react"
 import { type ComponentProps, useEffect, useMemo } from "react"

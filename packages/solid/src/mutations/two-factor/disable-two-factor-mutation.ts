@@ -1,18 +1,25 @@
-import { authQueryKeys } from "@better-auth-ui/core"
-import { twoFactorMutationKeys } from "@better-auth-ui/core/plugins"
-import type { TwoFactorAuthClient } from "../../lib/auth-client"
-import { createAuthMutationOptions } from "../create-auth-mutation"
+import {
+  type DisableTwoFactorOptions,
+  disableTwoFactorOptions,
+  type TwoFactorAuthClient
+} from "@better-auth-ui/core/plugins/two-factor"
+import { type QueryClient, useMutation } from "@tanstack/solid-query"
+import type { Accessor } from "solid-js"
 
-export type DisableTwoFactorParams<TAuthClient extends TwoFactorAuthClient> =
-  Parameters<TAuthClient["twoFactor"]["disable"]>[0]
-
-/** Mutation options factory for disabling two-factor authentication. */
-export function disableTwoFactorOptions<
+export type UseDisableTwoFactorOptions<
   TAuthClient extends TwoFactorAuthClient
->(authClient: TAuthClient) {
-  return createAuthMutationOptions(
-    authClient.twoFactor.disable,
-    twoFactorMutationKeys.disable,
-    { awaits: [authQueryKeys.session] }
+> = Accessor<DisableTwoFactorOptions<TAuthClient>>
+
+export function useDisableTwoFactor<TAuthClient extends TwoFactorAuthClient>(
+  authClient: TAuthClient,
+  options?: UseDisableTwoFactorOptions<TAuthClient>,
+  queryClient?: Accessor<QueryClient>
+) {
+  return useMutation(
+    () => ({
+      ...disableTwoFactorOptions(authClient),
+      ...(options?.() ?? {})
+    }),
+    queryClient
   )
 }

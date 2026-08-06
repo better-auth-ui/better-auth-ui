@@ -64,7 +64,7 @@ Pass `magicLinkPlugin()` to `<AuthProvider>`:
 
 ```tsx title="components/providers.tsx"
 import { AuthProvider } from "@better-auth-ui/heroui"
-import { magicLinkPlugin } from "@better-auth-ui/heroui/plugins" // [!code highlight]
+import { magicLinkPlugin } from "@better-auth-ui/heroui/plugins/magic-link" // [!code highlight]
 
 <AuthProvider
   authClient={authClient}
@@ -91,7 +91,7 @@ The plugin contributes `magic-link` and `magic-link-sent` segments to `viewPaths
 ```tsx title="routes/auth/$path.tsx"
 import { viewPaths } from "@better-auth-ui/core"
 import { Auth } from "@better-auth-ui/heroui"
-import { magicLinkPlugin } from "@better-auth-ui/heroui/plugins" // [!code highlight]
+import { magicLinkPlugin } from "@better-auth-ui/heroui/plugins/magic-link" // [!code highlight]
 import { createFileRoute, notFound } from "@tanstack/react-router"
 
 export const Route = createFileRoute("/auth/$path")({
@@ -120,7 +120,7 @@ function AuthPage() {
 ```tsx title="app/auth/[path]/page.tsx"
 import { viewPaths } from "@better-auth-ui/core"
 import { Auth } from "@better-auth-ui/heroui"
-import { magicLinkPlugin } from "@better-auth-ui/heroui/plugins" // [!code highlight]
+import { magicLinkPlugin } from "@better-auth-ui/heroui/plugins/magic-link" // [!code highlight]
 import { notFound } from "next/navigation"
 
 export default async function AuthPage({
@@ -160,7 +160,7 @@ The `<MagicLink />` view is automatically rendered at `/auth/magic-link` when th
 **Usage**
 
 ```tsx
-import { MagicLink } from "@better-auth-ui/heroui/plugins"
+import { MagicLink } from "@better-auth-ui/heroui/plugins/magic-link"
 
 <MagicLink />
 ```

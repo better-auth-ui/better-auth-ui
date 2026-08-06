@@ -1,17 +1,15 @@
 import { authQueryKeys } from "@better-auth-ui/core"
-import { adminMutationKeys } from "@better-auth-ui/core/plugins"
+import { adminMutationKeys } from "@better-auth-ui/core/plugins/admin"
 import { QueryClient } from "@tanstack/react-query"
 import { act, renderHook, waitFor } from "@testing-library/react"
 import type { PropsWithChildren } from "react"
 import { describe, expect, it, vi } from "vitest"
 
+import { AuthProvider, type AuthProviderProps, useSession } from "../../src"
 import {
   type AdminAuthClient,
-  AuthProvider,
-  type AuthProviderProps,
-  useSession,
   useStopImpersonating
-} from "../../src"
+} from "../../src/plugins/admin"
 
 describe("stop impersonating", () => {
   it("restores and awaits the administrator session", async () => {

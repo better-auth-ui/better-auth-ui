@@ -1,0 +1,45 @@
+[
+  {
+    "id": "update-member-role-mutation.ts-UpdateMemberRoleParams",
+    "name": "UpdateMemberRoleParams",
+    "description": "",
+    "entries": [
+      {
+        "name": "organizationId",
+        "description": "If not provided, the active organization will be used",
+        "tags": [],
+        "type": "string",
+        "simplifiedType": "string",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "role",
+        "description": "",
+        "tags": [],
+        "type": "LiteralString | LiteralString[] | \"member\" | \"admin\" | \"owner\" | (\"member\" | \"admin\" | \"owner\")[]",
+        "simplifiedType": "LiteralString | LiteralString[] | \"member\" | \"admin\" | \"owner\" | (\"member\" | \"admin\" | \"owner\")[]",
+        "required": true,
+        "deprecated": false
+      },
+      {
+        "name": "memberId",
+        "description": "",
+        "tags": [],
+        "type": "string",
+        "simplifiedType": "string",
+        "required": true,
+        "deprecated": false
+      },
+      {
+        "name": "fetchOptions",
+        "description": "",
+        "tags": [],
+        "type": "ClientFetchOption<Partial<{ role: LiteralString | LiteralString[] | \"member\" | \"admin\" | \"owner\" | (\"member\" | \"admin\" | \"owner\")[]; memberId: string; organizationId?: string; }> & Record<string, any>, Partial<Record<string, any>> & Record<string, any>, Record<string, any>>",
+        "simplifiedType": "ClientFetchOption<Record<string, any> & Partial<object>, Record<string, any> & Partial<Record<string, any>>, union>",
+        "required": false,
+        "deprecated": false
+      }
+    ]
+  }
+]

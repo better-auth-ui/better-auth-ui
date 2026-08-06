@@ -182,7 +182,10 @@ The method names ride along in session storage — names only, never a code or t
 Building a custom sign-in form? Check for the redirect yourself:
 
 ```tsx
-import { isTwoFactorRedirect, storeTwoFactorMethods } from "@better-auth-ui/core/plugins"
+import {
+  isTwoFactorRedirect,
+  storeTwoFactorMethods
+} from "@better-auth-ui/core/plugins/two-factor"
 
 const { mutate: signInEmail } = useSignInEmail(authClient, {
   onSuccess: (data) => {

@@ -1,11 +1,9 @@
-import { groupOAuthConsents } from "@better-auth-ui/core/plugins"
 import {
+  groupOAuthConsents,
   listOAuthConsentsOptions,
-  type OAuthProviderAuthClient,
-  useAuth,
-  useAuthPlugin,
-  useSession
-} from "@better-auth-ui/solid"
+  type OAuthProviderAuthClient
+} from "@better-auth-ui/core/plugins/oauth-provider"
+import { useAuth, useAuthPlugin, useSession } from "@better-auth-ui/solid"
 import { createQuery } from "@tanstack/solid-query"
 import { For, Show } from "solid-js"
 

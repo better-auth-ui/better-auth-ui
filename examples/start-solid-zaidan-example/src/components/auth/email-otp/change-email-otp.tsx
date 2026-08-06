@@ -2,11 +2,9 @@ import {
   changeEmailOtpOptions,
   type EmailOtpAuthClient,
   requestEmailChangeOtpOptions,
-  sendVerificationOtpOptions,
-  useAuth,
-  useAuthPlugin,
-  useSession
-} from "@better-auth-ui/solid"
+  sendVerificationOtpOptions
+} from "@better-auth-ui/core/plugins/email-otp"
+import { useAuth, useAuthPlugin, useSession } from "@better-auth-ui/solid"
 import { createMutation } from "@tanstack/solid-query"
 import { createSignal, Show } from "solid-js"
 import { toast } from "solid-sonner"

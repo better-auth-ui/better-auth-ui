@@ -2,15 +2,12 @@
 
 import {
   type AuthorizedOAuthApplication,
+  type OAuthProviderAuthClient,
   resolveOAuthScopeMetadata,
   sanitizeOAuthClientUrl
-} from "@better-auth-ui/core/plugins"
-import {
-  type OAuthProviderAuthClient,
-  useAuth,
-  useAuthPlugin,
-  usePublicOAuthClient
-} from "@better-auth-ui/react"
+} from "@better-auth-ui/core/plugins/oauth-provider"
+import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
+import { usePublicOAuthClient } from "@better-auth-ui/react/plugins/oauth-provider"
 import { Shield } from "@gravity-ui/icons"
 import { Avatar, Button, Chip, Link, Skeleton } from "@heroui/react"
 import { useState } from "react"

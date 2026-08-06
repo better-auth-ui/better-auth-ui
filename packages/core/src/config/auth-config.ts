@@ -1,5 +1,5 @@
 import type { SocialProvider } from "better-auth/social-providers"
-
+import type { AuthClient } from "../lib/auth-client"
 import type { AuthPlugin } from "../lib/auth-plugin"
 import { type BasePaths, basePaths } from "../lib/base-paths"
 import { type Localization, localization } from "../lib/localization"
@@ -15,7 +15,11 @@ import type { EmailAndPasswordConfig } from "./email-and-password-config"
  * Defines the base structure for authentication settings including paths,
  * providers, navigation functions, and feature flags.
  */
-export interface AuthConfig {
+export interface AuthConfig<TAuthClient extends AuthClient = AuthClient> {
+  /**
+   * The Better Auth client instance used for authentication operations.
+   */
+  authClient: TAuthClient
   /**
    * Additional user fields rendered on sign-up and the user profile.
    * @remarks `AdditionalFields`

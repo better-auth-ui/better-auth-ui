@@ -10,7 +10,7 @@ Better Auth's [redirect screens](https://better-auth.com/docs/plugins/oauth-prov
 ## Usage
 
 ```tsx
-import { useOAuthContinue } from "@better-auth-ui/react"
+import { useOAuthContinue } from "@better-auth-ui/react/plugins/oauth-provider"
 
 const oauthContinue = useOAuthContinue(authClient)
 
@@ -33,11 +33,11 @@ Only call `{ created: true }` when the account was created during the current fl
 ## Options factory
 
 ```ts
-import { oauthContinueOptions } from "@better-auth-ui/react"
+import { oauthContinueOptions } from "@better-auth-ui/core/plugins/oauth-provider"
 
 const options = oauthContinueOptions(authClient)
 ```
 
 ## Params
 
-<auto-type-table path="../../../../../../packages/react/src/mutations/oauth-provider/oauth-continue-mutation.ts" name="OAuthContinueParams" />
+<auto-type-table path="../../../../../../packages/core/src/plugins/oauth-provider/oauth-continue-mutation.ts" name="OAuthContinueParams" />

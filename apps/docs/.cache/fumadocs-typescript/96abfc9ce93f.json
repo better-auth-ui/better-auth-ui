@@ -1,0 +1,90 @@
+[
+  {
+    "id": "organization-switcher.tsx-OrganizationSwitcherProps",
+    "name": "OrganizationSwitcherProps",
+    "description": "Props for the {@link OrganizationSwitcher} component.",
+    "entries": [
+      {
+        "name": "className",
+        "description": "",
+        "tags": [],
+        "type": "string",
+        "simplifiedType": "string",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "placement",
+        "description": "",
+        "tags": [],
+        "type": "Placement",
+        "simplifiedType": "Placement",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "variant",
+        "description": "",
+        "tags": [],
+        "type": "\"secondary\" | \"tertiary\" | \"danger\" | \"danger-soft\" | \"ghost\" | \"outline\" | \"primary\"",
+        "simplifiedType": "\"secondary\" | \"tertiary\" | \"danger\" | \"danger-soft\" | \"ghost\" | \"outline\" | \"primary\"",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "trigger",
+        "description": "",
+        "tags": [],
+        "type": "ReactNode",
+        "simplifiedType": "ReactNode",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "hideCreate",
+        "description": "",
+        "tags": [],
+        "type": "boolean",
+        "simplifiedType": "boolean",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "hidePersonal",
+        "description": "",
+        "tags": [],
+        "type": "boolean",
+        "simplifiedType": "boolean",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "hideSettings",
+        "description": "",
+        "tags": [],
+        "type": "boolean",
+        "simplifiedType": "boolean",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "hideSlug",
+        "description": "",
+        "tags": [],
+        "type": "boolean",
+        "simplifiedType": "boolean",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "setActive",
+        "description": "",
+        "tags": [],
+        "type": "((organization: Organization | null) => void)",
+        "simplifiedType": "function",
+        "required": false,
+        "deprecated": false
+      }
+    ]
+  }
+]

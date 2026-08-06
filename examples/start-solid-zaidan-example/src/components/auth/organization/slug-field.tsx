@@ -1,6 +1,9 @@
-import type { OrganizationLocalization } from "@better-auth-ui/core/plugins"
-import type { OrganizationAuthClient } from "@better-auth-ui/solid"
-import { useAuth, useCheckOrganizationSlug } from "@better-auth-ui/solid"
+import type {
+  OrganizationAuthClient,
+  OrganizationLocalization
+} from "@better-auth-ui/core/plugins/organization"
+import { useAuth } from "@better-auth-ui/solid"
+import { useCheckSlug } from "@better-auth-ui/solid/plugins/organization"
 import { createDebounce } from "@solid-primitives/debounce"
 import { Check, X } from "lucide-solid"
 import { createEffect } from "solid-js"
@@ -31,10 +34,8 @@ const organizationFallbackLocalization = {
 } satisfies Pick<OrganizationLocalization, "slug" | "slugPlaceholder">
 
 export function SlugField(props: SlugFieldProps) {
-  const auth = useAuth()
-  const checkOrganizationSlug = useCheckOrganizationSlug(
-    auth.authClient as OrganizationAuthClient
-  )
+  const auth = useAuth<OrganizationAuthClient>()
+  const slugAvailability = useCheckSlug(auth.authClient)
   const organizationPluginConfig = () =>
     auth.plugins.find((plugin) => plugin.id === organizationPlugin.id) as
       | {
@@ -56,12 +57,12 @@ export function SlugField(props: SlugFieldProps) {
     props.value.trim() !== props.currentSlug
 
   const debouncedCheck = createDebounce((slug: string) => {
-    checkOrganizationSlug.mutate({ slug })
+    slugAvailability.mutate({ slug })
   }, 300)
 
   createEffect(() => {
     if (!shouldCheckSlug()) {
-      checkOrganizationSlug.reset()
+      slugAvailability.reset()
       return
     }
 
@@ -69,7 +70,7 @@ export function SlugField(props: SlugFieldProps) {
   })
 
   return (
-    <Field data-invalid={Boolean(checkOrganizationSlug.error)}>
+    <Field data-invalid={Boolean(slugAvailability.error)}>
       <FieldLabel for={props.id ?? "slug"}>{localization().slug}</FieldLabel>
       <InputGroup>
         <InputGroupInput
@@ -88,9 +89,9 @@ export function SlugField(props: SlugFieldProps) {
         ) : null}
         {shouldCheckSlug() ? (
           <InputGroupAddon align="inline-end">
-            {checkOrganizationSlug.data?.status ? (
+            {slugAvailability.data?.status ? (
               <Check class="size-4 text-foreground" />
-            ) : checkOrganizationSlug.error ? (
+            ) : slugAvailability.error ? (
               <X class="size-4 text-destructive" />
             ) : (
               <Spinner />
@@ -99,8 +100,8 @@ export function SlugField(props: SlugFieldProps) {
         ) : null}
       </InputGroup>
       <FieldError>
-        {checkOrganizationSlug.error?.error?.message ??
-          checkOrganizationSlug.error?.message}
+        {slugAvailability.error?.error?.message ??
+          slugAvailability.error?.message}
       </FieldError>
     </Field>
   )

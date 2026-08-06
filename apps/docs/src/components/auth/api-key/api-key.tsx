@@ -1,10 +1,7 @@
 "use client"
 
-import {
-  type ListedApiKey,
-  useAuth,
-  useAuthPlugin
-} from "@better-auth-ui/react"
+import type { ListedApiKey } from "@better-auth-ui/core/plugins/api-key"
+import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
 import { Key, X } from "lucide-react"
 import { useState } from "react"
 

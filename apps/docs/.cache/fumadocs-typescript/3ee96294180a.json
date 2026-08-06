@@ -1,0 +1,8 @@
+[
+  {
+    "id": "full-organization-query.ts-FullOrganizationParams",
+    "name": "FullOrganizationParams",
+    "description": "Parameters accepted by the Better Auth full organization endpoint.",
+    "entries": []
+  }
+]

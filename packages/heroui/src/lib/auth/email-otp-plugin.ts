@@ -2,7 +2,7 @@ import { createAuthPlugin } from "@better-auth-ui/core"
 import {
   emailOtpPlugin as coreEmailOtpPlugin,
   type EmailOtpPluginOptions
-} from "@better-auth-ui/core/plugins"
+} from "@better-auth-ui/core/plugins/email-otp"
 
 import { ChangeEmailOtp } from "../../components/auth/email-otp/change-email-otp"
 import { EmailOtp } from "../../components/auth/email-otp/email-otp"

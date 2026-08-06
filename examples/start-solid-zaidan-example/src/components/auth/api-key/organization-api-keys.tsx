@@ -1,10 +1,9 @@
+import type { OrganizationAuthClient } from "@better-auth-ui/core/plugins/organization"
+import { useAuth, useSession } from "@better-auth-ui/solid"
 import {
-  type OrganizationAuthClient,
   useActiveOrganization,
-  useAuth,
-  useListOrganizationMembers,
-  useSession
-} from "@better-auth-ui/solid"
+  useListOrganizationMembers
+} from "@better-auth-ui/solid/plugins/organization"
 import { createMemo, Show } from "solid-js"
 import { ApiKeys } from "@/components/auth/api-key/api-keys"
 
@@ -21,14 +20,10 @@ export type OrganizationApiKeysProps = {
  * `apiKey` statements), so we gate on role directly.
  */
 export function OrganizationApiKeys(props: OrganizationApiKeysProps) {
-  const auth = useAuth()
+  const auth = useAuth<OrganizationAuthClient>()
   const session = useSession(auth.authClient)
-  const activeOrganization = useActiveOrganization(
-    auth.authClient as OrganizationAuthClient
-  )
-  const members = useListOrganizationMembers(
-    auth.authClient as OrganizationAuthClient
-  )
+  const activeOrganization = useActiveOrganization(auth.authClient)
+  const members = useListOrganizationMembers(auth.authClient)
   const canManageApiKeys = createMemo(() =>
     Boolean(
       members.data?.members.some(

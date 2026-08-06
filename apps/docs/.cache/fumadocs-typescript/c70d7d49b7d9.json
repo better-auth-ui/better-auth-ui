@@ -1,0 +1,163 @@
+[
+  {
+    "id": "organization-invitation.tsx-OrganizationInvitationEmailProps",
+    "name": "OrganizationInvitationEmailProps",
+    "description": "Props for the OrganizationInvitationEmail component.",
+    "entries": [
+      {
+        "name": "url",
+        "description": "URL where the invitee can review and accept the invitation.",
+        "tags": [
+          {
+            "name": "remarks",
+            "text": "Pass `{baseUrl}/settings/organizations` — this is where pending\norganization invitations are listed in the settings UI."
+          }
+        ],
+        "type": "string",
+        "simplifiedType": "string",
+        "required": true,
+        "deprecated": false
+      },
+      {
+        "name": "email",
+        "description": "Email address of the user being invited",
+        "tags": [],
+        "type": "string",
+        "simplifiedType": "string",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "inviterName",
+        "description": "Name of the person who sent the invitation",
+        "tags": [],
+        "type": "string",
+        "simplifiedType": "string",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "inviterEmail",
+        "description": "Email address of the person who sent the invitation",
+        "tags": [],
+        "type": "string",
+        "simplifiedType": "string",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "organizationName",
+        "description": "Name of the organization the user is being invited to",
+        "tags": [],
+        "type": "string",
+        "simplifiedType": "string",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "organizationLogoURL",
+        "description": "Organization logo URL(s) - a single string or light/dark variants.",
+        "tags": [],
+        "type": "string | { light: string; dark: string; }",
+        "simplifiedType": "string | { light: string; dark: string; }",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "role",
+        "description": "Role being offered to the invitee (e.g. \"member\", \"admin\", \"owner\")",
+        "tags": [],
+        "type": "string",
+        "simplifiedType": "string",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "appName",
+        "description": "Name of the application sending the email",
+        "tags": [],
+        "type": "string",
+        "simplifiedType": "string",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "expirationHours",
+        "description": "Number of hours until the invitation expires",
+        "tags": [],
+        "type": "number",
+        "simplifiedType": "number",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "logoURL",
+        "description": "Logo URL(s) - a single string or light/dark variants. If omitted, no logo is shown.",
+        "tags": [],
+        "type": "string | { light: string; dark: string; }",
+        "simplifiedType": "string | { light: string; dark: string; }",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "classNames",
+        "description": "Custom CSS class names for styling specific parts of the email",
+        "tags": [],
+        "type": "EmailClassNames",
+        "simplifiedType": "EmailClassNames",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "colors",
+        "description": "Custom color scheme for light and dark modes",
+        "tags": [],
+        "type": "EmailColors",
+        "simplifiedType": "EmailColors",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "poweredBy",
+        "description": "Whether to show the \"Powered by better-auth\" footer",
+        "tags": [],
+        "type": "boolean",
+        "simplifiedType": "boolean",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "darkMode",
+        "description": "Whether to enable dark mode support",
+        "tags": [],
+        "type": "boolean",
+        "simplifiedType": "boolean",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "head",
+        "description": "Additional React nodes to inject into the email head",
+        "tags": [],
+        "type": "ReactNode",
+        "simplifiedType": "ReactNode",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "localization",
+        "description": "Localization overrides for customizing email text",
+        "tags": [
+          {
+            "name": "remarks",
+            "text": "`OrganizationInvitationEmailLocalization`"
+          }
+        ],
+        "type": "Partial<{ YOU_RE_INVITED_TO_ORGANIZATION: string; YOU_RE_INVITED: string; LOGO: string; ORGANIZATION_LOGO: string; INVITED_TO_JOIN_ORGANIZATION: string; ACCEPT_INVITATION: string; VIEW_INVITATION: string; OR_COPY_AND_PASTE_URL: string; THIS_INVITATION_EXPIRES_IN_HOURS: string; EMAIL_SENT_BY: string; IF_YOU_DIDNT_EXPECT_THIS_INVITATION: string; POWERED_BY_BETTER_AUTH: string; }>",
+        "simplifiedType": "OrganizationInvitationEmailLocalization",
+        "required": false,
+        "deprecated": false
+      }
+    ]
+  }
+]

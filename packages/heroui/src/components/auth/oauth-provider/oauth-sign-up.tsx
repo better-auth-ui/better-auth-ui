@@ -3,15 +3,14 @@
 import {
   hasOAuthPrompt,
   type OAuthAuthorizationRequest,
-  parseOAuthAuthorizationRequest
-} from "@better-auth-ui/core/plugins"
-import {
   type OAuthProviderAuthClient,
-  useAuth,
-  useAuthPlugin,
+  parseOAuthAuthorizationRequest
+} from "@better-auth-ui/core/plugins/oauth-provider"
+import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
+import {
   useOAuthContinue,
   usePublicOAuthClient
-} from "@better-auth-ui/react"
+} from "@better-auth-ui/react/plugins/oauth-provider"
 import { Button, Card, type CardProps, cn, Spinner } from "@heroui/react"
 import { useEffect, useState } from "react"
 

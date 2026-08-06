@@ -1,13 +1,9 @@
 "use client"
 
 import { getAuthLinkURL } from "@better-auth-ui/core"
-import {
-  type EmailOtpAuthClient,
-  useAuth,
-  useAuthPlugin,
-  useFetchOptions,
-  useRequestPasswordResetOtp
-} from "@better-auth-ui/react"
+import type { EmailOtpAuthClient } from "@better-auth-ui/core/plugins/email-otp"
+import { useAuth, useAuthPlugin, useFetchOptions } from "@better-auth-ui/react"
+import { useRequestPasswordResetOtp } from "@better-auth-ui/react/plugins/email-otp"
 import { type SyntheticEvent, useState } from "react"
 
 import { Button } from "@/components/ui/button"

@@ -8,11 +8,9 @@ Each code works once — the server consumes it on success. Refetches the sessio
 ## Usage
 
 ```tsx
-import {
-  type TwoFactorAuthClient,
-  useAuth,
-  useVerifyBackupCode
-} from "@better-auth-ui/react"
+import type { TwoFactorAuthClient } from "@better-auth-ui/core/plugins/two-factor"
+import { useAuth } from "@better-auth-ui/react"
+import { useVerifyBackupCode } from "@better-auth-ui/react/plugins/two-factor"
 
 const { authClient } = useAuth()
 const { mutate: verifyBackupCode } = useVerifyBackupCode(
@@ -27,7 +25,7 @@ verifyBackupCode({ code: "a1b2-c3d4" })
 ## Options factory
 
 ```tsx
-import { verifyBackupCodeOptions } from "@better-auth-ui/react"
+import { verifyBackupCodeOptions } from "@better-auth-ui/core/plugins/two-factor"
 import { useMutation } from "@tanstack/react-query"
 
 const { mutate } = useMutation(verifyBackupCodeOptions(authClient))
@@ -35,4 +33,4 @@ const { mutate } = useMutation(verifyBackupCodeOptions(authClient))
 
 ## Params
 
-<auto-type-table path="../../../../../../packages/react/src/mutations/two-factor/verify-backup-code-mutation.ts" name="VerifyBackupCodeParams" />
+<auto-type-table path="../../../../../../packages/core/src/plugins/two-factor/verify-backup-code-mutation.ts" name="VerifyBackupCodeParams" />

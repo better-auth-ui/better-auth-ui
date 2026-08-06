@@ -8,11 +8,9 @@ Used both to finish a pending sign-in challenge and to confirm enrollment. Verif
 ## Usage
 
 ```tsx
-import {
-  type TwoFactorAuthClient,
-  useAuth,
-  useVerifyTotp
-} from "@better-auth-ui/react"
+import type { TwoFactorAuthClient } from "@better-auth-ui/core/plugins/two-factor"
+import { useAuth } from "@better-auth-ui/react"
+import { useVerifyTotp } from "@better-auth-ui/react/plugins/two-factor"
 
 const { authClient } = useAuth()
 const { mutate: verifyTotp } = useVerifyTotp(
@@ -27,7 +25,7 @@ verifyTotp({ code: "123456", trustDevice: true })
 ## Options factory
 
 ```tsx
-import { verifyTotpOptions } from "@better-auth-ui/react"
+import { verifyTotpOptions } from "@better-auth-ui/core/plugins/two-factor"
 import { useMutation } from "@tanstack/react-query"
 
 const { mutate } = useMutation(verifyTotpOptions(authClient))
@@ -35,4 +33,4 @@ const { mutate } = useMutation(verifyTotpOptions(authClient))
 
 ## Params
 
-<auto-type-table path="../../../../../../packages/react/src/mutations/two-factor/verify-totp-mutation.ts" name="VerifyTotpParams" />
+<auto-type-table path="../../../../../../packages/core/src/plugins/two-factor/verify-totp-mutation.ts" name="VerifyTotpParams" />

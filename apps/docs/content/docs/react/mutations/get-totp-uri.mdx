@@ -8,11 +8,9 @@ A mutation rather than a query: the endpoint is a POST that takes the password a
 ## Usage
 
 ```tsx
-import {
-  type TwoFactorAuthClient,
-  useAuth,
-  useGetTotpUri
-} from "@better-auth-ui/react"
+import type { TwoFactorAuthClient } from "@better-auth-ui/core/plugins/two-factor"
+import { useAuth } from "@better-auth-ui/react"
+import { useGetTotpUri } from "@better-auth-ui/react/plugins/two-factor"
 
 const { authClient } = useAuth()
 const { mutate: getTotpUri } = useGetTotpUri(
@@ -27,7 +25,7 @@ getTotpUri({ password: "current-password" })
 ## Options factory
 
 ```tsx
-import { getTotpUriOptions } from "@better-auth-ui/react"
+import { getTotpUriOptions } from "@better-auth-ui/core/plugins/two-factor"
 import { useMutation } from "@tanstack/react-query"
 
 const { mutate } = useMutation(getTotpUriOptions(authClient))
@@ -35,4 +33,4 @@ const { mutate } = useMutation(getTotpUriOptions(authClient))
 
 ## Params
 
-<auto-type-table path="../../../../../../packages/react/src/mutations/two-factor/get-totp-uri-mutation.ts" name="GetTotpUriParams" />
+<auto-type-table path="../../../../../../packages/core/src/plugins/two-factor/get-totp-uri-mutation.ts" name="GetTotpUriParams" />

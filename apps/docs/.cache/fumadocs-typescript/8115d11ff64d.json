@@ -1,0 +1,72 @@
+[
+  {
+    "id": "sign-in-magic-link-mutation.ts-SignInMagicLinkParams",
+    "name": "SignInMagicLinkParams",
+    "description": "",
+    "entries": [
+      {
+        "name": "metadata",
+        "description": "",
+        "tags": [],
+        "type": "Record<string, any>",
+        "simplifiedType": "Record<string, any>",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "callbackURL",
+        "description": "",
+        "tags": [],
+        "type": "string",
+        "simplifiedType": "string",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "newUserCallbackURL",
+        "description": "",
+        "tags": [],
+        "type": "string",
+        "simplifiedType": "string",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "errorCallbackURL",
+        "description": "",
+        "tags": [],
+        "type": "string",
+        "simplifiedType": "string",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "name",
+        "description": "",
+        "tags": [],
+        "type": "string",
+        "simplifiedType": "string",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "email",
+        "description": "",
+        "tags": [],
+        "type": "string",
+        "simplifiedType": "string",
+        "required": true,
+        "deprecated": false
+      },
+      {
+        "name": "fetchOptions",
+        "description": "",
+        "tags": [],
+        "type": "ClientFetchOption<Partial<{ email: string; name?: string; callbackURL?: string; newUserCallbackURL?: string; errorCallbackURL?: string; metadata?: Record<string, any>; }> & Record<string, any>, Partial<Record<string, any>> & Record<string, any>, Record<string, any>>",
+        "simplifiedType": "ClientFetchOption<Record<string, any> & Partial<object>, Record<string, any> & Partial<Record<string, any>>, union>",
+        "required": false,
+        "deprecated": false
+      }
+    ]
+  }
+]

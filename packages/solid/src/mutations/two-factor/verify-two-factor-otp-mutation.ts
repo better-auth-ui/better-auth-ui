@@ -1,18 +1,25 @@
-import { authQueryKeys } from "@better-auth-ui/core"
-import { twoFactorMutationKeys } from "@better-auth-ui/core/plugins"
-import type { TwoFactorAuthClient } from "../../lib/auth-client"
-import { createAuthMutationOptions } from "../create-auth-mutation"
+import {
+  type TwoFactorAuthClient,
+  type VerifyTwoFactorOtpOptions,
+  verifyTwoFactorOtpOptions
+} from "@better-auth-ui/core/plugins/two-factor"
+import { type QueryClient, useMutation } from "@tanstack/solid-query"
+import type { Accessor } from "solid-js"
 
-export type VerifyTwoFactorOtpParams<TAuthClient extends TwoFactorAuthClient> =
-  Parameters<TAuthClient["twoFactor"]["verifyOtp"]>[0]
-
-/** Mutation options factory for verifying the emailed second-factor code. */
-export function verifyTwoFactorOtpOptions<
+export type UseVerifyTwoFactorOtpOptions<
   TAuthClient extends TwoFactorAuthClient
->(authClient: TAuthClient) {
-  return createAuthMutationOptions(
-    authClient.twoFactor.verifyOtp,
-    twoFactorMutationKeys.verifyOtp,
-    { awaits: [authQueryKeys.session] }
+> = Accessor<VerifyTwoFactorOtpOptions<TAuthClient>>
+
+export function useVerifyTwoFactorOtp<TAuthClient extends TwoFactorAuthClient>(
+  authClient: TAuthClient,
+  options?: UseVerifyTwoFactorOtpOptions<TAuthClient>,
+  queryClient?: Accessor<QueryClient>
+) {
+  return useMutation(
+    () => ({
+      ...verifyTwoFactorOtpOptions(authClient),
+      ...(options?.() ?? {})
+    }),
+    queryClient
   )
 }

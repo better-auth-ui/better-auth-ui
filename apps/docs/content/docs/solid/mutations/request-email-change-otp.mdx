@@ -3,14 +3,14 @@ title: requestEmailChangeOtpOptions
 description: Start an email change with a code.
 ---
 
-Requires the Better Auth email-OTP plugin. If TypeScript cannot infer the plugin methods from your client, type or cast `authClient` as `EmailOtpAuthClient` from `@better-auth-ui/solid`.
+Requires the Better Auth email-OTP plugin. If TypeScript cannot infer the plugin methods from your client, type or cast `authClient` as `EmailOtpAuthClient` from `@better-auth-ui/core/plugins/email-otp`.
 
 Sends a code to the new address. When the server runs with `changeEmail: { verifyCurrentEmail: true }`, pass the `otp` the user received at their current address too.
 
 ## Options factory
 
 ```tsx
-import { requestEmailChangeOtpOptions } from "@better-auth-ui/solid"
+import { requestEmailChangeOtpOptions } from "@better-auth-ui/core/plugins/email-otp"
 import { createMutation } from "@tanstack/solid-query"
 
 const requestChange = createMutation(() => requestEmailChangeOtpOptions(authClient))
@@ -20,4 +20,4 @@ requestChange.mutate({ newEmail: "new@example.com" })
 
 ## Params
 
-<auto-type-table path="../../../../../../packages/solid/src/mutations/email-otp/request-email-change-otp-mutation.ts" name="RequestEmailChangeOtpParams" />
+<auto-type-table path="../../../../../../packages/core/src/plugins/email-otp/request-email-change-otp-mutation.ts" name="RequestEmailChangeOtpParams" />

@@ -1,11 +1,9 @@
 import { viewPaths } from "@better-auth-ui/core"
 import { Auth } from "@better-auth-ui/heroui"
-import {
-  deviceAuthorizationPlugin,
-  emailOtpPlugin,
-  magicLinkPlugin,
-  twoFactorPlugin
-} from "@better-auth-ui/heroui/plugins"
+import { deviceAuthorizationPlugin } from "@better-auth-ui/heroui/plugins/device-authorization"
+import { emailOtpPlugin } from "@better-auth-ui/heroui/plugins/email-otp"
+import { magicLinkPlugin } from "@better-auth-ui/heroui/plugins/magic-link"
+import { twoFactorPlugin } from "@better-auth-ui/heroui/plugins/two-factor"
 import { createFileRoute, notFound } from "@tanstack/react-router"
 
 /** Keep in sync with the auth-view plugins in `providers.tsx` if paths are customized. */

@@ -1,13 +1,12 @@
 "use client"
 
 import { authMutationKeys } from "@better-auth-ui/core"
+import type { EmailOtpAuthClient } from "@better-auth-ui/core/plugins/email-otp"
+import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
 import {
-  type EmailOtpAuthClient,
-  useAuth,
-  useAuthPlugin,
   useSendVerificationOtp,
   useSignInEmailOtp
-} from "@better-auth-ui/react"
+} from "@better-auth-ui/react/plugins/email-otp"
 import { useIsMutating } from "@tanstack/react-query"
 import { type SyntheticEvent, useState } from "react"
 

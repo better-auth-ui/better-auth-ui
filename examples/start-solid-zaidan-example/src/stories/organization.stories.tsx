@@ -1,6 +1,6 @@
 import { authQueryKeys } from "@better-auth-ui/core"
-import { organizationQueryKeys } from "@better-auth-ui/core/plugins"
-import type { OrganizationAuthClient } from "@better-auth-ui/solid"
+import type { OrganizationAuthClient } from "@better-auth-ui/core/plugins/organization"
+import { organizationQueryKeys } from "@better-auth-ui/core/plugins/organization"
 import { QueryClient } from "@tanstack/solid-query"
 import {
   createMemoryHistory,

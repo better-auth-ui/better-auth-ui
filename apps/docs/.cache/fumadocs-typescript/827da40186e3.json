@@ -1,0 +1,36 @@
+[
+  {
+    "id": "sign-up.tsx-SignUpProps",
+    "name": "SignUpProps",
+    "description": "",
+    "entries": [
+      {
+        "name": "class",
+        "description": "",
+        "tags": [],
+        "type": "string",
+        "simplifiedType": "string",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "socialLayout",
+        "description": "",
+        "tags": [],
+        "type": "SocialLayout",
+        "simplifiedType": "SocialLayout",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "socialPosition",
+        "description": "",
+        "tags": [],
+        "type": "\"bottom\" | \"top\"",
+        "simplifiedType": "\"bottom\" | \"top\"",
+        "required": false,
+        "deprecated": false
+      }
+    ]
+  }
+]

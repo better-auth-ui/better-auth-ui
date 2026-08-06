@@ -1,0 +1,36 @@
+[
+  {
+    "id": "delete-api-key-mutation.ts-DeleteApiKeyParams",
+    "name": "DeleteApiKeyParams",
+    "description": "",
+    "entries": [
+      {
+        "name": "fetchOptions",
+        "description": "",
+        "tags": [],
+        "type": "ClientFetchOption<Partial<{ keyId: string; configId?: string; }> & Record<string, any>, Partial<Record<string, any>> & Record<string, any>, Record<string, any>>",
+        "simplifiedType": "ClientFetchOption<Record<string, any> & Partial<object>, Record<string, any> & Partial<Record<string, any>>, union>",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "configId",
+        "description": "",
+        "tags": [],
+        "type": "string",
+        "simplifiedType": "string",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "keyId",
+        "description": "",
+        "tags": [],
+        "type": "string",
+        "simplifiedType": "string",
+        "required": true,
+        "deprecated": false
+      }
+    ]
+  }
+]

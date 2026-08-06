@@ -1,0 +1,36 @@
+[
+  {
+    "id": "update-organization-mutation.ts-UpdateOrganizationParams",
+    "name": "UpdateOrganizationParams",
+    "description": "",
+    "entries": [
+      {
+        "name": "organizationId",
+        "description": "",
+        "tags": [],
+        "type": "string",
+        "simplifiedType": "string",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "data",
+        "description": "",
+        "tags": [],
+        "type": "{ name?: string; slug?: string; logo?: string | null; metadata?: Record<string, any>; } & Partial<{}>",
+        "simplifiedType": "Partial<object> & object",
+        "required": true,
+        "deprecated": false
+      },
+      {
+        "name": "fetchOptions",
+        "description": "",
+        "tags": [],
+        "type": "ClientFetchOption<Partial<{ data: { name?: string; slug?: string; logo?: string | null; metadata?: Record<string, any>; } & Partial<{}>; organizationId?: string; }> & Record<string, any>, Partial<Record<string, any>> & Record<string, any>, Record<string, any>>",
+        "simplifiedType": "ClientFetchOption<Record<string, any> & Partial<object>, Record<string, any> & Partial<Record<string, any>>, union>",
+        "required": false,
+        "deprecated": false
+      }
+    ]
+  }
+]

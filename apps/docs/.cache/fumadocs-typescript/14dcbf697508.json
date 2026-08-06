@@ -1,0 +1,36 @@
+[
+  {
+    "id": "captcha-plugin.tsx-CaptchaRenderProps",
+    "name": "CaptchaRenderProps",
+    "description": "Props passed to the consumer's `render` component.",
+    "entries": [
+      {
+        "name": "setToken",
+        "description": "Call once the user solves the captcha.",
+        "tags": [],
+        "type": "(token: string) => void",
+        "simplifiedType": "function",
+        "required": true,
+        "deprecated": false
+      },
+      {
+        "name": "clearToken",
+        "description": "Call on error/expire to clear the token.",
+        "tags": [],
+        "type": "() => void",
+        "simplifiedType": "function",
+        "required": true,
+        "deprecated": false
+      },
+      {
+        "name": "setReset",
+        "description": "Register your widget's `reset()`. Forms call it after a failed\nsubmission since captcha tokens are single-use. Pass `null` on unmount.",
+        "tags": [],
+        "type": "(reset: (() => void) | null) => void",
+        "simplifiedType": "function",
+        "required": true,
+        "deprecated": false
+      }
+    ]
+  }
+]

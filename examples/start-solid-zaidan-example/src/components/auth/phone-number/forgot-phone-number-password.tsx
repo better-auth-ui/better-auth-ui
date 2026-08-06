@@ -1,12 +1,11 @@
+import type { PhoneNumberAuthClient } from "@better-auth-ui/core/plugins/phone-number"
 import {
   AuthLink,
-  type PhoneNumberAuthClient,
-  requestPhoneNumberPasswordResetOptions,
   useAuth,
   useAuthPlugin,
   useFetchOptions
 } from "@better-auth-ui/solid"
-import { createMutation } from "@tanstack/solid-query"
+import { useRequestPhoneNumberPasswordReset } from "@better-auth-ui/solid/plugins/phone-number"
 import { createSignal, Show } from "solid-js"
 
 import { Button } from "@/components/ui/button"
@@ -44,19 +43,19 @@ export function ForgotPhoneNumberPassword(
     useAuthPlugin(phoneNumberPlugin)
   const { fetchOptions, resetFetchOptions } = useFetchOptions()
   const [fieldError, setFieldError] = createSignal<string>()
-  const requestReset = createMutation(() => ({
-    ...requestPhoneNumberPasswordResetOptions(
-      auth.authClient as PhoneNumberAuthClient
-    ),
-    onError: () => resetFetchOptions(),
-    onSuccess: (_data, variables) => {
-      const phoneNumber = (variables as { phoneNumber: string }).phoneNumber
-      sessionStorage.setItem(PHONE_NUMBER_RESET_STORAGE_KEY, phoneNumber)
-      auth.navigate({
-        to: `${auth.basePaths.auth}/${phoneNumberViewPaths.auth.phoneNumberResetPassword}`
-      })
-    }
-  }))
+  const requestReset = useRequestPhoneNumberPasswordReset(
+    auth.authClient as PhoneNumberAuthClient,
+    () => ({
+      onError: () => resetFetchOptions(),
+      onSuccess: (_data, variables) => {
+        const phoneNumber = (variables as { phoneNumber: string }).phoneNumber
+        sessionStorage.setItem(PHONE_NUMBER_RESET_STORAGE_KEY, phoneNumber)
+        auth.navigate({
+          to: `${auth.basePaths.auth}/${phoneNumberViewPaths.auth.phoneNumberResetPassword}`
+        })
+      }
+    })
+  )
   const submit = (event: SubmitEvent & { currentTarget: HTMLFormElement }) => {
     event.preventDefault()
     const formData = new FormData(event.currentTarget)

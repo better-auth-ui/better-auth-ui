@@ -22,37 +22,87 @@
       "types": "./dist/email.d.ts",
       "import": "./dist/email.js"
     },
-    "./server": {
-      "types": "./dist/server.d.ts",
-      "import": "./dist/server.js"
+    "./plugins/admin": {
+      "types": "./dist/plugins/admin/index.d.ts",
+      "import": "./dist/plugins/admin/index.js"
     },
-    "./plugins": {
-      "types": "./dist/plugins.d.ts",
-      "import": "./dist/plugins.js"
+    "./plugins/anonymous": {
+      "types": "./dist/plugins/anonymous/index.d.ts",
+      "import": "./dist/plugins/anonymous/index.js"
+    },
+    "./plugins/api-key": {
+      "types": "./dist/plugins/api-key/index.d.ts",
+      "import": "./dist/plugins/api-key/index.js"
+    },
+    "./plugins/captcha": {
+      "types": "./dist/plugins/captcha/index.d.ts",
+      "import": "./dist/plugins/captcha/index.js"
+    },
+    "./plugins/device-authorization": {
+      "types": "./dist/plugins/device-authorization/index.d.ts",
+      "import": "./dist/plugins/device-authorization/index.js"
+    },
+    "./plugins/email-otp": {
+      "types": "./dist/plugins/email-otp/index.d.ts",
+      "import": "./dist/plugins/email-otp/index.js"
+    },
+    "./plugins/magic-link": {
+      "types": "./dist/plugins/magic-link/index.d.ts",
+      "import": "./dist/plugins/magic-link/index.js"
+    },
+    "./plugins/multi-session": {
+      "types": "./dist/plugins/multi-session/index.d.ts",
+      "import": "./dist/plugins/multi-session/index.js"
+    },
+    "./plugins/oauth-provider": {
+      "types": "./dist/plugins/oauth-provider/index.d.ts",
+      "import": "./dist/plugins/oauth-provider/index.js"
+    },
+    "./plugins/one-tap": {
+      "types": "./dist/plugins/one-tap/index.d.ts",
+      "import": "./dist/plugins/one-tap/index.js"
+    },
+    "./plugins/organization": {
+      "types": "./dist/plugins/organization/index.d.ts",
+      "import": "./dist/plugins/organization/index.js"
+    },
+    "./plugins/passkey": {
+      "types": "./dist/plugins/passkey/index.d.ts",
+      "import": "./dist/plugins/passkey/index.js"
+    },
+    "./plugins/phone-number": {
+      "types": "./dist/plugins/phone-number/index.d.ts",
+      "import": "./dist/plugins/phone-number/index.js"
+    },
+    "./plugins/two-factor": {
+      "types": "./dist/plugins/two-factor/index.d.ts",
+      "import": "./dist/plugins/two-factor/index.js"
+    },
+    "./plugins/username": {
+      "types": "./dist/plugins/username/index.d.ts",
+      "import": "./dist/plugins/username/index.js"
     }
   },
   "devDependencies": {
-    "@better-auth/api-key": "^1.6.19",
-    "@better-auth/oauth-provider": "1.6.19",
-    "@better-auth/passkey": "^1.6.19",
+    "@better-auth/api-key": "1.7.0-rc.4",
+    "@better-auth/passkey": "1.7.0-rc.4",
     "@solidjs-email/main": "^2.0.0",
-    "@tanstack/solid-query": "^5.100.9",
-    "@types/node": "^25.9.4",
-    "better-auth": "^1.6.19",
-    "solid-js": "^1.9.12",
-    "vite-plugin-solid": "^2.11.8",
+    "@tanstack/solid-query": "^5.101.2",
+    "@types/node": "^26.1.2",
+    "better-auth": "1.7.0-rc.4",
+    "solid-js": "^1.9.14",
+    "vite-plugin-solid": "^2.11.14",
     "vitest": "^4.1.9",
     "zod": "^4.4.3"
   },
   "peerDependencies": {
     "@better-auth-ui/core": "*",
-    "@better-auth/api-key": ">=1.6.19",
-    "@better-auth/oauth-provider": ">=1.6.19",
-    "@better-auth/passkey": ">=1.6.19",
+    "@better-auth/api-key": ">=1.7.0-rc.4",
+    "@better-auth/passkey": ">=1.7.0-rc.4",
     "@solidjs-email/main": ">=2.0.0",
-    "@tanstack/solid-query": ">=5.100.9",
-    "better-auth": ">=1.6.19",
-    "solid-js": ">=1.9.12",
+    "@tanstack/solid-query": ">=5.101.2",
+    "better-auth": ">=1.7.0-rc.4",
+    "solid-js": ">=1.9.14",
     "zod": ">=4.4.3"
   },
   "repository": {

@@ -1,0 +1,189 @@
+[
+  {
+    "id": "additional-fields-config.ts-AdditionalField",
+    "name": "AdditionalField",
+    "description": "Configuration for a single additional user field.",
+    "entries": [
+      {
+        "name": "name",
+        "description": "Field name. Used as the user object key and form input `name`.",
+        "tags": [],
+        "type": "string",
+        "simplifiedType": "string",
+        "required": true,
+        "deprecated": false
+      },
+      {
+        "name": "type",
+        "description": "Data type of the field.",
+        "tags": [],
+        "type": "AdditionalFieldType",
+        "simplifiedType": "AdditionalFieldType",
+        "required": true,
+        "deprecated": false
+      },
+      {
+        "name": "label",
+        "description": "Visible label rendered next to the input.",
+        "tags": [],
+        "type": "string",
+        "simplifiedType": "string",
+        "required": true,
+        "deprecated": false
+      },
+      {
+        "name": "inputType",
+        "description": "Override the default UI rendering.",
+        "tags": [{ "name": "default", "text": "inferred from `type`" }],
+        "type": "AdditionalFieldInputType",
+        "simplifiedType": "AdditionalFieldInputType",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "placeholder",
+        "description": "Placeholder text.",
+        "tags": [],
+        "type": "string",
+        "simplifiedType": "string",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "prefix",
+        "description": "Content rendered as a prefix addon inside the input group.",
+        "tags": [],
+        "type": "string",
+        "simplifiedType": "string",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "suffix",
+        "description": "Content rendered as a suffix addon inside the input group.",
+        "tags": [],
+        "type": "string",
+        "simplifiedType": "string",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "formatOptions",
+        "description": "`Intl.NumberFormat` options for number fields. Use `maximumFractionDigits`\n(and optionally `minimumFractionDigits`) to allow decimals, or `style: \"currency\"`\n/ `style: \"percent\"` for richer formatting.",
+        "tags": [],
+        "type": "Intl.NumberFormatOptions",
+        "simplifiedType": "object",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "min",
+        "description": "Minimum value. Applies to `number` and `slider` input types.",
+        "tags": [],
+        "type": "number",
+        "simplifiedType": "number",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "max",
+        "description": "Maximum value. Applies to `number` and `slider` input types.",
+        "tags": [],
+        "type": "number",
+        "simplifiedType": "number",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "step",
+        "description": "Step value. Applies to `number` and `slider` input types.",
+        "tags": [],
+        "type": "number",
+        "simplifiedType": "number",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "required",
+        "description": "",
+        "tags": [{ "name": "default", "text": "false" }],
+        "type": "boolean",
+        "simplifiedType": "boolean",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "defaultValue",
+        "description": "Default value used to seed the input on the sign-up form. On the user\nprofile, the value is always re-seeded from the persisted session.",
+        "tags": [],
+        "type": "AdditionalFieldValue | null",
+        "simplifiedType": "AdditionalFieldValue | null",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "readOnly",
+        "description": "Render the field but exclude it from submission payloads.",
+        "tags": [{ "name": "default", "text": "false" }],
+        "type": "boolean",
+        "simplifiedType": "boolean",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "copyable",
+        "description": "Show a copy-to-clipboard button as a suffix. Input variant only.",
+        "tags": [{ "name": "default", "text": "false" }],
+        "type": "boolean",
+        "simplifiedType": "boolean",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "options",
+        "description": "Options for the select input type.",
+        "tags": [],
+        "type": "AdditionalFieldOption[]",
+        "simplifiedType": "array",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "validate",
+        "description": "Custom client-side validation. Throw an `Error` (the `message` is shown\nto the user) when invalid; return / resolve normally when valid.\n\nReceives the parsed value (after `parseAdditionalFieldValue`).",
+        "tags": [],
+        "type": "((value: AdditionalFieldValue | null) => void | Promise<void>)",
+        "simplifiedType": "function",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "signUp",
+        "description": "Render on the sign-up form. Pass `\"above\"` to render between the `email`\nand `password` fields; otherwise the field renders below the password\nblock. `true` is an alias for `\"below\"`.",
+        "tags": [{ "name": "default", "text": "false" }],
+        "type": "boolean | \"above\" | \"below\"",
+        "simplifiedType": "boolean | \"above\" | \"below\"",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "profile",
+        "description": "Render on the user profile.",
+        "tags": [{ "name": "default", "text": "true" }],
+        "type": "boolean",
+        "simplifiedType": "boolean",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "render",
+        "description": "Custom renderer. Replaces the host UI package's built-in input. Must emit\nan input named `field.name` so the value is captured by the form's\n`FormData`.",
+        "tags": [],
+        "type": "((props: AdditionalFieldRenderProps) => AdditionalFieldRenderResult)",
+        "simplifiedType": "function",
+        "required": false,
+        "deprecated": false
+      }
+    ]
+  }
+]

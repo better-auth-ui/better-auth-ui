@@ -1,17 +1,27 @@
 ---
-title: signInSocialOptions
-description: Social sign-in mutation options.
+title: useSignInSocial
+description: Social sign-in mutation hook.
 ---
 
 Starts the provider OAuth flow and redirects through Better Auth.
 
+## Usage
+
+```tsx
+import { useSignInSocial } from "@better-auth-ui/solid"
+
+const mutation = useSignInSocial(authClient)
+
+mutation.mutate(/* params */)
+```
+
 ## Options factory
 
 ```tsx
-import { signInSocialOptions } from "@better-auth-ui/solid"
-import { createMutation } from "@tanstack/solid-query"
+import { signInSocialOptions } from "@better-auth-ui/core"
+import { useMutation } from "@tanstack/solid-query"
 
-const signInSocial = createMutation(() => signInSocialOptions(authClient))
+const signInSocial = useMutation(() => signInSocialOptions(authClient))
 
 signInSocial.mutate({
   provider: "github",
@@ -21,4 +31,4 @@ signInSocial.mutate({
 
 ## Params
 
-<auto-type-table path="../../../../../../packages/solid/src/mutations/auth/sign-in-social-mutation.ts" name="SignInSocialParams" />
+<auto-type-table path="../../../../../../packages/core/src/mutations/sign-in-social-mutation.ts" name="SignInSocialParams" />

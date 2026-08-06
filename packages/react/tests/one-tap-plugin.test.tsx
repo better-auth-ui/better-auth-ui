@@ -3,7 +3,7 @@ import { render, waitFor } from "@testing-library/react"
 import { StrictMode } from "react"
 import { describe, expect, it, vi } from "vitest"
 import { AuthPrompts, AuthProvider } from "../src"
-import { oneTapPlugin } from "../src/plugins"
+import { oneTapPlugin } from "../src/plugins/one-tap"
 
 type OneTapParams = {
   context?: "signin" | "signup" | "use"

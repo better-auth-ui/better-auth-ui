@@ -1,7 +1,6 @@
 import { apiKeyClient } from "@better-auth/api-key/client"
 import { passkeyClient } from "@better-auth/passkey/client"
-import type { AuthClient } from "@better-auth-ui/solid"
-import { createAuthClient } from "@better-auth-ui/solid"
+import type { AuthClient } from "@better-auth-ui/core"
 import {
   emailOTPClient,
   magicLinkClient,
@@ -10,6 +9,7 @@ import {
   twoFactorClient,
   usernameClient
 } from "better-auth/client/plugins"
+import { createAuthClient } from "better-auth/solid"
 
 const resolveAuthBaseURL = () => {
   if (import.meta.env.VITE_AUTH_URL) return import.meta.env.VITE_AUTH_URL

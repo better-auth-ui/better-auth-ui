@@ -30,7 +30,7 @@ export function LinkedAccount({ account, provider }: LinkedAccountProps) {
 
   const { data: accountInfo, isPending: isLoadingInfo } = useAccountInfo(
     authClient,
-    { query: { accountId: account?.accountId } }
+    { query: { accountId: account?.id ?? "" } }
   )
 
   const { mutate: linkSocial, isPending: isLinking } = useLinkSocial(authClient)
@@ -44,10 +44,13 @@ export function LinkedAccount({ account, provider }: LinkedAccountProps) {
 
   const ProviderIcon = providerIcons[provider]
   const providerName = getProviderName(provider)
+  const accountData = accountInfo?.data as
+    | { login?: string; username?: string }
+    | undefined
 
   const displayName =
-    accountInfo?.data?.login ||
-    accountInfo?.data?.username ||
+    accountData?.login ||
+    accountData?.username ||
     accountInfo?.user?.email ||
     accountInfo?.user?.name ||
     account?.accountId
@@ -90,7 +93,7 @@ export function LinkedAccount({ account, provider }: LinkedAccountProps) {
           className="ml-auto shrink-0"
           variant="outline"
           size="sm"
-          onPress={() => unlinkAccount({ providerId: account.providerId })}
+          onPress={() => unlinkAccount({ accountId: account.id })}
           isPending={isUnlinking}
           aria-label={localization.settings.unlinkProvider.replace(
             "{{provider}}",

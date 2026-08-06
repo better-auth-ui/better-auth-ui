@@ -1,18 +1,31 @@
-import { authQueryKeys } from "@better-auth-ui/core"
-import { phoneNumberMutationKeys } from "@better-auth-ui/core/plugins"
-import type { PhoneNumberAuthClient } from "../../lib/auth-client"
-import { createAuthMutationOptions } from "../create-auth-mutation"
+import {
+  type PhoneNumberAuthClient,
+  type VerifyPhoneNumberOptions,
+  verifyPhoneNumberOptions
+} from "@better-auth-ui/core/plugins/phone-number"
+import { type QueryClient, useMutation } from "@tanstack/solid-query"
+import type { Accessor } from "solid-js"
 
-export type VerifyPhoneNumberParams<TAuthClient extends PhoneNumberAuthClient> =
-  Parameters<TAuthClient["phoneNumber"]["verify"]>[0]
-
-/** Mutation options factory for verifying a phone-number code. */
-export function verifyPhoneNumberOptions<
+export type UseVerifyPhoneNumberOptions<
   TAuthClient extends PhoneNumberAuthClient
->(authClient: TAuthClient) {
-  return createAuthMutationOptions(
-    authClient.phoneNumber.verify,
-    phoneNumberMutationKeys.verify,
-    { awaits: [authQueryKeys.session] }
+> = Accessor<VerifyPhoneNumberOptions<TAuthClient>>
+
+/**
+ * Create a mutation for verifying a phone-number code.
+ *
+ * Verification can create a session or update the current user's phone
+ * number, so the session query is refreshed before success settles.
+ */
+export function useVerifyPhoneNumber<TAuthClient extends PhoneNumberAuthClient>(
+  authClient: TAuthClient,
+  options?: UseVerifyPhoneNumberOptions<TAuthClient>,
+  queryClient?: Accessor<QueryClient>
+) {
+  return useMutation(
+    () => ({
+      ...verifyPhoneNumberOptions(authClient),
+      ...(options?.() ?? {})
+    }),
+    queryClient
   )
 }

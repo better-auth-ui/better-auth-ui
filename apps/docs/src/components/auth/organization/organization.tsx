@@ -1,13 +1,11 @@
 "use client"
 
-import type { OrganizationView } from "@better-auth-ui/core/plugins"
-import {
-  type OrganizationAuthClient,
-  useActiveOrganization,
-  useAuth,
-  useAuthenticate,
-  useAuthPlugin
-} from "@better-auth-ui/react"
+import type {
+  OrganizationAuthClient,
+  OrganizationView
+} from "@better-auth-ui/core/plugins/organization"
+import { useAuth, useAuthenticate, useAuthPlugin } from "@better-auth-ui/react"
+import { useActiveOrganization } from "@better-auth-ui/react/plugins/organization"
 import { Settings as SettingsIcon, User2 as UserIcon } from "lucide-react"
 import { useEffect, useMemo } from "react"
 
@@ -40,7 +38,8 @@ export function Organization({
     throw new Error("[Better Auth UI] Either `view` or `path` must be provided")
   }
 
-  const { authClient, basePaths, localization, navigate } = useAuth()
+  const { authClient, basePaths, localization, navigate } =
+    useAuth<OrganizationAuthClient>()
   useAuthenticate(authClient)
 
   const {
@@ -50,9 +49,8 @@ export function Organization({
     slugPrefix
   } = useAuthPlugin(organizationPlugin)
 
-  const { data: activeOrganization, isPending } = useActiveOrganization(
-    authClient as OrganizationAuthClient
-  )
+  const { data: activeOrganization, isPending } =
+    useActiveOrganization(authClient)
 
   useEffect(() => {
     if (!isPending && !activeOrganization) {

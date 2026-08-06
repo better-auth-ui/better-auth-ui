@@ -5,7 +5,7 @@ import {
   apiKeyPlugin,
   DEFAULT_API_KEY_EXPIRATION_INTERVALS,
   resolveApiKeyExpirationOptions
-} from "../src/plugins"
+} from "../src/plugins/api-key"
 
 describe("apiKeyPlugin", () => {
   it("offers expiring and non-expiring keys by default", () => {

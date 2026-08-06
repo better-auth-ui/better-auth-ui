@@ -8,7 +8,7 @@ Requires `deviceAuthorizationClient()` from `better-auth/client/plugins`. Call t
 ## Options factory
 
 ```tsx
-import { approveDeviceOptions } from "@better-auth-ui/solid"
+import { approveDeviceOptions } from "@better-auth-ui/core/plugins/device-authorization"
 import { createMutation } from "@tanstack/solid-query"
 
 const approveDevice = createMutation(() => approveDeviceOptions(authClient))
@@ -20,4 +20,4 @@ approveDevice.mutate({
 
 ## Params
 
-<auto-type-table path="../../../../../../packages/solid/src/mutations/device-authorization/approve-device-mutation.ts" name="ApproveDeviceParams" />
+<auto-type-table path="../../../../../../packages/core/src/plugins/device-authorization/approve-device-mutation.ts" name="ApproveDeviceParams" />

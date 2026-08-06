@@ -1,0 +1,27 @@
+[
+  {
+    "id": "create-organization-dialog.tsx-CreateOrganizationDialogProps",
+    "name": "CreateOrganizationDialogProps",
+    "description": "",
+    "entries": [
+      {
+        "name": "open",
+        "description": "",
+        "tags": [],
+        "type": "boolean",
+        "simplifiedType": "boolean",
+        "required": true,
+        "deprecated": false
+      },
+      {
+        "name": "onOpenChange",
+        "description": "",
+        "tags": [],
+        "type": "(open: boolean) => void",
+        "simplifiedType": "function",
+        "required": true,
+        "deprecated": false
+      }
+    ]
+  }
+]

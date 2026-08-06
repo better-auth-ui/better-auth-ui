@@ -10,8 +10,7 @@ const config = defineConfig({
     port: 3000
   },
   resolve: {
-    tsconfigPaths: true,
-    noExternal: ["@gravity-ui/icons"]
+    tsconfigPaths: true
   },
   plugins: [
     cloudflare({ viteEnvironment: { name: "ssr" } }),

@@ -18,20 +18,154 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
     },
-    "./plugins": {
-      "src": "./src/plugins.ts",
-      "types": "./dist/plugins.d.ts",
-      "import": "./dist/plugins.js"
+    "./plugins/admin": {
+      "src": "./src/plugins/admin/index.ts",
+      "types": "./dist/plugins/admin/index.d.ts",
+      "import": "./dist/plugins/admin/index.js"
+    },
+    "./plugins/anonymous": {
+      "src": "./src/plugins/anonymous/index.ts",
+      "types": "./dist/plugins/anonymous/index.d.ts",
+      "import": "./dist/plugins/anonymous/index.js"
+    },
+    "./server": {
+      "src": "./src/server.ts",
+      "types": "./dist/server.d.ts",
+      "import": "./dist/server.js"
+    },
+    "./plugins/api-key": {
+      "src": "./src/plugins/api-key/index.ts",
+      "types": "./dist/plugins/api-key/index.d.ts",
+      "import": "./dist/plugins/api-key/index.js"
+    },
+    "./plugins/api-key/server": {
+      "src": "./src/plugins/api-key/server.ts",
+      "types": "./dist/plugins/api-key/server.d.ts",
+      "import": "./dist/plugins/api-key/server.js"
+    },
+    "./plugins/delete-user": {
+      "src": "./src/plugins/delete-user/index.ts",
+      "types": "./dist/plugins/delete-user/index.d.ts",
+      "import": "./dist/plugins/delete-user/index.js"
+    },
+    "./plugins/device-authorization": {
+      "src": "./src/plugins/device-authorization/index.ts",
+      "types": "./dist/plugins/device-authorization/index.d.ts",
+      "import": "./dist/plugins/device-authorization/index.js"
+    },
+    "./plugins/email-otp": {
+      "src": "./src/plugins/email-otp/index.ts",
+      "types": "./dist/plugins/email-otp/index.d.ts",
+      "import": "./dist/plugins/email-otp/index.js"
+    },
+    "./plugins/last-login-method": {
+      "src": "./src/plugins/last-login-method/index.ts",
+      "types": "./dist/plugins/last-login-method/index.d.ts",
+      "import": "./dist/plugins/last-login-method/index.js"
+    },
+    "./plugins/magic-link": {
+      "src": "./src/plugins/magic-link/index.ts",
+      "types": "./dist/plugins/magic-link/index.d.ts",
+      "import": "./dist/plugins/magic-link/index.js"
+    },
+    "./plugins/magic-link/server": {
+      "src": "./src/plugins/magic-link/server.ts",
+      "types": "./dist/plugins/magic-link/server.d.ts",
+      "import": "./dist/plugins/magic-link/server.js"
+    },
+    "./plugins/multi-session": {
+      "src": "./src/plugins/multi-session/index.ts",
+      "types": "./dist/plugins/multi-session/index.d.ts",
+      "import": "./dist/plugins/multi-session/index.js"
+    },
+    "./plugins/multi-session/server": {
+      "src": "./src/plugins/multi-session/server.ts",
+      "types": "./dist/plugins/multi-session/server.d.ts",
+      "import": "./dist/plugins/multi-session/server.js"
+    },
+    "./plugins/oauth-provider": {
+      "src": "./src/plugins/oauth-provider/index.ts",
+      "types": "./dist/plugins/oauth-provider/index.d.ts",
+      "import": "./dist/plugins/oauth-provider/index.js"
+    },
+    "./plugins/one-tap": {
+      "src": "./src/plugins/one-tap/index.ts",
+      "types": "./dist/plugins/one-tap/index.d.ts",
+      "import": "./dist/plugins/one-tap/index.js"
+    },
+    "./plugins/organization": {
+      "src": "./src/plugins/organization/index.ts",
+      "types": "./dist/plugins/organization/index.d.ts",
+      "import": "./dist/plugins/organization/index.js"
+    },
+    "./plugins/organization/server": {
+      "src": "./src/plugins/organization/server.ts",
+      "types": "./dist/plugins/organization/server.d.ts",
+      "import": "./dist/plugins/organization/server.js"
+    },
+    "./plugins/passkey": {
+      "src": "./src/plugins/passkey/index.ts",
+      "types": "./dist/plugins/passkey/index.d.ts",
+      "import": "./dist/plugins/passkey/index.js"
+    },
+    "./plugins/passkey/server": {
+      "src": "./src/plugins/passkey/server.ts",
+      "types": "./dist/plugins/passkey/server.d.ts",
+      "import": "./dist/plugins/passkey/server.js"
+    },
+    "./plugins/phone-number": {
+      "src": "./src/plugins/phone-number/index.ts",
+      "types": "./dist/plugins/phone-number/index.d.ts",
+      "import": "./dist/plugins/phone-number/index.js"
+    },
+    "./plugins/theme": {
+      "src": "./src/plugins/theme/index.ts",
+      "types": "./dist/plugins/theme/index.d.ts",
+      "import": "./dist/plugins/theme/index.js"
+    },
+    "./plugins/two-factor": {
+      "src": "./src/plugins/two-factor/index.ts",
+      "types": "./dist/plugins/two-factor/index.d.ts",
+      "import": "./dist/plugins/two-factor/index.js"
+    },
+    "./plugins/username": {
+      "src": "./src/plugins/username/index.ts",
+      "types": "./dist/plugins/username/index.d.ts",
+      "import": "./dist/plugins/username/index.js"
+    },
+    "./plugins/username/server": {
+      "src": "./src/plugins/username/server.ts",
+      "types": "./dist/plugins/username/server.d.ts",
+      "import": "./dist/plugins/username/server.js"
     }
   },
   "devDependencies": {
-    "@mikkelscheike/email-provider-links": "^5.1.8",
-    "better-auth": "^1.6.19",
+    "@better-auth/api-key": "1.7.0-rc.4",
+    "@better-auth/oauth-provider": "1.7.0-rc.4",
+    "@better-auth/passkey": "1.7.0-rc.4",
+    "@mikkelscheike/email-provider-links": "5.2.1",
+    "@tanstack/query-core": "^5.101.2",
+    "better-auth": "1.7.0-rc.4",
     "vitest": "^4.1.9"
   },
   "peerDependencies": {
-    "@mikkelscheike/email-provider-links": ">=5.1.8",
-    "better-auth": ">=1.6.19"
+    "@better-auth/api-key": ">=1.7.0-rc.4",
+    "@better-auth/oauth-provider": ">=1.7.0-rc.4",
+    "@better-auth/passkey": ">=1.7.0-rc.4",
+    "@mikkelscheike/email-provider-links": ">=5.2.1",
+    "@tanstack/query-core": ">=5.101.2",
+    "better-auth": ">=1.7.0-rc.4"
+  },
+  "peerDependenciesMeta": {
+    "@better-auth/api-key": {
+      "optional": true
+    },
+    "@better-auth/oauth-provider": {
+      "optional": true
+    },
+    "@better-auth/passkey": {
+      "optional": true
+    }
   },
   "repository": {
     "type": "git",

@@ -1,21 +1,18 @@
 ---
-title: verifyPhoneNumberOptions
+title: useVerifyPhoneNumber
 description: Verify a phone code or update the current user's phone number.
 ---
 
-## Options factory
+## Usage
 
 ```tsx
-import {
-  type PhoneNumberAuthClient,
-  useAuth,
-  verifyPhoneNumberOptions
-} from "@better-auth-ui/solid"
-import { createMutation } from "@tanstack/solid-query"
+import type { PhoneNumberAuthClient } from "@better-auth-ui/core/plugins/phone-number"
+import { useAuth } from "@better-auth-ui/solid"
+import { useVerifyPhoneNumber } from "@better-auth-ui/solid/plugins/phone-number"
 
 const { authClient } = useAuth()
-const verify = createMutation(() =>
-  verifyPhoneNumberOptions(authClient as PhoneNumberAuthClient)
+const verify = useVerifyPhoneNumber(
+  authClient as PhoneNumberAuthClient
 )
 
 verify.mutate({
@@ -26,6 +23,15 @@ verify.mutate({
 
 Pass `updatePhoneNumber: true` while authenticated to replace the current phone number. Session data refreshes after success.
 
+## Options factory
+
+```tsx
+import { verifyPhoneNumberOptions } from "@better-auth-ui/core/plugins/phone-number"
+import { useMutation } from "@tanstack/solid-query"
+
+const verify = useMutation(() => verifyPhoneNumberOptions(authClient))
+```
+
 ## Params
 
-<auto-type-table path="../../../../../../packages/solid/src/mutations/phone-number/verify-phone-number-mutation.ts" name="VerifyPhoneNumberParams" />
+<auto-type-table path="../../../../../../packages/core/src/plugins/phone-number/verify-phone-number-mutation.ts" name="VerifyPhoneNumberParams" />

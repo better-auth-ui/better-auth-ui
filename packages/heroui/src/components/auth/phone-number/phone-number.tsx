@@ -1,14 +1,16 @@
 import { authMutationKeys } from "@better-auth-ui/core"
+import type { PhoneNumberAuthClient } from "@better-auth-ui/core/plugins/phone-number"
 import {
   AuthPrompts,
-  type PhoneNumberAuthClient,
   useAuth,
   useAuthPlugin,
-  useFetchOptions,
+  useFetchOptions
+} from "@better-auth-ui/react"
+import {
   useSendPhoneNumberOtp,
   useSignInPhoneNumber,
   useVerifyPhoneNumber
-} from "@better-auth-ui/react"
+} from "@better-auth-ui/react/plugins/phone-number"
 import { Eye, EyeSlash } from "@gravity-ui/icons"
 import {
   Button,

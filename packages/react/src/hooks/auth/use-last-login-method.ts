@@ -1,13 +1,13 @@
 "use client"
 
 import {
+  type LastLoginMethodAuthClient,
   type LastLoginMethodLocalization,
   lastLoginMethodLocalization,
   lastLoginMethodPlugin
-} from "@better-auth-ui/core/plugins"
+} from "@better-auth-ui/core/plugins/last-login-method"
 import { useCallback, useSyncExternalStore } from "react"
 import { useAuth } from "../../components/auth/auth-provider"
-import type { LastLoginMethodAuthClient } from "../../lib/auth-client"
 
 const subscribe = () => () => {}
 const getServerSnapshot = () => null
