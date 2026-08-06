@@ -66,24 +66,25 @@ describe("AuthProvider query defaults", () => {
     expect(queryFn).toHaveBeenCalledOnce()
   })
 
-  it.each([
-    429, 500
-  ])("retries transient auth query status %s three times", async (status) => {
-    const queryClient = createQueryClient()
-    const queryFn = vi
-      .fn<() => Promise<unknown>>()
-      .mockRejectedValue(
-        Object.assign(new Error("Transient error"), { status })
-      )
+  it.each([429, 500])(
+    "retries transient auth query status %s three times",
+    async (status) => {
+      const queryClient = createQueryClient()
+      const queryFn = vi
+        .fn<() => Promise<unknown>>()
+        .mockRejectedValue(
+          Object.assign(new Error("Transient error"), { status })
+        )
 
-    render(<RetryQuery queryFn={queryFn} />, {
-      wrapper: createWrapper(queryClient)
-    })
+      render(<RetryQuery queryFn={queryFn} />, {
+        wrapper: createWrapper(queryClient)
+      })
 
-    await waitFor(() => {
-      expect(queryClient.getQueryState(retryQueryKey)?.status).toBe("error")
-    })
+      await waitFor(() => {
+        expect(queryClient.getQueryState(retryQueryKey)?.status).toBe("error")
+      })
 
-    expect(queryFn).toHaveBeenCalledTimes(4)
-  })
+      expect(queryFn).toHaveBeenCalledTimes(4)
+    }
+  )
 })

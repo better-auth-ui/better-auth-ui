@@ -205,24 +205,26 @@ describe("<DeviceAuthorization />", () => {
   it.each([
     { action: "approve" as const, buttonName: "Approve" },
     { action: "deny" as const, buttonName: "Deny" }
-  ])("shows feedback when device $action fails", async ({
-    action,
-    buttonName
-  }) => {
-    const user = userEvent.setup()
-    const authClient = createMockAuthClient()
-    authClient.device[action].mockRejectedValueOnce(new Error("request failed"))
-    renderDeviceAuthorization(authClient)
+  ])(
+    "shows feedback when device $action fails",
+    async ({ action, buttonName }) => {
+      const user = userEvent.setup()
+      const authClient = createMockAuthClient()
+      authClient.device[action].mockRejectedValueOnce(
+        new Error("request failed")
+      )
+      renderDeviceAuthorization(authClient)
 
-    await enterDeviceCode(user)
-    await screen.findByRole("heading", { name: "Approve Device" })
-    await user.click(screen.getByRole("button", { name: buttonName }))
+      await enterDeviceCode(user)
+      await screen.findByRole("heading", { name: "Approve Device" })
+      await user.click(screen.getByRole("button", { name: buttonName }))
 
-    expect(
-      await screen.findByText("The code is invalid or has expired.")
-    ).toBeInTheDocument()
-    expect(screen.getByRole("textbox", { name: "Device code" })).toHaveValue(
-      "AB12CD34"
-    )
-  })
+      expect(
+        await screen.findByText("The code is invalid or has expired.")
+      ).toBeInTheDocument()
+      expect(screen.getByRole("textbox", { name: "Device code" })).toHaveValue(
+        "AB12CD34"
+      )
+    }
+  )
 })
