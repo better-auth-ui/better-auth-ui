@@ -4,7 +4,8 @@
     "rootDir": "src",
     "outDir": "dist",
     "jsx": "preserve",
-    "jsxImportSource": "solid-js"
+    "jsxImportSource": "solid-js",
+    "ignoreDeprecations": "6.0"
   },
   "include": ["src"]
 }

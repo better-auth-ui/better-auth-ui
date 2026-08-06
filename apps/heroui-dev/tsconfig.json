@@ -23,6 +23,8 @@
     "noUncheckedSideEffectImports": true,
     "paths": {
       "@/*": ["./src/*"]
-    }
+    },
+    "esModuleInterop": false,
+    "ignoreDeprecations": "6.0"
   }
 }

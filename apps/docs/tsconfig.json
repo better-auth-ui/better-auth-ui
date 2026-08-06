@@ -18,6 +18,8 @@
       "@/*": ["./src/*"],
       "fumadocs-mdx:collections/*": ["./.source/*"]
     },
-    "noEmit": true
+    "noEmit": true,
+    "noUncheckedSideEffectImports": false,
+    "ignoreDeprecations": "6.0"
   }
 }
