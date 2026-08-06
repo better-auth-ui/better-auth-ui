@@ -17,7 +17,7 @@
     "test": "vitest --run"
   },
   "dependencies": {
-    "@base-ui/react": "^1.6.0",
+    "@base-ui/react": "^1.7.0",
     "@better-auth/api-key": "1.7.0-rc.4",
     "@better-auth/passkey": "1.7.0-rc.4",
     "@better-auth-ui/core": "*",

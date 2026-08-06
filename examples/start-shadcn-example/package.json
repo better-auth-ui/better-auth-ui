@@ -52,7 +52,7 @@
     "wrangler": "^4.119.0"
   },
   "dependencies": {
-    "@base-ui/react": "^1.6.0",
+    "@base-ui/react": "^1.7.0",
     "@better-auth-ui/core": "*",
     "@better-auth-ui/react": "*",
     "@better-auth/api-key": "1.7.0-rc.4",
