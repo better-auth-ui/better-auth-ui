@@ -14,9 +14,6 @@
     "packages/*",
     "examples/*"
   ],
-  "overrides": {
-    "kysely": "0.28.17"
-  },
   "devDependencies": {
     "@better-auth-ui/react": "workspace:*",
     "@better-auth/api-key": "1.7.0-rc.4",
