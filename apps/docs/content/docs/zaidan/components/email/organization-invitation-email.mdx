@@ -16,6 +16,53 @@ description: Email template component that invites a user to join an organizatio
 npx shadcn@latest add https://better-auth-ui.com/r/solid/organization-invitation-email.json
 ```
 
+## Better Auth setup
+
+Wire the email into the Better Auth `organization` plugin via `sendInvitationEmail`. Point `url` at the direct invitation view registered by `organizationPlugin()`.
+
+```tsx title="auth.ts"
+import { OrganizationInvitationEmail } from "@better-auth-ui/solid/email"
+import { render } from "@solidjs-email/main"
+import { betterAuth } from "better-auth"
+import { organization } from "better-auth/plugins"
+
+const baseUrl = process.env.BETTER_AUTH_URL!
+
+export const auth = betterAuth({
+  plugins: [
+    organization({
+      async sendInvitationEmail(data) {
+        const html = await render(() =>
+          OrganizationInvitationEmail({
+            url: `${baseUrl}/auth/accept-invitation?invitationId=${data.id}`,
+            email: data.email,
+            inviterName: data.inviter.user.name,
+            inviterEmail: data.inviter.user.email,
+            organizationName: data.organization.name,
+            organizationLogoURL: data.organization.logo ?? undefined,
+            role: data.role,
+            appName: "My App",
+            poweredBy: true
+          })
+        )
+
+        await sendEmail({
+          to: data.email,
+          subject: `You're invited to ${data.organization.name}`,
+          html
+        })
+      }
+    })
+  ]
+})
+```
+
+<Callout>
+  Add `organizationPlugin().viewPaths.auth.acceptInvitation` to your auth
+  route allow-list. Use `{baseUrl}/settings/organizations` only when you want
+  the invitation email to open the full pending-invitations list instead.
+</Callout>
+
 ## Props
 
 <auto-type-table path="../../../../../../../packages/solid/src/components/auth/email/organization-invitation.tsx" name="OrganizationInvitationEmailProps" />
@@ -25,7 +72,7 @@ npx shadcn@latest add https://better-auth-ui.com/r/solid/organization-invitation
 - Inviter name and email display
 - Organization name and optional organization logo
 - Role being offered (e.g. member, admin, owner)
-- Accept invitation button linking to the settings invitations page
+- Accept invitation button linking to the direct invitation view
 - Fallback URL for manual copy/paste
 - Optional expiration time
 - Security notice for unexpected invitations

@@ -22,7 +22,7 @@ npx shadcn@latest add @better-auth-ui/organization-invitation-email
 
 ## Server setup
 
-Wire the email into the Better Auth `organization` plugin via `sendInvitationEmail`. Point `url` at the settings page where pending invitations are listed — better-auth-ui renders them under `/settings/organizations`.
+Wire the email into the Better Auth `organization` plugin via `sendInvitationEmail`. Point `url` at the direct invitation view registered by `organizationPlugin()`.
 
 ```tsx title="auth.ts"
 import { OrganizationInvitationEmail } from "@better-auth-ui/react/email"
@@ -38,7 +38,7 @@ export const auth = betterAuth({
       async sendInvitationEmail(data) {
         const html = await render(
           <OrganizationInvitationEmail
-            url={`${baseUrl}/settings/organizations`}
+            url={`${baseUrl}/auth/accept-invitation?invitationId=${data.id}`}
             email={data.email}
             inviterName={data.inviter.user.name}
             inviterEmail={data.inviter.user.email}
@@ -62,9 +62,9 @@ export const auth = betterAuth({
 ```
 
 <Callout>
-  `url` should always resolve to `{baseUrl}/settings/organizations` — that's
-  where the `<UserInvitations />` table inside `<OrganizationsSettings />`
-  renders pending invitations the user can accept or reject.
+  Add `organizationPlugin().viewPaths.auth.acceptInvitation` to your auth
+  route allow-list. Use `{baseUrl}/settings/organizations` only when you want
+  the invitation email to open the full pending-invitations list instead.
 </Callout>
 
 ## Props
@@ -76,7 +76,7 @@ export const auth = betterAuth({
 - Inviter name and email display
 - Organization name and optional organization logo
 - Role being offered (e.g. member, admin, owner)
-- Accept invitation button linking to the settings invitations page
+- Accept invitation button linking to the direct invitation view
 - Fallback URL for manual copy/paste
 - Optional expiration time
 - Security notice for unexpected invitations

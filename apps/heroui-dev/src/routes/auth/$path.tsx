@@ -4,6 +4,7 @@ import {
   deviceAuthorizationPlugin,
   emailOtpPlugin,
   magicLinkPlugin,
+  organizationPlugin,
   twoFactorPlugin
 } from "@better-auth-ui/heroui/plugins"
 import { createFileRoute, notFound } from "@tanstack/react-router"
@@ -13,6 +14,7 @@ const validAuthPathSegments = new Set([
   ...Object.values(viewPaths.auth),
   deviceAuthorizationPlugin().viewPaths.auth.deviceAuthorization,
   magicLinkPlugin().viewPaths.auth.magicLink,
+  organizationPlugin().viewPaths.auth.acceptInvitation,
   emailOtpPlugin().viewPaths.auth.emailOtp,
   twoFactorPlugin().viewPaths.auth.twoFactor
 ])

@@ -63,6 +63,7 @@ npx shadcn@latest add https://better-auth-ui.com/r/solid/organization.json
 This drops the following into your codebase:
 
 - `src/lib/auth/organization-plugin.tsx` — `organizationPlugin()` factory
+- `src/components/auth/organization/accept-invitation.tsx` — direct invitation acceptance view
 - `src/components/auth/organization/organization.tsx`: the prefixed organization route shell
 - `src/components/auth/organization/organization-switcher.tsx` — header dropdown for switching organizations
 - `src/components/auth/organization/organization-settings.tsx` — settings tab contents (profile + danger zone + plugin cards)
@@ -140,6 +141,26 @@ export function Providers(props: ProvidersProps) {
 ```
 
 `Show keyed` remounts the provider when the URL slug changes, so plugin state and organization-scoped queries cannot keep using a previous slug.
+
+</Step>
+<Step>
+### Allow the invitation auth path
+
+The organization plugin registers a direct invitation view at `/auth/accept-invitation`. Include its auth path in any route allow-list that wraps `<Auth path={path} />`:
+
+```tsx title="src/routes/auth/$path.tsx"
+import { viewPaths } from "@better-auth-ui/core"
+
+import { Auth } from "@/components/auth/auth"
+import { organizationPlugin } from "@/lib/auth/organization-plugin"
+
+const validAuthPaths = [
+  ...Object.values(viewPaths.auth),
+  ...Object.values(organizationPlugin().viewPaths.auth) // [!code highlight]
+]
+```
+
+Invitation links use `/auth/accept-invitation?invitationId=<id>`. Signed-out recipients return to the invitation after signing in, and successful accept or reject actions continue to the configured `redirectTo`.
 
 </Step>
 <Step>
@@ -462,6 +483,7 @@ organizationPlugin({
   checkSlug: false,
   // Override path segments (defaults shown).
   viewPaths: {
+    auth: { acceptInvitation: "accept-invitation" },
     settings: { organizations: "organizations" },
     organization: { settings: "settings", people: "people" }
   },
@@ -513,6 +535,10 @@ The copied Zaidan components read the configured client from `<AuthProvider>` wi
 ## Components
 
 These previews use seeded Storybook fixtures and do not call live Better Auth endpoints.
+
+### `<AcceptInvitation />`
+
+Direct invitation acceptance view registered by `organizationPlugin()` at `/auth/accept-invitation`. It reads `invitationId` from the query string, preserves the link through sign-in, and lets the recipient accept or reject the pending invitation.
 
 ### `<OrganizationSwitcher />`
 

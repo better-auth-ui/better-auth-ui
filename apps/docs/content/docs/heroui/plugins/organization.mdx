@@ -75,6 +75,25 @@ import { authClient } from "@/lib/auth-client"
 
 </Step>
 <Step>
+### Allow the invitation auth path
+
+The organization plugin registers a direct invitation view at `/auth/accept-invitation`. Include its auth path in any route allow-list that wraps `<Auth path={path} />`:
+
+```tsx title="routes/auth/$path.tsx"
+import { viewPaths } from "@better-auth-ui/core"
+import { Auth } from "@better-auth-ui/heroui"
+import { organizationPlugin } from "@better-auth-ui/heroui/plugins"
+
+const validAuthPaths = [
+  ...Object.values(viewPaths.auth),
+  ...Object.values(organizationPlugin().viewPaths.auth) // [!code highlight]
+]
+```
+
+Invitation links use `/auth/accept-invitation?invitationId=<id>`. Signed-out recipients return to the invitation after signing in, and successful accept or reject actions continue to the configured `redirectTo`.
+
+</Step>
+<Step>
 ### Mount the organization switcher
 
 Drop `<OrganizationSwitcher />` into your app shell — typically in the header next to `<UserButton />`. It shows the active organization, lets users switch between organizations, and exposes a "Create organization" entry:
@@ -643,6 +662,7 @@ organizationPlugin({
   checkSlug: false,
   // Override path segments (defaults shown).
   viewPaths: {
+    auth: { acceptInvitation: "accept-invitation" },
     settings: { organizations: "organizations" },
     organization: { settings: "settings", people: "people" }
   },
@@ -690,6 +710,12 @@ Read these inside custom slot components via `useAuthPlugin(organizationPlugin).
 - `useCheckSlug()` — Check whether an organization slug is available
 
 ## Components
+
+### `<AcceptInvitation />`
+
+Direct invitation acceptance view registered by `organizationPlugin()` at `/auth/accept-invitation`. It reads `invitationId` from the query string, preserves the link through sign-in, and lets the recipient accept or reject the pending invitation.
+
+<auto-type-table path="../../../../../../packages/heroui/src/components/auth/organization/accept-invitation.tsx" name="AcceptInvitationProps" />
 
 ### `<OrganizationSwitcher />`
 

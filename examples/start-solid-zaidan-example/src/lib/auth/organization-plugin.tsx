@@ -6,6 +6,7 @@ import {
 } from "@better-auth-ui/core/plugins"
 import { BriefcaseBusiness } from "lucide-solid"
 import type { Component } from "solid-js"
+import { AcceptInvitation } from "@/components/auth/organization/accept-invitation"
 import { OrganizationsSettings } from "@/components/auth/organization/organizations-settings"
 
 export type SolidSettingsTab = {
@@ -22,6 +23,9 @@ export const organizationPlugin = createAuthPlugin(
     return {
       ...core,
       localization: core.localization as OrganizationLocalization,
+      views: {
+        auth: { acceptInvitation: AcceptInvitation }
+      },
       settingsTabs: [
         {
           view: "organizations",

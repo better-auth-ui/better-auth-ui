@@ -1,6 +1,7 @@
 export * from "./active-organization-query"
 export * from "./full-organization-query"
 export * from "./has-permission-query"
+export * from "./invitation-query"
 export * from "./list-invitations-query"
 export * from "./list-members-query"
 export * from "./list-organizations-query"

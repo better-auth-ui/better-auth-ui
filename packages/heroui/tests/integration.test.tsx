@@ -19,6 +19,7 @@ const indexComponents = [
 // `MagicLinkButton` and `PasskeyButton` are not re-exported — they're only
 // used as `authButtons` slot contributions on the plugin objects.
 const pluginsExports = [
+  "AcceptInvitation",
   "StopImpersonating",
   "DeviceAuthorization",
   "MagicLink",
