@@ -160,6 +160,25 @@ describe("organizationPlugin invitation view (heroui)", () => {
     expect(screen.getByRole("button", { name: "Return" })).toBeInTheDocument()
   })
 
+  it("renders an unavailable state for an expired invitation", async () => {
+    window.history.pushState(
+      {},
+      "",
+      "/auth/accept-invitation?invitationId=invitation-1"
+    )
+    renderInvitation(
+      createMockAuthClient({
+        ...invitation,
+        expiresAt: new Date(Date.now() - 60_000)
+      })
+    )
+
+    expect(
+      await screen.findByRole("heading", { name: "Invitation unavailable" })
+    ).toBeInTheDocument()
+    expect(screen.getByRole("button", { name: "Return" })).toBeInTheDocument()
+  })
+
   it("renders an unavailable state when the invitation id is missing", async () => {
     window.history.pushState({}, "", "/auth/accept-invitation")
     renderInvitation()
