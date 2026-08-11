@@ -1,5 +1,6 @@
 import { createQrCodeSvgData } from "@better-auth-ui/core"
 import {
+  createCopyToClipboard,
   enableTwoFactorOptions,
   type TwoFactorAuthClient,
   useAuth,
@@ -8,7 +9,7 @@ import {
 } from "@better-auth-ui/solid"
 import { createMutation } from "@tanstack/solid-query"
 import { Check, Copy, ShieldCheck } from "lucide-solid"
-import { createSignal, onCleanup, Show } from "solid-js"
+import { createSignal, Show } from "solid-js"
 import { toast } from "solid-sonner"
 import { OtpField } from "@/components/auth/otp-field"
 import { BackupCodes } from "@/components/auth/two-factor/backup-codes"
@@ -55,8 +56,9 @@ export function EnableTwoFactorDialog(props: {
   const [totpUri, setTotpUri] = createSignal("")
   const [backupCodes, setBackupCodes] = createSignal<string[]>([])
   const [code, setCode] = createSignal("")
-  const [setupKeyCopied, setSetupKeyCopied] = createSignal(false)
-  let copyResetTimeout: ReturnType<typeof setTimeout> | undefined
+  const { copied: setupKeyCopied, copy: copySetupKey } = createCopyToClipboard({
+    onError: () => toast.error(twoFactorLocalization.setupKeyCopyFailed)
+  })
 
   const qrCode = () => (totpUri() ? createQrCodeSvgData(totpUri()) : null)
 
@@ -69,23 +71,6 @@ export function EnableTwoFactorDialog(props: {
       return new URL(totpUri()).searchParams.get("secret")
     } catch {
       return null
-    }
-  }
-
-  onCleanup(() => clearTimeout(copyResetTimeout))
-
-  const copySetupKey = async (key: string) => {
-    try {
-      await navigator.clipboard.writeText(key)
-      setSetupKeyCopied(true)
-      clearTimeout(copyResetTimeout)
-
-      copyResetTimeout = setTimeout(() => {
-        setSetupKeyCopied(false)
-        copyResetTimeout = undefined
-      }, 2000)
-    } catch {
-      toast.error(twoFactorLocalization.setupKeyCopyFailed)
     }
   }
 

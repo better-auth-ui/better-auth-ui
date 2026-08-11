@@ -1,4 +1,8 @@
-import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
+import {
+  useAuth,
+  useAuthPlugin,
+  useCopyToClipboard
+} from "@better-auth-ui/react"
 import { Check, Copy, Key } from "@gravity-ui/icons"
 import {
   Button,
@@ -8,7 +12,6 @@ import {
   TextField,
   toast
 } from "@heroui/react"
-import { useState } from "react"
 
 import { apiKeyPlugin } from "../../../lib/auth/api-key-plugin"
 
@@ -28,11 +31,14 @@ export function NewApiKeyDialog({
   const { localization } = useAuth()
   const { localization: apiKeyLocalization } = useAuthPlugin(apiKeyPlugin)
 
-  const [copied, setCopied] = useState(false)
+  const { copied, copy, reset } = useCopyToClipboard({
+    onError: (error) =>
+      toast.danger(error instanceof Error ? error.message : String(error))
+  })
 
   const handleOpenChange = (open: boolean) => {
     if (!open) {
-      setCopied(false)
+      reset()
     }
 
     onOpenChange(open)
@@ -41,13 +47,7 @@ export function NewApiKeyDialog({
   const copySecretKey = async () => {
     if (!secretKey) return
 
-    try {
-      await navigator.clipboard.writeText(secretKey)
-      setCopied(true)
-      setTimeout(() => setCopied(false), 1500)
-    } catch (error) {
-      toast.danger(error instanceof Error ? error.message : String(error))
-    }
+    await copy(secretKey)
   }
 
   return (
@@ -78,7 +78,11 @@ export function NewApiKeyDialog({
                 <InputGroup.Suffix className="px-0">
                   <Button
                     isIconOnly
-                    aria-label={localization.settings.copyToClipboard}
+                    aria-label={
+                      copied
+                        ? localization.settings.copiedToClipboard
+                        : localization.settings.copyToClipboard
+                    }
                     size="sm"
                     variant="ghost"
                     onPress={copySecretKey}

@@ -4,7 +4,7 @@ import {
   type AdditionalField as AdditionalFieldConfig,
   resolveInputType
 } from "@better-auth-ui/core"
-import { useAuth } from "@better-auth-ui/react"
+import { useAuth, useCopyToClipboard } from "@better-auth-ui/react"
 import { format } from "date-fns"
 import { CalendarIcon, Check, ChevronDownIcon, Copy } from "lucide-react"
 import { type ComponentType, useRef, useState } from "react"
@@ -88,25 +88,30 @@ function CopyButton({
   isDisabled?: boolean
 }) {
   const { localization } = useAuth()
-  const [copied, setCopied] = useState(false)
+  const { copied, copy } = useCopyToClipboard({
+    onError: (error) =>
+      toast.error(error instanceof Error ? error.message : String(error))
+  })
 
   async function handleCopy() {
     const value = getValue()
     if (!value) return
 
-    try {
-      await navigator.clipboard.writeText(value)
-      setCopied(true)
-      setTimeout(() => setCopied(false), 1500)
-    } catch (error) {
-      toast.error(error instanceof Error ? error.message : String(error))
-    }
+    await copy(value)
   }
 
   return (
     <InputGroupButton
-      aria-label={localization.settings.copyToClipboard}
-      title={localization.settings.copyToClipboard}
+      aria-label={
+        copied
+          ? localization.settings.copiedToClipboard
+          : localization.settings.copyToClipboard
+      }
+      title={
+        copied
+          ? localization.settings.copiedToClipboard
+          : localization.settings.copyToClipboard
+      }
       onClick={handleCopy}
       disabled={isDisabled}
     >

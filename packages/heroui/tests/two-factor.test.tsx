@@ -247,6 +247,9 @@ describe("<TwoFactorSettings />", () => {
       within(dialog).getByRole("button", { name: /copy to clipboard/i })
     )
 
+    expect(
+      within(dialog).getByRole("button", { name: /backup codes copied/i })
+    ).toBeInTheDocument()
     expect(writeText).toHaveBeenLastCalledWith(
       [
         `Backup codes for ${window.location.origin}`,

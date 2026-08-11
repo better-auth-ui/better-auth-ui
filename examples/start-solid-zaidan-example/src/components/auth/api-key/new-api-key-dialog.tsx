@@ -1,7 +1,7 @@
 import { apiKeyLocalization } from "@better-auth-ui/core/plugins"
-import { useAuth } from "@better-auth-ui/solid"
+import { createCopyToClipboard, useAuth } from "@better-auth-ui/solid"
 import { Check, Copy, Key } from "lucide-solid"
-import { createEffect, createSignal, Show } from "solid-js"
+import { createEffect, Show } from "solid-js"
 import { toast } from "solid-sonner"
 import { Button } from "@/components/ui/button"
 import {
@@ -26,29 +26,30 @@ export function NewApiKeyDialog(props: {
   secretKey: string | null
 }) {
   const auth = useAuth()
-  const [isCopied, setIsCopied] = createSignal(false)
+  const {
+    copied: isCopied,
+    copy,
+    reset
+  } = createCopyToClipboard({
+    onError: (error) =>
+      toast.error(error instanceof Error ? error.message : String(error))
+  })
 
   createEffect(() => {
     if (!props.open) {
-      setIsCopied(false)
+      reset()
     }
   })
 
   const handleDismiss = () => {
-    setIsCopied(false)
+    reset()
     props.onDismiss()
   }
 
   const copySecretKey = async () => {
     if (!props.secretKey) return
 
-    try {
-      await navigator.clipboard.writeText(props.secretKey)
-      setIsCopied(true)
-      setTimeout(() => setIsCopied(false), 1500)
-    } catch (error) {
-      toast.error(error instanceof Error ? error.message : String(error))
-    }
+    await copy(props.secretKey)
   }
 
   return (
@@ -76,7 +77,11 @@ export function NewApiKeyDialog(props: {
           />
           <InputGroupAddon align="inline-end">
             <InputGroupButton
-              aria-label={auth.localization.settings.copyToClipboard}
+              aria-label={
+                isCopied()
+                  ? auth.localization.settings.copiedToClipboard
+                  : auth.localization.settings.copyToClipboard
+              }
               onClick={copySecretKey}
               size="icon-xs"
               type="button"

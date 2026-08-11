@@ -3,6 +3,7 @@ import {
   type TwoFactorAuthClient,
   useAuth,
   useAuthPlugin,
+  useCopyToClipboard,
   useEnableTwoFactor,
   useVerifyTotp
 } from "@better-auth-ui/react"
@@ -19,13 +20,7 @@ import {
   TextField,
   toast
 } from "@heroui/react"
-import {
-  type SyntheticEvent,
-  useEffect,
-  useMemo,
-  useRef,
-  useState
-} from "react"
+import { type SyntheticEvent, useMemo, useState } from "react"
 
 import { twoFactorPlugin } from "../../../lib/auth/two-factor-plugin"
 import { useTwoFactorPasswordRequirement } from "../../../lib/auth/use-two-factor-password"
@@ -65,8 +60,13 @@ export function EnableTwoFactorDialog({
   const [totpUri, setTotpUri] = useState("")
   const [backupCodes, setBackupCodes] = useState<string[]>([])
   const [code, setCode] = useState("")
-  const [setupKeyCopied, setSetupKeyCopied] = useState(false)
-  const copyResetTimeout = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const {
+    copied: setupKeyCopied,
+    copy: copySetupKeyValue,
+    reset: resetSetupKeyCopy
+  } = useCopyToClipboard({
+    onError: () => toast.danger(twoFactorLocalization.setupKeyCopyFailed)
+  })
 
   const qrCode = useMemo(
     () => (totpUri ? createQrCodeSvgData(totpUri) : null),
@@ -84,33 +84,10 @@ export function EnableTwoFactorDialog({
     }
   }, [totpUri])
 
-  useEffect(
-    () => () => {
-      if (copyResetTimeout.current !== null) {
-        clearTimeout(copyResetTimeout.current)
-      }
-    },
-    []
-  )
-
   const copySetupKey = async () => {
     if (!setupKey) return
 
-    try {
-      await navigator.clipboard.writeText(setupKey)
-      setSetupKeyCopied(true)
-
-      if (copyResetTimeout.current !== null) {
-        clearTimeout(copyResetTimeout.current)
-      }
-
-      copyResetTimeout.current = setTimeout(() => {
-        setSetupKeyCopied(false)
-        copyResetTimeout.current = null
-      }, 2000)
-    } catch {
-      toast.danger(twoFactorLocalization.setupKeyCopyFailed)
-    }
+    await copySetupKeyValue(setupKey)
   }
 
   const {
@@ -154,11 +131,7 @@ export function EnableTwoFactorDialog({
       setTotpUri("")
       setBackupCodes([])
       setCode("")
-      setSetupKeyCopied(false)
-      if (copyResetTimeout.current !== null) {
-        clearTimeout(copyResetTimeout.current)
-        copyResetTimeout.current = null
-      }
+      resetSetupKeyCopy()
       // Clears the resolved TOTP URI and backup codes from the mutation cache.
       resetEnrollment()
     }

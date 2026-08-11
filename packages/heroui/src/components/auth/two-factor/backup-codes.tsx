@@ -3,8 +3,12 @@ import {
   formatBackupCodesText,
   printTextFile
 } from "@better-auth-ui/core"
-import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
-import { ArrowDownToLine, Copy, Printer } from "@gravity-ui/icons"
+import {
+  useAuth,
+  useAuthPlugin,
+  useCopyToClipboard
+} from "@better-auth-ui/react"
+import { ArrowDownToLine, Check, Copy, Printer } from "@gravity-ui/icons"
 import { Button, toast } from "@heroui/react"
 
 import { twoFactorPlugin } from "../../../lib/auth/two-factor-plugin"
@@ -25,20 +29,13 @@ export type BackupCodesProps = {
 export function BackupCodes({ codes }: BackupCodesProps) {
   const { localization } = useAuth()
   const { localization: twoFactorLocalization } = useAuthPlugin(twoFactorPlugin)
+  const { copied, copy } = useCopyToClipboard({
+    onError: () => toast.danger(twoFactorLocalization.backupCodesCopyFailed)
+  })
   const getBackupCodesText = () =>
     formatBackupCodesText(codes, twoFactorLocalization, window.location.origin)
 
-  // Clipboard writes reject on insecure origins and when the user denies the
-  // permission, so the codes stay on screen and the toast tells them to copy
-  // by hand rather than leaving a rejected promise behind.
-  const copyCodes = async () => {
-    try {
-      await navigator.clipboard.writeText(getBackupCodesText())
-      toast.success(twoFactorLocalization.backupCodesCopied)
-    } catch {
-      toast.danger(twoFactorLocalization.backupCodesCopyFailed)
-    }
-  }
+  const copyCodes = () => copy(getBackupCodesText())
 
   return (
     <div className="flex flex-col gap-3">
@@ -55,8 +52,17 @@ export function BackupCodes({ codes }: BackupCodesProps) {
       </ul>
 
       <div className="flex flex-wrap gap-2">
-        <Button size="sm" variant="tertiary" onPress={copyCodes}>
-          <Copy />
+        <Button
+          aria-label={
+            copied
+              ? twoFactorLocalization.backupCodesCopied
+              : localization.settings.copyToClipboard
+          }
+          size="sm"
+          variant="tertiary"
+          onPress={copyCodes}
+        >
+          {copied ? <Check /> : <Copy />}
           {localization.settings.copyToClipboard}
         </Button>
 

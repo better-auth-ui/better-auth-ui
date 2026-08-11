@@ -3,9 +3,13 @@ import {
   formatBackupCodesText,
   printTextFile
 } from "@better-auth-ui/core"
-import { useAuth, useAuthPlugin } from "@better-auth-ui/solid"
-import { Copy, Download, Printer } from "lucide-solid"
-import { For } from "solid-js"
+import {
+  createCopyToClipboard,
+  useAuth,
+  useAuthPlugin
+} from "@better-auth-ui/solid"
+import { Check, Copy, Download, Printer } from "lucide-solid"
+import { For, Show } from "solid-js"
 import { toast } from "solid-sonner"
 
 import { Button } from "@/components/ui/button"
@@ -25,6 +29,9 @@ export type BackupCodesProps = {
 export function BackupCodes(props: BackupCodesProps) {
   const auth = useAuth()
   const { localization: twoFactorLocalization } = useAuthPlugin(twoFactorPlugin)
+  const { copied, copy } = createCopyToClipboard({
+    onError: () => toast.error(twoFactorLocalization.backupCodesCopyFailed)
+  })
   const getBackupCodesText = () =>
     formatBackupCodesText(
       props.codes,
@@ -32,17 +39,7 @@ export function BackupCodes(props: BackupCodesProps) {
       window.location.origin
     )
 
-  // Clipboard writes reject on insecure origins and when the user denies the
-  // permission, so the codes stay on screen and the toast tells them to copy
-  // by hand rather than leaving a rejected promise behind.
-  const copyCodes = async () => {
-    try {
-      await navigator.clipboard.writeText(getBackupCodesText())
-      toast.success(twoFactorLocalization.backupCodesCopied)
-    } catch {
-      toast.error(twoFactorLocalization.backupCodesCopyFailed)
-    }
-  }
+  const copyCodes = () => copy(getBackupCodesText())
 
   return (
     <div class="flex flex-col gap-3">
@@ -57,8 +54,20 @@ export function BackupCodes(props: BackupCodesProps) {
       </ul>
 
       <div class="flex flex-wrap gap-2">
-        <Button onClick={copyCodes} size="sm" type="button" variant="outline">
-          <Copy />
+        <Button
+          aria-label={
+            copied()
+              ? twoFactorLocalization.backupCodesCopied
+              : auth.localization.settings.copyToClipboard
+          }
+          onClick={copyCodes}
+          size="sm"
+          type="button"
+          variant="outline"
+        >
+          <Show fallback={<Copy />} when={copied()}>
+            <Check />
+          </Show>
           {auth.localization.settings.copyToClipboard}
         </Button>
 

@@ -1,5 +1,5 @@
 import { resolveInputType } from "@better-auth-ui/core"
-import { useAuth } from "@better-auth-ui/react"
+import { useAuth, useCopyToClipboard } from "@better-auth-ui/react"
 import { Check, Copy } from "@gravity-ui/icons"
 import {
   Button,
@@ -34,7 +34,7 @@ import {
   toCalendarDate,
   toCalendarDateTime
 } from "@internationalized/date"
-import { type ComponentType, useRef, useState } from "react"
+import { type ComponentType, useRef } from "react"
 
 import type { AdditionalFieldProps } from "../../lib/auth/auth-plugin"
 
@@ -89,25 +89,26 @@ function CopyButton({
   isDisabled?: boolean
 }) {
   const { localization } = useAuth()
-  const [copied, setCopied] = useState(false)
+  const { copied, copy } = useCopyToClipboard({
+    onError: (error) =>
+      toast.danger(error instanceof Error ? error.message : String(error))
+  })
 
   async function handleCopy() {
     const value = getValue()
     if (!value) return
 
-    try {
-      await navigator.clipboard.writeText(value)
-      setCopied(true)
-      setTimeout(() => setCopied(false), 1500)
-    } catch (error) {
-      toast.danger(error instanceof Error ? error.message : String(error))
-    }
+    await copy(value)
   }
 
   return (
     <Button
       isIconOnly
-      aria-label={localization.settings.copyToClipboard}
+      aria-label={
+        copied
+          ? localization.settings.copiedToClipboard
+          : localization.settings.copyToClipboard
+      }
       size="sm"
       variant="ghost"
       isDisabled={isDisabled}
