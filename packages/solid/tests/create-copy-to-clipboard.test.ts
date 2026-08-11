@@ -45,6 +45,7 @@ describe("createCopyToClipboard", () => {
     deferred.resolve()
 
     await expect(copy).resolves.toBe(true)
+    expect(clipboard.copied()).toBe(false)
     expect(vi.getTimerCount()).toBe(0)
   })
 
