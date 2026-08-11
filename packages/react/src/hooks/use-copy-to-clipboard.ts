@@ -13,6 +13,7 @@ export function useCopyToClipboard({
   onError
 }: UseCopyToClipboardOptions = {}) {
   const [copied, setCopied] = useState(false)
+  const disposedRef = useRef(false)
   const resetTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const clearResetTimeout = useCallback(() => {
@@ -27,7 +28,14 @@ export function useCopyToClipboard({
     setCopied(false)
   }, [clearResetTimeout])
 
-  useEffect(() => clearResetTimeout, [clearResetTimeout])
+  useEffect(() => {
+    disposedRef.current = false
+
+    return () => {
+      disposedRef.current = true
+      clearResetTimeout()
+    }
+  }, [clearResetTimeout])
 
   const copy = useCallback(
     async (value: string) => {
@@ -37,6 +45,8 @@ export function useCopyToClipboard({
         onError?.(error)
         return false
       }
+
+      if (disposedRef.current) return true
 
       clearResetTimeout()
       setCopied(true)

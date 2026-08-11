@@ -28,6 +28,20 @@ describe("useCopyToClipboard", () => {
     expect(result.current.copied).toBe(false)
   })
 
+  it("does not schedule feedback after unmounting during a copy", async () => {
+    vi.useFakeTimers()
+    const deferred = Promise.withResolvers<void>()
+    vi.spyOn(navigator.clipboard, "writeText").mockReturnValue(deferred.promise)
+    const { result, unmount } = renderHook(() => useCopyToClipboard())
+    const copy = result.current.copy("secret")
+
+    unmount()
+    deferred.resolve()
+
+    await expect(copy).resolves.toBe(true)
+    expect(vi.getTimerCount()).toBe(0)
+  })
+
   it("reports clipboard failures without showing success feedback", async () => {
     const error = new Error("Clipboard unavailable")
     const onError = vi.fn()

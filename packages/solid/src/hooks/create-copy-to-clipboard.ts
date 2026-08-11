@@ -13,6 +13,7 @@ export function createCopyToClipboard({
   onError
 }: CreateCopyToClipboardOptions = {}) {
   const [copied, setCopied] = createSignal(false)
+  let disposed = false
   let resetTimeout: ReturnType<typeof setTimeout> | undefined
 
   const clearResetTimeout = () => {
@@ -27,7 +28,10 @@ export function createCopyToClipboard({
     setCopied(false)
   }
 
-  onCleanup(clearResetTimeout)
+  onCleanup(() => {
+    disposed = true
+    clearResetTimeout()
+  })
 
   const copy = async (value: string) => {
     try {
@@ -36,6 +40,8 @@ export function createCopyToClipboard({
       onError?.(error)
       return false
     }
+
+    if (disposed) return true
 
     clearResetTimeout()
     setCopied(true)

@@ -28,6 +28,26 @@ describe("createCopyToClipboard", () => {
     })
   })
 
+  it("does not schedule feedback after disposal during a copy", async () => {
+    vi.useFakeTimers()
+    const deferred = Promise.withResolvers<void>()
+    vi.stubGlobal("navigator", {
+      clipboard: { writeText: vi.fn().mockReturnValue(deferred.promise) }
+    })
+
+    const { clipboard, dispose } = createRoot((dispose) => ({
+      clipboard: createCopyToClipboard(),
+      dispose
+    }))
+    const copy = clipboard.copy("secret")
+
+    dispose()
+    deferred.resolve()
+
+    await expect(copy).resolves.toBe(true)
+    expect(vi.getTimerCount()).toBe(0)
+  })
+
   it("reports clipboard failures without showing success feedback", async () => {
     const error = new Error("Clipboard unavailable")
     const onError = vi.fn()
