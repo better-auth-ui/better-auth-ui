@@ -1,9 +1,9 @@
 import { getSafeRedirectTo } from "@better-auth-ui/core"
+import type { OrganizationAuthClient } from "@better-auth-ui/core/plugins/organization"
 import {
   type OrganizationLocalization,
   organizationLocalization
-} from "@better-auth-ui/core/plugins"
-import type { OrganizationAuthClient } from "@better-auth-ui/core/plugins/organization"
+} from "@better-auth-ui/core/plugins/organization"
 import { useAuth, useAuthenticate } from "@better-auth-ui/solid"
 import {
   useAcceptInvitation,
@@ -60,14 +60,14 @@ export function AcceptInvitation(props: AcceptInvitationProps) {
   const [invitationId, setInvitationId] = createSignal<string | null>(null)
   const [isHydrated, setIsHydrated] = createSignal(false)
   const session = useAuthenticate(organizationAuthClient)
-  const invitationQuery = useInvitation(organizationAuthClient, {
+  const invitationQuery = useInvitation(organizationAuthClient, () => ({
     get query() {
       return { id: invitationId() ?? "" }
     },
     get enabled() {
       return Boolean(invitationId())
     }
-  })
+  }))
   const invitation = createMemo(
     () => invitationQuery.data as UserInvitation | undefined
   )
@@ -89,12 +89,12 @@ export function AcceptInvitation(props: AcceptInvitationProps) {
     })
   }
 
-  const acceptInvitation = useAcceptInvitation(organizationAuthClient, {
+  const acceptInvitation = useAcceptInvitation(organizationAuthClient, () => ({
     onSuccess: returnToApplication
-  })
-  const rejectInvitation = useRejectInvitation(organizationAuthClient, {
+  }))
+  const rejectInvitation = useRejectInvitation(organizationAuthClient, () => ({
     onSuccess: returnToApplication
-  })
+  }))
   const isLoading = () =>
     !isHydrated() ||
     session.isPending ||

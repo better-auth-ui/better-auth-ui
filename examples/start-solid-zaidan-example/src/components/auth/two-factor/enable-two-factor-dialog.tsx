@@ -1,11 +1,14 @@
 import { createQrCodeSvgData } from "@better-auth-ui/core"
 import {
-  createCopyToClipboard,
   enableTwoFactorOptions,
   type TwoFactorAuthClient,
   verifyTotpOptions
 } from "@better-auth-ui/core/plugins/two-factor"
-import { useAuth, useAuthPlugin } from "@better-auth-ui/solid"
+import {
+  createCopyToClipboard,
+  useAuth,
+  useAuthPlugin
+} from "@better-auth-ui/solid"
 import { createMutation } from "@tanstack/solid-query"
 import { Check, Copy, ShieldCheck } from "lucide-solid"
 import { createSignal, Show } from "solid-js"

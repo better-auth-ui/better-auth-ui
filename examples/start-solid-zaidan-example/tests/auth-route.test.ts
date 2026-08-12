@@ -2726,6 +2726,45 @@ describe("Solid auth route component selection", () => {
     expect(newApiKeyDialog).toContain("apiKeyLocalization.dismissNewKey")
   })
 
+  it("imports merged invitation and copy helpers from their public subpaths", () => {
+    const acceptInvitation = readFileSync(
+      resolve(
+        __dirname,
+        "../src/components/auth/organization/accept-invitation.tsx"
+      ),
+      "utf8"
+    )
+    const enableTwoFactorDialog = readFileSync(
+      resolve(
+        __dirname,
+        "../src/components/auth/two-factor/enable-two-factor-dialog.tsx"
+      ),
+      "utf8"
+    )
+
+    expect(acceptInvitation).toContain(
+      'from "@better-auth-ui/core/plugins/organization"'
+    )
+    expect(acceptInvitation).not.toContain(
+      'from "@better-auth-ui/core/plugins"'
+    )
+    expect(acceptInvitation).toContain(
+      "useInvitation(organizationAuthClient, () => ({"
+    )
+    expect(acceptInvitation).toContain(
+      "useAcceptInvitation(organizationAuthClient, () => ({"
+    )
+    expect(acceptInvitation).toContain(
+      "useRejectInvitation(organizationAuthClient, () => ({"
+    )
+    expect(enableTwoFactorDialog).toMatch(
+      /createCopyToClipboard,[\s\S]*from "@better-auth-ui\/solid"/
+    )
+    expect(enableTwoFactorDialog).not.toMatch(
+      /createCopyToClipboard,[\s\S]*from "@better-auth-ui\/core\/plugins\/two-factor"/
+    )
+  })
+
   it("keeps passkey localization, class prop, and pending UX aligned with shadcn parity", () => {
     const passkeyLocalizationHelperPath = resolve(
       __dirname,
