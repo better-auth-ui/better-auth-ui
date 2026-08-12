@@ -1049,7 +1049,7 @@
       "name": "organization",
       "type": "registry:component",
       "title": "Organization",
-      "description": "Organization plugin: multi-tenant organization management with members, invitations, and roles. Registers an organizations tab in account settings, mounts a full `<Organization />` shell with settings and people tabs, and an `<OrganizationSwitcher />` dropdown for the header.",
+      "description": "Organization plugin: multi-tenant organization management with members, invitations, and roles. Registers direct invitation acceptance, an organizations settings tab, a full `<Organization />` shell, and an `<OrganizationSwitcher />` dropdown.",
       "dependencies": [
         "@better-auth-ui/react@latest",
         "@better-auth-ui/core@latest",
@@ -1090,6 +1090,16 @@
           "path": "src/lib/auth/organization-plugin.tsx",
           "type": "registry:lib",
           "target": "@lib/auth/organization-plugin.tsx"
+        },
+        {
+          "path": "src/components/auth/organization/accept-invitation.tsx",
+          "type": "registry:component",
+          "target": "@components/auth/organization/accept-invitation.tsx"
+        },
+        {
+          "path": "src/components/auth/use-is-hydrated.ts",
+          "type": "registry:component",
+          "target": "@components/auth/use-is-hydrated.ts"
         },
         {
           "path": "src/components/auth/organization/organization.tsx",

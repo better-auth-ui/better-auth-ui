@@ -1,6 +1,11 @@
 export const organizationLocalization = {
   /** @remarks `"Accept"` */
   accept: "Accept",
+  /** @remarks `"Organization invitation"` */
+  acceptInvitationTitle: "Organization invitation",
+  /** @remarks `"You've been invited to join {{organization}} as {{role}}."` */
+  acceptInvitationDescription:
+    "You've been invited to join {{organization}} as {{role}}.",
   /** @remarks `"Accepted"` */
   accepted: "Accepted",
   /** @remarks `"Actions"` */
@@ -30,6 +35,11 @@ export const organizationLocalization = {
     "Permanently delete this organization and all of its data. All members will lose access and this cannot be undone.",
   /** @remarks `"Invitations"` */
   invitations: "Invitations",
+  /** @remarks `"Invitation unavailable"` */
+  invitationUnavailable: "Invitation unavailable",
+  /** @remarks `"This invitation is invalid, expired, or has already been handled."` */
+  invitationUnavailableDescription:
+    "This invitation is invalid, expired, or has already been handled.",
   /** @remarks `"Invited at"` */
   invitedAt: "Invited at",
   /** @remarks `"Invite member"` */
@@ -96,6 +106,8 @@ export const organizationLocalization = {
   personalAccount: "Personal account",
   /** @remarks `"Rejected"` */
   rejected: "Rejected",
+  /** @remarks `"Return"` */
+  return: "Return",
   /** @remarks `"Reject invitation"` */
   rejectInvitation: "Reject invitation",
   /** @remarks `"Remove member"` */

@@ -4,11 +4,13 @@ import { createFileRoute, redirect } from "@tanstack/solid-router"
 import { Auth } from "@/components/auth/auth"
 import { emailOtpPlugin } from "@/lib/auth/email-otp-plugin"
 import { magicLinkPlugin } from "@/lib/auth/magic-link-plugin"
+import { organizationPlugin } from "@/lib/auth/organization-plugin"
 import { twoFactorPlugin } from "@/lib/auth/two-factor-plugin"
 
 const validAuthPathSegments = new Set([
   ...Object.values(viewPaths.auth),
   ...Object.values(magicLinkPlugin().viewPaths.auth),
+  ...Object.values(organizationPlugin().viewPaths.auth),
   ...Object.values(emailOtpPlugin().viewPaths.auth),
   ...Object.values(twoFactorPlugin().viewPaths.auth)
 ])

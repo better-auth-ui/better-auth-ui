@@ -2702,9 +2702,7 @@ describe("Solid auth route component selection", () => {
     expect(createApiKeyDialog).toContain("createApiKey.mutate(")
     expect(createApiKeyDialog).toContain("setNewApiKeySecret(apiKey.key)")
     expect(createApiKeyDialog).toContain("setIsNewKeyDialogOpen(true)")
-    expect(newApiKeyDialog).toContain("navigator.clipboard.writeText")
-    expect(newApiKeyDialog).toContain("setIsCopied(true)")
-    expect(newApiKeyDialog).toContain("setTimeout(() => setIsCopied(false)")
+    expect(newApiKeyDialog).toContain("createCopyToClipboard")
     expect(deleteApiKeyDialog).toContain(
       "const auth = useAuth<ApiKeyAuthClient>()"
     )

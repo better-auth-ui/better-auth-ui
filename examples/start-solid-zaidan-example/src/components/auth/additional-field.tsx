@@ -2,7 +2,7 @@ import {
   type AdditionalField as AdditionalFieldConfig,
   resolveInputType
 } from "@better-auth-ui/core"
-import { useAuth } from "@better-auth-ui/solid"
+import { createCopyToClipboard, useAuth } from "@better-auth-ui/solid"
 import { CalendarIcon, Check, Copy } from "lucide-solid"
 import { createEffect, createMemo, createSignal, For, Show } from "solid-js"
 import { toast } from "solid-sonner"
@@ -270,7 +270,10 @@ type LabeledAdditionalFieldProps = AdditionalFieldProps & {
 
 function InputField(props: LabeledAdditionalFieldProps) {
   const auth = useAuth()
-  const [copied, setCopied] = createSignal(false)
+  const { copied, copy } = createCopyToClipboard({
+    onError: (error) =>
+      toast.error(error instanceof Error ? error.message : String(error))
+  })
   let inputRef: HTMLInputElement | undefined
   const hasPrefix = () => props.field.prefix != null
   const hasSuffix = () =>
@@ -279,13 +282,7 @@ function InputField(props: LabeledAdditionalFieldProps) {
   const copyValue = async () => {
     if (!inputRef?.value) return
 
-    try {
-      await navigator.clipboard.writeText(inputRef.value)
-      setCopied(true)
-      window.setTimeout(() => setCopied(false), 1500)
-    } catch (error) {
-      toast.error(error instanceof Error ? error.message : String(error))
-    }
+    await copy(inputRef.value)
   }
 
   if (hasPrefix() || hasSuffix()) {
@@ -320,10 +317,18 @@ function InputField(props: LabeledAdditionalFieldProps) {
           >
             <InputGroupAddon align="inline-end">
               <InputGroupButton
-                aria-label={auth.localization.settings.copyToClipboard}
+                aria-label={
+                  copied()
+                    ? auth.localization.settings.copiedToClipboard
+                    : auth.localization.settings.copyToClipboard
+                }
                 disabled={props.isPending}
                 onClick={copyValue}
-                title={auth.localization.settings.copyToClipboard}
+                title={
+                  copied()
+                    ? auth.localization.settings.copiedToClipboard
+                    : auth.localization.settings.copyToClipboard
+                }
               >
                 <Show when={copied()} fallback={<Copy />}>
                   <Check />

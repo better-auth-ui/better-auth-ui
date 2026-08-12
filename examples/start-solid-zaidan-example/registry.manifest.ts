@@ -903,10 +903,11 @@ export const solidRegistryManifest = {
       type: "registry:component",
       title: "Solid Organization",
       description:
-        "Solid organization setup with settings tab, organization switcher, and slug route shell.",
+        "Solid organization setup with direct invitation acceptance, settings tab, organization switcher, and slug route shell.",
       registryDependencies: [betterAuthSolidRegistryDependency("user-view")],
       files: [
         libFile("src/lib/auth/organization-plugin.tsx"),
+        componentFile("src/components/auth/organization/accept-invitation.tsx"),
         componentFile(
           "src/components/auth/organization/organizations-settings.tsx"
         ),

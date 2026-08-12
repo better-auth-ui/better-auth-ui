@@ -52,6 +52,13 @@ export const organizationQueryKeys = {
   invitations: {
     all: (userId: string | undefined) =>
       [...organizationQueryKeys.all(userId), "invitations"] as const,
+    details: (userId: string | undefined) =>
+      [...organizationQueryKeys.invitations.all(userId), "detail"] as const,
+    detail: <TQuery = undefined>(userId: string | undefined, query?: TQuery) =>
+      [
+        ...organizationQueryKeys.invitations.details(userId),
+        query ?? null
+      ] as const,
     lists: (userId: string | undefined) =>
       [...organizationQueryKeys.invitations.all(userId), "list"] as const,
     list: <TQuery = undefined>(userId: string | undefined, query?: TQuery) =>

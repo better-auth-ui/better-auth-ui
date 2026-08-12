@@ -16,7 +16,7 @@ import { render } from "@react-email/render"
 const html = await render(
   // biome-ignore lint/a11y/useValidAriaRole: `role` is a prop on the email component, not an ARIA role.
   <OrganizationInvitationEmail
-    url="https://better-auth-ui.com/settings/organizations"
+    url="https://better-auth-ui.com/auth/accept-invitation?invitationId=example"
     email="invitee@example.com"
     inviterName="Jane Doe"
     inviterEmail="jane@example.com"

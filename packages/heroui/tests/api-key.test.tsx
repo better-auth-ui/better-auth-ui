@@ -2,7 +2,7 @@ import { API_KEY_EXPIRATION_SECONDS_PER_DAY } from "@better-auth-ui/core/plugins
 import { render, screen, waitFor } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { useState } from "react"
-import { describe, expect, it, vi } from "vitest"
+import { afterEach, describe, expect, it, vi } from "vitest"
 import { CreateApiKeyDialog } from "../src/components/auth/api-key/create-api-key-dialog"
 import { NewApiKeyDialog } from "../src/components/auth/api-key/new-api-key-dialog"
 import { AuthProvider } from "../src/components/auth/auth-provider"
@@ -33,7 +33,35 @@ function ControlledNewApiKeyDialog() {
   )
 }
 
+afterEach(() => {
+  vi.restoreAllMocks()
+})
+
 describe("<NewApiKeyDialog />", () => {
+  it("shows inline feedback after copying the key", async () => {
+    const user = userEvent.setup()
+    const writeText = vi
+      .spyOn(navigator.clipboard, "writeText")
+      .mockResolvedValue()
+
+    render(
+      <AuthProvider
+        authClient={createMockAuthClient()}
+        navigate={() => {}}
+        plugins={[apiKeyPlugin()]}
+      >
+        <ControlledNewApiKeyDialog />
+      </AuthProvider>
+    )
+
+    await user.click(screen.getByRole("button", { name: /copy to clipboard/i }))
+
+    expect(writeText).toHaveBeenCalledWith("api-key-secret")
+    expect(
+      screen.getByRole("button", { name: /copied to clipboard/i })
+    ).toBeInTheDocument()
+  })
+
   it("dismisses the controlled dialog after the key is saved", async () => {
     const user = userEvent.setup()
 

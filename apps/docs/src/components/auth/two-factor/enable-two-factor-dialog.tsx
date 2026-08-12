@@ -2,19 +2,17 @@
 
 import { createQrCodeSvgData } from "@better-auth-ui/core"
 import type { TwoFactorAuthClient } from "@better-auth-ui/core/plugins/two-factor"
-import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
+import {
+  useAuth,
+  useAuthPlugin,
+  useCopyToClipboard
+} from "@better-auth-ui/react"
 import {
   useEnableTwoFactor,
   useVerifyTotp
 } from "@better-auth-ui/react/plugins/two-factor"
 import { Check, Copy, ShieldCheck } from "lucide-react"
-import {
-  type SyntheticEvent,
-  useEffect,
-  useMemo,
-  useRef,
-  useState
-} from "react"
+import { type SyntheticEvent, useMemo, useState } from "react"
 import { toast } from "sonner"
 import { Button, buttonVariants } from "@/components/ui/button"
 import {
@@ -73,8 +71,13 @@ export function EnableTwoFactorDialog({
   const [totpUri, setTotpUri] = useState("")
   const [backupCodes, setBackupCodes] = useState<string[]>([])
   const [code, setCode] = useState("")
-  const [setupKeyCopied, setSetupKeyCopied] = useState(false)
-  const copyResetTimeout = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const {
+    copied: setupKeyCopied,
+    copy: copySetupKeyValue,
+    reset: resetSetupKeyCopy
+  } = useCopyToClipboard({
+    onError: () => toast.error(twoFactorLocalization.setupKeyCopyFailed)
+  })
 
   const qrCode = useMemo(
     () => (totpUri ? createQrCodeSvgData(totpUri) : null),
@@ -93,33 +96,10 @@ export function EnableTwoFactorDialog({
     }
   }, [totpUri])
 
-  useEffect(
-    () => () => {
-      if (copyResetTimeout.current !== null) {
-        clearTimeout(copyResetTimeout.current)
-      }
-    },
-    []
-  )
-
   const copySetupKey = async () => {
     if (!setupKey) return
 
-    try {
-      await navigator.clipboard.writeText(setupKey)
-      setSetupKeyCopied(true)
-
-      if (copyResetTimeout.current !== null) {
-        clearTimeout(copyResetTimeout.current)
-      }
-
-      copyResetTimeout.current = setTimeout(() => {
-        setSetupKeyCopied(false)
-        copyResetTimeout.current = null
-      }, 2000)
-    } catch {
-      toast.error(twoFactorLocalization.setupKeyCopyFailed)
-    }
+    await copySetupKeyValue(setupKey)
   }
 
   const {
@@ -165,11 +145,7 @@ export function EnableTwoFactorDialog({
       setTotpUri("")
       setBackupCodes([])
       setCode("")
-      setSetupKeyCopied(false)
-      if (copyResetTimeout.current !== null) {
-        clearTimeout(copyResetTimeout.current)
-        copyResetTimeout.current = null
-      }
+      resetSetupKeyCopy()
       // Clears the resolved TOTP URI and backup codes from the mutation cache.
       resetEnrollment()
     }

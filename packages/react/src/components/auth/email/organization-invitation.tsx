@@ -440,7 +440,7 @@ OrganizationInvitationEmail.localization =
   organizationInvitationEmailLocalization
 
 OrganizationInvitationEmail.PreviewProps = {
-  url: "https://better-auth-ui.com/settings/organizations",
+  url: "https://better-auth-ui.com/auth/accept-invitation?invitationId=example",
   email: "m@example.com",
   inviterName: "Jane Doe",
   inviterEmail: "jane@example.com",

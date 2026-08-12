@@ -188,6 +188,9 @@ export const localization = {
     /** @remarks `"Copy to clipboard"` */
     copyToClipboard: "Copy to clipboard",
 
+    /** @remarks `"Copied to clipboard"` */
+    copiedToClipboard: "Copied to clipboard",
+
     /** @remarks `"Change email"` */
     changeEmail: "Change email",
 

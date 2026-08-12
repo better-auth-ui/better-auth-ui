@@ -15,7 +15,7 @@ import { render } from "@solidjs-email/main"
 
 const html = await render(() =>
   OrganizationInvitationEmail({
-    url: "https://better-auth-ui.com/settings/organizations",
+    url: "https://better-auth-ui.com/auth/accept-invitation?invitationId=example",
     email: "invitee@example.com",
     inviterName: "Jane Doe",
     inviterEmail: "jane@example.com",

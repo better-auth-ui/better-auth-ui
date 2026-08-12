@@ -3,6 +3,7 @@ import { Auth } from "@better-auth-ui/heroui"
 import { deviceAuthorizationPlugin } from "@better-auth-ui/heroui/plugins/device-authorization"
 import { emailOtpPlugin } from "@better-auth-ui/heroui/plugins/email-otp"
 import { magicLinkPlugin } from "@better-auth-ui/heroui/plugins/magic-link"
+import { organizationPlugin } from "@better-auth-ui/heroui/plugins/organization"
 import { twoFactorPlugin } from "@better-auth-ui/heroui/plugins/two-factor"
 import { createFileRoute, notFound } from "@tanstack/react-router"
 
@@ -11,6 +12,7 @@ const validAuthPathSegments = new Set([
   ...Object.values(viewPaths.auth),
   deviceAuthorizationPlugin().viewPaths.auth.deviceAuthorization,
   magicLinkPlugin().viewPaths.auth.magicLink,
+  organizationPlugin().viewPaths.auth.acceptInvitation,
   emailOtpPlugin().viewPaths.auth.emailOtp,
   twoFactorPlugin().viewPaths.auth.twoFactor
 ])
