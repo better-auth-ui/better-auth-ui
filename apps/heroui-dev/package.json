@@ -20,7 +20,7 @@
     "@vitejs/plugin-react": "^6.0.5",
     "drizzle-kit": "^0.31.10",
     "typescript": "^6.0.3",
-    "vite": "^8.2.1",
+    "vite": "8.2.0",
     "wrangler": "^4.119.0"
   },
   "dependencies": {

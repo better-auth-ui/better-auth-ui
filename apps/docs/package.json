@@ -69,10 +69,10 @@
     "@vitejs/plugin-react": "^6.0.5",
     "fumadocs-typescript": "^5.2.7",
     "serve": "^14.2.6",
-    "shadcn": "^4.16.2",
+    "shadcn": "4.16.1",
     "tailwindcss": "^4.3.2",
     "typescript": "^6.0.3",
-    "vite": "^8.2.1",
+    "vite": "8.2.0",
     "vitest": "^4.1.9"
   }
 }
