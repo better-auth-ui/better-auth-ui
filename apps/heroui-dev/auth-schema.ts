@@ -145,7 +145,6 @@ export const deviceCodes = pgTable(
     pollingInterval: integer("polling_interval"),
     clientId: text("client_id"),
     scope: text("scope"),
-    resource: text("resource"),
   },
   (table) => [
     index("device_codes_deviceCode_idx").on(table.deviceCode),
