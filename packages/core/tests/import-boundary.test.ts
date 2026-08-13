@@ -21,6 +21,55 @@ function sourceFiles(dir: string): string[] {
 }
 
 describe("core query boundary", () => {
+  it("isolates typecheck artifacts from build and publish outputs", () => {
+    const packageJson = JSON.parse(readFileSync("package.json", "utf8")) as {
+      files: string[]
+      nx: {
+        targets: {
+          typecheck: {
+            command: string
+            options: { cwd: string }
+            outputs: string[]
+          }
+        }
+      }
+    }
+    const buildConfig = JSON.parse(readFileSync("tsconfig.json", "utf8")) as {
+      compilerOptions: { outDir: string }
+    }
+    const typecheckConfig = JSON.parse(
+      readFileSync("tsconfig.typecheck.json", "utf8")
+    ) as {
+      extends: string
+      compilerOptions: {
+        noEmit?: boolean
+        outDir: string
+        tsBuildInfoFile: string
+      }
+    }
+    const gitignore = readFileSync("../../.gitignore", "utf8").split("\n")
+
+    expect(buildConfig.compilerOptions.outDir).toBe("dist")
+    expect(typecheckConfig).toEqual({
+      extends: "./tsconfig.json",
+      compilerOptions: {
+        outDir: ".typecheck",
+        tsBuildInfoFile: ".typecheck/tsconfig.tsbuildinfo"
+      }
+    })
+    expect(packageJson.nx.targets.typecheck).toEqual({
+      command: "tsc --build tsconfig.typecheck.json --emitDeclarationOnly",
+      options: { cwd: "packages/core" },
+      outputs: ["{projectRoot}/.typecheck"]
+    })
+    expect(packageJson.nx.targets.typecheck.outputs).not.toContain(
+      "{projectRoot}/dist"
+    )
+    expect(packageJson.files).not.toContain(".typecheck")
+    expect(gitignore).toContain(".typecheck")
+    expect(typecheckConfig.compilerOptions.noEmit).toBeUndefined()
+  })
+
   it("does not expose the aggregate plugins subpath", () => {
     const packageJson = JSON.parse(readFileSync("package.json", "utf8")) as {
       exports: Record<string, unknown>

@@ -6,6 +6,19 @@
     "build": "vite build",
     "test": "vitest"
   },
+  "nx": {
+    "targets": {
+      "typecheck": {
+        "command": "tsc --build tsconfig.typecheck.json --emitDeclarationOnly",
+        "options": {
+          "cwd": "packages/core"
+        },
+        "outputs": [
+          "{projectRoot}/.typecheck"
+        ]
+      }
+    }
+  },
   "files": [
     "src",
     "dist"
