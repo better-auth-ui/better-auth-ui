@@ -78,6 +78,8 @@ export const organizationLocalization = {
   name: "Name",
   /** @remarks `"Enter the organization name"` */
   namePlaceholder: "Enter the organization name",
+  /** @remarks `"Next page"` */
+  nextPage: "Next page",
   /** @remarks `"No invitations"` */
   noInvitations: "No invitations",
   /** @remarks `"No organizations"` */
@@ -100,10 +102,14 @@ export const organizationLocalization = {
   organizationUpdatedSuccess: "Organization updated successfully",
   /** @remarks `"Owner"` */
   owner: "Owner",
+  /** @remarks `"Page {{page}} of {{pageCount}}"` */
+  pageOf: "Page {{page}} of {{pageCount}}",
   /** @remarks `"Pending"` */
   pending: "Pending",
   /** @remarks `"Personal account"` */
   personalAccount: "Personal account",
+  /** @remarks `"Previous page"` */
+  previousPage: "Previous page",
   /** @remarks `"Rejected"` */
   rejected: "Rejected",
   /** @remarks `"Return"` */

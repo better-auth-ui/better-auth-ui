@@ -43,6 +43,7 @@
     "@tanstack/react-router-devtools": "^1.167.0",
     "@tanstack/react-router-ssr-query": "^1.167.0",
     "@tanstack/react-start": "^1.168.26",
+    "@tanstack/react-table": "^9.1.2",
     "@tanstack/router-plugin": "^1.168.11",
     "better-auth": "^1.6.19",
     "bowser": "^2.11.0",

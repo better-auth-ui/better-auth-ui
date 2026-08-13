@@ -9,7 +9,9 @@ import {
   useListOrganizationMembers,
   useSession
 } from "@better-auth-ui/react"
-import type { Member } from "better-auth/client"
+import type { Column, RowData } from "@tanstack/react-table"
+import { useTable } from "@tanstack/react-table"
+import type { Member, User } from "better-auth/client"
 import { ChevronUp, Filter, Search, X } from "lucide-react"
 import { type ComponentProps, type ReactNode, useMemo, useState } from "react"
 
@@ -36,17 +38,30 @@ import {
   TableRow
 } from "@/components/ui/table"
 import { organizationPlugin } from "@/lib/auth/organization-plugin"
+import {
+  createOrganizationColumnHelper,
+  ORGANIZATION_TABLE_PAGE_SIZE,
+  organizationTableFeatures
+} from "@/lib/table/organization-table-features"
 import { cn } from "@/lib/utils"
 import { InviteMemberDialog } from "./invite-member-dialog"
 import { OrganizationMemberRow } from "./organization-member-row"
 import { OrganizationMemberRowSkeleton } from "./organization-member-row-skeleton"
+import { OrganizationTablePagination } from "./organization-table-pagination"
 
-type SortDirection = "ascending" | "descending"
+type MemberRow = Member & { user: Partial<User> }
 
-type SortDescriptor = {
-  column: string
-  direction: SortDirection
-}
+const EMPTY_MEMBERS: MemberRow[] = []
+
+const columnHelper = createOrganizationColumnHelper<MemberRow>()
+
+const memberColumns = columnHelper.columns([
+  columnHelper.accessor((member) => member.user.name || member.user.email, {
+    id: "user",
+    sortFn: "alphanumeric"
+  }),
+  columnHelper.accessor("role", { sortFn: "alphanumeric" })
+])
 
 /** Props for the `OrganizationMembers` component. */
 export type OrganizationMembersProps = {
@@ -89,7 +104,6 @@ export function OrganizationMembers({
     updatePermissionPending ||
     deletePermissionPending
 
-  const [sortDescriptor, setSortDescriptor] = useState<SortDescriptor>()
   const [roleFilter, setRoleFilter] = useState("all")
   const [search, setSearch] = useState("")
 
@@ -102,43 +116,21 @@ export function OrganizationMembers({
     )
   }, [search, membersData?.members, roleFilter])
 
-  const sortedMembers = useMemo(() => {
-    if (!sortDescriptor) return filteredMembers
-    if (!filteredMembers) return filteredMembers
-
-    return [...filteredMembers].sort((a, b) => {
-      const col = sortDescriptor.column as keyof Member | "user"
-      const first =
-        col === "user" ? a.user.name || a.user.email : String(a[col])
-      const second =
-        col === "user" ? b.user.name || b.user.email : String(b[col])
-
-      let cmp = first.localeCompare(second)
-      if (sortDescriptor.direction === "descending") {
-        cmp *= -1
-      }
-
-      return cmp
-    })
-  }, [sortDescriptor, filteredMembers])
+  const table = useTable({
+    columns: memberColumns,
+    data: filteredMembers ?? EMPTY_MEMBERS,
+    features: organizationTableFeatures,
+    getRowId: (member) => member.id,
+    initialState: {
+      pagination: { pageIndex: 0, pageSize: ORGANIZATION_TABLE_PAGE_SIZE }
+    }
+  })
 
   const [inviteOpen, setInviteOpen] = useState(false)
 
   const isOwner = membersData?.members.some(
     (member) => member.role === "owner" && member.userId === session?.user.id
   )
-
-  function toggleSort(column: string) {
-    setSortDescriptor((current) => {
-      if (current?.column !== column) {
-        return { column, direction: "ascending" }
-      }
-      if (current.direction === "ascending") {
-        return { column, direction: "descending" }
-      }
-      return undefined
-    })
-  }
 
   return (
     <div className={cn("flex flex-col gap-3", className)} {...props}>
@@ -226,25 +218,11 @@ export function OrganizationMembers({
           <Table aria-label={organizationLocalization.members}>
             <TableHeader>
               <TableRow>
-                <SortableTableHead
-                  sortDirection={
-                    sortDescriptor?.column === "user"
-                      ? sortDescriptor.direction
-                      : undefined
-                  }
-                  onClick={() => toggleSort("user")}
-                >
+                <SortableTableHead column={table.getColumn("user")}>
                   {organizationLocalization.member}
                 </SortableTableHead>
 
-                <SortableTableHead
-                  sortDirection={
-                    sortDescriptor?.column === "role"
-                      ? sortDescriptor.direction
-                      : undefined
-                  }
-                  onClick={() => toggleSort("role")}
-                >
+                <SortableTableHead column={table.getColumn("role")}>
                   {organizationLocalization.role}
                 </SortableTableHead>
 
@@ -259,18 +237,25 @@ export function OrganizationMembers({
                 <OrganizationMemberRowSkeleton />
               ) : (
                 !!activeOrganization &&
-                sortedMembers?.map((member) => (
-                  <OrganizationMemberRow
-                    key={member.id}
-                    member={member}
-                    isOwner={isOwner}
-                    organization={activeOrganization}
-                  />
-                ))
+                table
+                  .getRowModel()
+                  .rows.map((row) => (
+                    <OrganizationMemberRow
+                      key={row.id}
+                      member={row.original}
+                      isOwner={isOwner}
+                      organization={activeOrganization}
+                    />
+                  ))
               )}
             </TableBody>
           </Table>
         </Card>
+
+        <OrganizationTablePagination
+          table={table}
+          localization={organizationLocalization}
+        />
       </div>
 
       <InviteMemberDialog open={inviteOpen} onOpenChange={setInviteOpen} />
@@ -278,20 +263,28 @@ export function OrganizationMembers({
   )
 }
 
-function SortableTableHead({
+function SortableTableHead<TData extends RowData>({
   children,
-  sortDirection,
-  onClick
+  column
 }: {
   children: ReactNode
-  sortDirection?: SortDirection
-  onClick: () => void
+  column: Column<typeof organizationTableFeatures, TData> | undefined
 }) {
+  const sortDirection = column?.getIsSorted() || undefined
+
   return (
-    <TableHead aria-sort={sortDirection ?? "none"}>
+    <TableHead
+      aria-sort={
+        sortDirection === "asc"
+          ? "ascending"
+          : sortDirection === "desc"
+            ? "descending"
+            : "none"
+      }
+    >
       <Button
         className="h-auto w-full justify-start p-0 font-medium hover:bg-transparent"
-        onClick={onClick}
+        onClick={column?.getToggleSortingHandler()}
         size="sm"
         type="button"
         variant="ghost"
@@ -302,7 +295,7 @@ function SortableTableHead({
           <ChevronUp
             className={cn(
               "size-3 transition-transform duration-100 ease-out",
-              sortDirection === "descending" ? "rotate-180" : ""
+              sortDirection === "desc" ? "rotate-180" : ""
             )}
           />
         )}
