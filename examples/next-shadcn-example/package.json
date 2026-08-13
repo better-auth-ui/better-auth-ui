@@ -35,6 +35,7 @@
     "@neondatabase/serverless": "^1.0.2",
     "@tanstack/react-pacer": "^0.22.1",
     "@tanstack/react-query": "^5.100.14",
+    "@tanstack/react-table": "^9.1.2",
     "better-auth": "^1.6.19",
     "bowser": "^2.11.0",
     "class-variance-authority": "^0.7.1",
