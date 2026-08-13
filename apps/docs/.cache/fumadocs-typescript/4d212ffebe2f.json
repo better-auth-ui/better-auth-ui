@@ -1,0 +1,27 @@
+[
+  {
+    "id": "invite-member-dialog.tsx-InviteMemberDialogProps",
+    "name": "InviteMemberDialogProps",
+    "description": "Props for the {@link InviteMemberDialog} component.",
+    "entries": [
+      {
+        "name": "isOpen",
+        "description": "",
+        "tags": [],
+        "type": "boolean",
+        "simplifiedType": "boolean",
+        "required": true,
+        "deprecated": false
+      },
+      {
+        "name": "onOpenChange",
+        "description": "",
+        "tags": [],
+        "type": "(open: boolean) => void",
+        "simplifiedType": "function",
+        "required": true,
+        "deprecated": false
+      }
+    ]
+  }
+]

@@ -1,0 +1,47 @@
+[
+  {
+    "id": "theme-plugin.ts-ThemePluginOptions",
+    "name": "ThemePluginOptions",
+    "description": "",
+    "entries": [
+      {
+        "name": "localization",
+        "description": "Override the plugin's default localization strings.",
+        "tags": [{ "name": "remarks", "text": "`ThemeLocalization`" }],
+        "type": "Partial<{ appearance: string; theme: string; system: string; light: string; dark: string; }>",
+        "simplifiedType": "ThemeLocalization",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "theme",
+        "description": "Initial theme value",
+        "tags": [],
+        "type": "string",
+        "simplifiedType": "string",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "themes",
+        "description": "Available theme options",
+        "tags": [
+          { "name": "default", "text": "[\"system\", \"light\", \"dark\"]" }
+        ],
+        "type": "string[]",
+        "simplifiedType": "array",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "setTheme",
+        "description": "Function to set the theme. Defaults to the copied Solid theme helper.",
+        "tags": [],
+        "type": "((theme: string) => void)",
+        "simplifiedType": "function",
+        "required": false,
+        "deprecated": false
+      }
+    ]
+  }
+]

@@ -1,0 +1,27 @@
+[
+  {
+    "id": "account-info-query.ts-AccountInfoParams",
+    "name": "AccountInfoParams",
+    "description": "",
+    "entries": [
+      {
+        "name": "query",
+        "description": "",
+        "tags": [],
+        "type": "{ accountId: string; userId?: string; } | { useAccountCookie: true; userId?: string; }",
+        "simplifiedType": "{ accountId: string; userId?: string; } | { useAccountCookie: true; userId?: string; }",
+        "required": true,
+        "deprecated": false
+      },
+      {
+        "name": "fetchOptions",
+        "description": "",
+        "tags": [],
+        "type": "ClientFetchOption<never, Partial<{ accountId: string; userId?: string; } | { useAccountCookie: true; userId?: string; }> & Record<string, any>, Record<string, string>>",
+        "simplifiedType": "ClientFetchOption<never, union, union>",
+        "required": false,
+        "deprecated": false
+      }
+    ]
+  }
+]

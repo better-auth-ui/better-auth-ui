@@ -1,0 +1,72 @@
+[
+  {
+    "id": "organization-switcher.tsx-OrganizationSwitcherProps",
+    "name": "OrganizationSwitcherProps",
+    "description": "",
+    "entries": [
+      {
+        "name": "class",
+        "description": "",
+        "tags": [],
+        "type": "string",
+        "simplifiedType": "string",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "trigger",
+        "description": "",
+        "tags": [],
+        "type": "JSX.Element",
+        "simplifiedType": "Element",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "hidePersonal",
+        "description": "",
+        "tags": [],
+        "type": "boolean",
+        "simplifiedType": "boolean",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "hideSettings",
+        "description": "",
+        "tags": [],
+        "type": "boolean",
+        "simplifiedType": "boolean",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "hideSlug",
+        "description": "",
+        "tags": [],
+        "type": "boolean",
+        "simplifiedType": "boolean",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "hideCreate",
+        "description": "",
+        "tags": [],
+        "type": "boolean",
+        "simplifiedType": "boolean",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "setActive",
+        "description": "",
+        "tags": [],
+        "type": "((organization: Organization | null) => void)",
+        "simplifiedType": "function",
+        "required": false,
+        "deprecated": false
+      }
+    ]
+  }
+]

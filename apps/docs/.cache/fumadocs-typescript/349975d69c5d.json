@@ -1,0 +1,18 @@
+[
+  {
+    "id": "passkey-plugin.ts-PasskeyPluginOptions",
+    "name": "PasskeyPluginOptions",
+    "description": "",
+    "entries": [
+      {
+        "name": "localization",
+        "description": "Override the plugin's default localization strings.",
+        "tags": [{ "name": "remarks", "text": "`PasskeyLocalization`" }],
+        "type": "Partial<{ passkey: string; addPasskey: string; deletePasskey: string; deletePasskeyTitle: string; deletePasskeyWarning: string; passkeys: string; passkeysDescription: string; noPasskeys: string; name: string; }>",
+        "simplifiedType": "PasskeyLocalization",
+        "required": false,
+        "deprecated": false
+      }
+    ]
+  }
+]

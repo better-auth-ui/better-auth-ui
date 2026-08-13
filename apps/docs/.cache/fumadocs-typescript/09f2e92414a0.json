@@ -1,0 +1,27 @@
+[
+  {
+    "id": "switch-account-submenu.tsx-SwitchAccountSubmenuProps",
+    "name": "SwitchAccountSubmenuProps",
+    "description": "",
+    "entries": [
+      {
+        "name": "className",
+        "description": "",
+        "tags": [],
+        "type": "string",
+        "simplifiedType": "string",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "hideSubtitle",
+        "description": "",
+        "tags": [],
+        "type": "boolean",
+        "simplifiedType": "boolean",
+        "required": false,
+        "deprecated": false
+      }
+    ]
+  }
+]

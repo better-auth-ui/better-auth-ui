@@ -1,0 +1,45 @@
+[
+  {
+    "id": "oauth-continue-mutation.ts-OAuthContinueParams",
+    "name": "OAuthContinueParams",
+    "description": "",
+    "entries": [
+      {
+        "name": "created",
+        "description": "",
+        "tags": [],
+        "type": "true",
+        "simplifiedType": "true",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "selected",
+        "description": "",
+        "tags": [],
+        "type": "true",
+        "simplifiedType": "true",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "postLogin",
+        "description": "",
+        "tags": [],
+        "type": "true",
+        "simplifiedType": "true",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "fetchOptions",
+        "description": "",
+        "tags": [],
+        "type": "object",
+        "simplifiedType": "object",
+        "required": false,
+        "deprecated": false
+      }
+    ]
+  }
+]

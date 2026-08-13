@@ -1,0 +1,20 @@
+[
+  {
+    "id": "last-login-method-plugin.ts-LastLoginMethodPluginOptions",
+    "name": "LastLoginMethodPluginOptions",
+    "description": "",
+    "entries": [
+      {
+        "name": "localization",
+        "description": "Override the plugin's default localization strings.",
+        "tags": [
+          { "name": "remarks", "text": "`LastLoginMethodLocalization`" }
+        ],
+        "type": "Partial<{ lastUsed: string; lastUsedShort: string; }>",
+        "simplifiedType": "LastLoginMethodLocalization",
+        "required": false,
+        "deprecated": false
+      }
+    ]
+  }
+]

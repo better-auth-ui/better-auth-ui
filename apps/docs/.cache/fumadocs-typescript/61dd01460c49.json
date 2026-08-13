@@ -1,0 +1,45 @@
+[
+  {
+    "id": "enable-two-factor-mutation.ts-EnableTwoFactorParams",
+    "name": "EnableTwoFactorParams",
+    "description": "",
+    "entries": [
+      {
+        "name": "method",
+        "description": "",
+        "tags": [],
+        "type": "\"otp\" | \"totp\"",
+        "simplifiedType": "\"otp\" | \"totp\"",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "password",
+        "description": "",
+        "tags": [],
+        "type": "string",
+        "simplifiedType": "string",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "issuer",
+        "description": "",
+        "tags": [],
+        "type": "string",
+        "simplifiedType": "string",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "fetchOptions",
+        "description": "",
+        "tags": [],
+        "type": "ClientFetchOption<Partial<{ password?: string; method?: \"otp\" | \"totp\"; issuer?: string; } | { password: string; method?: \"otp\" | \"totp\"; issuer?: string; }> & Record<string, any>, Partial<Record<string, any>> & Record<string, any>, Record<string, string>>",
+        "simplifiedType": "ClientFetchOption<union, Record<string, any> & Partial<Record<string, any>>, union>",
+        "required": false,
+        "deprecated": false
+      }
+    ]
+  }
+]

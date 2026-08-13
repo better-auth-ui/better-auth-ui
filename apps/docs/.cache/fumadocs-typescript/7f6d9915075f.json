@@ -1,0 +1,8 @@
+[
+  {
+    "id": "active-organization-query.ts-ActiveOrganizationParams",
+    "name": "ActiveOrganizationParams",
+    "description": "Parameters forwarded to the active organization query factory.",
+    "entries": []
+  }
+]

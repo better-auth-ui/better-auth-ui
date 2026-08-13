@@ -1,0 +1,18 @@
+[
+  {
+    "id": "anonymous-plugin.ts-AnonymousPluginOptions",
+    "name": "AnonymousPluginOptions",
+    "description": "",
+    "entries": [
+      {
+        "name": "localization",
+        "description": "Override the plugin's default localization strings.",
+        "tags": [{ "name": "remarks", "text": "`AnonymousLocalization`" }],
+        "type": "Partial<{ continueAsGuest: string; }>",
+        "simplifiedType": "AnonymousLocalization",
+        "required": false,
+        "deprecated": false
+      }
+    ]
+  }
+]

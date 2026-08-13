@@ -1,0 +1,122 @@
+[
+  {
+    "id": "change-email-confirmation.tsx-ChangeEmailConfirmationEmailProps",
+    "name": "ChangeEmailConfirmationEmailProps",
+    "description": "Props for the ChangeEmailConfirmationEmail component.",
+    "entries": [
+      {
+        "name": "url",
+        "description": "Confirmation URL sent by Better Auth to the user's current email address",
+        "tags": [],
+        "type": "string",
+        "simplifiedType": "string",
+        "required": true,
+        "deprecated": false
+      },
+      {
+        "name": "currentEmail",
+        "description": "User's current email address",
+        "tags": [],
+        "type": "string",
+        "simplifiedType": "string",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "newEmail",
+        "description": "Requested new email address",
+        "tags": [],
+        "type": "string",
+        "simplifiedType": "string",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "appName",
+        "description": "Name of the application sending the email",
+        "tags": [],
+        "type": "string",
+        "simplifiedType": "string",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "expirationMinutes",
+        "description": "Number of minutes until the confirmation link expires",
+        "tags": [],
+        "type": "number",
+        "simplifiedType": "number",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "logoURL",
+        "description": "Logo URL(s) - a single string or light/dark variants. If omitted, no logo is shown.",
+        "tags": [],
+        "type": "string | { light: string; dark: string; }",
+        "simplifiedType": "string | { light: string; dark: string; }",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "classNames",
+        "description": "Custom CSS class names for styling specific parts of the email",
+        "tags": [],
+        "type": "EmailClassNames",
+        "simplifiedType": "EmailClassNames",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "colors",
+        "description": "Custom color scheme for light and dark modes",
+        "tags": [],
+        "type": "EmailColors",
+        "simplifiedType": "EmailColors",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "poweredBy",
+        "description": "Whether to show the \"Powered by better-auth\" footer",
+        "tags": [],
+        "type": "boolean",
+        "simplifiedType": "boolean",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "darkMode",
+        "description": "Whether to enable dark mode support",
+        "tags": [],
+        "type": "boolean",
+        "simplifiedType": "boolean",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "head",
+        "description": "Additional React nodes to inject into the email head",
+        "tags": [],
+        "type": "ReactNode",
+        "simplifiedType": "ReactNode",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "localization",
+        "description": "Localization overrides for customizing email text",
+        "tags": [
+          {
+            "name": "remarks",
+            "text": "`ChangeEmailConfirmationEmailLocalization`"
+          }
+        ],
+        "type": "Partial<{ CONFIRM_EMAIL_CHANGE: string; LOGO: string; EMAIL_CHANGE_REQUESTED: string; CURRENT_EMAIL: string; NEW_EMAIL: string; APPROVE_EMAIL_CHANGE: string; OR_COPY_AND_PASTE_URL: string; THIS_LINK_EXPIRES_IN_MINUTES: string; EMAIL_SENT_BY: string; IF_YOU_DIDNT_REQUEST_EMAIL_CHANGE: string; POWERED_BY_BETTER_AUTH: string; }>",
+        "simplifiedType": "ChangeEmailConfirmationEmailLocalization",
+        "required": false,
+        "deprecated": false
+      }
+    ]
+  }
+]

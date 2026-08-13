@@ -1,0 +1,27 @@
+[
+  {
+    "id": "last-login-method-localization.ts-LastLoginMethodLocalization",
+    "name": "LastLoginMethodLocalization",
+    "description": "",
+    "entries": [
+      {
+        "name": "lastUsed",
+        "description": "",
+        "tags": [{ "name": "remarks", "text": "`\"Last used\"`" }],
+        "type": "string",
+        "simplifiedType": "\"Last used\"",
+        "required": true,
+        "deprecated": false
+      },
+      {
+        "name": "lastUsedShort",
+        "description": "",
+        "tags": [{ "name": "remarks", "text": "`\"Last\"`" }],
+        "type": "string",
+        "simplifiedType": "\"Last\"",
+        "required": true,
+        "deprecated": false
+      }
+    ]
+  }
+]

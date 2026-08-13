@@ -1,0 +1,18 @@
+[
+  {
+    "id": "stop-impersonating.tsx-StopImpersonatingProps",
+    "name": "StopImpersonatingProps",
+    "description": "",
+    "entries": [
+      {
+        "name": "class",
+        "description": "",
+        "tags": [],
+        "type": "string",
+        "simplifiedType": "string",
+        "required": false,
+        "deprecated": false
+      }
+    ]
+  }
+]

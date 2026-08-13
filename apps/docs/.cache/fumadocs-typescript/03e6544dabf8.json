@@ -1,0 +1,61 @@
+[
+  {
+    "id": "theme-plugin.ts-ThemePluginOptions",
+    "name": "ThemePluginOptions",
+    "description": "",
+    "entries": [
+      {
+        "name": "localization",
+        "description": "Override the plugin's default localization strings.",
+        "tags": [{ "name": "remarks", "text": "`ThemeLocalization`" }],
+        "type": "Partial<{ appearance: string; theme: string; system: string; light: string; dark: string; }>",
+        "simplifiedType": "ThemeLocalization",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "themes",
+        "description": "Available theme options.",
+        "tags": [
+          { "name": "default", "text": "[\"system\", \"light\", \"dark\"]" }
+        ],
+        "type": "string[]",
+        "simplifiedType": "array",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "useTheme",
+        "description": "A theme hook (e.g. next-themes' `useTheme`) called inside the\nplugin's slot components on every render. The hook owns the live\ntheme value, so `theme`/`setTheme` are not accepted in this form.",
+        "tags": [],
+        "type": "UseThemeHook",
+        "simplifiedType": "UseThemeHook",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "theme",
+        "description": "Current theme value. Required when not using a hook so slot\ncomponents can highlight the active option. Pass it from a\nstateful source (e.g. `useState`, Context) so updates flow\nthrough `<AuthProvider>` and re-render slot components.",
+        "tags": [
+          {
+            "name": "remarks",
+            "text": "Do not memoize the static call (e.g. wrap\n`themePlugin({ theme, setTheme })` in `useMemo`): `theme` is\ncaptured at factory-creation time, so a memoized closure will\nkeep returning the stale value and slot components will stop\nreflecting theme changes. Let the factory re-run each render."
+          }
+        ],
+        "type": "string",
+        "simplifiedType": "string",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "setTheme",
+        "description": "Setter that updates the value `theme` is read from.",
+        "tags": [],
+        "type": "((theme: string) => void)",
+        "simplifiedType": "function",
+        "required": false,
+        "deprecated": false
+      }
+    ]
+  }
+]

@@ -1,0 +1,117 @@
+[
+  {
+    "id": "password-changed.tsx-PasswordChangedEmailProps",
+    "name": "PasswordChangedEmailProps",
+    "description": "",
+    "entries": [
+      {
+        "name": "email",
+        "description": "",
+        "tags": [],
+        "type": "string",
+        "simplifiedType": "string",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "timestamp",
+        "description": "",
+        "tags": [],
+        "type": "string",
+        "simplifiedType": "string",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "secureAccountURL",
+        "description": "",
+        "tags": [],
+        "type": "string",
+        "simplifiedType": "string",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "appName",
+        "description": "",
+        "tags": [],
+        "type": "string",
+        "simplifiedType": "string",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "supportEmail",
+        "description": "",
+        "tags": [],
+        "type": "string",
+        "simplifiedType": "string",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "logoURL",
+        "description": "",
+        "tags": [],
+        "type": "string | { light: string; dark: string; }",
+        "simplifiedType": "string | { light: string; dark: string; }",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "classNames",
+        "description": "",
+        "tags": [],
+        "type": "EmailClassNames",
+        "simplifiedType": "EmailClassNames",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "colors",
+        "description": "",
+        "tags": [],
+        "type": "EmailColors",
+        "simplifiedType": "EmailColors",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "poweredBy",
+        "description": "",
+        "tags": [],
+        "type": "boolean",
+        "simplifiedType": "boolean",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "darkMode",
+        "description": "",
+        "tags": [],
+        "type": "boolean",
+        "simplifiedType": "boolean",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "head",
+        "description": "",
+        "tags": [],
+        "type": "JSX.Element",
+        "simplifiedType": "Element",
+        "required": false,
+        "deprecated": false
+      },
+      {
+        "name": "localization",
+        "description": "",
+        "tags": [],
+        "type": "Partial<{ YOUR_PASSWORD_HAS_BEEN_CHANGED: string; LOGO: string; PASSWORD_CHANGED_SUCCESSFULLY: string; PASSWORD_FOR_YOUR_ACCOUNT_CHANGED: string; CHANGED_AT: string; IF_YOU_MADE_THIS_CHANGE: string; I_DIDNT_MAKE_THIS_CHANGE: string; EMAIL_SENT_BY: string; IF_YOU_DIDNT_AUTHORIZE_THIS_CHANGE: string; POWERED_BY_BETTER_AUTH: string; }>",
+        "simplifiedType": "Partial<object>",
+        "required": false,
+        "deprecated": false
+      }
+    ]
+  }
+]
