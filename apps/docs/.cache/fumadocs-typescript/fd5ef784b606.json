@@ -1,8 +1,0 @@
-[
-  {
-    "id": "list-device-sessions-query.ts-ListDeviceSessionsParams",
-    "name": "ListDeviceSessionsParams",
-    "description": "Parameters accepted by the Better Auth device sessions endpoint.",
-    "entries": []
-  }
-]

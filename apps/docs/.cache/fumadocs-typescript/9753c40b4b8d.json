@@ -1,8 +1,0 @@
-[
-  {
-    "id": "list-passkeys-query.ts-ListPasskeysParams",
-    "name": "ListPasskeysParams",
-    "description": "Parameters accepted by the Better Auth passkey list endpoint.",
-    "entries": []
-  }
-]
