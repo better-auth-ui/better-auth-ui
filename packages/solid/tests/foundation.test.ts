@@ -14,8 +14,34 @@ import { providerIconNames, resolveAuthConfig } from "../src"
 type PackageJson = {
   name: string
   version: string
+  files: string[]
+  nx: {
+    targets: {
+      typecheck: {
+        command: string
+        options: { cwd: string }
+        outputs: string[]
+      }
+    }
+  }
   exports: Record<string, unknown>
   peerDependencies: Record<string, string>
+}
+
+type TypeScriptConfig = {
+  extends?: string
+  compilerOptions: {
+    outDir: string
+    tsBuildInfoFile?: string
+  }
+}
+
+type NxConfig = {
+  targetDefaults: {
+    build: {
+      outputs: string[]
+    }
+  }
 }
 
 function parsePackageJson(source: string): PackageJson {
@@ -30,6 +56,11 @@ function parsePackageJson(source: string): PackageJson {
 
 const packageJson = () =>
   parsePackageJson(readFileSync(resolve(__dirname, "../package.json"), "utf8"))
+
+const typeScriptConfig = (name: string) =>
+  JSON.parse(
+    readFileSync(resolve(__dirname, `../${name}`), "utf8")
+  ) as TypeScriptConfig
 
 describe("@better-auth-ui/solid foundation", () => {
   it("declares the additive Solid package exports with native email support", () => {
@@ -72,6 +103,35 @@ describe("@better-auth-ui/solid foundation", () => {
         "solid-js"
       ])
     )
+  })
+
+  it("isolates typecheck artifacts from build and publish outputs", () => {
+    const metadata = packageJson()
+    const nxConfig = JSON.parse(
+      readFileSync(resolve(__dirname, "../../../nx.json"), "utf8")
+    ) as NxConfig
+    const buildConfig = typeScriptConfig("tsconfig.json")
+    const typecheckConfig = typeScriptConfig("tsconfig.typecheck.json")
+    const typecheckTarget = metadata.nx.targets.typecheck
+
+    expect(nxConfig.targetDefaults.build.outputs).toEqual([
+      "{projectRoot}/dist"
+    ])
+    expect(buildConfig.compilerOptions.outDir).toBe("dist")
+    expect(typecheckConfig).toEqual({
+      extends: "./tsconfig.json",
+      compilerOptions: {
+        outDir: ".typecheck",
+        tsBuildInfoFile: ".typecheck/tsconfig.tsbuildinfo"
+      }
+    })
+    expect(typecheckTarget).toEqual({
+      command: "tsc --build tsconfig.typecheck.json --emitDeclarationOnly",
+      options: { cwd: "packages/solid" },
+      outputs: ["{projectRoot}/.typecheck"]
+    })
+    expect(typecheckTarget.outputs).not.toContain("{projectRoot}/dist")
+    expect(metadata.files).not.toContain(".typecheck")
   })
 
   it("does not expose the Better Auth client factory from the Solid root", async () => {

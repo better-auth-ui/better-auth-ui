@@ -7,6 +7,19 @@
     "dev": "tsc --watch",
     "test": "vitest"
   },
+  "nx": {
+    "targets": {
+      "typecheck": {
+        "command": "tsc --build tsconfig.typecheck.json --emitDeclarationOnly",
+        "options": {
+          "cwd": "packages/solid"
+        },
+        "outputs": [
+          "{projectRoot}/.typecheck"
+        ]
+      }
+    }
+  },
   "files": [
     "src",
     "dist"
