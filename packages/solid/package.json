@@ -97,12 +97,12 @@
     }
   },
   "devDependencies": {
-    "@better-auth/api-key": "1.7.0-rc.5",
-    "@better-auth/passkey": "1.7.0-rc.5",
+    "@better-auth/api-key": "1.7.0-rc.6",
+    "@better-auth/passkey": "1.7.0-rc.6",
     "@solidjs-email/main": "^2.0.0",
     "@tanstack/solid-query": "^5.101.2",
     "@types/node": "^26.1.2",
-    "better-auth": "1.7.0-rc.5",
+    "better-auth": "1.7.0-rc.6",
     "solid-js": "^1.9.14",
     "vite-plugin-solid": "^2.11.14",
     "vitest": "^4.1.9",
@@ -110,11 +110,11 @@
   },
   "peerDependencies": {
     "@better-auth-ui/core": "*",
-    "@better-auth/api-key": ">=1.7.0-rc.5",
-    "@better-auth/passkey": ">=1.7.0-rc.5",
+    "@better-auth/api-key": ">=1.7.0-rc.6",
+    "@better-auth/passkey": ">=1.7.0-rc.6",
     "@solidjs-email/main": ">=2.0.0",
     "@tanstack/solid-query": ">=5.101.2",
-    "better-auth": ">=1.7.0-rc.5",
+    "better-auth": ">=1.7.0-rc.6",
     "solid-js": ">=1.9.14",
     "zod": ">=4.4.3"
   },
