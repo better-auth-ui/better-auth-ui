@@ -5,6 +5,7 @@ import { useState } from "react"
 import { describe, expect, it, vi } from "vitest"
 
 import { AuthProvider } from "../src/components/auth/auth-provider"
+import { CreateOrganizationDialog } from "../src/components/auth/organization/create-organization-dialog"
 import { SlugField } from "../src/components/auth/organization/slug-field"
 import { organizationPlugin } from "../src/lib/auth/organization-plugin"
 
@@ -33,6 +34,76 @@ function createSlugFieldAuthClient(
     useSession: () => ({ data: null, isPending: false, error: null })
   } as unknown as Parameters<typeof AuthProvider>[0]["authClient"] & {
     organization: { checkSlug: typeof checkSlug }
+  }
+}
+
+function createDeferred<T>() {
+  let resolve!: (value: T | PromiseLike<T>) => void
+  const promise = new Promise<T>((resolvePromise) => {
+    resolve = resolvePromise
+  })
+
+  return { promise, resolve }
+}
+
+function createOrganizationAuthClient(
+  create: () => Promise<unknown> = async () => ({ data: {}, error: null })
+) {
+  const createOrganization = vi.fn(create)
+  return {
+    organization: { create: createOrganization },
+    useSession: () => ({
+      data: { user: { id: "user-id" } },
+      isPending: false,
+      error: null
+    })
+  } as unknown as Parameters<typeof AuthProvider>[0]["authClient"] & {
+    organization: { create: typeof createOrganization }
+  }
+}
+
+function renderCreateOrganizationDialog({
+  authClient = createOrganizationAuthClient(),
+  isOpen = true,
+  onOpenChange = vi.fn(),
+  validate = async () => {}
+}: {
+  authClient?: ReturnType<typeof createOrganizationAuthClient>
+  isOpen?: boolean
+  onOpenChange?: (open: boolean) => void
+  validate?: () => Promise<void>
+} = {}) {
+  const queryClient = createTestQueryClient()
+  const renderDialog = (open: boolean) => (
+    <AuthProvider
+      authClient={authClient}
+      navigate={() => {}}
+      plugins={[
+        organizationPlugin({
+          checkSlug: false,
+          additionalFields: [
+            {
+              name: "approval",
+              type: "string",
+              label: "Approval",
+              inputType: "hidden",
+              defaultValue: "approved",
+              validate
+            }
+          ]
+        })
+      ]}
+      queryClient={queryClient}
+    >
+      <CreateOrganizationDialog isOpen={open} onOpenChange={onOpenChange} />
+    </AuthProvider>
+  )
+  const rendered = render(renderDialog(isOpen))
+
+  return {
+    ...rendered,
+    authClient,
+    rerenderDialog: (open: boolean) => rendered.rerender(renderDialog(open))
   }
 }
 
@@ -149,5 +220,53 @@ describe("<SlugField />", () => {
     await sleep(700)
 
     expect(authClient.organization.checkSlug).not.toHaveBeenCalled()
+  })
+})
+
+describe("<CreateOrganizationDialog />", () => {
+  it("does not create an organization when validation finishes after closing", async () => {
+    const user = userEvent.setup()
+    const validation = createDeferred<void>()
+    const validate = vi.fn(() => validation.promise)
+    const { authClient, rerenderDialog } = renderCreateOrganizationDialog({
+      validate
+    })
+
+    await user.type(screen.getByLabelText("Name"), "Acme")
+    await user.click(
+      screen.getByRole("button", { name: "Create organization" })
+    )
+    await waitFor(() => expect(validate).toHaveBeenCalledTimes(1))
+
+    act(() => rerenderDialog(false))
+    act(() => rerenderDialog(true))
+    await act(async () => validation.resolve())
+
+    expect(authClient.organization.create).not.toHaveBeenCalled()
+  })
+
+  it("ignores a completed mutation from a previous dialog opening", async () => {
+    const user = userEvent.setup()
+    const creation = createDeferred<unknown>()
+    const authClient = createOrganizationAuthClient(() => creation.promise)
+    const onOpenChange = vi.fn()
+    const { rerenderDialog } = renderCreateOrganizationDialog({
+      authClient,
+      onOpenChange
+    })
+
+    await user.type(screen.getByLabelText("Name"), "Acme")
+    await user.click(
+      screen.getByRole("button", { name: "Create organization" })
+    )
+    await waitFor(() => {
+      expect(authClient.organization.create).toHaveBeenCalledTimes(1)
+    })
+
+    act(() => rerenderDialog(false))
+    act(() => rerenderDialog(true))
+    await act(async () => creation.resolve({ data: {}, error: null }))
+
+    expect(onOpenChange).not.toHaveBeenCalled()
   })
 })

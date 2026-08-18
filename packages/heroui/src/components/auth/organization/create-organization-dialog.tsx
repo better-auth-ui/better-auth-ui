@@ -46,20 +46,16 @@ export function CreateOrganizationDialog({
   const [slugEdited, setSlugEdited] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const submissionLocked = useRef(false)
+  const submissionGeneration = useRef(0)
 
   const { mutate: createOrganization, isPending: isCreating } =
-    useCreateOrganization(authClient as OrganizationAuthClient, {
-      onSuccess: () => onOpenChange(false),
-      onSettled: () => {
-        submissionLocked.current = false
-        setIsSubmitting(false)
-      }
-    })
+    useCreateOrganization(authClient as OrganizationAuthClient)
 
   const handleSubmit = async (e: SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault()
     if (submissionLocked.current) return
 
+    const generation = ++submissionGeneration.current
     submissionLocked.current = true
     setIsSubmitting(true)
     const formData = new FormData(e.currentTarget)
@@ -74,18 +70,39 @@ export function CreateOrganizationDialog({
         if (value !== undefined) additionalValues[field.name] = value
       }
     } catch (error) {
+      if (generation !== submissionGeneration.current) return
+
       submissionLocked.current = false
       setIsSubmitting(false)
       toast.danger(error instanceof Error ? error.message : String(error))
       return
     }
-    createOrganization({ name, slug, ...additionalValues })
+
+    if (generation !== submissionGeneration.current) return
+
+    createOrganization(
+      { name, slug, ...additionalValues },
+      {
+        onSuccess: () => {
+          if (generation === submissionGeneration.current) onOpenChange(false)
+        },
+        onSettled: () => {
+          if (generation !== submissionGeneration.current) return
+
+          submissionLocked.current = false
+          setIsSubmitting(false)
+        }
+      }
+    )
   }
 
   const isPending = isCreating || isSubmitting
 
   useEffect(() => {
     if (!isOpen) {
+      submissionGeneration.current += 1
+      submissionLocked.current = false
+      setIsSubmitting(false)
       setSlug("")
       setName("")
       setSlugEdited(false)

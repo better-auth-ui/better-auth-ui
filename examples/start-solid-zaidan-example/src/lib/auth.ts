@@ -11,6 +11,7 @@ import {
   twoFactor,
   username
 } from "better-auth/plugins"
+import type { UpdateApiKeyInput } from "./auth/update-api-key"
 import { db } from "./db"
 import * as schema from "./schema"
 
@@ -133,5 +134,12 @@ const authOptions = {
 const authInstance = betterAuth(authOptions)
 
 export const auth: AuthServer = authInstance
+
+export const updateApiKeyForUser = async (
+  body: UpdateApiKeyInput,
+  userId: string
+): Promise<void> => {
+  await authInstance.api.updateApiKey({ body: { ...body, userId } })
+}
 
 export const authHandler = (request: Request) => authInstance.handler(request)

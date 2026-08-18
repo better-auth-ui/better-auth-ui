@@ -46,6 +46,7 @@ export type OrganizationPluginOptions = {
    * - `settings.organizations` — segment for the organizations settings view (default `"organizations"`).
    * - `organization.settings` — segment for the `/organization/...` profile and danger zone tab (default `"settings"`).
    * - `organization.people` — segment for the `/organization/...` members and invitations tab (default `"people"`).
+   * - `organization.teams` — segment for the `/organization/...` teams tab (default `"teams"`).
    */
   viewPaths?: {
     auth?: {

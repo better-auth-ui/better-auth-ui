@@ -1,6 +1,10 @@
-import type { ApiKeyAuthClient } from "@better-auth-ui/core/plugins/api-key"
-import { useAuth, useAuthPlugin } from "@better-auth-ui/solid"
+import {
+  type ApiKeyAuthClient,
+  apiKeyQueryKeys
+} from "@better-auth-ui/core/plugins/api-key"
+import { useAuth, useAuthPlugin, useSession } from "@better-auth-ui/solid"
 import { useUpdateApiKey } from "@better-auth-ui/solid/plugins/api-key"
+import { useMutation, useQueryClient } from "@tanstack/solid-query"
 import { createEffect, createSignal, Show } from "solid-js"
 import type { ListedApiKey } from "@/components/auth/settings/shared/types"
 import { Button } from "@/components/ui/button"
@@ -21,6 +25,7 @@ import { Input } from "@/components/ui/input"
 import { Switch } from "@/components/ui/switch"
 import { Textarea } from "@/components/ui/textarea"
 import { apiKeyPlugin } from "@/lib/auth/api-key-plugin"
+import type { UpdateApiKeyInput } from "@/lib/auth/update-api-key"
 
 const optionalNumber = (formData: FormData, name: string) => {
   const value = String(formData.get(name) ?? "").trim()
@@ -33,7 +38,10 @@ export function EditApiKeyDialog(props: {
   onOpenChange: (open: boolean) => void
 }) {
   const auth = useAuth<ApiKeyAuthClient>()
-  const { localization: labels } = useAuthPlugin(apiKeyPlugin)
+  const config = useAuthPlugin(apiKeyPlugin)
+  const labels = config.localization
+  const session = useSession(auth.authClient)
+  const queryClient = useQueryClient()
   const [enabled, setEnabled] = createSignal(props.apiKey.enabled)
   const [rateLimitEnabled, setRateLimitEnabled] = createSignal(
     props.apiKey.rateLimitEnabled
@@ -47,20 +55,42 @@ export function EditApiKeyDialog(props: {
     setFormError(undefined)
   })
 
-  const updateApiKey = useUpdateApiKey(auth.authClient, () => ({
+  const updateApiKeyClient = useUpdateApiKey(auth.authClient, () => ({
     onSuccess: () => props.onOpenChange(false)
+  }))
+  const updateApiKeyOnServer = useMutation(() => ({
+    mutationFn: async (input: UpdateApiKeyInput) => {
+      if (!config.updateApiKey) throw new Error("Server updates are disabled.")
+      return config.updateApiKey(input)
+    },
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: apiKeyQueryKeys.lists(session.data?.user.id)
+      })
+      props.onOpenChange(false)
+    }
   }))
   const submit = (event: SubmitEvent) => {
     event.preventDefault()
     const formData = new FormData(event.currentTarget as HTMLFormElement)
     try {
+      const baseUpdate = {
+        keyId: props.apiKey.id,
+        configId: props.apiKey.configId,
+        name: String(formData.get("name") ?? "").trim()
+      }
+
+      if (!config.updateApiKey) {
+        setFormError(undefined)
+        updateApiKeyClient.mutate(baseUpdate)
+        return
+      }
+
       const metadata = String(formData.get("metadata") ?? "").trim()
       const permissions = String(formData.get("permissions") ?? "").trim()
       setFormError(undefined)
-      updateApiKey.mutate({
-        keyId: props.apiKey.id,
-        configId: props.apiKey.configId,
-        name: String(formData.get("name") ?? "").trim(),
+      updateApiKeyOnServer.mutate({
+        ...baseUpdate,
         enabled: enabled(),
         rateLimitEnabled: rateLimitEnabled(),
         remaining: optionalNumber(formData, "remaining"),
@@ -69,12 +99,20 @@ export function EditApiKeyDialog(props: {
         rateLimitMax: optionalNumber(formData, "rateLimitMax"),
         rateLimitTimeWindow: optionalNumber(formData, "rateLimitTimeWindow"),
         metadata: metadata ? JSON.parse(metadata) : null,
-        permissions: permissions ? JSON.parse(permissions) : null
+        permissions: permissions
+          ? (JSON.parse(permissions) as Record<string, string[]>)
+          : null
       })
     } catch {
       setFormError("Metadata and permissions must contain valid JSON.")
     }
   }
+  const isPending = () =>
+    updateApiKeyClient.isPending || updateApiKeyOnServer.isPending
+  const updateErrorMessage = () =>
+    updateApiKeyOnServer.error?.message ??
+    updateApiKeyClient.error?.error?.message ??
+    updateApiKeyClient.error?.message
   return (
     <DialogContent class="sm:max-w-xl">
       <form class="flex flex-col gap-6" onSubmit={submit}>
@@ -92,69 +130,69 @@ export function EditApiKeyDialog(props: {
               value={props.apiKey.name ?? ""}
             />
           </Field>
-          <Field orientation="horizontal">
-            <Switch checked={enabled()} onChange={setEnabled} />
-            <FieldLabel>{labels.enabled}</FieldLabel>
-          </Field>
-          <Field orientation="horizontal">
-            <Switch
-              checked={rateLimitEnabled()}
-              onChange={setRateLimitEnabled}
+          <Show when={config.updateApiKey}>
+            <Field orientation="horizontal">
+              <Switch checked={enabled()} onChange={setEnabled} />
+              <FieldLabel>{labels.enabled}</FieldLabel>
+            </Field>
+            <Field orientation="horizontal">
+              <Switch
+                checked={rateLimitEnabled()}
+                onChange={setRateLimitEnabled}
+              />
+              <FieldLabel>{labels.rateLimit}</FieldLabel>
+            </Field>
+            <NumericField
+              name="remaining"
+              label={labels.remaining}
+              value={props.apiKey.remaining}
             />
-            <FieldLabel>{labels.rateLimit}</FieldLabel>
-          </Field>
-          <NumericField
-            name="remaining"
-            label={labels.remaining}
-            value={props.apiKey.remaining}
-          />
-          <NumericField
-            name="refillAmount"
-            label={labels.refillAmount}
-            value={props.apiKey.refillAmount}
-          />
-          <NumericField
-            name="refillInterval"
-            label={labels.refillInterval}
-            value={props.apiKey.refillInterval}
-          />
-          <NumericField
-            name="rateLimitMax"
-            label={labels.rateLimitMax}
-            value={props.apiKey.rateLimitMax}
-          />
-          <NumericField
-            name="rateLimitTimeWindow"
-            label={labels.rateLimitWindow}
-            value={props.apiKey.rateLimitTimeWindow}
-          />
-          <Field class="sm:col-span-2">
-            <FieldLabel>{labels.metadata}</FieldLabel>
-            <Textarea
-              name="metadata"
-              value={
-                props.apiKey.metadata
-                  ? JSON.stringify(props.apiKey.metadata, null, 2)
-                  : ""
-              }
+            <NumericField
+              name="refillAmount"
+              label={labels.refillAmount}
+              value={props.apiKey.refillAmount}
             />
-          </Field>
-          <Field class="sm:col-span-2">
-            <FieldLabel>{labels.permissions}</FieldLabel>
-            <Textarea
-              name="permissions"
-              value={
-                props.apiKey.permissions
-                  ? JSON.stringify(props.apiKey.permissions, null, 2)
-                  : ""
-              }
+            <NumericField
+              name="refillInterval"
+              label={labels.refillInterval}
+              value={props.apiKey.refillInterval}
             />
-          </Field>
-          <Show when={formError() || updateApiKey.error}>
+            <NumericField
+              name="rateLimitMax"
+              label={labels.rateLimitMax}
+              value={props.apiKey.rateLimitMax}
+            />
+            <NumericField
+              name="rateLimitTimeWindow"
+              label={labels.rateLimitWindow}
+              value={props.apiKey.rateLimitTimeWindow}
+            />
+            <Field class="sm:col-span-2">
+              <FieldLabel>{labels.metadata}</FieldLabel>
+              <Textarea
+                name="metadata"
+                value={
+                  props.apiKey.metadata
+                    ? JSON.stringify(props.apiKey.metadata, null, 2)
+                    : ""
+                }
+              />
+            </Field>
+            <Field class="sm:col-span-2">
+              <FieldLabel>{labels.permissions}</FieldLabel>
+              <Textarea
+                name="permissions"
+                value={
+                  props.apiKey.permissions
+                    ? JSON.stringify(props.apiKey.permissions, null, 2)
+                    : ""
+                }
+              />
+            </Field>
+          </Show>
+          <Show when={formError() || updateErrorMessage()}>
             <FieldError class="sm:col-span-2">
-              {formError() ??
-                updateApiKey.error?.error?.message ??
-                updateApiKey.error?.message}
+              {formError() ?? updateErrorMessage()}
             </FieldError>
           </Show>
         </FieldGroup>
@@ -162,7 +200,7 @@ export function EditApiKeyDialog(props: {
           <DialogClose as={Button} variant="outline">
             {auth.localization.settings.cancel}
           </DialogClose>
-          <Button disabled={updateApiKey.isPending} type="submit">
+          <Button disabled={isPending()} type="submit">
             {auth.localization.settings.saveChanges}
           </Button>
         </DialogFooter>
