@@ -56,6 +56,11 @@
       "types": "./dist/plugins/api-key/server.d.ts",
       "import": "./dist/plugins/api-key/server.js"
     },
+    "./plugins/billing": {
+      "src": "./src/plugins/billing/index.ts",
+      "types": "./dist/plugins/billing/index.d.ts",
+      "import": "./dist/plugins/billing/index.js"
+    },
     "./plugins/delete-user": {
       "src": "./src/plugins/delete-user/index.ts",
       "types": "./dist/plugins/delete-user/index.d.ts",

@@ -1,0 +1,163 @@
+---
+title: Billing
+description: Add pricing, subscriptions, checkout, seats, usage, and billing management without coupling the UI to one provider.
+---
+
+import { Callout } from "fumadocs-ui/components/callout"
+import { Step, Steps } from "fumadocs-ui/components/steps"
+
+The billing plugin adds a complete billing tab to personal or organization settings. Every component reads a provider-neutral `BillingAdapter`. BAUI includes adapters for Better Auth's Stripe and Polar plugins, and you can implement the same interface for another billing service.
+
+The UI includes:
+
+- Pricing plans with monthly, yearly, and one-time prices
+- Current subscription status
+- Checkout and plan changes
+- Billing portal access
+- Cancellation and restoration
+- Seat management
+- Metered usage
+- Personal and organization billing
+
+## Setup
+
+<Steps>
+<Step>
+### Configure a Better Auth billing plugin
+
+Use the [Better Auth Stripe plugin](https://www.better-auth.com/docs/beta/plugins/stripe) or the [Better Auth Polar plugin](https://www.better-auth.com/docs/plugins/polar) on the server and client. Apply the plugin's database schema before you open the billing page.
+
+</Step>
+<Step>
+### Install the registry item
+
+```bash
+bunx shadcn@latest registry add @better-auth-ui=https://better-auth-ui.com/r/{style}/{name}.json
+bunx shadcn@latest add @better-auth-ui/billing
+```
+
+This installs the billing views, the local plugin factory, and the required shadcn/ui components.
+
+</Step>
+<Step>
+### Create an adapter
+
+Define the plans once in BAUI's generic format. Amounts use the currency's smallest unit. For example, `2000` USD means `$20.00`.
+
+```ts title="lib/billing.ts"
+import {
+  type BillingPlan,
+  createStripeBillingAdapter
+} from "@better-auth-ui/core/plugins/billing"
+
+import { authClient } from "@/lib/auth-client"
+
+const plans = [
+  {
+    id: "pro",
+    name: "Pro",
+    description: "For teams shipping production applications.",
+    prices: [
+      { id: "pro-month", amount: 2000, currency: "USD", interval: "month" },
+      { id: "pro-year", amount: 19200, currency: "USD", interval: "year" }
+    ],
+    features: ["Unlimited projects", "Priority support"],
+    highlighted: true,
+    seatBased: true
+  }
+] satisfies BillingPlan[]
+
+export const billingAdapter = createStripeBillingAdapter(authClient, {
+  plans,
+  successUrl: "/settings/billing?checkout=success",
+  cancelUrl: "/settings/billing?checkout=canceled",
+  returnUrl: "/settings/billing"
+})
+```
+
+</Step>
+<Step>
+### Register the plugin
+
+```tsx title="components/providers.tsx"
+import { billingPlugin } from "@/lib/auth/billing-plugin"
+import { billingAdapter } from "@/lib/billing"
+
+<AuthProvider
+  authClient={authClient}
+  navigate={navigate}
+  plugins={[
+    organizationPlugin(),
+    billingPlugin({
+      adapter: billingAdapter,
+      user: true,
+      organization: true
+    })
+  ]}
+>
+  {children}
+</AuthProvider>
+```
+
+Organization requests always include the organization ID and slug. Your custom adapter must authorize the requested organization. Do not infer it from active organization state.
+
+</Step>
+</Steps>
+
+## Polar adapter
+
+Map each BAUI plan ID to a Polar product ID or checkout slug. The adapter uses the mapping in both directions, so the UI can match a Polar subscription to its BAUI plan.
+
+```ts title="lib/billing.ts"
+import { createPolarBillingAdapter } from "@better-auth-ui/core/plugins/billing"
+
+export const billingAdapter = createPolarBillingAdapter(authClient, {
+  plans,
+  products: {
+    pro: { type: "product", value: "123e4567-e89b-12d3-a456-426614174000" }
+  },
+  successUrl: "/settings/billing?checkout=success",
+  cancelUrl: "/settings/billing?checkout=canceled",
+  returnUrl: "/settings/billing"
+})
+```
+
+Polar handles cancellation, restoration, and seat changes in its customer portal. BAUI opens that portal for those actions. Stripe performs them through Better Auth's subscription endpoints.
+
+## Custom adapters
+
+Implement `BillingAdapter` when you use another provider. Keep provider SDK objects inside the adapter and return only BAUI's generic plan, subscription, usage, and action types.
+
+```ts
+import type { BillingAdapter } from "@better-auth-ui/core/plugins/billing"
+
+export const billingAdapter: BillingAdapter = {
+  id: "custom",
+  listPlans: async (scope, signal) => billingApi.listPlans(scope, signal),
+  getState: async (scope, signal) => billingApi.getState(scope, signal),
+  checkout: async (scope, input) => billingApi.checkout(scope, input),
+  openPortal: async (scope) => billingApi.openPortal(scope),
+  cancel: async (scope, subscriptionId) =>
+    billingApi.cancel(scope, subscriptionId),
+  restore: async (scope, subscriptionId) =>
+    billingApi.restore(scope, subscriptionId),
+  updateSeats: async (scope, subscriptionId, seats) =>
+    billingApi.updateSeats(scope, subscriptionId, seats)
+}
+```
+
+<Callout type="warn" title="Authorize every scope">
+The browser can change organization IDs and slugs. Validate membership and billing permissions on the server for every adapter operation.
+</Callout>
+
+## Headless hooks
+
+React and Solid export the same provider-neutral hooks from `@better-auth-ui/react/plugins/billing` and `@better-auth-ui/solid/plugins/billing`:
+
+- `useBillingPlans`
+- `useBillingState`
+- `useBillingCheckout`
+- `useBillingPortal`
+- `useCancelBillingSubscription`
+- `useRestoreBillingSubscription`
+- `useUpdateBillingSeats`

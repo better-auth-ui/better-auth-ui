@@ -44,6 +44,11 @@
       "types": "./dist/plugins/captcha/index.d.ts",
       "import": "./dist/plugins/captcha/index.js"
     },
+    "./plugins/billing": {
+      "src": "./src/plugins/billing/index.ts",
+      "types": "./dist/plugins/billing/index.d.ts",
+      "import": "./dist/plugins/billing/index.js"
+    },
     "./plugins/device-authorization": {
       "src": "./src/plugins/device-authorization/index.ts",
       "types": "./dist/plugins/device-authorization/index.d.ts",

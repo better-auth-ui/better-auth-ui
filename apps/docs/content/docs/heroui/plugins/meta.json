@@ -5,6 +5,7 @@
     "admin",
     "anonymous",
     "api-key",
+    "billing",
     "captcha",
     "delete-user",
     "device-authorization",

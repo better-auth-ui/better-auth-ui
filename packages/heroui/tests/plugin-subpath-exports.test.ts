@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest"
 import * as apiKey from "../src/plugins/api-key"
+import * as billing from "../src/plugins/billing"
 import * as deleteUser from "../src/plugins/delete-user"
 import * as emailOtp from "../src/plugins/email-otp"
 import * as magicLink from "../src/plugins/magic-link"
@@ -16,6 +17,11 @@ describe("HeroUI plugin subpath exports", () => {
     expect(apiKey).toHaveProperty("ApiKeys")
     expect(apiKey).toHaveProperty("OrganizationApiKeys")
     expect(apiKey).toHaveProperty("apiKeyPlugin")
+
+    expect(billing).toHaveProperty("BillingSettings")
+    expect(billing).toHaveProperty("UserBillingSettings")
+    expect(billing).toHaveProperty("OrganizationBillingSettings")
+    expect(billing).toHaveProperty("billingPlugin")
 
     expect(deleteUser).toHaveProperty("DangerZone")
     expect(deleteUser).toHaveProperty("DeleteAccount")

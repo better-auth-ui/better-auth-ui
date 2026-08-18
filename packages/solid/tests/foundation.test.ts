@@ -74,6 +74,7 @@ describe("@better-auth-ui/solid foundation", () => {
       "./plugins/admin",
       "./plugins/anonymous",
       "./plugins/api-key",
+      "./plugins/billing",
       "./plugins/captcha",
       "./plugins/device-authorization",
       "./plugins/email-otp",
@@ -90,6 +91,7 @@ describe("@better-auth-ui/solid foundation", () => {
     ])
     expect(metadata.exports).toHaveProperty("./email")
     expect(metadata.exports).toHaveProperty("./plugins/api-key")
+    expect(metadata.exports).toHaveProperty("./plugins/billing")
   })
 
   it("declares Solid runtime peers needed by the public surface", () => {

@@ -38,6 +38,7 @@ export default defineConfig({
         "plugins/anonymous/index": "src/plugins/anonymous/index.ts",
         "plugins/api-key/index": "src/plugins/api-key/index.ts",
         "plugins/captcha/index": "src/plugins/captcha/index.ts",
+        "plugins/billing/index": "src/plugins/billing/index.ts",
         "plugins/device-authorization/index":
           "src/plugins/device-authorization/index.ts",
         "plugins/email-otp/index": "src/plugins/email-otp/index.ts",

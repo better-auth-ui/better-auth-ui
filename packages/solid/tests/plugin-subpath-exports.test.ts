@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest"
 import * as admin from "../src/plugins/admin"
 import * as anonymous from "../src/plugins/anonymous"
 import * as apiKey from "../src/plugins/api-key"
+import * as billing from "../src/plugins/billing"
 import * as captcha from "../src/plugins/captcha"
 import * as deviceAuthorization from "../src/plugins/device-authorization"
 import * as emailOtp from "../src/plugins/email-otp"
@@ -22,6 +23,13 @@ describe("Solid plugin subpath exports", () => {
     expect(apiKey).toHaveProperty("useDeleteApiKey")
     expect(apiKey).toHaveProperty("useUpdateApiKey")
     expect(apiKey).toHaveProperty("useListApiKeys")
+    expect(billing).toHaveProperty("useBillingPlans")
+    expect(billing).toHaveProperty("useBillingState")
+    expect(billing).toHaveProperty("useBillingCheckout")
+    expect(billing).toHaveProperty("useBillingPortal")
+    expect(billing).toHaveProperty("useCancelBillingSubscription")
+    expect(billing).toHaveProperty("useRestoreBillingSubscription")
+    expect(billing).toHaveProperty("useUpdateBillingSeats")
 
     expect(passkey).toHaveProperty("useAddPasskey")
     expect(passkey).toHaveProperty("useDeletePasskey")
@@ -78,6 +86,8 @@ describe("Solid plugin subpath exports", () => {
 
   it("keeps core-owned mutation factories out of framework plugin entrypoints", () => {
     expect(apiKey).not.toHaveProperty("createApiKeyOptions")
+    expect(billing).not.toHaveProperty("billingPlansOptions")
+    expect(billing).not.toHaveProperty("billingCheckoutOptions")
     expect(anonymous).not.toHaveProperty("signInAnonymousOptions")
     expect(oneTap).not.toHaveProperty("promptOneTapOptions")
     expect(admin).not.toHaveProperty("stopImpersonatingOptions")
@@ -126,6 +136,7 @@ describe("Solid plugin subpath exports", () => {
     expect(solid).not.toHaveProperty("oneTapPlugin")
     expect(solid).not.toHaveProperty("useCancelInvitation")
     expect(solid).not.toHaveProperty("useListApiKeys")
+    expect(solid).not.toHaveProperty("useBillingState")
     expect(solid).not.toHaveProperty("useListPasskeys")
     expect(solid).not.toHaveProperty("useSignInEmailOtp")
     expect(solid).not.toHaveProperty("useOAuthConsent")

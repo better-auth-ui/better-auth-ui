@@ -10,6 +10,7 @@ export default defineConfig({
         "plugins/admin/index": "src/plugins/admin/index.ts",
         "plugins/anonymous/index": "src/plugins/anonymous/index.ts",
         "plugins/api-key/index": "src/plugins/api-key/index.ts",
+        "plugins/billing/index": "src/plugins/billing/index.ts",
         "plugins/api-key/server": "src/plugins/api-key/server.ts",
         "plugins/delete-user/index": "src/plugins/delete-user/index.ts",
         "plugins/device-authorization/index":
