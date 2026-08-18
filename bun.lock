@@ -408,6 +408,7 @@
         "vitest": "^4.1.9",
       },
       "peerDependencies": {
+        "@better-auth/agent-auth": ">=0.6.2",
         "@better-auth/api-key": ">=1.7.0",
         "@better-auth/oauth-provider": ">=1.7.0",
         "@better-auth/passkey": ">=1.7.0",
@@ -419,6 +420,7 @@
         "better-auth": ">=1.7.0",
       },
       "optionalPeers": [
+        "@better-auth/agent-auth",
         "@better-auth/api-key",
         "@better-auth/oauth-provider",
         "@better-auth/passkey",
