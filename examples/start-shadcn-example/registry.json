@@ -149,6 +149,50 @@
       ]
     },
     {
+      "name": "agent-auth",
+      "type": "registry:component",
+      "title": "Agent Auth",
+      "description": "Capability approval and grant revocation UI for Better Auth Agent Auth.",
+      "dependencies": [
+        "@better-auth-ui/react@latest",
+        "@better-auth-ui/core@latest",
+        "@better-auth/agent-auth@latest",
+        "better-auth",
+        "lucide-react"
+      ],
+      "registryDependencies": [
+        "alert-dialog",
+        "badge",
+        "button",
+        "card",
+        "checkbox",
+        "skeleton",
+        "spinner"
+      ],
+      "files": [
+        {
+          "path": "src/lib/auth/auth-plugin.ts",
+          "type": "registry:lib",
+          "target": "@lib/auth/auth-plugin.ts"
+        },
+        {
+          "path": "src/lib/auth/agent-auth-plugin.ts",
+          "type": "registry:lib",
+          "target": "@lib/auth/agent-auth-plugin.ts"
+        },
+        {
+          "path": "src/components/auth/agent-auth/agent-approval.tsx",
+          "type": "registry:component",
+          "target": "@components/auth/agent-auth/agent-approval.tsx"
+        },
+        {
+          "path": "src/components/auth/agent-auth/agent-authorizations.tsx",
+          "type": "registry:component",
+          "target": "@components/auth/agent-auth/agent-authorizations.tsx"
+        }
+      ]
+    },
+    {
       "name": "sso",
       "type": "registry:component",
       "title": "SSO and Email-First Sign In",

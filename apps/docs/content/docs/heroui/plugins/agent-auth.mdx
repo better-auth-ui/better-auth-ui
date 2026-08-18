@@ -1,0 +1,131 @@
+---
+title: Agent Auth
+description: Review agent capability requests and revoke granted access.
+---
+
+import { Callout } from 'fumadocs-ui/components/callout'
+import { Step, Steps } from 'fumadocs-ui/components/steps'
+
+The Agent Auth plugin adds the application-owned UI that the protocol does not render. It shows the requesting agent, host, mode, capabilities, and required approval strength. Users can allow selected capabilities or deny the request. A security settings card lists agents and revokes individual active grants.
+
+## Setup
+
+<Steps>
+<Step>
+### Configure Agent Auth on the server
+
+Point `deviceAuthorizationPage` at the BAUI route. Define each capability with a clear description and the approval strength it needs.
+
+```ts title="lib/auth.ts"
+import { agentAuth } from "@better-auth/agent-auth"
+import { betterAuth } from "better-auth"
+
+export const auth = betterAuth({
+  plugins: [
+    agentAuth({
+      deviceAuthorizationPage: "/auth/agent-approval",
+      capabilities: [
+        {
+          name: "invoices:read",
+          description: "Read invoices and payment status",
+          approvalStrength: "session"
+        },
+        {
+          name: "invoices:pay",
+          description: "Pay an invoice with a saved method",
+          approvalStrength: "webauthn"
+        }
+      ]
+    })
+  ]
+})
+```
+
+Apply the Agent Auth schema after enabling the plugin. See the [Better Auth Agent Auth guide](https://www.better-auth.com/docs/plugins/agent-auth).
+
+</Step>
+<Step>
+### Add the client plugin and adapter
+
+```ts title="lib/auth-client.ts"
+import { agentAuthClient } from "@better-auth/agent-auth/client"
+import { createAgentAuthClientAdapter } from "@better-auth-ui/core/plugins/agent-auth"
+import { createAuthClient } from "better-auth/react"
+
+export const authClient = createAuthClient({
+  plugins: [agentAuthClient()]
+})
+
+export const agentAuthAdapter = createAgentAuthClientAdapter(authClient)
+```
+
+The native adapter combines the agent record, pending grants, and capability catalog into one presentation model. It also provides grant listing and revocation.
+
+</Step>
+<Step>
+### Register the UI plugin
+
+```tsx title="components/providers.tsx"
+import { AuthProvider } from "@better-auth-ui/heroui"
+import { agentAuthPlugin } from "@better-auth-ui/heroui/plugins/agent-auth"
+
+<AuthProvider
+  authClient={authClient}
+  navigate={navigate}
+  plugins={[agentAuthPlugin({ adapter: agentAuthAdapter })]}
+>
+  {children}
+</AuthProvider>
+```
+
+</Step>
+<Step>
+### Allow the approval path
+
+Your route that renders `<Auth />` must accept `agent-approval`. Keep this path equal to `deviceAuthorizationPage`. The view preserves the full approval URL when it sends a signed-out user to sign in.
+
+```tsx title="routes/auth/$path.tsx"
+const validAuthPathSegments = new Set([
+  ...Object.values(viewPaths.auth),
+  agentAuthPlugin({ adapter: agentAuthAdapter }).viewPaths.auth.agentApproval
+])
+```
+
+</Step>
+</Steps>
+
+## Passkey approvals
+
+Capabilities with `approvalStrength: "webauthn"` return a WebAuthn challenge. Connect your passkey library through `authenticateWithPasskey`. BAUI retries the same approval with the signed response.
+
+```ts title="lib/auth-client.ts"
+export const agentAuthAdapter = createAgentAuthClientAdapter(authClient, {
+  authenticateWithPasskey: async (options) => {
+    return runPasskeyAuthentication(options)
+  }
+})
+```
+
+<Callout type="warn" title="Passkey enrollment">
+The user must have a passkey before approving a capability that requires WebAuthn. Show your normal passkey enrollment flow when the server reports that no passkey is enrolled.
+</Callout>
+
+## Approval and grant views
+
+`<AgentApproval />` reads `agent_id`, `approval_id`, and `code` from the current URL. It lets the user approve a subset of pending capabilities.
+
+`<AgentAuthorizations />` appears in security settings by default. Set `grants: false` to hide it. You can also render either component directly from `@better-auth-ui/heroui/plugins/agent-auth`.
+
+## Custom adapters
+
+Implement `AgentAuthAdapter` when your application resolves autonomous-agent approval details through a server route or needs a custom policy layer. The UI does not depend on Better Auth response shapes after the adapter boundary.
+
+<auto-type-table path="../../../../../../packages/core/src/plugins/agent-auth/agent-auth-adapter.ts" name="AgentAuthAdapter" />
+
+## Options
+
+<auto-type-table path="../../../../../../packages/core/src/plugins/agent-auth/agent-auth-plugin.ts" name="AgentAuthPluginOptions" />
+
+## Localization
+
+<auto-type-table path="../../../../../../packages/core/src/plugins/agent-auth/agent-auth-localization.ts" name="AgentAuthLocalization" />

@@ -72,6 +72,7 @@ describe("@better-auth-ui/solid foundation", () => {
       ".",
       "./email",
       "./plugins/admin",
+      "./plugins/agent-auth",
       "./plugins/anonymous",
       "./plugins/api-key",
       "./plugins/billing",

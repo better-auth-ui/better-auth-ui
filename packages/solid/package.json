@@ -39,6 +39,10 @@
       "types": "./dist/plugins/admin/index.d.ts",
       "import": "./dist/plugins/admin/index.js"
     },
+    "./plugins/agent-auth": {
+      "types": "./dist/plugins/agent-auth/index.d.ts",
+      "import": "./dist/plugins/agent-auth/index.js"
+    },
     "./plugins/anonymous": {
       "types": "./dist/plugins/anonymous/index.d.ts",
       "import": "./dist/plugins/anonymous/index.js"

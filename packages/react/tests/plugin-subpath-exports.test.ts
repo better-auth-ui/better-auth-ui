@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest"
 import * as admin from "../src/plugins/admin"
+import * as agentAuth from "../src/plugins/agent-auth"
 import * as anonymous from "../src/plugins/anonymous"
 import * as apiKey from "../src/plugins/api-key"
 import * as billing from "../src/plugins/billing"
@@ -20,6 +21,11 @@ import * as username from "../src/plugins/username"
 
 describe("React plugin subpath exports", () => {
   it("publishes plugin-specific hooks and queries from plugin-scoped entrypoints", () => {
+    expect(agentAuth).toHaveProperty("useAgentApproval")
+    expect(agentAuth).toHaveProperty("useAgentAuthorizations")
+    expect(agentAuth).toHaveProperty("useApproveAgent")
+    expect(agentAuth).toHaveProperty("useDenyAgent")
+    expect(agentAuth).toHaveProperty("useRevokeAgentCapability")
     expect(apiKey).toHaveProperty("useCreateApiKey")
     expect(apiKey).toHaveProperty("useDeleteApiKey")
     expect(apiKey).toHaveProperty("useUpdateApiKey")
@@ -91,6 +97,7 @@ describe("React plugin subpath exports", () => {
   })
 
   it("keeps core-owned mutation factories out of framework plugin entrypoints", () => {
+    expect(agentAuth).not.toHaveProperty("approveAgentOptions")
     expect(apiKey).not.toHaveProperty("createApiKeyOptions")
     expect(billing).not.toHaveProperty("billingPlansOptions")
     expect(billing).not.toHaveProperty("billingCheckoutOptions")

@@ -30,6 +30,7 @@ export default defineConfig({
         email: "src/email.ts",
         plugins: "src/plugins.ts",
         "plugins/admin/index": "src/plugins/admin/index.ts",
+        "plugins/agent-auth/index": "src/plugins/agent-auth/index.ts",
         "plugins/api-key/index": "src/plugins/api-key/index.ts",
         "plugins/billing/index": "src/plugins/billing/index.ts",
         "plugins/delete-user/index": "src/plugins/delete-user/index.ts",

@@ -16,10 +16,12 @@ const indexComponents = [
 
 // Components and plugin factories surfaced by the
 // `@better-auth-ui/heroui/plugins` entry. Plugin-internal components like
-// `MagicLinkButton` and `PasskeyButton` are not re-exported — they're only
+// `MagicLinkButton` and `PasskeyButton` are not re-exported. They are only
 // used as `authButtons` slot contributions on the plugin objects.
 const pluginsExports = [
   "AcceptInvitation",
+  "AgentApproval",
+  "AgentAuthorizations",
   "StopImpersonating",
   "DeviceAuthorization",
   "MagicLink",
@@ -31,6 +33,7 @@ const pluginsExports = [
   "WalletAccounts",
   "UsernameField",
   "adminPlugin",
+  "agentAuthPlugin",
   "anonymousPlugin",
   "deviceAuthorizationPlugin",
   "lastLoginMethodPlugin",

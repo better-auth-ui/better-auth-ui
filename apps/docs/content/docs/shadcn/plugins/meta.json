@@ -3,6 +3,7 @@
   "defaultOpen": true,
   "pages": [
     "admin",
+    "agent-auth",
     "anonymous",
     "api-key",
     "billing",

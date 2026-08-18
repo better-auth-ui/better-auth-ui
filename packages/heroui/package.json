@@ -31,6 +31,11 @@
       "types": "./dist/plugins/admin/index.d.ts",
       "import": "./dist/plugins/admin/index.js"
     },
+    "./plugins/agent-auth": {
+      "src": "./src/plugins/agent-auth/index.ts",
+      "types": "./dist/plugins/agent-auth/index.d.ts",
+      "import": "./dist/plugins/agent-auth/index.js"
+    },
     "./plugins/api-key": {
       "src": "./src/plugins/api-key/index.ts",
       "types": "./dist/plugins/api-key/index.d.ts",

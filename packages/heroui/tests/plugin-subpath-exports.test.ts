@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest"
+import * as agentAuth from "../src/plugins/agent-auth"
 import * as apiKey from "../src/plugins/api-key"
 import * as billing from "../src/plugins/billing"
 import * as deleteUser from "../src/plugins/delete-user"
@@ -15,6 +16,9 @@ import * as username from "../src/plugins/username"
 
 describe("HeroUI plugin subpath exports", () => {
   it("publishes plugin-specific components and plugin factories from scoped entrypoints", () => {
+    expect(agentAuth).toHaveProperty("AgentApproval")
+    expect(agentAuth).toHaveProperty("AgentAuthorizations")
+    expect(agentAuth).toHaveProperty("agentAuthPlugin")
     expect(apiKey).toHaveProperty("ApiKeys")
     expect(apiKey).toHaveProperty("OrganizationApiKeys")
     expect(apiKey).toHaveProperty("apiKeyPlugin")

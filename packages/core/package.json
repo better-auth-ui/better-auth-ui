@@ -36,6 +36,11 @@
       "types": "./dist/plugins/admin/index.d.ts",
       "import": "./dist/plugins/admin/index.js"
     },
+    "./plugins/agent-auth": {
+      "src": "./src/plugins/agent-auth/index.ts",
+      "types": "./dist/plugins/agent-auth/index.d.ts",
+      "import": "./dist/plugins/agent-auth/index.js"
+    },
     "./plugins/anonymous": {
       "src": "./src/plugins/anonymous/index.ts",
       "types": "./dist/plugins/anonymous/index.d.ts",
@@ -168,6 +173,7 @@
     }
   },
   "devDependencies": {
+    "@better-auth/agent-auth": "0.6.2",
     "@better-auth/api-key": "1.7.0",
     "@better-auth/oauth-provider": "1.7.0",
     "@better-auth/passkey": "1.7.0",
@@ -180,6 +186,7 @@
     "vitest": "^4.1.9"
   },
   "peerDependencies": {
+    "@better-auth/agent-auth": ">=0.6.2",
     "@better-auth/api-key": ">=1.7.0",
     "@better-auth/oauth-provider": ">=1.7.0",
     "@better-auth/passkey": ">=1.7.0",
@@ -191,6 +198,9 @@
     "better-auth": ">=1.7.0"
   },
   "peerDependenciesMeta": {
+    "@better-auth/agent-auth": {
+      "optional": true
+    },
     "@better-auth/api-key": {
       "optional": true
     },

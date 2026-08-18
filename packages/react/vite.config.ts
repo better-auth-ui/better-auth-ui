@@ -10,6 +10,7 @@ export default defineConfig({
         index: "src/index.ts",
         email: "src/email.ts",
         "plugins/admin/index": "src/plugins/admin/index.ts",
+        "plugins/agent-auth/index": "src/plugins/agent-auth/index.ts",
         "plugins/anonymous/index": "src/plugins/anonymous/index.ts",
         "plugins/api-key/index": "src/plugins/api-key/index.ts",
         "plugins/captcha/index": "src/plugins/captcha/index.ts",

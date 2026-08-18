@@ -8,6 +8,7 @@ export default defineConfig({
       entry: {
         index: "src/index.ts",
         "plugins/admin/index": "src/plugins/admin/index.ts",
+        "plugins/agent-auth/index": "src/plugins/agent-auth/index.ts",
         "plugins/anonymous/index": "src/plugins/anonymous/index.ts",
         "plugins/api-key/index": "src/plugins/api-key/index.ts",
         "plugins/billing/index": "src/plugins/billing/index.ts",

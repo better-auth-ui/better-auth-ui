@@ -1,0 +1,38 @@
+export const agentAuthLocalization = {
+  approvalTitle: "Approve agent access",
+  approvalDescription: "Review what this agent wants to do on your behalf.",
+  requestedCapabilities: "Requested capabilities",
+  requestReason: "Reason",
+  constraints: "Limits",
+  delegatedAgent: "Delegated agent",
+  autonomousAgent: "Autonomous agent",
+  approvalNone: "No extra check",
+  approvalSession: "Recent sign-in",
+  approvalWebauthn: "Passkey required",
+  allow: "Allow selected",
+  deny: "Deny",
+  approvedTitle: "Access approved",
+  approvedDescription: "The agent can now use the capabilities you selected.",
+  deniedTitle: "Access denied",
+  deniedDescription: "The agent did not receive access.",
+  noCapabilities: "This request has no pending capabilities.",
+  invalidRequest: "This approval link is missing the agent identifier.",
+  approvalError: "We could not update this request. Try again.",
+  agents: "Agent access",
+  agentsDescription:
+    "Review agents and revoke capabilities you no longer trust.",
+  noAgents: "No agents have access to your account.",
+  active: "Active",
+  pending: "Pending",
+  denied: "Denied",
+  revoked: "Revoked",
+  expires: "Expires {date}",
+  lastUsed: "Last used {date}",
+  neverUsed: "Never used",
+  revoke: "Revoke",
+  revokeTitle: "Revoke capability?",
+  revokeDescription: "The agent will immediately lose this capability.",
+  confirmRevoke: "Revoke capability"
+} as const
+
+export type AgentAuthLocalization = typeof agentAuthLocalization
