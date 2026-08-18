@@ -568,7 +568,7 @@
       "name": "oauth-provider",
       "type": "registry:component",
       "title": "OAuth Provider",
-      "description": "OAuth Provider plugin: authorization consent screen, prompt=create sign-up continuation, account chooser, and a connected applications security card for Better Auth authorization requests.",
+      "description": "OAuth Provider plugin: authorization screens, connected applications, and personal or organization OAuth client management.",
       "dependencies": [
         "@better-auth-ui/react@latest",
         "@better-auth-ui/core@latest",
@@ -582,11 +582,18 @@
         "badge",
         "button",
         "card",
+        "dialog",
         "empty",
+        "field",
+        "input",
+        "input-group",
         "item",
+        "select",
         "separator",
         "skeleton",
         "spinner",
+        "switch",
+        "textarea",
         "https://better-auth-ui.com/r/radix-nova/sign-up.json",
         "https://better-auth-ui.com/r/radix-nova/user-avatar.json"
       ],
@@ -600,6 +607,11 @@
           "path": "src/lib/auth/oauth-provider-plugin.ts",
           "type": "registry:lib",
           "target": "@lib/auth/oauth-provider-plugin.ts"
+        },
+        {
+          "path": "src/components/auth/oauth-provider/oauth-clients.tsx",
+          "type": "registry:component",
+          "target": "@components/auth/oauth-provider/oauth-clients.tsx"
         },
         {
           "path": "src/components/auth/oauth-provider/oauth-consent.tsx",

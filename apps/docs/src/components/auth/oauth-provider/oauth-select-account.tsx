@@ -1,9 +1,9 @@
 "use client"
 
 import type { ListDeviceSession } from "@better-auth-ui/core/plugins/multi-session"
+import type { OAuthProviderMultiSessionAuthClient } from "@better-auth-ui/core/plugins/oauth-provider"
 import {
   type OAuthAuthorizationRequest,
-  type OAuthProviderMultiSessionAuthClient,
   parseOAuthAuthorizationRequest,
   sanitizeOAuthClientUrl
 } from "@better-auth-ui/core/plugins/oauth-provider"

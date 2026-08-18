@@ -2,6 +2,7 @@ import { createAuthPlugin } from "../../lib/create-auth-plugin"
 // Side-effect import so this file participates in declaration merging on the
 // same module instance that external consumers reach via `@better-auth-ui/core`.
 import type {} from "../../lib/view-paths"
+import type { OAuthClientManager } from "./oauth-client-manager"
 import {
   type OAuthProviderLocalization,
   oauthProviderLocalization
@@ -17,6 +18,11 @@ declare module "../../lib/view-paths" {
     oauthSignUp?: string
     /** @default "select-account" */
     oauthSelectAccount?: string
+  }
+
+  interface SettingsViewPaths {
+    /** @default "oauth-clients" */
+    oauthClients?: string
   }
 }
 
@@ -147,6 +153,23 @@ export type OAuthProviderPluginOptions = {
    * @default true
    */
   showConnectedApplications?: boolean
+  /**
+   * Add personal OAuth client developer settings backed by Better Auth.
+   * @default false
+   */
+  clientManagement?: boolean
+  /**
+   * Replace the personal Better Auth browser adapter with an application-owned
+   * manager. Use this for server-only operations such as enable or disable.
+   */
+  clientManager?: OAuthClientManager
+  /**
+   * Add organization developer settings backed by an application-owned
+   * manager. The UI passes the organization ID and slug on every operation.
+   */
+  organizationClientManager?: OAuthClientManager
+  /** @default "oauth-clients" */
+  clientManagementPath?: string
 }
 
 export const oauthProviderPlugin = createAuthPlugin(
@@ -158,11 +181,18 @@ export const oauthProviderPlugin = createAuthPlugin(
     },
     scopeMetadata: options.scopeMetadata,
     showConnectedApplications: options.showConnectedApplications ?? true,
+    clientManagement:
+      options.clientManagement ?? Boolean(options.clientManager),
+    clientManager: options.clientManager,
+    organizationClientManager: options.organizationClientManager,
     viewPaths: {
       auth: {
         oauthConsent: options.path ?? "oauth-consent",
         oauthSignUp: options.signUpPath ?? "oauth-sign-up",
         oauthSelectAccount: options.selectAccountPath ?? "select-account"
+      },
+      settings: {
+        oauthClients: options.clientManagementPath ?? "oauth-clients"
       }
     }
   })

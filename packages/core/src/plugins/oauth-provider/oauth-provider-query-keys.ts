@@ -22,5 +22,8 @@ export const oauthProviderQueryKeys = {
   listConsents: <TQuery = undefined>(
     userId: string | undefined,
     query?: TQuery
-  ) => [...oauthProviderQueryKeys.consents(userId), query ?? null] as const
+  ) => [...oauthProviderQueryKeys.consents(userId), query ?? null] as const,
+  /** OAuth clients owned by one explicit user or organization cache scope. */
+  clients: (ownerKey: string | undefined) =>
+    ["auth", "oauthProvider", "clients", ownerKey ?? null] as const
 } as const

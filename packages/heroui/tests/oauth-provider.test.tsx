@@ -6,6 +6,10 @@ import { afterEach, describe, expect, it, vi } from "vitest"
 import { Auth } from "../src/components/auth/auth"
 import { AuthProvider } from "../src/components/auth/auth-provider"
 import { AuthorizedApplications } from "../src/components/auth/oauth-provider/authorized-applications"
+import {
+  OrganizationOAuthClients,
+  UserOAuthClients
+} from "../src/components/auth/oauth-provider/oauth-clients"
 import { OAuthConsent } from "../src/components/auth/oauth-provider/oauth-consent"
 import { OAuthSelectAccount } from "../src/components/auth/oauth-provider/oauth-select-account"
 import { OAuthSignUp } from "../src/components/auth/oauth-provider/oauth-sign-up"
@@ -174,6 +178,30 @@ describe("oauthProviderPlugin (heroui)", () => {
     expect(
       oauthProviderPlugin({ showConnectedApplications: false }).securityCards
     ).toBeUndefined()
+  })
+
+  it("registers personal and explicitly scoped organization client settings", () => {
+    const manager = {
+      list: vi.fn(async () => []),
+      create: vi.fn(),
+      update: vi.fn(),
+      delete: vi.fn(),
+      rotateSecret: vi.fn()
+    }
+    const plugin = oauthProviderPlugin({
+      clientManagement: true,
+      organizationClientManager: manager
+    })
+
+    expect(plugin.settingsTabs?.[0]).toMatchObject({
+      view: "oauthClients",
+      component: UserOAuthClients
+    })
+    expect(plugin.organizationTabs?.[0]).toMatchObject({
+      id: "oauthClients",
+      path: "oauth-clients",
+      component: OrganizationOAuthClients
+    })
   })
 
   it("renders through the Auth plugin path dispatcher", async () => {

@@ -1,6 +1,8 @@
 import {
+  createOAuthClientOptions,
   deleteOAuthConsentOptions,
   listOAuthConsentsOptions,
+  oauthClientsOptions,
   oauthConsentOptions,
   oauthContinueOptions,
   oauthProviderMutationKeys,
@@ -12,6 +14,42 @@ import { describe, expect, it, vi } from "vitest"
 type MutationOptions = { mutationFn: (variables: unknown) => Promise<unknown> }
 
 describe("OAuth provider query and mutation options", () => {
+  it("partitions managed clients by explicit owner and forwards create input", async () => {
+    const manager = {
+      list: vi.fn(async () => []),
+      create: vi.fn(async (_owner, input) => ({
+        ...input,
+        client_id: "client-1"
+      })),
+      update: vi.fn(),
+      delete: vi.fn(),
+      rotateSecret: vi.fn()
+    }
+    const owner = {
+      type: "organization" as const,
+      organizationId: "org-1",
+      organizationSlug: "acme"
+    }
+    const ownerKey = "organization:org-1:acme"
+    const query = oauthClientsOptions(manager, owner, ownerKey)
+    const create = createOAuthClientOptions(manager, owner, ownerKey)
+
+    expect(query.queryKey).toEqual(oauthProviderQueryKeys.clients(ownerKey))
+    await (query.queryFn as NonNullable<typeof query.queryFn>)({
+      signal: new AbortController().signal
+    } as never)
+    await (create as MutationOptions).mutationFn({
+      client_name: "Acme CLI",
+      redirect_uris: ["https://example.com/callback"]
+    })
+
+    expect(manager.list).toHaveBeenCalledWith(owner, expect.any(AbortSignal))
+    expect(manager.create).toHaveBeenCalledWith(owner, {
+      client_name: "Acme CLI",
+      redirect_uris: ["https://example.com/callback"]
+    })
+  })
+
   it("loads public client metadata with a stable key", async () => {
     const publicClient = vi.fn(async ({ query }) => ({
       client_id: query.client_id

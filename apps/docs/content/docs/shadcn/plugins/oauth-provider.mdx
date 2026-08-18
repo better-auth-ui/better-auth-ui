@@ -6,7 +6,41 @@ description: Add OAuth 2.1 consent, sign-up, account selection, and connected ap
 import { Callout } from "fumadocs-ui/components/callout"
 import { Step, Steps } from "fumadocs-ui/components/steps"
 
-The OAuth Provider plugin covers the user-facing screens Better Auth's [OAuth 2.1 Provider](https://better-auth.com/docs/plugins/oauth-provider) redirects to, plus the security settings card for managing what the user has already authorized.
+The OAuth Provider plugin covers the user-facing screens Better Auth's [OAuth 2.1 Provider](https://better-auth.com/docs/plugins/oauth-provider) redirects to. It also provides connected application security settings and OAuth client developer settings.
+
+## Client management
+
+Enable personal client management to add an OAuth clients tab to user settings. The tab lists, creates, edits, deletes, and rotates secrets through Better Auth's signed-in client endpoints.
+
+```tsx
+oauthProviderPlugin({
+  clientManagement: true
+})
+```
+
+The client secret appears only after creation or rotation. The user must copy it before closing the dialog.
+
+Pass `clientManager` when personal clients also need server-only operations such as enable or disable. This manager uses `{ type: "user" }` as its owner. The UI shows the enable or disable control when the manager implements `setDisabled`.
+
+Organization clients need an application-owned `OAuthClientManager`. Every operation receives both the organization ID and slug. Authorize both values in your server endpoint. Do not infer the organization from active session state.
+
+```tsx
+oauthProviderPlugin({
+  organizationClientManager: {
+    list: (owner, signal) => api.oauthClients.list(owner, signal),
+    create: (owner, input) => api.oauthClients.create(owner, input),
+    update: (owner, clientId, update) =>
+      api.oauthClients.update(owner, clientId, update),
+    delete: (owner, clientId) => api.oauthClients.delete(owner, clientId),
+    rotateSecret: (owner, clientId) =>
+      api.oauthClients.rotateSecret(owner, clientId),
+    setDisabled: (owner, clientId, disabled) =>
+      api.oauthClients.setDisabled(owner, clientId, disabled)
+  }
+})
+```
+
+Better Auth 1.7 exposes enable or disable through server admin APIs, so BAUI does not call it from the default browser adapter.
 
 It contributes:
 

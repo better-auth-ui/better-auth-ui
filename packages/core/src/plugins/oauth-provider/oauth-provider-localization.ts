@@ -63,7 +63,69 @@ export const oauthProviderLocalization = {
   removeAuthorizationDescription:
     "This application will need your approval before receiving new access. Existing tokens may remain valid until they expire.",
   /** @remarks `"Remove"` */
-  remove: "Remove"
+  remove: "Remove",
+
+  /** @remarks `"OAuth clients"` */
+  oauthClients: "OAuth clients",
+  /** @remarks `"Create and manage applications that can request access to accounts."` */
+  oauthClientsDescription:
+    "Create and manage applications that can request access to accounts.",
+  /** @remarks `"No OAuth clients"` */
+  noOAuthClients: "No OAuth clients",
+  /** @remarks `"Create a client when your application is ready to use OAuth."` */
+  noOAuthClientsDescription:
+    "Create a client when your application is ready to use OAuth.",
+  /** @remarks `"Create client"` */
+  createClient: "Create client",
+  /** @remarks `"Edit client"` */
+  editClient: "Edit client",
+  /** @remarks `"Client name"` */
+  clientName: "Client name",
+  /** @remarks `"Application type"` */
+  applicationType: "Application type",
+  /** @remarks `"Web"` */
+  webApplication: "Web",
+  /** @remarks `"Native"` */
+  nativeApplication: "Native",
+  /** @remarks `"Redirect URLs"` */
+  redirectUrls: "Redirect URLs",
+  /** @remarks `"Enter one URL per line."` */
+  redirectUrlsDescription: "Enter one URL per line.",
+  /** @remarks `"Application URL"` */
+  applicationUrl: "Application URL",
+  /** @remarks `"Logo URL"` */
+  logoUrl: "Logo URL",
+  /** @remarks `"Scopes"` */
+  scopes: "Scopes",
+  /** @remarks `"Save changes"` */
+  saveChanges: "Save changes",
+  /** @remarks `"Client ID"` */
+  clientId: "Client ID",
+  /** @remarks `"Client secret"` */
+  clientSecret: "Client secret",
+  /** @remarks `"Copy this secret now. It will not be shown again."` */
+  clientSecretWarning: "Copy this secret now. It will not be shown again.",
+  /** @remarks `"Rotate secret"` */
+  rotateSecret: "Rotate secret",
+  /** @remarks `"Rotate client secret?"` */
+  rotateSecretTitle: "Rotate client secret?",
+  /** @remarks `"The current secret will stop working immediately."` */
+  rotateSecretDescription: "The current secret will stop working immediately.",
+  /** @remarks `"Delete client"` */
+  deleteClient: "Delete client",
+  /** @remarks `"Delete OAuth client?"` */
+  deleteClientTitle: "Delete OAuth client?",
+  /** @remarks `"This permanently removes the client and stops new authorization requests."` */
+  deleteClientDescription:
+    "This permanently removes the client and stops new authorization requests.",
+  /** @remarks `"Enabled"` */
+  enabled: "Enabled",
+  /** @remarks `"Disabled"` */
+  disabled: "Disabled",
+  /** @remarks `"Client created"` */
+  clientCreated: "Client created",
+  /** @remarks `"Secret rotated"` */
+  secretRotated: "Secret rotated"
 }
 
 export type OAuthProviderLocalization = typeof oauthProviderLocalization

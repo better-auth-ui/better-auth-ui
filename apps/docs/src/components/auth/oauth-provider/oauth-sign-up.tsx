@@ -1,9 +1,9 @@
 "use client"
 
+import type { OAuthProviderAuthClient } from "@better-auth-ui/core/plugins/oauth-provider"
 import {
   hasOAuthPrompt,
   type OAuthAuthorizationRequest,
-  type OAuthProviderAuthClient,
   parseOAuthAuthorizationRequest
 } from "@better-auth-ui/core/plugins/oauth-provider"
 import { useAuth, useAuthPlugin } from "@better-auth-ui/react"

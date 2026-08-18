@@ -1,8 +1,8 @@
 "use client"
 
+import type { OAuthProviderAuthClient } from "@better-auth-ui/core/plugins/oauth-provider"
 import {
   type AuthorizedOAuthApplication,
-  type OAuthProviderAuthClient,
   resolveOAuthScopeMetadata,
   sanitizeOAuthClientUrl
 } from "@better-auth-ui/core/plugins/oauth-provider"

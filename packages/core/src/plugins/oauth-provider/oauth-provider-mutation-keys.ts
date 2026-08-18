@@ -12,5 +12,10 @@ export const oauthProviderMutationKeys = {
   /** Key for resuming a signed authorization request after a redirect screen. */
   continue: ["auth", "oauthProvider", "continue"] as const,
   /** Key for deleting a stored OAuth consent record. */
-  deleteConsent: ["auth", "oauthProvider", "deleteConsent"] as const
+  deleteConsent: ["auth", "oauthProvider", "deleteConsent"] as const,
+  createClient: ["auth", "oauthProvider", "createClient"] as const,
+  updateClient: ["auth", "oauthProvider", "updateClient"] as const,
+  deleteClient: ["auth", "oauthProvider", "deleteClient"] as const,
+  rotateClientSecret: ["auth", "oauthProvider", "rotateClientSecret"] as const,
+  setClientDisabled: ["auth", "oauthProvider", "setClientDisabled"] as const
 } as const

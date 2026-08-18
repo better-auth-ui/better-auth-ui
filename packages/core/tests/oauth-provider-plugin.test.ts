@@ -1,5 +1,6 @@
-import { describe, expect, it } from "vitest"
+import { describe, expect, it, vi } from "vitest"
 import {
+  createBetterAuthOAuthClientManager,
   groupOAuthConsents,
   hasOAuthPrompt,
   type OAuthScopeMetadataDefinition,
@@ -16,6 +17,49 @@ import {
 const context = { clientId: "client-123", requestedScopes: ["openid"] }
 
 describe("oauthProviderPlugin", () => {
+  it("adapts Better Auth user client endpoints without accepting organization state", async () => {
+    const getClients = vi.fn(async () => [])
+    const createClient = vi.fn(async (input) => ({
+      ...input,
+      client_id: "client-1"
+    }))
+    const authClient = {
+      oauth2: {
+        getClients,
+        createClient,
+        updateClient: vi.fn(),
+        deleteClient: vi.fn(),
+        client: { rotateSecret: vi.fn() }
+      }
+    }
+    const manager = createBetterAuthOAuthClientManager(authClient as never)
+
+    await manager.list({ type: "user" })
+    await manager.create(
+      { type: "user" },
+      {
+        client_name: "Acme CLI",
+        redirect_uris: ["https://example.com/callback"]
+      }
+    )
+
+    expect(getClients).toHaveBeenCalledWith({
+      fetchOptions: { signal: undefined, throw: true }
+    })
+    expect(createClient).toHaveBeenCalledWith({
+      client_name: "Acme CLI",
+      redirect_uris: ["https://example.com/callback"],
+      fetchOptions: { throw: true }
+    })
+    await expect(
+      manager.list({
+        type: "organization",
+        organizationId: "org-1",
+        organizationSlug: "acme"
+      })
+    ).rejects.toThrow("cannot safely scope organization clients")
+  })
+
   it("registers its own routes without touching the built-in sign-up path", () => {
     const plugin = oauthProviderPlugin()
 
@@ -47,6 +91,8 @@ describe("oauthProviderPlugin", () => {
       signUpPath: "register",
       selectAccountPath: "accounts",
       showConnectedApplications: false,
+      clientManagement: true,
+      clientManagementPath: "developers",
       localization: { allow: "Approve" }
     })
 
@@ -54,6 +100,8 @@ describe("oauthProviderPlugin", () => {
     expect(plugin.viewPaths.auth.oauthSignUp).toBe("register")
     expect(plugin.viewPaths.auth.oauthSelectAccount).toBe("accounts")
     expect(plugin.showConnectedApplications).toBe(false)
+    expect(plugin.clientManagement).toBe(true)
+    expect(plugin.viewPaths.settings.oauthClients).toBe("developers")
     expect(plugin.localization).toMatchObject({
       allow: "Approve",
       cancel: oauthProviderLocalization.cancel
@@ -67,6 +115,21 @@ describe("oauthProviderPlugin", () => {
       resolver
     )
     expect(oauthProviderPlugin().scopeMetadata).toBeUndefined()
+  })
+
+  it("enables personal client settings when a manager is provided", () => {
+    const clientManager = {
+      list: vi.fn(),
+      create: vi.fn(),
+      update: vi.fn(),
+      delete: vi.fn(),
+      rotateSecret: vi.fn()
+    }
+
+    const plugin = oauthProviderPlugin({ clientManager })
+
+    expect(plugin.clientManagement).toBe(true)
+    expect(plugin.clientManager).toBe(clientManager)
   })
 
   it("parses and deduplicates scopes and prompts", () => {
@@ -140,6 +203,12 @@ describe("oauthProviderPlugin", () => {
       "auth",
       "oauthProvider",
       "deleteConsent"
+    ])
+    expect(oauthProviderQueryKeys.clients("organization:org-1:acme")).toEqual([
+      "auth",
+      "oauthProvider",
+      "clients",
+      "organization:org-1:acme"
     ])
   })
 
