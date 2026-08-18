@@ -408,6 +408,7 @@
         "@better-auth/api-key": ">=1.7.0",
         "@better-auth/oauth-provider": ">=1.7.0",
         "@better-auth/passkey": ">=1.7.0",
+        "@better-auth/sso": ">=1.7.0",
         "@mikkelscheike/email-provider-links": ">=5.2.1",
         "@tanstack/query-core": ">=5.101.2",
         "better-auth": ">=1.7.0",
@@ -416,6 +417,7 @@
         "@better-auth/api-key",
         "@better-auth/oauth-provider",
         "@better-auth/passkey",
+        "@better-auth/sso",
       ],
     },
     "packages/heroui": {
