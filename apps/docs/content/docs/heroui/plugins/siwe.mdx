@@ -1,0 +1,114 @@
+---
+title: Sign in with Ethereum
+description: Add ERC-4361 wallet sign-in, optional email collection, and wallet account settings.
+---
+
+import { Callout } from 'fumadocs-ui/components/callout'
+import { Step, Steps } from 'fumadocs-ui/components/steps'
+
+The SIWE plugin adds an Ethereum wallet button to the sign-in form. It requests a nonce, builds an ERC-4361 message, signs it, and verifies it with Better Auth.
+
+You can also add a wallet settings card. The card lists connected wallets, changes the primary wallet, and removes wallets.
+
+## Setup
+
+<Steps>
+<Step>
+### Configure Better Auth
+
+Add `siwe()` to the server. Supply a secure nonce generator and an ERC-4361 message verifier.
+
+```ts title="lib/auth.ts"
+import { generateSiweNonce, parseSiweMessage, verifySiweMessage } from "viem/siwe"
+import { betterAuth } from "better-auth"
+import { siwe } from "better-auth/plugins"
+
+export const auth = betterAuth({
+  plugins: [
+    siwe({
+      domain: "app.example.com",
+      getNonce: async () => generateSiweNonce(),
+      verifyMessage: async ({ message, signature, address }) =>
+        verifySiweMessage({ message: parseSiweMessage(message), signature, address })
+    })
+  ]
+})
+```
+
+Apply the SIWE schema before using the plugin. See the [Better Auth SIWE guide](https://www.better-auth.com/docs/plugins/siwe).
+
+</Step>
+<Step>
+### Add the client plugin
+
+```ts title="lib/auth-client.ts"
+import { createAuthClient } from "better-auth/react"
+import { siweClient } from "better-auth/client/plugins"
+
+export const authClient = createAuthClient({ plugins: [siweClient()] })
+```
+
+</Step>
+<Step>
+### Register the UI plugin
+
+The included connector uses an injected EIP-1193 wallet. You can provide another connector for Wagmi or another wallet library.
+
+```tsx title="components/providers.tsx"
+import { createEip1193WalletConnector } from "@better-auth-ui/core/plugins/siwe"
+import { AuthProvider } from "@better-auth-ui/heroui"
+import { siwePlugin } from "@better-auth-ui/heroui/plugins/siwe"
+
+<AuthProvider
+  authClient={authClient}
+  navigate={navigate}
+  plugins={[
+    siwePlugin({
+      connector: createEip1193WalletConnector(),
+      domain: "app.example.com",
+      uri: "https://app.example.com",
+      email: "optional",
+      statement: "Sign in to Example"
+    })
+  ]}
+>
+  {children}
+</AuthProvider>
+```
+
+</Step>
+</Steps>
+
+## Wallet settings
+
+Better Auth does not expose browser endpoints for listing or changing SIWE wallets. Add authenticated server routes, then connect them with `SiweWalletManager`.
+
+<Callout type="warn" title="Authorize on the server">
+Never trust a user ID from the browser. Resolve the user from the server session for every wallet operation.
+</Callout>
+
+```ts title="lib/wallet-manager.ts"
+import type { SiweWalletManager } from "@better-auth-ui/core/plugins/siwe"
+
+export const walletManager: SiweWalletManager = {
+  list: (signal) => fetch("/api/wallets", { signal }).then((response) => response.json()),
+  createLinkChallenge: (wallet) => post("/api/wallets/link-challenge", wallet),
+  link: (proof) => post("/api/wallets/link", proof),
+  unlink: (walletId) => fetch(`/api/wallets/${walletId}`, { method: "DELETE" }).then(assertOk),
+  setPrimary: (walletId) => fetch(`/api/wallets/${walletId}/primary`, { method: "POST" }).then(assertOk)
+}
+```
+
+Pass `walletManager` to `siwePlugin()`. BAUI then adds connect, list, primary, and remove controls to security settings.
+
+The link challenge must contain a single-use nonce. Verify its domain, chain, address, nonce, and signature before attaching the wallet.
+
+Removing a wallet should delete its `walletAddress` row and matching SIWE account in one server transaction.
+
+## Email modes
+
+- `"optional"` asks for an email but allows an empty value. This is the default.
+- `"required"` requires an email before the wallet opens.
+- `"none"` opens the wallet immediately.
+
+The signature proves control of the wallet. It does not verify the supplied email address.

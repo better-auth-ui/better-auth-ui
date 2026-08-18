@@ -42,6 +42,7 @@ export default defineConfig({
         "plugins/organization/index": "src/plugins/organization/index.ts",
         "plugins/passkey/index": "src/plugins/passkey/index.ts",
         "plugins/sso/index": "src/plugins/sso/index.ts",
+        "plugins/siwe/index": "src/plugins/siwe/index.ts",
         "plugins/theme/index": "src/plugins/theme/index.ts",
         "plugins/two-factor/index": "src/plugins/two-factor/index.ts",
         "plugins/username/index": "src/plugins/username/index.ts"

@@ -28,6 +28,7 @@ const pluginsExports = [
   "SignInUsername",
   "LastUsedBadge",
   "EmailFirstSignIn",
+  "WalletAccounts",
   "UsernameField",
   "adminPlugin",
   "anonymousPlugin",
@@ -37,6 +38,7 @@ const pluginsExports = [
   "oauthProviderPlugin",
   "passkeyPlugin",
   "ssoPlugin",
+  "siwePlugin",
   "usernamePlugin"
 ] as const
 

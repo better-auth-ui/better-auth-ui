@@ -868,6 +868,51 @@
       ]
     },
     {
+      "name": "siwe",
+      "type": "registry:component",
+      "title": "Sign in with Ethereum",
+      "description": "ERC-4361 wallet sign-in with optional email collection and server-authorized wallet account management.",
+      "dependencies": [
+        "@better-auth-ui/react@latest",
+        "@better-auth-ui/core@latest",
+        "better-auth",
+        "lucide-react"
+      ],
+      "registryDependencies": [
+        "alert-dialog",
+        "badge",
+        "button",
+        "card",
+        "dialog",
+        "field",
+        "input",
+        "skeleton",
+        "spinner"
+      ],
+      "files": [
+        {
+          "path": "src/lib/auth/auth-plugin.ts",
+          "type": "registry:lib",
+          "target": "@lib/auth/auth-plugin.ts"
+        },
+        {
+          "path": "src/lib/auth/siwe-plugin.ts",
+          "type": "registry:lib",
+          "target": "@lib/auth/siwe-plugin.ts"
+        },
+        {
+          "path": "src/components/auth/siwe/sign-in-ethereum-button.tsx",
+          "type": "registry:component",
+          "target": "@components/auth/siwe/sign-in-ethereum-button.tsx"
+        },
+        {
+          "path": "src/components/auth/siwe/wallet-accounts.tsx",
+          "type": "registry:component",
+          "target": "@components/auth/siwe/wallet-accounts.tsx"
+        }
+      ]
+    },
+    {
       "name": "two-factor",
       "type": "registry:component",
       "title": "Two-Factor",

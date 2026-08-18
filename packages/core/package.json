@@ -141,6 +141,11 @@
       "types": "./dist/plugins/sso/index.d.ts",
       "import": "./dist/plugins/sso/index.js"
     },
+    "./plugins/siwe": {
+      "src": "./src/plugins/siwe/index.ts",
+      "types": "./dist/plugins/siwe/index.d.ts",
+      "import": "./dist/plugins/siwe/index.js"
+    },
     "./plugins/theme": {
       "src": "./src/plugins/theme/index.ts",
       "types": "./dist/plugins/theme/index.d.ts",

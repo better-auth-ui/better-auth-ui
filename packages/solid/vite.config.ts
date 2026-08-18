@@ -50,6 +50,7 @@ export default defineConfig({
         "plugins/passkey/index": "src/plugins/passkey/index.ts",
         "plugins/phone-number/index": "src/plugins/phone-number/index.ts",
         "plugins/sso/index": "src/plugins/sso/index.ts",
+        "plugins/siwe/index": "src/plugins/siwe/index.ts",
         "plugins/two-factor/index": "src/plugins/two-factor/index.ts",
         "plugins/username/index": "src/plugins/username/index.ts"
       },

@@ -7,6 +7,7 @@ import * as magicLink from "../src/plugins/magic-link"
 import * as multiSession from "../src/plugins/multi-session"
 import * as organization from "../src/plugins/organization"
 import * as passkey from "../src/plugins/passkey"
+import * as siwe from "../src/plugins/siwe"
 import * as sso from "../src/plugins/sso"
 import * as theme from "../src/plugins/theme"
 import * as twoFactor from "../src/plugins/two-factor"
@@ -48,6 +49,10 @@ describe("HeroUI plugin subpath exports", () => {
 
     expect(sso).toHaveProperty("EmailFirstSignIn")
     expect(sso).toHaveProperty("ssoPlugin")
+
+    expect(siwe).toHaveProperty("SignInEthereumButton")
+    expect(siwe).toHaveProperty("WalletAccounts")
+    expect(siwe).toHaveProperty("siwePlugin")
 
     expect(theme).toHaveProperty("Appearance")
     expect(theme).toHaveProperty("ThemeToggleItem")
