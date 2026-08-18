@@ -76,6 +76,11 @@
       "types": "./dist/plugins/passkey/index.d.ts",
       "import": "./dist/plugins/passkey/index.js"
     },
+    "./plugins/sso": {
+      "src": "./src/plugins/sso/index.ts",
+      "types": "./dist/plugins/sso/index.d.ts",
+      "import": "./dist/plugins/sso/index.js"
+    },
     "./plugins/theme": {
       "src": "./src/plugins/theme/index.ts",
       "types": "./dist/plugins/theme/index.d.ts",

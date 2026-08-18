@@ -6,6 +6,7 @@ import * as magicLink from "../src/plugins/magic-link"
 import * as multiSession from "../src/plugins/multi-session"
 import * as organization from "../src/plugins/organization"
 import * as passkey from "../src/plugins/passkey"
+import * as sso from "../src/plugins/sso"
 import * as theme from "../src/plugins/theme"
 import * as twoFactor from "../src/plugins/two-factor"
 import * as username from "../src/plugins/username"
@@ -38,6 +39,9 @@ describe("HeroUI plugin subpath exports", () => {
     expect(passkey).toHaveProperty("PasskeyButton")
     expect(passkey).toHaveProperty("Passkeys")
     expect(passkey).toHaveProperty("passkeyPlugin")
+
+    expect(sso).toHaveProperty("EmailFirstSignIn")
+    expect(sso).toHaveProperty("ssoPlugin")
 
     expect(theme).toHaveProperty("Appearance")
     expect(theme).toHaveProperty("ThemeToggleItem")

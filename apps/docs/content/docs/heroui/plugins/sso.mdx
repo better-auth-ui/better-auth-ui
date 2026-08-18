@@ -1,0 +1,87 @@
+---
+title: SSO and Email-First Sign-In
+description: Discover organization SSO from an email address before showing other sign-in methods.
+---
+
+import { Step, Steps } from 'fumadocs-ui/components/steps'
+
+The SSO plugin replaces the standard sign-in view with an email-first flow. It sends the email to Better Auth for provider discovery. If a provider exists, Better Auth redirects the user to it. If no provider exists, the view shows the configured password and plugin sign-in methods.
+
+Magic-link and email-OTP views reuse the submitted email. Users do not need to enter it again.
+
+## Setup
+
+<Steps>
+<Step>
+### Add SSO to the server
+
+Install `@better-auth/sso`, add `sso()` to Better Auth, and apply the plugin schema to your database. Configure providers with Better Auth or Better Auth Dash.
+
+```ts title="lib/auth.ts"
+import { sso } from "@better-auth/sso"
+import { betterAuth } from "better-auth"
+
+export const auth = betterAuth({
+  plugins: [sso()]
+})
+```
+
+See the [Better Auth SSO guide](https://www.better-auth.com/docs/plugins/sso) for provider setup and schema commands.
+
+</Step>
+<Step>
+### Add the client plugin
+
+```ts title="lib/auth-client.ts"
+import { ssoClient } from "@better-auth/sso/client"
+import { createAuthClient } from "better-auth/react"
+
+export const authClient = createAuthClient({
+  plugins: [ssoClient()]
+})
+```
+
+</Step>
+<Step>
+### Register the UI plugin
+
+Place `ssoPlugin()` before another plugin that replaces the sign-in view.
+
+```tsx title="components/providers.tsx"
+import { AuthProvider } from "@better-auth-ui/heroui"
+import { ssoPlugin } from "@better-auth-ui/heroui/plugins/sso"
+
+<AuthProvider
+  authClient={authClient}
+  navigate={navigate}
+  plugins={[ssoPlugin(), magicLinkPlugin(), emailOtpPlugin()]}
+>
+  {children}
+</AuthProvider>
+```
+
+</Step>
+</Steps>
+
+## Options
+
+Set `emailFirst: false` when you want the data hooks without replacing the sign-in view.
+
+```tsx
+ssoPlugin({
+  emailFirst: false,
+  localization: {
+    continueWithEmail: "Find my workspace"
+  }
+})
+```
+
+## Component
+
+```tsx
+import { EmailFirstSignIn } from "@better-auth-ui/heroui/plugins/sso"
+
+<EmailFirstSignIn />
+```
+
+<auto-type-table path="../../../../../../packages/heroui/src/components/auth/sso/email-first-sign-in.tsx" name="EmailFirstSignInProps" />

@@ -87,6 +87,11 @@
       "types": "./dist/plugins/phone-number/index.d.ts",
       "import": "./dist/plugins/phone-number/index.js"
     },
+    "./plugins/sso": {
+      "src": "./src/plugins/sso/index.ts",
+      "types": "./dist/plugins/sso/index.d.ts",
+      "import": "./dist/plugins/sso/index.js"
+    },
     "./plugins/two-factor": {
       "types": "./dist/plugins/two-factor/index.d.ts",
       "import": "./dist/plugins/two-factor/index.js"

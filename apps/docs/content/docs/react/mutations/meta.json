@@ -11,6 +11,7 @@
     "sign-in-phone-number",
     "sign-in-passkey",
     "sign-in-social",
+    "sign-in-sso",
     "sign-up-email",
     "sign-out",
     "request-password-reset",

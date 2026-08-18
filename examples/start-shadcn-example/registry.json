@@ -149,6 +149,46 @@
       ]
     },
     {
+      "name": "sso",
+      "type": "registry:component",
+      "title": "SSO and Email-First Sign In",
+      "description": "Discovers organization SSO from an email address, then falls back to configured password, email OTP, magic-link, or plugin sign-in methods.",
+      "dependencies": [
+        "@better-auth-ui/react@latest",
+        "@better-auth-ui/core@latest",
+        "@better-auth/sso",
+        "better-auth",
+        "lucide-react"
+      ],
+      "registryDependencies": [
+        "button",
+        "card",
+        "checkbox",
+        "field",
+        "input",
+        "input-group",
+        "spinner",
+        "https://better-auth-ui.com/r/radix-nova/sign-in.json"
+      ],
+      "files": [
+        {
+          "path": "src/lib/auth/auth-plugin.ts",
+          "type": "registry:lib",
+          "target": "@lib/auth/auth-plugin.ts"
+        },
+        {
+          "path": "src/lib/auth/sso-plugin.ts",
+          "type": "registry:lib",
+          "target": "@lib/auth/sso-plugin.ts"
+        },
+        {
+          "path": "src/components/auth/sso/email-first-sign-in.tsx",
+          "type": "registry:component",
+          "target": "@components/auth/sso/email-first-sign-in.tsx"
+        }
+      ]
+    },
+    {
       "name": "last-login-method",
       "type": "registry:component",
       "title": "Last Login Method",

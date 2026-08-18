@@ -12,6 +12,7 @@ import * as oneTap from "../src/plugins/one-tap"
 import * as organization from "../src/plugins/organization"
 import * as passkey from "../src/plugins/passkey"
 import * as phoneNumber from "../src/plugins/phone-number"
+import * as sso from "../src/plugins/sso"
 import * as twoFactor from "../src/plugins/two-factor"
 import * as username from "../src/plugins/username"
 
@@ -33,6 +34,7 @@ describe("Solid plugin subpath exports", () => {
     expect(phoneNumber).toHaveProperty("useSendPhoneNumberOtp")
     expect(phoneNumber).toHaveProperty("useSignInPhoneNumber")
     expect(phoneNumber).toHaveProperty("useVerifyPhoneNumber")
+    expect(sso).toHaveProperty("useSignInSso")
 
     expect(multiSession).toHaveProperty("useRevokeMultiSession")
     expect(multiSession).toHaveProperty("useSetActiveSession")
@@ -97,6 +99,7 @@ describe("Solid plugin subpath exports", () => {
     expect(phoneNumber).not.toHaveProperty("sendPhoneNumberOtpOptions")
     expect(phoneNumber).not.toHaveProperty("signInPhoneNumberOptions")
     expect(phoneNumber).not.toHaveProperty("verifyPhoneNumberOptions")
+    expect(sso).not.toHaveProperty("signInSsoOptions")
     expect(username).not.toHaveProperty("signInUsernameOptions")
     expect(username).not.toHaveProperty("isUsernameAvailableOptions")
     expect(twoFactor).not.toHaveProperty("enableTwoFactorOptions")

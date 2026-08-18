@@ -1,5 +1,6 @@
 import { authMutationKeys } from "@better-auth-ui/core"
 import type { MagicLinkAuthClient } from "@better-auth-ui/core/plugins/magic-link"
+import { getSsoFallbackEmail } from "@better-auth-ui/core/plugins/sso"
 import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
 import { useSignInMagicLink } from "@better-auth-ui/react/plugins/magic-link"
 import {
@@ -59,7 +60,7 @@ export function MagicLink({
   const { localization: magicLinkLocalization, viewPaths: magicLinkViewPaths } =
     useAuthPlugin(magicLinkPlugin)
 
-  const [email, setEmail] = useState("")
+  const [email, setEmail] = useState(getSsoFallbackEmail)
 
   const { mutate: signInMagicLink, isPending: signInMagicLinkPending } =
     useSignInMagicLink(authClient as MagicLinkAuthClient, {

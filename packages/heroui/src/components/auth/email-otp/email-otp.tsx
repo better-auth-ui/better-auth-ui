@@ -1,5 +1,6 @@
 import { authMutationKeys } from "@better-auth-ui/core"
 import type { EmailOtpAuthClient } from "@better-auth-ui/core/plugins/email-otp"
+import { getSsoFallbackEmail } from "@better-auth-ui/core/plugins/sso"
 import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
 import {
   useSendVerificationOtp,
@@ -70,7 +71,7 @@ export function EmailOtp({
   const continueSignIn = useSignInContinuation()
   const { cooldown, isCoolingDown, startCooldown } = useResendCooldown()
 
-  const [email, setEmail] = useState("")
+  const [email, setEmail] = useState(getSsoFallbackEmail)
   const [code, setCode] = useState("")
   const [codeSent, setCodeSent] = useState(false)
 

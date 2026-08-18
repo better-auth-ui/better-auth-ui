@@ -1,0 +1,69 @@
+---
+title: SSO and Email-First Sign-In
+description: Install an email-first sign-in view with organization SSO discovery and fallback methods.
+---
+
+import { Step, Steps } from 'fumadocs-ui/components/steps'
+
+The SSO registry item installs a sign-in view that discovers organization SSO from an email address. It redirects to the identity provider when one exists. Otherwise, it shows password, magic-link, email-OTP, and other registered sign-in methods.
+
+## Setup
+
+<Steps>
+<Step>
+### Configure Better Auth
+
+Install `@better-auth/sso`, add `sso()` to the server, add `ssoClient()` to the client, and apply the plugin schema. See the [Better Auth SSO guide](https://www.better-auth.com/docs/plugins/sso) for provider setup.
+
+```ts title="lib/auth.ts"
+import { sso } from "@better-auth/sso"
+
+export const auth = betterAuth({
+  plugins: [sso()]
+})
+```
+
+```ts title="lib/auth-client.ts"
+import { ssoClient } from "@better-auth/sso/client"
+
+export const authClient = createAuthClient({
+  plugins: [ssoClient()]
+})
+```
+
+</Step>
+<Step>
+### Install the registry item
+
+```npm
+npx shadcn@latest registry add @better-auth-ui=https://better-auth-ui.com/r/{style}/{name}.json
+```
+
+```npm
+npx shadcn@latest add @better-auth-ui/sso
+```
+
+This installs `EmailFirstSignIn` and the local `ssoPlugin()` factory.
+
+</Step>
+<Step>
+### Register the UI plugin
+
+Place `ssoPlugin()` before another plugin that replaces the sign-in view.
+
+```tsx title="components/providers.tsx"
+import { ssoPlugin } from "@/lib/auth/sso-plugin"
+
+<AuthProvider
+  authClient={authClient}
+  navigate={navigate}
+  plugins={[ssoPlugin(), magicLinkPlugin(), emailOtpPlugin()]}
+>
+  {children}
+</AuthProvider>
+```
+
+</Step>
+</Steps>
+
+The flow stores the submitted email in session storage. The installed magic-link and email-OTP views use it as their initial email.

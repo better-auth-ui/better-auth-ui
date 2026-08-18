@@ -131,6 +131,11 @@
       "types": "./dist/plugins/phone-number/index.d.ts",
       "import": "./dist/plugins/phone-number/index.js"
     },
+    "./plugins/sso": {
+      "src": "./src/plugins/sso/index.ts",
+      "types": "./dist/plugins/sso/index.d.ts",
+      "import": "./dist/plugins/sso/index.js"
+    },
     "./plugins/theme": {
       "src": "./src/plugins/theme/index.ts",
       "types": "./dist/plugins/theme/index.d.ts",
@@ -156,6 +161,7 @@
     "@better-auth/api-key": "1.7.0",
     "@better-auth/oauth-provider": "1.7.0",
     "@better-auth/passkey": "1.7.0",
+    "@better-auth/sso": "1.7.0",
     "@mikkelscheike/email-provider-links": "5.2.1",
     "@tanstack/query-core": "^5.101.2",
     "better-auth": "1.7.0",
@@ -165,6 +171,7 @@
     "@better-auth/api-key": ">=1.7.0",
     "@better-auth/oauth-provider": ">=1.7.0",
     "@better-auth/passkey": ">=1.7.0",
+    "@better-auth/sso": ">=1.7.0",
     "@mikkelscheike/email-provider-links": ">=5.2.1",
     "@tanstack/query-core": ">=5.101.2",
     "better-auth": ">=1.7.0"
@@ -177,6 +184,9 @@
       "optional": true
     },
     "@better-auth/passkey": {
+      "optional": true
+    },
+    "@better-auth/sso": {
       "optional": true
     }
   },

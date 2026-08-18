@@ -1,0 +1,33 @@
+---
+title: useSignInSso
+description: Discover and start an organization SSO sign-in.
+---
+
+## Usage
+
+```tsx
+import { authClient } from "@/lib/auth-client"
+import { useSignInSso } from "@better-auth-ui/react/plugins/sso"
+
+const { mutate: signInSso } = useSignInSso(authClient)
+
+signInSso({
+  email: "alice@example.com",
+  callbackURL: "/dashboard"
+})
+```
+
+You can discover a provider with `email`, `domain`, `organizationSlug`, or `providerId`. Better Auth redirects successful requests to the provider.
+
+## Options factory
+
+```tsx
+import { signInSsoOptions } from "@better-auth-ui/core/plugins/sso"
+import { useMutation } from "@tanstack/react-query"
+
+const { mutate } = useMutation(signInSsoOptions(authClient))
+```
+
+## Params
+
+<auto-type-table path="../../../../../../packages/core/src/plugins/sso/sign-in-sso-mutation.ts" name="SignInSsoParams" />

@@ -17,6 +17,7 @@
     "oauth-provider",
     "passkey",
     "phone-number",
+    "sso",
     "theme",
     "two-factor",
     "username"
