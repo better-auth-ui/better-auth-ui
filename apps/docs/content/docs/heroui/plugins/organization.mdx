@@ -855,3 +855,21 @@ Modal dialog for inviting a new member by email. Owned by `<OrganizationMembers 
 Confirmation dialog for deleting an organization (owner permission, server-side).
 
 <auto-type-table path="../../../../../../packages/heroui/src/components/auth/organization/delete-organization-dialog.tsx" name="DeleteOrganizationDialogProps" />
+
+## Teams and policy controls
+
+Enable teams on the Better Auth server, client, and UI plugin:
+
+```tsx
+organization({ teams: { enabled: true } })
+organizationClient({ teams: { enabled: true } })
+organizationPlugin({ teams: true })
+```
+
+The organization shell adds a Teams tab. Users can create, rename, and delete teams. They can also add and remove team members. Invitations can assign a team.
+
+The `useListTeams`, `useListTeamMembers`, `useCreateTeam`, `useUpdateTeam`, `useRemoveTeam`, `useAddTeamMember`, and `useRemoveTeamMember` hooks cover the team lifecycle. These controls use the existing active organization behavior.
+
+Use `organizationLimit`, `membershipLimit`, and `invitationLimit` to disable actions when a configured limit is reached. Use `allowOrganizationCreation: false` to hide creation controls. Use `additionalFields` to add custom inputs to organization creation and profile forms.
+
+Plugins can add an organization settings tab through `organizationTabs`. Each tab receives `organizationId` and `organizationSlug` for the active organization.

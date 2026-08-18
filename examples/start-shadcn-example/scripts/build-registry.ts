@@ -23,8 +23,11 @@ const STYLE_NAMES = [
 
 const EXPECTED_BASE_UI_OVERRIDES = [
   "src/components/auth/additional-field.tsx",
+  "src/components/auth/api-key/api-keys.tsx",
   "src/components/auth/api-key/create-api-key-dialog.tsx",
+  "src/components/auth/api-key/edit-api-key-dialog.tsx",
   "src/components/auth/organization/invite-member-dialog.tsx",
+  "src/components/auth/organization/organization-teams.tsx",
   "src/components/auth/phone-number/remove-phone-number-dialog.tsx",
   "src/components/auth/theme/theme-toggle-item.tsx"
 ] as const

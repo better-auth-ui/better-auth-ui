@@ -61,7 +61,6 @@ export function OrganizationRow(props: OrganizationRowProps) {
       })
     }
   }))
-
   const manageOrganization = () => {
     if (isSlugMode()) {
       navigateToOrganization()

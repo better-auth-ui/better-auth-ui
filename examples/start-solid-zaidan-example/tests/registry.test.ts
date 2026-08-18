@@ -1444,7 +1444,7 @@ describe("Solid registry isolation", () => {
       },
       "security-settings": {
         content: pages.securitySettings,
-        headings: ["Usage", "Installation", "Props"],
+        headings: ["Usage", "Installation", "Props", "Fresh-session checks"],
         install: true,
         propsName: "SecuritySettingsProps",
         storyId: "zaidan-components-settings--security-settings-preview",
@@ -3690,7 +3690,8 @@ describe("Solid registry isolation", () => {
     expect(organizationRegistry).toContain("useCheckSlug")
     expect(organizationRegistry).toContain("organization-row.tsx")
     expect(organizationPayload.registryDependencies).toEqual([
-      solidRegistryUrl("user-view")
+      solidRegistryUrl("user-view"),
+      solidRegistryUrl("additional-field")
     ])
     const authProviderPayload = readJson<{
       registryDependencies: string[]
@@ -3816,7 +3817,7 @@ describe("Solid registry isolation", () => {
     expect(organizationRegistry).toContain("inviteMemberSuccess")
     expect(organizationRegistry).toContain("useUpdateOrganization")
     expect(organizationRegistry).toContain(
-      "data: { name: name(), slug: slug() }"
+      "data: { name: name(), slug: slug(), ...additionalValues }"
     )
     expect(organizationRegistry).toContain("organization.tsx")
     expect(organizationRegistry).toContain("plugin.slug !== undefined")

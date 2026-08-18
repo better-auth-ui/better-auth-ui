@@ -37,8 +37,11 @@ export function OrganizationMembers({
   ...props
 }: OrganizationMembersProps & ComponentProps<"div">) {
   const { authClient } = useAuth()
-  const { localization: organizationLocalization, roles } =
-    useAuthPlugin(organizationPlugin)
+  const {
+    localization: organizationLocalization,
+    membershipLimit,
+    roles
+  } = useAuthPlugin(organizationPlugin)
 
   const { data: session } = useSession(authClient)
   const { data: activeOrganization, isPending: activeOrganizationPending } =
@@ -48,15 +51,11 @@ export function OrganizationMembers({
 
   const { isPending: updatePermissionPending } = useHasPermission(
     authClient as OrganizationAuthClient,
-    {
-      permissions: { member: ["update"] }
-    }
+    { permissions: { member: ["update"] } }
   )
   const { isPending: deletePermissionPending } = useHasPermission(
     authClient as OrganizationAuthClient,
-    {
-      permissions: { member: ["delete"] }
-    }
+    { permissions: { member: ["delete"] } }
   )
 
   const isPending =
@@ -99,6 +98,9 @@ export function OrganizationMembers({
   }, [sortDescriptor, filteredMembers])
 
   const [inviteOpen, setInviteOpen] = useState(false)
+  const membershipLimitReached =
+    membershipLimit !== undefined &&
+    (membersData?.members.length ?? 0) >= membershipLimit
 
   const isOwner = membersData?.members.some(
     (member) => member.role === "owner" && member.userId === session?.user.id
@@ -114,7 +116,7 @@ export function OrganizationMembers({
         <Button
           className="shrink-0"
           size="sm"
-          isDisabled={isPending}
+          isDisabled={isPending || membershipLimitReached}
           onPress={() => setInviteOpen(true)}
         >
           {organizationLocalization.inviteMember}

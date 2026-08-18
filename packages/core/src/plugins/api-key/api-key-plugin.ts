@@ -44,6 +44,25 @@ export type ApiKeyPluginOptions = {
    * @default { intervals: [30, 90], defaultInterval: 30, allowNever: true }
    */
   keyExpiration?: ApiKeyExpirationOptions | false
+  /** API key configurations users can choose from. */
+  configurations?: ApiKeyConfiguration[]
+  /** Permission resources and actions rendered by create and edit forms. */
+  permissions?: ApiKeyPermission[]
+  /** Number of keys shown per page. @default 10 */
+  pageSize?: number
+}
+
+export type ApiKeyConfiguration = {
+  id: string
+  label: string
+  description?: string
+  organization?: boolean
+}
+
+export type ApiKeyPermission = {
+  resource: string
+  label?: string
+  actions: Array<string | { id: string; label: string }>
 }
 
 export const apiKeyPlugin = createAuthPlugin(
@@ -57,7 +76,10 @@ export const apiKeyPlugin = createAuthPlugin(
     return {
       localization: { ...apiKeyLocalization, ...options.localization },
       organization: options.organization ?? false,
-      keyExpiration
+      keyExpiration,
+      configurations: options.configurations ?? [],
+      permissions: options.permissions ?? [],
+      pageSize: Math.max(1, Math.floor(options.pageSize ?? 10))
     }
   }
 )

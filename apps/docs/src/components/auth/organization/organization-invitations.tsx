@@ -64,15 +64,12 @@ export function OrganizationInvitations({
   const { authClient, localization } = useAuth<OrganizationAuthClient>()
   const { localization: organizationLocalization, roles } =
     useAuthPlugin(organizationPlugin)
-
   const { data: invitations, isPending: invitationsPending } =
     useListOrganizationInvitations(authClient)
 
   const { isPending: invitationPermissionPending } = useHasPermission(
     authClient,
-    {
-      permissions: { invitation: ["cancel"] }
-    }
+    { permissions: { invitation: ["cancel"] } }
   )
 
   const isPending = invitationsPending || invitationPermissionPending

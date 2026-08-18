@@ -429,6 +429,7 @@ export const solidRegistryManifest = {
         componentFile("src/components/auth/passkey/passkey-skeleton.tsx"),
         componentFile("src/components/auth/passkey/add-passkey-dialog.tsx"),
         componentFile("src/components/auth/passkey/delete-passkey-dialog.tsx"),
+        componentFile("src/components/auth/passkey/rename-passkey-dialog.tsx"),
         ...zaidanInteractiveSupportFiles
       ]
     }),
@@ -478,6 +479,7 @@ export const solidRegistryManifest = {
         componentFile("src/components/auth/api-key/api-key-skeleton.tsx"),
         componentFile("src/components/auth/api-key/create-api-key-dialog.tsx"),
         componentFile("src/components/auth/api-key/delete-api-key-dialog.tsx"),
+        componentFile("src/components/auth/api-key/edit-api-key-dialog.tsx"),
         componentFile("src/components/auth/api-key/new-api-key-dialog.tsx"),
         ...zaidanInteractiveSupportFiles
       ]
@@ -684,6 +686,9 @@ export const solidRegistryManifest = {
         ),
         componentFile(
           "src/components/auth/settings/security/active-session.tsx"
+        ),
+        componentFile(
+          "src/components/auth/settings/security/fresh-session-prompt.tsx"
         ),
         componentFile("src/components/auth/settings/shared/helpers.ts"),
         ...zaidanInteractiveSupportFiles
@@ -904,7 +909,10 @@ export const solidRegistryManifest = {
       title: "Solid Organization",
       description:
         "Solid organization setup with direct invitation acceptance, settings tab, organization switcher, and slug route shell.",
-      registryDependencies: [betterAuthSolidRegistryDependency("user-view")],
+      registryDependencies: [
+        betterAuthSolidRegistryDependency("user-view"),
+        betterAuthSolidRegistryDependency("additional-field")
+      ],
       files: [
         libFile("src/lib/auth/organization-plugin.tsx"),
         componentFile("src/components/auth/organization/accept-invitation.tsx"),
@@ -928,6 +936,9 @@ export const solidRegistryManifest = {
         componentFile("src/components/auth/organization/slug-field.tsx"),
         componentFile(
           "src/components/auth/organization/organization-settings.tsx"
+        ),
+        componentFile(
+          "src/components/auth/organization/organization-teams.tsx"
         ),
         componentFile(
           "src/components/auth/organization/organization-profile.tsx"

@@ -4,20 +4,21 @@ import type {
 } from "@better-auth-ui/core/plugins/organization"
 import { useAuth, useAuthenticate, useAuthPlugin } from "@better-auth-ui/react"
 import { useActiveOrganization } from "@better-auth-ui/react/plugins/organization"
-import { Gear, Person } from "@gravity-ui/icons"
+import { Gear, Person, Persons } from "@gravity-ui/icons"
 import { type CardProps, cn, Tabs } from "@heroui/react"
 import { type ComponentProps, useEffect, useMemo } from "react"
 import { organizationPlugin } from "../../../lib/auth/organization-plugin"
 import { OrganizationPeople } from "./organization-people"
 import { OrganizationSettings } from "./organization-settings"
+import { OrganizationTeams } from "./organization-teams"
 
 export type OrganizationProps = {
   className?: string
   hideNav?: boolean
   path?: string
   variant?: CardProps["variant"]
-  /** @remarks `OrganizationView` */
-  view?: OrganizationView
+  /** Built-in view name or a plugin-contributed organization tab id. */
+  view?: OrganizationView | string
 }
 
 /**
@@ -37,18 +38,22 @@ export function Organization({
     throw new Error("[Better Auth UI] Either `view` or `path` must be provided")
   }
 
-  const { authClient, basePaths, localization, navigate } = useAuth()
+  const { authClient, basePaths, localization, navigate, plugins } = useAuth()
   useAuthenticate(authClient)
 
   const {
     localization: organizationLocalization,
     viewPaths: organizationViewPaths,
     slug,
-    slugPrefix
+    slugPrefix,
+    teams
   } = useAuthPlugin(organizationPlugin)
 
   const { data: activeOrganization, isPending } = useActiveOrganization(
     authClient as OrganizationAuthClient
+  )
+  const extensionTabs = plugins.flatMap(
+    (plugin) => plugin.organizationTabs ?? []
   )
 
   useEffect(() => {
@@ -69,12 +74,13 @@ export function Organization({
   const currentView = useMemo(() => {
     if (view) return view
 
-    const match = Object.entries(organizationViewPaths.organization).find(
-      ([, segment]) => segment === path
-    )
+    const match = [
+      ...Object.entries(organizationViewPaths.organization),
+      ...extensionTabs.map((tab) => [tab.id, tab.path] as const)
+    ].find(([, segment]) => segment === path)
 
     return match?.[0] as OrganizationView | undefined
-  }, [view, path, organizationViewPaths.organization])
+  }, [extensionTabs, view, path, organizationViewPaths.organization])
 
   if (!currentView) {
     const validPaths = Object.values(organizationViewPaths.organization).join(
@@ -123,6 +129,28 @@ export function Organization({
 
               <Tabs.Indicator />
             </Tabs.Tab>
+            {teams && (
+              <Tabs.Tab
+                id="teams"
+                href={`${basePaths.organization}/${slugPrefix}${slug}/${organizationViewPaths.organization.teams}`}
+                className="gap-2"
+              >
+                <Persons className="text-muted" />
+                {organizationLocalization.teams}
+                <Tabs.Indicator />
+              </Tabs.Tab>
+            )}
+            {extensionTabs.map((tab) => (
+              <Tabs.Tab
+                id={tab.id}
+                key={tab.id}
+                href={`${basePaths.organization}/${slugPrefix}${slug}/${tab.path}`}
+                className="gap-2"
+              >
+                {tab.label}
+                <Tabs.Indicator />
+              </Tabs.Tab>
+            ))}
 
             <Tabs.Tab
               id="people"
@@ -156,6 +184,22 @@ export function Organization({
       <Tabs.Panel id="people" className="px-0">
         <OrganizationPeople />
       </Tabs.Panel>
+      {teams && (
+        <Tabs.Panel id="teams" className="px-0">
+          <OrganizationTeams />
+        </Tabs.Panel>
+      )}
+      {extensionTabs.map((tab) => {
+        const Extension = tab.component
+        return (
+          <Tabs.Panel id={tab.id} key={tab.id} className="px-0">
+            <Extension
+              organizationId={activeOrganization?.id ?? ""}
+              organizationSlug={activeOrganization?.slug ?? ""}
+            />
+          </Tabs.Panel>
+        )
+      })}
     </Tabs>
   )
 }

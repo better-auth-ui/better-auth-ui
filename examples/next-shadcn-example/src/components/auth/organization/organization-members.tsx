@@ -59,8 +59,11 @@ export function OrganizationMembers({
   ...props
 }: OrganizationMembersProps & ComponentProps<"div">) {
   const { authClient } = useAuth<OrganizationAuthClient>()
-  const { localization: organizationLocalization, roles } =
-    useAuthPlugin(organizationPlugin)
+  const {
+    localization: organizationLocalization,
+    membershipLimit,
+    roles
+  } = useAuthPlugin(organizationPlugin)
 
   const { data: session } = useSession(authClient)
   const { data: activeOrganization, isPending: activeOrganizationPending } =
@@ -119,6 +122,9 @@ export function OrganizationMembers({
   const isOwner = membersData?.members.some(
     (member) => member.role === "owner" && member.userId === session?.user.id
   )
+  const atMembershipLimit =
+    membershipLimit !== undefined &&
+    (membersData?.members.length ?? 0) >= membershipLimit
 
   function toggleSort(column: string) {
     setSortDescriptor((current) => {
@@ -142,7 +148,7 @@ export function OrganizationMembers({
         <Button
           className="shrink-0"
           size="sm"
-          disabled={isPending}
+          disabled={isPending || atMembershipLimit}
           onClick={() => setInviteOpen(true)}
         >
           {organizationLocalization.inviteMember}

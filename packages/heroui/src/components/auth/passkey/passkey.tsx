@@ -8,6 +8,7 @@ import {
   DeletePasskeyDialog,
   type ListedPasskey
 } from "./delete-passkey-dialog"
+import { RenamePasskeyDialog } from "./rename-passkey-dialog"
 
 export type PasskeyProps = {
   passkey: ListedPasskey
@@ -17,6 +18,7 @@ export function Passkey({ passkey }: PasskeyProps) {
   const { localization } = useAuth()
   const { localization: passkeyLocalization } = useAuthPlugin(passkeyPlugin)
   const [deleteOpen, setDeleteOpen] = useState(false)
+  const [renameOpen, setRenameOpen] = useState(false)
 
   const passkeyName = passkey.name || passkeyLocalization.passkey
 
@@ -43,6 +45,15 @@ export function Passkey({ passkey }: PasskeyProps) {
         className="ml-auto shrink-0"
         variant="outline"
         size="sm"
+        onPress={() => setRenameOpen(true)}
+      >
+        {passkeyLocalization.renamePasskey}
+      </Button>
+
+      <Button
+        className="shrink-0"
+        variant="outline"
+        size="sm"
         onPress={() => setDeleteOpen(true)}
         aria-label={passkeyLocalization.deletePasskey.replace(
           "{{name}}",
@@ -57,6 +68,11 @@ export function Passkey({ passkey }: PasskeyProps) {
       <DeletePasskeyDialog
         isOpen={deleteOpen}
         onOpenChange={setDeleteOpen}
+        passkey={passkey}
+      />
+      <RenamePasskeyDialog
+        isOpen={renameOpen}
+        onOpenChange={setRenameOpen}
         passkey={passkey}
       />
     </div>

@@ -1,3 +1,4 @@
+import { parseAdditionalFieldValue } from "@better-auth-ui/core"
 import type { OrganizationAuthClient } from "@better-auth-ui/core/plugins/organization"
 import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
 import {
@@ -21,6 +22,7 @@ import {
 import { type SyntheticEvent, useEffect, useState } from "react"
 
 import { organizationPlugin } from "../../../lib/auth/organization-plugin"
+import { AdditionalField } from "../additional-field"
 import { ChangeOrganizationLogo } from "./change-organization-logo"
 import { SlugField } from "./slug-field"
 
@@ -38,7 +40,7 @@ export function OrganizationProfile({
   ...props
 }: OrganizationProfileProps & Omit<CardProps, "children">) {
   const { authClient, localization } = useAuth()
-  const { localization: organizationLocalization } =
+  const { additionalFields, localization: organizationLocalization } =
     useAuthPlugin(organizationPlugin)
 
   const { data: activeOrganization } = useActiveOrganization(
@@ -59,15 +61,24 @@ export function OrganizationProfile({
     }
   )
 
-  function handleSubmit(e: SyntheticEvent<HTMLFormElement>) {
+  async function handleSubmit(e: SyntheticEvent<HTMLFormElement>) {
     e.preventDefault()
     if (!activeOrganization) return
 
     const formData = new FormData(e.currentTarget)
     const name = formData.get("name") as string
+    const additionalValues: Record<string, unknown> = {}
+    for (const field of additionalFields) {
+      const value = parseAdditionalFieldValue(
+        field,
+        formData.get(field.name) as string | null
+      )
+      await field.validate?.(value)
+      if (value !== undefined) additionalValues[field.name] = value
+    }
 
     commitOrganizationUpdate({
-      data: { name, slug }
+      data: { name, slug, ...additionalValues }
     })
   }
 
@@ -120,6 +131,22 @@ export function OrganizationProfile({
                 <Skeleton className="h-10 w-full rounded-xl md:h-9" />
               </TextField>
             )}
+            {activeOrganization &&
+              additionalFields.map((field) => (
+                <AdditionalField
+                  field={{
+                    ...field,
+                    defaultValue: (
+                      activeOrganization as Record<string, unknown>
+                    )[field.name] as never
+                  }}
+                  isPending={isPending}
+                  key={field.name}
+                  name={field.name}
+                  optionalLabel={localization.settings.optional}
+                  variant={variant}
+                />
+              ))}
 
             <Button
               type="submit"

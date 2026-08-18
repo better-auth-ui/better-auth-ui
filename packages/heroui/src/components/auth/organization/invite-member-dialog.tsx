@@ -1,10 +1,16 @@
 import type { OrganizationAuthClient } from "@better-auth-ui/core/plugins/organization"
 import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
-import { useInviteMember } from "@better-auth-ui/react/plugins/organization"
+import {
+  useActiveOrganization,
+  useInviteMember,
+  useListOrganizationInvitations,
+  useListTeams
+} from "@better-auth-ui/react/plugins/organization"
 import { PersonPlus } from "@gravity-ui/icons"
 import {
   AlertDialog,
   Button,
+  Checkbox,
   FieldError,
   Form,
   Input,
@@ -40,8 +46,26 @@ export function InviteMemberDialog({
   onOpenChange
 }: InviteMemberDialogProps) {
   const { authClient, localization } = useAuth()
-  const { localization: organizationLocalization, roles } =
-    useAuthPlugin(organizationPlugin)
+  const {
+    invitationLimit,
+    localization: organizationLocalization,
+    roles,
+    teams: teamsEnabled
+  } = useAuthPlugin(organizationPlugin)
+  const { data: activeOrganization } = useActiveOrganization(
+    authClient as OrganizationAuthClient
+  )
+  const teams = useListTeams(authClient as OrganizationAuthClient, {
+    query: { organizationId: activeOrganization?.id }
+  })
+  const invitations = useListOrganizationInvitations(
+    authClient as OrganizationAuthClient
+  )
+  const invitationLimitReached =
+    invitationLimit !== undefined &&
+    (invitations.data?.filter((invitation) => invitation.status === "pending")
+      .length ?? 0) >= invitationLimit
+  const [teamIds, setTeamIds] = useState<string[]>([])
 
   const [role, setRole] = useState(() => pickDefaultRole(Object.keys(roles)))
 
@@ -74,7 +98,8 @@ export function InviteMemberDialog({
 
     inviteMember({
       email: email.trim(),
-      role: role as Parameters<typeof inviteMember>[0]["role"]
+      role: role as Parameters<typeof inviteMember>[0]["role"],
+      ...(teamIds.length ? { teamId: teamIds } : {})
     })
   }
 
@@ -99,6 +124,11 @@ export function InviteMemberDialog({
               <p className="text-muted text-sm">
                 {organizationLocalization.inviteMemberDescription}
               </p>
+              {invitationLimitReached && (
+                <p className="text-danger text-sm" role="alert">
+                  {organizationLocalization.invitationLimitReached}
+                </p>
+              )}
 
               <TextField
                 id="email"
@@ -154,6 +184,28 @@ export function InviteMemberDialog({
 
                 <FieldError />
               </Select>
+              {teamsEnabled && (teams.data?.length ?? 0) > 0 && (
+                <div className="flex flex-col gap-2">
+                  <Label>{organizationLocalization.teams}</Label>
+                  <div className="flex flex-wrap gap-3">
+                    {teams.data?.map((team) => (
+                      <Checkbox
+                        key={team.id}
+                        isSelected={teamIds.includes(team.id)}
+                        onChange={(selected) =>
+                          setTeamIds((current) =>
+                            selected
+                              ? [...current, team.id]
+                              : current.filter((id) => id !== team.id)
+                          )
+                        }
+                      >
+                        {team.name}
+                      </Checkbox>
+                    ))}
+                  </div>
+                </div>
+              )}
             </AlertDialog.Body>
 
             <AlertDialog.Footer>
@@ -164,7 +216,7 @@ export function InviteMemberDialog({
               <Button
                 type="submit"
                 isPending={isInviting}
-                isDisabled={!isRoleValid}
+                isDisabled={!isRoleValid || invitationLimitReached}
               >
                 {isInviting && <Spinner color="current" size="sm" />}
 

@@ -12,6 +12,13 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Dialog, DialogTrigger } from "@/components/ui/dialog"
 import { ItemGroup, ItemSeparator } from "@/components/ui/item"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
+} from "@/components/ui/select"
 import { cn } from "@/lib/utils"
 
 export type ApiKeysProps = {
@@ -25,15 +32,32 @@ export type ApiKeysProps = {
 export function ApiKeys(props: ApiKeysProps = {}) {
   const auth = useAuth<ApiKeyAuthClient>()
   const [isCreateDialogOpen, setIsCreateDialogOpen] = createSignal(false)
+  const [page, setPage] = createSignal(0)
+  const [sort, setSort] = createSignal({
+    id: "createdAt:desc",
+    label: apiKeyLocalization.newest
+  })
+  const pageSize = 10
   const listParams = () =>
     props.isPending !== undefined || props.organizationId
       ? {
           query: {
             organizationId: props.organizationId ?? "",
-            configId: "organization" as const
+            configId: "organization" as const,
+            limit: pageSize,
+            offset: page() * pageSize,
+            sortBy: sort().id.split(":")[0],
+            sortDirection: sort().id.split(":")[1] as "asc" | "desc"
           }
         }
-      : undefined
+      : {
+          query: {
+            limit: pageSize,
+            offset: page() * pageSize,
+            sortBy: sort().id.split(":")[0],
+            sortDirection: sort().id.split(":")[1] as "asc" | "desc"
+          }
+        }
   const apiKeys = useListApiKeys(auth.authClient, () => listParams() ?? {})
   const keys = () => apiKeys.data?.apiKeys ?? []
   const pending = () => Boolean(props.isPending || apiKeys.isPending)
@@ -64,6 +88,37 @@ export function ApiKeys(props: ApiKeysProps = {}) {
           </Dialog>
         </Show>
       </div>
+      <Select
+        options={[
+          { id: "createdAt:desc", label: apiKeyLocalization.newest },
+          { id: "createdAt:asc", label: apiKeyLocalization.oldest },
+          { id: "name:asc", label: apiKeyLocalization.nameAscending },
+          { id: "name:desc", label: apiKeyLocalization.nameDescending }
+        ]}
+        optionTextValue="label"
+        optionValue="id"
+        value={sort()}
+        onChange={(value) => {
+          if (value) {
+            setSort(value)
+            setPage(0)
+          }
+        }}
+        itemComponent={(itemProps) => (
+          <SelectItem item={itemProps.item}>
+            {itemProps.item.rawValue.label}
+          </SelectItem>
+        )}
+      >
+        <SelectTrigger>
+          <SelectValue>
+            {(state) =>
+              (state.selectedOption() as { label: string } | undefined)?.label
+            }
+          </SelectValue>
+        </SelectTrigger>
+        <SelectContent />
+      </Select>
 
       <Card class="z-card-padding-none">
         <CardContent class="z-card-content-padding-none">
@@ -97,6 +152,26 @@ export function ApiKeys(props: ApiKeysProps = {}) {
           </Show>
         </CardContent>
       </Card>
+      <Show when={page() > 0 || keys().length === pageSize}>
+        <div class="flex justify-end gap-2">
+          <Button
+            size="sm"
+            variant="outline"
+            disabled={page() === 0}
+            onClick={() => setPage((value) => Math.max(0, value - 1))}
+          >
+            {apiKeyLocalization.previousPage}
+          </Button>
+          <Button
+            size="sm"
+            variant="outline"
+            disabled={keys().length < pageSize}
+            onClick={() => setPage((value) => value + 1)}
+          >
+            {apiKeyLocalization.nextPage}
+          </Button>
+        </div>
+      </Show>
     </div>
   )
 }

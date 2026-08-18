@@ -38,7 +38,7 @@ describe("Solid auth database parity", () => {
     expect(solidAuth).toContain("multiSession()")
     expect(solidAuth).toContain("passkey()")
     expect(solidAuth).toContain("username()")
-    expect(solidAuth).toContain("organization()")
+    expect(solidAuth).toContain("organization({ teams: { enabled: true } })")
     expect(solidAuth).toContain("apiKey([")
     expect(solidAuth).toContain('{ configId: "default", references: "user" }')
     expect(solidAuth).toContain(

@@ -6,7 +6,6 @@ import {
   useActiveOrganization,
   useListOrganizationMembers
 } from "@better-auth-ui/react/plugins/organization"
-
 import { ApiKeys } from "./api-keys"
 
 export type OrganizationApiKeysProps = {
@@ -27,7 +26,6 @@ export function OrganizationApiKeys({ className }: OrganizationApiKeysProps) {
 
   const { data: activeOrganization, isPending: activeOrganizationPending } =
     useActiveOrganization(authClient)
-
   const { data: membersData } = useListOrganizationMembers(authClient)
 
   const canManageApiKeys = membersData?.members.some(

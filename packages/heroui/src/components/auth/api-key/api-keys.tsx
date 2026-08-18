@@ -1,7 +1,15 @@
 import type { ApiKeyAuthClient } from "@better-auth-ui/core/plugins/api-key"
 import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
 import { useListApiKeys } from "@better-auth-ui/react/plugins/api-key"
-import { Button, Card, type CardProps, cn } from "@heroui/react"
+import {
+  Button,
+  Card,
+  type CardProps,
+  cn,
+  Label,
+  ListBox,
+  Select
+} from "@heroui/react"
 import { useState } from "react"
 
 import { apiKeyPlugin } from "../../../lib/auth/api-key-plugin"
@@ -32,15 +40,23 @@ export function ApiKeys({
   hideDelete
 }: ApiKeysProps) {
   const { authClient } = useAuth()
-  const { localization: apiKeyLocalization } = useAuthPlugin(apiKeyPlugin)
+  const { localization: apiKeyLocalization, pageSize } =
+    useAuthPlugin(apiKeyPlugin)
+  const [page, setPage] = useState(0)
+  const [sort, setSort] = useState("createdAt:desc")
+  const [sortBy, sortDirection] = sort.split(":") as [string, "asc" | "desc"]
 
   const { data: listData, isPending: isListPending } = useListApiKeys(
     authClient as ApiKeyAuthClient,
     {
       enabled: !isPendingProp,
-      ...(organizationId
-        ? { query: { organizationId, configId: "organization" } }
-        : {})
+      query: {
+        limit: pageSize,
+        offset: page * pageSize,
+        sortBy,
+        sortDirection,
+        ...(organizationId ? { organizationId, configId: "organization" } : {})
+      }
     }
   )
 
@@ -66,6 +82,36 @@ export function ApiKeys({
           </Button>
         )}
       </div>
+      <Select
+        aria-label={apiKeyLocalization.sortBy}
+        value={sort}
+        onChange={(value) => {
+          setSort(String(value))
+          setPage(0)
+        }}
+      >
+        <Label>{apiKeyLocalization.sortBy}</Label>
+        <Select.Trigger>
+          <Select.Value />
+          <Select.Indicator />
+        </Select.Trigger>
+        <Select.Popover>
+          <ListBox>
+            <ListBox.Item id="createdAt:desc">
+              {apiKeyLocalization.newest}
+            </ListBox.Item>
+            <ListBox.Item id="createdAt:asc">
+              {apiKeyLocalization.oldest}
+            </ListBox.Item>
+            <ListBox.Item id="name:asc">
+              {apiKeyLocalization.nameAscending}
+            </ListBox.Item>
+            <ListBox.Item id="name:desc">
+              {apiKeyLocalization.nameDescending}
+            </ListBox.Item>
+          </ListBox>
+        </Select.Popover>
+      </Select>
 
       <Card variant={variant}>
         <Card.Content>
@@ -93,6 +139,26 @@ export function ApiKeys({
           )}
         </Card.Content>
       </Card>
+      {(page > 0 || (listData?.apiKeys.length ?? 0) === pageSize) && (
+        <div className="flex justify-end gap-2">
+          <Button
+            size="sm"
+            variant="outline"
+            isDisabled={page === 0}
+            onPress={() => setPage((value) => Math.max(0, value - 1))}
+          >
+            {apiKeyLocalization.previousPage}
+          </Button>
+          <Button
+            size="sm"
+            variant="outline"
+            isDisabled={(listData?.apiKeys.length ?? 0) < pageSize}
+            onPress={() => setPage((value) => value + 1)}
+          >
+            {apiKeyLocalization.nextPage}
+          </Button>
+        </div>
+      )}
 
       {!hideCreate && (
         <CreateApiKeyDialog

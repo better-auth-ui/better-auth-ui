@@ -25,13 +25,20 @@ export type OrganizationsProps = {
  */
 export function Organizations({ className }: OrganizationsProps) {
   const { authClient } = useAuth<OrganizationAuthClient>()
-  const { localization: organizationLocalization } =
-    useAuthPlugin(organizationPlugin)
+  const {
+    allowOrganizationCreation,
+    localization: organizationLocalization,
+    organizationLimit
+  } = useAuthPlugin(organizationPlugin)
 
   const [createOpen, setCreateOpen] = useState(false)
 
   const { data: organizations, isPending: organizationsPending } =
     useListOrganizations(authClient)
+  const canCreate =
+    allowOrganizationCreation &&
+    (organizationLimit === undefined ||
+      (organizations?.length ?? 0) < organizationLimit)
 
   return (
     <>
@@ -42,14 +49,16 @@ export function Organizations({ className }: OrganizationsProps) {
               {organizationLocalization.organizations}
             </h2>
 
-            <Button
-              className="shrink-0"
-              size="sm"
-              disabled={organizationsPending}
-              onClick={() => setCreateOpen(true)}
-            >
-              {organizationLocalization.createOrganization}
-            </Button>
+            {allowOrganizationCreation && (
+              <Button
+                className="shrink-0"
+                size="sm"
+                disabled={organizationsPending || !canCreate}
+                onClick={() => setCreateOpen(true)}
+              >
+                {organizationLocalization.createOrganization}
+              </Button>
+            )}
           </div>
 
           <Card className="p-0">
@@ -61,7 +70,10 @@ export function Organizations({ className }: OrganizationsProps) {
                   </Item>
                 </ItemGroup>
               ) : !organizations?.length ? (
-                <OrganizationsEmpty onCreatePress={() => setCreateOpen(true)} />
+                <OrganizationsEmpty
+                  canCreate={canCreate}
+                  onCreatePress={() => setCreateOpen(true)}
+                />
               ) : (
                 <ItemGroup className="gap-0">
                   {organizations.map((organization, index) => (
@@ -77,10 +89,12 @@ export function Organizations({ className }: OrganizationsProps) {
         </div>
       </div>
 
-      <CreateOrganizationDialog
-        open={createOpen}
-        onOpenChange={setCreateOpen}
-      />
+      {canCreate && (
+        <CreateOrganizationDialog
+          open={createOpen}
+          onOpenChange={setCreateOpen}
+        />
+      )}
     </>
   )
 }

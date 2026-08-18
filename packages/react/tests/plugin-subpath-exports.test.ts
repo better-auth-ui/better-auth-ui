@@ -19,10 +19,12 @@ describe("React plugin subpath exports", () => {
   it("publishes plugin-specific hooks and queries from plugin-scoped entrypoints", () => {
     expect(apiKey).toHaveProperty("useCreateApiKey")
     expect(apiKey).toHaveProperty("useDeleteApiKey")
+    expect(apiKey).toHaveProperty("useUpdateApiKey")
     expect(apiKey).toHaveProperty("useListApiKeys")
 
     expect(passkey).toHaveProperty("useAddPasskey")
     expect(passkey).toHaveProperty("useDeletePasskey")
+    expect(passkey).toHaveProperty("useUpdatePasskey")
     expect(passkey).toHaveProperty("useSignInPasskey")
     expect(passkey).toHaveProperty("useListPasskeys")
 
@@ -60,6 +62,13 @@ describe("React plugin subpath exports", () => {
     expect(organization).toHaveProperty("useCancelInvitation")
     expect(organization).toHaveProperty("useActiveOrganization")
     expect(organization).toHaveProperty("useListOrganizations")
+    expect(organization).toHaveProperty("useListTeams")
+    expect(organization).toHaveProperty("useListTeamMembers")
+    expect(organization).toHaveProperty("useCreateTeam")
+    expect(organization).toHaveProperty("useUpdateTeam")
+    expect(organization).toHaveProperty("useRemoveTeam")
+    expect(organization).toHaveProperty("useAddTeamMember")
+    expect(organization).toHaveProperty("useRemoveTeamMember")
   })
 
   it("keeps core-owned mutation factories out of framework plugin entrypoints", () => {

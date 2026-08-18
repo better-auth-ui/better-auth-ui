@@ -155,7 +155,8 @@ describe("Solid auth route component selection", () => {
     expect(providers).not.toContain(
       'multiSessionPlugin\n} from "@better-auth-ui/core/plugins/delete-user"'
     )
-    expect(providers).toContain("apiKeyPlugin({ organization: true })")
+    expect(providers).toContain("configurations: [")
+    expect(providers).toContain("permissions: [")
     expect(providers).toContain("passkeyPlugin()")
     expect(providers).toContain('from "@/lib/auth/api-key-plugin"')
     expect(providers).toContain('from "@/lib/auth/passkey-plugin"')
@@ -2559,7 +2560,7 @@ describe("Solid auth route component selection", () => {
     expect(apiKey).toContain("apiKeyLocalization.deleteApiKey")
     expect(apiKey).toContain("<DeleteApiKeyDialog")
     expect(createApiKeyDialog).toContain("useCreateApiKey")
-    expect(createApiKeyDialog).toContain('configId: "organization"')
+    expect(createApiKeyDialog).toContain("configuration()?.id")
     expect(createApiKeyDialog).toContain("organizationId: props.organizationId")
     expect(createApiKeyDialog).toContain("<NewApiKeyDialog")
     expect(newApiKeyDialog).toContain("apiKeyLocalization.newApiKey")
@@ -3178,7 +3179,7 @@ describe("Solid auth route component selection", () => {
     expect(organizationProfile).toContain("mt-1 w-fit")
     expect(organizationProfile).not.toContain("CardDescription")
     expect(organizationProfile).toContain(
-      "data: { name: name(), slug: slug() }"
+      "data: { name: name(), slug: slug(), ...additionalValues }"
     )
     expect(changeLogo).toContain("OrganizationLogo")
     expect(changeLogo).toContain("logo().enabled")

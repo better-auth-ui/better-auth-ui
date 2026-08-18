@@ -6,6 +6,7 @@ import { useState } from "react"
 
 import { apiKeyPlugin } from "../../../lib/auth/api-key-plugin"
 import { DeleteApiKeyDialog } from "./delete-api-key-dialog"
+import { EditApiKeyDialog } from "./edit-api-key-dialog"
 
 export type ApiKeyProps = {
   apiKey: ListedApiKey
@@ -19,6 +20,7 @@ export function ApiKey({ apiKey, hideDelete, organizationId }: ApiKeyProps) {
   const { localization } = useAuth()
   const { localization: apiKeyLocalization } = useAuthPlugin(apiKeyPlugin)
   const [deleteOpen, setDeleteOpen] = useState(false)
+  const [editOpen, setEditOpen] = useState(false)
 
   const preview = `${apiKey.start}${"*".repeat(16)}`
 
@@ -53,12 +55,41 @@ export function ApiKey({ apiKey, hideDelete, organizationId }: ApiKeyProps) {
               })}`
             : apiKeyLocalization.neverExpires}
         </span>
+        <span className="text-xs text-muted">
+          {apiKey.enabled
+            ? apiKeyLocalization.enabled
+            : apiKeyLocalization.disabled}
+          {` · ${apiKeyLocalization.requests}: ${apiKey.requestCount}`}
+          {apiKey.remaining === null
+            ? ""
+            : ` · ${apiKeyLocalization.remaining}: ${apiKey.remaining}`}
+        </span>
+        <span className="text-xs text-muted">
+          {apiKeyLocalization.lastRequest}:{" "}
+          {apiKey.lastRequest
+            ? new Date(apiKey.lastRequest).toLocaleString()
+            : apiKeyLocalization.neverRequested}
+        </span>
       </div>
+
+      <Button
+        className="ml-auto shrink-0"
+        variant="outline"
+        size="sm"
+        onPress={() => setEditOpen(true)}
+      >
+        {apiKeyLocalization.editApiKey}
+      </Button>
+      <EditApiKeyDialog
+        apiKey={apiKey}
+        isOpen={editOpen}
+        onOpenChange={setEditOpen}
+      />
 
       {!hideDelete && (
         <>
           <Button
-            className="ml-auto shrink-0"
+            className="shrink-0"
             variant="outline"
             size="sm"
             onPress={() => setDeleteOpen(true)}

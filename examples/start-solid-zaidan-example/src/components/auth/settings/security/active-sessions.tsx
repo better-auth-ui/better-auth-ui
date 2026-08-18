@@ -1,4 +1,4 @@
-import type { ListSession } from "@better-auth-ui/core"
+import { isSessionNotFreshError, type ListSession } from "@better-auth-ui/core"
 import {
   useAuth,
   useListSessions,
@@ -12,6 +12,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { ItemGroup, ItemSeparator } from "@/components/ui/item"
 import { cn } from "@/lib/utils"
 import { ActiveSessionRow, ActiveSessionRowSkeleton } from "./active-session"
+import { FreshSessionPrompt } from "./fresh-session-prompt"
 
 export type ActiveSessionsSettingsProps = {
   class?: string
@@ -54,11 +55,22 @@ export function ActiveSessionsSettings(
         <CardContent class="z-card-content-padding-none">
           <Show
             fallback={
-              <ItemGroup class="gap-0">
-                <ActiveSessionRowSkeleton />
-              </ItemGroup>
+              <Show
+                fallback={
+                  <ItemGroup class="gap-0">
+                    <ActiveSessionRowSkeleton />
+                  </ItemGroup>
+                }
+                when={isSessionNotFreshError(activeSessions.error)}
+              >
+                <FreshSessionPrompt onFresh={() => activeSessions.refetch()} />
+              </Show>
             }
-            when={!activeSessions.isPending && session.data}
+            when={
+              !activeSessions.isPending &&
+              !isSessionNotFreshError(activeSessions.error) &&
+              session.data
+            }
           >
             <ItemGroup class="gap-0">
               <For each={sessions()}>

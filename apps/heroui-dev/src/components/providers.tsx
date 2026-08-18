@@ -42,13 +42,21 @@ export function Providers({ children }: { children: ReactNode }) {
           }),
           twoFactorPlugin(),
           passkeyPlugin(),
-          apiKeyPlugin({ organization: true }),
+          apiKeyPlugin({
+            organization: true,
+            configurations: [
+              { id: "default", label: "Personal", organization: false },
+              { id: "organization", label: "Organization", organization: true }
+            ],
+            permissions: [{ resource: "project", actions: ["read", "write"] }]
+          }),
           themePlugin({ useTheme }),
           multiSessionPlugin(),
           deleteUserPlugin(),
           organizationPlugin({
             slugPrefix: "@",
-            slug: slug ?? null
+            slug: slug ?? null,
+            teams: true
           })
         ]}
       >

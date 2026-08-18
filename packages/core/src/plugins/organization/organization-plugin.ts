@@ -1,4 +1,5 @@
 import { defaultAuthConfig } from "../../config"
+import type { AdditionalFields } from "../../config/additional-fields-config"
 import type { AvatarConfig } from "../../config/avatar-config"
 import { createAuthPlugin } from "../../lib/create-auth-plugin"
 import {
@@ -87,6 +88,18 @@ export type OrganizationPluginOptions = {
    * @default ""
    */
   slugPrefix?: string
+  /** Additional organization fields rendered during creation and profile editing. */
+  additionalFields?: AdditionalFields
+  /** Maximum organizations the current user can create. */
+  organizationLimit?: number
+  /** Maximum members per organization. */
+  membershipLimit?: number
+  /** Maximum pending invitations per organization. */
+  invitationLimit?: number
+  /** Whether organization creation controls are available. @default true */
+  allowOrganizationCreation?: boolean
+  /** Enable Better Auth team management controls. @default false */
+  teams?: boolean
 }
 
 export const organizationPlugin = createAuthPlugin(
@@ -114,6 +127,12 @@ export const organizationPlugin = createAuthPlugin(
         }),
         ...options.additionalRoles
       },
+      additionalFields: options.additionalFields ?? [],
+      organizationLimit: options.organizationLimit,
+      membershipLimit: options.membershipLimit,
+      invitationLimit: options.invitationLimit,
+      allowOrganizationCreation: options.allowOrganizationCreation ?? true,
+      teams: options.teams ?? false,
       viewPaths: {
         settings: {
           organizations:
@@ -125,7 +144,8 @@ export const organizationPlugin = createAuthPlugin(
         },
         organization: {
           settings: options.viewPaths?.organization?.settings ?? "settings",
-          people: options.viewPaths?.organization?.people ?? "people"
+          people: options.viewPaths?.organization?.people ?? "people",
+          teams: options.viewPaths?.organization?.teams ?? "teams"
         }
       }
     }

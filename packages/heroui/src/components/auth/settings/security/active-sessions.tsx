@@ -1,6 +1,8 @@
+import { isSessionNotFreshError } from "@better-auth-ui/core"
 import { useAuth, useListSessions, useSession } from "@better-auth-ui/react"
 import { Card, type CardProps, cn, Skeleton } from "@heroui/react"
 import { ActiveSession } from "./active-session"
+import { FreshSessionPrompt } from "./fresh-session-prompt"
 
 export type ActiveSessionsProps = {
   className?: string
@@ -23,7 +25,8 @@ export function ActiveSessions({
   const { authClient, localization } = useAuth()
   const { data: session } = useSession(authClient)
 
-  const { data: sessions, isPending } = useListSessions(authClient)
+  const sessionsQuery = useListSessions(authClient)
+  const { data: sessions, error, isPending } = sessionsQuery
 
   const activeSessions =
     sessions &&
@@ -39,7 +42,9 @@ export function ActiveSessions({
 
       <Card className={cn(className)} variant={variant} {...props}>
         <Card.Content className="gap-0">
-          {isPending ? (
+          {isSessionNotFreshError(error) ? (
+            <FreshSessionPrompt onFresh={() => sessionsQuery.refetch()} />
+          ) : isPending ? (
             <SessionRowSkeleton />
           ) : (
             activeSessions?.map((activeSession, index) => (

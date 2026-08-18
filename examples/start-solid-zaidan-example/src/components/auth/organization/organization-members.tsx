@@ -2,7 +2,7 @@ import type {
   OrganizationAuthClient,
   OrganizationLocalization
 } from "@better-auth-ui/core/plugins/organization"
-import { useAuth, useSession } from "@better-auth-ui/solid"
+import { useAuth, useAuthPlugin, useSession } from "@better-auth-ui/solid"
 import { useListOrganizationMembers } from "@better-auth-ui/solid/plugins/organization"
 import { ChevronUp, Filter, Search, X } from "lucide-solid"
 import { createMemo, createSignal, For, type JSX, Show } from "solid-js"
@@ -133,6 +133,7 @@ function SortableTableHead(props: {
 
 export function OrganizationMembers(props: OrganizationMembersProps) {
   const auth = useAuth<OrganizationAuthClient>()
+  const config = useAuthPlugin(organizationPlugin)
   const [inviteOpen, setInviteOpen] = createSignal(false)
   const [memberSearch, setMemberSearch] = createSignal("")
   const [memberRoleFilter, setMemberRoleFilter] = createSignal("all")
@@ -244,6 +245,10 @@ export function OrganizationMembers(props: OrganizationMembersProps) {
         <h3 class="truncate text-sm font-semibold">Members</h3>
         <Button
           class="shrink-0"
+          disabled={
+            config.membershipLimit !== undefined &&
+            memberRows().length >= config.membershipLimit
+          }
           onClick={() => setInviteOpen(true)}
           size="sm"
           type="button"

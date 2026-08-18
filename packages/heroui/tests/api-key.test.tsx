@@ -106,10 +106,12 @@ describe("<CreateApiKeyDialog />", () => {
     )
 
     await waitFor(() => {
-      expect(create).toHaveBeenCalledWith({
-        expiresIn: 30 * API_KEY_EXPIRATION_SECONDS_PER_DAY,
-        fetchOptions: { throw: true }
-      })
+      expect(create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          expiresIn: 30 * API_KEY_EXPIRATION_SECONDS_PER_DAY,
+          fetchOptions: { throw: true }
+        })
+      )
     })
   })
 

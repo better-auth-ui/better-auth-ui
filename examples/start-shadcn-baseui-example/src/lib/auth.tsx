@@ -122,7 +122,7 @@ export const auth = betterAuth({
       { configId: "default", references: "user" },
       { configId: "organization", references: "organization" }
     ]),
-    organization(),
+    organization({ teams: { enabled: true } }),
     magicLink({
       expiresIn: MAGIC_LINK_EXPIRES_SECONDS,
       sendMagicLink: async ({ email, url }) => {

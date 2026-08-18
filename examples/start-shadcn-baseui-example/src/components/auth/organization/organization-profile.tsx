@@ -1,5 +1,6 @@
 "use client"
 
+import { parseAdditionalFieldValue } from "@better-auth-ui/core"
 import type { OrganizationAuthClient } from "@better-auth-ui/core/plugins/organization"
 import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
 import {
@@ -17,6 +18,7 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { Spinner } from "@/components/ui/spinner"
 import { organizationPlugin } from "@/lib/auth/organization-plugin"
 import { cn } from "@/lib/utils"
+import { AdditionalField } from "../additional-field"
 import { ChangeOrganizationLogo } from "./change-organization-logo"
 import { SlugField } from "./slug-field"
 
@@ -29,7 +31,7 @@ export type OrganizationProfileProps = {
  */
 export function OrganizationProfile({ className }: OrganizationProfileProps) {
   const { authClient, localization } = useAuth<OrganizationAuthClient>()
-  const { localization: organizationLocalization } =
+  const { additionalFields, localization: organizationLocalization } =
     useAuthPlugin(organizationPlugin)
 
   const { data: activeOrganization } = useActiveOrganization(authClient)
@@ -48,15 +50,23 @@ export function OrganizationProfile({ className }: OrganizationProfileProps) {
     }
   )
 
-  function handleSubmit(e: SyntheticEvent<HTMLFormElement>) {
+  async function handleSubmit(e: SyntheticEvent<HTMLFormElement>) {
     e.preventDefault()
     if (!activeOrganization) return
-
     const formData = new FormData(e.currentTarget)
     const name = formData.get("name") as string
+    const additionalValues: Record<string, unknown> = {}
+    for (const field of additionalFields) {
+      const value = parseAdditionalFieldValue(
+        field,
+        formData.get(field.name) as string | null
+      )
+      await field.validate?.(value)
+      if (value !== undefined) additionalValues[field.name] = value
+    }
 
     commitOrganizationUpdate({
-      data: { name, slug }
+      data: { name, slug, ...additionalValues }
     })
   }
 
@@ -110,6 +120,22 @@ export function OrganizationProfile({ className }: OrganizationProfileProps) {
                 <Skeleton className="h-8 w-full rounded-md" />
               </Field>
             )}
+
+            {activeOrganization &&
+              additionalFields.map((field) => (
+                <AdditionalField
+                  key={field.name}
+                  field={{
+                    ...field,
+                    defaultValue: (
+                      activeOrganization as Record<string, unknown>
+                    )[field.name] as never
+                  }}
+                  isPending={isPending}
+                  name={field.name}
+                  optionalLabel={localization.settings.optional}
+                />
+              ))}
 
             <Button
               type="submit"

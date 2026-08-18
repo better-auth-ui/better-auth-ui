@@ -1,20 +1,18 @@
-import type {
-  OrganizationAuthClient,
-  OrganizationLocalization
-} from "@better-auth-ui/core/plugins/organization"
-import { useAuth } from "@better-auth-ui/solid"
+import { parseAdditionalFieldValue } from "@better-auth-ui/core"
+import type { OrganizationAuthClient } from "@better-auth-ui/core/plugins/organization"
+import { useAuth, useAuthPlugin } from "@better-auth-ui/solid"
 import {
   useActiveOrganization,
   useUpdateOrganization
 } from "@better-auth-ui/solid/plugins/organization"
-import { createEffect, createSignal, Show } from "solid-js"
+import { createEffect, createSignal, For, Show } from "solid-js"
 import { toast } from "solid-sonner"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Field, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
-import { Skeleton } from "@/components/ui/skeleton"
 import { organizationPlugin } from "@/lib/auth/organization-plugin"
+import { AdditionalField } from "../additional-field"
 import { ChangeOrganizationLogo } from "./change-organization-logo"
 import { SlugField } from "./slug-field"
 
@@ -22,55 +20,45 @@ export type OrganizationProfileProps = {
   class?: string
 }
 
-const fallbackLocalization = {
-  organizationProfile: "Organization profile",
-  name: "Name",
-  namePlaceholder: "Enter the organization name",
-  slug: "Slug",
-  organizationUpdatedSuccess: "Organization updated successfully"
-} satisfies Pick<
-  OrganizationLocalization,
-  | "organizationProfile"
-  | "name"
-  | "namePlaceholder"
-  | "slug"
-  | "organizationUpdatedSuccess"
->
-
 export function OrganizationProfile(props: OrganizationProfileProps) {
   const auth = useAuth<OrganizationAuthClient>()
   const activeOrganization = useActiveOrganization(auth.authClient)
+  const config = useAuthPlugin(organizationPlugin)
   const updateOrganization = useUpdateOrganization(auth.authClient, () => ({
-    onSuccess: () => toast.success(localization().organizationUpdatedSuccess)
+    onSuccess: () =>
+      toast.success(config.localization.organizationUpdatedSuccess)
   }))
   const [name, setName] = createSignal("")
   const [slug, setSlug] = createSignal("")
-  const organizationPluginConfig = () =>
-    auth.plugins.find((plugin) => plugin.id === organizationPlugin.id) as
-      | { localization?: OrganizationLocalization }
-      | undefined
-  const localization = () =>
-    organizationPluginConfig()?.localization ?? fallbackLocalization
-
   createEffect(() => {
     const organization = activeOrganization.data
-
     if (!organization) return
-
     setName(organization.name)
     setSlug(organization.slug)
   })
 
-  const handleSubmit = (event: SubmitEvent) => {
+  const handleSubmit = async (event: SubmitEvent) => {
     event.preventDefault()
-
-    updateOrganization.mutate({ data: { name: name(), slug: slug() } })
+    if (!activeOrganization.data) return
+    const formData = new FormData(event.currentTarget as HTMLFormElement)
+    const additionalValues: Record<string, unknown> = {}
+    for (const field of config.additionalFields) {
+      const value = parseAdditionalFieldValue(
+        field,
+        formData.get(field.name) as string | null
+      )
+      await field.validate?.(value)
+      if (value !== undefined) additionalValues[field.name] = value
+    }
+    updateOrganization.mutate({
+      data: { name: name(), slug: slug(), ...additionalValues }
+    })
   }
 
   return (
     <div class={props.class}>
       <h2 class="mb-3 font-semibold text-sm">
-        {localization().organizationProfile}
+        {config.localization.organizationProfile}
       </h2>
       <Card>
         <CardContent>
@@ -79,33 +67,22 @@ export function OrganizationProfile(props: OrganizationProfileProps) {
 
             <Field>
               <FieldLabel for="organization-profile-name">
-                {localization().name}
+                {config.localization.name}
               </FieldLabel>
-              <Show
-                when={activeOrganization.data}
-                fallback={<Skeleton class="h-8 w-full rounded-md" />}
-              >
+              <Show when={activeOrganization.data}>
                 <Input
                   disabled={updateOrganization.isPending}
                   id="organization-profile-name"
                   name="name"
                   onInput={(event) => setName(event.currentTarget.value)}
-                  placeholder={localization().namePlaceholder}
+                  placeholder={config.localization.namePlaceholder}
                   required
                   value={name()}
                 />
               </Show>
             </Field>
 
-            <Show
-              when={activeOrganization.data}
-              fallback={
-                <Field>
-                  <FieldLabel>{localization().slug}</FieldLabel>
-                  <Skeleton class="h-8 w-full rounded-md" />
-                </Field>
-              }
-            >
+            <Show when={activeOrganization.data}>
               {(organization) => (
                 <SlugField
                   currentSlug={organization().slug}
@@ -114,6 +91,26 @@ export function OrganizationProfile(props: OrganizationProfileProps) {
                   onChange={setSlug}
                   value={slug()}
                 />
+              )}
+            </Show>
+
+            <Show when={activeOrganization.data}>
+              {(organization) => (
+                <For each={config.additionalFields}>
+                  {(field) => (
+                    <AdditionalField
+                      field={{
+                        ...field,
+                        defaultValue: (
+                          organization() as Record<string, unknown>
+                        )[field.name] as never
+                      }}
+                      isPending={updateOrganization.isPending}
+                      name={field.name}
+                      optionalLabel={auth.localization.settings.optional}
+                    />
+                  )}
+                </For>
               )}
             </Show>
 

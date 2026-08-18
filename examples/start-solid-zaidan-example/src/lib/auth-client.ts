@@ -31,6 +31,6 @@ export const authClient: AuthClient = createAuthClient({
     magicLinkClient(),
     emailOTPClient(),
     twoFactorClient(),
-    organizationClient()
+    organizationClient({ teams: { enabled: true } })
   ]
 })

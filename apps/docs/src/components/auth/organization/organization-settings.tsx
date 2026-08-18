@@ -26,8 +26,8 @@ export function OrganizationSettings({
       <OrganizationProfile />
 
       {plugins.flatMap((plugin) =>
-        plugin.organizationCards?.map((Card, index) => (
-          <Card key={`${plugin.id}-${index.toString()}`} />
+        plugin.organizationCards?.map((Card) => (
+          <Card key={`${plugin.id}-${Card.displayName ?? Card.name}`} />
         ))
       )}
 

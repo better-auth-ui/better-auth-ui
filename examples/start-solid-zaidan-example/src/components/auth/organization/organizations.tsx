@@ -3,7 +3,7 @@ import type {
   OrganizationLocalization
 } from "@better-auth-ui/core/plugins/organization"
 import { organizationLocalization } from "@better-auth-ui/core/plugins/organization"
-import { useAuth } from "@better-auth-ui/solid"
+import { useAuth, useAuthPlugin } from "@better-auth-ui/solid"
 import { useListOrganizations } from "@better-auth-ui/solid/plugins/organization"
 import { createSignal, For, Show } from "solid-js"
 import { Button } from "@/components/ui/button"
@@ -26,6 +26,7 @@ type OrganizationPluginConfig = {
 export function Organizations(props: OrganizationsProps = {}) {
   const auth = useAuth<OrganizationAuthClient>()
   const client = auth.authClient
+  const config = useAuthPlugin(organizationPlugin)
   const localization = () =>
     (
       auth.plugins.find((plugin) => plugin.id === organizationPlugin.id) as
@@ -33,6 +34,10 @@ export function Organizations(props: OrganizationsProps = {}) {
         | undefined
     )?.localization ?? organizationLocalization
   const organizations = useListOrganizations(client)
+  const canCreate = () =>
+    config.allowOrganizationCreation &&
+    (config.organizationLimit === undefined ||
+      (organizations.data?.length ?? 0) < config.organizationLimit)
   const [createOpen, setCreateOpen] = createSignal(false)
 
   return (
@@ -44,14 +49,16 @@ export function Organizations(props: OrganizationsProps = {}) {
               {localization().organizations}
             </h2>
 
-            <Button
-              class="shrink-0"
-              size="sm"
-              disabled={organizations.isPending}
-              onClick={() => setCreateOpen(true)}
-            >
-              {localization().createOrganization}
-            </Button>
+            <Show when={config.allowOrganizationCreation}>
+              <Button
+                class="shrink-0"
+                size="sm"
+                disabled={organizations.isPending || !canCreate()}
+                onClick={() => setCreateOpen(true)}
+              >
+                {localization().createOrganization}
+              </Button>
+            </Show>
           </div>
 
           <Card class="z-card-padding-none">
@@ -70,6 +77,7 @@ export function Organizations(props: OrganizationsProps = {}) {
                   when={(organizations.data ?? []).length > 0}
                   fallback={
                     <OrganizationsEmpty
+                      canCreate={canCreate()}
                       onCreatePress={() => setCreateOpen(true)}
                     />
                   }
@@ -93,10 +101,12 @@ export function Organizations(props: OrganizationsProps = {}) {
         </div>
       </div>
 
-      <CreateOrganizationDialog
-        open={createOpen()}
-        onOpenChange={setCreateOpen}
-      />
+      <Show when={canCreate()}>
+        <CreateOrganizationDialog
+          open={createOpen()}
+          onOpenChange={setCreateOpen}
+        />
+      </Show>
     </>
   )
 }

@@ -1,11 +1,9 @@
-import type {
-  OrganizationAuthClient,
-  OrganizationLocalization
-} from "@better-auth-ui/core/plugins/organization"
-import { useAuth } from "@better-auth-ui/solid"
+import { parseAdditionalFieldValue } from "@better-auth-ui/core"
+import type { OrganizationAuthClient } from "@better-auth-ui/core/plugins/organization"
+import { useAuth, useAuthPlugin } from "@better-auth-ui/solid"
 import { useCreateOrganization } from "@better-auth-ui/solid/plugins/organization"
 import { BriefcaseBusiness, LoaderCircle } from "lucide-solid"
-import { createEffect, createSignal } from "solid-js"
+import { createEffect, createSignal, For } from "solid-js"
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
@@ -19,6 +17,7 @@ import {
 import { Field, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import { organizationPlugin } from "@/lib/auth/organization-plugin"
+import { AdditionalField } from "../additional-field"
 import { SlugField, sanitizeSlug } from "./slug-field"
 
 export type CreateOrganizationDialogProps = {
@@ -26,32 +25,15 @@ export type CreateOrganizationDialogProps = {
   onOpenChange: (open: boolean) => void
 }
 
-const organizationFallbackLocalization = {
-  createOrganization: "Create organization",
-  name: "Name",
-  namePlaceholder: "Enter the organization name",
-  organizationsDescription:
-    "Create an organization to collaborate with others and manage shared access."
-} satisfies Pick<
-  OrganizationLocalization,
-  "createOrganization" | "name" | "namePlaceholder" | "organizationsDescription"
->
-
 export function CreateOrganizationDialog(props: CreateOrganizationDialogProps) {
   const auth = useAuth<OrganizationAuthClient>()
+  const config = useAuthPlugin(organizationPlugin)
   const [name, setName] = createSignal("")
   const [slug, setSlug] = createSignal("")
   const [slugEdited, setSlugEdited] = createSignal(false)
   const createOrganization = useCreateOrganization(auth.authClient, () => ({
     onSuccess: () => props.onOpenChange(false)
   }))
-  const organizationPluginConfig = () =>
-    auth.plugins.find((plugin) => plugin.id === organizationPlugin.id) as
-      | { localization?: OrganizationLocalization }
-      | undefined
-  const localization = () =>
-    organizationPluginConfig()?.localization ?? organizationFallbackLocalization
-
   createEffect(() => {
     if (!props.open) {
       setName("")
@@ -65,12 +47,22 @@ export function CreateOrganizationDialog(props: CreateOrganizationDialogProps) {
     setSlug(sanitizeSlug(name()))
   })
 
-  const handleSubmit = (event: SubmitEvent) => {
+  const handleSubmit = async (event: SubmitEvent) => {
     event.preventDefault()
-
+    const formData = new FormData(event.currentTarget as HTMLFormElement)
+    const additionalValues: Record<string, unknown> = {}
+    for (const field of config.additionalFields) {
+      const value = parseAdditionalFieldValue(
+        field,
+        formData.get(field.name) as string | null
+      )
+      await field.validate?.(value)
+      if (value !== undefined) additionalValues[field.name] = value
+    }
     createOrganization.mutate({
       name: name(),
-      slug: slug()
+      slug: slug(),
+      ...additionalValues
     })
   }
 
@@ -82,15 +74,15 @@ export function CreateOrganizationDialog(props: CreateOrganizationDialogProps) {
             <div class="flex size-10 items-center justify-center rounded-md bg-muted">
               <BriefcaseBusiness class="size-4.5" />
             </div>
-            <DialogTitle>{localization().createOrganization}</DialogTitle>
+            <DialogTitle>{config.localization.createOrganization}</DialogTitle>
             <DialogDescription>
-              {localization().organizationsDescription}
+              {config.localization.organizationsDescription}
             </DialogDescription>
           </DialogHeader>
 
           <Field>
             <FieldLabel for="create-organization-name">
-              {localization().name}
+              {config.localization.name}
             </FieldLabel>
             <Input
               autofocus
@@ -98,7 +90,7 @@ export function CreateOrganizationDialog(props: CreateOrganizationDialogProps) {
               id="create-organization-name"
               name="name"
               onInput={(event) => setName(event.currentTarget.value)}
-              placeholder={localization().namePlaceholder}
+              placeholder={config.localization.namePlaceholder}
               required
               value={name()}
             />
@@ -114,6 +106,17 @@ export function CreateOrganizationDialog(props: CreateOrganizationDialogProps) {
             value={slug()}
           />
 
+          <For each={config.additionalFields}>
+            {(field) => (
+              <AdditionalField
+                field={field}
+                isPending={createOrganization.isPending}
+                name={field.name}
+                optionalLabel={auth.localization.settings.optional}
+              />
+            )}
+          </For>
+
           <DialogFooter>
             <DialogClose
               as={Button}
@@ -127,10 +130,10 @@ export function CreateOrganizationDialog(props: CreateOrganizationDialogProps) {
               {createOrganization.isPending ? (
                 <>
                   <LoaderCircle class="size-4 animate-spin" />
-                  {localization().createOrganization}
+                  {config.localization.createOrganization}
                 </>
               ) : (
-                localization().createOrganization
+                config.localization.createOrganization
               )}
             </Button>
           </DialogFooter>

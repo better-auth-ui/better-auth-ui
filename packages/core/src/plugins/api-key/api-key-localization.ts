@@ -37,7 +37,30 @@ export const apiKeyLocalization = {
   deleteApiKeyWarning:
     "This action cannot be undone. Any service using this API key will stop working immediately.",
   /** @remarks `"I've saved my key"` */
-  dismissNewKey: "I've saved my key"
+  dismissNewKey: "I've saved my key",
+  editApiKey: "Edit API key",
+  configuration: "Configuration",
+  enabled: "Enabled",
+  disabled: "Disabled",
+  permissions: "Permissions",
+  metadata: "Metadata (JSON)",
+  quota: "Request quota",
+  refillAmount: "Refill amount",
+  refillInterval: "Refill interval (milliseconds)",
+  rateLimit: "Rate limit",
+  rateLimitMax: "Maximum requests",
+  rateLimitWindow: "Time window (milliseconds)",
+  requests: "Requests",
+  remaining: "Remaining",
+  lastRequest: "Last request",
+  neverRequested: "Never requested",
+  sortBy: "Sort by",
+  newest: "Newest",
+  oldest: "Oldest",
+  nameAscending: "Name A–Z",
+  nameDescending: "Name Z–A",
+  previousPage: "Previous page",
+  nextPage: "Next page"
 }
 
 export type ApiKeyLocalization = typeof apiKeyLocalization

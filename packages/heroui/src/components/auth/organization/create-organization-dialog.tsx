@@ -1,3 +1,4 @@
+import { parseAdditionalFieldValue } from "@better-auth-ui/core"
 import type { OrganizationAuthClient } from "@better-auth-ui/core/plugins/organization"
 import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
 import { useCreateOrganization } from "@better-auth-ui/react/plugins/organization"
@@ -15,6 +16,7 @@ import {
 import { type SyntheticEvent, useEffect, useState } from "react"
 
 import { organizationPlugin } from "../../../lib/auth/organization-plugin"
+import { AdditionalField } from "../additional-field"
 import { SlugField, sanitizeSlug } from "./slug-field"
 
 /** Props for the {@link CreateOrganizationDialog} component. */
@@ -35,7 +37,7 @@ export function CreateOrganizationDialog({
   onOpenChange
 }: CreateOrganizationDialogProps) {
   const { authClient, localization } = useAuth()
-  const { localization: organizationLocalization } =
+  const { additionalFields, localization: organizationLocalization } =
     useAuthPlugin(organizationPlugin)
 
   const [name, setName] = useState("")
@@ -47,9 +49,19 @@ export function CreateOrganizationDialog({
       onSuccess: () => onOpenChange(false)
     })
 
-  const handleSubmit = (e: SyntheticEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault()
-    createOrganization({ name, slug })
+    const formData = new FormData(e.currentTarget)
+    const additionalValues: Record<string, unknown> = {}
+    for (const field of additionalFields) {
+      const value = parseAdditionalFieldValue(
+        field,
+        formData.get(field.name) as string | null
+      )
+      await field.validate?.(value)
+      if (value !== undefined) additionalValues[field.name] = value
+    }
+    createOrganization({ name, slug, ...additionalValues })
   }
 
   useEffect(() => {
@@ -118,6 +130,15 @@ export function CreateOrganizationDialog({
                 isDisabled={isCreating}
                 variant="secondary"
               />
+              {additionalFields.map((field) => (
+                <AdditionalField
+                  field={field}
+                  isPending={isCreating}
+                  key={field.name}
+                  name={field.name}
+                  optionalLabel={localization.settings.optional}
+                />
+              ))}
             </AlertDialog.Body>
 
             <AlertDialog.Footer>

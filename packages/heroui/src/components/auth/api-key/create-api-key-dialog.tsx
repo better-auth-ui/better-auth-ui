@@ -8,6 +8,7 @@ import { Key } from "@gravity-ui/icons"
 import {
   AlertDialog,
   Button,
+  Checkbox,
   FieldError,
   Form,
   Input,
@@ -15,6 +16,8 @@ import {
   ListBox,
   Select,
   Spinner,
+  Switch,
+  TextArea,
   TextField
 } from "@heroui/react"
 import { type SyntheticEvent, useState } from "react"
@@ -36,8 +39,12 @@ export function CreateApiKeyDialog({
   organizationId
 }: CreateApiKeyDialogProps) {
   const { authClient, localization } = useAuth()
-  const { keyExpiration, localization: apiKeyLocalization } =
-    useAuthPlugin(apiKeyPlugin)
+  const {
+    configurations,
+    keyExpiration,
+    localization: apiKeyLocalization,
+    permissions
+  } = useAuthPlugin(apiKeyPlugin)
 
   const { mutate: createApiKey, isPending: isCreating } = useCreateApiKey(
     authClient as ApiKeyAuthClient
@@ -46,6 +53,8 @@ export function CreateApiKeyDialog({
   const [isNewKeyDialogOpen, setIsNewKeyDialogOpen] = useState(false)
   const [keyName, setKeyName] = useState<string | null>(null)
   const [secretKey, setSecretKey] = useState<string | null>(null)
+  const [rateLimitEnabled, setRateLimitEnabled] = useState(false)
+  const [formError, setFormError] = useState<string>()
 
   const handleOpenChange = (open: boolean) => {
     if (!open) {
@@ -79,10 +88,50 @@ export function CreateApiKeyDialog({
       ? apiKeyExpirationDaysToSeconds(expirationDays)
       : undefined
 
+    const selectedConfig = String(formData.get("configId") ?? "").trim()
+    const resolvedConfigId =
+      selectedConfig || (organizationId ? "organization" : undefined)
+    const numberValue = (field: string) => {
+      const value = String(formData.get(field) ?? "").trim()
+      return value ? Number(value) : undefined
+    }
+    const selectedPermissions = Object.fromEntries(
+      permissions
+        .map((permission) => {
+          const actions = permission.actions
+            .map((action) => (typeof action === "string" ? action : action.id))
+            .filter((action) =>
+              formData.has(`permission:${permission.resource}:${action}`)
+            )
+          return [permission.resource, actions] as const
+        })
+        .filter(([, actions]) => actions.length)
+    )
+    let metadata: unknown
+    try {
+      const metadataText = String(formData.get("metadata") ?? "").trim()
+      metadata = metadataText ? JSON.parse(metadataText) : undefined
+      setFormError(undefined)
+    } catch {
+      setFormError("Metadata must contain valid JSON.")
+      return
+    }
+
     const payload = {
       ...(name ? { name } : {}),
       ...(expiresIn ? { expiresIn } : {}),
-      ...(organizationId ? { organizationId, configId: "organization" } : {})
+      ...(resolvedConfigId ? { configId: resolvedConfigId } : {}),
+      ...(organizationId ? { organizationId } : {}),
+      ...(metadata ? { metadata } : {}),
+      ...(Object.keys(selectedPermissions).length
+        ? { permissions: selectedPermissions }
+        : {}),
+      remaining: numberValue("remaining"),
+      refillAmount: numberValue("refillAmount"),
+      refillInterval: numberValue("refillInterval"),
+      rateLimitEnabled,
+      rateLimitMax: numberValue("rateLimitMax"),
+      rateLimitTimeWindow: numberValue("rateLimitTimeWindow")
     }
 
     createApiKey(Object.keys(payload).length > 0 ? payload : undefined, {
@@ -130,6 +179,48 @@ export function CreateApiKeyDialog({
 
                     <FieldError />
                   </TextField>
+
+                  {configurations.length > 0 && (
+                    <Select
+                      defaultValue={
+                        configurations.find(
+                          (configuration) =>
+                            configuration.organization ===
+                            Boolean(organizationId)
+                        )?.id ?? configurations[0]?.id
+                      }
+                      fullWidth
+                      isDisabled={isCreating}
+                      name="configId"
+                      variant="secondary"
+                    >
+                      <Label>{apiKeyLocalization.configuration}</Label>
+                      <Select.Trigger>
+                        <Select.Value />
+                        <Select.Indicator />
+                      </Select.Trigger>
+                      <Select.Popover>
+                        <ListBox>
+                          {configurations
+                            .filter(
+                              (configuration) =>
+                                configuration.organization ===
+                                Boolean(organizationId)
+                            )
+                            .map((configuration) => (
+                              <ListBox.Item
+                                id={configuration.id}
+                                key={configuration.id}
+                                textValue={configuration.label}
+                              >
+                                {configuration.label}
+                                <ListBox.ItemIndicator />
+                              </ListBox.Item>
+                            ))}
+                        </ListBox>
+                      </Select.Popover>
+                    </Select>
+                  )}
 
                   {keyExpiration ? (
                     <Select
@@ -183,6 +274,77 @@ export function CreateApiKeyDialog({
                       </Select.Popover>
                     </Select>
                   ) : null}
+
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <TextField name="remaining" type="number">
+                      <Label>{apiKeyLocalization.quota}</Label>
+                      <Input min={0} variant="secondary" />
+                    </TextField>
+                    <TextField name="refillAmount" type="number">
+                      <Label>{apiKeyLocalization.refillAmount}</Label>
+                      <Input min={1} variant="secondary" />
+                    </TextField>
+                    <TextField name="refillInterval" type="number">
+                      <Label>{apiKeyLocalization.refillInterval}</Label>
+                      <Input min={1} variant="secondary" />
+                    </TextField>
+                    <Switch
+                      isSelected={rateLimitEnabled}
+                      onChange={setRateLimitEnabled}
+                    >
+                      {apiKeyLocalization.rateLimit}
+                    </Switch>
+                    <TextField name="rateLimitMax" type="number">
+                      <Label>{apiKeyLocalization.rateLimitMax}</Label>
+                      <Input min={1} variant="secondary" />
+                    </TextField>
+                    <TextField name="rateLimitTimeWindow" type="number">
+                      <Label>{apiKeyLocalization.rateLimitWindow}</Label>
+                      <Input min={1} variant="secondary" />
+                    </TextField>
+                  </div>
+
+                  {permissions.length > 0 && (
+                    <div className="flex flex-col gap-3">
+                      <Label>{apiKeyLocalization.permissions}</Label>
+                      {permissions.map((permission) => (
+                        <div
+                          className="flex flex-col gap-2"
+                          key={permission.resource}
+                        >
+                          <span className="text-sm font-medium">
+                            {permission.label ?? permission.resource}
+                          </span>
+                          <div className="flex flex-wrap gap-3">
+                            {permission.actions.map((action) => {
+                              const actionId =
+                                typeof action === "string" ? action : action.id
+                              return (
+                                <Checkbox
+                                  key={actionId}
+                                  name={`permission:${permission.resource}:${actionId}`}
+                                >
+                                  {typeof action === "string"
+                                    ? action
+                                    : action.label}
+                                </Checkbox>
+                              )
+                            })}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  <TextField name="metadata">
+                    <Label>{apiKeyLocalization.metadata}</Label>
+                    <TextArea rows={3} variant="secondary" />
+                  </TextField>
+                  {formError && (
+                    <p className="text-sm text-danger" role="alert">
+                      {formError}
+                    </p>
+                  )}
                 </div>
               </AlertDialog.Body>
 

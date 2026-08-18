@@ -1,14 +1,15 @@
 import type {
   InviteMemberParams,
-  OrganizationAuthClient,
-  OrganizationLocalization
+  OrganizationAuthClient
 } from "@better-auth-ui/core/plugins/organization"
-import { useAuth } from "@better-auth-ui/solid"
+import { useAuth, useAuthPlugin } from "@better-auth-ui/solid"
 import {
   useActiveOrganization,
-  useInviteMember
+  useInviteMember,
+  useListOrganizationInvitations,
+  useListTeams
 } from "@better-auth-ui/solid/plugins/organization"
-import { createEffect, createMemo, createSignal, For } from "solid-js"
+import { createEffect, createMemo, createSignal, For, Show } from "solid-js"
 import { toast } from "solid-sonner"
 import { Button } from "@/components/ui/button"
 import {
@@ -30,35 +31,7 @@ export type InviteMemberDialogProps = {
   onOpenChange: (open: boolean) => void
 }
 
-type RoleMap = Record<string, string>
-
-const fallbackLocalization = {
-  admin: "Admin",
-  inviteMember: "Invite member",
-  inviteMemberDescription:
-    "We'll email them a link to join this organization. Choose the role they'll have once they accept.",
-  inviteMemberSuccess: "Member invited successfully",
-  member: "Member",
-  owner: "Owner",
-  role: "Role"
-} satisfies Pick<
-  OrganizationLocalization,
-  | "admin"
-  | "inviteMember"
-  | "inviteMemberDescription"
-  | "inviteMemberSuccess"
-  | "member"
-  | "owner"
-  | "role"
->
-
-const fallbackRoles: RoleMap = {
-  owner: fallbackLocalization.owner,
-  admin: fallbackLocalization.admin,
-  member: fallbackLocalization.member
-}
-
-function pickDefaultRole(roles: RoleMap) {
+function pickDefaultRole(roles: Record<string, string>) {
   const roleKeys = Object.keys(roles)
 
   if (roleKeys.includes("member")) return "member"
@@ -69,30 +42,20 @@ function pickDefaultRole(roles: RoleMap) {
 export function InviteMemberDialog(props: InviteMemberDialogProps) {
   const auth = useAuth<OrganizationAuthClient>()
   const activeOrganization = useActiveOrganization(auth.authClient)
-  const organizationPluginConfig = () =>
-    auth.plugins.find((plugin) => plugin.id === organizationPlugin.id) as
-      | {
-          localization?: Pick<
-            OrganizationLocalization,
-            | "inviteMember"
-            | "inviteMemberDescription"
-            | "inviteMemberSuccess"
-            | "role"
-          >
-          roles?: RoleMap
-        }
-      | undefined
-  const localization = () =>
-    organizationPluginConfig()?.localization ?? fallbackLocalization
-  const roles = createMemo(
-    () => organizationPluginConfig()?.roles ?? fallbackRoles
-  )
+  const config = useAuthPlugin(organizationPlugin)
+  const roles = createMemo(() => config.roles)
+  const teams = useListTeams(auth.authClient, () => ({
+    query: { organizationId: activeOrganization.data?.id },
+    enabled: config.teams
+  }))
+  const invitations = useListOrganizationInvitations(auth.authClient)
   const [email, setEmail] = createSignal("")
   const [role, setRole] = createSignal(pickDefaultRole(roles()))
+  const [teamId, setTeamId] = createSignal("")
   const inviteMember = useInviteMember(auth.authClient, () => ({
     onSuccess: () => {
       props.onOpenChange(false)
-      toast.success(localization().inviteMemberSuccess)
+      toast.success(config.localization.inviteMemberSuccess)
     }
   }))
 
@@ -114,6 +77,7 @@ export function InviteMemberDialog(props: InviteMemberDialogProps) {
     const payload = {
       email: email().trim(),
       organizationId: activeOrganization.data?.id,
+      teamId: teamId() || undefined,
       role: role() as InviteMemberParams["role"]
     } satisfies InviteMemberParams
 
@@ -125,9 +89,9 @@ export function InviteMemberDialog(props: InviteMemberDialogProps) {
       <DialogContent>
         <form class="flex flex-col gap-6" onSubmit={handleSubmit}>
           <DialogHeader>
-            <DialogTitle>{localization().inviteMember}</DialogTitle>
+            <DialogTitle>{config.localization.inviteMember}</DialogTitle>
             <DialogDescription>
-              {localization().inviteMemberDescription}
+              {config.localization.inviteMemberDescription}
             </DialogDescription>
           </DialogHeader>
 
@@ -149,7 +113,7 @@ export function InviteMemberDialog(props: InviteMemberDialogProps) {
 
           <Field>
             <FieldLabel for="invite-member-role">
-              {localization().role}
+              {config.localization.role}
             </FieldLabel>
             <NativeSelect
               class="w-full"
@@ -166,6 +130,32 @@ export function InviteMemberDialog(props: InviteMemberDialogProps) {
             </NativeSelect>
           </Field>
 
+          <Show when={config.teams}>
+            <Field>
+              <FieldLabel for="invite-member-team">
+                {config.localization.team}
+              </FieldLabel>
+              <NativeSelect
+                class="w-full"
+                disabled={inviteMember.isPending}
+                id="invite-member-team"
+                onChange={(event) => setTeamId(event.currentTarget.value)}
+                value={teamId()}
+              >
+                <NativeSelectOption value="">
+                  {config.localization.selectTeam}
+                </NativeSelectOption>
+                <For each={teams.data}>
+                  {(team) => (
+                    <NativeSelectOption value={team.id}>
+                      {team.name}
+                    </NativeSelectOption>
+                  )}
+                </For>
+              </NativeSelect>
+            </Field>
+          </Show>
+
           <DialogFooter>
             <DialogClose
               as={Button}
@@ -177,11 +167,17 @@ export function InviteMemberDialog(props: InviteMemberDialogProps) {
             </DialogClose>
             <Button
               disabled={
-                inviteMember.isPending || !email().trim() || !roles()[role()]
+                inviteMember.isPending ||
+                !email().trim() ||
+                !roles()[role()] ||
+                (config.invitationLimit !== undefined &&
+                  (invitations.data?.filter(
+                    (invitation) => invitation.status === "pending"
+                  ).length ?? 0) >= config.invitationLimit)
               }
               type="submit"
             >
-              {localization().inviteMember}
+              {config.localization.inviteMember}
             </Button>
           </DialogFooter>
         </form>

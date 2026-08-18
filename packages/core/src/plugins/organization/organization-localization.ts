@@ -129,7 +129,28 @@ export const organizationLocalization = {
   uploadLogo: "Upload logo",
   /** @remarks `"Invitations to join an organization will show up here."` */
   userInvitationsEmptyDescription:
-    "Invitations to join an organization will show up here."
+    "Invitations to join an organization will show up here.",
+  teams: "Teams",
+  team: "Team",
+  teamsDescription: "Create teams and manage their members.",
+  selectTeam: "Select a team",
+  selectMember: "Select a member",
+  createTeam: "Create team",
+  renameTeam: "Rename team",
+  deleteTeam: "Delete team",
+  noTeams: "No teams",
+  noTeamsDescription:
+    "Create a team to organize access within this organization.",
+  teamMembers: "Team members",
+  addTeamMember: "Add team member",
+  removeTeamMember: "Remove from team",
+  teamCreated: "Team created",
+  teamUpdated: "Team updated",
+  teamDeleted: "Team deleted",
+  limitReached: "Limit reached",
+  organizationLimitReached: "You have reached the organization limit.",
+  membershipLimitReached: "This organization has reached its member limit.",
+  invitationLimitReached: "This organization has reached its invitation limit."
 }
 
 export type OrganizationLocalization = typeof organizationLocalization

@@ -8,6 +8,13 @@ import { Fragment, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { ItemGroup, ItemSeparator } from "@/components/ui/item"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
+} from "@/components/ui/select"
 import { apiKeyPlugin } from "@/lib/auth/api-key-plugin"
 import { cn } from "@/lib/utils"
 import { ApiKey } from "./api-key"
@@ -35,15 +42,23 @@ export function ApiKeys({
   hideDelete
 }: ApiKeysProps) {
   const { authClient } = useAuth<ApiKeyAuthClient>()
-  const { localization: apiKeyLocalization } = useAuthPlugin(apiKeyPlugin)
+  const { localization: apiKeyLocalization, pageSize } =
+    useAuthPlugin(apiKeyPlugin)
+  const [page, setPage] = useState(0)
+  const [sort, setSort] = useState("createdAt:desc")
+  const [sortBy, sortDirection] = sort.split(":") as [string, "asc" | "desc"]
 
   const { data: listData, isPending: isListPending } = useListApiKeys(
     authClient,
     {
       enabled: !isPendingProp,
-      ...(organizationId
-        ? { query: { organizationId, configId: "organization" } }
-        : {})
+      query: {
+        limit: pageSize,
+        offset: page * pageSize,
+        sortBy,
+        sortDirection,
+        ...(organizationId ? { organizationId, configId: "organization" } : {})
+      }
     }
   )
 
@@ -69,6 +84,31 @@ export function ApiKeys({
           </Button>
         )}
       </div>
+      <Select
+        value={sort}
+        onValueChange={(value) => {
+          setSort(value)
+          setPage(0)
+        }}
+      >
+        <SelectTrigger aria-label={apiKeyLocalization.sortBy}>
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="createdAt:desc">
+            {apiKeyLocalization.newest}
+          </SelectItem>
+          <SelectItem value="createdAt:asc">
+            {apiKeyLocalization.oldest}
+          </SelectItem>
+          <SelectItem value="name:asc">
+            {apiKeyLocalization.nameAscending}
+          </SelectItem>
+          <SelectItem value="name:desc">
+            {apiKeyLocalization.nameDescending}
+          </SelectItem>
+        </SelectContent>
+      </Select>
 
       <Card className="p-0">
         <CardContent className="p-0">
@@ -95,6 +135,26 @@ export function ApiKeys({
           )}
         </CardContent>
       </Card>
+      {(page > 0 || (listData?.apiKeys.length ?? 0) === pageSize) && (
+        <div className="flex justify-end gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            disabled={page === 0}
+            onClick={() => setPage((value) => Math.max(0, value - 1))}
+          >
+            {apiKeyLocalization.previousPage}
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            disabled={(listData?.apiKeys.length ?? 0) < pageSize}
+            onClick={() => setPage((value) => value + 1)}
+          >
+            {apiKeyLocalization.nextPage}
+          </Button>
+        </div>
+      )}
 
       {!hideCreate && (
         <CreateApiKeyDialog

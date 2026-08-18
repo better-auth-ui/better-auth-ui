@@ -89,5 +89,22 @@ export const organizationQueryKeys = {
         "has",
         query ?? null
       ] as const
+  },
+
+  teams: {
+    all: (userId: string | undefined) =>
+      [...organizationQueryKeys.all(userId), "teams"] as const,
+    list: <TQuery = undefined>(userId: string | undefined, query?: TQuery) =>
+      [
+        ...organizationQueryKeys.teams.all(userId),
+        "list",
+        query ?? null
+      ] as const,
+    members: (userId: string | undefined, teamId?: string) =>
+      [
+        ...organizationQueryKeys.teams.all(userId),
+        "members",
+        teamId ?? null
+      ] as const
   }
 } as const

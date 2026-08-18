@@ -228,3 +228,21 @@ import { OrganizationApiKeys } from "@/components/auth/api-key/organization-api-
 ## Localization
 
 <auto-type-table path="../../../../../../packages/core/src/plugins/api-key/api-key-localization.ts" name="ApiKeyLocalization" />
+## Lifecycle controls
+
+`<ApiKeys />` supports creating, renaming, enabling, disabling, and deleting keys. Users can edit permissions, metadata, quotas, refill rules, and rate limits. The list shows request usage and the last request time, with sorting and pagination controls.
+
+```tsx
+apiKeyPlugin({
+  configurations: [
+    { id: "default", label: "Personal", organization: false },
+    { id: "organization", label: "Organization", organization: true }
+  ],
+  permissions: [
+    { resource: "project", actions: ["read", "write"] }
+  ],
+  pageSize: 20
+})
+```
+
+The server must define every listed `configId`. Use `useUpdateApiKey` for a custom Solid edit surface.

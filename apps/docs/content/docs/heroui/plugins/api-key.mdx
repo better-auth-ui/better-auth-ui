@@ -188,3 +188,23 @@ import { OrganizationApiKeys } from "@better-auth-ui/heroui/plugins/api-key"
 ## Localization
 
 <auto-type-table path="../../../../../../packages/core/src/plugins/api-key/api-key-localization.ts" name="ApiKeyLocalization" />
+## Lifecycle controls
+
+`<ApiKeys />` supports the complete key lifecycle. Users can create, rename, enable, disable, and delete keys. They can also edit permissions, metadata, quotas, refill rules, and rate limits. The list shows request usage and the last request time, with sorting and pagination controls.
+
+Configure the choices that the UI exposes:
+
+```tsx
+apiKeyPlugin({
+  configurations: [
+    { id: "default", label: "Personal", organization: false },
+    { id: "organization", label: "Organization", organization: true }
+  ],
+  permissions: [
+    { resource: "project", actions: ["read", "write"] }
+  ],
+  pageSize: 20
+})
+```
+
+The server must define every listed `configId`. Use `useUpdateApiKey` when you build a custom edit surface.

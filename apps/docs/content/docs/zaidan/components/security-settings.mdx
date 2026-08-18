@@ -27,3 +27,6 @@ After install, `src/components/auth/settings/security/security-settings.tsx` is 
 ## Props
 
 <auto-type-table path="../../../../../../examples/start-solid-zaidan-example/src/components/auth/settings/security/security-settings.tsx" name="SecuritySettingsProps" />
+## Fresh-session checks
+
+Sensitive session operations can return `SESSION_NOT_FRESH`. The active sessions card shows an inline password prompt for this response. After the user signs in again, it retries the session query. If password sign-in is disabled, the prompt links to the configured sign-in route.

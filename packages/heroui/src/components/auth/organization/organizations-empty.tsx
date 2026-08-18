@@ -5,9 +5,13 @@ import { organizationPlugin } from "../../../lib/auth/organization-plugin"
 
 export type OrganizationsEmptyProps = {
   onCreatePress: () => void
+  canCreate?: boolean
 }
 
-export function OrganizationsEmpty({ onCreatePress }: OrganizationsEmptyProps) {
+export function OrganizationsEmpty({
+  onCreatePress,
+  canCreate = true
+}: OrganizationsEmptyProps) {
   const { localization: organizationLocalization } =
     useAuthPlugin(organizationPlugin)
 
@@ -27,7 +31,7 @@ export function OrganizationsEmpty({ onCreatePress }: OrganizationsEmptyProps) {
         </span>
       </div>
 
-      <Button size="sm" onPress={onCreatePress}>
+      <Button size="sm" isDisabled={!canCreate} onPress={onCreatePress}>
         {organizationLocalization.createOrganization}
       </Button>
     </EmptyState>

@@ -79,7 +79,7 @@ const authOptions = {
     multiSession(),
     passkey(),
     username(),
-    organization(),
+    organization({ teams: { enabled: true } }),
     apiKey([
       { configId: "default", references: "user" },
       { configId: "organization", references: "organization" }

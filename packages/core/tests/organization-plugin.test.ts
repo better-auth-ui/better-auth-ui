@@ -13,8 +13,35 @@ describe("organizationPlugin", () => {
       viewPaths: {
         auth: { acceptInvitation: "accept-invitation" },
         settings: { organizations: "organizations" },
-        organization: { settings: "settings", people: "people" }
+        organization: {
+          settings: "settings",
+          people: "people",
+          teams: "teams"
+        }
       }
+    })
+  })
+
+  it("exposes team and policy controls", () => {
+    const additionalFields = [
+      { name: "billingCode", label: "Billing code", type: "string" as const }
+    ]
+    const plugin = organizationPlugin({
+      additionalFields,
+      allowOrganizationCreation: false,
+      invitationLimit: 5,
+      membershipLimit: 20,
+      organizationLimit: 2,
+      teams: true
+    })
+
+    expect(plugin).toMatchObject({
+      additionalFields,
+      allowOrganizationCreation: false,
+      invitationLimit: 5,
+      membershipLimit: 20,
+      organizationLimit: 2,
+      teams: true
     })
   })
 

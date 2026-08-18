@@ -11,5 +11,7 @@ export const passkeyMutationKeys = {
   /** Key for `passkey.addPasskey`. */
   addPasskey: ["auth", "passkey", "addPasskey"] as const,
   /** Key for `passkey.deletePasskey`. */
-  deletePasskey: ["auth", "passkey", "deletePasskey"] as const
+  deletePasskey: ["auth", "passkey", "deletePasskey"] as const,
+  /** Key for `passkey.updatePasskey`. */
+  updatePasskey: ["auth", "passkey", "updatePasskey"] as const
 } as const

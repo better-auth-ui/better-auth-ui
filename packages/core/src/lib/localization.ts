@@ -155,6 +155,22 @@ export const localization = {
     /** @remarks `"Active sessions"` */
     activeSessions: "Active sessions",
 
+    /** @remarks `"Confirm it’s you"` */
+    freshSessionTitle: "Confirm it’s you",
+
+    /** @remarks `"Enter your password again to manage this sensitive setting."` */
+    freshSessionDescription:
+      "Enter your password again to manage this sensitive setting.",
+
+    /** @remarks `"Confirm and continue"` */
+    freshSessionSubmit: "Confirm and continue",
+
+    /** @remarks `"Sign in again"` */
+    freshSessionSignIn: "Sign in again",
+
+    /** @remarks `"Your identity was confirmed."` */
+    freshSessionSuccess: "Your identity was confirmed.",
+
     /** @remarks `"Avatar"` */
     avatar: "Avatar",
 

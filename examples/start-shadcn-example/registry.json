@@ -767,6 +767,11 @@
           "path": "src/components/auth/passkey/passkey.tsx",
           "type": "registry:component",
           "target": "@components/auth/passkey/passkey.tsx"
+        },
+        {
+          "path": "src/components/auth/passkey/rename-passkey-dialog.tsx",
+          "type": "registry:component",
+          "target": "@components/auth/passkey/rename-passkey-dialog.tsx"
         }
       ]
     },
@@ -886,6 +891,7 @@
         "alert-dialog",
         "button",
         "card",
+        "checkbox",
         "dialog",
         "empty",
         "field",
@@ -897,7 +903,9 @@
         "separator",
         "skeleton",
         "sonner",
-        "spinner"
+        "spinner",
+        "switch",
+        "textarea"
       ],
       "files": [
         {
@@ -944,6 +952,11 @@
           "path": "src/components/auth/api-key/delete-api-key-dialog.tsx",
           "type": "registry:component",
           "target": "@components/auth/api-key/delete-api-key-dialog.tsx"
+        },
+        {
+          "path": "src/components/auth/api-key/edit-api-key-dialog.tsx",
+          "type": "registry:component",
+          "target": "@components/auth/api-key/edit-api-key-dialog.tsx"
         },
         {
           "path": "src/components/auth/api-key/organization-api-keys.tsx",
@@ -1005,7 +1018,8 @@
         "separator",
         "sonner",
         "spinner",
-        "https://better-auth-ui.com/r/radix-nova/user-view.json"
+        "https://better-auth-ui.com/r/radix-nova/user-view.json",
+        "https://better-auth-ui.com/r/radix-nova/additional-field.json"
       ],
       "files": [
         {
@@ -1078,6 +1092,7 @@
         "spinner",
         "table",
         "tabs",
+        "https://better-auth-ui.com/r/radix-nova/additional-field.json",
         "https://better-auth-ui.com/r/radix-nova/user-view.json"
       ],
       "files": [
@@ -1105,6 +1120,11 @@
           "path": "src/components/auth/organization/organization.tsx",
           "type": "registry:component",
           "target": "@components/auth/organization/organization.tsx"
+        },
+        {
+          "path": "src/components/auth/organization/organization-teams.tsx",
+          "type": "registry:component",
+          "target": "@components/auth/organization/organization-teams.tsx"
         },
         {
           "path": "src/components/auth/organization/organization-switcher.tsx",
@@ -1780,6 +1800,11 @@
           "path": "src/components/auth/settings/security/active-session.tsx",
           "type": "registry:component",
           "target": "@components/auth/settings/security/active-session.tsx"
+        },
+        {
+          "path": "src/components/auth/settings/security/fresh-session-prompt.tsx",
+          "type": "registry:component",
+          "target": "@components/auth/settings/security/fresh-session-prompt.tsx"
         }
       ]
     },

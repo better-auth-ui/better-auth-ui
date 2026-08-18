@@ -17,7 +17,11 @@ export const passkeyLocalization = {
   /** @remarks `"No passkeys"` */
   noPasskeys: "No passkeys",
   /** @remarks `"Name"` */
-  name: "Name"
+  name: "Name",
+  /** @remarks `"Rename passkey"` */
+  renamePasskey: "Rename passkey",
+  /** @remarks `"Passkey renamed"` */
+  renamePasskeySuccess: "Passkey renamed"
 }
 
 export type PasskeyLocalization = typeof passkeyLocalization

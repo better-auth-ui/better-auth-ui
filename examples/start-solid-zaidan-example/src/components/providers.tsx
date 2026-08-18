@@ -65,7 +65,14 @@ export function Providers(props: ProvidersProps) {
         socialProviders={["github"]}
         plugins={[
           multiSessionPlugin(),
-          apiKeyPlugin({ organization: true }),
+          apiKeyPlugin({
+            organization: true,
+            configurations: [
+              { id: "default", label: "Personal", organization: false },
+              { id: "organization", label: "Organization", organization: true }
+            ],
+            permissions: [{ resource: "project", actions: ["read", "write"] }]
+          }),
           usernamePlugin({
             usernamePrefix: "@",
             localization: { usernamePlaceholder: "username" }
@@ -82,7 +89,8 @@ export function Providers(props: ProvidersProps) {
           deleteUserPlugin(),
           organizationPlugin({
             slugPrefix: "@",
-            slug: organizationSlug()
+            slug: organizationSlug(),
+            teams: true
           })
         ]}
       >
