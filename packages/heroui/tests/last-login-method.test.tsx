@@ -1,4 +1,10 @@
-import { render, screen, within } from "@testing-library/react"
+import {
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+  within
+} from "@testing-library/react"
 import { describe, expect, it, vi } from "vitest"
 
 import { AuthProvider } from "../src/components/auth/auth-provider"
@@ -75,5 +81,34 @@ describe("lastLoginMethodPlugin", () => {
     )
 
     expect(screen.queryByText("Last")).toBeNull()
+  })
+
+  it("signs in with a custom provider ID and renders its metadata", async () => {
+    const authClient = createMockAuthClient(null)
+    const signInSocial = vi.fn(async () => ({ data: {}, error: null }))
+    authClient.signIn.social = signInSocial as never
+
+    render(
+      <AuthProvider authClient={authClient} navigate={() => {}}>
+        <ProviderButton
+          provider={{
+            id: "acme-sso",
+            label: "Acme ID",
+            icon: <svg aria-label="Acme logo" />
+          }}
+        />
+      </AuthProvider>
+    )
+
+    fireEvent.click(
+      screen.getByRole("button", { name: /continue with acme id/i })
+    )
+
+    expect(screen.getByLabelText("Acme logo")).toBeVisible()
+    await waitFor(() =>
+      expect(signInSocial).toHaveBeenCalledWith(
+        expect.objectContaining({ provider: "acme-sso" })
+      )
+    )
   })
 })

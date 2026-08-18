@@ -1,14 +1,18 @@
 "use client"
 
-import { getProviderName } from "@better-auth-ui/core"
 import {
-  providerIcons,
+  type AuthSocialProvider,
+  getProviderId,
+  getProviderName
+} from "@better-auth-ui/core"
+import {
+  renderProviderIcon,
   useAccountInfo,
   useAuth,
   useLinkSocial,
   useUnlinkAccount
 } from "@better-auth-ui/react"
-import type { Account, SocialProvider } from "better-auth"
+import type { Account } from "better-auth"
 import { Link2, Link2Off, Plug } from "lucide-react"
 import { toast } from "sonner"
 
@@ -27,7 +31,7 @@ import { cn } from "@/lib/utils"
 
 export type LinkedAccountProps = {
   account?: Account
-  provider: SocialProvider
+  provider: AuthSocialProvider | string
 }
 
 /**
@@ -57,7 +61,10 @@ export function LinkedAccount({ account, provider }: LinkedAccountProps) {
     }
   )
 
-  const ProviderIcon = providerIcons[provider]
+  const providerId = getProviderId(provider)
+  const providerIcon = renderProviderIcon(provider, {
+    className: cn(!account && "opacity-50")
+  })
   const providerName = getProviderName(provider)
   const accountData = accountInfo?.data as
     | { login?: string; username?: string }
@@ -73,8 +80,8 @@ export function LinkedAccount({ account, provider }: LinkedAccountProps) {
   return (
     <Item>
       <ItemMedia variant="icon">
-        {ProviderIcon ? (
-          <ProviderIcon className={cn(!account && "opacity-50")} />
+        {providerIcon ? (
+          providerIcon
         ) : (
           <Plug className={cn(!account && "opacity-50")} />
         )}
@@ -117,7 +124,7 @@ export function LinkedAccount({ account, provider }: LinkedAccountProps) {
             size="sm"
             onClick={() =>
               linkSocial({
-                provider,
+                provider: providerId,
                 callbackURL: `${baseURL}${window.location.pathname}`
               })
             }

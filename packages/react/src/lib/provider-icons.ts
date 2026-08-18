@@ -1,5 +1,10 @@
+import type { AuthSocialProvider } from "@better-auth-ui/core"
 import type { SocialProvider } from "better-auth/social-providers"
-import type { ComponentPropsWithRef, ComponentType } from "react"
+import {
+  type ComponentPropsWithRef,
+  type ComponentType,
+  createElement
+} from "react"
 import {
   Apple,
   Atlassian,
@@ -87,4 +92,20 @@ export const providerIcons: Record<
   vk: VK,
   wechat: WeChat,
   zoom: Zoom
+}
+
+/** Resolve a built-in icon component or a custom provider's configured icon. */
+export const getProviderIcon = (provider: AuthSocialProvider | string) =>
+  typeof provider === "string"
+    ? providerIcons[provider as SocialProvider]
+    : provider.icon
+
+/** Render a built-in provider icon or return a custom configured icon node. */
+export const renderProviderIcon = (
+  provider: AuthSocialProvider | string,
+  props?: ComponentPropsWithRef<"svg">
+) => {
+  if (typeof provider !== "string") return provider.icon ?? null
+  const ProviderIcon = providerIcons[provider as SocialProvider]
+  return ProviderIcon ? createElement(ProviderIcon, props) : null
 }

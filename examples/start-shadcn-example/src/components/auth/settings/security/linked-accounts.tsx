@@ -1,5 +1,6 @@
 "use client"
 
+import { getProviderId } from "@better-auth-ui/core"
 import { useAuth, useListAccounts } from "@better-auth-ui/react"
 import { Fragment } from "react"
 import { Card, CardContent } from "@/components/ui/card"
@@ -45,17 +46,22 @@ export function LinkedAccounts({ className }: LinkedAccountsProps) {
 
   const availableProviders =
     multipleAccountsPerProvider === false
-      ? socialProviders?.filter((p) => !linkedProviderIds.has(p))
+      ? socialProviders?.filter(
+          (provider) => !linkedProviderIds.has(getProviderId(provider))
+        )
       : socialProviders
 
   const allRows = [
     ...(linkedAccounts?.map((account) => ({
       key: account.id,
       account,
-      provider: account.providerId
+      provider:
+        socialProviders?.find(
+          (provider) => getProviderId(provider) === account.providerId
+        ) ?? account.providerId
     })) ?? []),
     ...(availableProviders?.map((provider) => ({
-      key: provider,
+      key: getProviderId(provider),
       account: undefined,
       provider
     })) ?? [])
@@ -72,7 +78,7 @@ export function LinkedAccounts({ className }: LinkedAccountsProps) {
           <ItemGroup className="gap-0">
             {isPending
               ? socialProviders?.map((provider, index) => (
-                  <Fragment key={provider}>
+                  <Fragment key={getProviderId(provider)}>
                     {index > 0 && <ItemSeparator />}
                     <AccountRowSkeleton />
                   </Fragment>

@@ -1,4 +1,3 @@
-import type { SocialProvider } from "better-auth/social-providers"
 import type { AuthClient } from "../lib/auth-client"
 import type { AuthPlugin } from "../lib/auth-plugin"
 import { type BasePaths, basePaths } from "../lib/base-paths"
@@ -8,6 +7,7 @@ import { type ViewPaths, viewPaths } from "../lib/view-paths"
 import type { AdditionalFields } from "./additional-fields-config"
 import type { AvatarConfig } from "./avatar-config"
 import type { EmailAndPasswordConfig } from "./email-and-password-config"
+import type { AuthSocialProvider } from "./social-provider-config"
 
 /**
  * Core authentication configuration interface.
@@ -71,9 +71,11 @@ export interface AuthConfig<TAuthClient extends AuthClient = AuthClient> {
   multipleAccountsPerProvider?: boolean
   /**
    * List of enabled social authentication providers
-   * @remarks `SocialProvider[]`
+   * Built-in providers can use their string ID. Custom and Generic OAuth
+   * providers use `{ id, label, icon }`.
+   * @remarks `AuthSocialProvider[]`
    */
-  socialProviders?: SocialProvider[]
+  socialProviders?: AuthSocialProvider[]
   /**
    * View path mappings for different authentication views
    * @remarks `ViewPaths`

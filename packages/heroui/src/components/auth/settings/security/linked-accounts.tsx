@@ -1,3 +1,4 @@
+import { getProviderId } from "@better-auth-ui/core"
 import { useAuth, useListAccounts } from "@better-auth-ui/react"
 import { Card, type CardProps, cn, Skeleton } from "@heroui/react"
 import { LinkedAccount } from "./linked-account"
@@ -38,17 +39,22 @@ export function LinkedAccounts({
 
   const availableProviders =
     multipleAccountsPerProvider === false
-      ? socialProviders?.filter((p) => !linkedProviderIds.has(p))
+      ? socialProviders?.filter(
+          (provider) => !linkedProviderIds.has(getProviderId(provider))
+        )
       : socialProviders
 
   const allRows = [
     ...(linkedAccounts?.map((account) => ({
       key: account.id,
       account,
-      provider: account.providerId
+      provider:
+        socialProviders?.find(
+          (provider) => getProviderId(provider) === account.providerId
+        ) ?? account.providerId
     })) ?? []),
     ...(availableProviders?.map((provider) => ({
-      key: provider,
+      key: getProviderId(provider),
       account: undefined,
       provider
     })) ?? [])
@@ -64,7 +70,7 @@ export function LinkedAccounts({
         <Card.Content className="gap-0">
           {isPending
             ? socialProviders?.map((provider, index) => (
-                <div key={provider}>
+                <div key={getProviderId(provider)}>
                   {index > 0 && (
                     <div className="border-b border-dashed -mx-4 my-4" />
                   )}

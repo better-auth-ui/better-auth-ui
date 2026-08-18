@@ -1,4 +1,9 @@
 import type { SocialProvider } from "better-auth/social-providers"
+import {
+  type AuthSocialProvider,
+  getProviderId,
+  isCustomSocialProvider
+} from "../config/social-provider-config"
 
 /**
  * Mapping of social authentication provider identifiers to their human-readable display names.
@@ -47,9 +52,15 @@ export const providerNames: Record<SocialProvider, string> = {
  * @param provider - The provider identifier (e.g., "github", "google").
  * @returns The mapped display name for `provider` if available, otherwise `provider` with its first character capitalized.
  */
-export function getProviderName(provider: string) {
+export function getProviderName(provider: AuthSocialProvider | string) {
+  if (typeof provider !== "string" && isCustomSocialProvider(provider)) {
+    return provider.label
+  }
+
+  const providerId =
+    typeof provider === "string" ? provider : getProviderId(provider)
   return (
-    providerNames[provider as SocialProvider] ||
-    provider.charAt(0).toUpperCase() + provider.slice(1)
+    providerNames[providerId as SocialProvider] ||
+    providerId.charAt(0).toUpperCase() + providerId.slice(1)
   )
 }

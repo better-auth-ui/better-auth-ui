@@ -1,6 +1,10 @@
-import { getProviderName } from "@better-auth-ui/core"
 import {
-  providerIcons,
+  type AuthSocialProvider,
+  getProviderId,
+  getProviderName
+} from "@better-auth-ui/core"
+import {
+  renderProviderIcon,
   useAccountInfo,
   useAuth,
   useLinkSocial,
@@ -8,11 +12,11 @@ import {
 } from "@better-auth-ui/react"
 import { Link, LinkSlash, PlugConnection } from "@gravity-ui/icons"
 import { Button, cn, Skeleton, Spinner, toast } from "@heroui/react"
-import type { Account, SocialProvider } from "better-auth"
+import type { Account } from "better-auth"
 
 export type LinkedAccountProps = {
   account?: Account
-  provider: SocialProvider
+  provider: AuthSocialProvider | string
 }
 
 /**
@@ -42,7 +46,10 @@ export function LinkedAccount({ account, provider }: LinkedAccountProps) {
     }
   )
 
-  const ProviderIcon = providerIcons[provider]
+  const providerId = getProviderId(provider)
+  const providerIcon = renderProviderIcon(provider, {
+    className: "size-4.5"
+  })
   const providerName = getProviderName(provider)
   const accountData = accountInfo?.data as
     | { login?: string; username?: string }
@@ -62,11 +69,7 @@ export function LinkedAccount({ account, provider }: LinkedAccountProps) {
           "flex size-10 shrink-0 items-center justify-center rounded-xl bg-surface-secondary"
         )}
       >
-        {ProviderIcon ? (
-          <ProviderIcon className="size-4.5" />
-        ) : (
-          <PlugConnection className="size-4.5" />
-        )}
+        {providerIcon ? providerIcon : <PlugConnection className="size-4.5" />}
       </div>
 
       <div className="flex flex-col min-w-0">
@@ -112,7 +115,7 @@ export function LinkedAccount({ account, provider }: LinkedAccountProps) {
           size="sm"
           onPress={() =>
             linkSocial({
-              provider,
+              provider: providerId,
               callbackURL: `${baseURL}${window.location.pathname}`
             })
           }

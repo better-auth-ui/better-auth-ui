@@ -1,5 +1,6 @@
 import { socialProviderList } from "better-auth/social-providers"
 import { describe, expect, it } from "vitest"
+import { getProviderId } from "../src/config/social-provider-config"
 import { getProviderName, providerNames } from "../src/lib/provider-names"
 
 describe("providerNames", () => {
@@ -61,6 +62,13 @@ describe("getProviderName", () => {
   describe("unknown providers", () => {
     it("should capitalize first letter of unknown provider", () => {
       expect(getProviderName("unknown")).toBe("Unknown")
+    })
+
+    it("uses custom provider labels and IDs", () => {
+      const provider = { id: "acme-sso", label: "Acme ID" }
+
+      expect(getProviderId(provider)).toBe("acme-sso")
+      expect(getProviderName(provider)).toBe("Acme ID")
     })
   })
 })

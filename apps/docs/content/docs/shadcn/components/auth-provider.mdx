@@ -8,6 +8,56 @@ description: Provides AuthConfig to descendant components.
 ```tsx file=<rootDir>/../../examples/start-shadcn-example/src/components/providers.tsx
 ```
 
+## Custom and Generic OAuth providers
+
+Built-in providers use their Better Auth ID as a string. For a custom or Generic OAuth provider, pass its ID, visible label, and optional icon.
+
+```tsx title="components/providers.tsx"
+import { Building2 } from "lucide-react"
+
+<AuthProvider
+  authClient={authClient}
+  navigate={navigate}
+  socialProviders={[
+    "github",
+    {
+      id: "company-oauth",
+      label: "Company SSO",
+      icon: <Building2 />
+    }
+  ]}
+>
+  {children}
+</AuthProvider>
+```
+
+The same metadata appears on sign-in, sign-up, and linked-account views. BAUI sends only `id` to Better Auth.
+
+Better Auth 1.7 registers Generic OAuth providers as normal social providers. Configure the same ID on the server:
+
+```ts title="lib/auth.ts"
+import { betterAuth } from "better-auth"
+import { genericOAuth } from "better-auth/plugins"
+
+export const auth = betterAuth({
+  plugins: [
+    genericOAuth({
+      config: [
+        {
+          providerId: "company-oauth",
+          clientId: process.env.COMPANY_OAUTH_CLIENT_ID!,
+          clientSecret: process.env.COMPANY_OAUTH_CLIENT_SECRET!,
+          discoveryUrl:
+            "https://id.example.com/.well-known/openid-configuration"
+        }
+      ]
+    })
+  ]
+})
+```
+
+Register `/api/auth/callback/company-oauth` with the provider. See the [Better Auth Generic OAuth guide](https://www.better-auth.com/docs/plugins/generic-oauth) for endpoint and profile options.
+
 ## Props
 
 <auto-type-table path="../../../../../../packages/react/src/components/auth/auth-provider.tsx" name="AuthProviderProps" />

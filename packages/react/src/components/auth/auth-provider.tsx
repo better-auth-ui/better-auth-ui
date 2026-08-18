@@ -43,6 +43,11 @@ declare module "@better-auth-ui/core" {
   interface AdditionalFieldRegister {
     label: ReactNode
   }
+
+  /** Custom social provider icons can be SVG components or rendered nodes. */
+  interface SocialProviderRegister {
+    icon: ReactNode
+  }
 }
 
 export type AuthProviderProps<TAuthClient extends AuthClient = AuthClient> =

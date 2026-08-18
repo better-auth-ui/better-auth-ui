@@ -183,5 +183,23 @@ describe("useAuth", () => {
 
       expect(result.current.socialProviders).toEqual(["github", "google"])
     })
+
+    it("accepts custom provider metadata", () => {
+      const icon = <svg aria-label="Acme logo" />
+      const provider = { id: "acme-sso", label: "Acme ID", icon }
+      const wrapper = ({ children }: { children: ReactNode }) => (
+        <AuthProvider
+          authClient={mockAuthClient}
+          socialProviders={["github", provider]}
+          navigate={() => {}}
+        >
+          {children}
+        </AuthProvider>
+      )
+
+      const { result } = renderHook(() => useAuth(), { wrapper })
+
+      expect(result.current.socialProviders?.[1]).toEqual(provider)
+    })
   })
 })
