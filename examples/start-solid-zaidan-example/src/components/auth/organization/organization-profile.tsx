@@ -42,13 +42,18 @@ export function OrganizationProfile(props: OrganizationProfileProps) {
     if (!activeOrganization.data) return
     const formData = new FormData(event.currentTarget as HTMLFormElement)
     const additionalValues: Record<string, unknown> = {}
-    for (const field of config.additionalFields) {
-      const value = parseAdditionalFieldValue(
-        field,
-        formData.get(field.name) as string | null
-      )
-      await field.validate?.(value)
-      if (value !== undefined) additionalValues[field.name] = value
+    try {
+      for (const field of config.additionalFields) {
+        const value = parseAdditionalFieldValue(
+          field,
+          formData.get(field.name) as string | null
+        )
+        await field.validate?.(value)
+        if (value !== undefined) additionalValues[field.name] = value
+      }
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : String(error))
+      return
     }
     updateOrganization.mutate({
       data: { name: name(), slug: slug(), ...additionalValues }

@@ -15,7 +15,7 @@ import {
   TextArea,
   TextField
 } from "@heroui/react"
-import { type FormEvent, useState } from "react"
+import { type FormEvent, useEffect, useRef, useState } from "react"
 import { apiKeyPlugin } from "../../../lib/auth/api-key-plugin"
 
 const optionalNumber = (formData: FormData, name: string) => {
@@ -39,6 +39,17 @@ export function EditApiKeyDialog({
     apiKey.rateLimitEnabled
   )
   const [formError, setFormError] = useState<string>()
+  const formRef = useRef<HTMLFormElement>(null)
+
+  useEffect(() => {
+    if (!isOpen) return
+
+    formRef.current?.reset()
+    setEnabled(apiKey.enabled)
+    setRateLimitEnabled(apiKey.rateLimitEnabled)
+    setFormError(undefined)
+  }, [apiKey, isOpen])
+
   const updateApiKey = useUpdateApiKey(authClient as ApiKeyAuthClient, {
     onSuccess: () => onOpenChange(false)
   })
@@ -73,7 +84,7 @@ export function EditApiKeyDialog({
     <AlertDialog.Backdrop isOpen={isOpen} onOpenChange={onOpenChange}>
       <AlertDialog.Container>
         <AlertDialog.Dialog className="max-w-xl">
-          <Form onSubmit={submit}>
+          <Form onSubmit={submit} ref={formRef}>
             <AlertDialog.CloseTrigger />
             <AlertDialog.Header>
               <AlertDialog.Heading>{labels.editApiKey}</AlertDialog.Heading>

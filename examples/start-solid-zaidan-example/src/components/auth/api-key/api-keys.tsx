@@ -1,6 +1,6 @@
 import type { ApiKeyAuthClient } from "@better-auth-ui/core/plugins/api-key"
 import { apiKeyLocalization } from "@better-auth-ui/core/plugins/api-key"
-import { useAuth } from "@better-auth-ui/solid"
+import { useAuth, useAuthPlugin } from "@better-auth-ui/solid"
 import { useListApiKeys } from "@better-auth-ui/solid/plugins/api-key"
 import { createSignal, For, Show } from "solid-js"
 import { ApiKey } from "@/components/auth/api-key/api-key"
@@ -19,6 +19,7 @@ import {
   SelectTrigger,
   SelectValue
 } from "@/components/ui/select"
+import { apiKeyPlugin } from "@/lib/auth/api-key-plugin"
 import { cn } from "@/lib/utils"
 
 export type ApiKeysProps = {
@@ -31,33 +32,28 @@ export type ApiKeysProps = {
 
 export function ApiKeys(props: ApiKeysProps = {}) {
   const auth = useAuth<ApiKeyAuthClient>()
+  const config = useAuthPlugin(apiKeyPlugin)
   const [isCreateDialogOpen, setIsCreateDialogOpen] = createSignal(false)
   const [page, setPage] = createSignal(0)
   const [sort, setSort] = createSignal({
     id: "createdAt:desc",
     label: apiKeyLocalization.newest
   })
-  const pageSize = 10
-  const listParams = () =>
-    props.isPending !== undefined || props.organizationId
-      ? {
-          query: {
-            organizationId: props.organizationId ?? "",
-            configId: "organization" as const,
-            limit: pageSize,
-            offset: page() * pageSize,
-            sortBy: sort().id.split(":")[0],
-            sortDirection: sort().id.split(":")[1] as "asc" | "desc"
+  const pageSize = config.pageSize
+  const listParams = () => ({
+    query: {
+      ...(props.organizationId
+        ? {
+            organizationId: props.organizationId,
+            configId: "organization" as const
           }
-        }
-      : {
-          query: {
-            limit: pageSize,
-            offset: page() * pageSize,
-            sortBy: sort().id.split(":")[0],
-            sortDirection: sort().id.split(":")[1] as "asc" | "desc"
-          }
-        }
+        : {}),
+      limit: pageSize,
+      offset: page() * pageSize,
+      sortBy: sort().id.split(":")[0],
+      sortDirection: sort().id.split(":")[1] as "asc" | "desc"
+    }
+  })
   const apiKeys = useListApiKeys(auth.authClient, () => listParams() ?? {})
   const keys = () => apiKeys.data?.apiKeys ?? []
   const pending = () => Boolean(props.isPending || apiKeys.isPending)

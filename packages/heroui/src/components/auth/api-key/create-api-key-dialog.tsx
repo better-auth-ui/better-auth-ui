@@ -55,6 +55,9 @@ export function CreateApiKeyDialog({
   const [secretKey, setSecretKey] = useState<string | null>(null)
   const [rateLimitEnabled, setRateLimitEnabled] = useState(false)
   const [formError, setFormError] = useState<string>()
+  const availableConfigurations = configurations.filter(
+    (configuration) => configuration.organization === Boolean(organizationId)
+  )
 
   const handleOpenChange = (open: boolean) => {
     if (!open) {
@@ -180,15 +183,9 @@ export function CreateApiKeyDialog({
                     <FieldError />
                   </TextField>
 
-                  {configurations.length > 0 && (
+                  {availableConfigurations.length > 0 && (
                     <Select
-                      defaultValue={
-                        configurations.find(
-                          (configuration) =>
-                            configuration.organization ===
-                            Boolean(organizationId)
-                        )?.id ?? configurations[0]?.id
-                      }
+                      defaultValue={availableConfigurations[0]?.id}
                       fullWidth
                       isDisabled={isCreating}
                       name="configId"
@@ -201,22 +198,16 @@ export function CreateApiKeyDialog({
                       </Select.Trigger>
                       <Select.Popover>
                         <ListBox>
-                          {configurations
-                            .filter(
-                              (configuration) =>
-                                configuration.organization ===
-                                Boolean(organizationId)
-                            )
-                            .map((configuration) => (
-                              <ListBox.Item
-                                id={configuration.id}
-                                key={configuration.id}
-                                textValue={configuration.label}
-                              >
-                                {configuration.label}
-                                <ListBox.ItemIndicator />
-                              </ListBox.Item>
-                            ))}
+                          {availableConfigurations.map((configuration) => (
+                            <ListBox.Item
+                              id={configuration.id}
+                              key={configuration.id}
+                              textValue={configuration.label}
+                            >
+                              {configuration.label}
+                              <ListBox.ItemIndicator />
+                            </ListBox.Item>
+                          ))}
                         </ListBox>
                       </Select.Popover>
                     </Select>

@@ -45,6 +45,32 @@ describe("organizationPlugin", () => {
     })
   })
 
+  it("ignores invalid policy limits", () => {
+    expect(
+      organizationPlugin({
+        invitationLimit: Number.NaN,
+        membershipLimit: -1,
+        organizationLimit: 1.5
+      })
+    ).toMatchObject({
+      invitationLimit: undefined,
+      membershipLimit: undefined,
+      organizationLimit: undefined
+    })
+
+    expect(
+      organizationPlugin({
+        invitationLimit: Number.POSITIVE_INFINITY,
+        membershipLimit: Number.MAX_SAFE_INTEGER + 1,
+        organizationLimit: 0
+      })
+    ).toMatchObject({
+      invitationLimit: undefined,
+      membershipLimit: undefined,
+      organizationLimit: 0
+    })
+  })
+
   it("merges path and localization overrides", () => {
     const plugin = organizationPlugin({
       viewPaths: {

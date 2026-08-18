@@ -52,8 +52,9 @@ export function Organization({
   const { data: activeOrganization, isPending } = useActiveOrganization(
     authClient as OrganizationAuthClient
   )
-  const extensionTabs = plugins.flatMap(
-    (plugin) => plugin.organizationTabs ?? []
+  const extensionTabs = useMemo(
+    () => plugins.flatMap((plugin) => plugin.organizationTabs ?? []),
+    [plugins]
   )
 
   useEffect(() => {
@@ -132,7 +133,11 @@ export function Organization({
             {teams && (
               <Tabs.Tab
                 id="teams"
-                href={`${basePaths.organization}/${slugPrefix}${slug}/${organizationViewPaths.organization.teams}`}
+                href={
+                  slug
+                    ? `${basePaths.organization}/${slugPrefix}${slug}/${organizationViewPaths.organization.teams}`
+                    : `${basePaths.organization}/${organizationViewPaths.organization.teams}`
+                }
                 className="gap-2"
               >
                 <Persons className="text-muted" />
@@ -144,7 +149,11 @@ export function Organization({
               <Tabs.Tab
                 id={tab.id}
                 key={tab.id}
-                href={`${basePaths.organization}/${slugPrefix}${slug}/${tab.path}`}
+                href={
+                  slug
+                    ? `${basePaths.organization}/${slugPrefix}${slug}/${tab.path}`
+                    : `${basePaths.organization}/${tab.path}`
+                }
                 className="gap-2"
               >
                 {tab.label}

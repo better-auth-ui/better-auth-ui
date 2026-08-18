@@ -1,3 +1,4 @@
+import { authQueryKeys } from "@better-auth-ui/core"
 import {
   sendTwoFactorOtpOptions,
   type TwoFactorAuthClient,
@@ -5,8 +6,13 @@ import {
   verifyTotpOptions,
   verifyTwoFactorOtpOptions
 } from "@better-auth-ui/core/plugins/two-factor"
-import { AuthLink, useAuth, useAuthPlugin } from "@better-auth-ui/solid"
-import { createMutation } from "@tanstack/solid-query"
+import {
+  AuthLink,
+  useAuth,
+  useAuthPlugin,
+  useSession
+} from "@better-auth-ui/solid"
+import { createMutation, useQueryClient } from "@tanstack/solid-query"
 import { createSignal, For, Show } from "solid-js"
 
 import { OtpField } from "@/components/auth/otp-field"
@@ -57,6 +63,8 @@ export type TwoFactorChallengeProps = {
  */
 export function TwoFactorChallenge(props: TwoFactorChallengeProps) {
   const auth = useAuth()
+  const session = useSession(auth.authClient)
+  const queryClient = useQueryClient()
   const {
     backupCodes: backupCodesEnabled,
     codeLength,
@@ -77,8 +85,11 @@ export function TwoFactorChallenge(props: TwoFactorChallengeProps) {
 
   const twoFactorClient = () => auth.authClient as TwoFactorAuthClient
 
-  const onVerified = () => {
+  const onVerified = async () => {
     clearTwoFactorMethods()
+    await queryClient.invalidateQueries({
+      queryKey: authQueryKeys.listSessions(session.data?.user.id)
+    })
     auth.navigate({ to: auth.redirectTo })
   }
 

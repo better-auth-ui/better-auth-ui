@@ -45,6 +45,7 @@ export function Passkey(props: { passkey: ListedPasskey }) {
             {labels().renamePasskey}
           </DialogTrigger>
           <RenamePasskeyDialog
+            open={renameOpen()}
             onOpenChange={setRenameOpen}
             passkey={props.passkey}
           />

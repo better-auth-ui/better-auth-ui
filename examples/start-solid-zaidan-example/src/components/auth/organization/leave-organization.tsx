@@ -70,13 +70,13 @@ function LeaveOrganizationDialog(props: {
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel
-            disabled={leaveOrganization.isPending || !activeOrganization.data}
+            disabled={leaveOrganization.isPending}
             type="button"
           >
             {auth.localization.settings.cancel}
           </AlertDialogCancel>
           <Button
-            disabled={leaveOrganization.isPending}
+            disabled={leaveOrganization.isPending || !activeOrganization.data}
             onClick={handleLeave}
             type="button"
             variant="destructive"

@@ -9,7 +9,7 @@ import {
   useListTeams
 } from "@better-auth-ui/react/plugins/organization"
 import { UserPlus } from "lucide-react"
-import { type SyntheticEvent, useEffect, useState } from "react"
+import { type SyntheticEvent, useEffect, useRef, useState } from "react"
 import { toast } from "sonner"
 import { Button, buttonVariants } from "@/components/ui/button"
 import {
@@ -67,6 +67,8 @@ export function InviteMemberDialog({
   const [role, setRole] = useState(() => pickDefaultRole(Object.keys(roles)))
   const [teamId, setTeamId] = useState("")
   const [emailError, setEmailError] = useState<string>()
+  const activeOrganizationId = activeOrganization?.id
+  const previousOrganizationId = useRef(activeOrganizationId)
   const roleItems = Object.entries(roles).map(([value, label]) => ({
     label,
     value
@@ -82,8 +84,13 @@ export function InviteMemberDialog({
   }, [roles])
 
   useEffect(() => {
+    const organizationChanged =
+      previousOrganizationId.current !== activeOrganizationId
+
+    if (open || organizationChanged) setTeamId("")
     if (!open) setEmailError(undefined)
-  }, [open])
+    previousOrganizationId.current = activeOrganizationId
+  }, [open, activeOrganizationId])
 
   const { mutate: inviteMember, isPending: isInviting } = useInviteMember(
     authClient,
@@ -100,15 +107,19 @@ export function InviteMemberDialog({
   const handleSubmit = (e: SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault()
 
-    if (!isRoleValid) return
+    if (!isRoleValid || atInvitationLimit) return
 
     const formData = new FormData(e.target as HTMLFormElement)
     const email = formData.get("email") as string
 
+    const selectedTeamId = teams.data?.some((team) => team.id === teamId)
+      ? teamId
+      : undefined
+
     inviteMember({
       email: email.trim(),
       role: role as Parameters<typeof inviteMember>[0]["role"],
-      teamId: teamId || undefined
+      teamId: selectedTeamId
     })
   }
 

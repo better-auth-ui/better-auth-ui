@@ -65,6 +65,11 @@ export type ApiKeyPermission = {
   actions: Array<string | { id: string; label: string }>
 }
 
+const resolvePageSize = (pageSize?: number) =>
+  pageSize !== undefined && Number.isFinite(pageSize)
+    ? Math.max(1, Math.floor(pageSize))
+    : 10
+
 export const apiKeyPlugin = createAuthPlugin(
   "apiKey",
   (options: ApiKeyPluginOptions = {}) => {
@@ -79,7 +84,7 @@ export const apiKeyPlugin = createAuthPlugin(
       keyExpiration,
       configurations: options.configurations ?? [],
       permissions: options.permissions ?? [],
-      pageSize: Math.max(1, Math.floor(options.pageSize ?? 10))
+      pageSize: resolvePageSize(options.pageSize)
     }
   }
 )

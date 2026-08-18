@@ -102,6 +102,11 @@ export type OrganizationPluginOptions = {
   teams?: boolean
 }
 
+const resolvePolicyLimit = (limit?: number) =>
+  limit !== undefined && Number.isSafeInteger(limit) && limit >= 0
+    ? limit
+    : undefined
+
 export const organizationPlugin = createAuthPlugin(
   "organization",
   (options: OrganizationPluginOptions = {}) => {
@@ -128,9 +133,9 @@ export const organizationPlugin = createAuthPlugin(
         ...options.additionalRoles
       },
       additionalFields: options.additionalFields ?? [],
-      organizationLimit: options.organizationLimit,
-      membershipLimit: options.membershipLimit,
-      invitationLimit: options.invitationLimit,
+      organizationLimit: resolvePolicyLimit(options.organizationLimit),
+      membershipLimit: resolvePolicyLimit(options.membershipLimit),
+      invitationLimit: resolvePolicyLimit(options.invitationLimit),
       allowOrganizationCreation: options.allowOrganizationCreation ?? true,
       teams: options.teams ?? false,
       viewPaths: {

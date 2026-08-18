@@ -3,7 +3,7 @@
 import type { PasskeyAuthClient } from "@better-auth-ui/core/plugins/passkey"
 import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
 import { useUpdatePasskey } from "@better-auth-ui/react/plugins/passkey"
-import { type FormEvent, useState } from "react"
+import { type FormEvent, useEffect, useState } from "react"
 import { Button, buttonVariants } from "@/components/ui/button"
 import {
   Dialog,
@@ -31,6 +31,11 @@ export function RenamePasskeyDialog({
   const { authClient, localization } = useAuth<PasskeyAuthClient>()
   const { localization: labels } = useAuthPlugin(passkeyPlugin)
   const [name, setName] = useState(passkey.name ?? "")
+
+  useEffect(() => {
+    if (open) setName(passkey.name ?? "")
+  }, [open, passkey.name])
+
   const updatePasskey = useUpdatePasskey(authClient, {
     onSuccess: () => onOpenChange(false)
   })

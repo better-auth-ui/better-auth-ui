@@ -9,7 +9,7 @@ import {
   useListOrganizationInvitations,
   useListTeams
 } from "@better-auth-ui/solid/plugins/organization"
-import { createEffect, createMemo, createSignal, For, Show } from "solid-js"
+import { createEffect, createMemo, createSignal, For, on, Show } from "solid-js"
 import { toast } from "solid-sonner"
 import { Button } from "@/components/ui/button"
 import {
@@ -69,15 +69,30 @@ export function InviteMemberDialog(props: InviteMemberDialogProps) {
     if (!roles()[role()]) setRole(pickDefaultRole(roles()))
   })
 
+  createEffect(
+    on([() => props.open, () => activeOrganization.data?.id], () =>
+      setTeamId("")
+    )
+  )
+
   const handleSubmit = (event: SubmitEvent) => {
     event.preventDefault()
 
-    if (!email().trim() || !roles()[role()]) return
+    const atInvitationLimit =
+      config.invitationLimit !== undefined &&
+      (invitations.data?.filter((invitation) => invitation.status === "pending")
+        .length ?? 0) >= config.invitationLimit
+
+    if (!email().trim() || !roles()[role()] || atInvitationLimit) return
+
+    const selectedTeamId = teams.data?.some((team) => team.id === teamId())
+      ? teamId()
+      : undefined
 
     const payload = {
       email: email().trim(),
       organizationId: activeOrganization.data?.id,
-      teamId: teamId() || undefined,
+      teamId: selectedTeamId,
       role: role() as InviteMemberParams["role"]
     } satisfies InviteMemberParams
 

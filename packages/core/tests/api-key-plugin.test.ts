@@ -35,6 +35,10 @@ describe("apiKeyPlugin", () => {
       apiKeyPlugin({ configurations, permissions, pageSize: 7 })
     ).toMatchObject({ configurations, permissions, pageSize: 7 })
     expect(apiKeyPlugin({ pageSize: 0 }).pageSize).toBe(1)
+    expect(apiKeyPlugin({ pageSize: Number.NaN }).pageSize).toBe(10)
+    expect(apiKeyPlugin({ pageSize: Number.POSITIVE_INFINITY }).pageSize).toBe(
+      10
+    )
   })
 
   it("normalizes custom intervals and selects an available default", () => {

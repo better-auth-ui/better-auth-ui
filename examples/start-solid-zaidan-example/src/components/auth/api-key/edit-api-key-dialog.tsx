@@ -1,7 +1,7 @@
 import type { ApiKeyAuthClient } from "@better-auth-ui/core/plugins/api-key"
 import { useAuth, useAuthPlugin } from "@better-auth-ui/solid"
 import { useUpdateApiKey } from "@better-auth-ui/solid/plugins/api-key"
-import { createSignal, Show } from "solid-js"
+import { createEffect, createSignal, Show } from "solid-js"
 import type { ListedApiKey } from "@/components/auth/settings/shared/types"
 import { Button } from "@/components/ui/button"
 import {
@@ -29,6 +29,7 @@ const optionalNumber = (formData: FormData, name: string) => {
 
 export function EditApiKeyDialog(props: {
   apiKey: ListedApiKey
+  open: boolean
   onOpenChange: (open: boolean) => void
 }) {
   const auth = useAuth<ApiKeyAuthClient>()
@@ -38,6 +39,14 @@ export function EditApiKeyDialog(props: {
     props.apiKey.rateLimitEnabled
   )
   const [formError, setFormError] = createSignal<string>()
+  createEffect(() => {
+    if (!props.open) return
+
+    setEnabled(props.apiKey.enabled)
+    setRateLimitEnabled(props.apiKey.rateLimitEnabled)
+    setFormError(undefined)
+  })
+
   const updateApiKey = useUpdateApiKey(auth.authClient, () => ({
     onSuccess: () => props.onOpenChange(false)
   }))

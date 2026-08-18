@@ -68,13 +68,18 @@ export function OrganizationProfile({
     const formData = new FormData(e.currentTarget)
     const name = formData.get("name") as string
     const additionalValues: Record<string, unknown> = {}
-    for (const field of additionalFields) {
-      const value = parseAdditionalFieldValue(
-        field,
-        formData.get(field.name) as string | null
-      )
-      await field.validate?.(value)
-      if (value !== undefined) additionalValues[field.name] = value
+    try {
+      for (const field of additionalFields) {
+        const value = parseAdditionalFieldValue(
+          field,
+          formData.get(field.name) as string | null
+        )
+        await field.validate?.(value)
+        if (value !== undefined) additionalValues[field.name] = value
+      }
+    } catch (error) {
+      toast.danger(error instanceof Error ? error.message : String(error))
+      return
     }
 
     commitOrganizationUpdate({

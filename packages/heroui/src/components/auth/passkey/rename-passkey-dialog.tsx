@@ -10,7 +10,7 @@ import {
   Spinner,
   TextField
 } from "@heroui/react"
-import { type FormEvent, useState } from "react"
+import { type FormEvent, useEffect, useState } from "react"
 import { passkeyPlugin } from "../../../lib/auth/passkey-plugin"
 import type { ListedPasskey } from "./delete-passkey-dialog"
 
@@ -26,6 +26,11 @@ export function RenamePasskeyDialog({
   const { authClient, localization } = useAuth()
   const { localization: labels } = useAuthPlugin(passkeyPlugin)
   const [name, setName] = useState(passkey.name ?? "")
+
+  useEffect(() => {
+    if (isOpen) setName(passkey.name ?? "")
+  }, [isOpen, passkey.name])
+
   const updatePasskey = useUpdatePasskey(authClient as PasskeyAuthClient, {
     onSuccess: () => onOpenChange(false)
   })

@@ -21,7 +21,7 @@ import {
   TextField,
   toast
 } from "@heroui/react"
-import { type SyntheticEvent, useEffect, useState } from "react"
+import { type SyntheticEvent, useEffect, useRef, useState } from "react"
 
 import { organizationPlugin } from "../../../lib/auth/organization-plugin"
 
@@ -66,6 +66,8 @@ export function InviteMemberDialog({
     (invitations.data?.filter((invitation) => invitation.status === "pending")
       .length ?? 0) >= invitationLimit
   const [teamIds, setTeamIds] = useState<string[]>([])
+  const activeOrganizationId = activeOrganization?.id
+  const previousOrganizationId = useRef(activeOrganizationId)
 
   const [role, setRole] = useState(() => pickDefaultRole(Object.keys(roles)))
 
@@ -75,6 +77,14 @@ export function InviteMemberDialog({
       return keys.includes(current) ? current : pickDefaultRole(keys)
     })
   }, [roles])
+
+  useEffect(() => {
+    const organizationChanged =
+      previousOrganizationId.current !== activeOrganizationId
+
+    if (isOpen || organizationChanged) setTeamIds([])
+    previousOrganizationId.current = activeOrganizationId
+  }, [isOpen, activeOrganizationId])
 
   const { mutate: inviteMember, isPending: isInviting } = useInviteMember(
     authClient as OrganizationAuthClient,
@@ -91,15 +101,20 @@ export function InviteMemberDialog({
   const handleSubmit = (e: SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault()
 
-    if (!isRoleValid) return
+    if (!isRoleValid || invitationLimitReached) return
 
     const formData = new FormData(e.target as HTMLFormElement)
     const email = formData.get("email") as string
 
+    const availableTeamIds = new Set(teams.data?.map((team) => team.id))
+    const selectedTeamIds = teamIds.filter((teamId) =>
+      availableTeamIds.has(teamId)
+    )
+
     inviteMember({
       email: email.trim(),
       role: role as Parameters<typeof inviteMember>[0]["role"],
-      ...(teamIds.length ? { teamId: teamIds } : {})
+      ...(selectedTeamIds.length ? { teamId: selectedTeamIds } : {})
     })
   }
 

@@ -1,13 +1,15 @@
 "use client"
 
+import { authQueryKeys } from "@better-auth-ui/core"
 import type { TwoFactorAuthClient } from "@better-auth-ui/core/plugins/two-factor"
-import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
+import { useAuth, useAuthPlugin, useSession } from "@better-auth-ui/react"
 import {
   useSendTwoFactorOtp,
   useVerifyBackupCode,
   useVerifyTotp,
   useVerifyTwoFactorOtp
 } from "@better-auth-ui/react/plugins/two-factor"
+import { useQueryClient } from "@tanstack/react-query"
 import { type SyntheticEvent, useEffect, useState } from "react"
 
 import { Button } from "@/components/ui/button"
@@ -76,6 +78,8 @@ export function TwoFactorChallenge({ className }: TwoFactorChallengeProps) {
   } = useAuthPlugin(twoFactorPlugin)
 
   const twoFactorClient = authClient as TwoFactorAuthClient
+  const session = useSession(authClient)
+  const queryClient = useQueryClient()
   const isHydrated = useIsHydrated()
 
   const [methods, setMethods] = useState<TwoFactorMethod[]>(() =>
@@ -95,8 +99,11 @@ export function TwoFactorChallenge({ className }: TwoFactorChallengeProps) {
     setMethod(stored[0] ?? "totp")
   }, [])
 
-  const onVerified = () => {
+  const onVerified = async () => {
     clearTwoFactorMethods()
+    await queryClient.invalidateQueries({
+      queryKey: authQueryKeys.listSessions(session.data?.user.id)
+    })
     navigate({ to: redirectTo })
   }
 

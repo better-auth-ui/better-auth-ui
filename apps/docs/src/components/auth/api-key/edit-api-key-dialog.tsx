@@ -6,7 +6,7 @@ import type {
 } from "@better-auth-ui/core/plugins/api-key"
 import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
 import { useUpdateApiKey } from "@better-auth-ui/react/plugins/api-key"
-import { type FormEvent, useState } from "react"
+import { type FormEvent, useEffect, useRef, useState } from "react"
 import { Button, buttonVariants } from "@/components/ui/button"
 import {
   Dialog,
@@ -49,6 +49,17 @@ export function EditApiKeyDialog({
     apiKey.rateLimitEnabled
   )
   const [formError, setFormError] = useState<string>()
+  const formRef = useRef<HTMLFormElement>(null)
+
+  useEffect(() => {
+    if (!open) return
+
+    formRef.current?.reset()
+    setEnabled(apiKey.enabled)
+    setRateLimitEnabled(apiKey.rateLimitEnabled)
+    setFormError(undefined)
+  }, [apiKey, open])
+
   const updateApiKey = useUpdateApiKey(authClient, {
     onSuccess: () => onOpenChange(false)
   })
@@ -80,7 +91,7 @@ export function EditApiKeyDialog({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-xl">
-        <form className="flex flex-col gap-6" onSubmit={submit}>
+        <form className="flex flex-col gap-6" onSubmit={submit} ref={formRef}>
           <DialogHeader>
             <DialogTitle>{labels.editApiKey}</DialogTitle>
           </DialogHeader>

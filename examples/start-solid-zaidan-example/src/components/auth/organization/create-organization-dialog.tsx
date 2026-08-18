@@ -4,6 +4,7 @@ import { useAuth, useAuthPlugin } from "@better-auth-ui/solid"
 import { useCreateOrganization } from "@better-auth-ui/solid/plugins/organization"
 import { BriefcaseBusiness, LoaderCircle } from "lucide-solid"
 import { createEffect, createSignal, For } from "solid-js"
+import { toast } from "solid-sonner"
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
@@ -31,8 +32,10 @@ export function CreateOrganizationDialog(props: CreateOrganizationDialogProps) {
   const [name, setName] = createSignal("")
   const [slug, setSlug] = createSignal("")
   const [slugEdited, setSlugEdited] = createSignal(false)
+  const [isSubmitting, setIsSubmitting] = createSignal(false)
   const createOrganization = useCreateOrganization(auth.authClient, () => ({
-    onSuccess: () => props.onOpenChange(false)
+    onSuccess: () => props.onOpenChange(false),
+    onSettled: () => setIsSubmitting(false)
   }))
   createEffect(() => {
     if (!props.open) {
@@ -49,15 +52,24 @@ export function CreateOrganizationDialog(props: CreateOrganizationDialogProps) {
 
   const handleSubmit = async (event: SubmitEvent) => {
     event.preventDefault()
+    if (isSubmitting()) return
+
+    setIsSubmitting(true)
     const formData = new FormData(event.currentTarget as HTMLFormElement)
     const additionalValues: Record<string, unknown> = {}
-    for (const field of config.additionalFields) {
-      const value = parseAdditionalFieldValue(
-        field,
-        formData.get(field.name) as string | null
-      )
-      await field.validate?.(value)
-      if (value !== undefined) additionalValues[field.name] = value
+    try {
+      for (const field of config.additionalFields) {
+        const value = parseAdditionalFieldValue(
+          field,
+          formData.get(field.name) as string | null
+        )
+        await field.validate?.(value)
+        if (value !== undefined) additionalValues[field.name] = value
+      }
+    } catch (error) {
+      setIsSubmitting(false)
+      toast.error(error instanceof Error ? error.message : String(error))
+      return
     }
     createOrganization.mutate({
       name: name(),
@@ -65,6 +77,8 @@ export function CreateOrganizationDialog(props: CreateOrganizationDialogProps) {
       ...additionalValues
     })
   }
+
+  const isPending = () => createOrganization.isPending || isSubmitting()
 
   return (
     <Dialog open={props.open} onOpenChange={props.onOpenChange}>
@@ -86,7 +100,7 @@ export function CreateOrganizationDialog(props: CreateOrganizationDialogProps) {
             </FieldLabel>
             <Input
               autofocus
-              disabled={createOrganization.isPending}
+              disabled={isPending()}
               id="create-organization-name"
               name="name"
               onInput={(event) => setName(event.currentTarget.value)}
@@ -97,7 +111,7 @@ export function CreateOrganizationDialog(props: CreateOrganizationDialogProps) {
           </Field>
 
           <SlugField
-            disabled={createOrganization.isPending}
+            disabled={isPending()}
             id="create-organization-slug"
             onChange={(value) => {
               setSlug(value)
@@ -110,7 +124,7 @@ export function CreateOrganizationDialog(props: CreateOrganizationDialogProps) {
             {(field) => (
               <AdditionalField
                 field={field}
-                isPending={createOrganization.isPending}
+                isPending={isPending()}
                 name={field.name}
                 optionalLabel={auth.localization.settings.optional}
               />
@@ -120,14 +134,14 @@ export function CreateOrganizationDialog(props: CreateOrganizationDialogProps) {
           <DialogFooter>
             <DialogClose
               as={Button}
-              disabled={createOrganization.isPending}
+              disabled={isPending()}
               type="button"
               variant="outline"
             >
               {auth.localization.settings.cancel}
             </DialogClose>
-            <Button disabled={createOrganization.isPending} type="submit">
-              {createOrganization.isPending ? (
+            <Button disabled={isPending()} type="submit">
+              {isPending() ? (
                 <>
                   <LoaderCircle class="size-4 animate-spin" />
                   {config.localization.createOrganization}

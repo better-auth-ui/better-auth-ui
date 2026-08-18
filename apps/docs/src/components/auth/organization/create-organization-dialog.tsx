@@ -5,7 +5,8 @@ import type { OrganizationAuthClient } from "@better-auth-ui/core/plugins/organi
 import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
 import { useCreateOrganization } from "@better-auth-ui/react/plugins/organization"
 import { Briefcase } from "lucide-react"
-import { type SyntheticEvent, useEffect, useState } from "react"
+import { type SyntheticEvent, useEffect, useRef, useState } from "react"
+import { toast } from "sonner"
 import { Button, buttonVariants } from "@/components/ui/button"
 import {
   Dialog,
@@ -41,26 +42,45 @@ export function CreateOrganizationDialog({
   const [slug, setSlug] = useState("")
   const [slugEdited, setSlugEdited] = useState(false)
   const [nameError, setNameError] = useState<string>()
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const submissionLocked = useRef(false)
 
   const { mutate: createOrganization, isPending: isCreating } =
     useCreateOrganization(authClient, {
-      onSuccess: () => onOpenChange(false)
+      onSuccess: () => onOpenChange(false),
+      onSettled: () => {
+        submissionLocked.current = false
+        setIsSubmitting(false)
+      }
     })
 
   const handleSubmit = async (e: SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault()
+    if (submissionLocked.current) return
+
+    submissionLocked.current = true
+    setIsSubmitting(true)
     const formData = new FormData(e.currentTarget)
     const additionalValues: Record<string, unknown> = {}
-    for (const field of additionalFields) {
-      const value = parseAdditionalFieldValue(
-        field,
-        formData.get(field.name) as string | null
-      )
-      await field.validate?.(value)
-      if (value !== undefined) additionalValues[field.name] = value
+    try {
+      for (const field of additionalFields) {
+        const value = parseAdditionalFieldValue(
+          field,
+          formData.get(field.name) as string | null
+        )
+        await field.validate?.(value)
+        if (value !== undefined) additionalValues[field.name] = value
+      }
+    } catch (error) {
+      submissionLocked.current = false
+      setIsSubmitting(false)
+      toast.error(error instanceof Error ? error.message : String(error))
+      return
     }
     createOrganization({ name, slug, ...additionalValues })
   }
+
+  const isPending = isCreating || isSubmitting
 
   useEffect(() => {
     if (!open) {
@@ -113,7 +133,7 @@ export function CreateOrganizationDialog({
                   setNameError(localization.auth.fieldRequired)
                 }}
                 aria-invalid={!!nameError}
-                disabled={isCreating}
+                disabled={isPending}
               />
 
               <FieldError>{nameError}</FieldError>
@@ -126,14 +146,14 @@ export function CreateOrganizationDialog({
                 setSlug(value)
                 setSlugEdited(true)
               }}
-              disabled={isCreating}
+              disabled={isPending}
             />
 
             {additionalFields.map((field) => (
               <AdditionalField
                 key={field.name}
                 field={field}
-                isPending={isCreating}
+                isPending={isPending}
                 name={field.name}
                 optionalLabel={localization.settings.optional}
               />
@@ -143,14 +163,14 @@ export function CreateOrganizationDialog({
           <DialogFooter>
             <DialogClose
               className={buttonVariants({ variant: "outline" })}
-              disabled={isCreating}
+              disabled={isPending}
               type="button"
             >
               {localization.settings.cancel}
             </DialogClose>
 
-            <Button type="submit" disabled={isCreating}>
-              {isCreating && <Spinner />}
+            <Button type="submit" disabled={isPending}>
+              {isPending && <Spinner />}
 
               {organizationLocalization.createOrganization}
             </Button>

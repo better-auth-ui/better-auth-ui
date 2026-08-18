@@ -112,10 +112,12 @@ function TeamCard(props: {
   }))
   const updateTeam = useUpdateTeam(auth.authClient)
   const removeTeam = useRemoveTeam(auth.authClient)
-  const addMember = useAddTeamMember(auth.authClient)
-  const removeMember = useRemoveTeamMember(auth.authClient)
   const [name, setName] = createSignal(props.team.name)
   const [selectedMember, setSelectedMember] = createSignal<MemberOption>()
+  const addMember = useAddTeamMember(auth.authClient, () => ({
+    onSuccess: () => setSelectedMember(undefined)
+  }))
+  const removeMember = useRemoveTeamMember(auth.authClient)
   const memberOptions = () => {
     const memberIds = new Set(teamMembers.data?.map((member) => member.userId))
     return props.organizationMembers
@@ -141,6 +143,7 @@ function TeamCard(props: {
             />
           </Field>
           <Button
+            disabled={updateTeam.isPending}
             variant="outline"
             onClick={() =>
               updateTeam.mutate({
@@ -152,13 +155,15 @@ function TeamCard(props: {
             {auth.localization.settings.saveChanges}
           </Button>
           <Button
+            disabled={removeTeam.isPending}
             variant="destructive"
-            onClick={() =>
+            onClick={() => {
+              if (!window.confirm(config.localization.deleteTeam)) return
               removeTeam.mutate({
                 teamId: props.team.id,
                 organizationId: props.organizationId
               })
-            }
+            }}
           >
             {config.localization.deleteTeam}
           </Button>
@@ -189,7 +194,7 @@ function TeamCard(props: {
             </Select>
           </Field>
           <Button
-            disabled={!selectedMember()}
+            disabled={!selectedMember() || addMember.isPending}
             onClick={() => {
               const member = selectedMember()
               if (!member) return

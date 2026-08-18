@@ -105,12 +105,14 @@ function TeamCard({
   const { localization: labels } = useAuthPlugin(organizationPlugin)
   const client = authClient as OrganizationAuthClient
   const teamMembers = useListTeamMembers(client, { query: { teamId: team.id } })
-  const updateTeam = useUpdateTeam(client)
-  const removeTeam = useRemoveTeam(client)
-  const addMember = useAddTeamMember(client)
-  const removeMember = useRemoveTeamMember(client)
   const [name, setName] = useState(team.name)
   const [userId, setUserId] = useState<string>()
+  const updateTeam = useUpdateTeam(client)
+  const removeTeam = useRemoveTeam(client)
+  const addMember = useAddTeamMember(client, {
+    onSuccess: () => setUserId(undefined)
+  })
+  const removeMember = useRemoveTeamMember(client)
   const memberIds = new Set(teamMembers.data?.map((member) => member.userId))
 
   return (
@@ -174,7 +176,7 @@ function TeamCard({
             </Select.Popover>
           </Select>
           <Button
-            isDisabled={!userId}
+            isDisabled={!userId || addMember.isPending}
             onPress={() =>
               userId &&
               addMember.mutate({ teamId: team.id, userId, organizationId })

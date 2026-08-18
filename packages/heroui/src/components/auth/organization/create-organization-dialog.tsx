@@ -11,9 +11,10 @@ import {
   Input,
   Label,
   Spinner,
-  TextField
+  TextField,
+  toast
 } from "@heroui/react"
-import { type SyntheticEvent, useEffect, useState } from "react"
+import { type SyntheticEvent, useEffect, useRef, useState } from "react"
 
 import { organizationPlugin } from "../../../lib/auth/organization-plugin"
 import { AdditionalField } from "../additional-field"
@@ -43,26 +44,45 @@ export function CreateOrganizationDialog({
   const [name, setName] = useState("")
   const [slug, setSlug] = useState("")
   const [slugEdited, setSlugEdited] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const submissionLocked = useRef(false)
 
   const { mutate: createOrganization, isPending: isCreating } =
     useCreateOrganization(authClient as OrganizationAuthClient, {
-      onSuccess: () => onOpenChange(false)
+      onSuccess: () => onOpenChange(false),
+      onSettled: () => {
+        submissionLocked.current = false
+        setIsSubmitting(false)
+      }
     })
 
   const handleSubmit = async (e: SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault()
+    if (submissionLocked.current) return
+
+    submissionLocked.current = true
+    setIsSubmitting(true)
     const formData = new FormData(e.currentTarget)
     const additionalValues: Record<string, unknown> = {}
-    for (const field of additionalFields) {
-      const value = parseAdditionalFieldValue(
-        field,
-        formData.get(field.name) as string | null
-      )
-      await field.validate?.(value)
-      if (value !== undefined) additionalValues[field.name] = value
+    try {
+      for (const field of additionalFields) {
+        const value = parseAdditionalFieldValue(
+          field,
+          formData.get(field.name) as string | null
+        )
+        await field.validate?.(value)
+        if (value !== undefined) additionalValues[field.name] = value
+      }
+    } catch (error) {
+      submissionLocked.current = false
+      setIsSubmitting(false)
+      toast.danger(error instanceof Error ? error.message : String(error))
+      return
     }
     createOrganization({ name, slug, ...additionalValues })
   }
+
+  const isPending = isCreating || isSubmitting
 
   useEffect(() => {
     if (!isOpen) {
@@ -102,7 +122,7 @@ export function CreateOrganizationDialog({
               <TextField
                 id="name"
                 name="name"
-                isDisabled={isCreating}
+                isDisabled={isPending}
                 value={name}
                 onChange={setName}
                 validate={(value) => {
@@ -127,13 +147,13 @@ export function CreateOrganizationDialog({
                   setSlug(value)
                   setSlugEdited(true)
                 }}
-                isDisabled={isCreating}
+                isDisabled={isPending}
                 variant="secondary"
               />
               {additionalFields.map((field) => (
                 <AdditionalField
                   field={field}
-                  isPending={isCreating}
+                  isPending={isPending}
                   key={field.name}
                   name={field.name}
                   optionalLabel={localization.settings.optional}
@@ -142,12 +162,12 @@ export function CreateOrganizationDialog({
             </AlertDialog.Body>
 
             <AlertDialog.Footer>
-              <Button slot="close" variant="tertiary" isDisabled={isCreating}>
+              <Button slot="close" variant="tertiary" isDisabled={isPending}>
                 {localization.settings.cancel}
               </Button>
 
-              <Button type="submit" isPending={isCreating}>
-                {isCreating && <Spinner color="current" size="sm" />}
+              <Button type="submit" isPending={isPending}>
+                {isPending && <Spinner color="current" size="sm" />}
 
                 {organizationLocalization.createOrganization}
               </Button>

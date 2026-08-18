@@ -271,6 +271,40 @@ describe("<Passkeys />", () => {
     })
   })
 
+  it("restores the saved passkey name after canceling a rename", async () => {
+    const user = userEvent.setup()
+    const authClient = createPasskeysAuthClient([
+      { id: "pk-1", name: "My MacBook", createdAt: new Date("2024-01-01") }
+    ])
+    renderPasskeys(authClient)
+
+    await user.click(
+      await screen.findByRole("button", { name: /rename passkey/i })
+    )
+
+    const renameDialog = await screen.findByRole("alertdialog")
+    const nameInput = within(renameDialog).getByRole("textbox", {
+      name: /^name$/i
+    })
+    await user.clear(nameInput)
+    await user.type(nameInput, "Work laptop")
+    await user.click(
+      within(renameDialog).getByRole("button", { name: /^cancel$/i })
+    )
+
+    await waitFor(() => {
+      expect(screen.queryByRole("alertdialog")).not.toBeInTheDocument()
+    })
+
+    await user.click(screen.getByRole("button", { name: /rename passkey/i }))
+
+    expect(
+      within(await screen.findByRole("alertdialog")).getByRole("textbox", {
+        name: /^name$/i
+      })
+    ).toHaveValue("My MacBook")
+  })
+
   it("calls deletePasskey with the correct id", async () => {
     const user = userEvent.setup()
     const authClient = createPasskeysAuthClient([

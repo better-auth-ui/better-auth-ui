@@ -75,7 +75,11 @@ export function ApiKey(props: {
             <Pencil />
             {apiKeyLocalization.editApiKey}
           </DialogTrigger>
-          <EditApiKeyDialog apiKey={props.apiKey} onOpenChange={setEditOpen} />
+          <EditApiKeyDialog
+            apiKey={props.apiKey}
+            open={editOpen()}
+            onOpenChange={setEditOpen}
+          />
         </Dialog>
         <Show when={!props.hideDelete}>
           <AlertDialog open={deleteOpen()} onOpenChange={setDeleteOpen}>

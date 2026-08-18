@@ -116,10 +116,12 @@ function TeamCard({
   })
   const updateTeam = useUpdateTeam(authClient)
   const removeTeam = useRemoveTeam(authClient)
-  const addMember = useAddTeamMember(authClient)
-  const removeMember = useRemoveTeamMember(authClient)
   const [name, setName] = useState(team.name)
   const [userId, setUserId] = useState("")
+  const addMember = useAddTeamMember(authClient, {
+    onSuccess: () => setUserId("")
+  })
+  const removeMember = useRemoveTeamMember(authClient)
   const memberIds = new Set(teamMembers.data?.map((member) => member.userId))
   const availableMembers = organizationMembers
     .filter((member) => !memberIds.has(member.userId))
@@ -143,6 +145,7 @@ function TeamCard({
             />
           </Field>
           <Button
+            disabled={updateTeam.isPending}
             variant="outline"
             onClick={() =>
               updateTeam.mutate({
@@ -154,10 +157,12 @@ function TeamCard({
             {authLocalization.settings.saveChanges}
           </Button>
           <Button
+            disabled={removeTeam.isPending}
             variant="destructive"
-            onClick={() =>
+            onClick={() => {
+              if (!window.confirm(localization.deleteTeam)) return
               removeTeam.mutate({ teamId: team.id, organizationId })
-            }
+            }}
           >
             {localization.deleteTeam}
           </Button>
@@ -185,7 +190,7 @@ function TeamCard({
             </Select>
           </Field>
           <Button
-            disabled={!userId}
+            disabled={!userId || addMember.isPending}
             onClick={() =>
               userId &&
               addMember.mutate({ teamId: team.id, userId, organizationId })

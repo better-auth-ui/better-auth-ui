@@ -1,7 +1,7 @@
 import type { PasskeyAuthClient } from "@better-auth-ui/core/plugins/passkey"
 import { useAuth } from "@better-auth-ui/solid"
 import { useUpdatePasskey } from "@better-auth-ui/solid/plugins/passkey"
-import { createSignal } from "solid-js"
+import { createEffect, createSignal } from "solid-js"
 import { passkeyLabels } from "@/components/auth/passkey/passkey-localization"
 import type { ListedPasskey } from "@/components/auth/settings/shared/types"
 import { Button } from "@/components/ui/button"
@@ -17,12 +17,17 @@ import { Input } from "@/components/ui/input"
 import { Spinner } from "@/components/ui/spinner"
 
 export function RenamePasskeyDialog(props: {
+  open: boolean
   onOpenChange: (open: boolean) => void
   passkey: ListedPasskey
 }) {
   const auth = useAuth<PasskeyAuthClient>()
   const labels = () => passkeyLabels(auth)
   const [name, setName] = createSignal(props.passkey.name ?? "")
+  createEffect(() => {
+    if (props.open) setName(props.passkey.name ?? "")
+  })
+
   const updatePasskey = useUpdatePasskey(auth.authClient, () => ({
     onSuccess: () => props.onOpenChange(false)
   }))
