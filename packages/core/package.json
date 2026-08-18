@@ -153,21 +153,21 @@
     }
   },
   "devDependencies": {
-    "@better-auth/api-key": "1.7.0-rc.6",
-    "@better-auth/oauth-provider": "1.7.0-rc.6",
-    "@better-auth/passkey": "1.7.0-rc.6",
+    "@better-auth/api-key": "1.7.0",
+    "@better-auth/oauth-provider": "1.7.0",
+    "@better-auth/passkey": "1.7.0",
     "@mikkelscheike/email-provider-links": "5.2.1",
     "@tanstack/query-core": "^5.101.2",
-    "better-auth": "1.7.0-rc.6",
+    "better-auth": "1.7.0",
     "vitest": "^4.1.9"
   },
   "peerDependencies": {
-    "@better-auth/api-key": ">=1.7.0-rc.6",
-    "@better-auth/oauth-provider": ">=1.7.0-rc.6",
-    "@better-auth/passkey": ">=1.7.0-rc.6",
+    "@better-auth/api-key": ">=1.7.0",
+    "@better-auth/oauth-provider": ">=1.7.0",
+    "@better-auth/passkey": ">=1.7.0",
     "@mikkelscheike/email-provider-links": ">=5.2.1",
     "@tanstack/query-core": ">=5.101.2",
-    "better-auth": ">=1.7.0-rc.6"
+    "better-auth": ">=1.7.0"
   },
   "peerDependenciesMeta": {
     "@better-auth/api-key": {
