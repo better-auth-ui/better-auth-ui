@@ -2494,6 +2494,7 @@ describe("Solid registry isolation", () => {
       "./plugins/passkey",
       "./plugins/phone-number",
       "./plugins/sso",
+      "./plugins/siwe",
       "./plugins/two-factor",
       "./plugins/username"
     ])
