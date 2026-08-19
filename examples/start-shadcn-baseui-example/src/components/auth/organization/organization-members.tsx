@@ -1,6 +1,9 @@
 "use client"
 
-import type { OrganizationAuthClient } from "@better-auth-ui/core/plugins/organization"
+import {
+  hasMemberRole,
+  type OrganizationAuthClient
+} from "@better-auth-ui/core/plugins/organization"
 import { useAuth, useAuthPlugin, useSession } from "@better-auth-ui/react"
 import {
   useActiveOrganization,
@@ -91,7 +94,7 @@ export function OrganizationMembers({
   const filteredMembers = useMemo(() => {
     return membersData?.members.filter(
       (member) =>
-        (roleFilter === "all" || member.role === roleFilter) &&
+        (roleFilter === "all" || hasMemberRole(member.role, roleFilter)) &&
         (member.user.name.toLowerCase().includes(search.toLowerCase()) ||
           member.user.email.toLowerCase().includes(search.toLowerCase()))
     )
@@ -120,7 +123,8 @@ export function OrganizationMembers({
   const [inviteOpen, setInviteOpen] = useState(false)
 
   const isOwner = membersData?.members.some(
-    (member) => member.role === "owner" && member.userId === session?.user.id
+    (member) =>
+      hasMemberRole(member.role, "owner") && member.userId === session?.user.id
   )
   const atMembershipLimit =
     membershipLimit !== undefined &&

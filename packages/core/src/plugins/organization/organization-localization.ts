@@ -123,6 +123,8 @@ export const organizationLocalization = {
   role: "Role",
   /** @remarks `"Search..."` */
   search: "Search...",
+  /** @remarks `"Select roles"` */
+  selectRoles: "Select roles",
   /** @remarks `"Slug"` */
   slug: "Slug",
   /** @remarks `"organization-slug"` */

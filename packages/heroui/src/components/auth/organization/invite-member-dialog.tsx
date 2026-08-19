@@ -69,12 +69,20 @@ export function InviteMemberDialog({
   const activeOrganizationId = activeOrganization?.id
   const previousOrganizationId = useRef(activeOrganizationId)
 
-  const [role, setRole] = useState(() => pickDefaultRole(Object.keys(roles)))
+  const [selectedRoles, setSelectedRoles] = useState(() => {
+    const fallback = pickDefaultRole(Object.keys(roles))
+    return fallback ? [fallback] : []
+  })
 
   useEffect(() => {
-    setRole((current) => {
+    setSelectedRoles((current) => {
       const keys = Object.keys(roles)
-      return keys.includes(current) ? current : pickDefaultRole(keys)
+      const kept = current.filter((entry) => keys.includes(entry))
+
+      if (kept.length > 0) return kept
+
+      const fallback = pickDefaultRole(keys)
+      return fallback ? [fallback] : []
     })
   }, [roles])
 
@@ -96,7 +104,7 @@ export function InviteMemberDialog({
     }
   )
 
-  const isRoleValid = Object.keys(roles).includes(role)
+  const isRoleValid = selectedRoles.length > 0
 
   const handleSubmit = (e: SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -113,7 +121,7 @@ export function InviteMemberDialog({
 
     inviteMember({
       email: email.trim(),
-      role: role as Parameters<typeof inviteMember>[0]["role"],
+      role: selectedRoles as Parameters<typeof inviteMember>[0]["role"],
       ...(selectedTeamIds.length ? { teamId: selectedTeamIds } : {})
     })
   }
@@ -170,9 +178,15 @@ export function InviteMemberDialog({
 
               <Select
                 name="role"
-                value={role}
-                onChange={(value) => {
-                  if (typeof value === "string") setRole(value)
+                selectionMode="multiple"
+                value={selectedRoles}
+                onChange={(keys) => {
+                  const next = [...(keys as Iterable<string>)]
+
+                  // An invitation always carries at least one role.
+                  if (next.length === 0) return
+
+                  setSelectedRoles(next)
                 }}
                 isDisabled={isInviting}
                 variant="secondary"
@@ -186,7 +200,7 @@ export function InviteMemberDialog({
                 </Select.Trigger>
 
                 <Select.Popover>
-                  <ListBox>
+                  <ListBox selectionMode="multiple">
                     {Object.entries(roles).map(([key, label]) => (
                       <ListBox.Item key={key} id={key} textValue={label}>
                         {label}

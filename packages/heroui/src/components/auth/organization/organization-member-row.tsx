@@ -1,4 +1,8 @@
-import type { OrganizationAuthClient } from "@better-auth-ui/core/plugins/organization"
+import {
+  memberRoleLabels,
+  type OrganizationAuthClient,
+  parseMemberRoles
+} from "@better-auth-ui/core/plugins/organization"
 import { useAuth, useAuthPlugin, useSession } from "@better-auth-ui/react"
 import {
   useHasPermission,
@@ -49,7 +53,9 @@ export function OrganizationMemberRow({
       onSuccess: () => toast.success(organizationLocalization.memberRoleUpdated)
     })
 
-  const roleLabel = roles?.[member.role] ?? member.role
+  // Better Auth persists multiple roles as one comma-joined string.
+  const memberRoles = parseMemberRoles(member.role)
+  const roleLabel = memberRoleLabels(member.role, roles).join(", ")
 
   const assignableRoles = Object.entries(roles).filter(
     ([key]) => isOwner || key !== "owner"
@@ -91,17 +97,24 @@ export function OrganizationMemberRow({
               </Button>
 
               <Dropdown.Popover className="min-w-fit">
-                <Dropdown.Menu>
+                <Dropdown.Menu
+                  selectionMode="multiple"
+                  selectedKeys={new Set(memberRoles)}
+                  onSelectionChange={(keys) => {
+                    const next = [...keys] as string[]
+
+                    // A member always holds at least one role, so refuse to
+                    // clear the last one.
+                    if (next.length === 0) return
+
+                    updateMemberRole({ memberId: member.id, role: next })
+                  }}
+                >
                   {assignableRoles.map(([role, label]) => (
-                    <Dropdown.Item
-                      key={role}
-                      textValue={label}
-                      isDisabled={member.role === role}
-                      onAction={() =>
-                        updateMemberRole({ memberId: member.id, role })
-                      }
-                    >
+                    <Dropdown.Item key={role} id={role} textValue={label}>
                       <Label>{label}</Label>
+
+                      <Dropdown.ItemIndicator />
                     </Dropdown.Item>
                   ))}
                 </Dropdown.Menu>

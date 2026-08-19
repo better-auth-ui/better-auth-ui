@@ -1,8 +1,9 @@
 "use client"
 
-import type {
-  OrganizationAuthClient,
-  OrganizationLocalization
+import {
+  hasMemberRole,
+  type OrganizationAuthClient,
+  type OrganizationLocalization
 } from "@better-auth-ui/core/plugins/organization"
 import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
 import {
@@ -82,7 +83,7 @@ export function OrganizationInvitations({
   const filteredInvitations = useMemo(() => {
     return invitations?.filter(
       (invitation) =>
-        (roleFilter === "all" || invitation.role === roleFilter) &&
+        (roleFilter === "all" || hasMemberRole(invitation.role, roleFilter)) &&
         (statusFilter === "all" || invitation.status === statusFilter) &&
         invitation.email.toLowerCase().includes(search.toLowerCase())
     )

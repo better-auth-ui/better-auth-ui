@@ -1,4 +1,7 @@
-import type { OrganizationAuthClient } from "@better-auth-ui/core/plugins/organization"
+import {
+  memberRoleLabels,
+  type OrganizationAuthClient
+} from "@better-auth-ui/core/plugins/organization"
 import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
 import {
   useCancelInvitation,
@@ -47,7 +50,7 @@ export function OrganizationInvitationTableRow({
       onSuccess: () => toast.success(organizationLocalization.invitationResent)
     })
 
-  const roleLabel = roles?.[invitation.role] ?? invitation.role
+  const roleLabel = memberRoleLabels(invitation.role, roles).join(", ")
 
   const statusLabel =
     organizationLocalization[invitation.status] ?? invitation.status

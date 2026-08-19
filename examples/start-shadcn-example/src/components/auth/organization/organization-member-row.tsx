@@ -1,6 +1,10 @@
 "use client"
 
-import type { OrganizationAuthClient } from "@better-auth-ui/core/plugins/organization"
+import {
+  memberRoleLabels,
+  type OrganizationAuthClient,
+  parseMemberRoles
+} from "@better-auth-ui/core/plugins/organization"
 import { useAuth, useAuthPlugin, useSession } from "@better-auth-ui/react"
 import {
   useHasPermission,
@@ -14,8 +18,8 @@ import { toast } from "sonner"
 import { Button, buttonVariants } from "@/components/ui/button"
 import {
   DropdownMenu,
+  DropdownMenuCheckboxItem,
   DropdownMenuContent,
-  DropdownMenuItem,
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu"
 import { Spinner } from "@/components/ui/spinner"
@@ -61,11 +65,24 @@ export function OrganizationMemberRow({
       onSuccess: () => toast.success(organizationLocalization.memberRoleUpdated)
     })
 
-  const roleLabel = roles?.[member.role] ?? member.role
+  // Better Auth persists multiple roles as one comma-joined string.
+  const memberRoles = parseMemberRoles(member.role)
+  const roleLabel = memberRoleLabels(member.role, roles).join(", ")
 
   const assignableRoles = Object.entries(roles).filter(
     ([key]) => isOwner || key !== "owner"
   )
+
+  const toggleRole = (role: string) => {
+    const next = memberRoles.includes(role)
+      ? memberRoles.filter((entry) => entry !== role)
+      : [...memberRoles, role]
+
+    // A member always holds at least one role, so refuse to clear the last one.
+    if (next.length === 0) return
+
+    updateMemberRole({ memberId: member.id, role: next })
+  }
 
   const isCurrentUser = session?.user.id === member.userId
 
@@ -100,17 +117,24 @@ export function OrganizationMemberRow({
               </DropdownMenuTrigger>
 
               <DropdownMenuContent align="end">
-                {assignableRoles.map(([role, label]) => (
-                  <DropdownMenuItem
-                    key={role}
-                    disabled={member.role === role}
-                    onClick={() =>
-                      updateMemberRole({ memberId: member.id, role })
-                    }
-                  >
-                    {label}
-                  </DropdownMenuItem>
-                ))}
+                {assignableRoles.map(([role, label]) => {
+                  const checked = memberRoles.includes(role)
+
+                  return (
+                    <DropdownMenuCheckboxItem
+                      key={role}
+                      checked={checked}
+                      disabled={checked && memberRoles.length === 1}
+                      onSelect={(event) => {
+                        // Keep the menu open so several roles can be toggled.
+                        event.preventDefault()
+                        toggleRole(role)
+                      }}
+                    >
+                      {label}
+                    </DropdownMenuCheckboxItem>
+                  )
+                })}
               </DropdownMenuContent>
             </DropdownMenu>
           )}

@@ -3570,12 +3570,13 @@ describe("Solid auth route component selection", () => {
     expect(organizationMemberRow).toContain("memberRoleUpdated")
     expect(organizationMemberRow).toContain("changeMemberRole")
     expect(organizationMemberRow).toContain("DropdownMenu")
-    expect(organizationMemberRow).toContain("DropdownMenuItem")
+    expect(organizationMemberRow).toContain("DropdownMenuCheckboxItem")
     expect(organizationMemberRow).toContain("updateMemberRole.mutate")
     expect(organizationMemberRow).toContain("memberId: props.member.id")
     expect(organizationMemberRow).toContain(
-      'role as UpdateMemberRoleParams["role"]'
+      'next as UpdateMemberRoleParams["role"]'
     )
+    expect(organizationMemberRow).toContain("parseMemberRoles")
     expect(organizationMemberRow).toContain('key !== "owner"')
     expect(organizationMemberRow).toContain("useSession")
     expect(organizationMemberRow).toContain("session.data?.user.id")

@@ -849,6 +849,33 @@ Modal dialog with the new-organization form. Owned by `<OrganizationSwitcher />`
 
 <auto-type-table path="../../../../../../packages/heroui/src/components/auth/organization/create-organization-dialog.tsx" name="CreateOrganizationDialogProps" />
 
+## Multiple roles per member
+
+Better Auth accepts `role` as either a string or an array, and persists the
+result as one comma-joined value (`"admin,member"`). The role pickers on
+`<InviteMemberDialog />` and `<OrganizationMemberRow />` are multi-select, so a
+member can hold several roles at once. Clearing the last role is blocked,
+because every member needs at least one.
+
+Anywhere you read a raw role, split it first. `@better-auth-ui/core/plugins/organization`
+exports helpers for this:
+
+```ts
+import {
+  hasMemberRole,
+  memberRoleLabels,
+  parseMemberRoles
+} from "@better-auth-ui/core/plugins/organization"
+
+parseMemberRoles("admin,member") // ["admin", "member"]
+hasMemberRole("owner,admin", "owner") // true
+memberRoleLabels("admin,auditor", roles) // ["Admin", "auditor"]
+```
+
+`hasMemberRole` matters more than it looks: `member.role === "owner"` silently
+misses an owner who also carries a second role, which is what the members list
+used to do when deciding whether to show owner-only actions.
+
 ### `<InviteMemberDialog />`
 
 Modal dialog for inviting a new member by email. Owned by `<OrganizationMembers />` and `<OrganizationInvitations />`; mount it directly to drive the invite flow from a custom action.

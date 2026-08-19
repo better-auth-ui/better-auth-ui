@@ -1,6 +1,7 @@
-import type {
-  OrganizationAuthClient,
-  OrganizationLocalization
+import {
+  hasMemberRole,
+  type OrganizationAuthClient,
+  type OrganizationLocalization
 } from "@better-auth-ui/core/plugins/organization"
 import { useAuth, useAuthPlugin, useSession } from "@better-auth-ui/solid"
 import { useListOrganizationMembers } from "@better-auth-ui/solid/plugins/organization"
@@ -178,7 +179,8 @@ export function OrganizationMembers(props: OrganizationMembersProps) {
   const filteredMemberRows = () =>
     memberRows().filter((member) => {
       const roleMatches =
-        memberRoleFilter() === "all" || member.role === memberRoleFilter()
+        memberRoleFilter() === "all" ||
+        hasMemberRole(member.role, memberRoleFilter())
       const search = normalizedMemberSearch()
 
       if (!search) return roleMatches
@@ -236,7 +238,8 @@ export function OrganizationMembers(props: OrganizationMembersProps) {
   const isOwner = () =>
     memberRows().some(
       (member) =>
-        member.role === "owner" && member.userId === session.data?.user.id
+        hasMemberRole(member.role, "owner") &&
+        member.userId === session.data?.user.id
     )
 
   return (

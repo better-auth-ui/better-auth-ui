@@ -1,6 +1,7 @@
-import type {
-  OrganizationAuthClient,
-  OrganizationLocalization
+import {
+  hasMemberRole,
+  type OrganizationAuthClient,
+  type OrganizationLocalization
 } from "@better-auth-ui/core/plugins/organization"
 import { useAuth } from "@better-auth-ui/solid"
 import { useListOrganizationInvitations } from "@better-auth-ui/solid/plugins/organization"
@@ -185,7 +186,7 @@ export function OrganizationInvitations(props: OrganizationInvitationsProps) {
     invitationRows().filter((invitation) => {
       const roleMatches =
         invitationRoleFilter() === "all" ||
-        invitation.role === invitationRoleFilter()
+        hasMemberRole(invitation.role, invitationRoleFilter())
       const statusMatches =
         invitationStatusFilter() === "all" ||
         invitation.status === invitationStatusFilter()

@@ -12,6 +12,7 @@ import {
 import { createEffect, createMemo, createSignal, For, on, Show } from "solid-js"
 import { toast } from "solid-sonner"
 import { Button } from "@/components/ui/button"
+import { Checkbox } from "@/components/ui/checkbox"
 import {
   Dialog,
   DialogClose,
@@ -50,7 +51,18 @@ export function InviteMemberDialog(props: InviteMemberDialogProps) {
   }))
   const invitations = useListOrganizationInvitations(auth.authClient)
   const [email, setEmail] = createSignal("")
-  const [role, setRole] = createSignal(pickDefaultRole(roles()))
+  const [selectedRoles, setSelectedRoles] = createSignal<string[]>(
+    pickDefaultRole(roles()) ? [pickDefaultRole(roles())] : []
+  )
+  const toggleRole = (role: string, selected: boolean) =>
+    setSelectedRoles((current) => {
+      const next = selected
+        ? [...current, role]
+        : current.filter((entry) => entry !== role)
+
+      // An invitation always carries at least one role.
+      return next.length > 0 ? next : current
+    })
   const [teamId, setTeamId] = createSignal("")
   const inviteMember = useInviteMember(auth.authClient, () => ({
     onSuccess: () => {
@@ -62,11 +74,18 @@ export function InviteMemberDialog(props: InviteMemberDialogProps) {
   createEffect(() => {
     if (!props.open) {
       setEmail("")
-      setRole(pickDefaultRole(roles()))
+      setSelectedRoles([pickDefaultRole(roles())].filter(Boolean))
       return
     }
 
-    if (!roles()[role()]) setRole(pickDefaultRole(roles()))
+    const available = roles()
+    const kept = selectedRoles().filter((entry) => entry in available)
+
+    if (kept.length !== selectedRoles().length) {
+      setSelectedRoles(
+        kept.length > 0 ? kept : [pickDefaultRole(available)].filter(Boolean)
+      )
+    }
   })
 
   createEffect(
@@ -83,7 +102,8 @@ export function InviteMemberDialog(props: InviteMemberDialogProps) {
       (invitations.data?.filter((invitation) => invitation.status === "pending")
         .length ?? 0) >= config.invitationLimit
 
-    if (!email().trim() || !roles()[role()] || atInvitationLimit) return
+    if (!email().trim() || selectedRoles().length === 0 || atInvitationLimit)
+      return
 
     const selectedTeamId = teams.data?.some((team) => team.id === teamId())
       ? teamId()
@@ -93,7 +113,7 @@ export function InviteMemberDialog(props: InviteMemberDialogProps) {
       email: email().trim(),
       organizationId: activeOrganization.data?.id,
       teamId: selectedTeamId,
-      role: role() as InviteMemberParams["role"]
+      role: selectedRoles() as InviteMemberParams["role"]
     } satisfies InviteMemberParams
 
     inviteMember.mutate(payload)
@@ -126,24 +146,28 @@ export function InviteMemberDialog(props: InviteMemberDialogProps) {
             />
           </Field>
 
-          <Field>
-            <FieldLabel for="invite-member-role">
+          <fieldset class="flex flex-col gap-2">
+            <legend class="font-medium text-sm">
               {config.localization.role}
-            </FieldLabel>
-            <NativeSelect
-              class="w-full"
-              disabled={inviteMember.isPending}
-              id="invite-member-role"
-              onChange={(event) => setRole(event.currentTarget.value)}
-              value={role()}
-            >
+            </legend>
+            <div class="flex flex-wrap gap-4">
               <For each={Object.entries(roles())}>
                 {([value, label]) => (
-                  <NativeSelectOption value={value}>{label}</NativeSelectOption>
+                  <Field orientation="horizontal">
+                    <Checkbox
+                      checked={selectedRoles().includes(value)}
+                      disabled={inviteMember.isPending}
+                      id={`invite-member-role-${value}`}
+                      onChange={(selected) => toggleRole(value, selected)}
+                    />
+                    <FieldLabel for={`invite-member-role-${value}`}>
+                      {label}
+                    </FieldLabel>
+                  </Field>
                 )}
               </For>
-            </NativeSelect>
-          </Field>
+            </div>
+          </fieldset>
 
           <Show when={config.teams}>
             <Field>
@@ -184,7 +208,7 @@ export function InviteMemberDialog(props: InviteMemberDialogProps) {
               disabled={
                 inviteMember.isPending ||
                 !email().trim() ||
-                !roles()[role()] ||
+                selectedRoles().length === 0 ||
                 (config.invitationLimit !== undefined &&
                   (invitations.data?.filter(
                     (invitation) => invitation.status === "pending"

@@ -1,9 +1,11 @@
-import type {
-  LeaveOrganizationParams,
-  OrganizationAuthClient,
-  OrganizationLocalization,
-  RemoveMemberParams,
-  UpdateMemberRoleParams
+import {
+  type LeaveOrganizationParams,
+  memberRoleLabels,
+  type OrganizationAuthClient,
+  type OrganizationLocalization,
+  parseMemberRoles,
+  type RemoveMemberParams,
+  type UpdateMemberRoleParams
 } from "@better-auth-ui/core/plugins/organization"
 import { useAuth, useSession } from "@better-auth-ui/solid"
 import {
@@ -29,8 +31,8 @@ import {
 import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
+  DropdownMenuCheckboxItem,
   DropdownMenuContent,
-  DropdownMenuItem,
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu"
 import { TableCell, TableRow } from "@/components/ui/table"
@@ -207,6 +209,24 @@ export function OrganizationMemberRow(props: OrganizationMemberRowProps) {
       ([key]) => props.isOwner || key !== "owner"
     )
 
+  // Better Auth persists multiple roles as one comma-joined string.
+  const memberRoles = () => parseMemberRoles(props.member.role)
+
+  const toggleRole = (role: string) => {
+    const current = memberRoles()
+    const next = current.includes(role)
+      ? current.filter((entry) => entry !== role)
+      : [...current, role]
+
+    // A member always holds at least one role, so refuse to clear the last one.
+    if (next.length === 0) return
+
+    updateMemberRole.mutate({
+      memberId: props.member.id,
+      role: next as UpdateMemberRoleParams["role"]
+    })
+  }
+
   return (
     <TableRow>
       <TableCell>
@@ -217,7 +237,8 @@ export function OrganizationMemberRow(props: OrganizationMemberRowProps) {
         />
       </TableCell>
       <TableCell class="text-sm">
-        {props.roles[props.member.role ?? ""] ?? formatRole(props.member.role)}
+        {memberRoleLabels(props.member.role, props.roles).join(", ") ||
+          formatRole(props.member.role)}
       </TableCell>
       <TableCell class="text-end">
         <div class="flex justify-end gap-2">
@@ -237,17 +258,17 @@ export function OrganizationMemberRow(props: OrganizationMemberRowProps) {
               <DropdownMenuContent>
                 <For each={assignableRoles()}>
                   {([role, label]) => (
-                    <DropdownMenuItem
-                      disabled={props.member.role === role}
-                      onSelect={() =>
-                        updateMemberRole.mutate({
-                          memberId: props.member.id,
-                          role: role as UpdateMemberRoleParams["role"]
-                        })
+                    <DropdownMenuCheckboxItem
+                      checked={memberRoles().includes(role)}
+                      closeOnSelect={false}
+                      disabled={
+                        memberRoles().includes(role) &&
+                        memberRoles().length === 1
                       }
+                      onChange={() => toggleRole(role)}
                     >
                       {label}
-                    </DropdownMenuItem>
+                    </DropdownMenuCheckboxItem>
                   )}
                 </For>
               </DropdownMenuContent>
