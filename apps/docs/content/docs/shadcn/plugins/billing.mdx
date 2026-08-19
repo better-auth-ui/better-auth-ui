@@ -79,6 +79,8 @@ export const billingAdapter = createStripeBillingAdapter(authClient, {
 <Step>
 ### Register the plugin
 
+This snippet shows only the billing additions. The [TanStack Start](/docs/shadcn/integrations/tanstack-start) and [Next.js](/docs/shadcn/integrations/nextjs) guides cover the full provider, including where `authClient` and `navigate` come from.
+
 ```tsx title="components/providers.tsx"
 import { AuthProvider } from "@/components/auth/auth-provider"
 import { billingPlugin } from "@/lib/auth/billing-plugin"

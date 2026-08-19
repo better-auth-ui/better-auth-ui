@@ -59,6 +59,8 @@ Price amounts use the currency's smallest unit. For example, `2000` USD means `$
 <Step>
 ### Register the HeroUI plugin
 
+This snippet shows only the billing additions. The [TanStack Start](/docs/heroui/integrations/tanstack-start) and [Next.js](/docs/heroui/integrations/nextjs) guides cover the full provider, including where `authClient` and `navigate` come from.
+
 ```tsx title="components/providers.tsx"
 import { AuthProvider } from "@better-auth-ui/heroui"
 import { billingPlugin } from "@better-auth-ui/heroui/plugins/billing"
