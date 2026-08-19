@@ -342,7 +342,11 @@ export function BillingSettings({
                   </span>
                 </div>
                 <Progress
-                  value={usage.limit ? (usage.used / usage.limit) * 100 : 0}
+                  value={
+                    usage.limit
+                      ? Math.min(100, (usage.used / usage.limit) * 100)
+                      : 0
+                  }
                   aria-label={usage.label}
                 />
               </div>
