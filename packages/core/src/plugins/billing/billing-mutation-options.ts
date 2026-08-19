@@ -5,15 +5,21 @@ import type {
   BillingCheckoutInput,
   BillingScope
 } from "./billing-adapter"
+import { billingScopeKey } from "./billing-adapter"
 import { billingQueryKeys } from "./billing-query-options"
 
 export const billingMutationKeys = {
   all: ["auth", "billing"] as const,
-  checkout: ["auth", "billing", "checkout"] as const,
-  portal: ["auth", "billing", "portal"] as const,
-  cancel: ["auth", "billing", "cancel"] as const,
-  restore: ["auth", "billing", "restore"] as const,
-  seats: ["auth", "billing", "seats"] as const
+  checkout: (scope: BillingScope) =>
+    [...billingMutationKeys.all, billingScopeKey(scope), "checkout"] as const,
+  portal: (scope: BillingScope) =>
+    [...billingMutationKeys.all, billingScopeKey(scope), "portal"] as const,
+  cancel: (scope: BillingScope) =>
+    [...billingMutationKeys.all, billingScopeKey(scope), "cancel"] as const,
+  restore: (scope: BillingScope) =>
+    [...billingMutationKeys.all, billingScopeKey(scope), "restore"] as const,
+  seats: (scope: BillingScope) =>
+    [...billingMutationKeys.all, billingScopeKey(scope), "seats"] as const
 } as const
 
 const stateMeta = (scope: BillingScope) => ({
@@ -25,7 +31,7 @@ export const billingCheckoutOptions = (
   scope: BillingScope
 ) =>
   ({
-    mutationKey: billingMutationKeys.checkout,
+    mutationKey: billingMutationKeys.checkout(scope),
     mutationFn: (input: BillingCheckoutInput) => adapter.checkout(scope, input),
     meta: stateMeta(scope)
   }) satisfies MutationOptions<BillingActionResult, Error, BillingCheckoutInput>
@@ -35,7 +41,7 @@ export const billingPortalOptions = (
   scope: BillingScope
 ) =>
   ({
-    mutationKey: billingMutationKeys.portal,
+    mutationKey: billingMutationKeys.portal(scope),
     mutationFn: () => adapter.openPortal(scope)
   }) satisfies MutationOptions<BillingActionResult, Error, void>
 
@@ -44,7 +50,7 @@ export const cancelBillingSubscriptionOptions = (
   scope: BillingScope
 ) =>
   ({
-    mutationKey: billingMutationKeys.cancel,
+    mutationKey: billingMutationKeys.cancel(scope),
     mutationFn: (subscriptionId: string) =>
       adapter.cancel(scope, subscriptionId),
     meta: stateMeta(scope)
@@ -55,7 +61,7 @@ export const restoreBillingSubscriptionOptions = (
   scope: BillingScope
 ) =>
   ({
-    mutationKey: billingMutationKeys.restore,
+    mutationKey: billingMutationKeys.restore(scope),
     mutationFn: (subscriptionId: string) =>
       adapter.restore(scope, subscriptionId),
     meta: stateMeta(scope)
@@ -71,7 +77,7 @@ export const updateBillingSeatsOptions = (
   scope: BillingScope
 ) =>
   ({
-    mutationKey: billingMutationKeys.seats,
+    mutationKey: billingMutationKeys.seats(scope),
     mutationFn: ({ subscriptionId, seats }: UpdateBillingSeatsVariables) =>
       adapter.updateSeats(scope, subscriptionId, seats),
     meta: stateMeta(scope)

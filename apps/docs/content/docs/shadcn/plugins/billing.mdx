@@ -122,7 +122,7 @@ export const billingAdapter = createPolarBillingAdapter(authClient, {
 })
 ```
 
-Polar handles cancellation, restoration, and seat changes in its customer portal. BAUI opens that portal for those actions. Stripe performs them through Better Auth's subscription endpoints.
+Polar handles cancellation, restoration, and seat changes in its customer portal. Its adapter marks those direct actions as unsupported, so BAUI shows a manage-billing action instead. Stripe performs the actions through Better Auth's subscription endpoints.
 
 ## Custom adapters
 
@@ -133,6 +133,7 @@ import type { BillingAdapter } from "@better-auth-ui/core/plugins/billing"
 
 export const billingAdapter: BillingAdapter = {
   id: "custom",
+  supports: { cancel: true, restore: true, seats: true },
   listPlans: async (scope, signal) => billingApi.listPlans(scope, signal),
   getState: async (scope, signal) => billingApi.getState(scope, signal),
   checkout: async (scope, input) => billingApi.checkout(scope, input),

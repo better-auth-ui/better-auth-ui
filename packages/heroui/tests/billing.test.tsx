@@ -37,4 +37,12 @@ describe("billingPlugin (heroui)", () => {
     expect(plugin.settingsTabs).toBeUndefined()
     expect(plugin.organizationTabs).toHaveLength(1)
   })
+
+  it("defaults to personal billing at the billing path", () => {
+    const plugin = billingPlugin({ adapter: { id: "test" } as never })
+
+    expect(plugin.settingsTabs).toHaveLength(1)
+    expect(plugin.organizationTabs).toBeUndefined()
+    expect(plugin.viewPaths.settings.billing).toBe("billing")
+  })
 })

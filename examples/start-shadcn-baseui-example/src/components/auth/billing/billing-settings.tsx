@@ -62,12 +62,20 @@ export type BillingSettingsProps = {
   className?: string
 }
 
-const formatPrice = (amount: number, currency: string) =>
-  new Intl.NumberFormat(undefined, {
+const formatPrice = (amount: number, currency: string) => {
+  const fractionDigits =
+    new Intl.NumberFormat(undefined, {
+      style: "currency",
+      currency
+    }).resolvedOptions().maximumFractionDigits ?? 2
+  const divisor = 10 ** fractionDigits
+
+  return new Intl.NumberFormat(undefined, {
     style: "currency",
     currency,
-    maximumFractionDigits: amount % 100 === 0 ? 0 : 2
-  }).format(amount / 100)
+    maximumFractionDigits: amount % divisor === 0 ? 0 : fractionDigits
+  }).format(amount / divisor)
+}
 
 const availableIntervals = (plans: BillingPlan[]) =>
   Array.from(
@@ -88,8 +96,7 @@ function PlanCard({
   onChoose: (plan: BillingPlan, priceId: string) => void
 }) {
   const { localization } = useAuthPlugin(billingPlugin)
-  const price =
-    plan.prices.find((entry) => entry.interval === interval) ?? plan.prices[0]
+  const price = plan.prices.find((entry) => entry.interval === interval)
   if (!price) return null
   const isCurrent = currentPlanId === plan.id
   const suffix =
@@ -269,19 +276,35 @@ export function BillingSettings({
                   )}
                 </p>
               )}
-              {typeof subscription.seats === "number" && (
-                <SeatsEditor
-                  key={subscription.id}
-                  seats={subscription.seats}
-                  isPending={updateSeats.isPending}
-                  onSave={(seats) =>
-                    updateSeats.mutate(
-                      { subscriptionId: subscription.id, seats },
-                      { onSuccess: followBillingAction }
-                    )
-                  }
-                />
-              )}
+              {typeof subscription.seats === "number" &&
+                (adapter.supports.seats ? (
+                  <SeatsEditor
+                    key={subscription.id}
+                    seats={subscription.seats}
+                    isPending={updateSeats.isPending}
+                    onSave={(seats) =>
+                      updateSeats.mutate(
+                        { subscriptionId: subscription.id, seats },
+                        { onSuccess: followBillingAction }
+                      )
+                    }
+                  />
+                ) : (
+                  <Button
+                    className="self-start"
+                    size="sm"
+                    variant="outline"
+                    disabled={portal.isPending}
+                    onClick={() =>
+                      portal.mutate(undefined, {
+                        onSuccess: followBillingAction
+                      })
+                    }
+                  >
+                    {portal.isPending ? <Spinner /> : <ExternalLink />}
+                    {localization.manageBilling}
+                  </Button>
+                ))}
             </>
           ) : (
             <p className="text-sm text-muted-foreground">
@@ -300,12 +323,12 @@ export function BillingSettings({
             {portal.isPending ? <Spinner /> : <ExternalLink />}
             {localization.manageBilling}
           </Button>
-          {subscription?.cancelAtPeriodEnd ? (
+          {subscription?.cancelAtPeriodEnd && adapter.supports.restore ? (
             <Button variant="outline" onClick={() => setAction("restore")}>
               <RotateCcw />
               {localization.restoreSubscription}
             </Button>
-          ) : subscription ? (
+          ) : subscription && adapter.supports.cancel ? (
             <Button variant="ghost" onClick={() => setAction("cancel")}>
               <X />
               {localization.cancelSubscription}
@@ -362,7 +385,11 @@ export function BillingSettings({
               <SelectContent>
                 {intervals.map((entry) => (
                   <SelectItem key={entry} value={entry}>
-                    {entry}
+                    {entry === "month"
+                      ? localization.perMonth
+                      : entry === "year"
+                        ? localization.perYear
+                        : localization.oneTime}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -464,6 +491,8 @@ export function OrganizationBillingSettings({
   organizationSlug: string
 }) {
   const { adapter } = useAuthPlugin(billingPlugin)
+  if (!organizationId || !organizationSlug) return null
+
   return (
     <BillingSettings
       {...props}

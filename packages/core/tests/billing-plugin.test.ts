@@ -1,12 +1,14 @@
-import { describe, expect, it, vi } from "vitest"
+import { afterEach, describe, expect, it, vi } from "vitest"
 
 import {
   billingCheckoutOptions,
+  billingMutationKeys,
   billingPlugin,
   billingQueryKeys,
   billingScopeKey,
   createPolarBillingAdapter,
-  createStripeBillingAdapter
+  createStripeBillingAdapter,
+  followBillingAction
 } from "../src/plugins/billing"
 
 const plans = [
@@ -26,6 +28,8 @@ const organizationScope = {
   organizationId: "org-1",
   organizationSlug: "acme"
 } as const
+
+afterEach(() => vi.unstubAllGlobals())
 
 describe("billingPlugin", () => {
   it("registers personal billing by default and supports organization billing", () => {
@@ -69,6 +73,26 @@ describe("billingPlugin", () => {
       priceId: "pro-month"
     })
     expect(mutation.meta?.awaits).toEqual([billingQueryKeys.state(userScope)])
+    expect(mutation.mutationKey).toEqual(
+      billingMutationKeys.checkout(userScope)
+    )
+    expect(billingMutationKeys.checkout(userScope)).not.toEqual(
+      billingMutationKeys.checkout(organizationScope)
+    )
+  })
+
+  it("follows only valid HTTP billing action URLs", () => {
+    const assign = vi.fn()
+    vi.stubGlobal("window", {
+      location: { href: "https://app.example/settings/billing", assign }
+    })
+
+    followBillingAction({ url: "/checkout" })
+    followBillingAction({ url: "javascript:alert(document.domain)" })
+    followBillingAction({ url: "http://[" })
+
+    expect(assign).toHaveBeenCalledOnce()
+    expect(assign).toHaveBeenCalledWith("https://app.example/checkout")
   })
 })
 
@@ -80,6 +104,7 @@ describe("vendor billing adapters", () => {
           id: "sub-1",
           plan: "pro",
           status: "active",
+          annual: true,
           currentPeriodEnd: "2027-01-01T00:00:00.000Z",
           seats: 3
         }
@@ -120,6 +145,7 @@ describe("vendor billing adapters", () => {
       id: "sub-1",
       planId: "pro",
       status: "active",
+      interval: "year",
       seats: 3
     })
     expect(upgrade).toHaveBeenCalledWith(
@@ -132,6 +158,109 @@ describe("vendor billing adapters", () => {
       })
     )
     expect(checkout).toEqual({ url: "/stripe-checkout" })
+    expect(adapter.supports).toEqual({
+      cancel: true,
+      restore: true,
+      seats: true
+    })
+  })
+
+  it("preserves Stripe billing periods for cancellation, restoration, and seat changes", async () => {
+    const list = vi.fn(async () => ({
+      data: [
+        {
+          id: "sub-yearly",
+          plan: "pro",
+          status: "active",
+          annual: true,
+          seats: 4
+        }
+      ]
+    }))
+    const upgrade = vi.fn(async () => ({ data: { url: "/seat-change" } }))
+    const cancel = vi.fn(async () => ({ data: { url: "/cancel" } }))
+    const restore = vi.fn(async () => ({ data: {} }))
+    const adapter = createStripeBillingAdapter(
+      {
+        subscription: {
+          list,
+          upgrade,
+          billingPortal: vi.fn(),
+          cancel,
+          restore
+        }
+      } as never,
+      {
+        plans: [
+          {
+            ...plans[0],
+            prices: [
+              ...plans[0].prices,
+              {
+                id: "pro-year",
+                amount: 20_000,
+                currency: "USD",
+                interval: "year"
+              }
+            ]
+          }
+        ],
+        successUrl: "/success",
+        cancelUrl: "/cancel",
+        returnUrl: "/settings/billing"
+      }
+    )
+
+    await adapter.cancel(userScope, "sub-yearly")
+    await adapter.restore(userScope, "sub-yearly")
+    const { updateSeats } = adapter
+    await updateSeats(userScope, "sub-yearly", 8)
+
+    expect(cancel).toHaveBeenCalledWith(
+      expect.objectContaining({
+        subscriptionId: "sub-yearly",
+        disableRedirect: true
+      })
+    )
+    expect(restore).toHaveBeenCalledWith(
+      expect.objectContaining({ subscriptionId: "sub-yearly" })
+    )
+    expect(upgrade).toHaveBeenCalledWith(
+      expect.objectContaining({
+        subscriptionId: "sub-yearly",
+        annual: true,
+        seats: 8
+      })
+    )
+  })
+
+  it("throws provider response errors", async () => {
+    const adapter = createStripeBillingAdapter(
+      {
+        subscription: {
+          list: vi.fn(),
+          upgrade: vi.fn(async () => ({
+            error: { message: "Checkout is unavailable" }
+          })),
+          billingPortal: vi.fn(),
+          cancel: vi.fn(),
+          restore: vi.fn()
+        }
+      } as never,
+      {
+        plans: [...plans],
+        successUrl: "/success",
+        cancelUrl: "/cancel",
+        returnUrl: "/settings/billing"
+      }
+    )
+
+    await expect(
+      adapter.checkout(userScope, {
+        planId: "pro",
+        priceId: "pro-month"
+      })
+    ).rejects.toThrow("Checkout is unavailable")
   })
 
   it("maps Polar subscriptions, usage, and product IDs into generic plans", async () => {
@@ -188,8 +317,14 @@ describe("vendor billing adapters", () => {
 
     expect(subscriptions).toHaveBeenCalledWith(
       expect.objectContaining({
-        query: expect.objectContaining({ referenceId: "org-1" })
+        query: expect.objectContaining({
+          active: true,
+          referenceId: "org-1"
+        })
       })
+    )
+    expect(meters).toHaveBeenCalledWith(
+      expect.objectContaining({ query: { page: 1, limit: 100 } })
     )
     expect(state).toMatchObject({
       subscription: { planId: "pro", seats: 5 },
@@ -203,5 +338,43 @@ describe("vendor billing adapters", () => {
       })
     )
     expect(result).toEqual({ url: "/polar-checkout" })
+    expect(adapter.supports).toEqual({
+      cancel: false,
+      restore: false,
+      seats: false
+    })
+  })
+
+  it("delegates unsupported Polar subscription changes to the portal", async () => {
+    const portal = vi.fn(async () => ({
+      data: { customerPortalUrl: "/portal" }
+    }))
+    const adapter = createPolarBillingAdapter(
+      {
+        checkout: vi.fn(),
+        customer: {
+          portal,
+          subscriptions: { list: vi.fn() }
+        },
+        usage: { meters: { list: vi.fn() } }
+      } as never,
+      {
+        plans: [...plans],
+        successUrl: "/success",
+        cancelUrl: "/cancel",
+        returnUrl: "/settings/billing"
+      }
+    )
+
+    await expect(adapter.cancel(userScope, "sub-1")).resolves.toEqual({
+      url: "/portal"
+    })
+    await expect(adapter.restore(userScope, "sub-1")).resolves.toEqual({
+      url: "/portal"
+    })
+    await expect(adapter.updateSeats(userScope, "sub-1", 5)).resolves.toEqual({
+      url: "/portal"
+    })
+    expect(portal).toHaveBeenCalledTimes(3)
   })
 })

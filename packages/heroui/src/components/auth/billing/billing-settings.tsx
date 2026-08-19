@@ -51,12 +51,20 @@ export type BillingSettingsProps = {
   variant?: CardProps["variant"]
 }
 
-const formatPrice = (amount: number, currency: string) =>
-  new Intl.NumberFormat(undefined, {
+const formatPrice = (amount: number, currency: string) => {
+  const fractionDigits =
+    new Intl.NumberFormat(undefined, {
+      style: "currency",
+      currency
+    }).resolvedOptions().maximumFractionDigits ?? 2
+  const divisor = 10 ** fractionDigits
+
+  return new Intl.NumberFormat(undefined, {
     style: "currency",
     currency,
-    maximumFractionDigits: amount % 100 === 0 ? 0 : 2
-  }).format(amount / 100)
+    maximumFractionDigits: amount % divisor === 0 ? 0 : fractionDigits
+  }).format(amount / divisor)
+}
 
 const availableIntervals = (plans: BillingPlan[]) =>
   Array.from(
@@ -79,8 +87,7 @@ function PlanCard({
   variant?: CardProps["variant"]
 }) {
   const { localization } = useAuthPlugin(billingPlugin)
-  const price =
-    plan.prices.find((entry) => entry.interval === interval) ?? plan.prices[0]
+  const price = plan.prices.find((entry) => entry.interval === interval)
   if (!price) return null
   const isCurrent = currentPlanId === plan.id
   const suffix =
@@ -196,6 +203,7 @@ export function BillingSettings({
   const updateSeats = useUpdateBillingSeats(adapter, scope)
   const [interval, setInterval] = useState<BillingInterval>("month")
   const [action, setAction] = useState<SubscriptionAction>()
+  const [actionError, setActionError] = useState("")
   const subscription = state.data?.subscription
   const intervals = availableIntervals(plans.data ?? [])
   const resolvedInterval = intervals.includes(interval)
@@ -206,14 +214,26 @@ export function BillingSettings({
 
   const handleAction = () => {
     if (!subscription || !action) return
+    setActionError("")
     const mutation =
       action === "cancel" ? cancelSubscription : restoreSubscription
     mutation.mutate(subscription.id, {
+      onError: (error) => setActionError(error.message),
       onSuccess: (result) => {
         setAction(undefined)
         followBillingAction(result)
       }
     })
+  }
+
+  const openAction = (nextAction: SubscriptionAction) => {
+    setActionError("")
+    setAction(nextAction)
+  }
+
+  const closeAction = () => {
+    setAction(undefined)
+    setActionError("")
   }
 
   return (
@@ -255,19 +275,35 @@ export function BillingSettings({
                   )}
                 </p>
               )}
-              {typeof subscription.seats === "number" && (
-                <SeatsEditor
-                  key={subscription.id}
-                  seats={subscription.seats}
-                  isPending={updateSeats.isPending}
-                  onSave={(seats) =>
-                    updateSeats.mutate(
-                      { subscriptionId: subscription.id, seats },
-                      { onSuccess: followBillingAction }
-                    )
-                  }
-                />
-              )}
+              {typeof subscription.seats === "number" &&
+                (adapter.supports.seats ? (
+                  <SeatsEditor
+                    key={subscription.id}
+                    seats={subscription.seats}
+                    isPending={updateSeats.isPending}
+                    onSave={(seats) =>
+                      updateSeats.mutate(
+                        { subscriptionId: subscription.id, seats },
+                        { onSuccess: followBillingAction }
+                      )
+                    }
+                  />
+                ) : (
+                  <Button
+                    className="self-start"
+                    size="sm"
+                    variant="outline"
+                    isPending={portal.isPending}
+                    onPress={() =>
+                      portal.mutate(undefined, {
+                        onSuccess: followBillingAction
+                      })
+                    }
+                  >
+                    <Gear />
+                    {localization.manageBilling}
+                  </Button>
+                ))}
             </>
           ) : (
             <p className="text-muted text-sm">{localization.noSubscription}</p>
@@ -284,13 +320,13 @@ export function BillingSettings({
             <Gear />
             {localization.manageBilling}
           </Button>
-          {subscription?.cancelAtPeriodEnd ? (
-            <Button variant="outline" onPress={() => setAction("restore")}>
+          {subscription?.cancelAtPeriodEnd && adapter.supports.restore ? (
+            <Button variant="outline" onPress={() => openAction("restore")}>
               <ArrowRotateLeft />
               {localization.restoreSubscription}
             </Button>
-          ) : subscription ? (
-            <Button variant="ghost" onPress={() => setAction("cancel")}>
+          ) : subscription && adapter.supports.cancel ? (
+            <Button variant="ghost" onPress={() => openAction("cancel")}>
               <Xmark />
               {localization.cancelSubscription}
             </Button>
@@ -348,7 +384,11 @@ export function BillingSettings({
                 <ListBox>
                   {intervals.map((entry) => (
                     <ListBox.Item key={entry} id={entry}>
-                      {entry}
+                      {entry === "month"
+                        ? localization.perMonth
+                        : entry === "year"
+                          ? localization.perYear
+                          : localization.oneTime}
                     </ListBox.Item>
                   ))}
                 </ListBox>
@@ -388,7 +428,7 @@ export function BillingSettings({
 
       <AlertDialog.Backdrop
         isOpen={Boolean(action)}
-        onOpenChange={(open) => !open && setAction(undefined)}
+        onOpenChange={(open) => !open && closeAction()}
       >
         <AlertDialog.Container>
           <AlertDialog.Dialog>
@@ -406,12 +446,19 @@ export function BillingSettings({
               </AlertDialog.Heading>
             </AlertDialog.Header>
             <AlertDialog.Body>
-              {action === "cancel"
-                ? localization.cancelSubscriptionDescription
-                : localization.restoreSubscriptionDescription}
+              <p>
+                {action === "cancel"
+                  ? localization.cancelSubscriptionDescription
+                  : localization.restoreSubscriptionDescription}
+              </p>
+              {actionError && (
+                <p className="text-danger mt-2" role="alert">
+                  {actionError}
+                </p>
+              )}
             </AlertDialog.Body>
             <AlertDialog.Footer>
-              <Button variant="ghost" onPress={() => setAction(undefined)}>
+              <Button variant="ghost" onPress={closeAction}>
                 {localization.cancel}
               </Button>
               <Button
@@ -454,6 +501,8 @@ export function OrganizationBillingSettings({
   organizationSlug: string
 }) {
   const { adapter } = useAuthPlugin(billingPlugin)
+  if (!organizationId || !organizationSlug) return null
+
   return (
     <BillingSettings
       {...props}

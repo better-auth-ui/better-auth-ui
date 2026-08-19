@@ -167,7 +167,9 @@
     "@better-auth/oauth-provider": "1.7.0",
     "@better-auth/passkey": "1.7.0",
     "@better-auth/sso": "1.7.0",
+    "@better-auth/stripe": "1.7.0",
     "@mikkelscheike/email-provider-links": "5.2.1",
+    "@polar-sh/better-auth": "1.7.0",
     "@tanstack/query-core": "^5.101.2",
     "better-auth": "1.7.0",
     "vitest": "^4.1.9"
@@ -177,7 +179,9 @@
     "@better-auth/oauth-provider": ">=1.7.0",
     "@better-auth/passkey": ">=1.7.0",
     "@better-auth/sso": ">=1.7.0",
+    "@better-auth/stripe": ">=1.7.0",
     "@mikkelscheike/email-provider-links": ">=5.2.1",
+    "@polar-sh/better-auth": ">=1.7.0",
     "@tanstack/query-core": ">=5.101.2",
     "better-auth": ">=1.7.0"
   },
@@ -192,6 +196,12 @@
       "optional": true
     },
     "@better-auth/sso": {
+      "optional": true
+    },
+    "@better-auth/stripe": {
+      "optional": true
+    },
+    "@polar-sh/better-auth": {
       "optional": true
     }
   },

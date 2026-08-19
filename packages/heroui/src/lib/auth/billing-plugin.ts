@@ -41,7 +41,7 @@ export const billingPlugin = createAuthPlugin(
             organizationTabs: [
               {
                 id: "billing",
-                path: options.path ?? "billing",
+                path: core.viewPaths.settings.billing,
                 label: billingLabel(core.localization.billing),
                 component: OrganizationBillingSettings
               }

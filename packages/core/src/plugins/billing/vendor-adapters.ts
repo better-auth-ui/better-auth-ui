@@ -1,3 +1,6 @@
+import type { stripeClient } from "@better-auth/stripe/client"
+import type { polarClient } from "@polar-sh/better-auth/client"
+import type { AuthClient } from "../../lib/auth-client"
 import type {
   BillingActionResult,
   BillingAdapter,
@@ -9,26 +12,13 @@ import type {
   BillingUsage
 } from "./billing-adapter"
 
-type Endpoint = (params?: unknown) => Promise<unknown>
+export type StripeBillingClient = AuthClient<{
+  plugins: [ReturnType<typeof stripeClient<{ subscription: true }>>]
+}>
 
-export type StripeBillingClient = {
-  subscription: {
-    list: Endpoint
-    upgrade: Endpoint
-    billingPortal: Endpoint
-    cancel: Endpoint
-    restore: Endpoint
-  }
-}
-
-export type PolarBillingClient = {
-  checkout: Endpoint
-  customer: {
-    portal: Endpoint
-    subscriptions: { list: Endpoint }
-  }
-  usage: { meters: { list: Endpoint } }
-}
+export type PolarBillingClient = AuthClient<{
+  plugins: [ReturnType<typeof polarClient>]
+}>
 
 export type VendorBillingAdapterOptions = {
   plans: BillingPlan[]
@@ -95,6 +85,16 @@ const statusValue = (value: unknown): BillingSubscriptionStatus => {
     : "unknown"
 }
 
+const intervalValue = (value: unknown) => {
+  const interval = stringValue(value)
+  if (interval === "month" || interval === "monthly") return "month" as const
+  if (interval === "year" || interval === "yearly" || interval === "annual")
+    return "year" as const
+  if (interval === "one-time" || interval === "one_time")
+    return "one-time" as const
+  return undefined
+}
+
 const mapSubscription = (value: unknown): BillingSubscription | undefined => {
   const subscription = record(value)
   const id = stringValue(subscription?.id)
@@ -110,6 +110,19 @@ const mapSubscription = (value: unknown): BillingSubscription | undefined => {
       stringValue(product?.id) ??
       "unknown",
     planName: stringValue(subscription.planName) ?? stringValue(product?.name),
+    priceId:
+      stringValue(subscription.priceId) ?? stringValue(subscription.price_id),
+    interval:
+      intervalValue(
+        subscription.interval ??
+          subscription.billingInterval ??
+          subscription.recurringInterval
+      ) ??
+      (typeof subscription.annual === "boolean"
+        ? subscription.annual
+          ? "year"
+          : "month"
+        : undefined),
     status: statusValue(subscription.status),
     currentPeriodEnd: dateValue(
       subscription.currentPeriodEnd ?? subscription.current_period_end
@@ -193,23 +206,29 @@ export function createStripeBillingAdapter(
     )
   }
 
+  const getState = async (
+    scope: BillingScope,
+    signal?: AbortSignal
+  ): Promise<BillingState> => {
+    const subscriptions = items(
+      await client.subscription.list({
+        query: scopeParams(scope),
+        fetchOptions: { signal, throw: true }
+      })
+    )
+      .map(mapSubscription)
+      .filter((value): value is BillingSubscription => Boolean(value))
+
+    return { subscription: subscriptions[0], usage: [] }
+  }
+
   return {
     id: "stripe",
+    supports: { cancel: true, restore: true, seats: true },
     async listPlans() {
       return options.plans
     },
-    async getState(scope, signal) {
-      const subscriptions = items(
-        await client.subscription.list({
-          query: scopeParams(scope),
-          fetchOptions: { signal, throw: true }
-        })
-      )
-        .map(mapSubscription)
-        .filter((value): value is BillingSubscription => Boolean(value))
-
-      return { subscription: subscriptions[0], usage: [] }
-    },
+    getState,
     checkout: (scope, input) => checkout(scope, input),
     async openPortal(scope) {
       return actionResult(
@@ -225,7 +244,8 @@ export function createStripeBillingAdapter(
         await client.subscription.cancel({
           ...scopeParams(scope),
           subscriptionId,
-          returnUrl: options.returnUrl
+          returnUrl: options.returnUrl,
+          disableRedirect: true
         })
       )
     },
@@ -238,12 +258,21 @@ export function createStripeBillingAdapter(
       )
     },
     async updateSeats(scope, subscriptionId, seats) {
-      const state = await this.getState(scope)
-      const planId = state.subscription?.planId
+      const state = await getState(scope)
+      const subscription = state.subscription
+      const planId = subscription?.planId
       const plan = planId ? findPlan(planId) : undefined
-      const price = plan?.prices[0]
+      const price = subscription?.priceId
+        ? plan?.prices.find((entry) => entry.id === subscription.priceId)
+        : subscription?.interval
+          ? plan?.prices.find(
+              (entry) => entry.interval === subscription.interval
+            )
+          : plan?.prices.length === 1
+            ? plan.prices[0]
+            : undefined
       if (!plan || !price)
-        throw new Error("The current billing plan is unavailable.")
+        throw new Error("The current billing price is unavailable.")
       return checkout(
         scope,
         { planId: plan.id, priceId: price.id, seats },
@@ -262,38 +291,35 @@ export function createPolarBillingAdapter(
       ([, product]) => product.value === providerPlanId
     )?.[0] ?? providerPlanId
 
-  const portal = async (scope: BillingScope) =>
+  const portal = async (_scope: BillingScope) =>
     actionResult(
       await client.customer.portal({
-        ...(scope.type === "organization"
-          ? { referenceId: scope.organizationId }
-          : {}),
-        returnUrl: options.returnUrl,
-        disableRedirect: true
+        fetchOptions: { throw: true }
       })
     )
 
   return {
     id: "polar",
+    supports: { cancel: false, restore: false, seats: false },
     async listPlans() {
       return options.plans
     },
     async getState(scope, signal): Promise<BillingState> {
-      const query = {
+      const subscriptionQuery = {
         page: 1,
         limit: 100,
-        active: false,
+        active: true,
         ...(scope.type === "organization"
           ? { referenceId: scope.organizationId }
           : {})
       }
       const [subscriptionsResult, usageResult] = await Promise.all([
         client.customer.subscriptions.list({
-          query,
+          query: subscriptionQuery,
           fetchOptions: { signal, throw: true }
         }),
         client.usage.meters.list({
-          query,
+          query: { page: 1, limit: 100 },
           fetchOptions: { signal, throw: true }
         })
       ])
@@ -326,8 +352,17 @@ export function createPolarBillingAdapter(
       )
     },
     openPortal: portal,
-    cancel: portal,
-    restore: portal,
-    updateSeats: portal
+    /** Polar completes cancellation in its customer portal. */
+    async cancel(scope) {
+      return portal(scope)
+    },
+    /** Polar completes restoration in its customer portal. */
+    async restore(scope) {
+      return portal(scope)
+    },
+    /** Polar completes seat changes in its customer portal. */
+    async updateSeats(scope) {
+      return portal(scope)
+    }
   }
 }
