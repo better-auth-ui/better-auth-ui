@@ -369,7 +369,7 @@ describe("Solid auth route component selection", () => {
     expect(providerButtons).toContain("<ProviderButton")
     expect(providerButtons).toContain("view={props.view}")
     expect(providerButton).toContain("auth.authClient.signIn.social")
-    expect(providerButton).toContain("provider: props.provider")
+    expect(providerButton).toContain("provider: providerId()")
     expect(providerButton).toContain("resolveSocialAuthParams")
     expect(passkeyPlugin).toContain("authButtons: [PasskeyButton]")
     expect(passkeyPlugin).toContain("securityCards: [Passkeys]")

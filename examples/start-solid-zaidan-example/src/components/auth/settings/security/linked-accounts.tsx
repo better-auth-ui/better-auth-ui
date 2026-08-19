@@ -1,3 +1,4 @@
+import { getProviderId } from "@better-auth-ui/core"
 import { useAuth, useListAccounts } from "@better-auth-ui/solid"
 import { For, Show } from "solid-js"
 import type {
@@ -31,22 +32,25 @@ export function LinkedAccountsSettings(
     )
 
     return socialProviders().filter(
-      (provider) => !linkedProviderIds.has(provider)
+      (provider) => !linkedProviderIds.has(getProviderId(provider))
     )
   }
   const accountRows = () => {
     const linked = linkedSocialAccounts().map((account: LinkedAccount) => ({
       account,
       key: account.id,
-      provider: account.providerId as LinkedProvider
+      provider:
+        socialProviders().find(
+          (provider) => getProviderId(provider) === account.providerId
+        ) ?? (account.providerId as LinkedProvider)
     }))
 
     return [
       ...linked,
       ...availableProviders().map((provider) => ({
         account: undefined,
-        key: provider,
-        provider: provider as LinkedProvider
+        key: getProviderId(provider),
+        provider
       }))
     ]
   }

@@ -1,5 +1,3 @@
-import type { SocialProvider } from "better-auth/social-providers"
-
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
 export type SignInPathInput = {
@@ -38,11 +36,11 @@ export type SocialAuthURLs = {
 }
 
 export type SocialAuthParamsInput = SocialAuthURLInput & {
-  provider: SocialProvider
+  provider: string
 }
 
 export type SocialAuthParams = SocialAuthURLs & {
-  provider: SocialProvider
+  provider: string
 }
 
 const getFormValue = (formData: FormData, name: string) => {

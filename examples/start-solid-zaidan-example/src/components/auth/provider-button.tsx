@@ -1,6 +1,9 @@
-import { getProviderName } from "@better-auth-ui/core"
+import {
+  type AuthSocialProvider,
+  getProviderId,
+  getProviderName
+} from "@better-auth-ui/core"
 import { useAuth } from "@better-auth-ui/solid"
-import type { SocialProvider } from "better-auth/social-providers"
 import type { ComponentProps } from "solid-js"
 import { createSignal } from "solid-js"
 import { Button } from "@/components/ui/button"
@@ -11,7 +14,7 @@ import { resolveSocialAuthParams, type SocialAuthView } from "./sign-in-path"
 
 export type ProviderButtonProps = {
   display?: "full" | "icon" | "name"
-  provider: SocialProvider
+  provider: AuthSocialProvider
   view?: SocialAuthView
 } & Omit<ComponentProps<typeof Button>, "children" | "disabled" | "onClick">
 
@@ -49,7 +52,7 @@ function GoogleIcon(props: ComponentProps<"svg">) {
   )
 }
 
-function ProviderIcon(props: { provider: SocialProvider }) {
+function ProviderIcon(props: { provider: AuthSocialProvider }) {
   if (props.provider === "github") return <GitHubIcon class="size-4" />
   if (props.provider === "google") return <GoogleIcon class="size-4" />
 
@@ -60,6 +63,7 @@ export function ProviderButton(props: ProviderButtonProps) {
   const auth = useAuth()
   const [isPending, setIsPending] = createSignal(false)
   const display = () => props.display ?? "full"
+  const providerId = () => getProviderId(props.provider)
   const providerName = () => getProviderName(props.provider)
   const label = () =>
     auth.localization.auth.continueWith.replace("{{provider}}", providerName())
@@ -71,7 +75,7 @@ export function ProviderButton(props: ProviderButtonProps) {
     try {
       await auth.authClient.signIn.social(
         resolveSocialAuthParams({
-          provider: props.provider,
+          provider: providerId(),
           basePaths: auth.basePaths,
           baseURL: auth.baseURL,
           redirectTo: auth.redirectTo,
@@ -104,7 +108,7 @@ export function ProviderButton(props: ProviderButtonProps) {
         <span class="sr-only">{label()}</span>
       ) : null}
       {(props.view ?? "signIn") !== "signUp" ? (
-        <LastUsedBadge floating method={props.provider} />
+        <LastUsedBadge floating method={providerId()} />
       ) : null}
     </Button>
   )

@@ -1,4 +1,4 @@
-import { getProviderName } from "@better-auth-ui/core"
+import { getProviderId, getProviderName } from "@better-auth-ui/core"
 import {
   useAccountInfo,
   useAuth,
@@ -107,7 +107,7 @@ export function LinkedAccountRow(props: {
   const linkProvider = () => {
     linkSocial.mutate({
       callbackURL: `${auth.baseURL}${window.location.pathname}`,
-      provider: props.provider
+      provider: getProviderId(props.provider)
     } as Parameters<typeof linkSocial.mutate>[0])
   }
   const unlinkProvider = (account: LinkedAccount) => {
