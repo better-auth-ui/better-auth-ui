@@ -227,11 +227,11 @@ export function OAuthClients({
                 <div className="flex shrink-0 flex-wrap items-center gap-1">
                   {manager.setDisabled && (
                     <Switch
-                      aria-label={
+                      aria-label={`${client.client_name || client.client_id}: ${
                         client.disabled
                           ? oauthLocalization.disabled
                           : oauthLocalization.enabled
-                      }
+                      }`}
                       size="sm"
                       isSelected={!client.disabled}
                       isDisabled={setDisabled.isPending}
@@ -241,7 +241,13 @@ export function OAuthClients({
                           disabled: !enabled
                         })
                       }
-                    />
+                    >
+                      <Switch.Content>
+                        <Switch.Control>
+                          <Switch.Thumb />
+                        </Switch.Control>
+                      </Switch.Content>
+                    </Switch>
                   )}
                   <Button
                     isIconOnly

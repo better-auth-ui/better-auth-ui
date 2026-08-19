@@ -7,6 +7,7 @@ import { Auth } from "../src/components/auth/auth"
 import { AuthProvider } from "../src/components/auth/auth-provider"
 import { AuthorizedApplications } from "../src/components/auth/oauth-provider/authorized-applications"
 import {
+  OAuthClients,
   OrganizationOAuthClients,
   UserOAuthClients
 } from "../src/components/auth/oauth-provider/oauth-clients"
@@ -507,6 +508,38 @@ describe("<AuthorizedApplications />", () => {
 
     expect(
       await screen.findByText("No connected applications")
+    ).toBeInTheDocument()
+  })
+})
+
+describe("<OAuthClients />", () => {
+  it("labels each status switch with its client identity", async () => {
+    const manager = {
+      list: vi.fn(async () => [
+        {
+          client_id: "desktop-client",
+          client_name: "Acme CLI",
+          redirect_uris: ["https://acme.example/callback"],
+          disabled: false
+        }
+      ]),
+      create: vi.fn(),
+      update: vi.fn(),
+      delete: vi.fn(),
+      rotateSecret: vi.fn(),
+      setDisabled: vi.fn()
+    }
+
+    renderWithAuth(
+      <OAuthClients
+        manager={manager}
+        owner={{ type: "user" }}
+        ownerKey="user"
+      />
+    )
+
+    expect(
+      await screen.findByRole("switch", { name: "Acme CLI: Enabled" })
     ).toBeInTheDocument()
   })
 })
