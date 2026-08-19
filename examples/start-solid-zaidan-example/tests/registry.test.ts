@@ -2483,6 +2483,7 @@ describe("Solid registry isolation", () => {
       "./plugins/anonymous",
       "./plugins/api-key",
       "./plugins/captcha",
+      "./plugins/billing",
       "./plugins/device-authorization",
       "./plugins/email-otp",
       "./plugins/magic-link",
