@@ -173,12 +173,20 @@ export function createAgentAuthClientAdapter(
   }
 
   const fetchAgents = async (signal?: AbortSignal): Promise<unknown[]> => {
-    const response = await authClient.agent.list({
-      query: { limit: 100, offset: 0 },
-      fetchOptions: fetchOptions(signal)
-    })
-    const agents = asRecord(unwrapData(response)).agents
-    return Array.isArray(agents) ? agents : []
+    const pageSize = 100
+    const agents: unknown[] = []
+
+    for (let offset = 0; ; offset += pageSize) {
+      const response = await authClient.agent.list({
+        query: { limit: pageSize, offset },
+        fetchOptions: fetchOptions(signal)
+      })
+      const result = asRecord(unwrapData(response)).agents
+      const page = Array.isArray(result) ? result : []
+      agents.push(...page)
+
+      if (page.length < pageSize) return agents
+    }
   }
 
   const listAgents = async (signal?: AbortSignal) => {

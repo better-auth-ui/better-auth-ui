@@ -103,6 +103,32 @@ describe("Agent Auth", () => {
     )
   })
 
+  it("loads every page of agent authorizations", async () => {
+    const client = createClient()
+    const firstPage = Array.from({ length: 100 }, (_, number) => ({
+      ...listedAgent,
+      agent_id: `agent-${number + 1}`
+    }))
+    const secondPage = [{ ...listedAgent, agent_id: "agent-101" }]
+    client.agent.list.mockImplementation(async ({ query }) => ({
+      agents: query.offset === 0 ? firstPage : secondPage
+    }))
+    const adapter = createAgentAuthClientAdapter(client as never)
+
+    const authorizations = await adapter.listAgents()
+
+    expect(authorizations).toHaveLength(101)
+    expect(authorizations.at(-1)?.id).toBe("agent-101")
+    expect(client.agent.list).toHaveBeenNthCalledWith(
+      1,
+      expect.objectContaining({ query: { limit: 100, offset: 0 } })
+    )
+    expect(client.agent.list).toHaveBeenNthCalledWith(
+      2,
+      expect.objectContaining({ query: { limit: 100, offset: 100 } })
+    )
+  })
+
   it("registers its route, settings default, and cache invalidation", async () => {
     const client = createClient()
     const adapter = createAgentAuthClientAdapter(client as never)

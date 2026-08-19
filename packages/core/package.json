@@ -198,9 +198,6 @@
     "better-auth": ">=1.7.0"
   },
   "peerDependenciesMeta": {
-    "@better-auth/agent-auth": {
-      "optional": true
-    },
     "@better-auth/api-key": {
       "optional": true
     },

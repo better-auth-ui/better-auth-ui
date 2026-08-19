@@ -420,7 +420,6 @@
         "better-auth": ">=1.7.0",
       },
       "optionalPeers": [
-        "@better-auth/agent-auth",
         "@better-auth/api-key",
         "@better-auth/oauth-provider",
         "@better-auth/passkey",

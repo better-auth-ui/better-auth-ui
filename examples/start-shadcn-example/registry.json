@@ -2279,6 +2279,7 @@
       "title": "All",
       "description": "Installs every Better Auth UI component, plugin, and email template in one shot.",
       "registryDependencies": [
+        "https://better-auth-ui.com/r/radix-nova/agent-auth.json",
         "https://better-auth-ui.com/r/radix-nova/auth-provider.json",
         "https://better-auth-ui.com/r/radix-nova/additional-field.json",
         "https://better-auth-ui.com/r/radix-nova/sign-in.json",

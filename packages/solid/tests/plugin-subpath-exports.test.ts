@@ -145,6 +145,11 @@ describe("Solid plugin subpath exports", () => {
   it("does not publish plugin-specific APIs from the root entrypoint", async () => {
     const solid = await import("../src")
 
+    expect(solid).not.toHaveProperty("useAgentApproval")
+    expect(solid).not.toHaveProperty("useAgentAuthorizations")
+    expect(solid).not.toHaveProperty("useApproveAgent")
+    expect(solid).not.toHaveProperty("useDenyAgent")
+    expect(solid).not.toHaveProperty("useRevokeAgentCapability")
     expect(solid).not.toHaveProperty("useAddPasskey")
     expect(solid).not.toHaveProperty("useSignInAnonymous")
     expect(solid).not.toHaveProperty("oneTapPlugin")

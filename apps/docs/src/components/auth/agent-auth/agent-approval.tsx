@@ -263,7 +263,12 @@ export function AgentApproval({ className }: AgentApprovalProps) {
         <Button
           className="flex-1"
           type="button"
-          disabled={!selected.size || deny.isPending || !approval.data}
+          disabled={
+            approve.isPending ||
+            !selected.size ||
+            deny.isPending ||
+            !approval.data
+          }
           onClick={() =>
             approve.mutate(decision, {
               onSuccess: () => setResult("approved")

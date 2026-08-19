@@ -145,6 +145,11 @@ describe("React plugin subpath exports", () => {
   it("does not publish plugin-specific APIs from the root entrypoint", async () => {
     const react = await import("../src")
 
+    expect(react).not.toHaveProperty("useAgentApproval")
+    expect(react).not.toHaveProperty("useAgentAuthorizations")
+    expect(react).not.toHaveProperty("useApproveAgent")
+    expect(react).not.toHaveProperty("useDenyAgent")
+    expect(react).not.toHaveProperty("useRevokeAgentCapability")
     expect(react).not.toHaveProperty("useAddPasskey")
     expect(react).not.toHaveProperty("useSignInAnonymous")
     expect(react).not.toHaveProperty("oneTapPlugin")

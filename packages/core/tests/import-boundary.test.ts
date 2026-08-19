@@ -80,6 +80,20 @@ describe("core query boundary", () => {
     expect(viteConfig).not.toContain('plugins: "src/plugins.ts"')
   })
 
+  it("requires the native Agent Auth client used by its declarations", () => {
+    const packageJson = JSON.parse(readFileSync("package.json", "utf8")) as {
+      peerDependencies: Record<string, string>
+      peerDependenciesMeta: Record<string, { optional?: boolean }>
+    }
+
+    expect(packageJson.peerDependencies["@better-auth/agent-auth"]).toBe(
+      ">=0.6.2"
+    )
+    expect(
+      packageJson.peerDependenciesMeta["@better-auth/agent-auth"]
+    ).toBeUndefined()
+  })
+
   it("does not import framework runtimes", () => {
     const files = sourceFiles("src")
     const offenders = files.flatMap((file) => {
