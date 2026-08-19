@@ -1,11 +1,13 @@
 import {
   type AuthSocialProvider,
   getProviderId,
-  getProviderName
+  getProviderName,
+  isCustomSocialProvider
 } from "@better-auth-ui/core"
 import { useAuth } from "@better-auth-ui/solid"
 import type { ComponentProps } from "solid-js"
-import { createSignal } from "solid-js"
+import { createSignal, Show } from "solid-js"
+import { Dynamic } from "solid-js/web"
 import { Button } from "@/components/ui/button"
 import { Spinner } from "@/components/ui/spinner"
 import { cn } from "@/lib/utils"
@@ -52,11 +54,27 @@ function GoogleIcon(props: ComponentProps<"svg">) {
   )
 }
 
-function ProviderIcon(props: { provider: AuthSocialProvider }) {
-  if (props.provider === "github") return <GitHubIcon class="size-4" />
-  if (props.provider === "google") return <GoogleIcon class="size-4" />
+function BuiltInProviderIcon(props: { provider: AuthSocialProvider }) {
+  const providerId = () => getProviderId(props.provider)
+
+  if (providerId() === "github") return <GitHubIcon class="size-4" />
+  if (providerId() === "google") return <GoogleIcon class="size-4" />
 
   return <span aria-hidden>{getProviderName(props.provider).slice(0, 1)}</span>
+}
+
+export function ProviderIcon(props: { provider: AuthSocialProvider }) {
+  const customIcon = () =>
+    isCustomSocialProvider(props.provider) ? props.provider.icon : undefined
+
+  return (
+    <Show
+      when={customIcon()}
+      fallback={<BuiltInProviderIcon provider={props.provider} />}
+    >
+      {(icon) => <Dynamic component={icon()} class="size-4" />}
+    </Show>
+  )
 }
 
 export function ProviderButton(props: ProviderButtonProps) {

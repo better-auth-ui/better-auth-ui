@@ -48,7 +48,7 @@ export function LinkedAccount({ account, provider }: LinkedAccountProps) {
 
   const providerId = getProviderId(provider)
   const providerIcon = renderProviderIcon(provider, {
-    className: cn("size-4.5", !account && "opacity-50")
+    className: "size-4.5"
   })
   const providerName = getProviderName(provider)
   const accountData = accountInfo?.data as
@@ -66,16 +66,11 @@ export function LinkedAccount({ account, provider }: LinkedAccountProps) {
     <div className="flex items-center gap-3">
       <div
         className={cn(
-          "flex size-10 shrink-0 items-center justify-center rounded-xl bg-surface-secondary"
+          "flex size-10 shrink-0 items-center justify-center rounded-xl bg-surface-secondary",
+          !account && "opacity-50"
         )}
       >
-        {providerIcon ? (
-          providerIcon
-        ) : (
-          <PlugConnection
-            className={cn("size-4.5", !account && "opacity-50")}
-          />
-        )}
+        {providerIcon ? providerIcon : <PlugConnection className="size-4.5" />}
       </div>
 
       <div className="flex flex-col min-w-0">

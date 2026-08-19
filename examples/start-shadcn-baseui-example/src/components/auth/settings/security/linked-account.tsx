@@ -62,9 +62,7 @@ export function LinkedAccount({ account, provider }: LinkedAccountProps) {
   )
 
   const providerId = getProviderId(provider)
-  const providerIcon = renderProviderIcon(provider, {
-    className: cn(!account && "opacity-50")
-  })
+  const providerIcon = renderProviderIcon(provider)
   const providerName = getProviderName(provider)
   const accountData = accountInfo?.data as
     | { login?: string; username?: string }
@@ -79,12 +77,8 @@ export function LinkedAccount({ account, provider }: LinkedAccountProps) {
 
   return (
     <Item>
-      <ItemMedia variant="icon">
-        {providerIcon ? (
-          providerIcon
-        ) : (
-          <Plug className={cn(!account && "opacity-50")} />
-        )}
+      <ItemMedia variant="icon" className={cn(!account && "opacity-50")}>
+        {providerIcon ? providerIcon : <Plug />}
       </ItemMedia>
       <ItemContent>
         <ItemTitle>{providerName}</ItemTitle>

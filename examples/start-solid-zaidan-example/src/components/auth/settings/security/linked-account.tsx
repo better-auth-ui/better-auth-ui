@@ -1,4 +1,8 @@
-import { getProviderId, getProviderName } from "@better-auth-ui/core"
+import {
+  getProviderId,
+  getProviderName,
+  isCustomSocialProvider
+} from "@better-auth-ui/core"
 import {
   useAccountInfo,
   useAuth,
@@ -8,6 +12,7 @@ import {
 import { Link2, Link2Off, Plug } from "lucide-solid"
 import type { ComponentProps } from "solid-js"
 import { Show } from "solid-js"
+import { Dynamic } from "solid-js/web"
 import { toast } from "solid-sonner"
 import type {
   AccountInfoResponse,
@@ -61,16 +66,38 @@ function GoogleIcon(props: ComponentProps<"svg">) {
   )
 }
 
-function ProviderIcon(props: {
+function BuiltInProviderIcon(props: {
+  class?: string
+  provider: LinkedProvider
+}) {
+  const providerId = () => getProviderId(props.provider)
+
+  if (providerId() === "github") return <GitHubIcon class={props.class} />
+  if (providerId() === "google") return <GoogleIcon class={props.class} />
+
+  return <Plug class={props.class} />
+}
+
+export function ProviderIcon(props: {
   account?: LinkedAccount
   provider: LinkedProvider
 }) {
   const iconClass = () => cn(!props.account && "opacity-50")
+  const customIcon = () =>
+    typeof props.provider !== "string" && isCustomSocialProvider(props.provider)
+      ? props.provider.icon
+      : undefined
 
-  if (props.provider === "github") return <GitHubIcon class={iconClass()} />
-  if (props.provider === "google") return <GoogleIcon class={iconClass()} />
-
-  return <Plug class={iconClass()} />
+  return (
+    <Show
+      when={customIcon()}
+      fallback={
+        <BuiltInProviderIcon class={iconClass()} provider={props.provider} />
+      }
+    >
+      {(icon) => <Dynamic component={icon()} class={iconClass()} />}
+    </Show>
+  )
 }
 
 export function LinkedAccountRow(props: {

@@ -10,10 +10,17 @@ import {
   QueryClient,
   QueryClientProvider
 } from "@tanstack/solid-query"
-import { createContext, type JSX, useContext } from "solid-js"
+import { type Component, createContext, type JSX, useContext } from "solid-js"
 import { resolveAuthConfig } from "./auth-config"
 import { FetchOptionsProvider } from "./fetch-options-provider"
 import { MutationInvalidator } from "./mutation-invalidator"
+
+declare module "@better-auth-ui/core" {
+  /** Custom social provider icons are Solid components that accept a class. */
+  interface SocialProviderRegister {
+    icon: Component<{ class?: string }>
+  }
+}
 
 const AuthContext = createContext<AuthConfig>()
 /** Provider-instance scoped config fallback for SSR — replaces the former module-level global. */
