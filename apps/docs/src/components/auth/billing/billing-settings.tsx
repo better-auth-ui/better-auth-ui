@@ -277,7 +277,7 @@ export function BillingSettings({
                 </p>
               )}
               {typeof subscription.seats === "number" &&
-                (adapter.supports.seats ? (
+                adapter.supports.seats && (
                   <SeatsEditor
                     key={subscription.id}
                     seats={subscription.seats}
@@ -289,22 +289,7 @@ export function BillingSettings({
                       )
                     }
                   />
-                ) : (
-                  <Button
-                    className="self-start"
-                    size="sm"
-                    variant="outline"
-                    disabled={portal.isPending}
-                    onClick={() =>
-                      portal.mutate(undefined, {
-                        onSuccess: followBillingAction
-                      })
-                    }
-                  >
-                    {portal.isPending ? <Spinner /> : <ExternalLink />}
-                    {localization.manageBilling}
-                  </Button>
-                ))}
+                )}
             </>
           ) : (
             <p className="text-sm text-muted-foreground">
@@ -357,7 +342,11 @@ export function BillingSettings({
                   </span>
                 </div>
                 <Progress
-                  value={usage.limit ? (usage.used / usage.limit) * 100 : 0}
+                  value={
+                    usage.limit
+                      ? Math.min(100, (usage.used / usage.limit) * 100)
+                      : 0
+                  }
                   aria-label={usage.label}
                 />
               </div>
