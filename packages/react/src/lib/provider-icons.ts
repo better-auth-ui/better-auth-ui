@@ -3,7 +3,10 @@ import type { SocialProvider } from "better-auth/social-providers"
 import {
   type ComponentPropsWithRef,
   type ComponentType,
-  createElement
+  cloneElement,
+  createElement,
+  isValidElement,
+  type ReactElement
 } from "react"
 import {
   Apple,
@@ -105,7 +108,19 @@ export const renderProviderIcon = (
   provider: AuthSocialProvider | string,
   props?: ComponentPropsWithRef<"svg">
 ) => {
-  if (typeof provider !== "string") return provider.icon ?? null
+  if (typeof provider !== "string") {
+    if (!isValidElement(provider.icon)) return provider.icon ?? null
+
+    const icon = provider.icon as ReactElement<ComponentPropsWithRef<"svg">>
+    const className = [icon.props.className, props?.className]
+      .filter(Boolean)
+      .join(" ")
+
+    return cloneElement(icon, {
+      ...props,
+      className: className || undefined
+    })
+  }
   const ProviderIcon = providerIcons[provider as SocialProvider]
   return ProviderIcon ? createElement(ProviderIcon, props) : null
 }
