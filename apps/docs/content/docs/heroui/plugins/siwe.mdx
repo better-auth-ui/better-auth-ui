@@ -94,6 +94,7 @@ Never trust a user ID from the browser. Resolve the user from the server session
 
 ```ts title="lib/wallet-manager.ts"
 import type {
+  SiweWalletAccount,
   SiweWalletLinkChallenge,
   SiweWalletManager
 } from "@better-auth-ui/core/plugins/siwe"
@@ -102,6 +103,15 @@ const assertOk = async (response: Response) => {
   if (!response.ok) {
     throw new Error(`Wallet request failed with status ${response.status}.`)
   }
+}
+
+const get = async <TResponse>(
+  url: string,
+  signal?: AbortSignal
+): Promise<TResponse> => {
+  const response = await fetch(url, { signal })
+  await assertOk(response)
+  return response.json() as Promise<TResponse>
 }
 
 const post = async <TResponse = void>(
@@ -119,7 +129,7 @@ const post = async <TResponse = void>(
 }
 
 export const walletManager: SiweWalletManager = {
-  list: (signal) => fetch("/api/wallets", { signal }).then((response) => response.json()),
+  list: (signal) => get<SiweWalletAccount[]>("/api/wallets", signal),
   createLinkChallenge: (wallet) =>
     post<SiweWalletLinkChallenge>("/api/wallets/link-challenge", wallet),
   link: (proof) => post("/api/wallets/link", proof),
