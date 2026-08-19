@@ -1,5 +1,9 @@
 import { authMutationKeys } from "@better-auth-ui/core"
 import {
+  isPasskeyAutoFillEnabled,
+  withPasskeyAutoFill
+} from "@better-auth-ui/core/plugins/passkey"
+import {
   AuthPrompts,
   useAuth,
   useFetchOptions,
@@ -111,6 +115,8 @@ export function SignIn({
     (plugin) => plugin.captchaComponent
   )?.captchaComponent
 
+  const passkeyAutoFill = isPasskeyAutoFillEnabled(plugins)
+
   const showSeparator = emailAndPassword?.enabled && !!socialProviders?.length
 
   return (
@@ -143,7 +149,7 @@ export function SignIn({
             <TextField
               name="email"
               type="email"
-              autoComplete="email"
+              autoComplete={withPasskeyAutoFill("email", passkeyAutoFill)}
               isDisabled={isPending}
               validate={(value) => {
                 if (!value) return localization.auth.fieldRequired
@@ -166,7 +172,10 @@ export function SignIn({
               minLength={emailAndPassword?.minPasswordLength}
               maxLength={emailAndPassword?.maxPasswordLength}
               name="password"
-              autoComplete="current-password"
+              autoComplete={withPasskeyAutoFill(
+                "current-password",
+                passkeyAutoFill
+              )}
               isDisabled={isPending}
               value={password}
               onChange={setPassword}

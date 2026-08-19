@@ -1,5 +1,9 @@
 import { authMutationKeys } from "@better-auth-ui/core"
 import {
+  isPasskeyAutoFillEnabled,
+  withPasskeyAutoFill
+} from "@better-auth-ui/core/plugins/passkey"
+import {
   type SsoAuthClient,
   setSsoFallbackEmail
 } from "@better-auth-ui/core/plugins/sso"
@@ -117,6 +121,8 @@ export function EmailFirstSignIn({
   const Captcha = plugins.find(
     (plugin) => plugin.captchaComponent
   )?.captchaComponent
+
+  const passkeyAutoFill = isPasskeyAutoFillEnabled(plugins)
   const showSocialSeparator =
     emailAndPassword.enabled && !!socialProviders?.length
 
@@ -171,7 +177,7 @@ export function EmailFirstSignIn({
             <TextField
               name="email"
               type="email"
-              autoComplete="email"
+              autoComplete={withPasskeyAutoFill("email", passkeyAutoFill)}
               isDisabled={isPending}
               value={email}
               onChange={setEmail}
@@ -225,7 +231,10 @@ export function EmailFirstSignIn({
                   minLength={emailAndPassword.minPasswordLength}
                   maxLength={emailAndPassword.maxPasswordLength}
                   name="password"
-                  autoComplete="current-password"
+                  autoComplete={withPasskeyAutoFill(
+                    "current-password",
+                    passkeyAutoFill
+                  )}
                   isDisabled={isPending}
                   value={password}
                   onChange={setPassword}

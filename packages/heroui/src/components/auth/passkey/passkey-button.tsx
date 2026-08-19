@@ -1,7 +1,10 @@
 import { type AuthView, authMutationKeys } from "@better-auth-ui/core"
 import type { PasskeyAuthClient } from "@better-auth-ui/core/plugins/passkey"
 import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
-import { useSignInPasskey } from "@better-auth-ui/react/plugins/passkey"
+import {
+  usePasskeyAutoFill,
+  useSignInPasskey
+} from "@better-auth-ui/react/plugins/passkey"
 import { Fingerprint } from "@gravity-ui/icons"
 import { Button, Spinner } from "@heroui/react"
 import { useIsMutating } from "@tanstack/react-query"
@@ -24,6 +27,13 @@ export function PasskeyButton({ view }: PasskeyButtonProps) {
     }
   )
 
+  // Surfaces passkeys in the browser's autofill dropdown while the sign-in
+  // form is open. The button stays for anyone who dismisses it.
+  usePasskeyAutoFill(authClient as PasskeyAuthClient, {
+    enabled: view !== "signUp",
+    onSuccess: () => navigate({ to: redirectTo })
+  })
+
   const signInMutating = useIsMutating({
     mutationKey: authMutationKeys.signIn.all
   })
@@ -41,7 +51,7 @@ export function PasskeyButton({ view }: PasskeyButtonProps) {
       variant="tertiary"
       isDisabled={isPending}
       isPending={passkeyPending}
-      onPress={() => signInPasskey()}
+      onPress={() => signInPasskey({ autoFill: false })}
     >
       {passkeyPending ? <Spinner color="current" size="sm" /> : <Fingerprint />}
       {localization.auth.continueWith.replace(

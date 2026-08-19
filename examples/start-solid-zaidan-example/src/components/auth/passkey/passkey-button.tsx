@@ -1,7 +1,10 @@
 import { type AuthView, authMutationKeys } from "@better-auth-ui/core"
 import type { PasskeyAuthClient } from "@better-auth-ui/core/plugins/passkey"
 import { useAuth } from "@better-auth-ui/solid"
-import { useSignInPasskey } from "@better-auth-ui/solid/plugins/passkey"
+import {
+  usePasskeyAutoFill,
+  useSignInPasskey
+} from "@better-auth-ui/solid/plugins/passkey"
 import { useIsMutating } from "@tanstack/solid-query"
 import { Fingerprint } from "lucide-solid"
 import { passkeyLabels } from "@/components/auth/passkey/passkey-localization"
@@ -19,6 +22,15 @@ export function PasskeyButton(props: PasskeyButtonProps) {
   const signInPasskey = useSignInPasskey(auth.authClient, () => ({
     onSuccess: () => auth.navigate({ to: auth.redirectTo })
   }))
+
+  // Surfaces passkeys in the browser's autofill dropdown while the sign-in
+  // form is open. The button stays for anyone who dismisses it.
+  usePasskeyAutoFill(auth.authClient, {
+    enabled: props.view !== "signUp",
+    mutation: () => ({
+      onSuccess: () => auth.navigate({ to: auth.redirectTo })
+    })
+  })
   const signInMutating = useIsMutating(() => ({
     mutationKey: authMutationKeys.signIn.all
   }))
@@ -34,7 +46,7 @@ export function PasskeyButton(props: PasskeyButtonProps) {
     <Button
       class={cn("w-full", isPending() && "pointer-events-none opacity-50")}
       disabled={isPending()}
-      onClick={() => signInPasskey.mutate(undefined as never)}
+      onClick={() => signInPasskey.mutate({ autoFill: false } as never)}
       type="button"
       variant="outline"
     >

@@ -3,6 +3,7 @@ title: Passkey
 description: Add passwordless passkey sign-in and device management to your Solid/Zaidan authentication flow.
 ---
 
+import { Callout } from 'fumadocs-ui/components/callout'
 import { Step, Steps } from 'fumadocs-ui/components/steps'
 
 The passkey plugin adds passwordless authentication using WebAuthn. Users can sign in with their device authenticator (Touch ID, Face ID, Windows Hello) and manage registered passkeys from their security settings.
@@ -163,6 +164,48 @@ The `<PasskeysSettings />` security card is rendered on the security settings pa
 **Props**
 
 <auto-type-table path="../../../../../../examples/start-solid-zaidan-example/src/components/auth/passkey/passkeys.tsx" name="PasskeysSettingsProps" />
+
+## Passkey autofill
+
+With the plugin registered, the sign-in form asks the browser to offer saved
+passkeys straight from its autofill dropdown, so most people never press the
+passkey button at all. This is the WebAuthn conditional UI flow.
+
+Two pieces make it work, and the built-in components already handle both:
+
+- The identifier and password fields carry `webauthn` as the last token of
+  their `autocomplete` attribute, added by `withPasskeyAutoFill`.
+- `<PasskeyButton />` calls `usePasskeyAutoFill`, which opens a conditionally
+  mediated request once the browser reports that it supports one.
+
+Browsers without conditional mediation ignore the extra token and never get the
+request, so the button stays as the fallback everywhere.
+
+Turn the whole thing off with:
+
+```ts
+passkeyPlugin({ autoFill: false })
+```
+
+If you write your own sign-in form, add the token yourself:
+
+```tsx
+import {
+  isPasskeyAutoFillEnabled,
+  withPasskeyAutoFill
+} from "@better-auth-ui/core/plugins/passkey"
+
+const auth = useAuth()
+const passkeyAutoFill = isPasskeyAutoFillEnabled(auth.plugins)
+
+<Input autocomplete={withPasskeyAutoFill("email", passkeyAutoFill)} />
+```
+
+<Callout type="warn">
+The browser keeps a conditional request open until someone picks a passkey or
+the page navigates. WebAuthn gives no way to withdraw it, so unmounting the
+form does not cancel a request that already started.
+</Callout>
 
 ## Options
 

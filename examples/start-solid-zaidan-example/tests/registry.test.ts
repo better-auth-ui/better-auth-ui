@@ -1668,9 +1668,7 @@ describe("Solid registry isolation", () => {
     expect(signIn).toContain("new FormData(event.currentTarget)")
     expect(signIn).toContain("username: signInPath.username")
     expect(signIn).toContain("email: signInPath.email")
-    expect(signIn).toContain(
-      'autocomplete={usernameAuth ? "username" : "email"}'
-    )
+    expect(signIn).toContain('usernameAuth ? "username" : "email"')
 
     expect(signUp).toContain("parseAdditionalFieldValue")
     expect(signUp).toContain("additionalFieldValues")

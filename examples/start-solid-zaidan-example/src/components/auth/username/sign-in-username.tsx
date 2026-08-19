@@ -1,4 +1,8 @@
 import { authQueryKeys } from "@better-auth-ui/core"
+import {
+  isPasskeyAutoFillEnabled,
+  withPasskeyAutoFill
+} from "@better-auth-ui/core/plugins/passkey"
 import type { UsernameAuthClient } from "@better-auth-ui/core/plugins/username"
 import {
   type UsernameLocalization,
@@ -86,6 +90,7 @@ export function SignInUsername(props: SignInUsernameProps) {
   const captchaComponent = () =>
     (auth.plugins as AuthPlugin[]).find((plugin) => plugin.captchaComponent)
       ?.captchaComponent
+  const passkeyAutoFill = isPasskeyAutoFillEnabled(auth.plugins)
   const socialPosition = () => props.socialPosition ?? "bottom"
   const showSeparator = () =>
     Boolean(auth.emailAndPassword?.enabled && auth.socialProviders?.length)
@@ -152,7 +157,10 @@ export function SignInUsername(props: SignInUsernameProps) {
               </FieldLabel>
               <Input
                 aria-invalid={Boolean(identifierError())}
-                autocomplete={usernameAuth ? "username" : "email"}
+                autocomplete={withPasskeyAutoFill(
+                  usernameAuth ? "username" : "email",
+                  passkeyAutoFill
+                )}
                 id="sign-in-email"
                 name={usernameAuth ? "username" : "email"}
                 onInput={(event) => {
@@ -185,7 +193,10 @@ export function SignInUsername(props: SignInUsernameProps) {
               <div class="relative">
                 <Input
                   aria-invalid={Boolean(passwordError())}
-                  autocomplete="current-password"
+                  autocomplete={withPasskeyAutoFill(
+                    "current-password",
+                    passkeyAutoFill
+                  )}
                   class="pr-12"
                   id="sign-in-password"
                   maxLength={auth.emailAndPassword.maxPasswordLength}
