@@ -80,7 +80,9 @@ export const billingAdapter = createStripeBillingAdapter(authClient, {
 ### Register the plugin
 
 ```tsx title="components/providers.tsx"
+import { AuthProvider } from "@/components/auth/auth-provider"
 import { billingPlugin } from "@/lib/auth/billing-plugin"
+import { organizationPlugin } from "@/lib/auth/organization-plugin"
 import { billingAdapter } from "@/lib/billing"
 
 <AuthProvider

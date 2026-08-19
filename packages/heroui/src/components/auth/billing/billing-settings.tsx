@@ -276,7 +276,7 @@ export function BillingSettings({
                 </p>
               )}
               {typeof subscription.seats === "number" &&
-                (adapter.supports.seats ? (
+                adapter.supports.seats && (
                   <SeatsEditor
                     key={subscription.id}
                     seats={subscription.seats}
@@ -288,22 +288,7 @@ export function BillingSettings({
                       )
                     }
                   />
-                ) : (
-                  <Button
-                    className="self-start"
-                    size="sm"
-                    variant="outline"
-                    isPending={portal.isPending}
-                    onPress={() =>
-                      portal.mutate(undefined, {
-                        onSuccess: followBillingAction
-                      })
-                    }
-                  >
-                    <Gear />
-                    {localization.manageBilling}
-                  </Button>
-                ))}
+                )}
             </>
           ) : (
             <p className="text-muted text-sm">{localization.noSubscription}</p>
