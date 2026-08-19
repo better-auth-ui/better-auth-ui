@@ -2,10 +2,11 @@ import type { OrganizationAuthClient } from "@better-auth-ui/core/plugins/organi
 import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
 import {
   useCancelInvitation,
-  useHasPermission
+  useHasPermission,
+  useInviteMember
 } from "@better-auth-ui/react/plugins/organization"
-import { Xmark } from "@gravity-ui/icons"
-import { Button, Chip, Spinner, Table } from "@heroui/react"
+import { PaperPlane, Xmark } from "@gravity-ui/icons"
+import { Button, Chip, Spinner, Table, toast } from "@heroui/react"
 
 import type { Invitation } from "better-auth/client"
 
@@ -33,6 +34,19 @@ export function OrganizationInvitationTableRow({
   const { mutate: cancelInvitation, isPending: cancelPending } =
     useCancelInvitation(authClient as OrganizationAuthClient)
 
+  const { data: inviteMemberPermission, isPending: invitePermissionPending } =
+    useHasPermission(authClient as OrganizationAuthClient, {
+      permissions: { invitation: ["create"] }
+    })
+
+  // Better Auth treats a re-invite as a resend: it extends the existing
+  // invitation's expiry and sends the email again rather than creating a
+  // second row.
+  const { mutate: resendInvitation, isPending: resendPending } =
+    useInviteMember(authClient as OrganizationAuthClient, {
+      onSuccess: () => toast.success(organizationLocalization.invitationResent)
+    })
+
   const roleLabel = roles?.[invitation.role] ?? invitation.role
 
   const statusLabel =
@@ -47,9 +61,11 @@ export function OrganizationInvitationTableRow({
           ? "danger"
           : "default"
 
-  if (cancelPermissionPending) {
+  if (cancelPermissionPending || invitePermissionPending) {
     return <OrganizationInvitationRowSkeleton />
   }
+
+  const isPending = invitation.status === "pending"
 
   return (
     <Table.Row>
@@ -73,8 +89,34 @@ export function OrganizationInvitationTableRow({
       </Table.Cell>
 
       <Table.Cell className="text-end">
-        {cancelInvitationPermission?.success &&
-          invitation.status === "pending" && (
+        <div className="flex justify-end gap-2">
+          {inviteMemberPermission?.success && isPending && (
+            <Button
+              isIconOnly
+              size="sm"
+              variant="tertiary"
+              isPending={resendPending}
+              onPress={() =>
+                resendInvitation({
+                  email: invitation.email,
+                  organizationId: invitation.organizationId,
+                  role: invitation.role as Parameters<
+                    typeof resendInvitation
+                  >[0]["role"],
+                  resend: true
+                })
+              }
+              aria-label={organizationLocalization.resendInvitation}
+            >
+              {resendPending ? (
+                <Spinner color="current" size="sm" />
+              ) : (
+                <PaperPlane />
+              )}
+            </Button>
+          )}
+
+          {cancelInvitationPermission?.success && isPending && (
             <Button
               isIconOnly
               size="sm"
@@ -90,6 +132,7 @@ export function OrganizationInvitationTableRow({
               )}
             </Button>
           )}
+        </div>
       </Table.Cell>
     </Table.Row>
   )

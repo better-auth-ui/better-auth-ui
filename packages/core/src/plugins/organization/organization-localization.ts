@@ -35,6 +35,8 @@ export const organizationLocalization = {
     "Permanently delete this organization and all of its data. All members will lose access and this cannot be undone.",
   /** @remarks `"Invitations"` */
   invitations: "Invitations",
+  /** @remarks `"Invitation resent"` */
+  invitationResent: "Invitation resent",
   /** @remarks `"Invitation unavailable"` */
   invitationUnavailable: "Invitation unavailable",
   /** @remarks `"This invitation is invalid, expired, or has already been handled."` */
@@ -115,6 +117,8 @@ export const organizationLocalization = {
   /** @remarks `"Are you sure you want to remove this member from the organization? They will lose access immediately."` */
   removeMemberWarning:
     "Are you sure you want to remove this member from the organization? They will lose access immediately.",
+  /** @remarks `"Resend invitation"` */
+  resendInvitation: "Resend invitation",
   /** @remarks `"Role"` */
   role: "Role",
   /** @remarks `"Search..."` */

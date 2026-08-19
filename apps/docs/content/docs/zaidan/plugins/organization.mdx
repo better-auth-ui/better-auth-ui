@@ -647,7 +647,12 @@ Searchable, sortable, filter-by-role table of the active organization's members 
 
 ### `<OrganizationInvitations />`
 
-Pending invitations for the active organization as a table aligned with `<OrganizationMembers />`. Includes role / status filters and a per-row cancel action.
+Pending invitations for the active organization as a table aligned with `<OrganizationMembers />`. Includes role / status filters, plus per-row resend and cancel actions.
+
+Resending re-invites the same address with `resend: true`, which pushes the
+invitation's expiry out and sends the email again instead of creating a second
+invitation. The action needs the `invitation: ["create"]` permission, the same
+one that gates `<InviteMemberDialog />`.
 
 <ZaidanStory
   storyId="zaidan-plugins-organization--organization-invitations-preview"
