@@ -65,4 +65,18 @@ describe("ssoPlugin", () => {
     setSsoFallbackEmail("person@example.com")
     expect(getSsoFallbackEmail()).toBe("person@example.com")
   })
+
+  it("continues when session storage is unavailable", () => {
+    vi.stubGlobal("sessionStorage", {
+      getItem: () => {
+        throw new DOMException("Storage access denied")
+      },
+      setItem: () => {
+        throw new DOMException("Storage access denied")
+      }
+    })
+
+    expect(() => setSsoFallbackEmail("person@example.com")).not.toThrow()
+    expect(getSsoFallbackEmail()).toBe("")
+  })
 })

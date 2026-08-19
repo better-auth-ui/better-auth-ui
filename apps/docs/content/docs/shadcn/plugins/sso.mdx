@@ -16,6 +16,7 @@ The SSO registry item installs a sign-in view that discovers organization SSO fr
 Install `@better-auth/sso`, add `sso()` to the server, add `ssoClient()` to the client, and apply the plugin schema. See the [Better Auth SSO guide](https://www.better-auth.com/docs/plugins/sso) for provider setup.
 
 ```ts title="lib/auth.ts"
+import { betterAuth } from "better-auth"
 import { sso } from "@better-auth/sso"
 
 export const auth = betterAuth({
@@ -25,6 +26,7 @@ export const auth = betterAuth({
 
 ```ts title="lib/auth-client.ts"
 import { ssoClient } from "@better-auth/sso/client"
+import { createAuthClient } from "better-auth/react"
 
 export const authClient = createAuthClient({
   plugins: [ssoClient()]

@@ -5,6 +5,7 @@ import {
 } from "@better-auth-ui/core/plugins/sso"
 import {
   AuthPrompts,
+  getAuthButtonKey,
   useAuth,
   useAuthPlugin,
   useFetchOptions,
@@ -33,7 +34,8 @@ import { type SyntheticEvent, useState } from "react"
 
 import { ssoPlugin } from "../../../lib/auth/sso-plugin"
 import { useSignInContinuation } from "../../../lib/auth/use-sign-in-continuation"
-import type { SocialLayout } from "../provider-buttons"
+import { FieldSeparator } from "../field-separator"
+import { ProviderButtons, type SocialLayout } from "../provider-buttons"
 
 export type EmailFirstSignInProps = {
   className?: string
@@ -47,6 +49,8 @@ type Step = "email" | "fallback"
 /** Discover organization SSO by email, then expose configured fallback methods. */
 export function EmailFirstSignIn({
   className,
+  socialLayout,
+  socialPosition = "bottom",
   variant
 }: EmailFirstSignInProps) {
   const {
@@ -58,6 +62,7 @@ export function EmailFirstSignIn({
     navigate,
     plugins,
     redirectTo,
+    socialProviders,
     viewPaths
   } = useAuth()
   const { localization: ssoLocalization } = useAuthPlugin(ssoPlugin)
@@ -112,6 +117,8 @@ export function EmailFirstSignIn({
   const Captcha = plugins.find(
     (plugin) => plugin.captchaComponent
   )?.captchaComponent
+  const showSocialSeparator =
+    emailAndPassword.enabled && !!socialProviders?.length
 
   const submitEmail = (event: SyntheticEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -197,6 +204,17 @@ export function EmailFirstSignIn({
           </Form>
         ) : (
           <div className="flex flex-col gap-4">
+            {socialPosition === "top" && (
+              <>
+                {!!socialProviders?.length && (
+                  <ProviderButtons socialLayout={socialLayout} view="signIn" />
+                )}
+                {showSocialSeparator && (
+                  <FieldSeparator>{localization.auth.or}</FieldSeparator>
+                )}
+              </>
+            )}
+
             {discoveryError && (
               <Description role="status">{discoveryError}</Description>
             )}
@@ -287,10 +305,21 @@ export function EmailFirstSignIn({
             {plugins.flatMap((plugin) =>
               (plugin.authButtons ?? []).map((AuthButton) => (
                 <AuthButton
-                  key={`${plugin.id}-${AuthButton.name}`}
+                  key={getAuthButtonKey(plugin.id, AuthButton)}
                   view="signIn"
                 />
               ))
+            )}
+
+            {socialPosition === "bottom" && (
+              <>
+                {showSocialSeparator && (
+                  <FieldSeparator>{localization.auth.or}</FieldSeparator>
+                )}
+                {!!socialProviders?.length && (
+                  <ProviderButtons socialLayout={socialLayout} view="signIn" />
+                )}
+              </>
             )}
 
             <Button variant="ghost" className="w-full" onPress={startOver}>

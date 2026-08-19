@@ -7,6 +7,7 @@ import {
 } from "@better-auth-ui/core/plugins/sso"
 import {
   AuthPrompts,
+  getAuthButtonKey,
   useAuth,
   useAuthPlugin,
   useFetchOptions,
@@ -32,7 +33,8 @@ import {
   FieldDescription,
   FieldError,
   FieldGroup,
-  FieldLabel
+  FieldLabel,
+  FieldSeparator
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import {
@@ -45,6 +47,7 @@ import { Spinner } from "@/components/ui/spinner"
 import { ssoPlugin } from "@/lib/auth/sso-plugin"
 import { useSignInContinuation } from "@/lib/auth/use-sign-in-continuation"
 import { cn } from "@/lib/utils"
+import { ProviderButtons } from "../provider-buttons"
 
 export type EmailFirstSignInProps = {
   className?: string
@@ -53,7 +56,11 @@ export type EmailFirstSignInProps = {
 }
 
 /** Discover organization SSO by email, then expose configured fallback methods. */
-export function EmailFirstSignIn({ className }: EmailFirstSignInProps) {
+export function EmailFirstSignIn({
+  className,
+  socialLayout,
+  socialPosition = "bottom"
+}: EmailFirstSignInProps) {
   const {
     authClient,
     basePaths,
@@ -63,6 +70,7 @@ export function EmailFirstSignIn({ className }: EmailFirstSignInProps) {
     navigate,
     plugins,
     redirectTo,
+    socialProviders,
     viewPaths,
     Link
   } = useAuth()
@@ -122,6 +130,8 @@ export function EmailFirstSignIn({ className }: EmailFirstSignInProps) {
   const Captcha = plugins.find(
     (plugin) => plugin.captchaComponent
   )?.captchaComponent
+  const showSocialSeparator =
+    emailAndPassword.enabled && !!socialProviders?.length
 
   const submitEmail = (event: SyntheticEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -219,6 +229,17 @@ export function EmailFirstSignIn({ className }: EmailFirstSignInProps) {
           </form>
         ) : (
           <div className="flex flex-col gap-4">
+            {socialPosition === "top" && (
+              <>
+                {!!socialProviders?.length && (
+                  <ProviderButtons socialLayout={socialLayout} view="signIn" />
+                )}
+                {showSocialSeparator && (
+                  <FieldSeparator>{localization.auth.or}</FieldSeparator>
+                )}
+              </>
+            )}
+
             {discoveryError && (
               <FieldDescription role="status">
                 {discoveryError}
@@ -245,6 +266,26 @@ export function EmailFirstSignIn({ className }: EmailFirstSignInProps) {
                           setFieldErrors((current) => ({
                             ...current,
                             password: undefined
+                          }))
+                        }}
+                        onInvalid={(event) => {
+                          event.preventDefault()
+                          const element = event.currentTarget
+                          const message = element.validity.valueMissing
+                            ? localization.auth.fieldRequired
+                            : element.validity.tooShort
+                              ? localization.auth.tooShort.replace(
+                                  "{{min}}",
+                                  String(emailAndPassword.minPasswordLength)
+                                )
+                              : localization.auth.tooLong.replace(
+                                  "{{max}}",
+                                  String(emailAndPassword.maxPasswordLength)
+                                )
+
+                          setFieldErrors((current) => ({
+                            ...current,
+                            password: message
                           }))
                         }}
                         placeholder={localization.auth.passwordPlaceholder}
@@ -306,10 +347,21 @@ export function EmailFirstSignIn({ className }: EmailFirstSignInProps) {
             {plugins.flatMap((plugin) =>
               (plugin.authButtons ?? []).map((AuthButton) => (
                 <AuthButton
-                  key={`${plugin.id}-${AuthButton.name}`}
+                  key={getAuthButtonKey(plugin.id, AuthButton)}
                   view="signIn"
                 />
               ))
+            )}
+
+            {socialPosition === "bottom" && (
+              <>
+                {showSocialSeparator && (
+                  <FieldSeparator>{localization.auth.or}</FieldSeparator>
+                )}
+                {!!socialProviders?.length && (
+                  <ProviderButtons socialLayout={socialLayout} view="signIn" />
+                )}
+              </>
             )}
 
             <Button variant="ghost" onClick={startOver}>

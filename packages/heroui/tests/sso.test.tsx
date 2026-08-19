@@ -96,4 +96,29 @@ describe("<EmailFirstSignIn />", () => {
       )
     })
   })
+
+  it("keeps social sign-in available after discovery falls back", async () => {
+    const user = userEvent.setup()
+    const authClient = createMockAuthClient()
+
+    render(
+      <AuthProvider
+        authClient={authClient}
+        navigate={vi.fn()}
+        plugins={[ssoPlugin()]}
+        socialProviders={["github"]}
+      >
+        <Auth view="signIn" />
+      </AuthProvider>
+    )
+
+    await user.type(screen.getByLabelText(/email/i), "person@example.com")
+    await user.click(
+      screen.getByRole("button", { name: /continue with email/i })
+    )
+
+    expect(
+      await screen.findByRole("button", { name: /continue with github/i })
+    ).toBeInTheDocument()
+  })
 })

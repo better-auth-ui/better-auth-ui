@@ -2,6 +2,9 @@ import type { AuthPluginBase, AuthView } from "@better-auth-ui/core"
 import type { ComponentType, ReactNode } from "react"
 import type { SettingsTab } from "./settings-tab"
 
+const authButtonIds = new WeakMap<ComponentType<AuthButtonProps>, number>()
+let nextAuthButtonId = 1
+
 export type { AuthPluginViewPaths } from "@better-auth-ui/core"
 
 /** Props for plugin-contributed auth buttons (e.g. passkey, magic link). */
@@ -10,6 +13,22 @@ export type AuthButtonProps = {
   children?: ReactNode
   /** Current auth view — lets buttons context-switch (e.g. show "back to sign-in"). */
   view?: AuthView
+}
+
+/** Return a stable React key for a plugin-contributed auth button component. */
+export function getAuthButtonKey(
+  pluginId: string,
+  AuthButton: ComponentType<AuthButtonProps>
+) {
+  let buttonId = authButtonIds.get(AuthButton)
+
+  if (buttonId === undefined) {
+    buttonId = nextAuthButtonId
+    nextAuthButtonId += 1
+    authButtonIds.set(AuthButton, buttonId)
+  }
+
+  return `${pluginId}-${buttonId.toString()}`
 }
 
 /** Props for plugin-contributed headless authentication prompts. */
