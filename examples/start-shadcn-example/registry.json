@@ -2242,6 +2242,7 @@
         "https://better-auth-ui.com/r/radix-nova/billing.json",
         "https://better-auth-ui.com/r/radix-nova/last-login-method.json",
         "https://better-auth-ui.com/r/radix-nova/one-tap.json",
+        "https://better-auth-ui.com/r/radix-nova/siwe.json",
         "https://better-auth-ui.com/r/radix-nova/sign-up.json",
         "https://better-auth-ui.com/r/radix-nova/email-otp.json",
         "https://better-auth-ui.com/r/radix-nova/magic-link.json",

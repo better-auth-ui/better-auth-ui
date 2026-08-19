@@ -17,9 +17,10 @@ The SIWE registry item adds wallet sign-in, optional email collection, and a sec
 Add `siwe()` to the server. Provide a secure nonce generator and an ERC-4361 verifier. Apply the plugin schema before sign-in.
 
 ```ts title="lib/auth.ts"
-import { generateSiweNonce, parseSiweMessage, verifySiweMessage } from "viem/siwe"
 import { betterAuth } from "better-auth"
 import { siwe } from "better-auth/plugins"
+import { verifyMessage } from "viem"
+import { generateSiweNonce } from "viem/siwe"
 
 export const auth = betterAuth({
   plugins: [
@@ -27,7 +28,11 @@ export const auth = betterAuth({
       domain: "app.example.com",
       getNonce: async () => generateSiweNonce(),
       verifyMessage: async ({ message, signature, address }) =>
-        verifySiweMessage({ message: parseSiweMessage(message), signature, address })
+        verifyMessage({
+          address: address as `0x${string}`,
+          message,
+          signature: signature as `0x${string}`
+        })
     })
   ]
 })
@@ -94,11 +99,35 @@ Resolve the user from the server session. Do not accept a user ID from the brows
 </Callout>
 
 ```ts title="lib/wallet-manager.ts"
-import type { SiweWalletManager } from "@better-auth-ui/core/plugins/siwe"
+import type {
+  SiweWalletLinkChallenge,
+  SiweWalletManager
+} from "@better-auth-ui/core/plugins/siwe"
+
+const assertOk = async (response: Response) => {
+  if (!response.ok) {
+    throw new Error(`Wallet request failed with status ${response.status}.`)
+  }
+}
+
+const post = async <TResponse = void>(
+  url: string,
+  body: unknown
+): Promise<TResponse> => {
+  const response = await fetch(url, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body)
+  })
+  await assertOk(response)
+  if (response.status === 204) return undefined as TResponse
+  return response.json() as Promise<TResponse>
+}
 
 export const walletManager: SiweWalletManager = {
   list: (signal) => fetch("/api/wallets", { signal }).then((response) => response.json()),
-  createLinkChallenge: (wallet) => post("/api/wallets/link-challenge", wallet),
+  createLinkChallenge: (wallet) =>
+    post<SiweWalletLinkChallenge>("/api/wallets/link-challenge", wallet),
   link: (proof) => post("/api/wallets/link", proof),
   unlink: (walletId) => fetch(`/api/wallets/${walletId}`, { method: "DELETE" }).then(assertOk),
   setPrimary: (walletId) => fetch(`/api/wallets/${walletId}/primary`, { method: "POST" }).then(assertOk)
