@@ -79,4 +79,29 @@ describe("ssoPlugin", () => {
     expect(() => setSsoFallbackEmail("person@example.com")).not.toThrow()
     expect(getSsoFallbackEmail()).toBe("")
   })
+
+  it("continues when reading the storage global throws", () => {
+    const descriptor = Object.getOwnPropertyDescriptor(
+      globalThis,
+      "sessionStorage"
+    )
+
+    Object.defineProperty(globalThis, "sessionStorage", {
+      configurable: true,
+      get() {
+        throw new DOMException("Storage access denied")
+      }
+    })
+
+    try {
+      expect(() => setSsoFallbackEmail("person@example.com")).not.toThrow()
+      expect(getSsoFallbackEmail()).toBe("")
+    } finally {
+      if (descriptor) {
+        Object.defineProperty(globalThis, "sessionStorage", descriptor)
+      } else {
+        Reflect.deleteProperty(globalThis, "sessionStorage")
+      }
+    }
+  })
 })
