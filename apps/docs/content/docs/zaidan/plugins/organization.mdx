@@ -3,6 +3,7 @@ title: Organization
 description: Add multi-tenant organization management with members, invitations, and roles to your Solid/Zaidan auth UI.
 ---
 
+import { Callout } from 'fumadocs-ui/components/callout'
 import { Step, Steps } from 'fumadocs-ui/components/steps'
 
 The organization plugin adds multi-tenant organization management to your Solid/Zaidan authentication UI. Users can create, switch between, and manage organizations with members, invitations, and roles.
@@ -644,6 +645,42 @@ Searchable, sortable, filter-by-role table of the active organization's members 
 ```
 
 <auto-type-table path="../../../../../../examples/start-solid-zaidan-example/src/components/auth/organization/organization-members.tsx" name="OrganizationMembersProps" />
+
+### Paginating members
+
+By default `<OrganizationMembers />` asks for the whole list and filters it in
+the browser. That is fine for a handful of members and quietly wrong for a
+large organization: `list-members` caps its response at 100 rows (or your
+`membershipLimit`) and says nothing about the rest, so members past that point
+simply never appear.
+
+Pass `pageSize` to move paging onto the server:
+
+```tsx
+<OrganizationMembers pageSize={20} />
+```
+
+In paged mode the component sends `limit` and `offset`, applies the role filter
+server-side through `filterField`/`filterValue`, sorts by role through
+`sortBy`/`sortDirection`, and reads the row count from the endpoint's `total`.
+
+Two controls step aside in paged mode, because `list-members` cannot honour
+them across pages:
+
+- **The search box.** The endpoint has no search parameter. Name and email live
+  on the joined user row, which it does not query.
+- **Sorting by member.** Same reason: it can only sort columns on the member
+  row itself.
+
+The signed-in user's own role comes from `getActiveMemberRole` rather than from
+scanning the loaded page, since they may well be on a different one. That is
+exposed as `useActiveMemberRole` if you need it yourself.
+
+<Callout>
+`list-invitations` and `list-sessions` take no pagination parameters at all, so
+those lists stay client-side until Better Auth adds them. `list-api-keys` does
+support `limit` and `offset`; wiring it up is a separate change.
+</Callout>
 
 ### `<OrganizationInvitations />`
 

@@ -1,3 +1,4 @@
+export * from "./use-active-member-role"
 export * from "./use-active-organization"
 export * from "./use-full-organization"
 export * from "./use-has-permission"

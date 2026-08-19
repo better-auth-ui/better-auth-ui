@@ -104,10 +104,16 @@ export const organizationLocalization = {
   owner: "Owner",
   /** @remarks `"Pending"` */
   pending: "Pending",
+  /** @remarks `"Next page"` */
+  nextPage: "Next page",
   /** @remarks `"Personal account"` */
   personalAccount: "Personal account",
+  /** @remarks `"Previous page"` */
+  previousPage: "Previous page",
   /** @remarks `"Rejected"` */
   rejected: "Rejected",
+  /** @remarks `"{{from}}–{{to}} of {{total}}"` */
+  paginationRange: "{{from}}–{{to}} of {{total}}",
   /** @remarks `"Return"` */
   return: "Return",
   /** @remarks `"Reject invitation"` */

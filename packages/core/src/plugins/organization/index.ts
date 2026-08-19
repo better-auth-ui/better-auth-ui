@@ -1,4 +1,5 @@
 export * from "./accept-invitation-mutation"
+export * from "./active-member-role-query"
 export * from "./active-organization-query"
 export * from "./cancel-invitation-mutation"
 export * from "./check-slug-mutation"

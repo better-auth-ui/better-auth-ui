@@ -46,7 +46,17 @@ export const organizationQueryKeys = {
     lists: (userId: string | undefined) =>
       [...organizationQueryKeys.members.all(userId), "list"] as const,
     list: <TQuery = undefined>(userId: string | undefined, query?: TQuery) =>
-      [...organizationQueryKeys.members.lists(userId), query ?? null] as const
+      [...organizationQueryKeys.members.lists(userId), query ?? null] as const,
+    /** The signed-in user's own role within an organization. */
+    activeRole: <TQuery = undefined>(
+      userId: string | undefined,
+      query?: TQuery
+    ) =>
+      [
+        ...organizationQueryKeys.members.all(userId),
+        "activeRole",
+        query ?? null
+      ] as const
   },
 
   invitations: {
