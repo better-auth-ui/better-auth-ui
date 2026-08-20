@@ -1,12 +1,14 @@
 import {
   hasMemberRole,
+  mergeOrganizationRoleLabels,
   type OrganizationAuthClient,
   type OrganizationLocalization
 } from "@better-auth-ui/core/plugins/organization"
 import { useAuth, useAuthPlugin } from "@better-auth-ui/solid"
 import {
   useActiveMemberRole,
-  useListOrganizationMembers
+  useListOrganizationMembers,
+  useListRoles
 } from "@better-auth-ui/solid/plugins/organization"
 import { ChevronUp, Filter, Search, X } from "lucide-solid"
 import {
@@ -224,6 +226,10 @@ export function OrganizationMembers(props: OrganizationMembersProps) {
   // The signed-in user need not be on the loaded page, so their own role comes
   // from a dedicated endpoint rather than from the member list.
   const activeMemberRole = useActiveMemberRole(auth.authClient)
+  const dynamicRoles = useListRoles(auth.authClient, () => ({
+    query: { organizationId: props.organizationId },
+    enabled: config.dynamicAccessControl?.enabled === true
+  }))
   const memberRows = () => (members.data?.members ?? []) as OrganizationMember[]
   const organizationPluginConfig = () =>
     auth.plugins.find((plugin) => plugin.id === organizationPlugin.id) as
@@ -252,8 +258,11 @@ export function OrganizationMembers(props: OrganizationMembersProps) {
       | undefined
   const localization = () =>
     organizationPluginConfig()?.localization ?? fallbackLocalization
-  const roles = createMemo(
-    () => organizationPluginConfig()?.roles ?? fallbackRoles
+  const roles = createMemo(() =>
+    mergeOrganizationRoleLabels(
+      organizationPluginConfig()?.roles ?? fallbackRoles,
+      dynamicRoles.data
+    )
   )
   const selectedRoleLabel = () =>
     roles()[memberRoleFilter()] ?? memberRoleFilter()

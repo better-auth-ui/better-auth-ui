@@ -69,6 +69,7 @@ This drops the following into your codebase:
 - `src/lib/auth/organization-plugin.tsx`: `organizationPlugin()` factory
 - `src/components/auth/organization/accept-invitation.tsx`: direct invitation acceptance view
 - `src/components/auth/organization/organization.tsx`: the `/organization/<path>` shell
+- `src/components/auth/organization/organization-roles.tsx`: dynamic role and permission editor
 - `src/components/auth/organization/organization-switcher.tsx`: header dropdown for switching organizations
 - `src/components/auth/organization/organization-settings.tsx`: settings tab contents (profile + danger zone + plugin cards)
 - `src/components/auth/organization/organization-people.tsx`: people tab contents (members + invitations)
@@ -969,6 +970,78 @@ Modal dialog for inviting a new member by email. Owned by `<OrganizationMembers 
 Confirmation dialog for deleting an organization (owner permission, server-side).
 
 <auto-type-table path="../../../../../../examples/start-shadcn-example/src/components/auth/organization/delete-organization-dialog.tsx" name="DeleteOrganizationDialogProps" />
+
+
+## Dynamic organization roles
+
+Enable dynamic access control in Better Auth before you enable the roles tab. The server, client, and UI must use the same resource and action keys.
+
+```ts title="lib/organization-access.ts"
+import { createAccessControl } from "better-auth/plugins/access"
+
+export const organizationStatements = {
+  project: ["create", "read", "update", "delete"]
+} as const
+
+export const organizationAccess = createAccessControl(organizationStatements)
+```
+
+```ts title="lib/auth.ts"
+import { organization } from "better-auth/plugins"
+import { organizationAccess } from "./organization-access"
+
+organization({
+  ac: organizationAccess,
+  dynamicAccessControl: { enabled: true }
+})
+```
+
+```ts title="lib/auth-client.ts"
+import { organizationClient } from "better-auth/client/plugins"
+import { organizationAccess } from "./organization-access"
+
+organizationClient({
+  ac: organizationAccess,
+  dynamicAccessControl: { enabled: true }
+})
+```
+
+Configure the labels that the permission matrix shows:
+
+```tsx title="components/providers.tsx"
+organizationPlugin({
+  dynamicAccessControl: {
+    permissions: {
+      project: {
+        label: "Projects",
+        actions: {
+          create: "Create projects",
+          read: "View projects",
+          update: "Edit projects",
+          delete: "Delete projects"
+        }
+      }
+    }
+  }
+})
+```
+
+This adds the `roles` organization tab. The tab supports role creation, editing, and deletion. Member and invitation controls include both configured roles and roles returned by Better Auth. A role cannot be deleted while a member holds it.
+
+The React hooks also expose the underlying endpoints. Always pass the organization ID:
+
+```tsx
+const roles = useListRoles(authClient, {
+  query: { organizationId }
+})
+const role = useRole(authClient, {
+  query: { organizationId, roleId }
+})
+
+const createRole = useCreateRole(authClient, organizationId)
+const updateRole = useUpdateRole(authClient, organizationId)
+const deleteRole = useDeleteRole(authClient, organizationId)
+```
 
 ## Teams and policy controls
 

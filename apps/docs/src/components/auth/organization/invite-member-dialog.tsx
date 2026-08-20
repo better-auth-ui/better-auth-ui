@@ -1,15 +1,25 @@
 "use client"
 
-import type { OrganizationAuthClient } from "@better-auth-ui/core/plugins/organization"
+import {
+  mergeOrganizationRoleLabels,
+  type OrganizationAuthClient
+} from "@better-auth-ui/core/plugins/organization"
 import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
 import {
   useActiveOrganization,
   useInviteMember,
   useListOrganizationInvitations,
+  useListRoles,
   useListTeams
 } from "@better-auth-ui/react/plugins/organization"
 import { ChevronDown, UserPlus } from "lucide-react"
-import { type SyntheticEvent, useEffect, useRef, useState } from "react"
+import {
+  type SyntheticEvent,
+  useEffect,
+  useMemo,
+  useRef,
+  useState
+} from "react"
 import { toast } from "sonner"
 import { Button, buttonVariants } from "@/components/ui/button"
 import {
@@ -58,6 +68,7 @@ export function InviteMemberDialog({
 }: InviteMemberDialogProps) {
   const { authClient, localization } = useAuth<OrganizationAuthClient>()
   const {
+    dynamicAccessControl,
     invitationLimit,
     localization: organizationLocalization,
     roles,
@@ -69,9 +80,17 @@ export function InviteMemberDialog({
     enabled: teamsEnabled
   })
   const invitations = useListOrganizationInvitations(authClient)
+  const dynamicRoles = useListRoles(authClient, {
+    query: { organizationId: activeOrganization?.id },
+    enabled: dynamicAccessControl?.enabled === true
+  })
+  const assignableRoles = useMemo(
+    () => mergeOrganizationRoleLabels(roles, dynamicRoles.data),
+    [dynamicRoles.data, roles]
+  )
 
   const [selectedRoles, setSelectedRoles] = useState(() => {
-    const fallback = pickDefaultRole(Object.keys(roles))
+    const fallback = pickDefaultRole(Object.keys(assignableRoles))
     return fallback ? [fallback] : []
   })
   const [teamId, setTeamId] = useState("")
@@ -81,7 +100,7 @@ export function InviteMemberDialog({
 
   useEffect(() => {
     setSelectedRoles((current) => {
-      const keys = Object.keys(roles)
+      const keys = Object.keys(assignableRoles)
       const kept = current.filter((entry) => keys.includes(entry))
 
       if (kept.length > 0) return kept
@@ -89,7 +108,7 @@ export function InviteMemberDialog({
       const fallback = pickDefaultRole(keys)
       return fallback ? [fallback] : []
     })
-  }, [roles])
+  }, [assignableRoles])
 
   useEffect(() => {
     const organizationChanged =
@@ -113,7 +132,7 @@ export function InviteMemberDialog({
   const isRoleValid = selectedRoles.length > 0
 
   const roleSummary = selectedRoles
-    .map((entry) => roles[entry] ?? entry)
+    .map((entry) => assignableRoles[entry] ?? entry)
     .join(", ")
 
   const toggleRole = (role: string) => {
@@ -127,7 +146,7 @@ export function InviteMemberDialog({
   const handleSubmit = (e: SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault()
 
-    if (!isRoleValid || atInvitationLimit) return
+    if (!activeOrganizationId || !isRoleValid || atInvitationLimit) return
 
     const formData = new FormData(e.target as HTMLFormElement)
     const email = formData.get("email") as string
@@ -138,6 +157,7 @@ export function InviteMemberDialog({
 
     inviteMember({
       email: email.trim(),
+      organizationId: activeOrganizationId,
       role: selectedRoles as Parameters<typeof inviteMember>[0]["role"],
       teamId: selectedTeamId
     })
@@ -216,7 +236,7 @@ export function InviteMemberDialog({
                   align="start"
                   className="w-(--radix-dropdown-menu-trigger-width)"
                 >
-                  {Object.entries(roles).map(([key, label]) => {
+                  {Object.entries(assignableRoles).map(([key, label]) => {
                     const checked = selectedRoles.includes(key)
 
                     return (

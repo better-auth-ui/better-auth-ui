@@ -196,9 +196,11 @@ export function OrganizationMemberRow(props: OrganizationMemberRowProps) {
   const session = useSession(auth.authClient)
   const user = () => props.member.user
   const permission = useHasPermission(auth.authClient, () => ({
+    organizationId: props.member.organizationId,
     permissions: { member: ["update"] }
   }))
   const deletePermission = useHasPermission(auth.authClient, () => ({
+    organizationId: props.member.organizationId,
     permissions: { member: ["delete"] }
   }))
   const updateMemberRole = useUpdateMemberRole(auth.authClient, () => ({
@@ -223,6 +225,7 @@ export function OrganizationMemberRow(props: OrganizationMemberRowProps) {
 
     updateMemberRole.mutate({
       memberId: props.member.id,
+      organizationId: props.member.organizationId,
       role: next as UpdateMemberRoleParams["role"]
     })
   }

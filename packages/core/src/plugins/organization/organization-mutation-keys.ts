@@ -49,6 +49,12 @@ export const organizationMutationKeys = {
 
   /** Key for `organization.checkSlug`. */
   checkSlug: ["auth", "organization", "checkSlug"] as const,
+  roles: {
+    all: ["auth", "organization", "role"] as const,
+    create: ["auth", "organization", "role", "create"] as const,
+    update: ["auth", "organization", "role", "update"] as const,
+    delete: ["auth", "organization", "role", "delete"] as const
+  },
   teams: {
     all: ["auth", "organization", "team"] as const,
     create: ["auth", "organization", "team", "create"] as const,

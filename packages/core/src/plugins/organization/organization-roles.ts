@@ -46,3 +46,34 @@ export function memberRoleLabels(
 ) {
   return parseMemberRoles(role).map((entry) => labels?.[entry] ?? entry)
 }
+
+export type DynamicOrganizationRole = {
+  id: string
+  role: string
+  permission: Record<string, string[]>
+}
+
+/** Merge configured labels with roles stored by Better Auth. */
+export function mergeOrganizationRoleLabels(
+  labels: Record<string, string> | undefined,
+  dynamicRoles:
+    | readonly Pick<DynamicOrganizationRole, "role">[]
+    | null
+    | undefined
+) {
+  const merged = { ...labels }
+
+  for (const dynamicRole of dynamicRoles ?? []) {
+    merged[dynamicRole.role] ??= dynamicRole.role
+  }
+
+  return merged
+}
+
+/** Return members that currently hold the supplied role. */
+export function membersWithRole<T extends { role?: string | null }>(
+  members: readonly T[] | undefined,
+  role: string
+) {
+  return (members ?? []).filter((member) => hasMemberRole(member.role, role))
+}

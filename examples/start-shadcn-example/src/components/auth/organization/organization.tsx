@@ -7,6 +7,7 @@ import type {
 import { useAuth, useAuthenticate, useAuthPlugin } from "@better-auth-ui/react"
 import { useActiveOrganization } from "@better-auth-ui/react/plugins/organization"
 import {
+  ShieldCheck as RolesIcon,
   Settings as SettingsIcon,
   UsersRound as TeamsIcon,
   User2 as UserIcon
@@ -17,6 +18,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { organizationPlugin } from "@/lib/auth/organization-plugin"
 import { cn } from "@/lib/utils"
 import { OrganizationPeople } from "./organization-people"
+import { OrganizationRoles } from "./organization-roles"
 import { OrganizationSettings } from "./organization-settings"
 import { OrganizationTeams } from "./organization-teams"
 
@@ -52,7 +54,8 @@ export function Organization({
     viewPaths: organizationViewPaths,
     slug,
     slugPrefix,
-    teams
+    teams,
+    dynamicAccessControl
   } = useAuthPlugin(organizationPlugin)
 
   const { data: activeOrganization, isPending } =
@@ -141,6 +144,23 @@ export function Organization({
             </TabsTrigger>
           )}
 
+          {dynamicAccessControl?.enabled && (
+            <TabsTrigger
+              value="roles"
+              className="gap-1"
+              onClick={() =>
+                navigate({
+                  to: slug
+                    ? `${basePaths.organization}/${slugPrefix}${slug}/${organizationViewPaths.organization.roles}`
+                    : `${basePaths.organization}/${organizationViewPaths.organization.roles}`
+                })
+              }
+            >
+              <RolesIcon className="text-muted-foreground" />
+              {organizationLocalization.roles}
+            </TabsTrigger>
+          )}
+
           {extensionTabs.map((tab) => (
             <TabsTrigger
               key={tab.id}
@@ -186,6 +206,12 @@ export function Organization({
       {teams && (
         <TabsContent value="teams" tabIndex={-1}>
           <OrganizationTeams />
+        </TabsContent>
+      )}
+
+      {dynamicAccessControl?.enabled && (
+        <TabsContent value="roles" tabIndex={-1}>
+          <OrganizationRoles organizationId={activeOrganization?.id ?? ""} />
         </TabsContent>
       )}
 

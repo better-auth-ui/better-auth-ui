@@ -2,11 +2,13 @@ import type {
   InviteMemberParams,
   OrganizationAuthClient
 } from "@better-auth-ui/core/plugins/organization"
+import { mergeOrganizationRoleLabels } from "@better-auth-ui/core/plugins/organization"
 import { useAuth, useAuthPlugin } from "@better-auth-ui/solid"
 import {
   useActiveOrganization,
   useInviteMember,
   useListOrganizationInvitations,
+  useListRoles,
   useListTeams
 } from "@better-auth-ui/solid/plugins/organization"
 import { createEffect, createMemo, createSignal, For, on, Show } from "solid-js"
@@ -44,7 +46,13 @@ export function InviteMemberDialog(props: InviteMemberDialogProps) {
   const auth = useAuth<OrganizationAuthClient>()
   const activeOrganization = useActiveOrganization(auth.authClient)
   const config = useAuthPlugin(organizationPlugin)
-  const roles = createMemo(() => config.roles)
+  const dynamicRoles = useListRoles(auth.authClient, () => ({
+    query: { organizationId: activeOrganization.data?.id },
+    enabled: config.dynamicAccessControl?.enabled === true
+  }))
+  const roles = createMemo(() =>
+    mergeOrganizationRoleLabels(config.roles, dynamicRoles.data)
+  )
   const teams = useListTeams(auth.authClient, () => ({
     query: { organizationId: activeOrganization.data?.id },
     enabled: config.teams

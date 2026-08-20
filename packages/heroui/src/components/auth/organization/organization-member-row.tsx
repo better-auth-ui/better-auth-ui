@@ -1,11 +1,13 @@
 import {
   memberRoleLabels,
+  mergeOrganizationRoleLabels,
   type OrganizationAuthClient,
   parseMemberRoles
 } from "@better-auth-ui/core/plugins/organization"
 import { useAuth, useAuthPlugin, useSession } from "@better-auth-ui/react"
 import {
   useHasPermission,
+  useListRoles,
   useUpdateMemberRole
 } from "@better-auth-ui/react/plugins/organization"
 import { ArrowRightFromSquare, Pencil, TrashBin } from "@gravity-ui/icons"
@@ -31,18 +33,27 @@ export function OrganizationMemberRow({
   organization
 }: OrganizationMemberRowProps) {
   const { authClient } = useAuth()
-  const { localization: organizationLocalization, roles } =
-    useAuthPlugin(organizationPlugin)
+  const {
+    dynamicAccessControl,
+    localization: organizationLocalization,
+    roles
+  } = useAuthPlugin(organizationPlugin)
 
   const { data: session } = useSession(authClient)
+  const dynamicRoles = useListRoles(authClient as OrganizationAuthClient, {
+    query: { organizationId: organization.id },
+    enabled: dynamicAccessControl?.enabled === true
+  })
 
   const { data: hasUpdatePermission, isPending: updatePermissionPending } =
     useHasPermission(authClient as OrganizationAuthClient, {
+      organizationId: organization.id,
       permissions: { member: ["update"] }
     })
 
   const { data: hasDeletePermission, isPending: deletePermissionPending } =
     useHasPermission(authClient as OrganizationAuthClient, {
+      organizationId: organization.id,
       permissions: { member: ["delete"] }
     })
 
@@ -55,9 +66,10 @@ export function OrganizationMemberRow({
 
   // Better Auth persists multiple roles as one comma-joined string.
   const memberRoles = parseMemberRoles(member.role)
-  const roleLabel = memberRoleLabels(member.role, roles).join(", ")
+  const mergedRoles = mergeOrganizationRoleLabels(roles, dynamicRoles.data)
+  const roleLabel = memberRoleLabels(member.role, mergedRoles).join(", ")
 
-  const assignableRoles = Object.entries(roles).filter(
+  const assignableRoles = Object.entries(mergedRoles).filter(
     ([key]) => isOwner || key !== "owner"
   )
 
@@ -107,7 +119,11 @@ export function OrganizationMemberRow({
                     // clear the last one.
                     if (next.length === 0) return
 
-                    updateMemberRole({ memberId: member.id, role: next })
+                    updateMemberRole({
+                      memberId: member.id,
+                      organizationId: organization.id,
+                      role: next
+                    })
                   }}
                 >
                   {assignableRoles.map(([role, label]) => (

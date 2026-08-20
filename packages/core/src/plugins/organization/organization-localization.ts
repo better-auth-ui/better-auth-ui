@@ -162,7 +162,23 @@ export const organizationLocalization = {
   limitReached: "Limit reached",
   organizationLimitReached: "You have reached the organization limit.",
   membershipLimitReached: "This organization has reached its member limit.",
-  invitationLimitReached: "This organization has reached its invitation limit."
+  invitationLimitReached: "This organization has reached its invitation limit.",
+  roles: "Roles",
+  rolesDescription: "Create roles and choose what each role can do.",
+  createRole: "Create role",
+  editRole: "Edit role",
+  deleteRole: "Delete role",
+  deleteRoleDescription:
+    "Delete this role permanently. Members must move to another role first.",
+  roleName: "Role name",
+  permissions: "Permissions",
+  noRoles: "No custom roles",
+  noRolesDescription: "Create a role to define custom organization access.",
+  roleCreated: "Role created",
+  roleUpdated: "Role updated",
+  roleDeleted: "Role deleted",
+  roleInUse: "This role is assigned to {{count}} member(s).",
+  roleNamePlaceholder: "support-agent"
 }
 
 export type OrganizationLocalization = typeof organizationLocalization

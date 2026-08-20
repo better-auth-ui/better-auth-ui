@@ -101,6 +101,19 @@ export const organizationQueryKeys = {
       ] as const
   },
 
+  roles: {
+    all: (userId: string | undefined) =>
+      [...organizationQueryKeys.all(userId), "roles"] as const,
+    lists: (userId: string | undefined) =>
+      [...organizationQueryKeys.roles.all(userId), "list"] as const,
+    list: <TQuery = undefined>(userId: string | undefined, query?: TQuery) =>
+      [...organizationQueryKeys.roles.lists(userId), query ?? null] as const,
+    details: (userId: string | undefined) =>
+      [...organizationQueryKeys.roles.all(userId), "detail"] as const,
+    detail: <TQuery = undefined>(userId: string | undefined, query?: TQuery) =>
+      [...organizationQueryKeys.roles.details(userId), query ?? null] as const
+  },
+
   teams: {
     all: (userId: string | undefined) =>
       [...organizationQueryKeys.all(userId), "teams"] as const,

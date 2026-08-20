@@ -16,6 +16,8 @@ export interface OrganizationViewPaths {
   people: string
   /** Team management. @default "teams" */
   teams: string
+  /** Dynamic role management. @default "roles" */
+  roles: string
 }
 
 /** Valid organization management tab / route key. */

@@ -2,6 +2,7 @@ import type { OrganizationAuthClient } from "@better-auth-ui/core/plugins/organi
 import { useAuth, useAuthPlugin } from "@better-auth-ui/solid"
 import { useActiveOrganization } from "@better-auth-ui/solid/plugins/organization"
 import {
+  ShieldCheck as RolesIcon,
   Settings as SettingsIcon,
   UsersRound as TeamsIcon,
   Users as UsersIcon
@@ -13,6 +14,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { organizationPlugin } from "@/lib/auth/organization-plugin"
 import { createOrganizationPath } from "./organization-path"
 import { OrganizationPeople } from "./organization-people"
+import { OrganizationRoles } from "./organization-roles"
 import { OrganizationSettings } from "./organization-settings"
 import { OrganizationTeams } from "./organization-teams"
 
@@ -58,6 +60,12 @@ export function Organization(props: OrganizationProps) {
             {config.localization.teams}
           </TabsTrigger>
         </Show>
+        <Show when={config.dynamicAccessControl?.enabled}>
+          <TabsTrigger value={config.viewPaths.organization.roles}>
+            <RolesIcon class="text-muted-foreground" />
+            {config.localization.roles}
+          </TabsTrigger>
+        </Show>
         <For each={extensionTabs()}>
           {(tab) => (
             <TabsTrigger value={tab.path}>
@@ -101,6 +109,14 @@ export function Organization(props: OrganizationProps) {
                 tabIndex={-1}
               >
                 <OrganizationTeams />
+              </TabsContent>
+            </Show>
+            <Show when={config.dynamicAccessControl?.enabled}>
+              <TabsContent
+                value={config.viewPaths.organization.roles}
+                tabIndex={-1}
+              >
+                <OrganizationRoles organizationId={currentOrganization().id} />
               </TabsContent>
             </Show>
             <For each={extensionTabs()}>

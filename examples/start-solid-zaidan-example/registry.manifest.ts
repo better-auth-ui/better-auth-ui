@@ -1013,6 +1013,9 @@ export const solidRegistryManifest = {
           "src/components/auth/organization/organization-teams.tsx"
         ),
         componentFile(
+          "src/components/auth/organization/organization-roles.tsx"
+        ),
+        componentFile(
           "src/components/auth/organization/organization-profile.tsx"
         ),
         componentFile("src/components/auth/organization/organization-logo.tsx"),

@@ -16,10 +16,31 @@ describe("organizationPlugin", () => {
         organization: {
           settings: "settings",
           people: "people",
-          teams: "teams"
+          teams: "teams",
+          roles: "roles"
         }
       }
     })
+  })
+
+  it("configures dynamic access control without enabling it by default", () => {
+    expect(organizationPlugin().dynamicAccessControl).toBeUndefined()
+
+    const permissions = {
+      project: {
+        label: "Projects",
+        actions: { create: "Create", read: "Read" }
+      }
+    }
+    const additionalFields = [
+      { name: "color", label: "Color", type: "string" as const }
+    ]
+
+    expect(
+      organizationPlugin({
+        dynamicAccessControl: { permissions, additionalFields }
+      }).dynamicAccessControl
+    ).toEqual({ enabled: true, permissions, additionalFields })
   })
 
   it("exposes team and policy controls", () => {

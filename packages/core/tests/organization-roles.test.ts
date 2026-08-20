@@ -3,6 +3,8 @@ import {
   formatMemberRoles,
   hasMemberRole,
   memberRoleLabels,
+  membersWithRole,
+  mergeOrganizationRoleLabels,
   parseMemberRoles
 } from "../src/plugins/organization"
 
@@ -43,5 +45,32 @@ describe("formatMemberRoles", () => {
       "admin",
       "member"
     ])
+  })
+})
+
+describe("dynamic organization roles", () => {
+  it("merges dynamic role names without replacing configured labels", () => {
+    expect(
+      mergeOrganizationRoleLabels(
+        { admin: "Administrator", auditor: "Audit team" },
+        [{ role: "auditor" }, { role: "support" }]
+      )
+    ).toEqual({
+      admin: "Administrator",
+      auditor: "Audit team",
+      support: "support"
+    })
+  })
+
+  it("finds every member that holds a role in a multi-role value", () => {
+    const members = [
+      { id: "one", role: "admin,support" },
+      { id: "two", role: "member" },
+      { id: "three", role: "support" }
+    ]
+
+    expect(
+      membersWithRole(members, "support").map((member) => member.id)
+    ).toEqual(["one", "three"])
   })
 })

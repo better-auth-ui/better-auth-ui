@@ -47,6 +47,7 @@ export type OrganizationPluginOptions = {
    * - `organization.settings` — segment for the `/organization/...` profile and danger zone tab (default `"settings"`).
    * - `organization.people` — segment for the `/organization/...` members and invitations tab (default `"people"`).
    * - `organization.teams` — segment for the `/organization/...` teams tab (default `"teams"`).
+   * - `organization.roles` — segment for the dynamic roles tab (default `"roles"`).
    */
   viewPaths?: {
     auth?: {
@@ -83,6 +84,18 @@ export type OrganizationPluginOptions = {
    * @remarks `Record<string, string>`
    */
   additionalRoles?: Record<string, string>
+  /**
+   * Enable runtime organization roles and configure the permission editor.
+   * The Better Auth client must also enable `dynamicAccessControl`.
+   */
+  dynamicAccessControl?: {
+    /** @default true */
+    enabled?: boolean
+    /** Resources and actions available in the role permission matrix. */
+    permissions: OrganizationPermissionRegistry
+    /** Additional fields rendered when a dynamic role is created or edited. */
+    additionalFields?: AdditionalFields
+  }
   slug?: string | null
   /**
    * Prefix prepended to organization slugs.
@@ -102,6 +115,18 @@ export type OrganizationPluginOptions = {
   /** Enable Better Auth team management controls. @default false */
   teams?: boolean
 }
+
+export type OrganizationPermissionResource = {
+  /** Resource label shown above its actions. Defaults to the resource key. */
+  label?: string
+  /** Map of Better Auth action keys to display labels. */
+  actions: Record<string, string>
+}
+
+export type OrganizationPermissionRegistry = Record<
+  string,
+  OrganizationPermissionResource
+>
 
 const resolvePolicyLimit = (limit?: number) =>
   limit !== undefined && Number.isSafeInteger(limit) && limit >= 0
@@ -134,6 +159,14 @@ export const organizationPlugin = createAuthPlugin(
         ...options.additionalRoles
       },
       additionalFields: options.additionalFields ?? [],
+      dynamicAccessControl: options.dynamicAccessControl
+        ? {
+            enabled: options.dynamicAccessControl.enabled ?? true,
+            permissions: options.dynamicAccessControl.permissions,
+            additionalFields:
+              options.dynamicAccessControl.additionalFields ?? []
+          }
+        : undefined,
       organizationLimit: resolvePolicyLimit(options.organizationLimit),
       membershipLimit: resolvePolicyLimit(options.membershipLimit),
       invitationLimit: resolvePolicyLimit(options.invitationLimit),
@@ -151,7 +184,8 @@ export const organizationPlugin = createAuthPlugin(
         organization: {
           settings: options.viewPaths?.organization?.settings ?? "settings",
           people: options.viewPaths?.organization?.people ?? "people",
-          teams: options.viewPaths?.organization?.teams ?? "teams"
+          teams: options.viewPaths?.organization?.teams ?? "teams",
+          roles: options.viewPaths?.organization?.roles ?? "roles"
         }
       }
     }

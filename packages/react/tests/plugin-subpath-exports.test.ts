@@ -94,6 +94,11 @@ describe("React plugin subpath exports", () => {
     expect(organization).toHaveProperty("useRemoveTeam")
     expect(organization).toHaveProperty("useAddTeamMember")
     expect(organization).toHaveProperty("useRemoveTeamMember")
+    expect(organization).toHaveProperty("useListRoles")
+    expect(organization).toHaveProperty("useRole")
+    expect(organization).toHaveProperty("useCreateRole")
+    expect(organization).toHaveProperty("useUpdateRole")
+    expect(organization).toHaveProperty("useDeleteRole")
   })
 
   it("keeps core-owned mutation factories out of framework plugin entrypoints", () => {
