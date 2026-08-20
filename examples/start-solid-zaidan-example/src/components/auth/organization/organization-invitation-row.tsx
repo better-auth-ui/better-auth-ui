@@ -132,18 +132,18 @@ export function OrganizationInvitationRow(
               disabled={resendInvitation.isPending}
               onClick={() =>
                 resendInvitation.mutate({
-                  email: props.invitation.email ?? "",
-                  organizationId: props.invitation.organizationId,
-                  resend: true,
-                  role: (props.invitation.role ?? "member") as Parameters<
-                    typeof resendInvitation.mutate
-                  >[0]["role"],
                   ...Object.fromEntries(
                     config.modelFields.invitation.flatMap((field) => {
                       const value = props.invitation[field.name]
                       return value === undefined ? [] : [[field.name, value]]
                     })
-                  )
+                  ),
+                  email: props.invitation.email ?? "",
+                  organizationId: props.invitation.organizationId,
+                  resend: true,
+                  role: (props.invitation.role ?? "member") as Parameters<
+                    typeof resendInvitation.mutate
+                  >[0]["role"]
                 })
               }
               size="icon-sm"

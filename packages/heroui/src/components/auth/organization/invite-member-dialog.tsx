@@ -135,7 +135,14 @@ export function InviteMemberDialog({
     if (!activeOrganizationId || !isRoleValid || invitationLimitReached) return
 
     const formData = new FormData(e.currentTarget)
-    const email = formData.get("email") as string
+    const invitationEmail = (formData.get("email") as string).trim()
+    const invitationRoles = [...selectedRoles] as Parameters<
+      typeof inviteMember
+    >[0]["role"]
+    const availableTeamIds = new Set(teams.data?.map((team) => team.id))
+    const selectedTeamIds = teamIds.filter((teamId) =>
+      availableTeamIds.has(teamId)
+    )
 
     setIsSubmitting(true)
     let invitationValues: Record<string, unknown>
@@ -150,18 +157,13 @@ export function InviteMemberDialog({
       return
     }
 
-    const availableTeamIds = new Set(teams.data?.map((team) => team.id))
-    const selectedTeamIds = teamIds.filter((teamId) =>
-      availableTeamIds.has(teamId)
-    )
-
     inviteMember(
       {
-        email: email.trim(),
+        ...invitationValues,
+        email: invitationEmail,
         organizationId: activeOrganizationId,
-        role: selectedRoles as Parameters<typeof inviteMember>[0]["role"],
-        ...(selectedTeamIds.length ? { teamId: selectedTeamIds } : {}),
-        ...invitationValues
+        role: invitationRoles,
+        ...(selectedTeamIds.length ? { teamId: selectedTeamIds } : {})
       },
       { onSettled: () => setIsSubmitting(false) }
     )

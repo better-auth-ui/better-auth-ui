@@ -211,11 +211,18 @@ export function formatAdditionalFieldValue(value: unknown): string | undefined {
   if (value === null || value === undefined || value === "") return undefined
   if (value instanceof Date) return value.toLocaleString()
   if (typeof value === "string") {
+    const dateOnly = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value)
+    if (dateOnly) {
+      const [, year, month, day] = dateOnly
+      return new Date(
+        Number(year),
+        Number(month) - 1,
+        Number(day)
+      ).toLocaleString()
+    }
+
     const parsed = new Date(value)
-    if (
-      /^\d{4}-\d{2}-\d{2}(T|$)/.test(value) &&
-      !Number.isNaN(parsed.getTime())
-    ) {
+    if (/^\d{4}-\d{2}-\d{2}T/.test(value) && !Number.isNaN(parsed.getTime())) {
       return parsed.toLocaleString()
     }
     return value

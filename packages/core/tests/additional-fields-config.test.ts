@@ -3,6 +3,7 @@ import { describe, expect, it, vi } from "vitest"
 import {
   type AdditionalField,
   fieldsWithModelValues,
+  formatAdditionalFieldValue,
   parseAdditionalFieldValue,
   parseAdditionalFieldValues,
   resolveInputType
@@ -43,6 +44,20 @@ describe("model field helpers", () => {
       defaultValue: "green"
     })
     expect(fields[0]?.defaultValue).toBe("blue")
+  })
+
+  it("formats date-only values as local calendar dates", () => {
+    const previousTimezone = process.env.TZ
+    process.env.TZ = "America/Los_Angeles"
+
+    try {
+      expect(formatAdditionalFieldValue("2024-06-15")).toBe(
+        new Date(2024, 5, 15).toLocaleString()
+      )
+    } finally {
+      if (previousTimezone === undefined) delete process.env.TZ
+      else process.env.TZ = previousTimezone
+    }
   })
 })
 

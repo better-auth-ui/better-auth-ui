@@ -113,7 +113,20 @@ export function InviteMemberDialog(props: InviteMemberDialogProps) {
       (invitations.data?.filter((invitation) => invitation.status === "pending")
         .length ?? 0) >= config.invitationLimit
 
-    if (!email().trim() || selectedRoles().length === 0 || atInvitationLimit)
+    const organizationId = activeOrganization.data?.id
+    const invitationEmail = email().trim()
+    const invitationRoles = [...selectedRoles()] as InviteMemberParams["role"]
+    const currentTeamId = teamId()
+    const selectedTeamId = teams.data?.some((team) => team.id === currentTeamId)
+      ? currentTeamId
+      : undefined
+
+    if (
+      !organizationId ||
+      !invitationEmail ||
+      invitationRoles.length === 0 ||
+      atInvitationLimit
+    )
       return
 
     const formData = new FormData(event.currentTarget as HTMLFormElement)
@@ -130,16 +143,12 @@ export function InviteMemberDialog(props: InviteMemberDialogProps) {
       return
     }
 
-    const selectedTeamId = teams.data?.some((team) => team.id === teamId())
-      ? teamId()
-      : undefined
-
     const payload = {
-      email: email().trim(),
-      organizationId: activeOrganization.data?.id,
+      ...invitationValues,
+      email: invitationEmail,
+      organizationId,
       teamId: selectedTeamId,
-      role: selectedRoles() as InviteMemberParams["role"],
-      ...invitationValues
+      role: invitationRoles
     } satisfies InviteMemberParams
 
     inviteMember.mutate(payload, { onSettled: () => setIsSubmitting(false) })

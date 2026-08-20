@@ -126,12 +126,6 @@ export function OrganizationInvitationRow({
               disabled={resendPending}
               onClick={() =>
                 resendInvitation({
-                  email: invitation.email,
-                  organizationId: invitation.organizationId,
-                  role: invitation.role as Parameters<
-                    typeof resendInvitation
-                  >[0]["role"],
-                  resend: true,
                   ...Object.fromEntries(
                     invitationFields.flatMap((field) => {
                       const value = (
@@ -139,7 +133,13 @@ export function OrganizationInvitationRow({
                       )[field.name]
                       return value === undefined ? [] : [[field.name, value]]
                     })
-                  )
+                  ),
+                  email: invitation.email,
+                  organizationId: invitation.organizationId,
+                  role: invitation.role as Parameters<
+                    typeof resendInvitation
+                  >[0]["role"],
+                  resend: true
                 })
               }
               aria-label={organizationLocalization.resendInvitation}
