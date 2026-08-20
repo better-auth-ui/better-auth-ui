@@ -363,7 +363,8 @@ export const solidRegistryManifest = {
         betterAuthSolidRegistryDependency("sign-up")
       ],
       files: [
-        libFile("src/lib/auth/oauth-provider-plugin.ts"),
+        libFile("src/lib/auth/oauth-provider-plugin.tsx"),
+        componentFile("src/components/auth/oauth-provider/oauth-clients.tsx"),
         componentFile("src/components/auth/oauth-provider/oauth-consent.tsx"),
         componentFile("src/components/auth/oauth-provider/oauth-sign-up.tsx"),
         componentFile(
@@ -398,6 +399,66 @@ export const solidRegistryManifest = {
         libFile("src/lib/auth/device-authorization-plugin.ts"),
         componentFile(
           "src/components/auth/device-authorization/device-authorization.tsx"
+        ),
+        ...zaidanInteractiveSupportFiles
+      ]
+    }),
+    item({
+      name: "siwe",
+      type: "registry:component",
+      title: "Solid Sign In With Ethereum",
+      description:
+        "Solid wallet sign-in button and linked-wallet management for Better Auth's SIWE plugin.",
+      files: [
+        libFile("src/lib/auth/siwe-plugin.ts"),
+        componentFile("src/components/auth/siwe/sign-in-ethereum-button.tsx"),
+        componentFile("src/components/auth/siwe/wallet-accounts.tsx"),
+        ...zaidanInteractiveSupportFiles
+      ]
+    }),
+    item({
+      name: "sso",
+      type: "registry:component",
+      title: "Solid SSO",
+      description:
+        "Solid email-first sign-in that discovers an organization's SSO provider before offering fallback methods.",
+      registryDependencies: [
+        betterAuthSolidRegistryDependency("auth-provider"),
+        betterAuthSolidRegistryDependency("sign-in")
+      ],
+      files: [
+        libFile("src/lib/auth/sso-plugin.ts"),
+        libFile("src/lib/auth/use-sign-in-continuation.ts"),
+        libFile("src/lib/auth/two-factor-methods.ts"),
+        componentFile("src/components/auth/sso/email-first-sign-in.tsx"),
+        componentFile("src/components/auth/provider-button.tsx"),
+        componentFile("src/components/auth/provider-buttons.tsx"),
+        ...zaidanFormSupportFiles
+      ]
+    }),
+    item({
+      name: "billing",
+      type: "registry:component",
+      title: "Solid Billing",
+      description:
+        "Solid provider-agnostic billing settings: plans, subscription state, seats, and usage.",
+      files: [
+        libFile("src/lib/auth/billing-plugin.tsx"),
+        componentFile("src/components/auth/billing/billing-settings.tsx"),
+        ...zaidanInteractiveSupportFiles
+      ]
+    }),
+    item({
+      name: "agent-auth",
+      type: "registry:component",
+      title: "Solid Agent Auth",
+      description:
+        "Solid capability approval page and agent authorization management for Better Auth's agent-auth plugin.",
+      files: [
+        libFile("src/lib/auth/agent-auth-plugin.ts"),
+        componentFile("src/components/auth/agent-auth/agent-approval.tsx"),
+        componentFile(
+          "src/components/auth/agent-auth/agent-authorizations.tsx"
         ),
         ...zaidanInteractiveSupportFiles
       ]

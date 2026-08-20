@@ -1,0 +1,110 @@
+---
+title: Agent Auth
+description: Review agent capability requests and revoke granted access from Solid/Zaidan.
+---
+
+import { Callout } from 'fumadocs-ui/components/callout'
+import { Step, Steps } from 'fumadocs-ui/components/steps'
+
+The Agent Auth plugin adds the application-owned UI that the protocol itself does not render. The approval page shows the requesting agent, its host, its mode, the capabilities it wants, and the approval strength each one needs. Users allow a subset or deny outright. A security settings card then lists agents and revokes individual active grants.
+
+## Setup
+
+<Steps>
+<Step>
+### Configure the Better Auth server
+
+Point the approval page at the BAUI route and describe each capability.
+
+```ts title="src/lib/auth.ts"
+import { agentAuth } from "@better-auth/agent-auth" // [!code highlight]
+import { betterAuth } from "better-auth"
+
+export const auth = betterAuth({
+  // ...
+  plugins: [
+    agentAuth({ // [!code highlight]
+      deviceAuthorizationPage: "/auth/agent-approval",
+      capabilities: [
+        {
+          name: "invoices:read",
+          description: "Read invoices and payment status",
+          approvalStrength: "session"
+        },
+        {
+          name: "invoices:pay",
+          description: "Pay an invoice with a saved method",
+          approvalStrength: "webauthn"
+        }
+      ]
+    })
+  ]
+})
+```
+
+</Step>
+<Step>
+### Install the UI plugin
+
+```npm
+npx shadcn@latest add https://better-auth-ui.com/r/solid/agent-auth.json
+```
+
+</Step>
+<Step>
+### Register the plugin
+
+```tsx title="src/components/providers.tsx"
+import { AuthProvider } from "@/components/auth/auth-provider"
+import { agentAuthPlugin } from "@/lib/auth/agent-auth-plugin" // [!code highlight]
+import { authClient } from "@/lib/auth-client"
+
+export function Providers(props: { children?: JSX.Element }) {
+  return (
+    <AuthProvider
+      authClient={authClient}
+      navigate={navigate}
+      plugins={[agentAuthPlugin({ adapter, grants: true })]} // [!code highlight]
+    >
+      {props.children}
+    </AuthProvider>
+  )
+}
+```
+
+`grants: true` adds the `<AgentAuthorizations />` security card. Leave it off if you only need the approval page.
+
+</Step>
+</Steps>
+
+<Callout type="warn">
+  Approval strength is the server's decision, not the UI's. The badge tells the user what a capability requires; the server still enforces it.
+</Callout>
+
+## The approval page
+
+The page reads `agent_id`, and optionally `approval_id` and `code`, from the query string. Without `agent_id` it renders an invalid-request state rather than guessing. Signed-out users are sent to sign-in with a `redirectTo` back to the full approval URL, so the request survives the round trip.
+
+Capabilities start fully selected. Clearing one removes it from the approval, and clearing all of them disables the allow button.
+
+## Runtime prerequisites
+
+- Server: `agentAuth()` from `@better-auth/agent-auth`, with `deviceAuthorizationPage` pointing at your route.
+- App: an `AgentAuthAdapter` instance.
+- Runtime API: agent query and mutation options from [Solid runtime APIs](/docs/solid).
+
+## Copied files
+
+- `src/lib/auth/agent-auth-plugin.ts`
+- `src/components/auth/agent-auth/agent-approval.tsx`
+- `src/components/auth/agent-auth/agent-authorizations.tsx`
+
+After install both views are yours. Group capabilities differently, add your own risk copy, or render the constraints payload instead of the raw JSON.
+
+## Options
+
+<auto-type-table path="../../../../../../packages/core/src/plugins/agent-auth/agent-auth-plugin.ts" name="AgentAuthPluginOptions" />
+
+## Localization
+
+<auto-type-table path="../../../../../../packages/core/src/plugins/agent-auth/agent-auth-localization.ts" name="AgentAuthLocalization" />

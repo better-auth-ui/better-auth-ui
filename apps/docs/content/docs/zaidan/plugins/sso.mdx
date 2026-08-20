@@ -1,0 +1,105 @@
+---
+title: SSO and Email-First Sign-In
+description: Discover organization SSO from an email address, then fall back to your other sign-in methods.
+---
+
+import { Step, Steps } from 'fumadocs-ui/components/steps'
+
+The SSO plugin replaces the standard sign-in form with an email-first flow. The user types an email, BAUI asks Better Auth whether an organization claims that domain, and redirects to the identity provider when one does. When none does, the same view reveals password, magic link, email OTP, and every other registered sign-in method.
+
+## Setup
+
+<Steps>
+<Step>
+### Configure the Better Auth server
+
+Install `@better-auth/sso`, add `sso()` to the server, and apply the plugin schema. See the [Better Auth SSO guide](https://www.better-auth.com/docs/plugins/sso) for provider setup.
+
+```ts title="src/lib/auth.ts"
+import { betterAuth } from "better-auth"
+import { sso } from "@better-auth/sso" // [!code highlight]
+
+export const auth = betterAuth({
+  // ...
+  plugins: [sso()] // [!code highlight]
+})
+```
+
+</Step>
+<Step>
+### Add the matching client plugin
+
+```ts title="src/lib/auth-client.ts"
+import { ssoClient } from "@better-auth/sso/client" // [!code highlight]
+import { createAuthClient } from "better-auth/solid"
+
+export const authClient = createAuthClient({
+  plugins: [ssoClient()] // [!code highlight]
+})
+```
+
+</Step>
+<Step>
+### Install the UI plugin
+
+```npm
+npx shadcn@latest add https://better-auth-ui.com/r/solid/sso.json
+```
+
+</Step>
+<Step>
+### Register the plugin
+
+```tsx title="src/components/providers.tsx"
+import { AuthProvider } from "@/components/auth/auth-provider"
+import { ssoPlugin } from "@/lib/auth/sso-plugin" // [!code highlight]
+import { authClient } from "@/lib/auth-client"
+
+export function Providers(props: { children?: JSX.Element }) {
+  return (
+    <AuthProvider
+      authClient={authClient}
+      navigate={navigate}
+      plugins={[ssoPlugin()]} // [!code highlight]
+    >
+      {props.children}
+    </AuthProvider>
+  )
+}
+```
+
+`ssoPlugin()` overrides the `signIn` view by default. Pass `ssoPlugin({ emailFirst: false })` to keep the standard form and use SSO only through your own UI.
+
+</Step>
+</Steps>
+
+## How discovery resolves
+
+- A provider match redirects the browser straight to the identity provider.
+- A 404 means no organization claims the domain. The email is remembered, the view moves to the fallback step, and the user continues with whatever methods you registered.
+- Any other failure shows an error and leaves the user on the email step so they can retry.
+
+## Runtime prerequisites
+
+- Server: `sso()` from `@better-auth/sso`, with at least one registered provider.
+- Client: `ssoClient()` from `@better-auth/sso/client`.
+- Runtime API: `signInSsoOptions` from [Solid runtime APIs](/docs/solid).
+
+## Copied files
+
+- `src/lib/auth/sso-plugin.ts`
+- `src/lib/auth/use-sign-in-continuation.ts`
+- `src/lib/auth/two-factor-methods.ts`
+- `src/components/auth/sso/email-first-sign-in.tsx`
+- `src/components/auth/provider-button.tsx`
+- `src/components/auth/provider-buttons.tsx`
+
+After install the flow is yours. Reorder the fallback methods, change the copy on the discovery step, or skip the fallback entirely for a tenant that must use SSO.
+
+## Options
+
+<auto-type-table path="../../../../../../packages/core/src/plugins/sso/sso-plugin.ts" name="SsoPluginOptions" />
+
+## Localization
+
+<auto-type-table path="../../../../../../packages/core/src/plugins/sso/sso-localization.ts" name="SsoLocalization" />

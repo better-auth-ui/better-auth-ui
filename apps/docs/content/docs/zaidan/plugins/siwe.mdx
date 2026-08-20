@@ -1,0 +1,129 @@
+---
+title: Sign in with Ethereum
+description: Add ERC-4361 wallet sign-in and connected wallet settings to your Solid/Zaidan app.
+---
+
+import { Callout } from 'fumadocs-ui/components/callout'
+import { Step, Steps } from 'fumadocs-ui/components/steps'
+
+The SIWE plugin adds wallet sign-in backed by Better Auth's `siwe()` plugin, with optional email collection and a security settings card for connected wallets.
+
+It contributes:
+
+- A "Continue with Ethereum" button on sign-in views
+- An optional email dialog when the plugin's `email` mode is `"optional"` or `"required"`
+- A `<WalletAccounts />` security card for connecting, promoting, and removing wallets
+
+## Setup
+
+<Steps>
+<Step>
+### Configure the Better Auth server
+
+Add `siwe()` with a secure nonce generator and an ERC-4361 verifier, then apply the plugin schema.
+
+```ts title="src/lib/auth.ts"
+import { betterAuth } from "better-auth"
+import { siwe } from "better-auth/plugins" // [!code highlight]
+import { verifyMessage } from "viem"
+import { generateSiweNonce } from "viem/siwe"
+
+export const auth = betterAuth({
+  // ...
+  plugins: [
+    siwe({ // [!code highlight]
+      domain: "app.example.com",
+      getNonce: async () => generateSiweNonce(),
+      verifyMessage: async ({ message, signature, address }) =>
+        verifyMessage({
+          address: address as `0x${string}`,
+          message,
+          signature: signature as `0x${string}`
+        })
+    })
+  ]
+})
+```
+
+</Step>
+<Step>
+### Add the matching client plugin
+
+```ts title="src/lib/auth-client.ts"
+import { createAuthClient } from "better-auth/solid"
+import { siweClient } from "better-auth/client/plugins" // [!code highlight]
+
+export const authClient = createAuthClient({
+  plugins: [siweClient()] // [!code highlight]
+})
+```
+
+</Step>
+<Step>
+### Install the UI plugin
+
+```npm
+npx shadcn@latest add https://better-auth-ui.com/r/solid/siwe.json
+```
+
+</Step>
+<Step>
+### Register the plugin
+
+`connector` is yours to supply. It bridges the plugin to whichever wallet library you use, so BAUI never depends on one.
+
+```tsx title="src/components/providers.tsx"
+import { AuthProvider } from "@/components/auth/auth-provider"
+import { siwePlugin } from "@/lib/auth/siwe-plugin" // [!code highlight]
+import { authClient } from "@/lib/auth-client"
+
+export function Providers(props: { children?: JSX.Element }) {
+  return (
+    <AuthProvider
+      authClient={authClient}
+      navigate={navigate}
+      plugins={[
+        siwePlugin({ // [!code highlight]
+          connector,
+          domain: "app.example.com",
+          uri: "https://app.example.com"
+        })
+      ]}
+    >
+      {props.children}
+    </AuthProvider>
+  )
+}
+```
+
+Pass `walletManager` as well to render the `<WalletAccounts />` security card. Without it the plugin only contributes the sign-in button.
+
+</Step>
+</Steps>
+
+<Callout type="warn">
+  `domain` and `uri` must match what the server verifies. A mismatch makes every signature fail verification.
+</Callout>
+
+## Runtime prerequisites
+
+- Server: `siwe()` from `better-auth/plugins`, with `getNonce` and `verifyMessage`.
+- Client: `siweClient()` from `better-auth/client/plugins`.
+- App: a wallet connector, and a wallet manager if you want the settings card.
+- Runtime API: SIWE query and mutation options from [Solid runtime APIs](/docs/solid).
+
+## Copied files
+
+- `src/lib/auth/siwe-plugin.ts`
+- `src/components/auth/siwe/sign-in-ethereum-button.tsx`
+- `src/components/auth/siwe/wallet-accounts.tsx`
+
+After install these files are yours. Restyle the wallet rows, change how addresses are shortened, or swap the dialog for your wallet library's own modal.
+
+## Options
+
+<auto-type-table path="../../../../../../packages/core/src/plugins/siwe/siwe-plugin.ts" name="SiwePluginOptions" />
+
+## Localization
+
+<auto-type-table path="../../../../../../packages/core/src/plugins/siwe/siwe-localization.ts" name="SiweLocalization" />

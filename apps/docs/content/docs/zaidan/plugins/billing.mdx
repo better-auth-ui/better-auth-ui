@@ -1,0 +1,100 @@
+---
+title: Billing
+description: Add plans, subscriptions, checkout, seats, and usage to Solid/Zaidan settings without coupling the UI to one provider.
+---
+
+import { Callout } from 'fumadocs-ui/components/callout'
+import { Step, Steps } from 'fumadocs-ui/components/steps'
+
+The billing plugin adds a billing tab to personal or organization settings. Every view reads a provider-neutral `BillingAdapter`, so the same UI works against Stripe, Polar, or anything else you write an adapter for.
+
+The UI covers:
+
+- Pricing plans with monthly, yearly, and one-time prices
+- Current subscription status and renewal or end date
+- Checkout and plan changes
+- Billing portal access
+- Cancellation and restoration
+- Seat management
+- Metered usage
+
+## Setup
+
+<Steps>
+<Step>
+### Configure a Better Auth billing plugin
+
+Use the [Better Auth Stripe plugin](https://www.better-auth.com/docs/beta/plugins/stripe) or the [Better Auth Polar plugin](https://www.better-auth.com/docs/plugins/polar) on the server and client, and apply its schema before opening the billing page.
+
+</Step>
+<Step>
+### Install the UI plugin
+
+```npm
+npx shadcn@latest add https://better-auth-ui.com/r/solid/billing.json
+```
+
+</Step>
+<Step>
+### Register the plugin
+
+Build an adapter and hand it to the plugin. BAUI ships `createStripeBillingAdapter` and `createPolarBillingAdapter`.
+
+```tsx title="src/components/providers.tsx"
+import { createStripeBillingAdapter } from "@better-auth-ui/core/plugins/billing" // [!code highlight]
+import { AuthProvider } from "@/components/auth/auth-provider"
+import { billingPlugin } from "@/lib/auth/billing-plugin" // [!code highlight]
+import { authClient } from "@/lib/auth-client"
+
+const billingAdapter = createStripeBillingAdapter(authClient) // [!code highlight]
+
+export function Providers(props: { children?: JSX.Element }) {
+  return (
+    <AuthProvider
+      authClient={authClient}
+      navigate={navigate}
+      plugins={[
+        billingPlugin({ adapter: billingAdapter, organization: true }) // [!code highlight]
+      ]}
+    >
+      {props.children}
+    </AuthProvider>
+  )
+}
+```
+
+`user` defaults to `true` and adds the tab to personal settings. `organization` defaults to `false`; turn it on to add the same tab to organization settings.
+
+</Step>
+</Steps>
+
+<Callout type="info">
+  The adapter's `supports` flags decide which controls render. A provider that cannot restore a cancelled subscription simply never shows the restore button.
+</Callout>
+
+## Writing your own adapter
+
+`BillingAdapter` is a plain interface: list plans, read state, start checkout, open a portal, cancel, restore, and update seats. Implement it against any billing service and the views work unchanged.
+
+<auto-type-table path="../../../../../../packages/core/src/plugins/billing/billing-adapter.ts" name="BillingAdapter" />
+
+## Runtime prerequisites
+
+- Server and client: a Better Auth billing plugin, or your own billing endpoints.
+- App: a `BillingAdapter` instance.
+- Runtime API: billing query and mutation options from [Solid runtime APIs](/docs/solid).
+
+## Copied files
+
+- `src/lib/auth/billing-plugin.tsx`
+- `src/components/auth/billing/billing-settings.tsx`
+
+After install the plan cards, usage bars, and dialogs are yours to restyle. The usage bar is rendered inline with `role="progressbar"` rather than a Zaidan primitive, since Zaidan does not ship one.
+
+## Options
+
+<auto-type-table path="../../../../../../packages/core/src/plugins/billing/billing-plugin.ts" name="BillingPluginOptions" />
+
+## Localization
+
+<auto-type-table path="../../../../../../packages/core/src/plugins/billing/billing-localization.ts" name="BillingLocalization" />

@@ -218,6 +218,10 @@ const expectedSolidRegistryPayloadNames = [
   "magic-link",
   "oauth-provider",
   "device-authorization",
+  "siwe",
+  "sso",
+  "billing",
+  "agent-auth",
   "username",
   "passkey",
   "two-factor",
@@ -2806,8 +2810,10 @@ describe("Solid registry isolation", () => {
     ])
     expect(zaidanPluginsMeta.pages).toEqual([
       "admin",
+      "agent-auth",
       "anonymous",
       "api-key",
+      "billing",
       "captcha",
       "delete-user",
       "device-authorization",
@@ -2815,11 +2821,13 @@ describe("Solid registry isolation", () => {
       "last-login-method",
       "magic-link",
       "multi-session",
+      "oauth-provider",
       "one-tap",
       "organization",
-      "oauth-provider",
       "passkey",
       "phone-number",
+      "siwe",
+      "sso",
       "theme",
       "two-factor",
       "username"
@@ -3102,7 +3110,11 @@ describe("Solid registry isolation", () => {
       "device-authorization",
       "theme",
       "anonymous",
-      "one-tap"
+      "one-tap",
+      "siwe",
+      "sso",
+      "billing",
+      "agent-auth"
     ]
     const runtimeOnlyPluginNames = ["captcha"]
     const hiddenComponentDocNames = ["organization"]
