@@ -1,5 +1,10 @@
 "use client"
 
+import {
+  type AdditionalFields,
+  fieldsWithModelValues,
+  parseAdditionalFieldValues
+} from "@better-auth-ui/core"
 import type { OrganizationAuthClient } from "@better-auth-ui/core/plugins/organization"
 import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
 import {
@@ -37,11 +42,13 @@ import {
   TableRow
 } from "@/components/ui/table"
 import { organizationPlugin } from "@/lib/auth/organization-plugin"
+import { AdditionalField } from "../additional-field"
 
 type Role = {
   id: string
   role: string
   permission: Record<string, string[]>
+  [key: string]: unknown
 }
 
 export function OrganizationRoles({
@@ -50,7 +57,7 @@ export function OrganizationRoles({
   organizationId: string
 }) {
   const { authClient } = useAuth<OrganizationAuthClient>()
-  const { dynamicAccessControl, localization } =
+  const { dynamicAccessControl, localization, modelFields } =
     useAuthPlugin(organizationPlugin)
   const roles = useListRoles(authClient, {
     query: { organizationId },
@@ -147,6 +154,7 @@ export function OrganizationRoles({
         open={editingRole !== undefined}
         role={editingRole ?? undefined}
         registry={dynamicAccessControl?.permissions ?? {}}
+        roleFields={modelFields.role}
         onOpenChange={(open) => !open && setEditingRole(undefined)}
       />
     </div>
@@ -239,19 +247,22 @@ function RoleDialog({
   open,
   organizationId,
   registry,
-  role
+  role,
+  roleFields
 }: {
   onOpenChange: (open: boolean) => void
   open: boolean
   organizationId: string
   registry: Record<string, { label?: string; actions: Record<string, string> }>
   role?: Role
+  roleFields: AdditionalFields
 }) {
   const { authClient, localization: authLocalization } =
     useAuth<OrganizationAuthClient>()
   const { localization } = useAuthPlugin(organizationPlugin)
   const [name, setName] = useState("")
   const [permission, setPermission] = useState<Record<string, string[]>>({})
+  const [isSubmitting, setIsSubmitting] = useState(false)
   const createRole = useCreateRole(authClient, organizationId, {
     onSuccess: () => {
       toast.success(localization.roleCreated)
@@ -271,23 +282,44 @@ function RoleDialog({
     setPermission(role?.permission ?? {})
   }, [open, role])
 
-  function submit(event: FormEvent<HTMLFormElement>) {
+  async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     const roleName = name.trim()
     if (!roleName) return
 
-    if (role) {
-      updateRole.mutate({
-        organizationId,
-        roleId: role.id,
-        data: { roleName, permission }
-      })
-    } else {
-      createRole.mutate({ organizationId, role: roleName, permission })
+    setIsSubmitting(true)
+    try {
+      const additionalFields = await parseAdditionalFieldValues(
+        roleFields,
+        new FormData(event.currentTarget)
+      )
+      if (role) {
+        updateRole.mutate(
+          {
+            organizationId,
+            roleId: role.id,
+            data: { ...additionalFields, roleName, permission }
+          },
+          { onSettled: () => setIsSubmitting(false) }
+        )
+      } else {
+        createRole.mutate(
+          {
+            organizationId,
+            role: roleName,
+            permission,
+            additionalFields
+          },
+          { onSettled: () => setIsSubmitting(false) }
+        )
+      }
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : String(error))
+      setIsSubmitting(false)
     }
   }
 
-  const pending = createRole.isPending || updateRole.isPending
+  const pending = createRole.isPending || updateRole.isPending || isSubmitting
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -315,6 +347,16 @@ function RoleDialog({
               required
             />
           </Field>
+
+          {fieldsWithModelValues(roleFields, role ?? {}).map((field) => (
+            <AdditionalField
+              key={field.name}
+              field={field}
+              name={field.name}
+              isPending={pending}
+              optionalLabel={authLocalization.settings.optional}
+            />
+          ))}
 
           <fieldset className="flex flex-col gap-4">
             <legend className="text-sm font-medium">

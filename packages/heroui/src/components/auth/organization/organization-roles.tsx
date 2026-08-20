@@ -1,3 +1,8 @@
+import {
+  type AdditionalFields,
+  fieldsWithModelValues,
+  parseAdditionalFieldValues
+} from "@better-auth-ui/core"
 import type {
   OrganizationAuthClient,
   OrganizationPermissionRegistry
@@ -27,11 +32,13 @@ import {
 } from "@heroui/react"
 import { type FormEvent, useEffect, useState } from "react"
 import { organizationPlugin } from "../../../lib/auth/organization-plugin"
+import { AdditionalField } from "../additional-field"
 
 type Role = {
   id: string
   role: string
   permission: Record<string, string[]>
+  [key: string]: unknown
 }
 
 export function OrganizationRoles({
@@ -41,7 +48,7 @@ export function OrganizationRoles({
 }) {
   const { authClient } = useAuth()
   const client = authClient as OrganizationAuthClient
-  const { dynamicAccessControl, localization } =
+  const { dynamicAccessControl, localization, modelFields } =
     useAuthPlugin(organizationPlugin)
   const roles = useListRoles(client, {
     query: { organizationId },
@@ -134,6 +141,7 @@ export function OrganizationRoles({
         onOpenChange={(open) => !open && setEditingRole(undefined)}
         organizationId={organizationId}
         registry={dynamicAccessControl?.permissions ?? {}}
+        roleFields={modelFields.role}
         role={editingRole ?? undefined}
       />
     </div>
@@ -226,19 +234,22 @@ function RoleDialog({
   onOpenChange,
   organizationId,
   registry,
-  role
+  role,
+  roleFields
 }: {
   isOpen: boolean
   onOpenChange: (open: boolean) => void
   organizationId: string
   registry: OrganizationPermissionRegistry
   role?: Role
+  roleFields: AdditionalFields
 }) {
   const { authClient, localization: authLocalization } = useAuth()
   const client = authClient as OrganizationAuthClient
   const { localization } = useAuthPlugin(organizationPlugin)
   const [name, setName] = useState("")
   const [permission, setPermission] = useState<Record<string, string[]>>({})
+  const [isSubmitting, setIsSubmitting] = useState(false)
   const createRole = useCreateRole(client, organizationId, {
     onSuccess: () => {
       toast.success(localization.roleCreated)
@@ -258,23 +269,44 @@ function RoleDialog({
     setPermission(role?.permission ?? {})
   }, [isOpen, role])
 
-  const submit = (event: FormEvent<HTMLFormElement>) => {
+  const submit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     const roleName = name.trim()
     if (!roleName) return
 
-    if (role) {
-      updateRole.mutate({
-        organizationId,
-        roleId: role.id,
-        data: { roleName, permission }
-      })
-    } else {
-      createRole.mutate({ organizationId, role: roleName, permission })
+    setIsSubmitting(true)
+    try {
+      const additionalFields = await parseAdditionalFieldValues(
+        roleFields,
+        new FormData(event.currentTarget)
+      )
+      if (role) {
+        updateRole.mutate(
+          {
+            organizationId,
+            roleId: role.id,
+            data: { ...additionalFields, roleName, permission }
+          },
+          { onSettled: () => setIsSubmitting(false) }
+        )
+      } else {
+        createRole.mutate(
+          {
+            organizationId,
+            role: roleName,
+            permission,
+            additionalFields
+          },
+          { onSettled: () => setIsSubmitting(false) }
+        )
+      }
+    } catch (error) {
+      toast.danger(error instanceof Error ? error.message : String(error))
+      setIsSubmitting(false)
     }
   }
 
-  const pending = createRole.isPending || updateRole.isPending
+  const pending = createRole.isPending || updateRole.isPending || isSubmitting
 
   return (
     <AlertDialog.Backdrop isOpen={isOpen} onOpenChange={onOpenChange}>
@@ -300,6 +332,15 @@ function RoleDialog({
                   variant="secondary"
                 />
               </TextField>
+              {fieldsWithModelValues(roleFields, role ?? {}).map((field) => (
+                <AdditionalField
+                  key={field.name}
+                  field={field}
+                  name={field.name}
+                  isPending={pending}
+                  optionalLabel={authLocalization.settings.optional}
+                />
+              ))}
               <fieldset className="flex flex-col gap-4">
                 <legend className="mb-3 text-sm font-medium">
                   {localization.permissions}

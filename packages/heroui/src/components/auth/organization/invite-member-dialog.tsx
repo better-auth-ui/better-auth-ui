@@ -1,3 +1,4 @@
+import { parseAdditionalFieldValues } from "@better-auth-ui/core"
 import {
   mergeOrganizationRoleLabels,
   type OrganizationAuthClient
@@ -34,6 +35,7 @@ import {
 } from "react"
 
 import { organizationPlugin } from "../../../lib/auth/organization-plugin"
+import { AdditionalField } from "../additional-field"
 
 /** Props for the {@link InviteMemberDialog} component. */
 export type InviteMemberDialogProps = {
@@ -57,6 +59,7 @@ export function InviteMemberDialog({
 }: InviteMemberDialogProps) {
   const { authClient, localization } = useAuth()
   const {
+    modelFields: { invitation: invitationFields },
     dynamicAccessControl,
     invitationLimit,
     localization: organizationLocalization,
@@ -85,6 +88,7 @@ export function InviteMemberDialog({
     (invitations.data?.filter((invitation) => invitation.status === "pending")
       .length ?? 0) >= invitationLimit
   const [teamIds, setTeamIds] = useState<string[]>([])
+  const [isSubmitting, setIsSubmitting] = useState(false)
   const activeOrganizationId = activeOrganization?.id
   const previousOrganizationId = useRef(activeOrganizationId)
 
@@ -125,25 +129,42 @@ export function InviteMemberDialog({
 
   const isRoleValid = selectedRoles.length > 0
 
-  const handleSubmit = (e: SyntheticEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault()
 
     if (!activeOrganizationId || !isRoleValid || invitationLimitReached) return
 
-    const formData = new FormData(e.target as HTMLFormElement)
+    const formData = new FormData(e.currentTarget)
     const email = formData.get("email") as string
+
+    setIsSubmitting(true)
+    let invitationValues: Record<string, unknown>
+    try {
+      invitationValues = await parseAdditionalFieldValues(
+        invitationFields,
+        formData
+      )
+    } catch (error) {
+      toast.danger(error instanceof Error ? error.message : String(error))
+      setIsSubmitting(false)
+      return
+    }
 
     const availableTeamIds = new Set(teams.data?.map((team) => team.id))
     const selectedTeamIds = teamIds.filter((teamId) =>
       availableTeamIds.has(teamId)
     )
 
-    inviteMember({
-      email: email.trim(),
-      organizationId: activeOrganizationId,
-      role: selectedRoles as Parameters<typeof inviteMember>[0]["role"],
-      ...(selectedTeamIds.length ? { teamId: selectedTeamIds } : {})
-    })
+    inviteMember(
+      {
+        email: email.trim(),
+        organizationId: activeOrganizationId,
+        role: selectedRoles as Parameters<typeof inviteMember>[0]["role"],
+        ...(selectedTeamIds.length ? { teamId: selectedTeamIds } : {}),
+        ...invitationValues
+      },
+      { onSettled: () => setIsSubmitting(false) }
+    )
   }
 
   return (
@@ -177,7 +198,7 @@ export function InviteMemberDialog({
                 id="email"
                 name="email"
                 type="email"
-                isDisabled={isInviting}
+                isDisabled={isInviting || isSubmitting}
                 validate={(value) => {
                   if (!value) return localization.auth.fieldRequired
                   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value))
@@ -208,7 +229,7 @@ export function InviteMemberDialog({
 
                   setSelectedRoles(next)
                 }}
-                isDisabled={isInviting}
+                isDisabled={isInviting || isSubmitting}
                 variant="secondary"
                 fullWidth
               >
@@ -255,19 +276,34 @@ export function InviteMemberDialog({
                   </div>
                 </div>
               )}
+              {invitationFields.map((field) => (
+                <AdditionalField
+                  key={field.name}
+                  field={field}
+                  name={field.name}
+                  isPending={isInviting || isSubmitting}
+                  optionalLabel={localization.settings.optional}
+                />
+              ))}
             </AlertDialog.Body>
 
             <AlertDialog.Footer>
-              <Button slot="close" variant="tertiary" isDisabled={isInviting}>
+              <Button
+                slot="close"
+                variant="tertiary"
+                isDisabled={isInviting || isSubmitting}
+              >
                 {localization.settings.cancel}
               </Button>
 
               <Button
                 type="submit"
-                isPending={isInviting}
+                isPending={isInviting || isSubmitting}
                 isDisabled={!isRoleValid || invitationLimitReached}
               >
-                {isInviting && <Spinner color="current" size="sm" />}
+                {(isInviting || isSubmitting) && (
+                  <Spinner color="current" size="sm" />
+                )}
 
                 {organizationLocalization.inviteMember}
               </Button>

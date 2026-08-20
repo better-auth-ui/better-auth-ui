@@ -1,5 +1,6 @@
 "use client"
 
+import { formatAdditionalFieldValue } from "@better-auth-ui/core"
 import {
   memberRoleLabels,
   mergeOrganizationRoleLabels,
@@ -46,6 +47,7 @@ export function OrganizationMemberRow({
 }: OrganizationMemberRowProps) {
   const { authClient } = useAuth<OrganizationAuthClient>()
   const {
+    modelFields: { member: memberFields },
     dynamicAccessControl,
     localization: organizationLocalization,
     roles
@@ -112,7 +114,19 @@ export function OrganizationMemberRow({
   return (
     <TableRow>
       <TableCell>
-        <UserView user={member.user} />
+        <div className="flex flex-col gap-1">
+          <UserView user={member.user} />
+          {memberFields.map((field) => {
+            const value = formatAdditionalFieldValue(
+              (member as unknown as Record<string, unknown>)[field.name]
+            )
+            return value ? (
+              <span className="text-xs text-muted-foreground" key={field.name}>
+                {field.label}: {value}
+              </span>
+            ) : null
+          })}
+        </div>
       </TableCell>
 
       <TableCell>{roleLabel}</TableCell>

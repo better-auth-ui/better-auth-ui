@@ -163,6 +163,69 @@ export function parseAdditionalFieldValue(
   return raw
 }
 
+/** Parse and validate a model's configured fields from submitted form data. */
+export async function parseAdditionalFieldValues(
+  fields: AdditionalFields,
+  formData: FormData
+): Promise<Record<string, AdditionalFieldValue | null>> {
+  const values: Record<string, AdditionalFieldValue | null> = {}
+
+  for (const field of fields) {
+    if (field.readOnly) continue
+
+    const value = parseAdditionalFieldValue(
+      field,
+      formData.get(field.name) as string | null
+    )
+    await field.validate?.(value)
+    if (value !== undefined) values[field.name] = value
+  }
+
+  return values
+}
+
+/** Seed field defaults from a Better Auth model returned by a query. */
+export function fieldsWithModelValues(
+  fields: AdditionalFields,
+  model: Record<string, unknown>
+): AdditionalFields {
+  return fields.map((field) => {
+    const value = model[field.name]
+
+    if (
+      value !== null &&
+      typeof value !== "string" &&
+      typeof value !== "number" &&
+      typeof value !== "boolean" &&
+      !(value instanceof Date)
+    ) {
+      return field
+    }
+
+    return { ...field, defaultValue: value }
+  })
+}
+
+/** Format a persisted additional-field value for compact read-only display. */
+export function formatAdditionalFieldValue(value: unknown): string | undefined {
+  if (value === null || value === undefined || value === "") return undefined
+  if (value instanceof Date) return value.toLocaleString()
+  if (typeof value === "string") {
+    const parsed = new Date(value)
+    if (
+      /^\d{4}-\d{2}-\d{2}(T|$)/.test(value) &&
+      !Number.isNaN(parsed.getTime())
+    ) {
+      return parsed.toLocaleString()
+    }
+    return value
+  }
+  if (typeof value === "number" || typeof value === "boolean") {
+    return String(value)
+  }
+  return undefined
+}
+
 /** Resolve the effective `inputType`, defaulting based on `field.type`. */
 export function resolveInputType(
   field: AdditionalField

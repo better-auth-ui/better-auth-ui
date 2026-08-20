@@ -1,3 +1,8 @@
+import {
+  type AdditionalFields,
+  fieldsWithModelValues,
+  parseAdditionalFieldValues
+} from "@better-auth-ui/core"
 import type {
   OrganizationAuthClient,
   OrganizationPermissionRegistry
@@ -36,11 +41,13 @@ import {
   TableRow
 } from "@/components/ui/table"
 import { organizationPlugin } from "@/lib/auth/organization-plugin"
+import { AdditionalField } from "../additional-field"
 
 type Role = {
   id: string
   role: string
   permission: Record<string, string[]>
+  [key: string]: unknown
 }
 
 export function OrganizationRoles(props: { organizationId: string }) {
@@ -152,6 +159,7 @@ export function OrganizationRoles(props: { organizationId: string }) {
         organizationId={props.organizationId}
         registry={config.dynamicAccessControl?.permissions ?? {}}
         role={editingRole() ?? undefined}
+        roleFields={config.modelFields.role}
       />
     </div>
   )
@@ -236,11 +244,13 @@ function RoleDialog(props: {
   organizationId: string
   registry: OrganizationPermissionRegistry
   role?: Role
+  roleFields: AdditionalFields
 }) {
   const auth = useAuth<OrganizationAuthClient>()
   const config = useAuthPlugin(organizationPlugin)
   const [name, setName] = createSignal("")
   const [permission, setPermission] = createSignal<Record<string, string[]>>({})
+  const [isSubmitting, setIsSubmitting] = createSignal(false)
   const createRole = useCreateRole(
     auth.authClient,
     () => props.organizationId,
@@ -268,27 +278,45 @@ function RoleDialog(props: {
     setPermission(props.role?.permission ?? {})
   })
 
-  const submit = (event: SubmitEvent) => {
+  const submit = async (event: SubmitEvent) => {
     event.preventDefault()
     const roleName = name().trim()
     if (!roleName) return
 
-    if (props.role) {
-      updateRole.mutate({
-        organizationId: props.organizationId,
-        roleId: props.role.id,
-        data: { roleName, permission: permission() }
-      })
-    } else {
-      createRole.mutate({
-        organizationId: props.organizationId,
-        role: roleName,
-        permission: permission()
-      })
+    setIsSubmitting(true)
+    try {
+      const additionalFields = await parseAdditionalFieldValues(
+        props.roleFields,
+        new FormData(event.currentTarget as HTMLFormElement)
+      )
+      if (props.role) {
+        updateRole.mutate(
+          {
+            organizationId: props.organizationId,
+            roleId: props.role.id,
+            data: { ...additionalFields, roleName, permission: permission() }
+          },
+          { onSettled: () => setIsSubmitting(false) }
+        )
+      } else {
+        createRole.mutate(
+          {
+            organizationId: props.organizationId,
+            role: roleName,
+            permission: permission(),
+            additionalFields
+          },
+          { onSettled: () => setIsSubmitting(false) }
+        )
+      }
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : String(error))
+      setIsSubmitting(false)
     }
   }
 
-  const pending = () => createRole.isPending || updateRole.isPending
+  const pending = () =>
+    createRole.isPending || updateRole.isPending || isSubmitting()
 
   return (
     <Dialog open={props.open} onOpenChange={props.onOpenChange}>
@@ -318,6 +346,17 @@ function RoleDialog(props: {
               value={name()}
             />
           </Field>
+
+          <For each={fieldsWithModelValues(props.roleFields, props.role ?? {})}>
+            {(field) => (
+              <AdditionalField
+                field={field}
+                isPending={pending()}
+                name={field.name}
+                optionalLabel={auth.localization.settings.optional}
+              />
+            )}
+          </For>
 
           <fieldset class="flex flex-col gap-4">
             <legend class="text-sm font-medium">

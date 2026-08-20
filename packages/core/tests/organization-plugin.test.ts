@@ -38,9 +38,15 @@ describe("organizationPlugin", () => {
 
     expect(
       organizationPlugin({
-        dynamicAccessControl: { permissions, additionalFields }
+        dynamicAccessControl: { permissions },
+        modelFields: { role: additionalFields }
       }).dynamicAccessControl
-    ).toEqual({ enabled: true, permissions, additionalFields })
+    ).toEqual({ enabled: true, permissions })
+
+    expect(
+      organizationPlugin({ modelFields: { role: additionalFields } })
+        .modelFields.role
+    ).toEqual(additionalFields)
   })
 
   it("exposes team and policy controls", () => {
@@ -48,7 +54,7 @@ describe("organizationPlugin", () => {
       { name: "billingCode", label: "Billing code", type: "string" as const }
     ]
     const plugin = organizationPlugin({
-      additionalFields,
+      modelFields: { organization: additionalFields },
       allowOrganizationCreation: false,
       invitationLimit: 5,
       membershipLimit: 20,
@@ -58,6 +64,13 @@ describe("organizationPlugin", () => {
 
     expect(plugin).toMatchObject({
       additionalFields,
+      modelFields: {
+        organization: additionalFields,
+        member: [],
+        invitation: [],
+        team: [],
+        role: []
+      },
       allowOrganizationCreation: false,
       invitationLimit: 5,
       membershipLimit: 20,

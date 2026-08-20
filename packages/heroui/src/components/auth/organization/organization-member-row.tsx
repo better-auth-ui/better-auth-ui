@@ -1,3 +1,4 @@
+import { formatAdditionalFieldValue } from "@better-auth-ui/core"
 import {
   memberRoleLabels,
   mergeOrganizationRoleLabels,
@@ -34,6 +35,7 @@ export function OrganizationMemberRow({
 }: OrganizationMemberRowProps) {
   const { authClient } = useAuth()
   const {
+    modelFields: { member: memberFields },
     dynamicAccessControl,
     localization: organizationLocalization,
     roles
@@ -85,7 +87,19 @@ export function OrganizationMemberRow({
   return (
     <Table.Row>
       <Table.Cell>
-        <UserView user={member.user} />
+        <div className="flex flex-col gap-1">
+          <UserView user={member.user} />
+          {memberFields.map((field) => {
+            const value = formatAdditionalFieldValue(
+              (member as unknown as Record<string, unknown>)[field.name]
+            )
+            return value ? (
+              <span className="text-muted text-xs" key={field.name}>
+                {field.label}: {value}
+              </span>
+            ) : null
+          })}
+        </div>
       </Table.Cell>
 
       <Table.Cell>{roleLabel}</Table.Cell>

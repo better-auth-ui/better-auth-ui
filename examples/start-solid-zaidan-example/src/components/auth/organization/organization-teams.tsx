@@ -1,3 +1,8 @@
+import {
+  type AdditionalFields,
+  fieldsWithModelValues,
+  parseAdditionalFieldValues
+} from "@better-auth-ui/core"
 import type { OrganizationAuthClient } from "@better-auth-ui/core/plugins/organization"
 import { useAuth, useAuthPlugin } from "@better-auth-ui/solid"
 import {
@@ -25,6 +30,7 @@ import {
   SelectValue
 } from "@/components/ui/select"
 import { organizationPlugin } from "@/lib/auth/organization-plugin"
+import { AdditionalField } from "../additional-field"
 
 type MemberOption = { id: string; label: string }
 
@@ -39,14 +45,31 @@ export function OrganizationTeams() {
   const createTeam = useCreateTeam(auth.authClient, () => ({
     onSuccess: () => toast.success(config.localization.teamCreated)
   }))
+  const [isCreatingFields, setIsCreatingFields] = createSignal(false)
 
-  function handleCreate(event: SubmitEvent) {
+  async function handleCreate(event: SubmitEvent) {
     event.preventDefault()
     const form = event.currentTarget as HTMLFormElement
     const name = String(new FormData(form).get("name") ?? "").trim()
     if (!name || !activeOrganization.data) return
-    createTeam.mutate({ name, organizationId: activeOrganization.data.id })
-    form.reset()
+
+    setIsCreatingFields(true)
+    try {
+      const values = await parseAdditionalFieldValues(
+        config.modelFields.team,
+        new FormData(form)
+      )
+      createTeam.mutate(
+        { ...values, name, organizationId: activeOrganization.data.id },
+        {
+          onSuccess: () => form.reset(),
+          onSettled: () => setIsCreatingFields(false)
+        }
+      )
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : String(error))
+      setIsCreatingFields(false)
+    }
   }
 
   return (
@@ -58,14 +81,31 @@ export function OrganizationTeams() {
             {config.localization.teamsDescription}
           </p>
         </div>
-        <form class="flex items-end gap-2" onSubmit={handleCreate}>
+        <form
+          class="grid w-full gap-3 sm:max-w-xl sm:grid-cols-2"
+          onSubmit={handleCreate}
+        >
           <Field>
             <FieldLabel for="new-team-name">
               {config.localization.name}
             </FieldLabel>
             <Input id="new-team-name" name="name" required />
           </Field>
-          <Button type="submit" disabled={createTeam.isPending}>
+          <For each={config.modelFields.team}>
+            {(field) => (
+              <AdditionalField
+                field={field}
+                isPending={createTeam.isPending || isCreatingFields()}
+                name={field.name}
+                optionalLabel={auth.localization.settings.optional}
+              />
+            )}
+          </For>
+          <Button
+            class="self-end"
+            type="submit"
+            disabled={createTeam.isPending || isCreatingFields()}
+          >
             {config.localization.createTeam}
           </Button>
         </form>
@@ -89,6 +129,7 @@ export function OrganizationTeams() {
               organizationId={activeOrganization.data?.id ?? ""}
               organizationMembers={members.data?.members ?? []}
               team={team}
+              teamFields={config.modelFields.team}
             />
           )}
         </For>
@@ -104,6 +145,7 @@ function TeamCard(props: {
     user: { name: string; email: string }
   }>
   team: { id: string; name: string }
+  teamFields: AdditionalFields
 }) {
   const auth = useAuth<OrganizationAuthClient>()
   const config = useAuthPlugin(organizationPlugin)
@@ -113,6 +155,7 @@ function TeamCard(props: {
   const updateTeam = useUpdateTeam(auth.authClient)
   const removeTeam = useRemoveTeam(auth.authClient)
   const [name, setName] = createSignal(props.team.name)
+  const [isUpdatingFields, setIsUpdatingFields] = createSignal(false)
   const [selectedMember, setSelectedMember] = createSignal<MemberOption>()
   const addMember = useAddTeamMember(auth.authClient, () => ({
     onSuccess: () => setSelectedMember(undefined)
@@ -128,10 +171,38 @@ function TeamCard(props: {
       }))
   }
 
+  const handleUpdate = async (event: SubmitEvent) => {
+    event.preventDefault()
+    setIsUpdatingFields(true)
+    try {
+      const values = await parseAdditionalFieldValues(
+        props.teamFields,
+        new FormData(event.currentTarget as HTMLFormElement)
+      )
+      updateTeam.mutate(
+        {
+          teamId: props.team.id,
+          data: {
+            ...values,
+            name: name(),
+            organizationId: props.organizationId
+          }
+        },
+        { onSettled: () => setIsUpdatingFields(false) }
+      )
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : String(error))
+      setIsUpdatingFields(false)
+    }
+  }
+
   return (
     <Card>
       <CardContent class="flex flex-col gap-4">
-        <div class="flex flex-col items-end gap-2 sm:flex-row">
+        <form
+          class="grid items-end gap-3 sm:grid-cols-2"
+          onSubmit={handleUpdate}
+        >
           <Field class="flex-1">
             <FieldLabel for={`team-name-${props.team.id}`}>
               {config.localization.name}
@@ -142,19 +213,30 @@ function TeamCard(props: {
               onInput={(event) => setName(event.currentTarget.value)}
             />
           </Field>
+          <For
+            each={fieldsWithModelValues(
+              props.teamFields,
+              props.team as Record<string, unknown>
+            )}
+          >
+            {(field) => (
+              <AdditionalField
+                field={field}
+                isPending={updateTeam.isPending || isUpdatingFields()}
+                name={field.name}
+                optionalLabel={auth.localization.settings.optional}
+              />
+            )}
+          </For>
           <Button
-            disabled={updateTeam.isPending}
+            type="submit"
+            disabled={updateTeam.isPending || isUpdatingFields()}
             variant="outline"
-            onClick={() =>
-              updateTeam.mutate({
-                teamId: props.team.id,
-                data: { name: name(), organizationId: props.organizationId }
-              })
-            }
           >
             {auth.localization.settings.saveChanges}
           </Button>
           <Button
+            type="button"
             disabled={removeTeam.isPending}
             variant="destructive"
             onClick={() => {
@@ -167,7 +249,7 @@ function TeamCard(props: {
           >
             {config.localization.deleteTeam}
           </Button>
-        </div>
+        </form>
         <div class="flex items-end gap-2">
           <Field class="flex-1">
             <FieldLabel>{config.localization.addTeamMember}</FieldLabel>

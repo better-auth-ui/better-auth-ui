@@ -1,3 +1,4 @@
+import { formatAdditionalFieldValue } from "@better-auth-ui/core"
 import type { OrganizationAuthClient } from "@better-auth-ui/core/plugins/organization"
 import { useAuth, useAuthPlugin } from "@better-auth-ui/solid"
 import {
@@ -6,7 +7,7 @@ import {
   useInviteMember
 } from "@better-auth-ui/solid/plugins/organization"
 import { Send, X } from "lucide-solid"
-import { Show } from "solid-js"
+import { For, Show } from "solid-js"
 import { toast } from "solid-sonner"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -21,6 +22,7 @@ type OrganizationInvitation = {
   organizationId: string
   role?: string | null
   status?: string | null
+  [key: string]: unknown
 }
 
 type RoleMap = Record<string, string>
@@ -91,8 +93,27 @@ export function OrganizationInvitationRow(
 
   return (
     <TableRow>
-      <TableCell class="font-medium">
-        {props.invitation.email ?? "Invitation"}
+      <TableCell>
+        <div class="flex flex-col gap-1">
+          <span class="font-medium">
+            {props.invitation.email ?? "Invitation"}
+          </span>
+          <For each={config.modelFields.invitation}>
+            {(field) => {
+              const value = () =>
+                formatAdditionalFieldValue(props.invitation[field.name])
+              return (
+                <Show when={value()}>
+                  {(resolved) => (
+                    <span class="text-muted-foreground text-xs">
+                      {field.label}: {resolved()}
+                    </span>
+                  )}
+                </Show>
+              )
+            }}
+          </For>
+        </div>
       </TableCell>
       <TableCell class="whitespace-nowrap text-muted-foreground text-xs tabular-nums">
         {formatInvitationDate(props.invitation.createdAt)}
@@ -116,7 +137,13 @@ export function OrganizationInvitationRow(
                   resend: true,
                   role: (props.invitation.role ?? "member") as Parameters<
                     typeof resendInvitation.mutate
-                  >[0]["role"]
+                  >[0]["role"],
+                  ...Object.fromEntries(
+                    config.modelFields.invitation.flatMap((field) => {
+                      const value = props.invitation[field.name]
+                      return value === undefined ? [] : [[field.name, value]]
+                    })
+                  )
                 })
               }
               size="icon-sm"

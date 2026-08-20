@@ -93,8 +93,6 @@ export type OrganizationPluginOptions = {
     enabled?: boolean
     /** Resources and actions available in the role permission matrix. */
     permissions: OrganizationPermissionRegistry
-    /** Additional fields rendered when a dynamic role is created or edited. */
-    additionalFields?: AdditionalFields
   }
   slug?: string | null
   /**
@@ -104,6 +102,11 @@ export type OrganizationPluginOptions = {
   slugPrefix?: string
   /** Additional organization fields rendered during creation and profile editing. */
   additionalFields?: AdditionalFields
+  /**
+   * Additional fields grouped by the Better Auth organization model that
+   * owns them. `organization` overrides the legacy `additionalFields` array.
+   */
+  modelFields?: OrganizationAdditionalFields
   /** Maximum organizations the current user can create. */
   organizationLimit?: number
   /** Maximum members per organization. */
@@ -114,6 +117,19 @@ export type OrganizationPluginOptions = {
   allowOrganizationCreation?: boolean
   /** Enable Better Auth team management controls. @default false */
   teams?: boolean
+}
+
+export type OrganizationAdditionalFields = {
+  /** Fields rendered during organization creation and profile editing. */
+  organization?: AdditionalFields
+  /** Read-only member details returned by Better Auth member queries. */
+  member?: AdditionalFields
+  /** Fields rendered when an invitation is created. */
+  invitation?: AdditionalFields
+  /** Fields rendered when a team is created or edited. */
+  team?: AdditionalFields
+  /** Fields rendered when a dynamic organization role is created or edited. */
+  role?: AdditionalFields
 }
 
 export type OrganizationPermissionResource = {
@@ -158,13 +174,20 @@ export const organizationPlugin = createAuthPlugin(
         }),
         ...options.additionalRoles
       },
-      additionalFields: options.additionalFields ?? [],
+      additionalFields:
+        options.modelFields?.organization ?? options.additionalFields ?? [],
+      modelFields: {
+        organization:
+          options.modelFields?.organization ?? options.additionalFields ?? [],
+        member: options.modelFields?.member ?? [],
+        invitation: options.modelFields?.invitation ?? [],
+        team: options.modelFields?.team ?? [],
+        role: options.modelFields?.role ?? []
+      },
       dynamicAccessControl: options.dynamicAccessControl
         ? {
             enabled: options.dynamicAccessControl.enabled ?? true,
-            permissions: options.dynamicAccessControl.permissions,
-            additionalFields:
-              options.dynamicAccessControl.additionalFields ?? []
+            permissions: options.dynamicAccessControl.permissions
           }
         : undefined,
       organizationLimit: resolvePolicyLimit(options.organizationLimit),

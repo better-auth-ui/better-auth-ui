@@ -1,5 +1,6 @@
 "use client"
 
+import { parseAdditionalFieldValues } from "@better-auth-ui/core"
 import {
   mergeOrganizationRoleLabels,
   type OrganizationAuthClient
@@ -21,6 +22,7 @@ import {
   useState
 } from "react"
 import { toast } from "sonner"
+import { AdditionalField } from "@/components/auth/additional-field"
 import { Button, buttonVariants } from "@/components/ui/button"
 import {
   Dialog,
@@ -68,6 +70,7 @@ export function InviteMemberDialog({
 }: InviteMemberDialogProps) {
   const { authClient, localization } = useAuth<OrganizationAuthClient>()
   const {
+    modelFields: { invitation: invitationFields },
     dynamicAccessControl,
     invitationLimit,
     localization: organizationLocalization,
@@ -95,6 +98,7 @@ export function InviteMemberDialog({
   })
   const [teamId, setTeamId] = useState("")
   const [emailError, setEmailError] = useState<string>()
+  const [isSubmitting, setIsSubmitting] = useState(false)
   const activeOrganizationId = activeOrganization?.id
   const previousOrganizationId = useRef(activeOrganizationId)
 
@@ -143,24 +147,41 @@ export function InviteMemberDialog({
     )
   }
 
-  const handleSubmit = (e: SyntheticEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault()
 
     if (!activeOrganizationId || !isRoleValid || atInvitationLimit) return
 
-    const formData = new FormData(e.target as HTMLFormElement)
+    const formData = new FormData(e.currentTarget)
     const email = formData.get("email") as string
+
+    setIsSubmitting(true)
+    let invitationValues: Record<string, unknown>
+    try {
+      invitationValues = await parseAdditionalFieldValues(
+        invitationFields,
+        formData
+      )
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : String(error))
+      setIsSubmitting(false)
+      return
+    }
 
     const selectedTeamId = teams.data?.some((team) => team.id === teamId)
       ? teamId
       : undefined
 
-    inviteMember({
-      email: email.trim(),
-      organizationId: activeOrganizationId,
-      role: selectedRoles as Parameters<typeof inviteMember>[0]["role"],
-      teamId: selectedTeamId
-    })
+    inviteMember(
+      {
+        email: email.trim(),
+        organizationId: activeOrganizationId,
+        role: selectedRoles as Parameters<typeof inviteMember>[0]["role"],
+        teamId: selectedTeamId,
+        ...invitationValues
+      },
+      { onSettled: () => setIsSubmitting(false) }
+    )
   }
 
   const atInvitationLimit =
@@ -285,12 +306,22 @@ export function InviteMemberDialog({
                 </Select>
               </Field>
             )}
+
+            {invitationFields.map((field) => (
+              <AdditionalField
+                key={field.name}
+                field={field}
+                name={field.name}
+                isPending={isInviting || isSubmitting}
+                optionalLabel={localization.settings.optional}
+              />
+            ))}
           </div>
 
           <DialogFooter>
             <DialogClose
               className={buttonVariants({ variant: "outline" })}
-              disabled={isInviting}
+              disabled={isInviting || isSubmitting}
               type="button"
             >
               {localization.settings.cancel}
@@ -298,9 +329,11 @@ export function InviteMemberDialog({
 
             <Button
               type="submit"
-              disabled={isInviting || !isRoleValid || atInvitationLimit}
+              disabled={
+                isInviting || isSubmitting || !isRoleValid || atInvitationLimit
+              }
             >
-              {isInviting && <Spinner />}
+              {(isInviting || isSubmitting) && <Spinner />}
 
               {organizationLocalization.inviteMember}
             </Button>

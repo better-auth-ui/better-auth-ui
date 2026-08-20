@@ -1084,6 +1084,34 @@ Set `syncSession` when an application still reads `session.activeTeamId`. This o
 
 The `useListUserTeams` and `useSetActiveTeam` hooks are also available for custom controls. Always pass `organizationId` to both APIs.
 
-Use `organizationLimit`, `membershipLimit`, and `invitationLimit` to disable actions when a configured limit is reached. Use `allowOrganizationCreation: false` to hide creation controls. Use `additionalFields` to add custom inputs to organization creation and profile forms.
+### Model-specific fields
+
+Configure fields by the Better Auth model that stores them. The names and types must match the `schema` fields in the server organization plugin.
+
+```tsx
+organizationPlugin({
+  modelFields: {
+    organization: [
+      { name: "billingCode", type: "string", label: "Billing code" }
+    ],
+    member: [
+      { name: "title", type: "string", label: "Job title" }
+    ],
+    invitation: [
+      { name: "department", type: "string", label: "Department" }
+    ],
+    team: [
+      { name: "description", type: "string", inputType: "textarea", label: "Description" }
+    ],
+    role: [
+      { name: "color", type: "string", label: "Color" }
+    ]
+  }
+})
+```
+
+Organization fields appear in creation and profile forms. Invitation, team, and role fields appear in their create and edit workflows. Member fields appear as read-only details because Better Auth does not provide browser client endpoints for creating or editing a member model directly.
+
+Use `organizationLimit`, `membershipLimit`, and `invitationLimit` to disable actions when a configured limit is reached. Use `allowOrganizationCreation: false` to hide creation controls.
 
 Plugins can add an organization settings tab through `organizationTabs`. Each tab receives `organizationId` and `organizationSlug` for the active organization.

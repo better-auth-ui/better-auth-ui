@@ -1,5 +1,10 @@
 "use client"
 
+import {
+  type AdditionalFields,
+  fieldsWithModelValues,
+  parseAdditionalFieldValues
+} from "@better-auth-ui/core"
 import type { OrganizationAuthClient } from "@better-auth-ui/core/plugins/organization"
 import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
 import {
@@ -28,11 +33,13 @@ import {
 } from "@/components/ui/select"
 import { Spinner } from "@/components/ui/spinner"
 import { organizationPlugin } from "@/lib/auth/organization-plugin"
+import { AdditionalField } from "../additional-field"
 
 export function OrganizationTeams() {
-  const { authClient } = useAuth<OrganizationAuthClient>()
+  const { authClient, localization: authLocalization } =
+    useAuth<OrganizationAuthClient>()
   const { data: activeOrganization } = useActiveOrganization(authClient)
-  const { localization } = useAuthPlugin(organizationPlugin)
+  const { localization, modelFields } = useAuthPlugin(organizationPlugin)
   const teams = useListTeams(authClient, {
     query: { organizationId: activeOrganization?.id }
   })
@@ -41,13 +48,31 @@ export function OrganizationTeams() {
     onSuccess: () => toast.success(localization.teamCreated)
   })
 
-  function handleCreate(event: FormEvent<HTMLFormElement>) {
+  const [isCreatingFields, setIsCreatingFields] = useState(false)
+
+  async function handleCreate(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     const form = event.currentTarget
     const name = String(new FormData(form).get("name") ?? "").trim()
     if (!name || !activeOrganization) return
-    createTeam.mutate({ name, organizationId: activeOrganization.id })
-    form.reset()
+
+    setIsCreatingFields(true)
+    try {
+      const values = await parseAdditionalFieldValues(
+        modelFields.team,
+        new FormData(form)
+      )
+      createTeam.mutate(
+        { ...values, name, organizationId: activeOrganization.id },
+        {
+          onSuccess: () => form.reset(),
+          onSettled: () => setIsCreatingFields(false)
+        }
+      )
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : String(error))
+      setIsCreatingFields(false)
+    }
   }
 
   return (
@@ -59,12 +84,28 @@ export function OrganizationTeams() {
             {localization.teamsDescription}
           </p>
         </div>
-        <form className="flex items-end gap-2" onSubmit={handleCreate}>
+        <form
+          className="grid w-full gap-3 sm:max-w-xl sm:grid-cols-2"
+          onSubmit={handleCreate}
+        >
           <Field>
             <FieldLabel htmlFor="new-team-name">{localization.name}</FieldLabel>
             <Input id="new-team-name" name="name" required />
           </Field>
-          <Button type="submit" disabled={createTeam.isPending}>
+          {modelFields.team.map((field) => (
+            <AdditionalField
+              key={field.name}
+              field={field}
+              name={field.name}
+              isPending={createTeam.isPending || isCreatingFields}
+              optionalLabel={authLocalization.settings.optional}
+            />
+          ))}
+          <Button
+            className="self-end"
+            type="submit"
+            disabled={createTeam.isPending || isCreatingFields}
+          >
             {createTeam.isPending && <Spinner />}
             {localization.createTeam}
           </Button>
@@ -79,6 +120,7 @@ export function OrganizationTeams() {
             organizationId={activeOrganization?.id ?? ""}
             organizationMembers={members.data?.members ?? []}
             team={team}
+            teamFields={modelFields.team}
           />
         ))
       ) : (
@@ -98,14 +140,16 @@ export function OrganizationTeams() {
 function TeamCard({
   organizationId,
   organizationMembers,
-  team
+  team,
+  teamFields
 }: {
   organizationId: string
   organizationMembers: Array<{
     userId: string
     user: { name: string; email: string }
   }>
-  team: { id: string; name: string }
+  team: { id: string; name: string; [key: string]: unknown }
+  teamFields: AdditionalFields
 }) {
   const { authClient, localization: authLocalization } =
     useAuth<OrganizationAuthClient>()
@@ -116,6 +160,7 @@ function TeamCard({
   const updateTeam = useUpdateTeam(authClient)
   const removeTeam = useRemoveTeam(authClient)
   const [name, setName] = useState(team.name)
+  const [isUpdatingFields, setIsUpdatingFields] = useState(false)
   const [userId, setUserId] = useState("")
   const addMember = useAddTeamMember(authClient, {
     onSuccess: () => setUserId("")
@@ -123,10 +168,34 @@ function TeamCard({
   const removeMember = useRemoveTeamMember(authClient)
   const memberIds = new Set(teamMembers.data?.map((member) => member.userId))
 
+  const handleUpdate = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    setIsUpdatingFields(true)
+    try {
+      const values = await parseAdditionalFieldValues(
+        teamFields,
+        new FormData(event.currentTarget)
+      )
+      updateTeam.mutate(
+        {
+          teamId: team.id,
+          data: { ...values, name, organizationId }
+        },
+        { onSettled: () => setIsUpdatingFields(false) }
+      )
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : String(error))
+      setIsUpdatingFields(false)
+    }
+  }
+
   return (
     <Card>
       <CardContent className="flex flex-col gap-4 pt-6">
-        <div className="flex flex-col items-end gap-2 sm:flex-row">
+        <form
+          className="grid items-end gap-3 sm:grid-cols-2"
+          onSubmit={handleUpdate}
+        >
           <Field className="flex-1">
             <FieldLabel htmlFor={`team-name-${team.id}`}>
               {localization.name}
@@ -137,19 +206,24 @@ function TeamCard({
               onChange={(event) => setName(event.target.value)}
             />
           </Field>
+          {fieldsWithModelValues(teamFields, team).map((field) => (
+            <AdditionalField
+              key={field.name}
+              field={field}
+              name={field.name}
+              isPending={updateTeam.isPending || isUpdatingFields}
+              optionalLabel={authLocalization.settings.optional}
+            />
+          ))}
           <Button
-            disabled={updateTeam.isPending}
+            type="submit"
+            disabled={updateTeam.isPending || isUpdatingFields}
             variant="outline"
-            onClick={() =>
-              updateTeam.mutate({
-                teamId: team.id,
-                data: { name, organizationId }
-              })
-            }
           >
             {authLocalization.settings.saveChanges}
           </Button>
           <Button
+            type="button"
             disabled={removeTeam.isPending}
             variant="destructive"
             onClick={() => {
@@ -159,7 +233,7 @@ function TeamCard({
           >
             {localization.deleteTeam}
           </Button>
-        </div>
+        </form>
         <div className="flex items-end gap-2">
           <Field className="flex-1">
             <FieldLabel>{localization.addTeamMember}</FieldLabel>

@@ -1,3 +1,4 @@
+import { formatAdditionalFieldValue } from "@better-auth-ui/core"
 import {
   type LeaveOrganizationParams,
   memberRoleLabels,
@@ -7,7 +8,7 @@ import {
   type RemoveMemberParams,
   type UpdateMemberRoleParams
 } from "@better-auth-ui/core/plugins/organization"
-import { useAuth, useSession } from "@better-auth-ui/solid"
+import { useAuth, useAuthPlugin, useSession } from "@better-auth-ui/solid"
 import {
   useActiveOrganization,
   useHasPermission,
@@ -48,6 +49,7 @@ type OrganizationMember = {
     image?: string | null
     name?: string | null
   } | null
+  [key: string]: unknown
 }
 
 type RoleMap = Record<string, string>
@@ -191,6 +193,7 @@ function LeaveOrganizationDialog(props: {
 
 export function OrganizationMemberRow(props: OrganizationMemberRowProps) {
   const auth = useAuth<OrganizationAuthClient>()
+  const config = useAuthPlugin(organizationPlugin)
   const [removeOpen, setRemoveOpen] = createSignal(false)
   const [leaveOpen, setLeaveOpen] = createSignal(false)
   const session = useSession(auth.authClient)
@@ -233,11 +236,28 @@ export function OrganizationMemberRow(props: OrganizationMemberRowProps) {
   return (
     <TableRow>
       <TableCell>
-        <UserView
-          image={user()?.image}
-          label={user()?.name ?? user()?.email ?? "Member"}
-          secondaryLabel={user()?.email}
-        />
+        <div class="flex flex-col gap-1">
+          <UserView
+            image={user()?.image}
+            label={user()?.name ?? user()?.email ?? "Member"}
+            secondaryLabel={user()?.email}
+          />
+          <For each={config.modelFields.member}>
+            {(field) => {
+              const value = () =>
+                formatAdditionalFieldValue(props.member[field.name])
+              return (
+                <Show when={value()}>
+                  {(resolved) => (
+                    <span class="text-muted-foreground text-xs">
+                      {field.label}: {resolved()}
+                    </span>
+                  )}
+                </Show>
+              )
+            }}
+          </For>
+        </div>
       </TableCell>
       <TableCell class="text-sm">
         {memberRoleLabels(props.member.role, props.roles).join(", ") ||
