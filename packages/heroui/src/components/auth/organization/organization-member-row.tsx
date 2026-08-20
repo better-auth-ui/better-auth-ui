@@ -111,7 +111,12 @@ export function OrganizationMemberRow({
                   }}
                 >
                   {assignableRoles.map(([role, label]) => (
-                    <Dropdown.Item key={role} id={role} textValue={label}>
+                    <Dropdown.Item
+                      key={role}
+                      id={role}
+                      isDisabled={isUpdatingRole}
+                      textValue={label}
+                    >
                       <Label>{label}</Label>
 
                       <Dropdown.ItemIndicator />

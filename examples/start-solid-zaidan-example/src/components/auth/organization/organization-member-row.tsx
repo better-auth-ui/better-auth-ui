@@ -262,8 +262,9 @@ export function OrganizationMemberRow(props: OrganizationMemberRowProps) {
                       checked={memberRoles().includes(role)}
                       closeOnSelect={false}
                       disabled={
-                        memberRoles().includes(role) &&
-                        memberRoles().length === 1
+                        updateMemberRole.isPending ||
+                        (memberRoles().includes(role) &&
+                          memberRoles().length === 1)
                       }
                       onChange={() => toggleRole(role)}
                     >

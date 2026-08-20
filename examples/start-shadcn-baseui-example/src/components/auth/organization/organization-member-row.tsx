@@ -124,7 +124,9 @@ export function OrganizationMemberRow({
                     <DropdownMenuCheckboxItem
                       key={role}
                       checked={checked}
-                      disabled={checked && memberRoles.length === 1}
+                      disabled={
+                        isUpdatingRole || (checked && memberRoles.length === 1)
+                      }
                       onSelect={(event) => {
                         // Keep the menu open so several roles can be toggled.
                         event.preventDefault()
