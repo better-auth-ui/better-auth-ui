@@ -9,6 +9,8 @@ export type { AuthPluginViewPaths } from "@better-auth-ui/core"
 
 /** Props for plugin-contributed auth buttons (e.g. passkey, magic link). */
 export type AuthButtonProps = {
+  /** Whether the button can own a browser autofill request. */
+  autoFill?: boolean
   className?: string
   children?: ReactNode
   /** Current auth view — lets buttons context-switch (e.g. show "back to sign-in"). */

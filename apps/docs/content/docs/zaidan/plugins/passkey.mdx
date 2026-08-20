@@ -187,24 +187,33 @@ Turn the whole thing off with:
 passkeyPlugin({ autoFill: false })
 ```
 
-If you write your own sign-in form, add the token yourself:
+If you write your own sign-in form, add the token and start the conditional
+request:
 
 ```tsx
+import type { PasskeyAuthClient } from "@better-auth-ui/core/plugins/passkey"
 import {
   isPasskeyAutoFillEnabled,
   withPasskeyAutoFill
 } from "@better-auth-ui/core/plugins/passkey"
+import { usePasskeyAutoFill } from "@better-auth-ui/solid/plugins/passkey"
 
-const auth = useAuth()
+const auth = useAuth<PasskeyAuthClient>()
 const passkeyAutoFill = isPasskeyAutoFillEnabled(auth.plugins)
+
+usePasskeyAutoFill(auth.authClient)
 
 <Input autocomplete={withPasskeyAutoFill("email", passkeyAutoFill)} />
 ```
 
 <Callout type="warn">
-The browser keeps a conditional request open until someone picks a passkey or
-the page navigates. WebAuthn gives no way to withdraw it, so unmounting the
-form does not cancel a request that already started.
+`navigator.credentials.get()` accepts an `AbortSignal`. The bundled hook calls
+the Better Auth passkey client, which does not expose that signal. Unmounting
+the form only stops a pending availability probe. It does not cancel a request
+that already started.
+
+If your custom implementation calls `navigator.credentials.get()` directly,
+pass an `AbortSignal` and abort it during cleanup.
 </Callout>
 
 ## Options

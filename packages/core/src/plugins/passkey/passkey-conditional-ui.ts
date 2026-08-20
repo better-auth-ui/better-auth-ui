@@ -22,11 +22,15 @@ export const webAuthnAutoCompleteToken = "webauthn"
  */
 export function withPasskeyAutoFill(autoComplete: string, enabled: boolean) {
   if (!enabled) return autoComplete
-  if (autoComplete.split(" ").includes(webAuthnAutoCompleteToken)) {
-    return autoComplete
-  }
 
-  return `${autoComplete} ${webAuthnAutoCompleteToken}`
+  const tokens = autoComplete
+    .split(/[\t\n\f\r ]+/)
+    .filter(
+      (token) =>
+        token && token.toLowerCase() !== webAuthnAutoCompleteToken.toLowerCase()
+    )
+
+  return [...tokens, webAuthnAutoCompleteToken].join(" ")
 }
 
 /**

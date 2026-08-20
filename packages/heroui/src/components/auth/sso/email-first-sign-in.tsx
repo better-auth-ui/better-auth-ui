@@ -1,6 +1,7 @@
 import { authMutationKeys } from "@better-auth-ui/core"
 import {
   isPasskeyAutoFillEnabled,
+  type PasskeyAuthClient,
   withPasskeyAutoFill
 } from "@better-auth-ui/core/plugins/passkey"
 import {
@@ -15,6 +16,7 @@ import {
   useFetchOptions,
   useSignInEmail
 } from "@better-auth-ui/react"
+import { usePasskeyAutoFill } from "@better-auth-ui/react/plugins/passkey"
 import { useSignInSso } from "@better-auth-ui/react/plugins/sso"
 import { Eye, EyeSlash } from "@gravity-ui/icons"
 import {
@@ -72,6 +74,10 @@ export function EmailFirstSignIn({
   const { localization: ssoLocalization } = useAuthPlugin(ssoPlugin)
   const { fetchOptions, resetFetchOptions } = useFetchOptions()
   const continueSignIn = useSignInContinuation()
+
+  usePasskeyAutoFill(authClient as PasskeyAuthClient, {
+    onSuccess: () => navigate({ to: redirectTo })
+  })
 
   const [step, setStep] = useState<Step>("email")
   const [email, setEmail] = useState("")
@@ -314,6 +320,7 @@ export function EmailFirstSignIn({
             {plugins.flatMap((plugin) =>
               (plugin.authButtons ?? []).map((AuthButton) => (
                 <AuthButton
+                  autoFill={false}
                   key={getAuthButtonKey(plugin.id, AuthButton)}
                   view="signIn"
                 />

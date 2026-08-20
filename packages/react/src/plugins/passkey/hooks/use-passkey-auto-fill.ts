@@ -30,8 +30,9 @@ export type UsePasskeyAutoFillOptions<TAuthClient extends PasskeyAuthClient> =
  * field — see `withPasskeyAutoFill` in `@better-auth-ui/core/plugins/passkey`.
  *
  * The request stays open until the user picks a passkey or the page
- * navigates. WebAuthn gives us no way to withdraw it, so unmounting only stops
- * a pending availability probe from starting one.
+ * navigates. The Better Auth passkey client doesn't expose WebAuthn's abort
+ * signal, so unmounting only stops a pending availability probe from starting
+ * one.
  *
  * @param authClient - The Better Auth client with the passkey plugin.
  * @param options - React Query options forwarded to the sign-in mutation.
@@ -53,12 +54,12 @@ export function usePasskeyAutoFill<TAuthClient extends PasskeyAuthClient>(
   useEffect(() => {
     if (started.current || !active) return
 
-    started.current = true
     let cancelled = false
 
     void isConditionalMediationAvailable().then((available) => {
       if (!available || cancelled) return
 
+      started.current = true
       signInPasskey({ autoFill: true })
     })
 

@@ -27,9 +27,15 @@ describe("withPasskeyAutoFill", () => {
     )
   })
 
-  it("leaves the value alone when disabled or already tokenised", () => {
+  it("leaves the value alone when disabled", () => {
     expect(withPasskeyAutoFill("email", false)).toBe("email")
+  })
+
+  it("keeps one canonical webauthn token in the final position", () => {
     expect(withPasskeyAutoFill("email webauthn", true)).toBe("email webauthn")
+    expect(withPasskeyAutoFill("WebAuthn\temail webauthn", true)).toBe(
+      "email webauthn"
+    )
   })
 })
 

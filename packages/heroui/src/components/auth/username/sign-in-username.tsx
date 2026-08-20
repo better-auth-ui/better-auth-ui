@@ -190,10 +190,7 @@ export function SignInUsername({
             <TextField
               name="email"
               type="text"
-              autoComplete={withPasskeyAutoFill(
-                "username email",
-                passkeyAutoFill
-              )}
+              autoComplete={withPasskeyAutoFill("username", passkeyAutoFill)}
               isDisabled={isPending}
               validate={(value) => {
                 if (!value) return localization.auth.fieldRequired

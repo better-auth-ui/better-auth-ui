@@ -12,11 +12,12 @@ import { useIsMutating } from "@tanstack/react-query"
 import { passkeyPlugin } from "../../../lib/auth/passkey-plugin"
 
 export type PasskeyButtonProps = {
+  autoFill?: boolean
   /** @remarks `AuthView` */
   view?: AuthView
 }
 
-export function PasskeyButton({ view }: PasskeyButtonProps) {
+export function PasskeyButton({ autoFill = true, view }: PasskeyButtonProps) {
   const { authClient, localization, redirectTo, navigate } = useAuth()
   const { localization: passkeyLocalization } = useAuthPlugin(passkeyPlugin)
 
@@ -30,7 +31,7 @@ export function PasskeyButton({ view }: PasskeyButtonProps) {
   // Surfaces passkeys in the browser's autofill dropdown while the sign-in
   // form is open. The button stays for anyone who dismisses it.
   usePasskeyAutoFill(authClient as PasskeyAuthClient, {
-    enabled: view !== "signUp",
+    enabled: autoFill && view !== "signUp",
     onSuccess: () => navigate({ to: redirectTo })
   })
 
