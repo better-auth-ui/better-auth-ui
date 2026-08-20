@@ -63,7 +63,9 @@ export function TeamSwitcher({
 
   return (
     <DropdownMenu open={open} onOpenChange={setOpen}>
-      {trigger ?? (
+      {trigger ? (
+        <DropdownMenuTrigger asChild>{trigger}</DropdownMenuTrigger>
+      ) : (
         <DropdownMenuTrigger
           className={cn(
             buttonVariants({ variant: "outline" }),

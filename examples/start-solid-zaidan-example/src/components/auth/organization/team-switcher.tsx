@@ -8,7 +8,7 @@ import {
   useSetActiveTeam
 } from "@better-auth-ui/solid/plugins/organization"
 import { Check, ChevronsUpDown, Users } from "lucide-solid"
-import type { JSX } from "solid-js"
+import type { ValidComponent } from "solid-js"
 import { createMemo, createSignal, For, Show } from "solid-js"
 import { Button } from "@/components/ui/button"
 import {
@@ -28,7 +28,7 @@ export type TeamSwitcherProps = {
   syncSession?: boolean
   allowClear?: boolean
   class?: string
-  trigger?: JSX.Element
+  trigger?: ValidComponent
 }
 
 export function TeamSwitcher(props: TeamSwitcherProps) {
@@ -81,7 +81,9 @@ export function TeamSwitcher(props: TeamSwitcherProps) {
           </DropdownMenuTrigger>
         }
       >
-        {props.trigger}
+        {(Trigger) => (
+          <DropdownMenuTrigger as={Trigger()} class={props.class} />
+        )}
       </Show>
       <DropdownMenuContent class="min-w-56">
         <Show when={props.allowClear !== false}>
