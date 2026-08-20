@@ -7,7 +7,7 @@ description: Add pricing, subscriptions, checkout, seats, usage, and billing man
 import { Callout } from "fumadocs-ui/components/callout"
 import { Step, Steps } from "fumadocs-ui/components/steps"
 
-The billing plugin adds a complete billing tab to personal or organization settings. Every component reads a provider-neutral `BillingAdapter`. BAUI includes adapters for Better Auth's Stripe and Polar plugins, and you can implement the same interface for another billing service.
+The billing plugin adds a complete billing tab to personal or organization settings. Every component reads a provider-neutral `BillingAdapter`. BAUI includes adapters for Stripe, Polar, Autumn, Creem, Dodo Payments, and Commet.
 
 The UI includes:
 
@@ -26,7 +26,9 @@ The UI includes:
 <Step>
 ### Configure a Better Auth billing plugin
 
-Use the [Better Auth Stripe plugin](https://www.better-auth.com/docs/beta/plugins/stripe) or the [Better Auth Polar plugin](https://www.better-auth.com/docs/plugins/polar) on the server and client. Apply the plugin's database schema before you open the billing page.
+Configure one of Better Auth's supported billing plugins on the server and client. Apply its database schema before you open the billing page.
+
+See the provider guides for [Stripe](https://www.better-auth.com/docs/beta/plugins/stripe), [Polar](https://www.better-auth.com/docs/plugins/polar), [Autumn](https://www.better-auth.com/docs/plugins/autumn), [Creem](https://www.better-auth.com/docs/plugins/creem), [Dodo Payments](https://docs.dodopayments.com/developer-resources/better-auth-adaptor), and [Commet](https://www.better-auth.com/docs/plugins/commet).
 
 </Step>
 <Step>
@@ -128,6 +130,72 @@ export const billingAdapter = createPolarBillingAdapter(authClient, {
 
 Polar handles cancellation, restoration, and seat changes in its customer portal. Its adapter marks those direct actions as unsupported, so BAUI shows a manage-billing action instead. Stripe performs the actions through Better Auth's subscription endpoints.
 
+## Other bundled adapters
+
+Each adapter reflects the official client API. It does not claim support for actions that the provider handles in its portal.
+
+| Adapter | Checkout and state | Direct actions | Scope |
+| --- | --- | --- | --- |
+| Stripe | Better Auth subscription API | Cancel, restore, seats | User and explicit organization |
+| Polar | Checkout, subscriptions, usage | Portal fallback | User and explicit organization |
+| Autumn | Attach, customer subscriptions, balances | Cancel, restore, optional license seats | User |
+| Creem | Checkout and active subscription | Cancel | User |
+| Dodo Payments | Checkout session and subscription list | Portal fallback | User |
+| Commet | Portal and current subscription | Cancel, optional feature usage and seats | User |
+
+```ts title="lib/billing.ts"
+import {
+  createAutumnBillingAdapter,
+  createCommetBillingAdapter,
+  createCreemBillingAdapter,
+  createDodoPaymentsBillingAdapter
+} from "@better-auth-ui/core/plugins/billing"
+import { createAutumnClient } from "autumn-js/react"
+
+const urls = {
+  successUrl: "/settings/billing?checkout=success",
+  cancelUrl: "/settings/billing?checkout=canceled",
+  returnUrl: "/settings/billing"
+}
+
+const autumnClient = createAutumnClient({
+  pathPrefix: "/api/auth/autumn",
+  includeCredentials: true
+})
+
+export const autumnAdapter = createAutumnBillingAdapter(autumnClient, {
+  plans,
+  seatLicensePlans: { pro: "team-seat" },
+  ...urls
+})
+
+export const creemAdapter = createCreemBillingAdapter(authClient, {
+  plans,
+  products: { pro: "prod_creem_pro" },
+  ...urls
+})
+
+export const dodoAdapter = createDodoPaymentsBillingAdapter(authClient, {
+  plans,
+  products: { pro: { type: "slug", value: "pro" } },
+  ...urls
+})
+
+export const commetAdapter = createCommetBillingAdapter(authClient, {
+  plans,
+  planIds: { pro: "commet-plan-id" },
+  usage: true,
+  seatFeatureCode: "members",
+  ...urls
+})
+```
+
+Enable the matching provider sub-plugins. Dodo needs checkout and portal. Commet needs portal and subscriptions, plus features or seats when you enable those adapter options.
+
+<Callout type="warn" title="User-only provider clients">
+Autumn, Creem, Dodo Payments, and Commet resolve the signed-in customer. Their browser APIs do not accept an explicit organization ID. Their adapters declare `scopes.organization: false`. `billingPlugin` rejects an organization billing configuration instead of reading active organization state.
+</Callout>
+
 ## Custom adapters
 
 Implement `BillingAdapter` when you use another provider. Keep provider SDK objects inside the adapter and return only BAUI's generic plan, subscription, usage, and action types.
@@ -137,6 +205,7 @@ import type { BillingAdapter } from "@better-auth-ui/core/plugins/billing"
 
 export const billingAdapter: BillingAdapter = {
   id: "custom",
+  scopes: { user: true, organization: true },
   supports: { cancel: true, restore: true, seats: true },
   listPlans: async (scope, signal) => billingApi.listPlans(scope, signal),
   getState: async (scope, signal) => billingApi.getState(scope, signal),

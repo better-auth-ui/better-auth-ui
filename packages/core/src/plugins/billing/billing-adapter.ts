@@ -77,10 +77,17 @@ export type BillingCapabilities = {
   seats: boolean
 }
 
+export type BillingScopeCapabilities = {
+  user: boolean
+  organization: boolean
+}
+
 /** Provider-neutral billing operations consumed by every BAUI billing view. */
 export interface BillingAdapter {
   readonly id: string
   readonly supports: BillingCapabilities
+  /** Billing scopes supported by the provider client. Omit for custom adapters. */
+  readonly scopes?: BillingScopeCapabilities
   listPlans(scope: BillingScope, signal?: AbortSignal): Promise<BillingPlan[]>
   getState(scope: BillingScope, signal?: AbortSignal): Promise<BillingState>
   checkout(

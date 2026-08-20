@@ -26,13 +26,27 @@ export type BillingPluginOptions = {
 
 export const billingPlugin = createAuthPlugin(
   "billing",
-  (options: BillingPluginOptions) => ({
-    adapter: options.adapter,
-    localization: { ...billingLocalization, ...options.localization },
-    user: options.user ?? true,
-    organization: options.organization ?? false,
-    viewPaths: {
-      settings: { billing: options.path ?? "billing" }
+  (options: BillingPluginOptions) => {
+    const user = options.user ?? true
+    const organization = options.organization ?? false
+
+    if (user && options.adapter.scopes?.user === false) {
+      throw new Error(`${options.adapter.id} does not support user billing.`)
     }
-  })
+    if (organization && options.adapter.scopes?.organization === false) {
+      throw new Error(
+        `${options.adapter.id} does not support explicit organization billing.`
+      )
+    }
+
+    return {
+      adapter: options.adapter,
+      localization: { ...billingLocalization, ...options.localization },
+      user,
+      organization,
+      viewPaths: {
+        settings: { billing: options.path ?? "billing" }
+      }
+    }
+  }
 )

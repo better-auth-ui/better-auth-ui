@@ -179,9 +179,14 @@
     "@better-auth/passkey": "1.7.0",
     "@better-auth/sso": "1.7.0",
     "@better-auth/stripe": "1.7.0",
+    "@commet/better-auth": "8.1.0",
+    "@commet/node": "9.1.0",
+    "@creem_io/better-auth": "1.1.4",
+    "@dodopayments/better-auth": "1.6.5",
     "@mikkelscheike/email-provider-links": "5.2.1",
     "@polar-sh/better-auth": "1.7.0",
     "@tanstack/query-core": "^5.101.2",
+    "autumn-js": "1.2.53",
     "better-auth": "1.7.0",
     "vitest": "^4.1.9"
   },
@@ -192,9 +197,13 @@
     "@better-auth/passkey": ">=1.7.0",
     "@better-auth/sso": ">=1.7.0",
     "@better-auth/stripe": ">=1.7.0",
+    "@commet/better-auth": ">=8.1.0",
+    "@creem_io/better-auth": ">=1.1.4",
+    "@dodopayments/better-auth": ">=1.6.5",
     "@mikkelscheike/email-provider-links": ">=5.2.1",
     "@polar-sh/better-auth": ">=1.7.0",
     "@tanstack/query-core": ">=5.101.2",
+    "autumn-js": ">=1.2.53",
     "better-auth": ">=1.7.0"
   },
   "peerDependenciesMeta": {
@@ -213,7 +222,19 @@
     "@better-auth/stripe": {
       "optional": true
     },
+    "@commet/better-auth": {
+      "optional": true
+    },
+    "@creem_io/better-auth": {
+      "optional": true
+    },
+    "@dodopayments/better-auth": {
+      "optional": true
+    },
     "@polar-sh/better-auth": {
+      "optional": true
+    },
+    "autumn-js": {
       "optional": true
     }
   },

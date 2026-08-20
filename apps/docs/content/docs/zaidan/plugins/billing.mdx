@@ -7,7 +7,7 @@ description: Add plans, subscriptions, checkout, seats, and usage to Solid/Zaida
 import { Callout } from 'fumadocs-ui/components/callout'
 import { Step, Steps } from 'fumadocs-ui/components/steps'
 
-The billing plugin adds a billing tab to personal or organization settings. Every view reads a provider-neutral `BillingAdapter`, so the same UI works against Stripe, Polar, or anything else you write an adapter for.
+The billing plugin adds a billing tab to personal or organization settings. Every view reads a provider-neutral `BillingAdapter`. BAUI includes adapters for Stripe, Polar, Autumn, Creem, Dodo Payments, and Commet.
 
 The UI covers:
 
@@ -25,7 +25,9 @@ The UI covers:
 <Step>
 ### Configure a Better Auth billing plugin
 
-Use the [Better Auth Stripe plugin](https://www.better-auth.com/docs/beta/plugins/stripe) or the [Better Auth Polar plugin](https://www.better-auth.com/docs/plugins/polar) on the server and client, and apply its schema before opening the billing page.
+Configure one of Better Auth's supported billing plugins on the server and client. Apply its schema before you open the billing page.
+
+See the provider guides for [Stripe](https://www.better-auth.com/docs/beta/plugins/stripe), [Polar](https://www.better-auth.com/docs/plugins/polar), [Autumn](https://www.better-auth.com/docs/plugins/autumn), [Creem](https://www.better-auth.com/docs/plugins/creem), [Dodo Payments](https://docs.dodopayments.com/developer-resources/better-auth-adaptor), and [Commet](https://www.better-auth.com/docs/plugins/commet).
 
 </Step>
 <Step>
@@ -39,7 +41,7 @@ npx shadcn@latest add https://better-auth-ui.com/r/solid/billing.json
 <Step>
 ### Register the plugin
 
-Build an adapter and hand it to the plugin. BAUI ships `createStripeBillingAdapter` and `createPolarBillingAdapter`.
+Build an adapter and hand it to the plugin.
 
 ```tsx title="src/components/providers.tsx"
 import { createStripeBillingAdapter } from "@better-auth-ui/core/plugins/billing" // [!code highlight]
@@ -47,7 +49,12 @@ import { AuthProvider } from "@/components/auth/auth-provider"
 import { billingPlugin } from "@/lib/auth/billing-plugin" // [!code highlight]
 import { authClient } from "@/lib/auth-client"
 
-const billingAdapter = createStripeBillingAdapter(authClient) // [!code highlight]
+const billingAdapter = createStripeBillingAdapter(authClient, {
+  plans,
+  successUrl: "/settings/billing?checkout=success",
+  cancelUrl: "/settings/billing?checkout=canceled",
+  returnUrl: "/settings/billing"
+}) // [!code highlight]
 
 export function Providers(props: { children?: JSX.Element }) {
   return (
@@ -68,6 +75,23 @@ export function Providers(props: { children?: JSX.Element }) {
 
 </Step>
 </Steps>
+
+## Bundled adapters
+
+| Adapter | Checkout and state | Direct actions | Scope |
+| --- | --- | --- | --- |
+| Stripe | Better Auth subscription API | Cancel, restore, seats | User and explicit organization |
+| Polar | Checkout, subscriptions, usage | Portal fallback | User and explicit organization |
+| Autumn | Attach, customer subscriptions, balances | Cancel, restore, optional license seats | User |
+| Creem | Checkout and active subscription | Cancel | User |
+| Dodo Payments | Checkout session and subscription list | Portal fallback | User |
+| Commet | Portal and current subscription | Cancel, optional feature usage and seats | User |
+
+The factories are `createStripeBillingAdapter`, `createPolarBillingAdapter`, `createAutumnBillingAdapter`, `createCreemBillingAdapter`, `createDodoPaymentsBillingAdapter`, and `createCommetBillingAdapter`. They use the same `BillingPlan` list and work with both React and Solid billing hooks.
+
+<Callout type="warn" title="User-only provider clients">
+Autumn, Creem, Dodo Payments, and Commet resolve the signed-in customer. Their browser APIs do not accept an explicit organization ID. Their adapters declare `scopes.organization: false`. `billingPlugin` rejects an organization billing configuration instead of reading active organization state.
+</Callout>
 
 <Callout type="info">
   The adapter's `supports` flags decide which controls render. A provider that cannot restore a canceled subscription does not show the restore button.
