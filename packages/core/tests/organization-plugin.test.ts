@@ -105,6 +105,42 @@ describe("organizationPlugin", () => {
     })
   })
 
+  it("normalizes static team policies", () => {
+    expect(
+      organizationPlugin({
+        teams: {
+          maximumTeams: 4,
+          maximumMembersPerTeam: 12,
+          allowRemovingAllTeams: true
+        }
+      })
+    ).toMatchObject({
+      teams: true,
+      teamPolicy: {
+        maximumTeams: 4,
+        maximumMembersPerTeam: 12,
+        allowRemovingAllTeams: true
+      }
+    })
+
+    expect(
+      organizationPlugin({
+        teams: {
+          enabled: false,
+          maximumTeams: -1,
+          maximumMembersPerTeam: Number.NaN
+        }
+      })
+    ).toMatchObject({
+      teams: false,
+      teamPolicy: {
+        maximumTeams: undefined,
+        maximumMembersPerTeam: undefined,
+        allowRemovingAllTeams: false
+      }
+    })
+  })
+
   it("merges path and localization overrides", () => {
     const plugin = organizationPlugin({
       viewPaths: {

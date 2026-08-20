@@ -1018,10 +1018,18 @@ Enable teams on the Better Auth server, client, and UI plugin:
 ```tsx
 organization({ teams: { enabled: true } })
 organizationClient({ teams: { enabled: true } })
-organizationPlugin({ teams: true })
+organizationPlugin({
+  teams: {
+    maximumTeams: 5,
+    maximumMembersPerTeam: 20,
+    allowRemovingAllTeams: false
+  }
+})
 ```
 
 The organization shell adds a Teams tab. Users can create, rename, and delete teams. They can also add and remove team members. Invitations can assign a team.
+
+The UI disables team creation and member assignment when these limits are reached. It also protects the final team unless `allowRemovingAllTeams` is true. Better Auth also accepts callback limits on the server. The browser cannot run those callbacks, so pass their resolved values into the UI configuration when the limits vary by organization.
 
 The `useListTeams`, `useListTeamMembers`, `useCreateTeam`, `useUpdateTeam`, `useRemoveTeam`, `useAddTeamMember`, and `useRemoveTeamMember` hooks cover the team lifecycle.
 

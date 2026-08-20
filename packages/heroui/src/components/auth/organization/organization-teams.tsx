@@ -37,8 +37,11 @@ export function OrganizationTeams() {
   const { data: activeOrganization } = useActiveOrganization(
     authClient as OrganizationAuthClient
   )
-  const { localization: labels, modelFields } =
-    useAuthPlugin(organizationPlugin)
+  const {
+    localization: labels,
+    modelFields,
+    teamPolicy
+  } = useAuthPlugin(organizationPlugin)
   const client = authClient as OrganizationAuthClient
   const teams = useListTeams(client, {
     query: { organizationId: activeOrganization?.id }
@@ -48,12 +51,15 @@ export function OrganizationTeams() {
     onSuccess: () => toast.success(labels.teamCreated)
   })
   const [isCreatingFields, setIsCreatingFields] = useState(false)
+  const teamLimitReached =
+    teamPolicy.maximumTeams !== undefined &&
+    (teams.data?.length ?? 0) >= teamPolicy.maximumTeams
   const submit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     const name = String(
       new FormData(event.currentTarget).get("name") ?? ""
     ).trim()
-    if (!name || !activeOrganization) return
+    if (!name || !activeOrganization || teamLimitReached) return
 
     setIsCreatingFields(true)
     try {
@@ -83,7 +89,10 @@ export function OrganizationTeams() {
           className="grid w-full gap-3 sm:max-w-xl sm:grid-cols-2"
           onSubmit={submit}
         >
-          <TextField name="name" isDisabled={createTeam.isPending}>
+          <TextField
+            name="name"
+            isDisabled={createTeam.isPending || teamLimitReached}
+          >
             <Label>{labels.name}</Label>
             <Input variant="secondary" required />
           </TextField>
@@ -100,12 +109,18 @@ export function OrganizationTeams() {
             className="self-end"
             type="submit"
             isPending={createTeam.isPending || isCreatingFields}
+            isDisabled={teamLimitReached}
           >
             {(createTeam.isPending || isCreatingFields) && (
               <Spinner color="current" size="sm" />
             )}
             {labels.createTeam}
           </Button>
+          {teamLimitReached && (
+            <p className="text-danger text-sm sm:col-span-2" role="alert">
+              {labels.teamLimitReached}
+            </p>
+          )}
         </Form>
       </div>
       {teams.isPending ? (
@@ -118,6 +133,9 @@ export function OrganizationTeams() {
             organizationId={activeOrganization?.id ?? ""}
             organizationMembers={members.data?.members ?? []}
             teamFields={modelFields.team}
+            teamCount={teams.data?.length ?? 0}
+            maximumMembersPerTeam={teamPolicy.maximumMembersPerTeam}
+            allowRemovingAllTeams={teamPolicy.allowRemovingAllTeams}
           />
         ))
       ) : (
@@ -136,7 +154,10 @@ function TeamCard({
   team,
   organizationId,
   organizationMembers,
-  teamFields
+  teamFields,
+  teamCount,
+  maximumMembersPerTeam,
+  allowRemovingAllTeams
 }: {
   team: { id: string; name: string; [key: string]: unknown }
   organizationId: string
@@ -145,6 +166,9 @@ function TeamCard({
     user: { name: string; email: string }
   }>
   teamFields: AdditionalFields
+  teamCount: number
+  maximumMembersPerTeam?: number
+  allowRemovingAllTeams: boolean
 }) {
   const { authClient, localization } = useAuth()
   const { localization: labels } = useAuthPlugin(organizationPlugin)
@@ -160,6 +184,10 @@ function TeamCard({
   })
   const removeMember = useRemoveTeamMember(client)
   const memberIds = new Set(teamMembers.data?.map((member) => member.userId))
+  const memberLimitReached =
+    maximumMembersPerTeam !== undefined &&
+    (teamMembers.data?.length ?? 0) >= maximumMembersPerTeam
+  const canRemoveTeam = allowRemovingAllTeams || teamCount > 1
   const submitUpdate = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     setIsUpdatingFields(true)
@@ -215,6 +243,10 @@ function TeamCard({
           <Button
             type="button"
             variant="danger-soft"
+            isDisabled={removeTeam.isPending || !canRemoveTeam}
+            aria-label={
+              canRemoveTeam ? labels.deleteTeam : labels.lastTeamRemovalDisabled
+            }
             onPress={() =>
               removeTeam.mutate({ teamId: team.id, organizationId })
             }
@@ -222,11 +254,15 @@ function TeamCard({
             {labels.deleteTeam}
           </Button>
         </Form>
+        {!canRemoveTeam && (
+          <p className="text-sm text-muted">{labels.lastTeamRemovalDisabled}</p>
+        )}
         <div className="flex items-end gap-2">
           <Select
             className="flex-1"
             value={userId}
             onChange={(value) => setUserId(String(value))}
+            isDisabled={memberLimitReached}
           >
             <Label>{labels.addTeamMember}</Label>
             <Select.Trigger>
@@ -251,7 +287,7 @@ function TeamCard({
             </Select.Popover>
           </Select>
           <Button
-            isDisabled={!userId || addMember.isPending}
+            isDisabled={!userId || addMember.isPending || memberLimitReached}
             onPress={() =>
               userId &&
               addMember.mutate({ teamId: team.id, userId, organizationId })
@@ -260,6 +296,11 @@ function TeamCard({
             {labels.addTeamMember}
           </Button>
         </div>
+        {memberLimitReached && (
+          <p className="text-danger text-sm" role="alert">
+            {labels.teamMemberLimitReached}
+          </p>
+        )}
         <div className="flex flex-col gap-2">
           {teamMembers.data?.map((teamMember) => {
             const member = organizationMembers.find(

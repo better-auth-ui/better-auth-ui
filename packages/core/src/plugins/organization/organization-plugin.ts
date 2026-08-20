@@ -115,8 +115,19 @@ export type OrganizationPluginOptions = {
   invitationLimit?: number
   /** Whether organization creation controls are available. @default true */
   allowOrganizationCreation?: boolean
-  /** Enable Better Auth team management controls. @default false */
-  teams?: boolean
+  /** Enable Better Auth team management controls and mirror static server policies. */
+  teams?: boolean | OrganizationTeamsOptions
+}
+
+export type OrganizationTeamsOptions = {
+  /** Enable team management controls. @default true */
+  enabled?: boolean
+  /** Maximum teams an organization can contain. */
+  maximumTeams?: number
+  /** Maximum members a team can contain. */
+  maximumMembersPerTeam?: number
+  /** Allow deletion of an organization's final team. @default false */
+  allowRemovingAllTeams?: boolean
 }
 
 export type OrganizationAdditionalFields = {
@@ -156,6 +167,8 @@ export const organizationPlugin = createAuthPlugin(
       ...organizationLocalization,
       ...options.localization
     }
+    const teamOptions =
+      typeof options.teams === "object" ? options.teams : undefined
 
     return {
       slug: options.slug,
@@ -194,7 +207,16 @@ export const organizationPlugin = createAuthPlugin(
       membershipLimit: resolvePolicyLimit(options.membershipLimit),
       invitationLimit: resolvePolicyLimit(options.invitationLimit),
       allowOrganizationCreation: options.allowOrganizationCreation ?? true,
-      teams: options.teams ?? false,
+      teams:
+        options.teams === true ||
+        (teamOptions !== undefined && (teamOptions.enabled ?? true)),
+      teamPolicy: {
+        maximumTeams: resolvePolicyLimit(teamOptions?.maximumTeams),
+        maximumMembersPerTeam: resolvePolicyLimit(
+          teamOptions?.maximumMembersPerTeam
+        ),
+        allowRemovingAllTeams: teamOptions?.allowRemovingAllTeams ?? false
+      },
       viewPaths: {
         settings: {
           organizations:
