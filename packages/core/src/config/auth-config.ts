@@ -9,6 +9,8 @@ import type { AvatarConfig } from "./avatar-config"
 import type { EmailAndPasswordConfig } from "./email-and-password-config"
 import type { AuthSocialProvider } from "./social-provider-config"
 
+export type SocialSignInMode = "redirect" | "popup"
+
 /**
  * Core authentication configuration interface.
  *
@@ -77,6 +79,12 @@ export interface AuthConfig<TAuthClient extends AuthClient = AuthClient> {
    */
   socialProviders?: AuthSocialProvider[]
   /**
+   * How social sign-in opens the provider flow.
+   * Popup mode requires Better Auth's experimental `oauthPopupClient` action.
+   * @default "redirect"
+   */
+  socialSignInMode: SocialSignInMode
+  /**
    * View path mappings for different authentication views
    * @remarks `ViewPaths`
    */
@@ -114,6 +122,7 @@ export const defaultAuthConfig: Omit<AuthConfig, "authClient"> = {
   },
   plugins: [],
   redirectTo: "/",
+  socialSignInMode: "redirect",
   viewPaths,
   localization,
   navigate: ({ to, replace }) => {

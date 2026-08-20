@@ -3,11 +3,13 @@ import {
   type AuthView,
   authMutationKeys,
   getProviderId,
-  getProviderName
+  getProviderName,
+  type OAuthPopupAuthClient
 } from "@better-auth-ui/core"
 import {
   renderProviderIcon,
   useAuth,
+  useSignInOAuthPopup,
   useSignInSocial
 } from "@better-auth-ui/react"
 import { Button, type ButtonProps, cn, Spinner } from "@heroui/react"
@@ -34,12 +36,21 @@ export function ProviderButton({
   className,
   ...props
 }: ProviderButtonProps) {
-  const { authClient, baseURL, localization, redirectTo } = useAuth()
+  const {
+    authClient,
+    baseURL,
+    localization,
+    navigate,
+    redirectTo,
+    socialSignInMode
+  } = useAuth()
 
   const callbackURL = `${baseURL}${redirectTo}`
 
   const { mutate: signInSocial, isPending: signInSocialPending } =
     useSignInSocial(authClient)
+  const { mutate: signInPopup, isPending: signInPopupPending } =
+    useSignInOAuthPopup(authClient as OAuthPopupAuthClient)
 
   const providerId = getProviderId(provider)
   const providerIcon = renderProviderIcon(provider)
@@ -52,15 +63,31 @@ export function ProviderButton({
   })
   const isPending = signInMutating + signUpMutating > 0
 
+  const handleSignIn = () => {
+    if (socialSignInMode === "popup") {
+      signInPopup(
+        {
+          provider: providerId,
+          callbackURL,
+          requestSignUp: view === "signUp"
+        },
+        { onSuccess: () => navigate({ to: redirectTo }) }
+      )
+      return
+    }
+
+    signInSocial({ provider: providerId, callbackURL })
+  }
+
   return (
     <Button
       variant={variant}
       isPending={isPending}
-      onPress={() => signInSocial({ provider: providerId, callbackURL })}
+      onPress={handleSignIn}
       className={cn("relative overflow-visible", className)}
       {...props}
     >
-      {signInSocialPending ? (
+      {signInSocialPending || signInPopupPending ? (
         <Spinner color="current" size="sm" />
       ) : (
         providerIcon

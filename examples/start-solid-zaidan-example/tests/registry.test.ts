@@ -3982,7 +3982,11 @@ describe("Solid registry isolation", () => {
     const authProviderHeadings = extractLevelTwoHeadings(authProviderDoc)
 
     expect(authProviderDoc).toContain("Solid Query")
-    expect(authProviderHeadings).toEqual(["Usage", "Props"])
+    expect(authProviderHeadings).toEqual([
+      "Usage",
+      "Popup social sign-in",
+      "Props"
+    ])
     expect(authProviderDoc).toContain(
       "```tsx file=<rootDir>/../../examples/start-solid-zaidan-example/src/components/providers.tsx"
     )

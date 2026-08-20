@@ -41,7 +41,9 @@ export const authMutationKeys = {
     /** Key for `signIn.email`. */
     email: ["auth", "signIn", "email"] as const,
     /** Key for `signIn.social`. */
-    social: ["auth", "signIn", "social"] as const
+    social: ["auth", "signIn", "social"] as const,
+    /** Key for `signIn.popup`. */
+    popup: ["auth", "signIn", "popup"] as const
   },
 
   /** Sign-up mutations, grouped by strategy. */

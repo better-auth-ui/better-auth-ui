@@ -58,6 +58,45 @@ export const auth = betterAuth({
 
 Register `/api/auth/callback/company-oauth` with the provider. See the [Better Auth Generic OAuth guide](https://www.better-auth.com/docs/plugins/generic-oauth) for endpoint and profile options.
 
+## Popup social sign-in
+
+Set `socialSignInMode="popup"` to keep the current page open during social sign-in. Redirect mode remains the default.
+
+Better Auth marks this API as experimental. Configure the server and client plugins before you enable it:
+
+```ts title="lib/auth.ts"
+import { betterAuth } from "better-auth"
+import { bearer, oauthPopup } from "better-auth/plugins"
+
+export const auth = betterAuth({
+  plugins: [bearer(), oauthPopup()]
+})
+```
+
+```ts title="lib/auth-client.ts"
+import { createAuthClient } from "better-auth/react"
+import { oauthPopupClient } from "better-auth/client/plugins"
+
+export const authClient = createAuthClient({
+  plugins: [oauthPopupClient()]
+})
+```
+
+Then select popup mode on the provider:
+
+```tsx
+<AuthProvider
+  authClient={authClient}
+  navigate={navigate}
+  socialProviders={["github", "google"]}
+  socialSignInMode="popup"
+>
+  {children}
+</AuthProvider>
+```
+
+Popup mode uses the same provider buttons and redirect target. It returns control to the current page, refreshes the session, and then runs the configured navigation.
+
 ## Props
 
 <auto-type-table path="../../../../../../packages/react/src/components/auth/auth-provider.tsx" name="AuthProviderProps" />

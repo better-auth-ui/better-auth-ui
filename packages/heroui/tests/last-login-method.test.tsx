@@ -17,6 +17,7 @@ function createMockAuthClient(method: string | null) {
     getLastUsedLoginMethod: vi.fn(() => method),
     signIn: {
       email: vi.fn(),
+      popup: vi.fn(),
       social: vi.fn()
     },
     useSession: () => ({ data: null, isPending: false, error: null })
@@ -109,6 +110,42 @@ describe("lastLoginMethodPlugin", () => {
       expect(signInSocial).toHaveBeenCalledWith(
         expect.objectContaining({ provider: "acme-sso" })
       )
+    )
+  })
+
+  it("uses popup sign-in when configured", async () => {
+    const authClient = createMockAuthClient(null)
+    const signInPopup = vi.fn(async () => ({
+      data: { success: true },
+      error: null
+    }))
+    authClient.signIn.popup = signInPopup as never
+    const navigate = vi.fn()
+
+    render(
+      <AuthProvider
+        authClient={authClient}
+        navigate={navigate}
+        redirectTo="/dashboard"
+        socialSignInMode="popup"
+      >
+        <ProviderButton provider="github" />
+      </AuthProvider>
+    )
+
+    fireEvent.click(
+      screen.getByRole("button", { name: /continue with github/i })
+    )
+
+    await waitFor(() =>
+      expect(signInPopup).toHaveBeenCalledWith({
+        provider: "github",
+        callbackURL: "/dashboard",
+        requestSignUp: false
+      })
+    )
+    await waitFor(() =>
+      expect(navigate).toHaveBeenCalledWith({ to: "/dashboard" })
     )
   })
 })

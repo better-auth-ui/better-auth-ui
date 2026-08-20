@@ -18,6 +18,7 @@ import {
   revokeSessionsOptions,
   sendVerificationEmailOptions,
   signInEmailOptions,
+  signInOAuthPopupOptions,
   signInSocialOptions,
   signOutOptions,
   signUpEmailOptions,
@@ -121,6 +122,10 @@ describe("core base endpoint option factories", () => {
       sendVerificationEmail: vi.fn(async (params) => ({ data: params.email })),
       signIn: {
         email: vi.fn(async (params) => ({ data: params.email })),
+        popup: vi.fn(async () => ({
+          data: { success: true },
+          error: null
+        })),
         social: vi.fn(async (params) => ({ data: params.provider }))
       },
       signOut: vi.fn(async (params) => ({ data: params.fetchOptions.throw })),
@@ -142,6 +147,7 @@ describe("core base endpoint option factories", () => {
     const resetPassword = resetPasswordOptions(authClient as never)
     const verification = sendVerificationEmailOptions(authClient as never)
     const signInEmail = signInEmailOptions(authClient as never)
+    const signInPopup = signInOAuthPopupOptions(authClient as never)
     const signInSocial = signInSocialOptions(authClient as never)
     const signOut = signOutOptions(authClient as never)
     const signUpEmail = signUpEmailOptions(authClient as never)
@@ -166,6 +172,7 @@ describe("core base endpoint option factories", () => {
       authMutationKeys.sendVerificationEmail
     )
     expect(signInEmail.mutationKey).toEqual(authMutationKeys.signIn.email)
+    expect(signInPopup.mutationKey).toEqual(authMutationKeys.signIn.popup)
     expect(signInSocial.mutationKey).toEqual(authMutationKeys.signIn.social)
     expect(signOut.mutationKey).toEqual(authMutationKeys.signOut)
     expect(signUpEmail.mutationKey).toEqual(authMutationKeys.signUp.email)
@@ -202,6 +209,16 @@ describe("core base endpoint option factories", () => {
     expect(authClient.signIn.email).toHaveBeenCalledWith({
       email: "ada@example.com",
       fetchOptions: { credentials: "include", throw: true }
+    })
+
+    await expect(
+      (
+        signInPopup as { mutationFn?: (variables: unknown) => unknown }
+      ).mutationFn?.({ provider: "github", callbackURL: "/dashboard" })
+    ).resolves.toEqual({ data: { success: true }, error: null })
+    expect(authClient.signIn.popup).toHaveBeenCalledWith({
+      provider: "github",
+      callbackURL: "/dashboard"
     })
 
     await (

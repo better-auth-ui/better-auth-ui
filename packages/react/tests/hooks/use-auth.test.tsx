@@ -168,6 +168,18 @@ describe("useAuth", () => {
   })
 
   describe("social providers configuration", () => {
+    it("uses redirect sign-in by default", () => {
+      const wrapper = ({ children }: { children: ReactNode }) => (
+        <AuthProvider authClient={mockAuthClient} navigate={() => {}}>
+          {children}
+        </AuthProvider>
+      )
+
+      const { result } = renderHook(() => useAuth(), { wrapper })
+
+      expect(result.current.socialSignInMode).toBe("redirect")
+    })
+
     it("should accept social providers array", () => {
       const wrapper = ({ children }: { children: ReactNode }) => (
         <AuthProvider

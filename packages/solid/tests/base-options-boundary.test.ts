@@ -10,6 +10,7 @@ const baseOptionFactories = [
   "resetPasswordOptions",
   "sendVerificationEmailOptions",
   "signInEmailOptions",
+  "signInOAuthPopupOptions",
   "signInSocialOptions",
   "signOutOptions",
   "signUpEmailOptions",

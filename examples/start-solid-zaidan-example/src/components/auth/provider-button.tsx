@@ -2,9 +2,10 @@ import {
   type AuthSocialProvider,
   getProviderId,
   getProviderName,
-  isCustomSocialProvider
+  isCustomSocialProvider,
+  type OAuthPopupAuthClient
 } from "@better-auth-ui/core"
-import { useAuth } from "@better-auth-ui/solid"
+import { useAuth, useSignInOAuthPopup } from "@better-auth-ui/solid"
 import type { ComponentProps } from "solid-js"
 import { createSignal, Show } from "solid-js"
 import { Dynamic } from "solid-js/web"
@@ -85,22 +86,37 @@ export function ProviderButton(props: ProviderButtonProps) {
   const providerName = () => getProviderName(props.provider)
   const label = () =>
     auth.localization.auth.continueWith.replace("{{provider}}", providerName())
+  const signInPopup = useSignInOAuthPopup(
+    auth.authClient as OAuthPopupAuthClient
+  )
   const signInSocial = async () => {
     if (isPending()) return
 
     setIsPending(true)
 
     try {
-      await auth.authClient.signIn.social(
-        resolveSocialAuthParams({
-          provider: providerId(),
-          basePaths: auth.basePaths,
-          baseURL: auth.baseURL,
-          redirectTo: auth.redirectTo,
-          view: props.view ?? "signIn",
-          viewPaths: auth.viewPaths
-        }) as Parameters<typeof auth.authClient.signIn.social>[0]
-      )
+      const params = resolveSocialAuthParams({
+        provider: providerId(),
+        basePaths: auth.basePaths,
+        baseURL: auth.baseURL,
+        redirectTo: auth.redirectTo,
+        view: props.view ?? "signIn",
+        viewPaths: auth.viewPaths
+      })
+
+      if (auth.socialSignInMode === "popup") {
+        await signInPopup.mutateAsync({
+          ...params,
+          requestSignUp: (props.view ?? "signIn") === "signUp"
+        })
+        auth.navigate({ to: auth.redirectTo })
+      } else {
+        await auth.authClient.signIn.social(
+          params as Parameters<typeof auth.authClient.signIn.social>[0]
+        )
+      }
+    } catch {
+      // Mutation errors are reported by the shared auth error handler.
     } finally {
       setIsPending(false)
     }
