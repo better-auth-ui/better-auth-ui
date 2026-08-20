@@ -44,7 +44,7 @@ export function useListOrganizationMembers<
 
   const { data: activeOrganization } = useActiveOrganization(
     authClient,
-    undefined,
+    { enabled: !query?.organizationId },
     queryClient
   )
 

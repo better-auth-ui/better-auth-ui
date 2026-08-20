@@ -104,7 +104,10 @@ export function Organization(props: OrganizationProps) {
               value={config.viewPaths.organization.settings}
               tabIndex={-1}
             >
-              <OrganizationSettings />
+              <OrganizationSettings
+                organizationId={currentOrganization().id}
+                organizationSlug={currentOrganization().slug}
+              />
             </TabsContent>
 
             <TabsContent

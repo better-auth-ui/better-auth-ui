@@ -62,6 +62,8 @@ export type AccountCardProps = {
 export type OrganizationCardProps = {
   className?: string
   children?: ReactNode
+  organizationId: string
+  organizationSlug: string
 }
 
 export type OrganizationTabProps = {

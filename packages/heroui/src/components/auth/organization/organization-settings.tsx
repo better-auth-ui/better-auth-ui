@@ -8,6 +8,8 @@ import { OrganizationProfile } from "./organization-profile"
 /** Props for the {@link OrganizationSettings} component. */
 export type OrganizationSettingsProps = {
   className?: string
+  organizationId: string
+  organizationSlug: string
   variant?: CardProps["variant"]
 }
 
@@ -17,6 +19,8 @@ export type OrganizationSettingsProps = {
  */
 export function OrganizationSettings({
   className,
+  organizationId,
+  organizationSlug,
   variant,
   ...props
 }: OrganizationSettingsProps & ComponentProps<"div">) {
@@ -27,8 +31,13 @@ export function OrganizationSettings({
       <OrganizationProfile variant={variant} />
 
       {plugins.flatMap((plugin) =>
-        plugin.organizationCards?.map((Card, index) => (
-          <Card key={`${plugin.id}-${index.toString()}`} variant={variant} />
+        plugin.organizationCards?.map((Card) => (
+          <Card
+            key={`${plugin.id}-${Card.displayName ?? Card.name}`}
+            organizationId={organizationId}
+            organizationSlug={organizationSlug}
+            variant={variant}
+          />
         ))
       )}
 

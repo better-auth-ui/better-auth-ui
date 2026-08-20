@@ -6,6 +6,8 @@ import { OrganizationProfile } from "./organization-profile"
 
 export type OrganizationSettingsProps = {
   class?: string
+  organizationId: string
+  organizationSlug: string
 }
 
 export function OrganizationSettings(props: OrganizationSettingsProps) {
@@ -19,7 +21,12 @@ export function OrganizationSettings(props: OrganizationSettingsProps) {
     <div class={props.class ?? "grid gap-4 md:gap-6"}>
       <OrganizationProfile />
       <For each={organizationCards()}>
-        {(OrganizationCard) => <OrganizationCard />}
+        {(OrganizationCard) => (
+          <OrganizationCard
+            organizationId={props.organizationId}
+            organizationSlug={props.organizationSlug}
+          />
+        )}
       </For>
       <OrganizationDangerZone />
     </div>

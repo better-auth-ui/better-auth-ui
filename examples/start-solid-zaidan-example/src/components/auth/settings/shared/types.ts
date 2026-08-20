@@ -22,9 +22,14 @@ export type SecurityCardsPlugin = {
   securityCards?: Component[]
 }
 
+export type OrganizationCardProps = {
+  organizationId: string
+  organizationSlug: string
+}
+
 export type OrganizationCardsPlugin = {
   id: string
-  organizationCards?: Component[]
+  organizationCards?: Component<OrganizationCardProps>[]
 }
 
 export type ChangePasswordFieldErrors = {

@@ -334,7 +334,10 @@ function OrganizationSettingsPreviewContent() {
     <OrganizationStoryProvider queryClient={queryClient} slug="acme">
       {() => (
         <main class="mx-auto min-h-[600px] w-full max-w-3xl bg-background p-6 text-foreground">
-          <OrganizationSettings />
+          <OrganizationSettings
+            organizationId="org_acme_docs"
+            organizationSlug="acme"
+          />
         </main>
       )}
     </OrganizationStoryProvider>

@@ -214,7 +214,13 @@ export function Organization({
       )}
 
       <Tabs.Panel id="settings" className="px-0">
-        <OrganizationSettings variant={variant} />
+        {activeOrganization && (
+          <OrganizationSettings
+            organizationId={activeOrganization.id}
+            organizationSlug={activeOrganization.slug}
+            variant={variant}
+          />
+        )}
       </Tabs.Panel>
 
       <Tabs.Panel id="people" className="px-0">

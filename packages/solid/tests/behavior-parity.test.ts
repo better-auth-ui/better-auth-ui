@@ -300,7 +300,13 @@ describe("Solid auth behavior parity", () => {
 
       expect(source).not.toContain("skipToken")
       expect(source).not.toContain("queryFn:")
-      expect(source).not.toContain("enabled:")
+      if (file.endsWith("use-list-members.ts")) {
+        expect(source).toContain(
+          "() => ({ enabled: !options?.().query?.organizationId })"
+        )
+      } else {
+        expect(source).not.toContain("enabled:")
+      }
       expect(source).toContain("initialData: initialData as undefined")
     }
   })

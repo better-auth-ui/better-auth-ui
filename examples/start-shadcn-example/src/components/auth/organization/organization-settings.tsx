@@ -9,6 +9,8 @@ import { OrganizationProfile } from "./organization-profile"
 
 export type OrganizationSettingsProps = {
   className?: string
+  organizationId: string
+  organizationSlug: string
 }
 
 /**
@@ -17,6 +19,8 @@ export type OrganizationSettingsProps = {
  */
 export function OrganizationSettings({
   className,
+  organizationId,
+  organizationSlug,
   ...props
 }: OrganizationSettingsProps & ComponentProps<"div">) {
   const { plugins } = useAuth()
@@ -26,8 +30,12 @@ export function OrganizationSettings({
       <OrganizationProfile />
 
       {plugins.flatMap((plugin) =>
-        plugin.organizationCards?.map((Card, index) => (
-          <Card key={`${plugin.id}-${index.toString()}`} />
+        plugin.organizationCards?.map((Card) => (
+          <Card
+            key={`${plugin.id}-${Card.displayName ?? Card.name}`}
+            organizationId={organizationId}
+            organizationSlug={organizationSlug}
+          />
         ))
       )}
 

@@ -5,7 +5,10 @@ import { OrganizationDemoWrapper } from "./organization-demo-wrapper"
 export function OrganizationSettingsDemo() {
   return (
     <OrganizationDemoWrapper>
-      <OrganizationSettings />
+      <OrganizationSettings
+        organizationId="organization-id"
+        organizationSlug="acme"
+      />
     </OrganizationDemoWrapper>
   )
 }

@@ -40,7 +40,7 @@ export function useListOrganizationMembers<
   const session = useSession(authClient, undefined, queryClient)
   const activeOrganization = useActiveOrganization(
     authClient,
-    undefined,
+    () => ({ enabled: !options?.().query?.organizationId }),
     queryClient
   )
 

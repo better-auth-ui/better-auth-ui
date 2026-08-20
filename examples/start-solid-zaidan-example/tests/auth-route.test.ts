@@ -2566,9 +2566,12 @@ describe("Solid auth route component selection", () => {
     expect(newApiKeyDialog).toContain("apiKeyLocalization.newApiKey")
     expect(deleteApiKeyDialog).toContain("useDeleteApiKey")
     expect(deleteApiKeyDialog).toContain('configId: "organization"')
-    expect(organizationApiKeys).toContain("useActiveOrganization")
+    expect(organizationApiKeys).not.toContain("useActiveOrganization")
     expect(organizationApiKeys).toContain("useListOrganizationMembers")
-    expect(organizationApiKeys).toContain('member.role === "owner"')
+    expect(organizationApiKeys).toContain('hasMemberRole(member.role, "owner")')
+    expect(organizationApiKeys).toContain(
+      "organizationId: props.organizationId"
+    )
     expect(organizationApiKeys).toContain("<ApiKeys")
     expect(apiKeyPlugin).toContain("coreApiKeyPlugin")
     expect(apiKeyPlugin).toContain("organizationCards: [OrganizationApiKeys]")
@@ -3073,7 +3076,10 @@ describe("Solid auth route component selection", () => {
     )
 
     expect(organization).toContain("OrganizationSettings")
-    expect(organization).not.toContain("organizationSlug: props.slug")
+    expect(organization).toContain("organizationId={currentOrganization().id}")
+    expect(organization).toContain(
+      "organizationSlug={currentOrganization().slug}"
+    )
     expect(organization).toContain("createOrganizationPath")
     expect(organization).toContain("slugPrefix")
 
@@ -3085,16 +3091,22 @@ describe("Solid auth route component selection", () => {
       expect(source).toContain("setActiveOrganization.mutate")
     }
 
-    expect(organizationApiKeys).toContain("useActiveOrganization")
+    expect(organizationApiKeys).not.toContain("useActiveOrganization")
     expect(organizationApiKeys).toContain("useListOrganizationMembers")
-    expect(organizationApiKeys).not.toContain("organizationSlug")
+    expect(organizationApiKeys).toContain("hasMemberRole")
+    expect(organizationApiKeys).toContain("organizationId: string")
+    expect(organizationApiKeys).toContain("organizationSlug: string")
     expect(organizationApiKeys).toContain(
-      "organizationId={activeOrganization.data?.id}"
+      "query: { organizationId: props.organizationId }"
     )
+    expect(organizationApiKeys).toContain('hasMemberRole(member.role, "owner")')
     expect(activeOrganizationQuery).toContain("resolveActiveOrganizationQuery")
     expect(coreActiveOrganizationQuery).toContain("organizationSlug === null")
     expect(coreActiveOrganizationQuery).toContain("async () => null")
     expect(listMembersQuery).toContain("activeOrganization.data?.id")
+    expect(listMembersQuery).toContain(
+      "enabled: !options?.().query?.organizationId"
+    )
   })
 
   it("adds Solid/Zaidan Organization profile settings parity", () => {
@@ -3170,6 +3182,12 @@ describe("Solid auth route component selection", () => {
     )
     expect(organizationSettings).toContain("OrganizationProfile")
     expect(organizationSettings).toContain("organizationCards")
+    expect(organizationSettings).toContain(
+      "organizationId={props.organizationId}"
+    )
+    expect(organizationSettings).toContain(
+      "organizationSlug={props.organizationSlug}"
+    )
     expect(organizationSettings).toContain("OrganizationDangerZone")
     expect(organizationProfile).toContain("useActiveOrganization")
     expect(organizationProfile).toContain("useUpdateOrganization")
