@@ -71,6 +71,7 @@ This drops the following into your codebase:
 - `src/components/auth/organization/organization.tsx`: the `/organization/<path>` shell
 - `src/components/auth/organization/organization-roles.tsx`: dynamic role and permission editor
 - `src/components/auth/organization/organization-switcher.tsx`: header dropdown for switching organizations
+- `src/components/auth/organization/team-switcher.tsx`: organization-scoped team selection
 - `src/components/auth/organization/organization-settings.tsx`: settings tab contents (profile + danger zone + plugin cards)
 - `src/components/auth/organization/organization-people.tsx`: people tab contents (members + invitations)
 - `src/components/auth/organization/organization-profile.tsx`: profile card (logo, name, slug)
@@ -1056,7 +1057,32 @@ organizationPlugin({ teams: true })
 
 The organization shell adds a Teams tab. Users can create, rename, and delete teams. They can also add and remove team members. Invitations can assign a team.
 
-The `useListTeams`, `useListTeamMembers`, `useCreateTeam`, `useUpdateTeam`, `useRemoveTeam`, `useAddTeamMember`, and `useRemoveTeamMember` hooks cover the team lifecycle. These controls use the existing active organization behavior.
+The `useListTeams`, `useListTeamMembers`, `useCreateTeam`, `useUpdateTeam`, `useRemoveTeam`, `useAddTeamMember`, and `useRemoveTeamMember` hooks cover the team lifecycle.
+
+### User team selection
+
+`TeamSwitcher` lists only the teams that the current user can access in the specified organization. The application owns the selected team. This keeps team routing independent from Better Auth active organizations.
+
+```tsx
+import { useState } from "react"
+import { TeamSwitcher } from "@/components/auth/organization/team-switcher"
+
+export function ProjectTeamFilter({ organizationId }: { organizationId: string }) {
+  const [teamId, setTeamId] = useState<string | null>(null)
+
+  return (
+    <TeamSwitcher
+      organizationId={organizationId}
+      teamId={teamId}
+      onTeamChange={(team) => setTeamId(team?.id ?? null)}
+    />
+  )
+}
+```
+
+Set `syncSession` when an application still reads `session.activeTeamId`. This opt-in mode calls Better Auth `setActiveTeam` after the callback.
+
+The `useListUserTeams` and `useSetActiveTeam` hooks are also available for custom controls. Always pass `organizationId` to both APIs.
 
 Use `organizationLimit`, `membershipLimit`, and `invitationLimit` to disable actions when a configured limit is reached. Use `allowOrganizationCreation: false` to hide creation controls. Use `additionalFields` to add custom inputs to organization creation and profile forms.
 

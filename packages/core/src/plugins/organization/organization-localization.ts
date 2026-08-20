@@ -146,6 +146,7 @@ export const organizationLocalization = {
   team: "Team",
   teamsDescription: "Create teams and manage their members.",
   selectTeam: "Select a team",
+  allTeams: "All teams",
   selectMember: "Select a member",
   createTeam: "Create team",
   renameTeam: "Rename team",

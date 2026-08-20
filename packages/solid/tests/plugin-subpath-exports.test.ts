@@ -88,12 +88,14 @@ describe("Solid plugin subpath exports", () => {
     expect(organization).toHaveProperty("useActiveOrganization")
     expect(organization).toHaveProperty("useListOrganizations")
     expect(organization).toHaveProperty("useListTeams")
+    expect(organization).toHaveProperty("useListUserTeams")
     expect(organization).toHaveProperty("useListTeamMembers")
     expect(organization).toHaveProperty("useCreateTeam")
     expect(organization).toHaveProperty("useUpdateTeam")
     expect(organization).toHaveProperty("useRemoveTeam")
     expect(organization).toHaveProperty("useAddTeamMember")
     expect(organization).toHaveProperty("useRemoveTeamMember")
+    expect(organization).toHaveProperty("useSetActiveTeam")
   })
 
   it("keeps core-owned mutation factories out of framework plugin entrypoints", () => {

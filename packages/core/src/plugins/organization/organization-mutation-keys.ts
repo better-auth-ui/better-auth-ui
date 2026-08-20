@@ -59,6 +59,7 @@ export const organizationMutationKeys = {
     all: ["auth", "organization", "team"] as const,
     create: ["auth", "organization", "team", "create"] as const,
     update: ["auth", "organization", "team", "update"] as const,
+    setActive: ["auth", "organization", "team", "setActive"] as const,
     remove: ["auth", "organization", "team", "remove"] as const,
     addMember: ["auth", "organization", "team", "addMember"] as const,
     removeMember: ["auth", "organization", "team", "removeMember"] as const

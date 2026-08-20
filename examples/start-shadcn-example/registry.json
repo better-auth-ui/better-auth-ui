@@ -1333,6 +1333,11 @@
           "target": "@components/auth/organization/organization-switcher.tsx"
         },
         {
+          "path": "src/components/auth/organization/team-switcher.tsx",
+          "type": "registry:component",
+          "target": "@components/auth/organization/team-switcher.tsx"
+        },
+        {
           "path": "src/components/auth/organization/organization-settings.tsx",
           "type": "registry:component",
           "target": "@components/auth/organization/organization-settings.tsx"

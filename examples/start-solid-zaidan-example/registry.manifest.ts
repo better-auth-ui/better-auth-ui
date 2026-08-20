@@ -1065,6 +1065,7 @@ export const solidRegistryManifest = {
         componentFile(
           "src/components/auth/organization/organization-switcher.tsx"
         ),
+        componentFile("src/components/auth/organization/team-switcher.tsx"),
         componentFile("src/components/auth/organization/organization-path.ts"),
         componentFile("src/components/auth/organization/organization-view.tsx"),
         componentFile(
