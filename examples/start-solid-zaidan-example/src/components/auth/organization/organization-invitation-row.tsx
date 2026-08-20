@@ -18,7 +18,7 @@ type OrganizationInvitation = {
   createdAt?: Date | string | null
   email?: string | null
   id: string
-  organizationId?: string | null
+  organizationId: string
   role?: string | null
   status?: string | null
 }
@@ -112,7 +112,7 @@ export function OrganizationInvitationRow(
               onClick={() =>
                 resendInvitation.mutate({
                   email: props.invitation.email ?? "",
-                  organizationId: props.invitation.organizationId ?? undefined,
+                  organizationId: props.invitation.organizationId,
                   resend: true,
                   role: (props.invitation.role ?? "member") as Parameters<
                     typeof resendInvitation.mutate

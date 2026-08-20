@@ -95,6 +95,7 @@ type OrganizationInvitation = {
   createdAt?: Date | string | null
   email?: string | null
   id: string
+  organizationId: string
   role?: string | null
   status?: string | null
 }

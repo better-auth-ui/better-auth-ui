@@ -3548,6 +3548,9 @@ describe("Solid auth route component selection", () => {
     )
     expect(organizationInvitationRow).toContain("resendInvitation.mutate")
     expect(organizationInvitationRow).toContain("resend: true")
+    expect(organizationInvitationRow).toContain(
+      "organizationId: props.invitation.organizationId"
+    )
     expect(organizationInvitationRow).toContain("Badge")
     expect(organizationInvitationRow).toContain("Spinner")
     expect(organizationInvitationRowSkeleton).toContain("TableRow")
