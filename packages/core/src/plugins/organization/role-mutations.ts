@@ -22,13 +22,20 @@ function roleMutationOptions<
 ) {
   const mutationFn = async (params: RoleParams<TAuthClient, TMethod>) => {
     const resolvedOrganizationId = params.organizationId ?? organizationId
+
+    if (!resolvedOrganizationId) {
+      throw new Error(
+        `[Better Auth UI] organizationId is required for ${method}.`
+      )
+    }
+
     const input = {
       ...params,
       organizationId: resolvedOrganizationId,
       fetchOptions: { ...params.fetchOptions, throw: true }
     }
 
-    if (method === "deleteRole" && resolvedOrganizationId) {
+    if (method === "deleteRole") {
       const roleSelector = params as DeleteRoleParams<TAuthClient>
       const role = await authClient.organization.getRole({
         query: {
@@ -59,11 +66,11 @@ function roleMutationOptions<
       }
     }
 
-    return await (
-      authClient.organization[method] as (
-        body: typeof input
-      ) => Promise<unknown>
-    )(input)
+    const roleMethod = authClient.organization[method] as (
+      body: typeof input
+    ) => ReturnType<TAuthClient["organization"][TMethod]>
+
+    return await roleMethod(input)
   }
 
   const relatedQueries: QueryKey[] = [

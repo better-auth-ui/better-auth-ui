@@ -62,6 +62,20 @@ describe("dynamic organization roles", () => {
     })
   })
 
+  it("creates own labels for prototype-named dynamic roles", () => {
+    const labels = mergeOrganizationRoleLabels(undefined, [
+      { role: "constructor" },
+      { role: "toString" }
+    ])
+
+    expect(Object.hasOwn(labels, "constructor")).toBe(true)
+    expect(Object.hasOwn(labels, "toString")).toBe(true)
+    expect(labels).toMatchObject({
+      constructor: "constructor",
+      toString: "toString"
+    })
+  })
+
   it("finds every member that holds a role in a multi-role value", () => {
     const members = [
       { id: "one", role: "admin,support" },

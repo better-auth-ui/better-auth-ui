@@ -1,7 +1,6 @@
-import {
-  membersWithRole,
-  type OrganizationAuthClient,
-  type OrganizationPermissionRegistry
+import type {
+  OrganizationAuthClient,
+  OrganizationPermissionRegistry
 } from "@better-auth-ui/core/plugins/organization"
 import { useAuth, useAuthPlugin } from "@better-auth-ui/solid"
 import {
@@ -51,10 +50,6 @@ export function OrganizationRoles(props: { organizationId: string }) {
     query: { organizationId: props.organizationId },
     enabled: !!props.organizationId
   }))
-  const members = useListOrganizationMembers(auth.authClient, () => ({
-    query: { organizationId: props.organizationId },
-    enabled: !!props.organizationId
-  }))
   const canCreate = useHasPermission(auth.authClient, () => ({
     organizationId: props.organizationId,
     permissions: { ac: ["create"] }
@@ -70,7 +65,10 @@ export function OrganizationRoles(props: { organizationId: string }) {
   const deleteRole = useDeleteRole(
     auth.authClient,
     () => props.organizationId,
-    () => ({ onSuccess: () => toast.success(config.localization.roleDeleted) })
+    () => ({
+      onSuccess: () => toast.success(config.localization.roleDeleted),
+      onError: (error) => toast.error(error.message)
+    })
   )
   const [editingRole, setEditingRole] = createSignal<Role | null | undefined>()
 
@@ -118,68 +116,29 @@ export function OrganizationRoles(props: { organizationId: string }) {
               </TableHeader>
               <TableBody>
                 <For each={roles.data}>
-                  {(role) => {
-                    const assignedMembers = () =>
-                      membersWithRole(members.data?.members, role.role)
-                    return (
-                      <TableRow>
-                        <TableCell class="font-medium">{role.role}</TableCell>
-                        <TableCell>
-                          {Object.values(role.permission).reduce(
-                            (total, actions) => total + actions.length,
-                            0
-                          )}
-                        </TableCell>
-                        <TableCell>
-                          <div class="flex justify-end gap-1">
-                            <Show when={canUpdate.data?.success}>
-                              <Button
-                                aria-label={config.localization.editRole}
-                                onClick={() => setEditingRole(role)}
-                                size="icon-sm"
-                                variant="ghost"
-                              >
-                                <Pencil />
-                              </Button>
-                            </Show>
-                            <Show when={canDelete.data?.success}>
-                              <Button
-                                aria-label={config.localization.deleteRole}
-                                disabled={
-                                  assignedMembers().length > 0 ||
-                                  deleteRole.isPending
-                                }
-                                onClick={() => {
-                                  if (
-                                    !window.confirm(
-                                      config.localization.deleteRoleDescription
-                                    )
-                                  )
-                                    return
-                                  deleteRole.mutate({
-                                    organizationId: props.organizationId,
-                                    roleId: role.id
-                                  })
-                                }}
-                                size="icon-sm"
-                                title={
-                                  assignedMembers().length > 0
-                                    ? config.localization.roleInUse.replace(
-                                        "{{count}}",
-                                        String(assignedMembers().length)
-                                      )
-                                    : config.localization.deleteRole
-                                }
-                                variant="ghost"
-                              >
-                                <Trash2 class="text-destructive" />
-                              </Button>
-                            </Show>
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    )
-                  }}
+                  {(role) => (
+                    <OrganizationRoleRow
+                      authClient={auth.authClient}
+                      canDelete={canDelete.data?.success === true}
+                      canUpdate={canUpdate.data?.success === true}
+                      deleting={deleteRole.isPending}
+                      onDelete={() => {
+                        if (
+                          !window.confirm(
+                            config.localization.deleteRoleDescription
+                          )
+                        )
+                          return
+                        deleteRole.mutate({
+                          organizationId: props.organizationId,
+                          roleId: role.id
+                        })
+                      }}
+                      onEdit={() => setEditingRole(role)}
+                      organizationId={props.organizationId}
+                      role={role}
+                    />
+                  )}
                 </For>
               </TableBody>
             </Table>
@@ -195,6 +154,79 @@ export function OrganizationRoles(props: { organizationId: string }) {
         role={editingRole() ?? undefined}
       />
     </div>
+  )
+}
+
+function OrganizationRoleRow(props: {
+  authClient: OrganizationAuthClient
+  canDelete: boolean
+  canUpdate: boolean
+  deleting: boolean
+  onDelete: () => void
+  onEdit: () => void
+  organizationId: string
+  role: Role
+}) {
+  const config = useAuthPlugin(organizationPlugin)
+  const assignments = useListOrganizationMembers(props.authClient, () => ({
+    query: {
+      organizationId: props.organizationId,
+      filterField: "role",
+      filterOperator: "contains",
+      filterValue: props.role.role,
+      limit: 1
+    },
+    enabled: Boolean(props.organizationId && props.canDelete)
+  }))
+  const assignedCount = () =>
+    assignments.data?.total ?? assignments.data?.members.length ?? 0
+  const assignmentUnknown = () => props.canDelete && !assignments.data
+
+  return (
+    <TableRow>
+      <TableCell class="font-medium">{props.role.role}</TableCell>
+      <TableCell>
+        {Object.values(props.role.permission).reduce(
+          (total, actions) => total + actions.length,
+          0
+        )}
+      </TableCell>
+      <TableCell>
+        <div class="flex justify-end gap-1">
+          <Show when={props.canUpdate}>
+            <Button
+              aria-label={config.localization.editRole}
+              onClick={props.onEdit}
+              size="icon-sm"
+              variant="ghost"
+            >
+              <Pencil />
+            </Button>
+          </Show>
+          <Show when={props.canDelete}>
+            <Button
+              aria-label={config.localization.deleteRole}
+              disabled={
+                assignmentUnknown() || assignedCount() > 0 || props.deleting
+              }
+              onClick={props.onDelete}
+              size="icon-sm"
+              title={
+                assignedCount() > 0
+                  ? config.localization.roleInUse.replace(
+                      "{{count}}",
+                      String(assignedCount())
+                    )
+                  : config.localization.deleteRole
+              }
+              variant="ghost"
+            >
+              <Trash2 class="text-destructive" />
+            </Button>
+          </Show>
+        </div>
+      </TableCell>
+    </TableRow>
   )
 }
 

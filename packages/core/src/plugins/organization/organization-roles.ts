@@ -64,7 +64,9 @@ export function mergeOrganizationRoleLabels(
   const merged = { ...labels }
 
   for (const dynamicRole of dynamicRoles ?? []) {
-    merged[dynamicRole.role] ??= dynamicRole.role
+    if (!Object.hasOwn(merged, dynamicRole.role)) {
+      merged[dynamicRole.role] = dynamicRole.role
+    }
   }
 
   return merged

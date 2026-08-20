@@ -64,6 +64,7 @@ export function Organization({
     () => plugins.flatMap((plugin) => plugin.organizationTabs ?? []),
     [plugins]
   )
+  const rolesEnabled = dynamicAccessControl?.enabled === true
 
   useEffect(() => {
     if (!isPending && !activeOrganization) {
@@ -81,20 +82,29 @@ export function Organization({
   ])
 
   const currentView = useMemo(() => {
-    if (view) return view
+    if (view) return view === "roles" && !rolesEnabled ? undefined : view
 
     const match = [
-      ...Object.entries(organizationViewPaths.organization),
+      ...Object.entries(organizationViewPaths.organization).filter(
+        ([name]) => rolesEnabled || name !== "roles"
+      ),
       ...extensionTabs.map((tab) => [tab.id, tab.path] as const)
     ].find(([, segment]) => segment === path)
 
     return match?.[0] as OrganizationView | undefined
-  }, [extensionTabs, view, path, organizationViewPaths.organization])
+  }, [
+    extensionTabs,
+    view,
+    path,
+    organizationViewPaths.organization,
+    rolesEnabled
+  ])
 
   if (!currentView) {
-    const validPaths = Object.values(organizationViewPaths.organization).join(
-      ", "
-    )
+    const validPaths = Object.entries(organizationViewPaths.organization)
+      .filter(([name]) => rolesEnabled || name !== "roles")
+      .map(([, segment]) => segment)
+      .join(", ")
     throw new Error(
       `[Better Auth UI] Unknown organization path "${path}". Valid paths are: ${validPaths}`
     )
@@ -144,7 +154,7 @@ export function Organization({
             </TabsTrigger>
           )}
 
-          {dynamicAccessControl?.enabled && (
+          {rolesEnabled && (
             <TabsTrigger
               value="roles"
               className="gap-1"
@@ -209,7 +219,7 @@ export function Organization({
         </TabsContent>
       )}
 
-      {dynamicAccessControl?.enabled && (
+      {rolesEnabled && (
         <TabsContent value="roles" tabIndex={-1}>
           <OrganizationRoles organizationId={activeOrganization?.id ?? ""} />
         </TabsContent>

@@ -2,6 +2,7 @@ import { skipToken } from "@tanstack/query-core"
 import { describe, expect, it, vi } from "vitest"
 import {
   createRoleOptions,
+  deleteRoleOptions,
   listRolesOptions,
   organizationQueryKeys,
   roleOptions
@@ -10,8 +11,11 @@ import {
 const createAuthClient = () => ({
   organization: {
     createRole: vi.fn(async (input) => input),
+    deleteRole: vi.fn(async (input) => input),
     getRole: vi.fn(async () => null),
-    listRoles: vi.fn(async () => [])
+    listMembers: vi.fn(async () => ({ members: [], total: 0 })),
+    listRoles: vi.fn(async () => []),
+    updateRole: vi.fn(async (input) => input)
   }
 })
 
@@ -75,5 +79,47 @@ describe("organization role mutation factories", () => {
         invalidates: [organizationQueryKeys.permissions.all("user-1")]
       })
     )
+  })
+
+  it("rejects role mutations without an explicit organization id", async () => {
+    const authClient = createAuthClient()
+    const options = deleteRoleOptions(authClient as never, "user-1")
+
+    await expect(
+      options.mutationFn?.({ roleId: "role-1" } as never, {} as never)
+    ).rejects.toThrow("organizationId is required for deleteRole")
+
+    expect(authClient.organization.getRole).not.toHaveBeenCalled()
+    expect(authClient.organization.deleteRole).not.toHaveBeenCalled()
+  })
+
+  it("rejects deletion when a member holds the role", async () => {
+    const authClient = createAuthClient()
+    authClient.organization.getRole.mockResolvedValueOnce({
+      id: "role-1",
+      role: "support",
+      permission: {}
+    } as never)
+    authClient.organization.listMembers.mockResolvedValueOnce({
+      members: [{ id: "member-1", role: "support" }],
+      total: 1
+    } as never)
+    const options = deleteRoleOptions(authClient as never, "user-1", "org-1")
+
+    await expect(
+      options.mutationFn?.({ roleId: "role-1" } as never, {} as never)
+    ).rejects.toThrow('Move members out of the "support" role')
+
+    expect(authClient.organization.listMembers).toHaveBeenCalledWith(
+      expect.objectContaining({
+        query: expect.objectContaining({
+          organizationId: "org-1",
+          filterField: "role",
+          filterValue: "support",
+          limit: 1
+        })
+      })
+    )
+    expect(authClient.organization.deleteRole).not.toHaveBeenCalled()
   })
 })

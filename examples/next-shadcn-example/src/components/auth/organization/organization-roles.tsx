@@ -1,9 +1,6 @@
 "use client"
 
-import {
-  membersWithRole,
-  type OrganizationAuthClient
-} from "@better-auth-ui/core/plugins/organization"
+import type { OrganizationAuthClient } from "@better-auth-ui/core/plugins/organization"
 import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
 import {
   useCreateRole,
@@ -59,10 +56,6 @@ export function OrganizationRoles({
     query: { organizationId },
     enabled: !!organizationId
   })
-  const members = useListOrganizationMembers(authClient, {
-    query: { organizationId },
-    enabled: !!organizationId
-  })
   const canCreate = useHasPermission(authClient, {
     organizationId,
     permissions: { ac: ["create"] }
@@ -76,7 +69,8 @@ export function OrganizationRoles({
     permissions: { ac: ["delete"] }
   })
   const deleteRole = useDeleteRole(authClient, organizationId, {
-    onSuccess: () => toast.success(localization.roleDeleted)
+    onSuccess: () => toast.success(localization.roleDeleted),
+    onError: (error) => toast.error(error.message)
   })
   const [editingRole, setEditingRole] = useState<Role | null>()
 
@@ -97,7 +91,7 @@ export function OrganizationRoles({
         )}
       </div>
 
-      {roles.isPending ? (
+      {roles.isLoading ? (
         <Spinner />
       ) : roles.data?.length ? (
         <Card>
@@ -113,71 +107,26 @@ export function OrganizationRoles({
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {roles.data.map((role) => {
-                  const assignedMembers = membersWithRole(
-                    members.data?.members,
-                    role.role
-                  )
-                  return (
-                    <TableRow key={role.id}>
-                      <TableCell className="font-medium">{role.role}</TableCell>
-                      <TableCell>
-                        {Object.values(role.permission).reduce(
-                          (total, actions) => total + actions.length,
-                          0
-                        )}
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex justify-end gap-1">
-                          {canUpdate.data?.success && (
-                            <Button
-                              size="icon"
-                              variant="ghost"
-                              onClick={() => setEditingRole(role)}
-                              aria-label={localization.editRole}
-                            >
-                              <Pencil />
-                            </Button>
-                          )}
-                          {canDelete.data?.success && (
-                            <Button
-                              size="icon"
-                              variant="ghost"
-                              className="text-destructive"
-                              disabled={
-                                assignedMembers.length > 0 ||
-                                deleteRole.isPending
-                              }
-                              title={
-                                assignedMembers.length > 0
-                                  ? localization.roleInUse.replace(
-                                      "{{count}}",
-                                      String(assignedMembers.length)
-                                    )
-                                  : localization.deleteRole
-                              }
-                              onClick={() => {
-                                if (
-                                  !window.confirm(
-                                    localization.deleteRoleDescription
-                                  )
-                                )
-                                  return
-                                deleteRole.mutate({
-                                  roleId: role.id,
-                                  organizationId
-                                })
-                              }}
-                              aria-label={localization.deleteRole}
-                            >
-                              <Trash2 />
-                            </Button>
-                          )}
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  )
-                })}
+                {roles.data.map((role) => (
+                  <OrganizationRoleRow
+                    key={role.id}
+                    authClient={authClient}
+                    canDelete={canDelete.data?.success === true}
+                    canUpdate={canUpdate.data?.success === true}
+                    deleting={deleteRole.isPending}
+                    onDelete={() => {
+                      if (!window.confirm(localization.deleteRoleDescription))
+                        return
+                      deleteRole.mutate({
+                        roleId: role.id,
+                        organizationId
+                      })
+                    }}
+                    onEdit={() => setEditingRole(role)}
+                    organizationId={organizationId}
+                    role={role}
+                  />
+                ))}
               </TableBody>
             </Table>
           </CardContent>
@@ -201,6 +150,87 @@ export function OrganizationRoles({
         onOpenChange={(open) => !open && setEditingRole(undefined)}
       />
     </div>
+  )
+}
+
+function OrganizationRoleRow({
+  authClient,
+  canDelete,
+  canUpdate,
+  deleting,
+  onDelete,
+  onEdit,
+  organizationId,
+  role
+}: {
+  authClient: OrganizationAuthClient
+  canDelete: boolean
+  canUpdate: boolean
+  deleting: boolean
+  onDelete: () => void
+  onEdit: () => void
+  organizationId: string
+  role: Role
+}) {
+  const { localization } = useAuthPlugin(organizationPlugin)
+  const assignments = useListOrganizationMembers(authClient, {
+    query: {
+      organizationId,
+      filterField: "role",
+      filterOperator: "contains",
+      filterValue: role.role,
+      limit: 1
+    },
+    enabled: Boolean(organizationId && canDelete)
+  })
+  const assignedCount =
+    assignments.data?.total ?? assignments.data?.members.length ?? 0
+  const assignmentUnknown = canDelete && !assignments.data
+
+  return (
+    <TableRow>
+      <TableCell className="font-medium">{role.role}</TableCell>
+      <TableCell>
+        {Object.values(role.permission).reduce(
+          (total, actions) => total + actions.length,
+          0
+        )}
+      </TableCell>
+      <TableCell>
+        <div className="flex justify-end gap-1">
+          {canUpdate && (
+            <Button
+              size="icon"
+              variant="ghost"
+              onClick={onEdit}
+              aria-label={localization.editRole}
+            >
+              <Pencil />
+            </Button>
+          )}
+          {canDelete && (
+            <Button
+              size="icon"
+              variant="ghost"
+              className="text-destructive"
+              disabled={assignmentUnknown || assignedCount > 0 || deleting}
+              title={
+                assignedCount > 0
+                  ? localization.roleInUse.replace(
+                      "{{count}}",
+                      String(assignedCount)
+                    )
+                  : localization.deleteRole
+              }
+              onClick={onDelete}
+              aria-label={localization.deleteRole}
+            >
+              <Trash2 />
+            </Button>
+          )}
+        </div>
+      </TableCell>
+    </TableRow>
   )
 }
 
