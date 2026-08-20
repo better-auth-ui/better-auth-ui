@@ -17,8 +17,11 @@ const baseOptionFactories = [
   "changePasswordOptions",
   "deleteUserOptions",
   "linkSocialOptions",
+  "revokeOtherSessionsOptions",
   "revokeSessionOptions",
+  "revokeSessionsOptions",
   "unlinkAccountOptions",
+  "updateSessionOptions",
   "updateUserOptions"
 ] as const
 
@@ -32,13 +35,16 @@ const baseParamExports = [
   "ListSessionsParams",
   "RequestPasswordResetParams",
   "ResetPasswordParams",
+  "RevokeOtherSessionsParams",
   "RevokeSessionParams",
+  "RevokeSessionsParams",
   "SendVerificationEmailParams",
   "SignInEmailParams",
   "SignInSocialParams",
   "SignOutParams",
   "SignUpEmailParams",
   "UnlinkAccountParams",
+  "UpdateSessionParams",
   "UpdateUserParams"
 ] as const
 

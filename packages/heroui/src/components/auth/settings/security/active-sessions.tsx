@@ -3,6 +3,7 @@ import { useAuth, useListSessions, useSession } from "@better-auth-ui/react"
 import { Card, type CardProps, cn, Skeleton } from "@heroui/react"
 import { ActiveSession } from "./active-session"
 import { FreshSessionPrompt } from "./fresh-session-prompt"
+import { SessionActions } from "./session-actions"
 
 export type ActiveSessionsProps = {
   className?: string
@@ -58,6 +59,16 @@ export function ActiveSessions({
             ))
           )}
         </Card.Content>
+
+        {!isPending && !error && (
+          <SessionActions
+            hasOtherSessions={
+              activeSessions?.some(
+                (activeSession) => activeSession.id !== session?.session.id
+              ) ?? false
+            }
+          />
+        )}
       </Card>
     </div>
   )

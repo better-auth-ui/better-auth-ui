@@ -359,6 +359,23 @@ export const localization = {
     /** @remarks `"Session revoked successfully"` */
     revokeSessionSuccess: "Session revoked successfully",
 
+    /** @remarks `"Sign out other devices"` */
+    signOutOtherDevices: "Sign out other devices",
+
+    /** @remarks `"This signs you out on every device except this one."` */
+    signOutOtherDevicesDescription:
+      "This signs you out on every device except this one.",
+
+    /** @remarks `"Other devices signed out successfully"` */
+    signOutOtherDevicesSuccess: "Other devices signed out successfully",
+
+    /** @remarks `"Sign out everywhere"` */
+    signOutEverywhere: "Sign out everywhere",
+
+    /** @remarks `"This signs you out on this device and every other device."` */
+    signOutEverywhereDescription:
+      "This signs you out on this device and every other device.",
+
     /** @remarks `"Save changes"` */
     saveChanges: "Save changes",
 

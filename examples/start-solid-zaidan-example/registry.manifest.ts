@@ -768,6 +768,9 @@ export const solidRegistryManifest = {
         componentFile(
           "src/components/auth/settings/security/fresh-session-prompt.tsx"
         ),
+        componentFile(
+          "src/components/auth/settings/security/session-actions.tsx"
+        ),
         componentFile("src/components/auth/settings/shared/helpers.ts"),
         ...zaidanInteractiveSupportFiles
       ]

@@ -13,6 +13,7 @@ import { ItemGroup, ItemSeparator } from "@/components/ui/item"
 import { cn } from "@/lib/utils"
 import { ActiveSessionRow, ActiveSessionRowSkeleton } from "./active-session"
 import { FreshSessionPrompt } from "./fresh-session-prompt"
+import { SessionActions } from "./session-actions"
 
 export type ActiveSessionsSettingsProps = {
   class?: string
@@ -95,6 +96,17 @@ export function ActiveSessionsSettings(
             </ItemGroup>
           </Show>
         </CardContent>
+        <Show
+          when={
+            !activeSessions.isPending && !activeSessions.error && session.data
+          }
+        >
+          <SessionActions
+            hasOtherSessions={sessions().some(
+              (activeSession) => activeSession.id !== session.data?.session.id
+            )}
+          />
+        </Show>
       </Card>
     </div>
   )

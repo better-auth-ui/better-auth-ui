@@ -74,6 +74,7 @@
         "lucide-react"
       ],
       "registryDependencies": [
+        "alert-dialog",
         "badge",
         "button",
         "card",
@@ -2032,6 +2033,11 @@
           "path": "src/components/auth/settings/security/fresh-session-prompt.tsx",
           "type": "registry:component",
           "target": "@components/auth/settings/security/fresh-session-prompt.tsx"
+        },
+        {
+          "path": "src/components/auth/settings/security/session-actions.tsx",
+          "type": "registry:component",
+          "target": "@components/auth/settings/security/session-actions.tsx"
         }
       ]
     },

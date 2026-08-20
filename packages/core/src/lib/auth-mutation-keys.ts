@@ -70,8 +70,14 @@ export const authMutationKeys = {
   linkSocial: ["auth", "linkSocial"] as const,
   /** Key for `revokeSession`. */
   revokeSession: ["auth", "revokeSession"] as const,
+  /** Key for `revokeOtherSessions`. */
+  revokeOtherSessions: ["auth", "revokeOtherSessions"] as const,
+  /** Key for `revokeSessions`. */
+  revokeSessions: ["auth", "revokeSessions"] as const,
   /** Key for `unlinkAccount`. */
   unlinkAccount: ["auth", "unlinkAccount"] as const,
+  /** Key for `updateSession`. */
+  updateSession: ["auth", "updateSession"] as const,
   /** Key for `updateUser`. */
   updateUser: ["auth", "updateUser"] as const
 } as const

@@ -13,13 +13,16 @@ import {
   listSessionsOptions,
   requestPasswordResetOptions,
   resetPasswordOptions,
+  revokeOtherSessionsOptions,
   revokeSessionOptions,
+  revokeSessionsOptions,
   sendVerificationEmailOptions,
   signInEmailOptions,
   signInSocialOptions,
   signOutOptions,
   signUpEmailOptions,
-  unlinkAccountOptions
+  unlinkAccountOptions,
+  updateSessionOptions
 } from "../src"
 import {
   type ApiKeyAuthClient,
@@ -129,6 +132,9 @@ describe("core base endpoint option factories", () => {
       deleteUser: vi.fn(async (params) => ({ data: params.callbackURL })),
       linkSocial: vi.fn(async (params) => ({ data: params.provider })),
       revokeSession: vi.fn(async (params) => ({ data: params.token })),
+      revokeOtherSessions: vi.fn(async () => ({ data: true })),
+      revokeSessions: vi.fn(async () => ({ data: true })),
+      updateSession: vi.fn(async (params) => ({ data: params.theme })),
       unlinkAccount: vi.fn(async (params) => ({ data: params.providerId }))
     }
 
@@ -144,6 +150,12 @@ describe("core base endpoint option factories", () => {
     const deleteUser = deleteUserOptions(authClient as never)
     const linkSocial = linkSocialOptions(authClient as never)
     const revokeSession = revokeSessionOptions(authClient as never)
+    const revokeOtherSessions = revokeOtherSessionsOptions(
+      authClient as never,
+      "user-1"
+    )
+    const revokeSessions = revokeSessionsOptions(authClient as never)
+    const updateSession = updateSessionOptions(authClient as never)
     const unlinkAccount = unlinkAccountOptions(authClient as never)
 
     expect(requestReset.mutationKey).toEqual(
@@ -162,12 +174,22 @@ describe("core base endpoint option factories", () => {
     expect(deleteUser.mutationKey).toEqual(deleteUserMutationKeys.deleteUser)
     expect(linkSocial.mutationKey).toEqual(authMutationKeys.linkSocial)
     expect(revokeSession.mutationKey).toEqual(authMutationKeys.revokeSession)
+    expect(revokeOtherSessions.mutationKey).toEqual(
+      authMutationKeys.revokeOtherSessions
+    )
+    expect(revokeSessions.mutationKey).toEqual(authMutationKeys.revokeSessions)
+    expect(updateSession.mutationKey).toEqual(authMutationKeys.updateSession)
     expect(unlinkAccount.mutationKey).toEqual(authMutationKeys.unlinkAccount)
     expect("deleteUser" in authMutationKeys).toBe(false)
     expect(signInEmail.meta).toEqual({ awaits: [authQueryKeys.session] })
     expect(signOut.meta).toEqual({ removes: [authQueryKeys.all] })
     expect(signUpEmail.meta).toEqual({ awaits: [authQueryKeys.session] })
     expect(changeEmail.meta).toEqual({ awaits: [authQueryKeys.session] })
+    expect(revokeOtherSessions.meta).toEqual({
+      awaits: [authQueryKeys.listSessions("user-1")]
+    })
+    expect(revokeSessions.meta).toEqual({ removes: [authQueryKeys.all] })
+    expect(updateSession.meta).toEqual({ awaits: [authQueryKeys.session] })
 
     await expect(
       (
@@ -179,6 +201,33 @@ describe("core base endpoint option factories", () => {
     ).resolves.toEqual({ data: "ada@example.com" })
     expect(authClient.signIn.email).toHaveBeenCalledWith({
       email: "ada@example.com",
+      fetchOptions: { credentials: "include", throw: true }
+    })
+
+    await (
+      revokeOtherSessions as { mutationFn?: (variables?: unknown) => unknown }
+    ).mutationFn?.()
+    expect(authClient.revokeOtherSessions).toHaveBeenCalledWith({
+      fetchOptions: { throw: true }
+    })
+
+    await (
+      revokeSessions as {
+        mutationFn?: (variables?: unknown) => unknown
+      }
+    ).mutationFn?.()
+    expect(authClient.revokeSessions).toHaveBeenCalledWith({
+      fetchOptions: { throw: true }
+    })
+
+    await (
+      updateSession as { mutationFn?: (variables: unknown) => unknown }
+    ).mutationFn?.({
+      theme: "dark",
+      fetchOptions: { credentials: "include" }
+    })
+    expect(authClient.updateSession).toHaveBeenCalledWith({
+      theme: "dark",
       fetchOptions: { credentials: "include", throw: true }
     })
 

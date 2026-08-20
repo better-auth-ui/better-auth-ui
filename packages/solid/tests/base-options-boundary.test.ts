@@ -17,8 +17,11 @@ const baseOptionFactories = [
   "changePasswordOptions",
   "deleteUserOptions",
   "linkSocialOptions",
+  "revokeOtherSessionsOptions",
   "revokeSessionOptions",
+  "revokeSessionsOptions",
   "unlinkAccountOptions",
+  "updateSessionOptions",
   "updateUserOptions"
 ] as const
 
