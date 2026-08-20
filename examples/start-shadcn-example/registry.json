@@ -341,6 +341,7 @@
         "input",
         "input-group",
         "input-otp",
+        "select",
         "skeleton",
         "sonner",
         "spinner",
@@ -495,6 +496,11 @@
           "path": "src/components/auth/phone-number/phone-number.tsx",
           "type": "registry:component",
           "target": "@components/auth/phone-number/phone-number.tsx"
+        },
+        {
+          "path": "src/components/auth/phone-number/international-phone-field.tsx",
+          "type": "registry:component",
+          "target": "@components/auth/phone-number/international-phone-field.tsx"
         },
         {
           "path": "src/components/auth/phone-number/phone-number-button.tsx",

@@ -7,10 +7,10 @@ description: Add phone verification-code and password sign-in, recovery, and ver
 import { Callout } from "fumadocs-ui/components/callout"
 import { Step, Steps } from "fumadocs-ui/components/steps"
 
-The phone-number plugin adds a dedicated `/auth/phone-number` view. It supports passwordless verification codes, phone number and password sign-in, password recovery, and a verified phone-number card in account settings.
+The phone-number plugin adds a dedicated `/auth/phone-number` view. It supports passwordless verification codes, phone number and password sign-in, password recovery, and a verified phone-number card in account settings. Its country selector formats national input as the user types, validates it, and sends an E.164 number to Better Auth.
 
 <Callout type="warn">
-Treat phone numbers as normalized identifiers. Validate and convert them to one canonical format, usually E.164, before sending an SMS. The UI intentionally accepts international input and leaves provider-specific parsing to your server.
+Keep server-side phone validation as a trust boundary. The UI sends E.164 numbers, but clients can bypass UI validation.
 </Callout>
 
 ## Setup
@@ -117,6 +117,8 @@ Use `validAuthPaths` in the route guard that renders `<Auth path={path} />`.
 | `passwordReset` | `false` | `sendPasswordResetOTP` |
 | `changePhoneNumber` | `true` | `sendOTP`. Verification uses `updatePhoneNumber: true` |
 | `otpLength` | `6` | Must match Better Auth `otpLength` |
+
+Use `defaultCountry`, `countries`, and `locale` to control the selector. Supply an `adapter` when your application needs different formatting or validation rules.
 
 When both sign-in modes are enabled, the form lets users switch between a code and a password. If password sign-in returns `PHONE_NUMBER_NOT_VERIFIED`, it moves directly to the code step because Better Auth has already started verification.
 

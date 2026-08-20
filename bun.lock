@@ -392,6 +392,7 @@
       "name": "@better-auth-ui/core",
       "version": "1.7.2",
       "dependencies": {
+        "libphonenumber-js": "^1.13.11",
         "uqr": "^0.1.3",
       },
       "devDependencies": {
@@ -2510,6 +2511,8 @@
     "lefthook-windows-arm64": ["lefthook-windows-arm64@2.1.10", "", { "os": "win32", "cpu": "arm64" }, "sha512-5Q6etF0Fla2DDA4ilDySrdNgiR5+W7cJZwnZ69Je3kvWCaWm4wnkuc8FEdjp3kiL2x3ZXipdI00f5vpO8aWmog=="],
 
     "lefthook-windows-x64": ["lefthook-windows-x64@2.1.10", "", { "os": "win32", "cpu": "x64" }, "sha512-c/XH8YZtylG4XaxzqFfXluvq2LXq2W/p54Bnzn3+Z7E5X2Fk3JlFJAibulMbIt2+w8T7UI/r97ok5GqE4kGaeA=="],
+
+    "libphonenumber-js": ["libphonenumber-js@1.13.11", "", {}, "sha512-ETER2kMaIFTI/Nh1a8Gk03dUF/SL0VZqtI+CcVHZxp5WIHYwNS7S+uiYZDYCvLy3lOR4/DAD5jf0h5WkePPpqg=="],
 
     "lightningcss": ["lightningcss@1.33.0", "", { "dependencies": { "detect-libc": "^2.0.3" }, "optionalDependencies": { "lightningcss-android-arm64": "1.33.0", "lightningcss-darwin-arm64": "1.33.0", "lightningcss-darwin-x64": "1.33.0", "lightningcss-freebsd-x64": "1.33.0", "lightningcss-linux-arm-gnueabihf": "1.33.0", "lightningcss-linux-arm64-gnu": "1.33.0", "lightningcss-linux-arm64-musl": "1.33.0", "lightningcss-linux-x64-gnu": "1.33.0", "lightningcss-linux-x64-musl": "1.33.0", "lightningcss-win32-arm64-msvc": "1.33.0", "lightningcss-win32-x64-msvc": "1.33.0" } }, "sha512-WkUDrojuJs0xkgGf2udWxa3yGBRxPtxUkB79i6aCZLRgc7PM8fZe9TosfPDcvEpQZbuFASnHYmRLBLUbmLOIIA=="],
 

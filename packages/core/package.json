@@ -247,6 +247,7 @@
     "access": "public"
   },
   "dependencies": {
+    "libphonenumber-js": "^1.13.11",
     "uqr": "^0.1.3"
   }
 }

@@ -1,6 +1,9 @@
 import { describe, expect, it, vi } from "vitest"
 import { authQueryKeys } from "../src"
 import {
+  createPhoneNumberValue,
+  defaultPhoneNumberAdapter,
+  getPhoneNumberCountries,
   phoneNumberLocalization,
   phoneNumberMutationKeys,
   phoneNumberPlugin,
@@ -22,6 +25,8 @@ describe("phoneNumberPlugin", () => {
     expect(phoneNumberPlugin.id).toBe("phoneNumber")
     expect(phoneNumberPlugin()).toMatchObject({
       id: "phoneNumber",
+      adapter: defaultPhoneNumberAdapter,
+      defaultCountry: "US",
       localization: phoneNumberLocalization,
       otpLength: 6,
       signIn: true,
@@ -40,6 +45,9 @@ describe("phoneNumberPlugin", () => {
 
   it("merges paths, code length, flow options, and localization", () => {
     const plugin = phoneNumberPlugin({
+      countries: ["CH", "DE"],
+      defaultCountry: "CH",
+      locale: "de-CH",
       path: "phone",
       forgotPasswordPath: "phone-forgot",
       resetPasswordPath: "phone-reset",
@@ -57,6 +65,9 @@ describe("phoneNumberPlugin", () => {
       phoneNumberResetPassword: "phone-reset"
     })
     expect(plugin.otpLength).toBe(8)
+    expect(plugin.countries).toEqual(["CH", "DE"])
+    expect(plugin.defaultCountry).toBe("CH")
+    expect(plugin.locale).toBe("de-CH")
     expect(plugin.signIn).toBe(false)
     expect(plugin.passwordSignIn).toBe(true)
     expect(plugin.passwordReset).toBe(true)
@@ -67,10 +78,67 @@ describe("phoneNumberPlugin", () => {
     })
   })
 
+  it("uses the first configured country when the default is omitted", () => {
+    expect(phoneNumberPlugin({ countries: ["CH", "DE"] })).toMatchObject({
+      countries: ["CH", "DE"],
+      defaultCountry: "CH"
+    })
+  })
+
+  it("rejects empty or inconsistent country configuration", () => {
+    expect(() => phoneNumberPlugin({ countries: [] })).toThrow(
+      "countries must include at least one country"
+    )
+    expect(() =>
+      phoneNumberPlugin({ countries: ["CH", "DE"], defaultCountry: "US" })
+    ).toThrow("defaultCountry must be included in countries")
+  })
+
   it("normalizes code length boundaries", () => {
     expect(phoneNumberPlugin({ otpLength: Number.NaN }).otpLength).toBe(6)
     expect(phoneNumberPlugin({ otpLength: 0 }).otpLength).toBe(1)
     expect(phoneNumberPlugin({ otpLength: -4 }).otpLength).toBe(1)
+  })
+
+  it("formats and normalizes national numbers to E.164", () => {
+    expect(createPhoneNumberValue("2025550123", "US")).toEqual({
+      country: "US",
+      display: "(202) 555-0123",
+      e164: "+12025550123",
+      isValid: true
+    })
+    expect(createPhoneNumberValue("020 7946 0018", "GB")).toMatchObject({
+      country: "GB",
+      e164: "+442079460018",
+      isValid: true
+    })
+  })
+
+  it("keeps invalid input visible without producing an E.164 value", () => {
+    expect(createPhoneNumberValue("123", "US")).toMatchObject({
+      country: "US",
+      display: "1 23",
+      isValid: false
+    })
+    expect(createPhoneNumberValue("123", "US").e164).toBeUndefined()
+  })
+
+  it("localizes and limits the country list", () => {
+    expect(getPhoneNumberCountries("de", ["US", "DE"])).toEqual([
+      { callingCode: "+49", code: "DE", label: "Deutschland" },
+      {
+        callingCode: "+1",
+        code: "US",
+        label: "Vereinigte Staaten"
+      }
+    ])
+  })
+
+  it("falls back to English names and sorting for an invalid locale", () => {
+    expect(getPhoneNumberCountries("invalid locale", ["US", "DE"])).toEqual([
+      { callingCode: "+49", code: "DE", label: "Germany" },
+      { callingCode: "+1", code: "US", label: "United States" }
+    ])
   })
 
   it("keeps password sign-in under the shared sign-in namespace", () => {

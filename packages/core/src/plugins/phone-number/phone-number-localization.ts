@@ -1,4 +1,8 @@
 export const phoneNumberLocalization = {
+  /** @remarks `"Country or region"` */
+  country: "Country or region",
+  /** @remarks `"Enter a valid phone number"` */
+  invalidPhoneNumber: "Enter a valid phone number",
   /** @remarks `"Phone number"` */
   phoneNumber: "Phone number",
   /** @remarks `"+1 555 123 4567"` */

@@ -7,7 +7,7 @@ description: Add phone verification-code and password sign-in to Solid and Zaida
 import { Callout } from "fumadocs-ui/components/callout"
 import { Step, Steps } from "fumadocs-ui/components/steps"
 
-The Solid/Zaidan registry item adds phone verification-code and password sign-in, phone password recovery, and verified phone-number management.
+The Solid/Zaidan registry item adds phone verification-code and password sign-in, phone password recovery, and verified phone-number management. Its country selector formats national input as the user types, validates it, and sends an E.164 number to Better Auth.
 
 ## Setup
 
@@ -35,7 +35,7 @@ export const auth = betterAuth({
 })
 ```
 
-Normalize numbers on the server and do not log codes in production.
+Keep server-side validation as a trust boundary even though the UI normalizes numbers to E.164. Do not log codes in production.
 
 </Step>
 <Step>
@@ -109,6 +109,8 @@ const validAuthPathSegments = new Set([
 | `passwordReset` | `false` | `sendPasswordResetOTP` |
 | `changePhoneNumber` | `true` | `sendOTP` |
 | `otpLength` | `6` | Must match Better Auth `otpLength` |
+
+Use `defaultCountry`, `countries`, and `locale` to control the selector. Supply an `adapter` when your application needs different formatting or validation rules.
 
 <Callout type="warn">
 Passwordless phone verification bypasses Better Auth 2FA. Phone number and password sign-in still follows the configured second-factor flow.

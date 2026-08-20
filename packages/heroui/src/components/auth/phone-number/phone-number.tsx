@@ -1,5 +1,8 @@
 import { authMutationKeys } from "@better-auth-ui/core"
-import type { PhoneNumberAuthClient } from "@better-auth-ui/core/plugins/phone-number"
+import {
+  createPhoneNumberValue,
+  type PhoneNumberAuthClient
+} from "@better-auth-ui/core/plugins/phone-number"
 import {
   AuthPrompts,
   useAuth,
@@ -21,7 +24,6 @@ import {
   Description,
   FieldError,
   Form,
-  Input,
   InputGroup,
   Label,
   Link,
@@ -37,6 +39,7 @@ import { useSignInContinuation } from "../../../lib/auth/use-sign-in-continuatio
 import { FieldSeparator } from "../field-separator"
 import { OtpField } from "../otp-field"
 import { ProviderButtons, type SocialLayout } from "../provider-buttons"
+import { InternationalPhoneField } from "./international-phone-field"
 
 type PhoneNumberMode = "code" | "password"
 
@@ -64,6 +67,10 @@ export function PhoneNumber({
     viewPaths
   } = useAuth()
   const {
+    adapter,
+    countries,
+    defaultCountry,
+    locale,
     localization: phoneLocalization,
     otpLength,
     passwordReset,
@@ -78,7 +85,10 @@ export function PhoneNumber({
   const [mode, setMode] = useState<PhoneNumberMode>(
     signIn ? "code" : "password"
   )
-  const [phoneNumber, setPhoneNumber] = useState("")
+  const [phoneNumber, setPhoneNumber] = useState(() =>
+    createPhoneNumberValue("", defaultCountry, adapter)
+  )
+  const [phoneError, setPhoneError] = useState<string>()
   const [password, setPassword] = useState("")
   const [code, setCode] = useState("")
   const [codeSent, setCodeSent] = useState(false)
@@ -135,10 +145,19 @@ export function PhoneNumber({
     (plugin) => plugin.captchaComponent
   )?.captchaComponent
 
-  const sendCode = () => sendOtp({ phoneNumber, fetchOptions })
+  const getPhoneNumber = () => {
+    if (phoneNumber.e164) return phoneNumber.e164
+    setPhoneError(phoneLocalization.invalidPhoneNumber)
+  }
+  const sendCode = () => {
+    const normalizedPhoneNumber = getPhoneNumber()
+    if (!normalizedPhoneNumber) return
+    sendOtp({ phoneNumber: normalizedPhoneNumber, fetchOptions })
+  }
   const verifyCode = (completedCode: string) => {
     if (isPending || completedCode.length !== otpLength) return
-    verify({ phoneNumber, code: completedCode })
+    if (!phoneNumber.e164) return
+    verify({ phoneNumber: phoneNumber.e164, code: completedCode })
   }
   const switchMode = () => {
     setMode((current) => (current === "code" ? "password" : "code"))
@@ -150,9 +169,11 @@ export function PhoneNumber({
     event.preventDefault()
 
     if (mode === "password") {
+      const normalizedPhoneNumber = getPhoneNumber()
+      if (!normalizedPhoneNumber) return
       const formData = new FormData(event.currentTarget)
       signInWithPassword({
-        phoneNumber,
+        phoneNumber: normalizedPhoneNumber,
         password,
         ...(emailAndPassword?.rememberMe
           ? { rememberMe: formData.get("rememberMe") === "on" }
@@ -182,7 +203,7 @@ export function PhoneNumber({
           <Card.Description>
             {phoneLocalization.codeSentTo.replace(
               "{{phoneNumber}}",
-              phoneNumber
+              phoneNumber.display
             )}
           </Card.Description>
         )}
@@ -211,26 +232,22 @@ export function PhoneNumber({
             />
           ) : (
             <>
-              <TextField
-                name="phoneNumber"
-                type="tel"
-                autoComplete="tel"
-                value={phoneNumber}
+              <InternationalPhoneField
+                adapter={adapter}
+                countryCodes={countries}
+                countryLabel={phoneLocalization.country}
+                error={phoneError}
                 isDisabled={isPending}
-                onChange={setPhoneNumber}
-                validate={(value) =>
-                  value ? undefined : localization.auth.fieldRequired
-                }
-              >
-                <Label>{phoneLocalization.phoneNumber}</Label>
-                <Input
-                  inputMode="tel"
-                  placeholder={phoneLocalization.phoneNumberPlaceholder}
-                  required
-                  variant={variant === "transparent" ? "primary" : "secondary"}
-                />
-                <FieldError />
-              </TextField>
+                locale={locale}
+                phoneLabel={phoneLocalization.phoneNumber}
+                placeholder={phoneLocalization.phoneNumberPlaceholder}
+                value={phoneNumber}
+                variant={variant === "transparent" ? "primary" : "secondary"}
+                onChange={(value) => {
+                  setPhoneNumber(value)
+                  setPhoneError(undefined)
+                }}
+              />
               {mode === "password" && (
                 <TextField
                   name="password"

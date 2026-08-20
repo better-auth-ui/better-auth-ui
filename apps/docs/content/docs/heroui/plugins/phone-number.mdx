@@ -7,7 +7,7 @@ description: Add phone verification-code and password sign-in, recovery, and ver
 import { Callout } from "fumadocs-ui/components/callout"
 import { Step, Steps } from "fumadocs-ui/components/steps"
 
-The HeroUI phone-number plugin contributes a phone sign-in route, password recovery views, and a verified phone-number card for account settings.
+The HeroUI phone-number plugin contributes a phone sign-in route, password recovery views, and a verified phone-number card for account settings. Its country selector formats national input as the user types, validates it, and sends an E.164 number to Better Auth.
 
 ## Setup
 
@@ -35,7 +35,7 @@ export const auth = betterAuth({
 })
 ```
 
-Normalize phone numbers on the server, preferably to E.164. Do not log codes in production. Better Auth recommends dispatching the SMS without waiting for the provider response.
+Keep server-side validation as a trust boundary even though the UI normalizes numbers to E.164. Do not log codes in production. Better Auth recommends dispatching the SMS without waiting for the provider response.
 
 </Step>
 <Step>
@@ -106,6 +106,8 @@ const validAuthPaths = new Set([
 | `passwordReset` | `false` | `sendPasswordResetOTP` |
 | `changePhoneNumber` | `true` | `sendOTP` |
 | `otpLength` | `6` | Must match Better Auth `otpLength` |
+
+Use `defaultCountry`, `countries`, and `locale` to control the selector. Supply an `adapter` when your application needs different formatting or validation rules.
 
 When password sign-in reports `PHONE_NUMBER_NOT_VERIFIED`, the UI switches to the code step. Better Auth sends that verification code automatically.
 

@@ -1,4 +1,7 @@
-import type { PhoneNumberAuthClient } from "@better-auth-ui/core/plugins/phone-number"
+import {
+  createPhoneNumberValue,
+  type PhoneNumberAuthClient
+} from "@better-auth-ui/core/plugins/phone-number"
 import {
   useAuth,
   useAuthPlugin,
@@ -14,20 +17,17 @@ import {
   Card,
   type CardProps,
   cn,
-  FieldError,
   Fieldset,
   Form,
-  Input,
-  Label,
   Skeleton,
   Spinner,
-  TextField,
   toast
 } from "@heroui/react"
 import { type SyntheticEvent, useEffect, useState } from "react"
 
 import { phoneNumberPlugin } from "../../../lib/auth/phone-number-plugin"
 import { OtpField } from "../otp-field"
+import { InternationalPhoneField } from "./international-phone-field"
 import { RemovePhoneNumberDialog } from "./remove-phone-number-dialog"
 
 type PhoneNumberUser = {
@@ -46,18 +46,30 @@ export function ChangePhoneNumber({
   ...props
 }: ChangePhoneNumberProps & Omit<CardProps, "children">) {
   const { authClient } = useAuth()
-  const { localization, otpLength } = useAuthPlugin(phoneNumberPlugin)
+  const {
+    adapter,
+    countries,
+    defaultCountry,
+    locale,
+    localization,
+    otpLength
+  } = useAuthPlugin(phoneNumberPlugin)
   const phoneClient = authClient as PhoneNumberAuthClient
   const { data: session } = useSession(phoneClient)
   const currentPhoneNumber =
     (session?.user as PhoneNumberUser | undefined)?.phoneNumber ?? ""
-  const [phoneNumber, setPhoneNumber] = useState("")
+  const [phoneNumber, setPhoneNumber] = useState(() =>
+    createPhoneNumberValue("", defaultCountry, adapter)
+  )
+  const [phoneError, setPhoneError] = useState<string>()
   const [code, setCode] = useState("")
   const [codeSent, setCodeSent] = useState(false)
 
   useEffect(() => {
-    setPhoneNumber(currentPhoneNumber)
-  }, [currentPhoneNumber])
+    setPhoneNumber(
+      createPhoneNumberValue(currentPhoneNumber, defaultCountry, adapter)
+    )
+  }, [adapter, currentPhoneNumber, defaultCountry])
 
   const { mutate: sendOtp, isPending: isSending } = useSendPhoneNumberOtp(
     phoneClient,
@@ -78,7 +90,7 @@ export function ChangePhoneNumber({
     phoneClient,
     {
       onSuccess: () => {
-        setPhoneNumber("")
+        setPhoneNumber(createPhoneNumberValue("", defaultCountry, adapter))
         toast.success(localization.phoneNumberRemoved)
       }
     }
@@ -87,11 +99,15 @@ export function ChangePhoneNumber({
 
   const handleSubmit = (event: SyntheticEvent<HTMLFormElement>) => {
     event.preventDefault()
-    if (!codeSent) {
-      sendOtp({ phoneNumber })
+    if (!phoneNumber.e164) {
+      setPhoneError(localization.invalidPhoneNumber)
       return
     }
-    verify({ phoneNumber, code, updatePhoneNumber: true })
+    if (!codeSent) {
+      sendOtp({ phoneNumber: phoneNumber.e164 })
+      return
+    }
+    verify({ phoneNumber: phoneNumber.e164, code, updatePhoneNumber: true })
   }
   const removePhoneNumber = () =>
     updateUser({
@@ -113,7 +129,7 @@ export function ChangePhoneNumber({
                     <p className="text-sm text-muted">
                       {localization.codeSentTo.replace(
                         "{{phoneNumber}}",
-                        phoneNumber
+                        phoneNumber.display
                       )}
                     </p>
                     <OtpField
@@ -127,30 +143,27 @@ export function ChangePhoneNumber({
                       onChange={setCode}
                     />
                   </div>
-                ) : (
-                  <TextField
-                    name="phoneNumber"
-                    type="tel"
-                    autoComplete="tel"
+                ) : session ? (
+                  <InternationalPhoneField
+                    adapter={adapter}
+                    countryCodes={countries}
+                    countryLabel={localization.country}
+                    error={phoneError}
+                    isDisabled={isPending}
+                    locale={locale}
+                    phoneLabel={localization.phoneNumber}
+                    placeholder={localization.phoneNumberPlaceholder}
                     value={phoneNumber}
-                    isDisabled={isPending || !session}
-                    onChange={setPhoneNumber}
-                  >
-                    <Label>{localization.phoneNumber}</Label>
-                    {session ? (
-                      <Input
-                        inputMode="tel"
-                        placeholder={localization.phoneNumberPlaceholder}
-                        required
-                        variant={
-                          variant === "transparent" ? "primary" : "secondary"
-                        }
-                      />
-                    ) : (
-                      <Skeleton className="h-10 w-full rounded-xl md:h-9" />
-                    )}
-                    <FieldError />
-                  </TextField>
+                    variant={
+                      variant === "transparent" ? "primary" : "secondary"
+                    }
+                    onChange={(value) => {
+                      setPhoneNumber(value)
+                      setPhoneError(undefined)
+                    }}
+                  />
+                ) : (
+                  <Skeleton className="h-14 w-full rounded-xl" />
                 )}
               </Fieldset.Group>
               <Fieldset.Actions>
@@ -162,7 +175,13 @@ export function ChangePhoneNumber({
                     onPress={() => {
                       setCode("")
                       setCodeSent(false)
-                      setPhoneNumber(currentPhoneNumber)
+                      setPhoneNumber(
+                        createPhoneNumberValue(
+                          currentPhoneNumber,
+                          defaultCountry,
+                          adapter
+                        )
+                      )
                     }}
                   >
                     {localization.cancel}

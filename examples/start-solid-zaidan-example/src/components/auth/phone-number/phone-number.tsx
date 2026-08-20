@@ -1,4 +1,7 @@
-import type { PhoneNumberAuthClient } from "@better-auth-ui/core/plugins/phone-number"
+import {
+  createPhoneNumberValue,
+  type PhoneNumberAuthClient
+} from "@better-auth-ui/core/plugins/phone-number"
 import {
   AuthLink,
   type AuthPlugin,
@@ -16,6 +19,7 @@ import type { BetterFetchError } from "better-auth/client"
 import { type Component, createSignal, For, Show } from "solid-js"
 
 import { OtpField } from "@/components/auth/otp-field"
+import { InternationalPhoneField } from "@/components/auth/phone-number/international-phone-field"
 import {
   ProviderButtons,
   type SocialLayout
@@ -58,6 +62,10 @@ export type PhoneNumberProps = {
 export function PhoneNumber(props: PhoneNumberProps) {
   const auth = useAuth()
   const {
+    adapter,
+    countries,
+    defaultCountry,
+    locale,
     localization,
     otpLength,
     passwordReset,
@@ -72,7 +80,9 @@ export function PhoneNumber(props: PhoneNumberProps) {
   const [mode, setMode] = createSignal<PhoneNumberMode>(
     signIn ? "code" : "password"
   )
-  const [phoneNumber, setPhoneNumber] = createSignal("")
+  const [phoneNumber, setPhoneNumber] = createSignal(
+    createPhoneNumberValue("", defaultCountry, adapter)
+  )
   const [phoneError, setPhoneError] = createSignal<string>()
   const [password, setPassword] = createSignal("")
   const [passwordError, setPasswordError] = createSignal<string>()
@@ -106,24 +116,35 @@ export function PhoneNumber(props: PhoneNumberProps) {
   }))
   const isPending = () =>
     sendOtp.isPending || verify.isPending || signInWithPassword.isPending
-  const requestCode = () =>
+  const normalizedPhoneNumber = () => {
+    const value = phoneNumber().e164
+    if (value) return value
+    setPhoneError(localization.invalidPhoneNumber)
+  }
+  const requestCode = () => {
+    const value = normalizedPhoneNumber()
+    if (!value) return
     sendOtp.mutate({
-      phoneNumber: phoneNumber(),
+      phoneNumber: value,
       fetchOptions: fetchOptions()
     } as Parameters<typeof sendOtp.mutate>[0])
+  }
   const verifyCode = (completedCode: string) => {
     if (isPending() || completedCode.length !== otpLength) return
+    if (!phoneNumber().e164) return
     verify.mutate({
-      phoneNumber: phoneNumber(),
+      phoneNumber: phoneNumber().e164,
       code: completedCode
     } as Parameters<typeof verify.mutate>[0])
   }
   const submit = (event: SubmitEvent & { currentTarget: HTMLFormElement }) => {
     event.preventDefault()
     if (mode() === "password") {
+      const value = normalizedPhoneNumber()
+      if (!value) return
       const formData = new FormData(event.currentTarget)
       signInWithPassword.mutate({
-        phoneNumber: phoneNumber(),
+        phoneNumber: value,
         password: password(),
         ...(auth.emailAndPassword?.rememberMe
           ? { rememberMe: formData.get("rememberMe") === "on" }
@@ -162,7 +183,10 @@ export function PhoneNumber(props: PhoneNumberProps) {
         </CardTitle>
         <Show when={codeSent()}>
           <CardDescription>
-            {localization.codeSentTo.replace("{{phoneNumber}}", phoneNumber())}
+            {localization.codeSentTo.replace(
+              "{{phoneNumber}}",
+              phoneNumber().display
+            )}
           </CardDescription>
         </Show>
       </CardHeader>
@@ -186,34 +210,21 @@ export function PhoneNumber(props: PhoneNumberProps) {
                 when={codeSent()}
                 fallback={
                   <>
-                    <Field data-invalid={Boolean(phoneError())}>
-                      <FieldLabel for="phone-number">
-                        {localization.phoneNumber}
-                      </FieldLabel>
-                      <Input
-                        aria-invalid={Boolean(phoneError())}
-                        autocomplete="tel"
-                        disabled={isPending()}
-                        id="phone-number"
-                        inputmode="tel"
-                        name="phoneNumber"
-                        onInput={(event) => {
-                          setPhoneNumber(event.currentTarget.value)
-                          setPhoneError(undefined)
-                        }}
-                        onInvalid={(event) => {
-                          event.preventDefault()
-                          setPhoneError(event.currentTarget.validationMessage)
-                        }}
-                        placeholder={localization.phoneNumberPlaceholder}
-                        required
-                        type="tel"
-                        value={phoneNumber()}
-                      />
-                      <Show when={phoneError()}>
-                        {(message) => <FieldError>{message()}</FieldError>}
-                      </Show>
-                    </Field>
+                    <InternationalPhoneField
+                      adapter={adapter}
+                      countryCodes={countries}
+                      countryLabel={localization.country}
+                      disabled={isPending()}
+                      error={phoneError()}
+                      locale={locale}
+                      phoneLabel={localization.phoneNumber}
+                      placeholder={localization.phoneNumberPlaceholder}
+                      value={phoneNumber()}
+                      onChange={(value) => {
+                        setPhoneNumber(value)
+                        setPhoneError(undefined)
+                      }}
+                    />
                     <Show when={mode() === "password"}>
                       <Field data-invalid={Boolean(passwordError())}>
                         <FieldLabel for="phone-password">

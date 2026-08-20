@@ -293,7 +293,8 @@ export const solidRegistryManifest = {
       registryDependencies: [
         betterAuthSolidRegistryDependency("auth-provider"),
         betterAuthSolidRegistryDependency("account-settings"),
-        "@zaidan/alert-dialog"
+        "@zaidan/alert-dialog",
+        "@zaidan/native-select"
       ],
       files: [
         libFile("src/lib/auth/phone-number-plugin.ts"),
@@ -301,6 +302,9 @@ export const solidRegistryManifest = {
         libFile("src/lib/auth/use-sign-in-continuation.ts"),
         componentFile("src/components/auth/otp-field.tsx"),
         componentFile("src/components/auth/phone-number/phone-number.tsx"),
+        componentFile(
+          "src/components/auth/phone-number/international-phone-field.tsx"
+        ),
         componentFile(
           "src/components/auth/phone-number/phone-number-button.tsx"
         ),

@@ -1,4 +1,7 @@
-import type { PhoneNumberAuthClient } from "@better-auth-ui/core/plugins/phone-number"
+import {
+  createPhoneNumberValue,
+  type PhoneNumberAuthClient
+} from "@better-auth-ui/core/plugins/phone-number"
 import {
   useAuth,
   useAuthPlugin,
@@ -13,10 +16,9 @@ import { createEffect, createSignal, Show } from "solid-js"
 import { toast } from "solid-sonner"
 
 import { OtpField } from "@/components/auth/otp-field"
+import { InternationalPhoneField } from "@/components/auth/phone-number/international-phone-field"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter } from "@/components/ui/card"
-import { Field, FieldError, FieldLabel } from "@/components/ui/field"
-import { Input } from "@/components/ui/input"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Spinner } from "@/components/ui/spinner"
 import { phoneNumberPlugin } from "@/lib/auth/phone-number-plugin"
@@ -34,12 +36,21 @@ export type ChangePhoneNumberProps = {
 /** Add, replace, or remove the authenticated user's verified phone number. */
 export function ChangePhoneNumber(props: ChangePhoneNumberProps = {}) {
   const auth = useAuth()
-  const { localization, otpLength } = useAuthPlugin(phoneNumberPlugin)
+  const {
+    adapter,
+    countries,
+    defaultCountry,
+    locale,
+    localization,
+    otpLength
+  } = useAuthPlugin(phoneNumberPlugin)
   const phoneClient = () => auth.authClient as PhoneNumberAuthClient
   const session = useSession(phoneClient())
   const currentPhoneNumber = () =>
     (session.data?.user as PhoneNumberUser | undefined)?.phoneNumber ?? ""
-  const [phoneNumber, setPhoneNumber] = createSignal("")
+  const [phoneNumber, setPhoneNumber] = createSignal(
+    createPhoneNumberValue("", defaultCountry, adapter)
+  )
   const [fieldError, setFieldError] = createSignal<string>()
   const [code, setCode] = createSignal("")
   const [codeSent, setCodeSent] = createSignal(false)
@@ -48,7 +59,9 @@ export function ChangePhoneNumber(props: ChangePhoneNumberProps = {}) {
   createEffect(() => {
     if (!session.data || initialized) return
     initialized = true
-    setPhoneNumber(currentPhoneNumber())
+    setPhoneNumber(
+      createPhoneNumberValue(currentPhoneNumber(), defaultCountry, adapter)
+    )
   })
 
   const sendOtp = useSendPhoneNumberOtp(phoneClient(), () => ({
@@ -64,7 +77,7 @@ export function ChangePhoneNumber(props: ChangePhoneNumberProps = {}) {
   }))
   const remove = useUpdateUser(phoneClient(), () => ({
     onSuccess: () => {
-      setPhoneNumber("")
+      setPhoneNumber(createPhoneNumberValue("", defaultCountry, adapter))
       toast.success(localization.phoneNumberRemoved)
     }
   }))
@@ -72,14 +85,18 @@ export function ChangePhoneNumber(props: ChangePhoneNumberProps = {}) {
     sendOtp.isPending || verify.isPending || remove.isPending
   const submit = (event: SubmitEvent & { currentTarget: HTMLFormElement }) => {
     event.preventDefault()
+    if (!phoneNumber().e164) {
+      setFieldError(localization.invalidPhoneNumber)
+      return
+    }
     if (!codeSent()) {
-      sendOtp.mutate({ phoneNumber: phoneNumber() } as Parameters<
+      sendOtp.mutate({ phoneNumber: phoneNumber().e164 } as Parameters<
         typeof sendOtp.mutate
       >[0])
       return
     }
     verify.mutate({
-      phoneNumber: phoneNumber(),
+      phoneNumber: phoneNumber().e164,
       code: code(),
       updatePhoneNumber: true
     } as Parameters<typeof verify.mutate>[0])
@@ -100,50 +117,33 @@ export function ChangePhoneNumber(props: ChangePhoneNumberProps = {}) {
             <Show
               when={codeSent()}
               fallback={
-                <Field data-invalid={Boolean(fieldError())}>
-                  <FieldLabel for="settings-phone-number">
-                    {localization.phoneNumber}
-                  </FieldLabel>
-                  <Show
-                    when={session.data}
-                    fallback={
-                      <Skeleton>
-                        <Input class="invisible" />
-                      </Skeleton>
-                    }
-                  >
-                    <Input
-                      aria-invalid={Boolean(fieldError())}
-                      autocomplete="tel"
-                      disabled={isPending()}
-                      id="settings-phone-number"
-                      inputmode="tel"
-                      name="phoneNumber"
-                      onInput={(event) => {
-                        setPhoneNumber(event.currentTarget.value)
-                        setFieldError(undefined)
-                      }}
-                      onInvalid={(event) => {
-                        event.preventDefault()
-                        setFieldError(event.currentTarget.validationMessage)
-                      }}
-                      placeholder={localization.phoneNumberPlaceholder}
-                      required
-                      type="tel"
-                      value={phoneNumber()}
-                    />
-                  </Show>
-                  <Show when={fieldError()}>
-                    {(message) => <FieldError>{message()}</FieldError>}
-                  </Show>
-                </Field>
+                <Show
+                  when={session.data}
+                  fallback={<Skeleton class="h-14 w-full" />}
+                >
+                  <InternationalPhoneField
+                    adapter={adapter}
+                    countryCodes={countries}
+                    countryLabel={localization.country}
+                    disabled={isPending()}
+                    error={fieldError()}
+                    locale={locale}
+                    phoneLabel={localization.phoneNumber}
+                    placeholder={localization.phoneNumberPlaceholder}
+                    value={phoneNumber()}
+                    onChange={(value) => {
+                      setPhoneNumber(value)
+                      setFieldError(undefined)
+                    }}
+                  />
+                </Show>
               }
             >
               <div class="flex flex-col gap-3">
                 <p class="text-sm text-muted-foreground">
                   {localization.codeSentTo.replace(
                     "{{phoneNumber}}",
-                    phoneNumber()
+                    phoneNumber().display
                   )}
                 </p>
                 <OtpField
@@ -166,7 +166,13 @@ export function ChangePhoneNumber(props: ChangePhoneNumberProps = {}) {
                 onClick={() => {
                   setCode("")
                   setCodeSent(false)
-                  setPhoneNumber(currentPhoneNumber())
+                  setPhoneNumber(
+                    createPhoneNumberValue(
+                      currentPhoneNumber(),
+                      defaultCountry,
+                      adapter
+                    )
+                  )
                 }}
                 size="sm"
                 type="button"

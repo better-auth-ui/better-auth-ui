@@ -1,4 +1,7 @@
-import type { PhoneNumberAuthClient } from "@better-auth-ui/core/plugins/phone-number"
+import {
+  createPhoneNumberValue,
+  type PhoneNumberAuthClient
+} from "@better-auth-ui/core/plugins/phone-number"
 import {
   AuthLink,
   useAuth,
@@ -16,16 +19,11 @@ import {
   CardHeader,
   CardTitle
 } from "@/components/ui/card"
-import {
-  Field,
-  FieldError,
-  FieldGroup,
-  FieldLabel
-} from "@/components/ui/field"
-import { Input } from "@/components/ui/input"
+import { FieldGroup } from "@/components/ui/field"
 import { Spinner } from "@/components/ui/spinner"
 import { phoneNumberPlugin } from "@/lib/auth/phone-number-plugin"
 import { cn } from "@/lib/utils"
+import { InternationalPhoneField } from "./international-phone-field"
 
 export const PHONE_NUMBER_RESET_STORAGE_KEY =
   "better-auth-ui.phone-number-reset"
@@ -39,9 +37,18 @@ export function ForgotPhoneNumberPassword(
   props: ForgotPhoneNumberPasswordProps
 ) {
   const auth = useAuth()
-  const { localization, viewPaths: phoneNumberViewPaths } =
-    useAuthPlugin(phoneNumberPlugin)
+  const {
+    adapter,
+    countries,
+    defaultCountry,
+    locale,
+    localization,
+    viewPaths: phoneNumberViewPaths
+  } = useAuthPlugin(phoneNumberPlugin)
   const { fetchOptions, resetFetchOptions } = useFetchOptions()
+  const [phoneNumber, setPhoneNumber] = createSignal(
+    createPhoneNumberValue("", defaultCountry, adapter)
+  )
   const [fieldError, setFieldError] = createSignal<string>()
   const requestReset = useRequestPhoneNumberPasswordReset(
     auth.authClient as PhoneNumberAuthClient,
@@ -58,9 +65,12 @@ export function ForgotPhoneNumberPassword(
   )
   const submit = (event: SubmitEvent & { currentTarget: HTMLFormElement }) => {
     event.preventDefault()
-    const formData = new FormData(event.currentTarget)
+    if (!phoneNumber().e164) {
+      setFieldError(localization.invalidPhoneNumber)
+      return
+    }
     requestReset.mutate({
-      phoneNumber: String(formData.get("phoneNumber") ?? ""),
+      phoneNumber: phoneNumber().e164,
       fetchOptions: fetchOptions()
     } as Parameters<typeof requestReset.mutate>[0])
   }
@@ -75,30 +85,21 @@ export function ForgotPhoneNumberPassword(
       <CardContent>
         <form aria-label={localization.forgotPassword} onSubmit={submit}>
           <FieldGroup>
-            <Field data-invalid={Boolean(fieldError())}>
-              <FieldLabel for="forgot-phone-number">
-                {localization.phoneNumber}
-              </FieldLabel>
-              <Input
-                aria-invalid={Boolean(fieldError())}
-                autocomplete="tel"
-                disabled={requestReset.isPending}
-                id="forgot-phone-number"
-                inputmode="tel"
-                name="phoneNumber"
-                onInput={() => setFieldError(undefined)}
-                onInvalid={(event) => {
-                  event.preventDefault()
-                  setFieldError(event.currentTarget.validationMessage)
-                }}
-                placeholder={localization.phoneNumberPlaceholder}
-                required
-                type="tel"
-              />
-              <Show when={fieldError()}>
-                {(message) => <FieldError>{message()}</FieldError>}
-              </Show>
-            </Field>
+            <InternationalPhoneField
+              adapter={adapter}
+              countryCodes={countries}
+              countryLabel={localization.country}
+              disabled={requestReset.isPending}
+              error={fieldError()}
+              locale={locale}
+              phoneLabel={localization.phoneNumber}
+              placeholder={localization.phoneNumberPlaceholder}
+              value={phoneNumber()}
+              onChange={(value) => {
+                setPhoneNumber(value)
+                setFieldError(undefined)
+              }}
+            />
             <Button
               class="w-full"
               disabled={requestReset.isPending}

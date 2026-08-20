@@ -1,3 +1,4 @@
+export * from "./phone-number"
 export type * from "./phone-number-auth-client"
 export * from "./phone-number-localization"
 export * from "./phone-number-mutation-keys"

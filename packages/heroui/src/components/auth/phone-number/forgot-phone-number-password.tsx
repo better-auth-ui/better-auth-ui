@@ -1,4 +1,7 @@
-import type { PhoneNumberAuthClient } from "@better-auth-ui/core/plugins/phone-number"
+import {
+  createPhoneNumberValue,
+  type PhoneNumberAuthClient
+} from "@better-auth-ui/core/plugins/phone-number"
 import { useAuth, useAuthPlugin, useFetchOptions } from "@better-auth-ui/react"
 import { useRequestPhoneNumberPasswordReset } from "@better-auth-ui/react/plugins/phone-number"
 import {
@@ -7,17 +10,14 @@ import {
   type CardProps,
   cn,
   Description,
-  FieldError,
   Form,
-  Input,
-  Label,
   Link,
-  Spinner,
-  TextField
+  Spinner
 } from "@heroui/react"
-import type { SyntheticEvent } from "react"
+import { type SyntheticEvent, useState } from "react"
 
 import { phoneNumberPlugin } from "../../../lib/auth/phone-number-plugin"
+import { InternationalPhoneField } from "./international-phone-field"
 
 export const PHONE_NUMBER_RESET_STORAGE_KEY =
   "better-auth-ui.phone-number-reset"
@@ -33,8 +33,18 @@ export function ForgotPhoneNumberPassword({
   variant
 }: ForgotPhoneNumberPasswordProps) {
   const { authClient, basePaths, localization, navigate, plugins } = useAuth()
-  const { localization: phoneLocalization, viewPaths: phoneNumberViewPaths } =
-    useAuthPlugin(phoneNumberPlugin)
+  const {
+    adapter,
+    countries,
+    defaultCountry,
+    locale,
+    localization: phoneLocalization,
+    viewPaths: phoneNumberViewPaths
+  } = useAuthPlugin(phoneNumberPlugin)
+  const [phoneNumber, setPhoneNumber] = useState(() =>
+    createPhoneNumberValue("", defaultCountry, adapter)
+  )
+  const [phoneError, setPhoneError] = useState<string>()
   const { fetchOptions, resetFetchOptions } = useFetchOptions()
   const { mutate: requestReset, isPending } =
     useRequestPhoneNumberPasswordReset(authClient as PhoneNumberAuthClient, {
@@ -52,9 +62,12 @@ export function ForgotPhoneNumberPassword({
 
   const handleSubmit = (event: SyntheticEvent<HTMLFormElement>) => {
     event.preventDefault()
-    const formData = new FormData(event.currentTarget)
+    if (!phoneNumber.e164) {
+      setPhoneError(phoneLocalization.invalidPhoneNumber)
+      return
+    }
     requestReset({
-      phoneNumber: String(formData.get("phoneNumber") ?? ""),
+      phoneNumber: phoneNumber.e164,
       fetchOptions
     })
   }
@@ -71,24 +84,22 @@ export function ForgotPhoneNumberPassword({
       </Card.Header>
       <Card.Content className="gap-4">
         <Form className="flex flex-col gap-4" onSubmit={handleSubmit}>
-          <TextField
-            name="phoneNumber"
-            type="tel"
-            autoComplete="tel"
+          <InternationalPhoneField
+            adapter={adapter}
+            countryCodes={countries}
+            countryLabel={phoneLocalization.country}
+            error={phoneError}
             isDisabled={isPending}
-            validate={(value) =>
-              value ? undefined : localization.auth.fieldRequired
-            }
-          >
-            <Label>{phoneLocalization.phoneNumber}</Label>
-            <Input
-              inputMode="tel"
-              placeholder={phoneLocalization.phoneNumberPlaceholder}
-              required
-              variant={variant === "transparent" ? "primary" : "secondary"}
-            />
-            <FieldError />
-          </TextField>
+            locale={locale}
+            phoneLabel={phoneLocalization.phoneNumber}
+            placeholder={phoneLocalization.phoneNumberPlaceholder}
+            value={phoneNumber}
+            variant={variant === "transparent" ? "primary" : "secondary"}
+            onChange={(value) => {
+              setPhoneNumber(value)
+              setPhoneError(undefined)
+            }}
+          />
           {Captcha && <div className="flex justify-center">{Captcha}</div>}
           <Button className="w-full" type="submit" isPending={isPending}>
             {isPending && <Spinner color="current" size="sm" />}

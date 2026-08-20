@@ -1,23 +1,20 @@
 "use client"
 
-import type { PhoneNumberAuthClient } from "@better-auth-ui/core/plugins/phone-number"
+import {
+  createPhoneNumberValue,
+  type PhoneNumberAuthClient
+} from "@better-auth-ui/core/plugins/phone-number"
 import { useAuth, useAuthPlugin, useFetchOptions } from "@better-auth-ui/react"
 import { useRequestPhoneNumberPasswordReset } from "@better-auth-ui/react/plugins/phone-number"
 import { type SyntheticEvent, useState } from "react"
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import {
-  Field,
-  FieldDescription,
-  FieldError,
-  FieldGroup,
-  FieldLabel
-} from "@/components/ui/field"
-import { Input } from "@/components/ui/input"
+import { FieldDescription, FieldGroup } from "@/components/ui/field"
 import { Spinner } from "@/components/ui/spinner"
 import { phoneNumberPlugin } from "@/lib/auth/phone-number-plugin"
 import { cn } from "@/lib/utils"
+import { InternationalPhoneField } from "./international-phone-field"
 
 export const PHONE_NUMBER_RESET_STORAGE_KEY =
   "better-auth-ui.phone-number-reset"
@@ -32,9 +29,18 @@ export function ForgotPhoneNumberPassword({
 }: ForgotPhoneNumberPasswordProps) {
   const { authClient, basePaths, localization, navigate, plugins, Link } =
     useAuth()
-  const { localization: phoneLocalization, viewPaths: phoneNumberViewPaths } =
-    useAuthPlugin(phoneNumberPlugin)
+  const {
+    adapter,
+    countries,
+    defaultCountry,
+    locale,
+    localization: phoneLocalization,
+    viewPaths: phoneNumberViewPaths
+  } = useAuthPlugin(phoneNumberPlugin)
   const { fetchOptions, resetFetchOptions } = useFetchOptions()
+  const [phoneNumber, setPhoneNumber] = useState(() =>
+    createPhoneNumberValue("", defaultCountry, adapter)
+  )
   const [fieldError, setFieldError] = useState<string>()
   const { mutate: requestReset, isPending } =
     useRequestPhoneNumberPasswordReset(authClient as PhoneNumberAuthClient, {
@@ -52,9 +58,12 @@ export function ForgotPhoneNumberPassword({
 
   const handleSubmit = (event: SyntheticEvent<HTMLFormElement>) => {
     event.preventDefault()
-    const formData = new FormData(event.currentTarget)
+    if (!phoneNumber.e164) {
+      setFieldError(phoneLocalization.invalidPhoneNumber)
+      return
+    }
     requestReset({
-      phoneNumber: String(formData.get("phoneNumber") ?? ""),
+      phoneNumber: phoneNumber.e164,
       fetchOptions
     })
   }
@@ -69,28 +78,21 @@ export function ForgotPhoneNumberPassword({
       <CardContent>
         <form onSubmit={handleSubmit}>
           <FieldGroup>
-            <Field data-invalid={Boolean(fieldError)}>
-              <FieldLabel htmlFor="resetPhoneNumber">
-                {phoneLocalization.phoneNumber}
-              </FieldLabel>
-              <Input
-                id="resetPhoneNumber"
-                name="phoneNumber"
-                type="tel"
-                autoComplete="tel"
-                inputMode="tel"
-                placeholder={phoneLocalization.phoneNumberPlaceholder}
-                required
-                disabled={isPending}
-                onChange={() => setFieldError(undefined)}
-                onInvalid={(event) => {
-                  event.preventDefault()
-                  setFieldError(event.currentTarget.validationMessage)
-                }}
-                aria-invalid={Boolean(fieldError)}
-              />
-              <FieldError>{fieldError}</FieldError>
-            </Field>
+            <InternationalPhoneField
+              adapter={adapter}
+              countryCodes={countries}
+              countryLabel={phoneLocalization.country}
+              disabled={isPending}
+              error={fieldError}
+              locale={locale}
+              phoneLabel={phoneLocalization.phoneNumber}
+              placeholder={phoneLocalization.phoneNumberPlaceholder}
+              value={phoneNumber}
+              onChange={(value) => {
+                setPhoneNumber(value)
+                setFieldError(undefined)
+              }}
+            />
             {Captcha && <div className="flex justify-center">{Captcha}</div>}
             <Button type="submit" disabled={isPending}>
               {isPending && <Spinner />}
