@@ -4,6 +4,8 @@ import type { SettingsTab } from "./settings-tab"
 
 const authButtonIds = new WeakMap<ComponentType<AuthButtonProps>, number>()
 let nextAuthButtonId = 1
+const organizationCardIds = new WeakMap<object, number>()
+let nextOrganizationCardId = 1
 
 export type { AuthPluginViewPaths } from "@better-auth-ui/core"
 
@@ -31,6 +33,22 @@ export function getAuthButtonKey(
   }
 
   return `${pluginId}-${buttonId.toString()}`
+}
+
+/** Return a stable React key for a plugin-contributed organization card. */
+export function getOrganizationCardKey<TProps>(
+  pluginId: string,
+  OrganizationCard: ComponentType<TProps>
+) {
+  let cardId = organizationCardIds.get(OrganizationCard)
+
+  if (cardId === undefined) {
+    cardId = nextOrganizationCardId
+    nextOrganizationCardId += 1
+    organizationCardIds.set(OrganizationCard, cardId)
+  }
+
+  return `${pluginId}-${cardId.toString()}`
 }
 
 /** Props for plugin-contributed headless authentication prompts. */

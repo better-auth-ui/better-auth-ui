@@ -1,6 +1,6 @@
 "use client"
 
-import { useAuth } from "@better-auth-ui/react"
+import { getOrganizationCardKey, useAuth } from "@better-auth-ui/react"
 import type { ComponentProps } from "react"
 
 import { cn } from "@/lib/utils"
@@ -32,7 +32,7 @@ export function OrganizationSettings({
       {plugins.flatMap((plugin) =>
         plugin.organizationCards?.map((Card) => (
           <Card
-            key={`${plugin.id}-${Card.displayName ?? Card.name}`}
+            key={getOrganizationCardKey(plugin.id, Card)}
             organizationId={organizationId}
             organizationSlug={organizationSlug}
           />
