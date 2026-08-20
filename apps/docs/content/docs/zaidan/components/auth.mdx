@@ -18,6 +18,8 @@ description: Renders the Solid auth component for the current path or explicit v
 
 | `view` | Default path |
 | --- | --- |
+| `callback` | `/auth/callback` |
+| `error` | `/auth/error` |
 | `redirect` | `/auth/redirect` |
 | `signIn` | `/auth/sign-in` |
 | `signUp` | `/auth/sign-up` |
@@ -28,6 +30,12 @@ description: Renders the Solid auth component for the current path or explicit v
 | `verifyEmail` | `/auth/verify-email` |
 
 Registered plugins can contribute more views through their own `viewPaths.auth`, such as `magicLink` and `magicLinkSent`.
+
+### Callback results
+
+Set Better Auth `onAPIError.errorURL` and each social sign-in `errorCallbackURL` to `/auth/error`. The view reads Better Auth's `error` query parameter and gives the user a suitable recovery action.
+
+Use `/auth/callback?result=email_verified` as an email verification callback. The result view also supports `account_linked`, `password_reset`, `signup_complete`, and `cancelled`. Add `flow=email-verification`, `account-linking`, `password-reset`, or `oauth` when `result=success` needs more context. A local `redirectTo` path adds a Continue action.
 
 ## Installation
 

@@ -1,7 +1,21 @@
 /**
  * View path segments for authentication routes.
+ *
+ * @remarks Direct implementations must include the `callback` and `error`
+ * paths. Provider `viewPaths` overrides remain partial and merge with these
+ * defaults.
  */
 export interface AuthViewPaths {
+  /**
+   * Path segment for authentication callback results
+   * @default "callback"
+   */
+  callback: string
+  /**
+   * Path segment for authentication callback errors
+   * @default "error"
+   */
+  error: string
   /**
    * Path segment for the authenticated redirect view
    * @default "redirect"
@@ -72,6 +86,8 @@ export type ViewPaths = {
 
 export const viewPaths: ViewPaths = {
   auth: {
+    callback: "callback",
+    error: "error",
     redirect: "redirect",
     signIn: "sign-in",
     signUp: "sign-up",

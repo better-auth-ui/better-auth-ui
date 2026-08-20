@@ -1757,6 +1757,11 @@
           "path": "src/components/auth/auth.tsx",
           "type": "registry:component",
           "target": "@components/auth/auth.tsx"
+        },
+        {
+          "path": "src/components/auth/auth-result.tsx",
+          "type": "registry:component",
+          "target": "@components/auth/auth-result.tsx"
         }
       ]
     },

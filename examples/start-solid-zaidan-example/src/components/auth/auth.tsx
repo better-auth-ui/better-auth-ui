@@ -5,6 +5,7 @@ import { createEffect } from "solid-js"
 import { Dynamic } from "solid-js/web"
 
 import { AuthRedirect } from "./auth-redirect"
+import { AuthCallback, AuthError } from "./auth-result"
 import { ForgotPassword } from "./forgot-password"
 import type { SocialLayout } from "./provider-buttons"
 import { ResetLinkSent } from "./reset-link-sent"
@@ -47,6 +48,14 @@ const passwordOnlyViews: AuthView[] = [
 ]
 
 const authRouteComponents: Partial<Record<string, SupportedAuthRoute>> = {
+  [viewPaths.auth.callback]: {
+    component: AuthCallback,
+    title: "Authentication complete"
+  },
+  [viewPaths.auth.error]: {
+    component: AuthError,
+    title: "Authentication error"
+  },
   [viewPaths.auth.redirect]: {
     component: AuthRedirect,
     title: "Redirecting"

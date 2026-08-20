@@ -1,5 +1,99 @@
 export const localization = {
   auth: {
+    /** @remarks `"Account linked"` */
+    callbackAccountLinkedTitle: "Account linked",
+
+    /** @remarks `"Your account is now connected."` */
+    callbackAccountLinkedDescription: "Your account is now connected.",
+
+    /** @remarks `"This account is already connected"` */
+    callbackAccountLinkConflictTitle: "This account is already connected",
+
+    /** @remarks `"The provider account belongs to a different user or cannot be linked safely."` */
+    callbackAccountLinkConflictDescription:
+      "The provider account belongs to a different user or cannot be linked safely.",
+
+    /** @remarks `"Authentication was cancelled"` */
+    callbackCancelledTitle: "Authentication was cancelled",
+
+    /** @remarks `"No changes were made. You can try again when you are ready."` */
+    callbackCancelledDescription:
+      "No changes were made. You can try again when you are ready.",
+
+    /** @remarks `"We could not complete authentication"` */
+    callbackFailedTitle: "We could not complete authentication",
+
+    /** @remarks `"The callback could not be verified. Return to sign in and try again."` */
+    callbackFailedDescription:
+      "The callback could not be verified. Return to sign in and try again.",
+
+    /** @remarks `"Continue"` */
+    callbackContinue: "Continue",
+
+    /** @remarks `"Email verified"` */
+    callbackEmailVerifiedTitle: "Email verified",
+
+    /** @remarks `"Your email address is verified. You can continue to your account."` */
+    callbackEmailVerifiedDescription:
+      "Your email address is verified. You can continue to your account.",
+
+    /** @remarks `"Verify your email first"` */
+    callbackEmailNotVerifiedTitle: "Verify your email first",
+
+    /** @remarks `"Check your inbox for a verification link before you sign in."` */
+    callbackEmailNotVerifiedDescription:
+      "Check your inbox for a verification link before you sign in.",
+
+    /** @remarks `"This link has expired"` */
+    callbackExpiredLinkTitle: "This link has expired",
+
+    /** @remarks `"Request a new link and use the most recent message in your inbox."` */
+    callbackExpiredLinkDescription:
+      "Request a new link and use the most recent message in your inbox.",
+
+    /** @remarks `"Something went wrong"` */
+    callbackGenericErrorTitle: "Something went wrong",
+
+    /** @remarks `"We could not finish this request. Return to sign in and try again."` */
+    callbackGenericErrorDescription:
+      "We could not finish this request. Return to sign in and try again.",
+
+    /** @remarks `"All set"` */
+    callbackGenericSuccessTitle: "All set",
+
+    /** @remarks `"Authentication completed successfully."` */
+    callbackGenericSuccessDescription: "Authentication completed successfully.",
+
+    /** @remarks `"Email address unavailable"` */
+    callbackMissingEmailTitle: "Email address unavailable",
+
+    /** @remarks `"The provider did not share an email address. Try another sign-in method."` */
+    callbackMissingEmailDescription:
+      "The provider did not share an email address. Try another sign-in method.",
+
+    /** @remarks `"Password reset"` */
+    callbackPasswordResetTitle: "Password reset",
+
+    /** @remarks `"Your password was reset. Sign in with your new password."` */
+    callbackPasswordResetDescription:
+      "Your password was reset. Sign in with your new password.",
+
+    /** @remarks `"Account created"` */
+    callbackSignupCompleteTitle: "Account created",
+
+    /** @remarks `"Your account is ready. You can continue."` */
+    callbackSignupCompleteDescription:
+      "Your account is ready. You can continue.",
+
+    /** @remarks `"Sign-up is unavailable"` */
+    callbackSignupDisabledTitle: "Sign-up is unavailable",
+
+    /** @remarks `"New accounts cannot be created with this sign-in method. Try signing in instead."` */
+    callbackSignupDisabledDescription:
+      "New accounts cannot be created with this sign-in method. Try signing in instead.",
+
+    /** @remarks `"Account settings"` */
+    callbackViewAccountSettings: "Account settings",
     /** @remarks `"Account"` */
     account: "Account",
 

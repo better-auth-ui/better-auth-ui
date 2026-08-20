@@ -3,6 +3,8 @@ import { type AuthView, type ViewPaths, viewPaths } from "../src/lib/view-paths"
 
 describe("viewPaths.auth", () => {
   it("should contain all built-in view paths", () => {
+    expect(viewPaths.auth).toHaveProperty("callback")
+    expect(viewPaths.auth).toHaveProperty("error")
     expect(viewPaths.auth).toHaveProperty("redirect")
     expect(viewPaths.auth).toHaveProperty("signIn")
     expect(viewPaths.auth).toHaveProperty("signUp")
@@ -14,6 +16,8 @@ describe("viewPaths.auth", () => {
   })
 
   it("should have correct path values", () => {
+    expect(viewPaths.auth.callback).toBe("callback")
+    expect(viewPaths.auth.error).toBe("error")
     expect(viewPaths.auth.redirect).toBe("redirect")
     expect(viewPaths.auth.signIn).toBe("sign-in")
     expect(viewPaths.auth.signUp).toBe("sign-up")
@@ -45,6 +49,8 @@ describe("authViews (derived)", () => {
 
   it("should contain all built-in view keys", () => {
     const authViews = Object.keys(viewPaths.auth)
+    expect(authViews).toContain("callback")
+    expect(authViews).toContain("error")
     expect(authViews).toContain("redirect")
     expect(authViews).toContain("signIn")
     expect(authViews).toContain("signUp")
@@ -68,11 +74,13 @@ describe("authPaths (derived)", () => {
   it("should be able to derive array of auth path values", () => {
     const authPaths = Object.values(viewPaths.auth)
     expect(Array.isArray(authPaths)).toBe(true)
-    expect(authPaths.length).toBe(8)
+    expect(authPaths.length).toBe(10)
   })
 
   it("should contain all built-in path values", () => {
     const authPaths = Object.values(viewPaths.auth)
+    expect(authPaths).toContain("callback")
+    expect(authPaths).toContain("error")
     expect(authPaths).toContain("redirect")
     expect(authPaths).toContain("sign-in")
     expect(authPaths).toContain("sign-up")
@@ -96,6 +104,8 @@ describe("viewPaths", () => {
   })
 
   it("should maintain all built-in auth view paths", () => {
+    expect(viewPaths.auth.callback).toBe("callback")
+    expect(viewPaths.auth.error).toBe("error")
     expect(viewPaths.auth.redirect).toBe("redirect")
     expect(viewPaths.auth.signIn).toBe("sign-in")
     expect(viewPaths.auth.signUp).toBe("sign-up")
@@ -110,6 +120,8 @@ describe("viewPaths", () => {
 describe("type safety", () => {
   it("should allow valid AuthView types", () => {
     const validViews: AuthView[] = [
+      "callback",
+      "error",
       "redirect",
       "signIn",
       "signUp",

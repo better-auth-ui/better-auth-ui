@@ -633,7 +633,10 @@ export const solidRegistryManifest = {
         betterAuthSolidRegistryDependency("auth-redirect"),
         betterAuthSolidRegistryDependency("sign-out")
       ],
-      files: [componentFile("src/components/auth/auth.tsx")]
+      files: [
+        componentFile("src/components/auth/auth.tsx"),
+        componentFile("src/components/auth/auth-result.tsx")
+      ]
     }),
     item({
       name: "user-button",

@@ -1980,6 +1980,10 @@ describe("Solid registry isolation", () => {
       expect.objectContaining({
         content: expect.stringContaining("export function Auth"),
         path: "src/components/auth/auth.tsx"
+      }),
+      expect.objectContaining({
+        content: expect.stringContaining("export function AuthCallback"),
+        path: "src/components/auth/auth-result.tsx"
       })
     ])
 
