@@ -49,8 +49,11 @@ import { OrganizationMemberRowSkeleton } from "./organization-member-row-skeleto
 
 export type OrganizationMembersProps = {
   class?: string
+  /** Organization to query. The current organization is used when omitted. */
+  organizationId?: string
   /**
-   * Rows per page. Setting it moves paging, role filtering, and role sorting
+   * Number of rows per page. This value must be a positive integer. Setting it
+   * moves paging, role filtering, and role sorting
    * onto the server, which is what large organizations want: without it the
    * endpoint caps the response at 100 members with no indication.
    *
@@ -58,6 +61,17 @@ export type OrganizationMembersProps = {
    * browser.
    */
   pageSize?: number
+}
+
+function validatePageSize(pageSize?: number) {
+  if (
+    pageSize !== undefined &&
+    (!Number.isInteger(pageSize) || pageSize <= 0)
+  ) {
+    throw new RangeError("pageSize must be a positive integer")
+  }
+
+  return pageSize
 }
 
 type OrganizationMember = {
@@ -170,10 +184,11 @@ export function OrganizationMembers(props: OrganizationMembersProps) {
     direction: "ascending"
   })
   const [page, setPage] = createSignal(0)
-  const paged = () => props.pageSize !== undefined
+  const pageSize = () => validatePageSize(props.pageSize)
+  const paged = () => pageSize() !== undefined
 
   const members = useListOrganizationMembers(auth.authClient, () => {
-    const size = props.pageSize
+    const size = pageSize()
 
     if (size === undefined) return {}
 
@@ -183,6 +198,7 @@ export function OrganizationMembers(props: OrganizationMembersProps) {
       query: {
         limit: size,
         offset: page() * size,
+        organizationId: props.organizationId,
         ...(memberRoleFilter() === "all"
           ? {}
           : {
@@ -311,14 +327,20 @@ export function OrganizationMembers(props: OrganizationMembersProps) {
   const isOwner = () => hasMemberRole(activeMemberRole.data?.role, "owner")
 
   const total = () => members.data?.total ?? memberRows().length
-  const pageStart = () => page() * (props.pageSize ?? 0)
+  const pageStart = () => page() * (pageSize() ?? 0)
   const pageEnd = () => pageStart() + sortedMemberRows().length
   const hasNextPage = () => pageEnd() < total()
 
   // Any change to what the server is being asked for invalidates the cursor.
   createEffect(
     on(
-      () => [memberRoleFilter(), sortDescriptor().column] as const,
+      () =>
+        [
+          memberRoleFilter(),
+          sortDescriptor().column,
+          sortDescriptor().direction,
+          props.organizationId
+        ] as const,
       () => setPage(0),
       { defer: true }
     )

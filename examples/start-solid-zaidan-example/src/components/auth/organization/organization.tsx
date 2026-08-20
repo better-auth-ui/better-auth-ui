@@ -93,7 +93,7 @@ export function Organization(props: OrganizationProps) {
               value={config.viewPaths.organization.people}
               tabIndex={-1}
             >
-              <OrganizationPeople />
+              <OrganizationPeople organizationId={currentOrganization().id} />
             </TabsContent>
             <Show when={config.teams}>
               <TabsContent

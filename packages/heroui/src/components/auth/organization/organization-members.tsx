@@ -32,7 +32,8 @@ import { OrganizationMemberRowSkeleton } from "./organization-member-row-skeleto
 export type OrganizationMembersProps = {
   className?: string
   /**
-   * Rows per page. Setting it moves paging, role filtering, and role sorting
+   * Number of rows per page. This value must be a positive integer. Setting it
+   * moves paging, role filtering, and role sorting
    * onto the server, which is what large organizations want: without it the
    * endpoint caps the response at 100 members with no indication.
    *
@@ -40,6 +41,17 @@ export type OrganizationMembersProps = {
    * browser.
    */
   pageSize?: number
+}
+
+function validatePageSize(pageSize?: number) {
+  if (
+    pageSize !== undefined &&
+    (!Number.isInteger(pageSize) || pageSize <= 0)
+  ) {
+    throw new RangeError("pageSize must be a positive integer")
+  }
+
+  return pageSize
 }
 
 /**
@@ -50,6 +62,7 @@ export function OrganizationMembers({
   pageSize,
   ...props
 }: OrganizationMembersProps & ComponentProps<"div">) {
+  const validatedPageSize = validatePageSize(pageSize)
   const { authClient } = useAuth()
   const {
     localization: organizationLocalization,
@@ -65,14 +78,14 @@ export function OrganizationMembers({
   const [search, setSearch] = useState("")
   const [page, setPage] = useState(0)
 
-  const paged = pageSize !== undefined
+  const paged = validatedPageSize !== undefined
 
   const { data: membersData, isPending: membersPending } =
     useListOrganizationMembers(authClient as OrganizationAuthClient, {
       query: paged
         ? {
-            limit: pageSize,
-            offset: page * pageSize,
+            limit: validatedPageSize,
+            offset: page * validatedPageSize,
             ...(roleFilter === "all"
               ? {}
               : {
@@ -166,7 +179,7 @@ export function OrganizationMembers({
     setPage(0)
   }, [roleFilter, sortDescriptor, activeOrganization?.id])
 
-  const pageStart = page * (pageSize ?? 0)
+  const pageStart = page * (validatedPageSize ?? 0)
   const pageEnd = pageStart + (sortedMembers?.length ?? 0)
   const hasNextPage = pageEnd < total
 
