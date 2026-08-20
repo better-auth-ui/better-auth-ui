@@ -213,7 +213,12 @@ export function ResetPassword(props: ResetPasswordProps) {
                 </AlertDescription>
               </Alert>
             </Show>
-            <Show when={resetPassword.isError}>
+            <Show
+              when={
+                resetPassword.isError &&
+                !isPasswordCompromisedError(resetPassword.error)
+              }
+            >
               <Alert variant="destructive">
                 <AlertDescription>
                   {auth.localization.auth.passwordResetErrorDescription}

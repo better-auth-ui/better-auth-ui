@@ -383,7 +383,9 @@ export function SignUp(props: SignUpProps) {
                 </AlertDescription>
               </Alert>
             </Show>
-            <Show when={signUp.isError}>
+            <Show
+              when={signUp.isError && !isPasswordCompromisedError(signUp.error)}
+            >
               <Alert variant="destructive">
                 <AlertDescription>
                   Unable to create an account. Try again.
