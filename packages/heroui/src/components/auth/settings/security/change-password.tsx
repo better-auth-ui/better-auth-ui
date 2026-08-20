@@ -1,4 +1,4 @@
-import { getViewURL } from "@better-auth-ui/core"
+import { getViewURL, isPasswordCompromisedError } from "@better-auth-ui/core"
 import {
   useAuth,
   useChangePassword,
@@ -26,6 +26,7 @@ import {
 import { type SyntheticEvent, useState } from "react"
 
 import { OpenEmailButton } from "../../open-email-button"
+import { PasswordStrengthMeter } from "../../password-strength-meter"
 
 export type ChangePasswordProps = {
   className?: string
@@ -176,12 +177,17 @@ function ChangePasswordForm({
   const { authClient } = useAuth()
   const [currentPassword, setCurrentPassword] = useState("")
   const [newPassword, setNewPassword] = useState("")
+  const [isCompromised, setIsCompromised] = useState(false)
   const [confirmPassword, setConfirmPassword] = useState("")
   const [isCurrentPasswordVisible, setIsCurrentPasswordVisible] =
     useState(false)
 
   const { mutate: changePassword, isPending } = useChangePassword(authClient, {
-    onError: () => {
+    onError: (error) => {
+      // The haveIBeenPwned plugin rejects on the password itself, so it
+      // belongs against the field rather than in a toast.
+      setIsCompromised(isPasswordCompromisedError(error))
+
       setCurrentPassword("")
       setNewPassword("")
       setConfirmPassword("")
@@ -284,7 +290,11 @@ function ChangePasswordForm({
                   maxLength={emailAndPassword?.maxPasswordLength}
                   isDisabled={isPending || !session}
                   value={newPassword}
-                  onChange={setNewPassword}
+                  onChange={(value) => {
+                    setNewPassword(value)
+                    setIsCompromised(false)
+                  }}
+                  isInvalid={isCompromised || undefined}
                 >
                   <Label>{localization.auth.newPassword}</Label>
 
@@ -326,7 +336,15 @@ function ChangePasswordForm({
                     <Skeleton className="h-10 md:h-9 w-full rounded-xl" />
                   )}
 
-                  <FieldError />
+                  {isCompromised ? (
+                    <FieldError>
+                      {localization.auth.passwordCompromised}
+                    </FieldError>
+                  ) : (
+                    <FieldError />
+                  )}
+
+                  <PasswordStrengthMeter password={newPassword} />
                 </TextField>
 
                 {emailAndPassword?.confirmPassword && (

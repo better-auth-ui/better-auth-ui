@@ -299,6 +299,11 @@
           "target": "@components/auth/sign-up.tsx"
         },
         {
+          "path": "src/components/auth/password-strength-meter.tsx",
+          "type": "registry:component",
+          "target": "@components/auth/password-strength-meter.tsx"
+        },
+        {
           "path": "src/components/auth/provider-button.tsx",
           "type": "registry:component",
           "target": "@components/auth/provider-button.tsx"
@@ -396,6 +401,11 @@
           "path": "src/components/auth/email-otp/reset-password-otp.tsx",
           "type": "registry:component",
           "target": "@components/auth/email-otp/reset-password-otp.tsx"
+        },
+        {
+          "path": "src/components/auth/password-strength-meter.tsx",
+          "type": "registry:component",
+          "target": "@components/auth/password-strength-meter.tsx"
         },
         {
           "path": "src/components/auth/email-otp/change-email-otp.tsx",
@@ -500,6 +510,11 @@
           "path": "src/components/auth/phone-number/reset-phone-number-password.tsx",
           "type": "registry:component",
           "target": "@components/auth/phone-number/reset-phone-number-password.tsx"
+        },
+        {
+          "path": "src/components/auth/password-strength-meter.tsx",
+          "type": "registry:component",
+          "target": "@components/auth/password-strength-meter.tsx"
         },
         {
           "path": "src/components/auth/phone-number/change-phone-number.tsx",
@@ -1625,6 +1640,11 @@
           "path": "src/components/auth/reset-password.tsx",
           "type": "registry:component",
           "target": "@components/auth/reset-password.tsx"
+        },
+        {
+          "path": "src/components/auth/password-strength-meter.tsx",
+          "type": "registry:component",
+          "target": "@components/auth/password-strength-meter.tsx"
         }
       ]
     },
@@ -1910,6 +1930,11 @@
           "path": "src/components/auth/settings/security/change-password.tsx",
           "type": "registry:component",
           "target": "@components/auth/settings/security/change-password.tsx"
+        },
+        {
+          "path": "src/components/auth/password-strength-meter.tsx",
+          "type": "registry:component",
+          "target": "@components/auth/password-strength-meter.tsx"
         },
         {
           "path": "src/components/auth/open-email-button.tsx",

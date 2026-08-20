@@ -1,4 +1,7 @@
-import { getAuthLinkURL } from "@better-auth-ui/core"
+import {
+  getAuthLinkURL,
+  isPasswordCompromisedError
+} from "@better-auth-ui/core"
 import type { EmailOtpAuthClient } from "@better-auth-ui/core/plugins/email-otp"
 import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
 import { useResetPasswordOtp } from "@better-auth-ui/react/plugins/email-otp"
@@ -25,6 +28,7 @@ import { type SyntheticEvent, useEffect, useRef, useState } from "react"
 import { emailOtpPlugin } from "../../../lib/auth/email-otp-plugin"
 import { OpenEmailButton } from "../open-email-button"
 import { OtpField } from "../otp-field"
+import { PasswordStrengthMeter } from "../password-strength-meter"
 import { RESET_PASSWORD_OTP_STORAGE_KEY } from "./forgot-password-otp"
 
 export type ResetPasswordOtpProps = {
@@ -66,6 +70,8 @@ export function ResetPasswordOtp({
   const [email, setEmail] = useState(initialEmail)
   const [hasStoredEmail, setHasStoredEmail] = useState(Boolean(initialEmail))
   const [code, setCode] = useState("")
+  const [password, setPassword] = useState("")
+  const [isCompromised, setIsCompromised] = useState(false)
   const [isPasswordVisible, setIsPasswordVisible] = useState(false)
   const [isConfirmPasswordVisible, setIsConfirmPasswordVisible] =
     useState(false)
@@ -82,7 +88,11 @@ export function ResetPasswordOtp({
   const { mutate: resetPasswordOtp, isPending } = useResetPasswordOtp(
     authClient as EmailOtpAuthClient,
     {
-      onError: () => {
+      onError: (error) => {
+        // The haveIBeenPwned plugin rejects on the password itself, so
+        // it belongs against the field rather than in a toast.
+        setIsCompromised(isPasswordCompromisedError(error))
+
         submissionLockedRef.current = false
         setCode("")
       },
@@ -223,6 +233,12 @@ export function ResetPasswordOtp({
             maxLength={emailAndPassword?.maxPasswordLength}
             name="password"
             autoComplete="new-password"
+            value={password}
+            onChange={(value) => {
+              setPassword(value)
+              setIsCompromised(false)
+            }}
+            isInvalid={isCompromised || undefined}
             isDisabled={isPending}
             validate={validatePassword}
           >
@@ -256,7 +272,13 @@ export function ResetPasswordOtp({
               </InputGroup.Suffix>
             </InputGroup>
 
-            <FieldError />
+            {isCompromised ? (
+              <FieldError>{localization.auth.passwordCompromised}</FieldError>
+            ) : (
+              <FieldError />
+            )}
+
+            <PasswordStrengthMeter password={password} />
           </TextField>
 
           {emailAndPassword?.confirmPassword && (

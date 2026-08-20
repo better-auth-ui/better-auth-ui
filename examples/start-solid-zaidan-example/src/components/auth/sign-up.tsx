@@ -1,6 +1,7 @@
 import {
   authQueryKeys,
   getAuthLinkURL,
+  isPasswordCompromisedError,
   parseAdditionalFieldValue
 } from "@better-auth-ui/core"
 import {
@@ -22,6 +23,7 @@ import { Field, FieldError, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import { cn } from "@/lib/utils"
 import { AdditionalField } from "./additional-field"
+import { PasswordStrengthMeter } from "./password-strength-meter"
 import { ProviderButtons, type SocialLayout } from "./provider-buttons"
 
 export type SignUpProps = {
@@ -52,7 +54,13 @@ export function SignUp(props: SignUpProps) {
   const [isConfirmPasswordVisible, setIsConfirmPasswordVisible] =
     createSignal(false)
   const signUp = useSignUpEmail(auth.authClient, () => ({
-    onError: () => {
+    onError: (error) => {
+      // The haveIBeenPwned plugin rejects on the password itself, so it
+      // belongs against the field rather than in a toast.
+      if (isPasswordCompromisedError(error)) {
+        setPasswordError(auth.localization.auth.passwordCompromised)
+      }
+
       resetFetchOptions()
     },
     onSuccess: (_data, variables) => {
@@ -283,6 +291,8 @@ export function SignUp(props: SignUpProps) {
               <Show when={passwordError()}>
                 {(message) => <FieldError>{message()}</FieldError>}
               </Show>
+
+              <PasswordStrengthMeter password={password()} />
             </Field>
             <Show when={auth.emailAndPassword.confirmPassword}>
               <Field>

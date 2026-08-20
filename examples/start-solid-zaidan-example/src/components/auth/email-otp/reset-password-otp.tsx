@@ -1,4 +1,7 @@
-import { getAuthLinkURL } from "@better-auth-ui/core"
+import {
+  getAuthLinkURL,
+  isPasswordCompromisedError
+} from "@better-auth-ui/core"
 import {
   type EmailOtpAuthClient,
   resetPasswordOtpOptions
@@ -29,6 +32,7 @@ import { Input } from "@/components/ui/input"
 import { Spinner } from "@/components/ui/spinner"
 import { emailOtpPlugin } from "@/lib/auth/email-otp-plugin"
 import { cn } from "@/lib/utils"
+import { PasswordStrengthMeter } from "../password-strength-meter"
 import { RESET_PASSWORD_OTP_STORAGE_KEY } from "./forgot-password-otp"
 
 export type ResetPasswordOtpProps = {
@@ -57,13 +61,20 @@ export function ResetPasswordOtp(props: ResetPasswordOtpProps) {
   const hasStoredEmail = Boolean(storedEmail)
   const [email, setEmail] = createSignal(storedEmail)
   const [code, setCode] = createSignal("")
+  const [password, setPassword] = createSignal("")
   const [passwordError, setPasswordError] = createSignal<string>()
   let formRef: HTMLFormElement | undefined
   let submissionLocked = false
 
   const resetPassword = createMutation(() => ({
     ...resetPasswordOtpOptions(auth.authClient as EmailOtpAuthClient),
-    onError: () => {
+    onError: (error) => {
+      // The haveIBeenPwned plugin rejects on the password itself, so it
+      // belongs against the field rather than in a toast.
+      if (isPasswordCompromisedError(error)) {
+        setPasswordError(auth.localization.auth.passwordCompromised)
+      }
+
       submissionLocked = false
       setCode("")
     },
@@ -197,7 +208,10 @@ export function ResetPasswordOtp(props: ResetPasswordOtpProps) {
                 maxLength={auth.emailAndPassword?.maxPasswordLength}
                 minLength={auth.emailAndPassword?.minPasswordLength}
                 name="password"
-                onInput={() => setPasswordError(undefined)}
+                onInput={(event) => {
+                  setPassword(event.currentTarget.value)
+                  setPasswordError(undefined)
+                }}
                 onInvalid={(event) => {
                   event.preventDefault()
                   setPasswordError(event.currentTarget.validationMessage)
@@ -210,6 +224,8 @@ export function ResetPasswordOtp(props: ResetPasswordOtpProps) {
               <Show when={passwordError()}>
                 {(message) => <FieldError>{message()}</FieldError>}
               </Show>
+
+              <PasswordStrengthMeter password={password()} />
             </Field>
 
             <Show when={auth.emailAndPassword?.confirmPassword}>

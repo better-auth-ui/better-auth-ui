@@ -27,7 +27,7 @@ export type UsePasskeyAutoFillOptions<TAuthClient extends PasskeyAuthClient> =
  * Does nothing when the passkey plugin isn't registered, when its `autoFill`
  * option is off, or when the browser can't service a conditionally mediated
  * request. Pair it with the `webauthn` autocomplete token on the identifier
- * field — see `withPasskeyAutoFill` in `@better-auth-ui/core/plugins/passkey`.
+ * field. See `withPasskeyAutoFill` in `@better-auth-ui/core/plugins/passkey`.
  *
  * The request stays open until the user picks a passkey or the page
  * navigates. The Better Auth passkey client doesn't expose WebAuthn's abort

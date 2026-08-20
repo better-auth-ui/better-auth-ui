@@ -1,5 +1,5 @@
 {
   "icon": "Lightbulb",
   "defaultOpen": true,
-  "pages": ["additional-fields"]
+  "pages": ["additional-fields", "passwords"]
 }

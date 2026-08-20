@@ -34,6 +34,15 @@ export type EmailAndPasswordConfig = {
   name?: boolean
   /** Whether to show a "Remember me" checkbox on sign-in forms */
   rememberMe?: boolean
+  /**
+   * Whether to show a strength meter under the password field on forms that
+   * choose a *new* password: sign-up, reset password, and change password.
+   *
+   * The score is a hint computed in the browser. It never gates submission.
+   * Your server rules stay the authority on what is acceptable.
+   * @default true
+   */
+  strengthMeter?: boolean
   /** Whether email verification is required before account activation */
   requireEmailVerification?: boolean
 }

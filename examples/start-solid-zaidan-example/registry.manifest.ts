@@ -118,6 +118,11 @@ const zaidanInteractiveSupportFiles = [
   libFile("src/lib/utils.ts")
 ] satisfies SolidRegistryFile[]
 
+/** Every form that picks a new password renders the strength meter. */
+const passwordStrengthFiles = [
+  componentFile("src/components/auth/password-strength-meter.tsx")
+] satisfies SolidRegistryFile[]
+
 const emailFiles = (path: SolidRegistryFile["path"]) => [
   componentFile(path),
   componentFile("src/components/auth/email/email-styles.tsx")
@@ -236,6 +241,7 @@ export const solidRegistryManifest = {
       ],
       files: [
         componentFile("src/components/auth/sign-up.tsx"),
+        ...passwordStrengthFiles,
         componentFile("src/components/auth/provider-button.tsx"),
         componentFile("src/components/auth/provider-buttons.tsx"),
         componentFile(
@@ -266,6 +272,7 @@ export const solidRegistryManifest = {
         componentFile("src/components/auth/email-otp/verify-email-otp.tsx"),
         componentFile("src/components/auth/email-otp/forgot-password-otp.tsx"),
         componentFile("src/components/auth/email-otp/reset-password-otp.tsx"),
+        ...passwordStrengthFiles,
         componentFile("src/components/auth/email-otp/change-email-otp.tsx"),
         componentFile("src/components/auth/open-email-button.tsx"),
         componentFile("src/components/auth/provider-buttons.tsx"),
@@ -303,6 +310,7 @@ export const solidRegistryManifest = {
         componentFile(
           "src/components/auth/phone-number/reset-phone-number-password.tsx"
         ),
+        ...passwordStrengthFiles,
         componentFile(
           "src/components/auth/phone-number/change-phone-number.tsx"
         ),
@@ -510,6 +518,7 @@ export const solidRegistryManifest = {
         "Solid reset-password component using the Solid password reset mutation options.",
       files: [
         componentFile("src/components/auth/reset-password.tsx"),
+        ...passwordStrengthFiles,
         ...zaidanFormSupportFiles
       ]
     }),
@@ -725,6 +734,7 @@ export const solidRegistryManifest = {
         componentFile(
           "src/components/auth/settings/security/change-password.tsx"
         ),
+        ...passwordStrengthFiles,
         componentFile("src/components/auth/open-email-button.tsx"),
         componentFile("src/components/auth/settings/shared/helpers.ts"),
         componentFile("src/components/auth/settings/shared/types.ts"),

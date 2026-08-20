@@ -1,4 +1,7 @@
-import { getAuthLinkURL } from "@better-auth-ui/core"
+import {
+  getAuthLinkURL,
+  isPasswordCompromisedError
+} from "@better-auth-ui/core"
 import { useAuth, useResetPassword } from "@better-auth-ui/react"
 import { Eye, EyeSlash } from "@gravity-ui/icons"
 import {
@@ -17,6 +20,7 @@ import {
   toast
 } from "@heroui/react"
 import { type SyntheticEvent, useEffect, useState } from "react"
+import { PasswordStrengthMeter } from "./password-strength-meter"
 
 export type ResetPasswordProps = {
   className?: string
@@ -44,12 +48,19 @@ export function ResetPassword({ className, variant }: ResetPasswordProps) {
   )
 
   const { mutate: resetPassword, isPending } = useResetPassword(authClient, {
+    onError: (error) => {
+      // The haveIBeenPwned plugin rejects on the password itself, so it
+      // belongs against the field rather than in a toast.
+      setIsCompromised(isPasswordCompromisedError(error))
+    },
     onSuccess: () => {
       toast.success(localization.auth.passwordResetSuccess)
       navigate({ to: signInURL })
     }
   })
 
+  const [password, setPassword] = useState("")
+  const [isCompromised, setIsCompromised] = useState(false)
   const [isPasswordVisible, setIsPasswordVisible] = useState(false)
   const [isConfirmPasswordVisible, setIsConfirmPasswordVisible] =
     useState(false)
@@ -106,6 +117,12 @@ export function ResetPassword({ className, variant }: ResetPasswordProps) {
             maxLength={emailAndPassword?.maxPasswordLength}
             name="password"
             autoComplete="new-password"
+            value={password}
+            onChange={(value) => {
+              setPassword(value)
+              setIsCompromised(false)
+            }}
+            isInvalid={isCompromised || undefined}
             isDisabled={isPending}
             validate={(value) => {
               if (!value) return localization.auth.fieldRequired
@@ -150,7 +167,13 @@ export function ResetPassword({ className, variant }: ResetPasswordProps) {
               </InputGroup.Suffix>
             </InputGroup>
 
-            <FieldError />
+            {isCompromised ? (
+              <FieldError>{localization.auth.passwordCompromised}</FieldError>
+            ) : (
+              <FieldError />
+            )}
+
+            <PasswordStrengthMeter password={password} />
           </TextField>
 
           {emailAndPassword?.confirmPassword && (

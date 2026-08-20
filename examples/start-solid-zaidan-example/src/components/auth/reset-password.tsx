@@ -1,4 +1,7 @@
-import { getAuthLinkURL } from "@better-auth-ui/core"
+import {
+  getAuthLinkURL,
+  isPasswordCompromisedError
+} from "@better-auth-ui/core"
 import { AuthLink, useAuth, useResetPassword } from "@better-auth-ui/solid"
 import { Eye, EyeOff } from "lucide-solid"
 import { createSignal, Show } from "solid-js"
@@ -8,6 +11,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Field, FieldError, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import { cn } from "@/lib/utils"
+import { PasswordStrengthMeter } from "./password-strength-meter"
 
 export type ResetPasswordProps = {
   class?: string
@@ -30,7 +34,15 @@ export function ResetPassword(props: ResetPasswordProps) {
   const [isPasswordVisible, setIsPasswordVisible] = createSignal(false)
   const [isConfirmPasswordVisible, setIsConfirmPasswordVisible] =
     createSignal(false)
-  const resetPassword = useResetPassword(auth.authClient)
+  const resetPassword = useResetPassword(auth.authClient, () => ({
+    onError: (error) => {
+      // The haveIBeenPwned plugin rejects on the password itself, so it
+      // belongs against the field rather than in a toast.
+      if (isPasswordCompromisedError(error)) {
+        setPasswordError(auth.localization.auth.passwordCompromised)
+      }
+    }
+  }))
 
   const submitPasswordReset = (event: SubmitEvent) => {
     event.preventDefault()
@@ -117,6 +129,8 @@ export function ResetPassword(props: ResetPasswordProps) {
               <Show when={passwordError()}>
                 {(message) => <FieldError>{message()}</FieldError>}
               </Show>
+
+              <PasswordStrengthMeter password={password()} />
             </Field>
             <Field data-invalid={Boolean(confirmPasswordError())}>
               <FieldLabel for="reset-password-confirm">

@@ -1,3 +1,4 @@
+import { isPasswordCompromisedError } from "@better-auth-ui/core"
 import type { PhoneNumberAuthClient } from "@better-auth-ui/core/plugins/phone-number"
 import { useAuth, useAuthPlugin } from "@better-auth-ui/solid"
 import { useResetPhoneNumberPassword } from "@better-auth-ui/solid/plugins/phone-number"
@@ -13,11 +14,17 @@ import {
   CardHeader,
   CardTitle
 } from "@/components/ui/card"
-import { Field, FieldGroup, FieldLabel } from "@/components/ui/field"
+import {
+  Field,
+  FieldError,
+  FieldGroup,
+  FieldLabel
+} from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import { Spinner } from "@/components/ui/spinner"
 import { phoneNumberPlugin } from "@/lib/auth/phone-number-plugin"
 import { cn } from "@/lib/utils"
+import { PasswordStrengthMeter } from "../password-strength-meter"
 import { PHONE_NUMBER_RESET_STORAGE_KEY } from "./forgot-phone-number-password"
 
 export type ResetPhoneNumberPasswordProps = {
@@ -38,10 +45,20 @@ export function ResetPhoneNumberPassword(props: ResetPhoneNumberPasswordProps) {
       : (sessionStorage.getItem(PHONE_NUMBER_RESET_STORAGE_KEY) ?? "")
   const [phoneNumber, setPhoneNumber] = createSignal(storedPhoneNumber)
   const [code, setCode] = createSignal("")
+  const [password, setPassword] = createSignal("")
+  const [passwordError, setPasswordError] = createSignal<string>()
   const resetPassword = useResetPhoneNumberPassword(
     auth.authClient as PhoneNumberAuthClient,
     () => ({
-      onError: () => setCode(""),
+      onError: (error) => {
+        // The haveIBeenPwned plugin rejects on the password itself, so it
+        // belongs against the field rather than in a toast.
+        if (isPasswordCompromisedError(error)) {
+          setPasswordError(auth.localization.auth.passwordCompromised)
+        }
+
+        setCode("")
+      },
       onSuccess: () => {
         sessionStorage.removeItem(PHONE_NUMBER_RESET_STORAGE_KEY)
         toast.success(auth.localization.auth.passwordResetSuccess)
@@ -121,21 +138,36 @@ export function ResetPhoneNumberPassword(props: ResetPhoneNumberPasswordProps) {
               onInput={setCode}
               value={code()}
             />
-            <Field>
+            <Field data-invalid={Boolean(passwordError())}>
               <FieldLabel for="reset-phone-password">
                 {auth.localization.auth.newPassword}
               </FieldLabel>
               <Input
+                aria-invalid={Boolean(passwordError())}
                 autocomplete="new-password"
                 disabled={resetPassword.isPending}
                 id="reset-phone-password"
                 maxLength={auth.emailAndPassword?.maxPasswordLength}
                 minLength={auth.emailAndPassword?.minPasswordLength}
                 name="password"
+                onInput={(event) => {
+                  setPassword(event.currentTarget.value)
+                  setPasswordError(undefined)
+                }}
+                onInvalid={(event) => {
+                  event.preventDefault()
+                  setPasswordError(event.currentTarget.validationMessage)
+                }}
                 placeholder={auth.localization.auth.newPasswordPlaceholder}
                 required
                 type="password"
               />
+
+              <Show when={passwordError()}>
+                {(message) => <FieldError>{message()}</FieldError>}
+              </Show>
+
+              <PasswordStrengthMeter password={password()} />
             </Field>
             <Show when={auth.emailAndPassword?.confirmPassword}>
               <Field>

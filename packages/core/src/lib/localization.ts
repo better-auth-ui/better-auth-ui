@@ -75,6 +75,16 @@ export const localization = {
     /** @remarks `"Password"` */
     password: "Password",
 
+    /** @remarks `"This password has appeared in a data breach. Pick a different one."` */
+    passwordCompromised:
+      "This password has appeared in a data breach. Pick a different one.",
+
+    /** @remarks `"Fair"` */
+    passwordFair: "Fair",
+
+    /** @remarks `"Good"` */
+    passwordGood: "Good",
+
     /** @remarks `"Password"` */
     passwordPlaceholder: "Password",
 
@@ -90,6 +100,15 @@ export const localization = {
     /** @remarks `"Password reset successfully. You can sign in with your new password."` */
     passwordResetSuccessDescription:
       "Password reset successfully. You can sign in with your new password.",
+
+    /** @remarks `"Password strength"` */
+    passwordStrength: "Password strength",
+
+    /** @remarks `"Strong"` */
+    passwordStrong: "Strong",
+
+    /** @remarks `"Weak"` */
+    passwordWeak: "Weak",
 
     /** @remarks `"Passwords do not match"` */
     passwordsDoNotMatch: "Passwords do not match",

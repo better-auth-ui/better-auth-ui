@@ -866,6 +866,7 @@ describe("Solid registry isolation", () => {
     )
     expect(signUp.files.map((file) => file.path)).toEqual([
       "src/components/auth/sign-up.tsx",
+      "src/components/auth/password-strength-meter.tsx",
       "src/components/auth/provider-button.tsx",
       "src/components/auth/provider-buttons.tsx",
       "src/components/auth/last-login-method/last-used-badge.tsx",
@@ -2861,7 +2862,7 @@ describe("Solid registry isolation", () => {
       "email/new-device-email",
       "email/organization-invitation-email"
     ])
-    expect(zaidanConceptsMeta.pages).toEqual(["additional-fields"])
+    expect(zaidanConceptsMeta.pages).toEqual(["additional-fields", "passwords"])
     expect(zaidanIntegrationsMeta.pages).toEqual(["tanstack-start"])
     expect(solidOverview).toContain("Solid package/runtime track")
     expect(solidOverview).toContain("/docs/zaidan")

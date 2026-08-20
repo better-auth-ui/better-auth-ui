@@ -1,4 +1,4 @@
-import { getViewURL } from "@better-auth-ui/core"
+import { getViewURL, isPasswordCompromisedError } from "@better-auth-ui/core"
 import {
   useAuth,
   useChangePassword,
@@ -11,6 +11,7 @@ import { Eye, EyeOff } from "lucide-solid"
 import { createSignal, Show } from "solid-js"
 import { toast } from "solid-sonner"
 import { OpenEmailButton } from "@/components/auth/open-email-button"
+import { PasswordStrengthMeter } from "@/components/auth/password-strength-meter"
 import type { ChangePasswordFieldErrors } from "@/components/auth/settings/shared/types"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter } from "@/components/ui/card"
@@ -57,6 +58,17 @@ export function ChangePasswordSettings(
       setCurrentPassword("")
       setNewPassword("")
       setConfirmPassword("")
+
+      // The haveIBeenPwned plugin rejects on the password itself, so it
+      // belongs against the field rather than in a toast.
+      if (isPasswordCompromisedError(error)) {
+        setPasswordFieldError(
+          "newPassword",
+          auth.localization.auth.passwordCompromised
+        )
+        return
+      }
+
       toast.error(error.error?.message || error.message)
     },
     onSuccess: () => {
@@ -315,6 +327,8 @@ export function ChangePasswordSettings(
               <Show when={fieldErrors().newPassword}>
                 {(message) => <FieldError>{message()}</FieldError>}
               </Show>
+
+              <PasswordStrengthMeter password={newPassword()} />
             </Field>
 
             <Show when={props.confirmPassword}>

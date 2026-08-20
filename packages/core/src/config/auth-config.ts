@@ -108,6 +108,7 @@ export const defaultAuthConfig: Omit<AuthConfig, "authClient"> = {
     forgotPassword: true,
     name: true,
     rememberMe: false,
+    strengthMeter: true,
     minPasswordLength: 8,
     maxPasswordLength: 128
   },

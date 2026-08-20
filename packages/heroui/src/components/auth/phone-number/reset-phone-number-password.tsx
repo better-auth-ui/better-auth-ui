@@ -1,3 +1,4 @@
+import { isPasswordCompromisedError } from "@better-auth-ui/core"
 import type { PhoneNumberAuthClient } from "@better-auth-ui/core/plugins/phone-number"
 import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
 import { useResetPhoneNumberPassword } from "@better-auth-ui/react/plugins/phone-number"
@@ -21,6 +22,7 @@ import { type SyntheticEvent, useEffect, useState } from "react"
 
 import { phoneNumberPlugin } from "../../../lib/auth/phone-number-plugin"
 import { OtpField } from "../otp-field"
+import { PasswordStrengthMeter } from "../password-strength-meter"
 import { PHONE_NUMBER_RESET_STORAGE_KEY } from "./forgot-phone-number-password"
 
 export type ResetPhoneNumberPasswordProps = {
@@ -49,6 +51,7 @@ export function ResetPhoneNumberPassword({
   )
   const [code, setCode] = useState("")
   const [password, setPassword] = useState("")
+  const [isCompromised, setIsCompromised] = useState(false)
   const [isPasswordVisible, setIsPasswordVisible] = useState(false)
 
   useEffect(() => {
@@ -60,7 +63,13 @@ export function ResetPhoneNumberPassword({
   const { mutate: resetPassword, isPending } = useResetPhoneNumberPassword(
     authClient as PhoneNumberAuthClient,
     {
-      onError: () => setCode(""),
+      onError: (error) => {
+        // The haveIBeenPwned plugin rejects on the password itself, so
+        // it belongs against the field rather than in a toast.
+        setIsCompromised(isPasswordCompromisedError(error))
+
+        setCode("")
+      },
       onSuccess: () => {
         sessionStorage.removeItem(PHONE_NUMBER_RESET_STORAGE_KEY)
         toast.success(localization.auth.passwordResetSuccess)
@@ -188,12 +197,22 @@ export function ResetPhoneNumberPassword({
             maxLength={emailAndPassword?.maxPasswordLength}
             value={password}
             isDisabled={isPending}
-            onChange={setPassword}
+            onChange={(value) => {
+              setPassword(value)
+              setIsCompromised(false)
+            }}
+            isInvalid={isCompromised || undefined}
             validate={validatePassword}
           >
             <Label>{localization.auth.newPassword}</Label>
             {passwordInput}
-            <FieldError />
+            {isCompromised ? (
+              <FieldError>{localization.auth.passwordCompromised}</FieldError>
+            ) : (
+              <FieldError />
+            )}
+
+            <PasswordStrengthMeter password={password} />
           </TextField>
           {emailAndPassword?.confirmPassword && (
             <TextField
