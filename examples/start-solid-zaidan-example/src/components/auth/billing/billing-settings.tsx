@@ -16,7 +16,7 @@ import {
   useUpdateBillingSeats
 } from "@better-auth-ui/solid/plugins/billing"
 import { Check, CreditCard, ExternalLink, RotateCcw, X } from "lucide-solid"
-import { createSignal, For, Match, Show, Switch } from "solid-js"
+import { createEffect, createSignal, For, Match, Show, Switch } from "solid-js"
 
 import {
   AlertDialog,
@@ -168,6 +168,8 @@ function SeatsEditor(props: {
 }) {
   const { localization } = useAuthPlugin(billingPlugin)
   const [value, setValue] = createSignal(props.seats)
+
+  createEffect(() => setValue(props.seats))
 
   return (
     <div class="flex items-end gap-2">
