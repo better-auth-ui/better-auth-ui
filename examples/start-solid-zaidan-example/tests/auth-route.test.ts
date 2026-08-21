@@ -3653,7 +3653,10 @@ describe("Solid auth route component selection", () => {
     expect(inviteMemberDialog).toContain(
       "organizationId: activeOrganization.data?.id"
     )
-    expect(inviteMemberDialog).toContain("email: email().trim()")
+    expect(inviteMemberDialog).toContain(
+      "const invitationEmail = email().trim()"
+    )
+    expect(inviteMemberDialog).toContain("email: invitationEmail")
     expect(inviteMemberDialog).not.toContain("useCancelInvitation")
   })
 

@@ -441,10 +441,11 @@ describe("Solid docs navigation", () => {
     const mutations = readDocsFile("solid", "mutations", "index.mdx")
     const source = readFileSync(sourceFile, "utf8")
 
-    expect(index).toContain("React render-hook behavior")
-    expect(index).toContain("HeroUI React components")
-    expect(mutations).toContain("The Solid package does not render toast UI")
-    expect(mutations).toContain("installed Zaidan components")
+    expect(index).toContain("does not describe React or HeroUI components")
+    expect(mutations).toContain(
+      "The Solid package does not render toast messages"
+    )
+    expect(mutations).toContain("use Zaidan components with toast integration")
     expect(source).toContain("Solid")
     expect(source).not.toContain("/r/solid")
   })

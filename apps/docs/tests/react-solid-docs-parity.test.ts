@@ -391,7 +391,9 @@ describe("React/Solid docs parity", () => {
     expect(reactSsr).not.toContain("equivalents for `accountInfo`")
     expect(reactSsr).not.toContain("equivalents for `listPasskeys`")
     expect(reactSsr).not.toContain("equivalents for `hasPermission`")
-    expect(reactSsr).toContain("Better Auth server instance (`auth`)")
+    expect(reactSsr).toContain(
+      "Better Auth server instance instead of `authClient`"
+    )
 
     expect(solidSsr).toContain(
       "Available `@better-auth-ui/core/server` exports include"

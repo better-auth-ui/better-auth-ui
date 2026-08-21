@@ -2723,6 +2723,7 @@ describe("Solid registry isolation", () => {
 
     expect(rootMeta.pages).toEqual([
       "index",
+      "migrations",
       "shadcn",
       "heroui",
       "react",
@@ -4015,6 +4016,7 @@ describe("Solid registry isolation", () => {
     expect(authProviderDoc).toContain("Solid Query")
     expect(authProviderHeadings).toEqual([
       "Usage",
+      "Localization",
       "Popup social sign-in",
       "Props"
     ])
