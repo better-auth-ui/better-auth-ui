@@ -204,6 +204,8 @@ export const deDEPlugins = {
     activity: "Aktivität",
     activityDescription:
       "Prüfe die letzten Authentifizierungs- und Kontoaktivitäten.",
+    adminUserActivityDescription:
+      "Prüfe die letzten Authentifizierungs- und Kontoaktivitäten für diesen Benutzer.",
     organizationActivityDescription:
       "Prüfe die für dich sichtbaren Aktivitäten dieser Organisation.",
     organizationWide: "Gesamte Organisation",
