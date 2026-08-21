@@ -120,7 +120,7 @@ export function setAdminUserRoleOptions(
  */
 export function setAdminUserPasswordOptions(
   authClient: AdminAuthClient,
-  onSettled: () => void
+  onSettled: () => void = () => {}
 ) {
   const mutationFn = (params: SetUserPasswordParams) =>
     authClient.admin.setUserPassword({
