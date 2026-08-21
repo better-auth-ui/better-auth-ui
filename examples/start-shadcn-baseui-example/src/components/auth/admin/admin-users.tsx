@@ -354,9 +354,16 @@ export function AdminUsers({
                         <div className="flex items-center gap-3">
                           <UserAvatar className="size-8" user={user} />
                           <div className="min-w-0">
-                            <div className="truncate font-medium">
-                              {user.name}
-                            </div>
+                            <Button
+                              className="h-auto min-w-0 justify-start p-0 font-medium"
+                              onClick={(event) => {
+                                event.stopPropagation()
+                                setSelectedUserId(user.id)
+                              }}
+                              variant="link"
+                            >
+                              <span className="truncate">{user.name}</span>
+                            </Button>
                             <div className="truncate text-xs text-muted-foreground">
                               {user.email}
                             </div>
@@ -884,6 +891,11 @@ function UserInspector({
                         ))}
                       </SelectContent>
                     </Select>
+                    {setRoleMutation.error ? (
+                      <FieldError>
+                        {getAdminErrorMessage(setRoleMutation.error)}
+                      </FieldError>
+                    ) : null}
                   </Field>
                   <Button
                     disabled={
@@ -953,6 +965,9 @@ function UserInspector({
                     {config.localization.deleteUser}
                   </Button>
                 </div>
+                {unban.error ? (
+                  <FieldError>{getAdminErrorMessage(unban.error)}</FieldError>
+                ) : null}
               </TabsContent>
               <TabsContent
                 className="flex flex-col gap-3 pt-4"
@@ -1061,7 +1076,10 @@ function UserInspector({
             <AlertDialogCancel>{config.localization.cancel}</AlertDialogCancel>
             <AlertDialogAction
               disabled={isSelf || dangerousMutation.isPending}
-              onClick={confirm}
+              onClick={(event) => {
+                event.preventDefault()
+                confirm()
+              }}
               variant={dangerousAction === "delete" ? "destructive" : "default"}
             >
               {dangerLabel}

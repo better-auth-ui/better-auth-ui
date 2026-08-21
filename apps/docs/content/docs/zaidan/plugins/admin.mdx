@@ -96,6 +96,8 @@ segment. The user-detail dialog keeps user IDs out of the route contract.
 Applications can control the selected user through `<AdminUsers />`:
 
 ```tsx
+import { AdminUsers } from "@/components/auth/admin/admin-users"
+
 <AdminUsers
   selectedUserId={selectedUserId()}
   onSelectedUserIdChange={setSelectedUserId}

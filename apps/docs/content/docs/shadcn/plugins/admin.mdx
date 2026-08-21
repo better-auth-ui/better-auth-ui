@@ -112,6 +112,8 @@ Use `<Admin path="users" />` when a parent route passes the final static path
 segment. Applications can control the drawer without changing this route:
 
 ```tsx
+import { AdminUsers } from "@/components/auth/admin/admin-users"
+
 <AdminUsers
   selectedUserId={selectedUserId}
   onSelectedUserIdChange={setSelectedUserId}

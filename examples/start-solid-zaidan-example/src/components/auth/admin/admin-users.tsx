@@ -198,6 +198,7 @@ export function AdminUsers(props: AdminUsersProps) {
                       <For each={users.data?.users}>
                         {(user) => (
                           <TableRow
+                            aria-selected={selectedUserId() === user.id}
                             class="cursor-pointer"
                             onClick={() => selectUser(user.id)}
                           >
@@ -205,9 +206,16 @@ export function AdminUsers(props: AdminUsersProps) {
                               <div class="flex items-center gap-3">
                                 <UserAvatar user={user} />
                                 <div class="min-w-0">
-                                  <div class="truncate font-medium">
-                                    {user.name}
-                                  </div>
+                                  <Button
+                                    class="h-auto min-w-0 justify-start p-0 font-medium"
+                                    onClick={(event) => {
+                                      event.stopPropagation()
+                                      selectUser(user.id)
+                                    }}
+                                    variant="link"
+                                  >
+                                    <span class="truncate">{user.name}</span>
+                                  </Button>
                                   <div class="truncate text-xs text-muted-foreground">
                                     {user.email}
                                   </div>
@@ -303,6 +311,14 @@ function AdminMessage(props: { description: string; title: string }) {
   )
 }
 
+function SessionRowsSkeleton() {
+  return (
+    <For each={skeletonIds}>
+      {(id) => <Skeleton class="h-20 w-full" data-id={`session-${id}`} />}
+    </For>
+  )
+}
+
 function UserDialog(props: {
   open: boolean
   onOpenChange: (open: boolean) => void
@@ -380,34 +396,55 @@ function UserDialog(props: {
                 </TabsContent>
                 <TabsContent class="flex flex-col gap-2 pt-4" value="sessions">
                   <Show
-                    fallback={
-                      <p class="py-8 text-center text-sm text-muted-foreground">
-                        {config().localization.noSessions}
-                      </p>
-                    }
-                    when={sessions.data?.sessions.length}
+                    fallback={<SessionRowsSkeleton />}
+                    when={!sessionsPermission.isPending}
                   >
-                    <For each={sessions.data?.sessions}>
-                      {(session) => (
-                        <div class="rounded-lg border p-3">
-                          <div class="truncate text-sm font-medium">
-                            {session.userAgent ||
-                              config().localization.sessions}
-                          </div>
-                          <div class="text-xs text-muted-foreground">
-                            {formatDate(session.createdAt)} ·{" "}
-                            {formatDate(session.expiresAt)}
-                          </div>
-                          <Show
-                            when={config().showIpAddress && session.ipAddress}
-                          >
-                            <div class="mt-1 font-mono text-xs text-muted-foreground">
-                              {session.ipAddress}
-                            </div>
-                          </Show>
-                        </div>
-                      )}
-                    </For>
+                    <Show
+                      fallback={
+                        <p class="py-8 text-center text-sm text-muted-foreground">
+                          {config().localization.accessDeniedDescription}
+                        </p>
+                      }
+                      when={sessionsPermission.data?.success}
+                    >
+                      <Show
+                        fallback={<SessionRowsSkeleton />}
+                        when={!sessions.isPending}
+                      >
+                        <Show
+                          fallback={
+                            <p class="py-8 text-center text-sm text-muted-foreground">
+                              {config().localization.noSessions}
+                            </p>
+                          }
+                          when={sessions.data?.sessions.length}
+                        >
+                          <For each={sessions.data?.sessions}>
+                            {(session) => (
+                              <div class="rounded-lg border p-3">
+                                <div class="truncate text-sm font-medium">
+                                  {session.userAgent ||
+                                    config().localization.sessions}
+                                </div>
+                                <div class="text-xs text-muted-foreground">
+                                  {formatDate(session.createdAt)} ·{" "}
+                                  {formatDate(session.expiresAt)}
+                                </div>
+                                <Show
+                                  when={
+                                    config().showIpAddress && session.ipAddress
+                                  }
+                                >
+                                  <div class="mt-1 font-mono text-xs text-muted-foreground">
+                                    {session.ipAddress}
+                                  </div>
+                                </Show>
+                              </div>
+                            )}
+                          </For>
+                        </Show>
+                      </Show>
+                    </Show>
                   </Show>
                 </TabsContent>
               </Tabs>
