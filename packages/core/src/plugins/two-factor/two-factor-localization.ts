@@ -14,6 +14,16 @@ export const twoFactorLocalization = {
   twoFactorDisabled: "Two-factor authentication is off",
   /** @remarks `"Enter your password to continue"` */
   passwordConfirmation: "Enter your password to continue",
+  /** @remarks `"Choose how you want to verify future sign-ins"` */
+  chooseEnrollmentMethod: "Choose how you want to verify future sign-ins",
+  /** @remarks `"Authenticator app"` */
+  authenticatorApp: "Authenticator app",
+  /** @remarks `"Use a rotating code from an authenticator app"` */
+  authenticatorAppDescription: "Use a rotating code from an authenticator app",
+  /** @remarks `"Email or SMS code"` */
+  deliveredCode: "Email or SMS code",
+  /** @remarks `"Receive a new code each time you sign in"` */
+  deliveredCodeDescription: "Receive a new code each time you sign in",
   /** @remarks `"Scan this with your authenticator app"` */
   scanQrCode: "Scan this with your authenticator app",
   /** @remarks `"Can't scan? Enter this setup key instead"` */

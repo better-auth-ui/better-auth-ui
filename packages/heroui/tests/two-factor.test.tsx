@@ -17,11 +17,16 @@ function createMockAuthClient(signInResult: SignInResult = {}) {
   const verifyTotp = vi.fn(async () => ({ token: "session-token" }))
   const verifyOtp = vi.fn(async () => ({ token: "session-token" }))
   const verifyBackupCode = vi.fn(async () => ({ token: "session-token" }))
-  const enable = vi.fn(async () => ({
-    method: "totp" as const,
-    totpURI: "otpauth://totp/App:user@example.com?secret=SECRET123&issuer=App",
-    backupCodes: ["code-1", "code-2"]
-  }))
+  const enable = vi.fn(async ({ method }: { method?: "otp" | "totp" }) =>
+    method === "otp"
+      ? { method: "otp" as const }
+      : {
+          method: "totp" as const,
+          totpURI:
+            "otpauth://totp/App:user@example.com?secret=SECRET123&issuer=App",
+          backupCodes: ["code-1", "code-2"]
+        }
+  )
 
   return {
     signIn: { email: signInEmail },
@@ -58,7 +63,8 @@ function createMockAuthClient(signInResult: SignInResult = {}) {
 
 function renderWithProvider(
   children: React.ReactNode,
-  authClient = createMockAuthClient()
+  authClient = createMockAuthClient(),
+  plugin = twoFactorPlugin()
 ) {
   const navigate = vi.fn()
 
@@ -70,7 +76,7 @@ function renderWithProvider(
         authClient={authClient}
         navigate={navigate}
         redirectTo="/dashboard"
-        plugins={[twoFactorPlugin()]}
+        plugins={[plugin]}
       >
         {children}
       </AuthProvider>
@@ -205,6 +211,33 @@ describe("<TwoFactorChallenge />", () => {
 })
 
 describe("<TwoFactorSettings />", () => {
+  it("enables delivered-code two-factor without a TOTP verification step", async () => {
+    const user = userEvent.setup()
+    const { authClient } = renderWithProvider(
+      <TwoFactorSettings />,
+      createMockAuthClient(),
+      twoFactorPlugin({ enrollmentMethods: ["totp", "otp"] })
+    )
+
+    await user.click(screen.getByRole("button", { name: /enable two-factor/i }))
+
+    const dialog = await screen.findByRole("alertdialog")
+    await user.click(
+      within(dialog).getByRole("tab", { name: /email or sms code/i })
+    )
+    await user.type(within(dialog).getByLabelText(/password/i), "password123")
+    await user.click(
+      within(dialog).getByRole("button", { name: /enable two-factor/i })
+    )
+
+    await waitFor(() => {
+      expect(authClient.twoFactor.enable).toHaveBeenCalledWith(
+        expect.objectContaining({ method: "otp", password: "password123" })
+      )
+    })
+    expect(authClient.twoFactor.verifyTotp).not.toHaveBeenCalled()
+  })
+
   it("auto-verifies enrollment codes before showing backup codes", async () => {
     const user = userEvent.setup()
     const writeText = vi

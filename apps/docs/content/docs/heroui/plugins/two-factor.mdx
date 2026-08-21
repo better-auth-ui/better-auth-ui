@@ -217,7 +217,7 @@ import { TwoFactorChallenge } from "@better-auth-ui/heroui/plugins"
 
 ### `<TwoFactorSettings />`
 
-Added to `<SecuritySettings />` automatically. Enrollment asks for the password, shows the QR code and setup key, requires one verified code, then displays the backup codes once. Enrolled users can regenerate backup codes or turn two-factor off.
+Added to `<SecuritySettings />` automatically. Users can enroll with an authenticator app or a delivered code. Enrolled users can regenerate backup codes or turn two-factor off.
 
 ```tsx
 import { TwoFactorSettings } from "@better-auth-ui/heroui/plugins"
@@ -228,6 +228,24 @@ import { TwoFactorSettings } from "@better-auth-ui/heroui/plugins"
 <auto-type-table path="../../../../../../packages/heroui/src/components/auth/two-factor/two-factor-settings.tsx" name="TwoFactorSettingsProps" />
 
 Backup codes live in component state and are never written to storage or the query cache: once the dialog closes they are gone.
+
+## Delivered-code enrollment
+
+The enrollment dialog offers authenticator apps by default. Configure OTP delivery on the server before you add the delivered-code option:
+
+```ts
+// Server
+twoFactor({
+  otpOptions: { sendOTP }
+})
+```
+
+```tsx
+// UI
+twoFactorPlugin({ enrollmentMethods: ["totp", "otp"] })
+```
+
+Better Auth activates OTP enrollment immediately. The dialog closes after `authClient.twoFactor.enable({ method: "otp" })` succeeds.
 
 ## Passwordless accounts
 
@@ -256,7 +274,9 @@ twoFactorPlugin({
   // Turn off when the server sets `backupCodeOptions: { enabled: false }`
   backupCodes: true,
   // Hide the "Trust this device" checkbox
-  trustDevice: false
+  trustDevice: false,
+  // Offer delivered-code enrollment after the server configures sendOTP
+  enrollmentMethods: ["totp", "otp"]
 })
 ```
 
