@@ -21,6 +21,7 @@ import {
   useAdminUsers
 } from "@better-auth-ui/react/plugins/admin"
 import { keepPreviousData, useMutation } from "@tanstack/react-query"
+import type { BetterFetchError } from "better-auth/react"
 import {
   BanIcon,
   ChevronLeftIcon,
@@ -61,7 +62,12 @@ import {
   DialogHeader,
   DialogTitle
 } from "@/components/ui/dialog"
-import { Field, FieldGroup, FieldLabel } from "@/components/ui/field"
+import {
+  Field,
+  FieldError,
+  FieldGroup,
+  FieldLabel
+} from "@/components/ui/field"
 import {
   InputGroup,
   InputGroupAddon,
@@ -112,6 +118,11 @@ const formatDate = (value: Date | string | undefined | null) =>
     : "–"
 
 const asAdminRole = (role: string) => role as "user" | "admin"
+
+const getAdminErrorMessage = (error: Error | null) => {
+  const authError = error as BetterFetchError | null
+  return authError?.error?.message ?? authError?.message
+}
 
 /** Server-paginated user management with optional controlled inspector state. */
 export function AdminUsers({
@@ -177,6 +188,7 @@ export function AdminUsers({
   const canCreate = useAdminPermission(auth.authClient, { user: ["create"] })
 
   const changeSort = (field: string) => {
+    setPage(0)
     if (sortBy === field) {
       setSortDirection((value) => (value === "asc" ? "desc" : "asc"))
     } else {
@@ -621,6 +633,7 @@ function CreateUserDialog({
               </select>
             </Field>
           </FieldGroup>
+          <FieldError>{getAdminErrorMessage(createUser.error)}</FieldError>
           <DialogFooter>
             <Button onClick={close} type="button" variant="outline">
               {config.localization.cancel}
@@ -759,6 +772,22 @@ function UserInspector({
         }
       )
   }
+  const closeDangerousAction = () => {
+    ban.reset()
+    remove.reset()
+    revokeSessions.reset()
+    impersonate.reset()
+    setDangerousAction(undefined)
+  }
+  const dangerousMutation =
+    dangerousAction === "ban"
+      ? ban
+      : dangerousAction === "delete"
+        ? remove
+        : dangerousAction === "revokeAll"
+          ? revokeSessions
+          : impersonate
+  const dangerousError = getAdminErrorMessage(dangerousMutation.error)
   const dangerLabel =
     dangerousAction === "ban"
       ? config.localization.banUser
@@ -1014,17 +1043,24 @@ function UserInspector({
       />
       <AlertDialog
         open={Boolean(dangerousAction)}
-        onOpenChange={(value) => !value && setDangerousAction(undefined)}
+        onOpenChange={(value) => !value && closeDangerousAction()}
       >
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>{dangerLabel}</AlertDialogTitle>
-            <AlertDialogDescription>{user?.email}</AlertDialogDescription>
+            <AlertDialogDescription className="flex flex-col gap-2">
+              <span>{user?.email}</span>
+              {dangerousError ? (
+                <span className="text-destructive" role="alert">
+                  {dangerousError}
+                </span>
+              ) : null}
+            </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>{config.localization.cancel}</AlertDialogCancel>
             <AlertDialogAction
-              disabled={isSelf}
+              disabled={isSelf || dangerousMutation.isPending}
               onClick={confirm}
               variant={dangerousAction === "delete" ? "destructive" : "default"}
             >
@@ -1049,18 +1085,28 @@ function PasswordDialog({
   const auth = useAuth<AdminAuthClient>()
   const config = useAuthPlugin(adminPlugin)
   const [password, setPassword] = useState("")
-  const mutation = useMutation(setAdminUserPasswordOptions(auth.authClient))
+  const [errorMessage, setErrorMessage] = useState<string>()
+  const mutation = useMutation(
+    setAdminUserPasswordOptions(auth.authClient, () => {
+      setTimeout(() => mutation.reset(), 0)
+    })
+  )
   const close = () => {
     setPassword("")
+    setErrorMessage(undefined)
     mutation.reset()
     onOpenChange(false)
   }
   const submit = (event: FormEvent) => {
     event.preventDefault()
+    setErrorMessage(undefined)
     if (userId)
       mutation.mutate(
         { userId, newPassword: password },
-        { onSuccess: close, onSettled: () => setPassword("") }
+        {
+          onError: (error) => setErrorMessage(getAdminErrorMessage(error)),
+          onSuccess: close
+        }
       )
   }
   return (
@@ -1076,12 +1122,13 @@ function PasswordDialog({
               {config.localization.userDetails}
             </DialogDescription>
           </DialogHeader>
-          <Field>
+          <Field data-invalid={Boolean(errorMessage)}>
             <FieldLabel htmlFor="admin-new-password">
               {config.localization.password}
             </FieldLabel>
             <InputGroup>
               <InputGroupInput
+                aria-invalid={Boolean(errorMessage)}
                 autoComplete="new-password"
                 id="admin-new-password"
                 onChange={(event) => setPassword(event.target.value)}
@@ -1090,6 +1137,7 @@ function PasswordDialog({
                 value={password}
               />
             </InputGroup>
+            <FieldError>{errorMessage}</FieldError>
           </Field>
           <DialogFooter>
             <Button onClick={close} type="button" variant="outline">

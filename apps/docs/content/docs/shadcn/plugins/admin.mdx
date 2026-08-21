@@ -100,6 +100,9 @@ export default function AdminUsersPage() {
 TanStack Start can use the same component in `routes/admin/users.tsx`:
 
 ```tsx
+import { createFileRoute } from "@tanstack/react-router"
+import { Admin } from "@/components/auth/admin/admin"
+
 export const Route = createFileRoute("/admin/users")({
   component: () => <Admin view="users" />
 })

@@ -82,6 +82,7 @@ import { adminPlugin } from "@/lib/auth/admin-plugin" // [!code highlight]
 Create one static TanStack Start route:
 
 ```tsx title="src/routes/admin/users.tsx"
+import { createFileRoute } from "@tanstack/solid-router"
 import { Admin } from "@/components/auth/admin/admin"
 
 export const Route = createFileRoute("/admin/users")({

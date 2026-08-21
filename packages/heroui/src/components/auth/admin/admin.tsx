@@ -20,15 +20,15 @@ export function Admin({ className, hideNav, path, view }: AdminProps) {
   const { authClient, basePaths, plugins, viewPaths } = useAuth()
   const { localization } = useAuthPlugin(adminPlugin)
   useAuthenticate(authClient)
+  const tabs = useMemo(
+    () => plugins.flatMap((plugin) => plugin.adminTabs ?? []),
+    [plugins]
+  )
 
   if (!view && !path) {
     throw new Error("[Better Auth UI] Either `view` or `path` must be provided")
   }
 
-  const tabs = useMemo(
-    () => plugins.flatMap((plugin) => plugin.adminTabs ?? []),
-    [plugins]
-  )
   const currentView =
     view ??
     (viewPaths.admin.users === path ? "users" : undefined) ??

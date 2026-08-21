@@ -10,8 +10,9 @@ import {
   useAdminUserSessions,
   useAdminUsers
 } from "@better-auth-ui/solid/plugins/admin"
+import { createDebounce } from "@solid-primitives/debounce"
 import { Search } from "lucide-solid"
-import { createEffect, createMemo, createSignal, For, Show } from "solid-js"
+import { createMemo, createSignal, For, Show } from "solid-js"
 
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -23,6 +24,12 @@ import {
   DialogHeader,
   DialogTitle
 } from "@/components/ui/dialog"
+import {
+  Empty,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyTitle
+} from "@/components/ui/empty"
 import {
   InputGroup,
   InputGroupAddon,
@@ -68,7 +75,9 @@ export function AdminUsers(props: AdminUsersProps) {
   const [localSelectedUserId, setLocalSelectedUserId] = createSignal<string>()
   const [page, setPage] = createSignal(0)
   const [search, setSearch] = createSignal("")
+  const [debouncedSearch, setDebouncedSearch] = createSignal("")
   const [searchField, setSearchField] = createSignal<"email" | "name">("email")
+  const updateDebouncedSearch = createDebounce(setDebouncedSearch, 300)
   const selectedUserId = () =>
     props.onSelectedUserIdChange ? props.selectedUserId : localSelectedUserId()
   const permission = useAdminPermission(authClient, () => ({ user: ["list"] }))
@@ -77,7 +86,7 @@ export function AdminUsers(props: AdminUsersProps) {
     offset: page() * config().pageSize,
     searchField: searchField(),
     searchOperator: "contains",
-    searchValue: search().trim() || undefined,
+    searchValue: debouncedSearch() || undefined,
     sortBy: "createdAt",
     sortDirection: "desc"
   }))
@@ -85,12 +94,6 @@ export function AdminUsers(props: AdminUsersProps) {
     enabled: permission.data?.success === true,
     params: params()
   }))
-
-  createEffect(() => {
-    search()
-    searchField()
-    setPage(0)
-  })
 
   const selectUser = (userId: string | undefined) => {
     if (!props.onSelectedUserIdChange) setLocalSelectedUserId(userId)
@@ -111,9 +114,10 @@ export function AdminUsers(props: AdminUsersProps) {
         <select
           aria-label={config().localization.search}
           class="h-8 rounded-lg border bg-transparent px-2 text-sm sm:w-36"
-          onChange={(event) =>
+          onChange={(event) => {
             setSearchField(event.currentTarget.value as "email" | "name")
-          }
+            setPage(0)
+          }}
           value={searchField()}
         >
           <option value="email">{config().localization.email}</option>
@@ -125,7 +129,12 @@ export function AdminUsers(props: AdminUsersProps) {
           </InputGroupAddon>
           <InputGroupInput
             aria-label={config().localization.search}
-            onInput={(event) => setSearch(event.currentTarget.value)}
+            onInput={(event) => {
+              const value = event.currentTarget.value
+              setSearch(value)
+              setPage(0)
+              updateDebouncedSearch(value.trim())
+            }}
             placeholder={
               searchField() === "email"
                 ? config().localization.searchByEmail
@@ -167,45 +176,65 @@ export function AdminUsers(props: AdminUsersProps) {
               <TableBody>
                 <Show
                   fallback={
-                    <For each={users.data?.users}>
-                      {(user) => (
-                        <TableRow
-                          class="cursor-pointer"
-                          onClick={() => selectUser(user.id)}
-                        >
-                          <TableCell>
-                            <div class="flex items-center gap-3">
-                              <UserAvatar user={user} />
-                              <div class="min-w-0">
-                                <div class="truncate font-medium">
-                                  {user.name}
-                                </div>
-                                <div class="truncate text-xs text-muted-foreground">
-                                  {user.email}
+                    <Show
+                      fallback={
+                        <TableRow>
+                          <TableCell colspan="4">
+                            <Empty class="min-h-48 gap-2 p-4">
+                              <EmptyHeader class="gap-1">
+                                <EmptyTitle>
+                                  {config().localization.noUsers}
+                                </EmptyTitle>
+                                <EmptyDescription>
+                                  {config().localization.noUsersDescription}
+                                </EmptyDescription>
+                              </EmptyHeader>
+                            </Empty>
+                          </TableCell>
+                        </TableRow>
+                      }
+                      when={users.data?.users.length}
+                    >
+                      <For each={users.data?.users}>
+                        {(user) => (
+                          <TableRow
+                            class="cursor-pointer"
+                            onClick={() => selectUser(user.id)}
+                          >
+                            <TableCell>
+                              <div class="flex items-center gap-3">
+                                <UserAvatar user={user} />
+                                <div class="min-w-0">
+                                  <div class="truncate font-medium">
+                                    {user.name}
+                                  </div>
+                                  <div class="truncate text-xs text-muted-foreground">
+                                    {user.email}
+                                  </div>
                                 </div>
                               </div>
-                            </div>
-                          </TableCell>
-                          <TableCell>
-                            <Badge variant="outline">
-                              {user.role ?? config().defaultRole}
-                            </Badge>
-                          </TableCell>
-                          <TableCell>
-                            <Badge
-                              variant={
-                                user.banned ? "destructive" : "secondary"
-                              }
-                            >
-                              {user.banned
-                                ? config().localization.banned
-                                : config().localization.active}
-                            </Badge>
-                          </TableCell>
-                          <TableCell>{formatDate(user.createdAt)}</TableCell>
-                        </TableRow>
-                      )}
-                    </For>
+                            </TableCell>
+                            <TableCell>
+                              <Badge variant="outline">
+                                {user.role ?? config().defaultRole}
+                              </Badge>
+                            </TableCell>
+                            <TableCell>
+                              <Badge
+                                variant={
+                                  user.banned ? "destructive" : "secondary"
+                                }
+                              >
+                                {user.banned
+                                  ? config().localization.banned
+                                  : config().localization.active}
+                              </Badge>
+                            </TableCell>
+                            <TableCell>{formatDate(user.createdAt)}</TableCell>
+                          </TableRow>
+                        )}
+                      </For>
+                    </Show>
                   }
                   when={permission.isPending || users.isPending}
                 >
@@ -301,75 +330,89 @@ function UserDialog(props: {
             {user.data?.email ?? config().localization.usersDescription}
           </DialogDescription>
         </DialogHeader>
-        <Show fallback={<Skeleton class="mt-4 h-40 w-full" />} when={user.data}>
-          {(detail) => (
-            <Tabs class="mt-4" defaultValue="overview">
-              <TabsList>
-                <TabsTrigger value="overview">
-                  {config().localization.overview}
-                </TabsTrigger>
-                <TabsTrigger value="sessions">
-                  {config().localization.sessions}
-                </TabsTrigger>
-              </TabsList>
-              <TabsContent class="flex flex-col gap-4 pt-4" value="overview">
-                <div class="flex items-center gap-3">
-                  <UserAvatar class="size-12" user={detail()} />
-                  <div>
-                    <div class="font-medium">{detail().name}</div>
-                    <div class="text-sm text-muted-foreground">
-                      {detail().email}
+        <Show
+          fallback={
+            <AdminMessage
+              title={config().localization.loadUsersError}
+              description={config().localization.loadUsersErrorDescription}
+            />
+          }
+          when={!user.isError}
+        >
+          <Show
+            fallback={<Skeleton class="mt-4 h-40 w-full" />}
+            when={user.data}
+          >
+            {(detail) => (
+              <Tabs class="mt-4" defaultValue="overview">
+                <TabsList>
+                  <TabsTrigger value="overview">
+                    {config().localization.overview}
+                  </TabsTrigger>
+                  <TabsTrigger value="sessions">
+                    {config().localization.sessions}
+                  </TabsTrigger>
+                </TabsList>
+                <TabsContent class="flex flex-col gap-4 pt-4" value="overview">
+                  <div class="flex items-center gap-3">
+                    <UserAvatar class="size-12" user={detail()} />
+                    <div>
+                      <div class="font-medium">{detail().name}</div>
+                      <div class="text-sm text-muted-foreground">
+                        {detail().email}
+                      </div>
                     </div>
                   </div>
-                </div>
-                <dl class="grid grid-cols-[auto_1fr] gap-3 text-sm">
-                  <dt class="text-muted-foreground">
-                    {config().localization.userId}
-                  </dt>
-                  <dd class="font-mono text-xs">{detail().id}</dd>
-                  <dt class="text-muted-foreground">
-                    {config().localization.role}
-                  </dt>
-                  <dd>{detail().role ?? config().defaultRole}</dd>
-                  <dt class="text-muted-foreground">
-                    {config().localization.created}
-                  </dt>
-                  <dd>{formatDate(detail().createdAt)}</dd>
-                </dl>
-              </TabsContent>
-              <TabsContent class="flex flex-col gap-2 pt-4" value="sessions">
-                <Show
-                  fallback={
-                    <p class="py-8 text-center text-sm text-muted-foreground">
-                      {config().localization.noSessions}
-                    </p>
-                  }
-                  when={sessions.data?.sessions.length}
-                >
-                  <For each={sessions.data?.sessions}>
-                    {(session) => (
-                      <div class="rounded-lg border p-3">
-                        <div class="truncate text-sm font-medium">
-                          {session.userAgent || config().localization.sessions}
-                        </div>
-                        <div class="text-xs text-muted-foreground">
-                          {formatDate(session.createdAt)} ·{" "}
-                          {formatDate(session.expiresAt)}
-                        </div>
-                        <Show
-                          when={config().showIpAddress && session.ipAddress}
-                        >
-                          <div class="mt-1 font-mono text-xs text-muted-foreground">
-                            {session.ipAddress}
+                  <dl class="grid grid-cols-[auto_1fr] gap-3 text-sm">
+                    <dt class="text-muted-foreground">
+                      {config().localization.userId}
+                    </dt>
+                    <dd class="font-mono text-xs">{detail().id}</dd>
+                    <dt class="text-muted-foreground">
+                      {config().localization.role}
+                    </dt>
+                    <dd>{detail().role ?? config().defaultRole}</dd>
+                    <dt class="text-muted-foreground">
+                      {config().localization.created}
+                    </dt>
+                    <dd>{formatDate(detail().createdAt)}</dd>
+                  </dl>
+                </TabsContent>
+                <TabsContent class="flex flex-col gap-2 pt-4" value="sessions">
+                  <Show
+                    fallback={
+                      <p class="py-8 text-center text-sm text-muted-foreground">
+                        {config().localization.noSessions}
+                      </p>
+                    }
+                    when={sessions.data?.sessions.length}
+                  >
+                    <For each={sessions.data?.sessions}>
+                      {(session) => (
+                        <div class="rounded-lg border p-3">
+                          <div class="truncate text-sm font-medium">
+                            {session.userAgent ||
+                              config().localization.sessions}
                           </div>
-                        </Show>
-                      </div>
-                    )}
-                  </For>
-                </Show>
-              </TabsContent>
-            </Tabs>
-          )}
+                          <div class="text-xs text-muted-foreground">
+                            {formatDate(session.createdAt)} ·{" "}
+                            {formatDate(session.expiresAt)}
+                          </div>
+                          <Show
+                            when={config().showIpAddress && session.ipAddress}
+                          >
+                            <div class="mt-1 font-mono text-xs text-muted-foreground">
+                              {session.ipAddress}
+                            </div>
+                          </Show>
+                        </div>
+                      )}
+                    </For>
+                  </Show>
+                </TabsContent>
+              </Tabs>
+            )}
+          </Show>
         </Show>
         <DialogFooter showCloseButton />
       </DialogContent>
