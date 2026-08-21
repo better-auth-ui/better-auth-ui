@@ -22,6 +22,7 @@ export type AuthPluginLocalizationResolver = (
  * via module augmentation from that plugin’s module — not declared here.
  */
 export interface AuthPluginViewPaths {
+  admin?: Record<string, string>
   auth?: Record<string, string>
   settings?: Record<string, string>
 }

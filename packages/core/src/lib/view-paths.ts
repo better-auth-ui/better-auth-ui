@@ -75,9 +75,22 @@ export interface SettingsViewPaths {
 }
 
 /**
+ * View path segments for application administration routes.
+ */
+export interface AdminViewPaths {
+  /**
+   * Path segment for user management
+   * @default "users"
+   */
+  users: string
+}
+
+/**
  * View path configuration for authentication and settings routes.
  */
 export type ViewPaths = {
+  /** Admin view path segments */
+  admin: AdminViewPaths
   /** Auth view path segments */
   auth: AuthViewPaths
   /** Settings view path segments */
@@ -85,6 +98,9 @@ export type ViewPaths = {
 }
 
 export const viewPaths: ViewPaths = {
+  admin: {
+    users: "users"
+  },
   auth: {
     callback: "callback",
     error: "error",
@@ -107,6 +123,11 @@ export const viewPaths: ViewPaths = {
  * Valid auth view key.
  */
 export type AuthView = keyof AuthViewPaths
+
+/**
+ * Valid admin view key.
+ */
+export type AdminView = keyof AdminViewPaths
 
 /**
  * Valid settings view key.

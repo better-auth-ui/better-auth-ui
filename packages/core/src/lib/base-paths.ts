@@ -1,7 +1,12 @@
 /**
- * Base path configuration for authentication, settings, and organization routes.
+ * Base path configuration for authentication, settings, organization, and admin routes.
  */
 export type BasePaths = {
+  /**
+   * Base path for application administration routes
+   * @default "/admin"
+   */
+  admin: string
   /**
    * Base path for authentication routes
    * @default "/auth"
@@ -20,6 +25,7 @@ export type BasePaths = {
 }
 
 export const basePaths: BasePaths = {
+  admin: "/admin",
   auth: "/auth",
   settings: "/settings",
   organization: "/organization"

@@ -3,12 +3,14 @@ import { basePaths } from "../src/lib/base-paths"
 
 describe("basePaths", () => {
   it("should contain all expected base paths", () => {
+    expect(basePaths).toHaveProperty("admin")
     expect(basePaths).toHaveProperty("auth")
     expect(basePaths).toHaveProperty("settings")
     expect(basePaths).toHaveProperty("organization")
   })
 
   it("should have correct path values", () => {
+    expect(basePaths.admin).toBe("/admin")
     expect(basePaths.auth).toBe("/auth")
     expect(basePaths.settings).toBe("/settings")
     expect(basePaths.organization).toBe("/organization")

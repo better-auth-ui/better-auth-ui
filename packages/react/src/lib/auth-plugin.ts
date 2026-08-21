@@ -96,6 +96,14 @@ export type OrganizationTab = {
   component: ComponentType<OrganizationTabProps>
 }
 
+/** A finite static view contributed to the administration shell. */
+export type AdminTab = {
+  id: string
+  path: string
+  label: ReactNode
+  component: ComponentType
+}
+
 /** Props for plugin-contributed items in the `UserButton` dropdown. */
 export type UserMenuItemProps = {
   className?: string
@@ -178,6 +186,8 @@ export type AuthPlugin<
      * `useAuthPlugin(plugin).settingsTabs`.
      */
     settingsTabs?: SettingsTab[]
+    /** First-class static views contributed to the administration shell. */
+    adminTabs?: AdminTab[]
     /** First-class organization settings tabs contributed by the plugin. */
     organizationTabs?: OrganizationTab[]
   }

@@ -13,6 +13,14 @@ export type OrganizationTab = {
   component: Component<OrganizationTabProps>
 }
 
+/** A finite static view contributed to the administration shell. */
+export type AdminTab = {
+  id: string
+  path: string
+  label: Component
+  component: Component
+}
+
 export type CaptchaComponent = Component
 
 export type AuthPromptProps = {
@@ -25,6 +33,8 @@ export type AuthPrompt = {
 }
 
 export type SolidAuthPlugin = AuthPluginBase & {
+  /** First-class static views contributed to the administration shell. */
+  adminTabs?: AdminTab[]
   /** Headless prompts mounted by authentication views. */
   authPrompts?: AuthPrompt[]
   /** Captcha widget rendered above submit buttons in auth forms. */

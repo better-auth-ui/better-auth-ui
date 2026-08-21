@@ -1,5 +1,19 @@
 import { describe, expect, it } from "vitest"
-import { type AuthView, type ViewPaths, viewPaths } from "../src/lib/view-paths"
+import {
+  type AdminView,
+  type AuthView,
+  type ViewPaths,
+  viewPaths
+} from "../src/lib/view-paths"
+
+describe("viewPaths.admin", () => {
+  it("exposes one finite built-in user-management route", () => {
+    const view: AdminView = "users"
+
+    expect(viewPaths.admin).toEqual({ users: "users" })
+    expect(viewPaths.admin[view]).toBe("users")
+  })
+})
 
 describe("viewPaths.auth", () => {
   it("should contain all built-in view paths", () => {
@@ -99,6 +113,9 @@ describe("authPaths (derived)", () => {
 })
 
 describe("viewPaths", () => {
+  it("should have admin property", () => {
+    expect(viewPaths).toHaveProperty("admin")
+  })
   it("should have auth property", () => {
     expect(viewPaths).toHaveProperty("auth")
   })
@@ -139,6 +156,7 @@ describe("type safety", () => {
 
   it("should have correct ViewPaths structure", () => {
     const paths: ViewPaths = viewPaths
+    expect(paths.admin.users).toBe("users")
     expect(paths.auth).toBeDefined()
     expect(typeof paths.auth.signIn).toBe("string")
   })
