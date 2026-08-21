@@ -13,6 +13,7 @@ import {
 import { createDebounce } from "@solid-primitives/debounce"
 import { Search } from "lucide-solid"
 import { createMemo, createSignal, For, Show } from "solid-js"
+import { Dynamic } from "solid-js/web"
 
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -329,6 +330,14 @@ function UserDialog(props: {
   const config = () =>
     (auth.plugins.find((plugin) => plugin.id === adminPlugin.id) ??
       adminPlugin()) as ReturnType<typeof adminPlugin>
+  const contributedTabs = createMemo(() =>
+    auth.plugins.flatMap((plugin) =>
+      (plugin.adminUserTabs ?? []).map((tab) => ({
+        ...tab,
+        value: `${plugin.id}:${tab.id}`
+      }))
+    )
+  )
   const user = useAdminUser(authClient, props.userId)
   const sessionsPermission = useAdminPermission(authClient, () => ({
     session: ["list"]
@@ -368,6 +377,13 @@ function UserDialog(props: {
                   <TabsTrigger value="sessions">
                     {config().localization.sessions}
                   </TabsTrigger>
+                  <For each={contributedTabs()}>
+                    {(tab) => (
+                      <TabsTrigger value={tab.value}>
+                        <Dynamic component={tab.label} />
+                      </TabsTrigger>
+                    )}
+                  </For>
                 </TabsList>
                 <TabsContent class="flex flex-col gap-4 pt-4" value="overview">
                   <div class="flex items-center gap-3">
@@ -447,6 +463,13 @@ function UserDialog(props: {
                     </Show>
                   </Show>
                 </TabsContent>
+                <For each={contributedTabs()}>
+                  {(tab) => (
+                    <TabsContent class="pt-4" value={tab.value}>
+                      <Dynamic component={tab.component} userId={detail().id} />
+                    </TabsContent>
+                  )}
+                </For>
               </Tabs>
             )}
           </Show>

@@ -9,5 +9,17 @@ export const dashQueryKeys = {
     [...dashQueryKeys.all(userId), "audit-logs", params] as const,
 
   allAuditLogs: <TParams>(userId: string | undefined, params: TParams) =>
-    [...dashQueryKeys.all(userId), "all-audit-logs", params] as const
+    [...dashQueryKeys.all(userId), "all-audit-logs", params] as const,
+
+  userAuditLogs: <TParams>(
+    actorUserId: string | undefined,
+    userId: string | undefined,
+    params: TParams
+  ) =>
+    [
+      ...dashQueryKeys.all(actorUserId),
+      "user-audit-logs",
+      userId,
+      params
+    ] as const
 } as const

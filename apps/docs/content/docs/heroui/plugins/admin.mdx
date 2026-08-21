@@ -89,6 +89,14 @@ Applications can control the drawer through `<AdminUsers />`:
 />
 ```
 
+## Inspector tabs
+
+The user inspector includes local Overview and Sessions tabs. Registered
+plugins can add more tabs without adding routes.
+
+The Dash integration adds an Activity tab when both UI plugins are registered.
+Dash applies its own organization owner or admin access rules to this tab.
+
 ## Permissions and privacy
 
 The users page calls the Better Auth permission API before it requests the

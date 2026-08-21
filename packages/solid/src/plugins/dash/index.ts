@@ -3,8 +3,10 @@ import {
   type DashAuditLogsParams,
   type DashAuditLogsResponse,
   type DashAuthClient,
+  type DashUserAuditLogsParams,
   dashAllAuditLogsOptions,
-  dashAuditLogsOptions
+  dashAuditLogsOptions,
+  dashUserAuditLogsOptions
 } from "@better-auth-ui/core/plugins/dash"
 import {
   type QueryClient,
@@ -22,6 +24,10 @@ export type UseDashAuditLogsOptions = Accessor<
 
 export type UseDashAllAuditLogsOptions = Accessor<
   DashQueryOptions & { params?: DashAllAuditLogsParams }
+>
+
+export type UseDashUserAuditLogsOptions = Accessor<
+  DashQueryOptions & { params?: DashUserAuditLogsParams }
 >
 
 /** Load audit logs for the signed-in user. */
@@ -54,6 +60,30 @@ export function useDashAllAuditLogs(
     const { params, initialData, ...queryOptions } = options?.() ?? {}
     return {
       ...dashAllAuditLogsOptions(authClient, session.data?.user.id, params),
+      ...queryOptions,
+      initialData: initialData as undefined
+    }
+  }, queryClient)
+}
+
+/** Load one user's audit logs available to organization owners/admins. */
+export function useDashUserAuditLogs(
+  authClient: DashAuthClient,
+  userId: Accessor<string | undefined>,
+  options?: UseDashUserAuditLogsOptions,
+  queryClient?: Accessor<QueryClient>
+) {
+  const session = useSession(authClient, undefined, queryClient)
+
+  return useQuery(() => {
+    const { params, initialData, ...queryOptions } = options?.() ?? {}
+    return {
+      ...dashUserAuditLogsOptions(
+        authClient,
+        session.data?.user.id,
+        userId(),
+        params
+      ),
       ...queryOptions,
       initialData: initialData as undefined
     }

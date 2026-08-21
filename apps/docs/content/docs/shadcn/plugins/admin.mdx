@@ -137,8 +137,11 @@ search across names, email addresses, and user IDs.
 
 ## User inspector
 
-Select a row to open the user inspector. The inspector uses local Overview and
-Sessions tabs. These tabs are not routes.
+Select a row to open the user inspector. The inspector includes local Overview
+and Sessions tabs. Registered plugins can add more tabs without adding routes.
+
+The Dash integration adds an Activity tab when both UI plugins are registered.
+Dash applies its own organization owner or admin access rules to this tab.
 
 The inspector can change roles, set passwords, ban users, impersonate users,
 remove users, and revoke sessions. Dangerous actions require confirmation.

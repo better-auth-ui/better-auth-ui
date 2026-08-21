@@ -666,6 +666,12 @@ function UserInspector({
 }) {
   const auth = useAuth<AdminAuthClient>()
   const config = useAuthPlugin(adminPlugin)
+  const contributedTabs = auth.plugins.flatMap((plugin) =>
+    (plugin.adminUserTabs ?? []).map((tab) => ({
+      ...tab,
+      value: `${plugin.id}:${tab.id}`
+    }))
+  )
   const detail = useAdminUser(auth.authClient, userId)
   const sessionsPermission = useAdminPermission(
     auth.authClient,
@@ -829,6 +835,11 @@ function UserInspector({
                 <TabsTrigger value="sessions">
                   {config.localization.sessions}
                 </TabsTrigger>
+                {contributedTabs.map((tab) => (
+                  <TabsTrigger key={tab.value} value={tab.value}>
+                    {tab.label}
+                  </TabsTrigger>
+                ))}
               </TabsList>
               <TabsContent
                 className="flex flex-col gap-6 pt-4"
@@ -1038,6 +1049,18 @@ function UserInspector({
                   </p>
                 )}
               </TabsContent>
+              {contributedTabs.map((tab) => {
+                const ContributedTab = tab.component
+                return (
+                  <TabsContent
+                    className="pt-4"
+                    key={tab.value}
+                    value={tab.value}
+                  >
+                    <ContributedTab userId={user.id} />
+                  </TabsContent>
+                )
+              })}
             </Tabs>
           ) : (
             <AdminState

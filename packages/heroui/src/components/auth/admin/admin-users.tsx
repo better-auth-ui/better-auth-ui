@@ -301,8 +301,18 @@ function UserDrawer({
   onOpenChange: (open: boolean) => void
   userId?: string
 }) {
-  const { authClient } = useAuth<AdminAuthClient>()
+  const { authClient, plugins } = useAuth<AdminAuthClient>()
   const config = useAuthPlugin(adminPlugin)
+  const contributedTabs = useMemo(
+    () =>
+      plugins.flatMap((plugin) =>
+        (plugin.adminUserTabs ?? []).map((tab) => ({
+          ...tab,
+          id: `${plugin.id}:${tab.id}`
+        }))
+      ),
+    [plugins]
+  )
   const user = useAdminUser(authClient, userId)
   const sessionsPermission = useAdminPermission(authClient, {
     session: ["list"]
@@ -338,6 +348,12 @@ function UserDrawer({
                       {config.localization.sessions}
                       <Tabs.Indicator />
                     </Tabs.Tab>
+                    {contributedTabs.map((tab) => (
+                      <Tabs.Tab id={tab.id} key={tab.id}>
+                        {tab.label}
+                        <Tabs.Indicator />
+                      </Tabs.Tab>
+                    ))}
                   </Tabs.List>
                 </Tabs.ListContainer>
                 <Tabs.Panel className="flex flex-col gap-4 pt-4" id="overview">
@@ -389,6 +405,14 @@ function UserDrawer({
                     </p>
                   )}
                 </Tabs.Panel>
+                {contributedTabs.map((tab) => {
+                  const ContributedTab = tab.component
+                  return (
+                    <Tabs.Panel className="pt-4" id={tab.id} key={tab.id}>
+                      <ContributedTab userId={user.data.id} />
+                    </Tabs.Panel>
+                  )
+                })}
               </Tabs>
             ) : (
               <AdminMessage

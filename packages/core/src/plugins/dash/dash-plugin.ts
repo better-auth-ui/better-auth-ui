@@ -13,6 +13,8 @@ declare module "../../lib/view-paths" {
 }
 
 export type DashPluginOptions = {
+  /** Add activity to the admin user inspector. @default true */
+  admin?: boolean
   /** Add activity to personal settings. @default true */
   user?: boolean
   /** Add activity to organization settings. @default true */
@@ -43,6 +45,7 @@ const resolvePageSize = (pageSize?: number) => {
 export const dashPlugin = createAuthPlugin(
   "dash",
   (options: DashPluginOptions = {}) => ({
+    admin: options.admin ?? true,
     user: options.user ?? true,
     organization: options.organization ?? true,
     pageSize: resolvePageSize(options.pageSize),

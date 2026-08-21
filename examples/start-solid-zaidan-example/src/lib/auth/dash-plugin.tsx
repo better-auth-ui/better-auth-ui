@@ -7,6 +7,7 @@ import {
 import { Activity } from "lucide-solid"
 
 import {
+  AdminUserActivity,
   OrganizationActivity,
   UserActivity
 } from "@/components/auth/dash/activity"
@@ -26,6 +27,17 @@ export const dashPlugin = createAuthPlugin(
     return {
       ...core,
       localization: core.localization as DashLocalization,
+      ...(core.admin
+        ? {
+            adminUserTabs: [
+              {
+                id: "activity",
+                label: ActivityLabel,
+                component: AdminUserActivity
+              }
+            ]
+          }
+        : {}),
       ...(core.user
         ? {
             settingsTabs: [

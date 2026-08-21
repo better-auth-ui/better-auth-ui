@@ -11,6 +11,7 @@ import {
 import { Pulse } from "@gravity-ui/icons"
 import { createElement } from "react"
 import {
+  AdminUserActivity,
   OrganizationActivity,
   UserActivity
 } from "../../components/auth/dash/activity"
@@ -28,6 +29,17 @@ export const dashPlugin = createAuthPlugin(
   (options: DashPluginOptions = {}) => {
     const core = coreDashPlugin(options)
     const localizedTabs = (localization: DashLocalization) => ({
+      ...(core.admin
+        ? {
+            adminUserTabs: [
+              {
+                id: "activity",
+                label: activityLabel(localization.activity),
+                component: AdminUserActivity
+              }
+            ]
+          }
+        : {}),
       ...(core.user
         ? {
             settingsTabs: [

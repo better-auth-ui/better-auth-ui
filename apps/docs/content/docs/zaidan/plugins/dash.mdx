@@ -7,7 +7,7 @@ description: Add personal activity and organization audit logs to Solid and Zaid
 import { Callout } from "fumadocs-ui/components/callout"
 import { Step, Steps } from "fumadocs-ui/components/steps"
 
-The Dash registry item adds an Activity tab to personal and organization settings. It reads audit logs through the public `dashClient()` API from `@better-auth/infra`.
+The Dash integration adds Activity tabs to personal settings, organization settings, and the Admin user inspector. It reads audit logs through the public `dashClient()` API from `@better-auth/infra`.
 
 Organization owners and admins see organization-wide activity. Other members see only their own activity in that organization. Every organization query uses the organization ID from the current route.
 
@@ -113,6 +113,14 @@ export const validOrganizationPaths = [
 
 Use the same Dash options in the provider and route configuration when you customize the segment.
 
+## Admin user activity
+
+If the Admin integration is present, Dash adds an Activity tab to its user inspector. The tab calls `getAllAuditLogs({ userId })` for the selected user.
+
+Dash authorizes this endpoint for organization owners and admins. A Better Auth application-admin role does not grant Dash access by itself.
+
+Set `admin: false` on `dashPlugin()` to remove this inspector tab.
+
 ## Access and privacy
 
 - Personal settings call `getAuditLogs` for the signed-in user.
@@ -130,7 +138,8 @@ The empty state says that no retained activity matches the view. It does not cla
 ```tsx
 import {
   useDashAllAuditLogs,
-  useDashAuditLogs
+  useDashAuditLogs,
+  useDashUserAuditLogs
 } from "@better-auth-ui/solid/plugins/dash"
 ```
 

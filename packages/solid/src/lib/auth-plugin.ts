@@ -21,6 +21,17 @@ export type AdminTab = {
   component: Component
 }
 
+export type AdminUserTabProps = {
+  userId: string
+}
+
+/** A tab contributed to the admin user inspector. */
+export type AdminUserTab = {
+  id: string
+  label: Component
+  component: Component<AdminUserTabProps>
+}
+
 export type CaptchaComponent = Component
 
 export type AuthPromptProps = {
@@ -35,6 +46,8 @@ export type AuthPrompt = {
 export type SolidAuthPlugin = AuthPluginBase & {
   /** First-class static views contributed to the administration shell. */
   adminTabs?: AdminTab[]
+  /** Tabs contributed to the administration user inspector. */
+  adminUserTabs?: AdminUserTab[]
   /** Headless prompts mounted by authentication views. */
   authPrompts?: AuthPrompt[]
   /** Captcha widget rendered above submit buttons in auth forms. */

@@ -40,6 +40,11 @@ export type DashAllAuditLogsParams = Omit<
   "session" | "userId"
 >
 
+export type DashUserAuditLogsParams = Omit<
+  DashGetAllAuditLogsInput,
+  "organizationId" | "session" | "userId"
+>
+
 const unwrapDashResult = (
   result:
     | { data: DashAuditLogsResponse; error: null }
@@ -78,6 +83,25 @@ export function dashAllAuditLogsOptions(
       ? async () =>
           unwrapDashResult(await authClient.dash.getAllAuditLogs(params))
       : skipToken
+  } satisfies QueryOptions<DashAuditLogsResponse>
+}
+
+/** Query options for one user's audit logs available to owners/admins. */
+export function dashUserAuditLogsOptions(
+  authClient: DashAuthClient,
+  actorUserId?: string,
+  userId?: string,
+  params: DashUserAuditLogsParams = {}
+) {
+  return {
+    queryKey: dashQueryKeys.userAuditLogs(actorUserId, userId, params),
+    queryFn:
+      actorUserId && userId
+        ? async () =>
+            unwrapDashResult(
+              await authClient.dash.getAllAuditLogs({ ...params, userId })
+            )
+        : skipToken
   } satisfies QueryOptions<DashAuditLogsResponse>
 }
 
@@ -127,3 +151,36 @@ export const fetchDashAllAuditLogs = (
   userId: string,
   params?: DashAllAuditLogsParams
 ) => queryClient.fetchQuery(dashAllAuditLogsOptions(authClient, userId, params))
+
+export const ensureDashUserAuditLogs = (
+  queryClient: QueryClient,
+  authClient: DashAuthClient,
+  actorUserId: string,
+  userId: string,
+  params?: DashUserAuditLogsParams
+) =>
+  queryClient.ensureQueryData(
+    dashUserAuditLogsOptions(authClient, actorUserId, userId, params)
+  )
+
+export const prefetchDashUserAuditLogs = (
+  queryClient: QueryClient,
+  authClient: DashAuthClient,
+  actorUserId: string,
+  userId: string,
+  params?: DashUserAuditLogsParams
+) =>
+  queryClient.prefetchQuery(
+    dashUserAuditLogsOptions(authClient, actorUserId, userId, params)
+  )
+
+export const fetchDashUserAuditLogs = (
+  queryClient: QueryClient,
+  authClient: DashAuthClient,
+  actorUserId: string,
+  userId: string,
+  params?: DashUserAuditLogsParams
+) =>
+  queryClient.fetchQuery(
+    dashUserAuditLogsOptions(authClient, actorUserId, userId, params)
+  )

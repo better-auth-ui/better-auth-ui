@@ -12,7 +12,8 @@ import {
 import { useAuth, useAuthPlugin } from "@better-auth-ui/solid"
 import {
   useDashAllAuditLogs,
-  useDashAuditLogs
+  useDashAuditLogs,
+  useDashUserAuditLogs
 } from "@better-auth-ui/solid/plugins/dash"
 import { useActiveMemberRole } from "@better-auth-ui/solid/plugins/organization"
 import { keepPreviousData } from "@tanstack/solid-query"
@@ -54,13 +55,19 @@ import { Spinner } from "@/components/ui/spinner"
 import { dashPlugin } from "@/lib/auth/dash-plugin"
 import { cn } from "@/lib/utils"
 
-type ActivityAccess = "organization" | "user"
+type ActivityAccess = "admin-user" | "organization" | "user"
 
 type ActivityFeedProps = {
   access: ActivityAccess
   organizationId?: string
   ready?: boolean
   class?: string
+  userId?: string
+}
+
+export type AdminUserActivityProps = {
+  class?: string
+  userId: string
 }
 
 export type UserActivityProps = { class?: string }
@@ -185,7 +192,7 @@ function ActivityFeed(props: ActivityFeedProps) {
   const [page, setPage] = createSignal(0)
   createEffect(
     on(
-      () => [props.access, props.organizationId] as const,
+      () => [props.access, props.organizationId, props.userId] as const,
       () => setPage(0),
       { defer: true }
     )
@@ -209,8 +216,21 @@ function ActivityFeed(props: ActivityFeedProps) {
       placeholderData: keepPreviousData
     })
   )
+  const adminUserQuery = useDashUserAuditLogs(
+    auth.authClient as DashAuthClient,
+    () => props.userId,
+    () => ({
+      enabled: (props.ready ?? true) && props.access === "admin-user",
+      params: { limit: pageSize, offset: offset() },
+      placeholderData: keepPreviousData
+    })
+  )
   const query = () =>
-    props.access === "organization" ? organizationQuery : userQuery
+    props.access === "organization"
+      ? organizationQuery
+      : props.access === "admin-user"
+        ? adminUserQuery
+        : userQuery
   const showPending = () => !(props.ready ?? true) || query().isPending
   const pageEnd = () => offset() + (query().data?.events.length ?? 0)
   const hasNextPage = () => pageEnd() < (query().data?.total ?? 0)
@@ -223,9 +243,11 @@ function ActivityFeed(props: ActivityFeedProps) {
       <CardHeader>
         <CardTitle>{localization.activity}</CardTitle>
         <CardDescription>
-          {props.organizationId
-            ? localization.organizationActivityDescription
-            : localization.activityDescription}
+          {props.access === "admin-user"
+            ? localization.adminUserActivityDescription
+            : props.organizationId
+              ? localization.organizationActivityDescription
+              : localization.activityDescription}
         </CardDescription>
         <Show when={props.organizationId}>
           <CardAction>
@@ -351,6 +373,11 @@ function ActivityFeed(props: ActivityFeedProps) {
       </Show>
     </Card>
   )
+}
+
+/** Authentication and account activity for a user selected by an administrator. */
+export function AdminUserActivity(props: AdminUserActivityProps) {
+  return <ActivityFeed access="admin-user" {...props} />
 }
 
 /** Personal authentication and account activity. */

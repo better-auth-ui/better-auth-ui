@@ -104,6 +104,17 @@ export type AdminTab = {
   component: ComponentType
 }
 
+export type AdminUserTabProps = {
+  userId: string
+}
+
+/** A tab contributed to the admin user inspector. */
+export type AdminUserTab = {
+  id: string
+  label: ReactNode
+  component: ComponentType<AdminUserTabProps>
+}
+
 /** Props for plugin-contributed items in the `UserButton` dropdown. */
 export type UserMenuItemProps = {
   className?: string
@@ -188,6 +199,8 @@ export type AuthPlugin<
     settingsTabs?: SettingsTab[]
     /** First-class static views contributed to the administration shell. */
     adminTabs?: AdminTab[]
+    /** Tabs contributed to the administration user inspector. */
+    adminUserTabs?: AdminUserTab[]
     /** First-class organization settings tabs contributed by the plugin. */
     organizationTabs?: OrganizationTab[]
   }

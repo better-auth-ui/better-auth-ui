@@ -6,6 +6,7 @@ import {
   dashAuditLogsOptions,
   dashPlugin,
   dashQueryKeys,
+  dashUserAuditLogsOptions,
   getDashEventDetail,
   getDashEventLocation
 } from "../src/plugins/dash"
@@ -28,6 +29,7 @@ describe("dashPlugin", () => {
   it("registers static personal and organization activity views", () => {
     expect(dashPlugin()).toMatchObject({
       id: "dash",
+      admin: true,
       user: true,
       organization: true,
       pageSize: 20,
@@ -37,12 +39,14 @@ describe("dashPlugin", () => {
 
     expect(
       dashPlugin({
+        admin: false,
         user: false,
         organization: true,
         pageSize: 250,
         path: "history"
       })
     ).toMatchObject({
+      admin: false,
       user: false,
       organization: true,
       pageSize: 100,
@@ -60,6 +64,9 @@ describe("dashPlugin", () => {
     expect(dashQueryKeys.auditLogs("user-1", params)).not.toEqual(
       dashQueryKeys.allAuditLogs("user-1", params)
     )
+    expect(
+      dashQueryKeys.userAuditLogs("admin-1", "user-1", params)
+    ).not.toEqual(dashQueryKeys.userAuditLogs("admin-1", "user-2", params))
   })
 
   it("waits for a session and forwards explicit organization filters", async () => {
@@ -91,6 +98,29 @@ describe("dashPlugin", () => {
 
     expect(authClient.dash.getAllAuditLogs).toHaveBeenCalledWith({
       organizationId: "org-1"
+    })
+    expect(authClient.dash.getAuditLogs).not.toHaveBeenCalled()
+  })
+
+  it("uses the privileged endpoint for an inspected user", async () => {
+    const authClient = createAuthClient()
+    const params = { limit: 10, offset: 20 }
+
+    expect(
+      dashUserAuditLogsOptions(authClient as never, undefined, "user-2").queryFn
+    ).toBe(skipToken)
+
+    const options = dashUserAuditLogsOptions(
+      authClient as never,
+      "admin-1",
+      "user-2",
+      params
+    )
+    await (options.queryFn as () => Promise<typeof response>)()
+
+    expect(authClient.dash.getAllAuditLogs).toHaveBeenCalledWith({
+      ...params,
+      userId: "user-2"
     })
     expect(authClient.dash.getAuditLogs).not.toHaveBeenCalled()
   })

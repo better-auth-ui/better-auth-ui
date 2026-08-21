@@ -17,7 +17,8 @@ import {
 import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
 import {
   useDashAllAuditLogs,
-  useDashAuditLogs
+  useDashAuditLogs,
+  useDashUserAuditLogs
 } from "@better-auth-ui/react/plugins/dash"
 import { useActiveMemberRole } from "@better-auth-ui/react/plugins/organization"
 import {
@@ -43,13 +44,20 @@ import { keepPreviousData } from "@tanstack/react-query"
 import { useState } from "react"
 import { dashPlugin } from "../../../lib/auth/dash-plugin"
 
-type ActivityAccess = "organization" | "user"
+type ActivityAccess = "admin-user" | "organization" | "user"
 
 type ActivityFeedProps = {
   access: ActivityAccess
   organizationId?: string
   ready?: boolean
   className?: string
+  userId?: string
+  variant?: CardProps["variant"]
+}
+
+export type AdminUserActivityProps = {
+  className?: string
+  userId: string
   variant?: CardProps["variant"]
 }
 
@@ -182,6 +190,7 @@ function ActivityFeed({
   organizationId,
   ready = true,
   className,
+  userId,
   variant
 }: ActivityFeedProps) {
   const { authClient, locale } = useAuth()
@@ -200,7 +209,21 @@ function ActivityFeed({
     params,
     placeholderData: keepPreviousData
   })
-  const query = access === "organization" ? organizationQuery : userQuery
+  const adminUserQuery = useDashUserAuditLogs(
+    authClient as DashAuthClient,
+    userId,
+    {
+      enabled: ready && access === "admin-user",
+      params: { limit: pageSize, offset },
+      placeholderData: keepPreviousData
+    }
+  )
+  const query =
+    access === "organization"
+      ? organizationQuery
+      : access === "admin-user"
+        ? adminUserQuery
+        : userQuery
   const { data, error, isFetching, isPending } = query
   const showPending = !ready || isPending
   const pageEnd = offset + (data?.events.length ?? 0)
@@ -212,9 +235,11 @@ function ActivityFeed({
         <div className="flex min-w-0 flex-col gap-1">
           <h2 className="text-sm font-semibold">{localization.activity}</h2>
           <p className="text-sm text-muted">
-            {organizationId
-              ? localization.organizationActivityDescription
-              : localization.activityDescription}
+            {access === "admin-user"
+              ? localization.adminUserActivityDescription
+              : organizationId
+                ? localization.organizationActivityDescription
+                : localization.activityDescription}
           </p>
         </div>
 
@@ -316,6 +341,11 @@ function ActivityFeed({
       </Card>
     </div>
   )
+}
+
+/** Authentication and account activity for a user selected by an administrator. */
+export function AdminUserActivity(props: AdminUserActivityProps) {
+  return <ActivityFeed access="admin-user" {...props} />
 }
 
 /** Personal authentication and account activity. */

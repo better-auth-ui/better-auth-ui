@@ -43,6 +43,8 @@ export const dashEventLabels = {
 export const dashLocalization = {
   activity: "Activity",
   activityDescription: "Review recent authentication and account activity.",
+  adminUserActivityDescription:
+    "Review recent authentication and account activity for this user.",
   organizationActivityDescription:
     "Review activity you can access for this organization.",
   organizationWide: "Organization-wide",
