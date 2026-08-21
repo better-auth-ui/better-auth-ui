@@ -221,8 +221,7 @@ function ActivityFeed(props: ActivityFeedProps) {
     () => props.userId,
     () => ({
       enabled: (props.ready ?? true) && props.access === "admin-user",
-      params: { limit: pageSize, offset: offset() },
-      placeholderData: keepPreviousData
+      params: { limit: pageSize, offset: offset() }
     })
   )
   const query = () =>

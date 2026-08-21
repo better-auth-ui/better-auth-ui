@@ -212,8 +212,7 @@ function ActivityFeed({
     userId,
     {
       enabled: ready && access === "admin-user",
-      params: { limit: pageSize, offset },
-      placeholderData: keepPreviousData
+      params: { limit: pageSize, offset }
     }
   )
   const query =
@@ -346,7 +345,7 @@ function ActivityFeed({
 
 /** Authentication and account activity for a user selected by an administrator. */
 export function AdminUserActivity(props: AdminUserActivityProps) {
-  return <ActivityFeed access="admin-user" {...props} />
+  return <ActivityFeed key={props.userId} access="admin-user" {...props} />
 }
 
 /** Personal authentication and account activity. */
