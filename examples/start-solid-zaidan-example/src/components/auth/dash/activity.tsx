@@ -26,7 +26,7 @@ import {
   UserRound,
   Users
 } from "lucide-solid"
-import { createSignal, For, Show } from "solid-js"
+import { createEffect, createSignal, For, on, Show } from "solid-js"
 import { Dynamic } from "solid-js/web"
 
 import { Badge } from "@/components/ui/badge"
@@ -183,6 +183,13 @@ function ActivityFeed(props: ActivityFeedProps) {
   const auth = useAuth()
   const { localization, pageSize } = useAuthPlugin(dashPlugin)
   const [page, setPage] = createSignal(0)
+  createEffect(
+    on(
+      () => [props.access, props.organizationId] as const,
+      () => setPage(0),
+      { defer: true }
+    )
+  )
   const offset = () => page() * pageSize
   const params = () => ({
     limit: pageSize,

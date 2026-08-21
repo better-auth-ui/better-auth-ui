@@ -83,9 +83,8 @@ It does not use query parameters, nested plugin routes, or a catch-all route. Ad
 
 ```ts title="route-paths.ts"
 import { viewPaths } from "@better-auth-ui/core"
-
-import { dashPlugin } from "@/lib/auth/dash-plugin"
-import { organizationPlugin } from "@/lib/auth/organization-plugin"
+import { dashPlugin } from "@better-auth-ui/heroui/plugins/dash"
+import { organizationPlugin } from "@better-auth-ui/heroui/plugins/organization"
 
 const activityPath = dashPlugin({ path: "activity" }).viewPaths.settings.activity
 

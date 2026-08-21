@@ -71,6 +71,8 @@ const generateN = (count: number) =>
     (_, index) => index + 1
   )
 
+const numberFormatter = new Intl.NumberFormat()
+
 const formatRelativeTime = (value: string) => {
   const date = new Date(value)
   const seconds = Math.floor((Date.now() - date.getTime()) / 1000)
@@ -276,9 +278,9 @@ function ActivityFeed({
             <div className="flex items-center gap-2">
               <p className="text-xs tabular-nums text-muted">
                 {localization.paginationRange
-                  .replace("{{from}}", String(offset + 1))
-                  .replace("{{to}}", String(pageEnd))
-                  .replace("{{total}}", String(data.total))}
+                  .replace("{{from}}", numberFormatter.format(offset + 1))
+                  .replace("{{to}}", numberFormatter.format(pageEnd))
+                  .replace("{{total}}", numberFormatter.format(data.total))}
               </p>
               {isFetching && <Spinner size="sm" color="current" />}
             </div>
