@@ -1,5 +1,8 @@
-import type { PasskeyAuthClient } from "@better-auth-ui/core/plugins/passkey"
-import { useAuth } from "@better-auth-ui/solid"
+import {
+  type PasskeyAuthClient,
+  resolvePasskeyAuthenticatorAttachment
+} from "@better-auth-ui/core/plugins/passkey"
+import { useAuth, useAuthPlugin } from "@better-auth-ui/solid"
 import { useAddPasskey } from "@better-auth-ui/solid/plugins/passkey"
 import { Fingerprint } from "lucide-solid"
 import { passkeyLabels } from "@/components/auth/passkey/passkey-localization"
@@ -14,7 +17,9 @@ import {
 } from "@/components/ui/dialog"
 import { Field, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
+import { NativeSelect, NativeSelectOption } from "@/components/ui/native-select"
 import { Spinner } from "@/components/ui/spinner"
+import { passkeyPlugin } from "@/lib/auth/passkey-plugin"
 
 export function AddPasskeyDialog(props: {
   onOpenChange: (open: boolean) => void
@@ -22,6 +27,7 @@ export function AddPasskeyDialog(props: {
 }) {
   const auth = useAuth<PasskeyAuthClient>()
   const labels = () => passkeyLabels(auth)
+  const { authenticatorAttachment } = useAuthPlugin(passkeyPlugin)
   const addPasskey = useAddPasskey(auth.authClient, () => ({
     onSuccess: () => {
       props.onOpenChange(false)
@@ -34,10 +40,14 @@ export function AddPasskeyDialog(props: {
 
     const formData = new FormData(event.currentTarget as HTMLFormElement)
     const name = String(formData.get("name") ?? "").trim()
-
-    addPasskey.mutate(
-      (name ? { name } : undefined) as Parameters<typeof addPasskey.mutate>[0]
+    const attachment = resolvePasskeyAuthenticatorAttachment(
+      formData.get("authenticatorAttachment")
     )
+
+    addPasskey.mutate({
+      ...(name ? { name } : {}),
+      ...(attachment ? { authenticatorAttachment: attachment } : {})
+    } as Parameters<typeof addPasskey.mutate>[0])
   }
 
   return (
@@ -61,6 +71,36 @@ export function AddPasskeyDialog(props: {
             placeholder={auth.localization.settings.optional}
           />
         </Field>
+
+        {authenticatorAttachment !== false ? (
+          <Field>
+            <FieldLabel for="passkey-authenticator-attachment">
+              {labels().authenticatorAttachment}
+            </FieldLabel>
+
+            <NativeSelect
+              class="w-full"
+              disabled={addPasskey.isPending}
+              id="passkey-authenticator-attachment"
+              name="authenticatorAttachment"
+              value={authenticatorAttachment}
+            >
+              <NativeSelectOption value="any">
+                {labels().anyAuthenticator}
+              </NativeSelectOption>
+              <NativeSelectOption value="platform">
+                {labels().platformAuthenticator}
+              </NativeSelectOption>
+              <NativeSelectOption value="cross-platform">
+                {labels().crossPlatformAuthenticator}
+              </NativeSelectOption>
+            </NativeSelect>
+
+            <p class="text-muted-foreground text-sm">
+              {labels().authenticatorAttachmentDescription}
+            </p>
+          </Field>
+        ) : null}
 
         <DialogFooter>
           <DialogClose
