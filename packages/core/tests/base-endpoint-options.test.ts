@@ -30,7 +30,8 @@ import {
   apiKeyMutationKeys,
   apiKeyQueryKeys,
   createApiKeyOptions,
-  deleteApiKeyOptions
+  deleteApiKeyOptions,
+  updateApiKeyOptions
 } from "../src/plugins/api-key"
 import { deleteUserMutationKeys } from "../src/plugins/delete-user"
 import {
@@ -285,6 +286,7 @@ describe("core base endpoint option factories", () => {
     const userId = "user-1"
     const createApiKey = createApiKeyOptions(authClient as never, userId)
     const deleteApiKey = deleteApiKeyOptions(authClient as never, userId)
+    const updateApiKey = updateApiKeyOptions(authClient as never, userId)
     const magicLink = signInMagicLinkOptions(authClient as never)
     const revokeMultiSession = revokeMultiSessionOptions(
       authClient as never,
@@ -300,6 +302,7 @@ describe("core base endpoint option factories", () => {
 
     expect(createApiKey.mutationKey).toEqual(apiKeyMutationKeys.create)
     expect(deleteApiKey.mutationKey).toEqual(apiKeyMutationKeys.delete)
+    expect(updateApiKey.mutationKey).toEqual(apiKeyMutationKeys.update)
     expect(magicLink.mutationKey).toEqual(magicLinkMutationKeys.signIn)
     expect(revokeMultiSession.mutationKey).toEqual(
       multiSessionMutationKeys.revoke
@@ -314,7 +317,10 @@ describe("core base endpoint option factories", () => {
       awaits: [apiKeyQueryKeys.lists(userId)]
     })
     expect(deleteApiKey.meta).toEqual({
-      awaits: [apiKeyQueryKeys.lists(userId)]
+      awaits: [apiKeyQueryKeys.all(userId)]
+    })
+    expect(updateApiKey.meta).toEqual({
+      awaits: [apiKeyQueryKeys.all(userId)]
     })
     expect(revokeMultiSession.meta).toEqual({
       awaits: [multiSessionQueryKeys.lists(userId)]

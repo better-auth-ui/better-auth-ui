@@ -825,7 +825,7 @@ describe("Solid auth behavior parity", () => {
         awaits: [apiKeyQueryKeys.lists(userId)]
       })
       expect(deleteApiKeyOptions(authClient as never, userId).meta).toEqual({
-        awaits: [apiKeyQueryKeys.lists(userId)]
+        awaits: [apiKeyQueryKeys.all(userId)]
       })
       expect(
         revokeMultiSessionOptions(authClient as never, userId).meta

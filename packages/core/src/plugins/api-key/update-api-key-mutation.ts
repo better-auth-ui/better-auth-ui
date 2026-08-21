@@ -26,7 +26,7 @@ export function updateApiKeyOptions<TAuthClient extends ApiKeyAuthClient>(
   return {
     mutationKey: apiKeyMutationKeys.update,
     mutationFn,
-    meta: { awaits: [apiKeyQueryKeys.lists(userId)] }
+    meta: { awaits: [apiKeyQueryKeys.all(userId)] }
   } as MutationOptions<
     Awaited<ReturnType<typeof mutationFn>>,
     BetterFetchError,

@@ -34,7 +34,7 @@ export function deleteApiKeyOptions<TAuthClient extends ApiKeyAuthClient>(
     mutationKey,
     mutationFn,
     meta: {
-      awaits: [apiKeyQueryKeys.lists(userId)]
+      awaits: [apiKeyQueryKeys.all(userId)]
     }
   } as MutationOptions<
     Awaited<ReturnType<typeof mutationFn>>,

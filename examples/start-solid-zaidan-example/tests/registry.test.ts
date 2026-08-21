@@ -2750,6 +2750,7 @@ describe("Solid registry isolation", () => {
       "list-device-sessions",
       "list-passkeys",
       "list-api-keys",
+      "get-api-key",
       "list-oauth-consents",
       "---Organization---",
       "active-organization",
