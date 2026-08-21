@@ -25,11 +25,13 @@ const createAuthClient = () => ({
 describe("adminPlugin", () => {
   it("resolves only exact finite admin paths", () => {
     const entries = [
+      { id: "root", path: "" },
       { id: "users", path: "users" },
       { id: "activity", path: "activity" }
     ]
 
-    expect(resolveAdminPath("users", entries)).toEqual(entries[0])
+    expect(resolveAdminPath("", entries)).toEqual(entries[0])
+    expect(resolveAdminPath("users", entries)).toEqual(entries[1])
     expect(resolveAdminPath("users/example", entries)).toBeUndefined()
     expect(resolveAdminPath("unknown", entries)).toBeUndefined()
   })
@@ -135,9 +137,13 @@ describe("adminPlugin", () => {
 
   it("never includes password values in keys or mutation metadata", async () => {
     const setUserPassword = vi.fn(async () => ({ data: null, error: null }))
-    const options = setAdminUserPasswordOptions({
-      admin: { setUserPassword }
-    } as never)
+    const reset = vi.fn()
+    const options = setAdminUserPasswordOptions(
+      {
+        admin: { setUserPassword }
+      } as never,
+      reset
+    )
     const password = "a-secret-that-must-not-be-cached"
 
     expect(options.mutationKey).toEqual(adminMutationKeys.setUserPassword)
@@ -145,12 +151,14 @@ describe("adminPlugin", () => {
     expect(JSON.stringify(options.mutationKey)).not.toContain(password)
 
     await options.mutationFn({ userId: "user-1", newPassword: password })
+    options.onSettled()
 
     expect(setUserPassword).toHaveBeenCalledWith({
       userId: "user-1",
       newPassword: password,
       fetchOptions: { throw: true }
     })
+    expect(reset).toHaveBeenCalledOnce()
   })
 
   it("recognizes only sessions with a non-empty impersonator", () => {

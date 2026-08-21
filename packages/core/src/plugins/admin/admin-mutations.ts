@@ -118,7 +118,10 @@ export function setAdminUserRoleOptions(
  * Keep the password in local form state, never in a query key or mutation
  * metadata, and reset the mutation immediately after the request settles.
  */
-export function setAdminUserPasswordOptions(authClient: AdminAuthClient) {
+export function setAdminUserPasswordOptions(
+  authClient: AdminAuthClient,
+  onSettled: () => void
+) {
   const mutationFn = (params: SetUserPasswordParams) =>
     authClient.admin.setUserPassword({
       ...params,
@@ -128,7 +131,8 @@ export function setAdminUserPasswordOptions(authClient: AdminAuthClient) {
   return {
     mutationKey: adminMutationKeys.setUserPassword,
     mutationFn,
-    gcTime: 0
+    gcTime: 0,
+    onSettled
   } satisfies AdminMutationOptions<
     Awaited<ReturnType<typeof mutationFn>>,
     SetUserPasswordParams

@@ -51,7 +51,14 @@ export function useSetAdminUserPassword(
   authClient: AdminAuthClient,
   queryClient?: QueryClient
 ) {
-  return useMutation(setAdminUserPasswordOptions(authClient), queryClient)
+  const mutation = useMutation(
+    setAdminUserPasswordOptions(authClient, () => {
+      setTimeout(() => mutation.reset(), 0)
+    }),
+    queryClient
+  )
+
+  return mutation
 }
 
 export function useBanAdminUser(
