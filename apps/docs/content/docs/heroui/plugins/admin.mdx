@@ -1,14 +1,13 @@
 ---
 icon: ShieldCheck
 title: Admin
-description: Let administrators stop impersonating a user from the user button.
+description: Add static user management, session details, and impersonation to an administration area.
 ---
 
 import { Step, Steps } from "fumadocs-ui/components/steps"
 
-The Admin plugin adds a "Stop impersonating" action to `<UserButton />`. The
-action appears only while Better Auth marks the current session as an
-impersonation session.
+The Admin plugin adds a static `/admin/users` page and a user-detail drawer.
+It also adds a "Stop impersonating" action to `<UserButton />`.
 
 ## Setup
 
@@ -65,6 +64,57 @@ import { adminPlugin } from "@better-auth-ui/heroui/plugins" // [!code highlight
 
 </Step>
 </Steps>
+
+## Add the users route
+
+Create one static route for the users page:
+
+```tsx title="app/admin/users/page.tsx"
+import { Admin } from "@better-auth-ui/heroui"
+
+export default function AdminUsersPage() {
+  return <Admin view="users" />
+}
+```
+
+Use `<Admin path="users" />` when a parent route passes the final static path
+segment. The user-detail drawer keeps user IDs out of the route contract.
+
+Applications can control the drawer through `<AdminUsers />`:
+
+```tsx
+<AdminUsers
+  selectedUserId={selectedUserId}
+  onSelectedUserIdChange={setSelectedUserId}
+/>
+```
+
+## Permissions and privacy
+
+The users page calls the Better Auth permission API before it requests the
+user list. Do not authorize the page from a role string alone.
+
+The table searches one field per request. The supported fields are `email`
+and `name`.
+
+Passwords stay in local form state and never enter query keys. Session IP
+addresses are hidden unless `showIpAddress` is `true`.
+
+Configure custom roles with the same names in Better Auth and the UI plugin:
+
+```ts
+adminPlugin({
+  defaultRole: "member",
+  impersonationRedirectTo: "/",
+  pageSize: 25,
+  roles: ["member", "support", "admin"],
+  showIpAddress: false
+})
+```
+
+The public Admin client does not provide account disconnection, global
+organization administration, or a Sentinel dashboard. These views are not
+part of this integration.
 
 ## User button behavior
 

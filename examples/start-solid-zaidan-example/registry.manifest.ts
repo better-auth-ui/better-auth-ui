@@ -967,15 +967,24 @@ export const solidRegistryManifest = {
       type: "registry:component",
       title: "Solid Admin",
       description:
-        "Adds a stop-impersonating action to the Solid user button while an administrator is impersonating another user.",
+        "Static administration shell with user management, a user inspector, session details, and the stop-impersonating action.",
       registryDependencies: [
         betterAuthSolidRegistryDependency("auth-provider"),
         betterAuthSolidRegistryDependency("user-button"),
+        "@zaidan/badge",
+        "@zaidan/button",
+        "@zaidan/dialog",
         "@zaidan/dropdown-menu",
-        "@zaidan/spinner"
+        "@zaidan/input-group",
+        "@zaidan/skeleton",
+        "@zaidan/spinner",
+        "@zaidan/table",
+        "@zaidan/tabs"
       ],
       files: [
         libFile("src/lib/auth/admin-plugin.ts"),
+        componentFile("src/components/auth/admin/admin.tsx"),
+        componentFile("src/components/auth/admin/admin-users.tsx"),
         componentFile("src/components/auth/admin/stop-impersonating.tsx"),
         ...zaidanInteractiveSupportFiles
       ]

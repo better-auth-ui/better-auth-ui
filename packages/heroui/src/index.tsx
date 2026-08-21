@@ -1,6 +1,8 @@
 "use client"
 
 export * from "./components/auth/additional-field"
+export * from "./components/auth/admin/admin"
+export * from "./components/auth/admin/admin-users"
 export * from "./components/auth/auth"
 export * from "./components/auth/auth-provider"
 export * from "./components/auth/auth-redirect"

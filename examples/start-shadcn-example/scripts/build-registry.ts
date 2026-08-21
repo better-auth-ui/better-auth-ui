@@ -23,6 +23,8 @@ const STYLE_NAMES = [
 
 const EXPECTED_BASE_UI_OVERRIDES = [
   "src/components/auth/additional-field.tsx",
+  "src/components/auth/admin/admin-users.tsx",
+  "src/components/auth/admin/admin.tsx",
   "src/components/auth/api-key/api-keys.tsx",
   "src/components/auth/api-key/create-api-key-dialog.tsx",
   "src/components/auth/api-key/edit-api-key-dialog.tsx",

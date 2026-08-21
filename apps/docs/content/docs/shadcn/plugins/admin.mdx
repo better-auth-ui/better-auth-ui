@@ -1,14 +1,13 @@
 ---
 icon: ShieldCheck
 title: Admin
-description: Let administrators stop impersonating a user from the user button.
+description: Add static user management, session controls, and impersonation to an administration area.
 ---
 
 import { Step, Steps } from "fumadocs-ui/components/steps"
 
-The Admin plugin adds a "Stop impersonating" action to `<UserButton />`. The
-action appears only while Better Auth marks the current session as an
-impersonation session.
+The Admin plugin adds a static `/admin/users` page and a user-detail drawer.
+It also adds a "Stop impersonating" action to `<UserButton />`.
 
 ## Setup
 
@@ -61,6 +60,8 @@ This installs:
 
 - `src/lib/auth/auth-plugin.ts`
 - `src/lib/auth/admin-plugin.ts`
+- `src/components/auth/admin/admin.tsx`
+- `src/components/auth/admin/admin-users.tsx`
 - `src/components/auth/admin/stop-impersonating.tsx`
 
 </Step>
@@ -82,6 +83,88 @@ import { adminPlugin } from "@/lib/auth/admin-plugin" // [!code highlight]
 
 </Step>
 </Steps>
+
+## Add the users route
+
+Create one static route for the users page. The drawer keeps user IDs out of
+the route contract.
+
+```tsx title="app/admin/users/page.tsx"
+import { Admin } from "@/components/auth/admin/admin"
+
+export default function AdminUsersPage() {
+  return <Admin view="users" />
+}
+```
+
+TanStack Start can use the same component in `routes/admin/users.tsx`:
+
+```tsx
+export const Route = createFileRoute("/admin/users")({
+  component: () => <Admin view="users" />
+})
+```
+
+Use `<Admin path="users" />` when a parent route passes the final static path
+segment. Applications can control the drawer without changing this route:
+
+```tsx
+<AdminUsers
+  selectedUserId={selectedUserId}
+  onSelectedUserIdChange={setSelectedUserId}
+/>
+```
+
+This API lets an application connect search parameters later. Search
+parameters are not required by the library.
+
+## Permissions
+
+The users page calls the Better Auth permission API before it requests the
+user list. Each server endpoint remains the final security boundary.
+
+Do not authorize this page from a role string alone. Better Auth also supports
+custom roles, custom permissions, and `adminUserIds`.
+
+The table searches one field per request. Select `Email` or `Name` before you
+enter a search value. The public Admin API does not provide one combined
+search across names, email addresses, and user IDs.
+
+## User inspector
+
+Select a row to open the user inspector. The inspector uses local Overview and
+Sessions tabs. These tabs are not routes.
+
+The inspector can change roles, set passwords, ban users, impersonate users,
+remove users, and revoke sessions. Dangerous actions require confirmation.
+The UI disables self-destructive actions and still relies on the server.
+
+Passwords stay in local form state. The forms clear each password after the
+request or after the user closes the form.
+
+Session IP addresses are hidden by default. Set `showIpAddress: true` only when
+your privacy policy permits this data.
+
+## Custom roles and options
+
+```ts
+adminPlugin({
+  defaultRole: "member",
+  impersonationRedirectTo: "/",
+  pageSize: 25,
+  roles: ["member", "support", "admin"],
+  showIpAddress: false
+})
+```
+
+Configure the same roles and permissions in Better Auth `admin()` and
+`adminClient()`. The UI list only controls which role choices it shows.
+
+## Scope
+
+This integration uses the public Better Auth Admin client. It does not add
+account disconnection, organization membership management, global
+organization administration, analytics, or a Sentinel dashboard.
 
 ## User button behavior
 

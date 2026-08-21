@@ -1,14 +1,13 @@
 ---
 icon: ShieldCheck
 title: Admin
-description: Add a stop-impersonating user menu action to Solid and Zaidan.
+description: Add static user management, session details, and impersonation to Solid and Zaidan.
 ---
 
 import { Step, Steps } from "fumadocs-ui/components/steps"
 
-The Admin plugin adds a "Stop impersonating" action to the copied
-`<UserButton />`. The action appears only while Better Auth marks the current
-session as an impersonation session.
+The Admin plugin adds a static `/admin/users` page and a user-detail dialog.
+It also adds a "Stop impersonating" action to the copied `<UserButton />`.
 
 ## Setup
 
@@ -55,6 +54,8 @@ npx shadcn@latest add https://better-auth-ui.com/r/solid/admin.json
 This copies:
 
 - `src/lib/auth/admin-plugin.ts`
+- `src/components/auth/admin/admin.tsx`
+- `src/components/auth/admin/admin-users.tsx`
 - `src/components/auth/admin/stop-impersonating.tsx`
 
 </Step>
@@ -75,6 +76,53 @@ import { adminPlugin } from "@/lib/auth/admin-plugin" // [!code highlight]
 
 </Step>
 </Steps>
+
+## Add the users route
+
+Create one static TanStack Start route:
+
+```tsx title="src/routes/admin/users.tsx"
+import { Admin } from "@/components/auth/admin/admin"
+
+export const Route = createFileRoute("/admin/users")({
+  component: () => <Admin view="users" />
+})
+```
+
+Use `<Admin path="users" />` when a parent route supplies the final static path
+segment. The user-detail dialog keeps user IDs out of the route contract.
+
+Applications can control the selected user through `<AdminUsers />`:
+
+```tsx
+<AdminUsers
+  selectedUserId={selectedUserId()}
+  onSelectedUserIdChange={setSelectedUserId}
+/>
+```
+
+## Permissions and privacy
+
+The users page calls the Better Auth permission API before it requests the
+user list. Do not authorize the page from a role string alone.
+
+The table searches either `email` or `name` in each request. Passwords stay in
+local form state. Session IP addresses are hidden unless `showIpAddress` is
+`true`.
+
+```ts
+adminPlugin({
+  defaultRole: "member",
+  impersonationRedirectTo: "/",
+  pageSize: 25,
+  roles: ["member", "support", "admin"],
+  showIpAddress: false
+})
+```
+
+The public Admin client does not provide account disconnection, global
+organization administration, or a Sentinel dashboard. These views are not
+part of this integration.
 
 ## User button behavior
 
