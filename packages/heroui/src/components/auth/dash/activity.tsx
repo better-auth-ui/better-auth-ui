@@ -71,14 +71,14 @@ const generateN = (count: number) =>
     (_, index) => index + 1
   )
 
-const numberFormatter = new Intl.NumberFormat()
-
-const formatRelativeTime = (value: string) => {
+const formatRelativeTime = (value: string, languageTag: string) => {
   const date = new Date(value)
   const seconds = Math.floor((Date.now() - date.getTime()) / 1000)
   if (!Number.isFinite(seconds)) return value
 
-  const formatter = new Intl.RelativeTimeFormat(undefined, { numeric: "auto" })
+  const formatter = new Intl.RelativeTimeFormat(languageTag, {
+    numeric: "auto"
+  })
   const units: [Intl.RelativeTimeFormatUnit, number][] = [
     ["year", 31_536_000],
     ["month", 2_592_000],
@@ -124,6 +124,7 @@ const getEventIcon = (eventType: string) => {
 }
 
 function ActivityRow({ event }: { event: DashAuditLog }) {
+  const { locale } = useAuth()
   const { localization, showIpAddress } = useAuthPlugin(dashPlugin)
   const Icon = getEventIcon(event.eventType)
   const title =
@@ -132,7 +133,9 @@ function ActivityRow({ event }: { event: DashAuditLog }) {
     localization.unknownEvent
   const detail = getDashEventDetail(event)
   const location = getDashEventLocation(event, showIpAddress)
-  const absoluteTime = new Date(event.createdAt).toLocaleString()
+  const absoluteTime = new Date(event.createdAt).toLocaleString(
+    locale.languageTag
+  )
 
   return (
     <li className="flex items-start gap-3 border-b border-dashed py-4 first:pt-0 last:border-b-0 last:pb-0">
@@ -148,7 +151,7 @@ function ActivityRow({ event }: { event: DashAuditLog }) {
             dateTime={event.createdAt}
             title={absoluteTime}
           >
-            {formatRelativeTime(event.createdAt)}
+            {formatRelativeTime(event.createdAt, locale.languageTag)}
           </time>
         </div>
 
@@ -181,9 +184,10 @@ function ActivityFeed({
   className,
   variant
 }: ActivityFeedProps) {
-  const { authClient } = useAuth()
+  const { authClient, locale } = useAuth()
   const { localization, pageSize } = useAuthPlugin(dashPlugin)
   const [page, setPage] = useState(0)
+  const numberFormatter = new Intl.NumberFormat(locale.languageTag)
   const offset = page * pageSize
   const params = { limit: pageSize, offset, organizationId }
   const userQuery = useDashAuditLogs(authClient as DashAuthClient, {

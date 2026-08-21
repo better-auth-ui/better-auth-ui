@@ -207,9 +207,12 @@ export function fieldsWithModelValues(
 }
 
 /** Format a persisted additional-field value for compact read-only display. */
-export function formatAdditionalFieldValue(value: unknown): string | undefined {
+export function formatAdditionalFieldValue(
+  value: unknown,
+  languageTag?: string
+): string | undefined {
   if (value === null || value === undefined || value === "") return undefined
-  if (value instanceof Date) return value.toLocaleString()
+  if (value instanceof Date) return value.toLocaleString(languageTag)
   if (typeof value === "string") {
     const dateOnly = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value)
     if (dateOnly) {
@@ -218,12 +221,12 @@ export function formatAdditionalFieldValue(value: unknown): string | undefined {
         Number(year),
         Number(month) - 1,
         Number(day)
-      ).toLocaleString()
+      ).toLocaleString(languageTag)
     }
 
     const parsed = new Date(value)
     if (/^\d{4}-\d{2}-\d{2}T/.test(value) && !Number.isNaN(parsed.getTime())) {
-      return parsed.toLocaleString()
+      return parsed.toLocaleString(languageTag)
     }
     return value
   }

@@ -1,14 +1,12 @@
 "use client"
 
 import {
-  type AdditionalField,
   type AuthClient,
   type AuthConfig,
+  type AuthConfigOptions,
   authQueryKeys,
   createAuthQueryRetryOptions,
-  type DeepPartial,
-  deepmerge,
-  defaultAuthConfig
+  resolveAuthConfig
 } from "@better-auth-ui/core"
 import {
   environmentManager,
@@ -52,8 +50,7 @@ declare module "@better-auth-ui/core" {
 
 export type AuthProviderProps<TAuthClient extends AuthClient = AuthClient> =
   PropsWithChildren<
-    DeepPartial<Omit<AuthConfig, "authClient">> & {
-      authClient: TAuthClient
+    Omit<AuthConfigOptions<TAuthClient>, "navigate"> & {
       navigate: (options: { to: string; replace?: boolean }) => void
       /** TanStack QueryClient to use for your application's queries */
       queryClient?: QueryClient
@@ -78,10 +75,10 @@ export function AuthProvider<TAuthClient extends AuthClient = AuthClient>({
   ...config
 }: AuthProviderProps<TAuthClient>) {
   const { authClient, ...partialConfig } = config
-  const mergedConfig = {
-    ...deepmerge(defaultAuthConfig, partialConfig),
+  const mergedConfig = resolveAuthConfig({
+    ...partialConfig,
     authClient
-  } as AuthConfig<TAuthClient>
+  }) as AuthConfig<TAuthClient>
   const configuredRedirectTo = mergedConfig.redirectTo
 
   Object.defineProperty(mergedConfig, "redirectTo", {
@@ -94,20 +91,6 @@ export function AuthProvider<TAuthClient extends AuthClient = AuthClient>({
           ?.trim()) ||
       configuredRedirectTo
   })
-
-  // Merge plugin-contributed `additionalFields` with user-supplied ones.
-  // Plugin order is preserved; user-supplied entries with the same `name`
-  // override the plugin contribution.
-  const fieldsByName = new Map<string, AdditionalField>()
-  for (const plugin of mergedConfig.plugins ?? []) {
-    for (const field of plugin.additionalFields ?? []) {
-      fieldsByName.set(field.name, field)
-    }
-  }
-  for (const field of mergedConfig.additionalFields ?? []) {
-    fieldsByName.set(field.name, field)
-  }
-  mergedConfig.additionalFields = Array.from(fieldsByName.values())
 
   const contextQueryClient = useContext(QueryClientContext)
   const resolvedQueryClient =

@@ -1,4 +1,8 @@
-import { createAuthPlugin } from "@better-auth-ui/core"
+import {
+  type AuthPluginBase,
+  type AuthPluginLocalizationContext,
+  createAuthPlugin
+} from "@better-auth-ui/core"
 import {
   organizationPlugin as coreOrganizationPlugin,
   type OrganizationLocalization,
@@ -12,6 +16,18 @@ export const organizationPlugin = createAuthPlugin(
   coreOrganizationPlugin.id,
   (options: OrganizationPluginOptions = {}) => {
     const coreOptions = coreOrganizationPlugin(options)
+    const settingsTabs = (localization: OrganizationLocalization) => [
+      {
+        view: "organizations" as const,
+        label: (
+          <>
+            <Briefcase className="text-muted" />
+            {localization.organizations}
+          </>
+        ),
+        component: OrganizationsSettings
+      }
+    ]
 
     return {
       ...coreOptions,
@@ -19,18 +35,16 @@ export const organizationPlugin = createAuthPlugin(
       views: {
         auth: { acceptInvitation: AcceptInvitation }
       },
-      settingsTabs: [
-        {
-          view: "organizations",
-          label: (
-            <>
-              <Briefcase className="text-muted" />
-              {coreOptions.localization.organizations}
-            </>
-          ),
-          component: OrganizationsSettings
-        }
-      ]
+      settingsTabs: settingsTabs(coreOptions.localization),
+      _localizationResolver: (
+        plugin: AuthPluginBase,
+        context: AuthPluginLocalizationContext
+      ) => ({
+        ...(coreOptions._localizationResolver?.(plugin, context) ?? plugin),
+        settingsTabs: settingsTabs(
+          context.localization as OrganizationLocalization
+        )
+      })
     }
   }
 )

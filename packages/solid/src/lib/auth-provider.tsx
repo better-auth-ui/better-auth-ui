@@ -1,19 +1,26 @@
 import {
   type AuthClient,
   type AuthConfig,
+  type AuthConfigOptions,
   authQueryKeys,
-  createAuthQueryRetryOptions,
-  type DeepPartial
+  createAuthQueryRetryOptions
 } from "@better-auth-ui/core"
 import {
   environmentManager,
   QueryClient,
   QueryClientProvider
 } from "@tanstack/solid-query"
-import { type Component, createContext, type JSX, useContext } from "solid-js"
+import {
+  type Component,
+  createContext,
+  createMemo,
+  type JSX,
+  useContext
+} from "solid-js"
 import { resolveAuthConfig } from "./auth-config"
 import { FetchOptionsProvider } from "./fetch-options-provider"
 import { MutationInvalidator } from "./mutation-invalidator"
+import { createReactiveAuthConfig } from "./reactive-auth-config"
 
 declare module "@better-auth-ui/core" {
   /** Custom social provider icons are Solid components that accept a class. */
@@ -39,8 +46,7 @@ const fallbackQueryClient = new QueryClient({
 })
 
 export type AuthProviderProps<TAuthClient extends AuthClient = AuthClient> =
-  DeepPartial<Omit<AuthConfig, "authClient">> & {
-    authClient: TAuthClient
+  AuthConfigOptions<TAuthClient> & {
     children?: JSX.Element | (() => JSX.Element)
     /** TanStack QueryClient to use for your application's queries. */
     queryClient?: QueryClient
@@ -52,19 +58,26 @@ const resolveProviderChildren = (children: AuthProviderProps["children"]) =>
 export function AuthProvider<TAuthClient extends AuthClient = AuthClient>(
   props: AuthProviderProps<TAuthClient>
 ) {
-  const { children, queryClient: qc, ...configInput } = props
-  const config = resolveAuthConfig(configInput)
-  const queryClient = qc || fallbackQueryClient
+  const config = createMemo(() => {
+    const {
+      children: _children,
+      queryClient: _queryClient,
+      ...configInput
+    } = props
+    return resolveAuthConfig(configInput)
+  })
+  const reactiveConfig = createReactiveAuthConfig(config)
+  const queryClient = props.queryClient || fallbackQueryClient
 
   queryClient.setQueryDefaults(authQueryKeys.all, authQueryRetryOptions)
 
   return (
-    <AuthContext.Provider value={config}>
-      <RenderingAuthConfigContext.Provider value={config}>
+    <AuthContext.Provider value={reactiveConfig}>
+      <RenderingAuthConfigContext.Provider value={reactiveConfig}>
         <QueryClientProvider client={queryClient}>
           <FetchOptionsProvider>
             <MutationInvalidator queryClient={queryClient} />
-            {resolveProviderChildren(children)}
+            {resolveProviderChildren(props.children)}
           </FetchOptionsProvider>
         </QueryClientProvider>
       </RenderingAuthConfigContext.Provider>

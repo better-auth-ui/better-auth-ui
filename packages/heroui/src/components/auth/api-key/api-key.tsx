@@ -17,7 +17,7 @@ export type ApiKeyProps = {
 }
 
 export function ApiKey({ apiKey, hideDelete, organizationId }: ApiKeyProps) {
-  const { localization } = useAuth()
+  const { locale, localization } = useAuth()
   const { localization: apiKeyLocalization } = useAuthPlugin(apiKeyPlugin)
   const [deleteOpen, setDeleteOpen] = useState(false)
   const [editOpen, setEditOpen] = useState(false)
@@ -39,7 +39,7 @@ export function ApiKey({ apiKey, hideDelete, organizationId }: ApiKeyProps) {
 
         <span className="text-xs text-muted">
           {apiKeyLocalization.created}{" "}
-          {new Date(apiKey.createdAt).toLocaleString(undefined, {
+          {new Date(apiKey.createdAt).toLocaleString(locale.languageTag, {
             dateStyle: "medium",
             timeStyle: "short"
           })}
@@ -49,7 +49,7 @@ export function ApiKey({ apiKey, hideDelete, organizationId }: ApiKeyProps) {
           {apiKey.expiresAt
             ? `${apiKeyLocalization.expires} ${new Date(
                 apiKey.expiresAt
-              ).toLocaleString(undefined, {
+              ).toLocaleString(locale.languageTag, {
                 dateStyle: "medium",
                 timeStyle: "short"
               })}`
@@ -67,7 +67,7 @@ export function ApiKey({ apiKey, hideDelete, organizationId }: ApiKeyProps) {
         <span className="text-xs text-muted">
           {apiKeyLocalization.lastRequest}:{" "}
           {apiKey.lastRequest
-            ? new Date(apiKey.lastRequest).toLocaleString()
+            ? new Date(apiKey.lastRequest).toLocaleString(locale.languageTag)
             : apiKeyLocalization.neverRequested}
         </span>
       </div>

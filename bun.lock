@@ -482,6 +482,19 @@
         "react-dom": ">=19.2.6",
       },
     },
+    "packages/locales": {
+      "name": "@better-auth-ui/locales",
+      "version": "1.7.6",
+      "devDependencies": {
+        "@better-auth-ui/core": "workspace:*",
+        "vite": "^8.2.1",
+        "vite-plugin-dts": "^5.0.3",
+        "vitest": "^4.1.9",
+      },
+      "peerDependencies": {
+        "@better-auth-ui/core": "*",
+      },
+    },
     "packages/react": {
       "name": "@better-auth-ui/react",
       "version": "1.7.6",
@@ -768,6 +781,8 @@
     "@better-auth-ui/core": ["@better-auth-ui/core@workspace:packages/core"],
 
     "@better-auth-ui/heroui": ["@better-auth-ui/heroui@workspace:packages/heroui"],
+
+    "@better-auth-ui/locales": ["@better-auth-ui/locales@workspace:packages/locales"],
 
     "@better-auth-ui/react": ["@better-auth-ui/react@workspace:packages/react"],
 

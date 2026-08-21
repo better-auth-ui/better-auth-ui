@@ -1,30 +1,15 @@
-import type { AuthClient } from "@better-auth-ui/core"
 import {
+  type AuthClient,
   type AuthConfig,
-  type DeepPartial,
-  deepmerge,
-  defaultAuthConfig
+  type AuthConfigOptions,
+  resolveAuthConfig as resolveCoreAuthConfig
 } from "@better-auth-ui/core"
-import { mergeAdditionalFields, resolveRedirectTo } from "./auth-utils"
+import { resolveRedirectTo } from "./auth-utils"
 
 export function resolveAuthConfig<TAuthClient extends AuthClient>(
-  config: DeepPartial<Omit<AuthConfig, "authClient">> & {
-    authClient: TAuthClient
-  }
+  config: AuthConfigOptions<TAuthClient>
 ): AuthConfig<TAuthClient> {
-  const mergedConfig = deepmerge(defaultAuthConfig, {
-    ...config,
-    viewPaths: {
-      auth: {
-        ...defaultAuthConfig.viewPaths.auth,
-        ...config.viewPaths?.auth
-      },
-      settings: {
-        ...defaultAuthConfig.viewPaths.settings,
-        ...config.viewPaths?.settings
-      }
-    }
-  } as AuthConfig<TAuthClient>)
+  const mergedConfig = resolveCoreAuthConfig(config)
   const configuredRedirectTo = mergedConfig.redirectTo
 
   Object.defineProperty(mergedConfig, "redirectTo", {
@@ -32,10 +17,5 @@ export function resolveAuthConfig<TAuthClient extends AuthClient>(
     enumerable: true,
     get: () => resolveRedirectTo(configuredRedirectTo)
   })
-  mergedConfig.additionalFields = mergeAdditionalFields(
-    mergedConfig.plugins?.flatMap((plugin) => plugin.additionalFields ?? []),
-    mergedConfig.additionalFields
-  )
-
-  return mergedConfig as AuthConfig<TAuthClient>
+  return mergedConfig
 }

@@ -51,15 +51,15 @@ export type BillingSettingsProps = {
   variant?: CardProps["variant"]
 }
 
-const formatPrice = (amount: number, currency: string) => {
+const formatPrice = (amount: number, currency: string, languageTag: string) => {
   const fractionDigits =
-    new Intl.NumberFormat(undefined, {
+    new Intl.NumberFormat(languageTag, {
       style: "currency",
       currency
     }).resolvedOptions().maximumFractionDigits ?? 2
   const divisor = 10 ** fractionDigits
 
-  return new Intl.NumberFormat(undefined, {
+  return new Intl.NumberFormat(languageTag, {
     style: "currency",
     currency,
     maximumFractionDigits: amount % divisor === 0 ? 0 : fractionDigits
@@ -86,6 +86,7 @@ function PlanCard({
   onChoose: (plan: BillingPlan, priceId: string) => void
   variant?: CardProps["variant"]
 }) {
+  const { locale } = useAuth()
   const { localization } = useAuthPlugin(billingPlugin)
   const price = plan.prices.find((entry) => entry.interval === interval)
   if (!price) return null
@@ -117,7 +118,7 @@ function PlanCard({
       <Card.Content className="flex flex-1 flex-col gap-4">
         <div>
           <span className="text-2xl font-semibold tracking-tight">
-            {formatPrice(price.amount, price.currency)}
+            {formatPrice(price.amount, price.currency, locale.languageTag)}
           </span>
           <span className="text-muted ml-1 text-xs">{suffix}</span>
         </div>
@@ -193,6 +194,7 @@ export function BillingSettings({
   className,
   variant
 }: BillingSettingsProps) {
+  const { locale } = useAuth()
   const { localization } = useAuthPlugin(billingPlugin)
   const plans = useBillingPlans(adapter, scope)
   const state = useBillingState(adapter, scope)
@@ -269,7 +271,7 @@ export function BillingSettings({
                     : localization.renewsOn
                   ).replace(
                     "{{date}}",
-                    new Intl.DateTimeFormat(undefined, {
+                    new Intl.DateTimeFormat(locale.languageTag, {
                       dateStyle: "medium"
                     }).format(subscription.currentPeriodEnd)
                   )}

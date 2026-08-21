@@ -1,10 +1,19 @@
 import type { AuthClient } from "../lib/auth-client"
+import {
+  type AuthLocale,
+  defaultAuthLocale,
+  localizeAuthPlugins
+} from "../lib/auth-locale"
 import type { AuthPlugin } from "../lib/auth-plugin"
 import { type BasePaths, basePaths } from "../lib/base-paths"
+import type { DeepPartial } from "../lib/deep-partial"
 import { type Localization, localization } from "../lib/localization"
-import { resizeAvatar } from "../lib/utils"
+import { deepmerge, resizeAvatar } from "../lib/utils"
 import { type ViewPaths, viewPaths } from "../lib/view-paths"
-import type { AdditionalFields } from "./additional-fields-config"
+import type {
+  AdditionalField,
+  AdditionalFields
+} from "./additional-fields-config"
 import type { AvatarConfig } from "./avatar-config"
 import type { EmailAndPasswordConfig } from "./email-and-password-config"
 import type { AuthSocialProvider } from "./social-provider-config"
@@ -53,6 +62,12 @@ export interface AuthConfig<TAuthClient extends AuthClient = AuthClient> {
    * @remarks `Localization`
    */
   localization: Localization
+  /**
+   * Language metadata and translated messages for all auth components.
+   * @remarks `AuthLocale`
+   * @default `defaultAuthLocale`
+   */
+  locale: AuthLocale
   /**
    * Registered auth plugins. UI packages widen the element type via the
    * `AuthPluginRegister` module-augmentation slot.
@@ -125,6 +140,7 @@ export const defaultAuthConfig: Omit<AuthConfig, "authClient"> = {
   socialSignInMode: "redirect",
   viewPaths,
   localization,
+  locale: defaultAuthLocale,
   navigate: ({ to, replace }) => {
     if (replace) {
       window.location.replace(to)
@@ -132,4 +148,45 @@ export const defaultAuthConfig: Omit<AuthConfig, "authClient"> = {
       window.location.href = to
     }
   }
+}
+
+export type AuthConfigOptions<TAuthClient extends AuthClient = AuthClient> =
+  DeepPartial<Omit<AuthConfig<TAuthClient>, "authClient" | "locale">> & {
+    authClient: TAuthClient
+    /** Imported locale bundle. Defaults to English (`en-US`). */
+    locale?: AuthLocale
+  }
+
+/** Resolves defaults, locale messages, plugin messages, and consumer overrides. */
+export function resolveAuthConfig<TAuthClient extends AuthClient = AuthClient>(
+  options: AuthConfigOptions<TAuthClient>
+): AuthConfig<TAuthClient> {
+  const locale = options.locale ?? defaultAuthLocale
+  const resolvedLocalization = deepmerge(
+    deepmerge(localization, locale.localization),
+    options.localization ?? {}
+  )
+  const plugins = localizeAuthPlugins(options.plugins ?? [], locale)
+  const mergedConfig = deepmerge<Omit<AuthConfig<TAuthClient>, "authClient">>(
+    defaultAuthConfig as Omit<AuthConfig<TAuthClient>, "authClient">,
+    {
+      ...options,
+      locale,
+      localization: resolvedLocalization,
+      plugins
+    }
+  )
+
+  const fieldsByName = new Map<string, AdditionalField>()
+  for (const plugin of plugins) {
+    for (const field of plugin.additionalFields ?? []) {
+      fieldsByName.set(field.name, field)
+    }
+  }
+  for (const field of mergedConfig.additionalFields ?? []) {
+    fieldsByName.set(field.name, field)
+  }
+  mergedConfig.additionalFields = Array.from(fieldsByName.values())
+
+  return { ...mergedConfig, authClient: options.authClient }
 }

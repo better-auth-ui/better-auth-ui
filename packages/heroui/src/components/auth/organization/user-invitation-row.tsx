@@ -18,7 +18,7 @@ export type UserInvitationRowProps = {
  * Single invitation row with accept/reject actions for the current user.
  */
 export function UserInvitationRow({ invitation }: UserInvitationRowProps) {
-  const { authClient } = useAuth()
+  const { authClient, locale } = useAuth()
   const { localization: organizationLocalization, roles } =
     useAuthPlugin(organizationPlugin)
 
@@ -44,7 +44,7 @@ export function UserInvitationRow({ invitation }: UserInvitationRowProps) {
         </div>
 
         <span className="truncate text-muted text-xs">
-          {new Date(invitation.createdAt).toLocaleString(undefined, {
+          {new Date(invitation.createdAt).toLocaleString(locale.languageTag, {
             dateStyle: "medium",
             timeStyle: "short"
           })}

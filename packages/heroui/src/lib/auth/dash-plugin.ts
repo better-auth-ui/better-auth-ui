@@ -1,6 +1,11 @@
-import { createAuthPlugin } from "@better-auth-ui/core"
+import {
+  type AuthPluginBase,
+  type AuthPluginLocalizationContext,
+  createAuthPlugin
+} from "@better-auth-ui/core"
 import {
   dashPlugin as coreDashPlugin,
+  type DashLocalization,
   type DashPluginOptions
 } from "@better-auth-ui/core/plugins/dash"
 import { Pulse } from "@gravity-ui/icons"
@@ -22,14 +27,13 @@ export const dashPlugin = createAuthPlugin(
   coreDashPlugin.id,
   (options: DashPluginOptions = {}) => {
     const core = coreDashPlugin(options)
-    return {
-      ...core,
+    const localizedTabs = (localization: DashLocalization) => ({
       ...(core.user
         ? {
             settingsTabs: [
               {
                 view: "activity" as const,
-                label: activityLabel(core.localization.activity),
+                label: activityLabel(localization.activity),
                 component: UserActivity
               }
             ]
@@ -41,12 +45,24 @@ export const dashPlugin = createAuthPlugin(
               {
                 id: "activity",
                 path: core.viewPaths.settings.activity,
-                label: activityLabel(core.localization.activity),
+                label: activityLabel(localization.activity),
                 component: OrganizationActivity
               }
             ]
           }
         : {})
+    })
+
+    return {
+      ...core,
+      ...localizedTabs(core.localization),
+      _localizationResolver: (
+        plugin: AuthPluginBase,
+        context: AuthPluginLocalizationContext
+      ) => ({
+        ...plugin,
+        ...localizedTabs(context.localization as DashLocalization)
+      })
     }
   }
 )

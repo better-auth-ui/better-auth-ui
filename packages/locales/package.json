@@ -1,0 +1,50 @@
+{
+  "name": "@better-auth-ui/locales",
+  "version": "1.7.6",
+  "type": "module",
+  "scripts": {
+    "build": "vite build",
+    "test": "vitest"
+  },
+  "files": [
+    "src",
+    "dist"
+  ],
+  "sideEffects": false,
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "src": "./src/index.ts",
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./en-US": {
+      "src": "./src/en-US.ts",
+      "types": "./dist/en-US.d.ts",
+      "import": "./dist/en-US.js"
+    },
+    "./de-DE": {
+      "src": "./src/de-DE.ts",
+      "types": "./dist/de-DE.d.ts",
+      "import": "./dist/de-DE.js"
+    }
+  },
+  "peerDependencies": {
+    "@better-auth-ui/core": "*"
+  },
+  "devDependencies": {
+    "@better-auth-ui/core": "workspace:*",
+    "vite": "^8.2.1",
+    "vite-plugin-dts": "^5.0.3",
+    "vitest": "^4.1.9"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/better-auth-ui/better-auth-ui",
+    "directory": "packages/locales"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

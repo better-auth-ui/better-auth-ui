@@ -1,3 +1,7 @@
+import type {
+  AuthPluginBase,
+  AuthPluginLocalizationContext
+} from "../../lib/auth-plugin"
 import { createAuthPlugin } from "../../lib/create-auth-plugin"
 // Side-effect import so this file participates in declaration merging on the
 // same module instance that external consumers reach via `@better-auth-ui/core`.
@@ -123,6 +127,13 @@ export const phoneNumberPlugin = createAuthPlugin(
       defaultCountry,
       locale: options.locale,
       localization: { ...phoneNumberLocalization, ...options.localization },
+      _localizationResolver: (
+        plugin: AuthPluginBase,
+        context: AuthPluginLocalizationContext
+      ) => ({
+        ...plugin,
+        locale: options.locale ?? context.languageTag
+      }),
       otpLength: resolveOtpLength(options.otpLength),
       signIn: options.signIn ?? true,
       passwordSignIn: options.passwordSignIn ?? false,

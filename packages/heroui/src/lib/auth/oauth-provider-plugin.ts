@@ -1,6 +1,11 @@
-import { createAuthPlugin } from "@better-auth-ui/core"
+import {
+  type AuthPluginBase,
+  type AuthPluginLocalizationContext,
+  createAuthPlugin
+} from "@better-auth-ui/core"
 import {
   oauthProviderPlugin as coreOAuthProviderPlugin,
+  type OAuthProviderLocalization,
   type OAuthProviderPluginOptions
 } from "@better-auth-ui/core/plugins/oauth-provider"
 import { Code } from "@gravity-ui/icons"
@@ -27,6 +32,31 @@ export const oauthProviderPlugin = createAuthPlugin(
   coreOAuthProviderPlugin.id,
   (options: OAuthProviderPluginOptions = {}) => {
     const core = coreOAuthProviderPlugin(options)
+    const localizedTabs = (localization: OAuthProviderLocalization) => ({
+      ...(core.clientManagement
+        ? {
+            settingsTabs: [
+              {
+                view: "oauthClients" as const,
+                label: clientManagementLabel(localization.oauthClients),
+                component: UserOAuthClients
+              }
+            ]
+          }
+        : {}),
+      ...(core.organizationClientManager
+        ? {
+            organizationTabs: [
+              {
+                id: "oauthClients",
+                path: options.clientManagementPath ?? "oauth-clients",
+                label: clientManagementLabel(localization.oauthClients),
+                component: OrganizationOAuthClients
+              }
+            ]
+          }
+        : {})
+    })
 
     return {
       ...core,
@@ -42,29 +72,14 @@ export const oauthProviderPlugin = createAuthPlugin(
       ...(core.showConnectedApplications
         ? { securityCards: [AuthorizedApplications] }
         : {}),
-      ...(core.clientManagement
-        ? {
-            settingsTabs: [
-              {
-                view: "oauthClients" as const,
-                label: clientManagementLabel(core.localization.oauthClients),
-                component: UserOAuthClients
-              }
-            ]
-          }
-        : {}),
-      ...(core.organizationClientManager
-        ? {
-            organizationTabs: [
-              {
-                id: "oauthClients",
-                path: options.clientManagementPath ?? "oauth-clients",
-                label: clientManagementLabel(core.localization.oauthClients),
-                component: OrganizationOAuthClients
-              }
-            ]
-          }
-        : {})
+      ...localizedTabs(core.localization),
+      _localizationResolver: (
+        plugin: AuthPluginBase,
+        context: AuthPluginLocalizationContext
+      ) => ({
+        ...plugin,
+        ...localizedTabs(context.localization as OAuthProviderLocalization)
+      })
     }
   }
 )

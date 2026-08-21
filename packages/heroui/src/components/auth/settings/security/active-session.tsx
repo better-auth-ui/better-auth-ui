@@ -9,9 +9,9 @@ import { Button, Chip, Spinner, toast } from "@heroui/react"
 import type { Session } from "better-auth"
 import Bowser from "bowser"
 
-function timeAgo(date: Date) {
+function timeAgo(date: Date, languageTag: string) {
   const seconds = Math.floor((Date.now() - date.getTime()) / 1000)
-  const rtf = new Intl.RelativeTimeFormat(undefined, { numeric: "auto" })
+  const rtf = new Intl.RelativeTimeFormat(languageTag, { numeric: "auto" })
 
   const UNITS: [Intl.RelativeTimeFormatUnit, number][] = [
     ["year", 31536000],
@@ -46,7 +46,8 @@ export type ActiveSessionProps = {
  * @returns A JSX element containing the active session row
  */
 export function ActiveSession({ activeSession }: ActiveSessionProps) {
-  const { authClient, basePaths, localization, viewPaths, navigate } = useAuth()
+  const { authClient, basePaths, locale, localization, viewPaths, navigate } =
+    useAuth()
   const { data: session } = useSession(authClient, { refetchOnMount: false })
 
   const { mutate: revokeSession, isPending: isRevoking } = useRevokeSession(
@@ -84,7 +85,7 @@ export function ActiveSession({ activeSession }: ActiveSessionProps) {
         ) : (
           activeSession.createdAt && (
             <span className="text-xs text-muted capitalize">
-              {timeAgo(activeSession.createdAt)}
+              {timeAgo(activeSession.createdAt, locale.languageTag)}
             </span>
           )
         )}

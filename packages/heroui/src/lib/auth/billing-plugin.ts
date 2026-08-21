@@ -1,5 +1,10 @@
-import { createAuthPlugin } from "@better-auth-ui/core"
 import {
+  type AuthPluginBase,
+  type AuthPluginLocalizationContext,
+  createAuthPlugin
+} from "@better-auth-ui/core"
+import {
+  type BillingLocalization,
   type BillingPluginOptions,
   billingPlugin as coreBillingPlugin
 } from "@better-auth-ui/core/plugins/billing"
@@ -23,14 +28,13 @@ export const billingPlugin = createAuthPlugin(
   coreBillingPlugin.id,
   (options: BillingPluginOptions) => {
     const core = coreBillingPlugin(options)
-    return {
-      ...core,
+    const localizedTabs = (localization: BillingLocalization) => ({
       ...(core.user
         ? {
             settingsTabs: [
               {
                 view: "billing" as const,
-                label: billingLabel(core.localization.billing),
+                label: billingLabel(localization.billing),
                 component: UserBillingSettings
               }
             ]
@@ -42,12 +46,24 @@ export const billingPlugin = createAuthPlugin(
               {
                 id: "billing",
                 path: core.viewPaths.settings.billing,
-                label: billingLabel(core.localization.billing),
+                label: billingLabel(localization.billing),
                 component: OrganizationBillingSettings
               }
             ]
           }
         : {})
+    })
+
+    return {
+      ...core,
+      ...localizedTabs(core.localization),
+      _localizationResolver: (
+        plugin: AuthPluginBase,
+        context: AuthPluginLocalizationContext
+      ) => ({
+        ...plugin,
+        ...localizedTabs(context.localization as BillingLocalization)
+      })
     }
   }
 )

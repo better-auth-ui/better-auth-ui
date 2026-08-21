@@ -38,7 +38,7 @@ export function CreateApiKeyDialog({
   onOpenChange,
   organizationId
 }: CreateApiKeyDialogProps) {
-  const { authClient, localization } = useAuth()
+  const { authClient, locale, localization } = useAuth()
   const {
     configurations,
     keyExpiration,
@@ -238,13 +238,13 @@ export function CreateApiKeyDialog({
                             <ListBox.Item
                               id={String(days)}
                               key={days}
-                              textValue={`${days.toLocaleString()} ${
+                              textValue={`${days.toLocaleString(locale.languageTag)} ${
                                 days === 1
                                   ? apiKeyLocalization.day
                                   : apiKeyLocalization.days
                               }`}
                             >
-                              {days.toLocaleString()}{" "}
+                              {days.toLocaleString(locale.languageTag)}{" "}
                               {days === 1
                                 ? apiKeyLocalization.day
                                 : apiKeyLocalization.days}

@@ -29,7 +29,7 @@ export type AuthorizedApplicationProps = {
 export function AuthorizedApplication({
   application
 }: AuthorizedApplicationProps) {
-  const { authClient } = useAuth()
+  const { authClient, locale } = useAuth()
   const { localization, scopeMetadata } = useAuthPlugin(oauthProviderPlugin)
   const [removeOpen, setRemoveOpen] = useState(false)
 
@@ -84,7 +84,7 @@ export function AuthorizedApplication({
           {application.updatedAt ? (
             <span className="text-muted text-xs">
               {`${localization.lastAuthorized} ${application.updatedAt.toLocaleDateString(
-                undefined,
+                locale.languageTag,
                 { dateStyle: "medium" }
               )}`}
             </span>

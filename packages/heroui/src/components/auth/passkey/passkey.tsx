@@ -15,7 +15,7 @@ export type PasskeyProps = {
 }
 
 export function Passkey({ passkey }: PasskeyProps) {
-  const { localization } = useAuth()
+  const { locale, localization } = useAuth()
   const { localization: passkeyLocalization } = useAuthPlugin(passkeyPlugin)
   const [deleteOpen, setDeleteOpen] = useState(false)
   const [renameOpen, setRenameOpen] = useState(false)
@@ -34,7 +34,7 @@ export function Passkey({ passkey }: PasskeyProps) {
         </span>
 
         <span className="text-xs text-muted">
-          {new Date(passkey.createdAt).toLocaleString(undefined, {
+          {new Date(passkey.createdAt).toLocaleString(locale.languageTag, {
             dateStyle: "medium",
             timeStyle: "short"
           })}

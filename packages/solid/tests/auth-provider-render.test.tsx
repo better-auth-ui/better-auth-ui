@@ -1,7 +1,11 @@
 import {
   authQueryKeys,
   basePaths,
-  createAuthPlugin
+  createAuthPlugin,
+  deepmerge,
+  defineAuthLocale,
+  localization,
+  resolveAuthConfig
 } from "@better-auth-ui/core"
 import { QueryClient } from "@tanstack/solid-query"
 import { renderToString } from "solid-js/web"
@@ -14,6 +18,7 @@ import {
   useAuth,
   useAuthPlugin
 } from "../src"
+import { createReactiveAuthConfig } from "../src/lib/reactive-auth-config"
 
 function AuthConsumer() {
   const auth = useAuth()
@@ -21,7 +26,9 @@ function AuthConsumer() {
   return auth.basePaths.auth
 }
 
-const testPlugin = createAuthPlugin("test", (label: string) => ({ label }))
+const testPlugin = createAuthPlugin("test", (label: string) => ({
+  localization: { label }
+}))
 
 describe("Solid AuthProvider render context", () => {
   it("disables auth query retries during server rendering", () => {
@@ -69,7 +76,7 @@ describe("Solid AuthProvider render context", () => {
     ).toContain(basePaths.auth)
   })
 
-  it("returns the registered plugin from the provider context", () => {
+  it("returns the registered plugin configuration from provider context", () => {
     const authClient = { getSession: vi.fn() }
     const registeredPlugin = testPlugin("Registered plugin")
     let resolvedPlugin: typeof registeredPlugin | undefined
@@ -88,7 +95,7 @@ describe("Solid AuthProvider render context", () => {
       </AuthProvider>
     ))
 
-    expect(resolvedPlugin).toBe(registeredPlugin)
+    expect(resolvedPlugin).toMatchObject(registeredPlugin)
   })
 
   it("renders internal links through the configured router adapter", () => {
@@ -107,5 +114,36 @@ describe("Solid AuthProvider render context", () => {
     ))
 
     expect(receivedHref).toBe("/login/sign-in")
+  })
+
+  it("keeps destructured locale values current when the config changes", () => {
+    const germanLocale = defineAuthLocale({
+      languageTag: "de-DE",
+      localization: deepmerge(localization, {
+        auth: { signIn: "Anmelden" }
+      }),
+      plugins: { test: { label: "Erweiterung" } }
+    })
+    const plugin = testPlugin("Plugin")
+    let config = resolveAuthConfig({ authClient: {}, plugins: [plugin] })
+    const reactiveConfig = createReactiveAuthConfig(() => config)
+    const destructuredLocalization = reactiveConfig.localization
+    const destructuredLocale = reactiveConfig.locale
+    const destructuredPlugin = reactiveConfig.plugins[0]
+    const destructuredPluginLocalization = destructuredPlugin?.localization
+
+    expect(destructuredLocalization.auth.signIn).toBe("Sign In")
+    expect(destructuredLocale).toBeDefined()
+    expect(destructuredPluginLocalization?.label).toBe("Plugin")
+
+    config = resolveAuthConfig({
+      authClient: {},
+      locale: germanLocale,
+      plugins: [plugin]
+    })
+
+    expect(destructuredLocalization.auth.signIn).toBe("Anmelden")
+    expect(destructuredLocale.languageTag).toBe("de-DE")
+    expect(destructuredPluginLocalization?.label).toBe("Erweiterung")
   })
 })

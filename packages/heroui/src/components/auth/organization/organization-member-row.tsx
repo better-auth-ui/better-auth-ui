@@ -33,7 +33,7 @@ export function OrganizationMemberRow({
   isOwner,
   organization
 }: OrganizationMemberRowProps) {
-  const { authClient } = useAuth()
+  const { authClient, locale } = useAuth()
   const {
     modelFields: { member: memberFields },
     dynamicAccessControl,
@@ -91,7 +91,8 @@ export function OrganizationMemberRow({
           <UserView user={member.user} />
           {memberFields.map((field) => {
             const value = formatAdditionalFieldValue(
-              (member as unknown as Record<string, unknown>)[field.name]
+              (member as unknown as Record<string, unknown>)[field.name],
+              locale.languageTag
             )
             return value ? (
               <span className="text-muted text-xs" key={field.name}>

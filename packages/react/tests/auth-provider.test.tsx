@@ -1,4 +1,9 @@
-import { authQueryKeys } from "@better-auth-ui/core"
+import {
+  authQueryKeys,
+  deepmerge,
+  defineAuthLocale,
+  localization
+} from "@better-auth-ui/core"
 import {
   QueryClient,
   QueryClientProvider,
@@ -10,7 +15,8 @@ import { describe, expect, it, vi } from "vitest"
 
 import {
   AuthProvider,
-  type AuthProviderProps
+  type AuthProviderProps,
+  useAuth
 } from "../src/components/auth/auth-provider"
 
 const retryQueryKey = [...authQueryKeys.all, "retry-test"] as const
@@ -87,4 +93,47 @@ describe("AuthProvider query defaults", () => {
       expect(queryFn).toHaveBeenCalledTimes(4)
     }
   )
+})
+
+describe("AuthProvider locale changes", () => {
+  const germanLocale = defineAuthLocale({
+    languageTag: "de-DE",
+    localization: deepmerge(localization, {
+      auth: { signIn: "Anmelden" }
+    })
+  })
+
+  it("updates context when the locale prop changes", () => {
+    let signInLabel: string | undefined
+    let languageTag: string | undefined
+
+    function LocaleConsumer() {
+      const auth = useAuth()
+      signInLabel = auth.localization.auth.signIn
+      languageTag = auth.locale.languageTag
+      return null
+    }
+
+    const view = render(
+      <AuthProvider authClient={authClient} navigate={() => {}}>
+        <LocaleConsumer />
+      </AuthProvider>
+    )
+
+    expect(signInLabel).toBe("Sign In")
+    expect(languageTag).toBe("en-US")
+
+    view.rerender(
+      <AuthProvider
+        authClient={authClient}
+        locale={germanLocale}
+        navigate={() => {}}
+      >
+        <LocaleConsumer />
+      </AuthProvider>
+    )
+
+    expect(signInLabel).toBe("Anmelden")
+    expect(languageTag).toBe("de-DE")
+  })
 })

@@ -24,7 +24,7 @@ export type OrganizationInvitationTableRowProps = {
 export function OrganizationInvitationTableRow({
   invitation
 }: OrganizationInvitationTableRowProps) {
-  const { authClient } = useAuth()
+  const { authClient, locale } = useAuth()
   const {
     modelFields: { invitation: invitationFields },
     localization: organizationLocalization,
@@ -81,7 +81,8 @@ export function OrganizationInvitationTableRow({
           <span className="font-medium text-sm">{invitation.email}</span>
           {invitationFields.map((field) => {
             const value = formatAdditionalFieldValue(
-              (invitation as unknown as Record<string, unknown>)[field.name]
+              (invitation as unknown as Record<string, unknown>)[field.name],
+              locale.languageTag
             )
             return value ? (
               <span className="text-muted text-xs" key={field.name}>
@@ -93,7 +94,7 @@ export function OrganizationInvitationTableRow({
       </Table.Cell>
 
       <Table.Cell className="text-muted text-xs tabular-nums whitespace-nowrap">
-        {new Date(invitation.createdAt).toLocaleString(undefined, {
+        {new Date(invitation.createdAt).toLocaleString(locale.languageTag, {
           dateStyle: "short",
           timeStyle: "short"
         })}

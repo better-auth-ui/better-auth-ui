@@ -8,6 +8,59 @@ description: Provides AuthConfig to descendant components.
 ```tsx file=<rootDir>/../../examples/start-shadcn-example/src/components/providers.tsx
 ```
 
+## Localization
+
+Install the locale package:
+
+```bash
+bun add @better-auth-ui/locales
+```
+
+Import one locale and pass it to `AuthProvider`:
+
+```tsx title="components/providers.tsx"
+import { deDE } from "@better-auth-ui/locales/de-DE"
+
+<AuthProvider authClient={authClient} locale={deDE} navigate={navigate}>
+  {children}
+</AuthProvider>
+```
+
+Locale bundles include the core messages and all built-in plugin messages.
+
+Use `localization` for product-specific text. These values take priority over the selected locale:
+
+```tsx
+<AuthProvider
+  authClient={authClient}
+  locale={deDE}
+  localization={{ auth: { signIn: "Bei Acme anmelden" } }}
+  navigate={navigate}
+>
+  {children}
+</AuthProvider>
+```
+
+### Match the browser language
+
+In a client-only application, import the supported locales and match `navigator.languages` against that list:
+
+```tsx
+import { matchAuthLocale } from "@better-auth-ui/locales"
+import { deDE } from "@better-auth-ui/locales/de-DE"
+import { enUS } from "@better-auth-ui/locales/en-US"
+
+const locale = matchAuthLocale({
+  requested: navigator.languages,
+  supported: [enUS, deDE],
+  fallback: enUS
+})
+```
+
+For server rendering, resolve the same locale from a user preference or the `Accept-Language` header. Pass that locale during the first render to prevent a hydration mismatch.
+
+Changing the `locale` prop updates mounted auth components. Email components do not read `AuthProvider`; pass their localization on the server.
+
 ## Custom and Generic OAuth providers
 
 Built-in providers use their Better Auth ID as a string. For a custom or Generic OAuth provider, pass its ID, visible label, and optional icon.

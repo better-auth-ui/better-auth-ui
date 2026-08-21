@@ -1,5 +1,16 @@
 import type { AdditionalFields } from "../config/additional-fields-config"
 
+export type AuthPluginLocalizationContext = {
+  direction: "ltr" | "rtl"
+  languageTag: string
+  localization: Record<string, unknown>
+}
+
+export type AuthPluginLocalizationResolver = (
+  plugin: AuthPluginBase,
+  context: AuthPluginLocalizationContext
+) => AuthPluginBase
+
 /**
  * View-path contributions kept on the plugin object.
  *
@@ -27,6 +38,10 @@ export interface AuthPluginBase {
   id: string
   /** Localization defaults contributed by the plugin. */
   localization?: Record<string, unknown>
+  /** @internal Consumer overrides retained so they win over locale messages. */
+  _localizationOverrides?: Record<string, unknown>
+  /** @internal Recomputes values derived from localization. */
+  _localizationResolver?: AuthPluginLocalizationResolver
   /**
    * View-path segments the plugin contributes. Read by host components
    * (e.g. `<Auth>`, `MagicLinkButton`) via `useAuthPlugin(plugin).viewPaths`.

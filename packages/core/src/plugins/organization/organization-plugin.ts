@@ -1,6 +1,10 @@
 import { defaultAuthConfig } from "../../config"
 import type { AdditionalFields } from "../../config/additional-fields-config"
 import type { AvatarConfig } from "../../config/avatar-config"
+import type {
+  AuthPluginBase,
+  AuthPluginLocalizationContext
+} from "../../lib/auth-plugin"
 import { createAuthPlugin } from "../../lib/create-auth-plugin"
 import {
   type OrganizationLocalization,
@@ -186,6 +190,24 @@ export const organizationPlugin = createAuthPlugin(
           member: localization.member
         }),
         ...options.additionalRoles
+      },
+      _localizationResolver: (
+        plugin: AuthPluginBase,
+        context: AuthPluginLocalizationContext
+      ) => {
+        const messages = context.localization as OrganizationLocalization
+
+        return {
+          ...plugin,
+          roles: {
+            ...(options.roles ?? {
+              owner: messages.owner,
+              admin: messages.admin,
+              member: messages.member
+            }),
+            ...options.additionalRoles
+          }
+        }
       },
       additionalFields:
         options.modelFields?.organization ?? options.additionalFields ?? [],

@@ -1,3 +1,7 @@
+import type {
+  AuthPluginBase,
+  AuthPluginLocalizationContext
+} from "../../lib/auth-plugin"
 import { createAuthPlugin } from "../../lib/create-auth-plugin"
 import {
   type UsernameLocalization,
@@ -42,35 +46,46 @@ export const usernamePlugin = createAuthPlugin(
     const maxUsernameLength = options.maxUsernameLength ?? 30
     const localization = { ...usernameLocalization, ...options.localization }
 
+    const createAdditionalFields = (messages: UsernameLocalization) => [
+      {
+        name: "username",
+        type: "string" as const,
+        label: messages.username,
+        placeholder: messages.usernamePlaceholder,
+        inputType: "input" as const,
+        signUp: "above" as const,
+        required: true
+      },
+      ...(options.displayUsername
+        ? [
+            {
+              name: "displayUsername",
+              type: "string" as const,
+              label: messages.displayUsername,
+              placeholder: messages.displayUsernamePlaceholder,
+              inputType: "input" as const,
+              signUp: "above" as const
+            }
+          ]
+        : [])
+    ]
+
     return {
       ...options,
       minUsernameLength,
       maxUsernameLength,
       usernamePrefix: options.usernamePrefix ?? "",
       localization,
-      additionalFields: [
-        {
-          name: "username",
-          type: "string" as const,
-          label: localization.username,
-          placeholder: localization.usernamePlaceholder,
-          inputType: "input" as const,
-          signUp: "above" as const,
-          required: true
-        },
-        ...(options.displayUsername
-          ? [
-              {
-                name: "displayUsername",
-                type: "string" as const,
-                label: localization.displayUsername,
-                placeholder: localization.displayUsernamePlaceholder,
-                inputType: "input" as const,
-                signUp: "above" as const
-              }
-            ]
-          : [])
-      ]
+      additionalFields: createAdditionalFields(localization),
+      _localizationResolver: (
+        plugin: AuthPluginBase,
+        context: AuthPluginLocalizationContext
+      ) => ({
+        ...plugin,
+        additionalFields: createAdditionalFields(
+          context.localization as UsernameLocalization
+        )
+      })
     }
   }
 )
