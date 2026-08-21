@@ -1,11 +1,14 @@
 import { beforeEach, describe, expect, it, vi } from "vitest"
 import {
   getSsoFallbackEmail,
+  registerSsoProviderOptions,
+  requestSsoDomainVerificationOptions,
   setSsoFallbackEmail,
   signInSsoOptions,
   ssoLocalization,
   ssoMutationKeys,
-  ssoPlugin
+  ssoPlugin,
+  verifySsoDomainOptions
 } from "../src/plugins/sso"
 
 describe("ssoPlugin", () => {
@@ -59,6 +62,68 @@ describe("ssoPlugin", () => {
       }
     })
     expect(mutation.mutationKey).toEqual(ssoMutationKeys.signIn)
+  })
+
+  it("registers providers with throw-enabled fetch options", async () => {
+    const register = vi.fn(async () => ({ data: {}, error: null }))
+    const mutation = registerSsoProviderOptions({ sso: { register } } as never)
+    const variables = {
+      providerId: "acme",
+      issuer: "https://idp.example.com",
+      domain: "example.com",
+      oidcConfig: { clientId: "client-id", clientSecret: "secret" },
+      fetchOptions: { headers: { "x-request-id": "request-1" } }
+    }
+
+    await mutation.mutationFn?.(variables as never)
+
+    expect(register).toHaveBeenCalledWith({
+      ...variables,
+      fetchOptions: {
+        ...variables.fetchOptions,
+        throw: true
+      }
+    })
+    expect(mutation.mutationKey).toEqual(ssoMutationKeys.register)
+  })
+
+  it("manages domain verification with distinct mutations", async () => {
+    const requestDomainVerification = vi.fn(async () => ({
+      data: { domainVerificationToken: "token" },
+      error: null
+    }))
+    const verifyDomain = vi.fn(async () => ({ data: undefined, error: null }))
+    const authClient = {
+      sso: { requestDomainVerification, verifyDomain }
+    } as never
+    const request = requestSsoDomainVerificationOptions(authClient)
+    const verify = verifySsoDomainOptions(authClient)
+    const variables = {
+      providerId: "acme",
+      fetchOptions: { headers: { "x-request-id": "request-1" } }
+    }
+
+    await request.mutationFn?.(variables as never)
+    await verify.mutationFn?.(variables as never)
+
+    expect(requestDomainVerification).toHaveBeenCalledWith({
+      ...variables,
+      fetchOptions: {
+        ...variables.fetchOptions,
+        throw: true
+      }
+    })
+    expect(verifyDomain).toHaveBeenCalledWith({
+      ...variables,
+      fetchOptions: {
+        ...variables.fetchOptions,
+        throw: true
+      }
+    })
+    expect(request.mutationKey).toEqual(
+      ssoMutationKeys.requestDomainVerification
+    )
+    expect(verify.mutationKey).toEqual(ssoMutationKeys.verifyDomain)
   })
 
   it("carries the discovered email into fallback views", () => {
