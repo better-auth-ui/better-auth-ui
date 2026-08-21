@@ -3,18 +3,38 @@ import {
   type AdminListUsersParams,
   adminPlugin
 } from "@better-auth-ui/core/plugins/admin"
-import { useAuth } from "@better-auth-ui/solid"
+import { useAuth, useSession } from "@better-auth-ui/solid"
 import {
   useAdminPermission,
   useAdminUser,
   useAdminUserSessions,
-  useAdminUsers
+  useAdminUsers,
+  useBanAdminUser,
+  useCreateAdminUser,
+  useImpersonateAdminUser,
+  useRemoveAdminUser,
+  useRevokeAdminUserSession,
+  useRevokeAdminUserSessions,
+  useSetAdminUserPassword,
+  useSetAdminUserRole,
+  useUnbanAdminUser,
+  useUpdateAdminUser
 } from "@better-auth-ui/solid/plugins/admin"
 import { createDebounce } from "@solid-primitives/debounce"
-import { Search } from "lucide-solid"
-import { createMemo, createSignal, For, Show } from "solid-js"
+import { Ban, KeyRound, LogIn, Search, Trash2, UserPlus } from "lucide-solid"
+import { createEffect, createMemo, createSignal, For, Show } from "solid-js"
 import { Dynamic } from "solid-js/web"
 
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle
+} from "@/components/ui/alert-dialog"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import {
@@ -31,6 +51,8 @@ import {
   EmptyHeader,
   EmptyTitle
 } from "@/components/ui/empty"
+import { Field, FieldError, FieldLabel } from "@/components/ui/field"
+import { Input } from "@/components/ui/input"
 import {
   InputGroup,
   InputGroupAddon,
@@ -56,6 +78,8 @@ export type AdminUsersProps = {
   selectedUserId?: string
 }
 
+type DangerousAction = "ban" | "delete" | "impersonate" | "revokeAll"
+
 const skeletonIds = ["solid-admin-1", "solid-admin-2", "solid-admin-3"]
 
 const formatDate = (value: Date | string | undefined | null) =>
@@ -64,6 +88,10 @@ const formatDate = (value: Date | string | undefined | null) =>
         new Date(value)
       )
     : "–"
+
+const asAdminRole = (role: string) => role as "user" | "admin"
+
+const getAdminErrorMessage = (error: Error | null) => error?.message
 
 /** Zaidan presentation for the static Admin users view. */
 export function AdminUsers(props: AdminUsersProps) {
@@ -82,6 +110,10 @@ export function AdminUsers(props: AdminUsersProps) {
   const selectedUserId = () =>
     props.onSelectedUserIdChange ? props.selectedUserId : localSelectedUserId()
   const permission = useAdminPermission(authClient, () => ({ user: ["list"] }))
+  const createPermission = useAdminPermission(authClient, () => ({
+    user: ["create"]
+  }))
+  const [createOpen, setCreateOpen] = createSignal(false)
   const params = createMemo<AdminListUsersParams>(() => ({
     limit: config().pageSize,
     offset: page() * config().pageSize,
@@ -104,11 +136,19 @@ export function AdminUsers(props: AdminUsersProps) {
 
   return (
     <section class={cn("flex flex-col gap-4", props.class)}>
-      <header class="flex flex-col gap-1">
-        <h1 class="text-xl font-semibold">{config().localization.users}</h1>
-        <p class="text-sm text-muted-foreground">
-          {config().localization.usersDescription}
-        </p>
+      <header class="flex items-end justify-between gap-3">
+        <div class="flex flex-col gap-1">
+          <h1 class="text-xl font-semibold">{config().localization.users}</h1>
+          <p class="text-sm text-muted-foreground">
+            {config().localization.usersDescription}
+          </p>
+        </div>
+        <Show when={createPermission.data?.success}>
+          <Button onClick={() => setCreateOpen(true)}>
+            <UserPlus />
+            {config().localization.createUser}
+          </Button>
+        </Show>
       </header>
 
       <div class="flex flex-col gap-2 sm:flex-row">
@@ -299,6 +339,7 @@ export function AdminUsers(props: AdminUsersProps) {
         onOpenChange={(open) => !open && selectUser(undefined)}
         userId={selectedUserId}
       />
+      <CreateUserDialog open={createOpen()} onOpenChange={setCreateOpen} />
     </section>
   )
 }
@@ -317,6 +358,111 @@ function SessionRowsSkeleton() {
     <For each={skeletonIds}>
       {(id) => <Skeleton class="h-20 w-full" data-id={`session-${id}`} />}
     </For>
+  )
+}
+
+function CreateUserDialog(props: {
+  open: boolean
+  onOpenChange: (open: boolean) => void
+}) {
+  const auth = useAuth()
+  const authClient = auth.authClient as AdminAuthClient
+  const config = () =>
+    (auth.plugins.find((plugin) => plugin.id === adminPlugin.id) ??
+      adminPlugin()) as ReturnType<typeof adminPlugin>
+  const createUser = useCreateAdminUser(authClient)
+
+  const close = () => {
+    createUser.reset()
+    props.onOpenChange(false)
+  }
+  const submit = (event: SubmitEvent) => {
+    event.preventDefault()
+    const data = new FormData(event.currentTarget as HTMLFormElement)
+    createUser.mutate(
+      {
+        email: String(data.get("email")),
+        name: String(data.get("name")),
+        password: String(data.get("password")),
+        role: asAdminRole(String(data.get("role") || config().defaultRole))
+      },
+      { onSuccess: close }
+    )
+  }
+
+  return (
+    <Dialog
+      open={props.open}
+      onOpenChange={(open) => (open ? props.onOpenChange(true) : close())}
+    >
+      <DialogContent>
+        <form class="flex flex-col gap-4" onSubmit={submit}>
+          <DialogHeader>
+            <DialogTitle>{config().localization.createUser}</DialogTitle>
+            <DialogDescription>
+              {config().localization.usersDescription}
+            </DialogDescription>
+          </DialogHeader>
+          <Field>
+            <FieldLabel for="solid-admin-create-name">
+              {config().localization.name}
+            </FieldLabel>
+            <Input id="solid-admin-create-name" name="name" required />
+          </Field>
+          <Field>
+            <FieldLabel for="solid-admin-create-email">
+              {config().localization.email}
+            </FieldLabel>
+            <Input
+              autocomplete="off"
+              id="solid-admin-create-email"
+              name="email"
+              required
+              type="email"
+            />
+          </Field>
+          <Field>
+            <FieldLabel for="solid-admin-create-password">
+              {config().localization.password}
+            </FieldLabel>
+            <Input
+              autocomplete="new-password"
+              id="solid-admin-create-password"
+              name="password"
+              required
+              type="password"
+            />
+          </Field>
+          <Field>
+            <FieldLabel for="solid-admin-create-role">
+              {config().localization.role}
+            </FieldLabel>
+            <select
+              class="h-8 rounded-lg border bg-transparent px-2 text-sm"
+              id="solid-admin-create-role"
+              name="role"
+            >
+              <For each={config().roles}>
+                {(role) => (
+                  <option selected={role === config().defaultRole} value={role}>
+                    {role}
+                  </option>
+                )}
+              </For>
+            </select>
+          </Field>
+          <FieldError>{getAdminErrorMessage(createUser.error)}</FieldError>
+          <DialogFooter>
+            <Button onClick={close} type="button" variant="outline">
+              {config().localization.cancel}
+            </Button>
+            <Button disabled={createUser.isPending} type="submit">
+              {config().localization.createUser}
+            </Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
   )
 }
 
@@ -339,93 +485,357 @@ function UserDialog(props: {
     )
   )
   const user = useAdminUser(authClient, props.userId)
-  const sessionsPermission = useAdminPermission(authClient, () => ({
-    session: ["list"]
-  }))
+  const actor = useSession(authClient)
+  const enabled = () => ({ enabled: Boolean(props.userId()) })
+  const sessionsPermission = useAdminPermission(
+    authClient,
+    () => ({ session: ["list"] }),
+    enabled
+  )
   const sessions = useAdminUserSessions(authClient, props.userId, () => ({
     enabled: sessionsPermission.data?.success === true
   }))
+  const canUpdate = useAdminPermission(
+    authClient,
+    () => ({ user: ["update"] }),
+    enabled
+  )
+  const canSetRole = useAdminPermission(
+    authClient,
+    () => ({ user: ["set-role"] }),
+    enabled
+  )
+  const canSetPassword = useAdminPermission(
+    authClient,
+    () => ({ user: ["set-password"] }),
+    enabled
+  )
+  const canBan = useAdminPermission(
+    authClient,
+    () => ({ user: ["ban"] }),
+    enabled
+  )
+  const canImpersonate = useAdminPermission(
+    authClient,
+    () => ({ user: ["impersonate"] }),
+    enabled
+  )
+  const canDelete = useAdminPermission(
+    authClient,
+    () => ({ user: ["delete"] }),
+    enabled
+  )
+  const canRevoke = useAdminPermission(
+    authClient,
+    () => ({ session: ["revoke"] }),
+    enabled
+  )
+  const [name, setName] = createSignal("")
+  const [role, setRole] = createSignal(config().defaultRole)
+  const [passwordOpen, setPasswordOpen] = createSignal(false)
+  const [dangerousAction, setDangerousAction] = createSignal<DangerousAction>()
+  const detail = () => user.data
+  const isSelf = () => detail()?.id === actor.data?.user.id
+  const updateUser = useUpdateAdminUser(authClient)
+  const setRoleMutation = useSetAdminUserRole(authClient)
+  const ban = useBanAdminUser(authClient)
+  const unban = useUnbanAdminUser(authClient)
+  const impersonate = useImpersonateAdminUser(authClient)
+  const remove = useRemoveAdminUser(authClient)
+  const revokeSession = useRevokeAdminUserSession(authClient, props.userId)
+  const revokeSessions = useRevokeAdminUserSessions(authClient, props.userId)
+
+  createEffect(() => {
+    setName(detail()?.name ?? "")
+    setRole(detail()?.role ?? config().defaultRole)
+  })
+
+  const confirmDangerousAction = () => {
+    const selectedUser = detail()
+    if (!selectedUser) return
+    if (dangerousAction() === "ban")
+      ban.mutate(
+        { userId: selectedUser.id },
+        { onSuccess: () => setDangerousAction(undefined) }
+      )
+    if (dangerousAction() === "delete")
+      remove.mutate(
+        { userId: selectedUser.id },
+        {
+          onSuccess: () => {
+            setDangerousAction(undefined)
+            props.onOpenChange(false)
+          }
+        }
+      )
+    if (dangerousAction() === "revokeAll")
+      revokeSessions.mutate(
+        { userId: selectedUser.id },
+        { onSuccess: () => setDangerousAction(undefined) }
+      )
+    if (dangerousAction() === "impersonate")
+      impersonate.mutate(
+        { userId: selectedUser.id },
+        {
+          onSuccess: () => {
+            setDangerousAction(undefined)
+            const redirectTo = config().impersonationRedirectTo
+            if (redirectTo) auth.navigate({ to: redirectTo })
+          }
+        }
+      )
+  }
+  const closeDangerousAction = () => {
+    ban.reset()
+    remove.reset()
+    revokeSessions.reset()
+    impersonate.reset()
+    setDangerousAction(undefined)
+  }
+  const dangerousMutation = () =>
+    dangerousAction() === "ban"
+      ? ban
+      : dangerousAction() === "delete"
+        ? remove
+        : dangerousAction() === "revokeAll"
+          ? revokeSessions
+          : impersonate
+  const dangerousLabel = () =>
+    dangerousAction() === "ban"
+      ? config().localization.banUser
+      : dangerousAction() === "delete"
+        ? config().localization.deleteUser
+        : dangerousAction() === "revokeAll"
+          ? config().localization.revokeAllSessions
+          : config().localization.impersonateUser
 
   return (
-    <Dialog open={props.open} onOpenChange={props.onOpenChange}>
-      <DialogContent class="max-h-[90vh] max-w-lg overflow-y-auto rounded-xl border bg-popover p-4">
-        <DialogHeader>
-          <DialogTitle>{config().localization.userDetails}</DialogTitle>
-          <DialogDescription>
-            {user.data?.email ?? config().localization.usersDescription}
-          </DialogDescription>
-        </DialogHeader>
-        <Show
-          fallback={
-            <AdminMessage
-              title={config().localization.loadUsersError}
-              description={config().localization.loadUsersErrorDescription}
-            />
-          }
-          when={!user.isError}
-        >
+    <>
+      <Dialog open={props.open} onOpenChange={props.onOpenChange}>
+        <DialogContent class="max-h-[90vh] max-w-lg overflow-y-auto rounded-xl border bg-popover p-4">
+          <DialogHeader>
+            <DialogTitle>{config().localization.userDetails}</DialogTitle>
+            <DialogDescription>
+              {detail()?.email ?? config().localization.usersDescription}
+            </DialogDescription>
+          </DialogHeader>
           <Show
-            fallback={<Skeleton class="mt-4 h-40 w-full" />}
-            when={user.data}
+            fallback={
+              <AdminMessage
+                title={config().localization.loadUsersError}
+                description={config().localization.loadUsersErrorDescription}
+              />
+            }
+            when={!user.isError}
           >
-            {(detail) => (
-              <Tabs class="mt-4" defaultValue="overview">
-                <TabsList>
-                  <TabsTrigger value="overview">
-                    {config().localization.overview}
-                  </TabsTrigger>
-                  <TabsTrigger value="sessions">
-                    {config().localization.sessions}
-                  </TabsTrigger>
-                  <For each={contributedTabs()}>
-                    {(tab) => (
-                      <TabsTrigger value={tab.value}>
-                        <Dynamic component={tab.label} />
-                      </TabsTrigger>
-                    )}
-                  </For>
-                </TabsList>
-                <TabsContent class="flex flex-col gap-4 pt-4" value="overview">
-                  <div class="flex items-center gap-3">
-                    <UserAvatar class="size-12" user={detail()} />
-                    <div>
-                      <div class="font-medium">{detail().name}</div>
-                      <div class="text-sm text-muted-foreground">
-                        {detail().email}
+            <Show
+              fallback={<Skeleton class="mt-4 h-40 w-full" />}
+              when={detail()}
+            >
+              {(selectedUser) => (
+                <Tabs class="mt-4" defaultValue="overview">
+                  <TabsList>
+                    <TabsTrigger value="overview">
+                      {config().localization.overview}
+                    </TabsTrigger>
+                    <TabsTrigger value="sessions">
+                      {config().localization.sessions}
+                    </TabsTrigger>
+                    <For each={contributedTabs()}>
+                      {(tab) => (
+                        <TabsTrigger value={tab.value}>
+                          <Dynamic component={tab.label} />
+                        </TabsTrigger>
+                      )}
+                    </For>
+                  </TabsList>
+                  <TabsContent
+                    class="flex flex-col gap-6 pt-4"
+                    value="overview"
+                  >
+                    <div class="flex items-center gap-3">
+                      <UserAvatar class="size-12" user={selectedUser()} />
+                      <div>
+                        <div class="font-medium">{selectedUser().name}</div>
+                        <div class="text-sm text-muted-foreground">
+                          {selectedUser().email}
+                        </div>
                       </div>
                     </div>
-                  </div>
-                  <dl class="grid grid-cols-[auto_1fr] gap-3 text-sm">
-                    <dt class="text-muted-foreground">
-                      {config().localization.userId}
-                    </dt>
-                    <dd class="font-mono text-xs">{detail().id}</dd>
-                    <dt class="text-muted-foreground">
-                      {config().localization.role}
-                    </dt>
-                    <dd>{detail().role ?? config().defaultRole}</dd>
-                    <dt class="text-muted-foreground">
-                      {config().localization.created}
-                    </dt>
-                    <dd>{formatDate(detail().createdAt)}</dd>
-                  </dl>
-                </TabsContent>
-                <TabsContent class="flex flex-col gap-2 pt-4" value="sessions">
-                  <Show
-                    fallback={<SessionRowsSkeleton />}
-                    when={!sessionsPermission.isPending}
+                    <dl class="grid grid-cols-[auto_1fr] gap-3 text-sm">
+                      <dt class="text-muted-foreground">
+                        {config().localization.userId}
+                      </dt>
+                      <dd class="font-mono text-xs">{selectedUser().id}</dd>
+                      <dt class="text-muted-foreground">
+                        {config().localization.created}
+                      </dt>
+                      <dd>{formatDate(selectedUser().createdAt)}</dd>
+                      <dt class="text-muted-foreground">
+                        {config().localization.status}
+                      </dt>
+                      <dd>
+                        <Badge
+                          variant={
+                            selectedUser().banned ? "destructive" : "secondary"
+                          }
+                        >
+                          {selectedUser().banned
+                            ? config().localization.banned
+                            : config().localization.active}
+                        </Badge>
+                      </dd>
+                    </dl>
+                    <form
+                      class="flex items-end gap-2"
+                      onSubmit={(event) => {
+                        event.preventDefault()
+                        updateUser.mutate({
+                          userId: selectedUser().id,
+                          data: { name: name().trim() }
+                        })
+                      }}
+                    >
+                      <Field class="flex-1">
+                        <FieldLabel for="solid-admin-user-name">
+                          {config().localization.name}
+                        </FieldLabel>
+                        <Input
+                          id="solid-admin-user-name"
+                          value={name()}
+                          onInput={(event) =>
+                            setName(event.currentTarget.value)
+                          }
+                        />
+                        <FieldError>
+                          {getAdminErrorMessage(updateUser.error)}
+                        </FieldError>
+                      </Field>
+                      <Button
+                        disabled={
+                          !name().trim() ||
+                          name() === selectedUser().name ||
+                          updateUser.isPending ||
+                          canUpdate.isPending ||
+                          !canUpdate.data?.success
+                        }
+                        type="submit"
+                        variant="outline"
+                      >
+                        {config().localization.saveUser}
+                      </Button>
+                    </form>
+                    <div class="flex items-end gap-2">
+                      <Field class="flex-1">
+                        <FieldLabel for="solid-admin-user-role">
+                          {config().localization.role}
+                        </FieldLabel>
+                        <select
+                          class="h-8 rounded-lg border bg-transparent px-2 text-sm"
+                          id="solid-admin-user-role"
+                          value={role()}
+                          onChange={(event) =>
+                            setRole(event.currentTarget.value)
+                          }
+                        >
+                          <For each={config().roles}>
+                            {(item) => <option value={item}>{item}</option>}
+                          </For>
+                        </select>
+                      </Field>
+                      <Button
+                        disabled={
+                          setRoleMutation.isPending ||
+                          canSetRole.isPending ||
+                          !canSetRole.data?.success ||
+                          isSelf()
+                        }
+                        variant="outline"
+                        onClick={() =>
+                          setRoleMutation.mutate({
+                            userId: selectedUser().id,
+                            role: asAdminRole(role())
+                          })
+                        }
+                      >
+                        {config().localization.saveRole}
+                      </Button>
+                    </div>
+                    <FieldError>
+                      {getAdminErrorMessage(setRoleMutation.error)}
+                    </FieldError>
+                    <div class="flex flex-wrap gap-2">
+                      <Button
+                        disabled={
+                          canSetPassword.isPending ||
+                          !canSetPassword.data?.success
+                        }
+                        variant="outline"
+                        onClick={() => setPasswordOpen(true)}
+                      >
+                        <KeyRound />
+                        {config().localization.setPassword}
+                      </Button>
+                      <Button
+                        disabled={
+                          canBan.isPending || !canBan.data?.success || isSelf()
+                        }
+                        variant="outline"
+                        onClick={() =>
+                          selectedUser().banned
+                            ? unban.mutate({ userId: selectedUser().id })
+                            : setDangerousAction("ban")
+                        }
+                      >
+                        <Ban />
+                        {selectedUser().banned
+                          ? config().localization.unbanUser
+                          : config().localization.banUser}
+                      </Button>
+                      <Button
+                        disabled={
+                          canImpersonate.isPending ||
+                          !canImpersonate.data?.success ||
+                          isSelf()
+                        }
+                        variant="outline"
+                        onClick={() => setDangerousAction("impersonate")}
+                      >
+                        <LogIn />
+                        {config().localization.impersonateUser}
+                      </Button>
+                      <Button
+                        disabled={
+                          canDelete.isPending ||
+                          !canDelete.data?.success ||
+                          isSelf()
+                        }
+                        variant="destructive"
+                        onClick={() => setDangerousAction("delete")}
+                      >
+                        <Trash2 />
+                        {config().localization.deleteUser}
+                      </Button>
+                    </div>
+                    <FieldError>{getAdminErrorMessage(unban.error)}</FieldError>
+                  </TabsContent>
+                  <TabsContent
+                    class="flex flex-col gap-3 pt-4"
+                    value="sessions"
                   >
                     <Show
-                      fallback={
-                        <p class="py-8 text-center text-sm text-muted-foreground">
-                          {config().localization.accessDeniedDescription}
-                        </p>
+                      fallback={<SessionRowsSkeleton />}
+                      when={
+                        !sessionsPermission.isPending && !sessions.isPending
                       }
-                      when={sessionsPermission.data?.success}
                     >
                       <Show
-                        fallback={<SessionRowsSkeleton />}
-                        when={!sessions.isPending}
+                        fallback={
+                          <p class="py-8 text-center text-sm text-muted-foreground">
+                            {config().localization.accessDeniedDescription}
+                          </p>
+                        }
+                        when={sessionsPermission.data?.success}
                       >
                         <Show
                           fallback={
@@ -435,46 +845,200 @@ function UserDialog(props: {
                           }
                           when={sessions.data?.sessions.length}
                         >
+                          <Button
+                            class="self-end"
+                            disabled={
+                              canRevoke.isPending ||
+                              !canRevoke.data?.success ||
+                              isSelf()
+                            }
+                            variant="outline"
+                            onClick={() => setDangerousAction("revokeAll")}
+                          >
+                            {config().localization.revokeAllSessions}
+                          </Button>
                           <For each={sessions.data?.sessions}>
                             {(session) => (
-                              <div class="rounded-lg border p-3">
-                                <div class="truncate text-sm font-medium">
-                                  {session.userAgent ||
-                                    config().localization.sessions}
+                              <div class="flex items-start justify-between gap-3 rounded-lg border p-3">
+                                <div class="min-w-0">
+                                  <div class="truncate text-sm font-medium">
+                                    {session.userAgent ||
+                                      config().localization.sessions}
+                                  </div>
+                                  <div class="text-xs text-muted-foreground">
+                                    {formatDate(session.createdAt)} ·{" "}
+                                    {formatDate(session.expiresAt)}
+                                  </div>
+                                  <Show
+                                    when={
+                                      config().showIpAddress &&
+                                      session.ipAddress
+                                    }
+                                  >
+                                    <div class="mt-1 font-mono text-xs text-muted-foreground">
+                                      {session.ipAddress}
+                                    </div>
+                                  </Show>
                                 </div>
-                                <div class="text-xs text-muted-foreground">
-                                  {formatDate(session.createdAt)} ·{" "}
-                                  {formatDate(session.expiresAt)}
-                                </div>
-                                <Show
-                                  when={
-                                    config().showIpAddress && session.ipAddress
+                                <Button
+                                  aria-label={config().localization.revoke}
+                                  disabled={
+                                    revokeSession.isPending ||
+                                    canRevoke.isPending ||
+                                    !canRevoke.data?.success ||
+                                    isSelf()
+                                  }
+                                  size="icon-sm"
+                                  variant="ghost"
+                                  onClick={() =>
+                                    revokeSession.mutate({
+                                      sessionToken: session.token
+                                    })
                                   }
                                 >
-                                  <div class="mt-1 font-mono text-xs text-muted-foreground">
-                                    {session.ipAddress}
-                                  </div>
-                                </Show>
+                                  <Trash2 />
+                                </Button>
                               </div>
                             )}
                           </For>
                         </Show>
                       </Show>
                     </Show>
-                  </Show>
-                </TabsContent>
-                <For each={contributedTabs()}>
-                  {(tab) => (
-                    <TabsContent class="pt-4" value={tab.value}>
-                      <Dynamic component={tab.component} userId={detail().id} />
-                    </TabsContent>
-                  )}
-                </For>
-              </Tabs>
-            )}
+                  </TabsContent>
+                  <For each={contributedTabs()}>
+                    {(tab) => (
+                      <TabsContent class="pt-4" value={tab.value}>
+                        <Dynamic
+                          component={tab.component}
+                          userId={selectedUser().id}
+                        />
+                      </TabsContent>
+                    )}
+                  </For>
+                </Tabs>
+              )}
+            </Show>
           </Show>
-        </Show>
-        <DialogFooter showCloseButton />
+          <DialogFooter showCloseButton />
+        </DialogContent>
+      </Dialog>
+      <PasswordDialog
+        open={passwordOpen()}
+        onOpenChange={setPasswordOpen}
+        userId={detail()?.id}
+      />
+      <AlertDialog
+        open={Boolean(dangerousAction())}
+        onOpenChange={(open) => !open && closeDangerousAction()}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{dangerousLabel()}</AlertDialogTitle>
+            <AlertDialogDescription class="flex flex-col gap-2">
+              <span>{detail()?.email}</span>
+              <Show when={dangerousMutation().error}>
+                <span class="text-destructive" role="alert">
+                  {getAdminErrorMessage(dangerousMutation().error)}
+                </span>
+              </Show>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>
+              {config().localization.cancel}
+            </AlertDialogCancel>
+            <AlertDialogAction
+              disabled={isSelf() || dangerousMutation().isPending}
+              variant={
+                dangerousAction() === "delete" ? "destructive" : "default"
+              }
+              onClick={(event: MouseEvent) => {
+                event.preventDefault()
+                confirmDangerousAction()
+              }}
+            >
+              {dangerousLabel()}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
+  )
+}
+
+function PasswordDialog(props: {
+  open: boolean
+  onOpenChange: (open: boolean) => void
+  userId?: string
+}) {
+  const auth = useAuth()
+  const authClient = auth.authClient as AdminAuthClient
+  const config = () =>
+    (auth.plugins.find((plugin) => plugin.id === adminPlugin.id) ??
+      adminPlugin()) as ReturnType<typeof adminPlugin>
+  const [password, setPassword] = createSignal("")
+  const [errorMessage, setErrorMessage] = createSignal<string>()
+  const setPasswordMutation = useSetAdminUserPassword(authClient)
+
+  const close = () => {
+    setPassword("")
+    setErrorMessage(undefined)
+    setPasswordMutation.reset()
+    props.onOpenChange(false)
+  }
+  const submit = (event: SubmitEvent) => {
+    event.preventDefault()
+    setErrorMessage(undefined)
+    if (props.userId)
+      setPasswordMutation.mutate(
+        { userId: props.userId, newPassword: password() },
+        {
+          onError: (error) => setErrorMessage(getAdminErrorMessage(error)),
+          onSuccess: close
+        }
+      )
+  }
+
+  return (
+    <Dialog
+      open={props.open}
+      onOpenChange={(open) => (open ? props.onOpenChange(true) : close())}
+    >
+      <DialogContent>
+        <form class="flex flex-col gap-4" onSubmit={submit}>
+          <DialogHeader>
+            <DialogTitle>{config().localization.setPassword}</DialogTitle>
+            <DialogDescription>
+              {config().localization.userDetails}
+            </DialogDescription>
+          </DialogHeader>
+          <Field data-invalid={Boolean(errorMessage())}>
+            <FieldLabel for="solid-admin-new-password">
+              {config().localization.password}
+            </FieldLabel>
+            <Input
+              aria-invalid={Boolean(errorMessage())}
+              autocomplete="new-password"
+              id="solid-admin-new-password"
+              required
+              type="password"
+              value={password()}
+              onInput={(event) => setPassword(event.currentTarget.value)}
+            />
+            <FieldError>{errorMessage()}</FieldError>
+          </Field>
+          <DialogFooter>
+            <Button onClick={close} type="button" variant="outline">
+              {config().localization.cancel}
+            </Button>
+            <Button
+              disabled={!password() || setPasswordMutation.isPending}
+              type="submit"
+            >
+              {config().localization.setPassword}
+            </Button>
+          </DialogFooter>
+        </form>
       </DialogContent>
     </Dialog>
   )

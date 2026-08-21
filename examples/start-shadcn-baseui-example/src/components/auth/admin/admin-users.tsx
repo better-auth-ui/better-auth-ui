@@ -11,7 +11,8 @@ import {
   revokeAdminUserSessionsOptions,
   setAdminUserPasswordOptions,
   setAdminUserRoleOptions,
-  unbanAdminUserOptions
+  unbanAdminUserOptions,
+  updateAdminUserOptions
 } from "@better-auth-ui/core/plugins/admin"
 import { useAuth, useAuthPlugin, useSession } from "@better-auth-ui/react"
 import {
@@ -691,6 +692,11 @@ function UserInspector({
     },
     { enabled: Boolean(userId) }
   )
+  const canUpdate = useAdminPermission(
+    auth.authClient,
+    { user: ["update"] },
+    { enabled: Boolean(userId) }
+  )
   const canSetPassword = useAdminPermission(
     auth.authClient,
     {
@@ -723,13 +729,19 @@ function UserInspector({
     { enabled: Boolean(userId) }
   )
   const [role, setRole] = useState(config.defaultRole)
+  const [name, setName] = useState("")
   const [passwordOpen, setPasswordOpen] = useState(false)
   const [dangerousAction, setDangerousAction] = useState<DangerousAction>()
   const user = detail.data
   const isSelf = user?.id === actor?.user.id
   useEffect(() => {
     if (user?.role) setRole(user.role)
-  }, [user?.role])
+    if (user?.name) setName(user.name)
+  }, [user?.name, user?.role])
+
+  const updateUser = useMutation(
+    updateAdminUserOptions(auth.authClient, actor?.user.id)
+  )
 
   const setRoleMutation = useMutation(
     setAdminUserRoleOptions(auth.authClient, actor?.user.id)
@@ -884,6 +896,44 @@ function UserInspector({
                     </Badge>
                   </dd>
                 </dl>
+                <form
+                  className="flex items-end gap-2"
+                  onSubmit={(event) => {
+                    event.preventDefault()
+                    updateUser.mutate({ userId: user.id, data: { name } })
+                  }}
+                >
+                  <Field className="flex-1">
+                    <FieldLabel htmlFor="admin-user-name">
+                      {config.localization.name}
+                    </FieldLabel>
+                    <InputGroup>
+                      <InputGroupInput
+                        id="admin-user-name"
+                        value={name}
+                        onChange={(event) => setName(event.target.value)}
+                      />
+                    </InputGroup>
+                    {updateUser.error ? (
+                      <FieldError>
+                        {getAdminErrorMessage(updateUser.error)}
+                      </FieldError>
+                    ) : null}
+                  </Field>
+                  <Button
+                    disabled={
+                      !name.trim() ||
+                      name === user.name ||
+                      updateUser.isPending ||
+                      canUpdate.isPending ||
+                      !canUpdate.data?.success
+                    }
+                    type="submit"
+                    variant="outline"
+                  >
+                    {config.localization.saveUser}
+                  </Button>
+                </form>
                 <div className="flex items-end gap-2">
                   <Field className="flex-1">
                     <FieldLabel>{config.localization.role}</FieldLabel>

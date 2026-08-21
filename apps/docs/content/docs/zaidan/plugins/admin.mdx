@@ -112,14 +112,25 @@ plugins can add more tabs without adding routes.
 The Dash integration adds an Activity tab when both UI plugins are registered.
 Dash applies its own organization owner or admin access rules to this tab.
 
+## User actions
+
+The users page can create users. The dialog can update a user's name and role,
+set a password, ban or unban the user, impersonate the user, delete the user,
+and revoke one or all of the user's sessions.
+
+The UI checks the matching Admin client permission before it enables each
+action. Dangerous actions require confirmation. The UI also disables actions
+that would ban, delete, impersonate, or revoke sessions for the current user.
+
 ## Permissions and privacy
 
 The users page calls the Better Auth permission API before it requests the
 user list. Do not authorize the page from a role string alone.
 
 The table searches either `email` or `name` in each request. Passwords stay in
-local form state. Session IP addresses are hidden unless `showIpAddress` is
-`true`.
+local form state. The forms clear each password after the request or when the
+user closes the form. Session IP addresses are hidden unless `showIpAddress`
+is `true`.
 
 ```ts
 adminPlugin({

@@ -7,6 +7,7 @@ import { describe, expect, it, vi } from "vitest"
 
 import { AuthProvider } from "../src/components/auth/auth-provider"
 import { adminPlugin, StopImpersonating } from "../src/plugins"
+import { AdminUsers } from "../src/plugins/admin"
 
 function renderStopImpersonating(
   session: { session: { impersonatedBy?: string } },
@@ -37,6 +38,46 @@ function renderStopImpersonating(
         <Dropdown.Menu aria-label="User menu">
           <StopImpersonating />
         </Dropdown.Menu>
+      </AuthProvider>
+    )
+  }
+}
+
+function renderAdminUsers() {
+  const queryClient = new QueryClient({
+    defaultOptions: {
+      queries: { retry: false, staleTime: Infinity },
+      mutations: { retry: false }
+    }
+  })
+  const session = {
+    session: { id: "session-1" },
+    user: { id: "admin-1", email: "admin@example.com", name: "Admin" }
+  }
+  queryClient.setQueryData(authQueryKeys.session, session)
+  const hasPermission = vi.fn(async () => ({
+    data: { success: true },
+    error: null
+  }))
+  const listUsers = vi.fn(async () => ({
+    data: { users: [], total: 0 },
+    error: null
+  }))
+  const authClient = {
+    admin: { hasPermission, listUsers },
+    getSession: vi.fn(async () => session)
+  } as unknown as Parameters<typeof AuthProvider>[0]["authClient"]
+
+  return {
+    hasPermission,
+    ...render(
+      <AuthProvider
+        authClient={authClient}
+        navigate={() => {}}
+        plugins={[adminPlugin()]}
+        queryClient={queryClient}
+      >
+        <AdminUsers />
       </AuthProvider>
     )
   }
@@ -100,5 +141,18 @@ describe("adminPlugin", () => {
     await waitFor(() => {
       expect(action).not.toHaveAttribute("data-disabled")
     })
+  })
+
+  it("opens user creation after the client grants permission", async () => {
+    const user = userEvent.setup()
+    const { hasPermission } = renderAdminUsers()
+
+    await user.click(await screen.findByRole("button", { name: "Create user" }))
+
+    expect(await screen.findByRole("alertdialog")).toBeVisible()
+    expect(screen.getByRole("textbox", { name: "Email" })).toBeVisible()
+    expect(hasPermission).toHaveBeenCalledWith(
+      expect.objectContaining({ permissions: { user: ["create"] } })
+    )
   })
 })

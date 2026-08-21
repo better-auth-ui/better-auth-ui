@@ -66,6 +66,8 @@ export const adminLocalization = {
   revokeAllSessions: "Revoke all sessions",
   /** @remarks `"Save role"` */
   saveRole: "Save role",
+  /** @remarks `"Save user"` */
+  saveUser: "Save user",
   /** @remarks `"Set password"` */
   setPassword: "Set password",
   /** @remarks `"Status"` */

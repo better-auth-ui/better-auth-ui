@@ -143,9 +143,10 @@ and Sessions tabs. Registered plugins can add more tabs without adding routes.
 The Dash integration adds an Activity tab when both UI plugins are registered.
 Dash applies its own organization owner or admin access rules to this tab.
 
-The inspector can change roles, set passwords, ban users, impersonate users,
-remove users, and revoke sessions. Dangerous actions require confirmation.
-The UI disables self-destructive actions and still relies on the server.
+The users page can create users. The inspector can update names and roles, set
+passwords, ban or unban users, impersonate users, remove users, and revoke one
+or all sessions. Dangerous actions require confirmation. The UI disables
+self-destructive actions and still relies on the server.
 
 Passwords stay in local form state. The forms clear each password after the
 request or after the user closes the form.
