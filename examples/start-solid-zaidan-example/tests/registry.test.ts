@@ -221,6 +221,7 @@ const expectedSolidRegistryPayloadNames = [
   "siwe",
   "sso",
   "billing",
+  "dash",
   "agent-auth",
   "username",
   "passkey",
@@ -2494,6 +2495,7 @@ describe("Solid registry isolation", () => {
       "./plugins/api-key",
       "./plugins/captcha",
       "./plugins/billing",
+      "./plugins/dash",
       "./plugins/device-authorization",
       "./plugins/email-otp",
       "./plugins/magic-link",
@@ -3118,6 +3120,7 @@ describe("Solid registry isolation", () => {
       "siwe",
       "sso",
       "billing",
+      "dash",
       "agent-auth"
     ]
     const runtimeOnlyPluginNames = ["captcha"]

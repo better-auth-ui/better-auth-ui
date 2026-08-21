@@ -20,6 +20,8 @@
     "---Enterprise---",
     "oauth-provider",
     "sso",
+    "---Infrastructure---",
+    "dash",
     "---Utility---",
     "device-authorization",
     "captcha",

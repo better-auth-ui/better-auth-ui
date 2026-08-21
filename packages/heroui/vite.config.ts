@@ -33,6 +33,7 @@ export default defineConfig({
         "plugins/agent-auth/index": "src/plugins/agent-auth/index.ts",
         "plugins/api-key/index": "src/plugins/api-key/index.ts",
         "plugins/billing/index": "src/plugins/billing/index.ts",
+        "plugins/dash/index": "src/plugins/dash/index.ts",
         "plugins/delete-user/index": "src/plugins/delete-user/index.ts",
         "plugins/device-authorization/index":
           "src/plugins/device-authorization/index.ts",

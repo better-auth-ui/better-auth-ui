@@ -1,0 +1,157 @@
+---
+icon: Activity
+title: Dash Activity
+description: Add personal activity and organization audit logs to Solid and Zaidan settings.
+---
+
+import { Callout } from "fumadocs-ui/components/callout"
+import { Step, Steps } from "fumadocs-ui/components/steps"
+
+The Dash registry item adds an Activity tab to personal and organization settings. It reads audit logs through the public `dashClient()` API from `@better-auth/infra`.
+
+Organization owners and admins see organization-wide activity. Other members see only their own activity in that organization. Every organization query uses the organization ID from the current route.
+
+## Setup
+
+<Steps>
+<Step>
+### Configure Dash on the server
+
+Install `@better-auth/infra`, then add `dash()` to Better Auth. Dash records supported authentication and organization events automatically.
+
+```ts title="lib/auth.ts"
+import { dash } from "@better-auth/infra"
+import { betterAuth } from "better-auth"
+
+export const auth = betterAuth({
+  plugins: [
+    dash({
+      apiUrl: process.env.BETTER_AUTH_API_URL,
+      kvUrl: process.env.BETTER_AUTH_KV_URL,
+      apiKey: process.env.BETTER_AUTH_API_KEY
+    })
+  ]
+})
+```
+
+See the [Dash plugin guide](https://better-auth.com/docs/infrastructure/plugins/dash) for infrastructure setup and available events.
+
+</Step>
+<Step>
+### Add the client plugin
+
+```ts title="lib/auth-client.ts"
+import { dashClient } from "@better-auth/infra/client"
+import { createAuthClient } from "better-auth/client"
+import { organizationClient } from "better-auth/client/plugins"
+
+export const authClient = createAuthClient({
+  plugins: [organizationClient(), dashClient()]
+})
+```
+
+</Step>
+<Step>
+### Install the UI plugin
+
+```bash
+bunx shadcn@latest add https://better-auth-ui.com/r/solid/dash.json
+```
+
+</Step>
+<Step>
+### Register the UI plugin
+
+```tsx title="src/components/providers.tsx"
+import { AuthProvider } from "@/components/auth/auth-provider"
+import { dashPlugin } from "@/lib/auth/dash-plugin"
+import { organizationPlugin } from "@/lib/auth/organization-plugin"
+
+export function Providers(props: { children?: JSX.Element }) {
+  return (
+    <AuthProvider
+      authClient={authClient}
+      navigate={navigate}
+      plugins={[organizationPlugin(), dashPlugin()]}
+    >
+      {props.children}
+    </AuthProvider>
+  )
+}
+```
+
+Both personal and organization activity are enabled by default. Set `organization: false` if the app does not use Better Auth organizations.
+
+</Step>
+</Steps>
+
+## Static routes
+
+The plugin adds one static path named `activity`. Its default segment is `activity`, which produces routes such as `/settings/activity` and the matching organization activity path.
+
+It does not use query parameters, nested plugin routes, or a catch-all route. Add the segment to both static path lists when the application validates or generates settings and organization routes.
+
+```ts title="route-paths.ts"
+import { viewPaths } from "@better-auth-ui/core"
+
+import { dashPlugin } from "@/lib/auth/dash-plugin"
+import { organizationPlugin } from "@/lib/auth/organization-plugin"
+
+const activityPath = dashPlugin({ path: "activity" }).viewPaths.settings.activity
+
+export const validSettingsPaths = [
+  ...Object.values(viewPaths.settings),
+  ...Object.values(organizationPlugin().viewPaths.settings ?? {}),
+  activityPath
+]
+
+export const validOrganizationPaths = [
+  ...Object.values(organizationPlugin().viewPaths.organization ?? {}),
+  activityPath
+]
+```
+
+Use the same Dash options in the provider and route configuration when you customize the segment.
+
+## Access and privacy
+
+- Personal settings call `getAuditLogs` for the signed-in user.
+- Organization settings check the member role for the explicit organization ID.
+- Owners and admins call `getAllAuditLogs` for that organization.
+- Other members call `getAuditLogs` with the organization filter.
+- IP addresses are hidden by default. Set `showIpAddress: true` only when your privacy policy permits it.
+
+<Callout type="info" title="Retention comes from Dash">
+The empty state says that no retained activity matches the view. It does not claim that an event never occurred.
+</Callout>
+
+## Headless hooks
+
+```tsx
+import {
+  useDashAllAuditLogs,
+  useDashAuditLogs
+} from "@better-auth-ui/solid/plugins/dash"
+```
+
+The core package also exports query option factories and `ensure`, `prefetch`, and `fetch` helpers from `@better-auth-ui/core/plugins/dash`.
+
+## Runtime prerequisites
+
+- Server: `dash()` from `@better-auth/infra`.
+- Client: `dashClient()` from `@better-auth/infra/client`.
+- Organization activity: the Better Auth organization server and client plugins.
+- Runtime API: Dash hooks and query helpers from the [Solid package](/docs/solid).
+
+## Copied files
+
+- `src/lib/auth/dash-plugin.tsx`
+- `src/components/auth/dash/activity.tsx`
+
+## Options
+
+<auto-type-table path="../../../../../../packages/core/src/plugins/dash/dash-plugin.ts" name="DashPluginOptions" />
+
+## Localization
+
+<auto-type-table path="../../../../../../packages/core/src/plugins/dash/dash-localization.ts" name="DashLocalization" />

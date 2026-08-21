@@ -206,7 +206,12 @@ export function Organization({
       </div>
 
       <TabsContent value="settings" tabIndex={-1}>
-        <OrganizationSettings />
+        {activeOrganization && (
+          <OrganizationSettings
+            organizationId={activeOrganization.id}
+            organizationSlug={activeOrganization.slug}
+          />
+        )}
       </TabsContent>
 
       <TabsContent value="people" tabIndex={-1}>

@@ -453,6 +453,19 @@ export const solidRegistryManifest = {
       ]
     }),
     item({
+      name: "dash",
+      type: "registry:component",
+      title: "Solid Dash Activity",
+      description:
+        "Solid personal activity and role-aware organization audit logs backed by Better Auth Infrastructure Dash.",
+      dependencies: [...solidAuthDependencies, "@better-auth/infra@latest"],
+      files: [
+        libFile("src/lib/auth/dash-plugin.tsx"),
+        componentFile("src/components/auth/dash/activity.tsx"),
+        ...zaidanInteractiveSupportFiles
+      ]
+    }),
+    item({
       name: "agent-auth",
       type: "registry:component",
       title: "Solid Agent Auth",

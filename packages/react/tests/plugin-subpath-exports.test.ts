@@ -5,6 +5,7 @@ import * as anonymous from "../src/plugins/anonymous"
 import * as apiKey from "../src/plugins/api-key"
 import * as billing from "../src/plugins/billing"
 import * as captcha from "../src/plugins/captcha"
+import * as dash from "../src/plugins/dash"
 import * as deviceAuthorization from "../src/plugins/device-authorization"
 import * as emailOtp from "../src/plugins/email-otp"
 import * as magicLink from "../src/plugins/magic-link"
@@ -37,6 +38,8 @@ describe("React plugin subpath exports", () => {
     expect(billing).toHaveProperty("useCancelBillingSubscription")
     expect(billing).toHaveProperty("useRestoreBillingSubscription")
     expect(billing).toHaveProperty("useUpdateBillingSeats")
+    expect(dash).toHaveProperty("useDashAuditLogs")
+    expect(dash).toHaveProperty("useDashAllAuditLogs")
 
     expect(passkey).toHaveProperty("useAddPasskey")
     expect(passkey).toHaveProperty("useDeletePasskey")
@@ -108,6 +111,7 @@ describe("React plugin subpath exports", () => {
     expect(apiKey).not.toHaveProperty("createApiKeyOptions")
     expect(billing).not.toHaveProperty("billingPlansOptions")
     expect(billing).not.toHaveProperty("billingCheckoutOptions")
+    expect(dash).not.toHaveProperty("dashAuditLogsOptions")
     expect(anonymous).not.toHaveProperty("signInAnonymousOptions")
     expect(oneTap).not.toHaveProperty("promptOneTapOptions")
     expect(admin).not.toHaveProperty("stopImpersonatingOptions")
@@ -163,6 +167,7 @@ describe("React plugin subpath exports", () => {
     expect(react).not.toHaveProperty("useCancelInvitation")
     expect(react).not.toHaveProperty("useListApiKeys")
     expect(react).not.toHaveProperty("useBillingState")
+    expect(react).not.toHaveProperty("useDashAuditLogs")
     expect(react).not.toHaveProperty("useListPasskeys")
     expect(react).not.toHaveProperty("useSignInEmailOtp")
     expect(react).not.toHaveProperty("useOAuthConsent")

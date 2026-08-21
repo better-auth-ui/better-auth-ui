@@ -59,6 +59,10 @@
       "types": "./dist/plugins/billing/index.d.ts",
       "import": "./dist/plugins/billing/index.js"
     },
+    "./plugins/dash": {
+      "types": "./dist/plugins/dash/index.d.ts",
+      "import": "./dist/plugins/dash/index.js"
+    },
     "./plugins/device-authorization": {
       "types": "./dist/plugins/device-authorization/index.d.ts",
       "import": "./dist/plugins/device-authorization/index.js"

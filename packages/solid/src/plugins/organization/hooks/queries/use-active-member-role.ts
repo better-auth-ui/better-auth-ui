@@ -41,9 +41,13 @@ export function useActiveMemberRole<TAuthClient extends OrganizationAuthClient>(
   queryClient?: Accessor<QueryClient>
 ) {
   const session = useSession(authClient, undefined, queryClient)
+  const hasExplicitOrganization = () => {
+    const query = options?.().query
+    return Boolean(query?.organizationId || query?.organizationSlug)
+  }
   const activeOrganization = useActiveOrganization(
     authClient,
-    undefined,
+    () => ({ enabled: !hasExplicitOrganization() }),
     queryClient
   )
 

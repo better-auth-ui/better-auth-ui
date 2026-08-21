@@ -42,9 +42,13 @@ export function useActiveMemberRole<TAuthClient extends OrganizationAuthClient>(
 
   const { query, fetchOptions, ...queryOptions } = options
 
+  const hasExplicitOrganization = Boolean(
+    query?.organizationId || query?.organizationSlug
+  )
+
   const { data: activeOrganization } = useActiveOrganization(
     authClient,
-    undefined,
+    { enabled: !hasExplicitOrganization },
     queryClient
   )
 

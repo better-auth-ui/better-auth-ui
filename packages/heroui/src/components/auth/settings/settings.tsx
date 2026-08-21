@@ -113,9 +113,9 @@ export function Settings({
 
           {plugins.flatMap(
             (plugin) =>
-              plugin.settingsTabs?.map((settingsTab, index) => (
+              plugin.settingsTabs?.map((settingsTab) => (
                 <Tabs.Tab
-                  key={`${plugin.id}-${index.toString()}`}
+                  key={`${plugin.id}-${settingsTab.view}`}
                   id={settingsTab.view}
                   href={`${basePaths.settings}/${plugin.viewPaths?.settings?.[settingsTab.view]}`}
                   className="gap-2"
@@ -144,9 +144,9 @@ export function Settings({
       </Tabs.Panel>
 
       {plugins.flatMap((plugin) =>
-        plugin.settingsTabs?.map((settingsTab, index) => (
+        plugin.settingsTabs?.map((settingsTab) => (
           <Tabs.Panel
-            key={`${plugin.id}-${index.toString()}`}
+            key={`${plugin.id}-${settingsTab.view}`}
             id={settingsTab.view}
             className="px-0"
           >

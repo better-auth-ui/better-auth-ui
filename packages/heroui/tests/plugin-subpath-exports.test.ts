@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest"
 import * as agentAuth from "../src/plugins/agent-auth"
 import * as apiKey from "../src/plugins/api-key"
 import * as billing from "../src/plugins/billing"
+import * as dash from "../src/plugins/dash"
 import * as deleteUser from "../src/plugins/delete-user"
 import * as emailOtp from "../src/plugins/email-otp"
 import * as magicLink from "../src/plugins/magic-link"
@@ -27,6 +28,10 @@ describe("HeroUI plugin subpath exports", () => {
     expect(billing).toHaveProperty("UserBillingSettings")
     expect(billing).toHaveProperty("OrganizationBillingSettings")
     expect(billing).toHaveProperty("billingPlugin")
+
+    expect(dash).toHaveProperty("UserActivity")
+    expect(dash).toHaveProperty("OrganizationActivity")
+    expect(dash).toHaveProperty("dashPlugin")
 
     expect(deleteUser).toHaveProperty("DangerZone")
     expect(deleteUser).toHaveProperty("DeleteAccount")
