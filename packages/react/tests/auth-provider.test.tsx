@@ -136,4 +136,31 @@ describe("AuthProvider locale changes", () => {
     expect(signInLabel).toBe("Anmelden")
     expect(languageTag).toBe("de-DE")
   })
+
+  it("keeps resolved config identities stable across equivalent renders", () => {
+    let currentConfig: ReturnType<typeof useAuth> | undefined
+    const navigate = () => {}
+
+    function ConfigConsumer() {
+      currentConfig = useAuth()
+      return null
+    }
+
+    const view = render(
+      <AuthProvider authClient={authClient} navigate={navigate}>
+        <ConfigConsumer />
+      </AuthProvider>
+    )
+    const firstConfig = currentConfig
+
+    view.rerender(
+      <AuthProvider authClient={authClient} navigate={navigate}>
+        <ConfigConsumer />
+      </AuthProvider>
+    )
+
+    expect(currentConfig).toBe(firstConfig)
+    expect(currentConfig?.localization).toBe(firstConfig?.localization)
+    expect(currentConfig?.plugins).toBe(firstConfig?.plugins)
+  })
 })

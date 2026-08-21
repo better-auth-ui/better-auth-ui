@@ -18,7 +18,8 @@ import {
   type PropsWithChildren,
   type ReactNode,
   useContext,
-  useMemo
+  useMemo,
+  useRef
 } from "react"
 import { MutationInvalidator } from "../mutation-invalidator"
 import { AuthContext } from "./auth-context"
@@ -35,6 +36,21 @@ const fallbackQueryClient = new QueryClient({
     }
   }
 })
+
+function useShallowStableObject<T extends object>(value: T): T {
+  const reference = useRef(value)
+  const previousKeys = Object.keys(reference.current)
+  const nextKeys = Object.keys(value)
+  const isStable =
+    previousKeys.length === nextKeys.length &&
+    nextKeys.every((key) =>
+      Object.is(reference.current[key as keyof T], value[key as keyof T])
+    )
+
+  if (!isStable) reference.current = value
+
+  return reference.current
+}
 
 declare module "@better-auth-ui/core" {
   /** Widen `AdditionalField.label` to `ReactNode` in the React package. */
@@ -74,23 +90,28 @@ export function AuthProvider<TAuthClient extends AuthClient = AuthClient>({
   queryClient,
   ...config
 }: AuthProviderProps<TAuthClient>) {
-  const { authClient, ...partialConfig } = config
-  const mergedConfig = resolveAuthConfig({
-    ...partialConfig,
-    authClient
-  }) as AuthConfig<TAuthClient>
-  const configuredRedirectTo = mergedConfig.redirectTo
+  const stableConfig = useShallowStableObject(config)
+  const mergedConfig = useMemo(() => {
+    const { authClient, ...partialConfig } = stableConfig
+    const resolvedConfig = resolveAuthConfig({
+      ...partialConfig,
+      authClient
+    }) as AuthConfig<TAuthClient>
+    const configuredRedirectTo = resolvedConfig.redirectTo
 
-  Object.defineProperty(mergedConfig, "redirectTo", {
-    configurable: true,
-    enumerable: true,
-    get: () =>
-      (typeof window !== "undefined" &&
-        new URLSearchParams(window.location.search)
-          .get("redirectTo")
-          ?.trim()) ||
-      configuredRedirectTo
-  })
+    Object.defineProperty(resolvedConfig, "redirectTo", {
+      configurable: true,
+      enumerable: true,
+      get: () =>
+        (typeof window !== "undefined" &&
+          new URLSearchParams(window.location.search)
+            .get("redirectTo")
+            ?.trim()) ||
+        configuredRedirectTo
+    })
+
+    return resolvedConfig
+  }, [stableConfig])
 
   const contextQueryClient = useContext(QueryClientContext)
   const resolvedQueryClient =

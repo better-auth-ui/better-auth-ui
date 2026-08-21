@@ -45,8 +45,10 @@ describe("locale bundles", () => {
       plugins: deDE.plugins
     })
 
+    expect(Object.keys(german).sort()).toEqual(Object.keys(english).sort())
+
     for (const [path, message] of Object.entries(english)) {
-      expect(placeholders(german[path] ?? ""), path).toEqual(
+      expect(placeholders(german[path] as string), path).toEqual(
         placeholders(message)
       )
     }
