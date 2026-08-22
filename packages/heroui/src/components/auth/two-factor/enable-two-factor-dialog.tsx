@@ -109,7 +109,7 @@ export function EnableTwoFactorDialog({
     onSuccess: (data) => {
       if (data.method === "otp") {
         toast.success(twoFactorLocalization.twoFactorEnabled)
-        onOpenChange(false)
+        handleOpenChange(false)
         return
       }
 
