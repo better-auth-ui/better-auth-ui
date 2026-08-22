@@ -3,8 +3,9 @@ import {
   requestSsoDomainVerificationOptions,
   type SsoAuthClient
 } from "@better-auth-ui/core/plugins/sso"
-import { useMutation } from "@tanstack/solid-query"
+import { type QueryClient, useMutation } from "@tanstack/solid-query"
 import type { Accessor } from "solid-js"
+import { useSession } from "../../../../hooks/queries/use-session"
 
 export type UseRequestSsoDomainVerificationOptions<
   TAuthClient extends SsoAuthClient
@@ -15,10 +16,15 @@ export function useRequestSsoDomainVerification<
   TAuthClient extends SsoAuthClient
 >(
   authClient: TAuthClient,
-  options?: UseRequestSsoDomainVerificationOptions<TAuthClient>
+  options?: UseRequestSsoDomainVerificationOptions<TAuthClient>,
+  queryClient?: Accessor<QueryClient>
 ) {
-  return useMutation(() => ({
-    ...requestSsoDomainVerificationOptions(authClient),
-    ...(options?.() ?? {})
-  }))
+  const session = useSession(authClient, undefined, queryClient)
+  return useMutation(
+    () => ({
+      ...requestSsoDomainVerificationOptions(authClient, session.data?.user.id),
+      ...(options?.() ?? {})
+    }),
+    queryClient
+  )
 }

@@ -2,6 +2,7 @@ import type { MutationOptions } from "@tanstack/query-core"
 import type { BetterFetchError } from "better-auth/client"
 import type { SsoAuthClient } from "./sso-auth-client"
 import { ssoMutationKeys } from "./sso-mutation-keys"
+import { ssoQueryKeys } from "./sso-query-keys"
 
 export type VerifySsoDomainParams<TAuthClient extends SsoAuthClient> =
   Parameters<TAuthClient["sso"]["verifyDomain"]>[0]
@@ -17,7 +18,8 @@ export type VerifySsoDomainOptions<TAuthClient extends SsoAuthClient> = Omit<
 
 /** Mutation options for validating an SSO provider's DNS records. */
 export function verifySsoDomainOptions<TAuthClient extends SsoAuthClient>(
-  authClient: TAuthClient
+  authClient: TAuthClient,
+  userId?: string
 ): MutationOptions<
   VerifySsoDomainData,
   BetterFetchError,
@@ -31,6 +33,7 @@ export function verifySsoDomainOptions<TAuthClient extends SsoAuthClient>(
 
   return {
     mutationKey: ssoMutationKeys.verifyDomain,
-    mutationFn
+    mutationFn,
+    meta: { awaits: [ssoQueryKeys.providers.all(userId)] }
   }
 }

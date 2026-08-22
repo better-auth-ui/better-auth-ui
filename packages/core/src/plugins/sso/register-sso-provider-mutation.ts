@@ -2,6 +2,7 @@ import type { MutationOptions } from "@tanstack/query-core"
 import type { BetterFetchError } from "better-auth/client"
 import type { SsoAuthClient } from "./sso-auth-client"
 import { ssoMutationKeys } from "./sso-mutation-keys"
+import { ssoQueryKeys } from "./sso-query-keys"
 
 export type RegisterSsoProviderParams<TAuthClient extends SsoAuthClient> =
   Parameters<TAuthClient["sso"]["register"]>[0]
@@ -18,7 +19,8 @@ export type RegisterSsoProviderOptions<TAuthClient extends SsoAuthClient> =
 
 /** Mutation options for registering an OIDC or SAML provider. */
 export function registerSsoProviderOptions<TAuthClient extends SsoAuthClient>(
-  authClient: TAuthClient
+  authClient: TAuthClient,
+  userId?: string
 ): MutationOptions<
   RegisterSsoProviderData,
   BetterFetchError,
@@ -32,6 +34,7 @@ export function registerSsoProviderOptions<TAuthClient extends SsoAuthClient>(
 
   return {
     mutationKey: ssoMutationKeys.register,
-    mutationFn
+    mutationFn,
+    meta: { awaits: [ssoQueryKeys.providers.all(userId)] }
   }
 }

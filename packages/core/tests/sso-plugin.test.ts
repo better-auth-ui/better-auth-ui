@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest"
 import {
+  deleteSsoProviderOptions,
   getSsoFallbackEmail,
   registerSsoProviderOptions,
   requestSsoDomainVerificationOptions,
@@ -8,6 +9,9 @@ import {
   ssoLocalization,
   ssoMutationKeys,
   ssoPlugin,
+  ssoProvidersOptions,
+  ssoQueryKeys,
+  updateSsoProviderOptions,
   verifySsoDomainOptions
 } from "../src/plugins/sso"
 
@@ -27,7 +31,9 @@ describe("ssoPlugin", () => {
     expect(ssoPlugin()).toMatchObject({
       id: "sso",
       emailFirst: true,
-      localization: ssoLocalization
+      localization: ssoLocalization,
+      organization: true,
+      path: "sso"
     })
     expect(
       ssoPlugin({
@@ -85,6 +91,55 @@ describe("ssoPlugin", () => {
       }
     })
     expect(mutation.mutationKey).toEqual(ssoMutationKeys.register)
+  })
+
+  it("lists providers only after a session is available", async () => {
+    const providers = vi.fn(async () => ({
+      data: { providers: [] },
+      error: null
+    }))
+    const authClient = { sso: { providers } } as never
+
+    expect(ssoProvidersOptions(authClient).queryFn).toBeTypeOf("symbol")
+
+    const options = ssoProvidersOptions(authClient, "user-1")
+    const signal = new AbortController().signal
+    const data = await (
+      options.queryFn as (context: {
+        signal: AbortSignal
+      }) => Promise<{ providers: unknown[] }>
+    )({ signal })
+
+    expect(data).toEqual({ providers: [] })
+    expect(providers).toHaveBeenCalledWith({ fetchOptions: { signal } })
+  })
+
+  it("updates and deletes providers with scoped cache invalidation", async () => {
+    const updateProvider = vi.fn(async () => ({ data: {}, error: null }))
+    const deleteProvider = vi.fn(async () => ({ data: {}, error: null }))
+    const authClient = { sso: { deleteProvider, updateProvider } } as never
+    const update = updateSsoProviderOptions(authClient, "user-1")
+    const remove = deleteSsoProviderOptions(authClient, "user-1")
+
+    await update.mutationFn?.({
+      providerId: "acme",
+      domain: "example.com"
+    } as never)
+    await remove.mutationFn?.({ providerId: "acme" } as never)
+
+    expect(updateProvider).toHaveBeenCalledWith({
+      providerId: "acme",
+      domain: "example.com",
+      fetchOptions: { throw: true }
+    })
+    expect(deleteProvider).toHaveBeenCalledWith({
+      providerId: "acme",
+      fetchOptions: { throw: true }
+    })
+    expect(update.meta).toEqual({
+      awaits: [ssoQueryKeys.providers.all("user-1")]
+    })
+    expect(remove.meta).toEqual(update.meta)
   })
 
   it("manages domain verification with distinct mutations", async () => {
