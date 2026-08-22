@@ -63,6 +63,7 @@ export const deDEPlugins = {
     revoke: "Widerrufen",
     revokeAllSessions: "Alle Sitzungen widerrufen",
     saveRole: "Rolle speichern",
+    saveUser: "Benutzer speichern",
     setPassword: "Passwort festlegen",
     status: "Status",
     stopImpersonating: "Identitätswechsel beenden",

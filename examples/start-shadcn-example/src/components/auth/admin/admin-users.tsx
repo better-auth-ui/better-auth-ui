@@ -734,14 +734,23 @@ function UserInspector({
   const [dangerousAction, setDangerousAction] = useState<DangerousAction>()
   const user = detail.data
   const isSelf = user?.id === actor?.user.id
-  useEffect(() => {
-    if (user?.role) setRole(user.role)
-    if (user?.name) setName(user.name)
-  }, [user?.name, user?.role])
 
   const updateUser = useMutation(
     updateAdminUserOptions(auth.authClient, actor?.user.id)
   )
+
+  useEffect(() => {
+    if (user?.role) setRole(user.role)
+    setName(user?.name ?? "")
+  }, [user?.name, user?.role])
+
+  useEffect(() => {
+    if (user?.id) updateUser.reset()
+  }, [user?.id, updateUser.reset])
+
+  useEffect(() => {
+    if (!open) updateUser.reset()
+  }, [open, updateUser.reset])
 
   const setRoleMutation = useMutation(
     setAdminUserRoleOptions(auth.authClient, actor?.user.id)

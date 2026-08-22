@@ -22,7 +22,7 @@ import {
 } from "@better-auth-ui/solid/plugins/admin"
 import { createDebounce } from "@solid-primitives/debounce"
 import { Ban, KeyRound, LogIn, Search, Trash2, UserPlus } from "lucide-solid"
-import { createEffect, createMemo, createSignal, For, Show } from "solid-js"
+import { createEffect, createMemo, createSignal, For, on, Show } from "solid-js"
 import { Dynamic } from "solid-js/web"
 
 import {
@@ -545,10 +545,15 @@ function UserDialog(props: {
   const revokeSession = useRevokeAdminUserSession(authClient, props.userId)
   const revokeSessions = useRevokeAdminUserSessions(authClient, props.userId)
 
-  createEffect(() => {
-    setName(detail()?.name ?? "")
-    setRole(detail()?.role ?? config().defaultRole)
-  })
+  createEffect(
+    on(
+      () => [detail()?.name, detail()?.role] as const,
+      ([userName, userRole]) => {
+        setName(userName ?? "")
+        setRole(userRole ?? config().defaultRole)
+      }
+    )
+  )
 
   const confirmDangerousAction = () => {
     const selectedUser = detail()
@@ -826,7 +831,9 @@ function UserDialog(props: {
                     <Show
                       fallback={<SessionRowsSkeleton />}
                       when={
-                        !sessionsPermission.isPending && !sessions.isPending
+                        !sessionsPermission.isPending &&
+                        (!sessionsPermission.data?.success ||
+                          !sessions.isPending)
                       }
                     >
                       <Show
