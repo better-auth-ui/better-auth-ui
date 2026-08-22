@@ -4,6 +4,8 @@ import {
   passkeyLocalization
 } from "./passkey-localization"
 
+export type PasskeyAuthenticatorAttachment = "platform" | "cross-platform"
+
 export type PasskeyPluginOptions = {
   /**
    * Offer passkeys through the browser's autofill dropdown (WebAuthn
@@ -16,6 +18,14 @@ export type PasskeyPluginOptions = {
    */
   autoFill?: boolean
   /**
+   * Request one authenticator type for passkey registration. Omit this option
+   * to let the browser and operating system show all available choices.
+   *
+   * `"platform"` prefers this device. `"cross-platform"` prefers a security
+   * key or another device.
+   */
+  authenticatorAttachment?: PasskeyAuthenticatorAttachment
+  /**
    * Override the plugin's default localization strings.
    * @remarks `PasskeyLocalization`
    */
@@ -26,6 +36,7 @@ export const passkeyPlugin = createAuthPlugin(
   "passkey",
   (options: PasskeyPluginOptions = {}) => ({
     autoFill: options.autoFill ?? true,
+    authenticatorAttachment: options.authenticatorAttachment,
     localization: { ...passkeyLocalization, ...options.localization }
   })
 )

@@ -52,6 +52,23 @@ describe("isPasskeyAutoFillEnabled", () => {
   })
 })
 
+describe("passkey authenticator attachment", () => {
+  it("lets the browser choose by default", () => {
+    expect(passkeyPlugin().authenticatorAttachment).toBeUndefined()
+  })
+
+  it("supports a plugin-level registration preference", () => {
+    expect(
+      passkeyPlugin({ authenticatorAttachment: "platform" })
+        .authenticatorAttachment
+    ).toBe("platform")
+    expect(
+      passkeyPlugin({ authenticatorAttachment: "cross-platform" })
+        .authenticatorAttachment
+    ).toBe("cross-platform")
+  })
+})
+
 describe("isConditionalMediationAvailable", () => {
   it("resolves false when the browser lacks the feature probe", async () => {
     stubPublicKeyCredential(null)

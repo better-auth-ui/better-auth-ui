@@ -26,7 +26,8 @@ export function AddPasskeyDialog({
   onOpenChange
 }: AddPasskeyDialogProps) {
   const { authClient, localization } = useAuth()
-  const { localization: passkeyLocalization } = useAuthPlugin(passkeyPlugin)
+  const { authenticatorAttachment, localization: passkeyLocalization } =
+    useAuthPlugin(passkeyPlugin)
 
   const { mutate: addPasskey, isPending: isAdding } = useAddPasskey(
     authClient as PasskeyAuthClient
@@ -42,9 +43,13 @@ export function AddPasskeyDialog({
     const formData = new FormData(e.target as HTMLFormElement)
     const name = (formData.get("name") as string)?.trim()
 
-    addPasskey(name ? { name } : undefined, {
-      onSuccess: () => handleOpenChange(false)
-    })
+    addPasskey(
+      {
+        ...(name ? { name } : {}),
+        ...(authenticatorAttachment ? { authenticatorAttachment } : {})
+      },
+      { onSuccess: () => handleOpenChange(false) }
+    )
   }
 
   return (

@@ -2898,7 +2898,8 @@ describe("Solid auth route component selection", () => {
     expect(passkeys).toContain("onPasskeyAdded={() => passkeys.refetch()}")
     expect(addPasskeyDialog).toContain("props.onPasskeyAdded()")
     expect(addPasskeyDialog).toContain("addPasskey.mutate(")
-    expect(addPasskeyDialog).toContain("name ? { name } : undefined")
+    expect(addPasskeyDialog).toContain("useAuthPlugin(passkeyPlugin)")
+    expect(addPasskeyDialog).toContain("authenticatorAttachment")
     expect(addPasskeyDialog).toContain("props.onOpenChange(false)")
     expect(deletePasskeyDialog).toContain(
       "const auth = useAuth<PasskeyAuthClient>()"

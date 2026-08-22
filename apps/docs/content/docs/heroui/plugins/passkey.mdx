@@ -110,6 +110,41 @@ import { Passkeys } from "@better-auth-ui/heroui/plugins/passkey"
 
 <auto-type-table path="../../../../../../packages/heroui/src/components/auth/passkey/passkeys.tsx" name="PasskeysProps" />
 
+## Passkey registration policy
+
+By default, the add-passkey dialog does not set `authenticatorAttachment`.
+The browser and operating system show the available passkey options.
+
+Set a preference in the plugin when all registrations must use one authenticator type:
+
+```ts
+passkeyPlugin({ authenticatorAttachment: "platform" })
+passkeyPlugin({ authenticatorAttachment: "cross-platform" })
+```
+
+`"platform"` prefers the current device. `"cross-platform"` prefers a security key or another device. The dialog does not show an attachment selector.
+
+`useAddPasskey` accepts every parameter exposed by `authClient.passkey.addPasskey`. Use this hook for custom registration flows:
+
+```tsx
+const { mutate: addPasskey } = useAddPasskey(
+  authClient as PasskeyAuthClient
+)
+
+addPasskey({
+  name: "Work laptop",
+  authenticatorAttachment: "platform",
+  extensions: { credProps: true },
+  returnWebAuthnResponse: true
+})
+```
+
+<Callout>
+`residentKey` and `userVerification` are server plugin policies. They are not
+parameters of `authClient.passkey.addPasskey`, so the client UI does not expose
+them.
+</Callout>
+
 ## Passkey autofill
 
 With the plugin registered, the sign-in form asks the browser to offer saved
@@ -165,6 +200,8 @@ pass an `AbortSignal` and abort it during cleanup.
 
 ```ts
 passkeyPlugin({
+  // Omit this option to let the browser show all available choices.
+  authenticatorAttachment: "platform",
   // Override any of the plugin's localization strings.
   localization: {
     passkeys: "Security Keys"

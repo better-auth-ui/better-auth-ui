@@ -1,5 +1,5 @@
 import type { PasskeyAuthClient } from "@better-auth-ui/core/plugins/passkey"
-import { useAuth } from "@better-auth-ui/solid"
+import { useAuth, useAuthPlugin } from "@better-auth-ui/solid"
 import { useAddPasskey } from "@better-auth-ui/solid/plugins/passkey"
 import { Fingerprint } from "lucide-solid"
 import { passkeyLabels } from "@/components/auth/passkey/passkey-localization"
@@ -15,6 +15,7 @@ import {
 import { Field, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import { Spinner } from "@/components/ui/spinner"
+import { passkeyPlugin } from "@/lib/auth/passkey-plugin"
 
 export function AddPasskeyDialog(props: {
   onOpenChange: (open: boolean) => void
@@ -22,6 +23,7 @@ export function AddPasskeyDialog(props: {
 }) {
   const auth = useAuth<PasskeyAuthClient>()
   const labels = () => passkeyLabels(auth)
+  const { authenticatorAttachment } = useAuthPlugin(passkeyPlugin)
   const addPasskey = useAddPasskey(auth.authClient, () => ({
     onSuccess: () => {
       props.onOpenChange(false)
@@ -35,9 +37,10 @@ export function AddPasskeyDialog(props: {
     const formData = new FormData(event.currentTarget as HTMLFormElement)
     const name = String(formData.get("name") ?? "").trim()
 
-    addPasskey.mutate(
-      (name ? { name } : undefined) as Parameters<typeof addPasskey.mutate>[0]
-    )
+    addPasskey.mutate({
+      ...(name ? { name } : {}),
+      ...(authenticatorAttachment ? { authenticatorAttachment } : {})
+    } as Parameters<typeof addPasskey.mutate>[0])
   }
 
   return (

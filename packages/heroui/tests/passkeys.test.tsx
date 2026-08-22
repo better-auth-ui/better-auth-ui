@@ -212,14 +212,17 @@ function createPasskeysAuthClient(
   }
 }
 
-function renderPasskeys(authClient = createPasskeysAuthClient()) {
+function renderPasskeys(
+  authClient = createPasskeysAuthClient(),
+  pluginOptions?: Parameters<typeof passkeyPlugin>[0]
+) {
   return {
     authClient,
     ...render(
       <AuthProvider
         authClient={authClient}
         navigate={() => {}}
-        plugins={[passkeyPlugin()]}
+        plugins={[passkeyPlugin(pluginOptions)]}
         queryClient={createTestQueryClient()}
       >
         <Passkeys />
@@ -296,6 +299,9 @@ describe("<Passkeys />", () => {
     expect(authClient.passkey.addPasskey.mock.calls[0][0]).not.toHaveProperty(
       "name"
     )
+    expect(authClient.passkey.addPasskey.mock.calls[0][0]).not.toHaveProperty(
+      "authenticatorAttachment"
+    )
   })
 
   it("forwards the typed name to addPasskey", async () => {
@@ -331,6 +337,32 @@ describe("<Passkeys />", () => {
         fetchOptions: expect.objectContaining({ throw: true })
       })
     )
+  })
+
+  it("forwards the configured authenticator preference without a selector", async () => {
+    const user = userEvent.setup()
+    const authClient = createPasskeysAuthClient()
+    renderPasskeys(authClient, { authenticatorAttachment: "platform" })
+
+    await user.click(
+      await screen.findByRole("button", { name: /add passkey/i })
+    )
+
+    const dialog = await screen.findByRole("alertdialog")
+    expect(within(dialog).queryByRole("combobox")).not.toBeInTheDocument()
+
+    await user.click(
+      within(dialog).getByRole("button", { name: /add passkey/i })
+    )
+
+    await waitFor(() => {
+      expect(authClient.passkey.addPasskey).toHaveBeenCalledWith(
+        expect.objectContaining({
+          authenticatorAttachment: "platform",
+          fetchOptions: expect.objectContaining({ throw: true })
+        })
+      )
+    })
   })
 
   it("renders registered passkeys", async () => {
