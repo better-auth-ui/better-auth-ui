@@ -212,6 +212,8 @@
         "input",
         "input-group",
         "spinner",
+        "tabs",
+        "textarea",
         "https://better-auth-ui.com/r/radix-nova/sign-in.json"
       ],
       "files": [
@@ -229,6 +231,16 @@
           "path": "src/components/auth/sso/email-first-sign-in.tsx",
           "type": "registry:component",
           "target": "@components/auth/sso/email-first-sign-in.tsx"
+        },
+        {
+          "path": "src/components/auth/sso/sso-domain-verification.tsx",
+          "type": "registry:component",
+          "target": "@components/auth/sso/sso-domain-verification.tsx"
+        },
+        {
+          "path": "src/components/auth/sso/sso-provider-setup.tsx",
+          "type": "registry:component",
+          "target": "@components/auth/sso/sso-provider-setup.tsx"
         }
       ]
     },
