@@ -39,6 +39,7 @@ describe("twoFactorPlugin", () => {
       backupCodes: true,
       trustDevice: true,
       allowPasswordless: false,
+      enrollmentMethods: ["totp"],
       viewPaths: { auth: { twoFactor: "two-factor" } }
     })
   })
@@ -47,6 +48,16 @@ describe("twoFactorPlugin", () => {
     expect(twoFactorPlugin({ codeLength: 8.7 }).codeLength).toBe(8)
     expect(twoFactorPlugin({ codeLength: Number.NaN }).codeLength).toBe(6)
     expect(twoFactorPlugin({ codeLength: 0 }).codeLength).toBe(1)
+  })
+
+  it("normalizes enrollment methods", () => {
+    expect(
+      twoFactorPlugin({ enrollmentMethods: ["otp", "totp", "otp"] })
+        .enrollmentMethods
+    ).toEqual(["totp", "otp"])
+    expect(
+      twoFactorPlugin({ enrollmentMethods: [] }).enrollmentMethods
+    ).toEqual(["totp"])
   })
 })
 

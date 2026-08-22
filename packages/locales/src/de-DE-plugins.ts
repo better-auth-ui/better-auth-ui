@@ -630,6 +630,13 @@ export const deDEPlugins = {
     twoFactorEnabled: "Zwei-Faktor-Authentifizierung ist aktiviert",
     twoFactorDisabled: "Zwei-Faktor-Authentifizierung ist deaktiviert",
     passwordConfirmation: "Gib dein Passwort ein, um fortzufahren",
+    chooseEnrollmentMethod:
+      "Wähle aus, wie du zukünftige Anmeldungen bestätigen möchtest",
+    authenticatorApp: "Authenticator-App",
+    authenticatorAppDescription:
+      "Verwende einen wechselnden Code aus einer Authenticator-App",
+    deliveredCode: "Code per E-Mail oder SMS",
+    deliveredCodeDescription: "Erhalte bei jeder Anmeldung einen neuen Code",
     scanQrCode: "Scanne dies mit deiner Authenticator-App",
     setupKey: "Scannen nicht möglich? Gib stattdessen diesen Schlüssel ein",
     setupKeyCopied: "Einrichtungsschlüssel kopiert",

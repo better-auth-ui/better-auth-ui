@@ -3,6 +3,10 @@ import { createAuthPlugin } from "../../lib/create-auth-plugin"
 // same module instance that external consumers reach via `@better-auth-ui/core`.
 import type {} from "../../lib/view-paths"
 import {
+  parseTwoFactorMethods,
+  type TwoFactorMethod
+} from "./two-factor-challenge"
+import {
   type TwoFactorLocalization,
   twoFactorLocalization
 } from "./two-factor-localization"
@@ -65,6 +69,15 @@ export type TwoFactorPluginOptions = {
    * @default false
    */
   allowPasswordless?: boolean
+  /**
+   * Methods users can choose while enrolling in two-factor authentication.
+   *
+   * Add `"otp"` only when the server configures `otpOptions.sendOTP`.
+   *
+   * @remarks `TwoFactorMethod[]`
+   * @default ["totp"]
+   */
+  enrollmentMethods?: TwoFactorMethod[]
 }
 
 const DEFAULT_CODE_LENGTH = 6
@@ -77,6 +90,11 @@ function resolveCodeLength(value?: number) {
   return Math.max(1, Math.floor(value))
 }
 
+function resolveEnrollmentMethods(methods?: TwoFactorMethod[]) {
+  const resolved = parseTwoFactorMethods(methods)
+  return resolved.length ? resolved : (["totp"] satisfies TwoFactorMethod[])
+}
+
 export const twoFactorPlugin = createAuthPlugin(
   "twoFactor",
   (options: TwoFactorPluginOptions = {}) => ({
@@ -85,6 +103,7 @@ export const twoFactorPlugin = createAuthPlugin(
     backupCodes: options.backupCodes ?? true,
     trustDevice: options.trustDevice ?? true,
     allowPasswordless: options.allowPasswordless ?? false,
+    enrollmentMethods: resolveEnrollmentMethods(options.enrollmentMethods),
     viewPaths: {
       auth: {
         twoFactor: options.path ?? "two-factor"

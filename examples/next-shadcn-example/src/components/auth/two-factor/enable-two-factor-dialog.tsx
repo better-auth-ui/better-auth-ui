@@ -1,7 +1,10 @@
 "use client"
 
 import { createQrCodeSvgData } from "@better-auth-ui/core"
-import type { TwoFactorAuthClient } from "@better-auth-ui/core/plugins/two-factor"
+import type {
+  TwoFactorAuthClient,
+  TwoFactorMethod
+} from "@better-auth-ui/core/plugins/two-factor"
 import {
   useAuth,
   useAuthPlugin,
@@ -33,6 +36,7 @@ import {
   InputGroupInput
 } from "@/components/ui/input-group"
 import { Spinner } from "@/components/ui/spinner"
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { twoFactorPlugin } from "@/lib/auth/two-factor-plugin"
 import { useTwoFactorPasswordRequirement } from "@/lib/auth/use-two-factor-password"
 import { OtpField } from "../otp-field"
@@ -46,11 +50,10 @@ export type EnableTwoFactorDialogProps = {
 }
 
 /**
- * Three-step two-factor enrollment: confirm the password, scan the QR code
- * and verify a first code, then save the backup codes.
+ * Two-factor enrollment with authenticator-app and delivered-code methods.
  *
- * Better Auth only marks two-factor as active once a TOTP code verifies, so
- * the dialog never closes on the enable call alone.
+ * TOTP continues through QR verification and backup-code capture. OTP becomes
+ * active as soon as Better Auth accepts the enrollment request.
  *
  * @param open - Whether the dialog is open.
  * @param onOpenChange - Called when the dialog requests an open state change.
@@ -60,14 +63,20 @@ export function EnableTwoFactorDialog({
   onOpenChange
 }: EnableTwoFactorDialogProps) {
   const { authClient, localization } = useAuth()
-  const { codeLength, localization: twoFactorLocalization } =
-    useAuthPlugin(twoFactorPlugin)
+  const {
+    codeLength,
+    enrollmentMethods,
+    localization: twoFactorLocalization
+  } = useAuthPlugin(twoFactorPlugin)
   const { isPending: isResolvingPasswordRequirement, requiresPassword } =
     useTwoFactorPasswordRequirement()
 
   const twoFactorClient = authClient as TwoFactorAuthClient
 
   const [step, setStep] = useState<EnrollmentStep>("password")
+  const [method, setMethod] = useState<TwoFactorMethod>(
+    enrollmentMethods[0] ?? "totp"
+  )
   const [totpUri, setTotpUri] = useState("")
   const [backupCodes, setBackupCodes] = useState<string[]>([])
   const [code, setCode] = useState("")
@@ -108,7 +117,11 @@ export function EnableTwoFactorDialog({
     reset: resetEnrollment
   } = useEnableTwoFactor(twoFactorClient, {
     onSuccess: (data) => {
-      if (data.method !== "totp") return
+      if (data.method === "otp") {
+        toast.success(twoFactorLocalization.twoFactorEnabled)
+        handleOpenChange(false)
+        return
+      }
 
       setTotpUri(data.totpURI)
       setBackupCodes(data.backupCodes)
@@ -142,6 +155,7 @@ export function EnableTwoFactorDialog({
 
     if (!nextOpen) {
       setStep("password")
+      setMethod(enrollmentMethods[0] ?? "totp")
       setTotpUri("")
       setBackupCodes([])
       setCode("")
@@ -167,9 +181,7 @@ export function EnableTwoFactorDialog({
     const formData = new FormData(e.currentTarget)
     const password = formData.get("password") as string
 
-    enableTwoFactor(
-      requiresPassword ? { method: "totp", password } : { method: "totp" }
-    )
+    enableTwoFactor(requiresPassword ? { method, password } : { method })
   }
 
   const submitLabel =
@@ -198,25 +210,58 @@ export function EnableTwoFactorDialog({
             </DialogDescription>
           </DialogHeader>
 
-          {step === "password" && requiresPassword && (
-            <Field>
-              <FieldLabel htmlFor="two-factor-password">
-                {localization.auth.password}
-              </FieldLabel>
+          {step === "password" && (
+            <div className="flex flex-col gap-4">
+              {enrollmentMethods.length > 1 && (
+                <Tabs
+                  value={method}
+                  onValueChange={(value) => setMethod(value as TwoFactorMethod)}
+                >
+                  <TabsList
+                    aria-label={twoFactorLocalization.chooseEnrollmentMethod}
+                    className="w-full"
+                  >
+                    {enrollmentMethods.includes("totp") && (
+                      <TabsTrigger value="totp">
+                        {twoFactorLocalization.authenticatorApp}
+                      </TabsTrigger>
+                    )}
+                    {enrollmentMethods.includes("otp") && (
+                      <TabsTrigger value="otp">
+                        {twoFactorLocalization.deliveredCode}
+                      </TabsTrigger>
+                    )}
+                  </TabsList>
+                </Tabs>
+              )}
 
-              <Input
-                id="two-factor-password"
-                name="password"
-                type="password"
-                autoComplete="current-password"
-                autoFocus
-                required
-                placeholder={localization.auth.passwordPlaceholder}
-                disabled={isPending}
-              />
+              <p className="text-muted-foreground text-sm">
+                {method === "totp"
+                  ? twoFactorLocalization.authenticatorAppDescription
+                  : twoFactorLocalization.deliveredCodeDescription}
+              </p>
 
-              <FieldError />
-            </Field>
+              {requiresPassword && (
+                <Field>
+                  <FieldLabel htmlFor="two-factor-password">
+                    {localization.auth.password}
+                  </FieldLabel>
+
+                  <Input
+                    id="two-factor-password"
+                    name="password"
+                    type="password"
+                    autoComplete="current-password"
+                    autoFocus
+                    required
+                    placeholder={localization.auth.passwordPlaceholder}
+                    disabled={isPending}
+                  />
+
+                  <FieldError />
+                </Field>
+              )}
+            </div>
           )}
 
           {step === "verify" && (
