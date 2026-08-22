@@ -1,14 +1,12 @@
-"use client"
-
 import type {
   RegisterSsoProviderData,
   RegisterSsoProviderParams,
   SsoAuthClient
 } from "@better-auth-ui/core/plugins/sso"
-import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
-import { useRegisterSsoProvider } from "@better-auth-ui/react/plugins/sso"
+import { useAuth, useAuthPlugin } from "@better-auth-ui/solid"
+import { useRegisterSsoProvider } from "@better-auth-ui/solid/plugins/sso"
 import type { BetterFetchError } from "better-auth/client"
-import { type FormEvent, useState } from "react"
+import { createSignal, Show } from "solid-js"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -36,7 +34,7 @@ import { cn } from "@/lib/utils"
 type SsoProtocol = "oidc" | "saml"
 
 export type SsoProviderSetupProps = {
-  className?: string
+  class?: string
   defaultOrganizationId?: string
   organizationId?: string
   onRegistered?: (provider: RegisterSsoProviderData) => void
@@ -45,40 +43,33 @@ export type SsoProviderSetupProps = {
 const readString = (formData: FormData, name: string) =>
   String(formData.get(name) ?? "").trim()
 
-const getErrorMessage = (error: Error | null) => {
-  const authError = error as BetterFetchError | null
+const getErrorMessage = (error: Error | null | undefined) => {
+  const authError = error as BetterFetchError | null | undefined
   return authError?.error?.message ?? authError?.message
 }
 
-/** Self-service form for registering an OIDC or SAML SSO provider. */
-export function SsoProviderSetup({
-  className,
-  defaultOrganizationId,
-  organizationId: fixedOrganizationId,
-  onRegistered
-}: SsoProviderSetupProps) {
-  const { authClient } = useAuth()
+export function SsoProviderSetup(props: SsoProviderSetupProps) {
+  const auth = useAuth()
   const { localization } = useAuthPlugin(ssoPlugin)
-  const [protocol, setProtocol] = useState<SsoProtocol>("oidc")
-  const [created, setCreated] = useState(false)
-  const register = useRegisterSsoProvider(authClient as SsoAuthClient)
+  const [protocol, setProtocol] = createSignal<SsoProtocol>("oidc")
+  const [created, setCreated] = createSignal(false)
+  const register = useRegisterSsoProvider(auth.authClient as SsoAuthClient)
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const submit = (event: SubmitEvent) => {
     event.preventDefault()
     setCreated(false)
-
-    const formData = new FormData(event.currentTarget)
+    const formData = new FormData(event.currentTarget as HTMLFormElement)
     const common = {
       providerId: readString(formData, "providerId"),
       issuer: readString(formData, "issuer"),
       domain: readString(formData, "domain"),
       organizationId:
-        fixedOrganizationId ||
+        props.organizationId ||
         readString(formData, "organizationId") ||
         undefined
     }
     const params =
-      protocol === "oidc"
+      protocol() === "oidc"
         ? {
             ...common,
             oidcConfig: {
@@ -99,13 +90,13 @@ export function SsoProviderSetup({
     register.mutate(params as RegisterSsoProviderParams<SsoAuthClient>, {
       onSuccess: (provider) => {
         setCreated(true)
-        onRegistered?.(provider)
+        props.onRegistered?.(provider)
       }
     })
   }
 
   return (
-    <form className={cn("w-full max-w-xl", className)} onSubmit={handleSubmit}>
+    <form class={cn("w-full max-w-xl", props.class)} onSubmit={submit}>
       <Card>
         <CardHeader>
           <CardTitle>{localization.providerSetup}</CardTitle>
@@ -115,124 +106,120 @@ export function SsoProviderSetup({
         </CardHeader>
         <CardContent>
           <FieldGroup>
-            <div className="grid gap-4 sm:grid-cols-2">
+            <div class="grid gap-4 sm:grid-cols-2">
               <Field>
-                <FieldLabel htmlFor="sso-provider-id">
+                <FieldLabel for="solid-sso-provider-id">
                   {localization.providerId}
                 </FieldLabel>
-                <Input id="sso-provider-id" name="providerId" required />
+                <Input id="solid-sso-provider-id" name="providerId" required />
               </Field>
               <Field>
-                <FieldLabel htmlFor="sso-domain">
+                <FieldLabel for="solid-sso-domain">
                   {localization.domain}
                 </FieldLabel>
                 <Input
-                  id="sso-domain"
+                  id="solid-sso-domain"
                   name="domain"
                   placeholder="example.com"
                   required
                 />
               </Field>
             </div>
-
             <Field>
-              <FieldLabel htmlFor="sso-issuer">
+              <FieldLabel for="solid-sso-issuer">
                 {localization.issuer}
               </FieldLabel>
               <Input
-                id="sso-issuer"
+                id="solid-sso-issuer"
                 name="issuer"
                 placeholder="https://idp.example.com"
-                type="url"
                 required
+                type="url"
               />
             </Field>
-
-            {!fixedOrganizationId ? (
+            <Show when={!props.organizationId}>
               <Field>
-                <FieldLabel htmlFor="sso-organization-id">
+                <FieldLabel for="solid-sso-organization-id">
                   {localization.organizationId}
                 </FieldLabel>
                 <Input
-                  defaultValue={defaultOrganizationId}
-                  id="sso-organization-id"
+                  id="solid-sso-organization-id"
                   name="organizationId"
+                  value={props.defaultOrganizationId ?? ""}
                 />
               </Field>
-            ) : null}
-
+            </Show>
             <Tabs
-              value={protocol}
-              onValueChange={(value) => setProtocol(value as SsoProtocol)}
+              value={protocol()}
+              onChange={(value) => setProtocol(value as SsoProtocol)}
             >
               <TabsList aria-label={localization.providerSetup}>
                 <TabsTrigger value="oidc">{localization.oidc}</TabsTrigger>
                 <TabsTrigger value="saml">{localization.saml}</TabsTrigger>
               </TabsList>
-              <TabsContent className="grid gap-4 sm:grid-cols-2" value="oidc">
+              <TabsContent class="grid gap-4 sm:grid-cols-2" value="oidc">
                 <Field>
-                  <FieldLabel htmlFor="sso-client-id">
+                  <FieldLabel for="solid-sso-client-id">
                     {localization.clientId}
                   </FieldLabel>
                   <Input
-                    autoComplete="off"
-                    id="sso-client-id"
+                    autocomplete="off"
+                    id="solid-sso-client-id"
                     name="clientId"
                     required
                   />
                 </Field>
                 <Field>
-                  <FieldLabel htmlFor="sso-client-secret">
+                  <FieldLabel for="solid-sso-client-secret">
                     {localization.clientSecret}
                   </FieldLabel>
                   <Input
-                    autoComplete="new-password"
-                    id="sso-client-secret"
+                    autocomplete="new-password"
+                    id="solid-sso-client-secret"
                     name="clientSecret"
-                    type="password"
                     required
+                    type="password"
                   />
                 </Field>
               </TabsContent>
-              <TabsContent className="flex flex-col gap-4" value="saml">
+              <TabsContent class="flex flex-col gap-4" value="saml">
                 <Field>
-                  <FieldLabel htmlFor="sso-entry-point">
+                  <FieldLabel for="solid-sso-entry-point">
                     {localization.entryPoint}
                   </FieldLabel>
                   <Input
-                    id="sso-entry-point"
+                    id="solid-sso-entry-point"
                     name="entryPoint"
-                    type="url"
                     required
+                    type="url"
                   />
                 </Field>
                 <Field>
-                  <FieldLabel htmlFor="sso-idp-metadata">
+                  <FieldLabel for="solid-sso-idp-metadata">
                     {localization.identityProviderMetadata}
                   </FieldLabel>
                   <Textarea
-                    className="min-h-40 font-mono text-xs"
-                    id="sso-idp-metadata"
+                    class="min-h-40 font-mono text-xs"
+                    id="solid-sso-idp-metadata"
                     name="identityProviderMetadata"
                     required
                   />
                 </Field>
               </TabsContent>
             </Tabs>
-
-            {register.error ? (
-              <FieldError>{getErrorMessage(register.error)}</FieldError>
-            ) : null}
-            {created ? (
-              <FieldDescription role="status" className="text-foreground">
+            <FieldError>{getErrorMessage(register.error)}</FieldError>
+            <Show when={created()}>
+              <FieldDescription role="status">
                 {localization.providerCreated}
               </FieldDescription>
-            ) : null}
+            </Show>
           </FieldGroup>
         </CardContent>
-        <CardFooter className="justify-end">
-          <Button type="submit" disabled={register.isPending}>
-            {register.isPending ? <Spinner data-icon="inline-start" /> : null}
+        <CardFooter class="justify-end">
+          <Button disabled={register.isPending} type="submit">
+            <Show when={register.isPending}>
+              <Spinner />
+            </Show>
             {localization.addProvider}
           </Button>
         </CardFooter>

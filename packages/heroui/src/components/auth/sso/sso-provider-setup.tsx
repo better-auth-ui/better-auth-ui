@@ -31,6 +31,7 @@ type SsoProtocol = "oidc" | "saml"
 
 export type SsoProviderSetupProps = {
   defaultOrganizationId?: string
+  organizationId?: string
   onRegistered?: (provider: RegisterSsoProviderData) => void
 } & Omit<CardProps, "children">
 
@@ -46,6 +47,7 @@ const getErrorMessage = (error: Error | null) => {
 export function SsoProviderSetup({
   className,
   defaultOrganizationId,
+  organizationId: fixedOrganizationId,
   onRegistered,
   variant,
   ...props
@@ -64,7 +66,8 @@ export function SsoProviderSetup({
     const providerId = readString(formData, "providerId")
     const issuer = readString(formData, "issuer")
     const domain = readString(formData, "domain")
-    const organizationId = readString(formData, "organizationId") || undefined
+    const organizationId =
+      fixedOrganizationId || readString(formData, "organizationId") || undefined
     const common = { providerId, issuer, domain, organizationId }
     const params =
       protocol === "oidc"
@@ -126,11 +129,16 @@ export function SsoProviderSetup({
             <FieldError />
           </TextField>
 
-          <TextField defaultValue={defaultOrganizationId} name="organizationId">
-            <Label>{localization.organizationId}</Label>
-            <Input variant="secondary" />
-            <FieldError />
-          </TextField>
+          {!fixedOrganizationId ? (
+            <TextField
+              defaultValue={defaultOrganizationId}
+              name="organizationId"
+            >
+              <Label>{localization.organizationId}</Label>
+              <Input variant="secondary" />
+              <FieldError />
+            </TextField>
+          ) : null}
 
           <Tabs
             selectedKey={protocol}
