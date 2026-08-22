@@ -222,6 +222,8 @@ export const deDEPlugins = {
       "Prüfe die letzten Authentifizierungs- und Kontoaktivitäten.",
     adminUserActivityDescription:
       "Prüfe die letzten Authentifizierungs- und Kontoaktivitäten für diesen Benutzer.",
+    adminActivityDescription:
+      "Prüfe Aktivitäten in den von dir verwalteten Organisationen.",
     organizationActivityDescription:
       "Prüfe die für dich sichtbaren Aktivitäten dieser Organisation.",
     organizationWide: "Gesamte Organisation",
@@ -236,6 +238,10 @@ export const deDEPlugins = {
     paginationRange: "{{from}}–{{to}} von {{total}}",
     previousPage: "Vorherige Seite",
     nextPage: "Nächste Seite",
+    allEvents: "Alle Ereignisse",
+    eventType: "Ereignistyp",
+    identifier: "Kennung",
+    identifierPlaceholder: "Nach E-Mail, Benutzer-ID oder Anbieter filtern",
     unknownEvent: "Aktivitätsereignis",
     eventLabels: {
       account_linked: "Konto verknüpft",

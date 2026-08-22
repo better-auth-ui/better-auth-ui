@@ -7,6 +7,7 @@ import { Activity } from "lucide-react"
 import { createElement } from "react"
 
 import {
+  AdminActivity,
   AdminUserActivity,
   OrganizationActivity,
   UserActivity
@@ -28,6 +29,14 @@ export const dashPlugin = createAuthPlugin(
       ...core,
       ...(core.admin
         ? {
+            adminTabs: [
+              {
+                id: "activity",
+                path: core.viewPaths.settings.activity,
+                label: activityLabel(core.localization.activity),
+                component: AdminActivity
+              }
+            ],
             adminUserTabs: [
               {
                 id: "activity",

@@ -26,11 +26,12 @@ import {
   ChevronLeft,
   ChevronRight,
   MonitorDot,
+  Search,
   ShieldCheck,
   UserRound,
   Users
 } from "lucide-react"
-import { Fragment, useState } from "react"
+import { Fragment, useDeferredValue, useMemo, useState } from "react"
 
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -51,13 +52,26 @@ import {
   EmptyMedia,
   EmptyTitle
 } from "@/components/ui/empty"
+import { Field, FieldLabel } from "@/components/ui/field"
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput
+} from "@/components/ui/input-group"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
+} from "@/components/ui/select"
 import { Separator } from "@/components/ui/separator"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Spinner } from "@/components/ui/spinner"
 import { dashPlugin } from "@/lib/auth/dash-plugin"
 import { cn } from "@/lib/utils"
 
-type ActivityAccess = "admin-user" | "organization" | "user"
+type ActivityAccess = "admin" | "admin-user" | "organization" | "user"
 
 type ActivityFeedProps = {
   access: ActivityAccess
@@ -71,6 +85,8 @@ export type AdminUserActivityProps = {
   className?: string
   userId: string
 }
+
+export type AdminActivityProps = { className?: string }
 
 export type UserActivityProps = { className?: string }
 
@@ -195,15 +211,28 @@ function ActivityFeed({
   const { authClient } = useAuth()
   const { localization, pageSize } = useAuthPlugin(dashPlugin)
   const [page, setPage] = useState(0)
+  const [eventType, setEventType] = useState("all")
+  const [identifier, setIdentifier] = useState("")
+  const deferredIdentifier = useDeferredValue(identifier.trim())
+  const eventOptions = useMemo(
+    () => Object.entries(localization.eventLabels),
+    [localization.eventLabels]
+  )
   const offset = page * pageSize
-  const params = { limit: pageSize, offset, organizationId }
+  const params = {
+    eventType: eventType === "all" ? undefined : eventType,
+    identifier: deferredIdentifier || undefined,
+    limit: pageSize,
+    offset,
+    organizationId
+  }
   const userQuery = useDashAuditLogs(authClient as DashAuthClient, {
     enabled: ready && access === "user",
     params,
     placeholderData: keepPreviousData
   })
   const organizationQuery = useDashAllAuditLogs(authClient as DashAuthClient, {
-    enabled: ready && access === "organization",
+    enabled: ready && (access === "admin" || access === "organization"),
     params,
     placeholderData: keepPreviousData
   })
@@ -212,11 +241,16 @@ function ActivityFeed({
     userId,
     {
       enabled: ready && access === "admin-user",
-      params: { limit: pageSize, offset }
+      params: {
+        eventType: params.eventType,
+        identifier: params.identifier,
+        limit: pageSize,
+        offset
+      }
     }
   )
   const query =
-    access === "organization"
+    access === "admin" || access === "organization"
       ? organizationQuery
       : access === "admin-user"
         ? adminUserQuery
@@ -234,11 +268,13 @@ function ActivityFeed({
       <CardHeader>
         <CardTitle>{localization.activity}</CardTitle>
         <CardDescription>
-          {access === "admin-user"
-            ? localization.adminUserActivityDescription
-            : organizationId
-              ? localization.organizationActivityDescription
-              : localization.activityDescription}
+          {access === "admin"
+            ? localization.adminActivityDescription
+            : access === "admin-user"
+              ? localization.adminUserActivityDescription
+              : organizationId
+                ? localization.organizationActivityDescription
+                : localization.activityDescription}
         </CardDescription>
         {organizationId && (
           <CardAction>
@@ -251,7 +287,53 @@ function ActivityFeed({
         )}
       </CardHeader>
 
-      <CardContent>
+      <CardContent className="flex flex-col gap-4">
+        <div className="grid gap-2 sm:grid-cols-[12rem_minmax(14rem,1fr)]">
+          <Field>
+            <FieldLabel htmlFor="dash-event-type">
+              {localization.eventType}
+            </FieldLabel>
+            <Select
+              value={eventType}
+              onValueChange={(value) => {
+                if (!value) return
+                setEventType(value)
+                setPage(0)
+              }}
+            >
+              <SelectTrigger id="dash-event-type" className="w-full">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">{localization.allEvents}</SelectItem>
+                {eventOptions.map(([key, label]) => (
+                  <SelectItem key={key} value={key}>
+                    {label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </Field>
+          <Field>
+            <FieldLabel htmlFor="dash-identifier">
+              {localization.identifier}
+            </FieldLabel>
+            <InputGroup>
+              <InputGroupAddon>
+                <Search />
+              </InputGroupAddon>
+              <InputGroupInput
+                id="dash-identifier"
+                onChange={(event) => {
+                  setIdentifier(event.target.value)
+                  setPage(0)
+                }}
+                placeholder={localization.identifierPlaceholder}
+                value={identifier}
+              />
+            </InputGroup>
+          </Field>
+        </div>
         {showPending ? (
           <ul>
             {generateN(3).map((skeletonId, position) => (
@@ -346,6 +428,11 @@ function ActivityFeed({
 /** Authentication and account activity for a user selected by an administrator. */
 export function AdminUserActivity(props: AdminUserActivityProps) {
   return <ActivityFeed key={props.userId} access="admin-user" {...props} />
+}
+
+/** Activity across every organization the current owner or administrator can manage. */
+export function AdminActivity(props: AdminActivityProps) {
+  return <ActivityFeed access="admin" {...props} />
 }
 
 /** Personal authentication and account activity. */

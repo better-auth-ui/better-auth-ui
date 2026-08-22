@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest"
 import {
+  AdminActivity,
   OrganizationActivity,
   UserActivity
 } from "../src/components/auth/dash/activity"
@@ -18,6 +19,11 @@ describe("dashPlugin (heroui)", () => {
       path: "history",
       component: OrganizationActivity
     })
+    expect(plugin.adminTabs?.[0]).toMatchObject({
+      id: "activity",
+      path: "history",
+      component: AdminActivity
+    })
   })
 
   it("can expose only one activity surface", () => {
@@ -26,7 +32,9 @@ describe("dashPlugin (heroui)", () => {
 
     expect(personal.settingsTabs).toHaveLength(1)
     expect(personal.organizationTabs).toBeUndefined()
+    expect(personal.adminTabs).toHaveLength(1)
     expect(organization.settingsTabs).toBeUndefined()
     expect(organization.organizationTabs).toHaveLength(1)
+    expect(dashPlugin({ admin: false }).adminTabs).toBeUndefined()
   })
 })

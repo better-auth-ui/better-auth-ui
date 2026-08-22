@@ -465,7 +465,7 @@ export const solidRegistryManifest = {
       type: "registry:component",
       title: "Solid Dash Activity",
       description:
-        "Solid personal activity and role-aware organization audit logs backed by Better Auth Infrastructure Dash.",
+        "Filtered Solid personal and organization audit logs, plus an administrator view across organizations the current administrator can manage, backed by Better Auth Infrastructure Dash.",
       dependencies: [...solidAuthDependencies, "@better-auth/infra@latest"],
       registryDependencies: [
         betterAuthSolidRegistryDependency("auth-provider"),

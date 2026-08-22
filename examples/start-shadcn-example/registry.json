@@ -695,7 +695,7 @@
       "name": "dash",
       "type": "registry:component",
       "title": "Dash Activity",
-      "description": "Personal activity and role-aware organization audit logs backed by Better Auth Infrastructure Dash.",
+      "description": "Filtered personal, organization, and administrator audit logs backed by Better Auth Infrastructure Dash.",
       "dependencies": [
         "@better-auth-ui/react@latest",
         "@better-auth-ui/core@latest",
@@ -707,6 +707,9 @@
         "button",
         "card",
         "empty",
+        "field",
+        "input-group",
+        "select",
         "separator",
         "skeleton",
         "spinner"
