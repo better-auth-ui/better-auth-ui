@@ -11,6 +11,7 @@ import {
 import { Pulse } from "@gravity-ui/icons"
 import { createElement } from "react"
 import {
+  AdminActivity,
   AdminUserActivity,
   OrganizationActivity,
   UserActivity
@@ -31,6 +32,14 @@ export const dashPlugin = createAuthPlugin(
     const localizedTabs = (localization: DashLocalization) => ({
       ...(core.admin
         ? {
+            adminTabs: [
+              {
+                id: "activity",
+                path: core.viewPaths.settings.activity,
+                label: activityLabel(localization.activity),
+                component: AdminActivity
+              }
+            ],
             adminUserTabs: [
               {
                 id: "activity",

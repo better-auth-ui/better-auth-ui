@@ -37,14 +37,18 @@ import {
   type CardProps,
   Chip,
   cn,
+  Label,
+  ListBox,
+  SearchField,
+  Select,
   Skeleton,
   Spinner
 } from "@heroui/react"
 import { keepPreviousData } from "@tanstack/react-query"
-import { useState } from "react"
+import { useDeferredValue, useMemo, useState } from "react"
 import { dashPlugin } from "../../../lib/auth/dash-plugin"
 
-type ActivityAccess = "admin-user" | "organization" | "user"
+type ActivityAccess = "admin" | "admin-user" | "organization" | "user"
 
 type ActivityFeedProps = {
   access: ActivityAccess
@@ -58,6 +62,11 @@ type ActivityFeedProps = {
 export type AdminUserActivityProps = {
   className?: string
   userId: string
+  variant?: CardProps["variant"]
+}
+
+export type AdminActivityProps = {
+  className?: string
   variant?: CardProps["variant"]
 }
 
@@ -196,16 +205,29 @@ function ActivityFeed({
   const { authClient, locale } = useAuth()
   const { localization, pageSize } = useAuthPlugin(dashPlugin)
   const [page, setPage] = useState(0)
+  const [eventType, setEventType] = useState("all")
+  const [identifier, setIdentifier] = useState("")
+  const deferredIdentifier = useDeferredValue(identifier.trim())
+  const eventOptions = useMemo(
+    () => Object.entries(localization.eventLabels),
+    [localization.eventLabels]
+  )
   const numberFormatter = new Intl.NumberFormat(locale.languageTag)
   const offset = page * pageSize
-  const params = { limit: pageSize, offset, organizationId }
+  const params = {
+    eventType: eventType === "all" ? undefined : eventType,
+    identifier: deferredIdentifier || undefined,
+    limit: pageSize,
+    offset,
+    organizationId
+  }
   const userQuery = useDashAuditLogs(authClient as DashAuthClient, {
     enabled: ready && access === "user",
     params,
     placeholderData: keepPreviousData
   })
   const organizationQuery = useDashAllAuditLogs(authClient as DashAuthClient, {
-    enabled: ready && access === "organization",
+    enabled: ready && (access === "admin" || access === "organization"),
     params,
     placeholderData: keepPreviousData
   })
@@ -214,11 +236,16 @@ function ActivityFeed({
     userId,
     {
       enabled: ready && access === "admin-user",
-      params: { limit: pageSize, offset }
+      params: {
+        eventType: params.eventType,
+        identifier: params.identifier,
+        limit: pageSize,
+        offset
+      }
     }
   )
   const query =
-    access === "organization"
+    access === "admin" || access === "organization"
       ? organizationQuery
       : access === "admin-user"
         ? adminUserQuery
@@ -234,11 +261,13 @@ function ActivityFeed({
         <div className="flex min-w-0 flex-col gap-1">
           <h2 className="text-sm font-semibold">{localization.activity}</h2>
           <p className="text-sm text-muted">
-            {access === "admin-user"
-              ? localization.adminUserActivityDescription
-              : organizationId
-                ? localization.organizationActivityDescription
-                : localization.activityDescription}
+            {access === "admin"
+              ? localization.adminActivityDescription
+              : access === "admin-user"
+                ? localization.adminUserActivityDescription
+                : organizationId
+                  ? localization.organizationActivityDescription
+                  : localization.activityDescription}
           </p>
         </div>
 
@@ -249,6 +278,49 @@ function ActivityFeed({
               : localization.personalOnly}
           </Chip>
         )}
+      </div>
+
+      <div className="grid gap-2 sm:grid-cols-[12rem_minmax(14rem,1fr)]">
+        <Select
+          value={eventType}
+          onChange={(value) => {
+            setEventType(String(value))
+            setPage(0)
+          }}
+        >
+          <Label>{localization.eventType}</Label>
+          <Select.Trigger>
+            <Select.Value />
+            <Select.Indicator />
+          </Select.Trigger>
+          <Select.Popover>
+            <ListBox>
+              <ListBox.Item id="all">{localization.allEvents}</ListBox.Item>
+              {eventOptions.map(([key, label]) => (
+                <ListBox.Item id={key} key={key} textValue={label}>
+                  {label}
+                </ListBox.Item>
+              ))}
+            </ListBox>
+          </Select.Popover>
+        </Select>
+        <SearchField
+          aria-label={localization.identifier}
+          value={identifier}
+          onChange={(value) => {
+            setIdentifier(value)
+            setPage(0)
+          }}
+        >
+          <Label>{localization.identifier}</Label>
+          <SearchField.Group>
+            <SearchField.SearchIcon />
+            <SearchField.Input
+              placeholder={localization.identifierPlaceholder}
+            />
+            <SearchField.ClearButton />
+          </SearchField.Group>
+        </SearchField>
       </div>
 
       <Card variant={variant} aria-busy={showPending || isFetching}>
@@ -345,6 +417,11 @@ function ActivityFeed({
 /** Authentication and account activity for a user selected by an administrator. */
 export function AdminUserActivity(props: AdminUserActivityProps) {
   return <ActivityFeed key={props.userId} access="admin-user" {...props} />
+}
+
+/** Activity across every organization the current owner or administrator can manage. */
+export function AdminActivity(props: AdminActivityProps) {
+  return <ActivityFeed access="admin" {...props} />
 }
 
 /** Personal authentication and account activity. */
