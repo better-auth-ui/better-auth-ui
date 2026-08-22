@@ -18,16 +18,6 @@ export const passkeyLocalization = {
   noPasskeys: "No passkeys",
   /** @remarks `"Name"` */
   name: "Name",
-  /** @remarks `"Passkey type"` */
-  authenticatorAttachment: "Passkey type",
-  /** @remarks `"Choose where to create this passkey."` */
-  authenticatorAttachmentDescription: "Choose where to create this passkey.",
-  /** @remarks `"Any available option"` */
-  anyAuthenticator: "Any available option",
-  /** @remarks `"This device"` */
-  platformAuthenticator: "This device",
-  /** @remarks `"Security key or another device"` */
-  crossPlatformAuthenticator: "Security key or another device",
   /** @remarks `"Rename passkey"` */
   renamePasskey: "Rename passkey",
   /** @remarks `"Passkey renamed"` */

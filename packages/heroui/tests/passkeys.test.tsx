@@ -212,17 +212,14 @@ function createPasskeysAuthClient(
   }
 }
 
-function renderPasskeys(
-  authClient = createPasskeysAuthClient(),
-  pluginOptions?: Parameters<typeof passkeyPlugin>[0]
-) {
+function renderPasskeys(authClient = createPasskeysAuthClient()) {
   return {
     authClient,
     ...render(
       <AuthProvider
         authClient={authClient}
         navigate={() => {}}
-        plugins={[passkeyPlugin(pluginOptions)]}
+        plugins={[passkeyPlugin()]}
         queryClient={createTestQueryClient()}
       >
         <Passkeys />
@@ -334,44 +331,6 @@ describe("<Passkeys />", () => {
         fetchOptions: expect.objectContaining({ throw: true })
       })
     )
-  })
-
-  it("forwards the configured authenticator choice to addPasskey", async () => {
-    const user = userEvent.setup()
-    const authClient = createPasskeysAuthClient()
-    renderPasskeys(authClient, { authenticatorAttachment: "platform" })
-
-    await user.click(
-      await screen.findByRole("button", { name: /add passkey/i })
-    )
-
-    const dialog = await screen.findByRole("alertdialog")
-    await user.click(
-      within(dialog).getByRole("button", { name: /add passkey/i })
-    )
-
-    await waitFor(() => {
-      expect(authClient.passkey.addPasskey).toHaveBeenCalledWith(
-        expect.objectContaining({
-          authenticatorAttachment: "platform",
-          fetchOptions: expect.objectContaining({ throw: true })
-        })
-      )
-    })
-  })
-
-  it("can hide the authenticator choice", async () => {
-    const user = userEvent.setup()
-    renderPasskeys(createPasskeysAuthClient(), {
-      authenticatorAttachment: false
-    })
-
-    await user.click(
-      await screen.findByRole("button", { name: /add passkey/i })
-    )
-
-    const dialog = await screen.findByRole("alertdialog")
-    expect(within(dialog).queryByText("Passkey type")).not.toBeInTheDocument()
   })
 
   it("renders registered passkeys", async () => {

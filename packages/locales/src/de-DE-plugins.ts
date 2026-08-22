@@ -530,12 +530,6 @@ export const deDEPlugins = {
       "Erstelle einen Passkey für den sicheren Zugriff auf dein Konto.",
     noPasskeys: "Keine Passkeys",
     name: "Name",
-    authenticatorAttachment: "Passkey-Typ",
-    authenticatorAttachmentDescription:
-      "Wähle aus, wo dieser Passkey erstellt werden soll.",
-    anyAuthenticator: "Beliebige verfügbare Option",
-    platformAuthenticator: "Dieses Gerät",
-    crossPlatformAuthenticator: "Sicherheitsschlüssel oder anderes Gerät",
     renamePasskey: "Passkey umbenennen",
     renamePasskeySuccess: "Passkey umbenannt"
   } satisfies Translated<PasskeyLocalization>,
