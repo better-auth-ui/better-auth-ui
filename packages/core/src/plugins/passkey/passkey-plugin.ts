@@ -4,10 +4,7 @@ import {
   passkeyLocalization
 } from "./passkey-localization"
 
-export type PasskeyAuthenticatorAttachment =
-  | "any"
-  | "platform"
-  | "cross-platform"
+export type PasskeyAuthenticatorAttachment = "platform" | "cross-platform"
 
 export type PasskeyPluginOptions = {
   /**
@@ -21,14 +18,13 @@ export type PasskeyPluginOptions = {
    */
   autoFill?: boolean
   /**
-   * Show an authenticator choice when users add a passkey and select its
-   * initial value. Use `false` to hide the choice and let the browser decide.
+   * Request one authenticator type for passkey registration. Omit this option
+   * to let the browser and operating system show all available choices.
    *
-   * Better Auth forwards `"platform"` and `"cross-platform"` to WebAuthn.
-   * `"any"` leaves `authenticatorAttachment` unset.
-   * @default "any"
+   * `"platform"` prefers this device. `"cross-platform"` prefers a security
+   * key or another device.
    */
-  authenticatorAttachment?: PasskeyAuthenticatorAttachment | false
+  authenticatorAttachment?: PasskeyAuthenticatorAttachment
   /**
    * Override the plugin's default localization strings.
    * @remarks `PasskeyLocalization`
@@ -40,12 +36,7 @@ export const passkeyPlugin = createAuthPlugin(
   "passkey",
   (options: PasskeyPluginOptions = {}) => ({
     autoFill: options.autoFill ?? true,
-    authenticatorAttachment: options.authenticatorAttachment ?? "any",
+    authenticatorAttachment: options.authenticatorAttachment,
     localization: { ...passkeyLocalization, ...options.localization }
   })
 )
-
-/** Convert the dialog choice to Better Auth's `addPasskey` parameter. */
-export function resolvePasskeyAuthenticatorAttachment(value: unknown) {
-  return value === "platform" || value === "cross-platform" ? value : undefined
-}

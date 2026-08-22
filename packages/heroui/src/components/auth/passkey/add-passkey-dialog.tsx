@@ -1,20 +1,14 @@
-import {
-  type PasskeyAuthClient,
-  resolvePasskeyAuthenticatorAttachment
-} from "@better-auth-ui/core/plugins/passkey"
+import type { PasskeyAuthClient } from "@better-auth-ui/core/plugins/passkey"
 import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
 import { useAddPasskey } from "@better-auth-ui/react/plugins/passkey"
 import { Fingerprint } from "@gravity-ui/icons"
 import {
   AlertDialog,
   Button,
-  Description,
   FieldError,
   Form,
   Input,
   Label,
-  ListBox,
-  Select,
   Spinner,
   TextField
 } from "@heroui/react"
@@ -48,14 +42,11 @@ export function AddPasskeyDialog({
 
     const formData = new FormData(e.target as HTMLFormElement)
     const name = (formData.get("name") as string)?.trim()
-    const attachment = resolvePasskeyAuthenticatorAttachment(
-      formData.get("authenticatorAttachment")
-    )
 
     addPasskey(
       {
         ...(name ? { name } : {}),
-        ...(attachment ? { authenticatorAttachment: attachment } : {})
+        ...(authenticatorAttachment ? { authenticatorAttachment } : {})
       },
       { onSuccess: () => handleOpenChange(false) }
     )
@@ -99,57 +90,6 @@ export function AddPasskeyDialog({
 
                 <FieldError />
               </TextField>
-
-              {authenticatorAttachment !== false && (
-                <Select
-                  className="mt-4"
-                  defaultSelectedKey={authenticatorAttachment}
-                  isDisabled={isAdding}
-                  name="authenticatorAttachment"
-                  variant="secondary"
-                >
-                  <Label>{passkeyLocalization.authenticatorAttachment}</Label>
-
-                  <Select.Trigger>
-                    <Select.Value />
-                    <Select.Indicator />
-                  </Select.Trigger>
-
-                  <Select.Popover>
-                    <ListBox>
-                      <ListBox.Item
-                        id="any"
-                        textValue={passkeyLocalization.anyAuthenticator}
-                      >
-                        {passkeyLocalization.anyAuthenticator}
-                        <ListBox.ItemIndicator />
-                      </ListBox.Item>
-
-                      <ListBox.Item
-                        id="platform"
-                        textValue={passkeyLocalization.platformAuthenticator}
-                      >
-                        {passkeyLocalization.platformAuthenticator}
-                        <ListBox.ItemIndicator />
-                      </ListBox.Item>
-
-                      <ListBox.Item
-                        id="cross-platform"
-                        textValue={
-                          passkeyLocalization.crossPlatformAuthenticator
-                        }
-                      >
-                        {passkeyLocalization.crossPlatformAuthenticator}
-                        <ListBox.ItemIndicator />
-                      </ListBox.Item>
-                    </ListBox>
-                  </Select.Popover>
-
-                  <Description>
-                    {passkeyLocalization.authenticatorAttachmentDescription}
-                  </Description>
-                </Select>
-              )}
             </AlertDialog.Body>
 
             <AlertDialog.Footer>

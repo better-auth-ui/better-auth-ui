@@ -3,7 +3,6 @@ import {
   isConditionalMediationAvailable,
   isPasskeyAutoFillEnabled,
   passkeyPlugin,
-  resolvePasskeyAuthenticatorAttachment,
   withPasskeyAutoFill
 } from "../src/plugins/passkey"
 
@@ -54,26 +53,19 @@ describe("isPasskeyAutoFillEnabled", () => {
 })
 
 describe("passkey authenticator attachment", () => {
-  it("defaults the registration dialog to any available authenticator", () => {
-    expect(passkeyPlugin().authenticatorAttachment).toBe("any")
+  it("lets the browser choose by default", () => {
+    expect(passkeyPlugin().authenticatorAttachment).toBeUndefined()
   })
 
-  it("supports a preferred authenticator and hiding the control", () => {
+  it("supports a plugin-level registration preference", () => {
     expect(
       passkeyPlugin({ authenticatorAttachment: "platform" })
         .authenticatorAttachment
     ).toBe("platform")
     expect(
-      passkeyPlugin({ authenticatorAttachment: false }).authenticatorAttachment
-    ).toBe(false)
-  })
-
-  it("only forwards WebAuthn attachment values", () => {
-    expect(resolvePasskeyAuthenticatorAttachment("platform")).toBe("platform")
-    expect(resolvePasskeyAuthenticatorAttachment("cross-platform")).toBe(
-      "cross-platform"
-    )
-    expect(resolvePasskeyAuthenticatorAttachment("any")).toBeUndefined()
+      passkeyPlugin({ authenticatorAttachment: "cross-platform" })
+        .authenticatorAttachment
+    ).toBe("cross-platform")
   })
 })
 
