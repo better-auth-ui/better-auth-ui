@@ -3,17 +3,23 @@ import {
   requestSsoDomainVerificationOptions,
   type SsoAuthClient
 } from "@better-auth-ui/core/plugins/sso"
-import { useMutation } from "@tanstack/react-query"
+import { type QueryClient, useMutation } from "@tanstack/react-query"
+import { useSession } from "../../../../hooks/queries/use-session"
 
 /** Create a mutation for issuing a fresh SSO domain-verification token. */
 export function useRequestSsoDomainVerification<
   TAuthClient extends SsoAuthClient
 >(
   authClient: TAuthClient,
-  options?: RequestSsoDomainVerificationOptions<TAuthClient>
+  options?: RequestSsoDomainVerificationOptions<TAuthClient>,
+  queryClient?: QueryClient
 ) {
-  return useMutation({
-    ...requestSsoDomainVerificationOptions(authClient),
-    ...options
-  })
+  const { data: session } = useSession(authClient, undefined, queryClient)
+  return useMutation(
+    {
+      ...requestSsoDomainVerificationOptions(authClient, session?.user.id),
+      ...options
+    },
+    queryClient
+  )
 }
