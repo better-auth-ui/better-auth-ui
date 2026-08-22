@@ -45,6 +45,8 @@ export const dashLocalization = {
   activityDescription: "Review recent authentication and account activity.",
   adminUserActivityDescription:
     "Review recent authentication and account activity for this user.",
+  adminActivityDescription:
+    "Review activity across the organizations you manage.",
   organizationActivityDescription:
     "Review activity you can access for this organization.",
   organizationWide: "Organization-wide",
@@ -58,6 +60,10 @@ export const dashLocalization = {
   paginationRange: "{{from}}–{{to}} of {{total}}",
   previousPage: "Previous page",
   nextPage: "Next page",
+  allEvents: "All events",
+  eventType: "Event type",
+  identifier: "Identifier",
+  identifierPlaceholder: "Filter by email, user ID, or provider",
   unknownEvent: "Activity event",
   eventLabels: dashEventLabels
 }
