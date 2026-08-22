@@ -1,6 +1,6 @@
 {
   "name": "@better-auth-ui/core",
-  "version": "1.7.9",
+  "version": "1.7.10",
   "type": "module",
   "scripts": {
     "build": "vite build",
