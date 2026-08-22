@@ -166,6 +166,40 @@ The `<PasskeysSettings />` security card is rendered on the security settings pa
 
 <auto-type-table path="../../../../../../examples/start-solid-zaidan-example/src/components/auth/passkey/passkeys.tsx" name="PasskeysSettingsProps" />
 
+## Passkey registration controls
+
+The add-passkey dialog lets users choose where to create a passkey:
+
+- **Any available option** lets the browser choose.
+- **This device** requests a platform authenticator, such as Touch ID or Windows Hello.
+- **Security key or another device** requests a cross-platform authenticator.
+
+Set the initial choice in the plugin. Use `false` to hide the field and let the browser choose:
+
+```ts
+passkeyPlugin({ authenticatorAttachment: "platform" })
+passkeyPlugin({ authenticatorAttachment: false })
+```
+
+`useAddPasskey` accepts every parameter exposed by `authClient.passkey.addPasskey`. Use it for custom registration UI that needs WebAuthn extensions or the raw response:
+
+```tsx
+const addPasskey = useAddPasskey(auth.authClient)
+
+addPasskey.mutate({
+  name: "Work laptop",
+  authenticatorAttachment: "platform",
+  extensions: { credProps: true },
+  returnWebAuthnResponse: true
+})
+```
+
+<Callout>
+`residentKey` and `userVerification` are server plugin policies. They are not
+parameters of `authClient.passkey.addPasskey`, so the client UI does not expose
+them.
+</Callout>
+
 ## Passkey autofill
 
 With the plugin registered, the sign-in form asks the browser to offer saved
@@ -221,6 +255,8 @@ pass an `AbortSignal` and abort it during cleanup.
 
 ```ts
 passkeyPlugin({
+  // Select the initial authenticator choice, or use false to hide the field.
+  authenticatorAttachment: "any",
   // Override any of the plugin's localization strings.
   localization: {
     passkeys: "Security Keys"

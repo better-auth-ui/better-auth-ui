@@ -1,6 +1,9 @@
 "use client"
 
-import type { PasskeyAuthClient } from "@better-auth-ui/core/plugins/passkey"
+import {
+  type PasskeyAuthClient,
+  resolvePasskeyAuthenticatorAttachment
+} from "@better-auth-ui/core/plugins/passkey"
 import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
 import { useAddPasskey } from "@better-auth-ui/react/plugins/passkey"
 import { Fingerprint } from "lucide-react"
@@ -17,6 +20,13 @@ import {
 } from "@/components/ui/dialog"
 import { Field, FieldError, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
+} from "@/components/ui/select"
 import { Spinner } from "@/components/ui/spinner"
 import { passkeyPlugin } from "@/lib/auth/passkey-plugin"
 
@@ -30,7 +40,8 @@ export function AddPasskeyDialog({
   onOpenChange
 }: AddPasskeyDialogProps) {
   const { authClient, localization } = useAuth<PasskeyAuthClient>()
-  const { localization: passkeyLocalization } = useAuthPlugin(passkeyPlugin)
+  const { authenticatorAttachment, localization: passkeyLocalization } =
+    useAuthPlugin(passkeyPlugin)
 
   const { mutate: addPasskey, isPending: isAdding } = useAddPasskey(authClient)
 
@@ -39,10 +50,17 @@ export function AddPasskeyDialog({
 
     const formData = new FormData(e.target as HTMLFormElement)
     const name = (formData.get("name") as string)?.trim()
+    const attachment = resolvePasskeyAuthenticatorAttachment(
+      formData.get("authenticatorAttachment")
+    )
 
-    addPasskey(name ? { name } : undefined, {
-      onSuccess: () => onOpenChange(false)
-    })
+    addPasskey(
+      {
+        ...(name ? { name } : {}),
+        ...(attachment ? { authenticatorAttachment: attachment } : {})
+      },
+      { onSuccess: () => onOpenChange(false) }
+    )
   }
 
   return (
@@ -75,6 +93,43 @@ export function AddPasskeyDialog({
 
             <FieldError />
           </Field>
+
+          {authenticatorAttachment !== false && (
+            <Field>
+              <FieldLabel htmlFor="passkey-authenticator-attachment">
+                {passkeyLocalization.authenticatorAttachment}
+              </FieldLabel>
+
+              <Select
+                name="authenticatorAttachment"
+                defaultValue={authenticatorAttachment}
+                disabled={isAdding}
+              >
+                <SelectTrigger
+                  id="passkey-authenticator-attachment"
+                  className="w-full"
+                >
+                  <SelectValue />
+                </SelectTrigger>
+
+                <SelectContent>
+                  <SelectItem value="any">
+                    {passkeyLocalization.anyAuthenticator}
+                  </SelectItem>
+                  <SelectItem value="platform">
+                    {passkeyLocalization.platformAuthenticator}
+                  </SelectItem>
+                  <SelectItem value="cross-platform">
+                    {passkeyLocalization.crossPlatformAuthenticator}
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+
+              <p className="text-muted-foreground text-sm">
+                {passkeyLocalization.authenticatorAttachmentDescription}
+              </p>
+            </Field>
+          )}
 
           <DialogFooter>
             <DialogClose
