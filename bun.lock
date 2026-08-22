@@ -486,7 +486,7 @@
       "name": "@better-auth-ui/locales",
       "version": "1.7.9",
       "devDependencies": {
-        "@better-auth-ui/core": "workspace:*",
+        "@better-auth-ui/core": "*",
         "vite": "^8.2.1",
         "vite-plugin-dts": "^5.0.3",
         "vitest": "^4.1.9",
