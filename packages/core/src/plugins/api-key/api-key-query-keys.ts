@@ -9,5 +9,11 @@ export const apiKeyQueryKeys = {
     [...apiKeyQueryKeys.all(userId), "list"] as const,
 
   list: <TQuery = undefined>(userId: string | undefined, query?: TQuery) =>
-    [...apiKeyQueryKeys.lists(userId), query ?? null] as const
+    [...apiKeyQueryKeys.lists(userId), query ?? null] as const,
+
+  details: (userId: string | undefined) =>
+    [...apiKeyQueryKeys.all(userId), "detail"] as const,
+
+  detail: <TQuery = undefined>(userId: string | undefined, query?: TQuery) =>
+    [...apiKeyQueryKeys.details(userId), query ?? null] as const
 } as const

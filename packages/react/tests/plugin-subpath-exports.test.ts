@@ -31,6 +31,7 @@ describe("React plugin subpath exports", () => {
     expect(apiKey).toHaveProperty("useDeleteApiKey")
     expect(apiKey).toHaveProperty("useUpdateApiKey")
     expect(apiKey).toHaveProperty("useListApiKeys")
+    expect(apiKey).toHaveProperty("useGetApiKey")
     expect(billing).toHaveProperty("useBillingPlans")
     expect(billing).toHaveProperty("useBillingState")
     expect(billing).toHaveProperty("useBillingCheckout")

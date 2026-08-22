@@ -1,9 +1,12 @@
-import { describe, expect, it } from "vitest"
+import { skipToken } from "@tanstack/query-core"
+import { describe, expect, it, vi } from "vitest"
 import {
   API_KEY_EXPIRATION_SECONDS_PER_DAY,
   apiKeyExpirationDaysToSeconds,
   apiKeyPlugin,
+  apiKeyQueryKeys,
   DEFAULT_API_KEY_EXPIRATION_INTERVALS,
+  getApiKeyOptions,
   resolveApiKeyExpirationOptions
 } from "../src/plugins/api-key"
 
@@ -80,6 +83,42 @@ describe("apiKeyPlugin", () => {
   it("converts configured days to Better Auth seconds", () => {
     expect(apiKeyExpirationDaysToSeconds(30)).toBe(
       30 * API_KEY_EXPIRATION_SECONDS_PER_DAY
+    )
+  })
+
+  it("gets one API key with a user-scoped detail query", async () => {
+    const get = vi.fn(async () => ({ id: "key-1", name: "Deploy" }))
+    const authClient = { apiKey: { get } }
+    const params = {
+      query: { configId: "service", id: "key-1" },
+      fetchOptions: { credentials: "include" as const }
+    }
+    const options = getApiKeyOptions(
+      authClient as never,
+      "user-1",
+      params as never
+    )
+    const signal = new AbortController().signal
+
+    expect(options.queryKey).toEqual(
+      apiKeyQueryKeys.detail("user-1", params.query)
+    )
+    await expect(
+      (options.queryFn as (context: { signal: AbortSignal }) => unknown)({
+        signal
+      })
+    ).resolves.toEqual({ id: "key-1", name: "Deploy" })
+    expect(get).toHaveBeenCalledWith({
+      query: params.query,
+      fetchOptions: expect.objectContaining({
+        credentials: "include",
+        signal,
+        throw: true
+      })
+    })
+    expect(getApiKeyOptions(authClient as never).queryFn).toBe(skipToken)
+    expect(getApiKeyOptions(authClient as never, "user-1").queryFn).toBe(
+      skipToken
     )
   })
 })
