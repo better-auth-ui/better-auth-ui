@@ -2,6 +2,7 @@ import type { MutationOptions } from "@tanstack/query-core"
 import type { BetterFetchError } from "better-auth/client"
 import type { SsoAuthClient } from "./sso-auth-client"
 import { ssoMutationKeys } from "./sso-mutation-keys"
+import { ssoQueryKeys } from "./sso-query-keys"
 
 export type RequestSsoDomainVerificationParams<
   TAuthClient extends SsoAuthClient
@@ -22,7 +23,8 @@ export type RequestSsoDomainVerificationOptions<
 export function requestSsoDomainVerificationOptions<
   TAuthClient extends SsoAuthClient
 >(
-  authClient: TAuthClient
+  authClient: TAuthClient,
+  userId?: string
 ): MutationOptions<
   RequestSsoDomainVerificationData,
   BetterFetchError,
@@ -38,6 +40,7 @@ export function requestSsoDomainVerificationOptions<
 
   return {
     mutationKey: ssoMutationKeys.requestDomainVerification,
-    mutationFn
+    mutationFn,
+    meta: { awaits: [ssoQueryKeys.providers.all(userId)] }
   }
 }
