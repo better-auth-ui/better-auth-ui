@@ -693,6 +693,7 @@ describe("Solid auth behavior parity", () => {
     expect(createOrganization.meta).toEqual({
       awaits: [organizationQueryKeys.lists("user-1")],
       invalidates: [
+        organizationQueryKeys.details("user-1"),
         organizationQueryKeys.fullDetails("user-1"),
         organizationQueryKeys.activeOrganizations("user-1")
       ]

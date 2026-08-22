@@ -38,6 +38,7 @@ export function deleteOrganizationOptions<
     meta: {
       awaits: [organizationQueryKeys.lists(userId)],
       invalidates: [
+        organizationQueryKeys.details(userId),
         organizationQueryKeys.fullDetails(userId),
         organizationQueryKeys.activeOrganizations(userId)
       ]
