@@ -11,6 +11,11 @@ export const organizationQueryKeys = {
   list: <TQuery = undefined>(userId: string | undefined, query?: TQuery) =>
     [...organizationQueryKeys.lists(userId), query ?? null] as const,
 
+  details: (userId: string | undefined) =>
+    [...organizationQueryKeys.all(userId), "detail"] as const,
+  detail: <TQuery = undefined>(userId: string | undefined, query?: TQuery) =>
+    [...organizationQueryKeys.details(userId), query ?? null] as const,
+
   fullDetails: (userId: string | undefined) =>
     [...organizationQueryKeys.all(userId), "fullDetails"] as const,
   fullDetail: <TQuery = undefined>(
