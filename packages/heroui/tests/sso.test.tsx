@@ -1,15 +1,25 @@
+import { authQueryKeys } from "@better-auth-ui/core"
+import { QueryClient } from "@tanstack/react-query"
 import { render, screen, waitFor } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { beforeEach, describe, expect, it, vi } from "vitest"
 
 import { Auth } from "../src/components/auth/auth"
 import { AuthProvider } from "../src/components/auth/auth-provider"
+import { OrganizationSsoProviders } from "../src/components/auth/sso/organization-sso-providers"
 import { SsoDomainVerification } from "../src/components/auth/sso/sso-domain-verification"
 import { SsoProviderSetup } from "../src/components/auth/sso/sso-provider-setup"
+import { organizationPlugin } from "../src/lib/auth/organization-plugin"
 import { passkeyPlugin } from "../src/lib/auth/passkey-plugin"
 import { ssoPlugin } from "../src/lib/auth/sso-plugin"
 
-function createMockAuthClient({ hasProvider = false } = {}) {
+function createMockAuthClient({
+  hasProvider = false,
+  memberRole
+}: {
+  hasProvider?: boolean
+  memberRole?: string
+} = {}) {
   const sso = vi.fn(async () => {
     if (!hasProvider) {
       throw Object.assign(new Error("No provider found"), { status: 404 })
@@ -30,11 +40,19 @@ function createMockAuthClient({ hasProvider = false } = {}) {
     domainVerificationToken: "renewed-token"
   }))
   const verifyDomain = vi.fn(async () => undefined)
+  const getActiveMemberRole = vi.fn(async () => ({ role: memberRole }))
+  const session = memberRole
+    ? {
+        session: { id: "session-1" },
+        user: { id: "user-1", email: "person@example.com", name: "Person" }
+      }
+    : null
 
   return {
     signIn: { email, passkey, sso },
     sso: { register, requestDomainVerification, verifyDomain },
-    useSession: () => ({ data: null, isPending: false, error: null })
+    organization: { getActiveMemberRole },
+    useSession: () => ({ data: session, isPending: false, error: null })
   } as unknown as Parameters<typeof AuthProvider>[0]["authClient"] & {
     signIn: { email: typeof email; passkey: typeof passkey; sso: typeof sso }
     sso: {
@@ -166,6 +184,49 @@ describe("<EmailFirstSignIn />", () => {
 })
 
 describe("SSO provider management", () => {
+  it("registers an organization settings tab with explicit scope", () => {
+    const plugin = ssoPlugin({ path: "identity", organization: true })
+
+    expect(plugin.organizationTabs?.[0]).toMatchObject({
+      id: "sso",
+      path: "identity",
+      component: OrganizationSsoProviders
+    })
+    expect(ssoPlugin({ organization: false }).organizationTabs).toBeUndefined()
+  })
+
+  it("shows access denied without waiting for the disabled providers query", async () => {
+    const authClient = createMockAuthClient({ memberRole: "member" })
+    const queryClient = new QueryClient({
+      defaultOptions: {
+        queries: { retry: false, staleTime: Infinity },
+        mutations: { retry: false }
+      }
+    })
+    queryClient.setQueryData(authQueryKeys.session, {
+      session: { id: "session-1" },
+      user: { id: "user-1", email: "person@example.com", name: "Person" }
+    })
+
+    const { container } = render(
+      <AuthProvider
+        authClient={authClient}
+        navigate={vi.fn()}
+        plugins={[organizationPlugin(), ssoPlugin({ emailFirst: false })]}
+        queryClient={queryClient}
+      >
+        <OrganizationSsoProviders
+          organizationId="org-1"
+          organizationSlug="acme"
+        />
+      </AuthProvider>
+    )
+
+    await waitFor(() => {
+      expect(container.querySelector("[data-access-denied]")).toBeVisible()
+    })
+  })
+
   it("registers an OIDC provider from the setup form", async () => {
     const user = userEvent.setup()
     const authClient = createMockAuthClient()

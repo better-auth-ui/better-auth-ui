@@ -38,6 +38,7 @@ type SsoProtocol = "oidc" | "saml"
 export type SsoProviderSetupProps = {
   className?: string
   defaultOrganizationId?: string
+  organizationId?: string
   onRegistered?: (provider: RegisterSsoProviderData) => void
 }
 
@@ -53,6 +54,7 @@ const getErrorMessage = (error: Error | null) => {
 export function SsoProviderSetup({
   className,
   defaultOrganizationId,
+  organizationId: fixedOrganizationId,
   onRegistered
 }: SsoProviderSetupProps) {
   const { authClient } = useAuth()
@@ -70,7 +72,10 @@ export function SsoProviderSetup({
       providerId: readString(formData, "providerId"),
       issuer: readString(formData, "issuer"),
       domain: readString(formData, "domain"),
-      organizationId: readString(formData, "organizationId") || undefined
+      organizationId:
+        fixedOrganizationId ||
+        readString(formData, "organizationId") ||
+        undefined
     }
     const params =
       protocol === "oidc"
@@ -143,16 +148,18 @@ export function SsoProviderSetup({
               />
             </Field>
 
-            <Field>
-              <FieldLabel htmlFor="sso-organization-id">
-                {localization.organizationId}
-              </FieldLabel>
-              <Input
-                defaultValue={defaultOrganizationId}
-                id="sso-organization-id"
-                name="organizationId"
-              />
-            </Field>
+            {!fixedOrganizationId ? (
+              <Field>
+                <FieldLabel htmlFor="sso-organization-id">
+                  {localization.organizationId}
+                </FieldLabel>
+                <Input
+                  defaultValue={defaultOrganizationId}
+                  id="sso-organization-id"
+                  name="organizationId"
+                />
+              </Field>
+            ) : null}
 
             <Tabs
               value={protocol}

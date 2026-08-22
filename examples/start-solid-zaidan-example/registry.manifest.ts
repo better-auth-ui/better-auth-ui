@@ -426,7 +426,7 @@ export const solidRegistryManifest = {
       type: "registry:component",
       title: "Solid SSO",
       description:
-        "Solid email-first sign-in that discovers an organization's SSO provider before offering fallback methods.",
+        "Solid email-first sign-in and organization provider management for Better Auth SSO.",
       registryDependencies: [
         betterAuthSolidRegistryDependency("auth-provider"),
         betterAuthSolidRegistryDependency("sign-in")
@@ -436,6 +436,9 @@ export const solidRegistryManifest = {
         libFile("src/lib/auth/use-sign-in-continuation.ts"),
         libFile("src/lib/auth/two-factor-methods.ts"),
         componentFile("src/components/auth/sso/email-first-sign-in.tsx"),
+        componentFile("src/components/auth/sso/organization-sso-providers.tsx"),
+        componentFile("src/components/auth/sso/sso-domain-verification.tsx"),
+        componentFile("src/components/auth/sso/sso-provider-setup.tsx"),
         componentFile("src/components/auth/provider-button.tsx"),
         componentFile("src/components/auth/provider-buttons.tsx"),
         ...zaidanFormSupportFiles
