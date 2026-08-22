@@ -103,25 +103,6 @@ export function SsoProviderSetup({
       </Card.Header>
       <Card.Content>
         <Form className="flex flex-col gap-4" onSubmit={handleSubmit}>
-          <Tabs
-            selectedKey={protocol}
-            onSelectionChange={(key) => setProtocol(String(key) as SsoProtocol)}
-            variant="secondary"
-          >
-            <Tabs.ListContainer>
-              <Tabs.List aria-label={localization.providerSetup}>
-                <Tabs.Tab id="oidc">
-                  {localization.oidc}
-                  <Tabs.Indicator />
-                </Tabs.Tab>
-                <Tabs.Tab id="saml">
-                  {localization.saml}
-                  <Tabs.Indicator />
-                </Tabs.Tab>
-              </Tabs.List>
-            </Tabs.ListContainer>
-          </Tabs>
-
           <div className="grid gap-4 sm:grid-cols-2">
             <TextField isRequired name="providerId">
               <Label>{localization.providerId}</Label>
@@ -151,25 +132,42 @@ export function SsoProviderSetup({
             <FieldError />
           </TextField>
 
-          {protocol === "oidc" ? (
-            <div className="grid gap-4 sm:grid-cols-2">
-              <TextField isRequired name="clientId">
-                <Label>{localization.clientId}</Label>
-                <Input autoComplete="off" variant="secondary" />
-                <FieldError />
-              </TextField>
-              <TextField isRequired name="clientSecret">
-                <Label>{localization.clientSecret}</Label>
-                <Input
-                  autoComplete="new-password"
-                  type="password"
-                  variant="secondary"
-                />
-                <FieldError />
-              </TextField>
-            </div>
-          ) : (
-            <>
+          <Tabs
+            selectedKey={protocol}
+            onSelectionChange={(key) => setProtocol(String(key) as SsoProtocol)}
+            variant="secondary"
+          >
+            <Tabs.ListContainer>
+              <Tabs.List aria-label={localization.providerSetup}>
+                <Tabs.Tab id="oidc">
+                  {localization.oidc}
+                  <Tabs.Indicator />
+                </Tabs.Tab>
+                <Tabs.Tab id="saml">
+                  {localization.saml}
+                  <Tabs.Indicator />
+                </Tabs.Tab>
+              </Tabs.List>
+            </Tabs.ListContainer>
+            <Tabs.Panel className="pt-4" id="oidc">
+              <div className="grid gap-4 sm:grid-cols-2">
+                <TextField isRequired name="clientId">
+                  <Label>{localization.clientId}</Label>
+                  <Input autoComplete="off" variant="secondary" />
+                  <FieldError />
+                </TextField>
+                <TextField isRequired name="clientSecret">
+                  <Label>{localization.clientSecret}</Label>
+                  <Input
+                    autoComplete="new-password"
+                    type="password"
+                    variant="secondary"
+                  />
+                  <FieldError />
+                </TextField>
+              </div>
+            </Tabs.Panel>
+            <Tabs.Panel className="flex flex-col gap-4 pt-4" id="saml">
               <TextField isRequired name="entryPoint">
                 <Label>{localization.entryPoint}</Label>
                 <Input type="url" variant="secondary" />
@@ -184,8 +182,8 @@ export function SsoProviderSetup({
                 />
                 <FieldError />
               </TextField>
-            </>
-          )}
+            </Tabs.Panel>
+          </Tabs>
 
           {register.error ? (
             <Alert status="danger">

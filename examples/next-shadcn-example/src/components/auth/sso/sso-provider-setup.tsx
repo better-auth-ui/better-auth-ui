@@ -28,7 +28,7 @@ import {
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import { Spinner } from "@/components/ui/spinner"
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Textarea } from "@/components/ui/textarea"
 import { ssoPlugin } from "@/lib/auth/sso-plugin"
 import { cn } from "@/lib/utils"
@@ -110,16 +110,6 @@ export function SsoProviderSetup({
         </CardHeader>
         <CardContent>
           <FieldGroup>
-            <Tabs
-              value={protocol}
-              onValueChange={(value) => setProtocol(value as SsoProtocol)}
-            >
-              <TabsList aria-label={localization.providerSetup}>
-                <TabsTrigger value="oidc">{localization.oidc}</TabsTrigger>
-                <TabsTrigger value="saml">{localization.saml}</TabsTrigger>
-              </TabsList>
-            </Tabs>
-
             <div className="grid gap-4 sm:grid-cols-2">
               <Field>
                 <FieldLabel htmlFor="sso-provider-id">
@@ -164,8 +154,15 @@ export function SsoProviderSetup({
               />
             </Field>
 
-            {protocol === "oidc" ? (
-              <div className="grid gap-4 sm:grid-cols-2">
+            <Tabs
+              value={protocol}
+              onValueChange={(value) => setProtocol(value as SsoProtocol)}
+            >
+              <TabsList aria-label={localization.providerSetup}>
+                <TabsTrigger value="oidc">{localization.oidc}</TabsTrigger>
+                <TabsTrigger value="saml">{localization.saml}</TabsTrigger>
+              </TabsList>
+              <TabsContent className="grid gap-4 sm:grid-cols-2" value="oidc">
                 <Field>
                   <FieldLabel htmlFor="sso-client-id">
                     {localization.clientId}
@@ -189,9 +186,8 @@ export function SsoProviderSetup({
                     required
                   />
                 </Field>
-              </div>
-            ) : (
-              <>
+              </TabsContent>
+              <TabsContent className="flex flex-col gap-4" value="saml">
                 <Field>
                   <FieldLabel htmlFor="sso-entry-point">
                     {localization.entryPoint}
@@ -214,8 +210,8 @@ export function SsoProviderSetup({
                     required
                   />
                 </Field>
-              </>
-            )}
+              </TabsContent>
+            </Tabs>
 
             {register.error ? (
               <FieldError>{getErrorMessage(register.error)}</FieldError>

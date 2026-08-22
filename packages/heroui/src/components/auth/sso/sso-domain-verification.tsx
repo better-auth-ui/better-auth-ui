@@ -74,7 +74,10 @@ export function SsoDomainVerification({
     onError: (error) =>
       toast.danger(error instanceof Error ? error.message : String(error))
   })
-  const error = requestToken.error ?? verify.error
+  const error =
+    requestToken.submittedAt > verify.submittedAt
+      ? requestToken.error
+      : verify.error
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -190,11 +193,9 @@ export function SsoDomainVerification({
             </Button>
           </div>
 
-          {token && !verified ? (
-            <span className="sr-only" aria-live="polite">
-              {localization.domainVerificationRequested}
-            </span>
-          ) : null}
+          <span className="sr-only" aria-live="polite">
+            {token && !verified ? localization.domainVerificationRequested : ""}
+          </span>
         </Form>
       </Card.Content>
     </Card>

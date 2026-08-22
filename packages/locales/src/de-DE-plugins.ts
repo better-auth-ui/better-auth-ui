@@ -578,11 +578,37 @@ export const deDEPlugins = {
     chain: "Chain {{chainId}}"
   } satisfies Translated<SiweLocalization>,
   sso: {
+    addProvider: "SSO-Anbieter hinzufügen",
+    clientId: "Client-ID",
+    clientSecret: "Client-Secret",
     continueWithEmail: "Mit E-Mail-Adresse fortfahren",
     continueWithSso: "Mit SSO fortfahren",
+    copyDnsHost: "DNS-Host kopieren",
+    copyDnsValue: "DNS-Wert kopieren",
+    domain: "E-Mail-Domain",
+    domainVerification: "Domain-Bestätigung",
+    domainVerificationDescription:
+      "Veröffentliche den TXT-Eintrag für jede konfigurierte Domain und bestätige sie anschließend.",
+    domainVerificationRequested: "Ein neuer Bestätigungstoken wurde erstellt.",
+    domainVerified: "Die Domain des Anbieters wurde bestätigt.",
     emailFirstDescription:
       "Gib deine geschäftliche E-Mail-Adresse ein, um fortzufahren.",
+    entryPoint: "SSO-URL",
+    identityProviderMetadata: "Metadaten-XML des Identitätsanbieters",
+    issuer: "Aussteller-URL",
+    oidc: "OIDC",
+    organizationId: "Organisations-ID",
+    providerCreated: "Der SSO-Anbieter wurde hinzugefügt.",
+    providerId: "Anbieter-ID",
+    providerSetup: "SSO-Anbieter einrichten",
+    providerSetupDescription:
+      "Verbinde einen OpenID-Connect- oder SAML-Identitätsanbieter.",
+    requestNewToken: "Neuen Token erstellen",
+    saml: "SAML",
+    txtRecordHost: "Host des TXT-Eintrags",
+    txtRecordValue: "Wert des TXT-Eintrags",
     useDifferentEmail: "Andere E-Mail-Adresse verwenden",
+    verifyDomain: "Domain bestätigen",
     noProvider:
       "Es wurde keine Organisationsanmeldung gefunden. Wähle eine andere Methode, um fortzufahren.",
     ssoUnavailable:
