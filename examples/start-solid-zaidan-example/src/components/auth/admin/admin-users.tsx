@@ -1,4 +1,8 @@
 import {
+  type AdditionalFieldValue,
+  parseAdditionalFieldValues
+} from "@better-auth-ui/core"
+import {
   type AdminAuthClient,
   type AdminListUsersParams,
   adminPlugin
@@ -37,6 +41,7 @@ import {
 } from "@/components/ui/alert-dialog"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
+import { Checkbox } from "@/components/ui/checkbox"
 import {
   Dialog,
   DialogContent,
@@ -51,7 +56,15 @@ import {
   EmptyHeader,
   EmptyTitle
 } from "@/components/ui/empty"
-import { Field, FieldError, FieldLabel } from "@/components/ui/field"
+import {
+  Field,
+  FieldContent,
+  FieldError,
+  FieldGroup,
+  FieldLabel,
+  FieldLegend,
+  FieldSet
+} from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import {
   InputGroup,
@@ -59,6 +72,7 @@ import {
   InputGroupInput
 } from "@/components/ui/input-group"
 import { Skeleton } from "@/components/ui/skeleton"
+import { Switch } from "@/components/ui/switch"
 import {
   Table,
   TableBody,
@@ -70,6 +84,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { cn } from "@/lib/utils"
 
+import { AdditionalField } from "../additional-field"
 import { UserAvatar } from "../user/user-avatar"
 
 export type AdminUsersProps = {
@@ -79,6 +94,9 @@ export type AdminUsersProps = {
 }
 
 type DangerousAction = "ban" | "delete" | "impersonate" | "revokeAll"
+type SearchOperator = "contains" | "ends_with" | "starts_with"
+type SortOption = "createdAt-asc" | "createdAt-desc" | "name-asc" | "name-desc"
+type StatusFilter = "active" | "all" | "banned"
 
 const skeletonIds = ["solid-admin-1", "solid-admin-2", "solid-admin-3"]
 
@@ -89,7 +107,23 @@ const formatDate = (value: Date | string | undefined | null) =>
       )
     : "–"
 
-const asAdminRole = (role: string) => role as "user" | "admin"
+const asAdminRoles = (roles: string[]) => roles as ("user" | "admin")[]
+
+const parseAdminRoles = (role: string | undefined, fallback: string) => {
+  const roles = role
+    ?.split(",")
+    .map((value) => value.trim())
+    .filter(Boolean)
+  return roles?.length ? roles : [fallback]
+}
+
+const getBanDurationSeconds = (value: string) => {
+  if (!value) return undefined
+  const days = Number(value)
+  if (!Number.isSafeInteger(days) || days <= 0) return null
+  const seconds = days * 86_400
+  return Number.isSafeInteger(seconds) ? seconds : null
+}
 
 const getAdminErrorMessage = (error: Error | null) => error?.message
 
@@ -106,6 +140,10 @@ export function AdminUsers(props: AdminUsersProps) {
   const [search, setSearch] = createSignal("")
   const [debouncedSearch, setDebouncedSearch] = createSignal("")
   const [searchField, setSearchField] = createSignal<"email" | "name">("email")
+  const [searchOperator, setSearchOperator] =
+    createSignal<SearchOperator>("contains")
+  const [sort, setSort] = createSignal<SortOption>("createdAt-desc")
+  const [status, setStatus] = createSignal<StatusFilter>("all")
   const updateDebouncedSearch = createDebounce(setDebouncedSearch, 300)
   const selectedUserId = () =>
     props.onSelectedUserIdChange ? props.selectedUserId : localSelectedUserId()
@@ -114,15 +152,24 @@ export function AdminUsers(props: AdminUsersProps) {
     user: ["create"]
   }))
   const [createOpen, setCreateOpen] = createSignal(false)
-  const params = createMemo<AdminListUsersParams>(() => ({
-    limit: config().pageSize,
-    offset: page() * config().pageSize,
-    searchField: searchField(),
-    searchOperator: "contains",
-    searchValue: debouncedSearch() || undefined,
-    sortBy: "createdAt",
-    sortDirection: "desc"
-  }))
+  const params = createMemo<AdminListUsersParams>(() => {
+    const [sortBy, sortDirection] = sort().split("-") as [
+      "createdAt" | "name",
+      "asc" | "desc"
+    ]
+    return {
+      filterField: status() === "all" ? undefined : "banned",
+      filterOperator: status() === "all" ? undefined : "eq",
+      filterValue: status() === "all" ? undefined : status() === "banned",
+      limit: config().pageSize,
+      offset: page() * config().pageSize,
+      searchField: searchField(),
+      searchOperator: searchOperator(),
+      searchValue: debouncedSearch() || undefined,
+      sortBy,
+      sortDirection
+    }
+  })
   const users = useAdminUsers(authClient, () => ({
     enabled: permission.data?.success === true,
     params: params()
@@ -151,7 +198,7 @@ export function AdminUsers(props: AdminUsersProps) {
         </Show>
       </header>
 
-      <div class="flex flex-col gap-2 sm:flex-row">
+      <div class="grid gap-2 sm:grid-cols-2 lg:grid-cols-[9rem_10rem_minmax(14rem,1fr)_10rem_10rem]">
         <select
           aria-label={config().localization.search}
           class="h-8 rounded-lg border bg-transparent px-2 text-sm sm:w-36"
@@ -164,12 +211,33 @@ export function AdminUsers(props: AdminUsersProps) {
           <option value="email">{config().localization.email}</option>
           <option value="name">{config().localization.name}</option>
         </select>
-        <InputGroup class="sm:max-w-md">
+        <select
+          aria-label={config().localization.searchOperator}
+          class="h-8 rounded-lg border bg-transparent px-2 text-sm"
+          onChange={(event) => {
+            setSearchOperator(event.currentTarget.value as SearchOperator)
+            setPage(0)
+          }}
+          value={searchOperator()}
+        >
+          <option value="contains">
+            {config().localization.searchContains}
+          </option>
+          <option value="starts_with">
+            {config().localization.startsWith}
+          </option>
+          <option value="ends_with">{config().localization.endsWith}</option>
+        </select>
+        <InputGroup>
           <InputGroupAddon>
             <Search />
           </InputGroupAddon>
           <InputGroupInput
-            aria-label={config().localization.search}
+            aria-label={
+              searchField() === "email"
+                ? config().localization.searchByEmail
+                : config().localization.searchByName
+            }
             onInput={(event) => {
               const value = event.currentTarget.value
               setSearch(value)
@@ -184,6 +252,41 @@ export function AdminUsers(props: AdminUsersProps) {
             value={search()}
           />
         </InputGroup>
+        <select
+          aria-label={config().localization.status}
+          class="h-8 rounded-lg border bg-transparent px-2 text-sm"
+          onChange={(event) => {
+            setStatus(event.currentTarget.value as StatusFilter)
+            setPage(0)
+          }}
+          value={status()}
+        >
+          <option value="all">{config().localization.filterAllStatuses}</option>
+          <option value="active">{config().localization.active}</option>
+          <option value="banned">{config().localization.banned}</option>
+        </select>
+        <select
+          aria-label={config().localization.sort}
+          class="h-8 rounded-lg border bg-transparent px-2 text-sm"
+          onChange={(event) => {
+            setSort(event.currentTarget.value as SortOption)
+            setPage(0)
+          }}
+          value={sort()}
+        >
+          <option value="createdAt-desc">
+            {config().localization.sortNewest}
+          </option>
+          <option value="createdAt-asc">
+            {config().localization.sortOldest}
+          </option>
+          <option value="name-asc">
+            {config().localization.sortNameAscending}
+          </option>
+          <option value="name-desc">
+            {config().localization.sortNameDescending}
+          </option>
+        </select>
       </div>
 
       <Show
@@ -371,20 +474,38 @@ function CreateUserDialog(props: {
     (auth.plugins.find((plugin) => plugin.id === adminPlugin.id) ??
       adminPlugin()) as ReturnType<typeof adminPlugin>
   const createUser = useCreateAdminUser(authClient)
+  const [emailVerified, setEmailVerified] = createSignal(false)
+  const [formError, setFormError] = createSignal<string>()
+  const [roles, setRoles] = createSignal([config().defaultRole])
 
   const close = () => {
     createUser.reset()
+    setEmailVerified(false)
+    setFormError(undefined)
+    setRoles([config().defaultRole])
     props.onOpenChange(false)
   }
-  const submit = (event: SubmitEvent) => {
+  const submit = async (event: SubmitEvent) => {
     event.preventDefault()
     const data = new FormData(event.currentTarget as HTMLFormElement)
+    let additionalFieldValues: Record<string, AdditionalFieldValue | null>
+    try {
+      additionalFieldValues = await parseAdditionalFieldValues(
+        auth.additionalFields ?? [],
+        data
+      )
+    } catch (error) {
+      setFormError(error instanceof Error ? error.message : String(error))
+      return
+    }
+    setFormError(undefined)
     createUser.mutate(
       {
+        data: { ...additionalFieldValues, emailVerified: emailVerified() },
         email: String(data.get("email")),
         name: String(data.get("name")),
         password: String(data.get("password")),
-        role: asAdminRole(String(data.get("role") || config().defaultRole))
+        role: asAdminRoles(roles())
       },
       { onSuccess: close }
     )
@@ -433,25 +554,56 @@ function CreateUserDialog(props: {
               type="password"
             />
           </Field>
-          <Field>
-            <FieldLabel for="solid-admin-create-role">
+          <FieldSet>
+            <FieldLegend variant="label">
               {config().localization.role}
-            </FieldLabel>
-            <select
-              class="h-8 rounded-lg border bg-transparent px-2 text-sm"
-              id="solid-admin-create-role"
-              name="role"
-            >
+            </FieldLegend>
+            <FieldGroup data-slot="checkbox-group">
               <For each={config().roles}>
                 {(role) => (
-                  <option selected={role === config().defaultRole} value={role}>
-                    {role}
-                  </option>
+                  <Field orientation="horizontal">
+                    <Checkbox
+                      checked={roles().includes(role)}
+                      id={`solid-admin-create-role-${role}`}
+                      onChange={(checked) => {
+                        const next = checked
+                          ? [...roles(), role]
+                          : roles().filter((item) => item !== role)
+                        if (next.length) setRoles(next)
+                      }}
+                    />
+                    <FieldLabel for={`solid-admin-create-role-${role}`}>
+                      {role}
+                    </FieldLabel>
+                  </Field>
                 )}
               </For>
-            </select>
+            </FieldGroup>
+          </FieldSet>
+          <Field orientation="horizontal">
+            <Switch
+              checked={emailVerified()}
+              id="solid-admin-create-email-verified"
+              onChange={setEmailVerified}
+            />
+            <FieldContent>
+              <FieldLabel for="solid-admin-create-email-verified">
+                {config().localization.emailVerified}
+              </FieldLabel>
+            </FieldContent>
           </Field>
-          <FieldError>{getAdminErrorMessage(createUser.error)}</FieldError>
+          <For each={auth.additionalFields}>
+            {(field) => (
+              <AdditionalField
+                field={field}
+                isPending={createUser.isPending}
+                name={field.name}
+              />
+            )}
+          </For>
+          <FieldError>
+            {formError() ?? getAdminErrorMessage(createUser.error)}
+          </FieldError>
           <DialogFooter>
             <Button onClick={close} type="button" variant="outline">
               {config().localization.cancel}
@@ -505,6 +657,11 @@ function UserDialog(props: {
     () => ({ user: ["set-role"] }),
     enabled
   )
+  const canSetEmail = useAdminPermission(
+    authClient,
+    () => ({ user: ["set-email"] }),
+    enabled
+  )
   const canSetPassword = useAdminPermission(
     authClient,
     () => ({ user: ["set-password"] }),
@@ -531,7 +688,15 @@ function UserDialog(props: {
     enabled
   )
   const [name, setName] = createSignal("")
-  const [role, setRole] = createSignal(config().defaultRole)
+  const [email, setEmail] = createSignal("")
+  const [emailVerified, setEmailVerified] = createSignal(false)
+  const [roles, setRoles] = createSignal([config().defaultRole])
+  const [banReason, setBanReason] = createSignal("")
+  const [banDuration, setBanDuration] = createSignal("")
+  const banDurationSeconds = createMemo(() =>
+    getBanDurationSeconds(banDuration())
+  )
+  const [profileError, setProfileError] = createSignal<string>()
   const [passwordOpen, setPasswordOpen] = createSignal(false)
   const [dangerousAction, setDangerousAction] = createSignal<DangerousAction>()
   const detail = () => user.data
@@ -547,10 +712,20 @@ function UserDialog(props: {
 
   createEffect(
     on(
-      () => [detail()?.name, detail()?.role] as const,
-      ([userName, userRole]) => {
+      () =>
+        [
+          detail()?.email,
+          detail()?.emailVerified,
+          detail()?.id,
+          detail()?.name,
+          detail()?.role
+        ] as const,
+      ([userEmail, userEmailVerified, _userId, userName, userRole]) => {
         setName(userName ?? "")
-        setRole(userRole ?? config().defaultRole)
+        setEmail(userEmail ?? "")
+        setEmailVerified(userEmailVerified ?? false)
+        setRoles(parseAdminRoles(userRole, config().defaultRole))
+        setProfileError(undefined)
       }
     )
   )
@@ -558,11 +733,24 @@ function UserDialog(props: {
   const confirmDangerousAction = () => {
     const selectedUser = detail()
     if (!selectedUser) return
-    if (dangerousAction() === "ban")
+    if (dangerousAction() === "ban") {
+      const durationSeconds = banDurationSeconds()
+      if (durationSeconds === null) return
       ban.mutate(
-        { userId: selectedUser.id },
-        { onSuccess: () => setDangerousAction(undefined) }
+        {
+          banExpiresIn: durationSeconds,
+          banReason: banReason().trim() || undefined,
+          userId: selectedUser.id
+        },
+        {
+          onSuccess: () => {
+            setBanDuration("")
+            setBanReason("")
+            setDangerousAction(undefined)
+          }
+        }
       )
+    }
     if (dangerousAction() === "delete")
       remove.mutate(
         { userId: selectedUser.id },
@@ -595,6 +783,8 @@ function UserDialog(props: {
     remove.reset()
     revokeSessions.reset()
     impersonate.reset()
+    setBanDuration("")
+    setBanReason("")
     setDangerousAction(undefined)
   }
   const dangerousMutation = () =>
@@ -690,36 +880,144 @@ function UserDialog(props: {
                             : config().localization.active}
                         </Badge>
                       </dd>
+                      <Show
+                        when={selectedUser().banned && selectedUser().banReason}
+                      >
+                        <dt class="text-muted-foreground">
+                          {config().localization.banReason}
+                        </dt>
+                        <dd>{selectedUser().banReason}</dd>
+                      </Show>
+                      <Show
+                        when={
+                          selectedUser().banned && selectedUser().banExpires
+                        }
+                      >
+                        <dt class="text-muted-foreground">
+                          {config().localization.banExpires}
+                        </dt>
+                        <dd>{formatDate(selectedUser().banExpires)}</dd>
+                      </Show>
                     </dl>
                     <form
-                      class="flex items-end gap-2"
-                      onSubmit={(event) => {
+                      class="flex flex-col gap-4"
+                      onSubmit={async (event) => {
                         event.preventDefault()
+                        const formData = new FormData(event.currentTarget)
+                        let additionalFieldValues: Record<
+                          string,
+                          AdditionalFieldValue | null
+                        >
+                        try {
+                          additionalFieldValues =
+                            await parseAdditionalFieldValues(
+                              auth.additionalFields ?? [],
+                              formData
+                            )
+                        } catch (error) {
+                          setProfileError(
+                            error instanceof Error
+                              ? error.message
+                              : String(error)
+                          )
+                          return
+                        }
+                        setProfileError(undefined)
                         updateUser.mutate({
                           userId: selectedUser().id,
-                          data: { name: name().trim() }
+                          data: {
+                            ...additionalFieldValues,
+                            name: name().trim(),
+                            ...(canSetEmail.data?.success
+                              ? {
+                                  email: email().trim(),
+                                  emailVerified: emailVerified()
+                                }
+                              : {})
+                          }
                         })
                       }}
                     >
-                      <Field class="flex-1">
+                      <Field>
                         <FieldLabel for="solid-admin-user-name">
                           {config().localization.name}
                         </FieldLabel>
                         <Input
+                          disabled={!canUpdate.data?.success}
                           id="solid-admin-user-name"
                           value={name()}
                           onInput={(event) =>
                             setName(event.currentTarget.value)
                           }
                         />
-                        <FieldError>
-                          {getAdminErrorMessage(updateUser.error)}
-                        </FieldError>
                       </Field>
+                      <Field>
+                        <FieldLabel for="solid-admin-user-email">
+                          {config().localization.email}
+                        </FieldLabel>
+                        <Input
+                          disabled={
+                            !canUpdate.data?.success ||
+                            !canSetEmail.data?.success
+                          }
+                          id="solid-admin-user-email"
+                          onInput={(event) =>
+                            setEmail(event.currentTarget.value)
+                          }
+                          required
+                          type="email"
+                          value={email()}
+                        />
+                      </Field>
+                      <Field orientation="horizontal">
+                        <Switch
+                          checked={emailVerified()}
+                          disabled={
+                            !canUpdate.data?.success ||
+                            !canSetEmail.data?.success
+                          }
+                          id="solid-admin-user-email-verified"
+                          onChange={setEmailVerified}
+                        />
+                        <FieldContent>
+                          <FieldLabel for="solid-admin-user-email-verified">
+                            {config().localization.emailVerified}
+                          </FieldLabel>
+                        </FieldContent>
+                      </Field>
+                      <For each={auth.additionalFields}>
+                        {(field) => {
+                          const value = () =>
+                            (
+                              selectedUser() as unknown as Record<
+                                string,
+                                unknown
+                              >
+                            )[field.name]
+                          return (
+                            <AdditionalField
+                              field={{
+                                ...field,
+                                defaultValue:
+                                  value() as AdditionalFieldValue | null
+                              }}
+                              isPending={
+                                updateUser.isPending || !canUpdate.data?.success
+                              }
+                              name={field.name}
+                            />
+                          )
+                        }}
+                      </For>
+                      <FieldError>
+                        {profileError() ??
+                          getAdminErrorMessage(updateUser.error)}
+                      </FieldError>
                       <Button
+                        class="self-start"
                         disabled={
                           !name().trim() ||
-                          name() === selectedUser().name ||
+                          !email().trim() ||
                           updateUser.isPending ||
                           canUpdate.isPending ||
                           !canUpdate.data?.success
@@ -730,25 +1028,40 @@ function UserDialog(props: {
                         {config().localization.saveUser}
                       </Button>
                     </form>
-                    <div class="flex items-end gap-2">
-                      <Field class="flex-1">
-                        <FieldLabel for="solid-admin-user-role">
+                    <div class="flex flex-col gap-3">
+                      <FieldSet>
+                        <FieldLegend variant="label">
                           {config().localization.role}
-                        </FieldLabel>
-                        <select
-                          class="h-8 rounded-lg border bg-transparent px-2 text-sm"
-                          id="solid-admin-user-role"
-                          value={role()}
-                          onChange={(event) =>
-                            setRole(event.currentTarget.value)
-                          }
-                        >
+                        </FieldLegend>
+                        <FieldGroup data-slot="checkbox-group">
                           <For each={config().roles}>
-                            {(item) => <option value={item}>{item}</option>}
+                            {(item) => (
+                              <Field orientation="horizontal">
+                                <Checkbox
+                                  checked={roles().includes(item)}
+                                  disabled={
+                                    isSelf() || !canSetRole.data?.success
+                                  }
+                                  id={`solid-admin-user-role-${item}`}
+                                  onChange={(checked) => {
+                                    const next = checked
+                                      ? [...roles(), item]
+                                      : roles().filter((role) => role !== item)
+                                    if (next.length) setRoles(next)
+                                  }}
+                                />
+                                <FieldLabel
+                                  for={`solid-admin-user-role-${item}`}
+                                >
+                                  {item}
+                                </FieldLabel>
+                              </Field>
+                            )}
                           </For>
-                        </select>
-                      </Field>
+                        </FieldGroup>
+                      </FieldSet>
                       <Button
+                        class="self-start"
                         disabled={
                           setRoleMutation.isPending ||
                           canSetRole.isPending ||
@@ -759,7 +1072,7 @@ function UserDialog(props: {
                         onClick={() =>
                           setRoleMutation.mutate({
                             userId: selectedUser().id,
-                            role: asAdminRole(role())
+                            role: asAdminRoles(roles())
                           })
                         }
                       >
@@ -941,21 +1254,53 @@ function UserDialog(props: {
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>{dangerousLabel()}</AlertDialogTitle>
-            <AlertDialogDescription class="flex flex-col gap-2">
-              <span>{detail()?.email}</span>
-              <Show when={dangerousMutation().error}>
-                <span class="text-destructive" role="alert">
-                  {getAdminErrorMessage(dangerousMutation().error)}
-                </span>
-              </Show>
-            </AlertDialogDescription>
+            <AlertDialogDescription>{detail()?.email}</AlertDialogDescription>
           </AlertDialogHeader>
+          <Show when={dangerousAction() === "ban"}>
+            <FieldGroup>
+              <Field>
+                <FieldLabel for="solid-admin-ban-reason">
+                  {config().localization.banReason}
+                </FieldLabel>
+                <Input
+                  id="solid-admin-ban-reason"
+                  onInput={(event) => setBanReason(event.currentTarget.value)}
+                  value={banReason()}
+                />
+              </Field>
+              <Field>
+                <FieldLabel for="solid-admin-ban-duration">
+                  {config().localization.banDuration}
+                </FieldLabel>
+                <Input
+                  id="solid-admin-ban-duration"
+                  min="1"
+                  onInput={(event) => setBanDuration(event.currentTarget.value)}
+                  step="1"
+                  type="number"
+                  value={banDuration()}
+                />
+                <p class="text-xs text-muted-foreground">
+                  {config().localization.banDurationDescription}
+                </p>
+              </Field>
+            </FieldGroup>
+          </Show>
+          <Show when={dangerousMutation().error}>
+            <FieldError>
+              {getAdminErrorMessage(dangerousMutation().error)}
+            </FieldError>
+          </Show>
           <AlertDialogFooter>
             <AlertDialogCancel>
               {config().localization.cancel}
             </AlertDialogCancel>
             <AlertDialogAction
-              disabled={isSelf() || dangerousMutation().isPending}
+              disabled={
+                isSelf() ||
+                dangerousMutation().isPending ||
+                (dangerousAction() === "ban" && banDurationSeconds() === null)
+              }
               variant={
                 dangerousAction() === "delete" ? "destructive" : "default"
               }

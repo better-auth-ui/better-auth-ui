@@ -1,5 +1,9 @@
 "use client"
 
+import {
+  type AdditionalFieldValue,
+  parseAdditionalFieldValues
+} from "@better-auth-ui/core"
 import type {
   AdminAuthClient,
   AdminListUsersParams
@@ -42,6 +46,7 @@ import {
   SearchField,
   Select,
   Skeleton,
+  Switch,
   Table,
   Tabs,
   TextField
@@ -53,13 +58,18 @@ import {
   useDeferredValue,
   useEffect,
   useMemo,
+  useRef,
   useState
 } from "react"
 
 import { adminPlugin } from "../../../lib/auth/admin-plugin"
+import { AdditionalField } from "../additional-field"
 import { UserAvatar } from "../user/user-avatar"
 
 type SearchFieldName = "email" | "name"
+type SearchOperator = "contains" | "ends_with" | "starts_with"
+type SortOption = "createdAt-asc" | "createdAt-desc" | "name-asc" | "name-desc"
+type StatusFilter = "active" | "all" | "banned"
 type DangerousAction = "ban" | "delete" | "impersonate" | "revokeAll"
 
 export type AdminUsersProps = {
@@ -82,7 +92,23 @@ const getAdminErrorMessage = (error: Error | null) => {
   return authError?.error?.message ?? authError?.message
 }
 
-const asAdminRole = (role: string) => role as "user" | "admin"
+const asAdminRoles = (roles: string[]) => roles as ("user" | "admin")[]
+
+const parseAdminRoles = (role: string | undefined, fallback: string) => {
+  const roles = role
+    ?.split(",")
+    .map((value) => value.trim())
+    .filter(Boolean)
+  return roles?.length ? roles : [fallback]
+}
+
+const getBanDurationSeconds = (value: string) => {
+  if (!value) return undefined
+  const days = Number(value)
+  if (!Number.isSafeInteger(days) || days <= 0) return null
+  const seconds = days * 86_400
+  return Number.isSafeInteger(seconds) ? seconds : null
+}
 
 /** HeroUI presentation for the static Admin users view. */
 export function AdminUsers({
@@ -96,6 +122,10 @@ export function AdminUsers({
   const [page, setPage] = useState(0)
   const [search, setSearch] = useState("")
   const [searchField, setSearchField] = useState<SearchFieldName>("email")
+  const [searchOperator, setSearchOperator] =
+    useState<SearchOperator>("contains")
+  const [sort, setSort] = useState<SortOption>("createdAt-desc")
+  const [status, setStatus] = useState<StatusFilter>("all")
   const [createOpen, setCreateOpen] = useState(false)
   const deferredSearch = useDeferredValue(search.trim())
   const isSelectionControlled = onSelectedUserIdChange !== undefined
@@ -104,18 +134,33 @@ export function AdminUsers({
     : localSelectedUserId
   const permission = useAdminPermission(authClient, { user: ["list"] })
   const createPermission = useAdminPermission(authClient, { user: ["create"] })
-  const params = useMemo<AdminListUsersParams>(
-    () => ({
+  const params = useMemo<AdminListUsersParams>(() => {
+    const [sortBy, sortDirection] = sort.split("-") as [
+      "createdAt" | "name",
+      "asc" | "desc"
+    ]
+
+    return {
+      filterField: status === "all" ? undefined : "banned",
+      filterOperator: status === "all" ? undefined : "eq",
+      filterValue: status === "all" ? undefined : status === "banned",
       limit: config.pageSize,
       offset: page * config.pageSize,
       searchField,
-      searchOperator: "contains",
+      searchOperator,
       searchValue: deferredSearch || undefined,
-      sortBy: "createdAt",
-      sortDirection: "desc"
-    }),
-    [config.pageSize, deferredSearch, page, searchField]
-  )
+      sortBy,
+      sortDirection
+    }
+  }, [
+    config.pageSize,
+    deferredSearch,
+    page,
+    searchField,
+    searchOperator,
+    sort,
+    status
+  ])
   const users = useAdminUsers(authClient, {
     enabled: permission.data?.success === true,
     params,
@@ -145,7 +190,7 @@ export function AdminUsers({
         ) : null}
       </header>
 
-      <div className="flex flex-col gap-2 sm:flex-row sm:items-end">
+      <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-[9rem_10rem_minmax(14rem,1fr)_10rem_10rem] lg:items-end">
         <Select
           className="sm:w-36"
           value={searchField}
@@ -168,8 +213,39 @@ export function AdminUsers({
             </ListBox>
           </Select.Popover>
         </Select>
+        <Select
+          value={searchOperator}
+          onChange={(value) => {
+            setSearchOperator(String(value) as SearchOperator)
+            setPage(0)
+          }}
+        >
+          <Label>{config.localization.searchOperator}</Label>
+          <Select.Trigger>
+            <Select.Value />
+            <Select.Indicator />
+          </Select.Trigger>
+          <Select.Popover>
+            <ListBox>
+              <ListBox.Item id="contains">
+                {config.localization.searchContains}
+              </ListBox.Item>
+              <ListBox.Item id="starts_with">
+                {config.localization.startsWith}
+              </ListBox.Item>
+              <ListBox.Item id="ends_with">
+                {config.localization.endsWith}
+              </ListBox.Item>
+            </ListBox>
+          </Select.Popover>
+        </Select>
         <SearchField
-          className="w-full sm:max-w-md"
+          aria-label={
+            searchField === "email"
+              ? config.localization.searchByEmail
+              : config.localization.searchByName
+          }
+          className="w-full"
           value={search}
           onChange={(value) => {
             setSearch(value)
@@ -188,6 +264,61 @@ export function AdminUsers({
             <SearchField.ClearButton />
           </SearchField.Group>
         </SearchField>
+        <Select
+          value={status}
+          onChange={(value) => {
+            setStatus(String(value) as StatusFilter)
+            setPage(0)
+          }}
+        >
+          <Label>{config.localization.status}</Label>
+          <Select.Trigger>
+            <Select.Value />
+            <Select.Indicator />
+          </Select.Trigger>
+          <Select.Popover>
+            <ListBox>
+              <ListBox.Item id="all">
+                {config.localization.filterAllStatuses}
+              </ListBox.Item>
+              <ListBox.Item id="active">
+                {config.localization.active}
+              </ListBox.Item>
+              <ListBox.Item id="banned">
+                {config.localization.banned}
+              </ListBox.Item>
+            </ListBox>
+          </Select.Popover>
+        </Select>
+        <Select
+          value={sort}
+          onChange={(value) => {
+            setSort(String(value) as SortOption)
+            setPage(0)
+          }}
+        >
+          <Label>{config.localization.sort}</Label>
+          <Select.Trigger>
+            <Select.Value />
+            <Select.Indicator />
+          </Select.Trigger>
+          <Select.Popover>
+            <ListBox>
+              <ListBox.Item id="createdAt-desc">
+                {config.localization.sortNewest}
+              </ListBox.Item>
+              <ListBox.Item id="createdAt-asc">
+                {config.localization.sortOldest}
+              </ListBox.Item>
+              <ListBox.Item id="name-asc">
+                {config.localization.sortNameAscending}
+              </ListBox.Item>
+              <ListBox.Item id="name-desc">
+                {config.localization.sortNameDescending}
+              </ListBox.Item>
+            </ListBox>
+          </Select.Popover>
+        </Select>
       </div>
 
       {permission.isPending ? (
@@ -347,23 +478,41 @@ function CreateUserDialog({
   isOpen: boolean
   onOpenChange: (open: boolean) => void
 }) {
-  const { authClient } = useAuth<AdminAuthClient>()
+  const { additionalFields, authClient } = useAuth<AdminAuthClient>()
   const config = useAuthPlugin(adminPlugin)
   const createUser = useCreateAdminUser(authClient)
+  const [emailVerified, setEmailVerified] = useState(false)
+  const [formError, setFormError] = useState<string>()
+  const [roles, setRoles] = useState([config.defaultRole])
 
   const close = () => {
     createUser.reset()
+    setEmailVerified(false)
+    setFormError(undefined)
+    setRoles([config.defaultRole])
     onOpenChange(false)
   }
-  const submit = (event: FormEvent<HTMLFormElement>) => {
+  const submit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     const data = new FormData(event.currentTarget)
+    let additionalFieldValues: Record<string, AdditionalFieldValue | null>
+    try {
+      additionalFieldValues = await parseAdditionalFieldValues(
+        additionalFields ?? [],
+        data
+      )
+    } catch (error) {
+      setFormError(error instanceof Error ? error.message : String(error))
+      return
+    }
+    setFormError(undefined)
     createUser.mutate(
       {
+        data: { ...additionalFieldValues, emailVerified },
         email: String(data.get("email")),
         name: String(data.get("name")),
         password: String(data.get("password")),
-        role: asAdminRole(String(data.get("role") || config.defaultRole))
+        role: asAdminRoles(roles)
       },
       { onSuccess: close }
     )
@@ -407,10 +556,14 @@ function CreateUserDialog({
                   <FieldError />
                 </TextField>
                 <Select
-                  defaultValue={config.defaultRole}
                   fullWidth
-                  name="role"
+                  selectionMode="multiple"
+                  value={roles}
                   variant="secondary"
+                  onChange={(keys) => {
+                    const next = [...(keys as Iterable<string>)]
+                    if (next.length) setRoles(next)
+                  }}
                 >
                   <Label>{config.localization.role}</Label>
                   <Select.Trigger>
@@ -418,7 +571,7 @@ function CreateUserDialog({
                     <Select.Indicator />
                   </Select.Trigger>
                   <Select.Popover>
-                    <ListBox>
+                    <ListBox selectionMode="multiple">
                       {config.roles.map((role) => (
                         <ListBox.Item id={role} key={role} textValue={role}>
                           {role}
@@ -428,9 +581,20 @@ function CreateUserDialog({
                     </ListBox>
                   </Select.Popover>
                 </Select>
-                {createUser.error ? (
+                <Switch isSelected={emailVerified} onChange={setEmailVerified}>
+                  {config.localization.emailVerified}
+                </Switch>
+                {additionalFields?.map((field) => (
+                  <AdditionalField
+                    field={field}
+                    isPending={createUser.isPending}
+                    key={field.name}
+                    name={field.name}
+                  />
+                ))}
+                {formError || createUser.error ? (
                   <FieldError>
-                    {getAdminErrorMessage(createUser.error)}
+                    {formError ?? getAdminErrorMessage(createUser.error)}
                   </FieldError>
                 ) : null}
               </div>
@@ -463,7 +627,8 @@ function UserDrawer({
   onOpenChange: (open: boolean) => void
   userId?: string
 }) {
-  const { authClient, navigate, plugins } = useAuth<AdminAuthClient>()
+  const { additionalFields, authClient, navigate, plugins } =
+    useAuth<AdminAuthClient>()
   const config = useAuthPlugin(adminPlugin)
   const contributedTabs = useMemo(
     () =>
@@ -497,6 +662,11 @@ function UserDrawer({
     { user: ["set-role"] },
     { enabled: Boolean(userId) }
   )
+  const canSetEmail = useAdminPermission(
+    authClient,
+    { user: ["set-email"] },
+    { enabled: Boolean(userId) }
+  )
   const canSetPassword = useAdminPermission(
     authClient,
     { user: ["set-password"] },
@@ -523,10 +693,17 @@ function UserDrawer({
     { enabled: Boolean(userId) }
   )
   const [name, setName] = useState("")
-  const [role, setRole] = useState(config.defaultRole)
+  const [email, setEmail] = useState("")
+  const [emailVerified, setEmailVerified] = useState(false)
+  const [roles, setRoles] = useState([config.defaultRole])
+  const [banReason, setBanReason] = useState("")
+  const [banDuration, setBanDuration] = useState("")
+  const banDurationSeconds = getBanDurationSeconds(banDuration)
+  const [profileError, setProfileError] = useState<string>()
   const [passwordOpen, setPasswordOpen] = useState(false)
   const [dangerousAction, setDangerousAction] = useState<DangerousAction>()
   const detail = user.data
+  const profileUserId = useRef(detail?.id)
   const isSelf = detail?.id === actor?.user.id
   const updateUser = useUpdateAdminUser(authClient)
   const setRoleMutation = useSetAdminUserRole(authClient)
@@ -540,16 +717,42 @@ function UserDrawer({
 
   useEffect(() => {
     setName(detail?.name ?? "")
-    setRole(detail?.role ?? config.defaultRole)
-  }, [config.defaultRole, detail?.name, detail?.role])
+    setEmail(detail?.email ?? "")
+    setEmailVerified(detail?.emailVerified ?? false)
+    setRoles(parseAdminRoles(detail?.role, config.defaultRole))
+  }, [
+    config.defaultRole,
+    detail?.email,
+    detail?.emailVerified,
+    detail?.name,
+    detail?.role
+  ])
+
+  useEffect(() => {
+    if (profileUserId.current === detail?.id) return
+    profileUserId.current = detail?.id
+    setProfileError(undefined)
+  }, [detail?.id])
 
   const confirmDangerousAction = () => {
     if (!detail) return
-    if (dangerousAction === "ban")
+    if (dangerousAction === "ban") {
+      if (banDurationSeconds === null) return
       ban.mutate(
-        { userId: detail.id },
-        { onSuccess: () => setDangerousAction(undefined) }
+        {
+          banExpiresIn: banDurationSeconds,
+          banReason: banReason.trim() || undefined,
+          userId: detail.id
+        },
+        {
+          onSuccess: () => {
+            setBanDuration("")
+            setBanReason("")
+            setDangerousAction(undefined)
+          }
+        }
       )
+    }
     if (dangerousAction === "delete")
       remove.mutate(
         { userId: detail.id },
@@ -582,6 +785,8 @@ function UserDrawer({
     remove.reset()
     revokeSessions.reset()
     impersonate.reset()
+    setBanDuration("")
+    setBanReason("")
     setDangerousAction(undefined)
   }
   const dangerousMutation =
@@ -670,19 +875,65 @@ function UserDrawer({
                             : config.localization.active}
                         </Chip>
                       </dd>
+                      {detail.banned && detail.banReason ? (
+                        <>
+                          <dt className="text-muted">
+                            {config.localization.banReason}
+                          </dt>
+                          <dd>{detail.banReason}</dd>
+                        </>
+                      ) : null}
+                      {detail.banned && detail.banExpires ? (
+                        <>
+                          <dt className="text-muted">
+                            {config.localization.banExpires}
+                          </dt>
+                          <dd>{formatDate(detail.banExpires)}</dd>
+                        </>
+                      ) : null}
                     </dl>
                     <Form
-                      className="flex items-end gap-2"
-                      onSubmit={(event) => {
+                      className="flex flex-col gap-4"
+                      onSubmit={async (event) => {
                         event.preventDefault()
+                        const formData = new FormData(event.currentTarget)
+                        let additionalFieldValues: Record<
+                          string,
+                          AdditionalFieldValue | null
+                        >
+                        try {
+                          additionalFieldValues =
+                            await parseAdditionalFieldValues(
+                              additionalFields ?? [],
+                              formData
+                            )
+                        } catch (error) {
+                          setProfileError(
+                            error instanceof Error
+                              ? error.message
+                              : String(error)
+                          )
+                          return
+                        }
+                        setProfileError(undefined)
                         updateUser.mutate({
                           userId: detail.id,
-                          data: { name: name.trim() }
+                          data: {
+                            ...additionalFieldValues,
+                            name: name.trim(),
+                            ...(canSetEmail.data?.success
+                              ? {
+                                  email: email.trim(),
+                                  emailVerified
+                                }
+                              : {})
+                          }
                         })
                       }}
                     >
                       <TextField
-                        className="flex-1"
+                        isDisabled={!canUpdate.data?.success}
+                        isRequired
                         value={name}
                         onChange={setName}
                       >
@@ -694,10 +945,54 @@ function UserDrawer({
                           </FieldError>
                         ) : null}
                       </TextField>
+                      <TextField
+                        isDisabled={
+                          !canUpdate.data?.success || !canSetEmail.data?.success
+                        }
+                        isRequired
+                        type="email"
+                        value={email}
+                        onChange={setEmail}
+                      >
+                        <Label>{config.localization.email}</Label>
+                        <Input variant="secondary" />
+                        <FieldError />
+                      </TextField>
+                      <Switch
+                        isDisabled={
+                          !canUpdate.data?.success || !canSetEmail.data?.success
+                        }
+                        isSelected={emailVerified}
+                        onChange={setEmailVerified}
+                      >
+                        {config.localization.emailVerified}
+                      </Switch>
+                      {additionalFields?.map((field) => {
+                        const value = (
+                          detail as unknown as Record<string, unknown>
+                        )[field.name]
+                        return (
+                          <AdditionalField
+                            field={{
+                              ...field,
+                              defaultValue: value as AdditionalFieldValue | null
+                            }}
+                            isPending={
+                              updateUser.isPending || !canUpdate.data?.success
+                            }
+                            key={`${detail.id}-${field.name}-${String(value ?? "")}`}
+                            name={field.name}
+                          />
+                        )
+                      })}
+                      {profileError ? (
+                        <FieldError>{profileError}</FieldError>
+                      ) : null}
                       <Button
+                        className="self-start"
                         isDisabled={
                           !name.trim() ||
-                          name === detail.name ||
+                          !email.trim() ||
                           updateUser.isPending ||
                           canUpdate.isPending ||
                           !canUpdate.data?.success
@@ -712,9 +1007,13 @@ function UserDrawer({
                       <Select
                         className="flex-1"
                         fullWidth
-                        value={role}
+                        selectionMode="multiple"
+                        value={roles}
                         variant="secondary"
-                        onChange={(value) => setRole(String(value))}
+                        onChange={(keys) => {
+                          const next = [...(keys as Iterable<string>)]
+                          if (next.length) setRoles(next)
+                        }}
                       >
                         <Label>{config.localization.role}</Label>
                         <Select.Trigger>
@@ -722,7 +1021,7 @@ function UserDrawer({
                           <Select.Indicator />
                         </Select.Trigger>
                         <Select.Popover>
-                          <ListBox>
+                          <ListBox selectionMode="multiple">
                             {config.roles.map((item) => (
                               <ListBox.Item
                                 id={item}
@@ -747,7 +1046,7 @@ function UserDrawer({
                         onPress={() =>
                           setRoleMutation.mutate({
                             userId: detail.id,
-                            role: asAdminRole(role)
+                            role: asAdminRoles(roles)
                           })
                         }
                       >
@@ -936,6 +1235,25 @@ function UserDrawer({
             </AlertDialog.Header>
             <AlertDialog.Body className="flex flex-col gap-2">
               <p className="text-sm text-muted">{detail?.email}</p>
+              {dangerousAction === "ban" ? (
+                <div className="flex flex-col gap-4 pt-2">
+                  <TextField value={banReason} onChange={setBanReason}>
+                    <Label>{config.localization.banReason}</Label>
+                    <Input variant="secondary" />
+                  </TextField>
+                  <TextField
+                    type="number"
+                    value={banDuration}
+                    onChange={setBanDuration}
+                  >
+                    <Label>{config.localization.banDuration}</Label>
+                    <Input min="1" step="1" variant="secondary" />
+                  </TextField>
+                  <p className="text-xs text-muted">
+                    {config.localization.banDurationDescription}
+                  </p>
+                </div>
+              ) : null}
               {dangerousMutation.error ? (
                 <FieldError>
                   {getAdminErrorMessage(dangerousMutation.error)}
@@ -947,7 +1265,10 @@ function UserDrawer({
                 {config.localization.cancel}
               </Button>
               <Button
-                isDisabled={isSelf}
+                isDisabled={
+                  isSelf ||
+                  (dangerousAction === "ban" && banDurationSeconds === null)
+                }
                 isPending={dangerousMutation.isPending}
                 variant={dangerousAction === "delete" ? "danger" : "primary"}
                 onPress={confirmDangerousAction}
