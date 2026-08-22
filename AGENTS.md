@@ -13,6 +13,13 @@ Before completing any task, ensure all of the following pass:
 1. **Biome** — No formatting errors in modified files
 2. **Linter** — No lint errors in the project
 
+## Platform Parity
+
+- Keep all supported platforms at feature and UI parity.
+- Implement every feature and UI change for React and Solid.
+- Implement every feature and UI change for shadcn/ui, HeroUI, and Zaidan.
+- Do not complete a change while any platform remains behind the others.
+
 <!-- nx configuration start-->
 <!-- Leave the start & end comments to automatically receive updates. -->
 
