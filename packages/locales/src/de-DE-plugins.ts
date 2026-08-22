@@ -601,6 +601,7 @@ export const deDEPlugins = {
   } satisfies Translated<SiweLocalization>,
   sso: {
     addProvider: "SSO-Anbieter hinzufügen",
+    cancel: "Abbrechen",
     clientId: "Client-ID",
     clientSecret: "Client-Secret",
     continueWithEmail: "Mit E-Mail-Adresse fortfahren",
@@ -613,20 +614,38 @@ export const deDEPlugins = {
       "Veröffentliche den TXT-Eintrag für jede konfigurierte Domain und bestätige sie anschließend.",
     domainVerificationRequested: "Ein neuer Bestätigungstoken wurde erstellt.",
     domainVerified: "Die Domain des Anbieters wurde bestätigt.",
+    deleteProvider: "Anbieter löschen",
+    deleteProviderDescription:
+      "Benutzer können sich nicht mehr über diesen Anbieter anmelden.",
+    discoveryEndpoint: "Discovery-Endpunkt",
+    editProvider: "Anbieter bearbeiten",
     emailFirstDescription:
       "Gib deine geschäftliche E-Mail-Adresse ein, um fortzufahren.",
     entryPoint: "SSO-URL",
     identityProviderMetadata: "Metadaten-XML des Identitätsanbieters",
     issuer: "Aussteller-URL",
     oidc: "OIDC",
+    noProviders: "Keine SSO-Anbieter",
+    noProvidersDescription:
+      "Füge einen Identitätsanbieter hinzu, um die Organisationsanmeldung zu aktivieren.",
     organizationId: "Organisations-ID",
     providerCreated: "Der SSO-Anbieter wurde hinzugefügt.",
+    providerDeleted: "Der SSO-Anbieter wurde gelöscht.",
     providerId: "Anbieter-ID",
     providerSetup: "SSO-Anbieter einrichten",
     providerSetupDescription:
       "Verbinde einen OpenID-Connect- oder SAML-Identitätsanbieter.",
+    providerList: "Organisations-SSO",
+    providerListDescription:
+      "Verwalte Identitätsanbieter und bestätigte Domains für diese Organisation.",
+    providerAccessDenied:
+      "Nur Organisationsinhaber und Administratoren können SSO-Anbieter verwalten.",
+    providerLoadError: "SSO-Anbieter konnten nicht geladen werden.",
+    providerUpdated: "Der SSO-Anbieter wurde aktualisiert.",
     requestNewToken: "Neuen Token erstellen",
+    retry: "Erneut versuchen",
     saml: "SAML",
+    saveProvider: "Anbieter speichern",
     txtRecordHost: "Host des TXT-Eintrags",
     txtRecordValue: "Wert des TXT-Eintrags",
     useDifferentEmail: "Andere E-Mail-Adresse verwenden",

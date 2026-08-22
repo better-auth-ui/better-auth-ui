@@ -100,6 +100,7 @@ export function SsoDomainVerification({
             name="providerId"
             onChange={(value) => {
               setProviderId(value.trim())
+              setToken("")
               setVerified(false)
             }}
             value={providerId}

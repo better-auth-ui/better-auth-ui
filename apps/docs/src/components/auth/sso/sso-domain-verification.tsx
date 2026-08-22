@@ -90,6 +90,7 @@ export function SsoDomainVerification({
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
+    setCopyError("")
     setVerified(false)
     verify.mutate({ providerId })
   }
@@ -115,6 +116,7 @@ export function SsoDomainVerification({
                 value={providerId}
                 onChange={(event) => {
                   setProviderId(event.target.value.trim())
+                  setToken("")
                   setVerified(false)
                 }}
                 required
@@ -190,6 +192,7 @@ export function SsoDomainVerification({
                 variant="outline"
                 disabled={!providerId || verify.isPending}
                 onClick={() => {
+                  setCopyError("")
                   setVerified(false)
                   requestToken.mutate({ providerId })
                 }}

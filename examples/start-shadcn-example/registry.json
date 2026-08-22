@@ -196,21 +196,27 @@
       "name": "sso",
       "type": "registry:component",
       "title": "SSO and Email-First Sign In",
-      "description": "Discovers organization SSO from an email address, then falls back to configured password, email OTP, magic-link, or plugin sign-in methods.",
+      "description": "Discovers organization SSO from an email address and manages organization identity providers and domain verification.",
       "dependencies": [
         "@better-auth-ui/react@latest",
         "@better-auth-ui/core@latest",
         "@better-auth/sso",
         "better-auth",
-        "lucide-react"
+        "lucide-react",
+        "sonner"
       ],
       "registryDependencies": [
+        "alert-dialog",
+        "badge",
         "button",
         "card",
         "checkbox",
+        "dialog",
+        "empty",
         "field",
         "input",
         "input-group",
+        "skeleton",
         "spinner",
         "tabs",
         "textarea",
@@ -231,6 +237,11 @@
           "path": "src/components/auth/sso/email-first-sign-in.tsx",
           "type": "registry:component",
           "target": "@components/auth/sso/email-first-sign-in.tsx"
+        },
+        {
+          "path": "src/components/auth/sso/organization-sso-providers.tsx",
+          "type": "registry:component",
+          "target": "@components/auth/sso/organization-sso-providers.tsx"
         },
         {
           "path": "src/components/auth/sso/sso-domain-verification.tsx",
