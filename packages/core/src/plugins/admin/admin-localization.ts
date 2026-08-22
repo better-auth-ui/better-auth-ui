@@ -9,6 +9,14 @@ export const adminLocalization = {
   admin: "Administration",
   /** @remarks `"Banned"` */
   banned: "Banned",
+  /** @remarks `"Ban duration (days)"` */
+  banDuration: "Ban duration (days)",
+  /** @remarks `"Leave blank for a permanent ban."` */
+  banDurationDescription: "Leave blank for a permanent ban.",
+  /** @remarks `"Ban expires"` */
+  banExpires: "Ban expires",
+  /** @remarks `"Ban reason"` */
+  banReason: "Ban reason",
   /** @remarks `"Ban user"` */
   banUser: "Ban user",
   /** @remarks `"Cancel"` */
@@ -25,6 +33,12 @@ export const adminLocalization = {
   deleteUser: "Delete user",
   /** @remarks `"Email"` */
   email: "Email",
+  /** @remarks `"Email verified"` */
+  emailVerified: "Email verified",
+  /** @remarks `"Ends with"` */
+  endsWith: "Ends with",
+  /** @remarks `"All statuses"` */
+  filterAllStatuses: "All statuses",
   /** @remarks `"Load users failed"` */
   loadUsersError: "Could not load users",
   /** @remarks `"Try again or check your Admin plugin configuration."` */
@@ -52,6 +66,12 @@ export const adminLocalization = {
   role: "Role",
   /** @remarks `"Search"` */
   search: "Search",
+  /** @remarks `"Search operator"` */
+  searchOperator: "Search operator",
+  /** @remarks `"Contains"` */
+  searchContains: "Contains",
+  /** @remarks `"Starts with"` */
+  startsWith: "Starts with",
   /** @remarks `"Search by email"` */
   searchByEmail: "Search by email",
   /** @remarks `"Search by name"` */
@@ -72,6 +92,16 @@ export const adminLocalization = {
   setPassword: "Set password",
   /** @remarks `"Status"` */
   status: "Status",
+  /** @remarks `"Sort"` */
+  sort: "Sort",
+  /** @remarks `"Newest first"` */
+  sortNewest: "Newest first",
+  /** @remarks `"Oldest first"` */
+  sortOldest: "Oldest first",
+  /** @remarks `"Name A-Z"` */
+  sortNameAscending: "Name A-Z",
+  /** @remarks `"Name Z-A"` */
+  sortNameDescending: "Name Z-A",
   /** @remarks `"Stop impersonating"` */
   stopImpersonating: "Stop impersonating",
   /** @remarks `"User details"` */
