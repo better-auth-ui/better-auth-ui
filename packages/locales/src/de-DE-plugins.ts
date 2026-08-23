@@ -522,6 +522,8 @@ export const deDEPlugins = {
       "Lösche diese Rolle dauerhaft. Mitglieder müssen zuerst einer anderen Rolle zugewiesen werden.",
     roleName: "Rollenname",
     permissions: "Berechtigungen",
+    permissionsLimitedDescription:
+      "Du kannst nur Berechtigungen zuweisen, die in deiner eigenen Rolle enthalten sind.",
     noRoles: "Keine benutzerdefinierten Rollen",
     noRolesDescription:
       "Erstelle eine Rolle, um einen benutzerdefinierten Organisationszugriff festzulegen.",
