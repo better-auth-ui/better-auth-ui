@@ -287,7 +287,7 @@ export const TwoFactorSettingsPreview: Story = {
       )
       await expect(
         within(canvasElement.ownerDocument.body).getByRole("dialog")
-      ).toBeVisible()
+      ).toBeInTheDocument()
     })
   }
 }

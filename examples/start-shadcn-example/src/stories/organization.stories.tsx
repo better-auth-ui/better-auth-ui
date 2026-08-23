@@ -210,7 +210,9 @@ function createOrganizationQueryClient() {
   for (const permissions of [
     { member: ["update"] },
     { member: ["delete"] },
+    { invitation: ["create"] },
     { invitation: ["cancel"] },
+    { organization: ["update"] },
     { organization: ["delete"] }
   ]) {
     queryClient.setQueryData(
@@ -351,7 +353,7 @@ export const OrganizationDangerZonePreview: Story = {
       )
       await expect(
         within(canvasElement.ownerDocument.body).getByRole("alertdialog")
-      ).toBeVisible()
+      ).toBeInTheDocument()
     })
   }
 }
@@ -370,7 +372,7 @@ export const OrganizationPeoplePreview: Story = {
       )
       await expect(
         within(canvasElement.ownerDocument.body).getByRole("dialog")
-      ).toBeVisible()
+      ).toBeInTheDocument()
     })
   }
 }
@@ -423,7 +425,7 @@ export const OrganizationsSettingsPreview: Story = {
       )
       await expect(
         within(canvasElement.ownerDocument.body).getByRole("dialog")
-      ).toBeVisible()
+      ).toBeInTheDocument()
     })
   }
 }

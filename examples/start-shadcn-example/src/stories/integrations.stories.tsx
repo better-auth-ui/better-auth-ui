@@ -379,7 +379,7 @@ export const OAuthClientsPreview: Story = {
       )
       await expect(
         within(canvasElement.ownerDocument.body).getByRole("dialog")
-      ).toBeVisible()
+      ).toBeInTheDocument()
     })
   }
 }

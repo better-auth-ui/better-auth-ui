@@ -251,7 +251,21 @@ function createStoryQueryClient() {
   queryClient.setQueryData(
     organizationQueryKeys.permissions.has(userId, {
       organizationId: "org_acme_docs",
+      permissions: { invitation: ["create"] }
+    }),
+    { success: true }
+  )
+  queryClient.setQueryData(
+    organizationQueryKeys.permissions.has(userId, {
+      organizationId: "org_acme_docs",
       permissions: { invitation: ["cancel"] }
+    }),
+    { success: true }
+  )
+  queryClient.setQueryData(
+    organizationQueryKeys.permissions.has(userId, {
+      organizationId: "org_acme_docs",
+      permissions: { organization: ["update"] }
     }),
     { success: true }
   )

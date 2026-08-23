@@ -210,7 +210,9 @@ function createOrganizationQueryClient() {
   for (const permissions of [
     { member: ["update"] },
     { member: ["delete"] },
+    { invitation: ["create"] },
     { invitation: ["cancel"] },
+    { organization: ["update"] },
     { organization: ["delete"] }
   ]) {
     queryClient.setQueryData(

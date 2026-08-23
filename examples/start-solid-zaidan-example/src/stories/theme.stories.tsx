@@ -7,16 +7,21 @@ import {
   createRouter,
   RouterProvider
 } from "@tanstack/solid-router"
-import type { JSX } from "solid-js"
+import { createEffect, type JSX } from "solid-js"
+import { expect } from "storybook/test"
 import type { Meta, StoryObj } from "storybook-solidjs-vite"
 import { AuthProvider } from "@/components/auth/auth-provider"
 import { Appearance } from "@/components/auth/theme/appearance"
 import { UserButton } from "@/components/auth/user/user-button"
 import { themePlugin } from "@/lib/auth/theme-plugin"
 import { storyRenders, withStoryActions } from "./story-coverage"
+import { applyStoryTheme, type StoryTheme } from "./story-theme"
 
 const mockAuthClient = {} as never
-const setTheme = withStoryActions(() => undefined, "theme.setTheme")
+const setTheme = withStoryActions(
+  (theme: string) => applyStoryTheme(theme as StoryTheme),
+  "theme.setTheme"
+)
 
 type ThemeStoryArgs = {
   theme?: string
@@ -58,6 +63,8 @@ function createStoryQueryClient() {
 function ThemeStoryProvider(
   props: ThemeStoryArgs & { children: () => JSX.Element }
 ) {
+  createEffect(() => applyStoryTheme((props.theme ?? "system") as StoryTheme))
+
   return (
     <AuthProvider
       authClient={mockAuthClient}
@@ -149,6 +156,14 @@ export const UserButtonPreview: Story = {
 }
 
 export const AppearancePreview: Story = {
-  play: storyRenders,
+  play: async ({ canvas, canvasElement, step, userEvent }) => {
+    await step("change the color theme", async () => {
+      await userEvent.click(canvas.getByRole("radio", { name: /Dark/ }))
+      await expect(setTheme).toHaveBeenCalledWith("dark")
+      await expect(canvasElement.ownerDocument.documentElement).toHaveClass(
+        "dark"
+      )
+    })
+  },
   render: (args) => <AppearancePreviewStory {...args} />
 }

@@ -1,15 +1,9 @@
 import type { Decorator, Preview } from "@storybook/react-vite"
 import "../src/styles/app.css"
-
-function applyModeToDOM(mode: "light" | "dark") {
-  const root = document.documentElement
-
-  root.classList.toggle("dark", mode === "dark")
-  root.setAttribute("data-theme", mode)
-}
+import { applyStoryTheme } from "../src/stories/story-theme"
 
 const withTheme: Decorator = (Story, context) => {
-  applyModeToDOM(context.globals.mode === "dark" ? "dark" : "light")
+  applyStoryTheme(context.globals.mode === "dark" ? "dark" : "light")
   return <Story />
 }
 

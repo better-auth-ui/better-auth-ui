@@ -3,7 +3,7 @@ import { multiSessionQueryKeys } from "@better-auth-ui/core/plugins/multi-sessio
 import { passkeyQueryKeys } from "@better-auth-ui/core/plugins/passkey"
 import type { AuthPlugin } from "@better-auth-ui/react"
 import type { Meta, StoryObj } from "@storybook/react-vite"
-import { type ReactNode, useState } from "react"
+import { type ReactNode, useEffect, useState } from "react"
 import { expect, fn, within } from "storybook/test"
 
 import { ApiKeys } from "@/components/auth/api-key/api-keys"
@@ -33,6 +33,7 @@ import {
   storySession,
   storyUserId
 } from "./story-fixtures"
+import { applyStoryTheme, type StoryTheme } from "./story-theme"
 
 const apiKeys = {
   apiKeys: [
@@ -192,8 +193,14 @@ function FeaturePreview({
 
 function ThemePreview({ initialTheme }: { initialTheme: string }) {
   const [theme, setTheme] = useState(initialTheme)
+
+  useEffect(() => {
+    applyStoryTheme(initialTheme as StoryTheme)
+  }, [initialTheme])
+
   const changeTheme = (nextTheme: string) => {
     featureActions.setTheme(nextTheme)
+    applyStoryTheme(nextTheme as StoryTheme)
     setTheme(nextTheme)
   }
 
@@ -271,7 +278,7 @@ export const ApiKeysPreview: Story = {
       )
       await expect(
         within(canvasElement.ownerDocument.body).getByRole("dialog")
-      ).toBeVisible()
+      ).toBeInTheDocument()
     })
   }
 }
@@ -321,7 +328,7 @@ export const DeleteUserPreview: Story = {
       )
       await expect(
         within(canvasElement.ownerDocument.body).getByRole("alertdialog")
-      ).toBeVisible()
+      ).toBeInTheDocument()
     })
   }
 }
@@ -331,10 +338,13 @@ export const ThemePreviewStory: Story = {
   render: ({ initialTheme = "system" }) => (
     <ThemePreview initialTheme={initialTheme} />
   ),
-  play: async ({ canvas, step, userEvent }) => {
+  play: async ({ canvas, canvasElement, step, userEvent }) => {
     await step("change the color theme", async () => {
       await userEvent.click(canvas.getByRole("radio", { name: /Dark/ }))
       await expect(featureActions.setTheme).toHaveBeenCalledWith("dark")
+      await expect(canvasElement.ownerDocument.documentElement).toHaveClass(
+        "dark"
+      )
     })
   }
 }

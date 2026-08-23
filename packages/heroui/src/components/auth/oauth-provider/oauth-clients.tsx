@@ -346,14 +346,13 @@ export function OAuthClients({
                     </ListBox>
                   </Select.Popover>
                 </Select>
-                <TextField isRequired>
+                <TextField
+                  name="redirectUris"
+                  defaultValue={editingClient?.redirect_uris.join("\n") ?? ""}
+                  isRequired
+                >
                   <Label>{oauthLocalization.redirectUrls}</Label>
-                  <TextArea
-                    name="redirectUris"
-                    rows={3}
-                    defaultValue={editingClient?.redirect_uris.join("\n") ?? ""}
-                    variant="secondary"
-                  />
+                  <TextArea rows={3} variant="secondary" />
                   <p className="text-muted text-xs">
                     {oauthLocalization.redirectUrlsDescription}
                   </p>

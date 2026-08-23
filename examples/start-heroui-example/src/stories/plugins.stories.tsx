@@ -21,7 +21,7 @@ import { usernamePlugin } from "@better-auth-ui/heroui/plugins/username"
 import type { AuthPlugin } from "@better-auth-ui/react"
 import { Toast } from "@heroui/react"
 import type { Meta, StoryObj } from "@storybook/react-vite"
-import { type ReactNode, useState } from "react"
+import { type ReactNode, useEffect, useState } from "react"
 import { expect, fn, within } from "storybook/test"
 
 import {
@@ -32,6 +32,7 @@ import {
   storySession,
   storyUserId
 } from "./story-fixtures"
+import { applyStoryTheme, type StoryTheme } from "./story-theme"
 
 const apiKeys = {
   apiKeys: [
@@ -190,8 +191,14 @@ function FeaturePreview({
 
 function ThemePreview({ initialTheme }: { initialTheme: string }) {
   const [theme, setTheme] = useState(initialTheme)
+
+  useEffect(() => {
+    applyStoryTheme(initialTheme as StoryTheme)
+  }, [initialTheme])
+
   const changeTheme = (nextTheme: string) => {
     featureActions.setTheme(nextTheme)
+    applyStoryTheme(nextTheme as StoryTheme)
     setTheme(nextTheme)
   }
 
@@ -329,10 +336,13 @@ export const ThemePreviewStory: Story = {
   render: ({ initialTheme = "system" }) => (
     <ThemePreview initialTheme={initialTheme} />
   ),
-  play: async ({ canvas, step, userEvent }) => {
+  play: async ({ canvas, canvasElement, step, userEvent }) => {
     await step("change the color theme", async () => {
       await userEvent.click(canvas.getByRole("radio", { name: /Dark/ }))
       await expect(featureActions.setTheme).toHaveBeenCalledWith("dark")
+      await expect(canvasElement.ownerDocument.documentElement).toHaveClass(
+        "dark"
+      )
     })
   }
 }
