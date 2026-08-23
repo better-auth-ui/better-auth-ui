@@ -60,6 +60,7 @@ export function OrganizationTeams() {
     const form = event.currentTarget
     const name = String(new FormData(form).get("name") ?? "").trim()
     if (!name || !activeOrganization || teamLimitReached) return
+
     setIsCreatingFields(true)
     try {
       const values = await parseAdditionalFieldValues(
@@ -117,7 +118,7 @@ export function OrganizationTeams() {
               createTeam.isPending || isCreatingFields || teamLimitReached
             }
           >
-            {(createTeam.isPending || isCreatingFields) && <Spinner />}
+            {createTeam.isPending && <Spinner />}
             {localization.createTeam}
           </Button>
           {teamLimitReached && (
@@ -202,6 +203,7 @@ function TeamCard({
     maximumMembersPerTeam !== undefined &&
     (teamMembers.data?.length ?? 0) >= maximumMembersPerTeam
   const canRemoveTeam = allowRemovingAllTeams || teamCount > 1
+
   const handleUpdate = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     setIsUpdatingFields(true)

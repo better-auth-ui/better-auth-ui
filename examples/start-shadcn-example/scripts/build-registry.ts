@@ -27,11 +27,14 @@ const EXPECTED_BASE_UI_OVERRIDES = [
   "src/components/auth/admin/admin.tsx",
   "src/components/auth/api-key/api-keys.tsx",
   "src/components/auth/api-key/create-api-key-dialog.tsx",
-  "src/components/auth/api-key/edit-api-key-dialog.tsx",
+  "src/components/auth/billing/billing-settings.tsx",
   "src/components/auth/dash/activity.tsx",
+  "src/components/auth/oauth-provider/oauth-clients.tsx",
   "src/components/auth/organization/invite-member-dialog.tsx",
+  "src/components/auth/organization/organization-member-row.tsx",
   "src/components/auth/organization/organization-teams.tsx",
   "src/components/auth/organization/team-switcher.tsx",
+  "src/components/auth/phone-number/international-phone-field.tsx",
   "src/components/auth/phone-number/remove-phone-number-dialog.tsx",
   "src/components/auth/theme/theme-toggle-item.tsx"
 ] as const

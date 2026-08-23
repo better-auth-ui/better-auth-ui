@@ -22,6 +22,7 @@ import {
   useState
 } from "react"
 import { toast } from "sonner"
+import { AdditionalField } from "@/components/auth/additional-field"
 import { Button, buttonVariants } from "@/components/ui/button"
 import {
   Dialog,
@@ -51,7 +52,6 @@ import {
 import { Spinner } from "@/components/ui/spinner"
 import { organizationPlugin } from "@/lib/auth/organization-plugin"
 import { cn } from "@/lib/utils"
-import { AdditionalField } from "../additional-field"
 
 /** Props for the `InviteMemberDialog` component. */
 export type InviteMemberDialogProps = {
@@ -71,10 +71,10 @@ export function InviteMemberDialog({
 }: InviteMemberDialogProps) {
   const { authClient, localization } = useAuth<OrganizationAuthClient>()
   const {
+    modelFields: { invitation: invitationFields },
     dynamicAccessControl,
     invitationLimit,
     localization: organizationLocalization,
-    modelFields: { invitation: invitationFields },
     roles,
     teams: teamsEnabled
   } = useAuthPlugin(organizationPlugin)
@@ -167,6 +167,7 @@ export function InviteMemberDialog({
     const selectedTeamId = teams.data?.some((team) => team.id === teamId)
       ? teamId
       : undefined
+
     setIsSubmitting(true)
     let invitationValues: Record<string, unknown>
     try {
@@ -225,7 +226,7 @@ export function InviteMemberDialog({
                 autoFocus
                 required
                 placeholder={localization.auth.email}
-                disabled={isInviting || isSubmitting}
+                disabled={isInviting}
                 onChange={() => setEmailError(undefined)}
                 onInvalid={(e) => {
                   e.preventDefault()
@@ -249,7 +250,7 @@ export function InviteMemberDialog({
               <DropdownMenu>
                 <DropdownMenuTrigger
                   id="invite-member-role"
-                  disabled={isInviting || isSubmitting}
+                  disabled={isInviting}
                   className={cn(
                     buttonVariants({ variant: "outline" }),
                     "w-full justify-between font-normal"
@@ -291,7 +292,7 @@ export function InviteMemberDialog({
                   items={teamItems}
                   value={teamId}
                   onValueChange={(value) => setTeamId(value ?? "")}
-                  disabled={isInviting || isSubmitting}
+                  disabled={isInviting}
                 >
                   <SelectTrigger id="invite-member-team" className="w-full">
                     <SelectValue
@@ -310,6 +311,7 @@ export function InviteMemberDialog({
                 </Select>
               </Field>
             )}
+
             {invitationFields.map((field) => (
               <AdditionalField
                 key={field.name}

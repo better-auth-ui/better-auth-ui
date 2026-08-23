@@ -91,7 +91,6 @@ export function ApiKeys({
           </Button>
         )}
       </div>
-
       <Select
         items={sortItems}
         value={sort}
@@ -139,7 +138,6 @@ export function ApiKeys({
           )}
         </CardContent>
       </Card>
-
       {(page > 0 || (listData?.apiKeys.length ?? 0) === pageSize) && (
         <div className="flex justify-end gap-2">
           <Button

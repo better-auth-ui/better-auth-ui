@@ -33,11 +33,18 @@ AGNOSTIC_MIRRORS=(
 BASE_UI_TARGET="$EXAMPLE_DIR/../start-shadcn-baseui-example/src"
 BASE_UI_OVERRIDES=(
   components/auth/additional-field.tsx
+  components/auth/admin/admin-users.tsx
+  components/auth/admin/admin.tsx
   components/auth/api-key/api-keys.tsx
   components/auth/api-key/create-api-key-dialog.tsx
-  components/auth/api-key/edit-api-key-dialog.tsx
+  components/auth/billing/billing-settings.tsx
+  components/auth/dash/activity.tsx
+  components/auth/oauth-provider/oauth-clients.tsx
   components/auth/organization/invite-member-dialog.tsx
+  components/auth/organization/organization-member-row.tsx
   components/auth/organization/organization-teams.tsx
+  components/auth/organization/team-switcher.tsx
+  components/auth/phone-number/international-phone-field.tsx
   components/auth/phone-number/remove-phone-number-dialog.tsx
   components/auth/theme/theme-toggle-item.tsx
 )

@@ -61,6 +61,7 @@ import {
 import {
   Select,
   SelectContent,
+  SelectGroup,
   SelectItem,
   SelectTrigger,
   SelectValue
@@ -218,6 +219,10 @@ function ActivityFeed({
     () => Object.entries(localization.eventLabels),
     [localization.eventLabels]
   )
+  const eventItems = [
+    { label: localization.allEvents, value: "all" },
+    ...eventOptions.map(([value, label]) => ({ label, value }))
+  ]
   const offset = page * pageSize
   const params = {
     eventType: eventType === "all" ? undefined : eventType,
@@ -294,6 +299,7 @@ function ActivityFeed({
               {localization.eventType}
             </FieldLabel>
             <Select
+              items={eventItems}
               value={eventType}
               onValueChange={(value) => {
                 if (!value) return
@@ -305,12 +311,13 @@ function ActivityFeed({
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">{localization.allEvents}</SelectItem>
-                {eventOptions.map(([key, label]) => (
-                  <SelectItem key={key} value={key}>
-                    {label}
-                  </SelectItem>
-                ))}
+                <SelectGroup>
+                  {eventItems.map((item) => (
+                    <SelectItem key={item.value} value={item.value}>
+                      {item.label}
+                    </SelectItem>
+                  ))}
+                </SelectGroup>
               </SelectContent>
             </Select>
           </Field>

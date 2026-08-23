@@ -14,6 +14,7 @@ import { Input } from "@/components/ui/input"
 import {
   Select,
   SelectContent,
+  SelectGroup,
   SelectItem,
   SelectTrigger,
   SelectValue
@@ -51,15 +52,21 @@ export function InternationalPhoneField({
     () => getPhoneNumberCountries(locale, countryCodes),
     [countryCodes, locale]
   )
+  const countryItems = countries.map((country) => ({
+    label: `${country.label} ${country.callingCode}`,
+    value: country.code
+  }))
 
   return (
     <div className="grid grid-cols-[8.5rem_minmax(0,1fr)] gap-2">
       <Field>
         <FieldLabel htmlFor={`${id}-country`}>{countryLabel}</FieldLabel>
         <Select
+          items={countryItems}
           disabled={disabled}
           value={value.country}
           onValueChange={(country) => {
+            if (!country) return
             const nextCountry = country as PhoneNumberCountryCode
             const input = value.display.startsWith("+") ? "" : value.display
             onChange(createPhoneNumberValue(input, nextCountry, adapter))
@@ -69,16 +76,18 @@ export function InternationalPhoneField({
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            {countries.map((country) => (
-              <SelectItem key={country.code} value={country.code}>
-                <span className="flex w-full items-center justify-between gap-4">
-                  <span>{country.label}</span>
-                  <span className="text-muted-foreground">
-                    {country.callingCode}
+            <SelectGroup>
+              {countries.map((country) => (
+                <SelectItem key={country.code} value={country.code}>
+                  <span className="flex w-full items-center justify-between gap-4">
+                    <span>{country.label}</span>
+                    <span className="text-muted-foreground">
+                      {country.callingCode}
+                    </span>
                   </span>
-                </span>
-              </SelectItem>
-            ))}
+                </SelectItem>
+              ))}
+            </SelectGroup>
           </SelectContent>
         </Select>
       </Field>

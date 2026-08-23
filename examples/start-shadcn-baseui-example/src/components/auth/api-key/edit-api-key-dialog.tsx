@@ -63,8 +63,7 @@ export function EditApiKeyDialog({
   const updateApiKey = useUpdateApiKey(authClient, {
     onSuccess: () => onOpenChange(false)
   })
-
-  function submit(event: FormEvent<HTMLFormElement>) {
+  const submit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     const formData = new FormData(event.currentTarget)
     try {
@@ -89,7 +88,6 @@ export function EditApiKeyDialog({
       setFormError("Metadata and permissions must contain valid JSON.")
     }
   }
-
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-xl">

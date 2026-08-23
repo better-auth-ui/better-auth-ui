@@ -87,6 +87,7 @@ import {
 import {
   Select,
   SelectContent,
+  SelectGroup,
   SelectItem,
   SelectTrigger,
   SelectValue
@@ -169,6 +170,20 @@ export function AdminUsers({
   const [searchOperator, setSearchOperator] =
     useState<SearchOperator>("contains")
   const [status, setStatus] = useState<StatusFilter>("all")
+  const searchFieldItems = [
+    { label: localization.email, value: "email" },
+    { label: localization.name, value: "name" }
+  ]
+  const searchOperatorItems = [
+    { label: localization.searchContains, value: "contains" },
+    { label: localization.startsWith, value: "starts_with" },
+    { label: localization.endsWith, value: "ends_with" }
+  ]
+  const statusItems = [
+    { label: localization.filterAllStatuses, value: "all" },
+    { label: localization.active, value: "active" },
+    { label: localization.banned, value: "banned" }
+  ]
   const [sortBy, setSortBy] = useState("createdAt")
   const [sortDirection, setSortDirection] = useState<SortDirection>("desc")
   const [createOpen, setCreateOpen] = useState(false)
@@ -257,6 +272,7 @@ export function AdminUsers({
 
         <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-[9rem_10rem_minmax(14rem,1fr)_10rem]">
           <Select
+            items={searchFieldItems}
             value={searchField}
             onValueChange={(value) => {
               if (!value) return
@@ -271,11 +287,17 @@ export function AdminUsers({
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="email">{localization.email}</SelectItem>
-              <SelectItem value="name">{localization.name}</SelectItem>
+              <SelectGroup>
+                {searchFieldItems.map((item) => (
+                  <SelectItem key={item.value} value={item.value}>
+                    {item.label}
+                  </SelectItem>
+                ))}
+              </SelectGroup>
             </SelectContent>
           </Select>
           <Select
+            items={searchOperatorItems}
             value={searchOperator}
             onValueChange={(value) => {
               if (!value) return
@@ -287,13 +309,13 @@ export function AdminUsers({
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="contains">
-                {localization.searchContains}
-              </SelectItem>
-              <SelectItem value="starts_with">
-                {localization.startsWith}
-              </SelectItem>
-              <SelectItem value="ends_with">{localization.endsWith}</SelectItem>
+              <SelectGroup>
+                {searchOperatorItems.map((item) => (
+                  <SelectItem key={item.value} value={item.value}>
+                    {item.label}
+                  </SelectItem>
+                ))}
+              </SelectGroup>
             </SelectContent>
           </Select>
           <InputGroup>
@@ -319,6 +341,7 @@ export function AdminUsers({
             />
           </InputGroup>
           <Select
+            items={statusItems}
             value={status}
             onValueChange={(value) => {
               if (!value) return
@@ -333,11 +356,13 @@ export function AdminUsers({
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">
-                {localization.filterAllStatuses}
-              </SelectItem>
-              <SelectItem value="active">{localization.active}</SelectItem>
-              <SelectItem value="banned">{localization.banned}</SelectItem>
+              <SelectGroup>
+                {statusItems.map((item) => (
+                  <SelectItem key={item.value} value={item.value}>
+                    {item.label}
+                  </SelectItem>
+                ))}
+              </SelectGroup>
             </SelectContent>
           </Select>
         </div>
