@@ -9,7 +9,6 @@ import { useCreateApiKey } from "@better-auth-ui/react/plugins/api-key"
 import { Key } from "lucide-react"
 import { type SyntheticEvent, useState } from "react"
 import { Button, buttonVariants } from "@/components/ui/button"
-import { Checkbox } from "@/components/ui/checkbox"
 import {
   Dialog,
   DialogClose,
@@ -35,7 +34,6 @@ import {
   SelectValue
 } from "@/components/ui/select"
 import { Spinner } from "@/components/ui/spinner"
-import { Switch } from "@/components/ui/switch"
 import { Textarea } from "@/components/ui/textarea"
 import { apiKeyPlugin } from "@/lib/auth/api-key-plugin"
 import { NewApiKeyDialog } from "./new-api-key-dialog"
@@ -56,8 +54,7 @@ export function CreateApiKeyDialog({
   const {
     configurations,
     keyExpiration,
-    localization: apiKeyLocalization,
-    permissions
+    localization: apiKeyLocalization
   } = useAuthPlugin(apiKeyPlugin)
 
   const { mutate: createApiKey, isPending: isCreating } =
@@ -66,7 +63,6 @@ export function CreateApiKeyDialog({
   const [isNewKeyDialogOpen, setIsNewKeyDialogOpen] = useState(false)
   const [keyName, setKeyName] = useState<string | null>(null)
   const [secretKey, setSecretKey] = useState<string | null>(null)
-  const [rateLimitEnabled, setRateLimitEnabled] = useState(false)
   const [formError, setFormError] = useState<string>()
   const availableConfigurations = configurations.filter(
     (configuration) => configuration.organization === Boolean(organizationId)
@@ -104,22 +100,6 @@ export function CreateApiKeyDialog({
       ? apiKeyExpirationDaysToSeconds(expirationDays)
       : undefined
 
-    const numberValue = (field: string) => {
-      const value = String(formData.get(field) ?? "").trim()
-      return value ? Number(value) : undefined
-    }
-    const selectedPermissions = Object.fromEntries(
-      permissions
-        .map((permission) => {
-          const actions = permission.actions
-            .map((action) => (typeof action === "string" ? action : action.id))
-            .filter((action) =>
-              formData.has(`permission:${permission.resource}:${action}`)
-            )
-          return [permission.resource, actions] as const
-        })
-        .filter(([, actions]) => actions.length)
-    )
     let metadata: unknown
     try {
       const metadataText = String(formData.get("metadata") ?? "").trim()
@@ -137,16 +117,7 @@ export function CreateApiKeyDialog({
       ...(expiresIn ? { expiresIn } : {}),
       ...(resolvedConfigId ? { configId: resolvedConfigId } : {}),
       ...(organizationId ? { organizationId } : {}),
-      ...(metadata ? { metadata } : {}),
-      ...(Object.keys(selectedPermissions).length
-        ? { permissions: selectedPermissions }
-        : {}),
-      remaining: numberValue("remaining"),
-      refillAmount: numberValue("refillAmount"),
-      refillInterval: numberValue("refillInterval"),
-      rateLimitEnabled,
-      rateLimitMax: numberValue("rateLimitMax"),
-      rateLimitTimeWindow: numberValue("rateLimitTimeWindow")
+      ...(metadata ? { metadata } : {})
     }
 
     createApiKey(Object.keys(payload).length > 0 ? payload : undefined, {
@@ -265,66 +236,6 @@ export function CreateApiKeyDialog({
                 </Field>
               ) : null}
 
-              <div className="grid gap-4 sm:grid-cols-2">
-                <NumberField
-                  name="remaining"
-                  label={apiKeyLocalization.quota}
-                />
-                <NumberField
-                  name="refillAmount"
-                  label={apiKeyLocalization.refillAmount}
-                />
-                <NumberField
-                  name="refillInterval"
-                  label={apiKeyLocalization.refillInterval}
-                />
-                <Field orientation="horizontal">
-                  <Switch
-                    id="api-key-rate-limit"
-                    checked={rateLimitEnabled}
-                    onCheckedChange={setRateLimitEnabled}
-                  />
-                  <FieldLabel htmlFor="api-key-rate-limit">
-                    {apiKeyLocalization.rateLimit}
-                  </FieldLabel>
-                </Field>
-                <NumberField
-                  name="rateLimitMax"
-                  label={apiKeyLocalization.rateLimitMax}
-                />
-                <NumberField
-                  name="rateLimitTimeWindow"
-                  label={apiKeyLocalization.rateLimitWindow}
-                />
-              </div>
-
-              {permissions.map((permission) => (
-                <Field key={permission.resource}>
-                  <FieldLabel>
-                    {permission.label ?? permission.resource}
-                  </FieldLabel>
-                  <div className="flex flex-wrap gap-3">
-                    {permission.actions.map((action) => {
-                      const id = typeof action === "string" ? action : action.id
-                      const checkboxId = `api-key-permission-${permission.resource}-${id}`
-                      return (
-                        <label
-                          className="flex items-center gap-2 text-sm"
-                          htmlFor={checkboxId}
-                          key={id}
-                        >
-                          <Checkbox
-                            id={checkboxId}
-                            name={`permission:${permission.resource}:${id}`}
-                          />
-                          {typeof action === "string" ? action : action.label}
-                        </label>
-                      )
-                    })}
-                  </div>
-                </Field>
-              ))}
-
               <Field>
                 <FieldLabel htmlFor="api-key-metadata">
                   {apiKeyLocalization.metadata}
@@ -360,14 +271,5 @@ export function CreateApiKeyDialog({
         name={keyName}
       />
     </>
-  )
-}
-
-function NumberField({ name, label }: { name: string; label: string }) {
-  return (
-    <Field>
-      <FieldLabel htmlFor={`api-key-${name}`}>{label}</FieldLabel>
-      <Input id={`api-key-${name}`} name={name} type="number" min={0} />
-    </Field>
   )
 }

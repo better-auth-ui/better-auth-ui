@@ -156,7 +156,7 @@ describe("Solid auth route component selection", () => {
       'multiSessionPlugin\n} from "@better-auth-ui/core/plugins/delete-user"'
     )
     expect(providers).toContain("configurations: [")
-    expect(providers).toContain("permissions: [")
+    expect(providers).not.toContain("permissions: [")
     expect(providers).toContain("passkeyPlugin()")
     expect(providers).toContain('from "@/lib/auth/api-key-plugin"')
     expect(providers).toContain('from "@/lib/auth/passkey-plugin"')

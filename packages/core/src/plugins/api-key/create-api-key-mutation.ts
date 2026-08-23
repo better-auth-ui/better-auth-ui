@@ -4,8 +4,23 @@ import type { ApiKeyAuthClient } from "./api-key-auth-client"
 import { apiKeyMutationKeys } from "./api-key-mutation-keys"
 import { apiKeyQueryKeys } from "./api-key-query-keys"
 
-export type CreateApiKeyParams<TAuthClient extends ApiKeyAuthClient> =
-  Parameters<TAuthClient["apiKey"]["create"]>[0]
+type CreateApiKeyInput = NonNullable<
+  Parameters<ApiKeyAuthClient["apiKey"]["create"]>[0]
+>
+
+type CreateApiKeyClientField =
+  | "configId"
+  | "name"
+  | "expiresIn"
+  | "organizationId"
+  | "prefix"
+  | "metadata"
+  | "fetchOptions"
+
+/** Fields accepted by Better Auth's client-side API key creation endpoint. */
+export type CreateApiKeyParams =
+  | Pick<CreateApiKeyInput, CreateApiKeyClientField>
+  | undefined
 
 export type CreateApiKeyOptions<TAuthClient extends ApiKeyAuthClient> = Omit<
   ReturnType<typeof createApiKeyOptions<TAuthClient>>,
@@ -24,11 +39,27 @@ export function createApiKeyOptions<TAuthClient extends ApiKeyAuthClient>(
 ) {
   const mutationKey = apiKeyMutationKeys.create
 
-  const mutationFn = (params: CreateApiKeyParams<TAuthClient>) =>
-    authClient.apiKey.create({
-      ...params,
-      fetchOptions: { ...params?.fetchOptions, throw: true }
+  const mutationFn = (params: CreateApiKeyParams) => {
+    const {
+      configId,
+      name,
+      expiresIn,
+      organizationId,
+      prefix,
+      metadata,
+      fetchOptions
+    } = params ?? {}
+
+    return authClient.apiKey.create({
+      ...(configId !== undefined ? { configId } : {}),
+      ...(name !== undefined ? { name } : {}),
+      ...(expiresIn !== undefined ? { expiresIn } : {}),
+      ...(organizationId !== undefined ? { organizationId } : {}),
+      ...(prefix !== undefined ? { prefix } : {}),
+      ...(metadata !== undefined ? { metadata } : {}),
+      fetchOptions: { ...fetchOptions, throw: true }
     })
+  }
 
   return {
     mutationKey,

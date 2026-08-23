@@ -32,11 +32,10 @@ describe("apiKeyPlugin", () => {
       { id: "personal", label: "Personal", organization: false },
       { id: "service", label: "Service", organization: true }
     ]
-    const permissions = [{ resource: "project", actions: ["read", "write"] }]
-
-    expect(
-      apiKeyPlugin({ configurations, permissions, pageSize: 7 })
-    ).toMatchObject({ configurations, permissions, pageSize: 7 })
+    expect(apiKeyPlugin({ configurations, pageSize: 7 })).toMatchObject({
+      configurations,
+      pageSize: 7
+    })
     expect(apiKeyPlugin({ pageSize: 0 }).pageSize).toBe(1)
     expect(apiKeyPlugin({ pageSize: Number.NaN }).pageSize).toBe(10)
     expect(apiKeyPlugin({ pageSize: Number.POSITIVE_INFINITY }).pageSize).toBe(

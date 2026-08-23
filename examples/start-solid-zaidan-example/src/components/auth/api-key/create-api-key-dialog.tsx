@@ -5,7 +5,7 @@ import {
 import { useAuth, useAuthPlugin } from "@better-auth-ui/solid"
 import { useCreateApiKey } from "@better-auth-ui/solid/plugins/api-key"
 import { Key } from "lucide-solid"
-import { createSignal, For, Show } from "solid-js"
+import { createSignal, Show } from "solid-js"
 import { NewApiKeyDialog } from "@/components/auth/api-key/new-api-key-dialog"
 import { Button } from "@/components/ui/button"
 import {
@@ -26,7 +26,6 @@ import {
   SelectTrigger,
   SelectValue
 } from "@/components/ui/select"
-import { Switch } from "@/components/ui/switch"
 import { Textarea } from "@/components/ui/textarea"
 import { apiKeyPlugin } from "@/lib/auth/api-key-plugin"
 
@@ -46,8 +45,7 @@ export function CreateApiKeyDialog(props: {
   const {
     configurations,
     keyExpiration,
-    localization: apiKeyLocalization,
-    permissions
+    localization: apiKeyLocalization
   } = useAuthPlugin(apiKeyPlugin)
   const configurationOptions: ConfigurationOption[] = configurations
     .filter(
@@ -89,7 +87,6 @@ export function CreateApiKeyDialog(props: {
   const [configuration, setConfiguration] = createSignal<
     ConfigurationOption | undefined
   >(configurationOptions[0])
-  const [rateLimitEnabled, setRateLimitEnabled] = createSignal(false)
   const [formError, setFormError] = createSignal<string>()
   const [isNewKeyDialogOpen, setIsNewKeyDialogOpen] = createSignal(false)
   const [newApiKeyName, setNewApiKeyName] = createSignal<string | null>(null)
@@ -123,22 +120,6 @@ export function CreateApiKeyDialog(props: {
     const expiresIn = expirationDays
       ? apiKeyExpirationDaysToSeconds(expirationDays)
       : undefined
-    const numberValue = (field: string) => {
-      const value = String(formData.get(field) ?? "").trim()
-      return value ? Number(value) : undefined
-    }
-    const selectedPermissions = Object.fromEntries(
-      permissions
-        .map((permission) => {
-          const actions = permission.actions
-            .map((action) => (typeof action === "string" ? action : action.id))
-            .filter((action) =>
-              formData.has(`permission:${permission.resource}:${action}`)
-            )
-          return [permission.resource, actions] as const
-        })
-        .filter(([, actions]) => actions.length)
-    )
     let metadata: unknown
     try {
       const metadataText = String(formData.get("metadata") ?? "").trim()
@@ -155,23 +136,10 @@ export function CreateApiKeyDialog(props: {
       ...(expiresIn ? { expiresIn } : {}),
       ...(configId ? { configId } : {}),
       ...(props.organizationId ? { organizationId: props.organizationId } : {}),
-      ...(metadata ? { metadata } : {}),
-      ...(Object.keys(selectedPermissions).length
-        ? { permissions: selectedPermissions }
-        : {}),
-      remaining: numberValue("remaining"),
-      refillAmount: numberValue("refillAmount"),
-      refillInterval: numberValue("refillInterval"),
-      rateLimitEnabled: rateLimitEnabled(),
-      rateLimitMax: numberValue("rateLimitMax"),
-      rateLimitTimeWindow: numberValue("rateLimitTimeWindow")
+      ...(metadata ? { metadata } : {})
     }
 
-    createApiKey.mutate(
-      (Object.keys(payload).length > 0 ? payload : undefined) as Parameters<
-        typeof createApiKey.mutate
-      >[0]
-    )
+    createApiKey.mutate(Object.keys(payload).length > 0 ? payload : undefined)
   }
 
   return (
@@ -264,60 +232,6 @@ export function CreateApiKeyDialog(props: {
               </Field>
             </Show>
 
-            <div class="grid gap-4 sm:grid-cols-2">
-              <NumberField name="remaining" label={apiKeyLocalization.quota} />
-              <NumberField
-                name="refillAmount"
-                label={apiKeyLocalization.refillAmount}
-              />
-              <NumberField
-                name="refillInterval"
-                label={apiKeyLocalization.refillInterval}
-              />
-              <Field orientation="horizontal">
-                <Switch
-                  checked={rateLimitEnabled()}
-                  onChange={setRateLimitEnabled}
-                />
-                <FieldLabel>{apiKeyLocalization.rateLimit}</FieldLabel>
-              </Field>
-              <NumberField
-                name="rateLimitMax"
-                label={apiKeyLocalization.rateLimitMax}
-              />
-              <NumberField
-                name="rateLimitTimeWindow"
-                label={apiKeyLocalization.rateLimitWindow}
-              />
-            </div>
-
-            <For each={permissions}>
-              {(permission) => (
-                <Field>
-                  <FieldLabel>
-                    {permission.label ?? permission.resource}
-                  </FieldLabel>
-                  <div class="flex flex-wrap gap-3">
-                    <For each={permission.actions}>
-                      {(action) => {
-                        const id =
-                          typeof action === "string" ? action : action.id
-                        return (
-                          <label class="flex items-center gap-2 text-sm">
-                            <input
-                              name={`permission:${permission.resource}:${id}`}
-                              type="checkbox"
-                            />
-                            {typeof action === "string" ? action : action.label}
-                          </label>
-                        )
-                      }}
-                    </For>
-                  </div>
-                </Field>
-              )}
-            </For>
-
             <Field>
               <FieldLabel for="api-key-metadata">
                 {apiKeyLocalization.metadata}
@@ -361,19 +275,5 @@ export function CreateApiKeyDialog(props: {
         />
       </Dialog>
     </>
-  )
-}
-
-function NumberField(props: { name: string; label: string }) {
-  return (
-    <Field>
-      <FieldLabel for={`api-key-${props.name}`}>{props.label}</FieldLabel>
-      <Input
-        id={`api-key-${props.name}`}
-        name={props.name}
-        type="number"
-        min="0"
-      />
-    </Field>
   )
 }

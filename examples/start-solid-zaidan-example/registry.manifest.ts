@@ -570,7 +570,6 @@ export const solidRegistryManifest = {
       dependencies: [...solidAuthDependencies, "@better-auth/api-key"],
       files: [
         libFile("src/lib/auth/api-key-plugin.ts"),
-        libFile("src/lib/auth/update-api-key.ts"),
         componentFile("src/components/auth/api-key/api-keys.tsx"),
         componentFile("src/components/auth/api-key/api-key.tsx"),
         componentFile("src/components/auth/api-key/api-keys-empty.tsx"),

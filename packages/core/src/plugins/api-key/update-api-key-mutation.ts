@@ -4,8 +4,17 @@ import type { ApiKeyAuthClient } from "./api-key-auth-client"
 import { apiKeyMutationKeys } from "./api-key-mutation-keys"
 import { apiKeyQueryKeys } from "./api-key-query-keys"
 
-export type UpdateApiKeyParams<TAuthClient extends ApiKeyAuthClient> =
-  Parameters<TAuthClient["apiKey"]["update"]>[0]
+type UpdateApiKeyInput = NonNullable<
+  Parameters<ApiKeyAuthClient["apiKey"]["update"]>[0]
+>
+
+type UpdateApiKeyClientField = "configId" | "keyId" | "name" | "fetchOptions"
+
+/** Fields accepted by Better Auth's client-side API key update endpoint. */
+export type UpdateApiKeyParams = Pick<
+  UpdateApiKeyInput,
+  UpdateApiKeyClientField
+>
 
 export type UpdateApiKeyOptions<TAuthClient extends ApiKeyAuthClient> = Omit<
   ReturnType<typeof updateApiKeyOptions<TAuthClient>>,
@@ -17,11 +26,16 @@ export function updateApiKeyOptions<TAuthClient extends ApiKeyAuthClient>(
   authClient: TAuthClient,
   userId?: string
 ) {
-  const mutationFn = (params: UpdateApiKeyParams<TAuthClient>) =>
-    authClient.apiKey.update({
-      ...params,
-      fetchOptions: { ...params.fetchOptions, throw: true }
+  const mutationFn = (params: UpdateApiKeyParams) => {
+    const { configId, keyId, name, fetchOptions } = params
+
+    return authClient.apiKey.update({
+      keyId,
+      ...(configId !== undefined ? { configId } : {}),
+      ...(name !== undefined ? { name } : {}),
+      fetchOptions: { ...fetchOptions, throw: true }
     })
+  }
 
   return {
     mutationKey: apiKeyMutationKeys.update,

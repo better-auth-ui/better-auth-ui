@@ -8,7 +8,6 @@ import { Key } from "@gravity-ui/icons"
 import {
   AlertDialog,
   Button,
-  Checkbox,
   FieldError,
   Form,
   Input,
@@ -16,7 +15,6 @@ import {
   ListBox,
   Select,
   Spinner,
-  Switch,
   TextArea,
   TextField
 } from "@heroui/react"
@@ -38,22 +36,19 @@ export function CreateApiKeyDialog({
   onOpenChange,
   organizationId
 }: CreateApiKeyDialogProps) {
-  const { authClient, locale, localization } = useAuth()
+  const { authClient, locale, localization } = useAuth<ApiKeyAuthClient>()
   const {
     configurations,
     keyExpiration,
-    localization: apiKeyLocalization,
-    permissions
+    localization: apiKeyLocalization
   } = useAuthPlugin(apiKeyPlugin)
 
-  const { mutate: createApiKey, isPending: isCreating } = useCreateApiKey(
-    authClient as ApiKeyAuthClient
-  )
+  const { mutate: createApiKey, isPending: isCreating } =
+    useCreateApiKey(authClient)
 
   const [isNewKeyDialogOpen, setIsNewKeyDialogOpen] = useState(false)
   const [keyName, setKeyName] = useState<string | null>(null)
   const [secretKey, setSecretKey] = useState<string | null>(null)
-  const [rateLimitEnabled, setRateLimitEnabled] = useState(false)
   const [formError, setFormError] = useState<string>()
   const availableConfigurations = configurations.filter(
     (configuration) => configuration.organization === Boolean(organizationId)
@@ -94,22 +89,6 @@ export function CreateApiKeyDialog({
     const selectedConfig = String(formData.get("configId") ?? "").trim()
     const resolvedConfigId =
       selectedConfig || (organizationId ? "organization" : undefined)
-    const numberValue = (field: string) => {
-      const value = String(formData.get(field) ?? "").trim()
-      return value ? Number(value) : undefined
-    }
-    const selectedPermissions = Object.fromEntries(
-      permissions
-        .map((permission) => {
-          const actions = permission.actions
-            .map((action) => (typeof action === "string" ? action : action.id))
-            .filter((action) =>
-              formData.has(`permission:${permission.resource}:${action}`)
-            )
-          return [permission.resource, actions] as const
-        })
-        .filter(([, actions]) => actions.length)
-    )
     let metadata: unknown
     try {
       const metadataText = String(formData.get("metadata") ?? "").trim()
@@ -125,16 +104,7 @@ export function CreateApiKeyDialog({
       ...(expiresIn ? { expiresIn } : {}),
       ...(resolvedConfigId ? { configId: resolvedConfigId } : {}),
       ...(organizationId ? { organizationId } : {}),
-      ...(metadata ? { metadata } : {}),
-      ...(Object.keys(selectedPermissions).length
-        ? { permissions: selectedPermissions }
-        : {}),
-      remaining: numberValue("remaining"),
-      refillAmount: numberValue("refillAmount"),
-      refillInterval: numberValue("refillInterval"),
-      rateLimitEnabled,
-      rateLimitMax: numberValue("rateLimitMax"),
-      rateLimitTimeWindow: numberValue("rateLimitTimeWindow")
+      ...(metadata ? { metadata } : {})
     }
 
     createApiKey(Object.keys(payload).length > 0 ? payload : undefined, {
@@ -265,67 +235,6 @@ export function CreateApiKeyDialog({
                       </Select.Popover>
                     </Select>
                   ) : null}
-
-                  <div className="grid gap-4 sm:grid-cols-2">
-                    <TextField name="remaining" type="number">
-                      <Label>{apiKeyLocalization.quota}</Label>
-                      <Input min={0} variant="secondary" />
-                    </TextField>
-                    <TextField name="refillAmount" type="number">
-                      <Label>{apiKeyLocalization.refillAmount}</Label>
-                      <Input min={1} variant="secondary" />
-                    </TextField>
-                    <TextField name="refillInterval" type="number">
-                      <Label>{apiKeyLocalization.refillInterval}</Label>
-                      <Input min={1} variant="secondary" />
-                    </TextField>
-                    <Switch
-                      isSelected={rateLimitEnabled}
-                      onChange={setRateLimitEnabled}
-                    >
-                      {apiKeyLocalization.rateLimit}
-                    </Switch>
-                    <TextField name="rateLimitMax" type="number">
-                      <Label>{apiKeyLocalization.rateLimitMax}</Label>
-                      <Input min={1} variant="secondary" />
-                    </TextField>
-                    <TextField name="rateLimitTimeWindow" type="number">
-                      <Label>{apiKeyLocalization.rateLimitWindow}</Label>
-                      <Input min={1} variant="secondary" />
-                    </TextField>
-                  </div>
-
-                  {permissions.length > 0 && (
-                    <div className="flex flex-col gap-3">
-                      <Label>{apiKeyLocalization.permissions}</Label>
-                      {permissions.map((permission) => (
-                        <div
-                          className="flex flex-col gap-2"
-                          key={permission.resource}
-                        >
-                          <span className="text-sm font-medium">
-                            {permission.label ?? permission.resource}
-                          </span>
-                          <div className="flex flex-wrap gap-3">
-                            {permission.actions.map((action) => {
-                              const actionId =
-                                typeof action === "string" ? action : action.id
-                              return (
-                                <Checkbox
-                                  key={actionId}
-                                  name={`permission:${permission.resource}:${actionId}`}
-                                >
-                                  {typeof action === "string"
-                                    ? action
-                                    : action.label}
-                                </Checkbox>
-                              )
-                            })}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
 
                   <TextField name="metadata">
                     <Label>{apiKeyLocalization.metadata}</Label>

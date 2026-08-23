@@ -267,7 +267,8 @@ describe("core base endpoint option factories", () => {
     const authClient = {
       apiKey: {
         create: vi.fn(async (params) => ({ data: params.name })),
-        delete: vi.fn(async (params) => ({ data: params.keyId }))
+        delete: vi.fn(async (params) => ({ data: params.keyId })),
+        update: vi.fn(async (params) => ({ data: params.name }))
       },
       signIn: {
         magicLink: vi.fn(async (params) => ({ data: params.email })),
@@ -343,11 +344,33 @@ describe("core base endpoint option factories", () => {
         createApiKey as { mutationFn?: (variables: unknown) => unknown }
       ).mutationFn?.({
         name: "CI key",
+        remaining: 100,
+        rateLimitEnabled: true,
+        permissions: { project: ["write"] },
         fetchOptions: { credentials: "include" }
       })
     ).resolves.toEqual({ data: "CI key" })
     expect(authClient.apiKey.create).toHaveBeenCalledWith({
       name: "CI key",
+      fetchOptions: { credentials: "include", throw: true }
+    })
+
+    await expect(
+      (
+        updateApiKey as { mutationFn?: (variables: unknown) => unknown }
+      ).mutationFn?.({
+        configId: "default",
+        keyId: "key-1",
+        name: "Renamed key",
+        enabled: false,
+        metadata: { owner: "server" },
+        fetchOptions: { credentials: "include" }
+      })
+    ).resolves.toEqual({ data: "Renamed key" })
+    expect(authClient.apiKey.update).toHaveBeenCalledWith({
+      configId: "default",
+      keyId: "key-1",
+      name: "Renamed key",
       fetchOptions: { credentials: "include", throw: true }
     })
 

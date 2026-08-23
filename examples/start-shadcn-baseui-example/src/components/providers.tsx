@@ -46,8 +46,7 @@ export function Providers({ children }: { children: ReactNode }) {
             configurations: [
               { id: "default", label: "Personal", organization: false },
               { id: "organization", label: "Organization", organization: true }
-            ],
-            permissions: [{ resource: "project", actions: ["read", "write"] }]
+            ]
           }),
           themePlugin({ useTheme }),
           multiSessionPlugin(),
