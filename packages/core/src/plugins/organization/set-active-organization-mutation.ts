@@ -1,5 +1,6 @@
 import type { MutationOptions } from "@tanstack/query-core"
 import type { BetterFetchError } from "better-auth/client"
+import { authQueryKeys } from "../../lib/auth-query-keys"
 import type { OrganizationAuthClient } from "./organization-auth-client"
 import { organizationMutationKeys } from "./organization-mutation-keys"
 import { organizationQueryKeys } from "./organization-query-keys"
@@ -36,7 +37,10 @@ export function setActiveOrganizationOptions<
     mutationKey,
     mutationFn,
     meta: {
-      awaits: [organizationQueryKeys.activeOrganizations(userId)],
+      awaits: [
+        authQueryKeys.session,
+        organizationQueryKeys.activeOrganization(userId)
+      ],
       invalidates: [organizationQueryKeys.lists(userId)]
     }
   } as MutationOptions<

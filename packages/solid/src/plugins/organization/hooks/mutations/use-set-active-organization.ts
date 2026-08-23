@@ -53,6 +53,9 @@ export function useSetActiveOrganization<
 
   return useMutation(() => {
     const mutationOptions = options?.() ?? {}
+    const activeOrganizationQueryKey = organizationQueryKeys.activeOrganization(
+      userId()
+    )
 
     return {
       ...setActiveOrganizationOptions(authClient, userId()),
@@ -61,25 +64,21 @@ export function useSetActiveOrganization<
         variables: SetActiveOrganizationVariables<TAuthClient>,
         context
       ) => {
-        // Cancel any outgoing refetches across every slug-partitioned
-        // active-organization cache entry so they don't overwrite our
-        // optimistic update.
+        // A stored active-organization change does not change entries selected
+        // by an explicit ID or slug.
         await mutationQueryClient.cancelQueries({
-          queryKey: organizationQueryKeys.activeOrganizations(userId())
+          queryKey: activeOrganizationQueryKey,
+          exact: true
         })
 
-        // Snapshot every slug-partitioned variant so the rollback hits
-        // whichever cache entry the UI is actually subscribed to.
         const previousOrganizations = mutationQueryClient.getQueriesData({
-          queryKey: organizationQueryKeys.activeOrganizations(userId())
+          queryKey: activeOrganizationQueryKey,
+          exact: true
         })
 
         // Optimistically update to the new value
         if (variables?.organizationId === null) {
-          mutationQueryClient.setQueriesData(
-            { queryKey: organizationQueryKeys.activeOrganizations(userId()) },
-            null
-          )
+          mutationQueryClient.setQueryData(activeOrganizationQueryKey, null)
 
           const userOnMutateResult = await mutationOptions.onMutate?.(
             variables,
@@ -98,8 +97,8 @@ export function useSetActiveOrganization<
         )
 
         if (newOrganization) {
-          mutationQueryClient.setQueriesData(
-            { queryKey: organizationQueryKeys.activeOrganizations(userId()) },
+          mutationQueryClient.setQueryData(
+            activeOrganizationQueryKey,
             newOrganization
           )
         }
@@ -136,11 +135,11 @@ export function useSetActiveOrganization<
           context
         )
       },
-      // Always refetch after error or success — invalidate every
-      // slug-partitioned variant via the broader prefix.
+      // Always refetch the session-selected organization after error or success.
       onSettled: async (data, error, variables, onMutateResult, context) => {
         await mutationQueryClient.invalidateQueries({
-          queryKey: organizationQueryKeys.activeOrganizations(userId())
+          queryKey: activeOrganizationQueryKey,
+          exact: true
         })
 
         await mutationOptions.onSettled?.(

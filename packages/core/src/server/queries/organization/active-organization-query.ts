@@ -18,7 +18,7 @@ import type { ListOrganization } from "./list-organizations-query"
  */
 export type ActiveOrganizationData<
   TAuth extends OrganizationAuthServer = OrganizationAuthServer
-> = ListOrganization<TAuth>
+> = ListOrganization<TAuth> | null
 
 /**
  * Same shape as {@link FullOrganizationParams} so server-side prefetches

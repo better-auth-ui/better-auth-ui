@@ -37,6 +37,8 @@ export function useSetActiveOrganization<
     undefined,
     queryClient
   )
+  const activeOrganizationQueryKey =
+    organizationQueryKeys.activeOrganization(userId)
 
   return useMutation(
     {
@@ -46,28 +48,21 @@ export function useSetActiveOrganization<
         variables: SetActiveOrganizationVariables<TAuthClient>,
         context
       ) => {
-        // Cancel any outgoing refetches across every slug-partitioned
-        // active-organization cache entry so they don't overwrite our
-        // optimistic update.
+        // A stored active-organization change does not change entries selected
+        // by an explicit ID or slug.
         await context.client.cancelQueries({
-          queryKey: organizationQueryKeys.activeOrganizations(userId)
+          queryKey: activeOrganizationQueryKey,
+          exact: true
         })
 
-        // Snapshot every slug-partitioned variant so the rollback hits
-        // whichever cache entry the UI is actually subscribed to (the
-        // entry's key is `[..., 'active', { organizationSlug }]` when the
-        // plugin's slug option is set, and `[..., 'active', null]`
-        // otherwise).
         const previousOrganizations = context.client.getQueriesData({
-          queryKey: organizationQueryKeys.activeOrganizations(userId)
+          queryKey: activeOrganizationQueryKey,
+          exact: true
         })
 
         // Optimistically update to the new value
         if (variables?.organizationId === null) {
-          context.client.setQueriesData(
-            { queryKey: organizationQueryKeys.activeOrganizations(userId) },
-            null
-          )
+          context.client.setQueryData(activeOrganizationQueryKey, null)
 
           return { previousOrganizations }
         }
@@ -81,8 +76,8 @@ export function useSetActiveOrganization<
         )
 
         if (newOrganization) {
-          context.client.setQueriesData(
-            { queryKey: organizationQueryKeys.activeOrganizations(userId) },
+          context.client.setQueryData(
+            activeOrganizationQueryKey,
             newOrganization
           )
         }
@@ -102,11 +97,11 @@ export function useSetActiveOrganization<
 
         return options?.onError?.(error, variables, onMutateResult, context)
       },
-      // Always refetch after error or success — invalidate every
-      // slug-partitioned variant via the broader prefix.
+      // Always refetch the session-selected organization after error or success.
       onSettled: async (data, error, variables, onMutateResult, context) => {
         await context.client.invalidateQueries({
-          queryKey: organizationQueryKeys.activeOrganizations(userId)
+          queryKey: activeOrganizationQueryKey,
+          exact: true
         })
 
         return options?.onSettled?.(

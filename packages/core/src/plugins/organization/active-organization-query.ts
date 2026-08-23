@@ -9,11 +9,10 @@ import type { ListOrganization } from "./list-organizations-query"
 import type { OrganizationAuthClient } from "./organization-auth-client"
 import { organizationQueryKeys } from "./organization-query-keys"
 
-// The active-organization cache holds a `ListOrganization`-shaped value even
-// though we fetch via `getFullOrganization`. The `members`/`invitations`
-// fields are intentionally discarded by the `as Promise<TData>` cast in
-// `queryFn` below so that `setActive`'s optimistic update — which can only
-// produce a list-shaped org — never corrupts a full-detail cache entry.
+// The active-organization cache exposes a `ListOrganization`-shaped value even
+// though `getFullOrganization` can return more fields. Consumers must use the
+// full-detail query for members and invitations because the `setActive`
+// optimistic update can only provide a list-shaped organization.
 /**
  * Cached data returned by active organization queries.
  */
@@ -46,8 +45,10 @@ type ActiveOrganizationQuery<TAuthClient extends OrganizationAuthClient> =
 /**
  * Resolve the active organization query from explicit options and plugin state.
  *
- * Plugin organization slug state takes precedence over caller-provided query
- * options. A `null` slug is preserved as the no-active-organization sentinel.
+ * An explicit caller-provided organization ID or slug takes precedence over
+ * plugin state. Otherwise, a plugin slug selects the route organization and a
+ * `null` plugin slug selects no organization. An undefined plugin slug lets
+ * Better Auth use the active organization stored on the session.
  *
  * @param query - Caller-provided organization query options.
  * @param organizationSlug - Organization slug from framework plugin state.
@@ -58,37 +59,23 @@ export function resolveActiveOrganizationQuery<
   query: ActiveOrganizationQuery<TAuthClient> | undefined,
   organizationSlug?: string | null
 ) {
-  if (organizationSlug === null) {
-    return { organizationSlug: null } as ActiveOrganizationQuery<TAuthClient>
+  const explicitQuery = query as
+    | { organizationId?: string; organizationSlug?: string | null }
+    | undefined
+  const queryOptions = (query ?? {}) as Record<string, unknown>
+
+  if (explicitQuery?.organizationId || explicitQuery?.organizationSlug) {
+    return query
   }
 
-  if (organizationSlug) {
-    return { organizationSlug } as ActiveOrganizationQuery<TAuthClient>
+  if (organizationSlug !== undefined) {
+    return {
+      ...queryOptions,
+      organizationSlug
+    } as ActiveOrganizationQuery<TAuthClient>
   }
 
   return query
-}
-
-/**
- * `organizationSlug: null` means "no active organization". It is normalized away
- * before the cache key is built so the entry has a single identity, which every
- * reader of that entry must reproduce. Otherwise, a null-slug read computes a
- * different key and misses the cached value.
- */
-const normalizeActiveOrganizationQuery = <
-  TAuthClient extends OrganizationAuthClient
->(
-  params?: ActiveOrganizationParams<TAuthClient>
-) => {
-  const query = params?.query as
-    | { organizationSlug?: string | null }
-    | undefined
-  const hasNoActiveOrganization = query?.organizationSlug === null
-
-  return {
-    hasNoActiveOrganization,
-    effectiveQuery: hasNoActiveOrganization ? undefined : params?.query
-  }
 }
 
 /**
@@ -109,11 +96,13 @@ export function activeOrganizationOptions<
   params?: ActiveOrganizationParams<TAuthClient>
 ) {
   type TData = ActiveOrganizationData<TAuthClient>
-  const { hasNoActiveOrganization, effectiveQuery } =
-    normalizeActiveOrganizationQuery<TAuthClient>(params)
+  const query = params?.query as
+    | { organizationSlug?: string | null }
+    | undefined
+  const hasNoActiveOrganization = query?.organizationSlug === null
   const queryKey = organizationQueryKeys.activeOrganization(
     userId,
-    effectiveQuery
+    params?.query
   )
 
   const queryFn = (() => {
@@ -123,7 +112,6 @@ export function activeOrganizationOptions<
     return ({ signal }: { signal: AbortSignal }) =>
       authClient.organization.getFullOrganization({
         ...params,
-        query: effectiveQuery,
         fetchOptions: createAuthQueryFetchOptions(params?.fetchOptions, signal)
       } as ActiveOrganizationParams<TAuthClient>) as unknown as Promise<TData>
   })()
@@ -201,11 +189,9 @@ export const getActiveOrganization = <
   userId?: string,
   params?: ActiveOrganizationParams<TAuthClient>
 ) => {
-  const { effectiveQuery } =
-    normalizeActiveOrganizationQuery<TAuthClient>(params)
   const queryKey = organizationQueryKeys.activeOrganization(
     userId,
-    effectiveQuery
+    params?.query
   )
   return queryClient.getQueryData<ActiveOrganizationData<TAuthClient>>(queryKey)
 }

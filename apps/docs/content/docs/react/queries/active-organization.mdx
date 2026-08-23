@@ -33,6 +33,7 @@ const organization = await fetchActiveOrganization(queryClient, authClient, user
 ## Notes
 
 - `useActiveOrganization` treats `slug: undefined` as the session active organization, a string slug as a URL-selected organization, and `slug: null` as intentionally no active organization.
+- An explicit `query.organizationId` or `query.organizationSlug` takes precedence over the plugin slug.
 - Member, invitation, and permission helpers follow upstream active-organization fallback behavior when an organization id is not provided.
 - `useHasPermission` preserves Better Auth's flat permission parameter shape.
 
