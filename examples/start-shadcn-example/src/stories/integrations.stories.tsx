@@ -11,6 +11,7 @@ import type {
 import type { AuthPlugin } from "@better-auth-ui/react"
 import type { Meta, StoryObj } from "@storybook/react-vite"
 import type { ReactNode } from "react"
+import { expect, fn, within } from "storybook/test"
 
 import { AgentAuthorizations } from "@/components/auth/agent-auth/agent-authorizations"
 import { AuthProvider } from "@/components/auth/auth-provider"
@@ -29,9 +30,39 @@ import {
   createStoryQueryClient,
   StoryLink,
   StoryShell,
+  storyActions,
   storyAuthClient,
   storyUserId
 } from "./story-fixtures"
+
+const integrationActions = {
+  agentRevoke: fn(async () => undefined).mockName("agentAuthAdapter.revoke"),
+  billingCancel: fn(async () => ({})).mockName("billingAdapter.cancel"),
+  billingCheckout: fn(async () => ({})).mockName("billingAdapter.checkout"),
+  billingOpenPortal: fn(async () => ({})).mockName("billingAdapter.openPortal"),
+  billingRestore: fn(async () => ({})).mockName("billingAdapter.restore"),
+  billingUpdateSeats: fn(async () => ({})).mockName(
+    "billingAdapter.updateSeats"
+  ),
+  oauthCreate: fn(async (_owner, input) => ({
+    ...input,
+    client_id: "storybook-new-client",
+    client_secret: "storybook-secret"
+  })).mockName("oauthClientManager.create"),
+  oauthDelete: fn(async () => undefined).mockName("oauthClientManager.delete"),
+  walletConnect: fn(async () => ({
+    address: "0x71C7656EC7ab88b098defB751B7401B5f6d8976F",
+    chainId: 1
+  })).mockName("walletConnector.connect"),
+  walletLink: fn(async () => undefined).mockName("walletManager.link"),
+  walletSetPrimary: fn(async () => undefined).mockName(
+    "walletManager.setPrimary"
+  ),
+  walletSignMessage: fn(async () => "0xstorybook-signature").mockName(
+    "walletConnector.signMessage"
+  ),
+  walletUnlink: fn(async () => undefined).mockName("walletManager.unlink")
+}
 
 const billingAdapter = {
   id: "storybook-billing",
@@ -102,21 +133,11 @@ const billingAdapter = {
       ]
     }
   },
-  async checkout() {
-    return {}
-  },
-  async openPortal() {
-    return {}
-  },
-  async cancel() {
-    return {}
-  },
-  async restore() {
-    return {}
-  },
-  async updateSeats() {
-    return {}
-  }
+  checkout: integrationActions.billingCheckout,
+  openPortal: integrationActions.billingOpenPortal,
+  cancel: integrationActions.billingCancel,
+  restore: integrationActions.billingRestore,
+  updateSeats: integrationActions.billingUpdateSeats
 } satisfies BillingAdapter
 
 const oauthClient: ManagedOAuthClient = {
@@ -133,17 +154,11 @@ const oauthClientManager = {
   async list() {
     return [oauthClient]
   },
-  async create(_owner, input) {
-    return {
-      ...input,
-      client_id: "storybook-new-client",
-      client_secret: "storybook-secret"
-    }
-  },
+  create: integrationActions.oauthCreate,
   async update(_owner, clientId, update) {
     return { ...oauthClient, ...update, client_id: clientId }
   },
-  async delete() {},
+  delete: integrationActions.oauthDelete,
   async rotateSecret(_owner, clientId) {
     return {
       ...oauthClient,
@@ -190,7 +205,7 @@ const agentAuthAdapter = {
       }
     ]
   },
-  async revoke() {}
+  revoke: integrationActions.agentRevoke
 } satisfies AgentAuthAdapter
 
 const walletManager = {
@@ -208,20 +223,16 @@ const walletManager = {
   async createLinkChallenge() {
     return { message: "Storybook wallet linking challenge" }
   },
-  async link() {},
-  async unlink() {},
-  async setPrimary() {}
+  link: integrationActions.walletLink,
+  unlink: integrationActions.walletUnlink,
+  setPrimary: integrationActions.walletSetPrimary
 } satisfies SiweWalletManager
 
 const walletConnector = {
   id: "storybook-wallet",
   label: "Storybook wallet",
-  async connect() {
-    return { address: "0x71C7656EC7ab88b098defB751B7401B5f6d8976F", chainId: 1 }
-  },
-  async signMessage() {
-    return "0xstorybook-signature"
-  }
+  connect: integrationActions.walletConnect,
+  signMessage: integrationActions.walletSignMessage
 } satisfies SiweWalletConnector
 
 const activityResponse = {
@@ -257,28 +268,36 @@ const activityResponse = {
 const integrationAuthClient = {
   ...(storyAuthClient as object),
   dash: {
-    getAllAuditLogs: async () => ({ data: activityResponse, error: null }),
-    getAuditLogs: async () => ({ data: activityResponse, error: null })
+    getAllAuditLogs: fn(async () => ({
+      data: activityResponse,
+      error: null
+    })).mockName("authClient.dash.getAllAuditLogs"),
+    getAuditLogs: fn(async () => ({
+      data: activityResponse,
+      error: null
+    })).mockName("authClient.dash.getAuditLogs")
   }
 } as never
 
 function IntegrationPreview({
   children,
   plugins,
+  redirectTo = "/settings/account",
   width = "max-w-4xl"
 }: {
   children: ReactNode
   plugins: AuthPlugin[]
+  redirectTo?: string
   width?: "max-w-xl" | "max-w-2xl" | "max-w-4xl"
 }) {
   return (
     <AuthProvider
       authClient={integrationAuthClient}
       Link={StoryLink}
-      navigate={() => undefined}
+      navigate={storyActions.navigate}
       plugins={plugins}
       queryClient={createStoryQueryClient()}
-      redirectTo="/settings/account"
+      redirectTo={redirectTo}
     >
       <StoryShell width={width}>{children}</StoryShell>
       <Toaster />
@@ -288,38 +307,81 @@ function IntegrationPreview({
 
 const meta = {
   title: "shadcn/ui/Plugins/Integrations",
+  args: {
+    oauthOwnerKey: storyUserId,
+    redirectTo: "/settings/account",
+    walletDomain: "storybook.local"
+  },
+  argTypes: {
+    oauthOwnerKey: { control: "text" },
+    redirectTo: { control: "text" },
+    walletDomain: { control: "text" }
+  },
   parameters: { layout: "fullscreen" }
-} satisfies Meta
+} satisfies Meta<{
+  oauthOwnerKey?: string
+  redirectTo?: string
+  walletDomain?: string
+}>
 
 export default meta
 
-type Story = StoryObj<typeof meta>
+type Story = StoryObj<{
+  oauthOwnerKey?: string
+  redirectTo?: string
+  walletDomain?: string
+}>
 
 export const BillingPreview: Story = {
   name: "Billing",
-  render: () => (
-    <IntegrationPreview plugins={[billingPlugin({ adapter: billingAdapter })]}>
+  render: ({ redirectTo = "/settings/account" }) => (
+    <IntegrationPreview
+      plugins={[billingPlugin({ adapter: billingAdapter })]}
+      redirectTo={redirectTo}
+    >
       <BillingSettings
         adapter={billingAdapter}
         scope={{ type: "user", userId: storyUserId }}
       />
     </IntegrationPreview>
-  )
+  ),
+  play: async ({ canvas, step, userEvent }) => {
+    await step("open the billing portal", async () => {
+      await userEvent.click(
+        canvas.getByRole("button", { name: "Manage billing" })
+      )
+      await expect(integrationActions.billingOpenPortal).toHaveBeenCalled()
+    })
+  }
 }
 
 export const OAuthClientsPreview: Story = {
   name: "OAuth clients",
-  render: () => (
+  render: ({
+    oauthOwnerKey = storyUserId,
+    redirectTo = "/settings/account"
+  }) => (
     <IntegrationPreview
       plugins={[oauthProviderPlugin({ clientManager: oauthClientManager })]}
+      redirectTo={redirectTo}
     >
       <OAuthClients
         manager={oauthClientManager}
         owner={{ type: "user" }}
-        ownerKey={storyUserId}
+        ownerKey={oauthOwnerKey}
       />
     </IntegrationPreview>
-  )
+  ),
+  play: async ({ canvas, canvasElement, step, userEvent }) => {
+    await step("open OAuth client creation", async () => {
+      await userEvent.click(
+        canvas.getByRole("button", { name: "Create client" })
+      )
+      await expect(
+        within(canvasElement.ownerDocument.body).getByRole("dialog")
+      ).toBeVisible()
+    })
+  }
 }
 
 export const AgentAuthorizationsPreview: Story = {
@@ -331,18 +393,31 @@ export const AgentAuthorizationsPreview: Story = {
     >
       <AgentAuthorizations />
     </IntegrationPreview>
-  )
+  ),
+  play: async ({ canvas, canvasElement, step, userEvent }) => {
+    await step("revoke an agent capability", async () => {
+      await userEvent.click(
+        await canvas.findByRole("button", { name: "Revoke calendar.read" })
+      )
+      await userEvent.click(
+        within(canvasElement.ownerDocument.body).getByRole("button", {
+          name: "Revoke capability"
+        })
+      )
+      await expect(integrationActions.agentRevoke).toHaveBeenCalled()
+    })
+  }
 }
 
 export const WalletAccountsPreview: Story = {
   name: "Wallet accounts",
-  render: () => (
+  render: ({ walletDomain = "storybook.local" }) => (
     <IntegrationPreview
       plugins={[
         siwePlugin({
           connector: walletConnector,
-          domain: "storybook.local",
-          uri: "https://storybook.local",
+          domain: walletDomain,
+          uri: `https://${walletDomain}`,
           walletManager
         })
       ]}
@@ -350,7 +425,16 @@ export const WalletAccountsPreview: Story = {
     >
       <WalletAccounts />
     </IntegrationPreview>
-  )
+  ),
+  play: async ({ canvas, step, userEvent }) => {
+    await step("connect a wallet", async () => {
+      await userEvent.click(
+        canvas.getByRole("button", { name: "Connect wallet" })
+      )
+      await expect(integrationActions.walletConnect).toHaveBeenCalled()
+      await expect(integrationActions.walletLink).toHaveBeenCalled()
+    })
+  }
 }
 
 export const ActivityPreview: Story = {
@@ -359,5 +443,14 @@ export const ActivityPreview: Story = {
     <IntegrationPreview plugins={[dashPlugin()]} width="max-w-2xl">
       <UserActivity />
     </IntegrationPreview>
-  )
+  ),
+  play: async ({ canvas, step, userEvent }) => {
+    await step("filter the activity feed", async () => {
+      await userEvent.type(
+        canvas.getByRole("textbox", { name: "Identifier" }),
+        "ada@example.com"
+      )
+      await expect(canvas.getByText("Signed in")).toBeVisible()
+    })
+  }
 }

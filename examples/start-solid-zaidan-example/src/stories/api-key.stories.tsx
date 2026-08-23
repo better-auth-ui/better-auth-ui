@@ -7,12 +7,16 @@ import type { ListedApiKey } from "@/components/auth/settings/shared/types"
 import { Card, CardContent } from "@/components/ui/card"
 import { ItemSeparator } from "@/components/ui/item"
 import { apiKeyPlugin } from "@/lib/auth/api-key-plugin"
+import { storyRenders, withStoryActions } from "./story-coverage"
 
-const mockAuthClient = {
-  apiKey: {
-    delete: async () => ({ data: null, error: null })
-  }
-} as unknown as ApiKeyAuthClient
+const mockAuthClient = withStoryActions(
+  {
+    apiKey: {
+      delete: async () => ({ data: null, error: null })
+    }
+  },
+  "authClient"
+) as unknown as ApiKeyAuthClient
 
 const apiKeys = [
   {
@@ -31,7 +35,9 @@ const apiKeys = [
   }
 ] as unknown as ListedApiKey[]
 
-function ApiKeyStory() {
+const createApiKey = withStoryActions(() => undefined, "onCreateApiKey")
+
+function ApiKeyStory(props: { showEmptyState?: boolean }) {
   return (
     <AuthProvider authClient={mockAuthClient} plugins={[apiKeyPlugin()]}>
       {() => (
@@ -59,14 +65,16 @@ function ApiKeyStory() {
               </Card>
             </section>
 
-            <section class="flex flex-col gap-3">
-              <h2 class="font-semibold text-sm">Empty state</h2>
-              <Card class="z-card-padding-none">
-                <CardContent class="z-card-content-padding-none">
-                  <ApiKeysEmpty onCreatePress={() => undefined} />
-                </CardContent>
-              </Card>
-            </section>
+            {props.showEmptyState !== false ? (
+              <section class="flex flex-col gap-3">
+                <h2 class="font-semibold text-sm">Empty state</h2>
+                <Card class="z-card-padding-none">
+                  <CardContent class="z-card-content-padding-none">
+                    <ApiKeysEmpty onCreatePress={createApiKey} />
+                  </CardContent>
+                </Card>
+              </section>
+            ) : null}
           </div>
         </main>
       )}
@@ -77,6 +85,8 @@ function ApiKeyStory() {
 const meta = {
   title: "Zaidan/Plugins/API Key",
   component: ApiKeyStory,
+  args: { showEmptyState: true },
+  argTypes: { showEmptyState: { control: "boolean" } },
   parameters: {
     layout: "fullscreen"
   }
@@ -86,4 +96,4 @@ export default meta
 
 type Story = StoryObj<typeof meta>
 
-export const Default: Story = {}
+export const Default: Story = { play: storyRenders }

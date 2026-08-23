@@ -16,6 +16,7 @@ import { PasskeysSettings } from "@/components/auth/passkey/passkeys"
 import type { ListedPasskey } from "@/components/auth/settings/shared/types"
 import { SignIn } from "@/components/auth/sign-in"
 import { passkeyPlugin } from "@/lib/auth/passkey-plugin"
+import { storyRenders, withStoryActions } from "./story-coverage"
 
 const userId = "user_passkey_docs"
 
@@ -49,18 +50,21 @@ const listPasskeys = async () => ({ data: passkeys, error: null })
 const addPasskey = async () => ({ data: null, error: null })
 const deletePasskey = async () => ({ data: null, error: null })
 
-const mockAuthClient = {
-  passkey: {
-    addPasskey,
-    deletePasskey,
-    listUserPasskeys: listPasskeys
+const mockAuthClient = withStoryActions(
+  {
+    passkey: {
+      addPasskey,
+      deletePasskey,
+      listUserPasskeys: listPasskeys
+    },
+    signIn: {
+      passkey: async () => ({ data: null, error: null })
+    }
   },
-  signIn: {
-    passkey: async () => ({ data: null, error: null })
-  }
-} as unknown as PasskeyAuthClient
+  "authClient"
+) as unknown as PasskeyAuthClient
 
-function createStoryQueryClient() {
+function createStoryQueryClient(passkeyName = "MacBook Touch ID") {
   const queryClient = new QueryClient({
     defaultOptions: {
       queries: {
@@ -70,7 +74,10 @@ function createStoryQueryClient() {
   })
 
   queryClient.setQueryData(authQueryKeys.session, sessionData)
-  queryClient.setQueryData(passkeyQueryKeys.list(userId), passkeys)
+  queryClient.setQueryData(
+    passkeyQueryKeys.list(userId),
+    passkeys.map((passkey) => ({ ...passkey, name: passkeyName }))
+  )
 
   return queryClient
 }
@@ -106,8 +113,8 @@ function PasskeySignInPreviewContent() {
   )
 }
 
-function PasskeysPreviewStory() {
-  const queryClient = createStoryQueryClient()
+function PasskeysPreviewStory(props: { passkeyName?: string }) {
+  const queryClient = createStoryQueryClient(props.passkeyName)
 
   return (
     <AuthProvider
@@ -129,21 +136,25 @@ function PasskeysPreviewStory() {
 
 const meta = {
   title: "Zaidan/Plugins/Passkey",
+  args: { passkeyName: "MacBook Touch ID" },
+  argTypes: { passkeyName: { control: "text" } },
   parameters: {
     layout: "fullscreen"
   }
-} satisfies Meta
+} satisfies Meta<{ passkeyName?: string }>
 
 export default meta
 
-type Story = StoryObj<typeof meta>
+type Story = StoryObj<{ passkeyName?: string }>
 
 export const PasskeySignInPreview: Story = {
+  play: storyRenders,
   render: () => (
     <RouterProvider router={createStoryRouter(PasskeySignInPreviewContent)} />
   )
 }
 
 export const PasskeysPreview: Story = {
-  render: () => <PasskeysPreviewStory />
+  play: storyRenders,
+  render: (args) => <PasskeysPreviewStory {...args} />
 }

@@ -19,6 +19,7 @@ import { emailOtpPlugin } from "@/lib/auth/email-otp-plugin"
 import { phoneNumberPlugin } from "@/lib/auth/phone-number-plugin"
 import { ssoPlugin } from "@/lib/auth/sso-plugin"
 import { twoFactorPlugin } from "@/lib/auth/two-factor-plugin"
+import { storyRenders, withStoryActions } from "./story-coverage"
 
 const storyUserId = "user_advanced_storybook"
 
@@ -57,39 +58,42 @@ const device = Object.assign(
   }
 )
 
-const advancedAuthClient = {
-  device,
-  emailOtp: {
-    sendVerificationOtp: async () => ({ data: null, error: null })
+const advancedAuthClient = withStoryActions(
+  {
+    device,
+    emailOtp: {
+      sendVerificationOtp: async () => ({ data: null, error: null })
+    },
+    getSession: async () => ({ data: storySession, error: null }),
+    phoneNumber: {
+      sendOtp: async () => ({ data: null, error: null }),
+      verify: async () => ({ data: storySession, error: null })
+    },
+    signIn: {
+      anonymous: async () => ({ data: storySession, error: null }),
+      emailOtp: async () => ({ data: storySession, error: null }),
+      phoneNumber: async () => ({ data: storySession, error: null }),
+      social: async () => ({ data: null, error: null })
+    },
+    sso: {
+      register: async () => ({
+        data: { id: "sso_storybook", providerId: "acme" },
+        error: null
+      })
+    },
+    twoFactor: {
+      disable: async () => ({ data: null, error: null }),
+      enable: async () => ({ data: null, error: null }),
+      generateBackupCodes: async () => ({ data: [], error: null }),
+      getTotpUri: async () => ({ data: null, error: null }),
+      sendOtp: async () => ({ data: null, error: null }),
+      verifyBackupCode: async () => ({ data: null, error: null }),
+      verifyOtp: async () => ({ data: null, error: null }),
+      verifyTotp: async () => ({ data: null, error: null })
+    }
   },
-  getSession: async () => ({ data: storySession, error: null }),
-  phoneNumber: {
-    sendOtp: async () => ({ data: null, error: null }),
-    verify: async () => ({ data: storySession, error: null })
-  },
-  signIn: {
-    anonymous: async () => ({ data: storySession, error: null }),
-    emailOtp: async () => ({ data: storySession, error: null }),
-    phoneNumber: async () => ({ data: storySession, error: null }),
-    social: async () => ({ data: null, error: null })
-  },
-  sso: {
-    register: async () => ({
-      data: { id: "sso_storybook", providerId: "acme" },
-      error: null
-    })
-  },
-  twoFactor: {
-    disable: async () => ({ data: null, error: null }),
-    enable: async () => ({ data: null, error: null }),
-    generateBackupCodes: async () => ({ data: [], error: null }),
-    getTotpUri: async () => ({ data: null, error: null }),
-    sendOtp: async () => ({ data: null, error: null }),
-    verifyBackupCode: async () => ({ data: null, error: null }),
-    verifyOtp: async () => ({ data: null, error: null }),
-    verifyTotp: async () => ({ data: null, error: null })
-  }
-} as never
+  "authClient"
+) as never
 
 function createStoryQueryClient() {
   const queryClient = new QueryClient({
@@ -132,14 +136,29 @@ function AdvancedPreview(props: {
 
 const meta = {
   title: "Zaidan/Plugins/Advanced flows",
+  args: {
+    backupCodes: ["4F8H-2K9M", "7Q3P-6W1N", "9C5R-8T2V", "3L7D-1X6B"],
+    defaultOrganizationId: "org_acme_storybook"
+  },
+  argTypes: {
+    backupCodes: { control: "object" },
+    defaultOrganizationId: { control: "text" }
+  },
   parameters: { layout: "fullscreen" }
-} satisfies Meta
+} satisfies Meta<{
+  backupCodes?: string[]
+  defaultOrganizationId?: string
+}>
 
 export default meta
 
-type Story = StoryObj<typeof meta>
+type Story = StoryObj<{
+  backupCodes?: string[]
+  defaultOrganizationId?: string
+}>
 
 export const AnonymousPreview: Story = {
+  play: storyRenders,
   name: "Anonymous sign in",
   render: () => (
     <AdvancedPreview plugins={[anonymousPlugin()]} width="max-w-md">
@@ -149,6 +168,7 @@ export const AnonymousPreview: Story = {
 }
 
 export const EmailOtpPreview: Story = {
+  play: storyRenders,
   name: "Email OTP",
   render: () => (
     <AdvancedPreview plugins={[emailOtpPlugin()]} width="max-w-md">
@@ -158,6 +178,7 @@ export const EmailOtpPreview: Story = {
 }
 
 export const PhoneNumberPreview: Story = {
+  play: storyRenders,
   name: "Phone number",
   render: () => (
     <AdvancedPreview plugins={[phoneNumberPlugin()]} width="max-w-md">
@@ -167,6 +188,7 @@ export const PhoneNumberPreview: Story = {
 }
 
 export const DeviceAuthorizationPreview: Story = {
+  play: storyRenders,
   name: "Device authorization",
   render: () => (
     <AdvancedPreview plugins={[deviceAuthorizationPlugin()]} width="max-w-md">
@@ -176,15 +198,17 @@ export const DeviceAuthorizationPreview: Story = {
 }
 
 export const SsoProviderSetupPreview: Story = {
+  play: storyRenders,
   name: "SSO provider setup",
-  render: () => (
+  render: ({ defaultOrganizationId = "org_acme_storybook" }) => (
     <AdvancedPreview plugins={[ssoPlugin()]}>
-      <SsoProviderSetup defaultOrganizationId="org_acme_storybook" />
+      <SsoProviderSetup defaultOrganizationId={defaultOrganizationId} />
     </AdvancedPreview>
   )
 }
 
 export const TwoFactorSettingsPreview: Story = {
+  play: storyRenders,
   name: "Two-factor settings",
   render: () => (
     <AdvancedPreview plugins={[twoFactorPlugin()]}>
@@ -194,12 +218,13 @@ export const TwoFactorSettingsPreview: Story = {
 }
 
 export const BackupCodesPreview: Story = {
+  play: storyRenders,
   name: "Backup codes",
-  render: () => (
+  render: ({
+    backupCodes = ["4F8H-2K9M", "7Q3P-6W1N", "9C5R-8T2V", "3L7D-1X6B"]
+  }) => (
     <AdvancedPreview plugins={[twoFactorPlugin()]}>
-      <BackupCodes
-        codes={["4F8H-2K9M", "7Q3P-6W1N", "9C5R-8T2V", "3L7D-1X6B"]}
-      />
+      <BackupCodes codes={backupCodes} />
     </AdvancedPreview>
   )
 }

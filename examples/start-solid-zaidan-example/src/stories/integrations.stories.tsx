@@ -12,7 +12,6 @@ import type {
 import { QueryClient } from "@tanstack/solid-query"
 import type { JSX } from "solid-js"
 import type { Meta, StoryObj } from "storybook-solidjs-vite"
-
 import { AgentAuthorizations } from "@/components/auth/agent-auth/agent-authorizations"
 import {
   AuthProvider,
@@ -27,6 +26,7 @@ import { billingPlugin } from "@/lib/auth/billing-plugin"
 import { dashPlugin } from "@/lib/auth/dash-plugin"
 import { oauthProviderPlugin } from "@/lib/auth/oauth-provider-plugin"
 import { siwePlugin } from "@/lib/auth/siwe-plugin"
+import { storyRenders, withStoryActions } from "./story-coverage"
 
 const storyUserId = "user_integrations_storybook"
 
@@ -48,91 +48,99 @@ const storySession = {
   }
 }
 
-const billingAdapter = {
-  id: "storybook-billing",
-  scopes: { organization: true, user: true },
-  supports: { cancel: true, restore: true, seats: true },
-  async listPlans() {
-    return [
-      {
-        id: "starter",
-        name: "Starter",
-        description: "For personal projects and prototypes.",
-        prices: [
-          {
-            amount: 900,
-            currency: "USD",
-            id: "starter-month",
-            interval: "month"
-          },
-          {
-            amount: 9000,
-            currency: "USD",
-            id: "starter-year",
-            interval: "year"
-          }
-        ],
-        features: ["Three projects", "Community support"]
-      },
-      {
-        highlighted: true,
-        id: "pro",
-        name: "Pro",
-        description: "For teams shipping production applications.",
-        prices: [
-          { amount: 2900, currency: "USD", id: "pro-month", interval: "month" },
-          { amount: 29000, currency: "USD", id: "pro-year", interval: "year" }
-        ],
-        features: ["Unlimited projects", "Priority support", "Audit history"]
-      }
-    ]
-  },
-  async getState() {
-    return {
-      subscription: {
-        currentPeriodEnd: new Date("2026-09-23T12:00:00Z"),
-        id: "subscription_storybook",
-        interval: "month",
-        planId: "pro",
-        planName: "Pro",
-        priceId: "pro-month",
-        seats: 6,
-        status: "active"
-      },
-      usage: [
+const billingAdapter = withStoryActions(
+  {
+    id: "storybook-billing",
+    scopes: { organization: true, user: true },
+    supports: { cancel: true, restore: true, seats: true },
+    async listPlans() {
+      return [
         {
-          id: "projects",
-          label: "Projects",
-          limit: 20,
-          unit: "projects",
-          used: 8
+          id: "starter",
+          name: "Starter",
+          description: "For personal projects and prototypes.",
+          prices: [
+            {
+              amount: 900,
+              currency: "USD",
+              id: "starter-month",
+              interval: "month"
+            },
+            {
+              amount: 9000,
+              currency: "USD",
+              id: "starter-year",
+              interval: "year"
+            }
+          ],
+          features: ["Three projects", "Community support"]
         },
         {
-          id: "members",
-          label: "Team members",
-          limit: 10,
-          unit: "members",
-          used: 6
+          highlighted: true,
+          id: "pro",
+          name: "Pro",
+          description: "For teams shipping production applications.",
+          prices: [
+            {
+              amount: 2900,
+              currency: "USD",
+              id: "pro-month",
+              interval: "month"
+            },
+            { amount: 29000, currency: "USD", id: "pro-year", interval: "year" }
+          ],
+          features: ["Unlimited projects", "Priority support", "Audit history"]
         }
       ]
+    },
+    async getState() {
+      return {
+        subscription: {
+          currentPeriodEnd: new Date("2026-09-23T12:00:00Z"),
+          id: "subscription_storybook",
+          interval: "month",
+          planId: "pro",
+          planName: "Pro",
+          priceId: "pro-month",
+          seats: 6,
+          status: "active"
+        },
+        usage: [
+          {
+            id: "projects",
+            label: "Projects",
+            limit: 20,
+            unit: "projects",
+            used: 8
+          },
+          {
+            id: "members",
+            label: "Team members",
+            limit: 10,
+            unit: "members",
+            used: 6
+          }
+        ]
+      }
+    },
+    async checkout() {
+      return {}
+    },
+    async openPortal() {
+      return {}
+    },
+    async cancel() {
+      return {}
+    },
+    async restore() {
+      return {}
+    },
+    async updateSeats() {
+      return {}
     }
   },
-  async checkout() {
-    return {}
-  },
-  async openPortal() {
-    return {}
-  },
-  async cancel() {
-    return {}
-  },
-  async restore() {
-    return {}
-  },
-  async updateSeats() {
-    return {}
-  }
-} satisfies BillingAdapter
+  "billingAdapter"
+) satisfies BillingAdapter
 
 const oauthClient: ManagedOAuthClient = {
   application_type: "web",
@@ -144,100 +152,115 @@ const oauthClient: ManagedOAuthClient = {
   scope: "openid profile email"
 }
 
-const oauthClientManager = {
-  async list() {
-    return [oauthClient]
-  },
-  async create(_owner, input) {
-    return {
-      ...input,
-      client_id: "storybook-new-client",
-      client_secret: "storybook-secret"
-    }
-  },
-  async update(_owner, clientId, update) {
-    return { ...oauthClient, ...update, client_id: clientId }
-  },
-  async delete() {},
-  async rotateSecret(_owner, clientId) {
-    return {
-      ...oauthClient,
-      client_id: clientId,
-      client_secret: "storybook-rotated-secret"
-    }
-  },
-  async setDisabled(_owner, clientId, disabled) {
-    return { ...oauthClient, client_id: clientId, disabled }
-  }
-} satisfies OAuthClientManager
-
-const agentAuthAdapter = {
-  async getApproval() {
-    throw new Error("No approval is pending in this story.")
-  },
-  async approve() {},
-  async deny() {},
-  async listAgents() {
-    return [
-      {
-        createdAt: new Date("2026-07-11T09:00:00Z"),
-        grants: [
-          {
-            approvalStrength: "session",
-            capability: "calendar.read",
-            description: "Read upcoming calendar events",
-            status: "active"
-          },
-          {
-            approvalStrength: "webauthn",
-            capability: "email.send",
-            description: "Draft and send email messages",
-            status: "pending"
-          }
-        ],
-        hostId: "codex-desktop",
-        hostName: "Codex Desktop",
-        id: "agent_storybook",
-        lastUsedAt: new Date("2026-08-23T08:15:00Z"),
-        mode: "delegated",
-        name: "Workspace assistant",
-        status: "active"
+const oauthClientManager = withStoryActions(
+  {
+    async list() {
+      return [oauthClient]
+    },
+    async create(_owner, input) {
+      return {
+        ...input,
+        client_id: "storybook-new-client",
+        client_secret: "storybook-secret"
       }
-    ]
+    },
+    async update(_owner, clientId, update) {
+      return { ...oauthClient, ...update, client_id: clientId }
+    },
+    async delete() {},
+    async rotateSecret(_owner, clientId) {
+      return {
+        ...oauthClient,
+        client_id: clientId,
+        client_secret: "storybook-rotated-secret"
+      }
+    },
+    async setDisabled(_owner, clientId, disabled) {
+      return { ...oauthClient, client_id: clientId, disabled }
+    }
   },
-  async revoke() {}
-} satisfies AgentAuthAdapter
+  "oauthClientManager"
+) satisfies OAuthClientManager
 
-const walletManager = {
-  async list() {
-    return [
-      {
+const agentAuthAdapter = withStoryActions(
+  {
+    async getApproval() {
+      throw new Error("No approval is pending in this story.")
+    },
+    async approve() {},
+    async deny() {},
+    async listAgents() {
+      return [
+        {
+          createdAt: new Date("2026-07-11T09:00:00Z"),
+          grants: [
+            {
+              approvalStrength: "session",
+              capability: "calendar.read",
+              description: "Read upcoming calendar events",
+              status: "active"
+            },
+            {
+              approvalStrength: "webauthn",
+              capability: "email.send",
+              description: "Draft and send email messages",
+              status: "pending"
+            }
+          ],
+          hostId: "codex-desktop",
+          hostName: "Codex Desktop",
+          id: "agent_storybook",
+          lastUsedAt: new Date("2026-08-23T08:15:00Z"),
+          mode: "delegated",
+          name: "Workspace assistant",
+          status: "active"
+        }
+      ]
+    },
+    async revoke() {}
+  },
+  "agentAuthAdapter"
+) satisfies AgentAuthAdapter
+
+const walletManager = withStoryActions(
+  {
+    async list() {
+      return [
+        {
+          address: "0x71C7656EC7ab88b098defB751B7401B5f6d8976F",
+          chainId: 1,
+          createdAt: new Date("2026-06-18T14:00:00Z"),
+          id: "wallet_storybook",
+          isPrimary: true
+        }
+      ]
+    },
+    async createLinkChallenge() {
+      return { message: "Storybook wallet linking challenge" }
+    },
+    async link() {},
+    async unlink() {},
+    async setPrimary() {}
+  },
+  "walletManager"
+) satisfies SiweWalletManager
+
+const walletConnector = withStoryActions(
+  {
+    id: "storybook-wallet",
+    label: "Storybook wallet",
+    async connect() {
+      return {
         address: "0x71C7656EC7ab88b098defB751B7401B5f6d8976F",
-        chainId: 1,
-        createdAt: new Date("2026-06-18T14:00:00Z"),
-        id: "wallet_storybook",
-        isPrimary: true
+        chainId: 1
       }
-    ]
+    },
+    async signMessage() {
+      return "0xstorybook-signature"
+    }
   },
-  async createLinkChallenge() {
-    return { message: "Storybook wallet linking challenge" }
-  },
-  async link() {},
-  async unlink() {},
-  async setPrimary() {}
-} satisfies SiweWalletManager
-
-const walletConnector = {
-  id: "storybook-wallet",
-  label: "Storybook wallet",
-  async connect() {
-    return { address: "0x71C7656EC7ab88b098defB751B7401B5f6d8976F", chainId: 1 }
-  },
-  async signMessage() {
-    return "0xstorybook-signature"
-  }
-} satisfies SiweWalletConnector
+  "walletConnector"
+) satisfies SiweWalletConnector
 
 const activityResponse = {
   events: [
@@ -269,13 +292,16 @@ const activityResponse = {
   total: 2
 }
 
-const integrationAuthClient = {
-  dash: {
-    getAllAuditLogs: async () => ({ data: activityResponse, error: null }),
-    getAuditLogs: async () => ({ data: activityResponse, error: null })
+const integrationAuthClient = withStoryActions(
+  {
+    dash: {
+      getAllAuditLogs: async () => ({ data: activityResponse, error: null }),
+      getAuditLogs: async () => ({ data: activityResponse, error: null })
+    },
+    getSession: async () => ({ data: storySession, error: null })
   },
-  getSession: async () => ({ data: storySession, error: null })
-} as never
+  "authClient"
+) as never
 
 function createStoryQueryClient() {
   const queryClient = new QueryClient({
@@ -313,14 +339,23 @@ function IntegrationPreview(props: {
 
 const meta = {
   title: "Zaidan/Plugins/Integrations",
+  args: {
+    oauthOwnerKey: storyUserId,
+    walletDomain: "storybook.local"
+  },
+  argTypes: {
+    oauthOwnerKey: { control: "text" },
+    walletDomain: { control: "text" }
+  },
   parameters: { layout: "fullscreen" }
-} satisfies Meta
+} satisfies Meta<{ oauthOwnerKey?: string; walletDomain?: string }>
 
 export default meta
 
-type Story = StoryObj<typeof meta>
+type Story = StoryObj<{ oauthOwnerKey?: string; walletDomain?: string }>
 
 export const BillingPreview: Story = {
+  play: storyRenders,
   name: "Billing",
   render: () => (
     <IntegrationPreview plugins={[billingPlugin({ adapter: billingAdapter })]}>
@@ -333,21 +368,23 @@ export const BillingPreview: Story = {
 }
 
 export const OAuthClientsPreview: Story = {
+  play: storyRenders,
   name: "OAuth clients",
-  render: () => (
+  render: ({ oauthOwnerKey = storyUserId }) => (
     <IntegrationPreview
       plugins={[oauthProviderPlugin({ clientManager: oauthClientManager })]}
     >
       <OAuthClients
         manager={oauthClientManager}
         owner={{ type: "user" }}
-        ownerKey={storyUserId}
+        ownerKey={oauthOwnerKey}
       />
     </IntegrationPreview>
   )
 }
 
 export const AgentAuthorizationsPreview: Story = {
+  play: storyRenders,
   name: "Agent authorizations",
   render: () => (
     <IntegrationPreview
@@ -360,14 +397,15 @@ export const AgentAuthorizationsPreview: Story = {
 }
 
 export const WalletAccountsPreview: Story = {
+  play: storyRenders,
   name: "Wallet accounts",
-  render: () => (
+  render: ({ walletDomain = "storybook.local" }) => (
     <IntegrationPreview
       plugins={[
         siwePlugin({
           connector: walletConnector,
-          domain: "storybook.local",
-          uri: "https://storybook.local",
+          domain: walletDomain,
+          uri: `https://${walletDomain}`,
           walletManager
         })
       ]}
@@ -379,6 +417,7 @@ export const WalletAccountsPreview: Story = {
 }
 
 export const ActivityPreview: Story = {
+  play: storyRenders,
   name: "Activity",
   render: () => (
     <IntegrationPreview plugins={[dashPlugin()]} width="max-w-2xl">

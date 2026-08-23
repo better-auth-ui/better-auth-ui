@@ -4,6 +4,7 @@ import { passkeyQueryKeys } from "@better-auth-ui/core/plugins/passkey"
 import type { AuthPlugin } from "@better-auth-ui/react"
 import type { Meta, StoryObj } from "@storybook/react-vite"
 import { type ReactNode, useState } from "react"
+import { expect, fn, within } from "storybook/test"
 
 import { ApiKeys } from "@/components/auth/api-key/api-keys"
 import { AuthProvider } from "@/components/auth/auth-provider"
@@ -27,6 +28,7 @@ import {
   createStoryQueryClient,
   StoryLink,
   StoryShell,
+  storyActions,
   storyAuthClient,
   storySession,
   storyUserId
@@ -74,30 +76,67 @@ const deviceSessions = [
   }
 ]
 
+const featureActions = {
+  addPasskey: fn(async () => ({ data: null, error: null })).mockName(
+    "authClient.passkey.addPasskey"
+  ),
+  createApiKey: fn(async () => ({ data: null, error: null })).mockName(
+    "authClient.apiKey.create"
+  ),
+  deleteApiKey: fn(async () => ({ data: null, error: null })).mockName(
+    "authClient.apiKey.delete"
+  ),
+  deletePasskey: fn(async () => ({ data: null, error: null })).mockName(
+    "authClient.passkey.deletePasskey"
+  ),
+  deleteUser: fn(async () => ({ data: null, error: null })).mockName(
+    "authClient.deleteUser"
+  ),
+  magicLink: fn(async () => ({ data: null, error: null })).mockName(
+    "authClient.signIn.magicLink"
+  ),
+  revokeDeviceSession: fn(async () => ({ data: null, error: null })).mockName(
+    "authClient.multiSession.revoke"
+  ),
+  setActiveSession: fn(async () => ({ data: null, error: null })).mockName(
+    "authClient.multiSession.setActive"
+  ),
+  setTheme: fn().mockName("theme.setTheme"),
+  signInPasskey: fn(async () => ({ data: null, error: null })).mockName(
+    "authClient.signIn.passkey"
+  ),
+  updateApiKey: fn(async () => ({ data: null, error: null })).mockName(
+    "authClient.apiKey.update"
+  ),
+  updatePasskey: fn(async () => ({ data: null, error: null })).mockName(
+    "authClient.passkey.updatePasskey"
+  )
+}
+
 const featureAuthClient = {
   ...(storyAuthClient as object),
   apiKey: {
-    create: async () => ({ data: null, error: null }),
-    delete: async () => ({ data: null, error: null }),
+    create: featureActions.createApiKey,
+    delete: featureActions.deleteApiKey,
     list: async () => ({ data: apiKeys, error: null }),
-    update: async () => ({ data: null, error: null })
+    update: featureActions.updateApiKey
   },
-  deleteUser: async () => ({ data: null, error: null }),
+  deleteUser: featureActions.deleteUser,
   multiSession: {
     listDeviceSessions: async () => ({ data: deviceSessions, error: null }),
-    revoke: async () => ({ data: null, error: null }),
-    setActive: async () => ({ data: null, error: null })
+    revoke: featureActions.revokeDeviceSession,
+    setActive: featureActions.setActiveSession
   },
   passkey: {
-    addPasskey: async () => ({ data: null, error: null }),
-    deletePasskey: async () => ({ data: null, error: null }),
+    addPasskey: featureActions.addPasskey,
+    deletePasskey: featureActions.deletePasskey,
     listUserPasskeys: async () => ({ data: passkeys, error: null }),
-    updatePasskey: async () => ({ data: null, error: null })
+    updatePasskey: featureActions.updatePasskey
   },
   signIn: {
     ...(storyAuthClient as { signIn: object }).signIn,
-    magicLink: async () => ({ data: null, error: null }),
-    passkey: async () => ({ data: null, error: null })
+    magicLink: featureActions.magicLink,
+    passkey: featureActions.signInPasskey
   }
 } as never
 
@@ -126,10 +165,12 @@ function createFeatureQueryClient() {
 function FeaturePreview({
   children,
   plugins,
+  redirectTo = "/settings/account",
   width
 }: {
   children: ReactNode
   plugins: AuthPlugin[]
+  redirectTo?: string
   width?: "max-w-md" | "max-w-xl" | "max-w-2xl" | "max-w-4xl"
 }) {
   return (
@@ -137,10 +178,10 @@ function FeaturePreview({
       authClient={featureAuthClient}
       baseURL="http://localhost:3000"
       Link={StoryLink}
-      navigate={() => undefined}
+      navigate={storyActions.navigate}
       plugins={plugins}
       queryClient={createFeatureQueryClient()}
-      redirectTo="/settings/account"
+      redirectTo={redirectTo}
       socialProviders={["github", "google"]}
     >
       <StoryShell width={width}>{children}</StoryShell>
@@ -149,32 +190,71 @@ function FeaturePreview({
   )
 }
 
-function ThemePreview() {
-  const [theme, setTheme] = useState("system")
+function ThemePreview({ initialTheme }: { initialTheme: string }) {
+  const [theme, setTheme] = useState(initialTheme)
+  const changeTheme = (nextTheme: string) => {
+    featureActions.setTheme(nextTheme)
+    setTheme(nextTheme)
+  }
 
   return (
-    <FeaturePreview plugins={[themePlugin({ setTheme, theme })]}>
+    <FeaturePreview plugins={[themePlugin({ setTheme: changeTheme, theme })]}>
       <Appearance />
     </FeaturePreview>
   )
 }
 
+type FeatureStoryArgs = {
+  initialTheme?: string
+  redirectTo?: string
+  usernameAvailable?: boolean
+}
+
 const meta = {
   title: "shadcn/ui/Plugins/Feature coverage",
+  args: {
+    initialTheme: "system",
+    redirectTo: "/settings/account",
+    usernameAvailable: true
+  },
+  argTypes: {
+    initialTheme: {
+      control: "inline-radio",
+      options: ["system", "light", "dark"]
+    },
+    redirectTo: { control: "text" },
+    usernameAvailable: { control: "boolean" }
+  },
   parameters: { layout: "fullscreen" }
-} satisfies Meta
+} satisfies Meta<FeatureStoryArgs>
 
 export default meta
 
-type Story = StoryObj<typeof meta>
+type Story = StoryObj<FeatureStoryArgs>
 
 export const MagicLinkPreview: Story = {
   name: "Magic link",
-  render: () => (
-    <FeaturePreview plugins={[magicLinkPlugin()]} width="max-w-md">
+  render: ({ redirectTo = "/settings/account" }) => (
+    <FeaturePreview
+      plugins={[magicLinkPlugin()]}
+      redirectTo={redirectTo}
+      width="max-w-md"
+    >
       <MagicLink />
     </FeaturePreview>
-  )
+  ),
+  play: async ({ canvas, step, userEvent }) => {
+    await step("send a magic link", async () => {
+      await userEvent.type(
+        canvas.getByRole("textbox", { name: "Email" }),
+        "ada@example.com"
+      )
+      await userEvent.click(
+        canvas.getByRole("button", { name: "Send Magic Link" })
+      )
+      await expect(featureActions.magicLink).toHaveBeenCalled()
+    })
+  }
 }
 
 export const ApiKeysPreview: Story = {
@@ -183,7 +263,17 @@ export const ApiKeysPreview: Story = {
     <FeaturePreview plugins={[apiKeyPlugin()]}>
       <ApiKeys />
     </FeaturePreview>
-  )
+  ),
+  play: async ({ canvas, canvasElement, step, userEvent }) => {
+    await step("open the API key creator", async () => {
+      await userEvent.click(
+        canvas.getByRole("button", { name: "Create API key" })
+      )
+      await expect(
+        within(canvasElement.ownerDocument.body).getByRole("dialog")
+      ).toBeVisible()
+    })
+  }
 }
 
 export const PasskeysPreview: Story = {
@@ -192,7 +282,13 @@ export const PasskeysPreview: Story = {
     <FeaturePreview plugins={[passkeyPlugin()]}>
       <Passkeys />
     </FeaturePreview>
-  )
+  ),
+  play: async ({ canvas, step, userEvent }) => {
+    await step("start passkey registration", async () => {
+      await userEvent.click(canvas.getByRole("button", { name: "Add passkey" }))
+      await expect(canvas.getByText("MacBook Touch ID")).toBeVisible()
+    })
+  }
 }
 
 export const MultiSessionPreview: Story = {
@@ -201,7 +297,14 @@ export const MultiSessionPreview: Story = {
     <FeaturePreview plugins={[multiSessionPlugin()]}>
       <ManageAccounts />
     </FeaturePreview>
-  )
+  ),
+  play: async ({ canvas, step }) => {
+    await step("show every device session", async () => {
+      await expect(
+        canvas.getAllByRole("button", { name: "Sign Out" })
+      ).toHaveLength(2)
+    })
+  }
 }
 
 export const DeleteUserPreview: Story = {
@@ -210,31 +313,73 @@ export const DeleteUserPreview: Story = {
     <FeaturePreview plugins={[deleteUserPlugin()]}>
       <DangerZone />
     </FeaturePreview>
-  )
+  ),
+  play: async ({ canvas, canvasElement, step, userEvent }) => {
+    await step("open account deletion confirmation", async () => {
+      await userEvent.click(
+        canvas.getByRole("button", { name: "Delete account" })
+      )
+      await expect(
+        within(canvasElement.ownerDocument.body).getByRole("alertdialog")
+      ).toBeVisible()
+    })
+  }
 }
 
 export const ThemePreviewStory: Story = {
   name: "Theme",
-  render: () => <ThemePreview />
+  render: ({ initialTheme = "system" }) => (
+    <ThemePreview initialTheme={initialTheme} />
+  ),
+  play: async ({ canvas, step, userEvent }) => {
+    await step("change the color theme", async () => {
+      await userEvent.click(canvas.getByRole("radio", { name: /Dark/ }))
+      await expect(featureActions.setTheme).toHaveBeenCalledWith("dark")
+    })
+  }
 }
 
 export const UsernameSignInPreview: Story = {
   name: "Username sign in",
-  render: () => (
+  render: ({ redirectTo = "/settings/account", usernameAvailable = true }) => (
     <FeaturePreview
-      plugins={[usernamePlugin({ isUsernameAvailable: true })]}
+      plugins={[usernamePlugin({ isUsernameAvailable: usernameAvailable })]}
+      redirectTo={redirectTo}
       width="max-w-md"
     >
       <SignIn />
     </FeaturePreview>
-  )
+  ),
+  play: async ({ canvas, step, userEvent }) => {
+    await step("sign in from the username-enabled form", async () => {
+      await userEvent.type(
+        canvas.getByRole("textbox", { name: "Email" }),
+        "ada@example.com"
+      )
+      await userEvent.type(
+        canvas.getByLabelText("Password"),
+        "storybook-password"
+      )
+      await userEvent.click(canvas.getByRole("button", { name: "Sign In" }))
+      await expect(storyActions.signInEmail).toHaveBeenCalled()
+    })
+  }
 }
 
 export const UsernameProfilePreview: Story = {
   name: "Username profile",
-  render: () => (
-    <FeaturePreview plugins={[usernamePlugin({ isUsernameAvailable: true })]}>
+  render: ({ usernameAvailable = true }) => (
+    <FeaturePreview
+      plugins={[usernamePlugin({ isUsernameAvailable: usernameAvailable })]}
+    >
       <UserProfile />
     </FeaturePreview>
-  )
+  ),
+  play: async ({ canvas, step }) => {
+    await step("render username profile fields", async () => {
+      await expect(
+        canvas.getByRole("heading", { name: "User profile" })
+      ).toBeVisible()
+    })
+  }
 }

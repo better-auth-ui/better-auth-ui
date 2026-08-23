@@ -25,6 +25,7 @@ import { OrganizationSwitcher } from "@/components/auth/organization/organizatio
 import { OrganizationsSettings } from "@/components/auth/organization/organizations-settings"
 import { UserInvitations } from "@/components/auth/organization/user-invitations"
 import { organizationPlugin } from "@/lib/auth/organization-plugin"
+import { storyRenders, withStoryActions } from "./story-coverage"
 
 const userId = "user_organization_docs"
 
@@ -164,34 +165,39 @@ const userInvitations = [
   }
 ]
 
-const mockAuthClient = {
-  getSession: async () => sessionData,
-  organization: {
-    acceptInvitation: async () => null,
-    cancelInvitation: async () => null,
-    checkSlug: async () => ({ status: true }),
-    create: async () => activeOrganization,
-    delete: async () => null,
-    getFullOrganization: async () => activeOrganization,
-    hasPermission: async () => ({ success: true }),
-    inviteMember: async () => null,
-    leave: async () => null,
-    list: async () => organizations,
-    listInvitations: async () => organizationInvitations,
-    listMembers: async (params?: { query?: { organizationId?: string } }) => ({
-      members:
-        params?.query?.organizationId === "org_northwind_docs"
-          ? northwindMembers
-          : organizationMembers
-    }),
-    listUserInvitations: async () => userInvitations,
-    rejectInvitation: async () => null,
-    removeMember: async () => null,
-    setActive: async () => null,
-    update: async () => activeOrganization,
-    updateMemberRole: async () => null
-  }
-} as unknown as OrganizationAuthClient
+const mockAuthClient = withStoryActions(
+  {
+    getSession: async () => sessionData,
+    organization: {
+      acceptInvitation: async () => null,
+      cancelInvitation: async () => null,
+      checkSlug: async () => ({ status: true }),
+      create: async () => activeOrganization,
+      delete: async () => null,
+      getFullOrganization: async () => activeOrganization,
+      hasPermission: async () => ({ success: true }),
+      inviteMember: async () => null,
+      leave: async () => null,
+      list: async () => organizations,
+      listInvitations: async () => organizationInvitations,
+      listMembers: async (params?: {
+        query?: { organizationId?: string }
+      }) => ({
+        members:
+          params?.query?.organizationId === "org_northwind_docs"
+            ? northwindMembers
+            : organizationMembers
+      }),
+      listUserInvitations: async () => userInvitations,
+      rejectInvitation: async () => null,
+      removeMember: async () => null,
+      setActive: async () => null,
+      update: async () => activeOrganization,
+      updateMemberRole: async () => null
+    }
+  },
+  "authClient"
+) as unknown as OrganizationAuthClient
 
 function createStoryQueryClient() {
   const queryClient = new QueryClient({
@@ -313,14 +319,19 @@ function OrganizationSwitcherPreviewContent() {
   )
 }
 
-function OrganizationPreviewContent() {
+function OrganizationPreviewContent(props: {
+  organizationView?: "people" | "settings"
+}) {
   const queryClient = createStoryQueryClient()
 
   return (
     <OrganizationStoryProvider queryClient={queryClient} slug="acme">
       {() => (
         <main class="mx-auto min-h-[640px] w-full max-w-3xl bg-background p-6 text-foreground">
-          <Organization path="settings" slug="acme" />
+          <Organization
+            path={props.organizationView ?? "settings"}
+            slug="acme"
+          />
         </main>
       )}
     </OrganizationStoryProvider>
@@ -444,16 +455,24 @@ function UserInvitationsPreviewContent() {
 
 const meta = {
   title: "Zaidan/Plugins/Organization",
+  args: { organizationView: "settings" },
+  argTypes: {
+    organizationView: {
+      control: "inline-radio",
+      options: ["settings", "people"]
+    }
+  },
   parameters: {
     layout: "fullscreen"
   }
-} satisfies Meta
+} satisfies Meta<{ organizationView?: "people" | "settings" }>
 
 export default meta
 
-type Story = StoryObj<typeof meta>
+type Story = StoryObj<{ organizationView?: "people" | "settings" }>
 
 export const OrganizationSwitcherPreview: Story = {
+  play: storyRenders,
   render: () => (
     <RouterProvider
       router={createStoryRouter(OrganizationSwitcherPreviewContent)}
@@ -462,12 +481,18 @@ export const OrganizationSwitcherPreview: Story = {
 }
 
 export const OrganizationPreview: Story = {
-  render: () => (
-    <RouterProvider router={createStoryRouter(OrganizationPreviewContent)} />
+  play: storyRenders,
+  render: ({ organizationView = "settings" }) => (
+    <RouterProvider
+      router={createStoryRouter(() => (
+        <OrganizationPreviewContent organizationView={organizationView} />
+      ))}
+    />
   )
 }
 
 export const OrganizationSettingsPreview: Story = {
+  play: storyRenders,
   render: () => (
     <RouterProvider
       router={createStoryRouter(OrganizationSettingsPreviewContent)}
@@ -476,6 +501,7 @@ export const OrganizationSettingsPreview: Story = {
 }
 
 export const OrganizationProfilePreview: Story = {
+  play: storyRenders,
   render: () => (
     <RouterProvider
       router={createStoryRouter(OrganizationProfilePreviewContent)}
@@ -484,6 +510,7 @@ export const OrganizationProfilePreview: Story = {
 }
 
 export const OrganizationDangerZonePreview: Story = {
+  play: storyRenders,
   render: () => (
     <RouterProvider
       router={createStoryRouter(OrganizationDangerZonePreviewContent)}
@@ -492,6 +519,7 @@ export const OrganizationDangerZonePreview: Story = {
 }
 
 export const OrganizationPeoplePreview: Story = {
+  play: storyRenders,
   render: () => (
     <RouterProvider
       router={createStoryRouter(OrganizationPeoplePreviewContent)}
@@ -500,6 +528,7 @@ export const OrganizationPeoplePreview: Story = {
 }
 
 export const OrganizationMembersPreview: Story = {
+  play: storyRenders,
   render: () => (
     <RouterProvider
       router={createStoryRouter(OrganizationMembersPreviewContent)}
@@ -508,6 +537,7 @@ export const OrganizationMembersPreview: Story = {
 }
 
 export const OrganizationInvitationsPreview: Story = {
+  play: storyRenders,
   render: () => (
     <RouterProvider
       router={createStoryRouter(OrganizationInvitationsPreviewContent)}
@@ -516,6 +546,7 @@ export const OrganizationInvitationsPreview: Story = {
 }
 
 export const OrganizationsSettingsPreview: Story = {
+  play: storyRenders,
   render: () => (
     <RouterProvider
       router={createStoryRouter(OrganizationsSettingsPreviewContent)}
@@ -524,6 +555,7 @@ export const OrganizationsSettingsPreview: Story = {
 }
 
 export const UserInvitationsPreview: Story = {
+  play: storyRenders,
   render: () => (
     <RouterProvider router={createStoryRouter(UserInvitationsPreviewContent)} />
   )

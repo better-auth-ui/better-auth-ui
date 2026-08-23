@@ -13,6 +13,7 @@ import { AuthProvider } from "@/components/auth/auth-provider"
 import { UserAvatar } from "@/components/auth/user/user-avatar"
 import { UserButton } from "@/components/auth/user/user-button"
 import { UserView } from "@/components/auth/user/user-view"
+import { storyRenders } from "./story-coverage"
 
 const mockAuthClient = {} as never
 
@@ -80,7 +81,13 @@ function UserButtonPreviewContent(props: { size?: "default" | "icon" }) {
   )
 }
 
-function UserButtonLinksPreviewContent() {
+type UserStoryArgs = {
+  avatarInitials?: string
+  dashboardLabel?: string
+  teamLabel?: string
+}
+
+function UserButtonLinksPreviewContent(props: UserStoryArgs) {
   return (
     <UserStoryProvider>
       {() => (
@@ -89,10 +96,13 @@ function UserButtonLinksPreviewContent() {
             links={[
               {
                 href: "/dashboard",
-                label: <span>Dashboard</span>,
+                label: <span>{props.dashboardLabel ?? "Dashboard"}</span>,
                 visibility: "authenticated"
               },
-              { href: "/team", label: <span>Team</span> }
+              {
+                href: "/team",
+                label: <span>{props.teamLabel ?? "Team"}</span>
+              }
             ]}
           />
         </UserPreviewShell>
@@ -133,31 +143,44 @@ function UserButtonIconPreviewStory() {
   )
 }
 
-function UserButtonLinksPreviewStory() {
+function UserButtonLinksPreviewStory(props: UserStoryArgs) {
   return (
     <RouterProvider
-      router={createUserButtonRouter(UserButtonLinksPreviewContent)}
+      router={createUserButtonRouter(() => (
+        <UserButtonLinksPreviewContent {...props} />
+      ))}
     />
   )
 }
 
 const meta = {
   title: "Zaidan/Components/User",
+  args: {
+    avatarInitials: "AL",
+    dashboardLabel: "Dashboard",
+    teamLabel: "Team"
+  },
+  argTypes: {
+    avatarInitials: { control: "text" },
+    dashboardLabel: { control: "text" },
+    teamLabel: { control: "text" }
+  },
   parameters: {
     layout: "fullscreen"
   }
-} satisfies Meta
+} satisfies Meta<UserStoryArgs>
 
 export default meta
 
-type Story = StoryObj<typeof meta>
+type Story = StoryObj<UserStoryArgs>
 
 export const UserAvatarPreview: Story = {
-  render: () => (
+  play: storyRenders,
+  render: ({ avatarInitials = "AL" }) => (
     <UserStoryProvider>
       {() => (
         <UserPreviewShell>
-          <UserAvatar label="Ada Lovelace" initials="AL" />
+          <UserAvatar label="Ada Lovelace" initials={avatarInitials} />
         </UserPreviewShell>
       )}
     </UserStoryProvider>
@@ -165,18 +188,22 @@ export const UserAvatarPreview: Story = {
 }
 
 export const UserButtonPreview: Story = {
+  play: storyRenders,
   render: () => <UserButtonPreviewStory />
 }
 
 export const UserButtonIconPreview: Story = {
+  play: storyRenders,
   render: () => <UserButtonIconPreviewStory />
 }
 
 export const UserButtonLinksPreview: Story = {
-  render: () => <UserButtonLinksPreviewStory />
+  play: storyRenders,
+  render: (args) => <UserButtonLinksPreviewStory {...args} />
 }
 
 export const UserViewPreview: Story = {
+  play: storyRenders,
   render: () => (
     <UserStoryProvider>
       {() => (

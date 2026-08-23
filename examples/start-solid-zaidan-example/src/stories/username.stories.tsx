@@ -14,6 +14,7 @@ import { UserProfile } from "@/components/auth/settings/account/user-profile"
 import { SignIn } from "@/components/auth/sign-in"
 import { SignUp } from "@/components/auth/sign-up"
 import { usernamePlugin } from "@/lib/auth/username-plugin"
+import { storyRenders, withStoryActions } from "./story-coverage"
 
 const userId = "user_username_docs"
 
@@ -36,20 +37,23 @@ const sessionData = {
   }
 }
 
-const mockAuthClient = {
-  isUsernameAvailable: async ({ username }: { username: string }) => ({
-    data: { available: username.toLowerCase() !== "taken" },
-    error: null
-  }),
-  signIn: {
-    email: async () => ({ data: sessionData, error: null }),
-    username: async () => ({ data: sessionData, error: null })
+const mockAuthClient = withStoryActions(
+  {
+    isUsernameAvailable: async ({ username }: { username: string }) => ({
+      data: { available: username.toLowerCase() !== "taken" },
+      error: null
+    }),
+    signIn: {
+      email: async () => ({ data: sessionData, error: null }),
+      username: async () => ({ data: sessionData, error: null })
+    },
+    signUp: {
+      email: async () => ({ data: sessionData, error: null })
+    },
+    updateUser: async () => ({ data: sessionData.user, error: null })
   },
-  signUp: {
-    email: async () => ({ data: sessionData, error: null })
-  },
-  updateUser: async () => ({ data: sessionData.user, error: null })
-} as never
+  "authClient"
+) as never
 
 function createStoryQueryClient() {
   const queryClient = new QueryClient({
@@ -65,14 +69,19 @@ function createStoryQueryClient() {
   return queryClient
 }
 
-function UsernameStoryProvider(props: { component: Component }) {
+function UsernameStoryProvider(props: {
+  component: Component
+  usernameAvailable?: boolean
+}) {
   const Preview = props.component
 
   return (
     <AuthProvider
       authClient={mockAuthClient}
       localization={{ settings: { userProfile: "User Profile" } }}
-      plugins={[usernamePlugin({ isUsernameAvailable: true })]}
+      plugins={[
+        usernamePlugin({ isUsernameAvailable: props.usernameAvailable ?? true })
+      ]}
       queryClient={createStoryQueryClient()}
       redirectTo="/settings/account"
     >
@@ -85,14 +94,24 @@ function UsernameStoryProvider(props: { component: Component }) {
   )
 }
 
-function createStoryRouter(component: Component) {
+function createStoryRouter(component: Component, usernameAvailable = true) {
   const rootRoute = createRootRoute({
-    component: () => <UsernameStoryProvider component={component} />
+    component: () => (
+      <UsernameStoryProvider
+        component={component}
+        usernameAvailable={usernameAvailable}
+      />
+    )
   })
   const indexRoute = createRoute({
     getParentRoute: () => rootRoute,
     path: "/",
-    component: () => <UsernameStoryProvider component={component} />
+    component: () => (
+      <UsernameStoryProvider
+        component={component}
+        usernameAvailable={usernameAvailable}
+      />
+    )
   })
 
   return createRouter({
@@ -115,29 +134,40 @@ function UserProfilePreviewContent() {
 
 const meta = {
   title: "Zaidan/Plugins/Username",
+  args: { usernameAvailable: true },
+  argTypes: { usernameAvailable: { control: "boolean" } },
   parameters: {
     layout: "fullscreen"
   }
-} satisfies Meta
+} satisfies Meta<{ usernameAvailable?: boolean }>
 
 export default meta
 
-type Story = StoryObj<typeof meta>
+type Story = StoryObj<{ usernameAvailable?: boolean }>
 
 export const SignInPreview: Story = {
-  render: () => (
-    <RouterProvider router={createStoryRouter(SignInPreviewContent)} />
+  play: storyRenders,
+  render: ({ usernameAvailable = true }) => (
+    <RouterProvider
+      router={createStoryRouter(SignInPreviewContent, usernameAvailable)}
+    />
   )
 }
 
 export const SignUpPreview: Story = {
-  render: () => (
-    <RouterProvider router={createStoryRouter(SignUpPreviewContent)} />
+  play: storyRenders,
+  render: ({ usernameAvailable = true }) => (
+    <RouterProvider
+      router={createStoryRouter(SignUpPreviewContent, usernameAvailable)}
+    />
   )
 }
 
 export const UserProfilePreview: Story = {
-  render: () => (
-    <RouterProvider router={createStoryRouter(UserProfilePreviewContent)} />
+  play: storyRenders,
+  render: ({ usernameAvailable = true }) => (
+    <RouterProvider
+      router={createStoryRouter(UserProfilePreviewContent, usernameAvailable)}
+    />
   )
 }

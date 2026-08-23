@@ -14,19 +14,23 @@ import { AuthProvider } from "@/components/auth/auth-provider"
 import { ManageAccounts } from "@/components/auth/multi-session/manage-accounts"
 import { UserButton } from "@/components/auth/user/user-button"
 import { multiSessionPlugin } from "@/lib/auth/multi-session-plugin"
+import { storyRenders, withStoryActions } from "./story-coverage"
 
 const userId = "user_multi_session_docs"
 
-const mockAuthClient = {
-  multiSession: {
-    listDeviceSessions: async () => ({
-      data: deviceSessions,
-      error: null
-    }),
-    revoke: async () => ({ data: null, error: null }),
-    setActive: async () => ({ data: null, error: null })
-  }
-} as unknown as MultiSessionAuthClient
+const mockAuthClient = withStoryActions(
+  {
+    multiSession: {
+      listDeviceSessions: async () => ({
+        data: deviceSessions,
+        error: null
+      }),
+      revoke: async () => ({ data: null, error: null }),
+      setActive: async () => ({ data: null, error: null })
+    }
+  },
+  "authClient"
+) as unknown as MultiSessionAuthClient
 
 const sessionData = {
   session: {
@@ -67,7 +71,7 @@ const deviceSessions = [
   }
 ]
 
-function createStoryQueryClient() {
+function createStoryQueryClient(showTabletSession = true) {
   const queryClient = new QueryClient({
     defaultOptions: {
       queries: {
@@ -77,13 +81,16 @@ function createStoryQueryClient() {
   })
 
   queryClient.setQueryData(authQueryKeys.session, sessionData)
-  queryClient.setQueryData(multiSessionQueryKeys.list(userId), deviceSessions)
+  queryClient.setQueryData(
+    multiSessionQueryKeys.list(userId),
+    showTabletSession ? deviceSessions : [sessionData]
+  )
 
   return queryClient
 }
 
-function ManageAccountsPreviewStory() {
-  const queryClient = createStoryQueryClient()
+function ManageAccountsPreviewStory(props: { showTabletSession?: boolean }) {
+  const queryClient = createStoryQueryClient(props.showTabletSession)
 
   return (
     <AuthProvider
@@ -100,8 +107,8 @@ function ManageAccountsPreviewStory() {
   )
 }
 
-function SwitchAccountPreviewContent() {
-  const queryClient = createStoryQueryClient()
+function SwitchAccountPreviewContent(props: { showTabletSession?: boolean }) {
+  const queryClient = createStoryQueryClient(props.showTabletSession)
 
   return (
     <AuthProvider
@@ -118,22 +125,17 @@ function SwitchAccountPreviewContent() {
   )
 }
 
-const rootRoute = createRootRoute({
-  component: SwitchAccountPreviewContent
-})
-
-const indexRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: "/",
-  component: SwitchAccountPreviewContent
-})
-
-const routeTree = rootRoute.addChildren([indexRoute])
-
-function SwitchAccountPreviewStory() {
+function SwitchAccountPreviewStory(props: { showTabletSession?: boolean }) {
+  const component = () => <SwitchAccountPreviewContent {...props} />
+  const rootRoute = createRootRoute({ component })
+  const indexRoute = createRoute({
+    getParentRoute: () => rootRoute,
+    path: "/",
+    component
+  })
   const router = createRouter({
     history: createMemoryHistory({ initialEntries: ["/"] }),
-    routeTree
+    routeTree: rootRoute.addChildren([indexRoute])
   })
 
   return <RouterProvider router={router} />
@@ -141,19 +143,23 @@ function SwitchAccountPreviewStory() {
 
 const meta = {
   title: "Zaidan/Plugins/Multi Session",
+  args: { showTabletSession: true },
+  argTypes: { showTabletSession: { control: "boolean" } },
   parameters: {
     layout: "fullscreen"
   }
-} satisfies Meta
+} satisfies Meta<{ showTabletSession?: boolean }>
 
 export default meta
 
-type Story = StoryObj<typeof meta>
+type Story = StoryObj<{ showTabletSession?: boolean }>
 
 export const ManageAccountsPreview: Story = {
-  render: () => <ManageAccountsPreviewStory />
+  play: storyRenders,
+  render: (args) => <ManageAccountsPreviewStory {...args} />
 }
 
 export const SwitchAccountPreview: Story = {
-  render: () => <SwitchAccountPreviewStory />
+  play: storyRenders,
+  render: (args) => <SwitchAccountPreviewStory {...args} />
 }

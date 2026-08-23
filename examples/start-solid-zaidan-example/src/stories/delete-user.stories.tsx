@@ -5,6 +5,7 @@ import { createAuthClient } from "better-auth/solid"
 import type { Meta, StoryObj } from "storybook-solidjs-vite"
 import { AuthProvider } from "@/components/auth/auth-provider"
 import { DangerZone } from "@/components/auth/delete-user/danger-zone"
+import { storyRenders } from "./story-coverage"
 
 const userId = "user_docs"
 
@@ -48,7 +49,7 @@ queryClient.setQueryData(authQueryKeys.listAccounts(userId), [
   }
 ])
 
-function DeleteAccountStory() {
+function DeleteAccountStory(props: { compact?: boolean }) {
   return (
     <AuthProvider
       authClient={mockAuthClient}
@@ -56,7 +57,11 @@ function DeleteAccountStory() {
       queryClient={queryClient}
     >
       {() => (
-        <main class="mx-auto flex min-h-[360px] w-full max-w-xl items-center justify-center bg-background p-6 text-foreground">
+        <main
+          class={`mx-auto flex w-full max-w-xl items-center justify-center bg-background text-foreground ${
+            props.compact ? "min-h-[240px] p-3" : "min-h-[360px] p-6"
+          }`}
+        >
           <DangerZone />
         </main>
       )}
@@ -67,6 +72,8 @@ function DeleteAccountStory() {
 const meta = {
   title: "Zaidan/Plugins/Delete User",
   component: DeleteAccountStory,
+  args: { compact: false },
+  argTypes: { compact: { control: "boolean" } },
   parameters: {
     layout: "fullscreen"
   }
@@ -76,4 +83,4 @@ export default meta
 
 type Story = StoryObj<typeof meta>
 
-export const DangerZonePreview: Story = {}
+export const DangerZonePreview: Story = { play: storyRenders }

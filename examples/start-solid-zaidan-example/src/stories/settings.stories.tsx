@@ -18,6 +18,7 @@ import { ChangePasswordSettings } from "@/components/auth/settings/security/chan
 import { LinkedAccountsSettings } from "@/components/auth/settings/security/linked-accounts"
 import { SecuritySettings } from "@/components/auth/settings/security/security-settings"
 import { Settings } from "@/components/auth/settings/settings"
+import { storyRenders, withStoryActions } from "./story-coverage"
 
 const sessionData = {
   session: {
@@ -75,19 +76,22 @@ const activeSessions = [
   }
 ]
 
-const mockAuthClient = {
-  changeEmail: async () => ({ data: null, error: null }),
-  changePassword: async () => ({ data: null, error: null }),
-  getSession: async () => ({ data: sessionData, error: null }),
-  listAccounts: async () => ({ data: linkedAccounts, error: null }),
-  listSessions: async () => ({ data: activeSessions, error: null }),
-  linkSocial: async () => ({ data: null, error: null }),
-  requestPasswordReset: async () => ({ data: null, error: null }),
-  revokeSession: async () => ({ data: null, error: null }),
-  signOut: async () => ({ data: null, error: null }),
-  unlinkAccount: async () => ({ data: null, error: null }),
-  updateUser: async () => ({ data: null, error: null })
-} as never
+const mockAuthClient = withStoryActions(
+  {
+    changeEmail: async () => ({ data: null, error: null }),
+    changePassword: async () => ({ data: null, error: null }),
+    getSession: async () => ({ data: sessionData, error: null }),
+    listAccounts: async () => ({ data: linkedAccounts, error: null }),
+    listSessions: async () => ({ data: activeSessions, error: null }),
+    linkSocial: async () => ({ data: null, error: null }),
+    requestPasswordReset: async () => ({ data: null, error: null }),
+    revokeSession: async () => ({ data: null, error: null }),
+    signOut: async () => ({ data: null, error: null }),
+    unlinkAccount: async () => ({ data: null, error: null }),
+    updateUser: async () => ({ data: null, error: null })
+  },
+  "authClient"
+) as never
 
 function createStoryQueryClient() {
   const queryClient = new QueryClient({
@@ -111,15 +115,23 @@ function createStoryQueryClient() {
   return queryClient
 }
 
-function SettingsStoryProvider(props: { children: () => JSX.Element }) {
+type SettingsStoryArgs = {
+  multipleAccountsPerProvider?: boolean
+  redirectTo?: string
+  socialProviders?: ("github" | "google")[]
+}
+
+function SettingsStoryProvider(
+  props: SettingsStoryArgs & { children: () => JSX.Element }
+) {
   return (
     <AuthProvider
       authClient={mockAuthClient}
-      multipleAccountsPerProvider={false}
+      multipleAccountsPerProvider={props.multipleAccountsPerProvider ?? false}
       navigate={() => undefined}
       queryClient={createStoryQueryClient()}
-      redirectTo="/settings/account"
-      socialProviders={["github", "google"]}
+      redirectTo={props.redirectTo ?? "/settings/account"}
+      socialProviders={props.socialProviders ?? ["github", "google"]}
     >
       {props.children}
     </AuthProvider>
@@ -155,11 +167,13 @@ function createSettingsRouter(component: () => JSX.Element) {
   })
 }
 
-function SettingsPreviewStory(props: { children: JSX.Element }) {
+function SettingsPreviewStory(
+  props: SettingsStoryArgs & { children: JSX.Element }
+) {
   return (
     <RouterProvider
       router={createSettingsRouter(() => (
-        <SettingsStoryProvider>
+        <SettingsStoryProvider {...props}>
           {() => <SettingsPreviewShell>{props.children}</SettingsPreviewShell>}
         </SettingsStoryProvider>
       ))}
@@ -169,74 +183,92 @@ function SettingsPreviewStory(props: { children: JSX.Element }) {
 
 const meta = {
   title: "Zaidan/Components/Settings",
+  args: {
+    multipleAccountsPerProvider: false,
+    redirectTo: "/settings/account",
+    socialProviders: ["github", "google"]
+  },
+  argTypes: {
+    multipleAccountsPerProvider: { control: "boolean" },
+    redirectTo: { control: "text" },
+    socialProviders: { control: "check", options: ["github", "google"] }
+  },
   parameters: {
     layout: "fullscreen"
   }
-} satisfies Meta
+} satisfies Meta<SettingsStoryArgs>
 
 export default meta
 
-type Story = StoryObj<typeof meta>
+type Story = StoryObj<SettingsStoryArgs>
 
 export const SettingsPreview: Story = {
-  render: () => (
-    <SettingsPreviewStory>
+  play: storyRenders,
+  render: (args) => (
+    <SettingsPreviewStory {...args}>
       <Settings view="account" />
     </SettingsPreviewStory>
   )
 }
 
 export const AccountSettingsPreview: Story = {
-  render: () => (
-    <SettingsPreviewStory>
+  play: storyRenders,
+  render: (args) => (
+    <SettingsPreviewStory {...args}>
       <AccountSettings />
     </SettingsPreviewStory>
   )
 }
 
 export const UserProfilePreview: Story = {
-  render: () => (
-    <SettingsPreviewStory>
+  play: storyRenders,
+  render: (args) => (
+    <SettingsPreviewStory {...args}>
       <UserProfile />
     </SettingsPreviewStory>
   )
 }
 
 export const ChangeEmailPreview: Story = {
-  render: () => (
-    <SettingsPreviewStory>
+  play: storyRenders,
+  render: (args) => (
+    <SettingsPreviewStory {...args}>
       <ChangeEmail />
     </SettingsPreviewStory>
   )
 }
 
 export const SecuritySettingsPreview: Story = {
-  render: () => (
-    <SettingsPreviewStory>
+  play: storyRenders,
+  render: (args) => (
+    <SettingsPreviewStory {...args}>
       <SecuritySettings />
     </SettingsPreviewStory>
   )
 }
 
 export const ChangePasswordPreview: Story = {
-  render: () => (
-    <SettingsPreviewStory>
+  play: storyRenders,
+  render: (args) => (
+    <SettingsPreviewStory {...args}>
       <ChangePasswordSettings />
     </SettingsPreviewStory>
   )
 }
 
 export const LinkedAccountsPreview: Story = {
-  render: () => (
-    <SettingsPreviewStory>
+  play: storyRenders,
+  render: (args) => (
+    <SettingsPreviewStory {...args}>
       <LinkedAccountsSettings />
     </SettingsPreviewStory>
   )
 }
 
 export const ActiveSessionsPreview: Story = {
-  render: () => (
-    <SettingsPreviewStory>
+  play: storyRenders,
+  render: (args) => (
+    <SettingsPreviewStory {...args}>
       <ActiveSessionsSettings />
     </SettingsPreviewStory>
   )

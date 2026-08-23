@@ -1,6 +1,7 @@
 import { organizationQueryKeys } from "@better-auth-ui/core/plugins/organization"
 import type { Meta, StoryObj } from "@storybook/react-vite"
 import type { ReactNode } from "react"
+import { expect, fn, within } from "storybook/test"
 
 import { AuthProvider } from "@/components/auth/auth-provider"
 import { Organization } from "@/components/auth/organization/organization"
@@ -20,6 +21,7 @@ import {
   createStoryQueryClient,
   StoryLink,
   StoryShell,
+  storyActions,
   storyAuthClient,
   storyUserId
 } from "./story-fixtures"
@@ -107,14 +109,50 @@ const userInvitations = [
   }
 ]
 
+const organizationActions = {
+  acceptInvitation: fn(async () => ({ data: null, error: null })).mockName(
+    "authClient.organization.acceptInvitation"
+  ),
+  cancelInvitation: fn(async () => ({ data: null, error: null })).mockName(
+    "authClient.organization.cancelInvitation"
+  ),
+  create: fn(async () => ({ data: activeOrganization, error: null })).mockName(
+    "authClient.organization.create"
+  ),
+  delete: fn(async () => ({ data: null, error: null })).mockName(
+    "authClient.organization.delete"
+  ),
+  inviteMember: fn(async () => ({ data: null, error: null })).mockName(
+    "authClient.organization.inviteMember"
+  ),
+  leave: fn(async () => ({ data: null, error: null })).mockName(
+    "authClient.organization.leave"
+  ),
+  rejectInvitation: fn(async () => ({ data: null, error: null })).mockName(
+    "authClient.organization.rejectInvitation"
+  ),
+  removeMember: fn(async () => ({ data: null, error: null })).mockName(
+    "authClient.organization.removeMember"
+  ),
+  setActive: fn(async () => ({ data: null, error: null })).mockName(
+    "authClient.organization.setActive"
+  ),
+  update: fn(async () => ({ data: activeOrganization, error: null })).mockName(
+    "authClient.organization.update"
+  ),
+  updateMemberRole: fn(async () => ({ data: null, error: null })).mockName(
+    "authClient.organization.updateMemberRole"
+  )
+}
+
 const organizationAuthClient = {
   ...(storyAuthClient as object),
   organization: {
-    acceptInvitation: async () => ({ data: null, error: null }),
-    cancelInvitation: async () => ({ data: null, error: null }),
+    acceptInvitation: organizationActions.acceptInvitation,
+    cancelInvitation: organizationActions.cancelInvitation,
     checkSlug: async () => ({ data: { status: true }, error: null }),
-    create: async () => ({ data: activeOrganization, error: null }),
-    delete: async () => ({ data: null, error: null }),
+    create: organizationActions.create,
+    delete: organizationActions.delete,
     getFullOrganization: async () => ({
       data: activeOrganization,
       error: null
@@ -123,8 +161,8 @@ const organizationAuthClient = {
       data: { success: true },
       error: null
     }),
-    inviteMember: async () => ({ data: null, error: null }),
-    leave: async () => ({ data: null, error: null }),
+    inviteMember: organizationActions.inviteMember,
+    leave: organizationActions.leave,
     list: async () => ({ data: organizations, error: null }),
     listInvitations: async () => ({
       data: organizationInvitations,
@@ -138,11 +176,11 @@ const organizationAuthClient = {
       data: userInvitations,
       error: null
     }),
-    rejectInvitation: async () => ({ data: null, error: null }),
-    removeMember: async () => ({ data: null, error: null }),
-    setActive: async () => ({ data: null, error: null }),
-    update: async () => ({ data: activeOrganization, error: null }),
-    updateMemberRole: async () => ({ data: null, error: null })
+    rejectInvitation: organizationActions.rejectInvitation,
+    removeMember: organizationActions.removeMember,
+    setActive: organizationActions.setActive,
+    update: organizationActions.update,
+    updateMemberRole: organizationActions.updateMemberRole
   }
 } as never
 
@@ -205,7 +243,7 @@ function OrganizationPreview({
     <AuthProvider
       authClient={organizationAuthClient}
       Link={StoryLink}
-      navigate={() => undefined}
+      navigate={storyActions.navigate}
       plugins={[organizationPlugin({ slug })]}
       queryClient={createOrganizationQueryClient()}
     >
@@ -217,86 +255,158 @@ function OrganizationPreview({
 
 const meta = {
   title: "shadcn/ui/Plugins/Organization",
+  args: { organizationSlug: "acme" },
+  argTypes: { organizationSlug: { control: "text" } },
   parameters: { layout: "fullscreen" }
-} satisfies Meta
+} satisfies Meta<{ organizationSlug?: string }>
 
 export default meta
 
-type Story = StoryObj<typeof meta>
+type Story = StoryObj<{ organizationSlug?: string }>
 
 export const OrganizationSwitcherPreview: Story = {
   name: "Organization switcher",
-  render: () => (
-    <OrganizationPreview width="max-w-xl">
+  render: ({ organizationSlug = "acme" }) => (
+    <OrganizationPreview slug={organizationSlug} width="max-w-xl">
       <OrganizationSwitcher />
     </OrganizationPreview>
-  )
+  ),
+  play: async ({ canvas, step, userEvent }) => {
+    await step("open the organization switcher", async () => {
+      const trigger = canvas.getByRole("button", { name: /Acme Labs/ })
+      await userEvent.click(trigger)
+      await expect(trigger).toHaveAttribute("aria-expanded", "true")
+    })
+  }
 }
 
 export const OrganizationPreviewStory: Story = {
   name: "Organization",
-  render: () => (
-    <OrganizationPreview>
+  render: ({ organizationSlug = "acme" }) => (
+    <OrganizationPreview slug={organizationSlug}>
       <Organization path="settings" />
     </OrganizationPreview>
-  )
+  ),
+  play: async ({ canvas, step, userEvent }) => {
+    await step("switch to organization people", async () => {
+      await userEvent.click(canvas.getByRole("tab", { name: "People" }))
+      await expect(storyActions.navigate).toHaveBeenCalled()
+    })
+  }
 }
 
 export const OrganizationSettingsPreview: Story = {
   name: "Organization settings",
-  render: () => (
-    <OrganizationPreview>
+  render: ({ organizationSlug = "acme" }) => (
+    <OrganizationPreview slug={organizationSlug}>
       <OrganizationSettings
         organizationId={activeOrganization.id}
         organizationSlug="acme"
       />
     </OrganizationPreview>
-  )
+  ),
+  play: async ({ canvas, step }) => {
+    await step("render organization settings", async () => {
+      await expect(
+        canvas.getByRole("heading", { name: "Organization profile" })
+      ).toBeVisible()
+      await expect(
+        canvas.getByRole("heading", { name: "Danger zone" })
+      ).toBeVisible()
+    })
+  }
 }
 
 export const OrganizationProfilePreview: Story = {
   name: "Organization profile",
-  render: () => (
-    <OrganizationPreview>
+  render: ({ organizationSlug = "acme" }) => (
+    <OrganizationPreview slug={organizationSlug}>
       <OrganizationProfile />
     </OrganizationPreview>
-  )
+  ),
+  play: async ({ canvas, step, userEvent }) => {
+    await step("update the organization profile", async () => {
+      const name = canvas.getByRole("textbox", { name: "Name" })
+      await userEvent.clear(name)
+      await userEvent.type(name, "Acme Storybook")
+      await userEvent.click(
+        canvas.getByRole("button", { name: "Save changes" })
+      )
+      await expect(organizationActions.update).toHaveBeenCalled()
+    })
+  }
 }
 
 export const OrganizationDangerZonePreview: Story = {
   name: "Organization danger zone",
-  render: () => (
-    <OrganizationPreview>
+  render: ({ organizationSlug = "acme" }) => (
+    <OrganizationPreview slug={organizationSlug}>
       <OrganizationDangerZone />
     </OrganizationPreview>
-  )
+  ),
+  play: async ({ canvas, canvasElement, step, userEvent }) => {
+    await step("open the leave organization dialog", async () => {
+      await userEvent.click(
+        canvas.getByRole("button", { name: "Leave organization" })
+      )
+      await expect(
+        within(canvasElement.ownerDocument.body).getByRole("alertdialog")
+      ).toBeVisible()
+    })
+  }
 }
 
 export const OrganizationPeoplePreview: Story = {
   name: "Organization people",
-  render: () => (
-    <OrganizationPreview>
+  render: ({ organizationSlug = "acme" }) => (
+    <OrganizationPreview slug={organizationSlug}>
       <OrganizationPeople />
     </OrganizationPreview>
-  )
+  ),
+  play: async ({ canvas, canvasElement, step, userEvent }) => {
+    await step("open the member invitation dialog", async () => {
+      await userEvent.click(
+        canvas.getByRole("button", { name: "Invite member" })
+      )
+      await expect(
+        within(canvasElement.ownerDocument.body).getByRole("dialog")
+      ).toBeVisible()
+    })
+  }
 }
 
 export const OrganizationMembersPreview: Story = {
   name: "Organization members",
-  render: () => (
-    <OrganizationPreview>
+  render: ({ organizationSlug = "acme" }) => (
+    <OrganizationPreview slug={organizationSlug}>
       <OrganizationMembers />
     </OrganizationPreview>
-  )
+  ),
+  play: async ({ canvas, step, userEvent }) => {
+    await step("open a member role menu", async () => {
+      const trigger = canvas.getAllByRole("button", { name: "Change role" })[1]
+      await userEvent.click(trigger)
+      await expect(trigger).toHaveAttribute("aria-expanded", "true")
+    })
+  }
 }
 
 export const OrganizationInvitationsPreview: Story = {
   name: "Organization invitations",
-  render: () => (
-    <OrganizationPreview>
+  render: ({ organizationSlug = "acme" }) => (
+    <OrganizationPreview slug={organizationSlug}>
       <OrganizationInvitations />
     </OrganizationPreview>
-  )
+  ),
+  play: async ({ canvas, step, userEvent }) => {
+    await step("inspect invitation actions", async () => {
+      const cancelButtons = await canvas.findAllByRole("button", {
+        name: /Cancel invitation/
+      })
+      await userEvent.hover(cancelButtons[0])
+      await expect(cancelButtons).toHaveLength(2)
+    })
+  }
 }
 
 export const OrganizationsSettingsPreview: Story = {
@@ -305,7 +415,17 @@ export const OrganizationsSettingsPreview: Story = {
     <OrganizationPreview slug={null} width="max-w-2xl">
       <OrganizationsSettings />
     </OrganizationPreview>
-  )
+  ),
+  play: async ({ canvas, canvasElement, step, userEvent }) => {
+    await step("open organization creation", async () => {
+      await userEvent.click(
+        canvas.getByRole("button", { name: "Create organization" })
+      )
+      await expect(
+        within(canvasElement.ownerDocument.body).getByRole("dialog")
+      ).toBeVisible()
+    })
+  }
 }
 
 export const UserInvitationsPreview: Story = {
@@ -314,5 +434,11 @@ export const UserInvitationsPreview: Story = {
     <OrganizationPreview slug={null} width="max-w-2xl">
       <UserInvitations />
     </OrganizationPreview>
-  )
+  ),
+  play: async ({ canvas, step, userEvent }) => {
+    await step("accept an organization invitation", async () => {
+      await userEvent.click(canvas.getByRole("button", { name: "Accept" }))
+      await expect(organizationActions.acceptInvitation).toHaveBeenCalled()
+    })
+  }
 }

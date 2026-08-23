@@ -13,8 +13,15 @@ import { AuthProvider } from "@/components/auth/auth-provider"
 import { Appearance } from "@/components/auth/theme/appearance"
 import { UserButton } from "@/components/auth/user/user-button"
 import { themePlugin } from "@/lib/auth/theme-plugin"
+import { storyRenders, withStoryActions } from "./story-coverage"
 
 const mockAuthClient = {} as never
+const setTheme = withStoryActions(() => undefined, "theme.setTheme")
+
+type ThemeStoryArgs = {
+  theme?: string
+  themes?: string[]
+}
 
 const sessionData = {
   session: {
@@ -48,11 +55,19 @@ function createStoryQueryClient() {
   return queryClient
 }
 
-function ThemeStoryProvider(props: { children: () => JSX.Element }) {
+function ThemeStoryProvider(
+  props: ThemeStoryArgs & { children: () => JSX.Element }
+) {
   return (
     <AuthProvider
       authClient={mockAuthClient}
-      plugins={[themePlugin()]}
+      plugins={[
+        themePlugin({
+          setTheme,
+          theme: props.theme ?? "system",
+          themes: props.themes ?? ["system", "light", "dark"]
+        })
+      ]}
       queryClient={createStoryQueryClient()}
       redirectTo="/settings/account"
     >
@@ -61,9 +76,9 @@ function ThemeStoryProvider(props: { children: () => JSX.Element }) {
   )
 }
 
-function UserButtonPreviewContent() {
+function UserButtonPreviewContent(props: ThemeStoryArgs) {
   return (
-    <ThemeStoryProvider>
+    <ThemeStoryProvider {...props}>
       {() => (
         <main class="flex min-h-[260px] w-full items-center justify-center bg-background p-10 text-foreground">
           <UserButton />
@@ -73,30 +88,25 @@ function UserButtonPreviewContent() {
   )
 }
 
-const rootRoute = createRootRoute({
-  component: UserButtonPreviewContent
-})
-
-const indexRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: "/",
-  component: UserButtonPreviewContent
-})
-
-const routeTree = rootRoute.addChildren([indexRoute])
-
-function UserButtonPreviewStory() {
+function UserButtonPreviewStory(props: ThemeStoryArgs) {
+  const component = () => <UserButtonPreviewContent {...props} />
+  const rootRoute = createRootRoute({ component })
+  const indexRoute = createRoute({
+    getParentRoute: () => rootRoute,
+    path: "/",
+    component
+  })
   const router = createRouter({
     history: createMemoryHistory({ initialEntries: ["/"] }),
-    routeTree
+    routeTree: rootRoute.addChildren([indexRoute])
   })
 
   return <RouterProvider router={router} />
 }
 
-function AppearancePreviewStory() {
+function AppearancePreviewStory(props: ThemeStoryArgs) {
   return (
-    <ThemeStoryProvider>
+    <ThemeStoryProvider {...props}>
       {() => (
         <main class="flex min-h-[360px] w-full items-center justify-center bg-background p-10 text-foreground">
           <div class="w-full max-w-3xl">
@@ -110,19 +120,35 @@ function AppearancePreviewStory() {
 
 const meta = {
   title: "Zaidan/Plugins/Theme",
+  args: {
+    theme: "system",
+    themes: ["system", "light", "dark"]
+  },
+  argTypes: {
+    theme: {
+      control: "inline-radio",
+      options: ["system", "light", "dark"]
+    },
+    themes: {
+      control: "check",
+      options: ["system", "light", "dark"]
+    }
+  },
   parameters: {
     layout: "fullscreen"
   }
-} satisfies Meta
+} satisfies Meta<ThemeStoryArgs>
 
 export default meta
 
-type Story = StoryObj<typeof meta>
+type Story = StoryObj<ThemeStoryArgs>
 
 export const UserButtonPreview: Story = {
-  render: () => <UserButtonPreviewStory />
+  play: storyRenders,
+  render: (args) => <UserButtonPreviewStory {...args} />
 }
 
 export const AppearancePreview: Story = {
-  render: () => <AppearancePreviewStory />
+  play: storyRenders,
+  render: (args) => <AppearancePreviewStory {...args} />
 }

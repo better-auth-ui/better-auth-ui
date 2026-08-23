@@ -1,6 +1,7 @@
 import { authQueryKeys } from "@better-auth-ui/core"
 import { QueryClient } from "@tanstack/react-query"
 import type { ReactNode } from "react"
+import { fn } from "storybook/test"
 
 export const storyUserId = "user_storybook"
 
@@ -62,32 +63,88 @@ export const storySessions = [
   }
 ]
 
-export const storyAuthClient = {
-  changeEmail: async () => ({ data: null, error: null }),
-  changePassword: async () => ({ data: null, error: null }),
-  getSession: async () => ({ data: storySession, error: null }),
-  isUsernameAvailable: async ({ username }: { username: string }) => ({
+export const storyActions = {
+  changeEmail: fn(async () => ({ data: null, error: null })).mockName(
+    "authClient.changeEmail"
+  ),
+  changePassword: fn(async () => ({ data: null, error: null })).mockName(
+    "authClient.changePassword"
+  ),
+  getSession: fn(async () => ({ data: storySession, error: null })).mockName(
+    "authClient.getSession"
+  ),
+  isUsernameAvailable: fn(async ({ username }: { username: string }) => ({
     data: { available: username.toLowerCase() !== "taken" },
     error: null
-  }),
-  linkSocial: async () => ({ data: null, error: null }),
-  listAccounts: async () => ({ data: storyAccounts, error: null }),
-  listSessions: async () => ({ data: storySessions, error: null }),
-  requestPasswordReset: async () => ({ data: null, error: null }),
-  resetPassword: async () => ({ data: null, error: null }),
-  revokeSession: async () => ({ data: null, error: null }),
-  sendVerificationEmail: async () => ({ data: null, error: null }),
+  })).mockName("authClient.isUsernameAvailable"),
+  linkSocial: fn(async () => ({ data: null, error: null })).mockName(
+    "authClient.linkSocial"
+  ),
+  listAccounts: fn(async () => ({ data: storyAccounts, error: null })).mockName(
+    "authClient.listAccounts"
+  ),
+  listSessions: fn(async () => ({ data: storySessions, error: null })).mockName(
+    "authClient.listSessions"
+  ),
+  navigate: fn().mockName("navigate"),
+  requestPasswordReset: fn(async () => ({ data: null, error: null })).mockName(
+    "authClient.requestPasswordReset"
+  ),
+  resetPassword: fn(async () => ({ data: null, error: null })).mockName(
+    "authClient.resetPassword"
+  ),
+  revokeSession: fn(async () => ({ data: null, error: null })).mockName(
+    "authClient.revokeSession"
+  ),
+  sendVerificationEmail: fn(async () => ({ data: null, error: null })).mockName(
+    "authClient.sendVerificationEmail"
+  ),
+  signInEmail: fn(async () => ({ data: storySession, error: null })).mockName(
+    "authClient.signIn.email"
+  ),
+  signInSocial: fn(async () => ({ data: null, error: null })).mockName(
+    "authClient.signIn.social"
+  ),
+  signInUsername: fn(async () => ({
+    data: storySession,
+    error: null
+  })).mockName("authClient.signIn.username"),
+  signOut: fn(async () => ({ data: null, error: null })).mockName(
+    "authClient.signOut"
+  ),
+  signUpEmail: fn(async () => ({ data: storySession, error: null })).mockName(
+    "authClient.signUp.email"
+  ),
+  unlinkAccount: fn(async () => ({ data: null, error: null })).mockName(
+    "authClient.unlinkAccount"
+  ),
+  updateUser: fn(async () => ({
+    data: storySession.user,
+    error: null
+  })).mockName("authClient.updateUser")
+}
+
+export const storyAuthClient = {
+  changeEmail: storyActions.changeEmail,
+  changePassword: storyActions.changePassword,
+  getSession: storyActions.getSession,
+  isUsernameAvailable: storyActions.isUsernameAvailable,
+  linkSocial: storyActions.linkSocial,
+  listAccounts: storyActions.listAccounts,
+  listSessions: storyActions.listSessions,
+  requestPasswordReset: storyActions.requestPasswordReset,
+  resetPassword: storyActions.resetPassword,
+  revokeSession: storyActions.revokeSession,
+  sendVerificationEmail: storyActions.sendVerificationEmail,
   signIn: {
-    email: async () => ({ data: storySession, error: null }),
-    social: async () => ({ data: null, error: null }),
-    username: async () => ({ data: storySession, error: null })
+    email: storyActions.signInEmail,
+    social: storyActions.signInSocial,
+    username: storyActions.signInUsername
   },
-  signOut: async () => ({ data: null, error: null }),
-  signUp: {
-    email: async () => ({ data: storySession, error: null })
-  },
-  unlinkAccount: async () => ({ data: null, error: null }),
-  updateUser: async () => ({ data: storySession.user, error: null })
+  signOut: storyActions.signOut,
+  signUp: { email: storyActions.signUpEmail },
+  unlinkAccount: storyActions.unlinkAccount,
+  updateUser: storyActions.updateUser
 } as never
 
 export function createStoryQueryClient() {

@@ -10,21 +10,25 @@ import type { Meta, StoryObj } from "storybook-solidjs-vite"
 import { AuthProvider } from "@/components/auth/auth-provider"
 import { MagicLink } from "@/components/auth/magic-link"
 import { magicLinkPlugin } from "@/lib/auth/magic-link-plugin"
+import { storyRenders, withStoryActions } from "./story-coverage"
 
-const mockAuthClient = {
-  signIn: {
-    magicLink: async () => ({ data: null, error: null }),
-    social: async () => ({ data: null, error: null })
-  }
-} as unknown as MagicLinkAuthClient
+const mockAuthClient = withStoryActions(
+  {
+    signIn: {
+      magicLink: async () => ({ data: null, error: null }),
+      social: async () => ({ data: null, error: null })
+    }
+  },
+  "authClient"
+) as unknown as MagicLinkAuthClient
 
-function MagicLinkPreview() {
+function MagicLinkPreview(props: { redirectTo?: string }) {
   return (
     <AuthProvider
       authClient={mockAuthClient}
       baseURL="http://localhost:3000"
       plugins={[magicLinkPlugin()]}
-      redirectTo="/settings/account"
+      redirectTo={props.redirectTo ?? "/settings/account"}
       socialProviders={["github", "google"]}
     >
       {() => (
@@ -36,22 +40,17 @@ function MagicLinkPreview() {
   )
 }
 
-const rootRoute = createRootRoute({
-  component: MagicLinkPreview
-})
-
-const indexRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: "/",
-  component: MagicLinkPreview
-})
-
-const routeTree = rootRoute.addChildren([indexRoute])
-
-function MagicLinkStory() {
+function MagicLinkStory(props: { redirectTo?: string }) {
+  const component = () => <MagicLinkPreview redirectTo={props.redirectTo} />
+  const rootRoute = createRootRoute({ component })
+  const indexRoute = createRoute({
+    getParentRoute: () => rootRoute,
+    path: "/",
+    component
+  })
   const router = createRouter({
     history: createMemoryHistory({ initialEntries: ["/"] }),
-    routeTree
+    routeTree: rootRoute.addChildren([indexRoute])
   })
 
   return <RouterProvider router={router} />
@@ -60,6 +59,8 @@ function MagicLinkStory() {
 const meta = {
   title: "Zaidan/Plugins/Magic Link",
   component: MagicLinkStory,
+  args: { redirectTo: "/settings/account" },
+  argTypes: { redirectTo: { control: "text" } },
   parameters: {
     layout: "fullscreen"
   }
@@ -69,4 +70,4 @@ export default meta
 
 type Story = StoryObj<typeof meta>
 
-export const Preview: Story = {}
+export const Preview: Story = { play: storyRenders }
