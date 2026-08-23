@@ -17,7 +17,7 @@
   "devDependencies": {
     "@better-auth-ui/react": "workspace:*",
     "@better-auth/api-key": "1.7.0",
-    "@biomejs/biome": "2.5.7",
+    "@biomejs/biome": "2.5.10",
     "@nx/js": "23.1.1",
     "@swc-node/register": "~1.12.1",
     "@swc/core": "~1.15.47",
