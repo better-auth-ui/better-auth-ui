@@ -3346,6 +3346,13 @@ describe("Solid auth route component selection", () => {
       ),
       "utf8"
     )
+    const editMemberRolesDialog = readFileSync(
+      resolve(
+        __dirname,
+        "../src/components/auth/organization/edit-member-roles-dialog.tsx"
+      ),
+      "utf8"
+    )
     const organizationMemberRowSkeleton = readFileSync(
       resolve(
         __dirname,
@@ -3588,20 +3595,19 @@ describe("Solid auth route component selection", () => {
     expect(organizationInvitations).toContain("InputGroupInput")
     expect(organizationInvitations).not.toContain("InputGroupTextarea")
     expect(organizationInvitations).not.toContain("useSearch")
-    expect(organizationMemberRow).toContain("useUpdateMemberRole")
+    expect(organizationMemberRow).toContain("EditMemberRolesDialog")
     expect(organizationMemberRow).toContain(
       'permissions: { member: ["update"] }'
     )
     expect(organizationMemberRow).toContain("memberRoleUpdated")
     expect(organizationMemberRow).toContain("changeMemberRole")
-    expect(organizationMemberRow).toContain("DropdownMenu")
-    expect(organizationMemberRow).toContain("DropdownMenuCheckboxItem")
-    expect(organizationMemberRow).toContain("updateMemberRole.mutate")
-    expect(organizationMemberRow).toContain("memberId: props.member.id")
-    expect(organizationMemberRow).toContain(
-      'next as UpdateMemberRoleParams["role"]'
+    expect(editMemberRolesDialog).toContain("useUpdateMemberRole")
+    expect(editMemberRolesDialog).toContain("updateMemberRole.mutate")
+    expect(editMemberRolesDialog).toContain("memberId: props.member.id")
+    expect(editMemberRolesDialog).toContain(
+      'selectedRoles() as UpdateMemberRoleParams["role"]'
     )
-    expect(organizationMemberRow).toContain("parseMemberRoles")
+    expect(editMemberRolesDialog).toContain("parseMemberRoles")
     expect(organizationMemberRow).toContain("key !== config.creatorRole")
     expect(organizationMemberRow).toContain("useSession")
     expect(organizationMemberRow).toContain("session.data?.user.id")

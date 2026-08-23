@@ -426,6 +426,8 @@ export const deDEPlugins = {
     cancelInvitation: "Einladung abbrechen",
     changeLogo: "Logo ändern",
     changeMemberRole: "Rolle ändern",
+    changeMemberRoleDescription:
+      "Wähle die Rollen aus, die dieses Mitglied in der Organisation haben soll.",
     clear: "Leeren",
     createOrganization: "Organisation erstellen",
     deleteLogo: "Logo löschen",

@@ -1087,6 +1087,9 @@ export const solidRegistryManifest = {
           "src/components/auth/organization/organization-member-row.tsx"
         ),
         componentFile(
+          "src/components/auth/organization/edit-member-roles-dialog.tsx"
+        ),
+        componentFile(
           "src/components/auth/organization/organization-member-row-skeleton.tsx"
         ),
         componentFile(

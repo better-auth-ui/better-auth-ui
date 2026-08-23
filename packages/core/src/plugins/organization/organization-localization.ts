@@ -22,6 +22,9 @@ export const organizationLocalization = {
   changeLogo: "Change logo",
   /** @remarks `"Change role"` */
   changeMemberRole: "Change role",
+  /** @remarks `"Choose the roles this member should have in the organization."` */
+  changeMemberRoleDescription:
+    "Choose the roles this member should have in the organization.",
   /** @remarks `"Clear"` */
   clear: "Clear",
   /** @remarks `"Create organization"` */

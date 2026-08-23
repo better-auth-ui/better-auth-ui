@@ -5,9 +5,7 @@ import {
   memberRoleLabels,
   type OrganizationAuthClient,
   type OrganizationLocalization,
-  parseMemberRoles,
-  type RemoveMemberParams,
-  type UpdateMemberRoleParams
+  type RemoveMemberParams
 } from "@better-auth-ui/core/plugins/organization"
 import { useAuth, useAuthPlugin, useSession } from "@better-auth-ui/solid"
 import {
@@ -15,8 +13,7 @@ import {
   useHasPermission,
   useLeaveOrganization,
   useListUserTeams,
-  useRemoveMember,
-  useUpdateMemberRole
+  useRemoveMember
 } from "@better-auth-ui/solid/plugins/organization"
 import { LogOut, Pencil, Trash2 } from "lucide-solid"
 import { createSignal, For, Show } from "solid-js"
@@ -32,15 +29,10 @@ import {
   AlertDialogTitle
 } from "@/components/ui/alert-dialog"
 import { Button } from "@/components/ui/button"
-import {
-  DropdownMenu,
-  DropdownMenuCheckboxItem,
-  DropdownMenuContent,
-  DropdownMenuTrigger
-} from "@/components/ui/dropdown-menu"
 import { Skeleton } from "@/components/ui/skeleton"
 import { TableCell, TableRow } from "@/components/ui/table"
 import { organizationPlugin } from "@/lib/auth/organization-plugin"
+import { EditMemberRolesDialog } from "./edit-member-roles-dialog"
 
 type OrganizationMember = {
   id: string
@@ -60,6 +52,7 @@ type RoleMap = Record<string, string>
 type MemberLocalization = Pick<
   OrganizationLocalization,
   | "changeMemberRole"
+  | "changeMemberRoleDescription"
   | "memberRoleUpdated"
   | "removeMember"
   | "removeMemberWarning"
@@ -203,6 +196,7 @@ export function OrganizationMemberRow(props: OrganizationMemberRowProps) {
   const config = useAuthPlugin(organizationPlugin)
   const [removeOpen, setRemoveOpen] = createSignal(false)
   const [leaveOpen, setLeaveOpen] = createSignal(false)
+  const [roleEditorOpen, setRoleEditorOpen] = createSignal(false)
   const session = useSession(auth.authClient)
   const user = () => props.member.user
   const permission = useHasPermission(auth.authClient, () => ({
@@ -220,38 +214,17 @@ export function OrganizationMemberRow(props: OrganizationMemberRowProps) {
     },
     enabled: props.showTeams === true && Boolean(props.member.userId)
   }))
-  const updateMemberRole = useUpdateMemberRole(auth.authClient, () => ({
-    onSuccess: () => toast.success(props.localization.memberRoleUpdated)
-  }))
   const assignableRoles = () =>
     Object.entries(props.roles).filter(
       ([key]) => props.isOwner || key !== config.creatorRole
     )
 
-  // Better Auth persists multiple roles as one comma-joined string.
-  const memberRoles = () => parseMemberRoles(props.member.role)
   const targetIsOwner = () =>
     hasMemberRole(props.member.role, config.creatorRole)
   const canManageTarget = () => props.isOwner || !targetIsOwner()
   const onlyOwnerActionDisabled = () =>
     targetIsOwner() && (props.ownerCount === undefined || props.ownerCount <= 1)
   const teamNames = () => memberTeams.data?.map((team) => team.name).join(", ")
-
-  const toggleRole = (role: string) => {
-    const current = memberRoles()
-    const next = current.includes(role)
-      ? current.filter((entry) => entry !== role)
-      : [...current, role]
-
-    // A member always holds at least one role, so refuse to clear the last one.
-    if (next.length === 0) return
-
-    updateMemberRole.mutate({
-      memberId: props.member.id,
-      organizationId: props.member.organizationId,
-      role: next as UpdateMemberRoleParams["role"]
-    })
-  }
 
   return (
     <TableRow>
@@ -316,40 +289,31 @@ export function OrganizationMemberRow(props: OrganizationMemberRowProps) {
             </Button>
           </Show>
           <Show when={canManageTarget() && permission.data?.success}>
-            <DropdownMenu>
-              <DropdownMenuTrigger
-                as={Button}
-                aria-label={props.localization.changeMemberRole}
-                class="size-8"
-                disabled={updateMemberRole.isPending}
-                size="icon-sm"
-                type="button"
-                variant="ghost"
-              >
-                <Pencil class="size-4" />
-              </DropdownMenuTrigger>
-              <DropdownMenuContent>
-                <For each={assignableRoles()}>
-                  {([role, label]) => (
-                    <DropdownMenuCheckboxItem
-                      checked={memberRoles().includes(role)}
-                      closeOnSelect={false}
-                      disabled={
-                        updateMemberRole.isPending ||
-                        (memberRoles().includes(role) &&
-                          memberRoles().length === 1) ||
-                        (role === config.creatorRole &&
-                          memberRoles().includes(role) &&
-                          onlyOwnerActionDisabled())
-                      }
-                      onChange={() => toggleRole(role)}
-                    >
-                      {label}
-                    </DropdownMenuCheckboxItem>
-                  )}
-                </For>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            <Button
+              aria-label={props.localization.changeMemberRole}
+              class="size-8"
+              onClick={() => setRoleEditorOpen(true)}
+              size="icon-sm"
+              type="button"
+              variant="ghost"
+            >
+              <Pencil class="size-4" />
+            </Button>
+          </Show>
+          <Show when={canManageTarget() && permission.data?.success}>
+            <EditMemberRolesDialog
+              localization={props.localization}
+              member={{
+                id: props.member.id,
+                organizationId: props.member.organizationId,
+                role: props.member.role
+              }}
+              onOpenChange={setRoleEditorOpen}
+              open={roleEditorOpen()}
+              protectedRole={config.creatorRole}
+              protectedRoleRemovalDisabled={onlyOwnerActionDisabled()}
+              roles={assignableRoles()}
+            />
           </Show>
           <Show
             when={

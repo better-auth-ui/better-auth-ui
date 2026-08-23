@@ -37,7 +37,6 @@ const EXPECTED_BASE_UI_OVERRIDES = [
   "@components/auth/dash/activity.tsx",
   "@components/auth/oauth-provider/oauth-clients.tsx",
   "@components/auth/organization/invite-member-dialog.tsx",
-  "@components/auth/organization/organization-member-row.tsx",
   "@components/auth/organization/organization-teams.tsx",
   "@components/auth/organization/team-switcher.tsx",
   "@components/auth/phone-number/international-phone-field.tsx",

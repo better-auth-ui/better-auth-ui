@@ -579,7 +579,7 @@ export const OrganizationMembersPreview: Story = {
       <OrganizationMembers />
     </OrganizationPreview>
   ),
-  play: async ({ canvas, step, userEvent }) => {
+  play: async ({ canvas, canvasElement, step, userEvent }) => {
     await step("show team assignments", async () => {
       await expect(
         canvas.getByRole("columnheader", { name: "Teams" })
@@ -588,10 +588,20 @@ export const OrganizationMembersPreview: Story = {
       await expect(canvas.getByText("No teams")).toBeVisible()
     })
 
-    await step("open a member role menu", async () => {
-      const trigger = canvas.getAllByRole("button", { name: "Change role" })[1]
+    await step("open the member role editor", async () => {
+      const graceRow = canvas.getByRole("row", { name: /Grace Hopper/ })
+      const trigger = within(graceRow).getByRole("button", {
+        name: "Change role"
+      })
       await userEvent.click(trigger)
-      await expect(trigger).toHaveAttribute("aria-expanded", "true")
+      const dialog = within(canvasElement.ownerDocument.body).getByRole(
+        "alertdialog",
+        { name: "Change role" }
+      )
+      await expect(dialog).toBeVisible()
+      await expect(
+        within(dialog).getByRole("checkbox", { name: "Admin" })
+      ).toBeChecked()
     })
   }
 }

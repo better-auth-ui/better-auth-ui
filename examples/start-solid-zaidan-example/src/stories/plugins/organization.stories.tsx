@@ -786,7 +786,25 @@ export const OrganizationPeoplePreview: Story = {
 }
 
 export const OrganizationMembersPreview: Story = {
-  play: storyRenders,
+  play: async ({ canvas, canvasElement, step, userEvent }) => {
+    await step("open the member role editor", async () => {
+      const graceRow = await waitFor(() =>
+        canvas.getByRole("row", { name: /Grace Hopper/ })
+      )
+      const trigger = within(graceRow).getByRole("button", {
+        name: "Change member role"
+      })
+      await userEvent.click(trigger)
+      const dialog = within(canvasElement.ownerDocument.body).getByRole(
+        "dialog",
+        { name: "Change member role" }
+      )
+      await expect(dialog).toBeVisible()
+      await expect(
+        within(dialog).getByRole("checkbox", { name: "Admin" })
+      ).toBeChecked()
+    })
+  },
   render: () => (
     <RouterProvider
       router={createStoryRouter(OrganizationMembersPreviewContent)}

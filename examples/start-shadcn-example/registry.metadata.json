@@ -1077,6 +1077,11 @@
           "target": "@components/auth/organization/organization-member-row.tsx"
         },
         {
+          "path": "src/components/auth/organization/edit-member-roles-dialog.tsx",
+          "type": "registry:component",
+          "target": "@components/auth/organization/edit-member-roles-dialog.tsx"
+        },
+        {
           "path": "src/components/auth/organization/organization-member-row-skeleton.tsx",
           "type": "registry:component",
           "target": "@components/auth/organization/organization-member-row-skeleton.tsx"

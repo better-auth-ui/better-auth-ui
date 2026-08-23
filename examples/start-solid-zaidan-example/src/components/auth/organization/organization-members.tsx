@@ -100,6 +100,8 @@ type SortDescriptor = {
 
 const fallbackLocalization = {
   changeMemberRole: "Change member role",
+  changeMemberRoleDescription:
+    "Choose the roles this member should have in the organization.",
   memberRoleUpdated: "Member role updated",
   removeMember: "Remove member",
   removeMemberWarning:
@@ -125,6 +127,7 @@ const fallbackLocalization = {
 } satisfies Pick<
   OrganizationLocalization,
   | "changeMemberRole"
+  | "changeMemberRoleDescription"
   | "memberRoleUpdated"
   | "removeMember"
   | "removeMemberWarning"
@@ -266,6 +269,7 @@ export function OrganizationMembers(props: OrganizationMembersProps) {
           localization?: Pick<
             OrganizationLocalization,
             | "changeMemberRole"
+            | "changeMemberRoleDescription"
             | "memberRoleUpdated"
             | "removeMember"
             | "removeMemberWarning"
