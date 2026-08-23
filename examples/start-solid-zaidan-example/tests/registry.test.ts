@@ -46,6 +46,7 @@ const readJson = <T>(path: string) =>
 type GeneratedRegistryFile = {
   content: string
   path: string
+  target?: string
 }
 
 type GeneratedRegistryItem = {
@@ -92,7 +93,11 @@ const collectRegistryInstall = ({
     )
 
     for (const file of item.files) {
-      files.set(file.path, file.content)
+      const installPath = file.target?.startsWith("@")
+        ? `src/${file.target.slice(1)}`
+        : (file.target ?? file.path)
+
+      files.set(installPath, file.content)
     }
 
     for (const dependency of item.registryDependencies ?? []) {

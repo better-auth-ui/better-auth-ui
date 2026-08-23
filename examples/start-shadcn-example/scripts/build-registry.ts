@@ -1,6 +1,7 @@
 import { spawnSync } from "node:child_process"
 import {
   cpSync,
+  existsSync,
   mkdirSync,
   readdirSync,
   readFileSync,
@@ -9,6 +10,11 @@ import {
 } from "node:fs"
 import { dirname, resolve } from "node:path"
 import { fileURLToPath } from "node:url"
+import {
+  createReactRegistry,
+  readRegistryMetadata,
+  validateBuiltRegistryDirectory
+} from "./registry-graph"
 
 const STYLE_NAMES = [
   "vega",
@@ -22,27 +28,28 @@ const STYLE_NAMES = [
 ] as const
 
 const EXPECTED_BASE_UI_OVERRIDES = [
-  "src/components/auth/additional-field.tsx",
-  "src/components/auth/admin/admin-users.tsx",
-  "src/components/auth/admin/admin.tsx",
-  "src/components/auth/api-key/api-keys.tsx",
-  "src/components/auth/api-key/create-api-key-dialog.tsx",
-  "src/components/auth/billing/billing-settings.tsx",
-  "src/components/auth/dash/activity.tsx",
-  "src/components/auth/oauth-provider/oauth-clients.tsx",
-  "src/components/auth/organization/invite-member-dialog.tsx",
-  "src/components/auth/organization/organization-member-row.tsx",
-  "src/components/auth/organization/organization-teams.tsx",
-  "src/components/auth/organization/team-switcher.tsx",
-  "src/components/auth/phone-number/international-phone-field.tsx",
-  "src/components/auth/phone-number/remove-phone-number-dialog.tsx",
-  "src/components/auth/theme/theme-toggle-item.tsx"
+  "@components/auth/additional-field.tsx",
+  "@components/auth/admin/admin-users.tsx",
+  "@components/auth/admin/admin.tsx",
+  "@components/auth/api-key/api-keys.tsx",
+  "@components/auth/api-key/create-api-key-dialog.tsx",
+  "@components/auth/billing/billing-settings.tsx",
+  "@components/auth/dash/activity.tsx",
+  "@components/auth/oauth-provider/oauth-clients.tsx",
+  "@components/auth/organization/invite-member-dialog.tsx",
+  "@components/auth/organization/organization-member-row.tsx",
+  "@components/auth/organization/organization-teams.tsx",
+  "@components/auth/organization/team-switcher.tsx",
+  "@components/auth/phone-number/international-phone-field.tsx",
+  "@components/auth/phone-number/remove-phone-number-dialog.tsx",
+  "@components/auth/theme/theme-toggle-item.tsx"
 ] as const
 
 type RegistryItem = {
   files?: Array<{
     content?: string
     path?: string
+    target?: string
   }>
 }
 
@@ -52,7 +59,9 @@ const baseExampleRoot = resolve(
   radixExampleRoot,
   "../start-shadcn-baseui-example"
 )
-const registryManifest = resolve(radixExampleRoot, "registry.json")
+const repoRoot = resolve(radixExampleRoot, "../..")
+const registryMetadataPath = resolve(radixExampleRoot, "registry.metadata.json")
+const registryMetadata = readRegistryMetadata(registryMetadataPath)
 const registryOutputRoot = resolve(radixExampleRoot, "../../apps/docs/public/r")
 const registryRewriteRoot = resolve(registryOutputRoot, "styles")
 
@@ -88,41 +97,58 @@ const cleanReactRegistryOutput = () => {
 }
 
 const buildCanonicalRegistry = ({
-  cwd,
+  base,
   style
 }: {
-  cwd: string
+  base: "base" | "radix"
   style: string
 }) => {
   const output = resolve(registryOutputRoot, style)
+  const registryManifest = resolve(repoRoot, "registry.json")
   mkdirSync(output, { recursive: true })
 
   console.log(`building ${style}`)
 
-  const result = spawnSync(
-    "bunx",
-    [
-      "--bun",
-      "shadcn",
-      "build",
-      registryManifest,
-      "--output",
-      output,
-      "--cwd",
-      cwd
-    ],
-    {
-      cwd: radixExampleRoot,
-      stdio: "inherit"
-    }
-  )
-
-  if (result.error) {
-    throw result.error
+  if (existsSync(registryManifest)) {
+    throw new Error(
+      `Cannot create generated registry because ${registryManifest} already exists`
+    )
   }
 
-  if (result.status !== 0) {
-    throw new Error(`shadcn build failed for ${style}`)
+  const generatedRegistry = createReactRegistry({
+    base,
+    baseExampleRoot,
+    metadata: registryMetadata,
+    metadataRoot: radixExampleRoot,
+    radixExampleRoot,
+    repoRoot
+  })
+
+  writeFileSync(
+    registryManifest,
+    `${JSON.stringify(generatedRegistry, null, 2)}\n`
+  )
+
+  try {
+    for (const args of [
+      ["registry", "validate", registryManifest, "--cwd", repoRoot],
+      ["build", registryManifest, "--output", output, "--cwd", repoRoot]
+    ]) {
+      const result = spawnSync("bunx", ["--bun", "shadcn", ...args], {
+        cwd: radixExampleRoot,
+        stdio: "inherit"
+      })
+
+      if (result.error) {
+        throw result.error
+      }
+
+      if (result.status !== 0) {
+        throw new Error(`shadcn ${args[0]} failed for ${style}`)
+      }
+    }
+  } finally {
+    rmSync(registryManifest, { force: true })
   }
 }
 
@@ -182,15 +208,16 @@ const collectRegistrySource = (directory: string) => {
         continue
       }
 
-      const existingContent = source.get(file.path)
+      const installPath = file.target ?? file.path
+      const existingContent = source.get(installPath)
 
       if (existingContent !== undefined && existingContent !== file.content) {
         throw new Error(
-          `Registry source ${file.path} has conflicting generated contents`
+          `Registry source ${installPath} has conflicting generated contents`
         )
       }
 
-      source.set(file.path, file.content)
+      source.set(installPath, file.content)
     }
   }
 
@@ -245,6 +272,8 @@ const assertStyleRegistry = (style: string, expectedFileNames: string[]) => {
   const directory = resolve(registryOutputRoot, style)
   const fileNames = jsonFileNames(directory)
 
+  validateBuiltRegistryDirectory(directory)
+
   if (
     fileNames.length !== expectedFileNames.length ||
     fileNames.some((fileName, index) => fileName !== expectedFileNames[index])
@@ -285,11 +314,11 @@ const mirrorStyleRegistries = () => {
 cleanReactRegistryOutput()
 
 buildCanonicalRegistry({
-  cwd: radixExampleRoot,
+  base: "radix",
   style: canonicalStyleFor("radix")
 })
 buildCanonicalRegistry({
-  cwd: baseExampleRoot,
+  base: "base",
   style: canonicalStyleFor("base")
 })
 rewriteStyleUrls({

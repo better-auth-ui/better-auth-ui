@@ -9,8 +9,9 @@
         "inputs": [
           "{projectRoot}/components.json",
           "{projectRoot}/package.json",
-          "{projectRoot}/registry.json",
+          "{projectRoot}/registry.metadata.json",
           "{projectRoot}/scripts/build-registry.ts",
+          "{projectRoot}/scripts/registry-graph.ts",
           "{projectRoot}/src/**/*",
           "{workspaceRoot}/examples/start-shadcn-baseui-example/components.json",
           "{workspaceRoot}/examples/start-shadcn-baseui-example/package.json",
@@ -23,6 +24,19 @@
           "{workspaceRoot}/apps/docs/public/r/radix-*/*.json",
           "{workspaceRoot}/apps/docs/public/r/styles/base-*/*.json",
           "{workspaceRoot}/apps/docs/public/r/styles/radix-*/*.json"
+        ]
+      },
+      "registry:test": {
+        "cache": true,
+        "inputs": [
+          "{projectRoot}/registry.metadata.json",
+          "{projectRoot}/scripts/registry-graph.ts",
+          "{projectRoot}/tests/registry-graph.test.ts",
+          "{projectRoot}/vitest.registry.config.ts",
+          "{projectRoot}/src/**/*",
+          "{workspaceRoot}/examples/start-shadcn-baseui-example/src/**/*",
+          "{workspaceRoot}/packages/react/src/components/auth/email/**/*",
+          "{workspaceRoot}/bun.lock"
         ]
       }
     }
@@ -37,6 +51,7 @@
     "deploy": "bun run build && wrangler deploy",
     "cf-typegen": "wrangler types",
     "registry:build": "bun scripts/build-registry.ts",
+    "registry:test": "vitest run --config vitest.registry.config.ts tests/registry-graph.test.ts",
     "source:sync": "bash scripts/sync-consumers.sh"
   },
   "devDependencies": {
@@ -53,6 +68,7 @@
     "tw-animate-css": "^1.4.0",
     "typescript": "^6.0.3",
     "vite": "^8.2.1",
+    "vitest": "^4.1.9",
     "wrangler": "^4.119.0"
   },
   "dependencies": {
@@ -89,7 +105,7 @@
     "react-day-picker": "^10.0.1",
     "react-dom": "^19.2.6",
     "react-email": "^6.6.8",
-    "shadcn": "^4.16.2",
+    "shadcn": "^4.19.0",
     "sonner": "^2.0.7",
     "tailwind-merge": "^3.5.0",
     "tailwindcss": "^4.3.2"

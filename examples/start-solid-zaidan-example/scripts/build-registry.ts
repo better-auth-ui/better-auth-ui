@@ -9,6 +9,7 @@ import {
 } from "node:fs"
 import { dirname, relative, resolve } from "node:path"
 import { fileURLToPath } from "node:url"
+import { registryItemSchema, registrySchema } from "shadcn/schema"
 import {
   type SolidRegistryFile,
   type SolidRegistryItem,
@@ -103,13 +104,19 @@ const assertSolidSourcePath = (
 const readRegistryItem = (
   exampleRoot: string,
   item: SolidRegistryItem
-): RegistryItemSnapshot => ({
-  ...item,
-  files: item.files.map((file) => ({
-    ...file,
-    content: readFileSync(assertSolidSourcePath(exampleRoot, file), "utf8")
-  }))
-})
+): RegistryItemSnapshot => {
+  const snapshot = {
+    ...item,
+    files: item.files.map((file) => ({
+      ...file,
+      content: readFileSync(assertSolidSourcePath(exampleRoot, file), "utf8")
+    }))
+  }
+
+  registryItemSchema.parse(snapshot)
+
+  return snapshot
+}
 
 const writeJson = (path: string, value: unknown) => {
   mkdirSync(dirname(path), { recursive: true })
@@ -210,6 +217,19 @@ export const buildSolidRegistry = ({
   manifest,
   outputRoot
 }: BuildSolidRegistryOptions): BuildSolidRegistryResult => {
+  for (const item of manifest.items) {
+    for (const file of item.files) {
+      assertSolidSourcePath(exampleRoot, file)
+    }
+  }
+
+  registrySchema.parse({
+    $schema: "https://ui.shadcn.com/schema/registry.json",
+    homepage: manifest.homepage,
+    items: manifest.items,
+    name: manifest.name
+  })
+
   const namespaceOutput = resolve(outputRoot, manifest.namespace)
   const writtenFiles: string[] = []
 
