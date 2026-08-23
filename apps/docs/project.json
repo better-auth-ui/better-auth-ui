@@ -21,6 +21,8 @@
     "build": {
       "dependsOn": [
         "^build",
+        "build-storybook-heroui",
+        "build-storybook-shadcn",
         "build-storybook-zaidan",
         {
           "projects": ["start-shadcn-example", "start-solid-zaidan-example"],
@@ -40,6 +42,60 @@
         "cwd": "apps/docs"
       },
       "outputs": ["{projectRoot}/dist"],
+      "cache": true
+    },
+    "build-storybook-heroui": {
+      "dependsOn": ["^build"],
+      "executor": "nx:run-commands",
+      "inputs": [
+        "{workspaceRoot}/packages/core/src/**",
+        "{workspaceRoot}/packages/core/package.json",
+        "{workspaceRoot}/packages/react/src/**",
+        "{workspaceRoot}/packages/react/package.json",
+        "{workspaceRoot}/packages/heroui/src/**",
+        "{workspaceRoot}/packages/heroui/package.json",
+        "{workspaceRoot}/examples/start-heroui-example/package.json",
+        "{workspaceRoot}/examples/start-heroui-example/.storybook/**",
+        "{workspaceRoot}/examples/start-heroui-example/src/stories/**",
+        "{workspaceRoot}/examples/start-heroui-example/src/styles/**",
+        "{workspaceRoot}/apps/docs/scripts/build-storybook.ts",
+        "{workspaceRoot}/bun.lock",
+        {
+          "dependentTasksOutputFiles": "packages/{core,react,heroui}/dist/**/*"
+        }
+      ],
+      "options": {
+        "command": "bun scripts/build-storybook.ts heroui",
+        "cwd": "apps/docs"
+      },
+      "outputs": ["{projectRoot}/public/storybook/heroui"],
+      "cache": true
+    },
+    "build-storybook-shadcn": {
+      "dependsOn": ["^build"],
+      "executor": "nx:run-commands",
+      "inputs": [
+        "{workspaceRoot}/packages/core/src/**",
+        "{workspaceRoot}/packages/core/package.json",
+        "{workspaceRoot}/packages/react/src/**",
+        "{workspaceRoot}/packages/react/package.json",
+        "{workspaceRoot}/examples/start-shadcn-example/package.json",
+        "{workspaceRoot}/examples/start-shadcn-example/.storybook/**",
+        "{workspaceRoot}/examples/start-shadcn-example/src/lib/**",
+        "{workspaceRoot}/examples/start-shadcn-example/src/stories/**",
+        "{workspaceRoot}/examples/start-shadcn-example/src/components/**",
+        "{workspaceRoot}/examples/start-shadcn-example/src/styles/**",
+        "{workspaceRoot}/apps/docs/scripts/build-storybook.ts",
+        "{workspaceRoot}/bun.lock",
+        {
+          "dependentTasksOutputFiles": "packages/{core,react}/dist/**/*"
+        }
+      ],
+      "options": {
+        "command": "bun scripts/build-storybook.ts shadcn",
+        "cwd": "apps/docs"
+      },
+      "outputs": ["{projectRoot}/public/storybook/shadcn"],
       "cache": true
     },
     "build-storybook-zaidan": {

@@ -6,6 +6,8 @@
   "scripts": {
     "dev": "nx run-many -t dev",
     "build": "nx run-many -t build",
+    "storybook": "nx run-many -t storybook -p start-heroui-example start-shadcn-example start-solid-zaidan-example",
+    "storybook:build": "nx run-many -t storybook:build -p start-heroui-example start-shadcn-example start-solid-zaidan-example",
     "test": "nx run-many -t test",
     "registry:build": "nx run-many -t registry:build -p start-shadcn-example start-solid-zaidan-example"
   },
