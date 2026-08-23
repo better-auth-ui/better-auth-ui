@@ -1,7 +1,8 @@
 import {
   type AuthSocialProvider,
   getProviderId,
-  getProviderName
+  getProviderName,
+  isSessionNotFreshError
 } from "@better-auth-ui/core"
 import {
   renderProviderIcon,
@@ -11,11 +12,20 @@ import {
   useUnlinkAccount
 } from "@better-auth-ui/react"
 import { Link, LinkSlash, PlugConnection } from "@gravity-ui/icons"
-import { Button, cn, Skeleton, Spinner, toast } from "@heroui/react"
+import {
+  AlertDialog,
+  Button,
+  cn,
+  Skeleton,
+  Spinner,
+  toast
+} from "@heroui/react"
 import type { Account } from "better-auth"
+import { FreshSessionPrompt } from "./fresh-session-prompt"
 
 export type LinkedAccountProps = {
   account?: Account
+  canUnlink?: boolean
   provider: AuthSocialProvider | string
 }
 
@@ -29,7 +39,11 @@ export type LinkedAccountProps = {
  * @param provider - The provider id
  * @returns A JSX element containing the linked account row
  */
-export function LinkedAccount({ account, provider }: LinkedAccountProps) {
+export function LinkedAccount({
+  account,
+  canUnlink = true,
+  provider
+}: LinkedAccountProps) {
   const { authClient, baseURL, localization } = useAuth()
 
   const { data: accountInfo, isPending: isLoadingInfo } = useAccountInfo(
@@ -39,12 +53,9 @@ export function LinkedAccount({ account, provider }: LinkedAccountProps) {
 
   const { mutate: linkSocial, isPending: isLinking } = useLinkSocial(authClient)
 
-  const { mutate: unlinkAccount, isPending: isUnlinking } = useUnlinkAccount(
-    authClient,
-    {
-      onSuccess: () => toast.success(localization.settings.accountUnlinked)
-    }
-  )
+  const unlinkAccount = useUnlinkAccount(authClient, {
+    onSuccess: () => toast.success(localization.settings.accountUnlinked)
+  })
 
   const providerId = getProviderId(provider)
   const providerIcon = renderProviderIcon(provider, {
@@ -61,75 +72,121 @@ export function LinkedAccount({ account, provider }: LinkedAccountProps) {
     accountInfo?.user?.email ||
     accountInfo?.user?.name ||
     account?.accountId
+  const needsFreshSession = isSessionNotFreshError(unlinkAccount.error)
 
   return (
-    <div className="flex items-center gap-3">
-      <div
-        className={cn(
-          "flex size-10 shrink-0 items-center justify-center rounded-xl bg-surface-secondary",
-          !account && "opacity-50"
-        )}
-      >
-        {providerIcon ? providerIcon : <PlugConnection className="size-4.5" />}
-      </div>
+    <>
+      <div className="flex items-center gap-3">
+        <div
+          className={cn(
+            "flex size-10 shrink-0 items-center justify-center rounded-xl bg-surface-secondary",
+            !account && "opacity-50"
+          )}
+        >
+          {providerIcon ? (
+            providerIcon
+          ) : (
+            <PlugConnection className="size-4.5" />
+          )}
+        </div>
 
-      <div className="flex flex-col min-w-0">
-        <span className="text-sm font-medium leading-tight">
-          {providerName}
-        </span>
-
-        {account && isLoadingInfo ? (
-          <Skeleton className="h-3 w-24 my-0.5 rounded-lg" />
-        ) : (
-          <span className="text-xs text-muted truncate">
-            {account
-              ? displayName
-              : localization.settings.linkProvider.replace(
-                  "{{provider}}",
-                  providerName
-                )}
+        <div className="flex flex-col min-w-0">
+          <span className="text-sm font-medium leading-tight">
+            {providerName}
           </span>
+
+          {account && isLoadingInfo ? (
+            <Skeleton className="h-3 w-24 my-0.5 rounded-lg" />
+          ) : (
+            <span className="text-xs text-muted truncate">
+              {account
+                ? displayName
+                : localization.settings.linkProvider.replace(
+                    "{{provider}}",
+                    providerName
+                  )}
+            </span>
+          )}
+        </div>
+
+        {account ? (
+          <span
+            className="ml-auto shrink-0"
+            title={
+              canUnlink
+                ? undefined
+                : localization.settings.lastAccountUnlinkingDisabled
+            }
+          >
+            <Button
+              variant="outline"
+              size="sm"
+              onPress={() => unlinkAccount.mutate({ accountId: account.id })}
+              isPending={unlinkAccount.isPending}
+              isDisabled={!canUnlink}
+              aria-label={localization.settings.unlinkProvider.replace(
+                "{{provider}}",
+                providerName
+              )}
+            >
+              {unlinkAccount.isPending ? (
+                <Spinner color="current" size="sm" />
+              ) : (
+                <LinkSlash />
+              )}
+              {localization.settings.unlinkProvider
+                .replace("{{provider}}", "")
+                .trim()}
+            </Button>
+          </span>
+        ) : (
+          <Button
+            className="ml-auto shrink-0"
+            variant="outline"
+            size="sm"
+            onPress={() =>
+              linkSocial({
+                provider: providerId,
+                callbackURL: `${baseURL}${window.location.pathname}`
+              })
+            }
+            isPending={isLinking}
+            aria-label={localization.settings.linkProvider.replace(
+              "{{provider}}",
+              providerName
+            )}
+          >
+            {isLinking ? <Spinner color="current" size="sm" /> : <Link />}
+            {localization.settings.link}
+          </Button>
         )}
       </div>
-
-      {account ? (
-        <Button
-          className="ml-auto shrink-0"
-          variant="outline"
-          size="sm"
-          onPress={() => unlinkAccount({ accountId: account.id })}
-          isPending={isUnlinking}
-          aria-label={localization.settings.unlinkProvider.replace(
-            "{{provider}}",
-            providerName
-          )}
+      {account && (
+        <AlertDialog.Backdrop
+          isOpen={needsFreshSession}
+          onOpenChange={(nextOpen) => {
+            if (!nextOpen) unlinkAccount.reset()
+          }}
         >
-          {isUnlinking ? <Spinner color="current" size="sm" /> : <LinkSlash />}
-          {localization.settings.unlinkProvider
-            .replace("{{provider}}", "")
-            .trim()}
-        </Button>
-      ) : (
-        <Button
-          className="ml-auto shrink-0"
-          variant="outline"
-          size="sm"
-          onPress={() =>
-            linkSocial({
-              provider: providerId,
-              callbackURL: `${baseURL}${window.location.pathname}`
-            })
-          }
-          isPending={isLinking}
-          aria-label={localization.settings.linkProvider.replace(
-            "{{provider}}",
-            providerName
-          )}
-        >
-          {isLinking ? <Spinner color="current" size="sm" /> : <Link />}
-          {localization.settings.link}
-        </Button>
+          <AlertDialog.Container>
+            <AlertDialog.Dialog>
+              <AlertDialog.CloseTrigger />
+              <AlertDialog.Header>
+                <AlertDialog.Heading className="sr-only">
+                  {localization.settings.freshSessionTitle}
+                </AlertDialog.Heading>
+              </AlertDialog.Header>
+              <AlertDialog.Body>
+                <FreshSessionPrompt
+                  onFresh={() =>
+                    unlinkAccount.mutate({ accountId: account.id })
+                  }
+                />
+              </AlertDialog.Body>
+            </AlertDialog.Dialog>
+          </AlertDialog.Container>
+        </AlertDialog.Backdrop>
       )}
-    </div>
+    </>
   )
 }

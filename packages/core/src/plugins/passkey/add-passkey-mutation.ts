@@ -34,7 +34,8 @@ export function addPasskeyOptions<TAuthClient extends PasskeyAuthClient>(
     mutationKey,
     mutationFn,
     meta: {
-      awaits: [passkeyQueryKeys.lists(userId)]
+      awaits: [passkeyQueryKeys.lists(userId)],
+      errorPresentation: "inline"
     }
   } as MutationOptions<
     Awaited<ReturnType<typeof mutationFn>>,

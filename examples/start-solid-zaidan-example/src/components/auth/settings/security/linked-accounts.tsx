@@ -24,6 +24,9 @@ export function LinkedAccountsSettings(
     ((linkedAccounts.data ?? []) as LinkedAccount[]).filter(
       (account) => account.providerId !== "credential"
     )
+  const canUnlink = () =>
+    auth.allowUnlinkingAllAccounts === true ||
+    ((linkedAccounts.data as LinkedAccount[] | undefined)?.length ?? 0) > 1
   const availableProviders = () => {
     if (auth.multipleAccountsPerProvider !== false) return socialProviders()
 
@@ -89,6 +92,7 @@ export function LinkedAccountsSettings(
                     </Show>
                     <LinkedAccountRow
                       account={row.account}
+                      canUnlink={canUnlink()}
                       provider={row.provider}
                     />
                   </>

@@ -2123,7 +2123,9 @@ describe("Solid auth route component selection", () => {
     expect(activeSessions).toContain("<ActiveSessionRow")
     expect(activeSessions).toContain("<ItemGroup")
     expect(activeSessions).toContain("<ItemSeparator")
-    expect(activeSessions).toContain('<Card class="z-card-padding-none">')
+    expect(activeSessions).toContain(
+      '<Card class="z-card-padding-none gap-0!">'
+    )
     expect(activeSessions).toContain(
       '<CardContent class="z-card-content-padding-none">'
     )
@@ -2567,8 +2569,10 @@ describe("Solid auth route component selection", () => {
     expect(deleteApiKeyDialog).toContain("useDeleteApiKey")
     expect(deleteApiKeyDialog).toContain('configId: "organization"')
     expect(organizationApiKeys).not.toContain("useActiveOrganization")
-    expect(organizationApiKeys).toContain("useListOrganizationMembers")
-    expect(organizationApiKeys).toContain('hasMemberRole(member.role, "owner")')
+    expect(organizationApiKeys).toContain("useActiveMemberRole")
+    expect(organizationApiKeys).toContain(
+      "hasMemberRole(memberRole.data?.role, config.creatorRole)"
+    )
     expect(organizationApiKeys).toContain(
       "organizationId: props.organizationId"
     )
@@ -3018,7 +3022,7 @@ describe("Solid auth route component selection", () => {
       /<Button disabled size="sm" type="button" variant="destructive">\s*Delete user/
     )
     expect(deleteUserStory).toContain('title: "Zaidan/Plugins/Delete User"')
-    expect(deleteUserStory).toContain("function DeleteAccountStory()")
+    expect(deleteUserStory).toContain("function DeleteAccountStory(props:")
     expect(deleteUserStory).toContain("<DangerZone />")
     expect(deleteUserStory).toContain("plugins={[deleteUserPlugin()]}")
     expect(deleteUserStory).toContain("queryClient={queryClient}")
@@ -3093,14 +3097,16 @@ describe("Solid auth route component selection", () => {
     }
 
     expect(organizationApiKeys).not.toContain("useActiveOrganization")
-    expect(organizationApiKeys).toContain("useListOrganizationMembers")
+    expect(organizationApiKeys).toContain("useActiveMemberRole")
     expect(organizationApiKeys).toContain("hasMemberRole")
     expect(organizationApiKeys).toContain("organizationId: string")
     expect(organizationApiKeys).toContain("organizationSlug: string")
     expect(organizationApiKeys).toContain(
       "query: { organizationId: props.organizationId }"
     )
-    expect(organizationApiKeys).toContain('hasMemberRole(member.role, "owner")')
+    expect(organizationApiKeys).toContain(
+      "hasMemberRole(memberRole.data?.role, config.creatorRole)"
+    )
     expect(activeOrganizationQuery).toContain("resolveActiveOrganizationQuery")
     expect(coreActiveOrganizationQuery).toContain("organizationSlug === null")
     expect(coreActiveOrganizationQuery).toContain("async () => null")
@@ -3596,7 +3602,7 @@ describe("Solid auth route component selection", () => {
       'next as UpdateMemberRoleParams["role"]'
     )
     expect(organizationMemberRow).toContain("parseMemberRoles")
-    expect(organizationMemberRow).toContain('key !== "owner"')
+    expect(organizationMemberRow).toContain("key !== config.creatorRole")
     expect(organizationMemberRow).toContain("useSession")
     expect(organizationMemberRow).toContain("session.data?.user.id")
     expect(organizationMemberRow).toContain("RemoveMemberDialog")
@@ -3759,8 +3765,10 @@ describe("Solid auth route component selection", () => {
     const magicLinkStory = readFileSync(magicLinkStoryPath, "utf8")
 
     expect(magicLinkStory).toContain('title: "Zaidan/Plugins/Magic Link"')
-    expect(magicLinkStory).toContain("function MagicLinkStory()")
-    expect(magicLinkStory).toContain("export const Preview: Story = {}")
+    expect(magicLinkStory).toContain("function MagicLinkStory(props:")
+    expect(magicLinkStory).toContain(
+      "export const Preview: Story = { play: storyRenders }"
+    )
     expect(magicLinkStory).toContain("RouterProvider")
     expect(magicLinkStory).toContain("createMemoryHistory")
     expect(magicLinkStory).toContain("plugins={[magicLinkPlugin()]}")

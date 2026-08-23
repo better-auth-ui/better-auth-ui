@@ -15,11 +15,14 @@ export function useSignInEmail<TAuthClient extends AuthClient>(
   options?: UseSignInEmailOptions<TAuthClient>,
   queryClient?: Accessor<QueryClient>
 ) {
-  return useMutation(
-    () => ({
-      ...signInEmailOptions(authClient),
-      ...(options?.() ?? {})
-    }),
-    queryClient
-  )
+  return useMutation(() => {
+    const mutationOptions = signInEmailOptions(authClient)
+    const consumerOptions = options?.()
+
+    return {
+      ...mutationOptions,
+      ...consumerOptions,
+      meta: { ...mutationOptions.meta, ...consumerOptions?.meta }
+    }
+  }, queryClient)
 }

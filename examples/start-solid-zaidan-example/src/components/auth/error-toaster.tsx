@@ -1,6 +1,7 @@
 import {
   authMutationKeys,
   authQueryKeys,
+  getAuthErrorPresentation,
   isPasswordCompromisedError,
   isSessionNotFreshError
 } from "@better-auth-ui/core"
@@ -25,6 +26,7 @@ export function ErrorToaster() {
       previousQueryOnError?.(error, query)
 
       if (!matchQuery({ queryKey: authQueryKeys.all }, query)) return
+      if (getAuthErrorPresentation(query.meta) !== "toast") return
       if (isSessionNotFreshError(error)) return
 
       const err = error as BetterFetchError
@@ -53,6 +55,7 @@ export function ErrorToaster() {
       if (!matchMutation({ mutationKey: authMutationKeys.all }, mutation)) {
         return
       }
+      if (getAuthErrorPresentation(mutation.meta) !== "toast") return
       if (isSessionNotFreshError(error)) return
       // Every form that sets a new password renders this one against the
       // password field, so a toast would just repeat it.

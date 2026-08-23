@@ -1,5 +1,6 @@
 import { formatAdditionalFieldValue } from "@better-auth-ui/core"
 import {
+  hasMemberRole,
   type LeaveOrganizationParams,
   memberRoleLabels,
   type OrganizationAuthClient,
@@ -13,6 +14,7 @@ import {
   useActiveOrganization,
   useHasPermission,
   useLeaveOrganization,
+  useListUserTeams,
   useRemoveMember,
   useUpdateMemberRole
 } from "@better-auth-ui/solid/plugins/organization"
@@ -36,6 +38,7 @@ import {
   DropdownMenuContent,
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu"
+import { Skeleton } from "@/components/ui/skeleton"
 import { TableCell, TableRow } from "@/components/ui/table"
 import { organizationPlugin } from "@/lib/auth/organization-plugin"
 
@@ -64,13 +67,17 @@ type MemberLocalization = Pick<
   | "leaveOrganization"
   | "leaveOrganizationDescription"
   | "leftOrganization"
+  | "onlyOwnerActionDisabled"
+  | "noTeams"
 >
 
 export type OrganizationMemberRowProps = {
   isOwner: boolean
   localization: MemberLocalization
   member: OrganizationMember
+  ownerCount?: number
   roles: RoleMap
+  showTeams?: boolean
 }
 
 function formatRole(role?: string | null) {
@@ -206,6 +213,13 @@ export function OrganizationMemberRow(props: OrganizationMemberRowProps) {
     organizationId: props.member.organizationId,
     permissions: { member: ["delete"] }
   }))
+  const memberTeams = useListUserTeams(auth.authClient, () => ({
+    query: {
+      organizationId: props.member.organizationId,
+      ...(props.member.userId ? { userId: props.member.userId } : {})
+    },
+    enabled: props.showTeams === true && Boolean(props.member.userId)
+  }))
   const updateMemberRole = useUpdateMemberRole(auth.authClient, () => ({
     onSuccess: () => toast.success(props.localization.memberRoleUpdated)
   }))
@@ -216,6 +230,12 @@ export function OrganizationMemberRow(props: OrganizationMemberRowProps) {
 
   // Better Auth persists multiple roles as one comma-joined string.
   const memberRoles = () => parseMemberRoles(props.member.role)
+  const targetIsOwner = () =>
+    hasMemberRole(props.member.role, config.creatorRole)
+  const canManageTarget = () => props.isOwner || !targetIsOwner()
+  const onlyOwnerActionDisabled = () =>
+    targetIsOwner() && (props.ownerCount === undefined || props.ownerCount <= 1)
+  const teamNames = () => memberTeams.data?.map((team) => team.name).join(", ")
 
   const toggleRole = (role: string) => {
     const current = memberRoles()
@@ -263,9 +283,27 @@ export function OrganizationMemberRow(props: OrganizationMemberRowProps) {
         {memberRoleLabels(props.member.role, props.roles).join(", ") ||
           formatRole(props.member.role)}
       </TableCell>
+      <Show when={props.showTeams}>
+        <TableCell class="text-sm">
+          <Show
+            when={!memberTeams.isPending}
+            fallback={<Skeleton class="h-4 w-24 rounded-md" />}
+          >
+            <Show when={!memberTeams.isError}>
+              <span
+                classList={{
+                  "text-muted-foreground": !teamNames()
+                }}
+              >
+                {teamNames() || props.localization.noTeams}
+              </span>
+            </Show>
+          </Show>
+        </TableCell>
+      </Show>
       <TableCell class="text-end">
         <div class="flex justify-end gap-2">
-          <Show when={permission.isPending}>
+          <Show when={canManageTarget() && permission.isPending}>
             <Button
               aria-label={props.localization.changeMemberRole}
               class="size-8"
@@ -277,7 +315,7 @@ export function OrganizationMemberRow(props: OrganizationMemberRowProps) {
               <Pencil class="size-4" />
             </Button>
           </Show>
-          <Show when={permission.data?.success}>
+          <Show when={canManageTarget() && permission.data?.success}>
             <DropdownMenu>
               <DropdownMenuTrigger
                 as={Button}
@@ -299,7 +337,10 @@ export function OrganizationMemberRow(props: OrganizationMemberRowProps) {
                       disabled={
                         updateMemberRole.isPending ||
                         (memberRoles().includes(role) &&
-                          memberRoles().length === 1)
+                          memberRoles().length === 1) ||
+                        (role === config.creatorRole &&
+                          memberRoles().includes(role) &&
+                          onlyOwnerActionDisabled())
                       }
                       onChange={() => toggleRole(role)}
                     >
@@ -313,11 +354,18 @@ export function OrganizationMemberRow(props: OrganizationMemberRowProps) {
           <Show
             when={
               deletePermission.data?.success &&
+              canManageTarget() &&
               props.member.userId !== session.data?.user.id
             }
           >
             <Button
               aria-label={props.localization.removeMember}
+              disabled={onlyOwnerActionDisabled()}
+              title={
+                onlyOwnerActionDisabled()
+                  ? props.localization.onlyOwnerActionDisabled
+                  : undefined
+              }
               onClick={() => setRemoveOpen(true)}
               size="icon-sm"
               type="button"
@@ -329,6 +377,7 @@ export function OrganizationMemberRow(props: OrganizationMemberRowProps) {
           <Show
             when={
               deletePermission.isPending &&
+              canManageTarget() &&
               props.member.userId !== session.data?.user.id
             }
           >
@@ -345,6 +394,12 @@ export function OrganizationMemberRow(props: OrganizationMemberRowProps) {
           <Show when={props.member.userId === session.data?.user.id}>
             <Button
               aria-label={props.localization.leaveOrganization}
+              disabled={onlyOwnerActionDisabled()}
+              title={
+                onlyOwnerActionDisabled()
+                  ? props.localization.onlyOwnerActionDisabled
+                  : undefined
+              }
               onClick={() => setLeaveOpen(true)}
               size="icon-sm"
               type="button"

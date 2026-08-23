@@ -13,10 +13,13 @@ export function useSignInEmail<TAuthClient extends AuthClient>(
   options?: SignInEmailOptions<TAuthClient>,
   queryClient?: QueryClient
 ) {
+  const mutationOptions = signInEmailOptions(authClient)
+
   return useMutation(
     {
-      ...signInEmailOptions(authClient),
-      ...options
+      ...mutationOptions,
+      ...options,
+      meta: { ...mutationOptions.meta, ...options?.meta }
     },
     queryClient
   )

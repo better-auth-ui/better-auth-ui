@@ -1,7 +1,8 @@
 import {
   getProviderId,
   getProviderName,
-  isCustomSocialProvider
+  isCustomSocialProvider,
+  isSessionNotFreshError
 } from "@better-auth-ui/core"
 import {
   useAccountInfo,
@@ -21,6 +22,12 @@ import type {
 } from "@/components/auth/settings/shared/types"
 import { Button } from "@/components/ui/button"
 import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle
+} from "@/components/ui/dialog"
+import {
   Item,
   ItemActions,
   ItemContent,
@@ -31,6 +38,7 @@ import {
 import { Skeleton } from "@/components/ui/skeleton"
 import { Spinner } from "@/components/ui/spinner"
 import { cn } from "@/lib/utils"
+import { FreshSessionPrompt } from "./fresh-session-prompt"
 
 function GitHubIcon(props: ComponentProps<"svg">) {
   return (
@@ -102,6 +110,7 @@ export function ProviderIcon(props: {
 
 export function LinkedAccountRow(props: {
   account?: LinkedAccount
+  canUnlink?: boolean
   provider: LinkedProvider
 }) {
   const auth = useAuth()
@@ -144,62 +153,88 @@ export function LinkedAccountRow(props: {
   }
 
   return (
-    <Item>
-      <ItemMedia variant="icon">
-        <ProviderIcon account={props.account} provider={props.provider} />
-      </ItemMedia>
-      <ItemContent>
-        <ItemTitle>{providerName()}</ItemTitle>
-        <Show
-          fallback={
-            <ItemDescription>
-              {props.account ? displayName() : linkProviderLabel()}
-            </ItemDescription>
-          }
-          when={props.account && accountInfo.isPending}
-        >
-          <Skeleton class="my-0.5 h-3 w-24" />
-        </Show>
-      </ItemContent>
-      <ItemActions>
-        <Show
-          fallback={
-            <Button
-              aria-label={linkProviderLabel()}
-              disabled={linkSocial.isPending}
-              onClick={linkProvider}
-              size="sm"
-              type="button"
-              variant="outline"
-            >
-              <Show fallback={<Link2 />} when={linkSocial.isPending}>
-                <Spinner />
-              </Show>
-              {auth.localization.settings.link}
-            </Button>
-          }
-          when={props.account}
-        >
-          {(account) => (
-            <Button
-              aria-label={unlinkProviderLabel()}
-              disabled={unlinkAccount.isPending}
-              onClick={() => unlinkProvider(account())}
-              size="sm"
-              type="button"
-              variant="outline"
-            >
-              <Show fallback={<Link2Off />} when={unlinkAccount.isPending}>
-                <Spinner />
-              </Show>
-              {auth.localization.settings.unlinkProvider
-                .replace("{{provider}}", "")
-                .trim()}
-            </Button>
-          )}
-        </Show>
-      </ItemActions>
-    </Item>
+    <>
+      <Item>
+        <ItemMedia variant="icon">
+          <ProviderIcon account={props.account} provider={props.provider} />
+        </ItemMedia>
+        <ItemContent>
+          <ItemTitle>{providerName()}</ItemTitle>
+          <Show
+            fallback={
+              <ItemDescription>
+                {props.account ? displayName() : linkProviderLabel()}
+              </ItemDescription>
+            }
+            when={props.account && accountInfo.isPending}
+          >
+            <Skeleton class="my-0.5 h-3 w-24" />
+          </Show>
+        </ItemContent>
+        <ItemActions>
+          <Show
+            fallback={
+              <Button
+                aria-label={linkProviderLabel()}
+                disabled={linkSocial.isPending}
+                onClick={linkProvider}
+                size="sm"
+                type="button"
+                variant="outline"
+              >
+                <Show fallback={<Link2 />} when={linkSocial.isPending}>
+                  <Spinner />
+                </Show>
+                {auth.localization.settings.link}
+              </Button>
+            }
+            when={props.account}
+          >
+            {(account) => (
+              <Button
+                aria-label={unlinkProviderLabel()}
+                disabled={unlinkAccount.isPending || props.canUnlink === false}
+                title={
+                  props.canUnlink === false
+                    ? auth.localization.settings.lastAccountUnlinkingDisabled
+                    : undefined
+                }
+                onClick={() => unlinkProvider(account())}
+                size="sm"
+                type="button"
+                variant="outline"
+              >
+                <Show fallback={<Link2Off />} when={unlinkAccount.isPending}>
+                  <Spinner />
+                </Show>
+                {auth.localization.settings.unlinkProvider
+                  .replace("{{provider}}", "")
+                  .trim()}
+              </Button>
+            )}
+          </Show>
+        </ItemActions>
+      </Item>
+      <Show when={props.account}>
+        {(account) => (
+          <Dialog
+            open={isSessionNotFreshError(unlinkAccount.error)}
+            onOpenChange={(nextOpen) => {
+              if (!nextOpen) unlinkAccount.reset()
+            }}
+          >
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle class="sr-only">
+                  {auth.localization.settings.freshSessionTitle}
+                </DialogTitle>
+              </DialogHeader>
+              <FreshSessionPrompt onFresh={() => unlinkProvider(account())} />
+            </DialogContent>
+          </Dialog>
+        )}
+      </Show>
+    </>
   )
 }
 

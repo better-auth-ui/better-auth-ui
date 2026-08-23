@@ -123,6 +123,8 @@ const deLocalization = deepmerge(localization, {
     deleteAvatar: "Profilbild löschen",
     link: "Verknüpfen",
     linkedAccounts: "Verknüpfte Konten",
+    lastAccountUnlinkingDisabled:
+      "Verknüpfe eine andere Anmeldemethode, bevor du dieses Konto trennst.",
     linkProvider: "{{provider}}-Konto verknüpfen",
     cancel: "Abbrechen",
     copyToClipboard: "In die Zwischenablage kopieren",

@@ -142,6 +142,11 @@ export const organizationLocalization = {
   /** @remarks `"Invitations to join an organization will show up here."` */
   userInvitationsEmptyDescription:
     "Invitations to join an organization will show up here.",
+  /** @remarks `"Verify your email to view invitations"` */
+  verifyEmailToViewInvitations: "Verify your email to view invitations",
+  /** @remarks `"For your security, invitations are available after you verify your email address."` */
+  verifyEmailToViewInvitationsDescription:
+    "For your security, invitations are available after you verify your email address.",
   teams: "Teams",
   team: "Team",
   teamsDescription: "Create teams and manage their members.",
@@ -151,6 +156,8 @@ export const organizationLocalization = {
   createTeam: "Create team",
   renameTeam: "Rename team",
   deleteTeam: "Delete team",
+  deleteTeamDescription:
+    "Delete this team and remove its member assignments. This cannot be undone.",
   noTeams: "No teams",
   noTeamsDescription:
     "Create a team to organize access within this organization.",
@@ -163,6 +170,9 @@ export const organizationLocalization = {
   teamLimitReached: "This organization has reached its team limit.",
   teamMemberLimitReached: "This team has reached its member limit.",
   lastTeamRemovalDisabled: "This organization must keep at least one team.",
+  activeTeamRemovalDisabled:
+    "Switch to another team before deleting this team.",
+  onlyOwnerActionDisabled: "Transfer ownership before removing the only owner.",
   limitReached: "Limit reached",
   organizationLimitReached: "You have reached the organization limit.",
   membershipLimitReached: "This organization has reached its member limit.",

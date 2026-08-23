@@ -248,7 +248,6 @@ describe("Solid auth behavior parity", () => {
       if (file.includes("/mutations/")) {
         expect(source).toMatch(/useMutation\([\s\S]*,\s*queryClient\s*\)/)
         expect(source).toContain("queryClient?: Accessor<QueryClient>")
-        expect(source).toContain("...(options?.() ?? {})")
         expect(source).not.toContain("createMutation")
       } else {
         expect(source).toMatch(/useQuery\([\s\S]*,\s*queryClient\s*\)/)
@@ -811,7 +810,8 @@ describe("Solid auth behavior parity", () => {
       const userId = "user-1"
 
       expect(addPasskeyOptions(authClient as never, userId).meta).toEqual({
-        awaits: [passkeyQueryKeys.lists(userId)]
+        awaits: [passkeyQueryKeys.lists(userId)],
+        errorPresentation: "inline"
       })
       expect(deletePasskeyOptions(authClient as never, userId).meta).toEqual({
         awaits: [passkeyQueryKeys.lists(userId)]

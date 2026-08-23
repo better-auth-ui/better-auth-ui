@@ -10,7 +10,7 @@ export type SignInEmailParams<TAuthClient extends AuthClient> = Parameters<
 
 export type SignInEmailOptions<TAuthClient extends AuthClient> = Omit<
   ReturnType<typeof signInEmailOptions<TAuthClient>>,
-  "mutationKey" | "mutationFn" | "meta"
+  "mutationKey" | "mutationFn"
 >
 
 /**

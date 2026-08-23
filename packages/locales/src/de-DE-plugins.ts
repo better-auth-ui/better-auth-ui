@@ -490,6 +490,10 @@ export const deDEPlugins = {
     uploadLogo: "Logo hochladen",
     userInvitationsEmptyDescription:
       "Einladungen zum Beitritt zu einer Organisation werden hier angezeigt.",
+    verifyEmailToViewInvitations:
+      "Bestätige deine E-Mail-Adresse, um Einladungen anzuzeigen",
+    verifyEmailToViewInvitationsDescription:
+      "Aus Sicherheitsgründen sind Einladungen erst nach der Bestätigung deiner E-Mail-Adresse verfügbar.",
     teams: "Teams",
     team: "Team",
     teamsDescription: "Erstelle Teams und verwalte ihre Mitglieder.",
@@ -499,6 +503,8 @@ export const deDEPlugins = {
     createTeam: "Team erstellen",
     renameTeam: "Team umbenennen",
     deleteTeam: "Team löschen",
+    deleteTeamDescription:
+      "Lösche dieses Team und entferne seine Mitgliederzuweisungen. Dies kann nicht rückgängig gemacht werden.",
     noTeams: "Keine Teams",
     noTeamsDescription:
       "Erstelle ein Team, um den Zugriff innerhalb dieser Organisation zu ordnen.",
@@ -512,6 +518,10 @@ export const deDEPlugins = {
     teamMemberLimitReached: "Dieses Team hat sein Mitgliederlimit erreicht.",
     lastTeamRemovalDisabled:
       "Diese Organisation muss mindestens ein Team behalten.",
+    activeTeamRemovalDisabled:
+      "Wechsle zu einem anderen Team, bevor du dieses Team löschst.",
+    onlyOwnerActionDisabled:
+      "Übertrage die Inhaberschaft, bevor du den einzigen Inhaber entfernst.",
     limitReached: "Limit erreicht",
     organizationLimitReached: "Du hast das Organisationslimit erreicht.",
     membershipLimitReached:

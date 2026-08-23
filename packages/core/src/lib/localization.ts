@@ -307,6 +307,9 @@ export const localization = {
 
     /** @remarks `"Linked accounts"` */
     linkedAccounts: "Linked accounts",
+    /** @remarks `"Link another sign-in method before unlinking this account."` */
+    lastAccountUnlinkingDisabled:
+      "Link another sign-in method before unlinking this account.",
 
     /** @remarks `"Link your {{provider}} account"` */
     linkProvider: "Link your {{provider}} account",

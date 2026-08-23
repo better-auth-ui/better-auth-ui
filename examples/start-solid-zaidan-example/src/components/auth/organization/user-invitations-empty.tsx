@@ -1,5 +1,5 @@
-import { organizationLocalization } from "@better-auth-ui/core/plugins/organization"
-import { Send } from "lucide-solid"
+import { useAuthPlugin } from "@better-auth-ui/solid"
+import { MailWarning, Send } from "lucide-solid"
 import {
   Empty,
   EmptyDescription,
@@ -7,17 +7,28 @@ import {
   EmptyMedia,
   EmptyTitle
 } from "@/components/ui/empty"
+import { organizationPlugin } from "@/lib/auth/organization-plugin"
 
-export function UserInvitationsEmpty() {
+export function UserInvitationsEmpty(props: {
+  verificationRequired?: boolean
+}) {
+  const config = useAuthPlugin(organizationPlugin)
+
   return (
     <Empty>
       <EmptyHeader>
         <EmptyMedia variant="icon">
-          <Send />
+          {props.verificationRequired ? <MailWarning /> : <Send />}
         </EmptyMedia>
-        <EmptyTitle>{organizationLocalization.noInvitations}</EmptyTitle>
+        <EmptyTitle>
+          {props.verificationRequired
+            ? config.localization.verifyEmailToViewInvitations
+            : config.localization.noInvitations}
+        </EmptyTitle>
         <EmptyDescription>
-          {organizationLocalization.userInvitationsEmptyDescription}
+          {props.verificationRequired
+            ? config.localization.verifyEmailToViewInvitationsDescription
+            : config.localization.userInvitationsEmptyDescription}
         </EmptyDescription>
       </EmptyHeader>
     </Empty>

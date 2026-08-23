@@ -109,6 +109,9 @@ const fallbackLocalization = {
   leaveOrganizationDescription:
     "Leave this organization and lose access to its data and resources. You'll need a new invitation to rejoin.",
   leftOrganization: "You left the organization",
+  onlyOwnerActionDisabled: "Transfer ownership before removing the only owner.",
+  teams: "Teams",
+  noTeams: "No teams",
   search: "Search...",
   clear: "Clear",
   all: "All",
@@ -129,6 +132,9 @@ const fallbackLocalization = {
   | "leaveOrganization"
   | "leaveOrganizationDescription"
   | "leftOrganization"
+  | "onlyOwnerActionDisabled"
+  | "teams"
+  | "noTeams"
   | "search"
   | "clear"
   | "all"
@@ -227,8 +233,22 @@ export function OrganizationMembers(props: OrganizationMembersProps) {
   // The signed-in user need not be on the loaded page, so their own role comes
   // from a dedicated endpoint rather than from the member list.
   const activeMemberRole = useActiveMemberRole(auth.authClient)
+  const owners = useListOrganizationMembers(auth.authClient, () => ({
+    query: {
+      organizationId: props.organizationId,
+      filterField: "role",
+      filterValue: config.creatorRole,
+      filterOperator: "contains",
+      limit: 1
+    }
+  }))
   const canInvite = useHasPermission(auth.authClient, () => ({
     permissions: { invitation: ["create"] }
+  }))
+  const canListMemberTeams = useHasPermission(auth.authClient, () => ({
+    organizationId: props.organizationId,
+    permissions: { member: ["update"] },
+    enabled: config.teams
   }))
   const canReadRoles = useHasPermission(auth.authClient, () => ({
     permissions: { ac: ["read"] }
@@ -253,6 +273,9 @@ export function OrganizationMembers(props: OrganizationMembersProps) {
             | "leaveOrganization"
             | "leaveOrganizationDescription"
             | "leftOrganization"
+            | "onlyOwnerActionDisabled"
+            | "teams"
+            | "noTeams"
             | "search"
             | "clear"
             | "all"
@@ -344,6 +367,9 @@ export function OrganizationMembers(props: OrganizationMembersProps) {
   }
   const isOwner = () =>
     hasMemberRole(activeMemberRole.data?.role, config.creatorRole)
+  const ownerCount = () => owners.data?.total ?? owners.data?.members.length
+  const showTeams = () =>
+    config.teams && canListMemberTeams.data?.success === true
 
   const total = () => members.data?.total ?? memberRows().length
   const pageStart = () => page() * (pageSize() ?? 0)
@@ -386,13 +412,17 @@ export function OrganizationMembers(props: OrganizationMembersProps) {
         </Show>
       </div>
       <Show
-        when={!members.isPending}
+        when={
+          !members.isPending &&
+          !owners.isPending &&
+          !(config.teams && canListMemberTeams.isPending)
+        }
         fallback={
           <Card class="z-card-padding-none">
             <Table>
               <TableBody>
-                <OrganizationMemberRowSkeleton />
-                <OrganizationMemberRowSkeleton />
+                <OrganizationMemberRowSkeleton showTeams={config.teams} />
+                <OrganizationMemberRowSkeleton showTeams={config.teams} />
               </TableBody>
             </Table>
           </Card>
@@ -503,6 +533,9 @@ export function OrganizationMembers(props: OrganizationMembersProps) {
                   >
                     {localization().role}
                   </SortableTableHead>
+                  <Show when={showTeams()}>
+                    <TableHead>{localization().teams}</TableHead>
+                  </Show>
                   <TableHead class="z-table-head-align-end">Actions</TableHead>
                 </TableRow>
               </TableHeader>
@@ -513,7 +546,7 @@ export function OrganizationMembers(props: OrganizationMembersProps) {
                     <TableRow>
                       <TableCell
                         class="text-muted-foreground text-sm"
-                        colSpan={3}
+                        colSpan={showTeams() ? 4 : 3}
                       >
                         No members match the current filters.
                       </TableCell>
@@ -526,7 +559,9 @@ export function OrganizationMembers(props: OrganizationMembersProps) {
                         isOwner={isOwner()}
                         localization={localization()}
                         member={member}
+                        ownerCount={ownerCount()}
                         roles={roles()}
+                        showTeams={showTeams()}
                       />
                     )}
                   </For>

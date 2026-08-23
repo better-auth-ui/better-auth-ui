@@ -321,7 +321,8 @@ describe("core base endpoint option factories", () => {
       awaits: [apiKeyQueryKeys.all(userId)]
     })
     expect(updateApiKey.meta).toEqual({
-      awaits: [apiKeyQueryKeys.all(userId)]
+      awaits: [apiKeyQueryKeys.all(userId)],
+      errorPresentation: "inline"
     })
     expect(revokeMultiSession.meta).toEqual({
       awaits: [multiSessionQueryKeys.lists(userId)]
@@ -330,7 +331,8 @@ describe("core base endpoint option factories", () => {
       awaits: [authQueryKeys.session, multiSessionQueryKeys.lists(userId)]
     })
     expect(addPasskey.meta).toEqual({
-      awaits: [passkeyQueryKeys.lists(userId)]
+      awaits: [passkeyQueryKeys.lists(userId)],
+      errorPresentation: "inline"
     })
     expect(deletePasskey.meta).toEqual({
       awaits: [passkeyQueryKeys.lists(userId)]

@@ -24,6 +24,7 @@ export function LinkedAccounts({
 }: LinkedAccountsProps & Omit<CardProps, "children">) {
   const {
     authClient,
+    allowUnlinkingAllAccounts,
     localization,
     multipleAccountsPerProvider,
     socialProviders
@@ -34,6 +35,8 @@ export function LinkedAccounts({
   const linkedAccounts = accounts?.filter(
     (account) => account.providerId !== "credential"
   )
+  const canUnlink =
+    allowUnlinkingAllAccounts === true || (accounts?.length ?? 0) > 1
 
   const linkedProviderIds = new Set(linkedAccounts?.map((a) => a.providerId))
 
@@ -85,6 +88,7 @@ export function LinkedAccounts({
 
                   <LinkedAccount
                     account={row.account}
+                    canUnlink={canUnlink}
                     provider={row.provider}
                   />
                 </div>

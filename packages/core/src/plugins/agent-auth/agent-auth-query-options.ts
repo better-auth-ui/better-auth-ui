@@ -29,6 +29,7 @@ export const agentApprovalOptions = (
 ) =>
   ({
     queryKey: agentAuthQueryKeys.approval(request, userId),
+    meta: { errorPresentation: "inline" },
     queryFn:
       request && userId
         ? ({ signal }) => adapter.getApproval(request, signal)

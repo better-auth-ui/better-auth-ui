@@ -87,6 +87,14 @@ export interface AuthConfig<TAuthClient extends AuthClient = AuthClient> {
    */
   multipleAccountsPerProvider?: boolean
   /**
+   * Allow the UI to unlink the final sign-in account.
+   *
+   * Enable this only when Better Auth's
+   * `account.accountLinking.allowUnlinkingAll` option is also enabled.
+   * @default false
+   */
+  allowUnlinkingAllAccounts?: boolean
+  /**
    * List of enabled social authentication providers
    * Built-in providers can use their string ID. Custom and Generic OAuth
    * providers use `{ id, label, icon }`.
@@ -118,6 +126,7 @@ export interface AuthConfig<TAuthClient extends AuthClient = AuthClient> {
 }
 
 export const defaultAuthConfig: Omit<AuthConfig, "authClient"> = {
+  allowUnlinkingAllAccounts: false,
   avatar: {
     enabled: true,
     resize: resizeAvatar,

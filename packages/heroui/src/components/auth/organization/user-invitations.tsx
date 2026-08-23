@@ -1,5 +1,5 @@
 import type { OrganizationAuthClient } from "@better-auth-ui/core/plugins/organization"
-import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
+import { useAuth, useAuthPlugin, useSession } from "@better-auth-ui/react"
 import { useListUserInvitations } from "@better-auth-ui/react/plugins/organization"
 import { Card, type CardProps } from "@heroui/react"
 
@@ -21,9 +21,12 @@ export function UserInvitations({ variant }: UserInvitationsProps) {
   const { authClient } = useAuth()
   const { localization: organizationLocalization } =
     useAuthPlugin(organizationPlugin)
+  const session = useSession(authClient)
+  const emailVerified = session.data?.user.emailVerified === true
 
   const { data: invitations, isPending } = useListUserInvitations(
-    authClient as OrganizationAuthClient
+    authClient as OrganizationAuthClient,
+    { enabled: emailVerified }
   )
 
   return (
@@ -34,10 +37,10 @@ export function UserInvitations({ variant }: UserInvitationsProps) {
 
       <Card variant={variant}>
         <Card.Content>
-          {isPending ? (
+          {session.isPending || (emailVerified && isPending) ? (
             <UserInvitationRowSkeleton />
           ) : !invitations?.length ? (
-            <UserInvitationsEmpty />
+            <UserInvitationsEmpty verificationRequired={!emailVerified} />
           ) : (
             invitations?.map((invitation, index) => (
               <div key={invitation.id}>

@@ -38,6 +38,7 @@ export function accountInfoOptions<TAuthClient extends AuthClient>(
 
   return {
     queryKey,
+    meta: { errorPresentation: "silent" },
     queryFn:
       userId &&
       query &&

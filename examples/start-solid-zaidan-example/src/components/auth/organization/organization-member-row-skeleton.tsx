@@ -1,7 +1,8 @@
+import { Show } from "solid-js"
 import { Skeleton } from "@/components/ui/skeleton"
 import { TableCell, TableRow } from "@/components/ui/table"
 
-export function OrganizationMemberRowSkeleton() {
+export function OrganizationMemberRowSkeleton(props: { showTeams?: boolean }) {
   return (
     <TableRow>
       <TableCell>
@@ -16,9 +17,11 @@ export function OrganizationMemberRowSkeleton() {
       <TableCell>
         <Skeleton class="h-4 w-40 rounded-md" />
       </TableCell>
-      <TableCell>
-        <Skeleton class="h-6 w-16 rounded-md" />
-      </TableCell>
+      <Show when={props.showTeams}>
+        <TableCell>
+          <Skeleton class="h-4 w-24 rounded-md" />
+        </TableCell>
+      </Show>
       <TableCell class="text-right">
         <div class="flex justify-end gap-2">
           <Skeleton class="size-8 rounded-md" />

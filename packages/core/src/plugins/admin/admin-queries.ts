@@ -65,6 +65,7 @@ export function adminUsersOptions(
 ) {
   return {
     queryKey: adminQueryKeys.users.list(actorUserId, params),
+    meta: { errorPresentation: "inline" },
     queryFn: actorUserId
       ? async ({ signal }) =>
           unwrapAdminResult(
@@ -85,6 +86,7 @@ export function adminUserOptions(
 ) {
   return {
     queryKey: adminQueryKeys.users.detail(actorUserId, targetUserId),
+    meta: { errorPresentation: "inline" },
     queryFn:
       actorUserId && targetUserId
         ? async ({ signal }) =>
@@ -106,6 +108,7 @@ export function adminUserSessionsOptions(
 ) {
   return {
     queryKey: adminQueryKeys.users.sessions(actorUserId, targetUserId),
+    meta: { errorPresentation: "inline" },
     queryFn:
       actorUserId && targetUserId
         ? async ({ signal }) =>

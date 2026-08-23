@@ -1,5 +1,6 @@
 import { formatAdditionalFieldValue } from "@better-auth-ui/core"
 import {
+  hasMemberRole,
   memberRoleLabels,
   mergeOrganizationRoleLabels,
   type OrganizationAuthClient,
@@ -9,10 +10,19 @@ import { useAuth, useAuthPlugin, useSession } from "@better-auth-ui/react"
 import {
   useHasPermission,
   useListRoles,
+  useListUserTeams,
   useUpdateMemberRole
 } from "@better-auth-ui/react/plugins/organization"
 import { ArrowRightFromSquare, Pencil, TrashBin } from "@gravity-ui/icons"
-import { Button, Dropdown, Label, Spinner, Table, toast } from "@heroui/react"
+import {
+  Button,
+  Dropdown,
+  Label,
+  Skeleton,
+  Spinner,
+  Table,
+  toast
+} from "@heroui/react"
 import type { Member, Organization, User } from "better-auth/client"
 import { useState } from "react"
 
@@ -24,13 +34,17 @@ import { RemoveMemberDialog } from "./remove-member-dialog"
 export type OrganizationMemberRowProps = {
   member: Member & { user: Partial<User> }
   isOwner?: boolean
+  ownerCount?: number
   organization: Organization
+  showTeams?: boolean
 }
 
 export function OrganizationMemberRow({
   member,
   isOwner,
-  organization
+  ownerCount,
+  organization,
+  showTeams
 }: OrganizationMemberRowProps) {
   const { authClient, locale } = useAuth()
   const {
@@ -51,6 +65,13 @@ export function OrganizationMemberRow({
     enabled:
       dynamicAccessControl?.enabled === true &&
       canReadRoles.data?.success === true
+  })
+  const memberTeams = useListUserTeams(authClient as OrganizationAuthClient, {
+    query: {
+      organizationId: organization.id,
+      userId: member.userId
+    },
+    enabled: showTeams === true
   })
 
   const { data: hasUpdatePermission, isPending: updatePermissionPending } =
@@ -74,12 +95,17 @@ export function OrganizationMemberRow({
   const memberRoles = parseMemberRoles(member.role)
   const mergedRoles = mergeOrganizationRoleLabels(roles, dynamicRoles.data)
   const roleLabel = memberRoleLabels(member.role, mergedRoles).join(", ")
+  const teamNames = memberTeams.data?.map((team) => team.name).join(", ")
 
   const assignableRoles = Object.entries(mergedRoles).filter(
     ([key]) => isOwner || key !== creatorRole
   )
 
   const isCurrentUser = session?.user.id === member.userId
+  const targetIsOwner = hasMemberRole(member.role, creatorRole)
+  const canManageTarget = isOwner || !targetIsOwner
+  const onlyOwnerActionDisabled =
+    targetIsOwner && (ownerCount === undefined || ownerCount <= 1)
 
   const [removeOpen, setRemoveOpen] = useState(false)
   const [leaveOpen, setLeaveOpen] = useState(false)
@@ -105,9 +131,23 @@ export function OrganizationMemberRow({
 
       <Table.Cell>{roleLabel}</Table.Cell>
 
+      {showTeams && (
+        <Table.Cell>
+          {memberTeams.isPending ? (
+            <Skeleton className="h-4 w-24 rounded-lg" />
+          ) : memberTeams.isError ? null : teamNames ? (
+            teamNames
+          ) : (
+            <span className="text-muted">
+              {organizationLocalization.noTeams}
+            </span>
+          )}
+        </Table.Cell>
+      )}
+
       <Table.Cell>
         <div className="flex items-center justify-end gap-1">
-          {updatePermissionPending && (
+          {canManageTarget && updatePermissionPending && (
             <Button
               aria-label={organizationLocalization.changeMemberRole}
               isDisabled
@@ -118,7 +158,7 @@ export function OrganizationMemberRow({
               <Pencil />
             </Button>
           )}
-          {hasUpdatePermission?.success && (
+          {canManageTarget && hasUpdatePermission?.success && (
             <Dropdown>
               <Button
                 isIconOnly
@@ -156,7 +196,12 @@ export function OrganizationMemberRow({
                     <Dropdown.Item
                       key={role}
                       id={role}
-                      isDisabled={isUpdatingRole}
+                      isDisabled={
+                        isUpdatingRole ||
+                        (role === creatorRole &&
+                          memberRoles.includes(role) &&
+                          onlyOwnerActionDisabled)
+                      }
                       textValue={label}
                     >
                       <Label>{label}</Label>
@@ -170,16 +215,25 @@ export function OrganizationMemberRow({
           )}
 
           {isCurrentUser ? (
-            <Button
-              isIconOnly
-              size="sm"
-              variant="danger-soft"
-              aria-label={organizationLocalization.leaveOrganization}
-              onPress={() => setLeaveOpen(true)}
+            <span
+              title={
+                onlyOwnerActionDisabled
+                  ? organizationLocalization.onlyOwnerActionDisabled
+                  : undefined
+              }
             >
-              <ArrowRightFromSquare />
-            </Button>
-          ) : deletePermissionPending ? (
+              <Button
+                isIconOnly
+                size="sm"
+                variant="danger-soft"
+                aria-label={organizationLocalization.leaveOrganization}
+                isDisabled={onlyOwnerActionDisabled}
+                onPress={() => setLeaveOpen(true)}
+              >
+                <ArrowRightFromSquare />
+              </Button>
+            </span>
+          ) : canManageTarget && deletePermissionPending ? (
             <Button
               aria-label={organizationLocalization.removeMember}
               isDisabled
@@ -189,27 +243,38 @@ export function OrganizationMemberRow({
             >
               <TrashBin />
             </Button>
-          ) : hasDeletePermission?.success ? (
-            <Button
-              isIconOnly
-              size="sm"
-              variant="danger-soft"
-              aria-label={organizationLocalization.removeMember}
-              onPress={() => setRemoveOpen(true)}
+          ) : canManageTarget && hasDeletePermission?.success ? (
+            <span
+              title={
+                onlyOwnerActionDisabled
+                  ? organizationLocalization.onlyOwnerActionDisabled
+                  : undefined
+              }
             >
-              <TrashBin />
-            </Button>
+              <Button
+                isIconOnly
+                size="sm"
+                variant="danger-soft"
+                aria-label={organizationLocalization.removeMember}
+                isDisabled={onlyOwnerActionDisabled}
+                onPress={() => setRemoveOpen(true)}
+              >
+                <TrashBin />
+              </Button>
+            </span>
           ) : null}
         </div>
 
-        {isCurrentUser && organization ? (
+        {isCurrentUser && organization && !onlyOwnerActionDisabled ? (
           <LeaveOrganizationDialog
             isOpen={leaveOpen}
             onOpenChange={setLeaveOpen}
             organization={organization}
           />
         ) : (
-          hasDeletePermission?.success && (
+          canManageTarget &&
+          hasDeletePermission?.success &&
+          !onlyOwnerActionDisabled && (
             <RemoveMemberDialog
               isOpen={removeOpen}
               onOpenChange={setRemoveOpen}

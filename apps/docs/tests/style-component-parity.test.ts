@@ -72,7 +72,7 @@ describe("shadcn/Solid feature parity", () => {
       "../../../examples/start-solid-zaidan-example/registry.manifest"
     )
     const shadcnRegistry = (await import(
-      "../../../examples/start-shadcn-example/registry.json"
+      "../public/r/radix-nova/registry.json"
     )) as { default: { items: { name: string }[] } }
 
     const solid = new Set(

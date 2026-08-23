@@ -692,7 +692,15 @@ describe("Solid registry isolation", () => {
 
   it("guards existing Zaidan auth styling important modifiers", () => {
     const authRoot = resolve(__dirname, "../src/components/auth")
-    const expectedImportantClassTokens = {} satisfies Record<string, string[]>
+    const expectedImportantClassTokens = {
+      "src/components/auth/admin/admin-users.tsx": ["sm:max-w-[56rem]!"],
+      "src/components/auth/settings/security/active-sessions.tsx": [
+        "gap-0!",
+        "gap-0!",
+        "gap-0!",
+        "my-0!"
+      ]
+    } satisfies Record<string, string[]>
     const extractStringLiteralValues = (content: string) => {
       const values: string[] = []
       let index = 0
@@ -4173,9 +4181,11 @@ describe("Solid registry isolation", () => {
       ),
       "utf8"
     )
-    expect(authStories).toContain('socialProviders={["github", "google"]}')
-    expect(authStories).toContain("social: async () =>")
-    expect(authStories).toContain("navigate={() => undefined}")
+    expect(authStories).toContain(
+      'socialProviders={props.socialProviders ?? ["github", "google"]}'
+    )
+    expect(authStories).toContain("signInSocial: fn(async () =>")
+    expect(authStories).toContain("navigate={authActions.navigate}")
     expect(authStories).toContain("overflow-hidden")
     expect(authStories).toContain("h-screen")
 

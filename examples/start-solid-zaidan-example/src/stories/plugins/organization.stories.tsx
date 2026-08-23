@@ -12,6 +12,7 @@ import {
 } from "@tanstack/solid-router"
 import type { Organization as BetterAuthOrganization } from "better-auth/client"
 import type { JSX } from "solid-js"
+import { expect, waitFor, within } from "storybook/test"
 import type { Meta, StoryObj } from "storybook-solidjs-vite"
 import { AuthProvider } from "@/components/auth/auth-provider"
 import { Organization } from "@/components/auth/organization/organization"
@@ -20,9 +21,12 @@ import { OrganizationInvitations } from "@/components/auth/organization/organiza
 import { OrganizationMembers } from "@/components/auth/organization/organization-members"
 import { OrganizationPeople } from "@/components/auth/organization/organization-people"
 import { OrganizationProfile } from "@/components/auth/organization/organization-profile"
+import { OrganizationRoles } from "@/components/auth/organization/organization-roles"
 import { OrganizationSettings } from "@/components/auth/organization/organization-settings"
 import { OrganizationSwitcher } from "@/components/auth/organization/organization-switcher"
+import { OrganizationTeams } from "@/components/auth/organization/organization-teams"
 import { OrganizationsSettings } from "@/components/auth/organization/organizations-settings"
+import { TeamSwitcher } from "@/components/auth/organization/team-switcher"
 import { UserInvitations } from "@/components/auth/organization/user-invitations"
 import { organizationPlugin } from "@/lib/auth/organization-plugin"
 import { storyRenders, withStoryActions } from "../support/story-coverage"
@@ -104,6 +108,83 @@ const organizationMembers = [
   }
 ]
 
+const organizationTeams = [
+  {
+    createdAt: new Date("2026-01-03T09:00:00Z"),
+    id: "team_platform_docs",
+    name: "Platform",
+    organizationId: activeOrganization.id,
+    updatedAt: new Date("2026-01-03T09:00:00Z")
+  },
+  {
+    createdAt: new Date("2026-01-04T09:00:00Z"),
+    id: "team_research_docs",
+    name: "Research",
+    organizationId: activeOrganization.id,
+    updatedAt: new Date("2026-01-04T09:00:00Z")
+  }
+]
+
+const organizationRoles = [
+  {
+    id: "role_billing_docs",
+    organizationId: activeOrganization.id,
+    permission: { invoice: ["read", "update"] },
+    role: "billing"
+  },
+  {
+    id: "role_support_docs",
+    organizationId: activeOrganization.id,
+    permission: { ticket: ["read", "update"] },
+    role: "support"
+  }
+]
+
+const rolePermissions = {
+  invoice: {
+    actions: {
+      read: "View invoices",
+      update: "Edit invoices"
+    },
+    label: "Invoices"
+  },
+  ticket: {
+    actions: {
+      read: "View tickets",
+      update: "Update tickets"
+    },
+    label: "Support tickets"
+  }
+}
+
+function teamsForUser(targetUserId?: string) {
+  if (!targetUserId || targetUserId === userId) return organizationTeams
+  if (targetUserId === "user_grace_docs") return organizationTeams.slice(0, 1)
+  return []
+}
+
+const teamMembers = {
+  [organizationTeams[0].id]: [
+    {
+      id: "team_member_ada_platform_docs",
+      teamId: organizationTeams[0].id,
+      userId
+    },
+    {
+      id: "team_member_grace_platform_docs",
+      teamId: organizationTeams[0].id,
+      userId: "user_grace_docs"
+    }
+  ],
+  [organizationTeams[1].id]: [
+    {
+      id: "team_member_ada_research_docs",
+      teamId: organizationTeams[1].id,
+      userId
+    }
+  ]
+}
+
 const northwindMembers = [
   {
     id: "member_docs_ada_northwind",
@@ -169,11 +250,15 @@ const mockAuthClient = withStoryActions(
   {
     getSession: async () => sessionData,
     organization: {
+      addTeamMember: async () => null,
       acceptInvitation: async () => null,
       cancelInvitation: async () => null,
       checkSlug: async () => ({ status: true }),
       create: async () => activeOrganization,
+      createRole: async () => organizationRoles[0],
+      createTeam: async () => organizationTeams[0],
       delete: async () => null,
+      deleteRole: async () => null,
       getFullOrganization: async () => activeOrganization,
       hasPermission: async () => ({ success: true }),
       inviteMember: async () => null,
@@ -188,12 +273,25 @@ const mockAuthClient = withStoryActions(
             ? northwindMembers
             : organizationMembers
       }),
+      listRoles: async () => organizationRoles,
+      listTeamMembers: async (params?: { query?: { teamId?: string } }) =>
+        params?.query?.teamId
+          ? (teamMembers[params.query.teamId as keyof typeof teamMembers] ?? [])
+          : [],
+      listTeams: async () => organizationTeams,
+      listUserTeams: async (params?: { query?: { userId?: string } }) =>
+        teamsForUser(params?.query?.userId),
       listUserInvitations: async () => userInvitations,
       rejectInvitation: async () => null,
       removeMember: async () => null,
+      removeTeam: async () => null,
+      removeTeamMember: async () => null,
       setActive: async () => null,
+      setActiveTeam: async () => null,
       update: async () => activeOrganization,
-      updateMemberRole: async () => null
+      updateMemberRole: async () => null,
+      updateRole: async () => null,
+      updateTeam: async () => null
     }
   },
   "authClient"
@@ -224,6 +322,16 @@ function createStoryQueryClient() {
   )
   queryClient.setQueryData(
     organizationQueryKeys.members.list(userId, {
+      organizationId: "org_acme_docs",
+      filterField: "role",
+      filterValue: "owner",
+      filterOperator: "contains",
+      limit: 1
+    }),
+    { members: organizationMembers.slice(0, 1), total: 1 }
+  )
+  queryClient.setQueryData(
+    organizationQueryKeys.members.list(userId, {
       organizationId: "org_northwind_docs"
     }),
     { members: northwindMembers }
@@ -234,6 +342,54 @@ function createStoryQueryClient() {
     }),
     organizationInvitations
   )
+  queryClient.setQueryData(
+    organizationQueryKeys.teams.list(userId, {
+      organizationId: "org_acme_docs"
+    }),
+    organizationTeams
+  )
+  queryClient.setQueryData(
+    organizationQueryKeys.teams.userList(userId, {
+      organizationId: "org_acme_docs"
+    }),
+    organizationTeams
+  )
+  queryClient.setQueryData(
+    organizationQueryKeys.roles.list(userId, {
+      organizationId: "org_acme_docs"
+    }),
+    organizationRoles
+  )
+
+  for (const role of organizationRoles) {
+    queryClient.setQueryData(
+      organizationQueryKeys.members.list(userId, {
+        organizationId: "org_acme_docs",
+        filterField: "role",
+        filterOperator: "contains",
+        filterValue: role.role,
+        limit: 1
+      }),
+      { members: [], total: 0 }
+    )
+  }
+
+  for (const team of organizationTeams) {
+    queryClient.setQueryData(
+      organizationQueryKeys.teams.members(userId, team.id),
+      teamMembers[team.id as keyof typeof teamMembers]
+    )
+  }
+
+  for (const member of organizationMembers) {
+    queryClient.setQueryData(
+      organizationQueryKeys.teams.userList(userId, {
+        organizationId: "org_acme_docs",
+        userId: member.userId
+      }),
+      teamsForUser(member.userId)
+    )
+  }
   queryClient.setQueryData(
     organizationQueryKeys.permissions.has(userId, {
       organizationId: "org_acme_docs",
@@ -248,6 +404,41 @@ function createStoryQueryClient() {
     }),
     { success: true }
   )
+  queryClient.setQueryData(
+    organizationQueryKeys.permissions.has(userId, {
+      organizationId: "org_acme_docs",
+      permissions: { team: ["create"] }
+    }),
+    { success: true }
+  )
+  queryClient.setQueryData(
+    organizationQueryKeys.permissions.has(userId, {
+      organizationId: "org_acme_docs",
+      permissions: { team: ["update"] }
+    }),
+    { success: true }
+  )
+  queryClient.setQueryData(
+    organizationQueryKeys.permissions.has(userId, {
+      organizationId: "org_acme_docs",
+      permissions: { team: ["delete"] }
+    }),
+    { success: true }
+  )
+  for (const permissions of [
+    { ac: ["read"] },
+    { ac: ["create"] },
+    { ac: ["update"] },
+    { ac: ["delete"] }
+  ]) {
+    queryClient.setQueryData(
+      organizationQueryKeys.permissions.has(userId, {
+        organizationId: "org_acme_docs",
+        permissions
+      }),
+      { success: true }
+    )
+  }
   queryClient.setQueryData(
     organizationQueryKeys.permissions.has(userId, {
       organizationId: "org_acme_docs",
@@ -297,7 +488,13 @@ function OrganizationStoryProvider(props: OrganizationStoryProviderProps) {
     <AuthProvider
       authClient={mockAuthClient}
       navigate={navigate}
-      plugins={[organizationPlugin({ slug: props.slug })]}
+      plugins={[
+        organizationPlugin({
+          dynamicAccessControl: { permissions: rolePermissions },
+          slug: props.slug,
+          teams: true
+        })
+      ]}
       queryClient={props.queryClient}
     >
       {props.children}
@@ -419,6 +616,52 @@ function OrganizationMembersPreviewContent() {
       {() => (
         <main class="mx-auto w-full max-w-5xl bg-background p-6 text-foreground">
           <OrganizationMembers />
+        </main>
+      )}
+    </OrganizationStoryProvider>
+  )
+}
+
+function OrganizationTeamsPreviewContent() {
+  const queryClient = createStoryQueryClient()
+
+  return (
+    <OrganizationStoryProvider queryClient={queryClient} slug="acme">
+      {() => (
+        <main class="mx-auto w-full max-w-5xl bg-background p-6 text-foreground">
+          <OrganizationTeams />
+        </main>
+      )}
+    </OrganizationStoryProvider>
+  )
+}
+
+function OrganizationRolesPreviewContent() {
+  const queryClient = createStoryQueryClient()
+
+  return (
+    <OrganizationStoryProvider queryClient={queryClient} slug="acme">
+      {() => (
+        <main class="mx-auto w-full max-w-5xl bg-background p-6 text-foreground">
+          <OrganizationRoles organizationId={activeOrganization.id} />
+        </main>
+      )}
+    </OrganizationStoryProvider>
+  )
+}
+
+function TeamSwitcherPreviewContent() {
+  const queryClient = createStoryQueryClient()
+
+  return (
+    <OrganizationStoryProvider queryClient={queryClient} slug="acme">
+      {() => (
+        <main class="mx-auto flex min-h-[360px] w-full max-w-xl items-center justify-center bg-background p-6 text-foreground">
+          <TeamSwitcher
+            organizationId={activeOrganization.id}
+            teamId={organizationTeams[0].id}
+            syncSession
+          />
         </main>
       )}
     </OrganizationStoryProvider>
@@ -548,6 +791,132 @@ export const OrganizationMembersPreview: Story = {
     <RouterProvider
       router={createStoryRouter(OrganizationMembersPreviewContent)}
     />
+  )
+}
+
+export const OrganizationTeamsPreview: Story = {
+  play: async ({ canvas, step }) => {
+    await step("show the compact team list", async () => {
+      await expect(canvas.getByRole("heading", { name: "Teams" })).toBeVisible()
+      await expect(canvas.getByText("Platform")).toBeVisible()
+      await expect(canvas.getByText("Research")).toBeVisible()
+      await expect(
+        canvas.getAllByRole("button", { name: /Manage/ })
+      ).toHaveLength(2)
+    })
+  },
+  render: () => (
+    <RouterProvider
+      router={createStoryRouter(OrganizationTeamsPreviewContent)}
+    />
+  )
+}
+
+export const CreateTeamDialogPreview: Story = {
+  play: async ({ canvas, canvasElement, step, userEvent }) => {
+    await step("open team creation", async () => {
+      await userEvent.click(canvas.getByRole("button", { name: "Create team" }))
+      const dialog = within(canvasElement.ownerDocument.body).getByRole(
+        "dialog"
+      )
+      await waitFor(() =>
+        expect(
+          within(dialog).getByRole("heading", { name: "Create team" })
+        ).toBeVisible()
+      )
+    })
+  },
+  render: () => (
+    <RouterProvider
+      router={createStoryRouter(OrganizationTeamsPreviewContent)}
+    />
+  )
+}
+
+export const EditTeamDialogPreview: Story = {
+  play: async ({ canvas, canvasElement, step, userEvent }) => {
+    await step("open team management", async () => {
+      await userEvent.click(
+        canvas.getAllByRole("button", { name: /Manage/ })[0]
+      )
+      const dialog = within(canvasElement.ownerDocument.body).getByRole(
+        "dialog"
+      )
+      await waitFor(() => {
+        expect(within(dialog).getByDisplayValue("Platform")).toBeVisible()
+        expect(within(dialog).getByText("Ada Lovelace")).toBeVisible()
+        expect(within(dialog).getByText("Grace Hopper")).toBeVisible()
+      })
+    })
+  },
+  render: () => (
+    <RouterProvider
+      router={createStoryRouter(OrganizationTeamsPreviewContent)}
+    />
+  )
+}
+
+export const OrganizationRolesPreview: Story = {
+  play: async ({ canvas, step }) => {
+    await step("show the role list", async () => {
+      await expect(canvas.getByText("billing")).toBeVisible()
+      await expect(canvas.getByText("support")).toBeVisible()
+    })
+  },
+  render: () => (
+    <RouterProvider
+      router={createStoryRouter(OrganizationRolesPreviewContent)}
+    />
+  )
+}
+
+export const CreateRoleDialogPreview: Story = {
+  play: async ({ canvas, canvasElement, step, userEvent }) => {
+    await step("open role creation", async () => {
+      await userEvent.click(canvas.getByRole("button", { name: "Create role" }))
+      const dialog = within(canvasElement.ownerDocument.body).getByRole(
+        "dialog"
+      )
+      await waitFor(() =>
+        expect(
+          within(dialog).getByRole("heading", { name: "Create role" })
+        ).toBeVisible()
+      )
+    })
+  },
+  render: () => (
+    <RouterProvider
+      router={createStoryRouter(OrganizationRolesPreviewContent)}
+    />
+  )
+}
+
+export const EditRoleDialogPreview: Story = {
+  play: async ({ canvas, canvasElement, step, userEvent }) => {
+    await step("open role editing", async () => {
+      await userEvent.click(
+        canvas.getAllByRole("button", { name: "Edit role" })[0]
+      )
+      const dialog = within(canvasElement.ownerDocument.body).getByRole(
+        "dialog"
+      )
+      await waitFor(() => {
+        expect(within(dialog).getByDisplayValue("billing")).toBeVisible()
+        expect(within(dialog).getByText("Invoices")).toBeVisible()
+      })
+    })
+  },
+  render: () => (
+    <RouterProvider
+      router={createStoryRouter(OrganizationRolesPreviewContent)}
+    />
+  )
+}
+
+export const TeamSwitcherPreview: Story = {
+  play: storyRenders,
+  render: () => (
+    <RouterProvider router={createStoryRouter(TeamSwitcherPreviewContent)} />
   )
 }
 

@@ -23,6 +23,7 @@ export function FreshSessionPrompt(props: FreshSessionPromptProps) {
   const continueSignIn = useSignInContinuation()
   const [password, setPassword] = createSignal("")
   const signIn = useSignInEmail(auth.authClient, () => ({
+    meta: { errorPresentation: "inline" },
     onError: () => setPassword(""),
     onSuccess: async (data) => {
       if (isTwoFactorRedirect(data)) {
