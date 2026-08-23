@@ -15,7 +15,6 @@ import {
   ListBox,
   Select,
   Spinner,
-  TextArea,
   TextField
 } from "@heroui/react"
 import { type SyntheticEvent, useState } from "react"
@@ -49,7 +48,6 @@ export function CreateApiKeyDialog({
   const [isNewKeyDialogOpen, setIsNewKeyDialogOpen] = useState(false)
   const [keyName, setKeyName] = useState<string | null>(null)
   const [secretKey, setSecretKey] = useState<string | null>(null)
-  const [formError, setFormError] = useState<string>()
   const availableConfigurations = configurations.filter(
     (configuration) => configuration.organization === Boolean(organizationId)
   )
@@ -89,22 +87,11 @@ export function CreateApiKeyDialog({
     const selectedConfig = String(formData.get("configId") ?? "").trim()
     const resolvedConfigId =
       selectedConfig || (organizationId ? "organization" : undefined)
-    let metadata: unknown
-    try {
-      const metadataText = String(formData.get("metadata") ?? "").trim()
-      metadata = metadataText ? JSON.parse(metadataText) : undefined
-      setFormError(undefined)
-    } catch {
-      setFormError("Metadata must contain valid JSON.")
-      return
-    }
-
     const payload = {
       ...(name ? { name } : {}),
       ...(expiresIn ? { expiresIn } : {}),
       ...(resolvedConfigId ? { configId: resolvedConfigId } : {}),
-      ...(organizationId ? { organizationId } : {}),
-      ...(metadata ? { metadata } : {})
+      ...(organizationId ? { organizationId } : {})
     }
 
     createApiKey(Object.keys(payload).length > 0 ? payload : undefined, {
@@ -235,16 +222,6 @@ export function CreateApiKeyDialog({
                       </Select.Popover>
                     </Select>
                   ) : null}
-
-                  <TextField name="metadata">
-                    <Label>{apiKeyLocalization.metadata}</Label>
-                    <TextArea rows={3} variant="secondary" />
-                  </TextField>
-                  {formError && (
-                    <p className="text-sm text-danger" role="alert">
-                      {formError}
-                    </p>
-                  )}
                 </div>
               </AlertDialog.Body>
 

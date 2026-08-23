@@ -34,7 +34,6 @@ import {
   SelectValue
 } from "@/components/ui/select"
 import { Spinner } from "@/components/ui/spinner"
-import { Textarea } from "@/components/ui/textarea"
 import { apiKeyPlugin } from "@/lib/auth/api-key-plugin"
 import { NewApiKeyDialog } from "./new-api-key-dialog"
 
@@ -63,7 +62,6 @@ export function CreateApiKeyDialog({
   const [isNewKeyDialogOpen, setIsNewKeyDialogOpen] = useState(false)
   const [keyName, setKeyName] = useState<string | null>(null)
   const [secretKey, setSecretKey] = useState<string | null>(null)
-  const [formError, setFormError] = useState<string>()
   const availableConfigurations = configurations.filter(
     (configuration) => configuration.organization === Boolean(organizationId)
   )
@@ -100,15 +98,6 @@ export function CreateApiKeyDialog({
       ? apiKeyExpirationDaysToSeconds(expirationDays)
       : undefined
 
-    let metadata: unknown
-    try {
-      const metadataText = String(formData.get("metadata") ?? "").trim()
-      metadata = metadataText ? JSON.parse(metadataText) : undefined
-      setFormError(undefined)
-    } catch {
-      setFormError("Metadata must contain valid JSON.")
-      return
-    }
     const configId = String(formData.get("configId") ?? "").trim()
     const resolvedConfigId =
       configId || (organizationId ? "organization" : undefined)
@@ -116,8 +105,7 @@ export function CreateApiKeyDialog({
       ...(name ? { name } : {}),
       ...(expiresIn ? { expiresIn } : {}),
       ...(resolvedConfigId ? { configId: resolvedConfigId } : {}),
-      ...(organizationId ? { organizationId } : {}),
-      ...(metadata ? { metadata } : {})
+      ...(organizationId ? { organizationId } : {})
     }
 
     createApiKey(Object.keys(payload).length > 0 ? payload : undefined, {
@@ -235,14 +223,6 @@ export function CreateApiKeyDialog({
                   </Select>
                 </Field>
               ) : null}
-
-              <Field>
-                <FieldLabel htmlFor="api-key-metadata">
-                  {apiKeyLocalization.metadata}
-                </FieldLabel>
-                <Textarea id="api-key-metadata" name="metadata" rows={3} />
-                {formError && <FieldError>{formError}</FieldError>}
-              </Field>
             </FieldGroup>
 
             <DialogFooter>

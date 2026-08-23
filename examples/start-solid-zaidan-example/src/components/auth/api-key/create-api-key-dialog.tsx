@@ -26,7 +26,6 @@ import {
   SelectTrigger,
   SelectValue
 } from "@/components/ui/select"
-import { Textarea } from "@/components/ui/textarea"
 import { apiKeyPlugin } from "@/lib/auth/api-key-plugin"
 
 type ExpirationOption = {
@@ -87,7 +86,6 @@ export function CreateApiKeyDialog(props: {
   const [configuration, setConfiguration] = createSignal<
     ConfigurationOption | undefined
   >(configurationOptions[0])
-  const [formError, setFormError] = createSignal<string>()
   const [isNewKeyDialogOpen, setIsNewKeyDialogOpen] = createSignal(false)
   const [newApiKeyName, setNewApiKeyName] = createSignal<string | null>(null)
   const [newApiKeySecret, setNewApiKeySecret] = createSignal<string | null>(
@@ -120,23 +118,13 @@ export function CreateApiKeyDialog(props: {
     const expiresIn = expirationDays
       ? apiKeyExpirationDaysToSeconds(expirationDays)
       : undefined
-    let metadata: unknown
-    try {
-      const metadataText = String(formData.get("metadata") ?? "").trim()
-      metadata = metadataText ? JSON.parse(metadataText) : undefined
-      setFormError(undefined)
-    } catch {
-      setFormError("Metadata must contain valid JSON.")
-      return
-    }
     const configId =
       configuration()?.id || (props.organizationId ? "organization" : undefined)
     const payload = {
       ...(name ? { name } : {}),
       ...(expiresIn ? { expiresIn } : {}),
       ...(configId ? { configId } : {}),
-      ...(props.organizationId ? { organizationId: props.organizationId } : {}),
-      ...(metadata ? { metadata } : {})
+      ...(props.organizationId ? { organizationId: props.organizationId } : {})
     }
 
     createApiKey.mutate(Object.keys(payload).length > 0 ? payload : undefined)
@@ -231,18 +219,6 @@ export function CreateApiKeyDialog(props: {
                 </Select>
               </Field>
             </Show>
-
-            <Field>
-              <FieldLabel for="api-key-metadata">
-                {apiKeyLocalization.metadata}
-              </FieldLabel>
-              <Textarea id="api-key-metadata" name="metadata" rows={3} />
-              <Show when={formError()}>
-                <p class="text-sm text-destructive" role="alert">
-                  {formError()}
-                </p>
-              </Show>
-            </Field>
           </FieldGroup>
 
           <DialogFooter>

@@ -191,7 +191,9 @@ import { OrganizationApiKeys } from "@better-auth-ui/heroui/plugins/api-key"
 <auto-type-table path="../../../../../../packages/core/src/plugins/api-key/api-key-localization.ts" name="ApiKeyLocalization" />
 ## Lifecycle controls
 
-`<ApiKeys />` lets users create, rename, and delete keys. The create form exposes the fields that Better Auth accepts from the client, including the name, configuration, expiration, organization, and metadata. The list shows status, remaining requests, request usage, and the last request time as read-only values.
+`<ApiKeys />` lets users create, rename, and delete keys. The create form exposes the name, configuration, expiration, and organization. The list shows status, remaining requests, request usage, and the last request time as read-only values.
+
+The built-in dialog does not show metadata because metadata belongs to the application. For metadata, build a custom form with `useCreateApiKey`. Map named fields or application state to the metadata object. Do not show a raw JSON editor. If metadata affects trusted behavior, validate it in a server route.
 
 Better Auth reserves enablement, permissions, quotas, refill rules, and rate limits for server-side creation and updates. Configure those values in trusted server code instead of exposing them in the account UI.
 

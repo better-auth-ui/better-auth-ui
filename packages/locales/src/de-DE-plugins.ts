@@ -160,7 +160,6 @@ export const deDEPlugins = {
     configuration: "Konfiguration",
     enabled: "Aktiviert",
     disabled: "Deaktiviert",
-    metadata: "Metadaten (JSON)",
     requests: "Anfragen",
     remaining: "Verbleibend",
     lastRequest: "Letzte Anfrage",

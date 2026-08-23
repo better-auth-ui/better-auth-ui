@@ -42,7 +42,6 @@ export const apiKeyLocalization = {
   configuration: "Configuration",
   enabled: "Enabled",
   disabled: "Disabled",
-  metadata: "Metadata (JSON)",
   requests: "Requests",
   remaining: "Remaining",
   lastRequest: "Last request",

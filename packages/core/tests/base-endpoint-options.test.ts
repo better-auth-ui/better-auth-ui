@@ -344,6 +344,7 @@ describe("core base endpoint option factories", () => {
         createApiKey as { mutationFn?: (variables: unknown) => unknown }
       ).mutationFn?.({
         name: "CI key",
+        metadata: { environment: "ci" },
         remaining: 100,
         rateLimitEnabled: true,
         permissions: { project: ["write"] },
@@ -352,6 +353,7 @@ describe("core base endpoint option factories", () => {
     ).resolves.toEqual({ data: "CI key" })
     expect(authClient.apiKey.create).toHaveBeenCalledWith({
       name: "CI key",
+      metadata: { environment: "ci" },
       fetchOptions: { credentials: "include", throw: true }
     })
 
