@@ -43,5 +43,11 @@ jobs:
       - name: Build packages
         run: bun nx run-many -t build --projects='packages/*'
 
+      - name: Sync npm package READMEs
+        run: |
+          for package_json in packages/*/package.json; do
+            cp README.md "$(dirname "$package_json")/README.md"
+          done
+
       - name: Publish packages
         run: rm -f bun.lock bun.lockb && npx nx release publish
