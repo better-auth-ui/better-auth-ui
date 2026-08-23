@@ -312,7 +312,7 @@ export function OAuthClients({
         <DialogContent>
           <form onSubmit={handleEditorSubmit} className="flex flex-col gap-6">
             <DialogHeader>
-              <DialogTitle>
+              <DialogTitle className="flex items-center gap-2">
                 {editingClient ? <Pencil /> : <Plus />}
                 {editingClient
                   ? oauthLocalization.editClient
@@ -475,7 +475,7 @@ export function OAuthClients({
       >
         <DialogContent showCloseButton={false}>
           <DialogHeader>
-            <DialogTitle>
+            <DialogTitle className="flex items-center gap-2">
               <Code2 />
               {secret?.client_name || oauthLocalization.clientSecret}
             </DialogTitle>

@@ -2,14 +2,21 @@ import {
   createPhoneNumberValue,
   getPhoneNumberCountries,
   type PhoneNumberAdapter,
+  type PhoneNumberCountry,
   type PhoneNumberCountryCode,
   type PhoneNumberValue
 } from "@better-auth-ui/core/plugins/phone-number"
-import { createMemo, createUniqueId, For } from "solid-js"
+import { createMemo, createUniqueId } from "solid-js"
 
 import { Field, FieldError, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
-import { NativeSelect, NativeSelectOption } from "@/components/ui/native-select"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
+} from "@/components/ui/select"
 
 type InternationalPhoneFieldProps = {
   adapter: PhoneNumberAdapter
@@ -35,28 +42,53 @@ export function InternationalPhoneField(props: InternationalPhoneFieldProps) {
     <div class="grid grid-cols-[8.5rem_minmax(0,1fr)] gap-2">
       <Field>
         <FieldLabel for={`${id}-country`}>{props.countryLabel}</FieldLabel>
-        <NativeSelect
-          id={`${id}-country`}
+        <Select<PhoneNumberCountry>
           disabled={props.disabled}
-          value={props.value.country}
-          onChange={(event) => {
-            const country = event.currentTarget.value as PhoneNumberCountryCode
+          itemComponent={(itemProps) => (
+            <SelectItem item={itemProps.item}>
+              <span class="flex w-full items-center justify-between gap-4">
+                <span class="flex min-w-0 items-center gap-2">
+                  <span aria-hidden="true">{itemProps.item.rawValue.flag}</span>
+                  <span>{itemProps.item.rawValue.label}</span>
+                </span>
+                <span class="text-muted-foreground">
+                  {itemProps.item.rawValue.callingCode}
+                </span>
+              </span>
+            </SelectItem>
+          )}
+          onChange={(country) => {
+            if (!country) return
             const input = props.value.display.startsWith("+")
               ? ""
               : props.value.display
             props.onChange(
-              createPhoneNumberValue(input, country, props.adapter)
+              createPhoneNumberValue(input, country.code, props.adapter)
             )
           }}
+          options={countries()}
+          optionTextValue="label"
+          optionValue="code"
+          value={countries().find(
+            (country) => country.code === props.value.country
+          )}
         >
-          <For each={countries()}>
-            {(country) => (
-              <NativeSelectOption value={country.code}>
-                {country.label} ({country.callingCode})
-              </NativeSelectOption>
-            )}
-          </For>
-        </NativeSelect>
+          <SelectTrigger id={`${id}-country`} class="w-full">
+            <SelectValue<PhoneNumberCountry>>
+              {(state) => {
+                const country = state.selectedOption()
+
+                return country ? (
+                  <span class="flex items-center gap-2">
+                    <span aria-hidden="true">{country.flag}</span>
+                    <span>{country.callingCode}</span>
+                  </span>
+                ) : null
+              }}
+            </SelectValue>
+          </SelectTrigger>
+          <SelectContent />
+        </Select>
       </Field>
       <Field data-invalid={Boolean(props.error)}>
         <FieldLabel for={`${id}-number`}>{props.phoneLabel}</FieldLabel>

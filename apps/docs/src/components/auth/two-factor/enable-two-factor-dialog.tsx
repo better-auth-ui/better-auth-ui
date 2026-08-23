@@ -196,7 +196,7 @@ export function EnableTwoFactorDialog({
       <DialogContent>
         <form onSubmit={handleSubmit} className="flex flex-col gap-6">
           <DialogHeader>
-            <DialogTitle>
+            <DialogTitle className="flex items-center gap-2">
               <ShieldCheck />
               {twoFactorLocalization.twoFactor}
             </DialogTitle>

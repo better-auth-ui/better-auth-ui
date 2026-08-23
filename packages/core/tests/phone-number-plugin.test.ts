@@ -125,10 +125,16 @@ describe("phoneNumberPlugin", () => {
 
   it("localizes and limits the country list", () => {
     expect(getPhoneNumberCountries("de", ["US", "DE"])).toEqual([
-      { callingCode: "+49", code: "DE", label: "Deutschland" },
+      {
+        callingCode: "+49",
+        code: "DE",
+        flag: "🇩🇪",
+        label: "Deutschland"
+      },
       {
         callingCode: "+1",
         code: "US",
+        flag: "🇺🇸",
         label: "Vereinigte Staaten"
       }
     ])
@@ -136,8 +142,13 @@ describe("phoneNumberPlugin", () => {
 
   it("falls back to English names and sorting for an invalid locale", () => {
     expect(getPhoneNumberCountries("invalid locale", ["US", "DE"])).toEqual([
-      { callingCode: "+49", code: "DE", label: "Germany" },
-      { callingCode: "+1", code: "US", label: "United States" }
+      { callingCode: "+49", code: "DE", flag: "🇩🇪", label: "Germany" },
+      {
+        callingCode: "+1",
+        code: "US",
+        flag: "🇺🇸",
+        label: "United States"
+      }
     ])
   })
 

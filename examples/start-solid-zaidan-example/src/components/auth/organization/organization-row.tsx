@@ -74,7 +74,7 @@ export function OrganizationRow(props: OrganizationRowProps) {
 
   return (
     <Item>
-      <OrganizationView organization={props.organization} />
+      <OrganizationView class="flex-1" organization={props.organization} />
       <ItemActions>
         <Button
           variant="outline"

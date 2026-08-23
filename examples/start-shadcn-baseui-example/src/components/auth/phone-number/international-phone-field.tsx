@@ -53,7 +53,7 @@ export function InternationalPhoneField({
     [countryCodes, locale]
   )
   const countryItems = countries.map((country) => ({
-    label: `${country.label} ${country.callingCode}`,
+    label: `${country.flag} ${country.callingCode}`,
     value: country.code
   }))
 
@@ -80,7 +80,10 @@ export function InternationalPhoneField({
               {countries.map((country) => (
                 <SelectItem key={country.code} value={country.code}>
                   <span className="flex w-full items-center justify-between gap-4">
-                    <span>{country.label}</span>
+                    <span className="flex min-w-0 items-center gap-2">
+                      <span aria-hidden="true">{country.flag}</span>
+                      <span>{country.label}</span>
+                    </span>
                     <span className="text-muted-foreground">
                       {country.callingCode}
                     </span>

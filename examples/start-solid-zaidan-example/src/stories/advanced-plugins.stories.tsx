@@ -1,6 +1,7 @@
 import { authQueryKeys } from "@better-auth-ui/core"
 import { QueryClient } from "@tanstack/solid-query"
 import type { JSX } from "solid-js"
+import { expect } from "storybook/test"
 import type { Meta, StoryObj } from "storybook-solidjs-vite"
 import { AnonymousButton } from "@/components/auth/anonymous/anonymous-button"
 import {
@@ -178,7 +179,14 @@ export const EmailOtpPreview: Story = {
 }
 
 export const PhoneNumberPreview: Story = {
-  play: storyRenders,
+  play: async (context) => {
+    await storyRenders(context)
+    await context.step("show the selected country dial code", async () => {
+      await expect(
+        context.canvas.getByRole("combobox", { name: "Country or region" })
+      ).toHaveTextContent("+1")
+    })
+  },
   name: "Phone number",
   render: () => (
     <AdvancedPreview plugins={[phoneNumberPlugin()]} width="max-w-md">

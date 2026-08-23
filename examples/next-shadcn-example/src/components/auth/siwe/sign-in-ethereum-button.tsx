@@ -86,7 +86,7 @@ export function SignInEthereumButton({ view }: SignInEthereumButtonProps) {
         <DialogContent>
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
             <DialogHeader>
-              <DialogTitle>
+              <DialogTitle className="flex items-center gap-2">
                 <Wallet />
                 {plugin.localization.continueWithEthereum}
               </DialogTitle>

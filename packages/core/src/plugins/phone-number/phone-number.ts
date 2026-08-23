@@ -11,6 +11,7 @@ export type PhoneNumberCountryCode = CountryCode
 export type PhoneNumberCountry = {
   callingCode: string
   code: PhoneNumberCountryCode
+  flag: string
   label: string
 }
 
@@ -83,6 +84,9 @@ export function getPhoneNumberCountries(
     .map((code) => ({
       callingCode: `+${getCountryCallingCode(code)}`,
       code,
+      flag: String.fromCodePoint(
+        ...Array.from(code, (character) => character.charCodeAt(0) + 127397)
+      ),
       label: displayNames.of(code) ?? code
     }))
     .sort((left, right) =>

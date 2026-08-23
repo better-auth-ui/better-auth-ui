@@ -48,6 +48,9 @@ export function InternationalPhoneField({
     () => getPhoneNumberCountries(locale, countryCodes),
     [countryCodes, locale]
   )
+  const selectedCountry = countries.find(
+    (country) => country.code === value.country
+  )
 
   return (
     <div className="grid grid-cols-[8.5rem_minmax(0,1fr)] gap-2">
@@ -64,7 +67,14 @@ export function InternationalPhoneField({
       >
         <Label>{countryLabel}</Label>
         <Select.Trigger>
-          <Select.Value />
+          <Select.Value>
+            {selectedCountry ? (
+              <span className="flex items-center gap-2">
+                <span aria-hidden="true">{selectedCountry.flag}</span>
+                <span>{selectedCountry.callingCode}</span>
+              </span>
+            ) : null}
+          </Select.Value>
           <Select.Indicator />
         </Select.Trigger>
         <Select.Popover>
@@ -76,7 +86,10 @@ export function InternationalPhoneField({
                 textValue={`${country.label} ${country.callingCode}`}
               >
                 <span className="flex w-full items-center justify-between gap-4">
-                  <span>{country.label}</span>
+                  <span className="flex min-w-0 items-center gap-2">
+                    <span aria-hidden="true">{country.flag}</span>
+                    <span>{country.label}</span>
+                  </span>
                   <span className="text-muted">{country.callingCode}</span>
                 </span>
                 <ListBox.ItemIndicator />

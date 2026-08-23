@@ -65,7 +65,7 @@ export function NewApiKeyDialog({
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent showCloseButton={false}>
         <DialogHeader>
-          <DialogTitle>
+          <DialogTitle className="flex items-center gap-2">
             <Key />
             {apiKeyLocalization.newApiKey}
           </DialogTitle>

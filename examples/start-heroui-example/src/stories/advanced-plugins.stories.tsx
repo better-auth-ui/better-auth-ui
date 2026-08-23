@@ -200,6 +200,12 @@ export const PhoneNumberPreview: Story = {
     </AdvancedPreview>
   ),
   play: async ({ canvas, step, userEvent }) => {
+    await step("show the selected country dial code", async () => {
+      await expect(
+        canvas.getByRole("combobox", { name: "Country or region" })
+      ).toHaveTextContent("+1")
+    })
+
     await step("send a phone code", async () => {
       const phoneNumber = canvas.getByRole("textbox", {
         name: "Phone number"
