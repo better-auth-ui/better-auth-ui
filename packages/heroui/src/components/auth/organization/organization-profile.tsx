@@ -3,6 +3,7 @@ import type { OrganizationAuthClient } from "@better-auth-ui/core/plugins/organi
 import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
 import {
   useActiveOrganization,
+  useHasPermission,
   useUpdateOrganization
 } from "@better-auth-ui/react/plugins/organization"
 import {
@@ -46,6 +47,9 @@ export function OrganizationProfile({
   const { data: activeOrganization } = useActiveOrganization(
     authClient as OrganizationAuthClient
   )
+  const canUpdate = useHasPermission(authClient as OrganizationAuthClient, {
+    permissions: { organization: ["update"] }
+  })
 
   const [slug, setSlug] = useState(activeOrganization?.slug ?? "")
 
@@ -63,7 +67,7 @@ export function OrganizationProfile({
 
   async function handleSubmit(e: SyntheticEvent<HTMLFormElement>) {
     e.preventDefault()
-    if (!activeOrganization) return
+    if (!activeOrganization || !canUpdate.data?.success) return
 
     const formData = new FormData(e.currentTarget)
     const name = formData.get("name") as string
@@ -88,6 +92,8 @@ export function OrganizationProfile({
   }
 
   const inputVariant = variant === "transparent" ? "primary" : "secondary"
+  const formDisabled =
+    isPending || canUpdate.isPending || !canUpdate.data?.success
 
   return (
     <div>
@@ -104,7 +110,7 @@ export function OrganizationProfile({
               key={`${activeOrganization?.id}-${activeOrganization?.name}-name`}
               name="name"
               defaultValue={activeOrganization?.name}
-              isDisabled={isPending || !activeOrganization}
+              isDisabled={formDisabled || !activeOrganization}
             >
               <Label>{organizationLocalization.name}</Label>
 
@@ -127,7 +133,7 @@ export function OrganizationProfile({
                 value={slug}
                 onChange={setSlug}
                 currentSlug={activeOrganization.slug}
-                isDisabled={isPending}
+                isDisabled={formDisabled}
                 variant={inputVariant}
               />
             ) : (
@@ -145,7 +151,7 @@ export function OrganizationProfile({
                       activeOrganization as Record<string, unknown>
                     )[field.name] as never
                   }}
-                  isPending={isPending}
+                  isPending={formDisabled}
                   key={field.name}
                   name={field.name}
                   optionalLabel={localization.settings.optional}
@@ -153,17 +159,19 @@ export function OrganizationProfile({
                 />
               ))}
 
-            <Button
-              type="submit"
-              isPending={isPending}
-              isDisabled={!activeOrganization}
-              size="sm"
-              className="mt-1"
-            >
-              {isPending && <Spinner color="current" size="sm" />}
+            {(canUpdate.isPending || canUpdate.data?.success) && (
+              <Button
+                type="submit"
+                isPending={isPending}
+                isDisabled={formDisabled || !activeOrganization}
+                size="sm"
+                className="mt-1"
+              >
+                {isPending && <Spinner color="current" size="sm" />}
 
-              {localization.settings.saveChanges}
-            </Button>
+                {localization.settings.saveChanges}
+              </Button>
+            )}
           </Form>
         </Card.Content>
       </Card>

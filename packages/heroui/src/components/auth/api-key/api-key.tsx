@@ -12,11 +12,18 @@ export type ApiKeyProps = {
   apiKey: ListedApiKey
   /** Hide the row's delete button (e.g., when caller lacks `apiKey:delete`). */
   hideDelete?: boolean
+  /** Hide the row's edit button (e.g., when caller lacks `apiKey:update`). */
+  hideUpdate?: boolean
   /** Scope the delete payload to an organization (sets `configId`). */
   organizationId?: string
 }
 
-export function ApiKey({ apiKey, hideDelete, organizationId }: ApiKeyProps) {
+export function ApiKey({
+  apiKey,
+  hideDelete,
+  hideUpdate,
+  organizationId
+}: ApiKeyProps) {
   const { locale, localization } = useAuth()
   const { localization: apiKeyLocalization } = useAuthPlugin(apiKeyPlugin)
   const [deleteOpen, setDeleteOpen] = useState(false)
@@ -72,24 +79,28 @@ export function ApiKey({ apiKey, hideDelete, organizationId }: ApiKeyProps) {
         </span>
       </div>
 
-      <Button
-        className="ml-auto shrink-0"
-        variant="outline"
-        size="sm"
-        onPress={() => setEditOpen(true)}
-      >
-        {apiKeyLocalization.editApiKey}
-      </Button>
-      <EditApiKeyDialog
-        apiKey={apiKey}
-        isOpen={editOpen}
-        onOpenChange={setEditOpen}
-      />
+      {!hideUpdate && (
+        <>
+          <Button
+            className="ml-auto shrink-0"
+            variant="outline"
+            size="sm"
+            onPress={() => setEditOpen(true)}
+          >
+            {apiKeyLocalization.editApiKey}
+          </Button>
+          <EditApiKeyDialog
+            apiKey={apiKey}
+            isOpen={editOpen}
+            onOpenChange={setEditOpen}
+          />
+        </>
+      )}
 
       {!hideDelete && (
         <>
           <Button
-            className="shrink-0"
+            className={hideUpdate ? "ml-auto shrink-0" : "shrink-0"}
             variant="outline"
             size="sm"
             onPress={() => setDeleteOpen(true)}

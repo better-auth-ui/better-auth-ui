@@ -95,7 +95,8 @@ export function OrganizationMembers({
   const {
     localization: organizationLocalization,
     membershipLimit,
-    roles
+    roles,
+    creatorRole
   } = useAuthPlugin(organizationPlugin)
 
   const { data: activeOrganization, isPending: activeOrganizationPending } =
@@ -140,18 +141,11 @@ export function OrganizationMembers({
   // from a dedicated endpoint rather than from the member list.
   const { data: activeMemberRole } = useActiveMemberRole(authClient)
 
-  const { isPending: updatePermissionPending } = useHasPermission(authClient, {
-    permissions: { member: ["update"] }
-  })
-  const { isPending: deletePermissionPending } = useHasPermission(authClient, {
-    permissions: { member: ["delete"] }
+  const canInvite = useHasPermission(authClient, {
+    permissions: { invitation: ["create"] }
   })
 
-  const isPending =
-    activeOrganizationPending ||
-    membersPending ||
-    updatePermissionPending ||
-    deletePermissionPending
+  const isPending = activeOrganizationPending || membersPending
 
   const filteredMembers = useMemo(() => {
     // The server already applied the role filter when paging, and it has no
@@ -190,7 +184,7 @@ export function OrganizationMembers({
 
   const [inviteOpen, setInviteOpen] = useState(false)
 
-  const isOwner = hasMemberRole(activeMemberRole?.role, "owner")
+  const isOwner = hasMemberRole(activeMemberRole?.role, creatorRole)
 
   const total = membersData?.total ?? membersData?.members.length ?? 0
 
@@ -226,14 +220,16 @@ export function OrganizationMembers({
           {organizationLocalization.members}
         </h3>
 
-        <Button
-          className="shrink-0"
-          size="sm"
-          disabled={isPending || atMembershipLimit}
-          onClick={() => setInviteOpen(true)}
-        >
-          {organizationLocalization.inviteMember}
-        </Button>
+        {(canInvite.isPending || canInvite.data?.success) && (
+          <Button
+            className="shrink-0"
+            size="sm"
+            disabled={canInvite.isPending || atMembershipLimit}
+            onClick={() => setInviteOpen(true)}
+          >
+            {organizationLocalization.inviteMember}
+          </Button>
+        )}
       </div>
 
       <div className="flex flex-col gap-4">
@@ -393,7 +389,9 @@ export function OrganizationMembers({
         )}
       </div>
 
-      <InviteMemberDialog open={inviteOpen} onOpenChange={setInviteOpen} />
+      {canInvite.data?.success && (
+        <InviteMemberDialog open={inviteOpen} onOpenChange={setInviteOpen} />
+      )}
     </div>
   )
 }

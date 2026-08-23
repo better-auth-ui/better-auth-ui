@@ -33,6 +33,8 @@ declare module "../../lib/auth-plugin" {
 }
 
 export type OrganizationPluginOptions = {
+  /** Role Better Auth assigns to organization creators. @default "owner" */
+  creatorRole?: string
   /**
    * Whether to call `organization.checkSlug` when entering an organization slug.
    * @default true
@@ -175,6 +177,7 @@ export const organizationPlugin = createAuthPlugin(
       typeof options.teams === "object" ? options.teams : undefined
 
     return {
+      creatorRole: options.creatorRole?.trim() || "owner",
       slug: options.slug,
       slugPrefix: options.slugPrefix ?? "",
       checkSlug: options.checkSlug ?? true,

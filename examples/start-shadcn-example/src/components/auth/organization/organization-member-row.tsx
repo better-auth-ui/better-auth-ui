@@ -31,7 +31,6 @@ import { organizationPlugin } from "@/lib/auth/organization-plugin"
 import { cn } from "@/lib/utils"
 import { UserView } from "../user/user-view"
 import { LeaveOrganizationDialog } from "./leave-organization-dialog"
-import { OrganizationMemberRowSkeleton } from "./organization-member-row-skeleton"
 import { RemoveMemberDialog } from "./remove-member-dialog"
 
 export type OrganizationMemberRowProps = {
@@ -49,14 +48,21 @@ export function OrganizationMemberRow({
   const {
     modelFields: { member: memberFields },
     dynamicAccessControl,
+    creatorRole,
     localization: organizationLocalization,
     roles
   } = useAuthPlugin(organizationPlugin)
 
   const { data: session } = useSession(authClient)
+  const canReadRoles = useHasPermission(authClient, {
+    organizationId: organization.id,
+    permissions: { ac: ["read"] }
+  })
   const dynamicRoles = useListRoles(authClient, {
     query: { organizationId: organization.id },
-    enabled: dynamicAccessControl?.enabled === true
+    enabled:
+      dynamicAccessControl?.enabled === true &&
+      canReadRoles.data?.success === true
   })
 
   const { data: hasUpdatePermission, isPending: updatePermissionPending } =
@@ -71,8 +77,6 @@ export function OrganizationMemberRow({
       permissions: { member: ["delete"] }
     })
 
-  const isPending = updatePermissionPending || deletePermissionPending
-
   const { mutate: updateMemberRole, isPending: isUpdatingRole } =
     useUpdateMemberRole(authClient, {
       onSuccess: () => toast.success(organizationLocalization.memberRoleUpdated)
@@ -84,7 +88,7 @@ export function OrganizationMemberRow({
   const roleLabel = memberRoleLabels(member.role, mergedRoles).join(", ")
 
   const assignableRoles = Object.entries(mergedRoles).filter(
-    ([key]) => isOwner || key !== "owner"
+    ([key]) => isOwner || key !== creatorRole
   )
 
   const toggleRole = (role: string) => {
@@ -106,10 +110,6 @@ export function OrganizationMemberRow({
 
   const [removeOpen, setRemoveOpen] = useState(false)
   const [leaveOpen, setLeaveOpen] = useState(false)
-
-  if (isPending) {
-    return <OrganizationMemberRowSkeleton />
-  }
 
   return (
     <TableRow>
@@ -133,6 +133,17 @@ export function OrganizationMemberRow({
 
       <TableCell>
         <div className="flex items-center justify-end gap-1">
+          {updatePermissionPending && (
+            <Button
+              aria-label={organizationLocalization.changeMemberRole}
+              className="size-8"
+              disabled
+              size="icon"
+              variant="ghost"
+            >
+              <Pencil />
+            </Button>
+          )}
           {hasUpdatePermission?.success && (
             <DropdownMenu>
               <DropdownMenuTrigger
@@ -181,19 +192,27 @@ export function OrganizationMemberRow({
             >
               <LogOut />
             </Button>
-          ) : (
-            hasDeletePermission?.success && (
-              <Button
-                size="icon"
-                variant="outline"
-                className="size-8 text-destructive"
-                aria-label={organizationLocalization.removeMember}
-                onClick={() => setRemoveOpen(true)}
-              >
-                <Trash2 />
-              </Button>
-            )
-          )}
+          ) : deletePermissionPending ? (
+            <Button
+              aria-label={organizationLocalization.removeMember}
+              className="size-8 text-destructive"
+              disabled
+              size="icon"
+              variant="outline"
+            >
+              <Trash2 />
+            </Button>
+          ) : hasDeletePermission?.success ? (
+            <Button
+              size="icon"
+              variant="outline"
+              className="size-8 text-destructive"
+              aria-label={organizationLocalization.removeMember}
+              onClick={() => setRemoveOpen(true)}
+            >
+              <Trash2 />
+            </Button>
+          ) : null}
         </div>
 
         {isCurrentUser && organization ? (

@@ -70,6 +70,7 @@ import { Separator } from "@/components/ui/separator"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Spinner } from "@/components/ui/spinner"
 import { dashPlugin } from "@/lib/auth/dash-plugin"
+import { organizationPlugin } from "@/lib/auth/organization-plugin"
 import { cn } from "@/lib/utils"
 
 type ActivityAccess = "admin" | "admin-user" | "organization" | "user"
@@ -454,12 +455,13 @@ export function OrganizationActivity({
   ...props
 }: OrganizationActivityProps) {
   const { authClient } = useAuth()
+  const { creatorRole } = useAuthPlugin(organizationPlugin)
   const { data: memberRole, isPending } = useActiveMemberRole(
     authClient as OrganizationAuthClient,
     { query: { organizationId } }
   )
   const canViewOrganization =
-    hasMemberRole(memberRole?.role, "owner") ||
+    hasMemberRole(memberRole?.role, creatorRole) ||
     hasMemberRole(memberRole?.role, "admin")
 
   if (isPending) {

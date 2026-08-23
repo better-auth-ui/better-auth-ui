@@ -8,6 +8,7 @@ import {
 import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
 import {
   useActiveOrganization,
+  useHasPermission,
   useInviteMember,
   useListOrganizationInvitations,
   useListRoles,
@@ -83,9 +84,19 @@ export function InviteMemberDialog({
     enabled: teamsEnabled
   })
   const invitations = useListOrganizationInvitations(authClient)
+  const canInvite = useHasPermission(authClient, {
+    organizationId: activeOrganization?.id,
+    permissions: { invitation: ["create"] }
+  })
+  const canReadRoles = useHasPermission(authClient, {
+    organizationId: activeOrganization?.id,
+    permissions: { ac: ["read"] }
+  })
   const dynamicRoles = useListRoles(authClient, {
     query: { organizationId: activeOrganization?.id },
-    enabled: dynamicAccessControl?.enabled === true
+    enabled:
+      dynamicAccessControl?.enabled === true &&
+      canReadRoles.data?.success === true
   })
   const assignableRoles = useMemo(
     () => mergeOrganizationRoleLabels(roles, dynamicRoles.data),
@@ -150,7 +161,13 @@ export function InviteMemberDialog({
   const handleSubmit = async (e: SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault()
 
-    if (!activeOrganizationId || !isRoleValid || atInvitationLimit) return
+    if (
+      !activeOrganizationId ||
+      !canInvite.data?.success ||
+      !isRoleValid ||
+      atInvitationLimit
+    )
+      return
 
     const formData = new FormData(e.currentTarget)
     const invitationEmail = (formData.get("email") as string).trim()
@@ -332,7 +349,12 @@ export function InviteMemberDialog({
             <Button
               type="submit"
               disabled={
-                isInviting || isSubmitting || !isRoleValid || atInvitationLimit
+                isInviting ||
+                isSubmitting ||
+                !isRoleValid ||
+                atInvitationLimit ||
+                canInvite.isPending ||
+                !canInvite.data?.success
               }
             >
               {(isInviting || isSubmitting) && <Spinner />}

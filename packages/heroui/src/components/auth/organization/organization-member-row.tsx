@@ -19,7 +19,6 @@ import { useState } from "react"
 import { organizationPlugin } from "../../../lib/auth/organization-plugin"
 import { UserView } from "../user/user-view"
 import { LeaveOrganizationDialog } from "./leave-organization-dialog"
-import { OrganizationMemberRowSkeleton } from "./organization-member-row-skeleton"
 import { RemoveMemberDialog } from "./remove-member-dialog"
 
 export type OrganizationMemberRowProps = {
@@ -36,15 +35,22 @@ export function OrganizationMemberRow({
   const { authClient, locale } = useAuth()
   const {
     modelFields: { member: memberFields },
+    creatorRole,
     dynamicAccessControl,
     localization: organizationLocalization,
     roles
   } = useAuthPlugin(organizationPlugin)
 
   const { data: session } = useSession(authClient)
+  const canReadRoles = useHasPermission(authClient as OrganizationAuthClient, {
+    organizationId: organization.id,
+    permissions: { ac: ["read"] }
+  })
   const dynamicRoles = useListRoles(authClient as OrganizationAuthClient, {
     query: { organizationId: organization.id },
-    enabled: dynamicAccessControl?.enabled === true
+    enabled:
+      dynamicAccessControl?.enabled === true &&
+      canReadRoles.data?.success === true
   })
 
   const { data: hasUpdatePermission, isPending: updatePermissionPending } =
@@ -59,8 +65,6 @@ export function OrganizationMemberRow({
       permissions: { member: ["delete"] }
     })
 
-  const isPending = updatePermissionPending || deletePermissionPending
-
   const { mutate: updateMemberRole, isPending: isUpdatingRole } =
     useUpdateMemberRole(authClient as OrganizationAuthClient, {
       onSuccess: () => toast.success(organizationLocalization.memberRoleUpdated)
@@ -72,17 +76,13 @@ export function OrganizationMemberRow({
   const roleLabel = memberRoleLabels(member.role, mergedRoles).join(", ")
 
   const assignableRoles = Object.entries(mergedRoles).filter(
-    ([key]) => isOwner || key !== "owner"
+    ([key]) => isOwner || key !== creatorRole
   )
 
   const isCurrentUser = session?.user.id === member.userId
 
   const [removeOpen, setRemoveOpen] = useState(false)
   const [leaveOpen, setLeaveOpen] = useState(false)
-
-  if (isPending) {
-    return <OrganizationMemberRowSkeleton />
-  }
 
   return (
     <Table.Row>
@@ -107,6 +107,17 @@ export function OrganizationMemberRow({
 
       <Table.Cell>
         <div className="flex items-center justify-end gap-1">
+          {updatePermissionPending && (
+            <Button
+              aria-label={organizationLocalization.changeMemberRole}
+              isDisabled
+              isIconOnly
+              size="sm"
+              variant="tertiary"
+            >
+              <Pencil />
+            </Button>
+          )}
           {hasUpdatePermission?.success && (
             <Dropdown>
               <Button
@@ -168,19 +179,27 @@ export function OrganizationMemberRow({
             >
               <ArrowRightFromSquare />
             </Button>
-          ) : (
-            hasDeletePermission?.success && (
-              <Button
-                isIconOnly
-                size="sm"
-                variant="danger-soft"
-                aria-label={organizationLocalization.removeMember}
-                onPress={() => setRemoveOpen(true)}
-              >
-                <TrashBin />
-              </Button>
-            )
-          )}
+          ) : deletePermissionPending ? (
+            <Button
+              aria-label={organizationLocalization.removeMember}
+              isDisabled
+              isIconOnly
+              size="sm"
+              variant="danger-soft"
+            >
+              <TrashBin />
+            </Button>
+          ) : hasDeletePermission?.success ? (
+            <Button
+              isIconOnly
+              size="sm"
+              variant="danger-soft"
+              aria-label={organizationLocalization.removeMember}
+              onPress={() => setRemoveOpen(true)}
+            >
+              <TrashBin />
+            </Button>
+          ) : null}
         </div>
 
         {isCurrentUser && organization ? (

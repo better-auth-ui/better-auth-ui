@@ -2,6 +2,10 @@ import { createAuthPlugin } from "../../lib/create-auth-plugin"
 import { type AdminLocalization, adminLocalization } from "./admin-localization"
 
 export type AdminPluginOptions = {
+  /** Roles Better Auth treats as administrators. @default ["admin"] */
+  adminRoles?: string | readonly string[]
+  /** User IDs Better Auth treats as administrators regardless of role. */
+  adminUserIds?: readonly string[]
   /** Default role selected when an administrator creates a user. @default "user" */
   defaultRole?: string
   /** Where to navigate after starting an impersonation session. */
@@ -31,6 +35,29 @@ const resolveRoles = (roles?: readonly string[]) => {
     new Set(roles?.map((role) => role.trim()).filter(Boolean))
   )
   return resolved.length ? resolved : ["user", "admin"]
+}
+
+const resolveValues = (values?: string | readonly string[]) => {
+  const entries = typeof values === "string" ? [values] : values
+  return Array.from(
+    new Set(entries?.map((value) => value.trim()).filter(Boolean))
+  )
+}
+
+/** Check whether a target requires Better Auth's `user:impersonate-admins` permission. */
+export function isAdminTarget(
+  user: { id: string; role?: string | null },
+  adminRoles: readonly string[] = ["admin"],
+  adminUserIds: readonly string[] = []
+) {
+  if (adminUserIds.includes(user.id)) return true
+
+  const roles = user.role
+    ?.split(",")
+    .map((role) => role.trim())
+    .filter(Boolean)
+
+  return roles?.some((role) => adminRoles.includes(role)) ?? false
 }
 
 export type ImpersonatingSession = {
@@ -73,8 +100,11 @@ export const adminPlugin = createAuthPlugin(
   (options: AdminPluginOptions = {}) => {
     const roles = resolveRoles(options.roles)
     const defaultRole = options.defaultRole?.trim() || roles[0] || "user"
+    const adminRoles = resolveValues(options.adminRoles)
 
     return {
+      adminRoles: adminRoles.length ? adminRoles : ["admin"],
+      adminUserIds: resolveValues(options.adminUserIds),
       defaultRole,
       impersonationRedirectTo: options.impersonationRedirectTo,
       localization: { ...adminLocalization, ...options.localization },

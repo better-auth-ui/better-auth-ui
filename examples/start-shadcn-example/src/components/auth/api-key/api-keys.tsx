@@ -32,6 +32,8 @@ export type ApiKeysProps = {
   hideCreate?: boolean
   /** Hide the per-row delete button on listed keys. */
   hideDelete?: boolean
+  /** Hide the per-row edit button on listed keys. */
+  hideUpdate?: boolean
 }
 
 export function ApiKeys({
@@ -39,7 +41,8 @@ export function ApiKeys({
   organizationId,
   isPending: isPendingProp,
   hideCreate,
-  hideDelete
+  hideDelete,
+  hideUpdate
 }: ApiKeysProps) {
   const { authClient } = useAuth<ApiKeyAuthClient>()
   const { localization: apiKeyLocalization, pageSize } =
@@ -127,6 +130,7 @@ export function ApiKeys({
                   <ApiKey
                     apiKey={key}
                     hideDelete={hideDelete}
+                    hideUpdate={hideUpdate}
                     organizationId={organizationId}
                   />
                 </Fragment>

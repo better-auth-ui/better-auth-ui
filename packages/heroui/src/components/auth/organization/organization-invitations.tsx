@@ -45,12 +45,11 @@ export function OrganizationInvitations({
   const { data: invitations, isPending: invitationsPending } =
     useListOrganizationInvitations(authClient as OrganizationAuthClient)
 
-  const { isPending: invitationPermissionPending } = useHasPermission(
-    authClient as OrganizationAuthClient,
-    { permissions: { invitation: ["cancel"] } }
-  )
+  const canInvite = useHasPermission(authClient as OrganizationAuthClient, {
+    permissions: { invitation: ["create"] }
+  })
 
-  const isPending = invitationsPending || invitationPermissionPending
+  const isPending = invitationsPending
 
   const [sortDescriptor, setSortDescriptor] = useState<SortDescriptor>()
   const [roleFilter, setRoleFilter] = useState("all")
@@ -301,7 +300,12 @@ export function OrganizationInvitations({
               <Table.Body
                 renderEmptyState={() => (
                   <OrganizationInvitationsEmpty
-                    onInvitePress={() => setInviteOpen(true)}
+                    isInvitePending={canInvite.isPending}
+                    onInvitePress={
+                      canInvite.data?.success
+                        ? () => setInviteOpen(true)
+                        : undefined
+                    }
                   />
                 )}
               >
@@ -321,7 +325,9 @@ export function OrganizationInvitations({
         </Table>
       </div>
 
-      <InviteMemberDialog isOpen={inviteOpen} onOpenChange={setInviteOpen} />
+      {canInvite.data?.success && (
+        <InviteMemberDialog isOpen={inviteOpen} onOpenChange={setInviteOpen} />
+      )}
     </div>
   )
 }

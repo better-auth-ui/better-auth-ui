@@ -1,6 +1,9 @@
 import type { OrganizationAuthClient } from "@better-auth-ui/core/plugins/organization"
 import { useAuth, useAuthPlugin } from "@better-auth-ui/solid"
-import { useActiveOrganization } from "@better-auth-ui/solid/plugins/organization"
+import {
+  useActiveOrganization,
+  useHasPermission
+} from "@better-auth-ui/solid/plugins/organization"
 import {
   ShieldCheck as RolesIcon,
   Settings as SettingsIcon,
@@ -30,6 +33,11 @@ export function Organization(props: OrganizationProps) {
   const extensionTabs = () =>
     auth.plugins.flatMap((plugin) => plugin.organizationTabs ?? [])
   const rolesEnabled = () => config.dynamicAccessControl?.enabled === true
+  const canReadRoles = useHasPermission(auth.authClient, () => ({
+    organizationId: activeOrganization.data?.id,
+    permissions: { ac: ["read"] },
+    enabled: rolesEnabled() && Boolean(activeOrganization.data?.id)
+  }))
   const currentPath = createMemo(() => {
     if (!rolesEnabled() && props.path === config.viewPaths.organization.roles) {
       throw new Error(
@@ -39,6 +47,13 @@ export function Organization(props: OrganizationProps) {
 
     return props.path
   })
+  const selectedPath = createMemo(() =>
+    currentPath() === config.viewPaths.organization.roles &&
+    !canReadRoles.isPending &&
+    !canReadRoles.data?.success
+      ? config.viewPaths.organization.settings
+      : currentPath()
+  )
 
   const handlePathChange = (path: string) => {
     if (!props.slug) return
@@ -55,7 +70,7 @@ export function Organization(props: OrganizationProps) {
 
   return (
     <Tabs
-      value={currentPath()}
+      value={selectedPath()}
       onChange={handlePathChange}
       class="w-full gap-4 md:gap-6"
     >
@@ -71,7 +86,10 @@ export function Organization(props: OrganizationProps) {
           </TabsTrigger>
         </Show>
         <Show when={rolesEnabled()}>
-          <TabsTrigger value={config.viewPaths.organization.roles}>
+          <TabsTrigger
+            disabled={canReadRoles.isPending || !canReadRoles.data?.success}
+            value={config.viewPaths.organization.roles}
+          >
             <RolesIcon class="text-muted-foreground" />
             {config.localization.roles}
           </TabsTrigger>
@@ -129,7 +147,11 @@ export function Organization(props: OrganizationProps) {
                 value={config.viewPaths.organization.roles}
                 tabIndex={-1}
               >
-                <OrganizationRoles organizationId={currentOrganization().id} />
+                <Show when={canReadRoles.data?.success}>
+                  <OrganizationRoles
+                    organizationId={currentOrganization().id}
+                  />
+                </Show>
               </TabsContent>
             </Show>
             <For each={extensionTabs()}>

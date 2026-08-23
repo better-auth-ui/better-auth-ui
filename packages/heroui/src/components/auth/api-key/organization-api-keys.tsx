@@ -2,9 +2,13 @@ import {
   hasMemberRole,
   type OrganizationAuthClient
 } from "@better-auth-ui/core/plugins/organization"
-import { useAuth, useSession } from "@better-auth-ui/react"
-import { useListOrganizationMembers } from "@better-auth-ui/react/plugins/organization"
+import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
+import {
+  useActiveMemberRole,
+  useHasPermission
+} from "@better-auth-ui/react/plugins/organization"
 import type { CardProps } from "@heroui/react"
+import { organizationPlugin } from "../../../lib/auth/organization-plugin"
 import { ApiKeys } from "./api-keys"
 
 export type OrganizationApiKeysProps = {
@@ -17,10 +21,8 @@ export type OrganizationApiKeysProps = {
 /**
  * {@link ApiKeys} scoped to an explicit organization.
  *
- * Hidden for members whose role isn't `owner`. Better Auth's
- * `/organization/has-permission` endpoint isn't usable for `apiKey:*` checks
- * (it doesn't pass `allowCreatorAllPermissions` and the default org AC has no
- * `apiKey` statements), so we gate on role directly.
+ * Access is resolved per API-key action. The configured organization creator
+ * role receives Better Auth's creator override.
  */
 export function OrganizationApiKeys({
   className,
@@ -28,25 +30,54 @@ export function OrganizationApiKeys({
   variant
 }: OrganizationApiKeysProps) {
   const { authClient } = useAuth()
-  const { data: session } = useSession(authClient)
-
-  const { data: membersData } = useListOrganizationMembers(
-    authClient as OrganizationAuthClient,
-    { query: { organizationId } }
-  )
-
-  const canManageApiKeys = membersData?.members.some(
-    (member) =>
-      hasMemberRole(member.role, "owner") && member.userId === session?.user.id
-  )
-
-  if (!canManageApiKeys) {
-    return null
+  const client = authClient as OrganizationAuthClient
+  const { creatorRole } = useAuthPlugin(organizationPlugin)
+  const memberRole = useActiveMemberRole(client, {
+    query: { organizationId }
+  })
+  const isCreator = hasMemberRole(memberRole.data?.role, creatorRole)
+  const permissionOptions = {
+    enabled: !memberRole.isPending && !isCreator,
+    organizationId
   }
+  const permissions = (action: string) =>
+    ({ apiKey: [action] }) as Parameters<
+      OrganizationAuthClient["organization"]["hasPermission"]
+    >[0]["permissions"]
+  const canRead = useHasPermission(client, {
+    ...permissionOptions,
+    permissions: permissions("read")
+  })
+  const canCreate = useHasPermission(client, {
+    ...permissionOptions,
+    permissions: permissions("create")
+  })
+  const canUpdate = useHasPermission(client, {
+    ...permissionOptions,
+    permissions: permissions("update")
+  })
+  const canDelete = useHasPermission(client, {
+    ...permissionOptions,
+    permissions: permissions("delete")
+  })
+  const permissionPending =
+    !isCreator &&
+    !memberRole.isPending &&
+    (canRead.isPending ||
+      canCreate.isPending ||
+      canUpdate.isPending ||
+      canDelete.isPending)
+  const isPending = memberRole.isPending || permissionPending
+
+  if (!isPending && !isCreator && !canRead.data?.success) return null
 
   return (
     <ApiKeys
       className={className}
+      hideCreate={!isCreator && !canCreate.data?.success}
+      hideDelete={!isCreator && !canDelete.data?.success}
+      hideUpdate={!isCreator && !canUpdate.data?.success}
+      isPending={isPending}
       variant={variant}
       organizationId={organizationId}
     />

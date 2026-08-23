@@ -4,7 +4,8 @@ import { Button, EmptyState } from "@heroui/react"
 import { organizationPlugin } from "../../../lib/auth/organization-plugin"
 
 export type OrganizationInvitationsEmptyProps = {
-  onInvitePress: () => void
+  isInvitePending?: boolean
+  onInvitePress?: () => void
 }
 
 /**
@@ -12,6 +13,7 @@ export type OrganizationInvitationsEmptyProps = {
  * (icon, title, description) with an "Invite member" call to action.
  */
 export function OrganizationInvitationsEmpty({
+  isInvitePending,
   onInvitePress
 }: OrganizationInvitationsEmptyProps) {
   const { localization: organizationLocalization } =
@@ -31,9 +33,11 @@ export function OrganizationInvitationsEmpty({
         </span>
       </div>
 
-      <Button size="sm" onPress={onInvitePress}>
-        {organizationLocalization.inviteMember}
-      </Button>
+      {(isInvitePending || onInvitePress) && (
+        <Button isDisabled={isInvitePending} size="sm" onPress={onInvitePress}>
+          {organizationLocalization.inviteMember}
+        </Button>
+      )}
     </EmptyState>
   )
 }

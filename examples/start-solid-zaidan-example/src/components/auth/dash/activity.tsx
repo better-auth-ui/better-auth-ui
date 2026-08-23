@@ -69,6 +69,7 @@ import { Separator } from "@/components/ui/separator"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Spinner } from "@/components/ui/spinner"
 import { dashPlugin } from "@/lib/auth/dash-plugin"
+import { organizationPlugin } from "@/lib/auth/organization-plugin"
 import { cn } from "@/lib/utils"
 
 type ActivityAccess = "admin" | "admin-user" | "organization" | "user"
@@ -470,12 +471,13 @@ export function UserActivity(props: UserActivityProps) {
 /** Activity for an explicit organization. */
 export function OrganizationActivity(props: OrganizationActivityProps) {
   const auth = useAuth()
+  const { creatorRole } = useAuthPlugin(organizationPlugin)
   const memberRole = useActiveMemberRole(
     auth.authClient as OrganizationAuthClient,
     () => ({ query: { organizationId: props.organizationId } })
   )
   const canViewOrganization = () =>
-    hasMemberRole(memberRole.data?.role, "owner") ||
+    hasMemberRole(memberRole.data?.role, creatorRole) ||
     hasMemberRole(memberRole.data?.role, "admin")
 
   return (

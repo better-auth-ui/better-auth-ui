@@ -3,6 +3,7 @@ import type { OrganizationAuthClient } from "@better-auth-ui/core/plugins/organi
 import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
 import {
   useActiveOrganization,
+  useHasPermission,
   useUpdateOrganization
 } from "@better-auth-ui/react/plugins/organization"
 import { CloudArrowUpIn, TrashBin } from "@gravity-ui/icons"
@@ -24,6 +25,9 @@ export function ChangeOrganizationLogo({
 
   const { data: activeOrganization, isPending: activeOrganizationPending } =
     useActiveOrganization(authClient as OrganizationAuthClient)
+  const canUpdate = useHasPermission(authClient as OrganizationAuthClient, {
+    permissions: { organization: ["update"] }
+  })
 
   const { mutate: updateOrganization, isPending: updatePending } =
     useUpdateOrganization(authClient as OrganizationAuthClient)
@@ -36,7 +40,7 @@ export function ChangeOrganizationLogo({
 
   async function handleFileChange(e: ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]
-    if (!file || !activeOrganization) return
+    if (!file || !activeOrganization || !canUpdate.data?.success) return
 
     e.target.value = ""
 
@@ -66,6 +70,7 @@ export function ChangeOrganizationLogo({
   }
 
   async function handleDelete() {
+    if (!canUpdate.data?.success) return
     const currentLogo = activeOrganization?.logo
 
     updateOrganization(
@@ -114,56 +119,68 @@ export function ChangeOrganizationLogo({
       />
 
       <div className="flex items-center gap-4">
-        <Button
-          type="button"
-          isIconOnly
-          variant="ghost"
-          className="p-0 h-auto w-auto rounded-full"
-          isDisabled={!activeOrganization || isPending}
-          onPress={() => fileInputRef.current?.click()}
-        >
+        {canUpdate.data?.success ? (
+          <Button
+            type="button"
+            isIconOnly
+            variant="ghost"
+            className="p-0 h-auto w-auto rounded-full"
+            isDisabled={!activeOrganization || isPending}
+            onPress={() => fileInputRef.current?.click()}
+          >
+            <OrganizationLogo
+              size="lg"
+              isPending={activeOrganizationPending}
+              organization={activeOrganization}
+            />
+          </Button>
+        ) : (
           <OrganizationLogo
             size="lg"
             isPending={activeOrganizationPending}
             organization={activeOrganization}
           />
-        </Button>
+        )}
 
-        <Dropdown>
-          <Button
-            isDisabled={!activeOrganization || isPending}
-            size="sm"
-            variant="secondary"
-          >
-            {isPending && <Spinner size="sm" />}
+        {(canUpdate.isPending || canUpdate.data?.success) && (
+          <Dropdown>
+            <Button
+              isDisabled={
+                !activeOrganization || isPending || canUpdate.isPending
+              }
+              size="sm"
+              variant="secondary"
+            >
+              {isPending && <Spinner size="sm" />}
 
-            {organizationLocalization.changeLogo}
-          </Button>
+              {organizationLocalization.changeLogo}
+            </Button>
 
-          <Dropdown.Popover className="min-w-fit">
-            <Dropdown.Menu>
-              <Dropdown.Item
-                textValue={organizationLocalization.uploadLogo}
-                onAction={() => fileInputRef.current?.click()}
-              >
-                <CloudArrowUpIn className="text-muted" />
+            <Dropdown.Popover className="min-w-fit">
+              <Dropdown.Menu>
+                <Dropdown.Item
+                  textValue={organizationLocalization.uploadLogo}
+                  onAction={() => fileInputRef.current?.click()}
+                >
+                  <CloudArrowUpIn className="text-muted" />
 
-                <Label>{organizationLocalization.uploadLogo}</Label>
-              </Dropdown.Item>
+                  <Label>{organizationLocalization.uploadLogo}</Label>
+                </Dropdown.Item>
 
-              <Dropdown.Item
-                textValue={organizationLocalization.deleteLogo}
-                isDisabled={!activeOrganization?.logo}
-                onAction={handleDelete}
-                variant="danger"
-              >
-                <TrashBin className="text-danger" />
+                <Dropdown.Item
+                  textValue={organizationLocalization.deleteLogo}
+                  isDisabled={!activeOrganization?.logo}
+                  onAction={handleDelete}
+                  variant="danger"
+                >
+                  <TrashBin className="text-danger" />
 
-                <Label>{organizationLocalization.deleteLogo}</Label>
-              </Dropdown.Item>
-            </Dropdown.Menu>
-          </Dropdown.Popover>
-        </Dropdown>
+                  <Label>{organizationLocalization.deleteLogo}</Label>
+                </Dropdown.Item>
+              </Dropdown.Menu>
+            </Dropdown.Popover>
+          </Dropdown>
+        )}
       </div>
     </div>
   )

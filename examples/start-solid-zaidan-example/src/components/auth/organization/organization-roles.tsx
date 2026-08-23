@@ -32,6 +32,7 @@ import {
 } from "@/components/ui/dialog"
 import { Field, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
+import { Spinner } from "@/components/ui/spinner"
 import {
   Table,
   TableBody,
@@ -53,9 +54,13 @@ type Role = {
 export function OrganizationRoles(props: { organizationId: string }) {
   const auth = useAuth<OrganizationAuthClient>()
   const config = useAuthPlugin(organizationPlugin)
+  const canRead = useHasPermission(auth.authClient, () => ({
+    organizationId: props.organizationId,
+    permissions: { ac: ["read"] }
+  }))
   const roles = useListRoles(auth.authClient, () => ({
     query: { organizationId: props.organizationId },
-    enabled: !!props.organizationId
+    enabled: !!props.organizationId && canRead.data?.success === true
   }))
   const canCreate = useHasPermission(auth.authClient, () => ({
     organizationId: props.organizationId,
@@ -88,8 +93,11 @@ export function OrganizationRoles(props: { organizationId: string }) {
             {config.localization.rolesDescription}
           </p>
         </div>
-        <Show when={canCreate.data?.success}>
-          <Button onClick={() => setEditingRole(null)}>
+        <Show when={canCreate.isPending || canCreate.data?.success}>
+          <Button
+            disabled={canCreate.isPending}
+            onClick={() => setEditingRole(null)}
+          >
             <Plus />
             {config.localization.createRole}
           </Button>
@@ -97,60 +105,71 @@ export function OrganizationRoles(props: { organizationId: string }) {
       </div>
 
       <Show
-        when={roles.data?.length}
-        fallback={
-          <Card>
-            <CardContent class="flex flex-col gap-1">
-              <p class="text-sm font-medium">{config.localization.noRoles}</p>
-              <p class="text-sm text-muted-foreground">
-                {config.localization.noRolesDescription}
-              </p>
-            </CardContent>
-          </Card>
-        }
+        when={!canRead.isPending && !roles.isLoading}
+        fallback={<Spinner />}
       >
-        <Card>
-          <CardContent class="p-0">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>{config.localization.roleName}</TableHead>
-                  <TableHead>{config.localization.permissions}</TableHead>
-                  <TableHead class="text-end">
-                    {config.localization.actions}
-                  </TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                <For each={roles.data}>
-                  {(role) => (
-                    <OrganizationRoleRow
-                      authClient={auth.authClient}
-                      canDelete={canDelete.data?.success === true}
-                      canUpdate={canUpdate.data?.success === true}
-                      deleting={deleteRole.isPending}
-                      onDelete={() => {
-                        if (
-                          !window.confirm(
-                            config.localization.deleteRoleDescription
-                          )
-                        )
-                          return
-                        deleteRole.mutate({
-                          organizationId: props.organizationId,
-                          roleId: role.id
-                        })
-                      }}
-                      onEdit={() => setEditingRole(role)}
-                      organizationId={props.organizationId}
-                      role={role}
-                    />
-                  )}
-                </For>
-              </TableBody>
-            </Table>
-          </CardContent>
-        </Card>
+        <Show when={canRead.data?.success}>
+          <Show
+            when={roles.data?.length}
+            fallback={
+              <Card>
+                <CardContent class="flex flex-col gap-1">
+                  <p class="text-sm font-medium">
+                    {config.localization.noRoles}
+                  </p>
+                  <p class="text-sm text-muted-foreground">
+                    {config.localization.noRolesDescription}
+                  </p>
+                </CardContent>
+              </Card>
+            }
+          >
+            <Card>
+              <CardContent class="p-0">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>{config.localization.roleName}</TableHead>
+                      <TableHead>{config.localization.permissions}</TableHead>
+                      <TableHead class="text-end">
+                        {config.localization.actions}
+                      </TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    <For each={roles.data}>
+                      {(role) => (
+                        <OrganizationRoleRow
+                          authClient={auth.authClient}
+                          canDelete={canDelete.data?.success === true}
+                          canDeletePending={canDelete.isPending}
+                          canUpdate={canUpdate.data?.success === true}
+                          canUpdatePending={canUpdate.isPending}
+                          deleting={deleteRole.isPending}
+                          onDelete={() => {
+                            if (
+                              !window.confirm(
+                                config.localization.deleteRoleDescription
+                              )
+                            )
+                              return
+                            deleteRole.mutate({
+                              organizationId: props.organizationId,
+                              roleId: role.id
+                            })
+                          }}
+                          onEdit={() => setEditingRole(role)}
+                          organizationId={props.organizationId}
+                          role={role}
+                        />
+                      )}
+                    </For>
+                  </TableBody>
+                </Table>
+              </CardContent>
+            </Card>
+          </Show>
+        </Show>
       </Show>
 
       <RoleDialog
@@ -168,7 +187,9 @@ export function OrganizationRoles(props: { organizationId: string }) {
 function OrganizationRoleRow(props: {
   authClient: OrganizationAuthClient
   canDelete: boolean
+  canDeletePending: boolean
   canUpdate: boolean
+  canUpdatePending: boolean
   deleting: boolean
   onDelete: () => void
   onEdit: () => void
@@ -201,6 +222,16 @@ function OrganizationRoleRow(props: {
       </TableCell>
       <TableCell>
         <div class="flex justify-end gap-1">
+          <Show when={props.canUpdatePending}>
+            <Button
+              aria-label={config.localization.editRole}
+              disabled
+              size="icon-sm"
+              variant="ghost"
+            >
+              <Pencil />
+            </Button>
+          </Show>
           <Show when={props.canUpdate}>
             <Button
               aria-label={config.localization.editRole}
@@ -227,6 +258,16 @@ function OrganizationRoleRow(props: {
                     )
                   : config.localization.deleteRole
               }
+              variant="ghost"
+            >
+              <Trash2 class="text-destructive" />
+            </Button>
+          </Show>
+          <Show when={props.canDeletePending}>
+            <Button
+              aria-label={config.localization.deleteRole}
+              disabled
+              size="icon-sm"
               variant="ghost"
             >
               <Trash2 class="text-destructive" />
@@ -285,6 +326,24 @@ function RoleDialog(props: {
 
     setIsSubmitting(true)
     try {
+      const selectedPermissions = permission()
+      if (
+        Object.values(selectedPermissions).some((actions) => actions.length > 0)
+      ) {
+        const access = await auth.authClient.organization.hasPermission({
+          organizationId: props.organizationId,
+          permissions: selectedPermissions as Parameters<
+            OrganizationAuthClient["organization"]["hasPermission"]
+          >[0]["permissions"]
+        })
+
+        if (access.error || !access.data?.success) {
+          toast.error(config.localization.permissionsLimitedDescription)
+          setIsSubmitting(false)
+          return
+        }
+      }
+
       const additionalFields = await parseAdditionalFieldValues(
         props.roleFields,
         new FormData(event.currentTarget as HTMLFormElement)
@@ -370,32 +429,28 @@ function RoleDialog(props: {
                   </p>
                   <div class="grid gap-3 sm:grid-cols-2">
                     <For each={Object.entries(definition.actions)}>
-                      {([action, label]) => {
-                        const id = `role-permission-${resource}-${action}`
-                        return (
-                          <Field orientation="horizontal">
-                            <Checkbox
-                              checked={
-                                permission()[resource]?.includes(action) ??
-                                false
-                              }
-                              disabled={pending()}
-                              id={id}
-                              onChange={(selected) =>
-                                setPermission((current) => ({
-                                  ...current,
-                                  [resource]: selected
-                                    ? [...(current[resource] ?? []), action]
-                                    : (current[resource] ?? []).filter(
-                                        (entry) => entry !== action
-                                      )
-                                }))
-                              }
-                            />
-                            <FieldLabel for={id}>{label}</FieldLabel>
-                          </Field>
-                        )
-                      }}
+                      {([action, label]) => (
+                        <RolePermissionCheckbox
+                          action={action}
+                          checked={
+                            permission()[resource]?.includes(action) ?? false
+                          }
+                          label={label}
+                          onChange={(selected) =>
+                            setPermission((current) => ({
+                              ...current,
+                              [resource]: selected
+                                ? [...(current[resource] ?? []), action]
+                                : (current[resource] ?? []).filter(
+                                    (entry) => entry !== action
+                                  )
+                            }))
+                          }
+                          organizationId={props.organizationId}
+                          pending={pending()}
+                          resource={resource}
+                        />
+                      )}
                     </For>
                   </div>
                 </div>
@@ -419,5 +474,40 @@ function RoleDialog(props: {
         </form>
       </DialogContent>
     </Dialog>
+  )
+}
+
+function RolePermissionCheckbox(props: {
+  action: string
+  checked: boolean
+  label: string
+  onChange: (checked: boolean) => void
+  organizationId: string
+  pending: boolean
+  resource: string
+}) {
+  const auth = useAuth<OrganizationAuthClient>()
+  const canAssign = useHasPermission(auth.authClient, () => ({
+    organizationId: props.organizationId,
+    permissions: { [props.resource]: [props.action] } as Parameters<
+      OrganizationAuthClient["organization"]["hasPermission"]
+    >[0]["permissions"]
+  }))
+  const id = () => `role-permission-${props.resource}-${props.action}`
+  const disabled = () =>
+    props.pending ||
+    canAssign.isPending ||
+    (!props.checked && !canAssign.data?.success)
+
+  return (
+    <Field orientation="horizontal">
+      <Checkbox
+        checked={props.checked}
+        disabled={disabled()}
+        id={id()}
+        onChange={props.onChange}
+      />
+      <FieldLabel for={id()}>{props.label}</FieldLabel>
+    </Field>
   )
 }

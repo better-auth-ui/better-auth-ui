@@ -47,6 +47,7 @@ import {
 import { keepPreviousData } from "@tanstack/react-query"
 import { useDeferredValue, useMemo, useState } from "react"
 import { dashPlugin } from "../../../lib/auth/dash-plugin"
+import { organizationPlugin } from "../../../lib/auth/organization-plugin"
 
 type ActivityAccess = "admin" | "admin-user" | "organization" | "user"
 
@@ -436,12 +437,13 @@ export function OrganizationActivity({
   ...props
 }: OrganizationActivityProps) {
   const { authClient } = useAuth()
+  const { creatorRole } = useAuthPlugin(organizationPlugin)
   const { data: memberRole, isPending } = useActiveMemberRole(
     authClient as OrganizationAuthClient,
     { query: { organizationId } }
   )
   const canViewOrganization =
-    hasMemberRole(memberRole?.role, "owner") ||
+    hasMemberRole(memberRole?.role, creatorRole) ||
     hasMemberRole(memberRole?.role, "admin")
 
   if (isPending) {

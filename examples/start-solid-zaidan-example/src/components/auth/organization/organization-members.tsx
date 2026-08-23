@@ -7,6 +7,7 @@ import {
 import { useAuth, useAuthPlugin } from "@better-auth-ui/solid"
 import {
   useActiveMemberRole,
+  useHasPermission,
   useListOrganizationMembers,
   useListRoles
 } from "@better-auth-ui/solid/plugins/organization"
@@ -226,9 +227,17 @@ export function OrganizationMembers(props: OrganizationMembersProps) {
   // The signed-in user need not be on the loaded page, so their own role comes
   // from a dedicated endpoint rather than from the member list.
   const activeMemberRole = useActiveMemberRole(auth.authClient)
+  const canInvite = useHasPermission(auth.authClient, () => ({
+    permissions: { invitation: ["create"] }
+  }))
+  const canReadRoles = useHasPermission(auth.authClient, () => ({
+    permissions: { ac: ["read"] }
+  }))
   const dynamicRoles = useListRoles(auth.authClient, () => ({
     query: { organizationId: props.organizationId },
-    enabled: config.dynamicAccessControl?.enabled === true
+    enabled:
+      config.dynamicAccessControl?.enabled === true &&
+      canReadRoles.data?.success === true
   }))
   const memberRows = () => (members.data?.members ?? []) as OrganizationMember[]
   const organizationPluginConfig = () =>
@@ -333,7 +342,8 @@ export function OrganizationMembers(props: OrganizationMembersProps) {
       }
     })
   }
-  const isOwner = () => hasMemberRole(activeMemberRole.data?.role, "owner")
+  const isOwner = () =>
+    hasMemberRole(activeMemberRole.data?.role, config.creatorRole)
 
   const total = () => members.data?.total ?? memberRows().length
   const pageStart = () => page() * (pageSize() ?? 0)
@@ -359,18 +369,21 @@ export function OrganizationMembers(props: OrganizationMembersProps) {
     <div class={cn("flex flex-col gap-3", props.class)}>
       <div class="flex items-end justify-between gap-3">
         <h3 class="truncate text-sm font-semibold">Members</h3>
-        <Button
-          class="shrink-0"
-          disabled={
-            config.membershipLimit !== undefined &&
-            total() >= config.membershipLimit
-          }
-          onClick={() => setInviteOpen(true)}
-          size="sm"
-          type="button"
-        >
-          Invite member
-        </Button>
+        <Show when={canInvite.isPending || canInvite.data?.success}>
+          <Button
+            class="shrink-0"
+            disabled={
+              canInvite.isPending ||
+              (config.membershipLimit !== undefined &&
+                total() >= config.membershipLimit)
+            }
+            onClick={() => setInviteOpen(true)}
+            size="sm"
+            type="button"
+          >
+            Invite member
+          </Button>
+        </Show>
       </div>
       <Show
         when={!members.isPending}
@@ -556,7 +569,9 @@ export function OrganizationMembers(props: OrganizationMembersProps) {
           </Show>
         </Show>
       </Show>
-      <InviteMemberDialog open={inviteOpen()} onOpenChange={setInviteOpen} />
+      <Show when={canInvite.data?.success}>
+        <InviteMemberDialog open={inviteOpen()} onOpenChange={setInviteOpen} />
+      </Show>
     </div>
   )
 }

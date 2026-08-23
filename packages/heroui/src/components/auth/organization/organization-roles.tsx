@@ -50,9 +50,13 @@ export function OrganizationRoles({
   const client = authClient as OrganizationAuthClient
   const { dynamicAccessControl, localization, modelFields } =
     useAuthPlugin(organizationPlugin)
+  const canRead = useHasPermission(client, {
+    organizationId,
+    permissions: { ac: ["read"] }
+  })
   const roles = useListRoles(client, {
     query: { organizationId },
-    enabled: !!organizationId
+    enabled: !!organizationId && canRead.data?.success === true
   })
   const canCreate = useHasPermission(client, {
     organizationId,
@@ -79,17 +83,20 @@ export function OrganizationRoles({
           <h2 className="text-sm font-semibold">{localization.roles}</h2>
           <p className="text-sm text-muted">{localization.rolesDescription}</p>
         </div>
-        {canCreate.data?.success && (
-          <Button onPress={() => setEditingRole(null)}>
+        {(canCreate.isPending || canCreate.data?.success) && (
+          <Button
+            isDisabled={canCreate.isPending}
+            onPress={() => setEditingRole(null)}
+          >
             <CirclePlus />
             {localization.createRole}
           </Button>
         )}
       </div>
 
-      {roles.isLoading ? (
+      {canRead.isPending || roles.isLoading ? (
         <Spinner />
-      ) : roles.data?.length ? (
+      ) : !canRead.data?.success ? null : roles.data?.length ? (
         <Table>
           <Table.ScrollContainer>
             <Table.Content aria-label={localization.roles}>
@@ -106,7 +113,9 @@ export function OrganizationRoles({
                     key={role.id}
                     authClient={client}
                     canDelete={canDelete.data?.success === true}
+                    canDeletePending={canDelete.isPending}
                     canUpdate={canUpdate.data?.success === true}
+                    canUpdatePending={canUpdate.isPending}
                     deleting={deleteRole.isPending}
                     onDelete={() => {
                       if (!window.confirm(localization.deleteRoleDescription))
@@ -151,7 +160,9 @@ export function OrganizationRoles({
 function OrganizationRoleRow({
   authClient,
   canDelete,
+  canDeletePending,
   canUpdate,
+  canUpdatePending,
   deleting,
   onDelete,
   onEdit,
@@ -160,7 +171,9 @@ function OrganizationRoleRow({
 }: {
   authClient: OrganizationAuthClient
   canDelete: boolean
+  canDeletePending: boolean
   canUpdate: boolean
+  canUpdatePending: boolean
   deleting: boolean
   onDelete: () => void
   onEdit: () => void
@@ -193,6 +206,17 @@ function OrganizationRoleRow({
       </Table.Cell>
       <Table.Cell>
         <div className="flex justify-end gap-1">
+          {canUpdatePending && (
+            <Button
+              aria-label={localization.editRole}
+              isDisabled
+              isIconOnly
+              size="sm"
+              variant="tertiary"
+            >
+              <Pencil />
+            </Button>
+          )}
           {canUpdate && (
             <Button
               isIconOnly
@@ -219,6 +243,17 @@ function OrganizationRoleRow({
               }
               isDisabled={assignmentUnknown || assignedCount > 0 || deleting}
               onPress={onDelete}
+            >
+              <TrashBin />
+            </Button>
+          )}
+          {canDeletePending && (
+            <Button
+              aria-label={localization.deleteRole}
+              isDisabled
+              isIconOnly
+              size="sm"
+              variant="danger-soft"
             >
               <TrashBin />
             </Button>
@@ -276,6 +311,21 @@ function RoleDialog({
 
     setIsSubmitting(true)
     try {
+      if (Object.values(permission).some((actions) => actions.length > 0)) {
+        const access = await client.organization.hasPermission({
+          organizationId,
+          permissions: permission as Parameters<
+            OrganizationAuthClient["organization"]["hasPermission"]
+          >[0]["permissions"]
+        })
+
+        if (access.error || !access.data?.success) {
+          toast.danger(localization.permissionsLimitedDescription)
+          setIsSubmitting(false)
+          return
+        }
+      }
+
       const additionalFields = await parseAdditionalFieldValues(
         roleFields,
         new FormData(event.currentTarget)
@@ -352,35 +402,29 @@ function RoleDialog({
                     </p>
                     <div className="grid gap-3 sm:grid-cols-2">
                       {Object.entries(definition.actions).map(
-                        ([action, label]) => {
-                          const selected =
-                            permission[resource]?.includes(action) ?? false
-                          return (
-                            <Checkbox
-                              key={action}
-                              isSelected={selected}
-                              isDisabled={pending}
-                              onChange={(checked) =>
-                                setPermission((current) => ({
-                                  ...current,
-                                  [resource]: checked
-                                    ? [...(current[resource] ?? []), action]
-                                    : (current[resource] ?? []).filter(
-                                        (entry) => entry !== action
-                                      )
-                                }))
-                              }
-                              variant="secondary"
-                            >
-                              <Checkbox.Content>
-                                <Checkbox.Control>
-                                  <Checkbox.Indicator />
-                                </Checkbox.Control>
-                                {label}
-                              </Checkbox.Content>
-                            </Checkbox>
-                          )
-                        }
+                        ([action, label]) => (
+                          <RolePermissionCheckbox
+                            action={action}
+                            isSelected={
+                              permission[resource]?.includes(action) ?? false
+                            }
+                            key={action}
+                            label={label}
+                            onChange={(checked) =>
+                              setPermission((current) => ({
+                                ...current,
+                                [resource]: checked
+                                  ? [...(current[resource] ?? []), action]
+                                  : (current[resource] ?? []).filter(
+                                      (entry) => entry !== action
+                                    )
+                              }))
+                            }
+                            organizationId={organizationId}
+                            pending={pending}
+                            resource={resource}
+                          />
+                        )
                       )}
                     </div>
                   </div>
@@ -404,5 +448,52 @@ function RoleDialog({
         </AlertDialog.Dialog>
       </AlertDialog.Container>
     </AlertDialog.Backdrop>
+  )
+}
+
+function RolePermissionCheckbox({
+  action,
+  isSelected,
+  label,
+  onChange,
+  organizationId,
+  pending,
+  resource
+}: {
+  action: string
+  isSelected: boolean
+  label: string
+  onChange: (checked: boolean) => void
+  organizationId: string
+  pending: boolean
+  resource: string
+}) {
+  const { authClient } = useAuth()
+  const client = authClient as OrganizationAuthClient
+  const canAssign = useHasPermission(client, {
+    organizationId,
+    permissions: { [resource]: [action] } as Parameters<
+      OrganizationAuthClient["organization"]["hasPermission"]
+    >[0]["permissions"]
+  })
+
+  return (
+    <Checkbox
+      isDisabled={
+        pending ||
+        canAssign.isPending ||
+        (!isSelected && !canAssign.data?.success)
+      }
+      isSelected={isSelected}
+      onChange={onChange}
+      variant="secondary"
+    >
+      <Checkbox.Content>
+        <Checkbox.Control>
+          <Checkbox.Indicator />
+        </Checkbox.Control>
+        {label}
+      </Checkbox.Content>
+    </Checkbox>
   )
 }

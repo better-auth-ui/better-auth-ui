@@ -22,11 +22,18 @@ export type ApiKeyProps = {
   apiKey: ListedApiKey
   /** Hide the row's delete button (e.g., when caller lacks `apiKey:delete`). */
   hideDelete?: boolean
+  /** Hide the row's edit button (e.g., when caller lacks `apiKey:update`). */
+  hideUpdate?: boolean
   /** Scope the delete payload to an organization (sets `configId`). */
   organizationId?: string
 }
 
-export function ApiKey({ apiKey, hideDelete, organizationId }: ApiKeyProps) {
+export function ApiKey({
+  apiKey,
+  hideDelete,
+  hideUpdate,
+  organizationId
+}: ApiKeyProps) {
   const { localization } = useAuth()
   const { localization: apiKeyLocalization } = useAuthPlugin(apiKeyPlugin)
   const [deleteOpen, setDeleteOpen] = useState(false)
@@ -76,15 +83,23 @@ export function ApiKey({ apiKey, hideDelete, organizationId }: ApiKeyProps) {
         </ItemDescription>
       </ItemContent>
       <ItemActions>
-        <Button variant="outline" size="sm" onClick={() => setEditOpen(true)}>
-          <Pencil />
-          {apiKeyLocalization.editApiKey}
-        </Button>
-        <EditApiKeyDialog
-          apiKey={apiKey}
-          open={editOpen}
-          onOpenChange={setEditOpen}
-        />
+        {!hideUpdate && (
+          <>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setEditOpen(true)}
+            >
+              <Pencil />
+              {apiKeyLocalization.editApiKey}
+            </Button>
+            <EditApiKeyDialog
+              apiKey={apiKey}
+              open={editOpen}
+              onOpenChange={setEditOpen}
+            />
+          </>
+        )}
         {!hideDelete && (
           <>
             <Button

@@ -28,6 +28,7 @@ export type ApiKeysProps = {
   isPending?: boolean
   hideCreate?: boolean
   hideDelete?: boolean
+  hideUpdate?: boolean
 }
 
 export function ApiKeys(props: ApiKeysProps = {}) {
@@ -41,6 +42,7 @@ export function ApiKeys(props: ApiKeysProps = {}) {
   })
   const pageSize = config.pageSize
   const listParams = () => ({
+    enabled: !props.isPending,
     query: {
       ...(props.organizationId
         ? {
@@ -138,6 +140,7 @@ export function ApiKeys(props: ApiKeysProps = {}) {
                       <ApiKey
                         apiKey={apiKey as ListedApiKey}
                         hideDelete={props.hideDelete}
+                        hideUpdate={props.hideUpdate}
                         organizationId={props.organizationId}
                       />
                     </>

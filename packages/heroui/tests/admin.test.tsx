@@ -43,7 +43,9 @@ function renderStopImpersonating(
   }
 }
 
-function renderAdminUsers() {
+function renderAdminUsers(
+  permission: (permissions: Record<string, string[]>) => boolean = () => true
+) {
   const queryClient = new QueryClient({
     defaultOptions: {
       queries: { retry: false, staleTime: Infinity },
@@ -55,10 +57,12 @@ function renderAdminUsers() {
     user: { id: "admin-1", email: "admin@example.com", name: "Admin" }
   }
   queryClient.setQueryData(authQueryKeys.session, session)
-  const hasPermission = vi.fn(async () => ({
-    data: { success: true },
-    error: null
-  }))
+  const hasPermission = vi.fn(
+    async ({ permissions }: { permissions: Record<string, string[]> }) => ({
+      data: { success: permission(permissions) },
+      error: null
+    })
+  )
   const listUsers = vi.fn(async () => ({
     data: { users: [], total: 0 },
     error: null
@@ -154,5 +158,19 @@ describe("adminPlugin", () => {
     expect(hasPermission).toHaveBeenCalledWith(
       expect.objectContaining({ permissions: { user: ["create"] } })
     )
+  })
+
+  it("creates users without exposing role assignment when it is denied", async () => {
+    const user = userEvent.setup()
+    renderAdminUsers((permissions) => !permissions.user?.includes("set-role"))
+
+    await user.click(await screen.findByRole("button", { name: "Create user" }))
+    expect(await screen.findByRole("alertdialog")).toBeVisible()
+
+    await waitFor(() => {
+      expect(
+        screen.queryByRole("button", { name: "Role" })
+      ).not.toBeInTheDocument()
+    })
   })
 })

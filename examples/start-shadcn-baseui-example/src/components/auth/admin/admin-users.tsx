@@ -10,6 +10,7 @@ import {
   banAdminUserOptions,
   createAdminUserOptions,
   impersonateAdminUserOptions,
+  isAdminTarget,
   removeAdminUserOptions,
   revokeAdminUserSessionOptions,
   revokeAdminUserSessionsOptions,
@@ -233,6 +234,7 @@ export function AdminUsers({
     placeholderData: keepPreviousData
   })
   const canCreate = useAdminPermission(auth.authClient, { user: ["create"] })
+  const canGet = useAdminPermission(auth.authClient, { user: ["get"] })
 
   const changeSort = (field: string) => {
     setPage(0)
@@ -429,23 +431,33 @@ export function AdminUsers({
                     <TableRow
                       key={user.id}
                       aria-selected={selectedUserId === user.id}
-                      className="cursor-pointer"
-                      onClick={() => setSelectedUserId(user.id)}
+                      className={
+                        canGet.data?.success ? "cursor-pointer" : undefined
+                      }
+                      onClick={
+                        canGet.data?.success
+                          ? () => setSelectedUserId(user.id)
+                          : undefined
+                      }
                     >
                       <TableCell>
                         <div className="flex items-center gap-3">
                           <UserAvatar className="size-8" user={user} />
                           <div className="min-w-0">
-                            <Button
-                              className="h-auto min-w-0 justify-start p-0 font-medium"
-                              onClick={(event) => {
-                                event.stopPropagation()
-                                setSelectedUserId(user.id)
-                              }}
-                              variant="link"
-                            >
+                            {canGet.data?.success ? (
+                              <Button
+                                className="h-auto min-w-0 justify-start p-0 font-medium"
+                                onClick={(event) => {
+                                  event.stopPropagation()
+                                  setSelectedUserId(user.id)
+                                }}
+                                variant="link"
+                              >
+                                <span className="truncate">{user.name}</span>
+                              </Button>
+                            ) : (
                               <span className="truncate">{user.name}</span>
-                            </Button>
+                            )}
                             <div className="truncate text-xs text-muted-foreground">
                               {user.email}
                             </div>
@@ -520,7 +532,8 @@ export function AdminUsers({
 
       <CreateUserDialog open={createOpen} onOpenChange={setCreateOpen} />
       <UserInspector
-        open={Boolean(selectedUserId)}
+        canGetUser={canGet.data?.success === true}
+        open={Boolean(selectedUserId) && canGet.data?.success === true}
         onOpenChange={(open) => !open && setSelectedUserId(undefined)}
         userId={selectedUserId}
       />
@@ -633,6 +646,9 @@ function CreateUserDialog({
   const [emailVerified, setEmailVerified] = useState(false)
   const [formError, setFormError] = useState<string>()
   const [roles, setRoles] = useState([config.defaultRole])
+  const canSetRole = useAdminPermission(auth.authClient, {
+    user: ["set-role"]
+  })
   const createUser = useMutation(
     createAdminUserOptions(auth.authClient, session?.user.id)
   )
@@ -665,7 +681,7 @@ function CreateUserDialog({
         email: String(data.get("email")),
         name: String(data.get("name")),
         password,
-        role: asAdminRoles(roles)
+        ...(canSetRole.data?.success ? { role: asAdminRoles(roles) } : {})
       },
       { onSuccess: close }
     )
@@ -722,30 +738,34 @@ function CreateUserDialog({
                 />
               </InputGroup>
             </Field>
-            <FieldSet>
-              <FieldLegend variant="label">
-                {config.localization.role}
-              </FieldLegend>
-              <FieldGroup data-slot="checkbox-group">
-                {config.roles.map((role) => (
-                  <Field key={role} orientation="horizontal">
-                    <Checkbox
-                      checked={roles.includes(role)}
-                      id={`admin-create-role-${role}`}
-                      onCheckedChange={(checked) => {
-                        const next = checked
-                          ? [...roles, role]
-                          : roles.filter((item) => item !== role)
-                        if (next.length) setRoles(next)
-                      }}
-                    />
-                    <FieldLabel htmlFor={`admin-create-role-${role}`}>
-                      {role}
-                    </FieldLabel>
-                  </Field>
-                ))}
-              </FieldGroup>
-            </FieldSet>
+            {canSetRole.isPending ? (
+              <Skeleton className="h-16 w-full" />
+            ) : canSetRole.data?.success ? (
+              <FieldSet>
+                <FieldLegend variant="label">
+                  {config.localization.role}
+                </FieldLegend>
+                <FieldGroup data-slot="checkbox-group">
+                  {config.roles.map((role) => (
+                    <Field key={role} orientation="horizontal">
+                      <Checkbox
+                        checked={roles.includes(role)}
+                        id={`admin-create-role-${role}`}
+                        onCheckedChange={(checked) => {
+                          const next = checked
+                            ? [...roles, role]
+                            : roles.filter((item) => item !== role)
+                          if (next.length) setRoles(next)
+                        }}
+                      />
+                      <FieldLabel htmlFor={`admin-create-role-${role}`}>
+                        {role}
+                      </FieldLabel>
+                    </Field>
+                  ))}
+                </FieldGroup>
+              </FieldSet>
+            ) : null}
             <Field orientation="horizontal">
               <Switch
                 checked={emailVerified}
@@ -785,10 +805,12 @@ function CreateUserDialog({
 }
 
 function UserInspector({
+  canGetUser,
   open,
   onOpenChange,
   userId
 }: {
+  canGetUser: boolean
   open: boolean
   onOpenChange: (open: boolean) => void
   userId?: string
@@ -801,7 +823,10 @@ function UserInspector({
       value: `${plugin.id}:${tab.id}`
     }))
   )
-  const detail = useAdminUser(auth.authClient, userId)
+  const detail = useAdminUser(auth.authClient, userId, {
+    enabled: canGetUser
+  })
+  const user = detail.data
   const sessionsPermission = useAdminPermission(
     auth.authClient,
     {
@@ -849,6 +874,14 @@ function UserInspector({
     },
     { enabled: Boolean(userId) }
   )
+  const targetIsAdmin = user
+    ? isAdminTarget(user, config.adminRoles, config.adminUserIds)
+    : false
+  const canImpersonateAdmins = useAdminPermission(
+    auth.authClient,
+    { user: ["impersonate-admins"] },
+    { enabled: Boolean(userId && targetIsAdmin) }
+  )
   const canDelete = useAdminPermission(
     auth.authClient,
     { user: ["delete"] },
@@ -871,7 +904,6 @@ function UserInspector({
   const [profileError, setProfileError] = useState<string>()
   const [passwordOpen, setPasswordOpen] = useState(false)
   const [dangerousAction, setDangerousAction] = useState<DangerousAction>()
-  const user = detail.data
   const profileUserId = useRef(user?.id)
   const isSelf = user?.id === actor?.user.id
 
@@ -1021,7 +1053,13 @@ function UserInspector({
                 <TabsTrigger value="overview">
                   {config.localization.overview}
                 </TabsTrigger>
-                <TabsTrigger value="sessions">
+                <TabsTrigger
+                  disabled={
+                    sessionsPermission.isPending ||
+                    !sessionsPermission.data?.success
+                  }
+                  value="sessions"
+                >
                   {config.localization.sessions}
                 </TabsTrigger>
                 {contributedTabs.map((tab) => (
@@ -1284,6 +1322,9 @@ function UserInspector({
                     disabled={
                       canImpersonate.isPending ||
                       !canImpersonate.data?.success ||
+                      (targetIsAdmin &&
+                        (canImpersonateAdmins.isPending ||
+                          !canImpersonateAdmins.data?.success)) ||
                       isSelf
                     }
                     onClick={() => setDangerousAction("impersonate")}

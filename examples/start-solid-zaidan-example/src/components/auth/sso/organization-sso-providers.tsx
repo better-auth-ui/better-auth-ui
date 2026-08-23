@@ -63,6 +63,7 @@ import { Input } from "@/components/ui/input"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Spinner } from "@/components/ui/spinner"
 import { Textarea } from "@/components/ui/textarea"
+import { organizationPlugin } from "@/lib/auth/organization-plugin"
 import { ssoPlugin } from "@/lib/auth/sso-plugin"
 import { cn } from "@/lib/utils"
 
@@ -88,12 +89,13 @@ const getErrorMessage = (error: Error | null) => {
 export function OrganizationSsoProviders(props: OrganizationSsoProvidersProps) {
   const auth = useAuth()
   const { localization } = useAuthPlugin(ssoPlugin)
+  const { creatorRole } = useAuthPlugin(organizationPlugin)
   const memberRole = useActiveMemberRole(
     auth.authClient as OrganizationAuthClient,
     () => ({ query: { organizationId: props.organizationId } })
   )
   const canManage = () =>
-    hasMemberRole(memberRole.data?.role, "owner") ||
+    hasMemberRole(memberRole.data?.role, creatorRole) ||
     hasMemberRole(memberRole.data?.role, "admin")
   const providersQuery = useSsoProviders(
     auth.authClient as SsoAuthClient,

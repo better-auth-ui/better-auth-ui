@@ -3,6 +3,7 @@ import type { OrganizationAuthClient } from "@better-auth-ui/core/plugins/organi
 import { useAuth, useAuthPlugin } from "@better-auth-ui/solid"
 import {
   useActiveOrganization,
+  useHasPermission,
   useUpdateOrganization
 } from "@better-auth-ui/solid/plugins/organization"
 import { createEffect, createSignal, For, Show } from "solid-js"
@@ -23,6 +24,9 @@ export type OrganizationProfileProps = {
 export function OrganizationProfile(props: OrganizationProfileProps) {
   const auth = useAuth<OrganizationAuthClient>()
   const activeOrganization = useActiveOrganization(auth.authClient)
+  const canUpdate = useHasPermission(auth.authClient, () => ({
+    permissions: { organization: ["update"] }
+  }))
   const config = useAuthPlugin(organizationPlugin)
   const updateOrganization = useUpdateOrganization(auth.authClient, () => ({
     onSuccess: () =>
@@ -39,7 +43,7 @@ export function OrganizationProfile(props: OrganizationProfileProps) {
 
   const handleSubmit = async (event: SubmitEvent) => {
     event.preventDefault()
-    if (!activeOrganization.data) return
+    if (!activeOrganization.data || !canUpdate.data?.success) return
     const formData = new FormData(event.currentTarget as HTMLFormElement)
     const additionalValues: Record<string, unknown> = {}
     try {
@@ -59,6 +63,10 @@ export function OrganizationProfile(props: OrganizationProfileProps) {
       data: { name: name(), slug: slug(), ...additionalValues }
     })
   }
+  const formDisabled = () =>
+    updateOrganization.isPending ||
+    canUpdate.isPending ||
+    !canUpdate.data?.success
 
   return (
     <div class={props.class}>
@@ -76,7 +84,7 @@ export function OrganizationProfile(props: OrganizationProfileProps) {
               </FieldLabel>
               <Show when={activeOrganization.data}>
                 <Input
-                  disabled={updateOrganization.isPending}
+                  disabled={formDisabled()}
                   id="organization-profile-name"
                   name="name"
                   onInput={(event) => setName(event.currentTarget.value)}
@@ -91,7 +99,7 @@ export function OrganizationProfile(props: OrganizationProfileProps) {
               {(organization) => (
                 <SlugField
                   currentSlug={organization().slug}
-                  disabled={updateOrganization.isPending}
+                  disabled={formDisabled()}
                   id="organization-profile-slug"
                   onChange={setSlug}
                   value={slug()}
@@ -110,7 +118,7 @@ export function OrganizationProfile(props: OrganizationProfileProps) {
                           organization() as Record<string, unknown>
                         )[field.name] as never
                       }}
-                      isPending={updateOrganization.isPending}
+                      isPending={formDisabled()}
                       name={field.name}
                       optionalLabel={auth.localization.settings.optional}
                     />
@@ -119,16 +127,16 @@ export function OrganizationProfile(props: OrganizationProfileProps) {
               )}
             </Show>
 
-            <Button
-              class="mt-1 w-fit"
-              disabled={
-                !activeOrganization.data || updateOrganization.isPending
-              }
-              size="sm"
-              type="submit"
-            >
-              {auth.localization.settings.saveChanges}
-            </Button>
+            <Show when={canUpdate.isPending || canUpdate.data?.success}>
+              <Button
+                class="mt-1 w-fit"
+                disabled={!activeOrganization.data || formDisabled()}
+                size="sm"
+                type="submit"
+              >
+                {auth.localization.settings.saveChanges}
+              </Button>
+            </Show>
           </form>
         </CardContent>
       </Card>

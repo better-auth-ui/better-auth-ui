@@ -176,6 +176,8 @@ export const organizationLocalization = {
     "Delete this role permanently. Members must move to another role first.",
   roleName: "Role name",
   permissions: "Permissions",
+  permissionsLimitedDescription:
+    "You can assign only permissions included in your own role.",
   noRoles: "No custom roles",
   noRolesDescription: "Create a role to define custom organization access.",
   roleCreated: "Role created",

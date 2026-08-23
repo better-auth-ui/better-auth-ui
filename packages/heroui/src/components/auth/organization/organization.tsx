@@ -3,7 +3,10 @@ import type {
   OrganizationView
 } from "@better-auth-ui/core/plugins/organization"
 import { useAuth, useAuthenticate, useAuthPlugin } from "@better-auth-ui/react"
-import { useActiveOrganization } from "@better-auth-ui/react/plugins/organization"
+import {
+  useActiveOrganization,
+  useHasPermission
+} from "@better-auth-ui/react/plugins/organization"
 import { Gear, Person, Persons, Shield } from "@gravity-ui/icons"
 import { type CardProps, cn, Tabs } from "@heroui/react"
 import { type ComponentProps, useEffect, useMemo } from "react"
@@ -59,6 +62,11 @@ export function Organization({
     [plugins]
   )
   const rolesEnabled = dynamicAccessControl?.enabled === true
+  const canReadRoles = useHasPermission(authClient as OrganizationAuthClient, {
+    organizationId: activeOrganization?.id,
+    permissions: { ac: ["read"] },
+    enabled: rolesEnabled && Boolean(activeOrganization?.id)
+  })
 
   useEffect(() => {
     if (!isPending && !activeOrganization) {
@@ -108,11 +116,18 @@ export function Organization({
     return null
   }
 
+  const selectedView =
+    currentView === "roles" &&
+    !canReadRoles.isPending &&
+    !canReadRoles.data?.success
+      ? "settings"
+      : currentView
+
   return (
     <Tabs
       className={cn(className)}
       orientation="horizontal"
-      selectedKey={currentView}
+      selectedKey={selectedView}
       {...props}
     >
       {!hideNav && (
@@ -160,6 +175,9 @@ export function Organization({
             {rolesEnabled && (
               <Tabs.Tab
                 id="roles"
+                isDisabled={
+                  canReadRoles.isPending || !canReadRoles.data?.success
+                }
                 href={
                   slug
                     ? `${basePaths.organization}/${slugPrefix}${slug}/${organizationViewPaths.organization.roles}`
@@ -233,7 +251,9 @@ export function Organization({
       )}
       {rolesEnabled && (
         <Tabs.Panel id="roles" className="px-0">
-          <OrganizationRoles organizationId={activeOrganization?.id ?? ""} />
+          {canReadRoles.data?.success ? (
+            <OrganizationRoles organizationId={activeOrganization?.id ?? ""} />
+          ) : null}
         </Tabs.Panel>
       )}
       {extensionTabs.map((tab) => {

@@ -21,6 +21,7 @@ export function ApiKey(props: {
   apiKey: ListedApiKey
   organizationId?: string
   hideDelete?: boolean
+  hideUpdate?: boolean
 }) {
   const auth = useAuth()
   const { localization: apiKeyLocalization } = useAuthPlugin(apiKeyPlugin)
@@ -70,17 +71,19 @@ export function ApiKey(props: {
         </ItemDescription>
       </ItemContent>
       <ItemActions>
-        <Dialog open={editOpen()} onOpenChange={setEditOpen}>
-          <DialogTrigger as={Button} size="sm" variant="outline">
-            <Pencil />
-            {apiKeyLocalization.editApiKey}
-          </DialogTrigger>
-          <EditApiKeyDialog
-            apiKey={props.apiKey}
-            open={editOpen()}
-            onOpenChange={setEditOpen}
-          />
-        </Dialog>
+        <Show when={!props.hideUpdate}>
+          <Dialog open={editOpen()} onOpenChange={setEditOpen}>
+            <DialogTrigger as={Button} size="sm" variant="outline">
+              <Pencil />
+              {apiKeyLocalization.editApiKey}
+            </DialogTrigger>
+            <EditApiKeyDialog
+              apiKey={props.apiKey}
+              open={editOpen()}
+              onOpenChange={setEditOpen}
+            />
+          </Dialog>
+        </Show>
         <Show when={!props.hideDelete}>
           <AlertDialog open={deleteOpen()} onOpenChange={setDeleteOpen}>
             <AlertDialogTrigger

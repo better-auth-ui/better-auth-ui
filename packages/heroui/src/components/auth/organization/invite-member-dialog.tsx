@@ -6,6 +6,7 @@ import {
 import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
 import {
   useActiveOrganization,
+  useHasPermission,
   useInviteMember,
   useListOrganizationInvitations,
   useListRoles,
@@ -75,9 +76,19 @@ export function InviteMemberDialog({
   const invitations = useListOrganizationInvitations(
     authClient as OrganizationAuthClient
   )
+  const canInvite = useHasPermission(authClient as OrganizationAuthClient, {
+    organizationId: activeOrganization?.id,
+    permissions: { invitation: ["create"] }
+  })
+  const canReadRoles = useHasPermission(authClient as OrganizationAuthClient, {
+    organizationId: activeOrganization?.id,
+    permissions: { ac: ["read"] }
+  })
   const dynamicRoles = useListRoles(authClient as OrganizationAuthClient, {
     query: { organizationId: activeOrganization?.id },
-    enabled: dynamicAccessControl?.enabled === true
+    enabled:
+      dynamicAccessControl?.enabled === true &&
+      canReadRoles.data?.success === true
   })
   const assignableRoles = useMemo(
     () => mergeOrganizationRoleLabels(roles, dynamicRoles.data),
@@ -132,7 +143,13 @@ export function InviteMemberDialog({
   const handleSubmit = async (e: SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault()
 
-    if (!activeOrganizationId || !isRoleValid || invitationLimitReached) return
+    if (
+      !activeOrganizationId ||
+      !canInvite.data?.success ||
+      !isRoleValid ||
+      invitationLimitReached
+    )
+      return
 
     const formData = new FormData(e.currentTarget)
     const invitationEmail = (formData.get("email") as string).trim()
@@ -301,7 +318,12 @@ export function InviteMemberDialog({
               <Button
                 type="submit"
                 isPending={isInviting || isSubmitting}
-                isDisabled={!isRoleValid || invitationLimitReached}
+                isDisabled={
+                  !isRoleValid ||
+                  invitationLimitReached ||
+                  canInvite.isPending ||
+                  !canInvite.data?.success
+                }
               >
                 {(isInviting || isSubmitting) && (
                   <Spinner color="current" size="sm" />

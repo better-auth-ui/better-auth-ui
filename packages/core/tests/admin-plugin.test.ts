@@ -8,6 +8,7 @@ import {
   adminUserOptions,
   adminUsersOptions,
   createAdminUserOptions,
+  isAdminTarget,
   isImpersonatingSession,
   resolveAdminPath,
   revokeAdminUserSessionOptions,
@@ -70,6 +71,35 @@ describe("adminPlugin", () => {
       pageSize: 100,
       roles: ["owner", "member"]
     })
+  })
+
+  it("normalizes configured administrator identities", () => {
+    expect(
+      adminPlugin({
+        adminRoles: ["admin", "admin", "super-admin", ""],
+        adminUserIds: ["user-1", "user-1", "user-2", ""]
+      })
+    ).toMatchObject({
+      adminRoles: ["admin", "super-admin"],
+      adminUserIds: ["user-1", "user-2"]
+    })
+    expect(adminPlugin({ adminRoles: "super-admin" }).adminRoles).toEqual([
+      "super-admin"
+    ])
+  })
+
+  it("recognizes administrator targets by role or explicit user ID", () => {
+    expect(
+      isAdminTarget({ id: "user-1", role: "member,super-admin" }, [
+        "super-admin"
+      ])
+    ).toBe(true)
+    expect(
+      isAdminTarget({ id: "user-2", role: "member" }, ["admin"], ["user-2"])
+    ).toBe(true)
+    expect(
+      isAdminTarget({ id: "user-3", role: "member" }, ["admin"], ["user-2"])
+    ).toBe(false)
   })
 
   it("keeps mutation keys under the shared auth namespace", () => {

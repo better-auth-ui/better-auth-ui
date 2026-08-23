@@ -211,7 +211,7 @@ export function OrganizationMemberRow(props: OrganizationMemberRowProps) {
   }))
   const assignableRoles = () =>
     Object.entries(props.roles).filter(
-      ([key]) => props.isOwner || key !== "owner"
+      ([key]) => props.isOwner || key !== config.creatorRole
     )
 
   // Better Auth persists multiple roles as one comma-joined string.
@@ -265,6 +265,18 @@ export function OrganizationMemberRow(props: OrganizationMemberRowProps) {
       </TableCell>
       <TableCell class="text-end">
         <div class="flex justify-end gap-2">
+          <Show when={permission.isPending}>
+            <Button
+              aria-label={props.localization.changeMemberRole}
+              class="size-8"
+              disabled
+              size="icon-sm"
+              type="button"
+              variant="ghost"
+            >
+              <Pencil class="size-4" />
+            </Button>
+          </Show>
           <Show when={permission.data?.success}>
             <DropdownMenu>
               <DropdownMenuTrigger
@@ -307,6 +319,22 @@ export function OrganizationMemberRow(props: OrganizationMemberRowProps) {
             <Button
               aria-label={props.localization.removeMember}
               onClick={() => setRemoveOpen(true)}
+              size="icon-sm"
+              type="button"
+              variant="outline"
+            >
+              <Trash2 class="size-4 text-destructive" />
+            </Button>
+          </Show>
+          <Show
+            when={
+              deletePermission.isPending &&
+              props.member.userId !== session.data?.user.id
+            }
+          >
+            <Button
+              aria-label={props.localization.removeMember}
+              disabled
               size="icon-sm"
               type="button"
               variant="outline"

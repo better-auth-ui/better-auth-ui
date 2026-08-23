@@ -79,6 +79,14 @@ describe("organizationPlugin", () => {
     })
   })
 
+  it("uses the configured organization creator role", () => {
+    expect(organizationPlugin().creatorRole).toBe("owner")
+    expect(organizationPlugin({ creatorRole: "founder" }).creatorRole).toBe(
+      "founder"
+    )
+    expect(organizationPlugin({ creatorRole: "  " }).creatorRole).toBe("owner")
+  })
+
   it("ignores invalid policy limits", () => {
     expect(
       organizationPlugin({

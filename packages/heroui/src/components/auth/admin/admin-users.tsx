@@ -4,9 +4,10 @@ import {
   type AdditionalFieldValue,
   parseAdditionalFieldValues
 } from "@better-auth-ui/core"
-import type {
-  AdminAuthClient,
-  AdminListUsersParams
+import {
+  type AdminAuthClient,
+  type AdminListUsersParams,
+  isAdminTarget
 } from "@better-auth-ui/core/plugins/admin"
 import { useAuth, useAuthPlugin, useSession } from "@better-auth-ui/react"
 import {
@@ -134,6 +135,7 @@ export function AdminUsers({
     : localSelectedUserId
   const permission = useAdminPermission(authClient, { user: ["list"] })
   const createPermission = useAdminPermission(authClient, { user: ["create"] })
+  const getPermission = useAdminPermission(authClient, { user: ["get"] })
   const params = useMemo<AdminListUsersParams>(() => {
     const [sortBy, sortDirection] = sort.split("-") as [
       "createdAt" | "name",
@@ -366,21 +368,35 @@ export function AdminUsers({
                   : users.data?.users.map((user) => (
                       <Table.Row id={user.id} key={user.id}>
                         <Table.Cell>
-                          <Button
-                            className="h-auto justify-start px-0"
-                            variant="tertiary"
-                            onPress={() => selectUser(user.id)}
-                          >
-                            <UserAvatar user={user} />
-                            <span className="min-w-0 text-start">
-                              <span className="block truncate font-medium">
-                                {user.name}
+                          {getPermission.data?.success ? (
+                            <Button
+                              className="h-auto justify-start px-0"
+                              variant="tertiary"
+                              onPress={() => selectUser(user.id)}
+                            >
+                              <UserAvatar user={user} />
+                              <span className="min-w-0 text-start">
+                                <span className="block truncate font-medium">
+                                  {user.name}
+                                </span>
+                                <span className="block truncate text-xs text-muted">
+                                  {user.email}
+                                </span>
                               </span>
-                              <span className="block truncate text-xs text-muted">
-                                {user.email}
+                            </Button>
+                          ) : (
+                            <div className="flex items-center gap-3">
+                              <UserAvatar user={user} />
+                              <span className="min-w-0 text-start">
+                                <span className="block truncate font-medium">
+                                  {user.name}
+                                </span>
+                                <span className="block truncate text-xs text-muted">
+                                  {user.email}
+                                </span>
                               </span>
-                            </span>
-                          </Button>
+                            </div>
+                          )}
                         </Table.Cell>
                         <Table.Cell>
                           <Chip size="sm">
@@ -437,7 +453,8 @@ export function AdminUsers({
       </footer>
 
       <UserDrawer
-        isOpen={Boolean(selectedUserId)}
+        canGetUser={getPermission.data?.success === true}
+        isOpen={Boolean(selectedUserId) && getPermission.data?.success === true}
         onOpenChange={(open) => !open && selectUser(undefined)}
         userId={selectedUserId}
       />
@@ -481,6 +498,7 @@ function CreateUserDialog({
   const { additionalFields, authClient } = useAuth<AdminAuthClient>()
   const config = useAuthPlugin(adminPlugin)
   const createUser = useCreateAdminUser(authClient)
+  const canSetRole = useAdminPermission(authClient, { user: ["set-role"] })
   const [emailVerified, setEmailVerified] = useState(false)
   const [formError, setFormError] = useState<string>()
   const [roles, setRoles] = useState([config.defaultRole])
@@ -512,7 +530,7 @@ function CreateUserDialog({
         email: String(data.get("email")),
         name: String(data.get("name")),
         password: String(data.get("password")),
-        role: asAdminRoles(roles)
+        ...(canSetRole.data?.success ? { role: asAdminRoles(roles) } : {})
       },
       { onSuccess: close }
     )
@@ -555,32 +573,36 @@ function CreateUserDialog({
                   <Input autoComplete="new-password" variant="secondary" />
                   <FieldError />
                 </TextField>
-                <Select
-                  fullWidth
-                  selectionMode="multiple"
-                  value={roles}
-                  variant="secondary"
-                  onChange={(keys) => {
-                    const next = [...(keys as Iterable<string>)]
-                    if (next.length) setRoles(next)
-                  }}
-                >
-                  <Label>{config.localization.role}</Label>
-                  <Select.Trigger>
-                    <Select.Value />
-                    <Select.Indicator />
-                  </Select.Trigger>
-                  <Select.Popover>
-                    <ListBox selectionMode="multiple">
-                      {config.roles.map((role) => (
-                        <ListBox.Item id={role} key={role} textValue={role}>
-                          {role}
-                          <ListBox.ItemIndicator />
-                        </ListBox.Item>
-                      ))}
-                    </ListBox>
-                  </Select.Popover>
-                </Select>
+                {canSetRole.isPending ? (
+                  <Skeleton className="h-10 w-full" />
+                ) : canSetRole.data?.success ? (
+                  <Select
+                    fullWidth
+                    selectionMode="multiple"
+                    value={roles}
+                    variant="secondary"
+                    onChange={(keys) => {
+                      const next = [...(keys as Iterable<string>)]
+                      if (next.length) setRoles(next)
+                    }}
+                  >
+                    <Label>{config.localization.role}</Label>
+                    <Select.Trigger>
+                      <Select.Value />
+                      <Select.Indicator />
+                    </Select.Trigger>
+                    <Select.Popover>
+                      <ListBox selectionMode="multiple">
+                        {config.roles.map((role) => (
+                          <ListBox.Item id={role} key={role} textValue={role}>
+                            {role}
+                            <ListBox.ItemIndicator />
+                          </ListBox.Item>
+                        ))}
+                      </ListBox>
+                    </Select.Popover>
+                  </Select>
+                ) : null}
                 <Switch isSelected={emailVerified} onChange={setEmailVerified}>
                   {config.localization.emailVerified}
                 </Switch>
@@ -619,10 +641,12 @@ function CreateUserDialog({
 }
 
 function UserDrawer({
+  canGetUser,
   isOpen,
   onOpenChange,
   userId
 }: {
+  canGetUser: boolean
   isOpen: boolean
   onOpenChange: (open: boolean) => void
   userId?: string
@@ -640,7 +664,7 @@ function UserDrawer({
       ),
     [plugins]
   )
-  const user = useAdminUser(authClient, userId)
+  const user = useAdminUser(authClient, userId, { enabled: canGetUser })
   const { data: actor } = useSession(authClient)
   const sessionsPermission = useAdminPermission(
     authClient,
@@ -703,6 +727,14 @@ function UserDrawer({
   const [passwordOpen, setPasswordOpen] = useState(false)
   const [dangerousAction, setDangerousAction] = useState<DangerousAction>()
   const detail = user.data
+  const targetIsAdmin = detail
+    ? isAdminTarget(detail, config.adminRoles, config.adminUserIds)
+    : false
+  const canImpersonateAdmins = useAdminPermission(
+    authClient,
+    { user: ["impersonate-admins"] },
+    { enabled: Boolean(userId && targetIsAdmin) }
+  )
   const profileUserId = useRef(detail?.id)
   const isSelf = detail?.id === actor?.user.id
   const updateUser = useUpdateAdminUser(authClient)
@@ -830,7 +862,13 @@ function UserDrawer({
                         {config.localization.overview}
                         <Tabs.Indicator />
                       </Tabs.Tab>
-                      <Tabs.Tab id="sessions">
+                      <Tabs.Tab
+                        id="sessions"
+                        isDisabled={
+                          sessionsPermission.isPending ||
+                          !sessionsPermission.data?.success
+                        }
+                      >
                         {config.localization.sessions}
                         <Tabs.Indicator />
                       </Tabs.Tab>
@@ -1090,6 +1128,9 @@ function UserDrawer({
                         isDisabled={
                           canImpersonate.isPending ||
                           !canImpersonate.data?.success ||
+                          (targetIsAdmin &&
+                            (canImpersonateAdmins.isPending ||
+                              !canImpersonateAdmins.data?.success)) ||
                           isSelf
                         }
                         variant="outline"

@@ -68,12 +68,11 @@ export function OrganizationInvitations({
   const { data: invitations, isPending: invitationsPending } =
     useListOrganizationInvitations(authClient)
 
-  const { isPending: invitationPermissionPending } = useHasPermission(
-    authClient,
-    { permissions: { invitation: ["cancel"] } }
-  )
+  const canInvite = useHasPermission(authClient, {
+    permissions: { invitation: ["create"] }
+  })
 
-  const isPending = invitationsPending || invitationPermissionPending
+  const isPending = invitationsPending
 
   const [sortDescriptor, setSortDescriptor] = useState<SortDescriptor>()
   const [roleFilter, setRoleFilter] = useState("all")
@@ -312,7 +311,12 @@ export function OrganizationInvitations({
                 <TableRow>
                   <TableCell colSpan={5}>
                     <OrganizationInvitationsEmpty
-                      onInvitePress={() => setInviteOpen(true)}
+                      isInvitePending={canInvite.isPending}
+                      onInvitePress={
+                        canInvite.data?.success
+                          ? () => setInviteOpen(true)
+                          : undefined
+                      }
                     />
                   </TableCell>
                 </TableRow>
@@ -329,7 +333,9 @@ export function OrganizationInvitations({
         </Card>
       </div>
 
-      <InviteMemberDialog open={inviteOpen} onOpenChange={setInviteOpen} />
+      {canInvite.data?.success && (
+        <InviteMemberDialog open={inviteOpen} onOpenChange={setInviteOpen} />
+      )}
     </div>
   )
 }

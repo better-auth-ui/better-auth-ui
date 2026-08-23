@@ -37,6 +37,7 @@ import {
 import type { BetterFetchError } from "better-auth/client"
 import { type FormEvent, useMemo, useState } from "react"
 
+import { organizationPlugin } from "../../../lib/auth/organization-plugin"
 import { ssoPlugin } from "../../../lib/auth/sso-plugin"
 import { SsoDomainVerification } from "./sso-domain-verification"
 import { SsoProviderSetup } from "./sso-provider-setup"
@@ -65,11 +66,12 @@ export function OrganizationSsoProviders({
 }: OrganizationSsoProvidersProps) {
   const { authClient } = useAuth()
   const { localization } = useAuthPlugin(ssoPlugin)
+  const { creatorRole } = useAuthPlugin(organizationPlugin)
   const memberRole = useActiveMemberRole(authClient as OrganizationAuthClient, {
     query: { organizationId }
   })
   const canManage =
-    hasMemberRole(memberRole.data?.role, "owner") ||
+    hasMemberRole(memberRole.data?.role, creatorRole) ||
     hasMemberRole(memberRole.data?.role, "admin")
   const providersQuery = useSsoProviders(authClient as SsoAuthClient, {
     enabled: !memberRole.isPending && canManage

@@ -6,6 +6,7 @@ import type {
 import { useAuth } from "@better-auth-ui/solid"
 import {
   useActiveOrganization,
+  useHasPermission,
   useUpdateOrganization
 } from "@better-auth-ui/solid/plugins/organization"
 import { Trash2, Upload } from "lucide-solid"
@@ -55,6 +56,9 @@ const fallbackLocalization = {
 export function ChangeOrganizationLogo(props: ChangeOrganizationLogoProps) {
   const auth = useAuth<OrganizationAuthClient>()
   const activeOrganization = useActiveOrganization(auth.authClient)
+  const canUpdate = useHasPermission(auth.authClient, () => ({
+    permissions: { organization: ["update"] }
+  }))
   const updateOrganization = useUpdateOrganization(auth.authClient)
   const [isUploadingLogo, setIsUploadingLogo] = createSignal(false)
   const [isDeletingLogo, setIsDeletingLogo] = createSignal(false)
@@ -76,7 +80,7 @@ export function ChangeOrganizationLogo(props: ChangeOrganizationLogoProps) {
     const input = event.currentTarget as HTMLInputElement
     const file = input.files?.[0]
 
-    if (!file) return
+    if (!file || !canUpdate.data?.success) return
 
     input.value = ""
     setIsUploadingLogo(true)
@@ -101,6 +105,7 @@ export function ChangeOrganizationLogo(props: ChangeOrganizationLogoProps) {
   }
 
   const deleteLogo = () => {
+    if (!canUpdate.data?.success) return
     const currentLogo = activeOrganization.data?.logo?.trim()
 
     updateOrganization.mutate(
@@ -134,45 +139,60 @@ export function ChangeOrganizationLogo(props: ChangeOrganizationLogoProps) {
           type="file"
         />
         <div class="flex items-center gap-4">
-          <Button
-            class="h-auto w-auto rounded-full p-0"
-            disabled={isPending()}
-            onClick={() => logoFileInput?.click()}
-            type="button"
-            variant="ghost"
+          <Show
+            fallback={
+              <OrganizationLogo
+                isPending={activeOrganization.isPending}
+                organization={activeOrganization.data}
+                size="lg"
+              />
+            }
+            when={canUpdate.data?.success}
           >
-            <OrganizationLogo
-              isPending={activeOrganization.isPending}
-              organization={activeOrganization.data}
-              size="lg"
-            />
-          </Button>
-
-          <DropdownMenu>
-            <DropdownMenuTrigger
-              as={Button}
-              class=""
-              disabled={!activeOrganization.data || isPending()}
-              size="sm"
-              variant="secondary"
+            <Button
+              class="h-auto w-auto rounded-full p-0"
+              disabled={isPending()}
+              onClick={() => logoFileInput?.click()}
+              type="button"
+              variant="ghost"
             >
-              {localization().changeLogo}
-            </DropdownMenuTrigger>
-            <DropdownMenuContent class="min-w-fit">
-              <DropdownMenuItem onSelect={() => logoFileInput?.click()}>
-                <Upload class="text-muted-foreground" />
-                {localization().uploadLogo}
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                disabled={!activeOrganization.data?.logo}
-                onSelect={deleteLogo}
-                variant="destructive"
+              <OrganizationLogo
+                isPending={activeOrganization.isPending}
+                organization={activeOrganization.data}
+                size="lg"
+              />
+            </Button>
+          </Show>
+
+          <Show when={canUpdate.isPending || canUpdate.data?.success}>
+            <DropdownMenu>
+              <DropdownMenuTrigger
+                as={Button}
+                class=""
+                disabled={
+                  !activeOrganization.data || isPending() || canUpdate.isPending
+                }
+                size="sm"
+                variant="secondary"
               >
-                <Trash2 />
-                {localization().deleteLogo}
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+                {localization().changeLogo}
+              </DropdownMenuTrigger>
+              <DropdownMenuContent class="min-w-fit">
+                <DropdownMenuItem onSelect={() => logoFileInput?.click()}>
+                  <Upload class="text-muted-foreground" />
+                  {localization().uploadLogo}
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  disabled={!activeOrganization.data?.logo}
+                  onSelect={deleteLogo}
+                  variant="destructive"
+                >
+                  <Trash2 />
+                  {localization().deleteLogo}
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </Show>
         </div>
       </Field>
     </Show>

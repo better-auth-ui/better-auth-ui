@@ -7,6 +7,7 @@ import { mergeOrganizationRoleLabels } from "@better-auth-ui/core/plugins/organi
 import { useAuth, useAuthPlugin } from "@better-auth-ui/solid"
 import {
   useActiveOrganization,
+  useHasPermission,
   useInviteMember,
   useListOrganizationInvitations,
   useListRoles,
@@ -48,9 +49,19 @@ export function InviteMemberDialog(props: InviteMemberDialogProps) {
   const auth = useAuth<OrganizationAuthClient>()
   const activeOrganization = useActiveOrganization(auth.authClient)
   const config = useAuthPlugin(organizationPlugin)
+  const canInvite = useHasPermission(auth.authClient, () => ({
+    organizationId: activeOrganization.data?.id,
+    permissions: { invitation: ["create"] }
+  }))
+  const canReadRoles = useHasPermission(auth.authClient, () => ({
+    organizationId: activeOrganization.data?.id,
+    permissions: { ac: ["read"] }
+  }))
   const dynamicRoles = useListRoles(auth.authClient, () => ({
     query: { organizationId: activeOrganization.data?.id },
-    enabled: config.dynamicAccessControl?.enabled === true
+    enabled:
+      config.dynamicAccessControl?.enabled === true &&
+      canReadRoles.data?.success === true
   }))
   const roles = createMemo(() =>
     mergeOrganizationRoleLabels(config.roles, dynamicRoles.data)
@@ -123,6 +134,7 @@ export function InviteMemberDialog(props: InviteMemberDialogProps) {
 
     if (
       !organizationId ||
+      !canInvite.data?.success ||
       !invitationEmail ||
       invitationRoles.length === 0 ||
       atInvitationLimit
@@ -254,6 +266,8 @@ export function InviteMemberDialog(props: InviteMemberDialogProps) {
               disabled={
                 inviteMember.isPending ||
                 isSubmitting() ||
+                canInvite.isPending ||
+                !canInvite.data?.success ||
                 !email().trim() ||
                 selectedRoles().length === 0 ||
                 (config.invitationLimit !== undefined &&

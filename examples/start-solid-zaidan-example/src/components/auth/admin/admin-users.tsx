@@ -5,7 +5,8 @@ import {
 import {
   type AdminAuthClient,
   type AdminListUsersParams,
-  adminPlugin
+  adminPlugin,
+  isAdminTarget
 } from "@better-auth-ui/core/plugins/admin"
 import { useAuth, useSession } from "@better-auth-ui/solid"
 import {
@@ -150,6 +151,9 @@ export function AdminUsers(props: AdminUsersProps) {
   const permission = useAdminPermission(authClient, () => ({ user: ["list"] }))
   const createPermission = useAdminPermission(authClient, () => ({
     user: ["create"]
+  }))
+  const getPermission = useAdminPermission(authClient, () => ({
+    user: ["get"]
   }))
   const [createOpen, setCreateOpen] = createSignal(false)
   const params = createMemo<AdminListUsersParams>(() => {
@@ -343,23 +347,40 @@ export function AdminUsers(props: AdminUsersProps) {
                         {(user) => (
                           <TableRow
                             aria-selected={selectedUserId() === user.id}
-                            class="cursor-pointer"
-                            onClick={() => selectUser(user.id)}
+                            class={
+                              getPermission.data?.success
+                                ? "cursor-pointer"
+                                : undefined
+                            }
+                            onClick={
+                              getPermission.data?.success
+                                ? () => selectUser(user.id)
+                                : undefined
+                            }
                           >
                             <TableCell>
                               <div class="flex items-center gap-3">
                                 <UserAvatar user={user} />
                                 <div class="min-w-0">
-                                  <Button
-                                    class="h-auto min-w-0 justify-start p-0 font-medium"
-                                    onClick={(event) => {
-                                      event.stopPropagation()
-                                      selectUser(user.id)
-                                    }}
-                                    variant="link"
+                                  <Show
+                                    fallback={
+                                      <span class="truncate font-medium">
+                                        {user.name}
+                                      </span>
+                                    }
+                                    when={getPermission.data?.success}
                                   >
-                                    <span class="truncate">{user.name}</span>
-                                  </Button>
+                                    <Button
+                                      class="h-auto min-w-0 justify-start p-0 font-medium"
+                                      onClick={(event) => {
+                                        event.stopPropagation()
+                                        selectUser(user.id)
+                                      }}
+                                      variant="link"
+                                    >
+                                      <span class="truncate">{user.name}</span>
+                                    </Button>
+                                  </Show>
                                   <div class="truncate text-xs text-muted-foreground">
                                     {user.email}
                                   </div>
@@ -438,7 +459,8 @@ export function AdminUsers(props: AdminUsersProps) {
       </footer>
 
       <UserDialog
-        open={Boolean(selectedUserId())}
+        canGetUser={getPermission.data?.success === true}
+        open={Boolean(selectedUserId()) && getPermission.data?.success === true}
         onOpenChange={(open) => !open && selectUser(undefined)}
         userId={selectedUserId}
       />
@@ -474,6 +496,9 @@ function CreateUserDialog(props: {
     (auth.plugins.find((plugin) => plugin.id === adminPlugin.id) ??
       adminPlugin()) as ReturnType<typeof adminPlugin>
   const createUser = useCreateAdminUser(authClient)
+  const canSetRole = useAdminPermission(authClient, () => ({
+    user: ["set-role"]
+  }))
   const [emailVerified, setEmailVerified] = createSignal(false)
   const [formError, setFormError] = createSignal<string>()
   const [roles, setRoles] = createSignal([config().defaultRole])
@@ -505,7 +530,7 @@ function CreateUserDialog(props: {
         email: String(data.get("email")),
         name: String(data.get("name")),
         password: String(data.get("password")),
-        role: asAdminRoles(roles())
+        ...(canSetRole.data?.success ? { role: asAdminRoles(roles()) } : {})
       },
       { onSuccess: close }
     )
@@ -554,32 +579,41 @@ function CreateUserDialog(props: {
               type="password"
             />
           </Field>
-          <FieldSet>
-            <FieldLegend variant="label">
-              {config().localization.role}
-            </FieldLegend>
-            <FieldGroup data-slot="checkbox-group">
-              <For each={config().roles}>
-                {(role) => (
-                  <Field orientation="horizontal">
-                    <Checkbox
-                      checked={roles().includes(role)}
-                      id={`solid-admin-create-role-${role}`}
-                      onChange={(checked) => {
-                        const next = checked
-                          ? [...roles(), role]
-                          : roles().filter((item) => item !== role)
-                        if (next.length) setRoles(next)
-                      }}
-                    />
-                    <FieldLabel for={`solid-admin-create-role-${role}`}>
-                      {role}
-                    </FieldLabel>
-                  </Field>
-                )}
-              </For>
-            </FieldGroup>
-          </FieldSet>
+          <Show
+            fallback={
+              <Show when={canSetRole.isPending}>
+                <Skeleton class="h-16 w-full" />
+              </Show>
+            }
+            when={canSetRole.data?.success}
+          >
+            <FieldSet>
+              <FieldLegend variant="label">
+                {config().localization.role}
+              </FieldLegend>
+              <FieldGroup data-slot="checkbox-group">
+                <For each={config().roles}>
+                  {(role) => (
+                    <Field orientation="horizontal">
+                      <Checkbox
+                        checked={roles().includes(role)}
+                        id={`solid-admin-create-role-${role}`}
+                        onChange={(checked) => {
+                          const next = checked
+                            ? [...roles(), role]
+                            : roles().filter((item) => item !== role)
+                          if (next.length) setRoles(next)
+                        }}
+                      />
+                      <FieldLabel for={`solid-admin-create-role-${role}`}>
+                        {role}
+                      </FieldLabel>
+                    </Field>
+                  )}
+                </For>
+              </FieldGroup>
+            </FieldSet>
+          </Show>
           <Field orientation="horizontal">
             <Switch
               checked={emailVerified()}
@@ -619,6 +653,7 @@ function CreateUserDialog(props: {
 }
 
 function UserDialog(props: {
+  canGetUser: boolean
   open: boolean
   onOpenChange: (open: boolean) => void
   userId: () => string | undefined
@@ -636,7 +671,9 @@ function UserDialog(props: {
       }))
     )
   )
-  const user = useAdminUser(authClient, props.userId)
+  const user = useAdminUser(authClient, props.userId, () => ({
+    enabled: props.canGetUser
+  }))
   const actor = useSession(authClient)
   const enabled = () => ({ enabled: Boolean(props.userId()) })
   const sessionsPermission = useAdminPermission(
@@ -700,6 +737,17 @@ function UserDialog(props: {
   const [passwordOpen, setPasswordOpen] = createSignal(false)
   const [dangerousAction, setDangerousAction] = createSignal<DangerousAction>()
   const detail = () => user.data
+  const targetIsAdmin = createMemo(() => {
+    const target = detail()
+    return target
+      ? isAdminTarget(target, config().adminRoles, config().adminUserIds)
+      : false
+  })
+  const canImpersonateAdmins = useAdminPermission(
+    authClient,
+    () => ({ user: ["impersonate-admins"] }),
+    () => ({ enabled: Boolean(props.userId() && targetIsAdmin()) })
+  )
   const isSelf = () => detail()?.id === actor.data?.user.id
   const updateUser = useUpdateAdminUser(authClient)
   const setRoleMutation = useSetAdminUserRole(authClient)
@@ -833,7 +881,13 @@ function UserDialog(props: {
                     <TabsTrigger value="overview">
                       {config().localization.overview}
                     </TabsTrigger>
-                    <TabsTrigger value="sessions">
+                    <TabsTrigger
+                      disabled={
+                        sessionsPermission.isPending ||
+                        !sessionsPermission.data?.success
+                      }
+                      value="sessions"
+                    >
                       {config().localization.sessions}
                     </TabsTrigger>
                     <For each={contributedTabs()}>
@@ -1114,6 +1168,9 @@ function UserDialog(props: {
                         disabled={
                           canImpersonate.isPending ||
                           !canImpersonate.data?.success ||
+                          (targetIsAdmin() &&
+                            (canImpersonateAdmins.isPending ||
+                              !canImpersonateAdmins.data?.success)) ||
                           isSelf()
                         }
                         variant="outline"

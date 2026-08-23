@@ -11,6 +11,7 @@ import {
   useActiveOrganization,
   useAddTeamMember,
   useCreateTeam,
+  useHasPermission,
   useListOrganizationMembers,
   useListTeamMembers,
   useListTeams,
@@ -48,6 +49,10 @@ export function OrganizationTeams() {
   const createTeam = useCreateTeam(authClient, {
     onSuccess: () => toast.success(localization.teamCreated)
   })
+  const canCreate = useHasPermission(authClient, {
+    organizationId: activeOrganization?.id,
+    permissions: { team: ["create"] }
+  })
 
   const [isCreatingFields, setIsCreatingFields] = useState(false)
   const teamLimitReached =
@@ -58,7 +63,13 @@ export function OrganizationTeams() {
     event.preventDefault()
     const form = event.currentTarget
     const name = String(new FormData(form).get("name") ?? "").trim()
-    if (!name || !activeOrganization || teamLimitReached) return
+    if (
+      !name ||
+      !activeOrganization ||
+      !canCreate.data?.success ||
+      teamLimitReached
+    )
+      return
 
     setIsCreatingFields(true)
     try {
@@ -88,44 +99,58 @@ export function OrganizationTeams() {
             {localization.teamsDescription}
           </p>
         </div>
-        <form
-          className="grid w-full gap-3 sm:max-w-xl sm:grid-cols-2"
-          onSubmit={handleCreate}
-        >
-          <Field>
-            <FieldLabel htmlFor="new-team-name">{localization.name}</FieldLabel>
-            <Input
-              id="new-team-name"
-              name="name"
-              required
-              disabled={teamLimitReached}
-            />
-          </Field>
-          {modelFields.team.map((field) => (
-            <AdditionalField
-              key={field.name}
-              field={field}
-              name={field.name}
-              isPending={createTeam.isPending || isCreatingFields}
-              optionalLabel={authLocalization.settings.optional}
-            />
-          ))}
-          <Button
-            className="self-end"
-            type="submit"
-            disabled={
-              createTeam.isPending || isCreatingFields || teamLimitReached
-            }
+        {(canCreate.isPending || canCreate.data?.success) && (
+          <form
+            className="grid w-full gap-3 sm:max-w-xl sm:grid-cols-2"
+            onSubmit={handleCreate}
           >
-            {createTeam.isPending && <Spinner />}
-            {localization.createTeam}
-          </Button>
-          {teamLimitReached && (
-            <p className="text-sm text-destructive sm:col-span-2" role="alert">
-              {localization.teamLimitReached}
-            </p>
-          )}
-        </form>
+            <Field>
+              <FieldLabel htmlFor="new-team-name">
+                {localization.name}
+              </FieldLabel>
+              <Input
+                id="new-team-name"
+                name="name"
+                required
+                disabled={canCreate.isPending || teamLimitReached}
+              />
+            </Field>
+            {modelFields.team.map((field) => (
+              <AdditionalField
+                key={field.name}
+                field={field}
+                name={field.name}
+                isPending={
+                  canCreate.isPending ||
+                  createTeam.isPending ||
+                  isCreatingFields
+                }
+                optionalLabel={authLocalization.settings.optional}
+              />
+            ))}
+            <Button
+              className="self-end"
+              type="submit"
+              disabled={
+                canCreate.isPending ||
+                createTeam.isPending ||
+                isCreatingFields ||
+                teamLimitReached
+              }
+            >
+              {createTeam.isPending && <Spinner />}
+              {localization.createTeam}
+            </Button>
+            {teamLimitReached && (
+              <p
+                className="text-sm text-destructive sm:col-span-2"
+                role="alert"
+              >
+                {localization.teamLimitReached}
+              </p>
+            )}
+          </form>
+        )}
       </div>
       {teams.isPending ? (
         <Spinner />
@@ -182,6 +207,22 @@ function TeamCard({
   const teamMembers = useListTeamMembers(authClient, {
     query: { teamId: team.id }
   })
+  const canUpdate = useHasPermission(authClient, {
+    organizationId,
+    permissions: { team: ["update"] }
+  })
+  const canDelete = useHasPermission(authClient, {
+    organizationId,
+    permissions: { team: ["delete"] }
+  })
+  const canAddMember = useHasPermission(authClient, {
+    organizationId,
+    permissions: { member: ["update"] }
+  })
+  const canRemoveMember = useHasPermission(authClient, {
+    organizationId,
+    permissions: { member: ["delete"] }
+  })
   const updateTeam = useUpdateTeam(authClient)
   const removeTeam = useRemoveTeam(authClient)
   const [name, setName] = useState(team.name)
@@ -199,6 +240,7 @@ function TeamCard({
 
   const handleUpdate = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
+    if (!canUpdate.data?.success) return
     setIsUpdatingFields(true)
     try {
       const values = await parseAdditionalFieldValues(
@@ -233,6 +275,7 @@ function TeamCard({
               id={`team-name-${team.id}`}
               value={name}
               onChange={(event) => setName(event.target.value)}
+              disabled={canUpdate.isPending || !canUpdate.data?.success}
             />
           </Field>
           {fieldsWithModelValues(teamFields, team).map((field) => (
@@ -240,72 +283,93 @@ function TeamCard({
               key={field.name}
               field={field}
               name={field.name}
-              isPending={updateTeam.isPending || isUpdatingFields}
+              isPending={
+                canUpdate.isPending ||
+                !canUpdate.data?.success ||
+                updateTeam.isPending ||
+                isUpdatingFields
+              }
               optionalLabel={authLocalization.settings.optional}
             />
           ))}
-          <Button
-            type="submit"
-            disabled={updateTeam.isPending || isUpdatingFields}
-            variant="outline"
-          >
-            {authLocalization.settings.saveChanges}
-          </Button>
-          <Button
-            type="button"
-            disabled={removeTeam.isPending || !canRemoveTeam}
-            title={
-              canRemoveTeam
-                ? localization.deleteTeam
-                : localization.lastTeamRemovalDisabled
-            }
-            variant="destructive"
-            onClick={() => {
-              if (!window.confirm(localization.deleteTeam)) return
-              removeTeam.mutate({ teamId: team.id, organizationId })
-            }}
-          >
-            {localization.deleteTeam}
-          </Button>
+          {(canUpdate.isPending || canUpdate.data?.success) && (
+            <Button
+              type="submit"
+              disabled={
+                canUpdate.isPending || updateTeam.isPending || isUpdatingFields
+              }
+              variant="outline"
+            >
+              {authLocalization.settings.saveChanges}
+            </Button>
+          )}
+          {(canDelete.isPending || canDelete.data?.success) && (
+            <Button
+              type="button"
+              disabled={
+                canDelete.isPending || removeTeam.isPending || !canRemoveTeam
+              }
+              title={
+                canRemoveTeam
+                  ? localization.deleteTeam
+                  : localization.lastTeamRemovalDisabled
+              }
+              variant="destructive"
+              onClick={() => {
+                if (!canDelete.data?.success) return
+                if (!window.confirm(localization.deleteTeam)) return
+                removeTeam.mutate({ teamId: team.id, organizationId })
+              }}
+            >
+              {localization.deleteTeam}
+            </Button>
+          )}
         </form>
-        {!canRemoveTeam && (
+        {!canRemoveTeam && canDelete.data?.success && (
           <p className="text-sm text-muted-foreground">
             {localization.lastTeamRemovalDisabled}
           </p>
         )}
-        <div className="flex items-end gap-2">
-          <Field className="flex-1">
-            <FieldLabel>{localization.addTeamMember}</FieldLabel>
-            <Select
-              value={userId}
-              onValueChange={(value) => setUserId(value ?? "")}
-              disabled={memberLimitReached}
+        {(canAddMember.isPending || canAddMember.data?.success) && (
+          <div className="flex items-end gap-2">
+            <Field className="flex-1">
+              <FieldLabel>{localization.addTeamMember}</FieldLabel>
+              <Select
+                value={userId}
+                onValueChange={(value) => setUserId(value ?? "")}
+                disabled={canAddMember.isPending || memberLimitReached}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder={localization.selectMember} />
+                </SelectTrigger>
+                <SelectContent>
+                  {organizationMembers
+                    .filter((member) => !memberIds.has(member.userId))
+                    .map((member) => (
+                      <SelectItem key={member.userId} value={member.userId}>
+                        {member.user.name || member.user.email}
+                      </SelectItem>
+                    ))}
+                </SelectContent>
+              </Select>
+            </Field>
+            <Button
+              disabled={
+                canAddMember.isPending ||
+                !userId ||
+                addMember.isPending ||
+                memberLimitReached
+              }
+              onClick={() => {
+                if (!canAddMember.data?.success || !userId) return
+                addMember.mutate({ teamId: team.id, userId, organizationId })
+              }}
             >
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder={localization.selectMember} />
-              </SelectTrigger>
-              <SelectContent>
-                {organizationMembers
-                  .filter((member) => !memberIds.has(member.userId))
-                  .map((member) => (
-                    <SelectItem key={member.userId} value={member.userId}>
-                      {member.user.name || member.user.email}
-                    </SelectItem>
-                  ))}
-              </SelectContent>
-            </Select>
-          </Field>
-          <Button
-            disabled={!userId || addMember.isPending || memberLimitReached}
-            onClick={() =>
-              userId &&
-              addMember.mutate({ teamId: team.id, userId, organizationId })
-            }
-          >
-            {localization.addTeamMember}
-          </Button>
-        </div>
-        {memberLimitReached && (
+              {localization.addTeamMember}
+            </Button>
+          </div>
+        )}
+        {canAddMember.data?.success && memberLimitReached && (
           <p className="text-sm text-destructive" role="alert">
             {localization.teamMemberLimitReached}
           </p>
@@ -323,19 +387,24 @@ function TeamCard({
                 <span className="text-sm">
                   {member?.user.name || member?.user.email || teamMember.userId}
                 </span>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() =>
-                    removeMember.mutate({
-                      teamId: team.id,
-                      userId: teamMember.userId,
-                      organizationId
-                    })
-                  }
-                >
-                  {localization.removeTeamMember}
-                </Button>
+                {(canRemoveMember.isPending ||
+                  canRemoveMember.data?.success) && (
+                  <Button
+                    disabled={canRemoveMember.isPending}
+                    size="sm"
+                    variant="outline"
+                    onClick={() => {
+                      if (!canRemoveMember.data?.success) return
+                      removeMember.mutate({
+                        teamId: team.id,
+                        userId: teamMember.userId,
+                        organizationId
+                      })
+                    }}
+                  >
+                    {localization.removeTeamMember}
+                  </Button>
+                )}
               </div>
             )
           })}

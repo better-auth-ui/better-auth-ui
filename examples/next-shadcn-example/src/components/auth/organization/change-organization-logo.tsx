@@ -5,6 +5,7 @@ import type { OrganizationAuthClient } from "@better-auth-ui/core/plugins/organi
 import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
 import {
   useActiveOrganization,
+  useHasPermission,
   useUpdateOrganization
 } from "@better-auth-ui/react/plugins/organization"
 import { Trash2, Upload } from "lucide-react"
@@ -37,6 +38,9 @@ export function ChangeOrganizationLogo({
 
   const { data: activeOrganization, isPending: activeOrganizationPending } =
     useActiveOrganization(authClient)
+  const canUpdate = useHasPermission(authClient, {
+    permissions: { organization: ["update"] }
+  })
 
   const { mutate: updateOrganization, isPending: updatePending } =
     useUpdateOrganization(authClient)
@@ -49,7 +53,7 @@ export function ChangeOrganizationLogo({
 
   async function handleFileChange(e: ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]
-    if (!file || !activeOrganization) return
+    if (!file || !activeOrganization || !canUpdate.data?.success) return
 
     e.target.value = ""
 
@@ -79,6 +83,7 @@ export function ChangeOrganizationLogo({
   }
 
   async function handleDelete() {
+    if (!canUpdate.data?.success) return
     const currentLogo = activeOrganization?.logo
 
     updateOrganization(
@@ -125,49 +130,61 @@ export function ChangeOrganizationLogo({
       />
 
       <div className="flex items-center gap-4">
-        <Button
-          type="button"
-          variant="ghost"
-          size="icon"
-          className="h-auto w-auto rounded-full p-0"
-          disabled={!activeOrganization || isPending}
-          onClick={() => fileInputRef.current?.click()}
-        >
+        {canUpdate.data?.success ? (
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            className="h-auto w-auto rounded-full p-0"
+            disabled={!activeOrganization || isPending}
+            onClick={() => fileInputRef.current?.click()}
+          >
+            <OrganizationLogo
+              size="lg"
+              isPending={activeOrganizationPending}
+              organization={activeOrganization}
+            />
+          </Button>
+        ) : (
           <OrganizationLogo
             size="lg"
             isPending={activeOrganizationPending}
             organization={activeOrganization}
           />
-        </Button>
+        )}
 
-        <DropdownMenu>
-          <DropdownMenuTrigger
-            className={cn(buttonVariants({ size: "sm", variant: "secondary" }))}
-            disabled={!activeOrganization || isPending}
-          >
-            {isPending && <Spinner />}
-
-            {organizationLocalization.changeLogo}
-          </DropdownMenuTrigger>
-
-          <DropdownMenuContent align="start" className="min-w-fit">
-            <DropdownMenuItem onClick={() => fileInputRef.current?.click()}>
-              <Upload className="text-muted-foreground" />
-
-              {organizationLocalization.uploadLogo}
-            </DropdownMenuItem>
-
-            <DropdownMenuItem
-              disabled={!activeOrganization?.logo}
-              onClick={handleDelete}
-              variant="destructive"
+        {(canUpdate.isPending || canUpdate.data?.success) && (
+          <DropdownMenu>
+            <DropdownMenuTrigger
+              className={cn(
+                buttonVariants({ size: "sm", variant: "secondary" })
+              )}
+              disabled={!activeOrganization || isPending || canUpdate.isPending}
             >
-              <Trash2 />
+              {isPending && <Spinner />}
 
-              {organizationLocalization.deleteLogo}
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+              {organizationLocalization.changeLogo}
+            </DropdownMenuTrigger>
+
+            <DropdownMenuContent align="start" className="min-w-fit">
+              <DropdownMenuItem onClick={() => fileInputRef.current?.click()}>
+                <Upload className="text-muted-foreground" />
+
+                {organizationLocalization.uploadLogo}
+              </DropdownMenuItem>
+
+              <DropdownMenuItem
+                disabled={!activeOrganization?.logo}
+                onClick={handleDelete}
+                variant="destructive"
+              >
+                <Trash2 />
+
+                {organizationLocalization.deleteLogo}
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        )}
       </div>
     </div>
   )
