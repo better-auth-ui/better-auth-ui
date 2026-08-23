@@ -1530,7 +1530,10 @@ describe("Solid registry isolation", () => {
     }
 
     const settingsStories = readFileSync(
-      resolve(__dirname, "../src/stories/settings.stories.tsx"),
+      resolve(
+        __dirname,
+        "../src/stories/components/account-settings.stories.tsx"
+      ),
       "utf8"
     )
     expect(settingsStories).toContain("h-screen")
@@ -3417,11 +3420,11 @@ describe("Solid registry isolation", () => {
     const magicLinkPluginDoc = pluginDoc("magic-link")
     const multiSessionPluginDoc = pluginDoc("multi-session")
     const multiSessionStory = readFileSync(
-      resolve(__dirname, "../src/stories/multi-session.stories.tsx"),
+      resolve(__dirname, "../src/stories/plugins/multi-session.stories.tsx"),
       "utf8"
     )
     const organizationStory = readFileSync(
-      resolve(__dirname, "../src/stories/organization.stories.tsx"),
+      resolve(__dirname, "../src/stories/plugins/organization.stories.tsx"),
       "utf8"
     )
 
@@ -3883,7 +3886,7 @@ describe("Solid registry isolation", () => {
     const passkeyPluginDoc = pluginDoc("passkey")
     const passkeyStoryPath = resolve(
       __dirname,
-      "../src/stories/passkey.stories.tsx"
+      "../src/stories/plugins/passkey.stories.tsx"
     )
     const solidPasskeyRegistry = readFileSync(
       resolve(__dirname, "../../../apps/docs/public/r/solid/passkey.json"),
@@ -4159,7 +4162,10 @@ describe("Solid registry isolation", () => {
     ])
 
     const authStories = readFileSync(
-      resolve(__dirname, "../src/stories/auth.stories.tsx"),
+      resolve(
+        __dirname,
+        "../src/stories/components/authentication.stories.tsx"
+      ),
       "utf8"
     )
     expect(authStories).toContain('socialProviders={["github", "google"]}')

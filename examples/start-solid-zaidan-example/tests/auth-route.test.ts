@@ -2950,7 +2950,7 @@ describe("Solid auth route component selection", () => {
       "utf8"
     )
     const deleteUserStory = readFileSync(
-      resolve(__dirname, "../src/stories/delete-user.stories.tsx"),
+      resolve(__dirname, "../src/stories/plugins/delete-user.stories.tsx"),
       "utf8"
     )
 
@@ -3751,7 +3751,7 @@ describe("Solid auth route component selection", () => {
   it("adds a Zaidan Magic Link Storybook preview story", () => {
     const magicLinkStoryPath = resolve(
       __dirname,
-      "../src/stories/magic-link.stories.tsx"
+      "../src/stories/plugins/magic-link.stories.tsx"
     )
 
     expect(existsSync(magicLinkStoryPath)).toBe(true)

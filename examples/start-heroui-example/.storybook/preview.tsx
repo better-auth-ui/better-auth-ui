@@ -1,6 +1,6 @@
 import type { Decorator, Preview } from "@storybook/react-vite"
 import "../src/styles/app.css"
-import { applyStoryTheme } from "../src/stories/story-theme"
+import { applyStoryTheme } from "../src/stories/support/story-theme"
 
 const withTheme: Decorator = (Story, context) => {
   applyStoryTheme(context.globals.mode === "dark" ? "dark" : "light")
@@ -33,6 +33,25 @@ const preview: Preview = {
       matchers: {
         color: /(background|color)$/i,
         date: /Date$/i
+      }
+    },
+    options: {
+      storySort: {
+        order: [
+          "HeroUI",
+          [
+            "Components",
+            ["Authentication", "User", "Account settings", "Component states"],
+            "Plugins",
+            [
+              "Core plugins",
+              "Advanced authentication",
+              "Authentication helpers",
+              "Organization",
+              "Integrations"
+            ]
+          ]
+        ]
       }
     }
   }
