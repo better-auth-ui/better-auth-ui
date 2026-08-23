@@ -52,13 +52,13 @@ export function ActiveSessionsSettings(
         {auth.localization.settings.activeSessions}
       </h2>
 
-      <Card class="z-card-padding-none">
+      <Card class="z-card-padding-none gap-0!">
         <CardContent class="z-card-content-padding-none">
           <Show
             fallback={
               <Show
                 fallback={
-                  <ItemGroup class="gap-0">
+                  <ItemGroup class="gap-0!">
                     <ActiveSessionRowSkeleton />
                   </ItemGroup>
                 }
@@ -73,12 +73,12 @@ export function ActiveSessionsSettings(
               session.data
             }
           >
-            <ItemGroup class="gap-0">
+            <ItemGroup class="gap-0!">
               <For each={sessions()}>
                 {(activeSession, index) => (
                   <>
                     <Show when={index() > 0}>
-                      <ItemSeparator />
+                      <ItemSeparator class="my-0!" />
                     </Show>
                     <ActiveSessionRow
                       activeSession={activeSession}

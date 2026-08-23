@@ -1,7 +1,7 @@
 import { apiKeyQueryKeys } from "@better-auth-ui/core/plugins/api-key"
 import { multiSessionQueryKeys } from "@better-auth-ui/core/plugins/multi-session"
 import { passkeyQueryKeys } from "@better-auth-ui/core/plugins/passkey"
-import { AuthProvider, SignIn, UserProfile } from "@better-auth-ui/heroui"
+import { AuthProvider, UserProfile } from "@better-auth-ui/heroui"
 import { ApiKeys, apiKeyPlugin } from "@better-auth-ui/heroui/plugins/api-key"
 import {
   DangerZone,
@@ -17,7 +17,10 @@ import {
 } from "@better-auth-ui/heroui/plugins/multi-session"
 import { Passkeys, passkeyPlugin } from "@better-auth-ui/heroui/plugins/passkey"
 import { Appearance, themePlugin } from "@better-auth-ui/heroui/plugins/theme"
-import { usernamePlugin } from "@better-auth-ui/heroui/plugins/username"
+import {
+  SignInUsername,
+  usernamePlugin
+} from "@better-auth-ui/heroui/plugins/username"
 import type { AuthPlugin } from "@better-auth-ui/react"
 import { Toast } from "@heroui/react"
 import type { Meta, StoryObj } from "@storybook/react-vite"
@@ -356,21 +359,23 @@ export const UsernameSignInPreview: Story = {
       redirectTo={redirectTo}
       width="max-w-md"
     >
-      <SignIn />
+      <SignInUsername />
     </FeaturePreview>
   ),
   play: async ({ canvas, step, userEvent }) => {
-    await step("sign in from the username-enabled form", async () => {
+    await step("sign in with a username", async () => {
       await userEvent.type(
-        canvas.getByRole("textbox", { name: "Email" }),
-        "ada@example.com"
+        canvas.getByRole("textbox", { name: "Username" }),
+        "ada"
       )
       await userEvent.type(
         canvas.getByLabelText("Password"),
         "storybook-password"
       )
       await userEvent.click(canvas.getByRole("button", { name: "Sign In" }))
-      await expect(storyActions.signInEmail).toHaveBeenCalled()
+      await expect(storyActions.signInUsername).toHaveBeenCalledWith(
+        expect.objectContaining({ username: "ada" })
+      )
     })
   }
 }

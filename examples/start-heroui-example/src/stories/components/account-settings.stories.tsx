@@ -178,6 +178,7 @@ export const LinkedAccountsPreview: Story = {
   ),
   play: async ({ canvas, step, userEvent }) => {
     await step("link another social account", async () => {
+      await expect(canvas.getByText("ada-lovelace")).toBeVisible()
       await userEvent.click(
         canvas.getByRole("button", { name: "Link your Google account" })
       )

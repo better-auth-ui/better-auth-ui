@@ -7,6 +7,7 @@ import {
   createRouter,
   RouterProvider
 } from "@tanstack/solid-router"
+import { LayoutDashboard, Users } from "lucide-solid"
 import type { JSX } from "solid-js"
 import type { Meta, StoryObj } from "storybook-solidjs-vite"
 import { AuthProvider } from "@/components/auth/auth-provider"
@@ -96,11 +97,13 @@ function UserButtonLinksPreviewContent(props: UserStoryArgs) {
             links={[
               {
                 href: "/dashboard",
+                icon: <LayoutDashboard class="size-4 text-muted-foreground" />,
                 label: <span>{props.dashboardLabel ?? "Dashboard"}</span>,
                 visibility: "authenticated"
               },
               {
                 href: "/team",
+                icon: <Users class="size-4 text-muted-foreground" />,
                 label: <span>{props.teamLabel ?? "Team"}</span>
               }
             ]}

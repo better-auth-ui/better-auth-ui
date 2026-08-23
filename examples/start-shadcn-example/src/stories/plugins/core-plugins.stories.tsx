@@ -13,8 +13,8 @@ import { MagicLink } from "@/components/auth/magic-link"
 import { ManageAccounts } from "@/components/auth/multi-session/manage-accounts"
 import { Passkeys } from "@/components/auth/passkey/passkeys"
 import { UserProfile } from "@/components/auth/settings/account/user-profile"
-import { SignIn } from "@/components/auth/sign-in"
 import { Appearance } from "@/components/auth/theme/appearance"
+import { SignInUsername } from "@/components/auth/username/sign-in-username"
 import { Toaster } from "@/components/ui/sonner"
 import { apiKeyPlugin } from "@/lib/auth/api-key-plugin"
 import { deleteUserPlugin } from "@/lib/auth/delete-user-plugin"
@@ -358,21 +358,23 @@ export const UsernameSignInPreview: Story = {
       redirectTo={redirectTo}
       width="max-w-md"
     >
-      <SignIn />
+      <SignInUsername />
     </FeaturePreview>
   ),
   play: async ({ canvas, step, userEvent }) => {
-    await step("sign in from the username-enabled form", async () => {
+    await step("sign in with a username", async () => {
       await userEvent.type(
-        canvas.getByRole("textbox", { name: "Email" }),
-        "ada@example.com"
+        canvas.getByRole("textbox", { name: "Username" }),
+        "ada"
       )
       await userEvent.type(
         canvas.getByLabelText("Password"),
         "storybook-password"
       )
       await userEvent.click(canvas.getByRole("button", { name: "Sign In" }))
-      await expect(storyActions.signInEmail).toHaveBeenCalled()
+      await expect(storyActions.signInUsername).toHaveBeenCalledWith(
+        expect.objectContaining({ username: "ada" })
+      )
     })
   }
 }

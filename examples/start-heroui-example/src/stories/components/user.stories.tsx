@@ -4,6 +4,7 @@ import {
   UserButton,
   UserView
 } from "@better-auth-ui/heroui"
+import { LayoutCells, Persons } from "@gravity-ui/icons"
 import { Toast } from "@heroui/react"
 import type { Meta, StoryObj } from "@storybook/react-vite"
 import type { ReactNode } from "react"
@@ -114,10 +115,15 @@ export const UserButtonLinksPreview: Story = {
         links={[
           {
             href: "/dashboard",
+            icon: <LayoutCells className="text-muted" />,
             label: dashboardLabel,
             visibility: "authenticated"
           },
-          { href: "/team", label: teamLabel }
+          {
+            href: "/team",
+            icon: <Persons className="text-muted" />,
+            label: teamLabel
+          }
         ]}
       />
     </UserPreview>

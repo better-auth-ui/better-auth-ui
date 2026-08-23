@@ -30,6 +30,7 @@
     "@better-auth-ui/core": "*",
     "@better-auth-ui/heroui": "*",
     "@better-auth-ui/react": "*",
+    "@gravity-ui/icons": "^2.20.0",
     "@heroui/react": "^3.2.1",
     "@heroui/styles": "^3.2.1",
     "@neondatabase/serverless": "^1.0.2",

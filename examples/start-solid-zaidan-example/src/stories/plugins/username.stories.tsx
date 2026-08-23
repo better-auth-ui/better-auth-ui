@@ -11,8 +11,8 @@ import type { Component } from "solid-js"
 import type { Meta, StoryObj } from "storybook-solidjs-vite"
 import { AuthProvider } from "@/components/auth/auth-provider"
 import { UserProfile } from "@/components/auth/settings/account/user-profile"
-import { SignIn } from "@/components/auth/sign-in"
 import { SignUp } from "@/components/auth/sign-up"
+import { SignInUsername } from "@/components/auth/username/sign-in-username"
 import { usernamePlugin } from "@/lib/auth/username-plugin"
 import { storyRenders, withStoryActions } from "../support/story-coverage"
 
@@ -121,7 +121,7 @@ function createStoryRouter(component: Component, usernameAvailable = true) {
 }
 
 function SignInPreviewContent() {
-  return <SignIn />
+  return <SignInUsername />
 }
 
 function SignUpPreviewContent() {

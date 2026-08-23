@@ -51,6 +51,11 @@ const linkedAccounts = [
   }
 ]
 
+const gitHubAccountInfo = {
+  data: { login: "ada-lovelace" },
+  error: null
+}
+
 const activeSessions = [
   {
     createdAt: new Date("2026-01-12T10:30:00Z"),
@@ -78,6 +83,7 @@ const activeSessions = [
 
 const mockAuthClient = withStoryActions(
   {
+    accountInfo: async () => gitHubAccountInfo,
     changeEmail: async () => ({ data: null, error: null }),
     changePassword: async () => ({ data: null, error: null }),
     getSession: async () => ({ data: sessionData, error: null }),
@@ -106,6 +112,12 @@ function createStoryQueryClient() {
   queryClient.setQueryData(
     authQueryKeys.listAccounts(sessionData.user.id),
     linkedAccounts
+  )
+  queryClient.setQueryData(
+    authQueryKeys.accountInfo(sessionData.user.id, {
+      accountId: "github_account"
+    }),
+    gitHubAccountInfo
   )
   queryClient.setQueryData(
     authQueryKeys.listSessions(sessionData.user.id),

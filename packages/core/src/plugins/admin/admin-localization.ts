@@ -5,6 +5,8 @@ export const adminLocalization = {
   accessDeniedDescription: "You do not have permission to manage users.",
   /** @remarks `"Active"` */
   active: "Active",
+  /** @remarks `"Account information"` */
+  accountInformation: "Account information",
   /** @remarks `"Administration"` */
   admin: "Administration",
   /** @remarks `"Banned"` */
@@ -31,6 +33,8 @@ export const adminLocalization = {
   createUser: "Create user",
   /** @remarks `"Delete user"` */
   deleteUser: "Delete user",
+  /** @remarks `"Danger zone"` */
+  dangerZone: "Danger zone",
   /** @remarks `"Email"` */
   email: "Email",
   /** @remarks `"Email verified"` */
@@ -46,6 +50,8 @@ export const adminLocalization = {
     "Try again or check your Admin plugin configuration.",
   /** @remarks `"Name"` */
   name: "Name",
+  /** @remarks `"More actions"` */
+  moreActions: "More actions",
   /** @remarks `"No users found"` */
   noUsers: "No users found",
   /** @remarks `"Change the search or create a user."` */
@@ -60,6 +66,8 @@ export const adminLocalization = {
   overview: "Overview",
   /** @remarks `"Password"` */
   password: "Password",
+  /** @remarks `"Profile and access"` */
+  profileAndAccess: "Profile and access",
   /** @remarks `"Retry"` */
   retry: "Retry",
   /** @remarks `"Role"` */
@@ -86,10 +94,14 @@ export const adminLocalization = {
   revokeAllSessions: "Revoke all sessions",
   /** @remarks `"Save role"` */
   saveRole: "Save role",
+  /** @remarks `"Save changes"` */
+  saveChanges: "Save changes",
   /** @remarks `"Save user"` */
   saveUser: "Save user",
   /** @remarks `"Set password"` */
   setPassword: "Set password",
+  /** @remarks `"Security"` */
+  security: "Security",
   /** @remarks `"Status"` */
   status: "Status",
   /** @remarks `"Sort"` */

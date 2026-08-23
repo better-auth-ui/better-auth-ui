@@ -33,6 +33,7 @@ import {
   ChevronLeftIcon,
   ChevronRightIcon,
   CopyIcon,
+  EllipsisIcon,
   KeyRoundIcon,
   LogInIcon,
   SearchIcon,
@@ -72,6 +73,13 @@ import {
   DialogTitle
 } from "@/components/ui/dialog"
 import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuTrigger
+} from "@/components/ui/dropdown-menu"
+import {
   Field,
   FieldContent,
   FieldError,
@@ -92,13 +100,7 @@ import {
   SelectTrigger,
   SelectValue
 } from "@/components/ui/select"
-import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle
-} from "@/components/ui/sheet"
+import { Separator } from "@/components/ui/separator"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Switch } from "@/components/ui/switch"
 import {
@@ -1003,25 +1005,127 @@ function UserInspector({
           ? config.localization.revokeAllSessions
           : config.localization.impersonateUser
 
+  const saveUser = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    if (!user) return
+
+    const mutations: Promise<unknown>[] = []
+    if (canUpdate.data?.success) {
+      const formData = new FormData(event.currentTarget)
+      let additionalFieldValues: Record<string, AdditionalFieldValue | null>
+      try {
+        additionalFieldValues = await parseAdditionalFieldValues(
+          auth.additionalFields ?? [],
+          formData
+        )
+      } catch (error) {
+        setProfileError(error instanceof Error ? error.message : String(error))
+        return
+      }
+      setProfileError(undefined)
+      mutations.push(
+        updateUser.mutateAsync({
+          userId: user.id,
+          data: {
+            ...additionalFieldValues,
+            name: name.trim(),
+            ...(canSetEmail.data?.success
+              ? { email: email.trim(), emailVerified }
+              : {})
+          }
+        })
+      )
+    }
+    if (canSetRole.data?.success && !isSelf) {
+      mutations.push(
+        setRoleMutation.mutateAsync({
+          userId: user.id,
+          role: asAdminRoles(roles)
+        })
+      )
+    }
+
+    try {
+      await Promise.all(mutations)
+    } catch {
+      // Mutation errors are rendered next to the form.
+    }
+  }
+
   return (
     <>
-      <Sheet open={open} onOpenChange={onOpenChange}>
-        <SheetContent className="w-full overflow-y-auto sm:max-w-lg">
-          <SheetHeader>
-            <SheetTitle>{config.localization.userDetails}</SheetTitle>
-            <SheetDescription>
-              {user?.email ?? config.localization.usersDescription}
-            </SheetDescription>
-          </SheetHeader>
+      <Dialog open={open} onOpenChange={onOpenChange}>
+        <DialogContent className="h-[min(52rem,calc(100vh-2rem))] grid-rows-[auto_minmax(0,1fr)] gap-0 overflow-hidden p-0 sm:max-w-4xl">
+          <DialogHeader className="border-b px-6 py-5 pr-14">
+            {user ? (
+              <div className="flex items-center justify-between gap-4">
+                <div className="flex min-w-0 items-center gap-3">
+                  <UserAvatar className="size-12" user={user} />
+                  <div className="min-w-0">
+                    <DialogTitle className="truncate">{user.name}</DialogTitle>
+                    <DialogDescription className="truncate">
+                      {user.email}
+                    </DialogDescription>
+                  </div>
+                </div>
+                <div className="flex shrink-0 items-center gap-2">
+                  <Badge variant={user.banned ? "destructive" : "secondary"}>
+                    {user.banned
+                      ? config.localization.banned
+                      : config.localization.active}
+                  </Badge>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button
+                        aria-label={config.localization.moreActions}
+                        size="icon-sm"
+                        variant="ghost"
+                      >
+                        <EllipsisIcon />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="w-48">
+                      <DropdownMenuGroup>
+                        <DropdownMenuItem
+                          disabled={
+                            canImpersonate.isPending ||
+                            !canImpersonate.data?.success ||
+                            (targetIsAdmin &&
+                              (canImpersonateAdmins.isPending ||
+                                !canImpersonateAdmins.data?.success)) ||
+                            isSelf
+                          }
+                          onSelect={() => setDangerousAction("impersonate")}
+                        >
+                          <LogInIcon />
+                          {config.localization.impersonateUser}
+                        </DropdownMenuItem>
+                      </DropdownMenuGroup>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
+              </div>
+            ) : (
+              <>
+                <DialogTitle>{config.localization.userDetails}</DialogTitle>
+                <DialogDescription>
+                  {config.localization.usersDescription}
+                </DialogDescription>
+              </>
+            )}
+          </DialogHeader>
           {detail.isPending ? (
-            <div className="flex flex-col gap-3 p-4">
+            <div className="flex flex-col gap-3 p-6">
               <Skeleton className="size-14 rounded-full" />
               <Skeleton className="h-5 w-40" />
               <Skeleton className="h-4 w-64" />
             </div>
           ) : user ? (
-            <Tabs className="px-4 pb-6" defaultValue="overview">
-              <TabsList>
+            <Tabs
+              className="min-h-0 gap-0 overflow-hidden"
+              defaultValue="overview"
+            >
+              <TabsList className="mx-6 h-11 shrink-0" variant="line">
                 <TabsTrigger value="overview">
                   {config.localization.overview}
                 </TabsTrigger>
@@ -1040,363 +1144,355 @@ function UserInspector({
                   </TabsTrigger>
                 ))}
               </TabsList>
-              <TabsContent
-                className="flex flex-col gap-6 pt-4"
-                value="overview"
-              >
-                <div className="flex items-center gap-3">
-                  <UserAvatar className="size-12" user={user} />
-                  <div>
-                    <div className="font-medium">{user.name}</div>
-                    <div className="text-sm text-muted-foreground">
-                      {user.email}
-                    </div>
-                  </div>
-                </div>
-                <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-3 text-sm">
-                  <dt className="text-muted-foreground">
-                    {config.localization.userId}
-                  </dt>
-                  <dd className="flex min-w-0 items-center gap-1">
-                    <code className="truncate text-xs">{user.id}</code>
-                    <Button
-                      aria-label={config.localization.copyUserId}
-                      onClick={() => navigator.clipboard.writeText(user.id)}
-                      size="icon-xs"
-                      variant="ghost"
-                    >
-                      <CopyIcon />
-                    </Button>
-                  </dd>
-                  <dt className="text-muted-foreground">
-                    {config.localization.created}
-                  </dt>
-                  <dd>{formatDate(user.createdAt)}</dd>
-                  <dt className="text-muted-foreground">
-                    {config.localization.status}
-                  </dt>
-                  <dd>
-                    <Badge variant={user.banned ? "destructive" : "secondary"}>
-                      {user.banned
-                        ? config.localization.banned
-                        : config.localization.active}
-                    </Badge>
-                  </dd>
-                  {user.banned && user.banReason ? (
-                    <>
-                      <dt className="text-muted-foreground">
-                        {config.localization.banReason}
-                      </dt>
-                      <dd>{user.banReason}</dd>
-                    </>
-                  ) : null}
-                  {user.banned && user.banExpires ? (
-                    <>
-                      <dt className="text-muted-foreground">
-                        {config.localization.banExpires}
-                      </dt>
-                      <dd>{formatDate(user.banExpires)}</dd>
-                    </>
-                  ) : null}
-                </dl>
+              <TabsContent className="min-h-0 overflow-hidden" value="overview">
                 <form
-                  className="flex flex-col gap-4"
-                  onSubmit={async (event) => {
-                    event.preventDefault()
-                    const formData = new FormData(event.currentTarget)
-                    let additionalFieldValues: Record<
-                      string,
-                      AdditionalFieldValue | null
-                    >
-                    try {
-                      additionalFieldValues = await parseAdditionalFieldValues(
-                        auth.additionalFields ?? [],
-                        formData
-                      )
-                    } catch (error) {
-                      setProfileError(
-                        error instanceof Error ? error.message : String(error)
-                      )
-                      return
-                    }
-                    setProfileError(undefined)
-                    updateUser.mutate({
-                      userId: user.id,
-                      data: {
-                        ...additionalFieldValues,
-                        name: name.trim(),
-                        ...(canSetEmail.data?.success
-                          ? { email: email.trim(), emailVerified }
-                          : {})
-                      }
-                    })
-                  }}
+                  className="grid h-full grid-rows-[minmax(0,1fr)_auto]"
+                  onSubmit={saveUser}
                 >
-                  <Field>
-                    <FieldLabel htmlFor="admin-user-name">
-                      {config.localization.name}
-                    </FieldLabel>
-                    <InputGroup>
-                      <InputGroupInput
-                        disabled={!canUpdate.data?.success}
-                        id="admin-user-name"
-                        value={name}
-                        onChange={(event) => setName(event.target.value)}
-                      />
-                    </InputGroup>
-                  </Field>
-                  <Field>
-                    <FieldLabel htmlFor="admin-user-email">
-                      {config.localization.email}
-                    </FieldLabel>
-                    <InputGroup>
-                      <InputGroupInput
-                        disabled={
-                          !canUpdate.data?.success || !canSetEmail.data?.success
-                        }
-                        id="admin-user-email"
-                        onChange={(event) => setEmail(event.target.value)}
-                        required
-                        type="email"
-                        value={email}
-                      />
-                    </InputGroup>
-                  </Field>
-                  <Field orientation="horizontal">
-                    <Switch
-                      checked={emailVerified}
-                      disabled={
-                        !canUpdate.data?.success || !canSetEmail.data?.success
-                      }
-                      id="admin-user-email-verified"
-                      onCheckedChange={setEmailVerified}
-                    />
-                    <FieldContent>
-                      <FieldLabel htmlFor="admin-user-email-verified">
-                        {config.localization.emailVerified}
-                      </FieldLabel>
-                    </FieldContent>
-                  </Field>
-                  {auth.additionalFields?.map((field) => {
-                    const value = (user as unknown as Record<string, unknown>)[
-                      field.name
-                    ]
-                    return (
-                      <AdditionalField
-                        field={{
-                          ...field,
-                          defaultValue: value as AdditionalFieldValue | null
-                        }}
-                        isPending={
-                          updateUser.isPending || !canUpdate.data?.success
-                        }
-                        key={`${user.id}-${field.name}-${String(value ?? "")}`}
-                        name={field.name}
-                      />
-                    )
-                  })}
-                  <FieldError>
-                    {profileError ?? getAdminErrorMessage(updateUser.error)}
-                  </FieldError>
-                  <Button
-                    className="self-start"
-                    disabled={
-                      !name.trim() ||
-                      !email.trim() ||
-                      updateUser.isPending ||
-                      canUpdate.isPending ||
-                      !canUpdate.data?.success
-                    }
-                    type="submit"
-                    variant="outline"
-                  >
-                    {config.localization.saveUser}
-                  </Button>
-                </form>
-                <div className="flex flex-col gap-3">
-                  <FieldSet>
-                    <FieldLegend variant="label">
-                      {config.localization.role}
-                    </FieldLegend>
-                    <FieldGroup data-slot="checkbox-group">
-                      {config.roles.map((item) => (
-                        <Field key={item} orientation="horizontal">
-                          <Checkbox
-                            checked={roles.includes(item)}
-                            disabled={isSelf || !canSetRole.data?.success}
-                            id={`admin-user-role-${item}`}
-                            onCheckedChange={(checked) => {
-                              const next = checked
-                                ? [...roles, item]
-                                : roles.filter((role) => role !== item)
-                              if (next.length) setRoles(next)
-                            }}
-                          />
-                          <FieldLabel htmlFor={`admin-user-role-${item}`}>
-                            {item}
+                  <div className="overflow-y-auto">
+                    <section className="flex flex-col gap-5 p-6">
+                      <h3 className="font-medium">
+                        {config.localization.profileAndAccess}
+                      </h3>
+                      <FieldGroup className="grid gap-5 md:grid-cols-2">
+                        <Field>
+                          <FieldLabel htmlFor="admin-user-name">
+                            {config.localization.name}
                           </FieldLabel>
+                          <InputGroup>
+                            <InputGroupInput
+                              disabled={!canUpdate.data?.success}
+                              id="admin-user-name"
+                              value={name}
+                              onChange={(event) => setName(event.target.value)}
+                            />
+                          </InputGroup>
                         </Field>
-                      ))}
-                    </FieldGroup>
-                    {setRoleMutation.error ? (
+                        <Field>
+                          <FieldLabel htmlFor="admin-user-email">
+                            {config.localization.email}
+                          </FieldLabel>
+                          <InputGroup>
+                            <InputGroupInput
+                              disabled={
+                                !canUpdate.data?.success ||
+                                !canSetEmail.data?.success
+                              }
+                              id="admin-user-email"
+                              onChange={(event) => setEmail(event.target.value)}
+                              required
+                              type="email"
+                              value={email}
+                            />
+                          </InputGroup>
+                        </Field>
+                        <Field orientation="horizontal">
+                          <Switch
+                            checked={emailVerified}
+                            disabled={
+                              !canUpdate.data?.success ||
+                              !canSetEmail.data?.success
+                            }
+                            id="admin-user-email-verified"
+                            onCheckedChange={setEmailVerified}
+                          />
+                          <FieldContent>
+                            <FieldLabel htmlFor="admin-user-email-verified">
+                              {config.localization.emailVerified}
+                            </FieldLabel>
+                          </FieldContent>
+                        </Field>
+                        <FieldSet>
+                          <FieldLegend variant="label">
+                            {config.localization.role}
+                          </FieldLegend>
+                          <FieldGroup
+                            className="flex-row flex-wrap gap-4"
+                            data-slot="checkbox-group"
+                          >
+                            {config.roles.map((item) => (
+                              <Field key={item} orientation="horizontal">
+                                <Checkbox
+                                  checked={roles.includes(item)}
+                                  disabled={isSelf || !canSetRole.data?.success}
+                                  id={`admin-user-role-${item}`}
+                                  onCheckedChange={(checked) => {
+                                    const next = checked
+                                      ? [...roles, item]
+                                      : roles.filter((role) => role !== item)
+                                    if (next.length) setRoles(next)
+                                  }}
+                                />
+                                <FieldLabel htmlFor={`admin-user-role-${item}`}>
+                                  {item}
+                                </FieldLabel>
+                              </Field>
+                            ))}
+                          </FieldGroup>
+                        </FieldSet>
+                        {auth.additionalFields?.map((field) => {
+                          const value = (
+                            user as unknown as Record<string, unknown>
+                          )[field.name]
+                          return (
+                            <AdditionalField
+                              field={{
+                                ...field,
+                                defaultValue:
+                                  value as AdditionalFieldValue | null
+                              }}
+                              isPending={
+                                updateUser.isPending || !canUpdate.data?.success
+                              }
+                              key={`${user.id}-${field.name}-${String(value ?? "")}`}
+                              name={field.name}
+                            />
+                          )
+                        })}
+                      </FieldGroup>
                       <FieldError>
-                        {getAdminErrorMessage(setRoleMutation.error)}
+                        {profileError ??
+                          getAdminErrorMessage(updateUser.error) ??
+                          getAdminErrorMessage(setRoleMutation.error)}
                       </FieldError>
-                    ) : null}
-                  </FieldSet>
-                  <Button
-                    className="self-start"
-                    disabled={
-                      setRoleMutation.isPending ||
-                      canSetRole.isPending ||
-                      !canSetRole.data?.success ||
-                      isSelf
-                    }
-                    onClick={() =>
-                      setRoleMutation.mutate({
-                        userId: user.id,
-                        role: asAdminRoles(roles)
-                      })
-                    }
-                    variant="outline"
-                  >
-                    {config.localization.saveRole}
-                  </Button>
-                </div>
-                <div className="flex flex-wrap gap-2">
-                  <Button
-                    disabled={
-                      canSetPassword.isPending || !canSetPassword.data?.success
-                    }
-                    onClick={() => setPasswordOpen(true)}
-                    variant="outline"
-                  >
-                    <KeyRoundIcon />
-                    {config.localization.setPassword}
-                  </Button>
-                  <Button
-                    disabled={
-                      canBan.isPending || !canBan.data?.success || isSelf
-                    }
-                    onClick={() =>
-                      user.banned
-                        ? unban.mutate({ userId: user.id })
-                        : setDangerousAction("ban")
-                    }
-                    variant="outline"
-                  >
-                    <BanIcon />
-                    {user.banned
-                      ? config.localization.unbanUser
-                      : config.localization.banUser}
-                  </Button>
-                  <Button
-                    disabled={
-                      canImpersonate.isPending ||
-                      !canImpersonate.data?.success ||
-                      (targetIsAdmin &&
-                        (canImpersonateAdmins.isPending ||
-                          !canImpersonateAdmins.data?.success)) ||
-                      isSelf
-                    }
-                    onClick={() => setDangerousAction("impersonate")}
-                    variant="outline"
-                  >
-                    <LogInIcon />
-                    {config.localization.impersonateUser}
-                  </Button>
-                  <Button
-                    disabled={
-                      canDelete.isPending || !canDelete.data?.success || isSelf
-                    }
-                    onClick={() => setDangerousAction("delete")}
-                    variant="destructive"
-                  >
-                    <Trash2Icon />
-                    {config.localization.deleteUser}
-                  </Button>
-                </div>
-                {unban.error ? (
-                  <FieldError>{getAdminErrorMessage(unban.error)}</FieldError>
-                ) : null}
-              </TabsContent>
-              <TabsContent
-                className="flex flex-col gap-3 pt-4"
-                value="sessions"
-              >
-                {sessionsPermission.isPending || sessions.isPending ? (
-                  skeletonRowIds
-                    .slice(0, 3)
-                    .map((id) => (
-                      <Skeleton className="h-20 w-full" key={`session-${id}`} />
-                    ))
-                ) : !sessionsPermission.data?.success ? (
-                  <p className="text-sm text-muted-foreground">
-                    {config.localization.accessDeniedDescription}
-                  </p>
-                ) : sessions.data?.sessions.length ? (
-                  <>
-                    <Button
-                      className="self-end"
-                      disabled={
-                        canRevoke.isPending ||
-                        !canRevoke.data?.success ||
-                        isSelf
-                      }
-                      onClick={() => setDangerousAction("revokeAll")}
-                      variant="outline"
-                    >
-                      {config.localization.revokeAllSessions}
-                    </Button>
-                    {sessions.data.sessions.map((item) => (
-                      <div
-                        className="flex items-start justify-between gap-3 rounded-lg border p-3"
-                        key={item.id}
-                      >
-                        <div className="min-w-0 text-sm">
-                          <div className="truncate font-medium">
-                            {item.userAgent || config.localization.sessions}
-                          </div>
-                          <div className="text-xs text-muted-foreground">
-                            {formatDate(item.createdAt)} ·{" "}
-                            {formatDate(item.expiresAt)}
-                          </div>
-                          {config.showIpAddress && item.ipAddress ? (
-                            <div className="mt-1 font-mono text-xs text-muted-foreground">
-                              {item.ipAddress}
-                            </div>
-                          ) : null}
+                    </section>
+                    <Separator />
+                    <section className="flex flex-col gap-4 p-6">
+                      <h3 className="font-medium">
+                        {config.localization.accountInformation}
+                      </h3>
+                      <dl className="grid gap-x-8 gap-y-4 text-sm sm:grid-cols-2">
+                        <div className="flex flex-col gap-1">
+                          <dt className="text-muted-foreground">
+                            {config.localization.userId}
+                          </dt>
+                          <dd className="flex min-w-0 items-center gap-1">
+                            <code className="truncate text-xs">{user.id}</code>
+                            <Button
+                              aria-label={config.localization.copyUserId}
+                              onClick={() =>
+                                navigator.clipboard.writeText(user.id)
+                              }
+                              size="icon-xs"
+                              type="button"
+                              variant="ghost"
+                            >
+                              <CopyIcon />
+                            </Button>
+                          </dd>
                         </div>
+                        <div className="flex flex-col gap-1">
+                          <dt className="text-muted-foreground">
+                            {config.localization.created}
+                          </dt>
+                          <dd>{formatDate(user.createdAt)}</dd>
+                        </div>
+                        <div className="flex flex-col gap-1">
+                          <dt className="text-muted-foreground">
+                            {config.localization.status}
+                          </dt>
+                          <dd>
+                            <Badge
+                              variant={
+                                user.banned ? "destructive" : "secondary"
+                              }
+                            >
+                              {user.banned
+                                ? config.localization.banned
+                                : config.localization.active}
+                            </Badge>
+                          </dd>
+                        </div>
+                        {user.banned && user.banReason ? (
+                          <div className="flex flex-col gap-1">
+                            <dt className="text-muted-foreground">
+                              {config.localization.banReason}
+                            </dt>
+                            <dd>{user.banReason}</dd>
+                          </div>
+                        ) : null}
+                        {user.banned && user.banExpires ? (
+                          <div className="flex flex-col gap-1">
+                            <dt className="text-muted-foreground">
+                              {config.localization.banExpires}
+                            </dt>
+                            <dd>{formatDate(user.banExpires)}</dd>
+                          </div>
+                        ) : null}
+                      </dl>
+                    </section>
+                    <Separator />
+                    <section className="flex flex-col gap-4 p-6">
+                      <h3 className="font-medium">
+                        {config.localization.security}
+                      </h3>
+                      <div>
                         <Button
-                          aria-label={config.localization.revoke}
                           disabled={
-                            revokeSession.isPending ||
-                            canRevoke.isPending ||
-                            !canRevoke.data?.success ||
-                            isSelf
+                            canSetPassword.isPending ||
+                            !canSetPassword.data?.success
                           }
-                          onClick={() =>
-                            revokeSession.mutate({ sessionToken: item.token })
-                          }
-                          size="icon-sm"
-                          variant="ghost"
+                          onClick={() => setPasswordOpen(true)}
+                          type="button"
+                          variant="outline"
                         >
-                          <Trash2Icon />
+                          <KeyRoundIcon />
+                          {config.localization.setPassword}
                         </Button>
                       </div>
-                    ))}
-                  </>
-                ) : (
-                  <p className="py-8 text-center text-sm text-muted-foreground">
-                    {config.localization.noSessions}
-                  </p>
-                )}
+                    </section>
+                    <Separator />
+                    <section className="flex flex-col gap-4 p-6">
+                      <h3 className="font-medium">
+                        {config.localization.dangerZone}
+                      </h3>
+                      <div className="flex flex-wrap gap-2">
+                        <Button
+                          disabled={
+                            canBan.isPending || !canBan.data?.success || isSelf
+                          }
+                          onClick={() =>
+                            user.banned
+                              ? unban.mutate({ userId: user.id })
+                              : setDangerousAction("ban")
+                          }
+                          type="button"
+                          variant="outline"
+                        >
+                          <BanIcon />
+                          {user.banned
+                            ? config.localization.unbanUser
+                            : config.localization.banUser}
+                        </Button>
+                        <Button
+                          disabled={
+                            canDelete.isPending ||
+                            !canDelete.data?.success ||
+                            isSelf
+                          }
+                          onClick={() => setDangerousAction("delete")}
+                          type="button"
+                          variant="destructive"
+                        >
+                          <Trash2Icon />
+                          {config.localization.deleteUser}
+                        </Button>
+                      </div>
+                      {unban.error ? (
+                        <FieldError>
+                          {getAdminErrorMessage(unban.error)}
+                        </FieldError>
+                      ) : null}
+                    </section>
+                  </div>
+                  <div className="flex flex-col-reverse gap-2 border-t bg-muted/50 px-6 py-4 sm:flex-row sm:justify-end">
+                    <Button
+                      onClick={() => onOpenChange(false)}
+                      type="button"
+                      variant="outline"
+                    >
+                      {config.localization.cancel}
+                    </Button>
+                    <Button
+                      disabled={
+                        !name.trim() ||
+                        !email.trim() ||
+                        updateUser.isPending ||
+                        setRoleMutation.isPending ||
+                        canUpdate.isPending ||
+                        canSetRole.isPending ||
+                        (!canUpdate.data?.success &&
+                          (!canSetRole.data?.success || isSelf))
+                      }
+                      type="submit"
+                    >
+                      {config.localization.saveChanges}
+                    </Button>
+                  </div>
+                </form>
+              </TabsContent>
+              <TabsContent
+                className="min-h-0 overflow-y-auto p-6"
+                value="sessions"
+              >
+                <div className="flex flex-col gap-3">
+                  {sessionsPermission.isPending || sessions.isPending ? (
+                    skeletonRowIds
+                      .slice(0, 3)
+                      .map((id) => (
+                        <Skeleton
+                          className="h-20 w-full"
+                          key={`session-${id}`}
+                        />
+                      ))
+                  ) : !sessionsPermission.data?.success ? (
+                    <p className="text-sm text-muted-foreground">
+                      {config.localization.accessDeniedDescription}
+                    </p>
+                  ) : sessions.data?.sessions.length ? (
+                    <>
+                      <Button
+                        className="self-end"
+                        disabled={
+                          canRevoke.isPending ||
+                          !canRevoke.data?.success ||
+                          isSelf
+                        }
+                        onClick={() => setDangerousAction("revokeAll")}
+                        variant="outline"
+                      >
+                        {config.localization.revokeAllSessions}
+                      </Button>
+                      {sessions.data.sessions.map((item) => (
+                        <div
+                          className="flex items-start justify-between gap-3 rounded-lg border p-3"
+                          key={item.id}
+                        >
+                          <div className="min-w-0 text-sm">
+                            <div className="truncate font-medium">
+                              {item.userAgent || config.localization.sessions}
+                            </div>
+                            <div className="text-xs text-muted-foreground">
+                              {formatDate(item.createdAt)} ·{" "}
+                              {formatDate(item.expiresAt)}
+                            </div>
+                            {config.showIpAddress && item.ipAddress ? (
+                              <div className="mt-1 font-mono text-xs text-muted-foreground">
+                                {item.ipAddress}
+                              </div>
+                            ) : null}
+                          </div>
+                          <Button
+                            aria-label={config.localization.revoke}
+                            disabled={
+                              revokeSession.isPending ||
+                              canRevoke.isPending ||
+                              !canRevoke.data?.success ||
+                              isSelf
+                            }
+                            onClick={() =>
+                              revokeSession.mutate({ sessionToken: item.token })
+                            }
+                            size="icon-sm"
+                            variant="ghost"
+                          >
+                            <Trash2Icon />
+                          </Button>
+                        </div>
+                      ))}
+                    </>
+                  ) : (
+                    <p className="py-8 text-center text-sm text-muted-foreground">
+                      {config.localization.noSessions}
+                    </p>
+                  )}
+                </div>
               </TabsContent>
               {contributedTabs.map((tab) => {
                 const ContributedTab = tab.component
                 return (
                   <TabsContent
-                    className="pt-4"
+                    className="min-h-0 overflow-y-auto p-6"
                     key={tab.value}
                     value={tab.value}
                   >
@@ -1412,8 +1508,8 @@ function UserInspector({
               description={config.localization.loadUsersErrorDescription}
             />
           )}
-        </SheetContent>
-      </Sheet>
+        </DialogContent>
+      </Dialog>
       <PasswordDialog
         open={passwordOpen}
         onOpenChange={setPasswordOpen}

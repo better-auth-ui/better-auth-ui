@@ -50,6 +50,11 @@ export const storyAccounts = [
   }
 ]
 
+export const storyGitHubAccountInfo = {
+  data: { login: "ada-lovelace" },
+  error: null
+}
+
 export const storySessions = [
   storySession.session,
   {
@@ -64,6 +69,9 @@ export const storySessions = [
 ]
 
 export const storyActions = {
+  accountInfo: fn(async () => storyGitHubAccountInfo).mockName(
+    "authClient.accountInfo"
+  ),
   changeEmail: fn(async () => ({ data: null, error: null })).mockName(
     "authClient.changeEmail"
   ),
@@ -125,6 +133,7 @@ export const storyActions = {
 }
 
 export const storyAuthClient = {
+  accountInfo: storyActions.accountInfo,
   changeEmail: storyActions.changeEmail,
   changePassword: storyActions.changePassword,
   getSession: storyActions.getSession,
@@ -161,6 +170,12 @@ export function createStoryQueryClient() {
   queryClient.setQueryData(
     authQueryKeys.listAccounts(storyUserId),
     storyAccounts
+  )
+  queryClient.setQueryData(
+    authQueryKeys.accountInfo(storyUserId, {
+      accountId: "github_account"
+    }),
+    storyGitHubAccountInfo
   )
   queryClient.setQueryData(
     authQueryKeys.listSessions(storyUserId),

@@ -41,19 +41,18 @@ export function ActiveSessions({
         {localization.settings.activeSessions}
       </h2>
 
-      <Card className={cn(className)} variant={variant} {...props}>
-        <Card.Content className="gap-0">
+      <Card className={cn("gap-0", className)} variant={variant} {...props}>
+        <Card.Content className="gap-0 p-0">
           {isSessionNotFreshError(error) ? (
             <FreshSessionPrompt onFresh={() => sessionsQuery.refetch()} />
           ) : isPending ? (
             <SessionRowSkeleton />
           ) : (
-            activeSessions?.map((activeSession, index) => (
-              <div key={activeSession.id}>
-                {index > 0 && (
-                  <div className="border-b border-dashed -mx-4 my-4" />
-                )}
-
+            activeSessions?.map((activeSession) => (
+              <div
+                className="border-b border-divider px-4 py-3 last:border-b-0"
+                key={activeSession.id}
+              >
                 <ActiveSession activeSession={activeSession} />
               </div>
             ))

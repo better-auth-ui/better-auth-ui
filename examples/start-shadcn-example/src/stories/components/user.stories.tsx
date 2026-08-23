@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite"
+import { LayoutDashboard, Users } from "lucide-react"
 import type { ReactNode } from "react"
 import { expect } from "storybook/test"
 
@@ -115,10 +116,15 @@ export const UserButtonLinksPreview: Story = {
         links={[
           {
             href: "/dashboard",
+            icon: <LayoutDashboard className="text-muted-foreground" />,
             label: dashboardLabel,
             visibility: "authenticated"
           },
-          { href: "/team", label: teamLabel }
+          {
+            href: "/team",
+            icon: <Users className="text-muted-foreground" />,
+            label: teamLabel
+          }
         ]}
       />
     </UserPreview>
