@@ -397,7 +397,7 @@
     },
     "packages/core": {
       "name": "@better-auth-ui/core",
-      "version": "1.7.11",
+      "version": "1.7.12",
       "dependencies": {
         "libphonenumber-js": "^1.13.11",
         "uqr": "^0.1.3",
@@ -454,7 +454,7 @@
     },
     "packages/heroui": {
       "name": "@better-auth-ui/heroui",
-      "version": "1.7.11",
+      "version": "1.7.12",
       "devDependencies": {
         "@gravity-ui/icons": "^2.20.0",
         "@heroui/react": "^3.2.1",
@@ -491,7 +491,7 @@
     },
     "packages/locales": {
       "name": "@better-auth-ui/locales",
-      "version": "1.7.11",
+      "version": "1.7.12",
       "devDependencies": {
         "@better-auth-ui/core": "*",
         "vite": "^8.2.1",
@@ -504,7 +504,7 @@
     },
     "packages/react": {
       "name": "@better-auth-ui/react",
-      "version": "1.7.11",
+      "version": "1.7.12",
       "devDependencies": {
         "@better-auth/api-key": "1.7.0",
         "@better-auth/passkey": "1.7.0",
@@ -547,7 +547,7 @@
     },
     "packages/solid": {
       "name": "@better-auth-ui/solid",
-      "version": "1.7.11",
+      "version": "1.7.12",
       "devDependencies": {
         "@better-auth/api-key": "1.7.0",
         "@better-auth/passkey": "1.7.0",
