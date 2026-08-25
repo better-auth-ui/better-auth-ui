@@ -4,10 +4,10 @@ import {
   parseMemberRoles,
   type UpdateMemberRoleParams
 } from "@better-auth-ui/core/plugins/organization"
-import { useAuth } from "@better-auth-ui/solid"
+import { useAuth, useAuthPlugin } from "@better-auth-ui/solid"
 import { useUpdateMemberRole } from "@better-auth-ui/solid/plugins/organization"
 import { ShieldCheck } from "lucide-solid"
-import { createEffect, createSignal, For } from "solid-js"
+import { createEffect, createSignal, For, Show } from "solid-js"
 import { toast } from "solid-sonner"
 
 import { Button } from "@/components/ui/button"
@@ -26,6 +26,8 @@ import {
   FieldLabel,
   FieldTitle
 } from "@/components/ui/field"
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
+import { organizationPlugin } from "@/lib/auth/organization-plugin"
 
 type EditMemberRolesLocalization = Pick<
   OrganizationLocalization,
@@ -46,10 +48,32 @@ export type EditMemberRolesDialogProps = {
   protectedRoleRemovalDisabled?: boolean
 }
 
+const selectedMemberRoles = (
+  memberRole: string | null | undefined,
+  allowMultipleRoles: boolean,
+  protectedRole?: string
+) => {
+  const parsedRoles = parseMemberRoles(memberRole)
+
+  if (allowMultipleRoles) return parsedRoles
+
+  const selectedRole =
+    protectedRole && parsedRoles.includes(protectedRole)
+      ? protectedRole
+      : parsedRoles[0]
+
+  return selectedRole ? [selectedRole] : []
+}
+
 export function EditMemberRolesDialog(props: EditMemberRolesDialogProps) {
   const auth = useAuth<OrganizationAuthClient>()
+  const config = useAuthPlugin(organizationPlugin)
   const [selectedRoles, setSelectedRoles] = createSignal(
-    parseMemberRoles(props.member.role)
+    selectedMemberRoles(
+      props.member.role,
+      config.allowMultipleRoles,
+      props.protectedRole
+    )
   )
   const updateMemberRole = useUpdateMemberRole(auth.authClient, () => ({
     onSuccess: () => {
@@ -59,8 +83,21 @@ export function EditMemberRolesDialog(props: EditMemberRolesDialogProps) {
   }))
 
   createEffect(() => {
-    if (props.open) setSelectedRoles(parseMemberRoles(props.member.role))
+    if (props.open)
+      setSelectedRoles(
+        selectedMemberRoles(
+          props.member.role,
+          config.allowMultipleRoles,
+          props.protectedRole
+        )
+      )
   })
+
+  const protectedRoleSelected = () =>
+    !config.allowMultipleRoles &&
+    props.protectedRoleRemovalDisabled &&
+    props.protectedRole !== undefined &&
+    selectedRoles().includes(props.protectedRole)
 
   return (
     <Dialog open={props.open} onOpenChange={props.onOpenChange}>
@@ -88,47 +125,91 @@ export function EditMemberRolesDialog(props: EditMemberRolesDialogProps) {
             </DialogDescription>
           </DialogHeader>
 
-          <div class="flex flex-col gap-2">
-            <For each={props.roles}>
-              {([role, label]) => {
-                const checked = () => selectedRoles().includes(role)
-                const disabled = () =>
-                  updateMemberRole.isPending ||
-                  (checked() && selectedRoles().length === 1) ||
-                  (role === props.protectedRole &&
-                    checked() &&
-                    props.protectedRoleRemovalDisabled)
-                const id = `member-${props.member.id}-role-${role}`
+          <Show
+            when={config.allowMultipleRoles}
+            fallback={
+              <RadioGroup
+                disabled={updateMemberRole.isPending}
+                onChange={(role) => setSelectedRoles([role])}
+                value={selectedRoles()[0] ?? ""}
+              >
+                <div class="flex flex-col gap-2">
+                  <For each={props.roles}>
+                    {([role, label]) => {
+                      const selected = () => selectedRoles().includes(role)
+                      const disabled = () =>
+                        (protectedRoleSelected() &&
+                          role !== props.protectedRole) ||
+                        (role === props.protectedRole &&
+                          selected() &&
+                          props.protectedRoleRemovalDisabled)
+                      const id = `member-${props.member.id}-role-${role}`
 
-                return (
-                  <FieldLabel for={id}>
-                    <Field
-                      data-disabled={disabled() || undefined}
-                      orientation="horizontal"
-                    >
-                      <FieldContent>
-                        <FieldTitle>{label}</FieldTitle>
-                      </FieldContent>
-                      <Checkbox
-                        checked={checked()}
-                        disabled={disabled()}
-                        id={id}
-                        onChange={(selected) =>
-                          setSelectedRoles((current) =>
-                            selected
-                              ? current.includes(role)
-                                ? current
-                                : [...current, role]
-                              : current.filter((entry) => entry !== role)
-                          )
-                        }
-                      />
-                    </Field>
-                  </FieldLabel>
-                )
-              }}
-            </For>
-          </div>
+                      return (
+                        <FieldLabel for={id}>
+                          <Field
+                            data-disabled={disabled() || undefined}
+                            orientation="horizontal"
+                          >
+                            <FieldContent>
+                              <FieldTitle>{label}</FieldTitle>
+                            </FieldContent>
+                            <RadioGroupItem
+                              disabled={disabled()}
+                              id={id}
+                              value={role}
+                            />
+                          </Field>
+                        </FieldLabel>
+                      )
+                    }}
+                  </For>
+                </div>
+              </RadioGroup>
+            }
+          >
+            <div class="flex flex-col gap-2">
+              <For each={props.roles}>
+                {([role, label]) => {
+                  const checked = () => selectedRoles().includes(role)
+                  const disabled = () =>
+                    updateMemberRole.isPending ||
+                    (checked() && selectedRoles().length === 1) ||
+                    (role === props.protectedRole &&
+                      checked() &&
+                      props.protectedRoleRemovalDisabled)
+                  const id = `member-${props.member.id}-role-${role}`
+
+                  return (
+                    <FieldLabel for={id}>
+                      <Field
+                        data-disabled={disabled() || undefined}
+                        orientation="horizontal"
+                      >
+                        <FieldContent>
+                          <FieldTitle>{label}</FieldTitle>
+                        </FieldContent>
+                        <Checkbox
+                          checked={checked()}
+                          disabled={disabled()}
+                          id={id}
+                          onChange={(selected) =>
+                            setSelectedRoles((current) =>
+                              selected
+                                ? current.includes(role)
+                                  ? current
+                                  : [...current, role]
+                                : current.filter((entry) => entry !== role)
+                            )
+                          }
+                        />
+                      </Field>
+                    </FieldLabel>
+                  )
+                }}
+              </For>
+            </div>
+          </Show>
 
           <DialogFooter>
             <Button

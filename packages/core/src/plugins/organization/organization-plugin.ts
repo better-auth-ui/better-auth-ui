@@ -119,6 +119,11 @@ export type OrganizationPluginOptions = {
   membershipLimit?: number
   /** Maximum pending invitations per organization. */
   invitationLimit?: number
+  /**
+   * Whether members and invitations can have more than one role.
+   * @default true
+   */
+  allowMultipleRoles?: boolean
   /** Whether organization creation controls are available. @default true */
   allowOrganizationCreation?: boolean
   /** Enable Better Auth team management controls and mirror static server policies. */
@@ -231,6 +236,7 @@ export const organizationPlugin = createAuthPlugin(
       organizationLimit: resolvePolicyLimit(options.organizationLimit),
       membershipLimit: resolvePolicyLimit(options.membershipLimit),
       invitationLimit: resolvePolicyLimit(options.invitationLimit),
+      allowMultipleRoles: options.allowMultipleRoles ?? true,
       allowOrganizationCreation: options.allowOrganizationCreation ?? true,
       teams:
         options.teams === true ||

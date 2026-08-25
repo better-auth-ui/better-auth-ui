@@ -45,6 +45,7 @@ import { Input } from "@/components/ui/input"
 import {
   Select,
   SelectContent,
+  SelectGroup,
   SelectItem,
   SelectTrigger,
   SelectValue
@@ -71,6 +72,7 @@ export function InviteMemberDialog({
 }: InviteMemberDialogProps) {
   const { authClient, localization } = useAuth<OrganizationAuthClient>()
   const {
+    allowMultipleRoles,
     modelFields: { invitation: invitationFields },
     dynamicAccessControl,
     invitationLimit,
@@ -118,12 +120,12 @@ export function InviteMemberDialog({
       const keys = Object.keys(assignableRoles)
       const kept = current.filter((entry) => keys.includes(entry))
 
-      if (kept.length > 0) return kept
+      if (kept.length > 0) return allowMultipleRoles ? kept : kept.slice(0, 1)
 
       const fallback = pickDefaultRole(keys)
       return fallback ? [fallback] : []
     })
-  }, [assignableRoles])
+  }, [allowMultipleRoles, assignableRoles])
 
   useEffect(() => {
     const organizationChanged =
@@ -257,45 +259,69 @@ export function InviteMemberDialog({
                 {organizationLocalization.role}
               </FieldLabel>
 
-              <DropdownMenu>
-                <DropdownMenuTrigger
-                  id="invite-member-role"
+              {allowMultipleRoles ? (
+                <DropdownMenu>
+                  <DropdownMenuTrigger
+                    id="invite-member-role"
+                    disabled={isInviting}
+                    className={cn(
+                      buttonVariants({ variant: "outline" }),
+                      "w-full justify-between font-normal"
+                    )}
+                  >
+                    <span
+                      className={cn(!roleSummary && "text-muted-foreground")}
+                    >
+                      {roleSummary || organizationLocalization.selectRoles}
+                    </span>
+                    <ChevronDown className="opacity-50" />
+                  </DropdownMenuTrigger>
+
+                  <DropdownMenuContent
+                    align="start"
+                    className="w-(--radix-dropdown-menu-trigger-width)"
+                  >
+                    {Object.entries(assignableRoles).map(([key, label]) => {
+                      const checked = selectedRoles.includes(key)
+
+                      return (
+                        <DropdownMenuCheckboxItem
+                          key={key}
+                          checked={checked}
+                          disabled={checked && selectedRoles.length === 1}
+                          onSelect={(event) => {
+                            event.preventDefault()
+                            toggleRole(key)
+                          }}
+                        >
+                          {label}
+                        </DropdownMenuCheckboxItem>
+                      )
+                    })}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              ) : (
+                <Select
                   disabled={isInviting}
-                  className={cn(
-                    buttonVariants({ variant: "outline" }),
-                    "w-full justify-between font-normal"
-                  )}
+                  onValueChange={(role) => setSelectedRoles([role])}
+                  value={selectedRoles[0] ?? ""}
                 >
-                  <span className={cn(!roleSummary && "text-muted-foreground")}>
-                    {roleSummary || organizationLocalization.selectRoles}
-                  </span>
-                  <ChevronDown className="opacity-50" />
-                </DropdownMenuTrigger>
-
-                <DropdownMenuContent
-                  align="start"
-                  className="w-(--radix-dropdown-menu-trigger-width)"
-                >
-                  {Object.entries(assignableRoles).map(([key, label]) => {
-                    const checked = selectedRoles.includes(key)
-
-                    return (
-                      <DropdownMenuCheckboxItem
-                        key={key}
-                        checked={checked}
-                        disabled={checked && selectedRoles.length === 1}
-                        onSelect={(event) => {
-                          // Keep the menu open for picking several roles.
-                          event.preventDefault()
-                          toggleRole(key)
-                        }}
-                      >
-                        {label}
-                      </DropdownMenuCheckboxItem>
-                    )
-                  })}
-                </DropdownMenuContent>
-              </DropdownMenu>
+                  <SelectTrigger id="invite-member-role" className="w-full">
+                    <SelectValue
+                      placeholder={organizationLocalization.selectRoles}
+                    />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectGroup>
+                      {Object.entries(assignableRoles).map(([key, label]) => (
+                        <SelectItem key={key} value={key}>
+                          {label}
+                        </SelectItem>
+                      ))}
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
+              )}
 
               <FieldError />
             </Field>

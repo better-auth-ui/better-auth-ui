@@ -55,6 +55,7 @@ describe("organizationPlugin", () => {
     ]
     const plugin = organizationPlugin({
       modelFields: { organization: additionalFields },
+      allowMultipleRoles: false,
       allowOrganizationCreation: false,
       invitationLimit: 5,
       membershipLimit: 20,
@@ -71,12 +72,20 @@ describe("organizationPlugin", () => {
         team: [],
         role: []
       },
+      allowMultipleRoles: false,
       allowOrganizationCreation: false,
       invitationLimit: 5,
       membershipLimit: 20,
       organizationLimit: 2,
       teams: true
     })
+  })
+
+  it("allows multiple member roles by default", () => {
+    expect(organizationPlugin().allowMultipleRoles).toBe(true)
+    expect(
+      organizationPlugin({ allowMultipleRoles: false }).allowMultipleRoles
+    ).toBe(false)
   })
 
   it("uses the configured organization creator role", () => {

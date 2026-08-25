@@ -25,6 +25,7 @@ import {
   FieldLabel,
   FieldTitle
 } from "@/components/ui/field"
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Spinner } from "@/components/ui/spinner"
 import { organizationPlugin } from "@/lib/auth/organization-plugin"
 
@@ -41,6 +42,23 @@ export type EditMemberRolesDialogProps = {
   protectedRoleRemovalDisabled?: boolean
 }
 
+const selectedMemberRoles = (
+  memberRole: string | null | undefined,
+  allowMultipleRoles: boolean,
+  protectedRole?: string
+) => {
+  const parsedRoles = parseMemberRoles(memberRole)
+
+  if (allowMultipleRoles) return parsedRoles
+
+  const selectedRole =
+    protectedRole && parsedRoles.includes(protectedRole)
+      ? protectedRole
+      : parsedRoles[0]
+
+  return selectedRole ? [selectedRole] : []
+}
+
 export function EditMemberRolesDialog({
   member,
   onOpenChange,
@@ -51,10 +69,10 @@ export function EditMemberRolesDialog({
   protectedRoleRemovalDisabled
 }: EditMemberRolesDialogProps) {
   const { authClient, localization } = useAuth<OrganizationAuthClient>()
-  const { localization: organizationLocalization } =
+  const { allowMultipleRoles, localization: organizationLocalization } =
     useAuthPlugin(organizationPlugin)
   const [selectedRoles, setSelectedRoles] = useState(() =>
-    parseMemberRoles(member.role)
+    selectedMemberRoles(member.role, allowMultipleRoles, protectedRole)
   )
   const { mutate: updateMemberRole, isPending } = useUpdateMemberRole(
     authClient,
@@ -67,8 +85,11 @@ export function EditMemberRolesDialog({
   )
 
   useEffect(() => {
-    if (open) setSelectedRoles(parseMemberRoles(member.role))
-  }, [member.role, open])
+    if (open)
+      setSelectedRoles(
+        selectedMemberRoles(member.role, allowMultipleRoles, protectedRole)
+      )
+  }, [allowMultipleRoles, member.role, open, protectedRole])
 
   const toggleRole = (role: string, checked: boolean) => {
     setSelectedRoles((current) =>
@@ -79,6 +100,41 @@ export function EditMemberRolesDialog({
         : current.filter((entry) => entry !== role)
     )
   }
+
+  const protectedRoleSelected =
+    !allowMultipleRoles &&
+    protectedRoleRemovalDisabled &&
+    protectedRole !== undefined &&
+    selectedRoles.includes(protectedRole)
+  const roleOptions = roles.map(([role, label]) => {
+    const checked = selectedRoles.includes(role)
+    const disabled =
+      isPending ||
+      (allowMultipleRoles && checked && selectedRoles.length === 1) ||
+      (protectedRoleSelected && role !== protectedRole) ||
+      (role === protectedRole && checked && protectedRoleRemovalDisabled)
+    const id = `member-${member.id}-role-${role}`
+
+    return (
+      <FieldLabel htmlFor={id} key={role}>
+        <Field orientation="horizontal" data-disabled={disabled}>
+          <FieldContent>
+            <FieldTitle>{label}</FieldTitle>
+          </FieldContent>
+          {allowMultipleRoles ? (
+            <Checkbox
+              checked={checked}
+              disabled={disabled}
+              id={id}
+              onCheckedChange={(next) => toggleRole(role, next === true)}
+            />
+          ) : (
+            <RadioGroupItem disabled={disabled} id={id} value={role} />
+          )}
+        </Field>
+      </FieldLabel>
+    )
+  })
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -106,36 +162,17 @@ export function EditMemberRolesDialog({
             </DialogDescription>
           </DialogHeader>
 
-          <div className="flex flex-col gap-2">
-            {roles.map(([role, label]) => {
-              const checked = selectedRoles.includes(role)
-              const disabled =
-                isPending ||
-                (checked && selectedRoles.length === 1) ||
-                (role === protectedRole &&
-                  checked &&
-                  protectedRoleRemovalDisabled)
-              const id = `member-${member.id}-role-${role}`
-
-              return (
-                <FieldLabel htmlFor={id} key={role}>
-                  <Field orientation="horizontal" data-disabled={disabled}>
-                    <FieldContent>
-                      <FieldTitle>{label}</FieldTitle>
-                    </FieldContent>
-                    <Checkbox
-                      checked={checked}
-                      disabled={disabled}
-                      id={id}
-                      onCheckedChange={(next) =>
-                        toggleRole(role, next === true)
-                      }
-                    />
-                  </Field>
-                </FieldLabel>
-              )
-            })}
-          </div>
+          {allowMultipleRoles ? (
+            <div className="flex flex-col gap-2">{roleOptions}</div>
+          ) : (
+            <RadioGroup
+              disabled={isPending}
+              onValueChange={(role) => setSelectedRoles([role])}
+              value={selectedRoles[0] ?? ""}
+            >
+              {roleOptions}
+            </RadioGroup>
+          )}
 
           <DialogFooter>
             <DialogClose
@@ -145,7 +182,10 @@ export function EditMemberRolesDialog({
             >
               {localization.settings.cancel}
             </DialogClose>
-            <Button disabled={isPending || selectedRoles.length === 0}>
+            <Button
+              disabled={isPending || selectedRoles.length === 0}
+              type="submit"
+            >
               {isPending && <Spinner />}
               {localization.settings.saveChanges}
             </Button>

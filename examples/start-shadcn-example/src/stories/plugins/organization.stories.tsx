@@ -422,10 +422,12 @@ function createOrganizationQueryClient() {
 }
 
 function OrganizationPreview({
+  allowMultipleRoles = true,
   children,
   slug = "acme",
   width = "max-w-4xl"
 }: {
+  allowMultipleRoles?: boolean
   children: ReactNode
   slug?: string | null
   width?: "max-w-md" | "max-w-xl" | "max-w-2xl" | "max-w-4xl"
@@ -437,6 +439,7 @@ function OrganizationPreview({
       navigate={storyActions.navigate}
       plugins={[
         organizationPlugin({
+          allowMultipleRoles,
           dynamicAccessControl: { permissions: rolePermissions },
           slug,
           teams: true
@@ -453,14 +456,25 @@ function OrganizationPreview({
 const meta = {
   id: "shadcn-ui-plugins-organization",
   title: "shadcn/Plugins/Organization",
-  args: { organizationSlug: "acme" },
-  argTypes: { organizationSlug: { control: "text" } },
+  args: { allowMultipleRoles: true, organizationSlug: "acme" },
+  argTypes: {
+    allowMultipleRoles: {
+      control: "boolean",
+      description: "Allow members and invitations to have multiple roles"
+    },
+    organizationSlug: { control: "text" }
+  },
   parameters: { layout: "fullscreen" }
-} satisfies Meta<{ organizationSlug?: string }>
+} satisfies Meta<OrganizationStoryArgs>
 
 export default meta
 
-type Story = StoryObj<{ organizationSlug?: string }>
+type OrganizationStoryArgs = {
+  allowMultipleRoles?: boolean
+  organizationSlug?: string
+}
+
+type Story = StoryObj<OrganizationStoryArgs>
 
 export const OrganizationSwitcherPreview: Story = {
   name: "Organization switcher",
@@ -556,8 +570,11 @@ export const OrganizationDangerZonePreview: Story = {
 
 export const OrganizationPeoplePreview: Story = {
   name: "Organization people",
-  render: ({ organizationSlug = "acme" }) => (
-    <OrganizationPreview slug={organizationSlug}>
+  render: ({ allowMultipleRoles = true, organizationSlug = "acme" }) => (
+    <OrganizationPreview
+      allowMultipleRoles={allowMultipleRoles}
+      slug={organizationSlug}
+    >
       <OrganizationPeople />
     </OrganizationPreview>
   ),
@@ -575,12 +592,15 @@ export const OrganizationPeoplePreview: Story = {
 
 export const OrganizationMembersPreview: Story = {
   name: "Organization members",
-  render: ({ organizationSlug = "acme" }) => (
-    <OrganizationPreview slug={organizationSlug}>
+  render: ({ allowMultipleRoles = true, organizationSlug = "acme" }) => (
+    <OrganizationPreview
+      allowMultipleRoles={allowMultipleRoles}
+      slug={organizationSlug}
+    >
       <OrganizationMembers />
     </OrganizationPreview>
   ),
-  play: async ({ canvas, canvasElement, step, userEvent }) => {
+  play: async ({ args, canvas, canvasElement, step, userEvent }) => {
     await step("show team assignments", async () => {
       await expect(
         canvas.getByRole("columnheader", { name: "Teams" })
@@ -600,9 +620,11 @@ export const OrganizationMembersPreview: Story = {
         { name: "Change role" }
       )
       await expect(dialog).toBeVisible()
-      await expect(
-        within(dialog).getByRole("checkbox", { name: "Admin" })
-      ).toBeChecked()
+      const roleControl = within(dialog).getByRole(
+        args.allowMultipleRoles === false ? "radio" : "checkbox",
+        { name: "Admin" }
+      )
+      await expect(roleControl).toBeChecked()
     })
   }
 }

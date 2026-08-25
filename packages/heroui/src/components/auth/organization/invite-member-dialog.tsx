@@ -60,6 +60,7 @@ export function InviteMemberDialog({
 }: InviteMemberDialogProps) {
   const { authClient, localization } = useAuth()
   const {
+    allowMultipleRoles,
     modelFields: { invitation: invitationFields },
     dynamicAccessControl,
     invitationLimit,
@@ -113,12 +114,12 @@ export function InviteMemberDialog({
       const keys = Object.keys(assignableRoles)
       const kept = current.filter((entry) => keys.includes(entry))
 
-      if (kept.length > 0) return kept
+      if (kept.length > 0) return allowMultipleRoles ? kept : kept.slice(0, 1)
 
       const fallback = pickDefaultRole(keys)
       return fallback ? [fallback] : []
     })
-  }, [assignableRoles])
+  }, [allowMultipleRoles, assignableRoles])
 
   useEffect(() => {
     const organizationChanged =
@@ -238,7 +239,7 @@ export function InviteMemberDialog({
 
               <Select
                 name="role"
-                selectionMode="multiple"
+                selectionMode={allowMultipleRoles ? "multiple" : "single"}
                 value={selectedRoles}
                 onChange={(keys) => {
                   const next = [...(keys as Iterable<string>)]
@@ -246,7 +247,7 @@ export function InviteMemberDialog({
                   // An invitation always carries at least one role.
                   if (next.length === 0) return
 
-                  setSelectedRoles(next)
+                  setSelectedRoles(allowMultipleRoles ? next : next.slice(0, 1))
                 }}
                 isDisabled={isInviting || isSubmitting}
                 variant="secondary"
@@ -260,7 +261,9 @@ export function InviteMemberDialog({
                 </Select.Trigger>
 
                 <Select.Popover>
-                  <ListBox selectionMode="multiple">
+                  <ListBox
+                    selectionMode={allowMultipleRoles ? "multiple" : "single"}
+                  >
                     {Object.entries(assignableRoles).map(([key, label]) => (
                       <ListBox.Item key={key} id={key} textValue={label}>
                         {label}

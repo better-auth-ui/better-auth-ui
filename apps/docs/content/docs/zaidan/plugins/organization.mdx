@@ -500,7 +500,9 @@ organizationPlugin({
   // Replace the default role labels.
   roles: { owner: "Owner", admin: "Admin", member: "Member" },
   // Add labels for custom server roles without redefining built-ins.
-  additionalRoles: { billing: "Billing" }
+  additionalRoles: { billing: "Billing" },
+  // Limit invitations and members to one role.
+  allowMultipleRoles: false
 })
 ```
 
@@ -753,11 +755,10 @@ Modal dialog with the new-organization form. Owned by `<OrganizationSwitcher />`
 
 ## Multiple roles per member
 
-Better Auth accepts `role` as either a string or an array, and persists the
-result as one comma-joined value (`"admin,member"`). The role pickers on
-`<InviteMemberDialog />` and `<OrganizationMemberRow />` are multi-select, so a
-member can hold several roles at once. Clearing the last role is blocked,
-because every member needs at least one.
+Better Auth accepts `role` as a string or an array. It stores multiple roles as
+one comma-joined value (`"admin,member"`). The role pickers allow multiple
+roles by default. Set `allowMultipleRoles: false` to limit invitations and
+members to one role. The pickers always keep at least one role selected.
 
 Anywhere you read a raw role, split it first. `@better-auth-ui/core/plugins/organization`
 exports helpers for this:

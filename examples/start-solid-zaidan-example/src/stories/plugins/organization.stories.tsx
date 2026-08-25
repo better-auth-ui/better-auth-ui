@@ -476,6 +476,7 @@ function createStoryQueryClient() {
 }
 
 type OrganizationStoryProviderProps = {
+  allowMultipleRoles?: boolean
   children: () => JSX.Element
   queryClient: QueryClient
   slug?: string | null
@@ -490,6 +491,7 @@ function OrganizationStoryProvider(props: OrganizationStoryProviderProps) {
       navigate={navigate}
       plugins={[
         organizationPlugin({
+          allowMultipleRoles: props.allowMultipleRoles,
           dynamicAccessControl: { permissions: rolePermissions },
           slug: props.slug,
           teams: true
@@ -531,12 +533,17 @@ function OrganizationSwitcherPreviewContent() {
 }
 
 function OrganizationPreviewContent(props: {
+  allowMultipleRoles?: boolean
   organizationView?: "people" | "settings"
 }) {
   const queryClient = createStoryQueryClient()
 
   return (
-    <OrganizationStoryProvider queryClient={queryClient} slug="acme">
+    <OrganizationStoryProvider
+      allowMultipleRoles={props.allowMultipleRoles}
+      queryClient={queryClient}
+      slug="acme"
+    >
       {() => (
         <main class="mx-auto min-h-[640px] w-full max-w-3xl bg-background p-6 text-foreground">
           <Organization
@@ -594,11 +601,17 @@ function OrganizationDangerZonePreviewContent() {
   )
 }
 
-function OrganizationPeoplePreviewContent() {
+function OrganizationPeoplePreviewContent(props: {
+  allowMultipleRoles?: boolean
+}) {
   const queryClient = createStoryQueryClient()
 
   return (
-    <OrganizationStoryProvider queryClient={queryClient} slug="acme">
+    <OrganizationStoryProvider
+      allowMultipleRoles={props.allowMultipleRoles}
+      queryClient={queryClient}
+      slug="acme"
+    >
       {() => (
         <main class="mx-auto w-full max-w-5xl bg-background p-6 text-foreground">
           <OrganizationPeople />
@@ -608,11 +621,17 @@ function OrganizationPeoplePreviewContent() {
   )
 }
 
-function OrganizationMembersPreviewContent() {
+function OrganizationMembersPreviewContent(props: {
+  allowMultipleRoles?: boolean
+}) {
   const queryClient = createStoryQueryClient()
 
   return (
-    <OrganizationStoryProvider queryClient={queryClient} slug="acme">
+    <OrganizationStoryProvider
+      allowMultipleRoles={props.allowMultipleRoles}
+      queryClient={queryClient}
+      slug="acme"
+    >
       {() => (
         <main class="mx-auto w-full max-w-5xl bg-background p-6 text-foreground">
           <OrganizationMembers />
@@ -710,11 +729,20 @@ function UserInvitationsPreviewContent() {
   )
 }
 
+type OrganizationStoryArgs = {
+  allowMultipleRoles?: boolean
+  organizationView?: "people" | "settings"
+}
+
 const meta = {
   id: "zaidan-plugins-organization",
   title: "Zaidan/Plugins/Organization",
-  args: { organizationView: "settings" },
+  args: { allowMultipleRoles: true, organizationView: "settings" },
   argTypes: {
+    allowMultipleRoles: {
+      control: "boolean",
+      description: "Allow members and invitations to have multiple roles"
+    },
     organizationView: {
       control: "inline-radio",
       options: ["settings", "people"]
@@ -723,11 +751,11 @@ const meta = {
   parameters: {
     layout: "fullscreen"
   }
-} satisfies Meta<{ organizationView?: "people" | "settings" }>
+} satisfies Meta<OrganizationStoryArgs>
 
 export default meta
 
-type Story = StoryObj<{ organizationView?: "people" | "settings" }>
+type Story = StoryObj<OrganizationStoryArgs>
 
 export const OrganizationSwitcherPreview: Story = {
   play: storyRenders,
@@ -740,10 +768,13 @@ export const OrganizationSwitcherPreview: Story = {
 
 export const OrganizationPreview: Story = {
   play: storyRenders,
-  render: ({ organizationView = "settings" }) => (
+  render: ({ allowMultipleRoles = true, organizationView = "settings" }) => (
     <RouterProvider
       router={createStoryRouter(() => (
-        <OrganizationPreviewContent organizationView={organizationView} />
+        <OrganizationPreviewContent
+          allowMultipleRoles={allowMultipleRoles}
+          organizationView={organizationView}
+        />
       ))}
     />
   )
@@ -778,15 +809,19 @@ export const OrganizationDangerZonePreview: Story = {
 
 export const OrganizationPeoplePreview: Story = {
   play: storyRenders,
-  render: () => (
+  render: ({ allowMultipleRoles = true }) => (
     <RouterProvider
-      router={createStoryRouter(OrganizationPeoplePreviewContent)}
+      router={createStoryRouter(() => (
+        <OrganizationPeoplePreviewContent
+          allowMultipleRoles={allowMultipleRoles}
+        />
+      ))}
     />
   )
 }
 
 export const OrganizationMembersPreview: Story = {
-  play: async ({ canvas, canvasElement, step, userEvent }) => {
+  play: async ({ args, canvas, canvasElement, step, userEvent }) => {
     await step("open the member role editor", async () => {
       const graceRow = await waitFor(() =>
         canvas.getByRole("row", { name: /Grace Hopper/ })
@@ -800,14 +835,20 @@ export const OrganizationMembersPreview: Story = {
         { name: "Change member role" }
       )
       await expect(dialog).toBeVisible()
-      await expect(
-        within(dialog).getByRole("checkbox", { name: "Admin" })
-      ).toBeChecked()
+      const roleControl = within(dialog).getByRole(
+        args.allowMultipleRoles === false ? "radio" : "checkbox",
+        { name: "Admin" }
+      )
+      await expect(roleControl).toBeChecked()
     })
   },
-  render: () => (
+  render: ({ allowMultipleRoles = true }) => (
     <RouterProvider
-      router={createStoryRouter(OrganizationMembersPreviewContent)}
+      router={createStoryRouter(() => (
+        <OrganizationMembersPreviewContent
+          allowMultipleRoles={allowMultipleRoles}
+        />
+      ))}
     />
   )
 }

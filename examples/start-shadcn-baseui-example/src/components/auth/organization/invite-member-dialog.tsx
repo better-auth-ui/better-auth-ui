@@ -72,6 +72,7 @@ export function InviteMemberDialog({
 }: InviteMemberDialogProps) {
   const { authClient, localization } = useAuth<OrganizationAuthClient>()
   const {
+    allowMultipleRoles,
     modelFields: { invitation: invitationFields },
     dynamicAccessControl,
     invitationLimit,
@@ -125,12 +126,12 @@ export function InviteMemberDialog({
       const keys = Object.keys(assignableRoles)
       const kept = current.filter((entry) => keys.includes(entry))
 
-      if (kept.length > 0) return kept
+      if (kept.length > 0) return allowMultipleRoles ? kept : kept.slice(0, 1)
 
       const fallback = pickDefaultRole(keys)
       return fallback ? [fallback] : []
     })
-  }, [assignableRoles])
+  }, [allowMultipleRoles, assignableRoles])
 
   useEffect(() => {
     const organizationChanged =
@@ -264,38 +265,64 @@ export function InviteMemberDialog({
                 {organizationLocalization.role}
               </FieldLabel>
 
-              <DropdownMenu>
-                <DropdownMenuTrigger
-                  id="invite-member-role"
+              {allowMultipleRoles ? (
+                <DropdownMenu>
+                  <DropdownMenuTrigger
+                    id="invite-member-role"
+                    disabled={isInviting}
+                    className={cn(
+                      buttonVariants({ variant: "outline" }),
+                      "w-full justify-between font-normal"
+                    )}
+                  >
+                    <span
+                      className={cn(!roleSummary && "text-muted-foreground")}
+                    >
+                      {roleSummary || organizationLocalization.selectRoles}
+                    </span>
+                    <ChevronDown className="opacity-50" />
+                  </DropdownMenuTrigger>
+
+                  <DropdownMenuContent align="start">
+                    {roleItems.map((item) => {
+                      const checked = selectedRoles.includes(item.value)
+
+                      return (
+                        <DropdownMenuCheckboxItem
+                          key={item.value}
+                          checked={checked}
+                          disabled={checked && selectedRoles.length === 1}
+                          onCheckedChange={() => toggleRole(item.value)}
+                        >
+                          {item.label}
+                        </DropdownMenuCheckboxItem>
+                      )
+                    })}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              ) : (
+                <Select
                   disabled={isInviting}
-                  className={cn(
-                    buttonVariants({ variant: "outline" }),
-                    "w-full justify-between font-normal"
-                  )}
+                  items={roleItems}
+                  onValueChange={(role) => role && setSelectedRoles([role])}
+                  value={selectedRoles[0] ?? ""}
                 >
-                  <span className={cn(!roleSummary && "text-muted-foreground")}>
-                    {roleSummary || organizationLocalization.selectRoles}
-                  </span>
-                  <ChevronDown className="opacity-50" />
-                </DropdownMenuTrigger>
-
-                <DropdownMenuContent align="start">
-                  {roleItems.map((item) => {
-                    const checked = selectedRoles.includes(item.value)
-
-                    return (
-                      <DropdownMenuCheckboxItem
-                        key={item.value}
-                        checked={checked}
-                        disabled={checked && selectedRoles.length === 1}
-                        onCheckedChange={() => toggleRole(item.value)}
-                      >
-                        {item.label}
-                      </DropdownMenuCheckboxItem>
-                    )
-                  })}
-                </DropdownMenuContent>
-              </DropdownMenu>
+                  <SelectTrigger id="invite-member-role" className="w-full">
+                    <SelectValue
+                      placeholder={organizationLocalization.selectRoles}
+                    />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectGroup>
+                      {roleItems.map((item) => (
+                        <SelectItem key={item.value} value={item.value}>
+                          {item.label}
+                        </SelectItem>
+                      ))}
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
+              )}
 
               <FieldError />
             </Field>

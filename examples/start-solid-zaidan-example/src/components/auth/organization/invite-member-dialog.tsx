@@ -102,10 +102,16 @@ export function InviteMemberDialog(props: InviteMemberDialogProps) {
 
     const available = roles()
     const kept = selectedRoles().filter((entry) => entry in available)
+    const allowed = config.allowMultipleRoles ? kept : kept.slice(0, 1)
 
-    if (kept.length !== selectedRoles().length) {
+    if (
+      allowed.length !== selectedRoles().length ||
+      allowed.some((role, index) => role !== selectedRoles()[index])
+    ) {
       setSelectedRoles(
-        kept.length > 0 ? kept : [pickDefaultRole(available)].filter(Boolean)
+        allowed.length > 0
+          ? allowed
+          : [pickDefaultRole(available)].filter(Boolean)
       )
     }
   })
@@ -193,28 +199,56 @@ export function InviteMemberDialog(props: InviteMemberDialogProps) {
             />
           </Field>
 
-          <fieldset class="flex flex-col gap-2">
-            <legend class="font-medium text-sm">
-              {config.localization.role}
-            </legend>
-            <div class="flex flex-wrap gap-4">
-              <For each={Object.entries(roles())}>
-                {([value, label]) => (
-                  <Field orientation="horizontal">
-                    <Checkbox
-                      checked={selectedRoles().includes(value)}
-                      disabled={inviteMember.isPending}
-                      id={`invite-member-role-${value}`}
-                      onChange={(selected) => toggleRole(value, selected)}
-                    />
-                    <FieldLabel for={`invite-member-role-${value}`}>
-                      {label}
-                    </FieldLabel>
-                  </Field>
-                )}
-              </For>
-            </div>
-          </fieldset>
+          <Show
+            when={config.allowMultipleRoles}
+            fallback={
+              <Field>
+                <FieldLabel for="invite-member-role">
+                  {config.localization.role}
+                </FieldLabel>
+                <NativeSelect
+                  class="w-full"
+                  disabled={inviteMember.isPending}
+                  id="invite-member-role"
+                  onChange={(event) =>
+                    setSelectedRoles([event.currentTarget.value])
+                  }
+                  value={selectedRoles()[0] ?? ""}
+                >
+                  <For each={Object.entries(roles())}>
+                    {([value, label]) => (
+                      <NativeSelectOption value={value}>
+                        {label}
+                      </NativeSelectOption>
+                    )}
+                  </For>
+                </NativeSelect>
+              </Field>
+            }
+          >
+            <fieldset class="flex flex-col gap-2">
+              <legend class="font-medium text-sm">
+                {config.localization.role}
+              </legend>
+              <div class="flex flex-wrap gap-4">
+                <For each={Object.entries(roles())}>
+                  {([value, label]) => (
+                    <Field orientation="horizontal">
+                      <Checkbox
+                        checked={selectedRoles().includes(value)}
+                        disabled={inviteMember.isPending}
+                        id={`invite-member-role-${value}`}
+                        onChange={(selected) => toggleRole(value, selected)}
+                      />
+                      <FieldLabel for={`invite-member-role-${value}`}>
+                        {label}
+                      </FieldLabel>
+                    </Field>
+                  )}
+                </For>
+              </div>
+            </fieldset>
+          </Show>
 
           <Show when={config.teams}>
             <Field>

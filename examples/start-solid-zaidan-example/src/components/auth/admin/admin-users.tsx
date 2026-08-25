@@ -912,6 +912,7 @@ function UserDialog(props: {
 
     try {
       await Promise.all(mutations)
+      props.onOpenChange(false)
     } catch {
       // Mutation errors are rendered next to the form.
     }

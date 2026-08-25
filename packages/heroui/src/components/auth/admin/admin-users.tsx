@@ -884,6 +884,7 @@ function UserDrawer({
 
     try {
       await Promise.all(mutations)
+      onOpenChange(false)
     } catch {
       // Mutation errors are rendered next to the form.
     }
