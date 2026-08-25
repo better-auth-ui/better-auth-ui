@@ -1,0 +1,11 @@
+{
+  "extends": ["config:recommended", "group:allNonMajor", ":semanticCommits"],
+  "reviewers": ["AlexProgrammerDE"],
+  "packageRules": [
+    {
+      "matchUpdateTypes": ["minor", "patch", "pin", "digest"],
+      "automerge": true,
+      "automergeType": "branch"
+    }
+  ]
+}
