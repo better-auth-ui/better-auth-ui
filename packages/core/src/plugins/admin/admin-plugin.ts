@@ -6,6 +6,8 @@ export type AdminPluginOptions = {
   adminRoles?: string | readonly string[]
   /** User IDs Better Auth treats as administrators regardless of role. */
   adminUserIds?: readonly string[]
+  /** Whether users can have more than one role. @default true */
+  allowMultipleRoles?: boolean
   /** Default role selected when an administrator creates a user. @default "user" */
   defaultRole?: string
   /** Where to navigate after starting an impersonation session. */
@@ -105,6 +107,7 @@ export const adminPlugin = createAuthPlugin(
     return {
       adminRoles: adminRoles.length ? adminRoles : ["admin"],
       adminUserIds: resolveValues(options.adminUserIds),
+      allowMultipleRoles: options.allowMultipleRoles ?? true,
       defaultRole,
       impersonationRedirectTo: options.impersonationRedirectTo,
       localization: { ...adminLocalization, ...options.localization },

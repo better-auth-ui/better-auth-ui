@@ -199,11 +199,28 @@ export default meta
 
 type Story = StoryObj<typeof meta>
 
-export const AdminPreview: Story = {
+type AdminPreviewArgs = {
+  allowMultipleRoles?: boolean
+}
+
+export const AdminPreview: StoryObj<AdminPreviewArgs> = {
   name: "Admin",
-  render: () => (
+  args: { allowMultipleRoles: true },
+  argTypes: {
+    allowMultipleRoles: {
+      control: "boolean",
+      description: "Allow users to have multiple roles"
+    }
+  },
+  render: ({ allowMultipleRoles = true }) => (
     <PluginPreview
-      plugins={[adminPlugin({ pageSize: 10, showIpAddress: true })]}
+      plugins={[
+        adminPlugin({
+          allowMultipleRoles,
+          pageSize: 10,
+          showIpAddress: true
+        })
+      ]}
       width="max-w-4xl"
     >
       <Admin view="users" />

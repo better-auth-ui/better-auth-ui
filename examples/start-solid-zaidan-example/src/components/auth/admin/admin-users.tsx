@@ -88,6 +88,7 @@ import {
   InputGroupAddon,
   InputGroupInput
 } from "@/components/ui/input-group"
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Separator } from "@/components/ui/separator"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Switch } from "@/components/ui/switch"
@@ -127,12 +128,17 @@ const formatDate = (value: Date | string | undefined | null) =>
 
 const asAdminRoles = (roles: string[]) => roles as ("user" | "admin")[]
 
-const parseAdminRoles = (role: string | undefined, fallback: string) => {
+const parseAdminRoles = (
+  role: string | undefined,
+  fallback: string,
+  allowMultipleRoles: boolean
+) => {
   const roles = role
     ?.split(",")
     .map((value) => value.trim())
     .filter(Boolean)
-  return roles?.length ? roles : [fallback]
+  const resolved = roles?.length ? roles : [fallback]
+  return allowMultipleRoles ? resolved : resolved.slice(0, 1)
 }
 
 const getBanDurationSeconds = (value: string) => {
@@ -520,6 +526,10 @@ function CreateUserDialog(props: {
   const [formError, setFormError] = createSignal<string>()
   const [roles, setRoles] = createSignal([config().defaultRole])
 
+  createEffect(() => {
+    if (!config().allowMultipleRoles) setRoles((current) => current.slice(0, 1))
+  })
+
   const close = () => {
     createUser.reset()
     setEmailVerified(false)
@@ -608,27 +618,51 @@ function CreateUserDialog(props: {
               <FieldLegend variant="label">
                 {config().localization.role}
               </FieldLegend>
-              <FieldGroup data-slot="checkbox-group">
-                <For each={config().roles}>
-                  {(role) => (
-                    <Field orientation="horizontal">
-                      <Checkbox
-                        checked={roles().includes(role)}
-                        id={`solid-admin-create-role-${role}`}
-                        onChange={(checked) => {
-                          const next = checked
-                            ? [...roles(), role]
-                            : roles().filter((item) => item !== role)
-                          if (next.length) setRoles(next)
-                        }}
-                      />
-                      <FieldLabel for={`solid-admin-create-role-${role}`}>
-                        {role}
-                      </FieldLabel>
-                    </Field>
-                  )}
-                </For>
-              </FieldGroup>
+              <Show
+                when={config().allowMultipleRoles}
+                fallback={
+                  <RadioGroup
+                    onChange={(role) => setRoles([role])}
+                    value={roles()[0] ?? ""}
+                  >
+                    <For each={config().roles}>
+                      {(role) => (
+                        <Field orientation="horizontal">
+                          <RadioGroupItem
+                            id={`solid-admin-create-role-${role}`}
+                            value={role}
+                          />
+                          <FieldLabel for={`solid-admin-create-role-${role}`}>
+                            {role}
+                          </FieldLabel>
+                        </Field>
+                      )}
+                    </For>
+                  </RadioGroup>
+                }
+              >
+                <FieldGroup data-slot="checkbox-group">
+                  <For each={config().roles}>
+                    {(role) => (
+                      <Field orientation="horizontal">
+                        <Checkbox
+                          checked={roles().includes(role)}
+                          id={`solid-admin-create-role-${role}`}
+                          onChange={(checked) => {
+                            const next = checked
+                              ? [...roles(), role]
+                              : roles().filter((item) => item !== role)
+                            if (next.length) setRoles(next)
+                          }}
+                        />
+                        <FieldLabel for={`solid-admin-create-role-${role}`}>
+                          {role}
+                        </FieldLabel>
+                      </Field>
+                    )}
+                  </For>
+                </FieldGroup>
+              </Show>
             </FieldSet>
           </Show>
           <Field orientation="horizontal">
@@ -789,7 +823,13 @@ function UserDialog(props: {
         setName(userName ?? "")
         setEmail(userEmail ?? "")
         setEmailVerified(userEmailVerified ?? false)
-        setRoles(parseAdminRoles(userRole, config().defaultRole))
+        setRoles(
+          parseAdminRoles(
+            userRole,
+            config().defaultRole,
+            config().allowMultipleRoles
+          )
+        )
         setProfileError(undefined)
       }
     )
@@ -1092,37 +1132,68 @@ function UserDialog(props: {
                               <FieldLegend variant="label">
                                 {config().localization.role}
                               </FieldLegend>
-                              <FieldGroup
-                                class="flex-row flex-wrap gap-4"
-                                data-slot="checkbox-group"
+                              <Show
+                                when={config().allowMultipleRoles}
+                                fallback={
+                                  <RadioGroup
+                                    class="flex-row flex-wrap gap-4"
+                                    disabled={
+                                      isSelf() || !canSetRole.data?.success
+                                    }
+                                    onChange={(role) => setRoles([role])}
+                                    value={roles()[0] ?? ""}
+                                  >
+                                    <For each={config().roles}>
+                                      {(item) => (
+                                        <Field orientation="horizontal">
+                                          <RadioGroupItem
+                                            id={`solid-admin-user-role-${item}`}
+                                            value={item}
+                                          />
+                                          <FieldLabel
+                                            for={`solid-admin-user-role-${item}`}
+                                          >
+                                            {item}
+                                          </FieldLabel>
+                                        </Field>
+                                      )}
+                                    </For>
+                                  </RadioGroup>
+                                }
                               >
-                                <For each={config().roles}>
-                                  {(item) => (
-                                    <Field orientation="horizontal">
-                                      <Checkbox
-                                        checked={roles().includes(item)}
-                                        disabled={
-                                          isSelf() || !canSetRole.data?.success
-                                        }
-                                        id={`solid-admin-user-role-${item}`}
-                                        onChange={(checked) => {
-                                          const next = checked
-                                            ? [...roles(), item]
-                                            : roles().filter(
-                                                (role) => role !== item
-                                              )
-                                          if (next.length) setRoles(next)
-                                        }}
-                                      />
-                                      <FieldLabel
-                                        for={`solid-admin-user-role-${item}`}
-                                      >
-                                        {item}
-                                      </FieldLabel>
-                                    </Field>
-                                  )}
-                                </For>
-                              </FieldGroup>
+                                <FieldGroup
+                                  class="flex-row flex-wrap gap-4"
+                                  data-slot="checkbox-group"
+                                >
+                                  <For each={config().roles}>
+                                    {(item) => (
+                                      <Field orientation="horizontal">
+                                        <Checkbox
+                                          checked={roles().includes(item)}
+                                          disabled={
+                                            isSelf() ||
+                                            !canSetRole.data?.success
+                                          }
+                                          id={`solid-admin-user-role-${item}`}
+                                          onChange={(checked) => {
+                                            const next = checked
+                                              ? [...roles(), item]
+                                              : roles().filter(
+                                                  (role) => role !== item
+                                                )
+                                            if (next.length) setRoles(next)
+                                          }}
+                                        />
+                                        <FieldLabel
+                                          for={`solid-admin-user-role-${item}`}
+                                        >
+                                          {item}
+                                        </FieldLabel>
+                                      </Field>
+                                    )}
+                                  </For>
+                                </FieldGroup>
+                              </Show>
                             </FieldSet>
                             <For each={auth.additionalFields}>
                               {(field) => {

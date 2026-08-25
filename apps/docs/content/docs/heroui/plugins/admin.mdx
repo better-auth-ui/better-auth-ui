@@ -123,6 +123,7 @@ Configure custom roles with the same names in Better Auth and the UI plugin:
 
 ```ts
 adminPlugin({
+  allowMultipleRoles: false,
   defaultRole: "member",
   impersonationRedirectTo: "/",
   pageSize: 25,
@@ -130,6 +131,10 @@ adminPlugin({
   showIpAddress: false
 })
 ```
+
+Set `allowMultipleRoles` to `false` to make the create and edit forms accept
+one role. This option does not change `adminRoles`, which controls administrator
+access.
 
 The public Admin client does not provide account disconnection, global
 organization administration, or a Sentinel dashboard. These views are not

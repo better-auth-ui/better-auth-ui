@@ -99,12 +99,17 @@ const getAdminErrorMessage = (error: Error | null) => {
 
 const asAdminRoles = (roles: string[]) => roles as ("user" | "admin")[]
 
-const parseAdminRoles = (role: string | undefined, fallback: string) => {
+const parseAdminRoles = (
+  role: string | undefined,
+  fallback: string,
+  allowMultipleRoles: boolean
+) => {
   const roles = role
     ?.split(",")
     .map((value) => value.trim())
     .filter(Boolean)
-  return roles?.length ? roles : [fallback]
+  const resolved = roles?.length ? roles : [fallback]
+  return allowMultipleRoles ? resolved : resolved.slice(0, 1)
 }
 
 const getBanDurationSeconds = (value: string) => {
@@ -507,6 +512,10 @@ function CreateUserDialog({
   const [formError, setFormError] = useState<string>()
   const [roles, setRoles] = useState([config.defaultRole])
 
+  useEffect(() => {
+    if (!config.allowMultipleRoles) setRoles((current) => current.slice(0, 1))
+  }, [config.allowMultipleRoles])
+
   const close = () => {
     createUser.reset()
     setEmailVerified(false)
@@ -582,12 +591,17 @@ function CreateUserDialog({
                 ) : canSetRole.data?.success ? (
                   <Select
                     fullWidth
-                    selectionMode="multiple"
+                    selectionMode={
+                      config.allowMultipleRoles ? "multiple" : "single"
+                    }
                     value={roles}
                     variant="secondary"
                     onChange={(keys) => {
                       const next = [...(keys as Iterable<string>)]
-                      if (next.length) setRoles(next)
+                      if (next.length)
+                        setRoles(
+                          config.allowMultipleRoles ? next : next.slice(0, 1)
+                        )
                     }}
                   >
                     <Label>{config.localization.role}</Label>
@@ -596,7 +610,11 @@ function CreateUserDialog({
                       <Select.Indicator />
                     </Select.Trigger>
                     <Select.Popover>
-                      <ListBox selectionMode="multiple">
+                      <ListBox
+                        selectionMode={
+                          config.allowMultipleRoles ? "multiple" : "single"
+                        }
+                      >
                         {config.roles.map((role) => (
                           <ListBox.Item id={role} key={role} textValue={role}>
                             {role}
@@ -755,8 +773,15 @@ function UserDrawer({
     setName(detail?.name ?? "")
     setEmail(detail?.email ?? "")
     setEmailVerified(detail?.emailVerified ?? false)
-    setRoles(parseAdminRoles(detail?.role, config.defaultRole))
+    setRoles(
+      parseAdminRoles(
+        detail?.role,
+        config.defaultRole,
+        config.allowMultipleRoles
+      )
+    )
   }, [
+    config.allowMultipleRoles,
     config.defaultRole,
     detail?.email,
     detail?.emailVerified,
@@ -1034,12 +1059,21 @@ function UserDrawer({
                             <Select
                               fullWidth
                               isDisabled={isSelf || !canSetRole.data?.success}
-                              selectionMode="multiple"
+                              selectionMode={
+                                config.allowMultipleRoles
+                                  ? "multiple"
+                                  : "single"
+                              }
                               value={roles}
                               variant="secondary"
                               onChange={(keys) => {
                                 const next = [...(keys as Iterable<string>)]
-                                if (next.length) setRoles(next)
+                                if (next.length)
+                                  setRoles(
+                                    config.allowMultipleRoles
+                                      ? next
+                                      : next.slice(0, 1)
+                                  )
                               }}
                             >
                               <Label>{config.localization.role}</Label>
@@ -1048,7 +1082,13 @@ function UserDrawer({
                                 <Select.Indicator />
                               </Select.Trigger>
                               <Select.Popover>
-                                <ListBox selectionMode="multiple">
+                                <ListBox
+                                  selectionMode={
+                                    config.allowMultipleRoles
+                                      ? "multiple"
+                                      : "single"
+                                  }
+                                >
                                   {config.roles.map((item) => (
                                     <ListBox.Item
                                       id={item}

@@ -54,6 +54,7 @@ describe("adminPlugin", () => {
 
   it("normalizes user-management options", () => {
     expect(adminPlugin()).toMatchObject({
+      allowMultipleRoles: true,
       defaultRole: "user",
       pageSize: 20,
       roles: ["user", "admin"],
@@ -62,11 +63,13 @@ describe("adminPlugin", () => {
 
     expect(
       adminPlugin({
+        allowMultipleRoles: false,
         defaultRole: "owner",
         pageSize: 500,
         roles: ["member", "member", ""]
       })
     ).toMatchObject({
+      allowMultipleRoles: false,
       defaultRole: "owner",
       pageSize: 100,
       roles: ["owner", "member"]

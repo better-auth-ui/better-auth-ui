@@ -158,6 +158,7 @@ your privacy policy permits this data.
 
 ```ts
 adminPlugin({
+  allowMultipleRoles: false,
   defaultRole: "member",
   impersonationRedirectTo: "/",
   pageSize: 25,
@@ -168,6 +169,10 @@ adminPlugin({
 
 Configure the same roles and permissions in Better Auth `admin()` and
 `adminClient()`. The UI list only controls which role choices it shows.
+
+Set `allowMultipleRoles` to `false` to make the create and edit forms accept
+one role. This option does not change `adminRoles`, which controls administrator
+access.
 
 ## Scope
 
