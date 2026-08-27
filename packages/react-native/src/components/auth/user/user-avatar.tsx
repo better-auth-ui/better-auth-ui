@@ -1,8 +1,5 @@
-import {
-  type UsernameAuthClient,
-  useAuth,
-  useSession
-} from "@better-auth-ui/react"
+import type { UsernameAuthClient } from "@better-auth-ui/core/plugins/username"
+import { useAuth, useSession } from "@better-auth-ui/react"
 import type { User } from "better-auth"
 import type { ReactNode } from "react"
 import { cn } from "../../../lib/cn"

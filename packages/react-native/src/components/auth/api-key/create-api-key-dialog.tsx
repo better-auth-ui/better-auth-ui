@@ -1,9 +1,6 @@
-import {
-  type ApiKeyAuthClient,
-  useAuth,
-  useAuthPlugin,
-  useCreateApiKey
-} from "@better-auth-ui/react"
+import type { ApiKeyAuthClient } from "@better-auth-ui/core/plugins/api-key"
+import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
+import { useCreateApiKey } from "@better-auth-ui/react/plugins/api-key"
 import { useState } from "react"
 import { apiKeyPlugin } from "../../../lib/auth/api-key-plugin"
 import { useThemeColors } from "../../../lib/theme-colors"

@@ -1,10 +1,9 @@
+import type { OrganizationAuthClient } from "@better-auth-ui/core/plugins/organization"
+import { useAuth, useSession } from "@better-auth-ui/react"
 import {
-  type OrganizationAuthClient,
   useActiveOrganization,
-  useAuth,
-  useListOrganizationMembers,
-  useSession
-} from "@better-auth-ui/react"
+  useListOrganizationMembers
+} from "@better-auth-ui/react/plugins/organization"
 import type { CardVariant } from "../../../primitives/card"
 import { ApiKeys } from "./api-keys"
 

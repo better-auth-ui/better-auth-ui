@@ -1,8 +1,5 @@
-import {
-  type ListedApiKey,
-  useAuth,
-  useAuthPlugin
-} from "@better-auth-ui/react"
+import type { ListedApiKey } from "@better-auth-ui/core/plugins/api-key"
+import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
 import { useState } from "react"
 import { apiKeyPlugin } from "../../../lib/auth/api-key-plugin"
 import { formatDateTime } from "../../../lib/format-date"
