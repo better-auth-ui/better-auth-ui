@@ -1,3 +1,4 @@
+import { getProviderId } from "@better-auth-ui/core"
 import { useAuth, useListAccounts } from "@better-auth-ui/react"
 import { cn } from "../../../../lib/cn"
 import { Card, type CardVariant } from "../../../../primitives/card"
@@ -23,6 +24,7 @@ export type LinkedAccountsProps = {
 export function LinkedAccounts({ className, variant }: LinkedAccountsProps) {
   const {
     authClient,
+    allowUnlinkingAllAccounts,
     localization,
     multipleAccountsPerProvider,
     socialProviders
@@ -34,21 +36,29 @@ export function LinkedAccounts({ className, variant }: LinkedAccountsProps) {
     (account) => account.providerId !== "credential"
   )
 
+  const canUnlink =
+    allowUnlinkingAllAccounts === true || (accounts?.length ?? 0) > 1
+
   const linkedProviderIds = new Set(linkedAccounts?.map((a) => a.providerId))
 
   const availableProviders =
     multipleAccountsPerProvider === false
-      ? socialProviders?.filter((p) => !linkedProviderIds.has(p))
+      ? socialProviders?.filter(
+          (provider) => !linkedProviderIds.has(getProviderId(provider))
+        )
       : socialProviders
 
   const allRows = [
     ...(linkedAccounts?.map((account) => ({
       key: account.id,
       account,
-      provider: account.providerId
+      provider:
+        socialProviders?.find(
+          (provider) => getProviderId(provider) === account.providerId
+        ) ?? account.providerId
     })) ?? []),
     ...(availableProviders?.map((provider) => ({
-      key: provider,
+      key: getProviderId(provider),
       account: undefined,
       provider
     })) ?? [])
@@ -64,7 +74,7 @@ export function LinkedAccounts({ className, variant }: LinkedAccountsProps) {
         <Card.Content className="gap-0">
           {isPending
             ? socialProviders?.map((provider, index) => (
-                <Box key={provider}>
+                <Box key={getProviderId(provider)}>
                   {index > 0 && <Separator className="my-4" />}
                   <AccountRowSkeleton />
                 </Box>
@@ -75,6 +85,7 @@ export function LinkedAccounts({ className, variant }: LinkedAccountsProps) {
 
                   <LinkedAccount
                     account={row.account}
+                    canUnlink={canUnlink}
                     provider={row.provider}
                   />
                 </Box>

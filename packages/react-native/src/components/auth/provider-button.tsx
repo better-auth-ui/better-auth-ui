@@ -1,4 +1,10 @@
-import { authMutationKeys, getProviderName } from "@better-auth-ui/core"
+import {
+  type AuthSocialProvider,
+  authMutationKeys,
+  getProviderId,
+  getProviderName,
+  isCustomSocialProvider
+} from "@better-auth-ui/core"
 import { useAuth, useSignInSocial } from "@better-auth-ui/react"
 import { useIsMutating } from "@tanstack/react-query"
 import type { SocialProvider } from "better-auth/social-providers"
@@ -7,7 +13,7 @@ import { useThemeColors } from "../../lib/theme-colors"
 import { Button, type ButtonProps } from "../../primitives/button"
 
 export type ProviderButtonProps = {
-  provider: SocialProvider
+  provider: AuthSocialProvider
   display?: "full" | "name" | "icon"
 } & Omit<ButtonProps, "children" | "onPress" | "isPending" | "isDisabled">
 
@@ -28,7 +34,13 @@ export function ProviderButton({
 
   const { mutate: signInSocial } = useSignInSocial(authClient)
 
-  const ProviderIcon = providerIcons[provider]
+  const providerId = getProviderId(provider)
+  // Custom providers may supply their own icon element; built-in providers
+  // resolve to this package's react-native-svg icon set.
+  const customIcon = isCustomSocialProvider(provider)
+    ? provider.icon
+    : undefined
+  const ProviderIcon = providerIcons[providerId as SocialProvider]
 
   const signInMutating = useIsMutating({
     mutationKey: authMutationKeys.signIn.all
@@ -42,13 +54,14 @@ export function ProviderButton({
     <Button
       variant={variant}
       isPending={isPending}
-      onPress={() => signInSocial({ provider, callbackURL })}
+      onPress={() => signInSocial({ provider: providerId, callbackURL })}
       aria-label={getProviderName(provider)}
       {...props}
     >
-      {ProviderIcon ? (
-        <ProviderIcon width={20} height={20} color={colors.foreground} />
-      ) : null}
+      {customIcon ??
+        (ProviderIcon ? (
+          <ProviderIcon width={20} height={20} color={colors.foreground} />
+        ) : null)}
 
       {display === "full"
         ? localization.auth.continueWith.replace(

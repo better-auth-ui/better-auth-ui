@@ -1,4 +1,8 @@
-import { getProviderName } from "@better-auth-ui/core"
+import {
+  type AuthSocialProvider,
+  getProviderId,
+  getProviderName
+} from "@better-auth-ui/core"
 import {
   useAccountInfo,
   useAuth,
@@ -22,7 +26,8 @@ import {
 
 export type LinkedAccountProps = {
   account?: Account
-  provider: SocialProvider
+  canUnlink?: boolean
+  provider: AuthSocialProvider | string
 }
 
 /**
@@ -38,13 +43,17 @@ export type LinkedAccountProps = {
  * @param provider - The provider id
  * @returns A JSX element containing the linked account row
  */
-export function LinkedAccount({ account, provider }: LinkedAccountProps) {
+export function LinkedAccount({
+  account,
+  canUnlink = true,
+  provider
+}: LinkedAccountProps) {
   const { authClient, baseURL, localization, redirectTo } = useAuth()
   const colors = useThemeColors()
 
   const { data: accountInfo, isPending: isLoadingInfo } = useAccountInfo(
     authClient,
-    { query: { accountId: account?.accountId } }
+    { query: { accountId: account?.id ?? "" } }
   )
 
   const { mutate: linkSocial, isPending: isLinking } = useLinkSocial(authClient)
@@ -56,12 +65,17 @@ export function LinkedAccount({ account, provider }: LinkedAccountProps) {
     }
   )
 
-  const ProviderIcon = providerIcons[provider]
+  const providerId = getProviderId(provider)
+  const ProviderIcon = providerIcons[providerId as SocialProvider]
   const providerName = getProviderName(provider)
 
+  const accountData = accountInfo?.data as
+    | { login?: string; username?: string }
+    | undefined
+
   const displayName =
-    accountInfo?.data?.login ||
-    accountInfo?.data?.username ||
+    accountData?.login ||
+    accountData?.username ||
     accountInfo?.user?.email ||
     accountInfo?.user?.name ||
     account?.accountId
@@ -104,8 +118,9 @@ export function LinkedAccount({ account, provider }: LinkedAccountProps) {
           className="ml-auto shrink-0"
           variant="outline"
           size="sm"
-          onPress={() => unlinkAccount({ providerId: account.providerId })}
+          onPress={() => unlinkAccount({ accountId: account.id })}
           isPending={isUnlinking}
+          isDisabled={!canUnlink}
           aria-label={localization.settings.unlinkProvider.replace(
             "{{provider}}",
             providerName
@@ -123,7 +138,7 @@ export function LinkedAccount({ account, provider }: LinkedAccountProps) {
           size="sm"
           onPress={() =>
             linkSocial({
-              provider,
+              provider: providerId,
               callbackURL: `${baseURL}${redirectTo}`
             })
           }

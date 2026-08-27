@@ -3,7 +3,7 @@ import {
   organizationPlugin as coreOrganizationPlugin,
   type OrganizationLocalization,
   type OrganizationPluginOptions
-} from "@better-auth-ui/core/plugins"
+} from "@better-auth-ui/core/plugins/organization"
 import { OrganizationsSettings } from "../../components/auth/organization/organizations-settings"
 import { Box, Txt } from "../../primitives/styled"
 import { Briefcase } from "../../primitives/ui-icons"

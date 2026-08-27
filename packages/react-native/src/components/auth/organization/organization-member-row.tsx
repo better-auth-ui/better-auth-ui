@@ -1,13 +1,11 @@
+import type { OrganizationAuthClient } from "@better-auth-ui/core/plugins/organization"
+import { useAuth, useAuthPlugin, useSession } from "@better-auth-ui/react"
 import {
-  type OrganizationAuthClient,
-  useAuth,
-  useAuthPlugin,
   useHasPermission,
   useLeaveOrganization,
   useRemoveMember,
-  useSession,
   useUpdateMemberRole
-} from "@better-auth-ui/react"
+} from "@better-auth-ui/react/plugins/organization"
 import type { Member, Organization, User } from "better-auth/client"
 import { useState } from "react"
 
