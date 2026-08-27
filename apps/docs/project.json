@@ -38,7 +38,7 @@
       ],
       "executor": "nx:run-commands",
       "options": {
-        "command": "vite build",
+        "command": "NODE_OPTIONS='--max-old-space-size=16384' vite build",
         "cwd": "apps/docs"
       },
       "outputs": ["{projectRoot}/dist"],
