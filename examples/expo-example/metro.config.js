@@ -1,7 +1,7 @@
 // Expo Metro config for a bun/nx monorepo — NO nativewind (the
 // @better-auth-ui/react-native package styles itself with plain RN styles).
 const { getDefaultConfig } = require("expo/metro-config")
-const path = require("path")
+const path = require("node:path")
 
 const projectRoot = __dirname
 const workspaceRoot = path.resolve(projectRoot, "../..")
