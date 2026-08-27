@@ -1,11 +1,9 @@
+import type { MultiSessionAuthClient } from "@better-auth-ui/core/plugins/multi-session"
+import { useAuth, useAuthPlugin, useSession } from "@better-auth-ui/react"
 import {
-  type MultiSessionAuthClient,
-  useAuth,
-  useAuthPlugin,
   useListDeviceSessions,
-  useSession,
   useSetActiveSession
-} from "@better-auth-ui/react"
+} from "@better-auth-ui/react/plugins/multi-session"
 import { multiSessionPlugin } from "../../../lib/auth/multi-session-plugin"
 import { useThemeColors } from "../../../lib/theme-colors"
 import { useAuthNavigation } from "../../../navigation/navigation-context"

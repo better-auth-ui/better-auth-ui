@@ -1,11 +1,10 @@
+import type { OrganizationAuthClient } from "@better-auth-ui/core/plugins/organization"
+import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
 import {
-  type OrganizationAuthClient,
   useAcceptInvitation,
-  useAuth,
-  useAuthPlugin,
   useListUserInvitations,
   useRejectInvitation
-} from "@better-auth-ui/react"
+} from "@better-auth-ui/react/plugins/organization"
 import { organizationPlugin } from "../../../lib/auth/organization-plugin"
 import type { SettingsViewProps } from "../../../lib/auth-plugin"
 import { cn } from "../../../lib/cn"

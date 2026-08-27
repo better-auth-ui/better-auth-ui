@@ -1,4 +1,4 @@
-import { apiKeyPlugin } from "@better-auth-ui/core/plugins"
+import { apiKeyPlugin } from "@better-auth-ui/core/plugins/api-key"
 import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
 import { useState } from "react"
 import { copyText } from "../../../lib/clipboard"
