@@ -133,7 +133,7 @@
     "@types/react": "^19.2.18",
     "@vitejs/plugin-react": "^6.0.5",
     "@vitest/browser-playwright": "^4.1.9",
-    "better-auth": "1.7.2",
+    "better-auth": "1.7.0",
     "bowser": "^2.11.0",
     "playwright": "^1.62.1",
     "react": "^19.2.6",

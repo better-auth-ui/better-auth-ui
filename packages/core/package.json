@@ -179,12 +179,12 @@
   },
   "devDependencies": {
     "@better-auth/agent-auth": "0.6.2",
-    "@better-auth/api-key": "1.7.2",
+    "@better-auth/api-key": "1.7.0",
     "@better-auth/infra": "0.4.4",
-    "@better-auth/oauth-provider": "1.7.2",
-    "@better-auth/passkey": "1.7.2",
-    "@better-auth/sso": "1.7.2",
-    "@better-auth/stripe": "1.7.2",
+    "@better-auth/oauth-provider": "1.7.0",
+    "@better-auth/passkey": "1.7.0",
+    "@better-auth/sso": "1.7.0",
+    "@better-auth/stripe": "1.7.0",
     "@commet/better-auth": "8.1.0",
     "@commet/node": "9.3.0",
     "@creem_io/better-auth": "1.2.0",
@@ -193,7 +193,7 @@
     "@polar-sh/better-auth": "1.8.4",
     "@tanstack/query-core": "^5.101.2",
     "autumn-js": "1.2.55",
-    "better-auth": "1.7.2",
+    "better-auth": "1.7.0",
     "vitest": "^4.1.9"
   },
   "peerDependencies": {
