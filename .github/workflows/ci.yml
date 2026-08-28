@@ -12,6 +12,7 @@ permissions:
 
 env:
   DATABASE_URL: "postgresql://foo@bar"
+  NX_PARALLEL: "1"
 
 jobs:
   main:
@@ -65,10 +66,10 @@ jobs:
       - run: bun nx-cloud record -- biome lint
 
       # Run tests, build, and typecheck affected projects
-      - run: bun nx affected -t build typecheck test --parallel=4
+      - run: bun nx affected -t build typecheck test
 
       # Ensure all publishable packages are built (cache hits when unaffected)
-      - run: bun nx run-many -t build --projects 'packages/*' --parallel=4
+      - run: bun nx run-many -t build --projects 'packages/*'
 
       # Publish new versions of the packages
       - run: bun nx-cloud record -- bunx pkg-pr-new publish --packageManager=bun './packages/*'
