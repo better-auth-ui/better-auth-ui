@@ -492,7 +492,7 @@ export function createPolarBillingAdapter(
             : {}),
           ...(input.seats ? { seats: input.seats } : {}),
           successUrl: options.successUrl,
-          disableRedirect: true
+          redirect: false
         })
       )
     },

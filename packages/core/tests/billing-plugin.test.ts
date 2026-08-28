@@ -352,7 +352,7 @@ describe("vendor billing adapters", () => {
       expect.objectContaining({
         products: ["product-pro"],
         referenceId: "org-1",
-        disableRedirect: true
+        redirect: false
       })
     )
     expect(result).toEqual({ url: "/polar-checkout" })
