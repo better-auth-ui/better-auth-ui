@@ -9,7 +9,7 @@
     "prebuild": "bun run registry:build && bun nx run docs:type-tables",
     "build": "vite build",
     "registry:build": "bun nx run-many -t registry:build -p start-shadcn-example start-solid-zaidan-example",
-    "type-tables:generate": "NODE_OPTIONS='--max-old-space-size=1024' bun scripts/generate-type-tables.ts",
+    "type-tables:generate": "bun scripts/generate-type-tables.ts",
     "typecheck": "bun nx run docs:type-tables && fumadocs-mdx && tsr generate && tsc --noEmit",
     "start": "serve dist/client",
     "postinstall": "fumadocs-mdx",
