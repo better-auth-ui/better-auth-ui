@@ -6,6 +6,7 @@
       "dependsOn": [
         "^dev",
         "email",
+        "type-tables",
         {
           "projects": ["start-shadcn-example", "start-solid-zaidan-example"],
           "target": "registry:build"
@@ -21,6 +22,7 @@
     "build": {
       "dependsOn": [
         "^build",
+        "type-tables",
         "build-storybook-heroui",
         "build-storybook-shadcn",
         "build-storybook-zaidan",
@@ -42,6 +44,37 @@
         "cwd": "apps/docs"
       },
       "outputs": ["{projectRoot}/dist"],
+      "cache": true
+    },
+    "typecheck": {
+      "dependsOn": ["^build", "^typecheck", "type-tables"],
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "fumadocs-mdx && tsr generate && tsc --noEmit",
+        "cwd": "apps/docs"
+      },
+      "cache": true
+    },
+    "type-tables": {
+      "executor": "nx:run-commands",
+      "inputs": [
+        "{workspaceRoot}/apps/docs/content/docs/**/*.mdx",
+        "{workspaceRoot}/apps/docs/scripts/generate-type-tables.ts",
+        "{workspaceRoot}/apps/docs/src/lib/type-table-data.ts",
+        "{workspaceRoot}/apps/docs/package.json",
+        "{workspaceRoot}/apps/docs/tsconfig.json",
+        "{workspaceRoot}/examples/**/*.ts",
+        "{workspaceRoot}/examples/**/*.tsx",
+        "{workspaceRoot}/packages/**/*.ts",
+        "{workspaceRoot}/packages/**/*.tsx",
+        "{workspaceRoot}/tsconfig.base.json",
+        "{workspaceRoot}/bun.lock"
+      ],
+      "options": {
+        "command": "bun run type-tables:generate",
+        "cwd": "apps/docs"
+      },
+      "outputs": ["{projectRoot}/type-table-snapshot.json"],
       "cache": true
     },
     "build-storybook-heroui": {

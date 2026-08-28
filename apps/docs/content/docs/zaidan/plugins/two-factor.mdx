@@ -182,13 +182,13 @@ const signIn = createMutation(() => ({
 
 Offers the methods the sign-in response reported, plus backup-code recovery and an optional "trust this device" checkbox. Emailed codes are sent on request rather than automatically, so a user with an authenticator app never triggers a pointless email.
 
-<auto-type-table path="../../../../../../examples/start-solid-zaidan-example/src/components/auth/two-factor/two-factor-challenge.tsx" name="TwoFactorChallengeProps" />
+<type-table path="../../../../../../examples/start-solid-zaidan-example/src/components/auth/two-factor/two-factor-challenge.tsx" name="TwoFactorChallengeProps" />
 
 ### `<TwoFactorSettings />`
 
 Added to `<SecuritySettings />` automatically. Users can enroll with an authenticator app or a delivered code. Enrolled users can regenerate backup codes or turn two-factor off.
 
-<auto-type-table path="../../../../../../examples/start-solid-zaidan-example/src/components/auth/two-factor/two-factor-settings.tsx" name="TwoFactorSettingsProps" />
+<type-table path="../../../../../../examples/start-solid-zaidan-example/src/components/auth/two-factor/two-factor-settings.tsx" name="TwoFactorSettingsProps" />
 
 Backup codes live in component state and are never written to storage or the query cache: once the dialog closes they are gone.
 
@@ -228,10 +228,10 @@ The UI still asks for a password when the account has a credential account, matc
 
 ## Options
 
-<auto-type-table path="../../../../../../packages/core/src/plugins/two-factor/two-factor-plugin.ts" name="TwoFactorPluginOptions" />
+<type-table path="../../../../../../packages/core/src/plugins/two-factor/two-factor-plugin.ts" name="TwoFactorPluginOptions" />
 
 ## Localization
 
-<auto-type-table path="../../../../../../packages/core/src/plugins/two-factor/two-factor-localization.ts" name="TwoFactorLocalization" />
+<type-table path="../../../../../../packages/core/src/plugins/two-factor/two-factor-localization.ts" name="TwoFactorLocalization" />
 
 Read these from `useAuthPlugin(twoFactorPlugin).localization` inside custom slot components.

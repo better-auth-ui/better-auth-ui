@@ -189,33 +189,33 @@ import { EmailOtp } from "@/components/auth/email-otp/email-otp"
 <EmailOtp />
 ```
 
-<auto-type-table path="../../../../../../examples/start-shadcn-example/src/components/auth/email-otp/email-otp.tsx" name="EmailOtpProps" />
+<type-table path="../../../../../../examples/start-shadcn-example/src/components/auth/email-otp/email-otp.tsx" name="EmailOtpProps" />
 
 ### `<VerifyEmailOtp />`
 
 Rendered at `/auth/verify-email` when `emailVerification` is on. Reads the pending address from session storage (sign-up and sign-in put it there) and asks for it when it is missing.
 
-<auto-type-table path="../../../../../../examples/start-shadcn-example/src/components/auth/email-otp/verify-email-otp.tsx" name="VerifyEmailOtpProps" />
+<type-table path="../../../../../../examples/start-shadcn-example/src/components/auth/email-otp/verify-email-otp.tsx" name="VerifyEmailOtpProps" />
 
 ### `<ForgotPasswordOtp />` and `<ResetPasswordOtp />`
 
 With `passwordReset` on, `/auth/forgot-password` emails a code and sends the user straight to `/auth/reset-password`, which takes the code and the new password together. The reset-link-sent view is skipped.
 
-<auto-type-table path="../../../../../../examples/start-shadcn-example/src/components/auth/email-otp/reset-password-otp.tsx" name="ResetPasswordOtpProps" />
+<type-table path="../../../../../../examples/start-shadcn-example/src/components/auth/email-otp/reset-password-otp.tsx" name="ResetPasswordOtpProps" />
 
 ### `<ChangeEmailOtp />`
 
 With `changeEmail` on, this replaces the built-in change-email card inside `<AccountSettings />`: no extra wiring needed.
 
-<auto-type-table path="../../../../../../examples/start-shadcn-example/src/components/auth/email-otp/change-email-otp.tsx" name="ChangeEmailOtpProps" />
+<type-table path="../../../../../../examples/start-shadcn-example/src/components/auth/email-otp/change-email-otp.tsx" name="ChangeEmailOtpProps" />
 
 ## Options
 
-<auto-type-table path="../../../../../../packages/core/src/plugins/email-otp/email-otp-plugin.ts" name="EmailOtpPluginOptions" />
+<type-table path="../../../../../../packages/core/src/plugins/email-otp/email-otp-plugin.ts" name="EmailOtpPluginOptions" />
 
 ## Localization
 
-<auto-type-table path="../../../../../../packages/core/src/plugins/email-otp/email-otp-localization.ts" name="EmailOtpLocalization" />
+<type-table path="../../../../../../packages/core/src/plugins/email-otp/email-otp-localization.ts" name="EmailOtpLocalization" />
 
 Read these from `useAuthPlugin(emailOtpPlugin).localization` inside custom slot components.
 

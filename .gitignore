@@ -68,6 +68,8 @@ Thumbs.db
 .repos
 /apps/docs/public/storybook/
 /apps/docs/public/r/
+/apps/docs/.cache/fumadocs-typescript/
+/apps/docs/type-table-snapshot.json
 .codex
 .opencode
 opencode.json
