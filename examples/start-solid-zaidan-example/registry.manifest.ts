@@ -86,7 +86,7 @@ const zaidanUiRegistryDependencies = [
   "@zaidan/separator",
   "@zaidan/skeleton",
   "@zaidan/slider",
-  "@zaidan/sonner",
+  "@zaidan/toast",
   "@zaidan/spinner",
   "@zaidan/switch",
   "@zaidan/table",
@@ -144,7 +144,7 @@ const item = ({
     files
   }) satisfies SolidRegistryItem
 
-export const solidRegistryManifest = {
+const solidRegistryBaseManifest = {
   name: "better-auth-ui-solid",
   namespace: "solid",
   homepage: "https://better-auth-ui.com",
@@ -1140,6 +1140,25 @@ export const solidRegistryManifest = {
         libFile("src/lib/theme.ts"),
         libFile("src/lib/utils.ts")
       ]
+    })
+  ]
+} satisfies SolidRegistryManifest
+
+export const solidRegistryManifest = {
+  ...solidRegistryBaseManifest,
+  items: [
+    ...solidRegistryBaseManifest.items,
+    item({
+      name: "all",
+      type: "registry:item",
+      title: "All",
+      description:
+        "Installs every Better Auth UI Solid component, plugin, and email template in one command.",
+      dependencies: [],
+      registryDependencies: solidRegistryBaseManifest.items.map(({ name }) =>
+        betterAuthSolidRegistryDependency(name)
+      ),
+      files: []
     })
   ]
 } satisfies SolidRegistryManifest

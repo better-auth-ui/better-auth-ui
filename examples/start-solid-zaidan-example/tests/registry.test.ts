@@ -263,7 +263,8 @@ const expectedSolidRegistryPayloadNames = [
   "admin",
   "multi-session",
   "organization",
-  "theme"
+  "theme",
+  "all"
 ]
 
 const verifyLocalRegistryCoherence = () =>
@@ -950,7 +951,6 @@ describe("Solid registry isolation", () => {
       separator: "@zaidan/separator",
       skeleton: "@zaidan/skeleton",
       slider: "@zaidan/slider",
-      sonner: "@zaidan/sonner",
       spinner: "@zaidan/spinner",
       switch: "@zaidan/switch",
       table: "@zaidan/table",
@@ -1386,7 +1386,7 @@ describe("Solid registry isolation", () => {
       if (!shadcnModelDocs.has(name)) {
         expect(content, name).toContain("Parity classification")
       }
-      expect(content, name).toContain("<auto-type-table")
+      expect(content, name).toContain("<type-table")
       expect(content, name).not.toContain("| Prop | Type")
     }
 
@@ -2274,7 +2274,7 @@ describe("Solid registry isolation", () => {
         "@zaidan/font-inter",
         "@zaidan/neutral",
         "@zaidan/style-mira",
-        "@zaidan/sonner"
+        "@zaidan/toast"
       ])
     )
     expect(authProvider.files).toEqual(
@@ -2494,6 +2494,23 @@ describe("Solid registry isolation", () => {
     expect(all.registryDependencies).toContain(
       "https://better-auth-ui.com/r/radix-nova/dash.json"
     )
+  })
+
+  it("installs every Solid registry item through all", () => {
+    const solidRegistryRoot = resolve(
+      __dirname,
+      "../../../apps/docs/public/r/solid"
+    )
+    const install = collectRegistryInstall({
+      entry: "all",
+      registryRoot: solidRegistryRoot,
+      solid: true
+    })
+    const expectedItemNames = solidRegistryManifest.items
+      .map(({ name }) => name)
+      .toSorted()
+
+    expect([...install.itemNames].toSorted()).toEqual(expectedItemNames)
   })
 
   it("rejects manifest files that escape the Solid example source tree", () => {
@@ -3171,6 +3188,7 @@ describe("Solid registry isolation", () => {
     ]
     const runtimeOnlyPluginNames = ["captcha"]
     const hiddenComponentDocNames = ["organization"]
+    const aggregatePayloadNames = ["all"]
     const emailPayloadNames = [
       "email-verification-email",
       "magic-link-email",
@@ -3188,7 +3206,8 @@ describe("Solid registry isolation", () => {
       .filter(
         (name) =>
           !pluginPayloadNames.includes(name) &&
-          !hiddenComponentDocNames.includes(name)
+          !hiddenComponentDocNames.includes(name) &&
+          !aggregatePayloadNames.includes(name)
       )
 
     expect(quickStart).toContain("title: Quick Start")
@@ -3199,6 +3218,9 @@ describe("Solid registry isolation", () => {
     )
     expect(quickStart).toContain(
       "npx shadcn@latest add https://better-auth-ui.com/r/solid/settings.json https://better-auth-ui.com/r/solid/user-button.json"
+    )
+    expect(quickStart).toContain(
+      "npx shadcn@latest add https://better-auth-ui.com/r/solid/all.json"
     )
     expect(quickStart).not.toContain(
       "npx shadcn@latest add https://better-auth-ui.com/r/solid/auth-provider.json"
@@ -4041,7 +4063,7 @@ describe("Solid registry isolation", () => {
       "```tsx file=<rootDir>/../../examples/start-solid-zaidan-example/src/components/providers.tsx"
     )
     expect(authProviderDoc).toContain(
-      '<auto-type-table path="../../../../../../packages/solid/src/lib/auth-provider.tsx" name="AuthProviderProps" />'
+      '<type-table path="../../../../../../packages/solid/src/lib/auth-provider.tsx" name="AuthProviderProps" />'
     )
     expect(authProviderHeadings).not.toContain("Installation")
     expect(authProviderHeadings).not.toContain("Installed files")
@@ -4320,7 +4342,7 @@ describe("Solid registry isolation", () => {
       ).not.toContain("## Installed files")
 
       expect(page, `${name} should derive props from source types`).toContain(
-        "<auto-type-table"
+        "<type-table"
       )
     }
 
@@ -4427,7 +4449,7 @@ describe("Solid registry isolation", () => {
         `${name} should not keep installed files prose`
       ).not.toContain("## Installed files")
       expect(page, `${name} should derive props from source types`).toContain(
-        "<auto-type-table"
+        "<type-table"
       )
     }
 
