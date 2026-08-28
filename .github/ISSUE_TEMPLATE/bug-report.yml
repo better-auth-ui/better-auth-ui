@@ -1,8 +1,7 @@
 name: 🐞 Bug report
 description: Report a reproducible problem with Better Auth UI
 title: "[Bug]: "
-labels:
-  - bug
+type: Bug
 body:
   - type: markdown
     attributes:

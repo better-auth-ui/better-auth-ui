@@ -1,8 +1,7 @@
 name: 💡 Feature request
 description: Suggest an improvement for Better Auth UI
 title: "[Feature]: "
-labels:
-  - enhancement
+type: Feature
 body:
   - type: markdown
     attributes:
