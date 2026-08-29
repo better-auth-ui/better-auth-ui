@@ -14,12 +14,13 @@ const EXCLUDED_PRERENDER_PATHS = [
   "/organization"
 ] as const
 
-const FumadocsDeps = [
+const ServerBundledDeps = [
   "fumadocs-core",
   "fumadocs-ui",
   "fumadocs-openapi",
   "@fumadocs/base-ui",
-  "@fumadocs/ui"
+  "@fumadocs/ui",
+  "@gravity-ui/icons"
 ]
 
 const solidJsWebServer = fileURLToPath(
@@ -57,7 +58,7 @@ export default defineConfig(async ({ command }) => ({
       "solid-js/web": solidJsWebServer
     },
     tsconfigPaths: true,
-    noExternal: [...FumadocsDeps]
+    noExternal: [...ServerBundledDeps]
   },
   plugins: [
     mdx(await import("./source.config")),
