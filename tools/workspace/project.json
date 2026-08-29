@@ -1,0 +1,15 @@
+{
+  "name": "workspace",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "targets": {
+    "lint": {
+      "executor": "nx:run-commands",
+      "inputs": ["workspaceLint"],
+      "options": {
+        "command": "biome lint",
+        "cwd": "."
+      },
+      "cache": true
+    }
+  }
+}

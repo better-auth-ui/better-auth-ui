@@ -32,8 +32,11 @@
         }
       ],
       "inputs": [
-        "default",
-        "^default",
+        "production",
+        "^production",
+        "typescript",
+        "buildEnvironment",
+        "buildToolchain",
         {
           "dependentTasksOutputFiles": "apps/docs/public/**/*"
         }
@@ -63,12 +66,17 @@
         "{workspaceRoot}/apps/docs/src/lib/type-table-data.ts",
         "{workspaceRoot}/apps/docs/package.json",
         "{workspaceRoot}/apps/docs/tsconfig.json",
-        "{workspaceRoot}/examples/**/*.ts",
-        "{workspaceRoot}/examples/**/*.tsx",
-        "{workspaceRoot}/packages/**/*.ts",
-        "{workspaceRoot}/packages/**/*.tsx",
-        "{workspaceRoot}/tsconfig.base.json",
-        "{workspaceRoot}/bun.lock"
+        "{workspaceRoot}/examples/*/src/**/*.ts",
+        "{workspaceRoot}/examples/*/src/**/*.tsx",
+        "{workspaceRoot}/examples/*/package.json",
+        "{workspaceRoot}/examples/*/tsconfig*.json",
+        "{workspaceRoot}/packages/*/src/**/*.ts",
+        "{workspaceRoot}/packages/*/src/**/*.tsx",
+        "{workspaceRoot}/packages/*/package.json",
+        "{workspaceRoot}/packages/*/tsconfig*.json",
+        "{workspaceRoot}/tsconfig.json",
+        "{workspaceRoot}/bun.lock",
+        "sharedGlobals"
       ],
       "options": {
         "command": "bun run type-tables:generate",
@@ -93,6 +101,9 @@
         "{workspaceRoot}/examples/start-heroui-example/src/styles/**",
         "{workspaceRoot}/apps/docs/scripts/build-storybook.ts",
         "{workspaceRoot}/bun.lock",
+        "typescript",
+        "storybookToolchain",
+        "sharedGlobals",
         {
           "dependentTasksOutputFiles": "packages/{core,react,heroui}/dist/**/*"
         }
@@ -120,6 +131,9 @@
         "{workspaceRoot}/examples/start-shadcn-example/src/styles/**",
         "{workspaceRoot}/apps/docs/scripts/build-storybook.ts",
         "{workspaceRoot}/bun.lock",
+        "typescript",
+        "storybookToolchain",
+        "sharedGlobals",
         {
           "dependentTasksOutputFiles": "packages/{core,react}/dist/**/*"
         }
@@ -147,6 +161,9 @@
         "{workspaceRoot}/examples/start-solid-zaidan-example/src/components/**",
         "{workspaceRoot}/examples/start-solid-zaidan-example/src/routes/**",
         "{workspaceRoot}/bun.lock",
+        "typescript",
+        "storybookToolchain",
+        "sharedGlobals",
         {
           "dependentTasksOutputFiles": "packages/{core,solid}/dist/**/*"
         }

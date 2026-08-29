@@ -1,18 +1,63 @@
 {
   "$schema": "./node_modules/nx/schemas/nx-schema.json",
+  "defaultBase": "main",
   "targetDefaults": {
     "build": {
       "dependsOn": ["^build"],
+      "inputs": [
+        "production",
+        "^production",
+        "typescript",
+        "buildEnvironment",
+        "buildToolchain"
+      ],
       "outputs": ["{projectRoot}/dist"],
       "cache": true
     },
     "typecheck": {
       "dependsOn": ["^build", "^typecheck"],
-      "inputs": ["default", "^default", "{workspaceRoot}/tsconfig.json"],
+      "inputs": ["default", "^production", "typescript", "typecheckToolchain"],
       "cache": true
     },
     "test": {
       "dependsOn": ["^build"],
+      "inputs": [
+        "default",
+        "^production",
+        "typescript",
+        "testEnvironment",
+        "testToolchain"
+      ],
+      "cache": true
+    },
+    "lint": {
+      "inputs": ["lint"],
+      "cache": true
+    },
+    "storybook:build": {
+      "dependsOn": ["^build"],
+      "inputs": [
+        "storybook",
+        "^production",
+        "typescript",
+        "storybookToolchain",
+        { "env": "STORYBOOK_BASE_PATH" }
+      ],
+      "outputs": ["{projectRoot}/storybook-static"],
+      "cache": true
+    },
+    "storybook:docs:build": {
+      "dependsOn": ["^build"],
+      "inputs": [
+        "storybook",
+        "^production",
+        "typescript",
+        "storybookToolchain"
+      ],
+      "outputs": [
+        "{projectRoot}/storybook-static",
+        "{workspaceRoot}/apps/docs/public/storybook/zaidan"
+      ],
       "cache": true
     },
     "dev": {
@@ -25,10 +70,104 @@
   },
   "namedInputs": {
     "sharedGlobals": [
-      "{workspaceRoot}/.github/workflows/ci.yml",
-      "{workspaceRoot}/bun.lock"
+      { "runtime": "node --version" },
+      { "runtime": "bun --version" }
     ],
-    "default": ["{projectRoot}/**/*", "sharedGlobals"]
+    "default": ["{projectRoot}/**/*", "sharedGlobals"],
+    "production": [
+      "default",
+      "!{projectRoot}/README.md",
+      "!{projectRoot}/tests/**/*",
+      "!{projectRoot}/**/__tests__/**/*",
+      "!{projectRoot}/**/*.spec.{js,jsx,ts,tsx}",
+      "!{projectRoot}/**/*.test.{js,jsx,ts,tsx}",
+      "!{projectRoot}/**/*.stories.{js,jsx,ts,tsx,mdx}",
+      "!{projectRoot}/.storybook/**/*",
+      "!{projectRoot}/vitest.config.*",
+      "!{projectRoot}/vitest.*.config.*"
+    ],
+    "storybook": [
+      "production",
+      "{projectRoot}/.storybook/**/*",
+      "{projectRoot}/**/*.stories.{js,jsx,ts,tsx,mdx}"
+    ],
+    "typescript": ["{workspaceRoot}/tsconfig.json"],
+    "buildEnvironment": [
+      { "env": "NODE_ENV" },
+      { "env": "DATABASE_URL" },
+      { "env": "BETTER_AUTH_URL" },
+      { "env": "BETTER_AUTH_SECRET" },
+      { "env": "GITHUB_CLIENT_ID" },
+      { "env": "GITHUB_CLIENT_SECRET" },
+      { "env": "GOOGLE_CLIENT_ID" },
+      { "env": "GOOGLE_CLIENT_SECRET" },
+      { "env": "MAIL_FROM" },
+      { "env": "SMTP_HOST" },
+      { "env": "SMTP_PORT" },
+      { "env": "SMTP_USER" },
+      { "env": "SMTP_PASSWORD" },
+      { "env": "VITE_AUTH_URL" },
+      { "env": "VITE_TURNSTILE_SITE_KEY" }
+    ],
+    "testEnvironment": [{ "env": "CI" }, { "env": "TZ" }],
+    "buildToolchain": [
+      {
+        "externalDependencies": [
+          "@cloudflare/vite-plugin",
+          "@tailwindcss/vite",
+          "@tanstack/devtools-vite",
+          "@tanstack/react-start",
+          "@tanstack/solid-start",
+          "@vitejs/plugin-react",
+          "fumadocs-mdx",
+          "next",
+          "typescript",
+          "vite",
+          "vite-plugin-dts",
+          "vite-plugin-solid"
+        ]
+      }
+    ],
+    "typecheckToolchain": [{ "externalDependencies": ["typescript"] }],
+    "testToolchain": [
+      {
+        "externalDependencies": [
+          "@vitest/browser-playwright",
+          "playwright",
+          "typescript",
+          "vitest"
+        ]
+      }
+    ],
+    "storybookToolchain": [
+      {
+        "externalDependencies": [
+          "@storybook/react-vite",
+          "@vitejs/plugin-react",
+          "storybook",
+          "storybook-solidjs-vite",
+          "typescript",
+          "vite",
+          "vite-plugin-solid"
+        ]
+      }
+    ],
+    "lint": [
+      "default",
+      "{workspaceRoot}/biome.json",
+      "{workspaceRoot}/.gitignore",
+      { "externalDependencies": ["@biomejs/biome"] }
+    ],
+    "workspaceLint": [
+      "{workspaceRoot}/**/*",
+      "sharedGlobals",
+      { "externalDependencies": ["@biomejs/biome"] }
+    ]
+  },
+  "pluginsConfig": {
+    "@nx/js": {
+      "projectsAffectedByDependencyUpdates": "auto"
+    }
   },
   "nxCloudId": "691fe786e56af5ab30ac4788",
   "plugins": [

@@ -63,7 +63,7 @@ jobs:
       # - run: bun nx-cloud record -- echo Hello World
 
       # Check code formatting and linting
-      - run: bun nx-cloud record -- biome lint
+      - run: bun nx run workspace:lint
 
       # Run tests, build, and typecheck affected projects
       - run: bun nx affected -t build typecheck test

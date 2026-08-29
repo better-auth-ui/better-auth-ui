@@ -11,7 +11,10 @@
         ],
         "inputs": [
           "default",
-          "^default",
+          "^production",
+          "typescript",
+          "testEnvironment",
+          "testToolchain",
           {
             "dependentTasksOutputFiles": "apps/docs/public/r/**/*",
             "transitive": true
@@ -39,6 +42,8 @@
           "{projectRoot}/scripts/build-registry.ts",
           "{projectRoot}/src/**/*",
           "{workspaceRoot}/bun.lock",
+          "typescript",
+          "sharedGlobals",
           {
             "dependentTasksOutputFiles": "apps/docs/public/r/radix-nova/registry.json"
           }
