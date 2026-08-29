@@ -1,12 +1,11 @@
-import { createHash } from "node:crypto"
 import { readdir, readFile, writeFile } from "node:fs/promises"
+import { availableParallelism } from "node:os"
 import { dirname, relative, resolve } from "node:path"
 import { fileURLToPath } from "node:url"
-import { createGenerator, type DocEntry } from "fumadocs-typescript"
 
-import {
-  type TypeTableSnapshot,
-  transformTypeTableEntry
+import type {
+  TypeTableSnapshot,
+  TypeTableSnapshotEntry
 } from "../src/lib/type-table-data"
 
 const docsRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..")
@@ -15,9 +14,31 @@ const contentRoot = resolve(docsRoot, "content/docs")
 const outputPath = resolve(docsRoot, "type-table-snapshot.json")
 
 interface TypeTableReference {
+  key: string
   name: string
   sourcePath: string
 }
+
+interface WorkerBatch {
+  prefixSourcePaths: string[]
+  references: TypeTableReference[]
+}
+
+type WorkerResponse =
+  | {
+      completed: number
+      type: "progress"
+    }
+  | {
+      tables: Record<string, TypeTableSnapshotEntry>
+      type: "complete"
+    }
+  | {
+      error: string
+      type: "error"
+    }
+
+const DEFAULT_WORKER_COUNT = 2
 
 async function findMdxFiles(directory: string): Promise<string[]> {
   const files: string[] = []
@@ -51,7 +72,8 @@ async function collectReferences(): Promise<Map<string, TypeTableReference>> {
         "\\",
         "/"
       )
-      references.set(`${relativeSourcePath}#${name}`, { name, sourcePath })
+      const key = `${relativeSourcePath}#${name}`
+      references.set(key, { key, name, sourcePath })
     }
   }
 
@@ -60,43 +82,119 @@ async function collectReferences(): Promise<Map<string, TypeTableReference>> {
   )
 }
 
-function hashSource(source: string): string {
-  return createHash("sha256").update(source).digest("hex")
+function createWorkerBatches(
+  references: Map<string, TypeTableReference>,
+  workerCount: number
+): WorkerBatch[] {
+  const orderedReferences = [...references.values()]
+  const batchSize = Math.ceil(orderedReferences.length / workerCount)
+  const prefixSourcePaths = new Set<string>()
+  const batches: WorkerBatch[] = []
+
+  for (let offset = 0; offset < orderedReferences.length; offset += batchSize) {
+    const batchReferences = orderedReferences.slice(offset, offset + batchSize)
+
+    // Recreate the serial generator's project state at the start of each batch.
+    // TypeScript module augmentation and declaration order depend on this prefix.
+    batches.push({
+      prefixSourcePaths: [...prefixSourcePaths],
+      references: batchReferences
+    })
+
+    for (const reference of batchReferences) {
+      prefixSourcePaths.add(reference.sourcePath)
+    }
+  }
+
+  return batches
 }
 
-const generator = createGenerator()
-const references = await collectReferences()
-const snapshot: TypeTableSnapshot = { version: 1, tables: {} }
-let completed = 0
+function getWorkerCount(referenceCount: number): number {
+  const configuredWorkerCount = Number.parseInt(
+    process.env.TYPE_TABLE_WORKERS ?? "",
+    10
+  )
+  const requestedWorkerCount =
+    Number.isSafeInteger(configuredWorkerCount) && configuredWorkerCount > 0
+      ? configuredWorkerCount
+      : Math.min(DEFAULT_WORKER_COUNT, availableParallelism())
 
-for (const [key, reference] of references) {
-  const source = await readFile(reference.sourcePath, "utf8")
-  const pathFromDocsRoot = relative(docsRoot, reference.sourcePath)
-  const documents = await generator.generateDocumentation(
-    { path: pathFromDocsRoot, content: source },
-    reference.name,
-    {
-      transform(entry: DocEntry) {
-        transformTypeTableEntry(entry)
+  return Math.max(1, Math.min(requestedWorkerCount, referenceCount))
+}
+
+function generateBatch(
+  batch: WorkerBatch,
+  onProgress: (completed: number) => void
+): Promise<Record<string, TypeTableSnapshotEntry>> {
+  return new Promise((resolveBatch, rejectBatch) => {
+    const worker = new Worker(
+      new URL("./generate-type-table-worker.ts", import.meta.url).href
+    )
+
+    worker.onmessage = (event: MessageEvent<WorkerResponse>) => {
+      const response = event.data
+
+      if (response.type === "progress") {
+        onProgress(response.completed)
+        return
+      }
+
+      worker.terminate()
+
+      if (response.type === "error") {
+        rejectBatch(new Error(response.error))
+      } else {
+        resolveBatch(response.tables)
       }
     }
+
+    worker.onerror = (event) => {
+      worker.terminate()
+      rejectBatch(event.error ?? new Error(event.message))
+    }
+
+    worker.postMessage({
+      docsRoot,
+      prefixSourcePaths: batch.prefixSourcePaths,
+      references: batch.references
+    })
+  })
+}
+
+const references = await collectReferences()
+const workerCount = getWorkerCount(references.size)
+const batches = createWorkerBatches(references, workerCount)
+let completed = 0
+let nextProgress = 25
+
+console.info(
+  `Generating ${references.size} type tables with ${workerCount} Bun workers`
+)
+
+const batchTables = await Promise.all(
+  batches.map((batch) =>
+    generateBatch(batch, (count) => {
+      completed += count
+
+      while (completed >= nextProgress) {
+        console.info(`Generated ${nextProgress}/${references.size} type tables`)
+        nextProgress += 25
+      }
+    })
   )
+)
+const generatedTables = Object.assign({}, ...batchTables)
+const snapshot: TypeTableSnapshot = { version: 1, tables: {} }
 
-  if (documents.length === 0) {
-    throw new Error(
-      `${reference.name} is not exported from ${pathFromDocsRoot}`
-    )
-  }
+for (const key of references.keys()) {
+  const table = generatedTables[key]
+  if (!table) throw new Error(`Worker did not generate ${key}`)
 
-  snapshot.tables[key] = {
-    sourceHash: hashSource(source),
-    documents
-  }
-  completed += 1
+  snapshot.tables[key] = table
+}
 
-  if (completed % 25 === 0 || completed === references.size) {
-    console.info(`Generated ${completed}/${references.size} type tables`)
-  }
+if (references.size % 25 !== 0) {
+  console.info(`Generated ${references.size}/${references.size} type tables`)
 }
 
 await writeFile(outputPath, `${JSON.stringify(snapshot, null, 2)}\n`)
