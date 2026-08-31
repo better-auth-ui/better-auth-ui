@@ -1,5 +1,14 @@
 {
   "extends": ["config:recommended", "group:allNonMajor", ":semanticCommits"],
+  "ignorePaths": [
+    "**/node_modules/**",
+    "**/bower_components/**",
+    "**/vendor/**",
+    "**/__tests__/**",
+    "**/test/**",
+    "**/tests/**",
+    "**/__fixtures__/**"
+  ],
   "reviewers": ["AlexProgrammerDE"],
   "packageRules": [
     {
