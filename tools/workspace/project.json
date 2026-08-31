@@ -2,6 +2,13 @@
   "name": "workspace",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "targets": {
+    "skills-check": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "bun tools/skills/check.ts",
+        "cwd": "."
+      }
+    },
     "lint": {
       "executor": "nx:run-commands",
       "inputs": ["workspaceLint"],

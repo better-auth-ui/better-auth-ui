@@ -1,0 +1,89 @@
+---
+title: Agent Skills
+description: Install Better Auth UI guidance through TanStack Intent or skills.sh.
+---
+
+Better Auth UI ships skills for React, Solid, shadcn/ui, HeroUI, Zaidan, core data APIs, and localization.
+
+Choose either TanStack Intent or skills.sh. Both use the same skill files, with different update behavior.
+
+| Install path | Skill source | Updates |
+| --- | --- | --- |
+| TanStack Intent | Installed npm package | Skills change with the library version. |
+| skills.sh | GitHub branch or tag | Skills change independently of installed packages. |
+
+## Install through TanStack Intent
+
+Install the Better Auth UI packages for your application first. Skills are included in package releases that contain a `skills` directory.
+
+Add the Better Auth UI scope to your application's Intent allowlist in `package.json`. Preserve any existing entries:
+
+```json
+{
+  "intent": {
+    "skills": ["@better-auth-ui/*"]
+  }
+}
+```
+
+Install the agent guidance, then list the available skills:
+
+```bash
+bunx @tanstack/intent@latest install
+bunx @tanstack/intent@latest list
+```
+
+Load the skill for your package. For example:
+
+```bash
+bunx @tanstack/intent@latest load @better-auth-ui/react#better-auth-ui-react
+```
+
+Intent reads the skill from the installed package version. If the package has no skills, update it or use the GitHub install path.
+
+Read the [TanStack Intent documentation](https://tanstack.com/intent/latest/docs/overview) for supported agents and project configuration.
+
+## Install through skills.sh
+
+Select the skill for your application:
+
+```bash
+bunx skills@latest add better-auth-ui/better-auth-ui --full-depth --skill better-auth-ui-react
+```
+
+Replace `better-auth-ui-react` with a name from this table:
+
+| Skill | Covers | npm package |
+| --- | --- | --- |
+| `better-auth-ui-react` | React hooks, providers, SSR, and copied shadcn/ui components | `@better-auth-ui/react` |
+| `better-auth-ui-solid` | Solid hooks, providers, SSR, and copied Zaidan components | `@better-auth-ui/solid` |
+| `better-auth-ui-heroui` | Packaged HeroUI components and integration | `@better-auth-ui/heroui` |
+| `better-auth-ui-core` | Query factories, mutations, server helpers, and explicit organization access | `@better-auth-ui/core` |
+| `better-auth-ui-localization` | Locales, message overrides, language matching, and email localization | `@better-auth-ui/locales` |
+
+You can select multiple skills after `--skill`. Each skill also works on its own.
+
+`--full-depth` finds skills inside this monorepo's package directories. `--skill` selects public guidance without installing the repository's internal Nx skills.
+
+To browse without installation, run:
+
+```bash
+bunx skills@latest add better-auth-ui/better-auth-ui --full-depth --list
+```
+
+This list also includes contributor skills. Select the `better-auth-ui-*` names for application development.
+
+For a specific release, use its GitHub tag URL and package directory instead of the repository shorthand. That tag must contain the skills.
+
+The default GitHub install follows the default branch. It does not automatically match the installed Better Auth UI version.
+
+Read the [skills CLI documentation](https://github.com/vercel-labs/skills#install-a-skill) for agent selection and update commands.
+
+## Documentation for agents
+
+Skills provide task guidance and common mistakes. The documentation endpoints provide reference material:
+
+- [llms.txt](https://better-auth-ui.com/llms.txt) lists documentation pages and their Markdown URLs.
+- [llms-full.txt](https://better-auth-ui.com/llms-full.txt) contains the complete documentation text.
+
+When website examples differ from installed package exports, use the installed package as the API authority.

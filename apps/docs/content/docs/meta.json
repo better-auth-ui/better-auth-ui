@@ -1,6 +1,7 @@
 {
   "pages": [
     "index",
+    "agent-skills",
     "migrations",
     "shadcn",
     "heroui",

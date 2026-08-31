@@ -1,0 +1,47 @@
+library:
+  name: better-auth-ui
+
+skills:
+  - name: better-auth-ui-core
+    package: packages/core
+    path: packages/core/skills/better-auth-ui-core/SKILL.md
+    sources:
+      - packages/core/src/index.ts
+      - packages/core/src/server.ts
+      - packages/core/src/queries/auth/session-query.ts
+      - packages/core/src/lib/setup-mutation-invalidation.ts
+      - apps/docs/content/topics/ui/plugins/organization.mdx
+  - name: better-auth-ui-react
+    package: packages/react
+    path: packages/react/skills/better-auth-ui-react/SKILL.md
+    sources:
+      - packages/react/src/components/auth/auth-provider.tsx
+      - packages/react/src/hooks/queries/use-session.ts
+      - packages/react/src/hooks/mutations/use-sign-in-email.ts
+      - apps/docs/content/docs/react/ssr.mdx
+      - apps/docs/content/docs/shadcn/index.mdx
+  - name: better-auth-ui-solid
+    package: packages/solid
+    path: packages/solid/skills/better-auth-ui-solid/SKILL.md
+    sources:
+      - packages/solid/src/lib/auth-provider.tsx
+      - packages/solid/src/hooks/queries/use-session.ts
+      - packages/solid/src/hooks/mutations/use-sign-in-email.ts
+      - apps/docs/content/docs/solid/ssr.mdx
+      - apps/docs/content/docs/zaidan/index.mdx
+  - name: better-auth-ui-heroui
+    package: packages/heroui
+    path: packages/heroui/skills/better-auth-ui-heroui/SKILL.md
+    sources:
+      - packages/heroui/src/components/auth/auth-provider.tsx
+      - packages/heroui/src/styles.css
+      - apps/docs/content/docs/heroui/index.mdx
+      - apps/docs/content/docs/heroui/plugins/organization.mdx
+  - name: better-auth-ui-localization
+    package: packages/locales
+    path: packages/locales/skills/better-auth-ui-localization/SKILL.md
+    sources:
+      - packages/locales/src/index.ts
+      - packages/locales/src/de-DE.ts
+      - packages/core/src/lib/auth-locale.ts
+      - apps/docs/content/topics/ui/components/auth-provider.mdx
