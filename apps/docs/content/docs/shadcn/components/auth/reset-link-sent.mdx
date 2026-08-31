@@ -3,25 +3,17 @@ title: <ResetLinkSent />
 description: Confirms that a password reset link was sent and helps the user open their email provider.
 ---
 
-`<Auth />` renders this view at `/auth/reset-link-sent` after `<ForgotPassword />` successfully requests a reset link. It reads the submitted email from session storage, shows an email-provider shortcut when one is available, and links back to sign-in.
+<include>../../../../shared/ui/components/reset-link-sent.mdx#shared-overview</include>
 
-Hover or focus the email-provider button to show a QR code for the same provider URL. Users can scan it when their email account is available on another device.
+<include>../../../../shared/ui/components/reset-link-sent.mdx#shared-provider-qr-code</include>
 
 ## Installation
 
 The view is included with the forgot-password registry entry.
 
-```npm
-npx shadcn@latest add @better-auth-ui/forgot-password
-```
+<include>../../../../shared/ui/installation/shadcn.mdx#shared-forgot-password</include>
 
-## Usage
-
-```tsx
-import { ResetLinkSent } from "@/components/auth/reset-link-sent"
-
-<ResetLinkSent />
-```
+<include>../../../../shared/ui/components/reset-link-sent.mdx#shared-usage</include>
 
 ## Props
 

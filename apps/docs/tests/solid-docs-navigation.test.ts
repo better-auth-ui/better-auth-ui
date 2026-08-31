@@ -2,13 +2,11 @@ import { readdirSync, readFileSync, statSync } from "node:fs"
 import { join } from "node:path"
 import { describe, expect, it } from "vitest"
 
+import { readDocsFile } from "./read-docs-file"
+
 const docsRoot = join(import.meta.dirname, "../content/docs")
 const sourceRoot = join(import.meta.dirname, "../src")
 const sourceFile = join(sourceRoot, "lib/source.tsx")
-
-function readDocsFile(...segments: string[]) {
-  return readFileSync(join(docsRoot, ...segments), "utf8")
-}
 
 function listFilesRecursive(root: string, prefix = ""): string[] {
   const current = join(root, prefix)
@@ -22,9 +20,9 @@ function listFilesRecursive(root: string, prefix = ""): string[] {
 }
 
 describe("Solid docs navigation", () => {
-  it("adds Solid as a root docs section with the expected page order", () => {
-    const docsIndex = readDocsFile("index.mdx")
-    const rootMeta = JSON.parse(readDocsFile("meta.json")) as {
+  it("adds Solid as a root docs section with the expected page order", async () => {
+    const docsIndex = await readDocsFile("index.mdx")
+    const rootMeta = JSON.parse(await readDocsFile("meta.json")) as {
       pages: string[]
     }
 
@@ -34,13 +32,15 @@ describe("Solid docs navigation", () => {
     expect(docsIndex).toContain("Zaidan Solid")
     expect(docsIndex).toContain("Copied Solid components for TanStack Start")
 
-    const solidMeta = JSON.parse(readDocsFile("solid", "meta.json")) as {
+    const solidMeta = JSON.parse(await readDocsFile("solid", "meta.json")) as {
       title: string
       icon: string
       root: boolean
       pages: string[]
     }
-    const zaidanMeta = JSON.parse(readDocsFile("zaidan", "meta.json")) as {
+    const zaidanMeta = JSON.parse(
+      await readDocsFile("zaidan", "meta.json")
+    ) as {
       title: string
       icon: string
       root: boolean
@@ -59,13 +59,13 @@ describe("Solid docs navigation", () => {
     })
 
     const solidQueriesMeta = JSON.parse(
-      readDocsFile("solid", "queries", "meta.json")
+      await readDocsFile("solid", "queries", "meta.json")
     ) as { pages: string[]; title: string }
     const zaidanComponentsMeta = JSON.parse(
-      readDocsFile("zaidan", "components", "meta.json")
+      await readDocsFile("zaidan", "components", "meta.json")
     ) as { pages: string[] }
     const solidMutationsMeta = JSON.parse(
-      readDocsFile("solid", "mutations", "meta.json")
+      await readDocsFile("solid", "mutations", "meta.json")
     ) as { pages: string[]; title: string }
 
     expect(zaidanComponentsMeta.pages).toEqual([
@@ -213,7 +213,7 @@ describe("Solid docs navigation", () => {
     })
   })
 
-  it("documents only the Solid runtime/package track", () => {
+  it("documents only the Solid runtime/package track", async () => {
     const expectedPages = [
       "index.mdx",
       "mutations/accept-invitation.mdx",
@@ -308,8 +308,8 @@ describe("Solid docs navigation", () => {
 
     expect(actualPages).toEqual([...expectedPages].sort())
 
-    const index = readDocsFile("solid", "index.mdx")
-    const ssr = readDocsFile("solid", "ssr.mdx")
+    const index = await readDocsFile("solid", "index.mdx")
+    const ssr = await readDocsFile("solid", "ssr.mdx")
 
     expect(index).toContain("@better-auth-ui/solid")
     expect(index).toContain("/docs/zaidan/integrations/tanstack-start")
@@ -319,7 +319,7 @@ describe("Solid docs navigation", () => {
     expect(ssr).toContain("does not create routes")
   })
 
-  it("documents native Solid email templates in Zaidan Components", () => {
+  it("documents native Solid email templates in Zaidan Components", async () => {
     const emailPages = [
       [
         "email-verification-email",
@@ -379,7 +379,12 @@ describe("Solid docs navigation", () => {
     ] as const
 
     for (const [slug, previewName, sourceFileName, propsName] of emailPages) {
-      const page = readDocsFile("zaidan", "components", "email", `${slug}.mdx`)
+      const page = await readDocsFile(
+        "zaidan",
+        "components",
+        "email",
+        `${slug}.mdx`
+      )
       const demo = readFileSync(
         join(sourceRoot, "demos", "zaidan", "email", `${slug}.tsx`),
         "utf8"
@@ -438,9 +443,9 @@ describe("Solid docs navigation", () => {
     expect(storybookAssetRoute).toContain("public/storybook/zaidan")
   })
 
-  it("surfaces explicit non-goals without coupling Solid docs to React runtime execution", () => {
-    const index = readDocsFile("solid", "index.mdx")
-    const mutations = readDocsFile("solid", "mutations", "index.mdx")
+  it("surfaces explicit non-goals without coupling Solid docs to React runtime execution", async () => {
+    const index = await readDocsFile("solid", "index.mdx")
+    const mutations = await readDocsFile("solid", "mutations", "index.mdx")
     const source = readFileSync(sourceFile, "utf8")
 
     expect(index).toContain("does not describe React or HeroUI components")

@@ -112,11 +112,7 @@ import { UserButton } from "@/components/auth/user/user-button"
 
 ### `<SwitchAccountSubmenu />`
 
-```tsx
-import { SwitchAccountSubmenu } from "@/components/auth/multi-session/switch-account-submenu"
-
-<SwitchAccountSubmenu />
-```
+<include>../../../shared/ui/plugins/multi-session.mdx#shared-registry-switcher-example</include>
 
 <type-table path="../../../../../../examples/start-solid-zaidan-example/src/components/auth/multi-session/switch-account-submenu.tsx" name="SwitchAccountSubmenuProps" />
 
@@ -124,11 +120,7 @@ import { SwitchAccountSubmenu } from "@/components/auth/multi-session/switch-acc
 
 `<ManageAccounts />` is rendered through plugin-contributed `accountCards`, so it appears inside `<AccountSettings />` when the plugin is registered.
 
-```tsx
-import { ManageAccounts } from "@/components/auth/multi-session/manage-accounts"
-
-<ManageAccounts />
-```
+<include>../../../shared/ui/plugins/multi-session.mdx#shared-manage-accounts</include>
 
 <ZaidanStory
   storyId="zaidan-plugins-multi-session--manage-accounts-preview"

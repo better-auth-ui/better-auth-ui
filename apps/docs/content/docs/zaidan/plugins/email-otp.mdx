@@ -15,7 +15,7 @@ It contributes:
 - Code-based replacements for the verify-email, forgot-password, reset-password, and change-email surfaces
 - Solid runtime wiring through [`signInEmailOtpOptions`](/docs/solid/mutations/sign-in-email-otp) and the other email-OTP mutation factories
 
-When `emailAndPassword.enabled === false`, `<EmailOtp />` takes over `/auth/sign-in` as the primary passwordless surface.
+<include>../../../shared/ui/plugins/email-otp.mdx#shared-passwordless-sign-in</include>
 
 <Callout type="warn">
 Email OTP sign-in **replaces** the password, it does not add a step after it. If you want "password, then an emailed code", that is the [Two-Factor plugin](/docs/zaidan/plugins/two-factor) with `otpOptions`. Better Auth does not apply 2FA to passwordless methods, so email-OTP sign-in bypasses a configured second factor.
@@ -133,33 +133,9 @@ export const Route = createFileRoute("/auth/$path")({
 </Step>
 </Steps>
 
-## Choosing which flows use codes
+<include>../../../shared/ui/plugins/email-otp.mdx#shared-choosing-which-flows-use-codes</include>
 
-Each option replaces one link-based surface. Turn a flow on in the UI only when the matching server option is set, otherwise the user waits for a code that never arrives.
-
-| Option | Replaces | Server option it needs |
-|---|---|---|
-| `signIn` (default `true`) | adds `/auth/email-otp` | none |
-| `emailVerification` | `<VerifyEmail />` | `overrideDefaultEmailVerification: true` |
-| `passwordReset` | `<ForgotPassword />` and `<ResetPassword />` | none |
-| `changeEmail` | the change-email card in account settings | `changeEmail: { enabled: true }` |
-| `verifyCurrentEmail` | adds a step to the change-email flow | `changeEmail: { verifyCurrentEmail: true }` |
-
-```tsx
-emailOtpPlugin({
-  // Keep the emailed sign-in link, use codes for everything else.
-  signIn: false,
-  emailVerification: true,
-  passwordReset: true,
-  changeEmail: true
-})
-```
-
-### Confirming the current address
-
-`verifyCurrentEmail` adds a verification step for the current address. After this step, the plugin sends a code to the new address.
-
-This process prevents a hijacked session from moving the account and its password-reset path to an attacker's inbox.
+<include>../../../shared/ui/plugins/email-otp.mdx#shared-confirming-the-current-address</include>
 
 The copied `<ChangeEmailOtp />` card handles the extra round trip for you. Set the option on both sides or neither.
 
@@ -167,9 +143,7 @@ The copied `<ChangeEmailOtp />` card handles the extra round trip for you. Set t
 
 Better Auth creates an account for any address that completes an email-OTP sign-in, unless you set `disableSignUp: true` on the server. The UI plugin mirrors that with `disableSignUp` defaulting to `true`.
 
-Collecting a name only for unregistered addresses reveals which addresses already have accounts. This creates an account-enumeration risk.
-
-Keep sign-up on the password or magic-link path. Alternatively, build a flow that asks every user for the same fields.
+<include>../../../shared/ui/plugins/email-otp.mdx#shared-account-enumeration</include>
 
 ## Components
 
@@ -191,9 +165,7 @@ With `passwordReset` on, `/auth/forgot-password` emails a code and sends the use
 
 <type-table path="../../../../../../examples/start-solid-zaidan-example/src/components/auth/email-otp/reset-password-otp.tsx" name="ResetPasswordOtpProps" />
 
-### `<ChangeEmailOtp />`
-
-With `changeEmail` on, this replaces the built-in change-email card inside `<AccountSettings />`: no extra wiring needed.
+<include>../../../shared/ui/plugins/email-otp.mdx#shared-change-email-otp</include>
 
 <type-table path="../../../../../../examples/start-solid-zaidan-example/src/components/auth/email-otp/change-email-otp.tsx" name="ChangeEmailOtpProps" />
 
@@ -205,4 +177,4 @@ With `changeEmail` on, this replaces the built-in change-email card inside `<Acc
 
 <type-table path="../../../../../../packages/core/src/plugins/email-otp/email-otp-localization.ts" name="EmailOtpLocalization" />
 
-Read these from `useAuthPlugin(emailOtpPlugin).localization` inside custom slot components.
+<include>../../../shared/ui/plugins/email-otp.mdx#shared-localization</include>

@@ -1,0 +1,61 @@
+<section id="shared-overview">
+
+The theme plugin adds theme selection to your authentication UI. Users can switch between system, light, and dark themes from the user button dropdown and account settings.
+
+</section>
+
+<section id="shared-register-the-ui-plugin">
+
+### Register the UI plugin
+
+The plugin works with any theme library. Pass the theme library's hook, such as `useTheme` from [next-themes](https://github.com/pacocoursey/next-themes).
+
+The slot components can then read the current theme inside `<ThemeProvider>`. You do not need another wrapper.
+
+</section>
+
+<section id="shared-theme-hook">
+
+The plugin calls `useTheme()` inside its slot components during each render. The call stays inside `<ThemeProvider>` when both providers share a component.
+
+</section>
+
+<section id="shared-or-pass-static-theme-state">
+
+<Step>
+### Or pass static theme state
+
+If the theme source has no hook, pass both `theme` and `setTheme`. The source can use `useState` or a custom controller.
+
+The plugin runs during each parent render. The slot components update when the state owner renders with a new value.
+
+```tsx title="components/providers.tsx"
+const [theme, setTheme] = useState("system") // [!code highlight]
+
+<AuthProvider
+  authClient={authClient}
+  plugins={[
+    themePlugin({ // [!code highlight]
+      theme, // [!code highlight]
+      setTheme, // [!code highlight]
+      themes: ["system", "light", "dark"] // [!code highlight]
+    }) // [!code highlight]
+  ]}
+>
+  {children}
+</AuthProvider>
+```
+
+The two forms are mutually exclusive: you pass either `useTheme` **or** the `theme`/`setTheme` pair.
+
+</Step>
+
+</section>
+
+<section id="shared-appearance">
+
+The `<Appearance />` card is automatically rendered in `<AccountSettings />` when the plugin is registered.
+
+**Usage**
+
+</section>

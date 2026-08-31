@@ -1,0 +1,620 @@
+<section id="shared-overview">
+
+The organization plugin adds multi-tenant organization management to your authentication UI. Users can create, switch between, and manage organizations with members, invitations, and roles.
+
+It contributes:
+
+</section>
+
+<section id="shared-install-the-server-plugin">
+
+### Install the server plugin
+
+Add the [`organization`](https://www.better-auth.com/docs/plugins/organization) plugin to your Better Auth server config:
+
+</section>
+
+<section id="shared-server-example">
+
+```ts title="lib/auth.ts"
+import { betterAuth } from "better-auth"
+import { organization } from "better-auth/plugins" // [!code highlight]
+
+export const auth = betterAuth({
+  // ...
+  plugins: [
+    organization() // [!code highlight]
+  ]
+})
+```
+
+</section>
+
+<section id="shared-install-the-matching-client-plugin">
+
+### Install the matching client plugin
+
+Add `organizationClient()` to your auth client so `authClient.organization.*` methods are available:
+
+</section>
+
+<section id="shared-react-client-example">
+
+```ts title="lib/auth-client.ts"
+import { createAuthClient } from "better-auth/react"
+import { organizationClient } from "better-auth/client/plugins" // [!code highlight]
+
+export const authClient = createAuthClient({
+  plugins: [organizationClient()] // [!code highlight]
+})
+```
+
+</section>
+
+<section id="shared-register-the-ui-plugin">
+
+### Register the UI plugin
+
+Pass `organizationPlugin()` to `<AuthProvider>` so the organizations settings tab, the `<Organization />` shell, and `<OrganizationSwitcher />` can read plugin localization and view paths:
+
+</section>
+
+<section id="shared-allow-the-invitation-auth-path">
+
+### Allow the invitation auth path
+
+The organization plugin registers a direct invitation view at `/auth/accept-invitation`. Include its auth path in any route allow-list that wraps `<Auth path={path} />`:
+
+</section>
+
+<section id="shared-invitation-redirects">
+
+Invitation links use `/auth/accept-invitation?invitationId=<id>`. Signed-out recipients return to the invitation after signing in, and successful accept or reject actions continue to the configured `redirectTo`.
+
+</section>
+
+<section id="shared-mount-the-organization-switcher">
+
+### Mount the organization switcher
+
+Add `<OrganizationSwitcher />` to the application shell, usually next to `<UserButton />` in the header.
+
+It shows the selected organization and provides switch and create actions:
+
+</section>
+
+<section id="shared-allow-the-organizations-settings-path">
+
+### Allow the `organizations` settings path
+
+The plugin contributes an `organizations` segment to `viewPaths.settings`. Spread `organizationPlugin().viewPaths.settings` into your settings route's allowed-path set so `/settings/organizations` resolves correctly:
+
+</section>
+
+<section id="shared-organizations-settings-route">
+
+`/settings/organizations` now renders `<OrganizationsSettings />`: the list of organizations the user belongs to plus pending invitations.
+
+</section>
+
+<section id="shared-create-the-organization-page">
+
+### Create the organization page
+
+Mount a dynamic route at `/organization/<path>` that renders `<Organization />` for the matching tab. `<Organization />` is the shell: it shows the `settings` (profile + danger zone) and `people` (members + invitations) tabs for the **active** organization. The active organization is whatever the user picked in `<OrganizationSwitcher />` (persisted on the server session via `setActive`).
+
+</section>
+
+<section id="shared-organization-route-navigation">
+
+`/organization/settings` and `/organization/people` now render the org management UI. Internal links from `<OrganizationSwitcher />` and from `<Organizations />` (in the settings tab) wire up automatically.
+
+</section>
+
+<section id="shared-slug-based-routes">
+
+Users can now create organizations from `/settings/organizations`. They can use the header switcher and manage members or invitations at `/organization/<path>`.
+
+## Slug-based routes
+
+By default, the switcher stores the selected organization in the session. Enable **slug-based routing** to select the organization from the URL.
+
+For example, use `acme.your-app.com` or `your-app.com/organization/acme/settings`.
+
+This unlocks:
+
+- Shareable, bookmarkable per-org URLs that do not depend on session state
+- Server-side prefetching of the correct organization without round-tripping `setActive`
+- Letting members keep multiple organizations open in separate tabs without thrashing the active organization
+
+</section>
+
+<section id="shared-slug-configuration">
+
+You wire this up by passing the URL slug into `organizationPlugin({ slug })`. The UI plugin then:
+
+</section>
+
+<section id="shared-slug-routing-behavior">
+
+1. Drives `useActiveOrganization()` to fetch the org matching that slug (instead of reading the session's active org)
+2. Rewrites every link from `<OrganizationSwitcher />`, `<Organizations />`, and the `<Organization />` tabs to include `/<slug>/`
+3. Swaps the switcher's behavior from `setActive` to `navigate`: clicking an organization takes the user to its slug-prefixed route
+
+Set `slugPrefix` to include a marker in the visible route, such as `/organization/@acme/settings`. Keep `slug` itself unprefixed.
+
+For example, `/organization/@{$slug}/$path` captures `acme`. The plugin adds the prefix to fields, labels, and generated links.
+
+</section>
+
+<section id="shared-read-the-slug-from-the-url-in-your-providers">
+
+### Read the slug from the URL in your providers
+
+Read the slug param wherever you render `<AuthProvider>` and forward it to `organizationPlugin`.
+
+</section>
+
+<section id="shared-personal-account-slug">
+
+On a non-slug page, set `slug` to `null`. This value tells the plugin to use the user's personal account.
+
+Do not leave `slug` as `undefined`. That value uses the organization from the session and can show the wrong organization.
+
+</section>
+
+<section id="shared-add-the-slug-prefixed-organization-route">
+
+### Add the slug-prefixed organization route
+
+Move `/organization/$path` → `/organization/$slug/$path`. Validate both segments and gate on session as before.
+
+</section>
+
+<section id="shared-customize-where-the-switcher-navigates">
+
+After you configure `organizationPlugin({ slug })`, internal organization links include `/<slug>/` automatically.
+
+These links include the switcher, organization rows, and the tab bar in `<Organization />`.
+
+### Customize where the switcher navigates
+
+When slug-based routing is enabled, clicking an organization in `<OrganizationSwitcher />` navigates to `/organization/<slug>/settings` by default, and clicking the personal account navigates to `/settings/account`.
+
+To use a custom destination such as `/<slug>/dashboard`, pass the `setActive` prop. This prop replaces the plugin's default navigation.
+
+The callback receives the selected `Organization`, or `null` for the personal account:
+
+</section>
+
+<section id="shared-session-based-selection">
+
+Without slug-based routing, the default behavior is `authClient.organization.setActive`. Pass `setActive` to intercept the selection and apply custom behavior.
+
+</section>
+
+<section id="shared-hide-organization-slugs">
+
+## Hide organization slugs
+
+Set `hideSlug: true` to hide slugs in creation dialogs, profile forms, organization views, and switchers:
+
+```ts
+organizationPlugin({ hideSlug: true })
+```
+
+Creation still generates a slug from the organization name. Names without Latin letters or digits use a generated identifier instead. The server still validates the slug and its availability. Profile edits preserve the existing slug.
+
+Each component's `hideSlug` prop overrides the plugin configuration. Without either option, forms and organization views show slugs, while switchers hide them.
+
+</section>
+
+<section id="shared-options">
+
+## Options
+
+```ts
+organizationPlugin({
+  // Display slugs as @acme and include the prefix in generated URLs.
+  slugPrefix: "@",
+  // Disable the slug-availability check that runs while typing a slug.
+  checkSlug: false,
+  // Override path segments (defaults shown).
+  viewPaths: {
+    auth: { acceptInvitation: "accept-invitation" },
+    settings: { organizations: "organizations" },
+    organization: { settings: "settings", people: "people" }
+  },
+  // Disable logo upload, or customize the resize / size.
+  logo: { enabled: false },
+  // Replace the default role labels.
+  roles: { owner: "Owner", admin: "Admin", member: "Member" },
+  // Add labels for custom server roles without redefining built-ins.
+  additionalRoles: { billing: "Billing" },
+  // Limit invitations and members to one role.
+  allowMultipleRoles: false
+})
+```
+
+</section>
+
+<section id="shared-localization">
+
+Read these inside custom slot components via `useAuthPlugin(organizationPlugin).localization`.
+
+</section>
+
+<section id="shared-react-hooks">
+
+## React Hooks
+
+### Queries
+
+- `useActiveOrganization()`: Full organization for the active session (or the URL slug when `organizationPlugin({ slug })` is set)
+- `useListOrganizations()`: All organizations the signed-in user belongs to
+- `useListOrganizationMembers()`: Members of the active organization
+- `useListOrganizationInvitations()`: Pending invitations for the active organization
+- `useListUserInvitations()`: Pending invitations addressed to the signed-in user
+- `useHasPermission({ permissions })`: Check the current member's permission against the active organization
+
+### Mutations
+
+- `useCreateOrganization()`: Create a new organization
+- `useUpdateOrganization()`: Update name / slug / logo of the active organization
+- `useDeleteOrganization()`: Delete an organization
+- `useSetActiveOrganization()`: Switch the active organization (server-side, persists on session)
+- `useLeaveOrganization()`: Leave an organization
+- `useInviteMember()`: Invite a member by email
+- `useRemoveMember()`: Remove a member
+- `useUpdateMemberRole()`: Update a member's role
+- `useCancelInvitation()`: Cancel a pending invitation
+- `useAcceptInvitation()`: Accept an invitation
+- `useRejectInvitation()`: Reject an invitation
+- `useCheckSlug()`: Check whether an organization slug is available
+
+</section>
+
+<section id="shared-accept-invitation">
+
+### `<AcceptInvitation />`
+
+Direct invitation acceptance view registered by `organizationPlugin()` at `/auth/accept-invitation`. It reads `invitationId` from the query string, preserves the link through sign-in, and lets the recipient accept or reject the pending invitation.
+
+</section>
+
+<section id="shared-organization-switcher">
+
+### `<OrganizationSwitcher />`
+
+Dropdown that shows the active organization, lets the user switch between organizations, and exposes a "Create organization" entry. Drop it in your app shell: typically next to `<UserButton />`.
+
+</section>
+
+<section id="shared-organization">
+
+### `<Organization />`
+
+The full organization management shell mounted at `/organization/<path>`. Renders `settings` (profile + danger zone) and `people` (members + invitations) tabs for the active organization.
+
+</section>
+
+<section id="shared-organization-profile">
+
+### `<OrganizationProfile />`
+
+Editable profile card for the active organization: logo, display name, and slug. Submits via `useUpdateOrganization`.
+
+</section>
+
+<section id="shared-organization-danger-zone">
+
+### `<OrganizationDangerZone />`
+
+Danger-zone card with `<LeaveOrganization />` and `<DeleteOrganization />` rows.
+
+</section>
+
+<section id="shared-organization-people">
+
+### `<OrganizationPeople />`
+
+The contents of the `people` tab: `<OrganizationMembers />` on top, `<OrganizationInvitations />` below.
+
+</section>
+
+<section id="shared-organization-members">
+
+### `<OrganizationMembers />`
+
+Searchable, sortable, filter-by-role table of the active organization's members with an invite control and per-row role / remove actions.
+
+</section>
+
+<section id="shared-paginating-members">
+
+### Paginating members
+
+By default `<OrganizationMembers />` asks for the whole list and filters it in
+the browser. That is fine for a handful of members and quietly wrong for a
+large organization: `list-members` caps its response at 100 rows (or your
+`membershipLimit`) and says nothing about the rest, so members past that point
+do not appear.
+
+Pass `pageSize` to move paging onto the server:
+
+```tsx
+<OrganizationMembers pageSize={20} />
+```
+
+In paged mode the component sends `limit` and `offset`, applies the role filter
+server-side through `filterField`/`filterValue`, sorts by role through
+`sortBy`/`sortDirection`, and reads the row count from the endpoint's `total`.
+
+Two controls step aside in paged mode, because `list-members` cannot honour
+them across pages:
+
+- **The search box.** The endpoint has no search parameter. Name and email live
+  on the joined user row, which it does not query.
+- **Sorting by member.** Same reason: it can only sort columns on the member
+  row itself.
+
+The signed-in user's own role comes from `getActiveMemberRole` rather than from
+scanning the loaded page because that member can be on a different page. This is
+exposed as `useActiveMemberRole` for custom components.
+
+<Callout>
+`list-invitations` and `list-sessions` take no pagination parameters at all, so
+those lists stay client-side until Better Auth adds them. `list-api-keys` does
+support `limit` and `offset`. Wiring it up is a separate change.
+</Callout>
+
+### `<OrganizationInvitations />`
+
+Pending invitations for the active organization as a table aligned with `<OrganizationMembers />`. Includes role / status filters, plus per-row resend and cancel actions.
+
+Resending re-invites the same address with `resend: true`, which pushes the
+invitation's expiry out and sends the email again instead of creating a second
+invitation. The action needs the `invitation: ["create"]` permission, the same
+one that gates `<InviteMemberDialog />`.
+
+</section>
+
+<section id="shared-organizations-settings">
+
+### `<OrganizationsSettings />`
+
+The user-level organizations panel rendered at `/settings/organizations`. Lists every organization the user belongs to (with a "Create organization" button and empty state) plus invitations addressed to the user.
+
+</section>
+
+<section id="shared-organizations">
+
+### `<Organizations />`
+
+List of organizations the user belongs to with a "Create organization" button and per-row Manage control. Embedded inside `<OrganizationsSettings />`.
+
+</section>
+
+<section id="shared-user-invitations">
+
+### `<UserInvitations />`
+
+Invitations addressed to the signed-in user across every organization, with Accept / Reject actions. Embedded inside `<OrganizationsSettings />`.
+
+</section>
+
+<section id="shared-create-organization-dialog">
+
+### `<CreateOrganizationDialog />`
+
+Modal dialog with the new-organization form. Owned by `<OrganizationSwitcher />` and `<Organizations />`. Mount it directly when you want to open the create flow from your own surface.
+
+</section>
+
+<section id="shared-multiple-roles-per-member">
+
+## Multiple roles per member
+
+Better Auth accepts `role` as a string or an array. It stores multiple roles as
+one comma-joined value (`"admin,member"`). The role pickers allow multiple
+roles by default. Set `allowMultipleRoles: false` to limit invitations and
+members to one role. The pickers always keep at least one role selected.
+
+Anywhere you read a raw role, split it first. `@better-auth-ui/core/plugins/organization`
+exports helpers for this:
+
+```ts
+import {
+  hasMemberRole,
+  memberRoleLabels,
+  parseMemberRoles
+} from "@better-auth-ui/core/plugins/organization"
+
+parseMemberRoles("admin,member") // ["admin", "member"]
+hasMemberRole("owner,admin", "owner") // true
+memberRoleLabels("admin,auditor", roles) // ["Admin", "auditor"]
+```
+
+`hasMemberRole` matters more than it looks: `member.role === "owner"` silently
+misses an owner who also carries a second role, which is what the members list
+used to do when deciding whether to show owner-only actions.
+
+### `<InviteMemberDialog />`
+
+Modal dialog for inviting a new member by email. Owned by `<OrganizationMembers />` and `<OrganizationInvitations />`. Mount it directly to drive the invite flow from a custom action.
+
+</section>
+
+<section id="shared-delete-organization-dialog">
+
+### `<DeleteOrganizationDialog />`
+
+Confirmation dialog for deleting an organization (owner permission, server-side).
+
+</section>
+
+<section id="shared-dynamic-organization-roles">
+
+## Dynamic organization roles
+
+Enable dynamic access control in Better Auth before you enable the roles tab. The server, client, and UI must use the same resource and action keys.
+
+</section>
+
+<section id="shared-dynamic-roles-example">
+
+```ts title="lib/organization-access.ts"
+import { createAccessControl } from "better-auth/plugins/access"
+
+export const organizationStatements = {
+  project: ["create", "read", "update", "delete"]
+} as const
+
+export const organizationAccess = createAccessControl(organizationStatements)
+```
+
+```ts title="lib/auth.ts"
+import { organization } from "better-auth/plugins"
+import { organizationAccess } from "./organization-access"
+
+organization({
+  ac: organizationAccess,
+  dynamicAccessControl: { enabled: true }
+})
+```
+
+```ts title="lib/auth-client.ts"
+import { organizationClient } from "better-auth/client/plugins"
+import { organizationAccess } from "./organization-access"
+
+organizationClient({
+  ac: organizationAccess,
+  dynamicAccessControl: { enabled: true }
+})
+```
+
+Configure the labels that the permission matrix shows:
+
+```tsx title="components/providers.tsx"
+organizationPlugin({
+  dynamicAccessControl: {
+    enabled: true,
+    permissions: {
+      project: {
+        label: "Projects",
+        actions: {
+          create: "Create projects",
+          read: "View projects",
+          update: "Edit projects",
+          delete: "Delete projects"
+        }
+      }
+    }
+  }
+})
+```
+
+</section>
+
+<section id="shared-dynamic-roles-behavior">
+
+This adds the `roles` organization tab. The tab supports role creation, editing, and deletion. Member and invitation controls include both configured roles and roles returned by Better Auth. A role cannot be deleted while a member holds it.
+
+</section>
+
+<section id="shared-react-role-hooks">
+
+The React hooks also expose the underlying endpoints. Always pass the organization ID:
+
+```tsx
+const roles = useListRoles(authClient, {
+  query: { organizationId }
+})
+const role = useRole(authClient, {
+  query: { organizationId, roleId }
+})
+
+const createRole = useCreateRole(authClient, organizationId)
+const updateRole = useUpdateRole(authClient, organizationId)
+const deleteRole = useDeleteRole(authClient, organizationId)
+```
+
+</section>
+
+<section id="shared-teams-and-policy-controls">
+
+## Teams and policy controls
+
+Enable teams on the Better Auth server, client, and UI plugin:
+
+```tsx
+organization({ teams: { enabled: true } })
+organizationClient({ teams: { enabled: true } })
+organizationPlugin({
+  teams: {
+    maximumTeams: 5,
+    maximumMembersPerTeam: 20,
+    allowRemovingAllTeams: false
+  }
+})
+```
+
+The organization shell adds a Teams tab. Users can create, rename, and delete teams. They can also add and remove team members. Invitations can assign a team.
+
+The UI disables team creation and member assignment when these limits are reached. It also protects the final team unless `allowRemovingAllTeams` is true. Better Auth also accepts callback limits on the server. The browser cannot run those callbacks, so pass their resolved values into the UI configuration when the limits vary by organization.
+
+The `useListTeams`, `useListTeamMembers`, `useCreateTeam`, `useUpdateTeam`, `useRemoveTeam`, `useAddTeamMember`, and `useRemoveTeamMember` hooks cover the team lifecycle.
+
+### User team selection
+
+`TeamSwitcher` lists only the teams that the current user can access in the specified organization. The application owns the selected team. This keeps team routing independent from Better Auth active organizations.
+
+</section>
+
+<section id="shared-model-specific-fields">
+
+Set `syncSession` when an application still reads `session.activeTeamId`. This opt-in mode calls Better Auth `setActiveTeam` after the callback.
+
+The `useListUserTeams` and `useSetActiveTeam` hooks are also available for custom controls. Always pass `organizationId` to both APIs.
+
+### Model-specific fields
+
+Configure fields by the Better Auth model that stores them. The names and types must match the `schema` fields in the server organization plugin.
+
+```tsx
+organizationPlugin({
+  modelFields: {
+    organization: [
+      { name: "billingCode", type: "string", label: "Billing code" }
+    ],
+    member: [
+      { name: "title", type: "string", label: "Job title" }
+    ],
+    invitation: [
+      { name: "department", type: "string", label: "Department" }
+    ],
+    team: [
+      { name: "description", type: "string", inputType: "textarea", label: "Description" }
+    ],
+    role: [
+      { name: "color", type: "string", label: "Color" }
+    ]
+  }
+})
+```
+
+Organization fields appear in creation and profile forms. Invitation, team, and role fields appear in their create and edit workflows. Member fields appear as read-only details because Better Auth does not provide browser client endpoints for creating or editing a member model directly.
+
+Use `organizationLimit`, `membershipLimit`, and `invitationLimit` to disable actions when a configured limit is reached. Use `allowOrganizationCreation: false` to hide creation controls.
+
+Plugins can add an organization settings tab through `organizationTabs`. Each tab receives `organizationId` and `organizationSlug` for the active organization.
+
+</section>
+
+<section id="shared-install-the-ui-plugin">
+
+### Install the UI plugin
+
+Run the shadcn CLI to install every organization component and the `organizationPlugin()` factory into your project:
+
+</section>

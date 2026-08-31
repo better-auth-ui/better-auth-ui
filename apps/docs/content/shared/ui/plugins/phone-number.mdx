@@ -1,0 +1,61 @@
+<section id="shared-configure-better-auth-and-your-sms-provider">
+
+```ts title="lib/auth.ts"
+import { betterAuth } from "better-auth"
+import { phoneNumber } from "better-auth/plugins"
+
+export const auth = betterAuth({
+  plugins: [
+    phoneNumber({
+      otpLength: 6,
+      requireVerification: true,
+      sendOTP: ({ phoneNumber, code }) => {
+        void sms.send({ to: phoneNumber, body: `Your code is ${code}` })
+      },
+      sendPasswordResetOTP: ({ phoneNumber, code }) => {
+        void sms.send({ to: phoneNumber, body: `Your reset code is ${code}` })
+      }
+    })
+  ]
+})
+```
+
+</section>
+
+<section id="shared-add-the-client-plugin">
+
+<Step>
+### Add the client plugin
+
+```ts title="lib/auth-client.ts"
+import { createAuthClient } from "better-auth/react"
+import { phoneNumberClient } from "better-auth/client/plugins"
+
+export const authClient = createAuthClient({
+  plugins: [phoneNumberClient()]
+})
+```
+
+</Step>
+
+</section>
+
+<section id="shared-flow-options">
+
+## Flow options
+
+| UI option | Default | Server requirement |
+|---|---:|---|
+| `signIn` | `true` | `sendOTP` |
+| `passwordSignIn` | `false` | A password credential |
+| `passwordReset` | `false` | `sendPasswordResetOTP` |
+| `changePhoneNumber` | `true` | `sendOTP` |
+| `otpLength` | `6` | Must match Better Auth `otpLength` |
+
+</section>
+
+<section id="shared-selector-options">
+
+Use `defaultCountry`, `countries`, and `locale` to control the selector. Supply an `adapter` when your application needs different formatting or validation rules.
+
+</section>

@@ -3,9 +3,9 @@ title: getTotpUriOptions
 description: Re-read the TOTP URI of an enrolled user.
 ---
 
-Requires the Better Auth two-factor plugin. If TypeScript cannot infer the plugin methods from your client, type or cast `authClient` as `TwoFactorAuthClient` from `@better-auth-ui/core/plugins/two-factor`.
+<include>../../../shared/mutations/plugin-requirements.mdx#shared-two-factor</include>
 
-This operation is a mutation because the endpoint uses POST. It accepts the password and returns a secret that the application must not cache.
+<include>../../../shared/mutations/get-totp-uri.mdx#shared-overview</include>
 
 ## Options factory
 

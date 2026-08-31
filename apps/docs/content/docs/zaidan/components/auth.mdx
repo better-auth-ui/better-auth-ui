@@ -14,34 +14,11 @@ description: Renders the Solid auth component for the current path or explicit v
 ```tsx file=<rootDir>/../../examples/start-solid-zaidan-example/src/demos/auth/auth.tsx
 ```
 
-### Built-in views
-
-| `view` | Default path |
-| --- | --- |
-| `callback` | `/auth/callback` |
-| `error` | `/auth/error` |
-| `redirect` | `/auth/redirect` |
-| `signIn` | `/auth/sign-in` |
-| `signUp` | `/auth/sign-up` |
-| `signOut` | `/auth/sign-out` |
-| `forgotPassword` | `/auth/forgot-password` |
-| `resetPassword` | `/auth/reset-password` |
-| `resetLinkSent` | `/auth/reset-link-sent` |
-| `verifyEmail` | `/auth/verify-email` |
-
-Registered plugins can contribute more views through their own `viewPaths.auth`, such as `magicLink` and `magicLinkSent`.
-
-### Callback results
-
-Set Better Auth `onAPIError.errorURL` and each social sign-in `errorCallbackURL` to `/auth/error`. The view reads Better Auth's `error` query parameter and gives the user a suitable recovery action.
-
-Use `/auth/callback?result=email_verified` as an email verification callback. The result view also supports `account_linked`, `password_reset`, `signup_complete`, and `cancelled`. Add `flow=email-verification`, `account-linking`, `password-reset`, or `oauth` when `result=success` needs more context. A local `redirectTo` path adds a Continue action.
+<include>../../../shared/ui/components/auth.mdx#shared-built-in-views</include>
 
 ## Installation
 
-```npm
-npx shadcn@latest add https://better-auth-ui.com/r/solid/auth.json
-```
+<include>../../../shared/ui/installation/zaidan.mdx#shared-auth</include>
 
 After install, `src/components/auth/auth.tsx` and the copied auth view files are app-owned. Wire it to your TanStack Router auth route or pass an explicit `view`.
 

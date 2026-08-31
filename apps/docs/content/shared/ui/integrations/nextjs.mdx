@@ -1,0 +1,129 @@
+<section id="shared-create-the-query-client">
+
+### Create the QueryClient
+
+Create a shared `QueryClient` factory with the standard Next.js SSR pattern. Create one client per server request and one browser singleton.
+
+</section>
+
+<section id="shared-query-client-lifetime">
+
+On the server, each call returns a new `QueryClient`. This design keeps the request cache separate for each user.
+
+In the browser, the singleton preserves the React Query cache across navigation. It also gives `HydrationBoundary` a stable hydration target.
+
+</section>
+
+<section id="shared-configure-auth-provider">
+
+### Configure AuthProvider
+
+Configure `AuthProvider` with Next.js navigation. Then wrap it in `QueryClientProvider` so it uses the shared client.
+
+</section>
+
+<section id="shared-update-the-root-layout">
+
+### Update the Root Layout
+
+Wrap your application with the `Providers` component in your root layout.
+
+</section>
+
+<section id="shared-create-the-settings-page">
+
+The async server component validates the path and session. It redirects unauthenticated users before it sends HTML.
+
+The component also adds the session query to `HydrationBoundary`. As a result, child hooks skip their loading state during hydration.
+
+</section>
+
+<section id="shared-protecting-routes">
+
+## Protecting Routes
+
+Better Auth UI provides separate protection patterns for server-rendered and prerendered routes.
+
+### Server-rendered routes (async server component)
+
+For an SSR route, read the session in an async server component. This redirects unauthenticated users before the server streams HTML.
+
+Call `ensureSessionServer` from `@better-auth-ui/core/server` with a separate `QueryClient` for each request. This helper calls `auth.api` directly.
+
+Wrap the rendered children in `HydrationBoundary`. Then downstream `useSession` calls read `authQueryKeys.session` from the hydrated cache.
+
+```tsx title="app/dashboard/page.tsx"
+import { ensureSessionServer } from "@better-auth-ui/core/server"
+import { dehydrate, HydrationBoundary } from "@tanstack/react-query"
+import { headers } from "next/headers"
+import Link from "next/link"
+import { redirect } from "next/navigation"
+
+import { auth } from "@/lib/auth"
+import { getQueryClient } from "@/lib/query-client"
+
+export default async function Dashboard() {
+  const queryClient = getQueryClient()
+
+  const session = await ensureSessionServer(queryClient, auth, {
+    headers: await headers()
+  })
+
+  if (!session) {
+    redirect("/auth/sign-in?redirectTo=/dashboard")
+  }
+
+  return (
+    <HydrationBoundary state={dehydrate(queryClient)}>
+      <div className="flex flex-col items-center my-auto">
+        <h1 className="text-2xl">Hello, {session.user.email}</h1>
+
+        <Link href="/auth/sign-out">Sign Out</Link>
+      </div>
+    </HydrationBoundary>
+  )
+}
+```
+
+`ensureSession` adds the session to the query cache during SSR. `HydrationBoundary` sends this state to the browser.
+
+As a result, child components that call `useSession` render without a loading state.
+
+If a client component outside the protected route reads the session, prefetch the session in its server parent. Then wrap that subtree in `HydrationBoundary`.
+
+This pattern commonly applies to a header or sidebar that contains `UserButton`. Without the prefetch, the component starts a new browser request.
+
+</section>
+
+<section id="shared-reactive-protection-and-prerendered-routes-use-authenticate">
+
+### Reactive protection and prerendered routes (`useAuthenticate`)
+
+Server-side session checks only occur when the route loads. They do not detect session changes while the page remains mounted.
+
+These changes include token expiration, sign-out in another tab, and server-side session revocation. Prerendered and client-rendered routes also have no server check.
+
+The `useAuthenticate` hook covers both cases. It subscribes to `useSession` and redirects the user when the session ends.
+
+The hook preserves the current URL in the `redirectTo` query parameter.
+
+Use it in two situations:
+
+1. **Alongside an async server component** for server-rendered routes, as a second layer that keeps the UI in sync after the initial load.
+2. **On its own** for prerendered or client-rendered routes that have no server-side session access.
+
+</section>
+
+<section id="shared-session-changes">
+
+The async server component protects the initial render and hydrates the session. Then `useAuthenticate` reacts to later session changes.
+
+</section>
+
+<section id="shared-next-steps">
+
+## Next Steps
+
+Read about the shared React hooks and query primitives that power each Better Auth UI component.
+
+</section>

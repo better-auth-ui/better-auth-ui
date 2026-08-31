@@ -1,0 +1,140 @@
+<section id="shared-configure-auth-provider">
+
+### Configure AuthProvider
+
+Configure `AuthProvider` with TanStack Router's navigation.
+
+</section>
+
+<section id="shared-update-the-root-route">
+
+### Update the Root Route
+
+Wrap your application with the `Providers` component in your root route.
+
+</section>
+
+<section id="shared-protecting-routes">
+
+## Protecting Routes
+
+Better Auth UI provides separate protection patterns for server-rendered and prerendered routes.
+
+### Server-rendered routes (`beforeLoad`)
+
+For an SSR route, read the session in `beforeLoad`. This redirects unauthenticated users before a component renders.
+
+Use `createIsomorphicFn` to call `ensureSessionServer` on the server and `ensureSession` in the browser. The server helper calls `auth.api` directly.
+
+Both helpers use `authQueryKeys.session` in the same TanStack Query cache. Child `useSession` calls can reuse the hydrated session.
+
+</section>
+
+<section id="shared-server-rendered-routes-before-load">
+
+```tsx title="routes/dashboard.tsx"
+import { ensureSession } from "@better-auth-ui/core"
+import { ensureSessionServer } from "@better-auth-ui/core/server"
+import { createFileRoute, Link, redirect } from "@tanstack/react-router"
+import { createIsomorphicFn } from "@tanstack/react-start"
+import { getRequestHeaders } from "@tanstack/react-start/server"
+
+import { auth } from "@/lib/auth"
+import { authClient } from "@/lib/auth-client"
+
+export const Route = createFileRoute("/dashboard")({
+  async beforeLoad({ context: { queryClient }, location }) {
+    const ensureSessionIso = createIsomorphicFn()
+      .server(() =>
+        ensureSessionServer(queryClient, auth, { headers: getRequestHeaders() })
+      )
+      .client(() => ensureSession(queryClient, authClient))
+
+    const session = await ensureSessionIso()
+
+    if (!session) {
+      throw redirect({
+        to: "/auth/$path",
+        params: { path: "sign-in" },
+        search: { redirectTo: location.href }
+      })
+    }
+
+    return { session }
+  },
+  component: Dashboard
+})
+
+function Dashboard() {
+  const { session } = Route.useRouteContext()
+
+  return (
+    <div className="flex flex-col items-center my-auto">
+      <h1 className="text-2xl">Hello, {session.user.email}</h1>
+
+      <Link to="/auth/$path" params={{ path: "sign-out" }}>
+        Sign Out
+      </Link>
+    </div>
+  )
+}
+```
+
+</section>
+
+<section id="shared-route-session-context">
+
+Child routes and components can read the returned `{ session }` through `Route.useRouteContext()`.
+
+</section>
+
+<section id="shared-session-hydration">
+
+`ensureSessionServer` also adds the session to the query cache during SSR. Downstream `useSession` calls then render without a loading state.
+
+</section>
+
+<section id="shared-reactive-protection-and-prerendered-routes-use-authenticate">
+
+### Reactive protection and prerendered routes (`useAuthenticate`)
+
+`beforeLoad` only runs when the route loads. It does not detect session changes while the page remains mounted.
+
+These changes include token expiration, sign-out in another tab, and server-side session revocation. Prerendered and client-rendered routes also have no server check.
+
+The `useAuthenticate` hook covers both cases. It subscribes to `useSession` and redirects the user when the session ends.
+
+The hook preserves the current URL in the `redirectTo` query parameter.
+
+Use it in two situations:
+
+1. **Alongside `beforeLoad`** for server-rendered routes, as a second layer that keeps the UI in sync after the initial load.
+2. **On its own** for prerendered or client-rendered routes that have no server-side session access.
+
+</section>
+
+<section id="shared-session-changes">
+
+`beforeLoad` protects the initial render and hydrates the session. Then `useAuthenticate` reacts to later session changes.
+
+</section>
+
+<section id="shared-next-steps">
+
+## Next Steps
+
+Read about the shared React hooks and query primitives that power each Better Auth UI component.
+
+</section>
+
+<section id="shared-create-the-auth-page">
+
+The `viewPaths.auth` object contains the built-in auth paths: `redirect`, `sign-in`, `sign-up`, `sign-out`, `forgot-password`, `reset-password`, `reset-link-sent`, and `verify-email`.
+
+</section>
+
+<section id="shared-create-the-settings-page">
+
+Validate the segment against `viewPaths.settings`. Return a 404 response for an unknown path.
+
+</section>

@@ -1,0 +1,196 @@
+<section id="shared-overview">
+
+The API key plugin adds programmatic API key management to your authentication UI. Users can create, copy, and revoke API keys from a security card in account settings. New keys can use a configurable expiration interval, and each listed key shows when it expires.
+
+It contributes:
+
+</section>
+
+<section id="shared-install-the-better-auth-plugin">
+
+### Install the Better Auth plugin
+
+Install the [`@better-auth/api-key`](https://www.better-auth.com/docs/plugins/api-key) package and add it to your Better Auth server config:
+
+</section>
+
+<section id="shared-server-example">
+
+```ts title="lib/auth.ts"
+import { betterAuth } from "better-auth"
+import { apiKey } from "@better-auth/api-key" // [!code highlight]
+
+export const auth = betterAuth({
+  // ...
+  plugins: [
+    apiKey() // [!code highlight]
+  ]
+})
+```
+
+</section>
+
+<section id="shared-install-the-matching-client-plugin">
+
+<Step>
+### Install the matching client plugin
+
+Add `apiKeyClient()` to your auth client so `authClient.apiKey.*` methods are available:
+
+```ts title="lib/auth-client.ts"
+import { createAuthClient } from "better-auth/react"
+import { apiKeyClient } from "@better-auth/api-key/client" // [!code highlight]
+
+export const authClient = createAuthClient({
+  plugins: [apiKeyClient()] // [!code highlight]
+})
+```
+
+</Step>
+
+</section>
+
+<section id="shared-configure-expiration">
+
+## Configure expiration
+
+The create dialog offers 30 days, 90 days, and Never by default. It initially selects 30 days. Configure the choices through `apiKeyPlugin()`:
+
+```tsx title="components/providers.tsx"
+apiKeyPlugin({
+  keyExpiration: {
+    intervals: [7, 30, 90],
+    defaultInterval: 30,
+    allowNever: true
+  }
+})
+```
+
+</section>
+
+<section id="shared-expiration-units">
+
+`intervals` and `defaultInterval` use days. Better Auth receives the selected lifetime as seconds.
+
+Keep the UI choices within the limits in your Better Auth server configuration:
+
+</section>
+
+<section id="shared-server-expiration-example">
+
+```ts title="lib/auth.ts"
+apiKey({
+  keyExpiration: {
+    minExpiresIn: 7,
+    maxExpiresIn: 90,
+    defaultExpiresIn: null
+  }
+})
+```
+
+</section>
+
+<section id="shared-default-expiration">
+
+When `allowNever` is enabled, selecting Never sends no custom interval. Better Auth will still apply `defaultExpiresIn` if the server defines one, so set `allowNever: false` in the UI when your server always requires expiration.
+
+To remove the expiration field and rely entirely on the server default:
+
+</section>
+
+<section id="shared-disable-expiration-example">
+
+```tsx title="components/providers.tsx"
+apiKeyPlugin({ keyExpiration: false })
+```
+
+</section>
+
+<section id="shared-organization-api-keys">
+
+### `<OrganizationApiKeys />`
+
+A thin wrapper around `<ApiKeys />` that resolves the active organization via `useActiveOrganization` and forwards its id. Rendered inside `<OrganizationSettings />` only when the plugin is registered with `{ organization: true }`.
+
+To enable, opt in on the UI plugin and add a matching API key configuration to your Better Auth server config. The plugin uses a fixed `configId` of `"organization"`, so the server entry **must** be `{ configId: "organization", references: "organization" }`:
+
+</section>
+
+<section id="shared-organization-server-example">
+
+```ts title="lib/auth.ts"
+import { betterAuth } from "better-auth"
+import { apiKey } from "@better-auth/api-key"
+import { organization } from "better-auth/plugins"
+
+export const auth = betterAuth({
+  // ...
+  plugins: [
+    organization(),
+    apiKey([
+      { configId: "default", references: "user" },
+      { configId: "organization", references: "organization" } // [!code highlight]
+    ])
+  ]
+})
+```
+
+</section>
+
+<section id="shared-organization-permissions">
+
+See the [Better Auth docs](https://www.better-auth.com/docs/plugins/api-key/advanced#organization-owned-api-keys) for role-based permissions on organization-owned keys.
+
+**Usage**
+
+</section>
+
+<section id="shared-lifecycle-controls">
+
+## Lifecycle controls
+
+`<ApiKeys />` lets users create, rename, and delete keys. The create form exposes the name, configuration, expiration, and organization. The list shows status, remaining requests, request usage, and the last request time as read-only values.
+
+The built-in dialog does not show metadata because metadata belongs to the application. For metadata, build a custom form with `useCreateApiKey`. Map named fields or application state to the metadata object. Do not show a raw JSON editor. If metadata affects trusted behavior, validate it in a server route.
+
+Better Auth reserves enablement, permissions, quotas, refill rules, and rate limits for server-side creation and updates. Configure those values in trusted server code instead of exposing them in the account UI.
+
+</section>
+
+<section id="shared-lifecycle-example">
+
+```tsx
+apiKeyPlugin({
+  configurations: [
+    { id: "default", label: "Personal", organization: false },
+    { id: "organization", label: "Organization", organization: true }
+  ],
+  pageSize: 20
+})
+```
+
+</section>
+
+<section id="shared-api-keys">
+
+**Usage**
+
+```tsx
+import { ApiKeys } from "@/components/auth/api-key/api-keys"
+
+<ApiKeys />
+```
+
+</section>
+
+<section id="shared-organization-registry-example">
+
+```tsx
+import { OrganizationApiKeys } from "@/components/auth/api-key/organization-api-keys"
+
+<OrganizationApiKeys />
+```
+
+**Props**
+
+</section>

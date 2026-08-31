@@ -45,14 +45,12 @@ The root route also imports the global Tailwind v4 stylesheet. It renders shared
 
 Install the composed authentication registry entry. Then create a dynamic page that selects the authentication view from the URL segment.
 
-```npm
-npx shadcn@latest add https://better-auth-ui.com/r/solid/auth.json
-```
+<include>../../../shared/ui/installation/zaidan.mdx#shared-auth</include>
 
 ```tsx title="routes/auth/$path.tsx" file=<rootDir>/../../examples/start-solid-zaidan-example/src/routes/auth/$path.tsx
 ```
 
-The `viewPaths.auth` object contains the built-in auth paths: `redirect`, `sign-in`, `sign-up`, `sign-out`, `forgot-password`, `reset-password`, `reset-link-sent`, and `verify-email`.
+<include>../../../shared/ui/integrations/tanstack-start.mdx#shared-create-the-auth-page</include>
 
 </Step>
 <Step>
@@ -60,11 +58,9 @@ The `viewPaths.auth` object contains the built-in auth paths: `redirect`, `sign-
 
 If you installed the settings registry entry, create a dynamic settings route for the URL segment.
 
-Validate the segment against `viewPaths.settings`. Return a 404 response for an unknown path.
+<include>../../../shared/ui/integrations/tanstack-start.mdx#shared-create-the-settings-page</include>
 
-```npm
-npx shadcn@latest add https://better-auth-ui.com/r/solid/settings.json
-```
+<include>../../../shared/ui/installation/zaidan.mdx#shared-settings</include>
 
 ```tsx title="routes/settings/$path.tsx" file=<rootDir>/../../examples/start-solid-zaidan-example/src/routes/settings/$path.tsx
 ```
@@ -77,9 +73,7 @@ The `viewPaths.settings` object contains the base segments `account` and `securi
 
 If the application shell needs a signed-in user menu, install the composed user button registry entry.
 
-```npm
-npx shadcn@latest add https://better-auth-ui.com/r/solid/user-button.json
-```
+<include>../../../shared/ui/installation/zaidan.mdx#shared-user-button</include>
 
 The example application renders the button in the header. The copied Solid component supports SSR.
 
@@ -88,17 +82,7 @@ It renders a lightweight shell first. Then it creates session queries after the 
 </Step>
 </Steps>
 
-## Protecting Routes
-
-Better Auth UI provides separate protection patterns for server-rendered and prerendered routes.
-
-### Server-rendered routes (`beforeLoad`)
-
-For an SSR route, read the session in `beforeLoad`. This redirects unauthenticated users before a component renders.
-
-Use `createIsomorphicFn` to call `ensureSessionServer` on the server and `ensureSession` in the browser. The server helper calls `auth.api` directly.
-
-Both helpers use `authQueryKeys.session` in the same TanStack Query cache. Child `useSession` calls can reuse the hydrated session.
+<include>../../../shared/ui/integrations/tanstack-start.mdx#shared-protecting-routes</include>
 
 ```tsx title="routes/dashboard.tsx"
 import { ensureSession } from "@better-auth-ui/core"
@@ -147,24 +131,11 @@ function Dashboard() {
 }
 ```
 
-Child routes and components can read the returned `{ session }` through `Route.useRouteContext()`.
+<include>../../../shared/ui/integrations/tanstack-start.mdx#shared-route-session-context</include>
 
 `ensureSessionServer` also adds the session to the query cache during SSR. Downstream `useSession` calls can reuse the hydrated session.
 
-### Reactive protection and prerendered routes (`useAuthenticate`)
-
-`beforeLoad` only runs when the route loads. It does not detect session changes while the page remains mounted.
-
-These changes include token expiration, sign-out in another tab, and server-side session revocation. Prerendered and client-rendered routes also have no server check.
-
-The `useAuthenticate` hook covers both cases. It subscribes to `useSession` and redirects the user when the session ends.
-
-The hook preserves the current URL in the `redirectTo` query parameter.
-
-Use it in two situations:
-
-1. **Alongside `beforeLoad`** for server-rendered routes, as a second layer that keeps the UI in sync after the initial load.
-2. **On its own** for prerendered or client-rendered routes that have no server-side session access.
+<include>../../../shared/ui/integrations/tanstack-start.mdx#shared-reactive-protection-and-prerendered-routes-use-authenticate</include>
 
 ```tsx title="routes/dashboard.tsx"
 import { useAuthenticate } from "@better-auth-ui/solid"
@@ -202,7 +173,7 @@ function Dashboard() {
 }
 ```
 
-`beforeLoad` protects the initial render and hydrates the session. Then `useAuthenticate` reacts to later session changes.
+<include>../../../shared/ui/integrations/tanstack-start.mdx#shared-session-changes</include>
 
 ## Example Project
 

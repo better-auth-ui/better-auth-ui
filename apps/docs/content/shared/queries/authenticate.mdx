@@ -1,0 +1,31 @@
+<section id="shared-usage">
+
+The redirect uses `basePaths.auth` + `viewPaths.auth.signIn` from `AuthProvider`: override those to target a custom sign-in view.
+
+</section>
+
+<section id="shared-gate-on-is-pending-simplest">
+
+You have two ways to handle this:
+
+### Gate on `isPending` (simplest)
+
+Render a skeleton or spinner while the session query is pending, and `null` once it resolves to unauthenticated (the redirect is already in flight). This is what the [Usage](#usage) example does and is enough for most apps:
+
+</section>
+
+<section id="shared-pair-with-a-server-side-guard-no-loading-state">
+
+No flash of protected content, no server work required: just a brief loading state on first mount. Works identically for SSR, client-rendered, and statically prerendered routes.
+
+### Pair with a server-side guard (no loading state)
+
+To render the protected interface immediately without a skeleton, prefetch the session on the server. Then hydrate it into the query cache:
+
+</section>
+
+<section id="shared-session-changes">
+
+The server-side check protects the first render. `useAuthenticate` redirects after token expiration, remote sign-out, or server-side session revocation.
+
+</section>

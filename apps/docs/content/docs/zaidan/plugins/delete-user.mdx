@@ -80,11 +80,7 @@ When the plugin is registered, the copied `<SecuritySettings />` surface renders
 
 `<DangerZone />` is the primary security card wrapper. It renders the localized danger-zone heading and composes `<DeleteAccount />` below it.
 
-```tsx
-import { DangerZone } from "@/components/auth/delete-user/danger-zone"
-
-<DangerZone />
-```
+<include>../../../shared/ui/plugins/delete-user.mdx#shared-danger-zone-registry-example</include>
 
 <type-table path="../../../../../../examples/start-solid-zaidan-example/src/components/auth/delete-user/danger-zone.tsx" name="DangerZoneProps" />
 
@@ -92,13 +88,9 @@ import { DangerZone } from "@/components/auth/delete-user/danger-zone"
 
 `<DeleteAccount />` is the lower-level delete account card used inside `<DangerZone />`. You can also import it directly for custom settings layouts.
 
-When credential confirmation is required, the password starts masked and includes a localized show/hide control.
+<include>../../../shared/ui/plugins/delete-user.mdx#shared-password-visibility</include>
 
-```tsx
-import { DeleteAccount } from "@/components/auth/delete-user/delete-account"
-
-<DeleteAccount />
-```
+<include>../../../shared/ui/plugins/delete-user.mdx#shared-delete-account-registry-example</include>
 
 <type-table path="../../../../../../examples/start-solid-zaidan-example/src/components/auth/delete-user/delete-account.tsx" name="DeleteAccountProps" />
 

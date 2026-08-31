@@ -3,9 +3,9 @@ title: verifyBackupCodeOptions
 description: Recover with a backup code.
 ---
 
-Requires the Better Auth two-factor plugin. If TypeScript cannot infer the plugin methods from your client, type or cast `authClient` as `TwoFactorAuthClient` from `@better-auth-ui/core/plugins/two-factor`.
+<include>../../../shared/mutations/plugin-requirements.mdx#shared-two-factor</include>
 
-Each code works once: the server consumes it on success. Refetches the session.
+<include>../../../shared/mutations/verify-backup-code.mdx#shared-overview</include>
 
 ## Options factory
 

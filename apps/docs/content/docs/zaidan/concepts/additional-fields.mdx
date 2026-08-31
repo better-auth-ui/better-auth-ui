@@ -7,9 +7,7 @@ description: Render custom user fields in copied Zaidan auth and profile forms.
 
 Zaidan copies the Solid `<AdditionalField />` renderer into your app, so the happy path matches the shadcn API while the UI remains app-owned and customizable.
 
-<Callout type="info">
-  Define the same fields in your Better Auth server config under `user.additionalFields`. The UI's `additionalFields` only controls rendering and form submission: the server still owns persistence and validation.
-</Callout>
+<include>../../../shared/ui/concepts/additional-fields.mdx#shared-server-fields</include>
 
 ## Usage
 
@@ -21,36 +19,9 @@ npx shadcn@latest add https://better-auth-ui.com/r/solid/auth.json https://bette
 
 Pass an array of field configurations to the copied `<AuthProvider>` shell:
 
-```tsx
-import { AuthProvider } from "@/components/auth/auth-provider"
+<include>../../../shared/ui/concepts/additional-fields.mdx#shared-registry-provider-example</include>
 
-<AuthProvider
-  authClient={authClient}
-  navigate={navigate}
-  additionalFields={[
-    {
-      name: "bio",
-      type: "string",
-      label: "Bio",
-      inputType: "textarea",
-      placeholder: "Tell us a bit about yourself"
-    },
-    {
-      name: "birthday",
-      type: "date",
-      label: "Birthday",
-      signUp: true,
-      required: true
-    }
-  ]}
->
-  {children}
-</AuthProvider>
-```
-
-Fields default to rendering on the user profile only. Set `signUp: true` to also render the field on the sign-up form.
-
-Additional sign-up fields without `required: true` include an ` (optional)` suffix in their label. Override the complete suffix with `localization.auth.optional`, or set it to an empty string to remove the indicator.
+<include>../../../shared/ui/concepts/additional-fields.mdx#shared-field-visibility</include>
 
 ## Install model
 
@@ -67,16 +38,7 @@ The registry entry copies:
 
 After install, adapt validation messages, Solid `class` styling, and field layouts in your app-owned copy.
 
-## Field types
-
-The `type` controls the data type of the field. The default `inputType` is inferred from `type`, but you can override it for a different look.
-
-| `type`      | Default `inputType` | Submitted as              |
-| ----------- | ------------------- | ------------------------- |
-| `"string"`  | `"input"`           | `string`                  |
-| `"number"`  | `"number"`          | `number`                  |
-| `"boolean"` | `"switch"`          | `boolean`                 |
-| `"date"`    | `"date"`            | `Date`                    |
+<include>../../../shared/ui/concepts/additional-fields.mdx#shared-field-types</include>
 
 ## Input types
 
@@ -102,70 +64,23 @@ Override the visual rendering with `inputType`. The current Zaidan renderer favo
 
 `number` fields can declare `Intl.NumberFormatOptions` via `formatOptions`, matching the shared field config. The current Zaidan renderer keeps the control native, so use `formatOptions` as metadata or customize the copied renderer if you need formatted display text.
 
-```ts
-{
-  name: "hourlyRate",
-  type: "number",
-  label: "Hourly rate",
-  formatOptions: { style: "currency", currency: "USD" }
-}
-
-{
-  name: "commissionRate",
-  type: "number",
-  label: "Commission rate",
-  formatOptions: { style: "percent", maximumFractionDigits: 2 }
-}
-```
+<include>../../../shared/ui/concepts/additional-fields.mdx#shared-currency-and-percent-example</include>
 
 Use `min`, `max`, and `step` to bound the native value:
 
-```ts
-{
-  name: "yearsExperience",
-  type: "number",
-  label: "Years of experience",
-  min: 0,
-  max: 50,
-  step: 1
-}
-```
+<include>../../../shared/ui/concepts/additional-fields.mdx#shared-number-range-example</include>
 
 ### Slider
 
 The shared config supports `inputType: "slider"`, but the current Zaidan registry entry does not ship a Solid slider primitive. The copied renderer falls back to a native number control for number fields. Replace that branch in `src/components/auth/additional-field.tsx` when your app has a Solid slider component.
 
-```ts
-{
-  name: "budget",
-  type: "number",
-  label: "Budget",
-  inputType: "slider",
-  min: 0,
-  max: 5000,
-  step: 50,
-  defaultValue: 1000,
-  formatOptions: { style: "currency", currency: "USD" }
-}
-```
+<include>../../../shared/ui/concepts/additional-fields.mdx#shared-slider-example</include>
 
 ### Select / Combobox
 
 Both accept an `options` array of `{ label, value }` objects. Zaidan currently renders both as a native `<select>` so the copied registry entry stays dependency-light.
 
-```ts
-{
-  name: "country",
-  type: "string",
-  label: "Country",
-  inputType: "select",
-  options: [
-    { label: "United States", value: "us" },
-    { label: "Canada", value: "ca" },
-    { label: "United Kingdom", value: "gb" }
-  ]
-}
-```
+<include>../../../shared/ui/concepts/additional-fields.mdx#shared-select-example</include>
 
 Use `inputType: "combobox"` for the same data shape when you plan to replace the native select with your own searchable Solid control.
 
@@ -173,48 +88,11 @@ Use `inputType: "combobox"` for the same data shape when you plan to replace the
 
 String and number inputs render inline prefix and suffix text when `prefix` or `suffix` is set:
 
-```ts
-{
-  name: "website",
-  type: "string",
-  label: "Website",
-  prefix: "https://",
-  suffix: ".com"
-}
-```
+<include>../../../shared/ui/concepts/additional-fields.mdx#shared-prefix-suffix-example</include>
 
 The current Zaidan renderer uses simple text wrappers next to the input. If your app needs grouped styling, customize the copied renderer with your preferred input-group primitive.
 
-### Copy button
-
-Set `copyable: true` to add a copy button to the input. The button copies the current value, including an edited value.
-
-Use this option with `readOnly: true` for fields such as `id`:
-
-```ts
-{
-  name: "id",
-  type: "string",
-  label: "User ID",
-  readOnly: true,
-  copyable: true
-}
-```
-
-### Hidden value
-
-`inputType: "hidden"` submits a value without rendering anything visible. Combine with `defaultValue` to attach a server-side preset:
-
-```ts
-{
-  name: "referralSource",
-  type: "string",
-  label: "Referral source",
-  inputType: "hidden",
-  defaultValue: "demo-app",
-  signUp: true
-}
-```
+<include>../../../shared/ui/concepts/additional-fields.mdx#shared-copy-button</include>
 
 ### Custom rendering
 
@@ -237,36 +115,7 @@ Use `render` when the native Zaidan renderer is not enough. The function receive
 }
 ```
 
-### Custom validation
-
-Provide a `validate` callback to check a value before submission. If validation fails, throw an `Error`.
-
-The interface shows the error message in a toast:
-
-```ts
-{
-  name: "nickname",
-  type: "string",
-  label: "Nickname",
-  signUp: true,
-  required: true,
-  validate: (value) => {
-    if (typeof value === "string" && !/^[a-zA-Z0-9_]+$/.test(value)) {
-      throw new Error(
-        "Nickname must only contain letters, numbers, and underscores"
-      )
-    }
-  }
-}
-```
-
-## Where fields render
-
-| Flag             | Default | Effect                                              |
-| ---------------- | ------- | --------------------------------------------------- |
-| `signUp: true`   | `false` | Render on the sign-up form                          |
-| `profile: false` | `true`  | Hide on the user profile                            |
-| `readOnly: true` | `false` | Render but exclude the value from submission        |
+<include>../../../shared/ui/concepts/additional-fields.mdx#shared-custom-validation</include>
 
 ## Type reference
 

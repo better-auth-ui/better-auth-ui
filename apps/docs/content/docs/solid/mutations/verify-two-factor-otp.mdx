@@ -3,7 +3,7 @@ title: verifyTwoFactorOtpOptions
 description: Verify the emailed second-factor code.
 ---
 
-Requires the Better Auth two-factor plugin. If TypeScript cannot infer the plugin methods from your client, type or cast `authClient` as `TwoFactorAuthClient` from `@better-auth-ui/core/plugins/two-factor`.
+<include>../../../shared/mutations/plugin-requirements.mdx#shared-two-factor</include>
 
 Send the code with `sendTwoFactorOtpOptions` first. Refetches the session on success.
 

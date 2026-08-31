@@ -1,0 +1,91 @@
+<section id="shared-configure-better-auth">
+
+```ts title="lib/auth.ts"
+import { betterAuth } from "better-auth"
+import { siwe } from "better-auth/plugins"
+import { verifyMessage } from "viem"
+import { generateSiweNonce } from "viem/siwe"
+
+export const auth = betterAuth({
+  plugins: [
+    siwe({
+      domain: "app.example.com",
+      getNonce: async () => generateSiweNonce(),
+      verifyMessage: async ({ message, signature, address }) =>
+        verifyMessage({
+          address: address as `0x${string}`,
+          message,
+          signature: signature as `0x${string}`
+        })
+    })
+  ]
+})
+```
+
+</section>
+
+<section id="shared-add-the-client-plugin">
+
+<Step>
+### Add the client plugin
+
+```ts title="lib/auth-client.ts"
+import { createAuthClient } from "better-auth/react"
+import { siweClient } from "better-auth/client/plugins"
+
+export const authClient = createAuthClient({ plugins: [siweClient()] })
+```
+
+</Step>
+
+</section>
+
+<section id="shared-wallet-settings">
+
+```ts title="lib/wallet-manager.ts"
+import type {
+  SiweWalletAccount,
+  SiweWalletLinkChallenge,
+  SiweWalletManager
+} from "@better-auth-ui/core/plugins/siwe"
+
+const assertOk = async (response: Response) => {
+  if (!response.ok) {
+    throw new Error(`Wallet request failed with status ${response.status}.`)
+  }
+}
+
+const get = async <TResponse>(
+  url: string,
+  signal?: AbortSignal
+): Promise<TResponse> => {
+  const response = await fetch(url, { signal })
+  await assertOk(response)
+  return response.json() as Promise<TResponse>
+}
+
+const post = async <TResponse = void>(
+  url: string,
+  body: unknown
+): Promise<TResponse> => {
+  const response = await fetch(url, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body)
+  })
+  await assertOk(response)
+  if (response.status === 204) return undefined as TResponse
+  return response.json() as Promise<TResponse>
+}
+
+export const walletManager: SiweWalletManager = {
+  list: (signal) => get<SiweWalletAccount[]>("/api/wallets", signal),
+  createLinkChallenge: (wallet) =>
+    post<SiweWalletLinkChallenge>("/api/wallets/link-challenge", wallet),
+  link: (proof) => post("/api/wallets/link", proof),
+  unlink: (walletId) => fetch(`/api/wallets/${walletId}`, { method: "DELETE" }).then(assertOk),
+  setPrimary: (walletId) => fetch(`/api/wallets/${walletId}/primary`, { method: "POST" }).then(assertOk)
+}
+```
+
+</section>

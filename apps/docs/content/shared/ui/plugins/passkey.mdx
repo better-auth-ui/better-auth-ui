@@ -1,0 +1,187 @@
+<section id="shared-overview">
+
+The passkey plugin adds passwordless authentication using WebAuthn. Users can sign in with their device authenticator (Touch ID, Face ID, Windows Hello) and manage registered passkeys from their security settings.
+
+It contributes:
+
+</section>
+
+<section id="shared-react-features">
+
+- A "Continue with Passkey" button rendered on the sign-in and magic-link views (hidden on sign-up)
+- A `<Passkeys />` security card for listing, adding, renaming, and deleting registered passkeys
+- `useSignInPasskey`, `useAddPasskey`, `useUpdatePasskey`, `useDeletePasskey`, and `useListPasskeys` hooks
+
+</section>
+
+<section id="shared-install-the-better-auth-plugin">
+
+### Install the Better Auth plugin
+
+Install the [`@better-auth/passkey`](https://www.better-auth.com/docs/plugins/passkey) package and add it to your Better Auth server config:
+
+</section>
+
+<section id="shared-server-example">
+
+```ts title="lib/auth.ts"
+import { betterAuth } from "better-auth"
+import { passkey } from "@better-auth/passkey" // [!code highlight]
+
+export const auth = betterAuth({
+  // ...
+  plugins: [
+    passkey() // [!code highlight]
+  ]
+})
+```
+
+</section>
+
+<section id="shared-install-the-matching-client-plugin">
+
+### Install the matching client plugin
+
+Add `passkeyClient()` to your auth client so `authClient.signIn.passkey` and `authClient.passkey.*` are available:
+
+</section>
+
+<section id="shared-react-client-example">
+
+```ts title="lib/auth-client.ts"
+import { createAuthClient } from "better-auth/react"
+import { passkeyClient } from "@better-auth/passkey/client" // [!code highlight]
+
+export const authClient = createAuthClient({
+  plugins: [passkeyClient()] // [!code highlight]
+})
+```
+
+</section>
+
+<section id="shared-sign-in">
+
+A "Continue with Passkey" button is automatically rendered on the `<SignIn />` and `<MagicLink />` views when the plugin is registered (hidden on sign-up).
+
+**Usage**
+
+</section>
+
+<section id="shared-passkey-registration-policy">
+
+## Passkey registration policy
+
+By default, the add-passkey dialog does not set `authenticatorAttachment`.
+The browser and operating system show the available passkey options.
+
+Set a preference in the plugin when all registrations must use one authenticator type:
+
+```ts
+passkeyPlugin({ authenticatorAttachment: "platform" })
+passkeyPlugin({ authenticatorAttachment: "cross-platform" })
+```
+
+`"platform"` prefers the current device. `"cross-platform"` prefers a security key or another device. The dialog does not show an attachment selector.
+
+`useAddPasskey` accepts every parameter exposed by `authClient.passkey.addPasskey`. Use this hook for custom registration flows:
+
+</section>
+
+<section id="shared-react-registration-example">
+
+```tsx
+const { mutate: addPasskey } = useAddPasskey(
+  authClient as PasskeyAuthClient
+)
+
+addPasskey({
+  name: "Work laptop",
+  authenticatorAttachment: "platform",
+  extensions: { credProps: true },
+  returnWebAuthnResponse: true
+})
+```
+
+</section>
+
+<section id="shared-passkey-autofill">
+
+<Callout>
+`residentKey` and `userVerification` are server plugin policies. They are not
+parameters of `authClient.passkey.addPasskey`, so the client UI does not expose
+them.
+</Callout>
+
+## Passkey autofill
+
+With the plugin registered, the sign-in form asks the browser to offer saved
+passkeys straight from its autofill dropdown, so most people never press the
+passkey button at all. This is the WebAuthn conditional UI flow.
+
+Two pieces make it work, and the built-in components already handle both:
+
+- The identifier and password fields carry `webauthn` as the last token of
+  their `autocomplete` attribute, added by `withPasskeyAutoFill`.
+- `<PasskeyButton />` calls `usePasskeyAutoFill`, which opens a conditionally
+  mediated request once the browser reports that it supports one.
+
+Browsers without conditional mediation ignore the extra token and never get the
+request, so the button stays as the fallback everywhere.
+
+Turn the whole thing off with:
+
+```ts
+passkeyPlugin({ autoFill: false })
+```
+
+If you write your own sign-in form, add the token and start the conditional
+request:
+
+</section>
+
+<section id="shared-react-autofill-example">
+
+```tsx
+import type { PasskeyAuthClient } from "@better-auth-ui/core/plugins/passkey"
+import {
+  isPasskeyAutoFillEnabled,
+  withPasskeyAutoFill
+} from "@better-auth-ui/core/plugins/passkey"
+import { usePasskeyAutoFill } from "@better-auth-ui/react/plugins/passkey"
+
+const { authClient, plugins } = useAuth()
+const passkeyAutoFill = isPasskeyAutoFillEnabled(plugins)
+
+usePasskeyAutoFill(authClient as PasskeyAuthClient)
+
+<Input autoComplete={withPasskeyAutoFill("email", passkeyAutoFill)} />
+```
+
+</section>
+
+<section id="shared-options">
+
+<Callout type="warn">
+`navigator.credentials.get()` accepts an `AbortSignal`. The bundled hook calls
+the Better Auth passkey client, which does not expose that signal. Unmounting
+the form only stops a pending availability probe. It does not cancel a request
+that already started.
+
+If your custom implementation calls `navigator.credentials.get()` directly,
+pass an `AbortSignal` and abort it during cleanup.
+</Callout>
+
+## Options
+
+```ts
+passkeyPlugin({
+  // Omit this option to let the browser show all available choices.
+  authenticatorAttachment: "platform",
+  // Override any of the plugin's localization strings.
+  localization: {
+    passkeys: "Security Keys"
+  }
+})
+```
+
+</section>

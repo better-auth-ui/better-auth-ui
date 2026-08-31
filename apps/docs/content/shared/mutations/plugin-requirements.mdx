@@ -1,0 +1,35 @@
+<section id="shared-organization-react">
+
+Organization mutations require `organizationClient()` on the Better Auth client.
+
+</section>
+
+<section id="shared-organization-solid">
+
+Organization mutations require `organizationClient()` on the Better Auth client. They attach the same `meta.invalidates` / `meta.awaits` cache metadata used by the shared React implementation, and the Solid `AuthProvider` installs a mutation invalidator that refreshes affected organization/session caches after successful auth mutations.
+
+</section>
+
+<section id="shared-two-factor">
+
+Requires the Better Auth two-factor plugin. If TypeScript cannot infer the plugin methods from your client, type or cast `authClient` as `TwoFactorAuthClient` from `@better-auth-ui/core/plugins/two-factor`.
+
+</section>
+
+<section id="shared-email-otp">
+
+Requires the Better Auth email-OTP plugin. If TypeScript cannot infer the plugin methods from your client, type or cast `authClient` as `EmailOtpAuthClient` from `@better-auth-ui/core/plugins/email-otp`.
+
+</section>
+
+<section id="shared-api-key">
+
+Requires the Better Auth API key plugin.
+
+</section>
+
+<section id="shared-passkey">
+
+Requires the Better Auth passkey plugin.
+
+</section>

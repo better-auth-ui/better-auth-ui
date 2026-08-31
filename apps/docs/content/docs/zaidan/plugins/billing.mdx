@@ -27,7 +27,7 @@ The UI covers:
 
 Configure one of Better Auth's supported billing plugins on the server and client. Apply its schema before you open the billing page.
 
-See the provider guides for [Stripe](https://www.better-auth.com/docs/beta/plugins/stripe), [Polar](https://www.better-auth.com/docs/plugins/polar), [Autumn](https://www.better-auth.com/docs/plugins/autumn), [Creem](https://www.better-auth.com/docs/plugins/creem), [Dodo Payments](https://docs.dodopayments.com/developer-resources/better-auth-adaptor), and [Commet](https://www.better-auth.com/docs/plugins/commet).
+<include>../../../shared/ui/plugins/billing.mdx#shared-provider-guides</include>
 
 </Step>
 <Step>
@@ -78,20 +78,11 @@ export function Providers(props: { children?: JSX.Element }) {
 
 ## Bundled adapters
 
-| Adapter | Checkout and state | Direct actions | Scope |
-| --- | --- | --- | --- |
-| Stripe | Better Auth subscription API | Cancel, restore, seats | User and explicit organization |
-| Polar | Checkout, subscriptions, usage | Portal fallback | User and explicit organization |
-| Autumn | Attach, customer subscriptions, balances | Cancel, restore, optional license seats | User |
-| Creem | Checkout and active subscription | Cancel | User |
-| Dodo Payments | Checkout session and subscription list | Portal fallback | User |
-| Commet | Portal and current subscription | Cancel, optional feature usage and seats | User |
+<include>../../../shared/ui/plugins/billing.mdx#shared-other-bundled-adapters</include>
 
 The factories are `createStripeBillingAdapter`, `createPolarBillingAdapter`, `createAutumnBillingAdapter`, `createCreemBillingAdapter`, `createDodoPaymentsBillingAdapter`, and `createCommetBillingAdapter`. They use the same `BillingPlan` list and work with both React and Solid billing hooks.
 
-<Callout type="warn" title="User-only provider clients">
-Autumn, Creem, Dodo Payments, and Commet resolve the signed-in customer. Their browser APIs do not accept an explicit organization ID. Their adapters declare `scopes.organization: false`. `billingPlugin` rejects an organization billing configuration instead of reading active organization state.
-</Callout>
+<include>../../../shared/ui/plugins/billing.mdx#shared-user-only-adapters</include>
 
 <Callout type="info">
   The adapter's `supports` flags decide which controls render. A provider that cannot restore a canceled subscription does not show the restore button.

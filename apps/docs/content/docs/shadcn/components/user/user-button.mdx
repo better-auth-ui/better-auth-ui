@@ -17,16 +17,14 @@ description: Renders a user button with dropdown menu showing user info and sign
 ```tsx file=<rootDir>/src/demos/shadcn/user/user-button-icon.tsx
 ```
 
-## Custom links
-
-Use the `links` prop to add entries above the built-in items. Each entry is either a `{ label, href, icon?, variant?, visibility? }` descriptor or a fully rendered React element. `visibility` defaults to `"always"` and accepts `"authenticated" | "unauthenticated" | "always"`. Pass `hideSettings` to remove the built-in Settings link.
+<include>../../../../shared/ui/components/user-button.mdx#shared-custom-links</include>
 
 <ComponentPreview name="shadcn-user-button-links" />
 
 ```tsx file=<rootDir>/src/demos/shadcn/user/user-button-links.tsx
 ```
 
-For interactive items shared across the app (for example a theme toggle or account switcher), prefer a plugin's `userMenuItems` slot over `links`.
+<include>../../../../shared/ui/components/user-button.mdx#shared-plugin-menu-items</include>
 
 ## Installation
 

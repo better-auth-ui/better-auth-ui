@@ -29,15 +29,7 @@ await prefetchListAccounts(queryClient, authClient, userId)
 const accounts = await fetchListAccounts(queryClient, authClient, userId)
 ```
 
-## Invalidation
-
-```ts
-import { listAccountsOptions } from "@better-auth-ui/core"
-
-queryClient.invalidateQueries({
-  queryKey: listAccountsOptions(authClient, userId).queryKey
-})
-```
+<include>../../../shared/queries/list-accounts.mdx#shared-invalidation</include>
 
 ## Params
 

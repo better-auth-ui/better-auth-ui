@@ -6,44 +6,22 @@ description: Add static user management, session details, and impersonation to a
 
 import { Step, Steps } from "fumadocs-ui/components/steps"
 
-The Admin plugin adds a static `/admin/users` page and a user-detail drawer.
-It also adds a "Stop impersonating" action to `<UserButton />`.
+<include>../../../shared/ui/plugins/admin.mdx#shared-overview</include>
 
 ## Setup
 
 <Steps>
 <Step>
-### Enable the Better Auth admin plugin
 
-Add `admin()` to the server configuration:
+<include>../../../shared/ui/plugins/admin.mdx#shared-enable-the-better-auth-admin-plugin</include>
 
-```ts title="lib/auth.ts"
-import { betterAuth } from "better-auth"
-import { admin } from "better-auth/plugins" // [!code highlight]
-
-export const auth = betterAuth({
-  // ...
-  plugins: [
-    admin() // [!code highlight]
-  ]
-})
-```
-
-Update your database schema after enabling the plugin. Better Auth adds admin
-fields to users and an `impersonatedBy` field to sessions.
+<include>../../../shared/ui/plugins/admin.mdx#shared-schema</include>
 
 </Step>
 <Step>
 ### Add the matching client plugin
 
-```ts title="lib/auth-client.ts"
-import { createAuthClient } from "better-auth/react"
-import { adminClient } from "better-auth/client/plugins" // [!code highlight]
-
-export const authClient = createAuthClient({
-  plugins: [adminClient()] // [!code highlight]
-})
-```
+<include>../../../shared/ui/plugins/admin.mdx#shared-add-the-matching-client-plugin</include>
 
 </Step>
 <Step>
@@ -89,13 +67,9 @@ Applications can control the drawer through `<AdminUsers />`:
 />
 ```
 
-## Inspector tabs
+<include>../../../shared/ui/plugins/admin.mdx#shared-inspector-tabs</include>
 
-The user inspector includes local Overview and Sessions tabs. Registered
-plugins can add more tabs without adding routes.
-
-The Dash integration adds an Activity tab when both UI plugins are registered.
-Dash applies its own organization owner or admin access rules to this tab.
+<include>../../../shared/ui/plugins/admin.mdx#shared-dash-activity</include>
 
 ## User actions
 
@@ -103,14 +77,7 @@ The users page can create users. The drawer can update a user's name and role,
 set a password, ban or unban the user, impersonate the user, delete the user,
 and revoke one or all of the user's sessions.
 
-The UI checks the matching Admin client permission before it enables each
-action. Dangerous actions require confirmation. The UI also disables actions
-that would ban, delete, impersonate, or revoke sessions for the current user.
-
-## Permissions and privacy
-
-The users page calls the Better Auth permission API before it requests the
-user list. Do not authorize the page from a role string alone.
+<include>../../../shared/ui/plugins/admin.mdx#shared-permissions-and-privacy</include>
 
 The table searches one field per request. The supported fields are `email`
 and `name`.
@@ -121,33 +88,15 @@ addresses are hidden unless `showIpAddress` is `true`.
 
 Configure custom roles with the same names in Better Auth and the UI plugin:
 
-```ts
-adminPlugin({
-  allowMultipleRoles: false,
-  defaultRole: "member",
-  impersonationRedirectTo: "/",
-  pageSize: 25,
-  roles: ["member", "support", "admin"],
-  showIpAddress: false
-})
-```
+<include>../../../shared/ui/plugins/admin.mdx#shared-permissions-example</include>
 
-Set `allowMultipleRoles` to `false` to make the create and edit forms accept
-one role. This option does not change `adminRoles`, which controls administrator
-access.
+<include>../../../shared/ui/plugins/admin.mdx#shared-single-role</include>
 
-The public Admin client does not provide account disconnection, global
-organization administration, or a Sentinel dashboard. These views are not
-part of this integration.
+<include>../../../shared/ui/plugins/admin.mdx#shared-client-limitations</include>
 
-## User button behavior
+<include>../../../shared/ui/plugins/admin.mdx#shared-user-button-behavior</include>
 
-`adminPlugin()` contributes `<StopImpersonating />` through the
-`userMenuItems` slot. `<UserButton />` places it above sign out.
-
-The action renders only when `session.session.impersonatedBy` is present.
-Selecting it calls `authClient.admin.stopImpersonating()` and refreshes the
-cached session before the pending state completes.
+<include>../../../shared/ui/plugins/admin.mdx#shared-stop-impersonating-behavior</include>
 
 ```tsx
 import { StopImpersonating } from "@better-auth-ui/heroui/plugins"
@@ -157,15 +106,7 @@ import { StopImpersonating } from "@better-auth-ui/heroui/plugins"
 
 <type-table path="../../../../../../packages/heroui/src/components/auth/admin/stop-impersonating.tsx" name="StopImpersonatingProps" />
 
-## Options
-
-```ts
-adminPlugin({
-  localization: {
-    stopImpersonating: "Return to admin"
-  }
-})
-```
+<include>../../../shared/ui/plugins/admin.mdx#shared-options</include>
 
 <type-table path="../../../../../../packages/core/src/plugins/admin/admin-plugin.ts" name="AdminPluginOptions" />
 
@@ -173,13 +114,4 @@ adminPlugin({
 
 <type-table path="../../../../../../packages/core/src/plugins/admin/admin-localization.ts" name="AdminLocalization" />
 
-## Mutation API
-
-```tsx
-import { useStopImpersonating } from "@better-auth-ui/react/plugins/admin"
-
-const stopImpersonating = useStopImpersonating(authClient)
-```
-
-Use the hook when you need the same behavior outside the user button. It
-restores the admin session and awaits invalidation of the shared session query.
+<include>../../../shared/ui/plugins/admin.mdx#shared-mutation-api</include>

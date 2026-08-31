@@ -1,16 +1,17 @@
-import { existsSync, readFileSync } from "node:fs"
+import { existsSync } from "node:fs"
 import { join } from "node:path"
 import { describe, expect, it } from "vitest"
 
+import { readDocsFile } from "./read-docs-file"
+
 const docsRoot = join(import.meta.dirname, "../content/docs")
 
-function readDocsFile(...segments: string[]) {
-  return readFileSync(join(docsRoot, ...segments), "utf8")
-}
-
-function readMeta(framework: "react" | "solid", area: "queries" | "mutations") {
+async function readMeta(
+  framework: "react" | "solid",
+  area: "queries" | "mutations"
+) {
   try {
-    return JSON.parse(readDocsFile(framework, area, "meta.json")) as {
+    return JSON.parse(await readDocsFile(framework, area, "meta.json")) as {
       pages: string[]
     }
   } catch (error) {
@@ -151,9 +152,9 @@ const organizationMutationPagesSolid = [
 ]
 
 describe("React/Solid docs parity", () => {
-  it("keeps react and solid query docs aligned with documented runtime families", () => {
-    const reactQueriesMeta = readMeta("react", "queries")
-    const solidQueriesMeta = readMeta("solid", "queries")
+  it("keeps react and solid query docs aligned with documented runtime families", async () => {
+    const reactQueriesMeta = await readMeta("react", "queries")
+    const solidQueriesMeta = await readMeta("solid", "queries")
 
     const expectedReact = [
       ...sharedQueryPages,
@@ -179,9 +180,9 @@ describe("React/Solid docs parity", () => {
     expectPagesExist("solid", "queries", expectedSolid)
   })
 
-  it("keeps react and solid mutation docs aligned with documented runtime families", () => {
-    const reactMutationsMeta = readMeta("react", "mutations")
-    const solidMutationsMeta = readMeta("solid", "mutations")
+  it("keeps react and solid mutation docs aligned with documented runtime families", async () => {
+    const reactMutationsMeta = await readMeta("react", "mutations")
+    const solidMutationsMeta = await readMeta("solid", "mutations")
 
     const expectedReact = [
       ...sharedMutationPages,
@@ -207,8 +208,8 @@ describe("React/Solid docs parity", () => {
     expectPagesExist("solid", "mutations", expectedSolid)
   })
 
-  it("keeps Solid auth mutation docs ordered and documents options factories", () => {
-    const solidMutationsMeta = readMeta("solid", "mutations")
+  it("keeps Solid auth mutation docs ordered and documents options factories", async () => {
+    const solidMutationsMeta = await readMeta("solid", "mutations")
     const authStart = solidMutationsMeta.pages.indexOf("---Auth---") + 1
     const authEnd = solidMutationsMeta.pages.indexOf("---Settings---")
 
@@ -217,24 +218,28 @@ describe("React/Solid docs parity", () => {
     )
 
     for (const page of sharedAuthMutationPages) {
-      const content = readDocsFile("solid", "mutations", `${page}.mdx`)
+      const content = await readDocsFile("solid", "mutations", `${page}.mdx`)
 
       expect(content).toContain("## Options factory")
     }
   })
 
-  it("removes stale solid-only wording that contradicts runtime parity", () => {
-    const solidListApiKeys = readDocsFile(
+  it("removes stale solid-only wording that contradicts runtime parity", async () => {
+    const solidListApiKeys = await readDocsFile(
       "solid",
       "queries",
       "list-api-keys.mdx"
     )
-    const solidCreateApiKey = readDocsFile(
+    const solidCreateApiKey = await readDocsFile(
       "solid",
       "mutations",
       "create-api-key.mdx"
     )
-    const solidMutationsIndex = readDocsFile("solid", "mutations", "index.mdx")
+    const solidMutationsIndex = await readDocsFile(
+      "solid",
+      "mutations",
+      "index.mdx"
+    )
 
     expect(solidListApiKeys).not.toContain("no React docs counterpart")
     expect(solidListApiKeys).not.toContain("intentionally has no React")
@@ -246,7 +251,7 @@ describe("React/Solid docs parity", () => {
     )
   })
 
-  it("keeps Solid settings query docs aligned with React invalidation guidance", () => {
+  it("keeps Solid settings query docs aligned with React invalidation guidance", async () => {
     const solidSettingsQueries = [
       ["list-accounts", "listAccountsOptions", "@better-auth-ui/core"],
       ["account-info", "accountInfoOptions", "@better-auth-ui/core"],
@@ -269,7 +274,7 @@ describe("React/Solid docs parity", () => {
     ] as const
 
     for (const [page, factory, packageName] of solidSettingsQueries) {
-      const content = readDocsFile("solid", "queries", `${page}.mdx`)
+      const content = await readDocsFile("solid", "queries", `${page}.mdx`)
 
       expect(content).toContain("## Invalidation")
       expect(content).toContain(`import { ${factory} } from "${packageName}"`)
@@ -277,7 +282,7 @@ describe("React/Solid docs parity", () => {
     }
   })
 
-  it("documents Solid organization query prefetch helpers", () => {
+  it("documents Solid organization query prefetch helpers", async () => {
     const solidOrganizationQueries = [
       ["active-organization", "ensureActiveOrganization"],
       ["full-organization", "ensureFullOrganization"],
@@ -289,7 +294,7 @@ describe("React/Solid docs parity", () => {
     ] as const
 
     for (const [page, helper] of solidOrganizationQueries) {
-      const content = readDocsFile("solid", "queries", `${page}.mdx`)
+      const content = await readDocsFile("solid", "queries", `${page}.mdx`)
 
       expect(content).toContain("## Server-side prefetching")
       expect(content).toContain("@better-auth-ui/solid")
@@ -303,26 +308,26 @@ describe("React/Solid docs parity", () => {
     }
   })
 
-  it("documents server-side prefetch entrypoints with the correct API shape", () => {
-    const reactSession = readDocsFile("react", "queries", "session.mdx")
-    const solidSession = readDocsFile("solid", "queries", "session.mdx")
-    const reactListApiKeys = readDocsFile(
+  it("documents server-side prefetch entrypoints with the correct API shape", async () => {
+    const reactSession = await readDocsFile("react", "queries", "session.mdx")
+    const solidSession = await readDocsFile("solid", "queries", "session.mdx")
+    const reactListApiKeys = await readDocsFile(
       "react",
       "queries",
       "list-api-keys.mdx"
     )
-    const reactActiveOrganization = readDocsFile(
+    const reactActiveOrganization = await readDocsFile(
       "react",
       "queries",
       "active-organization.mdx"
     )
-    const reactHasPermission = readDocsFile(
+    const reactHasPermission = await readDocsFile(
       "react",
       "queries",
       "has-permission.mdx"
     )
-    const reactSsr = readDocsFile("react", "ssr.mdx")
-    const solidSsr = readDocsFile("solid", "ssr.mdx")
+    const reactSsr = await readDocsFile("react", "ssr.mdx")
+    const solidSsr = await readDocsFile("solid", "ssr.mdx")
 
     expect(reactSession).toContain("@better-auth-ui/core/server")
     expect(reactSession).toContain("ensureSessionServer(queryClient, auth")

@@ -3,7 +3,7 @@ title: usePublicOAuthClient
 description: Load public metadata for the application requesting OAuth authorization.
 ---
 
-Requires `oauthProviderClient()` from `@better-auth/oauth-provider/client`. Read the client ID from the signed authorization query and leave the complete query string in the browser URL.
+<include>../../../shared/queries/public-oauth-client.mdx#shared-overview</include>
 
 ## Usage
 
@@ -19,21 +19,7 @@ const client = usePublicOAuthClient(
 
 The query remains disabled until the client ID accessor returns a value.
 
-## Options factory and loader helpers
-
-```ts
-import {
-  ensurePublicOAuthClient,
-  fetchPublicOAuthClient,
-  prefetchPublicOAuthClient,
-  publicOAuthClientOptions
-} from "@better-auth-ui/core/plugins/oauth-provider"
-
-const options = publicOAuthClientOptions(authClient, clientId)
-await ensurePublicOAuthClient(queryClient, authClient, clientId)
-await prefetchPublicOAuthClient(queryClient, authClient, clientId)
-const client = await fetchPublicOAuthClient(queryClient, authClient, clientId)
-```
+<include>../../../shared/queries/public-oauth-client.mdx#shared-options-factory-and-loader-helpers</include>
 
 ## Params
 

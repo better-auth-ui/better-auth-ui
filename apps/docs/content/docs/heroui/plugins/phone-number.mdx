@@ -15,25 +15,7 @@ The HeroUI phone-number plugin contributes a phone sign-in route, password recov
 <Step>
 ### Configure Better Auth and your SMS provider
 
-```ts title="lib/auth.ts"
-import { betterAuth } from "better-auth"
-import { phoneNumber } from "better-auth/plugins"
-
-export const auth = betterAuth({
-  plugins: [
-    phoneNumber({
-      otpLength: 6,
-      requireVerification: true,
-      sendOTP: ({ phoneNumber, code }) => {
-        void sms.send({ to: phoneNumber, body: `Your code is ${code}` })
-      },
-      sendPasswordResetOTP: ({ phoneNumber, code }) => {
-        void sms.send({ to: phoneNumber, body: `Your reset code is ${code}` })
-      }
-    })
-  ]
-})
-```
+<include>../../../shared/ui/plugins/phone-number.mdx#shared-configure-better-auth-and-your-sms-provider</include>
 
 Keep server-side validation as a trust boundary even though the UI normalizes numbers to E.164. Do not log codes in production. Better Auth recommends dispatching the SMS without waiting for the provider response.
 
@@ -44,19 +26,9 @@ Keep server-side validation as a trust boundary even though the UI normalizes nu
 Use your normal Better Auth schema generation or migration flow. The user model needs nullable `phoneNumber` and `phoneNumberVerified` fields, with `phoneNumber` kept unique.
 
 </Step>
-<Step>
-### Add the client plugin
 
-```ts title="lib/auth-client.ts"
-import { createAuthClient } from "better-auth/react"
-import { phoneNumberClient } from "better-auth/client/plugins"
+<include>../../../shared/ui/plugins/phone-number.mdx#shared-add-the-client-plugin</include>
 
-export const authClient = createAuthClient({
-  plugins: [phoneNumberClient()]
-})
-```
-
-</Step>
 <Step>
 ### Register the HeroUI plugin
 
@@ -97,17 +69,9 @@ const validAuthPaths = new Set([
 </Step>
 </Steps>
 
-## Flow options
+<include>../../../shared/ui/plugins/phone-number.mdx#shared-flow-options</include>
 
-| UI option | Default | Server requirement |
-|---|---:|---|
-| `signIn` | `true` | `sendOTP` |
-| `passwordSignIn` | `false` | A password credential |
-| `passwordReset` | `false` | `sendPasswordResetOTP` |
-| `changePhoneNumber` | `true` | `sendOTP` |
-| `otpLength` | `6` | Must match Better Auth `otpLength` |
-
-Use `defaultCountry`, `countries`, and `locale` to control the selector. Supply an `adapter` when your application needs different formatting or validation rules.
+<include>../../../shared/ui/plugins/phone-number.mdx#shared-selector-options</include>
 
 When password sign-in reports `PHONE_NUMBER_NOT_VERIFIED`, the UI switches to the code step. Better Auth sends that verification code automatically.
 

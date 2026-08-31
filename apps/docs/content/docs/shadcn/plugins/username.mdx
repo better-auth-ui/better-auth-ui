@@ -6,51 +6,19 @@ description: Add username-based sign-in and real-time availability checking to y
 
 import { Step, Steps } from 'fumadocs-ui/components/steps'
 
-The username plugin adds username-based authentication to your auth UI. Users can sign in with a username instead of an email address, and optionally check username availability during sign-up and profile updates.
+<include>../../../shared/ui/plugins/username.mdx#shared-overview</include>
 
-It contributes:
-
-- A `<SignInUsername />` view that accepts both username and email, routing to the appropriate sign-in method
-- A `<UsernameField />` renderer for the username additional field with real-time availability checking
-- `useSignInUsername` and `useIsUsernameAvailable` hooks
-- Automatic username field injection into sign-up and user profile forms
-
-## Setup
-
-The username plugin requires no additional UI installation: the components are built-in. You only need to configure the Better Auth server plugin and register the client plugin.
+<include>../../../shared/ui/plugins/username.mdx#shared-setup</include>
 
 <Steps>
+
+<include>../../../shared/ui/plugins/username.mdx#shared-install-the-better-auth-plugin</include>
+
 <Step>
-### Install the Better Auth plugin
 
-Install the [`better-auth`](https://www.better-auth.com/docs/plugins/username) package and add it to your Better Auth server config:
+<include>../../../shared/ui/plugins/username.mdx#shared-install-the-matching-client-plugin</include>
 
-```ts title="lib/auth.ts"
-import { betterAuth } from "better-auth"
-import { username } from "better-auth/plugins" // [!code highlight]
-
-export const auth = betterAuth({
-  // ...
-  plugins: [
-    username() // [!code highlight]
-  ]
-})
-```
-
-</Step>
-<Step>
-### Install the matching client plugin
-
-Add `usernameClient()` to your auth client so `authClient.signIn.username` and `authClient.username.*` are available:
-
-```ts title="lib/auth-client.ts"
-import { createAuthClient } from "better-auth/react"
-import { usernameClient } from "better-auth/client/plugins" // [!code highlight]
-
-export const authClient = createAuthClient({
-  plugins: [usernameClient()] // [!code highlight]
-})
-```
+<include>../../../shared/ui/plugins/username.mdx#shared-react-client-example</include>
 
 </Step>
 <Step>
@@ -88,18 +56,9 @@ import { AuthProvider } from "@/components/auth/auth-provider"
 
 <ComponentPreview name="shadcn-username-user-profile" />
 
-## Options
+<include>../../../shared/ui/plugins/username.mdx#shared-options</include>
 
-Use `usernamePrefix` when usernames are displayed with a marker such as `@`. The prefix appears inside username fields but is not included in the value sent to Better Auth.
-
-```tsx
-usernamePlugin({
-  usernamePrefix: "@",
-  localization: {
-    usernamePlaceholder: "username"
-  }
-})
-```
+<include>../../../shared/ui/plugins/username.mdx#shared-options-example</include>
 
 <type-table path="../../../../../../packages/core/src/plugins/username/username-plugin.ts" name="UsernamePluginOptions" />
 

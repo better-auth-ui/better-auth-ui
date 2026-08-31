@@ -3,7 +3,7 @@ title: useOAuthConsent
 description: Accept or deny the current OAuth authorization request.
 ---
 
-Requires `oauthProviderClient()` from `@better-auth/oauth-provider/client`. Better Auth reads and validates the signed authorization query from the current browser URL before completing the redirect.
+<include>../../../shared/mutations/oauth-consent.mdx#shared-overview</include>
 
 ## Usage
 
@@ -16,9 +16,7 @@ consent.mutate({ accept: true })
 consent.mutate({ accept: false })
 ```
 
-Pass only the user's decision for the complete requested scope set. The OAuth Provider plugin handles the redirect.
-
-Do not navigate to `redirect_uri` from the application.
+<include>../../../shared/mutations/oauth-consent.mdx#shared-usage</include>
 
 ## Options factory
 

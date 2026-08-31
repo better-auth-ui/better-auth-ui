@@ -3,7 +3,7 @@ title: useSignInEmail
 description: Email/password sign-in mutation.
 ---
 
-Resets the session query on success so the new session is refetched.
+<include>../../../shared/mutations/sign-in-email.mdx#shared-behavior</include>
 
 ## Usage
 
@@ -28,6 +28,8 @@ import { useMutation } from "@tanstack/react-query"
 
 const { mutate } = useMutation(signInEmailOptions(authClient))
 ```
+
+<include>../../../shared/mutations/sign-in-email.mdx#shared-options-factory</include>
 
 ## Params
 

@@ -30,16 +30,14 @@ Before you install registry entries, add these prerequisites:
 
 Install the composed auth route surface with the shadcn CLI from the Better Auth UI Solid registry.
 
-```npm
-npx shadcn@latest add https://better-auth-ui.com/r/solid/auth.json
-```
+<include>../../shared/ui/installation/zaidan.mdx#shared-auth</include>
 
-This command installs `<Auth />` and its built-in authentication views.
+<include>../../shared/ui/index.mdx#shared-install-the-auth-components</include>
+
 </Step>
 <Step>
-### Install settings and user button (optional)
 
-If you need the settings page and user button, install them separately.
+<include>../../shared/ui/index.mdx#shared-install-settings-and-user-button-optional</include>
 
 ```npm
 npx shadcn@latest add https://better-auth-ui.com/r/solid/settings.json https://better-auth-ui.com/r/solid/user-button.json
@@ -59,9 +57,7 @@ npx shadcn@latest add https://better-auth-ui.com/r/solid/all.json
 
 Plugin registry entries are optional. If the application enables a Better Auth plugin, add its matching registry entry.
 
-```npm
-npx shadcn@latest add https://better-auth-ui.com/r/solid/passkey.json
-```
+<include>../../shared/ui/installation/zaidan.mdx#shared-passkey</include>
 </Step>
 </Steps>
 

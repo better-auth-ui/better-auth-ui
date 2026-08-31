@@ -19,11 +19,7 @@ The examples use [TanStack Start](https://tanstack.com/start) and match [`exampl
 
 The package also wraps the application in `QueryClientProvider`. You do not need another provider.
 
-## Customize the QueryClient
-
-Create the `QueryClient` inside the router factory. Each SSR request then receives a separate cache.
-
-Apply `defaultOptions` in this factory. The example uses a `staleTime` of 5 seconds to reuse recent results during navigation.
+<include>../../shared/ssr.mdx#shared-customize-the-query-client</include>
 
 ```tsx title="src/router.tsx"
 import { QueryClient } from "@tanstack/react-query"
@@ -91,7 +87,7 @@ export const Route = createRootRouteWithContext<{
 })
 ```
 
-The tree of routes now has `{ queryClient }` available in every loader, `beforeLoad`, and component via `Route.useRouteContext()`.
+<include>../../shared/ssr.mdx#shared-type-the-root-route-context</include>
 
 ## Prefetch the session in `beforeLoad`
 
@@ -150,31 +146,15 @@ function SettingsPage() {
 
 The server adds the session to the query cache. As a result, `Settings` and its `useSession` calls read it during the first render.
 
-TanStack Router adds the value from `beforeLoad` to the route context. Read this value in a component with `Route.useRouteContext()`.
+<include>../../shared/ssr.mdx#shared-prefetch-the-session-in-before-load</include>
 
 This pattern avoids another query for the same user data.
 
-## Prefetch without blocking
-
-Use `prefetchSession` to fill the cache without blocking navigation. This pattern can prepare a public route that later shows an authenticated widget:
-
-```ts
-import { prefetchSession } from "@better-auth-ui/core"
-
-export const Route = createFileRoute("/")({
-  loader: ({ context: { queryClient } }) => {
-    void prefetchSession(queryClient, authClient)
-  }
-})
-```
+<include>../../shared/ssr.mdx#shared-prefetch-without-blocking</include>
 
 The same pattern works for each settings query. The related prefetch helpers and options factories are available from `@better-auth-ui/core`.
 
-## Server-only helpers
-
-To avoid an HTTP request, import the session helpers from `@better-auth-ui/core/server`. Call them from a server function or another server runtime.
-
-These helpers accept the Better Auth server instance instead of `authClient`:
+<include>../../shared/ssr.mdx#shared-server-only-helpers</include>
 
 ```ts title="src/lib/session.ts"
 import { ensureSessionServer } from "@better-auth-ui/core/server"
@@ -199,11 +179,6 @@ Available `@better-auth-ui/core/server` helper families include:
 - Session: `sessionOptionsServer`, `ensureSessionServer`, `prefetchSessionServer`, `fetchSessionServer`
 - Settings: `listAccountsOptions`, `ensureListAccounts`, `prefetchListAccounts`, `fetchListAccounts`, `accountInfoOptions`, `ensureAccountInfo`, `listSessionsOptions`, and `ensureListSessions` with matching prefetch/fetch helpers
 
-Plugin server query helper families live under their plugin server entrypoints:
-
-- API-key (`@better-auth-ui/core/plugins/api-key/server`): `listApiKeysOptions`, `ensureListApiKeys`, `prefetchListApiKeys`, `fetchListApiKeys`
-- Multi-session (`@better-auth-ui/core/plugins/multi-session/server`): `listDeviceSessionsOptions`, `ensureListDeviceSessions`, `prefetchListDeviceSessions`, `fetchListDeviceSessions`
-- Passkey (`@better-auth-ui/core/plugins/passkey/server`): `listPasskeysOptions`, `ensureListPasskeys`, `prefetchListPasskeys`, `fetchListPasskeys`
-- Organization (`@better-auth-ui/core/plugins/organization/server`): `activeOrganizationOptions`, `ensureActiveOrganization`, `prefetchActiveOrganization`, `fetchActiveOrganization`, `fullOrganizationOptions`, `ensureFullOrganization`, `listOrganizationsOptions`, `ensureListOrganizations`, `listOrganizationMembersOptions`, `ensureListOrganizationMembers`, `listOrganizationInvitationsOptions`, `ensureListOrganizationInvitations`, `listUserInvitationsOptions`, `ensureListUserInvitations`, `hasPermissionOptions`, and `ensureHasPermission` with matching prefetch/fetch helpers
+<include>../../shared/ssr.mdx#shared-plugin-server-entrypoints</include>
 
 Server and client helpers use the same cache keys. Therefore, browser hooks such as `useSession` can read data that the server prefetched.

@@ -1,0 +1,15 @@
+<section id="shared-behavior">
+
+The email sign-in mutation calls `authClient.signIn.email` with the supplied credentials.
+
+With `AuthProvider`, a successful sign-in invalidates the session query and waits for active session queries to refetch.
+
+</section>
+
+<section id="shared-options-factory">
+
+`signInEmailOptions` supplies the mutation key, request function, and session invalidation metadata.
+
+Without `AuthProvider` or `setupMutationInvalidation`, handle session invalidation in the mutation's `onSuccess` callback. This requirement applies to both the hook and the options factory.
+
+</section>

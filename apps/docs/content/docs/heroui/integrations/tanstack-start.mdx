@@ -14,9 +14,8 @@ Complete the [Quick Start](/docs/heroui) guide first.
 
 <Steps>
 <Step>
-### Configure AuthProvider
 
-Configure `AuthProvider` with TanStack Router's navigation.
+<include>../../../shared/ui/integrations/tanstack-start.mdx#shared-configure-auth-provider</include>
 
 ```tsx title="components/providers.tsx" file=<rootDir>/../../examples/start-heroui-example/src/components/providers.tsx
 ```
@@ -25,9 +24,8 @@ The `navigate` prop connects Better Auth UI to TanStack Router. It accepts `{ to
 
 </Step>
 <Step>
-### Update the Root Route
 
-Wrap your application with the `Providers` component in your root route.
+<include>../../../shared/ui/integrations/tanstack-start.mdx#shared-update-the-root-route</include>
 
 ```tsx title="routes/__root.tsx" file=<rootDir>/../../examples/start-heroui-example/src/routes/__root.tsx
 ```
@@ -61,84 +59,15 @@ The built-in `viewPaths.settings` object contains `account` and `security`. If a
 </Step>
 </Steps>
 
-## Protecting Routes
+<include>../../../shared/ui/integrations/tanstack-start.mdx#shared-protecting-routes</include>
 
-Better Auth UI provides separate protection patterns for server-rendered and prerendered routes.
+<include>../../../shared/ui/integrations/tanstack-start.mdx#shared-server-rendered-routes-before-load</include>
 
-### Server-rendered routes (`beforeLoad`)
+<include>../../../shared/ui/integrations/tanstack-start.mdx#shared-route-session-context</include>
 
-For an SSR route, read the session in `beforeLoad`. This redirects unauthenticated users before a component renders.
+<include>../../../shared/ui/integrations/tanstack-start.mdx#shared-session-hydration</include>
 
-Use `createIsomorphicFn` to call `ensureSessionServer` on the server and `ensureSession` in the browser. The server helper calls `auth.api` directly.
-
-Both helpers use `authQueryKeys.session` in the same TanStack Query cache. Child `useSession` calls can reuse the hydrated session.
-
-```tsx title="routes/dashboard.tsx"
-import { ensureSession } from "@better-auth-ui/core"
-import { ensureSessionServer } from "@better-auth-ui/core/server"
-import { createFileRoute, Link, redirect } from "@tanstack/react-router"
-import { createIsomorphicFn } from "@tanstack/react-start"
-import { getRequestHeaders } from "@tanstack/react-start/server"
-
-import { auth } from "@/lib/auth"
-import { authClient } from "@/lib/auth-client"
-
-export const Route = createFileRoute("/dashboard")({
-  async beforeLoad({ context: { queryClient }, location }) {
-    const ensureSessionIso = createIsomorphicFn()
-      .server(() =>
-        ensureSessionServer(queryClient, auth, { headers: getRequestHeaders() })
-      )
-      .client(() => ensureSession(queryClient, authClient))
-
-    const session = await ensureSessionIso()
-
-    if (!session) {
-      throw redirect({
-        to: "/auth/$path",
-        params: { path: "sign-in" },
-        search: { redirectTo: location.href }
-      })
-    }
-
-    return { session }
-  },
-  component: Dashboard
-})
-
-function Dashboard() {
-  const { session } = Route.useRouteContext()
-
-  return (
-    <div className="flex flex-col items-center my-auto">
-      <h1 className="text-2xl">Hello, {session.user.email}</h1>
-
-      <Link to="/auth/$path" params={{ path: "sign-out" }}>
-        Sign Out
-      </Link>
-    </div>
-  )
-}
-```
-
-Child routes and components can read the returned `{ session }` through `Route.useRouteContext()`.
-
-`ensureSessionServer` also adds the session to the query cache during SSR. Downstream `useSession` calls then render without a loading state.
-
-### Reactive protection and prerendered routes (`useAuthenticate`)
-
-`beforeLoad` only runs when the route loads. It does not detect session changes while the page remains mounted.
-
-These changes include token expiration, sign-out in another tab, and server-side session revocation. Prerendered and client-rendered routes also have no server check.
-
-The `useAuthenticate` hook covers both cases. It subscribes to `useSession` and redirects the user when the session ends.
-
-The hook preserves the current URL in the `redirectTo` query parameter.
-
-Use it in two situations:
-
-1. **Alongside `beforeLoad`** for server-rendered routes, as a second layer that keeps the UI in sync after the initial load.
-2. **On its own** for prerendered or client-rendered routes that have no server-side session access.
+<include>../../../shared/ui/integrations/tanstack-start.mdx#shared-reactive-protection-and-prerendered-routes-use-authenticate</include>
 
 ```tsx title="routes/dashboard.tsx"
 import { authClient } from "@/lib/auth-client"
@@ -173,15 +102,13 @@ function Dashboard() {
 }
 ```
 
-`beforeLoad` protects the initial render and hydrates the session. Then `useAuthenticate` reacts to later session changes.
+<include>../../../shared/ui/integrations/tanstack-start.mdx#shared-session-changes</include>
 
 ## Example Project
 
 For a complete example, see [start-heroui-example](https://github.com/better-auth-ui/better-auth-ui/tree/main/examples/start-heroui-example) in the repository.
 
-## Next Steps
-
-Read about the shared React hooks and query primitives that power each Better Auth UI component.
+<include>../../../shared/ui/integrations/tanstack-start.mdx#shared-next-steps</include>
 
 <Cards>
   <Card icon={<React />} title="React Reference" href="/docs/react">

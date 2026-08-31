@@ -3,7 +3,7 @@ title: useListSessions
 description: Retrieve the active sessions (devices) for the current user.
 ---
 
-Keyed per-user. Waits for the active session before firing.
+<include>../../../shared/queries/user-scoped.mdx#shared-session</include>
 
 ## Usage
 
@@ -26,15 +26,7 @@ import { useQuery } from "@tanstack/react-query"
 const { data: sessions } = useQuery(listSessionsOptions(authClient, userId))
 ```
 
-## Invalidation
-
-```ts
-import { listSessionsOptions } from "@better-auth-ui/core"
-
-queryClient.invalidateQueries({
-  queryKey: listSessionsOptions(authClient, userId).queryKey
-})
-```
+<include>../../../shared/queries/list-sessions.mdx#shared-invalidation</include>
 
 ## Params
 

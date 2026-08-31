@@ -23,7 +23,7 @@ export function AccountPage() {
 }
 ```
 
-The redirect uses `basePaths.auth` + `viewPaths.auth.signIn` from `AuthProvider`: override those to target a custom sign-in view.
+<include>../../../shared/queries/authenticate.mdx#shared-usage</include>
 
 Accepts the same arguments as `useSession`: see its [Params](/docs/react/queries/session#params).
 
@@ -33,11 +33,7 @@ The redirect runs inside `useEffect`, so it is browser-only. During the first re
 
 The protected interface can appear briefly before the browser mounts the component and redirects to sign-in.
 
-You have two ways to handle this:
-
-### Gate on `isPending` (simplest)
-
-Render a skeleton or spinner while the session query is pending, and `null` once it resolves to unauthenticated (the redirect is already in flight). This is what the [Usage](#usage) example does and is enough for most apps:
+<include>../../../shared/queries/authenticate.mdx#shared-gate-on-is-pending-simplest</include>
 
 ```tsx
 const { data: session, isPending } = useAuthenticate(authClient)
@@ -48,13 +44,9 @@ if (!session) return null // navigating to sign-in
 return <Account user={session.user} />
 ```
 
-No flash of protected content, no server work required: just a brief loading state on first mount. Works identically for SSR, client-rendered, and statically prerendered routes.
-
-### Pair with a server-side guard (no loading state)
-
-To render the protected interface immediately without a skeleton, prefetch the session on the server. Then hydrate it into the query cache:
+<include>../../../shared/queries/authenticate.mdx#shared-pair-with-a-server-side-guard-no-loading-state</include>
 
 - **Next.js**: prefetch in a server component and wrap the subtree in `HydrationBoundary`. See the [Next.js integration guide](/docs/heroui/integrations/nextjs#reactive-protection--prerendered-routes-useauthenticate).
 - **TanStack Start**: check the session in `beforeLoad` on the route. See the [TanStack Start integration guide](/docs/heroui/integrations/tanstack-start#reactive-protection--prerendered-routes-useauthenticate).
 
-The server-side check protects the first render. `useAuthenticate` redirects after token expiration, remote sign-out, or server-side session revocation.
+<include>../../../shared/queries/authenticate.mdx#shared-session-changes</include>

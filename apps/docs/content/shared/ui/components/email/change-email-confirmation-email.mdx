@@ -1,0 +1,43 @@
+<section id="shared-better-auth-setup">
+
+## Better Auth setup
+
+Render this template from `user.changeEmail.sendChangeEmailConfirmation` and send it to `user.email`. Better Auth supplies the approval URL and requested address.
+
+</section>
+
+<section id="shared-send-confirmation">
+
+```tsx
+sendChangeEmailConfirmation: async ({ user, newEmail, url }) => {
+  const html = await render(
+    <ChangeEmailConfirmationEmail
+      url={url}
+      currentEmail={user.email}
+      newEmail={newEmail}
+      appName="My App"
+    />
+  )
+
+  await sendEmail({
+    to: user.email,
+    subject: "Approve your email change",
+    html
+  })
+}
+```
+
+Use `<EmailChangedEmail />` separately if you also send a notification after the address has changed.
+
+</section>
+
+<section id="shared-features">
+
+## Features
+
+- Shows the current and requested email addresses
+- Includes an approval button and fallback URL
+- Explains that ignoring the message leaves the address unchanged
+- Supports expiration details, theming, branding, and localization
+
+</section>

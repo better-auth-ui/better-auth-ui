@@ -12,7 +12,7 @@ description: Email template component that invites a user to join an organizatio
 
 ## Server setup
 
-Wire the email into the Better Auth `organization` plugin via `sendInvitationEmail`. Point `url` at the direct invitation view registered by `organizationPlugin()`.
+<include>../../../../shared/ui/components/email/organization-invitation-email.mdx#shared-server-setup</include>
 
 ```tsx title="auth.ts"
 import { OrganizationInvitationEmail } from "@better-auth-ui/heroui/email"
@@ -51,25 +51,10 @@ export const auth = betterAuth({
 })
 ```
 
-<Callout>
-  Add `organizationPlugin().viewPaths.auth.acceptInvitation` to your auth
-  route allow-list. Use `{baseUrl}/settings/organizations` only when you want
-  the invitation email to open the full pending-invitations list instead.
-</Callout>
+<include>../../../../shared/ui/components/email/organization-invitation-email.mdx#shared-invitation-route</include>
 
 ## Props
 
 <type-table path="../../../../../../../packages/react/src/components/auth/email/organization-invitation.tsx" name="OrganizationInvitationEmailProps" />
 
-## Features
-
-- Inviter name and email display
-- Organization name and optional organization logo
-- Role being offered (for example member, admin, owner)
-- Accept invitation button linking to the direct invitation view
-- Fallback URL for manual copy/paste
-- Optional expiration time
-- Security notice for unexpected invitations
-- Customizable branding and styling
-- Support for light/dark mode themes
-- Localization support
+<include>../../../../shared/ui/components/email/organization-invitation-email.mdx#shared-features</include>

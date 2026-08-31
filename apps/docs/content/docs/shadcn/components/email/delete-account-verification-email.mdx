@@ -10,27 +10,9 @@ description: Email template for verifying a permanent account deletion request.
 ```tsx file=<rootDir>/src/demos/shadcn/email/delete-account-verification-email.tsx#L13-
 ```
 
-## Better Auth setup
+<include>../../../../shared/ui/components/email/delete-account-verification-email.mdx#shared-better-auth-setup</include>
 
-Render this template from `user.deleteUser.sendDeleteAccountVerification`. Better Auth supplies the verification URL and user whose account is being deleted.
-
-```tsx
-sendDeleteAccountVerification: async ({ user, url }) => {
-  const html = await render(
-    <DeleteAccountVerificationEmail
-      url={url}
-      email={user.email}
-      appName="My App"
-    />
-  )
-
-  await sendEmail({
-    to: user.email,
-    subject: "Confirm account deletion",
-    html
-  })
-}
-```
+<include>../../../../shared/ui/components/email/delete-account-verification-email.mdx#shared-send-verification</include>
 
 ## Installation
 
@@ -42,9 +24,4 @@ npx shadcn@latest add @better-auth-ui/delete-account-verification-email
 
 <type-table path="../../../../../../../packages/react/src/components/auth/email/delete-account-verification.tsx" name="DeleteAccountVerificationEmailProps" />
 
-## Features
-
-- Clearly states that account deletion is permanent
-- Includes a verification button and fallback URL
-- Explains that ignoring the message keeps the account active
-- Supports expiration details, theming, branding, and localization
+<include>../../../../shared/ui/components/email/delete-account-verification-email.mdx#shared-features</include>

@@ -3,7 +3,7 @@ title: useListPasskeys
 description: Retrieve the passkeys registered for the current user.
 ---
 
-Keyed per-user. Waits for the active session before firing.
+<include>../../../shared/queries/user-scoped.mdx#shared-session</include>
 
 <Callout type="info">
   The Better Auth client method is `authClient.passkey.listUserPasskeys`, while the corresponding server endpoint is `auth.api.listPasskeys`. The names diverge in Better Auth itself: this is not a typo. We expose a single unified `listPasskeys` API on top (hooks, options, helpers all drop the redundant `User` infix).
@@ -36,15 +36,7 @@ const { data: passkeys } = useQuery(
 )
 ```
 
-## Invalidation
-
-```ts
-import { listPasskeysOptions } from "@better-auth-ui/core/plugins/passkey"
-
-queryClient.invalidateQueries({
-  queryKey: listPasskeysOptions(authClient, userId).queryKey
-})
-```
+<include>../../../shared/queries/list-passkeys.mdx#shared-invalidation</include>
 
 ## Params
 

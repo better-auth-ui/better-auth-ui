@@ -36,19 +36,7 @@ import { useQuery } from "@tanstack/react-query"
 const { data: session } = useQuery(sessionOptions(authClient))
 ```
 
-## Server-side prefetching
-
-For client/router loaders that already have an `authClient`, use the client helpers from `@better-auth-ui/core`.
-
-```tsx
-import { ensureSession, fetchSession, prefetchSession } from "@better-auth-ui/core"
-
-await ensureSession(queryClient, authClient)
-await prefetchSession(queryClient, authClient)
-const session = await fetchSession(queryClient, authClient)
-```
-
-For server loaders, import from `@better-auth-ui/core/server`. These helpers call your Better Auth server instance directly and require the request params passed to `auth.api.getSession`, typically request headers.
+<include>../../../shared/queries/session.mdx#server-side-prefetching</include>
 
 ```ts
 import { ensureSessionServer } from "@better-auth-ui/core/server"
@@ -63,23 +51,7 @@ const session = await ensureSessionServer(queryClient, auth, {
 
 Both entrypoints share the same session query key, so server-prefetched data hydrates into client-side `useSession`.
 
-## Invalidation
-
-```ts
-import { sessionOptions } from "@better-auth-ui/core"
-
-queryClient.invalidateQueries({
-  queryKey: sessionOptions(authClient).queryKey
-})
-```
-
-Or, equivalently, via the shared key factory:
-
-```ts
-import { authQueryKeys } from "@better-auth-ui/core"
-
-queryClient.invalidateQueries({ queryKey: authQueryKeys.session })
-```
+<include>../../../shared/queries/session.mdx#invalidation</include>
 
 ## Client params
 

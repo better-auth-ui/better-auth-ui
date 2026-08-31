@@ -3,9 +3,9 @@ title: generateBackupCodesOptions
 description: Replace the existing backup codes.
 ---
 
-Requires the Better Auth two-factor plugin. If TypeScript cannot infer the plugin methods from your client, type or cast `authClient` as `TwoFactorAuthClient` from `@better-auth-ui/core/plugins/two-factor`.
+<include>../../../shared/mutations/plugin-requirements.mdx#shared-two-factor</include>
 
-The new codes are returned once. Keep them in component state and let the user copy them: they are never returned again.
+<include>../../../shared/mutations/generate-backup-codes.mdx#shared-overview</include>
 
 ## Options factory
 

@@ -10,17 +10,7 @@ The captcha plugin adds a widget to the copied Solid/Zaidan authentication forms
 
 The plugin supports Cloudflare Turnstile, hCaptcha, CaptchaFox, and reCAPTCHA. Provide a Solid `render` component that connects the provider callbacks to the plugin.
 
-It contributes:
-
-- A captcha widget rendered above the submit button on sign-in, sign-up, and forgot-password forms
-- Automatic header management. The plugin clears the token after an error or expiration, or when the component unmounts.
-- Automatic widget refresh after an unsuccessful submission. Captcha tokens are single-use, so each retry requires a new token.
-
-## Social sign-in
-
-Provider buttons forward the current CAPTCHA token to `/sign-in/social`. Add this endpoint to the server CAPTCHA configuration to protect social sign-in. Failed requests clear the token and reset the widget before another attempt.
-
-Use `socialSignInMode="redirect"` for CAPTCHA-protected social sign-in. Better Auth 1.7's experimental popup API does not accept `fetchOptions` or forward CAPTCHA headers. Popup failures reset the widget, but the popup flow cannot send the token.
+<include>../../../shared/ui/plugins/captcha.mdx#shared-social-sign-in</include>
 
 ## Setup
 
@@ -49,9 +39,7 @@ export const auth = betterAuth({
 
 By default, Better Auth protects `/sign-up/email`, `/sign-in/email`, and `/request-password-reset`.
 
-Better Auth 1.7 and later matches complete authentication paths. Use an exact endpoint or an explicit wildcard such as `/sign-in/*`.
-
-Do not use a partial prefix such as `/sign-in`. To protect username and social sign-in, add their endpoints explicitly:
+<include>../../../shared/ui/plugins/captcha.mdx#shared-protected-endpoints</include>
 
 ```ts title="src/lib/auth.ts"
 captcha({
@@ -281,10 +269,4 @@ The `render` component receives:
 
 <type-table path="../../../../../../packages/solid/src/plugins/captcha-plugin.tsx" name="CaptchaRenderProps" />
 
-- Connect the provider's success callback to `setToken`. It adds the `x-captcha-response` header to the next Better Auth request.
-- Connect the error and expiration callbacks to `clearToken`. It removes the header before the application sends a stale token.
-- Connect the widget's `reset()` function to `setReset`. Better Auth consumes the token through `/siteverify` before the authentication handler completes.
-
-  A rejected request still consumes the token. Each protected form calls the registered `reset()` function from `onError` and clears the old token.
-
-The plugin also clears the header when the component unmounts. The application does not need additional cleanup.
+<include>../../../shared/ui/plugins/captcha.mdx#shared-render-props</include>

@@ -3,6 +3,8 @@ title: useSignInEmail
 description: Email/password sign-in mutation hook.
 ---
 
+<include>../../../shared/mutations/sign-in-email.mdx#shared-behavior</include>
+
 ## Usage
 
 ```tsx
@@ -28,7 +30,7 @@ signIn.mutate({
 })
 ```
 
-The raw options factory does not perform Solid hook cache cleanup automatically. Invalidate `authQueryKeys.session` in your `onSuccess` handler when your screen needs the new session immediately.
+<include>../../../shared/mutations/sign-in-email.mdx#shared-options-factory</include>
 
 ## Params
 

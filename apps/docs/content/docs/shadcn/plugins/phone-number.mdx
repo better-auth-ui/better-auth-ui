@@ -19,25 +19,7 @@ Keep server-side phone validation as a trust boundary. The UI sends E.164 number
 <Step>
 ### Configure Better Auth
 
-```ts title="lib/auth.ts"
-import { betterAuth } from "better-auth"
-import { phoneNumber } from "better-auth/plugins"
-
-export const auth = betterAuth({
-  plugins: [
-    phoneNumber({
-      otpLength: 6,
-      requireVerification: true,
-      sendOTP: ({ phoneNumber, code }) => {
-        void sms.send({ to: phoneNumber, body: `Your code is ${code}` })
-      },
-      sendPasswordResetOTP: ({ phoneNumber, code }) => {
-        void sms.send({ to: phoneNumber, body: `Your reset code is ${code}` })
-      }
-    })
-  ]
-})
-```
+<include>../../../shared/ui/plugins/phone-number.mdx#shared-configure-better-auth-and-your-sms-provider</include>
 
 Do not log codes in production. Better Auth recommends returning from `sendOTP` without waiting for the SMS provider. Use your runtime's background-task primitive when delivery must outlive the request.
 
@@ -50,19 +32,9 @@ Generate or migrate the Better Auth schema using your existing database workflow
 For Drizzle projects, regenerate the Better Auth schema first, then generate the Drizzle migration from that schema. Do not hand-edit generated migration metadata.
 
 </Step>
-<Step>
-### Add the client plugin
 
-```ts title="lib/auth-client.ts"
-import { createAuthClient } from "better-auth/react"
-import { phoneNumberClient } from "better-auth/client/plugins"
+<include>../../../shared/ui/plugins/phone-number.mdx#shared-add-the-client-plugin</include>
 
-export const authClient = createAuthClient({
-  plugins: [phoneNumberClient()]
-})
-```
-
-</Step>
 <Step>
 ### Install and register the UI plugin
 
@@ -118,7 +90,7 @@ Use `validAuthPaths` in the route guard that renders `<Auth path={path} />`.
 | `changePhoneNumber` | `true` | `sendOTP`. Verification uses `updatePhoneNumber: true` |
 | `otpLength` | `6` | Must match Better Auth `otpLength` |
 
-Use `defaultCountry`, `countries`, and `locale` to control the selector. Supply an `adapter` when your application needs different formatting or validation rules.
+<include>../../../shared/ui/plugins/phone-number.mdx#shared-selector-options</include>
 
 When both sign-in modes are enabled, the form lets users switch between a code and a password. If password sign-in returns `PHONE_NUMBER_NOT_VERIFIED`, it moves directly to the code step because Better Auth has already started verification.
 

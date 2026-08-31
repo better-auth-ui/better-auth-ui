@@ -12,46 +12,15 @@ The anonymous UI plugin contributes one "Continue as guest" button to the authen
 
 <Steps>
 <Step>
-### Configure the Better Auth server plugin
 
-Add Better Auth's [Anonymous](https://www.better-auth.com/docs/plugins/anonymous) plugin:
+<include>../../../shared/ui/plugins/anonymous.mdx#shared-configure-the-better-auth-server-plugin</include>
 
-```ts title="lib/auth.ts"
-import { betterAuth } from "better-auth"
-import { anonymous } from "better-auth/plugins" // [!code highlight]
-
-export const auth = betterAuth({
-  // ...
-  plugins: [
-    anonymous() // [!code highlight]
-  ]
-})
-```
-
-Run the Better Auth migration command so the user table includes `isAnonymous`:
-
-```bash
-bunx @better-auth/cli migrate
-```
+<include>../../../shared/ui/plugins/anonymous.mdx#shared-migration</include>
 
 </Step>
-<Step>
-### Configure the Better Auth client plugin
 
-Add `anonymousClient()` to the browser client:
+<include>../../../shared/ui/plugins/anonymous.mdx#shared-configure-the-better-auth-client-plugin</include>
 
-```ts title="lib/auth-client.ts"
-import { createAuthClient } from "better-auth/react"
-import { anonymousClient } from "better-auth/client/plugins" // [!code highlight]
-
-export const authClient = createAuthClient({
-  plugins: [
-    anonymousClient() // [!code highlight]
-  ]
-})
-```
-
-</Step>
 <Step>
 ### Register the Better Auth UI plugin
 
@@ -79,14 +48,8 @@ import { anonymousPlugin } from "@better-auth-ui/heroui/plugins" // [!code highl
 
 Override the plugin localization when the default wording does not fit your product:
 
-```tsx
-anonymousPlugin({
-  localization: {
-    continueAsGuest: "Explore as a guest"
-  }
-})
-```
+<include>../../../shared/ui/plugins/anonymous.mdx#shared-change-the-label</include>
 
 <type-table path="../../../../../../packages/core/src/plugins/anonymous/anonymous-plugin.ts" name="AnonymousPluginOptions" />
 
-This integration only adds guest entry. If your application later lets guests create a permanent account, configure Better Auth's server-side `onLinkAccount` callback to move application data to the new user.
+<include>../../../shared/ui/plugins/anonymous.mdx#shared-account-linking</include>

@@ -19,42 +19,14 @@ You can also add a wallet settings card. The card lists connected wallets, chang
 
 Add `siwe()` to the server. Supply a secure nonce generator and an ERC-4361 message verifier.
 
-```ts title="lib/auth.ts"
-import { betterAuth } from "better-auth"
-import { siwe } from "better-auth/plugins"
-import { verifyMessage } from "viem"
-import { generateSiweNonce } from "viem/siwe"
-
-export const auth = betterAuth({
-  plugins: [
-    siwe({
-      domain: "app.example.com",
-      getNonce: async () => generateSiweNonce(),
-      verifyMessage: async ({ message, signature, address }) =>
-        verifyMessage({
-          address: address as `0x${string}`,
-          message,
-          signature: signature as `0x${string}`
-        })
-    })
-  ]
-})
-```
+<include>../../../shared/ui/plugins/siwe.mdx#shared-configure-better-auth</include>
 
 Apply the SIWE schema before using the plugin. See the [Better Auth SIWE guide](https://www.better-auth.com/docs/plugins/siwe).
 
 </Step>
-<Step>
-### Add the client plugin
 
-```ts title="lib/auth-client.ts"
-import { createAuthClient } from "better-auth/react"
-import { siweClient } from "better-auth/client/plugins"
+<include>../../../shared/ui/plugins/siwe.mdx#shared-add-the-client-plugin</include>
 
-export const authClient = createAuthClient({ plugins: [siweClient()] })
-```
-
-</Step>
 <Step>
 ### Register the UI plugin
 
@@ -93,51 +65,7 @@ Better Auth does not expose browser endpoints for listing or changing SIWE walle
 Never trust a user ID from the browser. Resolve the user from the server session for every wallet operation.
 </Callout>
 
-```ts title="lib/wallet-manager.ts"
-import type {
-  SiweWalletAccount,
-  SiweWalletLinkChallenge,
-  SiweWalletManager
-} from "@better-auth-ui/core/plugins/siwe"
-
-const assertOk = async (response: Response) => {
-  if (!response.ok) {
-    throw new Error(`Wallet request failed with status ${response.status}.`)
-  }
-}
-
-const get = async <TResponse>(
-  url: string,
-  signal?: AbortSignal
-): Promise<TResponse> => {
-  const response = await fetch(url, { signal })
-  await assertOk(response)
-  return response.json() as Promise<TResponse>
-}
-
-const post = async <TResponse = void>(
-  url: string,
-  body: unknown
-): Promise<TResponse> => {
-  const response = await fetch(url, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(body)
-  })
-  await assertOk(response)
-  if (response.status === 204) return undefined as TResponse
-  return response.json() as Promise<TResponse>
-}
-
-export const walletManager: SiweWalletManager = {
-  list: (signal) => get<SiweWalletAccount[]>("/api/wallets", signal),
-  createLinkChallenge: (wallet) =>
-    post<SiweWalletLinkChallenge>("/api/wallets/link-challenge", wallet),
-  link: (proof) => post("/api/wallets/link", proof),
-  unlink: (walletId) => fetch(`/api/wallets/${walletId}`, { method: "DELETE" }).then(assertOk),
-  setPrimary: (walletId) => fetch(`/api/wallets/${walletId}/primary`, { method: "POST" }).then(assertOk)
-}
-```
+<include>../../../shared/ui/plugins/siwe.mdx#shared-wallet-settings</include>
 
 Pass `walletManager` to `siwePlugin()`. BAUI then adds connect, list, primary, and remove controls to security settings.
 

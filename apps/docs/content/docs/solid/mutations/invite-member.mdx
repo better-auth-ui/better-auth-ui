@@ -13,7 +13,7 @@ const mutation = useInviteMember(authClient)
 mutation.mutate(/* params */)
 ```
 
-Organization mutations require `organizationClient()` on the Better Auth client. They attach the same `meta.invalidates` / `meta.awaits` cache metadata used by the shared React implementation, and the Solid `AuthProvider` installs a mutation invalidator that refreshes affected organization/session caches after successful auth mutations.
+<include>../../../shared/mutations/plugin-requirements.mdx#shared-organization-solid</include>
 
 ## Options factory
 

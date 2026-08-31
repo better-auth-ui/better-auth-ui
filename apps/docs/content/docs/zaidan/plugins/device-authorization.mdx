@@ -6,9 +6,7 @@ description: Approve CLI, TV, and limited-input device sign-ins with Solid and Z
 
 import { Step, Steps } from "fumadocs-ui/components/steps"
 
-The Device Authorization plugin adds the browser half of Better Auth's device authorization flow. A user enters the short code shown by a CLI, TV, or another limited-input device, signs in if needed, then approves or denies access.
-
-It contributes:
+<include>../../../shared/ui/plugins/device-authorization.mdx#shared-browser-flow</include>
 
 - A copied `<DeviceAuthorization />` view at `/auth/device`
 - Code verification with the `user_code` query parameter prefilled when present
@@ -16,7 +14,7 @@ It contributes:
 - Approve and deny confirmation states
 - Solid Query mutation options for verifying, approving, and denying requests
 
-The requesting device remains responsible for calling Better Auth's `/device/code` endpoint and polling `/device/token`.
+<include>../../../shared/ui/plugins/device-authorization.mdx#shared-overview</include>
 
 ## Setup
 
@@ -24,7 +22,7 @@ The requesting device remains responsible for calling Better Auth's `/device/cod
 <Step>
 ### Configure the Better Auth server
 
-Add the [Device Authorization](https://www.better-auth.com/docs/plugins/device-authorization) plugin to your Better Auth server. Set `verificationUri` to the public route that renders the UI view:
+<include>../../../shared/ui/plugins/device-authorization.mdx#shared-install-the-better-auth-plugin</include>
 
 ```ts title="src/lib/auth.ts"
 import { betterAuth } from "better-auth"
@@ -40,13 +38,7 @@ export const auth = betterAuth({
 })
 ```
 
-Generate or migrate your Better Auth schema after enabling the plugin:
-
-```bash
-bunx auth@latest migrate
-```
-
-The plugin adds the `deviceCode` model used to track pending requests.
+<include>../../../shared/ui/plugins/device-authorization.mdx#shared-configure-the-better-auth-server</include>
 
 </Step>
 <Step>
@@ -99,9 +91,8 @@ import { deviceAuthorizationPlugin } from "@/lib/auth/device-authorization-plugi
 
 </Step>
 <Step>
-### Allow the device route
 
-Include the plugin path in the route that renders `<Auth />`. Keep it aligned with the server's `verificationUri`:
+<include>../../../shared/ui/plugins/device-authorization.mdx#shared-allow-the-device-route</include>
 
 ```tsx title="src/routes/auth/$path.tsx"
 import { viewPaths } from "@better-auth-ui/core"
@@ -137,31 +128,15 @@ function AuthPage() {
 
 The copied component is rendered automatically at `/auth/device` when the plugin is registered. You can also render it directly:
 
-```tsx
-import { DeviceAuthorization } from "@/components/auth/device-authorization/device-authorization"
-
-<DeviceAuthorization />
-```
+<include>../../../shared/ui/plugins/device-authorization.mdx#shared-component</include>
 
 <type-table path="../../../../../../examples/start-solid-zaidan-example/src/components/auth/device-authorization/device-authorization.tsx" name="DeviceAuthorizationProps" />
 
-## Options
-
-```ts
-deviceAuthorizationPlugin({
-  // Override the URL segment. Default: "device"
-  path: "activate",
-  // Match Better Auth's server-side userCodeLength. Default: 8
-  userCodeLength: 8,
-  localization: {
-    approveDevice: "Allow this device?"
-  }
-})
-```
+<include>../../../shared/ui/plugins/device-authorization.mdx#shared-options</include>
 
 <type-table path="../../../../../../packages/core/src/plugins/device-authorization/device-authorization-plugin.ts" name="DeviceAuthorizationPluginOptions" />
 
-Keep `userCodeLength` equal to the value passed to Better Auth's server plugin. A mismatched length prevents valid codes from being submitted.
+<include>../../../shared/ui/plugins/device-authorization.mdx#shared-code-length</include>
 
 ## Localization
 

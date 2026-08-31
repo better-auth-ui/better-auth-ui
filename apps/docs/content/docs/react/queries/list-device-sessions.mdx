@@ -5,7 +5,7 @@ description: Retrieve the device sessions for the multi-session account switcher
 
 Powers the multi-session account switcher: each entry represents a session currently signed in on this device.
 
-Keyed per-user. Waits for the active session before firing.
+<include>../../../shared/queries/user-scoped.mdx#shared-session</include>
 
 ## Usage
 
@@ -34,15 +34,7 @@ const { data: deviceSessions } = useQuery(
 )
 ```
 
-## Invalidation
-
-```ts
-import { listDeviceSessionsOptions } from "@better-auth-ui/core/plugins/multi-session"
-
-queryClient.invalidateQueries({
-  queryKey: listDeviceSessionsOptions(authClient, userId).queryKey
-})
-```
+<include>../../../shared/queries/list-device-sessions.mdx#shared-invalidation</include>
 
 ## Params
 

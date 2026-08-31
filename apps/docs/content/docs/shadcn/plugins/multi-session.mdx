@@ -6,50 +6,14 @@ description: Enable concurrent sessions so users can sign in to and switch betwe
 
 import { Step, Steps } from 'fumadocs-ui/components/steps'
 
-The multi-session plugin enables users to maintain multiple active sessions simultaneously. Users can switch between accounts without signing out, manage all their device sessions, and quickly add new accounts from the user menu.
-
-It contributes:
-
-- A "Switch Account" submenu in the user button dropdown showing all active device sessions
-- A `<ManageAccounts />` card in account settings for viewing and revoking device sessions
-- `useListDeviceSessions`, `useSetActiveSession`, and `useRevokeMultiSession` hooks
+<include>../../../shared/ui/plugins/multi-session.mdx#shared-overview</include>
 
 ## Setup
 
 <Steps>
-<Step>
-### Install the Better Auth plugin
 
-Add the [Multi Session](https://www.better-auth.com/docs/plugins/multi-session) plugin to your Better Auth server config:
+<include>../../../shared/ui/plugins/multi-session.mdx#shared-install-the-better-auth-plugin</include>
 
-```ts title="lib/auth.ts"
-import { betterAuth } from "better-auth"
-import { multiSession } from "better-auth/plugins" // [!code highlight]
-
-export const auth = betterAuth({
-  // ...
-  plugins: [
-    multiSession() // [!code highlight]
-  ]
-})
-```
-
-</Step>
-<Step>
-### Install the matching client plugin
-
-Add `multiSessionClient()` to your auth client so `authClient.multiSession.*` methods are available:
-
-```ts title="lib/auth-client.ts"
-import { createAuthClient } from "better-auth/react"
-import { multiSessionClient } from "better-auth/client/plugins" // [!code highlight]
-
-export const authClient = createAuthClient({
-  plugins: [multiSessionClient()] // [!code highlight]
-})
-```
-
-</Step>
 <Step>
 ### Install the UI plugin
 
@@ -97,17 +61,9 @@ import { AuthProvider } from "@/components/auth/auth-provider"
 
 <ComponentPreview name="shadcn-switch-account-submenu" />
 
-The plugin adds a "Switch Account" submenu to `<UserButton />`. It shows all active device sessions.
+<include>../../../shared/ui/plugins/multi-session.mdx#shared-user-button</include>
 
-Users can switch accounts, add an account, and identify the current account.
-
-**Usage**
-
-```tsx
-import { SwitchAccountSubmenu } from "@/components/auth/multi-session/switch-account-submenu"
-
-<SwitchAccountSubmenu />
-```
+<include>../../../shared/ui/plugins/multi-session.mdx#shared-registry-switcher-example</include>
 
 **Props**
 
@@ -121,28 +77,13 @@ The `<ManageAccounts />` card is rendered in account settings when your layout r
 
 **Usage**
 
-```tsx
-import { ManageAccounts } from "@/components/auth/multi-session/manage-accounts"
-
-<ManageAccounts />
-```
+<include>../../../shared/ui/plugins/multi-session.mdx#shared-manage-accounts</include>
 
 **Props**
 
 <type-table path="../../../../../../examples/start-shadcn-example/src/components/auth/multi-session/manage-accounts.tsx" name="ManageAccountsProps" />
 
-## Options
-
-```ts
-multiSessionPlugin({
-  // Override any of the plugin's localization strings.
-  localization: {
-    switchAccount: "Switch Account",
-    addAccount: "Add Account",
-    manageAccounts: "Manage Accounts"
-  }
-})
-```
+<include>../../../shared/ui/plugins/multi-session.mdx#shared-options</include>
 
 <type-table path="../../../../../../packages/core/src/plugins/multi-session/multi-session-plugin.ts" name="MultiSessionPluginOptions" />
 
@@ -150,10 +91,4 @@ multiSessionPlugin({
 
 <type-table path="../../../../../../packages/core/src/plugins/multi-session/multi-session-localization.ts" name="MultiSessionLocalization" />
 
-## Session management
-
-The plugin provides hooks for managing multiple sessions:
-
-- `useListDeviceSessions` - List all device sessions for the current user
-- `useSetActiveSession` - Switch to a different session
-- `useRevokeMultiSession` - Sign out from a specific session
+<include>../../../shared/ui/plugins/multi-session.mdx#shared-session-management</include>

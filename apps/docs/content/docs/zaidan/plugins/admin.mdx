@@ -27,8 +27,7 @@ export const auth = betterAuth({
 })
 ```
 
-Update your database schema after enabling the plugin. Better Auth adds admin
-fields to users and an `impersonatedBy` field to sessions.
+<include>../../../shared/ui/plugins/admin.mdx#shared-schema</include>
 
 </Step>
 <Step>
@@ -104,13 +103,9 @@ import { AdminUsers } from "@/components/auth/admin/admin-users"
 />
 ```
 
-## Inspector tabs
+<include>../../../shared/ui/plugins/admin.mdx#shared-inspector-tabs</include>
 
-The user inspector includes local Overview and Sessions tabs. Registered
-plugins can add more tabs without adding routes.
-
-The Dash integration adds an Activity tab when both UI plugins are registered.
-Dash applies its own organization owner or admin access rules to this tab.
+<include>../../../shared/ui/plugins/admin.mdx#shared-dash-activity</include>
 
 ## User actions
 
@@ -118,65 +113,31 @@ The users page can create users. The dialog can update a user's name and role,
 set a password, ban or unban the user, impersonate the user, delete the user,
 and revoke one or all of the user's sessions.
 
-The UI checks the matching Admin client permission before it enables each
-action. Dangerous actions require confirmation. The UI also disables actions
-that would ban, delete, impersonate, or revoke sessions for the current user.
-
-## Permissions and privacy
-
-The users page calls the Better Auth permission API before it requests the
-user list. Do not authorize the page from a role string alone.
+<include>../../../shared/ui/plugins/admin.mdx#shared-permissions-and-privacy</include>
 
 The table searches either `email` or `name` in each request. Passwords stay in
 local form state. The forms clear each password after the request or when the
 user closes the form. Session IP addresses are hidden unless `showIpAddress`
 is `true`.
 
-```ts
-adminPlugin({
-  allowMultipleRoles: false,
-  defaultRole: "member",
-  impersonationRedirectTo: "/",
-  pageSize: 25,
-  roles: ["member", "support", "admin"],
-  showIpAddress: false
-})
-```
+<include>../../../shared/ui/plugins/admin.mdx#shared-permissions-example</include>
 
-Set `allowMultipleRoles` to `false` to make the create and edit forms accept
-one role. This option does not change `adminRoles`, which controls administrator
-access.
+<include>../../../shared/ui/plugins/admin.mdx#shared-single-role</include>
 
-The public Admin client does not provide account disconnection, global
-organization administration, or a Sentinel dashboard. These views are not
-part of this integration.
+<include>../../../shared/ui/plugins/admin.mdx#shared-client-limitations</include>
 
 ## User button behavior
 
 The copied `adminPlugin()` contributes `<StopImpersonating />` through the
 `userMenuItems` slot. `<UserButton />` places it above sign out.
 
-The action renders only when `session.session.impersonatedBy` is present.
-Selecting it calls `authClient.admin.stopImpersonating()` and refreshes the
-cached session before the pending state completes.
+<include>../../../shared/ui/plugins/admin.mdx#shared-stop-impersonating-behavior</include>
 
-```tsx
-import { StopImpersonating } from "@/components/auth/admin/stop-impersonating"
-
-<StopImpersonating />
-```
+<include>../../../shared/ui/plugins/admin.mdx#shared-stop-impersonating-example</include>
 
 <type-table path="../../../../../../examples/start-solid-zaidan-example/src/components/auth/admin/stop-impersonating.tsx" name="StopImpersonatingProps" />
 
-## Options
-
-```ts
-adminPlugin({
-  localization: {
-    stopImpersonating: "Return to admin"
-  }
-})
-```
+<include>../../../shared/ui/plugins/admin.mdx#shared-options</include>
 
 <type-table path="../../../../../../packages/core/src/plugins/admin/admin-plugin.ts" name="AdminPluginOptions" />
 

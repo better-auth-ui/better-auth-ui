@@ -10,9 +10,7 @@ description: Email template for verifying a permanent account deletion request.
 ```tsx file=<rootDir>/src/demos/zaidan/email/delete-account-verification-email.tsx#L13-
 ```
 
-## Better Auth setup
-
-Render this template from `user.deleteUser.sendDeleteAccountVerification`. Better Auth supplies the verification URL and user whose account is being deleted.
+<include>../../../../shared/ui/components/email/delete-account-verification-email.mdx#shared-better-auth-setup</include>
 
 ```tsx
 sendDeleteAccountVerification: async ({ user, url }) => {
@@ -42,9 +40,4 @@ npx shadcn@latest add https://better-auth-ui.com/r/solid/delete-account-verifica
 
 <type-table path="../../../../../../../packages/solid/src/components/auth/email/delete-account-verification.tsx" name="DeleteAccountVerificationEmailProps" />
 
-## Features
-
-- Clearly states that account deletion is permanent
-- Includes a verification button and fallback URL
-- Explains that ignoring the message keeps the account active
-- Supports expiration details, theming, branding, and localization
+<include>../../../../shared/ui/components/email/delete-account-verification-email.mdx#shared-features</include>

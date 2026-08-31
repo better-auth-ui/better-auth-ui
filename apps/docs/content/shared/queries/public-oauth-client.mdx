@@ -1,0 +1,25 @@
+<section id="shared-overview">
+
+Requires `oauthProviderClient()` from `@better-auth/oauth-provider/client`. Read the client ID from the signed authorization query and leave the complete query string in the browser URL.
+
+</section>
+
+<section id="shared-options-factory-and-loader-helpers">
+
+## Options factory and loader helpers
+
+```ts
+import {
+  ensurePublicOAuthClient,
+  fetchPublicOAuthClient,
+  prefetchPublicOAuthClient,
+  publicOAuthClientOptions
+} from "@better-auth-ui/core/plugins/oauth-provider"
+
+const options = publicOAuthClientOptions(authClient, clientId)
+await ensurePublicOAuthClient(queryClient, authClient, clientId)
+await prefetchPublicOAuthClient(queryClient, authClient, clientId)
+const client = await fetchPublicOAuthClient(queryClient, authClient, clientId)
+```
+
+</section>

@@ -143,11 +143,7 @@ function AuthPage() {
 
 The copied `<MagicLink />` view is rendered when the Magic Link plugin is registered and the auth route accepts the plugin path.
 
-```tsx
-import { MagicLink } from "@/components/auth/magic-link"
-
-<MagicLink />
-```
+<include>../../../shared/ui/plugins/magic-link.mdx#shared-magic-link</include>
 
 <type-table path="../../../../../../examples/start-solid-zaidan-example/src/components/auth/magic-link.tsx" name="MagicLinkProps" />
 
@@ -155,11 +151,7 @@ import { MagicLink } from "@/components/auth/magic-link"
 
 After a magic-link request succeeds, the form stores the submitted email in session storage and navigates to this confirmation view. It redirects back to the magic-link form when that state is missing and shows an email-provider shortcut when one is available. Hover or focus the button to show a QR code for opening the same provider URL on another device.
 
-```tsx
-import { MagicLinkSent } from "@/components/auth/magic-link-sent"
-
-<MagicLinkSent />
-```
+<include>../../../shared/ui/plugins/magic-link.mdx#shared-registry-sent-example</include>
 
 <type-table path="../../../../../../examples/start-solid-zaidan-example/src/components/auth/magic-link-sent.tsx" name="MagicLinkSentProps" />
 

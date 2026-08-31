@@ -6,36 +6,14 @@ description: Add account deletion with confirmation dialog to your authenticatio
 
 import { Step, Steps } from 'fumadocs-ui/components/steps'
 
-The delete-user plugin renders the UI for Better Auth's built-in [account deletion](https://www.better-auth.com/docs/concepts/users-accounts#delete-user) feature. Users can permanently delete their account with a confirmation dialog via the `<DeleteAccount />` card, wrapped by `<DangerZone />` in security settings.
+<include>../../../shared/ui/plugins/delete-user.mdx#shared-overview</include>
 
 ## Setup
 
 <Steps>
-<Step>
-### Enable account deletion in Better Auth
 
-[Better Auth core includes account deletion](https://www.better-auth.com/docs/concepts/users-accounts#delete-user). You do not need another plugin.
+<include>../../../shared/ui/plugins/delete-user.mdx#shared-enable-account-deletion-in-better-auth</include>
 
-Enable the feature by setting `user.deleteUser.enabled` to `true`:
-
-```ts title="lib/auth.ts"
-import { betterAuth } from "better-auth"
-
-export const auth = betterAuth({
-  // ...
-  user: {
-    deleteUser: { // [!code highlight]
-      enabled: true // [!code highlight]
-    } // [!code highlight]
-  }
-})
-```
-
-After you enable the feature, the client provides `authClient.deleteUser()`. You do not need a client plugin.
-
-For an OAuth user without a password, provide `sendDeleteAccountVerification`. This callback lets the user confirm deletion by email.
-
-</Step>
 <Step>
 ### Register the UI plugin
 
@@ -63,9 +41,7 @@ import { deleteUserPlugin } from "@better-auth-ui/heroui/plugins/delete-user" //
 
 <ComponentPreview name="heroui-delete-user-danger-zone" />
 
-The `<DangerZone />` card is automatically rendered in `<SecuritySettings />` when the plugin is registered. It renders a danger zone heading and the `<DeleteAccount />` card below it.
-
-**Usage**
+<include>../../../shared/ui/plugins/delete-user.mdx#shared-danger-zone</include>
 
 ```tsx
 import { DangerZone } from "@better-auth-ui/heroui/plugins/delete-user"
@@ -77,11 +53,9 @@ import { DangerZone } from "@better-auth-ui/heroui/plugins/delete-user"
 
 <type-table path="../../../../../../packages/heroui/src/components/auth/delete-user/danger-zone.tsx" name="DangerZoneProps" />
 
-### `<DeleteAccount />`
+<include>../../../shared/ui/plugins/delete-user.mdx#shared-delete-account</include>
 
-The delete account card with confirmation dialog. Used inside `<DangerZone />` by default. Import it directly if you need a custom layout.
-
-When credential confirmation is required, the password starts masked and includes a localized show/hide control.
+<include>../../../shared/ui/plugins/delete-user.mdx#shared-password-visibility</include>
 
 **Usage**
 

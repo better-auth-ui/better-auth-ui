@@ -22,7 +22,7 @@ export function AccountPage() {
 }
 ```
 
-The redirect uses `basePaths.auth` + `viewPaths.auth.signIn` from `AuthProvider`: override those to target a custom sign-in view.
+<include>../../../shared/queries/authenticate.mdx#shared-usage</include>
 
 Accepts the same arguments as `useSession`: see its [Params](/docs/solid/queries/session#params).
 
@@ -32,11 +32,7 @@ The redirect runs inside a Solid `createEffect`, so it is browser-only. During t
 
 The protected interface can appear briefly before the browser effect redirects to sign-in.
 
-You have two ways to handle this:
-
-### Gate on `isPending` (simplest)
-
-Render a skeleton or spinner while the session query is pending, and `null` once it resolves to unauthenticated (the redirect is already in flight). This is what the [Usage](#usage) example does and is enough for most apps:
+<include>../../../shared/queries/authenticate.mdx#shared-gate-on-is-pending-simplest</include>
 
 ```tsx
 const session = useAuthenticate(authClient)
@@ -47,13 +43,9 @@ if (!session.data) return null // navigating to sign-in
 return <Account user={session.data.user} />
 ```
 
-No flash of protected content, no server work required: just a brief loading state on first mount. Works identically for SSR, client-rendered, and statically prerendered routes.
-
-### Pair with a server-side guard (no loading state)
-
-To render the protected interface immediately without a skeleton, prefetch the session on the server. Then hydrate it into the query cache:
+<include>../../../shared/queries/authenticate.mdx#shared-pair-with-a-server-side-guard-no-loading-state</include>
 
 - **TanStack Start**: check the session in a server route guard or loader, then hydrate the session query for the protected route.
 - **Solid server runtimes**: use the server-side session helpers from [`useSession`](/docs/solid/queries/session#server-side-prefetching) with the request headers for the current request.
 
-The server-side check protects the first render. `useAuthenticate` redirects after token expiration, remote sign-out, or server-side session revocation.
+<include>../../../shared/queries/authenticate.mdx#shared-session-changes</include>

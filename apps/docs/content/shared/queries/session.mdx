@@ -1,0 +1,31 @@
+## Server-side prefetching
+
+For client and router loaders that already have an `authClient`, use the helpers from `@better-auth-ui/core`.
+
+```ts
+import { ensureSession, fetchSession, prefetchSession } from "@better-auth-ui/core"
+
+await ensureSession(queryClient, authClient)
+await prefetchSession(queryClient, authClient)
+const session = await fetchSession(queryClient, authClient)
+```
+
+For server loaders, use `@better-auth-ui/core/server`. These helpers call your Better Auth server instance directly. Pass the request headers required by `auth.api.getSession`.
+
+## Invalidation
+
+```ts
+import { sessionOptions } from "@better-auth-ui/core"
+
+queryClient.invalidateQueries({
+  queryKey: sessionOptions(authClient).queryKey
+})
+```
+
+The shared key factory provides the same query key:
+
+```ts
+import { authQueryKeys } from "@better-auth-ui/core"
+
+queryClient.invalidateQueries({ queryKey: authQueryKeys.session })
+```

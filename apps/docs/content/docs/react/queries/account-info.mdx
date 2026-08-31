@@ -35,17 +35,7 @@ const { data: accountInfo } = useQuery(
 )
 ```
 
-## Invalidation
-
-```ts
-import { accountInfoOptions } from "@better-auth-ui/core"
-
-queryClient.invalidateQueries({
-  queryKey: accountInfoOptions(authClient, userId, {
-    query: { accountId: "acc_123" }
-  }).queryKey
-})
-```
+<include>../../../shared/queries/account-info.mdx#shared-invalidation</include>
 
 ## Params
 

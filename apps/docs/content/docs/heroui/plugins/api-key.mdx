@@ -6,9 +6,7 @@ description: Add programmatic API key management with create, copy, and revoke f
 
 import { Step, Steps } from 'fumadocs-ui/components/steps'
 
-The API key plugin adds programmatic API key management to your authentication UI. Users can create, copy, and revoke API keys from a security card in account settings. New keys can use a configurable expiration interval, and each listed key shows when it expires.
-
-It contributes:
+<include>../../../shared/ui/plugins/api-key.mdx#shared-overview</include>
 
 - An `<ApiKeys />` card to the security settings tab for user-owned keys
 - An `<OrganizationApiKeys />` card to `<OrganizationSettings />` for organization-owned keys (opt-in via `apiKeyPlugin({ organization: true })`. Requires the [organization plugin](/docs/heroui/plugins/organization) and a matching server-side API key config)
@@ -17,38 +15,15 @@ It contributes:
 
 <Steps>
 <Step>
-### Install the Better Auth plugin
 
-Install the [`@better-auth/api-key`](https://www.better-auth.com/docs/plugins/api-key) package and add it to your Better Auth server config:
+<include>../../../shared/ui/plugins/api-key.mdx#shared-install-the-better-auth-plugin</include>
 
-```ts title="lib/auth.ts"
-import { betterAuth } from "better-auth"
-import { apiKey } from "@better-auth/api-key" // [!code highlight]
-
-export const auth = betterAuth({
-  // ...
-  plugins: [
-    apiKey() // [!code highlight]
-  ]
-})
-```
+<include>../../../shared/ui/plugins/api-key.mdx#shared-server-example</include>
 
 </Step>
-<Step>
-### Install the matching client plugin
 
-Add `apiKeyClient()` to your auth client so `authClient.apiKey.*` methods are available:
+<include>../../../shared/ui/plugins/api-key.mdx#shared-install-the-matching-client-plugin</include>
 
-```ts title="lib/auth-client.ts"
-import { createAuthClient } from "better-auth/react"
-import { apiKeyClient } from "@better-auth/api-key/client" // [!code highlight]
-
-export const authClient = createAuthClient({
-  plugins: [apiKeyClient()] // [!code highlight]
-})
-```
-
-</Step>
 <Step>
 ### Register the UI plugin
 
@@ -73,41 +48,15 @@ import { authClient } from "@/lib/auth-client"
 </Step>
 </Steps>
 
-## Configure expiration
+<include>../../../shared/ui/plugins/api-key.mdx#shared-configure-expiration</include>
 
-The create dialog offers 30 days, 90 days, and Never by default. It initially selects 30 days. Configure the choices through `apiKeyPlugin()`:
+<include>../../../shared/ui/plugins/api-key.mdx#shared-expiration-units</include>
 
-```tsx title="components/providers.tsx"
-apiKeyPlugin({
-  keyExpiration: {
-    intervals: [7, 30, 90],
-    defaultInterval: 30,
-    allowNever: true
-  }
-})
-```
+<include>../../../shared/ui/plugins/api-key.mdx#shared-server-expiration-example</include>
 
-`intervals` and `defaultInterval` use days. Better Auth receives the selected lifetime as seconds.
+<include>../../../shared/ui/plugins/api-key.mdx#shared-default-expiration</include>
 
-Keep the UI choices within the limits in your Better Auth server configuration:
-
-```ts title="lib/auth.ts"
-apiKey({
-  keyExpiration: {
-    minExpiresIn: 7,
-    maxExpiresIn: 90,
-    defaultExpiresIn: null
-  }
-})
-```
-
-When `allowNever` is enabled, selecting Never sends no custom interval. Better Auth will still apply `defaultExpiresIn` if the server defines one, so set `allowNever: false` in the UI when your server always requires expiration.
-
-To remove the expiration field and rely entirely on the server default:
-
-```tsx title="components/providers.tsx"
-apiKeyPlugin({ keyExpiration: false })
-```
+<include>../../../shared/ui/plugins/api-key.mdx#shared-disable-expiration-example</include>
 
 ## Components
 
@@ -129,11 +78,7 @@ import { ApiKeys } from "@better-auth-ui/heroui/plugins/api-key"
 
 <type-table path="../../../../../../packages/heroui/src/components/auth/api-key/api-keys.tsx" name="ApiKeysProps" />
 
-### `<OrganizationApiKeys />`
-
-A thin wrapper around `<ApiKeys />` that resolves the active organization via `useActiveOrganization` and forwards its id. Rendered inside `<OrganizationSettings />` only when the plugin is registered with `{ organization: true }`.
-
-To enable, opt in on the UI plugin and add a matching API key configuration to your Better Auth server config. The plugin uses a fixed `configId` of `"organization"`, so the server entry **must** be `{ configId: "organization", references: "organization" }`:
+<include>../../../shared/ui/plugins/api-key.mdx#shared-organization-api-keys</include>
 
 ```ts title="components/providers.tsx"
 import { AuthProvider } from "@better-auth-ui/heroui"
@@ -151,26 +96,9 @@ import { authClient } from "@/lib/auth-client"
 </AuthProvider>
 ```
 
-```ts title="lib/auth.ts"
-import { betterAuth } from "better-auth"
-import { apiKey } from "@better-auth/api-key"
-import { organization } from "better-auth/plugins"
+<include>../../../shared/ui/plugins/api-key.mdx#shared-organization-server-example</include>
 
-export const auth = betterAuth({
-  // ...
-  plugins: [
-    organization(),
-    apiKey([
-      { configId: "default", references: "user" },
-      { configId: "organization", references: "organization" } // [!code highlight]
-    ])
-  ]
-})
-```
-
-See the [Better Auth docs](https://www.better-auth.com/docs/plugins/api-key/advanced#organization-owned-api-keys) for role-based permissions on organization-owned keys.
-
-**Usage**
+<include>../../../shared/ui/plugins/api-key.mdx#shared-organization-permissions</include>
 
 ```tsx
 import { OrganizationApiKeys } from "@better-auth-ui/heroui/plugins/api-key"
@@ -189,24 +117,11 @@ import { OrganizationApiKeys } from "@better-auth-ui/heroui/plugins/api-key"
 ## Localization
 
 <type-table path="../../../../../../packages/core/src/plugins/api-key/api-key-localization.ts" name="ApiKeyLocalization" />
-## Lifecycle controls
 
-`<ApiKeys />` lets users create, rename, and delete keys. The create form exposes the name, configuration, expiration, and organization. The list shows status, remaining requests, request usage, and the last request time as read-only values.
-
-The built-in dialog does not show metadata because metadata belongs to the application. For metadata, build a custom form with `useCreateApiKey`. Map named fields or application state to the metadata object. Do not show a raw JSON editor. If metadata affects trusted behavior, validate it in a server route.
-
-Better Auth reserves enablement, permissions, quotas, refill rules, and rate limits for server-side creation and updates. Configure those values in trusted server code instead of exposing them in the account UI.
+<include>../../../shared/ui/plugins/api-key.mdx#shared-lifecycle-controls</include>
 
 Configure the choices that the UI exposes:
 
-```tsx
-apiKeyPlugin({
-  configurations: [
-    { id: "default", label: "Personal", organization: false },
-    { id: "organization", label: "Organization", organization: true }
-  ],
-  pageSize: 20
-})
-```
+<include>../../../shared/ui/plugins/api-key.mdx#shared-lifecycle-example</include>
 
 The server must define every listed `configId`. Use `useUpdateApiKey` when you build a custom rename surface.

@@ -1,0 +1,121 @@
+<section id="shared-polar-adapter">
+
+```ts title="lib/billing.ts"
+import { createPolarBillingAdapter } from "@better-auth-ui/core/plugins/billing"
+
+export const billingAdapter = createPolarBillingAdapter(authClient, {
+  plans,
+  products: {
+    pro: { type: "product", value: "123e4567-e89b-12d3-a456-426614174000" }
+  },
+  successUrl: "/settings/billing?checkout=success",
+  cancelUrl: "/settings/billing?checkout=canceled",
+  returnUrl: "/settings/billing"
+})
+```
+
+</section>
+
+<section id="shared-other-bundled-adapters">
+
+| Adapter | Checkout and state | Direct actions | Scope |
+| --- | --- | --- | --- |
+| Stripe | Better Auth subscription API | Cancel, restore, seats | User and explicit organization |
+| Polar | Checkout, subscriptions, usage | Portal fallback | User and explicit organization |
+| Autumn | Attach, customer subscriptions, balances | Cancel, restore, optional license seats | User |
+| Creem | Checkout and active subscription | Cancel | User |
+| Dodo Payments | Checkout session and subscription list | Portal fallback | User |
+| Commet | Portal and current subscription | Cancel, optional feature usage and seats | User |
+
+</section>
+
+<section id="shared-adapter-examples">
+
+```ts title="lib/billing.ts"
+import {
+  createAutumnBillingAdapter,
+  createCommetBillingAdapter,
+  createCreemBillingAdapter,
+  createDodoPaymentsBillingAdapter
+} from "@better-auth-ui/core/plugins/billing"
+import { createAutumnClient } from "autumn-js/react"
+
+const urls = {
+  successUrl: "/settings/billing?checkout=success",
+  cancelUrl: "/settings/billing?checkout=canceled",
+  returnUrl: "/settings/billing"
+}
+
+const autumnClient = createAutumnClient({
+  pathPrefix: "/api/auth/autumn",
+  includeCredentials: true
+})
+
+export const autumnAdapter = createAutumnBillingAdapter(autumnClient, {
+  plans,
+  seatLicensePlans: { pro: "team-seat" },
+  ...urls
+})
+
+export const creemAdapter = createCreemBillingAdapter(authClient, {
+  plans,
+  products: { pro: "prod_creem_pro" },
+  ...urls
+})
+
+export const dodoAdapter = createDodoPaymentsBillingAdapter(authClient, {
+  plans,
+  products: { pro: { type: "slug", value: "pro" } },
+  ...urls
+})
+
+export const commetAdapter = createCommetBillingAdapter(authClient, {
+  plans,
+  planIds: { pro: "commet-plan-id" },
+  usage: true,
+  seatFeatureCode: "members",
+  ...urls
+})
+```
+
+Enable the matching provider sub-plugins. Dodo needs checkout and portal. Commet needs portal and subscriptions, plus features or seats when you enable those adapter options.
+
+</section>
+
+<section id="shared-user-only-adapters">
+
+<Callout type="warn" title="User-only provider clients">
+Autumn, Creem, Dodo Payments, and Commet resolve the signed-in customer. Their browser APIs do not accept an explicit organization ID. Their adapters declare `scopes.organization: false`. `billingPlugin` rejects an organization billing configuration instead of reading active organization state.
+</Callout>
+
+</section>
+
+<section id="shared-custom-adapter">
+
+```ts
+import type { BillingAdapter } from "@better-auth-ui/core/plugins/billing"
+
+export const billingAdapter: BillingAdapter = {
+  id: "custom",
+  scopes: { user: true, organization: true },
+  supports: { cancel: true, restore: true, seats: true },
+  listPlans: async (scope, signal) => billingApi.listPlans(scope, signal),
+  getState: async (scope, signal) => billingApi.getState(scope, signal),
+  checkout: async (scope, input) => billingApi.checkout(scope, input),
+  openPortal: async (scope) => billingApi.openPortal(scope),
+  cancel: async (scope, subscriptionId) =>
+    billingApi.cancel(scope, subscriptionId),
+  restore: async (scope, subscriptionId) =>
+    billingApi.restore(scope, subscriptionId),
+  updateSeats: async (scope, subscriptionId, seats) =>
+    billingApi.updateSeats(scope, subscriptionId, seats)
+}
+```
+
+</section>
+
+<section id="shared-provider-guides">
+
+See the provider guides for [Stripe](https://www.better-auth.com/docs/beta/plugins/stripe), [Polar](https://www.better-auth.com/docs/plugins/polar), [Autumn](https://www.better-auth.com/docs/plugins/autumn), [Creem](https://www.better-auth.com/docs/plugins/creem), [Dodo Payments](https://docs.dodopayments.com/developer-resources/better-auth-adaptor), and [Commet](https://www.better-auth.com/docs/plugins/commet).
+
+</section>

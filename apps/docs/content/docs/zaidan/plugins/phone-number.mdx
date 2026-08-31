@@ -100,17 +100,9 @@ const validAuthPathSegments = new Set([
 </Step>
 </Steps>
 
-## Flow options
+<include>../../../shared/ui/plugins/phone-number.mdx#shared-flow-options</include>
 
-| UI option | Default | Server requirement |
-|---|---:|---|
-| `signIn` | `true` | `sendOTP` |
-| `passwordSignIn` | `false` | A password credential |
-| `passwordReset` | `false` | `sendPasswordResetOTP` |
-| `changePhoneNumber` | `true` | `sendOTP` |
-| `otpLength` | `6` | Must match Better Auth `otpLength` |
-
-Use `defaultCountry`, `countries`, and `locale` to control the selector. Supply an `adapter` when your application needs different formatting or validation rules.
+<include>../../../shared/ui/plugins/phone-number.mdx#shared-selector-options</include>
 
 <Callout type="warn">
 Passwordless phone verification bypasses Better Auth 2FA. Phone number and password sign-in still follows the configured second-factor flow.

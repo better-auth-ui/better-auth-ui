@@ -6,31 +6,16 @@ description: Add static user management, session controls, and impersonation to 
 
 import { Step, Steps } from "fumadocs-ui/components/steps"
 
-The Admin plugin adds a static `/admin/users` page and a user-detail drawer.
-It also adds a "Stop impersonating" action to `<UserButton />`.
+<include>../../../shared/ui/plugins/admin.mdx#shared-overview</include>
 
 ## Setup
 
 <Steps>
 <Step>
-### Enable the Better Auth admin plugin
 
-Add `admin()` to the server configuration:
+<include>../../../shared/ui/plugins/admin.mdx#shared-enable-the-better-auth-admin-plugin</include>
 
-```ts title="lib/auth.ts"
-import { betterAuth } from "better-auth"
-import { admin } from "better-auth/plugins" // [!code highlight]
-
-export const auth = betterAuth({
-  // ...
-  plugins: [
-    admin() // [!code highlight]
-  ]
-})
-```
-
-Update your database schema after enabling the plugin. Better Auth adds admin
-fields to users and an `impersonatedBy` field to sessions.
+<include>../../../shared/ui/plugins/admin.mdx#shared-schema</include>
 
 </Step>
 <Step>
@@ -39,14 +24,7 @@ fields to users and an `impersonatedBy` field to sessions.
 Add `adminClient()` so the UI can read the impersonation marker and restore the
 administrator's session:
 
-```ts title="lib/auth-client.ts"
-import { createAuthClient } from "better-auth/react"
-import { adminClient } from "better-auth/client/plugins" // [!code highlight]
-
-export const authClient = createAuthClient({
-  plugins: [adminClient()] // [!code highlight]
-})
-```
+<include>../../../shared/ui/plugins/admin.mdx#shared-add-the-matching-client-plugin</include>
 
 </Step>
 <Step>
@@ -140,8 +118,7 @@ search across names, email addresses, and user IDs.
 Select a row to open the user inspector. The inspector includes local Overview
 and Sessions tabs. Registered plugins can add more tabs without adding routes.
 
-The Dash integration adds an Activity tab when both UI plugins are registered.
-Dash applies its own organization owner or admin access rules to this tab.
+<include>../../../shared/ui/plugins/admin.mdx#shared-dash-activity</include>
 
 The users page can create users. The inspector can update names and roles, set
 passwords, ban or unban users, impersonate users, remove users, and revoke one
@@ -156,23 +133,12 @@ your privacy policy permits this data.
 
 ## Custom roles and options
 
-```ts
-adminPlugin({
-  allowMultipleRoles: false,
-  defaultRole: "member",
-  impersonationRedirectTo: "/",
-  pageSize: 25,
-  roles: ["member", "support", "admin"],
-  showIpAddress: false
-})
-```
+<include>../../../shared/ui/plugins/admin.mdx#shared-permissions-example</include>
 
 Configure the same roles and permissions in Better Auth `admin()` and
 `adminClient()`. The UI list only controls which role choices it shows.
 
-Set `allowMultipleRoles` to `false` to make the create and edit forms accept
-one role. This option does not change `adminRoles`, which controls administrator
-access.
+<include>../../../shared/ui/plugins/admin.mdx#shared-single-role</include>
 
 ## Scope
 
@@ -180,32 +146,15 @@ This integration uses the public Better Auth Admin client. It does not add
 account disconnection, organization membership management, global
 organization administration, analytics, or a Sentinel dashboard.
 
-## User button behavior
+<include>../../../shared/ui/plugins/admin.mdx#shared-user-button-behavior</include>
 
-`adminPlugin()` contributes `<StopImpersonating />` through the
-`userMenuItems` slot. `<UserButton />` places it above sign out.
+<include>../../../shared/ui/plugins/admin.mdx#shared-stop-impersonating-behavior</include>
 
-The action renders only when `session.session.impersonatedBy` is present.
-Selecting it calls `authClient.admin.stopImpersonating()` and refreshes the
-cached session before the pending state completes.
-
-```tsx
-import { StopImpersonating } from "@/components/auth/admin/stop-impersonating"
-
-<StopImpersonating />
-```
+<include>../../../shared/ui/plugins/admin.mdx#shared-stop-impersonating-example</include>
 
 <type-table path="../../../../../../examples/start-shadcn-example/src/components/auth/admin/stop-impersonating.tsx" name="StopImpersonatingProps" />
 
-## Options
-
-```ts
-adminPlugin({
-  localization: {
-    stopImpersonating: "Return to admin"
-  }
-})
-```
+<include>../../../shared/ui/plugins/admin.mdx#shared-options</include>
 
 <type-table path="../../../../../../packages/core/src/plugins/admin/admin-plugin.ts" name="AdminPluginOptions" />
 
@@ -213,13 +162,4 @@ adminPlugin({
 
 <type-table path="../../../../../../packages/core/src/plugins/admin/admin-localization.ts" name="AdminLocalization" />
 
-## Mutation API
-
-```tsx
-import { useStopImpersonating } from "@better-auth-ui/react/plugins/admin"
-
-const stopImpersonating = useStopImpersonating(authClient)
-```
-
-Use the hook when you need the same behavior outside the user button. It
-restores the admin session and awaits invalidation of the shared session query.
+<include>../../../shared/ui/plugins/admin.mdx#shared-mutation-api</include>

@@ -6,17 +6,14 @@ description: Add theme selection with system, light, and dark modes to your auth
 
 import { Step, Steps } from 'fumadocs-ui/components/steps'
 
-The theme plugin adds theme selection to your authentication UI. Users can switch between system, light, and dark themes from the user button dropdown and account settings.
+<include>../../../shared/ui/plugins/theme.mdx#shared-overview</include>
 
 ## Setup
 
 <Steps>
 <Step>
-### Register the UI plugin
 
-The plugin works with any theme library. Pass the theme library's hook, such as `useTheme` from [next-themes](https://github.com/pacocoursey/next-themes).
-
-The slot components can then read the current theme inside `<ThemeProvider>`. You do not need another wrapper.
+<include>../../../shared/ui/plugins/theme.mdx#shared-register-the-ui-plugin</include>
 
 ```tsx title="components/providers.tsx"
 import { AuthProvider } from "@better-auth-ui/heroui"
@@ -42,36 +39,12 @@ export function Providers({ children }: { children: ReactNode }) {
 }
 ```
 
-The plugin calls `useTheme()` inside its slot components during each render. The call stays inside `<ThemeProvider>` when both providers share a component.
+<include>../../../shared/ui/plugins/theme.mdx#shared-theme-hook</include>
 
 </Step>
-<Step>
-### Or pass static theme state
 
-If the theme source has no hook, pass both `theme` and `setTheme`. The source can use `useState` or a custom controller.
+<include>../../../shared/ui/plugins/theme.mdx#shared-or-pass-static-theme-state</include>
 
-The plugin runs during each parent render. The slot components update when the state owner renders with a new value.
-
-```tsx title="components/providers.tsx"
-const [theme, setTheme] = useState("system") // [!code highlight]
-
-<AuthProvider
-  authClient={authClient}
-  plugins={[
-    themePlugin({ // [!code highlight]
-      theme, // [!code highlight]
-      setTheme, // [!code highlight]
-      themes: ["system", "light", "dark"] // [!code highlight]
-    }) // [!code highlight]
-  ]}
->
-  {children}
-</AuthProvider>
-```
-
-The two forms are mutually exclusive: you pass either `useTheme` **or** the `theme`/`setTheme` pair.
-
-</Step>
 </Steps>
 
 ## Components
@@ -84,9 +57,7 @@ The two forms are mutually exclusive: you pass either `useTheme` **or** the `the
 
 <ComponentPreview name="heroui-theme-appearance" />
 
-The `<Appearance />` card is automatically rendered in `<AccountSettings />` when the plugin is registered.
-
-**Usage**
+<include>../../../shared/ui/plugins/theme.mdx#shared-appearance</include>
 
 ```tsx
 import { Appearance } from "@better-auth-ui/heroui/plugins/theme"

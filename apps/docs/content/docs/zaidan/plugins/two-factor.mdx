@@ -17,9 +17,7 @@ It contributes:
 
 The copied sign-in form detects `twoFactorRedirect` for you and routes to the challenge with `redirectTo` preserved.
 
-<Callout type="warn">
-Better Auth does not apply two-factor to passwordless sign-in. Magic link, email OTP, passkeys, and OAuth all bypass the challenge: the second factor only guards password (and username) sign-in.
-</Callout>
+<include>../../../shared/ui/plugins/two-factor.mdx#shared-passwordless-limitations</include>
 
 ## Setup
 
@@ -50,14 +48,10 @@ export const auth = betterAuth({
 
 </Step>
 <Step>
-### Migrate your database
 
-The plugin adds a `twoFactor` table and a `twoFactorEnabled` field on `user`:
+<include>../../../shared/ui/plugins/two-factor.mdx#shared-registry-migration</include>
 
-```bash
-npx @better-auth/cli generate
-npx @better-auth/cli migrate
-```
+<include>../../../shared/ui/plugins/two-factor.mdx#shared-migrate-your-database</include>
 
 </Step>
 <Step>
@@ -74,7 +68,7 @@ export const authClient = createAuthClient({
 })
 ```
 
-Leave `twoFactorPage` and `onTwoFactorRedirect` unset: the copied components handle the redirect themselves and keep `redirectTo` intact, while `twoFactorPage` forces a full page reload.
+<include>../../../shared/ui/plugins/two-factor.mdx#shared-registry-redirects</include>
 
 </Step>
 <Step>
@@ -140,21 +134,7 @@ export const Route = createFileRoute("/auth/$path")({
 </Step>
 </Steps>
 
-## The sign-in flow
-
-```text
-email/password or username/password
-    ↓
-{ twoFactorRedirect: true, twoFactorMethods: ["totp", "otp"] }
-    ↓
-/auth/two-factor?redirectTo=…
-    ↓ authenticator code, emailed code, or backup code
-authenticated session
-```
-
-The method names ride along in session storage: names only, never a code or token. The two-factor cookie that authorizes the challenge stays HTTP-only, exactly as Better Auth set it.
-
-Building a custom sign-in form? Check for the redirect yourself:
+<include>../../../shared/ui/plugins/two-factor.mdx#shared-the-sign-in-flow</include>
 
 ```tsx
 import {
@@ -176,55 +156,15 @@ const signIn = createMutation(() => ({
 }))
 ```
 
-## Components
-
-### `<TwoFactorChallenge />`
-
-Offers the methods the sign-in response reported, plus backup-code recovery and an optional "trust this device" checkbox. Emailed codes are sent on request rather than automatically, so a user with an authenticator app never triggers a pointless email.
+<include>../../../shared/ui/plugins/two-factor.mdx#shared-components</include>
 
 <type-table path="../../../../../../examples/start-solid-zaidan-example/src/components/auth/two-factor/two-factor-challenge.tsx" name="TwoFactorChallengeProps" />
 
-### `<TwoFactorSettings />`
-
-Added to `<SecuritySettings />` automatically. Users can enroll with an authenticator app or a delivered code. Enrolled users can regenerate backup codes or turn two-factor off.
+<include>../../../shared/ui/plugins/two-factor.mdx#shared-two-factor-settings</include>
 
 <type-table path="../../../../../../examples/start-solid-zaidan-example/src/components/auth/two-factor/two-factor-settings.tsx" name="TwoFactorSettingsProps" />
 
-Backup codes live in component state and are never written to storage or the query cache: once the dialog closes they are gone.
-
-## Delivered-code enrollment
-
-The enrollment dialog offers authenticator apps by default. Configure OTP delivery on the server before you add the delivered-code option:
-
-```ts
-// Server
-twoFactor({
-  otpOptions: { sendOTP }
-})
-```
-
-```tsx
-// UI
-twoFactorPlugin({ enrollmentMethods: ["totp", "otp"] })
-```
-
-Better Auth activates OTP enrollment immediately. The dialog closes after `authClient.twoFactor.enable({ method: "otp" })` succeeds.
-
-## Passwordless accounts
-
-Set `allowPasswordless` on both sides to let passkey-only users manage two-factor without a password:
-
-```ts
-// Server
-twoFactor({ allowPasswordless: true })
-```
-
-```tsx
-// UI
-twoFactorPlugin({ allowPasswordless: true })
-```
-
-The UI still asks for a password when the account has a credential account, matching the server's rule. It reads the linked accounts to decide, so users who do have a password are not offered a shortcut around it.
+<include>../../../shared/ui/plugins/two-factor.mdx#shared-delivered-code-enrollment</include>
 
 ## Options
 
@@ -234,4 +174,4 @@ The UI still asks for a password when the account has a credential account, matc
 
 <type-table path="../../../../../../packages/core/src/plugins/two-factor/two-factor-localization.ts" name="TwoFactorLocalization" />
 
-Read these from `useAuthPlugin(twoFactorPlugin).localization` inside custom slot components.
+<include>../../../shared/ui/plugins/two-factor.mdx#shared-localization</include>

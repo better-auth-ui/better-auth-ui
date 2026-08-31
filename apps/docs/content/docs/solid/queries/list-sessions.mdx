@@ -29,15 +29,7 @@ await prefetchListSessions(queryClient, authClient, userId)
 const sessions = await fetchListSessions(queryClient, authClient, userId)
 ```
 
-## Invalidation
-
-```ts
-import { listSessionsOptions } from "@better-auth-ui/core"
-
-queryClient.invalidateQueries({
-  queryKey: listSessionsOptions(authClient, userId).queryKey
-})
-```
+<include>../../../shared/queries/list-sessions.mdx#shared-invalidation</include>
 
 ## Params
 

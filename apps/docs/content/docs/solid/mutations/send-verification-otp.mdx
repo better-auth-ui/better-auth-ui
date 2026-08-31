@@ -3,9 +3,9 @@ title: sendVerificationOtpOptions
 description: Email a one-time code for any email-OTP flow.
 ---
 
-Requires the Better Auth email-OTP plugin. If TypeScript cannot infer the plugin methods from your client, type or cast `authClient` as `EmailOtpAuthClient` from `@better-auth-ui/core/plugins/email-otp`.
+<include>../../../shared/mutations/plugin-requirements.mdx#shared-email-otp</include>
 
-One endpoint backs every email-OTP flow. `type` picks which one: `"sign-in"`, `"email-verification"`, `"forget-password"`, or `"change-email"`.
+<include>../../../shared/mutations/send-verification-otp.mdx#shared-overview</include>
 
 ## Options factory
 

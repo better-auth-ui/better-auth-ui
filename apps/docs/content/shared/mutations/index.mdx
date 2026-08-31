@@ -1,0 +1,35 @@
+<section id="shared-error-handling">
+
+## Error handling
+
+Each mutation adds `throw: true` to `fetchOptions`. The promise rejects with `BetterFetchError` instead of resolving with `{ error }`.
+
+You can therefore use the standard `error`, `isError`, `throwOnError`, and `onError` values from `useMutation`.
+
+</section>
+
+<section id="shared-tracking-mutation-state-globally">
+
+## Tracking mutation state globally
+
+All mutation keys start with `"auth"`. The shared `authMutationKeys` factory in `@better-auth-ui/core` exposes these keys.
+
+Use this factory instead of inline tuples. Call sites and mutation factories will then use the same keys:
+
+</section>
+
+<section id="shared-mutation-prefixes">
+
+Each grouping (`signIn`, `signUp`, `passkey`, `multiSession`) exposes an `all` prefix so you can match a whole feature at once.
+
+Match inside a `MutationCache` observer for global toasts or analytics:
+
+</section>
+
+<section id="shared-escape-hatch">
+
+TypeScript infers variables from the `authFn` parameter. Required parameters prevent an empty `mutate()` call, while optional parameters permit it.
+
+The factory adds `throw: true` to `fetchOptions`. Therefore, `onError` and `error` receive a `BetterFetchError`.
+
+</section>

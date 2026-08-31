@@ -3,9 +3,7 @@ title: useListOAuthConsents
 description: List the OAuth applications the current user has authorized.
 ---
 
-Requires `oauthProviderClient()` from `@better-auth/oauth-provider/client`.
-
-Returns the raw consent records Better Auth stores for the signed-in user. One OAuth client can have several records, so pair this with `groupOAuthConsents` from `@better-auth-ui/core/plugins/oauth-provider` before rendering.
+<include>../../../shared/queries/list-oauth-consents.mdx#shared-overview</include>
 
 ## Usage
 
@@ -18,7 +16,7 @@ const consents = useListOAuthConsents(authClient)
 const applications = () => groupOAuthConsents(consents.data)
 ```
 
-The query key is scoped to the signed-in user, so one account's authorized applications never surface in another account's view.
+<include>../../../shared/queries/list-oauth-consents.mdx#shared-usage</include>
 
 ## Options factory and loader helpers
 

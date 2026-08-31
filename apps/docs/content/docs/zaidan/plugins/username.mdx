@@ -6,9 +6,7 @@ description: Add username-based sign-in and real-time availability checking to y
 
 import { Step, Steps } from 'fumadocs-ui/components/steps'
 
-The username plugin adds username-based authentication to your auth UI. Users can sign in with a username instead of an email address, and optionally check username availability during sign-up and profile updates.
-
-It contributes:
+<include>../../../shared/ui/plugins/username.mdx#shared-overview</include>
 
 - A `<SignInUsername />` view that accepts both username and email, routing to the appropriate sign-in method
 - A `<UsernameField />` renderer for the username additional field with real-time availability checking
@@ -39,9 +37,8 @@ export const auth = betterAuth({
 
 </Step>
 <Step>
-### Install the matching client plugin
 
-Add `usernameClient()` to your auth client so `authClient.signIn.username` and `authClient.username.*` are available:
+<include>../../../shared/ui/plugins/username.mdx#shared-install-the-matching-client-plugin</include>
 
 ```ts title="src/lib/auth-client.ts"
 import { createAuthClient } from "better-auth/solid"
@@ -121,14 +118,7 @@ These previews use mocked auth clients and do not call live Better Auth endpoint
 
 Use `usernamePrefix` when usernames are displayed with a marker such as `@`. The prefix appears inside copied Solid username fields but is not included in the value sent to Better Auth.
 
-```tsx
-usernamePlugin({
-  usernamePrefix: "@",
-  localization: {
-    usernamePlaceholder: "username"
-  }
-})
-```
+<include>../../../shared/ui/plugins/username.mdx#shared-options-example</include>
 
 <type-table path="../../../../../../packages/core/src/plugins/username/username-plugin.ts" name="UsernamePluginOptions" />
 

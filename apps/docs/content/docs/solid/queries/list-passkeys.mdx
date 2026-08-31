@@ -29,15 +29,7 @@ await prefetchListPasskeys(queryClient, authClient, userId)
 const passkeys = await fetchListPasskeys(queryClient, authClient, userId)
 ```
 
-## Invalidation
-
-```ts
-import { listPasskeysOptions } from "@better-auth-ui/core/plugins/passkey"
-
-queryClient.invalidateQueries({
-  queryKey: listPasskeysOptions(authClient, userId).queryKey
-})
-```
+<include>../../../shared/queries/list-passkeys.mdx#shared-invalidation</include>
 
 ## Params
 

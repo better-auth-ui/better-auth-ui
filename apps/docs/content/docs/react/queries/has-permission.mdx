@@ -3,7 +3,7 @@ title: useHasPermission
 description: Check organization permissions for the current member.
 ---
 
-Organization queries require `organizationClient()` on your Better Auth client. Queries that depend on a signed-in user wait for session data before calling Better Auth.
+<include>../../../shared/queries/organization.mdx#shared-requirements</include>
 
 ## Usage
 
@@ -42,11 +42,7 @@ const permission = await fetchHasPermission(
 )
 ```
 
-## Notes
-
-- `useActiveOrganization` treats `slug: undefined` as the session active organization, a string slug as a URL-selected organization, and `slug: null` as intentionally no active organization.
-- Member, invitation, and permission helpers follow upstream active-organization fallback behavior when an organization id is not provided.
-- `useHasPermission` preserves Better Auth's flat permission parameter shape.
+<include>../../../shared/queries/organization.mdx#shared-notes</include>
 
 ## Server-side prefetching
 

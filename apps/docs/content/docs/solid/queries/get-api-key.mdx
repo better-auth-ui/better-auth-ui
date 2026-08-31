@@ -3,8 +3,7 @@ title: useGetApiKey
 description: Get one API key by ID.
 ---
 
-Requires the Better Auth API key plugin. This query calls the browser
-`authClient.apiKey.get` endpoint and waits for the current session.
+<include>../../../shared/queries/get-api-key.mdx#shared-overview</include>
 
 ## Usage
 
@@ -16,35 +15,7 @@ const apiKey = useGetApiKey(authClient, () => ({
 }))
 ```
 
-Omit `configId` when you use the default API key configuration.
-
-## Options factory and loader helpers
-
-```ts
-import {
-  ensureGetApiKey,
-  fetchGetApiKey,
-  getApiKey,
-  getApiKeyOptions,
-  prefetchGetApiKey
-} from "@better-auth-ui/core/plugins/api-key"
-
-const options = { query: { id: apiKeyId, configId: "service" } }
-
-getApiKeyOptions(authClient, userId, options)
-await ensureGetApiKey(queryClient, authClient, userId, options)
-await prefetchGetApiKey(queryClient, authClient, userId, options)
-const apiKey = await fetchGetApiKey(
-  queryClient,
-  authClient,
-  userId,
-  options
-)
-const cachedApiKey = getApiKey(queryClient, authClient, userId, options)
-```
-
-These helpers use `authClient`, so use them in client-side loaders. Do not call
-them from a trusted server loader.
+<include>../../../shared/queries/get-api-key.mdx#shared-options-factory-and-loader-helpers</include>
 
 ## Params
 

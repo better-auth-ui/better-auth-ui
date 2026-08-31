@@ -30,19 +30,7 @@ import { createQuery } from "@tanstack/solid-query"
 const session = createQuery(() => sessionOptions(authClient))
 ```
 
-## Server-side prefetching
-
-For client/router loaders that already have an `authClient`, use the client helpers from `@better-auth-ui/core`.
-
-```ts
-import { ensureSession, fetchSession, prefetchSession } from "@better-auth-ui/core"
-
-await ensureSession(queryClient, authClient)
-await prefetchSession(queryClient, authClient)
-const session = await fetchSession(queryClient, authClient)
-```
-
-For server loaders, import from `@better-auth-ui/core/server`. These helpers call your Better Auth server instance directly and require the request params passed to `auth.api.getSession`, typically request headers.
+<include>../../../shared/queries/session.mdx#server-side-prefetching</include>
 
 ```ts
 import { ensureSessionServer } from "@better-auth-ui/core/server"
@@ -56,15 +44,7 @@ const session = await ensureSessionServer(queryClient, auth, {
 
 `@better-auth-ui/core/server` is the canonical session server-auth entrypoint. Plugin non-session server helpers live under their plugin `/server` entrypoints, such as `@better-auth-ui/core/plugins/organization/server`.
 
-## Invalidation
-
-```ts
-import { sessionOptions } from "@better-auth-ui/core"
-
-queryClient.invalidateQueries({
-  queryKey: sessionOptions(authClient).queryKey
-})
-```
+<include>../../../shared/queries/session.mdx#invalidation</include>
 
 ## Client params
 

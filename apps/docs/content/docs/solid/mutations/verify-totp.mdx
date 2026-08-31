@@ -3,9 +3,9 @@ title: verifyTotpOptions
 description: Verify an authenticator code.
 ---
 
-Requires the Better Auth two-factor plugin. If TypeScript cannot infer the plugin methods from your client, type or cast `authClient` as `TwoFactorAuthClient` from `@better-auth-ui/core/plugins/two-factor`.
+<include>../../../shared/mutations/plugin-requirements.mdx#shared-two-factor</include>
 
-Used both to finish a pending sign-in challenge and to confirm enrollment. Verification is what creates the session, so it refetches the session query.
+<include>../../../shared/mutations/verify-totp.mdx#shared-overview</include>
 
 ## Options factory
 

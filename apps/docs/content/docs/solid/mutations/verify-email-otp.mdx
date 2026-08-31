@@ -3,9 +3,9 @@ title: verifyEmailOtpOptions
 description: Verify an email address with a code instead of a link.
 ---
 
-Requires the Better Auth email-OTP plugin. If TypeScript cannot infer the plugin methods from your client, type or cast `authClient` as `EmailOtpAuthClient` from `@better-auth-ui/core/plugins/email-otp`.
+<include>../../../shared/mutations/plugin-requirements.mdx#shared-email-otp</include>
 
-Verification signs the user in, so the session query is refetched on success.
+<include>../../../shared/mutations/verify-email-otp.mdx#shared-overview</include>
 
 ## Options factory
 

@@ -16,7 +16,7 @@ It contributes:
 - Approve and deny confirmation states
 - `useVerifyDeviceCode`, `useApproveDevice`, and `useDenyDevice` mutation hooks
 
-The requesting device remains responsible for calling Better Auth's `/device/code` endpoint and polling `/device/token`.
+<include>../../../shared/ui/plugins/device-authorization.mdx#shared-overview</include>
 
 ## Setup
 
@@ -24,21 +24,9 @@ The requesting device remains responsible for calling Better Auth's `/device/cod
 <Step>
 ### Install the Better Auth plugin
 
-Add the [Device Authorization](https://www.better-auth.com/docs/plugins/device-authorization) plugin to your Better Auth server. Set `verificationUri` to the public route that renders the UI view:
+<include>../../../shared/ui/plugins/device-authorization.mdx#shared-install-the-better-auth-plugin</include>
 
-```ts title="lib/auth.ts"
-import { betterAuth } from "better-auth"
-import { deviceAuthorization } from "better-auth/plugins" // [!code highlight]
-
-export const auth = betterAuth({
-  // ...
-  plugins: [
-    deviceAuthorization({ // [!code highlight]
-      verificationUri: "/auth/device" // [!code highlight]
-    }) // [!code highlight]
-  ]
-})
-```
+<include>../../../shared/ui/plugins/device-authorization.mdx#shared-server-example</include>
 
 Generate or migrate the Better Auth schema after enabling the server plugin. It adds the `deviceCode` model used to track pending requests.
 
@@ -46,22 +34,12 @@ Generate or migrate the Better Auth schema after enabling the server plugin. It 
 <Step>
 ### Install the matching client plugin
 
-Add `deviceAuthorizationClient()` to your browser auth client:
-
-```ts title="lib/auth-client.ts"
-import { createAuthClient } from "better-auth/react"
-import { deviceAuthorizationClient } from "better-auth/client/plugins" // [!code highlight]
-
-export const authClient = createAuthClient({
-  plugins: [deviceAuthorizationClient()] // [!code highlight]
-})
-```
+<include>../../../shared/ui/plugins/device-authorization.mdx#shared-install-the-matching-client-plugin</include>
 
 </Step>
 <Step>
-### Register the UI plugin
 
-Pass `deviceAuthorizationPlugin()` to `<AuthProvider>`:
+<include>../../../shared/ui/plugins/device-authorization.mdx#shared-register-the-ui-plugin</include>
 
 ```tsx title="components/providers.tsx"
 import { AuthProvider } from "@better-auth-ui/heroui"
@@ -117,7 +95,7 @@ function AuthPage() {
 
 <ComponentPreview name="heroui-device-authorization" />
 
-Enter any eight-character code in the preview to exercise the approval flow.
+<include>../../../shared/ui/plugins/device-authorization.mdx#shared-device-authorization</include>
 
 The component is rendered automatically at `/auth/device` when the plugin is registered. You can also use it directly:
 
@@ -129,23 +107,11 @@ import { DeviceAuthorization } from "@better-auth-ui/heroui/plugins"
 
 <type-table path="../../../../../../packages/heroui/src/components/auth/device-authorization/device-authorization.tsx" name="DeviceAuthorizationProps" />
 
-## Options
-
-```ts
-deviceAuthorizationPlugin({
-  // Override the URL segment. Default: "device"
-  path: "activate",
-  // Match Better Auth's server-side userCodeLength. Default: 8
-  userCodeLength: 8,
-  localization: {
-    approveDevice: "Allow this device?"
-  }
-})
-```
+<include>../../../shared/ui/plugins/device-authorization.mdx#shared-options</include>
 
 <type-table path="../../../../../../packages/core/src/plugins/device-authorization/device-authorization-plugin.ts" name="DeviceAuthorizationPluginOptions" />
 
-Keep `userCodeLength` equal to the value passed to Better Auth's server plugin. A mismatched length prevents valid codes from being submitted.
+<include>../../../shared/ui/plugins/device-authorization.mdx#shared-code-length</include>
 
 ## Localization
 

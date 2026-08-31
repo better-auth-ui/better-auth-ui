@@ -6,7 +6,7 @@ description: Add a Continue as guest action to copied Solid and Zaidan authentic
 
 import { Step, Steps } from 'fumadocs-ui/components/steps'
 
-The anonymous UI plugin contributes one "Continue as guest" button to the copied authentication forms. A successful sign-in refreshes the session and follows the `redirectTo` configured on `<AuthProvider>`.
+<include>../../../shared/ui/plugins/anonymous.mdx#shared-overview</include>
 
 ## Setup
 
@@ -28,11 +28,7 @@ export const auth = betterAuth({
 })
 ```
 
-Run the Better Auth migration command so the user table includes `isAnonymous`:
-
-```bash
-bunx @better-auth/cli migrate
-```
+<include>../../../shared/ui/plugins/anonymous.mdx#shared-migration</include>
 
 </Step>
 <Step>
@@ -61,16 +57,12 @@ Install the Solid button and local plugin factory:
 bunx --bun shadcn@latest add https://better-auth-ui.com/r/solid/anonymous.json
 ```
 
-The registry item adds:
-
-- `src/lib/auth/anonymous-plugin.ts`
-- `src/components/auth/anonymous/anonymous-button.tsx`
+<include>../../../shared/ui/plugins/anonymous.mdx#shared-install-the-ui-plugin</include>
 
 </Step>
 <Step>
-### Register the plugin
 
-Pass `anonymousPlugin()` to the copied `<AuthProvider>`:
+<include>../../../shared/ui/plugins/anonymous.mdx#shared-register-the-plugin</include>
 
 ```tsx title="src/components/providers.tsx"
 import { AuthProvider } from "@/components/auth/auth-provider"
@@ -92,17 +84,11 @@ import { anonymousPlugin } from "@/lib/auth/anonymous-plugin" // [!code highligh
 
 ## Change the label
 
-```tsx
-anonymousPlugin({
-  localization: {
-    continueAsGuest: "Explore as a guest"
-  }
-})
-```
+<include>../../../shared/ui/plugins/anonymous.mdx#shared-change-the-label</include>
 
 <type-table path="../../../../../../packages/core/src/plugins/anonymous/anonymous-plugin.ts" name="AnonymousPluginOptions" />
 
 For custom Solid surfaces, use `useSignInAnonymous` from `@better-auth-ui/solid/plugins/anonymous`.
 See the [Solid package reference](/docs/solid) for the shared runtime APIs.
 
-This integration only adds guest entry. If your application later lets guests create a permanent account, configure Better Auth's server-side `onLinkAccount` callback to move application data to the new user.
+<include>../../../shared/ui/plugins/anonymous.mdx#shared-account-linking</include>

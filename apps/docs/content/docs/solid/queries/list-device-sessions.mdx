@@ -29,15 +29,7 @@ await prefetchListDeviceSessions(queryClient, authClient, userId)
 const sessions = await fetchListDeviceSessions(queryClient, authClient, userId)
 ```
 
-## Invalidation
-
-```ts
-import { listDeviceSessionsOptions } from "@better-auth-ui/core/plugins/multi-session"
-
-queryClient.invalidateQueries({
-  queryKey: listDeviceSessionsOptions(authClient, userId).queryKey
-})
-```
+<include>../../../shared/queries/list-device-sessions.mdx#shared-invalidation</include>
 
 ## Params
 

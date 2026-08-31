@@ -1,0 +1,21 @@
+<section id="shared-invalidation">
+
+## Invalidation
+
+All keys start with `["auth", ...]`. Queries for one user use the `["auth", "user", userId, ...]` prefix.
+
+Invalidate a prefix to control the related cache entries. Use `authQueryKeys` from `@better-auth-ui/core` to create consistent keys:
+
+```ts
+import { authQueryKeys } from "@better-auth-ui/core"
+
+queryClient.invalidateQueries({ queryKey: authQueryKeys.all })
+queryClient.invalidateQueries({ queryKey: authQueryKeys.user(userId) })
+queryClient.invalidateQueries({ queryKey: authQueryKeys.session })
+```
+
+## Per-user queries
+
+Settings queries use a separate cache key for each user. They wait for the session before they start.
+
+</section>

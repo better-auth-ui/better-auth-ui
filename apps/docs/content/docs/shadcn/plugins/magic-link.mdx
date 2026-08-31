@@ -7,57 +7,14 @@ description: Add passwordless email sign-in to your authentication flow.
 import { Step, Steps } from 'fumadocs-ui/components/steps'
 import { Tab, Tabs, TabsList, TabsTrigger } from 'fumadocs-ui/components/tabs'
 
-The magic-link plugin adds a passwordless email sign-in flow. The user enters their email, receives a one-time link, and is signed in when they click it.
-
-It contributes:
-
-- A `<MagicLink />` view at `/auth/magic-link`
-- A `<MagicLinkSent />` confirmation view at `/auth/magic-link-sent`
-- A "Continue with Magic Link" button rendered alongside the password sign-in button
-- A `useSignInMagicLink` mutation hook
-
-When `emailAndPassword.enabled === false`, `<MagicLink />` automatically takes over `/auth/sign-in` as the primary passwordless surface.
+<include>../../../shared/ui/plugins/magic-link.mdx#shared-overview</include>
 
 ## Setup
 
 <Steps>
-<Step>
-### Install the Better Auth plugin
 
-Add the [Magic Link](https://www.better-auth.com/docs/plugins/magic-link) plugin to your Better Auth server config and wire up `sendMagicLink` to your email provider:
+<include>../../../shared/ui/plugins/magic-link.mdx#shared-install-the-better-auth-plugin</include>
 
-```ts title="lib/auth.ts"
-import { betterAuth } from "better-auth"
-import { magicLink } from "better-auth/plugins" // [!code highlight]
-
-export const auth = betterAuth({
-  // ...
-  plugins: [
-    magicLink({ // [!code highlight]
-      sendMagicLink: async ({ email, url }) => { // [!code highlight]
-        // Send `url` to `email` via your email provider. // [!code highlight]
-      } // [!code highlight]
-    }) // [!code highlight]
-  ]
-})
-```
-
-</Step>
-<Step>
-### Install the matching client plugin
-
-Add `magicLinkClient()` to your auth client so `authClient.signIn.magicLink` is available:
-
-```ts title="lib/auth-client.ts"
-import { createAuthClient } from "better-auth/react"
-import { magicLinkClient } from "better-auth/client/plugins" // [!code highlight]
-
-export const authClient = createAuthClient({
-  plugins: [magicLinkClient()] // [!code highlight]
-})
-```
-
-</Step>
 <Step>
 ### Install the UI plugin
 
@@ -98,9 +55,8 @@ import { AuthProvider } from "@/components/auth/auth-provider"
 
 </Step>
 <Step>
-### Allow the new view path
 
-The plugin contributes `magic-link` and `magic-link-sent` segments to `viewPaths.auth`. Spread `magicLinkPlugin().viewPaths?.auth` into your auth route's allowed-paths set so both views resolve correctly:
+<include>../../../shared/ui/plugins/magic-link.mdx#shared-allow-the-new-view-path</include>
 
 <Tabs defaultValue="tanstack-start">
 <TabsList>
@@ -182,42 +138,19 @@ The `<MagicLink />` view is rendered at `/auth/magic-link` when the plugin is re
 
 **Usage**
 
-```tsx
-import { MagicLink } from "@/components/auth/magic-link"
-
-<MagicLink />
-```
+<include>../../../shared/ui/plugins/magic-link.mdx#shared-magic-link</include>
 
 **Props**
 
 <type-table path="../../../../../../examples/start-shadcn-example/src/components/auth/magic-link.tsx" name="MagicLinkProps" />
 
-### `<MagicLinkSent />`
+<include>../../../shared/ui/plugins/magic-link.mdx#shared-magic-link-sent</include>
 
-After a magic-link request succeeds, the form stores the submitted email in session storage and navigates to this confirmation view. It shows an email-provider shortcut when one is available. Hover or focus the button to show a QR code for opening the same provider URL on another device.
-
-```tsx
-import { MagicLinkSent } from "@/components/auth/magic-link-sent"
-
-<MagicLinkSent />
-```
+<include>../../../shared/ui/plugins/magic-link.mdx#shared-registry-sent-example</include>
 
 <type-table path="../../../../../../examples/start-shadcn-example/src/components/auth/magic-link-sent.tsx" name="MagicLinkSentProps" />
 
-## Options
-
-```ts
-magicLinkPlugin({
-  // Override the URL segment. Default: "magic-link"
-  path: "email-link",
-  // Override the confirmation segment. Default: "magic-link-sent"
-  sentPath: "email-link-sent",
-  // Override any of the plugin's localization strings.
-  localization: {
-    sendMagicLink: "Email me a link"
-  }
-})
-```
+<include>../../../shared/ui/plugins/magic-link.mdx#shared-options</include>
 
 <type-table path="../../../../../../packages/core/src/plugins/magic-link/magic-link-plugin.ts" name="MagicLinkPluginOptions" />
 
@@ -225,25 +158,10 @@ magicLinkPlugin({
 
 <type-table path="../../../../../../packages/core/src/plugins/magic-link/magic-link-localization.ts" name="MagicLinkLocalization" />
 
-Read these from `useAuthPlugin(magicLinkPlugin).localization` inside custom slot components.
+<include>../../../shared/ui/plugins/magic-link.mdx#shared-localization</include>
 
 ## Email template
 
 Pair the plugin with the [`<MagicLinkEmail />`](/docs/shadcn/components/email/magic-link-email) component to send a styled email from your `sendMagicLink` callback.
 
-## Passwordless-only flows
-
-If you disable email and password authentication, the magic-link form becomes the primary sign-in view. No additional configuration is required:
-
-```tsx
-<AuthProvider
-  authClient={authClient}
-  navigate={navigate}
-  emailAndPassword={{ enabled: false }}
-  plugins={[magicLinkPlugin()]}
->
-  {children}
-</AuthProvider>
-```
-
-`/auth/sign-in` now renders `<MagicLink />`, and the `signUp`, `forgotPassword`, `resetPassword`, and `resetLinkSent` routes redirect to it.
+<include>../../../shared/ui/plugins/magic-link.mdx#shared-passwordless-only-flows</include>

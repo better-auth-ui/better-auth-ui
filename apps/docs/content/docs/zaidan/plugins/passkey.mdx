@@ -7,9 +7,7 @@ description: Add passwordless passkey sign-in and device management to your Soli
 import { Callout } from 'fumadocs-ui/components/callout'
 import { Step, Steps } from 'fumadocs-ui/components/steps'
 
-The passkey plugin adds passwordless authentication using WebAuthn. Users can sign in with their device authenticator (Touch ID, Face ID, Windows Hello) and manage registered passkeys from their security settings.
-
-It contributes:
+<include>../../../shared/ui/plugins/passkey.mdx#shared-overview</include>
 
 - A "Continue with Passkey" button rendered on the sign-in and magic-link views (hidden on sign-up)
 - A `<PasskeysSettings />` security card for listing, adding, renaming, and deleting registered passkeys
@@ -19,9 +17,8 @@ It contributes:
 
 <Steps>
 <Step>
-### Install the Better Auth plugin
 
-Install the [`@better-auth/passkey`](https://www.better-auth.com/docs/plugins/passkey) package and add it to your Better Auth server config:
+<include>../../../shared/ui/plugins/passkey.mdx#shared-install-the-better-auth-plugin</include>
 
 ```ts title="src/lib/auth.ts"
 import { betterAuth } from "better-auth"
@@ -39,9 +36,8 @@ Configure the WebAuthn origin and trusted origins before production so browser a
 
 </Step>
 <Step>
-### Install the matching client plugin
 
-Add `passkeyClient()` to your auth client so `authClient.signIn.passkey` and `authClient.passkey.*` are available:
+<include>../../../shared/ui/plugins/passkey.mdx#shared-install-the-matching-client-plugin</include>
 
 ```ts title="src/lib/auth-client.ts"
 import { createAuthClient } from "better-auth/solid"
@@ -58,9 +54,7 @@ export const authClient = createAuthClient({
 
 Run the shadcn CLI to install the passkey button, passkey management card, and the local `passkeyPlugin()` factory into your project:
 
-```npm
-npx shadcn@latest add https://better-auth-ui.com/r/solid/passkey.json
-```
+<include>../../../shared/ui/installation/zaidan.mdx#shared-passkey</include>
 
 This drops the following into your codebase:
 
@@ -166,21 +160,7 @@ The `<PasskeysSettings />` security card is rendered on the security settings pa
 
 <type-table path="../../../../../../examples/start-solid-zaidan-example/src/components/auth/passkey/passkeys.tsx" name="PasskeysSettingsProps" />
 
-## Passkey registration policy
-
-By default, the add-passkey dialog does not set `authenticatorAttachment`.
-The browser and operating system show the available passkey options.
-
-Set a preference in the plugin when all registrations must use one authenticator type:
-
-```ts
-passkeyPlugin({ authenticatorAttachment: "platform" })
-passkeyPlugin({ authenticatorAttachment: "cross-platform" })
-```
-
-`"platform"` prefers the current device. `"cross-platform"` prefers a security key or another device. The dialog does not show an attachment selector.
-
-`useAddPasskey` accepts every parameter exposed by `authClient.passkey.addPasskey`. Use this hook for custom registration flows:
+<include>../../../shared/ui/plugins/passkey.mdx#shared-passkey-registration-policy</include>
 
 ```tsx
 const addPasskey = useAddPasskey(auth.authClient)
@@ -193,36 +173,7 @@ addPasskey.mutate({
 })
 ```
 
-<Callout>
-`residentKey` and `userVerification` are server plugin policies. They are not
-parameters of `authClient.passkey.addPasskey`, so the client UI does not expose
-them.
-</Callout>
-
-## Passkey autofill
-
-With the plugin registered, the sign-in form asks the browser to offer saved
-passkeys straight from its autofill dropdown, so most people never press the
-passkey button at all. This is the WebAuthn conditional UI flow.
-
-Two pieces make it work, and the built-in components already handle both:
-
-- The identifier and password fields carry `webauthn` as the last token of
-  their `autocomplete` attribute, added by `withPasskeyAutoFill`.
-- `<PasskeyButton />` calls `usePasskeyAutoFill`, which opens a conditionally
-  mediated request once the browser reports that it supports one.
-
-Browsers without conditional mediation ignore the extra token and never get the
-request, so the button stays as the fallback everywhere.
-
-Turn the whole thing off with:
-
-```ts
-passkeyPlugin({ autoFill: false })
-```
-
-If you write your own sign-in form, add the token and start the conditional
-request:
+<include>../../../shared/ui/plugins/passkey.mdx#shared-passkey-autofill</include>
 
 ```tsx
 import type { PasskeyAuthClient } from "@better-auth-ui/core/plugins/passkey"
@@ -240,28 +191,7 @@ usePasskeyAutoFill(auth.authClient)
 <Input autocomplete={withPasskeyAutoFill("email", passkeyAutoFill)} />
 ```
 
-<Callout type="warn">
-`navigator.credentials.get()` accepts an `AbortSignal`. The bundled hook calls
-the Better Auth passkey client, which does not expose that signal. Unmounting
-the form only stops a pending availability probe. It does not cancel a request
-that already started.
-
-If your custom implementation calls `navigator.credentials.get()` directly,
-pass an `AbortSignal` and abort it during cleanup.
-</Callout>
-
-## Options
-
-```ts
-passkeyPlugin({
-  // Omit this option to let the browser show all available choices.
-  authenticatorAttachment: "platform",
-  // Override any of the plugin's localization strings.
-  localization: {
-    passkeys: "Security Keys"
-  }
-})
-```
+<include>../../../shared/ui/plugins/passkey.mdx#shared-options</include>
 
 <type-table path="../../../../../../packages/core/src/plugins/passkey/passkey-plugin.ts" name="PasskeyPluginOptions" />
 

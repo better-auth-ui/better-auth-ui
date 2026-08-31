@@ -3,7 +3,7 @@ title: useListAccounts
 description: Retrieve the current user's linked social accounts.
 ---
 
-Keyed per-user. Waits for the active session before firing.
+<include>../../../shared/queries/user-scoped.mdx#shared-session</include>
 
 ## Usage
 
@@ -26,15 +26,7 @@ import { useQuery } from "@tanstack/react-query"
 const { data: accounts } = useQuery(listAccountsOptions(authClient, userId))
 ```
 
-## Invalidation
-
-```ts
-import { listAccountsOptions } from "@better-auth-ui/core"
-
-queryClient.invalidateQueries({
-  queryKey: listAccountsOptions(authClient, userId).queryKey
-})
-```
+<include>../../../shared/queries/list-accounts.mdx#shared-invalidation</include>
 
 ## Params
 

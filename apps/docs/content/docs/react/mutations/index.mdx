@@ -13,11 +13,7 @@ import { useSignInEmail } from "@better-auth-ui/react"
 
 Use the hook in components. Use the core factory where TanStack Query accepts a `mutationOptions` object.
 
-## Error handling
-
-Each mutation adds `throw: true` to `fetchOptions`. The promise rejects with `BetterFetchError` instead of resolving with `{ error }`.
-
-You can therefore use the standard `error`, `isError`, `throwOnError`, and `onError` values from `useMutation`.
+<include>../../../shared/mutations/index.mdx#shared-error-handling</include>
 
 ```tsx
 const { mutate, error } = useSignInEmail(authClient, {
@@ -43,11 +39,7 @@ Hooks that change authentication state also update the cache. A custom `onSucces
 - `useRevokeMultiSession`: refresh the device sessions list.
 - `useUnlinkAccount`: refresh the linked accounts list.
 
-## Tracking mutation state globally
-
-All mutation keys start with `"auth"`. The shared `authMutationKeys` factory in `@better-auth-ui/core` exposes these keys.
-
-Use this factory instead of inline tuples. Call sites and mutation factories will then use the same keys:
+<include>../../../shared/mutations/index.mdx#shared-tracking-mutation-state-globally</include>
 
 ```ts
 import { authMutationKeys } from "@better-auth-ui/core"
@@ -60,9 +52,7 @@ const emailSignInPending = useIsMutating({
 })
 ```
 
-Each grouping (`signIn`, `signUp`, `passkey`, `multiSession`) exposes an `all` prefix so you can match a whole feature at once.
-
-Match inside a `MutationCache` observer for global toasts or analytics:
+<include>../../../shared/mutations/index.mdx#shared-mutation-prefixes</include>
 
 ```ts
 import { authMutationKeys } from "@better-auth-ui/core"
@@ -92,9 +82,7 @@ const { mutate } = useAuthMutation(
 mutate({ email: "user@example.com", type: "sign-in" })
 ```
 
-TypeScript infers variables from the `authFn` parameter. Required parameters prevent an empty `mutate()` call, while optional parameters permit it.
-
-The factory adds `throw: true` to `fetchOptions`. Therefore, `onError` and `error` receive a `BetterFetchError`.
+<include>../../../shared/mutations/index.mdx#shared-escape-hatch</include>
 
 For shared mutation registration (`useIsMutating`, a global `MutationCache` observer, manual `useMutation`), import the endpoint's option factory from core and use it directly:
 

@@ -33,20 +33,12 @@ See the [Better Auth SSO guide](https://www.better-auth.com/docs/plugins/sso) fo
 <Step>
 ### Add the client plugin
 
-```ts title="lib/auth-client.ts"
-import { ssoClient } from "@better-auth/sso/client"
-import { createAuthClient } from "better-auth/react"
-
-export const authClient = createAuthClient({
-  plugins: [ssoClient()]
-})
-```
+<include>../../../shared/ui/plugins/sso.mdx#shared-add-the-client-plugin</include>
 
 </Step>
 <Step>
-### Register the UI plugin
 
-Place `ssoPlugin()` before another plugin that replaces the sign-in view.
+<include>../../../shared/ui/plugins/sso.mdx#shared-register-the-ui-plugin</include>
 
 ```tsx title="components/providers.tsx"
 import { AuthProvider } from "@better-auth-ui/heroui"

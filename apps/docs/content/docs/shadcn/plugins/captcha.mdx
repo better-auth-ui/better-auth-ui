@@ -6,21 +6,9 @@ description: Add bot protection to sign-up, sign-in, and password reset using a 
 
 import { Step, Steps } from 'fumadocs-ui/components/steps'
 
-The captcha plugin adds a widget to the sign-in, sign-up, and forgot-password forms. It sends the resolved token in the `x-captcha-response` header.
+<include>../../../shared/ui/plugins/captcha.mdx#shared-overview</include>
 
-The plugin supports Cloudflare Turnstile, hCaptcha, CaptchaFox, and reCAPTCHA. Provide a `render` component that connects the provider callbacks to the plugin.
-
-It contributes:
-
-- A captcha widget rendered above the submit button on sign-in, sign-up, and forgot-password forms
-- Automatic header management. The plugin clears the token after an error or expiration, or when the component unmounts.
-- Automatic widget refresh after an unsuccessful submission. Captcha tokens are single-use, so each retry requires a new token.
-
-## Social sign-in
-
-Provider buttons forward the current CAPTCHA token to `/sign-in/social`. Add this endpoint to the server CAPTCHA configuration to protect social sign-in. Failed requests clear the token and reset the widget before another attempt.
-
-Use `socialSignInMode="redirect"` for CAPTCHA-protected social sign-in. Better Auth 1.7's experimental popup API does not accept `fetchOptions` or forward CAPTCHA headers. Popup failures reset the widget, but the popup flow cannot send the token.
+<include>../../../shared/ui/plugins/captcha.mdx#shared-social-sign-in</include>
 
 ## Setup
 
@@ -28,50 +16,17 @@ The authentication forms already contain the captcha widget slot. Configure the 
 
 <Steps>
 <Step>
-### Install the Better Auth plugin
 
-Add the [`captcha`](https://www.better-auth.com/docs/plugins/captcha) plugin to your Better Auth server config and pick a provider:
+<include>../../../shared/ui/plugins/captcha.mdx#shared-install-the-better-auth-plugin</include>
 
-```ts title="lib/auth.ts"
-import { betterAuth } from "better-auth"
-import { captcha } from "better-auth/plugins" // [!code highlight]
+<include>../../../shared/ui/plugins/captcha.mdx#shared-protected-endpoints</include>
 
-export const auth = betterAuth({
-  // ...
-  plugins: [
-    captcha({ // [!code highlight]
-      provider: "cloudflare-turnstile", // or "hcaptcha", "captchafox", "google-recaptcha" // [!code highlight]
-      secretKey: process.env.TURNSTILE_SECRET_KEY as string // [!code highlight]
-    }) // [!code highlight]
-  ]
-})
-```
-
-By default, the Better Auth captcha plugin protects `/sign-up/email`, `/sign-in/email`, and `/request-password-reset`. The UI plugin shows the widget on these views.
-
-Better Auth 1.7 and later matches complete authentication paths. Use an exact endpoint or an explicit wildcard such as `/sign-in/*`.
-
-Do not use a partial prefix such as `/sign-in`. To protect username and social sign-in, add their endpoints explicitly:
-
-```ts
-captcha({
-  provider: "cloudflare-turnstile",
-  secretKey: process.env.TURNSTILE_SECRET_KEY as string,
-  endpoints: [ // [!code highlight]
-    "/sign-up/email", // [!code highlight]
-    "/sign-in/email", // [!code highlight]
-    "/sign-in/username", // [!code highlight]
-    "/sign-in/social", // [!code highlight]
-    "/request-password-reset" // [!code highlight]
-  ] // [!code highlight]
-})
-```
+<include>../../../shared/ui/plugins/captcha.mdx#shared-endpoints-example</include>
 
 </Step>
 <Step>
-### Register the UI plugin
 
-Pass `captchaPlugin({ render })` to `<AuthProvider>`. `render` is a component that receives `setToken`, `clearToken`, and `setReset` and is responsible for mounting your provider's React widget.
+<include>../../../shared/ui/plugins/captcha.mdx#shared-register-the-ui-plugin</include>
 
 ```tsx title="components/providers.tsx"
 import { captchaPlugin } from "@better-auth-ui/react/plugins/captcha" // [!code highlight]
@@ -88,48 +43,12 @@ import { TurnstileWidget } from "@/components/turnstile-widget" // [!code highli
 </AuthProvider>
 ```
 
-The `render` component is mounted as a real React component, so hooks like `useTheme` work inside it. See the [Providers](#providers) section below for ready-to-use widgets.
+<include>../../../shared/ui/plugins/captcha.mdx#shared-react-render-component</include>
 
 </Step>
 </Steps>
 
-## Providers
-
-### Cloudflare Turnstile
-
-```package-install
-@marsidev/react-turnstile
-```
-
-```tsx title="components/turnstile-widget.tsx"
-import type { CaptchaRenderProps } from "@better-auth-ui/react/plugins/captcha"
-import { type TurnstileInstance, Turnstile } from "@marsidev/react-turnstile"
-import { useEffect, useRef } from "react"
-
-export function TurnstileWidget({
-  setToken,
-  clearToken,
-  setReset
-}: CaptchaRenderProps) {
-  const ref = useRef<TurnstileInstance>(null)
-
-  useEffect(() => {
-    setReset(() => ref.current?.reset())
-    return () => setReset(null)
-  }, [setReset])
-
-  return (
-    <Turnstile
-      ref={ref}
-      siteKey={import.meta.env.VITE_TURNSTILE_SITE_KEY}
-      onSuccess={setToken}
-      onError={clearToken}
-      onExpire={clearToken}
-      options={{ size: "flexible" }}
-    />
-  )
-}
-```
+<include>../../../shared/ui/plugins/captcha.mdx#shared-providers</include>
 
 ```tsx title="components/providers.tsx"
 import { captchaPlugin } from "@better-auth-ui/react/plugins/captcha"
@@ -145,43 +64,7 @@ import { TurnstileWidget } from "@/components/turnstile-widget"
 </AuthProvider>
 ```
 
-### hCaptcha
-
-```package-install
-@hcaptcha/react-hcaptcha
-```
-
-```tsx title="components/hcaptcha-widget.tsx"
-import type { CaptchaRenderProps } from "@better-auth-ui/react/plugins/captcha"
-import HCaptcha from "@hcaptcha/react-hcaptcha"
-import { useTheme } from "next-themes"
-import { useEffect, useRef } from "react"
-
-export function HCaptchaWidget({
-  setToken,
-  clearToken,
-  setReset
-}: CaptchaRenderProps) {
-  const { resolvedTheme } = useTheme()
-  const ref = useRef<HCaptcha>(null)
-
-  useEffect(() => {
-    setReset(() => ref.current?.resetCaptcha())
-    return () => setReset(null)
-  }, [setReset])
-
-  return (
-    <HCaptcha
-      ref={ref}
-      sitekey={import.meta.env.VITE_HCAPTCHA_SITE_KEY}
-      onVerify={setToken}
-      onExpire={clearToken}
-      onError={clearToken}
-      theme={resolvedTheme === "dark" ? "dark" : "light"}
-    />
-  )
-}
-```
+<include>../../../shared/ui/plugins/captcha.mdx#shared-h-captcha</include>
 
 ```tsx title="components/providers.tsx"
 import { captchaPlugin } from "@better-auth-ui/react/plugins/captcha"
@@ -197,44 +80,7 @@ import { HCaptchaWidget } from "@/components/hcaptcha-widget"
 </AuthProvider>
 ```
 
-### CaptchaFox
-
-```package-install
-@captchafox/react
-```
-
-```tsx title="components/captchafox-widget.tsx"
-import type { CaptchaRenderProps } from "@better-auth-ui/react/plugins/captcha"
-import { CaptchaFox, type CaptchaFoxInstance } from "@captchafox/react"
-import { useTheme } from "next-themes"
-import { useEffect, useRef } from "react"
-
-export function CaptchaFoxWidget({
-  setToken,
-  clearToken,
-  setReset
-}: CaptchaRenderProps) {
-  const { resolvedTheme } = useTheme()
-  const ref = useRef<CaptchaFoxInstance>(null)
-
-  useEffect(() => {
-    setReset(() => ref.current?.reset())
-    return () => setReset(null)
-  }, [setReset])
-
-  return (
-    <CaptchaFox
-      ref={ref}
-      key={resolvedTheme}
-      sitekey={import.meta.env.VITE_CAPTCHAFOX_SITE_KEY}
-      onVerify={setToken}
-      onExpire={clearToken}
-      onError={clearToken}
-      theme={resolvedTheme === "dark" ? "dark" : "light"}
-    />
-  )
-}
-```
+<include>../../../shared/ui/plugins/captcha.mdx#shared-captcha-fox</include>
 
 ```tsx title="components/providers.tsx"
 import { captchaPlugin } from "@better-auth-ui/react/plugins/captcha"
@@ -260,10 +106,4 @@ The `render` component receives:
 
 <type-table path="../../../../../../packages/react/src/plugins/captcha-plugin.tsx" name="CaptchaRenderProps" />
 
-- Connect the provider's success callback to `setToken`. It adds the `x-captcha-response` header to the next Better Auth request.
-- Connect the error and expiration callbacks to `clearToken`. It removes the header before the application sends a stale token.
-- Connect the widget's `reset()` function to `setReset`. Better Auth consumes the token through `/siteverify` before the authentication handler completes.
-
-  A rejected request still consumes the token. Each protected form calls the registered `reset()` function from `onError` and clears the old token.
-
-The plugin also clears the header when the component unmounts. The application does not need additional cleanup.
+<include>../../../shared/ui/plugins/captcha.mdx#shared-render-props</include>
