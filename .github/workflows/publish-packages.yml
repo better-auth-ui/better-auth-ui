@@ -49,5 +49,8 @@ jobs:
             cp README.md "$(dirname "$package_json")/README.md"
           done
 
+      - name: Validate agent skills and package contents
+        run: bun nx run workspace:skills-check
+
       - name: Publish packages
         run: rm -f bun.lock bun.lockb && npx nx release publish

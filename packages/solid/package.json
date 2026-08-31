@@ -22,7 +22,8 @@
   },
   "files": [
     "src",
-    "dist"
+    "dist",
+    "skills"
   ],
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -147,5 +148,8 @@
   },
   "publishConfig": {
     "access": "public"
-  }
+  },
+  "keywords": [
+    "tanstack-intent"
+  ]
 }

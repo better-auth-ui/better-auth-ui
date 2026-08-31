@@ -71,6 +71,9 @@ jobs:
       # Ensure all publishable packages are built (cache hits when unaffected)
       - run: bun nx run-many -t build --projects 'packages/*'
 
+      - name: Validate agent skills and package contents
+        run: bun nx run workspace:skills-check
+
       # Publish new versions of the packages
       - run: bun nx-cloud record -- bunx pkg-pr-new publish --packageManager=bun './packages/*'
 

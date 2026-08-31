@@ -8,7 +8,8 @@
   },
   "files": [
     "src",
-    "dist"
+    "dist",
+    "skills"
   ],
   "sideEffects": false,
   "main": "./dist/index.js",
@@ -46,5 +47,8 @@
   },
   "publishConfig": {
     "access": "public"
-  }
+  },
+  "keywords": [
+    "tanstack-intent"
+  ]
 }

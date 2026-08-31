@@ -95,6 +95,20 @@ Read the [Zaidan Solid quick start](https://better-auth-ui.com/docs/zaidan) for 
 
 See the [React reference](https://better-auth-ui.com/docs/react) or [Solid reference](https://better-auth-ui.com/docs/solid) when you need lower-level APIs.
 
+## Agent skills
+
+Better Auth UI publishes the same agent skills through TanStack Intent and [skills.sh](https://skills.sh).
+
+For GitHub installation, select the skill for your application:
+
+```bash
+bunx skills@latest add better-auth-ui/better-auth-ui --full-depth --skill better-auth-ui-react
+```
+
+Skills cover React/shadcn, Solid/Zaidan, HeroUI, core data APIs, and localization. TanStack Intent loads them from installed npm packages.
+
+Read the [agent skills guide](https://better-auth-ui.com/docs/agent-skills) for both installation paths and their version behavior.
+
 ## Development
 
 This repository uses [Bun](https://bun.sh) and [Nx](https://nx.dev).

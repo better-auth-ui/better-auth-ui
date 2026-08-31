@@ -25,9 +25,11 @@
     "@swc-node/register": "~1.12.1",
     "@swc/core": "~1.16.0",
     "@swc/helpers": "~0.5.23",
+    "@tanstack/intent": "0.3.8",
     "@vitejs/plugin-react": "^6.0.5",
     "lefthook": "^2.1.8",
     "nx": "23.1.2",
+    "skills": "1.5.23",
     "typescript": "^6.0.3",
     "vite": "^8.2.1",
     "vite-plugin-dts": "^5.0.3"

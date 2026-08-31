@@ -1,0 +1,54 @@
+library:
+  name: better-auth-ui
+  repository: https://github.com/better-auth-ui/better-auth-ui
+
+domains:
+  - name: Authentication data and server boundaries
+    slug: core
+    failure_modes:
+      - Share a QueryClient between server requests and expose another user's cache.
+      - Import a server helper into a browser bundle or omit incoming request headers.
+      - Select organization access through session state instead of an explicit slug or ID.
+      - Lose mutation metadata or invent incompatible query keys.
+  - name: React authentication interfaces
+    slug: react
+    failure_modes:
+      - Import copied shadcn components from the React data package.
+      - Confuse raw Better Auth results with unwrapped Query results.
+      - Configure a UI plugin without its matching server and client plugins.
+      - Reject valid plugin routes through an incomplete path allowlist.
+  - name: Solid authentication interfaces
+    slug: solid
+    failure_modes:
+      - Pass React options objects where Solid hooks require accessors.
+      - Lose reactivity through destructuring or a stale organization slug.
+      - Install the React registry into a Solid application.
+  - name: Packaged HeroUI interfaces
+    slug: heroui
+    failure_modes:
+      - Use the primitive provider and omit HeroUI navigation or error presentation.
+      - Omit the Better Auth UI stylesheet or assume it replaces HeroUI styles.
+      - Apply HeroUI v2 contracts to HeroUI v3 components.
+  - name: Localization
+    slug: localization
+    failure_modes:
+      - Import a locale from the root entrypoint or invent an unsupported locale.
+      - Choose different languages during server and browser rendering.
+      - Assume browser provider localization also translates server-rendered emails.
+
+skills:
+  - slug: better-auth-ui-core
+    packages: ["@better-auth-ui/core"]
+    domain: core
+  - slug: better-auth-ui-react
+    packages: ["@better-auth-ui/react"]
+    domain: react
+  - slug: better-auth-ui-solid
+    packages: ["@better-auth-ui/solid"]
+    domain: solid
+  - slug: better-auth-ui-heroui
+    packages: ["@better-auth-ui/heroui"]
+    domain: heroui
+  - slug: better-auth-ui-localization
+    packages: ["@better-auth-ui/locales"]
+    domain: localization
