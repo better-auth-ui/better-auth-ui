@@ -18,7 +18,7 @@ HeroUI components are packaged React components. They are separate from the copi
 Configure Better Auth and HeroUI v3 first. HeroUI v3 uses React 19 and Tailwind v4.
 
 ```bash
-bun add @better-auth-ui/heroui @better-auth-ui/react @better-auth-ui/core
+bun add @better-auth-ui/heroui @better-auth-ui/react @better-auth-ui/core @better-auth-ui/locales
 ```
 
 Add Better Auth UI's styles to the existing global stylesheet after the application's Tailwind and HeroUI setup:

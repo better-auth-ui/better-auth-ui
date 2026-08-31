@@ -92,6 +92,7 @@ Read the [Zaidan Solid quick start](https://better-auth-ui.com/docs/zaidan) for 
 | `@better-auth-ui/react` | React providers, hooks, queries, mutations, and plugin APIs |
 | `@better-auth-ui/heroui` | Ready-to-use React components built with HeroUI |
 | `@better-auth-ui/solid` | Solid providers, hooks, queries, mutations, and plugin APIs |
+| `@better-auth-ui/locales` | Locale bundles, language matching helpers, and the localization skill |
 
 See the [React reference](https://better-auth-ui.com/docs/react) or [Solid reference](https://better-auth-ui.com/docs/solid) when you need lower-level APIs.
 
