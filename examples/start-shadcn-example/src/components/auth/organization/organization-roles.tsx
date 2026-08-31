@@ -19,7 +19,18 @@ import { Pencil, Plus, Trash2 } from "lucide-react"
 import { type FormEvent, useEffect, useState } from "react"
 import { toast } from "sonner"
 
-import { Button } from "@/components/ui/button"
+import {
+  AlertDialog,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogMedia,
+  AlertDialogTitle,
+  AlertDialogTrigger
+} from "@/components/ui/alert-dialog"
+import { Button, buttonVariants } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Checkbox } from "@/components/ui/checkbox"
 import {
@@ -79,10 +90,6 @@ export function OrganizationRoles({
     organizationId,
     permissions: { ac: ["delete"] }
   })
-  const deleteRole = useDeleteRole(authClient, organizationId, {
-    onSuccess: () => toast.success(localization.roleDeleted),
-    onError: (error) => toast.error(error.message)
-  })
   const [editingRole, setEditingRole] = useState<Role | null>()
 
   return (
@@ -129,15 +136,6 @@ export function OrganizationRoles({
                     canDeletePending={canDelete.isPending}
                     canUpdate={canUpdate.data?.success === true}
                     canUpdatePending={canUpdate.isPending}
-                    deleting={deleteRole.isPending}
-                    onDelete={() => {
-                      if (!window.confirm(localization.deleteRoleDescription))
-                        return
-                      deleteRole.mutate({
-                        roleId: role.id,
-                        organizationId
-                      })
-                    }}
                     onEdit={() => setEditingRole(role)}
                     organizationId={organizationId}
                     role={role}
@@ -176,8 +174,6 @@ function OrganizationRoleRow({
   canDeletePending,
   canUpdate,
   canUpdatePending,
-  deleting,
-  onDelete,
   onEdit,
   organizationId,
   role
@@ -187,13 +183,20 @@ function OrganizationRoleRow({
   canDeletePending: boolean
   canUpdate: boolean
   canUpdatePending: boolean
-  deleting: boolean
-  onDelete: () => void
   onEdit: () => void
   organizationId: string
   role: Role
 }) {
+  const { localization: authLocalization } = useAuth()
   const { localization } = useAuthPlugin(organizationPlugin)
+  const [deleteOpen, setDeleteOpen] = useState(false)
+  const deleteRole = useDeleteRole(authClient, organizationId, {
+    onSuccess: () => {
+      setDeleteOpen(false)
+      toast.success(localization.roleDeleted)
+    },
+    onError: (error) => toast.error(error.message)
+  })
   const assignments = useListOrganizationMembers(authClient, {
     query: {
       organizationId,
@@ -207,6 +210,8 @@ function OrganizationRoleRow({
   const assignedCount =
     assignments.data?.total ?? assignments.data?.members.length ?? 0
   const assignmentUnknown = canDelete && !assignments.data
+  const deleteDisabled =
+    assignmentUnknown || assignedCount > 0 || deleteRole.isPending
 
   return (
     <TableRow>
@@ -240,24 +245,59 @@ function OrganizationRoleRow({
             </Button>
           )}
           {canDelete && (
-            <Button
-              size="icon"
-              variant="ghost"
-              className="text-destructive"
-              disabled={assignmentUnknown || assignedCount > 0 || deleting}
-              title={
-                assignedCount > 0
-                  ? localization.roleInUse.replace(
-                      "{{count}}",
-                      String(assignedCount)
-                    )
-                  : localization.deleteRole
-              }
-              onClick={onDelete}
-              aria-label={localization.deleteRole}
+            <AlertDialog
+              open={deleteOpen}
+              onOpenChange={(open) => {
+                if (!deleteRole.isPending) setDeleteOpen(open)
+              }}
             >
-              <Trash2 />
-            </Button>
+              <AlertDialogTrigger
+                className={buttonVariants({
+                  size: "icon",
+                  variant: "ghost",
+                  className: "text-destructive"
+                })}
+                disabled={deleteDisabled}
+                title={
+                  assignedCount > 0
+                    ? localization.roleInUse.replace(
+                        "{{count}}",
+                        String(assignedCount)
+                      )
+                    : localization.deleteRole
+                }
+                aria-label={localization.deleteRole}
+              >
+                <Trash2 />
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogMedia>
+                    <Trash2 />
+                  </AlertDialogMedia>
+                  <AlertDialogTitle>{localization.deleteRole}</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    {localization.deleteRoleDescription}
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <p className="break-words text-sm font-medium">{role.role}</p>
+                <AlertDialogFooter>
+                  <AlertDialogCancel disabled={deleteRole.isPending}>
+                    {authLocalization.settings.cancel}
+                  </AlertDialogCancel>
+                  <Button
+                    variant="destructive"
+                    disabled={deleteDisabled}
+                    onClick={() =>
+                      deleteRole.mutate({ roleId: role.id, organizationId })
+                    }
+                  >
+                    {deleteRole.isPending && <Spinner />}
+                    {localization.deleteRole}
+                  </Button>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
           )}
           {canDeletePending && (
             <Button
