@@ -1,5 +1,5 @@
-/** Generate a valid slug when the organization slug field is hidden. */
-export function generateOrganizationSlug(name: string) {
+/** Generate a slug candidate. Creation checks availability before using it. */
+export function generateOrganizationSlug(name: string, suffix?: string) {
   const slug = name
     .normalize("NFKD")
     .replace(/[\u0300-\u036f]/g, "")
@@ -7,5 +7,6 @@ export function generateOrganizationSlug(name: string) {
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-|-$/g, "")
 
-  return slug || crypto.randomUUID()
+  const candidate = slug || crypto.randomUUID()
+  return suffix ? `${candidate}-${suffix}` : candidate
 }

@@ -74,7 +74,8 @@ export function InviteMemberDialog({
     authClient as OrganizationAuthClient
   )
   const teams = useListTeams(authClient as OrganizationTeamsAuthClient, {
-    query: { organizationId: activeOrganization?.id }
+    query: { organizationId: activeOrganization?.id },
+    enabled: teamsEnabled
   })
   const invitations = useListOrganizationInvitations(
     authClient as OrganizationAuthClient

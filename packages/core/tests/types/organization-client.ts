@@ -4,6 +4,7 @@ import { createAuthClient } from "better-auth/client"
 import { organizationClient } from "better-auth/client/plugins"
 import { organization } from "better-auth/plugins"
 import {
+  type CreateOrganizationParams,
   checkSlugOptions,
   createOrganizationOptions,
   createRoleOptions,
@@ -85,6 +86,17 @@ const custom = createAuthClient({
   ]
 })
 basicHelpers(custom)
+const generatedSlugParams = {
+  name: "Acme",
+  workspaceId: "workspace"
+} satisfies CreateOrganizationParams<typeof custom>
+generatedSlugParams satisfies CreateOrganizationParams<typeof basic>
+const invalidCreation: CreateOrganizationParams<typeof custom> = {
+  name: "Acme",
+  // @ts-expect-error Generated slugs must preserve custom field input types.
+  workspaceId: 123
+}
+void invalidCreation
 const customOrganization = await ensureFullOrganization(
   queryClient,
   custom,

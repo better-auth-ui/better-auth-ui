@@ -231,6 +231,7 @@ export function OrganizationSwitcher({
       </DropdownMenu>
 
       <CreateOrganizationDialog
+        hideSlug={hideSlug}
         open={createOpen}
         onOpenChange={setCreateOpen}
       />

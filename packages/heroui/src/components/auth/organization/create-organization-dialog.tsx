@@ -1,8 +1,5 @@
 import { parseAdditionalFieldValue } from "@better-auth-ui/core"
-import {
-  generateOrganizationSlug,
-  type OrganizationAuthClient
-} from "@better-auth-ui/core/plugins/organization"
+import type { OrganizationAuthClient } from "@better-auth-ui/core/plugins/organization"
 import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
 import { useCreateOrganization } from "@better-auth-ui/react/plugins/organization"
 import { Briefcase } from "@gravity-ui/icons"
@@ -93,7 +90,7 @@ export function CreateOrganizationDialog({
       {
         ...additionalValues,
         name,
-        slug: hideSlug ? generateOrganizationSlug(name) : slug
+        slug: hideSlug ? undefined : slug
       },
       {
         onSuccess: () => {

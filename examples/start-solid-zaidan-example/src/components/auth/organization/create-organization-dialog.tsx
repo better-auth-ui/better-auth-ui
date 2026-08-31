@@ -1,8 +1,5 @@
 import { parseAdditionalFieldValue } from "@better-auth-ui/core"
-import {
-  generateOrganizationSlug,
-  type OrganizationAuthClient
-} from "@better-auth-ui/core/plugins/organization"
+import type { OrganizationAuthClient } from "@better-auth-ui/core/plugins/organization"
 import { useAuth, useAuthPlugin } from "@better-auth-ui/solid"
 import { useCreateOrganization } from "@better-auth-ui/solid/plugins/organization"
 import { BriefcaseBusiness, LoaderCircle } from "lucide-solid"
@@ -79,7 +76,7 @@ export function CreateOrganizationDialog(props: CreateOrganizationDialogProps) {
     createOrganization.mutate({
       ...additionalValues,
       name: name(),
-      slug: hideSlug() ? generateOrganizationSlug(name()) : slug()
+      slug: hideSlug() ? undefined : slug()
     })
   }
 

@@ -338,6 +338,7 @@ function MountedOrganizationSwitcher(rawProps: OrganizationSwitcherProps = {}) {
         </DropdownMenuContent>
       </DropdownMenu>
       <CreateOrganizationDialog
+        hideSlug={hideSlug()}
         open={createOpen()}
         onOpenChange={setCreateOpen}
       />

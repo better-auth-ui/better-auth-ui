@@ -1,12 +1,16 @@
 import type { MutationOptions } from "@tanstack/query-core"
 import type { BetterFetchError } from "better-auth/client"
+import { generateOrganizationSlug } from "./generate-organization-slug"
 import type { OrganizationAuthClient } from "./organization-auth-client"
 import { organizationMutationKeys } from "./organization-mutation-keys"
 import { organizationQueryKeys } from "./organization-query-keys"
 
 export type CreateOrganizationParams<
   TAuthClient extends OrganizationAuthClient = OrganizationAuthClient
-> = Parameters<TAuthClient["organization"]["create"]>[0]
+> = Omit<Parameters<TAuthClient["organization"]["create"]>[0], "slug"> & {
+  /** Omit to generate an available slug from the name. */
+  slug?: string
+}
 
 export type CreateOrganizationOptions<
   TAuthClient extends OrganizationAuthClient = OrganizationAuthClient
@@ -26,11 +30,41 @@ export function createOrganizationOptions<
 >(authClient: TAuthClient, userId?: string) {
   const mutationKey = organizationMutationKeys.create
 
-  const mutationFn = (params: CreateOrganizationParams<TAuthClient>) =>
-    authClient.organization.create({
-      ...params,
-      fetchOptions: { ...params?.fetchOptions, throw: true }
-    })
+  const mutationFn = async (params: CreateOrganizationParams<TAuthClient>) => {
+    const generateSlug = params.slug === undefined
+    const fetchOptions = {
+      ...params.fetchOptions,
+      throw: true as const
+    }
+    let slug = params.slug ?? generateOrganizationSlug(params.name)
+
+    for (let attempt = 0; ; attempt++) {
+      try {
+        if (generateSlug) {
+          await authClient.organization.checkSlug({ slug, fetchOptions })
+        }
+
+        return await authClient.organization.create<{ throw: true }>({
+          ...params,
+          slug,
+          fetchOptions
+        })
+      } catch (error) {
+        const code = (error as BetterFetchError | null)?.error?.code
+        // Creation can race with a successful availability check.
+        if (
+          !generateSlug ||
+          attempt >= 4 ||
+          (code !== "ORGANIZATION_SLUG_ALREADY_TAKEN" &&
+            code !== "ORGANIZATION_ALREADY_EXISTS")
+        ) {
+          throw error
+        }
+
+        slug = generateOrganizationSlug(params.name, crypto.randomUUID())
+      }
+    }
+  }
 
   return {
     mutationKey,

@@ -51,7 +51,7 @@ By default, Better Auth protects `/sign-up/email`, `/sign-in/email`, and `/reque
 
 Better Auth 1.7 and later matches complete authentication paths. Use an exact endpoint or an explicit wildcard such as `/sign-in/*`.
 
-Do not use a partial prefix such as `/sign-in`. If the application protects username sign-in, add that endpoint explicitly:
+Do not use a partial prefix such as `/sign-in`. To protect username and social sign-in, add their endpoints explicitly:
 
 ```ts title="src/lib/auth.ts"
 captcha({
@@ -61,6 +61,7 @@ captcha({
     "/sign-up/email", // [!code highlight]
     "/sign-in/email", // [!code highlight]
     "/sign-in/username", // [!code highlight]
+    "/sign-in/social", // [!code highlight]
     "/request-password-reset" // [!code highlight]
   ] // [!code highlight]
 })

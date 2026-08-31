@@ -6,7 +6,9 @@ import { describe, expect, it, vi } from "vitest"
 
 import { AuthProvider } from "../src/components/auth/auth-provider"
 import { CreateOrganizationDialog } from "../src/components/auth/organization/create-organization-dialog"
+import { InviteMemberDialog } from "../src/components/auth/organization/invite-member-dialog"
 import { OrganizationProfile } from "../src/components/auth/organization/organization-profile"
+import { OrganizationSwitcher } from "../src/components/auth/organization/organization-switcher"
 import { SlugField } from "../src/components/auth/organization/slug-field"
 import { organizationPlugin } from "../src/lib/auth/organization-plugin"
 
@@ -51,16 +53,42 @@ function createOrganizationAuthClient(
   create: () => Promise<unknown> = async () => ({ data: {}, error: null })
 ) {
   const createOrganization = vi.fn(create)
+  const checkSlug = vi.fn(async () => ({ status: true }))
   return {
-    organization: { create: createOrganization },
+    organization: { create: createOrganization, checkSlug },
     useSession: () => ({
       data: { user: { id: "user-id" } },
       isPending: false,
       error: null
     })
   } as unknown as Parameters<typeof AuthProvider>[0]["authClient"] & {
-    organization: { create: typeof createOrganization }
+    organization: {
+      create: typeof createOrganization
+      checkSlug: typeof checkSlug
+    }
   }
+}
+
+function createOrganizationScopeAuthClient() {
+  const organization = {
+    id: "org",
+    name: "Acme",
+    slug: "acme",
+    createdAt: new Date()
+  }
+  const authClient = {
+    getSession: vi.fn(async () => ({ user: { id: "user", name: "Alex" } })),
+    organization: {
+      getFullOrganization: vi.fn(async () => organization),
+      list: vi.fn(async () => [organization]),
+      listMembers: vi.fn(async () => ({ members: [], total: 0 })),
+      hasPermission: vi.fn(async () => ({ success: true })),
+      listInvitations: vi.fn(async () => []),
+      listTeams: vi.fn(async () => [])
+    }
+  }
+  return authClient as typeof authClient &
+    Parameters<typeof AuthProvider>[0]["authClient"]
 }
 
 function renderCreateOrganizationDialog({
@@ -276,11 +304,36 @@ describe("<CreateOrganizationDialog />", () => {
     )
   })
 
-  it("keeps hidden creation open when server slug validation fails", async () => {
+  it("retries a hidden slug collision and closes after successful creation", async () => {
+    const user = userEvent.setup()
+    const onOpenChange = vi.fn()
+    const authClient = createOrganizationAuthClient()
+    authClient.organization.create.mockRejectedValueOnce(
+      Object.assign(new Error("Organization already exists"), {
+        error: { code: "ORGANIZATION_ALREADY_EXISTS" }
+      })
+    )
+    renderCreateOrganizationDialog({ authClient, hideSlug: true, onOpenChange })
+    await user.type(screen.getByLabelText("Name"), "Acme")
+    await user.click(
+      screen.getByRole("button", { name: "Create organization" })
+    )
+
+    await waitFor(() => expect(onOpenChange).toHaveBeenCalledWith(false))
+    expect(authClient.organization.create).toHaveBeenCalledTimes(2)
+    expect(authClient.organization.checkSlug).toHaveBeenCalledTimes(2)
+    expect(authClient.organization.create).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        slug: expect.stringMatching(/^acme-[a-f0-9-]+$/)
+      })
+    )
+  })
+
+  it("keeps hidden creation open when the server rejects creation", async () => {
     const user = userEvent.setup()
     const onOpenChange = vi.fn()
     const authClient = createOrganizationAuthClient(async () => {
-      throw new Error("Organization slug already taken")
+      throw new Error("Organization limit reached")
     })
     renderCreateOrganizationDialog({ authClient, hideSlug: true, onOpenChange })
     await user.type(screen.getByLabelText("Name"), "Acme")
@@ -389,4 +442,76 @@ describe("<OrganizationProfile />", () => {
       )
     )
   })
+})
+
+describe("<OrganizationSwitcher />", () => {
+  it.each([
+    {
+      localHideSlug: undefined,
+      pluginHideSlug: undefined,
+      expectedHidden: true
+    },
+    { localHideSlug: true, pluginHideSlug: false, expectedHidden: true },
+    { localHideSlug: false, pluginHideSlug: true, expectedHidden: false }
+  ])(
+    "passes its resolved slug visibility to the create dialog: %j",
+    async ({ localHideSlug, pluginHideSlug, expectedHidden }) => {
+      const user = userEvent.setup()
+      render(
+        <AuthProvider
+          authClient={createOrganizationScopeAuthClient()}
+          navigate={() => {}}
+          queryClient={createTestQueryClient()}
+          plugins={[
+            organizationPlugin({ slug: "acme", hideSlug: pluginHideSlug })
+          ]}
+        >
+          <OrganizationSwitcher hideSlug={localHideSlug} />
+        </AuthProvider>
+      )
+
+      const trigger = screen.getByRole("button", {
+        name: "Organization",
+        exact: true
+      })
+      await waitFor(() => expect(trigger).toBeEnabled())
+      await user.click(trigger)
+      await user.click(
+        await screen.findByRole("menuitem", { name: "Create organization" })
+      )
+      await screen.findByLabelText("Name")
+
+      expect(screen.queryByLabelText("Slug") === null).toBe(expectedHidden)
+    }
+  )
+})
+
+describe("<InviteMemberDialog />", () => {
+  it.each([false, true])(
+    "loads teams only when enabled (teams: %s)",
+    async (teams) => {
+      const authClient = createOrganizationScopeAuthClient()
+      const queryClient = createTestQueryClient()
+      render(
+        <AuthProvider
+          authClient={authClient}
+          navigate={() => {}}
+          queryClient={queryClient}
+          plugins={[organizationPlugin({ slug: "acme", teams })]}
+        >
+          <InviteMemberDialog isOpen onOpenChange={() => {}} />
+        </AuthProvider>
+      )
+
+      await waitFor(() =>
+        expect(
+          screen.getByRole("button", { name: "Invite member" })
+        ).toBeEnabled()
+      )
+      await waitFor(() => expect(queryClient.isFetching()).toBe(0))
+      expect(authClient.organization.listTeams).toHaveBeenCalledTimes(
+        teams ? 1 : 0
+      )
+    }
+  )
 })
