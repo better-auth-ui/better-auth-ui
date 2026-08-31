@@ -1,0 +1,11 @@
+Hover or focus the email-provider button to show a QR code for the same provider URL. Users can scan it when their email account is available on another device.
+
+<ComponentPage id="verify-email">
+
+<PageSlot name="installation" doc-variant="zaidan">
+
+After install, `src/components/auth/verify-email.tsx` and the copied verify-email files are app-owned. The component reads the target email from `sessionStorage` (set on sign-up or sign-in redirect) and redirects back to sign-in when no email is stored.
+
+</PageSlot>
+
+</ComponentPage>

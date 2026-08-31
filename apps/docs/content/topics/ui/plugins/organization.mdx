@@ -1,0 +1,2569 @@
+<DocVariant name="heroui shadcn">
+The organization plugin adds multi-tenant organization management to your authentication UI. Users can create, switch between, and manage organizations with members, invitations, and roles.
+
+It contributes:
+</DocVariant>
+
+<DocVariant name="heroui">
+- An `organizations` tab to `<Settings />` listing every organization the user belongs to plus pending invitations to them
+- An `<Organization />` shell mounted at `/organization/<path>` with `settings` and `people` tabs
+- An `<OrganizationSwitcher />` dropdown to switch the active organization, manage it, or create a new one
+- An `organizationCards` plugin slot rendered inside `<OrganizationSettings />` so other plugins (for example [api-key](/docs/heroui/plugins/api-key)) can attach org-scoped cards
+- Hooks and mutations for organization endpoints, including `useActiveOrganization`, `useListOrganizations`, and `useInviteMember`
+</DocVariant>
+
+<DocVariant name="shadcn">
+- An `organizations` tab to `<Settings />` listing every organization the user belongs to plus pending invitations to them
+- An `<Organization />` shell mounted at `/organization/<path>` with `settings` and `people` tabs
+- An `<OrganizationSwitcher />` dropdown to switch the active organization, manage it, or create a new one
+- An `organizationCards` plugin slot rendered inside `<OrganizationSettings />` so other plugins (for example [api-key](/docs/shadcn/plugins/api-key)) can attach org-scoped cards
+- Hooks and mutations for organization endpoints, including `useActiveOrganization`, `useListOrganizations`, and `useInviteMember`
+</DocVariant>
+
+<DocVariant name="zaidan">
+The organization plugin adds multi-tenant organization management to your Solid/Zaidan authentication UI. Users can create, switch between, and manage organizations with members, invitations, and roles.
+
+It contributes:
+
+- An `organizations` tab to `<Settings />` listing every organization the user belongs to plus pending invitations to them
+- An `<Organization />` shell mounted at `/organization/@<slug>/<path>` with `settings` and `people` tabs
+- An `<OrganizationSwitcher />` dropdown to switch the active organization, manage it, or create a new one
+- An `organizationCards` plugin slot rendered inside `<OrganizationSettings />` so other plugins (for example [api-key](/docs/zaidan/plugins/api-key)) can attach org-scoped cards
+- Solid hooks and mutations for organization endpoints such as `useActiveOrganization`, `useListOrganizations`, `useInviteMember`, and `useUpdateMemberRole`
+</DocVariant>
+
+## Setup
+
+<Steps>
+
+<Step>
+
+### Install the server plugin
+
+Add the [`organization`](https://www.better-auth.com/docs/plugins/organization) plugin to your Better Auth server config:
+
+```ts doc-variant="heroui shadcn" title="lib/auth.ts"
+import { betterAuth } from "better-auth"
+import { organization } from "better-auth/plugins" // [!code highlight]
+
+export const auth = betterAuth({
+  // ...
+  plugins: [
+    organization() // [!code highlight]
+  ]
+})
+```
+
+```ts doc-variant="zaidan" title="src/lib/auth.ts"
+import { betterAuth } from "better-auth"
+import { organization } from "better-auth/plugins" // [!code highlight]
+
+export const auth = betterAuth({
+  // ...
+  plugins: [
+    organization() // [!code highlight]
+  ]
+})
+```
+
+</Step>
+
+<Step>
+
+### Install the matching client plugin
+
+Add `organizationClient()` to your auth client so `authClient.organization.*` methods are available:
+
+```ts doc-variant="heroui shadcn" title="lib/auth-client.ts"
+import { createAuthClient } from "better-auth/react"
+import { organizationClient } from "better-auth/client/plugins" // [!code highlight]
+
+export const authClient = createAuthClient({
+  plugins: [organizationClient()] // [!code highlight]
+})
+```
+
+```ts doc-variant="zaidan" title="src/lib/auth-client.ts"
+import { createAuthClient } from "better-auth/solid"
+import { organizationClient } from "better-auth/client/plugins" // [!code highlight]
+
+export const authClient = createAuthClient({
+  plugins: [organizationClient()] // [!code highlight]
+})
+```
+
+</Step>
+
+<Step>
+
+<DocVariant name="heroui">
+### Register the UI plugin
+
+Pass `organizationPlugin()` to `<AuthProvider>` so the organizations settings tab, the `<Organization />` shell, and `<OrganizationSwitcher />` can read plugin localization and view paths:
+</DocVariant>
+
+```tsx doc-variant="heroui" title="components/providers.tsx"
+import { AuthProvider } from "@better-auth-ui/heroui"
+import { organizationPlugin } from "@better-auth-ui/heroui/plugins/organization" // [!code highlight]
+
+import { authClient } from "@/lib/auth-client"
+
+<AuthProvider
+  authClient={authClient}
+  plugins={[
+    organizationPlugin() // [!code highlight]
+  ]}
+>
+  {children}
+</AuthProvider>
+```
+
+<DocVariant name="shadcn zaidan">
+### Install the UI plugin
+
+Run the shadcn CLI to install every organization component and the `organizationPlugin()` factory into your project:
+</DocVariant>
+
+```npm doc-variant="shadcn"
+npx shadcn@latest add @better-auth-ui/organization
+```
+
+```npm doc-variant="zaidan"
+npx shadcn@latest add https://better-auth-ui.com/r/solid/organization.json
+```
+
+<DocVariant name="shadcn zaidan">
+This drops the following into your codebase:
+</DocVariant>
+
+<DocVariant name="shadcn">
+- `src/lib/auth/auth-plugin.ts`: local `AuthPlugin` typing widener
+- `src/lib/auth/organization-plugin.tsx`: `organizationPlugin()` factory
+- `src/components/auth/organization/accept-invitation.tsx`: direct invitation acceptance view
+- `src/components/auth/organization/organization.tsx`: the `/organization/<path>` shell
+- `src/components/auth/organization/organization-roles.tsx`: dynamic role and permission editor
+- `src/components/auth/organization/organization-switcher.tsx`: header dropdown for switching organizations
+- `src/components/auth/organization/team-switcher.tsx`: organization-scoped team selection
+- `src/components/auth/organization/organization-settings.tsx`: settings tab contents (profile + danger zone + plugin cards)
+- `src/components/auth/organization/organization-people.tsx`: people tab contents (members + invitations)
+- `src/components/auth/organization/organization-profile.tsx`: profile card (logo, name, slug)
+- `src/components/auth/organization/organization-danger-zone.tsx`: danger zone card
+- `src/components/auth/organization/organization-members.tsx`: members table with search/filter/sort
+- `src/components/auth/organization/organization-member-row.tsx`: member row with role and remove actions
+- `src/components/auth/organization/organization-invitations.tsx`: invitations table with search/filter/sort
+- `src/components/auth/organization/organization-invitation-row.tsx`: invitation row with cancel action
+- `src/components/auth/organization/organizations.tsx`: list of organizations the user belongs to
+- `src/components/auth/organization/organization-row.tsx`: single organization row in the list
+- `src/components/auth/organization/organizations-settings.tsx`: `/settings/organizations` panel
+- `src/components/auth/organization/user-invitations.tsx`: invitations addressed to the user
+- `src/components/auth/organization/user-invitation-row.tsx`: invitation row with accept/reject actions
+- `src/components/auth/organization/create-organization-dialog.tsx`: new-organization dialog
+- `src/components/auth/organization/invite-member-dialog.tsx`: invite-by-email dialog
+- `src/components/auth/organization/delete-organization-dialog.tsx`: delete confirmation dialog
+- `src/components/auth/organization/leave-organization-dialog.tsx`: leave confirmation dialog
+- `src/components/auth/organization/remove-member-dialog.tsx`: remove-member confirmation dialog
+- `src/components/auth/organization/leave-organization.tsx` / `delete-organization.tsx`: danger-zone rows
+- `src/components/auth/organization/change-organization-logo.tsx`: logo upload control
+- `src/components/auth/organization/organization-logo.tsx`, `organization-view.tsx`, `slug-field.tsx`, plus matching skeletons and empty states
+</DocVariant>
+
+<DocVariant name="zaidan">
+- `src/lib/auth/organization-plugin.tsx`: `organizationPlugin()` factory
+- `src/components/auth/organization/accept-invitation.tsx`: direct invitation acceptance view
+- `src/components/auth/organization/organization.tsx`: the prefixed organization route shell
+- `src/components/auth/organization/organization-switcher.tsx`: header dropdown for switching organizations
+- `src/components/auth/organization/organization-roles.tsx`: dynamic role and permission editor
+- `src/components/auth/organization/team-switcher.tsx`: organization-scoped team selection
+- `src/components/auth/organization/organization-settings.tsx`: settings tab contents (profile + danger zone + plugin cards)
+- `src/components/auth/organization/organization-people.tsx`: people tab contents (members + invitations)
+- `src/components/auth/organization/organization-profile.tsx`: profile card (logo, name, slug)
+- `src/components/auth/organization/organization-danger-zone.tsx`: danger zone card
+- `src/components/auth/organization/organization-members.tsx`: members table with search/filter/sort
+- `src/components/auth/organization/organization-member-row.tsx`: member row with role, remove, and leave actions
+- `src/components/auth/organization/organization-invitations.tsx`: invitations table with search/filter/sort
+- `src/components/auth/organization/organization-invitation-row.tsx`: invitation row with cancel action
+- `src/components/auth/organization/organizations.tsx`: list of organizations the user belongs to
+- `src/components/auth/organization/organization-row.tsx`: single organization row in the list
+- `src/components/auth/organization/organizations-settings.tsx`: `/settings/organizations` panel
+- `src/components/auth/organization/user-invitations.tsx`: invitations addressed to the user
+- `src/components/auth/organization/user-invitation-row.tsx`: invitation row with accept/reject actions
+- `src/components/auth/organization/create-organization-dialog.tsx`: new-organization dialog
+- `src/components/auth/organization/invite-member-dialog.tsx`: invite-by-email dialog
+- `src/components/auth/organization/delete-organization-dialog.tsx`: delete confirmation dialog
+- `src/components/auth/organization/delete-organization.tsx`: delete danger-zone row
+- `src/components/auth/organization/leave-organization.tsx`: leave danger-zone row
+- `src/components/auth/organization/change-organization-logo.tsx`: logo upload control
+- `src/components/auth/organization/organization-logo.tsx`, `slug-field.tsx`, plus matching loading and empty states
+</DocVariant>
+
+</Step>
+
+<Step>
+
+<DocVariant name="heroui">
+### Allow the invitation auth path
+
+The organization plugin registers a direct invitation view at `/auth/accept-invitation`. Include its auth path in any route allow-list that wraps `<Auth path={path} />`:
+</DocVariant>
+
+```tsx doc-variant="heroui" title="routes/auth/$path.tsx"
+import { viewPaths } from "@better-auth-ui/core"
+import { Auth } from "@better-auth-ui/heroui"
+import { organizationPlugin } from "@better-auth-ui/heroui/plugins"
+
+const validAuthPaths = [
+  ...Object.values(viewPaths.auth),
+  ...Object.values(organizationPlugin().viewPaths.auth) // [!code highlight]
+]
+```
+
+<DocVariant name="heroui">
+Invitation links use `/auth/accept-invitation?invitationId=<id>`. Signed-out recipients return to the invitation after signing in, and successful accept or reject actions continue to the configured `redirectTo`.
+</DocVariant>
+
+<DocVariant name="shadcn">
+### Register the UI plugin
+
+Pass `organizationPlugin()` to `<AuthProvider>` so the organizations settings tab, the `<Organization />` shell, and `<OrganizationSwitcher />` can read plugin localization and view paths:
+</DocVariant>
+
+```tsx doc-variant="shadcn" title="components/providers.tsx"
+import { AuthProvider } from "@/components/auth/auth-provider"
+import { organizationPlugin } from "@/lib/auth/organization-plugin" // [!code highlight]
+
+import { authClient } from "@/lib/auth-client"
+
+<AuthProvider
+  authClient={authClient}
+  plugins={[
+    organizationPlugin() // [!code highlight]
+  ]}
+>
+  {children}
+</AuthProvider>
+```
+
+<DocVariant name="zaidan">
+### Register the UI plugin
+
+Pass `organizationPlugin()` to `<AuthProvider>` so the organizations settings tab, `<Organization />` shell, and `<OrganizationSwitcher />` can read plugin localization and view paths.
+</DocVariant>
+
+```tsx doc-variant="zaidan" title="src/components/providers.tsx"
+import type { QueryClient } from "@tanstack/solid-query"
+import { useNavigate, useParams } from "@tanstack/solid-router"
+import type { JSX } from "solid-js"
+import { Show } from "solid-js"
+
+import { AuthProvider } from "@/components/auth/auth-provider"
+import { organizationPlugin } from "@/lib/auth/organization-plugin" // [!code highlight]
+import { authClient } from "@/lib/auth-client"
+
+export type ProvidersProps = {
+  children?: JSX.Element | (() => JSX.Element)
+  queryClient?: QueryClient
+}
+
+export function Providers(props: ProvidersProps) {
+  const navigate = useNavigate()
+  const params = useParams({ strict: false })
+  const organizationSlug = () => {
+    const slug = params().slug
+
+    if (typeof slug === "string" && slug.length > 0) return slug
+
+    return null
+  }
+
+  return (
+    <Show keyed when={organizationSlug() ?? "personal"}>
+      <AuthProvider
+        authClient={authClient}
+        redirectTo="/settings/account"
+        navigate={navigate}
+        queryClient={props.queryClient}
+        plugins={[
+          organizationPlugin({ // [!code highlight]
+            slug: organizationSlug(), // [!code highlight]
+            slugPrefix: "@" // [!code highlight]
+          }) // [!code highlight]
+        ]}
+      >
+        {props.children}
+      </AuthProvider>
+    </Show>
+  )
+}
+```
+
+<DocVariant name="zaidan">
+`Show keyed` remounts the provider when the URL slug changes, so plugin state and organization-scoped queries cannot keep using a previous slug.
+</DocVariant>
+
+</Step>
+
+<Step>
+
+<DocVariant name="heroui">
+### Mount the organization switcher
+
+Add `<OrganizationSwitcher />` to the application shell, usually next to `<UserButton />` in the header.
+
+It shows the selected organization and provides switch and create actions:
+</DocVariant>
+
+```tsx doc-variant="heroui" title="components/header.tsx" {2,7}
+import { UserButton } from "@better-auth-ui/heroui"
+import { OrganizationSwitcher } from "@better-auth-ui/heroui/plugins/organization"
+
+export function Header() {
+  return (
+    <header className="flex items-center justify-between gap-3 p-4">
+      <OrganizationSwitcher />
+
+      <UserButton />
+    </header>
+  )
+}
+```
+
+<DocVariant name="shadcn zaidan">
+### Allow the invitation auth path
+
+The organization plugin registers a direct invitation view at `/auth/accept-invitation`. Include its auth path in any route allow-list that wraps `<Auth path={path} />`:
+</DocVariant>
+
+```tsx doc-variant="shadcn" title="routes/auth/$path.tsx"
+import { viewPaths } from "@better-auth-ui/core"
+
+import { Auth } from "@/components/auth/auth"
+import { organizationPlugin } from "@/lib/auth/organization-plugin"
+
+const validAuthPaths = [
+  ...Object.values(viewPaths.auth),
+  ...Object.values(organizationPlugin().viewPaths.auth) // [!code highlight]
+]
+```
+
+```tsx doc-variant="zaidan" title="src/routes/auth/$path.tsx"
+import { viewPaths } from "@better-auth-ui/core"
+
+import { Auth } from "@/components/auth/auth"
+import { organizationPlugin } from "@/lib/auth/organization-plugin"
+
+const validAuthPaths = [
+  ...Object.values(viewPaths.auth),
+  ...Object.values(organizationPlugin().viewPaths.auth) // [!code highlight]
+]
+```
+
+<DocVariant name="shadcn zaidan">
+Invitation links use `/auth/accept-invitation?invitationId=<id>`. Signed-out recipients return to the invitation after signing in, and successful accept or reject actions continue to the configured `redirectTo`.
+</DocVariant>
+
+</Step>
+
+<Step>
+
+<DocVariant name="heroui">
+### Allow the `organizations` settings path
+
+The plugin contributes an `organizations` segment to `viewPaths.settings`. Spread `organizationPlugin().viewPaths.settings` into your settings route's allowed-path set so `/settings/organizations` resolves correctly:
+</DocVariant>
+
+<Tabs doc-variant="heroui" defaultValue="tanstack-start">
+
+<TabsList>
+<TabsTrigger value="tanstack-start"><TanStackStart />TanStack Start</TabsTrigger>
+<TabsTrigger value="next.js"><NextJS />Next.js</TabsTrigger>
+</TabsList>
+
+<Tab value="tanstack-start">
+
+```tsx title="routes/settings/$path.tsx"
+import { viewPaths } from "@better-auth-ui/core"
+import { Settings } from "@better-auth-ui/heroui"
+import { organizationPlugin } from "@better-auth-ui/heroui/plugins/organization" // [!code highlight]
+import { ensureSession } from "@better-auth-ui/core"
+import { ensureSessionServer } from "@better-auth-ui/core/server"
+import { createFileRoute, notFound, redirect } from "@tanstack/react-router"
+import { createIsomorphicFn } from "@tanstack/react-start"
+import { getRequestHeaders } from "@tanstack/react-start/server"
+
+import { auth } from "@/lib/auth"
+import { authClient } from "@/lib/auth-client"
+
+const validSettingsPaths = [
+  ...Object.values(viewPaths.settings),
+  ...Object.values(organizationPlugin().viewPaths.settings) // [!code highlight]
+]
+
+export const Route = createFileRoute("/settings/$path")({
+  async beforeLoad({ params: { path }, context: { queryClient }, location }) {
+    if (!validSettingsPaths.includes(path)) {
+      throw notFound()
+    }
+
+    const ensureSessionIso = createIsomorphicFn()
+      .server(() =>
+        ensureSessionServer(queryClient, auth, { headers: getRequestHeaders() })
+      )
+      .client(() => ensureSession(queryClient, authClient))
+
+    const session = await ensureSessionIso()
+
+    if (!session) {
+      throw redirect({
+        to: "/auth/$path",
+        params: { path: "sign-in" },
+        search: { redirectTo: location.href }
+      })
+    }
+
+    return { session }
+  },
+  component: SettingsPage
+})
+
+function SettingsPage() {
+  const { path } = Route.useParams()
+  return (
+    <div className="w-full max-w-3xl mx-auto p-4 md:p-6">
+      <Settings path={path} />
+    </div>
+  )
+}
+```
+
+</Tab>
+
+<Tab value="next.js">
+
+```tsx title="app/settings/[path]/page.tsx"
+import { viewPaths } from "@better-auth-ui/core"
+import { Settings } from "@better-auth-ui/heroui"
+import { organizationPlugin } from "@better-auth-ui/heroui/plugins/organization" // [!code highlight]
+import { ensureSessionServer } from "@better-auth-ui/core/server"
+import { dehydrate, HydrationBoundary } from "@tanstack/react-query"
+import { headers } from "next/headers"
+import { notFound, redirect } from "next/navigation"
+
+import { auth } from "@/lib/auth"
+import { getQueryClient } from "@/lib/query-client"
+
+const validSettingsPaths = [
+  ...Object.values(viewPaths.settings),
+  ...Object.values(organizationPlugin().viewPaths.settings) // [!code highlight]
+]
+
+export default async function SettingsPage({
+  params
+}: {
+  params: Promise<{ path: string }>
+}) {
+  const { path } = await params
+
+  if (!validSettingsPaths.includes(path)) {
+    notFound()
+  }
+
+  const queryClient = getQueryClient()
+
+  const session = await ensureSessionServer(queryClient, auth, {
+    headers: await headers()
+  })
+
+  if (!session) {
+    redirect(
+      `/auth/sign-in?redirectTo=${encodeURIComponent(`/settings/${path}`)}`
+    )
+  }
+
+  return (
+    <HydrationBoundary state={dehydrate(queryClient)}>
+      <div className="w-full max-w-3xl mx-auto p-4 md:p-6">
+        <Settings path={path} />
+      </div>
+    </HydrationBoundary>
+  )
+}
+```
+
+</Tab>
+
+</Tabs>
+
+<DocVariant name="heroui">
+`/settings/organizations` now renders `<OrganizationsSettings />`: the list of organizations the user belongs to plus pending invitations.
+</DocVariant>
+
+<DocVariant name="shadcn">
+### Mount the organization switcher
+
+Add `<OrganizationSwitcher />` to the application shell, usually next to `<UserButton />` in the header.
+
+It shows the selected organization and provides switch and create actions:
+</DocVariant>
+
+```tsx doc-variant="shadcn" title="components/header.tsx" {2,7}
+import { UserButton } from "@/components/auth/user/user-button"
+import { OrganizationSwitcher } from "@/components/auth/organization/organization-switcher"
+
+export function Header() {
+  return (
+    <header className="flex items-center justify-between gap-3 p-4">
+      <OrganizationSwitcher />
+
+      <UserButton />
+    </header>
+  )
+}
+```
+
+<DocVariant name="zaidan">
+### Mount the organization switcher
+
+Drop `<OrganizationSwitcher />` into your app shell: typically in the header next to `<UserButton />`. It shows the active organization, lets users switch between organizations, and exposes a "Create organization" entry.
+</DocVariant>
+
+```tsx doc-variant="zaidan" title="src/components/header.tsx" {2,7}
+import { OrganizationSwitcher } from "@/components/auth/organization/organization-switcher"
+import { UserButton } from "@/components/auth/user/user-button"
+
+export function Header() {
+  return (
+    <header class="flex items-center justify-between gap-3 p-4">
+      <OrganizationSwitcher />
+      <UserButton />
+    </header>
+  )
+}
+```
+
+</Step>
+
+<Step>
+
+<DocVariant name="heroui">
+### Create the organization page
+
+Mount a dynamic route at `/organization/<path>` that renders `<Organization />` for the matching tab. `<Organization />` is the shell: it shows the `settings` (profile + danger zone) and `people` (members + invitations) tabs for the **active** organization. The active organization is whatever the user picked in `<OrganizationSwitcher />` (persisted on the server session via `setActive`).
+</DocVariant>
+
+<DocVariant name="shadcn">
+### Allow the `organizations` settings path
+
+The plugin contributes an `organizations` segment to `viewPaths.settings`. Spread `organizationPlugin().viewPaths.settings` into your settings route's allowed-path set so `/settings/organizations` resolves correctly:
+</DocVariant>
+
+<Tabs doc-variant="heroui shadcn" defaultValue="tanstack-start">
+
+<TabsList>
+<TabsTrigger value="tanstack-start"><TanStackStart />TanStack Start</TabsTrigger>
+<TabsTrigger value="next.js"><NextJS />Next.js</TabsTrigger>
+</TabsList>
+
+<Tab value="tanstack-start">
+
+```tsx doc-variant="heroui" title="routes/organization/$path.tsx"
+import {
+  Organization,
+  organizationPlugin
+} from "@better-auth-ui/heroui/plugins/organization"
+import { ensureSession } from "@better-auth-ui/core"
+import { ensureSessionServer } from "@better-auth-ui/core/server"
+import { createFileRoute, notFound, redirect } from "@tanstack/react-router"
+import { createIsomorphicFn } from "@tanstack/react-start"
+import { getRequestHeaders } from "@tanstack/react-start/server"
+
+import { auth } from "@/lib/auth"
+import { authClient } from "@/lib/auth-client"
+
+const validOrganizationPaths = Object.values(
+  organizationPlugin().viewPaths.organization
+)
+
+export const Route = createFileRoute("/organization/$path")({
+  async beforeLoad({ params: { path }, context: { queryClient }, location }) {
+    if (!validOrganizationPaths.includes(path)) {
+      throw notFound()
+    }
+
+    const ensureSessionIso = createIsomorphicFn()
+      .server(() =>
+        ensureSessionServer(queryClient, auth, { headers: getRequestHeaders() })
+      )
+      .client(() => ensureSession(queryClient, authClient))
+
+    const session = await ensureSessionIso()
+
+    if (!session) {
+      throw redirect({
+        to: "/auth/$path",
+        params: { path: "sign-in" },
+        search: { redirectTo: location.href }
+      })
+    }
+
+    return { session }
+  },
+  component: OrganizationPage
+})
+
+function OrganizationPage() {
+  const { path } = Route.useParams()
+  return (
+    <div className="w-full max-w-3xl mx-auto p-4 md:p-6">
+      <Organization path={path} />
+    </div>
+  )
+}
+```
+
+```tsx doc-variant="shadcn" title="routes/settings/$path.tsx"
+import { viewPaths } from "@better-auth-ui/core"
+import { ensureSession } from "@better-auth-ui/core"
+import { ensureSessionServer } from "@better-auth-ui/core/server"
+import { createFileRoute, notFound, redirect } from "@tanstack/react-router"
+import { createIsomorphicFn } from "@tanstack/react-start"
+import { getRequestHeaders } from "@tanstack/react-start/server"
+
+import { Settings } from "@/components/auth/settings/settings"
+import { auth } from "@/lib/auth"
+import { authClient } from "@/lib/auth-client"
+import { organizationPlugin } from "@/lib/auth/organization-plugin" // [!code highlight]
+
+const validSettingsPaths = [
+  ...Object.values(viewPaths.settings),
+  ...Object.values(organizationPlugin().viewPaths.settings) // [!code highlight]
+]
+
+export const Route = createFileRoute("/settings/$path")({
+  async beforeLoad({ params: { path }, context: { queryClient }, location }) {
+    if (!validSettingsPaths.includes(path)) {
+      throw notFound()
+    }
+
+    const ensureSessionIso = createIsomorphicFn()
+      .server(() =>
+        ensureSessionServer(queryClient, auth, { headers: getRequestHeaders() })
+      )
+      .client(() => ensureSession(queryClient, authClient))
+
+    const session = await ensureSessionIso()
+
+    if (!session) {
+      throw redirect({
+        to: "/auth/$path",
+        params: { path: "sign-in" },
+        search: { redirectTo: location.href }
+      })
+    }
+
+    return { session }
+  },
+  component: SettingsPage
+})
+
+function SettingsPage() {
+  const { path } = Route.useParams()
+  return (
+    <div className="w-full max-w-3xl mx-auto p-4 md:p-6">
+      <Settings path={path} />
+    </div>
+  )
+}
+```
+
+</Tab>
+
+<Tab value="next.js">
+
+```tsx doc-variant="heroui" title="app/organization/[path]/page.tsx"
+import {
+  Organization,
+  organizationPlugin
+} from "@better-auth-ui/heroui/plugins/organization"
+import { ensureSessionServer } from "@better-auth-ui/core/server"
+import { dehydrate, HydrationBoundary } from "@tanstack/react-query"
+import { headers } from "next/headers"
+import { notFound, redirect } from "next/navigation"
+
+import { auth } from "@/lib/auth"
+import { getQueryClient } from "@/lib/query-client"
+
+const validOrganizationPaths = Object.values(
+  organizationPlugin().viewPaths.organization
+)
+
+export default async function OrganizationPage({
+  params
+}: {
+  params: Promise<{ path: string }>
+}) {
+  const { path } = await params
+
+  if (!validOrganizationPaths.includes(path)) {
+    notFound()
+  }
+
+  const queryClient = getQueryClient()
+
+  const session = await ensureSessionServer(queryClient, auth, {
+    headers: await headers()
+  })
+
+  if (!session) {
+    redirect(
+      `/auth/sign-in?redirectTo=${encodeURIComponent(`/organization/${path}`)}`
+    )
+  }
+
+  return (
+    <HydrationBoundary state={dehydrate(queryClient)}>
+      <div className="w-full max-w-3xl mx-auto p-4 md:p-6">
+        <Organization path={path} />
+      </div>
+    </HydrationBoundary>
+  )
+}
+```
+
+```tsx doc-variant="shadcn" title="app/settings/[path]/page.tsx"
+import { viewPaths } from "@better-auth-ui/core"
+import { ensureSessionServer } from "@better-auth-ui/core/server"
+import { dehydrate, HydrationBoundary } from "@tanstack/react-query"
+import { headers } from "next/headers"
+import { notFound, redirect } from "next/navigation"
+
+import { Settings } from "@/components/auth/settings/settings"
+import { auth } from "@/lib/auth"
+import { getQueryClient } from "@/lib/query-client"
+import { organizationPlugin } from "@/lib/auth/organization-plugin" // [!code highlight]
+
+const validSettingsPaths = [
+  ...Object.values(viewPaths.settings),
+  ...Object.values(organizationPlugin().viewPaths.settings) // [!code highlight]
+]
+
+export default async function SettingsPage({
+  params
+}: {
+  params: Promise<{ path: string }>
+}) {
+  const { path } = await params
+
+  if (!validSettingsPaths.includes(path)) {
+    notFound()
+  }
+
+  const queryClient = getQueryClient()
+
+  const session = await ensureSessionServer(queryClient, auth, {
+    headers: await headers()
+  })
+
+  if (!session) {
+    redirect(
+      `/auth/sign-in?redirectTo=${encodeURIComponent(`/settings/${path}`)}`
+    )
+  }
+
+  return (
+    <HydrationBoundary state={dehydrate(queryClient)}>
+      <div className="w-full max-w-3xl mx-auto p-4 md:p-6">
+        <Settings path={path} />
+      </div>
+    </HydrationBoundary>
+  )
+}
+```
+
+</Tab>
+
+</Tabs>
+
+<DocVariant name="heroui">
+`/organization/settings` and `/organization/people` now render the org management UI. Internal links from `<OrganizationSwitcher />` and from `<Organizations />` (in the settings tab) wire up automatically.
+</DocVariant>
+
+<DocVariant name="shadcn">
+`/settings/organizations` now renders `<OrganizationsSettings />`: the list of organizations the user belongs to plus pending invitations.
+</DocVariant>
+
+<DocVariant name="zaidan">
+### Allow the `organizations` settings path
+
+The plugin contributes an `organizations` segment to `viewPaths.settings`. Spread `organizationPlugin().viewPaths.settings` into your settings route's allowed-path set so `/settings/organizations` resolves correctly.
+</DocVariant>
+
+```tsx doc-variant="zaidan" title="src/routes/settings/$path.tsx"
+import { ensureSession } from "@better-auth-ui/core"
+import { ensureSessionServer } from "@better-auth-ui/core/server"
+import { viewPaths } from "@better-auth-ui/core"
+import { createFileRoute, notFound, redirect } from "@tanstack/solid-router"
+import { createIsomorphicFn } from "@tanstack/solid-start"
+import { getRequestHeaders } from "@tanstack/solid-start/server"
+
+import { Settings } from "@/components/auth/settings/settings"
+import { auth } from "@/lib/auth"
+import { authClient } from "@/lib/auth-client"
+import { organizationPlugin } from "@/lib/auth/organization-plugin" // [!code highlight]
+
+const validSettingsPaths = [
+  ...Object.values(viewPaths.settings),
+  ...Object.values(organizationPlugin().viewPaths.settings ?? {}) // [!code highlight]
+]
+
+export const Route = createFileRoute("/settings/$path")({
+  async beforeLoad({ params: { path }, context: { queryClient }, location }) {
+    if (!validSettingsPaths.includes(path)) {
+      throw notFound()
+    }
+
+    const ensureSessionIso = createIsomorphicFn()
+      .server(() =>
+        ensureSessionServer(queryClient, auth, { headers: getRequestHeaders() })
+      )
+      .client(() => ensureSession(queryClient, authClient))
+
+    const session = await ensureSessionIso()
+
+    if (!session) {
+      throw redirect({
+        to: "/auth/$path",
+        params: { path: "sign-in" },
+        search: { redirectTo: location.href }
+      })
+    }
+
+    return { session }
+  },
+  component: SettingsPage
+})
+
+function SettingsPage() {
+  const params = Route.useParams()
+
+  return (
+    <div class="mx-auto w-full max-w-3xl p-4 md:p-6">
+      <Settings path={params().path} />
+    </div>
+  )
+}
+```
+
+<DocVariant name="zaidan">
+`/settings/organizations` now renders `<OrganizationsSettings />`: the list of organizations the user belongs to plus pending invitations addressed to them.
+</DocVariant>
+
+</Step>
+
+<Step doc-variant="shadcn zaidan">
+
+<DocVariant name="shadcn">
+### Create the organization page
+
+Mount a dynamic route at `/organization/<path>` that renders `<Organization />` for the matching tab. `<Organization />` is the shell: it shows the `settings` (profile + danger zone) and `people` (members + invitations) tabs for the **active** organization. The active organization is whatever the user picked in `<OrganizationSwitcher />` (persisted on the server session via `setActive`).
+</DocVariant>
+
+<Tabs doc-variant="shadcn" defaultValue="tanstack-start">
+
+<TabsList>
+<TabsTrigger value="tanstack-start"><TanStackStart />TanStack Start</TabsTrigger>
+<TabsTrigger value="next.js"><NextJS />Next.js</TabsTrigger>
+</TabsList>
+
+<Tab value="tanstack-start">
+
+```tsx title="routes/organization/$path.tsx"
+import { ensureSession } from "@better-auth-ui/core"
+import { ensureSessionServer } from "@better-auth-ui/core/server"
+import { createFileRoute, notFound, redirect } from "@tanstack/react-router"
+import { createIsomorphicFn } from "@tanstack/react-start"
+import { getRequestHeaders } from "@tanstack/react-start/server"
+
+import { Organization } from "@/components/auth/organization/organization"
+import { auth } from "@/lib/auth"
+import { authClient } from "@/lib/auth-client"
+import { organizationPlugin } from "@/lib/auth/organization-plugin"
+
+const validOrganizationPaths = Object.values(
+  organizationPlugin().viewPaths.organization
+)
+
+export const Route = createFileRoute("/organization/$path")({
+  async beforeLoad({ params: { path }, context: { queryClient }, location }) {
+    if (!validOrganizationPaths.includes(path)) {
+      throw notFound()
+    }
+
+    const ensureSessionIso = createIsomorphicFn()
+      .server(() =>
+        ensureSessionServer(queryClient, auth, { headers: getRequestHeaders() })
+      )
+      .client(() => ensureSession(queryClient, authClient))
+
+    const session = await ensureSessionIso()
+
+    if (!session) {
+      throw redirect({
+        to: "/auth/$path",
+        params: { path: "sign-in" },
+        search: { redirectTo: location.href }
+      })
+    }
+
+    return { session }
+  },
+  component: OrganizationPage
+})
+
+function OrganizationPage() {
+  const { path } = Route.useParams()
+  return (
+    <div className="w-full max-w-3xl mx-auto p-4 md:p-6">
+      <Organization path={path} />
+    </div>
+  )
+}
+```
+
+</Tab>
+
+<Tab value="next.js">
+
+```tsx title="app/organization/[path]/page.tsx"
+import { ensureSessionServer } from "@better-auth-ui/core/server"
+import { dehydrate, HydrationBoundary } from "@tanstack/react-query"
+import { headers } from "next/headers"
+import { notFound, redirect } from "next/navigation"
+
+import { Organization } from "@/components/auth/organization/organization"
+import { auth } from "@/lib/auth"
+import { getQueryClient } from "@/lib/query-client"
+import { organizationPlugin } from "@/lib/auth/organization-plugin"
+
+const validOrganizationPaths = Object.values(
+  organizationPlugin().viewPaths.organization
+)
+
+export default async function OrganizationPage({
+  params
+}: {
+  params: Promise<{ path: string }>
+}) {
+  const { path } = await params
+
+  if (!validOrganizationPaths.includes(path)) {
+    notFound()
+  }
+
+  const queryClient = getQueryClient()
+
+  const session = await ensureSessionServer(queryClient, auth, {
+    headers: await headers()
+  })
+
+  if (!session) {
+    redirect(
+      `/auth/sign-in?redirectTo=${encodeURIComponent(`/organization/${path}`)}`
+    )
+  }
+
+  return (
+    <HydrationBoundary state={dehydrate(queryClient)}>
+      <div className="w-full max-w-3xl mx-auto p-4 md:p-6">
+        <Organization path={path} />
+      </div>
+    </HydrationBoundary>
+  )
+}
+```
+
+</Tab>
+
+</Tabs>
+
+<DocVariant name="shadcn">
+`/organization/settings` and `/organization/people` now render the org management UI. Internal links from `<OrganizationSwitcher />` and from `<Organizations />` (in the settings tab) wire up automatically.
+</DocVariant>
+
+<DocVariant name="zaidan">
+### Create the organization page
+
+Mount a dynamic route at `/organization/@{$slug}/$path` that renders `<Organization />` for the matching tab. The literal `@` stays in the URL while the router captures the unprefixed slug. `<Organization />` shows the `settings` and `people` tabs for that organization.
+</DocVariant>
+
+```tsx doc-variant="zaidan" title="src/routes/organization/@{$slug}/$path.tsx"
+import { ensureSession } from "@better-auth-ui/core"
+import { ensureSessionServer } from "@better-auth-ui/core/server"
+import { createFileRoute, notFound, redirect } from "@tanstack/solid-router"
+import { createIsomorphicFn } from "@tanstack/solid-start"
+import { getRequestHeaders } from "@tanstack/solid-start/server"
+
+import { Organization } from "@/components/auth/organization/organization"
+import { auth } from "@/lib/auth"
+import { authClient } from "@/lib/auth-client"
+import { organizationPlugin } from "@/lib/auth/organization-plugin"
+
+const validOrganizationPaths = Object.values(
+  organizationPlugin().viewPaths.organization ?? {}
+)
+
+export const Route = createFileRoute("/organization/@{$slug}/$path")({
+  async beforeLoad({ params: { path }, context: { queryClient }, location }) {
+    if (!validOrganizationPaths.includes(path)) {
+      throw notFound()
+    }
+
+    const ensureSessionIso = createIsomorphicFn()
+      .server(() =>
+        ensureSessionServer(queryClient, auth, { headers: getRequestHeaders() })
+      )
+      .client(() => ensureSession(queryClient, authClient))
+
+    const session = await ensureSessionIso()
+
+    if (!session) {
+      throw redirect({
+        to: "/auth/$path",
+        params: { path: "sign-in" },
+        search: { redirectTo: location.href }
+      })
+    }
+
+    return { session }
+  },
+  component: OrganizationPage
+})
+
+function OrganizationPage() {
+  const params = Route.useParams()
+
+  return (
+    <div class="mx-auto w-full max-w-3xl p-4 md:p-6">
+      <Organization path={params().path} slug={params().slug} />
+    </div>
+  )
+}
+```
+
+<DocVariant name="zaidan">
+`/organization/@acme/settings` and `/organization/@acme/people` now render the organization management UI. Internal links from `<OrganizationSwitcher />` and `<Organizations />` wire up automatically.
+</DocVariant>
+
+</Step>
+
+</Steps>
+
+<DocVariant name="heroui shadcn">
+Users can now create organizations from `/settings/organizations`. They can use the header switcher and manage members or invitations at `/organization/<path>`.
+
+## Slug-based routes
+
+By default, the switcher stores the selected organization in the session. Enable **slug-based routing** to select the organization from the URL.
+
+For example, use `acme.your-app.com` or `your-app.com/organization/acme/settings`.
+
+This unlocks:
+
+- Shareable, bookmarkable per-org URLs that do not depend on session state
+- Server-side prefetching of the correct organization without round-tripping `setActive`
+- Letting members keep multiple organizations open in separate tabs without thrashing the active organization
+</DocVariant>
+
+<DocVariant name="zaidan">
+Users can now create organizations from `/settings/organizations`, switch between them from the header, and manage members and invitations at prefixed organization URLs.
+
+## Slug-based routes
+
+The Solid/Zaidan organization UI uses slug-based routes for organization pages. This avoids relying on stale session-active organization state when users open multiple organizations or navigate directly to a saved link.
+
+This unlocks:
+
+- Shareable, bookmarkable per-org URLs that do not depend on session state
+- Fetching the organization identified by the URL without round-tripping `setActive`
+- Letting members keep multiple organizations open in separate tabs without thrashing the active organization
+</DocVariant>
+
+You wire this up by passing the URL slug into `organizationPlugin({ slug })`. The UI plugin then:
+
+<DocVariant name="heroui shadcn">
+1. Drives `useActiveOrganization()` to fetch the org matching that slug (instead of reading the session's active org)
+2. Rewrites every link from `<OrganizationSwitcher />`, `<Organizations />`, and the `<Organization />` tabs to include `/<slug>/`
+3. Swaps the switcher's behavior from `setActive` to `navigate`: clicking an organization takes the user to its slug-prefixed route
+
+Set `slugPrefix` to include a marker in the visible route, such as `/organization/@acme/settings`. Keep `slug` itself unprefixed.
+
+For example, `/organization/@{$slug}/$path` captures `acme`. The plugin adds the prefix to fields, labels, and generated links.
+</DocVariant>
+
+<DocVariant name="zaidan">
+1. Drives `useActiveOrganization()` to fetch the org matching that slug
+2. Rewrites links from `<OrganizationSwitcher />`, `<Organizations />`, and the `<Organization />` tabs to include `/$slug/`
+3. Swaps the switcher's behavior from `setActive` to `navigate`: clicking an organization takes the user to its slug-prefixed route
+
+The example also passes `slugPrefix: "@"`. Solid fields and organization labels display `@acme`, generated links use `/organization/@acme/...`, and the router still passes the raw `acme` slug to Better Auth.
+</DocVariant>
+
+<Steps>
+
+<Step>
+
+### Read the slug from the URL in your providers
+
+Read the slug param wherever you render `<AuthProvider>` and forward it to `organizationPlugin`.
+
+<Tabs doc-variant="heroui shadcn" defaultValue="tanstack-start">
+
+<TabsList>
+<TabsTrigger value="tanstack-start"><TanStackStart />TanStack Start</TabsTrigger>
+<TabsTrigger value="next.js"><NextJS />Next.js</TabsTrigger>
+</TabsList>
+
+<Tab value="tanstack-start">
+
+```tsx doc-variant="heroui" title="components/providers.tsx"
+import { AuthProvider } from "@better-auth-ui/heroui"
+import { organizationPlugin } from "@better-auth-ui/heroui/plugins/organization"
+import { useNavigate, useParams } from "@tanstack/react-router"
+import type { ReactNode } from "react"
+
+import { authClient } from "@/lib/auth-client"
+
+export function Providers({ children }: { children: ReactNode }) {
+  const navigate = useNavigate()
+  const { slug } = useParams({ strict: false }) // [!code highlight]
+
+  return (
+    <AuthProvider
+      authClient={authClient}
+      navigate={navigate}
+      plugins={[organizationPlugin({ slug: slug ?? null })]} // [!code highlight]
+    >
+      {children}
+    </AuthProvider>
+  )
+}
+```
+
+```tsx doc-variant="shadcn" title="components/providers.tsx"
+import { useNavigate, useParams } from "@tanstack/react-router"
+import type { ReactNode } from "react"
+
+import { AuthProvider } from "@/components/auth/auth-provider"
+import { organizationPlugin } from "@/lib/auth/organization-plugin"
+import { authClient } from "@/lib/auth-client"
+
+export function Providers({ children }: { children: ReactNode }) {
+  const navigate = useNavigate()
+  const { slug } = useParams({ strict: false }) // [!code highlight]
+
+  return (
+    <AuthProvider
+      authClient={authClient}
+      navigate={navigate}
+      plugins={[organizationPlugin({ slug: slug ?? null })]} // [!code highlight]
+    >
+      {children}
+    </AuthProvider>
+  )
+}
+```
+
+</Tab>
+
+<Tab value="next.js">
+
+```tsx doc-variant="heroui" title="components/providers.tsx"
+"use client"
+
+import { AuthProvider } from "@better-auth-ui/heroui"
+import { organizationPlugin } from "@better-auth-ui/heroui/plugins/organization"
+import { useParams, useRouter } from "next/navigation"
+import type { ReactNode } from "react"
+
+import { authClient } from "@/lib/auth-client"
+
+export function Providers({ children }: { children: ReactNode }) {
+  const router = useRouter()
+  const params = useParams<{ slug?: string | string[] }>() // [!code highlight]
+  const slug = typeof params?.slug === "string" ? params.slug : null // [!code highlight]
+
+  return (
+    <AuthProvider
+      authClient={authClient}
+      navigate={({ to, replace }) =>
+        replace ? router.replace(to) : router.push(to)
+      }
+      plugins={[organizationPlugin({ slug })]} // [!code highlight]
+    >
+      {children}
+    </AuthProvider>
+  )
+}
+```
+
+```tsx doc-variant="shadcn" title="components/providers.tsx"
+"use client"
+
+import { useParams, useRouter } from "next/navigation"
+import type { ReactNode } from "react"
+
+import { AuthProvider } from "@/components/auth/auth-provider"
+import { organizationPlugin } from "@/lib/auth/organization-plugin"
+import { authClient } from "@/lib/auth-client"
+
+export function Providers({ children }: { children: ReactNode }) {
+  const router = useRouter()
+  const params = useParams<{ slug?: string | string[] }>() // [!code highlight]
+  const slug = typeof params?.slug === "string" ? params.slug : null // [!code highlight]
+
+  return (
+    <AuthProvider
+      authClient={authClient}
+      navigate={({ to, replace }) =>
+        replace ? router.replace(to) : router.push(to)
+      }
+      plugins={[organizationPlugin({ slug })]} // [!code highlight]
+    >
+      {children}
+    </AuthProvider>
+  )
+}
+```
+
+</Tab>
+
+</Tabs>
+
+```tsx doc-variant="zaidan" title="src/components/providers.tsx"
+import { useNavigate, useParams } from "@tanstack/solid-router"
+import { Show } from "solid-js"
+
+import { AuthProvider } from "@/components/auth/auth-provider"
+import { organizationPlugin } from "@/lib/auth/organization-plugin"
+import { authClient } from "@/lib/auth-client"
+
+export function Providers(props: ProvidersProps) {
+  const navigate = useNavigate()
+  const params = useParams({ strict: false }) // [!code highlight]
+  const organizationSlug = () => {
+    const slug = params().slug
+
+    if (typeof slug === "string" && slug.length > 0) return slug
+
+    return null
+  }
+
+  return (
+    <Show keyed when={organizationSlug() ?? "personal"}>
+      <AuthProvider
+        authClient={authClient}
+        navigate={navigate}
+        queryClient={props.queryClient}
+        plugins={[ // [!code highlight]
+          organizationPlugin({ // [!code highlight]
+            slug: organizationSlug(), // [!code highlight]
+            slugPrefix: "@" // [!code highlight]
+          }) // [!code highlight]
+        ]} // [!code highlight]
+      >
+        {props.children}
+      </AuthProvider>
+    </Show>
+  )
+}
+```
+
+On a non-slug page, set `slug` to `null`. This value tells the plugin to use the user's personal account.
+
+Do not leave `slug` as `undefined`. That value uses the organization from the session and can show the wrong organization.
+
+</Step>
+
+<Step>
+
+<DocVariant name="heroui shadcn">
+### Add the slug-prefixed organization route
+
+Move `/organization/$path` → `/organization/$slug/$path`. Validate both segments and gate on session as before.
+</DocVariant>
+
+<Tabs doc-variant="heroui shadcn" defaultValue="tanstack-start">
+
+<TabsList>
+<TabsTrigger value="tanstack-start"><TanStackStart />TanStack Start</TabsTrigger>
+<TabsTrigger value="next.js"><NextJS />Next.js</TabsTrigger>
+</TabsList>
+
+<Tab value="tanstack-start">
+
+```tsx doc-variant="heroui" title="routes/organization/$slug/$path.tsx"
+import {
+  Organization,
+  organizationPlugin
+} from "@better-auth-ui/heroui/plugins/organization"
+import { ensureSession } from "@better-auth-ui/core"
+import { ensureSessionServer } from "@better-auth-ui/core/server"
+import { createFileRoute, notFound, redirect } from "@tanstack/react-router"
+import { createIsomorphicFn } from "@tanstack/react-start"
+import { getRequestHeaders } from "@tanstack/react-start/server"
+
+import { auth } from "@/lib/auth"
+import { authClient } from "@/lib/auth-client"
+
+const validOrganizationPaths = Object.values(
+  organizationPlugin().viewPaths.organization
+)
+
+export const Route = createFileRoute("/organization/$slug/$path")({
+  async beforeLoad({ params: { path }, context: { queryClient }, location }) {
+    if (!validOrganizationPaths.includes(path)) {
+      throw notFound()
+    }
+
+    const ensureSessionIso = createIsomorphicFn()
+      .server(() =>
+        ensureSessionServer(queryClient, auth, { headers: getRequestHeaders() })
+      )
+      .client(() => ensureSession(queryClient, authClient))
+
+    const session = await ensureSessionIso()
+
+    if (!session) {
+      throw redirect({
+        to: "/auth/$path",
+        params: { path: "sign-in" },
+        search: { redirectTo: location.href }
+      })
+    }
+
+    return { session }
+  },
+  component: OrganizationPage
+})
+
+function OrganizationPage() {
+  const { path } = Route.useParams()
+  return (
+    <div className="w-full max-w-3xl mx-auto p-4 md:p-6">
+      <Organization path={path} />
+    </div>
+  )
+}
+```
+
+```tsx doc-variant="shadcn" title="routes/organization/$slug/$path.tsx"
+import { ensureSession } from "@better-auth-ui/core"
+import { ensureSessionServer } from "@better-auth-ui/core/server"
+import { createFileRoute, notFound, redirect } from "@tanstack/react-router"
+import { createIsomorphicFn } from "@tanstack/react-start"
+import { getRequestHeaders } from "@tanstack/react-start/server"
+
+import { Organization } from "@/components/auth/organization/organization"
+import { auth } from "@/lib/auth"
+import { authClient } from "@/lib/auth-client"
+import { organizationPlugin } from "@/lib/auth/organization-plugin"
+
+const validOrganizationPaths = Object.values(
+  organizationPlugin().viewPaths.organization
+)
+
+export const Route = createFileRoute("/organization/$slug/$path")({
+  async beforeLoad({ params: { path }, context: { queryClient }, location }) {
+    if (!validOrganizationPaths.includes(path)) {
+      throw notFound()
+    }
+
+    const ensureSessionIso = createIsomorphicFn()
+      .server(() =>
+        ensureSessionServer(queryClient, auth, { headers: getRequestHeaders() })
+      )
+      .client(() => ensureSession(queryClient, authClient))
+
+    const session = await ensureSessionIso()
+
+    if (!session) {
+      throw redirect({
+        to: "/auth/$path",
+        params: { path: "sign-in" },
+        search: { redirectTo: location.href }
+      })
+    }
+
+    return { session }
+  },
+  component: OrganizationPage
+})
+
+function OrganizationPage() {
+  const { path } = Route.useParams()
+  return (
+    <div className="w-full max-w-3xl mx-auto p-4 md:p-6">
+      <Organization path={path} />
+    </div>
+  )
+}
+```
+
+</Tab>
+
+<Tab value="next.js">
+
+```tsx doc-variant="heroui" title="app/organization/[slug]/[path]/page.tsx"
+import {
+  Organization,
+  organizationPlugin
+} from "@better-auth-ui/heroui/plugins/organization"
+import { ensureSessionServer } from "@better-auth-ui/core/server"
+import { dehydrate, HydrationBoundary } from "@tanstack/react-query"
+import { headers } from "next/headers"
+import { notFound, redirect } from "next/navigation"
+
+import { auth } from "@/lib/auth"
+import { getQueryClient } from "@/lib/query-client"
+
+const validOrganizationPaths = Object.values(
+  organizationPlugin().viewPaths.organization
+)
+
+export default async function OrganizationPage({
+  params
+}: {
+  params: Promise<{ slug: string; path: string }>
+}) {
+  const { slug, path } = await params
+
+  if (!validOrganizationPaths.includes(path)) {
+    notFound()
+  }
+
+  const queryClient = getQueryClient()
+
+  const session = await ensureSessionServer(queryClient, auth, {
+    headers: await headers()
+  })
+
+  if (!session) {
+    redirect(
+      `/auth/sign-in?redirectTo=${encodeURIComponent(`/organization/${slug}/${path}`)}`
+    )
+  }
+
+  return (
+    <HydrationBoundary state={dehydrate(queryClient)}>
+      <div className="w-full max-w-3xl mx-auto p-4 md:p-6">
+        <Organization path={path} />
+      </div>
+    </HydrationBoundary>
+  )
+}
+```
+
+```tsx doc-variant="shadcn" title="app/organization/[slug]/[path]/page.tsx"
+import { ensureSessionServer } from "@better-auth-ui/core/server"
+import { dehydrate, HydrationBoundary } from "@tanstack/react-query"
+import { headers } from "next/headers"
+import { notFound, redirect } from "next/navigation"
+
+import { Organization } from "@/components/auth/organization/organization"
+import { auth } from "@/lib/auth"
+import { getQueryClient } from "@/lib/query-client"
+import { organizationPlugin } from "@/lib/auth/organization-plugin"
+
+const validOrganizationPaths = Object.values(
+  organizationPlugin().viewPaths.organization
+)
+
+export default async function OrganizationPage({
+  params
+}: {
+  params: Promise<{ slug: string; path: string }>
+}) {
+  const { slug, path } = await params
+
+  if (!validOrganizationPaths.includes(path)) {
+    notFound()
+  }
+
+  const queryClient = getQueryClient()
+
+  const session = await ensureSessionServer(queryClient, auth, {
+    headers: await headers()
+  })
+
+  if (!session) {
+    redirect(
+      `/auth/sign-in?redirectTo=${encodeURIComponent(`/organization/${slug}/${path}`)}`
+    )
+  }
+
+  return (
+    <HydrationBoundary state={dehydrate(queryClient)}>
+      <div className="w-full max-w-3xl mx-auto p-4 md:p-6">
+        <Organization path={path} />
+      </div>
+    </HydrationBoundary>
+  )
+}
+```
+
+</Tab>
+
+</Tabs>
+
+<DocVariant name="zaidan">
+### Add the slug-prefixed organization route
+
+Move `/organization/$path` to `/organization/@{$slug}/$path`. Validate the path segment and gate on the signed-in session as before.
+</DocVariant>
+
+```tsx doc-variant="zaidan" title="src/routes/organization/@{$slug}/$path.tsx"
+import { ensureSession } from "@better-auth-ui/core"
+import { ensureSessionServer } from "@better-auth-ui/core/server"
+import { createFileRoute, notFound, redirect } from "@tanstack/solid-router"
+import { createIsomorphicFn } from "@tanstack/solid-start"
+import { getRequestHeaders } from "@tanstack/solid-start/server"
+
+import { Organization } from "@/components/auth/organization/organization"
+import { auth } from "@/lib/auth"
+import { authClient } from "@/lib/auth-client"
+import { organizationPlugin } from "@/lib/auth/organization-plugin"
+
+const validOrganizationPaths = Object.values(
+  organizationPlugin().viewPaths.organization ?? {}
+)
+
+export const Route = createFileRoute("/organization/@{$slug}/$path")({
+  async beforeLoad({ params: { path }, context: { queryClient }, location }) {
+    if (!validOrganizationPaths.includes(path)) {
+      throw notFound()
+    }
+
+    const ensureSessionIso = createIsomorphicFn()
+      .server(() =>
+        ensureSessionServer(queryClient, auth, { headers: getRequestHeaders() })
+      )
+      .client(() => ensureSession(queryClient, authClient))
+
+    const session = await ensureSessionIso()
+
+    if (!session) {
+      throw redirect({
+        to: "/auth/$path",
+        params: { path: "sign-in" },
+        search: { redirectTo: location.href }
+      })
+    }
+
+    return { session }
+  },
+  component: OrganizationPage
+})
+
+function OrganizationPage() {
+  const params = Route.useParams()
+
+  return (
+    <div class="mx-auto w-full max-w-3xl p-4 md:p-6">
+      <Organization path={params().path} slug={params().slug} />
+    </div>
+  )
+}
+```
+
+</Step>
+
+</Steps>
+
+<DocVariant name="heroui shadcn">
+After you configure `organizationPlugin({ slug })`, internal organization links include `/<slug>/` automatically.
+
+These links include the switcher, organization rows, and the tab bar in `<Organization />`.
+
+### Customize where the switcher navigates
+
+When slug-based routing is enabled, clicking an organization in `<OrganizationSwitcher />` navigates to `/organization/<slug>/settings` by default, and clicking the personal account navigates to `/settings/account`.
+
+To use a custom destination such as `/<slug>/dashboard`, pass the `setActive` prop. This prop replaces the plugin's default navigation.
+
+The callback receives the selected `Organization`, or `null` for the personal account:
+</DocVariant>
+
+<Tabs doc-variant="heroui shadcn" defaultValue="tanstack-start">
+
+<TabsList>
+<TabsTrigger value="tanstack-start"><TanStackStart />TanStack Start</TabsTrigger>
+<TabsTrigger value="next.js"><NextJS />Next.js</TabsTrigger>
+</TabsList>
+
+<Tab value="tanstack-start">
+
+```tsx doc-variant="heroui" title="components/header.tsx"
+import { OrganizationSwitcher } from "@better-auth-ui/heroui/plugins/organization"
+import { useNavigate } from "@tanstack/react-router"
+
+export function Header() {
+  const navigate = useNavigate()
+
+  return (
+    <OrganizationSwitcher
+      setActive={(organization) => {
+        navigate({
+          to: organization ? `/${organization.slug}/dashboard` : "/dashboard"
+        })
+      }}
+    />
+  )
+}
+```
+
+```tsx doc-variant="shadcn" title="components/header.tsx"
+import { useNavigate } from "@tanstack/react-router"
+
+import { OrganizationSwitcher } from "@/components/auth/organization/organization-switcher"
+
+export function Header() {
+  const navigate = useNavigate()
+
+  return (
+    <OrganizationSwitcher
+      setActive={(organization) => {
+        navigate({
+          to: organization ? `/${organization.slug}/dashboard` : "/dashboard"
+        })
+      }}
+    />
+  )
+}
+```
+
+</Tab>
+
+<Tab value="next.js">
+
+```tsx doc-variant="heroui" title="components/header.tsx"
+"use client"
+
+import { OrganizationSwitcher } from "@better-auth-ui/heroui/plugins/organization"
+import { useRouter } from "next/navigation"
+
+export function Header() {
+  const router = useRouter()
+
+  return (
+    <OrganizationSwitcher
+      setActive={(organization) => {
+        router.push(
+          organization ? `/${organization.slug}/dashboard` : "/dashboard"
+        )
+      }}
+    />
+  )
+}
+```
+
+```tsx doc-variant="shadcn" title="components/header.tsx"
+"use client"
+
+import { useRouter } from "next/navigation"
+
+import { OrganizationSwitcher } from "@/components/auth/organization/organization-switcher"
+
+export function Header() {
+  const router = useRouter()
+
+  return (
+    <OrganizationSwitcher
+      setActive={(organization) => {
+        router.push(
+          organization ? `/${organization.slug}/dashboard` : "/dashboard"
+        )
+      }}
+    />
+  )
+}
+```
+
+</Tab>
+
+</Tabs>
+
+<DocVariant name="heroui shadcn">
+Without slug-based routing, the default behavior is `authClient.organization.setActive`. Pass `setActive` to intercept the selection and apply custom behavior.
+</DocVariant>
+
+<DocVariant name="zaidan">
+The switcher, organization rows, and tabs automatically include `/@<slug>/` once `organizationPlugin({ slug, slugPrefix: "@" })` is wired in.
+
+### Customize where the switcher navigates
+
+When slug-based routing is enabled, clicking an organization in `<OrganizationSwitcher />` navigates to `/organization/@<slug>/settings` by default. Clicking the personal account navigates to `auth.basePaths.settings`.
+
+To use a custom destination, pass the `setActive` prop. This prop replaces the plugin's default navigation.
+
+The callback receives the selected organization, or `null` for the personal account:
+</DocVariant>
+
+```tsx doc-variant="zaidan" title="src/components/header.tsx"
+import { useNavigate } from "@tanstack/solid-router"
+
+import { OrganizationSwitcher } from "@/components/auth/organization/organization-switcher"
+
+export function Header() {
+  const navigate = useNavigate()
+
+  return (
+    <OrganizationSwitcher
+      setActive={(organization) => {
+        navigate({
+          to: organization ? `/${organization.slug}/dashboard` : "/dashboard"
+        })
+      }}
+    />
+  )
+}
+```
+
+<DocVariant name="zaidan">
+Outside slug-aware routes, the default behavior is `authClient.organization.setActive`. Pass `setActive` to intercept the selection.
+</DocVariant>
+
+## Hide organization slugs
+
+Set `hideSlug: true` to hide slugs in creation dialogs, profile forms, organization views, and switchers:
+
+```ts
+organizationPlugin({ hideSlug: true })
+```
+
+Creation still generates a slug from the organization name. Names without Latin letters or digits use a generated identifier instead. The server still validates the slug and its availability. Profile edits preserve the existing slug.
+
+Each component's `hideSlug` prop overrides the plugin configuration. Without either option, forms and organization views show slugs, while switchers hide them.
+
+<DocVariant name="heroui shadcn">
+## Options
+
+```ts
+organizationPlugin({
+  // Display slugs as @acme and include the prefix in generated URLs.
+  slugPrefix: "@",
+  // Disable the slug-availability check that runs while typing a slug.
+  checkSlug: false,
+  // Override path segments (defaults shown).
+  viewPaths: {
+    auth: { acceptInvitation: "accept-invitation" },
+    settings: { organizations: "organizations" },
+    organization: { settings: "settings", people: "people" }
+  },
+  // Disable logo upload, or customize the resize / size.
+  logo: { enabled: false },
+  // Replace the default role labels.
+  roles: { owner: "Owner", admin: "Admin", member: "Member" },
+  // Add labels for custom server roles without redefining built-ins.
+  additionalRoles: { billing: "Billing" },
+  // Limit invitations and members to one role.
+  allowMultipleRoles: false
+})
+```
+</DocVariant>
+
+<DocVariant name="zaidan">
+## Options
+</DocVariant>
+
+```ts doc-variant="zaidan"
+organizationPlugin({
+  // Pass a string slug for org routes, null for non-org routes, or omit it to use session fallback.
+  slug: "acme",
+  // Display slugs as @acme and include the prefix in generated URLs.
+  slugPrefix: "@",
+  // Disable the slug-availability check that runs while typing a slug.
+  checkSlug: false,
+  // Override path segments (defaults shown).
+  viewPaths: {
+    auth: { acceptInvitation: "accept-invitation" },
+    settings: { organizations: "organizations" },
+    organization: { settings: "settings", people: "people" }
+  },
+  // Disable logo upload, or customize the resize / size.
+  logo: { enabled: false },
+  // Replace the default role labels.
+  roles: { owner: "Owner", admin: "Admin", member: "Member" },
+  // Add labels for custom server roles without redefining built-ins.
+  additionalRoles: { billing: "Billing" },
+  // Limit invitations and members to one role.
+  allowMultipleRoles: false
+})
+```
+
+<type-table path="packages/core/src/plugins/organization/organization-plugin.ts" name="OrganizationPluginOptions" />
+
+## Localization
+
+<type-table path="packages/core/src/plugins/organization/organization-localization.ts" name="OrganizationLocalization" />
+
+Read these inside custom slot components via `useAuthPlugin(organizationPlugin).localization`.
+
+<DocVariant name="heroui shadcn">
+## React Hooks
+
+### Queries
+
+- `useActiveOrganization()`: Full organization for the active session (or the URL slug when `organizationPlugin({ slug })` is set)
+- `useListOrganizations()`: All organizations the signed-in user belongs to
+- `useListOrganizationMembers()`: Members of the active organization
+- `useListOrganizationInvitations()`: Pending invitations for the active organization
+- `useListUserInvitations()`: Pending invitations addressed to the signed-in user
+- `useHasPermission({ permissions })`: Check the current member's permission against the active organization
+
+### Mutations
+
+- `useCreateOrganization()`: Create a new organization
+- `useUpdateOrganization()`: Update name / slug / logo of the active organization
+- `useDeleteOrganization()`: Delete an organization
+- `useSetActiveOrganization()`: Switch the active organization (server-side, persists on session)
+- `useLeaveOrganization()`: Leave an organization
+- `useInviteMember()`: Invite a member by email
+- `useRemoveMember()`: Remove a member
+- `useUpdateMemberRole()`: Update a member's role
+- `useCancelInvitation()`: Cancel a pending invitation
+- `useAcceptInvitation()`: Accept an invitation
+- `useRejectInvitation()`: Reject an invitation
+- `useCheckSlug()`: Check whether an organization slug is available
+</DocVariant>
+
+<DocVariant name="zaidan">
+## Solid Hooks
+
+Copied Zaidan components are wired through `<AuthProvider>`. If you build custom organization UI with the low-level `@better-auth-ui/solid` hooks, pass your configured `authClient` as shown in the linked Solid API docs.
+
+### Queries
+
+- `useActiveOrganization()`: Full organization for the URL slug when `organizationPlugin({ slug })` is set, or the active session organization when slug is omitted
+- `useListOrganizations()`: All organizations the signed-in user belongs to
+- `useListOrganizationMembers()`: Members of the active organization
+- `useListOrganizationInvitations()`: Invitations for the active organization
+- `useListUserInvitations()`: Pending invitations addressed to the signed-in user
+- `useHasPermission()`: Check the current member's permission against the active organization
+
+### Mutations
+
+- `useCreateOrganization()`: Create a new organization
+- `useUpdateOrganization()`: Update name / slug / logo of the active organization
+- `useDeleteOrganization()`: Delete an organization
+- `useSetActiveOrganization()`: Switch the active organization outside slug-aware routing
+- `useLeaveOrganization()`: Leave an organization
+- `useInviteMember()`: Invite a member by email
+- `useRemoveMember()`: Remove a member
+- `useUpdateMemberRole()`: Update a member's role
+- `useCancelInvitation()`: Cancel a pending invitation
+- `useAcceptInvitation()`: Accept an invitation
+- `useRejectInvitation()`: Reject an invitation
+- `useCheckSlug()`: Check whether an organization slug is available
+</DocVariant>
+
+## Components
+
+<DocVariant name="zaidan">
+These previews use seeded Storybook fixtures and do not call live Better Auth endpoints.
+</DocVariant>
+
+### `<AcceptInvitation />`
+
+Direct invitation acceptance view registered by `organizationPlugin()` at `/auth/accept-invitation`. It reads `invitationId` from the query string, preserves the link through sign-in, and lets the recipient accept or reject the pending invitation.
+
+<type-table doc-variant="heroui" path="packages/heroui/src/components/auth/organization/accept-invitation.tsx" name="AcceptInvitationProps" />
+
+### `<OrganizationSwitcher />`
+
+Dropdown that shows the active organization, lets the user switch between organizations, and exposes a "Create organization" entry. Drop it in your app shell: typically next to `<UserButton />`.
+
+<ComponentPreview doc-variant="heroui" name="heroui-organization-switcher" />
+
+```tsx doc-variant="heroui" file=<rootDir>/src/demos/heroui/organization/organization-switcher.tsx
+```
+
+<type-table doc-variant="heroui" path="packages/heroui/src/components/auth/organization/organization-switcher.tsx" name="OrganizationSwitcherProps" />
+
+<ComponentPreview doc-variant="shadcn" name="shadcn-organization-switcher" />
+
+```tsx doc-variant="shadcn" file=<rootDir>/src/demos/shadcn/organization/organization-switcher.tsx
+```
+
+<type-table doc-variant="shadcn" path="examples/start-shadcn-example/src/components/auth/organization/organization-switcher.tsx" name="OrganizationSwitcherProps" />
+
+<DocVariant name="heroui shadcn">
+### `<Organization />`
+
+The full organization management shell mounted at `/organization/<path>`. Renders `settings` (profile + danger zone) and `people` (members + invitations) tabs for the active organization.
+</DocVariant>
+
+<ComponentPreview doc-variant="heroui" name="heroui-organization" />
+
+```tsx doc-variant="heroui" file=<rootDir>/src/demos/heroui/organization/organization.tsx
+```
+
+<type-table doc-variant="heroui" path="packages/heroui/src/components/auth/organization/organization.tsx" name="OrganizationProps" />
+
+<ComponentPreview doc-variant="shadcn" name="shadcn-organization" />
+
+```tsx doc-variant="shadcn" file=<rootDir>/src/demos/shadcn/organization/organization.tsx
+```
+
+<type-table doc-variant="shadcn" path="examples/start-shadcn-example/src/components/auth/organization/organization.tsx" name="OrganizationProps" />
+
+<ZaidanStory doc-variant="zaidan"
+  storyId="zaidan-plugins-organization--organization-switcher-preview"
+  title="Zaidan Organization Switcher preview"
+  height={420}
+/>
+
+```tsx doc-variant="zaidan" file=<rootDir>/../../examples/start-solid-zaidan-example/src/demos/organization/organization-switcher.tsx
+```
+
+<type-table doc-variant="zaidan" path="examples/start-solid-zaidan-example/src/components/auth/organization/organization-switcher.tsx" name="OrganizationSwitcherProps" />
+
+<DocVariant name="zaidan">
+### `<Organization />`
+
+The full organization management shell mounted at `/organization/@<slug>/<path>`. It renders `settings` and `people` tabs for the organization identified by the raw slug.
+</DocVariant>
+
+<ZaidanStory doc-variant="zaidan"
+  storyId="zaidan-plugins-organization--organization-preview"
+  title="Zaidan Organization preview"
+  height={680}
+/>
+
+```tsx doc-variant="zaidan" file=<rootDir>/../../examples/start-solid-zaidan-example/src/demos/organization/organization.tsx
+```
+
+<type-table doc-variant="zaidan" path="examples/start-solid-zaidan-example/src/components/auth/organization/organization.tsx" name="OrganizationProps" />
+
+### `<OrganizationSettings />`
+
+<DocVariant name="heroui">
+The contents of the `settings` tab: `<OrganizationProfile />`, any plugin-contributed `organizationCards` (for example `<OrganizationApiKeys />` from the [api-key plugin](/docs/heroui/plugins/api-key)), then `<OrganizationDangerZone />`. Drop it into a custom layout if you do not want the tabbed shell.
+</DocVariant>
+
+<ComponentPreview doc-variant="heroui" name="heroui-organization-settings" />
+
+```tsx doc-variant="heroui" file=<rootDir>/src/demos/heroui/organization/organization-settings.tsx
+```
+
+<type-table doc-variant="heroui" path="packages/heroui/src/components/auth/organization/organization-settings.tsx" name="OrganizationSettingsProps" />
+
+<DocVariant name="shadcn">
+The contents of the `settings` tab: `<OrganizationProfile />`, any plugin-contributed `organizationCards` (for example `<OrganizationApiKeys />` from the [api-key plugin](/docs/shadcn/plugins/api-key)), then `<OrganizationDangerZone />`. Drop it into a custom layout if you do not want the tabbed shell.
+</DocVariant>
+
+<ComponentPreview doc-variant="shadcn" name="shadcn-organization-settings" />
+
+```tsx doc-variant="shadcn" file=<rootDir>/src/demos/shadcn/organization/organization-settings.tsx
+```
+
+<type-table doc-variant="shadcn" path="examples/start-shadcn-example/src/components/auth/organization/organization-settings.tsx" name="OrganizationSettingsProps" />
+
+<DocVariant name="zaidan">
+The contents of the `settings` tab: `<OrganizationProfile />`, any plugin-contributed `organizationCards` (for example `<OrganizationApiKeys />` from the [api-key plugin](/docs/zaidan/plugins/api-key)), then `<OrganizationDangerZone />`. Drop it into a custom layout if you do not want the tabbed shell.
+</DocVariant>
+
+<ZaidanStory doc-variant="zaidan"
+  storyId="zaidan-plugins-organization--organization-settings-preview"
+  title="Zaidan Organization Settings preview"
+  height={640}
+/>
+
+```tsx doc-variant="zaidan" file=<rootDir>/../../examples/start-solid-zaidan-example/src/demos/organization/organization-settings.tsx
+```
+
+<type-table doc-variant="zaidan" path="examples/start-solid-zaidan-example/src/components/auth/organization/organization-settings.tsx" name="OrganizationSettingsProps" />
+
+### `<OrganizationProfile />`
+
+Editable profile card for the active organization: logo, display name, and slug. Submits via `useUpdateOrganization`.
+
+<ComponentPreview doc-variant="heroui" name="heroui-organization-profile" />
+
+```tsx doc-variant="heroui" file=<rootDir>/src/demos/heroui/organization/organization-profile.tsx
+```
+
+<type-table doc-variant="heroui" path="packages/heroui/src/components/auth/organization/organization-profile.tsx" name="OrganizationProfileProps" />
+
+<ComponentPreview doc-variant="shadcn" name="shadcn-organization-profile" />
+
+```tsx doc-variant="shadcn" file=<rootDir>/src/demos/shadcn/organization/organization-profile.tsx
+```
+
+<type-table doc-variant="shadcn" path="examples/start-shadcn-example/src/components/auth/organization/organization-profile.tsx" name="OrganizationProfileProps" />
+
+<ZaidanStory doc-variant="zaidan"
+  storyId="zaidan-plugins-organization--organization-profile-preview"
+  title="Zaidan Organization Profile preview"
+  height={460}
+/>
+
+```tsx doc-variant="zaidan" file=<rootDir>/../../examples/start-solid-zaidan-example/src/demos/organization/organization-profile.tsx
+```
+
+<type-table doc-variant="zaidan" path="examples/start-solid-zaidan-example/src/components/auth/organization/organization-profile.tsx" name="OrganizationProfileProps" />
+
+### `<OrganizationDangerZone />`
+
+Danger-zone card with `<LeaveOrganization />` and `<DeleteOrganization />` rows.
+
+<ComponentPreview doc-variant="heroui" name="heroui-organization-danger-zone" />
+
+```tsx doc-variant="heroui" file=<rootDir>/src/demos/heroui/organization/organization-danger-zone.tsx
+```
+
+<type-table doc-variant="heroui" path="packages/heroui/src/components/auth/organization/organization-danger-zone.tsx" name="OrganizationDangerZoneProps" />
+
+<ComponentPreview doc-variant="shadcn" name="shadcn-organization-danger-zone" />
+
+```tsx doc-variant="shadcn" file=<rootDir>/src/demos/shadcn/organization/organization-danger-zone.tsx
+```
+
+<type-table doc-variant="shadcn" path="examples/start-shadcn-example/src/components/auth/organization/organization-danger-zone.tsx" name="OrganizationDangerZoneProps" />
+
+<ZaidanStory doc-variant="zaidan"
+  storyId="zaidan-plugins-organization--organization-danger-zone-preview"
+  title="Zaidan Organization Danger Zone preview"
+  height={360}
+/>
+
+```tsx doc-variant="zaidan" file=<rootDir>/../../examples/start-solid-zaidan-example/src/demos/organization/organization-danger-zone.tsx
+```
+
+<type-table doc-variant="zaidan" path="examples/start-solid-zaidan-example/src/components/auth/organization/organization-danger-zone.tsx" name="OrganizationDangerZoneProps" />
+
+### `<OrganizationPeople />`
+
+The contents of the `people` tab: `<OrganizationMembers />` on top, `<OrganizationInvitations />` below.
+
+<ComponentPreview doc-variant="heroui" name="heroui-organization-people" />
+
+```tsx doc-variant="heroui" file=<rootDir>/src/demos/heroui/organization/organization-people.tsx
+```
+
+<type-table doc-variant="heroui" path="packages/heroui/src/components/auth/organization/organization-people.tsx" name="OrganizationPeopleProps" />
+
+<ComponentPreview doc-variant="shadcn" name="shadcn-organization-people" />
+
+```tsx doc-variant="shadcn" file=<rootDir>/src/demos/shadcn/organization/organization-people.tsx
+```
+
+<type-table doc-variant="shadcn" path="examples/start-shadcn-example/src/components/auth/organization/organization-people.tsx" name="OrganizationPeopleProps" />
+
+<ZaidanStory doc-variant="zaidan"
+  storyId="zaidan-plugins-organization--organization-people-preview"
+  title="Zaidan Organization People preview"
+  height={760}
+/>
+
+```tsx doc-variant="zaidan" file=<rootDir>/../../examples/start-solid-zaidan-example/src/demos/organization/organization-people.tsx
+```
+
+<type-table doc-variant="zaidan" path="examples/start-solid-zaidan-example/src/components/auth/organization/organization-people.tsx" name="OrganizationPeopleProps" />
+
+### `<OrganizationMembers />`
+
+Searchable, sortable, filter-by-role table of the active organization's members with an invite control and per-row role / remove actions.
+
+<ComponentPreview doc-variant="heroui" name="heroui-organization-members" />
+
+```tsx doc-variant="heroui" file=<rootDir>/src/demos/heroui/organization/organization-members.tsx
+```
+
+<type-table doc-variant="heroui" path="packages/heroui/src/components/auth/organization/organization-members.tsx" name="OrganizationMembersProps" />
+
+<ComponentPreview doc-variant="shadcn" name="shadcn-organization-members" />
+
+```tsx doc-variant="shadcn" file=<rootDir>/src/demos/shadcn/organization/organization-members.tsx
+```
+
+<type-table doc-variant="shadcn" path="examples/start-shadcn-example/src/components/auth/organization/organization-members.tsx" name="OrganizationMembersProps" />
+
+<ZaidanStory doc-variant="zaidan"
+  storyId="zaidan-plugins-organization--organization-members-preview"
+  title="Zaidan Organization Members preview"
+  height={460}
+/>
+
+```tsx doc-variant="zaidan" file=<rootDir>/../../examples/start-solid-zaidan-example/src/demos/organization/organization-members.tsx
+```
+
+<type-table doc-variant="zaidan" path="examples/start-solid-zaidan-example/src/components/auth/organization/organization-members.tsx" name="OrganizationMembersProps" />
+
+### Paginating members
+
+By default `<OrganizationMembers />` asks for the whole list and filters it in
+the browser. That is fine for a handful of members and quietly wrong for a
+large organization: `list-members` caps its response at 100 rows (or your
+`membershipLimit`) and says nothing about the rest, so members past that point
+do not appear.
+
+Pass `pageSize` to move paging onto the server:
+
+```tsx
+<OrganizationMembers pageSize={20} />
+```
+
+In paged mode the component sends `limit` and `offset`, applies the role filter
+server-side through `filterField`/`filterValue`, sorts by role through
+`sortBy`/`sortDirection`, and reads the row count from the endpoint's `total`.
+
+Two controls step aside in paged mode, because `list-members` cannot honour
+them across pages:
+
+- **The search box.** The endpoint has no search parameter. Name and email live
+  on the joined user row, which it does not query.
+- **Sorting by member.** Same reason: it can only sort columns on the member
+  row itself.
+
+The signed-in user's own role comes from `getActiveMemberRole` rather than from
+scanning the loaded page because that member can be on a different page. This is
+exposed as `useActiveMemberRole` for custom components.
+
+<Callout>
+`list-invitations` and `list-sessions` take no pagination parameters at all, so
+those lists stay client-side until Better Auth adds them. `list-api-keys` does
+support `limit` and `offset`. Wiring it up is a separate change.
+</Callout>
+
+### `<OrganizationInvitations />`
+
+Pending invitations for the active organization as a table aligned with `<OrganizationMembers />`. Includes role / status filters, plus per-row resend and cancel actions.
+
+Resending re-invites the same address with `resend: true`, which pushes the
+invitation's expiry out and sends the email again instead of creating a second
+invitation. The action needs the `invitation: ["create"]` permission, the same
+one that gates `<InviteMemberDialog />`.
+
+<ComponentPreview doc-variant="heroui" name="heroui-organization-invitations" />
+
+```tsx doc-variant="heroui" file=<rootDir>/src/demos/heroui/organization/organization-invitations.tsx
+```
+
+<type-table doc-variant="heroui" path="packages/heroui/src/components/auth/organization/organization-invitations.tsx" name="OrganizationInvitationsProps" />
+
+<ComponentPreview doc-variant="shadcn" name="shadcn-organization-invitations" />
+
+```tsx doc-variant="shadcn" file=<rootDir>/src/demos/shadcn/organization/organization-invitations.tsx
+```
+
+<type-table doc-variant="shadcn" path="examples/start-shadcn-example/src/components/auth/organization/organization-invitations.tsx" name="OrganizationInvitationsProps" />
+
+<ZaidanStory doc-variant="zaidan"
+  storyId="zaidan-plugins-organization--organization-invitations-preview"
+  title="Zaidan Organization Invitations preview"
+  height={520}
+/>
+
+```tsx doc-variant="zaidan" file=<rootDir>/../../examples/start-solid-zaidan-example/src/demos/organization/organization-invitations.tsx
+```
+
+<type-table doc-variant="zaidan" path="examples/start-solid-zaidan-example/src/components/auth/organization/organization-invitations.tsx" name="OrganizationInvitationsProps" />
+
+### `<OrganizationsSettings />`
+
+The user-level organizations panel rendered at `/settings/organizations`. Lists every organization the user belongs to (with a "Create organization" button and empty state) plus invitations addressed to the user.
+
+<ComponentPreview doc-variant="heroui" name="heroui-organizations-settings" />
+
+```tsx doc-variant="heroui" file=<rootDir>/src/demos/heroui/organization/organizations-settings.tsx
+```
+
+<type-table doc-variant="heroui" path="packages/heroui/src/components/auth/organization/organizations-settings.tsx" name="OrganizationsSettingsProps" />
+
+<ComponentPreview doc-variant="shadcn" name="shadcn-organizations-settings" />
+
+```tsx doc-variant="shadcn" file=<rootDir>/src/demos/shadcn/organization/organizations-settings.tsx
+```
+
+<type-table doc-variant="shadcn" path="examples/start-shadcn-example/src/components/auth/organization/organizations-settings.tsx" name="OrganizationsSettingsProps" />
+
+<ZaidanStory doc-variant="zaidan"
+  storyId="zaidan-plugins-organization--organizations-settings-preview"
+  title="Zaidan Organizations Settings preview"
+  height={560}
+/>
+
+```tsx doc-variant="zaidan" file=<rootDir>/../../examples/start-solid-zaidan-example/src/demos/organization/organizations-settings.tsx
+```
+
+<type-table doc-variant="zaidan" path="examples/start-solid-zaidan-example/src/components/auth/organization/organizations-settings.tsx" name="OrganizationsSettingsProps" />
+
+### `<Organizations />`
+
+List of organizations the user belongs to with a "Create organization" button and per-row Manage control. Embedded inside `<OrganizationsSettings />`.
+
+<ComponentPreview doc-variant="heroui" name="heroui-organizations" />
+
+```tsx doc-variant="heroui" file=<rootDir>/src/demos/heroui/organization/organizations.tsx
+```
+
+<type-table doc-variant="heroui" path="packages/heroui/src/components/auth/organization/organizations.tsx" name="OrganizationsProps" />
+
+<ComponentPreview doc-variant="shadcn" name="shadcn-organizations" />
+
+```tsx doc-variant="shadcn" file=<rootDir>/src/demos/shadcn/organization/organizations.tsx
+```
+
+<type-table doc-variant="shadcn" path="examples/start-shadcn-example/src/components/auth/organization/organizations.tsx" name="OrganizationsProps" />
+
+<type-table doc-variant="zaidan" path="examples/start-solid-zaidan-example/src/components/auth/organization/organizations.tsx" name="OrganizationsProps" />
+
+### `<UserInvitations />`
+
+Invitations addressed to the signed-in user across every organization, with Accept / Reject actions. Embedded inside `<OrganizationsSettings />`.
+
+<ComponentPreview doc-variant="heroui" name="heroui-user-invitations" />
+
+```tsx doc-variant="heroui" file=<rootDir>/src/demos/heroui/organization/user-invitations.tsx
+```
+
+<type-table doc-variant="heroui" path="packages/heroui/src/components/auth/organization/user-invitations.tsx" name="UserInvitationsProps" />
+
+<ComponentPreview doc-variant="shadcn" name="shadcn-user-invitations" />
+
+```tsx doc-variant="shadcn" file=<rootDir>/src/demos/shadcn/organization/user-invitations.tsx
+```
+
+<type-table doc-variant="shadcn" path="examples/start-shadcn-example/src/components/auth/organization/user-invitations.tsx" name="UserInvitationsProps" />
+
+<ZaidanStory doc-variant="zaidan"
+  storyId="zaidan-plugins-organization--user-invitations-preview"
+  title="Zaidan User Invitations preview"
+  height={260}
+/>
+
+```tsx doc-variant="zaidan" file=<rootDir>/../../examples/start-solid-zaidan-example/src/demos/organization/user-invitations.tsx
+```
+
+<type-table doc-variant="zaidan" path="examples/start-solid-zaidan-example/src/components/auth/organization/user-invitations.tsx" name="UserInvitationsProps" />
+
+### `<CreateOrganizationDialog />`
+
+Modal dialog with the new-organization form. Owned by `<OrganizationSwitcher />` and `<Organizations />`. Mount it directly when you want to open the create flow from your own surface.
+
+<type-table doc-variant="heroui" path="packages/heroui/src/components/auth/organization/create-organization-dialog.tsx" name="CreateOrganizationDialogProps" />
+
+<type-table doc-variant="shadcn" path="examples/start-shadcn-example/src/components/auth/organization/create-organization-dialog.tsx" name="CreateOrganizationDialogProps" />
+
+<type-table doc-variant="zaidan" path="examples/start-solid-zaidan-example/src/components/auth/organization/create-organization-dialog.tsx" name="CreateOrganizationDialogProps" />
+
+## Multiple roles per member
+
+Better Auth accepts `role` as a string or an array. It stores multiple roles as
+one comma-joined value (`"admin,member"`). The role pickers allow multiple
+roles by default. Set `allowMultipleRoles: false` to limit invitations and
+members to one role. The pickers always keep at least one role selected.
+
+Anywhere you read a raw role, split it first. `@better-auth-ui/core/plugins/organization`
+exports helpers for this:
+
+```ts
+import {
+  hasMemberRole,
+  memberRoleLabels,
+  parseMemberRoles
+} from "@better-auth-ui/core/plugins/organization"
+
+parseMemberRoles("admin,member") // ["admin", "member"]
+hasMemberRole("owner,admin", "owner") // true
+memberRoleLabels("admin,auditor", roles) // ["Admin", "auditor"]
+```
+
+`hasMemberRole` matters more than it looks: `member.role === "owner"` silently
+misses an owner who also carries a second role, which is what the members list
+used to do when deciding whether to show owner-only actions.
+
+### `<InviteMemberDialog />`
+
+Modal dialog for inviting a new member by email. Owned by `<OrganizationMembers />` and `<OrganizationInvitations />`. Mount it directly to drive the invite flow from a custom action.
+
+<type-table doc-variant="heroui" path="packages/heroui/src/components/auth/organization/invite-member-dialog.tsx" name="InviteMemberDialogProps" />
+
+<type-table doc-variant="shadcn" path="examples/start-shadcn-example/src/components/auth/organization/invite-member-dialog.tsx" name="InviteMemberDialogProps" />
+
+<type-table doc-variant="zaidan" path="examples/start-solid-zaidan-example/src/components/auth/organization/invite-member-dialog.tsx" name="InviteMemberDialogProps" />
+
+### `<DeleteOrganizationDialog />`
+
+Confirmation dialog for deleting an organization (owner permission, server-side).
+
+<type-table doc-variant="heroui" path="packages/heroui/src/components/auth/organization/delete-organization-dialog.tsx" name="DeleteOrganizationDialogProps" />
+
+<type-table doc-variant="shadcn" path="examples/start-shadcn-example/src/components/auth/organization/delete-organization-dialog.tsx" name="DeleteOrganizationDialogProps" />
+
+<type-table doc-variant="zaidan" path="examples/start-solid-zaidan-example/src/components/auth/organization/delete-organization-dialog.tsx" name="DeleteOrganizationDialogProps" />
+
+<DocVariant name="zaidan">
+## Related APIs
+
+- [Solid organization queries](/docs/solid/queries/active-organization)
+- [Solid organization mutations](/docs/solid/mutations/create-organization)
+</DocVariant>
+
+## Dynamic organization roles
+
+Enable dynamic access control in Better Auth before you enable the roles tab. The server, client, and UI must use the same resource and action keys.
+
+<DocVariant name="heroui shadcn">
+```ts title="lib/organization-access.ts"
+import { createAccessControl } from "better-auth/plugins/access"
+
+export const organizationStatements = {
+  project: ["create", "read", "update", "delete"]
+} as const
+
+export const organizationAccess = createAccessControl(organizationStatements)
+```
+
+```ts title="lib/auth.ts"
+import { organization } from "better-auth/plugins"
+import { organizationAccess } from "./organization-access"
+
+organization({
+  ac: organizationAccess,
+  dynamicAccessControl: { enabled: true }
+})
+```
+
+```ts title="lib/auth-client.ts"
+import { organizationClient } from "better-auth/client/plugins"
+import { organizationAccess } from "./organization-access"
+
+organizationClient({
+  ac: organizationAccess,
+  dynamicAccessControl: { enabled: true }
+})
+```
+
+Configure the labels that the permission matrix shows:
+
+```tsx title="components/providers.tsx"
+organizationPlugin({
+  dynamicAccessControl: {
+    enabled: true,
+    permissions: {
+      project: {
+        label: "Projects",
+        actions: {
+          create: "Create projects",
+          read: "View projects",
+          update: "Edit projects",
+          delete: "Delete projects"
+        }
+      }
+    }
+  }
+})
+```
+</DocVariant>
+
+```ts doc-variant="zaidan" title="src/lib/organization-access.ts"
+import { createAccessControl } from "better-auth/plugins/access"
+
+export const organizationStatements = {
+  project: ["create", "read", "update", "delete"]
+} as const
+
+export const organizationAccess = createAccessControl(organizationStatements)
+```
+
+```ts doc-variant="zaidan" title="src/lib/auth.ts"
+import { organization } from "better-auth/plugins"
+import { organizationAccess } from "./organization-access"
+
+organization({
+  ac: organizationAccess,
+  dynamicAccessControl: { enabled: true }
+})
+```
+
+```ts doc-variant="zaidan" title="src/lib/auth-client.ts"
+import { organizationClient } from "better-auth/client/plugins"
+import { organizationAccess } from "./organization-access"
+
+organizationClient({
+  ac: organizationAccess,
+  dynamicAccessControl: { enabled: true }
+})
+```
+
+<DocVariant name="zaidan">
+Configure the labels that the permission matrix shows:
+</DocVariant>
+
+```tsx doc-variant="zaidan" title="src/components/providers.tsx"
+organizationPlugin({
+  dynamicAccessControl: {
+    enabled: true,
+    permissions: {
+      project: {
+        label: "Projects",
+        actions: {
+          create: "Create projects",
+          read: "View projects",
+          update: "Edit projects",
+          delete: "Delete projects"
+        }
+      }
+    }
+  }
+})
+```
+
+This adds the `roles` organization tab. The tab supports role creation, editing, and deletion. Member and invitation controls include both configured roles and roles returned by Better Auth. A role cannot be deleted while a member holds it.
+
+<DocVariant name="heroui shadcn">
+The React hooks also expose the underlying endpoints. Always pass the organization ID:
+
+```tsx
+const roles = useListRoles(authClient, {
+  query: { organizationId }
+})
+const role = useRole(authClient, {
+  query: { organizationId, roleId }
+})
+
+const createRole = useCreateRole(authClient, organizationId)
+const updateRole = useUpdateRole(authClient, organizationId)
+const deleteRole = useDeleteRole(authClient, organizationId)
+```
+</DocVariant>
+
+<DocVariant name="zaidan">
+The Solid hooks also expose the underlying endpoints. Always pass the organization ID:
+</DocVariant>
+
+```tsx doc-variant="zaidan"
+const roles = useListRoles(authClient, () => ({
+  query: { organizationId }
+}))
+const role = useRole(authClient, () => ({
+  query: { organizationId, roleId }
+}))
+
+const createRole = useCreateRole(authClient, () => organizationId)
+const updateRole = useUpdateRole(authClient, () => organizationId)
+const deleteRole = useDeleteRole(authClient, () => organizationId)
+```
+
+## Teams and policy controls
+
+Enable teams on the Better Auth server, client, and UI plugin:
+
+```tsx
+organization({ teams: { enabled: true } })
+organizationClient({ teams: { enabled: true } })
+organizationPlugin({
+  teams: {
+    maximumTeams: 5,
+    maximumMembersPerTeam: 20,
+    allowRemovingAllTeams: false
+  }
+})
+```
+
+The organization shell adds a Teams tab. Users can create, rename, and delete teams. They can also add and remove team members. Invitations can assign a team.
+
+The UI disables team creation and member assignment when these limits are reached. It also protects the final team unless `allowRemovingAllTeams` is true. Better Auth also accepts callback limits on the server. The browser cannot run those callbacks, so pass their resolved values into the UI configuration when the limits vary by organization.
+
+The `useListTeams`, `useListTeamMembers`, `useCreateTeam`, `useUpdateTeam`, `useRemoveTeam`, `useAddTeamMember`, and `useRemoveTeamMember` hooks cover the team lifecycle.
+
+### User team selection
+
+`TeamSwitcher` lists only the teams that the current user can access in the specified organization. The application owns the selected team. This keeps team routing independent from Better Auth active organizations.
+
+```tsx doc-variant="heroui"
+import { useState } from "react"
+import { TeamSwitcher } from "@better-auth-ui/heroui/plugins/organization"
+
+export function ProjectTeamFilter({ organizationId }: { organizationId: string }) {
+  const [teamId, setTeamId] = useState<string | null>(null)
+
+  return (
+    <TeamSwitcher
+      organizationId={organizationId}
+      teamId={teamId}
+      onTeamChange={(team) => setTeamId(team?.id ?? null)}
+    />
+  )
+}
+```
+
+```tsx doc-variant="shadcn"
+import { useState } from "react"
+import { TeamSwitcher } from "@/components/auth/organization/team-switcher"
+
+export function ProjectTeamFilter({ organizationId }: { organizationId: string }) {
+  const [teamId, setTeamId] = useState<string | null>(null)
+
+  return (
+    <TeamSwitcher
+      organizationId={organizationId}
+      teamId={teamId}
+      onTeamChange={(team) => setTeamId(team?.id ?? null)}
+    />
+  )
+}
+```
+
+```tsx doc-variant="zaidan"
+import { createSignal } from "solid-js"
+import { TeamSwitcher } from "@/components/auth/organization/team-switcher"
+
+export function ProjectTeamFilter(props: { organizationId: string }) {
+  const [teamId, setTeamId] = createSignal<string | null>(null)
+
+  return (
+    <TeamSwitcher
+      organizationId={props.organizationId}
+      teamId={teamId()}
+      onTeamChange={(team) => setTeamId(team?.id ?? null)}
+    />
+  )
+}
+```
+
+Set `syncSession` when an application still reads `session.activeTeamId`. This opt-in mode calls Better Auth `setActiveTeam` after the callback.
+
+The `useListUserTeams` and `useSetActiveTeam` hooks are also available for custom controls. Always pass `organizationId` to both APIs.
+
+### Model-specific fields
+
+Configure fields by the Better Auth model that stores them. The names and types must match the `schema` fields in the server organization plugin.
+
+```tsx
+organizationPlugin({
+  modelFields: {
+    organization: [
+      { name: "billingCode", type: "string", label: "Billing code" }
+    ],
+    member: [
+      { name: "title", type: "string", label: "Job title" }
+    ],
+    invitation: [
+      { name: "department", type: "string", label: "Department" }
+    ],
+    team: [
+      { name: "description", type: "string", inputType: "textarea", label: "Description" }
+    ],
+    role: [
+      { name: "color", type: "string", label: "Color" }
+    ]
+  }
+})
+```
+
+Organization fields appear in creation and profile forms. Invitation, team, and role fields appear in their create and edit workflows. Member fields appear as read-only details because Better Auth does not provide browser client endpoints for creating or editing a member model directly.
+
+Use `organizationLimit`, `membershipLimit`, and `invitationLimit` to disable actions when a configured limit is reached. Use `allowOrganizationCreation: false` to hide creation controls.
+
+Plugins can add an organization settings tab through `organizationTabs`. Each tab receives `organizationId` and `organizationSlug` for the active organization.

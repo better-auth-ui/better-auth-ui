@@ -1,0 +1,91 @@
+<DocVariant name="react">
+<include>../../shared/queries/organization.mdx#shared-requirements</include>
+</DocVariant>
+
+## Usage
+
+```tsx doc-variant="react"
+import { authClient } from "@/lib/auth-client"
+import { useListOrganizationMembers } from "@better-auth-ui/react/plugins/organization"
+
+const result = useListOrganizationMembers(authClient)
+```
+
+<DocVariant name="react">
+## Client options factory and router-loader helpers
+</DocVariant>
+
+```tsx doc-variant="react"
+import {
+  ensureListOrganizationMembers,
+  fetchListOrganizationMembers,
+  listOrganizationMembersOptions,
+  prefetchListOrganizationMembers
+} from "@better-auth-ui/core/plugins/organization"
+
+const options = listOrganizationMembersOptions(authClient, userId)
+await ensureListOrganizationMembers(queryClient, authClient, userId)
+await prefetchListOrganizationMembers(queryClient, authClient, userId)
+const members = await fetchListOrganizationMembers(queryClient, authClient, userId)
+```
+
+```tsx doc-variant="solid"
+import { useListOrganizationMembers } from "@better-auth-ui/solid/plugins/organization"
+
+const result = useListOrganizationMembers(authClient)
+```
+
+<DocVariant name="solid">
+<include>../../shared/queries/organization.mdx#shared-requirements</include>
+
+## Options factory
+</DocVariant>
+
+```tsx doc-variant="solid"
+import { listOrganizationMembersOptions } from "@better-auth-ui/core/plugins/organization"
+import { createQuery } from "@tanstack/solid-query"
+
+const query = createQuery(() =>
+  listOrganizationMembersOptions(authClient, userId)
+)
+```
+
+<include>../../shared/queries/organization.mdx#shared-notes</include>
+
+## Server-side prefetching
+
+<DocVariant name="react">
+For server loaders, import from `@better-auth-ui/core/plugins/organization/server`. Pass the Better Auth server instance, signed-in `userId`, and the request params for the organization member list.
+</DocVariant>
+
+```ts doc-variant="react"
+import { ensureListOrganizationMembers } from "@better-auth-ui/core/plugins/organization/server"
+import { getRequestHeaders } from "@tanstack/react-start/server"
+
+import { auth } from "@/lib/auth"
+
+await ensureListOrganizationMembers(queryClient, auth, userId, {
+  headers: getRequestHeaders(),
+  query: { organizationId: "org_123" }
+})
+```
+
+<DocVariant name="solid">
+<include>../../shared/queries/organization.mdx#shared-solid-client-prefetching</include>
+</DocVariant>
+
+```ts doc-variant="solid"
+import {
+  ensureListOrganizationMembers,
+  fetchListOrganizationMembers,
+  prefetchListOrganizationMembers
+} from "@better-auth-ui/core/plugins/organization"
+
+await ensureListOrganizationMembers(queryClient, authClient, userId, { query: { organizationId: "org_123" } })
+await prefetchListOrganizationMembers(queryClient, authClient, userId, { query: { organizationId: "org_123" } })
+const members = await fetchListOrganizationMembers(queryClient, authClient, userId, { query: { organizationId: "org_123" } })
+```
+
+## Params
+
+<type-table path="packages/core/src/plugins/organization/list-members-query.ts" name="ListOrganizationMembersParams" />

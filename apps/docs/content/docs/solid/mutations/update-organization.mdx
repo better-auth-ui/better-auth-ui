@@ -1,29 +1,7 @@
 ---
 title: useUpdateOrganization
 description: Update organization name, slug, or logo data.
+variant: solid
 ---
 
-## Usage
-
-```tsx
-import { useUpdateOrganization } from "@better-auth-ui/solid/plugins/organization"
-
-const mutation = useUpdateOrganization(authClient)
-
-mutation.mutate(/* params */)
-```
-
-<include>../../../shared/mutations/plugin-requirements.mdx#shared-organization-solid</include>
-
-## Options factory
-
-```tsx
-import { updateOrganizationOptions } from "@better-auth-ui/core/plugins/organization"
-import { useMutation } from "@tanstack/solid-query"
-
-const mutation = useMutation(() => updateOrganizationOptions(authClient))
-```
-
-## Params
-
-<type-table path="../../../../../../packages/core/src/plugins/organization/update-organization-mutation.ts" name="UpdateOrganizationParams" />
+<include>../../../topics/mutations/update-organization.mdx</include>

@@ -1,0 +1,259 @@
+<DocVariant name="heroui">
+The SSO plugin replaces the standard sign-in view with an email-first flow. It sends the email to Better Auth for provider discovery. If a provider exists, Better Auth redirects the user to it. If no provider exists, the view shows the configured password and plugin sign-in methods.
+
+Magic-link and email-OTP views reuse the submitted email. Users do not need to enter it again.
+</DocVariant>
+
+<DocVariant name="shadcn">
+The SSO registry item installs a sign-in view that discovers organization SSO from an email address. It redirects to the identity provider when one exists. Otherwise, it shows password, magic-link, email-OTP, and other registered sign-in methods.
+</DocVariant>
+
+<DocVariant name="zaidan">
+The SSO plugin replaces the standard sign-in form with an email-first flow. The user types an email, BAUI asks Better Auth whether an organization claims that domain, and redirects to the identity provider when one does. When none does, the same view reveals password, magic link, email OTP, and every other registered sign-in method.
+</DocVariant>
+
+## Setup
+
+<Steps>
+
+<Step>
+
+<DocVariant name="heroui">
+### Add SSO to the server
+
+Install `@better-auth/sso`, add `sso()` to Better Auth, and apply the plugin schema to your database. Configure providers with Better Auth or Better Auth Dash.
+</DocVariant>
+
+```ts doc-variant="heroui" title="lib/auth.ts"
+import { sso } from "@better-auth/sso"
+import { betterAuth } from "better-auth"
+
+export const auth = betterAuth({
+  plugins: [sso()]
+})
+```
+
+<DocVariant name="heroui">
+See the [Better Auth SSO guide](https://www.better-auth.com/docs/plugins/sso) for provider setup and schema commands.
+</DocVariant>
+
+<DocVariant name="shadcn">
+### Configure Better Auth
+
+Install `@better-auth/sso`, add `sso()` to the server, add `ssoClient()` to the client, and apply the plugin schema. See the [Better Auth SSO guide](https://www.better-auth.com/docs/plugins/sso) for provider setup.
+</DocVariant>
+
+```ts doc-variant="shadcn" title="lib/auth.ts"
+import { betterAuth } from "better-auth"
+import { sso } from "@better-auth/sso"
+
+export const auth = betterAuth({
+  plugins: [sso()]
+})
+```
+
+```ts doc-variant="shadcn" title="lib/auth-client.ts"
+import { ssoClient } from "@better-auth/sso/client"
+import { createAuthClient } from "better-auth/react"
+
+export const authClient = createAuthClient({
+  plugins: [ssoClient()]
+})
+```
+
+<DocVariant name="zaidan">
+### Configure the Better Auth server
+
+Install `@better-auth/sso`, add `sso()` to the server, and apply the plugin schema. See the [Better Auth SSO guide](https://www.better-auth.com/docs/plugins/sso) for provider setup.
+</DocVariant>
+
+```ts doc-variant="zaidan" title="src/lib/auth.ts"
+import { betterAuth } from "better-auth"
+import { sso } from "@better-auth/sso" // [!code highlight]
+
+export const auth = betterAuth({
+  // ...
+  plugins: [sso()] // [!code highlight]
+})
+```
+
+</Step>
+
+<Step>
+
+<DocVariant name="heroui">
+### Add the client plugin
+
+```ts title="lib/auth-client.ts"
+import { ssoClient } from "@better-auth/sso/client"
+import { createAuthClient } from "better-auth/react"
+
+export const authClient = createAuthClient({
+  plugins: [ssoClient()]
+})
+```
+</DocVariant>
+
+<DocVariant name="shadcn">
+### Install the registry item
+</DocVariant>
+
+```npm doc-variant="shadcn"
+npx shadcn@latest add @better-auth-ui/sso
+```
+
+<DocVariant name="shadcn">
+This installs `EmailFirstSignIn` and the local `ssoPlugin()` factory.
+</DocVariant>
+
+<DocVariant name="zaidan">
+### Add the matching client plugin
+</DocVariant>
+
+```ts doc-variant="zaidan" title="src/lib/auth-client.ts"
+import { ssoClient } from "@better-auth/sso/client" // [!code highlight]
+import { createAuthClient } from "better-auth/solid"
+
+export const authClient = createAuthClient({
+  plugins: [ssoClient()] // [!code highlight]
+})
+```
+
+</Step>
+
+<Step>
+
+<DocVariant name="heroui shadcn">
+### Register the UI plugin
+
+Place `ssoPlugin()` before another plugin that replaces the sign-in view.
+</DocVariant>
+
+```tsx doc-variant="heroui" title="components/providers.tsx"
+import { AuthProvider } from "@better-auth-ui/heroui"
+import { ssoPlugin } from "@better-auth-ui/heroui/plugins/sso"
+
+<AuthProvider
+  authClient={authClient}
+  navigate={navigate}
+  plugins={[ssoPlugin(), magicLinkPlugin(), emailOtpPlugin()]}
+>
+  {children}
+</AuthProvider>
+```
+
+```tsx doc-variant="shadcn" title="components/providers.tsx"
+import { ssoPlugin } from "@/lib/auth/sso-plugin"
+
+<AuthProvider
+  authClient={authClient}
+  navigate={navigate}
+  plugins={[ssoPlugin(), magicLinkPlugin(), emailOtpPlugin()]}
+>
+  {children}
+</AuthProvider>
+```
+
+<DocVariant name="zaidan">
+### Install the UI plugin
+</DocVariant>
+
+```npm doc-variant="zaidan"
+npx shadcn@latest add https://better-auth-ui.com/r/solid/sso.json
+```
+
+</Step>
+
+<Step doc-variant="zaidan">
+
+### Register the plugin
+
+```tsx title="src/components/providers.tsx"
+import { AuthProvider } from "@/components/auth/auth-provider"
+import { ssoPlugin } from "@/lib/auth/sso-plugin" // [!code highlight]
+import { authClient } from "@/lib/auth-client"
+
+export function Providers(props: { children?: JSX.Element }) {
+  return (
+    <AuthProvider
+      authClient={authClient}
+      navigate={navigate}
+      plugins={[ssoPlugin()]} // [!code highlight]
+    >
+      {props.children}
+    </AuthProvider>
+  )
+}
+```
+
+`ssoPlugin()` overrides the `signIn` view by default. Pass `ssoPlugin({ emailFirst: false })` to keep the standard form and use SSO only through your own UI.
+
+</Step>
+
+</Steps>
+
+<DocVariant name="zaidan">
+## How discovery resolves
+
+- A provider match redirects the browser straight to the identity provider.
+- A 404 means no organization claims the domain. The email is remembered, the view moves to the fallback step, and the user continues with whatever methods you registered.
+- Any other failure shows an error and leaves the user on the email step so they can retry.
+
+## Runtime prerequisites
+
+- Server: `sso()` from `@better-auth/sso`, with at least one registered provider.
+- Client: `ssoClient()` from `@better-auth/sso/client`.
+- Runtime API: `signInSsoOptions` from [Solid runtime APIs](/docs/solid).
+
+## Copied files
+
+- `src/lib/auth/sso-plugin.ts`
+- `src/lib/auth/use-sign-in-continuation.ts`
+- `src/lib/auth/two-factor-methods.ts`
+- `src/components/auth/sso/email-first-sign-in.tsx`
+- `src/components/auth/provider-button.tsx`
+- `src/components/auth/provider-buttons.tsx`
+
+After install the flow is yours. Reorder the fallback methods, change the copy on the discovery step, or skip the fallback entirely for a tenant that must use SSO.
+</DocVariant>
+
+<DocVariant name="heroui zaidan">
+## Options
+</DocVariant>
+
+<DocVariant name="heroui">
+Set `emailFirst: false` when you want the data hooks without replacing the sign-in view.
+</DocVariant>
+
+```tsx doc-variant="heroui"
+ssoPlugin({
+  emailFirst: false,
+  localization: {
+    continueWithEmail: "Find my workspace"
+  }
+})
+```
+
+<DocVariant name="heroui">
+## Component
+</DocVariant>
+
+```tsx doc-variant="heroui"
+import { EmailFirstSignIn } from "@better-auth-ui/heroui/plugins/sso"
+
+<EmailFirstSignIn />
+```
+
+<type-table doc-variant="heroui" path="packages/heroui/src/components/auth/sso/email-first-sign-in.tsx" name="EmailFirstSignInProps" />
+
+<DocVariant name="shadcn">
+The flow stores the submitted email in session storage. The installed magic-link and email-OTP views use it as their initial email.
+</DocVariant>
+
+<type-table doc-variant="zaidan" path="packages/core/src/plugins/sso/sso-plugin.ts" name="SsoPluginOptions" />
+
+<DocVariant name="zaidan">
+## Localization
+</DocVariant>
+
+<type-table doc-variant="zaidan" path="packages/core/src/plugins/sso/sso-localization.ts" name="SsoLocalization" />

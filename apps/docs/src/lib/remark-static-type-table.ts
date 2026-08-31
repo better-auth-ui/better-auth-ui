@@ -1,6 +1,5 @@
 import { createHash } from "node:crypto"
 import { readFile } from "node:fs/promises"
-import { dirname, relative, resolve } from "node:path"
 import { valueToEstree } from "estree-util-value-to-estree"
 import { remarkGfm } from "fumadocs-core/mdx-plugins/remark-gfm"
 import { toEstree } from "hast-util-to-estree"
@@ -10,13 +9,13 @@ import { remark } from "remark"
 import remarkRehype from "remark-rehype"
 import { visit } from "unist-util-visit"
 import type { VFile } from "vfile"
-
 import type {
   TypeTableDocument,
   TypeTableEntry,
   TypeTableSnapshot,
   TypeTableTag
 } from "./type-table-data.ts"
+import { getTypeTableReference } from "./type-table-reference.ts"
 
 type EstreeNode = {
   type: string
@@ -223,25 +222,6 @@ async function createTypeTableNode(
   }
 }
 
-function getStringAttribute(
-  node: TypeTableNode,
-  name: string,
-  file: VFile
-): string {
-  const attribute = node.attributes.find(
-    (item) => item.type === "mdxJsxAttribute" && item.name === name
-  )
-
-  if (!attribute || typeof attribute.value !== "string") {
-    const location = node.position
-      ? `${file.path}:${node.position.start.line}:${node.position.start.column}`
-      : file.path
-    throw new Error(`${location}: <type-table> requires a string ${name}`)
-  }
-
-  return attribute.value
-}
-
 function hashSource(source: string): string {
   return createHash("sha256").update(source).digest("hex")
 }
@@ -261,17 +241,11 @@ export function remarkStaticTypeTable(
 
       queue.push(
         (async () => {
-          const sourceAttribute = getStringAttribute(node, "path", file)
-          const name = getStringAttribute(node, "name", file)
-          const sourcePath = resolve(
-            dirname(String(file.path)),
-            sourceAttribute
+          const { key, sourcePath } = getTypeTableReference(
+            node,
+            file,
+            workspaceRoot
           )
-          const relativeSourcePath = relative(
-            workspaceRoot,
-            sourcePath
-          ).replaceAll("\\", "/")
-          const key = `${relativeSourcePath}#${name}`
           const snapshotEntry = snapshot.tables[key]
 
           if (!snapshotEntry) {

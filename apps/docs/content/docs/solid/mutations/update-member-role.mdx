@@ -1,29 +1,7 @@
 ---
 title: useUpdateMemberRole
 description: Update a member role.
+variant: solid
 ---
 
-## Usage
-
-```tsx
-import { useUpdateMemberRole } from "@better-auth-ui/solid/plugins/organization"
-
-const mutation = useUpdateMemberRole(authClient)
-
-mutation.mutate(/* params */)
-```
-
-<include>../../../shared/mutations/plugin-requirements.mdx#shared-organization-solid</include>
-
-## Options factory
-
-```tsx
-import { updateMemberRoleOptions } from "@better-auth-ui/core/plugins/organization"
-import { useMutation } from "@tanstack/solid-query"
-
-const mutation = useMutation(() => updateMemberRoleOptions(authClient))
-```
-
-## Params
-
-<type-table path="../../../../../../packages/core/src/plugins/organization/update-member-role-mutation.ts" name="UpdateMemberRoleParams" />
+<include>../../../topics/mutations/update-member-role.mdx</include>

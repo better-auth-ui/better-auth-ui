@@ -1,23 +1,7 @@
 ---
 title: useUnlinkAccount
 description: Unlink a social account from the current user.
+variant: solid
 ---
 
-## Usage
-
-```tsx
-import { unlinkAccountOptions } from "@better-auth-ui/core"
-import { useMutation } from "@tanstack/solid-query"
-
-const unlinkAccount = useMutation(() => unlinkAccountOptions(authClient))
-
-unlinkAccount.mutate({ providerId: "github", accountId: "github-account-id" })
-```
-
-## Cache
-
-Refetch linked accounts after unlinking.
-
-## Params
-
-<type-table path="../../../../../../packages/core/src/mutations/unlink-account-mutation.ts" name="UnlinkAccountParams" />
+<include>../../../topics/mutations/unlink-account.mdx</include>

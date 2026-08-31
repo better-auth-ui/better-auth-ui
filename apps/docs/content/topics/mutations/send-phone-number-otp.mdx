@@ -1,0 +1,20 @@
+<DocVariant name="react">
+Requires Better Auth `phoneNumber()` on the server and `phoneNumberClient()` on the client.
+
+```tsx
+import {
+  type PhoneNumberAuthClient
+} from "@better-auth-ui/core/plugins/phone-number"
+import { useAuth } from "@better-auth-ui/react"
+import { useSendPhoneNumberOtp } from "@better-auth-ui/react/plugins/phone-number"
+
+const { authClient } = useAuth()
+const { mutate: sendOtp } = useSendPhoneNumberOtp(
+  authClient as PhoneNumberAuthClient
+)
+
+sendOtp({ phoneNumber: "+12025550123" })
+```
+</DocVariant>
+
+<MutationPage id="send-phone-number-otp" />

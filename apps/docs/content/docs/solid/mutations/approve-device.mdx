@@ -1,23 +1,7 @@
 ---
 title: approveDeviceOptions
 description: Approve a verified device authorization request.
+variant: solid
 ---
 
-<include>../../../shared/mutations/approve-device.mdx#shared-overview</include>
-
-## Options factory
-
-```tsx
-import { approveDeviceOptions } from "@better-auth-ui/core/plugins/device-authorization"
-import { createMutation } from "@tanstack/solid-query"
-
-const approveDevice = createMutation(() => approveDeviceOptions(authClient))
-
-approveDevice.mutate({
-  userCode: "ABCD1234"
-})
-```
-
-## Params
-
-<type-table path="../../../../../../packages/core/src/plugins/device-authorization/approve-device-mutation.ts" name="ApproveDeviceParams" />
+<include>../../../topics/mutations/approve-device.mdx</include>

@@ -1,0 +1,364 @@
+<DocVariant name="heroui">
+The SIWE plugin adds an Ethereum wallet button to the sign-in form. It requests a nonce, builds an ERC-4361 message, signs it, and verifies it with Better Auth.
+
+You can also add a wallet settings card. The card lists connected wallets, changes the primary wallet, and removes wallets.
+</DocVariant>
+
+<DocVariant name="shadcn">
+The SIWE registry item adds wallet sign-in, optional email collection, and a security settings card for connected wallets.
+</DocVariant>
+
+<DocVariant name="zaidan">
+The SIWE plugin adds wallet sign-in backed by Better Auth's `siwe()` plugin, with optional email collection and a security settings card for connected wallets.
+
+It contributes:
+
+- A "Continue with Ethereum" button on sign-in views
+- An optional email dialog when the plugin's `email` mode is `"optional"` or `"required"`
+- A `<WalletAccounts />` security card for connecting, promoting, and removing wallets
+</DocVariant>
+
+## Setup
+
+<Steps>
+
+<Step>
+
+<DocVariant name="heroui shadcn">
+### Configure Better Auth
+</DocVariant>
+
+<DocVariant name="heroui">
+Add `siwe()` to the server. Supply a secure nonce generator and an ERC-4361 message verifier.
+</DocVariant>
+
+<DocVariant name="shadcn">
+Add `siwe()` to the server. Provide a secure nonce generator and an ERC-4361 verifier. Apply the plugin schema before sign-in.
+</DocVariant>
+
+```ts doc-variant="heroui shadcn" title="lib/auth.ts"
+import { betterAuth } from "better-auth"
+import { siwe } from "better-auth/plugins"
+import { verifyMessage } from "viem"
+import { generateSiweNonce } from "viem/siwe"
+
+export const auth = betterAuth({
+  plugins: [
+    siwe({
+      domain: "app.example.com",
+      getNonce: async () => generateSiweNonce(),
+      verifyMessage: async ({ message, signature, address }) =>
+        verifyMessage({
+          address: address as `0x${string}`,
+          message,
+          signature: signature as `0x${string}`
+        })
+    })
+  ]
+})
+```
+
+<DocVariant name="heroui">
+Apply the SIWE schema before using the plugin. See the [Better Auth SIWE guide](https://www.better-auth.com/docs/plugins/siwe).
+</DocVariant>
+
+<DocVariant name="shadcn">
+See the [Better Auth SIWE guide](https://www.better-auth.com/docs/plugins/siwe) for the complete server setup.
+</DocVariant>
+
+<DocVariant name="zaidan">
+### Configure the Better Auth server
+
+Add `siwe()` with a secure nonce generator and an ERC-4361 verifier, then apply the plugin schema.
+</DocVariant>
+
+```ts doc-variant="zaidan" title="src/lib/auth.ts"
+import { betterAuth } from "better-auth"
+import { siwe } from "better-auth/plugins" // [!code highlight]
+import { verifyMessage } from "viem"
+import { generateSiweNonce } from "viem/siwe"
+
+export const auth = betterAuth({
+  // ...
+  plugins: [
+    siwe({ // [!code highlight]
+      domain: "app.example.com",
+      getNonce: async () => generateSiweNonce(),
+      verifyMessage: async ({ message, signature, address }) =>
+        verifyMessage({
+          address: address as `0x${string}`,
+          message,
+          signature: signature as `0x${string}`
+        })
+    })
+  ]
+})
+```
+
+</Step>
+
+<Step doc-variant="heroui shadcn">
+### Add the client plugin
+
+```ts title="lib/auth-client.ts"
+import { createAuthClient } from "better-auth/react"
+import { siweClient } from "better-auth/client/plugins"
+
+export const authClient = createAuthClient({ plugins: [siweClient()] })
+```
+
+</Step>
+
+<Step>
+
+<DocVariant name="heroui">
+### Register the UI plugin
+
+The included connector uses an injected EIP-1193 wallet. You can provide another connector for Wagmi or another wallet library.
+</DocVariant>
+
+```tsx doc-variant="heroui" title="components/providers.tsx"
+import { createEip1193WalletConnector } from "@better-auth-ui/core/plugins/siwe"
+import { AuthProvider } from "@better-auth-ui/heroui"
+import { siwePlugin } from "@better-auth-ui/heroui/plugins/siwe"
+
+<AuthProvider
+  authClient={authClient}
+  navigate={navigate}
+  plugins={[
+    siwePlugin({
+      connector: createEip1193WalletConnector(),
+      domain: "app.example.com",
+      uri: "https://app.example.com",
+      email: "optional",
+      statement: "Sign in to Example"
+    })
+  ]}
+>
+  {children}
+</AuthProvider>
+```
+
+<DocVariant name="shadcn">
+### Install the registry item
+</DocVariant>
+
+```npm doc-variant="shadcn"
+npx shadcn@latest add @better-auth-ui/siwe
+```
+
+<DocVariant name="zaidan">
+### Add the matching client plugin
+</DocVariant>
+
+```ts doc-variant="zaidan" title="src/lib/auth-client.ts"
+import { createAuthClient } from "better-auth/solid"
+import { siweClient } from "better-auth/client/plugins" // [!code highlight]
+
+export const authClient = createAuthClient({
+  plugins: [siweClient()] // [!code highlight]
+})
+```
+
+</Step>
+
+<Step doc-variant="shadcn zaidan">
+
+<DocVariant name="shadcn">
+### Register the UI plugin
+</DocVariant>
+
+```tsx doc-variant="shadcn" title="components/providers.tsx"
+import { createEip1193WalletConnector } from "@better-auth-ui/core/plugins/siwe"
+import { siwePlugin } from "@/lib/auth/siwe-plugin"
+
+<AuthProvider
+  authClient={authClient}
+  navigate={navigate}
+  plugins={[
+    siwePlugin({
+      connector: createEip1193WalletConnector(),
+      domain: "app.example.com",
+      uri: "https://app.example.com",
+      email: "optional"
+    })
+  ]}
+>
+  {children}
+</AuthProvider>
+```
+
+<DocVariant name="zaidan">
+### Install the UI plugin
+</DocVariant>
+
+```npm doc-variant="zaidan"
+npx shadcn@latest add https://better-auth-ui.com/r/solid/siwe.json
+```
+
+</Step>
+
+<Step doc-variant="zaidan">
+
+### Register the plugin
+
+`connector` is yours to supply. It bridges the plugin to whichever wallet library you use, so BAUI never depends on one.
+
+```tsx title="src/components/providers.tsx"
+import { AuthProvider } from "@/components/auth/auth-provider"
+import { siwePlugin } from "@/lib/auth/siwe-plugin" // [!code highlight]
+import { authClient } from "@/lib/auth-client"
+
+export function Providers(props: { children?: JSX.Element }) {
+  return (
+    <AuthProvider
+      authClient={authClient}
+      navigate={navigate}
+      plugins={[
+        siwePlugin({ // [!code highlight]
+          connector,
+          domain: "app.example.com",
+          uri: "https://app.example.com"
+        })
+      ]}
+    >
+      {props.children}
+    </AuthProvider>
+  )
+}
+```
+
+Pass `walletManager` as well to render the `<WalletAccounts />` security card. Without it the plugin only contributes the sign-in button.
+
+</Step>
+
+</Steps>
+
+<DocVariant name="heroui shadcn">
+## Wallet settings
+</DocVariant>
+
+<DocVariant name="heroui">
+Better Auth does not expose browser endpoints for listing or changing SIWE wallets. Add authenticated server routes, then connect them with `SiweWalletManager`.
+</DocVariant>
+
+<DocVariant name="shadcn">
+Better Auth does not expose browser endpoints for SIWE wallet management. Create authenticated server routes and connect them through `SiweWalletManager`.
+</DocVariant>
+
+<Callout doc-variant="heroui shadcn" type="warn" title="Authorize on the server">
+
+<DocVariant name="heroui">
+Never trust a user ID from the browser. Resolve the user from the server session for every wallet operation.
+</DocVariant>
+
+<DocVariant name="shadcn">
+Resolve the user from the server session. Do not accept a user ID from the browser for wallet operations.
+</DocVariant>
+
+</Callout>
+
+```ts doc-variant="heroui shadcn" title="lib/wallet-manager.ts"
+import type {
+  SiweWalletAccount,
+  SiweWalletLinkChallenge,
+  SiweWalletManager
+} from "@better-auth-ui/core/plugins/siwe"
+
+const assertOk = async (response: Response) => {
+  if (!response.ok) {
+    throw new Error(`Wallet request failed with status ${response.status}.`)
+  }
+}
+
+const get = async <TResponse>(
+  url: string,
+  signal?: AbortSignal
+): Promise<TResponse> => {
+  const response = await fetch(url, { signal })
+  await assertOk(response)
+  return response.json() as Promise<TResponse>
+}
+
+const post = async <TResponse = void>(
+  url: string,
+  body: unknown
+): Promise<TResponse> => {
+  const response = await fetch(url, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body)
+  })
+  await assertOk(response)
+  if (response.status === 204) return undefined as TResponse
+  return response.json() as Promise<TResponse>
+}
+
+export const walletManager: SiweWalletManager = {
+  list: (signal) => get<SiweWalletAccount[]>("/api/wallets", signal),
+  createLinkChallenge: (wallet) =>
+    post<SiweWalletLinkChallenge>("/api/wallets/link-challenge", wallet),
+  link: (proof) => post("/api/wallets/link", proof),
+  unlink: (walletId) => fetch(`/api/wallets/${walletId}`, { method: "DELETE" }).then(assertOk),
+  setPrimary: (walletId) => fetch(`/api/wallets/${walletId}/primary`, { method: "POST" }).then(assertOk)
+}
+```
+
+<DocVariant name="heroui">
+Pass `walletManager` to `siwePlugin()`. BAUI then adds connect, list, primary, and remove controls to security settings.
+
+The link challenge must contain a single-use nonce. Verify its domain, chain, address, nonce, and signature before attaching the wallet.
+
+The server must delete a wallet's `walletAddress` row and matching SIWE account in one transaction.
+
+## Email modes
+
+- `"optional"` asks for an email but allows an empty value. This is the default.
+- `"required"` requires an email before the wallet opens.
+- `"none"` opens the wallet immediately.
+
+The signature proves control of the wallet. It does not verify the supplied email address.
+</DocVariant>
+
+<DocVariant name="shadcn">
+Pass `walletManager` to `siwePlugin()`. The registry item then adds connect, list, primary, and remove controls.
+
+The link challenge must use a single-use nonce. Verify its domain, chain, address, nonce, and signature before attaching the wallet.
+
+Use `email: "required"` to require an email. Use `email: "none"` to open the wallet without an email dialog.
+
+The wallet signature does not verify the supplied email address.
+</DocVariant>
+
+<Callout doc-variant="zaidan" type="warn">
+
+`domain` and `uri` must match what the server verifies. A mismatch makes every signature fail verification.
+
+</Callout>
+
+<DocVariant name="zaidan">
+## Runtime prerequisites
+
+- Server: `siwe()` from `better-auth/plugins`, with `getNonce` and `verifyMessage`.
+- Client: `siweClient()` from `better-auth/client/plugins`.
+- App: a wallet connector, and a wallet manager if you want the settings card.
+- Runtime API: SIWE query and mutation options from [Solid runtime APIs](/docs/solid).
+
+## Copied files
+
+- `src/lib/auth/siwe-plugin.ts`
+- `src/components/auth/siwe/sign-in-ethereum-button.tsx`
+- `src/components/auth/siwe/wallet-accounts.tsx`
+
+After install these files are yours. Restyle the wallet rows, change how addresses are shortened, or swap the dialog for your wallet library's own modal.
+
+## Options
+</DocVariant>
+
+<type-table doc-variant="zaidan" path="packages/core/src/plugins/siwe/siwe-plugin.ts" name="SiwePluginOptions" />
+
+<DocVariant name="zaidan">
+## Localization
+</DocVariant>
+
+<type-table doc-variant="zaidan" path="packages/core/src/plugins/siwe/siwe-localization.ts" name="SiweLocalization" />

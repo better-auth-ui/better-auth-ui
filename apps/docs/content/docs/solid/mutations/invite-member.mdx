@@ -1,29 +1,7 @@
 ---
 title: useInviteMember
 description: Invite a member to an organization.
+variant: solid
 ---
 
-## Usage
-
-```tsx
-import { useInviteMember } from "@better-auth-ui/solid/plugins/organization"
-
-const mutation = useInviteMember(authClient)
-
-mutation.mutate(/* params */)
-```
-
-<include>../../../shared/mutations/plugin-requirements.mdx#shared-organization-solid</include>
-
-## Options factory
-
-```tsx
-import { inviteMemberOptions } from "@better-auth-ui/core/plugins/organization"
-import { useMutation } from "@tanstack/solid-query"
-
-const mutation = useMutation(() => inviteMemberOptions(authClient))
-```
-
-## Params
-
-<type-table path="../../../../../../packages/core/src/plugins/organization/invite-member-mutation.ts" name="InviteMemberParams" />
+<include>../../../topics/mutations/invite-member.mdx</include>

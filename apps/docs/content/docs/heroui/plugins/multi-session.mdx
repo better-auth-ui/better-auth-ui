@@ -2,81 +2,9 @@
 icon: Users
 title: Multi Session
 description: Enable concurrent sessions so users can sign in to and switch between multiple accounts.
+variant: heroui
 ---
 
 import { Step, Steps } from 'fumadocs-ui/components/steps'
 
-<include>../../../shared/ui/plugins/multi-session.mdx#shared-overview</include>
-
-## Setup
-
-<Steps>
-
-<include>../../../shared/ui/plugins/multi-session.mdx#shared-install-the-better-auth-plugin</include>
-
-<Step>
-### Register the UI plugin
-
-Pass `multiSessionPlugin()` to `<AuthProvider>`:
-
-```tsx title="components/providers.tsx"
-import { AuthProvider } from "@better-auth-ui/heroui"
-import { multiSessionPlugin } from "@better-auth-ui/heroui/plugins/multi-session" // [!code highlight]
-
-<AuthProvider
-  authClient={authClient}
-  navigate={navigate}
-  plugins={[multiSessionPlugin()]} // [!code highlight]
->
-  {children}
-</AuthProvider>
-```
-
-</Step>
-</Steps>
-
-## Components
-
-### `<UserButton />`
-
-<ComponentPreview name="heroui-switch-account-submenu" />
-
-<include>../../../shared/ui/plugins/multi-session.mdx#shared-user-button</include>
-
-```tsx
-import { SwitchAccountSubmenu } from "@better-auth-ui/heroui/plugins/multi-session"
-
-<SwitchAccountSubmenu />
-```
-
-**Props**
-
-<type-table path="../../../../../../packages/heroui/src/components/auth/multi-session/switch-account-submenu.tsx" name="SwitchAccountSubmenuProps" />
-
-### `<ManageAccounts />`
-
-<ComponentPreview name="heroui-manage-accounts" />
-
-The `<ManageAccounts />` card is automatically rendered in account settings when the plugin is registered.
-
-**Usage**
-
-```tsx
-import { ManageAccounts } from "@better-auth-ui/heroui/plugins/multi-session"
-
-<ManageAccounts />
-```
-
-**Props**
-
-<type-table path="../../../../../../packages/heroui/src/components/auth/multi-session/manage-accounts.tsx" name="ManageAccountsProps" />
-
-<include>../../../shared/ui/plugins/multi-session.mdx#shared-options</include>
-
-<type-table path="../../../../../../packages/core/src/plugins/multi-session/multi-session-plugin.ts" name="MultiSessionPluginOptions" />
-
-## Localization
-
-<type-table path="../../../../../../packages/core/src/plugins/multi-session/multi-session-localization.ts" name="MultiSessionLocalization" />
-
-<include>../../../shared/ui/plugins/multi-session.mdx#shared-session-management</include>
+<include>../../../topics/ui/plugins/multi-session.mdx</include>

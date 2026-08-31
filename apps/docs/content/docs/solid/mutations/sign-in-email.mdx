@@ -1,37 +1,7 @@
 ---
 title: useSignInEmail
 description: Email/password sign-in mutation hook.
+variant: solid
 ---
 
-<include>../../../shared/mutations/sign-in-email.mdx#shared-behavior</include>
-
-## Usage
-
-```tsx
-import { useSignInEmail } from "@better-auth-ui/solid"
-
-const mutation = useSignInEmail(authClient)
-
-mutation.mutate(/* params */)
-```
-
-## Options factory
-
-```tsx
-import { signInEmailOptions } from "@better-auth-ui/core"
-import { useMutation } from "@tanstack/solid-query"
-
-const signIn = useMutation(() => signInEmailOptions(authClient))
-
-signIn.mutate({
-  email: "alice@example.com",
-  password: passwordInput,
-  rememberMe: true
-})
-```
-
-<include>../../../shared/mutations/sign-in-email.mdx#shared-options-factory</include>
-
-## Params
-
-<type-table path="../../../../../../packages/core/src/mutations/sign-in-email-mutation.ts" name="SignInEmailParams" />
+<include>../../../topics/mutations/sign-in-email.mdx</include>

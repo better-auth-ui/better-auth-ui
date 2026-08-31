@@ -1,30 +1,7 @@
 ---
 title: <AuthRedirect />
 description: Require a session before redirecting to a same-origin page or API callback.
+variant: zaidan
 ---
 
-`<AuthRedirect />` powers the Solid `/auth/redirect` view. It checks the
-current session, then continues to the `redirectTo` query parameter.
-
-## Installation
-
-```npm
-npx shadcn@latest add https://better-auth-ui.com/r/solid/auth-redirect.json
-```
-
-After install, `src/components/auth/auth-redirect.tsx` is app-owned. Route it
-through the unified auth component:
-
-```tsx
-import { Auth } from "@/components/auth/auth"
-
-export default function AuthPage(props: { path: string }) {
-  return <Auth path={props.path} />
-}
-```
-
-<include>../../../shared/ui/components/auth-redirect.mdx#shared-use-with-account-deletion-emails</include>
-
-## Props
-
-<type-table path="../../../../../../examples/start-solid-zaidan-example/src/components/auth/auth-redirect.tsx" name="AuthRedirectProps" />
+<include>../../../topics/ui/components/auth-redirect.mdx</include>

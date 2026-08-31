@@ -1,0 +1,31 @@
+<DocVariant name="react">
+Thin wrapper over [`useSession`](/docs/react/queries/session) that returns `session.user` as `data`. Shares the session cache entry, so no extra request is made.
+</DocVariant>
+
+<DocVariant name="solid">
+Thin wrapper over [`useSession`](/docs/solid/queries/session) that returns `session.data?.user` as `data`. It shares the session cache entry and does not make an extra request.
+</DocVariant>
+
+## Usage
+
+```tsx doc-variant="react"
+import { authClient } from "@/lib/auth-client"
+import { useUser } from "@better-auth-ui/react"
+
+const { data: user } = useUser(authClient)
+```
+
+<DocVariant name="react">
+Accepts the same arguments as `useSession`: see its [Params](/docs/react/queries/session#params).
+</DocVariant>
+
+```tsx doc-variant="solid"
+import { useUser } from "@better-auth-ui/solid"
+
+const user = useUser(authClient)
+const email = () => user.data?.email
+```
+
+<DocVariant name="solid">
+Accepts the same options as [`useSession`](/docs/solid/queries/session#params).
+</DocVariant>

@@ -1,0 +1,21 @@
+<DocVariant name="react">
+On success, the shared mutation invalidator awaits session invalidation so cached user data refreshes.
+</DocVariant>
+
+<MutationPage id="update-user">
+
+<PageSlot name="usage" doc-variant="solid">
+
+## Cache
+
+The shared mutation invalidator awaits session invalidation after a successful update so cached user data refreshes.
+
+</PageSlot>
+
+<PageSlot name="options" doc-variant="react">
+
+Note: prefer `useUpdateUser` for React components. Use the core factory when you need a stable framework-neutral options object, for example to match on `mutationKey` inside a global `MutationCache` observer.
+
+</PageSlot>
+
+</MutationPage>

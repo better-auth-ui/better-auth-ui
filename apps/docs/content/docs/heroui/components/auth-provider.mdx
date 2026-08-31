@@ -1,54 +1,7 @@
 ---
 title: <AuthProvider>
 description: Provides AuthConfig to descendant components.
+variant: heroui
 ---
 
-## Usage
-
-```tsx file=<rootDir>/../../examples/start-heroui-example/src/components/providers.tsx
-```
-
-<include>../../../shared/ui/components/auth-provider.mdx#shared-localization</include>
-
-<include>../../../shared/ui/components/auth-provider.mdx#shared-locale-example</include>
-
-Locale bundles include the core messages and all built-in plugin messages. The locale also controls date, number, currency, and relative-time formatting in HeroUI components.
-
-<include>../../../shared/ui/components/auth-provider.mdx#shared-localization-overrides</include>
-
-<include>../../../shared/ui/components/auth-provider.mdx#shared-localization-example</include>
-
-<include>../../../shared/ui/components/auth-provider.mdx#shared-match-the-browser-language</include>
-
-<include>../../../shared/ui/components/auth-provider.mdx#shared-custom-and-generic-oauth-providers</include>
-
-```tsx title="components/providers.tsx"
-import { Briefcase } from "@gravity-ui/icons"
-
-<AuthProvider
-  authClient={authClient}
-  navigate={navigate}
-  socialProviders={[
-    "github",
-    {
-      id: "company-oauth",
-      label: "Company SSO",
-      icon: <Briefcase />
-    }
-  ]}
->
-  {children}
-</AuthProvider>
-```
-
-<include>../../../shared/ui/components/auth-provider.mdx#shared-generic-oauth-server</include>
-
-<include>../../../shared/ui/components/auth-provider.mdx#shared-popup-social-sign-in</include>
-
-<include>../../../shared/ui/components/auth-provider.mdx#shared-popup-react-client</include>
-
-<include>../../../shared/ui/components/auth-provider.mdx#shared-popup-provider</include>
-
-## Props
-
-<type-table path="../../../../../../packages/heroui/src/components/auth/auth-provider.tsx" name="AuthProviderProps" />
+<include>../../../topics/ui/components/auth-provider.mdx</include>

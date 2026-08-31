@@ -2,83 +2,10 @@
 icon: Activity
 title: Dash
 description: Add personal activity and organization audit logs from Better Auth Infrastructure Dash.
+variant: shadcn
 ---
 
 import { Callout } from "fumadocs-ui/components/callout"
 import { Step, Steps } from "fumadocs-ui/components/steps"
 
-<include>../../../shared/ui/plugins/dash.mdx#shared-overview</include>
-
-## Setup
-
-<Steps>
-
-<include>../../../shared/ui/plugins/dash.mdx#shared-configure-dash-on-the-server</include>
-
-<Step>
-
-<include>../../../shared/ui/plugins/dash.mdx#shared-add-the-client-plugin</include>
-
-</Step>
-<Step>
-### Install the registry item
-
-```bash
-bunx shadcn@latest add @better-auth-ui/dash
-```
-
-This installs the activity views, local plugin factory, and required shadcn/ui components.
-
-</Step>
-<Step>
-### Register the UI plugin
-
-```tsx title="components/providers.tsx"
-import { AuthProvider } from "@/components/auth/auth-provider"
-import { dashPlugin } from "@/lib/auth/dash-plugin"
-import { organizationPlugin } from "@/lib/auth/organization-plugin"
-
-<AuthProvider
-  authClient={authClient}
-  navigate={navigate}
-  plugins={[organizationPlugin(), dashPlugin()]}
->
-  {children}
-</AuthProvider>
-```
-
-<include>../../../shared/ui/plugins/dash.mdx#shared-register-the-ui-plugin</include>
-
-</Step>
-</Steps>
-
-<include>../../../shared/ui/plugins/dash.mdx#shared-static-routes</include>
-
-<include>../../../shared/ui/plugins/dash.mdx#shared-registry-route-paths</include>
-
-<include>../../../shared/ui/plugins/dash.mdx#shared-admin-user-activity</include>
-
-## Headless hooks
-
-```tsx
-import {
-  useDashAllAuditLogs,
-  useDashAuditLogs,
-  useDashUserAuditLogs
-} from "@better-auth-ui/react/plugins/dash"
-```
-
-<include>../../../shared/ui/plugins/dash.mdx#shared-components-and-hooks</include>
-
-## Copied files
-
-- `src/lib/auth/dash-plugin.ts`
-- `src/components/auth/dash/activity.tsx`
-
-## Options
-
-<type-table path="../../../../../../packages/core/src/plugins/dash/dash-plugin.ts" name="DashPluginOptions" />
-
-## Localization
-
-<type-table path="../../../../../../packages/core/src/plugins/dash/dash-localization.ts" name="DashLocalization" />
+<include>../../../topics/ui/plugins/dash.mdx</include>

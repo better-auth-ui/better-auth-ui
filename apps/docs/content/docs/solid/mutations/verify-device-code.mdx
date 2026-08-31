@@ -1,29 +1,7 @@
 ---
 title: verifyDeviceCodeOptions
 description: Verify and claim a device user code for the current session.
+variant: solid
 ---
 
-<include>../../../shared/mutations/verify-device-code.mdx#shared-overview</include>
-
-## Options factory
-
-```tsx
-import { verifyDeviceCodeOptions } from "@better-auth-ui/core/plugins/device-authorization"
-import { createMutation } from "@tanstack/solid-query"
-
-const verifyDeviceCode = createMutation(() =>
-  verifyDeviceCodeOptions(authClient)
-)
-
-verifyDeviceCode.mutate({
-  query: {
-    user_code: "ABCD1234"
-  }
-})
-```
-
-<include>../../../shared/mutations/verify-device-code.mdx#shared-usage</include>
-
-## Params
-
-<type-table path="../../../../../../packages/core/src/plugins/device-authorization/verify-device-code-mutation.ts" name="VerifyDeviceCodeParams" />
+<include>../../../topics/mutations/verify-device-code.mdx</include>

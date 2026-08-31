@@ -1,53 +1,7 @@
 ---
 title: useListOAuthConsents
 description: List the OAuth applications the current user has authorized.
+variant: react
 ---
 
-<include>../../../shared/queries/list-oauth-consents.mdx#shared-overview</include>
-
-## Usage
-
-```tsx
-import { groupOAuthConsents } from "@better-auth-ui/core/plugins/oauth-provider"
-import { useAuth } from "@better-auth-ui/react"
-import { useListOAuthConsents } from "@better-auth-ui/react/plugins/oauth-provider"
-
-const { authClient } = useAuth()
-const { data: consents } = useListOAuthConsents(authClient)
-
-const applications = groupOAuthConsents(consents)
-```
-
-<include>../../../shared/queries/list-oauth-consents.mdx#shared-usage</include>
-
-## Client options factory and router-loader helpers
-
-```tsx
-import {
-  ensureListOAuthConsents,
-  fetchListOAuthConsents,
-  listOAuthConsentsOptions,
-  prefetchListOAuthConsents
-} from "@better-auth-ui/core/plugins/oauth-provider"
-
-const options = listOAuthConsentsOptions(authClient, userId)
-await ensureListOAuthConsents(queryClient, authClient, userId)
-await prefetchListOAuthConsents(queryClient, authClient, userId)
-const consents = await fetchListOAuthConsents(queryClient, authClient, userId)
-```
-
-## Invalidation
-
-```ts
-import { oauthProviderQueryKeys } from "@better-auth-ui/core/plugins/oauth-provider"
-
-queryClient.invalidateQueries({
-  queryKey: oauthProviderQueryKeys.consents(userId)
-})
-```
-
-[`useDeleteOAuthConsent`](/docs/react/mutations/delete-oauth-consent) already awaits this invalidation, so a partially failed removal still ends up reflecting the server's state.
-
-## Params
-
-<type-table path="../../../../../../packages/core/src/plugins/oauth-provider/list-oauth-consents-query.ts" name="ListOAuthConsentsParams" />
+<include>../../../topics/queries/list-oauth-consents.mdx</include>

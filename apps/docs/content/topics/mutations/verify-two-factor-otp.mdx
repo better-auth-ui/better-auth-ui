@@ -1,0 +1,19 @@
+<DocVariant name="react">
+Send the code with `useSendTwoFactorOtp` first. Refetches the session on success.
+</DocVariant>
+
+<DocVariant name="solid">
+<include>../../shared/mutations/plugin-requirements.mdx#shared-two-factor</include>
+
+Send the code with `sendTwoFactorOtpOptions` first. Refetches the session on success.
+</DocVariant>
+
+<MutationPage id="verify-two-factor-otp">
+
+<PageSlot name="usage" doc-variant="react">
+
+`useVerifyTwoFactorOtp` requires the Better Auth `twoFactor` plugin. Cast `authClient` to `TwoFactorAuthClient` so TypeScript picks up the plugin-extended method signature.
+
+</PageSlot>
+
+</MutationPage>

@@ -1,0 +1,31 @@
+<DocVariant name="react">
+```tsx
+import {
+  type PhoneNumberAuthClient
+} from "@better-auth-ui/core/plugins/phone-number"
+import { useAuth } from "@better-auth-ui/react"
+import { useVerifyPhoneNumber } from "@better-auth-ui/react/plugins/phone-number"
+
+const { authClient } = useAuth()
+const { mutate: verifyPhoneNumber } = useVerifyPhoneNumber(
+  authClient as PhoneNumberAuthClient
+)
+
+verifyPhoneNumber({
+  phoneNumber: "+12025550123",
+  code: "123456"
+})
+```
+
+Pass `updatePhoneNumber: true` while authenticated to replace the current user's phone number. The mutation refreshes session data after success.
+</DocVariant>
+
+<MutationPage id="verify-phone-number">
+
+<PageSlot name="usage" doc-variant="solid">
+
+Pass `updatePhoneNumber: true` while authenticated to replace the current phone number. Session data refreshes after success.
+
+</PageSlot>
+
+</MutationPage>

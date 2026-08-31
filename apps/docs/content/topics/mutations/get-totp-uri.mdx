@@ -1,0 +1,15 @@
+<DocVariant name="solid">
+<include>../../shared/mutations/plugin-requirements.mdx#shared-two-factor</include>
+</DocVariant>
+
+This operation is a mutation because the endpoint uses POST. It accepts the password and returns a secret that the application must not cache.
+
+<MutationPage id="get-totp-uri">
+
+<PageSlot name="usage" doc-variant="react">
+
+`useGetTotpUri` requires the Better Auth `twoFactor` plugin. Cast `authClient` to `TwoFactorAuthClient` so TypeScript picks up the plugin-extended method signature.
+
+</PageSlot>
+
+</MutationPage>

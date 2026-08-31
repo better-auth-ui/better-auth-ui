@@ -1,54 +1,7 @@
 ---
 title: <AuthProvider>
 description: Provides AuthConfig to descendant components.
+variant: shadcn
 ---
 
-## Usage
-
-```tsx file=<rootDir>/../../examples/start-shadcn-example/src/components/providers.tsx
-```
-
-<include>../../../shared/ui/components/auth-provider.mdx#shared-localization</include>
-
-<include>../../../shared/ui/components/auth-provider.mdx#shared-locale-example</include>
-
-<include>../../../shared/ui/components/auth-provider.mdx#shared-locale-bundles</include>
-
-<include>../../../shared/ui/components/auth-provider.mdx#shared-localization-overrides</include>
-
-<include>../../../shared/ui/components/auth-provider.mdx#shared-localization-example</include>
-
-<include>../../../shared/ui/components/auth-provider.mdx#shared-match-the-browser-language</include>
-
-<include>../../../shared/ui/components/auth-provider.mdx#shared-custom-and-generic-oauth-providers</include>
-
-```tsx title="components/providers.tsx"
-import { Building2 } from "lucide-react"
-
-<AuthProvider
-  authClient={authClient}
-  navigate={navigate}
-  socialProviders={[
-    "github",
-    {
-      id: "company-oauth",
-      label: "Company SSO",
-      icon: <Building2 />
-    }
-  ]}
->
-  {children}
-</AuthProvider>
-```
-
-<include>../../../shared/ui/components/auth-provider.mdx#shared-generic-oauth-server</include>
-
-<include>../../../shared/ui/components/auth-provider.mdx#shared-popup-social-sign-in</include>
-
-<include>../../../shared/ui/components/auth-provider.mdx#shared-popup-react-client</include>
-
-<include>../../../shared/ui/components/auth-provider.mdx#shared-popup-provider</include>
-
-## Props
-
-<type-table path="../../../../../../packages/react/src/components/auth/auth-provider.tsx" name="AuthProviderProps" />
+<include>../../../topics/ui/components/auth-provider.mdx</include>

@@ -1,29 +1,7 @@
 ---
 title: useCancelInvitation
 description: Cancel an organization invitation.
+variant: solid
 ---
 
-## Usage
-
-```tsx
-import { useCancelInvitation } from "@better-auth-ui/solid/plugins/organization"
-
-const mutation = useCancelInvitation(authClient)
-
-mutation.mutate(/* params */)
-```
-
-<include>../../../shared/mutations/plugin-requirements.mdx#shared-organization-solid</include>
-
-## Options factory
-
-```tsx
-import { cancelInvitationOptions } from "@better-auth-ui/core/plugins/organization"
-import { useMutation } from "@tanstack/solid-query"
-
-const mutation = useMutation(() => cancelInvitationOptions(authClient))
-```
-
-## Params
-
-<type-table path="../../../../../../packages/core/src/plugins/organization/cancel-invitation-mutation.ts" name="CancelInvitationParams" />
+<include>../../../topics/mutations/cancel-invitation.mdx</include>

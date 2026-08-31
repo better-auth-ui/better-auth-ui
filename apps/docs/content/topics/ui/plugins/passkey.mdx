@@ -1,0 +1,477 @@
+The passkey plugin adds passwordless authentication using WebAuthn. Users can sign in with their device authenticator (Touch ID, Face ID, Windows Hello) and manage registered passkeys from their security settings.
+
+It contributes:
+
+<DocVariant name="heroui shadcn">
+- A "Continue with Passkey" button rendered on the sign-in and magic-link views (hidden on sign-up)
+- A `<Passkeys />` security card for listing, adding, renaming, and deleting registered passkeys
+- `useSignInPasskey`, `useAddPasskey`, `useUpdatePasskey`, `useDeletePasskey`, and `useListPasskeys` hooks
+</DocVariant>
+
+<DocVariant name="zaidan">
+- A "Continue with Passkey" button rendered on the sign-in and magic-link views (hidden on sign-up)
+- A `<PasskeysSettings />` security card for listing, adding, renaming, and deleting registered passkeys
+- Solid query and mutation options such as `signInPasskeyOptions`, `listPasskeysOptions`, `addPasskeyOptions`, `updatePasskeyOptions`, and `deletePasskeyOptions`
+</DocVariant>
+
+## Setup
+
+<Steps>
+
+<Step>
+
+### Install the Better Auth plugin
+
+Install the [`@better-auth/passkey`](https://www.better-auth.com/docs/plugins/passkey) package and add it to your Better Auth server config:
+
+```ts doc-variant="heroui shadcn" title="lib/auth.ts"
+import { betterAuth } from "better-auth"
+import { passkey } from "@better-auth/passkey" // [!code highlight]
+
+export const auth = betterAuth({
+  // ...
+  plugins: [
+    passkey() // [!code highlight]
+  ]
+})
+```
+
+```ts doc-variant="zaidan" title="src/lib/auth.ts"
+import { betterAuth } from "better-auth"
+import { passkey } from "@better-auth/passkey" // [!code highlight]
+
+export const auth = betterAuth({
+  // ...
+  plugins: [
+    passkey() // [!code highlight]
+  ]
+})
+```
+
+<DocVariant name="zaidan">
+Configure the WebAuthn origin and trusted origins before production so browser authenticators can complete ceremonies on your real domain.
+</DocVariant>
+
+</Step>
+
+<Step>
+
+### Install the matching client plugin
+
+Add `passkeyClient()` to your auth client so `authClient.signIn.passkey` and `authClient.passkey.*` are available:
+
+```ts doc-variant="heroui shadcn" title="lib/auth-client.ts"
+import { createAuthClient } from "better-auth/react"
+import { passkeyClient } from "@better-auth/passkey/client" // [!code highlight]
+
+export const authClient = createAuthClient({
+  plugins: [passkeyClient()] // [!code highlight]
+})
+```
+
+```ts doc-variant="zaidan" title="src/lib/auth-client.ts"
+import { createAuthClient } from "better-auth/solid"
+import { passkeyClient } from "@better-auth/passkey/client" // [!code highlight]
+
+export const authClient = createAuthClient({
+  plugins: [passkeyClient()] // [!code highlight]
+})
+```
+
+</Step>
+
+<Step>
+
+<DocVariant name="heroui">
+### Register the UI plugin
+
+Pass `passkeyPlugin()` to `<AuthProvider>`:
+</DocVariant>
+
+```tsx doc-variant="heroui" title="components/providers.tsx"
+import { AuthProvider } from "@better-auth-ui/heroui"
+import { passkeyPlugin } from "@better-auth-ui/heroui/plugins/passkey" // [!code highlight]
+
+<AuthProvider
+  authClient={authClient}
+  navigate={navigate}
+  plugins={[passkeyPlugin()]} // [!code highlight]
+>
+  {children}
+</AuthProvider>
+```
+
+<DocVariant name="shadcn zaidan">
+### Install the UI plugin
+</DocVariant>
+
+<DocVariant name="shadcn">
+Run the shadcn CLI to install the passkey button, passkey management card, and the `passkeyPlugin()` factory into your project:
+</DocVariant>
+
+```npm doc-variant="shadcn"
+npx shadcn@latest add @better-auth-ui/passkey
+```
+
+<DocVariant name="zaidan">
+Run the shadcn CLI to install the passkey button, passkey management card, and the local `passkeyPlugin()` factory into your project:
+
+<include>../../../shared/ui/installation/zaidan.mdx#shared-passkey</include>
+</DocVariant>
+
+<DocVariant name="shadcn zaidan">
+This drops the following into your codebase:
+</DocVariant>
+
+<DocVariant name="shadcn">
+- `src/lib/auth/auth-plugin.ts`: local `AuthPlugin` typing widener
+- `src/lib/auth/passkey-plugin.ts`: `passkeyPlugin()` factory
+- `src/components/auth/passkey/passkey-button.tsx`: the "Continue with Passkey" sign-in button
+- `src/components/auth/passkey/passkeys.tsx`: the passkey management card
+- `src/components/auth/passkey/passkey.tsx`: individual passkey row
+- `src/components/auth/passkey/passkey-skeleton.tsx`: skeleton shown while passkeys load
+- `src/components/auth/passkey/passkeys-empty.tsx`: empty state shown when no passkeys exist
+- `src/components/auth/passkey/add-passkey-dialog.tsx`: dialog for registering a new passkey
+- `src/components/auth/passkey/delete-passkey-dialog.tsx`: confirmation dialog for revoking a passkey
+</DocVariant>
+
+<DocVariant name="zaidan">
+- `src/lib/auth/passkey-plugin.ts`: `passkeyPlugin()` factory
+- `src/components/auth/passkey/passkey-localization.ts`: local localization resolver for copied Passkey UI
+- `src/components/auth/passkey/passkey-button.tsx`: the "Continue with Passkey" sign-in button
+- `src/components/auth/passkey/passkeys.tsx`: the passkey management card
+- `src/components/auth/passkey/passkey.tsx`: individual passkey row
+- `src/components/auth/passkey/passkey-skeleton.tsx`: loading placeholder shown while passkeys load
+- `src/components/auth/passkey/passkeys-empty.tsx`: empty state shown when no passkeys exist
+- `src/components/auth/passkey/add-passkey-dialog.tsx`: dialog for registering a new passkey
+- `src/components/auth/passkey/delete-passkey-dialog.tsx`: confirmation dialog for deleting a passkey
+- `src/components/ui/spinner.tsx`: pending indicator reused by Passkey actions
+</DocVariant>
+
+</Step>
+
+<Step doc-variant="shadcn zaidan">
+
+### Register the plugin
+
+<DocVariant name="shadcn">
+Pass `passkeyPlugin()` to `<AuthProvider>`:
+</DocVariant>
+
+```tsx doc-variant="shadcn" title="components/providers.tsx"
+import { passkeyPlugin } from "@/lib/auth/passkey-plugin" // [!code highlight]
+import { AuthProvider } from "@/components/auth/auth-provider"
+
+<AuthProvider
+  authClient={authClient}
+  navigate={navigate}
+  plugins={[passkeyPlugin()]} // [!code highlight]
+>
+  {children}
+</AuthProvider>
+```
+
+<DocVariant name="zaidan">
+Pass `passkeyPlugin()` to `<AuthProvider>`. The local plugin registers the auth-flow button and the security settings card.
+</DocVariant>
+
+```tsx doc-variant="zaidan" title="src/components/providers.tsx"
+import { AuthProvider } from "@/components/auth/auth-provider"
+import { passkeyPlugin } from "@/lib/auth/passkey-plugin" // [!code highlight]
+import { authClient } from "@/lib/auth-client"
+
+export function Providers(props: { children?: JSX.Element }) {
+  return (
+    <AuthProvider
+      authClient={authClient}
+      navigate={navigate}
+      plugins={[passkeyPlugin()]} // [!code highlight]
+    >
+      {props.children}
+    </AuthProvider>
+  )
+}
+```
+
+<DocVariant name="zaidan">
+When the plugin is registered, `<SignIn />` can render `<PasskeyButton />`, and `<SecuritySettings />` can render `<PasskeysSettings />` through plugin-contributed `securityCards`.
+</DocVariant>
+
+</Step>
+
+</Steps>
+
+<DocVariant name="zaidan">
+## Runtime prerequisites
+
+- Server: `passkey()` from `@better-auth/passkey`.
+- Client: `passkeyClient()` from `@better-auth/passkey/client`.
+- Production: set the WebAuthn origin and trusted origins correctly.
+- Runtime API: passkey options and queries from [Solid runtime APIs](/docs/solid).
+
+## Copied files
+
+- `src/lib/auth/passkey-plugin.ts`
+- `src/components/auth/passkey/passkey-localization.ts`
+- `src/components/auth/passkey/passkey-button.tsx`
+- `src/components/auth/passkey/passkeys.tsx`
+- `src/components/auth/passkey/passkey.tsx`
+- `src/components/auth/passkey/passkey-skeleton.tsx`
+- `src/components/auth/passkey/passkeys-empty.tsx`
+- `src/components/auth/passkey/add-passkey-dialog.tsx`
+- `src/components/auth/passkey/delete-passkey-dialog.tsx`
+- `src/components/ui/spinner.tsx`
+</DocVariant>
+
+## Components
+
+<DocVariant name="zaidan">
+These previews use seeded Storybook fixtures and mocked Passkey methods. They do not call `navigator.credentials` or start real WebAuthn ceremonies.
+</DocVariant>
+
+### `<SignIn />`
+
+<ComponentPreview doc-variant="heroui" name="heroui-passkey-sign-in" />
+
+<ComponentPreview doc-variant="shadcn" name="shadcn-passkey-sign-in" />
+
+<DocVariant name="heroui shadcn">
+A "Continue with Passkey" button is automatically rendered on the `<SignIn />` and `<MagicLink />` views when the plugin is registered (hidden on sign-up).
+
+**Usage**
+</DocVariant>
+
+```tsx doc-variant="heroui"
+import { PasskeyButton } from "@better-auth-ui/heroui/plugins/passkey"
+
+<PasskeyButton />
+```
+
+```tsx doc-variant="shadcn"
+import { PasskeyButton } from "@/components/auth/passkey/passkey-button"
+
+<PasskeyButton />
+```
+
+<ZaidanStory doc-variant="zaidan"
+  storyId="zaidan-plugins-passkey--passkey-sign-in-preview"
+  title="Zaidan Passkey Sign-In preview"
+  height={680}
+/>
+
+<DocVariant name="zaidan">
+A "Continue with Passkey" button is automatically rendered on the `<SignIn />` and magic-link views when the plugin is registered. It is hidden on sign-up.
+
+**Usage**
+</DocVariant>
+
+```tsx doc-variant="zaidan" file=<rootDir>/../../examples/start-solid-zaidan-example/src/demos/passkey/passkey-sign-in.tsx
+```
+
+**Props**
+
+<type-table doc-variant="heroui" path="packages/heroui/src/components/auth/passkey/passkey-button.tsx" name="PasskeyButtonProps" />
+
+<type-table doc-variant="shadcn" path="examples/start-shadcn-example/src/components/auth/passkey/passkey-button.tsx" name="PasskeyButtonProps" />
+
+<DocVariant name="heroui shadcn">
+### `<Passkeys />`
+</DocVariant>
+
+<ComponentPreview doc-variant="heroui" name="heroui-passkeys" />
+
+<DocVariant name="heroui">
+The `<Passkeys />` security card is automatically rendered on the security settings page when the plugin is registered.
+</DocVariant>
+
+<ComponentPreview doc-variant="shadcn" name="shadcn-passkeys" />
+
+<DocVariant name="shadcn">
+The security settings page shows `<Passkeys />` when the layout renders plugin `securityCards`. Add `passkeyPlugin()` to `plugins` to provide this card.
+</DocVariant>
+
+<type-table doc-variant="zaidan" path="examples/start-solid-zaidan-example/src/components/auth/passkey/passkey-button.tsx" name="PasskeyButtonProps" />
+
+<DocVariant name="zaidan">
+### `<PasskeysSettings />`
+</DocVariant>
+
+<ZaidanStory doc-variant="zaidan"
+  storyId="zaidan-plugins-passkey--passkeys-preview"
+  title="Zaidan Passkeys preview"
+  height={360}
+/>
+
+<DocVariant name="zaidan">
+The `<PasskeysSettings />` security card is rendered on the security settings page when your layout renders each plugin's `securityCards` and `passkeyPlugin()` is registered. It lists registered passkeys and provides add / delete dialogs.
+</DocVariant>
+
+**Usage**
+
+```tsx doc-variant="heroui"
+import { Passkeys } from "@better-auth-ui/heroui/plugins/passkey"
+
+<Passkeys />
+```
+
+```tsx doc-variant="shadcn"
+import { Passkeys } from "@/components/auth/passkey/passkeys"
+
+<Passkeys />
+```
+
+```tsx doc-variant="zaidan" file=<rootDir>/../../examples/start-solid-zaidan-example/src/demos/passkey/passkeys.tsx
+```
+
+**Props**
+
+<type-table doc-variant="heroui" path="packages/heroui/src/components/auth/passkey/passkeys.tsx" name="PasskeysProps" />
+
+<type-table doc-variant="shadcn" path="examples/start-shadcn-example/src/components/auth/passkey/passkeys.tsx" name="PasskeysProps" />
+
+<type-table doc-variant="zaidan" path="examples/start-solid-zaidan-example/src/components/auth/passkey/passkeys.tsx" name="PasskeysSettingsProps" />
+
+## Passkey registration policy
+
+By default, the add-passkey dialog does not set `authenticatorAttachment`.
+The browser and operating system show the available passkey options.
+
+Set a preference in the plugin when all registrations must use one authenticator type:
+
+```ts
+passkeyPlugin({ authenticatorAttachment: "platform" })
+passkeyPlugin({ authenticatorAttachment: "cross-platform" })
+```
+
+`"platform"` prefers the current device. `"cross-platform"` prefers a security key or another device. The dialog does not show an attachment selector.
+
+`useAddPasskey` accepts every parameter exposed by `authClient.passkey.addPasskey`. Use this hook for custom registration flows:
+
+```tsx doc-variant="heroui shadcn"
+const { mutate: addPasskey } = useAddPasskey(
+  authClient as PasskeyAuthClient
+)
+
+addPasskey({
+  name: "Work laptop",
+  authenticatorAttachment: "platform",
+  extensions: { credProps: true },
+  returnWebAuthnResponse: true
+})
+```
+
+```tsx doc-variant="zaidan"
+const addPasskey = useAddPasskey(auth.authClient)
+
+addPasskey.mutate({
+  name: "Work laptop",
+  authenticatorAttachment: "platform",
+  extensions: { credProps: true },
+  returnWebAuthnResponse: true
+})
+```
+
+<Callout>
+`residentKey` and `userVerification` are server plugin policies. They are not
+parameters of `authClient.passkey.addPasskey`, so the client UI does not expose
+them.
+</Callout>
+
+## Passkey autofill
+
+With the plugin registered, the sign-in form asks the browser to offer saved
+passkeys straight from its autofill dropdown, so most people never press the
+passkey button at all. This is the WebAuthn conditional UI flow.
+
+Two pieces make it work, and the built-in components already handle both:
+
+- The identifier and password fields carry `webauthn` as the last token of
+  their `autocomplete` attribute, added by `withPasskeyAutoFill`.
+- `<PasskeyButton />` calls `usePasskeyAutoFill`, which opens a conditionally
+  mediated request once the browser reports that it supports one.
+
+Browsers without conditional mediation ignore the extra token and never get the
+request, so the button stays as the fallback everywhere.
+
+Turn the whole thing off with:
+
+```ts
+passkeyPlugin({ autoFill: false })
+```
+
+If you write your own sign-in form, add the token and start the conditional
+request:
+
+```tsx doc-variant="heroui shadcn"
+import type { PasskeyAuthClient } from "@better-auth-ui/core/plugins/passkey"
+import {
+  isPasskeyAutoFillEnabled,
+  withPasskeyAutoFill
+} from "@better-auth-ui/core/plugins/passkey"
+import { usePasskeyAutoFill } from "@better-auth-ui/react/plugins/passkey"
+
+const { authClient, plugins } = useAuth()
+const passkeyAutoFill = isPasskeyAutoFillEnabled(plugins)
+
+usePasskeyAutoFill(authClient as PasskeyAuthClient)
+
+<Input autoComplete={withPasskeyAutoFill("email", passkeyAutoFill)} />
+```
+
+```tsx doc-variant="zaidan"
+import type { PasskeyAuthClient } from "@better-auth-ui/core/plugins/passkey"
+import {
+  isPasskeyAutoFillEnabled,
+  withPasskeyAutoFill
+} from "@better-auth-ui/core/plugins/passkey"
+import { usePasskeyAutoFill } from "@better-auth-ui/solid/plugins/passkey"
+
+const auth = useAuth<PasskeyAuthClient>()
+const passkeyAutoFill = isPasskeyAutoFillEnabled(auth.plugins)
+
+usePasskeyAutoFill(auth.authClient)
+
+<Input autocomplete={withPasskeyAutoFill("email", passkeyAutoFill)} />
+```
+
+<Callout type="warn">
+`navigator.credentials.get()` accepts an `AbortSignal`. The bundled hook calls
+the Better Auth passkey client, which does not expose that signal. Unmounting
+the form only stops a pending availability probe. It does not cancel a request
+that already started.
+
+If your custom implementation calls `navigator.credentials.get()` directly,
+pass an `AbortSignal` and abort it during cleanup.
+</Callout>
+
+## Options
+
+```ts
+passkeyPlugin({
+  // Omit this option to let the browser show all available choices.
+  authenticatorAttachment: "platform",
+  // Override any of the plugin's localization strings.
+  localization: {
+    passkeys: "Security Keys"
+  }
+})
+```
+
+<type-table path="packages/core/src/plugins/passkey/passkey-plugin.ts" name="PasskeyPluginOptions" />
+
+## Localization
+
+<type-table path="packages/core/src/plugins/passkey/passkey-localization.ts" name="PasskeyLocalization" />
+
+<DocVariant name="zaidan">
+The copied Zaidan Passkey components resolve labels from `passkeyPlugin({ localization })` and fall back to the default Passkey localization.
+
+## Solid runtime APIs
+
+Use the low-level Solid runtime helpers when building custom Passkey UI:
+
+- [`signInPasskeyOptions`](/docs/solid/mutations/sign-in-passkey)
+- [`addPasskeyOptions`](/docs/solid/mutations/add-passkey)
+- [`deletePasskeyOptions`](/docs/solid/mutations/delete-passkey)
+- [`listPasskeysOptions`](/docs/solid/queries/list-passkeys)
+</DocVariant>

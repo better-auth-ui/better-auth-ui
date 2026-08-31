@@ -1,37 +1,7 @@
 ---
 title: useVerifyPhoneNumber
 description: Verify a phone code or update the current user's phone number.
+variant: react
 ---
 
-```tsx
-import {
-  type PhoneNumberAuthClient
-} from "@better-auth-ui/core/plugins/phone-number"
-import { useAuth } from "@better-auth-ui/react"
-import { useVerifyPhoneNumber } from "@better-auth-ui/react/plugins/phone-number"
-
-const { authClient } = useAuth()
-const { mutate: verifyPhoneNumber } = useVerifyPhoneNumber(
-  authClient as PhoneNumberAuthClient
-)
-
-verifyPhoneNumber({
-  phoneNumber: "+12025550123",
-  code: "123456"
-})
-```
-
-Pass `updatePhoneNumber: true` while authenticated to replace the current user's phone number. The mutation refreshes session data after success.
-
-## Options factory
-
-```tsx
-import { verifyPhoneNumberOptions } from "@better-auth-ui/core/plugins/phone-number"
-import { useMutation } from "@tanstack/react-query"
-
-const { mutate } = useMutation(verifyPhoneNumberOptions(authClient))
-```
-
-## Params
-
-<type-table path="../../../../../../packages/core/src/plugins/phone-number/verify-phone-number-mutation.ts" name="VerifyPhoneNumberParams" />
+<include>../../../topics/mutations/verify-phone-number.mdx</include>

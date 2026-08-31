@@ -1,29 +1,7 @@
 ---
 title: useLeaveOrganization
 description: Leave an organization.
+variant: solid
 ---
 
-## Usage
-
-```tsx
-import { useLeaveOrganization } from "@better-auth-ui/solid/plugins/organization"
-
-const mutation = useLeaveOrganization(authClient)
-
-mutation.mutate(/* params */)
-```
-
-<include>../../../shared/mutations/plugin-requirements.mdx#shared-organization-solid</include>
-
-## Options factory
-
-```tsx
-import { leaveOrganizationOptions } from "@better-auth-ui/core/plugins/organization"
-import { useMutation } from "@tanstack/solid-query"
-
-const mutation = useMutation(() => leaveOrganizationOptions(authClient))
-```
-
-## Params
-
-<type-table path="../../../../../../packages/core/src/plugins/organization/leave-organization-mutation.ts" name="LeaveOrganizationParams" />
+<include>../../../topics/mutations/leave-organization.mdx</include>

@@ -1,31 +1,7 @@
 ---
 title: useSignInUsername
 description: Username/password sign-in mutation hook.
+variant: solid
 ---
 
-Requires the Better Auth username plugin. Import your configured `authClient`. It already carries the username methods from `createAuthClient`.
-
-## Usage
-
-```tsx
-import { useSignInUsername } from "@better-auth-ui/solid/plugins/username"
-
-const mutation = useSignInUsername(authClient)
-
-mutation.mutate(/* params */)
-```
-
-## Options factory
-
-```tsx
-import { signInUsernameOptions } from "@better-auth-ui/core/plugins/username"
-import { useMutation } from "@tanstack/solid-query"
-
-const signIn = useMutation(() => signInUsernameOptions(authClient))
-
-signIn.mutate({ username: "alice", password: passwordInput })
-```
-
-## Params
-
-<type-table path="../../../../../../packages/core/src/plugins/username/sign-in-username-mutation.ts" name="SignInUsernameParams" />
+<include>../../../topics/mutations/sign-in-username.mdx</include>

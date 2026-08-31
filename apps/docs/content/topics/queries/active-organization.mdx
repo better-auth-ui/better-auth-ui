@@ -1,0 +1,96 @@
+<DocVariant name="react">
+<include>../../shared/queries/organization.mdx#shared-requirements</include>
+</DocVariant>
+
+## Usage
+
+```tsx doc-variant="react"
+import { authClient } from "@/lib/auth-client"
+import { useActiveOrganization } from "@better-auth-ui/react/plugins/organization"
+
+const result = useActiveOrganization(authClient)
+```
+
+<DocVariant name="react">
+## Client options factory and router-loader helpers
+</DocVariant>
+
+```tsx doc-variant="react"
+import {
+  activeOrganizationOptions,
+  ensureActiveOrganization,
+  fetchActiveOrganization,
+  prefetchActiveOrganization
+} from "@better-auth-ui/core/plugins/organization"
+
+const options = activeOrganizationOptions(authClient, userId)
+await ensureActiveOrganization(queryClient, authClient, userId)
+await prefetchActiveOrganization(queryClient, authClient, userId)
+const organization = await fetchActiveOrganization(queryClient, authClient, userId)
+```
+
+```tsx doc-variant="solid"
+import { useActiveOrganization } from "@better-auth-ui/solid/plugins/organization"
+
+const result = useActiveOrganization(authClient)
+```
+
+<DocVariant name="solid">
+<include>../../shared/queries/organization.mdx#shared-requirements</include>
+
+## Options factory
+</DocVariant>
+
+```tsx doc-variant="solid"
+import { activeOrganizationOptions } from "@better-auth-ui/core/plugins/organization"
+import { createQuery } from "@tanstack/solid-query"
+
+const query = createQuery(() =>
+  activeOrganizationOptions(authClient, userId)
+)
+```
+
+## Notes
+
+- `useActiveOrganization` treats `slug: undefined` as the session active organization, a string slug as a URL-selected organization, and `slug: null` as intentionally no active organization.
+- An explicit `query.organizationId` or `query.organizationSlug` takes precedence over the plugin slug.
+- Member, invitation, and permission helpers follow upstream active-organization fallback behavior when an organization id is not provided.
+- `useHasPermission` preserves Better Auth's flat permission parameter shape.
+
+## Server-side prefetching
+
+<DocVariant name="react">
+For server loaders, import from `@better-auth-ui/core/plugins/organization/server`. The server helper uses your Better Auth server instance and request params so the prefetched key hydrates into `useActiveOrganization`.
+</DocVariant>
+
+```ts doc-variant="react"
+import { ensureActiveOrganization } from "@better-auth-ui/core/plugins/organization/server"
+import { getRequestHeaders } from "@tanstack/react-start/server"
+
+import { auth } from "@/lib/auth"
+
+await ensureActiveOrganization(queryClient, auth, userId, {
+  headers: getRequestHeaders(),
+  query: { organizationSlug: "acme" }
+})
+```
+
+<DocVariant name="solid">
+<include>../../shared/queries/organization.mdx#shared-solid-client-prefetching</include>
+</DocVariant>
+
+```ts doc-variant="solid"
+import {
+  ensureActiveOrganization,
+  fetchActiveOrganization,
+  prefetchActiveOrganization
+} from "@better-auth-ui/core/plugins/organization"
+
+await ensureActiveOrganization(queryClient, authClient, userId, { query: { organizationId: "org_123" } })
+await prefetchActiveOrganization(queryClient, authClient, userId, { query: { organizationId: "org_123" } })
+const organization = await fetchActiveOrganization(queryClient, authClient, userId, { query: { organizationId: "org_123" } })
+```
+
+## Params
+
+<type-table path="packages/core/src/plugins/organization/active-organization-query.ts" name="ActiveOrganizationParams" />

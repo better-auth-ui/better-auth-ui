@@ -1,30 +1,7 @@
 ---
 title: useInviteMember
 description: Invite a member to an organization.
+variant: react
 ---
 
-<include>../../../shared/mutations/plugin-requirements.mdx#shared-organization-react</include>
-
-## Usage
-
-```tsx
-import { authClient } from "@/lib/auth-client"
-import { useInviteMember } from "@better-auth-ui/react/plugins/organization"
-
-const mutation = useInviteMember(authClient)
-
-mutation.mutate(/* params */)
-```
-
-## Options factory
-
-```tsx
-import { inviteMemberOptions } from "@better-auth-ui/core/plugins/organization"
-import { useMutation } from "@tanstack/react-query"
-
-const mutation = useMutation(inviteMemberOptions(authClient))
-```
-
-## Params
-
-<type-table path="../../../../../../packages/core/src/plugins/organization/invite-member-mutation.ts" name="InviteMemberParams" />
+<include>../../../topics/mutations/invite-member.mdx</include>

@@ -1,30 +1,7 @@
 ---
 title: useLeaveOrganization
 description: Leave an organization.
+variant: react
 ---
 
-<include>../../../shared/mutations/plugin-requirements.mdx#shared-organization-react</include>
-
-## Usage
-
-```tsx
-import { authClient } from "@/lib/auth-client"
-import { useLeaveOrganization } from "@better-auth-ui/react/plugins/organization"
-
-const mutation = useLeaveOrganization(authClient)
-
-mutation.mutate(/* params */)
-```
-
-## Options factory
-
-```tsx
-import { leaveOrganizationOptions } from "@better-auth-ui/core/plugins/organization"
-import { useMutation } from "@tanstack/react-query"
-
-const mutation = useMutation(leaveOrganizationOptions(authClient))
-```
-
-## Params
-
-<type-table path="../../../../../../packages/core/src/plugins/organization/leave-organization-mutation.ts" name="LeaveOrganizationParams" />
+<include>../../../topics/mutations/leave-organization.mdx</include>

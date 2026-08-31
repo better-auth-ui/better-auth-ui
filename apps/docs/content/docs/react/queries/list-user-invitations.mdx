@@ -1,52 +1,7 @@
 ---
 title: useListUserInvitations
 description: List organization invitations for the current user.
+variant: react
 ---
 
-<include>../../../shared/queries/organization.mdx#shared-requirements</include>
-
-## Usage
-
-```tsx
-import { authClient } from "@/lib/auth-client"
-import { useListUserInvitations } from "@better-auth-ui/react/plugins/organization"
-
-const result = useListUserInvitations(authClient)
-```
-
-## Client options factory and router-loader helpers
-
-```tsx
-import {
-  ensureListUserInvitations,
-  fetchListUserInvitations,
-  listUserInvitationsOptions,
-  prefetchListUserInvitations
-} from "@better-auth-ui/core/plugins/organization"
-
-const options = listUserInvitationsOptions(authClient, userId)
-await ensureListUserInvitations(queryClient, authClient, userId)
-await prefetchListUserInvitations(queryClient, authClient, userId)
-const invitations = await fetchListUserInvitations(queryClient, authClient, userId)
-```
-
-<include>../../../shared/queries/organization.mdx#shared-notes</include>
-
-## Server-side prefetching
-
-For server loaders, import from `@better-auth-ui/core/plugins/organization/server`. Pass the Better Auth server instance and signed-in `userId`. Request headers are forwarded to Better Auth for session-aware calls.
-
-```ts
-import { ensureListUserInvitations } from "@better-auth-ui/core/plugins/organization/server"
-import { getRequestHeaders } from "@tanstack/react-start/server"
-
-import { auth } from "@/lib/auth"
-
-await ensureListUserInvitations(queryClient, auth, userId, {
-  headers: getRequestHeaders()
-})
-```
-
-## Params
-
-<type-table path="../../../../../../packages/core/src/plugins/organization/list-user-invitations-query.ts" name="ListUserInvitationsParams" />
+<include>../../../topics/queries/list-user-invitations.mdx</include>

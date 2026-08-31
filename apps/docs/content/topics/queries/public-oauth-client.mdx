@@ -1,0 +1,49 @@
+Requires `oauthProviderClient()` from `@better-auth/oauth-provider/client`. Read the client ID from the signed authorization query and leave the complete query string in the browser URL.
+
+## Usage
+
+```tsx doc-variant="react"
+import { parseOAuthAuthorizationRequest } from "@better-auth-ui/core/plugins/oauth-provider"
+import { usePublicOAuthClient } from "@better-auth-ui/react/plugins/oauth-provider"
+
+const { clientId } = parseOAuthAuthorizationRequest(window.location.search)
+const client = usePublicOAuthClient(authClient, clientId)
+```
+
+<DocVariant name="react">
+The query remains disabled until `clientId` is available.
+</DocVariant>
+
+```tsx doc-variant="solid"
+import { parseOAuthAuthorizationRequest } from "@better-auth-ui/core/plugins/oauth-provider"
+import { usePublicOAuthClient } from "@better-auth-ui/solid/plugins/oauth-provider"
+
+const client = usePublicOAuthClient(
+  authClient,
+  () => parseOAuthAuthorizationRequest(window.location.search).clientId
+)
+```
+
+<DocVariant name="solid">
+The query remains disabled until the client ID accessor returns a value.
+</DocVariant>
+
+## Options factory and loader helpers
+
+```ts
+import {
+  ensurePublicOAuthClient,
+  fetchPublicOAuthClient,
+  prefetchPublicOAuthClient,
+  publicOAuthClientOptions
+} from "@better-auth-ui/core/plugins/oauth-provider"
+
+const options = publicOAuthClientOptions(authClient, clientId)
+await ensurePublicOAuthClient(queryClient, authClient, clientId)
+await prefetchPublicOAuthClient(queryClient, authClient, clientId)
+const client = await fetchPublicOAuthClient(queryClient, authClient, clientId)
+```
+
+## Params
+
+<type-table path="packages/core/src/plugins/oauth-provider/public-oauth-client-query.ts" name="PublicOAuthClientParams" />

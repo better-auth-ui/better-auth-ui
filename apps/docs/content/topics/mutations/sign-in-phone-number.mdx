@@ -1,0 +1,32 @@
+<DocVariant name="react">
+```tsx
+import {
+  type PhoneNumberAuthClient
+} from "@better-auth-ui/core/plugins/phone-number"
+import { useAuth } from "@better-auth-ui/react"
+import { useSignInPhoneNumber } from "@better-auth-ui/react/plugins/phone-number"
+
+const { authClient } = useAuth()
+const { mutate: signInPhoneNumber } = useSignInPhoneNumber(
+  authClient as PhoneNumberAuthClient
+)
+
+signInPhoneNumber({
+  phoneNumber: "+12025550123",
+  password,
+  rememberMe: true
+})
+```
+
+With Better Auth `requireVerification`, an unverified credential returns `PHONE_NUMBER_NOT_VERIFIED` and starts phone verification. This password-based method follows configured 2FA.
+</DocVariant>
+
+<MutationPage id="sign-in-phone-number">
+
+<PageSlot name="usage" doc-variant="solid">
+
+With Better Auth `requireVerification`, an unverified credential returns `PHONE_NUMBER_NOT_VERIFIED` and starts verification.
+
+</PageSlot>
+
+</MutationPage>

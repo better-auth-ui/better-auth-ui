@@ -1,22 +1,7 @@
 ---
 title: useUpdateUser
 description: Update the current user's profile fields.
+variant: solid
 ---
 
-## Usage
-
-```tsx
-import { useUpdateUser } from "@better-auth-ui/solid"
-
-const updateUser = useUpdateUser(authClient)
-
-updateUser.mutate({ name: "Alice" })
-```
-
-## Cache
-
-The shared mutation invalidator awaits session invalidation after a successful update so cached user data refreshes.
-
-## Params
-
-<type-table path="../../../../../../packages/core/src/mutations/update-user-mutation.ts" name="UpdateUserParams" />
+<include>../../../topics/mutations/update-user.mdx</include>

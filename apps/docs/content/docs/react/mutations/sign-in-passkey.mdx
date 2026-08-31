@@ -1,32 +1,7 @@
 ---
 title: useSignInPasskey
 description: Passkey (WebAuthn) sign-in mutation.
+variant: react
 ---
 
-Resets the session query on success so the new session is refetched.
-
-## Usage
-
-```tsx
-import { authClient } from "@/lib/auth-client"
-import { useSignInPasskey } from "@better-auth-ui/react/plugins/passkey"
-
-const { mutate: signInPasskey } = useSignInPasskey(authClient)
-
-signInPasskey()
-```
-
-`useSignInPasskey` requires the Better Auth `passkey` plugin. Import your configured `authClient`. It already carries the plugin methods from `createAuthClient`.
-
-## Options factory
-
-```tsx
-import { signInPasskeyOptions } from "@better-auth-ui/core/plugins/passkey"
-import { useMutation } from "@tanstack/react-query"
-
-const { mutate } = useMutation(signInPasskeyOptions(authClient))
-```
-
-## Params
-
-<type-table path="../../../../../../packages/core/src/plugins/passkey/sign-in-passkey-mutation.ts" name="SignInPasskeyParams" />
+<include>../../../topics/mutations/sign-in-passkey.mdx</include>

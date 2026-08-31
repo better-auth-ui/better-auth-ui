@@ -1,0 +1,15 @@
+<DocVariant name="solid">
+<include>../../shared/mutations/plugin-requirements.mdx#shared-two-factor</include>
+</DocVariant>
+
+The new codes are returned once. Keep them in component state and let the user copy them: they are never returned again.
+
+<MutationPage id="generate-backup-codes">
+
+<PageSlot name="usage" doc-variant="react">
+
+`useGenerateBackupCodes` requires the Better Auth `twoFactor` plugin. Cast `authClient` to `TwoFactorAuthClient` so TypeScript picks up the plugin-extended method signature.
+
+</PageSlot>
+
+</MutationPage>

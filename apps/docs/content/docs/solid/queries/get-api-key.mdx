@@ -1,22 +1,7 @@
 ---
 title: useGetApiKey
 description: Get one API key by ID.
+variant: solid
 ---
 
-<include>../../../shared/queries/get-api-key.mdx#shared-overview</include>
-
-## Usage
-
-```tsx
-import { useGetApiKey } from "@better-auth-ui/solid/plugins/api-key"
-
-const apiKey = useGetApiKey(authClient, () => ({
-  query: { id: apiKeyId(), configId: "service" }
-}))
-```
-
-<include>../../../shared/queries/get-api-key.mdx#shared-options-factory-and-loader-helpers</include>
-
-## Params
-
-<type-table path="../../../../../../packages/core/src/plugins/api-key/get-api-key-query.ts" name="GetApiKeyParams" />
+<include>../../../topics/queries/get-api-key.mdx</include>

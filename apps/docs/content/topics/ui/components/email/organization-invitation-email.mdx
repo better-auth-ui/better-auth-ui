@@ -1,0 +1,171 @@
+<ComponentPage id="email/organization-invitation-email">
+
+<PageSlot name="props">
+
+## Features
+
+* Inviter name and email display
+* Organization name and optional organization logo
+* Role being offered (for example member, admin, owner)
+* Accept invitation button linking to the direct invitation view
+* Fallback URL for manual copy/paste
+* Optional expiration time
+* Security notice for unexpected invitations
+* Customizable branding and styling
+* Support for light/dark mode themes
+* Localization support
+
+</PageSlot>
+
+<PageSlot name="usage" doc-variant="heroui">
+
+## Server setup
+
+Wire the email into the Better Auth `organization` plugin via `sendInvitationEmail`. Point `url` at the direct invitation view registered by `organizationPlugin()`.
+
+```tsx title="auth.ts"
+import { OrganizationInvitationEmail } from "@better-auth-ui/heroui/email"
+import { render } from "@react-email/render"
+import { betterAuth } from "better-auth"
+import { organization } from "better-auth/plugins"
+
+const baseUrl = process.env.BETTER_AUTH_URL!
+
+export const auth = betterAuth({
+  plugins: [
+    organization({
+      async sendInvitationEmail(data) {
+        const html = await render(
+          <OrganizationInvitationEmail
+            url={`${baseUrl}/auth/accept-invitation?invitationId=${data.id}`}
+            email={data.email}
+            inviterName={data.inviter.user.name}
+            inviterEmail={data.inviter.user.email}
+            organizationName={data.organization.name}
+            organizationLogoURL={data.organization.logo ?? undefined}
+            role={data.role}
+            appName="My App"
+            poweredBy
+          />
+        )
+
+        await sendEmail({
+          to: data.email,
+          subject: `You're invited to ${data.organization.name}`,
+          html
+        })
+      }
+    })
+  ]
+})
+```
+
+<Callout>
+
+Add `organizationPlugin().viewPaths.auth.acceptInvitation` to your auth
+route allow-list. Use `{baseUrl}/settings/organizations` only when you want
+the invitation email to open the full pending-invitations list instead.
+
+</Callout>
+
+</PageSlot>
+
+<PageSlot name="installation">
+
+<DocVariant name="shadcn">
+## Server setup
+</DocVariant>
+
+<DocVariant name="zaidan">
+## Better Auth setup
+</DocVariant>
+
+<DocVariant name="shadcn zaidan">
+Wire the email into the Better Auth `organization` plugin via `sendInvitationEmail`. Point `url` at the direct invitation view registered by `organizationPlugin()`.
+</DocVariant>
+
+```tsx doc-variant="shadcn" title="auth.ts"
+import { OrganizationInvitationEmail } from "@better-auth-ui/react/email"
+import { render } from "@react-email/render"
+import { betterAuth } from "better-auth"
+import { organization } from "better-auth/plugins"
+
+const baseUrl = process.env.BETTER_AUTH_URL!
+
+export const auth = betterAuth({
+  plugins: [
+    organization({
+      async sendInvitationEmail(data) {
+        const html = await render(
+          <OrganizationInvitationEmail
+            url={`${baseUrl}/auth/accept-invitation?invitationId=${data.id}`}
+            email={data.email}
+            inviterName={data.inviter.user.name}
+            inviterEmail={data.inviter.user.email}
+            organizationName={data.organization.name}
+            organizationLogoURL={data.organization.logo ?? undefined}
+            role={data.role}
+            appName="My App"
+            poweredBy
+          />
+        )
+
+        await sendEmail({
+          to: data.email,
+          subject: `You're invited to ${data.organization.name}`,
+          html
+        })
+      }
+    })
+  ]
+})
+```
+
+```tsx doc-variant="zaidan" title="auth.ts"
+import { OrganizationInvitationEmail } from "@better-auth-ui/solid/email"
+import { render } from "@solidjs-email/main"
+import { betterAuth } from "better-auth"
+import { organization } from "better-auth/plugins"
+
+const baseUrl = process.env.BETTER_AUTH_URL!
+
+export const auth = betterAuth({
+  plugins: [
+    organization({
+      async sendInvitationEmail(data) {
+        const html = await render(() =>
+          OrganizationInvitationEmail({
+            url: `${baseUrl}/auth/accept-invitation?invitationId=${data.id}`,
+            email: data.email,
+            inviterName: data.inviter.user.name,
+            inviterEmail: data.inviter.user.email,
+            organizationName: data.organization.name,
+            organizationLogoURL: data.organization.logo ?? undefined,
+            role: data.role,
+            appName: "My App",
+            poweredBy: true
+          })
+        )
+
+        await sendEmail({
+          to: data.email,
+          subject: `You're invited to ${data.organization.name}`,
+          html
+        })
+      }
+    })
+  ]
+})
+```
+
+<Callout doc-variant="shadcn zaidan">
+
+Add `organizationPlugin().viewPaths.auth.acceptInvitation` to your auth
+route allow-list. Use `{baseUrl}/settings/organizations` only when you want
+the invitation email to open the full pending-invitations list instead.
+
+</Callout>
+
+</PageSlot>
+
+</ComponentPage>

@@ -1,53 +1,7 @@
 ---
 title: useActiveOrganization
 description: Read the active organization from the session or a URL slug.
+variant: react
 ---
 
-<include>../../../shared/queries/organization.mdx#shared-requirements</include>
-
-## Usage
-
-```tsx
-import { authClient } from "@/lib/auth-client"
-import { useActiveOrganization } from "@better-auth-ui/react/plugins/organization"
-
-const result = useActiveOrganization(authClient)
-```
-
-## Client options factory and router-loader helpers
-
-```tsx
-import {
-  activeOrganizationOptions,
-  ensureActiveOrganization,
-  fetchActiveOrganization,
-  prefetchActiveOrganization
-} from "@better-auth-ui/core/plugins/organization"
-
-const options = activeOrganizationOptions(authClient, userId)
-await ensureActiveOrganization(queryClient, authClient, userId)
-await prefetchActiveOrganization(queryClient, authClient, userId)
-const organization = await fetchActiveOrganization(queryClient, authClient, userId)
-```
-
-<include>../../../shared/queries/active-organization.mdx#shared-notes</include>
-
-## Server-side prefetching
-
-For server loaders, import from `@better-auth-ui/core/plugins/organization/server`. The server helper uses your Better Auth server instance and request params so the prefetched key hydrates into `useActiveOrganization`.
-
-```ts
-import { ensureActiveOrganization } from "@better-auth-ui/core/plugins/organization/server"
-import { getRequestHeaders } from "@tanstack/react-start/server"
-
-import { auth } from "@/lib/auth"
-
-await ensureActiveOrganization(queryClient, auth, userId, {
-  headers: getRequestHeaders(),
-  query: { organizationSlug: "acme" }
-})
-```
-
-## Params
-
-<type-table path="../../../../../../packages/core/src/plugins/organization/active-organization-query.ts" name="ActiveOrganizationParams" />
+<include>../../../topics/queries/active-organization.mdx</include>

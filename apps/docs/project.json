@@ -61,8 +61,14 @@
     "type-tables": {
       "executor": "nx:run-commands",
       "inputs": [
-        "{workspaceRoot}/apps/docs/content/docs/**/*.mdx",
+        "{workspaceRoot}/apps/docs/content/**/*.mdx",
         "{workspaceRoot}/apps/docs/scripts/generate-type-tables.ts",
+        "{workspaceRoot}/apps/docs/src/lib/docs-content.ts",
+        "{workspaceRoot}/apps/docs/src/lib/docs-variants.ts",
+        "{workspaceRoot}/apps/docs/src/lib/remark-doc-variants.ts",
+        "{workspaceRoot}/apps/docs/src/lib/remark-doc-templates.ts",
+        "{workspaceRoot}/apps/docs/src/lib/docs-templates/**/*.ts",
+        "{workspaceRoot}/apps/docs/src/lib/type-table-reference.ts",
         "{workspaceRoot}/apps/docs/src/lib/type-table-data.ts",
         "{workspaceRoot}/apps/docs/package.json",
         "{workspaceRoot}/apps/docs/tsconfig.json",

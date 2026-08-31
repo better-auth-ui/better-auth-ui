@@ -1,47 +1,7 @@
 ---
 title: useListUserInvitations
 description: List invitations addressed to the current user.
+variant: solid
 ---
 
-## Usage
-
-```tsx
-import { useListUserInvitations } from "@better-auth-ui/solid/plugins/organization"
-
-const result = useListUserInvitations(authClient)
-```
-
-<include>../../../shared/queries/organization.mdx#shared-requirements</include>
-
-## Options factory
-
-```tsx
-import { listUserInvitationsOptions } from "@better-auth-ui/core/plugins/organization"
-import { createQuery } from "@tanstack/solid-query"
-
-const query = createQuery(() =>
-  listUserInvitationsOptions(authClient, userId)
-)
-```
-
-<include>../../../shared/queries/organization.mdx#shared-notes</include>
-
-## Server-side prefetching
-
-<include>../../../shared/queries/organization.mdx#shared-solid-client-prefetching</include>
-
-```ts
-import {
-  ensureListUserInvitations,
-  fetchListUserInvitations,
-  prefetchListUserInvitations
-} from "@better-auth-ui/core/plugins/organization"
-
-await ensureListUserInvitations(queryClient, authClient, userId)
-await prefetchListUserInvitations(queryClient, authClient, userId)
-const invitations = await fetchListUserInvitations(queryClient, authClient, userId)
-```
-
-## Params
-
-<type-table path="../../../../../../packages/core/src/plugins/organization/list-user-invitations-query.ts" name="ListUserInvitationsParams" />
+<include>../../../topics/queries/list-user-invitations.mdx</include>

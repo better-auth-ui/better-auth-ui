@@ -1,30 +1,7 @@
 ---
 title: useRevokeSession
 description: Revoke an active session (sign out another device).
+variant: react
 ---
 
-Refetches the sessions list on success.
-
-## Usage
-
-```tsx
-import { authClient } from "@/lib/auth-client"
-import { useRevokeSession } from "@better-auth-ui/react"
-
-const { mutate: revokeSession } = useRevokeSession(authClient)
-
-revokeSession({ token: session.token })
-```
-
-## Options factory
-
-```tsx
-import { revokeSessionOptions } from "@better-auth-ui/core"
-import { useMutation } from "@tanstack/react-query"
-
-const { mutate } = useMutation(revokeSessionOptions(authClient))
-```
-
-## Params
-
-<type-table path="../../../../../../packages/core/src/mutations/revoke-session-mutation.ts" name="RevokeSessionParams" />
+<include>../../../topics/mutations/revoke-session.mdx</include>

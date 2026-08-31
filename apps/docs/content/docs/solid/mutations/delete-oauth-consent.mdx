@@ -1,35 +1,7 @@
 ---
 title: useDeleteOAuthConsent
 description: Remove a stored OAuth consent record.
+variant: solid
 ---
 
-<include>../../../shared/mutations/delete-oauth-consent.mdx#shared-overview</include>
-
-## Usage
-
-```tsx
-import { useDeleteOAuthConsent } from "@better-auth-ui/solid/plugins/oauth-provider"
-
-const deleteConsent = useDeleteOAuthConsent(authClient)
-
-for (const id of application.consentIds) {
-  await deleteConsent.mutateAsync({ id })
-}
-```
-
-<include>../../../shared/mutations/delete-oauth-consent.mdx#shared-usage</include>
-
-## Options factory
-
-```ts
-import { deleteOAuthConsentOptions } from "@better-auth-ui/core/plugins/oauth-provider"
-import { createMutation } from "@tanstack/solid-query"
-
-const deleteConsent = createMutation(() =>
-  deleteOAuthConsentOptions(authClient)
-)
-```
-
-## Params
-
-<type-table path="../../../../../../packages/core/src/plugins/oauth-provider/delete-oauth-consent-mutation.ts" name="DeleteOAuthConsentParams" />
+<include>../../../topics/mutations/delete-oauth-consent.mdx</include>

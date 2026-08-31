@@ -1,0 +1,104 @@
+<DocVariant name="react">
+`useAuthenticate` calls [`useSession`](/docs/react/queries/session) and, once the query settles, redirects unauthenticated users to the configured sign-in path. The current URL is preserved as a `redirectTo` query parameter so the user lands back where they started after signing in.
+</DocVariant>
+
+<DocVariant name="solid">
+`useAuthenticate` calls [`useSession`](/docs/solid/queries/session) and, once the query settles, redirects unauthenticated users to the configured sign-in path. The current URL is preserved as a `redirectTo` query parameter so the user lands back where they started after signing in.
+</DocVariant>
+
+Use this as the primary guard inside protected route components.
+
+## Usage
+
+```tsx doc-variant="react"
+import { authClient } from "@/lib/auth-client"
+import { useAuthenticate } from "@better-auth-ui/react"
+
+export function AccountPage() {
+  const { data: session, isPending } = useAuthenticate(authClient)
+
+  if (isPending) return <Spinner />
+  if (!session) return null // navigating to sign-in
+
+  return <Account user={session.user} />
+}
+```
+
+```tsx doc-variant="solid"
+import { useAuthenticate } from "@better-auth-ui/solid"
+
+export function AccountPage() {
+  const session = useAuthenticate(authClient)
+
+  if (session.isPending) return <Spinner />
+  if (!session.data) return null // navigating to sign-in
+
+  return <Account user={session.data.user} />
+}
+```
+
+The redirect uses `basePaths.auth` + `viewPaths.auth.signIn` from `AuthProvider`: override those to target a custom sign-in view.
+
+<DocVariant name="react">
+Accepts the same arguments as `useSession`: see its [Params](/docs/react/queries/session#params).
+</DocVariant>
+
+<DocVariant name="solid">
+Accepts the same arguments as `useSession`: see its [Params](/docs/solid/queries/session#params).
+</DocVariant>
+
+## First-render caveat
+
+<DocVariant name="react">
+The redirect runs inside `useEffect`, so it is browser-only. During the first render, `session` is `undefined` and navigation has not started.
+
+The protected interface can appear briefly before the browser mounts the component and redirects to sign-in.
+</DocVariant>
+
+<DocVariant name="solid">
+The redirect runs inside a Solid `createEffect`, so it is browser-only. During the first render, `session.data` is `undefined` and navigation has not started.
+
+The protected interface can appear briefly before the browser effect redirects to sign-in.
+</DocVariant>
+
+You have two ways to handle this:
+
+### Gate on `isPending` (simplest)
+
+Render a skeleton or spinner while the session query is pending, and `null` once it resolves to unauthenticated (the redirect is already in flight). This is what the [Usage](#usage) example does and is enough for most apps:
+
+```tsx doc-variant="react"
+const { data: session, isPending } = useAuthenticate(authClient)
+
+if (isPending) return <Skeleton />
+if (!session) return null // navigating to sign-in
+
+return <Account user={session.user} />
+```
+
+```tsx doc-variant="solid"
+const session = useAuthenticate(authClient)
+
+if (session.isPending) return <Skeleton />
+if (!session.data) return null // navigating to sign-in
+
+return <Account user={session.data.user} />
+```
+
+No flash of protected content, no server work required: just a brief loading state on first mount. Works identically for SSR, client-rendered, and statically prerendered routes.
+
+### Pair with a server-side guard (no loading state)
+
+To render the protected interface immediately without a skeleton, prefetch the session on the server. Then hydrate it into the query cache:
+
+<DocVariant name="react">
+- **Next.js**: prefetch in a server component and wrap the subtree in `HydrationBoundary`. See the [Next.js integration guide](/docs/heroui/integrations/nextjs#reactive-protection--prerendered-routes-useauthenticate).
+- **TanStack Start**: check the session in `beforeLoad` on the route. See the [TanStack Start integration guide](/docs/heroui/integrations/tanstack-start#reactive-protection--prerendered-routes-useauthenticate).
+</DocVariant>
+
+<DocVariant name="solid">
+- **TanStack Start**: check the session in a server route guard or loader, then hydrate the session query for the protected route.
+- **Solid server runtimes**: use the server-side session helpers from [`useSession`](/docs/solid/queries/session#server-side-prefetching) with the request headers for the current request.
+</DocVariant>
+
+The server-side check protects the first render. `useAuthenticate` redirects after token expiration, remote sign-out, or server-side session revocation.

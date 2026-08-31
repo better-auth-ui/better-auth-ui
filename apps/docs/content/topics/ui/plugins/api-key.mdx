@@ -1,0 +1,534 @@
+<DocVariant name="heroui shadcn">
+The API key plugin adds programmatic API key management to your authentication UI. Users can create, copy, and revoke API keys from a security card in account settings. New keys can use a configurable expiration interval, and each listed key shows when it expires.
+
+It contributes:
+</DocVariant>
+
+<DocVariant name="heroui">
+- An `<ApiKeys />` card to the security settings tab for user-owned keys
+- An `<OrganizationApiKeys />` card to `<OrganizationSettings />` for organization-owned keys (opt-in via `apiKeyPlugin({ organization: true })`. Requires the [organization plugin](/docs/heroui/plugins/organization) and a matching server-side API key config)
+</DocVariant>
+
+<DocVariant name="shadcn">
+- An `<ApiKeys />` card to the security settings tab for user-owned keys
+- An `<OrganizationApiKeys />` card to `<OrganizationSettings />` for organization-owned keys (opt-in via `apiKeyPlugin({ organization: true })`. Requires the [organization plugin](/docs/shadcn/plugins/organization) and a matching server-side API key config)
+</DocVariant>
+
+<DocVariant name="zaidan">
+The API key plugin adds programmatic API key management to your Solid/Zaidan authentication settings. Users can create, reveal once, copy, list, and revoke API keys from security and organization settings. New keys can use a configurable expiration interval, and each listed key shows when it expires.
+
+It contributes:
+
+- An `<ApiKeys />` card rendered by the copied `SecuritySettings` component when the API Key plugin is enabled
+- An `<OrganizationApiKeys />` card for organization-owned keys when `apiKeyPlugin({ organization: true })` is registered
+- Solid query and mutation wiring through `listApiKeysOptions`, `createApiKeyOptions`, and `deleteApiKeyOptions`
+- App-owned API key cards, empty state, loading placeholder, create dialog, new-key reveal dialog, and delete confirmation dialog
+</DocVariant>
+
+## Setup
+
+<Steps>
+
+<Step>
+
+### Install the Better Auth plugin
+
+Install the [`@better-auth/api-key`](https://www.better-auth.com/docs/plugins/api-key) package and add it to your Better Auth server config:
+
+```ts doc-variant="heroui shadcn" title="lib/auth.ts"
+import { betterAuth } from "better-auth"
+import { apiKey } from "@better-auth/api-key" // [!code highlight]
+
+export const auth = betterAuth({
+  // ...
+  plugins: [
+    apiKey() // [!code highlight]
+  ]
+})
+```
+
+```ts doc-variant="zaidan" title="src/lib/auth.ts"
+import { apiKey } from "@better-auth/api-key" // [!code highlight]
+import { betterAuth } from "better-auth"
+
+export const auth = betterAuth({
+  // ...
+  plugins: [
+    apiKey() // [!code highlight]
+  ]
+})
+```
+
+</Step>
+
+<Step doc-variant="heroui shadcn">
+### Install the matching client plugin
+
+Add `apiKeyClient()` to your auth client so `authClient.apiKey.*` methods are available:
+
+```ts title="lib/auth-client.ts"
+import { createAuthClient } from "better-auth/react"
+import { apiKeyClient } from "@better-auth/api-key/client" // [!code highlight]
+
+export const authClient = createAuthClient({
+  plugins: [apiKeyClient()] // [!code highlight]
+})
+```
+
+</Step>
+
+<Step>
+
+<DocVariant name="heroui">
+### Register the UI plugin
+
+Pass `apiKeyPlugin()` to `<AuthProvider>`:
+</DocVariant>
+
+```tsx doc-variant="heroui" title="components/providers.tsx"
+import { AuthProvider } from "@better-auth-ui/heroui"
+import { apiKeyPlugin } from "@better-auth-ui/heroui/plugins/api-key" // [!code highlight]
+
+import { authClient } from "@/lib/auth-client"
+
+<AuthProvider
+  authClient={authClient}
+  plugins={[
+    apiKeyPlugin() // [!code highlight]
+  ]}
+>
+  {children}
+</AuthProvider>
+```
+
+<DocVariant name="shadcn">
+### Install the UI plugin
+
+Run the shadcn CLI to install the API key components and the `apiKeyPlugin()` factory into your project:
+</DocVariant>
+
+```npm doc-variant="shadcn"
+npx shadcn@latest add @better-auth-ui/api-key
+```
+
+<DocVariant name="shadcn">
+This drops the following into your codebase:
+
+- `src/lib/auth/auth-plugin.ts`: local `AuthPlugin` typing widener
+- `src/lib/auth/api-key-plugin.ts`: `apiKeyPlugin()` factory
+- `src/components/auth/api-key/api-keys.tsx`: the API keys security card
+- `src/components/auth/api-key/api-key.tsx`: individual API key row with delete control
+- `src/components/auth/api-key/api-keys-empty.tsx`: empty state shown when no keys exist
+- `src/components/auth/api-key/api-key-skeleton.tsx`: skeleton shown while keys are loading
+- `src/components/auth/api-key/create-api-key-dialog.tsx`: dialog for creating a new key
+- `src/components/auth/api-key/new-api-key-dialog.tsx`: dialog showing the newly created key with copy button
+- `src/components/auth/api-key/delete-api-key-dialog.tsx`: confirmation dialog for revoking a key
+- `src/components/auth/api-key/organization-api-keys.tsx`: owner-gated wrapper that renders `<ApiKeys />` scoped to the active organization
+</DocVariant>
+
+<DocVariant name="zaidan">
+### Install the matching client plugin
+
+Add `apiKeyClient()` to your Solid auth client so `authClient.apiKey.*` methods are available:
+</DocVariant>
+
+```ts doc-variant="zaidan" title="src/lib/auth-client.ts"
+import { apiKeyClient } from "@better-auth/api-key/client" // [!code highlight]
+import { createAuthClient } from "better-auth/solid"
+
+export const authClient = createAuthClient({
+  plugins: [
+    apiKeyClient() // [!code highlight]
+  ]
+})
+```
+
+</Step>
+
+<Step doc-variant="shadcn zaidan">
+
+<DocVariant name="shadcn">
+### Register the UI plugin
+
+Pass `apiKeyPlugin()` to `<AuthProvider>`:
+</DocVariant>
+
+```tsx doc-variant="shadcn" title="components/providers.tsx"
+import { AuthProvider } from "@/components/auth/auth-provider"
+import { apiKeyPlugin } from "@/lib/auth/api-key-plugin" // [!code highlight]
+
+import { authClient } from "@/lib/auth-client"
+
+<AuthProvider
+  authClient={authClient}
+  plugins={[
+    apiKeyPlugin() // [!code highlight]
+  ]}
+>
+  {children}
+</AuthProvider>
+```
+
+<DocVariant name="zaidan">
+### Install the Solid/Zaidan components
+
+Run the shadcn CLI to install the Solid API key components and the `apiKeyPlugin()` factory into your project:
+</DocVariant>
+
+```npm doc-variant="zaidan"
+npx shadcn@latest add https://better-auth-ui.com/r/solid/api-key.json
+```
+
+<DocVariant name="zaidan">
+This drops the following into your codebase:
+
+- `src/lib/auth/api-key-plugin.ts`: local `apiKeyPlugin()` factory
+- `src/components/auth/api-key/api-keys.tsx`: the API keys security card
+- `src/components/auth/api-key/api-key.tsx`: individual API key row with delete control
+- `src/components/auth/api-key/api-keys-empty.tsx`: empty state shown when no keys exist
+- `src/components/auth/api-key/api-key-skeleton.tsx`: loading placeholder shown while keys are loading
+- `src/components/auth/api-key/create-api-key-dialog.tsx`: dialog for creating a new key
+- `src/components/auth/api-key/new-api-key-dialog.tsx`: dialog showing the newly created key with copy button
+- `src/components/auth/api-key/delete-api-key-dialog.tsx`: confirmation dialog for revoking a key
+- `src/components/auth/api-key/organization-api-keys.tsx`: owner-gated wrapper that renders `<ApiKeys />` scoped to the active organization
+</DocVariant>
+
+</Step>
+
+<Step doc-variant="zaidan">
+
+### Register the UI plugin
+
+For user-owned keys, the copied `SecuritySettings` component renders `<ApiKeys />` whenever the API Key plugin is enabled. For organization-owned keys, register the copied UI plugin with `{ organization: true }`:
+
+```tsx title="src/components/providers.tsx"
+import { apiKeyPlugin } from "@/lib/auth/api-key-plugin" // [!code highlight]
+
+<AuthProvider
+  authClient={authClient}
+  plugins={[
+    apiKeyPlugin({ organization: true }) // [!code highlight]
+  ]}
+>
+  {children}
+</AuthProvider>
+```
+
+</Step>
+
+</Steps>
+
+<DocVariant name="heroui shadcn">
+## Configure expiration
+
+The create dialog offers 30 days, 90 days, and Never by default. It initially selects 30 days. Configure the choices through `apiKeyPlugin()`:
+
+```tsx title="components/providers.tsx"
+apiKeyPlugin({
+  keyExpiration: {
+    intervals: [7, 30, 90],
+    defaultInterval: 30,
+    allowNever: true
+  }
+})
+```
+</DocVariant>
+
+<DocVariant name="zaidan">
+## Configure expiration
+
+The create dialog offers 30 days, 90 days, and Never by default. It initially selects 30 days. Configure the choices through the copied `apiKeyPlugin()`:
+</DocVariant>
+
+```tsx doc-variant="zaidan" title="src/components/providers.tsx"
+apiKeyPlugin({
+  keyExpiration: {
+    intervals: [7, 30, 90],
+    defaultInterval: 30,
+    allowNever: true
+  }
+})
+```
+
+`intervals` and `defaultInterval` use days. Better Auth receives the selected lifetime as seconds.
+
+Keep the UI choices within the limits in your Better Auth server configuration:
+
+```ts doc-variant="heroui shadcn" title="lib/auth.ts"
+apiKey({
+  keyExpiration: {
+    minExpiresIn: 7,
+    maxExpiresIn: 90,
+    defaultExpiresIn: null
+  }
+})
+```
+
+```ts doc-variant="zaidan" title="src/lib/auth.ts"
+apiKey({
+  keyExpiration: {
+    minExpiresIn: 7,
+    maxExpiresIn: 90,
+    defaultExpiresIn: null
+  }
+})
+```
+
+When `allowNever` is enabled, selecting Never sends no custom interval. Better Auth will still apply `defaultExpiresIn` if the server defines one, so set `allowNever: false` in the UI when your server always requires expiration.
+
+To remove the expiration field and rely entirely on the server default:
+
+```tsx doc-variant="heroui shadcn" title="components/providers.tsx"
+apiKeyPlugin({ keyExpiration: false })
+```
+
+```tsx doc-variant="zaidan" title="src/components/providers.tsx"
+apiKeyPlugin({ keyExpiration: false })
+```
+
+## Components
+
+### `<ApiKeys />`
+
+<ComponentPreview doc-variant="heroui" name="heroui-api-keys" />
+
+<DocVariant name="heroui">
+The `<ApiKeys />` security card is automatically rendered in `<SecuritySettings />` when the plugin is registered. Pass `organizationId` to scope the list and create payload to an organization instead of the signed-in user.
+
+**Usage**
+</DocVariant>
+
+```tsx doc-variant="heroui"
+import { ApiKeys } from "@better-auth-ui/heroui/plugins/api-key"
+
+<ApiKeys />
+```
+
+<ComponentPreview doc-variant="shadcn" name="shadcn-api-keys" />
+
+<DocVariant name="shadcn">
+The security settings page shows `<ApiKeys />` when the layout renders plugin `securityCards`. Add `apiKeyPlugin()` to `plugins` to provide this card.
+</DocVariant>
+
+<ZaidanStory doc-variant="zaidan"
+  storyId="zaidan-plugins-api-key--default"
+  title="Zaidan API Key preview"
+  height={560}
+/>
+
+<DocVariant name="zaidan">
+The security settings page shows `<ApiKeys />` when its layout includes `SecuritySettings` and enables the API Key plugin.
+
+The component uses the [Solid runtime APIs](/docs/solid) to list, create, and revoke keys.
+</DocVariant>
+
+<DocVariant name="shadcn zaidan">
+**Usage**
+
+```tsx
+import { ApiKeys } from "@/components/auth/api-key/api-keys"
+
+<ApiKeys />
+```
+</DocVariant>
+
+<DocVariant name="zaidan">
+This component is normally mounted by `SecuritySettings`. Render it manually only if you are building a custom settings layout.
+</DocVariant>
+
+**Props**
+
+<type-table doc-variant="heroui" path="packages/heroui/src/components/auth/api-key/api-keys.tsx" name="ApiKeysProps" />
+
+<type-table doc-variant="shadcn" path="examples/start-shadcn-example/src/components/auth/api-key/api-keys.tsx" name="ApiKeysProps" />
+
+<DocVariant name="heroui shadcn">
+### `<OrganizationApiKeys />`
+
+A thin wrapper around `<ApiKeys />` that resolves the active organization via `useActiveOrganization` and forwards its id. Rendered inside `<OrganizationSettings />` only when the plugin is registered with `{ organization: true }`.
+
+To enable, opt in on the UI plugin and add a matching API key configuration to your Better Auth server config. The plugin uses a fixed `configId` of `"organization"`, so the server entry **must** be `{ configId: "organization", references: "organization" }`:
+</DocVariant>
+
+```ts doc-variant="heroui" title="components/providers.tsx"
+import { AuthProvider } from "@better-auth-ui/heroui"
+import { apiKeyPlugin } from "@better-auth-ui/heroui/plugins/api-key"
+
+import { authClient } from "@/lib/auth-client"
+
+<AuthProvider
+  authClient={authClient}
+  plugins={[
+    apiKeyPlugin({ organization: true }) // [!code highlight]
+  ]}
+>
+  {children}
+</AuthProvider>
+```
+
+```tsx doc-variant="shadcn" title="components/providers.tsx"
+import { AuthProvider } from "@/components/auth/auth-provider"
+import { apiKeyPlugin } from "@/lib/auth/api-key-plugin"
+
+import { authClient } from "@/lib/auth-client"
+
+<AuthProvider
+  authClient={authClient}
+  plugins={[
+    apiKeyPlugin({ organization: true }) // [!code highlight]
+  ]}
+>
+  {children}
+</AuthProvider>
+```
+
+```ts doc-variant="heroui shadcn" title="lib/auth.ts"
+import { betterAuth } from "better-auth"
+import { apiKey } from "@better-auth/api-key"
+import { organization } from "better-auth/plugins"
+
+export const auth = betterAuth({
+  // ...
+  plugins: [
+    organization(),
+    apiKey([
+      { configId: "default", references: "user" },
+      { configId: "organization", references: "organization" } // [!code highlight]
+    ])
+  ]
+})
+```
+
+<type-table doc-variant="zaidan" path="examples/start-solid-zaidan-example/src/components/auth/api-key/api-keys.tsx" name="ApiKeysProps" />
+
+<DocVariant name="zaidan">
+### `<OrganizationApiKeys />`
+
+This component wraps `<ApiKeys />`. It resolves the organization and checks the current user's membership.
+
+It renders the API keys only for an organization owner.
+
+To enable, opt in on the copied UI plugin and add a matching API key configuration to your Better Auth server config. The organization API key config uses a fixed `configId` of `"organization"`, so the server entry **must** be `{ configId: "organization", references: "organization" }`:
+</DocVariant>
+
+```tsx doc-variant="zaidan" title="src/components/providers.tsx"
+import { apiKeyPlugin } from "@/lib/auth/api-key-plugin"
+
+<AuthProvider
+  authClient={authClient}
+  plugins={[
+    apiKeyPlugin({ organization: true }) // [!code highlight]
+  ]}
+>
+  {children}
+</AuthProvider>
+```
+
+```ts doc-variant="zaidan" title="src/lib/auth.ts"
+import { apiKey } from "@better-auth/api-key"
+import { betterAuth } from "better-auth"
+import { organization } from "better-auth/plugins"
+
+export const auth = betterAuth({
+  // ...
+  plugins: [
+    organization(),
+    apiKey([
+      { configId: "default", references: "user" },
+      { configId: "organization", references: "organization" } // [!code highlight]
+    ])
+  ]
+})
+```
+
+See the [Better Auth docs](https://www.better-auth.com/docs/plugins/api-key/advanced#organization-owned-api-keys) for role-based permissions on organization-owned keys.
+
+**Usage**
+
+```tsx doc-variant="heroui"
+import { OrganizationApiKeys } from "@better-auth-ui/heroui/plugins/api-key"
+
+<OrganizationApiKeys />
+```
+
+<DocVariant name="heroui">
+**Props**
+</DocVariant>
+
+<type-table doc-variant="heroui" path="packages/heroui/src/components/auth/api-key/organization-api-keys.tsx" name="OrganizationApiKeysProps" />
+
+<DocVariant name="shadcn zaidan">
+```tsx
+import { OrganizationApiKeys } from "@/components/auth/api-key/organization-api-keys"
+
+<OrganizationApiKeys />
+```
+
+**Props**
+</DocVariant>
+
+<type-table doc-variant="shadcn" path="examples/start-shadcn-example/src/components/auth/api-key/organization-api-keys.tsx" name="OrganizationApiKeysProps" />
+
+<type-table doc-variant="zaidan" path="examples/start-solid-zaidan-example/src/components/auth/api-key/organization-api-keys.tsx" name="OrganizationApiKeysProps" />
+
+## Options
+
+<type-table path="packages/core/src/plugins/api-key/api-key-plugin.ts" name="ApiKeyPluginOptions" />
+
+<DocVariant name="zaidan">
+## Runtime API references
+
+### List API keys
+</DocVariant>
+
+<type-table doc-variant="zaidan" path="packages/core/src/plugins/api-key/list-api-keys-query.ts" name="ListApiKeysParams" />
+
+<DocVariant name="zaidan">
+### Create API key
+</DocVariant>
+
+<type-table doc-variant="zaidan" path="packages/core/src/plugins/api-key/create-api-key-mutation.ts" name="CreateApiKeyParams" />
+
+<DocVariant name="zaidan">
+### Delete API key
+</DocVariant>
+
+<type-table doc-variant="zaidan" path="packages/core/src/plugins/api-key/delete-api-key-mutation.ts" name="DeleteApiKeyParams" />
+
+## Localization
+
+<type-table path="packages/core/src/plugins/api-key/api-key-localization.ts" name="ApiKeyLocalization" />
+
+## Lifecycle controls
+
+`<ApiKeys />` lets users create, rename, and delete keys. The create form exposes the name, configuration, expiration, and organization. The list shows status, remaining requests, request usage, and the last request time as read-only values.
+
+The built-in dialog does not show metadata because metadata belongs to the application. For metadata, build a custom form with `useCreateApiKey`. Map named fields or application state to the metadata object. Do not show a raw JSON editor. If metadata affects trusted behavior, validate it in a server route.
+
+Better Auth reserves enablement, permissions, quotas, refill rules, and rate limits for server-side creation and updates. Configure those values in trusted server code instead of exposing them in the account UI.
+
+<DocVariant name="heroui">
+Configure the choices that the UI exposes:
+</DocVariant>
+
+```tsx
+apiKeyPlugin({
+  configurations: [
+    { id: "default", label: "Personal", organization: false },
+    { id: "organization", label: "Organization", organization: true }
+  ],
+  pageSize: 20
+})
+```
+
+<DocVariant name="heroui">
+The server must define every listed `configId`. Use `useUpdateApiKey` when you build a custom rename surface.
+</DocVariant>
+
+<DocVariant name="shadcn">
+The server must define every listed `configId`. Use `useUpdateApiKey` for a custom rename surface.
+</DocVariant>
+
+<DocVariant name="zaidan">
+The server must define every listed `configId`. Use `useUpdateApiKey` for a custom Solid rename surface.
+</DocVariant>

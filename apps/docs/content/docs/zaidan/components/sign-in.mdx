@@ -1,29 +1,7 @@
 ---
 title: <SignIn />
 description: Renders a Solid sign-in form with email/password, username-aware, and provider button support.
+variant: zaidan
 ---
 
-## Usage
-
-<ZaidanStory
-  storyId="zaidan-components-auth--sign-in-preview"
-  title="Zaidan SignIn preview"
-  height={520}
-/>
-
-```tsx file=<rootDir>/../../examples/start-solid-zaidan-example/src/demos/auth/sign-in.tsx
-```
-
-<include>../../../shared/ui/components/sign-in.mdx#shared-password-visibility</include>
-
-## Installation
-
-```npm
-npx shadcn@latest add https://better-auth-ui.com/r/solid/sign-in.json
-```
-
-After install, `src/components/auth/sign-in.tsx` and the copied sign-in files are app-owned. Register plugins such as Username or Magic Link in `AuthProvider` when you want them to alter the sign-in flow.
-
-## Props
-
-<type-table path="../../../../../../examples/start-solid-zaidan-example/src/components/auth/sign-in.tsx" name="SignInProps" />
+<include>../../../topics/ui/components/sign-in.mdx</include>

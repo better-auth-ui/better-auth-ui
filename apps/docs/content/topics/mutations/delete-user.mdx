@@ -1,0 +1,17 @@
+<DocVariant name="react">
+Depending on your Better Auth server config, this either deletes the account immediately or sends a confirmation email.
+</DocVariant>
+
+<DocVariant name="solid">
+Requires the Better Auth delete-user capability to be enabled on the server.
+</DocVariant>
+
+<MutationPage id="delete-user">
+
+<PageSlot name="usage" doc-variant="react">
+
+After an immediate deletion, use `useSignOut` to clear the cache. Alternatively, call `queryClient.removeQueries({ queryKey: ["auth"] })`.
+
+</PageSlot>
+
+</MutationPage>

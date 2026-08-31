@@ -1,31 +1,7 @@
 ---
 title: useOAuthConsent
 description: Accept or deny the current OAuth authorization request.
+variant: react
 ---
 
-<include>../../../shared/mutations/oauth-consent.mdx#shared-overview</include>
-
-## Usage
-
-```tsx
-import { useOAuthConsent } from "@better-auth-ui/react/plugins/oauth-provider"
-
-const consent = useOAuthConsent(authClient)
-
-consent.mutate({ accept: true })
-consent.mutate({ accept: false })
-```
-
-<include>../../../shared/mutations/oauth-consent.mdx#shared-usage</include>
-
-## Options factory
-
-```ts
-import { oauthConsentOptions } from "@better-auth-ui/core/plugins/oauth-provider"
-
-const options = oauthConsentOptions(authClient)
-```
-
-## Params
-
-<type-table path="../../../../../../packages/core/src/plugins/oauth-provider/oauth-consent-mutation.ts" name="OAuthConsentParams" />
+<include>../../../topics/mutations/oauth-consent.mdx</include>

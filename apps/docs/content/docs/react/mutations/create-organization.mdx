@@ -1,30 +1,7 @@
 ---
 title: useCreateOrganization
 description: Create an organization.
+variant: react
 ---
 
-<include>../../../shared/mutations/plugin-requirements.mdx#shared-organization-react</include>
-
-## Usage
-
-```tsx
-import { authClient } from "@/lib/auth-client"
-import { useCreateOrganization } from "@better-auth-ui/react/plugins/organization"
-
-const mutation = useCreateOrganization(authClient)
-
-mutation.mutate(/* params */)
-```
-
-## Options factory
-
-```tsx
-import { createOrganizationOptions } from "@better-auth-ui/core/plugins/organization"
-import { useMutation } from "@tanstack/react-query"
-
-const mutation = useMutation(createOrganizationOptions(authClient))
-```
-
-## Params
-
-<type-table path="../../../../../../packages/core/src/plugins/organization/create-organization-mutation.ts" name="CreateOrganizationParams" />
+<include>../../../topics/mutations/create-organization.mdx</include>

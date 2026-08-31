@@ -1,23 +1,7 @@
 ---
 title: changeEmailOtpOptions
 description: Confirm an email change with a code.
+variant: solid
 ---
 
-<include>../../../shared/mutations/plugin-requirements.mdx#shared-email-otp</include>
-
-<include>../../../shared/mutations/change-email-otp.mdx#shared-overview</include>
-
-## Options factory
-
-```tsx
-import { changeEmailOtpOptions } from "@better-auth-ui/core/plugins/email-otp"
-import { createMutation } from "@tanstack/solid-query"
-
-const changeEmail = createMutation(() => changeEmailOtpOptions(authClient))
-
-changeEmail.mutate({ newEmail: "new@example.com", otp: "123456" })
-```
-
-## Params
-
-<type-table path="../../../../../../packages/core/src/plugins/email-otp/change-email-otp-mutation.ts" name="ChangeEmailOtpParams" />
+<include>../../../topics/mutations/change-email-otp.mdx</include>

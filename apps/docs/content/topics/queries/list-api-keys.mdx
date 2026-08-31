@@ -1,0 +1,91 @@
+<DocVariant name="react">
+Requires the Better Auth API key plugin.
+</DocVariant>
+
+<DocVariant name="solid">
+This page documents the Solid package API for the Better Auth API key plugin. React now has a matching runtime/docs track, but the Solid helpers remain specific to `@tanstack/solid-query` usage.
+</DocVariant>
+
+## Usage
+
+```tsx doc-variant="react"
+import { authClient } from "@/lib/auth-client"
+import { useListApiKeys } from "@better-auth-ui/react/plugins/api-key"
+
+const { data: apiKeys } = useListApiKeys(authClient)
+```
+
+<DocVariant name="react">
+## Client options factory and router-loader helpers
+</DocVariant>
+
+```tsx doc-variant="react"
+import {
+  ensureListApiKeys,
+  fetchListApiKeys,
+  listApiKeysOptions,
+  prefetchListApiKeys
+} from "@better-auth-ui/core/plugins/api-key"
+
+const options = listApiKeysOptions(authClient, userId)
+await ensureListApiKeys(queryClient, authClient, userId)
+await prefetchListApiKeys(queryClient, authClient, userId)
+const apiKeys = await fetchListApiKeys(queryClient, authClient, userId)
+```
+
+<DocVariant name="react">
+## Server-side prefetching
+
+For server loaders, import from `@better-auth-ui/core/plugins/api-key/server`. These helpers call your Better Auth server instance directly, so they take `auth`, the signed-in `userId`, and request params instead of an `authClient`.
+</DocVariant>
+
+```ts doc-variant="react"
+import { ensureListApiKeys } from "@better-auth-ui/core/plugins/api-key/server"
+import { getRequestHeaders } from "@tanstack/react-start/server"
+
+import { auth } from "@/lib/auth"
+
+await ensureListApiKeys(queryClient, auth, userId, {
+  headers: getRequestHeaders()
+})
+```
+
+```tsx doc-variant="solid"
+import { useListApiKeys } from "@better-auth-ui/solid/plugins/api-key"
+
+const apiKeys = useListApiKeys(authClient)
+```
+
+<DocVariant name="solid">
+## Options factory and loader helpers
+</DocVariant>
+
+```ts doc-variant="solid"
+import {
+  ensureListApiKeys,
+  fetchListApiKeys,
+  listApiKeysOptions,
+  prefetchListApiKeys
+} from "@better-auth-ui/core/plugins/api-key"
+
+const options = listApiKeysOptions(authClient, userId)
+await ensureListApiKeys(queryClient, authClient, userId)
+await prefetchListApiKeys(queryClient, authClient, userId)
+const keys = await fetchListApiKeys(queryClient, authClient, userId)
+```
+
+<DocVariant name="solid">
+## Invalidation
+</DocVariant>
+
+```ts doc-variant="solid"
+import { listApiKeysOptions } from "@better-auth-ui/core/plugins/api-key"
+
+queryClient.invalidateQueries({
+  queryKey: listApiKeysOptions(authClient, userId).queryKey
+})
+```
+
+## Params
+
+<type-table path="packages/core/src/plugins/api-key/list-api-keys-query.ts" name="ListApiKeysParams" />

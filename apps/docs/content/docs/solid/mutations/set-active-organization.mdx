@@ -1,29 +1,7 @@
 ---
 title: useSetActiveOrganization
 description: Set the active organization on the session.
+variant: solid
 ---
 
-## Usage
-
-```tsx
-import { useSetActiveOrganization } from "@better-auth-ui/solid/plugins/organization"
-
-const mutation = useSetActiveOrganization(authClient)
-
-mutation.mutate(/* params */)
-```
-
-<include>../../../shared/mutations/plugin-requirements.mdx#shared-organization-solid</include>
-
-## Options factory
-
-```tsx
-import { setActiveOrganizationOptions } from "@better-auth-ui/core/plugins/organization"
-import { useMutation } from "@tanstack/solid-query"
-
-const mutation = useMutation(() => setActiveOrganizationOptions(authClient))
-```
-
-## Params
-
-<type-table path="../../../../../../packages/core/src/plugins/organization/set-active-organization-mutation.ts" name="SetActiveOrganizationParams" />
+<include>../../../topics/mutations/set-active-organization.mdx</include>

@@ -1,19 +1,7 @@
 ---
 title: useChangeEmail
 description: Change the current user's email address.
+variant: solid
 ---
 
-## Usage
-
-```tsx
-import { changeEmailOptions } from "@better-auth-ui/core"
-import { useMutation } from "@tanstack/solid-query"
-
-const changeEmail = useMutation(() => changeEmailOptions(authClient))
-
-changeEmail.mutate({ newEmail: "alice@example.com" })
-```
-
-## Params
-
-<type-table path="../../../../../../packages/core/src/mutations/change-email-mutation.ts" name="ChangeEmailParams" />
+<include>../../../topics/mutations/change-email.mdx</include>

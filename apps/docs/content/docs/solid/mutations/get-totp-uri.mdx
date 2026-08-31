@@ -1,23 +1,7 @@
 ---
 title: getTotpUriOptions
 description: Re-read the TOTP URI of an enrolled user.
+variant: solid
 ---
 
-<include>../../../shared/mutations/plugin-requirements.mdx#shared-two-factor</include>
-
-<include>../../../shared/mutations/get-totp-uri.mdx#shared-overview</include>
-
-## Options factory
-
-```tsx
-import { getTotpUriOptions } from "@better-auth-ui/core/plugins/two-factor"
-import { createMutation } from "@tanstack/solid-query"
-
-const getTotpUri = createMutation(() => getTotpUriOptions(authClient))
-
-getTotpUri.mutate({ password: "current-password" })
-```
-
-## Params
-
-<type-table path="../../../../../../packages/core/src/plugins/two-factor/get-totp-uri-mutation.ts" name="GetTotpUriParams" />
+<include>../../../topics/mutations/get-totp-uri.mdx</include>

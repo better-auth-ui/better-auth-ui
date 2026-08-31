@@ -48,6 +48,17 @@ describe("shared documentation", () => {
           failures.push(`${location}: include shares a paragraph`)
         }
 
+        if (
+          node.name === "include" &&
+          node.attributes.some(
+            (attribute) =>
+              attribute.type === "mdxJsxAttribute" &&
+              attribute.name === "doc-variant"
+          )
+        ) {
+          failures.push(`${location}: wrap conditional includes in DocVariant`)
+        }
+
         if (node.name !== "section" || !isFragment) return
 
         for (const attribute of node.attributes) {

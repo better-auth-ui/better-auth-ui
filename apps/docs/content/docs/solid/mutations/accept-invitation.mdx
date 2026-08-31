@@ -1,29 +1,7 @@
 ---
 title: useAcceptInvitation
 description: Accept an organization invitation.
+variant: solid
 ---
 
-## Usage
-
-```tsx
-import { useAcceptInvitation } from "@better-auth-ui/solid/plugins/organization"
-
-const mutation = useAcceptInvitation(authClient)
-
-mutation.mutate(/* params */)
-```
-
-<include>../../../shared/mutations/plugin-requirements.mdx#shared-organization-solid</include>
-
-## Options factory
-
-```tsx
-import { acceptInvitationOptions } from "@better-auth-ui/core/plugins/organization"
-import { useMutation } from "@tanstack/solid-query"
-
-const mutation = useMutation(() => acceptInvitationOptions(authClient))
-```
-
-## Params
-
-<type-table path="../../../../../../packages/core/src/plugins/organization/accept-invitation-mutation.ts" name="AcceptInvitationParams" />
+<include>../../../topics/mutations/accept-invitation.mdx</include>

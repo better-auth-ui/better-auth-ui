@@ -1,36 +1,7 @@
 ---
 title: useListAccounts
 description: List linked accounts for the current user.
+variant: solid
 ---
 
-User-scoped query helpers wait for the active session user before firing. Solid hooks stay disabled until `userId` exists while preserving consumer `enabled` controls, so account data stays isolated per signed-in user.
-
-## Usage
-
-```tsx
-import { useListAccounts } from "@better-auth-ui/solid"
-
-const accounts = useListAccounts(authClient)
-```
-
-## Options factory and loader helpers
-
-```ts
-import {
-  ensureListAccounts,
-  fetchListAccounts,
-  listAccountsOptions,
-  prefetchListAccounts
-} from "@better-auth-ui/core"
-
-const options = listAccountsOptions(authClient, userId)
-await ensureListAccounts(queryClient, authClient, userId)
-await prefetchListAccounts(queryClient, authClient, userId)
-const accounts = await fetchListAccounts(queryClient, authClient, userId)
-```
-
-<include>../../../shared/queries/list-accounts.mdx#shared-invalidation</include>
-
-## Params
-
-<type-table path="../../../../../../packages/core/src/queries/list-accounts-query.ts" name="ListAccountsParams" />
+<include>../../../topics/queries/list-accounts.mdx</include>

@@ -2,66 +2,10 @@
 icon: MousePointerClick
 title: One Tap
 description: Open Google's One Tap prompt from copied shadcn authentication views.
+variant: shadcn
 ---
 
 import { Callout } from 'fumadocs-ui/components/callout'
 import { Step, Steps } from 'fumadocs-ui/components/steps'
 
-<include>../../../shared/ui/plugins/one-tap.mdx#shared-overview</include>
-
-## Setup
-
-<Steps>
-<Step>
-
-<include>../../../shared/ui/plugins/one-tap.mdx#shared-configure-the-better-auth-server-plugin</include>
-
-<include>../../../shared/ui/plugins/one-tap.mdx#shared-server-example</include>
-
-</Step>
-
-<include>../../../shared/ui/plugins/one-tap.mdx#shared-configure-the-better-auth-client-plugin</include>
-
-<Step>
-### Update the copied authentication views
-
-Install the registry item so the sign-in and sign-up surfaces include the headless prompt slot:
-
-```bash
-bunx --bun shadcn@latest add @better-auth-ui/one-tap
-```
-
-</Step>
-<Step>
-### Register the Better Auth UI plugin
-
-<include>../../../shared/ui/plugins/one-tap.mdx#shared-register-the-better-auth-ui-plugin</include>
-
-```tsx title="components/providers.tsx"
-import { oneTapPlugin } from "@better-auth-ui/react/plugins/one-tap" // [!code highlight]
-
-<AuthProvider
-  authClient={authClient}
-  navigate={navigate}
-  plugins={[
-    oneTapPlugin() // [!code highlight]
-  ]}
-  socialProviders={["google"]}
->
-  {children}
-</AuthProvider>
-```
-
-</Step>
-
-<include>../../../shared/ui/plugins/one-tap.mdx#shared-add-your-authorized-origins</include>
-
-</Steps>
-
-<include>../../../shared/ui/plugins/one-tap.mdx#shared-show-one-tap-on-sign-up</include>
-
-<type-table path="../../../../../../packages/react/src/plugins/one-tap/one-tap-plugin.tsx" name="OneTapPluginOptions" />
-
-<include>../../../shared/ui/plugins/one-tap.mdx#shared-last-login-method</include>
-
-<include>../../../shared/ui/plugins/one-tap.mdx#shared-last-login-method-example</include>
+<include>../../../topics/ui/plugins/one-tap.mdx</include>

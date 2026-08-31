@@ -1,0 +1,381 @@
+<DocVariant name="heroui shadcn">
+The multi-session plugin enables users to maintain multiple active sessions simultaneously. Users can switch between accounts without signing out, manage all their device sessions, and quickly add new accounts from the user menu.
+
+It contributes:
+
+- A "Switch Account" submenu in the user button dropdown showing all active device sessions
+- A `<ManageAccounts />` card in account settings for viewing and revoking device sessions
+- `useListDeviceSessions`, `useSetActiveSession`, and `useRevokeMultiSession` hooks
+</DocVariant>
+
+<DocVariant name="zaidan">
+The Multi Session plugin lets users stay signed in to multiple accounts at once, switch the active account from the user menu, and manage device sessions from account settings.
+
+It contributes:
+
+- A plugin-injected switch-account submenu inside `<UserButton />`
+- A plugin-injected `<ManageAccounts />` card inside `<AccountSettings />`
+- Solid runtime helpers for listing, switching, and revoking device sessions
+</DocVariant>
+
+## Setup
+
+<Steps>
+
+<DocVariant name="heroui shadcn">
+<Step>
+### Install the Better Auth plugin
+
+Add the [Multi Session](https://www.better-auth.com/docs/plugins/multi-session) plugin to your Better Auth server config:
+
+```ts title="lib/auth.ts"
+import { betterAuth } from "better-auth"
+import { multiSession } from "better-auth/plugins" // [!code highlight]
+
+export const auth = betterAuth({
+  // ...
+  plugins: [
+    multiSession() // [!code highlight]
+  ]
+})
+```
+
+</Step>
+<Step>
+### Install the matching client plugin
+
+Add `multiSessionClient()` to your auth client so `authClient.multiSession.*` methods are available:
+
+```ts title="lib/auth-client.ts"
+import { createAuthClient } from "better-auth/react"
+import { multiSessionClient } from "better-auth/client/plugins" // [!code highlight]
+
+export const authClient = createAuthClient({
+  plugins: [multiSessionClient()] // [!code highlight]
+})
+```
+
+</Step>
+</DocVariant>
+
+<Step>
+
+<DocVariant name="heroui">
+### Register the UI plugin
+
+Pass `multiSessionPlugin()` to `<AuthProvider>`:
+</DocVariant>
+
+```tsx doc-variant="heroui" title="components/providers.tsx"
+import { AuthProvider } from "@better-auth-ui/heroui"
+import { multiSessionPlugin } from "@better-auth-ui/heroui/plugins/multi-session" // [!code highlight]
+
+<AuthProvider
+  authClient={authClient}
+  navigate={navigate}
+  plugins={[multiSessionPlugin()]} // [!code highlight]
+>
+  {children}
+</AuthProvider>
+```
+
+<DocVariant name="shadcn">
+### Install the UI plugin
+
+Run the shadcn CLI to install the multi-session management components and the `multiSessionPlugin()` factory into your project:
+</DocVariant>
+
+```npm doc-variant="shadcn"
+npx shadcn@latest add @better-auth-ui/multi-session
+```
+
+<DocVariant name="shadcn">
+This drops the following into your codebase:
+
+- `src/lib/auth/auth-plugin.ts`: local `AuthPlugin` typing widener
+- `src/lib/auth/multi-session-plugin.ts`: `multiSessionPlugin()` factory
+- `src/components/multi-session/manage-accounts.tsx`: the account management card
+- `src/components/multi-session/manage-account.tsx`: individual account row
+- `src/components/multi-session/switch-account-submenu.tsx`: the submenu trigger
+- `src/components/multi-session/switch-account-submenu-content.tsx`: the submenu content
+- `src/components/multi-session/switch-account-submenu-item.tsx`: individual session item
+</DocVariant>
+
+<DocVariant name="zaidan">
+### Install the Better Auth plugin
+
+Add `multiSession()` to your Better Auth server config:
+</DocVariant>
+
+```ts doc-variant="zaidan" title="src/lib/auth.ts"
+import { betterAuth } from "better-auth"
+import { multiSession } from "better-auth/plugins" // [!code highlight]
+
+export const auth = betterAuth({
+  // ...
+  plugins: [
+    multiSession() // [!code highlight]
+  ]
+})
+```
+
+</Step>
+
+<Step doc-variant="shadcn zaidan">
+
+<DocVariant name="shadcn">
+### Register the plugin
+
+Pass `multiSessionPlugin()` to `<AuthProvider>`:
+</DocVariant>
+
+```tsx doc-variant="shadcn" title="components/providers.tsx"
+import { multiSessionPlugin } from "@/lib/auth/multi-session-plugin" // [!code highlight]
+import { AuthProvider } from "@/components/auth/auth-provider"
+
+<AuthProvider
+  authClient={authClient}
+  navigate={navigate}
+  plugins={[multiSessionPlugin()]} // [!code highlight]
+>
+  {children}
+</AuthProvider>
+```
+
+<DocVariant name="zaidan">
+### Install the matching Solid client plugin
+
+Add `multiSessionClient()` so `authClient.multiSession.*` methods are available to the copied Solid components:
+</DocVariant>
+
+```ts doc-variant="zaidan" title="src/lib/auth-client.ts"
+import { createAuthClient } from "better-auth/solid" // [!code highlight]
+import { multiSessionClient } from "better-auth/client/plugins" // [!code highlight]
+
+export const authClient = createAuthClient({
+  plugins: [multiSessionClient()] // [!code highlight]
+})
+```
+
+</Step>
+
+<Step doc-variant="zaidan">
+
+### Install the Solid/Zaidan components
+
+```npm
+npx shadcn@latest add https://better-auth-ui.com/r/solid/multi-session.json
+```
+
+This copies the following files into your project:
+
+- `src/lib/auth/multi-session-plugin.ts`
+- `src/components/auth/multi-session/manage-account.tsx`
+- `src/components/auth/multi-session/manage-accounts.tsx`
+- `src/components/auth/multi-session/switch-account-submenu.tsx`
+- `src/components/auth/multi-session/switch-account-submenu-content.tsx`
+- `src/components/auth/multi-session/switch-account-submenu-item.tsx`
+- `src/components/auth/settings/shared/helpers.ts`
+- `src/components/auth/settings/shared/types.ts`
+- copied UI primitives under `src/components/ui/**`
+
+</Step>
+
+<Step doc-variant="zaidan">
+
+### Register the copied UI plugin
+
+Register the local `multiSessionPlugin()` wrapper in your copied provider:
+
+```tsx title="src/components/providers.tsx"
+import { AuthProvider } from "@/components/auth/auth-provider"
+import { multiSessionPlugin } from "@/lib/auth/multi-session-plugin" // [!code highlight]
+
+<AuthProvider
+  authClient={authClient}
+  plugins={[multiSessionPlugin()]} // [!code highlight]
+>
+  {children}
+</AuthProvider>
+```
+
+The copied wrapper composes the core Better Auth UI metadata and injects Solid UI slots for account settings and the user menu.
+
+</Step>
+
+</Steps>
+
+## Components
+
+### `<UserButton />`
+
+<ComponentPreview doc-variant="heroui" name="heroui-switch-account-submenu" />
+
+<ComponentPreview doc-variant="shadcn" name="shadcn-switch-account-submenu" />
+
+<DocVariant name="heroui shadcn">
+The plugin adds a "Switch Account" submenu to `<UserButton />`. It shows all active device sessions.
+
+Users can switch accounts, add an account, and identify the current account.
+
+**Usage**
+</DocVariant>
+
+```tsx doc-variant="heroui"
+import { SwitchAccountSubmenu } from "@better-auth-ui/heroui/plugins/multi-session"
+
+<SwitchAccountSubmenu />
+```
+
+<DocVariant name="zaidan">
+When `multiSessionPlugin()` is registered, `<UserButton />` renders plugin-contributed user menu items, including the switch-account submenu.
+</DocVariant>
+
+```tsx doc-variant="zaidan"
+import { UserButton } from "@/components/auth/user/user-button"
+
+<UserButton />
+```
+
+<ZaidanStory doc-variant="zaidan"
+  storyId="zaidan-plugins-multi-session--switch-account-preview"
+  title="Zaidan Multi Session user menu preview"
+  height={420}
+/>
+
+<DocVariant name="zaidan">
+### `<SwitchAccountSubmenu />`
+</DocVariant>
+
+```tsx doc-variant="shadcn zaidan"
+import { SwitchAccountSubmenu } from "@/components/auth/multi-session/switch-account-submenu"
+
+<SwitchAccountSubmenu />
+```
+
+<DocVariant name="heroui shadcn">
+**Props**
+</DocVariant>
+
+<type-table doc-variant="heroui" path="packages/heroui/src/components/auth/multi-session/switch-account-submenu.tsx" name="SwitchAccountSubmenuProps" />
+
+<type-table doc-variant="shadcn" path="examples/start-shadcn-example/src/components/auth/multi-session/switch-account-submenu.tsx" name="SwitchAccountSubmenuProps" />
+
+<type-table doc-variant="zaidan" path="examples/start-solid-zaidan-example/src/components/auth/multi-session/switch-account-submenu.tsx" name="SwitchAccountSubmenuProps" />
+
+### `<ManageAccounts />`
+
+<ComponentPreview doc-variant="heroui" name="heroui-manage-accounts" />
+
+<DocVariant name="heroui">
+The `<ManageAccounts />` card is automatically rendered in account settings when the plugin is registered.
+</DocVariant>
+
+<ComponentPreview doc-variant="shadcn" name="shadcn-manage-accounts" />
+
+<DocVariant name="shadcn">
+The `<ManageAccounts />` card is rendered in account settings when your layout renders plugin-contributed `accountCards` and `multiSessionPlugin()` is in `plugins`.
+</DocVariant>
+
+<DocVariant name="heroui shadcn">
+**Usage**
+</DocVariant>
+
+```tsx doc-variant="heroui"
+import { ManageAccounts } from "@better-auth-ui/heroui/plugins/multi-session"
+
+<ManageAccounts />
+```
+
+<DocVariant name="zaidan">
+`<ManageAccounts />` is rendered through plugin-contributed `accountCards`, so it appears inside `<AccountSettings />` when the plugin is registered.
+</DocVariant>
+
+```tsx doc-variant="shadcn zaidan"
+import { ManageAccounts } from "@/components/auth/multi-session/manage-accounts"
+
+<ManageAccounts />
+```
+
+<DocVariant name="heroui shadcn">
+**Props**
+</DocVariant>
+
+<type-table doc-variant="heroui" path="packages/heroui/src/components/auth/multi-session/manage-accounts.tsx" name="ManageAccountsProps" />
+
+<type-table doc-variant="shadcn" path="examples/start-shadcn-example/src/components/auth/multi-session/manage-accounts.tsx" name="ManageAccountsProps" />
+
+<DocVariant name="heroui shadcn">
+## Options
+
+```ts
+multiSessionPlugin({
+  // Override any of the plugin's localization strings.
+  localization: {
+    switchAccount: "Switch Account",
+    addAccount: "Add Account",
+    manageAccounts: "Manage Accounts"
+  }
+})
+```
+</DocVariant>
+
+<ZaidanStory doc-variant="zaidan"
+  storyId="zaidan-plugins-multi-session--manage-accounts-preview"
+  title="Zaidan Multi Session manage accounts preview"
+  height={520}
+/>
+
+<type-table doc-variant="zaidan" path="examples/start-solid-zaidan-example/src/components/auth/multi-session/manage-accounts.tsx" name="ManageAccountsProps" />
+
+<DocVariant name="zaidan">
+## Options
+
+The copied local wrapper accepts the same core plugin options:
+</DocVariant>
+
+```ts doc-variant="zaidan" title="src/lib/auth/multi-session-plugin.ts"
+multiSessionPlugin({
+  localization: {
+    switchAccount: "Switch Account",
+    addAccount: "Add account",
+    manageAccounts: "Manage accounts"
+  }
+})
+```
+
+<type-table path="packages/core/src/plugins/multi-session/multi-session-plugin.ts" name="MultiSessionPluginOptions" />
+
+## Localization
+
+<type-table path="packages/core/src/plugins/multi-session/multi-session-localization.ts" name="MultiSessionLocalization" />
+
+<DocVariant name="heroui shadcn">
+## Session management
+
+The plugin provides hooks for managing multiple sessions:
+
+- `useListDeviceSessions` - List all device sessions for the current user
+- `useSetActiveSession` - Switch to a different session
+- `useRevokeMultiSession` - Sign out from a specific session
+</DocVariant>
+
+<DocVariant name="zaidan">
+The copied submenu and manage-accounts components read localization from the registered plugin first, then fall back to the core defaults.
+
+## Session management
+
+The copied Solid components use the Solid runtime helpers directly:
+
+- `listDeviceSessionsOptions`
+- `setActiveSessionOptions`
+- `revokeMultiSessionOptions`
+
+References:
+
+- [listDeviceSessionsOptions](/docs/solid/queries/list-device-sessions)
+- [setActiveSessionOptions](/docs/solid/mutations/set-active-session)
+- [revokeMultiSessionOptions](/docs/solid/mutations/revoke-multi-session)
+
+These APIs power the switch-account submenu, current-session indicator, add-account navigation, and device-session revoke/switch actions.
+</DocVariant>

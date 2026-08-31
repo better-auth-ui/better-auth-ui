@@ -1,33 +1,7 @@
 ---
 title: useChangeEmail
 description: Change the authenticated user's email address.
+variant: react
 ---
 
-Refetches the session on success so the new email surfaces everywhere that reads `useSession` / `useUser`.
-
-## Usage
-
-```tsx
-import { authClient } from "@/lib/auth-client"
-import { useChangeEmail } from "@better-auth-ui/react"
-
-const { mutate: changeEmail } = useChangeEmail(authClient)
-
-changeEmail({
-  newEmail: "new@example.com",
-  callbackURL: "/account"
-})
-```
-
-## Options factory
-
-```tsx
-import { changeEmailOptions } from "@better-auth-ui/core"
-import { useMutation } from "@tanstack/react-query"
-
-const { mutate } = useMutation(changeEmailOptions(authClient))
-```
-
-## Params
-
-<type-table path="../../../../../../packages/core/src/mutations/change-email-mutation.ts" name="ChangeEmailParams" />
+<include>../../../topics/mutations/change-email.mdx</include>

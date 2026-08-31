@@ -2,66 +2,9 @@
 icon: UserSquare2
 title: Username
 description: Add username-based sign-in and real-time availability checking to your authentication flow.
+variant: shadcn
 ---
 
 import { Step, Steps } from 'fumadocs-ui/components/steps'
 
-<include>../../../shared/ui/plugins/username.mdx#shared-overview</include>
-
-<include>../../../shared/ui/plugins/username.mdx#shared-setup</include>
-
-<Steps>
-
-<include>../../../shared/ui/plugins/username.mdx#shared-install-the-better-auth-plugin</include>
-
-<Step>
-
-<include>../../../shared/ui/plugins/username.mdx#shared-install-the-matching-client-plugin</include>
-
-<include>../../../shared/ui/plugins/username.mdx#shared-react-client-example</include>
-
-</Step>
-<Step>
-### Register the UI plugin
-
-Pass `usernamePlugin()` to `<AuthProvider>`:
-
-```tsx title="components/providers.tsx"
-import { usernamePlugin } from "@/lib/auth/username-plugin" // [!code highlight]
-import { AuthProvider } from "@/components/auth/auth-provider"
-
-<AuthProvider
-  authClient={authClient}
-  navigate={navigate}
-  plugins={[usernamePlugin()]} // [!code highlight]
->
-  {children}
-</AuthProvider>
-```
-
-</Step>
-</Steps>
-
-## Components
-
-### `<SignIn />`
-
-<ComponentPreview name="shadcn-username-sign-in" />
-
-### `<SignUp />`
-
-<ComponentPreview name="shadcn-username-sign-up" />
-
-### `<UserProfile />`
-
-<ComponentPreview name="shadcn-username-user-profile" />
-
-<include>../../../shared/ui/plugins/username.mdx#shared-options</include>
-
-<include>../../../shared/ui/plugins/username.mdx#shared-options-example</include>
-
-<type-table path="../../../../../../packages/core/src/plugins/username/username-plugin.ts" name="UsernamePluginOptions" />
-
-## Localization
-
-<type-table path="../../../../../../packages/core/src/plugins/username/username-localization.ts" name="UsernameLocalization" />
+<include>../../../topics/ui/plugins/username.mdx</include>

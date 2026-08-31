@@ -1,32 +1,7 @@
 ---
 title: useSignInMagicLink
 description: Magic-link sign-in mutation hook.
+variant: solid
 ---
 
-Requires the Better Auth magic-link plugin. Import your configured `authClient`. It already carries the magic-link methods from `createAuthClient`.
-
-## Usage
-
-```tsx
-import { useSignInMagicLink } from "@better-auth-ui/solid/plugins/magic-link"
-
-const sendMagicLink = useSignInMagicLink(authClient)
-
-sendMagicLink.mutate({
-  email: "alice@example.com",
-  callbackURL: "/dashboard"
-})
-```
-
-## Options factory
-
-```tsx
-import { signInMagicLinkOptions } from "@better-auth-ui/core/plugins/magic-link"
-import { useMutation } from "@tanstack/solid-query"
-
-const sendMagicLink = useMutation(() => signInMagicLinkOptions(authClient))
-```
-
-## Params
-
-<type-table path="../../../../../../packages/core/src/plugins/magic-link/sign-in-magic-link-mutation.ts" name="SignInMagicLinkParams" />
+<include>../../../topics/mutations/sign-in-magic-link.mdx</include>

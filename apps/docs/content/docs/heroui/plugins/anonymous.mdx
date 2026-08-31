@@ -2,54 +2,9 @@
 icon: UserCircle
 title: Anonymous
 description: Let users continue with a temporary guest account.
+variant: heroui
 ---
 
 import { Step, Steps } from 'fumadocs-ui/components/steps'
 
-The anonymous UI plugin contributes one "Continue as guest" button to the authentication forms. A successful sign-in refreshes the session and follows the `redirectTo` configured on `<AuthProvider>`.
-
-## Setup
-
-<Steps>
-<Step>
-
-<include>../../../shared/ui/plugins/anonymous.mdx#shared-configure-the-better-auth-server-plugin</include>
-
-<include>../../../shared/ui/plugins/anonymous.mdx#shared-migration</include>
-
-</Step>
-
-<include>../../../shared/ui/plugins/anonymous.mdx#shared-configure-the-better-auth-client-plugin</include>
-
-<Step>
-### Register the Better Auth UI plugin
-
-Pass `anonymousPlugin()` to `<AuthProvider>`:
-
-```tsx title="components/providers.tsx"
-import { AuthProvider } from "@better-auth-ui/heroui"
-import { anonymousPlugin } from "@better-auth-ui/heroui/plugins" // [!code highlight]
-
-<AuthProvider
-  authClient={authClient}
-  navigate={navigate}
-  plugins={[
-    anonymousPlugin() // [!code highlight]
-  ]}
->
-  {children}
-</AuthProvider>
-```
-
-</Step>
-</Steps>
-
-## Change the label
-
-Override the plugin localization when the default wording does not fit your product:
-
-<include>../../../shared/ui/plugins/anonymous.mdx#shared-change-the-label</include>
-
-<type-table path="../../../../../../packages/core/src/plugins/anonymous/anonymous-plugin.ts" name="AnonymousPluginOptions" />
-
-<include>../../../shared/ui/plugins/anonymous.mdx#shared-account-linking</include>
+<include>../../../topics/ui/plugins/anonymous.mdx</include>

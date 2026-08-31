@@ -1,54 +1,7 @@
 ---
 title: <AuthProvider />
 description: Provides AuthConfig and Solid Query context to installed Solid auth components.
+variant: zaidan
 ---
 
-## Usage
-
-Install the provider registry payload with `npx shadcn@latest add https://better-auth-ui.com/r/solid/auth-provider.json`. It copies `src/components/auth/auth-provider.tsx` and related provider support files. After install, these files are app-owned. Then wrap your application shell as shown in the Solid/Zaidan example.
-
-```tsx file=<rootDir>/../../examples/start-solid-zaidan-example/src/components/providers.tsx
-```
-
-<include>../../../shared/ui/components/auth-provider.mdx#shared-localization</include>
-
-```tsx title="components/providers.tsx"
-import { deDE } from "@better-auth-ui/locales/de-DE"
-
-<AuthProvider authClient={authClient} locale={deDE}>
-  {children}
-</AuthProvider>
-```
-
-<include>../../../shared/ui/components/auth-provider.mdx#shared-locale-bundles</include>
-
-<include>../../../shared/ui/components/auth-provider.mdx#shared-localization-overrides</include>
-
-```tsx
-<AuthProvider
-  authClient={authClient}
-  locale={deDE}
-  localization={{ auth: { signIn: "Bei Acme anmelden" } }}
->
-  {children}
-</AuthProvider>
-```
-
-<include>../../../shared/ui/components/auth-provider.mdx#shared-match-the-browser-language</include>
-
-<include>../../../shared/ui/components/auth-provider.mdx#shared-popup-social-sign-in</include>
-
-```ts title="lib/auth-client.ts"
-import { createAuthClient } from "better-auth/solid"
-import { oauthPopupClient } from "better-auth/client/plugins"
-
-export const authClient = createAuthClient({
-  plugins: [oauthPopupClient()]
-})
-```
-
-<include>../../../shared/ui/components/auth-provider.mdx#shared-popup-provider</include>
-
-## Props
-
-<type-table path="../../../../../../packages/solid/src/lib/auth-provider.tsx" name="AuthProviderProps" />
+<include>../../../topics/ui/components/auth-provider.mdx</include>

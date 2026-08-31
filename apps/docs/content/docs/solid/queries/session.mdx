@@ -1,55 +1,7 @@
 ---
 title: useSession
 description: Read, prefetch, and invalidate the current authenticated session.
+variant: solid
 ---
 
-## Usage
-
-```tsx
-import { useSession } from "@better-auth-ui/solid"
-
-const session = useSession(authClient)
-const user = () => session.data?.user
-```
-
-Pass Better Auth params and Solid Query options through the same object.
-
-```tsx
-const session = useSession(authClient, () => ({
-  query: { disableCookieCache: true },
-  staleTime: 30_000
-}))
-```
-
-## Options factory
-
-```tsx
-import { sessionOptions } from "@better-auth-ui/core"
-import { createQuery } from "@tanstack/solid-query"
-
-const session = createQuery(() => sessionOptions(authClient))
-```
-
-<include>../../../shared/queries/session.mdx#server-side-prefetching</include>
-
-```ts
-import { ensureSessionServer } from "@better-auth-ui/core/server"
-
-import { auth } from "~/lib/auth"
-
-const session = await ensureSessionServer(queryClient, auth, {
-  headers: request.headers
-})
-```
-
-`@better-auth-ui/core/server` is the canonical session server-auth entrypoint. Plugin non-session server helpers live under their plugin `/server` entrypoints, such as `@better-auth-ui/core/plugins/organization/server`.
-
-<include>../../../shared/queries/session.mdx#invalidation</include>
-
-## Client params
-
-<type-table path="../../../../../../packages/core/src/queries/auth/session-query.ts" name="SessionParams" />
-
-## Server params
-
-<type-table path="../../../../../../packages/core/src/server/queries/auth/session-query-server.ts" name="SessionParams" />
+<include>../../../topics/queries/session.mdx</include>

@@ -1,0 +1,90 @@
+<DocVariant name="react">
+<include>../../shared/queries/organization.mdx#shared-requirements</include>
+</DocVariant>
+
+## Usage
+
+```tsx doc-variant="react"
+import { authClient } from "@/lib/auth-client"
+import { useListOrganizations } from "@better-auth-ui/react/plugins/organization"
+
+const result = useListOrganizations(authClient)
+```
+
+<DocVariant name="react">
+## Client options factory and router-loader helpers
+</DocVariant>
+
+```tsx doc-variant="react"
+import {
+  ensureListOrganizations,
+  fetchListOrganizations,
+  listOrganizationsOptions,
+  prefetchListOrganizations
+} from "@better-auth-ui/core/plugins/organization"
+
+const options = listOrganizationsOptions(authClient, userId)
+await ensureListOrganizations(queryClient, authClient, userId)
+await prefetchListOrganizations(queryClient, authClient, userId)
+const organizations = await fetchListOrganizations(queryClient, authClient, userId)
+```
+
+```tsx doc-variant="solid"
+import { useListOrganizations } from "@better-auth-ui/solid/plugins/organization"
+
+const result = useListOrganizations(authClient)
+```
+
+<DocVariant name="solid">
+<include>../../shared/queries/organization.mdx#shared-requirements</include>
+
+## Options factory
+</DocVariant>
+
+```tsx doc-variant="solid"
+import { listOrganizationsOptions } from "@better-auth-ui/core/plugins/organization"
+import { createQuery } from "@tanstack/solid-query"
+
+const query = createQuery(() =>
+  listOrganizationsOptions(authClient, userId)
+)
+```
+
+<include>../../shared/queries/organization.mdx#shared-notes</include>
+
+## Server-side prefetching
+
+<DocVariant name="react">
+For server loaders, import from `@better-auth-ui/core/plugins/organization/server`. The server helper uses your Better Auth server instance and the signed-in `userId` so the cache key stays partitioned per user.
+</DocVariant>
+
+```ts doc-variant="react"
+import { ensureListOrganizations } from "@better-auth-ui/core/plugins/organization/server"
+import { getRequestHeaders } from "@tanstack/react-start/server"
+
+import { auth } from "@/lib/auth"
+
+await ensureListOrganizations(queryClient, auth, userId, {
+  headers: getRequestHeaders()
+})
+```
+
+<DocVariant name="solid">
+<include>../../shared/queries/organization.mdx#shared-solid-client-prefetching</include>
+</DocVariant>
+
+```ts doc-variant="solid"
+import {
+  ensureListOrganizations,
+  fetchListOrganizations,
+  prefetchListOrganizations
+} from "@better-auth-ui/core/plugins/organization"
+
+await ensureListOrganizations(queryClient, authClient, userId)
+await prefetchListOrganizations(queryClient, authClient, userId)
+const organizations = await fetchListOrganizations(queryClient, authClient, userId)
+```
+
+## Params
+
+<type-table path="packages/core/src/plugins/organization/list-organizations-query.ts" name="ListOrganizationsParams" />

@@ -1,47 +1,7 @@
 ---
 title: useListOrganizationInvitations
 description: List pending invitations for an organization.
+variant: solid
 ---
 
-## Usage
-
-```tsx
-import { useListOrganizationInvitations } from "@better-auth-ui/solid/plugins/organization"
-
-const result = useListOrganizationInvitations(authClient)
-```
-
-<include>../../../shared/queries/organization.mdx#shared-requirements</include>
-
-## Options factory
-
-```tsx
-import { listOrganizationInvitationsOptions } from "@better-auth-ui/core/plugins/organization"
-import { createQuery } from "@tanstack/solid-query"
-
-const query = createQuery(() =>
-  listOrganizationInvitationsOptions(authClient, userId)
-)
-```
-
-<include>../../../shared/queries/organization.mdx#shared-notes</include>
-
-## Server-side prefetching
-
-<include>../../../shared/queries/organization.mdx#shared-solid-client-prefetching</include>
-
-```ts
-import {
-  ensureListOrganizationInvitations,
-  fetchListOrganizationInvitations,
-  prefetchListOrganizationInvitations
-} from "@better-auth-ui/core/plugins/organization"
-
-await ensureListOrganizationInvitations(queryClient, authClient, userId, { query: { organizationId: "org_123" } })
-await prefetchListOrganizationInvitations(queryClient, authClient, userId, { query: { organizationId: "org_123" } })
-const invitations = await fetchListOrganizationInvitations(queryClient, authClient, userId, { query: { organizationId: "org_123" } })
-```
-
-## Params
-
-<type-table path="../../../../../../packages/core/src/plugins/organization/list-invitations-query.ts" name="ListOrganizationInvitationsParams" />
+<include>../../../topics/queries/list-invitations.mdx</include>

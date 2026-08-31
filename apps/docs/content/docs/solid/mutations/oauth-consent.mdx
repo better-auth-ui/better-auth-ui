@@ -1,35 +1,7 @@
 ---
 title: useOAuthConsent
 description: Accept or deny the current OAuth authorization request.
+variant: solid
 ---
 
-<include>../../../shared/mutations/oauth-consent.mdx#shared-overview</include>
-
-## Usage
-
-```tsx
-import { useOAuthConsent } from "@better-auth-ui/solid/plugins/oauth-provider"
-
-const consent = useOAuthConsent(authClient)
-
-consent.mutate({ accept: true })
-consent.mutate({ accept: false })
-```
-
-<include>../../../shared/mutations/oauth-consent.mdx#shared-usage</include>
-
-## Options factory
-
-```tsx
-import { oauthConsentOptions } from "@better-auth-ui/core/plugins/oauth-provider"
-import { createMutation } from "@tanstack/solid-query"
-
-const consent = createMutation(() => oauthConsentOptions(authClient))
-
-consent.mutate({ accept: true })
-consent.mutate({ accept: false })
-```
-
-## Params
-
-<type-table path="../../../../../../packages/core/src/plugins/oauth-provider/oauth-consent-mutation.ts" name="OAuthConsentParams" />
+<include>../../../topics/mutations/oauth-consent.mdx</include>

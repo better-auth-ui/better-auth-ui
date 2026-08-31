@@ -1,30 +1,7 @@
 ---
 title: useUnlinkAccount
 description: Unlink a social provider from the current user.
+variant: react
 ---
 
-Refetches the linked accounts list on success.
-
-## Usage
-
-```tsx
-import { authClient } from "@/lib/auth-client"
-import { useUnlinkAccount } from "@better-auth-ui/react"
-
-const { mutate: unlinkAccount } = useUnlinkAccount(authClient)
-
-unlinkAccount({ providerId: "github", accountId: "acc_123" })
-```
-
-## Options factory
-
-```tsx
-import { unlinkAccountOptions } from "@better-auth-ui/core"
-import { useMutation } from "@tanstack/react-query"
-
-const { mutate } = useMutation(unlinkAccountOptions(authClient))
-```
-
-## Params
-
-<type-table path="../../../../../../packages/core/src/mutations/unlink-account-mutation.ts" name="UnlinkAccountParams" />
+<include>../../../topics/mutations/unlink-account.mdx</include>

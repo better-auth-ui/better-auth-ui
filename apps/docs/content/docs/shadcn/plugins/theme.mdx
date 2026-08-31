@@ -2,87 +2,9 @@
 icon: Palette
 title: Theme
 description: Add theme selection with system, light, and dark modes to your authentication flow.
+variant: shadcn
 ---
 
 import { Step, Steps } from 'fumadocs-ui/components/steps'
 
-<include>../../../shared/ui/plugins/theme.mdx#shared-overview</include>
-
-## Setup
-
-<Steps>
-<Step>
-### Install the UI plugin
-
-Run the shadcn CLI to install the theme plugin components:
-
-```npm
-npx shadcn@latest add @better-auth-ui/theme
-```
-
-</Step>
-<Step>
-
-<include>../../../shared/ui/plugins/theme.mdx#shared-register-the-ui-plugin</include>
-
-```tsx title="components/providers.tsx"
-import { ThemeProvider, useTheme } from "next-themes"
-import type { ReactNode } from "react"
-
-import { AuthProvider } from "@/components/auth/auth-provider"
-import { authClient } from "@/lib/auth-client"
-import { themePlugin } from "@/lib/auth/theme-plugin" // [!code highlight]
-
-export function Providers({ children }: { children: ReactNode }) {
-  return (
-    <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-      <AuthProvider
-        authClient={authClient}
-        plugins={[
-          themePlugin({ useTheme }) // [!code highlight]
-        ]}
-      >
-        {children}
-      </AuthProvider>
-    </ThemeProvider>
-  )
-}
-```
-
-<include>../../../shared/ui/plugins/theme.mdx#shared-theme-hook</include>
-
-</Step>
-
-<include>../../../shared/ui/plugins/theme.mdx#shared-or-pass-static-theme-state</include>
-
-</Steps>
-
-## Components
-
-### `<UserButton />`
-
-<ComponentPreview name="shadcn-theme-toggle-item" />
-
-### `<Appearance />`
-
-<ComponentPreview name="shadcn-theme-appearance" />
-
-<include>../../../shared/ui/plugins/theme.mdx#shared-appearance</include>
-
-```tsx
-import { Appearance } from "@/components/auth/theme/appearance"
-
-<Appearance />
-```
-
-**Props**
-
-<type-table path="../../../../../../examples/start-shadcn-example/src/components/auth/theme/appearance.tsx" name="AppearanceProps" />
-
-## Options
-
-<type-table path="../../../../../../examples/start-shadcn-example/src/lib/auth/theme-plugin.ts" name="ThemePluginOptions" />
-
-## Localization
-
-<type-table path="../../../../../../packages/core/src/plugins/theme/theme-localization.ts" name="ThemeLocalization" />
+<include>../../../topics/ui/plugins/theme.mdx</include>

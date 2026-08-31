@@ -1,30 +1,7 @@
 ---
 title: useDeleteOrganization
 description: Delete an organization.
+variant: react
 ---
 
-<include>../../../shared/mutations/plugin-requirements.mdx#shared-organization-react</include>
-
-## Usage
-
-```tsx
-import { authClient } from "@/lib/auth-client"
-import { useDeleteOrganization } from "@better-auth-ui/react/plugins/organization"
-
-const mutation = useDeleteOrganization(authClient)
-
-mutation.mutate(/* params */)
-```
-
-## Options factory
-
-```tsx
-import { deleteOrganizationOptions } from "@better-auth-ui/core/plugins/organization"
-import { useMutation } from "@tanstack/react-query"
-
-const mutation = useMutation(deleteOrganizationOptions(authClient))
-```
-
-## Params
-
-<type-table path="../../../../../../packages/core/src/plugins/organization/delete-organization-mutation.ts" name="DeleteOrganizationParams" />
+<include>../../../topics/mutations/delete-organization.mdx</include>

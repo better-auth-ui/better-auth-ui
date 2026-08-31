@@ -1,0 +1,500 @@
+<DocVariant name="heroui">
+The billing plugin adds a complete billing tab to personal or organization settings. Its components use a generic `BillingAdapter`, so the UI does not depend on provider-specific objects. BAUI includes adapters for Stripe, Polar, Autumn, Creem, Dodo Payments, and Commet.
+
+The billing view includes pricing plans, checkout, subscription status, portal access, cancellation, restoration, seats, and metered usage.
+</DocVariant>
+
+<DocVariant name="shadcn">
+The billing plugin adds a complete billing tab to personal or organization settings. Every component reads a provider-neutral `BillingAdapter`. BAUI includes adapters for Stripe, Polar, Autumn, Creem, Dodo Payments, and Commet.
+
+The UI includes:
+
+- Pricing plans with monthly, yearly, and one-time prices
+- Current subscription status
+- Checkout and plan changes
+- Billing portal access
+- Cancellation and restoration
+- Seat management
+- Metered usage
+- Personal and organization billing
+</DocVariant>
+
+<DocVariant name="zaidan">
+The billing plugin adds a billing tab to personal or organization settings. Every view reads a provider-neutral `BillingAdapter`. BAUI includes adapters for Stripe, Polar, Autumn, Creem, Dodo Payments, and Commet.
+
+The UI covers:
+
+- Pricing plans with monthly, yearly, and one-time prices
+- Current subscription status and renewal or end date
+- Checkout and plan changes
+- Billing portal access
+- Cancellation and restoration
+- Seat management
+- Metered usage
+</DocVariant>
+
+## Setup
+
+<Steps>
+
+<Step>
+
+<DocVariant name="heroui">
+### Configure billing in Better Auth
+
+Configure one of Better Auth's supported billing plugins. Add its client plugin and apply its database schema.
+</DocVariant>
+
+<DocVariant name="shadcn zaidan">
+### Configure a Better Auth billing plugin
+</DocVariant>
+
+<DocVariant name="shadcn">
+Configure one of Better Auth's supported billing plugins on the server and client. Apply its database schema before you open the billing page.
+</DocVariant>
+
+<DocVariant name="zaidan">
+Configure one of Better Auth's supported billing plugins on the server and client. Apply its schema before you open the billing page.
+</DocVariant>
+
+See the provider guides for [Stripe](https://www.better-auth.com/docs/beta/plugins/stripe), [Polar](https://www.better-auth.com/docs/plugins/polar), [Autumn](https://www.better-auth.com/docs/plugins/autumn), [Creem](https://www.better-auth.com/docs/plugins/creem), [Dodo Payments](https://docs.dodopayments.com/developer-resources/better-auth-adaptor), and [Commet](https://www.better-auth.com/docs/plugins/commet).
+
+</Step>
+
+<Step>
+
+<DocVariant name="heroui">
+### Create a provider-neutral adapter
+</DocVariant>
+
+```ts doc-variant="heroui" title="lib/billing.ts"
+import {
+  type BillingPlan,
+  createStripeBillingAdapter
+} from "@better-auth-ui/core/plugins/billing"
+
+import { authClient } from "./auth-client"
+
+const plans = [
+  {
+    id: "pro",
+    name: "Pro",
+    description: "For teams shipping production applications.",
+    prices: [
+      { id: "pro-month", amount: 2000, currency: "USD", interval: "month" },
+      { id: "pro-year", amount: 19200, currency: "USD", interval: "year" }
+    ],
+    features: ["Unlimited projects", "Priority support"],
+    highlighted: true,
+    seatBased: true
+  }
+] satisfies BillingPlan[]
+
+export const billingAdapter = createStripeBillingAdapter(authClient, {
+  plans,
+  successUrl: "/settings/billing?checkout=success",
+  cancelUrl: "/settings/billing?checkout=canceled",
+  returnUrl: "/settings/billing"
+})
+```
+
+<DocVariant name="heroui">
+Price amounts use the currency's smallest unit. For example, `2000` USD means `$20.00`.
+</DocVariant>
+
+<DocVariant name="shadcn">
+### Install the registry item
+</DocVariant>
+
+```bash doc-variant="shadcn"
+bunx shadcn@latest add @better-auth-ui/billing
+```
+
+<DocVariant name="shadcn">
+This installs the billing views, the local plugin factory, and the required shadcn/ui components.
+</DocVariant>
+
+<DocVariant name="zaidan">
+### Install the UI plugin
+</DocVariant>
+
+```npm doc-variant="zaidan"
+npx shadcn@latest add https://better-auth-ui.com/r/solid/billing.json
+```
+
+</Step>
+
+<Step>
+
+<DocVariant name="heroui">
+### Register the HeroUI plugin
+
+This snippet shows only the billing additions. The [TanStack Start](/docs/heroui/integrations/tanstack-start) and [Next.js](/docs/heroui/integrations/nextjs) guides cover the full provider, including where `authClient` and `navigate` come from.
+</DocVariant>
+
+```tsx doc-variant="heroui" title="components/providers.tsx"
+import { AuthProvider } from "@better-auth-ui/heroui"
+import { billingPlugin } from "@better-auth-ui/heroui/plugins/billing"
+import { organizationPlugin } from "@better-auth-ui/heroui/plugins/organization"
+
+import { billingAdapter } from "@/lib/billing"
+
+<AuthProvider
+  authClient={authClient}
+  navigate={navigate}
+  plugins={[
+    organizationPlugin(),
+    billingPlugin({
+      adapter: billingAdapter,
+      user: true,
+      organization: true
+    })
+  ]}
+>
+  {children}
+</AuthProvider>
+```
+
+<DocVariant name="heroui">
+Personal billing is enabled by default. Set `organization: true` to add the organization billing tab.
+</DocVariant>
+
+<DocVariant name="shadcn">
+### Create an adapter
+
+Define the plans once in BAUI's generic format. Amounts use the currency's smallest unit. For example, `2000` USD means `$20.00`.
+</DocVariant>
+
+```ts doc-variant="shadcn" title="lib/billing.ts"
+import {
+  type BillingPlan,
+  createStripeBillingAdapter
+} from "@better-auth-ui/core/plugins/billing"
+
+import { authClient } from "@/lib/auth-client"
+
+const plans = [
+  {
+    id: "pro",
+    name: "Pro",
+    description: "For teams shipping production applications.",
+    prices: [
+      { id: "pro-month", amount: 2000, currency: "USD", interval: "month" },
+      { id: "pro-year", amount: 19200, currency: "USD", interval: "year" }
+    ],
+    features: ["Unlimited projects", "Priority support"],
+    highlighted: true,
+    seatBased: true
+  }
+] satisfies BillingPlan[]
+
+export const billingAdapter = createStripeBillingAdapter(authClient, {
+  plans,
+  successUrl: "/settings/billing?checkout=success",
+  cancelUrl: "/settings/billing?checkout=canceled",
+  returnUrl: "/settings/billing"
+})
+```
+
+<DocVariant name="zaidan">
+### Register the plugin
+
+Build an adapter and hand it to the plugin.
+</DocVariant>
+
+```tsx doc-variant="zaidan" title="src/components/providers.tsx"
+import { createStripeBillingAdapter } from "@better-auth-ui/core/plugins/billing" // [!code highlight]
+import { AuthProvider } from "@/components/auth/auth-provider"
+import { billingPlugin } from "@/lib/auth/billing-plugin" // [!code highlight]
+import { authClient } from "@/lib/auth-client"
+
+const billingAdapter = createStripeBillingAdapter(authClient, {
+  plans,
+  successUrl: "/settings/billing?checkout=success",
+  cancelUrl: "/settings/billing?checkout=canceled",
+  returnUrl: "/settings/billing"
+}) // [!code highlight]
+
+export function Providers(props: { children?: JSX.Element }) {
+  return (
+    <AuthProvider
+      authClient={authClient}
+      navigate={navigate}
+      plugins={[
+        billingPlugin({ adapter: billingAdapter, organization: true }) // [!code highlight]
+      ]}
+    >
+      {props.children}
+    </AuthProvider>
+  )
+}
+```
+
+<DocVariant name="zaidan">
+`user` defaults to `true` and adds the tab to personal settings. `organization` defaults to `false`. Turn it on to add the same tab to organization settings.
+</DocVariant>
+
+</Step>
+
+<Step doc-variant="shadcn">
+
+### Register the plugin
+
+This snippet shows only the billing additions. The [TanStack Start](/docs/shadcn/integrations/tanstack-start) and [Next.js](/docs/shadcn/integrations/nextjs) guides cover the full provider, including where `authClient` and `navigate` come from.
+
+```tsx title="components/providers.tsx"
+import { AuthProvider } from "@/components/auth/auth-provider"
+import { billingPlugin } from "@/lib/auth/billing-plugin"
+import { organizationPlugin } from "@/lib/auth/organization-plugin"
+import { billingAdapter } from "@/lib/billing"
+
+<AuthProvider
+  authClient={authClient}
+  navigate={navigate}
+  plugins={[
+    organizationPlugin(),
+    billingPlugin({
+      adapter: billingAdapter,
+      user: true,
+      organization: true
+    })
+  ]}
+>
+  {children}
+</AuthProvider>
+```
+
+Organization requests always include the organization ID and slug. Your custom adapter must authorize the requested organization. Do not infer it from active organization state.
+
+</Step>
+
+</Steps>
+
+<DocVariant name="heroui shadcn">
+## Polar adapter
+</DocVariant>
+
+<DocVariant name="heroui">
+Use the Polar adapter with the same generic plan list. Map each BAUI plan to a Polar product ID or checkout slug.
+</DocVariant>
+
+<DocVariant name="shadcn">
+Map each BAUI plan ID to a Polar product ID or checkout slug. The adapter uses the mapping in both directions, so the UI can match a Polar subscription to its BAUI plan.
+</DocVariant>
+
+```ts doc-variant="heroui shadcn" title="lib/billing.ts"
+import { createPolarBillingAdapter } from "@better-auth-ui/core/plugins/billing"
+
+export const billingAdapter = createPolarBillingAdapter(authClient, {
+  plans,
+  products: {
+    pro: { type: "product", value: "123e4567-e89b-12d3-a456-426614174000" }
+  },
+  successUrl: "/settings/billing?checkout=success",
+  cancelUrl: "/settings/billing?checkout=canceled",
+  returnUrl: "/settings/billing"
+})
+```
+
+<DocVariant name="heroui">
+Polar handles cancellation, restoration, and seat changes in its customer portal. Its adapter marks those direct actions as unsupported, so BAUI shows a manage-billing action instead. Stripe uses Better Auth's subscription endpoints.
+</DocVariant>
+
+<DocVariant name="shadcn">
+Polar handles cancellation, restoration, and seat changes in its customer portal. Its adapter marks those direct actions as unsupported, so BAUI shows a manage-billing action instead. Stripe performs the actions through Better Auth's subscription endpoints.
+</DocVariant>
+
+<DocVariant name="heroui shadcn">
+## Other bundled adapters
+</DocVariant>
+
+<DocVariant name="shadcn">
+Each adapter reflects the official client API. It does not claim support for actions that the provider handles in its portal.
+</DocVariant>
+
+<DocVariant name="zaidan">
+## Bundled adapters
+</DocVariant>
+
+| Adapter | Checkout and state | Direct actions | Scope |
+| --- | --- | --- | --- |
+| Stripe | Better Auth subscription API | Cancel, restore, seats | User and explicit organization |
+| Polar | Checkout, subscriptions, usage | Portal fallback | User and explicit organization |
+| Autumn | Attach, customer subscriptions, balances | Cancel, restore, optional license seats | User |
+| Creem | Checkout and active subscription | Cancel | User |
+| Dodo Payments | Checkout session and subscription list | Portal fallback | User |
+| Commet | Portal and current subscription | Cancel, optional feature usage and seats | User |
+
+<DocVariant name="heroui shadcn">
+```ts title="lib/billing.ts"
+import {
+  createAutumnBillingAdapter,
+  createCommetBillingAdapter,
+  createCreemBillingAdapter,
+  createDodoPaymentsBillingAdapter
+} from "@better-auth-ui/core/plugins/billing"
+import { createAutumnClient } from "autumn-js/react"
+
+const urls = {
+  successUrl: "/settings/billing?checkout=success",
+  cancelUrl: "/settings/billing?checkout=canceled",
+  returnUrl: "/settings/billing"
+}
+
+const autumnClient = createAutumnClient({
+  pathPrefix: "/api/auth/autumn",
+  includeCredentials: true
+})
+
+export const autumnAdapter = createAutumnBillingAdapter(autumnClient, {
+  plans,
+  seatLicensePlans: { pro: "team-seat" },
+  ...urls
+})
+
+export const creemAdapter = createCreemBillingAdapter(authClient, {
+  plans,
+  products: { pro: "prod_creem_pro" },
+  ...urls
+})
+
+export const dodoAdapter = createDodoPaymentsBillingAdapter(authClient, {
+  plans,
+  products: { pro: { type: "slug", value: "pro" } },
+  ...urls
+})
+
+export const commetAdapter = createCommetBillingAdapter(authClient, {
+  plans,
+  planIds: { pro: "commet-plan-id" },
+  usage: true,
+  seatFeatureCode: "members",
+  ...urls
+})
+```
+
+Enable the matching provider sub-plugins. Dodo needs checkout and portal. Commet needs portal and subscriptions, plus features or seats when you enable those adapter options.
+</DocVariant>
+
+<DocVariant name="zaidan">
+The factories are `createStripeBillingAdapter`, `createPolarBillingAdapter`, `createAutumnBillingAdapter`, `createCreemBillingAdapter`, `createDodoPaymentsBillingAdapter`, and `createCommetBillingAdapter`. They use the same `BillingPlan` list and work with both React and Solid billing hooks.
+</DocVariant>
+
+<Callout type="warn" title="User-only provider clients">
+Autumn, Creem, Dodo Payments, and Commet resolve the signed-in customer. Their browser APIs do not accept an explicit organization ID. Their adapters declare `scopes.organization: false`. `billingPlugin` rejects an organization billing configuration instead of reading active organization state.
+</Callout>
+
+<DocVariant name="heroui">
+## Custom adapter
+
+Implement `BillingAdapter` to connect another billing service. The adapter receives an explicit user or organization scope for every operation.
+</DocVariant>
+
+<DocVariant name="shadcn">
+## Custom adapters
+
+Implement `BillingAdapter` when you use another provider. Keep provider SDK objects inside the adapter and return only BAUI's generic plan, subscription, usage, and action types.
+</DocVariant>
+
+```ts doc-variant="heroui shadcn"
+import type { BillingAdapter } from "@better-auth-ui/core/plugins/billing"
+
+export const billingAdapter: BillingAdapter = {
+  id: "custom",
+  scopes: { user: true, organization: true },
+  supports: { cancel: true, restore: true, seats: true },
+  listPlans: async (scope, signal) => billingApi.listPlans(scope, signal),
+  getState: async (scope, signal) => billingApi.getState(scope, signal),
+  checkout: async (scope, input) => billingApi.checkout(scope, input),
+  openPortal: async (scope) => billingApi.openPortal(scope),
+  cancel: async (scope, subscriptionId) =>
+    billingApi.cancel(scope, subscriptionId),
+  restore: async (scope, subscriptionId) =>
+    billingApi.restore(scope, subscriptionId),
+  updateSeats: async (scope, subscriptionId, seats) =>
+    billingApi.updateSeats(scope, subscriptionId, seats)
+}
+```
+
+<Callout doc-variant="heroui shadcn" type="warn" title="Authorize every scope">
+
+<DocVariant name="heroui">
+Validate organization membership and billing permissions on the server. Do not trust organization IDs or slugs from the browser.
+</DocVariant>
+
+<DocVariant name="shadcn">
+The browser can change organization IDs and slugs. Validate membership and billing permissions on the server for every adapter operation.
+</DocVariant>
+
+</Callout>
+
+<DocVariant name="heroui">
+## Components and hooks
+</DocVariant>
+
+```tsx doc-variant="heroui"
+import {
+  BillingSettings,
+  OrganizationBillingSettings,
+  UserBillingSettings
+} from "@better-auth-ui/heroui/plugins/billing"
+```
+
+<DocVariant name="heroui">
+For custom views, import the provider-neutral React hooks from `@better-auth-ui/react/plugins/billing`.
+</DocVariant>
+
+<type-table doc-variant="heroui" path="packages/heroui/src/components/auth/billing/billing-settings.tsx" name="BillingSettingsProps" />
+
+<DocVariant name="shadcn">
+## Headless hooks
+
+React and Solid export the same provider-neutral hooks from `@better-auth-ui/react/plugins/billing` and `@better-auth-ui/solid/plugins/billing`:
+
+- `useBillingPlans`
+- `useBillingState`
+- `useBillingCheckout`
+- `useBillingPortal`
+- `useCancelBillingSubscription`
+- `useRestoreBillingSubscription`
+- `useUpdateBillingSeats`
+</DocVariant>
+
+<Callout doc-variant="zaidan" type="info">
+
+The adapter's `supports` flags decide which controls render. A provider that cannot restore a canceled subscription does not show the restore button.
+
+</Callout>
+
+<DocVariant name="zaidan">
+## Writing your own adapter
+
+`BillingAdapter` is a plain interface: list plans, read state, start checkout, open a portal, cancel, restore, and update seats. Implement it against any billing service and the views work unchanged.
+</DocVariant>
+
+<type-table doc-variant="zaidan" path="packages/core/src/plugins/billing/billing-adapter.ts" name="BillingAdapter" />
+
+<DocVariant name="zaidan">
+## Runtime prerequisites
+
+- Server and client: a Better Auth billing plugin, or your own billing endpoints.
+- App: a `BillingAdapter` instance.
+- Runtime API: billing query and mutation options from [Solid runtime APIs](/docs/solid).
+
+## Copied files
+
+- `src/lib/auth/billing-plugin.tsx`
+- `src/components/auth/billing/billing-settings.tsx`
+
+After install the plan cards, usage bars, and dialogs are yours to restyle. The usage bar is rendered inline with `role="progressbar"` rather than a Zaidan primitive, since Zaidan does not ship one.
+
+## Options
+</DocVariant>
+
+<type-table doc-variant="zaidan" path="packages/core/src/plugins/billing/billing-plugin.ts" name="BillingPluginOptions" />
+
+<DocVariant name="zaidan">
+## Localization
+</DocVariant>
+
+<type-table doc-variant="zaidan" path="packages/core/src/plugins/billing/billing-localization.ts" name="BillingLocalization" />

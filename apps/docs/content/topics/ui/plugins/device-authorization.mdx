@@ -1,0 +1,437 @@
+<DocVariant name="heroui">
+The device-authorization plugin adds the browser half of Better Auth's device authorization flow. A user enters the short code shown by a CLI, TV, or another limited-input device, signs in if needed, then approves or denies access.
+
+It contributes:
+
+- A `<DeviceAuthorization />` view at `/auth/device`
+- Code verification with the `user_code` query parameter prefilled when present
+- Sign-in redirection that preserves the pending code
+- Approve and deny confirmation states
+- `useVerifyDeviceCode`, `useApproveDevice`, and `useDenyDevice` mutation hooks
+</DocVariant>
+
+<DocVariant name="shadcn zaidan">
+The Device Authorization plugin adds the browser half of Better Auth's device authorization flow. A user enters the short code shown by a CLI, TV, or another limited-input device, signs in if needed, then approves or denies access.
+
+It contributes:
+</DocVariant>
+
+<DocVariant name="shadcn">
+- A `<DeviceAuthorization />` view at `/auth/device`
+- Code verification with the `user_code` query parameter prefilled when present
+- Sign-in redirection that preserves the pending code
+- Approve and deny confirmation states
+- React Query hooks for verifying, approving, and denying device requests
+</DocVariant>
+
+<DocVariant name="zaidan">
+- A copied `<DeviceAuthorization />` view at `/auth/device`
+- Code verification with the `user_code` query parameter prefilled when present
+- Sign-in redirection that preserves the pending code
+- Approve and deny confirmation states
+- Solid Query mutation options for verifying, approving, and denying requests
+</DocVariant>
+
+The requesting device remains responsible for calling Better Auth's `/device/code` endpoint and polling `/device/token`.
+
+## Setup
+
+<Steps>
+
+<Step>
+
+<DocVariant name="heroui">
+### Install the Better Auth plugin
+</DocVariant>
+
+<DocVariant name="shadcn zaidan">
+### Configure the Better Auth server
+</DocVariant>
+
+Add the [Device Authorization](https://www.better-auth.com/docs/plugins/device-authorization) plugin to your Better Auth server. Set `verificationUri` to the public route that renders the UI view:
+
+```ts doc-variant="heroui shadcn" title="lib/auth.ts"
+import { betterAuth } from "better-auth"
+import { deviceAuthorization } from "better-auth/plugins" // [!code highlight]
+
+export const auth = betterAuth({
+  // ...
+  plugins: [
+    deviceAuthorization({ // [!code highlight]
+      verificationUri: "/auth/device" // [!code highlight]
+    }) // [!code highlight]
+  ]
+})
+```
+
+<DocVariant name="heroui">
+Generate or migrate the Better Auth schema after enabling the server plugin. It adds the `deviceCode` model used to track pending requests.
+</DocVariant>
+
+```ts doc-variant="zaidan" title="src/lib/auth.ts"
+import { betterAuth } from "better-auth"
+import { deviceAuthorization } from "better-auth/plugins" // [!code highlight]
+
+export const auth = betterAuth({
+  // ...
+  plugins: [
+    deviceAuthorization({ // [!code highlight]
+      verificationUri: "/auth/device" // [!code highlight]
+    }) // [!code highlight]
+  ]
+})
+```
+
+<DocVariant name="shadcn zaidan">
+Generate or migrate your Better Auth schema after enabling the plugin:
+
+```bash
+bunx auth@latest migrate
+```
+
+The plugin adds the `deviceCode` model used to track pending requests.
+</DocVariant>
+
+</Step>
+
+<Step>
+
+<DocVariant name="heroui">
+### Install the matching client plugin
+</DocVariant>
+
+<DocVariant name="shadcn">
+### Configure the browser client
+</DocVariant>
+
+<DocVariant name="heroui shadcn">
+Add `deviceAuthorizationClient()` to your browser auth client:
+
+```ts title="lib/auth-client.ts"
+import { createAuthClient } from "better-auth/react"
+import { deviceAuthorizationClient } from "better-auth/client/plugins" // [!code highlight]
+
+export const authClient = createAuthClient({
+  plugins: [deviceAuthorizationClient()] // [!code highlight]
+})
+```
+</DocVariant>
+
+<DocVariant name="zaidan">
+### Configure the Solid client
+
+Add `deviceAuthorizationClient()` to the auth client:
+</DocVariant>
+
+```ts doc-variant="zaidan" title="src/lib/auth-client.ts"
+import { createAuthClient } from "@better-auth-ui/solid"
+import { deviceAuthorizationClient } from "better-auth/client/plugins" // [!code highlight]
+
+export const authClient = createAuthClient({
+  plugins: [deviceAuthorizationClient()] // [!code highlight]
+})
+```
+
+</Step>
+
+<Step>
+
+<DocVariant name="heroui">
+### Register the UI plugin
+
+Pass `deviceAuthorizationPlugin()` to `<AuthProvider>`:
+</DocVariant>
+
+```tsx doc-variant="heroui" title="components/providers.tsx"
+import { AuthProvider } from "@better-auth-ui/heroui"
+import { deviceAuthorizationPlugin } from "@better-auth-ui/heroui/plugins" // [!code highlight]
+
+<AuthProvider
+  authClient={authClient}
+  navigate={navigate}
+  plugins={[deviceAuthorizationPlugin()]} // [!code highlight]
+>
+  {children}
+</AuthProvider>
+```
+
+<DocVariant name="shadcn">
+### Install the device authorization view
+</DocVariant>
+
+```bash doc-variant="shadcn"
+bunx --bun shadcn@latest add @better-auth-ui/device-authorization
+```
+
+<DocVariant name="shadcn">
+This installs:
+
+- `src/lib/auth/device-authorization-plugin.ts`
+- `src/components/auth/device-authorization/device-authorization.tsx`
+- The required shadcn UI primitives
+</DocVariant>
+
+<DocVariant name="zaidan">
+### Install the Solid and Zaidan view
+</DocVariant>
+
+```bash doc-variant="zaidan"
+bunx --bun shadcn@latest add https://better-auth-ui.com/r/solid/device-authorization.json
+```
+
+<DocVariant name="zaidan">
+This copies the following files into your project:
+
+- `src/lib/auth/device-authorization-plugin.ts`
+- `src/components/auth/device-authorization/device-authorization.tsx`
+- Local Zaidan UI primitives under `src/components/ui/**`
+
+After install, the view and plugin factory belong to your application. You can adapt their layout or behavior without waiting for a package release.
+</DocVariant>
+
+</Step>
+
+<Step>
+
+<DocVariant name="heroui">
+### Allow the new auth path
+
+Include the plugin's path in the route that renders `<Auth />`. Keep this path aligned with the server's `verificationUri`:
+</DocVariant>
+
+```tsx doc-variant="heroui" title="routes/auth/$path.tsx"
+import { viewPaths } from "@better-auth-ui/core"
+import { Auth } from "@better-auth-ui/heroui"
+import { deviceAuthorizationPlugin } from "@better-auth-ui/heroui/plugins"
+import { createFileRoute, notFound } from "@tanstack/react-router"
+
+const validAuthPathSegments = new Set([
+  ...Object.values(viewPaths.auth),
+  deviceAuthorizationPlugin().viewPaths.auth.deviceAuthorization
+])
+
+export const Route = createFileRoute("/auth/$path")({
+  beforeLoad({ params: { path } }) {
+    if (!validAuthPathSegments.has(path)) {
+      throw notFound()
+    }
+  },
+  component: AuthPage
+})
+
+function AuthPage() {
+  const { path } = Route.useParams()
+  return <Auth path={path} />
+}
+```
+
+<DocVariant name="shadcn">
+### Register the UI plugin
+
+Pass `deviceAuthorizationPlugin()` to `<AuthProvider>`:
+</DocVariant>
+
+```tsx doc-variant="shadcn" title="components/providers.tsx"
+import { AuthProvider } from "@/components/auth/auth-provider"
+import { deviceAuthorizationPlugin } from "@/lib/auth/device-authorization-plugin" // [!code highlight]
+
+<AuthProvider
+  authClient={authClient}
+  navigate={navigate}
+  plugins={[deviceAuthorizationPlugin()]} // [!code highlight]
+>
+  {children}
+</AuthProvider>
+```
+
+<DocVariant name="zaidan">
+### Register the UI plugin
+
+Pass `deviceAuthorizationPlugin()` to the copied `<AuthProvider>`:
+</DocVariant>
+
+```tsx doc-variant="zaidan" title="src/components/providers.tsx"
+import { AuthProvider } from "@/components/auth/auth-provider"
+import { deviceAuthorizationPlugin } from "@/lib/auth/device-authorization-plugin" // [!code highlight]
+
+<AuthProvider
+  authClient={authClient}
+  plugins={[deviceAuthorizationPlugin()]} // [!code highlight]
+>
+  {children}
+</AuthProvider>
+```
+
+</Step>
+
+<Step doc-variant="shadcn zaidan">
+
+### Allow the device route
+
+Include the plugin path in the route that renders `<Auth />`. Keep it aligned with the server's `verificationUri`:
+
+```tsx doc-variant="shadcn" title="routes/auth/$path.tsx"
+import { viewPaths } from "@better-auth-ui/core"
+import { createFileRoute, notFound } from "@tanstack/react-router"
+
+import { Auth } from "@/components/auth/auth"
+import { deviceAuthorizationPlugin } from "@/lib/auth/device-authorization-plugin"
+
+const validAuthPathSegments = new Set([
+  ...Object.values(viewPaths.auth),
+  deviceAuthorizationPlugin().viewPaths.auth.deviceAuthorization
+])
+
+export const Route = createFileRoute("/auth/$path")({
+  beforeLoad({ params: { path } }) {
+    if (!validAuthPathSegments.has(path)) {
+      throw notFound()
+    }
+  },
+  component: AuthPage
+})
+
+function AuthPage() {
+  const { path } = Route.useParams()
+  return <Auth path={path} />
+}
+```
+
+```tsx doc-variant="zaidan" title="src/routes/auth/$path.tsx"
+import { viewPaths } from "@better-auth-ui/core"
+import { createFileRoute, redirect } from "@tanstack/solid-router"
+
+import { Auth } from "@/components/auth/auth"
+import { deviceAuthorizationPlugin } from "@/lib/auth/device-authorization-plugin"
+
+const validAuthPathSegments = new Set([
+  ...Object.values(viewPaths.auth),
+  deviceAuthorizationPlugin().viewPaths.auth.deviceAuthorization
+])
+
+export const Route = createFileRoute("/auth/$path")({
+  beforeLoad({ params: { path } }) {
+    if (!validAuthPathSegments.has(path)) {
+      throw redirect({ to: "/" })
+    }
+  },
+  component: AuthPage
+})
+
+function AuthPage() {
+  const { path } = Route.useParams()()
+  return <Auth path={path} />
+}
+```
+
+</Step>
+
+</Steps>
+
+<DocVariant name="heroui">
+## Components
+
+### `<DeviceAuthorization />`
+</DocVariant>
+
+<ComponentPreview doc-variant="heroui" name="heroui-device-authorization" />
+
+<DocVariant name="shadcn zaidan">
+## Component
+</DocVariant>
+
+<ComponentPreview doc-variant="shadcn" name="shadcn-device-authorization" />
+
+<DocVariant name="heroui shadcn">
+Enter any eight-character code in the preview to exercise the approval flow.
+</DocVariant>
+
+<DocVariant name="heroui">
+The component is rendered automatically at `/auth/device` when the plugin is registered. You can also use it directly:
+</DocVariant>
+
+```tsx doc-variant="heroui"
+import { DeviceAuthorization } from "@better-auth-ui/heroui/plugins"
+
+<DeviceAuthorization />
+```
+
+<type-table doc-variant="heroui" path="packages/heroui/src/components/auth/device-authorization/device-authorization.tsx" name="DeviceAuthorizationProps" />
+
+<DocVariant name="shadcn">
+The component is rendered automatically at `/auth/device` when the plugin is registered. You can also render it directly:
+</DocVariant>
+
+<DocVariant name="zaidan">
+The copied component is rendered automatically at `/auth/device` when the plugin is registered. You can also render it directly:
+</DocVariant>
+
+```tsx doc-variant="shadcn zaidan"
+import { DeviceAuthorization } from "@/components/auth/device-authorization/device-authorization"
+
+<DeviceAuthorization />
+```
+
+<type-table doc-variant="shadcn" path="examples/start-shadcn-example/src/components/auth/device-authorization/device-authorization.tsx" name="DeviceAuthorizationProps" />
+
+<type-table doc-variant="zaidan" path="examples/start-solid-zaidan-example/src/components/auth/device-authorization/device-authorization.tsx" name="DeviceAuthorizationProps" />
+
+## Options
+
+```ts
+deviceAuthorizationPlugin({
+  // Override the URL segment. Default: "device"
+  path: "activate",
+  // Match Better Auth's server-side userCodeLength. Default: 8
+  userCodeLength: 8,
+  localization: {
+    approveDevice: "Allow this device?"
+  }
+})
+```
+
+<type-table path="packages/core/src/plugins/device-authorization/device-authorization-plugin.ts" name="DeviceAuthorizationPluginOptions" />
+
+Keep `userCodeLength` equal to the value passed to Better Auth's server plugin. A mismatched length prevents valid codes from being submitted.
+
+## Localization
+
+<type-table path="packages/core/src/plugins/device-authorization/device-authorization-localization.ts" name="DeviceAuthorizationLocalization" />
+
+<DocVariant name="heroui">
+Read these values from `useAuthPlugin(deviceAuthorizationPlugin).localization` inside custom plugin views.
+</DocVariant>
+
+<DocVariant name="shadcn">
+## React APIs
+
+The view uses these React Query hooks:
+
+- [`useVerifyDeviceCode`](/docs/react/mutations/verify-device-code) verifies and claims the submitted code for the current session.
+- [`useApproveDevice`](/docs/react/mutations/approve-device) grants the requesting device access.
+- [`useDenyDevice`](/docs/react/mutations/deny-device) rejects the request.
+</DocVariant>
+
+<DocVariant name="zaidan">
+## Solid APIs
+
+The copied view uses these Solid Query option factories:
+
+- [`verifyDeviceCodeOptions`](/docs/solid/mutations/verify-device-code) verifies and claims the submitted code for the current session.
+- [`approveDeviceOptions`](/docs/solid/mutations/approve-device) grants the requesting device access.
+- [`denyDeviceOptions`](/docs/solid/mutations/deny-device) rejects the request.
+</DocVariant>
+
+## Sessions and revocation
+
+<DocVariant name="heroui">
+The device token creates an ordinary Better Auth session after approval. There is no separate device registry in the device-authorization plugin. Use [`<ActiveSessions />`](/docs/heroui/components/settings/security/active-sessions) to list sessions and revoke access for an approved device.
+</DocVariant>
+
+<DocVariant name="shadcn">
+An approved device token creates an ordinary Better Auth session. There is no separate device registry in the Device Authorization plugin. Use [`<ActiveSessions />`](/docs/shadcn/components/settings/security/active-sessions) to list sessions and revoke access for an approved device.
+</DocVariant>
+
+<DocVariant name="zaidan">
+An approved device token creates an ordinary Better Auth session. There is no separate device registry in the Device Authorization plugin. Use [`<ActiveSessions />`](/docs/zaidan/components/active-sessions) to list sessions and revoke access for an approved device.
+</DocVariant>

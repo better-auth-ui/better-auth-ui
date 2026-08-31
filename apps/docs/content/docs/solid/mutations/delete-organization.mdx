@@ -1,29 +1,7 @@
 ---
 title: useDeleteOrganization
 description: Delete an organization.
+variant: solid
 ---
 
-## Usage
-
-```tsx
-import { useDeleteOrganization } from "@better-auth-ui/solid/plugins/organization"
-
-const mutation = useDeleteOrganization(authClient)
-
-mutation.mutate(/* params */)
-```
-
-<include>../../../shared/mutations/plugin-requirements.mdx#shared-organization-solid</include>
-
-## Options factory
-
-```tsx
-import { deleteOrganizationOptions } from "@better-auth-ui/core/plugins/organization"
-import { useMutation } from "@tanstack/solid-query"
-
-const mutation = useMutation(() => deleteOrganizationOptions(authClient))
-```
-
-## Params
-
-<type-table path="../../../../../../packages/core/src/plugins/organization/delete-organization-mutation.ts" name="DeleteOrganizationParams" />
+<include>../../../topics/mutations/delete-organization.mdx</include>

@@ -1,24 +1,7 @@
 ---
 title: usePublicOAuthClient
 description: Load public metadata for the application requesting OAuth authorization.
+variant: react
 ---
 
-<include>../../../shared/queries/public-oauth-client.mdx#shared-overview</include>
-
-## Usage
-
-```tsx
-import { parseOAuthAuthorizationRequest } from "@better-auth-ui/core/plugins/oauth-provider"
-import { usePublicOAuthClient } from "@better-auth-ui/react/plugins/oauth-provider"
-
-const { clientId } = parseOAuthAuthorizationRequest(window.location.search)
-const client = usePublicOAuthClient(authClient, clientId)
-```
-
-The query remains disabled until `clientId` is available.
-
-<include>../../../shared/queries/public-oauth-client.mdx#shared-options-factory-and-loader-helpers</include>
-
-## Params
-
-<type-table path="../../../../../../packages/core/src/plugins/oauth-provider/public-oauth-client-query.ts" name="PublicOAuthClientParams" />
+<include>../../../topics/queries/public-oauth-client.mdx</include>

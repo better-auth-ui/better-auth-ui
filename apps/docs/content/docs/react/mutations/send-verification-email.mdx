@@ -1,31 +1,7 @@
 ---
 title: useSendVerificationEmail
 description: Resend the verification email to an address.
+variant: react
 ---
 
-## Usage
-
-```tsx
-import { authClient } from "@/lib/auth-client"
-import { useSendVerificationEmail } from "@better-auth-ui/react"
-
-const { mutate: sendVerificationEmail } = useSendVerificationEmail(authClient)
-
-sendVerificationEmail({
-  email: "alice@example.com",
-  callbackURL: "/dashboard"
-})
-```
-
-## Options factory
-
-```tsx
-import { sendVerificationEmailOptions } from "@better-auth-ui/core"
-import { useMutation } from "@tanstack/react-query"
-
-const { mutate } = useMutation(sendVerificationEmailOptions(authClient))
-```
-
-## Params
-
-<type-table path="../../../../../../packages/core/src/mutations/send-verification-email-mutation.ts" name="SendVerificationEmailParams" />
+<include>../../../topics/mutations/send-verification-email.mdx</include>

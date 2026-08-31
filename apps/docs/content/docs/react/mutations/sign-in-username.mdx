@@ -1,35 +1,7 @@
 ---
 title: useSignInUsername
 description: Username/password sign-in mutation.
+variant: react
 ---
 
-Resets the session query on success so the new session is refetched.
-
-## Usage
-
-```tsx
-import { authClient } from "@/lib/auth-client"
-import { useSignInUsername } from "@better-auth-ui/react/plugins/username"
-
-const { mutate: signInUsername } = useSignInUsername(authClient)
-
-signInUsername({
-  username: "alice",
-  password: "hunter2"
-})
-```
-
-`useSignInUsername` requires the Better Auth `username` plugin. Import your configured `authClient`. It already carries the plugin methods from `createAuthClient`.
-
-## Options factory
-
-```tsx
-import { signInUsernameOptions } from "@better-auth-ui/core/plugins/username"
-import { useMutation } from "@tanstack/react-query"
-
-const { mutate } = useMutation(signInUsernameOptions(authClient))
-```
-
-## Params
-
-<type-table path="../../../../../../packages/core/src/plugins/username/sign-in-username-mutation.ts" name="SignInUsernameParams" />
+<include>../../../topics/mutations/sign-in-username.mdx</include>

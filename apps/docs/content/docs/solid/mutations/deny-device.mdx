@@ -1,23 +1,7 @@
 ---
 title: denyDeviceOptions
 description: Deny a verified device authorization request.
+variant: solid
 ---
 
-<include>../../../shared/mutations/deny-device.mdx#shared-overview</include>
-
-## Options factory
-
-```tsx
-import { denyDeviceOptions } from "@better-auth-ui/core/plugins/device-authorization"
-import { createMutation } from "@tanstack/solid-query"
-
-const denyDevice = createMutation(() => denyDeviceOptions(authClient))
-
-denyDevice.mutate({
-  userCode: "ABCD1234"
-})
-```
-
-## Params
-
-<type-table path="../../../../../../packages/core/src/plugins/device-authorization/deny-device-mutation.ts" name="DenyDeviceParams" />
+<include>../../../topics/mutations/deny-device.mdx</include>

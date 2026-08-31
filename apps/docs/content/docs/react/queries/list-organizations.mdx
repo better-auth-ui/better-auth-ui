@@ -1,52 +1,7 @@
 ---
 title: useListOrganizations
 description: List organizations available to the current user.
+variant: react
 ---
 
-<include>../../../shared/queries/organization.mdx#shared-requirements</include>
-
-## Usage
-
-```tsx
-import { authClient } from "@/lib/auth-client"
-import { useListOrganizations } from "@better-auth-ui/react/plugins/organization"
-
-const result = useListOrganizations(authClient)
-```
-
-## Client options factory and router-loader helpers
-
-```tsx
-import {
-  ensureListOrganizations,
-  fetchListOrganizations,
-  listOrganizationsOptions,
-  prefetchListOrganizations
-} from "@better-auth-ui/core/plugins/organization"
-
-const options = listOrganizationsOptions(authClient, userId)
-await ensureListOrganizations(queryClient, authClient, userId)
-await prefetchListOrganizations(queryClient, authClient, userId)
-const organizations = await fetchListOrganizations(queryClient, authClient, userId)
-```
-
-<include>../../../shared/queries/organization.mdx#shared-notes</include>
-
-## Server-side prefetching
-
-For server loaders, import from `@better-auth-ui/core/plugins/organization/server`. The server helper uses your Better Auth server instance and the signed-in `userId` so the cache key stays partitioned per user.
-
-```ts
-import { ensureListOrganizations } from "@better-auth-ui/core/plugins/organization/server"
-import { getRequestHeaders } from "@tanstack/react-start/server"
-
-import { auth } from "@/lib/auth"
-
-await ensureListOrganizations(queryClient, auth, userId, {
-  headers: getRequestHeaders()
-})
-```
-
-## Params
-
-<type-table path="../../../../../../packages/core/src/plugins/organization/list-organizations-query.ts" name="ListOrganizationsParams" />
+<include>../../../topics/queries/list-organizations.mdx</include>

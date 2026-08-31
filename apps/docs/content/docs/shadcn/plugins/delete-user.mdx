@@ -2,86 +2,9 @@
 icon: UserRoundX
 title: Delete User
 description: Add account deletion with confirmation dialog to your authentication flow.
+variant: shadcn
 ---
 
 import { Step, Steps } from 'fumadocs-ui/components/steps'
 
-<include>../../../shared/ui/plugins/delete-user.mdx#shared-overview</include>
-
-## Setup
-
-<Steps>
-
-<include>../../../shared/ui/plugins/delete-user.mdx#shared-enable-account-deletion-in-better-auth</include>
-
-<Step>
-### Install the UI plugin
-
-Run the shadcn CLI to install the danger zone card and the `deleteUserPlugin()` factory into your project:
-
-```npm
-npx shadcn@latest add @better-auth-ui/delete-user
-```
-
-This drops the following into your codebase:
-
-- `src/lib/auth/auth-plugin.ts`: local `AuthPlugin` typing widener
-- `src/lib/auth/delete-user-plugin.ts`: `deleteUserPlugin()` factory
-- `src/components/auth/delete-user/danger-zone.tsx`: the danger zone security card
-- `src/components/auth/delete-user/delete-account.tsx`: the delete account card with confirmation dialog
-
-</Step>
-<Step>
-### Register the plugin
-
-Pass `deleteUserPlugin()` to `<AuthProvider>`:
-
-```tsx title="components/providers.tsx"
-import { deleteUserPlugin } from "@/lib/auth/delete-user-plugin" // [!code highlight]
-import { AuthProvider } from "@/components/auth/auth-provider"
-
-<AuthProvider
-  authClient={authClient}
-  navigate={navigate}
-  plugins={[deleteUserPlugin()]} // [!code highlight]
->
-  {children}
-</AuthProvider>
-```
-
-</Step>
-</Steps>
-
-## Components
-
-### `<DangerZone />`
-
-<ComponentPreview name="shadcn-delete-user-danger-zone" />
-
-<include>../../../shared/ui/plugins/delete-user.mdx#shared-danger-zone</include>
-
-<include>../../../shared/ui/plugins/delete-user.mdx#shared-danger-zone-registry-example</include>
-
-**Props**
-
-<type-table path="../../../../../../examples/start-shadcn-example/src/components/auth/delete-user/danger-zone.tsx" name="DangerZoneProps" />
-
-<include>../../../shared/ui/plugins/delete-user.mdx#shared-delete-account</include>
-
-<include>../../../shared/ui/plugins/delete-user.mdx#shared-password-visibility</include>
-
-**Usage**
-
-<include>../../../shared/ui/plugins/delete-user.mdx#shared-delete-account-registry-example</include>
-
-**Props**
-
-<type-table path="../../../../../../examples/start-shadcn-example/src/components/auth/delete-user/delete-account.tsx" name="DeleteAccountProps" />
-
-## Options
-
-<type-table path="../../../../../../packages/core/src/plugins/delete-user/delete-user-plugin.ts" name="DeleteUserPluginOptions" />
-
-## Localization
-
-<type-table path="../../../../../../packages/core/src/plugins/delete-user/delete-user-localization.ts" name="DeleteUserLocalization" />
+<include>../../../topics/ui/plugins/delete-user.mdx</include>

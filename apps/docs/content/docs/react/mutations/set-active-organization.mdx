@@ -1,30 +1,7 @@
 ---
 title: useSetActiveOrganization
 description: Set the active organization for the current session.
+variant: react
 ---
 
-<include>../../../shared/mutations/plugin-requirements.mdx#shared-organization-react</include>
-
-## Usage
-
-```tsx
-import { authClient } from "@/lib/auth-client"
-import { useSetActiveOrganization } from "@better-auth-ui/react/plugins/organization"
-
-const mutation = useSetActiveOrganization(authClient)
-
-mutation.mutate(/* params */)
-```
-
-## Options factory
-
-```tsx
-import { setActiveOrganizationOptions } from "@better-auth-ui/core/plugins/organization"
-import { useMutation } from "@tanstack/react-query"
-
-const mutation = useMutation(setActiveOrganizationOptions(authClient))
-```
-
-## Params
-
-<type-table path="../../../../../../packages/core/src/plugins/organization/set-active-organization-mutation.ts" name="SetActiveOrganizationParams" />
+<include>../../../topics/mutations/set-active-organization.mdx</include>

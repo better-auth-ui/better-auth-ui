@@ -1,50 +1,7 @@
 ---
 title: useListApiKeys
 description: List API keys for the current user.
+variant: react
 ---
 
-Requires the Better Auth API key plugin.
-
-## Usage
-
-```tsx
-import { authClient } from "@/lib/auth-client"
-import { useListApiKeys } from "@better-auth-ui/react/plugins/api-key"
-
-const { data: apiKeys } = useListApiKeys(authClient)
-```
-
-## Client options factory and router-loader helpers
-
-```tsx
-import {
-  ensureListApiKeys,
-  fetchListApiKeys,
-  listApiKeysOptions,
-  prefetchListApiKeys
-} from "@better-auth-ui/core/plugins/api-key"
-
-const options = listApiKeysOptions(authClient, userId)
-await ensureListApiKeys(queryClient, authClient, userId)
-await prefetchListApiKeys(queryClient, authClient, userId)
-const apiKeys = await fetchListApiKeys(queryClient, authClient, userId)
-```
-
-## Server-side prefetching
-
-For server loaders, import from `@better-auth-ui/core/plugins/api-key/server`. These helpers call your Better Auth server instance directly, so they take `auth`, the signed-in `userId`, and request params instead of an `authClient`.
-
-```ts
-import { ensureListApiKeys } from "@better-auth-ui/core/plugins/api-key/server"
-import { getRequestHeaders } from "@tanstack/react-start/server"
-
-import { auth } from "@/lib/auth"
-
-await ensureListApiKeys(queryClient, auth, userId, {
-  headers: getRequestHeaders()
-})
-```
-
-## Params
-
-<type-table path="../../../../../../packages/core/src/plugins/api-key/list-api-keys-query.ts" name="ListApiKeysParams" />
+<include>../../../topics/queries/list-api-keys.mdx</include>

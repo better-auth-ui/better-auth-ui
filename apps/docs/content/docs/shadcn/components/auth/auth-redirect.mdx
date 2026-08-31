@@ -1,28 +1,7 @@
 ---
 title: <AuthRedirect />
 description: Require a session before redirecting to a same-origin page or API callback.
+variant: shadcn
 ---
 
-<include>../../../../shared/ui/components/auth-redirect.mdx#shared-overview</include>
-
-## Installation
-
-```npm
-npx shadcn@latest add @better-auth-ui/auth-redirect
-```
-
-Route it through the unified auth component:
-
-```tsx
-import { Auth } from "@/components/auth/auth"
-
-export default function AuthPage({ path }: { path: string }) {
-  return <Auth path={path} />
-}
-```
-
-<include>../../../../shared/ui/components/auth-redirect.mdx#shared-use-with-account-deletion-emails</include>
-
-## Props
-
-<type-table path="../../../../../../../examples/start-shadcn-example/src/components/auth/auth-redirect.tsx" name="AuthRedirectProps" />
+<include>../../../../topics/ui/components/auth-redirect.mdx</include>

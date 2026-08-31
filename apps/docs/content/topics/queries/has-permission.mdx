@@ -1,0 +1,122 @@
+<DocVariant name="react">
+<include>../../shared/queries/organization.mdx#shared-requirements</include>
+</DocVariant>
+
+## Usage
+
+```tsx doc-variant="react"
+import { authClient } from "@/lib/auth-client"
+import { useHasPermission } from "@better-auth-ui/react/plugins/organization"
+
+const result = useHasPermission(authClient, {
+  permissions: { organization: ["update"] }
+})
+```
+
+<DocVariant name="react">
+## Client options factory and router-loader helpers
+</DocVariant>
+
+```tsx doc-variant="react"
+import {
+  ensureHasPermission,
+  fetchHasPermission,
+  hasPermissionOptions,
+  prefetchHasPermission
+} from "@better-auth-ui/core/plugins/organization"
+
+const params = {
+  organizationId: "org_123",
+  permissions: { organization: ["update"] }
+}
+
+const options = hasPermissionOptions(authClient, userId, params)
+await ensureHasPermission(queryClient, authClient, userId, params)
+await prefetchHasPermission(queryClient, authClient, userId, params)
+const permission = await fetchHasPermission(
+  queryClient,
+  authClient,
+  userId,
+  params
+)
+```
+
+```tsx doc-variant="solid"
+import { useHasPermission } from "@better-auth-ui/solid/plugins/organization"
+
+const result = useHasPermission(authClient, () => ({
+  permissions: { organization: ["update"] }
+}))
+```
+
+<DocVariant name="solid">
+<include>../../shared/queries/organization.mdx#shared-requirements</include>
+
+## Options factory
+</DocVariant>
+
+```tsx doc-variant="solid"
+import { hasPermissionOptions } from "@better-auth-ui/core/plugins/organization"
+import { createQuery } from "@tanstack/solid-query"
+
+const params = {
+  organizationId: "org_123",
+  permissions: { organization: ["update"] }
+}
+
+const query = createQuery(() =>
+  hasPermissionOptions(authClient, userId, params)
+)
+```
+
+<include>../../shared/queries/organization.mdx#shared-notes</include>
+
+## Server-side prefetching
+
+<DocVariant name="react">
+For server loaders, import from `@better-auth-ui/core/plugins/organization/server`. Server helpers use the Better Auth server endpoint shape: pass the Better Auth server instance, signed-in `userId`, and request params with the permission payload under `body`.
+</DocVariant>
+
+```ts doc-variant="react"
+import { ensureHasPermission } from "@better-auth-ui/core/plugins/organization/server"
+import { getRequestHeaders } from "@tanstack/react-start/server"
+
+import { auth } from "@/lib/auth"
+
+await ensureHasPermission(queryClient, auth, userId, {
+  headers: getRequestHeaders(),
+  body: {
+    organizationId: "org_123",
+    permissions: { organization: ["update"] }
+  }
+})
+```
+
+<DocVariant name="solid">
+<include>../../shared/queries/organization.mdx#shared-solid-client-prefetching</include>
+</DocVariant>
+
+```ts doc-variant="solid"
+import {
+  ensureHasPermission,
+  fetchHasPermission,
+  prefetchHasPermission
+} from "@better-auth-ui/core/plugins/organization"
+
+await ensureHasPermission(queryClient, authClient, userId, {
+  organizationId: "org_123",
+  permissions: { organization: ["update"] }
+})
+await prefetchHasPermission(queryClient, authClient, userId, {
+  organizationId: "org_123",
+  permissions: { organization: ["update"] }
+})
+const permission = await fetchHasPermission(queryClient, authClient, userId, {
+  organizationId: "org_123",
+  permissions: { organization: ["update"] }
+})
+```
+
+## Params
+
+<type-table path="packages/core/src/plugins/organization/has-permission-query.ts" name="HasPermissionParams" />

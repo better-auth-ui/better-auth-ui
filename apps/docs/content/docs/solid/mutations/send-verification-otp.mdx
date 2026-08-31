@@ -1,23 +1,7 @@
 ---
 title: sendVerificationOtpOptions
 description: Email a one-time code for any email-OTP flow.
+variant: solid
 ---
 
-<include>../../../shared/mutations/plugin-requirements.mdx#shared-email-otp</include>
-
-<include>../../../shared/mutations/send-verification-otp.mdx#shared-overview</include>
-
-## Options factory
-
-```tsx
-import { sendVerificationOtpOptions } from "@better-auth-ui/core/plugins/email-otp"
-import { createMutation } from "@tanstack/solid-query"
-
-const sendCode = createMutation(() => sendVerificationOtpOptions(authClient))
-
-sendCode.mutate({ email: "alice@example.com", type: "sign-in" })
-```
-
-## Params
-
-<type-table path="../../../../../../packages/core/src/plugins/email-otp/send-verification-otp-mutation.ts" name="SendVerificationOtpParams" />
+<include>../../../topics/mutations/send-verification-otp.mdx</include>

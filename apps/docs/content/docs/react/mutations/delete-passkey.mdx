@@ -1,32 +1,7 @@
 ---
 title: useDeletePasskey
 description: Remove a passkey from the current user.
+variant: react
 ---
 
-Refetches the passkey list on success.
-
-## Usage
-
-```tsx
-import { useDeletePasskey } from "@better-auth-ui/react/plugins/passkey"
-import { authClient } from "@/lib/auth-client"
-
-const { mutate: deletePasskey } = useDeletePasskey(authClient)
-
-deletePasskey({ id: passkey.id })
-```
-
-`useDeletePasskey` requires the Better Auth `passkey` plugin on your app auth client.
-
-## Options factory
-
-```tsx
-import { deletePasskeyOptions } from "@better-auth-ui/core/plugins/passkey"
-import { useMutation } from "@tanstack/react-query"
-
-const { mutate } = useMutation(deletePasskeyOptions(authClient))
-```
-
-## Params
-
-<type-table path="../../../../../../packages/core/src/plugins/passkey/delete-passkey-mutation.ts" name="DeletePasskeyParams" />
+<include>../../../topics/mutations/delete-passkey.mdx</include>

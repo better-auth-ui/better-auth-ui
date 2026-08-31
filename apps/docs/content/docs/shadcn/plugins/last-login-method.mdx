@@ -2,46 +2,9 @@
 icon: LogIn
 title: Last Login Method
 description: Show which sign-in method a user chose most recently.
+variant: shadcn
 ---
 
 import { Step, Steps } from 'fumadocs-ui/components/steps'
 
-<include>../../../shared/ui/plugins/last-login-method.mdx#shared-overview</include>
-
-## Setup
-
-<Steps>
-
-<include>../../../shared/ui/plugins/last-login-method.mdx#shared-add-the-better-auth-server-plugin</include>
-
-<include>../../../shared/ui/plugins/last-login-method.mdx#shared-add-the-matching-client-plugin</include>
-
-<Step>
-### Install the UI integration
-
-Install the registry item. It includes the updated sign-in components and the UI plugin factory:
-
-```bash
-bunx --bun shadcn@latest add @better-auth-ui/last-login-method
-```
-
-</Step>
-<Step>
-### Register the UI plugin
-
-Register the copied plugin factory with your auth provider:
-
-<include>../../../shared/ui/plugins/last-login-method.mdx#shared-register-the-ui-plugin</include>
-
-</Step>
-</Steps>
-
-<include>../../../shared/ui/plugins/last-login-method.mdx#shared-localization</include>
-
-<type-table path="../../../../../../packages/core/src/plugins/last-login-method/last-login-method-plugin.ts" name="LastLoginMethodPluginOptions" />
-
-<type-table path="../../../../../../packages/core/src/plugins/last-login-method/last-login-method-localization.ts" name="LastLoginMethodLocalization" />
-
-<include>../../../shared/ui/plugins/last-login-method.mdx#shared-custom-methods</include>
-
-<include>../../../shared/ui/plugins/last-login-method.mdx#shared-cookie-consent</include>
+<include>../../../topics/ui/plugins/last-login-method.mdx</include>

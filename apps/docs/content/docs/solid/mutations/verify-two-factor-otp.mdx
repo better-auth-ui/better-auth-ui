@@ -1,23 +1,7 @@
 ---
 title: verifyTwoFactorOtpOptions
 description: Verify the emailed second-factor code.
+variant: solid
 ---
 
-<include>../../../shared/mutations/plugin-requirements.mdx#shared-two-factor</include>
-
-Send the code with `sendTwoFactorOtpOptions` first. Refetches the session on success.
-
-## Options factory
-
-```tsx
-import { verifyTwoFactorOtpOptions } from "@better-auth-ui/core/plugins/two-factor"
-import { createMutation } from "@tanstack/solid-query"
-
-const verifyOtp = createMutation(() => verifyTwoFactorOtpOptions(authClient))
-
-verifyOtp.mutate({ code: "123456", trustDevice: true })
-```
-
-## Params
-
-<type-table path="../../../../../../packages/core/src/plugins/two-factor/verify-two-factor-otp-mutation.ts" name="VerifyTwoFactorOtpParams" />
+<include>../../../topics/mutations/verify-two-factor-otp.mdx</include>

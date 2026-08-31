@@ -1,47 +1,7 @@
 ---
 title: useListOrganizationMembers
 description: List members for an organization.
+variant: solid
 ---
 
-## Usage
-
-```tsx
-import { useListOrganizationMembers } from "@better-auth-ui/solid/plugins/organization"
-
-const result = useListOrganizationMembers(authClient)
-```
-
-<include>../../../shared/queries/organization.mdx#shared-requirements</include>
-
-## Options factory
-
-```tsx
-import { listOrganizationMembersOptions } from "@better-auth-ui/core/plugins/organization"
-import { createQuery } from "@tanstack/solid-query"
-
-const query = createQuery(() =>
-  listOrganizationMembersOptions(authClient, userId)
-)
-```
-
-<include>../../../shared/queries/organization.mdx#shared-notes</include>
-
-## Server-side prefetching
-
-<include>../../../shared/queries/organization.mdx#shared-solid-client-prefetching</include>
-
-```ts
-import {
-  ensureListOrganizationMembers,
-  fetchListOrganizationMembers,
-  prefetchListOrganizationMembers
-} from "@better-auth-ui/core/plugins/organization"
-
-await ensureListOrganizationMembers(queryClient, authClient, userId, { query: { organizationId: "org_123" } })
-await prefetchListOrganizationMembers(queryClient, authClient, userId, { query: { organizationId: "org_123" } })
-const members = await fetchListOrganizationMembers(queryClient, authClient, userId, { query: { organizationId: "org_123" } })
-```
-
-## Params
-
-<type-table path="../../../../../../packages/core/src/plugins/organization/list-members-query.ts" name="ListOrganizationMembersParams" />
+<include>../../../topics/queries/list-members.mdx</include>

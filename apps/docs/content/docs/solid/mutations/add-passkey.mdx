@@ -1,21 +1,7 @@
 ---
 title: useAddPasskey
 description: Register a new passkey for the current user.
+variant: solid
 ---
 
-<include>../../../shared/mutations/plugin-requirements.mdx#shared-passkey</include>
-
-## Usage
-
-```tsx
-import { addPasskeyOptions } from "@better-auth-ui/core/plugins/passkey"
-import { useMutation } from "@tanstack/solid-query"
-
-const addPasskey = useMutation(() => addPasskeyOptions(authClient))
-
-addPasskey.mutate({ name: "Work laptop" })
-```
-
-## Params
-
-<type-table path="../../../../../../packages/core/src/plugins/passkey/add-passkey-mutation.ts" name="AddPasskeyParams" />
+<include>../../../topics/mutations/add-passkey.mdx</include>

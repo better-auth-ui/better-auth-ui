@@ -1,0 +1,80 @@
+<DocVariant name="react">
+<include>../../shared/queries/user-scoped.mdx#shared-session</include>
+</DocVariant>
+
+<Callout doc-variant="react" type="info">
+
+The Better Auth client method is `authClient.passkey.listUserPasskeys`, while the corresponding server endpoint is `auth.api.listPasskeys`. The names diverge in Better Auth itself: this is not a typo. We expose a single unified `listPasskeys` API on top (hooks, options, helpers all drop the redundant `User` infix).
+
+</Callout>
+
+<DocVariant name="solid">
+Requires the Better Auth passkey plugin. Use this query in passkey settings screens and invalidate it after add/delete passkey mutations.
+</DocVariant>
+
+## Usage
+
+```tsx doc-variant="react"
+import { authClient } from "@/lib/auth-client"
+import { useListPasskeys } from "@better-auth-ui/react/plugins/passkey"
+
+const { data: passkeys } = useListPasskeys(authClient)
+
+// With React Query options
+const { data: passkeys } = useListPasskeys(authClient, {
+  refetchOnMount: false
+})
+```
+
+<DocVariant name="react">
+`useListPasskeys` requires the Better Auth `passkey` plugin. Import your configured `authClient`. It already carries the plugin methods from `createAuthClient`.
+
+## Options factory
+</DocVariant>
+
+```tsx doc-variant="react"
+import { listPasskeysOptions } from "@better-auth-ui/core/plugins/passkey"
+import { useQuery } from "@tanstack/react-query"
+
+const { data: passkeys } = useQuery(
+  listPasskeysOptions(authClient, userId)
+)
+```
+
+```tsx doc-variant="solid"
+import { useListPasskeys } from "@better-auth-ui/solid/plugins/passkey"
+
+const passkeys = useListPasskeys(authClient)
+```
+
+<DocVariant name="solid">
+## Options factory and loader helpers
+</DocVariant>
+
+```ts doc-variant="solid"
+import {
+  ensureListPasskeys,
+  fetchListPasskeys,
+  listPasskeysOptions,
+  prefetchListPasskeys
+} from "@better-auth-ui/core/plugins/passkey"
+
+const options = listPasskeysOptions(authClient, userId)
+await ensureListPasskeys(queryClient, authClient, userId)
+await prefetchListPasskeys(queryClient, authClient, userId)
+const passkeys = await fetchListPasskeys(queryClient, authClient, userId)
+```
+
+## Invalidation
+
+```ts
+import { listPasskeysOptions } from "@better-auth-ui/core/plugins/passkey"
+
+queryClient.invalidateQueries({
+  queryKey: listPasskeysOptions(authClient, userId).queryKey
+})
+```
+
+## Params
+
+<type-table path="packages/core/src/plugins/passkey/list-passkeys-query.ts" name="ListPasskeysParams" />

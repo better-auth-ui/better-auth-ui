@@ -1,35 +1,7 @@
 ---
 title: useSetActiveSession
 description: Switch the active session in a multi-session setup.
+variant: solid
 ---
 
-Requires the Better Auth multi-session plugin.
-
-## Usage
-
-```tsx
-import { useSetActiveSession } from "@better-auth-ui/solid/plugins/multi-session"
-
-const setActiveSession = useSetActiveSession(authClient)
-
-setActiveSession.mutate({ sessionToken: "session-token" })
-```
-
-## Options factory
-
-```tsx
-import { setActiveSessionOptions } from "@better-auth-ui/core/plugins/multi-session"
-import { useMutation } from "@tanstack/solid-query"
-
-const setActiveSession = useMutation(() =>
-  setActiveSessionOptions(authClient, userId)
-)
-```
-
-## Cache
-
-The core options metadata refetches the session and device-session queries after switching.
-
-## Params
-
-<type-table path="../../../../../../packages/core/src/plugins/multi-session/set-active-session-mutation.ts" name="SetActiveSessionParams" />
+<include>../../../topics/mutations/set-active-session.mdx</include>

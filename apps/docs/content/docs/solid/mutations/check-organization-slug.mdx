@@ -1,29 +1,7 @@
 ---
 title: useCheckSlug
 description: Check whether an organization slug is available.
+variant: solid
 ---
 
-## Usage
-
-```tsx
-import { useCheckSlug } from "@better-auth-ui/solid/plugins/organization"
-
-const mutation = useCheckSlug(authClient)
-
-mutation.mutate(/* params */)
-```
-
-<include>../../../shared/mutations/plugin-requirements.mdx#shared-organization-solid</include>
-
-## Options factory
-
-```tsx
-import { checkSlugOptions } from "@better-auth-ui/core/plugins/organization"
-import { useMutation } from "@tanstack/solid-query"
-
-const mutation = useMutation(() => checkSlugOptions(authClient))
-```
-
-## Params
-
-<type-table path="../../../../../../packages/core/src/plugins/organization/check-slug-mutation.ts" name="CheckSlugParams" />
+<include>../../../topics/mutations/check-slug.mdx</include>

@@ -1,0 +1,259 @@
+<DocVariant name="heroui shadcn">
+The delete-user plugin renders the UI for Better Auth's built-in [account deletion](https://www.better-auth.com/docs/concepts/users-accounts#delete-user) feature. Users can permanently delete their account with a confirmation dialog via the `<DeleteAccount />` card, wrapped by `<DangerZone />` in security settings.
+</DocVariant>
+
+<DocVariant name="zaidan">
+The copied Solid/Zaidan delete-user components render the danger-zone account deletion UI for Better Auth's built-in [account deletion](https://www.better-auth.com/docs/concepts/users-accounts#delete-user) capability. Register the UI plugin directly from `@better-auth-ui/core/plugins/delete-user` to show `<DangerZone />` in the copied security settings surface.
+</DocVariant>
+
+## Setup
+
+<Steps>
+
+<Step doc-variant="heroui shadcn">
+### Enable account deletion in Better Auth
+
+[Better Auth core includes account deletion](https://www.better-auth.com/docs/concepts/users-accounts#delete-user). You do not need another plugin.
+
+Enable the feature by setting `user.deleteUser.enabled` to `true`:
+
+```ts title="lib/auth.ts"
+import { betterAuth } from "better-auth"
+
+export const auth = betterAuth({
+  // ...
+  user: {
+    deleteUser: { // [!code highlight]
+      enabled: true // [!code highlight]
+    } // [!code highlight]
+  }
+})
+```
+
+After you enable the feature, the client provides `authClient.deleteUser()`. You do not need a client plugin.
+
+For an OAuth user without a password, provide `sendDeleteAccountVerification`. This callback lets the user confirm deletion by email.
+
+</Step>
+
+<Step>
+
+<DocVariant name="heroui">
+### Register the UI plugin
+
+Pass `deleteUserPlugin()` to `<AuthProvider>`:
+</DocVariant>
+
+```tsx doc-variant="heroui" title="components/providers.tsx"
+import { AuthProvider } from "@better-auth-ui/heroui"
+import { deleteUserPlugin } from "@better-auth-ui/heroui/plugins/delete-user" // [!code highlight]
+
+<AuthProvider
+  authClient={authClient}
+  navigate={navigate}
+  plugins={[deleteUserPlugin()]} // [!code highlight]
+>
+  {children}
+</AuthProvider>
+```
+
+<DocVariant name="shadcn">
+### Install the UI plugin
+
+Run the shadcn CLI to install the danger zone card and the `deleteUserPlugin()` factory into your project:
+</DocVariant>
+
+```npm doc-variant="shadcn"
+npx shadcn@latest add @better-auth-ui/delete-user
+```
+
+<DocVariant name="shadcn">
+This drops the following into your codebase:
+
+- `src/lib/auth/auth-plugin.ts`: local `AuthPlugin` typing widener
+- `src/lib/auth/delete-user-plugin.ts`: `deleteUserPlugin()` factory
+- `src/components/auth/delete-user/danger-zone.tsx`: the danger zone security card
+- `src/components/auth/delete-user/delete-account.tsx`: the delete account card with confirmation dialog
+</DocVariant>
+
+<DocVariant name="zaidan">
+### Enable account deletion in Better Auth
+
+Enable Better Auth account deletion in your server config:
+</DocVariant>
+
+```ts doc-variant="zaidan" title="src/lib/auth.ts"
+import { betterAuth } from "better-auth"
+
+export const auth = betterAuth({
+  // ...
+  user: {
+    deleteUser: {
+      enabled: true
+    }
+  }
+})
+```
+
+<DocVariant name="zaidan">
+For OAuth users or flows that confirm deletion by email, configure the related Better Auth options. See the [delete-user documentation](https://www.better-auth.com/docs/concepts/users-accounts#delete-user).
+</DocVariant>
+
+</Step>
+
+<Step doc-variant="shadcn zaidan">
+
+<DocVariant name="shadcn">
+### Register the plugin
+
+Pass `deleteUserPlugin()` to `<AuthProvider>`:
+</DocVariant>
+
+```tsx doc-variant="shadcn" title="components/providers.tsx"
+import { deleteUserPlugin } from "@/lib/auth/delete-user-plugin" // [!code highlight]
+import { AuthProvider } from "@/components/auth/auth-provider"
+
+<AuthProvider
+  authClient={authClient}
+  navigate={navigate}
+  plugins={[deleteUserPlugin()]} // [!code highlight]
+>
+  {children}
+</AuthProvider>
+```
+
+<DocVariant name="zaidan">
+### Install the Solid/Zaidan components
+</DocVariant>
+
+```npm doc-variant="zaidan"
+npx shadcn@latest add https://better-auth-ui.com/r/solid/delete-user.json
+```
+
+<DocVariant name="zaidan">
+This copies the following files into your project:
+
+- `src/components/auth/delete-user/danger-zone.tsx`
+- `src/components/auth/delete-user/delete-account.tsx`
+- local dialog, button, card, input, and label primitives under `src/components/ui/**`
+</DocVariant>
+
+</Step>
+
+<Step doc-variant="zaidan">
+
+### Register the UI plugin
+
+Import `deleteUserPlugin()` directly from `@better-auth-ui/core/plugins/delete-user` and register it with your copied Solid auth provider:
+
+```tsx title="src/components/providers.tsx"
+import { deleteUserPlugin } from "@better-auth-ui/core/plugins/delete-user"
+import { AuthProvider } from "@/components/auth/auth-provider"
+
+<AuthProvider
+  authClient={authClient}
+  plugins={[deleteUserPlugin()]}
+>
+  {children}
+</AuthProvider>
+```
+
+When the plugin is registered, the copied `<SecuritySettings />` surface renders `<DangerZone />` automatically.
+
+</Step>
+
+</Steps>
+
+## Components
+
+### `<DangerZone />`
+
+<ComponentPreview doc-variant="heroui" name="heroui-delete-user-danger-zone" />
+
+<ComponentPreview doc-variant="shadcn" name="shadcn-delete-user-danger-zone" />
+
+<DocVariant name="heroui shadcn">
+The `<DangerZone />` card is automatically rendered in `<SecuritySettings />` when the plugin is registered. It renders a danger zone heading and the `<DeleteAccount />` card below it.
+
+**Usage**
+</DocVariant>
+
+```tsx doc-variant="heroui"
+import { DangerZone } from "@better-auth-ui/heroui/plugins/delete-user"
+
+<DangerZone />
+```
+
+<ZaidanStory doc-variant="zaidan"
+  storyId="zaidan-plugins-delete-user--danger-zone-preview"
+  title="Zaidan Delete User Danger Zone preview"
+  height={420}
+/>
+
+<DocVariant name="zaidan">
+`<DangerZone />` is the primary security card wrapper. It renders the localized danger-zone heading and composes `<DeleteAccount />` below it.
+</DocVariant>
+
+```tsx doc-variant="shadcn zaidan"
+import { DangerZone } from "@/components/auth/delete-user/danger-zone"
+
+<DangerZone />
+```
+
+<DocVariant name="heroui shadcn">
+**Props**
+</DocVariant>
+
+<type-table doc-variant="heroui" path="packages/heroui/src/components/auth/delete-user/danger-zone.tsx" name="DangerZoneProps" />
+
+<type-table doc-variant="shadcn" path="examples/start-shadcn-example/src/components/auth/delete-user/danger-zone.tsx" name="DangerZoneProps" />
+
+<DocVariant name="heroui shadcn">
+### `<DeleteAccount />`
+
+The delete account card with confirmation dialog. Used inside `<DangerZone />` by default. Import it directly if you need a custom layout.
+</DocVariant>
+
+<type-table doc-variant="zaidan" path="examples/start-solid-zaidan-example/src/components/auth/delete-user/danger-zone.tsx" name="DangerZoneProps" />
+
+<DocVariant name="zaidan">
+### `<DeleteAccount />`
+
+`<DeleteAccount />` is the lower-level delete account card used inside `<DangerZone />`. You can also import it directly for custom settings layouts.
+</DocVariant>
+
+When credential confirmation is required, the password starts masked and includes a localized show/hide control.
+
+<DocVariant name="heroui shadcn">
+**Usage**
+</DocVariant>
+
+```tsx doc-variant="heroui"
+import { DeleteAccount } from "@better-auth-ui/heroui/plugins/delete-user"
+
+<DeleteAccount />
+```
+
+```tsx doc-variant="shadcn zaidan"
+import { DeleteAccount } from "@/components/auth/delete-user/delete-account"
+
+<DeleteAccount />
+```
+
+<DocVariant name="heroui shadcn">
+**Props**
+</DocVariant>
+
+<type-table doc-variant="heroui" path="packages/heroui/src/components/auth/delete-user/delete-account.tsx" name="DeleteAccountProps" />
+
+<type-table doc-variant="shadcn" path="examples/start-shadcn-example/src/components/auth/delete-user/delete-account.tsx" name="DeleteAccountProps" />
+
+<type-table doc-variant="zaidan" path="examples/start-solid-zaidan-example/src/components/auth/delete-user/delete-account.tsx" name="DeleteAccountProps" />
+
+## Options
+
+<type-table path="packages/core/src/plugins/delete-user/delete-user-plugin.ts" name="DeleteUserPluginOptions" />
+
+## Localization
+
+<type-table path="packages/core/src/plugins/delete-user/delete-user-localization.ts" name="DeleteUserLocalization" />

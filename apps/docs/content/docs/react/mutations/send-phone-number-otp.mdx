@@ -1,34 +1,7 @@
 ---
 title: useSendPhoneNumberOtp
 description: Send a phone verification code.
+variant: react
 ---
 
-Requires Better Auth `phoneNumber()` on the server and `phoneNumberClient()` on the client.
-
-```tsx
-import {
-  type PhoneNumberAuthClient
-} from "@better-auth-ui/core/plugins/phone-number"
-import { useAuth } from "@better-auth-ui/react"
-import { useSendPhoneNumberOtp } from "@better-auth-ui/react/plugins/phone-number"
-
-const { authClient } = useAuth()
-const { mutate: sendOtp } = useSendPhoneNumberOtp(
-  authClient as PhoneNumberAuthClient
-)
-
-sendOtp({ phoneNumber: "+12025550123" })
-```
-
-## Options factory
-
-```tsx
-import { sendPhoneNumberOtpOptions } from "@better-auth-ui/core/plugins/phone-number"
-import { useMutation } from "@tanstack/react-query"
-
-const { mutate } = useMutation(sendPhoneNumberOtpOptions(authClient))
-```
-
-## Params
-
-<type-table path="../../../../../../packages/core/src/plugins/phone-number/send-phone-number-otp-mutation.ts" name="SendPhoneNumberOtpParams" />
+<include>../../../topics/mutations/send-phone-number-otp.mdx</include>

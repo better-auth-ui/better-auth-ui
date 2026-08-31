@@ -1,53 +1,7 @@
 ---
 title: useFullOrganization
 description: Read full details for one organization.
+variant: react
 ---
 
-<include>../../../shared/queries/organization.mdx#shared-requirements</include>
-
-## Usage
-
-```tsx
-import { authClient } from "@/lib/auth-client"
-import { useFullOrganization } from "@better-auth-ui/react/plugins/organization"
-
-const result = useFullOrganization(authClient)
-```
-
-## Client options factory and router-loader helpers
-
-```tsx
-import {
-  ensureFullOrganization,
-  fetchFullOrganization,
-  fullOrganizationOptions,
-  prefetchFullOrganization
-} from "@better-auth-ui/core/plugins/organization"
-
-const options = fullOrganizationOptions(authClient, userId)
-await ensureFullOrganization(queryClient, authClient, userId)
-await prefetchFullOrganization(queryClient, authClient, userId)
-const organization = await fetchFullOrganization(queryClient, authClient, userId)
-```
-
-<include>../../../shared/queries/organization.mdx#shared-notes</include>
-
-## Server-side prefetching
-
-For server loaders, import from `@better-auth-ui/core/plugins/organization/server`. The server helper calls your Better Auth server instance directly and accepts the same request params forwarded to `auth.api.getFullOrganization`.
-
-```ts
-import { ensureFullOrganization } from "@better-auth-ui/core/plugins/organization/server"
-import { getRequestHeaders } from "@tanstack/react-start/server"
-
-import { auth } from "@/lib/auth"
-
-await ensureFullOrganization(queryClient, auth, userId, {
-  headers: getRequestHeaders(),
-  query: { organizationId: "org_123" }
-})
-```
-
-## Params
-
-<type-table path="../../../../../../packages/core/src/plugins/organization/full-organization-query.ts" name="FullOrganizationParams" />
+<include>../../../topics/queries/full-organization.mdx</include>

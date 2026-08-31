@@ -1,23 +1,7 @@
 ---
 title: useRevokeSession
 description: Revoke one active session for the current user.
+variant: solid
 ---
 
-## Usage
-
-```tsx
-import { revokeSessionOptions } from "@better-auth-ui/core"
-import { useMutation } from "@tanstack/solid-query"
-
-const revokeSession = useMutation(() => revokeSessionOptions(authClient))
-
-revokeSession.mutate({ token: "session-token" })
-```
-
-## Cache
-
-Refetch `listSessions` after revocation.
-
-## Params
-
-<type-table path="../../../../../../packages/core/src/mutations/revoke-session-mutation.ts" name="RevokeSessionParams" />
+<include>../../../topics/mutations/revoke-session.mdx</include>

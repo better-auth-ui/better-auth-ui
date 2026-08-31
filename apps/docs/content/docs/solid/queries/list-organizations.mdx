@@ -1,47 +1,7 @@
 ---
 title: useListOrganizations
 description: List organizations for the current user.
+variant: solid
 ---
 
-## Usage
-
-```tsx
-import { useListOrganizations } from "@better-auth-ui/solid/plugins/organization"
-
-const result = useListOrganizations(authClient)
-```
-
-<include>../../../shared/queries/organization.mdx#shared-requirements</include>
-
-## Options factory
-
-```tsx
-import { listOrganizationsOptions } from "@better-auth-ui/core/plugins/organization"
-import { createQuery } from "@tanstack/solid-query"
-
-const query = createQuery(() =>
-  listOrganizationsOptions(authClient, userId)
-)
-```
-
-<include>../../../shared/queries/organization.mdx#shared-notes</include>
-
-## Server-side prefetching
-
-<include>../../../shared/queries/organization.mdx#shared-solid-client-prefetching</include>
-
-```ts
-import {
-  ensureListOrganizations,
-  fetchListOrganizations,
-  prefetchListOrganizations
-} from "@better-auth-ui/core/plugins/organization"
-
-await ensureListOrganizations(queryClient, authClient, userId)
-await prefetchListOrganizations(queryClient, authClient, userId)
-const organizations = await fetchListOrganizations(queryClient, authClient, userId)
-```
-
-## Params
-
-<type-table path="../../../../../../packages/core/src/plugins/organization/list-organizations-query.ts" name="ListOrganizationsParams" />
+<include>../../../topics/queries/list-organizations.mdx</include>

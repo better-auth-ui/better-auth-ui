@@ -2,92 +2,10 @@
 icon: Activity
 title: Dash
 description: Add personal activity and organization audit logs to Solid and Zaidan settings.
+variant: zaidan
 ---
 
 import { Callout } from "fumadocs-ui/components/callout"
 import { Step, Steps } from "fumadocs-ui/components/steps"
 
-<include>../../../shared/ui/plugins/dash.mdx#shared-overview</include>
-
-## Setup
-
-<Steps>
-
-<include>../../../shared/ui/plugins/dash.mdx#shared-configure-dash-on-the-server</include>
-
-<Step>
-
-<include>../../../shared/ui/plugins/dash.mdx#shared-add-the-client-plugin</include>
-
-</Step>
-<Step>
-### Install the UI plugin
-
-```bash
-bunx shadcn@latest add https://better-auth-ui.com/r/solid/dash.json
-```
-
-</Step>
-<Step>
-### Register the UI plugin
-
-```tsx title="src/components/providers.tsx"
-import { AuthProvider } from "@/components/auth/auth-provider"
-import { dashPlugin } from "@/lib/auth/dash-plugin"
-import { organizationPlugin } from "@/lib/auth/organization-plugin"
-
-export function Providers(props: { children?: JSX.Element }) {
-  return (
-    <AuthProvider
-      authClient={authClient}
-      navigate={navigate}
-      plugins={[organizationPlugin(), dashPlugin()]}
-    >
-      {props.children}
-    </AuthProvider>
-  )
-}
-```
-
-<include>../../../shared/ui/plugins/dash.mdx#shared-register-the-ui-plugin</include>
-
-</Step>
-</Steps>
-
-<include>../../../shared/ui/plugins/dash.mdx#shared-static-routes</include>
-
-<include>../../../shared/ui/plugins/dash.mdx#shared-registry-route-paths</include>
-
-<include>../../../shared/ui/plugins/dash.mdx#shared-admin-user-activity</include>
-
-## Headless hooks
-
-```tsx
-import {
-  useDashAllAuditLogs,
-  useDashAuditLogs,
-  useDashUserAuditLogs
-} from "@better-auth-ui/solid/plugins/dash"
-```
-
-<include>../../../shared/ui/plugins/dash.mdx#shared-components-and-hooks</include>
-
-## Runtime prerequisites
-
-- Server: `dash()` from `@better-auth/infra`.
-- Client: `dashClient()` from `@better-auth/infra/client`.
-- Organization activity: the Better Auth organization server and client plugins.
-- Runtime API: Dash hooks and query helpers from the [Solid package](/docs/solid).
-
-## Copied files
-
-- `src/lib/auth/dash-plugin.tsx`
-- `src/components/auth/dash/activity.tsx`
-
-## Options
-
-<type-table path="../../../../../../packages/core/src/plugins/dash/dash-plugin.ts" name="DashPluginOptions" />
-
-## Localization
-
-<type-table path="../../../../../../packages/core/src/plugins/dash/dash-localization.ts" name="DashLocalization" />
+<include>../../../topics/ui/plugins/dash.mdx</include>

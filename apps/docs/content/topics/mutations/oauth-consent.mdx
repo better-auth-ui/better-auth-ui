@@ -1,0 +1,13 @@
+Requires `oauthProviderClient()` from `@better-auth/oauth-provider/client`. Better Auth reads and validates the signed authorization query from the current browser URL before completing the redirect.
+
+<MutationPage id="oauth-consent">
+
+<PageSlot name="usage">
+
+Pass only the user's decision for the complete requested scope set. The OAuth Provider plugin handles the redirect.
+
+Do not navigate to `redirect_uri` from the application.
+
+</PageSlot>
+
+</MutationPage>

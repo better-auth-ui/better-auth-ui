@@ -1,12 +1,15 @@
-import { readdir, readFile, writeFile } from "node:fs/promises"
+import { readdir, writeFile } from "node:fs/promises"
 import { availableParallelism } from "node:os"
 import { dirname, relative, resolve } from "node:path"
 import { fileURLToPath } from "node:url"
+import { visit } from "unist-util-visit"
 
+import { readDocsTree } from "../src/lib/docs-content"
 import type {
   TypeTableSnapshot,
   TypeTableSnapshotEntry
 } from "../src/lib/type-table-data"
+import { getTypeTableReference } from "../src/lib/type-table-reference"
 
 const docsRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..")
 const workspaceRoot = resolve(docsRoot, "../..")
@@ -58,23 +61,13 @@ async function findMdxFiles(directory: string): Promise<string[]> {
 
 async function collectReferences(): Promise<Map<string, TypeTableReference>> {
   const references = new Map<string, TypeTableReference>()
-  const pattern = /<type-table\s+path="([^"]+)"\s+name="([^"]+)"\s*\/>/g
-
   for (const mdxPath of await findMdxFiles(contentRoot)) {
-    const source = await readFile(mdxPath, "utf8")
-
-    for (const match of source.matchAll(pattern)) {
-      const [, sourceAttribute, name] = match
-      if (!sourceAttribute || !name) continue
-
-      const sourcePath = resolve(dirname(mdxPath), sourceAttribute)
-      const relativeSourcePath = relative(workspaceRoot, sourcePath).replaceAll(
-        "\\",
-        "/"
-      )
-      const key = `${relativeSourcePath}#${name}`
-      references.set(key, { key, name, sourcePath })
-    }
+    const { tree, file } = await readDocsTree(mdxPath)
+    visit(tree, "mdxJsxFlowElement", (node) => {
+      if (node.name !== "type-table") return
+      const reference = getTypeTableReference(node, file, workspaceRoot)
+      references.set(reference.key, reference)
+    })
   }
 
   return new Map(

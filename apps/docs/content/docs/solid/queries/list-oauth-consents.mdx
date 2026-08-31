@@ -1,51 +1,7 @@
 ---
 title: useListOAuthConsents
 description: List the OAuth applications the current user has authorized.
+variant: solid
 ---
 
-<include>../../../shared/queries/list-oauth-consents.mdx#shared-overview</include>
-
-## Usage
-
-```tsx
-import { groupOAuthConsents } from "@better-auth-ui/core/plugins/oauth-provider"
-import { useListOAuthConsents } from "@better-auth-ui/solid/plugins/oauth-provider"
-
-const consents = useListOAuthConsents(authClient)
-
-const applications = () => groupOAuthConsents(consents.data)
-```
-
-<include>../../../shared/queries/list-oauth-consents.mdx#shared-usage</include>
-
-## Options factory and loader helpers
-
-```ts
-import {
-  ensureListOAuthConsents,
-  fetchListOAuthConsents,
-  listOAuthConsentsOptions,
-  prefetchListOAuthConsents
-} from "@better-auth-ui/core/plugins/oauth-provider"
-
-const options = listOAuthConsentsOptions(authClient, userId)
-await ensureListOAuthConsents(queryClient, authClient, userId)
-await prefetchListOAuthConsents(queryClient, authClient, userId)
-const consents = await fetchListOAuthConsents(queryClient, authClient, userId)
-```
-
-## Invalidation
-
-```ts
-import { listOAuthConsentsOptions } from "@better-auth-ui/core/plugins/oauth-provider"
-
-queryClient.invalidateQueries({
-  queryKey: listOAuthConsentsOptions(authClient, userId).queryKey
-})
-```
-
-`deleteOAuthConsentOptions` shares the same user-scoped prefix, so a partially failed removal still ends up reflecting the server's state.
-
-## Params
-
-<type-table path="../../../../../../packages/core/src/plugins/oauth-provider/list-oauth-consents-query.ts" name="ListOAuthConsentsParams" />
+<include>../../../topics/queries/list-oauth-consents.mdx</include>

@@ -2,89 +2,10 @@
 icon: Phone
 title: Phone Number
 description: Add phone verification-code and password sign-in, recovery, and verified phone management.
+variant: heroui
 ---
 
 import { Callout } from "fumadocs-ui/components/callout"
 import { Step, Steps } from "fumadocs-ui/components/steps"
 
-The HeroUI phone-number plugin contributes a phone sign-in route, password recovery views, and a verified phone-number card for account settings. Its country selector formats national input as the user types, validates it, and sends an E.164 number to Better Auth.
-
-## Setup
-
-<Steps>
-<Step>
-### Configure Better Auth and your SMS provider
-
-<include>../../../shared/ui/plugins/phone-number.mdx#shared-configure-better-auth-and-your-sms-provider</include>
-
-Keep server-side validation as a trust boundary even though the UI normalizes numbers to E.164. Do not log codes in production. Better Auth recommends dispatching the SMS without waiting for the provider response.
-
-</Step>
-<Step>
-### Update the schema
-
-Use your normal Better Auth schema generation or migration flow. The user model needs nullable `phoneNumber` and `phoneNumberVerified` fields, with `phoneNumber` kept unique.
-
-</Step>
-
-<include>../../../shared/ui/plugins/phone-number.mdx#shared-add-the-client-plugin</include>
-
-<Step>
-### Register the HeroUI plugin
-
-```tsx title="components/providers.tsx"
-import { AuthProvider } from "@better-auth-ui/heroui"
-import { phoneNumberPlugin } from "@better-auth-ui/heroui/plugins"
-
-<AuthProvider
-  authClient={authClient}
-  navigate={navigate}
-  plugins={[
-    phoneNumberPlugin({
-      signIn: true,
-      passwordSignIn: true,
-      passwordReset: true,
-      changePhoneNumber: true
-    })
-  ]}
->
-  {children}
-</AuthProvider>
-```
-
-</Step>
-<Step>
-### Allow the new route segments
-
-```ts
-import { viewPaths } from "@better-auth-ui/core"
-import { phoneNumberPlugin } from "@better-auth-ui/heroui/plugins"
-
-const validAuthPaths = new Set([
-  ...Object.values(viewPaths.auth),
-  ...Object.values(phoneNumberPlugin().viewPaths.auth)
-])
-```
-
-</Step>
-</Steps>
-
-<include>../../../shared/ui/plugins/phone-number.mdx#shared-flow-options</include>
-
-<include>../../../shared/ui/plugins/phone-number.mdx#shared-selector-options</include>
-
-When password sign-in reports `PHONE_NUMBER_NOT_VERIFIED`, the UI switches to the code step. Better Auth sends that verification code automatically.
-
-<Callout type="warn">
-Passwordless phone verification is not a second factor. Better Auth applies 2FA to phone number and password sign-in, but not to passwordless verification.
-</Callout>
-
-Enable Better Auth `signUpOnVerification` to create an account after it verifies an unknown number. If verification requires more user fields, use a custom view.
-
-## Options and localization
-
-<type-table path="../../../../../../packages/core/src/plugins/phone-number/phone-number-plugin.ts" name="PhoneNumberPluginOptions" />
-
-<type-table path="../../../../../../packages/core/src/plugins/phone-number/phone-number-localization.ts" name="PhoneNumberLocalization" />
-
-The implementation uses the [React phone-number mutations](/docs/react/mutations/send-phone-number-otp). See the [Better Auth phone-number plugin](https://better-auth.com/docs/plugins/phone-number) for all server options.
+<include>../../../topics/ui/plugins/phone-number.mdx</include>

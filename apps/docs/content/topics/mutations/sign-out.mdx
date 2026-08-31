@@ -1,0 +1,21 @@
+<DocVariant name="react">
+Removes every `["auth", ...]` query on success, clearing the session, linked accounts, sessions, device sessions, and passkeys in one go.
+</DocVariant>
+
+<MutationPage id="sign-out">
+
+<PageSlot name="options">
+
+<DocVariant name="react">
+Note: The raw factory skips cache cleanup. Use `useSignOut` for the complete behavior.
+
+Use the raw factory only when you need a stable options object, such as for matching a `mutationKey`.
+</DocVariant>
+
+<DocVariant name="solid">
+The core options metadata removes `authQueryKeys.all` after sign-out when the Better Auth mutation invalidator is installed by `AuthProvider`.
+</DocVariant>
+
+</PageSlot>
+
+</MutationPage>

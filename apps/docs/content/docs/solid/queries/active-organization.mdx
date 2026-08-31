@@ -1,47 +1,7 @@
 ---
 title: useActiveOrganization
 description: Read the active organization from the session or a URL slug.
+variant: solid
 ---
 
-## Usage
-
-```tsx
-import { useActiveOrganization } from "@better-auth-ui/solid/plugins/organization"
-
-const result = useActiveOrganization(authClient)
-```
-
-<include>../../../shared/queries/organization.mdx#shared-requirements</include>
-
-## Options factory
-
-```tsx
-import { activeOrganizationOptions } from "@better-auth-ui/core/plugins/organization"
-import { createQuery } from "@tanstack/solid-query"
-
-const query = createQuery(() =>
-  activeOrganizationOptions(authClient, userId)
-)
-```
-
-<include>../../../shared/queries/active-organization.mdx#shared-notes</include>
-
-## Server-side prefetching
-
-<include>../../../shared/queries/organization.mdx#shared-solid-client-prefetching</include>
-
-```ts
-import {
-  ensureActiveOrganization,
-  fetchActiveOrganization,
-  prefetchActiveOrganization
-} from "@better-auth-ui/core/plugins/organization"
-
-await ensureActiveOrganization(queryClient, authClient, userId, { query: { organizationId: "org_123" } })
-await prefetchActiveOrganization(queryClient, authClient, userId, { query: { organizationId: "org_123" } })
-const organization = await fetchActiveOrganization(queryClient, authClient, userId, { query: { organizationId: "org_123" } })
-```
-
-## Params
-
-<type-table path="../../../../../../packages/core/src/plugins/organization/active-organization-query.ts" name="ActiveOrganizationParams" />
+<include>../../../topics/queries/active-organization.mdx</include>

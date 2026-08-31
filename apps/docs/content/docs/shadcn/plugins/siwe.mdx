@@ -2,77 +2,10 @@
 icon: Wallet
 title: Sign In With Ethereum
 description: Install ERC-4361 wallet sign-in and wallet account settings.
+variant: shadcn
 ---
 
 import { Callout } from 'fumadocs-ui/components/callout'
 import { Step, Steps } from 'fumadocs-ui/components/steps'
 
-The SIWE registry item adds wallet sign-in, optional email collection, and a security settings card for connected wallets.
-
-## Setup
-
-<Steps>
-<Step>
-### Configure Better Auth
-
-Add `siwe()` to the server. Provide a secure nonce generator and an ERC-4361 verifier. Apply the plugin schema before sign-in.
-
-<include>../../../shared/ui/plugins/siwe.mdx#shared-configure-better-auth</include>
-
-See the [Better Auth SIWE guide](https://www.better-auth.com/docs/plugins/siwe) for the complete server setup.
-
-</Step>
-
-<include>../../../shared/ui/plugins/siwe.mdx#shared-add-the-client-plugin</include>
-
-<Step>
-### Install the registry item
-
-```npm
-npx shadcn@latest add @better-auth-ui/siwe
-```
-
-</Step>
-<Step>
-### Register the UI plugin
-
-```tsx title="components/providers.tsx"
-import { createEip1193WalletConnector } from "@better-auth-ui/core/plugins/siwe"
-import { siwePlugin } from "@/lib/auth/siwe-plugin"
-
-<AuthProvider
-  authClient={authClient}
-  navigate={navigate}
-  plugins={[
-    siwePlugin({
-      connector: createEip1193WalletConnector(),
-      domain: "app.example.com",
-      uri: "https://app.example.com",
-      email: "optional"
-    })
-  ]}
->
-  {children}
-</AuthProvider>
-```
-
-</Step>
-</Steps>
-
-## Wallet settings
-
-Better Auth does not expose browser endpoints for SIWE wallet management. Create authenticated server routes and connect them through `SiweWalletManager`.
-
-<Callout type="warn" title="Authorize on the server">
-Resolve the user from the server session. Do not accept a user ID from the browser for wallet operations.
-</Callout>
-
-<include>../../../shared/ui/plugins/siwe.mdx#shared-wallet-settings</include>
-
-Pass `walletManager` to `siwePlugin()`. The registry item then adds connect, list, primary, and remove controls.
-
-The link challenge must use a single-use nonce. Verify its domain, chain, address, nonce, and signature before attaching the wallet.
-
-Use `email: "required"` to require an email. Use `email: "none"` to open the wallet without an email dialog.
-
-The wallet signature does not verify the supplied email address.
+<include>../../../topics/ui/plugins/siwe.mdx</include>

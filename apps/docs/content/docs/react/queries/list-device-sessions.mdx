@@ -1,41 +1,7 @@
 ---
 title: useListDeviceSessions
 description: Retrieve the device sessions for the multi-session account switcher.
+variant: react
 ---
 
-Powers the multi-session account switcher: each entry represents a session currently signed in on this device.
-
-<include>../../../shared/queries/user-scoped.mdx#shared-session</include>
-
-## Usage
-
-```tsx
-import { authClient } from "@/lib/auth-client"
-import { useListDeviceSessions } from "@better-auth-ui/react/plugins/multi-session"
-
-const { data: deviceSessions } = useListDeviceSessions(authClient)
-
-// With React Query options
-const { data: deviceSessions } = useListDeviceSessions(authClient, {
-  refetchOnMount: false
-})
-```
-
-`useListDeviceSessions` requires the Better Auth `multiSession` plugin. Import your configured `authClient`. It already carries the plugin methods from `createAuthClient`.
-
-## Options factory
-
-```tsx
-import { listDeviceSessionsOptions } from "@better-auth-ui/core/plugins/multi-session"
-import { useQuery } from "@tanstack/react-query"
-
-const { data: deviceSessions } = useQuery(
-  listDeviceSessionsOptions(authClient, userId)
-)
-```
-
-<include>../../../shared/queries/list-device-sessions.mdx#shared-invalidation</include>
-
-## Params
-
-<type-table path="../../../../../../packages/core/src/plugins/multi-session/list-device-sessions-query.ts" name="ListDeviceSessionsParams" />
+<include>../../../topics/queries/list-device-sessions.mdx</include>

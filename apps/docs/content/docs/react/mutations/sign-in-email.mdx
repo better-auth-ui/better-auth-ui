@@ -1,36 +1,7 @@
 ---
 title: useSignInEmail
 description: Email/password sign-in mutation.
+variant: react
 ---
 
-<include>../../../shared/mutations/sign-in-email.mdx#shared-behavior</include>
-
-## Usage
-
-```tsx
-import { authClient } from "@/lib/auth-client"
-import { useSignInEmail } from "@better-auth-ui/react"
-
-const { mutate: signInEmail, isPending } = useSignInEmail(authClient)
-
-signInEmail({
-  email: "alice@example.com",
-  password: "hunter2",
-  rememberMe: true
-})
-```
-
-## Options factory
-
-```tsx
-import { signInEmailOptions } from "@better-auth-ui/core"
-import { useMutation } from "@tanstack/react-query"
-
-const { mutate } = useMutation(signInEmailOptions(authClient))
-```
-
-<include>../../../shared/mutations/sign-in-email.mdx#shared-options-factory</include>
-
-## Params
-
-<type-table path="../../../../../../packages/core/src/mutations/sign-in-email-mutation.ts" name="SignInEmailParams" />
+<include>../../../topics/mutations/sign-in-email.mdx</include>

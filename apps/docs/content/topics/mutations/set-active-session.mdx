@@ -1,0 +1,37 @@
+<DocVariant name="react">
+On success the hook:
+
+1. Optimistically swaps the cached session to the matching entry from `useListDeviceSessions`.
+2. Scrolls the window to the top.
+3. Refetches both the session and device-session queries.
+</DocVariant>
+
+<DocVariant name="solid">
+Requires the Better Auth multi-session plugin.
+</DocVariant>
+
+<MutationPage id="set-active-session">
+
+<PageSlot name="usage" doc-variant="react">
+
+`useSetActiveSession` requires the Better Auth `multiSession` plugin. Import your configured `authClient`. It already carries the plugin methods from `createAuthClient`.
+
+</PageSlot>
+
+<PageSlot name="options">
+
+<DocVariant name="react">
+Note: The raw factory skips the optimistic session update. Use `useSetActiveSession` for the complete behavior.
+
+Use the raw factory only when you need a stable options object, such as for matching a `mutationKey`.
+</DocVariant>
+
+<DocVariant name="solid">
+## Cache
+
+The core options metadata refetches the session and device-session queries after switching.
+</DocVariant>
+
+</PageSlot>
+
+</MutationPage>

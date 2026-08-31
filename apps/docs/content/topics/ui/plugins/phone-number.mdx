@@ -1,0 +1,376 @@
+<DocVariant name="heroui">
+The HeroUI phone-number plugin contributes a phone sign-in route, password recovery views, and a verified phone-number card for account settings. Its country selector formats national input as the user types, validates it, and sends an E.164 number to Better Auth.
+</DocVariant>
+
+<DocVariant name="shadcn">
+The phone-number plugin adds a dedicated `/auth/phone-number` view. It supports passwordless verification codes, phone number and password sign-in, password recovery, and a verified phone-number card in account settings. Its country selector formats national input as the user types, validates it, and sends an E.164 number to Better Auth.
+</DocVariant>
+
+<Callout doc-variant="shadcn" type="warn">
+
+Keep server-side phone validation as a trust boundary. The UI sends E.164 numbers, but clients can bypass UI validation.
+
+</Callout>
+
+<DocVariant name="zaidan">
+The Solid/Zaidan registry item adds phone verification-code and password sign-in, phone password recovery, and verified phone-number management. Its country selector formats national input as the user types, validates it, and sends an E.164 number to Better Auth.
+</DocVariant>
+
+## Setup
+
+<Steps>
+
+<Step>
+
+<DocVariant name="heroui">
+### Configure Better Auth and your SMS provider
+</DocVariant>
+
+<DocVariant name="shadcn zaidan">
+### Configure Better Auth
+</DocVariant>
+
+```ts doc-variant="heroui shadcn" title="lib/auth.ts"
+import { betterAuth } from "better-auth"
+import { phoneNumber } from "better-auth/plugins"
+
+export const auth = betterAuth({
+  plugins: [
+    phoneNumber({
+      otpLength: 6,
+      requireVerification: true,
+      sendOTP: ({ phoneNumber, code }) => {
+        void sms.send({ to: phoneNumber, body: `Your code is ${code}` })
+      },
+      sendPasswordResetOTP: ({ phoneNumber, code }) => {
+        void sms.send({ to: phoneNumber, body: `Your reset code is ${code}` })
+      }
+    })
+  ]
+})
+```
+
+<DocVariant name="heroui">
+Keep server-side validation as a trust boundary even though the UI normalizes numbers to E.164. Do not log codes in production. Better Auth recommends dispatching the SMS without waiting for the provider response.
+</DocVariant>
+
+<DocVariant name="shadcn">
+Do not log codes in production. Better Auth recommends returning from `sendOTP` without waiting for the SMS provider. Use your runtime's background-task primitive when delivery must outlive the request.
+</DocVariant>
+
+```ts doc-variant="zaidan" title="src/lib/auth.ts"
+import { betterAuth } from "better-auth"
+import { phoneNumber } from "better-auth/plugins"
+
+export const auth = betterAuth({
+  plugins: [
+    phoneNumber({
+      otpLength: 6,
+      requireVerification: true,
+      sendOTP: ({ phoneNumber, code }) => {
+        void sms.send({ to: phoneNumber, body: `Your code is ${code}` })
+      },
+      sendPasswordResetOTP: ({ phoneNumber, code }) => {
+        void sms.send({ to: phoneNumber, body: `Your reset code is ${code}` })
+      }
+    })
+  ]
+})
+```
+
+<DocVariant name="zaidan">
+Keep server-side validation as a trust boundary even though the UI normalizes numbers to E.164. Do not log codes in production.
+</DocVariant>
+
+</Step>
+
+<Step>
+
+<DocVariant name="heroui">
+### Update the schema
+
+Use your normal Better Auth schema generation or migration flow. The user model needs nullable `phoneNumber` and `phoneNumberVerified` fields, with `phoneNumber` kept unique.
+</DocVariant>
+
+<DocVariant name="shadcn">
+### Update the database
+
+Generate or migrate the Better Auth schema using your existing database workflow. The plugin adds nullable `phoneNumber` and `phoneNumberVerified` fields to the user model. Keep `phoneNumber` unique.
+
+For Drizzle projects, regenerate the Better Auth schema first, then generate the Drizzle migration from that schema. Do not hand-edit generated migration metadata.
+</DocVariant>
+
+<DocVariant name="zaidan">
+### Update the schema and client
+
+Generate or migrate the Better Auth schema so the user model has nullable `phoneNumber` and `phoneNumberVerified` fields. Keep `phoneNumber` unique.
+</DocVariant>
+
+```ts doc-variant="zaidan" title="src/lib/auth-client.ts"
+import { createAuthClient } from "@better-auth-ui/solid"
+import { phoneNumberClient } from "better-auth/client/plugins"
+
+export const authClient = createAuthClient({
+  plugins: [phoneNumberClient()]
+})
+```
+
+</Step>
+
+<Step doc-variant="heroui shadcn">
+### Add the client plugin
+
+```ts title="lib/auth-client.ts"
+import { createAuthClient } from "better-auth/react"
+import { phoneNumberClient } from "better-auth/client/plugins"
+
+export const authClient = createAuthClient({
+  plugins: [phoneNumberClient()]
+})
+```
+
+</Step>
+
+<Step>
+
+<DocVariant name="heroui">
+### Register the HeroUI plugin
+</DocVariant>
+
+```tsx doc-variant="heroui" title="components/providers.tsx"
+import { AuthProvider } from "@better-auth-ui/heroui"
+import { phoneNumberPlugin } from "@better-auth-ui/heroui/plugins"
+
+<AuthProvider
+  authClient={authClient}
+  navigate={navigate}
+  plugins={[
+    phoneNumberPlugin({
+      signIn: true,
+      passwordSignIn: true,
+      passwordReset: true,
+      changePhoneNumber: true
+    })
+  ]}
+>
+  {children}
+</AuthProvider>
+```
+
+<DocVariant name="shadcn">
+### Install and register the UI plugin
+</DocVariant>
+
+```bash doc-variant="shadcn"
+bunx --bun shadcn@latest add @better-auth-ui/phone-number
+```
+
+```tsx doc-variant="shadcn" title="components/providers.tsx"
+import { phoneNumberPlugin } from "@/lib/auth/phone-number-plugin"
+
+<AuthProvider
+  authClient={authClient}
+  navigate={navigate}
+  plugins={[
+    phoneNumberPlugin({
+      signIn: true,
+      passwordSignIn: true,
+      passwordReset: true,
+      changePhoneNumber: true
+    })
+  ]}
+>
+  {children}
+</AuthProvider>
+```
+
+<DocVariant name="zaidan">
+### Add the registry item
+</DocVariant>
+
+```bash doc-variant="zaidan"
+bunx --bun shadcn@latest add https://better-auth-ui.com/r/solid/phone-number.json
+```
+
+</Step>
+
+<Step>
+
+<DocVariant name="heroui">
+### Allow the new route segments
+</DocVariant>
+
+```ts doc-variant="heroui"
+import { viewPaths } from "@better-auth-ui/core"
+import { phoneNumberPlugin } from "@better-auth-ui/heroui/plugins"
+
+const validAuthPaths = new Set([
+  ...Object.values(viewPaths.auth),
+  ...Object.values(phoneNumberPlugin().viewPaths.auth)
+])
+```
+
+<DocVariant name="shadcn">
+### Allow the plugin routes
+</DocVariant>
+
+```tsx doc-variant="shadcn" title="routes/auth/$path.tsx"
+import { viewPaths } from "@better-auth-ui/core"
+import { phoneNumberPlugin } from "@/lib/auth/phone-number-plugin"
+
+const validAuthPaths = new Set([
+  ...Object.values(viewPaths.auth),
+  ...Object.values(phoneNumberPlugin().viewPaths.auth)
+])
+```
+
+<DocVariant name="shadcn">
+Use `validAuthPaths` in the route guard that renders `<Auth path={path} />`.
+</DocVariant>
+
+<DocVariant name="zaidan">
+### Register the UI plugin
+</DocVariant>
+
+```tsx doc-variant="zaidan" title="src/components/providers.tsx"
+import { phoneNumberPlugin } from "@/lib/auth/phone-number-plugin"
+
+<AuthProvider
+  authClient={authClient}
+  navigate={navigate}
+  plugins={[
+    phoneNumberPlugin({
+      signIn: true,
+      passwordSignIn: true,
+      passwordReset: true,
+      changePhoneNumber: true
+    })
+  ]}
+>
+  {props.children}
+</AuthProvider>
+```
+
+</Step>
+
+<Step doc-variant="zaidan">
+
+### Allow the plugin route segments
+
+```ts title="src/routes/auth/$path.tsx"
+import { viewPaths } from "@better-auth-ui/core"
+import { phoneNumberPlugin } from "@/lib/auth/phone-number-plugin"
+
+const validAuthPathSegments = new Set([
+  ...Object.values(viewPaths.auth),
+  ...Object.values(phoneNumberPlugin().viewPaths.auth)
+])
+```
+
+</Step>
+
+</Steps>
+
+<DocVariant name="heroui zaidan">
+## Flow options
+
+| UI option | Default | Server requirement |
+|---|---:|---|
+| `signIn` | `true` | `sendOTP` |
+| `passwordSignIn` | `false` | A password credential |
+| `passwordReset` | `false` | `sendPasswordResetOTP` |
+| `changePhoneNumber` | `true` | `sendOTP` |
+| `otpLength` | `6` | Must match Better Auth `otpLength` |
+</DocVariant>
+
+<DocVariant name="shadcn">
+## Match UI options to server options
+
+| UI option | Default | Server requirement |
+|---|---:|---|
+| `signIn` | `true` | `sendOTP` |
+| `passwordSignIn` | `false` | A password credential. Use `requireVerification` when appropriate |
+| `passwordReset` | `false` | `sendPasswordResetOTP` |
+| `changePhoneNumber` | `true` | `sendOTP`. Verification uses `updatePhoneNumber: true` |
+| `otpLength` | `6` | Must match Better Auth `otpLength` |
+</DocVariant>
+
+Use `defaultCountry`, `countries`, and `locale` to control the selector. Supply an `adapter` when your application needs different formatting or validation rules.
+
+<DocVariant name="heroui">
+When password sign-in reports `PHONE_NUMBER_NOT_VERIFIED`, the UI switches to the code step. Better Auth sends that verification code automatically.
+</DocVariant>
+
+<DocVariant name="shadcn">
+When both sign-in modes are enabled, the form lets users switch between a code and a password. If password sign-in returns `PHONE_NUMBER_NOT_VERIFIED`, it moves directly to the code step because Better Auth has already started verification.
+</DocVariant>
+
+<Callout type="warn">
+
+<DocVariant name="heroui">
+Passwordless phone verification is not a second factor. Better Auth applies 2FA to phone number and password sign-in, but not to passwordless verification.
+</DocVariant>
+
+<DocVariant name="shadcn">
+Passwordless verification is not a second factor. Better Auth applies 2FA to phone number and password sign-in, but not to passwordless phone verification.
+</DocVariant>
+
+<DocVariant name="zaidan">
+Passwordless phone verification bypasses Better Auth 2FA. Phone number and password sign-in still follows the configured second-factor flow.
+</DocVariant>
+
+</Callout>
+
+<DocVariant name="heroui">
+Enable Better Auth `signUpOnVerification` to create an account after it verifies an unknown number. If verification requires more user fields, use a custom view.
+</DocVariant>
+
+<DocVariant name="zaidan">
+Set Better Auth `signUpOnVerification` to create an account after it verifies an unknown number. If verification requires more user fields, build a custom view.
+</DocVariant>
+
+<DocVariant name="heroui zaidan">
+## Options and localization
+</DocVariant>
+
+<DocVariant name="shadcn">
+## Account creation
+
+Set Better Auth `signUpOnVerification` to create a user after it verifies an unknown number. This option requires a temporary email generator.
+
+The Better Auth user model still requires an email address.
+
+If the user schema requires more fields, replace the `phoneNumber` view with a custom component. Pass the collected values to `authClient.phoneNumber.verify`.
+
+## Components
+
+- `<PhoneNumber />` handles code and password sign-in.
+- `<ForgotPhoneNumberPassword />` and `<ResetPhoneNumberPassword />` handle phone password recovery.
+- `<ChangePhoneNumber />` adds, replaces, verifies, and removes the current user's phone number.
+
+## Options
+</DocVariant>
+
+<type-table path="packages/core/src/plugins/phone-number/phone-number-plugin.ts" name="PhoneNumberPluginOptions" />
+
+<DocVariant name="shadcn">
+## Localization
+</DocVariant>
+
+<type-table path="packages/core/src/plugins/phone-number/phone-number-localization.ts" name="PhoneNumberLocalization" />
+
+<DocVariant name="heroui">
+The implementation uses the [React phone-number mutations](/docs/react/mutations/send-phone-number-otp). See the [Better Auth phone-number plugin](https://better-auth.com/docs/plugins/phone-number) for all server options.
+</DocVariant>
+
+<DocVariant name="shadcn">
+## Headless mutations
+
+The UI uses [`useSendPhoneNumberOtp`](/docs/react/mutations/send-phone-number-otp), [`useVerifyPhoneNumber`](/docs/react/mutations/verify-phone-number), [`useSignInPhoneNumber`](/docs/react/mutations/sign-in-phone-number), [`useRequestPhoneNumberPasswordReset`](/docs/react/mutations/request-phone-number-password-reset), and [`useResetPhoneNumberPassword`](/docs/react/mutations/reset-phone-number-password).
+
+See the [Better Auth phone-number plugin](https://better-auth.com/docs/plugins/phone-number) for server options, external OTP verification, attempt limits, and endpoint behavior.
+</DocVariant>
+
+<DocVariant name="zaidan">
+The copied components use [`useSendPhoneNumberOtp`](/docs/solid/mutations/send-phone-number-otp) and the other Solid phone-number mutation hooks. See the [Better Auth phone-number plugin](https://better-auth.com/docs/plugins/phone-number) for server behavior and advanced options.
+</DocVariant>

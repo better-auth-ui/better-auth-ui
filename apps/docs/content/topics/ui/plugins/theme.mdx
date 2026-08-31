@@ -1,0 +1,302 @@
+The theme plugin adds theme selection to your authentication UI. Users can switch between system, light, and dark themes from the user button dropdown and account settings.
+
+## Setup
+
+<Steps>
+
+<Step>
+
+<DocVariant name="heroui">
+### Register the UI plugin
+
+The plugin works with any theme library. Pass the theme library's hook, such as `useTheme` from [next-themes](https://github.com/pacocoursey/next-themes).
+
+The slot components can then read the current theme inside `<ThemeProvider>`. You do not need another wrapper.
+</DocVariant>
+
+```tsx doc-variant="heroui" title="components/providers.tsx"
+import { AuthProvider } from "@better-auth-ui/heroui"
+import { themePlugin } from "@better-auth-ui/heroui/plugins/theme" // [!code highlight]
+import { ThemeProvider, useTheme } from "next-themes"
+import type { ReactNode } from "react"
+
+import { authClient } from "@/lib/auth-client"
+
+export function Providers({ children }: { children: ReactNode }) {
+  return (
+    <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+      <AuthProvider
+        authClient={authClient}
+        plugins={[
+          themePlugin({ useTheme }) // [!code highlight]
+        ]}
+      >
+        {children}
+      </AuthProvider>
+    </ThemeProvider>
+  )
+}
+```
+
+<DocVariant name="heroui">
+The plugin calls `useTheme()` inside its slot components during each render. The call stays inside `<ThemeProvider>` when both providers share a component.
+</DocVariant>
+
+<DocVariant name="shadcn zaidan">
+### Install the UI plugin
+</DocVariant>
+
+<DocVariant name="shadcn">
+Run the shadcn CLI to install the theme plugin components:
+</DocVariant>
+
+```npm doc-variant="shadcn"
+npx shadcn@latest add @better-auth-ui/theme
+```
+
+<DocVariant name="zaidan">
+Run the shadcn CLI to install the theme plugin factory, preference helpers, and copied Theme UI components:
+</DocVariant>
+
+```npm doc-variant="zaidan"
+npx shadcn@latest add https://better-auth-ui.com/r/solid/theme.json
+```
+
+</Step>
+
+<Step doc-variant="shadcn zaidan">
+
+<DocVariant name="shadcn">
+### Register the UI plugin
+
+The plugin works with any theme library. Pass the theme library's hook, such as `useTheme` from [next-themes](https://github.com/pacocoursey/next-themes).
+
+The slot components can then read the current theme inside `<ThemeProvider>`. You do not need another wrapper.
+</DocVariant>
+
+```tsx doc-variant="shadcn" title="components/providers.tsx"
+import { ThemeProvider, useTheme } from "next-themes"
+import type { ReactNode } from "react"
+
+import { AuthProvider } from "@/components/auth/auth-provider"
+import { authClient } from "@/lib/auth-client"
+import { themePlugin } from "@/lib/auth/theme-plugin" // [!code highlight]
+
+export function Providers({ children }: { children: ReactNode }) {
+  return (
+    <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+      <AuthProvider
+        authClient={authClient}
+        plugins={[
+          themePlugin({ useTheme }) // [!code highlight]
+        ]}
+      >
+        {children}
+      </AuthProvider>
+    </ThemeProvider>
+  )
+}
+```
+
+<DocVariant name="shadcn">
+The plugin calls `useTheme()` inside its slot components during each render. The call stays inside `<ThemeProvider>` when both providers share a component.
+</DocVariant>
+
+<DocVariant name="zaidan">
+### Register the UI plugin
+
+The plugin is theme-library agnostic. The recommended Zaidan setup is to use the copied theme helper from `src/lib/theme.ts`: run `themeScript` before Solid hydrates, sync the document preference in your provider shell, then register `themePlugin()` so the plugin's slot components read the persisted theme state.
+</DocVariant>
+
+```tsx doc-variant="zaidan" title="src/routes/__root.tsx"
+import { themeScript } from "@/lib/theme" // [!code highlight]
+
+export const Route = createRootRoute({
+  head: () => ({
+    scripts: [{ children: themeScript }] // [!code highlight]
+  })
+})
+```
+
+```tsx doc-variant="zaidan" title="src/components/providers.tsx"
+import { onCleanup, onMount } from "solid-js"
+import { AuthProvider } from "@/components/auth/auth-provider"
+import { themePlugin } from "@/lib/auth/theme-plugin" // [!code highlight]
+import { authClient } from "@/lib/auth-client"
+import { syncDocumentThemePreference } from "@/lib/theme" // [!code highlight]
+
+export function Providers(props: { children?: JSX.Element }) {
+  onMount(() => {
+    const cleanup = syncDocumentThemePreference() // [!code highlight]
+
+    onCleanup(cleanup)
+  })
+
+  return (
+    <AuthProvider
+      authClient={authClient}
+      plugins={[
+        themePlugin() // [!code highlight]
+      ]}
+    >
+      {props.children}
+    </AuthProvider>
+  )
+}
+```
+
+<DocVariant name="zaidan">
+When the plugin is registered, `<UserButton />` renders the Theme menu item through `userMenuItems`, and account settings render `<Appearance />` through `accountCards`.
+</DocVariant>
+
+</Step>
+
+<Step doc-variant="heroui shadcn">
+### Or pass static theme state
+
+If the theme source has no hook, pass both `theme` and `setTheme`. The source can use `useState` or a custom controller.
+
+The plugin runs during each parent render. The slot components update when the state owner renders with a new value.
+
+```tsx title="components/providers.tsx"
+const [theme, setTheme] = useState("system") // [!code highlight]
+
+<AuthProvider
+  authClient={authClient}
+  plugins={[
+    themePlugin({ // [!code highlight]
+      theme, // [!code highlight]
+      setTheme, // [!code highlight]
+      themes: ["system", "light", "dark"] // [!code highlight]
+    }) // [!code highlight]
+  ]}
+>
+  {children}
+</AuthProvider>
+```
+
+The two forms are mutually exclusive: you pass either `useTheme` **or** the `theme`/`setTheme` pair.
+
+</Step>
+
+<Step doc-variant="zaidan">
+
+### Or pass static theme state
+
+If you manage the theme with a custom Solid signal or controller, pass both `theme` **and** `setTheme` from that stateful source. The plugin receives the current value from the parent and the slot components call your setter when users change themes.
+
+```tsx title="src/components/providers.tsx"
+import { createSignal } from "solid-js"
+import type { ThemeMode } from "@/lib/theme"
+
+const [theme, setTheme] = createSignal<ThemeMode>("system") // [!code highlight]
+
+<AuthProvider
+  authClient={authClient}
+  plugins={[
+    themePlugin({ // [!code highlight]
+      theme: theme(), // [!code highlight]
+      setTheme: (nextTheme) => setTheme(nextTheme as ThemeMode), // [!code highlight]
+      themes: ["system", "light", "dark"] // [!code highlight]
+    }) // [!code highlight]
+  ]}
+>
+  {props.children}
+</AuthProvider>
+```
+
+Use either the copied helper defaults **or** an explicit `theme`/`setTheme` pair when you need a custom controller.
+
+</Step>
+
+</Steps>
+
+## Components
+
+<DocVariant name="zaidan">
+These previews use local theme state only. They do not call Better Auth endpoints or require a live session.
+</DocVariant>
+
+### `<UserButton />`
+
+<ComponentPreview doc-variant="heroui" name="heroui-theme-toggle-item" />
+
+<ComponentPreview doc-variant="shadcn" name="shadcn-theme-toggle-item" />
+
+<ZaidanStory doc-variant="zaidan"
+  storyId="zaidan-plugins-theme--user-button-preview"
+  title="Zaidan User Button Theme preview"
+  height={260}
+/>
+
+<DocVariant name="zaidan">
+The Theme menu item is automatically rendered in `<UserButton />` when `themePlugin()` is registered.
+
+**Usage**
+</DocVariant>
+
+```tsx doc-variant="zaidan" file=<rootDir>/../../examples/start-solid-zaidan-example/src/demos/theme/user-button.tsx
+```
+
+### `<Appearance />`
+
+<ComponentPreview doc-variant="heroui" name="heroui-theme-appearance" />
+
+<ComponentPreview doc-variant="shadcn" name="shadcn-theme-appearance" />
+
+<DocVariant name="heroui shadcn">
+The `<Appearance />` card is automatically rendered in `<AccountSettings />` when the plugin is registered.
+
+**Usage**
+</DocVariant>
+
+```tsx doc-variant="heroui"
+import { Appearance } from "@better-auth-ui/heroui/plugins/theme"
+
+<Appearance />
+```
+
+```tsx doc-variant="shadcn"
+import { Appearance } from "@/components/auth/theme/appearance"
+
+<Appearance />
+```
+
+<ZaidanStory doc-variant="zaidan"
+  storyId="zaidan-plugins-theme--appearance-preview"
+  title="Zaidan Theme Appearance preview"
+  height={360}
+/>
+
+<DocVariant name="zaidan">
+The `<Appearance />` card is automatically rendered in account settings when `themePlugin()` is registered and the account page renders plugin-contributed `accountCards`.
+
+**Usage**
+</DocVariant>
+
+```tsx doc-variant="zaidan" file=<rootDir>/../../examples/start-solid-zaidan-example/src/demos/theme/appearance.tsx
+```
+
+**Props**
+
+<type-table doc-variant="heroui" path="packages/heroui/src/components/auth/theme/appearance.tsx" name="AppearanceProps" />
+
+<type-table doc-variant="shadcn" path="examples/start-shadcn-example/src/components/auth/theme/appearance.tsx" name="AppearanceProps" />
+
+<type-table doc-variant="zaidan" path="examples/start-solid-zaidan-example/src/components/auth/theme/appearance.tsx" name="AppearanceProps" />
+
+## Options
+
+<type-table doc-variant="heroui" path="packages/heroui/src/lib/auth/theme-plugin.ts" name="ThemePluginOptions" />
+
+<type-table doc-variant="shadcn" path="examples/start-shadcn-example/src/lib/auth/theme-plugin.ts" name="ThemePluginOptions" />
+
+<type-table doc-variant="zaidan" path="examples/start-solid-zaidan-example/src/lib/auth/theme-plugin.ts" name="ThemePluginOptions" />
+
+## Localization
+
+<type-table path="packages/core/src/plugins/theme/theme-localization.ts" name="ThemeLocalization" />
+
+<DocVariant name="zaidan">
+The copied Zaidan Theme components resolve labels from `themePlugin({ localization })` and fall back to the default Theme localization.
+</DocVariant>

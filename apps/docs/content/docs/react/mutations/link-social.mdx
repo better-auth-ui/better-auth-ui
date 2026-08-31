@@ -1,33 +1,7 @@
 ---
 title: useLinkSocial
 description: Link a social provider to the current user.
+variant: react
 ---
 
-Kicks off the OAuth redirect: the linked account appears in `useListAccounts` after the provider redirects back.
-
-## Usage
-
-```tsx
-import { authClient } from "@/lib/auth-client"
-import { useLinkSocial } from "@better-auth-ui/react"
-
-const { mutate: linkSocial } = useLinkSocial(authClient)
-
-linkSocial({
-  provider: "github",
-  callbackURL: "/account"
-})
-```
-
-## Options factory
-
-```tsx
-import { linkSocialOptions } from "@better-auth-ui/core"
-import { useMutation } from "@tanstack/react-query"
-
-const { mutate } = useMutation(linkSocialOptions(authClient))
-```
-
-## Params
-
-<type-table path="../../../../../../packages/core/src/mutations/link-social-mutation.ts" name="LinkSocialParams" />
+<include>../../../topics/mutations/link-social.mdx</include>

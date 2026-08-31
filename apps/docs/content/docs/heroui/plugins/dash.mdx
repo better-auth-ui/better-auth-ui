@@ -2,93 +2,10 @@
 icon: Activity
 title: Dash
 description: Add personal activity and organization audit logs from Better Auth Infrastructure Dash.
+variant: heroui
 ---
 
 import { Callout } from "fumadocs-ui/components/callout"
 import { Step, Steps } from "fumadocs-ui/components/steps"
 
-<include>../../../shared/ui/plugins/dash.mdx#shared-overview</include>
-
-## Setup
-
-<Steps>
-
-<include>../../../shared/ui/plugins/dash.mdx#shared-configure-dash-on-the-server</include>
-
-<Step>
-
-<include>../../../shared/ui/plugins/dash.mdx#shared-add-the-client-plugin</include>
-
-The organization client is required only when you enable organization activity.
-
-</Step>
-<Step>
-### Register the UI plugin
-
-```tsx title="components/providers.tsx"
-import { AuthProvider } from "@better-auth-ui/heroui"
-import { dashPlugin } from "@better-auth-ui/heroui/plugins/dash"
-import { organizationPlugin } from "@better-auth-ui/heroui/plugins/organization"
-
-<AuthProvider
-  authClient={authClient}
-  navigate={navigate}
-  plugins={[organizationPlugin(), dashPlugin()]}
->
-  {children}
-</AuthProvider>
-```
-
-Both personal and organization activity are enabled by default.
-
-</Step>
-</Steps>
-
-<include>../../../shared/ui/plugins/dash.mdx#shared-static-routes</include>
-
-```ts title="route-paths.ts"
-import { viewPaths } from "@better-auth-ui/core"
-import { dashPlugin } from "@better-auth-ui/heroui/plugins/dash"
-import { organizationPlugin } from "@better-auth-ui/heroui/plugins/organization"
-
-const activityPath = dashPlugin({ path: "activity" }).viewPaths.settings.activity
-
-export const validSettingsPaths = [
-  ...Object.values(viewPaths.settings),
-  ...Object.values(organizationPlugin().viewPaths.settings ?? {}),
-  activityPath
-]
-
-export const validOrganizationPaths = [
-  ...Object.values(organizationPlugin().viewPaths.organization ?? {}),
-  activityPath
-]
-```
-
-<include>../../../shared/ui/plugins/dash.mdx#shared-admin-user-activity</include>
-
-## Components and hooks
-
-```tsx
-import {
-  AdminUserActivity,
-  OrganizationActivity,
-  UserActivity
-} from "@better-auth-ui/heroui/plugins/dash"
-
-import {
-  useDashAllAuditLogs,
-  useDashAuditLogs,
-  useDashUserAuditLogs
-} from "@better-auth-ui/react/plugins/dash"
-```
-
-<include>../../../shared/ui/plugins/dash.mdx#shared-components-and-hooks</include>
-
-## Options
-
-<type-table path="../../../../../../packages/core/src/plugins/dash/dash-plugin.ts" name="DashPluginOptions" />
-
-## Localization
-
-<type-table path="../../../../../../packages/core/src/plugins/dash/dash-localization.ts" name="DashLocalization" />
+<include>../../../topics/ui/plugins/dash.mdx</include>

@@ -1,33 +1,7 @@
 ---
 title: useListSessions
 description: Retrieve the active sessions (devices) for the current user.
+variant: react
 ---
 
-<include>../../../shared/queries/user-scoped.mdx#shared-session</include>
-
-## Usage
-
-```tsx
-import { authClient } from "@/lib/auth-client"
-import { useListSessions } from "@better-auth-ui/react"
-
-const { data: sessions } = useListSessions(authClient)
-
-// With React Query options
-const { data: sessions } = useListSessions(authClient, { refetchOnMount: false })
-```
-
-## Options factory
-
-```tsx
-import { listSessionsOptions } from "@better-auth-ui/core"
-import { useQuery } from "@tanstack/react-query"
-
-const { data: sessions } = useQuery(listSessionsOptions(authClient, userId))
-```
-
-<include>../../../shared/queries/list-sessions.mdx#shared-invalidation</include>
-
-## Params
-
-<type-table path="../../../../../../packages/core/src/queries/list-sessions-query.ts" name="ListSessionsParams" />
+<include>../../../topics/queries/list-sessions.mdx</include>

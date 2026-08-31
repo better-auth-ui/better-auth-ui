@@ -1,30 +1,7 @@
 ---
 title: useCreateApiKey
 description: Create an API key for the current user.
+variant: react
 ---
 
-<include>../../../shared/mutations/plugin-requirements.mdx#shared-api-key</include>
-
-## Usage
-
-```tsx
-import { authClient } from "@/lib/auth-client"
-import { useCreateApiKey } from "@better-auth-ui/react/plugins/api-key"
-
-const mutation = useCreateApiKey(authClient)
-
-mutation.mutate(/* params */)
-```
-
-## Options factory
-
-```tsx
-import { createApiKeyOptions } from "@better-auth-ui/core/plugins/api-key"
-import { useMutation } from "@tanstack/react-query"
-
-const mutation = useMutation(createApiKeyOptions(authClient))
-```
-
-## Params
-
-<type-table path="../../../../../../packages/core/src/plugins/api-key/create-api-key-mutation.ts" name="CreateApiKeyParams" />
+<include>../../../topics/mutations/create-api-key.mdx</include>

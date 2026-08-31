@@ -1,42 +1,7 @@
 ---
 title: useAccountInfo
 description: Retrieve provider-specific info for a linked account.
+variant: react
 ---
 
-Keyed per-user. Waits for the active session and `query.accountId` before firing.
-
-## Usage
-
-```tsx
-import { authClient } from "@/lib/auth-client"
-import { useAccountInfo } from "@better-auth-ui/react"
-
-const { data: accountInfo } = useAccountInfo(authClient, {
-  query: { accountId: "acc_123" }
-})
-
-// With React Query options in the same object
-const { data: accountInfo } = useAccountInfo(authClient, {
-  query: { accountId: "acc_123" },
-  staleTime: 60_000
-})
-```
-
-## Options factory
-
-```tsx
-import { accountInfoOptions } from "@better-auth-ui/core"
-import { useQuery } from "@tanstack/react-query"
-
-const { data: accountInfo } = useQuery(
-  accountInfoOptions(authClient, userId, {
-    query: { accountId: "acc_123" }
-  })
-)
-```
-
-<include>../../../shared/queries/account-info.mdx#shared-invalidation</include>
-
-## Params
-
-<type-table path="../../../../../../packages/core/src/queries/account-info-query.ts" name="AccountInfoParams" />
+<include>../../../topics/queries/account-info.mdx</include>

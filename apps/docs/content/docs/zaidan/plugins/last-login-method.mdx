@@ -2,61 +2,9 @@
 icon: LogIn
 title: Last Login Method
 description: Show which sign-in method a user chose most recently.
+variant: zaidan
 ---
 
 import { Step, Steps } from 'fumadocs-ui/components/steps'
 
-<include>../../../shared/ui/plugins/last-login-method.mdx#shared-overview</include>
-
-## Setup
-
-<Steps>
-
-<include>../../../shared/ui/plugins/last-login-method.mdx#shared-add-the-better-auth-server-plugin</include>
-
-<Step>
-### Add the matching client plugin
-
-Add `lastLoginMethodClient()` to the Solid client passed to `<AuthProvider>`:
-
-```ts title="lib/auth-client.ts"
-import { createAuthClient } from "@better-auth-ui/solid"
-import { lastLoginMethodClient } from "better-auth/client/plugins" // [!code highlight]
-
-export const authClient = createAuthClient({
-  plugins: [
-    lastLoginMethodClient() // [!code highlight]
-  ]
-})
-```
-
-</Step>
-<Step>
-### Install the UI integration
-
-Install the Solid registry item:
-
-```bash
-bunx --bun shadcn@latest add https://better-auth-ui.com/r/solid/last-login-method.json
-```
-
-</Step>
-<Step>
-### Register the UI plugin
-
-Register the copied UI plugin with your auth provider:
-
-<include>../../../shared/ui/plugins/last-login-method.mdx#shared-register-the-ui-plugin</include>
-
-</Step>
-</Steps>
-
-<include>../../../shared/ui/plugins/last-login-method.mdx#shared-localization</include>
-
-<type-table path="../../../../../../packages/core/src/plugins/last-login-method/last-login-method-plugin.ts" name="LastLoginMethodPluginOptions" />
-
-<type-table path="../../../../../../packages/core/src/plugins/last-login-method/last-login-method-localization.ts" name="LastLoginMethodLocalization" />
-
-<include>../../../shared/ui/plugins/last-login-method.mdx#shared-custom-methods</include>
-
-<include>../../../shared/ui/plugins/last-login-method.mdx#shared-cookie-consent</include>
+<include>../../../topics/ui/plugins/last-login-method.mdx</include>

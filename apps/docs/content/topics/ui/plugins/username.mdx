@@ -1,0 +1,241 @@
+The username plugin adds username-based authentication to your auth UI. Users can sign in with a username instead of an email address, and optionally check username availability during sign-up and profile updates.
+
+It contributes:
+
+<DocVariant name="heroui shadcn">
+- A `<SignInUsername />` view that accepts both username and email, routing to the appropriate sign-in method
+- A `<UsernameField />` renderer for the username additional field with real-time availability checking
+- `useSignInUsername` and `useIsUsernameAvailable` hooks
+- Automatic username field injection into sign-up and user profile forms
+
+## Setup
+
+The username plugin requires no additional UI installation: the components are built-in. You only need to configure the Better Auth server plugin and register the client plugin.
+</DocVariant>
+
+<DocVariant name="zaidan">
+- A `<SignInUsername />` view that accepts both username and email, routing to the appropriate sign-in method
+- A `<UsernameField />` renderer for the username additional field with real-time availability checking
+- Solid username availability and username sign-in mutations through the Better Auth client
+- Automatic username field injection into sign-up and user profile forms
+
+## Setup
+
+The username plugin requires the Better Auth server plugin, the matching client plugin, and the copied Zaidan UI plugin wrapper.
+</DocVariant>
+
+<Steps>
+
+<Step doc-variant="heroui shadcn">
+### Install the Better Auth plugin
+
+Install the [`better-auth`](https://www.better-auth.com/docs/plugins/username) package and add it to your Better Auth server config:
+
+```ts title="lib/auth.ts"
+import { betterAuth } from "better-auth"
+import { username } from "better-auth/plugins" // [!code highlight]
+
+export const auth = betterAuth({
+  // ...
+  plugins: [
+    username() // [!code highlight]
+  ]
+})
+```
+
+</Step>
+
+<Step>
+
+<DocVariant name="heroui shadcn">
+### Install the matching client plugin
+
+Add `usernameClient()` to your auth client so `authClient.signIn.username` and `authClient.username.*` are available:
+
+```ts title="lib/auth-client.ts"
+import { createAuthClient } from "better-auth/react"
+import { usernameClient } from "better-auth/client/plugins" // [!code highlight]
+
+export const authClient = createAuthClient({
+  plugins: [usernameClient()] // [!code highlight]
+})
+```
+</DocVariant>
+
+<DocVariant name="zaidan">
+### Install the Better Auth plugin
+
+Install the [`better-auth`](https://www.better-auth.com/docs/plugins/username) server plugin and add it to your Better Auth config:
+</DocVariant>
+
+```ts doc-variant="zaidan" title="src/lib/auth.ts"
+import { betterAuth } from "better-auth"
+import { username } from "better-auth/plugins" // [!code highlight]
+
+export const auth = betterAuth({
+  // ...
+  plugins: [
+    username() // [!code highlight]
+  ]
+})
+```
+
+</Step>
+
+<Step>
+
+<DocVariant name="heroui shadcn">
+### Register the UI plugin
+
+Pass `usernamePlugin()` to `<AuthProvider>`:
+</DocVariant>
+
+```tsx doc-variant="heroui" title="components/providers.tsx"
+import { usernamePlugin } from "@better-auth-ui/heroui/plugins/username" // [!code highlight]
+import { AuthProvider } from "@better-auth-ui/heroui"
+
+<AuthProvider
+  authClient={authClient}
+  navigate={navigate}
+  plugins={[usernamePlugin()]} // [!code highlight]
+>
+  {children}
+</AuthProvider>
+```
+
+```tsx doc-variant="shadcn" title="components/providers.tsx"
+import { usernamePlugin } from "@/lib/auth/username-plugin" // [!code highlight]
+import { AuthProvider } from "@/components/auth/auth-provider"
+
+<AuthProvider
+  authClient={authClient}
+  navigate={navigate}
+  plugins={[usernamePlugin()]} // [!code highlight]
+>
+  {children}
+</AuthProvider>
+```
+
+<DocVariant name="zaidan">
+### Install the matching client plugin
+
+Add `usernameClient()` to your auth client so `authClient.signIn.username` and `authClient.username.*` are available:
+</DocVariant>
+
+```ts doc-variant="zaidan" title="src/lib/auth-client.ts"
+import { createAuthClient } from "better-auth/solid"
+import { usernameClient } from "better-auth/client/plugins" // [!code highlight]
+
+export const authClient = createAuthClient({
+  plugins: [usernameClient()] // [!code highlight]
+})
+```
+
+</Step>
+
+<Step doc-variant="zaidan">
+
+### Register the UI plugin
+
+Run the shadcn CLI to install the Username UI plugin wrapper and copied Solid components:
+
+```npm
+npx shadcn@latest add https://better-auth-ui.com/r/solid/username.json
+```
+
+Then pass `usernamePlugin()` to `<AuthProvider>`:
+
+```tsx title="src/components/providers.tsx"
+import { AuthProvider } from "@/components/auth/auth-provider"
+import { usernamePlugin } from "@/lib/auth/username-plugin" // [!code highlight]
+import { authClient } from "@/lib/auth-client"
+
+export function Providers(props: { children?: JSX.Element }) {
+  return (
+    <AuthProvider
+      authClient={authClient}
+      plugins={[
+        usernamePlugin({ // [!code highlight]
+          usernamePrefix: "@", // [!code highlight]
+          localization: { usernamePlaceholder: "username" } // [!code highlight]
+        }) // [!code highlight]
+      ]}
+    >
+      {props.children}
+    </AuthProvider>
+  )
+}
+```
+
+</Step>
+
+</Steps>
+
+## Components
+
+<DocVariant name="zaidan">
+These previews use mocked auth clients and do not call live Better Auth endpoints.
+</DocVariant>
+
+### `<SignIn />`
+
+<ComponentPreview doc-variant="heroui" name="heroui-username-sign-in" />
+
+<ComponentPreview doc-variant="shadcn" name="shadcn-username-sign-in" />
+
+<ZaidanStory doc-variant="zaidan"
+  storyId="zaidan-plugins-username--sign-in-preview"
+  title="Zaidan Username Sign In preview"
+  height={390}
+/>
+
+### `<SignUp />`
+
+<ComponentPreview doc-variant="heroui" name="heroui-username-sign-up" />
+
+<ComponentPreview doc-variant="shadcn" name="shadcn-username-sign-up" />
+
+<ZaidanStory doc-variant="zaidan"
+  storyId="zaidan-plugins-username--sign-up-preview"
+  title="Zaidan Username Sign Up preview"
+  height={560}
+/>
+
+### `<UserProfile />`
+
+<ComponentPreview doc-variant="heroui" name="heroui-username-user-profile" />
+
+<ComponentPreview doc-variant="shadcn" name="shadcn-username-user-profile" />
+
+<DocVariant name="heroui shadcn">
+## Options
+
+Use `usernamePrefix` when usernames are displayed with a marker such as `@`. The prefix appears inside username fields but is not included in the value sent to Better Auth.
+</DocVariant>
+
+<ZaidanStory doc-variant="zaidan"
+  storyId="zaidan-plugins-username--user-profile-preview"
+  title="Zaidan Username User Profile preview"
+  height={520}
+/>
+
+<DocVariant name="zaidan">
+## Options
+
+Use `usernamePrefix` when usernames are displayed with a marker such as `@`. The prefix appears inside copied Solid username fields but is not included in the value sent to Better Auth.
+</DocVariant>
+
+```tsx
+usernamePlugin({
+  usernamePrefix: "@",
+  localization: {
+    usernamePlaceholder: "username"
+  }
+})
+```
+
+<type-table path="packages/core/src/plugins/username/username-plugin.ts" name="UsernamePluginOptions" />
+
+## Localization
+
+<type-table path="packages/core/src/plugins/username/username-localization.ts" name="UsernameLocalization" />

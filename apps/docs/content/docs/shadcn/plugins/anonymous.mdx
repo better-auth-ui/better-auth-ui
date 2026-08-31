@@ -2,63 +2,9 @@
 icon: UserCircle
 title: Anonymous
 description: Add a Continue as guest action to copied shadcn authentication forms.
+variant: shadcn
 ---
 
 import { Step, Steps } from 'fumadocs-ui/components/steps'
 
-<include>../../../shared/ui/plugins/anonymous.mdx#shared-overview</include>
-
-## Setup
-
-<Steps>
-<Step>
-
-<include>../../../shared/ui/plugins/anonymous.mdx#shared-configure-the-better-auth-server-plugin</include>
-
-<include>../../../shared/ui/plugins/anonymous.mdx#shared-migration</include>
-
-</Step>
-
-<include>../../../shared/ui/plugins/anonymous.mdx#shared-configure-the-better-auth-client-plugin</include>
-
-<Step>
-### Install the UI plugin
-
-Install the button and local plugin factory:
-
-```bash
-bunx --bun shadcn@latest add @better-auth-ui/anonymous
-```
-
-<include>../../../shared/ui/plugins/anonymous.mdx#shared-install-the-ui-plugin</include>
-
-</Step>
-<Step>
-
-<include>../../../shared/ui/plugins/anonymous.mdx#shared-register-the-plugin</include>
-
-```tsx title="components/providers.tsx"
-import { AuthProvider } from "@/components/auth/auth-provider"
-import { anonymousPlugin } from "@/lib/auth/anonymous-plugin" // [!code highlight]
-
-<AuthProvider
-  authClient={authClient}
-  navigate={navigate}
-  plugins={[
-    anonymousPlugin() // [!code highlight]
-  ]}
->
-  {children}
-</AuthProvider>
-```
-
-</Step>
-</Steps>
-
-## Change the label
-
-<include>../../../shared/ui/plugins/anonymous.mdx#shared-change-the-label</include>
-
-<type-table path="../../../../../../packages/core/src/plugins/anonymous/anonymous-plugin.ts" name="AnonymousPluginOptions" />
-
-<include>../../../shared/ui/plugins/anonymous.mdx#shared-account-linking</include>
+<include>../../../topics/ui/plugins/anonymous.mdx</include>

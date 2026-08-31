@@ -1,0 +1,19 @@
+<DocVariant name="react">
+Resolves with the TOTP URI and the backup codes. Unless the server sets `skipVerificationOnEnable`, two-factor only becomes active once `useVerifyTotp` succeeds.
+</DocVariant>
+
+<DocVariant name="solid">
+<include>../../shared/mutations/plugin-requirements.mdx#shared-two-factor</include>
+
+Resolves with the TOTP URI and the backup codes. Unless the server sets `skipVerificationOnEnable`, two-factor only becomes active once a TOTP code verifies.
+</DocVariant>
+
+<MutationPage id="enable-two-factor">
+
+<PageSlot name="usage" doc-variant="react">
+
+`useEnableTwoFactor` requires the Better Auth `twoFactor` plugin. Cast `authClient` to `TwoFactorAuthClient` so TypeScript picks up the plugin-extended method signature.
+
+</PageSlot>
+
+</MutationPage>

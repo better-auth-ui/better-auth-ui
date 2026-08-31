@@ -1,30 +1,7 @@
 ---
 title: useDeleteApiKey
 description: Delete an API key for the current user.
+variant: react
 ---
 
-<include>../../../shared/mutations/plugin-requirements.mdx#shared-api-key</include>
-
-## Usage
-
-```tsx
-import { authClient } from "@/lib/auth-client"
-import { useDeleteApiKey } from "@better-auth-ui/react/plugins/api-key"
-
-const mutation = useDeleteApiKey(authClient)
-
-mutation.mutate(/* params */)
-```
-
-## Options factory
-
-```tsx
-import { deleteApiKeyOptions } from "@better-auth-ui/core/plugins/api-key"
-import { useMutation } from "@tanstack/react-query"
-
-const mutation = useMutation(deleteApiKeyOptions(authClient))
-```
-
-## Params
-
-<type-table path="../../../../../../packages/core/src/plugins/api-key/delete-api-key-mutation.ts" name="DeleteApiKeyParams" />
+<include>../../../topics/mutations/delete-api-key.mdx</include>

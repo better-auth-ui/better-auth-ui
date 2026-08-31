@@ -1,0 +1,83 @@
+<DocVariant name="react">
+Keyed per-user. Waits for the active session and `query.accountId` before firing.
+</DocVariant>
+
+<DocVariant name="solid">
+Use `useAccountInfo` when a settings screen needs provider metadata for the current user's linked account. It is user-scoped and waits for the active session.
+</DocVariant>
+
+## Usage
+
+```tsx doc-variant="react"
+import { authClient } from "@/lib/auth-client"
+import { useAccountInfo } from "@better-auth-ui/react"
+
+const { data: accountInfo } = useAccountInfo(authClient, {
+  query: { accountId: "acc_123" }
+})
+
+// With React Query options in the same object
+const { data: accountInfo } = useAccountInfo(authClient, {
+  query: { accountId: "acc_123" },
+  staleTime: 60_000
+})
+```
+
+<DocVariant name="react">
+## Options factory
+</DocVariant>
+
+```tsx doc-variant="react"
+import { accountInfoOptions } from "@better-auth-ui/core"
+import { useQuery } from "@tanstack/react-query"
+
+const { data: accountInfo } = useQuery(
+  accountInfoOptions(authClient, userId, {
+    query: { accountId: "acc_123" }
+  })
+)
+```
+
+```tsx doc-variant="solid"
+import { useAccountInfo } from "@better-auth-ui/solid"
+
+const github = useAccountInfo(authClient, () => ({
+  query: { accountId: "github-account-id" }
+}))
+```
+
+<DocVariant name="solid">
+## Options factory and loader helpers
+</DocVariant>
+
+```ts doc-variant="solid"
+import {
+  accountInfoOptions,
+  ensureAccountInfo,
+  fetchAccountInfo,
+  prefetchAccountInfo
+} from "@better-auth-ui/core"
+
+const options = accountInfoOptions(authClient, userId, {
+  query: { accountId }
+})
+await ensureAccountInfo(queryClient, authClient, userId, { query: { accountId } })
+await prefetchAccountInfo(queryClient, authClient, userId, { query: { accountId } })
+const info = await fetchAccountInfo(queryClient, authClient, userId, { query: { accountId } })
+```
+
+## Invalidation
+
+```ts
+import { accountInfoOptions } from "@better-auth-ui/core"
+
+queryClient.invalidateQueries({
+  queryKey: accountInfoOptions(authClient, userId, {
+    query: { accountId: "acc_123" }
+  }).queryKey
+})
+```
+
+## Params
+
+<type-table path="packages/core/src/queries/account-info-query.ts" name="AccountInfoParams" />

@@ -1,31 +1,7 @@
 ---
 title: useSignInPasskey
 description: Passkey sign-in mutation hook.
+variant: solid
 ---
 
-Requires the Better Auth passkey plugin. Import your configured `authClient`. It already carries the passkey methods from `createAuthClient`.
-
-## Usage
-
-```tsx
-import { useSignInPasskey } from "@better-auth-ui/solid/plugins/passkey"
-
-const mutation = useSignInPasskey(authClient)
-
-mutation.mutate(/* params */)
-```
-
-## Options factory
-
-```tsx
-import { signInPasskeyOptions } from "@better-auth-ui/core/plugins/passkey"
-import { useMutation } from "@tanstack/solid-query"
-
-const signInWithPasskey = useMutation(() => signInPasskeyOptions(authClient))
-
-signInWithPasskey.mutate()
-```
-
-## Params
-
-<type-table path="../../../../../../packages/core/src/plugins/passkey/sign-in-passkey-mutation.ts" name="SignInPasskeyParams" />
+<include>../../../topics/mutations/sign-in-passkey.mdx</include>

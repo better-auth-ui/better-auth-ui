@@ -1,38 +1,7 @@
 ---
 title: useSignInPhoneNumber
 description: Sign in with a phone number and password.
+variant: solid
 ---
 
-## Usage
-
-```tsx
-import type { PhoneNumberAuthClient } from "@better-auth-ui/core/plugins/phone-number"
-import { useAuth } from "@better-auth-ui/solid"
-import { useSignInPhoneNumber } from "@better-auth-ui/solid/plugins/phone-number"
-
-const { authClient } = useAuth()
-const signIn = useSignInPhoneNumber(
-  authClient as PhoneNumberAuthClient
-)
-
-signIn.mutate({
-  phoneNumber: "+12025550123",
-  password,
-  rememberMe: true
-})
-```
-
-With Better Auth `requireVerification`, an unverified credential returns `PHONE_NUMBER_NOT_VERIFIED` and starts verification.
-
-## Options factory
-
-```tsx
-import { signInPhoneNumberOptions } from "@better-auth-ui/core/plugins/phone-number"
-import { useMutation } from "@tanstack/solid-query"
-
-const signIn = useMutation(() => signInPhoneNumberOptions(authClient))
-```
-
-## Params
-
-<type-table path="../../../../../../packages/core/src/plugins/phone-number/sign-in-phone-number-mutation.ts" name="SignInPhoneNumberParams" />
+<include>../../../topics/mutations/sign-in-phone-number.mdx</include>

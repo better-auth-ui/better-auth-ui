@@ -1,17 +1,7 @@
 ---
 title: useUser
 description: Retrieve the current authenticated user.
+variant: react
 ---
 
-Thin wrapper over [`useSession`](/docs/react/queries/session) that returns `session.user` as `data`. Shares the session cache entry, so no extra request is made.
-
-## Usage
-
-```tsx
-import { authClient } from "@/lib/auth-client"
-import { useUser } from "@better-auth-ui/react"
-
-const { data: user } = useUser(authClient)
-```
-
-Accepts the same arguments as `useSession`: see its [Params](/docs/react/queries/session#params).
+<include>../../../topics/queries/user.mdx</include>

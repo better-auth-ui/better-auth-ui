@@ -1,53 +1,7 @@
 ---
 title: <UserButton />
 description: Renders the Solid account trigger with session-aware menu items, settings links, sign out, and plugin-contributed user menu items.
+variant: zaidan
 ---
 
-## Usage
-
-<ZaidanStory
-  storyId="zaidan-components-user--user-button-preview"
-  title="Zaidan UserButton preview"
-  height={260}
-/>
-
-```tsx file=<rootDir>/../../examples/start-solid-zaidan-example/src/demos/user/user-button.tsx
-```
-
-## Icon
-
-<ZaidanStory
-  storyId="zaidan-components-user--user-button-icon-preview"
-  title="Zaidan UserButton icon preview"
-  height={260}
-/>
-
-```tsx file=<rootDir>/../../examples/start-solid-zaidan-example/src/demos/user/user-button-icon.tsx
-```
-
-## Custom links
-
-Use the `links` prop to add entries above the built-in items. Each entry is either a `{ label, href, icon?, variant?, visibility? }` descriptor or a fully rendered Solid element. `visibility` defaults to `"always"` and accepts `"authenticated" | "unauthenticated" | "always"`. Pass `hideSettings` to remove the built-in Settings link.
-
-<ZaidanStory
-  storyId="zaidan-components-user--user-button-links-preview"
-  title="Zaidan UserButton links preview"
-  height={260}
-/>
-
-```tsx file=<rootDir>/../../examples/start-solid-zaidan-example/src/demos/user/user-button-links.tsx
-```
-
-For interactive items shared across the app, prefer a plugin's `userMenuItems` slot over `links`.
-
-## Installation
-
-<include>../../../shared/ui/installation/zaidan.mdx#shared-user-button</include>
-
-After installation, the application owns `src/components/auth/user-button.tsx` and the other copied files. Point authentication and settings links to the TanStack Router paths.
-
-Then select the plugins that add authenticated user menu items.
-
-## Props
-
-<type-table path="../../../../../../examples/start-solid-zaidan-example/src/components/auth/user/user-button.tsx" name="UserButtonProps" />
+<include>../../../topics/ui/components/user-button.mdx</include>

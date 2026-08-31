@@ -1,0 +1,93 @@
+Requires `oauthProviderClient()` from `@better-auth/oauth-provider/client`.
+
+Returns the raw consent records Better Auth stores for the signed-in user. One OAuth client can have several records, so pair this with `groupOAuthConsents` from `@better-auth-ui/core/plugins/oauth-provider` before rendering.
+
+## Usage
+
+```tsx doc-variant="react"
+import { groupOAuthConsents } from "@better-auth-ui/core/plugins/oauth-provider"
+import { useAuth } from "@better-auth-ui/react"
+import { useListOAuthConsents } from "@better-auth-ui/react/plugins/oauth-provider"
+
+const { authClient } = useAuth()
+const { data: consents } = useListOAuthConsents(authClient)
+
+const applications = groupOAuthConsents(consents)
+```
+
+```tsx doc-variant="solid"
+import { groupOAuthConsents } from "@better-auth-ui/core/plugins/oauth-provider"
+import { useListOAuthConsents } from "@better-auth-ui/solid/plugins/oauth-provider"
+
+const consents = useListOAuthConsents(authClient)
+
+const applications = () => groupOAuthConsents(consents.data)
+```
+
+The query key is scoped to the signed-in user, so one account's authorized applications never surface in another account's view.
+
+<DocVariant name="react">
+## Client options factory and router-loader helpers
+</DocVariant>
+
+```tsx doc-variant="react"
+import {
+  ensureListOAuthConsents,
+  fetchListOAuthConsents,
+  listOAuthConsentsOptions,
+  prefetchListOAuthConsents
+} from "@better-auth-ui/core/plugins/oauth-provider"
+
+const options = listOAuthConsentsOptions(authClient, userId)
+await ensureListOAuthConsents(queryClient, authClient, userId)
+await prefetchListOAuthConsents(queryClient, authClient, userId)
+const consents = await fetchListOAuthConsents(queryClient, authClient, userId)
+```
+
+<DocVariant name="solid">
+## Options factory and loader helpers
+</DocVariant>
+
+```ts doc-variant="solid"
+import {
+  ensureListOAuthConsents,
+  fetchListOAuthConsents,
+  listOAuthConsentsOptions,
+  prefetchListOAuthConsents
+} from "@better-auth-ui/core/plugins/oauth-provider"
+
+const options = listOAuthConsentsOptions(authClient, userId)
+await ensureListOAuthConsents(queryClient, authClient, userId)
+await prefetchListOAuthConsents(queryClient, authClient, userId)
+const consents = await fetchListOAuthConsents(queryClient, authClient, userId)
+```
+
+## Invalidation
+
+```ts doc-variant="react"
+import { oauthProviderQueryKeys } from "@better-auth-ui/core/plugins/oauth-provider"
+
+queryClient.invalidateQueries({
+  queryKey: oauthProviderQueryKeys.consents(userId)
+})
+```
+
+<DocVariant name="react">
+[`useDeleteOAuthConsent`](/docs/react/mutations/delete-oauth-consent) already awaits this invalidation, so a partially failed removal still ends up reflecting the server's state.
+</DocVariant>
+
+```ts doc-variant="solid"
+import { listOAuthConsentsOptions } from "@better-auth-ui/core/plugins/oauth-provider"
+
+queryClient.invalidateQueries({
+  queryKey: listOAuthConsentsOptions(authClient, userId).queryKey
+})
+```
+
+<DocVariant name="solid">
+`deleteOAuthConsentOptions` shares the same user-scoped prefix, so a partially failed removal still ends up reflecting the server's state.
+</DocVariant>
+
+## Params
+
+<type-table path="packages/core/src/plugins/oauth-provider/list-oauth-consents-query.ts" name="ListOAuthConsentsParams" />

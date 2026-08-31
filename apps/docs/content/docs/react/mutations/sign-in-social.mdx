@@ -1,33 +1,7 @@
 ---
 title: useSignInSocial
 description: Start a social (OAuth) sign-in flow.
+variant: react
 ---
 
-Initiates the OAuth redirect flow: the session lands once the provider redirects back, so no session-cache side effects run here.
-
-## Usage
-
-```tsx
-import { authClient } from "@/lib/auth-client"
-import { useSignInSocial } from "@better-auth-ui/react"
-
-const { mutate: signInSocial } = useSignInSocial(authClient)
-
-signInSocial({
-  provider: "github",
-  callbackURL: "/dashboard"
-})
-```
-
-## Options factory
-
-```tsx
-import { signInSocialOptions } from "@better-auth-ui/core"
-import { useMutation } from "@tanstack/react-query"
-
-const { mutate } = useMutation(signInSocialOptions(authClient))
-```
-
-## Params
-
-<type-table path="../../../../../../packages/core/src/mutations/sign-in-social-mutation.ts" name="SignInSocialParams" />
+<include>../../../topics/mutations/sign-in-social.mdx</include>

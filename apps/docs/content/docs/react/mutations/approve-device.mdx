@@ -1,30 +1,7 @@
 ---
 title: useApproveDevice
 description: Approve a verified device authorization request.
+variant: react
 ---
 
-<include>../../../shared/mutations/approve-device.mdx#shared-overview</include>
-
-## Usage
-
-```tsx
-import { useApproveDevice } from "@better-auth-ui/react/plugins/device-authorization"
-
-const approveDevice = useApproveDevice(authClient)
-
-approveDevice.mutate({
-  userCode: "ABCD1234"
-})
-```
-
-## Options factory
-
-```ts
-import { approveDeviceOptions } from "@better-auth-ui/core/plugins/device-authorization"
-
-const options = approveDeviceOptions(authClient)
-```
-
-## Params
-
-<type-table path="../../../../../../packages/core/src/plugins/device-authorization/approve-device-mutation.ts" name="ApproveDeviceParams" />
+<include>../../../topics/mutations/approve-device.mdx</include>

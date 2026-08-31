@@ -1,0 +1,596 @@
+<DocVariant name="heroui shadcn">
+The magic-link plugin adds a passwordless email sign-in flow. The user enters their email, receives a one-time link, and is signed in when they click it.
+
+It contributes:
+
+- A `<MagicLink />` view at `/auth/magic-link`
+- A `<MagicLinkSent />` confirmation view at `/auth/magic-link-sent`
+- A "Continue with Magic Link" button rendered alongside the password sign-in button
+- A `useSignInMagicLink` mutation hook
+
+When `emailAndPassword.enabled === false`, `<MagicLink />` automatically takes over `/auth/sign-in` as the primary passwordless surface.
+</DocVariant>
+
+<DocVariant name="zaidan">
+The Magic Link plugin adds a passwordless email sign-in flow to the copied Solid/Zaidan auth UI. Users enter an email address, receive a one-time link, and sign in when they open it.
+
+It contributes:
+
+- A copied `<MagicLink />` view rendered at `/auth/magic-link`
+- A copied `<MagicLinkSent />` confirmation view rendered at `/auth/magic-link-sent`
+- A Magic Link toggle button that links between password sign-in and the magic-link view
+- Solid runtime wiring through [`signInMagicLinkOptions`](/docs/solid/mutations/sign-in-magic-link)
+</DocVariant>
+
+## Setup
+
+<Steps>
+
+<DocVariant name="heroui shadcn">
+<Step>
+### Install the Better Auth plugin
+
+Add the [Magic Link](https://www.better-auth.com/docs/plugins/magic-link) plugin to your Better Auth server config and wire up `sendMagicLink` to your email provider:
+
+```ts title="lib/auth.ts"
+import { betterAuth } from "better-auth"
+import { magicLink } from "better-auth/plugins" // [!code highlight]
+
+export const auth = betterAuth({
+  // ...
+  plugins: [
+    magicLink({ // [!code highlight]
+      sendMagicLink: async ({ email, url }) => { // [!code highlight]
+        // Send `url` to `email` via your email provider. // [!code highlight]
+      } // [!code highlight]
+    }) // [!code highlight]
+  ]
+})
+```
+
+</Step>
+<Step>
+### Install the matching client plugin
+
+Add `magicLinkClient()` to your auth client so `authClient.signIn.magicLink` is available:
+
+```ts title="lib/auth-client.ts"
+import { createAuthClient } from "better-auth/react"
+import { magicLinkClient } from "better-auth/client/plugins" // [!code highlight]
+
+export const authClient = createAuthClient({
+  plugins: [magicLinkClient()] // [!code highlight]
+})
+```
+
+</Step>
+</DocVariant>
+
+<Step>
+
+<DocVariant name="heroui">
+### Register the UI plugin
+
+Pass `magicLinkPlugin()` to `<AuthProvider>`:
+</DocVariant>
+
+```tsx doc-variant="heroui" title="components/providers.tsx"
+import { AuthProvider } from "@better-auth-ui/heroui"
+import { magicLinkPlugin } from "@better-auth-ui/heroui/plugins/magic-link" // [!code highlight]
+
+<AuthProvider
+  authClient={authClient}
+  navigate={navigate}
+  plugins={[magicLinkPlugin()]} // [!code highlight]
+>
+  {children}
+</AuthProvider>
+```
+
+<DocVariant name="shadcn">
+### Install the UI plugin
+
+Run the shadcn CLI to install the magic-link form, the toggle button, and the `magicLinkPlugin()` factory into your project:
+</DocVariant>
+
+```npm doc-variant="shadcn"
+npx shadcn@latest add @better-auth-ui/magic-link
+```
+
+<DocVariant name="shadcn">
+This drops the following into your codebase:
+
+- `src/lib/auth/auth-plugin.ts`: local `AuthPlugin` typing widener
+- `src/lib/auth/magic-link-plugin.ts`: `magicLinkPlugin()` factory
+- `src/components/auth/magic-link.tsx`: the magic-link form
+- `src/components/auth/magic-link-sent.tsx`: the sent confirmation view
+- `src/components/auth/magic-link-button.tsx`: the toggle button
+- `src/components/auth/open-email-button.tsx`: the email-provider shortcut
+- `src/components/auth/provider-button(s).tsx`: social provider buttons used by the form
+</DocVariant>
+
+<DocVariant name="zaidan">
+### Install the Better Auth plugin
+
+Add `magicLink({ sendMagicLink })` to your Better Auth server config and connect `sendMagicLink` to your email provider:
+</DocVariant>
+
+```ts doc-variant="zaidan" title="src/lib/auth.ts"
+import { betterAuth } from "better-auth"
+import { magicLink } from "better-auth/plugins" // [!code highlight]
+
+export const auth = betterAuth({
+  // ...
+  plugins: [
+    magicLink({ // [!code highlight]
+      sendMagicLink: async ({ email, url }) => { // [!code highlight]
+        // Send `url` to `email` with your provider. // [!code highlight]
+      } // [!code highlight]
+    }) // [!code highlight]
+  ]
+})
+```
+
+<DocVariant name="zaidan">
+Replace example email logging with a real email provider before production.
+</DocVariant>
+
+</Step>
+
+<Step>
+
+<DocVariant name="heroui">
+### Allow the new view path
+
+The plugin contributes `magic-link` and `magic-link-sent` segments to `viewPaths.auth`. Spread `magicLinkPlugin().viewPaths?.auth` into your auth route's allowed-paths set so both views resolve correctly:
+</DocVariant>
+
+<Tabs doc-variant="heroui" defaultValue="tanstack-start">
+
+<TabsList>
+<TabsTrigger value="tanstack-start"><TanStackStart />TanStack Start</TabsTrigger>
+<TabsTrigger value="next.js"><NextJS />Next.js</TabsTrigger>
+</TabsList>
+
+<Tab value="tanstack-start">
+
+```tsx title="routes/auth/$path.tsx"
+import { viewPaths } from "@better-auth-ui/core"
+import { Auth } from "@better-auth-ui/heroui"
+import { magicLinkPlugin } from "@better-auth-ui/heroui/plugins/magic-link" // [!code highlight]
+import { createFileRoute, notFound } from "@tanstack/react-router"
+
+export const Route = createFileRoute("/auth/$path")({
+  beforeLoad({ params: { path } }) {
+    if (
+      !Object.values({
+        ...viewPaths.auth,
+        ...magicLinkPlugin().viewPaths?.auth // [!code highlight]
+      }).includes(path)
+    ) {
+      throw notFound()
+    }
+  },
+  component: AuthPage
+})
+
+function AuthPage() {
+  const { path } = Route.useParams()
+  return <Auth path={path} />
+}
+```
+
+</Tab>
+
+<Tab value="next.js">
+
+```tsx title="app/auth/[path]/page.tsx"
+import { viewPaths } from "@better-auth-ui/core"
+import { Auth } from "@better-auth-ui/heroui"
+import { magicLinkPlugin } from "@better-auth-ui/heroui/plugins/magic-link" // [!code highlight]
+import { notFound } from "next/navigation"
+
+export default async function AuthPage({
+  params
+}: {
+  params: Promise<{ path: string }>
+}) {
+  const { path } = await params
+
+  if (
+    !Object.values({
+      ...viewPaths.auth,
+      ...magicLinkPlugin().viewPaths?.auth // [!code highlight]
+    }).includes(path)
+  ) {
+    notFound()
+  }
+
+  return <Auth path={path} />
+}
+```
+
+</Tab>
+
+</Tabs>
+
+<DocVariant name="shadcn">
+### Register the plugin
+
+Pass `magicLinkPlugin()` to `<AuthProvider>`:
+</DocVariant>
+
+```tsx doc-variant="shadcn" title="components/providers.tsx"
+import { magicLinkPlugin } from "@/lib/auth/magic-link-plugin" // [!code highlight]
+import { AuthProvider } from "@/components/auth/auth-provider"
+
+<AuthProvider
+  authClient={authClient}
+  navigate={navigate}
+  plugins={[magicLinkPlugin()]} // [!code highlight]
+>
+  {children}
+</AuthProvider>
+```
+
+<DocVariant name="zaidan">
+### Install the matching Solid client plugin
+
+Add `magicLinkClient()` to your Solid auth client so `authClient.signIn.magicLink` is available:
+</DocVariant>
+
+```ts doc-variant="zaidan" title="src/lib/auth-client.ts"
+import { magicLinkClient } from "better-auth/client/plugins" // [!code highlight]
+import { createAuthClient } from "better-auth/solid" // [!code highlight]
+
+export const authClient = createAuthClient({
+  plugins: [
+    magicLinkClient() // [!code highlight]
+  ]
+})
+```
+
+</Step>
+
+<Step doc-variant="shadcn zaidan">
+
+<DocVariant name="shadcn">
+### Allow the new view path
+
+The plugin contributes `magic-link` and `magic-link-sent` segments to `viewPaths.auth`. Spread `magicLinkPlugin().viewPaths?.auth` into your auth route's allowed-paths set so both views resolve correctly:
+</DocVariant>
+
+<Tabs doc-variant="shadcn" defaultValue="tanstack-start">
+
+<TabsList>
+<TabsTrigger value="tanstack-start"><TanStackStart />TanStack Start</TabsTrigger>
+<TabsTrigger value="next.js"><NextJS />Next.js</TabsTrigger>
+</TabsList>
+
+<Tab value="tanstack-start">
+
+```tsx title="routes/auth/$path.tsx"
+import { viewPaths } from "@better-auth-ui/core"
+import { createFileRoute, notFound } from "@tanstack/react-router"
+
+import { Auth } from "@/components/auth/auth"
+import { magicLinkPlugin } from "@/lib/auth/magic-link-plugin" // [!code highlight]
+
+export const Route = createFileRoute("/auth/$path")({
+  beforeLoad({ params: { path } }) {
+    if (
+      !Object.values({
+        ...viewPaths.auth,
+        ...magicLinkPlugin().viewPaths?.auth // [!code highlight]
+      }).includes(path)
+    ) {
+      throw notFound()
+    }
+  },
+  component: AuthPage
+})
+
+function AuthPage() {
+  const { path } = Route.useParams()
+  return <Auth path={path} />
+}
+```
+
+</Tab>
+
+<Tab value="next.js">
+
+```tsx title="app/auth/[path]/page.tsx"
+import { viewPaths } from "@better-auth-ui/core"
+import { notFound } from "next/navigation"
+
+import { Auth } from "@/components/auth/auth"
+import { magicLinkPlugin } from "@/lib/auth/magic-link-plugin" // [!code highlight]
+
+export default async function AuthPage({
+  params
+}: {
+  params: Promise<{ path: string }>
+}) {
+  const { path } = await params
+
+  if (
+    !Object.values({
+      ...viewPaths.auth,
+      ...magicLinkPlugin().viewPaths?.auth // [!code highlight]
+    }).includes(path)
+  ) {
+    notFound()
+  }
+
+  return <Auth path={path} />
+}
+```
+
+</Tab>
+
+</Tabs>
+
+<DocVariant name="zaidan">
+### Install the Solid/Zaidan components
+</DocVariant>
+
+```npm doc-variant="zaidan"
+npx shadcn@latest add https://better-auth-ui.com/r/solid/magic-link.json
+```
+
+<DocVariant name="zaidan">
+This copies the following files into your project:
+
+- `src/lib/auth/magic-link-plugin.ts`
+- `src/components/auth/magic-link.tsx`
+- `src/components/auth/magic-link-sent.tsx`
+- `src/components/auth/magic-link-button.tsx`
+- `src/components/auth/open-email-button.tsx`
+- local form UI primitives under `src/components/ui/**`
+</DocVariant>
+
+</Step>
+
+<Step doc-variant="zaidan">
+
+### Register the UI plugin
+
+Register `magicLinkPlugin()` in your copied Solid auth provider:
+
+```tsx title="src/components/providers.tsx"
+import { AuthProvider } from "@/components/auth/auth-provider"
+import { magicLinkPlugin } from "@/lib/auth/magic-link-plugin" // [!code highlight]
+
+<AuthProvider
+  authClient={authClient}
+  plugins={[magicLinkPlugin()]} // [!code highlight]
+>
+  {children}
+</AuthProvider>
+```
+
+</Step>
+
+<Step doc-variant="zaidan">
+
+### Allow the plugin auth route
+
+The copied route must accept the plugin-contributed auth path. Keep provider registration and route validation aligned, especially if you customize `magicLinkPlugin({ path })`:
+
+```tsx title="src/routes/auth/$path.tsx"
+import { viewPaths } from "@better-auth-ui/core"
+import { createFileRoute, redirect } from "@tanstack/solid-router"
+
+import { Auth } from "@/components/auth/auth"
+import { magicLinkPlugin } from "@/lib/auth/magic-link-plugin" // [!code highlight]
+
+const validAuthPathSegments = new Set([
+  ...Object.values(viewPaths.auth),
+  ...Object.values(magicLinkPlugin().viewPaths.auth) // [!code highlight]
+])
+
+export const Route = createFileRoute("/auth/$path")({
+  beforeLoad({ params: { path } }) {
+    if (!validAuthPathSegments.has(path)) {
+      throw redirect({ to: "/" })
+    }
+  },
+  component: AuthPage
+})
+
+function AuthPage() {
+  const { path } = Route.useParams()()
+  return <Auth path={path} />
+}
+```
+
+`/auth/magic-link` and `/auth/magic-link-sent` work after both the provider registration step and the route-wiring step are in place.
+
+</Step>
+
+</Steps>
+
+## Components
+
+### `<MagicLink />`
+
+<ComponentPreview doc-variant="heroui" name="heroui-magic-link" />
+
+<DocVariant name="heroui">
+The `<MagicLink />` view is automatically rendered at `/auth/magic-link` when the plugin is registered.
+</DocVariant>
+
+<ComponentPreview doc-variant="shadcn" name="shadcn-magic-link" />
+
+<DocVariant name="shadcn">
+The `<MagicLink />` view is rendered at `/auth/magic-link` when the plugin is registered and the route is wired up (see the setup step above).
+</DocVariant>
+
+<DocVariant name="heroui shadcn">
+**Usage**
+</DocVariant>
+
+```tsx doc-variant="heroui"
+import { MagicLink } from "@better-auth-ui/heroui/plugins/magic-link"
+
+<MagicLink />
+```
+
+<ZaidanStory doc-variant="zaidan"
+  storyId="zaidan-plugins-magic-link--preview"
+  title="Zaidan Magic Link preview"
+  height={520}
+/>
+
+<DocVariant name="zaidan">
+The copied `<MagicLink />` view is rendered when the Magic Link plugin is registered and the auth route accepts the plugin path.
+</DocVariant>
+
+```tsx doc-variant="shadcn zaidan"
+import { MagicLink } from "@/components/auth/magic-link"
+
+<MagicLink />
+```
+
+<DocVariant name="heroui shadcn">
+**Props**
+</DocVariant>
+
+<type-table doc-variant="heroui" path="packages/heroui/src/components/auth/magic-link/magic-link.tsx" name="MagicLinkProps" />
+
+<type-table doc-variant="shadcn" path="examples/start-shadcn-example/src/components/auth/magic-link.tsx" name="MagicLinkProps" />
+
+<DocVariant name="heroui shadcn">
+### `<MagicLinkSent />`
+
+After a magic-link request succeeds, the form stores the submitted email in session storage and navigates to this confirmation view. It shows an email-provider shortcut when one is available. Hover or focus the button to show a QR code for opening the same provider URL on another device.
+</DocVariant>
+
+```tsx doc-variant="heroui"
+import { MagicLinkSent } from "@better-auth-ui/heroui/plugins"
+
+<MagicLinkSent />
+```
+
+<type-table doc-variant="heroui" path="packages/heroui/src/components/auth/magic-link/magic-link-sent.tsx" name="MagicLinkSentProps" />
+
+<type-table doc-variant="zaidan" path="examples/start-solid-zaidan-example/src/components/auth/magic-link.tsx" name="MagicLinkProps" />
+
+<DocVariant name="zaidan">
+### `<MagicLinkSent />`
+
+After a magic-link request succeeds, the form stores the submitted email in session storage and navigates to this confirmation view. It redirects back to the magic-link form when that state is missing and shows an email-provider shortcut when one is available. Hover or focus the button to show a QR code for opening the same provider URL on another device.
+</DocVariant>
+
+```tsx doc-variant="shadcn zaidan"
+import { MagicLinkSent } from "@/components/auth/magic-link-sent"
+
+<MagicLinkSent />
+```
+
+<type-table doc-variant="shadcn" path="examples/start-shadcn-example/src/components/auth/magic-link-sent.tsx" name="MagicLinkSentProps" />
+
+<DocVariant name="heroui shadcn">
+## Options
+
+```ts
+magicLinkPlugin({
+  // Override the URL segment. Default: "magic-link"
+  path: "email-link",
+  // Override the confirmation segment. Default: "magic-link-sent"
+  sentPath: "email-link-sent",
+  // Override any of the plugin's localization strings.
+  localization: {
+    sendMagicLink: "Email me a link"
+  }
+})
+```
+</DocVariant>
+
+<type-table doc-variant="zaidan" path="examples/start-solid-zaidan-example/src/components/auth/magic-link-sent.tsx" name="MagicLinkSentProps" />
+
+<DocVariant name="zaidan">
+## Options
+
+Override the route segment or localization by configuring the copied `magicLinkPlugin()` factory:
+</DocVariant>
+
+```ts doc-variant="zaidan" title="src/lib/auth/magic-link-plugin.ts"
+magicLinkPlugin({
+  path: "email-link",
+  sentPath: "email-link-sent",
+  localization: {
+    sendMagicLink: "Email me a link"
+  }
+})
+```
+
+<DocVariant name="zaidan">
+If you override `path` or `sentPath`, use the same plugin options in both your provider registration and your auth-route validation.
+</DocVariant>
+
+<type-table path="packages/core/src/plugins/magic-link/magic-link-plugin.ts" name="MagicLinkPluginOptions" />
+
+## Localization
+
+<type-table path="packages/core/src/plugins/magic-link/magic-link-localization.ts" name="MagicLinkLocalization" />
+
+<DocVariant name="heroui shadcn">
+Read these from `useAuthPlugin(magicLinkPlugin).localization` inside custom slot components.
+</DocVariant>
+
+<DocVariant name="zaidan">
+In a custom Solid component, read Magic Link labels from the registered plugin metadata. This keeps the form and toggle button consistent.
+</DocVariant>
+
+## Email template
+
+<DocVariant name="heroui">
+Pair the plugin with the [`<MagicLinkEmail />`](/docs/heroui/components/email/magic-link-email) component to send a styled email from your `sendMagicLink` callback.
+</DocVariant>
+
+<DocVariant name="shadcn">
+Pair the plugin with the [`<MagicLinkEmail />`](/docs/shadcn/components/email/magic-link-email) component to send a styled email from your `sendMagicLink` callback.
+</DocVariant>
+
+<DocVariant name="heroui shadcn">
+## Passwordless-only flows
+
+If you disable email and password authentication, the magic-link form becomes the primary sign-in view. No additional configuration is required:
+
+```tsx
+<AuthProvider
+  authClient={authClient}
+  navigate={navigate}
+  emailAndPassword={{ enabled: false }}
+  plugins={[magicLinkPlugin()]}
+>
+  {children}
+</AuthProvider>
+```
+
+`/auth/sign-in` now renders `<MagicLink />`, and the `signUp`, `forgotPassword`, `resetPassword`, and `resetLinkSent` routes redirect to it.
+</DocVariant>
+
+<DocVariant name="zaidan">
+You can pair `sendMagicLink` with the existing [`<MagicLinkEmail />`](/docs/shadcn/components/email/magic-link-email) example, or render your own email template on the server.
+
+## Passwordless-only
+
+If your app disables email and password auth, you can keep the Magic Link flow as the primary sign-in surface:
+</DocVariant>
+
+```tsx doc-variant="zaidan"
+<AuthProvider
+  authClient={authClient}
+  emailAndPassword={{ enabled: false }}
+  plugins={[magicLinkPlugin()]}
+>
+  {children}
+</AuthProvider>
+```
+
+<DocVariant name="zaidan">
+The copied plugin already provides `fallbackViews.auth.signIn`. The `signUp`, `forgotPassword`, `resetPassword`, and `resetLinkSent` views redirect there when password auth is disabled. Route behavior still depends on the setup steps above: register `magicLinkPlugin()` and allow both plugin auth paths in `/auth/$path`.
+</DocVariant>

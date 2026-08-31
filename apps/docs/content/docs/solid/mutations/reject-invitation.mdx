@@ -1,29 +1,7 @@
 ---
 title: useRejectInvitation
 description: Reject an organization invitation.
+variant: solid
 ---
 
-## Usage
-
-```tsx
-import { useRejectInvitation } from "@better-auth-ui/solid/plugins/organization"
-
-const mutation = useRejectInvitation(authClient)
-
-mutation.mutate(/* params */)
-```
-
-<include>../../../shared/mutations/plugin-requirements.mdx#shared-organization-solid</include>
-
-## Options factory
-
-```tsx
-import { rejectInvitationOptions } from "@better-auth-ui/core/plugins/organization"
-import { useMutation } from "@tanstack/solid-query"
-
-const mutation = useMutation(() => rejectInvitationOptions(authClient))
-```
-
-## Params
-
-<type-table path="../../../../../../packages/core/src/plugins/organization/reject-invitation-mutation.ts" name="RejectInvitationParams" />
+<include>../../../topics/mutations/reject-invitation.mdx</include>

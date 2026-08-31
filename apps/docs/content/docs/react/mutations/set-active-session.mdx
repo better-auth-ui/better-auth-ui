@@ -1,40 +1,7 @@
 ---
 title: useSetActiveSession
 description: Switch the active device session in multi-session mode.
+variant: react
 ---
 
-On success the hook:
-
-1. Optimistically swaps the cached session to the matching entry from `useListDeviceSessions`.
-2. Scrolls the window to the top.
-3. Refetches both the session and device-session queries.
-
-## Usage
-
-```tsx
-import { authClient } from "@/lib/auth-client"
-import { useSetActiveSession } from "@better-auth-ui/react/plugins/multi-session"
-
-const { mutate: setActive } = useSetActiveSession(authClient)
-
-setActive({ sessionToken: deviceSession.session.token })
-```
-
-`useSetActiveSession` requires the Better Auth `multiSession` plugin. Import your configured `authClient`. It already carries the plugin methods from `createAuthClient`.
-
-## Options factory
-
-```tsx
-import { setActiveSessionOptions } from "@better-auth-ui/core/plugins/multi-session"
-import { useMutation } from "@tanstack/react-query"
-
-const { mutate } = useMutation(setActiveSessionOptions(authClient))
-```
-
-Note: The raw factory skips the optimistic session update. Use `useSetActiveSession` for the complete behavior.
-
-Use the raw factory only when you need a stable options object, such as for matching a `mutationKey`.
-
-## Params
-
-<type-table path="../../../../../../packages/core/src/plugins/multi-session/set-active-session-mutation.ts" name="SetActiveSessionParams" />
+<include>../../../topics/mutations/set-active-session.mdx</include>

@@ -2,10 +2,14 @@ import { readFileSync } from "node:fs"
 import { resolve } from "node:path"
 import { transformerMetaHighlight } from "@shikijs/transformers"
 import { rehypeCodeDefaultOptions } from "fumadocs-core/mdx-plugins"
+import { pageSchema } from "fumadocs-core/source/schema"
 import { defineConfig, defineDocs } from "fumadocs-mdx/config"
 import lastModified from "fumadocs-mdx/plugins/last-modified"
 import remarkCodeImport from "remark-code-import"
 
+import { docsVariantFrontmatterSchema } from "./src/lib/docs-variants.ts"
+import { remarkDocTemplates } from "./src/lib/remark-doc-templates.ts"
+import { remarkDocVariants } from "./src/lib/remark-doc-variants.ts"
 import { remarkStaticTypeTable } from "./src/lib/remark-static-type-table.ts"
 import type { TypeTableSnapshot } from "./src/lib/type-table-data.ts"
 
@@ -32,6 +36,7 @@ const typeTableSnapshot = readTypeTableSnapshot()
 export const docs = defineDocs({
   dir: "content/docs",
   docs: {
+    schema: pageSchema.extend(docsVariantFrontmatterSchema.shape),
     postprocess: {
       includeProcessedMarkdown: true
     }
@@ -41,9 +46,12 @@ export const docs = defineDocs({
 export default defineConfig({
   plugins: [lastModified()],
   mdxOptions: {
-    remarkPlugins: [
+    remarkPlugins: (defaults) => [
+      remarkDocVariants,
+      remarkDocTemplates,
       [remarkCodeImport, { allowImportingFromOutside: true }],
-      [remarkStaticTypeTable, typeTableSnapshot, workspaceRoot]
+      [remarkStaticTypeTable, typeTableSnapshot, workspaceRoot],
+      ...defaults
     ],
     remarkNpmOptions: {
       persist: {

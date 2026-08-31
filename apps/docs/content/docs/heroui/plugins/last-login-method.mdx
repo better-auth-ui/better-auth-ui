@@ -2,57 +2,9 @@
 icon: LogIn
 title: Last Login Method
 description: Show which sign-in method a user chose most recently.
+variant: heroui
 ---
 
 import { Step, Steps } from 'fumadocs-ui/components/steps'
 
-<include>../../../shared/ui/plugins/last-login-method.mdx#shared-overview</include>
-
-## Setup
-
-<Steps>
-
-<include>../../../shared/ui/plugins/last-login-method.mdx#shared-add-the-better-auth-server-plugin</include>
-
-<include>../../../shared/ui/plugins/last-login-method.mdx#shared-add-the-matching-client-plugin</include>
-
-<Step>
-### Register the UI plugin
-
-Register `lastLoginMethodPlugin()` with the HeroUI auth provider:
-
-```tsx title="components/providers.tsx"
-import { AuthProvider } from "@better-auth-ui/heroui"
-import { lastLoginMethodPlugin } from "@better-auth-ui/heroui/plugins" // [!code highlight]
-
-<AuthProvider
-  authClient={authClient}
-  navigate={navigate}
-  plugins={[
-    lastLoginMethodPlugin() // [!code highlight]
-  ]}
->
-  {children}
-</AuthProvider>
-```
-
-</Step>
-</Steps>
-
-<include>../../../shared/ui/plugins/last-login-method.mdx#shared-localization</include>
-
-<type-table path="../../../../../../packages/core/src/plugins/last-login-method/last-login-method-plugin.ts" name="LastLoginMethodPluginOptions" />
-
-<type-table path="../../../../../../packages/core/src/plugins/last-login-method/last-login-method-localization.ts" name="LastLoginMethodLocalization" />
-
-## Custom methods
-
-Better Auth tracks email and social providers by default. If `customResolveMethod` stores another method, place `<LastUsedBadge />` beside its sign-in control:
-
-```tsx
-import { LastUsedBadge } from "@better-auth-ui/heroui/plugins"
-
-<LastUsedBadge method="magic-link" />
-```
-
-<include>../../../shared/ui/plugins/last-login-method.mdx#shared-cookie-consent</include>
+<include>../../../topics/ui/plugins/last-login-method.mdx</include>

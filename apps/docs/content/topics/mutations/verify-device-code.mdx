@@ -1,0 +1,17 @@
+Requires `deviceAuthorizationClient()` from `better-auth/client/plugins`. Verification is modeled as a mutation because it claims the code for the signed-in session, even though Better Auth exposes the underlying endpoint through `authClient.device`.
+
+<MutationPage id="verify-device-code">
+
+<PageSlot name="usage" doc-variant="react">
+
+The returned `status` indicates whether the request still needs approval or has already been approved or denied.
+
+</PageSlot>
+
+<PageSlot name="options" doc-variant="solid">
+
+The returned `status` indicates whether the request still needs approval or has already been approved or denied.
+
+</PageSlot>
+
+</MutationPage>

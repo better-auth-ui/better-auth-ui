@@ -1,0 +1,68 @@
+<DocVariant name="react">
+<include>../../shared/queries/user-scoped.mdx#shared-session</include>
+</DocVariant>
+
+<DocVariant name="solid">
+`useListSessions` powers account security screens that show active sessions/devices for the signed-in user.
+</DocVariant>
+
+## Usage
+
+```tsx doc-variant="react"
+import { authClient } from "@/lib/auth-client"
+import { useListSessions } from "@better-auth-ui/react"
+
+const { data: sessions } = useListSessions(authClient)
+
+// With React Query options
+const { data: sessions } = useListSessions(authClient, { refetchOnMount: false })
+```
+
+<DocVariant name="react">
+## Options factory
+</DocVariant>
+
+```tsx doc-variant="react"
+import { listSessionsOptions } from "@better-auth-ui/core"
+import { useQuery } from "@tanstack/react-query"
+
+const { data: sessions } = useQuery(listSessionsOptions(authClient, userId))
+```
+
+```tsx doc-variant="solid"
+import { useListSessions } from "@better-auth-ui/solid"
+
+const sessions = useListSessions(authClient)
+```
+
+<DocVariant name="solid">
+## Options factory and loader helpers
+</DocVariant>
+
+```ts doc-variant="solid"
+import {
+  ensureListSessions,
+  fetchListSessions,
+  listSessionsOptions,
+  prefetchListSessions
+} from "@better-auth-ui/core"
+
+const options = listSessionsOptions(authClient, userId)
+await ensureListSessions(queryClient, authClient, userId)
+await prefetchListSessions(queryClient, authClient, userId)
+const sessions = await fetchListSessions(queryClient, authClient, userId)
+```
+
+## Invalidation
+
+```ts
+import { listSessionsOptions } from "@better-auth-ui/core"
+
+queryClient.invalidateQueries({
+  queryKey: listSessionsOptions(authClient, userId).queryKey
+})
+```
+
+## Params
+
+<type-table path="packages/core/src/queries/list-sessions-query.ts" name="ListSessionsParams" />

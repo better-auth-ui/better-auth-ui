@@ -1,23 +1,7 @@
 ---
 title: sendTwoFactorOtpOptions
 description: Email the second-factor code.
+variant: solid
 ---
 
-<include>../../../shared/mutations/plugin-requirements.mdx#shared-two-factor</include>
-
-<include>../../../shared/mutations/send-two-factor-otp.mdx#shared-overview</include>
-
-## Options factory
-
-```tsx
-import { sendTwoFactorOtpOptions } from "@better-auth-ui/core/plugins/two-factor"
-import { createMutation } from "@tanstack/solid-query"
-
-const sendOtp = createMutation(() => sendTwoFactorOtpOptions(authClient))
-
-sendOtp.mutate({})
-```
-
-## Params
-
-<type-table path="../../../../../../packages/core/src/plugins/two-factor/send-two-factor-otp-mutation.ts" name="SendTwoFactorOtpParams" />
+<include>../../../topics/mutations/send-two-factor-otp.mdx</include>

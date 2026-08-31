@@ -1,20 +1,7 @@
 ---
 title: <AuthRedirect />
 description: Require a session before redirecting to a same-origin page or API callback.
+variant: heroui
 ---
 
-<include>../../../../shared/ui/components/auth-redirect.mdx#shared-overview</include>
-
-```tsx
-import { Auth } from "@better-auth-ui/heroui"
-
-export default function AuthPage({ path }: { path: string }) {
-  return <Auth path={path} />
-}
-```
-
-<include>../../../../shared/ui/components/auth-redirect.mdx#shared-use-with-account-deletion-emails</include>
-
-## Props
-
-<type-table path="../../../../../../../packages/heroui/src/components/auth/auth-redirect.tsx" name="AuthRedirectProps" />
+<include>../../../../topics/ui/components/auth-redirect.mdx</include>

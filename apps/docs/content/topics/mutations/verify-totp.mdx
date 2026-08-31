@@ -1,0 +1,15 @@
+<DocVariant name="solid">
+<include>../../shared/mutations/plugin-requirements.mdx#shared-two-factor</include>
+</DocVariant>
+
+Used both to finish a pending sign-in challenge and to confirm enrollment. Verification is what creates the session, so it refetches the session query.
+
+<MutationPage id="verify-totp">
+
+<PageSlot name="usage" doc-variant="react">
+
+`useVerifyTotp` requires the Better Auth `twoFactor` plugin. Cast `authClient` to `TwoFactorAuthClient` so TypeScript picks up the plugin-extended method signature.
+
+</PageSlot>
+
+</MutationPage>

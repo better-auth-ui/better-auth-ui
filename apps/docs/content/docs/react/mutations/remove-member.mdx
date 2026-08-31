@@ -1,30 +1,7 @@
 ---
 title: useRemoveMember
 description: Remove a member from an organization.
+variant: react
 ---
 
-<include>../../../shared/mutations/plugin-requirements.mdx#shared-organization-react</include>
-
-## Usage
-
-```tsx
-import { authClient } from "@/lib/auth-client"
-import { useRemoveMember } from "@better-auth-ui/react/plugins/organization"
-
-const mutation = useRemoveMember(authClient)
-
-mutation.mutate(/* params */)
-```
-
-## Options factory
-
-```tsx
-import { removeMemberOptions } from "@better-auth-ui/core/plugins/organization"
-import { useMutation } from "@tanstack/react-query"
-
-const mutation = useMutation(removeMemberOptions(authClient))
-```
-
-## Params
-
-<type-table path="../../../../../../packages/core/src/plugins/organization/remove-member-mutation.ts" name="RemoveMemberParams" />
+<include>../../../topics/mutations/remove-member.mdx</include>

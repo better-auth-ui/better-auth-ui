@@ -1,0 +1,211 @@
+<ComponentPage id="auth-provider">
+
+<PageSlot name="usage:before" doc-variant="zaidan">
+
+Install the provider registry payload with `npx shadcn@latest add https://better-auth-ui.com/r/solid/auth-provider.json`. It copies `src/components/auth/auth-provider.tsx` and related provider support files. After install, these files are app-owned. Then wrap your application shell as shown in the Solid/Zaidan example.
+
+</PageSlot>
+
+<PageSlot name="usage">
+
+## Localization
+
+Install the locale package:
+
+```bash
+bun add @better-auth-ui/locales
+```
+
+Import one locale and pass it to `AuthProvider`:
+
+```tsx doc-variant="heroui shadcn" title="components/providers.tsx"
+import { deDE } from "@better-auth-ui/locales/de-DE"
+
+<AuthProvider authClient={authClient} locale={deDE} navigate={navigate}>
+  {children}
+</AuthProvider>
+```
+
+<DocVariant name="heroui">
+Locale bundles include the core messages and all built-in plugin messages. The locale also controls date, number, currency, and relative-time formatting in HeroUI components.
+</DocVariant>
+
+```tsx doc-variant="zaidan" title="components/providers.tsx"
+import { deDE } from "@better-auth-ui/locales/de-DE"
+
+<AuthProvider authClient={authClient} locale={deDE}>
+  {children}
+</AuthProvider>
+```
+
+<DocVariant name="shadcn zaidan">
+Locale bundles include the core messages and all built-in plugin messages.
+</DocVariant>
+
+Use `localization` for product-specific text. These values take priority over the selected locale:
+
+```tsx doc-variant="heroui shadcn"
+<AuthProvider
+  authClient={authClient}
+  locale={deDE}
+  localization={{ auth: { signIn: "Bei Acme anmelden" } }}
+  navigate={navigate}
+>
+  {children}
+</AuthProvider>
+```
+
+```tsx doc-variant="zaidan"
+<AuthProvider
+  authClient={authClient}
+  locale={deDE}
+  localization={{ auth: { signIn: "Bei Acme anmelden" } }}
+>
+  {children}
+</AuthProvider>
+```
+
+### Match the browser language
+
+In a client-only application, import the supported locales and match `navigator.languages` against that list:
+
+```tsx
+import { matchAuthLocale } from "@better-auth-ui/locales"
+import { deDE } from "@better-auth-ui/locales/de-DE"
+import { enUS } from "@better-auth-ui/locales/en-US"
+
+const locale = matchAuthLocale({
+  requested: navigator.languages,
+  supported: [enUS, deDE],
+  fallback: enUS
+})
+```
+
+For server rendering, resolve the same locale from a user preference or the `Accept-Language` header. Pass that locale during the first render to prevent a hydration mismatch.
+
+Changing the `locale` prop updates mounted auth components. Email components do not read `AuthProvider`; pass their localization on the server.
+
+<DocVariant name="heroui shadcn">
+## Custom and Generic OAuth providers
+
+Built-in providers use their Better Auth ID as a string. For a custom or Generic OAuth provider, pass its ID, visible label, and optional icon.
+</DocVariant>
+
+```tsx doc-variant="heroui" title="components/providers.tsx"
+import { Briefcase } from "@gravity-ui/icons"
+
+<AuthProvider
+  authClient={authClient}
+  navigate={navigate}
+  socialProviders={[
+    "github",
+    {
+      id: "company-oauth",
+      label: "Company SSO",
+      icon: <Briefcase />
+    }
+  ]}
+>
+  {children}
+</AuthProvider>
+```
+
+```tsx doc-variant="shadcn" title="components/providers.tsx"
+import { Building2 } from "lucide-react"
+
+<AuthProvider
+  authClient={authClient}
+  navigate={navigate}
+  socialProviders={[
+    "github",
+    {
+      id: "company-oauth",
+      label: "Company SSO",
+      icon: <Building2 />
+    }
+  ]}
+>
+  {children}
+</AuthProvider>
+```
+
+<DocVariant name="heroui shadcn">
+The same metadata appears on sign-in, sign-up, and linked-account views. BAUI sends only `id` to Better Auth.
+
+Better Auth 1.7 registers Generic OAuth providers as normal social providers. Configure the same ID on the server:
+
+```ts title="lib/auth.ts"
+import { betterAuth } from "better-auth"
+import { genericOAuth } from "better-auth/plugins"
+
+export const auth = betterAuth({
+  plugins: [
+    genericOAuth({
+      config: [
+        {
+          providerId: "company-oauth",
+          clientId: process.env.COMPANY_OAUTH_CLIENT_ID!,
+          clientSecret: process.env.COMPANY_OAUTH_CLIENT_SECRET!,
+          discoveryUrl:
+            "https://id.example.com/.well-known/openid-configuration"
+        }
+      ]
+    })
+  ]
+})
+```
+
+Register `/api/auth/callback/company-oauth` with the provider. See the [Better Auth Generic OAuth guide](https://www.better-auth.com/docs/plugins/generic-oauth) for endpoint and profile options.
+</DocVariant>
+
+## Popup social sign-in
+
+Set `socialSignInMode="popup"` to keep the current page open during social sign-in. Redirect mode remains the default.
+
+Better Auth marks this API as experimental. Configure the server and client plugins before you enable it:
+
+```ts title="lib/auth.ts"
+import { betterAuth } from "better-auth"
+import { bearer, oauthPopup } from "better-auth/plugins"
+
+export const auth = betterAuth({
+  plugins: [bearer(), oauthPopup()]
+})
+```
+
+```ts doc-variant="heroui shadcn" title="lib/auth-client.ts"
+import { createAuthClient } from "better-auth/react"
+import { oauthPopupClient } from "better-auth/client/plugins"
+
+export const authClient = createAuthClient({
+  plugins: [oauthPopupClient()]
+})
+```
+
+```ts doc-variant="zaidan" title="lib/auth-client.ts"
+import { createAuthClient } from "better-auth/solid"
+import { oauthPopupClient } from "better-auth/client/plugins"
+
+export const authClient = createAuthClient({
+  plugins: [oauthPopupClient()]
+})
+```
+
+Then select popup mode on the provider:
+
+```tsx
+<AuthProvider
+  authClient={authClient}
+  navigate={navigate}
+  socialProviders={["github", "google"]}
+  socialSignInMode="popup"
+>
+  {children}
+</AuthProvider>
+```
+
+Popup mode uses the same provider buttons and redirect target. It returns control to the current page, refreshes the session, and then runs the configured navigation.
+
+</PageSlot>
+
+</ComponentPage>

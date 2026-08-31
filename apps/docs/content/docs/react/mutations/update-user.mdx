@@ -1,32 +1,7 @@
 ---
 title: useUpdateUser
 description: Update the authenticated user's profile fields.
+variant: react
 ---
 
-On success, the shared mutation invalidator awaits session invalidation so cached user data refreshes.
-
-## Usage
-
-```tsx
-import { authClient } from "@/lib/auth-client"
-import { useUpdateUser } from "@better-auth-ui/react"
-
-const { mutate: updateUser, isPending } = useUpdateUser(authClient)
-
-updateUser({ name: "Alice", image: "https://.../avatar.png" })
-```
-
-## Options factory
-
-```tsx
-import { updateUserOptions } from "@better-auth-ui/core"
-import { useMutation } from "@tanstack/react-query"
-
-const { mutate } = useMutation(updateUserOptions(authClient))
-```
-
-Note: prefer `useUpdateUser` for React components. Use the core factory when you need a stable framework-neutral options object, for example to match on `mutationKey` inside a global `MutationCache` observer.
-
-## Params
-
-<type-table path="../../../../../../packages/core/src/mutations/update-user-mutation.ts" name="UpdateUserParams" />
+<include>../../../topics/mutations/update-user.mdx</include>

@@ -2,77 +2,9 @@
 icon: Palette
 title: Theme
 description: Add theme selection with system, light, and dark modes to your authentication flow.
+variant: heroui
 ---
 
 import { Step, Steps } from 'fumadocs-ui/components/steps'
 
-<include>../../../shared/ui/plugins/theme.mdx#shared-overview</include>
-
-## Setup
-
-<Steps>
-<Step>
-
-<include>../../../shared/ui/plugins/theme.mdx#shared-register-the-ui-plugin</include>
-
-```tsx title="components/providers.tsx"
-import { AuthProvider } from "@better-auth-ui/heroui"
-import { themePlugin } from "@better-auth-ui/heroui/plugins/theme" // [!code highlight]
-import { ThemeProvider, useTheme } from "next-themes"
-import type { ReactNode } from "react"
-
-import { authClient } from "@/lib/auth-client"
-
-export function Providers({ children }: { children: ReactNode }) {
-  return (
-    <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-      <AuthProvider
-        authClient={authClient}
-        plugins={[
-          themePlugin({ useTheme }) // [!code highlight]
-        ]}
-      >
-        {children}
-      </AuthProvider>
-    </ThemeProvider>
-  )
-}
-```
-
-<include>../../../shared/ui/plugins/theme.mdx#shared-theme-hook</include>
-
-</Step>
-
-<include>../../../shared/ui/plugins/theme.mdx#shared-or-pass-static-theme-state</include>
-
-</Steps>
-
-## Components
-
-### `<UserButton />`
-
-<ComponentPreview name="heroui-theme-toggle-item" />
-
-### `<Appearance />`
-
-<ComponentPreview name="heroui-theme-appearance" />
-
-<include>../../../shared/ui/plugins/theme.mdx#shared-appearance</include>
-
-```tsx
-import { Appearance } from "@better-auth-ui/heroui/plugins/theme"
-
-<Appearance />
-```
-
-**Props**
-
-<type-table path="../../../../../../packages/heroui/src/components/auth/theme/appearance.tsx" name="AppearanceProps" />
-
-## Options
-
-<type-table path="../../../../../../packages/heroui/src/lib/auth/theme-plugin.ts" name="ThemePluginOptions" />
-
-## Localization
-
-<type-table path="../../../../../../packages/core/src/plugins/theme/theme-localization.ts" name="ThemeLocalization" />
+<include>../../../topics/ui/plugins/theme.mdx</include>

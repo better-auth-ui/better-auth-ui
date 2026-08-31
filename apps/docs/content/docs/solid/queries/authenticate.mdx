@@ -1,51 +1,7 @@
 ---
 title: useAuthenticate
 description: Redirect unauthenticated Solid users to the configured sign-in route.
+variant: solid
 ---
 
-`useAuthenticate` calls [`useSession`](/docs/solid/queries/session) and, once the query settles, redirects unauthenticated users to the configured sign-in path. The current URL is preserved as a `redirectTo` query parameter so the user lands back where they started after signing in.
-
-Use this as the primary guard inside protected route components.
-
-## Usage
-
-```tsx
-import { useAuthenticate } from "@better-auth-ui/solid"
-
-export function AccountPage() {
-  const session = useAuthenticate(authClient)
-
-  if (session.isPending) return <Spinner />
-  if (!session.data) return null // navigating to sign-in
-
-  return <Account user={session.data.user} />
-}
-```
-
-<include>../../../shared/queries/authenticate.mdx#shared-usage</include>
-
-Accepts the same arguments as `useSession`: see its [Params](/docs/solid/queries/session#params).
-
-## First-render caveat
-
-The redirect runs inside a Solid `createEffect`, so it is browser-only. During the first render, `session.data` is `undefined` and navigation has not started.
-
-The protected interface can appear briefly before the browser effect redirects to sign-in.
-
-<include>../../../shared/queries/authenticate.mdx#shared-gate-on-is-pending-simplest</include>
-
-```tsx
-const session = useAuthenticate(authClient)
-
-if (session.isPending) return <Skeleton />
-if (!session.data) return null // navigating to sign-in
-
-return <Account user={session.data.user} />
-```
-
-<include>../../../shared/queries/authenticate.mdx#shared-pair-with-a-server-side-guard-no-loading-state</include>
-
-- **TanStack Start**: check the session in a server route guard or loader, then hydrate the session query for the protected route.
-- **Solid server runtimes**: use the server-side session helpers from [`useSession`](/docs/solid/queries/session#server-side-prefetching) with the request headers for the current request.
-
-<include>../../../shared/queries/authenticate.mdx#shared-session-changes</include>
+<include>../../../topics/queries/authenticate.mdx</include>

@@ -1,28 +1,7 @@
 ---
 title: useSignOut
 description: Sign out the current user.
+variant: solid
 ---
 
-## Usage
-
-```tsx
-import { useSignOut } from "@better-auth-ui/solid"
-
-const signOut = useSignOut(authClient)
-signOut.mutate()
-```
-
-## Options factory
-
-```tsx
-import { signOutOptions } from "@better-auth-ui/core"
-import { useMutation } from "@tanstack/solid-query"
-
-const signOut = useMutation(() => signOutOptions(authClient))
-```
-
-The core options metadata removes `authQueryKeys.all` after sign-out when the Better Auth mutation invalidator is installed by `AuthProvider`.
-
-## Params
-
-<type-table path="../../../../../../packages/core/src/mutations/sign-out-mutation.ts" name="SignOutParams" />
+<include>../../../topics/mutations/sign-out.mdx</include>

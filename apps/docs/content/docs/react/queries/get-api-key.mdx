@@ -1,23 +1,7 @@
 ---
 title: useGetApiKey
 description: Get one API key by ID.
+variant: react
 ---
 
-<include>../../../shared/queries/get-api-key.mdx#shared-overview</include>
-
-## Usage
-
-```tsx
-import { authClient } from "@/lib/auth-client"
-import { useGetApiKey } from "@better-auth-ui/react/plugins/api-key"
-
-const { data: apiKey } = useGetApiKey(authClient, {
-  query: { id: apiKeyId, configId: "service" }
-})
-```
-
-<include>../../../shared/queries/get-api-key.mdx#shared-options-factory-and-loader-helpers</include>
-
-## Params
-
-<type-table path="../../../../../../packages/core/src/plugins/api-key/get-api-key-query.ts" name="GetApiKeyParams" />
+<include>../../../topics/queries/get-api-key.mdx</include>

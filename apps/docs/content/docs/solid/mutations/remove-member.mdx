@@ -1,29 +1,7 @@
 ---
 title: useRemoveMember
 description: Remove a member from an organization.
+variant: solid
 ---
 
-## Usage
-
-```tsx
-import { useRemoveMember } from "@better-auth-ui/solid/plugins/organization"
-
-const mutation = useRemoveMember(authClient)
-
-mutation.mutate(/* params */)
-```
-
-<include>../../../shared/mutations/plugin-requirements.mdx#shared-organization-solid</include>
-
-## Options factory
-
-```tsx
-import { removeMemberOptions } from "@better-auth-ui/core/plugins/organization"
-import { useMutation } from "@tanstack/solid-query"
-
-const mutation = useMutation(() => removeMemberOptions(authClient))
-```
-
-## Params
-
-<type-table path="../../../../../../packages/core/src/plugins/organization/remove-member-mutation.ts" name="RemoveMemberParams" />
+<include>../../../topics/mutations/remove-member.mdx</include>

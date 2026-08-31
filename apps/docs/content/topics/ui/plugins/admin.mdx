@@ -1,0 +1,491 @@
+<DocVariant name="heroui shadcn">
+The Admin plugin adds a static `/admin/users` page and a user-detail drawer.
+It also adds a "Stop impersonating" action to `<UserButton />`.
+</DocVariant>
+
+<DocVariant name="zaidan">
+The Admin plugin adds a static `/admin/users` page and a user-detail dialog.
+It also adds a "Stop impersonating" action to the copied `<UserButton />`.
+</DocVariant>
+
+## Setup
+
+<Steps>
+
+<Step>
+
+<DocVariant name="heroui shadcn">
+### Enable the Better Auth admin plugin
+
+Add `admin()` to the server configuration:
+
+```ts title="lib/auth.ts"
+import { betterAuth } from "better-auth"
+import { admin } from "better-auth/plugins" // [!code highlight]
+
+export const auth = betterAuth({
+  // ...
+  plugins: [
+    admin() // [!code highlight]
+  ]
+})
+```
+</DocVariant>
+
+<DocVariant name="zaidan">
+### Enable the Better Auth admin plugin
+</DocVariant>
+
+```ts doc-variant="zaidan" title="src/lib/auth.ts"
+import { betterAuth } from "better-auth"
+import { admin } from "better-auth/plugins" // [!code highlight]
+
+export const auth = betterAuth({
+  // ...
+  plugins: [
+    admin() // [!code highlight]
+  ]
+})
+```
+
+Update your database schema after enabling the plugin. Better Auth adds admin
+fields to users and an `impersonatedBy` field to sessions.
+
+</Step>
+
+<Step>
+
+<DocVariant name="heroui shadcn">
+### Add the matching client plugin
+</DocVariant>
+
+<DocVariant name="shadcn">
+Add `adminClient()` so the UI can read the impersonation marker and restore the
+administrator's session:
+</DocVariant>
+
+```ts doc-variant="heroui shadcn" title="lib/auth-client.ts"
+import { createAuthClient } from "better-auth/react"
+import { adminClient } from "better-auth/client/plugins" // [!code highlight]
+
+export const authClient = createAuthClient({
+  plugins: [adminClient()] // [!code highlight]
+})
+```
+
+<DocVariant name="zaidan">
+### Add the matching Solid client plugin
+</DocVariant>
+
+```ts doc-variant="zaidan" title="src/lib/auth-client.ts"
+import { createAuthClient } from "@better-auth-ui/solid"
+import { adminClient } from "better-auth/client/plugins" // [!code highlight]
+
+export const authClient = createAuthClient({
+  plugins: [adminClient()] // [!code highlight]
+})
+```
+
+</Step>
+
+<Step>
+
+<DocVariant name="heroui">
+### Register the UI plugin
+</DocVariant>
+
+```tsx doc-variant="heroui" title="components/providers.tsx"
+import { AuthProvider } from "@better-auth-ui/heroui"
+import { adminPlugin } from "@better-auth-ui/heroui/plugins" // [!code highlight]
+
+<AuthProvider
+  authClient={authClient}
+  navigate={navigate}
+  plugins={[adminPlugin()]} // [!code highlight]
+>
+  {children}
+</AuthProvider>
+```
+
+<DocVariant name="shadcn">
+### Install the UI integration
+</DocVariant>
+
+```npm doc-variant="shadcn"
+npx shadcn@latest add @better-auth-ui/admin
+```
+
+<DocVariant name="shadcn">
+This installs:
+
+- `src/lib/auth/auth-plugin.ts`
+- `src/lib/auth/admin-plugin.ts`
+- `src/components/auth/admin/admin.tsx`
+- `src/components/auth/admin/admin-users.tsx`
+- `src/components/auth/admin/stop-impersonating.tsx`
+</DocVariant>
+
+<DocVariant name="zaidan">
+### Install the Solid and Zaidan integration
+</DocVariant>
+
+```npm doc-variant="zaidan"
+npx shadcn@latest add https://better-auth-ui.com/r/solid/admin.json
+```
+
+<DocVariant name="zaidan">
+This copies:
+
+- `src/lib/auth/admin-plugin.ts`
+- `src/components/auth/admin/admin.tsx`
+- `src/components/auth/admin/admin-users.tsx`
+- `src/components/auth/admin/stop-impersonating.tsx`
+</DocVariant>
+
+</Step>
+
+<Step doc-variant="shadcn zaidan">
+
+<DocVariant name="shadcn">
+### Register the UI plugin
+</DocVariant>
+
+```tsx doc-variant="shadcn" title="components/providers.tsx"
+import { AuthProvider } from "@/components/auth/auth-provider"
+import { adminPlugin } from "@/lib/auth/admin-plugin" // [!code highlight]
+
+<AuthProvider
+  authClient={authClient}
+  navigate={navigate}
+  plugins={[adminPlugin()]} // [!code highlight]
+>
+  {children}
+</AuthProvider>
+```
+
+<DocVariant name="zaidan">
+### Register the copied UI plugin
+</DocVariant>
+
+```tsx doc-variant="zaidan" title="src/components/providers.tsx"
+import { AuthProvider } from "@/components/auth/auth-provider"
+import { adminPlugin } from "@/lib/auth/admin-plugin" // [!code highlight]
+
+<AuthProvider
+  authClient={authClient}
+  plugins={[adminPlugin()]} // [!code highlight]
+>
+  {children}
+</AuthProvider>
+```
+
+</Step>
+
+</Steps>
+
+## Add the users route
+
+<DocVariant name="heroui">
+Create one static route for the users page:
+</DocVariant>
+
+```tsx doc-variant="heroui" title="app/admin/users/page.tsx"
+import { Admin } from "@better-auth-ui/heroui"
+
+export default function AdminUsersPage() {
+  return <Admin view="users" />
+}
+```
+
+<DocVariant name="heroui">
+Use `<Admin path="users" />` when a parent route passes the final static path
+segment. The user-detail drawer keeps user IDs out of the route contract.
+
+Applications can control the drawer through `<AdminUsers />`:
+</DocVariant>
+
+```tsx doc-variant="heroui"
+<AdminUsers
+  selectedUserId={selectedUserId}
+  onSelectedUserIdChange={setSelectedUserId}
+/>
+```
+
+<DocVariant name="zaidan">
+Create one static TanStack Start route:
+</DocVariant>
+
+```tsx doc-variant="zaidan" title="src/routes/admin/users.tsx"
+import { createFileRoute } from "@tanstack/solid-router"
+import { Admin } from "@/components/auth/admin/admin"
+
+export const Route = createFileRoute("/admin/users")({
+  component: () => <Admin view="users" />
+})
+```
+
+<DocVariant name="zaidan">
+Use `<Admin path="users" />` when a parent route supplies the final static path
+segment. The user-detail dialog keeps user IDs out of the route contract.
+
+Applications can control the selected user through `<AdminUsers />`:
+</DocVariant>
+
+```tsx doc-variant="zaidan"
+import { AdminUsers } from "@/components/auth/admin/admin-users"
+
+<AdminUsers
+  selectedUserId={selectedUserId()}
+  onSelectedUserIdChange={setSelectedUserId}
+/>
+```
+
+<DocVariant name="heroui zaidan">
+## Inspector tabs
+
+The user inspector includes local Overview and Sessions tabs. Registered
+plugins can add more tabs without adding routes.
+</DocVariant>
+
+<DocVariant name="shadcn">
+Create one static route for the users page. The drawer keeps user IDs out of
+the route contract.
+</DocVariant>
+
+```tsx doc-variant="shadcn" title="app/admin/users/page.tsx"
+import { Admin } from "@/components/auth/admin/admin"
+
+export default function AdminUsersPage() {
+  return <Admin view="users" />
+}
+```
+
+<DocVariant name="shadcn">
+TanStack Start can use the same component in `routes/admin/users.tsx`:
+</DocVariant>
+
+```tsx doc-variant="shadcn"
+import { createFileRoute } from "@tanstack/react-router"
+import { Admin } from "@/components/auth/admin/admin"
+
+export const Route = createFileRoute("/admin/users")({
+  component: () => <Admin view="users" />
+})
+```
+
+<DocVariant name="shadcn">
+Use `<Admin path="users" />` when a parent route passes the final static path
+segment. Applications can control the drawer without changing this route:
+</DocVariant>
+
+```tsx doc-variant="shadcn"
+import { AdminUsers } from "@/components/auth/admin/admin-users"
+
+<AdminUsers
+  selectedUserId={selectedUserId}
+  onSelectedUserIdChange={setSelectedUserId}
+/>
+```
+
+<DocVariant name="shadcn">
+This API lets an application connect search parameters later. Search
+parameters are not required by the library.
+
+## Permissions
+
+The users page calls the Better Auth permission API before it requests the
+user list. Each server endpoint remains the final security boundary.
+
+Do not authorize this page from a role string alone. Better Auth also supports
+custom roles, custom permissions, and `adminUserIds`.
+
+The table searches one field per request. Select `Email` or `Name` before you
+enter a search value. The public Admin API does not provide one combined
+search across names, email addresses, and user IDs.
+
+## User inspector
+
+Select a row to open the user inspector. The inspector includes local Overview
+and Sessions tabs. Registered plugins can add more tabs without adding routes.
+</DocVariant>
+
+The Dash integration adds an Activity tab when both UI plugins are registered.
+Dash applies its own organization owner or admin access rules to this tab.
+
+<DocVariant name="heroui zaidan">
+## User actions
+</DocVariant>
+
+<DocVariant name="heroui">
+The users page can create users. The drawer can update a user's name and role,
+set a password, ban or unban the user, impersonate the user, delete the user,
+and revoke one or all of the user's sessions.
+</DocVariant>
+
+<DocVariant name="zaidan">
+The users page can create users. The dialog can update a user's name and role,
+set a password, ban or unban the user, impersonate the user, delete the user,
+and revoke one or all of the user's sessions.
+</DocVariant>
+
+<DocVariant name="heroui zaidan">
+The UI checks the matching Admin client permission before it enables each
+action. Dangerous actions require confirmation. The UI also disables actions
+that would ban, delete, impersonate, or revoke sessions for the current user.
+
+## Permissions and privacy
+
+The users page calls the Better Auth permission API before it requests the
+user list. Do not authorize the page from a role string alone.
+</DocVariant>
+
+<DocVariant name="heroui">
+The table searches one field per request. The supported fields are `email`
+and `name`.
+
+Passwords stay in local form state and never enter query keys. The forms clear
+each password after the request or when the user closes the form. Session IP
+addresses are hidden unless `showIpAddress` is `true`.
+
+Configure custom roles with the same names in Better Auth and the UI plugin:
+</DocVariant>
+
+<DocVariant name="shadcn">
+The users page can create users. The inspector can update names and roles, set
+passwords, ban or unban users, impersonate users, remove users, and revoke one
+or all sessions. Dangerous actions require confirmation. The UI disables
+self-destructive actions and still relies on the server.
+
+Passwords stay in local form state. The forms clear each password after the
+request or after the user closes the form.
+
+Session IP addresses are hidden by default. Set `showIpAddress: true` only when
+your privacy policy permits this data.
+
+## Custom roles and options
+</DocVariant>
+
+<DocVariant name="zaidan">
+The table searches either `email` or `name` in each request. Passwords stay in
+local form state. The forms clear each password after the request or when the
+user closes the form. Session IP addresses are hidden unless `showIpAddress`
+is `true`.
+</DocVariant>
+
+```ts
+adminPlugin({
+  allowMultipleRoles: false,
+  defaultRole: "member",
+  impersonationRedirectTo: "/",
+  pageSize: 25,
+  roles: ["member", "support", "admin"],
+  showIpAddress: false
+})
+```
+
+<DocVariant name="shadcn">
+Configure the same roles and permissions in Better Auth `admin()` and
+`adminClient()`. The UI list only controls which role choices it shows.
+</DocVariant>
+
+Set `allowMultipleRoles` to `false` to make the create and edit forms accept
+one role. This option does not change `adminRoles`, which controls administrator
+access.
+
+<DocVariant name="heroui zaidan">
+The public Admin client does not provide account disconnection, global
+organization administration, or a Sentinel dashboard. These views are not
+part of this integration.
+</DocVariant>
+
+<DocVariant name="shadcn">
+## Scope
+
+This integration uses the public Better Auth Admin client. It does not add
+account disconnection, organization membership management, global
+organization administration, analytics, or a Sentinel dashboard.
+</DocVariant>
+
+<DocVariant name="heroui shadcn">
+## User button behavior
+
+`adminPlugin()` contributes `<StopImpersonating />` through the
+`userMenuItems` slot. `<UserButton />` places it above sign out.
+</DocVariant>
+
+<DocVariant name="zaidan">
+## User button behavior
+
+The copied `adminPlugin()` contributes `<StopImpersonating />` through the
+`userMenuItems` slot. `<UserButton />` places it above sign out.
+</DocVariant>
+
+The action renders only when `session.session.impersonatedBy` is present.
+Selecting it calls `authClient.admin.stopImpersonating()` and refreshes the
+cached session before the pending state completes.
+
+```tsx doc-variant="heroui"
+import { StopImpersonating } from "@better-auth-ui/heroui/plugins"
+
+<StopImpersonating />
+```
+
+<type-table doc-variant="heroui" path="packages/heroui/src/components/auth/admin/stop-impersonating.tsx" name="StopImpersonatingProps" />
+
+```tsx doc-variant="shadcn zaidan"
+import { StopImpersonating } from "@/components/auth/admin/stop-impersonating"
+
+<StopImpersonating />
+```
+
+<type-table doc-variant="shadcn" path="examples/start-shadcn-example/src/components/auth/admin/stop-impersonating.tsx" name="StopImpersonatingProps" />
+
+<type-table doc-variant="zaidan" path="examples/start-solid-zaidan-example/src/components/auth/admin/stop-impersonating.tsx" name="StopImpersonatingProps" />
+
+## Options
+
+```ts
+adminPlugin({
+  localization: {
+    stopImpersonating: "Return to admin"
+  }
+})
+```
+
+<type-table path="packages/core/src/plugins/admin/admin-plugin.ts" name="AdminPluginOptions" />
+
+## Localization
+
+<type-table path="packages/core/src/plugins/admin/admin-localization.ts" name="AdminLocalization" />
+
+<DocVariant name="heroui shadcn">
+## Mutation API
+
+```tsx
+import { useStopImpersonating } from "@better-auth-ui/react/plugins/admin"
+
+const stopImpersonating = useStopImpersonating(authClient)
+```
+
+Use the hook when you need the same behavior outside the user button. It
+restores the admin session and awaits invalidation of the shared session query.
+</DocVariant>
+
+<DocVariant name="zaidan">
+## Mutation API
+</DocVariant>
+
+```tsx doc-variant="zaidan"
+import { useStopImpersonating } from "@better-auth-ui/solid/plugins/admin"
+
+const stopImpersonating = useStopImpersonating(authClient)
+```
+
+<DocVariant name="zaidan">
+Use the hook when you need the same behavior outside the copied user button.
+It restores the admin session and awaits invalidation of the shared session
+query.
+
+See the [Solid package reference](/docs/solid) for the shared query and
+mutation APIs.
+</DocVariant>

@@ -1,43 +1,7 @@
 ---
 title: useListPasskeys
 description: Retrieve the passkeys registered for the current user.
+variant: react
 ---
 
-<include>../../../shared/queries/user-scoped.mdx#shared-session</include>
-
-<Callout type="info">
-  The Better Auth client method is `authClient.passkey.listUserPasskeys`, while the corresponding server endpoint is `auth.api.listPasskeys`. The names diverge in Better Auth itself: this is not a typo. We expose a single unified `listPasskeys` API on top (hooks, options, helpers all drop the redundant `User` infix).
-</Callout>
-
-## Usage
-
-```tsx
-import { authClient } from "@/lib/auth-client"
-import { useListPasskeys } from "@better-auth-ui/react/plugins/passkey"
-
-const { data: passkeys } = useListPasskeys(authClient)
-
-// With React Query options
-const { data: passkeys } = useListPasskeys(authClient, {
-  refetchOnMount: false
-})
-```
-
-`useListPasskeys` requires the Better Auth `passkey` plugin. Import your configured `authClient`. It already carries the plugin methods from `createAuthClient`.
-
-## Options factory
-
-```tsx
-import { listPasskeysOptions } from "@better-auth-ui/core/plugins/passkey"
-import { useQuery } from "@tanstack/react-query"
-
-const { data: passkeys } = useQuery(
-  listPasskeysOptions(authClient, userId)
-)
-```
-
-<include>../../../shared/queries/list-passkeys.mdx#shared-invalidation</include>
-
-## Params
-
-<type-table path="../../../../../../packages/core/src/plugins/passkey/list-passkeys-query.ts" name="ListPasskeysParams" />
+<include>../../../topics/queries/list-passkeys.mdx</include>

@@ -1,32 +1,7 @@
 ---
 title: useAddPasskey
 description: Register a new passkey for the current user.
+variant: react
 ---
 
-Prompts the WebAuthn ceremony then refetches the passkey list on success.
-
-## Usage
-
-```tsx
-import { authClient } from "@/lib/auth-client"
-import { useAddPasskey } from "@better-auth-ui/react/plugins/passkey"
-
-const { mutate: addPasskey, isPending } = useAddPasskey(authClient)
-
-addPasskey({ name: "MacBook Pro" })
-```
-
-`useAddPasskey` requires the Better Auth `passkey` plugin. Import your configured `authClient`. It already carries the plugin methods from `createAuthClient`.
-
-## Options factory
-
-```tsx
-import { addPasskeyOptions } from "@better-auth-ui/core/plugins/passkey"
-import { useMutation } from "@tanstack/react-query"
-
-const { mutate } = useMutation(addPasskeyOptions(authClient))
-```
-
-## Params
-
-<type-table path="../../../../../../packages/core/src/plugins/passkey/add-passkey-mutation.ts" name="AddPasskeyParams" />
+<include>../../../topics/mutations/add-passkey.mdx</include>

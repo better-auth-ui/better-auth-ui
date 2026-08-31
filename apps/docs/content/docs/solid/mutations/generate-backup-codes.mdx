@@ -1,23 +1,7 @@
 ---
 title: generateBackupCodesOptions
 description: Replace the existing backup codes.
+variant: solid
 ---
 
-<include>../../../shared/mutations/plugin-requirements.mdx#shared-two-factor</include>
-
-<include>../../../shared/mutations/generate-backup-codes.mdx#shared-overview</include>
-
-## Options factory
-
-```tsx
-import { generateBackupCodesOptions } from "@better-auth-ui/core/plugins/two-factor"
-import { createMutation } from "@tanstack/solid-query"
-
-const generateCodes = createMutation(() => generateBackupCodesOptions(authClient))
-
-generateCodes.mutate({ password: "current-password" })
-```
-
-## Params
-
-<type-table path="../../../../../../packages/core/src/plugins/two-factor/generate-backup-codes-mutation.ts" name="GenerateBackupCodesParams" />
+<include>../../../topics/mutations/generate-backup-codes.mdx</include>

@@ -1,0 +1,17 @@
+<DocVariant name="react">
+Prompts the WebAuthn ceremony then refetches the passkey list on success.
+</DocVariant>
+
+<DocVariant name="solid">
+<include>../../shared/mutations/plugin-requirements.mdx#shared-passkey</include>
+</DocVariant>
+
+<MutationPage id="add-passkey">
+
+<PageSlot name="usage" doc-variant="react">
+
+`useAddPasskey` requires the Better Auth `passkey` plugin. Import your configured `authClient`. It already carries the plugin methods from `createAuthClient`.
+
+</PageSlot>
+
+</MutationPage>

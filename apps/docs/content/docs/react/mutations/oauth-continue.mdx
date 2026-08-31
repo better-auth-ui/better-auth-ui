@@ -1,37 +1,7 @@
 ---
 title: useOAuthContinue
 description: Resume a signed OAuth authorization request after a redirect screen.
+variant: react
 ---
 
-<include>../../../shared/mutations/oauth-continue.mdx#shared-overview</include>
-
-## Usage
-
-```tsx
-import { useOAuthContinue } from "@better-auth-ui/react/plugins/oauth-provider"
-
-const oauthContinue = useOAuthContinue(authClient)
-
-// After the account was created during this flow (`prompt=create`)
-oauthContinue.mutate({ created: true })
-
-// After the user picked an account (`prompt=select_account`)
-oauthContinue.mutate({ selected: true })
-
-// After your own post-login selection screen
-await oauthContinue.mutateAsync({ postLogin: true })
-```
-
-<include>../../../shared/mutations/oauth-continue.mdx#shared-usage</include>
-
-## Options factory
-
-```ts
-import { oauthContinueOptions } from "@better-auth-ui/core/plugins/oauth-provider"
-
-const options = oauthContinueOptions(authClient)
-```
-
-## Params
-
-<type-table path="../../../../../../packages/core/src/plugins/oauth-provider/oauth-continue-mutation.ts" name="OAuthContinueParams" />
+<include>../../../topics/mutations/oauth-continue.mdx</include>

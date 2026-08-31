@@ -1,36 +1,7 @@
 ---
 title: useVerifyTwoFactorOtp
 description: Verify the emailed second-factor code.
+variant: react
 ---
 
-Send the code with `useSendTwoFactorOtp` first. Refetches the session on success.
-
-## Usage
-
-```tsx
-import type { TwoFactorAuthClient } from "@better-auth-ui/core/plugins/two-factor"
-import { useAuth } from "@better-auth-ui/react"
-import { useVerifyTwoFactorOtp } from "@better-auth-ui/react/plugins/two-factor"
-
-const { authClient } = useAuth()
-const { mutate: verifyTwoFactorOtp } = useVerifyTwoFactorOtp(
-  authClient as TwoFactorAuthClient
-)
-
-verifyTwoFactorOtp({ code: "123456", trustDevice: true })
-```
-
-`useVerifyTwoFactorOtp` requires the Better Auth `twoFactor` plugin. Cast `authClient` to `TwoFactorAuthClient` so TypeScript picks up the plugin-extended method signature.
-
-## Options factory
-
-```tsx
-import { verifyTwoFactorOtpOptions } from "@better-auth-ui/core/plugins/two-factor"
-import { useMutation } from "@tanstack/react-query"
-
-const { mutate } = useMutation(verifyTwoFactorOtpOptions(authClient))
-```
-
-## Params
-
-<type-table path="../../../../../../packages/core/src/plugins/two-factor/verify-two-factor-otp-mutation.ts" name="VerifyTwoFactorOtpParams" />
+<include>../../../topics/mutations/verify-two-factor-otp.mdx</include>

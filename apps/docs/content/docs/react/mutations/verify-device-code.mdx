@@ -1,34 +1,7 @@
 ---
 title: useVerifyDeviceCode
 description: Verify and claim a device user code for the current session.
+variant: react
 ---
 
-<include>../../../shared/mutations/verify-device-code.mdx#shared-overview</include>
-
-## Usage
-
-```tsx
-import { useVerifyDeviceCode } from "@better-auth-ui/react/plugins/device-authorization"
-
-const verifyDeviceCode = useVerifyDeviceCode(authClient)
-
-verifyDeviceCode.mutate({
-  query: {
-    user_code: "ABCD1234"
-  }
-})
-```
-
-<include>../../../shared/mutations/verify-device-code.mdx#shared-usage</include>
-
-## Options factory
-
-```ts
-import { verifyDeviceCodeOptions } from "@better-auth-ui/core/plugins/device-authorization"
-
-const options = verifyDeviceCodeOptions(authClient)
-```
-
-## Params
-
-<type-table path="../../../../../../packages/core/src/plugins/device-authorization/verify-device-code-mutation.ts" name="VerifyDeviceCodeParams" />
+<include>../../../topics/mutations/verify-device-code.mdx</include>

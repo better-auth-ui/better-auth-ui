@@ -1,0 +1,58 @@
+<ComponentPage id="email/delete-account-verification-email">
+
+<PageSlot name="props">
+
+## Features
+
+* Clearly states that account deletion is permanent
+* Includes a verification button and fallback URL
+* Explains that ignoring the message keeps the account active
+* Supports expiration details, theming, branding, and localization
+
+</PageSlot>
+
+<PageSlot name="usage">
+
+## Better Auth setup
+
+Render this template from `user.deleteUser.sendDeleteAccountVerification`. Better Auth supplies the verification URL and user whose account is being deleted.
+
+```tsx doc-variant="heroui shadcn"
+sendDeleteAccountVerification: async ({ user, url }) => {
+  const html = await render(
+    <DeleteAccountVerificationEmail
+      url={url}
+      email={user.email}
+      appName="My App"
+    />
+  )
+
+  await sendEmail({
+    to: user.email,
+    subject: "Confirm account deletion",
+    html
+  })
+}
+```
+
+```tsx doc-variant="zaidan"
+sendDeleteAccountVerification: async ({ user, url }) => {
+  const html = await render(() =>
+    DeleteAccountVerificationEmail({
+      url,
+      email: user.email,
+      appName: "My App"
+    })
+  )
+
+  await sendEmail({
+    to: user.email,
+    subject: "Confirm account deletion",
+    html
+  })
+}
+```
+
+</PageSlot>
+
+</ComponentPage>

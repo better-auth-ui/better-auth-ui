@@ -1,23 +1,7 @@
 ---
 title: verifyBackupCodeOptions
 description: Recover with a backup code.
+variant: solid
 ---
 
-<include>../../../shared/mutations/plugin-requirements.mdx#shared-two-factor</include>
-
-<include>../../../shared/mutations/verify-backup-code.mdx#shared-overview</include>
-
-## Options factory
-
-```tsx
-import { verifyBackupCodeOptions } from "@better-auth-ui/core/plugins/two-factor"
-import { createMutation } from "@tanstack/solid-query"
-
-const verifyBackupCode = createMutation(() => verifyBackupCodeOptions(authClient))
-
-verifyBackupCode.mutate({ code: "a1b2-c3d4" })
-```
-
-## Params
-
-<type-table path="../../../../../../packages/core/src/plugins/two-factor/verify-backup-code-mutation.ts" name="VerifyBackupCodeParams" />
+<include>../../../topics/mutations/verify-backup-code.mdx</include>

@@ -1,21 +1,7 @@
 ---
 title: useDeletePasskey
 description: Delete a passkey from the current user's account.
+variant: solid
 ---
 
-<include>../../../shared/mutations/plugin-requirements.mdx#shared-passkey</include>
-
-## Usage
-
-```tsx
-import { deletePasskeyOptions } from "@better-auth-ui/core/plugins/passkey"
-import { useMutation } from "@tanstack/solid-query"
-
-const deletePasskey = useMutation(() => deletePasskeyOptions(authClient))
-
-deletePasskey.mutate({ id: "passkey-id" })
-```
-
-## Params
-
-<type-table path="../../../../../../packages/core/src/plugins/passkey/delete-passkey-mutation.ts" name="DeletePasskeyParams" />
+<include>../../../topics/mutations/delete-passkey.mdx</include>
