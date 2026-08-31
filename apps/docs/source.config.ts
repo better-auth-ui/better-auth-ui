@@ -6,8 +6,8 @@ import { defineConfig, defineDocs } from "fumadocs-mdx/config"
 import lastModified from "fumadocs-mdx/plugins/last-modified"
 import remarkCodeImport from "remark-code-import"
 
-import { remarkStaticTypeTable } from "./src/lib/remark-static-type-table"
-import type { TypeTableSnapshot } from "./src/lib/type-table-data"
+import { remarkStaticTypeTable } from "./src/lib/remark-static-type-table.ts"
+import type { TypeTableSnapshot } from "./src/lib/type-table-data.ts"
 
 const workspaceRoot = resolve(import.meta.dirname, "../..")
 function readTypeTableSnapshot(): TypeTableSnapshot {

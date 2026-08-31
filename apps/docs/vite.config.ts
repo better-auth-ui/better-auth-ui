@@ -61,7 +61,7 @@ export default defineConfig(async ({ command }) => ({
     noExternal: [...ServerBundledDeps]
   },
   plugins: [
-    mdx(await import("./source.config")),
+    mdx(await import("./source.config.ts")),
     tailwindcss(),
     tanstackStart({
       // Docs is a fully prerendered static site hosted on Cloudflare Pages —

@@ -14,8 +14,8 @@ function copyStyles(): Plugin {
     apply: "build",
     closeBundle() {
       copyFileSync(
-        resolve(__dirname, "src/styles.css"),
-        resolve(__dirname, "dist/styles.css")
+        resolve(import.meta.dirname, "src/styles.css"),
+        resolve(import.meta.dirname, "dist/styles.css")
       )
     }
   }

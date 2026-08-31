@@ -16,7 +16,7 @@ import type {
   TypeTableEntry,
   TypeTableSnapshot,
   TypeTableTag
-} from "./type-table-data"
+} from "./type-table-data.ts"
 
 type EstreeNode = {
   type: string

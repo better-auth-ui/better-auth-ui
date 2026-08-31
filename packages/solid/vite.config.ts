@@ -16,7 +16,10 @@ function cleanOutDir(): Plugin {
     name: "better-auth-ui-solid:clean-out-dir",
     apply: "build",
     buildStart() {
-      rmSync(resolve(__dirname, "dist"), { recursive: true, force: true })
+      rmSync(resolve(import.meta.dirname, "dist"), {
+        recursive: true,
+        force: true
+      })
     }
   }
 }
