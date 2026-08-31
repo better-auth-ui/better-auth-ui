@@ -4,8 +4,8 @@ import {
   parseAdditionalFieldValues
 } from "@better-auth-ui/core"
 import type {
-  OrganizationAuthClient,
-  OrganizationPermissionRegistry
+  OrganizationPermissionRegistry,
+  OrganizationRolesAuthClient
 } from "@better-auth-ui/core/plugins/organization"
 import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
 import {
@@ -47,7 +47,7 @@ export function OrganizationRoles({
   organizationId: string
 }) {
   const { authClient } = useAuth()
-  const client = authClient as OrganizationAuthClient
+  const client = authClient as OrganizationRolesAuthClient
   const { dynamicAccessControl, localization, modelFields } =
     useAuthPlugin(organizationPlugin)
   const canRead = useHasPermission(client, {
@@ -169,7 +169,7 @@ function OrganizationRoleRow({
   organizationId,
   role
 }: {
-  authClient: OrganizationAuthClient
+  authClient: OrganizationRolesAuthClient
   canDelete: boolean
   canDeletePending: boolean
   canUpdate: boolean
@@ -280,7 +280,7 @@ function RoleDialog({
   roleFields: AdditionalFields
 }) {
   const { authClient, localization: authLocalization } = useAuth()
-  const client = authClient as OrganizationAuthClient
+  const client = authClient as OrganizationRolesAuthClient
   const { localization } = useAuthPlugin(organizationPlugin)
   const [name, setName] = useState("")
   const [permission, setPermission] = useState<Record<string, string[]>>({})
@@ -315,7 +315,7 @@ function RoleDialog({
         const access = await client.organization.hasPermission({
           organizationId,
           permissions: permission as Parameters<
-            OrganizationAuthClient["organization"]["hasPermission"]
+            OrganizationRolesAuthClient["organization"]["hasPermission"]
           >[0]["permissions"]
         })
 
@@ -469,11 +469,11 @@ function RolePermissionCheckbox({
   resource: string
 }) {
   const { authClient } = useAuth()
-  const client = authClient as OrganizationAuthClient
+  const client = authClient as OrganizationRolesAuthClient
   const canAssign = useHasPermission(client, {
     organizationId,
     permissions: { [resource]: [action] } as Parameters<
-      OrganizationAuthClient["organization"]["hasPermission"]
+      OrganizationRolesAuthClient["organization"]["hasPermission"]
     >[0]["permissions"]
   })
 

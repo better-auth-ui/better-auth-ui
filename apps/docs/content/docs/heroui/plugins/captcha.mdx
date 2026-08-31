@@ -16,6 +16,12 @@ It contributes:
 - Automatic header management. The plugin clears the token after an error or expiration, or when the component unmounts.
 - Automatic widget refresh after an unsuccessful submission. Captcha tokens are single-use, so each retry requires a new token.
 
+## Social sign-in
+
+Provider buttons forward the current CAPTCHA token to `/sign-in/social`. Add this endpoint to the server CAPTCHA configuration to protect social sign-in. Failed requests clear the token and reset the widget before another attempt.
+
+Use `socialSignInMode="redirect"` for CAPTCHA-protected social sign-in. Better Auth 1.7's experimental popup API does not accept `fetchOptions` or forward CAPTCHA headers. Popup failures reset the widget, but the popup flow cannot send the token.
+
 ## Setup
 
 <Steps>
@@ -43,7 +49,7 @@ By default, the Better Auth captcha plugin protects `/sign-up/email`, `/sign-in/
 
 Better Auth 1.7 and later matches complete authentication paths. Use an exact endpoint or an explicit wildcard such as `/sign-in/*`.
 
-Do not use a partial prefix such as `/sign-in`. To protect `/sign-in/username`, add that endpoint explicitly:
+Do not use a partial prefix such as `/sign-in`. To protect username and social sign-in, add their endpoints explicitly:
 
 ```ts
 captcha({
@@ -53,6 +59,7 @@ captcha({
     "/sign-up/email", // [!code highlight]
     "/sign-in/email", // [!code highlight]
     "/sign-in/username", // [!code highlight]
+    "/sign-in/social", // [!code highlight]
     "/request-password-reset" // [!code highlight]
   ] // [!code highlight]
 })

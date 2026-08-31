@@ -25,15 +25,23 @@ import { SlugField } from "./slug-field"
 
 export type OrganizationProfileProps = {
   className?: string
+  hideSlug?: boolean
 }
 
 /**
  * Profile card for the active organization: logo (when enabled), display name, and slug.
  */
-export function OrganizationProfile({ className }: OrganizationProfileProps) {
+export function OrganizationProfile({
+  className,
+  hideSlug: hideSlugProp
+}: OrganizationProfileProps) {
   const { authClient, localization } = useAuth<OrganizationAuthClient>()
-  const { additionalFields, localization: organizationLocalization } =
-    useAuthPlugin(organizationPlugin)
+  const {
+    additionalFields,
+    localization: organizationLocalization,
+    hideSlug: pluginHideSlug
+  } = useAuthPlugin(organizationPlugin)
+  const hideSlug = hideSlugProp ?? pluginHideSlug ?? false
 
   const { data: activeOrganization } = useActiveOrganization(authClient)
   const canUpdate = useHasPermission(authClient, {
@@ -75,7 +83,7 @@ export function OrganizationProfile({ className }: OrganizationProfileProps) {
     }
 
     commitOrganizationUpdate({
-      data: { name, slug, ...additionalValues }
+      data: { ...additionalValues, name, ...(!hideSlug && { slug }) }
     })
   }
 
@@ -117,20 +125,21 @@ export function OrganizationProfile({ className }: OrganizationProfileProps) {
               <FieldError />
             </Field>
 
-            {activeOrganization ? (
-              <SlugField
-                id={slugInputId}
-                value={slug}
-                onChange={setSlug}
-                currentSlug={activeOrganization.slug}
-                disabled={formDisabled}
-              />
-            ) : (
-              <Field>
-                <FieldLabel>{organizationLocalization.slug}</FieldLabel>
-                <Skeleton className="h-8 w-full rounded-md" />
-              </Field>
-            )}
+            {!hideSlug &&
+              (activeOrganization ? (
+                <SlugField
+                  id={slugInputId}
+                  value={slug}
+                  onChange={setSlug}
+                  currentSlug={activeOrganization.slug}
+                  disabled={formDisabled}
+                />
+              ) : (
+                <Field>
+                  <FieldLabel>{organizationLocalization.slug}</FieldLabel>
+                  <Skeleton className="h-8 w-full rounded-md" />
+                </Field>
+              ))}
 
             {activeOrganization &&
               additionalFields.map((field) => (

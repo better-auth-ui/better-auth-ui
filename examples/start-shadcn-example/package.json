@@ -30,7 +30,11 @@
       },
       "registry:test": {
         "cache": true,
+        "dependsOn": [
+          "^build"
+        ],
         "inputs": [
+          "^production",
           "{projectRoot}/registry.metadata.json",
           "{projectRoot}/scripts/registry-graph.ts",
           "{projectRoot}/tests/registry-graph.test.ts",

@@ -2,7 +2,7 @@ import {
   type ListRolesData,
   type ListRolesParams,
   listRolesOptions,
-  type OrganizationAuthClient
+  type OrganizationRolesAuthClient
 } from "@better-auth-ui/core/plugins/organization"
 import {
   type QueryClient,
@@ -12,11 +12,12 @@ import {
 import type { Accessor } from "solid-js"
 import { useSession } from "../../../../hooks/queries/use-session"
 
-export type UseListRolesOptions<T extends OrganizationAuthClient> = Accessor<
-  Omit<QueryOptions<ListRolesData<T>>, "queryKey"> & ListRolesParams<T>
->
+export type UseListRolesOptions<T extends OrganizationRolesAuthClient> =
+  Accessor<
+    Omit<QueryOptions<ListRolesData<T>>, "queryKey"> & ListRolesParams<T>
+  >
 
-export function useListRoles<T extends OrganizationAuthClient>(
+export function useListRoles<T extends OrganizationRolesAuthClient>(
   authClient: T,
   options: UseListRolesOptions<T>,
   queryClient?: Accessor<QueryClient>

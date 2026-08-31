@@ -1,26 +1,27 @@
 import type { MutationOptions } from "@tanstack/query-core"
 import type { BetterFetchError } from "better-auth/client"
 import { authQueryKeys } from "../../lib/auth-query-keys"
-import type { OrganizationAuthClient } from "./organization-auth-client"
+import type { OrganizationTeamsAuthClient } from "./organization-auth-client"
 import { organizationMutationKeys } from "./organization-mutation-keys"
 import { organizationQueryKeys } from "./organization-query-keys"
 
-type BetterAuthSetActiveTeamParams<TAuthClient extends OrganizationAuthClient> =
-  Parameters<TAuthClient["organization"]["setActiveTeam"]>[0]
+type BetterAuthSetActiveTeamParams<
+  TAuthClient extends OrganizationTeamsAuthClient
+> = Parameters<TAuthClient["organization"]["setActiveTeam"]>[0]
 
 export type SetActiveTeamParams<
-  TAuthClient extends OrganizationAuthClient = OrganizationAuthClient
+  TAuthClient extends OrganizationTeamsAuthClient = OrganizationTeamsAuthClient
 > = BetterAuthSetActiveTeamParams<TAuthClient> & { organizationId: string }
 
 export type SetActiveTeamOptions<
-  TAuthClient extends OrganizationAuthClient = OrganizationAuthClient
+  TAuthClient extends OrganizationTeamsAuthClient = OrganizationTeamsAuthClient
 > = Omit<
   ReturnType<typeof setActiveTeamOptions<TAuthClient>>,
   "mutationKey" | "mutationFn" | "meta"
 >
 
 export function setActiveTeamOptions<
-  TAuthClient extends OrganizationAuthClient
+  TAuthClient extends OrganizationTeamsAuthClient
 >(authClient: TAuthClient, userId?: string) {
   const mutationFn = (params: SetActiveTeamParams<TAuthClient>) => {
     const { organizationId: _organizationId, ...betterAuthParams } = params

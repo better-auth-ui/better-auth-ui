@@ -1,5 +1,5 @@
 import {
-  type OrganizationAuthClient,
+  type OrganizationTeamsAuthClient,
   type SetActiveTeamOptions,
   setActiveTeamOptions
 } from "@better-auth-ui/core/plugins/organization"
@@ -7,7 +7,7 @@ import { type QueryClient, useMutation } from "@tanstack/react-query"
 import { useSession } from "../../../../hooks/queries/use-session"
 
 export function useSetActiveTeam<
-  TAuthClient extends OrganizationAuthClient = OrganizationAuthClient
+  TAuthClient extends OrganizationTeamsAuthClient = OrganizationTeamsAuthClient
 >(
   authClient: TAuthClient,
   options?: SetActiveTeamOptions<TAuthClient>,

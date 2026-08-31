@@ -3,7 +3,7 @@ import {
   fieldsWithModelValues,
   parseAdditionalFieldValues
 } from "@better-auth-ui/core"
-import type { OrganizationAuthClient } from "@better-auth-ui/core/plugins/organization"
+import type { OrganizationTeamsAuthClient } from "@better-auth-ui/core/plugins/organization"
 import { useAuth, useAuthPlugin, useSession } from "@better-auth-ui/react"
 import {
   useActiveOrganization,
@@ -40,7 +40,7 @@ type Team = { id: string; name: string; [key: string]: unknown }
 
 export function OrganizationTeams() {
   const { authClient } = useAuth()
-  const client = authClient as OrganizationAuthClient
+  const client = authClient as OrganizationTeamsAuthClient
   const { data: activeOrganization } = useActiveOrganization(client)
   const { data: session } = useSession(client)
   const {
@@ -176,7 +176,7 @@ function TeamDialog({
   teamLimitReached: boolean
 }) {
   const { authClient, localization } = useAuth()
-  const client = authClient as OrganizationAuthClient
+  const client = authClient as OrganizationTeamsAuthClient
   const { localization: labels } = useAuthPlugin(organizationPlugin)
   const teamMembers = useListTeamMembers(client, {
     query: { teamId: team?.id ?? "" },

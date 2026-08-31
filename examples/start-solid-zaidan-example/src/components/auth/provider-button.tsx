@@ -5,7 +5,12 @@ import {
   isCustomSocialProvider,
   type OAuthPopupAuthClient
 } from "@better-auth-ui/core"
-import { useAuth, useSignInOAuthPopup } from "@better-auth-ui/solid"
+import {
+  useAuth,
+  useFetchOptions,
+  useSignInOAuthPopup,
+  useSignInSocial
+} from "@better-auth-ui/solid"
 import type { ComponentProps } from "solid-js"
 import { createSignal, Show } from "solid-js"
 import { Dynamic } from "solid-js/web"
@@ -80,6 +85,8 @@ export function ProviderIcon(props: { provider: AuthSocialProvider }) {
 
 export function ProviderButton(props: ProviderButtonProps) {
   const auth = useAuth()
+  const { fetchOptions, resetFetchOptions } = useFetchOptions()
+  const socialMutation = useSignInSocial(auth.authClient)
   const [isPending, setIsPending] = createSignal(false)
   const display = () => props.display ?? "full"
   const providerId = () => getProviderId(props.provider)
@@ -111,11 +118,13 @@ export function ProviderButton(props: ProviderButtonProps) {
         })
         auth.navigate({ to: auth.redirectTo })
       } else {
-        await auth.authClient.signIn.social(
-          params as Parameters<typeof auth.authClient.signIn.social>[0]
-        )
+        await socialMutation.mutateAsync({
+          ...(params as Parameters<typeof auth.authClient.signIn.social>[0]),
+          fetchOptions: fetchOptions()
+        })
       }
     } catch {
+      resetFetchOptions()
       // Mutation errors are reported by the shared auth error handler.
     } finally {
       setIsPending(false)

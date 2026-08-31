@@ -702,6 +702,18 @@ export function Header() {
 
 Without slug-based routing, the default behavior is `authClient.organization.setActive`. Pass `setActive` to intercept the selection and apply custom behavior.
 
+## Hide organization slugs
+
+Set `hideSlug: true` to hide slugs in creation dialogs, profile forms, organization views, and switchers:
+
+```ts
+organizationPlugin({ hideSlug: true })
+```
+
+Creation still generates a slug from the organization name. Names without Latin letters or digits use a generated identifier instead. The server still validates the slug and its availability. Profile edits preserve the existing slug.
+
+Each component's `hideSlug` prop overrides the plugin configuration. Without either option, forms and organization views show slugs, while switchers hide them.
+
 ## Options
 
 ```ts

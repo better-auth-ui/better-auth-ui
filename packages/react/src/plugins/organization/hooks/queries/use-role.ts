@@ -1,7 +1,7 @@
 import {
-  type OrganizationAuthClient,
   type OrganizationRoleData,
   type OrganizationRoleParams,
+  type OrganizationRolesAuthClient,
   roleOptions
 } from "@better-auth-ui/core/plugins/organization"
 import {
@@ -11,13 +11,13 @@ import {
 } from "@tanstack/react-query"
 import { useSession } from "../../../../hooks/queries/use-session"
 
-export type UseRoleOptions<T extends OrganizationAuthClient> = Omit<
+export type UseRoleOptions<T extends OrganizationRolesAuthClient> = Omit<
   UseQueryOptions<OrganizationRoleData<T>>,
   "queryKey"
 > &
   OrganizationRoleParams<T>
 
-export function useRole<T extends OrganizationAuthClient>(
+export function useRole<T extends OrganizationRolesAuthClient>(
   authClient: T,
   options: UseRoleOptions<T>,
   queryClient?: QueryClient

@@ -1,5 +1,5 @@
 import {
-  type OrganizationAuthClient,
+  type OrganizationTeamsAuthClient,
   type SetActiveTeamOptions,
   setActiveTeamOptions
 } from "@better-auth-ui/core/plugins/organization"
@@ -7,11 +7,11 @@ import { type QueryClient, useMutation } from "@tanstack/solid-query"
 import type { Accessor } from "solid-js"
 import { useSession } from "../../../../hooks/queries/use-session"
 
-export type UseSetActiveTeamOptions<T extends OrganizationAuthClient> =
+export type UseSetActiveTeamOptions<T extends OrganizationTeamsAuthClient> =
   Accessor<SetActiveTeamOptions<T>>
 
 export function useSetActiveTeam<
-  TAuthClient extends OrganizationAuthClient = OrganizationAuthClient
+  TAuthClient extends OrganizationTeamsAuthClient = OrganizationTeamsAuthClient
 >(
   authClient: TAuthClient,
   options?: UseSetActiveTeamOptions<TAuthClient>,

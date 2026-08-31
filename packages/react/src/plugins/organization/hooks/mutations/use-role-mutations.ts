@@ -3,14 +3,14 @@ import {
   createRoleOptions,
   type DeleteRoleOptions,
   deleteRoleOptions,
-  type OrganizationAuthClient,
+  type OrganizationRolesAuthClient,
   type UpdateRoleOptions,
   updateRoleOptions
 } from "@better-auth-ui/core/plugins/organization"
 import { type QueryClient, useMutation } from "@tanstack/react-query"
 import { useSession } from "../../../../hooks/queries/use-session"
 
-export function useCreateRole<T extends OrganizationAuthClient>(
+export function useCreateRole<T extends OrganizationRolesAuthClient>(
   authClient: T,
   organizationId: string | undefined,
   options?: CreateRoleOptions<T>,
@@ -26,7 +26,7 @@ export function useCreateRole<T extends OrganizationAuthClient>(
   )
 }
 
-export function useUpdateRole<T extends OrganizationAuthClient>(
+export function useUpdateRole<T extends OrganizationRolesAuthClient>(
   authClient: T,
   organizationId: string | undefined,
   options?: UpdateRoleOptions<T>,
@@ -42,7 +42,7 @@ export function useUpdateRole<T extends OrganizationAuthClient>(
   )
 }
 
-export function useDeleteRole<T extends OrganizationAuthClient>(
+export function useDeleteRole<T extends OrganizationRolesAuthClient>(
   authClient: T,
   organizationId: string | undefined,
   options?: DeleteRoleOptions<T>,

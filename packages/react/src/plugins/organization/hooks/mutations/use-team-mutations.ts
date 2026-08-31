@@ -3,7 +3,7 @@ import {
   addTeamMemberOptions,
   type CreateTeamOptions,
   createTeamOptions,
-  type OrganizationAuthClient,
+  type OrganizationTeamsAuthClient,
   type RemoveTeamMemberOptions,
   type RemoveTeamOptions,
   removeTeamMemberOptions,
@@ -14,7 +14,7 @@ import {
 import { type QueryClient, useMutation } from "@tanstack/react-query"
 import { useSession } from "../../../../hooks/queries/use-session"
 
-export function useCreateTeam<T extends OrganizationAuthClient>(
+export function useCreateTeam<T extends OrganizationTeamsAuthClient>(
   authClient: T,
   options?: CreateTeamOptions<T>,
   queryClient?: QueryClient
@@ -25,7 +25,7 @@ export function useCreateTeam<T extends OrganizationAuthClient>(
     queryClient
   )
 }
-export function useUpdateTeam<T extends OrganizationAuthClient>(
+export function useUpdateTeam<T extends OrganizationTeamsAuthClient>(
   authClient: T,
   options?: UpdateTeamOptions<T>,
   queryClient?: QueryClient
@@ -36,7 +36,7 @@ export function useUpdateTeam<T extends OrganizationAuthClient>(
     queryClient
   )
 }
-export function useRemoveTeam<T extends OrganizationAuthClient>(
+export function useRemoveTeam<T extends OrganizationTeamsAuthClient>(
   authClient: T,
   options?: RemoveTeamOptions<T>,
   queryClient?: QueryClient
@@ -47,7 +47,7 @@ export function useRemoveTeam<T extends OrganizationAuthClient>(
     queryClient
   )
 }
-export function useAddTeamMember<T extends OrganizationAuthClient>(
+export function useAddTeamMember<T extends OrganizationTeamsAuthClient>(
   authClient: T,
   options?: AddTeamMemberOptions<T>,
   queryClient?: QueryClient
@@ -58,7 +58,7 @@ export function useAddTeamMember<T extends OrganizationAuthClient>(
     queryClient
   )
 }
-export function useRemoveTeamMember<T extends OrganizationAuthClient>(
+export function useRemoveTeamMember<T extends OrganizationTeamsAuthClient>(
   authClient: T,
   options?: RemoveTeamMemberOptions<T>,
   queryClient?: QueryClient

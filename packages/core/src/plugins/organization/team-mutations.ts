@@ -1,6 +1,6 @@
 import type { MutationOptions } from "@tanstack/query-core"
 import type { BetterFetchError } from "better-auth/client"
-import type { OrganizationAuthClient } from "./organization-auth-client"
+import type { OrganizationTeamsAuthClient } from "./organization-auth-client"
 import { organizationMutationKeys } from "./organization-mutation-keys"
 import { organizationQueryKeys } from "./organization-query-keys"
 
@@ -11,12 +11,12 @@ type TeamMethod =
   | "addTeamMember"
   | "removeTeamMember"
 type TeamParams<
-  T extends OrganizationAuthClient,
+  T extends OrganizationTeamsAuthClient,
   K extends TeamMethod
 > = Parameters<T["organization"][K]>[0]
 
 function teamMutationOptions<
-  T extends OrganizationAuthClient,
+  T extends OrganizationTeamsAuthClient,
   K extends TeamMethod
 >(authClient: T, method: K, mutationKey: readonly string[], userId?: string) {
   const mutationFn = (params: TeamParams<T, K>) =>
@@ -36,19 +36,19 @@ function teamMutationOptions<
 }
 
 export type CreateTeamParams<
-  T extends OrganizationAuthClient = OrganizationAuthClient
+  T extends OrganizationTeamsAuthClient = OrganizationTeamsAuthClient
 > = TeamParams<T, "createTeam">
 export type UpdateTeamParams<
-  T extends OrganizationAuthClient = OrganizationAuthClient
+  T extends OrganizationTeamsAuthClient = OrganizationTeamsAuthClient
 > = TeamParams<T, "updateTeam">
 export type RemoveTeamParams<
-  T extends OrganizationAuthClient = OrganizationAuthClient
+  T extends OrganizationTeamsAuthClient = OrganizationTeamsAuthClient
 > = TeamParams<T, "removeTeam">
 export type AddTeamMemberParams<
-  T extends OrganizationAuthClient = OrganizationAuthClient
+  T extends OrganizationTeamsAuthClient = OrganizationTeamsAuthClient
 > = TeamParams<T, "addTeamMember">
 export type RemoveTeamMemberParams<
-  T extends OrganizationAuthClient = OrganizationAuthClient
+  T extends OrganizationTeamsAuthClient = OrganizationTeamsAuthClient
 > = TeamParams<T, "removeTeamMember">
 
 type PublicTeamMutationOptions<T> = Omit<
@@ -56,7 +56,7 @@ type PublicTeamMutationOptions<T> = Omit<
   "mutationKey" | "mutationFn" | "meta"
 >
 
-export const createTeamOptions = <T extends OrganizationAuthClient>(
+export const createTeamOptions = <T extends OrganizationTeamsAuthClient>(
   authClient: T,
   userId?: string
 ) =>
@@ -66,7 +66,7 @@ export const createTeamOptions = <T extends OrganizationAuthClient>(
     organizationMutationKeys.teams.create,
     userId
   )
-export const updateTeamOptions = <T extends OrganizationAuthClient>(
+export const updateTeamOptions = <T extends OrganizationTeamsAuthClient>(
   authClient: T,
   userId?: string
 ) =>
@@ -76,7 +76,7 @@ export const updateTeamOptions = <T extends OrganizationAuthClient>(
     organizationMutationKeys.teams.update,
     userId
   )
-export const removeTeamOptions = <T extends OrganizationAuthClient>(
+export const removeTeamOptions = <T extends OrganizationTeamsAuthClient>(
   authClient: T,
   userId?: string
 ) =>
@@ -86,7 +86,7 @@ export const removeTeamOptions = <T extends OrganizationAuthClient>(
     organizationMutationKeys.teams.remove,
     userId
   )
-export const addTeamMemberOptions = <T extends OrganizationAuthClient>(
+export const addTeamMemberOptions = <T extends OrganizationTeamsAuthClient>(
   authClient: T,
   userId?: string
 ) =>
@@ -96,7 +96,7 @@ export const addTeamMemberOptions = <T extends OrganizationAuthClient>(
     organizationMutationKeys.teams.addMember,
     userId
   )
-export const removeTeamMemberOptions = <T extends OrganizationAuthClient>(
+export const removeTeamMemberOptions = <T extends OrganizationTeamsAuthClient>(
   authClient: T,
   userId?: string
 ) =>
@@ -108,17 +108,17 @@ export const removeTeamMemberOptions = <T extends OrganizationAuthClient>(
   )
 
 export type CreateTeamOptions<
-  T extends OrganizationAuthClient = OrganizationAuthClient
+  T extends OrganizationTeamsAuthClient = OrganizationTeamsAuthClient
 > = PublicTeamMutationOptions<ReturnType<typeof createTeamOptions<T>>>
 export type UpdateTeamOptions<
-  T extends OrganizationAuthClient = OrganizationAuthClient
+  T extends OrganizationTeamsAuthClient = OrganizationTeamsAuthClient
 > = PublicTeamMutationOptions<ReturnType<typeof updateTeamOptions<T>>>
 export type RemoveTeamOptions<
-  T extends OrganizationAuthClient = OrganizationAuthClient
+  T extends OrganizationTeamsAuthClient = OrganizationTeamsAuthClient
 > = PublicTeamMutationOptions<ReturnType<typeof removeTeamOptions<T>>>
 export type AddTeamMemberOptions<
-  T extends OrganizationAuthClient = OrganizationAuthClient
+  T extends OrganizationTeamsAuthClient = OrganizationTeamsAuthClient
 > = PublicTeamMutationOptions<ReturnType<typeof addTeamMemberOptions<T>>>
 export type RemoveTeamMemberOptions<
-  T extends OrganizationAuthClient = OrganizationAuthClient
+  T extends OrganizationTeamsAuthClient = OrganizationTeamsAuthClient
 > = PublicTeamMutationOptions<ReturnType<typeof removeTeamMemberOptions<T>>>

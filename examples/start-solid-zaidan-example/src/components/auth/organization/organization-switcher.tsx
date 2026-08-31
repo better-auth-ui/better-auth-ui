@@ -16,14 +16,7 @@ import {
   Settings as SettingsIcon
 } from "lucide-solid"
 import type { JSX } from "solid-js"
-import {
-  createMemo,
-  createSignal,
-  For,
-  mergeProps,
-  onMount,
-  Show
-} from "solid-js"
+import { createMemo, createSignal, For, onMount, Show } from "solid-js"
 import { UserView } from "@/components/auth/user/user-view"
 import { Button } from "@/components/ui/button"
 import {
@@ -51,6 +44,7 @@ export type OrganizationSwitcherProps = {
 
 type OrganizationPluginConfig = {
   slug?: string | null
+  hideSlug?: boolean
   slugPrefix?: string
   localization?: Pick<
     OrganizationLocalization,
@@ -59,7 +53,16 @@ type OrganizationPluginConfig = {
 }
 
 function OrganizationSwitcherTrigger(rawProps: OrganizationSwitcherProps = {}) {
-  const props = mergeProps({ hideSlug: true }, rawProps)
+  const props = rawProps
+  const auth = useAuth()
+  const hideSlug = () =>
+    props.hideSlug ??
+    (
+      auth.plugins.find((plugin) => plugin.id === organizationPlugin.id) as
+        | OrganizationPluginConfig
+        | undefined
+    )?.hideSlug ??
+    true
 
   return (
     <Show
@@ -70,7 +73,7 @@ function OrganizationSwitcherTrigger(rawProps: OrganizationSwitcherProps = {}) {
           disabled
           variant="ghost"
         >
-          <OrganizationView isPending hideRole hideSlug={props.hideSlug} />
+          <OrganizationView isPending hideRole hideSlug={hideSlug()} />
           <ChevronsUpDown class="size-4 shrink-0 text-muted-foreground" />
         </Button>
       }
@@ -81,7 +84,7 @@ function OrganizationSwitcherTrigger(rawProps: OrganizationSwitcherProps = {}) {
 }
 
 function MountedOrganizationSwitcher(rawProps: OrganizationSwitcherProps = {}) {
-  const props = mergeProps({ hideSlug: true }, rawProps)
+  const props = rawProps
   const auth = useAuth<OrganizationAuthClient>()
   const client = auth.authClient
   const session = useSession(client)
@@ -109,7 +112,9 @@ function MountedOrganizationSwitcher(rawProps: OrganizationSwitcherProps = {}) {
     session.isPending ||
     (!!session.data &&
       (organizations.isPending || activeOrganization.isPending))
-  const shouldShowSlug = () => !props.hideSlug
+  const hideSlug = () =>
+    props.hideSlug ?? organizationPluginConfig()?.hideSlug ?? true
+  const shouldShowSlug = () => !hideSlug()
   const selectableOrganizations = () =>
     ((organizations.data ?? []) as Organization[]).filter(
       (organization) => organization.id !== activeOrganization.data?.id
@@ -202,11 +207,7 @@ function MountedOrganizationSwitcher(rawProps: OrganizationSwitcherProps = {}) {
               <Show
                 when={!isPending()}
                 fallback={
-                  <OrganizationView
-                    isPending
-                    hideRole
-                    hideSlug={props.hideSlug}
-                  />
+                  <OrganizationView isPending hideRole hideSlug={hideSlug()} />
                 }
               >
                 <Show
@@ -219,7 +220,7 @@ function MountedOrganizationSwitcher(rawProps: OrganizationSwitcherProps = {}) {
                       fallback={
                         <OrganizationView
                           hideRole
-                          hideSlug={props.hideSlug}
+                          hideSlug={hideSlug()}
                           organization={{
                             name: localization().organization
                           }}
@@ -227,7 +228,7 @@ function MountedOrganizationSwitcher(rawProps: OrganizationSwitcherProps = {}) {
                       }
                     >
                       {(user) => (
-                        <UserView hideSubtitle={props.hideSlug} user={user()} />
+                        <UserView hideSubtitle={hideSlug()} user={user()} />
                       )}
                     </Show>
                   }
@@ -256,7 +257,7 @@ function MountedOrganizationSwitcher(rawProps: OrganizationSwitcherProps = {}) {
               <div class="flex items-center justify-between gap-4 px-2 py-2">
                 <OrganizationView
                   hideRole
-                  hideSlug={props.hideSlug}
+                  hideSlug={hideSlug()}
                   organization={organization()}
                 />
 
@@ -283,10 +284,7 @@ function MountedOrganizationSwitcher(rawProps: OrganizationSwitcherProps = {}) {
           >
             {(resolvedSession) => (
               <div class="flex items-center justify-between gap-4 px-2 py-2">
-                <UserView
-                  hideSubtitle={props.hideSlug}
-                  user={resolvedSession()}
-                />
+                <UserView hideSubtitle={hideSlug()} user={resolvedSession()} />
 
                 <Show when={!props.hideSettings}>
                   <Button
@@ -306,7 +304,7 @@ function MountedOrganizationSwitcher(rawProps: OrganizationSwitcherProps = {}) {
 
           <Show when={activeOrganization.data && !props.hidePersonal}>
             <DropdownMenuItem onSelect={() => handleSetActive(null)}>
-              <UserView hideSubtitle={props.hideSlug} />
+              <UserView hideSubtitle={hideSlug()} />
             </DropdownMenuItem>
           </Show>
 
@@ -315,7 +313,7 @@ function MountedOrganizationSwitcher(rawProps: OrganizationSwitcherProps = {}) {
               <DropdownMenuItem onSelect={() => handleSetActive(organization)}>
                 <OrganizationView
                   hideRole
-                  hideSlug={props.hideSlug}
+                  hideSlug={hideSlug()}
                   organization={organization}
                 />
               </DropdownMenuItem>
@@ -340,6 +338,7 @@ function MountedOrganizationSwitcher(rawProps: OrganizationSwitcherProps = {}) {
         </DropdownMenuContent>
       </DropdownMenu>
       <CreateOrganizationDialog
+        hideSlug={hideSlug()}
         open={createOpen()}
         onOpenChange={setCreateOpen}
       />

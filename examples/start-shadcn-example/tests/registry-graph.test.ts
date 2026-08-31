@@ -1,5 +1,7 @@
-import { dirname, resolve } from "node:path"
+import { cpSync, mkdirSync, mkdtempSync, rmSync } from "node:fs"
+import { basename, dirname, resolve } from "node:path"
 import { fileURLToPath } from "node:url"
+import ts from "typescript"
 import { describe, expect, it } from "vitest"
 import {
   createReactRegistry,
@@ -40,6 +42,75 @@ const targets = (name: string) =>
   item(radixRegistry, name).files?.map((file) => file.target) ?? []
 
 describe("React registry import graph", () => {
+  it.each([
+    ["radix", radixRegistry, exampleRoot],
+    ["base", baseRegistry, baseExampleRoot]
+  ] as const)(
+    "typechecks a standalone %s auth installation",
+    (_, registry, sourceRoot) => {
+      const installation = mkdtempSync(resolve(sourceRoot, ".auth-install-"))
+      try {
+        const roots = new Set<string>()
+        const visited = new Set<string>()
+        const install = (name: string) => {
+          if (visited.has(name)) return
+          visited.add(name)
+          const entry = item(registry, name)
+          for (const file of entry.files ?? []) {
+            if (!file.target) throw new Error(`Missing target for ${file.path}`)
+            const destination = resolve(
+              installation,
+              "src",
+              file.target.slice(1)
+            )
+            mkdirSync(dirname(destination), { recursive: true })
+            cpSync(resolve(repoRoot, file.path), destination)
+            roots.add(destination)
+          }
+          for (const dependency of entry.registryDependencies ?? []) {
+            if (dependency.startsWith("https://better-auth-ui.com/r/")) {
+              install(basename(new URL(dependency).pathname, ".json"))
+            }
+          }
+        }
+        install("auth")
+        // Host-provided shadcn primitives and utilities, without optional auth plugins.
+        for (const path of ["components/ui", "lib/utils.ts"]) {
+          cpSync(
+            resolve(sourceRoot, "src", path),
+            resolve(installation, "src", path),
+            {
+              recursive: true
+            }
+          )
+        }
+        const program = ts.createProgram([...roots], {
+          target: ts.ScriptTarget.ES2022,
+          module: ts.ModuleKind.ESNext,
+          moduleResolution: ts.ModuleResolutionKind.Bundler,
+          jsx: ts.JsxEmit.ReactJSX,
+          strict: true,
+          skipLibCheck: true,
+          noEmit: true,
+          esModuleInterop: true,
+          paths: { "@/*": [resolve(installation, "src/*")] },
+          types: ["react", "react-dom"]
+        })
+        const diagnostics = ts.getPreEmitDiagnostics(program)
+        expect(
+          ts.formatDiagnosticsWithColorAndContext(diagnostics, {
+            getCurrentDirectory: () => installation,
+            getCanonicalFileName: (file) => file,
+            getNewLine: () => "\n"
+          })
+        ).toBe("")
+      } finally {
+        rmSync(installation, { recursive: true, force: true })
+      }
+    },
+    60000
+  )
+
   it("emits schema-valid source paths and install targets", () => {
     for (const registry of [radixRegistry, baseRegistry]) {
       for (const registryItem of registry.items) {

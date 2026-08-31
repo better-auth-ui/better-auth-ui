@@ -1,22 +1,24 @@
 import { type QueryOptions, skipToken } from "@tanstack/query-core"
 import type { InferData } from "../../lib/auth-client"
 import { createAuthQueryFetchOptions } from "../../lib/auth-query-retry"
-import type { OrganizationAuthClient } from "./organization-auth-client"
+import type { OrganizationRolesAuthClient } from "./organization-auth-client"
 import { organizationQueryKeys } from "./organization-query-keys"
 
 export type ListRolesData<
-  TAuthClient extends OrganizationAuthClient = OrganizationAuthClient
+  TAuthClient extends OrganizationRolesAuthClient = OrganizationRolesAuthClient
 > = InferData<TAuthClient["organization"]["listRoles"]>
 
 export type ListRolesParams<
-  TAuthClient extends OrganizationAuthClient = OrganizationAuthClient
+  TAuthClient extends OrganizationRolesAuthClient = OrganizationRolesAuthClient
 > = Parameters<TAuthClient["organization"]["listRoles"]>[0]
 
 export type ListedOrganizationRole<
-  TAuthClient extends OrganizationAuthClient = OrganizationAuthClient
+  TAuthClient extends OrganizationRolesAuthClient = OrganizationRolesAuthClient
 > = NonNullable<ListRolesData<TAuthClient>>[number]
 
-export function listRolesOptions<TAuthClient extends OrganizationAuthClient>(
+export function listRolesOptions<
+  TAuthClient extends OrganizationRolesAuthClient
+>(
   authClient: TAuthClient,
   userId?: string,
   params?: ListRolesParams<TAuthClient>

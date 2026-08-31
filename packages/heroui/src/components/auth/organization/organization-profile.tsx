@@ -29,6 +29,7 @@ import { SlugField } from "./slug-field"
 
 export type OrganizationProfileProps = {
   className?: string
+  hideSlug?: boolean
   variant?: CardProps["variant"]
 }
 
@@ -38,11 +39,16 @@ export type OrganizationProfileProps = {
 export function OrganizationProfile({
   className,
   variant,
+  hideSlug: hideSlugProp,
   ...props
 }: OrganizationProfileProps & Omit<CardProps, "children">) {
   const { authClient, localization } = useAuth()
-  const { additionalFields, localization: organizationLocalization } =
-    useAuthPlugin(organizationPlugin)
+  const {
+    additionalFields,
+    localization: organizationLocalization,
+    hideSlug: pluginHideSlug
+  } = useAuthPlugin(organizationPlugin)
+  const hideSlug = hideSlugProp ?? pluginHideSlug ?? false
 
   const { data: activeOrganization } = useActiveOrganization(
     authClient as OrganizationAuthClient
@@ -87,7 +93,7 @@ export function OrganizationProfile({
     }
 
     commitOrganizationUpdate({
-      data: { name, slug, ...additionalValues }
+      data: { ...additionalValues, name, ...(!hideSlug && { slug }) }
     })
   }
 
@@ -128,20 +134,21 @@ export function OrganizationProfile({
               <FieldError />
             </TextField>
 
-            {activeOrganization ? (
-              <SlugField
-                value={slug}
-                onChange={setSlug}
-                currentSlug={activeOrganization.slug}
-                isDisabled={formDisabled}
-                variant={inputVariant}
-              />
-            ) : (
-              <TextField isDisabled>
-                <Label>{organizationLocalization.slug}</Label>
-                <Skeleton className="h-10 w-full rounded-xl md:h-9" />
-              </TextField>
-            )}
+            {!hideSlug &&
+              (activeOrganization ? (
+                <SlugField
+                  value={slug}
+                  onChange={setSlug}
+                  currentSlug={activeOrganization.slug}
+                  isDisabled={formDisabled}
+                  variant={inputVariant}
+                />
+              ) : (
+                <TextField isDisabled>
+                  <Label>{organizationLocalization.slug}</Label>
+                  <Skeleton className="h-10 w-full rounded-xl md:h-9" />
+                </TextField>
+              ))}
             {activeOrganization &&
               additionalFields.map((field) => (
                 <AdditionalField
