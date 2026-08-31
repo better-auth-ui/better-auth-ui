@@ -1,7 +1,10 @@
 "use client"
 
 import { parseAdditionalFieldValue } from "@better-auth-ui/core"
-import type { OrganizationAuthClient } from "@better-auth-ui/core/plugins/organization"
+import {
+  generateOrganizationSlug,
+  type OrganizationAuthClient
+} from "@better-auth-ui/core/plugins/organization"
 import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
 import { useCreateOrganization } from "@better-auth-ui/react/plugins/organization"
 import { Briefcase } from "lucide-react"
@@ -28,15 +31,21 @@ import { SlugField, sanitizeSlug } from "./slug-field"
 export type CreateOrganizationDialogProps = {
   open: boolean
   onOpenChange: (open: boolean) => void
+  hideSlug?: boolean
 }
 
 export function CreateOrganizationDialog({
   open,
-  onOpenChange
+  onOpenChange,
+  hideSlug: hideSlugProp
 }: CreateOrganizationDialogProps) {
   const { authClient, localization } = useAuth<OrganizationAuthClient>()
-  const { additionalFields, localization: organizationLocalization } =
-    useAuthPlugin(organizationPlugin)
+  const {
+    additionalFields,
+    localization: organizationLocalization,
+    hideSlug: pluginHideSlug
+  } = useAuthPlugin(organizationPlugin)
+  const hideSlug = hideSlugProp ?? pluginHideSlug ?? false
 
   const [name, setName] = useState("")
   const [slug, setSlug] = useState("")
@@ -77,7 +86,11 @@ export function CreateOrganizationDialog({
       toast.error(error instanceof Error ? error.message : String(error))
       return
     }
-    createOrganization({ name, slug, ...additionalValues })
+    createOrganization({
+      ...additionalValues,
+      name,
+      slug: hideSlug ? generateOrganizationSlug(name) : slug
+    })
   }
 
   const isPending = isCreating || isSubmitting
@@ -139,15 +152,17 @@ export function CreateOrganizationDialog({
               <FieldError>{nameError}</FieldError>
             </Field>
 
-            <SlugField
-              id="create-organization-slug"
-              value={slug}
-              onChange={(value) => {
-                setSlug(value)
-                setSlugEdited(true)
-              }}
-              disabled={isPending}
-            />
+            {!hideSlug && (
+              <SlugField
+                id="create-organization-slug"
+                value={slug}
+                onChange={(value) => {
+                  setSlug(value)
+                  setSlugEdited(true)
+                }}
+                disabled={isPending}
+              />
+            )}
 
             {additionalFields.map((field) => (
               <AdditionalField

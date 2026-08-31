@@ -6,6 +6,7 @@ import { describe, expect, it, vi } from "vitest"
 
 import { AuthProvider } from "../src/components/auth/auth-provider"
 import { CreateOrganizationDialog } from "../src/components/auth/organization/create-organization-dialog"
+import { OrganizationProfile } from "../src/components/auth/organization/organization-profile"
 import { SlugField } from "../src/components/auth/organization/slug-field"
 import { organizationPlugin } from "../src/lib/auth/organization-plugin"
 
@@ -66,11 +67,15 @@ function renderCreateOrganizationDialog({
   authClient = createOrganizationAuthClient(),
   isOpen = true,
   onOpenChange = vi.fn(),
+  hideSlug,
+  localHideSlug,
   validate = async () => {}
 }: {
   authClient?: ReturnType<typeof createOrganizationAuthClient>
   isOpen?: boolean
   onOpenChange?: (open: boolean) => void
+  hideSlug?: boolean
+  localHideSlug?: boolean
   validate?: () => Promise<void>
 } = {}) {
   const queryClient = createTestQueryClient()
@@ -80,6 +85,7 @@ function renderCreateOrganizationDialog({
       navigate={() => {}}
       plugins={[
         organizationPlugin({
+          hideSlug,
           checkSlug: false,
           additionalFields: [
             {
@@ -95,7 +101,11 @@ function renderCreateOrganizationDialog({
       ]}
       queryClient={queryClient}
     >
-      <CreateOrganizationDialog isOpen={open} onOpenChange={onOpenChange} />
+      <CreateOrganizationDialog
+        isOpen={open}
+        onOpenChange={onOpenChange}
+        hideSlug={localHideSlug}
+      />
     </AuthProvider>
   )
   const rendered = render(renderDialog(isOpen))
@@ -224,6 +234,67 @@ describe("<SlugField />", () => {
 })
 
 describe("<CreateOrganizationDialog />", () => {
+  it.each([{ hideSlug: true }, { localHideSlug: true }])(
+    "creates an organization with a generated slug when hidden: %j",
+    async (options) => {
+      const user = userEvent.setup()
+      const { authClient } = renderCreateOrganizationDialog(options)
+      expect(screen.queryByLabelText("Slug")).not.toBeInTheDocument()
+      await user.type(screen.getByLabelText("Name"), "  Café Partners  ")
+      await user.click(
+        screen.getByRole("button", { name: "Create organization" })
+      )
+      await waitFor(() =>
+        expect(authClient.organization.create).toHaveBeenCalledWith(
+          expect.objectContaining({
+            name: "  Café Partners  ",
+            slug: "cafe-partners"
+          })
+        )
+      )
+    }
+  )
+
+  it("allows a visible field override and preserves a manually edited slug", async () => {
+    const user = userEvent.setup()
+    const { authClient } = renderCreateOrganizationDialog({
+      hideSlug: true,
+      localHideSlug: false
+    })
+    await user.type(screen.getByLabelText("Name"), "Acme")
+    const slug = screen.getByLabelText("Slug")
+    await user.clear(slug)
+    await user.type(slug, "custom")
+    await user.type(screen.getByLabelText("Name"), " Partners")
+    await user.click(
+      screen.getByRole("button", { name: "Create organization" })
+    )
+    await waitFor(() =>
+      expect(authClient.organization.create).toHaveBeenCalledWith(
+        expect.objectContaining({ name: "Acme Partners", slug: "custom" })
+      )
+    )
+  })
+
+  it("keeps hidden creation open when server slug validation fails", async () => {
+    const user = userEvent.setup()
+    const onOpenChange = vi.fn()
+    const authClient = createOrganizationAuthClient(async () => {
+      throw new Error("Organization slug already taken")
+    })
+    renderCreateOrganizationDialog({ authClient, hideSlug: true, onOpenChange })
+    await user.type(screen.getByLabelText("Name"), "Acme")
+    const submit = screen.getByRole("button", { name: "Create organization" })
+    await user.click(submit)
+    await waitFor(() =>
+      expect(authClient.organization.create).toHaveBeenCalledOnce()
+    )
+    await waitFor(() =>
+      expect(submit).not.toHaveAttribute("data-pending", "true")
+    )
+    expect(onOpenChange).not.toHaveBeenCalled()
+  })
+
   it("does not create an organization when validation finishes after closing", async () => {
     const user = userEvent.setup()
     const validation = createDeferred<void>()
@@ -268,5 +339,54 @@ describe("<CreateOrganizationDialog />", () => {
     await act(async () => creation.resolve({ data: {}, error: null }))
 
     expect(onOpenChange).not.toHaveBeenCalled()
+  })
+})
+
+describe("<OrganizationProfile />", () => {
+  it("preserves the existing slug when renaming an organization with hidden slugs", async () => {
+    const user = userEvent.setup()
+    const update = vi.fn(async () => ({}))
+    const authClient = {
+      getSession: vi.fn(async () => ({ user: { id: "user" } })),
+      organization: {
+        getFullOrganization: vi.fn(async () => ({
+          id: "org",
+          name: "Acme",
+          slug: "original-slug"
+        })),
+        hasPermission: vi.fn(async () => ({ success: true })),
+        update
+      }
+    } as unknown as Parameters<typeof AuthProvider>[0]["authClient"]
+    render(
+      <AuthProvider
+        authClient={authClient}
+        navigate={() => {}}
+        queryClient={createTestQueryClient()}
+        plugins={[
+          organizationPlugin({
+            slug: "original-slug",
+            hideSlug: true,
+            logo: { enabled: false }
+          })
+        ]}
+      >
+        <OrganizationProfile />
+      </AuthProvider>
+    )
+    const name = await screen.findByDisplayValue("Acme")
+    await waitFor(() => expect(name).toBeEnabled())
+    expect(screen.queryByLabelText("Slug")).not.toBeInTheDocument()
+    await user.clear(name)
+    await user.type(name, "Renamed")
+    await user.click(screen.getByRole("button", { name: "Save changes" }))
+    await waitFor(() =>
+      expect(update).toHaveBeenCalledWith(
+        expect.objectContaining({
+          organizationId: "org",
+          data: { name: "Renamed" }
+        })
+      )
+    )
   })
 })

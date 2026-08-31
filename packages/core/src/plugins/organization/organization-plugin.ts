@@ -101,6 +101,8 @@ export type OrganizationPluginOptions = {
     permissions: OrganizationPermissionRegistry
   }
   slug?: string | null
+  /** Hide slugs in organization forms and views. Switchers hide slugs by default. */
+  hideSlug?: boolean
   /**
    * Prefix prepended to organization slugs.
    * @default ""
@@ -184,6 +186,7 @@ export const organizationPlugin = createAuthPlugin(
     return {
       creatorRole: options.creatorRole?.trim() || "owner",
       slug: options.slug,
+      hideSlug: options.hideSlug,
       slugPrefix: options.slugPrefix ?? "",
       checkSlug: options.checkSlug ?? true,
       localization,

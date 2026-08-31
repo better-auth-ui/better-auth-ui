@@ -28,6 +28,11 @@
       "description": "Wraps the Better Auth UI provider and mounts an ErrorToaster that surfaces query and mutation failures via sonner.",
       "files": [
         {
+          "path": "src/lib/auth/auth-plugin.ts",
+          "type": "registry:lib",
+          "target": "@lib/auth/auth-plugin.ts"
+        },
+        {
           "path": "src/components/auth/auth-provider.tsx",
           "type": "registry:component",
           "target": "@components/auth/auth-provider.tsx"

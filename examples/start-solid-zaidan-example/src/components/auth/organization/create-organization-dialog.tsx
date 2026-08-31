@@ -1,9 +1,12 @@
 import { parseAdditionalFieldValue } from "@better-auth-ui/core"
-import type { OrganizationAuthClient } from "@better-auth-ui/core/plugins/organization"
+import {
+  generateOrganizationSlug,
+  type OrganizationAuthClient
+} from "@better-auth-ui/core/plugins/organization"
 import { useAuth, useAuthPlugin } from "@better-auth-ui/solid"
 import { useCreateOrganization } from "@better-auth-ui/solid/plugins/organization"
 import { BriefcaseBusiness, LoaderCircle } from "lucide-solid"
-import { createEffect, createSignal, For } from "solid-js"
+import { createEffect, createSignal, For, Show } from "solid-js"
 import { toast } from "solid-sonner"
 import { Button } from "@/components/ui/button"
 import {
@@ -24,11 +27,13 @@ import { SlugField, sanitizeSlug } from "./slug-field"
 export type CreateOrganizationDialogProps = {
   open: boolean
   onOpenChange: (open: boolean) => void
+  hideSlug?: boolean
 }
 
 export function CreateOrganizationDialog(props: CreateOrganizationDialogProps) {
   const auth = useAuth<OrganizationAuthClient>()
   const config = useAuthPlugin(organizationPlugin)
+  const hideSlug = () => props.hideSlug ?? config.hideSlug ?? false
   const [name, setName] = createSignal("")
   const [slug, setSlug] = createSignal("")
   const [slugEdited, setSlugEdited] = createSignal(false)
@@ -72,9 +77,9 @@ export function CreateOrganizationDialog(props: CreateOrganizationDialogProps) {
       return
     }
     createOrganization.mutate({
+      ...additionalValues,
       name: name(),
-      slug: slug(),
-      ...additionalValues
+      slug: hideSlug() ? generateOrganizationSlug(name()) : slug()
     })
   }
 
@@ -110,15 +115,17 @@ export function CreateOrganizationDialog(props: CreateOrganizationDialogProps) {
             />
           </Field>
 
-          <SlugField
-            disabled={isPending()}
-            id="create-organization-slug"
-            onChange={(value) => {
-              setSlug(value)
-              setSlugEdited(true)
-            }}
-            value={slug()}
-          />
+          <Show when={!hideSlug()}>
+            <SlugField
+              disabled={isPending()}
+              id="create-organization-slug"
+              onChange={(value) => {
+                setSlug(value)
+                setSlugEdited(true)
+              }}
+              value={slug()}
+            />
+          </Show>
 
           <For each={config.additionalFields}>
             {(field) => (

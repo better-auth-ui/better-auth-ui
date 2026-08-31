@@ -3,7 +3,7 @@ import {
   createRoleOptions,
   type DeleteRoleOptions,
   deleteRoleOptions,
-  type OrganizationAuthClient,
+  type OrganizationRolesAuthClient,
   type UpdateRoleOptions,
   updateRoleOptions
 } from "@better-auth-ui/core/plugins/organization"
@@ -11,7 +11,7 @@ import { type QueryClient, useMutation } from "@tanstack/solid-query"
 import type { Accessor } from "solid-js"
 import { useSession } from "../../../../hooks/queries/use-session"
 
-export function useCreateRole<T extends OrganizationAuthClient>(
+export function useCreateRole<T extends OrganizationRolesAuthClient>(
   authClient: T,
   organizationId: Accessor<string | undefined>,
   options?: Accessor<CreateRoleOptions<T>>,
@@ -27,7 +27,7 @@ export function useCreateRole<T extends OrganizationAuthClient>(
   )
 }
 
-export function useUpdateRole<T extends OrganizationAuthClient>(
+export function useUpdateRole<T extends OrganizationRolesAuthClient>(
   authClient: T,
   organizationId: Accessor<string | undefined>,
   options?: Accessor<UpdateRoleOptions<T>>,
@@ -43,7 +43,7 @@ export function useUpdateRole<T extends OrganizationAuthClient>(
   )
 }
 
-export function useDeleteRole<T extends OrganizationAuthClient>(
+export function useDeleteRole<T extends OrganizationRolesAuthClient>(
   authClient: T,
   organizationId: Accessor<string | undefined>,
   options?: Accessor<DeleteRoleOptions<T>>,

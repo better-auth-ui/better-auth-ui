@@ -1,5 +1,8 @@
 import { parseAdditionalFieldValue } from "@better-auth-ui/core"
-import type { OrganizationAuthClient } from "@better-auth-ui/core/plugins/organization"
+import {
+  generateOrganizationSlug,
+  type OrganizationAuthClient
+} from "@better-auth-ui/core/plugins/organization"
 import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
 import { useCreateOrganization } from "@better-auth-ui/react/plugins/organization"
 import { Briefcase } from "@gravity-ui/icons"
@@ -24,6 +27,7 @@ import { SlugField, sanitizeSlug } from "./slug-field"
 export type CreateOrganizationDialogProps = {
   isOpen: boolean
   onOpenChange: (open: boolean) => void
+  hideSlug?: boolean
 }
 
 /**
@@ -35,11 +39,16 @@ export type CreateOrganizationDialogProps = {
  */
 export function CreateOrganizationDialog({
   isOpen,
-  onOpenChange
+  onOpenChange,
+  hideSlug: hideSlugProp
 }: CreateOrganizationDialogProps) {
   const { authClient, localization } = useAuth()
-  const { additionalFields, localization: organizationLocalization } =
-    useAuthPlugin(organizationPlugin)
+  const {
+    additionalFields,
+    localization: organizationLocalization,
+    hideSlug: pluginHideSlug
+  } = useAuthPlugin(organizationPlugin)
+  const hideSlug = hideSlugProp ?? pluginHideSlug ?? false
 
   const [name, setName] = useState("")
   const [slug, setSlug] = useState("")
@@ -81,7 +90,11 @@ export function CreateOrganizationDialog({
     if (generation !== submissionGeneration.current) return
 
     createOrganization(
-      { name, slug, ...additionalValues },
+      {
+        ...additionalValues,
+        name,
+        slug: hideSlug ? generateOrganizationSlug(name) : slug
+      },
       {
         onSuccess: () => {
           if (generation === submissionGeneration.current) onOpenChange(false)
@@ -158,15 +171,17 @@ export function CreateOrganizationDialog({
                 <FieldError />
               </TextField>
 
-              <SlugField
-                value={slug}
-                onChange={(value) => {
-                  setSlug(value)
-                  setSlugEdited(true)
-                }}
-                isDisabled={isPending}
-                variant="secondary"
-              />
+              {!hideSlug && (
+                <SlugField
+                  value={slug}
+                  onChange={(value) => {
+                    setSlug(value)
+                    setSlugEdited(true)
+                  }}
+                  isDisabled={isPending}
+                  variant="secondary"
+                />
+              )}
               {additionalFields.map((field) => (
                 <AdditionalField
                   field={field}

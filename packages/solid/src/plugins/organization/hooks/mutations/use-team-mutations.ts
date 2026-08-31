@@ -3,7 +3,7 @@ import {
   addTeamMemberOptions,
   type CreateTeamOptions,
   createTeamOptions,
-  type OrganizationAuthClient,
+  type OrganizationTeamsAuthClient,
   type RemoveTeamMemberOptions,
   type RemoveTeamOptions,
   removeTeamMemberOptions,
@@ -15,7 +15,7 @@ import { type QueryClient, useMutation } from "@tanstack/solid-query"
 import type { Accessor } from "solid-js"
 import { useSession } from "../../../../hooks/queries/use-session"
 
-export function useCreateTeam<T extends OrganizationAuthClient>(
+export function useCreateTeam<T extends OrganizationTeamsAuthClient>(
   authClient: T,
   options?: Accessor<CreateTeamOptions<T>>,
   queryClient?: Accessor<QueryClient>
@@ -29,7 +29,7 @@ export function useCreateTeam<T extends OrganizationAuthClient>(
     queryClient
   )
 }
-export function useUpdateTeam<T extends OrganizationAuthClient>(
+export function useUpdateTeam<T extends OrganizationTeamsAuthClient>(
   authClient: T,
   options?: Accessor<UpdateTeamOptions<T>>,
   queryClient?: Accessor<QueryClient>
@@ -43,7 +43,7 @@ export function useUpdateTeam<T extends OrganizationAuthClient>(
     queryClient
   )
 }
-export function useRemoveTeam<T extends OrganizationAuthClient>(
+export function useRemoveTeam<T extends OrganizationTeamsAuthClient>(
   authClient: T,
   options?: Accessor<RemoveTeamOptions<T>>,
   queryClient?: Accessor<QueryClient>
@@ -57,7 +57,7 @@ export function useRemoveTeam<T extends OrganizationAuthClient>(
     queryClient
   )
 }
-export function useAddTeamMember<T extends OrganizationAuthClient>(
+export function useAddTeamMember<T extends OrganizationTeamsAuthClient>(
   authClient: T,
   options?: Accessor<AddTeamMemberOptions<T>>,
   queryClient?: Accessor<QueryClient>
@@ -71,7 +71,7 @@ export function useAddTeamMember<T extends OrganizationAuthClient>(
     queryClient
   )
 }
-export function useRemoveTeamMember<T extends OrganizationAuthClient>(
+export function useRemoveTeamMember<T extends OrganizationTeamsAuthClient>(
   authClient: T,
   options?: Accessor<RemoveTeamMemberOptions<T>>,
   queryClient?: Accessor<QueryClient>

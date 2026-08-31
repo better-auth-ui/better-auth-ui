@@ -4,8 +4,8 @@ import {
   parseAdditionalFieldValues
 } from "@better-auth-ui/core"
 import type {
-  OrganizationAuthClient,
-  OrganizationPermissionRegistry
+  OrganizationPermissionRegistry,
+  OrganizationRolesAuthClient
 } from "@better-auth-ui/core/plugins/organization"
 import { useAuth, useAuthPlugin } from "@better-auth-ui/solid"
 import {
@@ -52,7 +52,7 @@ type Role = {
 }
 
 export function OrganizationRoles(props: { organizationId: string }) {
-  const auth = useAuth<OrganizationAuthClient>()
+  const auth = useAuth<OrganizationRolesAuthClient>()
   const config = useAuthPlugin(organizationPlugin)
   const canRead = useHasPermission(auth.authClient, () => ({
     organizationId: props.organizationId,
@@ -185,7 +185,7 @@ export function OrganizationRoles(props: { organizationId: string }) {
 }
 
 function OrganizationRoleRow(props: {
-  authClient: OrganizationAuthClient
+  authClient: OrganizationRolesAuthClient
   canDelete: boolean
   canDeletePending: boolean
   canUpdate: boolean
@@ -287,7 +287,7 @@ function RoleDialog(props: {
   role?: Role
   roleFields: AdditionalFields
 }) {
-  const auth = useAuth<OrganizationAuthClient>()
+  const auth = useAuth<OrganizationRolesAuthClient>()
   const config = useAuthPlugin(organizationPlugin)
   const [name, setName] = createSignal("")
   const [permission, setPermission] = createSignal<Record<string, string[]>>({})
@@ -333,7 +333,7 @@ function RoleDialog(props: {
         const access = await auth.authClient.organization.hasPermission({
           organizationId: props.organizationId,
           permissions: selectedPermissions as Parameters<
-            OrganizationAuthClient["organization"]["hasPermission"]
+            OrganizationRolesAuthClient["organization"]["hasPermission"]
           >[0]["permissions"]
         })
 
@@ -486,11 +486,11 @@ function RolePermissionCheckbox(props: {
   pending: boolean
   resource: string
 }) {
-  const auth = useAuth<OrganizationAuthClient>()
+  const auth = useAuth<OrganizationRolesAuthClient>()
   const canAssign = useHasPermission(auth.authClient, () => ({
     organizationId: props.organizationId,
     permissions: { [props.resource]: [props.action] } as Parameters<
-      OrganizationAuthClient["organization"]["hasPermission"]
+      OrganizationRolesAuthClient["organization"]["hasPermission"]
     >[0]["permissions"]
   }))
   const id = () => `role-permission-${props.resource}-${props.action}`

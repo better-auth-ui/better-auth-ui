@@ -1,7 +1,9 @@
 import { parseAdditionalFieldValues } from "@better-auth-ui/core"
 import {
   mergeOrganizationRoleLabels,
-  type OrganizationAuthClient
+  type OrganizationAuthClient,
+  type OrganizationRolesAuthClient,
+  type OrganizationTeamsAuthClient
 } from "@better-auth-ui/core/plugins/organization"
 import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
 import {
@@ -71,7 +73,7 @@ export function InviteMemberDialog({
   const { data: activeOrganization } = useActiveOrganization(
     authClient as OrganizationAuthClient
   )
-  const teams = useListTeams(authClient as OrganizationAuthClient, {
+  const teams = useListTeams(authClient as OrganizationTeamsAuthClient, {
     query: { organizationId: activeOrganization?.id }
   })
   const invitations = useListOrganizationInvitations(
@@ -85,7 +87,7 @@ export function InviteMemberDialog({
     organizationId: activeOrganization?.id,
     permissions: { ac: ["read"] }
   })
-  const dynamicRoles = useListRoles(authClient as OrganizationAuthClient, {
+  const dynamicRoles = useListRoles(authClient as OrganizationRolesAuthClient, {
     query: { organizationId: activeOrganization?.id },
     enabled:
       dynamicAccessControl?.enabled === true &&
@@ -130,7 +132,7 @@ export function InviteMemberDialog({
   }, [isOpen, activeOrganizationId])
 
   const { mutate: inviteMember, isPending: isInviting } = useInviteMember(
-    authClient as OrganizationAuthClient,
+    authClient as OrganizationTeamsAuthClient,
     {
       onSuccess: () => {
         onOpenChange(false)

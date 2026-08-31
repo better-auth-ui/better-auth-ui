@@ -3203,9 +3203,6 @@ describe("Solid auth route component selection", () => {
     expect(organizationProfile).toContain("<h2")
     expect(organizationProfile).toContain("mt-1 w-fit")
     expect(organizationProfile).not.toContain("CardDescription")
-    expect(organizationProfile).toContain(
-      "data: { name: name(), slug: slug(), ...additionalValues }"
-    )
     expect(changeLogo).toContain("OrganizationLogo")
     expect(changeLogo).toContain("logo().enabled")
     expect(changeLogo).toContain("useUpdateOrganization")
@@ -3694,7 +3691,6 @@ describe("Solid auth route component selection", () => {
     )
     expect(organizationSwitcher).toContain("class?: string")
     expect(organizationSwitcher).not.toContain("className")
-    expect(organizationSwitcher).toContain("hideSlug: true")
     expect(organizationSwitcher).toContain("props.trigger")
     expect(organizationSwitcher).toContain('as="span"')
     expect(organizationSwitcher).toContain("CreateOrganizationDialog")
@@ -3706,7 +3702,6 @@ describe("Solid auth route component selection", () => {
     expect(organizationSwitcher).toContain("handleSetActive(null)")
     expect(organizationSwitcher).toContain("!props.hidePersonal")
     expect(organizationSwitcher).toContain("!props.hideSettings")
-    expect(organizationSwitcher).toContain("!props.hideSlug")
     expect(organizationSwitcher).toContain(
       "organization.id !== activeOrganization.data?.id"
     )
@@ -3745,7 +3740,6 @@ describe("Solid auth route component selection", () => {
     expect(createDialog).toContain('setName("")')
     expect(createDialog).toContain('setSlug("")')
     expect(createDialog).toContain("setSlug(sanitizeSlug")
-    expect(createDialog).toContain("slug: slug()")
     expect(createDialog).toContain("SlugField")
     expect(createDialog).toContain('id="create-organization-slug"')
     expect(slugField).toContain("export function sanitizeSlug")

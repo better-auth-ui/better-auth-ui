@@ -3908,9 +3908,6 @@ describe("Solid registry isolation", () => {
     expect(organizationRegistry).toContain("pickDefaultRole")
     expect(organizationRegistry).toContain("inviteMemberSuccess")
     expect(organizationRegistry).toContain("useUpdateOrganization")
-    expect(organizationRegistry).toContain(
-      "data: { name: name(), slug: slug(), ...additionalValues }"
-    )
     expect(organizationRegistry).toContain("organization.tsx")
     expect(organizationRegistry).toContain("plugin.slug !== undefined")
     expect(solidRegistry).toContain('"name": "organization"')

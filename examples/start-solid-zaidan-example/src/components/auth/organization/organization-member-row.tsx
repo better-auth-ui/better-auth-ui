@@ -5,6 +5,7 @@ import {
   memberRoleLabels,
   type OrganizationAuthClient,
   type OrganizationLocalization,
+  type OrganizationTeamsAuthClient,
   type RemoveMemberParams
 } from "@better-auth-ui/core/plugins/organization"
 import { useAuth, useAuthPlugin, useSession } from "@better-auth-ui/solid"
@@ -207,13 +208,16 @@ export function OrganizationMemberRow(props: OrganizationMemberRowProps) {
     organizationId: props.member.organizationId,
     permissions: { member: ["delete"] }
   }))
-  const memberTeams = useListUserTeams(auth.authClient, () => ({
-    query: {
-      organizationId: props.member.organizationId,
-      ...(props.member.userId ? { userId: props.member.userId } : {})
-    },
-    enabled: props.showTeams === true && Boolean(props.member.userId)
-  }))
+  const memberTeams = useListUserTeams(
+    auth.authClient as OrganizationTeamsAuthClient,
+    () => ({
+      query: {
+        organizationId: props.member.organizationId,
+        ...(props.member.userId ? { userId: props.member.userId } : {})
+      },
+      enabled: props.showTeams === true && Boolean(props.member.userId)
+    })
+  )
   const assignableRoles = () =>
     Object.entries(props.roles).filter(
       ([key]) => props.isOwner || key !== config.creatorRole

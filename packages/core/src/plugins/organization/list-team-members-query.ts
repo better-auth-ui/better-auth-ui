@@ -1,18 +1,18 @@
 import { type QueryOptions, skipToken } from "@tanstack/query-core"
 import type { InferData } from "../../lib/auth-client"
 import { createAuthQueryFetchOptions } from "../../lib/auth-query-retry"
-import type { OrganizationAuthClient } from "./organization-auth-client"
+import type { OrganizationTeamsAuthClient } from "./organization-auth-client"
 import { organizationQueryKeys } from "./organization-query-keys"
 
 export type ListTeamMembersData<
-  TAuthClient extends OrganizationAuthClient = OrganizationAuthClient
+  TAuthClient extends OrganizationTeamsAuthClient = OrganizationTeamsAuthClient
 > = InferData<TAuthClient["organization"]["listTeamMembers"]>
 export type ListTeamMembersParams<
-  TAuthClient extends OrganizationAuthClient = OrganizationAuthClient
+  TAuthClient extends OrganizationTeamsAuthClient = OrganizationTeamsAuthClient
 > = Parameters<TAuthClient["organization"]["listTeamMembers"]>[0]
 
 export function listTeamMembersOptions<
-  TAuthClient extends OrganizationAuthClient
+  TAuthClient extends OrganizationTeamsAuthClient
 >(
   authClient: TAuthClient,
   userId?: string,

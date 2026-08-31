@@ -2,7 +2,7 @@ import {
   type ListUserTeamsData,
   type ListUserTeamsParams,
   listUserTeamsOptions,
-  type OrganizationAuthClient
+  type OrganizationTeamsAuthClient
 } from "@better-auth-ui/core/plugins/organization"
 import {
   type QueryClient,
@@ -11,13 +11,11 @@ import {
 } from "@tanstack/react-query"
 import { useSession } from "../../../../hooks/queries/use-session"
 
-export type UseListUserTeamsOptions<T extends OrganizationAuthClient> = Omit<
-  UseQueryOptions<ListUserTeamsData<T>>,
-  "queryKey"
-> &
-  ListUserTeamsParams<T>
+export type UseListUserTeamsOptions<T extends OrganizationTeamsAuthClient> =
+  Omit<UseQueryOptions<ListUserTeamsData<T>>, "queryKey"> &
+    ListUserTeamsParams<T>
 
-export function useListUserTeams<T extends OrganizationAuthClient>(
+export function useListUserTeams<T extends OrganizationTeamsAuthClient>(
   authClient: T,
   options: UseListUserTeamsOptions<T>,
   queryClient?: QueryClient

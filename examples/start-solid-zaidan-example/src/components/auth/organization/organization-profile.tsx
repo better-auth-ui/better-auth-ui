@@ -19,6 +19,7 @@ import { SlugField } from "./slug-field"
 
 export type OrganizationProfileProps = {
   class?: string
+  hideSlug?: boolean
 }
 
 export function OrganizationProfile(props: OrganizationProfileProps) {
@@ -28,6 +29,7 @@ export function OrganizationProfile(props: OrganizationProfileProps) {
     permissions: { organization: ["update"] }
   }))
   const config = useAuthPlugin(organizationPlugin)
+  const hideSlug = () => props.hideSlug ?? config.hideSlug ?? false
   const updateOrganization = useUpdateOrganization(auth.authClient, () => ({
     onSuccess: () =>
       toast.success(config.localization.organizationUpdatedSuccess)
@@ -60,7 +62,11 @@ export function OrganizationProfile(props: OrganizationProfileProps) {
       return
     }
     updateOrganization.mutate({
-      data: { name: name(), slug: slug(), ...additionalValues }
+      data: {
+        ...additionalValues,
+        name: name(),
+        ...(!hideSlug() && { slug: slug() })
+      }
     })
   }
   const formDisabled = () =>
@@ -95,7 +101,7 @@ export function OrganizationProfile(props: OrganizationProfileProps) {
               </Show>
             </Field>
 
-            <Show when={activeOrganization.data}>
+            <Show when={!hideSlug() && activeOrganization.data}>
               {(organization) => (
                 <SlugField
                   currentSlug={organization().slug}

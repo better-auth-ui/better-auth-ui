@@ -45,7 +45,7 @@ export function OrganizationSwitcher({
   hideCreate,
   hidePersonal,
   hideSettings,
-  hideSlug = true,
+  hideSlug: hideSlugProp,
   setActive,
   placement,
   variant = "ghost",
@@ -59,8 +59,10 @@ export function OrganizationSwitcher({
     localization: organizationLocalization,
     viewPaths: organizationViewPaths,
     slug,
-    slugPrefix
+    slugPrefix,
+    hideSlug: pluginHideSlug
   } = useAuthPlugin(organizationPlugin)
+  const hideSlug = hideSlugProp ?? pluginHideSlug ?? true
 
   const { data: activeOrganization, isPending: activeOrganizationPending } =
     useActiveOrganization(authClient as OrganizationAuthClient)

@@ -2,7 +2,8 @@ import {
   hasMemberRole,
   mergeOrganizationRoleLabels,
   type OrganizationAuthClient,
-  type OrganizationLocalization
+  type OrganizationLocalization,
+  type OrganizationRolesAuthClient
 } from "@better-auth-ui/core/plugins/organization"
 import { useAuth, useAuthPlugin } from "@better-auth-ui/solid"
 import {
@@ -256,12 +257,15 @@ export function OrganizationMembers(props: OrganizationMembersProps) {
   const canReadRoles = useHasPermission(auth.authClient, () => ({
     permissions: { ac: ["read"] }
   }))
-  const dynamicRoles = useListRoles(auth.authClient, () => ({
-    query: { organizationId: props.organizationId },
-    enabled:
-      config.dynamicAccessControl?.enabled === true &&
-      canReadRoles.data?.success === true
-  }))
+  const dynamicRoles = useListRoles(
+    auth.authClient as OrganizationRolesAuthClient,
+    () => ({
+      query: { organizationId: props.organizationId },
+      enabled:
+        config.dynamicAccessControl?.enabled === true &&
+        canReadRoles.data?.success === true
+    })
+  )
   const memberRows = () => (members.data?.members ?? []) as OrganizationMember[]
   const organizationPluginConfig = () =>
     auth.plugins.find((plugin) => plugin.id === organizationPlugin.id) as

@@ -34,13 +34,18 @@ export function OrganizationView({
   className,
   isPending,
   size = "md",
-  hideSlug,
+  hideSlug: hideSlugProp,
   hideRole,
   organization,
   ...props
 }: OrganizationViewProps & ComponentProps<"div">) {
   const { authClient } = useAuth<OrganizationAuthClient>()
-  const { roles, slugPrefix } = useAuthPlugin(organizationPlugin)
+  const {
+    roles,
+    slugPrefix,
+    hideSlug: pluginHideSlug
+  } = useAuthPlugin(organizationPlugin)
+  const hideSlug = hideSlugProp ?? pluginHideSlug ?? false
 
   const { data: session } = useSession(authClient)
 

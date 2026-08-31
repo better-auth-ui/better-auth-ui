@@ -1,6 +1,6 @@
 import type {
   ListedUserTeam,
-  OrganizationAuthClient
+  OrganizationTeamsAuthClient
 } from "@better-auth-ui/core/plugins/organization"
 import { useAuth } from "@better-auth-ui/solid"
 import {
@@ -32,7 +32,7 @@ export type TeamSwitcherProps = {
 }
 
 export function TeamSwitcher(props: TeamSwitcherProps) {
-  const auth = useAuth<OrganizationAuthClient>()
+  const auth = useAuth<OrganizationTeamsAuthClient>()
   const localization = () => organizationPlugin().localization
   const [open, setOpen] = createSignal(false)
   const teams = useListUserTeams(auth.authClient, () => ({

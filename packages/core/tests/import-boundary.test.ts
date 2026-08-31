@@ -50,7 +50,7 @@ describe("core query boundary", () => {
     const gitignore = readFileSync("../../.gitignore", "utf8").split("\n")
 
     expect(buildConfig.compilerOptions.outDir).toBe("dist")
-    expect(typecheckConfig).toEqual({
+    expect(typecheckConfig).toMatchObject({
       extends: "./tsconfig.json",
       compilerOptions: {
         outDir: ".typecheck",

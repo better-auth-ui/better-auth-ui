@@ -1,17 +1,17 @@
 import type { MutationOptions, QueryKey } from "@tanstack/query-core"
 import type { BetterFetchError } from "better-auth/client"
-import type { OrganizationAuthClient } from "./organization-auth-client"
+import type { OrganizationRolesAuthClient } from "./organization-auth-client"
 import { organizationMutationKeys } from "./organization-mutation-keys"
 import { organizationQueryKeys } from "./organization-query-keys"
 
 type RoleMethod = "createRole" | "updateRole" | "deleteRole"
 type RoleParams<
-  TAuthClient extends OrganizationAuthClient,
+  TAuthClient extends OrganizationRolesAuthClient,
   TMethod extends RoleMethod
 > = NonNullable<Parameters<TAuthClient["organization"][TMethod]>[0]>
 
 function roleMutationOptions<
-  TAuthClient extends OrganizationAuthClient,
+  TAuthClient extends OrganizationRolesAuthClient,
   TMethod extends RoleMethod
 >(
   authClient: TAuthClient,
@@ -95,18 +95,18 @@ function roleMutationOptions<
 }
 
 export type CreateRoleParams<
-  TAuthClient extends OrganizationAuthClient = OrganizationAuthClient
+  TAuthClient extends OrganizationRolesAuthClient = OrganizationRolesAuthClient
 > = RoleParams<TAuthClient, "createRole">
 export type UpdateRoleParams<
-  TAuthClient extends OrganizationAuthClient = OrganizationAuthClient
+  TAuthClient extends OrganizationRolesAuthClient = OrganizationRolesAuthClient
 > = RoleParams<TAuthClient, "updateRole">
 export type DeleteRoleParams<
-  TAuthClient extends OrganizationAuthClient = OrganizationAuthClient
+  TAuthClient extends OrganizationRolesAuthClient = OrganizationRolesAuthClient
 > = RoleParams<TAuthClient, "deleteRole">
 
 type PublicMutationOptions<T> = Omit<T, "mutationKey" | "mutationFn" | "meta">
 
-export const createRoleOptions = <T extends OrganizationAuthClient>(
+export const createRoleOptions = <T extends OrganizationRolesAuthClient>(
   authClient: T,
   userId?: string,
   organizationId?: string
@@ -119,7 +119,7 @@ export const createRoleOptions = <T extends OrganizationAuthClient>(
     organizationId
   )
 
-export const updateRoleOptions = <T extends OrganizationAuthClient>(
+export const updateRoleOptions = <T extends OrganizationRolesAuthClient>(
   authClient: T,
   userId?: string,
   organizationId?: string
@@ -132,7 +132,7 @@ export const updateRoleOptions = <T extends OrganizationAuthClient>(
     organizationId
   )
 
-export const deleteRoleOptions = <T extends OrganizationAuthClient>(
+export const deleteRoleOptions = <T extends OrganizationRolesAuthClient>(
   authClient: T,
   userId?: string,
   organizationId?: string
@@ -145,9 +145,9 @@ export const deleteRoleOptions = <T extends OrganizationAuthClient>(
     organizationId
   )
 
-export type CreateRoleOptions<T extends OrganizationAuthClient> =
+export type CreateRoleOptions<T extends OrganizationRolesAuthClient> =
   PublicMutationOptions<ReturnType<typeof createRoleOptions<T>>>
-export type UpdateRoleOptions<T extends OrganizationAuthClient> =
+export type UpdateRoleOptions<T extends OrganizationRolesAuthClient> =
   PublicMutationOptions<ReturnType<typeof updateRoleOptions<T>>>
-export type DeleteRoleOptions<T extends OrganizationAuthClient> =
+export type DeleteRoleOptions<T extends OrganizationRolesAuthClient> =
   PublicMutationOptions<ReturnType<typeof deleteRoleOptions<T>>>

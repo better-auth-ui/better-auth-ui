@@ -1,7 +1,9 @@
 import { parseAdditionalFieldValues } from "@better-auth-ui/core"
 import type {
   InviteMemberParams,
-  OrganizationAuthClient
+  OrganizationAuthClient,
+  OrganizationRolesAuthClient,
+  OrganizationTeamsAuthClient
 } from "@better-auth-ui/core/plugins/organization"
 import { mergeOrganizationRoleLabels } from "@better-auth-ui/core/plugins/organization"
 import { useAuth, useAuthPlugin } from "@better-auth-ui/solid"
@@ -57,19 +59,25 @@ export function InviteMemberDialog(props: InviteMemberDialogProps) {
     organizationId: activeOrganization.data?.id,
     permissions: { ac: ["read"] }
   }))
-  const dynamicRoles = useListRoles(auth.authClient, () => ({
-    query: { organizationId: activeOrganization.data?.id },
-    enabled:
-      config.dynamicAccessControl?.enabled === true &&
-      canReadRoles.data?.success === true
-  }))
+  const dynamicRoles = useListRoles(
+    auth.authClient as OrganizationRolesAuthClient,
+    () => ({
+      query: { organizationId: activeOrganization.data?.id },
+      enabled:
+        config.dynamicAccessControl?.enabled === true &&
+        canReadRoles.data?.success === true
+    })
+  )
   const roles = createMemo(() =>
     mergeOrganizationRoleLabels(config.roles, dynamicRoles.data)
   )
-  const teams = useListTeams(auth.authClient, () => ({
-    query: { organizationId: activeOrganization.data?.id },
-    enabled: config.teams
-  }))
+  const teams = useListTeams(
+    auth.authClient as OrganizationTeamsAuthClient,
+    () => ({
+      query: { organizationId: activeOrganization.data?.id },
+      enabled: config.teams
+    })
+  )
   const invitations = useListOrganizationInvitations(auth.authClient)
   const [email, setEmail] = createSignal("")
   const [selectedRoles, setSelectedRoles] = createSignal<string[]>(
@@ -86,12 +94,15 @@ export function InviteMemberDialog(props: InviteMemberDialogProps) {
     })
   const [teamId, setTeamId] = createSignal("")
   const [isSubmitting, setIsSubmitting] = createSignal(false)
-  const inviteMember = useInviteMember(auth.authClient, () => ({
-    onSuccess: () => {
-      props.onOpenChange(false)
-      toast.success(config.localization.inviteMemberSuccess)
-    }
-  }))
+  const inviteMember = useInviteMember(
+    auth.authClient as OrganizationTeamsAuthClient,
+    () => ({
+      onSuccess: () => {
+        props.onOpenChange(false)
+        toast.success(config.localization.inviteMemberSuccess)
+      }
+    })
+  )
 
   createEffect(() => {
     if (!props.open) {
@@ -167,7 +178,7 @@ export function InviteMemberDialog(props: InviteMemberDialogProps) {
       organizationId,
       teamId: selectedTeamId,
       role: invitationRoles
-    } satisfies InviteMemberParams
+    } satisfies InviteMemberParams<OrganizationTeamsAuthClient>
 
     inviteMember.mutate(payload, { onSettled: () => setIsSubmitting(false) })
   }
