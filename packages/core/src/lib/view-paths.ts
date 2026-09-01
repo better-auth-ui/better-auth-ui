@@ -1,4 +1,27 @@
 /**
+ * The view-path interfaces below are augmentation points: a plugin adds its
+ * own views by merging into them, which widens `AuthView` / `SettingsView` /
+ * `AdminView` accordingly.
+ *
+ * Built-in plugins augment via the relative specifier (`"../../lib/view-paths"`).
+ * Third-party plugins target the published subpath, which resolves to this
+ * same module:
+ *
+ * ```ts
+ * declare module "@better-auth-ui/core/lib/view-paths" {
+ *   interface SettingsViewPaths {
+ *     cart?: string
+ *   }
+ * }
+ * ```
+ *
+ * Without that subpath the interfaces are only reachable from inside the
+ * package, so external plugins have to cast their view keys even though
+ * `<Settings>` and `<Admin>` already merge every plugin's `viewPaths` at
+ * runtime.
+ */
+
+/**
  * View path segments for authentication routes.
  *
  * @remarks Direct implementations must include the `callback` and `error`

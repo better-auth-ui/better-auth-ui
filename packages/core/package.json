@@ -32,6 +32,11 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
     },
+    "./lib/view-paths": {
+      "src": "./src/lib/view-paths.ts",
+      "types": "./dist/lib/view-paths.d.ts",
+      "import": "./dist/lib/view-paths.js"
+    },
     "./plugins/admin": {
       "src": "./src/plugins/admin/index.ts",
       "types": "./dist/plugins/admin/index.d.ts",
