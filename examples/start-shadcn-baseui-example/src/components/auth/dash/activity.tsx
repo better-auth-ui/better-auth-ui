@@ -21,6 +21,17 @@ import {
 import { useActiveMemberRole } from "@better-auth-ui/react/plugins/organization"
 import { keepPreviousData } from "@tanstack/react-query"
 import {
+  type ColumnFiltersState,
+  columnFilteringFeature,
+  createTableHook,
+  functionalUpdate,
+  globalFilteringFeature,
+  type PaginationState,
+  rowPaginationFeature,
+  tableFeatures,
+  type Updater
+} from "@tanstack/react-table"
+import {
   Activity,
   Building2,
   ChevronLeft,
@@ -74,6 +85,21 @@ import { organizationPlugin } from "@/lib/auth/organization-plugin"
 import { cn } from "@/lib/utils"
 
 type ActivityAccess = "admin" | "admin-user" | "organization" | "user"
+
+const { createAppColumnHelper, useAppTable: useActivityTable } =
+  createTableHook({
+    features: tableFeatures({
+      columnFilteringFeature,
+      globalFilteringFeature,
+      rowPaginationFeature
+    })
+  })
+
+const activityColumnHelper = createAppColumnHelper<DashAuditLog>()
+const activityColumns = activityColumnHelper.columns([
+  activityColumnHelper.accessor("eventType", { id: "eventType" })
+])
+const EMPTY_EVENTS: DashAuditLog[] = []
 
 type ActivityFeedProps = {
   access: ActivityAccess
@@ -212,10 +238,18 @@ function ActivityFeed({
 }: ActivityFeedProps) {
   const { authClient } = useAuth()
   const { localization, pageSize } = useAuthPlugin(dashPlugin)
-  const [page, setPage] = useState(0)
-  const [eventType, setEventType] = useState("all")
-  const [identifier, setIdentifier] = useState("")
-  const deferredIdentifier = useDeferredValue(identifier.trim())
+  const [pagination, setPaginationState] = useState<PaginationState>({
+    pageIndex: 0,
+    pageSize
+  })
+  const [columnFilters, setColumnFiltersState] = useState<ColumnFiltersState>(
+    []
+  )
+  const [globalFilter, setGlobalFilterState] = useState("")
+  const eventType = String(
+    columnFilters.find((filter) => filter.id === "eventType")?.value ?? "all"
+  )
+  const deferredIdentifier = useDeferredValue(globalFilter.trim())
   const eventOptions = useMemo(
     () => Object.entries(localization.eventLabels),
     [localization.eventLabels]
@@ -224,11 +258,11 @@ function ActivityFeed({
     { label: localization.allEvents, value: "all" },
     ...eventOptions.map(([value, label]) => ({ label, value }))
   ]
-  const offset = page * pageSize
+  const offset = pagination.pageIndex * pagination.pageSize
   const params = {
     eventType: eventType === "all" ? undefined : eventType,
     identifier: deferredIdentifier || undefined,
-    limit: pageSize,
+    limit: pagination.pageSize,
     offset,
     organizationId
   }
@@ -250,7 +284,7 @@ function ActivityFeed({
       params: {
         eventType: params.eventType,
         identifier: params.identifier,
-        limit: pageSize,
+        limit: pagination.pageSize,
         offset
       }
     }
@@ -264,7 +298,28 @@ function ActivityFeed({
   const { data, error, isFetching, isPending } = query
   const showPending = !ready || isPending
   const pageEnd = offset + (data?.events.length ?? 0)
-  const hasNextPage = pageEnd < (data?.total ?? 0)
+  const setPagination = (updater: Updater<PaginationState>) =>
+    setPaginationState((current) => functionalUpdate(updater, current))
+  const setColumnFilters = (updater: Updater<ColumnFiltersState>) => {
+    setColumnFiltersState((current) => functionalUpdate(updater, current))
+    setPaginationState((current) => ({ ...current, pageIndex: 0 }))
+  }
+  const setGlobalFilter = (updater: Updater<string>) => {
+    setGlobalFilterState((current) => functionalUpdate(updater, current))
+    setPaginationState((current) => ({ ...current, pageIndex: 0 }))
+  }
+  const table = useActivityTable({
+    columns: activityColumns,
+    data: data?.events ?? EMPTY_EVENTS,
+    getRowId: getDashEventKey,
+    manualFiltering: true,
+    manualPagination: true,
+    rowCount: data?.total ?? 0,
+    state: { columnFilters, globalFilter, pagination },
+    onColumnFiltersChange: setColumnFilters,
+    onGlobalFilterChange: setGlobalFilter,
+    onPaginationChange: setPagination
+  })
 
   return (
     <Card
@@ -304,8 +359,9 @@ function ActivityFeed({
               value={eventType}
               onValueChange={(value) => {
                 if (!value) return
-                setEventType(value)
-                setPage(0)
+                table
+                  .getColumn("eventType")
+                  ?.setFilterValue(value === "all" ? undefined : value)
               }}
             >
               <SelectTrigger id="dash-event-type" className="w-full">
@@ -333,11 +389,10 @@ function ActivityFeed({
               <InputGroupInput
                 id="dash-identifier"
                 onChange={(event) => {
-                  setIdentifier(event.target.value)
-                  setPage(0)
+                  table.setGlobalFilter(event.target.value)
                 }}
                 placeholder={localization.identifierPlaceholder}
-                value={identifier}
+                value={globalFilter}
               />
             </InputGroup>
           </Field>
@@ -374,10 +429,10 @@ function ActivityFeed({
           </Empty>
         ) : data?.events.length ? (
           <ul>
-            {data.events.map((event, position) => (
-              <Fragment key={getDashEventKey(event)}>
+            {table.getRowModel().rows.map((row, position) => (
+              <Fragment key={row.id}>
                 {position > 0 && <Separator />}
-                <ActivityRow event={event} />
+                <ActivityRow event={row.original} />
               </Fragment>
             ))}
           </ul>
@@ -410,19 +465,19 @@ function ActivityFeed({
           <div className="flex gap-1">
             <Button
               aria-label={localization.previousPage}
-              disabled={isFetching || page === 0}
+              disabled={isFetching || !table.getCanPreviousPage()}
               size="icon-sm"
               variant="ghost"
-              onClick={() => setPage((current) => Math.max(0, current - 1))}
+              onClick={() => table.previousPage()}
             >
               <ChevronLeft />
             </Button>
             <Button
               aria-label={localization.nextPage}
-              disabled={isFetching || !hasNextPage}
+              disabled={isFetching || !table.getCanNextPage()}
               size="icon-sm"
               variant="ghost"
-              onClick={() => setPage((current) => current + 1)}
+              onClick={() => table.nextPage()}
             >
               <ChevronRight />
             </Button>

@@ -1586,7 +1586,8 @@ describe("Solid auth route component selection", () => {
     expect(signUp).toContain("<AdditionalField")
     expect(signUp).toContain("if (!field.signUp || field.readOnly) continue")
     expect(signUp).toContain("await field.validate(value)")
-    expect(signUp).toContain("additionalFieldValues[field.name] = value")
+    expect(signUp).toContain("values[field.name] = value")
+    expect(signUp).toContain("additionalFieldValues = values")
     expect(signUp).toContain("...additionalFieldValues")
 
     expect(userProfile).toContain("parseAdditionalFieldValue")
@@ -2163,7 +2164,8 @@ describe("Solid auth route component selection", () => {
     expect(changePassword).toContain("resetLinkSentTo")
     expect(changePassword).toContain("OpenEmailButton")
     expect(changePassword).toContain("const changePassword = useChangePassword")
-    expect(changePassword).toContain("submitChangePassword")
+    expect(changePassword).toContain("createForm(() => ({")
+    expect(changePassword).toContain("onSubmit: ({ value }) =>")
     expect(changePassword).toContain("passwordsDoNotMatch")
     expect(changePassword).toContain("changePassword.mutate({")
     expect(changePassword).toContain("currentPassword,")
@@ -3582,7 +3584,7 @@ describe("Solid auth route component selection", () => {
     expect(editMemberRolesDialog).toContain("updateMemberRole.mutate")
     expect(editMemberRolesDialog).toContain("memberId: props.member.id")
     expect(editMemberRolesDialog).toContain(
-      'selectedRoles() as UpdateMemberRoleParams["role"]'
+      'value.roles as UpdateMemberRoleParams["role"]'
     )
     expect(editMemberRolesDialog).toContain("parseMemberRoles")
     expect(organizationMemberRow).toContain("key !== config.creatorRole")

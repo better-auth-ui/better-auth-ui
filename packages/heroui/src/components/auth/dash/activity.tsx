@@ -45,11 +45,37 @@ import {
   Spinner
 } from "@heroui/react"
 import { keepPreviousData } from "@tanstack/react-query"
+import {
+  type ColumnFiltersState,
+  columnFilteringFeature,
+  createTableHook,
+  functionalUpdate,
+  globalFilteringFeature,
+  type PaginationState,
+  rowPaginationFeature,
+  tableFeatures,
+  type Updater
+} from "@tanstack/react-table"
 import { useDeferredValue, useMemo, useState } from "react"
 import { dashPlugin } from "../../../lib/auth/dash-plugin"
 import { organizationPlugin } from "../../../lib/auth/organization-plugin"
 
 type ActivityAccess = "admin" | "admin-user" | "organization" | "user"
+
+const { createAppColumnHelper, useAppTable: useActivityTable } =
+  createTableHook({
+    features: tableFeatures({
+      columnFilteringFeature,
+      globalFilteringFeature,
+      rowPaginationFeature
+    })
+  })
+
+const activityColumnHelper = createAppColumnHelper<DashAuditLog>()
+const activityColumns = activityColumnHelper.columns([
+  activityColumnHelper.accessor("eventType", { id: "eventType" })
+])
+const EMPTY_EVENTS: DashAuditLog[] = []
 
 type ActivityFeedProps = {
   access: ActivityAccess
@@ -205,20 +231,28 @@ function ActivityFeed({
 }: ActivityFeedProps) {
   const { authClient, locale } = useAuth()
   const { localization, pageSize } = useAuthPlugin(dashPlugin)
-  const [page, setPage] = useState(0)
-  const [eventType, setEventType] = useState("all")
-  const [identifier, setIdentifier] = useState("")
-  const deferredIdentifier = useDeferredValue(identifier.trim())
+  const [pagination, setPaginationState] = useState<PaginationState>({
+    pageIndex: 0,
+    pageSize
+  })
+  const [columnFilters, setColumnFiltersState] = useState<ColumnFiltersState>(
+    []
+  )
+  const [globalFilter, setGlobalFilterState] = useState("")
+  const eventType = String(
+    columnFilters.find((filter) => filter.id === "eventType")?.value ?? "all"
+  )
+  const deferredIdentifier = useDeferredValue(globalFilter.trim())
   const eventOptions = useMemo(
     () => Object.entries(localization.eventLabels),
     [localization.eventLabels]
   )
   const numberFormatter = new Intl.NumberFormat(locale.languageTag)
-  const offset = page * pageSize
+  const offset = pagination.pageIndex * pagination.pageSize
   const params = {
     eventType: eventType === "all" ? undefined : eventType,
     identifier: deferredIdentifier || undefined,
-    limit: pageSize,
+    limit: pagination.pageSize,
     offset,
     organizationId
   }
@@ -240,7 +274,7 @@ function ActivityFeed({
       params: {
         eventType: params.eventType,
         identifier: params.identifier,
-        limit: pageSize,
+        limit: pagination.pageSize,
         offset
       }
     }
@@ -254,7 +288,28 @@ function ActivityFeed({
   const { data, error, isFetching, isPending } = query
   const showPending = !ready || isPending
   const pageEnd = offset + (data?.events.length ?? 0)
-  const hasNextPage = pageEnd < (data?.total ?? 0)
+  const setPagination = (updater: Updater<PaginationState>) =>
+    setPaginationState((current) => functionalUpdate(updater, current))
+  const setColumnFilters = (updater: Updater<ColumnFiltersState>) => {
+    setColumnFiltersState((current) => functionalUpdate(updater, current))
+    setPaginationState((current) => ({ ...current, pageIndex: 0 }))
+  }
+  const setGlobalFilter = (updater: Updater<string>) => {
+    setGlobalFilterState((current) => functionalUpdate(updater, current))
+    setPaginationState((current) => ({ ...current, pageIndex: 0 }))
+  }
+  const table = useActivityTable({
+    columns: activityColumns,
+    data: data?.events ?? EMPTY_EVENTS,
+    getRowId: getDashEventKey,
+    manualFiltering: true,
+    manualPagination: true,
+    rowCount: data?.total ?? 0,
+    state: { columnFilters, globalFilter, pagination },
+    onColumnFiltersChange: setColumnFilters,
+    onGlobalFilterChange: setGlobalFilter,
+    onPaginationChange: setPagination
+  })
 
   return (
     <div className={cn("flex flex-col gap-3", className)}>
@@ -285,8 +340,12 @@ function ActivityFeed({
         <Select
           value={eventType}
           onChange={(value) => {
-            setEventType(String(value))
-            setPage(0)
+            const nextEventType = String(value)
+            table
+              .getColumn("eventType")
+              ?.setFilterValue(
+                nextEventType === "all" ? undefined : nextEventType
+              )
           }}
         >
           <Label>{localization.eventType}</Label>
@@ -307,10 +366,9 @@ function ActivityFeed({
         </Select>
         <SearchField
           aria-label={localization.identifier}
-          value={identifier}
+          value={globalFilter}
           onChange={(value) => {
-            setIdentifier(value)
-            setPage(0)
+            table.setGlobalFilter(value)
           }}
         >
           <Label>{localization.identifier}</Label>
@@ -355,8 +413,8 @@ function ActivityFeed({
             </div>
           ) : data?.events.length ? (
             <ul>
-              {data.events.map((event) => (
-                <ActivityRow key={getDashEventKey(event)} event={event} />
+              {table.getRowModel().rows.map((row) => (
+                <ActivityRow key={row.id} event={row.original} />
               ))}
             </ul>
           ) : (
@@ -392,8 +450,8 @@ function ActivityFeed({
                 aria-label={localization.previousPage}
                 size="sm"
                 variant="ghost"
-                isDisabled={isFetching || page === 0}
-                onPress={() => setPage((current) => Math.max(0, current - 1))}
+                isDisabled={isFetching || !table.getCanPreviousPage()}
+                onPress={() => table.previousPage()}
               >
                 <ChevronLeft />
               </Button>
@@ -402,8 +460,8 @@ function ActivityFeed({
                 aria-label={localization.nextPage}
                 size="sm"
                 variant="ghost"
-                isDisabled={isFetching || !hasNextPage}
-                onPress={() => setPage((current) => current + 1)}
+                isDisabled={isFetching || !table.getCanNextPage()}
+                onPress={() => table.nextPage()}
               >
                 <ChevronRight />
               </Button>

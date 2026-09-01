@@ -27,6 +27,7 @@ import {
   useAdminUserSessions,
   useAdminUsers
 } from "@better-auth-ui/react/plugins/admin"
+import { useForm } from "@tanstack/react-form"
 import { keepPreviousData, useMutation } from "@tanstack/react-query"
 import {
   type ColumnFiltersState,
@@ -705,26 +706,51 @@ function CreateUserDialog({
   const auth = useAuth<AdminAuthClient>()
   const config = useAuthPlugin(adminPlugin)
   const { data: session } = useSession(auth.authClient)
-  const [password, setPassword] = useState("")
-  const [emailVerified, setEmailVerified] = useState(false)
   const [formError, setFormError] = useState<string>()
-  const [roles, setRoles] = useState([config.defaultRole])
-
-  useEffect(() => {
-    if (!config.allowMultipleRoles) setRoles((current) => current.slice(0, 1))
-  }, [config.allowMultipleRoles])
   const canSetRole = useAdminPermission(auth.authClient, {
     user: ["set-role"]
   })
   const createUser = useMutation(
     createAdminUserOptions(auth.authClient, session?.user.id)
   )
+  const additionalFieldValuesRef = useRef<
+    Record<string, AdditionalFieldValue | null>
+  >({})
+  const form = useForm({
+    defaultValues: {
+      email: "",
+      emailVerified: false,
+      name: "",
+      password: "",
+      roles: [config.defaultRole]
+    },
+    onSubmit: ({ value }) => {
+      createUser.mutate(
+        {
+          data: {
+            ...additionalFieldValuesRef.current,
+            emailVerified: value.emailVerified
+          },
+          email: value.email,
+          name: value.name,
+          password: value.password,
+          ...(canSetRole.data?.success
+            ? { role: asAdminRoles(value.roles) }
+            : {})
+        },
+        { onSuccess: close }
+      )
+    }
+  })
+
+  useEffect(() => {
+    if (!config.allowMultipleRoles)
+      form.setFieldValue("roles", (current) => current.slice(0, 1))
+  }, [config.allowMultipleRoles, form.setFieldValue])
 
   const close = () => {
-    setPassword("")
-    setEmailVerified(false)
+    form.reset()
     setFormError(undefined)
-    setRoles([config.defaultRole])
     createUser.reset()
     onOpenChange(false)
   }
@@ -742,16 +768,8 @@ function CreateUserDialog({
       return
     }
     setFormError(undefined)
-    createUser.mutate(
-      {
-        data: { ...additionalFieldValues, emailVerified },
-        email: String(data.get("email")),
-        name: String(data.get("name")),
-        password,
-        ...(canSetRole.data?.success ? { role: asAdminRoles(roles) } : {})
-      },
-      { onSuccess: close }
-    )
+    additionalFieldValuesRef.current = additionalFieldValues
+    await form.handleSubmit()
   }
 
   return (
@@ -768,43 +786,70 @@ function CreateUserDialog({
             </DialogDescription>
           </DialogHeader>
           <FieldGroup>
-            <Field>
-              <FieldLabel htmlFor="admin-create-name">
-                {config.localization.name}
-              </FieldLabel>
-              <InputGroup>
-                <InputGroupInput id="admin-create-name" name="name" required />
-              </InputGroup>
-            </Field>
-            <Field>
-              <FieldLabel htmlFor="admin-create-email">
-                {config.localization.email}
-              </FieldLabel>
-              <InputGroup>
-                <InputGroupInput
-                  autoComplete="off"
-                  id="admin-create-email"
-                  name="email"
-                  required
-                  type="email"
-                />
-              </InputGroup>
-            </Field>
-            <Field>
-              <FieldLabel htmlFor="admin-create-password">
-                {config.localization.password}
-              </FieldLabel>
-              <InputGroup>
-                <InputGroupInput
-                  autoComplete="new-password"
-                  id="admin-create-password"
-                  onChange={(event) => setPassword(event.target.value)}
-                  required
-                  type="password"
-                  value={password}
-                />
-              </InputGroup>
-            </Field>
+            <form.Field name="name">
+              {(field) => (
+                <Field>
+                  <FieldLabel htmlFor="admin-create-name">
+                    {config.localization.name}
+                  </FieldLabel>
+                  <InputGroup>
+                    <InputGroupInput
+                      id="admin-create-name"
+                      name={field.name}
+                      onChange={(event) =>
+                        field.handleChange(event.target.value)
+                      }
+                      required
+                      value={field.state.value}
+                    />
+                  </InputGroup>
+                </Field>
+              )}
+            </form.Field>
+            <form.Field name="email">
+              {(field) => (
+                <Field>
+                  <FieldLabel htmlFor="admin-create-email">
+                    {config.localization.email}
+                  </FieldLabel>
+                  <InputGroup>
+                    <InputGroupInput
+                      autoComplete="off"
+                      id="admin-create-email"
+                      name={field.name}
+                      onChange={(event) =>
+                        field.handleChange(event.target.value)
+                      }
+                      required
+                      type="email"
+                      value={field.state.value}
+                    />
+                  </InputGroup>
+                </Field>
+              )}
+            </form.Field>
+            <form.Field name="password">
+              {(field) => (
+                <Field>
+                  <FieldLabel htmlFor="admin-create-password">
+                    {config.localization.password}
+                  </FieldLabel>
+                  <InputGroup>
+                    <InputGroupInput
+                      autoComplete="new-password"
+                      id="admin-create-password"
+                      name={field.name}
+                      onChange={(event) =>
+                        field.handleChange(event.target.value)
+                      }
+                      required
+                      type="password"
+                      value={field.state.value}
+                    />
+                  </InputGroup>
+                </Field>
+              )}
+            </form.Field>
             {canSetRole.isPending ? (
               <Skeleton className="h-16 w-full" />
             ) : canSetRole.data?.success ? (
@@ -812,58 +857,68 @@ function CreateUserDialog({
                 <FieldLegend variant="label">
                   {config.localization.role}
                 </FieldLegend>
-                {config.allowMultipleRoles ? (
-                  <FieldGroup data-slot="checkbox-group">
-                    {config.roles.map((role) => (
-                      <Field key={role} orientation="horizontal">
-                        <Checkbox
-                          checked={roles.includes(role)}
-                          id={`admin-create-role-${role}`}
-                          onCheckedChange={(checked) => {
-                            const next = checked
-                              ? [...roles, role]
-                              : roles.filter((item) => item !== role)
-                            if (next.length) setRoles(next)
-                          }}
-                        />
-                        <FieldLabel htmlFor={`admin-create-role-${role}`}>
-                          {role}
-                        </FieldLabel>
-                      </Field>
-                    ))}
-                  </FieldGroup>
-                ) : (
-                  <RadioGroup
-                    onValueChange={(role) => setRoles([role])}
-                    value={roles[0] ?? ""}
-                  >
-                    {config.roles.map((role) => (
-                      <Field key={role} orientation="horizontal">
-                        <RadioGroupItem
-                          id={`admin-create-role-${role}`}
-                          value={role}
-                        />
-                        <FieldLabel htmlFor={`admin-create-role-${role}`}>
-                          {role}
-                        </FieldLabel>
-                      </Field>
-                    ))}
-                  </RadioGroup>
-                )}
+                <form.Field name="roles">
+                  {(field) =>
+                    config.allowMultipleRoles ? (
+                      <FieldGroup data-slot="checkbox-group">
+                        {config.roles.map((role) => (
+                          <Field key={role} orientation="horizontal">
+                            <Checkbox
+                              checked={field.state.value.includes(role)}
+                              id={`admin-create-role-${role}`}
+                              onCheckedChange={(checked) => {
+                                const next = checked
+                                  ? [...field.state.value, role]
+                                  : field.state.value.filter(
+                                      (item) => item !== role
+                                    )
+                                if (next.length) field.handleChange(next)
+                              }}
+                            />
+                            <FieldLabel htmlFor={`admin-create-role-${role}`}>
+                              {role}
+                            </FieldLabel>
+                          </Field>
+                        ))}
+                      </FieldGroup>
+                    ) : (
+                      <RadioGroup
+                        onValueChange={(role) => field.handleChange([role])}
+                        value={field.state.value[0] ?? ""}
+                      >
+                        {config.roles.map((role) => (
+                          <Field key={role} orientation="horizontal">
+                            <RadioGroupItem
+                              id={`admin-create-role-${role}`}
+                              value={role}
+                            />
+                            <FieldLabel htmlFor={`admin-create-role-${role}`}>
+                              {role}
+                            </FieldLabel>
+                          </Field>
+                        ))}
+                      </RadioGroup>
+                    )
+                  }
+                </form.Field>
               </FieldSet>
             ) : null}
-            <Field orientation="horizontal">
-              <Switch
-                checked={emailVerified}
-                id="admin-create-email-verified"
-                onCheckedChange={setEmailVerified}
-              />
-              <FieldContent>
-                <FieldLabel htmlFor="admin-create-email-verified">
-                  {config.localization.emailVerified}
-                </FieldLabel>
-              </FieldContent>
-            </Field>
+            <form.Field name="emailVerified">
+              {(field) => (
+                <Field orientation="horizontal">
+                  <Switch
+                    checked={field.state.value}
+                    id="admin-create-email-verified"
+                    onCheckedChange={field.handleChange}
+                  />
+                  <FieldContent>
+                    <FieldLabel htmlFor="admin-create-email-verified">
+                      {config.localization.emailVerified}
+                    </FieldLabel>
+                  </FieldContent>
+                </Field>
+              )}
+            </form.Field>
             {auth.additionalFields?.map((field) => (
               <AdditionalField
                 field={field}
@@ -980,10 +1035,6 @@ function UserInspector({
     },
     { enabled: Boolean(userId) }
   )
-  const [name, setName] = useState("")
-  const [email, setEmail] = useState("")
-  const [emailVerified, setEmailVerified] = useState(false)
-  const [roles, setRoles] = useState([config.defaultRole])
   const [banReason, setBanReason] = useState("")
   const [banDuration, setBanDuration] = useState("")
   const banDurationSeconds = getBanDurationSeconds(banDuration)
@@ -996,22 +1047,6 @@ function UserInspector({
   const updateUser = useMutation(
     updateAdminUserOptions(auth.authClient, actor?.user.id)
   )
-
-  useEffect(() => {
-    setName(user?.name ?? "")
-    setEmail(user?.email ?? "")
-    setEmailVerified(user?.emailVerified ?? false)
-    setRoles(
-      parseAdminRoles(user?.role, config.defaultRole, config.allowMultipleRoles)
-    )
-  }, [
-    config.allowMultipleRoles,
-    config.defaultRole,
-    user?.email,
-    user?.emailVerified,
-    user?.name,
-    user?.role
-  ])
 
   useEffect(() => {
     if (profileUserId.current === user?.id) return
@@ -1046,6 +1081,75 @@ function UserInspector({
   const revokeSessions = useMutation(
     revokeAdminUserSessionsOptions(auth.authClient, actor?.user.id, userId)
   )
+  const profileAdditionalFieldValuesRef = useRef<
+    Record<string, AdditionalFieldValue | null>
+  >({})
+  const profileForm = useForm({
+    defaultValues: {
+      email: "",
+      emailVerified: false,
+      name: "",
+      roles: [config.defaultRole]
+    },
+    onSubmit: async ({ value }) => {
+      if (!user) return
+
+      const mutations: Promise<unknown>[] = []
+      if (canUpdate.data?.success) {
+        mutations.push(
+          updateUser.mutateAsync({
+            userId: user.id,
+            data: {
+              ...profileAdditionalFieldValuesRef.current,
+              name: value.name.trim(),
+              ...(canSetEmail.data?.success
+                ? {
+                    email: value.email.trim(),
+                    emailVerified: value.emailVerified
+                  }
+                : {})
+            }
+          })
+        )
+      }
+      if (canSetRole.data?.success && !isSelf) {
+        mutations.push(
+          setRoleMutation.mutateAsync({
+            userId: user.id,
+            role: asAdminRoles(value.roles)
+          })
+        )
+      }
+
+      try {
+        await Promise.all(mutations)
+        onOpenChange(false)
+      } catch {
+        // Mutation errors are rendered next to the form.
+      }
+    }
+  })
+
+  useEffect(() => {
+    profileForm.reset({
+      email: user?.email ?? "",
+      emailVerified: user?.emailVerified ?? false,
+      name: user?.name ?? "",
+      roles: parseAdminRoles(
+        user?.role,
+        config.defaultRole,
+        config.allowMultipleRoles
+      )
+    })
+  }, [
+    config.allowMultipleRoles,
+    config.defaultRole,
+    profileForm.reset,
+    user?.email,
+    user?.emailVerified,
+    user?.name,
+    user?.role
+  ])
 
   const confirm = () => {
     if (!user) return
@@ -1124,7 +1228,6 @@ function UserInspector({
     event.preventDefault()
     if (!user) return
 
-    const mutations: Promise<unknown>[] = []
     if (canUpdate.data?.success) {
       const formData = new FormData(event.currentTarget)
       let additionalFieldValues: Record<string, AdditionalFieldValue | null>
@@ -1138,34 +1241,10 @@ function UserInspector({
         return
       }
       setProfileError(undefined)
-      mutations.push(
-        updateUser.mutateAsync({
-          userId: user.id,
-          data: {
-            ...additionalFieldValues,
-            name: name.trim(),
-            ...(canSetEmail.data?.success
-              ? { email: email.trim(), emailVerified }
-              : {})
-          }
-        })
-      )
-    }
-    if (canSetRole.data?.success && !isSelf) {
-      mutations.push(
-        setRoleMutation.mutateAsync({
-          userId: user.id,
-          role: asAdminRoles(roles)
-        })
-      )
+      profileAdditionalFieldValuesRef.current = additionalFieldValues
     }
 
-    try {
-      await Promise.all(mutations)
-      onOpenChange(false)
-    } catch {
-      // Mutation errors are rendered next to the form.
-    }
+    await profileForm.handleSubmit()
   }
 
   return (
@@ -1273,107 +1352,136 @@ function UserInspector({
                         {config.localization.profileAndAccess}
                       </h3>
                       <FieldGroup className="grid gap-5 md:grid-cols-2">
-                        <Field>
-                          <FieldLabel htmlFor="admin-user-name">
-                            {config.localization.name}
-                          </FieldLabel>
-                          <InputGroup>
-                            <InputGroupInput
-                              disabled={!canUpdate.data?.success}
-                              id="admin-user-name"
-                              value={name}
-                              onChange={(event) => setName(event.target.value)}
-                            />
-                          </InputGroup>
-                        </Field>
-                        <Field>
-                          <FieldLabel htmlFor="admin-user-email">
-                            {config.localization.email}
-                          </FieldLabel>
-                          <InputGroup>
-                            <InputGroupInput
-                              disabled={
-                                !canUpdate.data?.success ||
-                                !canSetEmail.data?.success
-                              }
-                              id="admin-user-email"
-                              onChange={(event) => setEmail(event.target.value)}
-                              required
-                              type="email"
-                              value={email}
-                            />
-                          </InputGroup>
-                        </Field>
-                        <Field orientation="horizontal">
-                          <Switch
-                            checked={emailVerified}
-                            disabled={
-                              !canUpdate.data?.success ||
-                              !canSetEmail.data?.success
-                            }
-                            id="admin-user-email-verified"
-                            onCheckedChange={setEmailVerified}
-                          />
-                          <FieldContent>
-                            <FieldLabel htmlFor="admin-user-email-verified">
-                              {config.localization.emailVerified}
-                            </FieldLabel>
-                          </FieldContent>
-                        </Field>
+                        <profileForm.Field name="name">
+                          {(field) => (
+                            <Field>
+                              <FieldLabel htmlFor="admin-user-name">
+                                {config.localization.name}
+                              </FieldLabel>
+                              <InputGroup>
+                                <InputGroupInput
+                                  disabled={!canUpdate.data?.success}
+                                  id="admin-user-name"
+                                  name={field.name}
+                                  value={field.state.value}
+                                  onChange={(event) =>
+                                    field.handleChange(event.target.value)
+                                  }
+                                />
+                              </InputGroup>
+                            </Field>
+                          )}
+                        </profileForm.Field>
+                        <profileForm.Field name="email">
+                          {(field) => (
+                            <Field>
+                              <FieldLabel htmlFor="admin-user-email">
+                                {config.localization.email}
+                              </FieldLabel>
+                              <InputGroup>
+                                <InputGroupInput
+                                  disabled={
+                                    !canUpdate.data?.success ||
+                                    !canSetEmail.data?.success
+                                  }
+                                  id="admin-user-email"
+                                  name={field.name}
+                                  onChange={(event) =>
+                                    field.handleChange(event.target.value)
+                                  }
+                                  required
+                                  type="email"
+                                  value={field.state.value}
+                                />
+                              </InputGroup>
+                            </Field>
+                          )}
+                        </profileForm.Field>
+                        <profileForm.Field name="emailVerified">
+                          {(field) => (
+                            <Field orientation="horizontal">
+                              <Switch
+                                checked={field.state.value}
+                                disabled={
+                                  !canUpdate.data?.success ||
+                                  !canSetEmail.data?.success
+                                }
+                                id="admin-user-email-verified"
+                                onCheckedChange={field.handleChange}
+                              />
+                              <FieldContent>
+                                <FieldLabel htmlFor="admin-user-email-verified">
+                                  {config.localization.emailVerified}
+                                </FieldLabel>
+                              </FieldContent>
+                            </Field>
+                          )}
+                        </profileForm.Field>
                         <FieldSet>
                           <FieldLegend variant="label">
                             {config.localization.role}
                           </FieldLegend>
-                          {config.allowMultipleRoles ? (
-                            <FieldGroup
-                              className="flex-row flex-wrap gap-4"
-                              data-slot="checkbox-group"
-                            >
-                              {config.roles.map((item) => (
-                                <Field key={item} orientation="horizontal">
-                                  <Checkbox
-                                    checked={roles.includes(item)}
-                                    disabled={
-                                      isSelf || !canSetRole.data?.success
-                                    }
-                                    id={`admin-user-role-${item}`}
-                                    onCheckedChange={(checked) => {
-                                      const next = checked
-                                        ? [...roles, item]
-                                        : roles.filter((role) => role !== item)
-                                      if (next.length) setRoles(next)
-                                    }}
-                                  />
-                                  <FieldLabel
-                                    htmlFor={`admin-user-role-${item}`}
-                                  >
-                                    {item}
-                                  </FieldLabel>
-                                </Field>
-                              ))}
-                            </FieldGroup>
-                          ) : (
-                            <RadioGroup
-                              className="flex-row flex-wrap gap-4"
-                              disabled={isSelf || !canSetRole.data?.success}
-                              onValueChange={(role) => setRoles([role])}
-                              value={roles[0] ?? ""}
-                            >
-                              {config.roles.map((item) => (
-                                <Field key={item} orientation="horizontal">
-                                  <RadioGroupItem
-                                    id={`admin-user-role-${item}`}
-                                    value={item}
-                                  />
-                                  <FieldLabel
-                                    htmlFor={`admin-user-role-${item}`}
-                                  >
-                                    {item}
-                                  </FieldLabel>
-                                </Field>
-                              ))}
-                            </RadioGroup>
-                          )}
+                          <profileForm.Field name="roles">
+                            {(field) =>
+                              config.allowMultipleRoles ? (
+                                <FieldGroup
+                                  className="flex-row flex-wrap gap-4"
+                                  data-slot="checkbox-group"
+                                >
+                                  {config.roles.map((item) => (
+                                    <Field key={item} orientation="horizontal">
+                                      <Checkbox
+                                        checked={field.state.value.includes(
+                                          item
+                                        )}
+                                        disabled={
+                                          isSelf || !canSetRole.data?.success
+                                        }
+                                        id={`admin-user-role-${item}`}
+                                        onCheckedChange={(checked) => {
+                                          const next = checked
+                                            ? [...field.state.value, item]
+                                            : field.state.value.filter(
+                                                (role) => role !== item
+                                              )
+                                          if (next.length)
+                                            field.handleChange(next)
+                                        }}
+                                      />
+                                      <FieldLabel
+                                        htmlFor={`admin-user-role-${item}`}
+                                      >
+                                        {item}
+                                      </FieldLabel>
+                                    </Field>
+                                  ))}
+                                </FieldGroup>
+                              ) : (
+                                <RadioGroup
+                                  className="flex-row flex-wrap gap-4"
+                                  disabled={isSelf || !canSetRole.data?.success}
+                                  onValueChange={(role) =>
+                                    field.handleChange([role])
+                                  }
+                                  value={field.state.value[0] ?? ""}
+                                >
+                                  {config.roles.map((item) => (
+                                    <Field key={item} orientation="horizontal">
+                                      <RadioGroupItem
+                                        id={`admin-user-role-${item}`}
+                                        value={item}
+                                      />
+                                      <FieldLabel
+                                        htmlFor={`admin-user-role-${item}`}
+                                      >
+                                        {item}
+                                      </FieldLabel>
+                                    </Field>
+                                  ))}
+                                </RadioGroup>
+                              )
+                            }
+                          </profileForm.Field>
                         </FieldSet>
                         {auth.additionalFields?.map((field) => {
                           const value = (
@@ -1538,21 +1646,30 @@ function UserInspector({
                     >
                       {config.localization.cancel}
                     </Button>
-                    <Button
-                      disabled={
-                        !name.trim() ||
-                        !email.trim() ||
-                        updateUser.isPending ||
-                        setRoleMutation.isPending ||
-                        canUpdate.isPending ||
-                        canSetRole.isPending ||
-                        (!canUpdate.data?.success &&
-                          (!canSetRole.data?.success || isSelf))
-                      }
-                      type="submit"
+                    <profileForm.Subscribe
+                      selector={(state) => [
+                        state.values.name,
+                        state.values.email
+                      ]}
                     >
-                      {config.localization.saveChanges}
-                    </Button>
+                      {([name, email]) => (
+                        <Button
+                          disabled={
+                            !name.trim() ||
+                            !email.trim() ||
+                            updateUser.isPending ||
+                            setRoleMutation.isPending ||
+                            canUpdate.isPending ||
+                            canSetRole.isPending ||
+                            (!canUpdate.data?.success &&
+                              (!canSetRole.data?.success || isSelf))
+                          }
+                          type="submit"
+                        >
+                          {config.localization.saveChanges}
+                        </Button>
+                      )}
+                    </profileForm.Subscribe>
                   </div>
                 </form>
               </TabsContent>

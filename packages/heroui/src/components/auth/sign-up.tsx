@@ -27,8 +27,9 @@ import {
   TextField,
   toast
 } from "@heroui/react"
+import { useForm } from "@tanstack/react-form"
 import { useIsMutating } from "@tanstack/react-query"
-import { type SyntheticEvent, useState } from "react"
+import { type FormEvent, useRef, useState } from "react"
 import { AdditionalField } from "./additional-field"
 import { FieldSeparator } from "./field-separator"
 import { PasswordStrengthMeter } from "./password-strength-meter"
@@ -80,10 +81,7 @@ export function SignUp({
 
   const { fetchOptions, resetFetchOptions } = useFetchOptions()
 
-  const [password, setPassword] = useState("")
-
   const [isCompromised, setIsCompromised] = useState(false)
-  const [confirmPassword, setConfirmPassword] = useState("")
 
   const { mutate: signUpEmail, isPending: signUpEmailPending } = useSignUpEmail(
     authClient,
@@ -93,8 +91,7 @@ export function SignUp({
         // it belongs against the field rather than in a toast.
         setIsCompromised(isPasswordCompromisedError(error))
 
-        setPassword("")
-        setConfirmPassword("")
+        form.reset()
         resetFetchOptions()
       },
       onSuccess: (_data, { email }) => {
@@ -130,21 +127,38 @@ export function SignUp({
   const Captcha = plugins.find(
     (plugin) => plugin.captchaComponent
   )?.captchaComponent
+  const additionalFieldValuesRef = useRef<Record<string, unknown>>({})
+  const form = useForm({
+    defaultValues: {
+      confirmPassword: "",
+      email: "",
+      name: "",
+      password: ""
+    },
+    onSubmit: ({ value }) => {
+      if (
+        emailAndPassword?.confirmPassword &&
+        value.password !== value.confirmPassword
+      ) {
+        toast.danger(localization.auth.passwordsDoNotMatch)
+        form.reset()
+        return
+      }
 
-  const handleSubmit = async (e: SyntheticEvent<HTMLFormElement>) => {
-    e.preventDefault()
-
-    const formData = new FormData(e.currentTarget)
-    // `emailAndPassword.name === false` hides the name field and submits "".
-    const name = (formData.get("name") as string | null) ?? ""
-    const email = formData.get("email") as string
-
-    if (emailAndPassword?.confirmPassword && password !== confirmPassword) {
-      toast.danger(localization.auth.passwordsDoNotMatch)
-      setPassword("")
-      setConfirmPassword("")
-      return
+      signUpEmail({
+        name: emailAndPassword?.name === false ? "" : value.name,
+        email: value.email,
+        password: value.password,
+        ...additionalFieldValuesRef.current,
+        fetchOptions
+      })
     }
+  })
+
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+
+    const formData = new FormData(event.currentTarget)
 
     const additionalFieldValues: Record<string, unknown> = {}
 
@@ -169,13 +183,8 @@ export function SignUp({
       }
     }
 
-    signUpEmail({
-      name,
-      email,
-      password,
-      ...additionalFieldValues,
-      fetchOptions
-    })
+    additionalFieldValuesRef.current = additionalFieldValues
+    await form.handleSubmit()
   }
 
   const showSeparator = emailAndPassword?.enabled && !!socialProviders?.length
@@ -208,48 +217,64 @@ export function SignUp({
         {emailAndPassword?.enabled && (
           <Form onSubmit={handleSubmit} className="flex flex-col gap-4">
             {emailAndPassword.name !== false && (
-              <TextField
-                name="name"
-                type="text"
-                autoComplete="name"
-                isDisabled={isPending}
-                validate={(value) => {
-                  if (!value) return localization.auth.fieldRequired
-                }}
-              >
-                <Label>{localization.auth.name}</Label>
+              <form.Field name="name">
+                {(field) => (
+                  <TextField
+                    name={field.name}
+                    type="text"
+                    autoComplete="name"
+                    isDisabled={isPending}
+                    value={field.state.value}
+                    onChange={field.handleChange}
+                    validate={(value) => {
+                      if (!value) return localization.auth.fieldRequired
+                    }}
+                  >
+                    <Label>{localization.auth.name}</Label>
 
-                <Input
-                  placeholder={localization.auth.namePlaceholder}
-                  required
-                  variant={variant === "transparent" ? "primary" : "secondary"}
-                />
+                    <Input
+                      placeholder={localization.auth.namePlaceholder}
+                      required
+                      variant={
+                        variant === "transparent" ? "primary" : "secondary"
+                      }
+                    />
 
-                <FieldError />
-              </TextField>
+                    <FieldError />
+                  </TextField>
+                )}
+              </form.Field>
             )}
 
-            <TextField
-              name="email"
-              type="email"
-              autoComplete="email"
-              isDisabled={isPending}
-              validate={(value) => {
-                if (!value) return localization.auth.fieldRequired
-                if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value))
-                  return localization.auth.invalidEmail
-              }}
-            >
-              <Label>{localization.auth.email}</Label>
+            <form.Field name="email">
+              {(field) => (
+                <TextField
+                  name={field.name}
+                  type="email"
+                  autoComplete="email"
+                  isDisabled={isPending}
+                  value={field.state.value}
+                  onChange={field.handleChange}
+                  validate={(value) => {
+                    if (!value) return localization.auth.fieldRequired
+                    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value))
+                      return localization.auth.invalidEmail
+                  }}
+                >
+                  <Label>{localization.auth.email}</Label>
 
-              <Input
-                placeholder={localization.auth.emailPlaceholder}
-                required
-                variant={variant === "transparent" ? "primary" : "secondary"}
-              />
+                  <Input
+                    placeholder={localization.auth.emailPlaceholder}
+                    required
+                    variant={
+                      variant === "transparent" ? "primary" : "secondary"
+                    }
+                  />
 
-              <FieldError />
-            </TextField>
+                  <FieldError />
+                </TextField>
+              )}
+            </form.Field>
 
             {additionalFields?.map(
               (field) =>
@@ -265,132 +290,150 @@ export function SignUp({
                 )
             )}
 
-            <TextField
-              minLength={emailAndPassword?.minPasswordLength}
-              maxLength={emailAndPassword?.maxPasswordLength}
-              name="password"
-              autoComplete="new-password"
-              isDisabled={isPending}
-              value={password}
-              onChange={(value) => {
-                setPassword(value)
-                setIsCompromised(false)
-              }}
-              isInvalid={isCompromised || undefined}
-              validate={(value) => {
-                if (!value) return localization.auth.fieldRequired
-                const min = emailAndPassword?.minPasswordLength
-                const max = emailAndPassword?.maxPasswordLength
-                if (min && value.length < min)
-                  return localization.auth.tooShort.replace(
-                    "{{min}}",
-                    String(min)
-                  )
-                if (max && value.length > max)
-                  return localization.auth.tooLong.replace(
-                    "{{max}}",
-                    String(max)
-                  )
-              }}
-            >
-              <Label>{localization.auth.password}</Label>
+            <form.Field name="password">
+              {(field) => (
+                <TextField
+                  minLength={emailAndPassword?.minPasswordLength}
+                  maxLength={emailAndPassword?.maxPasswordLength}
+                  name={field.name}
+                  autoComplete="new-password"
+                  isDisabled={isPending}
+                  value={field.state.value}
+                  onChange={(value) => {
+                    field.handleChange(value)
+                    setIsCompromised(false)
+                  }}
+                  isInvalid={isCompromised || undefined}
+                  validate={(value) => {
+                    if (!value) return localization.auth.fieldRequired
+                    const min = emailAndPassword?.minPasswordLength
+                    const max = emailAndPassword?.maxPasswordLength
+                    if (min && value.length < min)
+                      return localization.auth.tooShort.replace(
+                        "{{min}}",
+                        String(min)
+                      )
+                    if (max && value.length > max)
+                      return localization.auth.tooLong.replace(
+                        "{{max}}",
+                        String(max)
+                      )
+                  }}
+                >
+                  <Label>{localization.auth.password}</Label>
 
-              <InputGroup
-                variant={variant === "transparent" ? "primary" : "secondary"}
-              >
-                <InputGroup.Input
-                  placeholder={localization.auth.passwordPlaceholder}
-                  type={isPasswordVisible ? "text" : "password"}
-                  name="password"
-                  required
-                />
-
-                <InputGroup.Suffix className="px-0">
-                  <Button
-                    isIconOnly
-                    aria-label={
-                      isPasswordVisible
-                        ? localization.auth.hidePassword
-                        : localization.auth.showPassword
+                  <InputGroup
+                    variant={
+                      variant === "transparent" ? "primary" : "secondary"
                     }
-                    size="sm"
-                    variant="ghost"
-                    onPress={() => setIsPasswordVisible(!isPasswordVisible)}
-                    isDisabled={isPending}
                   >
-                    {isPasswordVisible ? <EyeSlash /> : <Eye />}
-                  </Button>
-                </InputGroup.Suffix>
-              </InputGroup>
+                    <InputGroup.Input
+                      placeholder={localization.auth.passwordPlaceholder}
+                      type={isPasswordVisible ? "text" : "password"}
+                      name="password"
+                      required
+                    />
 
-              {isCompromised ? (
-                <FieldError>{localization.auth.passwordCompromised}</FieldError>
-              ) : (
-                <FieldError />
+                    <InputGroup.Suffix className="px-0">
+                      <Button
+                        isIconOnly
+                        aria-label={
+                          isPasswordVisible
+                            ? localization.auth.hidePassword
+                            : localization.auth.showPassword
+                        }
+                        size="sm"
+                        variant="ghost"
+                        onPress={() => setIsPasswordVisible(!isPasswordVisible)}
+                        isDisabled={isPending}
+                      >
+                        {isPasswordVisible ? <EyeSlash /> : <Eye />}
+                      </Button>
+                    </InputGroup.Suffix>
+                  </InputGroup>
+
+                  {isCompromised ? (
+                    <FieldError>
+                      {localization.auth.passwordCompromised}
+                    </FieldError>
+                  ) : (
+                    <FieldError />
+                  )}
+
+                  <PasswordStrengthMeter password={field.state.value} />
+                </TextField>
               )}
-
-              <PasswordStrengthMeter password={password} />
-            </TextField>
+            </form.Field>
 
             {emailAndPassword?.confirmPassword && (
-              <TextField
-                minLength={emailAndPassword?.minPasswordLength}
-                maxLength={emailAndPassword?.maxPasswordLength}
-                name="confirmPassword"
-                autoComplete="new-password"
-                isDisabled={isPending}
-                value={confirmPassword}
-                onChange={setConfirmPassword}
-                validate={(value) => {
-                  if (!value) return localization.auth.fieldRequired
-                  const min = emailAndPassword?.minPasswordLength
-                  const max = emailAndPassword?.maxPasswordLength
-                  if (min && value.length < min)
-                    return localization.auth.tooShort.replace(
-                      "{{min}}",
-                      String(min)
-                    )
-                  if (max && value.length > max)
-                    return localization.auth.tooLong.replace(
-                      "{{max}}",
-                      String(max)
-                    )
-                }}
-              >
-                <Label>{localization.auth.confirmPassword}</Label>
+              <form.Field name="confirmPassword">
+                {(field) => (
+                  <TextField
+                    minLength={emailAndPassword?.minPasswordLength}
+                    maxLength={emailAndPassword?.maxPasswordLength}
+                    name={field.name}
+                    autoComplete="new-password"
+                    isDisabled={isPending}
+                    value={field.state.value}
+                    onChange={field.handleChange}
+                    validate={(value) => {
+                      if (!value) return localization.auth.fieldRequired
+                      const min = emailAndPassword?.minPasswordLength
+                      const max = emailAndPassword?.maxPasswordLength
+                      if (min && value.length < min)
+                        return localization.auth.tooShort.replace(
+                          "{{min}}",
+                          String(min)
+                        )
+                      if (max && value.length > max)
+                        return localization.auth.tooLong.replace(
+                          "{{max}}",
+                          String(max)
+                        )
+                    }}
+                  >
+                    <Label>{localization.auth.confirmPassword}</Label>
 
-                <InputGroup
-                  variant={variant === "transparent" ? "primary" : "secondary"}
-                >
-                  <InputGroup.Input
-                    name="confirmPassword"
-                    placeholder={localization.auth.confirmPasswordPlaceholder}
-                    type={isConfirmPasswordVisible ? "text" : "password"}
-                    required
-                  />
-
-                  <InputGroup.Suffix className="px-0">
-                    <Button
-                      isIconOnly
-                      aria-label={
-                        isConfirmPasswordVisible
-                          ? localization.auth.hidePassword
-                          : localization.auth.showPassword
+                    <InputGroup
+                      variant={
+                        variant === "transparent" ? "primary" : "secondary"
                       }
-                      size="sm"
-                      variant="ghost"
-                      onPress={() =>
-                        setIsConfirmPasswordVisible(!isConfirmPasswordVisible)
-                      }
-                      isDisabled={isPending}
                     >
-                      {isConfirmPasswordVisible ? <EyeSlash /> : <Eye />}
-                    </Button>
-                  </InputGroup.Suffix>
-                </InputGroup>
+                      <InputGroup.Input
+                        name="confirmPassword"
+                        placeholder={
+                          localization.auth.confirmPasswordPlaceholder
+                        }
+                        type={isConfirmPasswordVisible ? "text" : "password"}
+                        required
+                      />
 
-                <FieldError />
-              </TextField>
+                      <InputGroup.Suffix className="px-0">
+                        <Button
+                          isIconOnly
+                          aria-label={
+                            isConfirmPasswordVisible
+                              ? localization.auth.hidePassword
+                              : localization.auth.showPassword
+                          }
+                          size="sm"
+                          variant="ghost"
+                          onPress={() =>
+                            setIsConfirmPasswordVisible(
+                              !isConfirmPasswordVisible
+                            )
+                          }
+                          isDisabled={isPending}
+                        >
+                          {isConfirmPasswordVisible ? <EyeSlash /> : <Eye />}
+                        </Button>
+                      </InputGroup.Suffix>
+                    </InputGroup>
+
+                    <FieldError />
+                  </TextField>
+                )}
+              </form.Field>
             )}
 
             {additionalFields?.map(

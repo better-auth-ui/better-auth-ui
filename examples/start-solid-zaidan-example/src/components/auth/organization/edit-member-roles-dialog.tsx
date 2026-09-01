@@ -6,8 +6,9 @@ import {
 } from "@better-auth-ui/core/plugins/organization"
 import { useAuth, useAuthPlugin } from "@better-auth-ui/solid"
 import { useUpdateMemberRole } from "@better-auth-ui/solid/plugins/organization"
+import { createForm } from "@tanstack/solid-form"
 import { ShieldCheck } from "lucide-solid"
-import { createEffect, createSignal, For, Show } from "solid-js"
+import { createEffect, For, Show } from "solid-js"
 import { toast } from "solid-sonner"
 
 import { Button } from "@/components/ui/button"
@@ -68,36 +69,41 @@ const selectedMemberRoles = (
 export function EditMemberRolesDialog(props: EditMemberRolesDialogProps) {
   const auth = useAuth<OrganizationAuthClient>()
   const config = useAuthPlugin(organizationPlugin)
-  const [selectedRoles, setSelectedRoles] = createSignal(
-    selectedMemberRoles(
-      props.member.role,
-      config.allowMultipleRoles,
-      props.protectedRole
-    )
-  )
   const updateMemberRole = useUpdateMemberRole(auth.authClient, () => ({
     onSuccess: () => {
       toast.success(props.localization.memberRoleUpdated)
       props.onOpenChange(false)
     }
   }))
+  const form = createForm(() => ({
+    defaultValues: {
+      roles: selectedMemberRoles(
+        props.member.role,
+        config.allowMultipleRoles,
+        props.protectedRole
+      )
+    },
+    onSubmit: ({ value }) => {
+      if (value.roles.length === 0) return
+
+      updateMemberRole.mutate({
+        memberId: props.member.id,
+        organizationId: props.member.organizationId,
+        role: value.roles as UpdateMemberRoleParams["role"]
+      })
+    }
+  }))
 
   createEffect(() => {
     if (props.open)
-      setSelectedRoles(
-        selectedMemberRoles(
+      form.reset({
+        roles: selectedMemberRoles(
           props.member.role,
           config.allowMultipleRoles,
           props.protectedRole
         )
-      )
+      })
   })
-
-  const protectedRoleSelected = () =>
-    !config.allowMultipleRoles &&
-    props.protectedRoleRemovalDisabled &&
-    props.protectedRole !== undefined &&
-    selectedRoles().includes(props.protectedRole)
 
   return (
     <Dialog open={props.open} onOpenChange={props.onOpenChange}>
@@ -106,13 +112,7 @@ export function EditMemberRolesDialog(props: EditMemberRolesDialogProps) {
           class="flex flex-col gap-6"
           onSubmit={(event) => {
             event.preventDefault()
-            if (selectedRoles().length === 0) return
-
-            updateMemberRole.mutate({
-              memberId: props.member.id,
-              organizationId: props.member.organizationId,
-              role: selectedRoles() as UpdateMemberRoleParams["role"]
-            })
+            void form.handleSubmit()
           }}
         >
           <DialogHeader>
@@ -125,110 +125,129 @@ export function EditMemberRolesDialog(props: EditMemberRolesDialogProps) {
             </DialogDescription>
           </DialogHeader>
 
-          <Show
-            when={config.allowMultipleRoles}
-            fallback={
-              <RadioGroup
-                disabled={updateMemberRole.isPending}
-                onChange={(role) => setSelectedRoles([role])}
-                value={selectedRoles()[0] ?? ""}
-              >
-                <div class="flex flex-col gap-2">
-                  <For each={props.roles}>
-                    {([role, label]) => {
-                      const selected = () => selectedRoles().includes(role)
-                      const disabled = () =>
-                        (protectedRoleSelected() &&
-                          role !== props.protectedRole) ||
-                        (role === props.protectedRole &&
-                          selected() &&
-                          props.protectedRoleRemovalDisabled)
-                      const id = `member-${props.member.id}-role-${role}`
+          <form.Field name="roles">
+            {(field) => {
+              const selectedRoles = () => field().state.value
+              const protectedRoleSelected = () =>
+                !config.allowMultipleRoles &&
+                props.protectedRoleRemovalDisabled &&
+                props.protectedRole !== undefined &&
+                selectedRoles().includes(props.protectedRole)
 
-                      return (
-                        <FieldLabel for={id}>
-                          <Field
-                            data-disabled={disabled() || undefined}
-                            orientation="horizontal"
-                          >
-                            <FieldContent>
-                              <FieldTitle>{label}</FieldTitle>
-                            </FieldContent>
-                            <RadioGroupItem
-                              disabled={disabled()}
-                              id={id}
-                              value={role}
-                            />
-                          </Field>
-                        </FieldLabel>
-                      )
-                    }}
-                  </For>
-                </div>
-              </RadioGroup>
-            }
-          >
-            <div class="flex flex-col gap-2">
-              <For each={props.roles}>
-                {([role, label]) => {
-                  const checked = () => selectedRoles().includes(role)
-                  const disabled = () =>
-                    updateMemberRole.isPending ||
-                    (checked() && selectedRoles().length === 1) ||
-                    (role === props.protectedRole &&
-                      checked() &&
-                      props.protectedRoleRemovalDisabled)
-                  const id = `member-${props.member.id}-role-${role}`
-
-                  return (
-                    <FieldLabel for={id}>
-                      <Field
-                        data-disabled={disabled() || undefined}
-                        orientation="horizontal"
+              return (
+                <>
+                  <Show
+                    when={config.allowMultipleRoles}
+                    fallback={
+                      <RadioGroup
+                        disabled={updateMemberRole.isPending}
+                        onChange={(role) => field().handleChange([role])}
+                        value={selectedRoles()[0] ?? ""}
                       >
-                        <FieldContent>
-                          <FieldTitle>{label}</FieldTitle>
-                        </FieldContent>
-                        <Checkbox
-                          checked={checked()}
-                          disabled={disabled()}
-                          id={id}
-                          onChange={(selected) =>
-                            setSelectedRoles((current) =>
-                              selected
-                                ? current.includes(role)
-                                  ? current
-                                  : [...current, role]
-                                : current.filter((entry) => entry !== role)
-                            )
-                          }
-                        />
-                      </Field>
-                    </FieldLabel>
-                  )
-                }}
-              </For>
-            </div>
-          </Show>
+                        <div class="flex flex-col gap-2">
+                          <For each={props.roles}>
+                            {([role, label]) => {
+                              const selected = () =>
+                                selectedRoles().includes(role)
+                              const disabled = () =>
+                                (protectedRoleSelected() &&
+                                  role !== props.protectedRole) ||
+                                (role === props.protectedRole &&
+                                  selected() &&
+                                  props.protectedRoleRemovalDisabled)
+                              const id = `member-${props.member.id}-role-${role}`
 
-          <DialogFooter>
-            <Button
-              disabled={updateMemberRole.isPending}
-              onClick={() => props.onOpenChange(false)}
-              type="button"
-              variant="outline"
-            >
-              {auth.localization.settings.cancel}
-            </Button>
-            <Button
-              disabled={
-                updateMemberRole.isPending || selectedRoles().length === 0
-              }
-              type="submit"
-            >
-              {auth.localization.settings.saveChanges}
-            </Button>
-          </DialogFooter>
+                              return (
+                                <FieldLabel for={id}>
+                                  <Field
+                                    data-disabled={disabled() || undefined}
+                                    orientation="horizontal"
+                                  >
+                                    <FieldContent>
+                                      <FieldTitle>{label}</FieldTitle>
+                                    </FieldContent>
+                                    <RadioGroupItem
+                                      disabled={disabled()}
+                                      id={id}
+                                      value={role}
+                                    />
+                                  </Field>
+                                </FieldLabel>
+                              )
+                            }}
+                          </For>
+                        </div>
+                      </RadioGroup>
+                    }
+                  >
+                    <div class="flex flex-col gap-2">
+                      <For each={props.roles}>
+                        {([role, label]) => {
+                          const checked = () => selectedRoles().includes(role)
+                          const disabled = () =>
+                            updateMemberRole.isPending ||
+                            (checked() && selectedRoles().length === 1) ||
+                            (role === props.protectedRole &&
+                              checked() &&
+                              props.protectedRoleRemovalDisabled)
+                          const id = `member-${props.member.id}-role-${role}`
+
+                          return (
+                            <FieldLabel for={id}>
+                              <Field
+                                data-disabled={disabled() || undefined}
+                                orientation="horizontal"
+                              >
+                                <FieldContent>
+                                  <FieldTitle>{label}</FieldTitle>
+                                </FieldContent>
+                                <Checkbox
+                                  checked={checked()}
+                                  disabled={disabled()}
+                                  id={id}
+                                  onChange={(selected) =>
+                                    field().handleChange(
+                                      selected
+                                        ? selectedRoles().includes(role)
+                                          ? selectedRoles()
+                                          : [...selectedRoles(), role]
+                                        : selectedRoles().filter(
+                                            (entry) => entry !== role
+                                          )
+                                    )
+                                  }
+                                />
+                              </Field>
+                            </FieldLabel>
+                          )
+                        }}
+                      </For>
+                    </div>
+                  </Show>
+
+                  <DialogFooter>
+                    <Button
+                      disabled={updateMemberRole.isPending}
+                      onClick={() => props.onOpenChange(false)}
+                      type="button"
+                      variant="outline"
+                    >
+                      {auth.localization.settings.cancel}
+                    </Button>
+                    <Button
+                      disabled={
+                        updateMemberRole.isPending ||
+                        selectedRoles().length === 0
+                      }
+                      type="submit"
+                    >
+                      {auth.localization.settings.saveChanges}
+                    </Button>
+                  </DialogFooter>
+                </>
+              )
+            }}
+          </form.Field>
         </form>
       </DialogContent>
     </Dialog>
