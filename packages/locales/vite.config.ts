@@ -8,7 +8,8 @@ export default defineConfig({
       entry: {
         index: "src/index.ts",
         "en-US": "src/en-US.ts",
-        "de-DE": "src/de-DE.ts"
+        "de-DE": "src/de-DE.ts",
+        "es-ES": "src/es-ES.ts"
       },
       formats: ["es"],
       fileName: "[name]"
