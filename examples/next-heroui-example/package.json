@@ -34,6 +34,7 @@
     "@heroui/react": "^3.2.1",
     "@heroui/styles": "^3.2.1",
     "@neondatabase/serverless": "^1.0.2",
+    "@tanstack/react-form": "^1.33.5",
     "@tanstack/react-query": "^5.101.2",
     "@tanstack/react-table": "^9.2.4",
     "better-auth": "1.7.2",
