@@ -29,6 +29,11 @@
       "src": "./src/de-DE.ts",
       "types": "./dist/de-DE.d.ts",
       "import": "./dist/de-DE.js"
+    },
+    "./es-ES": {
+      "src": "./src/es-ES.ts",
+      "types": "./dist/es-ES.d.ts",
+      "import": "./dist/es-ES.js"
     }
   },
   "peerDependencies": {
