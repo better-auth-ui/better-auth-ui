@@ -109,6 +109,43 @@ export const organizationLocalization = {
   pending: "Pending",
   /** @remarks `"Next page"` */
   nextPage: "Next page",
+  /** @remarks `"First page"` */
+  firstPage: "First page",
+  /** @remarks `"Last page"` */
+  lastPage: "Last page",
+  /** @remarks `"Page {{page}} of {{pages}}"` */
+  pageOf: "Page {{page}} of {{pages}}",
+  /** @remarks `"Rows per page"` */
+  rowsPerPage: "Rows per page",
+  /** @remarks `"Columns"` */
+  columns: "Columns",
+  /** @remarks `"{{count}} selected"` */
+  selectedCount: "{{count}} selected",
+  /** @remarks `"Select row"` */
+  selectRow: "Select row",
+  /** @remarks `"Select all rows on this page"` */
+  selectAllRows: "Select all rows on this page",
+  /** @remarks `"Cancel selected invitations"` */
+  cancelSelectedInvitations: "Cancel selected invitations",
+  /** @remarks `"Cancel the selected pending invitations?"` */
+  cancelSelectedInvitationsDescription:
+    "Cancel the selected pending invitations?",
+  /** @remarks `"{{count}} invitations canceled"` */
+  invitationsCanceled: "{{count}} invitations canceled",
+  /** @remarks `"Remove selected members"` */
+  removeSelectedMembers: "Remove selected members",
+  /** @remarks `"Remove the selected members from this organization? They will lose access immediately."` */
+  removeSelectedMembersDescription:
+    "Remove the selected members from this organization? They will lose access immediately.",
+  /** @remarks `"{{count}} members removed"` */
+  membersRemoved: "{{count}} members removed",
+  /** @remarks `"Delete selected roles"` */
+  deleteSelectedRoles: "Delete selected roles",
+  /** @remarks `"Delete the selected roles? Roles assigned to members cannot be deleted."` */
+  deleteSelectedRolesDescription:
+    "Delete the selected roles? Roles assigned to members cannot be deleted.",
+  /** @remarks `"{{count}} roles deleted"` */
+  rolesDeleted: "{{count}} roles deleted",
   /** @remarks `"Personal account"` */
   personalAccount: "Personal account",
   /** @remarks `"Previous page"` */

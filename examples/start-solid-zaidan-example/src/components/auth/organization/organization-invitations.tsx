@@ -4,9 +4,14 @@ import {
   type OrganizationLocalization
 } from "@better-auth-ui/core/plugins/organization"
 import { useAuth } from "@better-auth-ui/solid"
-import { useListOrganizationInvitations } from "@better-auth-ui/solid/plugins/organization"
-import { ChevronUp, Filter, Search, X } from "lucide-solid"
-import { createMemo, createSignal, For, type JSX, Show } from "solid-js"
+import {
+  useCancelInvitation,
+  useHasPermission,
+  useListOrganizationInvitations
+} from "@better-auth-ui/solid/plugins/organization"
+import { Filter, Search, X } from "lucide-solid"
+import { createMemo, For, Show } from "solid-js"
+import { toast } from "solid-sonner"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
@@ -35,20 +40,23 @@ import { cn } from "@/lib/utils"
 import { OrganizationInvitationRow } from "./organization-invitation-row"
 import { OrganizationInvitationRowSkeleton } from "./organization-invitation-row-skeleton"
 import { OrganizationInvitationsEmpty } from "./organization-invitations-empty"
+import { OrganizationSortableTableHead } from "./organization-sortable-table-head"
+import {
+  createOrganizationColumnHelper,
+  createOrganizationTable,
+  ORGANIZATION_TABLE_PAGE_SIZE
+} from "./organization-table"
+import { OrganizationTableBulkAction } from "./organization-table-bulk-action"
+import { OrganizationTablePagination } from "./organization-table-pagination"
+import { OrganizationTableSelectAll } from "./organization-table-selection"
+import { createOrganizationTableState } from "./organization-table-state"
+import { OrganizationTableViewOptions } from "./organization-table-view-options"
 
 export type OrganizationInvitationsProps = {
   class?: string
 }
 
 type RoleMap = Record<string, string>
-type InvitationSort = "none" | "email" | "createdAt" | "role" | "status"
-type InvitationSortColumn = Exclude<InvitationSort, "none">
-type SortDirection = "ascending" | "descending"
-
-type SortDescriptor = {
-  column: InvitationSortColumn
-  direction: SortDirection
-}
 
 const fallbackLocalization = {
   search: "Search...",
@@ -62,7 +70,22 @@ const fallbackLocalization = {
   canceled: "Canceled",
   member: "Member",
   admin: "Admin",
-  owner: "Owner"
+  owner: "Owner",
+  previousPage: "Previous page",
+  nextPage: "Next page",
+  paginationRange: "{{from}}–{{to}} of {{total}}",
+  firstPage: "First page",
+  lastPage: "Last page",
+  pageOf: "Page {{page}} of {{pages}}",
+  rowsPerPage: "Rows per page",
+  columns: "Columns",
+  selectedCount: "{{count}} selected",
+  selectRow: "Select row",
+  selectAllRows: "Select all rows",
+  cancelSelectedInvitations: "Cancel selected invitations",
+  cancelSelectedInvitationsDescription:
+    "Cancel every selected pending invitation?",
+  invitationsCanceled: "Canceled {{count}} invitations"
 } satisfies Pick<
   OrganizationLocalization,
   | "search"
@@ -77,6 +100,20 @@ const fallbackLocalization = {
   | "member"
   | "admin"
   | "owner"
+  | "previousPage"
+  | "nextPage"
+  | "paginationRange"
+  | "firstPage"
+  | "lastPage"
+  | "pageOf"
+  | "rowsPerPage"
+  | "columns"
+  | "selectedCount"
+  | "selectRow"
+  | "selectAllRows"
+  | "cancelSelectedInvitations"
+  | "cancelSelectedInvitationsDescription"
+  | "invitationsCanceled"
 >
 
 const invitationStatuses = [
@@ -101,51 +138,46 @@ type OrganizationInvitation = {
   status?: string | null
 }
 
+const invitationColumnHelper =
+  createOrganizationColumnHelper<OrganizationInvitation>()
+const invitationColumns = invitationColumnHelper.columns([
+  invitationColumnHelper.accessor((invitation) => invitation.email ?? "", {
+    id: "email",
+    enableHiding: false,
+    filterFn: "includesString"
+  }),
+  invitationColumnHelper.accessor(
+    (invitation) =>
+      invitation.createdAt
+        ? new Date(invitation.createdAt).getTime()
+        : Number.POSITIVE_INFINITY,
+    { id: "createdAt", enableGlobalFilter: false }
+  ),
+  invitationColumnHelper.accessor((invitation) => invitation.role ?? "", {
+    id: "role",
+    enableGlobalFilter: false,
+    filterFn: (row, columnId, value) =>
+      hasMemberRole(row.getValue<string>(columnId), String(value))
+  }),
+  invitationColumnHelper.accessor((invitation) => invitation.status ?? "", {
+    id: "status",
+    enableGlobalFilter: false,
+    filterFn: (row, columnId, value) => row.getValue(columnId) === String(value)
+  })
+])
+
 function formatStatus(status?: string | null) {
   if (!status) return "Pending"
 
   return status.charAt(0).toUpperCase() + status.slice(1)
 }
 
-function SortableTableHead(props: {
-  children: JSX.Element
-  onClick: () => void
-  sortDirection?: SortDirection
-}) {
-  return (
-    <TableHead aria-sort={props.sortDirection ?? "none"}>
-      <Button
-        class="h-auto w-full justify-start p-0 font-medium hover:bg-transparent"
-        onClick={props.onClick}
-        size="sm"
-        type="button"
-        variant="ghost"
-      >
-        {props.children}
-        <Show when={props.sortDirection}>
-          <ChevronUp
-            class={cn(
-              "size-3 transition-transform duration-100 ease-out",
-              props.sortDirection === "descending" && "rotate-180"
-            )}
-          />
-        </Show>
-      </Button>
-    </TableHead>
-  )
-}
-
 export function OrganizationInvitations(props: OrganizationInvitationsProps) {
   const auth = useAuth<OrganizationAuthClient>()
-  const [invitationSearch, setInvitationSearch] = createSignal("")
-  const [invitationRoleFilter, setInvitationRoleFilter] = createSignal("all")
-  const [invitationStatusFilter, setInvitationStatusFilter] =
-    createSignal("all")
-  const [invitationSort, setInvitationSort] =
-    createSignal<InvitationSort>("none")
-  const [sortDescriptor, setSortDescriptor] = createSignal<
-    SortDescriptor | undefined
-  >()
+  const tableState = createOrganizationTableState(
+    "organizationInvitations",
+    ORGANIZATION_TABLE_PAGE_SIZE
+  )
   const invitations = useListOrganizationInvitations(auth.authClient)
   const invitationRows = () =>
     (invitations.data ?? []) as OrganizationInvitation[]
@@ -163,6 +195,20 @@ export function OrganizationInvitations(props: OrganizationInvitationsProps) {
             | "accepted"
             | "rejected"
             | "canceled"
+            | "previousPage"
+            | "nextPage"
+            | "paginationRange"
+            | "firstPage"
+            | "lastPage"
+            | "pageOf"
+            | "rowsPerPage"
+            | "columns"
+            | "selectedCount"
+            | "selectRow"
+            | "selectAllRows"
+            | "cancelSelectedInvitations"
+            | "cancelSelectedInvitationsDescription"
+            | "invitationsCanceled"
           >
           roles?: RoleMap
         }
@@ -172,6 +218,10 @@ export function OrganizationInvitations(props: OrganizationInvitationsProps) {
   const roles = createMemo(
     () => organizationPluginConfig()?.roles ?? fallbackRoles
   )
+  const invitationRoleFilter = () =>
+    String(table.getColumn("role")?.getFilterValue() ?? "all")
+  const invitationStatusFilter = () =>
+    String(table.getColumn("status")?.getFilterValue() ?? "all")
   const selectedRoleLabel = () =>
     roles()[invitationRoleFilter()] ?? invitationRoleFilter()
   const selectedStatusLabel = () =>
@@ -180,85 +230,63 @@ export function OrganizationInvitations(props: OrganizationInvitationsProps) {
       : invitationStatusLabel(
           invitationStatusFilter() as (typeof invitationStatuses)[number]
         )
-  const normalizedInvitationSearch = () =>
-    invitationSearch().trim().toLowerCase()
-  const filteredInvitationRows = () =>
-    invitationRows().filter((invitation) => {
-      const roleMatches =
-        invitationRoleFilter() === "all" ||
-        hasMemberRole(invitation.role, invitationRoleFilter())
-      const statusMatches =
-        invitationStatusFilter() === "all" ||
-        invitation.status === invitationStatusFilter()
-      const search = normalizedInvitationSearch()
-
-      if (!search) return roleMatches && statusMatches
-
-      return (
-        roleMatches &&
-        statusMatches &&
-        (invitation.email?.toLowerCase().includes(search) ?? false)
-      )
-    })
   const invitationStatusLabel = (status: (typeof invitationStatuses)[number]) =>
     localization()[status] ?? formatStatus(status)
-  const invitationDateTime = (invitation: OrganizationInvitation) => {
-    if (!invitation.createdAt) return Number.POSITIVE_INFINITY
-
-    const date =
-      invitation.createdAt instanceof Date
-        ? invitation.createdAt
-        : new Date(invitation.createdAt)
-    const time = date.getTime()
-
-    return Number.isNaN(time) ? Number.POSITIVE_INFINITY : time
-  }
-  const sortInvitations = (
-    first: OrganizationInvitation,
-    second: OrganizationInvitation
-  ) => {
-    let comparison = 0
-
-    if (invitationSort() === "email") {
-      comparison = (first.email ?? "").localeCompare(second.email ?? "")
-    }
-
-    if (invitationSort() === "createdAt") {
-      comparison = invitationDateTime(first) - invitationDateTime(second)
-    }
-
-    if (invitationSort() === "role") {
-      const firstRole = roles()[first.role ?? ""] ?? first.role ?? ""
-      const secondRole = roles()[second.role ?? ""] ?? second.role ?? ""
-
-      comparison = firstRole.localeCompare(secondRole)
-    }
-
-    if (invitationSort() === "status") {
-      comparison = formatStatus(first.status).localeCompare(
-        formatStatus(second.status)
-      )
-    }
-
-    return sortDescriptor()?.direction === "descending"
-      ? comparison * -1
-      : comparison
-  }
-  const sortedInvitationRows = () =>
-    [...filteredInvitationRows()].sort(sortInvitations)
-  const toggleSort = (column: InvitationSortColumn) => {
-    setInvitationSort(column)
-    setSortDescriptor((current) => {
-      if (current?.column !== column) {
-        return { column, direction: "ascending" }
-      }
-
+  const table = createOrganizationTable({
+    columns: invitationColumns,
+    get data() {
+      return invitationRows()
+    },
+    enableRowSelection: (row) =>
+      canCancel.data?.success === true && row.original.status === "pending",
+    globalFilterFn: "includesString",
+    get state() {
       return {
-        column,
-        direction:
-          current.direction === "ascending" ? "descending" : "ascending"
+        columnFilters: tableState.columnFilters(),
+        columnVisibility: tableState.columnVisibility(),
+        globalFilter: tableState.globalFilter(),
+        pagination: tableState.pagination(),
+        rowSelection: tableState.rowSelection(),
+        sorting: tableState.sorting()
       }
-    })
+    },
+    getRowId: (invitation) => invitation.id,
+    onColumnFiltersChange: tableState.setColumnFilters,
+    onColumnVisibilityChange: tableState.setColumnVisibility,
+    onGlobalFilterChange: tableState.setGlobalFilter,
+    onPaginationChange: tableState.setPagination,
+    onRowSelectionChange: tableState.setRowSelection,
+    onSortingChange: tableState.setSorting
+  })
+  const canCancel = useHasPermission(auth.authClient, () => ({
+    permissions: { invitation: ["cancel"] }
+  }))
+  const cancelInvitations = useCancelInvitation(auth.authClient)
+  const selectedInvitations = () => table.getSelectedRowModel().rows
+  const statusCounts = () => table.getColumn("status")?.getFacetedUniqueValues()
+  const roleFacetRows = () =>
+    table.getColumn("role")?.getFacetedRowModel().flatRows
+  const cancelSelectedInvitations = async () => {
+    const results = await Promise.allSettled(
+      selectedInvitations().map((row) =>
+        cancelInvitations.mutateAsync({ invitationId: row.original.id })
+      )
+    )
+    const count = results.filter(
+      (result) => result.status === "fulfilled"
+    ).length
+    const failed = results.find((result) => result.status === "rejected")
+    if (count)
+      toast.success(
+        localization().invitationsCanceled.replace("{{count}}", String(count))
+      )
+    if (failed?.status === "rejected")
+      toast.error(
+        failed.reason instanceof Error
+          ? failed.reason.message
+          : String(failed.reason)
+      )
+    table.resetRowSelection(true)
   }
 
   return (
@@ -301,11 +329,11 @@ export function OrganizationInvitations(props: OrganizationInvitationsProps) {
               <InputGroupInput
                 aria-label={localization().search}
                 onInput={(event) =>
-                  setInvitationSearch(event.currentTarget.value)
+                  table.setGlobalFilter(event.currentTarget.value)
                 }
                 placeholder={localization().search}
                 type="search"
-                value={invitationSearch()}
+                value={tableState.globalFilter()}
               />
             </InputGroup>
             <DropdownMenu>
@@ -319,7 +347,11 @@ export function OrganizationInvitations(props: OrganizationInvitationsProps) {
               </DropdownMenuTrigger>
               <DropdownMenuContent>
                 <DropdownMenuRadioGroup
-                  onChange={setInvitationRoleFilter}
+                  onChange={(value) =>
+                    table
+                      .getColumn("role")
+                      ?.setFilterValue(value === "all" ? undefined : value)
+                  }
                   value={invitationRoleFilter()}
                 >
                   <DropdownMenuRadioItem value="all">
@@ -328,7 +360,11 @@ export function OrganizationInvitations(props: OrganizationInvitationsProps) {
                   <For each={Object.entries(roles())}>
                     {([role, label]) => (
                       <DropdownMenuRadioItem value={role}>
-                        {label}
+                        {label} (
+                        {roleFacetRows()?.filter((row) =>
+                          hasMemberRole(row.original.role, role)
+                        ).length ?? 0}
+                        )
                       </DropdownMenuRadioItem>
                     )}
                   </For>
@@ -346,7 +382,11 @@ export function OrganizationInvitations(props: OrganizationInvitationsProps) {
               </DropdownMenuTrigger>
               <DropdownMenuContent>
                 <DropdownMenuRadioGroup
-                  onChange={setInvitationStatusFilter}
+                  onChange={(value) =>
+                    table
+                      .getColumn("status")
+                      ?.setFilterValue(value === "all" ? undefined : value)
+                  }
                   value={invitationStatusFilter()}
                 >
                   <DropdownMenuRadioItem value="all">
@@ -355,13 +395,43 @@ export function OrganizationInvitations(props: OrganizationInvitationsProps) {
                   <For each={invitationStatuses}>
                     {(status) => (
                       <DropdownMenuRadioItem value={status}>
-                        {invitationStatusLabel(status)}
+                        {invitationStatusLabel(status)} (
+                        {statusCounts()?.get(status) ?? 0})
                       </DropdownMenuRadioItem>
                     )}
                   </For>
                 </DropdownMenuRadioGroup>
               </DropdownMenuContent>
             </DropdownMenu>
+            <div class="ms-auto">
+              <OrganizationTableViewOptions
+                columns={[
+                  {
+                    id: "createdAt",
+                    label: "Invited",
+                    visible:
+                      table.getColumn("createdAt")?.getIsVisible() ?? true,
+                    onVisibleChange: (visible) =>
+                      table.getColumn("createdAt")?.toggleVisibility(visible)
+                  },
+                  {
+                    id: "role",
+                    label: localization().role,
+                    visible: table.getColumn("role")?.getIsVisible() ?? true,
+                    onVisibleChange: (visible) =>
+                      table.getColumn("role")?.toggleVisibility(visible)
+                  },
+                  {
+                    id: "status",
+                    label: localization().status,
+                    visible: table.getColumn("status")?.getIsVisible() ?? true,
+                    onVisibleChange: (visible) =>
+                      table.getColumn("status")?.toggleVisibility(visible)
+                  }
+                ]}
+                localization={localization()}
+              />
+            </div>
           </div>
           <Show
             when={
@@ -376,7 +446,9 @@ export function OrganizationInvitations(props: OrganizationInvitationsProps) {
                   <Button
                     aria-label={`${localization().clear} invitation role filter`}
                     class="size-4 rounded-sm"
-                    onClick={() => setInvitationRoleFilter("all")}
+                    onClick={() =>
+                      table.getColumn("role")?.setFilterValue(undefined)
+                    }
                     size="icon-xs"
                     type="button"
                     variant="ghost"
@@ -391,7 +463,9 @@ export function OrganizationInvitations(props: OrganizationInvitationsProps) {
                   <Button
                     aria-label={`${localization().clear} invitation status filter`}
                     class="size-4 rounded-sm"
-                    onClick={() => setInvitationStatusFilter("all")}
+                    onClick={() =>
+                      table.getColumn("status")?.setFilterValue(undefined)
+                    }
                     size="icon-xs"
                     type="button"
                     variant="ghost"
@@ -402,56 +476,64 @@ export function OrganizationInvitations(props: OrganizationInvitationsProps) {
               </Show>
             </div>
           </Show>
+          <OrganizationTableBulkAction
+            cancelLabel={auth.localization.settings.cancel}
+            confirmLabel={localization().cancelSelectedInvitations}
+            description={localization().cancelSelectedInvitationsDescription}
+            localization={localization()}
+            onConfirm={cancelSelectedInvitations}
+            pending={cancelInvitations.isPending}
+            selectedCount={selectedInvitations().length}
+            title={localization().cancelSelectedInvitations}
+          />
           <Card class="z-card-padding-none">
             <Table aria-label="Invitations">
               <TableHeader>
                 <TableRow>
-                  <SortableTableHead
-                    onClick={() => toggleSort("email")}
-                    sortDirection={
-                      sortDescriptor()?.column === "email"
-                        ? sortDescriptor()?.direction
-                        : undefined
-                    }
+                  <Show when={canCancel.data?.success}>
+                    <TableHead>
+                      <OrganizationTableSelectAll
+                        allSelected={table.getIsAllPageRowsSelected()}
+                        localization={localization()}
+                        onCheckedChange={(checked) =>
+                          table.toggleAllPageRowsSelected(checked)
+                        }
+                        someSelected={table.getIsSomePageRowsSelected()}
+                      />
+                    </TableHead>
+                  </Show>
+                  <OrganizationSortableTableHead
+                    column={table.getColumn("email")}
                   >
                     Email
-                  </SortableTableHead>
-                  <SortableTableHead
-                    onClick={() => toggleSort("createdAt")}
-                    sortDirection={
-                      sortDescriptor()?.column === "createdAt"
-                        ? sortDescriptor()?.direction
-                        : undefined
-                    }
-                  >
-                    Invited
-                  </SortableTableHead>
-                  <SortableTableHead
-                    onClick={() => toggleSort("role")}
-                    sortDirection={
-                      sortDescriptor()?.column === "role"
-                        ? sortDescriptor()?.direction
-                        : undefined
-                    }
-                  >
-                    {localization().role}
-                  </SortableTableHead>
-                  <SortableTableHead
-                    onClick={() => toggleSort("status")}
-                    sortDirection={
-                      sortDescriptor()?.column === "status"
-                        ? sortDescriptor()?.direction
-                        : undefined
-                    }
-                  >
-                    {localization().status}
-                  </SortableTableHead>
+                  </OrganizationSortableTableHead>
+                  <Show when={table.getColumn("createdAt")?.getIsVisible()}>
+                    <OrganizationSortableTableHead
+                      column={table.getColumn("createdAt")}
+                    >
+                      Invited
+                    </OrganizationSortableTableHead>
+                  </Show>
+                  <Show when={table.getColumn("role")?.getIsVisible()}>
+                    <OrganizationSortableTableHead
+                      column={table.getColumn("role")}
+                    >
+                      {localization().role}
+                    </OrganizationSortableTableHead>
+                  </Show>
+                  <Show when={table.getColumn("status")?.getIsVisible()}>
+                    <OrganizationSortableTableHead
+                      column={table.getColumn("status")}
+                    >
+                      {localization().status}
+                    </OrganizationSortableTableHead>
+                  </Show>
                   <TableHead class="z-table-head-align-end">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 <Show
-                  when={filteredInvitationRows().length > 0}
+                  when={table.getRowModel().rows.length > 0}
                   fallback={
                     <TableRow>
                       <TableCell
@@ -463,11 +545,19 @@ export function OrganizationInvitations(props: OrganizationInvitationsProps) {
                     </TableRow>
                   }
                 >
-                  <For each={sortedInvitationRows()}>
-                    {(invitation) => (
+                  <For each={table.getRowModel().rows}>
+                    {(row) => (
                       <OrganizationInvitationRow
-                        invitation={invitation}
+                        invitation={row.original}
                         roles={roles()}
+                        selectableRow={
+                          canCancel.data?.success ? row : undefined
+                        }
+                        showCreatedAt={table
+                          .getColumn("createdAt")
+                          ?.getIsVisible()}
+                        showRole={table.getColumn("role")?.getIsVisible()}
+                        showStatus={table.getColumn("status")?.getIsVisible()}
                       />
                     )}
                   </For>
@@ -475,6 +565,22 @@ export function OrganizationInvitations(props: OrganizationInvitationsProps) {
               </TableBody>
             </Table>
           </Card>
+          <OrganizationTablePagination
+            canNextPage={table.getCanNextPage()}
+            canPreviousPage={table.getCanPreviousPage()}
+            disabled={invitations.isPending}
+            localization={localization()}
+            onFirstPage={() => table.firstPage()}
+            onLastPage={() => table.lastPage()}
+            onNextPage={() => table.nextPage()}
+            onPageSizeChange={(size) => table.setPageSize(size)}
+            onPreviousPage={() => table.previousPage()}
+            pageCount={table.getPageCount()}
+            pageIndex={tableState.pagination().pageIndex}
+            pageSize={tableState.pagination().pageSize}
+            rowCount={table.getRowCount()}
+            visibleRowCount={table.getRowModel().rows.length}
+          />
         </Show>
       </Show>
     </div>

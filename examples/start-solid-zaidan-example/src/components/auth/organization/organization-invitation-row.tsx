@@ -14,6 +14,10 @@ import { Button } from "@/components/ui/button"
 import { Spinner } from "@/components/ui/spinner"
 import { TableCell, TableRow } from "@/components/ui/table"
 import { organizationPlugin } from "@/lib/auth/organization-plugin"
+import {
+  type OrganizationSelectableRow,
+  OrganizationTableSelectRow
+} from "./organization-table-selection"
 
 type OrganizationInvitation = {
   createdAt?: Date | string | null
@@ -37,6 +41,10 @@ const statusBadgeClasses: Record<string, string> = {
 export type OrganizationInvitationRowProps = {
   invitation: OrganizationInvitation
   roles: RoleMap
+  selectableRow?: OrganizationSelectableRow
+  showCreatedAt?: boolean
+  showRole?: boolean
+  showStatus?: boolean
 }
 
 function formatRole(role?: string | null) {
@@ -93,6 +101,16 @@ export function OrganizationInvitationRow(
 
   return (
     <TableRow>
+      <Show when={props.selectableRow}>
+        {(row) => (
+          <TableCell>
+            <OrganizationTableSelectRow
+              localization={config.localization}
+              row={row()}
+            />
+          </TableCell>
+        )}
+      </Show>
       <TableCell>
         <div class="flex flex-col gap-1">
           <span class="font-medium">
@@ -115,15 +133,21 @@ export function OrganizationInvitationRow(
           </For>
         </div>
       </TableCell>
-      <TableCell class="whitespace-nowrap text-muted-foreground text-xs tabular-nums">
-        {formatInvitationDate(props.invitation.createdAt)}
-      </TableCell>
-      <TableCell class="text-sm">{roleLabel()}</TableCell>
-      <TableCell>
-        <Badge class={statusBadgeClass()} variant="secondary">
-          {formatStatus(props.invitation.status)}
-        </Badge>
-      </TableCell>
+      <Show when={props.showCreatedAt !== false}>
+        <TableCell class="whitespace-nowrap text-muted-foreground text-xs tabular-nums">
+          {formatInvitationDate(props.invitation.createdAt)}
+        </TableCell>
+      </Show>
+      <Show when={props.showRole !== false}>
+        <TableCell class="text-sm">{roleLabel()}</TableCell>
+      </Show>
+      <Show when={props.showStatus !== false}>
+        <TableCell>
+          <Badge class={statusBadgeClass()} variant="secondary">
+            {formatStatus(props.invitation.status)}
+          </Badge>
+        </TableCell>
+      </Show>
       <TableCell class="text-end">
         <div class="flex justify-end gap-2">
           <Show when={invitePermission.data?.success && isPending()}>
