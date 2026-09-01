@@ -1,7 +1,24 @@
+import type { AuthLocale } from "@better-auth-ui/core"
 import { describe, expect, it } from "vitest"
-import { deDE } from "../src/de-DE"
 import { enUS } from "../src/en-US"
-import { esES } from "../src/es-ES"
+
+const localeModules = import.meta.glob<Record<string, AuthLocale>>(
+  "../src/*.ts",
+  { eager: true }
+)
+
+const otherLocales = Object.entries(localeModules)
+  .filter(
+    ([path]) => path !== "../src/index.ts" && !path.endsWith("-plugins.ts")
+  )
+  .map(([path, mod]) => {
+    const locale = Object.values(mod)[0]
+    if (!locale) {
+      throw new Error(`Locale module at ${path} has no exported locale`)
+    }
+    return locale
+  })
+  .filter((locale) => locale.languageTag !== enUS.languageTag)
 
 function flattenMessages(
   value: Record<string, unknown>,
@@ -24,50 +41,46 @@ function placeholders(message: string) {
 }
 
 describe("locale bundles", () => {
-  it("exports canonical language tags and complete localization trees", () => {
-    expect(enUS.languageTag).toBe("en-US")
-    expect(deDE.languageTag).toBe("de-DE")
-    expect(esES.languageTag).toBe("es-ES")
-    expect(Object.keys(deDE.localization.auth)).toEqual(
-      Object.keys(enUS.localization.auth)
-    )
-    expect(Object.keys(deDE.localization.settings)).toEqual(
-      Object.keys(enUS.localization.settings)
-    )
-    expect(Object.keys(deDE.plugins)).toEqual(Object.keys(enUS.plugins))
-    expect(Object.keys(esES.localization.auth)).toEqual(
-      Object.keys(enUS.localization.auth)
-    )
-    expect(Object.keys(esES.localization.settings)).toEqual(
-      Object.keys(enUS.localization.settings)
-    )
-    expect(Object.keys(esES.plugins)).toEqual(Object.keys(enUS.plugins))
+  it("discovers at least one non-English locale", () => {
+    expect(otherLocales.length).toBeGreaterThan(0)
   })
 
-  it("preserves interpolation placeholders", () => {
-    const english = flattenMessages({
-      ...enUS.localization,
-      plugins: enUS.plugins
-    })
-    const german = flattenMessages({
-      ...deDE.localization,
-      plugins: deDE.plugins
-    })
-    const spanish = flattenMessages({
-      ...esES.localization,
-      plugins: esES.plugins
-    })
-
-    expect(Object.keys(german).sort()).toEqual(Object.keys(english).sort())
-    expect(Object.keys(spanish).sort()).toEqual(Object.keys(english).sort())
-
-    for (const [path, message] of Object.entries(english)) {
-      expect(placeholders(german[path] as string), path).toEqual(
-        placeholders(message)
+  it.each(otherLocales)(
+    "$languageTag exports complete localization trees",
+    (locale) => {
+      expect(Object.keys(locale.localization.auth)).toEqual(
+        Object.keys(enUS.localization.auth)
       )
-      expect(placeholders(spanish[path] as string), path).toEqual(
-        placeholders(message)
+      expect(Object.keys(locale.localization.settings)).toEqual(
+        Object.keys(enUS.localization.settings)
+      )
+      expect(Object.keys(locale.plugins ?? {})).toEqual(
+        Object.keys(enUS.plugins ?? {})
       )
     }
-  })
+  )
+
+  it.each(otherLocales)(
+    "$languageTag preserves interpolation placeholders",
+    (locale) => {
+      const english = flattenMessages({
+        ...enUS.localization,
+        plugins: enUS.plugins
+      })
+      const translated = flattenMessages({
+        ...locale.localization,
+        plugins: locale.plugins
+      })
+
+      expect(Object.keys(translated).sort()).toEqual(
+        Object.keys(english).sort()
+      )
+
+      for (const [path, message] of Object.entries(english)) {
+        expect(placeholders(translated[path] as string), path).toEqual(
+          placeholders(message)
+        )
+      }
+    }
+  )
 })
