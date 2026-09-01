@@ -6,10 +6,12 @@ import { afterEach, describe, expect, it, vi } from "vitest"
 import { AuthProvider } from "../src/components/auth/auth-provider"
 import { SignUp } from "../src/components/auth/sign-up"
 
-function createMockAuthClient() {
+function createMockAuthClient(
+  signUpEmail = vi.fn(async () => ({ data: {}, error: null }))
+) {
   return {
     signUp: {
-      email: vi.fn(async () => ({ data: {}, error: null }))
+      email: signUpEmail
     },
     useSession: () => ({ data: null, isPending: false, error: null })
   } as unknown as Parameters<typeof AuthProvider>[0]["authClient"]
@@ -100,6 +102,62 @@ describe("<SignUp />", () => {
         to: `/auth/verify-email?redirectTo=${encodeURIComponent(redirectTo)}`
       })
     })
+  })
+
+  it("clears only password fields after validation and request errors", async () => {
+    const user = userEvent.setup()
+    const signUpEmail = vi.fn(async () => {
+      throw { code: "PASSWORD_COMPROMISED" }
+    })
+
+    render(
+      <AuthProvider
+        authClient={createMockAuthClient(signUpEmail)}
+        emailAndPassword={{ confirmPassword: true }}
+        navigate={() => {}}
+        queryClient={
+          new QueryClient({
+            defaultOptions: {
+              queries: { retry: false },
+              mutations: { retry: false }
+            }
+          })
+        }
+      >
+        <SignUp />
+      </AuthProvider>
+    )
+
+    const name = screen.getByLabelText("Name")
+    const email = screen.getByLabelText("Email")
+    const password = screen.getByLabelText("Password")
+    const confirmPassword = screen.getByLabelText("Confirm password")
+
+    await user.type(name, "Ada Lovelace")
+    await user.type(email, "ada@example.com")
+    await user.type(password, "correct horse battery")
+    await user.type(confirmPassword, "different horse battery")
+    await user.click(screen.getByRole("button", { name: "Sign Up" }))
+
+    await waitFor(() => {
+      expect(password).toHaveValue("")
+      expect(confirmPassword).toHaveValue("")
+    })
+    expect(name).toHaveValue("Ada Lovelace")
+    expect(email).toHaveValue("ada@example.com")
+    expect(signUpEmail).not.toHaveBeenCalled()
+
+    await user.type(password, "compromised password")
+    await user.type(confirmPassword, "compromised password")
+    await user.click(screen.getByRole("button", { name: "Sign Up" }))
+
+    await waitFor(() => expect(signUpEmail).toHaveBeenCalledOnce())
+    await waitFor(() => {
+      expect(password).toHaveValue("")
+      expect(confirmPassword).toHaveValue("")
+    })
+    expect(name).toHaveValue("Ada Lovelace")
+    expect(email).toHaveValue("ada@example.com")
   })
 
   it("labels optional additional fields without marking required fields", () => {

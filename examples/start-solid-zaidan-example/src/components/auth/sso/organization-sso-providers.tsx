@@ -14,9 +14,10 @@ import {
   useSsoProviders,
   useUpdateSsoProvider
 } from "@better-auth-ui/solid/plugins/sso"
+import { createForm } from "@tanstack/solid-form"
 import type { BetterFetchError } from "better-auth/client"
 import { Pencil, Trash2 } from "lucide-solid"
-import { createMemo, createSignal, For, Show } from "solid-js"
+import { createEffect, createMemo, createSignal, For, on, Show } from "solid-js"
 import { toast } from "solid-sonner"
 
 import {
@@ -78,8 +79,27 @@ export type OrganizationSsoProvidersProps = {
 
 const providerSkeletonIds = ["solid-sso-provider-1", "solid-sso-provider-2"]
 
-const readString = (formData: FormData, name: string) =>
-  String(formData.get(name) ?? "").trim()
+type SsoProviderEditorValues = {
+  clientId: string
+  clientSecret: string
+  discoveryEndpoint: string
+  domain: string
+  entryPoint: string
+  identityProviderMetadata: string
+  issuer: string
+}
+
+const getSsoProviderEditorValues = (
+  provider?: SsoProvider
+): SsoProviderEditorValues => ({
+  clientId: "",
+  clientSecret: "",
+  discoveryEndpoint: provider?.oidcConfig?.discoveryEndpoint ?? "",
+  domain: provider?.domain ?? "",
+  entryPoint: provider?.samlConfig?.entryPoint ?? "",
+  identityProviderMetadata: "",
+  issuer: provider?.issuer ?? ""
+})
 
 const getErrorMessage = (error: Error | null) => {
   const authError = error as BetterFetchError | null
@@ -294,48 +314,54 @@ function EditSsoProviderDialog(props: {
     update.reset()
     props.onOpenChange(undefined)
   }
-  const submit = (event: SubmitEvent) => {
-    event.preventDefault()
-    if (!props.provider) return
-    const data = new FormData(event.currentTarget as HTMLFormElement)
-    const clientId = readString(data, "clientId")
-    const clientSecret = readString(data, "clientSecret")
-    const identityProviderMetadata = readString(
-      data,
-      "identityProviderMetadata"
-    )
-    const params = {
-      providerId: props.provider.providerId,
-      issuer: readString(data, "issuer"),
-      domain: readString(data, "domain"),
-      ...(props.provider.oidcConfig
-        ? {
-            oidcConfig: {
-              ...(clientId ? { clientId } : {}),
-              ...(clientSecret ? { clientSecret } : {}),
-              discoveryEndpoint:
-                readString(data, "discoveryEndpoint") || undefined
+  const form = createForm(() => ({
+    defaultValues: getSsoProviderEditorValues(props.provider),
+    onSubmit: async ({ value }) => {
+      const provider = props.provider
+      if (!provider) return
+      const clientId = value.clientId.trim()
+      const clientSecret = value.clientSecret.trim()
+      const identityProviderMetadata = value.identityProviderMetadata.trim()
+      const params = {
+        providerId: provider.providerId,
+        issuer: value.issuer.trim(),
+        domain: value.domain.trim(),
+        ...(provider.oidcConfig
+          ? {
+              oidcConfig: {
+                ...(clientId ? { clientId } : {}),
+                ...(clientSecret ? { clientSecret } : {}),
+                discoveryEndpoint: value.discoveryEndpoint.trim() || undefined
+              }
             }
-          }
-        : {}),
-      ...(props.provider.samlConfig
-        ? {
-            samlConfig: {
-              entryPoint: readString(data, "entryPoint"),
-              ...(identityProviderMetadata
-                ? { idpMetadata: { metadata: identityProviderMetadata } }
-                : {})
+          : {}),
+        ...(provider.samlConfig
+          ? {
+              samlConfig: {
+                entryPoint: value.entryPoint.trim(),
+                ...(identityProviderMetadata
+                  ? { idpMetadata: { metadata: identityProviderMetadata } }
+                  : {})
+              }
             }
-          }
-        : {})
-    } as UpdateSsoProviderParams
-    update.mutate(params, {
-      onSuccess: () => {
+          : {})
+      } as UpdateSsoProviderParams
+      try {
+        await update.mutateAsync(params)
         toast.success(localization.providerUpdated)
         close()
+      } catch {
+        // The mutation error is rendered below the fields.
       }
-    })
-  }
+    }
+  }))
+  createEffect(
+    on(
+      () => props.provider,
+      (provider) => form.reset(getSsoProviderEditorValues(provider)),
+      { defer: true }
+    )
+  )
 
   return (
     <Dialog
@@ -345,90 +371,146 @@ function EditSsoProviderDialog(props: {
       }}
     >
       <DialogContent class="max-h-[90vh] max-w-xl overflow-y-auto">
-        <form class="flex flex-col gap-4" onSubmit={submit}>
+        <form
+          class="flex flex-col gap-4"
+          onSubmit={(event) => {
+            event.preventDefault()
+            void form.handleSubmit()
+          }}
+        >
           <DialogHeader>
             <DialogTitle>{localization.editProvider}</DialogTitle>
             <DialogDescription>{props.provider?.providerId}</DialogDescription>
           </DialogHeader>
           <FieldGroup>
-            <Field>
-              <FieldLabel for="solid-sso-edit-domain">
-                {localization.domain}
-              </FieldLabel>
-              <Input
-                id="solid-sso-edit-domain"
-                name="domain"
-                required
-                value={props.provider?.domain ?? ""}
-              />
-            </Field>
-            <Field>
-              <FieldLabel for="solid-sso-edit-issuer">
-                {localization.issuer}
-              </FieldLabel>
-              <Input
-                id="solid-sso-edit-issuer"
-                name="issuer"
-                required
-                type="url"
-                value={props.provider?.issuer ?? ""}
-              />
-            </Field>
+            <form.Field name="domain">
+              {(field) => (
+                <Field>
+                  <FieldLabel for="solid-sso-edit-domain">
+                    {localization.domain}
+                  </FieldLabel>
+                  <Input
+                    id="solid-sso-edit-domain"
+                    name={field().name}
+                    onBlur={field().handleBlur}
+                    onInput={(event) =>
+                      field().handleChange(event.currentTarget.value)
+                    }
+                    required
+                    value={field().state.value}
+                  />
+                </Field>
+              )}
+            </form.Field>
+            <form.Field name="issuer">
+              {(field) => (
+                <Field>
+                  <FieldLabel for="solid-sso-edit-issuer">
+                    {localization.issuer}
+                  </FieldLabel>
+                  <Input
+                    id="solid-sso-edit-issuer"
+                    name={field().name}
+                    onBlur={field().handleBlur}
+                    onInput={(event) =>
+                      field().handleChange(event.currentTarget.value)
+                    }
+                    required
+                    type="url"
+                    value={field().state.value}
+                  />
+                </Field>
+              )}
+            </form.Field>
             <Show when={props.provider?.oidcConfig}>
               {(oidc) => (
                 <>
-                  <Field>
-                    <FieldLabel for="solid-sso-edit-discovery">
-                      {localization.discoveryEndpoint}
-                    </FieldLabel>
-                    <Input
-                      id="solid-sso-edit-discovery"
-                      name="discoveryEndpoint"
-                      type="url"
-                      value={oidc().discoveryEndpoint ?? ""}
-                    />
-                  </Field>
+                  <form.Field name="discoveryEndpoint">
+                    {(field) => (
+                      <Field>
+                        <FieldLabel for="solid-sso-edit-discovery">
+                          {localization.discoveryEndpoint}
+                        </FieldLabel>
+                        <Input
+                          id="solid-sso-edit-discovery"
+                          name={field().name}
+                          onBlur={field().handleBlur}
+                          onInput={(event) =>
+                            field().handleChange(event.currentTarget.value)
+                          }
+                          type="url"
+                          value={field().state.value}
+                        />
+                      </Field>
+                    )}
+                  </form.Field>
                   <div class="grid gap-4 sm:grid-cols-2">
-                    <Field>
-                      <FieldLabel for="solid-sso-edit-client-id">
-                        {localization.clientId}
-                      </FieldLabel>
-                      <Input
-                        id="solid-sso-edit-client-id"
-                        name="clientId"
-                        placeholder={`••••${oidc().clientIdLastFour}`}
-                      />
-                    </Field>
-                    <Field>
-                      <FieldLabel for="solid-sso-edit-client-secret">
-                        {localization.clientSecret}
-                      </FieldLabel>
-                      <Input
-                        autocomplete="new-password"
-                        id="solid-sso-edit-client-secret"
-                        name="clientSecret"
-                        type="password"
-                      />
-                    </Field>
+                    <form.Field name="clientId">
+                      {(field) => (
+                        <Field>
+                          <FieldLabel for="solid-sso-edit-client-id">
+                            {localization.clientId}
+                          </FieldLabel>
+                          <Input
+                            id="solid-sso-edit-client-id"
+                            name={field().name}
+                            onBlur={field().handleBlur}
+                            onInput={(event) =>
+                              field().handleChange(event.currentTarget.value)
+                            }
+                            placeholder={`••••${oidc().clientIdLastFour}`}
+                            value={field().state.value}
+                          />
+                        </Field>
+                      )}
+                    </form.Field>
+                    <form.Field name="clientSecret">
+                      {(field) => (
+                        <Field>
+                          <FieldLabel for="solid-sso-edit-client-secret">
+                            {localization.clientSecret}
+                          </FieldLabel>
+                          <Input
+                            autocomplete="new-password"
+                            id="solid-sso-edit-client-secret"
+                            name={field().name}
+                            onBlur={field().handleBlur}
+                            onInput={(event) =>
+                              field().handleChange(event.currentTarget.value)
+                            }
+                            type="password"
+                            value={field().state.value}
+                          />
+                        </Field>
+                      )}
+                    </form.Field>
                   </div>
                 </>
               )}
             </Show>
             <Show when={props.provider?.samlConfig}>
-              {(saml) => (
-                <>
+              <form.Field name="entryPoint">
+                {(field) => (
                   <Field>
                     <FieldLabel for="solid-sso-edit-entry-point">
                       {localization.entryPoint}
                     </FieldLabel>
                     <Input
                       id="solid-sso-edit-entry-point"
-                      name="entryPoint"
+                      name={field().name}
+                      onBlur={field().handleBlur}
+                      onInput={(event) =>
+                        field().handleChange(event.currentTarget.value)
+                      }
                       required
                       type="url"
-                      value={saml().entryPoint}
+                      value={field().state.value}
                     />
                   </Field>
+                )}
+              </form.Field>
+              <form.Field name="identityProviderMetadata">
+                {(field) => (
                   <Field>
                     <FieldLabel for="solid-sso-edit-metadata">
                       {localization.identityProviderMetadata}
@@ -436,12 +518,17 @@ function EditSsoProviderDialog(props: {
                     <Textarea
                       class="font-mono text-xs"
                       id="solid-sso-edit-metadata"
-                      name="identityProviderMetadata"
+                      name={field().name}
+                      onBlur={field().handleBlur}
+                      onInput={(event) =>
+                        field().handleChange(event.currentTarget.value)
+                      }
                       rows={6}
+                      value={field().state.value}
                     />
                   </Field>
-                </>
-              )}
+                )}
+              </form.Field>
             </Show>
           </FieldGroup>
           <FieldError>{getErrorMessage(update.error)}</FieldError>
@@ -454,12 +541,16 @@ function EditSsoProviderDialog(props: {
             >
               {localization.cancel}
             </Button>
-            <Button disabled={update.isPending} type="submit">
-              <Show when={update.isPending}>
-                <Spinner />
-              </Show>
-              {localization.saveProvider}
-            </Button>
+            <form.Subscribe selector={(state) => state.isSubmitting}>
+              {(isSubmitting) => (
+                <Button disabled={isSubmitting()} type="submit">
+                  <Show when={isSubmitting()}>
+                    <Spinner />
+                  </Show>
+                  {localization.saveProvider}
+                </Button>
+              )}
+            </form.Subscribe>
           </DialogFooter>
         </form>
       </DialogContent>

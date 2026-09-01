@@ -4,8 +4,9 @@ import type { OrganizationAuthClient } from "@better-auth-ui/core/plugins/organi
 import { parseMemberRoles } from "@better-auth-ui/core/plugins/organization"
 import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
 import { useUpdateMemberRole } from "@better-auth-ui/react/plugins/organization"
+import { useForm } from "@tanstack/react-form"
 import { ShieldCheck } from "lucide-react"
-import { useEffect, useState } from "react"
+import { useEffect } from "react"
 import { toast } from "sonner"
 
 import { Button, buttonVariants } from "@/components/ui/button"
@@ -71,9 +72,6 @@ export function EditMemberRolesDialog({
   const { authClient, localization } = useAuth<OrganizationAuthClient>()
   const { allowMultipleRoles, localization: organizationLocalization } =
     useAuthPlugin(organizationPlugin)
-  const [selectedRoles, setSelectedRoles] = useState(() =>
-    selectedMemberRoles(member.role, allowMultipleRoles, protectedRole)
-  )
   const { mutate: updateMemberRole, isPending } = useUpdateMemberRole(
     authClient,
     {
@@ -83,16 +81,36 @@ export function EditMemberRolesDialog({
       }
     }
   )
+  const form = useForm({
+    defaultValues: {
+      roles: selectedMemberRoles(member.role, allowMultipleRoles, protectedRole)
+    },
+    onSubmit: ({ value }) => {
+      if (value.roles.length === 0) return
+
+      updateMemberRole({
+        memberId: member.id,
+        organizationId,
+        role: value.roles
+      })
+    }
+  })
 
   useEffect(() => {
     if (open)
-      setSelectedRoles(
-        selectedMemberRoles(member.role, allowMultipleRoles, protectedRole)
-      )
-  }, [allowMultipleRoles, member.role, open, protectedRole])
+      form.reset({
+        roles: selectedMemberRoles(
+          member.role,
+          allowMultipleRoles,
+          protectedRole
+        )
+      })
+  }, [allowMultipleRoles, form.reset, member.role, open, protectedRole])
 
   const toggleRole = (role: string, checked: boolean) => {
-    setSelectedRoles((current) =>
+    const current = form.getFieldValue("roles")
+    form.setFieldValue(
+      "roles",
       checked
         ? current.includes(role)
           ? current
@@ -101,41 +119,6 @@ export function EditMemberRolesDialog({
     )
   }
 
-  const protectedRoleSelected =
-    !allowMultipleRoles &&
-    protectedRoleRemovalDisabled &&
-    protectedRole !== undefined &&
-    selectedRoles.includes(protectedRole)
-  const roleOptions = roles.map(([role, label]) => {
-    const checked = selectedRoles.includes(role)
-    const disabled =
-      isPending ||
-      (allowMultipleRoles && checked && selectedRoles.length === 1) ||
-      (protectedRoleSelected && role !== protectedRole) ||
-      (role === protectedRole && checked && protectedRoleRemovalDisabled)
-    const id = `member-${member.id}-role-${role}`
-
-    return (
-      <FieldLabel htmlFor={id} key={role}>
-        <Field orientation="horizontal" data-disabled={disabled}>
-          <FieldContent>
-            <FieldTitle>{label}</FieldTitle>
-          </FieldContent>
-          {allowMultipleRoles ? (
-            <Checkbox
-              checked={checked}
-              disabled={disabled}
-              id={id}
-              onCheckedChange={(next) => toggleRole(role, next === true)}
-            />
-          ) : (
-            <RadioGroupItem disabled={disabled} id={id} value={role} />
-          )}
-        </Field>
-      </FieldLabel>
-    )
-  })
-
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
@@ -143,13 +126,7 @@ export function EditMemberRolesDialog({
           className="flex flex-col gap-6"
           onSubmit={(event) => {
             event.preventDefault()
-            if (selectedRoles.length === 0) return
-
-            updateMemberRole({
-              memberId: member.id,
-              organizationId,
-              role: selectedRoles
-            })
+            void form.handleSubmit()
           }}
         >
           <DialogHeader>
@@ -162,34 +139,89 @@ export function EditMemberRolesDialog({
             </DialogDescription>
           </DialogHeader>
 
-          {allowMultipleRoles ? (
-            <div className="flex flex-col gap-2">{roleOptions}</div>
-          ) : (
-            <RadioGroup
-              disabled={isPending}
-              onValueChange={(role) => setSelectedRoles([role])}
-              value={selectedRoles[0] ?? ""}
-            >
-              {roleOptions}
-            </RadioGroup>
-          )}
+          <form.Subscribe selector={(state) => state.values.roles}>
+            {(selectedRoles) => {
+              const protectedRoleSelected =
+                !allowMultipleRoles &&
+                protectedRoleRemovalDisabled &&
+                protectedRole !== undefined &&
+                selectedRoles.includes(protectedRole)
+              const roleOptions = roles.map(([role, label]) => {
+                const checked = selectedRoles.includes(role)
+                const disabled =
+                  isPending ||
+                  (allowMultipleRoles &&
+                    checked &&
+                    selectedRoles.length === 1) ||
+                  (protectedRoleSelected && role !== protectedRole) ||
+                  (role === protectedRole &&
+                    checked &&
+                    protectedRoleRemovalDisabled)
+                const id = `member-${member.id}-role-${role}`
 
-          <DialogFooter>
-            <DialogClose
-              className={buttonVariants({ variant: "outline" })}
-              disabled={isPending}
-              type="button"
-            >
-              {localization.settings.cancel}
-            </DialogClose>
-            <Button
-              disabled={isPending || selectedRoles.length === 0}
-              type="submit"
-            >
-              {isPending && <Spinner />}
-              {localization.settings.saveChanges}
-            </Button>
-          </DialogFooter>
+                return (
+                  <FieldLabel htmlFor={id} key={role}>
+                    <Field orientation="horizontal" data-disabled={disabled}>
+                      <FieldContent>
+                        <FieldTitle>{label}</FieldTitle>
+                      </FieldContent>
+                      {allowMultipleRoles ? (
+                        <Checkbox
+                          checked={checked}
+                          disabled={disabled}
+                          id={id}
+                          onCheckedChange={(next) =>
+                            toggleRole(role, next === true)
+                          }
+                        />
+                      ) : (
+                        <RadioGroupItem
+                          disabled={disabled}
+                          id={id}
+                          value={role}
+                        />
+                      )}
+                    </Field>
+                  </FieldLabel>
+                )
+              })
+
+              return (
+                <>
+                  {allowMultipleRoles ? (
+                    <div className="flex flex-col gap-2">{roleOptions}</div>
+                  ) : (
+                    <RadioGroup
+                      disabled={isPending}
+                      onValueChange={(role) =>
+                        form.setFieldValue("roles", [role])
+                      }
+                      value={selectedRoles[0] ?? ""}
+                    >
+                      {roleOptions}
+                    </RadioGroup>
+                  )}
+
+                  <DialogFooter>
+                    <DialogClose
+                      className={buttonVariants({ variant: "outline" })}
+                      disabled={isPending}
+                      type="button"
+                    >
+                      {localization.settings.cancel}
+                    </DialogClose>
+                    <Button
+                      disabled={isPending || selectedRoles.length === 0}
+                      type="submit"
+                    >
+                      {isPending && <Spinner />}
+                      {localization.settings.saveChanges}
+                    </Button>
+                  </DialogFooter>
+                </>
+              )
+            }}
+          </form.Subscribe>
         </form>
       </DialogContent>
     </Dialog>

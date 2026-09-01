@@ -1,4 +1,7 @@
-import type { ApiKeyAuthClient } from "@better-auth-ui/core/plugins/api-key"
+import type {
+  ApiKeyAuthClient,
+  ListedApiKey
+} from "@better-auth-ui/core/plugins/api-key"
 import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
 import { useListApiKeys } from "@better-auth-ui/react/plugins/api-key"
 import {
@@ -10,6 +13,16 @@ import {
   ListBox,
   Select
 } from "@heroui/react"
+import {
+  createTableHook,
+  functionalUpdate,
+  type PaginationState,
+  rowPaginationFeature,
+  rowSortingFeature,
+  type SortingState,
+  tableFeatures,
+  type Updater
+} from "@tanstack/react-table"
 import { useState } from "react"
 
 import { apiKeyPlugin } from "../../../lib/auth/api-key-plugin"
@@ -17,6 +30,20 @@ import { ApiKey } from "./api-key"
 import { ApiKeySkeleton } from "./api-key-skeleton"
 import { ApiKeysEmpty } from "./api-keys-empty"
 import { CreateApiKeyDialog } from "./create-api-key-dialog"
+
+const { createAppColumnHelper, useAppTable: useApiKeyTable } = createTableHook({
+  enableMultiSort: false,
+  enableSortingRemoval: false,
+  sortDescFirst: false,
+  features: tableFeatures({ rowPaginationFeature, rowSortingFeature })
+})
+
+const apiKeyColumnHelper = createAppColumnHelper<ListedApiKey>()
+const apiKeyColumns = apiKeyColumnHelper.columns([
+  apiKeyColumnHelper.accessor("createdAt", { id: "createdAt" }),
+  apiKeyColumnHelper.accessor("name", { id: "name" })
+])
+const EMPTY_API_KEYS: ListedApiKey[] = []
 
 export type ApiKeysProps = {
   className?: string
@@ -45,17 +72,25 @@ export function ApiKeys({
   const { authClient } = useAuth()
   const { localization: apiKeyLocalization, pageSize } =
     useAuthPlugin(apiKeyPlugin)
-  const [page, setPage] = useState(0)
-  const [sort, setSort] = useState("createdAt:desc")
-  const [sortBy, sortDirection] = sort.split(":") as [string, "asc" | "desc"]
+  const [pagination, setPaginationState] = useState<PaginationState>({
+    pageIndex: 0,
+    pageSize
+  })
+  const [sorting, setSortingState] = useState<SortingState>([
+    { id: "createdAt", desc: true }
+  ])
+  const primarySort = sorting[0]
+  const sortBy = primarySort?.id === "name" ? "name" : "createdAt"
+  const sortDirection = primarySort?.desc ? "desc" : "asc"
+  const sort = `${sortBy}:${sortDirection}`
 
   const { data: listData, isPending: isListPending } = useListApiKeys(
     authClient as ApiKeyAuthClient,
     {
       enabled: !isPendingProp,
       query: {
-        limit: pageSize,
-        offset: page * pageSize,
+        limit: pagination.pageSize,
+        offset: pagination.pageIndex * pagination.pageSize,
         sortBy,
         sortDirection,
         ...(organizationId ? { organizationId, configId: "organization" } : {})
@@ -64,6 +99,22 @@ export function ApiKeys({
   )
 
   const isPending = isPendingProp || isListPending
+  const setPagination = (updater: Updater<PaginationState>) =>
+    setPaginationState((current) => functionalUpdate(updater, current))
+  const setSorting = (updater: Updater<SortingState>) => {
+    setSortingState((current) => functionalUpdate(updater, current))
+    setPaginationState((current) => ({ ...current, pageIndex: 0 }))
+  }
+  const table = useApiKeyTable({
+    columns: apiKeyColumns,
+    data: listData?.apiKeys ?? EMPTY_API_KEYS,
+    getRowId: (apiKey) => apiKey.id,
+    manualPagination: true,
+    manualSorting: true,
+    state: { pagination, sorting },
+    onPaginationChange: setPagination,
+    onSortingChange: setSorting
+  })
 
   const [createOpen, setCreateOpen] = useState(false)
 
@@ -89,8 +140,8 @@ export function ApiKeys({
         aria-label={apiKeyLocalization.sortBy}
         value={sort}
         onChange={(value) => {
-          setSort(String(value))
-          setPage(0)
+          const [id, direction] = String(value).split(":")
+          table.setSorting([{ id, desc: direction === "desc" }])
         }}
       >
         <Label>{apiKeyLocalization.sortBy}</Label>
@@ -126,14 +177,14 @@ export function ApiKeys({
               hideCreate={hideCreate}
             />
           ) : (
-            listData?.apiKeys.map((key, index) => (
-              <div key={key.id}>
+            table.getRowModel().rows.map((row, index) => (
+              <div key={row.id}>
                 {index > 0 && (
                   <div className="border-b border-dashed -mx-4 my-4" />
                 )}
 
                 <ApiKey
-                  apiKey={key}
+                  apiKey={row.original}
                   hideDelete={hideDelete}
                   hideUpdate={hideUpdate}
                   organizationId={organizationId}
@@ -143,21 +194,22 @@ export function ApiKeys({
           )}
         </Card.Content>
       </Card>
-      {(page > 0 || (listData?.apiKeys.length ?? 0) === pageSize) && (
+      {(pagination.pageIndex > 0 ||
+        (listData?.apiKeys.length ?? 0) === pagination.pageSize) && (
         <div className="flex justify-end gap-2">
           <Button
             size="sm"
             variant="outline"
-            isDisabled={page === 0}
-            onPress={() => setPage((value) => Math.max(0, value - 1))}
+            isDisabled={!table.getCanPreviousPage()}
+            onPress={() => table.previousPage()}
           >
             {apiKeyLocalization.previousPage}
           </Button>
           <Button
             size="sm"
             variant="outline"
-            isDisabled={(listData?.apiKeys.length ?? 0) < pageSize}
-            onPress={() => setPage((value) => value + 1)}
+            isDisabled={(listData?.apiKeys.length ?? 0) < pagination.pageSize}
+            onPress={() => table.nextPage()}
           >
             {apiKeyLocalization.nextPage}
           </Button>

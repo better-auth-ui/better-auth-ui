@@ -16,9 +16,10 @@ import {
   useSsoProviders,
   useUpdateSsoProvider
 } from "@better-auth-ui/react/plugins/sso"
+import { useForm } from "@tanstack/react-form"
 import type { BetterFetchError } from "better-auth/client"
 import { PencilIcon, Trash2Icon } from "lucide-react"
-import { type FormEvent, useMemo, useState } from "react"
+import { useMemo, useState } from "react"
 import { toast } from "sonner"
 
 import {
@@ -80,8 +81,27 @@ export type OrganizationSsoProvidersProps = {
 
 const providerSkeletonIds = ["sso-provider-1", "sso-provider-2"]
 
-const readString = (formData: FormData, name: string) =>
-  String(formData.get(name) ?? "").trim()
+type SsoProviderEditorValues = {
+  clientId: string
+  clientSecret: string
+  discoveryEndpoint: string
+  domain: string
+  entryPoint: string
+  identityProviderMetadata: string
+  issuer: string
+}
+
+const getSsoProviderEditorValues = (
+  provider?: SsoProvider
+): SsoProviderEditorValues => ({
+  clientId: "",
+  clientSecret: "",
+  discoveryEndpoint: provider?.oidcConfig?.discoveryEndpoint ?? "",
+  domain: provider?.domain ?? "",
+  entryPoint: provider?.samlConfig?.entryPoint ?? "",
+  identityProviderMetadata: "",
+  issuer: provider?.issuer ?? ""
+})
 
 const getErrorMessage = (error: Error | null) => {
   const authError = error as BetterFetchError | null
@@ -240,7 +260,11 @@ export function OrganizationSsoProviders({
         )}
       </CardContent>
 
-      <EditSsoProviderDialog onOpenChange={setEditing} provider={editing} />
+      <EditSsoProviderDialog
+        key={editing?.providerId ?? "closed"}
+        onOpenChange={setEditing}
+        provider={editing}
+      />
       <DeleteSsoProviderDialog onOpenChange={setDeleting} provider={deleting} />
       <Dialog
         open={Boolean(verifying)}
@@ -277,49 +301,47 @@ function EditSsoProviderDialog({
     update.reset()
     onOpenChange(undefined)
   }
-  const submit = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault()
-    if (!provider) return
-    const data = new FormData(event.currentTarget)
-    const clientId = readString(data, "clientId")
-    const clientSecret = readString(data, "clientSecret")
-    const identityProviderMetadata = readString(
-      data,
-      "identityProviderMetadata"
-    )
-    const params = {
-      providerId: provider.providerId,
-      issuer: readString(data, "issuer"),
-      domain: readString(data, "domain"),
-      ...(provider.oidcConfig
-        ? {
-            oidcConfig: {
-              ...(clientId ? { clientId } : {}),
-              ...(clientSecret ? { clientSecret } : {}),
-              discoveryEndpoint:
-                readString(data, "discoveryEndpoint") || undefined
+  const form = useForm({
+    defaultValues: getSsoProviderEditorValues(provider),
+    onSubmit: async ({ value }) => {
+      if (!provider) return
+      const clientId = value.clientId.trim()
+      const clientSecret = value.clientSecret.trim()
+      const identityProviderMetadata = value.identityProviderMetadata.trim()
+      const params = {
+        providerId: provider.providerId,
+        issuer: value.issuer.trim(),
+        domain: value.domain.trim(),
+        ...(provider.oidcConfig
+          ? {
+              oidcConfig: {
+                ...(clientId ? { clientId } : {}),
+                ...(clientSecret ? { clientSecret } : {}),
+                discoveryEndpoint: value.discoveryEndpoint.trim() || undefined
+              }
             }
-          }
-        : {}),
-      ...(provider.samlConfig
-        ? {
-            samlConfig: {
-              entryPoint: readString(data, "entryPoint"),
-              ...(identityProviderMetadata
-                ? { idpMetadata: { metadata: identityProviderMetadata } }
-                : {})
+          : {}),
+        ...(provider.samlConfig
+          ? {
+              samlConfig: {
+                entryPoint: value.entryPoint.trim(),
+                ...(identityProviderMetadata
+                  ? { idpMetadata: { metadata: identityProviderMetadata } }
+                  : {})
+              }
             }
-          }
-        : {})
-    } as UpdateSsoProviderParams
+          : {})
+      } as UpdateSsoProviderParams
 
-    update.mutate(params, {
-      onSuccess: () => {
+      try {
+        await update.mutateAsync(params)
         toast.success(localization.providerUpdated)
         close()
+      } catch {
+        // The mutation error is rendered below the fields.
       }
-    })
-  }
+    }
+  })
 
   return (
     <Dialog
@@ -329,98 +351,148 @@ function EditSsoProviderDialog({
       }}
     >
       <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-xl">
-        <form className="flex flex-col gap-4" onSubmit={submit}>
+        <form
+          className="flex flex-col gap-4"
+          onSubmit={(event) => {
+            event.preventDefault()
+            void form.handleSubmit()
+          }}
+        >
           <DialogHeader>
             <DialogTitle>{localization.editProvider}</DialogTitle>
             <DialogDescription>{provider?.providerId}</DialogDescription>
           </DialogHeader>
           <FieldGroup>
-            <Field>
-              <FieldLabel htmlFor="sso-edit-domain">
-                {localization.domain}
-              </FieldLabel>
-              <Input
-                defaultValue={provider?.domain}
-                id="sso-edit-domain"
-                name="domain"
-                required
-              />
-            </Field>
-            <Field>
-              <FieldLabel htmlFor="sso-edit-issuer">
-                {localization.issuer}
-              </FieldLabel>
-              <Input
-                defaultValue={provider?.issuer}
-                id="sso-edit-issuer"
-                name="issuer"
-                required
-                type="url"
-              />
-            </Field>
+            {(
+              [
+                ["domain", "sso-edit-domain", localization.domain, "text"],
+                ["issuer", "sso-edit-issuer", localization.issuer, "url"]
+              ] as const
+            ).map(([name, id, label, type]) => (
+              <form.Field key={name} name={name}>
+                {(field) => (
+                  <Field>
+                    <FieldLabel htmlFor={id}>{label}</FieldLabel>
+                    <Input
+                      id={id}
+                      name={field.name}
+                      onBlur={field.handleBlur}
+                      onChange={(event) =>
+                        field.handleChange(event.target.value)
+                      }
+                      required
+                      type={type}
+                      value={field.state.value}
+                    />
+                  </Field>
+                )}
+              </form.Field>
+            ))}
             {provider?.oidcConfig ? (
               <>
-                <Field>
-                  <FieldLabel htmlFor="sso-edit-discovery">
-                    {localization.discoveryEndpoint}
-                  </FieldLabel>
-                  <Input
-                    defaultValue={provider.oidcConfig.discoveryEndpoint}
-                    id="sso-edit-discovery"
-                    name="discoveryEndpoint"
-                    type="url"
-                  />
-                </Field>
+                <form.Field name="discoveryEndpoint">
+                  {(field) => (
+                    <Field>
+                      <FieldLabel htmlFor="sso-edit-discovery">
+                        {localization.discoveryEndpoint}
+                      </FieldLabel>
+                      <Input
+                        id="sso-edit-discovery"
+                        name={field.name}
+                        onBlur={field.handleBlur}
+                        onChange={(event) =>
+                          field.handleChange(event.target.value)
+                        }
+                        type="url"
+                        value={field.state.value}
+                      />
+                    </Field>
+                  )}
+                </form.Field>
                 <div className="grid gap-4 sm:grid-cols-2">
-                  <Field>
-                    <FieldLabel htmlFor="sso-edit-client-id">
-                      {localization.clientId}
-                    </FieldLabel>
-                    <Input
-                      id="sso-edit-client-id"
-                      name="clientId"
-                      placeholder={`••••${provider.oidcConfig.clientIdLastFour}`}
-                    />
-                  </Field>
-                  <Field>
-                    <FieldLabel htmlFor="sso-edit-client-secret">
-                      {localization.clientSecret}
-                    </FieldLabel>
-                    <Input
-                      autoComplete="new-password"
-                      id="sso-edit-client-secret"
-                      name="clientSecret"
-                      type="password"
-                    />
-                  </Field>
+                  {(
+                    [
+                      ["clientId", "sso-edit-client-id", localization.clientId],
+                      [
+                        "clientSecret",
+                        "sso-edit-client-secret",
+                        localization.clientSecret
+                      ]
+                    ] as const
+                  ).map(([name, id, label]) => (
+                    <form.Field key={name} name={name}>
+                      {(field) => (
+                        <Field>
+                          <FieldLabel htmlFor={id}>{label}</FieldLabel>
+                          <Input
+                            autoComplete={
+                              name === "clientSecret"
+                                ? "new-password"
+                                : undefined
+                            }
+                            id={id}
+                            name={field.name}
+                            onBlur={field.handleBlur}
+                            onChange={(event) =>
+                              field.handleChange(event.target.value)
+                            }
+                            placeholder={
+                              name === "clientId"
+                                ? `••••${provider.oidcConfig?.clientIdLastFour}`
+                                : undefined
+                            }
+                            type={name === "clientSecret" ? "password" : "text"}
+                            value={field.state.value}
+                          />
+                        </Field>
+                      )}
+                    </form.Field>
+                  ))}
                 </div>
               </>
             ) : null}
             {provider?.samlConfig ? (
               <>
-                <Field>
-                  <FieldLabel htmlFor="sso-edit-entry-point">
-                    {localization.entryPoint}
-                  </FieldLabel>
-                  <Input
-                    defaultValue={provider.samlConfig.entryPoint}
-                    id="sso-edit-entry-point"
-                    name="entryPoint"
-                    required
-                    type="url"
-                  />
-                </Field>
-                <Field>
-                  <FieldLabel htmlFor="sso-edit-metadata">
-                    {localization.identityProviderMetadata}
-                  </FieldLabel>
-                  <Textarea
-                    className="font-mono text-xs"
-                    id="sso-edit-metadata"
-                    name="identityProviderMetadata"
-                    rows={6}
-                  />
-                </Field>
+                <form.Field name="entryPoint">
+                  {(field) => (
+                    <Field>
+                      <FieldLabel htmlFor="sso-edit-entry-point">
+                        {localization.entryPoint}
+                      </FieldLabel>
+                      <Input
+                        id="sso-edit-entry-point"
+                        name={field.name}
+                        onBlur={field.handleBlur}
+                        onChange={(event) =>
+                          field.handleChange(event.target.value)
+                        }
+                        required
+                        type="url"
+                        value={field.state.value}
+                      />
+                    </Field>
+                  )}
+                </form.Field>
+                <form.Field name="identityProviderMetadata">
+                  {(field) => (
+                    <Field>
+                      <FieldLabel htmlFor="sso-edit-metadata">
+                        {localization.identityProviderMetadata}
+                      </FieldLabel>
+                      <Textarea
+                        className="font-mono text-xs"
+                        id="sso-edit-metadata"
+                        name={field.name}
+                        onBlur={field.handleBlur}
+                        onChange={(event) =>
+                          field.handleChange(event.target.value)
+                        }
+                        rows={6}
+                        value={field.state.value}
+                      />
+                    </Field>
+                  )}
+                </form.Field>
               </>
             ) : null}
           </FieldGroup>
@@ -434,10 +506,14 @@ function EditSsoProviderDialog({
             >
               {localization.cancel}
             </Button>
-            <Button disabled={update.isPending} type="submit">
-              {update.isPending ? <Spinner data-icon="inline-start" /> : null}
-              {localization.saveProvider}
-            </Button>
+            <form.Subscribe selector={(state) => state.isSubmitting}>
+              {(isSubmitting) => (
+                <Button disabled={isSubmitting} type="submit">
+                  {isSubmitting ? <Spinner data-icon="inline-start" /> : null}
+                  {localization.saveProvider}
+                </Button>
+              )}
+            </form.Subscribe>
           </DialogFooter>
         </form>
       </DialogContent>

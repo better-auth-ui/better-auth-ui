@@ -1,13 +1,25 @@
-import type { ApiKeyAuthClient } from "@better-auth-ui/core/plugins/api-key"
-import { apiKeyLocalization } from "@better-auth-ui/core/plugins/api-key"
+import {
+  type ApiKeyAuthClient,
+  apiKeyLocalization,
+  type ListedApiKey
+} from "@better-auth-ui/core/plugins/api-key"
 import { useAuth, useAuthPlugin } from "@better-auth-ui/solid"
 import { useListApiKeys } from "@better-auth-ui/solid/plugins/api-key"
+import {
+  createTableHook,
+  functionalUpdate,
+  type PaginationState,
+  rowPaginationFeature,
+  rowSortingFeature,
+  type SortingState,
+  tableFeatures,
+  type Updater
+} from "@tanstack/solid-table"
 import { createSignal, For, Show } from "solid-js"
 import { ApiKey } from "@/components/auth/api-key/api-key"
 import { ApiKeySkeleton } from "@/components/auth/api-key/api-key-skeleton"
 import { ApiKeysEmpty } from "@/components/auth/api-key/api-keys-empty"
 import { CreateApiKeyDialog } from "@/components/auth/api-key/create-api-key-dialog"
-import type { ListedApiKey } from "@/components/auth/settings/shared/types"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Dialog, DialogTrigger } from "@/components/ui/dialog"
@@ -22,6 +34,21 @@ import {
 import { apiKeyPlugin } from "@/lib/auth/api-key-plugin"
 import { cn } from "@/lib/utils"
 
+const { createAppColumnHelper, createAppTable: createApiKeyTable } =
+  createTableHook({
+    enableMultiSort: false,
+    enableSortingRemoval: false,
+    sortDescFirst: false,
+    features: tableFeatures({ rowPaginationFeature, rowSortingFeature })
+  })
+
+const apiKeyColumnHelper = createAppColumnHelper<ListedApiKey>()
+const apiKeyColumns = apiKeyColumnHelper.columns([
+  apiKeyColumnHelper.accessor("createdAt", { id: "createdAt" }),
+  apiKeyColumnHelper.accessor("name", { id: "name" })
+])
+const EMPTY_API_KEYS: ListedApiKey[] = []
+
 export type ApiKeysProps = {
   class?: string
   organizationId?: string
@@ -35,12 +62,30 @@ export function ApiKeys(props: ApiKeysProps = {}) {
   const auth = useAuth<ApiKeyAuthClient>()
   const config = useAuthPlugin(apiKeyPlugin)
   const [isCreateDialogOpen, setIsCreateDialogOpen] = createSignal(false)
-  const [page, setPage] = createSignal(0)
-  const [sort, setSort] = createSignal({
-    id: "createdAt:desc",
-    label: apiKeyLocalization.newest
-  })
   const pageSize = config.pageSize
+  const [pagination, setPaginationState] = createSignal<PaginationState>({
+    pageIndex: 0,
+    pageSize
+  })
+  const [sorting, setSortingState] = createSignal<SortingState>([
+    { id: "createdAt", desc: true }
+  ])
+  const sort = () => {
+    const primarySort = sorting()[0]
+    const id = primarySort?.id === "name" ? "name" : "createdAt"
+    const direction = primarySort?.desc ? "desc" : "asc"
+    return {
+      id: `${id}:${direction}`,
+      label:
+        id === "name"
+          ? direction === "desc"
+            ? apiKeyLocalization.nameDescending
+            : apiKeyLocalization.nameAscending
+          : direction === "desc"
+            ? apiKeyLocalization.newest
+            : apiKeyLocalization.oldest
+    }
+  }
   const listParams = () => ({
     enabled: !props.isPending,
     query: {
@@ -50,8 +95,8 @@ export function ApiKeys(props: ApiKeysProps = {}) {
             configId: "organization" as const
           }
         : {}),
-      limit: pageSize,
-      offset: page() * pageSize,
+      limit: pagination().pageSize,
+      offset: pagination().pageIndex * pagination().pageSize,
       sortBy: sort().id.split(":")[0],
       sortDirection: sort().id.split(":")[1] as "asc" | "desc"
     }
@@ -59,6 +104,26 @@ export function ApiKeys(props: ApiKeysProps = {}) {
   const apiKeys = useListApiKeys(auth.authClient, () => listParams() ?? {})
   const keys = () => apiKeys.data?.apiKeys ?? []
   const pending = () => Boolean(props.isPending || apiKeys.isPending)
+  const setPagination = (updater: Updater<PaginationState>) =>
+    setPaginationState((current) => functionalUpdate(updater, current))
+  const setSorting = (updater: Updater<SortingState>) => {
+    setSortingState((current) => functionalUpdate(updater, current))
+    setPaginationState((current) => ({ ...current, pageIndex: 0 }))
+  }
+  const table = createApiKeyTable({
+    columns: apiKeyColumns,
+    get data() {
+      return apiKeys.data?.apiKeys ?? EMPTY_API_KEYS
+    },
+    get state() {
+      return { pagination: pagination(), sorting: sorting() }
+    },
+    getRowId: (apiKey) => apiKey.id,
+    manualPagination: true,
+    manualSorting: true,
+    onPaginationChange: setPagination,
+    onSortingChange: setSorting
+  })
 
   return (
     <div class={cn("flex flex-col gap-3", props.class)}>
@@ -98,8 +163,8 @@ export function ApiKeys(props: ApiKeysProps = {}) {
         value={sort()}
         onChange={(value) => {
           if (value) {
-            setSort(value)
-            setPage(0)
+            const [id, direction] = value.id.split(":")
+            table.setSorting([{ id, desc: direction === "desc" }])
           }
         }}
         itemComponent={(itemProps) => (
@@ -131,14 +196,14 @@ export function ApiKeys(props: ApiKeysProps = {}) {
               }
             >
               <ItemGroup class="gap-0">
-                <For each={keys()}>
-                  {(apiKey, index) => (
+                <For each={table.getRowModel().rows}>
+                  {(row, index) => (
                     <>
                       <Show when={index() > 0}>
                         <ItemSeparator />
                       </Show>
                       <ApiKey
-                        apiKey={apiKey as ListedApiKey}
+                        apiKey={row.original}
                         hideDelete={props.hideDelete}
                         hideUpdate={props.hideUpdate}
                         organizationId={props.organizationId}
@@ -151,21 +216,25 @@ export function ApiKeys(props: ApiKeysProps = {}) {
           </Show>
         </CardContent>
       </Card>
-      <Show when={page() > 0 || keys().length === pageSize}>
+      <Show
+        when={
+          pagination().pageIndex > 0 || keys().length === pagination().pageSize
+        }
+      >
         <div class="flex justify-end gap-2">
           <Button
             size="sm"
             variant="outline"
-            disabled={page() === 0}
-            onClick={() => setPage((value) => Math.max(0, value - 1))}
+            disabled={!table.getCanPreviousPage()}
+            onClick={() => table.previousPage()}
           >
             {apiKeyLocalization.previousPage}
           </Button>
           <Button
             size="sm"
             variant="outline"
-            disabled={keys().length < pageSize}
-            onClick={() => setPage((value) => value + 1)}
+            disabled={keys().length < pagination().pageSize}
+            onClick={() => table.nextPage()}
           >
             {apiKeyLocalization.nextPage}
           </Button>

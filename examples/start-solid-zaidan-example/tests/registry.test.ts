@@ -1304,7 +1304,7 @@ describe("Solid registry isolation", () => {
     expect(forgotPassword).toContain("auth.viewPaths.auth.signIn")
 
     expect(resetPassword).toContain(
-      "placeholder={auth.localization.auth.newPasswordPlaceholder}"
+      "auth.localization.auth.newPasswordPlaceholder"
     )
     expect(resetPassword).toContain(
       "auth.localization.auth.confirmPasswordPlaceholder"
@@ -1599,9 +1599,7 @@ describe("Solid registry isolation", () => {
     expect(signUp).toContain('import { Eye, EyeOff } from "lucide-solid"')
     expect(signUp).toContain('type={isPasswordVisible() ? "text" : "password"}')
     expect(signUp).toContain('type="button"')
-    expect(signUp).toContain(
-      "onClick={() => setIsPasswordVisible((visible) => !visible)}"
-    )
+    expect(signUp).toContain("setIsPasswordVisible((visible) => !visible)")
     expect(signUp).toContain(
       "setIsConfirmPasswordVisible((visible) => !visible)"
     )
@@ -1626,7 +1624,7 @@ describe("Solid registry isolation", () => {
     )
     expect(resetPassword).toContain('type="button"')
     expect(resetPassword).toContain(
-      "onClick={() => setIsPasswordVisible((visible) => !visible)}"
+      "setIsPasswordVisible((visible) => !visible)"
     )
     expect(resetPassword).toContain(
       "setIsConfirmPasswordVisible((visible) => !visible)"

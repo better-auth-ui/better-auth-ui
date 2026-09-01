@@ -57,6 +57,7 @@ import {
   Tabs,
   TextField
 } from "@heroui/react"
+import { useForm } from "@tanstack/react-form"
 import { keepPreviousData } from "@tanstack/react-query"
 import {
   type ColumnFiltersState,
@@ -589,19 +590,46 @@ function CreateUserDialog({
   const config = useAuthPlugin(adminPlugin)
   const createUser = useCreateAdminUser(authClient)
   const canSetRole = useAdminPermission(authClient, { user: ["set-role"] })
-  const [emailVerified, setEmailVerified] = useState(false)
   const [formError, setFormError] = useState<string>()
-  const [roles, setRoles] = useState([config.defaultRole])
+  const additionalFieldValuesRef = useRef<
+    Record<string, AdditionalFieldValue | null>
+  >({})
+  const form = useForm({
+    defaultValues: {
+      email: "",
+      emailVerified: false,
+      name: "",
+      password: "",
+      roles: [config.defaultRole]
+    },
+    onSubmit: ({ value }) => {
+      createUser.mutate(
+        {
+          data: {
+            ...additionalFieldValuesRef.current,
+            emailVerified: value.emailVerified
+          },
+          email: value.email,
+          name: value.name,
+          password: value.password,
+          ...(canSetRole.data?.success
+            ? { role: asAdminRoles(value.roles) }
+            : {})
+        },
+        { onSuccess: close }
+      )
+    }
+  })
 
   useEffect(() => {
-    if (!config.allowMultipleRoles) setRoles((current) => current.slice(0, 1))
-  }, [config.allowMultipleRoles])
+    if (!config.allowMultipleRoles)
+      form.setFieldValue("roles", (current) => current.slice(0, 1))
+  }, [config.allowMultipleRoles, form.setFieldValue])
 
   const close = () => {
     createUser.reset()
-    setEmailVerified(false)
+    form.reset()
     setFormError(undefined)
-    setRoles([config.defaultRole])
     onOpenChange(false)
   }
   const submit = async (event: FormEvent<HTMLFormElement>) => {
@@ -618,16 +646,8 @@ function CreateUserDialog({
       return
     }
     setFormError(undefined)
-    createUser.mutate(
-      {
-        data: { ...additionalFieldValues, emailVerified },
-        email: String(data.get("email")),
-        name: String(data.get("name")),
-        password: String(data.get("password")),
-        ...(canSetRole.data?.success ? { role: asAdminRoles(roles) } : {})
-      },
-      { onSuccess: close }
-    )
+    additionalFieldValuesRef.current = additionalFieldValues
+    await form.handleSubmit()
   }
 
   return (
@@ -652,63 +672,109 @@ function CreateUserDialog({
                 {config.localization.usersDescription}
               </p>
               <div className="mt-4 flex flex-col gap-4">
-                <TextField isRequired name="name">
-                  <Label>{config.localization.name}</Label>
-                  <Input autoFocus variant="secondary" />
-                  <FieldError />
-                </TextField>
-                <TextField isRequired name="email" type="email">
-                  <Label>{config.localization.email}</Label>
-                  <Input autoComplete="off" variant="secondary" />
-                  <FieldError />
-                </TextField>
-                <TextField isRequired name="password" type="password">
-                  <Label>{config.localization.password}</Label>
-                  <Input autoComplete="new-password" variant="secondary" />
-                  <FieldError />
-                </TextField>
+                <form.Field name="name">
+                  {(field) => (
+                    <TextField
+                      isRequired
+                      name={field.name}
+                      value={field.state.value}
+                      onChange={field.handleChange}
+                    >
+                      <Label>{config.localization.name}</Label>
+                      <Input autoFocus variant="secondary" />
+                      <FieldError />
+                    </TextField>
+                  )}
+                </form.Field>
+                <form.Field name="email">
+                  {(field) => (
+                    <TextField
+                      isRequired
+                      name={field.name}
+                      type="email"
+                      value={field.state.value}
+                      onChange={field.handleChange}
+                    >
+                      <Label>{config.localization.email}</Label>
+                      <Input autoComplete="off" variant="secondary" />
+                      <FieldError />
+                    </TextField>
+                  )}
+                </form.Field>
+                <form.Field name="password">
+                  {(field) => (
+                    <TextField
+                      isRequired
+                      name={field.name}
+                      type="password"
+                      value={field.state.value}
+                      onChange={field.handleChange}
+                    >
+                      <Label>{config.localization.password}</Label>
+                      <Input autoComplete="new-password" variant="secondary" />
+                      <FieldError />
+                    </TextField>
+                  )}
+                </form.Field>
                 {canSetRole.isPending ? (
                   <Skeleton className="h-10 w-full" />
                 ) : canSetRole.data?.success ? (
-                  <Select
-                    fullWidth
-                    selectionMode={
-                      config.allowMultipleRoles ? "multiple" : "single"
-                    }
-                    value={roles}
-                    variant="secondary"
-                    onChange={(keys) => {
-                      const next = [...(keys as Iterable<string>)]
-                      if (next.length)
-                        setRoles(
-                          config.allowMultipleRoles ? next : next.slice(0, 1)
-                        )
-                    }}
-                  >
-                    <Label>{config.localization.role}</Label>
-                    <Select.Trigger>
-                      <Select.Value />
-                      <Select.Indicator />
-                    </Select.Trigger>
-                    <Select.Popover>
-                      <ListBox
+                  <form.Field name="roles">
+                    {(field) => (
+                      <Select
+                        fullWidth
                         selectionMode={
                           config.allowMultipleRoles ? "multiple" : "single"
                         }
+                        value={field.state.value}
+                        variant="secondary"
+                        onChange={(keys) => {
+                          const next = [...(keys as Iterable<string>)]
+                          if (next.length)
+                            field.handleChange(
+                              config.allowMultipleRoles
+                                ? next
+                                : next.slice(0, 1)
+                            )
+                        }}
                       >
-                        {config.roles.map((role) => (
-                          <ListBox.Item id={role} key={role} textValue={role}>
-                            {role}
-                            <ListBox.ItemIndicator />
-                          </ListBox.Item>
-                        ))}
-                      </ListBox>
-                    </Select.Popover>
-                  </Select>
+                        <Label>{config.localization.role}</Label>
+                        <Select.Trigger>
+                          <Select.Value />
+                          <Select.Indicator />
+                        </Select.Trigger>
+                        <Select.Popover>
+                          <ListBox
+                            selectionMode={
+                              config.allowMultipleRoles ? "multiple" : "single"
+                            }
+                          >
+                            {config.roles.map((role) => (
+                              <ListBox.Item
+                                id={role}
+                                key={role}
+                                textValue={role}
+                              >
+                                {role}
+                                <ListBox.ItemIndicator />
+                              </ListBox.Item>
+                            ))}
+                          </ListBox>
+                        </Select.Popover>
+                      </Select>
+                    )}
+                  </form.Field>
                 ) : null}
-                <Switch isSelected={emailVerified} onChange={setEmailVerified}>
-                  {config.localization.emailVerified}
-                </Switch>
+                <form.Field name="emailVerified">
+                  {(field) => (
+                    <Switch
+                      isSelected={field.state.value}
+                      onChange={field.handleChange}
+                    >
+                      {config.localization.emailVerified}
+                    </Switch>
+                  )}
+                </form.Field>
                 {additionalFields?.map((field) => (
                   <AdditionalField
                     field={field}
@@ -819,10 +885,6 @@ function UserDrawer({
     { session: ["revoke"] },
     { enabled: Boolean(userId) }
   )
-  const [name, setName] = useState("")
-  const [email, setEmail] = useState("")
-  const [emailVerified, setEmailVerified] = useState(false)
-  const [roles, setRoles] = useState([config.defaultRole])
   const [banReason, setBanReason] = useState("")
   const [banDuration, setBanDuration] = useState("")
   const banDurationSeconds = getBanDurationSeconds(banDuration)
@@ -850,24 +912,74 @@ function UserDrawer({
   const revokeSession = useRevokeAdminUserSession(authClient, userId)
   const revokeSessions = useRevokeAdminUserSessions(authClient, userId)
 
+  const profileAdditionalFieldValuesRef = useRef<
+    Record<string, AdditionalFieldValue | null>
+  >({})
+  const profileForm = useForm({
+    defaultValues: {
+      email: "",
+      emailVerified: false,
+      name: "",
+      roles: [config.defaultRole]
+    },
+    onSubmit: async ({ value }) => {
+      if (!detail) return
+
+      const mutations: Promise<unknown>[] = []
+      if (canUpdate.data?.success) {
+        mutations.push(
+          updateUser.mutateAsync({
+            userId: detail.id,
+            data: {
+              ...profileAdditionalFieldValuesRef.current,
+              name: value.name.trim(),
+              ...(canSetEmail.data?.success
+                ? {
+                    email: value.email.trim(),
+                    emailVerified: value.emailVerified
+                  }
+                : {})
+            }
+          })
+        )
+      }
+      if (canSetRole.data?.success && !isSelf) {
+        mutations.push(
+          setRoleMutation.mutateAsync({
+            userId: detail.id,
+            role: asAdminRoles(value.roles)
+          })
+        )
+      }
+
+      try {
+        await Promise.all(mutations)
+        onOpenChange(false)
+      } catch {
+        // Mutation errors are rendered next to the form.
+      }
+    }
+  })
+
   useEffect(() => {
-    setName(detail?.name ?? "")
-    setEmail(detail?.email ?? "")
-    setEmailVerified(detail?.emailVerified ?? false)
-    setRoles(
-      parseAdminRoles(
+    profileForm.reset({
+      email: detail?.email ?? "",
+      emailVerified: detail?.emailVerified ?? false,
+      name: detail?.name ?? "",
+      roles: parseAdminRoles(
         detail?.role,
         config.defaultRole,
         config.allowMultipleRoles
       )
-    )
+    })
   }, [
     config.allowMultipleRoles,
     config.defaultRole,
     detail?.email,
     detail?.emailVerified,
     detail?.name,
-    detail?.role
+    detail?.role,
+    profileForm.reset
   ])
 
   useEffect(() => {
@@ -952,7 +1064,6 @@ function UserDrawer({
     event.preventDefault()
     if (!detail) return
 
-    const mutations: Promise<unknown>[] = []
     if (canUpdate.data?.success) {
       const formData = new FormData(event.currentTarget)
       let additionalFieldValues: Record<string, AdditionalFieldValue | null>
@@ -966,34 +1077,10 @@ function UserDrawer({
         return
       }
       setProfileError(undefined)
-      mutations.push(
-        updateUser.mutateAsync({
-          userId: detail.id,
-          data: {
-            ...additionalFieldValues,
-            name: name.trim(),
-            ...(canSetEmail.data?.success
-              ? { email: email.trim(), emailVerified }
-              : {})
-          }
-        })
-      )
-    }
-    if (canSetRole.data?.success && !isSelf) {
-      mutations.push(
-        setRoleMutation.mutateAsync({
-          userId: detail.id,
-          role: asAdminRoles(roles)
-        })
-      )
+      profileAdditionalFieldValuesRef.current = additionalFieldValues
     }
 
-    try {
-      await Promise.all(mutations)
-      onOpenChange(false)
-    } catch {
-      // Mutation errors are rendered next to the form.
-    }
+    await profileForm.handleSubmit()
   }
 
   return (
@@ -1104,85 +1191,105 @@ function UserDrawer({
                             {config.localization.profileAndAccess}
                           </h3>
                           <div className="grid gap-5 md:grid-cols-2">
-                            <TextField
-                              isDisabled={!canUpdate.data?.success}
-                              isRequired
-                              value={name}
-                              onChange={setName}
-                            >
-                              <Label>{config.localization.name}</Label>
-                              <Input variant="secondary" />
-                            </TextField>
-                            <TextField
-                              isDisabled={
-                                !canUpdate.data?.success ||
-                                !canSetEmail.data?.success
-                              }
-                              isRequired
-                              type="email"
-                              value={email}
-                              onChange={setEmail}
-                            >
-                              <Label>{config.localization.email}</Label>
-                              <Input variant="secondary" />
-                              <FieldError />
-                            </TextField>
-                            <Switch
-                              isDisabled={
-                                !canUpdate.data?.success ||
-                                !canSetEmail.data?.success
-                              }
-                              isSelected={emailVerified}
-                              onChange={setEmailVerified}
-                            >
-                              {config.localization.emailVerified}
-                            </Switch>
-                            <Select
-                              fullWidth
-                              isDisabled={isSelf || !canSetRole.data?.success}
-                              selectionMode={
-                                config.allowMultipleRoles
-                                  ? "multiple"
-                                  : "single"
-                              }
-                              value={roles}
-                              variant="secondary"
-                              onChange={(keys) => {
-                                const next = [...(keys as Iterable<string>)]
-                                if (next.length)
-                                  setRoles(
-                                    config.allowMultipleRoles
-                                      ? next
-                                      : next.slice(0, 1)
-                                  )
-                              }}
-                            >
-                              <Label>{config.localization.role}</Label>
-                              <Select.Trigger>
-                                <Select.Value />
-                                <Select.Indicator />
-                              </Select.Trigger>
-                              <Select.Popover>
-                                <ListBox
+                            <profileForm.Field name="name">
+                              {(field) => (
+                                <TextField
+                                  isDisabled={!canUpdate.data?.success}
+                                  isRequired
+                                  name={field.name}
+                                  value={field.state.value}
+                                  onChange={field.handleChange}
+                                >
+                                  <Label>{config.localization.name}</Label>
+                                  <Input variant="secondary" />
+                                </TextField>
+                              )}
+                            </profileForm.Field>
+                            <profileForm.Field name="email">
+                              {(field) => (
+                                <TextField
+                                  isDisabled={
+                                    !canUpdate.data?.success ||
+                                    !canSetEmail.data?.success
+                                  }
+                                  isRequired
+                                  name={field.name}
+                                  type="email"
+                                  value={field.state.value}
+                                  onChange={field.handleChange}
+                                >
+                                  <Label>{config.localization.email}</Label>
+                                  <Input variant="secondary" />
+                                  <FieldError />
+                                </TextField>
+                              )}
+                            </profileForm.Field>
+                            <profileForm.Field name="emailVerified">
+                              {(field) => (
+                                <Switch
+                                  isDisabled={
+                                    !canUpdate.data?.success ||
+                                    !canSetEmail.data?.success
+                                  }
+                                  isSelected={field.state.value}
+                                  onChange={field.handleChange}
+                                >
+                                  {config.localization.emailVerified}
+                                </Switch>
+                              )}
+                            </profileForm.Field>
+                            <profileForm.Field name="roles">
+                              {(field) => (
+                                <Select
+                                  fullWidth
+                                  isDisabled={
+                                    isSelf || !canSetRole.data?.success
+                                  }
                                   selectionMode={
                                     config.allowMultipleRoles
                                       ? "multiple"
                                       : "single"
                                   }
+                                  value={field.state.value}
+                                  variant="secondary"
+                                  onChange={(keys) => {
+                                    const next = [...(keys as Iterable<string>)]
+                                    if (next.length)
+                                      field.handleChange(
+                                        config.allowMultipleRoles
+                                          ? next
+                                          : next.slice(0, 1)
+                                      )
+                                  }}
                                 >
-                                  {config.roles.map((item) => (
-                                    <ListBox.Item
-                                      id={item}
-                                      key={item}
-                                      textValue={item}
+                                  <Label>{config.localization.role}</Label>
+                                  <Select.Trigger>
+                                    <Select.Value />
+                                    <Select.Indicator />
+                                  </Select.Trigger>
+                                  <Select.Popover>
+                                    <ListBox
+                                      selectionMode={
+                                        config.allowMultipleRoles
+                                          ? "multiple"
+                                          : "single"
+                                      }
                                     >
-                                      {item}
-                                      <ListBox.ItemIndicator />
-                                    </ListBox.Item>
-                                  ))}
-                                </ListBox>
-                              </Select.Popover>
-                            </Select>
+                                      {config.roles.map((item) => (
+                                        <ListBox.Item
+                                          id={item}
+                                          key={item}
+                                          textValue={item}
+                                        >
+                                          {item}
+                                          <ListBox.ItemIndicator />
+                                        </ListBox.Item>
+                                      ))}
+                                    </ListBox>
+                                  </Select.Popover>
+                                </Select>
+                              )}
+                            </profileForm.Field>
                             {additionalFields?.map((field) => {
                               const value = (
                                 detail as unknown as Record<string, unknown>
@@ -1351,22 +1458,32 @@ function UserDrawer({
                         >
                           {config.localization.cancel}
                         </Button>
-                        <Button
-                          isDisabled={
-                            !name.trim() ||
-                            !email.trim() ||
-                            canUpdate.isPending ||
-                            canSetRole.isPending ||
-                            (!canUpdate.data?.success &&
-                              (!canSetRole.data?.success || isSelf))
-                          }
-                          isPending={
-                            updateUser.isPending || setRoleMutation.isPending
-                          }
-                          type="submit"
+                        <profileForm.Subscribe
+                          selector={(state) => [
+                            state.values.name,
+                            state.values.email
+                          ]}
                         >
-                          {config.localization.saveChanges}
-                        </Button>
+                          {([name, email]) => (
+                            <Button
+                              isDisabled={
+                                !name.trim() ||
+                                !email.trim() ||
+                                canUpdate.isPending ||
+                                canSetRole.isPending ||
+                                (!canUpdate.data?.success &&
+                                  (!canSetRole.data?.success || isSelf))
+                              }
+                              isPending={
+                                updateUser.isPending ||
+                                setRoleMutation.isPending
+                              }
+                              type="submit"
+                            >
+                              {config.localization.saveChanges}
+                            </Button>
+                          )}
+                        </profileForm.Subscribe>
                       </div>
                     </Form>
                   </Tabs.Panel>

@@ -3,6 +3,7 @@ import {
   type DashAuthClient,
   formatDashEventName,
   getDashEventDetail,
+  getDashEventKey,
   getDashEventLocation
 } from "@better-auth-ui/core/plugins/dash"
 import {
@@ -17,6 +18,17 @@ import {
 } from "@better-auth-ui/solid/plugins/dash"
 import { useActiveMemberRole } from "@better-auth-ui/solid/plugins/organization"
 import { keepPreviousData } from "@tanstack/solid-query"
+import {
+  type ColumnFiltersState,
+  columnFilteringFeature,
+  createTableHook,
+  functionalUpdate,
+  globalFilteringFeature,
+  type PaginationState,
+  rowPaginationFeature,
+  tableFeatures,
+  type Updater
+} from "@tanstack/solid-table"
 import {
   Activity,
   Building2,
@@ -73,6 +85,21 @@ import { organizationPlugin } from "@/lib/auth/organization-plugin"
 import { cn } from "@/lib/utils"
 
 type ActivityAccess = "admin" | "admin-user" | "organization" | "user"
+
+const { createAppColumnHelper, createAppTable: createActivityTable } =
+  createTableHook({
+    features: tableFeatures({
+      columnFilteringFeature,
+      globalFilteringFeature,
+      rowPaginationFeature
+    })
+  })
+
+const activityColumnHelper = createAppColumnHelper<DashAuditLog>()
+const activityColumns = activityColumnHelper.columns([
+  activityColumnHelper.accessor("eventType", { id: "eventType" })
+])
+const EMPTY_EVENTS: DashAuditLog[] = []
 
 type ActivityFeedProps = {
   access: ActivityAccess
@@ -208,25 +235,34 @@ function ActivityRowSkeleton() {
 function ActivityFeed(props: ActivityFeedProps) {
   const auth = useAuth()
   const { localization, pageSize } = useAuthPlugin(dashPlugin)
-  const [page, setPage] = createSignal(0)
-  const [eventType, setEventType] = createSignal("all")
-  const [identifier, setIdentifier] = createSignal("")
-  const deferredIdentifier = createDeferred(() => identifier().trim())
+  const [pagination, setPaginationState] = createSignal<PaginationState>({
+    pageIndex: 0,
+    pageSize
+  })
+  const [columnFilters, setColumnFiltersState] =
+    createSignal<ColumnFiltersState>([])
+  const [globalFilter, setGlobalFilterState] = createSignal("")
+  const eventType = () =>
+    String(
+      columnFilters().find((filter) => filter.id === "eventType")?.value ??
+        "all"
+    )
+  const deferredIdentifier = createDeferred(() => globalFilter().trim())
   const eventOptions = createMemo(() =>
     Object.entries(localization.eventLabels)
   )
   createEffect(
     on(
       () => [props.access, props.organizationId, props.userId] as const,
-      () => setPage(0),
+      () => setPaginationState((current) => ({ ...current, pageIndex: 0 })),
       { defer: true }
     )
   )
-  const offset = () => page() * pageSize
+  const offset = () => pagination().pageIndex * pagination().pageSize
   const params = () => ({
     eventType: eventType() === "all" ? undefined : eventType(),
     identifier: deferredIdentifier() || undefined,
-    limit: pageSize,
+    limit: pagination().pageSize,
     offset: offset(),
     organizationId: props.organizationId
   })
@@ -253,7 +289,7 @@ function ActivityFeed(props: ActivityFeedProps) {
       params: {
         eventType: params().eventType,
         identifier: params().identifier,
-        limit: pageSize,
+        limit: pagination().pageSize,
         offset: offset()
       }
     })
@@ -266,7 +302,38 @@ function ActivityFeed(props: ActivityFeedProps) {
         : userQuery
   const showPending = () => !(props.ready ?? true) || query().isPending
   const pageEnd = () => offset() + (query().data?.events.length ?? 0)
-  const hasNextPage = () => pageEnd() < (query().data?.total ?? 0)
+  const setPagination = (updater: Updater<PaginationState>) =>
+    setPaginationState((current) => functionalUpdate(updater, current))
+  const setColumnFilters = (updater: Updater<ColumnFiltersState>) => {
+    setColumnFiltersState((current) => functionalUpdate(updater, current))
+    setPaginationState((current) => ({ ...current, pageIndex: 0 }))
+  }
+  const setGlobalFilter = (updater: Updater<string>) => {
+    setGlobalFilterState((current) => functionalUpdate(updater, current))
+    setPaginationState((current) => ({ ...current, pageIndex: 0 }))
+  }
+  const table = createActivityTable({
+    columns: activityColumns,
+    get data() {
+      return query().data?.events ?? EMPTY_EVENTS
+    },
+    get rowCount() {
+      return query().data?.total ?? 0
+    },
+    get state() {
+      return {
+        columnFilters: columnFilters(),
+        globalFilter: globalFilter(),
+        pagination: pagination()
+      }
+    },
+    getRowId: getDashEventKey,
+    manualFiltering: true,
+    manualPagination: true,
+    onColumnFiltersChange: setColumnFilters,
+    onGlobalFilterChange: setGlobalFilter,
+    onPaginationChange: setPagination
+  })
 
   return (
     <Card
@@ -304,8 +371,10 @@ function ActivityFeed(props: ActivityFeedProps) {
             <NativeSelect
               id="solid-dash-event-type"
               onChange={(event) => {
-                setEventType(event.currentTarget.value)
-                setPage(0)
+                const value = event.currentTarget.value
+                table
+                  .getColumn("eventType")
+                  ?.setFilterValue(value === "all" ? undefined : value)
               }}
               value={eventType()}
             >
@@ -330,11 +399,10 @@ function ActivityFeed(props: ActivityFeedProps) {
               <InputGroupInput
                 id="solid-dash-identifier"
                 onInput={(event) => {
-                  setIdentifier(event.currentTarget.value)
-                  setPage(0)
+                  table.setGlobalFilter(event.currentTarget.value)
                 }}
                 placeholder={localization.identifierPlaceholder}
-                value={identifier()}
+                value={globalFilter()}
               />
             </InputGroup>
           </Field>
@@ -398,13 +466,13 @@ function ActivityFeed(props: ActivityFeedProps) {
               }
             >
               <ul>
-                <For each={query().data?.events ?? []}>
-                  {(event, position) => (
+                <For each={table.getRowModel().rows}>
+                  {(row, position) => (
                     <>
                       <Show when={position() > 0}>
                         <Separator />
                       </Show>
-                      <ActivityRow event={event} />
+                      <ActivityRow event={row.original} />
                     </>
                   )}
                 </For>
@@ -430,8 +498,8 @@ function ActivityFeed(props: ActivityFeedProps) {
           <div class="flex gap-1">
             <Button
               aria-label={localization.previousPage}
-              disabled={query().isFetching || page() === 0}
-              onClick={() => setPage((current) => Math.max(0, current - 1))}
+              disabled={query().isFetching || !table.getCanPreviousPage()}
+              onClick={() => table.previousPage()}
               size="icon-sm"
               variant="ghost"
             >
@@ -439,8 +507,8 @@ function ActivityFeed(props: ActivityFeedProps) {
             </Button>
             <Button
               aria-label={localization.nextPage}
-              disabled={query().isFetching || !hasNextPage()}
-              onClick={() => setPage((current) => current + 1)}
+              disabled={query().isFetching || !table.getCanNextPage()}
+              onClick={() => table.nextPage()}
               size="icon-sm"
               variant="ghost"
             >

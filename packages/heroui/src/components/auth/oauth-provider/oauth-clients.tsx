@@ -51,13 +51,23 @@ import {
   TextField,
   toast
 } from "@heroui/react"
-import { type SyntheticEvent, useMemo, useState } from "react"
+import { useForm } from "@tanstack/react-form"
+import { useMemo, useState } from "react"
 
 import { oauthProviderPlugin } from "../../../lib/auth/oauth-provider-plugin"
 
 type ClientAction =
   | { kind: "delete"; client: ManagedOAuthClient }
   | { kind: "rotate"; client: ManagedOAuthClient }
+
+type OAuthClientFormValues = {
+  applicationType: "native" | "web"
+  clientName: string
+  clientUri: string
+  logoUri: string
+  redirectUris: string
+  scope: string
+}
 
 export type OAuthClientsProps = {
   manager: OAuthClientManager
@@ -76,6 +86,17 @@ const lines = (value: string) =>
         .filter(Boolean)
     )
   )
+
+const getOAuthClientFormValues = (
+  client?: ManagedOAuthClient
+): OAuthClientFormValues => ({
+  applicationType: client?.application_type === "native" ? "native" : "web",
+  clientName: client?.client_name ?? "",
+  clientUri: client?.client_uri ?? "",
+  logoUri: client?.logo_uri ?? "",
+  redirectUris: client?.redirect_uris.join("\n") ?? "",
+  scope: client?.scope ?? ""
+})
 
 export function OAuthClients({
   manager,
@@ -100,44 +121,47 @@ export function OAuthClients({
     onError: (error) =>
       toast.danger(error instanceof Error ? error.message : String(error))
   })
+  const form = useForm({
+    defaultValues: getOAuthClientFormValues(),
+    onSubmit: async ({ value }) => {
+      const input: OAuthClientInput = {
+        client_name: value.clientName.trim(),
+        application_type: value.applicationType,
+        redirect_uris: lines(value.redirectUris),
+        client_uri: value.clientUri.trim() || undefined,
+        logo_uri: value.logoUri.trim() || undefined,
+        scope: value.scope.trim() || undefined
+      }
+
+      try {
+        if (editingClient) {
+          await updateClient.mutateAsync({
+            clientId: editingClient.client_id,
+            update: input
+          })
+          setEditorOpen(false)
+          return
+        }
+
+        const client = await createClient.mutateAsync(input)
+        setEditorOpen(false)
+        setSecret(client)
+      } catch {
+        // The mutation keeps its error state for the host application.
+      }
+    }
+  })
 
   const openCreate = () => {
     setEditingClient(undefined)
+    form.reset(getOAuthClientFormValues())
     setEditorOpen(true)
   }
 
   const openEdit = (client: ManagedOAuthClient) => {
     setEditingClient(client)
+    form.reset(getOAuthClientFormValues(client))
     setEditorOpen(true)
-  }
-
-  const handleEditorSubmit = (event: SyntheticEvent<HTMLFormElement>) => {
-    event.preventDefault()
-    const formData = new FormData(event.currentTarget)
-    const input: OAuthClientInput = {
-      client_name: String(formData.get("clientName") ?? "").trim(),
-      application_type:
-        formData.get("applicationType") === "native" ? "native" : "web",
-      redirect_uris: lines(String(formData.get("redirectUris") ?? "")),
-      client_uri: String(formData.get("clientUri") ?? "").trim() || undefined,
-      logo_uri: String(formData.get("logoUri") ?? "").trim() || undefined,
-      scope: String(formData.get("scope") ?? "").trim() || undefined
-    }
-
-    if (editingClient) {
-      updateClient.mutate(
-        { clientId: editingClient.client_id, update: input },
-        { onSuccess: () => setEditorOpen(false) }
-      )
-      return
-    }
-
-    createClient.mutate(input, {
-      onSuccess: (client) => {
-        setEditorOpen(false)
-        setSecret(client)
-      }
-    })
   }
 
   const confirmAction = () => {
@@ -303,7 +327,12 @@ export function OAuthClients({
       <Modal.Backdrop isOpen={editorOpen} onOpenChange={setEditorOpen}>
         <Modal.Container>
           <Modal.Dialog>
-            <Form onSubmit={handleEditorSubmit}>
+            <Form
+              onSubmit={(event) => {
+                event.preventDefault()
+                void form.handleSubmit()
+              }}
+            >
               <Modal.CloseTrigger />
               <Modal.Header>
                 <Modal.Icon>
@@ -316,85 +345,110 @@ export function OAuthClients({
                 </Modal.Heading>
               </Modal.Header>
               <Modal.Body className="flex flex-col gap-4 overflow-visible">
-                <TextField
-                  name="clientName"
-                  defaultValue={editingClient?.client_name ?? ""}
-                  isRequired
-                >
-                  <Label>{oauthLocalization.clientName}</Label>
-                  <Input autoFocus variant="secondary" />
-                  <FieldError />
-                </TextField>
-                <Select
-                  name="applicationType"
-                  defaultValue={editingClient?.application_type ?? "web"}
-                  variant="secondary"
-                >
-                  <Label>{oauthLocalization.applicationType}</Label>
-                  <Select.Trigger>
-                    <Select.Value />
-                    <Select.Indicator />
-                  </Select.Trigger>
-                  <Select.Popover>
-                    <ListBox>
-                      <ListBox.Item id="web">
-                        {oauthLocalization.webApplication}
-                      </ListBox.Item>
-                      <ListBox.Item id="native">
-                        {oauthLocalization.nativeApplication}
-                      </ListBox.Item>
-                    </ListBox>
-                  </Select.Popover>
-                </Select>
-                <TextField
-                  name="redirectUris"
-                  defaultValue={editingClient?.redirect_uris.join("\n") ?? ""}
-                  isRequired
-                >
-                  <Label>{oauthLocalization.redirectUrls}</Label>
-                  <TextArea rows={3} variant="secondary" />
-                  <p className="text-muted text-xs">
-                    {oauthLocalization.redirectUrlsDescription}
-                  </p>
-                  <FieldError />
-                </TextField>
-                <TextField
-                  name="clientUri"
-                  defaultValue={editingClient?.client_uri ?? ""}
-                >
-                  <Label>{oauthLocalization.applicationUrl}</Label>
-                  <Input type="url" variant="secondary" />
-                </TextField>
-                <TextField
-                  name="logoUri"
-                  defaultValue={editingClient?.logo_uri ?? ""}
-                >
-                  <Label>{oauthLocalization.logoUrl}</Label>
-                  <Input type="url" variant="secondary" />
-                </TextField>
-                <TextField
-                  name="scope"
-                  defaultValue={editingClient?.scope ?? ""}
-                >
-                  <Label>{oauthLocalization.scopes}</Label>
-                  <Input
-                    placeholder="openid profile email"
-                    variant="secondary"
-                  />
-                </TextField>
+                <form.Field name="clientName">
+                  {(field) => (
+                    <TextField
+                      isRequired
+                      name={field.name}
+                      onBlur={field.handleBlur}
+                      onChange={field.handleChange}
+                      value={field.state.value}
+                    >
+                      <Label>{oauthLocalization.clientName}</Label>
+                      <Input autoFocus variant="secondary" />
+                      <FieldError />
+                    </TextField>
+                  )}
+                </form.Field>
+                <form.Field name="applicationType">
+                  {(field) => (
+                    <Select
+                      name={field.name}
+                      onChange={(value) =>
+                        field.handleChange(String(value) as "native" | "web")
+                      }
+                      value={field.state.value}
+                      variant="secondary"
+                    >
+                      <Label>{oauthLocalization.applicationType}</Label>
+                      <Select.Trigger>
+                        <Select.Value />
+                        <Select.Indicator />
+                      </Select.Trigger>
+                      <Select.Popover>
+                        <ListBox>
+                          <ListBox.Item id="web">
+                            {oauthLocalization.webApplication}
+                          </ListBox.Item>
+                          <ListBox.Item id="native">
+                            {oauthLocalization.nativeApplication}
+                          </ListBox.Item>
+                        </ListBox>
+                      </Select.Popover>
+                    </Select>
+                  )}
+                </form.Field>
+                <form.Field name="redirectUris">
+                  {(field) => (
+                    <TextField
+                      isRequired
+                      name={field.name}
+                      onBlur={field.handleBlur}
+                      onChange={field.handleChange}
+                      value={field.state.value}
+                    >
+                      <Label>{oauthLocalization.redirectUrls}</Label>
+                      <TextArea rows={3} variant="secondary" />
+                      <p className="text-muted text-xs">
+                        {oauthLocalization.redirectUrlsDescription}
+                      </p>
+                      <FieldError />
+                    </TextField>
+                  )}
+                </form.Field>
+                {(
+                  [
+                    ["clientUri", oauthLocalization.applicationUrl, "url"],
+                    ["logoUri", oauthLocalization.logoUrl, "url"],
+                    ["scope", oauthLocalization.scopes, "text"]
+                  ] as const
+                ).map(([name, label, type]) => (
+                  <form.Field key={name} name={name}>
+                    {(field) => (
+                      <TextField
+                        name={field.name}
+                        onBlur={field.handleBlur}
+                        onChange={field.handleChange}
+                        value={field.state.value}
+                      >
+                        <Label>{label}</Label>
+                        <Input
+                          placeholder={
+                            name === "scope"
+                              ? "openid profile email"
+                              : undefined
+                          }
+                          type={type}
+                          variant="secondary"
+                        />
+                      </TextField>
+                    )}
+                  </form.Field>
+                ))}
               </Modal.Body>
               <Modal.Footer>
                 <Button variant="ghost" onPress={() => setEditorOpen(false)}>
                   {oauthLocalization.cancel}
                 </Button>
-                <Button
-                  type="submit"
-                  isPending={createClient.isPending || updateClient.isPending}
-                >
-                  {editingClient
-                    ? oauthLocalization.saveChanges
-                    : oauthLocalization.createClient}
-                </Button>
+                <form.Subscribe selector={(state) => state.isSubmitting}>
+                  {(isSubmitting) => (
+                    <Button type="submit" isPending={isSubmitting}>
+                      {editingClient
+                        ? oauthLocalization.saveChanges
+                        : oauthLocalization.createClient}
+                    </Button>
+                  )}
+                </form.Subscribe>
               </Modal.Footer>
             </Form>
           </Modal.Dialog>

@@ -34,8 +34,9 @@ import {
   TextField,
   toast
 } from "@heroui/react"
+import { useForm } from "@tanstack/react-form"
 import type { BetterFetchError } from "better-auth/client"
-import { type FormEvent, useMemo, useState } from "react"
+import { useMemo, useState } from "react"
 
 import { organizationPlugin } from "../../../lib/auth/organization-plugin"
 import { ssoPlugin } from "../../../lib/auth/sso-plugin"
@@ -49,8 +50,27 @@ export type OrganizationSsoProvidersProps = {
 
 const providerSkeletonIds = ["sso-provider-1", "sso-provider-2"]
 
-const readString = (formData: FormData, name: string) =>
-  String(formData.get(name) ?? "").trim()
+type SsoProviderEditorValues = {
+  clientId: string
+  clientSecret: string
+  discoveryEndpoint: string
+  domain: string
+  entryPoint: string
+  identityProviderMetadata: string
+  issuer: string
+}
+
+const getSsoProviderEditorValues = (
+  provider?: SsoProvider
+): SsoProviderEditorValues => ({
+  clientId: "",
+  clientSecret: "",
+  discoveryEndpoint: provider?.oidcConfig?.discoveryEndpoint ?? "",
+  domain: provider?.domain ?? "",
+  entryPoint: provider?.samlConfig?.entryPoint ?? "",
+  identityProviderMetadata: "",
+  issuer: provider?.issuer ?? ""
+})
 
 const getErrorMessage = (error: Error | null) => {
   const authError = error as BetterFetchError | null
@@ -213,7 +233,11 @@ export function OrganizationSsoProviders({
         )}
       </Card.Content>
 
-      <EditSsoProviderDialog provider={editing} onOpenChange={setEditing} />
+      <EditSsoProviderDialog
+        key={editing?.providerId ?? "closed"}
+        provider={editing}
+        onOpenChange={setEditing}
+      />
       <DeleteSsoProviderDialog provider={deleting} onOpenChange={setDeleting} />
       <AlertDialog.Backdrop
         isOpen={Boolean(verifying)}
@@ -257,49 +281,47 @@ function EditSsoProviderDialog({
     update.reset()
     onOpenChange(undefined)
   }
-  const submit = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault()
-    if (!provider) return
-    const data = new FormData(event.currentTarget)
-    const clientId = readString(data, "clientId")
-    const clientSecret = readString(data, "clientSecret")
-    const identityProviderMetadata = readString(
-      data,
-      "identityProviderMetadata"
-    )
-    const params = {
-      providerId: provider.providerId,
-      issuer: readString(data, "issuer"),
-      domain: readString(data, "domain"),
-      ...(provider.oidcConfig
-        ? {
-            oidcConfig: {
-              ...(clientId ? { clientId } : {}),
-              ...(clientSecret ? { clientSecret } : {}),
-              discoveryEndpoint:
-                readString(data, "discoveryEndpoint") || undefined
+  const form = useForm({
+    defaultValues: getSsoProviderEditorValues(provider),
+    onSubmit: async ({ value }) => {
+      if (!provider) return
+      const clientId = value.clientId.trim()
+      const clientSecret = value.clientSecret.trim()
+      const identityProviderMetadata = value.identityProviderMetadata.trim()
+      const params = {
+        providerId: provider.providerId,
+        issuer: value.issuer.trim(),
+        domain: value.domain.trim(),
+        ...(provider.oidcConfig
+          ? {
+              oidcConfig: {
+                ...(clientId ? { clientId } : {}),
+                ...(clientSecret ? { clientSecret } : {}),
+                discoveryEndpoint: value.discoveryEndpoint.trim() || undefined
+              }
             }
-          }
-        : {}),
-      ...(provider.samlConfig
-        ? {
-            samlConfig: {
-              entryPoint: readString(data, "entryPoint"),
-              ...(identityProviderMetadata
-                ? { idpMetadata: { metadata: identityProviderMetadata } }
-                : {})
+          : {}),
+        ...(provider.samlConfig
+          ? {
+              samlConfig: {
+                entryPoint: value.entryPoint.trim(),
+                ...(identityProviderMetadata
+                  ? { idpMetadata: { metadata: identityProviderMetadata } }
+                  : {})
+              }
             }
-          }
-        : {})
-    } as UpdateSsoProviderParams
+          : {})
+      } as UpdateSsoProviderParams
 
-    update.mutate(params, {
-      onSuccess: () => {
+      try {
+        await update.mutateAsync(params)
         toast.success(localization.providerUpdated)
         close()
+      } catch {
+        // The mutation error is rendered below the fields.
       }
-    })
-  }
+    }
+  })
 
   return (
     <AlertDialog.Backdrop
@@ -310,7 +332,12 @@ function EditSsoProviderDialog({
     >
       <AlertDialog.Container>
         <AlertDialog.Dialog className="max-w-xl">
-          <Form onSubmit={submit}>
+          <Form
+            onSubmit={(event) => {
+              event.preventDefault()
+              void form.handleSubmit()
+            }}
+          >
             <AlertDialog.CloseTrigger />
             <AlertDialog.Header>
               <AlertDialog.Heading>
@@ -318,64 +345,110 @@ function EditSsoProviderDialog({
               </AlertDialog.Heading>
             </AlertDialog.Header>
             <AlertDialog.Body className="flex flex-col gap-4 overflow-visible">
-              <TextField
-                defaultValue={provider?.domain}
-                isRequired
-                name="domain"
-              >
-                <Label>{localization.domain}</Label>
-                <Input variant="secondary" />
-                <FieldError />
-              </TextField>
-              <TextField
-                defaultValue={provider?.issuer}
-                isRequired
-                name="issuer"
-              >
-                <Label>{localization.issuer}</Label>
-                <Input type="url" variant="secondary" />
-                <FieldError />
-              </TextField>
+              {(
+                [
+                  ["domain", localization.domain, "text"],
+                  ["issuer", localization.issuer, "url"]
+                ] as const
+              ).map(([name, label, type]) => (
+                <form.Field key={name} name={name}>
+                  {(field) => (
+                    <TextField
+                      isRequired
+                      name={field.name}
+                      onBlur={field.handleBlur}
+                      onChange={field.handleChange}
+                      value={field.state.value}
+                    >
+                      <Label>{label}</Label>
+                      <Input type={type} variant="secondary" />
+                      <FieldError />
+                    </TextField>
+                  )}
+                </form.Field>
+              ))}
               {provider?.oidcConfig ? (
                 <>
-                  <TextField name="discoveryEndpoint">
-                    <Label>{localization.discoveryEndpoint}</Label>
-                    <Input
-                      defaultValue={provider.oidcConfig.discoveryEndpoint}
-                      type="url"
-                      variant="secondary"
-                    />
-                  </TextField>
+                  <form.Field name="discoveryEndpoint">
+                    {(field) => (
+                      <TextField
+                        name={field.name}
+                        onBlur={field.handleBlur}
+                        onChange={field.handleChange}
+                        value={field.state.value}
+                      >
+                        <Label>{localization.discoveryEndpoint}</Label>
+                        <Input type="url" variant="secondary" />
+                      </TextField>
+                    )}
+                  </form.Field>
                   <div className="grid gap-4 sm:grid-cols-2">
-                    <TextField name="clientId">
-                      <Label>{localization.clientId}</Label>
-                      <Input
-                        placeholder={`••••${provider.oidcConfig.clientIdLastFour}`}
-                        variant="secondary"
-                      />
-                    </TextField>
-                    <TextField name="clientSecret" type="password">
-                      <Label>{localization.clientSecret}</Label>
-                      <Input autoComplete="new-password" variant="secondary" />
-                    </TextField>
+                    <form.Field name="clientId">
+                      {(field) => (
+                        <TextField
+                          name={field.name}
+                          onBlur={field.handleBlur}
+                          onChange={field.handleChange}
+                          value={field.state.value}
+                        >
+                          <Label>{localization.clientId}</Label>
+                          <Input
+                            placeholder={`••••${provider.oidcConfig?.clientIdLastFour}`}
+                            variant="secondary"
+                          />
+                        </TextField>
+                      )}
+                    </form.Field>
+                    <form.Field name="clientSecret">
+                      {(field) => (
+                        <TextField
+                          name={field.name}
+                          onBlur={field.handleBlur}
+                          onChange={field.handleChange}
+                          type="password"
+                          value={field.state.value}
+                        >
+                          <Label>{localization.clientSecret}</Label>
+                          <Input
+                            autoComplete="new-password"
+                            variant="secondary"
+                          />
+                        </TextField>
+                      )}
+                    </form.Field>
                   </div>
                 </>
               ) : null}
               {provider?.samlConfig ? (
                 <>
-                  <TextField isRequired name="entryPoint">
-                    <Label>{localization.entryPoint}</Label>
-                    <Input
-                      defaultValue={provider.samlConfig.entryPoint}
-                      type="url"
-                      variant="secondary"
-                    />
-                    <FieldError />
-                  </TextField>
-                  <TextField name="identityProviderMetadata">
-                    <Label>{localization.identityProviderMetadata}</Label>
-                    <TextArea className="font-mono text-xs" rows={6} />
-                  </TextField>
+                  <form.Field name="entryPoint">
+                    {(field) => (
+                      <TextField
+                        isRequired
+                        name={field.name}
+                        onBlur={field.handleBlur}
+                        onChange={field.handleChange}
+                        value={field.state.value}
+                      >
+                        <Label>{localization.entryPoint}</Label>
+                        <Input type="url" variant="secondary" />
+                        <FieldError />
+                      </TextField>
+                    )}
+                  </form.Field>
+                  <form.Field name="identityProviderMetadata">
+                    {(field) => (
+                      <TextField
+                        name={field.name}
+                        onBlur={field.handleBlur}
+                        onChange={field.handleChange}
+                        value={field.state.value}
+                      >
+                        <Label>{localization.identityProviderMetadata}</Label>
+                        <TextArea className="font-mono text-xs" rows={6} />
+                      </TextField>
+                    )}
+                  </form.Field>
                 </>
               ) : null}
               {update.error ? (
@@ -390,9 +463,13 @@ function EditSsoProviderDialog({
               >
                 {localization.cancel}
               </Button>
-              <Button isPending={update.isPending} type="submit">
-                {localization.saveProvider}
-              </Button>
+              <form.Subscribe selector={(state) => state.isSubmitting}>
+                {(isSubmitting) => (
+                  <Button isPending={isSubmitting} type="submit">
+                    {localization.saveProvider}
+                  </Button>
+                )}
+              </form.Subscribe>
             </AlertDialog.Footer>
           </Form>
         </AlertDialog.Dialog>

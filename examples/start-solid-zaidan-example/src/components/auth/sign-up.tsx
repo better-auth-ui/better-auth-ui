@@ -12,6 +12,7 @@ import {
   useFetchOptions,
   useSignUpEmail
 } from "@better-auth-ui/solid"
+import { createForm } from "@tanstack/solid-form"
 import { useQueryClient } from "@tanstack/solid-query"
 import { Eye, EyeOff } from "lucide-solid"
 import { createSignal, For, Show } from "solid-js"
@@ -42,13 +43,9 @@ export function SignUp(props: SignUpProps) {
   const auth = useAuth()
   const { fetchOptions, resetFetchOptions } = useFetchOptions()
   const queryClient = useQueryClient()
-  const [email, setEmail] = createSignal("")
   const [emailError, setEmailError] = createSignal<string>()
-  const [name, setName] = createSignal("")
   const [nameError, setNameError] = createSignal<string>()
-  const [password, setPassword] = createSignal("")
   const [passwordError, setPasswordError] = createSignal<string>()
-  const [confirmPassword, setConfirmPassword] = createSignal("")
   const [confirmPasswordError, setConfirmPasswordError] = createSignal<string>()
   const [isPasswordVisible, setIsPasswordVisible] = createSignal(false)
   const [isConfirmPasswordVisible, setIsConfirmPasswordVisible] =
@@ -61,6 +58,8 @@ export function SignUp(props: SignUpProps) {
         setPasswordError(auth.localization.auth.passwordCompromised)
       }
 
+      form.setFieldValue("password", "")
+      form.setFieldValue("confirmPassword", "")
       resetFetchOptions()
     },
     onSuccess: (_data, variables) => {
@@ -98,22 +97,42 @@ export function SignUp(props: SignUpProps) {
     auth.additionalFields?.filter(
       (field) => field.signUp && field.signUp !== "above"
     ) ?? []
+  let additionalFieldValues: Record<string, unknown> = {}
+  const form = createForm(() => ({
+    defaultValues: {
+      confirmPassword: "",
+      email: "",
+      name: "",
+      password: ""
+    },
+    onSubmit: ({ value }) => {
+      setConfirmPasswordError(undefined)
+
+      if (
+        auth.emailAndPassword.confirmPassword &&
+        value.password !== value.confirmPassword
+      ) {
+        setConfirmPasswordError(auth.localization.auth.passwordsDoNotMatch)
+        form.setFieldValue("password", "")
+        form.setFieldValue("confirmPassword", "")
+        return
+      }
+
+      signUp.mutate({
+        email: value.email,
+        fetchOptions: fetchOptions(),
+        name: auth.emailAndPassword.name ? value.name : "",
+        password: value.password,
+        ...additionalFieldValues
+      } as Parameters<typeof signUp.mutate>[0])
+    }
+  }))
 
   const submitSignUp = async (event: SubmitEvent) => {
     event.preventDefault()
 
-    setConfirmPasswordError(undefined)
-
-    if (
-      auth.emailAndPassword.confirmPassword &&
-      password() !== confirmPassword()
-    ) {
-      setConfirmPasswordError(auth.localization.auth.passwordsDoNotMatch)
-      return
-    }
-
     const formData = new FormData(event.currentTarget as HTMLFormElement)
-    const additionalFieldValues: Record<string, unknown> = {}
+    const values: Record<string, unknown> = {}
 
     for (const field of auth.additionalFields ?? []) {
       if (!field.signUp || field.readOnly) continue
@@ -133,17 +152,12 @@ export function SignUp(props: SignUpProps) {
       }
 
       if (value !== undefined) {
-        additionalFieldValues[field.name] = value
+        values[field.name] = value
       }
     }
 
-    signUp.mutate({
-      email: email(),
-      fetchOptions: fetchOptions(),
-      name: name(),
-      password: password(),
-      ...additionalFieldValues
-    } as Parameters<typeof signUp.mutate>[0])
+    additionalFieldValues = values
+    await form.handleSubmit()
   }
 
   return (
@@ -170,61 +184,69 @@ export function SignUp(props: SignUpProps) {
         <form aria-label="Sign up" onSubmit={submitSignUp}>
           <div class="flex flex-col gap-6">
             <Show when={auth.emailAndPassword.name}>
-              <Field>
-                <FieldLabel for="sign-up-name">
-                  {auth.localization.auth.name}
-                </FieldLabel>
-                <Input
-                  aria-invalid={Boolean(nameError())}
-                  autocomplete="name"
-                  id="sign-up-name"
-                  name="name"
-                  onInput={(event) => {
-                    setName(event.currentTarget.value)
-                    setNameError(undefined)
-                  }}
-                  onInvalid={(event) => {
-                    event.preventDefault()
-                    setNameError(event.currentTarget.validationMessage)
-                  }}
-                  placeholder={auth.localization.auth.namePlaceholder}
-                  required={auth.emailAndPassword.name}
-                  type="text"
-                  value={name()}
-                />
+              <form.Field name="name">
+                {(field) => (
+                  <Field>
+                    <FieldLabel for="sign-up-name">
+                      {auth.localization.auth.name}
+                    </FieldLabel>
+                    <Input
+                      aria-invalid={Boolean(nameError())}
+                      autocomplete="name"
+                      id="sign-up-name"
+                      name={field().name}
+                      onInput={(event) => {
+                        field().handleChange(event.currentTarget.value)
+                        setNameError(undefined)
+                      }}
+                      onInvalid={(event) => {
+                        event.preventDefault()
+                        setNameError(event.currentTarget.validationMessage)
+                      }}
+                      placeholder={auth.localization.auth.namePlaceholder}
+                      required={auth.emailAndPassword.name}
+                      type="text"
+                      value={field().state.value}
+                    />
 
-                <Show when={nameError()}>
-                  {(message) => <FieldError>{message()}</FieldError>}
-                </Show>
-              </Field>
+                    <Show when={nameError()}>
+                      {(message) => <FieldError>{message()}</FieldError>}
+                    </Show>
+                  </Field>
+                )}
+              </form.Field>
             </Show>
-            <Field>
-              <FieldLabel for="sign-up-email">
-                {auth.localization.auth.email}
-              </FieldLabel>
-              <Input
-                aria-invalid={Boolean(emailError())}
-                autocomplete="email"
-                id="sign-up-email"
-                name="email"
-                onInput={(event) => {
-                  setEmail(event.currentTarget.value)
-                  setEmailError(undefined)
-                }}
-                onInvalid={(event) => {
-                  event.preventDefault()
-                  setEmailError(event.currentTarget.validationMessage)
-                }}
-                placeholder={auth.localization.auth.emailPlaceholder}
-                required
-                type="email"
-                value={email()}
-              />
+            <form.Field name="email">
+              {(field) => (
+                <Field>
+                  <FieldLabel for="sign-up-email">
+                    {auth.localization.auth.email}
+                  </FieldLabel>
+                  <Input
+                    aria-invalid={Boolean(emailError())}
+                    autocomplete="email"
+                    id="sign-up-email"
+                    name={field().name}
+                    onInput={(event) => {
+                      field().handleChange(event.currentTarget.value)
+                      setEmailError(undefined)
+                    }}
+                    onInvalid={(event) => {
+                      event.preventDefault()
+                      setEmailError(event.currentTarget.validationMessage)
+                    }}
+                    placeholder={auth.localization.auth.emailPlaceholder}
+                    required
+                    type="email"
+                    value={field().state.value}
+                  />
 
-              <Show when={emailError()}>
-                {(message) => <FieldError>{message()}</FieldError>}
-              </Show>
-            </Field>
+                  <Show when={emailError()}>
+                    {(message) => <FieldError>{message()}</FieldError>}
+                  </Show>
+                </Field>
+              )}
+            </form.Field>
             <For each={signUpFieldsAbove()}>
               {(field) => (
                 <AdditionalField
@@ -235,128 +257,138 @@ export function SignUp(props: SignUpProps) {
                 />
               )}
             </For>
-            <Field>
-              <FieldLabel for="sign-up-password">
-                {auth.localization.auth.password}
-              </FieldLabel>
-              <div class="relative">
-                <Input
-                  aria-invalid={Boolean(passwordError())}
-                  autocomplete="new-password"
-                  class="pr-12"
-                  id="sign-up-password"
-                  maxLength={auth.emailAndPassword.maxPasswordLength}
-                  minLength={auth.emailAndPassword.minPasswordLength}
-                  name="password"
-                  onInput={(event) => {
-                    setPassword(event.currentTarget.value)
-                    setPasswordError(undefined)
-                    setConfirmPasswordError(undefined)
-                  }}
-                  onInvalid={(event) => {
-                    event.preventDefault()
-                    setPasswordError(event.currentTarget.validationMessage)
-                  }}
-                  placeholder={auth.localization.auth.passwordPlaceholder}
-                  required
-                  type={isPasswordVisible() ? "text" : "password"}
-                  value={password()}
-                />
+            <form.Field name="password">
+              {(field) => (
+                <Field>
+                  <FieldLabel for="sign-up-password">
+                    {auth.localization.auth.password}
+                  </FieldLabel>
+                  <div class="relative">
+                    <Input
+                      aria-invalid={Boolean(passwordError())}
+                      autocomplete="new-password"
+                      class="pr-12"
+                      id="sign-up-password"
+                      maxLength={auth.emailAndPassword.maxPasswordLength}
+                      minLength={auth.emailAndPassword.minPasswordLength}
+                      name={field().name}
+                      onInput={(event) => {
+                        field().handleChange(event.currentTarget.value)
+                        setPasswordError(undefined)
+                        setConfirmPasswordError(undefined)
+                      }}
+                      onInvalid={(event) => {
+                        event.preventDefault()
+                        setPasswordError(event.currentTarget.validationMessage)
+                      }}
+                      placeholder={auth.localization.auth.passwordPlaceholder}
+                      required
+                      type={isPasswordVisible() ? "text" : "password"}
+                      value={field().state.value}
+                    />
 
-                <Button
-                  aria-label={
-                    isPasswordVisible()
-                      ? auth.localization.auth.hidePassword
-                      : auth.localization.auth.showPassword
-                  }
-                  class="absolute right-1 top-1/2 -translate-y-1/2"
-                  onClick={() => setIsPasswordVisible((visible) => !visible)}
-                  size="icon-sm"
-                  title={
-                    isPasswordVisible()
-                      ? auth.localization.auth.hidePassword
-                      : auth.localization.auth.showPassword
-                  }
-                  type="button"
-                  variant="ghost"
-                >
-                  {isPasswordVisible() ? (
-                    <EyeOff aria-hidden class="size-4" />
-                  ) : (
-                    <Eye aria-hidden class="size-4" />
-                  )}
-                </Button>
-              </div>
+                    <Button
+                      aria-label={
+                        isPasswordVisible()
+                          ? auth.localization.auth.hidePassword
+                          : auth.localization.auth.showPassword
+                      }
+                      class="absolute right-1 top-1/2 -translate-y-1/2"
+                      onClick={() =>
+                        setIsPasswordVisible((visible) => !visible)
+                      }
+                      size="icon-sm"
+                      title={
+                        isPasswordVisible()
+                          ? auth.localization.auth.hidePassword
+                          : auth.localization.auth.showPassword
+                      }
+                      type="button"
+                      variant="ghost"
+                    >
+                      {isPasswordVisible() ? (
+                        <EyeOff aria-hidden class="size-4" />
+                      ) : (
+                        <Eye aria-hidden class="size-4" />
+                      )}
+                    </Button>
+                  </div>
 
-              <Show when={passwordError()}>
-                {(message) => <FieldError>{message()}</FieldError>}
-              </Show>
+                  <Show when={passwordError()}>
+                    {(message) => <FieldError>{message()}</FieldError>}
+                  </Show>
 
-              <PasswordStrengthMeter password={password()} />
-            </Field>
+                  <PasswordStrengthMeter password={field().state.value} />
+                </Field>
+              )}
+            </form.Field>
             <Show when={auth.emailAndPassword.confirmPassword}>
-              <Field>
-                <FieldLabel for="sign-up-confirm-password">
-                  {auth.localization.auth.confirmPassword}
-                </FieldLabel>
-                <div class="relative">
-                  <Input
-                    aria-invalid={Boolean(confirmPasswordError())}
-                    autocomplete="new-password"
-                    class="pr-12"
-                    id="sign-up-confirm-password"
-                    maxLength={auth.emailAndPassword.maxPasswordLength}
-                    minLength={auth.emailAndPassword.minPasswordLength}
-                    name="confirmPassword"
-                    onInput={(event) => {
-                      setConfirmPassword(event.currentTarget.value)
-                      setConfirmPasswordError(undefined)
-                    }}
-                    onInvalid={(event) => {
-                      event.preventDefault()
-                      setConfirmPasswordError(
-                        event.currentTarget.validationMessage
-                      )
-                    }}
-                    placeholder={
-                      auth.localization.auth.confirmPasswordPlaceholder
-                    }
-                    required
-                    type={isConfirmPasswordVisible() ? "text" : "password"}
-                    value={confirmPassword()}
-                  />
+              <form.Field name="confirmPassword">
+                {(field) => (
+                  <Field>
+                    <FieldLabel for="sign-up-confirm-password">
+                      {auth.localization.auth.confirmPassword}
+                    </FieldLabel>
+                    <div class="relative">
+                      <Input
+                        aria-invalid={Boolean(confirmPasswordError())}
+                        autocomplete="new-password"
+                        class="pr-12"
+                        id="sign-up-confirm-password"
+                        maxLength={auth.emailAndPassword.maxPasswordLength}
+                        minLength={auth.emailAndPassword.minPasswordLength}
+                        name={field().name}
+                        onInput={(event) => {
+                          field().handleChange(event.currentTarget.value)
+                          setConfirmPasswordError(undefined)
+                        }}
+                        onInvalid={(event) => {
+                          event.preventDefault()
+                          setConfirmPasswordError(
+                            event.currentTarget.validationMessage
+                          )
+                        }}
+                        placeholder={
+                          auth.localization.auth.confirmPasswordPlaceholder
+                        }
+                        required
+                        type={isConfirmPasswordVisible() ? "text" : "password"}
+                        value={field().state.value}
+                      />
 
-                  <Button
-                    aria-label={
-                      isConfirmPasswordVisible()
-                        ? auth.localization.auth.hidePassword
-                        : auth.localization.auth.showPassword
-                    }
-                    class="absolute right-1 top-1/2 -translate-y-1/2"
-                    onClick={() =>
-                      setIsConfirmPasswordVisible((visible) => !visible)
-                    }
-                    size="icon-sm"
-                    title={
-                      isConfirmPasswordVisible()
-                        ? auth.localization.auth.hidePassword
-                        : auth.localization.auth.showPassword
-                    }
-                    type="button"
-                    variant="ghost"
-                  >
-                    {isConfirmPasswordVisible() ? (
-                      <EyeOff aria-hidden class="size-4" />
-                    ) : (
-                      <Eye aria-hidden class="size-4" />
-                    )}
-                  </Button>
-                </div>
+                      <Button
+                        aria-label={
+                          isConfirmPasswordVisible()
+                            ? auth.localization.auth.hidePassword
+                            : auth.localization.auth.showPassword
+                        }
+                        class="absolute right-1 top-1/2 -translate-y-1/2"
+                        onClick={() =>
+                          setIsConfirmPasswordVisible((visible) => !visible)
+                        }
+                        size="icon-sm"
+                        title={
+                          isConfirmPasswordVisible()
+                            ? auth.localization.auth.hidePassword
+                            : auth.localization.auth.showPassword
+                        }
+                        type="button"
+                        variant="ghost"
+                      >
+                        {isConfirmPasswordVisible() ? (
+                          <EyeOff aria-hidden class="size-4" />
+                        ) : (
+                          <Eye aria-hidden class="size-4" />
+                        )}
+                      </Button>
+                    </div>
 
-                <Show when={confirmPasswordError()}>
-                  {(message) => <FieldError>{message()}</FieldError>}
-                </Show>
-              </Field>
+                    <Show when={confirmPasswordError()}>
+                      {(message) => <FieldError>{message()}</FieldError>}
+                    </Show>
+                  </Field>
+                )}
+              </form.Field>
             </Show>
             <For each={signUpFieldsBelow()}>
               {(field) => (
