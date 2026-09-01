@@ -5,7 +5,8 @@ import {
   Book,
   BookOpen,
   ClockArrowDown,
-  ListTodo
+  ListTodo,
+  PanelsTopLeft
 } from "lucide-react"
 import { Logo } from "@/components/icons/logo"
 
@@ -28,6 +29,32 @@ export function baseOptions(): BaseLayoutProps {
         icon: <BookOpen />,
         text: "Docs",
         url: "/docs",
+        secondary: false
+      },
+      {
+        type: "menu",
+        icon: <PanelsTopLeft />,
+        text: "Storybook",
+        items: [
+          {
+            text: "HeroUI",
+            description: "Browse the HeroUI component stories.",
+            url: "/storybook/heroui/",
+            external: true
+          },
+          {
+            text: "shadcn/ui",
+            description: "Browse the shadcn/ui component stories.",
+            url: "/storybook/shadcn/",
+            external: true
+          },
+          {
+            text: "Zaidan",
+            description: "Browse the Solid and Zaidan component stories.",
+            url: "/storybook/zaidan/",
+            external: true
+          }
+        ],
         secondary: false
       },
       {
