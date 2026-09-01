@@ -5,16 +5,18 @@ import {
   type OrganizationLocalization,
   type OrganizationRolesAuthClient
 } from "@better-auth-ui/core/plugins/organization"
-import { useAuth, useAuthPlugin } from "@better-auth-ui/solid"
+import { useAuth, useAuthPlugin, useSession } from "@better-auth-ui/solid"
 import {
   useActiveMemberRole,
+  useActiveOrganization,
   useHasPermission,
   useListOrganizationMembers,
-  useListRoles
+  useListRoles,
+  useRemoveMember
 } from "@better-auth-ui/solid/plugins/organization"
-import type { PaginationState, SortingState } from "@tanstack/solid-table"
 import { Filter, Search, X } from "lucide-solid"
-import { createEffect, createMemo, createSignal, For, on, Show } from "solid-js"
+import { createEffect, createMemo, createSignal, For, Show } from "solid-js"
+import { toast } from "solid-sonner"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
@@ -49,7 +51,11 @@ import {
   createOrganizationTable,
   ORGANIZATION_TABLE_PAGE_SIZE
 } from "./organization-table"
+import { OrganizationTableBulkAction } from "./organization-table-bulk-action"
 import { OrganizationTablePagination } from "./organization-table-pagination"
+import { OrganizationTableSelectAll } from "./organization-table-selection"
+import { createOrganizationTableState } from "./organization-table-state"
+import { OrganizationTableViewOptions } from "./organization-table-view-options"
 
 export type OrganizationMembersProps = {
   class?: string
@@ -94,9 +100,19 @@ const memberColumnHelper = createOrganizationColumnHelper<OrganizationMember>()
 const memberColumns = memberColumnHelper.columns([
   memberColumnHelper.accessor(
     (member) => member.user?.name ?? member.user?.email ?? "",
-    { id: "name" }
+    { id: "name", enableHiding: false, filterFn: "includesString" }
   ),
-  memberColumnHelper.accessor((member) => member.role ?? "", { id: "role" })
+  memberColumnHelper.accessor((member) => member.role ?? "", {
+    id: "role",
+    enableGlobalFilter: false,
+    filterFn: (row, columnId, value) =>
+      hasMemberRole(row.getValue<string>(columnId), String(value))
+  }),
+  memberColumnHelper.display({
+    id: "teams",
+    enableGlobalFilter: false,
+    enableSorting: false
+  })
 ])
 
 type RoleMap = Record<string, string>
@@ -126,7 +142,18 @@ const fallbackLocalization = {
   owner: "Owner",
   previousPage: "Previous page",
   nextPage: "Next page",
-  paginationRange: "{{from}}–{{to}} of {{total}}"
+  paginationRange: "{{from}}–{{to}} of {{total}}",
+  firstPage: "First page",
+  lastPage: "Last page",
+  pageOf: "Page {{page}} of {{pages}}",
+  rowsPerPage: "Rows per page",
+  columns: "Columns",
+  selectedCount: "{{count}} selected",
+  selectRow: "Select row",
+  selectAllRows: "Select all rows",
+  removeSelectedMembers: "Remove selected members",
+  removeSelectedMembersDescription: "Remove every selected member?",
+  membersRemoved: "Removed {{count}} members"
 } satisfies Pick<
   OrganizationLocalization,
   | "changeMemberRole"
@@ -151,6 +178,17 @@ const fallbackLocalization = {
   | "previousPage"
   | "nextPage"
   | "paginationRange"
+  | "firstPage"
+  | "lastPage"
+  | "pageOf"
+  | "rowsPerPage"
+  | "columns"
+  | "selectedCount"
+  | "selectRow"
+  | "selectAllRows"
+  | "removeSelectedMembers"
+  | "removeSelectedMembersDescription"
+  | "membersRemoved"
 >
 
 const fallbackRoles: RoleMap = {
@@ -163,33 +201,46 @@ export function OrganizationMembers(props: OrganizationMembersProps) {
   const auth = useAuth<OrganizationAuthClient>()
   const config = useAuthPlugin(organizationPlugin)
   const [inviteOpen, setInviteOpen] = createSignal(false)
-  const [memberSearch, setMemberSearch] = createSignal("")
-  const [memberRoleFilter, setMemberRoleFilter] = createSignal("all")
-  const [sorting, setSorting] = createSignal<SortingState>([])
-  const [pagination, setPagination] = createSignal<PaginationState>({
-    pageIndex: 0,
-    pageSize: validatePageSize(props.pageSize) ?? ORGANIZATION_TABLE_PAGE_SIZE
-  })
+  const tableState = createOrganizationTableState(
+    "organizationMembers",
+    validatePageSize(props.pageSize) ?? ORGANIZATION_TABLE_PAGE_SIZE
+  )
   const pageSize = () => validatePageSize(props.pageSize)
   const paged = () => pageSize() !== undefined
+  const activeOrganization = useActiveOrganization(auth.authClient)
+  let previousOrganizationId: string | undefined
+
+  createEffect(() => {
+    const organizationId = props.organizationId ?? activeOrganization.data?.id
+    if (!organizationId) return
+    if (previousOrganizationId && previousOrganizationId !== organizationId) {
+      tableState.setPagination((current) => ({ ...current, pageIndex: 0 }))
+    }
+    previousOrganizationId = organizationId
+  })
 
   const members = useListOrganizationMembers(auth.authClient, () => {
     const size = pageSize()
 
     if (size === undefined) return {}
 
-    const descriptor = sorting()[0]
+    const descriptor = tableState.sorting()[0]
+    const roleFilter = String(
+      tableState.columnFilters().find((filter) => filter.id === "role")
+        ?.value ?? "all"
+    )
 
     return {
       query: {
-        limit: size,
-        offset: pagination().pageIndex * size,
+        limit: tableState.pagination().pageSize,
+        offset:
+          tableState.pagination().pageIndex * tableState.pagination().pageSize,
         organizationId: props.organizationId,
-        ...(memberRoleFilter() === "all"
+        ...(roleFilter === "all"
           ? {}
           : {
               filterField: "role",
-              filterValue: memberRoleFilter(),
+              filterValue: roleFilter,
               // Roles are stored comma-joined, so an exact match would drop
               // anyone holding more than one.
               filterOperator: "contains" as const
@@ -209,6 +260,7 @@ export function OrganizationMembers(props: OrganizationMembersProps) {
   // The signed-in user need not be on the loaded page, so their own role comes
   // from a dedicated endpoint rather than from the member list.
   const activeMemberRole = useActiveMemberRole(auth.authClient)
+  const session = useSession(auth.authClient)
   const owners = useListOrganizationMembers(auth.authClient, () => ({
     query: {
       organizationId: props.organizationId,
@@ -225,6 +277,10 @@ export function OrganizationMembers(props: OrganizationMembersProps) {
     organizationId: props.organizationId,
     permissions: { member: ["update"] },
     enabled: config.teams
+  }))
+  const canDeleteMembers = useHasPermission(auth.authClient, () => ({
+    organizationId: props.organizationId,
+    permissions: { member: ["delete"] }
   }))
   const canReadRoles = useHasPermission(auth.authClient, () => ({
     permissions: { ac: ["read"] }
@@ -264,6 +320,17 @@ export function OrganizationMembers(props: OrganizationMembersProps) {
             | "previousPage"
             | "nextPage"
             | "paginationRange"
+            | "firstPage"
+            | "lastPage"
+            | "pageOf"
+            | "rowsPerPage"
+            | "columns"
+            | "selectedCount"
+            | "selectRow"
+            | "selectAllRows"
+            | "removeSelectedMembers"
+            | "removeSelectedMembersDescription"
+            | "membersRemoved"
           >
           roles?: RoleMap
         }
@@ -276,35 +343,10 @@ export function OrganizationMembers(props: OrganizationMembersProps) {
       dynamicRoles.data
     )
   )
+  const memberRoleFilter = () =>
+    String(table.getColumn("role")?.getFilterValue() ?? "all")
   const selectedRoleLabel = () =>
     roles()[memberRoleFilter()] ?? memberRoleFilter()
-  const normalizedMemberSearch = () => memberSearch().trim().toLowerCase()
-  const filteredMemberRows = () => {
-    // The server already applied the role filter when paging, and it has no
-    // parameter for name or email search, so both stay here only in the
-    // unpaged mode where the whole list is present.
-    if (paged()) return memberRows()
-
-    return memberRows().filter((member) => {
-      const roleMatches =
-        memberRoleFilter() === "all" ||
-        hasMemberRole(member.role, memberRoleFilter())
-      const search = normalizedMemberSearch()
-
-      if (!search) return roleMatches
-
-      const searchableMember = [
-        member.user?.name,
-        member.user?.email,
-        member.role
-      ]
-        .filter(Boolean)
-        .join(" ")
-        .toLowerCase()
-
-      return roleMatches && searchableMember.includes(search)
-    })
-  }
   const isOwner = () =>
     hasMemberRole(activeMemberRole.data?.role, config.creatorRole)
   const ownerCount = () => owners.data?.total ?? owners.data?.members.length
@@ -315,7 +357,21 @@ export function OrganizationMembers(props: OrganizationMembersProps) {
   const table = createOrganizationTable({
     columns: memberColumns,
     get data() {
-      return filteredMemberRows()
+      return memberRows()
+    },
+    enableRowSelection: (row) => {
+      const targetIsOwner = hasMemberRole(row.original.role, config.creatorRole)
+      const count = ownerCount()
+      return (
+        canDeleteMembers.data?.success === true &&
+        row.original.userId !== session.data?.user.id &&
+        (isOwner() || !targetIsOwner) &&
+        !(targetIsOwner && (count === undefined || count <= 1))
+      )
+    },
+    globalFilterFn: "includesString",
+    get manualFiltering() {
+      return paged()
     },
     get manualPagination() {
       return paged()
@@ -327,21 +383,55 @@ export function OrganizationMembers(props: OrganizationMembersProps) {
       return paged() ? total() : undefined
     },
     get state() {
-      return { pagination: pagination(), sorting: sorting() }
+      return {
+        columnFilters: tableState.columnFilters(),
+        columnVisibility: {
+          ...tableState.columnVisibility(),
+          teams: showTeams() && tableState.columnVisibility().teams !== false
+        },
+        globalFilter: tableState.globalFilter(),
+        pagination: tableState.pagination(),
+        rowSelection: tableState.rowSelection(),
+        sorting: tableState.sorting()
+      }
     },
     getRowId: (member) => member.id,
-    onPaginationChange: setPagination,
-    onSortingChange: setSorting
+    onColumnFiltersChange: tableState.setColumnFilters,
+    onColumnVisibilityChange: tableState.setColumnVisibility,
+    onGlobalFilterChange: tableState.setGlobalFilter,
+    onPaginationChange: tableState.setPagination,
+    onRowSelectionChange: tableState.setRowSelection,
+    onSortingChange: tableState.setSorting
   })
-
-  // Any change to what the server is being asked for invalidates the cursor.
-  createEffect(
-    on(
-      () => [memberRoleFilter(), sorting(), props.organizationId] as const,
-      () => setPagination((current) => ({ ...current, pageIndex: 0 })),
-      { defer: true }
+  const removeMembers = useRemoveMember(auth.authClient)
+  const selectedMembers = () => table.getSelectedRowModel().rows
+  const roleFacetRows = () =>
+    table.getColumn("role")?.getFacetedRowModel().flatRows
+  const removeSelectedMembers = async () => {
+    const results = await Promise.allSettled(
+      selectedMembers().map((row) =>
+        removeMembers.mutateAsync({
+          memberIdOrEmail: row.original.id,
+          organizationId: row.original.organizationId
+        })
+      )
     )
-  )
+    const count = results.filter(
+      (result) => result.status === "fulfilled"
+    ).length
+    const failed = results.find((result) => result.status === "rejected")
+    if (count)
+      toast.success(
+        localization().membersRemoved.replace("{{count}}", String(count))
+      )
+    if (failed?.status === "rejected")
+      toast.error(
+        failed.reason instanceof Error
+          ? failed.reason.message
+          : String(failed.reason)
+      )
+    table.resetRowSelection(true)
+  }
 
   return (
     <div class={cn("flex flex-col gap-3", props.class)}>
@@ -399,11 +489,11 @@ export function OrganizationMembers(props: OrganizationMembersProps) {
                 <InputGroupInput
                   aria-label={localization().search}
                   onInput={(event) =>
-                    setMemberSearch(event.currentTarget.value)
+                    table.setGlobalFilter(event.currentTarget.value)
                   }
                   placeholder={localization().search}
                   type="search"
-                  value={memberSearch()}
+                  value={tableState.globalFilter()}
                 />
               </InputGroup>
             </Show>
@@ -418,7 +508,11 @@ export function OrganizationMembers(props: OrganizationMembersProps) {
               </DropdownMenuTrigger>
               <DropdownMenuContent>
                 <DropdownMenuRadioGroup
-                  onChange={setMemberRoleFilter}
+                  onChange={(value) =>
+                    table
+                      .getColumn("role")
+                      ?.setFilterValue(value === "all" ? undefined : value)
+                  }
                   value={memberRoleFilter()}
                 >
                   <DropdownMenuRadioItem value="all">
@@ -428,12 +522,41 @@ export function OrganizationMembers(props: OrganizationMembersProps) {
                     {([role, label]) => (
                       <DropdownMenuRadioItem value={role}>
                         {label}
+                        {!paged()
+                          ? ` (${roleFacetRows()?.filter((row) => hasMemberRole(row.original.role, role)).length ?? 0})`
+                          : ""}
                       </DropdownMenuRadioItem>
                     )}
                   </For>
                 </DropdownMenuRadioGroup>
               </DropdownMenuContent>
             </DropdownMenu>
+            <div class="ms-auto">
+              <OrganizationTableViewOptions
+                columns={[
+                  {
+                    id: "role",
+                    label: localization().role,
+                    visible: table.getColumn("role")?.getIsVisible() ?? true,
+                    onVisibleChange: (visible) =>
+                      table.getColumn("role")?.toggleVisibility(visible)
+                  },
+                  ...(showTeams()
+                    ? [
+                        {
+                          id: "teams",
+                          label: localization().teams,
+                          visible:
+                            table.getColumn("teams")?.getIsVisible() ?? true,
+                          onVisibleChange: (visible: boolean) =>
+                            table.getColumn("teams")?.toggleVisibility(visible)
+                        }
+                      ]
+                    : [])
+                ]}
+                localization={localization()}
+              />
+            </div>
           </div>
           <Show when={memberRoleFilter() !== "all"}>
             <div class="flex flex-wrap gap-2">
@@ -443,7 +566,9 @@ export function OrganizationMembers(props: OrganizationMembersProps) {
                   <Button
                     aria-label={`${localization().clear} member role filter`}
                     class="size-4 rounded-sm"
-                    onClick={() => setMemberRoleFilter("all")}
+                    onClick={() =>
+                      table.getColumn("role")?.setFilterValue(undefined)
+                    }
                     size="icon-xs"
                     type="button"
                     variant="ghost"
@@ -454,10 +579,32 @@ export function OrganizationMembers(props: OrganizationMembersProps) {
               </Show>
             </div>
           </Show>
+          <OrganizationTableBulkAction
+            cancelLabel={auth.localization.settings.cancel}
+            confirmLabel={localization().removeSelectedMembers}
+            description={localization().removeSelectedMembersDescription}
+            localization={localization()}
+            onConfirm={removeSelectedMembers}
+            pending={removeMembers.isPending}
+            selectedCount={selectedMembers().length}
+            title={localization().removeSelectedMembers}
+          />
           <Card class="z-card-padding-none">
             <Table aria-label="Members">
               <TableHeader>
                 <TableRow>
+                  <Show when={canDeleteMembers.data?.success}>
+                    <TableHead>
+                      <OrganizationTableSelectAll
+                        allSelected={table.getIsAllPageRowsSelected()}
+                        localization={localization()}
+                        onCheckedChange={(checked) =>
+                          table.toggleAllPageRowsSelected(checked)
+                        }
+                        someSelected={table.getIsSomePageRowsSelected()}
+                      />
+                    </TableHead>
+                  </Show>
                   {/* Name and email live on the joined user row, which
                       list-members cannot sort by. */}
                   <Show
@@ -470,12 +617,18 @@ export function OrganizationMembers(props: OrganizationMembersProps) {
                       {localization().member}
                     </OrganizationSortableTableHead>
                   </Show>
-                  <OrganizationSortableTableHead
-                    column={table.getColumn("role")}
+                  <Show when={table.getColumn("role")?.getIsVisible()}>
+                    <OrganizationSortableTableHead
+                      column={table.getColumn("role")}
+                    >
+                      {localization().role}
+                    </OrganizationSortableTableHead>
+                  </Show>
+                  <Show
+                    when={
+                      showTeams() && table.getColumn("teams")?.getIsVisible()
+                    }
                   >
-                    {localization().role}
-                  </OrganizationSortableTableHead>
-                  <Show when={showTeams()}>
                     <TableHead>{localization().teams}</TableHead>
                   </Show>
                   <TableHead class="z-table-head-align-end">Actions</TableHead>
@@ -483,7 +636,7 @@ export function OrganizationMembers(props: OrganizationMembersProps) {
               </TableHeader>
               <TableBody>
                 <Show
-                  when={filteredMemberRows().length > 0}
+                  when={table.getRowModel().rows.length > 0}
                   fallback={
                     <TableRow>
                       <TableCell
@@ -496,14 +649,21 @@ export function OrganizationMembers(props: OrganizationMembersProps) {
                   }
                 >
                   <For each={table.getRowModel().rows}>
-                    {({ original: member }) => (
+                    {(row) => (
                       <OrganizationMemberRow
                         isOwner={isOwner()}
                         localization={localization()}
-                        member={member}
+                        member={row.original}
                         ownerCount={ownerCount()}
                         roles={roles()}
-                        showTeams={showTeams()}
+                        selectableRow={
+                          canDeleteMembers.data?.success ? row : undefined
+                        }
+                        showRole={table.getColumn("role")?.getIsVisible()}
+                        showTeams={
+                          showTeams() &&
+                          table.getColumn("teams")?.getIsVisible() === true
+                        }
                       />
                     )}
                   </For>
@@ -517,10 +677,14 @@ export function OrganizationMembers(props: OrganizationMembersProps) {
             canPreviousPage={table.getCanPreviousPage()}
             disabled={members.isPending}
             localization={localization()}
-            onNextPage={table.nextPage}
-            onPreviousPage={table.previousPage}
-            pageIndex={pagination().pageIndex}
-            pageSize={pagination().pageSize}
+            onFirstPage={() => table.firstPage()}
+            onLastPage={() => table.lastPage()}
+            onNextPage={() => table.nextPage()}
+            onPageSizeChange={(size) => table.setPageSize(size)}
+            onPreviousPage={() => table.previousPage()}
+            pageCount={table.getPageCount()}
+            pageIndex={tableState.pagination().pageIndex}
+            pageSize={tableState.pagination().pageSize}
             rowCount={table.getRowCount()}
             visibleRowCount={table.getRowModel().rows.length}
           />

@@ -14,8 +14,8 @@ type TestRow = {
 
 const columnHelper = createOrganizationColumnHelper<TestRow>()
 const columns = columnHelper.columns([
-  columnHelper.accessor("group", {}),
-  columnHelper.accessor("name", {})
+  columnHelper.accessor("group", { filterFn: "includesString" }),
+  columnHelper.accessor("name", { filterFn: "includesString" })
 ])
 const rows: TestRow[] = [
   { group: "b", id: "1", name: "Ada" },
@@ -82,5 +82,36 @@ describe("organization table state", () => {
     expect(server.result.current.getPageCount()).toBe(3)
     expect(server.result.current.getCanPreviousPage()).toBe(true)
     expect(server.result.current.getCanNextPage()).toBe(true)
+  })
+
+  it("composes filtering, visibility, and selection state", () => {
+    const { result } = renderHook(() =>
+      useOrganizationTable({
+        columns,
+        data: rows,
+        getRowId: (row) => row.id,
+        globalFilterFn: "includesString"
+      })
+    )
+
+    act(() => result.current.setGlobalFilter("a"))
+    expect(
+      result.current.getRowModel().rows.map((row) => row.original.id)
+    ).toEqual(["1", "2", "3"])
+
+    act(() => result.current.getColumn("group")?.setFilterValue("a"))
+    expect(
+      result.current.getRowModel().rows.map((row) => row.original.id)
+    ).toEqual(["2", "3"])
+
+    act(() => result.current.getColumn("group")?.toggleVisibility(false))
+    expect(
+      result.current.getVisibleLeafColumns().map((column) => column.id)
+    ).toEqual(["name"])
+
+    act(() => result.current.toggleAllPageRowsSelected(true))
+    expect(
+      result.current.getSelectedRowModel().rows.map((row) => row.id)
+    ).toEqual(["2", "3"])
   })
 })

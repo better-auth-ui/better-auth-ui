@@ -22,6 +22,7 @@ import { organizationPlugin } from "../../../lib/auth/organization-plugin"
 import { UserView } from "../user/user-view"
 import { EditMemberRolesDialog } from "./edit-member-roles-dialog"
 import { LeaveOrganizationDialog } from "./leave-organization-dialog"
+import { OrganizationTableSelectRow } from "./organization-table-selection"
 import { RemoveMemberDialog } from "./remove-member-dialog"
 
 export type OrganizationMemberRowProps = {
@@ -29,6 +30,8 @@ export type OrganizationMemberRowProps = {
   isOwner?: boolean
   ownerCount?: number
   organization: Organization
+  selectableRow?: Parameters<typeof OrganizationTableSelectRow>[0]["row"]
+  showRole?: boolean
   showTeams?: boolean
 }
 
@@ -37,6 +40,8 @@ export function OrganizationMemberRow({
   isOwner,
   ownerCount,
   organization,
+  selectableRow,
+  showRole = true,
   showTeams
 }: OrganizationMemberRowProps) {
   const { authClient, locale } = useAuth()
@@ -102,6 +107,14 @@ export function OrganizationMemberRow({
 
   return (
     <Table.Row>
+      {selectableRow && (
+        <Table.Cell>
+          <OrganizationTableSelectRow
+            localization={organizationLocalization}
+            row={selectableRow}
+          />
+        </Table.Cell>
+      )}
       <Table.Cell>
         <div className="flex flex-col gap-1">
           <UserView user={member.user} />
@@ -119,7 +132,7 @@ export function OrganizationMemberRow({
         </div>
       </Table.Cell>
 
-      <Table.Cell>{roleLabel}</Table.Cell>
+      {showRole && <Table.Cell>{roleLabel}</Table.Cell>}
 
       {showTeams && (
         <Table.Cell>

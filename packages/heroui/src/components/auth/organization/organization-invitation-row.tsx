@@ -16,13 +16,22 @@ import type { Invitation } from "better-auth/client"
 
 import { organizationPlugin } from "../../../lib/auth/organization-plugin"
 import { OrganizationInvitationRowSkeleton } from "./organization-invitation-row-skeleton"
+import { OrganizationTableSelectRow } from "./organization-table-selection"
 
 export type OrganizationInvitationTableRowProps = {
   invitation: Invitation
+  selectableRow?: Parameters<typeof OrganizationTableSelectRow>[0]["row"]
+  showCreatedAt?: boolean
+  showRole?: boolean
+  showStatus?: boolean
 }
 
 export function OrganizationInvitationTableRow({
-  invitation
+  invitation,
+  selectableRow,
+  showCreatedAt = true,
+  showRole = true,
+  showStatus = true
 }: OrganizationInvitationTableRowProps) {
   const { authClient, locale } = useAuth()
   const {
@@ -76,6 +85,14 @@ export function OrganizationInvitationTableRow({
 
   return (
     <Table.Row>
+      {selectableRow && (
+        <Table.Cell>
+          <OrganizationTableSelectRow
+            localization={organizationLocalization}
+            row={selectableRow}
+          />
+        </Table.Cell>
+      )}
       <Table.Cell>
         <div className="flex flex-col gap-1">
           <span className="font-medium text-sm">{invitation.email}</span>
@@ -93,20 +110,24 @@ export function OrganizationInvitationTableRow({
         </div>
       </Table.Cell>
 
-      <Table.Cell className="text-muted text-xs tabular-nums whitespace-nowrap">
-        {new Date(invitation.createdAt).toLocaleString(locale.languageTag, {
-          dateStyle: "short",
-          timeStyle: "short"
-        })}
-      </Table.Cell>
+      {showCreatedAt && (
+        <Table.Cell className="text-muted text-xs tabular-nums whitespace-nowrap">
+          {new Date(invitation.createdAt).toLocaleString(locale.languageTag, {
+            dateStyle: "short",
+            timeStyle: "short"
+          })}
+        </Table.Cell>
+      )}
 
-      <Table.Cell className="text-sm">{roleLabel}</Table.Cell>
+      {showRole && <Table.Cell className="text-sm">{roleLabel}</Table.Cell>}
 
-      <Table.Cell className="text-sm">
-        <Chip color={statusColor} size="sm" variant="soft">
-          {statusLabel}
-        </Chip>
-      </Table.Cell>
+      {showStatus && (
+        <Table.Cell className="text-sm">
+          <Chip color={statusColor} size="sm" variant="soft">
+            {statusLabel}
+          </Chip>
+        </Table.Cell>
+      )}
 
       <Table.Cell className="text-end">
         <div className="flex justify-end gap-2">

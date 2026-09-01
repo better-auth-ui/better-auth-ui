@@ -16,8 +16,7 @@ import {
   useListRoles,
   useUpdateRole
 } from "@better-auth-ui/solid/plugins/organization"
-import type { PaginationState, SortingState } from "@tanstack/solid-table"
-import { Pencil, Plus, Trash2 } from "lucide-solid"
+import { Filter, Pencil, Plus, Search, Trash2, X } from "lucide-solid"
 import { createEffect, createSignal, For, Show } from "solid-js"
 import { toast } from "solid-sonner"
 import {
@@ -31,6 +30,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger
 } from "@/components/ui/alert-dialog"
+import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Checkbox } from "@/components/ui/checkbox"
@@ -42,8 +42,20 @@ import {
   DialogHeader,
   DialogTitle
 } from "@/components/ui/dialog"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+  DropdownMenuTrigger
+} from "@/components/ui/dropdown-menu"
 import { Field, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput
+} from "@/components/ui/input-group"
 import { Spinner } from "@/components/ui/spinner"
 import {
   Table,
@@ -61,7 +73,15 @@ import {
   createOrganizationTable,
   ORGANIZATION_TABLE_PAGE_SIZE
 } from "./organization-table"
+import { OrganizationTableBulkAction } from "./organization-table-bulk-action"
 import { OrganizationTablePagination } from "./organization-table-pagination"
+import {
+  type OrganizationSelectableRow,
+  OrganizationTableSelectAll,
+  OrganizationTableSelectRow
+} from "./organization-table-selection"
+import { createOrganizationTableState } from "./organization-table-state"
+import { OrganizationTableViewOptions } from "./organization-table-view-options"
 
 type Role = {
   id: string
@@ -72,15 +92,26 @@ type Role = {
 
 const roleColumnHelper = createOrganizationColumnHelper<Role>()
 const roleColumns = roleColumnHelper.columns([
-  roleColumnHelper.accessor("role", {}),
+  roleColumnHelper.accessor("role", {
+    enableHiding: false,
+    filterFn: "includesString"
+  }),
   roleColumnHelper.accessor(
     (role) =>
       Object.values(role.permission).reduce(
         (total, actions) => total + actions.length,
         0
       ),
-    { id: "permissions" }
-  )
+    { id: "permissions", enableGlobalFilter: false }
+  ),
+  roleColumnHelper.accessor((role) => Object.keys(role.permission), {
+    id: "permissionResources",
+    enableGlobalFilter: false,
+    enableHiding: false,
+    enableSorting: false,
+    filterFn: (row, columnId, value) =>
+      row.getValue<string[]>(columnId).includes(String(value))
+  })
 ])
 const EMPTY_ROLES: Role[] = []
 
@@ -108,23 +139,89 @@ export function OrganizationRoles(props: { organizationId: string }) {
     permissions: { ac: ["delete"] }
   }))
   const [editingRole, setEditingRole] = createSignal<Role | null | undefined>()
-  const [sorting, setSorting] = createSignal<SortingState>([])
-  const [pagination, setPagination] = createSignal<PaginationState>({
-    pageIndex: 0,
-    pageSize: ORGANIZATION_TABLE_PAGE_SIZE
-  })
+  const tableState = createOrganizationTableState(
+    "organizationRoles",
+    ORGANIZATION_TABLE_PAGE_SIZE
+  )
   const table = createOrganizationTable({
     columns: roleColumns,
     get data() {
       return roles.data ?? EMPTY_ROLES
     },
+    get enableRowSelection() {
+      return canDelete.data?.success === true
+    },
+    globalFilterFn: (row, _columnId, value) => {
+      const query = String(value).toLowerCase()
+      return (
+        row.original.role.toLowerCase().includes(query) ||
+        Object.entries(row.original.permission).some(
+          ([resource, actions]) =>
+            resource.toLowerCase().includes(query) ||
+            actions.some((action) => action.toLowerCase().includes(query))
+        )
+      )
+    },
     get state() {
-      return { pagination: pagination(), sorting: sorting() }
+      return {
+        columnFilters: tableState.columnFilters(),
+        columnVisibility: {
+          ...tableState.columnVisibility(),
+          permissionResources: false
+        },
+        globalFilter: tableState.globalFilter(),
+        pagination: tableState.pagination(),
+        rowSelection: tableState.rowSelection(),
+        sorting: tableState.sorting()
+      }
     },
     getRowId: (role) => role.id,
-    onPaginationChange: setPagination,
-    onSortingChange: setSorting
+    onColumnFiltersChange: tableState.setColumnFilters,
+    onColumnVisibilityChange: tableState.setColumnVisibility,
+    onGlobalFilterChange: tableState.setGlobalFilter,
+    onPaginationChange: tableState.setPagination,
+    onRowSelectionChange: tableState.setRowSelection,
+    onSortingChange: tableState.setSorting
   })
+  const deleteRoles = useDeleteRole(auth.authClient, () => props.organizationId)
+  const permissionFilter = () =>
+    String(table.getColumn("permissionResources")?.getFilterValue() ?? "all")
+  const permissionResources = () =>
+    Array.from(
+      new Set(
+        (roles.data ?? EMPTY_ROLES).flatMap((role) =>
+          Object.keys(role.permission)
+        )
+      )
+    ).sort()
+  const permissionFacetRows = () =>
+    table.getColumn("permissionResources")?.getFacetedRowModel().flatRows
+  const selectedRoles = () => table.getSelectedRowModel().rows
+  const deleteSelectedRoles = async () => {
+    const results = await Promise.allSettled(
+      selectedRoles().map((row) =>
+        deleteRoles.mutateAsync({
+          roleId: row.original.id,
+          organizationId: props.organizationId
+        })
+      )
+    )
+    const count = results.filter(
+      (result) => result.status === "fulfilled"
+    ).length
+    const failed = results.find((result) => result.status === "rejected")
+    if (count)
+      toast.success(
+        config.localization.rolesDeleted.replace("{{count}}", String(count))
+      )
+    if (failed?.status === "rejected")
+      toast.error(
+        failed.reason instanceof Error
+          ? failed.reason.message
+          : String(failed.reason)
+      )
+    table.resetRowSelection(true)
+  }
 
   return (
     <div class="flex flex-col gap-4">
@@ -145,6 +242,99 @@ export function OrganizationRoles(props: { organizationId: string }) {
           </Button>
         </Show>
       </div>
+
+      <div class="flex flex-wrap items-center gap-3">
+        <InputGroup class="min-w-0 sm:w-[220px]">
+          <InputGroupAddon>
+            <Search class="size-4 text-muted-foreground" />
+          </InputGroupAddon>
+          <InputGroupInput
+            aria-label={config.localization.search}
+            onInput={(event) =>
+              table.setGlobalFilter(event.currentTarget.value)
+            }
+            placeholder={config.localization.search}
+            type="search"
+            value={tableState.globalFilter()}
+          />
+        </InputGroup>
+        <DropdownMenu>
+          <DropdownMenuTrigger as={Button} class="shrink-0" variant="outline">
+            <Filter />
+            {config.localization.permissions}
+          </DropdownMenuTrigger>
+          <DropdownMenuContent>
+            <DropdownMenuRadioGroup
+              value={permissionFilter()}
+              onChange={(value) =>
+                table
+                  .getColumn("permissionResources")
+                  ?.setFilterValue(value === "all" ? undefined : value)
+              }
+            >
+              <DropdownMenuRadioItem value="all">
+                {config.localization.all}
+              </DropdownMenuRadioItem>
+              <For each={permissionResources()}>
+                {(resource) => (
+                  <DropdownMenuRadioItem value={resource}>
+                    {config.dynamicAccessControl?.permissions[resource]
+                      ?.label ?? resource}{" "}
+                    (
+                    {permissionFacetRows()?.filter((row) =>
+                      Object.hasOwn(row.original.permission, resource)
+                    ).length ?? 0}
+                    )
+                  </DropdownMenuRadioItem>
+                )}
+              </For>
+            </DropdownMenuRadioGroup>
+          </DropdownMenuContent>
+        </DropdownMenu>
+        <div class="ms-auto">
+          <OrganizationTableViewOptions
+            columns={[
+              {
+                id: "permissions",
+                label: config.localization.permissions,
+                visible: table.getColumn("permissions")?.getIsVisible() ?? true,
+                onVisibleChange: (visible) =>
+                  table.getColumn("permissions")?.toggleVisibility(visible)
+              }
+            ]}
+            localization={config.localization}
+          />
+        </div>
+      </div>
+
+      <Show when={permissionFilter() !== "all"}>
+        <Badge class="w-fit gap-1" variant="secondary">
+          {config.dynamicAccessControl?.permissions[permissionFilter()]
+            ?.label ?? permissionFilter()}
+          <Button
+            aria-label={config.localization.clear}
+            class="size-4"
+            onClick={() =>
+              table.getColumn("permissionResources")?.setFilterValue(undefined)
+            }
+            size="icon-xs"
+            variant="ghost"
+          >
+            <X />
+          </Button>
+        </Badge>
+      </Show>
+
+      <OrganizationTableBulkAction
+        cancelLabel={auth.localization.settings.cancel}
+        confirmLabel={config.localization.deleteSelectedRoles}
+        description={config.localization.deleteSelectedRolesDescription}
+        localization={config.localization}
+        onConfirm={deleteSelectedRoles}
+        pending={deleteRoles.isPending}
+        selectedCount={selectedRoles().length}
+        title={config.localization.deleteSelectedRoles}
+      />
 
       <Show
         when={!canRead.isPending && !roles.isLoading}
@@ -171,16 +361,32 @@ export function OrganizationRoles(props: { organizationId: string }) {
                 <Table>
                   <TableHeader>
                     <TableRow>
+                      <Show when={canDelete.data?.success}>
+                        <TableHead>
+                          <OrganizationTableSelectAll
+                            allSelected={table.getIsAllPageRowsSelected()}
+                            localization={config.localization}
+                            onCheckedChange={(checked) =>
+                              table.toggleAllPageRowsSelected(checked)
+                            }
+                            someSelected={table.getIsSomePageRowsSelected()}
+                          />
+                        </TableHead>
+                      </Show>
                       <OrganizationSortableTableHead
                         column={table.getColumn("role")}
                       >
                         {config.localization.roleName}
                       </OrganizationSortableTableHead>
-                      <OrganizationSortableTableHead
-                        column={table.getColumn("permissions")}
+                      <Show
+                        when={table.getColumn("permissions")?.getIsVisible()}
                       >
-                        {config.localization.permissions}
-                      </OrganizationSortableTableHead>
+                        <OrganizationSortableTableHead
+                          column={table.getColumn("permissions")}
+                        >
+                          {config.localization.permissions}
+                        </OrganizationSortableTableHead>
+                      </Show>
                       <TableHead class="text-end">
                         {config.localization.actions}
                       </TableHead>
@@ -188,16 +394,23 @@ export function OrganizationRoles(props: { organizationId: string }) {
                   </TableHeader>
                   <TableBody>
                     <For each={table.getRowModel().rows}>
-                      {({ original: role }) => (
+                      {(row) => (
                         <OrganizationRoleRow
                           authClient={auth.authClient}
                           canDelete={canDelete.data?.success === true}
                           canDeletePending={canDelete.isPending}
                           canUpdate={canUpdate.data?.success === true}
                           canUpdatePending={canUpdate.isPending}
-                          onEdit={() => setEditingRole(role)}
+                          onEdit={() => setEditingRole(row.original)}
                           organizationId={props.organizationId}
-                          role={role}
+                          role={row.original}
+                          selectableRow={
+                            canDelete.data?.success ? row : undefined
+                          }
+                          showPermissions={
+                            table.getColumn("permissions")?.getIsVisible() ===
+                            true
+                          }
                         />
                       )}
                     </For>
@@ -214,10 +427,14 @@ export function OrganizationRoles(props: { organizationId: string }) {
         canPreviousPage={table.getCanPreviousPage()}
         disabled={roles.isLoading}
         localization={config.localization}
-        onNextPage={table.nextPage}
-        onPreviousPage={table.previousPage}
-        pageIndex={pagination().pageIndex}
-        pageSize={pagination().pageSize}
+        onFirstPage={() => table.firstPage()}
+        onLastPage={() => table.lastPage()}
+        onNextPage={() => table.nextPage()}
+        onPageSizeChange={(size) => table.setPageSize(size)}
+        onPreviousPage={() => table.previousPage()}
+        pageCount={table.getPageCount()}
+        pageIndex={tableState.pagination().pageIndex}
+        pageSize={tableState.pagination().pageSize}
         rowCount={table.getRowCount()}
         visibleRowCount={table.getRowModel().rows.length}
       />
@@ -243,6 +460,8 @@ function OrganizationRoleRow(props: {
   onEdit: () => void
   organizationId: string
   role: Role
+  selectableRow?: OrganizationSelectableRow
+  showPermissions: boolean
 }) {
   const auth = useAuth()
   const config = useAuthPlugin(organizationPlugin)
@@ -276,13 +495,25 @@ function OrganizationRoleRow(props: {
 
   return (
     <TableRow>
-      <TableCell class="font-medium">{props.role.role}</TableCell>
-      <TableCell>
-        {Object.values(props.role.permission).reduce(
-          (total, actions) => total + actions.length,
-          0
+      <Show when={props.selectableRow}>
+        {(row) => (
+          <TableCell>
+            <OrganizationTableSelectRow
+              localization={config.localization}
+              row={row()}
+            />
+          </TableCell>
         )}
-      </TableCell>
+      </Show>
+      <TableCell class="font-medium">{props.role.role}</TableCell>
+      <Show when={props.showPermissions}>
+        <TableCell>
+          {Object.values(props.role.permission).reduce(
+            (total, actions) => total + actions.length,
+            0
+          )}
+        </TableCell>
+      </Show>
       <TableCell>
         <div class="flex justify-end gap-1">
           <Show when={props.canUpdatePending}>

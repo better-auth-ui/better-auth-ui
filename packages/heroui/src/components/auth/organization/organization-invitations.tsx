@@ -5,6 +5,7 @@ import {
 } from "@better-auth-ui/core/plugins/organization"
 import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
 import {
+  useCancelInvitation,
   useHasPermission,
   useListOrganizationInvitations
 } from "@better-auth-ui/react/plugins/organization"
@@ -16,11 +17,11 @@ import {
   Dropdown,
   Label,
   SearchField,
-  Table
+  Table,
+  toast
 } from "@heroui/react"
-import type { PaginationState, SortingState } from "@tanstack/react-table"
 import type { Invitation } from "better-auth/client"
-import { type ComponentProps, useMemo, useState } from "react"
+import { type ComponentProps, useState } from "react"
 
 import { organizationPlugin } from "../../../lib/auth/organization-plugin"
 import { InviteMemberDialog } from "./invite-member-dialog"
@@ -33,17 +34,31 @@ import {
   ORGANIZATION_TABLE_PAGE_SIZE,
   useOrganizationTable
 } from "./organization-table"
+import { OrganizationTableBulkAction } from "./organization-table-bulk-action"
 import { OrganizationTablePagination } from "./organization-table-pagination"
+import { OrganizationTableSelectAll } from "./organization-table-selection"
+import { useOrganizationTableState } from "./organization-table-state"
+import { OrganizationTableViewOptions } from "./organization-table-view-options"
 
 const invitationColumnHelper = createOrganizationColumnHelper<Invitation>()
 const invitationColumns = invitationColumnHelper.columns([
-  invitationColumnHelper.accessor("email", {}),
+  invitationColumnHelper.accessor("email", {
+    enableHiding: false,
+    filterFn: "includesString"
+  }),
   invitationColumnHelper.accessor(
     (invitation) => new Date(invitation.createdAt).getTime(),
-    { id: "createdAt" }
+    { id: "createdAt", enableGlobalFilter: false }
   ),
-  invitationColumnHelper.accessor("role", {}),
-  invitationColumnHelper.accessor("status", {})
+  invitationColumnHelper.accessor("role", {
+    enableGlobalFilter: false,
+    filterFn: (row, columnId, value) =>
+      hasMemberRole(row.getValue<string>(columnId), String(value))
+  }),
+  invitationColumnHelper.accessor("status", {
+    enableGlobalFilter: false,
+    filterFn: (row, columnId, value) => row.getValue(columnId) === String(value)
+  })
 ])
 const EMPTY_INVITATIONS: Invitation[] = []
 
@@ -68,35 +83,84 @@ export function OrganizationInvitations({
   const canInvite = useHasPermission(authClient as OrganizationAuthClient, {
     permissions: { invitation: ["create"] }
   })
-
-  const isPending = invitationsPending
-
-  const [sorting, setSorting] = useState<SortingState>([])
-  const [pagination, setPagination] = useState<PaginationState>({
-    pageIndex: 0,
-    pageSize: ORGANIZATION_TABLE_PAGE_SIZE
+  const canCancel = useHasPermission(authClient as OrganizationAuthClient, {
+    permissions: { invitation: ["cancel"] }
   })
-  const [roleFilter, setRoleFilter] = useState("all")
-  const [statusFilter, setStatusFilter] = useState("all")
-  const [search, setSearch] = useState("")
 
-  const filteredInvitations = useMemo(() => {
-    return invitations?.filter(
-      (invitation) =>
-        (roleFilter === "all" || hasMemberRole(invitation.role, roleFilter)) &&
-        (statusFilter === "all" || invitation.status === statusFilter) &&
-        invitation.email.toLowerCase().includes(search.toLowerCase())
-    )
-  }, [search, invitations, roleFilter, statusFilter])
+  const isPending = invitationsPending || canCancel.isPending
+  const tableState = useOrganizationTableState(
+    "organizationInvitations",
+    ORGANIZATION_TABLE_PAGE_SIZE
+  )
+  const {
+    columnFilters,
+    columnVisibility,
+    globalFilter,
+    pagination,
+    rowSelection,
+    sorting
+  } = tableState
 
   const table = useOrganizationTable({
     columns: invitationColumns,
-    data: filteredInvitations ?? EMPTY_INVITATIONS,
+    data: invitations ?? EMPTY_INVITATIONS,
+    enableRowSelection: (row) =>
+      canCancel.data?.success === true && row.original.status === "pending",
+    globalFilterFn: "includesString",
     getRowId: (invitation) => invitation.id,
-    state: { pagination, sorting },
-    onPaginationChange: setPagination,
-    onSortingChange: setSorting
+    state: {
+      columnFilters,
+      columnVisibility,
+      globalFilter,
+      pagination,
+      rowSelection,
+      sorting
+    },
+    onColumnFiltersChange: tableState.setColumnFilters,
+    onColumnVisibilityChange: tableState.setColumnVisibility,
+    onGlobalFilterChange: tableState.setGlobalFilter,
+    onPaginationChange: tableState.setPagination,
+    onRowSelectionChange: tableState.setRowSelection,
+    onSortingChange: tableState.setSorting
   })
+
+  const cancelInvitations = useCancelInvitation(
+    authClient as OrganizationAuthClient
+  )
+  const roleFilter = String(table.getColumn("role")?.getFilterValue() ?? "all")
+  const statusFilter = String(
+    table.getColumn("status")?.getFilterValue() ?? "all"
+  )
+  const roleFacetRows = table.getColumn("role")?.getFacetedRowModel().flatRows
+  const statusCounts = table.getColumn("status")?.getFacetedUniqueValues()
+  const selectedInvitations = table.getSelectedRowModel().rows
+  const showSelection = canCancel.data?.success === true
+
+  async function cancelSelectedInvitations() {
+    const results = await Promise.allSettled(
+      selectedInvitations.map((row) =>
+        cancelInvitations.mutateAsync({ invitationId: row.original.id })
+      )
+    )
+    const canceledCount = results.filter(
+      (result) => result.status === "fulfilled"
+    ).length
+    const failed = results.find((result) => result.status === "rejected")
+    if (canceledCount > 0)
+      toast.success(
+        organizationLocalization.invitationsCanceled.replace(
+          "{{count}}",
+          String(canceledCount)
+        )
+      )
+    if (failed?.status === "rejected")
+      toast.danger(
+        failed.reason instanceof Error
+          ? failed.reason.message
+          : String(failed.reason)
+      )
+    table.resetRowSelection(true)
+  }
 
   const [inviteOpen, setInviteOpen] = useState(false)
 
@@ -107,12 +171,12 @@ export function OrganizationInvitations({
       </h3>
 
       <div className="flex flex-col gap-4">
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-3">
           <SearchField
             className="min-w-0"
             aria-label={organizationLocalization.search}
-            value={search}
-            onChange={setSearch}
+            value={globalFilter}
+            onChange={table.setGlobalFilter}
             isDisabled={isPending}
           >
             <SearchField.Group>
@@ -140,7 +204,9 @@ export function OrganizationInvitations({
                 selectedKeys={new Set([roleFilter])}
                 onSelectionChange={(keys) => {
                   const key = [...keys][0] as string | undefined
-                  setRoleFilter(key ?? "all")
+                  table
+                    .getColumn("role")
+                    ?.setFilterValue(!key || key === "all" ? undefined : key)
                 }}
               >
                 <Dropdown.Item
@@ -154,7 +220,13 @@ export function OrganizationInvitations({
 
                 {Object.entries(roles).map(([key, label]) => (
                   <Dropdown.Item key={key} id={key} textValue={label}>
-                    <Label>{label}</Label>
+                    <Label>
+                      {label} (
+                      {roleFacetRows?.filter((row) =>
+                        hasMemberRole(row.original.role, key)
+                      ).length ?? 0}
+                      )
+                    </Label>
 
                     <Dropdown.ItemIndicator />
                   </Dropdown.Item>
@@ -176,7 +248,9 @@ export function OrganizationInvitations({
                 selectedKeys={new Set([statusFilter])}
                 onSelectionChange={(keys) => {
                   const key = [...keys][0] as string | undefined
-                  setStatusFilter(key ?? "all")
+                  table
+                    .getColumn("status")
+                    ?.setFilterValue(!key || key === "all" ? undefined : key)
                 }}
               >
                 <Dropdown.Item
@@ -202,7 +276,8 @@ export function OrganizationInvitations({
                       <Label>
                         {organizationLocalization[
                           status as keyof OrganizationLocalization
-                        ] ?? status}
+                        ] ?? status}{" "}
+                        ({statusCounts?.get(status) ?? 0})
                       </Label>
 
                       <Dropdown.ItemIndicator />
@@ -212,6 +287,36 @@ export function OrganizationInvitations({
               </Dropdown.Menu>
             </Dropdown.Popover>
           </Dropdown>
+
+          <div className="ms-auto">
+            <OrganizationTableViewOptions
+              columns={[
+                {
+                  id: "createdAt",
+                  label: organizationLocalization.invitedAt,
+                  visible: table.getColumn("createdAt")?.getIsVisible() ?? true,
+                  onVisibleChange: (visible) =>
+                    table.getColumn("createdAt")?.toggleVisibility(visible)
+                },
+                {
+                  id: "role",
+                  label: organizationLocalization.role,
+                  visible: table.getColumn("role")?.getIsVisible() ?? true,
+                  onVisibleChange: (visible) =>
+                    table.getColumn("role")?.toggleVisibility(visible)
+                },
+                {
+                  id: "status",
+                  label: organizationLocalization.status,
+                  visible: table.getColumn("status")?.getIsVisible() ?? true,
+                  onVisibleChange: (visible) =>
+                    table.getColumn("status")?.toggleVisibility(visible)
+                }
+              ]}
+              disabled={isPending}
+              localization={organizationLocalization}
+            />
+          </div>
         </div>
 
         {(roleFilter !== "all" || statusFilter !== "all") && (
@@ -229,7 +334,9 @@ export function OrganizationInvitations({
                   type="button"
                   aria-label={organizationLocalization.clear}
                   className="text-muted hover:text-foreground inline-flex cursor-pointer items-center"
-                  onClick={() => setRoleFilter("all")}
+                  onClick={() =>
+                    table.getColumn("role")?.setFilterValue(undefined)
+                  }
                 >
                   <Xmark className="size-3" />
                 </button>
@@ -249,7 +356,9 @@ export function OrganizationInvitations({
                   type="button"
                   aria-label={organizationLocalization.clear}
                   className="text-muted hover:text-foreground inline-flex cursor-pointer items-center"
-                  onClick={() => setStatusFilter("all")}
+                  onClick={() =>
+                    table.getColumn("status")?.setFilterValue(undefined)
+                  }
                 >
                   <Xmark className="size-3" />
                 </button>
@@ -258,10 +367,36 @@ export function OrganizationInvitations({
           </div>
         )}
 
+        <OrganizationTableBulkAction
+          cancelLabel={localization.settings.cancel}
+          confirmLabel={organizationLocalization.cancelSelectedInvitations}
+          description={
+            organizationLocalization.cancelSelectedInvitationsDescription
+          }
+          onConfirm={cancelSelectedInvitations}
+          pending={cancelInvitations.isPending}
+          selectedCount={selectedInvitations.length}
+          title={organizationLocalization.cancelSelectedInvitations}
+          localization={organizationLocalization}
+        />
+
         <Table>
           <Table.ScrollContainer>
             <Table.Content aria-label={organizationLocalization.invitations}>
               <Table.Header>
+                {showSelection && (
+                  <Table.Column>
+                    <OrganizationTableSelectAll
+                      allSelected={table.getIsAllPageRowsSelected()}
+                      disabled={isPending}
+                      localization={organizationLocalization}
+                      onCheckedChange={(checked) =>
+                        table.toggleAllPageRowsSelected(checked)
+                      }
+                      someSelected={table.getIsSomePageRowsSelected()}
+                    />
+                  </Table.Column>
+                )}
                 <OrganizationSortableTableColumn
                   column={table.getColumn("email")}
                   isRowHeader
@@ -269,23 +404,29 @@ export function OrganizationInvitations({
                   {localization.auth.email}
                 </OrganizationSortableTableColumn>
 
-                <OrganizationSortableTableColumn
-                  column={table.getColumn("createdAt")}
-                >
-                  {organizationLocalization.invitedAt}
-                </OrganizationSortableTableColumn>
+                {table.getColumn("createdAt")?.getIsVisible() && (
+                  <OrganizationSortableTableColumn
+                    column={table.getColumn("createdAt")}
+                  >
+                    {organizationLocalization.invitedAt}
+                  </OrganizationSortableTableColumn>
+                )}
 
-                <OrganizationSortableTableColumn
-                  column={table.getColumn("role")}
-                >
-                  {organizationLocalization.role}
-                </OrganizationSortableTableColumn>
+                {table.getColumn("role")?.getIsVisible() && (
+                  <OrganizationSortableTableColumn
+                    column={table.getColumn("role")}
+                  >
+                    {organizationLocalization.role}
+                  </OrganizationSortableTableColumn>
+                )}
 
-                <OrganizationSortableTableColumn
-                  column={table.getColumn("status")}
-                >
-                  {organizationLocalization.status}
-                </OrganizationSortableTableColumn>
+                {table.getColumn("status")?.getIsVisible() && (
+                  <OrganizationSortableTableColumn
+                    column={table.getColumn("status")}
+                  >
+                    {organizationLocalization.status}
+                  </OrganizationSortableTableColumn>
+                )}
 
                 <Table.Column className="text-end">
                   {organizationLocalization.actions}
@@ -309,10 +450,16 @@ export function OrganizationInvitations({
                 ) : (
                   table
                     .getRowModel()
-                    .rows.map(({ original: invitation }) => (
+                    .rows.map((row) => (
                       <OrganizationInvitationTableRow
-                        key={invitation.id}
-                        invitation={invitation}
+                        key={row.original.id}
+                        invitation={row.original}
+                        selectableRow={showSelection ? row : undefined}
+                        showCreatedAt={table
+                          .getColumn("createdAt")
+                          ?.getIsVisible()}
+                        showRole={table.getColumn("role")?.getIsVisible()}
+                        showStatus={table.getColumn("status")?.getIsVisible()}
                       />
                     ))
                 )}
@@ -326,8 +473,12 @@ export function OrganizationInvitations({
           canPreviousPage={table.getCanPreviousPage()}
           disabled={isPending}
           localization={organizationLocalization}
-          onNextPage={table.nextPage}
-          onPreviousPage={table.previousPage}
+          onFirstPage={() => table.firstPage()}
+          onLastPage={() => table.lastPage()}
+          onNextPage={() => table.nextPage()}
+          onPageSizeChange={(size) => table.setPageSize(size)}
+          onPreviousPage={() => table.previousPage()}
+          pageCount={table.getPageCount()}
           pageIndex={pagination.pageIndex}
           pageSize={pagination.pageSize}
           rowCount={table.getRowCount()}

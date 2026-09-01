@@ -34,6 +34,10 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { TableCell, TableRow } from "@/components/ui/table"
 import { organizationPlugin } from "@/lib/auth/organization-plugin"
 import { EditMemberRolesDialog } from "./edit-member-roles-dialog"
+import {
+  type OrganizationSelectableRow,
+  OrganizationTableSelectRow
+} from "./organization-table-selection"
 
 type OrganizationMember = {
   id: string
@@ -63,6 +67,7 @@ type MemberLocalization = Pick<
   | "leftOrganization"
   | "onlyOwnerActionDisabled"
   | "noTeams"
+  | "selectRow"
 >
 
 export type OrganizationMemberRowProps = {
@@ -71,6 +76,8 @@ export type OrganizationMemberRowProps = {
   member: OrganizationMember
   ownerCount?: number
   roles: RoleMap
+  selectableRow?: OrganizationSelectableRow
+  showRole?: boolean
   showTeams?: boolean
 }
 
@@ -232,6 +239,16 @@ export function OrganizationMemberRow(props: OrganizationMemberRowProps) {
 
   return (
     <TableRow>
+      <Show when={props.selectableRow}>
+        {(row) => (
+          <TableCell>
+            <OrganizationTableSelectRow
+              localization={props.localization}
+              row={row()}
+            />
+          </TableCell>
+        )}
+      </Show>
       <TableCell>
         <div class="flex flex-col gap-1">
           <UserView
@@ -256,10 +273,12 @@ export function OrganizationMemberRow(props: OrganizationMemberRowProps) {
           </For>
         </div>
       </TableCell>
-      <TableCell class="text-sm">
-        {memberRoleLabels(props.member.role, props.roles).join(", ") ||
-          formatRole(props.member.role)}
-      </TableCell>
+      <Show when={props.showRole !== false}>
+        <TableCell class="text-sm">
+          {memberRoleLabels(props.member.role, props.roles).join(", ") ||
+            formatRole(props.member.role)}
+        </TableCell>
+      </Show>
       <Show when={props.showTeams}>
         <TableCell class="text-sm">
           <Show

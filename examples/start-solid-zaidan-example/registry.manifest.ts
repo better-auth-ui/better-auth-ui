@@ -1111,6 +1111,18 @@ const solidRegistryBaseManifest = {
         componentFile(
           "src/components/auth/organization/organization-table-pagination.tsx"
         ),
+        componentFile(
+          "src/components/auth/organization/organization-table-bulk-action.tsx"
+        ),
+        componentFile(
+          "src/components/auth/organization/organization-table-selection.tsx"
+        ),
+        componentFile(
+          "src/components/auth/organization/organization-table-state.ts"
+        ),
+        componentFile(
+          "src/components/auth/organization/organization-table-view-options.tsx"
+        ),
         componentFile("src/components/auth/organization/organization-table.ts"),
         componentFile(
           "src/components/auth/organization/invite-member-dialog.tsx"
