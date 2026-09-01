@@ -7,6 +7,8 @@ const localeModules = import.meta.glob<Record<string, AuthLocale>>(
   { eager: true }
 )
 
+const languageTagPattern = /^[a-z]{2,3}(-[A-Z]{2})?$/
+
 const otherLocales = Object.entries(localeModules)
   .filter(
     ([path]) => path !== "../src/index.ts" && !path.endsWith("-plugins.ts")
@@ -15,6 +17,11 @@ const otherLocales = Object.entries(localeModules)
     const locale = Object.values(mod)[0]
     if (!locale) {
       throw new Error(`Locale module at ${path} has no exported locale`)
+    }
+    if (!languageTagPattern.test(locale.languageTag)) {
+      throw new Error(
+        `Locale module at ${path} has a non-canonical languageTag: "${locale.languageTag}"`
+      )
     }
     return locale
   })
@@ -69,7 +76,7 @@ describe("locale bundles", () => {
       })
       const translated = flattenMessages({
         ...locale.localization,
-        plugins: locale.plugins
+        plugins: locale.plugins ?? {}
       })
 
       expect(Object.keys(translated).sort()).toEqual(
