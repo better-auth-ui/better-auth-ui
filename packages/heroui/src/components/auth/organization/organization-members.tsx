@@ -17,16 +17,35 @@ import {
   Dropdown,
   Label,
   SearchField,
-  type SortDescriptor,
   Table
 } from "@heroui/react"
-import type { Member } from "better-auth/client"
+import type { PaginationState, SortingState } from "@tanstack/react-table"
+import type { Member, User } from "better-auth/client"
 import { type ComponentProps, useEffect, useMemo, useState } from "react"
 
 import { organizationPlugin } from "../../../lib/auth/organization-plugin"
 import { InviteMemberDialog } from "./invite-member-dialog"
 import { OrganizationMemberRow } from "./organization-member-row"
 import { OrganizationMemberRowSkeleton } from "./organization-member-row-skeleton"
+import { OrganizationSortableTableColumn } from "./organization-sortable-table-column"
+import {
+  createOrganizationColumnHelper,
+  ORGANIZATION_TABLE_PAGE_SIZE,
+  useOrganizationTable
+} from "./organization-table"
+import { OrganizationTablePagination } from "./organization-table-pagination"
+
+type MemberRow = Member & { user: Partial<User> }
+
+const memberColumnHelper = createOrganizationColumnHelper<MemberRow>()
+const memberColumns = memberColumnHelper.columns([
+  memberColumnHelper.accessor(
+    (member) => member.user.name || member.user.email || "",
+    { id: "user" }
+  ),
+  memberColumnHelper.accessor("role", {})
+])
+const EMPTY_MEMBERS: MemberRow[] = []
 
 /** Props for the {@link OrganizationMembers} component. */
 export type OrganizationMembersProps = {
@@ -75,10 +94,13 @@ export function OrganizationMembers({
   const { data: activeOrganization, isPending: activeOrganizationPending } =
     useActiveOrganization(authClient as OrganizationAuthClient)
 
-  const [sortDescriptor, setSortDescriptor] = useState<SortDescriptor>()
+  const [sorting, setSorting] = useState<SortingState>([])
   const [roleFilter, setRoleFilter] = useState("all")
   const [search, setSearch] = useState("")
-  const [page, setPage] = useState(0)
+  const [pagination, setPagination] = useState<PaginationState>({
+    pageIndex: 0,
+    pageSize: validatedPageSize ?? ORGANIZATION_TABLE_PAGE_SIZE
+  })
 
   const paged = validatedPageSize !== undefined
 
@@ -87,7 +109,7 @@ export function OrganizationMembers({
       query: paged
         ? {
             limit: validatedPageSize,
-            offset: page * validatedPageSize,
+            offset: pagination.pageIndex * validatedPageSize,
             ...(roleFilter === "all"
               ? {}
               : {
@@ -97,13 +119,12 @@ export function OrganizationMembers({
                   // drop anyone holding more than one.
                   filterOperator: "contains" as const
                 }),
-            ...(sortDescriptor?.column === "role"
+            ...(sorting[0]?.id === "role"
               ? {
                   sortBy: "role",
-                  sortDirection:
-                    sortDescriptor.direction === "descending"
-                      ? ("desc" as const)
-                      : ("asc" as const)
+                  sortDirection: sorting[0].desc
+                    ? ("desc" as const)
+                    : ("asc" as const)
                 }
               : {})
           }
@@ -161,30 +182,21 @@ export function OrganizationMembers({
     )
   }, [paged, search, membersData?.members, roleFilter])
 
-  const sortedMembers = useMemo(() => {
-    if (paged) return filteredMembers
-    if (!sortDescriptor) return filteredMembers
-    if (!filteredMembers) return filteredMembers
-
-    return [...filteredMembers].sort((a, b) => {
-      const col = sortDescriptor.column as keyof Member | "user"
-      const first =
-        col === "user" ? a.user.name || a.user.email : String(a[col])
-      const second =
-        col === "user" ? b.user.name || b.user.email : String(b[col])
-
-      let cmp = first.localeCompare(second)
-      if (sortDescriptor.direction === "descending") {
-        cmp *= -1
-      }
-
-      return cmp
-    })
-  }, [paged, sortDescriptor, filteredMembers])
-
   const [inviteOpen, setInviteOpen] = useState(false)
 
   const total = membersData?.total ?? membersData?.members.length ?? 0
+
+  const table = useOrganizationTable({
+    columns: memberColumns,
+    data: filteredMembers ?? EMPTY_MEMBERS,
+    getRowId: (member) => member.id,
+    manualPagination: paged,
+    manualSorting: paged,
+    rowCount: paged ? total : undefined,
+    state: { pagination, sorting },
+    onPaginationChange: setPagination,
+    onSortingChange: setSorting
+  })
 
   const membershipLimitReached =
     membershipLimit !== undefined && total >= membershipLimit
@@ -196,12 +208,8 @@ export function OrganizationMembers({
   // Any change to what the server is being asked for invalidates the cursor.
   // biome-ignore lint/correctness/useExhaustiveDependencies: resets on query change
   useEffect(() => {
-    setPage(0)
-  }, [roleFilter, sortDescriptor, activeOrganization?.id])
-
-  const pageStart = page * (validatedPageSize ?? 0)
-  const pageEnd = pageStart + (sortedMembers?.length ?? 0)
-  const hasNextPage = pageEnd < total
+    setPagination((current) => ({ ...current, pageIndex: 0 }))
+  }, [roleFilter, sorting, activeOrganization?.id])
 
   return (
     <div className={cn("flex flex-col gap-3", className)} {...props}>
@@ -306,34 +314,28 @@ export function OrganizationMembers({
 
         <Table>
           <Table.ScrollContainer>
-            <Table.Content
-              aria-label={organizationLocalization.members}
-              sortDescriptor={sortDescriptor}
-              onSortChange={(descriptor) => {
-                const shouldReset =
-                  sortDescriptor?.column === descriptor.column &&
-                  descriptor.direction === "ascending"
-                setSortDescriptor(shouldReset ? undefined : descriptor)
-              }}
-            >
+            <Table.Content aria-label={organizationLocalization.members}>
               <Table.Header>
                 {/* Name and email live on the joined user row, which
                     list-members cannot sort by. */}
-                <Table.Column allowsSorting={!paged} isRowHeader id="user">
-                  {({ sortDirection }) => (
-                    <Table.SortableColumnHeader sortDirection={sortDirection}>
-                      {organizationLocalization.member}
-                    </Table.SortableColumnHeader>
-                  )}
-                </Table.Column>
+                {paged ? (
+                  <Table.Column isRowHeader>
+                    {organizationLocalization.member}
+                  </Table.Column>
+                ) : (
+                  <OrganizationSortableTableColumn
+                    column={table.getColumn("user")}
+                    isRowHeader
+                  >
+                    {organizationLocalization.member}
+                  </OrganizationSortableTableColumn>
+                )}
 
-                <Table.Column allowsSorting id="role">
-                  {({ sortDirection }) => (
-                    <Table.SortableColumnHeader sortDirection={sortDirection}>
-                      {organizationLocalization.role}
-                    </Table.SortableColumnHeader>
-                  )}
-                </Table.Column>
+                <OrganizationSortableTableColumn
+                  column={table.getColumn("role")}
+                >
+                  {organizationLocalization.role}
+                </OrganizationSortableTableColumn>
 
                 {showTeams && (
                   <Table.Column>{organizationLocalization.teams}</Table.Column>
@@ -349,52 +351,36 @@ export function OrganizationMembers({
                   <OrganizationMemberRowSkeleton showTeams={showTeams} />
                 ) : (
                   !!activeOrganization &&
-                  sortedMembers?.map((member) => (
-                    <OrganizationMemberRow
-                      key={member.id}
-                      member={member}
-                      isOwner={isOwner}
-                      ownerCount={ownerCount}
-                      organization={activeOrganization}
-                      showTeams={showTeams}
-                    />
-                  ))
+                  table
+                    .getRowModel()
+                    .rows.map(({ original: member }) => (
+                      <OrganizationMemberRow
+                        key={member.id}
+                        member={member}
+                        isOwner={isOwner}
+                        ownerCount={ownerCount}
+                        organization={activeOrganization}
+                        showTeams={showTeams}
+                      />
+                    ))
                 )}
               </Table.Body>
             </Table.Content>
           </Table.ScrollContainer>
         </Table>
 
-        {paged && total > 0 && (
-          <div className="flex items-center justify-between gap-3">
-            <p className="text-muted text-sm tabular-nums">
-              {organizationLocalization.paginationRange
-                .replace("{{from}}", String(pageStart + 1))
-                .replace("{{to}}", String(pageEnd))
-                .replace("{{total}}", String(total))}
-            </p>
-
-            <div className="flex gap-2">
-              <Button
-                size="sm"
-                variant="secondary"
-                isDisabled={isPending || page === 0}
-                onPress={() => setPage((current) => Math.max(0, current - 1))}
-              >
-                {organizationLocalization.previousPage}
-              </Button>
-
-              <Button
-                size="sm"
-                variant="secondary"
-                isDisabled={isPending || !hasNextPage}
-                onPress={() => setPage((current) => current + 1)}
-              >
-                {organizationLocalization.nextPage}
-              </Button>
-            </div>
-          </div>
-        )}
+        <OrganizationTablePagination
+          canNextPage={table.getCanNextPage()}
+          canPreviousPage={table.getCanPreviousPage()}
+          disabled={isPending}
+          localization={organizationLocalization}
+          onNextPage={table.nextPage}
+          onPreviousPage={table.previousPage}
+          pageIndex={pagination.pageIndex}
+          pageSize={pagination.pageSize}
+          rowCount={table.getRowCount()}
+          visibleRowCount={table.getRowModel().rows.length}
+        />
       </div>
 
       {canInvite.data?.success && (

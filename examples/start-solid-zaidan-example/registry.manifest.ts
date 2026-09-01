@@ -1024,6 +1024,7 @@ const solidRegistryBaseManifest = {
       title: "Solid Organization",
       description:
         "Solid organization setup with direct invitation acceptance, settings tab, organization switcher, and slug route shell.",
+      dependencies: [...solidAuthDependencies, "@tanstack/solid-table"],
       registryDependencies: [
         betterAuthSolidRegistryDependency("user-view"),
         betterAuthSolidRegistryDependency("additional-field")
@@ -1104,6 +1105,13 @@ const solidRegistryBaseManifest = {
         componentFile(
           "src/components/auth/organization/organization-invitations-empty.tsx"
         ),
+        componentFile(
+          "src/components/auth/organization/organization-sortable-table-head.tsx"
+        ),
+        componentFile(
+          "src/components/auth/organization/organization-table-pagination.tsx"
+        ),
+        componentFile("src/components/auth/organization/organization-table.ts"),
         componentFile(
           "src/components/auth/organization/invite-member-dialog.tsx"
         ),

@@ -16,6 +16,7 @@ import {
   useListRoles,
   useUpdateRole
 } from "@better-auth-ui/solid/plugins/organization"
+import type { PaginationState, SortingState } from "@tanstack/solid-table"
 import { Pencil, Plus, Trash2 } from "lucide-solid"
 import { createEffect, createSignal, For, Show } from "solid-js"
 import { toast } from "solid-sonner"
@@ -54,6 +55,13 @@ import {
 } from "@/components/ui/table"
 import { organizationPlugin } from "@/lib/auth/organization-plugin"
 import { AdditionalField } from "../additional-field"
+import { OrganizationSortableTableHead } from "./organization-sortable-table-head"
+import {
+  createOrganizationColumnHelper,
+  createOrganizationTable,
+  ORGANIZATION_TABLE_PAGE_SIZE
+} from "./organization-table"
+import { OrganizationTablePagination } from "./organization-table-pagination"
 
 type Role = {
   id: string
@@ -61,6 +69,20 @@ type Role = {
   permission: Record<string, string[]>
   [key: string]: unknown
 }
+
+const roleColumnHelper = createOrganizationColumnHelper<Role>()
+const roleColumns = roleColumnHelper.columns([
+  roleColumnHelper.accessor("role", {}),
+  roleColumnHelper.accessor(
+    (role) =>
+      Object.values(role.permission).reduce(
+        (total, actions) => total + actions.length,
+        0
+      ),
+    { id: "permissions" }
+  )
+])
+const EMPTY_ROLES: Role[] = []
 
 export function OrganizationRoles(props: { organizationId: string }) {
   const auth = useAuth<OrganizationRolesAuthClient>()
@@ -86,6 +108,23 @@ export function OrganizationRoles(props: { organizationId: string }) {
     permissions: { ac: ["delete"] }
   }))
   const [editingRole, setEditingRole] = createSignal<Role | null | undefined>()
+  const [sorting, setSorting] = createSignal<SortingState>([])
+  const [pagination, setPagination] = createSignal<PaginationState>({
+    pageIndex: 0,
+    pageSize: ORGANIZATION_TABLE_PAGE_SIZE
+  })
+  const table = createOrganizationTable({
+    columns: roleColumns,
+    get data() {
+      return roles.data ?? EMPTY_ROLES
+    },
+    get state() {
+      return { pagination: pagination(), sorting: sorting() }
+    },
+    getRowId: (role) => role.id,
+    onPaginationChange: setPagination,
+    onSortingChange: setSorting
+  })
 
   return (
     <div class="flex flex-col gap-4">
@@ -132,16 +171,24 @@ export function OrganizationRoles(props: { organizationId: string }) {
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>{config.localization.roleName}</TableHead>
-                      <TableHead>{config.localization.permissions}</TableHead>
+                      <OrganizationSortableTableHead
+                        column={table.getColumn("role")}
+                      >
+                        {config.localization.roleName}
+                      </OrganizationSortableTableHead>
+                      <OrganizationSortableTableHead
+                        column={table.getColumn("permissions")}
+                      >
+                        {config.localization.permissions}
+                      </OrganizationSortableTableHead>
                       <TableHead class="text-end">
                         {config.localization.actions}
                       </TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    <For each={roles.data}>
-                      {(role) => (
+                    <For each={table.getRowModel().rows}>
+                      {({ original: role }) => (
                         <OrganizationRoleRow
                           authClient={auth.authClient}
                           canDelete={canDelete.data?.success === true}
@@ -161,6 +208,19 @@ export function OrganizationRoles(props: { organizationId: string }) {
           </Show>
         </Show>
       </Show>
+
+      <OrganizationTablePagination
+        canNextPage={table.getCanNextPage()}
+        canPreviousPage={table.getCanPreviousPage()}
+        disabled={roles.isLoading}
+        localization={config.localization}
+        onNextPage={table.nextPage}
+        onPreviousPage={table.previousPage}
+        pageIndex={pagination().pageIndex}
+        pageSize={pagination().pageSize}
+        rowCount={table.getRowCount()}
+        visibleRowCount={table.getRowModel().rows.length}
+      />
 
       <RoleDialog
         onOpenChange={(open) => !open && setEditingRole(undefined)}

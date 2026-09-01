@@ -5,8 +5,9 @@ import {
 } from "@better-auth-ui/core/plugins/organization"
 import { useAuth } from "@better-auth-ui/solid"
 import { useListOrganizationInvitations } from "@better-auth-ui/solid/plugins/organization"
-import { ChevronUp, Filter, Search, X } from "lucide-solid"
-import { createMemo, createSignal, For, type JSX, Show } from "solid-js"
+import type { PaginationState, SortingState } from "@tanstack/solid-table"
+import { Filter, Search, X } from "lucide-solid"
+import { createMemo, createSignal, For, Show } from "solid-js"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
@@ -35,20 +36,19 @@ import { cn } from "@/lib/utils"
 import { OrganizationInvitationRow } from "./organization-invitation-row"
 import { OrganizationInvitationRowSkeleton } from "./organization-invitation-row-skeleton"
 import { OrganizationInvitationsEmpty } from "./organization-invitations-empty"
+import { OrganizationSortableTableHead } from "./organization-sortable-table-head"
+import {
+  createOrganizationColumnHelper,
+  createOrganizationTable,
+  ORGANIZATION_TABLE_PAGE_SIZE
+} from "./organization-table"
+import { OrganizationTablePagination } from "./organization-table-pagination"
 
 export type OrganizationInvitationsProps = {
   class?: string
 }
 
 type RoleMap = Record<string, string>
-type InvitationSort = "none" | "email" | "createdAt" | "role" | "status"
-type InvitationSortColumn = Exclude<InvitationSort, "none">
-type SortDirection = "ascending" | "descending"
-
-type SortDescriptor = {
-  column: InvitationSortColumn
-  direction: SortDirection
-}
 
 const fallbackLocalization = {
   search: "Search...",
@@ -62,7 +62,10 @@ const fallbackLocalization = {
   canceled: "Canceled",
   member: "Member",
   admin: "Admin",
-  owner: "Owner"
+  owner: "Owner",
+  previousPage: "Previous page",
+  nextPage: "Next page",
+  paginationRange: "{{from}}–{{to}} of {{total}}"
 } satisfies Pick<
   OrganizationLocalization,
   | "search"
@@ -77,6 +80,9 @@ const fallbackLocalization = {
   | "member"
   | "admin"
   | "owner"
+  | "previousPage"
+  | "nextPage"
+  | "paginationRange"
 >
 
 const invitationStatuses = [
@@ -101,38 +107,31 @@ type OrganizationInvitation = {
   status?: string | null
 }
 
+const invitationColumnHelper =
+  createOrganizationColumnHelper<OrganizationInvitation>()
+const invitationColumns = invitationColumnHelper.columns([
+  invitationColumnHelper.accessor((invitation) => invitation.email ?? "", {
+    id: "email"
+  }),
+  invitationColumnHelper.accessor(
+    (invitation) =>
+      invitation.createdAt
+        ? new Date(invitation.createdAt).getTime()
+        : Number.POSITIVE_INFINITY,
+    { id: "createdAt" }
+  ),
+  invitationColumnHelper.accessor((invitation) => invitation.role ?? "", {
+    id: "role"
+  }),
+  invitationColumnHelper.accessor((invitation) => invitation.status ?? "", {
+    id: "status"
+  })
+])
+
 function formatStatus(status?: string | null) {
   if (!status) return "Pending"
 
   return status.charAt(0).toUpperCase() + status.slice(1)
-}
-
-function SortableTableHead(props: {
-  children: JSX.Element
-  onClick: () => void
-  sortDirection?: SortDirection
-}) {
-  return (
-    <TableHead aria-sort={props.sortDirection ?? "none"}>
-      <Button
-        class="h-auto w-full justify-start p-0 font-medium hover:bg-transparent"
-        onClick={props.onClick}
-        size="sm"
-        type="button"
-        variant="ghost"
-      >
-        {props.children}
-        <Show when={props.sortDirection}>
-          <ChevronUp
-            class={cn(
-              "size-3 transition-transform duration-100 ease-out",
-              props.sortDirection === "descending" && "rotate-180"
-            )}
-          />
-        </Show>
-      </Button>
-    </TableHead>
-  )
 }
 
 export function OrganizationInvitations(props: OrganizationInvitationsProps) {
@@ -141,11 +140,11 @@ export function OrganizationInvitations(props: OrganizationInvitationsProps) {
   const [invitationRoleFilter, setInvitationRoleFilter] = createSignal("all")
   const [invitationStatusFilter, setInvitationStatusFilter] =
     createSignal("all")
-  const [invitationSort, setInvitationSort] =
-    createSignal<InvitationSort>("none")
-  const [sortDescriptor, setSortDescriptor] = createSignal<
-    SortDescriptor | undefined
-  >()
+  const [sorting, setSorting] = createSignal<SortingState>([])
+  const [pagination, setPagination] = createSignal<PaginationState>({
+    pageIndex: 0,
+    pageSize: ORGANIZATION_TABLE_PAGE_SIZE
+  })
   const invitations = useListOrganizationInvitations(auth.authClient)
   const invitationRows = () =>
     (invitations.data ?? []) as OrganizationInvitation[]
@@ -163,6 +162,9 @@ export function OrganizationInvitations(props: OrganizationInvitationsProps) {
             | "accepted"
             | "rejected"
             | "canceled"
+            | "previousPage"
+            | "nextPage"
+            | "paginationRange"
           >
           roles?: RoleMap
         }
@@ -202,64 +204,18 @@ export function OrganizationInvitations(props: OrganizationInvitationsProps) {
     })
   const invitationStatusLabel = (status: (typeof invitationStatuses)[number]) =>
     localization()[status] ?? formatStatus(status)
-  const invitationDateTime = (invitation: OrganizationInvitation) => {
-    if (!invitation.createdAt) return Number.POSITIVE_INFINITY
-
-    const date =
-      invitation.createdAt instanceof Date
-        ? invitation.createdAt
-        : new Date(invitation.createdAt)
-    const time = date.getTime()
-
-    return Number.isNaN(time) ? Number.POSITIVE_INFINITY : time
-  }
-  const sortInvitations = (
-    first: OrganizationInvitation,
-    second: OrganizationInvitation
-  ) => {
-    let comparison = 0
-
-    if (invitationSort() === "email") {
-      comparison = (first.email ?? "").localeCompare(second.email ?? "")
-    }
-
-    if (invitationSort() === "createdAt") {
-      comparison = invitationDateTime(first) - invitationDateTime(second)
-    }
-
-    if (invitationSort() === "role") {
-      const firstRole = roles()[first.role ?? ""] ?? first.role ?? ""
-      const secondRole = roles()[second.role ?? ""] ?? second.role ?? ""
-
-      comparison = firstRole.localeCompare(secondRole)
-    }
-
-    if (invitationSort() === "status") {
-      comparison = formatStatus(first.status).localeCompare(
-        formatStatus(second.status)
-      )
-    }
-
-    return sortDescriptor()?.direction === "descending"
-      ? comparison * -1
-      : comparison
-  }
-  const sortedInvitationRows = () =>
-    [...filteredInvitationRows()].sort(sortInvitations)
-  const toggleSort = (column: InvitationSortColumn) => {
-    setInvitationSort(column)
-    setSortDescriptor((current) => {
-      if (current?.column !== column) {
-        return { column, direction: "ascending" }
-      }
-
-      return {
-        column,
-        direction:
-          current.direction === "ascending" ? "descending" : "ascending"
-      }
-    })
-  }
+  const table = createOrganizationTable({
+    columns: invitationColumns,
+    get data() {
+      return filteredInvitationRows()
+    },
+    get state() {
+      return { pagination: pagination(), sorting: sorting() }
+    },
+    getRowId: (invitation) => invitation.id,
+    onPaginationChange: setPagination,
+    onSortingChange: setSorting
+  })
 
   return (
     <div class={cn("flex flex-col gap-3", props.class)}>
@@ -406,46 +362,26 @@ export function OrganizationInvitations(props: OrganizationInvitationsProps) {
             <Table aria-label="Invitations">
               <TableHeader>
                 <TableRow>
-                  <SortableTableHead
-                    onClick={() => toggleSort("email")}
-                    sortDirection={
-                      sortDescriptor()?.column === "email"
-                        ? sortDescriptor()?.direction
-                        : undefined
-                    }
+                  <OrganizationSortableTableHead
+                    column={table.getColumn("email")}
                   >
                     Email
-                  </SortableTableHead>
-                  <SortableTableHead
-                    onClick={() => toggleSort("createdAt")}
-                    sortDirection={
-                      sortDescriptor()?.column === "createdAt"
-                        ? sortDescriptor()?.direction
-                        : undefined
-                    }
+                  </OrganizationSortableTableHead>
+                  <OrganizationSortableTableHead
+                    column={table.getColumn("createdAt")}
                   >
                     Invited
-                  </SortableTableHead>
-                  <SortableTableHead
-                    onClick={() => toggleSort("role")}
-                    sortDirection={
-                      sortDescriptor()?.column === "role"
-                        ? sortDescriptor()?.direction
-                        : undefined
-                    }
+                  </OrganizationSortableTableHead>
+                  <OrganizationSortableTableHead
+                    column={table.getColumn("role")}
                   >
                     {localization().role}
-                  </SortableTableHead>
-                  <SortableTableHead
-                    onClick={() => toggleSort("status")}
-                    sortDirection={
-                      sortDescriptor()?.column === "status"
-                        ? sortDescriptor()?.direction
-                        : undefined
-                    }
+                  </OrganizationSortableTableHead>
+                  <OrganizationSortableTableHead
+                    column={table.getColumn("status")}
                   >
                     {localization().status}
-                  </SortableTableHead>
+                  </OrganizationSortableTableHead>
                   <TableHead class="z-table-head-align-end">Actions</TableHead>
                 </TableRow>
               </TableHeader>
@@ -463,8 +399,8 @@ export function OrganizationInvitations(props: OrganizationInvitationsProps) {
                     </TableRow>
                   }
                 >
-                  <For each={sortedInvitationRows()}>
-                    {(invitation) => (
+                  <For each={table.getRowModel().rows}>
+                    {({ original: invitation }) => (
                       <OrganizationInvitationRow
                         invitation={invitation}
                         roles={roles()}
@@ -475,6 +411,18 @@ export function OrganizationInvitations(props: OrganizationInvitationsProps) {
               </TableBody>
             </Table>
           </Card>
+          <OrganizationTablePagination
+            canNextPage={table.getCanNextPage()}
+            canPreviousPage={table.getCanPreviousPage()}
+            disabled={invitations.isPending}
+            localization={localization()}
+            onNextPage={table.nextPage}
+            onPreviousPage={table.previousPage}
+            pageIndex={pagination().pageIndex}
+            pageSize={pagination().pageSize}
+            rowCount={table.getRowCount()}
+            visibleRowCount={table.getRowModel().rows.length}
+          />
         </Show>
       </Show>
     </div>

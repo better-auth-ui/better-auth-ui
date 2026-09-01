@@ -11,15 +11,10 @@ import {
   useHasPermission,
   useListOrganizationMembers
 } from "@better-auth-ui/react/plugins/organization"
-import type { Member } from "better-auth/client"
-import { ChevronUp, Filter, Search, X } from "lucide-react"
-import {
-  type ComponentProps,
-  type ReactNode,
-  useEffect,
-  useMemo,
-  useState
-} from "react"
+import type { PaginationState, SortingState } from "@tanstack/react-table"
+import type { Member, User } from "better-auth/client"
+import { Filter, Search, X } from "lucide-react"
+import { type ComponentProps, useEffect, useMemo, useState } from "react"
 
 import { Badge } from "@/components/ui/badge"
 import { Button, buttonVariants } from "@/components/ui/button"
@@ -48,13 +43,25 @@ import { cn } from "@/lib/utils"
 import { InviteMemberDialog } from "./invite-member-dialog"
 import { OrganizationMemberRow } from "./organization-member-row"
 import { OrganizationMemberRowSkeleton } from "./organization-member-row-skeleton"
+import { OrganizationSortableTableHead } from "./organization-sortable-table-head"
+import {
+  createOrganizationColumnHelper,
+  ORGANIZATION_TABLE_PAGE_SIZE,
+  useOrganizationTable
+} from "./organization-table"
+import { OrganizationTablePagination } from "./organization-table-pagination"
 
-type SortDirection = "ascending" | "descending"
+type MemberRow = Member & { user: Partial<User> }
 
-type SortDescriptor = {
-  column: string
-  direction: SortDirection
-}
+const memberColumnHelper = createOrganizationColumnHelper<MemberRow>()
+const memberColumns = memberColumnHelper.columns([
+  memberColumnHelper.accessor(
+    (member) => member.user.name || member.user.email || "",
+    { id: "user" }
+  ),
+  memberColumnHelper.accessor("role", {})
+])
+const EMPTY_MEMBERS: MemberRow[] = []
 
 /** Props for the `OrganizationMembers` component. */
 export type OrganizationMembersProps = {
@@ -103,10 +110,13 @@ export function OrganizationMembers({
   const { data: activeOrganization, isPending: activeOrganizationPending } =
     useActiveOrganization(authClient)
 
-  const [sortDescriptor, setSortDescriptor] = useState<SortDescriptor>()
+  const [sorting, setSorting] = useState<SortingState>([])
   const [roleFilter, setRoleFilter] = useState("all")
   const [search, setSearch] = useState("")
-  const [page, setPage] = useState(0)
+  const [pagination, setPagination] = useState<PaginationState>({
+    pageIndex: 0,
+    pageSize: validatedPageSize ?? ORGANIZATION_TABLE_PAGE_SIZE
+  })
 
   const paged = validatedPageSize !== undefined
 
@@ -115,7 +125,7 @@ export function OrganizationMembers({
       query: paged
         ? {
             limit: validatedPageSize,
-            offset: page * validatedPageSize,
+            offset: pagination.pageIndex * validatedPageSize,
             ...(roleFilter === "all"
               ? {}
               : {
@@ -125,13 +135,12 @@ export function OrganizationMembers({
                   // drop anyone holding more than one.
                   filterOperator: "contains" as const
                 }),
-            ...(sortDescriptor?.column === "role"
+            ...(sorting[0]?.id === "role"
               ? {
                   sortBy: "role",
-                  sortDirection:
-                    sortDescriptor.direction === "descending"
-                      ? ("desc" as const)
-                      : ("asc" as const)
+                  sortDirection: sorting[0].desc
+                    ? ("desc" as const)
+                    : ("asc" as const)
                 }
               : {})
           }
@@ -181,27 +190,6 @@ export function OrganizationMembers({
     )
   }, [paged, search, membersData?.members, roleFilter])
 
-  const sortedMembers = useMemo(() => {
-    if (paged) return filteredMembers
-    if (!sortDescriptor) return filteredMembers
-    if (!filteredMembers) return filteredMembers
-
-    return [...filteredMembers].sort((a, b) => {
-      const col = sortDescriptor.column as keyof Member | "user"
-      const first =
-        col === "user" ? a.user.name || a.user.email : String(a[col])
-      const second =
-        col === "user" ? b.user.name || b.user.email : String(b[col])
-
-      let cmp = first.localeCompare(second)
-      if (sortDescriptor.direction === "descending") {
-        cmp *= -1
-      }
-
-      return cmp
-    })
-  }, [paged, sortDescriptor, filteredMembers])
-
   const [inviteOpen, setInviteOpen] = useState(false)
 
   const isOwner = hasMemberRole(activeMemberRole?.role, creatorRole)
@@ -210,30 +198,26 @@ export function OrganizationMembers({
 
   const total = membersData?.total ?? membersData?.members.length ?? 0
 
+  const table = useOrganizationTable({
+    columns: memberColumns,
+    data: filteredMembers ?? EMPTY_MEMBERS,
+    getRowId: (member) => member.id,
+    manualPagination: paged,
+    manualSorting: paged,
+    rowCount: paged ? total : undefined,
+    state: { pagination, sorting },
+    onPaginationChange: setPagination,
+    onSortingChange: setSorting
+  })
+
   const atMembershipLimit =
     membershipLimit !== undefined && total >= membershipLimit
 
   // Any change to what the server is being asked for invalidates the cursor.
   // biome-ignore lint/correctness/useExhaustiveDependencies: resets on query change
   useEffect(() => {
-    setPage(0)
-  }, [roleFilter, sortDescriptor, activeOrganization?.id])
-
-  const pageStart = page * (validatedPageSize ?? 0)
-  const pageEnd = pageStart + (sortedMembers?.length ?? 0)
-  const hasNextPage = pageEnd < total
-
-  function toggleSort(column: string) {
-    setSortDescriptor((current) => {
-      if (current?.column !== column) {
-        return { column, direction: "ascending" }
-      }
-      if (current.direction === "ascending") {
-        return { column, direction: "descending" }
-      }
-      return undefined
-    })
-  }
+    setPagination((current) => ({ ...current, pageIndex: 0 }))
+  }, [roleFilter, sorting, activeOrganization?.id])
 
   return (
     <div className={cn("flex flex-col gap-3", className)} {...props}>
@@ -332,28 +316,16 @@ export function OrganizationMembers({
                 {paged ? (
                   <TableHead>{organizationLocalization.member}</TableHead>
                 ) : (
-                  <SortableTableHead
-                    sortDirection={
-                      sortDescriptor?.column === "user"
-                        ? sortDescriptor.direction
-                        : undefined
-                    }
-                    onClick={() => toggleSort("user")}
+                  <OrganizationSortableTableHead
+                    column={table.getColumn("user")}
                   >
                     {organizationLocalization.member}
-                  </SortableTableHead>
+                  </OrganizationSortableTableHead>
                 )}
 
-                <SortableTableHead
-                  sortDirection={
-                    sortDescriptor?.column === "role"
-                      ? sortDescriptor.direction
-                      : undefined
-                  }
-                  onClick={() => toggleSort("role")}
-                >
+                <OrganizationSortableTableHead column={table.getColumn("role")}>
                   {organizationLocalization.role}
-                </SortableTableHead>
+                </OrganizationSortableTableHead>
 
                 {showTeams && (
                   <TableHead>{organizationLocalization.teams}</TableHead>
@@ -370,89 +342,40 @@ export function OrganizationMembers({
                 <OrganizationMemberRowSkeleton showTeams={showTeams} />
               ) : (
                 !!activeOrganization &&
-                sortedMembers?.map((member) => (
-                  <OrganizationMemberRow
-                    key={member.id}
-                    member={member}
-                    isOwner={isOwner}
-                    ownerCount={ownerCount}
-                    organization={activeOrganization}
-                    showTeams={showTeams}
-                  />
-                ))
+                table
+                  .getRowModel()
+                  .rows.map(({ original: member }) => (
+                    <OrganizationMemberRow
+                      key={member.id}
+                      member={member}
+                      isOwner={isOwner}
+                      ownerCount={ownerCount}
+                      organization={activeOrganization}
+                      showTeams={showTeams}
+                    />
+                  ))
               )}
             </TableBody>
           </Table>
         </Card>
 
-        {paged && total > 0 && (
-          <div className="flex items-center justify-between gap-3">
-            <p className="text-muted-foreground text-sm tabular-nums">
-              {organizationLocalization.paginationRange
-                .replace("{{from}}", String(pageStart + 1))
-                .replace("{{to}}", String(pageEnd))
-                .replace("{{total}}", String(total))}
-            </p>
-
-            <div className="flex gap-2">
-              <Button
-                size="sm"
-                variant="outline"
-                disabled={isPending || page === 0}
-                onClick={() => setPage((current) => Math.max(0, current - 1))}
-              >
-                {organizationLocalization.previousPage}
-              </Button>
-
-              <Button
-                size="sm"
-                variant="outline"
-                disabled={isPending || !hasNextPage}
-                onClick={() => setPage((current) => current + 1)}
-              >
-                {organizationLocalization.nextPage}
-              </Button>
-            </div>
-          </div>
-        )}
+        <OrganizationTablePagination
+          canNextPage={table.getCanNextPage()}
+          canPreviousPage={table.getCanPreviousPage()}
+          disabled={isPending}
+          localization={organizationLocalization}
+          onNextPage={table.nextPage}
+          onPreviousPage={table.previousPage}
+          pageIndex={pagination.pageIndex}
+          pageSize={pagination.pageSize}
+          rowCount={table.getRowCount()}
+          visibleRowCount={table.getRowModel().rows.length}
+        />
       </div>
 
       {canInvite.data?.success && (
         <InviteMemberDialog open={inviteOpen} onOpenChange={setInviteOpen} />
       )}
     </div>
-  )
-}
-
-function SortableTableHead({
-  children,
-  sortDirection,
-  onClick
-}: {
-  children: ReactNode
-  sortDirection?: SortDirection
-  onClick: () => void
-}) {
-  return (
-    <TableHead aria-sort={sortDirection ?? "none"}>
-      <Button
-        className="h-auto w-full justify-start p-0 font-medium hover:bg-transparent"
-        onClick={onClick}
-        size="sm"
-        type="button"
-        variant="ghost"
-      >
-        {children}
-
-        {!!sortDirection && (
-          <ChevronUp
-            className={cn(
-              "size-3 transition-transform duration-100 ease-out",
-              sortDirection === "descending" ? "rotate-180" : ""
-            )}
-          />
-        )}
-      </Button>
-    </TableHead>
   )
 }

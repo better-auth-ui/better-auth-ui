@@ -82,6 +82,7 @@
     "@tanstack/solid-query": "^5.101.2",
     "@tanstack/solid-router": "^1.170.21",
     "@tanstack/solid-start": "^1.168.37",
+    "@tanstack/solid-table": "^9.2.4",
     "better-auth": "1.7.2",
     "bowser": "^2.11.0",
     "class-variance-authority": "^0.7.1",

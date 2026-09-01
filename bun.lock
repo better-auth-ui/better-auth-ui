@@ -42,6 +42,7 @@
         "@tanstack/react-query": "^5.101.2",
         "@tanstack/react-router": "^1.170.21",
         "@tanstack/react-start": "^1.168.38",
+        "@tanstack/react-table": "^9.2.4",
         "@tanstack/start-static-server-functions": "^1.167.22",
         "better-auth": "1.7.2",
         "bowser": "^2.11.0",
@@ -150,6 +151,7 @@
         "@heroui/styles": "^3.2.1",
         "@neondatabase/serverless": "^1.0.2",
         "@tanstack/react-query": "^5.101.2",
+        "@tanstack/react-table": "^9.2.4",
         "better-auth": "1.7.2",
         "drizzle-orm": "^0.45.2",
         "next": "^16.3.0",
@@ -180,6 +182,7 @@
         "@react-email/render": "^2.0.9",
         "@tanstack/react-pacer": "^0.22.1",
         "@tanstack/react-query": "^5.101.2",
+        "@tanstack/react-table": "^9.2.4",
         "better-auth": "1.7.2",
         "bowser": "^2.11.0",
         "class-variance-authority": "^0.7.1",
@@ -228,6 +231,7 @@
         "@tanstack/react-router-devtools": "^1.167.1",
         "@tanstack/react-router-ssr-query": "^1.167.1",
         "@tanstack/react-start": "^1.168.38",
+        "@tanstack/react-table": "^9.2.4",
         "better-auth": "1.7.2",
         "drizzle-orm": "^0.45.2",
         "next-themes": "^0.4.6",
@@ -271,6 +275,7 @@
         "@tanstack/react-router-devtools": "^1.167.1",
         "@tanstack/react-router-ssr-query": "^1.167.1",
         "@tanstack/react-start": "^1.168.38",
+        "@tanstack/react-table": "^9.2.4",
         "better-auth": "1.7.2",
         "bowser": "^2.11.0",
         "class-variance-authority": "^0.7.1",
@@ -326,6 +331,7 @@
         "@tanstack/react-router-devtools": "^1.167.1",
         "@tanstack/react-router-ssr-query": "^1.167.1",
         "@tanstack/react-start": "^1.168.38",
+        "@tanstack/react-table": "^9.2.4",
         "better-auth": "1.7.2",
         "bowser": "^2.11.0",
         "class-variance-authority": "^0.7.1",
@@ -382,6 +388,7 @@
         "@tanstack/solid-query": "^5.101.2",
         "@tanstack/solid-router": "^1.170.21",
         "@tanstack/solid-start": "^1.168.37",
+        "@tanstack/solid-table": "^9.2.4",
         "better-auth": "1.7.2",
         "bowser": "^2.11.0",
         "class-variance-authority": "^0.7.1",
@@ -476,6 +483,7 @@
         "@internationalized/date": "^3.12.2",
         "@tanstack/react-pacer": "^0.23.0",
         "@tanstack/react-query": "^5.101.2",
+        "@tanstack/react-table": "^9.2.4",
         "@testing-library/react": "^16.3.2",
         "@testing-library/user-event": "^14.6.3",
         "@types/react": "^19.2.18",
@@ -497,6 +505,7 @@
         "@internationalized/date": ">=3.12.2",
         "@tanstack/react-pacer": ">=0.22.1",
         "@tanstack/react-query": ">=5.101.2",
+        "@tanstack/react-table": ">=9.2.4",
         "better-auth": ">=1.7.0",
         "bowser": ">=2.11.0",
         "react": ">=19.2.6",
@@ -1739,6 +1748,8 @@
 
     "@tanstack/react-store": ["@tanstack/react-store@0.11.1", "", { "dependencies": { "@tanstack/store": "0.11.1", "use-sync-external-store": "^1.6.0" }, "peerDependencies": { "react": "^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0", "react-dom": "^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0" } }, "sha512-HaIGKI3YLmjBYIvy5DFDY23oNaYZIsTZfngey07Uh5iLVJgM3bIGCnZeOFOqzjFld9JHWcaHJnasD/bKoGKwJQ=="],
 
+    "@tanstack/react-table": ["@tanstack/react-table@9.2.4", "", { "dependencies": { "@tanstack/react-store": "^0.11.1", "@tanstack/table-core": "9.2.4" }, "peerDependencies": { "react": ">=18" } }, "sha512-Rzp1Q4e0/nIgEjmISYR5HeEgLTNtrG+C7NFZf/AbCxPO5hg+zC3yNGwcoECigUk8SFzzvhXbd2rFdtP2ZiGrfA=="],
+
     "@tanstack/router-cli": ["@tanstack/router-cli@1.167.24", "", { "dependencies": { "@tanstack/router-generator": "1.167.24", "chokidar": "^5.0.0", "yargs": "^17.7.2" }, "bin": { "tsr": "bin/tsr.cjs" } }, "sha512-GOkgpleSluS5KMx+eDtSWEtqeJeS7qJwWidEUts/vRn8xGp/nbmD/Hq8UlYqSK9Mp7R/HVdKhJ53/iWXXoJ0Gw=="],
 
     "@tanstack/router-core": ["@tanstack/router-core@1.171.18", "", { "dependencies": { "@tanstack/history": "1.162.1", "cookie-es": "^3.0.0", "seroval": "^1.6.2", "seroval-plugins": "^1.6.2" } }, "sha512-F91BWGqxOhDRubSaoAA3FDkzbr/WPrW6v3NcmTrI2T0AwtAL8qvY9FEDhTYwFoFiicBsRtt1NaNWKNTFNGQrqA=="],
@@ -1763,6 +1774,8 @@
 
     "@tanstack/solid-start-server": ["@tanstack/solid-start-server@1.167.26", "", { "dependencies": { "@tanstack/router-core": "1.171.18", "@tanstack/solid-router": "1.170.21", "@tanstack/start-server-core": "1.169.21" }, "peerDependencies": { "solid-js": "^1.0.0" } }, "sha512-AleUZV6etQZL5J+4UBKzAqgNpAPCfHFstsPDPm97+tn0qbuICPNSsa6vU6g9yLyFPoHqzzCqxlL4+rNvrp9Ubg=="],
 
+    "@tanstack/solid-table": ["@tanstack/solid-table@9.2.4", "", { "dependencies": { "@tanstack/store": "^0.11.1", "@tanstack/table-core": "9.2.4" }, "peerDependencies": { "solid-js": ">=1.3" } }, "sha512-fPveX8c3TJp63Bt9hQkrgd2Lm7Cfsm6/s6lh1Vmp2jcX90+RP+UHr3VO8/GPtVOSSroik9ZVSzC3Gobi17SqSA=="],
+
     "@tanstack/start-client-core": ["@tanstack/start-client-core@1.170.17", "", { "dependencies": { "@tanstack/router-core": "1.171.18", "@tanstack/start-fn-stubs": "1.162.0", "@tanstack/start-storage-context": "1.167.20", "seroval": "^1.6.2" } }, "sha512-UV9eMksqiyxWXimQLUn+u8bTugRpbkCD+opuYW8qDp6QfMsASHaIBZUZ0Xqn+ZrAxoePmRzWKgIef5cA+lJf4A=="],
 
     "@tanstack/start-fn-stubs": ["@tanstack/start-fn-stubs@1.162.0", "", {}, "sha512-QWfUZ3Yo923tdQn38LyKMU8rcTw69zc+T4dAvgTWV4O56SqFRsGfS0lSWIMhJRwXIx/bvdi7nTUBDdZtTHtpTQ=="],
@@ -1776,6 +1789,8 @@
     "@tanstack/start-storage-context": ["@tanstack/start-storage-context@1.167.20", "", { "dependencies": { "@tanstack/router-core": "1.171.18" } }, "sha512-rGsNmEMLYhCq1UeZu69TetnvRklIJUwlUDn4u2jXc5IrU5Hdc5m7ABw9EYNyFUz5XFntiZqJVl1l7gVc6iuwuw=="],
 
     "@tanstack/store": ["@tanstack/store@0.11.1", "", {}, "sha512-mzTOBhypOuDJAy/D8n2MfUZ1HFkXnmSETviRyhqEC8LUE7/IZQExOTxMANj3KjTofYTkFNpBY67qaVrT41YccA=="],
+
+    "@tanstack/table-core": ["@tanstack/table-core@9.2.4", "", { "dependencies": { "@tanstack/store": "^0.11.1" } }, "sha512-GwdDyGGr6UXAtubF14yAwcXvdaogqfsQgIk89Suebjxob/Rjq2xvfmXsjDF1rQmKmhHsJm9TOY7myxv3i6geJw=="],
 
     "@tanstack/virtual-file-routes": ["@tanstack/virtual-file-routes@1.162.0", "", {}, "sha512-uhOeFyxLcU41HzvrxsGpiWdcMbScY1EDgbZ5K7DVRMYInbLYWAC0EA/kx9wXAoSM8q82bUG2hRl8+EAjE6XAbA=="],
 

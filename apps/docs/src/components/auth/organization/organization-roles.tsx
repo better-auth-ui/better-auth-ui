@@ -15,6 +15,7 @@ import {
   useListRoles,
   useUpdateRole
 } from "@better-auth-ui/react/plugins/organization"
+import type { PaginationState, SortingState } from "@tanstack/react-table"
 import { Pencil, Plus, Trash2 } from "lucide-react"
 import { type FormEvent, useEffect, useState } from "react"
 import { toast } from "sonner"
@@ -54,6 +55,13 @@ import {
 } from "@/components/ui/table"
 import { organizationPlugin } from "@/lib/auth/organization-plugin"
 import { AdditionalField } from "../additional-field"
+import { OrganizationSortableTableHead } from "./organization-sortable-table-head"
+import {
+  createOrganizationColumnHelper,
+  ORGANIZATION_TABLE_PAGE_SIZE,
+  useOrganizationTable
+} from "./organization-table"
+import { OrganizationTablePagination } from "./organization-table-pagination"
 
 type Role = {
   id: string
@@ -61,6 +69,20 @@ type Role = {
   permission: Record<string, string[]>
   [key: string]: unknown
 }
+
+const roleColumnHelper = createOrganizationColumnHelper<Role>()
+const roleColumns = roleColumnHelper.columns([
+  roleColumnHelper.accessor("role", {}),
+  roleColumnHelper.accessor(
+    (role) =>
+      Object.values(role.permission).reduce(
+        (total, actions) => total + actions.length,
+        0
+      ),
+    { id: "permissions" }
+  )
+])
+const EMPTY_ROLES: Role[] = []
 
 export function OrganizationRoles({
   organizationId
@@ -91,6 +113,19 @@ export function OrganizationRoles({
     permissions: { ac: ["delete"] }
   })
   const [editingRole, setEditingRole] = useState<Role | null>()
+  const [sorting, setSorting] = useState<SortingState>([])
+  const [pagination, setPagination] = useState<PaginationState>({
+    pageIndex: 0,
+    pageSize: ORGANIZATION_TABLE_PAGE_SIZE
+  })
+  const table = useOrganizationTable({
+    columns: roleColumns,
+    data: roles.data ?? EMPTY_ROLES,
+    getRowId: (role) => role.id,
+    state: { pagination, sorting },
+    onPaginationChange: setPagination,
+    onSortingChange: setSorting
+  })
 
   return (
     <div className="flex flex-col gap-4">
@@ -120,15 +155,23 @@ export function OrganizationRoles({
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>{localization.roleName}</TableHead>
-                  <TableHead>{localization.permissions}</TableHead>
+                  <OrganizationSortableTableHead
+                    column={table.getColumn("role")}
+                  >
+                    {localization.roleName}
+                  </OrganizationSortableTableHead>
+                  <OrganizationSortableTableHead
+                    column={table.getColumn("permissions")}
+                  >
+                    {localization.permissions}
+                  </OrganizationSortableTableHead>
                   <TableHead className="text-right">
                     {localization.actions}
                   </TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {roles.data.map((role) => (
+                {table.getRowModel().rows.map(({ original: role }) => (
                   <OrganizationRoleRow
                     key={role.id}
                     authClient={authClient}
@@ -155,6 +198,19 @@ export function OrganizationRoles({
           </CardContent>
         </Card>
       )}
+
+      <OrganizationTablePagination
+        canNextPage={table.getCanNextPage()}
+        canPreviousPage={table.getCanPreviousPage()}
+        disabled={roles.isLoading}
+        localization={localization}
+        onNextPage={table.nextPage}
+        onPreviousPage={table.previousPage}
+        pageIndex={pagination.pageIndex}
+        pageSize={pagination.pageSize}
+        rowCount={table.getRowCount()}
+        visibleRowCount={table.getRowModel().rows.length}
+      />
 
       <RoleDialog
         organizationId={organizationId}

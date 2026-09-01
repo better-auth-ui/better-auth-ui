@@ -16,9 +16,10 @@ import {
   Dropdown,
   Label,
   SearchField,
-  type SortDescriptor,
   Table
 } from "@heroui/react"
+import type { PaginationState, SortingState } from "@tanstack/react-table"
+import type { Invitation } from "better-auth/client"
 import { type ComponentProps, useMemo, useState } from "react"
 
 import { organizationPlugin } from "../../../lib/auth/organization-plugin"
@@ -26,6 +27,25 @@ import { InviteMemberDialog } from "./invite-member-dialog"
 import { OrganizationInvitationTableRow } from "./organization-invitation-row"
 import { OrganizationInvitationRowSkeleton } from "./organization-invitation-row-skeleton"
 import { OrganizationInvitationsEmpty } from "./organization-invitations-empty"
+import { OrganizationSortableTableColumn } from "./organization-sortable-table-column"
+import {
+  createOrganizationColumnHelper,
+  ORGANIZATION_TABLE_PAGE_SIZE,
+  useOrganizationTable
+} from "./organization-table"
+import { OrganizationTablePagination } from "./organization-table-pagination"
+
+const invitationColumnHelper = createOrganizationColumnHelper<Invitation>()
+const invitationColumns = invitationColumnHelper.columns([
+  invitationColumnHelper.accessor("email", {}),
+  invitationColumnHelper.accessor(
+    (invitation) => new Date(invitation.createdAt).getTime(),
+    { id: "createdAt" }
+  ),
+  invitationColumnHelper.accessor("role", {}),
+  invitationColumnHelper.accessor("status", {})
+])
+const EMPTY_INVITATIONS: Invitation[] = []
 
 /** Props for the {@link OrganizationInvitations} component. */
 export type OrganizationInvitationsProps = {
@@ -51,7 +71,11 @@ export function OrganizationInvitations({
 
   const isPending = invitationsPending
 
-  const [sortDescriptor, setSortDescriptor] = useState<SortDescriptor>()
+  const [sorting, setSorting] = useState<SortingState>([])
+  const [pagination, setPagination] = useState<PaginationState>({
+    pageIndex: 0,
+    pageSize: ORGANIZATION_TABLE_PAGE_SIZE
+  })
   const [roleFilter, setRoleFilter] = useState("all")
   const [statusFilter, setStatusFilter] = useState("all")
   const [search, setSearch] = useState("")
@@ -65,27 +89,14 @@ export function OrganizationInvitations({
     )
   }, [search, invitations, roleFilter, statusFilter])
 
-  const sortedInvitations = useMemo(() => {
-    if (!sortDescriptor) return filteredInvitations
-    if (!filteredInvitations) return filteredInvitations
-
-    return [...filteredInvitations].sort((a, b) => {
-      const col = sortDescriptor.column as keyof typeof a
-      let cmp = 0
-
-      if (col === "createdAt") {
-        cmp = new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
-      } else {
-        cmp = String(a[col]).localeCompare(String(b[col]))
-      }
-
-      if (sortDescriptor.direction === "descending") {
-        cmp *= -1
-      }
-
-      return cmp
-    })
-  }, [sortDescriptor, filteredInvitations])
+  const table = useOrganizationTable({
+    columns: invitationColumns,
+    data: filteredInvitations ?? EMPTY_INVITATIONS,
+    getRowId: (invitation) => invitation.id,
+    state: { pagination, sorting },
+    onPaginationChange: setPagination,
+    onSortingChange: setSorting
+  })
 
   const [inviteOpen, setInviteOpen] = useState(false)
 
@@ -249,48 +260,32 @@ export function OrganizationInvitations({
 
         <Table>
           <Table.ScrollContainer>
-            <Table.Content
-              aria-label={organizationLocalization.invitations}
-              sortDescriptor={sortDescriptor}
-              onSortChange={(descriptor) => {
-                const shouldReset =
-                  sortDescriptor?.column === descriptor.column &&
-                  descriptor.direction === "ascending"
-                setSortDescriptor(shouldReset ? undefined : descriptor)
-              }}
-            >
+            <Table.Content aria-label={organizationLocalization.invitations}>
               <Table.Header>
-                <Table.Column allowsSorting isRowHeader id="email">
-                  {({ sortDirection }) => (
-                    <Table.SortableColumnHeader sortDirection={sortDirection}>
-                      {localization.auth.email}
-                    </Table.SortableColumnHeader>
-                  )}
-                </Table.Column>
+                <OrganizationSortableTableColumn
+                  column={table.getColumn("email")}
+                  isRowHeader
+                >
+                  {localization.auth.email}
+                </OrganizationSortableTableColumn>
 
-                <Table.Column allowsSorting id="createdAt">
-                  {({ sortDirection }) => (
-                    <Table.SortableColumnHeader sortDirection={sortDirection}>
-                      {organizationLocalization.invitedAt}
-                    </Table.SortableColumnHeader>
-                  )}
-                </Table.Column>
+                <OrganizationSortableTableColumn
+                  column={table.getColumn("createdAt")}
+                >
+                  {organizationLocalization.invitedAt}
+                </OrganizationSortableTableColumn>
 
-                <Table.Column allowsSorting id="role">
-                  {({ sortDirection }) => (
-                    <Table.SortableColumnHeader sortDirection={sortDirection}>
-                      {organizationLocalization.role}
-                    </Table.SortableColumnHeader>
-                  )}
-                </Table.Column>
+                <OrganizationSortableTableColumn
+                  column={table.getColumn("role")}
+                >
+                  {organizationLocalization.role}
+                </OrganizationSortableTableColumn>
 
-                <Table.Column allowsSorting id="status">
-                  {({ sortDirection }) => (
-                    <Table.SortableColumnHeader sortDirection={sortDirection}>
-                      {organizationLocalization.status}
-                    </Table.SortableColumnHeader>
-                  )}
-                </Table.Column>
+                <OrganizationSortableTableColumn
+                  column={table.getColumn("status")}
+                >
+                  {organizationLocalization.status}
+                </OrganizationSortableTableColumn>
 
                 <Table.Column className="text-end">
                   {organizationLocalization.actions}
@@ -312,17 +307,32 @@ export function OrganizationInvitations({
                 {isPending ? (
                   <OrganizationInvitationRowSkeleton />
                 ) : (
-                  sortedInvitations?.map((invitation) => (
-                    <OrganizationInvitationTableRow
-                      key={invitation.id}
-                      invitation={invitation}
-                    />
-                  ))
+                  table
+                    .getRowModel()
+                    .rows.map(({ original: invitation }) => (
+                      <OrganizationInvitationTableRow
+                        key={invitation.id}
+                        invitation={invitation}
+                      />
+                    ))
                 )}
               </Table.Body>
             </Table.Content>
           </Table.ScrollContainer>
         </Table>
+
+        <OrganizationTablePagination
+          canNextPage={table.getCanNextPage()}
+          canPreviousPage={table.getCanPreviousPage()}
+          disabled={isPending}
+          localization={organizationLocalization}
+          onNextPage={table.nextPage}
+          onPreviousPage={table.previousPage}
+          pageIndex={pagination.pageIndex}
+          pageSize={pagination.pageSize}
+          rowCount={table.getRowCount()}
+          visibleRowCount={table.getRowModel().rows.length}
+        />
       </div>
 
       {canInvite.data?.success && (
