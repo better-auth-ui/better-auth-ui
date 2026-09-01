@@ -1,13 +1,6 @@
 import { Discord } from "@better-auth-ui/react"
 import type { BaseLayoutProps } from "fumadocs-ui/layouts/shared"
-import {
-  ArrowUpRight,
-  Book,
-  BookOpen,
-  ClockArrowDown,
-  ListTodo,
-  PanelsTopLeft
-} from "lucide-react"
+import { ArrowUpRight, Book, BookOpen, PanelsTopLeft } from "lucide-react"
 import { Logo } from "@/components/icons/logo"
 
 export function baseOptions(): BaseLayoutProps {
@@ -73,24 +66,29 @@ export function baseOptions(): BaseLayoutProps {
         secondary: false
       },
       {
-        icon: <ListTodo />,
-        text: "Roadmap",
-        url: "https://github.com/orgs/better-auth-ui/projects/1",
-        external: true,
-        secondary: false
-      },
-      {
-        icon: <ClockArrowDown />,
-        text: "Changelog",
-        url: "https://github.com/better-auth-ui/better-auth-ui/releases",
-        external: true,
-        secondary: false
-      },
-      {
+        type: "menu",
         icon: <Book />,
-        text: "LLMs.txt",
-        url: "/llms.txt",
-        external: true,
+        text: "Resources",
+        items: [
+          {
+            text: "Roadmap",
+            description: "See what we're planning and track progress.",
+            url: "https://github.com/orgs/better-auth-ui/projects/1",
+            external: true
+          },
+          {
+            text: "Changelog",
+            description: "Review releases and recent changes.",
+            url: "https://github.com/better-auth-ui/better-auth-ui/releases",
+            external: true
+          },
+          {
+            text: "LLMs.txt",
+            description: "Open the complete documentation in plain text.",
+            url: "/llms.txt",
+            external: true
+          }
+        ],
         secondary: false
       }
     ]
