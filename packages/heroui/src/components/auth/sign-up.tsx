@@ -91,7 +91,8 @@ export function SignUp({
         // it belongs against the field rather than in a toast.
         setIsCompromised(isPasswordCompromisedError(error))
 
-        form.reset()
+        form.setFieldValue("password", "")
+        form.setFieldValue("confirmPassword", "")
         resetFetchOptions()
       },
       onSuccess: (_data, { email }) => {
@@ -141,7 +142,8 @@ export function SignUp({
         value.password !== value.confirmPassword
       ) {
         toast.danger(localization.auth.passwordsDoNotMatch)
-        form.reset()
+        form.setFieldValue("password", "")
+        form.setFieldValue("confirmPassword", "")
         return
       }
 

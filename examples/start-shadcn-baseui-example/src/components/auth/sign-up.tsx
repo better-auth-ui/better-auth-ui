@@ -102,7 +102,8 @@ export function SignUp({
           }))
         }
 
-        form.reset()
+        form.setFieldValue("password", "")
+        form.setFieldValue("confirmPassword", "")
         resetFetchOptions()
       },
       onSuccess: (_data, { email }) => {
@@ -159,7 +160,8 @@ export function SignUp({
         value.password !== value.confirmPassword
       ) {
         toast.error(localization.auth.passwordsDoNotMatch)
-        form.reset()
+        form.setFieldValue("password", "")
+        form.setFieldValue("confirmPassword", "")
         return
       }
 

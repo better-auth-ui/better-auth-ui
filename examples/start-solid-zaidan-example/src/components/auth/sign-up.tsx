@@ -58,6 +58,8 @@ export function SignUp(props: SignUpProps) {
         setPasswordError(auth.localization.auth.passwordCompromised)
       }
 
+      form.setFieldValue("password", "")
+      form.setFieldValue("confirmPassword", "")
       resetFetchOptions()
     },
     onSuccess: (_data, variables) => {
@@ -111,6 +113,8 @@ export function SignUp(props: SignUpProps) {
         value.password !== value.confirmPassword
       ) {
         setConfirmPasswordError(auth.localization.auth.passwordsDoNotMatch)
+        form.setFieldValue("password", "")
+        form.setFieldValue("confirmPassword", "")
         return
       }
 
