@@ -7,6 +7,7 @@ import {
 import {
   type AdminAuthClient,
   type AdminListUsersParams,
+  type AdminUser,
   banAdminUserOptions,
   createAdminUserOptions,
   impersonateAdminUserOptions,
@@ -27,6 +28,13 @@ import {
   useAdminUsers
 } from "@better-auth-ui/react/plugins/admin"
 import { keepPreviousData, useMutation } from "@tanstack/react-query"
+import {
+  type ColumnFiltersState,
+  functionalUpdate,
+  type PaginationState,
+  type SortingState,
+  type Updater
+} from "@tanstack/react-table"
 import type { BetterFetchError } from "better-auth/react"
 import {
   BanIcon,
@@ -115,10 +123,11 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { adminPlugin } from "@/lib/auth/admin-plugin"
 
+import { createAdminColumnHelper, useAdminTable } from "./admin-table"
+
 type SearchField = "email" | "name"
 type SearchOperator = "contains" | "ends_with" | "starts_with"
 type StatusFilter = "all" | "active" | "banned"
-type SortDirection = "asc" | "desc"
 type DangerousAction = "ban" | "delete" | "impersonate" | "revokeAll"
 
 export type AdminUsersProps = {
@@ -162,6 +171,23 @@ const getAdminErrorMessage = (error: Error | null) => {
   return authError?.error?.message ?? authError?.message
 }
 
+const adminColumnHelper = createAdminColumnHelper<AdminUser>()
+const adminColumns = adminColumnHelper.columns([
+  adminColumnHelper.accessor("name", { id: "name" }),
+  adminColumnHelper.accessor("role", {
+    id: "role",
+    enableSorting: false
+  }),
+  adminColumnHelper.accessor("banned", {
+    id: "status",
+    enableSorting: false
+  }),
+  adminColumnHelper.accessor((user) => new Date(user.createdAt).getTime(), {
+    id: "createdAt"
+  })
+])
+const EMPTY_USERS: AdminUser[] = []
+
 /** Server-paginated user management with optional controlled inspector state. */
 export function AdminUsers({
   className,
@@ -172,16 +198,28 @@ export function AdminUsers({
   const config = useAuthPlugin(adminPlugin)
   const { localization } = config
   const [localSelectedUserId, setLocalSelectedUserId] = useState<string>()
-  const [page, setPage] = useState(0)
-  const [search, setSearch] = useState("")
+  const [globalFilter, setGlobalFilterState] = useState("")
+  const [columnFilters, setColumnFiltersState] = useState<ColumnFiltersState>(
+    []
+  )
+  const [pagination, setPaginationState] = useState<PaginationState>({
+    pageIndex: 0,
+    pageSize: config.pageSize
+  })
+  const [sorting, setSortingState] = useState<SortingState>([
+    { id: "createdAt", desc: true }
+  ])
   const [searchField, setSearchField] = useState<SearchField>("email")
   const [searchOperator, setSearchOperator] =
     useState<SearchOperator>("contains")
-  const [status, setStatus] = useState<StatusFilter>("all")
-  const [sortBy, setSortBy] = useState("createdAt")
-  const [sortDirection, setSortDirection] = useState<SortDirection>("desc")
   const [createOpen, setCreateOpen] = useState(false)
-  const deferredSearch = useDeferredValue(search.trim())
+  const deferredSearch = useDeferredValue(globalFilter.trim())
+  const status = String(
+    columnFilters.find((filter) => filter.id === "status")?.value ?? "all"
+  ) as StatusFilter
+  const primarySort = sorting[0]
+  const sortBy = primarySort?.id === "name" ? "name" : "createdAt"
+  const sortDirection = primarySort?.desc ? "desc" : "asc"
   const isSelectionControlled = onSelectedUserIdChange !== undefined
   const selectedUserId = isSelectionControlled
     ? controlledSelectedUserId
@@ -194,8 +232,8 @@ export function AdminUsers({
 
   const params = useMemo<AdminListUsersParams>(
     () => ({
-      limit: config.pageSize,
-      offset: page * config.pageSize,
+      limit: pagination.pageSize,
+      offset: pagination.pageIndex * pagination.pageSize,
       searchField,
       searchOperator,
       searchValue: deferredSearch || undefined,
@@ -210,9 +248,9 @@ export function AdminUsers({
           })
     }),
     [
-      config.pageSize,
       deferredSearch,
-      page,
+      pagination.pageIndex,
+      pagination.pageSize,
       searchField,
       searchOperator,
       sortBy,
@@ -229,19 +267,37 @@ export function AdminUsers({
   const canCreate = useAdminPermission(auth.authClient, { user: ["create"] })
   const canGet = useAdminPermission(auth.authClient, { user: ["get"] })
 
-  const changeSort = (field: string) => {
-    setPage(0)
-    if (sortBy === field) {
-      setSortDirection((value) => (value === "asc" ? "desc" : "asc"))
-    } else {
-      setSortBy(field)
-      setSortDirection("asc")
-    }
-  }
-
   const total = users.data?.total ?? 0
-  const from = total ? page * config.pageSize + 1 : 0
-  const to = Math.min(total, (page + 1) * config.pageSize)
+  const setPagination = (updater: Updater<PaginationState>) =>
+    setPaginationState((current) => functionalUpdate(updater, current))
+  const setColumnFilters = (updater: Updater<ColumnFiltersState>) => {
+    setColumnFiltersState((current) => functionalUpdate(updater, current))
+    setPaginationState((current) => ({ ...current, pageIndex: 0 }))
+  }
+  const setGlobalFilter = (updater: Updater<string>) => {
+    setGlobalFilterState((current) => functionalUpdate(updater, current))
+    setPaginationState((current) => ({ ...current, pageIndex: 0 }))
+  }
+  const setSorting = (updater: Updater<SortingState>) => {
+    setSortingState((current) => functionalUpdate(updater, current))
+    setPaginationState((current) => ({ ...current, pageIndex: 0 }))
+  }
+  const table = useAdminTable({
+    columns: adminColumns,
+    data: users.data?.users ?? EMPTY_USERS,
+    getRowId: (user) => user.id,
+    manualFiltering: true,
+    manualPagination: true,
+    manualSorting: true,
+    rowCount: total,
+    state: { columnFilters, globalFilter, pagination, sorting },
+    onColumnFiltersChange: setColumnFilters,
+    onGlobalFilterChange: setGlobalFilter,
+    onPaginationChange: setPagination,
+    onSortingChange: setSorting
+  })
+  const from = total ? pagination.pageIndex * pagination.pageSize + 1 : 0
+  const to = Math.min(total, (pagination.pageIndex + 1) * pagination.pageSize)
 
   return (
     <section className={className}>
@@ -270,7 +326,7 @@ export function AdminUsers({
             value={searchField}
             onValueChange={(value) => {
               setSearchField(value as SearchField)
-              setPage(0)
+              table.setPageIndex(0)
             }}
           >
             <SelectTrigger
@@ -288,7 +344,7 @@ export function AdminUsers({
             value={searchOperator}
             onValueChange={(value) => {
               setSearchOperator(value as SearchOperator)
-              setPage(0)
+              table.setPageIndex(0)
             }}
           >
             <SelectTrigger aria-label={localization.searchOperator}>
@@ -315,22 +371,22 @@ export function AdminUsers({
                   : localization.searchByName
               }
               onChange={(event) => {
-                setSearch(event.target.value)
-                setPage(0)
+                table.setGlobalFilter(event.target.value)
               }}
               placeholder={
                 searchField === "email"
                   ? localization.searchByEmail
                   : localization.searchByName
               }
-              value={search}
+              value={globalFilter}
             />
           </InputGroup>
           <Select
             value={status}
             onValueChange={(value) => {
-              setStatus(value as StatusFilter)
-              setPage(0)
+              table
+                .getColumn("status")
+                ?.setFilterValue(value === "all" ? undefined : value)
             }}
           >
             <SelectTrigger
@@ -375,28 +431,26 @@ export function AdminUsers({
                 <TableRow>
                   <TableHead>
                     <SortButton
-                      active={sortBy === "name"}
-                      direction={sortDirection}
-                      onClick={() => changeSort("name")}
+                      onClick={table
+                        .getColumn("name")
+                        ?.getToggleSortingHandler()}
+                      sorted={table.getColumn("name")?.getIsSorted() ?? false}
                     >
                       {localization.name}
                     </SortButton>
                   </TableHead>
                   <TableHead className="hidden md:table-cell">
-                    <SortButton
-                      active={sortBy === "role"}
-                      direction={sortDirection}
-                      onClick={() => changeSort("role")}
-                    >
-                      {localization.role}
-                    </SortButton>
+                    {localization.role}
                   </TableHead>
                   <TableHead>{localization.status}</TableHead>
                   <TableHead className="hidden lg:table-cell">
                     <SortButton
-                      active={sortBy === "createdAt"}
-                      direction={sortDirection}
-                      onClick={() => changeSort("createdAt")}
+                      onClick={table
+                        .getColumn("createdAt")
+                        ?.getToggleSortingHandler()}
+                      sorted={
+                        table.getColumn("createdAt")?.getIsSorted() ?? false
+                      }
                     >
                       {localization.created}
                     </SortButton>
@@ -406,63 +460,66 @@ export function AdminUsers({
               <TableBody>
                 {users.isPending ? (
                   <UserRowsSkeleton />
-                ) : users.data?.users.length ? (
-                  users.data.users.map((user) => (
-                    <TableRow
-                      key={user.id}
-                      aria-selected={selectedUserId === user.id}
-                      className={
-                        canGet.data?.success ? "cursor-pointer" : undefined
-                      }
-                      onClick={
-                        canGet.data?.success
-                          ? () => setSelectedUserId(user.id)
-                          : undefined
-                      }
-                    >
-                      <TableCell>
-                        <div className="flex items-center gap-3">
-                          <UserAvatar className="size-8" user={user} />
-                          <div className="min-w-0">
-                            {canGet.data?.success ? (
-                              <Button
-                                className="h-auto min-w-0 justify-start p-0 font-medium"
-                                onClick={(event) => {
-                                  event.stopPropagation()
-                                  setSelectedUserId(user.id)
-                                }}
-                                variant="link"
-                              >
+                ) : table.getRowModel().rows.length ? (
+                  table.getRowModel().rows.map((row) => {
+                    const user = row.original
+                    return (
+                      <TableRow
+                        key={row.id}
+                        aria-selected={selectedUserId === user.id}
+                        className={
+                          canGet.data?.success ? "cursor-pointer" : undefined
+                        }
+                        onClick={
+                          canGet.data?.success
+                            ? () => setSelectedUserId(user.id)
+                            : undefined
+                        }
+                      >
+                        <TableCell>
+                          <div className="flex items-center gap-3">
+                            <UserAvatar className="size-8" user={user} />
+                            <div className="min-w-0">
+                              {canGet.data?.success ? (
+                                <Button
+                                  className="h-auto min-w-0 justify-start p-0 font-medium"
+                                  onClick={(event) => {
+                                    event.stopPropagation()
+                                    setSelectedUserId(user.id)
+                                  }}
+                                  variant="link"
+                                >
+                                  <span className="truncate">{user.name}</span>
+                                </Button>
+                              ) : (
                                 <span className="truncate">{user.name}</span>
-                              </Button>
-                            ) : (
-                              <span className="truncate">{user.name}</span>
-                            )}
-                            <div className="truncate text-xs text-muted-foreground">
-                              {user.email}
+                              )}
+                              <div className="truncate text-xs text-muted-foreground">
+                                {user.email}
+                              </div>
                             </div>
                           </div>
-                        </div>
-                      </TableCell>
-                      <TableCell className="hidden md:table-cell">
-                        <Badge variant="outline">
-                          {user.role ?? config.defaultRole}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>
-                        <Badge
-                          variant={user.banned ? "destructive" : "secondary"}
-                        >
-                          {user.banned
-                            ? localization.banned
-                            : localization.active}
-                        </Badge>
-                      </TableCell>
-                      <TableCell className="hidden text-muted-foreground lg:table-cell">
-                        {formatDate(user.createdAt)}
-                      </TableCell>
-                    </TableRow>
-                  ))
+                        </TableCell>
+                        <TableCell className="hidden md:table-cell">
+                          <Badge variant="outline">
+                            {user.role ?? config.defaultRole}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>
+                          <Badge
+                            variant={user.banned ? "destructive" : "secondary"}
+                          >
+                            {user.banned
+                              ? localization.banned
+                              : localization.active}
+                          </Badge>
+                        </TableCell>
+                        <TableCell className="hidden text-muted-foreground lg:table-cell">
+                          {formatDate(user.createdAt)}
+                        </TableCell>
+                      </TableRow>
+                    )
+                  })
                 ) : (
                   <TableRow>
                     <TableCell colSpan={4} className="h-40 text-center">
@@ -490,8 +547,8 @@ export function AdminUsers({
           <div className="flex gap-1">
             <Button
               aria-label={localization.previousPage}
-              disabled={page === 0 || users.isFetching}
-              onClick={() => setPage((value) => Math.max(0, value - 1))}
+              disabled={!table.getCanPreviousPage() || users.isFetching}
+              onClick={() => table.previousPage()}
               size="icon-sm"
               variant="outline"
             >
@@ -499,8 +556,8 @@ export function AdminUsers({
             </Button>
             <Button
               aria-label={localization.nextPage}
-              disabled={to >= total || users.isFetching}
-              onClick={() => setPage((value) => value + 1)}
+              disabled={!table.getCanNextPage() || users.isFetching}
+              onClick={() => table.nextPage()}
               size="icon-sm"
               variant="outline"
             >
@@ -522,15 +579,13 @@ export function AdminUsers({
 }
 
 function SortButton({
-  active,
   children,
-  direction,
-  onClick
+  onClick,
+  sorted
 }: {
-  active: boolean
   children: React.ReactNode
-  direction: SortDirection
-  onClick: () => void
+  onClick?: (event: unknown) => void
+  sorted: false | "asc" | "desc"
 }) {
   return (
     <button
@@ -539,7 +594,7 @@ function SortButton({
       type="button"
     >
       {children}
-      {active ? (direction === "asc" ? "↑" : "↓") : null}
+      {sorted ? (sorted === "asc" ? "↑" : "↓") : null}
     </button>
   )
 }

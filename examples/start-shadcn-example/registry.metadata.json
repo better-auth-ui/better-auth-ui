@@ -10,8 +10,10 @@
     "@better-auth/oauth-provider",
     "@better-auth/passkey",
     "@better-auth/sso",
+    "@tanstack/react-form",
     "@tanstack/react-pacer",
     "@tanstack/react-query",
+    "@tanstack/react-table",
     "better-auth",
     "bowser",
     "date-fns",
@@ -941,6 +943,11 @@
           "path": "src/components/auth/admin/admin.tsx",
           "type": "registry:component",
           "target": "@components/auth/admin/admin.tsx"
+        },
+        {
+          "path": "src/components/auth/admin/admin-table.ts",
+          "type": "registry:component",
+          "target": "@components/auth/admin/admin-table.ts"
         },
         {
           "path": "src/components/auth/admin/admin-users.tsx",

@@ -22,21 +22,31 @@ import {
   TextArea,
   TextField
 } from "@heroui/react"
+import { useForm } from "@tanstack/react-form"
 import type { BetterFetchError } from "better-auth/client"
-import { type FormEvent, useState } from "react"
+import { useState } from "react"
 
 import { ssoPlugin } from "../../../lib/auth/sso-plugin"
 
 type SsoProtocol = "oidc" | "saml"
+
+type SsoProviderFormValues = {
+  clientId: string
+  clientSecret: string
+  domain: string
+  entryPoint: string
+  identityProviderMetadata: string
+  issuer: string
+  organizationId: string
+  protocol: SsoProtocol
+  providerId: string
+}
 
 export type SsoProviderSetupProps = {
   defaultOrganizationId?: string
   organizationId?: string
   onRegistered?: (provider: RegisterSsoProviderData) => void
 } & Omit<CardProps, "children">
-
-const readString = (formData: FormData, name: string) =>
-  String(formData.get(name) ?? "").trim()
 
 const getErrorMessage = (error: Error | null) => {
   const authError = error as BetterFetchError | null
@@ -54,47 +64,59 @@ export function SsoProviderSetup({
 }: SsoProviderSetupProps) {
   const { authClient } = useAuth()
   const { localization } = useAuthPlugin(ssoPlugin)
-  const [protocol, setProtocol] = useState<SsoProtocol>("oidc")
   const [created, setCreated] = useState(false)
   const register = useRegisterSsoProvider(authClient as SsoAuthClient)
-
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault()
-    setCreated(false)
-
-    const formData = new FormData(event.currentTarget)
-    const providerId = readString(formData, "providerId")
-    const issuer = readString(formData, "issuer")
-    const domain = readString(formData, "domain")
-    const organizationId =
-      fixedOrganizationId || readString(formData, "organizationId") || undefined
-    const common = { providerId, issuer, domain, organizationId }
-    const params =
-      protocol === "oidc"
-        ? {
-            ...common,
-            oidcConfig: {
-              clientId: readString(formData, "clientId"),
-              clientSecret: readString(formData, "clientSecret")
-            }
-          }
-        : {
-            ...common,
-            samlConfig: {
-              entryPoint: readString(formData, "entryPoint"),
-              idpMetadata: {
-                metadata: readString(formData, "identityProviderMetadata")
+  const form = useForm({
+    defaultValues: {
+      clientId: "",
+      clientSecret: "",
+      domain: "",
+      entryPoint: "",
+      identityProviderMetadata: "",
+      issuer: "",
+      organizationId: defaultOrganizationId ?? "",
+      protocol: "oidc" as SsoProtocol,
+      providerId: ""
+    } satisfies SsoProviderFormValues,
+    onSubmit: async ({ value }) => {
+      setCreated(false)
+      const common = {
+        providerId: value.providerId.trim(),
+        issuer: value.issuer.trim(),
+        domain: value.domain.trim(),
+        organizationId:
+          fixedOrganizationId || value.organizationId.trim() || undefined
+      }
+      const params =
+        value.protocol === "oidc"
+          ? {
+              ...common,
+              oidcConfig: {
+                clientId: value.clientId.trim(),
+                clientSecret: value.clientSecret.trim()
               }
             }
-          }
+          : {
+              ...common,
+              samlConfig: {
+                entryPoint: value.entryPoint.trim(),
+                idpMetadata: {
+                  metadata: value.identityProviderMetadata.trim()
+                }
+              }
+            }
 
-    register.mutate(params as RegisterSsoProviderParams<SsoAuthClient>, {
-      onSuccess: (provider) => {
+      try {
+        const provider = await register.mutateAsync(
+          params as RegisterSsoProviderParams<SsoAuthClient>
+        )
         setCreated(true)
         onRegistered?.(provider)
+      } catch {
+        // The mutation exposes its error below the fields.
       }
-    })
-  }
+    }
+  })
 
   return (
     <Card className={cn(className)} variant={variant} {...props}>
@@ -105,93 +127,181 @@ export function SsoProviderSetup({
         </Card.Description>
       </Card.Header>
       <Card.Content>
-        <Form className="flex flex-col gap-4" onSubmit={handleSubmit}>
+        <Form
+          className="flex flex-col gap-4"
+          onSubmit={(event) => {
+            event.preventDefault()
+            void form.handleSubmit()
+          }}
+        >
           <div className="grid gap-4 sm:grid-cols-2">
-            <TextField isRequired name="providerId">
-              <Label>{localization.providerId}</Label>
-              <Input variant="secondary" />
-              <FieldError />
-            </TextField>
-            <TextField isRequired name="domain">
-              <Label>{localization.domain}</Label>
-              <Input placeholder="example.com" variant="secondary" />
-              <FieldError />
-            </TextField>
+            <form.Field name="providerId">
+              {(field) => (
+                <TextField
+                  isRequired
+                  name={field.name}
+                  onBlur={field.handleBlur}
+                  onChange={field.handleChange}
+                  value={field.state.value}
+                >
+                  <Label>{localization.providerId}</Label>
+                  <Input variant="secondary" />
+                  <FieldError />
+                </TextField>
+              )}
+            </form.Field>
+            <form.Field name="domain">
+              {(field) => (
+                <TextField
+                  isRequired
+                  name={field.name}
+                  onBlur={field.handleBlur}
+                  onChange={field.handleChange}
+                  value={field.state.value}
+                >
+                  <Label>{localization.domain}</Label>
+                  <Input placeholder="example.com" variant="secondary" />
+                  <FieldError />
+                </TextField>
+              )}
+            </form.Field>
           </div>
 
-          <TextField isRequired name="issuer">
-            <Label>{localization.issuer}</Label>
-            <Input
-              placeholder="https://idp.example.com"
-              type="url"
-              variant="secondary"
-            />
-            <FieldError />
-          </TextField>
-
-          {!fixedOrganizationId ? (
-            <TextField
-              defaultValue={defaultOrganizationId}
-              name="organizationId"
-            >
-              <Label>{localization.organizationId}</Label>
-              <Input variant="secondary" />
-              <FieldError />
-            </TextField>
-          ) : null}
-
-          <Tabs
-            selectedKey={protocol}
-            onSelectionChange={(key) => setProtocol(String(key) as SsoProtocol)}
-            variant="secondary"
-          >
-            <Tabs.ListContainer>
-              <Tabs.List aria-label={localization.providerSetup}>
-                <Tabs.Tab id="oidc">
-                  {localization.oidc}
-                  <Tabs.Indicator />
-                </Tabs.Tab>
-                <Tabs.Tab id="saml">
-                  {localization.saml}
-                  <Tabs.Indicator />
-                </Tabs.Tab>
-              </Tabs.List>
-            </Tabs.ListContainer>
-            <Tabs.Panel className="pt-4" id="oidc">
-              <div className="grid gap-4 sm:grid-cols-2">
-                <TextField isRequired name="clientId">
-                  <Label>{localization.clientId}</Label>
-                  <Input autoComplete="off" variant="secondary" />
-                  <FieldError />
-                </TextField>
-                <TextField isRequired name="clientSecret">
-                  <Label>{localization.clientSecret}</Label>
-                  <Input
-                    autoComplete="new-password"
-                    type="password"
-                    variant="secondary"
-                  />
-                  <FieldError />
-                </TextField>
-              </div>
-            </Tabs.Panel>
-            <Tabs.Panel className="flex flex-col gap-4 pt-4" id="saml">
-              <TextField isRequired name="entryPoint">
-                <Label>{localization.entryPoint}</Label>
-                <Input type="url" variant="secondary" />
-                <FieldError />
-              </TextField>
-              <TextField isRequired name="identityProviderMetadata">
-                <Label>{localization.identityProviderMetadata}</Label>
-                <TextArea
-                  className="font-mono text-xs"
-                  rows={8}
+          <form.Field name="issuer">
+            {(field) => (
+              <TextField
+                isRequired
+                name={field.name}
+                onBlur={field.handleBlur}
+                onChange={field.handleChange}
+                value={field.state.value}
+              >
+                <Label>{localization.issuer}</Label>
+                <Input
+                  placeholder="https://idp.example.com"
+                  type="url"
                   variant="secondary"
                 />
                 <FieldError />
               </TextField>
-            </Tabs.Panel>
-          </Tabs>
+            )}
+          </form.Field>
+
+          {!fixedOrganizationId ? (
+            <form.Field name="organizationId">
+              {(field) => (
+                <TextField
+                  name={field.name}
+                  onBlur={field.handleBlur}
+                  onChange={field.handleChange}
+                  value={field.state.value}
+                >
+                  <Label>{localization.organizationId}</Label>
+                  <Input variant="secondary" />
+                  <FieldError />
+                </TextField>
+              )}
+            </form.Field>
+          ) : null}
+
+          <form.Field name="protocol">
+            {(protocolField) => (
+              <Tabs
+                selectedKey={protocolField.state.value}
+                onSelectionChange={(key) =>
+                  protocolField.handleChange(String(key) as SsoProtocol)
+                }
+                variant="secondary"
+              >
+                <Tabs.ListContainer>
+                  <Tabs.List aria-label={localization.providerSetup}>
+                    <Tabs.Tab id="oidc">
+                      {localization.oidc}
+                      <Tabs.Indicator />
+                    </Tabs.Tab>
+                    <Tabs.Tab id="saml">
+                      {localization.saml}
+                      <Tabs.Indicator />
+                    </Tabs.Tab>
+                  </Tabs.List>
+                </Tabs.ListContainer>
+                <Tabs.Panel className="pt-4" id="oidc">
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <form.Field name="clientId">
+                      {(field) => (
+                        <TextField
+                          isRequired
+                          name={field.name}
+                          onBlur={field.handleBlur}
+                          onChange={field.handleChange}
+                          value={field.state.value}
+                        >
+                          <Label>{localization.clientId}</Label>
+                          <Input autoComplete="off" variant="secondary" />
+                          <FieldError />
+                        </TextField>
+                      )}
+                    </form.Field>
+                    <form.Field name="clientSecret">
+                      {(field) => (
+                        <TextField
+                          isRequired
+                          name={field.name}
+                          onBlur={field.handleBlur}
+                          onChange={field.handleChange}
+                          value={field.state.value}
+                        >
+                          <Label>{localization.clientSecret}</Label>
+                          <Input
+                            autoComplete="new-password"
+                            type="password"
+                            variant="secondary"
+                          />
+                          <FieldError />
+                        </TextField>
+                      )}
+                    </form.Field>
+                  </div>
+                </Tabs.Panel>
+                <Tabs.Panel className="flex flex-col gap-4 pt-4" id="saml">
+                  <form.Field name="entryPoint">
+                    {(field) => (
+                      <TextField
+                        isRequired
+                        name={field.name}
+                        onBlur={field.handleBlur}
+                        onChange={field.handleChange}
+                        value={field.state.value}
+                      >
+                        <Label>{localization.entryPoint}</Label>
+                        <Input type="url" variant="secondary" />
+                        <FieldError />
+                      </TextField>
+                    )}
+                  </form.Field>
+                  <form.Field name="identityProviderMetadata">
+                    {(field) => (
+                      <TextField
+                        isRequired
+                        name={field.name}
+                        onBlur={field.handleBlur}
+                        onChange={field.handleChange}
+                        value={field.state.value}
+                      >
+                        <Label>{localization.identityProviderMetadata}</Label>
+                        <TextArea
+                          className="font-mono text-xs"
+                          rows={8}
+                          variant="secondary"
+                        />
+                        <FieldError />
+                      </TextField>
+                    )}
+                  </form.Field>
+                </Tabs.Panel>
+              </Tabs>
+            )}
+          </form.Field>
 
           {register.error ? (
             <Alert status="danger">
@@ -214,14 +324,20 @@ export function SsoProviderSetup({
             </Alert>
           ) : null}
 
-          <Button
-            className="self-end"
-            isPending={register.isPending}
-            type="submit"
-          >
-            {register.isPending ? <Spinner color="current" size="sm" /> : null}
-            {localization.addProvider}
-          </Button>
+          <form.Subscribe selector={(state) => state.isSubmitting}>
+            {(isSubmitting) => (
+              <Button
+                className="self-end"
+                isPending={isSubmitting || register.isPending}
+                type="submit"
+              >
+                {isSubmitting || register.isPending ? (
+                  <Spinner color="current" size="sm" />
+                ) : null}
+                {localization.addProvider}
+              </Button>
+            )}
+          </form.Subscribe>
         </Form>
       </Card.Content>
     </Card>

@@ -267,6 +267,54 @@ describe("SSO provider management", () => {
     })
   })
 
+  it("registers a trimmed SAML provider from the protocol fields", async () => {
+    const user = userEvent.setup()
+    const authClient = createMockAuthClient()
+
+    render(
+      <AuthProvider
+        authClient={authClient}
+        navigate={vi.fn()}
+        plugins={[ssoPlugin({ emailFirst: false })]}
+      >
+        <SsoProviderSetup defaultOrganizationId="org-1" />
+      </AuthProvider>
+    )
+
+    await user.type(screen.getByLabelText(/provider id/i), "  acme-saml  ")
+    await user.type(screen.getByLabelText(/email domain/i), "  example.com  ")
+    await user.type(
+      screen.getByLabelText(/issuer url/i),
+      "https://idp.example.com"
+    )
+    await user.click(screen.getByRole("tab", { name: /saml/i }))
+    await user.type(
+      await screen.findByLabelText(/sso url/i),
+      "https://idp.example.com/saml"
+    )
+    await user.type(
+      await screen.findByLabelText(/identity provider metadata/i),
+      "  <EntityDescriptor />  "
+    )
+    await user.click(screen.getByRole("button", { name: /add sso provider/i }))
+
+    await waitFor(() => {
+      expect(authClient.sso.register).toHaveBeenCalledWith(
+        expect.objectContaining({
+          providerId: "acme-saml",
+          issuer: "https://idp.example.com",
+          domain: "example.com",
+          organizationId: "org-1",
+          samlConfig: {
+            entryPoint: "https://idp.example.com/saml",
+            idpMetadata: { metadata: "<EntityDescriptor />" }
+          },
+          fetchOptions: expect.objectContaining({ throw: true })
+        })
+      )
+    })
+  })
+
   it("renews a DNS token and verifies the provider domain", async () => {
     const user = userEvent.setup()
     const authClient = createMockAuthClient()

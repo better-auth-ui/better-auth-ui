@@ -5,6 +5,7 @@ import {
 import {
   type AdminAuthClient,
   type AdminListUsersParams,
+  type AdminUser,
   adminPlugin,
   isAdminTarget
 } from "@better-auth-ui/core/plugins/admin"
@@ -26,6 +27,13 @@ import {
   useUpdateAdminUser
 } from "@better-auth-ui/solid/plugins/admin"
 import { createDebounce } from "@solid-primitives/debounce"
+import {
+  type ColumnFiltersState,
+  functionalUpdate,
+  type PaginationState,
+  type SortingState,
+  type Updater
+} from "@tanstack/solid-table"
 import {
   Ban,
   Copy,
@@ -105,6 +113,7 @@ import { cn } from "@/lib/utils"
 
 import { AdditionalField } from "../additional-field"
 import { UserAvatar } from "../user/user-avatar"
+import { createAdminColumnHelper, createAdminTable } from "./admin-table"
 
 export type AdminUsersProps = {
   class?: string
@@ -151,6 +160,23 @@ const getBanDurationSeconds = (value: string) => {
 
 const getAdminErrorMessage = (error: Error | null) => error?.message
 
+const adminColumnHelper = createAdminColumnHelper<AdminUser>()
+const adminColumns = adminColumnHelper.columns([
+  adminColumnHelper.accessor("name", { id: "name" }),
+  adminColumnHelper.accessor("role", {
+    id: "role",
+    enableSorting: false
+  }),
+  adminColumnHelper.accessor("banned", {
+    id: "status",
+    enableSorting: false
+  }),
+  adminColumnHelper.accessor((user) => new Date(user.createdAt).getTime(), {
+    id: "createdAt"
+  })
+])
+const EMPTY_USERS: AdminUser[] = []
+
 /** Zaidan presentation for the static Admin users view. */
 export function AdminUsers(props: AdminUsersProps) {
   const auth = useAuth()
@@ -160,15 +186,29 @@ export function AdminUsers(props: AdminUsersProps) {
     (auth.plugins.find((plugin) => plugin.id === adminPlugin.id) ??
       defaults) as typeof defaults
   const [localSelectedUserId, setLocalSelectedUserId] = createSignal<string>()
-  const [page, setPage] = createSignal(0)
-  const [search, setSearch] = createSignal("")
+  const [globalFilter, setGlobalFilterState] = createSignal("")
   const [debouncedSearch, setDebouncedSearch] = createSignal("")
+  const [columnFilters, setColumnFiltersState] =
+    createSignal<ColumnFiltersState>([])
+  const [pagination, setPaginationState] = createSignal<PaginationState>({
+    pageIndex: 0,
+    pageSize: config().pageSize
+  })
+  const [sorting, setSortingState] = createSignal<SortingState>([
+    { id: "createdAt", desc: true }
+  ])
   const [searchField, setSearchField] = createSignal<"email" | "name">("email")
   const [searchOperator, setSearchOperator] =
     createSignal<SearchOperator>("contains")
-  const [sort, setSort] = createSignal<SortOption>("createdAt-desc")
-  const [status, setStatus] = createSignal<StatusFilter>("all")
   const updateDebouncedSearch = createDebounce(setDebouncedSearch, 300)
+  const status = () =>
+    String(
+      columnFilters().find((filter) => filter.id === "status")?.value ?? "all"
+    ) as StatusFilter
+  const sort = () => {
+    const primarySort = sorting()[0]
+    return `${primarySort?.id === "name" ? "name" : "createdAt"}-${primarySort?.desc ? "desc" : "asc"}` as SortOption
+  }
   const selectedUserId = () =>
     props.onSelectedUserIdChange ? props.selectedUserId : localSelectedUserId()
   const permission = useAdminPermission(authClient, () => ({ user: ["list"] }))
@@ -188,8 +228,8 @@ export function AdminUsers(props: AdminUsersProps) {
       filterField: status() === "all" ? undefined : "banned",
       filterOperator: status() === "all" ? undefined : "eq",
       filterValue: status() === "all" ? undefined : status() === "banned",
-      limit: config().pageSize,
-      offset: page() * config().pageSize,
+      limit: pagination().pageSize,
+      offset: pagination().pageIndex * pagination().pageSize,
       searchField: searchField(),
       searchOperator: searchOperator(),
       searchValue: debouncedSearch() || undefined,
@@ -207,6 +247,47 @@ export function AdminUsers(props: AdminUsersProps) {
     props.onSelectedUserIdChange?.(userId)
   }
   const total = () => users.data?.total ?? 0
+  const setPagination = (updater: Updater<PaginationState>) =>
+    setPaginationState((current) => functionalUpdate(updater, current))
+  const setColumnFilters = (updater: Updater<ColumnFiltersState>) => {
+    setColumnFiltersState((current) => functionalUpdate(updater, current))
+    setPaginationState((current) => ({ ...current, pageIndex: 0 }))
+  }
+  const setGlobalFilter = (updater: Updater<string>) => {
+    const next = functionalUpdate(updater, globalFilter())
+    setGlobalFilterState(next)
+    updateDebouncedSearch(next.trim())
+    setPaginationState((current) => ({ ...current, pageIndex: 0 }))
+  }
+  const setSorting = (updater: Updater<SortingState>) => {
+    setSortingState((current) => functionalUpdate(updater, current))
+    setPaginationState((current) => ({ ...current, pageIndex: 0 }))
+  }
+  const table = createAdminTable({
+    columns: adminColumns,
+    get data() {
+      return users.data?.users ?? EMPTY_USERS
+    },
+    get rowCount() {
+      return total()
+    },
+    get state() {
+      return {
+        columnFilters: columnFilters(),
+        globalFilter: globalFilter(),
+        pagination: pagination(),
+        sorting: sorting()
+      }
+    },
+    getRowId: (user) => user.id,
+    manualFiltering: true,
+    manualPagination: true,
+    manualSorting: true,
+    onColumnFiltersChange: setColumnFilters,
+    onGlobalFilterChange: setGlobalFilter,
+    onPaginationChange: setPagination,
+    onSortingChange: setSorting
+  })
 
   return (
     <section class={cn("flex flex-col gap-4", props.class)}>
@@ -231,7 +312,7 @@ export function AdminUsers(props: AdminUsersProps) {
           class="h-8 rounded-lg border bg-transparent px-2 text-sm sm:w-36"
           onChange={(event) => {
             setSearchField(event.currentTarget.value as "email" | "name")
-            setPage(0)
+            table.setPageIndex(0)
           }}
           value={searchField()}
         >
@@ -243,7 +324,7 @@ export function AdminUsers(props: AdminUsersProps) {
           class="h-8 rounded-lg border bg-transparent px-2 text-sm"
           onChange={(event) => {
             setSearchOperator(event.currentTarget.value as SearchOperator)
-            setPage(0)
+            table.setPageIndex(0)
           }}
           value={searchOperator()}
         >
@@ -266,25 +347,24 @@ export function AdminUsers(props: AdminUsersProps) {
                 : config().localization.searchByName
             }
             onInput={(event) => {
-              const value = event.currentTarget.value
-              setSearch(value)
-              setPage(0)
-              updateDebouncedSearch(value.trim())
+              table.setGlobalFilter(event.currentTarget.value)
             }}
             placeholder={
               searchField() === "email"
                 ? config().localization.searchByEmail
                 : config().localization.searchByName
             }
-            value={search()}
+            value={globalFilter()}
           />
         </InputGroup>
         <select
           aria-label={config().localization.status}
           class="h-8 rounded-lg border bg-transparent px-2 text-sm"
           onChange={(event) => {
-            setStatus(event.currentTarget.value as StatusFilter)
-            setPage(0)
+            const nextStatus = event.currentTarget.value as StatusFilter
+            table
+              .getColumn("status")
+              ?.setFilterValue(nextStatus === "all" ? undefined : nextStatus)
           }}
           value={status()}
         >
@@ -296,8 +376,11 @@ export function AdminUsers(props: AdminUsersProps) {
           aria-label={config().localization.sort}
           class="h-8 rounded-lg border bg-transparent px-2 text-sm"
           onChange={(event) => {
-            setSort(event.currentTarget.value as SortOption)
-            setPage(0)
+            const [id, direction] = event.currentTarget.value.split("-") as [
+              "createdAt" | "name",
+              "asc" | "desc"
+            ]
+            table.setSorting([{ id, desc: direction === "desc" }])
           }}
           value={sort()}
         >
@@ -364,71 +447,78 @@ export function AdminUsers(props: AdminUsersProps) {
                           </TableCell>
                         </TableRow>
                       }
-                      when={users.data?.users.length}
+                      when={table.getRowModel().rows.length}
                     >
-                      <For each={users.data?.users}>
-                        {(user) => (
-                          <TableRow
-                            aria-selected={selectedUserId() === user.id}
-                            class={
-                              getPermission.data?.success
-                                ? "cursor-pointer"
-                                : undefined
-                            }
-                            onClick={
-                              getPermission.data?.success
-                                ? () => selectUser(user.id)
-                                : undefined
-                            }
-                          >
-                            <TableCell>
-                              <div class="flex items-center gap-3">
-                                <UserAvatar user={user} />
-                                <div class="min-w-0">
-                                  <Show
-                                    fallback={
-                                      <span class="truncate font-medium">
-                                        {user.name}
-                                      </span>
-                                    }
-                                    when={getPermission.data?.success}
-                                  >
-                                    <Button
-                                      class="h-auto min-w-0 justify-start p-0 font-medium"
-                                      onClick={(event) => {
-                                        event.stopPropagation()
-                                        selectUser(user.id)
-                                      }}
-                                      variant="link"
+                      <For each={table.getRowModel().rows}>
+                        {(row) => {
+                          const user = row.original
+                          return (
+                            <TableRow
+                              aria-selected={selectedUserId() === user.id}
+                              class={
+                                getPermission.data?.success
+                                  ? "cursor-pointer"
+                                  : undefined
+                              }
+                              onClick={
+                                getPermission.data?.success
+                                  ? () => selectUser(user.id)
+                                  : undefined
+                              }
+                            >
+                              <TableCell>
+                                <div class="flex items-center gap-3">
+                                  <UserAvatar user={user} />
+                                  <div class="min-w-0">
+                                    <Show
+                                      fallback={
+                                        <span class="truncate font-medium">
+                                          {user.name}
+                                        </span>
+                                      }
+                                      when={getPermission.data?.success}
                                     >
-                                      <span class="truncate">{user.name}</span>
-                                    </Button>
-                                  </Show>
-                                  <div class="truncate text-xs text-muted-foreground">
-                                    {user.email}
+                                      <Button
+                                        class="h-auto min-w-0 justify-start p-0 font-medium"
+                                        onClick={(event) => {
+                                          event.stopPropagation()
+                                          selectUser(user.id)
+                                        }}
+                                        variant="link"
+                                      >
+                                        <span class="truncate">
+                                          {user.name}
+                                        </span>
+                                      </Button>
+                                    </Show>
+                                    <div class="truncate text-xs text-muted-foreground">
+                                      {user.email}
+                                    </div>
                                   </div>
                                 </div>
-                              </div>
-                            </TableCell>
-                            <TableCell>
-                              <Badge variant="outline">
-                                {user.role ?? config().defaultRole}
-                              </Badge>
-                            </TableCell>
-                            <TableCell>
-                              <Badge
-                                variant={
-                                  user.banned ? "destructive" : "secondary"
-                                }
-                              >
-                                {user.banned
-                                  ? config().localization.banned
-                                  : config().localization.active}
-                              </Badge>
-                            </TableCell>
-                            <TableCell>{formatDate(user.createdAt)}</TableCell>
-                          </TableRow>
-                        )}
+                              </TableCell>
+                              <TableCell>
+                                <Badge variant="outline">
+                                  {user.role ?? config().defaultRole}
+                                </Badge>
+                              </TableCell>
+                              <TableCell>
+                                <Badge
+                                  variant={
+                                    user.banned ? "destructive" : "secondary"
+                                  }
+                                >
+                                  {user.banned
+                                    ? config().localization.banned
+                                    : config().localization.active}
+                                </Badge>
+                              </TableCell>
+                              <TableCell>
+                                {formatDate(user.createdAt)}
+                              </TableCell>
+                            </TableRow>
+                          )
+                        }}
                       </For>
                     </Show>
                   }
@@ -455,25 +545,32 @@ export function AdminUsers(props: AdminUsersProps) {
           {config()
             .localization.usersPaginationRange.replace(
               "{{from}}",
-              String(total() ? page() * config().pageSize + 1 : 0)
+              String(
+                total() ? pagination().pageIndex * pagination().pageSize + 1 : 0
+              )
             )
             .replace(
               "{{to}}",
-              String(Math.min(total(), (page() + 1) * config().pageSize))
+              String(
+                Math.min(
+                  total(),
+                  (pagination().pageIndex + 1) * pagination().pageSize
+                )
+              )
             )
             .replace("{{total}}", String(total()))}
         </span>
         <div class="flex gap-2">
           <Button
-            disabled={page() === 0}
-            onClick={() => setPage((value) => Math.max(0, value - 1))}
+            disabled={!table.getCanPreviousPage() || users.isFetching}
+            onClick={() => table.previousPage()}
             variant="outline"
           >
             {config().localization.previousPage}
           </Button>
           <Button
-            disabled={(page() + 1) * config().pageSize >= total()}
-            onClick={() => setPage((value) => value + 1)}
+            disabled={!table.getCanNextPage() || users.isFetching}
+            onClick={() => table.nextPage()}
             variant="outline"
           >
             {config().localization.nextPage}

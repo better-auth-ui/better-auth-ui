@@ -7,6 +7,7 @@ import {
 import {
   type AdminAuthClient,
   type AdminListUsersParams,
+  type AdminUser,
   isAdminTarget
 } from "@better-auth-ui/core/plugins/admin"
 import { useAuth, useAuthPlugin, useSession } from "@better-auth-ui/react"
@@ -57,6 +58,13 @@ import {
   TextField
 } from "@heroui/react"
 import { keepPreviousData } from "@tanstack/react-query"
+import {
+  type ColumnFiltersState,
+  functionalUpdate,
+  type PaginationState,
+  type SortingState,
+  type Updater
+} from "@tanstack/react-table"
 import type { BetterFetchError } from "better-auth/client"
 import {
   type FormEvent,
@@ -70,6 +78,7 @@ import {
 import { adminPlugin } from "../../../lib/auth/admin-plugin"
 import { AdditionalField } from "../additional-field"
 import { UserAvatar } from "../user/user-avatar"
+import { createAdminColumnHelper, useAdminTable } from "./admin-table"
 
 type SearchFieldName = "email" | "name"
 type SearchOperator = "contains" | "ends_with" | "starts_with"
@@ -120,6 +129,23 @@ const getBanDurationSeconds = (value: string) => {
   return Number.isSafeInteger(seconds) ? seconds : null
 }
 
+const adminColumnHelper = createAdminColumnHelper<AdminUser>()
+const adminColumns = adminColumnHelper.columns([
+  adminColumnHelper.accessor("name", { id: "name" }),
+  adminColumnHelper.accessor("role", {
+    id: "role",
+    enableSorting: false
+  }),
+  adminColumnHelper.accessor("banned", {
+    id: "status",
+    enableSorting: false
+  }),
+  adminColumnHelper.accessor((user) => new Date(user.createdAt).getTime(), {
+    id: "createdAt"
+  })
+])
+const EMPTY_USERS: AdminUser[] = []
+
 /** HeroUI presentation for the static Admin users view. */
 export function AdminUsers({
   className,
@@ -129,15 +155,28 @@ export function AdminUsers({
   const { authClient } = useAuth<AdminAuthClient>()
   const config = useAuthPlugin(adminPlugin)
   const [localSelectedUserId, setLocalSelectedUserId] = useState<string>()
-  const [page, setPage] = useState(0)
-  const [search, setSearch] = useState("")
+  const [globalFilter, setGlobalFilterState] = useState("")
+  const [columnFilters, setColumnFiltersState] = useState<ColumnFiltersState>(
+    []
+  )
+  const [pagination, setPaginationState] = useState<PaginationState>({
+    pageIndex: 0,
+    pageSize: config.pageSize
+  })
+  const [sorting, setSortingState] = useState<SortingState>([
+    { id: "createdAt", desc: true }
+  ])
   const [searchField, setSearchField] = useState<SearchFieldName>("email")
   const [searchOperator, setSearchOperator] =
     useState<SearchOperator>("contains")
-  const [sort, setSort] = useState<SortOption>("createdAt-desc")
-  const [status, setStatus] = useState<StatusFilter>("all")
   const [createOpen, setCreateOpen] = useState(false)
-  const deferredSearch = useDeferredValue(search.trim())
+  const deferredSearch = useDeferredValue(globalFilter.trim())
+  const status = String(
+    columnFilters.find((filter) => filter.id === "status")?.value ?? "all"
+  ) as StatusFilter
+  const primarySort = sorting[0]
+  const sort =
+    `${primarySort?.id === "name" ? "name" : "createdAt"}-${primarySort?.desc ? "desc" : "asc"}` as SortOption
   const isSelectionControlled = onSelectedUserIdChange !== undefined
   const selectedUserId = isSelectionControlled
     ? controlledSelectedUserId
@@ -146,17 +185,15 @@ export function AdminUsers({
   const createPermission = useAdminPermission(authClient, { user: ["create"] })
   const getPermission = useAdminPermission(authClient, { user: ["get"] })
   const params = useMemo<AdminListUsersParams>(() => {
-    const [sortBy, sortDirection] = sort.split("-") as [
-      "createdAt" | "name",
-      "asc" | "desc"
-    ]
+    const sortBy = primarySort?.id === "name" ? "name" : "createdAt"
+    const sortDirection = primarySort?.desc ? "desc" : "asc"
 
     return {
       filterField: status === "all" ? undefined : "banned",
       filterOperator: status === "all" ? undefined : "eq",
       filterValue: status === "all" ? undefined : status === "banned",
-      limit: config.pageSize,
-      offset: page * config.pageSize,
+      limit: pagination.pageSize,
+      offset: pagination.pageIndex * pagination.pageSize,
       searchField,
       searchOperator,
       searchValue: deferredSearch || undefined,
@@ -164,12 +201,13 @@ export function AdminUsers({
       sortDirection
     }
   }, [
-    config.pageSize,
     deferredSearch,
-    page,
+    pagination.pageIndex,
+    pagination.pageSize,
     searchField,
     searchOperator,
-    sort,
+    primarySort?.desc,
+    primarySort?.id,
     status
   ])
   const users = useAdminUsers(authClient, {
@@ -183,6 +221,34 @@ export function AdminUsers({
     onSelectedUserIdChange?.(userId)
   }
   const total = users.data?.total ?? 0
+  const setPagination = (updater: Updater<PaginationState>) =>
+    setPaginationState((current) => functionalUpdate(updater, current))
+  const setColumnFilters = (updater: Updater<ColumnFiltersState>) => {
+    setColumnFiltersState((current) => functionalUpdate(updater, current))
+    setPaginationState((current) => ({ ...current, pageIndex: 0 }))
+  }
+  const setGlobalFilter = (updater: Updater<string>) => {
+    setGlobalFilterState((current) => functionalUpdate(updater, current))
+    setPaginationState((current) => ({ ...current, pageIndex: 0 }))
+  }
+  const setSorting = (updater: Updater<SortingState>) => {
+    setSortingState((current) => functionalUpdate(updater, current))
+    setPaginationState((current) => ({ ...current, pageIndex: 0 }))
+  }
+  const table = useAdminTable({
+    columns: adminColumns,
+    data: users.data?.users ?? EMPTY_USERS,
+    getRowId: (user) => user.id,
+    manualFiltering: true,
+    manualPagination: true,
+    manualSorting: true,
+    rowCount: total,
+    state: { columnFilters, globalFilter, pagination, sorting },
+    onColumnFiltersChange: setColumnFilters,
+    onGlobalFilterChange: setGlobalFilter,
+    onPaginationChange: setPagination,
+    onSortingChange: setSorting
+  })
 
   return (
     <section className={cn("flex flex-col gap-4", className)}>
@@ -207,7 +273,7 @@ export function AdminUsers({
           value={searchField}
           onChange={(value) => {
             setSearchField(String(value) as SearchFieldName)
-            setPage(0)
+            table.setPageIndex(0)
           }}
         >
           <Label>{config.localization.search}</Label>
@@ -228,7 +294,7 @@ export function AdminUsers({
           value={searchOperator}
           onChange={(value) => {
             setSearchOperator(String(value) as SearchOperator)
-            setPage(0)
+            table.setPageIndex(0)
           }}
         >
           <Label>{config.localization.searchOperator}</Label>
@@ -257,10 +323,9 @@ export function AdminUsers({
               : config.localization.searchByName
           }
           className="w-full"
-          value={search}
+          value={globalFilter}
           onChange={(value) => {
-            setSearch(value)
-            setPage(0)
+            table.setGlobalFilter(value)
           }}
         >
           <SearchField.Group>
@@ -278,8 +343,10 @@ export function AdminUsers({
         <Select
           value={status}
           onChange={(value) => {
-            setStatus(String(value) as StatusFilter)
-            setPage(0)
+            const nextStatus = String(value) as StatusFilter
+            table
+              .getColumn("status")
+              ?.setFilterValue(nextStatus === "all" ? undefined : nextStatus)
           }}
         >
           <Label>{config.localization.status}</Label>
@@ -304,8 +371,11 @@ export function AdminUsers({
         <Select
           value={sort}
           onChange={(value) => {
-            setSort(String(value) as SortOption)
-            setPage(0)
+            const [id, direction] = String(value).split("-") as [
+              "createdAt" | "name",
+              "asc" | "desc"
+            ]
+            table.setSorting([{ id, desc: direction === "desc" }])
           }}
         >
           <Label>{config.localization.sort}</Label>
@@ -374,57 +444,60 @@ export function AdminUsers({
                         </Table.Cell>
                       </Table.Row>
                     ))
-                  : users.data?.users.map((user) => (
-                      <Table.Row id={user.id} key={user.id}>
-                        <Table.Cell>
-                          {getPermission.data?.success ? (
-                            <Button
-                              className="h-auto justify-start px-0"
-                              variant="tertiary"
-                              onPress={() => selectUser(user.id)}
+                  : table.getRowModel().rows.map((row) => {
+                      const user = row.original
+                      return (
+                        <Table.Row id={row.id} key={row.id}>
+                          <Table.Cell>
+                            {getPermission.data?.success ? (
+                              <Button
+                                className="h-auto justify-start px-0"
+                                variant="tertiary"
+                                onPress={() => selectUser(user.id)}
+                              >
+                                <UserAvatar user={user} />
+                                <span className="min-w-0 text-start">
+                                  <span className="block truncate font-medium">
+                                    {user.name}
+                                  </span>
+                                  <span className="block truncate text-xs text-muted">
+                                    {user.email}
+                                  </span>
+                                </span>
+                              </Button>
+                            ) : (
+                              <div className="flex items-center gap-3">
+                                <UserAvatar user={user} />
+                                <span className="min-w-0 text-start">
+                                  <span className="block truncate font-medium">
+                                    {user.name}
+                                  </span>
+                                  <span className="block truncate text-xs text-muted">
+                                    {user.email}
+                                  </span>
+                                </span>
+                              </div>
+                            )}
+                          </Table.Cell>
+                          <Table.Cell>
+                            <Chip size="sm">
+                              {user.role ?? config.defaultRole}
+                            </Chip>
+                          </Table.Cell>
+                          <Table.Cell>
+                            <Chip
+                              color={user.banned ? "danger" : "default"}
+                              size="sm"
                             >
-                              <UserAvatar user={user} />
-                              <span className="min-w-0 text-start">
-                                <span className="block truncate font-medium">
-                                  {user.name}
-                                </span>
-                                <span className="block truncate text-xs text-muted">
-                                  {user.email}
-                                </span>
-                              </span>
-                            </Button>
-                          ) : (
-                            <div className="flex items-center gap-3">
-                              <UserAvatar user={user} />
-                              <span className="min-w-0 text-start">
-                                <span className="block truncate font-medium">
-                                  {user.name}
-                                </span>
-                                <span className="block truncate text-xs text-muted">
-                                  {user.email}
-                                </span>
-                              </span>
-                            </div>
-                          )}
-                        </Table.Cell>
-                        <Table.Cell>
-                          <Chip size="sm">
-                            {user.role ?? config.defaultRole}
-                          </Chip>
-                        </Table.Cell>
-                        <Table.Cell>
-                          <Chip
-                            color={user.banned ? "danger" : "default"}
-                            size="sm"
-                          >
-                            {user.banned
-                              ? config.localization.banned
-                              : config.localization.active}
-                          </Chip>
-                        </Table.Cell>
-                        <Table.Cell>{formatDate(user.createdAt)}</Table.Cell>
-                      </Table.Row>
-                    ))}
+                              {user.banned
+                                ? config.localization.banned
+                                : config.localization.active}
+                            </Chip>
+                          </Table.Cell>
+                          <Table.Cell>{formatDate(user.createdAt)}</Table.Cell>
+                        </Table.Row>
+                      )
+                    })}
               </Table.Body>
             </Table.Content>
           </Table.ScrollContainer>
@@ -434,27 +507,35 @@ export function AdminUsers({
       <footer className="flex items-center justify-between gap-2 text-sm text-muted">
         <span>
           {config.localization.usersPaginationRange
-            .replace("{{from}}", String(total ? page * config.pageSize + 1 : 0))
+            .replace(
+              "{{from}}",
+              String(total ? pagination.pageIndex * pagination.pageSize + 1 : 0)
+            )
             .replace(
               "{{to}}",
-              String(Math.min(total, (page + 1) * config.pageSize))
+              String(
+                Math.min(
+                  total,
+                  (pagination.pageIndex + 1) * pagination.pageSize
+                )
+              )
             )
             .replace("{{total}}", String(total))}
         </span>
         <div className="flex gap-2">
           <Button
-            isDisabled={page === 0}
+            isDisabled={!table.getCanPreviousPage() || users.isFetching}
             size="sm"
             variant="outline"
-            onPress={() => setPage((value) => Math.max(0, value - 1))}
+            onPress={() => table.previousPage()}
           >
             {config.localization.previousPage}
           </Button>
           <Button
-            isDisabled={(page + 1) * config.pageSize >= total}
+            isDisabled={!table.getCanNextPage() || users.isFetching}
             size="sm"
             variant="outline"
-            onPress={() => setPage((value) => value + 1)}
+            onPress={() => table.nextPage()}
           >
             {config.localization.nextPage}
           </Button>

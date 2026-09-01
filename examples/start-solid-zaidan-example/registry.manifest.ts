@@ -427,6 +427,7 @@ const solidRegistryBaseManifest = {
       title: "Solid SSO",
       description:
         "Solid email-first sign-in and organization provider management for Better Auth SSO.",
+      dependencies: [...solidAuthDependencies, "@tanstack/solid-form"],
       registryDependencies: [
         betterAuthSolidRegistryDependency("auth-provider"),
         betterAuthSolidRegistryDependency("sign-in")
@@ -970,6 +971,7 @@ const solidRegistryBaseManifest = {
       title: "Solid Admin",
       description:
         "Static administration shell with user management, a user inspector, session details, and the stop-impersonating action.",
+      dependencies: [...solidAuthDependencies, "@tanstack/solid-table"],
       registryDependencies: [
         betterAuthSolidRegistryDependency("auth-provider"),
         betterAuthSolidRegistryDependency("user-button"),
@@ -986,6 +988,7 @@ const solidRegistryBaseManifest = {
       files: [
         libFile("src/lib/auth/admin-plugin.ts"),
         componentFile("src/components/auth/admin/admin.tsx"),
+        componentFile("src/components/auth/admin/admin-table.ts"),
         componentFile("src/components/auth/admin/admin-users.tsx"),
         componentFile("src/components/auth/admin/stop-impersonating.tsx"),
         ...zaidanInteractiveSupportFiles

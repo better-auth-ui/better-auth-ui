@@ -7,8 +7,9 @@ import type {
 } from "@better-auth-ui/core/plugins/sso"
 import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
 import { useRegisterSsoProvider } from "@better-auth-ui/react/plugins/sso"
+import { useForm } from "@tanstack/react-form"
 import type { BetterFetchError } from "better-auth/client"
-import { type FormEvent, useState } from "react"
+import { useState } from "react"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -35,15 +36,24 @@ import { cn } from "@/lib/utils"
 
 type SsoProtocol = "oidc" | "saml"
 
+type SsoProviderFormValues = {
+  clientId: string
+  clientSecret: string
+  domain: string
+  entryPoint: string
+  identityProviderMetadata: string
+  issuer: string
+  organizationId: string
+  protocol: SsoProtocol
+  providerId: string
+}
+
 export type SsoProviderSetupProps = {
   className?: string
   defaultOrganizationId?: string
   organizationId?: string
   onRegistered?: (provider: RegisterSsoProviderData) => void
 }
-
-const readString = (formData: FormData, name: string) =>
-  String(formData.get(name) ?? "").trim()
 
 const getErrorMessage = (error: Error | null) => {
   const authError = error as BetterFetchError | null
@@ -59,53 +69,68 @@ export function SsoProviderSetup({
 }: SsoProviderSetupProps) {
   const { authClient } = useAuth()
   const { localization } = useAuthPlugin(ssoPlugin)
-  const [protocol, setProtocol] = useState<SsoProtocol>("oidc")
   const [created, setCreated] = useState(false)
   const register = useRegisterSsoProvider(authClient as SsoAuthClient)
-
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault()
-    setCreated(false)
-
-    const formData = new FormData(event.currentTarget)
-    const common = {
-      providerId: readString(formData, "providerId"),
-      issuer: readString(formData, "issuer"),
-      domain: readString(formData, "domain"),
-      organizationId:
-        fixedOrganizationId ||
-        readString(formData, "organizationId") ||
-        undefined
-    }
-    const params =
-      protocol === "oidc"
-        ? {
-            ...common,
-            oidcConfig: {
-              clientId: readString(formData, "clientId"),
-              clientSecret: readString(formData, "clientSecret")
-            }
-          }
-        : {
-            ...common,
-            samlConfig: {
-              entryPoint: readString(formData, "entryPoint"),
-              idpMetadata: {
-                metadata: readString(formData, "identityProviderMetadata")
+  const form = useForm({
+    defaultValues: {
+      clientId: "",
+      clientSecret: "",
+      domain: "",
+      entryPoint: "",
+      identityProviderMetadata: "",
+      issuer: "",
+      organizationId: defaultOrganizationId ?? "",
+      protocol: "oidc" as SsoProtocol,
+      providerId: ""
+    } satisfies SsoProviderFormValues,
+    onSubmit: async ({ value }) => {
+      setCreated(false)
+      const common = {
+        providerId: value.providerId.trim(),
+        issuer: value.issuer.trim(),
+        domain: value.domain.trim(),
+        organizationId:
+          fixedOrganizationId || value.organizationId.trim() || undefined
+      }
+      const params =
+        value.protocol === "oidc"
+          ? {
+              ...common,
+              oidcConfig: {
+                clientId: value.clientId.trim(),
+                clientSecret: value.clientSecret.trim()
               }
             }
-          }
+          : {
+              ...common,
+              samlConfig: {
+                entryPoint: value.entryPoint.trim(),
+                idpMetadata: {
+                  metadata: value.identityProviderMetadata.trim()
+                }
+              }
+            }
 
-    register.mutate(params as RegisterSsoProviderParams<SsoAuthClient>, {
-      onSuccess: (provider) => {
+      try {
+        const provider = await register.mutateAsync(
+          params as RegisterSsoProviderParams<SsoAuthClient>
+        )
         setCreated(true)
         onRegistered?.(provider)
+      } catch {
+        // The mutation exposes its error below the fields.
       }
-    })
-  }
+    }
+  })
 
   return (
-    <form className={cn("w-full max-w-xl", className)} onSubmit={handleSubmit}>
+    <form
+      className={cn("w-full max-w-xl", className)}
+      onSubmit={(event) => {
+        event.preventDefault()
+        void form.handleSubmit()
+      }}
+    >
       <Card>
         <CardHeader>
           <CardTitle>{localization.providerSetup}</CardTitle>
@@ -116,109 +141,191 @@ export function SsoProviderSetup({
         <CardContent>
           <FieldGroup>
             <div className="grid gap-4 sm:grid-cols-2">
-              <Field>
-                <FieldLabel htmlFor="sso-provider-id">
-                  {localization.providerId}
-                </FieldLabel>
-                <Input id="sso-provider-id" name="providerId" required />
-              </Field>
-              <Field>
-                <FieldLabel htmlFor="sso-domain">
-                  {localization.domain}
-                </FieldLabel>
-                <Input
-                  id="sso-domain"
-                  name="domain"
-                  placeholder="example.com"
-                  required
-                />
-              </Field>
+              <form.Field name="providerId">
+                {(field) => (
+                  <Field>
+                    <FieldLabel htmlFor="sso-provider-id">
+                      {localization.providerId}
+                    </FieldLabel>
+                    <Input
+                      id="sso-provider-id"
+                      name={field.name}
+                      onBlur={field.handleBlur}
+                      onChange={(event) =>
+                        field.handleChange(event.target.value)
+                      }
+                      required
+                      value={field.state.value}
+                    />
+                  </Field>
+                )}
+              </form.Field>
+              <form.Field name="domain">
+                {(field) => (
+                  <Field>
+                    <FieldLabel htmlFor="sso-domain">
+                      {localization.domain}
+                    </FieldLabel>
+                    <Input
+                      id="sso-domain"
+                      name={field.name}
+                      onBlur={field.handleBlur}
+                      onChange={(event) =>
+                        field.handleChange(event.target.value)
+                      }
+                      placeholder="example.com"
+                      required
+                      value={field.state.value}
+                    />
+                  </Field>
+                )}
+              </form.Field>
             </div>
 
-            <Field>
-              <FieldLabel htmlFor="sso-issuer">
-                {localization.issuer}
-              </FieldLabel>
-              <Input
-                id="sso-issuer"
-                name="issuer"
-                placeholder="https://idp.example.com"
-                type="url"
-                required
-              />
-            </Field>
+            <form.Field name="issuer">
+              {(field) => (
+                <Field>
+                  <FieldLabel htmlFor="sso-issuer">
+                    {localization.issuer}
+                  </FieldLabel>
+                  <Input
+                    id="sso-issuer"
+                    name={field.name}
+                    onBlur={field.handleBlur}
+                    onChange={(event) => field.handleChange(event.target.value)}
+                    placeholder="https://idp.example.com"
+                    required
+                    type="url"
+                    value={field.state.value}
+                  />
+                </Field>
+              )}
+            </form.Field>
 
             {!fixedOrganizationId ? (
-              <Field>
-                <FieldLabel htmlFor="sso-organization-id">
-                  {localization.organizationId}
-                </FieldLabel>
-                <Input
-                  defaultValue={defaultOrganizationId}
-                  id="sso-organization-id"
-                  name="organizationId"
-                />
-              </Field>
+              <form.Field name="organizationId">
+                {(field) => (
+                  <Field>
+                    <FieldLabel htmlFor="sso-organization-id">
+                      {localization.organizationId}
+                    </FieldLabel>
+                    <Input
+                      id="sso-organization-id"
+                      name={field.name}
+                      onBlur={field.handleBlur}
+                      onChange={(event) =>
+                        field.handleChange(event.target.value)
+                      }
+                      value={field.state.value}
+                    />
+                  </Field>
+                )}
+              </form.Field>
             ) : null}
 
-            <Tabs
-              value={protocol}
-              onValueChange={(value) => setProtocol(value as SsoProtocol)}
-            >
-              <TabsList aria-label={localization.providerSetup}>
-                <TabsTrigger value="oidc">{localization.oidc}</TabsTrigger>
-                <TabsTrigger value="saml">{localization.saml}</TabsTrigger>
-              </TabsList>
-              <TabsContent className="grid gap-4 sm:grid-cols-2" value="oidc">
-                <Field>
-                  <FieldLabel htmlFor="sso-client-id">
-                    {localization.clientId}
-                  </FieldLabel>
-                  <Input
-                    autoComplete="off"
-                    id="sso-client-id"
-                    name="clientId"
-                    required
-                  />
-                </Field>
-                <Field>
-                  <FieldLabel htmlFor="sso-client-secret">
-                    {localization.clientSecret}
-                  </FieldLabel>
-                  <Input
-                    autoComplete="new-password"
-                    id="sso-client-secret"
-                    name="clientSecret"
-                    type="password"
-                    required
-                  />
-                </Field>
-              </TabsContent>
-              <TabsContent className="flex flex-col gap-4" value="saml">
-                <Field>
-                  <FieldLabel htmlFor="sso-entry-point">
-                    {localization.entryPoint}
-                  </FieldLabel>
-                  <Input
-                    id="sso-entry-point"
-                    name="entryPoint"
-                    type="url"
-                    required
-                  />
-                </Field>
-                <Field>
-                  <FieldLabel htmlFor="sso-idp-metadata">
-                    {localization.identityProviderMetadata}
-                  </FieldLabel>
-                  <Textarea
-                    className="min-h-40 font-mono text-xs"
-                    id="sso-idp-metadata"
-                    name="identityProviderMetadata"
-                    required
-                  />
-                </Field>
-              </TabsContent>
-            </Tabs>
+            <form.Field name="protocol">
+              {(protocolField) => (
+                <Tabs
+                  value={protocolField.state.value}
+                  onValueChange={(value) =>
+                    protocolField.handleChange(value as SsoProtocol)
+                  }
+                >
+                  <TabsList aria-label={localization.providerSetup}>
+                    <TabsTrigger value="oidc">{localization.oidc}</TabsTrigger>
+                    <TabsTrigger value="saml">{localization.saml}</TabsTrigger>
+                  </TabsList>
+                  <TabsContent
+                    className="grid gap-4 sm:grid-cols-2"
+                    value="oidc"
+                  >
+                    <form.Field name="clientId">
+                      {(field) => (
+                        <Field>
+                          <FieldLabel htmlFor="sso-client-id">
+                            {localization.clientId}
+                          </FieldLabel>
+                          <Input
+                            autoComplete="off"
+                            id="sso-client-id"
+                            name={field.name}
+                            onBlur={field.handleBlur}
+                            onChange={(event) =>
+                              field.handleChange(event.target.value)
+                            }
+                            required
+                            value={field.state.value}
+                          />
+                        </Field>
+                      )}
+                    </form.Field>
+                    <form.Field name="clientSecret">
+                      {(field) => (
+                        <Field>
+                          <FieldLabel htmlFor="sso-client-secret">
+                            {localization.clientSecret}
+                          </FieldLabel>
+                          <Input
+                            autoComplete="new-password"
+                            id="sso-client-secret"
+                            name={field.name}
+                            onBlur={field.handleBlur}
+                            onChange={(event) =>
+                              field.handleChange(event.target.value)
+                            }
+                            required
+                            type="password"
+                            value={field.state.value}
+                          />
+                        </Field>
+                      )}
+                    </form.Field>
+                  </TabsContent>
+                  <TabsContent className="flex flex-col gap-4" value="saml">
+                    <form.Field name="entryPoint">
+                      {(field) => (
+                        <Field>
+                          <FieldLabel htmlFor="sso-entry-point">
+                            {localization.entryPoint}
+                          </FieldLabel>
+                          <Input
+                            id="sso-entry-point"
+                            name={field.name}
+                            onBlur={field.handleBlur}
+                            onChange={(event) =>
+                              field.handleChange(event.target.value)
+                            }
+                            required
+                            type="url"
+                            value={field.state.value}
+                          />
+                        </Field>
+                      )}
+                    </form.Field>
+                    <form.Field name="identityProviderMetadata">
+                      {(field) => (
+                        <Field>
+                          <FieldLabel htmlFor="sso-idp-metadata">
+                            {localization.identityProviderMetadata}
+                          </FieldLabel>
+                          <Textarea
+                            className="min-h-40 font-mono text-xs"
+                            id="sso-idp-metadata"
+                            name={field.name}
+                            onBlur={field.handleBlur}
+                            onChange={(event) =>
+                              field.handleChange(event.target.value)
+                            }
+                            required
+                            value={field.state.value}
+                          />
+                        </Field>
+                      )}
+                    </form.Field>
+                  </TabsContent>
+                </Tabs>
+              )}
+            </form.Field>
 
             {register.error ? (
               <FieldError>{getErrorMessage(register.error)}</FieldError>
@@ -231,10 +338,19 @@ export function SsoProviderSetup({
           </FieldGroup>
         </CardContent>
         <CardFooter className="justify-end">
-          <Button type="submit" disabled={register.isPending}>
-            {register.isPending ? <Spinner data-icon="inline-start" /> : null}
-            {localization.addProvider}
-          </Button>
+          <form.Subscribe selector={(state) => state.isSubmitting}>
+            {(isSubmitting) => (
+              <Button
+                type="submit"
+                disabled={isSubmitting || register.isPending}
+              >
+                {isSubmitting || register.isPending ? (
+                  <Spinner data-icon="inline-start" />
+                ) : null}
+                {localization.addProvider}
+              </Button>
+            )}
+          </form.Subscribe>
         </CardFooter>
       </Card>
     </form>
