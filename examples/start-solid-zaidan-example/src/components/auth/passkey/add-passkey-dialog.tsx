@@ -32,12 +32,7 @@ export function AddPasskeyDialog(props: {
   const { authenticatorAttachment } = useAuthPlugin(passkeyPlugin)
   const [pendingRequest, setPendingRequest] =
     createSignal<AddPasskeyParams<PasskeyAuthClient>>()
-  const addPasskey = useAddPasskey(auth.authClient, () => ({
-    onSuccess: () => {
-      props.onOpenChange(false)
-      props.onPasskeyAdded()
-    }
-  }))
+  const addPasskey = useAddPasskey(auth.authClient)
 
   const handleOpenChange = (open: boolean) => {
     if (!open) {
@@ -48,8 +43,18 @@ export function AddPasskeyDialog(props: {
   }
 
   const submitRequest = (request: AddPasskeyParams<PasskeyAuthClient>) => {
-    setPendingRequest(request)
-    addPasskey.mutate(request)
+    const requestWithCallbacks = {
+      ...request,
+      fetchOptions: {
+        ...request?.fetchOptions,
+        onSuccess: () => {
+          props.onOpenChange(false)
+          props.onPasskeyAdded()
+        }
+      }
+    }
+    setPendingRequest(requestWithCallbacks)
+    addPasskey.mutate(requestWithCallbacks)
   }
 
   const submitAddPasskey = (event: SubmitEvent) => {

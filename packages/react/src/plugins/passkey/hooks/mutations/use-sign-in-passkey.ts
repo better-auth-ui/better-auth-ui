@@ -8,8 +8,8 @@ import { type QueryClient, useMutation } from "@tanstack/react-query"
 /**
  * Create a mutation for passkey sign-in.
  *
- * On success, `MutationInvalidator` awaits invalidation of the session
- * query so the new session is refetched (see `meta.awaits`).
+ * Use `fetchOptions.onSuccess` for side effects that require a verified
+ * passkey. Better Auth resolves cancelled ceremonies as mutation results.
  *
  * @param authClient - The Better Auth client with the passkey plugin.
  * @param options - React Query options forwarded to `useMutation`.

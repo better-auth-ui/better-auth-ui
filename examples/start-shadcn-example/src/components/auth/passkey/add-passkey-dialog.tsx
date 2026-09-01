@@ -50,10 +50,15 @@ export function AddPasskeyDialog({
   }
 
   const submitRequest = (request: AddPasskeyParams<PasskeyAuthClient>) => {
-    pendingRequest.current = request
-    addPasskey.mutate(request, {
-      onSuccess: () => handleOpenChange(false)
-    })
+    const requestWithCallbacks = {
+      ...request,
+      fetchOptions: {
+        ...request?.fetchOptions,
+        onSuccess: () => handleOpenChange(false)
+      }
+    }
+    pendingRequest.current = requestWithCallbacks
+    addPasskey.mutate(requestWithCallbacks)
   }
 
   const handleSubmit = (e: SyntheticEvent<HTMLFormElement>) => {

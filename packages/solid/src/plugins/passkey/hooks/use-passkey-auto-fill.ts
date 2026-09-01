@@ -2,10 +2,10 @@ import {
   isConditionalMediationAvailable,
   isPasskeyAutoFillEnabled,
   type PasskeyAuthClient,
-  passkeyMutationKeys,
-  signInPasskeyOptions
+  passkeyAutoFillOptions
 } from "@better-auth-ui/core/plugins/passkey"
 import { useMutation } from "@tanstack/solid-query"
+import type { BetterFetchOption } from "better-auth/client"
 import { onCleanup, onMount } from "solid-js"
 import { useAuth } from "../../../lib/auth-provider"
 import type { UseSignInPasskeyOptions } from "./mutations/use-sign-in-passkey"
@@ -17,6 +17,8 @@ export type UsePasskeyAutoFillOptions<TAuthClient extends PasskeyAuthClient> = {
    * @default true
    */
   enabled?: boolean
+  /** Fetch callbacks for the passkey verification request. */
+  fetchOptions?: BetterFetchOption
   /** Solid Query options forwarded to the sign-in mutation. */
   mutation?: UseSignInPasskeyOptions<TAuthClient>
 }
@@ -31,8 +33,9 @@ export type UsePasskeyAutoFillOptions<TAuthClient extends PasskeyAuthClient> = {
  * field. See `withPasskeyAutoFill` in `@better-auth-ui/core/plugins/passkey`.
  *
  * The request stays open until the user picks a passkey or the page
- * navigates. WebAuthn gives us no way to withdraw it, so cleanup only stops a
- * pending availability probe from starting one.
+ * navigates. The Better Auth passkey client doesn't expose WebAuthn's abort
+ * signal, so cleanup only stops a pending availability probe from starting
+ * one.
  *
  * @param authClient - The Better Auth client with the passkey plugin.
  * @param options - Enablement flag and mutation options.
@@ -43,9 +46,8 @@ export function usePasskeyAutoFill<TAuthClient extends PasskeyAuthClient>(
 ) {
   const auth = useAuth()
   const signInPasskey = useMutation(() => ({
-    ...signInPasskeyOptions(authClient),
-    ...(options?.mutation?.() ?? {}),
-    mutationKey: passkeyMutationKeys.autoFill
+    ...passkeyAutoFillOptions(authClient),
+    ...(options?.mutation?.() ?? {})
   }))
 
   onMount(() => {
@@ -58,7 +60,10 @@ export function usePasskeyAutoFill<TAuthClient extends PasskeyAuthClient>(
     void isConditionalMediationAvailable().then((available) => {
       if (!available || cancelled) return
 
-      signInPasskey.mutate({ autoFill: true })
+      signInPasskey.mutate({
+        autoFill: true,
+        fetchOptions: options?.fetchOptions
+      })
     })
 
     onCleanup(() => {

@@ -1,11 +1,15 @@
-import { type AuthView, authMutationKeys } from "@better-auth-ui/core"
+import {
+  type AuthView,
+  authMutationKeys,
+  authQueryKeys
+} from "@better-auth-ui/core"
 import type { PasskeyAuthClient } from "@better-auth-ui/core/plugins/passkey"
 import { useAuth } from "@better-auth-ui/solid"
 import {
   usePasskeyAutoFill,
   useSignInPasskey
 } from "@better-auth-ui/solid/plugins/passkey"
-import { useIsMutating } from "@tanstack/solid-query"
+import { useIsMutating, useQueryClient } from "@tanstack/solid-query"
 import { Fingerprint } from "lucide-solid"
 import { passkeyLabels } from "@/components/auth/passkey/passkey-localization"
 import { Button } from "@/components/ui/button"
@@ -19,17 +23,22 @@ export type PasskeyButtonProps = {
 export function PasskeyButton(props: PasskeyButtonProps) {
   const auth = useAuth<PasskeyAuthClient>()
   const labels = () => passkeyLabels(auth)
-  const signInPasskey = useSignInPasskey(auth.authClient, () => ({
-    onSuccess: () => auth.navigate({ to: auth.redirectTo })
-  }))
+  const queryClient = useQueryClient()
+  const handleSuccess = async () => {
+    await queryClient.invalidateQueries(
+      { queryKey: authQueryKeys.session },
+      { cancelRefetch: false }
+    )
+    auth.navigate({ to: auth.redirectTo })
+  }
+  const fetchOptions = { onSuccess: handleSuccess }
+  const signInPasskey = useSignInPasskey(auth.authClient)
 
-  // Surfaces passkeys in the browser's autofill dropdown while the sign-in
-  // form is open. The button stays for anyone who dismisses it.
+  // Surface passkeys in the browser's autofill dropdown on every view where
+  // this button is shown.
   usePasskeyAutoFill(auth.authClient, {
     enabled: props.view !== "signUp",
-    mutation: () => ({
-      onSuccess: () => auth.navigate({ to: auth.redirectTo })
-    })
+    fetchOptions
   })
   const signInMutating = useIsMutating(() => ({
     mutationKey: authMutationKeys.signIn.all
@@ -46,7 +55,9 @@ export function PasskeyButton(props: PasskeyButtonProps) {
     <Button
       class={cn("w-full", isPending() && "pointer-events-none opacity-50")}
       disabled={isPending()}
-      onClick={() => signInPasskey.mutate({ autoFill: false } as never)}
+      onClick={() =>
+        signInPasskey.mutate({ autoFill: false, fetchOptions } as never)
+      }
       type="button"
       variant="outline"
     >

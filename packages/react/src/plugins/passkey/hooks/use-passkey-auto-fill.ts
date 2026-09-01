@@ -4,11 +4,11 @@ import {
   isConditionalMediationAvailable,
   isPasskeyAutoFillEnabled,
   type PasskeyAuthClient,
-  passkeyMutationKeys,
-  type SignInPasskeyOptions,
-  signInPasskeyOptions
+  passkeyAutoFillOptions,
+  type SignInPasskeyOptions
 } from "@better-auth-ui/core/plugins/passkey"
 import { useMutation } from "@tanstack/react-query"
+import type { BetterFetchOption } from "better-auth/client"
 import { useEffect, useRef } from "react"
 import { useAuth } from "../../../components/auth/auth-provider"
 
@@ -20,6 +20,8 @@ export type UsePasskeyAutoFillOptions<TAuthClient extends PasskeyAuthClient> =
      * @default true
      */
     enabled?: boolean
+    /** Fetch callbacks for the passkey verification request. */
+    fetchOptions?: BetterFetchOption
   }
 
 /**
@@ -44,11 +46,10 @@ export function usePasskeyAutoFill<TAuthClient extends PasskeyAuthClient>(
   options?: UsePasskeyAutoFillOptions<TAuthClient>
 ) {
   const { plugins } = useAuth()
-  const { enabled = true, ...mutationOptions } = options ?? {}
+  const { enabled = true, fetchOptions, ...mutationOptions } = options ?? {}
   const { mutate: signInPasskey } = useMutation({
-    ...signInPasskeyOptions(authClient),
-    ...mutationOptions,
-    mutationKey: passkeyMutationKeys.autoFill
+    ...passkeyAutoFillOptions(authClient),
+    ...mutationOptions
   })
   const started = useRef(false)
 
@@ -63,11 +64,11 @@ export function usePasskeyAutoFill<TAuthClient extends PasskeyAuthClient>(
       if (!available || cancelled) return
 
       started.current = true
-      signInPasskey({ autoFill: true })
+      signInPasskey({ autoFill: true, fetchOptions })
     })
 
     return () => {
       cancelled = true
     }
-  }, [active, signInPasskey])
+  }, [active, fetchOptions, signInPasskey])
 }

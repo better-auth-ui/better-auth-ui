@@ -1,6 +1,5 @@
 import type { MutationOptions } from "@tanstack/query-core"
 import type { BetterFetchError } from "better-auth/client"
-import { authQueryKeys } from "../../lib/auth-query-keys"
 import type { PasskeyAuthClient } from "./passkey-auth-client"
 import { passkeyMutationKeys } from "./passkey-mutation-keys"
 
@@ -31,13 +30,25 @@ export function signInPasskeyOptions<TAuthClient extends PasskeyAuthClient>(
 
   return {
     mutationKey,
-    mutationFn,
-    meta: {
-      awaits: [authQueryKeys.session]
-    }
+    mutationFn
   } as MutationOptions<
     Awaited<ReturnType<typeof mutationFn>>,
     BetterFetchError,
     Parameters<typeof mutationFn>[0]
   >
+}
+
+/** Mutation options for the non-blocking conditional passkey request. */
+export function passkeyAutoFillOptions<TAuthClient extends PasskeyAuthClient>(
+  authClient: TAuthClient
+): ReturnType<typeof signInPasskeyOptions<TAuthClient>> {
+  const options = signInPasskeyOptions(authClient)
+
+  return {
+    ...options,
+    mutationKey: passkeyMutationKeys.autoFill,
+    meta: {
+      errorPresentation: "silent" as const
+    }
+  }
 }
