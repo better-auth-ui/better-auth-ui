@@ -7,6 +7,9 @@ export default defineConfig({
     lib: {
       entry: {
         index: "src/index.ts",
+        // Published so third-party plugins can `declare module` against the
+        // same module identity the built-in plugins augment.
+        "lib/view-paths": "src/lib/view-paths.ts",
         "plugins/admin/index": "src/plugins/admin/index.ts",
         "plugins/agent-auth/index": "src/plugins/agent-auth/index.ts",
         "plugins/anonymous/index": "src/plugins/anonymous/index.ts",
