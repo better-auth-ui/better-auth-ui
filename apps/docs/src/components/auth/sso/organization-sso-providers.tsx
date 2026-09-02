@@ -1,5 +1,6 @@
 "use client"
 
+import { validateAbsoluteUrl, validateStringLength } from "@better-auth-ui/core"
 import {
   hasMemberRole,
   type OrganizationAuthClient
@@ -16,12 +17,10 @@ import {
   useSsoProviders,
   useUpdateSsoProvider
 } from "@better-auth-ui/react/plugins/sso"
-import { useForm } from "@tanstack/react-form"
 import type { BetterFetchError } from "better-auth/client"
 import { PencilIcon, Trash2Icon } from "lucide-react"
 import { useMemo, useState } from "react"
 import { toast } from "sonner"
-
 import {
   AlertDialog,
   AlertDialogAction,
@@ -69,6 +68,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { organizationPlugin } from "@/lib/auth/organization-plugin"
 import { ssoPlugin } from "@/lib/auth/sso-plugin"
 import { cn } from "@/lib/utils"
+import { isAuthFormFieldInvalid, useAuthForm } from "../auth-form"
 
 import { SsoDomainVerification } from "./sso-domain-verification"
 import { SsoProviderSetup } from "./sso-provider-setup"
@@ -293,7 +293,7 @@ function EditSsoProviderDialog({
   onOpenChange: (provider: SsoProvider | undefined) => void
   provider?: SsoProvider
 }) {
-  const { authClient } = useAuth()
+  const { authClient, localization: authLocalization } = useAuth()
   const { localization } = useAuthPlugin(ssoPlugin)
   const update = useUpdateSsoProvider(authClient as SsoAuthClient)
 
@@ -301,7 +301,7 @@ function EditSsoProviderDialog({
     update.reset()
     onOpenChange(undefined)
   }
-  const form = useForm({
+  const form = useAuthForm({
     defaultValues: getSsoProviderEditorValues(provider),
     onSubmit: async ({ value }) => {
       if (!provider) return
@@ -363,36 +363,78 @@ function EditSsoProviderDialog({
             <DialogDescription>{provider?.providerId}</DialogDescription>
           </DialogHeader>
           <FieldGroup>
-            {(
-              [
-                ["domain", "sso-edit-domain", localization.domain, "text"],
-                ["issuer", "sso-edit-issuer", localization.issuer, "url"]
-              ] as const
-            ).map(([name, id, label, type]) => (
-              <form.Field key={name} name={name}>
-                {(field) => (
-                  <Field>
-                    <FieldLabel htmlFor={id}>{label}</FieldLabel>
-                    <Input
-                      id={id}
-                      name={field.name}
-                      onBlur={field.handleBlur}
-                      onChange={(event) =>
-                        field.handleChange(event.target.value)
-                      }
-                      required
-                      type={type}
-                      value={field.state.value}
-                    />
-                  </Field>
-                )}
-              </form.Field>
-            ))}
+            <form.AppField
+              name="domain"
+              validators={{
+                onChange: ({ value }) =>
+                  validateStringLength(value, {
+                    requiredMessage: authLocalization.auth.fieldRequired,
+                    trim: true
+                  })
+              }}
+            >
+              {(field) => (
+                <Field data-invalid={isAuthFormFieldInvalid(field.state.meta)}>
+                  <FieldLabel htmlFor="sso-edit-domain">
+                    {localization.domain}
+                  </FieldLabel>
+                  <Input
+                    id="sso-edit-domain"
+                    name={field.name}
+                    onBlur={field.handleBlur}
+                    onChange={(event) => field.handleChange(event.target.value)}
+                    required
+                    value={field.state.value}
+                    aria-invalid={isAuthFormFieldInvalid(field.state.meta)}
+                  />
+                  <field.AuthFormFieldError />
+                </Field>
+              )}
+            </form.AppField>
+            <form.AppField
+              name="issuer"
+              validators={{
+                onChange: ({ value }) =>
+                  validateAbsoluteUrl(value, {
+                    invalidMessage: localization.invalidUrl,
+                    requiredMessage: authLocalization.auth.fieldRequired
+                  })
+              }}
+            >
+              {(field) => (
+                <Field data-invalid={isAuthFormFieldInvalid(field.state.meta)}>
+                  <FieldLabel htmlFor="sso-edit-issuer">
+                    {localization.issuer}
+                  </FieldLabel>
+                  <Input
+                    id="sso-edit-issuer"
+                    name={field.name}
+                    onBlur={field.handleBlur}
+                    onChange={(event) => field.handleChange(event.target.value)}
+                    required
+                    type="url"
+                    value={field.state.value}
+                    aria-invalid={isAuthFormFieldInvalid(field.state.meta)}
+                  />
+                  <field.AuthFormFieldError />
+                </Field>
+              )}
+            </form.AppField>
             {provider?.oidcConfig ? (
               <>
-                <form.Field name="discoveryEndpoint">
+                <form.AppField
+                  name="discoveryEndpoint"
+                  validators={{
+                    onChange: ({ value }) =>
+                      validateAbsoluteUrl(value, {
+                        invalidMessage: localization.invalidUrl
+                      })
+                  }}
+                >
                   {(field) => (
-                    <Field>
+                    <Field
+                      data-invalid={isAuthFormFieldInvalid(field.state.meta)}
+                    >
                       <FieldLabel htmlFor="sso-edit-discovery">
                         {localization.discoveryEndpoint}
                       </FieldLabel>
@@ -405,10 +447,12 @@ function EditSsoProviderDialog({
                         }
                         type="url"
                         value={field.state.value}
+                        aria-invalid={isAuthFormFieldInvalid(field.state.meta)}
                       />
+                      <field.AuthFormFieldError />
                     </Field>
                   )}
-                </form.Field>
+                </form.AppField>
                 <div className="grid gap-4 sm:grid-cols-2">
                   {(
                     [
@@ -453,9 +497,20 @@ function EditSsoProviderDialog({
             ) : null}
             {provider?.samlConfig ? (
               <>
-                <form.Field name="entryPoint">
+                <form.AppField
+                  name="entryPoint"
+                  validators={{
+                    onChange: ({ value }) =>
+                      validateAbsoluteUrl(value, {
+                        invalidMessage: localization.invalidUrl,
+                        requiredMessage: authLocalization.auth.fieldRequired
+                      })
+                  }}
+                >
                   {(field) => (
-                    <Field>
+                    <Field
+                      data-invalid={isAuthFormFieldInvalid(field.state.meta)}
+                    >
                       <FieldLabel htmlFor="sso-edit-entry-point">
                         {localization.entryPoint}
                       </FieldLabel>
@@ -469,10 +524,12 @@ function EditSsoProviderDialog({
                         required
                         type="url"
                         value={field.state.value}
+                        aria-invalid={isAuthFormFieldInvalid(field.state.meta)}
                       />
+                      <field.AuthFormFieldError />
                     </Field>
                   )}
-                </form.Field>
+                </form.AppField>
                 <form.Field name="identityProviderMetadata">
                   {(field) => (
                     <Field>
@@ -506,9 +563,13 @@ function EditSsoProviderDialog({
             >
               {localization.cancel}
             </Button>
-            <form.Subscribe selector={(state) => state.isSubmitting}>
-              {(isSubmitting) => (
-                <Button disabled={isSubmitting} type="submit">
+            <form.Subscribe
+              selector={(state) =>
+                [state.canSubmit, state.isSubmitting] as const
+              }
+            >
+              {([canSubmit, isSubmitting]) => (
+                <Button disabled={!canSubmit || isSubmitting} type="submit">
                   {isSubmitting ? <Spinner data-icon="inline-start" /> : null}
                   {localization.saveProvider}
                 </Button>

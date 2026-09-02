@@ -267,6 +267,35 @@ describe("SSO provider management", () => {
     })
   })
 
+  it("blocks whitespace-only values and invalid provider URLs", async () => {
+    const user = userEvent.setup()
+    const authClient = createMockAuthClient()
+
+    render(
+      <AuthProvider
+        authClient={authClient}
+        navigate={vi.fn()}
+        plugins={[ssoPlugin({ emailFirst: false })]}
+      >
+        <SsoProviderSetup />
+      </AuthProvider>
+    )
+
+    await user.type(screen.getByLabelText(/provider id/i), "   ")
+    await user.type(screen.getByLabelText(/email domain/i), "   ")
+    await user.type(screen.getByLabelText(/issuer url/i), "idp.example.com")
+    await user.tab()
+
+    expect(
+      await screen.findByText("Enter a valid absolute URL.")
+    ).toBeInTheDocument()
+    expect(screen.getAllByText("This field is required")).toHaveLength(2)
+    expect(
+      screen.getByRole("button", { name: /add sso provider/i })
+    ).toBeDisabled()
+    expect(authClient.sso.register).not.toHaveBeenCalled()
+  })
+
   it("registers a trimmed SAML provider from the protocol fields", async () => {
     const user = userEvent.setup()
     const authClient = createMockAuthClient()

@@ -27,7 +27,6 @@ import {
   useAdminUserSessions,
   useAdminUsers
 } from "@better-auth-ui/react/plugins/admin"
-import { useForm } from "@tanstack/react-form"
 import { keepPreviousData, useMutation } from "@tanstack/react-query"
 import {
   type ColumnFiltersState,
@@ -124,6 +123,7 @@ import {
 } from "@/components/ui/table"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { adminPlugin } from "@/lib/auth/admin-plugin"
+import { useAuthForm } from "../auth-form"
 
 import { createAdminColumnHelper, useAdminTable } from "./admin-table"
 
@@ -716,7 +716,7 @@ function CreateUserDialog({
   const additionalFieldValuesRef = useRef<
     Record<string, AdditionalFieldValue | null>
   >({})
-  const form = useForm({
+  const form = useAuthForm({
     defaultValues: {
       email: "",
       emailVerified: false,
@@ -1084,7 +1084,7 @@ function UserInspector({
   const profileAdditionalFieldValuesRef = useRef<
     Record<string, AdditionalFieldValue | null>
   >({})
-  const profileForm = useForm({
+  const profileForm = useAuthForm({
     defaultValues: {
       email: "",
       emailVerified: false,

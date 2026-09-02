@@ -1,8 +1,13 @@
-import { API_KEY_EXPIRATION_SECONDS_PER_DAY } from "@better-auth-ui/core/plugins/api-key"
+import {
+  API_KEY_EXPIRATION_SECONDS_PER_DAY,
+  type ListedApiKey
+} from "@better-auth-ui/core/plugins/api-key"
+import { QueryClient } from "@tanstack/react-query"
 import { render, screen, waitFor } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { useState } from "react"
 import { afterEach, describe, expect, it, vi } from "vitest"
+import { ApiKeys } from "../src/components/auth/api-key/api-keys"
 import { CreateApiKeyDialog } from "../src/components/auth/api-key/create-api-key-dialog"
 import { NewApiKeyDialog } from "../src/components/auth/api-key/new-api-key-dialog"
 import { AuthProvider } from "../src/components/auth/auth-provider"
@@ -31,6 +36,34 @@ function ControlledNewApiKeyDialog() {
       secretKey="api-key-secret"
     />
   )
+}
+
+function createListedApiKey(id: string): ListedApiKey {
+  const now = new Date("2026-01-01T00:00:00.000Z")
+
+  return {
+    configId: "default",
+    createdAt: now,
+    enabled: true,
+    expiresAt: null,
+    id,
+    lastRefillAt: null,
+    lastRequest: null,
+    metadata: null,
+    name: `Key ${id}`,
+    permissions: null,
+    prefix: null,
+    rateLimitEnabled: false,
+    rateLimitMax: null,
+    rateLimitTimeWindow: null,
+    referenceId: "user-1",
+    refillAmount: null,
+    refillInterval: null,
+    remaining: null,
+    requestCount: 0,
+    start: "bau_",
+    updatedAt: now
+  }
 }
 
 afterEach(() => {
@@ -127,5 +160,55 @@ describe("<CreateApiKeyDialog />", () => {
     )
 
     expect(screen.queryByRole("combobox")).not.toBeInTheDocument()
+  })
+})
+
+describe("<ApiKeys />", () => {
+  it("keeps the requested page when loading it fails", async () => {
+    const user = userEvent.setup()
+    const apiKeys = ["1", "2", "3"].map(createListedApiKey)
+    const list = vi.fn(
+      async ({ query }: { query?: { limit?: number; offset?: number } }) => {
+        if (query?.offset === 2) throw new Error("Page failed")
+
+        return {
+          apiKeys,
+          limit: query?.limit,
+          offset: query?.offset,
+          total: apiKeys.length
+        }
+      }
+    )
+    const authClient = {
+      apiKey: { list },
+      getSession: vi.fn(async () => ({ user: { id: "user-1" } }))
+    } as unknown as Parameters<typeof AuthProvider>[0]["authClient"]
+
+    render(
+      <AuthProvider
+        authClient={authClient}
+        navigate={() => {}}
+        plugins={[apiKeyPlugin({ pageSize: 2 })]}
+        queryClient={
+          new QueryClient({
+            defaultOptions: { queries: { retry: false } }
+          })
+        }
+      >
+        <ApiKeys hideCreate hideDelete hideUpdate />
+      </AuthProvider>
+    )
+
+    await user.click(await screen.findByRole("button", { name: "Next page" }))
+
+    await waitFor(() => {
+      expect(list).toHaveBeenCalledTimes(2)
+      expect(list).toHaveBeenLastCalledWith(
+        expect.objectContaining({
+          query: expect.objectContaining({ offset: 2 })
+        })
+      )
+    })
+    expect(screen.getByRole("button", { name: "Previous page" })).toBeEnabled()
   })
 })

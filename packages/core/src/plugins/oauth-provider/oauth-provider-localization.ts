@@ -91,6 +91,8 @@ export const oauthProviderLocalization = {
   redirectUrls: "Redirect URLs",
   /** @remarks `"Enter one URL per line."` */
   redirectUrlsDescription: "Enter one URL per line.",
+  /** @remarks `"Enter a valid absolute URL."` */
+  invalidUrl: "Enter a valid absolute URL.",
   /** @remarks `"Application URL"` */
   applicationUrl: "Application URL",
   /** @remarks `"Logo URL"` */

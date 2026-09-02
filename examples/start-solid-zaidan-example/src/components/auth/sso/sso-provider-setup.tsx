@@ -1,3 +1,4 @@
+import { validateAbsoluteUrl, validateStringLength } from "@better-auth-ui/core"
 import type {
   RegisterSsoProviderData,
   RegisterSsoProviderParams,
@@ -5,10 +6,8 @@ import type {
 } from "@better-auth-ui/core/plugins/sso"
 import { useAuth, useAuthPlugin } from "@better-auth-ui/solid"
 import { useRegisterSsoProvider } from "@better-auth-ui/solid/plugins/sso"
-import { createForm } from "@tanstack/solid-form"
 import type { BetterFetchError } from "better-auth/client"
 import { createSignal, Show } from "solid-js"
-
 import { Button } from "@/components/ui/button"
 import {
   Card,
@@ -31,6 +30,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Textarea } from "@/components/ui/textarea"
 import { ssoPlugin } from "@/lib/auth/sso-plugin"
 import { cn } from "@/lib/utils"
+import { createAuthForm, isAuthFormFieldInvalid } from "../auth-form"
 
 type SsoProtocol = "oidc" | "saml"
 
@@ -63,7 +63,7 @@ export function SsoProviderSetup(props: SsoProviderSetupProps) {
   const { localization } = useAuthPlugin(ssoPlugin)
   const [created, setCreated] = createSignal(false)
   const register = useRegisterSsoProvider(auth.authClient as SsoAuthClient)
-  const form = createForm(() => ({
+  const form = createAuthForm(() => ({
     defaultValues: {
       clientId: "",
       clientSecret: "",
@@ -133,67 +133,115 @@ export function SsoProviderSetup(props: SsoProviderSetupProps) {
         <CardContent>
           <FieldGroup>
             <div class="grid gap-4 sm:grid-cols-2">
-              <form.Field name="providerId">
-                {(field) => (
-                  <Field>
-                    <FieldLabel for="solid-sso-provider-id">
-                      {localization.providerId}
-                    </FieldLabel>
-                    <Input
-                      id="solid-sso-provider-id"
-                      name={field().name}
-                      onBlur={field().handleBlur}
-                      onInput={(event) =>
-                        field().handleChange(event.currentTarget.value)
-                      }
-                      required
-                      value={field().state.value}
-                    />
-                  </Field>
-                )}
-              </form.Field>
-              <form.Field name="domain">
-                {(field) => (
-                  <Field>
-                    <FieldLabel for="solid-sso-domain">
-                      {localization.domain}
-                    </FieldLabel>
-                    <Input
-                      id="solid-sso-domain"
-                      name={field().name}
-                      onBlur={field().handleBlur}
-                      onInput={(event) =>
-                        field().handleChange(event.currentTarget.value)
-                      }
-                      placeholder="example.com"
-                      required
-                      value={field().state.value}
-                    />
-                  </Field>
-                )}
-              </form.Field>
+              <form.AppField
+                name="providerId"
+                validators={{
+                  onChange: ({ value }) =>
+                    validateStringLength(value, {
+                      requiredMessage: auth.localization.auth.fieldRequired,
+                      trim: true
+                    })
+                }}
+              >
+                {(field) => {
+                  const isInvalid = () =>
+                    isAuthFormFieldInvalid(field().state.meta)
+
+                  return (
+                    <Field data-invalid={isInvalid()}>
+                      <FieldLabel for="solid-sso-provider-id">
+                        {localization.providerId}
+                      </FieldLabel>
+                      <Input
+                        id="solid-sso-provider-id"
+                        name={field().name}
+                        onBlur={field().handleBlur}
+                        onInput={(event) =>
+                          field().handleChange(event.currentTarget.value)
+                        }
+                        required
+                        value={field().state.value}
+                        aria-invalid={isInvalid()}
+                      />
+                      <field.AuthFormFieldError />
+                    </Field>
+                  )
+                }}
+              </form.AppField>
+              <form.AppField
+                name="domain"
+                validators={{
+                  onChange: ({ value }) =>
+                    validateStringLength(value, {
+                      requiredMessage: auth.localization.auth.fieldRequired,
+                      trim: true
+                    })
+                }}
+              >
+                {(field) => {
+                  const isInvalid = () =>
+                    isAuthFormFieldInvalid(field().state.meta)
+
+                  return (
+                    <Field data-invalid={isInvalid()}>
+                      <FieldLabel for="solid-sso-domain">
+                        {localization.domain}
+                      </FieldLabel>
+                      <Input
+                        id="solid-sso-domain"
+                        name={field().name}
+                        onBlur={field().handleBlur}
+                        onInput={(event) =>
+                          field().handleChange(event.currentTarget.value)
+                        }
+                        placeholder="example.com"
+                        required
+                        value={field().state.value}
+                        aria-invalid={isInvalid()}
+                      />
+                      <field.AuthFormFieldError />
+                    </Field>
+                  )
+                }}
+              </form.AppField>
             </div>
-            <form.Field name="issuer">
-              {(field) => (
-                <Field>
-                  <FieldLabel for="solid-sso-issuer">
-                    {localization.issuer}
-                  </FieldLabel>
-                  <Input
-                    id="solid-sso-issuer"
-                    name={field().name}
-                    onBlur={field().handleBlur}
-                    onInput={(event) =>
-                      field().handleChange(event.currentTarget.value)
-                    }
-                    placeholder="https://idp.example.com"
-                    required
-                    type="url"
-                    value={field().state.value}
-                  />
-                </Field>
-              )}
-            </form.Field>
+            <form.AppField
+              name="issuer"
+              validators={{
+                onChange: ({ value }) =>
+                  validateAbsoluteUrl(value, {
+                    invalidMessage: localization.invalidUrl,
+                    requiredMessage: auth.localization.auth.fieldRequired
+                  })
+              }}
+            >
+              {(field) => {
+                const isInvalid = () =>
+                  isAuthFormFieldInvalid(field().state.meta)
+
+                return (
+                  <Field data-invalid={isInvalid()}>
+                    <FieldLabel for="solid-sso-issuer">
+                      {localization.issuer}
+                    </FieldLabel>
+                    <Input
+                      id="solid-sso-issuer"
+                      name={field().name}
+                      onBlur={field().handleBlur}
+                      onInput={(event) =>
+                        field().handleChange(event.currentTarget.value)
+                      }
+                      placeholder="https://idp.example.com"
+                      required
+                      type="url"
+                      value={field().state.value}
+                      aria-invalid={isInvalid()}
+                    />
+                    <field.AuthFormFieldError />
+                  </Field>
+                )
+              }}
+            </form.AppField>
             <Show when={!props.organizationId}>
               <form.Field name="organizationId">
                 {(field) => (
@@ -227,89 +275,157 @@ export function SsoProviderSetup(props: SsoProviderSetupProps) {
                     <TabsTrigger value="saml">{localization.saml}</TabsTrigger>
                   </TabsList>
                   <TabsContent class="grid gap-4 sm:grid-cols-2" value="oidc">
-                    <form.Field name="clientId">
-                      {(field) => (
-                        <Field>
-                          <FieldLabel for="solid-sso-client-id">
-                            {localization.clientId}
-                          </FieldLabel>
-                          <Input
-                            autocomplete="off"
-                            id="solid-sso-client-id"
-                            name={field().name}
-                            onBlur={field().handleBlur}
-                            onInput={(event) =>
-                              field().handleChange(event.currentTarget.value)
-                            }
-                            required
-                            value={field().state.value}
-                          />
-                        </Field>
-                      )}
-                    </form.Field>
-                    <form.Field name="clientSecret">
-                      {(field) => (
-                        <Field>
-                          <FieldLabel for="solid-sso-client-secret">
-                            {localization.clientSecret}
-                          </FieldLabel>
-                          <Input
-                            autocomplete="new-password"
-                            id="solid-sso-client-secret"
-                            name={field().name}
-                            onBlur={field().handleBlur}
-                            onInput={(event) =>
-                              field().handleChange(event.currentTarget.value)
-                            }
-                            required
-                            type="password"
-                            value={field().state.value}
-                          />
-                        </Field>
-                      )}
-                    </form.Field>
+                    <form.AppField
+                      name="clientId"
+                      validators={{
+                        onChange: ({ value }) =>
+                          validateStringLength(value, {
+                            requiredMessage:
+                              auth.localization.auth.fieldRequired,
+                            trim: true
+                          })
+                      }}
+                    >
+                      {(field) => {
+                        const isInvalid = () =>
+                          isAuthFormFieldInvalid(field().state.meta)
+
+                        return (
+                          <Field data-invalid={isInvalid()}>
+                            <FieldLabel for="solid-sso-client-id">
+                              {localization.clientId}
+                            </FieldLabel>
+                            <Input
+                              autocomplete="off"
+                              id="solid-sso-client-id"
+                              name={field().name}
+                              onBlur={field().handleBlur}
+                              onInput={(event) =>
+                                field().handleChange(event.currentTarget.value)
+                              }
+                              required
+                              value={field().state.value}
+                              aria-invalid={isInvalid()}
+                            />
+                            <field.AuthFormFieldError />
+                          </Field>
+                        )
+                      }}
+                    </form.AppField>
+                    <form.AppField
+                      name="clientSecret"
+                      validators={{
+                        onChange: ({ value }) =>
+                          validateStringLength(value, {
+                            requiredMessage:
+                              auth.localization.auth.fieldRequired,
+                            trim: true
+                          })
+                      }}
+                    >
+                      {(field) => {
+                        const isInvalid = () =>
+                          isAuthFormFieldInvalid(field().state.meta)
+
+                        return (
+                          <Field data-invalid={isInvalid()}>
+                            <FieldLabel for="solid-sso-client-secret">
+                              {localization.clientSecret}
+                            </FieldLabel>
+                            <Input
+                              autocomplete="new-password"
+                              id="solid-sso-client-secret"
+                              name={field().name}
+                              onBlur={field().handleBlur}
+                              onInput={(event) =>
+                                field().handleChange(event.currentTarget.value)
+                              }
+                              required
+                              type="password"
+                              value={field().state.value}
+                              aria-invalid={isInvalid()}
+                            />
+                            <field.AuthFormFieldError />
+                          </Field>
+                        )
+                      }}
+                    </form.AppField>
                   </TabsContent>
                   <TabsContent class="flex flex-col gap-4" value="saml">
-                    <form.Field name="entryPoint">
-                      {(field) => (
-                        <Field>
-                          <FieldLabel for="solid-sso-entry-point">
-                            {localization.entryPoint}
-                          </FieldLabel>
-                          <Input
-                            id="solid-sso-entry-point"
-                            name={field().name}
-                            onBlur={field().handleBlur}
-                            onInput={(event) =>
-                              field().handleChange(event.currentTarget.value)
-                            }
-                            required
-                            type="url"
-                            value={field().state.value}
-                          />
-                        </Field>
-                      )}
-                    </form.Field>
-                    <form.Field name="identityProviderMetadata">
-                      {(field) => (
-                        <Field>
-                          <FieldLabel for="solid-sso-idp-metadata">
-                            {localization.identityProviderMetadata}
-                          </FieldLabel>
-                          <Textarea
-                            class="min-h-40 font-mono text-xs"
-                            id="solid-sso-idp-metadata"
-                            name={field().name}
-                            onBlur={field().handleBlur}
-                            onInput={(event) =>
-                              field().handleChange(event.currentTarget.value)
-                            }
-                            required
-                            value={field().state.value}
-                          />
-                        </Field>
-                      )}
-                    </form.Field>
+                    <form.AppField
+                      name="entryPoint"
+                      validators={{
+                        onChange: ({ value }) =>
+                          validateAbsoluteUrl(value, {
+                            invalidMessage: localization.invalidUrl,
+                            requiredMessage:
+                              auth.localization.auth.fieldRequired
+                          })
+                      }}
+                    >
+                      {(field) => {
+                        const isInvalid = () =>
+                          isAuthFormFieldInvalid(field().state.meta)
+
+                        return (
+                          <Field data-invalid={isInvalid()}>
+                            <FieldLabel for="solid-sso-entry-point">
+                              {localization.entryPoint}
+                            </FieldLabel>
+                            <Input
+                              id="solid-sso-entry-point"
+                              name={field().name}
+                              onBlur={field().handleBlur}
+                              onInput={(event) =>
+                                field().handleChange(event.currentTarget.value)
+                              }
+                              required
+                              type="url"
+                              value={field().state.value}
+                              aria-invalid={isInvalid()}
+                            />
+                            <field.AuthFormFieldError />
+                          </Field>
+                        )
+                      }}
+                    </form.AppField>
+                    <form.AppField
+                      name="identityProviderMetadata"
+                      validators={{
+                        onChange: ({ value }) =>
+                          validateStringLength(value, {
+                            requiredMessage:
+                              auth.localization.auth.fieldRequired,
+                            trim: true
+                          })
+                      }}
+                    >
+                      {(field) => {
+                        const isInvalid = () =>
+                          isAuthFormFieldInvalid(field().state.meta)
+
+                        return (
+                          <Field data-invalid={isInvalid()}>
+                            <FieldLabel for="solid-sso-idp-metadata">
+                              {localization.identityProviderMetadata}
+                            </FieldLabel>
+                            <Textarea
+                              class="min-h-40 font-mono text-xs"
+                              id="solid-sso-idp-metadata"
+                              name={field().name}
+                              onBlur={field().handleBlur}
+                              onInput={(event) =>
+                                field().handleChange(event.currentTarget.value)
+                              }
+                              required
+                              value={field().state.value}
+                              aria-invalid={isInvalid()}
+                            />
+                            <field.AuthFormFieldError />
+                          </Field>
+                        )
+                      }}
+                    </form.AppField>
                   </TabsContent>
                 </Tabs>
               )}
@@ -323,13 +439,17 @@ export function SsoProviderSetup(props: SsoProviderSetupProps) {
           </FieldGroup>
         </CardContent>
         <CardFooter class="justify-end">
-          <form.Subscribe selector={(state) => state.isSubmitting}>
-            {(isSubmitting) => (
+          <form.Subscribe
+            selector={(state) => [state.canSubmit, state.isSubmitting] as const}
+          >
+            {(formState) => (
               <Button
-                disabled={isSubmitting() || register.isPending}
+                disabled={
+                  !formState()[0] || formState()[1] || register.isPending
+                }
                 type="submit"
               >
-                <Show when={isSubmitting() || register.isPending}>
+                <Show when={formState()[1] || register.isPending}>
                   <Spinner />
                 </Show>
                 {localization.addProvider}

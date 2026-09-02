@@ -169,6 +169,8 @@ export const organizationLocalization = {
   role: "Role",
   /** @remarks `"Search..."` */
   search: "Search...",
+  /** @remarks `"Select at least one role"` */
+  selectAtLeastOneRole: "Select at least one role",
   /** @remarks `"Select roles"` */
   selectRoles: "Select roles",
   /** @remarks `"Slug"` */

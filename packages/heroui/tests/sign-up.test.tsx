@@ -64,6 +64,31 @@ afterEach(() => {
 })
 
 describe("<SignUp />", () => {
+  it("trims the submitted email address", async () => {
+    const user = userEvent.setup()
+    const signUpEmail = vi.fn(async () => ({ data: {}, error: null }))
+
+    render(
+      <AuthProvider
+        authClient={createMockAuthClient(signUpEmail)}
+        navigate={() => {}}
+      >
+        <SignUp />
+      </AuthProvider>
+    )
+
+    await user.type(screen.getByLabelText("Name"), "Ada Lovelace")
+    await user.type(screen.getByLabelText("Email"), "  ada@example.com  ")
+    await user.type(screen.getByLabelText("Password"), "correct horse battery")
+    await user.click(screen.getByRole("button", { name: "Sign Up" }))
+
+    await waitFor(() => {
+      expect(signUpEmail).toHaveBeenCalledWith(
+        expect.objectContaining({ email: "ada@example.com" })
+      )
+    })
+  })
+
   it("preserves the redirect target when continuing to email verification", async () => {
     const user = userEvent.setup()
     const navigate = vi.fn()
@@ -104,7 +129,7 @@ describe("<SignUp />", () => {
     })
   })
 
-  it("clears only password fields after validation and request errors", async () => {
+  it("validates matching passwords and clears secrets after request errors", async () => {
     const user = userEvent.setup()
     const signUpEmail = vi.fn(async () => {
       throw { code: "PASSWORD_COMPROMISED" }
@@ -137,17 +162,17 @@ describe("<SignUp />", () => {
     await user.type(email, "ada@example.com")
     await user.type(password, "correct horse battery")
     await user.type(confirmPassword, "different horse battery")
-    await user.click(screen.getByRole("button", { name: "Sign Up" }))
-
-    await waitFor(() => {
-      expect(password).toHaveValue("")
-      expect(confirmPassword).toHaveValue("")
-    })
+    expect(screen.getByText("Passwords do not match")).toBeVisible()
+    expect(screen.getByRole("button", { name: "Sign Up" })).toBeDisabled()
+    expect(password).toHaveValue("correct horse battery")
+    expect(confirmPassword).toHaveValue("different horse battery")
     expect(name).toHaveValue("Ada Lovelace")
     expect(email).toHaveValue("ada@example.com")
     expect(signUpEmail).not.toHaveBeenCalled()
 
+    await user.clear(password)
     await user.type(password, "compromised password")
+    await user.clear(confirmPassword)
     await user.type(confirmPassword, "compromised password")
     await user.click(screen.getByRole("button", { name: "Sign Up" }))
 

@@ -27,7 +27,6 @@ import {
   useUpdateAdminUser
 } from "@better-auth-ui/solid/plugins/admin"
 import { createDebounce } from "@solid-primitives/debounce"
-import { createForm } from "@tanstack/solid-form"
 import {
   type ColumnFiltersState,
   functionalUpdate,
@@ -47,7 +46,6 @@ import {
 } from "lucide-solid"
 import { createEffect, createMemo, createSignal, For, on, Show } from "solid-js"
 import { Dynamic } from "solid-js/web"
-
 import {
   AlertDialog,
   AlertDialogAction,
@@ -111,8 +109,8 @@ import {
 } from "@/components/ui/table"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { cn } from "@/lib/utils"
-
 import { AdditionalField } from "../additional-field"
+import { createAuthForm } from "../auth-form"
 import { UserAvatar } from "../user/user-avatar"
 import { createAdminColumnHelper, createAdminTable } from "./admin-table"
 
@@ -622,7 +620,7 @@ function CreateUserDialog(props: {
   }))
   const [formError, setFormError] = createSignal<string>()
   let additionalFieldValues: Record<string, AdditionalFieldValue | null> = {}
-  const form = createForm(() => ({
+  const form = createAuthForm(() => ({
     defaultValues: {
       email: "",
       emailVerified: false,
@@ -963,7 +961,7 @@ function UserDialog(props: {
     string,
     AdditionalFieldValue | null
   > = {}
-  const profileForm = createForm(() => ({
+  const profileForm = createAuthForm(() => ({
     defaultValues: {
       email: "",
       emailVerified: false,

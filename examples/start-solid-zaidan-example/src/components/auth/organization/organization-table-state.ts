@@ -1,4 +1,11 @@
 import {
+  parseTableColumnVisibility,
+  parseTablePage,
+  parseTablePageSize,
+  parseTableSorting,
+  serializeTableColumnVisibility
+} from "@better-auth-ui/core"
+import {
   type ColumnFiltersState,
   type ColumnVisibilityState,
   functionalUpdate,
@@ -12,21 +19,6 @@ import { ORGANIZATION_TABLE_PAGE_SIZE } from "./organization-table"
 
 const STORAGE_PREFIX = "better-auth-ui:organization-table"
 
-function positive(value: string | null, fallback: number) {
-  const number = Number(value)
-  return Number.isSafeInteger(number) && number > 0 ? number : fallback
-}
-
-function parseSorting(value: string | null): SortingState {
-  if (!value) return []
-  return value.split(",").flatMap((entry) => {
-    const [id, direction] = entry.split(".")
-    return id && (direction === "asc" || direction === "desc")
-      ? [{ id, desc: direction === "desc" }]
-      : []
-  })
-}
-
 function readUrl(stateKey: string, defaultPageSize: number) {
   const params = new URLSearchParams(window.location.search)
   const prefix = `${stateKey}.filter.`
@@ -39,10 +31,14 @@ function readUrl(stateKey: string, defaultPageSize: number) {
     columnFilters: filters,
     globalFilter: params.get(`${stateKey}.search`) ?? "",
     pagination: {
-      pageIndex: positive(params.get(`${stateKey}.page`), 1) - 1,
-      pageSize: positive(params.get(`${stateKey}.pageSize`), defaultPageSize)
+      pageIndex: parseTablePage(params.get(`${stateKey}.page`), 1) - 1,
+      pageSize: parseTablePageSize(
+        params.get(`${stateKey}.pageSize`),
+        defaultPageSize,
+        ORGANIZATION_TABLE_PAGE_SIZE_OPTIONS
+      )
     },
-    sorting: parseSorting(params.get(`${stateKey}.sort`))
+    sorting: parseTableSorting(params.get(`${stateKey}.sort`))
   }
 }
 
@@ -98,7 +94,7 @@ export function createOrganizationTableState(
       const saved = window.localStorage.getItem(
         `${STORAGE_PREFIX}:${stateKey}:columns`
       )
-      if (saved) setColumnVisibility(JSON.parse(saved) as ColumnVisibilityState)
+      setColumnVisibility(parseTableColumnVisibility(saved))
     } catch {
       // Storage is optional.
     }
@@ -122,7 +118,7 @@ export function createOrganizationTableState(
     try {
       window.localStorage.setItem(
         `${STORAGE_PREFIX}:${stateKey}:columns`,
-        JSON.stringify(visibility)
+        serializeTableColumnVisibility(visibility)
       )
     } catch {
       // Storage is optional.

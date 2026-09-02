@@ -1,5 +1,6 @@
 "use client"
 
+import { validateAbsoluteUrl, validateStringLength } from "@better-auth-ui/core"
 import type {
   RegisterSsoProviderData,
   RegisterSsoProviderParams,
@@ -22,11 +23,10 @@ import {
   TextArea,
   TextField
 } from "@heroui/react"
-import { useForm } from "@tanstack/react-form"
 import type { BetterFetchError } from "better-auth/client"
 import { useState } from "react"
-
 import { ssoPlugin } from "../../../lib/auth/sso-plugin"
+import { isAuthFormFieldInvalid, useAuthForm } from "../auth-form"
 
 type SsoProtocol = "oidc" | "saml"
 
@@ -62,11 +62,11 @@ export function SsoProviderSetup({
   variant,
   ...props
 }: SsoProviderSetupProps) {
-  const { authClient } = useAuth()
+  const { authClient, localization: authLocalization } = useAuth()
   const { localization } = useAuthPlugin(ssoPlugin)
   const [created, setCreated] = useState(false)
   const register = useRegisterSsoProvider(authClient as SsoAuthClient)
-  const form = useForm({
+  const form = useAuthForm({
     defaultValues: {
       clientId: "",
       clientSecret: "",
@@ -135,46 +135,85 @@ export function SsoProviderSetup({
           }}
         >
           <div className="grid gap-4 sm:grid-cols-2">
-            <form.Field name="providerId">
+            <form.AppField
+              name="providerId"
+              validators={{
+                onChange: ({ value }) =>
+                  validateStringLength(value, {
+                    requiredMessage: authLocalization.auth.fieldRequired,
+                    trim: true
+                  })
+              }}
+            >
               {(field) => (
                 <TextField
+                  isInvalid={
+                    isAuthFormFieldInvalid(field.state.meta) || undefined
+                  }
                   isRequired
                   name={field.name}
                   onBlur={field.handleBlur}
                   onChange={field.handleChange}
                   value={field.state.value}
+                  validationBehavior="aria"
                 >
                   <Label>{localization.providerId}</Label>
                   <Input variant="secondary" />
-                  <FieldError />
+                  <field.AuthFormFieldError />
                 </TextField>
               )}
-            </form.Field>
-            <form.Field name="domain">
+            </form.AppField>
+            <form.AppField
+              name="domain"
+              validators={{
+                onChange: ({ value }) =>
+                  validateStringLength(value, {
+                    requiredMessage: authLocalization.auth.fieldRequired,
+                    trim: true
+                  })
+              }}
+            >
               {(field) => (
                 <TextField
+                  isInvalid={
+                    isAuthFormFieldInvalid(field.state.meta) || undefined
+                  }
                   isRequired
                   name={field.name}
                   onBlur={field.handleBlur}
                   onChange={field.handleChange}
                   value={field.state.value}
+                  validationBehavior="aria"
                 >
                   <Label>{localization.domain}</Label>
                   <Input placeholder="example.com" variant="secondary" />
-                  <FieldError />
+                  <field.AuthFormFieldError />
                 </TextField>
               )}
-            </form.Field>
+            </form.AppField>
           </div>
 
-          <form.Field name="issuer">
+          <form.AppField
+            name="issuer"
+            validators={{
+              onChange: ({ value }) =>
+                validateAbsoluteUrl(value, {
+                  invalidMessage: localization.invalidUrl,
+                  requiredMessage: authLocalization.auth.fieldRequired
+                })
+            }}
+          >
             {(field) => (
               <TextField
+                isInvalid={
+                  isAuthFormFieldInvalid(field.state.meta) || undefined
+                }
                 isRequired
                 name={field.name}
                 onBlur={field.handleBlur}
                 onChange={field.handleChange}
                 value={field.state.value}
+                validationBehavior="aria"
               >
                 <Label>{localization.issuer}</Label>
                 <Input
@@ -182,10 +221,10 @@ export function SsoProviderSetup({
                   type="url"
                   variant="secondary"
                 />
-                <FieldError />
+                <field.AuthFormFieldError />
               </TextField>
             )}
-          </form.Field>
+          </form.AppField>
 
           {!fixedOrganizationId ? (
             <form.Field name="organizationId">
@@ -227,29 +266,59 @@ export function SsoProviderSetup({
                 </Tabs.ListContainer>
                 <Tabs.Panel className="pt-4" id="oidc">
                   <div className="grid gap-4 sm:grid-cols-2">
-                    <form.Field name="clientId">
+                    <form.AppField
+                      name="clientId"
+                      validators={{
+                        onChange: ({ value }) =>
+                          validateStringLength(value, {
+                            requiredMessage:
+                              authLocalization.auth.fieldRequired,
+                            trim: true
+                          })
+                      }}
+                    >
                       {(field) => (
                         <TextField
+                          isInvalid={
+                            isAuthFormFieldInvalid(field.state.meta) ||
+                            undefined
+                          }
                           isRequired
                           name={field.name}
                           onBlur={field.handleBlur}
                           onChange={field.handleChange}
                           value={field.state.value}
+                          validationBehavior="aria"
                         >
                           <Label>{localization.clientId}</Label>
                           <Input autoComplete="off" variant="secondary" />
-                          <FieldError />
+                          <field.AuthFormFieldError />
                         </TextField>
                       )}
-                    </form.Field>
-                    <form.Field name="clientSecret">
+                    </form.AppField>
+                    <form.AppField
+                      name="clientSecret"
+                      validators={{
+                        onChange: ({ value }) =>
+                          validateStringLength(value, {
+                            requiredMessage:
+                              authLocalization.auth.fieldRequired,
+                            trim: true
+                          })
+                      }}
+                    >
                       {(field) => (
                         <TextField
+                          isInvalid={
+                            isAuthFormFieldInvalid(field.state.meta) ||
+                            undefined
+                          }
                           isRequired
                           name={field.name}
                           onBlur={field.handleBlur}
                           onChange={field.handleChange}
                           value={field.state.value}
+                          validationBehavior="aria"
                         >
                           <Label>{localization.clientSecret}</Label>
                           <Input
@@ -257,36 +326,62 @@ export function SsoProviderSetup({
                             type="password"
                             variant="secondary"
                           />
-                          <FieldError />
+                          <field.AuthFormFieldError />
                         </TextField>
                       )}
-                    </form.Field>
+                    </form.AppField>
                   </div>
                 </Tabs.Panel>
                 <Tabs.Panel className="flex flex-col gap-4 pt-4" id="saml">
-                  <form.Field name="entryPoint">
+                  <form.AppField
+                    name="entryPoint"
+                    validators={{
+                      onChange: ({ value }) =>
+                        validateAbsoluteUrl(value, {
+                          invalidMessage: localization.invalidUrl,
+                          requiredMessage: authLocalization.auth.fieldRequired
+                        })
+                    }}
+                  >
                     {(field) => (
                       <TextField
+                        isInvalid={
+                          isAuthFormFieldInvalid(field.state.meta) || undefined
+                        }
                         isRequired
                         name={field.name}
                         onBlur={field.handleBlur}
                         onChange={field.handleChange}
                         value={field.state.value}
+                        validationBehavior="aria"
                       >
                         <Label>{localization.entryPoint}</Label>
                         <Input type="url" variant="secondary" />
-                        <FieldError />
+                        <field.AuthFormFieldError />
                       </TextField>
                     )}
-                  </form.Field>
-                  <form.Field name="identityProviderMetadata">
+                  </form.AppField>
+                  <form.AppField
+                    name="identityProviderMetadata"
+                    validators={{
+                      onChange: ({ value }) =>
+                        validateStringLength(value, {
+                          requiredMessage: authLocalization.auth.fieldRequired,
+                          trim: true
+                        })
+                    }}
+                  >
                     {(field) => (
                       <TextField
+                        isInvalid={
+                          isAuthFormFieldInvalid(field.state.meta) || undefined
+                        }
                         isRequired
                         name={field.name}
                         onBlur={field.handleBlur}
                         onChange={field.handleChange}
                         value={field.state.value}
+                        validationBehavior="aria"
                       >
                         <Label>{localization.identityProviderMetadata}</Label>
                         <TextArea
@@ -294,10 +389,10 @@ export function SsoProviderSetup({
                           rows={8}
                           variant="secondary"
                         />
-                        <FieldError />
+                        <field.AuthFormFieldError />
                       </TextField>
                     )}
-                  </form.Field>
+                  </form.AppField>
                 </Tabs.Panel>
               </Tabs>
             )}
@@ -324,10 +419,13 @@ export function SsoProviderSetup({
             </Alert>
           ) : null}
 
-          <form.Subscribe selector={(state) => state.isSubmitting}>
-            {(isSubmitting) => (
+          <form.Subscribe
+            selector={(state) => [state.canSubmit, state.isSubmitting] as const}
+          >
+            {([canSubmit, isSubmitting]) => (
               <Button
                 className="self-end"
+                isDisabled={!canSubmit}
                 isPending={isSubmitting || register.isPending}
                 type="submit"
               >
