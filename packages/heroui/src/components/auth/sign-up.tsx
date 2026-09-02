@@ -1,8 +1,9 @@
 import {
   authMutationKeys,
+  getAdditionalFieldDefaultValues,
+  getAdditionalFieldSubmitValues,
   getAuthLinkURL,
   isPasswordCompromisedError,
-  parseAdditionalFieldValue,
   validateEmailAddress,
   validateMatchingValue,
   validateStringLength
@@ -25,13 +26,15 @@ import {
   InputGroup,
   Label,
   Link,
-  TextField,
-  toast
+  TextField
 } from "@heroui/react"
 import { useIsMutating } from "@tanstack/react-query"
-import { useRef, useState } from "react"
-import { AdditionalField } from "./additional-field"
-import { isAuthFormFieldInvalid, useAuthForm } from "./auth-form"
+import { useMemo, useState } from "react"
+import {
+  getAuthAdditionalFieldValidators,
+  isAuthFormFieldInvalid,
+  useAuthForm
+} from "./auth-form"
 import { FieldSeparator } from "./field-separator"
 import { PasswordStrengthMeter } from "./password-strength-meter"
 import { ProviderButtons, type SocialLayout } from "./provider-buttons"
@@ -126,9 +129,13 @@ export function SignUp({
   const Captcha = plugins.find(
     (plugin) => plugin.captchaComponent
   )?.captchaComponent
-  const additionalFieldValuesRef = useRef<Record<string, unknown>>({})
+  const signUpFields = useMemo(
+    () => additionalFields?.filter((field) => field.signUp) ?? [],
+    [additionalFields]
+  )
   const form = useAuthForm({
     defaultValues: {
+      additionalFields: getAdditionalFieldDefaultValues(signUpFields),
       confirmPassword: "",
       email: "",
       name: "",
@@ -140,7 +147,10 @@ export function SignUp({
           name: emailAndPassword?.name === false ? "" : value.name,
           email: value.email.trim(),
           password: value.password,
-          ...additionalFieldValuesRef.current,
+          ...getAdditionalFieldSubmitValues(
+            signUpFields,
+            value.additionalFields
+          ),
           fetchOptions
         })
       } catch {
@@ -148,35 +158,6 @@ export function SignUp({
       }
     }
   })
-
-  const prepareSubmit = async (formElement: HTMLFormElement) => {
-    const formData = new FormData(formElement)
-
-    const additionalFieldValues: Record<string, unknown> = {}
-
-    for (const field of additionalFields ?? []) {
-      if (!field.signUp || field.readOnly) continue
-      const value = parseAdditionalFieldValue(
-        field,
-        formData.get(field.name) as string | null
-      )
-
-      if (field.validate) {
-        try {
-          await field.validate(value)
-        } catch (error) {
-          toast.danger(error instanceof Error ? error.message : String(error))
-          return false
-        }
-      }
-
-      if (value !== undefined) {
-        additionalFieldValues[field.name] = value
-      }
-    }
-
-    additionalFieldValuesRef.current = additionalFieldValues
-  }
 
   const showSeparator = emailAndPassword?.enabled && !!socialProviders?.length
 
@@ -207,10 +188,7 @@ export function SignUp({
 
         {emailAndPassword?.enabled && (
           <form.AppForm>
-            <form.AuthFormRoot
-              className="flex flex-col gap-4"
-              prepareSubmit={prepareSubmit}
-            >
+            <form.AuthFormRoot className="flex flex-col gap-4">
               {emailAndPassword.name !== false && (
                 <form.AppField
                   name="name"
@@ -291,17 +269,26 @@ export function SignUp({
                 )}
               </form.AppField>
 
-              {additionalFields?.map(
-                (field) =>
-                  field.signUp === "above" && (
-                    <AdditionalField
-                      key={field.name}
-                      name={field.name}
-                      field={field}
-                      isPending={isPending}
-                      optionalLabel={localization.auth.optional}
-                      variant={variant}
-                    />
+              {signUpFields.map(
+                (configuredField) =>
+                  configuredField.signUp === "above" && (
+                    <form.AppField
+                      key={configuredField.name}
+                      name={`additionalFields.${configuredField.name}`}
+                      validators={getAuthAdditionalFieldValidators(
+                        configuredField,
+                        localization.auth.fieldRequired
+                      )}
+                    >
+                      {(field) => (
+                        <field.AuthFormAdditionalField
+                          field={configuredField}
+                          isPending={isPending}
+                          optionalLabel={localization.auth.optional}
+                          variant={variant}
+                        />
+                      )}
+                    </form.AppField>
                   )
               )}
 
@@ -477,18 +464,26 @@ export function SignUp({
                 </form.AppField>
               )}
 
-              {additionalFields?.map(
-                (field) =>
-                  field.signUp &&
-                  field.signUp !== "above" && (
-                    <AdditionalField
-                      key={field.name}
-                      name={field.name}
-                      field={field}
-                      isPending={isPending}
-                      optionalLabel={localization.auth.optional}
-                      variant={variant}
-                    />
+              {signUpFields.map(
+                (configuredField) =>
+                  configuredField.signUp !== "above" && (
+                    <form.AppField
+                      key={configuredField.name}
+                      name={`additionalFields.${configuredField.name}`}
+                      validators={getAuthAdditionalFieldValidators(
+                        configuredField,
+                        localization.auth.fieldRequired
+                      )}
+                    >
+                      {(field) => (
+                        <field.AuthFormAdditionalField
+                          field={configuredField}
+                          isPending={isPending}
+                          optionalLabel={localization.auth.optional}
+                          variant={variant}
+                        />
+                      )}
+                    </form.AppField>
                   )
               )}
 

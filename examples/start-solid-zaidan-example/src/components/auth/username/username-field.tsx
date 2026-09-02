@@ -1,3 +1,4 @@
+import { getFormFieldErrors } from "@better-auth-ui/core"
 import type { UsernameAuthClient } from "@better-auth-ui/core/plugins/username"
 import { useAuth } from "@better-auth-ui/solid"
 import { useIsUsernameAvailable } from "@better-auth-ui/solid/plugins/username"
@@ -28,19 +29,20 @@ export function UsernameField(props: AdditionalFieldProps) {
         }
       | undefined
   const currentUsername = String(props.field.defaultValue ?? "")
-  const [value, setValue] = createSignal(currentUsername)
-  const [error, setError] = createSignal<string>()
+  const username = () => (typeof props.value === "string" ? props.value : "")
+  const [nativeError, setNativeError] = createSignal<string>()
+  const fieldErrors = () => getFormFieldErrors(props.errors ?? [])
   const availability = useIsUsernameAvailable(auth.authClient, () => ({
     onError: () => undefined
   }))
   const shouldCheckAvailability = () =>
     Boolean(usernamePlugin()?.isUsernameAvailable) &&
-    Boolean(value().trim()) &&
-    value().trim() !== currentUsername
+    Boolean(username().trim()) &&
+    username().trim() !== currentUsername
 
   const handleInput = (next: string) => {
-    setValue(next)
-    setError(undefined)
+    props.onChange(next || null)
+    setNativeError(undefined)
 
     if (shouldCheckAvailability()) {
       availability.mutate({ username: next.trim() })
@@ -50,27 +52,28 @@ export function UsernameField(props: AdditionalFieldProps) {
   }
 
   return (
-    <Field data-invalid={Boolean(error())}>
+    <Field data-invalid={props.isInvalid || Boolean(nativeError())}>
       <FieldLabel for={props.name}>{props.field.label}</FieldLabel>
       <InputGroup>
         <InputGroupInput
-          aria-invalid={Boolean(error())}
+          aria-invalid={props.isInvalid || Boolean(nativeError())}
           autocomplete="username"
           disabled={props.isPending}
           id={props.name}
           maxLength={usernamePlugin()?.maxUsernameLength}
           minLength={usernamePlugin()?.minUsernameLength}
           name={props.name}
+          onBlur={props.onBlur}
           onInput={(event) => handleInput(event.currentTarget.value)}
           onInvalid={(event) => {
             event.preventDefault()
-            setError(event.currentTarget.validationMessage)
+            setNativeError(event.currentTarget.validationMessage)
           }}
           placeholder={props.field.placeholder}
           readonly={props.field.readOnly}
           required={props.field.required}
           type="text"
-          value={value()}
+          value={username()}
         />
         <Show when={usernamePlugin()?.usernamePrefix}>
           {(usernamePrefix) => (
@@ -101,9 +104,7 @@ export function UsernameField(props: AdditionalFieldProps) {
           </InputGroupAddon>
         </Show>
       </InputGroup>
-      <Show when={error()}>
-        {(message) => <FieldError>{message()}</FieldError>}
-      </Show>
+      <FieldError errors={fieldErrors()}>{nativeError()}</FieldError>
     </Field>
   )
 }

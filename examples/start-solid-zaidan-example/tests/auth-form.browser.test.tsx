@@ -23,10 +23,7 @@ function NativeValidationForm() {
   )
 }
 
-function PendingAuthForm(props: {
-  onSubmit: () => void
-  prepareSubmit: () => Promise<boolean>
-}) {
+function PendingAuthForm(props: { onSubmit: () => Promise<void> }) {
   const form = createAuthForm(() => ({
     defaultValues: {},
     onSubmit: props.onSubmit
@@ -34,7 +31,7 @@ function PendingAuthForm(props: {
 
   return (
     <form.AppForm>
-      <form.AuthFormRoot prepareSubmit={props.prepareSubmit}>
+      <form.AuthFormRoot>
         <form.AuthFormSubmitButton>Submit</form.AuthFormSubmitButton>
       </form.AuthFormRoot>
     </form.AppForm>
@@ -55,16 +52,13 @@ describe("Solid auth form", () => {
     expect(document.activeElement).toBe(firstControl)
   })
 
-  it("rejects concurrent preparation and exposes its pending state", async () => {
-    let finishPreparation!: (result: boolean) => void
-    const preparation = new Promise<boolean>((resolve) => {
-      finishPreparation = resolve
+  it("rejects concurrent submission and exposes its pending state", async () => {
+    let finishSubmission!: () => void
+    const submission = new Promise<void>((resolve) => {
+      finishSubmission = resolve
     })
-    const prepareSubmit = vi.fn(() => preparation)
-    const onSubmit = vi.fn()
-    const view = render(() => (
-      <PendingAuthForm onSubmit={onSubmit} prepareSubmit={prepareSubmit} />
-    ))
+    const onSubmit = vi.fn(() => submission)
+    const view = render(() => <PendingAuthForm onSubmit={onSubmit} />)
     const formElement = view.container.querySelector("form")
     const submitButton = view.getByRole("button", { name: /Submit/ })
 
@@ -72,12 +66,12 @@ describe("Solid auth form", () => {
     fireEvent.submit(formElement as HTMLFormElement)
     fireEvent.submit(formElement as HTMLFormElement)
 
-    expect(prepareSubmit).toHaveBeenCalledOnce()
-    expect(submitButton).toBeDisabled()
+    await vi.waitFor(() => expect(onSubmit).toHaveBeenCalledOnce())
+    await vi.waitFor(() => expect(submitButton).toBeDisabled())
     expect(view.getByRole("status", { name: "Loading" })).toBeInTheDocument()
 
-    finishPreparation(true)
-    await vi.waitFor(() => expect(onSubmit).toHaveBeenCalledOnce())
+    finishSubmission()
+    await vi.waitFor(() => expect(submitButton).toBeEnabled())
   })
 })
 

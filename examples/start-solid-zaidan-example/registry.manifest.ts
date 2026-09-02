@@ -173,6 +173,7 @@ const solidRegistryBaseManifest = {
       description:
         "Additional field renderer used by Solid sign-up and profile surfaces.",
       files: [
+        componentFile("src/components/auth/auth-form.tsx"),
         componentFile("src/components/auth/additional-field.tsx"),
         ...zaidanFormSupportFiles
       ]

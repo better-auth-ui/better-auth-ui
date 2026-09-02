@@ -1,7 +1,10 @@
 import {
   type AdditionalFields,
   fieldsWithModelValues,
-  parseAdditionalFieldValues
+  getAdditionalFieldDefaultValues,
+  getAdditionalFieldSubmitValues,
+  getFormFieldErrors,
+  validateStringLength
 } from "@better-auth-ui/core"
 import type {
   OrganizationPermissionRegistry,
@@ -49,7 +52,7 @@ import {
   DropdownMenuRadioItem,
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu"
-import { Field, FieldLabel } from "@/components/ui/field"
+import { Field, FieldError, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import {
   InputGroup,
@@ -66,7 +69,11 @@ import {
   TableRow
 } from "@/components/ui/table"
 import { organizationPlugin } from "@/lib/auth/organization-plugin"
-import { AdditionalField } from "../additional-field"
+import {
+  createAuthForm,
+  getAuthAdditionalFieldValidators,
+  isAuthFormFieldInvalid
+} from "../auth-form"
 import { OrganizationSortableTableHead } from "./organization-sortable-table-head"
 import {
   createOrganizationColumnHelper,
@@ -615,9 +622,6 @@ function RoleDialog(props: {
 }) {
   const auth = useAuth<OrganizationRolesAuthClient>()
   const config = useAuthPlugin(organizationPlugin)
-  const [name, setName] = createSignal("")
-  const [permission, setPermission] = createSignal<Record<string, string[]>>({})
-  const [isSubmitting, setIsSubmitting] = createSignal(false)
   const createRole = useCreateRole(
     auth.authClient,
     () => props.organizationId,
@@ -639,165 +643,217 @@ function RoleDialog(props: {
     })
   )
 
-  createEffect(() => {
-    if (!props.open) return
-    setName(props.role?.role ?? "")
-    setPermission(props.role?.permission ?? {})
-  })
+  const configuredRoleFields = () =>
+    fieldsWithModelValues(props.roleFields, props.role ?? {})
+  const form = createAuthForm(() => ({
+    defaultValues: {
+      additionalFields: getAdditionalFieldDefaultValues(configuredRoleFields()),
+      name: props.role?.role ?? "",
+      permission: props.role?.permission ?? ({} as Record<string, string[]>)
+    },
+    onSubmit: async ({ value }) => {
+      const roleName = value.name.trim()
+      if (!roleName) return
 
-  const submit = async (event: SubmitEvent) => {
-    event.preventDefault()
-    const roleName = name().trim()
-    if (!roleName) return
+      try {
+        const selectedPermissions = value.permission
+        if (
+          Object.values(selectedPermissions).some(
+            (actions) => actions.length > 0
+          )
+        ) {
+          const access = await auth.authClient.organization.hasPermission({
+            organizationId: props.organizationId,
+            permissions: selectedPermissions as Parameters<
+              OrganizationRolesAuthClient["organization"]["hasPermission"]
+            >[0]["permissions"]
+          })
 
-    setIsSubmitting(true)
-    try {
-      const selectedPermissions = permission()
-      if (
-        Object.values(selectedPermissions).some((actions) => actions.length > 0)
-      ) {
-        const access = await auth.authClient.organization.hasPermission({
-          organizationId: props.organizationId,
-          permissions: selectedPermissions as Parameters<
-            OrganizationRolesAuthClient["organization"]["hasPermission"]
-          >[0]["permissions"]
-        })
-
-        if (access.error || !access.data?.success) {
-          toast.error(config.localization.permissionsLimitedDescription)
-          setIsSubmitting(false)
-          return
+          if (access.error || !access.data?.success) {
+            toast.error(config.localization.permissionsLimitedDescription)
+            return
+          }
         }
-      }
 
-      const additionalFields = await parseAdditionalFieldValues(
-        props.roleFields,
-        new FormData(event.currentTarget as HTMLFormElement)
-      )
-      if (props.role) {
-        updateRole.mutate(
-          {
+        const additionalFields = getAdditionalFieldSubmitValues(
+          configuredRoleFields(),
+          value.additionalFields
+        )
+        if (props.role) {
+          await updateRole.mutateAsync({
             organizationId: props.organizationId,
             roleId: props.role.id,
-            data: { ...additionalFields, roleName, permission: permission() }
-          },
-          { onSettled: () => setIsSubmitting(false) }
-        )
-      } else {
-        createRole.mutate(
-          {
+            data: {
+              ...additionalFields,
+              roleName,
+              permission: value.permission
+            }
+          })
+        } else {
+          await createRole.mutateAsync({
             organizationId: props.organizationId,
             role: roleName,
-            permission: permission(),
+            permission: value.permission,
             additionalFields
-          },
-          { onSettled: () => setIsSubmitting(false) }
-        )
+          })
+        }
+      } catch {
+        // The mutation reports the error through its configured handler.
       }
-    } catch (error) {
-      toast.error(error instanceof Error ? error.message : String(error))
-      setIsSubmitting(false)
     }
-  }
+  }))
 
-  const pending = () =>
-    createRole.isPending || updateRole.isPending || isSubmitting()
+  createEffect(() => {
+    if (!props.open) return
+    form.reset({
+      additionalFields: getAdditionalFieldDefaultValues(configuredRoleFields()),
+      name: props.role?.role ?? "",
+      permission: props.role?.permission ?? {}
+    })
+  })
+
+  const pending = () => createRole.isPending || updateRole.isPending
 
   return (
     <Dialog open={props.open} onOpenChange={props.onOpenChange}>
       <DialogContent class="max-h-[85vh] overflow-y-auto sm:max-w-lg">
-        <form class="flex flex-col gap-6" onSubmit={submit}>
-          <DialogHeader>
-            <DialogTitle>
-              {props.role
-                ? config.localization.editRole
-                : config.localization.createRole}
-            </DialogTitle>
-            <DialogDescription>
-              {config.localization.rolesDescription}
-            </DialogDescription>
-          </DialogHeader>
+        <form.AppForm>
+          <form.AuthFormRoot class="flex flex-col gap-6">
+            <DialogHeader>
+              <DialogTitle>
+                {props.role
+                  ? config.localization.editRole
+                  : config.localization.createRole}
+              </DialogTitle>
+              <DialogDescription>
+                {config.localization.rolesDescription}
+              </DialogDescription>
+            </DialogHeader>
 
-          <Field>
-            <FieldLabel for="organization-role-name">
-              {config.localization.roleName}
-            </FieldLabel>
-            <Input
-              disabled={pending()}
-              id="organization-role-name"
-              onInput={(event) => setName(event.currentTarget.value)}
-              placeholder={config.localization.roleNamePlaceholder}
-              required
-              value={name()}
-            />
-          </Field>
+            <form.AppField
+              name="name"
+              validators={{
+                onChange: ({ value }) =>
+                  validateStringLength(value, {
+                    requiredMessage: auth.localization.auth.fieldRequired,
+                    trim: true
+                  })
+              }}
+            >
+              {(field) => {
+                const isInvalid = () =>
+                  isAuthFormFieldInvalid(field().state.meta)
+                return (
+                  <Field data-invalid={isInvalid()}>
+                    <FieldLabel for="organization-role-name">
+                      {config.localization.roleName}
+                    </FieldLabel>
+                    <Input
+                      aria-invalid={isInvalid()}
+                      disabled={pending()}
+                      id="organization-role-name"
+                      name={field().name}
+                      onBlur={field().handleBlur}
+                      onInput={(event) =>
+                        field().handleChange(event.currentTarget.value)
+                      }
+                      placeholder={config.localization.roleNamePlaceholder}
+                      value={field().state.value}
+                    />
+                    <FieldError
+                      errors={getFormFieldErrors(field().state.meta.errors)}
+                    />
+                  </Field>
+                )
+              }}
+            </form.AppField>
 
-          <For each={fieldsWithModelValues(props.roleFields, props.role ?? {})}>
-            {(field) => (
-              <AdditionalField
-                field={field}
-                isPending={pending()}
-                name={field.name}
-                optionalLabel={auth.localization.settings.optional}
-              />
-            )}
-          </For>
-
-          <fieldset class="flex flex-col gap-4">
-            <legend class="text-sm font-medium">
-              {config.localization.permissions}
-            </legend>
-            <For each={Object.entries(props.registry)}>
-              {([resource, definition]) => (
-                <div class="flex flex-col gap-2">
-                  <p class="text-sm font-medium">
-                    {definition.label ?? resource}
-                  </p>
-                  <div class="grid gap-3 sm:grid-cols-2">
-                    <For each={Object.entries(definition.actions)}>
-                      {([action, label]) => (
-                        <RolePermissionCheckbox
-                          action={action}
-                          checked={
-                            permission()[resource]?.includes(action) ?? false
-                          }
-                          label={label}
-                          onChange={(selected) =>
-                            setPermission((current) => ({
-                              ...current,
-                              [resource]: selected
-                                ? [...(current[resource] ?? []), action]
-                                : (current[resource] ?? []).filter(
-                                    (entry) => entry !== action
-                                  )
-                            }))
-                          }
-                          organizationId={props.organizationId}
-                          pending={pending()}
-                          resource={resource}
-                        />
-                      )}
-                    </For>
-                  </div>
-                </div>
+            <For each={configuredRoleFields()}>
+              {(configuredField) => (
+                <form.AppField
+                  name={`additionalFields.${configuredField.name}`}
+                  validators={getAuthAdditionalFieldValidators(
+                    configuredField,
+                    auth.localization.auth.fieldRequired
+                  )}
+                >
+                  {(field) => (
+                    <field.AuthFormAdditionalField
+                      field={configuredField}
+                      isPending={pending()}
+                      optionalLabel={auth.localization.settings.optional}
+                    />
+                  )}
+                </form.AppField>
               )}
             </For>
-          </fieldset>
 
-          <DialogFooter>
-            <Button
-              disabled={pending()}
-              onClick={() => props.onOpenChange(false)}
-              type="button"
-              variant="outline"
-            >
-              {auth.localization.settings.cancel}
-            </Button>
-            <Button disabled={pending() || !name().trim()} type="submit">
-              {auth.localization.settings.saveChanges}
-            </Button>
-          </DialogFooter>
-        </form>
+            <form.AppField name="permission">
+              {(field) => (
+                <fieldset class="flex flex-col gap-4">
+                  <legend class="text-sm font-medium">
+                    {config.localization.permissions}
+                  </legend>
+                  <For each={Object.entries(props.registry)}>
+                    {([resource, definition]) => (
+                      <div class="flex flex-col gap-2">
+                        <p class="text-sm font-medium">
+                          {definition.label ?? resource}
+                        </p>
+                        <div class="grid gap-3 sm:grid-cols-2">
+                          <For each={Object.entries(definition.actions)}>
+                            {([action, label]) => (
+                              <RolePermissionCheckbox
+                                action={action}
+                                checked={
+                                  field().state.value[resource]?.includes(
+                                    action
+                                  ) ?? false
+                                }
+                                label={label}
+                                onChange={(selected) =>
+                                  field().handleChange({
+                                    ...field().state.value,
+                                    [resource]: selected
+                                      ? [
+                                          ...(field().state.value[resource] ??
+                                            []),
+                                          action
+                                        ]
+                                      : (
+                                          field().state.value[resource] ?? []
+                                        ).filter((entry) => entry !== action)
+                                  })
+                                }
+                                organizationId={props.organizationId}
+                                pending={pending()}
+                                resource={resource}
+                              />
+                            )}
+                          </For>
+                        </div>
+                      </div>
+                    )}
+                  </For>
+                </fieldset>
+              )}
+            </form.AppField>
+
+            <DialogFooter>
+              <Button
+                disabled={pending()}
+                onClick={() => props.onOpenChange(false)}
+                type="button"
+                variant="outline"
+              >
+                {auth.localization.settings.cancel}
+              </Button>
+              <form.AuthFormSubmitButton disabled={pending()}>
+                {auth.localization.settings.saveChanges}
+              </form.AuthFormSubmitButton>
+            </DialogFooter>
+          </form.AuthFormRoot>
+        </form.AppForm>
       </DialogContent>
     </Dialog>
   )

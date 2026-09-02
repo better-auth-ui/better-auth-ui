@@ -1,7 +1,10 @@
 import {
   type AdditionalFields,
   fieldsWithModelValues,
-  parseAdditionalFieldValues
+  getAdditionalFieldDefaultValues,
+  getAdditionalFieldSubmitValues,
+  getFormFieldErrors,
+  validateStringLength
 } from "@better-auth-ui/core"
 import type { OrganizationTeamsAuthClient } from "@better-auth-ui/core/plugins/organization"
 import { useAuth, useAuthPlugin, useSession } from "@better-auth-ui/solid"
@@ -19,7 +22,6 @@ import {
   useUpdateTeam
 } from "@better-auth-ui/solid/plugins/organization"
 import {
-  LoaderCircle,
   Pencil,
   Plus,
   Trash2,
@@ -40,7 +42,7 @@ import {
   DialogHeader,
   DialogTitle
 } from "@/components/ui/dialog"
-import { Field, FieldLabel } from "@/components/ui/field"
+import { Field, FieldError, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import {
   Select,
@@ -50,7 +52,11 @@ import {
   SelectValue
 } from "@/components/ui/select"
 import { organizationPlugin } from "@/lib/auth/organization-plugin"
-import { AdditionalField } from "../additional-field"
+import {
+  createAuthForm,
+  getAuthAdditionalFieldValidators,
+  isAuthFormFieldInvalid
+} from "../auth-form"
 
 type MemberOption = { id: string; label: string }
 type Team = { id: string; name: string; [key: string]: unknown }
@@ -209,8 +215,6 @@ function TeamDialog(props: {
     organizationId: props.organizationId,
     permissions: { member: ["delete"] }
   }))
-  const [name, setName] = createSignal("")
-  const [isSubmittingFields, setIsSubmittingFields] = createSignal(false)
   const [selectedMember, setSelectedMember] = createSignal<MemberOption>()
   const createTeam = useCreateTeam(auth.authClient, () => ({
     onSuccess: () => {
@@ -256,293 +260,331 @@ function TeamDialog(props: {
       : config.localization.lastTeamRemovalDisabled
   const canEdit = () => !props.team || canUpdate.data?.success === true
 
+  const configuredTeamFields = () =>
+    fieldsWithModelValues(props.teamFields, props.team ?? {})
+  const form = createAuthForm(() => ({
+    defaultValues: {
+      additionalFields: getAdditionalFieldDefaultValues(configuredTeamFields()),
+      name: props.team?.name ?? ""
+    },
+    onSubmit: async ({ value }) => {
+      const name = value.name.trim()
+      if (
+        !name ||
+        !props.organizationId ||
+        (!props.team && props.teamLimitReached)
+      )
+        return
+      if (props.team && !canUpdate.data?.success) return
+
+      const data = {
+        ...getAdditionalFieldSubmitValues(
+          configuredTeamFields(),
+          value.additionalFields
+        ),
+        name,
+        organizationId: props.organizationId
+      }
+
+      try {
+        if (props.team) {
+          await updateTeam.mutateAsync({ teamId: props.team.id, data })
+        } else {
+          await createTeam.mutateAsync(data)
+        }
+      } catch {
+        // The mutation reports the error through its configured handler.
+      }
+    }
+  }))
+
   createEffect(() => {
     if (!props.open) return
-    setName(props.team?.name ?? "")
+    form.reset({
+      additionalFields: getAdditionalFieldDefaultValues(configuredTeamFields()),
+      name: props.team?.name ?? ""
+    })
     setSelectedMember(undefined)
   })
 
-  const handleSubmit = async (event: SubmitEvent) => {
-    event.preventDefault()
-    const trimmedName = name().trim()
-    if (
-      !trimmedName ||
-      !props.organizationId ||
-      (!props.team && props.teamLimitReached)
-    )
-      return
-    if (props.team && !canUpdate.data?.success) return
-
-    setIsSubmittingFields(true)
-    try {
-      const values = await parseAdditionalFieldValues(
-        props.teamFields,
-        new FormData(event.currentTarget as HTMLFormElement)
-      )
-      if (props.team) {
-        updateTeam.mutate(
-          {
-            teamId: props.team.id,
-            data: {
-              ...values,
-              name: trimmedName,
-              organizationId: props.organizationId
-            }
-          },
-          { onSettled: () => setIsSubmittingFields(false) }
-        )
-      } else {
-        createTeam.mutate(
-          {
-            ...values,
-            name: trimmedName,
-            organizationId: props.organizationId
-          },
-          { onSettled: () => setIsSubmittingFields(false) }
-        )
-      }
-    } catch (error) {
-      toast.error(error instanceof Error ? error.message : String(error))
-      setIsSubmittingFields(false)
-    }
-  }
-
-  const pending = () =>
-    createTeam.isPending || updateTeam.isPending || isSubmittingFields()
+  const pending = () => createTeam.isPending || updateTeam.isPending
 
   return (
     <Dialog open={props.open} onOpenChange={props.onOpenChange}>
       <DialogContent class="max-h-[85vh] overflow-y-auto sm:max-w-lg">
-        <form class="flex flex-col gap-6" onSubmit={handleSubmit}>
-          <DialogHeader>
-            <div class="flex size-10 items-center justify-center rounded-md bg-muted">
-              <Users class="size-4.5" />
-            </div>
-            <DialogTitle>
-              {props.team
-                ? config.localization.renameTeam
-                : config.localization.createTeam}
-            </DialogTitle>
-            <DialogDescription>
-              {config.localization.teamsDescription}
-            </DialogDescription>
-          </DialogHeader>
-
-          <div class="flex flex-col gap-4">
-            <Field>
-              <FieldLabel for="organization-team-name">
-                {config.localization.name}
-              </FieldLabel>
-              <Input
-                autofocus
-                disabled={pending() || !canEdit()}
-                id="organization-team-name"
-                onInput={(event) => setName(event.currentTarget.value)}
-                required
-                value={name()}
-              />
-            </Field>
-
-            <For
-              each={fieldsWithModelValues(props.teamFields, props.team ?? {})}
-            >
-              {(field) => (
-                <AdditionalField
-                  field={field}
-                  isPending={pending() || !canEdit()}
-                  name={field.name}
-                  optionalLabel={auth.localization.settings.optional}
-                />
-              )}
-            </For>
-          </div>
-
-          <Show when={props.team && props.canListMembers}>
-            <div class="flex flex-col gap-4 border-t pt-5">
-              <div>
-                <h3 class="text-sm font-medium">
-                  {config.localization.teamMembers}
-                </h3>
-                <p class="text-sm text-muted-foreground">
-                  {config.localization.addTeamMember}
-                </p>
+        <form.AppForm>
+          <form.AuthFormRoot class="flex flex-col gap-6">
+            <DialogHeader>
+              <div class="flex size-10 items-center justify-center rounded-md bg-muted">
+                <Users class="size-4.5" />
               </div>
+              <DialogTitle>
+                {props.team
+                  ? config.localization.renameTeam
+                  : config.localization.createTeam}
+              </DialogTitle>
+              <DialogDescription>
+                {config.localization.teamsDescription}
+              </DialogDescription>
+            </DialogHeader>
 
-              <Show when={canAddMember.isPending || canAddMember.data?.success}>
-                <div class="flex flex-col items-stretch gap-2 sm:flex-row sm:items-end">
-                  <Field class="flex-1">
-                    <FieldLabel>{config.localization.addTeamMember}</FieldLabel>
-                    <Select<MemberOption>
-                      disabled={canAddMember.isPending || memberLimitReached()}
-                      itemComponent={(itemProps) => (
-                        <SelectItem item={itemProps.item}>
-                          {itemProps.item.rawValue.label}
-                        </SelectItem>
-                      )}
-                      onChange={(value) =>
-                        setSelectedMember(value ?? undefined)
-                      }
-                      options={memberOptions()}
-                      optionTextValue="label"
-                      optionValue="id"
-                      value={selectedMember()}
-                    >
-                      <SelectTrigger class="w-full">
-                        <SelectValue<MemberOption>>
-                          {(state) =>
-                            (state.selectedOption() as MemberOption | undefined)
-                              ?.label
-                          }
-                        </SelectValue>
-                      </SelectTrigger>
-                      <SelectContent />
-                    </Select>
-                  </Field>
-                  <Button
-                    disabled={
-                      canAddMember.isPending ||
-                      !selectedMember() ||
-                      addMember.isPending ||
-                      memberLimitReached()
-                    }
-                    onClick={() => {
-                      const member = selectedMember()
-                      if (!canAddMember.data?.success || !member || !props.team)
-                        return
-                      addMember.mutate({
-                        teamId: props.team.id,
-                        userId: member.id,
-                        organizationId: props.organizationId
-                      })
-                    }}
-                    type="button"
-                  >
-                    <UserPlus />
-                    {config.localization.addTeamMember}
-                  </Button>
-                </div>
-              </Show>
-
-              <Show when={canAddMember.data?.success && memberLimitReached()}>
-                <p class="text-destructive text-sm" role="alert">
-                  {config.localization.teamMemberLimitReached}
-                </p>
-              </Show>
-
-              <div class="flex flex-col gap-2">
-                <For each={teamMembers.data}>
-                  {(teamMember) => {
-                    const member = () =>
-                      props.organizationMembers.find(
-                        (candidate) => candidate.userId === teamMember.userId
-                      )
-                    return (
-                      <div class="flex items-center justify-between gap-3 rounded-md border px-3 py-2">
-                        <span class="truncate text-sm">
-                          {member()?.user.name ||
-                            member()?.user.email ||
-                            teamMember.userId}
-                        </span>
-                        <Show
-                          when={
-                            canRemoveMember.isPending ||
-                            canRemoveMember.data?.success
-                          }
-                        >
-                          <Button
-                            aria-label={config.localization.removeTeamMember}
-                            disabled={
-                              canRemoveMember.isPending ||
-                              removeMember.isPending
-                            }
-                            onClick={() => {
-                              if (!canRemoveMember.data?.success || !props.team)
-                                return
-                              removeMember.mutate({
-                                teamId: props.team.id,
-                                userId: teamMember.userId,
-                                organizationId: props.organizationId
-                              })
-                            }}
-                            size="icon-sm"
-                            type="button"
-                            variant="ghost"
-                          >
-                            <UserRoundMinus />
-                          </Button>
-                        </Show>
-                      </div>
-                    )
-                  }}
-                </For>
-              </div>
-            </div>
-          </Show>
-
-          <Show
-            when={props.team && !canRemoveTeam() && canDelete.data?.success}
-          >
-            <p class="text-sm text-muted-foreground">
-              {teamRemovalDisabledReason()}
-            </p>
-          </Show>
-
-          <DialogFooter class="sm:justify-between">
-            <Show
-              when={
-                props.team && (canDelete.isPending || canDelete.data?.success)
-              }
-            >
-              <Button
-                disabled={
-                  canDelete.isPending ||
-                  removeTeam.isPending ||
-                  !canRemoveTeam()
-                }
-                onClick={() => {
-                  if (!props.team) return
-                  removeTeam.mutate({
-                    teamId: props.team.id,
-                    organizationId: props.organizationId
-                  })
+            <div class="flex flex-col gap-4">
+              <form.AppField
+                name="name"
+                validators={{
+                  onChange: ({ value }) =>
+                    validateStringLength(value, {
+                      requiredMessage: auth.localization.auth.fieldRequired,
+                      trim: true
+                    })
                 }}
-                type="button"
-                variant="destructive"
               >
-                <Trash2 />
-                {config.localization.deleteTeam}
-              </Button>
+                {(field) => {
+                  const isInvalid = () =>
+                    isAuthFormFieldInvalid(field().state.meta)
+                  return (
+                    <Field data-invalid={isInvalid()}>
+                      <FieldLabel for="organization-team-name">
+                        {config.localization.name}
+                      </FieldLabel>
+                      <Input
+                        aria-invalid={isInvalid()}
+                        autofocus
+                        disabled={pending() || !canEdit()}
+                        id="organization-team-name"
+                        name={field().name}
+                        onBlur={field().handleBlur}
+                        onInput={(event) =>
+                          field().handleChange(event.currentTarget.value)
+                        }
+                        value={field().state.value}
+                      />
+                      <FieldError
+                        errors={getFormFieldErrors(field().state.meta.errors)}
+                      />
+                    </Field>
+                  )
+                }}
+              </form.AppField>
+
+              <For each={configuredTeamFields()}>
+                {(configuredField) => (
+                  <form.AppField
+                    name={`additionalFields.${configuredField.name}`}
+                    validators={getAuthAdditionalFieldValidators(
+                      configuredField,
+                      auth.localization.auth.fieldRequired
+                    )}
+                  >
+                    {(field) => (
+                      <field.AuthFormAdditionalField
+                        field={configuredField}
+                        isPending={pending() || !canEdit()}
+                        optionalLabel={auth.localization.settings.optional}
+                      />
+                    )}
+                  </form.AppField>
+                )}
+              </For>
+            </div>
+
+            <Show when={props.team && props.canListMembers}>
+              <div class="flex flex-col gap-4 border-t pt-5">
+                <div>
+                  <h3 class="text-sm font-medium">
+                    {config.localization.teamMembers}
+                  </h3>
+                  <p class="text-sm text-muted-foreground">
+                    {config.localization.addTeamMember}
+                  </p>
+                </div>
+
+                <Show
+                  when={canAddMember.isPending || canAddMember.data?.success}
+                >
+                  <div class="flex flex-col items-stretch gap-2 sm:flex-row sm:items-end">
+                    <Field class="flex-1">
+                      <FieldLabel>
+                        {config.localization.addTeamMember}
+                      </FieldLabel>
+                      <Select<MemberOption>
+                        disabled={
+                          canAddMember.isPending || memberLimitReached()
+                        }
+                        itemComponent={(itemProps) => (
+                          <SelectItem item={itemProps.item}>
+                            {itemProps.item.rawValue.label}
+                          </SelectItem>
+                        )}
+                        onChange={(value) =>
+                          setSelectedMember(value ?? undefined)
+                        }
+                        options={memberOptions()}
+                        optionTextValue="label"
+                        optionValue="id"
+                        value={selectedMember()}
+                      >
+                        <SelectTrigger class="w-full">
+                          <SelectValue<MemberOption>>
+                            {(state) =>
+                              (
+                                state.selectedOption() as
+                                  | MemberOption
+                                  | undefined
+                              )?.label
+                            }
+                          </SelectValue>
+                        </SelectTrigger>
+                        <SelectContent />
+                      </Select>
+                    </Field>
+                    <Button
+                      disabled={
+                        canAddMember.isPending ||
+                        !selectedMember() ||
+                        addMember.isPending ||
+                        memberLimitReached()
+                      }
+                      onClick={() => {
+                        const member = selectedMember()
+                        if (
+                          !canAddMember.data?.success ||
+                          !member ||
+                          !props.team
+                        )
+                          return
+                        addMember.mutate({
+                          teamId: props.team.id,
+                          userId: member.id,
+                          organizationId: props.organizationId
+                        })
+                      }}
+                      type="button"
+                    >
+                      <UserPlus />
+                      {config.localization.addTeamMember}
+                    </Button>
+                  </div>
+                </Show>
+
+                <Show when={canAddMember.data?.success && memberLimitReached()}>
+                  <p class="text-destructive text-sm" role="alert">
+                    {config.localization.teamMemberLimitReached}
+                  </p>
+                </Show>
+
+                <div class="flex flex-col gap-2">
+                  <For each={teamMembers.data}>
+                    {(teamMember) => {
+                      const member = () =>
+                        props.organizationMembers.find(
+                          (candidate) => candidate.userId === teamMember.userId
+                        )
+                      return (
+                        <div class="flex items-center justify-between gap-3 rounded-md border px-3 py-2">
+                          <span class="truncate text-sm">
+                            {member()?.user.name ||
+                              member()?.user.email ||
+                              teamMember.userId}
+                          </span>
+                          <Show
+                            when={
+                              canRemoveMember.isPending ||
+                              canRemoveMember.data?.success
+                            }
+                          >
+                            <Button
+                              aria-label={config.localization.removeTeamMember}
+                              disabled={
+                                canRemoveMember.isPending ||
+                                removeMember.isPending
+                              }
+                              onClick={() => {
+                                if (
+                                  !canRemoveMember.data?.success ||
+                                  !props.team
+                                )
+                                  return
+                                removeMember.mutate({
+                                  teamId: props.team.id,
+                                  userId: teamMember.userId,
+                                  organizationId: props.organizationId
+                                })
+                              }}
+                              size="icon-sm"
+                              type="button"
+                              variant="ghost"
+                            >
+                              <UserRoundMinus />
+                            </Button>
+                          </Show>
+                        </div>
+                      )
+                    }}
+                  </For>
+                </div>
+              </div>
             </Show>
 
-            <div class="flex flex-col-reverse gap-2 sm:flex-row">
-              <DialogClose
-                as={Button}
-                disabled={pending()}
-                type="button"
-                variant="outline"
+            <Show
+              when={props.team && !canRemoveTeam() && canDelete.data?.success}
+            >
+              <p class="text-sm text-muted-foreground">
+                {teamRemovalDisabledReason()}
+              </p>
+            </Show>
+
+            <DialogFooter class="sm:justify-between">
+              <Show
+                when={
+                  props.team && (canDelete.isPending || canDelete.data?.success)
+                }
               >
-                {auth.localization.settings.cancel}
-              </DialogClose>
-              <Show when={canEdit()}>
                 <Button
                   disabled={
-                    pending() ||
-                    !name().trim() ||
-                    (props.teamLimitReached && !props.team)
+                    canDelete.isPending ||
+                    removeTeam.isPending ||
+                    !canRemoveTeam()
                   }
-                  type="submit"
+                  onClick={() => {
+                    if (!props.team) return
+                    removeTeam.mutate({
+                      teamId: props.team.id,
+                      organizationId: props.organizationId
+                    })
+                  }}
+                  type="button"
+                  variant="destructive"
                 >
-                  <Show when={pending()}>
-                    <LoaderCircle class="animate-spin" />
-                  </Show>
-                  {props.team
-                    ? auth.localization.settings.saveChanges
-                    : config.localization.createTeam}
+                  <Trash2 />
+                  {config.localization.deleteTeam}
                 </Button>
               </Show>
-            </div>
-          </DialogFooter>
-        </form>
+
+              <div class="flex flex-col-reverse gap-2 sm:flex-row">
+                <DialogClose
+                  as={Button}
+                  disabled={pending()}
+                  type="button"
+                  variant="outline"
+                >
+                  {auth.localization.settings.cancel}
+                </DialogClose>
+                <Show when={canEdit()}>
+                  <form.AuthFormSubmitButton
+                    disabled={
+                      pending() || (props.teamLimitReached && !props.team)
+                    }
+                  >
+                    {props.team
+                      ? auth.localization.settings.saveChanges
+                      : config.localization.createTeam}
+                  </form.AuthFormSubmitButton>
+                </Show>
+              </div>
+            </DialogFooter>
+          </form.AuthFormRoot>
+        </form.AppForm>
       </DialogContent>
     </Dialog>
   )

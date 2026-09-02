@@ -1,6 +1,8 @@
+import type { AdditionalFieldFormValue } from "@better-auth-ui/core"
 import { QueryClient } from "@tanstack/react-query"
 import { act, render, screen, waitFor } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
+import { useState } from "react"
 import { describe, expect, it, vi } from "vitest"
 
 import { AuthProvider } from "../src/components/auth/auth-provider"
@@ -191,6 +193,31 @@ function renderUsernameField(
   } = {}
 ) {
   const authClient = options.authClient ?? createUsernameFieldAuthClient()
+
+  function ControlledUsernameField() {
+    const [value, setValue] = useState<AdditionalFieldFormValue>(
+      options.defaultValue ?? null
+    )
+
+    return (
+      <UsernameField
+        name="username"
+        field={{
+          name: "username",
+          type: "string",
+          label: "Username",
+          placeholder: "Enter your username",
+          inputType: "input",
+          required: true,
+          defaultValue: options.defaultValue
+        }}
+        value={value}
+        onBlur={() => {}}
+        onChange={setValue}
+      />
+    )
+  }
+
   return {
     authClient,
     ...render(
@@ -200,18 +227,7 @@ function renderUsernameField(
         plugins={[usernamePlugin(options.pluginOptions)]}
         queryClient={createTestQueryClient()}
       >
-        <UsernameField
-          name="username"
-          field={{
-            name: "username",
-            type: "string",
-            label: "Username",
-            placeholder: "Enter your username",
-            inputType: "input",
-            required: true,
-            defaultValue: options.defaultValue
-          }}
-        />
+        <ControlledUsernameField />
       </AuthProvider>
     )
   }

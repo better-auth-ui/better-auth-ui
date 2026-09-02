@@ -1,7 +1,9 @@
 import {
   type AdditionalFields,
   fieldsWithModelValues,
-  parseAdditionalFieldValues
+  getAdditionalFieldDefaultValues,
+  getAdditionalFieldSubmitValues,
+  validateStringLength
 } from "@better-auth-ui/core"
 import type {
   OrganizationPermissionRegistry,
@@ -24,7 +26,6 @@ import {
   Checkbox,
   Chip,
   Dropdown,
-  Form,
   Input,
   Label,
   SearchField,
@@ -33,9 +34,13 @@ import {
   TextField,
   toast
 } from "@heroui/react"
-import { type FormEvent, useEffect, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { organizationPlugin } from "../../../lib/auth/organization-plugin"
-import { AdditionalField } from "../additional-field"
+import {
+  getAuthAdditionalFieldValidators,
+  isAuthFormFieldInvalid,
+  useAuthForm
+} from "../auth-form"
 import { OrganizationSortableTableColumn } from "./organization-sortable-table-column"
 import {
   createOrganizationColumnHelper,
@@ -610,9 +615,6 @@ function RoleDialog({
   const { authClient, localization: authLocalization } = useAuth()
   const client = authClient as OrganizationRolesAuthClient
   const { localization } = useAuthPlugin(organizationPlugin)
-  const [name, setName] = useState("")
-  const [permission, setPermission] = useState<Record<string, string[]>>({})
-  const [isSubmitting, setIsSubmitting] = useState(false)
   const createRole = useCreateRole(client, organizationId, {
     onSuccess: () => {
       toast.success(localization.roleCreated)
@@ -626,153 +628,202 @@ function RoleDialog({
     }
   })
 
-  useEffect(() => {
-    if (!isOpen) return
-    setName(role?.role ?? "")
-    setPermission(role?.permission ?? {})
-  }, [isOpen, role])
+  const configuredRoleFields = useMemo(
+    () => fieldsWithModelValues(roleFields, role ?? {}),
+    [role, roleFields]
+  )
+  const form = useAuthForm({
+    defaultValues: {
+      additionalFields: getAdditionalFieldDefaultValues(configuredRoleFields),
+      name: role?.role ?? "",
+      permission: role?.permission ?? ({} as Record<string, string[]>)
+    },
+    onSubmit: async ({ value }) => {
+      const roleName = value.name.trim()
+      if (!roleName) return
 
-  const submit = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault()
-    const roleName = name.trim()
-    if (!roleName) return
+      try {
+        if (
+          Object.values(value.permission).some((actions) => actions.length > 0)
+        ) {
+          const access = await client.organization.hasPermission({
+            organizationId,
+            permissions: value.permission as Parameters<
+              OrganizationRolesAuthClient["organization"]["hasPermission"]
+            >[0]["permissions"]
+          })
 
-    setIsSubmitting(true)
-    try {
-      if (Object.values(permission).some((actions) => actions.length > 0)) {
-        const access = await client.organization.hasPermission({
-          organizationId,
-          permissions: permission as Parameters<
-            OrganizationRolesAuthClient["organization"]["hasPermission"]
-          >[0]["permissions"]
-        })
-
-        if (access.error || !access.data?.success) {
-          toast.danger(localization.permissionsLimitedDescription)
-          setIsSubmitting(false)
-          return
+          if (access.error || !access.data?.success) {
+            toast.danger(localization.permissionsLimitedDescription)
+            return
+          }
         }
-      }
 
-      const additionalFields = await parseAdditionalFieldValues(
-        roleFields,
-        new FormData(event.currentTarget)
-      )
-      if (role) {
-        updateRole.mutate(
-          {
+        const additionalFields = getAdditionalFieldSubmitValues(
+          configuredRoleFields,
+          value.additionalFields
+        )
+        if (role) {
+          await updateRole.mutateAsync({
             organizationId,
             roleId: role.id,
-            data: { ...additionalFields, roleName, permission }
-          },
-          { onSettled: () => setIsSubmitting(false) }
-        )
-      } else {
-        createRole.mutate(
-          {
+            data: {
+              ...additionalFields,
+              roleName,
+              permission: value.permission
+            }
+          })
+        } else {
+          await createRole.mutateAsync({
             organizationId,
             role: roleName,
-            permission,
+            permission: value.permission,
             additionalFields
-          },
-          { onSettled: () => setIsSubmitting(false) }
-        )
+          })
+        }
+      } catch {
+        // The mutation reports the error through its configured handler.
       }
-    } catch (error) {
-      toast.danger(error instanceof Error ? error.message : String(error))
-      setIsSubmitting(false)
     }
-  }
+  })
 
-  const pending = createRole.isPending || updateRole.isPending || isSubmitting
+  useEffect(() => {
+    if (!isOpen) return
+    form.reset({
+      additionalFields: getAdditionalFieldDefaultValues(configuredRoleFields),
+      name: role?.role ?? "",
+      permission: role?.permission ?? {}
+    })
+  }, [configuredRoleFields, form, isOpen, role?.permission, role?.role])
+
+  const pending = createRole.isPending || updateRole.isPending
 
   return (
     <AlertDialog.Backdrop isOpen={isOpen} onOpenChange={onOpenChange}>
       <AlertDialog.Container>
         <AlertDialog.Dialog className="max-w-xl">
-          <Form onSubmit={submit}>
-            <AlertDialog.CloseTrigger />
-            <AlertDialog.Header>
-              <AlertDialog.Heading>
-                {role ? localization.editRole : localization.createRole}
-              </AlertDialog.Heading>
-            </AlertDialog.Header>
-            <AlertDialog.Body className="flex max-h-[65vh] flex-col gap-5 overflow-y-auto">
-              <p className="text-sm text-muted">
-                {localization.rolesDescription}
-              </p>
-              <TextField isDisabled={pending} isRequired>
-                <Label>{localization.roleName}</Label>
-                <Input
-                  value={name}
-                  onChange={(event) => setName(event.target.value)}
-                  placeholder={localization.roleNamePlaceholder}
-                  variant="secondary"
-                />
-              </TextField>
-              {fieldsWithModelValues(roleFields, role ?? {}).map((field) => (
-                <AdditionalField
-                  key={field.name}
-                  field={field}
-                  name={field.name}
-                  isPending={pending}
-                  optionalLabel={authLocalization.settings.optional}
-                />
-              ))}
-              <fieldset className="flex flex-col gap-4">
-                <legend className="mb-3 text-sm font-medium">
-                  {localization.permissions}
-                </legend>
-                {Object.entries(registry).map(([resource, definition]) => (
-                  <div className="flex flex-col gap-2" key={resource}>
-                    <p className="text-sm font-medium">
-                      {definition.label ?? resource}
-                    </p>
-                    <div className="grid gap-3 sm:grid-cols-2">
-                      {Object.entries(definition.actions).map(
-                        ([action, label]) => (
-                          <RolePermissionCheckbox
-                            action={action}
-                            isSelected={
-                              permission[resource]?.includes(action) ?? false
-                            }
-                            key={action}
-                            label={label}
-                            onChange={(checked) =>
-                              setPermission((current) => ({
-                                ...current,
-                                [resource]: checked
-                                  ? [...(current[resource] ?? []), action]
-                                  : (current[resource] ?? []).filter(
-                                      (entry) => entry !== action
-                                    )
-                              }))
-                            }
-                            organizationId={organizationId}
-                            pending={pending}
-                            resource={resource}
-                          />
+          <form.AppForm>
+            <form.AuthFormRoot>
+              <AlertDialog.CloseTrigger />
+              <AlertDialog.Header>
+                <AlertDialog.Heading>
+                  {role ? localization.editRole : localization.createRole}
+                </AlertDialog.Heading>
+              </AlertDialog.Header>
+              <AlertDialog.Body className="flex max-h-[65vh] flex-col gap-5 overflow-y-auto">
+                <p className="text-sm text-muted">
+                  {localization.rolesDescription}
+                </p>
+                <form.AppField
+                  name="name"
+                  validators={{
+                    onChange: ({ value }) =>
+                      validateStringLength(value, {
+                        requiredMessage: authLocalization.auth.fieldRequired,
+                        trim: true
+                      })
+                  }}
+                >
+                  {(field) => (
+                    <TextField
+                      isDisabled={pending}
+                      isInvalid={isAuthFormFieldInvalid(field.state.meta)}
+                      name={field.name}
+                      value={field.state.value}
+                      onBlur={field.handleBlur}
+                      onChange={field.handleChange}
+                    >
+                      <Label>{localization.roleName}</Label>
+                      <Input
+                        placeholder={localization.roleNamePlaceholder}
+                        variant="secondary"
+                      />
+                      <field.AuthFormFieldError />
+                    </TextField>
+                  )}
+                </form.AppField>
+                {configuredRoleFields.map((configuredField) => (
+                  <form.AppField
+                    key={configuredField.name}
+                    name={`additionalFields.${configuredField.name}`}
+                    validators={getAuthAdditionalFieldValidators(
+                      configuredField,
+                      authLocalization.auth.fieldRequired
+                    )}
+                  >
+                    {(field) => (
+                      <field.AuthFormAdditionalField
+                        field={configuredField}
+                        isPending={pending}
+                        optionalLabel={authLocalization.settings.optional}
+                      />
+                    )}
+                  </form.AppField>
+                ))}
+                <form.AppField name="permission">
+                  {(field) => (
+                    <fieldset className="flex flex-col gap-4">
+                      <legend className="mb-3 text-sm font-medium">
+                        {localization.permissions}
+                      </legend>
+                      {Object.entries(registry).map(
+                        ([resource, definition]) => (
+                          <div className="flex flex-col gap-2" key={resource}>
+                            <p className="text-sm font-medium">
+                              {definition.label ?? resource}
+                            </p>
+                            <div className="grid gap-3 sm:grid-cols-2">
+                              {Object.entries(definition.actions).map(
+                                ([action, label]) => (
+                                  <RolePermissionCheckbox
+                                    action={action}
+                                    isSelected={
+                                      field.state.value[resource]?.includes(
+                                        action
+                                      ) ?? false
+                                    }
+                                    key={action}
+                                    label={label}
+                                    onChange={(checked) =>
+                                      field.handleChange({
+                                        ...field.state.value,
+                                        [resource]: checked
+                                          ? [
+                                              ...(field.state.value[resource] ??
+                                                []),
+                                              action
+                                            ]
+                                          : (
+                                              field.state.value[resource] ?? []
+                                            ).filter(
+                                              (entry) => entry !== action
+                                            )
+                                      })
+                                    }
+                                    organizationId={organizationId}
+                                    pending={pending}
+                                    resource={resource}
+                                  />
+                                )
+                              )}
+                            </div>
+                          </div>
                         )
                       )}
-                    </div>
-                  </div>
-                ))}
-              </fieldset>
-            </AlertDialog.Body>
-            <AlertDialog.Footer>
-              <Button slot="close" variant="tertiary" isDisabled={pending}>
-                {authLocalization.settings.cancel}
-              </Button>
-              <Button
-                type="submit"
-                isDisabled={pending || !name.trim()}
-                isPending={pending}
-              >
-                {pending && <Spinner color="current" size="sm" />}
-                {authLocalization.settings.saveChanges}
-              </Button>
-            </AlertDialog.Footer>
-          </Form>
+                    </fieldset>
+                  )}
+                </form.AppField>
+              </AlertDialog.Body>
+              <AlertDialog.Footer>
+                <Button slot="close" variant="tertiary" isDisabled={pending}>
+                  {authLocalization.settings.cancel}
+                </Button>
+                <form.AuthFormSubmitButton isDisabled={pending}>
+                  {authLocalization.settings.saveChanges}
+                </form.AuthFormSubmitButton>
+              </AlertDialog.Footer>
+            </form.AuthFormRoot>
+          </form.AppForm>
         </AlertDialog.Dialog>
       </AlertDialog.Container>
     </AlertDialog.Backdrop>

@@ -1,4 +1,7 @@
-import { resolveInputType } from "@better-auth-ui/core"
+import {
+  getFormFieldErrorMessage,
+  resolveInputType
+} from "@better-auth-ui/core"
 import { useAuth, useCopyToClipboard } from "@better-auth-ui/react"
 import { Check, Copy } from "@gravity-ui/icons"
 import {
@@ -123,6 +126,11 @@ function CopyButton({
 export function AdditionalField({
   name,
   field: configuredField,
+  value,
+  onBlur,
+  onChange,
+  isInvalid,
+  errors,
   isPending,
   optionalLabel,
   variant
@@ -146,6 +154,7 @@ export function AdditionalField({
         }
       : configuredField
   const inputVariant = variant === "transparent" ? "primary" : "secondary"
+  const errorMessage = getFormFieldErrorMessage(errors ?? [])
 
   if (field.render) {
     const FieldRenderer = field.render as ComponentType<AdditionalFieldProps>
@@ -153,6 +162,11 @@ export function AdditionalField({
       <FieldRenderer
         name={name}
         field={field}
+        value={value}
+        onBlur={onBlur}
+        onChange={onChange}
+        isInvalid={isInvalid}
+        errors={errors}
         isPending={isPending}
         optionalLabel={optionalLabel}
         variant={variant}
@@ -166,12 +180,13 @@ export function AdditionalField({
         type="hidden"
         name={name}
         value={
-          field.defaultValue == null
+          value == null
             ? ""
-            : field.defaultValue instanceof Date
-              ? field.defaultValue.toISOString()
-              : String(field.defaultValue)
+            : value instanceof Date
+              ? value.toISOString()
+              : String(value)
         }
+        readOnly
       />
     )
   }
@@ -180,21 +195,23 @@ export function AdditionalField({
     return (
       <TextField
         name={name}
-        defaultValue={
-          field.defaultValue == null ? undefined : String(field.defaultValue)
-        }
+        value={value == null ? "" : String(value)}
+        onBlur={onBlur}
+        onChange={(nextValue) => onChange(nextValue || null)}
+        isInvalid={isInvalid}
         isDisabled={isPending}
         isReadOnly={field.readOnly}
+        validationBehavior="aria"
       >
         <Label>{field.label}</Label>
 
         <TextArea
           placeholder={field.placeholder}
-          required={field.required}
+          aria-required={field.required}
           variant={inputVariant}
         />
 
-        <FieldError />
+        <FieldError>{errorMessage}</FieldError>
       </TextField>
     )
   }
@@ -205,13 +222,12 @@ export function AdditionalField({
     return (
       <NumberField
         name={name}
-        defaultValue={
-          typeof field.defaultValue === "number"
-            ? field.defaultValue
-            : field.defaultValue != null && field.defaultValue !== ""
-              ? Number(field.defaultValue)
-              : undefined
+        value={typeof value === "number" ? value : Number.NaN}
+        onBlur={onBlur}
+        onChange={(nextValue) =>
+          onChange(Number.isNaN(nextValue) ? null : nextValue)
         }
+        isInvalid={isInvalid}
         minValue={field.min}
         maxValue={field.max}
         step={
@@ -220,6 +236,7 @@ export function AdditionalField({
         formatOptions={field.formatOptions}
         isDisabled={isPending}
         isReadOnly={field.readOnly}
+        validationBehavior="aria"
         variant={inputVariant}
       >
         <Label>{field.label}</Label>
@@ -228,12 +245,12 @@ export function AdditionalField({
           <NumberField.DecrementButton />
           <NumberField.Input
             placeholder={field.placeholder}
-            required={field.required}
+            aria-required={field.required}
           />
           <NumberField.IncrementButton />
         </NumberField.Group>
 
-        <FieldError />
+        <FieldError>{errorMessage}</FieldError>
       </NumberField>
     )
   }
@@ -243,12 +260,11 @@ export function AdditionalField({
 
     return (
       <Slider
-        defaultValue={
-          typeof field.defaultValue === "number"
-            ? field.defaultValue
-            : field.defaultValue != null
-              ? Number(field.defaultValue)
-              : undefined
+        value={typeof value === "number" ? value : (field.min ?? 0)}
+        onChange={(nextValue) =>
+          onChange(
+            Array.isArray(nextValue) ? (nextValue[0] ?? null) : nextValue
+          )
         }
         minValue={field.min ?? 0}
         maxValue={field.max ?? 100}
@@ -266,8 +282,9 @@ export function AdditionalField({
 
         <Slider.Track>
           <Slider.Fill />
-          <Slider.Thumb name={name} />
+          <Slider.Thumb name={name} onBlur={onBlur} aria-invalid={isInvalid} />
         </Slider.Track>
+        <FieldError>{errorMessage}</FieldError>
       </Slider>
     )
   }
@@ -276,9 +293,10 @@ export function AdditionalField({
     return (
       <Switch
         name={name}
-        defaultSelected={
-          field.defaultValue === true || field.defaultValue === "true"
-        }
+        isSelected={value === true}
+        onBlur={onBlur}
+        onChange={onChange}
+        isInvalid={isInvalid}
         isDisabled={isPending}
         isReadOnly={field.readOnly}
       >
@@ -289,6 +307,7 @@ export function AdditionalField({
 
           {field.label}
         </Switch.Content>
+        <FieldError>{errorMessage}</FieldError>
       </Switch>
     )
   }
@@ -297,12 +316,13 @@ export function AdditionalField({
     return (
       <Checkbox
         name={name}
-        defaultSelected={
-          field.defaultValue === true || field.defaultValue === "true"
-        }
+        isSelected={value === true}
+        onBlur={onBlur}
+        onChange={onChange}
+        isInvalid={isInvalid}
         isDisabled={isPending}
         isReadOnly={field.readOnly}
-        isRequired={field.required}
+        aria-required={field.required}
         variant={inputVariant}
       >
         <Checkbox.Content>
@@ -312,6 +332,7 @@ export function AdditionalField({
 
           {field.label}
         </Checkbox.Content>
+        <FieldError>{errorMessage}</FieldError>
       </Checkbox>
     )
   }
@@ -321,12 +342,14 @@ export function AdditionalField({
       <Select
         className="[&[data-required=true]>.label]:after:content-none"
         name={name}
-        defaultValue={
-          field.defaultValue != null ? String(field.defaultValue) : undefined
-        }
+        value={value == null ? null : String(value)}
+        onBlur={onBlur}
+        onChange={(nextValue) => onChange(nextValue || null)}
+        isInvalid={isInvalid}
         placeholder={field.placeholder}
         isDisabled={isPending || field.readOnly}
-        isRequired={field.required}
+        aria-required={field.required}
+        validationBehavior="aria"
         variant={inputVariant}
         fullWidth
       >
@@ -355,7 +378,7 @@ export function AdditionalField({
           </ListBox>
         </Select.Popover>
 
-        <FieldError />
+        <FieldError>{errorMessage}</FieldError>
       </Select>
     )
   }
@@ -365,12 +388,14 @@ export function AdditionalField({
       <ComboBox
         className="[&[data-required=true]>.label]:after:content-none"
         name={name}
-        defaultSelectedKey={
-          field.defaultValue != null ? String(field.defaultValue) : undefined
-        }
+        selectedKey={value == null ? null : String(value)}
+        onBlur={onBlur}
+        onSelectionChange={(key) => onChange(key == null ? null : String(key))}
+        isInvalid={isInvalid}
         isDisabled={isPending}
         isReadOnly={field.readOnly}
-        isRequired={field.required}
+        aria-required={field.required}
+        validationBehavior="aria"
         variant={inputVariant}
         fullWidth
       >
@@ -399,26 +424,30 @@ export function AdditionalField({
           </ListBox>
         </ComboBox.Popover>
 
-        <FieldError />
+        <FieldError>{errorMessage}</FieldError>
       </ComboBox>
     )
   }
 
   if (inputType === "date" || inputType === "datetime") {
     const isDateTime = inputType === "datetime"
-    const defaultValue = isDateTime
-      ? toDateTimeValue(field.defaultValue)
-      : toDateValue(field.defaultValue)
+    const dateValue = isDateTime ? toDateTimeValue(value) : toDateValue(value)
 
     return (
       <DatePicker
         className="w-full [&[data-required=true]>.label]:after:content-none"
         name={name}
-        defaultValue={defaultValue as unknown as DateValue}
+        value={(dateValue ?? null) as DateValue | null}
+        onBlur={onBlur}
+        onChange={(nextValue) =>
+          onChange(nextValue?.toDate(getLocalTimeZone()) ?? null)
+        }
+        isInvalid={isInvalid}
         granularity={isDateTime ? "minute" : "day"}
         isDisabled={isPending}
         isReadOnly={field.readOnly}
-        isRequired={field.required}
+        aria-required={field.required}
+        validationBehavior="aria"
       >
         {({ state }) => (
           <>
@@ -436,7 +465,7 @@ export function AdditionalField({
               </DateField.Suffix>
             </DateField.Group>
 
-            <FieldError />
+            <FieldError>{errorMessage}</FieldError>
 
             <DatePicker.Popover className="flex flex-col gap-3">
               <Calendar
@@ -499,6 +528,11 @@ export function AdditionalField({
     <HeroInputField
       name={name}
       field={field}
+      value={value}
+      onBlur={onBlur}
+      onChange={onChange}
+      isInvalid={isInvalid}
+      errors={errors}
       isPending={isPending}
       variant={variant}
     />
@@ -508,6 +542,11 @@ export function AdditionalField({
 function HeroInputField({
   name,
   field,
+  value,
+  onBlur,
+  onChange,
+  isInvalid,
+  errors,
   isPending,
   variant
 }: AdditionalFieldProps) {
@@ -526,16 +565,19 @@ function HeroInputField({
       : "numeric"
     : undefined
   const nativeStep = maxFractionDigits ? 1 / 10 ** maxFractionDigits : undefined
+  const errorMessage = getFormFieldErrorMessage(errors ?? [])
 
   if (hasPrefix || hasSuffix) {
     return (
       <TextField
         name={name}
-        defaultValue={
-          field.defaultValue == null ? undefined : String(field.defaultValue)
-        }
+        value={value == null ? "" : String(value)}
+        onBlur={onBlur}
+        onChange={(nextValue) => onChange(nextValue || null)}
+        isInvalid={isInvalid}
         isDisabled={isPending}
         isReadOnly={field.readOnly}
+        validationBehavior="aria"
       >
         <Label>{field.label}</Label>
 
@@ -545,7 +587,7 @@ function HeroInputField({
           <InputGroup.Input
             ref={inputRef}
             placeholder={field.placeholder}
-            required={field.required}
+            aria-required={field.required}
             type={nativeInputType}
             inputMode={nativeInputMode}
             step={nativeStep}
@@ -565,7 +607,7 @@ function HeroInputField({
           )}
         </InputGroup>
 
-        <FieldError />
+        <FieldError>{errorMessage}</FieldError>
       </TextField>
     )
   }
@@ -573,24 +615,26 @@ function HeroInputField({
   return (
     <TextField
       name={name}
-      defaultValue={
-        field.defaultValue == null ? undefined : String(field.defaultValue)
-      }
+      value={value == null ? "" : String(value)}
+      onBlur={onBlur}
+      onChange={(nextValue) => onChange(nextValue || null)}
+      isInvalid={isInvalid}
       isDisabled={isPending}
       isReadOnly={field.readOnly}
+      validationBehavior="aria"
     >
       <Label>{field.label}</Label>
 
       <Input
         placeholder={field.placeholder}
-        required={field.required}
+        aria-required={field.required}
         variant={inputVariant}
         type={nativeInputType}
         inputMode={nativeInputMode}
         step={nativeStep}
       />
 
-      <FieldError />
+      <FieldError>{errorMessage}</FieldError>
     </TextField>
   )
 }

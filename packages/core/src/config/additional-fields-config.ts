@@ -4,6 +4,12 @@ export type AdditionalFieldType = "string" | "number" | "boolean" | "date"
 /** Runtime value held by an `AdditionalField` (matches `AdditionalFieldType`). */
 export type AdditionalFieldValue = string | number | boolean | Date
 
+/** Value stored for an additional field while it is owned by a form. */
+export type AdditionalFieldFormValue = AdditionalFieldValue | null
+
+/** Runtime additional-field values keyed by their configured model names. */
+export type AdditionalFieldFormValues = Record<string, AdditionalFieldFormValue>
+
 /** UI rendering choice. Default is inferred from `AdditionalField.type`. */
 export type AdditionalFieldInputType =
   | "input"
@@ -42,7 +48,16 @@ export type AdditionalFieldRenderProps = AdditionalFieldRegister extends {
   renderProps: infer P
 }
   ? P
-  : { name: string; field: AdditionalField; isPending?: boolean }
+  : {
+      name: string
+      field: AdditionalField
+      value: AdditionalFieldFormValue
+      onBlur: () => void
+      onChange: (value: AdditionalFieldFormValue) => void
+      isInvalid?: boolean
+      errors?: unknown[]
+      isPending?: boolean
+    }
 
 /** Resolved return type for `AdditionalField.render`. */
 export type AdditionalFieldRenderResult = AdditionalFieldRegister extends {
@@ -108,7 +123,7 @@ export interface AdditionalField {
    * Custom client-side validation. Throw an `Error` (the `message` is shown
    * to the user) when invalid; return / resolve normally when valid.
    *
-   * Receives the parsed value (after `parseAdditionalFieldValue`).
+   * Receives the current typed form value.
    */
   validate?: (
     value: AdditionalFieldValue | null | undefined
@@ -123,15 +138,78 @@ export interface AdditionalField {
   /** Render on the user profile. @default true */
   profile?: boolean
   /**
-   * Custom renderer. Replaces the host UI package's built-in input. Must emit
-   * an input named `field.name` so the value is captured by the form's
-   * `FormData`.
+   * Custom renderer. Replaces the host UI package's built-in input. Use the
+   * form bindings supplied by the host package to read and update its value.
    */
   render?: (props: AdditionalFieldRenderProps) => AdditionalFieldRenderResult
 }
 
 /** Ordered list of `AdditionalField` configurations. */
 export type AdditionalFields = AdditionalField[]
+
+/** Resolve the initial form value for a configured additional field. */
+export function getAdditionalFieldDefaultValue(
+  field: AdditionalField
+): AdditionalFieldFormValue {
+  if (field.defaultValue != null) return field.defaultValue
+  return field.type === "boolean" ? false : null
+}
+
+/** Build collision-safe form defaults for a runtime list of fields. */
+export function getAdditionalFieldDefaultValues(
+  fields: readonly AdditionalField[]
+): AdditionalFieldFormValues {
+  return Object.fromEntries(
+    fields.map((field) => [field.name, getAdditionalFieldDefaultValue(field)])
+  )
+}
+
+/** Keep only writable configured values when building an API payload. */
+export function getAdditionalFieldSubmitValues(
+  fields: readonly AdditionalField[],
+  values: AdditionalFieldFormValues
+): AdditionalFieldFormValues {
+  const submittedValues: AdditionalFieldFormValues = {}
+
+  for (const field of fields) {
+    if (!field.readOnly && field.name in values) {
+      submittedValues[field.name] = values[field.name] ?? null
+    }
+  }
+
+  return submittedValues
+}
+
+/** Validate required semantics without relying on native constraint state. */
+export function validateAdditionalFieldRequired(
+  field: AdditionalField,
+  value: AdditionalFieldFormValue,
+  requiredMessage: string
+): string | undefined {
+  if (!field.required) return undefined
+
+  const isMissing =
+    value == null ||
+    value === "" ||
+    (field.type === "boolean" && value !== true) ||
+    (typeof value === "number" && !Number.isFinite(value)) ||
+    (value instanceof Date && Number.isNaN(value.getTime()))
+
+  return isMissing ? requiredMessage : undefined
+}
+
+/** Run a configured custom validator and normalize thrown values as errors. */
+export async function validateAdditionalFieldValue(
+  field: AdditionalField,
+  value: AdditionalFieldFormValue
+): Promise<string | undefined> {
+  try {
+    await field.validate?.(value)
+    return undefined
+  } catch (error) {
+    return error instanceof Error ? error.message : String(error)
+  }
+}
 
 /**
  * Convert a raw form value into the JS value Better Auth expects.

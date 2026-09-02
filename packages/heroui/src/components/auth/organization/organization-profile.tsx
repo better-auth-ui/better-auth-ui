@@ -1,4 +1,9 @@
-import { parseAdditionalFieldValue } from "@better-auth-ui/core"
+import {
+  fieldsWithModelValues,
+  getAdditionalFieldDefaultValues,
+  getAdditionalFieldSubmitValues,
+  validateStringLength
+} from "@better-auth-ui/core"
 import type { OrganizationAuthClient } from "@better-auth-ui/core/plugins/organization"
 import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
 import {
@@ -7,23 +12,23 @@ import {
   useUpdateOrganization
 } from "@better-auth-ui/react/plugins/organization"
 import {
-  Button,
   Card,
   type CardProps,
   cn,
-  FieldError,
-  Form,
   Input,
   Label,
   Skeleton,
-  Spinner,
   TextField,
   toast
 } from "@heroui/react"
-import { type SyntheticEvent, useEffect, useState } from "react"
+import { useEffect } from "react"
 
 import { organizationPlugin } from "../../../lib/auth/organization-plugin"
-import { AdditionalField } from "../additional-field"
+import {
+  getAuthAdditionalFieldValidators,
+  isAuthFormFieldInvalid,
+  useAuthForm
+} from "../auth-form"
 import { ChangeOrganizationLogo } from "./change-organization-logo"
 import { SlugField } from "./slug-field"
 
@@ -57,45 +62,46 @@ export function OrganizationProfile({
     permissions: { organization: ["update"] }
   })
 
-  const [slug, setSlug] = useState(activeOrganization?.slug ?? "")
-
-  useEffect(() => {
-    setSlug(activeOrganization?.slug ?? "")
-  }, [activeOrganization?.slug])
-
-  const { mutate: commitOrganizationUpdate, isPending } = useUpdateOrganization(
-    authClient as OrganizationAuthClient,
-    {
+  const { mutateAsync: commitOrganizationUpdate, isPending } =
+    useUpdateOrganization(authClient as OrganizationAuthClient, {
       onSuccess: () =>
         toast.success(organizationLocalization.organizationUpdatedSuccess)
-    }
-  )
-
-  async function handleSubmit(e: SyntheticEvent<HTMLFormElement>) {
-    e.preventDefault()
-    if (!activeOrganization || !canUpdate.data?.success) return
-
-    const formData = new FormData(e.currentTarget)
-    const name = formData.get("name") as string
-    const additionalValues: Record<string, unknown> = {}
-    try {
-      for (const field of additionalFields) {
-        const value = parseAdditionalFieldValue(
-          field,
-          formData.get(field.name) as string | null
-        )
-        await field.validate?.(value)
-        if (value !== undefined) additionalValues[field.name] = value
-      }
-    } catch (error) {
-      toast.danger(error instanceof Error ? error.message : String(error))
-      return
-    }
-
-    commitOrganizationUpdate({
-      data: { ...additionalValues, name, ...(!hideSlug && { slug }) }
     })
-  }
+
+  const form = useAuthForm({
+    defaultValues: {
+      additionalFields: getAdditionalFieldDefaultValues(additionalFields),
+      name: "",
+      slug: ""
+    },
+    onSubmit: async ({ value }) => {
+      if (!activeOrganization || !canUpdate.data?.success) return
+      await commitOrganizationUpdate({
+        data: {
+          ...getAdditionalFieldSubmitValues(
+            additionalFields,
+            value.additionalFields
+          ),
+          name: value.name,
+          ...(!hideSlug && { slug: value.slug })
+        }
+      })
+    }
+  })
+
+  useEffect(() => {
+    if (!activeOrganization) return
+    form.reset({
+      additionalFields: getAdditionalFieldDefaultValues(
+        fieldsWithModelValues(
+          additionalFields,
+          activeOrganization as Record<string, unknown>
+        )
+      ),
+      name: activeOrganization.name,
+      slug: activeOrganization.slug
+    })
+  }, [activeOrganization, additionalFields, form])
 
   const inputVariant = variant === "transparent" ? "primary" : "secondary"
   const formDisabled =
@@ -109,77 +115,103 @@ export function OrganizationProfile({
 
       <Card className={cn(className)} variant={variant} {...props}>
         <Card.Content>
-          <Form onSubmit={handleSubmit} className="flex flex-col gap-4">
-            <ChangeOrganizationLogo />
+          <form.AppForm>
+            <form.AuthFormRoot className="flex flex-col gap-4">
+              <ChangeOrganizationLogo />
 
-            <TextField
-              key={`${activeOrganization?.id}-${activeOrganization?.name}-name`}
-              name="name"
-              defaultValue={activeOrganization?.name}
-              isDisabled={formDisabled || !activeOrganization}
-            >
-              <Label>{organizationLocalization.name}</Label>
-
-              <Input
-                className={cn(!activeOrganization && "hidden")}
-                autoComplete="organization"
-                placeholder={organizationLocalization.namePlaceholder}
-                variant={inputVariant}
-              />
-
-              {!activeOrganization && (
-                <Skeleton className="h-10 w-full rounded-xl md:h-9" />
-              )}
-
-              <FieldError />
-            </TextField>
-
-            {!hideSlug &&
-              (activeOrganization ? (
-                <SlugField
-                  value={slug}
-                  onChange={setSlug}
-                  currentSlug={activeOrganization.slug}
-                  isDisabled={formDisabled}
-                  variant={inputVariant}
-                />
-              ) : (
-                <TextField isDisabled>
-                  <Label>{organizationLocalization.slug}</Label>
-                  <Skeleton className="h-10 w-full rounded-xl md:h-9" />
-                </TextField>
-              ))}
-            {activeOrganization &&
-              additionalFields.map((field) => (
-                <AdditionalField
-                  field={{
-                    ...field,
-                    defaultValue: (
-                      activeOrganization as Record<string, unknown>
-                    )[field.name] as never
-                  }}
-                  isPending={formDisabled}
-                  key={field.name}
-                  name={field.name}
-                  optionalLabel={localization.settings.optional}
-                  variant={variant}
-                />
-              ))}
-
-            {(canUpdate.isPending || canUpdate.data?.success) && (
-              <Button
-                type="submit"
-                isPending={isPending}
-                isDisabled={formDisabled || !activeOrganization}
-                size="sm"
-                className="mt-1"
+              <form.AppField
+                name="name"
+                validators={{
+                  onChange: ({ value }) =>
+                    validateStringLength(value, {
+                      requiredMessage: localization.auth.fieldRequired,
+                      trim: true
+                    })
+                }}
               >
-                {isPending && <Spinner color="current" size="sm" />}
+                {(field) => {
+                  const isInvalid = isAuthFormFieldInvalid(field.state.meta)
 
-                {localization.settings.saveChanges}
-              </Button>
-            )}
-          </Form>
+                  return (
+                    <TextField
+                      name={field.name}
+                      isDisabled={formDisabled || !activeOrganization}
+                      value={field.state.value}
+                      onBlur={field.handleBlur}
+                      onChange={field.handleChange}
+                      isInvalid={isInvalid || undefined}
+                      validationBehavior="aria"
+                    >
+                      <Label>{organizationLocalization.name}</Label>
+
+                      <Input
+                        className={cn(!activeOrganization && "hidden")}
+                        autoComplete="organization"
+                        placeholder={organizationLocalization.namePlaceholder}
+                        variant={inputVariant}
+                      />
+
+                      {!activeOrganization && (
+                        <Skeleton className="h-10 w-full rounded-xl md:h-9" />
+                      )}
+
+                      <field.AuthFormFieldError />
+                    </TextField>
+                  )
+                }}
+              </form.AppField>
+
+              {!hideSlug &&
+                (activeOrganization ? (
+                  <form.AppField name="slug">
+                    {(field) => (
+                      <SlugField
+                        value={field.state.value}
+                        onChange={field.handleChange}
+                        currentSlug={activeOrganization.slug}
+                        isDisabled={formDisabled}
+                        variant={inputVariant}
+                      />
+                    )}
+                  </form.AppField>
+                ) : (
+                  <TextField isDisabled>
+                    <Label>{organizationLocalization.slug}</Label>
+                    <Skeleton className="h-10 w-full rounded-xl md:h-9" />
+                  </TextField>
+                ))}
+              {activeOrganization &&
+                additionalFields.map((configuredField) => (
+                  <form.AppField
+                    key={configuredField.name}
+                    name={`additionalFields.${configuredField.name}`}
+                    validators={getAuthAdditionalFieldValidators(
+                      configuredField,
+                      localization.auth.fieldRequired
+                    )}
+                  >
+                    {(field) => (
+                      <field.AuthFormAdditionalField
+                        field={configuredField}
+                        isPending={formDisabled}
+                        optionalLabel={localization.settings.optional}
+                        variant={variant}
+                      />
+                    )}
+                  </form.AppField>
+                ))}
+
+              {(canUpdate.isPending || canUpdate.data?.success) && (
+                <form.AuthFormSubmitButton
+                  isDisabled={formDisabled || !activeOrganization}
+                  size="sm"
+                  className="mt-1"
+                >
+                  {localization.settings.saveChanges}
+                </form.AuthFormSubmitButton>
+              )}
+            </form.AuthFormRoot>
+          </form.AppForm>
         </Card.Content>
       </Card>
     </div>

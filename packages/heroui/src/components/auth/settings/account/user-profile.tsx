@@ -1,25 +1,27 @@
 import {
-  type AdditionalFieldValue,
-  parseAdditionalFieldValue
+  fieldsWithModelValues,
+  getAdditionalFieldDefaultValues,
+  getAdditionalFieldSubmitValues,
+  validateStringLength
 } from "@better-auth-ui/core"
 import { useAuth, useSession, useUpdateUser } from "@better-auth-ui/react"
 import {
-  Button,
   Card,
   type CardProps,
   cn,
-  FieldError,
-  Form,
   Input,
   Label,
   Skeleton,
-  Spinner,
   TextField,
   toast
 } from "@heroui/react"
-import type { SyntheticEvent } from "react"
+import { useEffect, useMemo } from "react"
 
-import { AdditionalField } from "../../additional-field"
+import {
+  getAuthAdditionalFieldValidators,
+  isAuthFormFieldInvalid,
+  useAuthForm
+} from "../../auth-form"
 import { ChangeAvatar } from "./change-avatar"
 
 export type UserProfileProps = {
@@ -39,44 +41,39 @@ export function UserProfile({
   const { additionalFields, authClient, localization } = useAuth()
   const { data: session } = useSession(authClient)
 
-  const { mutate: updateUser, isPending } = useUpdateUser(authClient, {
+  const { mutateAsync: updateUser, isPending } = useUpdateUser(authClient, {
     onSuccess: () => toast.success(localization.settings.profileUpdatedSuccess)
   })
 
-  async function handleSubmit(e: SyntheticEvent<HTMLFormElement>) {
-    e.preventDefault()
-    const formData = new FormData(e.currentTarget)
-    const name = formData.get("name") as string
-
-    const additionalFieldValues: Record<string, unknown> = {}
-
-    for (const field of additionalFields ?? []) {
-      if (field.profile === false || field.readOnly) continue
-      const value = parseAdditionalFieldValue(
-        field,
-        formData.get(field.name) as string | null
-      )
-
-      if (field.validate) {
-        try {
-          await field.validate(value)
-        } catch (error) {
-          toast.danger(error instanceof Error ? error.message : String(error))
-          return
-        }
-      }
-
-      // `null` = explicit clear (forward to backend); `undefined` = omitted.
-      if (value !== undefined) {
-        additionalFieldValues[field.name] = value
-      }
+  const profileFields = useMemo(
+    () => additionalFields?.filter((field) => field.profile !== false) ?? [],
+    [additionalFields]
+  )
+  const form = useAuthForm({
+    defaultValues: {
+      additionalFields: getAdditionalFieldDefaultValues(profileFields),
+      name: ""
+    },
+    onSubmit: async ({ value }) => {
+      await updateUser({
+        name: value.name,
+        ...getAdditionalFieldSubmitValues(profileFields, value.additionalFields)
+      })
     }
+  })
 
-    updateUser({
-      name,
-      ...additionalFieldValues
+  useEffect(() => {
+    if (!session) return
+    form.reset({
+      additionalFields: getAdditionalFieldDefaultValues(
+        fieldsWithModelValues(
+          profileFields,
+          session.user as Record<string, unknown>
+        )
+      ),
+      name: session.user.name
     })
-  }
+  }, [form, profileFields, session])
 
   return (
     <div>
@@ -86,84 +83,97 @@ export function UserProfile({
 
       <Card className={cn("p-4 gap-4", className)} variant={variant} {...props}>
         <Card.Content>
-          <Form onSubmit={handleSubmit} className="flex flex-col gap-4">
-            <ChangeAvatar />
+          <form.AppForm>
+            <form.AuthFormRoot className="flex flex-col gap-4">
+              <ChangeAvatar />
 
-            <TextField
-              key={`${session?.user?.id}-${session?.user?.name}-name`}
-              name="name"
-              defaultValue={session?.user.name}
-              isDisabled={isPending || !session}
-            >
-              <Label>{localization.auth.name}</Label>
+              <form.AppField
+                name="name"
+                validators={{
+                  onChange: ({ value }) =>
+                    validateStringLength(value, {
+                      requiredMessage: localization.auth.fieldRequired,
+                      trim: true
+                    })
+                }}
+              >
+                {(field) => {
+                  const isInvalid = isAuthFormFieldInvalid(field.state.meta)
 
-              <Input
-                className={cn(!session && "hidden")}
-                autoComplete="name"
-                placeholder={localization.auth.name}
-                variant={variant === "transparent" ? "primary" : "secondary"}
-              />
+                  return (
+                    <TextField
+                      name={field.name}
+                      isDisabled={isPending || !session}
+                      value={field.state.value}
+                      onBlur={field.handleBlur}
+                      onChange={field.handleChange}
+                      isInvalid={isInvalid || undefined}
+                      validationBehavior="aria"
+                    >
+                      <Label>{localization.auth.name}</Label>
 
-              {!session && (
-                <Skeleton className="h-10 md:h-9 w-full rounded-xl" />
-              )}
+                      <Input
+                        className={cn(!session && "hidden")}
+                        autoComplete="name"
+                        placeholder={localization.auth.name}
+                        variant={
+                          variant === "transparent" ? "primary" : "secondary"
+                        }
+                      />
 
-              <FieldError />
-            </TextField>
+                      {!session && (
+                        <Skeleton className="h-10 md:h-9 w-full rounded-xl" />
+                      )}
 
-            {additionalFields
-              ?.filter((field) => field.profile !== false)
-              .map((field) => {
+                      <field.AuthFormFieldError />
+                    </TextField>
+                  )
+                }}
+              </form.AppField>
+
+              {profileFields.map((configuredField) => {
                 if (!session) {
-                  if (field.inputType === "hidden") {
+                  if (configuredField.inputType === "hidden") {
                     return null
                   }
 
                   return (
                     <Skeleton
-                      key={field.name}
+                      key={configuredField.name}
                       className="h-10 md:h-9 w-full rounded-xl"
                     />
                   )
                 }
 
-                const value = (session.user as Record<string, unknown>)[
-                  field.name
-                ]
-
-                // Re-mount when the user or the session value changes so the
-                // field's uncontrolled `defaultValue` reflects the latest data.
-                const key = `${session.user.id}-${field.name}-${
-                  value instanceof Date
-                    ? value.toISOString()
-                    : String(value ?? "")
-                }`
-
                 return (
-                  <AdditionalField
-                    key={key}
-                    name={field.name}
-                    field={{
-                      ...field,
-                      defaultValue: value as AdditionalFieldValue | null
-                    }}
-                    isPending={isPending}
-                    variant={variant}
-                  />
+                  <form.AppField
+                    key={configuredField.name}
+                    name={`additionalFields.${configuredField.name}`}
+                    validators={getAuthAdditionalFieldValidators(
+                      configuredField,
+                      localization.auth.fieldRequired
+                    )}
+                  >
+                    {(field) => (
+                      <field.AuthFormAdditionalField
+                        field={configuredField}
+                        isPending={isPending}
+                        variant={variant}
+                      />
+                    )}
+                  </form.AppField>
                 )
               })}
 
-            <Button
-              type="submit"
-              isPending={isPending}
-              isDisabled={!session}
-              size="sm"
-              className="self-start mt-1"
-            >
-              {isPending && <Spinner color="current" size="sm" />}
-              {localization.settings.saveChanges}
-            </Button>
-          </Form>
+              <form.AuthFormSubmitButton
+                isDisabled={!session}
+                size="sm"
+                className="self-start mt-1"
+              >
+                {localization.settings.saveChanges}
+              </form.AuthFormSubmitButton>
+            </form.AuthFormRoot>
+          </form.AppForm>
         </Card.Content>
       </Card>
     </div>

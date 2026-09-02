@@ -1,3 +1,4 @@
+import { getFormFieldErrorMessage } from "@better-auth-ui/core"
 import type { UsernameAuthClient } from "@better-auth-ui/core/plugins/username"
 import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
 import { useIsUsernameAvailable } from "@better-auth-ui/react/plugins/username"
@@ -10,7 +11,6 @@ import {
   TextField
 } from "@heroui/react"
 import { useDebouncer } from "@tanstack/react-pacer"
-import { useState } from "react"
 import { usernamePlugin } from "../../../lib/auth/username-plugin"
 import type { AdditionalFieldProps } from "../additional-field"
 
@@ -23,6 +23,11 @@ import type { AdditionalFieldProps } from "../additional-field"
 export function UsernameField({
   name,
   field,
+  value,
+  onBlur,
+  onChange,
+  isInvalid,
+  errors,
   isPending,
   variant
 }: AdditionalFieldProps) {
@@ -36,7 +41,8 @@ export function UsernameField({
   } = useAuthPlugin(usernamePlugin)
 
   const currentUsername = String(field.defaultValue ?? "")
-  const [value, setValue] = useState(currentUsername)
+  const username = typeof value === "string" ? value : ""
+  const errorMessage = getFormFieldErrorMessage(errors ?? [])
 
   const {
     mutate: requestAvailability,
@@ -63,7 +69,7 @@ export function UsernameField({
   )
 
   function handleChange(next: string) {
-    setValue(next)
+    onChange(next || null)
     resetAvailability()
 
     if (checkAvailability) {
@@ -72,7 +78,9 @@ export function UsernameField({
   }
 
   const isCheckingAvailability =
-    !!checkAvailability && !!value.trim() && value.trim() !== currentUsername
+    !!checkAvailability &&
+    !!username.trim() &&
+    username.trim() !== currentUsername
 
   const { localization: authLocalization } = useAuth()
 
@@ -85,8 +93,10 @@ export function UsernameField({
       maxLength={maxUsernameLength}
       isDisabled={isPending}
       isReadOnly={field.readOnly}
-      value={value}
+      value={username}
+      onBlur={onBlur}
       onChange={handleChange}
+      isInvalid={isInvalid}
       validate={(val) => {
         if (!val) {
           if (field.required) return authLocalization.auth.fieldRequired
@@ -140,7 +150,7 @@ export function UsernameField({
         )}
       </InputGroup>
 
-      <FieldError />
+      <FieldError>{errorMessage}</FieldError>
     </TextField>
   )
 }
