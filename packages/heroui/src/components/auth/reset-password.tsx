@@ -1,6 +1,8 @@
 import {
   getAuthLinkURL,
-  isPasswordCompromisedError
+  isPasswordCompromisedError,
+  validateMatchingValue,
+  validateStringLength
 } from "@better-auth-ui/core"
 import { useAuth, useResetPassword } from "@better-auth-ui/react"
 import { Eye, EyeSlash } from "@gravity-ui/icons"
@@ -19,8 +21,8 @@ import {
   TextField,
   toast
 } from "@heroui/react"
-import { useForm } from "@tanstack/react-form"
 import { useEffect, useState } from "react"
+import { isAuthFormFieldInvalid, useAuthForm } from "./auth-form"
 import { PasswordStrengthMeter } from "./password-strength-meter"
 
 export type ResetPasswordProps = {
@@ -75,7 +77,7 @@ export function ResetPassword({ className, variant }: ResetPasswordProps) {
     }
   }, [localization.auth.invalidResetPasswordToken, navigate, signInURL])
 
-  const form = useForm({
+  const form = useAuthForm({
     defaultValues: { confirmPassword: "", password: "" },
     onSubmit: ({ value }) => {
       const searchParams = new URLSearchParams(window.location.search)
@@ -84,14 +86,6 @@ export function ResetPassword({ className, variant }: ResetPasswordProps) {
       if (!token) {
         toast.danger(localization.auth.invalidResetPasswordToken)
         navigate({ to: signInURL })
-        return
-      }
-
-      if (
-        emailAndPassword?.confirmPassword &&
-        value.password !== value.confirmPassword
-      ) {
-        toast.danger(localization.auth.passwordsDoNotMatch)
         return
       }
 
@@ -118,82 +112,117 @@ export function ResetPassword({ className, variant }: ResetPasswordProps) {
           }}
           className="flex flex-col gap-4"
         >
-          <form.Field name="password">
-            {(field) => (
-              <TextField
-                minLength={emailAndPassword?.minPasswordLength}
-                maxLength={emailAndPassword?.maxPasswordLength}
-                name={field.name}
-                autoComplete="new-password"
-                value={field.state.value}
-                onBlur={field.handleBlur}
-                onChange={(value) => {
-                  field.handleChange(value)
-                  setIsCompromised(false)
-                }}
-                isInvalid={isCompromised || undefined}
-                isDisabled={isPending}
-                validate={(value) => {
-                  if (!value) return localization.auth.fieldRequired
-                  const min = emailAndPassword?.minPasswordLength
-                  const max = emailAndPassword?.maxPasswordLength
-                  if (min && value.length < min)
-                    return localization.auth.tooShort.replace(
-                      "{{min}}",
-                      String(min)
-                    )
-                  if (max && value.length > max)
-                    return localization.auth.tooLong.replace(
-                      "{{max}}",
-                      String(max)
-                    )
-                }}
-              >
-                <Label>{localization.auth.password}</Label>
+          <form.AppField
+            name="password"
+            validators={{
+              onChange: ({ value }) =>
+                validateStringLength(value, {
+                  maxLength: emailAndPassword?.maxPasswordLength,
+                  maxLengthMessage: localization.auth.tooLong.replace(
+                    "{{max}}",
+                    String(emailAndPassword?.maxPasswordLength)
+                  ),
+                  minLength: emailAndPassword?.minPasswordLength,
+                  minLengthMessage: localization.auth.tooShort.replace(
+                    "{{min}}",
+                    String(emailAndPassword?.minPasswordLength)
+                  ),
+                  requiredMessage: localization.auth.fieldRequired
+                })
+            }}
+          >
+            {(field) => {
+              const isInvalid =
+                isAuthFormFieldInvalid(field.state.meta) || isCompromised
 
-                <InputGroup
-                  variant={variant === "transparent" ? "primary" : "secondary"}
+              return (
+                <TextField
+                  minLength={emailAndPassword?.minPasswordLength}
+                  maxLength={emailAndPassword?.maxPasswordLength}
+                  name={field.name}
+                  autoComplete="new-password"
+                  value={field.state.value}
+                  onBlur={field.handleBlur}
+                  onChange={(value) => {
+                    field.handleChange(value)
+                    setIsCompromised(false)
+                  }}
+                  isInvalid={isInvalid || undefined}
+                  isDisabled={isPending}
+                  validationBehavior="aria"
                 >
-                  <InputGroup.Input
-                    name="password"
-                    placeholder={localization.auth.newPasswordPlaceholder}
-                    type={isPasswordVisible ? "text" : "password"}
-                    required
-                  />
+                  <Label>{localization.auth.password}</Label>
 
-                  <InputGroup.Suffix className="px-0">
-                    <Button
-                      isIconOnly
-                      aria-label={
-                        isPasswordVisible
-                          ? localization.auth.hidePassword
-                          : localization.auth.showPassword
-                      }
-                      size="sm"
-                      variant="ghost"
-                      onPress={() => setIsPasswordVisible(!isPasswordVisible)}
-                      isDisabled={isPending}
-                    >
-                      {isPasswordVisible ? <EyeSlash /> : <Eye />}
-                    </Button>
-                  </InputGroup.Suffix>
-                </InputGroup>
+                  <InputGroup
+                    variant={
+                      variant === "transparent" ? "primary" : "secondary"
+                    }
+                  >
+                    <InputGroup.Input
+                      name="password"
+                      placeholder={localization.auth.newPasswordPlaceholder}
+                      type={isPasswordVisible ? "text" : "password"}
+                      required
+                    />
 
-                {isCompromised ? (
-                  <FieldError>
-                    {localization.auth.passwordCompromised}
-                  </FieldError>
-                ) : (
-                  <FieldError />
-                )}
+                    <InputGroup.Suffix className="px-0">
+                      <Button
+                        isIconOnly
+                        aria-label={
+                          isPasswordVisible
+                            ? localization.auth.hidePassword
+                            : localization.auth.showPassword
+                        }
+                        size="sm"
+                        variant="ghost"
+                        onPress={() => setIsPasswordVisible(!isPasswordVisible)}
+                        isDisabled={isPending}
+                      >
+                        {isPasswordVisible ? <EyeSlash /> : <Eye />}
+                      </Button>
+                    </InputGroup.Suffix>
+                  </InputGroup>
 
-                <PasswordStrengthMeter password={field.state.value} />
-              </TextField>
-            )}
-          </form.Field>
+                  {isCompromised ? (
+                    <FieldError>
+                      {localization.auth.passwordCompromised}
+                    </FieldError>
+                  ) : (
+                    <field.AuthFormFieldError />
+                  )}
+
+                  <PasswordStrengthMeter password={field.state.value} />
+                </TextField>
+              )
+            }}
+          </form.AppField>
 
           {emailAndPassword?.confirmPassword && (
-            <form.Field name="confirmPassword">
+            <form.AppField
+              name="confirmPassword"
+              validators={{
+                onChangeListenTo: ["password"],
+                onChange: ({ fieldApi, value }) =>
+                  validateStringLength(value, {
+                    maxLength: emailAndPassword?.maxPasswordLength,
+                    maxLengthMessage: localization.auth.tooLong.replace(
+                      "{{max}}",
+                      String(emailAndPassword?.maxPasswordLength)
+                    ),
+                    minLength: emailAndPassword?.minPasswordLength,
+                    minLengthMessage: localization.auth.tooShort.replace(
+                      "{{min}}",
+                      String(emailAndPassword?.minPasswordLength)
+                    ),
+                    requiredMessage: localization.auth.fieldRequired
+                  }) ??
+                  validateMatchingValue(
+                    value,
+                    fieldApi.form.getFieldValue("password"),
+                    localization.auth.passwordsDoNotMatch
+                  )
+              }}
+            >
               {(field) => (
                 <TextField
                   minLength={emailAndPassword?.minPasswordLength}
@@ -204,21 +233,10 @@ export function ResetPassword({ className, variant }: ResetPasswordProps) {
                   onBlur={field.handleBlur}
                   onChange={field.handleChange}
                   value={field.state.value}
-                  validate={(value) => {
-                    if (!value) return localization.auth.fieldRequired
-                    const min = emailAndPassword?.minPasswordLength
-                    const max = emailAndPassword?.maxPasswordLength
-                    if (min && value.length < min)
-                      return localization.auth.tooShort.replace(
-                        "{{min}}",
-                        String(min)
-                      )
-                    if (max && value.length > max)
-                      return localization.auth.tooLong.replace(
-                        "{{max}}",
-                        String(max)
-                      )
-                  }}
+                  isInvalid={
+                    isAuthFormFieldInvalid(field.state.meta) || undefined
+                  }
+                  validationBehavior="aria"
                 >
                   <Label>{localization.auth.confirmPassword}</Label>
 
@@ -254,18 +272,33 @@ export function ResetPassword({ className, variant }: ResetPasswordProps) {
                     </InputGroup.Suffix>
                   </InputGroup>
 
-                  <FieldError />
+                  <field.AuthFormFieldError />
                 </TextField>
               )}
-            </form.Field>
+            </form.AppField>
           )}
 
           <div className="flex flex-col gap-3">
-            <Button type="submit" className="w-full" isPending={isPending}>
-              {isPending && <Spinner color="current" size="sm" />}
+            <form.Subscribe
+              selector={(state) =>
+                [state.canSubmit, state.isSubmitting] as const
+              }
+            >
+              {([canSubmit, isSubmitting]) => (
+                <Button
+                  type="submit"
+                  className="w-full"
+                  isDisabled={!canSubmit || isPending}
+                  isPending={isSubmitting || isPending}
+                >
+                  {(isSubmitting || isPending) && (
+                    <Spinner color="current" size="sm" />
+                  )}
 
-              {localization.auth.resetPassword}
-            </Button>
+                  {localization.auth.resetPassword}
+                </Button>
+              )}
+            </form.Subscribe>
           </div>
         </Form>
       </Card.Content>

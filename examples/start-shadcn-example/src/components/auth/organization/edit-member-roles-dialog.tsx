@@ -1,14 +1,13 @@
 "use client"
 
+import { validateMinimumItems } from "@better-auth-ui/core"
 import type { OrganizationAuthClient } from "@better-auth-ui/core/plugins/organization"
 import { parseMemberRoles } from "@better-auth-ui/core/plugins/organization"
 import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
 import { useUpdateMemberRole } from "@better-auth-ui/react/plugins/organization"
-import { useForm } from "@tanstack/react-form"
 import { ShieldCheck } from "lucide-react"
 import { useEffect } from "react"
 import { toast } from "sonner"
-
 import { Button, buttonVariants } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import {
@@ -23,12 +22,16 @@ import {
 import {
   Field,
   FieldContent,
+  FieldGroup,
   FieldLabel,
+  FieldLegend,
+  FieldSet,
   FieldTitle
 } from "@/components/ui/field"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Spinner } from "@/components/ui/spinner"
 import { organizationPlugin } from "@/lib/auth/organization-plugin"
+import { useAuthForm } from "../auth-form"
 
 export type EditMemberRolesDialogProps = {
   member: {
@@ -81,7 +84,7 @@ export function EditMemberRolesDialog({
       }
     }
   )
-  const form = useForm({
+  const form = useAuthForm({
     defaultValues: {
       roles: selectedMemberRoles(member.role, allowMultipleRoles, protectedRole)
     },
@@ -107,18 +110,6 @@ export function EditMemberRolesDialog({
       })
   }, [allowMultipleRoles, form.reset, member.role, open, protectedRole])
 
-  const toggleRole = (role: string, checked: boolean) => {
-    const current = form.getFieldValue("roles")
-    form.setFieldValue(
-      "roles",
-      checked
-        ? current.includes(role)
-          ? current
-          : [...current, role]
-        : current.filter((entry) => entry !== role)
-    )
-  }
-
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
@@ -139,8 +130,20 @@ export function EditMemberRolesDialog({
             </DialogDescription>
           </DialogHeader>
 
-          <form.Subscribe selector={(state) => state.values.roles}>
-            {(selectedRoles) => {
+          <form.AppField
+            name="roles"
+            mode="array"
+            validators={{
+              onChange: ({ value }) =>
+                validateMinimumItems(
+                  value,
+                  1,
+                  organizationLocalization.selectRoles
+                )
+            }}
+          >
+            {(field) => {
+              const selectedRoles = field.state.value
               const protectedRoleSelected =
                 !allowMultipleRoles &&
                 protectedRoleRemovalDisabled &&
@@ -170,9 +173,15 @@ export function EditMemberRolesDialog({
                           checked={checked}
                           disabled={disabled}
                           id={id}
-                          onCheckedChange={(next) =>
-                            toggleRole(role, next === true)
-                          }
+                          onCheckedChange={(next) => {
+                            if (next === true && !checked) {
+                              field.pushValue(role)
+                              return
+                            }
+
+                            const index = selectedRoles.indexOf(role)
+                            if (index >= 0) field.removeValue(index)
+                          }}
                         />
                       ) : (
                         <RadioGroupItem
@@ -189,18 +198,23 @@ export function EditMemberRolesDialog({
               return (
                 <>
                   {allowMultipleRoles ? (
-                    <div className="flex flex-col gap-2">{roleOptions}</div>
+                    <FieldSet>
+                      <FieldLegend className="sr-only" variant="label">
+                        {organizationLocalization.changeMemberRole}
+                      </FieldLegend>
+                      <FieldGroup className="gap-2">{roleOptions}</FieldGroup>
+                    </FieldSet>
                   ) : (
                     <RadioGroup
                       disabled={isPending}
-                      onValueChange={(role) =>
-                        form.setFieldValue("roles", [role])
-                      }
+                      onValueChange={(role) => field.handleChange([role])}
                       value={selectedRoles[0] ?? ""}
                     >
                       {roleOptions}
                     </RadioGroup>
                   )}
+
+                  <field.AuthFormFieldError />
 
                   <DialogFooter>
                     <DialogClose
@@ -211,7 +225,11 @@ export function EditMemberRolesDialog({
                       {localization.settings.cancel}
                     </DialogClose>
                     <Button
-                      disabled={isPending || selectedRoles.length === 0}
+                      disabled={
+                        isPending ||
+                        form.state.isSubmitting ||
+                        !form.state.canSubmit
+                      }
                       type="submit"
                     >
                       {isPending && <Spinner />}
@@ -221,7 +239,7 @@ export function EditMemberRolesDialog({
                 </>
               )
             }}
-          </form.Subscribe>
+          </form.AppField>
         </form>
       </DialogContent>
     </Dialog>

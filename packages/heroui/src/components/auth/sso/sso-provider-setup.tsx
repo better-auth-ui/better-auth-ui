@@ -22,11 +22,10 @@ import {
   TextArea,
   TextField
 } from "@heroui/react"
-import { useForm } from "@tanstack/react-form"
 import type { BetterFetchError } from "better-auth/client"
 import { useState } from "react"
-
 import { ssoPlugin } from "../../../lib/auth/sso-plugin"
+import { useAuthForm } from "../auth-form"
 
 type SsoProtocol = "oidc" | "saml"
 
@@ -66,7 +65,7 @@ export function SsoProviderSetup({
   const { localization } = useAuthPlugin(ssoPlugin)
   const [created, setCreated] = useState(false)
   const register = useRegisterSsoProvider(authClient as SsoAuthClient)
-  const form = useForm({
+  const form = useAuthForm({
     defaultValues: {
       clientId: "",
       clientSecret: "",
@@ -324,10 +323,13 @@ export function SsoProviderSetup({
             </Alert>
           ) : null}
 
-          <form.Subscribe selector={(state) => state.isSubmitting}>
-            {(isSubmitting) => (
+          <form.Subscribe
+            selector={(state) => [state.canSubmit, state.isSubmitting] as const}
+          >
+            {([canSubmit, isSubmitting]) => (
               <Button
                 className="self-end"
+                isDisabled={!canSubmit}
                 isPending={isSubmitting || register.isPending}
                 type="submit"
               >

@@ -2164,7 +2164,7 @@ describe("Solid auth route component selection", () => {
     expect(changePassword).toContain("resetLinkSentTo")
     expect(changePassword).toContain("OpenEmailButton")
     expect(changePassword).toContain("const changePassword = useChangePassword")
-    expect(changePassword).toContain("createForm(() => ({")
+    expect(changePassword).toContain("createAuthForm(() => ({")
     expect(changePassword).toContain("onSubmit: ({ value }) =>")
     expect(changePassword).toContain("passwordsDoNotMatch")
     expect(changePassword).toContain("changePassword.mutate({")
@@ -2175,8 +2175,8 @@ describe("Solid auth route component selection", () => {
     expect(changePassword).toContain(
       "auth.localization.settings.currentPassword"
     )
-    expect(changePassword).toContain(
-      "auth.localization.settings.currentPasswordPlaceholder"
+    expect(changePassword).toMatch(
+      /auth\.localization\.settings\s*\.currentPasswordPlaceholder/
     )
     expect(changePassword).toContain("auth.localization.auth.newPassword")
     expect(changePassword).toContain(

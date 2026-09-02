@@ -1,6 +1,10 @@
 "use client"
 
 import {
+  validateAbsoluteUrlList,
+  validateStringLength
+} from "@better-auth-ui/core"
+import {
   createBetterAuthOAuthClientManager,
   type ManagedOAuthClient,
   type OAuthClientInput,
@@ -37,7 +41,6 @@ import {
   Card,
   type CardProps,
   cn,
-  FieldError,
   Form,
   Input,
   InputGroup,
@@ -51,10 +54,9 @@ import {
   TextField,
   toast
 } from "@heroui/react"
-import { useForm } from "@tanstack/react-form"
 import { useMemo, useState } from "react"
-
 import { oauthProviderPlugin } from "../../../lib/auth/oauth-provider-plugin"
+import { isAuthFormFieldInvalid, useAuthForm } from "../auth-form"
 
 type ClientAction =
   | { kind: "delete"; client: ManagedOAuthClient }
@@ -121,7 +123,7 @@ export function OAuthClients({
     onError: (error) =>
       toast.danger(error instanceof Error ? error.message : String(error))
   })
-  const form = useForm({
+  const form = useAuthForm({
     defaultValues: getOAuthClientFormValues(),
     onSubmit: async ({ value }) => {
       const input: OAuthClientInput = {
@@ -345,7 +347,15 @@ export function OAuthClients({
                 </Modal.Heading>
               </Modal.Header>
               <Modal.Body className="flex flex-col gap-4 overflow-visible">
-                <form.Field name="clientName">
+                <form.AppField
+                  name="clientName"
+                  validators={{
+                    onChange: ({ value }) =>
+                      validateStringLength(value, {
+                        requiredMessage: localization.auth.fieldRequired
+                      })
+                  }}
+                >
                   {(field) => (
                     <TextField
                       isRequired
@@ -353,13 +363,17 @@ export function OAuthClients({
                       onBlur={field.handleBlur}
                       onChange={field.handleChange}
                       value={field.state.value}
+                      isInvalid={
+                        isAuthFormFieldInvalid(field.state.meta) || undefined
+                      }
+                      validationBehavior="aria"
                     >
                       <Label>{oauthLocalization.clientName}</Label>
                       <Input autoFocus variant="secondary" />
-                      <FieldError />
+                      <field.AuthFormFieldError />
                     </TextField>
                   )}
-                </form.Field>
+                </form.AppField>
                 <form.Field name="applicationType">
                   {(field) => (
                     <Select
@@ -388,7 +402,16 @@ export function OAuthClients({
                     </Select>
                   )}
                 </form.Field>
-                <form.Field name="redirectUris">
+                <form.AppField
+                  name="redirectUris"
+                  validators={{
+                    onChange: ({ value }) =>
+                      validateAbsoluteUrlList(value, {
+                        invalidMessage: oauthLocalization.invalidUrl,
+                        requiredMessage: localization.auth.fieldRequired
+                      })
+                  }}
+                >
                   {(field) => (
                     <TextField
                       isRequired
@@ -396,16 +419,20 @@ export function OAuthClients({
                       onBlur={field.handleBlur}
                       onChange={field.handleChange}
                       value={field.state.value}
+                      isInvalid={
+                        isAuthFormFieldInvalid(field.state.meta) || undefined
+                      }
+                      validationBehavior="aria"
                     >
                       <Label>{oauthLocalization.redirectUrls}</Label>
                       <TextArea rows={3} variant="secondary" />
                       <p className="text-muted text-xs">
                         {oauthLocalization.redirectUrlsDescription}
                       </p>
-                      <FieldError />
+                      <field.AuthFormFieldError />
                     </TextField>
                   )}
-                </form.Field>
+                </form.AppField>
                 {(
                   [
                     ["clientUri", oauthLocalization.applicationUrl, "url"],
@@ -440,9 +467,17 @@ export function OAuthClients({
                 <Button variant="ghost" onPress={() => setEditorOpen(false)}>
                   {oauthLocalization.cancel}
                 </Button>
-                <form.Subscribe selector={(state) => state.isSubmitting}>
-                  {(isSubmitting) => (
-                    <Button type="submit" isPending={isSubmitting}>
+                <form.Subscribe
+                  selector={(state) =>
+                    [state.canSubmit, state.isSubmitting] as const
+                  }
+                >
+                  {([canSubmit, isSubmitting]) => (
+                    <Button
+                      type="submit"
+                      isDisabled={!canSubmit}
+                      isPending={isSubmitting}
+                    >
                       {editingClient
                         ? oauthLocalization.saveChanges
                         : oauthLocalization.createClient}

@@ -34,12 +34,11 @@ import {
   TextField,
   toast
 } from "@heroui/react"
-import { useForm } from "@tanstack/react-form"
 import type { BetterFetchError } from "better-auth/client"
 import { useMemo, useState } from "react"
-
 import { organizationPlugin } from "../../../lib/auth/organization-plugin"
 import { ssoPlugin } from "../../../lib/auth/sso-plugin"
+import { useAuthForm } from "../auth-form"
 import { SsoDomainVerification } from "./sso-domain-verification"
 import { SsoProviderSetup } from "./sso-provider-setup"
 
@@ -281,7 +280,7 @@ function EditSsoProviderDialog({
     update.reset()
     onOpenChange(undefined)
   }
-  const form = useForm({
+  const form = useAuthForm({
     defaultValues: getSsoProviderEditorValues(provider),
     onSubmit: async ({ value }) => {
       if (!provider) return
@@ -463,9 +462,17 @@ function EditSsoProviderDialog({
               >
                 {localization.cancel}
               </Button>
-              <form.Subscribe selector={(state) => state.isSubmitting}>
-                {(isSubmitting) => (
-                  <Button isPending={isSubmitting} type="submit">
+              <form.Subscribe
+                selector={(state) =>
+                  [state.canSubmit, state.isSubmitting] as const
+                }
+              >
+                {([canSubmit, isSubmitting]) => (
+                  <Button
+                    isDisabled={!canSubmit}
+                    isPending={isSubmitting}
+                    type="submit"
+                  >
                     {localization.saveProvider}
                   </Button>
                 )}

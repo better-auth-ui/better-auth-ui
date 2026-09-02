@@ -1,3 +1,4 @@
+import { getLookaheadPage } from "@better-auth-ui/core"
 import type {
   ApiKeyAuthClient,
   ListedApiKey
@@ -23,7 +24,7 @@ import {
   tableFeatures,
   type Updater
 } from "@tanstack/react-table"
-import { useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 
 import { apiKeyPlugin } from "../../../lib/auth/api-key-plugin"
 import { ApiKey } from "./api-key"
@@ -89,7 +90,7 @@ export function ApiKeys({
     {
       enabled: !isPendingProp,
       query: {
-        limit: pagination.pageSize,
+        limit: pagination.pageSize + 1,
         offset: pagination.pageIndex * pagination.pageSize,
         sortBy,
         sortDirection,
@@ -99,15 +100,33 @@ export function ApiKeys({
   )
 
   const isPending = isPendingProp || isListPending
+  const page = useMemo(
+    () =>
+      getLookaheadPage(
+        listData?.apiKeys ?? EMPTY_API_KEYS,
+        pagination.pageSize
+      ),
+    [listData?.apiKeys, pagination.pageSize]
+  )
   const setPagination = (updater: Updater<PaginationState>) =>
     setPaginationState((current) => functionalUpdate(updater, current))
   const setSorting = (updater: Updater<SortingState>) => {
     setSortingState((current) => functionalUpdate(updater, current))
     setPaginationState((current) => ({ ...current, pageIndex: 0 }))
   }
+
+  useEffect(() => {
+    if (!isPending && pagination.pageIndex > 0 && page.rows.length === 0) {
+      setPaginationState((current) => ({
+        ...current,
+        pageIndex: Math.max(0, current.pageIndex - 1)
+      }))
+    }
+  }, [isPending, page.rows.length, pagination.pageIndex])
+
   const table = useApiKeyTable({
     columns: apiKeyColumns,
-    data: listData?.apiKeys ?? EMPTY_API_KEYS,
+    data: page.rows,
     getRowId: (apiKey) => apiKey.id,
     manualPagination: true,
     manualSorting: true,
@@ -171,7 +190,7 @@ export function ApiKeys({
         <Card.Content>
           {isPending ? (
             <ApiKeySkeleton />
-          ) : !listData?.apiKeys.length ? (
+          ) : page.rows.length === 0 ? (
             <ApiKeysEmpty
               onCreatePress={() => setCreateOpen(true)}
               hideCreate={hideCreate}
@@ -194,8 +213,7 @@ export function ApiKeys({
           )}
         </Card.Content>
       </Card>
-      {(pagination.pageIndex > 0 ||
-        (listData?.apiKeys.length ?? 0) === pagination.pageSize) && (
+      {(pagination.pageIndex > 0 || page.hasNextPage) && (
         <div className="flex justify-end gap-2">
           <Button
             size="sm"
@@ -208,7 +226,7 @@ export function ApiKeys({
           <Button
             size="sm"
             variant="outline"
-            isDisabled={(listData?.apiKeys.length ?? 0) < pagination.pageSize}
+            isDisabled={!page.hasNextPage}
             onPress={() => table.nextPage()}
           >
             {apiKeyLocalization.nextPage}

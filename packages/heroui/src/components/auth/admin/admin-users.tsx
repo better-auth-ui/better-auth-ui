@@ -57,7 +57,6 @@ import {
   Tabs,
   TextField
 } from "@heroui/react"
-import { useForm } from "@tanstack/react-form"
 import { keepPreviousData } from "@tanstack/react-query"
 import {
   type ColumnFiltersState,
@@ -75,9 +74,9 @@ import {
   useRef,
   useState
 } from "react"
-
 import { adminPlugin } from "../../../lib/auth/admin-plugin"
 import { AdditionalField } from "../additional-field"
+import { useAuthForm } from "../auth-form"
 import { UserAvatar } from "../user/user-avatar"
 import { createAdminColumnHelper, useAdminTable } from "./admin-table"
 
@@ -594,7 +593,7 @@ function CreateUserDialog({
   const additionalFieldValuesRef = useRef<
     Record<string, AdditionalFieldValue | null>
   >({})
-  const form = useForm({
+  const form = useAuthForm({
     defaultValues: {
       email: "",
       emailVerified: false,
@@ -915,7 +914,7 @@ function UserDrawer({
   const profileAdditionalFieldValuesRef = useRef<
     Record<string, AdditionalFieldValue | null>
   >({})
-  const profileForm = useForm({
+  const profileForm = useAuthForm({
     defaultValues: {
       email: "",
       emailVerified: false,

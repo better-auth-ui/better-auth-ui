@@ -1,4 +1,9 @@
-import { getViewURL, isPasswordCompromisedError } from "@better-auth-ui/core"
+import {
+  getViewURL,
+  isPasswordCompromisedError,
+  validateMatchingValue,
+  validateStringLength
+} from "@better-auth-ui/core"
 import {
   useAuth,
   useChangePassword,
@@ -23,8 +28,8 @@ import {
   TextField,
   toast
 } from "@heroui/react"
-import { useForm } from "@tanstack/react-form"
 import { useState } from "react"
+import { isAuthFormFieldInvalid, useAuthForm } from "../../auth-form"
 
 import { OpenEmailButton } from "../../open-email-button"
 import { PasswordStrengthMeter } from "../../password-strength-meter"
@@ -185,8 +190,6 @@ function ChangePasswordForm({
       // The haveIBeenPwned plugin rejects on the password itself, so it
       // belongs against the field rather than in a toast.
       setIsCompromised(isPasswordCompromisedError(error))
-
-      form.reset()
     },
     onSuccess: () => {
       form.reset()
@@ -198,22 +201,13 @@ function ChangePasswordForm({
   const [isConfirmPasswordVisible, setIsConfirmPasswordVisible] =
     useState(false)
 
-  const form = useForm({
+  const form = useAuthForm({
     defaultValues: {
       confirmPassword: "",
       currentPassword: "",
       newPassword: ""
     },
     onSubmit: ({ value }) => {
-      if (
-        emailAndPassword?.confirmPassword &&
-        value.newPassword !== value.confirmPassword
-      ) {
-        form.reset()
-        toast.danger(localization.auth.passwordsDoNotMatch)
-        return
-      }
-
       changePassword({
         currentPassword: value.currentPassword,
         newPassword: value.newPassword,
@@ -238,13 +232,26 @@ function ChangePasswordForm({
           >
             <Fieldset className="w-full gap-4">
               <Fieldset.Group>
-                <form.Field name="currentPassword">
+                <form.AppField
+                  name="currentPassword"
+                  validators={{
+                    onChange: ({ value }) =>
+                      validateStringLength(value, {
+                        requiredMessage: localization.auth.fieldRequired
+                      })
+                  }}
+                >
                   {(field) => (
                     <TextField
                       name={field.name}
                       isDisabled={isPending || !session}
                       value={field.state.value}
+                      onBlur={field.handleBlur}
                       onChange={field.handleChange}
+                      isInvalid={
+                        isAuthFormFieldInvalid(field.state.meta) || undefined
+                      }
+                      validationBehavior="aria"
                     >
                       <Label>{localization.settings.currentPassword}</Label>
 
@@ -290,79 +297,130 @@ function ChangePasswordForm({
                         <Skeleton className="h-10 md:h-9 w-full rounded-xl" />
                       )}
 
-                      <FieldError />
+                      <field.AuthFormFieldError />
                     </TextField>
                   )}
-                </form.Field>
+                </form.AppField>
 
-                <form.Field name="newPassword">
-                  {(field) => (
-                    <TextField
-                      minLength={emailAndPassword?.minPasswordLength}
-                      maxLength={emailAndPassword?.maxPasswordLength}
-                      isDisabled={isPending || !session}
-                      value={field.state.value}
-                      onChange={(value) => {
-                        field.handleChange(value)
-                        setIsCompromised(false)
-                      }}
-                      isInvalid={isCompromised || undefined}
-                    >
-                      <Label>{localization.auth.newPassword}</Label>
+                <form.AppField
+                  name="newPassword"
+                  validators={{
+                    onChange: ({ value }) =>
+                      validateStringLength(value, {
+                        maxLength: emailAndPassword?.maxPasswordLength,
+                        maxLengthMessage: localization.auth.tooLong.replace(
+                          "{{max}}",
+                          String(emailAndPassword?.maxPasswordLength)
+                        ),
+                        minLength: emailAndPassword?.minPasswordLength,
+                        minLengthMessage: localization.auth.tooShort.replace(
+                          "{{min}}",
+                          String(emailAndPassword?.minPasswordLength)
+                        ),
+                        requiredMessage: localization.auth.fieldRequired
+                      })
+                  }}
+                >
+                  {(field) => {
+                    const isInvalid =
+                      isAuthFormFieldInvalid(field.state.meta) || isCompromised
 
-                      <InputGroup
-                        className={cn(!session && "hidden")}
-                        variant={
-                          variant === "transparent" ? "primary" : "secondary"
-                        }
+                    return (
+                      <TextField
+                        minLength={emailAndPassword?.minPasswordLength}
+                        maxLength={emailAndPassword?.maxPasswordLength}
+                        isDisabled={isPending || !session}
+                        value={field.state.value}
+                        onBlur={field.handleBlur}
+                        onChange={(value) => {
+                          field.handleChange(value)
+                          setIsCompromised(false)
+                        }}
+                        isInvalid={isInvalid || undefined}
+                        validationBehavior="aria"
                       >
-                        <InputGroup.Input
-                          name="newPassword"
-                          type={isNewPasswordVisible ? "text" : "password"}
-                          autoComplete="new-password"
-                          placeholder={localization.auth.newPasswordPlaceholder}
-                          required
-                        />
+                        <Label>{localization.auth.newPassword}</Label>
 
-                        <InputGroup.Suffix className="px-0">
-                          <Button
-                            isIconOnly
-                            aria-label={
-                              isNewPasswordVisible
-                                ? localization.auth.hidePassword
-                                : localization.auth.showPassword
+                        <InputGroup
+                          className={cn(!session && "hidden")}
+                          variant={
+                            variant === "transparent" ? "primary" : "secondary"
+                          }
+                        >
+                          <InputGroup.Input
+                            name="newPassword"
+                            type={isNewPasswordVisible ? "text" : "password"}
+                            autoComplete="new-password"
+                            placeholder={
+                              localization.auth.newPasswordPlaceholder
                             }
-                            size="sm"
-                            variant="ghost"
-                            onPress={() =>
-                              setIsNewPasswordVisible(!isNewPasswordVisible)
-                            }
-                            isDisabled={isPending}
-                          >
-                            {isNewPasswordVisible ? <EyeSlash /> : <Eye />}
-                          </Button>
-                        </InputGroup.Suffix>
-                      </InputGroup>
+                            required
+                          />
 
-                      {!session && (
-                        <Skeleton className="h-10 md:h-9 w-full rounded-xl" />
-                      )}
+                          <InputGroup.Suffix className="px-0">
+                            <Button
+                              isIconOnly
+                              aria-label={
+                                isNewPasswordVisible
+                                  ? localization.auth.hidePassword
+                                  : localization.auth.showPassword
+                              }
+                              size="sm"
+                              variant="ghost"
+                              onPress={() =>
+                                setIsNewPasswordVisible(!isNewPasswordVisible)
+                              }
+                              isDisabled={isPending}
+                            >
+                              {isNewPasswordVisible ? <EyeSlash /> : <Eye />}
+                            </Button>
+                          </InputGroup.Suffix>
+                        </InputGroup>
 
-                      {isCompromised ? (
-                        <FieldError>
-                          {localization.auth.passwordCompromised}
-                        </FieldError>
-                      ) : (
-                        <FieldError />
-                      )}
+                        {!session && (
+                          <Skeleton className="h-10 md:h-9 w-full rounded-xl" />
+                        )}
 
-                      <PasswordStrengthMeter password={field.state.value} />
-                    </TextField>
-                  )}
-                </form.Field>
+                        {isCompromised ? (
+                          <FieldError>
+                            {localization.auth.passwordCompromised}
+                          </FieldError>
+                        ) : (
+                          <field.AuthFormFieldError />
+                        )}
+
+                        <PasswordStrengthMeter password={field.state.value} />
+                      </TextField>
+                    )
+                  }}
+                </form.AppField>
 
                 {emailAndPassword?.confirmPassword && (
-                  <form.Field name="confirmPassword">
+                  <form.AppField
+                    name="confirmPassword"
+                    validators={{
+                      onChangeListenTo: ["newPassword"],
+                      onChange: ({ fieldApi, value }) =>
+                        validateStringLength(value, {
+                          maxLength: emailAndPassword?.maxPasswordLength,
+                          maxLengthMessage: localization.auth.tooLong.replace(
+                            "{{max}}",
+                            String(emailAndPassword?.maxPasswordLength)
+                          ),
+                          minLength: emailAndPassword?.minPasswordLength,
+                          minLengthMessage: localization.auth.tooShort.replace(
+                            "{{min}}",
+                            String(emailAndPassword?.minPasswordLength)
+                          ),
+                          requiredMessage: localization.auth.fieldRequired
+                        }) ??
+                        validateMatchingValue(
+                          value,
+                          fieldApi.form.getFieldValue("newPassword"),
+                          localization.auth.passwordsDoNotMatch
+                        )
+                    }}
+                  >
                     {(field) => (
                       <TextField
                         minLength={emailAndPassword?.minPasswordLength}
@@ -370,7 +428,12 @@ function ChangePasswordForm({
                         isDisabled={isPending || !session}
                         isRequired
                         value={field.state.value}
+                        onBlur={field.handleBlur}
                         onChange={field.handleChange}
+                        isInvalid={
+                          isAuthFormFieldInvalid(field.state.meta) || undefined
+                        }
+                        validationBehavior="aria"
                       >
                         <Label>{localization.auth.confirmPassword}</Label>
 
@@ -422,23 +485,33 @@ function ChangePasswordForm({
                           <Skeleton className="h-10 md:h-9 w-full rounded-xl" />
                         )}
 
-                        <FieldError />
+                        <field.AuthFormFieldError />
                       </TextField>
                     )}
-                  </form.Field>
+                  </form.AppField>
                 )}
               </Fieldset.Group>
 
               <Fieldset.Actions>
-                <Button
-                  type="submit"
-                  isPending={isPending}
-                  isDisabled={!session}
-                  size="sm"
+                <form.Subscribe
+                  selector={(state) =>
+                    [state.canSubmit, state.isSubmitting] as const
+                  }
                 >
-                  {isPending && <Spinner color="current" size="sm" />}
-                  {localization.settings.updatePassword}
-                </Button>
+                  {([canSubmit, isSubmitting]) => (
+                    <Button
+                      type="submit"
+                      isPending={isSubmitting || isPending}
+                      isDisabled={!canSubmit || !session}
+                      size="sm"
+                    >
+                      {(isSubmitting || isPending) && (
+                        <Spinner color="current" size="sm" />
+                      )}
+                      {localization.settings.updatePassword}
+                    </Button>
+                  )}
+                </form.Subscribe>
               </Fieldset.Actions>
             </Fieldset>
           </Form>

@@ -1,4 +1,8 @@
 import {
+  type FormFieldError as FormFieldErrorValue,
+  validateMinimumItems
+} from "@better-auth-ui/core"
+import {
   type OrganizationAuthClient,
   type OrganizationLocalization,
   parseMemberRoles,
@@ -6,11 +10,9 @@ import {
 } from "@better-auth-ui/core/plugins/organization"
 import { useAuth, useAuthPlugin } from "@better-auth-ui/solid"
 import { useUpdateMemberRole } from "@better-auth-ui/solid/plugins/organization"
-import { createForm } from "@tanstack/solid-form"
 import { ShieldCheck } from "lucide-solid"
 import { createEffect, For, Show } from "solid-js"
 import { toast } from "solid-sonner"
-
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import {
@@ -24,11 +26,13 @@ import {
 import {
   Field,
   FieldContent,
+  FieldError,
   FieldLabel,
   FieldTitle
 } from "@/components/ui/field"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { organizationPlugin } from "@/lib/auth/organization-plugin"
+import { createAuthForm } from "../auth-form"
 
 type EditMemberRolesLocalization = Pick<
   OrganizationLocalization,
@@ -75,7 +79,7 @@ export function EditMemberRolesDialog(props: EditMemberRolesDialogProps) {
       props.onOpenChange(false)
     }
   }))
-  const form = createForm(() => ({
+  const form = createAuthForm(() => ({
     defaultValues: {
       roles: selectedMemberRoles(
         props.member.role,
@@ -125,7 +129,18 @@ export function EditMemberRolesDialog(props: EditMemberRolesDialogProps) {
             </DialogDescription>
           </DialogHeader>
 
-          <form.Field name="roles">
+          <form.AppField
+            name="roles"
+            mode="array"
+            validators={{
+              onChange: ({ value }) =>
+                validateMinimumItems(
+                  value,
+                  1,
+                  props.localization.changeMemberRole
+                )
+            }}
+          >
             {(field) => {
               const selectedRoles = () => field().state.value
               const protectedRoleSelected = () =>
@@ -205,17 +220,15 @@ export function EditMemberRolesDialog(props: EditMemberRolesDialogProps) {
                                   checked={checked()}
                                   disabled={disabled()}
                                   id={id}
-                                  onChange={(selected) =>
-                                    field().handleChange(
-                                      selected
-                                        ? selectedRoles().includes(role)
-                                          ? selectedRoles()
-                                          : [...selectedRoles(), role]
-                                        : selectedRoles().filter(
-                                            (entry) => entry !== role
-                                          )
-                                    )
-                                  }
+                                  onChange={(selected) => {
+                                    if (selected && !checked()) {
+                                      field().pushValue(role)
+                                      return
+                                    }
+
+                                    const index = selectedRoles().indexOf(role)
+                                    if (index >= 0) field().removeValue(index)
+                                  }}
                                 />
                               </Field>
                             </FieldLabel>
@@ -224,6 +237,14 @@ export function EditMemberRolesDialog(props: EditMemberRolesDialogProps) {
                       </For>
                     </div>
                   </Show>
+
+                  <FieldError
+                    errors={
+                      field().state.meta.errors as Array<
+                        FormFieldErrorValue | undefined
+                      >
+                    }
+                  />
 
                   <DialogFooter>
                     <Button
@@ -237,7 +258,8 @@ export function EditMemberRolesDialog(props: EditMemberRolesDialogProps) {
                     <Button
                       disabled={
                         updateMemberRole.isPending ||
-                        selectedRoles().length === 0
+                        form.state.isSubmitting ||
+                        !form.state.canSubmit
                       }
                       type="submit"
                     >
@@ -247,7 +269,7 @@ export function EditMemberRolesDialog(props: EditMemberRolesDialogProps) {
                 </>
               )
             }}
-          </form.Field>
+          </form.AppField>
         </form>
       </DialogContent>
     </Dialog>

@@ -1,6 +1,13 @@
 "use client"
 
 import {
+  parseTableColumnVisibility,
+  parseTablePage,
+  parseTablePageSize,
+  parseTableSorting,
+  serializeTableColumnVisibility
+} from "@better-auth-ui/core"
+import {
   type ColumnFiltersState,
   type ColumnVisibilityState,
   functionalUpdate,
@@ -19,22 +26,6 @@ type OrganizationTableUrlState = {
   globalFilter: string
   pagination: PaginationState
   sorting: SortingState
-}
-
-function parsePositiveInteger(value: string | null, fallback: number) {
-  const parsed = Number(value)
-  return Number.isSafeInteger(parsed) && parsed > 0 ? parsed : fallback
-}
-
-function parseSorting(value: string | null): SortingState {
-  if (!value) return []
-
-  return value.split(",").flatMap((entry) => {
-    const [id, direction] = entry.split(".")
-    return id && (direction === "asc" || direction === "desc")
-      ? [{ id, desc: direction === "desc" }]
-      : []
-  })
 }
 
 function readUrlState(
@@ -58,13 +49,14 @@ function readUrlState(
     columnFilters,
     globalFilter: params.get(`${stateKey}.search`) ?? "",
     pagination: {
-      pageIndex: parsePositiveInteger(params.get(`${stateKey}.page`), 1) - 1,
-      pageSize: parsePositiveInteger(
+      pageIndex: parseTablePage(params.get(`${stateKey}.page`), 1) - 1,
+      pageSize: parseTablePageSize(
         params.get(`${stateKey}.pageSize`),
-        defaultPageSize
+        defaultPageSize,
+        ORGANIZATION_TABLE_PAGE_SIZE_OPTIONS
       )
     },
-    sorting: parseSorting(params.get(`${stateKey}.sort`))
+    sorting: parseTableSorting(params.get(`${stateKey}.sort`))
   }
 }
 
@@ -75,7 +67,7 @@ function readColumnVisibility(stateKey: string): ColumnVisibilityState {
     const value = window.localStorage.getItem(
       `${TABLE_STATE_STORAGE_PREFIX}:${stateKey}:columns`
     )
-    return value ? (JSON.parse(value) as ColumnVisibilityState) : {}
+    return parseTableColumnVisibility(value)
   } catch {
     return {}
   }
@@ -201,7 +193,7 @@ export function useOrganizationTableState(
     try {
       window.localStorage.setItem(
         `${TABLE_STATE_STORAGE_PREFIX}:${stateKey}:columns`,
-        JSON.stringify(columnVisibility)
+        serializeTableColumnVisibility(columnVisibility)
       )
     } catch {
       // Browsers can disable storage while still allowing the table to work.

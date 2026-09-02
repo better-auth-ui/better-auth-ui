@@ -392,6 +392,7 @@ export const deDEPlugins = {
     nativeApplication: "Nativ",
     redirectUrls: "Weiterleitungs-URLs",
     redirectUrlsDescription: "Gib eine URL pro Zeile ein.",
+    invalidUrl: "Gib eine gültige absolute URL ein.",
     applicationUrl: "Anwendungs-URL",
     logoUrl: "Logo-URL",
     scopes: "Geltungsbereiche",

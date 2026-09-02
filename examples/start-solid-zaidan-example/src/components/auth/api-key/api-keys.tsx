@@ -1,3 +1,4 @@
+import { getLookaheadPage } from "@better-auth-ui/core"
 import {
   type ApiKeyAuthClient,
   apiKeyLocalization,
@@ -15,7 +16,7 @@ import {
   tableFeatures,
   type Updater
 } from "@tanstack/solid-table"
-import { createSignal, For, Show } from "solid-js"
+import { createEffect, createMemo, createSignal, For, Show } from "solid-js"
 import { ApiKey } from "@/components/auth/api-key/api-key"
 import { ApiKeySkeleton } from "@/components/auth/api-key/api-key-skeleton"
 import { ApiKeysEmpty } from "@/components/auth/api-key/api-keys-empty"
@@ -95,14 +96,19 @@ export function ApiKeys(props: ApiKeysProps = {}) {
             configId: "organization" as const
           }
         : {}),
-      limit: pagination().pageSize,
+      limit: pagination().pageSize + 1,
       offset: pagination().pageIndex * pagination().pageSize,
       sortBy: sort().id.split(":")[0],
       sortDirection: sort().id.split(":")[1] as "asc" | "desc"
     }
   })
   const apiKeys = useListApiKeys(auth.authClient, () => listParams() ?? {})
-  const keys = () => apiKeys.data?.apiKeys ?? []
+  const page = createMemo(() =>
+    getLookaheadPage(
+      apiKeys.data?.apiKeys ?? EMPTY_API_KEYS,
+      pagination().pageSize
+    )
+  )
   const pending = () => Boolean(props.isPending || apiKeys.isPending)
   const setPagination = (updater: Updater<PaginationState>) =>
     setPaginationState((current) => functionalUpdate(updater, current))
@@ -110,10 +116,20 @@ export function ApiKeys(props: ApiKeysProps = {}) {
     setSortingState((current) => functionalUpdate(updater, current))
     setPaginationState((current) => ({ ...current, pageIndex: 0 }))
   }
+
+  createEffect(() => {
+    if (!pending() && pagination().pageIndex > 0 && page().rows.length === 0) {
+      setPaginationState((current) => ({
+        ...current,
+        pageIndex: Math.max(0, current.pageIndex - 1)
+      }))
+    }
+  })
+
   const table = createApiKeyTable({
     columns: apiKeyColumns,
     get data() {
-      return apiKeys.data?.apiKeys ?? EMPTY_API_KEYS
+      return page().rows
     },
     get state() {
       return { pagination: pagination(), sorting: sorting() }
@@ -187,7 +203,7 @@ export function ApiKeys(props: ApiKeysProps = {}) {
         <CardContent class="z-card-content-padding-none">
           <Show when={!pending()} fallback={<ApiKeySkeleton />}>
             <Show
-              when={keys().length > 0}
+              when={page().rows.length > 0}
               fallback={
                 <ApiKeysEmpty
                   hideCreate={props.hideCreate}
@@ -216,11 +232,7 @@ export function ApiKeys(props: ApiKeysProps = {}) {
           </Show>
         </CardContent>
       </Card>
-      <Show
-        when={
-          pagination().pageIndex > 0 || keys().length === pagination().pageSize
-        }
-      >
+      <Show when={pagination().pageIndex > 0 || page().hasNextPage}>
         <div class="flex justify-end gap-2">
           <Button
             size="sm"
@@ -233,7 +245,7 @@ export function ApiKeys(props: ApiKeysProps = {}) {
           <Button
             size="sm"
             variant="outline"
-            disabled={keys().length < pagination().pageSize}
+            disabled={!page().hasNextPage}
             onClick={() => table.nextPage()}
           >
             {apiKeyLocalization.nextPage}

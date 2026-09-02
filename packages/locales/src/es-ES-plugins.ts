@@ -390,6 +390,7 @@ export const esESPlugins = {
     nativeApplication: "Nativa",
     redirectUrls: "URL de redirección",
     redirectUrlsDescription: "Introduce una URL por línea.",
+    invalidUrl: "Introduce una URL absoluta válida.",
     applicationUrl: "URL de la aplicación",
     logoUrl: "URL del logotipo",
     scopes: "Ámbitos",

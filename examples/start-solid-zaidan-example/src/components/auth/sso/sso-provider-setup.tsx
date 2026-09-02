@@ -5,10 +5,8 @@ import type {
 } from "@better-auth-ui/core/plugins/sso"
 import { useAuth, useAuthPlugin } from "@better-auth-ui/solid"
 import { useRegisterSsoProvider } from "@better-auth-ui/solid/plugins/sso"
-import { createForm } from "@tanstack/solid-form"
 import type { BetterFetchError } from "better-auth/client"
 import { createSignal, Show } from "solid-js"
-
 import { Button } from "@/components/ui/button"
 import {
   Card,
@@ -31,6 +29,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Textarea } from "@/components/ui/textarea"
 import { ssoPlugin } from "@/lib/auth/sso-plugin"
 import { cn } from "@/lib/utils"
+import { createAuthForm } from "../auth-form"
 
 type SsoProtocol = "oidc" | "saml"
 
@@ -63,7 +62,7 @@ export function SsoProviderSetup(props: SsoProviderSetupProps) {
   const { localization } = useAuthPlugin(ssoPlugin)
   const [created, setCreated] = createSignal(false)
   const register = useRegisterSsoProvider(auth.authClient as SsoAuthClient)
-  const form = createForm(() => ({
+  const form = createAuthForm(() => ({
     defaultValues: {
       clientId: "",
       clientSecret: "",
@@ -323,13 +322,17 @@ export function SsoProviderSetup(props: SsoProviderSetupProps) {
           </FieldGroup>
         </CardContent>
         <CardFooter class="justify-end">
-          <form.Subscribe selector={(state) => state.isSubmitting}>
-            {(isSubmitting) => (
+          <form.Subscribe
+            selector={(state) => [state.canSubmit, state.isSubmitting] as const}
+          >
+            {(formState) => (
               <Button
-                disabled={isSubmitting() || register.isPending}
+                disabled={
+                  !formState()[0] || formState()[1] || register.isPending
+                }
                 type="submit"
               >
-                <Show when={isSubmitting() || register.isPending}>
+                <Show when={formState()[1] || register.isPending}>
                   <Spinner />
                 </Show>
                 {localization.addProvider}

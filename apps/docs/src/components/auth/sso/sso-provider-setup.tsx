@@ -7,10 +7,8 @@ import type {
 } from "@better-auth-ui/core/plugins/sso"
 import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
 import { useRegisterSsoProvider } from "@better-auth-ui/react/plugins/sso"
-import { useForm } from "@tanstack/react-form"
 import type { BetterFetchError } from "better-auth/client"
 import { useState } from "react"
-
 import { Button } from "@/components/ui/button"
 import {
   Card,
@@ -33,6 +31,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Textarea } from "@/components/ui/textarea"
 import { ssoPlugin } from "@/lib/auth/sso-plugin"
 import { cn } from "@/lib/utils"
+import { useAuthForm } from "../auth-form"
 
 type SsoProtocol = "oidc" | "saml"
 
@@ -71,7 +70,7 @@ export function SsoProviderSetup({
   const { localization } = useAuthPlugin(ssoPlugin)
   const [created, setCreated] = useState(false)
   const register = useRegisterSsoProvider(authClient as SsoAuthClient)
-  const form = useForm({
+  const form = useAuthForm({
     defaultValues: {
       clientId: "",
       clientSecret: "",
@@ -338,11 +337,13 @@ export function SsoProviderSetup({
           </FieldGroup>
         </CardContent>
         <CardFooter className="justify-end">
-          <form.Subscribe selector={(state) => state.isSubmitting}>
-            {(isSubmitting) => (
+          <form.Subscribe
+            selector={(state) => [state.canSubmit, state.isSubmitting] as const}
+          >
+            {([canSubmit, isSubmitting]) => (
               <Button
                 type="submit"
-                disabled={isSubmitting || register.isPending}
+                disabled={!canSubmit || isSubmitting || register.isPending}
               >
                 {isSubmitting || register.isPending ? (
                   <Spinner data-icon="inline-start" />

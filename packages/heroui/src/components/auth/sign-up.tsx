@@ -2,7 +2,10 @@ import {
   authMutationKeys,
   getAuthLinkURL,
   isPasswordCompromisedError,
-  parseAdditionalFieldValue
+  parseAdditionalFieldValue,
+  validateEmailAddress,
+  validateMatchingValue,
+  validateStringLength
 } from "@better-auth-ui/core"
 import {
   AuthPrompts,
@@ -27,10 +30,10 @@ import {
   TextField,
   toast
 } from "@heroui/react"
-import { useForm } from "@tanstack/react-form"
 import { useIsMutating } from "@tanstack/react-query"
 import { type FormEvent, useRef, useState } from "react"
 import { AdditionalField } from "./additional-field"
+import { isAuthFormFieldInvalid, useAuthForm } from "./auth-form"
 import { FieldSeparator } from "./field-separator"
 import { PasswordStrengthMeter } from "./password-strength-meter"
 import { ProviderButtons, type SocialLayout } from "./provider-buttons"
@@ -129,7 +132,7 @@ export function SignUp({
     (plugin) => plugin.captchaComponent
   )?.captchaComponent
   const additionalFieldValuesRef = useRef<Record<string, unknown>>({})
-  const form = useForm({
+  const form = useAuthForm({
     defaultValues: {
       confirmPassword: "",
       email: "",
@@ -137,16 +140,6 @@ export function SignUp({
       password: ""
     },
     onSubmit: ({ value }) => {
-      if (
-        emailAndPassword?.confirmPassword &&
-        value.password !== value.confirmPassword
-      ) {
-        toast.danger(localization.auth.passwordsDoNotMatch)
-        form.setFieldValue("password", "")
-        form.setFieldValue("confirmPassword", "")
-        return
-      }
-
       signUpEmail({
         name: emailAndPassword?.name === false ? "" : value.name,
         email: value.email,
@@ -219,7 +212,16 @@ export function SignUp({
         {emailAndPassword?.enabled && (
           <Form onSubmit={handleSubmit} className="flex flex-col gap-4">
             {emailAndPassword.name !== false && (
-              <form.Field name="name">
+              <form.AppField
+                name="name"
+                validators={{
+                  onChange: ({ value }) =>
+                    validateStringLength(value, {
+                      requiredMessage: localization.auth.fieldRequired,
+                      trim: true
+                    })
+                }}
+              >
                 {(field) => (
                   <TextField
                     name={field.name}
@@ -227,10 +229,12 @@ export function SignUp({
                     autoComplete="name"
                     isDisabled={isPending}
                     value={field.state.value}
+                    onBlur={field.handleBlur}
                     onChange={field.handleChange}
-                    validate={(value) => {
-                      if (!value) return localization.auth.fieldRequired
-                    }}
+                    isInvalid={
+                      isAuthFormFieldInvalid(field.state.meta) || undefined
+                    }
+                    validationBehavior="aria"
                   >
                     <Label>{localization.auth.name}</Label>
 
@@ -242,13 +246,22 @@ export function SignUp({
                       }
                     />
 
-                    <FieldError />
+                    <field.AuthFormFieldError />
                   </TextField>
                 )}
-              </form.Field>
+              </form.AppField>
             )}
 
-            <form.Field name="email">
+            <form.AppField
+              name="email"
+              validators={{
+                onChange: ({ value }) =>
+                  validateEmailAddress(value, {
+                    invalidMessage: localization.auth.invalidEmail,
+                    requiredMessage: localization.auth.fieldRequired
+                  })
+              }}
+            >
               {(field) => (
                 <TextField
                   name={field.name}
@@ -256,12 +269,12 @@ export function SignUp({
                   autoComplete="email"
                   isDisabled={isPending}
                   value={field.state.value}
+                  onBlur={field.handleBlur}
                   onChange={field.handleChange}
-                  validate={(value) => {
-                    if (!value) return localization.auth.fieldRequired
-                    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value))
-                      return localization.auth.invalidEmail
-                  }}
+                  isInvalid={
+                    isAuthFormFieldInvalid(field.state.meta) || undefined
+                  }
+                  validationBehavior="aria"
                 >
                   <Label>{localization.auth.email}</Label>
 
@@ -273,10 +286,10 @@ export function SignUp({
                     }
                   />
 
-                  <FieldError />
+                  <field.AuthFormFieldError />
                 </TextField>
               )}
-            </form.Field>
+            </form.AppField>
 
             {additionalFields?.map(
               (field) =>
@@ -292,83 +305,119 @@ export function SignUp({
                 )
             )}
 
-            <form.Field name="password">
-              {(field) => (
-                <TextField
-                  minLength={emailAndPassword?.minPasswordLength}
-                  maxLength={emailAndPassword?.maxPasswordLength}
-                  name={field.name}
-                  autoComplete="new-password"
-                  isDisabled={isPending}
-                  value={field.state.value}
-                  onChange={(value) => {
-                    field.handleChange(value)
-                    setIsCompromised(false)
-                  }}
-                  isInvalid={isCompromised || undefined}
-                  validate={(value) => {
-                    if (!value) return localization.auth.fieldRequired
-                    const min = emailAndPassword?.minPasswordLength
-                    const max = emailAndPassword?.maxPasswordLength
-                    if (min && value.length < min)
-                      return localization.auth.tooShort.replace(
-                        "{{min}}",
-                        String(min)
-                      )
-                    if (max && value.length > max)
-                      return localization.auth.tooLong.replace(
-                        "{{max}}",
-                        String(max)
-                      )
-                  }}
-                >
-                  <Label>{localization.auth.password}</Label>
+            <form.AppField
+              name="password"
+              validators={{
+                onChange: ({ value }) =>
+                  validateStringLength(value, {
+                    maxLength: emailAndPassword?.maxPasswordLength,
+                    maxLengthMessage: localization.auth.tooLong.replace(
+                      "{{max}}",
+                      String(emailAndPassword?.maxPasswordLength)
+                    ),
+                    minLength: emailAndPassword?.minPasswordLength,
+                    minLengthMessage: localization.auth.tooShort.replace(
+                      "{{min}}",
+                      String(emailAndPassword?.minPasswordLength)
+                    ),
+                    requiredMessage: localization.auth.fieldRequired
+                  })
+              }}
+            >
+              {(field) => {
+                const isInvalid =
+                  isAuthFormFieldInvalid(field.state.meta) || isCompromised
 
-                  <InputGroup
-                    variant={
-                      variant === "transparent" ? "primary" : "secondary"
-                    }
+                return (
+                  <TextField
+                    minLength={emailAndPassword?.minPasswordLength}
+                    maxLength={emailAndPassword?.maxPasswordLength}
+                    name={field.name}
+                    autoComplete="new-password"
+                    isDisabled={isPending}
+                    onBlur={field.handleBlur}
+                    value={field.state.value}
+                    onChange={(value) => {
+                      field.handleChange(value)
+                      setIsCompromised(false)
+                    }}
+                    isInvalid={isInvalid || undefined}
+                    validationBehavior="aria"
                   >
-                    <InputGroup.Input
-                      placeholder={localization.auth.passwordPlaceholder}
-                      type={isPasswordVisible ? "text" : "password"}
-                      name="password"
-                      required
-                    />
+                    <Label>{localization.auth.password}</Label>
 
-                    <InputGroup.Suffix className="px-0">
-                      <Button
-                        isIconOnly
-                        aria-label={
-                          isPasswordVisible
-                            ? localization.auth.hidePassword
-                            : localization.auth.showPassword
-                        }
-                        size="sm"
-                        variant="ghost"
-                        onPress={() => setIsPasswordVisible(!isPasswordVisible)}
-                        isDisabled={isPending}
-                      >
-                        {isPasswordVisible ? <EyeSlash /> : <Eye />}
-                      </Button>
-                    </InputGroup.Suffix>
-                  </InputGroup>
+                    <InputGroup
+                      variant={
+                        variant === "transparent" ? "primary" : "secondary"
+                      }
+                    >
+                      <InputGroup.Input
+                        placeholder={localization.auth.passwordPlaceholder}
+                        type={isPasswordVisible ? "text" : "password"}
+                        name="password"
+                        required
+                      />
 
-                  {isCompromised ? (
-                    <FieldError>
-                      {localization.auth.passwordCompromised}
-                    </FieldError>
-                  ) : (
-                    <FieldError />
-                  )}
+                      <InputGroup.Suffix className="px-0">
+                        <Button
+                          isIconOnly
+                          aria-label={
+                            isPasswordVisible
+                              ? localization.auth.hidePassword
+                              : localization.auth.showPassword
+                          }
+                          size="sm"
+                          variant="ghost"
+                          onPress={() =>
+                            setIsPasswordVisible(!isPasswordVisible)
+                          }
+                          isDisabled={isPending}
+                        >
+                          {isPasswordVisible ? <EyeSlash /> : <Eye />}
+                        </Button>
+                      </InputGroup.Suffix>
+                    </InputGroup>
 
-                  <PasswordStrengthMeter password={field.state.value} />
-                </TextField>
-              )}
-            </form.Field>
+                    {isCompromised ? (
+                      <FieldError>
+                        {localization.auth.passwordCompromised}
+                      </FieldError>
+                    ) : (
+                      <field.AuthFormFieldError />
+                    )}
+
+                    <PasswordStrengthMeter password={field.state.value} />
+                  </TextField>
+                )
+              }}
+            </form.AppField>
 
             {emailAndPassword?.confirmPassword && (
-              <form.Field name="confirmPassword">
+              <form.AppField
+                name="confirmPassword"
+                validators={{
+                  onChangeListenTo: ["password"],
+                  onChange: ({ fieldApi, value }) =>
+                    validateStringLength(value, {
+                      maxLength: emailAndPassword?.maxPasswordLength,
+                      maxLengthMessage: localization.auth.tooLong.replace(
+                        "{{max}}",
+                        String(emailAndPassword?.maxPasswordLength)
+                      ),
+                      minLength: emailAndPassword?.minPasswordLength,
+                      minLengthMessage: localization.auth.tooShort.replace(
+                        "{{min}}",
+                        String(emailAndPassword?.minPasswordLength)
+                      ),
+                      requiredMessage: localization.auth.fieldRequired
+                    }) ??
+                    validateMatchingValue(
+                      value,
+                      fieldApi.form.getFieldValue("password"),
+                      localization.auth.passwordsDoNotMatch
+                    )
+                }}
+              >
                 {(field) => (
                   <TextField
                     minLength={emailAndPassword?.minPasswordLength}
@@ -377,22 +426,12 @@ export function SignUp({
                     autoComplete="new-password"
                     isDisabled={isPending}
                     value={field.state.value}
+                    onBlur={field.handleBlur}
                     onChange={field.handleChange}
-                    validate={(value) => {
-                      if (!value) return localization.auth.fieldRequired
-                      const min = emailAndPassword?.minPasswordLength
-                      const max = emailAndPassword?.maxPasswordLength
-                      if (min && value.length < min)
-                        return localization.auth.tooShort.replace(
-                          "{{min}}",
-                          String(min)
-                        )
-                      if (max && value.length > max)
-                        return localization.auth.tooLong.replace(
-                          "{{max}}",
-                          String(max)
-                        )
-                    }}
+                    isInvalid={
+                      isAuthFormFieldInvalid(field.state.meta) || undefined
+                    }
+                    validationBehavior="aria"
                   >
                     <Label>{localization.auth.confirmPassword}</Label>
 
@@ -432,10 +471,10 @@ export function SignUp({
                       </InputGroup.Suffix>
                     </InputGroup>
 
-                    <FieldError />
+                    <field.AuthFormFieldError />
                   </TextField>
                 )}
-              </form.Field>
+              </form.AppField>
             )}
 
             {additionalFields?.map(
@@ -456,11 +495,26 @@ export function SignUp({
             {Captcha && <div className="flex justify-center">{Captcha}</div>}
 
             <div className="flex flex-col gap-3">
-              <Button type="submit" className="w-full" isPending={isPending}>
-                {signUpEmailPending && <Spinner color="current" size="sm" />}
+              <form.Subscribe
+                selector={(state) =>
+                  [state.canSubmit, state.isSubmitting] as const
+                }
+              >
+                {([canSubmit, isSubmitting]) => (
+                  <Button
+                    type="submit"
+                    className="w-full"
+                    isDisabled={!canSubmit || isPending}
+                    isPending={isSubmitting || isPending}
+                  >
+                    {(signUpEmailPending || isSubmitting) && (
+                      <Spinner color="current" size="sm" />
+                    )}
 
-                {localization.auth.signUp}
-              </Button>
+                    {localization.auth.signUp}
+                  </Button>
+                )}
+              </form.Subscribe>
 
               {plugins.flatMap((plugin) =>
                 plugin.authButtons?.map((AuthButton, index) => (

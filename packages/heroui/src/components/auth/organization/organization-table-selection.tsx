@@ -27,6 +27,7 @@ function SelectionCheckbox({
       isIndeterminate={indeterminate}
       isSelected={selected}
       onChange={onChange}
+      slot="selection"
     >
       <Checkbox.Content>
         <Checkbox.Control>

@@ -14,12 +14,10 @@ import {
   useSsoProviders,
   useUpdateSsoProvider
 } from "@better-auth-ui/solid/plugins/sso"
-import { createForm } from "@tanstack/solid-form"
 import type { BetterFetchError } from "better-auth/client"
 import { Pencil, Trash2 } from "lucide-solid"
 import { createEffect, createMemo, createSignal, For, on, Show } from "solid-js"
 import { toast } from "solid-sonner"
-
 import {
   AlertDialog,
   AlertDialogAction,
@@ -67,6 +65,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { organizationPlugin } from "@/lib/auth/organization-plugin"
 import { ssoPlugin } from "@/lib/auth/sso-plugin"
 import { cn } from "@/lib/utils"
+import { createAuthForm } from "../auth-form"
 
 import { SsoDomainVerification } from "./sso-domain-verification"
 import { SsoProviderSetup } from "./sso-provider-setup"
@@ -314,7 +313,7 @@ function EditSsoProviderDialog(props: {
     update.reset()
     props.onOpenChange(undefined)
   }
-  const form = createForm(() => ({
+  const form = createAuthForm(() => ({
     defaultValues: getSsoProviderEditorValues(props.provider),
     onSubmit: async ({ value }) => {
       const provider = props.provider
@@ -541,10 +540,17 @@ function EditSsoProviderDialog(props: {
             >
               {localization.cancel}
             </Button>
-            <form.Subscribe selector={(state) => state.isSubmitting}>
-              {(isSubmitting) => (
-                <Button disabled={isSubmitting()} type="submit">
-                  <Show when={isSubmitting()}>
+            <form.Subscribe
+              selector={(state) =>
+                [state.canSubmit, state.isSubmitting] as const
+              }
+            >
+              {(formState) => (
+                <Button
+                  disabled={!formState()[0] || formState()[1]}
+                  type="submit"
+                >
+                  <Show when={formState()[1]}>
                     <Spinner />
                   </Show>
                   {localization.saveProvider}
