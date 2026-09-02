@@ -20,25 +20,27 @@ import {
 
 export const ORGANIZATION_TABLE_PAGE_SIZE = 10
 
+export const organizationTableFeatures = tableFeatures({
+  columnFilteringFeature,
+  globalFilteringFeature,
+  filteredRowModel: createFilteredRowModel(),
+  filterFns: { includesString: filterFn_includesString },
+  columnFacetingFeature,
+  facetedRowModel: createFacetedRowModel(),
+  facetedUniqueValues: createFacetedUniqueValues(),
+  columnVisibilityFeature,
+  rowSortingFeature,
+  sortedRowModel: createSortedRowModel(),
+  rowPaginationFeature,
+  paginatedRowModel: createPaginatedRowModel(),
+  rowSelectionFeature
+})
+
 export const {
   createAppColumnHelper: createOrganizationColumnHelper,
   useAppTable: useOrganizationTable
 } = createTableHook({
   enableMultiSort: true,
   sortDescFirst: false,
-  features: tableFeatures({
-    columnFilteringFeature,
-    globalFilteringFeature,
-    filteredRowModel: createFilteredRowModel(),
-    filterFns: { includesString: filterFn_includesString },
-    columnFacetingFeature,
-    facetedRowModel: createFacetedRowModel(),
-    facetedUniqueValues: createFacetedUniqueValues(),
-    columnVisibilityFeature,
-    rowSortingFeature,
-    sortedRowModel: createSortedRowModel(),
-    rowPaginationFeature,
-    paginatedRowModel: createPaginatedRowModel(),
-    rowSelectionFeature
-  })
+  features: organizationTableFeatures
 })

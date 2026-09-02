@@ -11,6 +11,13 @@ export type TableFilterValue =
   | null
   | readonly (boolean | number | string | null)[]
 
+export type TableUrlState = {
+  columnFilters: { id: string; value: TableFilterValue }[]
+  globalFilter: string
+  pagination: { pageIndex: number; pageSize: number }
+  sorting: TableSortingEntry[]
+}
+
 const TABLE_STATE_VERSION = 1
 const TABLE_FILTER_VALUE_PREFIX = "~"
 
@@ -121,6 +128,91 @@ export function serializeTableFilterValue(value: unknown): string | undefined {
   return `${TABLE_FILTER_VALUE_PREFIX}${JSON.stringify(value)}`
 }
 
+/** Parse one namespaced table state from URL search parameters. */
+export function parseTableUrlState(
+  params: URLSearchParams,
+  stateKey: string,
+  defaultPageSize: number,
+  allowedPageSizes: readonly number[],
+  allowedColumnIds?: readonly string[]
+): TableUrlState {
+  const filterPrefix = `${stateKey}.filter.`
+  const columnFilters: TableUrlState["columnFilters"] = []
+
+  for (const [key, value] of params) {
+    const id = key.slice(filterPrefix.length)
+    if (
+      key.startsWith(filterPrefix) &&
+      value &&
+      (!allowedColumnIds || allowedColumnIds.includes(id))
+    ) {
+      columnFilters.push({ id, value: parseTableFilterValue(value) })
+    }
+  }
+
+  return {
+    columnFilters,
+    globalFilter: params.get(`${stateKey}.search`) ?? "",
+    pagination: {
+      pageIndex: parseTablePage(params.get(`${stateKey}.page`), 1) - 1,
+      pageSize: parseTablePageSize(
+        params.get(`${stateKey}.pageSize`),
+        defaultPageSize,
+        allowedPageSizes
+      )
+    },
+    sorting: parseTableSorting(params.get(`${stateKey}.sort`), allowedColumnIds)
+  }
+}
+
+/** Write one namespaced table state without changing unrelated parameters. */
+export function serializeTableUrlState(
+  source: URLSearchParams,
+  stateKey: string,
+  defaultPageSize: number,
+  state: {
+    columnFilters: readonly { id: string; value: unknown }[]
+    globalFilter: string
+    pagination: { pageIndex: number; pageSize: number }
+    sorting: readonly TableSortingEntry[]
+  }
+) {
+  const params = new URLSearchParams(source)
+  const filterPrefix = `${stateKey}.filter.`
+
+  for (const key of Array.from(params.keys())) {
+    if (key.startsWith(filterPrefix)) params.delete(key)
+  }
+
+  for (const filter of state.columnFilters) {
+    const value = serializeTableFilterValue(filter.value)
+    if (value) params.set(`${filterPrefix}${filter.id}`, value)
+  }
+
+  setOrDelete(params, `${stateKey}.search`, state.globalFilter)
+  setOrDelete(
+    params,
+    `${stateKey}.page`,
+    String(state.pagination.pageIndex + 1),
+    "1"
+  )
+  setOrDelete(
+    params,
+    `${stateKey}.pageSize`,
+    String(state.pagination.pageSize),
+    String(defaultPageSize)
+  )
+  setOrDelete(
+    params,
+    `${stateKey}.sort`,
+    state.sorting
+      .map(({ desc, id }) => `${id}.${desc ? "desc" : "asc"}`)
+      .join(",")
+  )
+
+  return params
+}
+
 export function getLookaheadPage<T>(items: readonly T[], pageSize: number) {
   const normalizedPageSize = Math.max(1, Math.floor(pageSize))
   return {
@@ -155,6 +247,16 @@ export function getClampedTablePageIndex(
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value)
+}
+
+function setOrDelete(
+  params: URLSearchParams,
+  key: string,
+  value: string,
+  defaultValue = ""
+) {
+  if (value === defaultValue) params.delete(key)
+  else params.set(key, value)
 }
 
 function isTableFilterPrimitive(

@@ -19,6 +19,7 @@ import {
   Spinner,
   TextField
 } from "@heroui/react"
+import { useSelector } from "@tanstack/react-form"
 import { useIsMutating } from "@tanstack/react-query"
 import { useState } from "react"
 
@@ -115,6 +116,11 @@ export function EmailOtp({
       verifyCode(value.code)
     }
   })
+  const codeComplete = useSelector(
+    form.store,
+    (state) => state.values.code.length === otpLength
+  )
+  const email = useSelector(form.store, (state) => state.values.email)
 
   const startOver = () => {
     setCodeSent(false)
@@ -135,10 +141,7 @@ export function EmailOtp({
 
         {codeSent && (
           <Card.Description>
-            {emailOtpLocalization.codeSentTo.replace(
-              "{{email}}",
-              form.state.values.email
-            )}
+            {emailOtpLocalization.codeSentTo.replace("{{email}}", email)}
           </Card.Description>
         )}
       </Card.Header>
@@ -211,9 +214,7 @@ export function EmailOtp({
               <form.AuthFormSubmitButton
                 className="w-full"
                 isDisabled={
-                  isPending ||
-                  isSigningIn ||
-                  (codeSent && form.state.values.code.length !== otpLength)
+                  isPending || isSigningIn || (codeSent && !codeComplete)
                 }
               >
                 {(isSending || isSigningIn) && (
@@ -227,10 +228,7 @@ export function EmailOtp({
 
               {codeSent ? (
                 <div className="flex flex-col gap-3">
-                  <OpenEmailButton
-                    email={form.state.values.email}
-                    variant="secondary"
-                  />
+                  <OpenEmailButton email={email} variant="secondary" />
 
                   <Button
                     className="w-full"

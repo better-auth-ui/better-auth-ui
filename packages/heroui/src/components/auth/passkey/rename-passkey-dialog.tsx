@@ -9,6 +9,7 @@ import {
   Spinner,
   TextField
 } from "@heroui/react"
+import { useSelector } from "@tanstack/react-form"
 import { useEffect } from "react"
 import { passkeyPlugin } from "../../../lib/auth/passkey-plugin"
 import { useAuthForm } from "../auth-form"
@@ -35,6 +36,10 @@ export function RenamePasskeyDialog({
       if (nextName) updatePasskey.mutate({ id: passkey.id, name: nextName })
     }
   })
+  const nameIsEmpty = useSelector(
+    form.store,
+    (state) => state.values.name.trim().length === 0
+  )
   useEffect(() => {
     if (isOpen) form.setFieldValue("name", passkey.name ?? "")
   }, [form.setFieldValue, isOpen, passkey.name])
@@ -71,9 +76,7 @@ export function RenamePasskeyDialog({
                   {localization.settings.cancel}
                 </Button>
                 <form.AuthFormSubmitButton
-                  isDisabled={
-                    !form.state.values.name.trim() || updatePasskey.isPending
-                  }
+                  isDisabled={nameIsEmpty || updatePasskey.isPending}
                 >
                   {updatePasskey.isPending && (
                     <Spinner color="current" size="sm" />

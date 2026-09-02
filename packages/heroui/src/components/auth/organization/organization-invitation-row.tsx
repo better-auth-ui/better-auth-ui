@@ -16,11 +16,14 @@ import type { Invitation } from "better-auth/client"
 
 import { organizationPlugin } from "../../../lib/auth/organization-plugin"
 import { OrganizationInvitationRowSkeleton } from "./organization-invitation-row-skeleton"
-import { OrganizationTableSelectRow } from "./organization-table-selection"
+import {
+  type OrganizationSelectableRow,
+  OrganizationTableSelectRow
+} from "./organization-table-selection"
 
 export type OrganizationInvitationTableRowProps = {
   invitation: Invitation
-  selectableRow?: Parameters<typeof OrganizationTableSelectRow>[0]["row"]
+  selectableRow?: OrganizationSelectableRow<Invitation>
   showCreatedAt?: boolean
   showRole?: boolean
   showStatus?: boolean
@@ -84,7 +87,7 @@ export function OrganizationInvitationTableRow({
   const isPending = invitation.status === "pending"
 
   return (
-    <Table.Row>
+    <Table.Row id={invitation.id}>
       {selectableRow && (
         <Table.Cell>
           <OrganizationTableSelectRow

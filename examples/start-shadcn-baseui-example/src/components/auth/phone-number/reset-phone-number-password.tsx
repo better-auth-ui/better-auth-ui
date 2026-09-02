@@ -4,6 +4,7 @@ import { isPasswordCompromisedError } from "@better-auth-ui/core"
 import type { PhoneNumberAuthClient } from "@better-auth-ui/core/plugins/phone-number"
 import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
 import { useResetPhoneNumberPassword } from "@better-auth-ui/react/plugins/phone-number"
+import { useSelector } from "@tanstack/react-form"
 import { Eye, EyeOff } from "lucide-react"
 import { useEffect, useState } from "react"
 import { toast } from "sonner"
@@ -115,6 +116,14 @@ export function ResetPhoneNumberPassword({
       })
     }
   })
+  const codeComplete = useSelector(
+    form.store,
+    (formState) => formState.values.code.length === otpLength
+  )
+  const phoneNumber = useSelector(
+    form.store,
+    (formState) => formState.values.phoneNumber
+  )
 
   useEffect(() => {
     const stored = sessionStorage.getItem(PHONE_NUMBER_RESET_STORAGE_KEY) ?? ""
@@ -132,7 +141,7 @@ export function ResetPhoneNumberPassword({
           <CardDescription>
             {phoneLocalization.codeSentTo.replace(
               "{{phoneNumber}}",
-              form.state.values.phoneNumber
+              phoneNumber
             )}
           </CardDescription>
         )}
@@ -261,11 +270,7 @@ export function ResetPhoneNumberPassword({
                 </form.AppField>
               )}
 
-              <form.AuthFormSubmitButton
-                disabled={
-                  isPending || form.state.values.code.length !== otpLength
-                }
-              >
+              <form.AuthFormSubmitButton disabled={isPending || !codeComplete}>
                 {isPending && <Spinner />}
                 {phoneLocalization.resetPassword}
               </form.AuthFormSubmitButton>

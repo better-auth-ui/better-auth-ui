@@ -1,6 +1,7 @@
 import {
   type AdditionalField as AdditionalFieldConfig,
   type AdditionalFieldFormValue,
+  DEFAULT_ADDITIONAL_FIELD_VALIDATION_DEBOUNCE_MS,
   getFormFieldErrors,
   validateAdditionalFieldRequired,
   validateAdditionalFieldValue
@@ -135,7 +136,11 @@ function AuthFormAdditionalField(props: AuthFormAdditionalFieldProps) {
   )
 }
 
-export const { useAppForm: createAuthForm } = createFormHook({
+export const {
+  useAppForm: createAuthForm,
+  withFieldGroup: withAuthFieldGroup,
+  withForm: withAuthForm
+} = createFormHook({
   fieldComponents: { AuthFormAdditionalField, AuthFormFieldError },
   fieldContext,
   formComponents: { AuthFormRoot, AuthFormSubmitButton },
@@ -152,6 +157,10 @@ export function getAuthAdditionalFieldValidators(
     onChangeAsync: field.validate
       ? ({ value }: { value: AdditionalFieldFormValue }) =>
           validateAdditionalFieldValue(field, value)
+      : undefined,
+    onChangeAsyncDebounceMs: field.validate
+      ? (field.validateDebounceMs ??
+        DEFAULT_ADDITIONAL_FIELD_VALIDATION_DEBOUNCE_MS)
       : undefined
   }
 }

@@ -7,6 +7,7 @@ import {
 import type { EmailOtpAuthClient } from "@better-auth-ui/core/plugins/email-otp"
 import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
 import { useResetPasswordOtp } from "@better-auth-ui/react/plugins/email-otp"
+import { useSelector } from "@tanstack/react-form"
 import { Eye, EyeOff } from "lucide-react"
 import { useEffect, useState } from "react"
 import { toast } from "sonner"
@@ -128,6 +129,7 @@ export function ResetPasswordOtp({ className }: ResetPasswordOtpProps) {
       })
     }
   })
+  const email = useSelector(form.store, (state) => state.values.email)
 
   useEffect(() => {
     const storedEmail =
@@ -143,12 +145,9 @@ export function ResetPasswordOtp({ className }: ResetPasswordOtpProps) {
           {localization.auth.resetPassword}
         </CardTitle>
 
-        {hasStoredEmail && form.state.values.email && (
+        {hasStoredEmail && email && (
           <CardDescription>
-            {emailOtpLocalization.codeSentTo.replace(
-              "{{email}}",
-              form.state.values.email
-            )}
+            {emailOtpLocalization.codeSentTo.replace("{{email}}", email)}
           </CardDescription>
         )}
       </CardHeader>
@@ -298,12 +297,7 @@ export function ResetPasswordOtp({ className }: ResetPasswordOtpProps) {
                   {localization.auth.resetPassword}
                 </form.AuthFormSubmitButton>
 
-                {form.state.values.email && (
-                  <OpenEmailButton
-                    email={form.state.values.email}
-                    variant="secondary"
-                  />
-                )}
+                {email && <OpenEmailButton email={email} variant="secondary" />}
               </div>
             </FieldGroup>
           </form.AuthFormRoot>

@@ -26,7 +26,10 @@ import { organizationPlugin } from "@/lib/auth/organization-plugin"
 import { UserView } from "../user/user-view"
 import { EditMemberRolesDialog } from "./edit-member-roles-dialog"
 import { LeaveOrganizationDialog } from "./leave-organization-dialog"
-import { OrganizationTableSelectRow } from "./organization-table-selection"
+import {
+  type OrganizationSelectableRow,
+  OrganizationTableSelectRow
+} from "./organization-table-selection"
 import { RemoveMemberDialog } from "./remove-member-dialog"
 
 export type OrganizationMemberRowProps = {
@@ -34,7 +37,7 @@ export type OrganizationMemberRowProps = {
   isOwner?: boolean
   ownerCount?: number
   organization: Organization
-  selectableRow?: Parameters<typeof OrganizationTableSelectRow>[0]["row"]
+  selectableRow?: OrganizationSelectableRow<Member & { user: Partial<User> }>
   showRole?: boolean
   showTeams?: boolean
 }

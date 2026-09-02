@@ -42,14 +42,20 @@ afterEach(() => {
 describe("organization table state", () => {
   it("preserves Shift for keyboard range selection", () => {
     const toggleSelected = vi.fn()
+    const { result } = renderHook(() =>
+      useOrganizationTable({
+        columns,
+        data: rows,
+        getRowId: (row) => row.id
+      })
+    )
+    const row = result.current.getRow("1")
+    vi.spyOn(row, "getToggleSelectedHandler").mockReturnValue(toggleSelected)
+
     render(
       <OrganizationTableSelectRow
         localization={organizationLocalization}
-        row={{
-          getCanSelect: () => true,
-          getIsSelected: () => false,
-          getToggleSelectedHandler: () => toggleSelected
-        }}
+        row={row}
       />
     )
 

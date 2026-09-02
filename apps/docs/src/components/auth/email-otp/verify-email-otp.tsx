@@ -7,6 +7,7 @@ import {
   useSendVerificationOtp,
   useVerifyEmailOtp
 } from "@better-auth-ui/react/plugins/email-otp"
+import { useSelector } from "@tanstack/react-form"
 import { useEffect, useState } from "react"
 import { toast } from "sonner"
 
@@ -130,6 +131,10 @@ export function VerifyEmailOtp({ className }: VerifyEmailOtpProps) {
       verifyCode(value.code)
     }
   })
+  const codeComplete = useSelector(
+    form.store,
+    (state) => state.values.code.length === otpLength
+  )
 
   return (
     <Card className={cn("w-full max-w-sm", className)}>
@@ -195,11 +200,7 @@ export function VerifyEmailOtp({ className }: VerifyEmailOtpProps) {
 
               <div className="flex flex-col gap-3">
                 <form.AuthFormSubmitButton
-                  disabled={
-                    isPending ||
-                    (Boolean(email) &&
-                      form.state.values.code.length !== otpLength)
-                  }
+                  disabled={isPending || (Boolean(email) && !codeComplete)}
                 >
                   {isPending && <Spinner />}
 
