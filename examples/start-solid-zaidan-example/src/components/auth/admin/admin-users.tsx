@@ -1,5 +1,6 @@
 import {
   type AdditionalFieldValue,
+  getClampedTablePageIndex,
   parseAdditionalFieldValues
 } from "@better-auth-ui/core"
 import {
@@ -246,6 +247,19 @@ export function AdminUsers(props: AdminUsersProps) {
     props.onSelectedUserIdChange?.(userId)
   }
   const total = () => users.data?.total ?? 0
+
+  createEffect(() => {
+    if (!users.isSuccess) return
+    const current = pagination()
+    const pageIndex = getClampedTablePageIndex(
+      current.pageIndex,
+      current.pageSize,
+      total()
+    )
+    if (pageIndex !== current.pageIndex) {
+      setPaginationState({ ...current, pageIndex })
+    }
+  })
   const setPagination = (updater: Updater<PaginationState>) =>
     setPaginationState((current) => functionalUpdate(updater, current))
   const setColumnFilters = (updater: Updater<ColumnFiltersState>) => {
@@ -628,22 +642,26 @@ function CreateUserDialog(props: {
       password: "",
       roles: [config().defaultRole]
     },
-    onSubmit: ({ value }) => {
-      createUser.mutate(
-        {
-          data: {
-            ...additionalFieldValues,
-            emailVerified: value.emailVerified
+    onSubmit: async ({ value }) => {
+      try {
+        await createUser.mutateAsync(
+          {
+            data: {
+              ...additionalFieldValues,
+              emailVerified: value.emailVerified
+            },
+            email: value.email,
+            name: value.name,
+            password: value.password,
+            ...(canSetRole.data?.success
+              ? { role: asAdminRoles(value.roles) }
+              : {})
           },
-          email: value.email,
-          name: value.name,
-          password: value.password,
-          ...(canSetRole.data?.success
-            ? { role: asAdminRoles(value.roles) }
-            : {})
-        },
-        { onSuccess: close }
-      )
+          { onSuccess: close }
+        )
+      } catch {
+        // The mutation reports the error through its configured handler.
+      }
     }
   }))
 
@@ -658,9 +676,8 @@ function CreateUserDialog(props: {
     setFormError(undefined)
     props.onOpenChange(false)
   }
-  const submit = async (event: SubmitEvent) => {
-    event.preventDefault()
-    const data = new FormData(event.currentTarget as HTMLFormElement)
+  const prepareSubmit = async (formElement: HTMLFormElement) => {
+    const data = new FormData(formElement)
     let values: Record<string, AdditionalFieldValue | null>
     try {
       values = await parseAdditionalFieldValues(
@@ -669,11 +686,10 @@ function CreateUserDialog(props: {
       )
     } catch (error) {
       setFormError(error instanceof Error ? error.message : String(error))
-      return
+      return false
     }
     setFormError(undefined)
     additionalFieldValues = values
-    await form.handleSubmit()
   }
 
   return (
@@ -682,98 +698,129 @@ function CreateUserDialog(props: {
       onOpenChange={(open) => (open ? props.onOpenChange(true) : close())}
     >
       <DialogContent>
-        <form class="flex flex-col gap-4" onSubmit={submit}>
-          <DialogHeader>
-            <DialogTitle>{config().localization.createUser}</DialogTitle>
-            <DialogDescription>
-              {config().localization.usersDescription}
-            </DialogDescription>
-          </DialogHeader>
-          <form.Field name="name">
-            {(field) => (
-              <Field>
-                <FieldLabel for="solid-admin-create-name">
-                  {config().localization.name}
-                </FieldLabel>
-                <Input
-                  id="solid-admin-create-name"
-                  name={field().name}
-                  onInput={(event) =>
-                    field().handleChange(event.currentTarget.value)
-                  }
-                  required
-                  value={field().state.value}
-                />
-              </Field>
-            )}
-          </form.Field>
-          <form.Field name="email">
-            {(field) => (
-              <Field>
-                <FieldLabel for="solid-admin-create-email">
-                  {config().localization.email}
-                </FieldLabel>
-                <Input
-                  autocomplete="off"
-                  id="solid-admin-create-email"
-                  name={field().name}
-                  onInput={(event) =>
-                    field().handleChange(event.currentTarget.value)
-                  }
-                  required
-                  type="email"
-                  value={field().state.value}
-                />
-              </Field>
-            )}
-          </form.Field>
-          <form.Field name="password">
-            {(field) => (
-              <Field>
-                <FieldLabel for="solid-admin-create-password">
-                  {config().localization.password}
-                </FieldLabel>
-                <Input
-                  autocomplete="new-password"
-                  id="solid-admin-create-password"
-                  name={field().name}
-                  onInput={(event) =>
-                    field().handleChange(event.currentTarget.value)
-                  }
-                  required
-                  type="password"
-                  value={field().state.value}
-                />
-              </Field>
-            )}
-          </form.Field>
-          <Show
-            fallback={
-              <Show when={canSetRole.isPending}>
-                <Skeleton class="h-16 w-full" />
-              </Show>
-            }
-            when={canSetRole.data?.success}
+        <form.AppForm>
+          <form.AuthFormRoot
+            class="flex flex-col gap-4"
+            prepareSubmit={prepareSubmit}
           >
-            <form.Field name="roles">
+            <DialogHeader>
+              <DialogTitle>{config().localization.createUser}</DialogTitle>
+              <DialogDescription>
+                {config().localization.usersDescription}
+              </DialogDescription>
+            </DialogHeader>
+            <form.Field name="name">
               {(field) => (
-                <FieldSet>
-                  <FieldLegend variant="label">
-                    {config().localization.role}
-                  </FieldLegend>
-                  <Show
-                    when={config().allowMultipleRoles}
-                    fallback={
-                      <RadioGroup
-                        onChange={(role) => field().handleChange([role])}
-                        value={field().state.value[0] ?? ""}
-                      >
+                <Field>
+                  <FieldLabel for="solid-admin-create-name">
+                    {config().localization.name}
+                  </FieldLabel>
+                  <Input
+                    id="solid-admin-create-name"
+                    name={field().name}
+                    onInput={(event) =>
+                      field().handleChange(event.currentTarget.value)
+                    }
+                    required
+                    value={field().state.value}
+                  />
+                </Field>
+              )}
+            </form.Field>
+            <form.Field name="email">
+              {(field) => (
+                <Field>
+                  <FieldLabel for="solid-admin-create-email">
+                    {config().localization.email}
+                  </FieldLabel>
+                  <Input
+                    autocomplete="off"
+                    id="solid-admin-create-email"
+                    name={field().name}
+                    onInput={(event) =>
+                      field().handleChange(event.currentTarget.value)
+                    }
+                    required
+                    type="email"
+                    value={field().state.value}
+                  />
+                </Field>
+              )}
+            </form.Field>
+            <form.Field name="password">
+              {(field) => (
+                <Field>
+                  <FieldLabel for="solid-admin-create-password">
+                    {config().localization.password}
+                  </FieldLabel>
+                  <Input
+                    autocomplete="new-password"
+                    id="solid-admin-create-password"
+                    name={field().name}
+                    onInput={(event) =>
+                      field().handleChange(event.currentTarget.value)
+                    }
+                    required
+                    type="password"
+                    value={field().state.value}
+                  />
+                </Field>
+              )}
+            </form.Field>
+            <Show
+              fallback={
+                <Show when={canSetRole.isPending}>
+                  <Skeleton class="h-16 w-full" />
+                </Show>
+              }
+              when={canSetRole.data?.success}
+            >
+              <form.Field name="roles">
+                {(field) => (
+                  <FieldSet>
+                    <FieldLegend variant="label">
+                      {config().localization.role}
+                    </FieldLegend>
+                    <Show
+                      when={config().allowMultipleRoles}
+                      fallback={
+                        <RadioGroup
+                          onChange={(role) => field().handleChange([role])}
+                          value={field().state.value[0] ?? ""}
+                        >
+                          <For each={config().roles}>
+                            {(role) => (
+                              <Field orientation="horizontal">
+                                <RadioGroupItem
+                                  id={`solid-admin-create-role-${role}`}
+                                  value={role}
+                                />
+                                <FieldLabel
+                                  for={`solid-admin-create-role-${role}`}
+                                >
+                                  {role}
+                                </FieldLabel>
+                              </Field>
+                            )}
+                          </For>
+                        </RadioGroup>
+                      }
+                    >
+                      <FieldGroup data-slot="checkbox-group">
                         <For each={config().roles}>
                           {(role) => (
                             <Field orientation="horizontal">
-                              <RadioGroupItem
+                              <Checkbox
+                                checked={field().state.value.includes(role)}
                                 id={`solid-admin-create-role-${role}`}
-                                value={role}
+                                onChange={(checked) => {
+                                  const next = checked
+                                    ? [...field().state.value, role]
+                                    : field().state.value.filter(
+                                        (item) => item !== role
+                                      )
+                                  if (next.length) field().handleChange(next)
+                                }}
                               />
                               <FieldLabel
                                 for={`solid-admin-create-role-${role}`}
@@ -783,74 +830,50 @@ function CreateUserDialog(props: {
                             </Field>
                           )}
                         </For>
-                      </RadioGroup>
-                    }
-                  >
-                    <FieldGroup data-slot="checkbox-group">
-                      <For each={config().roles}>
-                        {(role) => (
-                          <Field orientation="horizontal">
-                            <Checkbox
-                              checked={field().state.value.includes(role)}
-                              id={`solid-admin-create-role-${role}`}
-                              onChange={(checked) => {
-                                const next = checked
-                                  ? [...field().state.value, role]
-                                  : field().state.value.filter(
-                                      (item) => item !== role
-                                    )
-                                if (next.length) field().handleChange(next)
-                              }}
-                            />
-                            <FieldLabel for={`solid-admin-create-role-${role}`}>
-                              {role}
-                            </FieldLabel>
-                          </Field>
-                        )}
-                      </For>
-                    </FieldGroup>
-                  </Show>
-                </FieldSet>
+                      </FieldGroup>
+                    </Show>
+                  </FieldSet>
+                )}
+              </form.Field>
+            </Show>
+            <form.Field name="emailVerified">
+              {(field) => (
+                <Field orientation="horizontal">
+                  <Switch
+                    checked={field().state.value}
+                    id="solid-admin-create-email-verified"
+                    onChange={field().handleChange}
+                  />
+                  <FieldContent>
+                    <FieldLabel for="solid-admin-create-email-verified">
+                      {config().localization.emailVerified}
+                    </FieldLabel>
+                  </FieldContent>
+                </Field>
               )}
             </form.Field>
-          </Show>
-          <form.Field name="emailVerified">
-            {(field) => (
-              <Field orientation="horizontal">
-                <Switch
-                  checked={field().state.value}
-                  id="solid-admin-create-email-verified"
-                  onChange={field().handleChange}
+            <For each={auth.additionalFields}>
+              {(field) => (
+                <AdditionalField
+                  field={field}
+                  isPending={createUser.isPending}
+                  name={field.name}
                 />
-                <FieldContent>
-                  <FieldLabel for="solid-admin-create-email-verified">
-                    {config().localization.emailVerified}
-                  </FieldLabel>
-                </FieldContent>
-              </Field>
-            )}
-          </form.Field>
-          <For each={auth.additionalFields}>
-            {(field) => (
-              <AdditionalField
-                field={field}
-                isPending={createUser.isPending}
-                name={field.name}
-              />
-            )}
-          </For>
-          <FieldError>
-            {formError() ?? getAdminErrorMessage(createUser.error)}
-          </FieldError>
-          <DialogFooter>
-            <Button onClick={close} type="button" variant="outline">
-              {config().localization.cancel}
-            </Button>
-            <Button disabled={createUser.isPending} type="submit">
-              {config().localization.createUser}
-            </Button>
-          </DialogFooter>
-        </form>
+              )}
+            </For>
+            <FieldError>
+              {formError() ?? getAdminErrorMessage(createUser.error)}
+            </FieldError>
+            <DialogFooter>
+              <Button onClick={close} type="button" variant="outline">
+                {config().localization.cancel}
+              </Button>
+              <form.AuthFormSubmitButton disabled={createUser.isPending}>
+                {config().localization.createUser}
+              </form.AuthFormSubmitButton>
+            </DialogFooter>
+          </form.AuthFormRoot>
+        </form.AppForm>
       </DialogContent>
     </Dialog>
   )
@@ -1108,13 +1131,12 @@ function UserDialog(props: {
           ? config().localization.revokeAllSessions
           : config().localization.impersonateUser
 
-  const saveUser = async (event: SubmitEvent) => {
-    event.preventDefault()
+  const prepareSaveUser = async (formElement: HTMLFormElement) => {
     const selectedUser = detail()
-    if (!selectedUser) return
+    if (!selectedUser) return false
 
     if (canUpdate.data?.success) {
-      const formData = new FormData(event.currentTarget as HTMLFormElement)
+      const formData = new FormData(formElement)
       let additionalFieldValues: Record<string, AdditionalFieldValue | null>
       try {
         additionalFieldValues = await parseAdditionalFieldValues(
@@ -1123,13 +1145,11 @@ function UserDialog(props: {
         )
       } catch (error) {
         setProfileError(error instanceof Error ? error.message : String(error))
-        return
+        return false
       }
       setProfileError(undefined)
       profileAdditionalFieldValues = additionalFieldValues
     }
-
-    await profileForm.handleSubmit()
   }
 
   return (
@@ -1245,106 +1265,148 @@ function UserDialog(props: {
                     </For>
                   </TabsList>
                   <TabsContent class="min-h-0 overflow-hidden" value="overview">
-                    <form
-                      class="grid h-full grid-rows-[minmax(0,1fr)_auto]"
-                      onSubmit={saveUser}
-                    >
-                      <div class="overflow-y-auto">
-                        <section class="flex flex-col gap-5 p-6">
-                          <h3 class="font-medium">
-                            {config().localization.profileAndAccess}
-                          </h3>
-                          <FieldGroup class="grid gap-5 md:grid-cols-2">
-                            <profileForm.Field name="name">
-                              {(field) => (
-                                <Field>
-                                  <FieldLabel for="solid-admin-user-name">
-                                    {config().localization.name}
-                                  </FieldLabel>
-                                  <Input
-                                    disabled={!canUpdate.data?.success}
-                                    id="solid-admin-user-name"
-                                    name={field().name}
-                                    value={field().state.value}
-                                    onInput={(event) =>
-                                      field().handleChange(
-                                        event.currentTarget.value
-                                      )
-                                    }
-                                  />
-                                </Field>
-                              )}
-                            </profileForm.Field>
-                            <profileForm.Field name="email">
-                              {(field) => (
-                                <Field>
-                                  <FieldLabel for="solid-admin-user-email">
-                                    {config().localization.email}
-                                  </FieldLabel>
-                                  <Input
-                                    disabled={
-                                      !canUpdate.data?.success ||
-                                      !canSetEmail.data?.success
-                                    }
-                                    id="solid-admin-user-email"
-                                    name={field().name}
-                                    onInput={(event) =>
-                                      field().handleChange(
-                                        event.currentTarget.value
-                                      )
-                                    }
-                                    required
-                                    type="email"
-                                    value={field().state.value}
-                                  />
-                                </Field>
-                              )}
-                            </profileForm.Field>
-                            <profileForm.Field name="emailVerified">
-                              {(field) => (
-                                <Field orientation="horizontal">
-                                  <Switch
-                                    checked={field().state.value}
-                                    disabled={
-                                      !canUpdate.data?.success ||
-                                      !canSetEmail.data?.success
-                                    }
-                                    id="solid-admin-user-email-verified"
-                                    onChange={field().handleChange}
-                                  />
-                                  <FieldContent>
-                                    <FieldLabel for="solid-admin-user-email-verified">
-                                      {config().localization.emailVerified}
+                    <profileForm.AppForm>
+                      <profileForm.AuthFormRoot
+                        class="grid h-full grid-rows-[minmax(0,1fr)_auto]"
+                        prepareSubmit={prepareSaveUser}
+                      >
+                        <div class="overflow-y-auto">
+                          <section class="flex flex-col gap-5 p-6">
+                            <h3 class="font-medium">
+                              {config().localization.profileAndAccess}
+                            </h3>
+                            <FieldGroup class="grid gap-5 md:grid-cols-2">
+                              <profileForm.Field name="name">
+                                {(field) => (
+                                  <Field>
+                                    <FieldLabel for="solid-admin-user-name">
+                                      {config().localization.name}
                                     </FieldLabel>
-                                  </FieldContent>
-                                </Field>
-                              )}
-                            </profileForm.Field>
-                            <profileForm.Field name="roles">
-                              {(field) => (
-                                <FieldSet>
-                                  <FieldLegend variant="label">
-                                    {config().localization.role}
-                                  </FieldLegend>
-                                  <Show
-                                    when={config().allowMultipleRoles}
-                                    fallback={
-                                      <RadioGroup
+                                    <Input
+                                      disabled={!canUpdate.data?.success}
+                                      id="solid-admin-user-name"
+                                      name={field().name}
+                                      value={field().state.value}
+                                      onInput={(event) =>
+                                        field().handleChange(
+                                          event.currentTarget.value
+                                        )
+                                      }
+                                    />
+                                  </Field>
+                                )}
+                              </profileForm.Field>
+                              <profileForm.Field name="email">
+                                {(field) => (
+                                  <Field>
+                                    <FieldLabel for="solid-admin-user-email">
+                                      {config().localization.email}
+                                    </FieldLabel>
+                                    <Input
+                                      disabled={
+                                        !canUpdate.data?.success ||
+                                        !canSetEmail.data?.success
+                                      }
+                                      id="solid-admin-user-email"
+                                      name={field().name}
+                                      onInput={(event) =>
+                                        field().handleChange(
+                                          event.currentTarget.value
+                                        )
+                                      }
+                                      required
+                                      type="email"
+                                      value={field().state.value}
+                                    />
+                                  </Field>
+                                )}
+                              </profileForm.Field>
+                              <profileForm.Field name="emailVerified">
+                                {(field) => (
+                                  <Field orientation="horizontal">
+                                    <Switch
+                                      checked={field().state.value}
+                                      disabled={
+                                        !canUpdate.data?.success ||
+                                        !canSetEmail.data?.success
+                                      }
+                                      id="solid-admin-user-email-verified"
+                                      onChange={field().handleChange}
+                                    />
+                                    <FieldContent>
+                                      <FieldLabel for="solid-admin-user-email-verified">
+                                        {config().localization.emailVerified}
+                                      </FieldLabel>
+                                    </FieldContent>
+                                  </Field>
+                                )}
+                              </profileForm.Field>
+                              <profileForm.Field name="roles">
+                                {(field) => (
+                                  <FieldSet>
+                                    <FieldLegend variant="label">
+                                      {config().localization.role}
+                                    </FieldLegend>
+                                    <Show
+                                      when={config().allowMultipleRoles}
+                                      fallback={
+                                        <RadioGroup
+                                          class="flex-row flex-wrap gap-4"
+                                          disabled={
+                                            isSelf() ||
+                                            !canSetRole.data?.success
+                                          }
+                                          onChange={(role) =>
+                                            field().handleChange([role])
+                                          }
+                                          value={field().state.value[0] ?? ""}
+                                        >
+                                          <For each={config().roles}>
+                                            {(item) => (
+                                              <Field orientation="horizontal">
+                                                <RadioGroupItem
+                                                  id={`solid-admin-user-role-${item}`}
+                                                  value={item}
+                                                />
+                                                <FieldLabel
+                                                  for={`solid-admin-user-role-${item}`}
+                                                >
+                                                  {item}
+                                                </FieldLabel>
+                                              </Field>
+                                            )}
+                                          </For>
+                                        </RadioGroup>
+                                      }
+                                    >
+                                      <FieldGroup
                                         class="flex-row flex-wrap gap-4"
-                                        disabled={
-                                          isSelf() || !canSetRole.data?.success
-                                        }
-                                        onChange={(role) =>
-                                          field().handleChange([role])
-                                        }
-                                        value={field().state.value[0] ?? ""}
+                                        data-slot="checkbox-group"
                                       >
                                         <For each={config().roles}>
                                           {(item) => (
                                             <Field orientation="horizontal">
-                                              <RadioGroupItem
+                                              <Checkbox
+                                                checked={field().state.value.includes(
+                                                  item
+                                                )}
+                                                disabled={
+                                                  isSelf() ||
+                                                  !canSetRole.data?.success
+                                                }
                                                 id={`solid-admin-user-role-${item}`}
-                                                value={item}
+                                                onChange={(checked) => {
+                                                  const next = checked
+                                                    ? [
+                                                        ...field().state.value,
+                                                        item
+                                                      ]
+                                                    : field().state.value.filter(
+                                                        (role) => role !== item
+                                                      )
+                                                  if (next.length)
+                                                    field().handleChange(next)
+                                                }}
                                               />
                                               <FieldLabel
                                                 for={`solid-admin-user-role-${item}`}
@@ -1354,263 +1416,227 @@ function UserDialog(props: {
                                             </Field>
                                           )}
                                         </For>
-                                      </RadioGroup>
+                                      </FieldGroup>
+                                    </Show>
+                                  </FieldSet>
+                                )}
+                              </profileForm.Field>
+                              <For each={auth.additionalFields}>
+                                {(field) => {
+                                  const value = () =>
+                                    (
+                                      selectedUser() as unknown as Record<
+                                        string,
+                                        unknown
+                                      >
+                                    )[field.name]
+                                  return (
+                                    <AdditionalField
+                                      field={{
+                                        ...field,
+                                        defaultValue:
+                                          value() as AdditionalFieldValue | null
+                                      }}
+                                      isPending={
+                                        updateUser.isPending ||
+                                        !canUpdate.data?.success
+                                      }
+                                      name={field.name}
+                                    />
+                                  )
+                                }}
+                              </For>
+                            </FieldGroup>
+                            <FieldError>
+                              {profileError() ??
+                                getAdminErrorMessage(updateUser.error) ??
+                                getAdminErrorMessage(setRoleMutation.error)}
+                            </FieldError>
+                          </section>
+                          <Separator />
+                          <section class="flex flex-col gap-4 p-6">
+                            <h3 class="font-medium">
+                              {config().localization.accountInformation}
+                            </h3>
+                            <dl class="grid gap-x-8 gap-y-4 text-sm sm:grid-cols-2">
+                              <div class="flex flex-col gap-1">
+                                <dt class="text-muted-foreground">
+                                  {config().localization.userId}
+                                </dt>
+                                <dd class="flex min-w-0 items-center gap-1">
+                                  <code class="truncate text-xs">
+                                    {selectedUser().id}
+                                  </code>
+                                  <Button
+                                    aria-label={
+                                      config().localization.copyUserId
+                                    }
+                                    size="icon-xs"
+                                    type="button"
+                                    variant="ghost"
+                                    onClick={() =>
+                                      navigator.clipboard.writeText(
+                                        selectedUser().id
+                                      )
                                     }
                                   >
-                                    <FieldGroup
-                                      class="flex-row flex-wrap gap-4"
-                                      data-slot="checkbox-group"
-                                    >
-                                      <For each={config().roles}>
-                                        {(item) => (
-                                          <Field orientation="horizontal">
-                                            <Checkbox
-                                              checked={field().state.value.includes(
-                                                item
-                                              )}
-                                              disabled={
-                                                isSelf() ||
-                                                !canSetRole.data?.success
-                                              }
-                                              id={`solid-admin-user-role-${item}`}
-                                              onChange={(checked) => {
-                                                const next = checked
-                                                  ? [
-                                                      ...field().state.value,
-                                                      item
-                                                    ]
-                                                  : field().state.value.filter(
-                                                      (role) => role !== item
-                                                    )
-                                                if (next.length)
-                                                  field().handleChange(next)
-                                              }}
-                                            />
-                                            <FieldLabel
-                                              for={`solid-admin-user-role-${item}`}
-                                            >
-                                              {item}
-                                            </FieldLabel>
-                                          </Field>
-                                        )}
-                                      </For>
-                                    </FieldGroup>
-                                  </Show>
-                                </FieldSet>
-                              )}
-                            </profileForm.Field>
-                            <For each={auth.additionalFields}>
-                              {(field) => {
-                                const value = () =>
-                                  (
-                                    selectedUser() as unknown as Record<
-                                      string,
-                                      unknown
-                                    >
-                                  )[field.name]
-                                return (
-                                  <AdditionalField
-                                    field={{
-                                      ...field,
-                                      defaultValue:
-                                        value() as AdditionalFieldValue | null
-                                    }}
-                                    isPending={
-                                      updateUser.isPending ||
-                                      !canUpdate.data?.success
+                                    <Copy />
+                                  </Button>
+                                </dd>
+                              </div>
+                              <div class="flex flex-col gap-1">
+                                <dt class="text-muted-foreground">
+                                  {config().localization.created}
+                                </dt>
+                                <dd>{formatDate(selectedUser().createdAt)}</dd>
+                              </div>
+                              <div class="flex flex-col gap-1">
+                                <dt class="text-muted-foreground">
+                                  {config().localization.status}
+                                </dt>
+                                <dd>
+                                  <Badge
+                                    variant={
+                                      selectedUser().banned
+                                        ? "destructive"
+                                        : "secondary"
                                     }
-                                    name={field.name}
-                                  />
-                                )
-                              }}
-                            </For>
-                          </FieldGroup>
-                          <FieldError>
-                            {profileError() ??
-                              getAdminErrorMessage(updateUser.error) ??
-                              getAdminErrorMessage(setRoleMutation.error)}
-                          </FieldError>
-                        </section>
-                        <Separator />
-                        <section class="flex flex-col gap-4 p-6">
-                          <h3 class="font-medium">
-                            {config().localization.accountInformation}
-                          </h3>
-                          <dl class="grid gap-x-8 gap-y-4 text-sm sm:grid-cols-2">
-                            <div class="flex flex-col gap-1">
-                              <dt class="text-muted-foreground">
-                                {config().localization.userId}
-                              </dt>
-                              <dd class="flex min-w-0 items-center gap-1">
-                                <code class="truncate text-xs">
-                                  {selectedUser().id}
-                                </code>
-                                <Button
-                                  aria-label={config().localization.copyUserId}
-                                  size="icon-xs"
-                                  type="button"
-                                  variant="ghost"
-                                  onClick={() =>
-                                    navigator.clipboard.writeText(
-                                      selectedUser().id
-                                    )
-                                  }
-                                >
-                                  <Copy />
-                                </Button>
-                              </dd>
-                            </div>
-                            <div class="flex flex-col gap-1">
-                              <dt class="text-muted-foreground">
-                                {config().localization.created}
-                              </dt>
-                              <dd>{formatDate(selectedUser().createdAt)}</dd>
-                            </div>
-                            <div class="flex flex-col gap-1">
-                              <dt class="text-muted-foreground">
-                                {config().localization.status}
-                              </dt>
-                              <dd>
-                                <Badge
-                                  variant={
-                                    selectedUser().banned
-                                      ? "destructive"
-                                      : "secondary"
-                                  }
-                                >
-                                  {selectedUser().banned
-                                    ? config().localization.banned
-                                    : config().localization.active}
-                                </Badge>
-                              </dd>
-                            </div>
-                            <Show
-                              when={
-                                selectedUser().banned &&
-                                selectedUser().banReason
-                              }
-                            >
-                              <div class="flex flex-col gap-1">
-                                <dt class="text-muted-foreground">
-                                  {config().localization.banReason}
-                                </dt>
-                                <dd>{selectedUser().banReason}</dd>
+                                  >
+                                    {selectedUser().banned
+                                      ? config().localization.banned
+                                      : config().localization.active}
+                                  </Badge>
+                                </dd>
                               </div>
-                            </Show>
-                            <Show
-                              when={
-                                selectedUser().banned &&
-                                selectedUser().banExpires
-                              }
-                            >
-                              <div class="flex flex-col gap-1">
-                                <dt class="text-muted-foreground">
-                                  {config().localization.banExpires}
-                                </dt>
-                                <dd>{formatDate(selectedUser().banExpires)}</dd>
-                              </div>
-                            </Show>
-                          </dl>
-                        </section>
-                        <Separator />
-                        <section class="flex flex-col gap-4 p-6">
-                          <h3 class="font-medium">
-                            {config().localization.security}
-                          </h3>
-                          <div>
-                            <Button
-                              disabled={
-                                canSetPassword.isPending ||
-                                !canSetPassword.data?.success
-                              }
-                              type="button"
-                              variant="outline"
-                              onClick={() => setPasswordOpen(true)}
-                            >
-                              <KeyRound />
-                              {config().localization.setPassword}
-                            </Button>
-                          </div>
-                        </section>
-                        <Separator />
-                        <section class="flex flex-col gap-4 p-6">
-                          <h3 class="font-medium">
-                            {config().localization.dangerZone}
-                          </h3>
-                          <div class="flex flex-wrap gap-2">
-                            <Button
-                              disabled={
-                                canBan.isPending ||
-                                !canBan.data?.success ||
-                                isSelf()
-                              }
-                              type="button"
-                              variant="outline"
-                              onClick={() =>
-                                selectedUser().banned
-                                  ? unban.mutate({
-                                      userId: selectedUser().id
-                                    })
-                                  : setDangerousAction("ban")
-                              }
-                            >
-                              <Ban />
-                              {selectedUser().banned
-                                ? config().localization.unbanUser
-                                : config().localization.banUser}
-                            </Button>
-                            <Button
-                              disabled={
-                                canDelete.isPending ||
-                                !canDelete.data?.success ||
-                                isSelf()
-                              }
-                              type="button"
-                              variant="destructive"
-                              onClick={() => setDangerousAction("delete")}
-                            >
-                              <Trash2 />
-                              {config().localization.deleteUser}
-                            </Button>
-                          </div>
-                          <FieldError>
-                            {getAdminErrorMessage(unban.error)}
-                          </FieldError>
-                        </section>
-                      </div>
-                      <div class="flex flex-col-reverse gap-2 border-t bg-muted/50 px-6 py-4 sm:flex-row sm:justify-end">
-                        <Button
-                          type="button"
-                          variant="outline"
-                          onClick={() => props.onOpenChange(false)}
-                        >
-                          {config().localization.cancel}
-                        </Button>
-                        <profileForm.Subscribe
-                          selector={(state) =>
-                            [state.values.name, state.values.email] as const
-                          }
-                        >
-                          {(values) => (
-                            <Button
-                              disabled={
-                                !values()[0].trim() ||
-                                !values()[1].trim() ||
-                                updateUser.isPending ||
-                                setRoleMutation.isPending ||
-                                canUpdate.isPending ||
-                                canSetRole.isPending ||
-                                (!canUpdate.data?.success &&
-                                  (!canSetRole.data?.success || isSelf()))
-                              }
-                              type="submit"
-                            >
-                              {config().localization.saveChanges}
-                            </Button>
-                          )}
-                        </profileForm.Subscribe>
-                      </div>
-                    </form>
+                              <Show
+                                when={
+                                  selectedUser().banned &&
+                                  selectedUser().banReason
+                                }
+                              >
+                                <div class="flex flex-col gap-1">
+                                  <dt class="text-muted-foreground">
+                                    {config().localization.banReason}
+                                  </dt>
+                                  <dd>{selectedUser().banReason}</dd>
+                                </div>
+                              </Show>
+                              <Show
+                                when={
+                                  selectedUser().banned &&
+                                  selectedUser().banExpires
+                                }
+                              >
+                                <div class="flex flex-col gap-1">
+                                  <dt class="text-muted-foreground">
+                                    {config().localization.banExpires}
+                                  </dt>
+                                  <dd>
+                                    {formatDate(selectedUser().banExpires)}
+                                  </dd>
+                                </div>
+                              </Show>
+                            </dl>
+                          </section>
+                          <Separator />
+                          <section class="flex flex-col gap-4 p-6">
+                            <h3 class="font-medium">
+                              {config().localization.security}
+                            </h3>
+                            <div>
+                              <Button
+                                disabled={
+                                  canSetPassword.isPending ||
+                                  !canSetPassword.data?.success
+                                }
+                                type="button"
+                                variant="outline"
+                                onClick={() => setPasswordOpen(true)}
+                              >
+                                <KeyRound />
+                                {config().localization.setPassword}
+                              </Button>
+                            </div>
+                          </section>
+                          <Separator />
+                          <section class="flex flex-col gap-4 p-6">
+                            <h3 class="font-medium">
+                              {config().localization.dangerZone}
+                            </h3>
+                            <div class="flex flex-wrap gap-2">
+                              <Button
+                                disabled={
+                                  canBan.isPending ||
+                                  !canBan.data?.success ||
+                                  isSelf()
+                                }
+                                type="button"
+                                variant="outline"
+                                onClick={() =>
+                                  selectedUser().banned
+                                    ? unban.mutate({
+                                        userId: selectedUser().id
+                                      })
+                                    : setDangerousAction("ban")
+                                }
+                              >
+                                <Ban />
+                                {selectedUser().banned
+                                  ? config().localization.unbanUser
+                                  : config().localization.banUser}
+                              </Button>
+                              <Button
+                                disabled={
+                                  canDelete.isPending ||
+                                  !canDelete.data?.success ||
+                                  isSelf()
+                                }
+                                type="button"
+                                variant="destructive"
+                                onClick={() => setDangerousAction("delete")}
+                              >
+                                <Trash2 />
+                                {config().localization.deleteUser}
+                              </Button>
+                            </div>
+                            <FieldError>
+                              {getAdminErrorMessage(unban.error)}
+                            </FieldError>
+                          </section>
+                        </div>
+                        <div class="flex flex-col-reverse gap-2 border-t bg-muted/50 px-6 py-4 sm:flex-row sm:justify-end">
+                          <Button
+                            type="button"
+                            variant="outline"
+                            onClick={() => props.onOpenChange(false)}
+                          >
+                            {config().localization.cancel}
+                          </Button>
+                          <profileForm.Subscribe
+                            selector={(state) =>
+                              [state.values.name, state.values.email] as const
+                            }
+                          >
+                            {(values) => (
+                              <profileForm.AuthFormSubmitButton
+                                disabled={
+                                  !values()[0].trim() ||
+                                  !values()[1].trim() ||
+                                  updateUser.isPending ||
+                                  setRoleMutation.isPending ||
+                                  canUpdate.isPending ||
+                                  canSetRole.isPending ||
+                                  (!canUpdate.data?.success &&
+                                    (!canSetRole.data?.success || isSelf()))
+                                }
+                              >
+                                {config().localization.saveChanges}
+                              </profileForm.AuthFormSubmitButton>
+                            )}
+                          </profileForm.Subscribe>
+                        </div>
+                      </profileForm.AuthFormRoot>
+                    </profileForm.AppForm>
                   </TabsContent>
                   <TabsContent
                     class="flex min-h-0 flex-col gap-3 overflow-y-auto p-6"

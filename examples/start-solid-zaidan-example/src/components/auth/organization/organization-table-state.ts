@@ -1,10 +1,13 @@
 import {
   parseTableColumnVisibility,
+  parseTableFilterValue,
   parseTablePage,
   parseTablePageSize,
   parseTableSorting,
-  serializeTableColumnVisibility
+  serializeTableColumnVisibility,
+  serializeTableFilterValue
 } from "@better-auth-ui/core"
+import { createAtom, useSelector } from "@tanstack/solid-store"
 import {
   type ColumnFiltersState,
   type ColumnVisibilityState,
@@ -19,13 +22,22 @@ import { ORGANIZATION_TABLE_PAGE_SIZE } from "./organization-table"
 
 const STORAGE_PREFIX = "better-auth-ui:organization-table"
 
-function readUrl(stateKey: string, defaultPageSize: number) {
+function readUrl(
+  stateKey: string,
+  defaultPageSize: number,
+  allowedColumnIds?: readonly string[]
+) {
   const params = new URLSearchParams(window.location.search)
   const prefix = `${stateKey}.filter.`
   const filters: ColumnFiltersState = []
   for (const [key, value] of params) {
-    if (key.startsWith(prefix) && value)
-      filters.push({ id: key.slice(prefix.length), value })
+    const id = key.slice(prefix.length)
+    if (
+      key.startsWith(prefix) &&
+      value &&
+      (!allowedColumnIds || allowedColumnIds.includes(id))
+    )
+      filters.push({ id, value: parseTableFilterValue(value) })
   }
   return {
     columnFilters: filters,
@@ -38,7 +50,7 @@ function readUrl(stateKey: string, defaultPageSize: number) {
         ORGANIZATION_TABLE_PAGE_SIZE_OPTIONS
       )
     },
-    sorting: parseTableSorting(params.get(`${stateKey}.sort`))
+    sorting: parseTableSorting(params.get(`${stateKey}.sort`), allowedColumnIds)
   }
 }
 
@@ -54,62 +66,87 @@ function setOrDelete(
 
 export function createOrganizationTableState(
   stateKey: string,
-  defaultPageSize = ORGANIZATION_TABLE_PAGE_SIZE
+  defaultPageSize = ORGANIZATION_TABLE_PAGE_SIZE,
+  allowedColumnIds?: readonly string[]
 ) {
-  const [columnFilters, setColumnFiltersState] =
-    createSignal<ColumnFiltersState>([])
-  const [columnVisibility, setColumnVisibility] =
-    createSignal<ColumnVisibilityState>({})
-  const [globalFilter, setGlobalFilterState] = createSignal("")
-  const [pagination, setPaginationState] = createSignal<PaginationState>({
+  const columnFiltersAtom = createAtom<ColumnFiltersState>([])
+  const globalFilterAtom = createAtom("")
+  const paginationAtom = createAtom<PaginationState>({
     pageIndex: 0,
     pageSize: defaultPageSize
   })
-  const [rowSelection, setRowSelection] = createSignal<RowSelectionState>({})
-  const [sorting, setSortingState] = createSignal<SortingState>([])
+  const rowSelectionAtom = createAtom<RowSelectionState>({})
+  const sortingAtom = createAtom<SortingState>([])
+  const columnFilters = useSelector(columnFiltersAtom)
+  const globalFilter = useSelector(globalFilterAtom)
+  const pagination = useSelector(paginationAtom)
+  const rowSelection = useSelector(rowSelectionAtom)
+  const sorting = useSelector(sortingAtom)
+  const [columnVisibility, setColumnVisibility] =
+    createSignal<ColumnVisibilityState>({})
   const [ready, setReady] = createSignal(false)
+  const atoms = {
+    columnFilters: columnFiltersAtom,
+    globalFilter: globalFilterAtom,
+    pagination: paginationAtom,
+    rowSelection: rowSelectionAtom,
+    sorting: sortingAtom
+  }
 
   const setPagination = (updater: Updater<PaginationState>) => {
-    setPaginationState((current) => functionalUpdate(updater, current))
-    setRowSelection({})
+    paginationAtom.set((current) => functionalUpdate(updater, current))
+    rowSelectionAtom.set({})
   }
   const setColumnFilters = (updater: Updater<ColumnFiltersState>) => {
-    setColumnFiltersState((current) => functionalUpdate(updater, current))
-    setPaginationState((current) => ({ ...current, pageIndex: 0 }))
-    setRowSelection({})
+    columnFiltersAtom.set((current) => functionalUpdate(updater, current))
+    paginationAtom.set((current) => ({ ...current, pageIndex: 0 }))
+    rowSelectionAtom.set({})
   }
   const setGlobalFilter = (updater: Updater<string>) => {
-    setGlobalFilterState((current) => functionalUpdate(updater, current))
-    setPaginationState((current) => ({ ...current, pageIndex: 0 }))
-    setRowSelection({})
+    globalFilterAtom.set((current) => functionalUpdate(updater, current))
+    paginationAtom.set((current) => ({ ...current, pageIndex: 0 }))
+    rowSelectionAtom.set({})
   }
   const setSorting = (updater: Updater<SortingState>) => {
-    setSortingState((current) => functionalUpdate(updater, current))
-    setPaginationState((current) => ({ ...current, pageIndex: 0 }))
-    setRowSelection({})
+    sortingAtom.set((current) => functionalUpdate(updater, current))
+    paginationAtom.set((current) => ({ ...current, pageIndex: 0 }))
+    rowSelectionAtom.set({})
   }
 
   onMount(() => {
+    const resetPageAndSelection = () => {
+      paginationAtom.set((current) => ({ ...current, pageIndex: 0 }))
+      rowSelectionAtom.set({})
+    }
+    const subscriptions = [
+      columnFiltersAtom.subscribe(resetPageAndSelection),
+      globalFilterAtom.subscribe(resetPageAndSelection),
+      sortingAtom.subscribe(resetPageAndSelection)
+    ]
+
     try {
       const saved = window.localStorage.getItem(
         `${STORAGE_PREFIX}:${stateKey}:columns`
       )
-      setColumnVisibility(parseTableColumnVisibility(saved))
+      setColumnVisibility(parseTableColumnVisibility(saved, allowedColumnIds))
     } catch {
       // Storage is optional.
     }
     const restore = () => {
-      const next = readUrl(stateKey, defaultPageSize)
-      setColumnFiltersState(next.columnFilters)
-      setGlobalFilterState(next.globalFilter)
-      setPaginationState(next.pagination)
-      setSortingState(next.sorting)
-      setRowSelection({})
+      const next = readUrl(stateKey, defaultPageSize, allowedColumnIds)
+      columnFiltersAtom.set(next.columnFilters)
+      globalFilterAtom.set(next.globalFilter)
+      sortingAtom.set(next.sorting)
+      paginationAtom.set(next.pagination)
+      rowSelectionAtom.set({})
       setReady(true)
     }
     restore()
     window.addEventListener("popstate", restore)
-    onCleanup(() => window.removeEventListener("popstate", restore))
+    onCleanup(() => {
+      window.removeEventListener("popstate", restore)
+      for (const subscription of subscriptions) subscription.unsubscribe()
+    })
   })
 
   createEffect(() => {
@@ -138,7 +175,7 @@ export function createOrganizationTableState(
     for (const key of Array.from(url.searchParams.keys()))
       if (key.startsWith(prefix)) url.searchParams.delete(key)
     for (const filter of state.columnFilters) {
-      const value = String(filter.value ?? "")
+      const value = serializeTableFilterValue(filter.value)
       if (value) url.searchParams.set(`${prefix}${filter.id}`, value)
     }
     setOrDelete(url.searchParams, `${stateKey}.search`, state.globalFilter)
@@ -165,17 +202,19 @@ export function createOrganizationTableState(
   })
 
   return {
+    atoms,
     columnFilters,
     columnVisibility,
     globalFilter,
     pagination,
+    ready,
     rowSelection,
     sorting,
     setColumnFilters,
     setColumnVisibility,
     setGlobalFilter,
     setPagination,
-    setRowSelection,
+    setRowSelection: rowSelectionAtom.set,
     setSorting
   }
 }

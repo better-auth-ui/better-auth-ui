@@ -63,7 +63,6 @@ import {
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import { Skeleton } from "@/components/ui/skeleton"
-import { Spinner } from "@/components/ui/spinner"
 import { Textarea } from "@/components/ui/textarea"
 import { organizationPlugin } from "@/lib/auth/organization-plugin"
 import { ssoPlugin } from "@/lib/auth/sso-plugin"
@@ -351,232 +350,237 @@ function EditSsoProviderDialog({
       }}
     >
       <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-xl">
-        <form
-          className="flex flex-col gap-4"
-          onSubmit={(event) => {
-            event.preventDefault()
-            void form.handleSubmit()
-          }}
-        >
-          <DialogHeader>
-            <DialogTitle>{localization.editProvider}</DialogTitle>
-            <DialogDescription>{provider?.providerId}</DialogDescription>
-          </DialogHeader>
-          <FieldGroup>
-            <form.AppField
-              name="domain"
-              validators={{
-                onChange: ({ value }) =>
-                  validateStringLength(value, {
-                    requiredMessage: authLocalization.auth.fieldRequired,
-                    trim: true
-                  })
-              }}
-            >
-              {(field) => (
-                <Field data-invalid={isAuthFormFieldInvalid(field.state.meta)}>
-                  <FieldLabel htmlFor="sso-edit-domain">
-                    {localization.domain}
-                  </FieldLabel>
-                  <Input
-                    id="sso-edit-domain"
-                    name={field.name}
-                    onBlur={field.handleBlur}
-                    onChange={(event) => field.handleChange(event.target.value)}
-                    required
-                    value={field.state.value}
-                    aria-invalid={isAuthFormFieldInvalid(field.state.meta)}
-                  />
-                  <field.AuthFormFieldError />
-                </Field>
-              )}
-            </form.AppField>
-            <form.AppField
-              name="issuer"
-              validators={{
-                onChange: ({ value }) =>
-                  validateAbsoluteUrl(value, {
-                    invalidMessage: localization.invalidUrl,
-                    requiredMessage: authLocalization.auth.fieldRequired
-                  })
-              }}
-            >
-              {(field) => (
-                <Field data-invalid={isAuthFormFieldInvalid(field.state.meta)}>
-                  <FieldLabel htmlFor="sso-edit-issuer">
-                    {localization.issuer}
-                  </FieldLabel>
-                  <Input
-                    id="sso-edit-issuer"
-                    name={field.name}
-                    onBlur={field.handleBlur}
-                    onChange={(event) => field.handleChange(event.target.value)}
-                    required
-                    type="url"
-                    value={field.state.value}
-                    aria-invalid={isAuthFormFieldInvalid(field.state.meta)}
-                  />
-                  <field.AuthFormFieldError />
-                </Field>
-              )}
-            </form.AppField>
-            {provider?.oidcConfig ? (
-              <>
-                <form.AppField
-                  name="discoveryEndpoint"
-                  validators={{
-                    onChange: ({ value }) =>
-                      validateAbsoluteUrl(value, {
-                        invalidMessage: localization.invalidUrl
-                      })
-                  }}
-                >
-                  {(field) => (
-                    <Field
-                      data-invalid={isAuthFormFieldInvalid(field.state.meta)}
-                    >
-                      <FieldLabel htmlFor="sso-edit-discovery">
-                        {localization.discoveryEndpoint}
-                      </FieldLabel>
-                      <Input
-                        id="sso-edit-discovery"
-                        name={field.name}
-                        onBlur={field.handleBlur}
-                        onChange={(event) =>
-                          field.handleChange(event.target.value)
-                        }
-                        type="url"
-                        value={field.state.value}
-                        aria-invalid={isAuthFormFieldInvalid(field.state.meta)}
-                      />
-                      <field.AuthFormFieldError />
-                    </Field>
-                  )}
-                </form.AppField>
-                <div className="grid gap-4 sm:grid-cols-2">
-                  {(
-                    [
-                      ["clientId", "sso-edit-client-id", localization.clientId],
+        <form.AppForm>
+          <form.AuthFormRoot className="flex flex-col gap-4">
+            <DialogHeader>
+              <DialogTitle>{localization.editProvider}</DialogTitle>
+              <DialogDescription>{provider?.providerId}</DialogDescription>
+            </DialogHeader>
+            <FieldGroup>
+              <form.AppField
+                name="domain"
+                validators={{
+                  onChange: ({ value }) =>
+                    validateStringLength(value, {
+                      requiredMessage: authLocalization.auth.fieldRequired,
+                      trim: true
+                    })
+                }}
+              >
+                {(field) => (
+                  <Field
+                    data-invalid={isAuthFormFieldInvalid(field.state.meta)}
+                  >
+                    <FieldLabel htmlFor="sso-edit-domain">
+                      {localization.domain}
+                    </FieldLabel>
+                    <Input
+                      id="sso-edit-domain"
+                      name={field.name}
+                      onBlur={field.handleBlur}
+                      onChange={(event) =>
+                        field.handleChange(event.target.value)
+                      }
+                      required
+                      value={field.state.value}
+                      aria-invalid={isAuthFormFieldInvalid(field.state.meta)}
+                    />
+                    <field.AuthFormFieldError />
+                  </Field>
+                )}
+              </form.AppField>
+              <form.AppField
+                name="issuer"
+                validators={{
+                  onChange: ({ value }) =>
+                    validateAbsoluteUrl(value, {
+                      invalidMessage: localization.invalidUrl,
+                      requiredMessage: authLocalization.auth.fieldRequired
+                    })
+                }}
+              >
+                {(field) => (
+                  <Field
+                    data-invalid={isAuthFormFieldInvalid(field.state.meta)}
+                  >
+                    <FieldLabel htmlFor="sso-edit-issuer">
+                      {localization.issuer}
+                    </FieldLabel>
+                    <Input
+                      id="sso-edit-issuer"
+                      name={field.name}
+                      onBlur={field.handleBlur}
+                      onChange={(event) =>
+                        field.handleChange(event.target.value)
+                      }
+                      required
+                      type="url"
+                      value={field.state.value}
+                      aria-invalid={isAuthFormFieldInvalid(field.state.meta)}
+                    />
+                    <field.AuthFormFieldError />
+                  </Field>
+                )}
+              </form.AppField>
+              {provider?.oidcConfig ? (
+                <>
+                  <form.AppField
+                    name="discoveryEndpoint"
+                    validators={{
+                      onChange: ({ value }) =>
+                        validateAbsoluteUrl(value, {
+                          invalidMessage: localization.invalidUrl
+                        })
+                    }}
+                  >
+                    {(field) => (
+                      <Field
+                        data-invalid={isAuthFormFieldInvalid(field.state.meta)}
+                      >
+                        <FieldLabel htmlFor="sso-edit-discovery">
+                          {localization.discoveryEndpoint}
+                        </FieldLabel>
+                        <Input
+                          id="sso-edit-discovery"
+                          name={field.name}
+                          onBlur={field.handleBlur}
+                          onChange={(event) =>
+                            field.handleChange(event.target.value)
+                          }
+                          type="url"
+                          value={field.state.value}
+                          aria-invalid={isAuthFormFieldInvalid(
+                            field.state.meta
+                          )}
+                        />
+                        <field.AuthFormFieldError />
+                      </Field>
+                    )}
+                  </form.AppField>
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    {(
                       [
-                        "clientSecret",
-                        "sso-edit-client-secret",
-                        localization.clientSecret
-                      ]
-                    ] as const
-                  ).map(([name, id, label]) => (
-                    <form.Field key={name} name={name}>
-                      {(field) => (
-                        <Field>
-                          <FieldLabel htmlFor={id}>{label}</FieldLabel>
-                          <Input
-                            autoComplete={
-                              name === "clientSecret"
-                                ? "new-password"
-                                : undefined
-                            }
-                            id={id}
-                            name={field.name}
-                            onBlur={field.handleBlur}
-                            onChange={(event) =>
-                              field.handleChange(event.target.value)
-                            }
-                            placeholder={
-                              name === "clientId"
-                                ? `••••${provider.oidcConfig?.clientIdLastFour}`
-                                : undefined
-                            }
-                            type={name === "clientSecret" ? "password" : "text"}
-                            value={field.state.value}
-                          />
-                        </Field>
-                      )}
-                    </form.Field>
-                  ))}
-                </div>
-              </>
-            ) : null}
-            {provider?.samlConfig ? (
-              <>
-                <form.AppField
-                  name="entryPoint"
-                  validators={{
-                    onChange: ({ value }) =>
-                      validateAbsoluteUrl(value, {
-                        invalidMessage: localization.invalidUrl,
-                        requiredMessage: authLocalization.auth.fieldRequired
-                      })
-                  }}
-                >
-                  {(field) => (
-                    <Field
-                      data-invalid={isAuthFormFieldInvalid(field.state.meta)}
-                    >
-                      <FieldLabel htmlFor="sso-edit-entry-point">
-                        {localization.entryPoint}
-                      </FieldLabel>
-                      <Input
-                        id="sso-edit-entry-point"
-                        name={field.name}
-                        onBlur={field.handleBlur}
-                        onChange={(event) =>
-                          field.handleChange(event.target.value)
-                        }
-                        required
-                        type="url"
-                        value={field.state.value}
-                        aria-invalid={isAuthFormFieldInvalid(field.state.meta)}
-                      />
-                      <field.AuthFormFieldError />
-                    </Field>
-                  )}
-                </form.AppField>
-                <form.Field name="identityProviderMetadata">
-                  {(field) => (
-                    <Field>
-                      <FieldLabel htmlFor="sso-edit-metadata">
-                        {localization.identityProviderMetadata}
-                      </FieldLabel>
-                      <Textarea
-                        className="font-mono text-xs"
-                        id="sso-edit-metadata"
-                        name={field.name}
-                        onBlur={field.handleBlur}
-                        onChange={(event) =>
-                          field.handleChange(event.target.value)
-                        }
-                        rows={6}
-                        value={field.state.value}
-                      />
-                    </Field>
-                  )}
-                </form.Field>
-              </>
-            ) : null}
-          </FieldGroup>
-          <FieldError>{getErrorMessage(update.error)}</FieldError>
-          <DialogFooter>
-            <Button
-              disabled={update.isPending}
-              onClick={close}
-              type="button"
-              variant="outline"
-            >
-              {localization.cancel}
-            </Button>
-            <form.Subscribe
-              selector={(state) =>
-                [state.canSubmit, state.isSubmitting] as const
-              }
-            >
-              {([canSubmit, isSubmitting]) => (
-                <Button disabled={!canSubmit || isSubmitting} type="submit">
-                  {isSubmitting ? <Spinner data-icon="inline-start" /> : null}
-                  {localization.saveProvider}
-                </Button>
-              )}
-            </form.Subscribe>
-          </DialogFooter>
-        </form>
+                        [
+                          "clientId",
+                          "sso-edit-client-id",
+                          localization.clientId
+                        ],
+                        [
+                          "clientSecret",
+                          "sso-edit-client-secret",
+                          localization.clientSecret
+                        ]
+                      ] as const
+                    ).map(([name, id, label]) => (
+                      <form.Field key={name} name={name}>
+                        {(field) => (
+                          <Field>
+                            <FieldLabel htmlFor={id}>{label}</FieldLabel>
+                            <Input
+                              autoComplete={
+                                name === "clientSecret"
+                                  ? "new-password"
+                                  : undefined
+                              }
+                              id={id}
+                              name={field.name}
+                              onBlur={field.handleBlur}
+                              onChange={(event) =>
+                                field.handleChange(event.target.value)
+                              }
+                              placeholder={
+                                name === "clientId"
+                                  ? `••••${provider.oidcConfig?.clientIdLastFour}`
+                                  : undefined
+                              }
+                              type={
+                                name === "clientSecret" ? "password" : "text"
+                              }
+                              value={field.state.value}
+                            />
+                          </Field>
+                        )}
+                      </form.Field>
+                    ))}
+                  </div>
+                </>
+              ) : null}
+              {provider?.samlConfig ? (
+                <>
+                  <form.AppField
+                    name="entryPoint"
+                    validators={{
+                      onChange: ({ value }) =>
+                        validateAbsoluteUrl(value, {
+                          invalidMessage: localization.invalidUrl,
+                          requiredMessage: authLocalization.auth.fieldRequired
+                        })
+                    }}
+                  >
+                    {(field) => (
+                      <Field
+                        data-invalid={isAuthFormFieldInvalid(field.state.meta)}
+                      >
+                        <FieldLabel htmlFor="sso-edit-entry-point">
+                          {localization.entryPoint}
+                        </FieldLabel>
+                        <Input
+                          id="sso-edit-entry-point"
+                          name={field.name}
+                          onBlur={field.handleBlur}
+                          onChange={(event) =>
+                            field.handleChange(event.target.value)
+                          }
+                          required
+                          type="url"
+                          value={field.state.value}
+                          aria-invalid={isAuthFormFieldInvalid(
+                            field.state.meta
+                          )}
+                        />
+                        <field.AuthFormFieldError />
+                      </Field>
+                    )}
+                  </form.AppField>
+                  <form.Field name="identityProviderMetadata">
+                    {(field) => (
+                      <Field>
+                        <FieldLabel htmlFor="sso-edit-metadata">
+                          {localization.identityProviderMetadata}
+                        </FieldLabel>
+                        <Textarea
+                          className="font-mono text-xs"
+                          id="sso-edit-metadata"
+                          name={field.name}
+                          onBlur={field.handleBlur}
+                          onChange={(event) =>
+                            field.handleChange(event.target.value)
+                          }
+                          rows={6}
+                          value={field.state.value}
+                        />
+                      </Field>
+                    )}
+                  </form.Field>
+                </>
+              ) : null}
+            </FieldGroup>
+            <FieldError>{getErrorMessage(update.error)}</FieldError>
+            <DialogFooter>
+              <Button
+                disabled={update.isPending}
+                onClick={close}
+                type="button"
+                variant="outline"
+              >
+                {localization.cancel}
+              </Button>
+              <form.AuthFormSubmitButton disabled={update.isPending}>
+                {localization.saveProvider}
+              </form.AuthFormSubmitButton>
+            </DialogFooter>
+          </form.AuthFormRoot>
+        </form.AppForm>
       </DialogContent>
     </Dialog>
   )

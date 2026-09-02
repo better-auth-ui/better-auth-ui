@@ -1,10 +1,14 @@
 import type { OrganizationLocalization } from "@better-auth-ui/core/plugins/organization"
 import { Checkbox } from "@heroui/react"
+import { useRef } from "react"
 
 type SelectableRow = {
   getCanSelect: () => boolean
   getIsSelected: () => boolean
-  toggleSelected: (selected?: boolean) => void
+  getToggleSelectedHandler: () => (event: {
+    shiftKey: boolean
+    target: { checked: boolean }
+  }) => void
 }
 
 function SelectionCheckbox({
@@ -18,15 +22,26 @@ function SelectionCheckbox({
   disabled?: boolean
   selected: boolean
   indeterminate?: boolean
-  onChange: (selected: boolean) => void
+  onChange: (selected: boolean, shiftKey: boolean) => void
 }) {
+  const shiftKey = useRef(false)
+
   return (
     <Checkbox
       aria-label={ariaLabel}
       isDisabled={disabled}
       isIndeterminate={indeterminate}
       isSelected={selected}
-      onChange={onChange}
+      onChange={(next) => {
+        onChange(next, shiftKey.current)
+        shiftKey.current = false
+      }}
+      onKeyDown={(event) => {
+        shiftKey.current = event.shiftKey
+      }}
+      onPointerDown={(event) => {
+        shiftKey.current = event.shiftKey
+      }}
       slot="selection"
     >
       <Checkbox.Content>
@@ -77,7 +92,12 @@ export function OrganizationTableSelectRow({
       ariaLabel={localization.selectRow}
       disabled={disabled || !row.getCanSelect()}
       selected={selected}
-      onChange={(next) => row.toggleSelected(next)}
+      onChange={(next, shiftKey) =>
+        row.getToggleSelectedHandler()({
+          shiftKey,
+          target: { checked: next }
+        })
+      }
     />
   )
 }

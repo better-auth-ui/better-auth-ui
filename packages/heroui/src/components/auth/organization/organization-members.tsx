@@ -1,3 +1,4 @@
+import { getClampedTablePageIndex } from "@better-auth-ui/core"
 import {
   hasMemberRole,
   type OrganizationAuthClient
@@ -21,6 +22,7 @@ import {
   Table,
   toast
 } from "@heroui/react"
+import { keepPreviousData } from "@tanstack/react-query"
 import type { Member, User } from "better-auth/client"
 import { type ComponentProps, useEffect, useRef, useState } from "react"
 
@@ -60,6 +62,7 @@ const memberColumns = memberColumnHelper.columns([
   })
 ])
 const EMPTY_MEMBERS: MemberRow[] = []
+const MEMBER_COLUMN_IDS = ["user", "role", "teams"] as const
 
 /** Props for the {@link OrganizationMembers} component. */
 export type OrganizationMembersProps = {
@@ -111,16 +114,11 @@ export function OrganizationMembers({
   const paged = validatedPageSize !== undefined
   const tableState = useOrganizationTableState(
     "organizationMembers",
-    validatedPageSize ?? ORGANIZATION_TABLE_PAGE_SIZE
+    validatedPageSize ?? ORGANIZATION_TABLE_PAGE_SIZE,
+    MEMBER_COLUMN_IDS
   )
-  const {
-    columnFilters,
-    columnVisibility,
-    globalFilter,
-    pagination,
-    rowSelection,
-    sorting
-  } = tableState
+  const { columnFilters, columnVisibility, globalFilter, pagination, sorting } =
+    tableState
   const roleFilter = String(
     columnFilters.find((filter) => filter.id === "role")?.value ?? "all"
   )
@@ -140,6 +138,8 @@ export function OrganizationMembers({
 
   const { data: membersData, isPending: membersPending } =
     useListOrganizationMembers(authClient as OrganizationAuthClient, {
+      enabled: !paged || tableState.ready,
+      placeholderData: paged ? keepPreviousData : undefined,
       query: paged
         ? {
             limit: pagination.pageSize,
@@ -215,11 +215,36 @@ export function OrganizationMembers({
   const [inviteOpen, setInviteOpen] = useState(false)
 
   const total = membersData?.total ?? membersData?.members.length ?? 0
+
+  useEffect(() => {
+    if (!paged || !tableState.ready || !membersData) return
+
+    const lastPageIndex = getClampedTablePageIndex(
+      pagination.pageIndex,
+      pagination.pageSize,
+      total
+    )
+    if (pagination.pageIndex > lastPageIndex) {
+      tableState.setPagination((current) => ({
+        ...current,
+        pageIndex: lastPageIndex
+      }))
+    }
+  }, [
+    membersData,
+    paged,
+    pagination.pageIndex,
+    pagination.pageSize,
+    tableState.ready,
+    tableState.setPagination,
+    total
+  ])
   const isOwner = hasMemberRole(activeMemberRole?.role, creatorRole)
   const ownerCount = owners.data?.total ?? owners.data?.members.length
   const showTeams = teams && canListMemberTeams.data?.success === true
 
   const table = useOrganizationTable({
+    atoms: tableState.atoms,
     columns: memberColumns,
     data: membersData?.members ?? EMPTY_MEMBERS,
     enableRowSelection: (row) => {
@@ -238,22 +263,12 @@ export function OrganizationMembers({
     manualSorting: paged,
     rowCount: paged ? total : undefined,
     state: {
-      columnFilters,
       columnVisibility: {
         ...columnVisibility,
         teams: showTeams && columnVisibility.teams !== false
-      },
-      globalFilter,
-      pagination,
-      rowSelection,
-      sorting
+      }
     },
-    onColumnFiltersChange: tableState.setColumnFilters,
-    onColumnVisibilityChange: tableState.setColumnVisibility,
-    onGlobalFilterChange: tableState.setGlobalFilter,
-    onPaginationChange: tableState.setPagination,
-    onRowSelectionChange: tableState.setRowSelection,
-    onSortingChange: tableState.setSorting
+    onColumnVisibilityChange: tableState.setColumnVisibility
   })
 
   const removeMembers = useRemoveMember(authClient as OrganizationAuthClient)

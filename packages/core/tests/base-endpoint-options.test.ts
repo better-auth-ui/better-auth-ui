@@ -50,6 +50,7 @@ import type { OrganizationAuthClient } from "../src/plugins/organization/organiz
 import {
   addPasskeyOptions,
   deletePasskeyOptions,
+  passkeyAutoFillOptions,
   passkeyMutationKeys,
   passkeyQueryKeys,
   signInPasskeyOptions
@@ -300,6 +301,7 @@ describe("core base endpoint option factories", () => {
     const addPasskey = addPasskeyOptions(authClient as never, userId)
     const deletePasskey = deletePasskeyOptions(authClient as never, userId)
     const signInPasskey = signInPasskeyOptions(authClient as never)
+    const passkeyAutoFill = passkeyAutoFillOptions(authClient as never)
 
     expect(createApiKey.mutationKey).toEqual(apiKeyMutationKeys.create)
     expect(deleteApiKey.mutationKey).toEqual(apiKeyMutationKeys.delete)
@@ -339,6 +341,10 @@ describe("core base endpoint option factories", () => {
     })
     expect(signInPasskey.meta).toEqual({
       awaits: [authQueryKeys.session]
+    })
+    expect(passkeyAutoFill.meta).toEqual({
+      awaits: [authQueryKeys.session],
+      errorPresentation: "silent"
     })
 
     await expect(

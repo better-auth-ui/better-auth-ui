@@ -4,7 +4,10 @@ import { Checkbox } from "@/components/ui/checkbox"
 export type OrganizationSelectableRow = {
   getCanSelect: () => boolean
   getIsSelected: () => boolean
-  toggleSelected: (selected?: boolean) => void
+  getToggleSelectedHandler: () => (event: {
+    shiftKey: boolean
+    target: { checked: boolean }
+  }) => void
 }
 
 export function OrganizationTableSelectAll(props: {
@@ -30,12 +33,26 @@ export function OrganizationTableSelectRow(props: {
   localization: Pick<OrganizationLocalization, "selectRow">
   row: OrganizationSelectableRow
 }) {
+  let shiftKey = false
+
   return (
     <Checkbox
       aria-label={props.localization.selectRow}
       checked={props.row.getIsSelected()}
       disabled={props.disabled || !props.row.getCanSelect()}
-      onChange={(checked) => props.row.toggleSelected(checked)}
+      onChange={(checked) => {
+        props.row.getToggleSelectedHandler()({
+          shiftKey,
+          target: { checked }
+        })
+        shiftKey = false
+      }}
+      onKeyDown={(event) => {
+        shiftKey = event.shiftKey
+      }}
+      onPointerDown={(event) => {
+        shiftKey = event.shiftKey
+      }}
     />
   )
 }

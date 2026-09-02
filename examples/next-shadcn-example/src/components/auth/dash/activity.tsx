@@ -1,5 +1,6 @@
 "use client"
 
+import { getClampedTablePageIndex } from "@better-auth-ui/core"
 import {
   type DashAuditLog,
   type DashAuthClient,
@@ -42,7 +43,7 @@ import {
   UserRound,
   Users
 } from "lucide-react"
-import { Fragment, useDeferredValue, useMemo, useState } from "react"
+import { Fragment, useDeferredValue, useEffect, useMemo, useState } from "react"
 
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -293,6 +294,24 @@ function ActivityFeed({
   const { data, error, isFetching, isPending } = query
   const showPending = !ready || isPending
   const pageEnd = offset + (data?.events.length ?? 0)
+
+  useEffect(() => {
+    if (!ready || !query.isSuccess) return
+    const pageIndex = getClampedTablePageIndex(
+      pagination.pageIndex,
+      pagination.pageSize,
+      data?.total ?? 0
+    )
+    if (pageIndex !== pagination.pageIndex) {
+      setPaginationState((current) => ({ ...current, pageIndex }))
+    }
+  }, [
+    data?.total,
+    pagination.pageIndex,
+    pagination.pageSize,
+    query.isSuccess,
+    ready
+  ])
   const setPagination = (updater: Updater<PaginationState>) =>
     setPaginationState((current) => functionalUpdate(updater, current))
   const setColumnFilters = (updater: Updater<ColumnFiltersState>) => {

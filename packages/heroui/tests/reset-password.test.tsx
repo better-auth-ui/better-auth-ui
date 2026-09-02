@@ -2,7 +2,7 @@ import { QueryClient } from "@tanstack/react-query"
 import { render, screen, waitFor } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { afterEach, describe, expect, it, vi } from "vitest"
-
+import { focusFirstInvalidAuthFormControl } from "../src/components/auth/auth-form"
 import { AuthProvider } from "../src/components/auth/auth-provider"
 import { ResetPassword } from "../src/components/auth/reset-password"
 
@@ -98,5 +98,22 @@ describe("<ResetPassword />", () => {
       })
       expect(navigate).toHaveBeenCalledWith({ to: signInURL })
     })
+  })
+
+  it("focuses the first invalid form control", async () => {
+    const { container } = render(
+      <form>
+        <input aria-invalid="false" />
+        <input aria-invalid="true" />
+        <input aria-invalid="true" />
+      </form>
+    )
+    const form = container.querySelector("form")
+    const invalidControls = screen.getAllByRole("textbox").slice(1)
+
+    expect(form).not.toBeNull()
+    focusFirstInvalidAuthFormControl(form as HTMLFormElement)
+
+    await waitFor(() => expect(invalidControls[0]).toHaveFocus())
   })
 })
