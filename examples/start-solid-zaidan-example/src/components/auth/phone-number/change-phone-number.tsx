@@ -20,9 +20,9 @@ import { InternationalPhoneField } from "@/components/auth/phone-number/internat
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
-import { Spinner } from "@/components/ui/spinner"
 import { phoneNumberPlugin } from "@/lib/auth/phone-number-plugin"
 import { cn } from "@/lib/utils"
+import { createAuthForm, isAuthFormFieldInvalid } from "../auth-form"
 import { RemovePhoneNumberDialog } from "./remove-phone-number-dialog"
 
 type PhoneNumberUser = {
@@ -48,18 +48,14 @@ export function ChangePhoneNumber(props: ChangePhoneNumberProps = {}) {
   const session = useSession(phoneClient())
   const currentPhoneNumber = () =>
     (session.data?.user as PhoneNumberUser | undefined)?.phoneNumber ?? ""
-  const [phoneNumber, setPhoneNumber] = createSignal(
-    createPhoneNumberValue("", defaultCountry, adapter)
-  )
-  const [fieldError, setFieldError] = createSignal<string>()
-  const [code, setCode] = createSignal("")
   const [codeSent, setCodeSent] = createSignal(false)
 
   let initialized = false
   createEffect(() => {
     if (!session.data || initialized) return
     initialized = true
-    setPhoneNumber(
+    form.setFieldValue(
+      "phoneNumber",
       createPhoneNumberValue(currentPhoneNumber(), defaultCountry, adapter)
     )
   })
@@ -68,39 +64,45 @@ export function ChangePhoneNumber(props: ChangePhoneNumberProps = {}) {
     onSuccess: () => setCodeSent(true)
   }))
   const verify = useVerifyPhoneNumber(phoneClient(), () => ({
-    onError: () => setCode(""),
+    onError: () => form.setFieldValue("code", ""),
     onSuccess: () => {
-      setCode("")
+      form.setFieldValue("code", "")
       setCodeSent(false)
       toast.success(localization.phoneNumberUpdated)
     }
   }))
   const remove = useUpdateUser(phoneClient(), () => ({
     onSuccess: () => {
-      setPhoneNumber(createPhoneNumberValue("", defaultCountry, adapter))
+      form.setFieldValue(
+        "phoneNumber",
+        createPhoneNumberValue("", defaultCountry, adapter)
+      )
       toast.success(localization.phoneNumberRemoved)
     }
   }))
   const isPending = () =>
     sendOtp.isPending || verify.isPending || remove.isPending
-  const submit = (event: SubmitEvent & { currentTarget: HTMLFormElement }) => {
-    event.preventDefault()
-    if (!phoneNumber().e164) {
-      setFieldError(localization.invalidPhoneNumber)
-      return
+  const form = createAuthForm(() => ({
+    defaultValues: {
+      code: "",
+      phoneNumber: createPhoneNumberValue("", defaultCountry, adapter)
+    },
+    onSubmit: async ({ value }) => {
+      if (!codeSent()) {
+        await sendOtp.mutateAsync({
+          phoneNumber: value.phoneNumber.e164
+        } as Parameters<typeof sendOtp.mutateAsync>[0])
+        return
+      }
+      await verify.mutateAsync({
+        phoneNumber: value.phoneNumber.e164,
+        code: value.code,
+        updatePhoneNumber: true
+      } as Parameters<typeof verify.mutateAsync>[0])
     }
-    if (!codeSent()) {
-      sendOtp.mutate({ phoneNumber: phoneNumber().e164 } as Parameters<
-        typeof sendOtp.mutate
-      >[0])
-      return
-    }
-    verify.mutate({
-      phoneNumber: phoneNumber().e164,
-      code: code(),
-      updatePhoneNumber: true
-    } as Parameters<typeof verify.mutate>[0])
-  }
+  }))
+  const phoneNumber = () => form.state.values.phoneNumber
+  const code = () => form.state.values.code
   const removePhoneNumber = () =>
     remove.mutate({
       phoneNumber: null
@@ -111,105 +113,133 @@ export function ChangePhoneNumber(props: ChangePhoneNumberProps = {}) {
       <h2 class="mb-3 text-sm font-semibold">
         {localization.changePhoneNumber}
       </h2>
-      <form onSubmit={submit}>
-        <Card>
-          <CardContent class="flex flex-col gap-6">
-            <Show
-              when={codeSent()}
-              fallback={
-                <Show
-                  when={session.data}
-                  fallback={<Skeleton class="h-14 w-full" />}
-                >
-                  <InternationalPhoneField
-                    adapter={adapter}
-                    countryCodes={countries}
-                    countryLabel={localization.country}
-                    disabled={isPending()}
-                    error={fieldError()}
-                    locale={locale}
-                    phoneLabel={localization.phoneNumber}
-                    placeholder={localization.phoneNumberPlaceholder}
-                    value={phoneNumber()}
-                    onChange={(value) => {
-                      setPhoneNumber(value)
-                      setFieldError(undefined)
-                    }}
-                  />
-                </Show>
-              }
-            >
-              <div class="flex flex-col gap-3">
-                <p class="text-sm text-muted-foreground">
-                  {localization.codeSentTo.replace(
-                    "{{phoneNumber}}",
-                    phoneNumber().display
-                  )}
-                </p>
-                <OtpField
-                  autofocus
-                  disabled={isPending()}
-                  id="settings-phone-code"
-                  label={localization.phoneCode}
-                  length={otpLength}
-                  name="otp"
-                  onInput={setCode}
-                  value={code()}
-                />
-              </div>
-            </Show>
-          </CardContent>
-          <CardFooter class="gap-3">
-            <Show when={codeSent()}>
-              <Button
-                disabled={isPending()}
-                onClick={() => {
-                  setCode("")
-                  setCodeSent(false)
-                  setPhoneNumber(
-                    createPhoneNumberValue(
-                      currentPhoneNumber(),
-                      defaultCountry,
-                      adapter
-                    )
-                  )
-                }}
-                size="sm"
-                type="button"
-                variant="outline"
+      <form.AppForm>
+        <form.AuthFormRoot>
+          <Card>
+            <CardContent class="flex flex-col gap-6">
+              <Show
+                when={codeSent()}
+                fallback={
+                  <Show
+                    when={session.data}
+                    fallback={<Skeleton class="h-14 w-full" />}
+                  >
+                    <form.AppField
+                      name="phoneNumber"
+                      validators={{
+                        onChange: ({ value }) =>
+                          value.e164
+                            ? undefined
+                            : localization.invalidPhoneNumber
+                      }}
+                    >
+                      {(field) => (
+                        <InternationalPhoneField
+                          adapter={adapter}
+                          countryCodes={countries}
+                          countryLabel={localization.country}
+                          disabled={isPending()}
+                          error={
+                            isAuthFormFieldInvalid(field().state.meta)
+                              ? field().state.meta.errors[0]?.toString()
+                              : undefined
+                          }
+                          locale={locale}
+                          onChange={field().handleChange}
+                          phoneLabel={localization.phoneNumber}
+                          placeholder={localization.phoneNumberPlaceholder}
+                          value={field().state.value}
+                        />
+                      )}
+                    </form.AppField>
+                  </Show>
+                }
               >
-                {localization.cancel}
-              </Button>
-            </Show>
-            <Button
-              disabled={
-                isPending() ||
-                !session.data ||
-                (codeSent() && code().length !== otpLength)
-              }
-              size="sm"
-              type="submit"
-            >
-              <Show when={sendOtp.isPending || verify.isPending}>
-                <Spinner />
+                <div class="flex flex-col gap-3">
+                  <p class="text-sm text-muted-foreground">
+                    {localization.codeSentTo.replace(
+                      "{{phoneNumber}}",
+                      phoneNumber().display
+                    )}
+                  </p>
+                  <form.AppField
+                    name="code"
+                    validators={{
+                      onChange: ({ value }) =>
+                        value.length === otpLength
+                          ? undefined
+                          : localization.codeLengthMismatch.replace(
+                              "{{length}}",
+                              String(otpLength)
+                            )
+                    }}
+                  >
+                    {(field) => (
+                      <OtpField
+                        autofocus
+                        disabled={isPending()}
+                        id="settings-phone-code"
+                        label={localization.phoneCode}
+                        length={otpLength}
+                        name={field().name}
+                        onInput={field().handleChange}
+                        value={field().state.value}
+                      />
+                    )}
+                  </form.AppField>
+                </div>
               </Show>
-              {codeSent()
-                ? localization.verifyCode
-                : localization.updatePhoneNumber}
-            </Button>
-            <Show when={!codeSent() && currentPhoneNumber()}>
-              <RemovePhoneNumberDialog
-                cancelLabel={localization.cancel}
-                description={localization.removePhoneNumberDescription}
-                isPending={remove.isPending}
-                label={localization.removePhoneNumber}
-                title={localization.removePhoneNumberTitle}
-                onConfirm={removePhoneNumber}
-              />
-            </Show>
-          </CardFooter>
-        </Card>
-      </form>
+            </CardContent>
+            <CardFooter class="gap-3">
+              <Show when={codeSent()}>
+                <Button
+                  disabled={isPending()}
+                  onClick={() => {
+                    form.setFieldValue("code", "")
+                    setCodeSent(false)
+                    form.setFieldValue(
+                      "phoneNumber",
+                      createPhoneNumberValue(
+                        currentPhoneNumber(),
+                        defaultCountry,
+                        adapter
+                      )
+                    )
+                  }}
+                  size="sm"
+                  type="button"
+                  variant="outline"
+                >
+                  {localization.cancel}
+                </Button>
+              </Show>
+              <form.AuthFormSubmitButton
+                disabled={
+                  isPending() ||
+                  !session.data ||
+                  (codeSent() && code().length !== otpLength)
+                }
+                size="sm"
+              >
+                {codeSent()
+                  ? localization.verifyCode
+                  : localization.updatePhoneNumber}
+              </form.AuthFormSubmitButton>
+              <Show when={!codeSent() && currentPhoneNumber()}>
+                <RemovePhoneNumberDialog
+                  cancelLabel={localization.cancel}
+                  description={localization.removePhoneNumberDescription}
+                  isPending={remove.isPending}
+                  label={localization.removePhoneNumber}
+                  title={localization.removePhoneNumberTitle}
+                  onConfirm={removePhoneNumber}
+                />
+              </Show>
+              <form.AuthFormServerError />
+            </CardFooter>
+          </Card>
+        </form.AuthFormRoot>
+      </form.AppForm>
     </div>
   )
 }

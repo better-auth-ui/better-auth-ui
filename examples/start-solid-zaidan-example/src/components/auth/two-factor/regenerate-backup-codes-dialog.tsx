@@ -18,12 +18,12 @@ import {
   AlertDialogMedia,
   AlertDialogTitle
 } from "@/components/ui/alert-dialog"
-import { Button } from "@/components/ui/button"
 import { Field, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import { Spinner } from "@/components/ui/spinner"
 import { twoFactorPlugin } from "@/lib/auth/two-factor-plugin"
 import { useTwoFactorPasswordRequirement } from "@/lib/auth/use-two-factor-password"
+import { createAuthForm } from "../auth-form"
 
 /**
  * Replace the existing backup codes with a fresh set.
@@ -52,87 +52,96 @@ export function RegenerateBackupCodesDialog(props: {
   const isPending = () =>
     generateBackupCodes.isPending || isResolvingPasswordRequirement()
 
-  const submit = (event: SubmitEvent & { currentTarget: HTMLFormElement }) => {
-    event.preventDefault()
-
-    if (codes().length) {
-      props.onOpenChange(false)
-      return
+  const form = createAuthForm(() => ({
+    defaultValues: { password: "" },
+    onSubmit: async ({ value }) => {
+      if (codes().length) {
+        props.onOpenChange(false)
+        return
+      }
+      await generateBackupCodes.mutateAsync(
+        (requiresPassword() ? { password: value.password } : {}) as Parameters<
+          typeof generateBackupCodes.mutateAsync
+        >[0]
+      )
     }
-
-    const formData = new FormData(event.currentTarget)
-    const password = String(formData.get("password") ?? "")
-
-    generateBackupCodes.mutate(
-      (requiresPassword() ? { password } : {}) as Parameters<
-        typeof generateBackupCodes.mutate
-      >[0]
-    )
-  }
+  }))
 
   return (
     <AlertDialogContent>
-      <form class="flex flex-col gap-6" onSubmit={submit}>
-        <AlertDialogHeader>
-          <AlertDialogMedia>
-            <KeyRound />
-          </AlertDialogMedia>
+      <form.AppForm>
+        <form.AuthFormRoot class="flex flex-col gap-6">
+          <AlertDialogHeader>
+            <AlertDialogMedia>
+              <KeyRound />
+            </AlertDialogMedia>
 
-          <AlertDialogTitle>
-            {twoFactorLocalization.backupCodes}
-          </AlertDialogTitle>
+            <AlertDialogTitle>
+              {twoFactorLocalization.backupCodes}
+            </AlertDialogTitle>
 
-          <AlertDialogDescription>
-            {codes().length || !requiresPassword()
-              ? twoFactorLocalization.backupCodesDescription
-              : twoFactorLocalization.passwordConfirmation}
-          </AlertDialogDescription>
-        </AlertDialogHeader>
+            <AlertDialogDescription>
+              {codes().length || !requiresPassword()
+                ? twoFactorLocalization.backupCodesDescription
+                : twoFactorLocalization.passwordConfirmation}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
 
-        <Show
-          when={codes().length}
-          fallback={
-            <Show when={requiresPassword()}>
-              <Field>
-                <FieldLabel for="regenerate-backup-codes-password">
-                  {auth.localization.auth.password}
-                </FieldLabel>
+          <Show
+            when={codes().length}
+            fallback={
+              <Show when={requiresPassword()}>
+                <form.AppField name="password">
+                  {(field) => (
+                    <Field>
+                      <FieldLabel for="regenerate-backup-codes-password">
+                        {auth.localization.auth.password}
+                      </FieldLabel>
 
-                <Input
-                  autocomplete="current-password"
-                  autofocus
-                  disabled={isPending()}
-                  id="regenerate-backup-codes-password"
-                  name="password"
-                  placeholder={auth.localization.auth.passwordPlaceholder}
-                  required
-                  type="password"
-                />
-              </Field>
-            </Show>
-          }
-        >
-          <BackupCodes codes={codes()} />
-        </Show>
-
-        <AlertDialogFooter>
-          <Show when={!codes().length}>
-            <AlertDialogCancel disabled={isPending()} type="button">
-              {auth.localization.settings.cancel}
-            </AlertDialogCancel>
+                      <Input
+                        autocomplete="current-password"
+                        autofocus
+                        disabled={isPending()}
+                        id="regenerate-backup-codes-password"
+                        name={field().name}
+                        placeholder={auth.localization.auth.passwordPlaceholder}
+                        value={field().state.value}
+                        onBlur={field().handleBlur}
+                        onInput={(event) =>
+                          field().handleChange(event.currentTarget.value)
+                        }
+                        type="password"
+                      />
+                      <field.AuthFormFieldError />
+                    </Field>
+                  )}
+                </form.AppField>
+              </Show>
+            }
+          >
+            <BackupCodes codes={codes()} />
           </Show>
 
-          <Button disabled={isPending()} type="submit">
-            <Show when={isPending()}>
-              <Spinner />
+          <AlertDialogFooter>
+            <Show when={!codes().length}>
+              <AlertDialogCancel disabled={isPending()} type="button">
+                {auth.localization.settings.cancel}
+              </AlertDialogCancel>
             </Show>
 
-            {codes().length
-              ? twoFactorLocalization.done
-              : twoFactorLocalization.regenerateBackupCodes}
-          </Button>
-        </AlertDialogFooter>
-      </form>
+            <form.AuthFormSubmitButton disabled={isPending()}>
+              <Show when={isPending()}>
+                <Spinner />
+              </Show>
+
+              {codes().length
+                ? twoFactorLocalization.done
+                : twoFactorLocalization.regenerateBackupCodes}
+            </form.AuthFormSubmitButton>
+          </AlertDialogFooter>
+          <form.AuthFormServerError />
+        </form.AuthFormRoot>
+      </form.AppForm>
     </AlertDialogContent>
   )
 }

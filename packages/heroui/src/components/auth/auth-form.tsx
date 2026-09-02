@@ -4,11 +4,26 @@ import {
   DEFAULT_ADDITIONAL_FIELD_VALIDATION_DEBOUNCE_MS,
   getFormFieldErrorMessage,
   getFormFieldErrors,
+  normalizeAuthFormServerError,
   validateAdditionalFieldRequired,
   validateAdditionalFieldValue
 } from "@better-auth-ui/core"
-import { Button, FieldError, Form, Spinner } from "@heroui/react"
-import { createFormHook, createFormHookContexts } from "@tanstack/react-form"
+import {
+  Button,
+  Description,
+  ErrorMessage,
+  FieldError,
+  Form,
+  Input,
+  Label,
+  Spinner,
+  TextField
+} from "@heroui/react"
+import {
+  type AnyFormApi,
+  createFormHook,
+  createFormHookContexts
+} from "@tanstack/react-form"
 import {
   type ComponentProps,
   type FormEvent,
@@ -40,13 +55,64 @@ function AuthFormFieldError() {
   return message ? <FieldError>{message}</FieldError> : null
 }
 
+function AuthFormServerError() {
+  const form = useFormContext()
+
+  return (
+    <form.Subscribe selector={(state) => state.errorMap.onServer}>
+      {(error) => {
+        const formError =
+          error && typeof error === "object" && "form" in error
+            ? error.form
+            : error
+        const message = getFormFieldErrorMessage(formError ? [formError] : [])
+        return message ? <ErrorMessage>{message}</ErrorMessage> : null
+      }}
+    </form.Subscribe>
+  )
+}
+
+export function setAuthFormServerError(
+  form: AnyFormApi,
+  error: unknown,
+  fallbackMessage: string
+) {
+  const normalized = normalizeAuthFormServerError(error, fallbackMessage)
+  form.setErrorMap({
+    onServer: {
+      fields: normalized.fields ?? {},
+      form: normalized.form
+    }
+  })
+}
+
+export function clearAuthFormServerError(form: AnyFormApi) {
+  form.setErrorMap({ onServer: undefined })
+}
+
+export async function submitAuthForm(
+  form: AnyFormApi,
+  serverErrorMessage = "Unable to submit this form. Try again."
+) {
+  clearAuthFormServerError(form)
+  try {
+    await form.handleSubmit()
+    return form.state.isValid
+  } catch (error) {
+    setAuthFormServerError(form, error, serverErrorMessage)
+    return false
+  }
+}
+
 type AuthFormRootProps = Omit<ComponentProps<typeof Form>, "onSubmit"> & {
   onBeforeSubmit?: () => void
+  serverErrorMessage?: string
 }
 
 function AuthFormRoot({
   children,
   onBeforeSubmit,
+  serverErrorMessage = "Unable to submit this form. Try again.",
   ...props
 }: AuthFormRootProps) {
   const form = useFormContext()
@@ -60,8 +126,8 @@ function AuthFormRoot({
     onBeforeSubmit?.()
     submittingRef.current = true
     try {
-      await form.handleSubmit()
-      if (!form.state.isValid) focusFirstInvalidAuthFormControl(formElement)
+      const isValid = await submitAuthForm(form, serverErrorMessage)
+      if (!isValid) focusFirstInvalidAuthFormControl(formElement)
     } finally {
       submittingRef.current = false
     }
@@ -70,6 +136,7 @@ function AuthFormRoot({
   return (
     <Form
       {...props}
+      validationBehavior="aria"
       onInvalid={(event) =>
         focusFirstInvalidAuthFormControl(event.currentTarget)
       }
@@ -77,6 +144,42 @@ function AuthFormRoot({
     >
       {children}
     </Form>
+  )
+}
+
+type AuthFormTextFieldProps = Omit<
+  ComponentProps<typeof TextField>,
+  "children" | "name" | "onBlur" | "onChange" | "value"
+> & {
+  description?: ReactNode
+  inputProps?: Omit<ComponentProps<typeof Input>, "name">
+  label: ReactNode
+}
+
+function AuthFormTextField({
+  description,
+  inputProps,
+  label,
+  ...props
+}: AuthFormTextFieldProps) {
+  const field = useFieldContext<string>()
+  const isInvalid = isAuthFormFieldInvalid(field.state.meta)
+
+  return (
+    <TextField
+      {...props}
+      isInvalid={isInvalid || undefined}
+      name={field.name}
+      onBlur={field.handleBlur}
+      onChange={field.handleChange}
+      validationBehavior="aria"
+      value={field.state.value}
+    >
+      <Label>{label}</Label>
+      <Input {...inputProps} />
+      {description ? <Description>{description}</Description> : null}
+      <AuthFormFieldError />
+    </TextField>
   )
 }
 
@@ -135,9 +238,17 @@ export const {
   withFieldGroup: withAuthFieldGroup,
   withForm: withAuthForm
 } = createFormHook({
-  fieldComponents: { AuthFormAdditionalField, AuthFormFieldError },
+  fieldComponents: {
+    AuthFormAdditionalField,
+    AuthFormFieldError,
+    AuthFormTextField
+  },
   fieldContext,
-  formComponents: { AuthFormRoot, AuthFormSubmitButton },
+  formComponents: {
+    AuthFormRoot,
+    AuthFormServerError,
+    AuthFormSubmitButton
+  },
   formContext
 })
 

@@ -1,4 +1,4 @@
-import { authMutationKeys } from "@better-auth-ui/core"
+import { authMutationKeys, validateEmailAddress } from "@better-auth-ui/core"
 import type { EmailOtpAuthClient } from "@better-auth-ui/core/plugins/email-otp"
 import { getSsoFallbackEmail } from "@better-auth-ui/core/plugins/sso"
 import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
@@ -12,7 +12,6 @@ import {
   type CardProps,
   cn,
   Description,
-  FieldError,
   Input,
   Label,
   Link,
@@ -74,7 +73,7 @@ export function EmailOtp({
 
   const [codeSent, setCodeSent] = useState(false)
 
-  const { mutate: sendVerificationOtp, isPending: isSending } =
+  const { mutateAsync: sendVerificationOtp, isPending: isSending } =
     useSendVerificationOtp(otpClient, {
       onSuccess: () => {
         setCodeSent(true)
@@ -82,13 +81,11 @@ export function EmailOtp({
       }
     })
 
-  const { mutate: signInEmailOtp, isPending: isSigningIn } = useSignInEmailOtp(
-    otpClient,
-    {
+  const { mutateAsync: signInEmailOtp, isPending: isSigningIn } =
+    useSignInEmailOtp(otpClient, {
       onError: () => form.setFieldValue("code", ""),
       onSuccess: (data) => continueSignIn(data)
-    }
-  )
+    })
 
   const signInMutating = useIsMutating({
     mutationKey: authMutationKeys.signIn.all
@@ -108,12 +105,12 @@ export function EmailOtp({
 
   const form = useAuthForm({
     defaultValues: { code: "", email: getSsoFallbackEmail() },
-    onSubmit: ({ value }) => {
+    onSubmit: async ({ value }) => {
       if (!codeSent) {
-        sendVerificationOtp({ email: value.email, type: "sign-in" })
+        await sendVerificationOtp({ email: value.email, type: "sign-in" })
         return
       }
-      verifyCode(value.code)
+      await verifyCode(value.code)
     }
   })
   const codeComplete = useSelector(
@@ -178,7 +175,16 @@ export function EmailOtp({
                 )}
               </form.AppField>
             ) : (
-              <form.AppField name="email">
+              <form.AppField
+                name="email"
+                validators={{
+                  onChange: ({ value }) =>
+                    validateEmailAddress(value, {
+                      invalidMessage: localization.auth.invalidEmail,
+                      requiredMessage: localization.auth.fieldRequired
+                    })
+                }}
+              >
                 {(field) => (
                   <TextField
                     name={field.name}
@@ -188,11 +194,7 @@ export function EmailOtp({
                     value={field.state.value}
                     onBlur={field.handleBlur}
                     onChange={field.handleChange}
-                    validate={(value) => {
-                      if (!value) return localization.auth.fieldRequired
-                      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value))
-                        return localization.auth.invalidEmail
-                    }}
+                    validationBehavior="aria"
                   >
                     <Label>{localization.auth.email}</Label>
 
@@ -204,11 +206,13 @@ export function EmailOtp({
                       }
                     />
 
-                    <FieldError />
+                    <field.AuthFormFieldError />
                   </TextField>
                 )}
               </form.AppField>
             )}
+
+            <form.AuthFormServerError />
 
             <div className="flex flex-col gap-3">
               <form.AuthFormSubmitButton

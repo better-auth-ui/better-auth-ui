@@ -1,3 +1,4 @@
+import { validateStringLength } from "@better-auth-ui/core"
 import {
   createPhoneNumberValue,
   type PhoneNumberAuthClient
@@ -33,18 +34,18 @@ import {
   CardTitle
 } from "@/components/ui/card"
 import { Checkbox } from "@/components/ui/checkbox"
-import {
-  Field,
-  FieldError,
-  FieldGroup,
-  FieldLabel
-} from "@/components/ui/field"
-import { Input } from "@/components/ui/input"
+import { FieldGroup } from "@/components/ui/field"
 import { Spinner } from "@/components/ui/spinner"
 import { phoneNumberPlugin } from "@/lib/auth/phone-number-plugin"
 import { useResendCooldown } from "@/lib/auth/use-resend-cooldown"
 import { useSignInContinuation } from "@/lib/auth/use-sign-in-continuation"
 import { cn } from "@/lib/utils"
+import {
+  createAuthForm,
+  isAuthFormFieldInvalid,
+  setAuthFormServerError,
+  submitAuthForm
+} from "../auth-form"
 
 type PhoneNumberMode = "code" | "password"
 
@@ -80,13 +81,6 @@ export function PhoneNumber(props: PhoneNumberProps) {
   const [mode, setMode] = createSignal<PhoneNumberMode>(
     signIn ? "code" : "password"
   )
-  const [phoneNumber, setPhoneNumber] = createSignal(
-    createPhoneNumberValue("", defaultCountry, adapter)
-  )
-  const [phoneError, setPhoneError] = createSignal<string>()
-  const [password, setPassword] = createSignal("")
-  const [passwordError, setPasswordError] = createSignal<string>()
-  const [code, setCode] = createSignal("")
   const [codeSent, setCodeSent] = createSignal(false)
   const sendOtp = useSendPhoneNumberOtp(phoneClient(), () => ({
     onError: () => resetFetchOptions(),
@@ -96,12 +90,12 @@ export function PhoneNumber(props: PhoneNumberProps) {
     }
   }))
   const verify = useVerifyPhoneNumber(phoneClient(), () => ({
-    onError: () => setCode(""),
+    onError: () => form.setFieldValue("code", ""),
     onSuccess: (data) => continueSignIn(data)
   }))
   const signInWithPassword = useSignInPhoneNumber(phoneClient(), () => ({
     onError: (error) => {
-      setPassword("")
+      form.setFieldValue("password", "")
       resetFetchOptions()
       if (
         signIn &&
@@ -116,54 +110,61 @@ export function PhoneNumber(props: PhoneNumberProps) {
   }))
   const isPending = () =>
     sendOtp.isPending || verify.isPending || signInWithPassword.isPending
-  const normalizedPhoneNumber = () => {
-    const value = phoneNumber().e164
-    if (value) return value
-    setPhoneError(localization.invalidPhoneNumber)
+  const form = createAuthForm(() => ({
+    defaultValues: {
+      code: "",
+      password: "",
+      phoneNumber: createPhoneNumberValue("", defaultCountry, adapter),
+      rememberMe: false
+    },
+    onSubmit: async ({ value }) => {
+      if (mode() === "password") {
+        await signInWithPassword.mutateAsync({
+          phoneNumber: value.phoneNumber.e164,
+          password: value.password,
+          ...(auth.emailAndPassword?.rememberMe
+            ? { rememberMe: value.rememberMe }
+            : {}),
+          fetchOptions: fetchOptions()
+        } as Parameters<typeof signInWithPassword.mutateAsync>[0])
+        return
+      }
+      if (!codeSent()) {
+        await sendOtp.mutateAsync({
+          phoneNumber: value.phoneNumber.e164,
+          fetchOptions: fetchOptions()
+        } as Parameters<typeof sendOtp.mutateAsync>[0])
+        return
+      }
+      await verify.mutateAsync({
+        phoneNumber: value.phoneNumber.e164,
+        code: value.code
+      } as Parameters<typeof verify.mutateAsync>[0])
+    }
+  }))
+  const phoneNumber = () => form.state.values.phoneNumber
+  const code = () => form.state.values.code
+  const requestCode = async () => {
+    try {
+      await sendOtp.mutateAsync({
+        phoneNumber: phoneNumber().e164,
+        fetchOptions: fetchOptions()
+      } as Parameters<typeof sendOtp.mutateAsync>[0])
+    } catch (error) {
+      setAuthFormServerError(form, error, "Unable to send a code. Try again.")
+    }
   }
-  const requestCode = () => {
-    const value = normalizedPhoneNumber()
-    if (!value) return
-    sendOtp.mutate({
-      phoneNumber: value,
-      fetchOptions: fetchOptions()
-    } as Parameters<typeof sendOtp.mutate>[0])
-  }
-  const verifyCode = (completedCode: string) => {
+  const verifyCode = async (completedCode: string) => {
     if (isPending() || completedCode.length !== otpLength) return
     if (!phoneNumber().e164) return
-    verify.mutate({
-      phoneNumber: phoneNumber().e164,
-      code: completedCode
-    } as Parameters<typeof verify.mutate>[0])
-  }
-  const submit = (event: SubmitEvent & { currentTarget: HTMLFormElement }) => {
-    event.preventDefault()
-    if (mode() === "password") {
-      const value = normalizedPhoneNumber()
-      if (!value) return
-      const formData = new FormData(event.currentTarget)
-      signInWithPassword.mutate({
-        phoneNumber: value,
-        password: password(),
-        ...(auth.emailAndPassword?.rememberMe
-          ? { rememberMe: formData.get("rememberMe") === "on" }
-          : {}),
-        fetchOptions: fetchOptions()
-      } as Parameters<typeof signInWithPassword.mutate>[0])
-      return
-    }
-    if (!codeSent()) {
-      requestCode()
-      return
-    }
-    verifyCode(code())
+    form.setFieldValue("code", completedCode)
+    await submitAuthForm(form)
   }
   const switchMode = () => {
     setMode((current) => (current === "code" ? "password" : "code"))
-    setCode("")
+    form.setFieldValue("code", "")
     setCodeSent(false)
-    setPassword("")
+    form.setFieldValue("password", "")
   }
   const socialPosition = () => props.socialPosition ?? "bottom"
   const authButtons = () =>
@@ -204,147 +205,179 @@ export function PhoneNumber(props: PhoneNumberProps) {
               {auth.localization.auth.or}
             </div>
           </Show>
-          <form aria-label={auth.localization.auth.signIn} onSubmit={submit}>
-            <FieldGroup>
-              <Show
-                when={codeSent()}
-                fallback={
-                  <>
-                    <InternationalPhoneField
-                      adapter={adapter}
-                      countryCodes={countries}
-                      countryLabel={localization.country}
-                      disabled={isPending()}
-                      error={phoneError()}
-                      locale={locale}
-                      phoneLabel={localization.phoneNumber}
-                      placeholder={localization.phoneNumberPlaceholder}
-                      value={phoneNumber()}
-                      onChange={(value) => {
-                        setPhoneNumber(value)
-                        setPhoneError(undefined)
-                      }}
-                    />
-                    <Show when={mode() === "password"}>
-                      <Field data-invalid={Boolean(passwordError())}>
-                        <FieldLabel for="phone-password">
-                          {auth.localization.auth.password}
-                        </FieldLabel>
-                        <Input
-                          aria-invalid={Boolean(passwordError())}
-                          autocomplete="current-password"
-                          disabled={isPending()}
-                          id="phone-password"
+          <form.AppForm>
+            <form.AuthFormRoot aria-label={auth.localization.auth.signIn}>
+              <FieldGroup>
+                <Show
+                  when={codeSent()}
+                  fallback={
+                    <>
+                      <form.AppField
+                        name="phoneNumber"
+                        validators={{
+                          onChange: ({ value }) =>
+                            value.e164
+                              ? undefined
+                              : localization.invalidPhoneNumber
+                        }}
+                      >
+                        {(field) => (
+                          <InternationalPhoneField
+                            adapter={adapter}
+                            countryCodes={countries}
+                            countryLabel={localization.country}
+                            disabled={isPending()}
+                            error={
+                              isAuthFormFieldInvalid(field().state.meta)
+                                ? field().state.meta.errors[0]?.toString()
+                                : undefined
+                            }
+                            locale={locale}
+                            onChange={field().handleChange}
+                            phoneLabel={localization.phoneNumber}
+                            placeholder={localization.phoneNumberPlaceholder}
+                            value={field().state.value}
+                          />
+                        )}
+                      </form.AppField>
+                      <Show when={mode() === "password"}>
+                        <form.AppField
                           name="password"
-                          onInput={(event) => {
-                            setPassword(event.currentTarget.value)
-                            setPasswordError(undefined)
+                          validators={{
+                            onChange: ({ value }) =>
+                              validateStringLength(value, {
+                                requiredMessage:
+                                  auth.localization.auth.fieldRequired
+                              })
                           }}
-                          onInvalid={(event) => {
-                            event.preventDefault()
-                            setPasswordError(
-                              event.currentTarget.validationMessage
-                            )
-                          }}
-                          placeholder={
-                            auth.localization.auth.passwordPlaceholder
-                          }
-                          required
-                          type="password"
-                          value={password()}
-                        />
-                        <Show when={passwordError()}>
-                          {(message) => <FieldError>{message()}</FieldError>}
+                        >
+                          {(field) => (
+                            <field.AuthFormTextField
+                              autocomplete="current-password"
+                              disabled={isPending()}
+                              id="phone-password"
+                              label={auth.localization.auth.password}
+                              placeholder={
+                                auth.localization.auth.passwordPlaceholder
+                              }
+                              type="password"
+                            />
+                          )}
+                        </form.AppField>
+                        <Show when={auth.emailAndPassword?.rememberMe}>
+                          <form.AppField name="rememberMe">
+                            {(field) => (
+                              <Checkbox
+                                checked={field().state.value}
+                                disabled={isPending()}
+                                name={field().name}
+                                onChange={field().handleChange}
+                              >
+                                {auth.localization.auth.rememberMe}
+                              </Checkbox>
+                            )}
+                          </form.AppField>
                         </Show>
-                      </Field>
-                      <Show when={auth.emailAndPassword?.rememberMe}>
-                        <Checkbox disabled={isPending()} name="rememberMe">
-                          {auth.localization.auth.rememberMe}
-                        </Checkbox>
                       </Show>
-                    </Show>
-                  </>
-                }
-              >
-                <OtpField
-                  autofocus
-                  disabled={isPending()}
-                  id="phone-code"
-                  label={localization.phoneCode}
-                  length={otpLength}
-                  name="otp"
-                  onInput={setCode}
-                  onComplete={verifyCode}
-                  value={code()}
-                />
-              </Show>
-              <Show when={captchaComponent()} keyed>
-                {(Captcha) => <Captcha />}
-              </Show>
-              <Button
-                class="w-full"
-                disabled={
-                  isPending() || (codeSent() && code().length !== otpLength)
-                }
-                type="submit"
-              >
-                <Show when={isPending()}>
-                  <Spinner />
+                    </>
+                  }
+                >
+                  <form.AppField
+                    name="code"
+                    validators={{
+                      onChange: ({ value }) =>
+                        value.length === otpLength
+                          ? undefined
+                          : localization.codeLengthMismatch.replace(
+                              "{{length}}",
+                              String(otpLength)
+                            )
+                    }}
+                  >
+                    {(field) => (
+                      <OtpField
+                        autofocus
+                        disabled={isPending()}
+                        id="phone-code"
+                        label={localization.phoneCode}
+                        length={otpLength}
+                        name={field().name}
+                        onInput={field().handleChange}
+                        onComplete={(value) => void verifyCode(value)}
+                        value={field().state.value}
+                      />
+                    )}
+                  </form.AppField>
                 </Show>
-                {mode() === "password"
-                  ? auth.localization.auth.signIn
-                  : codeSent()
-                    ? localization.verifyCode
-                    : localization.sendCode}
-              </Button>
-              <Show when={codeSent()}>
+                <Show when={captchaComponent()} keyed>
+                  {(Captcha) => <Captcha />}
+                </Show>
                 <Button
                   class="w-full"
-                  disabled={isPending() || isCoolingDown()}
-                  onClick={requestCode}
-                  type="button"
-                  variant="outline"
+                  disabled={
+                    isPending() || (codeSent() && code().length !== otpLength)
+                  }
+                  type="submit"
                 >
-                  {isCoolingDown()
-                    ? auth.localization.auth.resendIn.replace(
-                        "{{seconds}}",
-                        String(cooldown())
-                      )
-                    : auth.localization.auth.resend}
+                  <Show when={isPending()}>
+                    <Spinner />
+                  </Show>
+                  {mode() === "password"
+                    ? auth.localization.auth.signIn
+                    : codeSent()
+                      ? localization.verifyCode
+                      : localization.sendCode}
                 </Button>
-                <Button
-                  class="w-full"
-                  disabled={isPending()}
-                  onClick={() => {
-                    setCode("")
-                    setCodeSent(false)
-                  }}
-                  type="button"
-                  variant="ghost"
-                >
-                  {localization.useDifferentPhoneNumber}
-                </Button>
-              </Show>
-              <Show when={!codeSent() && signIn && passwordSignIn}>
-                <Button
-                  class="w-full"
-                  disabled={isPending()}
-                  onClick={switchMode}
-                  type="button"
-                  variant="outline"
-                >
-                  {mode() === "code"
-                    ? localization.usePassword
-                    : localization.useVerificationCode}
-                </Button>
-              </Show>
-              <Show when={!codeSent()}>
-                <For each={authButtons()}>
-                  {(AuthButton) => <AuthButton view="phoneNumber" />}
-                </For>
-              </Show>
-            </FieldGroup>
-          </form>
+                <Show when={codeSent()}>
+                  <Button
+                    class="w-full"
+                    disabled={isPending() || isCoolingDown()}
+                    onClick={() => void requestCode()}
+                    type="button"
+                    variant="outline"
+                  >
+                    {isCoolingDown()
+                      ? auth.localization.auth.resendIn.replace(
+                          "{{seconds}}",
+                          String(cooldown())
+                        )
+                      : auth.localization.auth.resend}
+                  </Button>
+                  <Button
+                    class="w-full"
+                    disabled={isPending()}
+                    onClick={() => {
+                      form.setFieldValue("code", "")
+                      setCodeSent(false)
+                    }}
+                    type="button"
+                    variant="ghost"
+                  >
+                    {localization.useDifferentPhoneNumber}
+                  </Button>
+                </Show>
+                <Show when={!codeSent() && signIn && passwordSignIn}>
+                  <Button
+                    class="w-full"
+                    disabled={isPending()}
+                    onClick={switchMode}
+                    type="button"
+                    variant="outline"
+                  >
+                    {mode() === "code"
+                      ? localization.usePassword
+                      : localization.useVerificationCode}
+                  </Button>
+                </Show>
+                <Show when={!codeSent()}>
+                  <For each={authButtons()}>
+                    {(AuthButton) => <AuthButton view="phoneNumber" />}
+                  </For>
+                </Show>
+                <form.AuthFormServerError />
+              </FieldGroup>
+            </form.AuthFormRoot>
+          </form.AppForm>
           <Show
             when={
               socialPosition() === "bottom" &&

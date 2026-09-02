@@ -1,5 +1,10 @@
 export type FormFieldError = Readonly<{ message: string }>
 
+export type AuthFormServerError = Readonly<{
+  fields?: Readonly<Record<string, FormFieldError>>
+  form?: FormFieldError
+}>
+
 export type StringLengthValidation = {
   maxLength?: number
   maxLengthMessage?: string
@@ -45,6 +50,67 @@ export function getFormFieldErrors(
 
     return []
   })
+}
+
+function getErrorMessage(error: unknown): string | undefined {
+  if (typeof error === "string") return error || undefined
+  if (!error || typeof error !== "object") return undefined
+
+  if ("message" in error && typeof error.message === "string" && error.message)
+    return error.message
+
+  if (
+    "statusText" in error &&
+    typeof error.statusText === "string" &&
+    error.statusText
+  )
+    return error.statusText
+}
+
+function getServerFieldErrors(value: unknown) {
+  if (!value || typeof value !== "object") return undefined
+
+  const candidate =
+    "fieldErrors" in value
+      ? value.fieldErrors
+      : "fields" in value
+        ? value.fields
+        : undefined
+
+  if (!candidate || typeof candidate !== "object") return undefined
+
+  return Object.fromEntries(
+    Object.entries(candidate).flatMap(([field, error]) => {
+      const message = Array.isArray(error)
+        ? getFormFieldErrorMessage(error)
+        : getErrorMessage(error)
+      return message ? [[field, { message }]] : []
+    })
+  )
+}
+
+/** Normalizes thrown mutation errors for TanStack Form's global error map. */
+export function normalizeAuthFormServerError(
+  error: unknown,
+  fallbackMessage: string
+): AuthFormServerError {
+  const nestedBody =
+    error &&
+    typeof error === "object" &&
+    "body" in error &&
+    error.body &&
+    typeof error.body === "object"
+      ? error.body
+      : undefined
+  const fields =
+    getServerFieldErrors(error) ?? getServerFieldErrors(nestedBody) ?? undefined
+  const message =
+    getErrorMessage(error) ?? getErrorMessage(nestedBody) ?? fallbackMessage
+
+  return {
+    fields,
+    form: createFormFieldError(message)
+  }
 }
 
 export function validateStringLength(

@@ -1,4 +1,4 @@
-import { authMutationKeys } from "@better-auth-ui/core"
+import { authMutationKeys, validateStringLength } from "@better-auth-ui/core"
 import {
   isPasskeyAutoFillEnabled,
   withPasskeyAutoFill
@@ -20,7 +20,6 @@ import {
   Checkbox,
   cn,
   Description,
-  FieldError,
   Input,
   InputGroup,
   Label,
@@ -77,7 +76,7 @@ export function SignInUsername({
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)
   }
 
-  const { mutate: signInEmail, isPending: isSignInEmailPending } =
+  const { mutateAsync: signInEmail, isPending: isSignInEmailPending } =
     useSignInEmail(authClient, {
       onError: (error, { email }) => {
         form.setFieldValue("password", "")
@@ -97,7 +96,7 @@ export function SignInUsername({
       }
     })
 
-  const { mutate: signInUsername, isPending: isSignInUsernamePending } =
+  const { mutateAsync: signInUsername, isPending: isSignInUsernamePending } =
     useSignInUsername(authClient as UsernameAuthClient, {
       onError: (error) => {
         form.setFieldValue("password", "")
@@ -120,10 +119,10 @@ export function SignInUsername({
 
   const form = useAuthForm({
     defaultValues: { email: "", password: "", rememberMe: false },
-    onSubmit: ({ value }) => {
+    onSubmit: async ({ value }) => {
       const email = value.email
       if (isEmail(email)) {
-        signInEmail({
+        await signInEmail({
           email,
           password: value.password,
           ...(emailAndPassword?.rememberMe
@@ -132,7 +131,7 @@ export function SignInUsername({
           fetchOptions
         })
       } else {
-        signInUsername({
+        await signInUsername({
           username: email,
           password: value.password,
           ...(emailAndPassword?.rememberMe
@@ -189,7 +188,16 @@ export function SignInUsername({
         {emailAndPassword?.enabled && (
           <form.AppForm>
             <form.AuthFormRoot className="flex flex-col gap-4">
-              <form.AppField name="email">
+              <form.AppField
+                name="email"
+                validators={{
+                  onChange: ({ value }) =>
+                    validateStringLength(value, {
+                      requiredMessage: localization.auth.fieldRequired,
+                      trim: true
+                    })
+                }}
+              >
                 {(field) => (
                   <TextField
                     name={field.name}
@@ -202,9 +210,7 @@ export function SignInUsername({
                     value={field.state.value}
                     onBlur={field.handleBlur}
                     onChange={field.handleChange}
-                    validate={(value) => {
-                      if (!value) return localization.auth.fieldRequired
-                    }}
+                    validationBehavior="aria"
                   >
                     <Label>{usernameLocalization.username}</Label>
 
@@ -218,12 +224,30 @@ export function SignInUsername({
                       required
                     />
 
-                    <FieldError />
+                    <field.AuthFormFieldError />
                   </TextField>
                 )}
               </form.AppField>
 
-              <form.AppField name="password">
+              <form.AppField
+                name="password"
+                validators={{
+                  onChange: ({ value }) =>
+                    validateStringLength(value, {
+                      maxLength: emailAndPassword?.maxPasswordLength,
+                      maxLengthMessage: localization.auth.tooLong.replace(
+                        "{{max}}",
+                        String(emailAndPassword?.maxPasswordLength)
+                      ),
+                      minLength: emailAndPassword?.minPasswordLength,
+                      minLengthMessage: localization.auth.tooShort.replace(
+                        "{{min}}",
+                        String(emailAndPassword?.minPasswordLength)
+                      ),
+                      requiredMessage: localization.auth.fieldRequired
+                    })
+                }}
+              >
                 {(field) => (
                   <TextField
                     minLength={emailAndPassword?.minPasswordLength}
@@ -237,21 +261,7 @@ export function SignInUsername({
                     value={field.state.value}
                     onBlur={field.handleBlur}
                     onChange={field.handleChange}
-                    validate={(value) => {
-                      if (!value) return localization.auth.fieldRequired
-                      const min = emailAndPassword?.minPasswordLength
-                      const max = emailAndPassword?.maxPasswordLength
-                      if (min && value.length < min)
-                        return localization.auth.tooShort.replace(
-                          "{{min}}",
-                          String(min)
-                        )
-                      if (max && value.length > max)
-                        return localization.auth.tooLong.replace(
-                          "{{max}}",
-                          String(max)
-                        )
-                    }}
+                    validationBehavior="aria"
                   >
                     <Label>{localization.auth.password}</Label>
 
@@ -286,7 +296,7 @@ export function SignInUsername({
                       </InputGroup.Suffix>
                     </InputGroup>
 
-                    <FieldError />
+                    <field.AuthFormFieldError />
                   </TextField>
                 )}
               </form.AppField>
@@ -316,6 +326,8 @@ export function SignInUsername({
               )}
 
               {Captcha && <div className="flex justify-center">{Captcha}</div>}
+
+              <form.AuthFormServerError />
 
               <div className="flex flex-col gap-3">
                 <form.AuthFormSubmitButton

@@ -17,12 +17,12 @@ import {
   AlertDialogMedia,
   AlertDialogTitle
 } from "@/components/ui/alert-dialog"
-import { Button } from "@/components/ui/button"
 import { Field, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import { Spinner } from "@/components/ui/spinner"
 import { twoFactorPlugin } from "@/lib/auth/two-factor-plugin"
 import { useTwoFactorPasswordRequirement } from "@/lib/auth/use-two-factor-password"
+import { createAuthForm } from "../auth-form"
 
 /** Confirm turning two-factor off. */
 export function DisableTwoFactorDialog(props: {
@@ -44,71 +44,84 @@ export function DisableTwoFactorDialog(props: {
   const isPending = () =>
     disableTwoFactor.isPending || isResolvingPasswordRequirement()
 
-  const submit = (event: SubmitEvent & { currentTarget: HTMLFormElement }) => {
-    event.preventDefault()
-
-    const formData = new FormData(event.currentTarget)
-    const password = String(formData.get("password") ?? "")
-
-    disableTwoFactor.mutate(
-      (requiresPassword() ? { password } : {}) as Parameters<
-        typeof disableTwoFactor.mutate
-      >[0]
-    )
-  }
+  const form = createAuthForm(() => ({
+    defaultValues: { password: "" },
+    onSubmit: async ({ value }) => {
+      await disableTwoFactor.mutateAsync(
+        (requiresPassword() ? { password: value.password } : {}) as Parameters<
+          typeof disableTwoFactor.mutateAsync
+        >[0]
+      )
+    }
+  }))
 
   return (
     <AlertDialogContent>
-      <form class="flex flex-col gap-6" onSubmit={submit}>
-        <AlertDialogHeader>
-          <AlertDialogMedia>
-            <ShieldAlert />
-          </AlertDialogMedia>
+      <form.AppForm>
+        <form.AuthFormRoot class="flex flex-col gap-6">
+          <AlertDialogHeader>
+            <AlertDialogMedia>
+              <ShieldAlert />
+            </AlertDialogMedia>
 
-          <AlertDialogTitle>
-            {twoFactorLocalization.disableTwoFactor}
-          </AlertDialogTitle>
+            <AlertDialogTitle>
+              {twoFactorLocalization.disableTwoFactor}
+            </AlertDialogTitle>
 
-          <AlertDialogDescription>
-            {requiresPassword()
-              ? twoFactorLocalization.passwordConfirmation
-              : twoFactorLocalization.twoFactorDescription}
-          </AlertDialogDescription>
-        </AlertDialogHeader>
+            <AlertDialogDescription>
+              {requiresPassword()
+                ? twoFactorLocalization.passwordConfirmation
+                : twoFactorLocalization.twoFactorDescription}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
 
-        <Show when={requiresPassword()}>
-          <Field>
-            <FieldLabel for="disable-two-factor-password">
-              {auth.localization.auth.password}
-            </FieldLabel>
+          <Show when={requiresPassword()}>
+            <form.AppField name="password">
+              {(field) => (
+                <Field>
+                  <FieldLabel for="disable-two-factor-password">
+                    {auth.localization.auth.password}
+                  </FieldLabel>
 
-            <Input
-              autocomplete="current-password"
-              autofocus
+                  <Input
+                    autocomplete="current-password"
+                    autofocus
+                    disabled={isPending()}
+                    id="disable-two-factor-password"
+                    name={field().name}
+                    placeholder={auth.localization.auth.passwordPlaceholder}
+                    value={field().state.value}
+                    onBlur={field().handleBlur}
+                    onInput={(event) =>
+                      field().handleChange(event.currentTarget.value)
+                    }
+                    type="password"
+                  />
+                  <field.AuthFormFieldError />
+                </Field>
+              )}
+            </form.AppField>
+          </Show>
+
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isPending()} type="button">
+              {auth.localization.settings.cancel}
+            </AlertDialogCancel>
+
+            <form.AuthFormSubmitButton
               disabled={isPending()}
-              id="disable-two-factor-password"
-              name="password"
-              placeholder={auth.localization.auth.passwordPlaceholder}
-              required
-              type="password"
-            />
-          </Field>
-        </Show>
+              variant="destructive"
+            >
+              <Show when={isPending()}>
+                <Spinner />
+              </Show>
 
-        <AlertDialogFooter>
-          <AlertDialogCancel disabled={isPending()} type="button">
-            {auth.localization.settings.cancel}
-          </AlertDialogCancel>
-
-          <Button disabled={isPending()} type="submit" variant="destructive">
-            <Show when={isPending()}>
-              <Spinner />
-            </Show>
-
-            {twoFactorLocalization.disableTwoFactor}
-          </Button>
-        </AlertDialogFooter>
-      </form>
+              {twoFactorLocalization.disableTwoFactor}
+            </form.AuthFormSubmitButton>
+          </AlertDialogFooter>
+          <form.AuthFormServerError />
+        </form.AuthFormRoot>
+      </form.AppForm>
     </AlertDialogContent>
   )
 }

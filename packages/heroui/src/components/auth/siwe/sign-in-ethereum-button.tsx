@@ -43,8 +43,8 @@ export function SignInEthereumButton({ view }: SignInEthereumButtonProps) {
       useIsMutating({ mutationKey: siweMutationKeys.all }) >
     0
 
-  const completeSignIn = (email?: string) => {
-    signIn.mutate(email ? { email } : undefined, {
+  const completeSignIn = async (email?: string) => {
+    await signIn.mutateAsync(email ? { email } : undefined, {
       onSuccess: () => {
         setIsOpen(false)
         navigate({ to: redirectTo })
@@ -59,9 +59,9 @@ export function SignInEthereumButton({ view }: SignInEthereumButtonProps) {
 
   const form = useAuthForm({
     defaultValues: { email: "" },
-    onSubmit: ({ value }) => {
+    onSubmit: async ({ value }) => {
       const email = value.email.trim()
-      completeSignIn(email || undefined)
+      await completeSignIn(email || undefined)
     }
   })
 

@@ -1,17 +1,17 @@
+import { validateStringLength } from "@better-auth-ui/core"
 import { isTwoFactorRedirect } from "@better-auth-ui/core/plugins/two-factor"
 import { useAuth, useSession, useSignInEmail } from "@better-auth-ui/solid"
-import { createSignal, Show } from "solid-js"
+import { Show } from "solid-js"
 import { Button } from "@/components/ui/button"
 import {
   Field,
   FieldDescription,
-  FieldError,
   FieldGroup,
   FieldLabel
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
-import { Spinner } from "@/components/ui/spinner"
 import { useSignInContinuation } from "@/lib/auth/use-sign-in-continuation"
+import { createAuthForm, isAuthFormFieldInvalid } from "../../auth-form"
 
 export interface FreshSessionPromptProps {
   onFresh: () => unknown | Promise<unknown>
@@ -21,26 +21,27 @@ export function FreshSessionPrompt(props: FreshSessionPromptProps) {
   const auth = useAuth()
   const session = useSession(auth.authClient)
   const continueSignIn = useSignInContinuation()
-  const [password, setPassword] = createSignal("")
   const signIn = useSignInEmail(auth.authClient, () => ({
     meta: { errorPresentation: "inline" },
-    onError: () => setPassword(""),
+    onError: () => form.setFieldValue("password", ""),
     onSuccess: async (data) => {
       if (isTwoFactorRedirect(data)) {
         continueSignIn(data)
         return
       }
-      setPassword("")
+      form.setFieldValue("password", "")
       await props.onFresh()
     }
   }))
 
-  const submit = (event: SubmitEvent & { currentTarget: HTMLFormElement }) => {
-    event.preventDefault()
-    const email = session.data?.user.email
-    if (!email) return
-    signIn.mutate({ email, password: password() })
-  }
+  const form = createAuthForm(() => ({
+    defaultValues: { password: "" },
+    onSubmit: async ({ value }) => {
+      const email = session.data?.user.email
+      if (!email) return
+      await signIn.mutateAsync({ email, password: value.password })
+    }
+  }))
 
   return (
     <div class="p-4">
@@ -67,35 +68,46 @@ export function FreshSessionPrompt(props: FreshSessionPromptProps) {
           }
           when={auth.emailAndPassword?.enabled}
         >
-          <form class="flex flex-col gap-3" onSubmit={submit}>
-            <Field data-invalid={signIn.isError}>
-              <FieldLabel for="fresh-session-password">
-                {auth.localization.auth.password}
-              </FieldLabel>
-              <Input
-                id="fresh-session-password"
-                autocomplete="current-password"
-                disabled={signIn.isPending}
-                value={password()}
-                onInput={(event) => setPassword(event.currentTarget.value)}
-                type="password"
-                required
-              />
-              <Show when={signIn.error}>
-                {(error) => (
-                  <FieldError>
-                    {error().error?.message ?? error().message}
-                  </FieldError>
+          <form.AppForm>
+            <form.AuthFormRoot class="flex flex-col gap-3">
+              <form.AppField
+                name="password"
+                validators={{
+                  onChange: ({ value }) =>
+                    validateStringLength(value, {
+                      requiredMessage: auth.localization.auth.fieldRequired
+                    })
+                }}
+              >
+                {(field) => (
+                  <Field
+                    data-invalid={isAuthFormFieldInvalid(field().state.meta)}
+                  >
+                    <FieldLabel for="fresh-session-password">
+                      {auth.localization.auth.password}
+                    </FieldLabel>
+                    <Input
+                      id="fresh-session-password"
+                      autocomplete="current-password"
+                      disabled={signIn.isPending}
+                      name={field().name}
+                      value={field().state.value}
+                      onBlur={field().handleBlur}
+                      onInput={(event) =>
+                        field().handleChange(event.currentTarget.value)
+                      }
+                      type="password"
+                    />
+                    <field.AuthFormFieldError />
+                  </Field>
                 )}
-              </Show>
-            </Field>
-            <Button disabled={!password() || signIn.isPending} type="submit">
-              <Show when={signIn.isPending}>
-                <Spinner />
-              </Show>
-              {auth.localization.settings.freshSessionSubmit}
-            </Button>
-          </form>
+              </form.AppField>
+              <form.AuthFormServerError />
+              <form.AuthFormSubmitButton disabled={signIn.isPending}>
+                {auth.localization.settings.freshSessionSubmit}
+              </form.AuthFormSubmitButton>
+            </form.AuthFormRoot>
+          </form.AppForm>
         </Show>
       </FieldGroup>
     </div>

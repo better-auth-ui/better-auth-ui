@@ -26,7 +26,7 @@ export function DeleteOrganizationDialog({
     viewPaths: organizationPluginViewPaths
   } = useAuthPlugin(organizationPlugin)
 
-  const { mutate: deleteOrganization, isPending } = useDeleteOrganization(
+  const { mutateAsync: deleteOrganization, isPending } = useDeleteOrganization(
     authClient as OrganizationAuthClient,
     {
       onSuccess: () => {
@@ -43,7 +43,8 @@ export function DeleteOrganizationDialog({
 
   const form = useAuthForm({
     defaultValues: {},
-    onSubmit: () => deleteOrganization({ organizationId: organization.id })
+    onSubmit: async () =>
+      await deleteOrganization({ organizationId: organization.id })
   })
 
   return (

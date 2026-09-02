@@ -18,7 +18,6 @@ import {
   DialogTitle
 } from "@/components/ui/dialog"
 import { Field, FieldGroup, FieldLabel } from "@/components/ui/field"
-import { Input } from "@/components/ui/input"
 import {
   Select,
   SelectContent,
@@ -27,6 +26,7 @@ import {
   SelectValue
 } from "@/components/ui/select"
 import { apiKeyPlugin } from "@/lib/auth/api-key-plugin"
+import { createAuthForm } from "../auth-form"
 
 type ExpirationOption = {
   id: string
@@ -109,134 +109,138 @@ export function CreateApiKeyDialog(props: {
     }
   }
 
-  const submitCreateApiKey = (event: SubmitEvent) => {
-    event.preventDefault()
-
-    const formData = new FormData(event.currentTarget as HTMLFormElement)
-    const name = String(formData.get("name") ?? "").trim()
-    const expirationDays = expiration()?.days
-    const expiresIn = expirationDays
-      ? apiKeyExpirationDaysToSeconds(expirationDays)
-      : undefined
-    const configId =
-      configuration()?.id || (props.organizationId ? "organization" : undefined)
-    const payload = {
-      ...(name ? { name } : {}),
-      ...(expiresIn ? { expiresIn } : {}),
-      ...(configId ? { configId } : {}),
-      ...(props.organizationId ? { organizationId: props.organizationId } : {})
+  const form = createAuthForm(() => ({
+    defaultValues: { name: "" },
+    onSubmit: async ({ value }) => {
+      const name = value.name.trim()
+      const expirationDays = expiration()?.days
+      const expiresIn = expirationDays
+        ? apiKeyExpirationDaysToSeconds(expirationDays)
+        : undefined
+      const configId =
+        configuration()?.id ||
+        (props.organizationId ? "organization" : undefined)
+      const payload = {
+        ...(name ? { name } : {}),
+        ...(expiresIn ? { expiresIn } : {}),
+        ...(configId ? { configId } : {}),
+        ...(props.organizationId
+          ? { organizationId: props.organizationId }
+          : {})
+      }
+      await createApiKey.mutateAsync(
+        Object.keys(payload).length > 0 ? payload : undefined
+      )
     }
-
-    createApiKey.mutate(Object.keys(payload).length > 0 ? payload : undefined)
-  }
+  }))
 
   return (
     <>
       <DialogContent>
-        <form class="flex flex-col gap-6" onSubmit={submitCreateApiKey}>
-          <DialogHeader>
-            <div class="flex size-10 items-center justify-center rounded-md bg-muted">
-              <Key class="size-4.5" />
-            </div>
-            <DialogTitle>{apiKeyLocalization.createApiKey}</DialogTitle>
-            <DialogDescription>
-              {apiKeyLocalization.apiKeysDescription}
-            </DialogDescription>
-          </DialogHeader>
+        <form.AppForm>
+          <form.AuthFormRoot class="flex flex-col gap-6">
+            <DialogHeader>
+              <div class="flex size-10 items-center justify-center rounded-md bg-muted">
+                <Key class="size-4.5" />
+              </div>
+              <DialogTitle>{apiKeyLocalization.createApiKey}</DialogTitle>
+              <DialogDescription>
+                {apiKeyLocalization.apiKeysDescription}
+              </DialogDescription>
+            </DialogHeader>
 
-          <FieldGroup>
-            <Field>
-              <FieldLabel for="api-key-name">
-                {apiKeyLocalization.name}
-              </FieldLabel>
-              <Input
-                autofocus
+            <FieldGroup>
+              <form.AppField name="name">
+                {(field) => (
+                  <field.AuthFormTextField
+                    autofocus
+                    disabled={createApiKey.isPending}
+                    id="api-key-name"
+                    label={apiKeyLocalization.name}
+                    placeholder={auth.localization.settings.optional}
+                  />
+                )}
+              </form.AppField>
+
+              <Show when={configurationOptions.length > 0}>
+                <Field>
+                  <FieldLabel for="api-key-configuration">
+                    {apiKeyLocalization.configuration}
+                  </FieldLabel>
+                  <Select<ConfigurationOption>
+                    disabled={createApiKey.isPending}
+                    itemComponent={(itemProps) => (
+                      <SelectItem item={itemProps.item}>
+                        {itemProps.item.rawValue.label}
+                      </SelectItem>
+                    )}
+                    onChange={(option) => setConfiguration(option ?? undefined)}
+                    options={configurationOptions}
+                    optionTextValue="label"
+                    optionValue="id"
+                    value={configuration()}
+                  >
+                    <SelectTrigger id="api-key-configuration" class="w-full">
+                      <SelectValue<ConfigurationOption>>
+                        {(state) =>
+                          (
+                            state.selectedOption() as
+                              | ConfigurationOption
+                              | undefined
+                          )?.label
+                        }
+                      </SelectValue>
+                    </SelectTrigger>
+                    <SelectContent />
+                  </Select>
+                </Field>
+              </Show>
+
+              <Show when={keyExpiration}>
+                <Field>
+                  <FieldLabel for="api-key-expiration">
+                    {apiKeyLocalization.expiration}
+                  </FieldLabel>
+                  <Select<ExpirationOption>
+                    disabled={createApiKey.isPending}
+                    itemComponent={(itemProps) => (
+                      <SelectItem item={itemProps.item}>
+                        {itemProps.item.rawValue.label}
+                      </SelectItem>
+                    )}
+                    onChange={(option) => setExpiration(option ?? undefined)}
+                    options={expirationOptions}
+                    optionTextValue="label"
+                    optionValue="id"
+                    value={expiration()}
+                  >
+                    <SelectTrigger id="api-key-expiration" class="w-full">
+                      <SelectValue<ExpirationOption>>
+                        {(state) => state.selectedOption().label}
+                      </SelectValue>
+                    </SelectTrigger>
+                    <SelectContent />
+                  </Select>
+                </Field>
+              </Show>
+              <form.AuthFormServerError />
+            </FieldGroup>
+
+            <DialogFooter>
+              <DialogClose
+                as={Button}
                 disabled={createApiKey.isPending}
-                id="api-key-name"
-                name="name"
-                placeholder={auth.localization.settings.optional}
-              />
-            </Field>
-
-            <Show when={configurationOptions.length > 0}>
-              <Field>
-                <FieldLabel for="api-key-configuration">
-                  {apiKeyLocalization.configuration}
-                </FieldLabel>
-                <Select<ConfigurationOption>
-                  disabled={createApiKey.isPending}
-                  itemComponent={(itemProps) => (
-                    <SelectItem item={itemProps.item}>
-                      {itemProps.item.rawValue.label}
-                    </SelectItem>
-                  )}
-                  onChange={(option) => setConfiguration(option ?? undefined)}
-                  options={configurationOptions}
-                  optionTextValue="label"
-                  optionValue="id"
-                  value={configuration()}
-                >
-                  <SelectTrigger id="api-key-configuration" class="w-full">
-                    <SelectValue<ConfigurationOption>>
-                      {(state) =>
-                        (
-                          state.selectedOption() as
-                            | ConfigurationOption
-                            | undefined
-                        )?.label
-                      }
-                    </SelectValue>
-                  </SelectTrigger>
-                  <SelectContent />
-                </Select>
-              </Field>
-            </Show>
-
-            <Show when={keyExpiration}>
-              <Field>
-                <FieldLabel for="api-key-expiration">
-                  {apiKeyLocalization.expiration}
-                </FieldLabel>
-                <Select<ExpirationOption>
-                  disabled={createApiKey.isPending}
-                  itemComponent={(itemProps) => (
-                    <SelectItem item={itemProps.item}>
-                      {itemProps.item.rawValue.label}
-                    </SelectItem>
-                  )}
-                  onChange={(option) => setExpiration(option ?? undefined)}
-                  options={expirationOptions}
-                  optionTextValue="label"
-                  optionValue="id"
-                  value={expiration()}
-                >
-                  <SelectTrigger id="api-key-expiration" class="w-full">
-                    <SelectValue<ExpirationOption>>
-                      {(state) => state.selectedOption().label}
-                    </SelectValue>
-                  </SelectTrigger>
-                  <SelectContent />
-                </Select>
-              </Field>
-            </Show>
-          </FieldGroup>
-
-          <DialogFooter>
-            <DialogClose
-              as={Button}
-              disabled={createApiKey.isPending}
-              type="button"
-              variant="outline"
-            >
-              {auth.localization.settings.cancel}
-            </DialogClose>
-            <Button disabled={createApiKey.isPending} type="submit">
-              {createApiKey.isPending
-                ? `${apiKeyLocalization.createApiKey}…`
-                : apiKeyLocalization.createApiKey}
-            </Button>
-          </DialogFooter>
-        </form>
+                type="button"
+                variant="outline"
+              >
+                {auth.localization.settings.cancel}
+              </DialogClose>
+              <form.AuthFormSubmitButton disabled={createApiKey.isPending}>
+                {apiKeyLocalization.createApiKey}
+              </form.AuthFormSubmitButton>
+            </DialogFooter>
+          </form.AuthFormRoot>
+        </form.AppForm>
       </DialogContent>
 
       <Dialog

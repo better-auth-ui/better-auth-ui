@@ -56,7 +56,7 @@ export function DeleteAccount({
   )
   const needsPassword = !sendDeleteAccountVerification && hasCredentialAccount
 
-  const { mutate: deleteUser, isPending } = useDeleteUser(authClient)
+  const { mutateAsync: deleteUser, isPending } = useDeleteUser(authClient)
 
   const handleDialogOpenChange = (open: boolean) => {
     setConfirmOpen(open)
@@ -66,12 +66,12 @@ export function DeleteAccount({
 
   const form = useAuthForm({
     defaultValues: { password: "" },
-    onSubmit: ({ value }) => {
+    onSubmit: async ({ value }) => {
       const params = {
         ...(needsPassword ? { password: value.password } : {})
       }
 
-      deleteUser(params, {
+      await deleteUser(params, {
         onSuccess: () => {
           setConfirmOpen(false)
           form.setFieldValue("password", "")

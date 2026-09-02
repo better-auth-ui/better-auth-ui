@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest"
 import {
   getFormFieldErrorMessage,
   getFormFieldErrors,
+  normalizeAuthFormServerError,
   validateAbsoluteUrl,
   validateAbsoluteUrlList,
   validateEmailAddress,
@@ -93,5 +94,29 @@ describe("form validation", () => {
         { other: true }
       ])
     ).toEqual([{ message: "Invalid" }, { message: "Required" }])
+  })
+
+  it("normalizes form and field errors from mutation responses", () => {
+    expect(
+      normalizeAuthFormServerError(
+        {
+          body: {
+            fieldErrors: {
+              email: ["Email is already in use"]
+            }
+          },
+          message: "Could not create the account"
+        },
+        "Request failed"
+      )
+    ).toEqual({
+      fields: { email: { message: "Email is already in use" } },
+      form: { message: "Could not create the account" }
+    })
+
+    expect(normalizeAuthFormServerError(null, "Request failed")).toEqual({
+      fields: undefined,
+      form: { message: "Request failed" }
+    })
   })
 })

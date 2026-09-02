@@ -1,4 +1,4 @@
-import { getAuthLinkURL } from "@better-auth-ui/core"
+import { getAuthLinkURL, validateEmailAddress } from "@better-auth-ui/core"
 import type { EmailOtpAuthClient } from "@better-auth-ui/core/plugins/email-otp"
 import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
 import {
@@ -11,7 +11,6 @@ import {
   type CardProps,
   cn,
   Description,
-  FieldError,
   Input,
   Label,
   Link,
@@ -83,7 +82,7 @@ export function VerifyEmailOtp({ className, variant }: VerifyEmailOtpProps) {
     if (pendingEmail) startCooldown(RESEND_COOLDOWN_SECONDS)
   }, [startCooldown])
 
-  const { mutate: sendVerificationOtp, isPending: isSending } =
+  const { mutateAsync: sendVerificationOtp, isPending: isSending } =
     useSendVerificationOtp(otpClient, {
       onSuccess: (_data, { email: sentTo }) => {
         sessionStorage.setItem(VERIFY_EMAIL_STORAGE_KEY, sentTo)
@@ -93,17 +92,15 @@ export function VerifyEmailOtp({ className, variant }: VerifyEmailOtpProps) {
       }
     })
 
-  const { mutate: verifyEmailOtp, isPending: isVerifying } = useVerifyEmailOtp(
-    otpClient,
-    {
+  const { mutateAsync: verifyEmailOtp, isPending: isVerifying } =
+    useVerifyEmailOtp(otpClient, {
       onError: () => form.setFieldValue("code", ""),
       onSuccess: () => {
         sessionStorage.removeItem(VERIFY_EMAIL_STORAGE_KEY)
         toast.success(emailOtpLocalization.emailVerified)
         navigate({ to: redirectTo })
       }
-    }
-  )
+    })
 
   const isPending = isSending || isVerifying
 
@@ -115,16 +112,16 @@ export function VerifyEmailOtp({ className, variant }: VerifyEmailOtpProps) {
 
   const form = useAuthForm({
     defaultValues: { code: "", email: "" },
-    onSubmit: ({ value }) => {
+    onSubmit: async ({ value }) => {
       if (!email) {
-        sendVerificationOtp({
+        await sendVerificationOtp({
           email: value.email,
           type: "email-verification"
         })
         return
       }
 
-      verifyCode(value.code)
+      await verifyCode(value.code)
     }
   })
   const codeComplete = useSelector(
@@ -169,7 +166,16 @@ export function VerifyEmailOtp({ className, variant }: VerifyEmailOtpProps) {
                 )}
               </form.AppField>
             ) : (
-              <form.AppField name="email">
+              <form.AppField
+                name="email"
+                validators={{
+                  onChange: ({ value }) =>
+                    validateEmailAddress(value, {
+                      invalidMessage: localization.auth.invalidEmail,
+                      requiredMessage: localization.auth.fieldRequired
+                    })
+                }}
+              >
                 {(field) => (
                   <TextField
                     name={field.name}
@@ -179,11 +185,7 @@ export function VerifyEmailOtp({ className, variant }: VerifyEmailOtpProps) {
                     value={field.state.value}
                     onBlur={field.handleBlur}
                     onChange={field.handleChange}
-                    validate={(value) => {
-                      if (!value) return localization.auth.fieldRequired
-                      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value))
-                        return localization.auth.invalidEmail
-                    }}
+                    validationBehavior="aria"
                   >
                     <Label>{localization.auth.email}</Label>
 
@@ -195,11 +197,13 @@ export function VerifyEmailOtp({ className, variant }: VerifyEmailOtpProps) {
                       }
                     />
 
-                    <FieldError />
+                    <field.AuthFormFieldError />
                   </TextField>
                 )}
               </form.AppField>
             )}
+
+            <form.AuthFormServerError />
 
             <div className="flex flex-col gap-3">
               <form.AuthFormSubmitButton

@@ -67,9 +67,9 @@ export function SsoDomainVerification({
   })
   const form = useAuthForm({
     defaultValues: { providerId: defaultProviderId },
-    onSubmit: ({ value }) => {
+    onSubmit: async ({ value }) => {
       setVerified(false)
-      verify.mutate({ providerId: value.providerId })
+      await verify.mutateAsync({ providerId: value.providerId })
     }
   })
   const providerId = useSelector(form.store, (state) => state.values.providerId)

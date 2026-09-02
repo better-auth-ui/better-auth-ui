@@ -1,4 +1,4 @@
-import { getViewURL } from "@better-auth-ui/core"
+import { getViewURL, validateEmailAddress } from "@better-auth-ui/core"
 import {
   AuthLink,
   type AuthPlugin,
@@ -6,14 +6,13 @@ import {
   useFetchOptions,
   useRequestPasswordReset
 } from "@better-auth-ui/solid"
-import { createSignal, Show } from "solid-js"
+import { Show } from "solid-js"
 import { RESET_LINK_SENT_STORAGE_KEY } from "@/components/auth/reset-link-sent"
-import { Alert, AlertDescription } from "@/components/ui/alert"
-import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Field, FieldError, FieldLabel } from "@/components/ui/field"
+import { Field, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import { cn } from "@/lib/utils"
+import { createAuthForm, isAuthFormFieldInvalid } from "./auth-form"
 
 export type ForgotPasswordProps = {
   class?: string
@@ -23,8 +22,6 @@ export type ForgotPasswordProps = {
 export function ForgotPassword(props: ForgotPasswordProps) {
   const auth = useAuth()
   const { fetchOptions, resetFetchOptions } = useFetchOptions()
-  const [email, setEmail] = createSignal("")
-  const [emailError, setEmailError] = createSignal<string>()
   const requestReset = useRequestPasswordReset(auth.authClient, () => ({
     onError: () => {
       resetFetchOptions()
@@ -41,21 +38,22 @@ export function ForgotPassword(props: ForgotPasswordProps) {
     (auth.plugins as AuthPlugin[]).find((plugin) => plugin.captchaComponent)
       ?.captchaComponent
 
-  const submitPasswordReset = (event: SubmitEvent) => {
-    event.preventDefault()
-
-    requestReset.mutate({
-      email: email(),
-      fetchOptions: fetchOptions(),
-      redirectTo:
-        props.redirectTo ??
-        getViewURL(
-          auth.baseURL,
-          auth.basePaths.auth,
-          auth.viewPaths.auth.resetPassword
-        )
-    } as Parameters<typeof requestReset.mutate>[0])
-  }
+  const form = createAuthForm(() => ({
+    defaultValues: { email: "" },
+    onSubmit: async ({ value }) => {
+      await requestReset.mutateAsync({
+        email: value.email,
+        fetchOptions: fetchOptions(),
+        redirectTo:
+          props.redirectTo ??
+          getViewURL(
+            auth.baseURL,
+            auth.basePaths.auth,
+            auth.viewPaths.auth.resetPassword
+          )
+      } as Parameters<typeof requestReset.mutateAsync>[0])
+    }
+  }))
 
   return (
     <Card class={cn("w-full max-w-sm", props.class)}>
@@ -66,51 +64,54 @@ export function ForgotPassword(props: ForgotPasswordProps) {
       </CardHeader>
 
       <CardContent>
-        <form aria-label="Forgot password" onSubmit={submitPasswordReset}>
-          <div class="flex flex-col gap-6">
-            <Field data-invalid={Boolean(emailError())}>
-              <FieldLabel for="forgot-password-email">
-                {auth.localization.auth.email}
-              </FieldLabel>
-              <Input
-                aria-invalid={Boolean(emailError())}
-                id="forgot-password-email"
+        <form.AppForm>
+          <form.AuthFormRoot aria-label="Forgot password">
+            <div class="flex flex-col gap-6">
+              <form.AppField
                 name="email"
-                onInput={(event) => {
-                  setEmail(event.currentTarget.value)
-                  setEmailError(undefined)
+                validators={{
+                  onChange: ({ value }) =>
+                    validateEmailAddress(value, {
+                      invalidMessage: auth.localization.auth.invalidEmail,
+                      requiredMessage: auth.localization.auth.fieldRequired
+                    })
                 }}
-                onInvalid={(event) => {
-                  event.preventDefault()
-                  setEmailError(event.currentTarget.validationMessage)
-                }}
-                placeholder={auth.localization.auth.emailPlaceholder}
-                required
-                type="email"
-                value={email()}
-              />
-
-              <Show when={emailError()}>
-                {(message) => <FieldError>{message()}</FieldError>}
+              >
+                {(field) => (
+                  <Field
+                    data-invalid={isAuthFormFieldInvalid(field().state.meta)}
+                  >
+                    <FieldLabel for="forgot-password-email">
+                      {auth.localization.auth.email}
+                    </FieldLabel>
+                    <Input
+                      aria-invalid={isAuthFormFieldInvalid(field().state.meta)}
+                      id="forgot-password-email"
+                      name={field().name}
+                      onBlur={field().handleBlur}
+                      onInput={(event) =>
+                        field().handleChange(event.currentTarget.value)
+                      }
+                      placeholder={auth.localization.auth.emailPlaceholder}
+                      type="email"
+                      value={field().state.value}
+                    />
+                    <field.AuthFormFieldError />
+                  </Field>
+                )}
+              </form.AppField>
+              <Show when={captchaComponent()} keyed>
+                {(Captcha) => <Captcha />}
               </Show>
-            </Field>
-            <Show when={captchaComponent()} keyed>
-              {(Captcha) => <Captcha />}
-            </Show>
-            <Button disabled={requestReset.isPending} type="submit">
-              {requestReset.isPending
-                ? `${auth.localization.auth.sendResetLink}…`
-                : auth.localization.auth.sendResetLink}
-            </Button>
-            <Show when={requestReset.isError}>
-              <Alert variant="destructive">
-                <AlertDescription>
-                  Unable to send a reset link. Try again.
-                </AlertDescription>
-              </Alert>
-            </Show>
-          </div>
-        </form>
+              <form.AuthFormSubmitButton disabled={requestReset.isPending}>
+                {requestReset.isPending
+                  ? `${auth.localization.auth.sendResetLink}…`
+                  : auth.localization.auth.sendResetLink}
+              </form.AuthFormSubmitButton>
+              <form.AuthFormServerError />
+            </div>
+          </form.AuthFormRoot>
+        </form.AppForm>
 
         <div class="mt-4 flex w-full flex-col items-center gap-3">
           <p class="text-center text-sm text-muted-foreground">

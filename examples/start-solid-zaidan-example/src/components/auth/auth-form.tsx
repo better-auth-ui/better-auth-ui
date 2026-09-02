@@ -3,14 +3,25 @@ import {
   type AdditionalFieldFormValue,
   DEFAULT_ADDITIONAL_FIELD_VALIDATION_DEBOUNCE_MS,
   getFormFieldErrors,
+  normalizeAuthFormServerError,
   validateAdditionalFieldRequired,
   validateAdditionalFieldValue
 } from "@better-auth-ui/core"
-import { createFormHook, createFormHookContexts } from "@tanstack/solid-form"
-import { type ComponentProps, Show, splitProps } from "solid-js"
+import {
+  type AnyFormApi,
+  createFormHook,
+  createFormHookContexts
+} from "@tanstack/solid-form"
+import { type ComponentProps, type JSX, Show, splitProps } from "solid-js"
 
 import { Button } from "@/components/ui/button"
-import { FieldError } from "@/components/ui/field"
+import {
+  Field,
+  FieldDescription,
+  FieldError,
+  FieldLabel
+} from "@/components/ui/field"
+import { Input } from "@/components/ui/input"
 import { Spinner } from "@/components/ui/spinner"
 import { AdditionalField, type AdditionalFieldProps } from "./additional-field"
 
@@ -49,13 +60,73 @@ function AuthFormFieldError() {
   )
 }
 
+function AuthFormServerError() {
+  const form = useFormContext()
+
+  return (
+    <form.Subscribe selector={(state) => state.errorMap.onServer}>
+      {(error) => {
+        const errors = () => {
+          const current = error()
+          const formError =
+            current && typeof current === "object" && "form" in current
+              ? current.form
+              : current
+          return getFormFieldErrors(formError ? [formError] : [])
+        }
+        return (
+          <Show when={errors().length > 0}>
+            <FieldError errors={errors()} />
+          </Show>
+        )
+      }}
+    </form.Subscribe>
+  )
+}
+
+export function setAuthFormServerError(
+  form: AnyFormApi,
+  error: unknown,
+  fallbackMessage: string
+) {
+  const normalized = normalizeAuthFormServerError(error, fallbackMessage)
+  form.setErrorMap({
+    onServer: {
+      fields: normalized.fields ?? {},
+      form: normalized.form
+    }
+  })
+}
+
+export function clearAuthFormServerError(form: AnyFormApi) {
+  form.setErrorMap({ onServer: undefined })
+}
+
+export async function submitAuthForm(
+  form: AnyFormApi,
+  serverErrorMessage = "Unable to submit this form. Try again."
+) {
+  clearAuthFormServerError(form)
+  try {
+    await form.handleSubmit()
+    return form.state.isValid
+  } catch (error) {
+    setAuthFormServerError(form, error, serverErrorMessage)
+    return false
+  }
+}
+
 type AuthFormRootProps = Omit<ComponentProps<"form">, "onSubmit"> & {
   onBeforeSubmit?: () => void
+  serverErrorMessage?: string
 }
 
 function AuthFormRoot(props: AuthFormRootProps) {
   const form = useFormContext()
-  const [local, formProps] = splitProps(props, ["onBeforeSubmit"])
+  const [local, formProps] = splitProps(props, [
+    "onBeforeSubmit",
+    "serverErrorMessage"
+  ])
   let submitting = false
 
   const submit = async (event: SubmitEvent) => {
@@ -66,8 +137,11 @@ function AuthFormRoot(props: AuthFormRootProps) {
     local.onBeforeSubmit?.()
     submitting = true
     try {
-      await form.handleSubmit()
-      if (!form.state.isValid) focusFirstInvalidAuthFormControl(formElement)
+      const isValid = await submitAuthForm(
+        form,
+        local.serverErrorMessage ?? "Unable to submit this form. Try again."
+      )
+      if (!isValid) focusFirstInvalidAuthFormControl(formElement)
     } finally {
       submitting = false
     }
@@ -83,6 +157,40 @@ function AuthFormRoot(props: AuthFormRootProps) {
       }}
       onSubmit={submit}
     />
+  )
+}
+
+type AuthFormTextFieldProps = Omit<
+  ComponentProps<typeof Input>,
+  "name" | "onBlur" | "onInput" | "value"
+> & {
+  description?: JSX.Element
+  label: JSX.Element
+}
+
+function AuthFormTextField(props: AuthFormTextFieldProps) {
+  const field = useFieldContext<string>()
+  const [local, inputProps] = splitProps(props, ["description", "id", "label"])
+  const isInvalid = () => isAuthFormFieldInvalid(field().state.meta)
+  const inputId = () => local.id ?? field().name
+
+  return (
+    <Field data-invalid={isInvalid()}>
+      <FieldLabel for={inputId()}>{local.label}</FieldLabel>
+      <Input
+        {...inputProps}
+        aria-invalid={isInvalid()}
+        id={inputId()}
+        name={field().name}
+        onBlur={field().handleBlur}
+        onInput={(event) => field().handleChange(event.currentTarget.value)}
+        value={field().state.value}
+      />
+      <Show when={local.description}>
+        <FieldDescription>{local.description}</FieldDescription>
+      </Show>
+      <AuthFormFieldError />
+    </Field>
   )
 }
 
@@ -141,9 +249,17 @@ export const {
   withFieldGroup: withAuthFieldGroup,
   withForm: withAuthForm
 } = createFormHook({
-  fieldComponents: { AuthFormAdditionalField, AuthFormFieldError },
+  fieldComponents: {
+    AuthFormAdditionalField,
+    AuthFormFieldError,
+    AuthFormTextField
+  },
   fieldContext,
-  formComponents: { AuthFormRoot, AuthFormSubmitButton },
+  formComponents: {
+    AuthFormRoot,
+    AuthFormServerError,
+    AuthFormSubmitButton
+  },
   formContext
 })
 

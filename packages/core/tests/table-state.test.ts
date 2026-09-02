@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest"
 import {
+  createTableSearchParamsAdapter,
   getClampedTablePageIndex,
   getLookaheadPage,
   parseTableColumnVisibility,
@@ -126,5 +127,38 @@ describe("table state", () => {
         { desc: true, id: "createdAt" }
       ]
     })
+  })
+
+  it("supports router-owned search state through the persistence contract", () => {
+    let current = new URLSearchParams("tab=members")
+    const listeners = new Set<() => void>()
+    const adapter = createTableSearchParamsAdapter({
+      read: () => new URLSearchParams(current),
+      replace: (params) => {
+        current = new URLSearchParams(params)
+        for (const listener of listeners) listener()
+      },
+      subscribe: (listener) => {
+        listeners.add(listener)
+        return () => listeners.delete(listener)
+      }
+    })
+    let notifications = 0
+    const unsubscribe = adapter.subscribe(() => notifications++)
+
+    adapter.replace(
+      serializeTableUrlState(adapter.read(), "members", 10, {
+        columnFilters: [],
+        globalFilter: "Ada",
+        pagination: { pageIndex: 1, pageSize: 20 },
+        sorting: [{ desc: false, id: "name" }]
+      })
+    )
+
+    expect(notifications).toBe(1)
+    expect(current.get("tab")).toBe("members")
+    expect(current.get("members.search")).toBe("Ada")
+    expect(current.get("members.page")).toBe("2")
+    unsubscribe()
   })
 })

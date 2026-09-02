@@ -1,8 +1,10 @@
 import {
+  createBrowserTablePersistenceAdapters,
   parseTableColumnVisibility,
   parseTableUrlState,
   serializeTableColumnVisibility,
-  serializeTableUrlState
+  serializeTableUrlState,
+  type TablePersistenceAdapters
 } from "@better-auth-ui/core"
 import { createAtom, useSelector } from "@tanstack/solid-store"
 import {
@@ -20,12 +22,13 @@ import { ORGANIZATION_TABLE_PAGE_SIZE } from "./organization-table"
 const STORAGE_PREFIX = "better-auth-ui:organization-table"
 
 function readUrl(
+  adapters: TablePersistenceAdapters,
   stateKey: string,
   defaultPageSize: number,
   allowedColumnIds?: readonly string[]
 ) {
   return parseTableUrlState(
-    new URLSearchParams(window.location.search),
+    adapters.search.read(),
     stateKey,
     defaultPageSize,
     ORGANIZATION_TABLE_PAGE_SIZE_OPTIONS,
@@ -36,8 +39,11 @@ function readUrl(
 export function createOrganizationTableState(
   stateKey: string,
   defaultPageSize = ORGANIZATION_TABLE_PAGE_SIZE,
-  allowedColumnIds?: readonly string[]
+  allowedColumnIds?: readonly string[],
+  persistenceAdapters?: TablePersistenceAdapters
 ) {
+  const adapters =
+    persistenceAdapters ?? createBrowserTablePersistenceAdapters()
   const columnFiltersAtom = createAtom<ColumnFiltersState>([])
   const columnVisibilityAtom = createAtom<ColumnVisibilityState>({})
   const globalFilterAtom = createAtom("")
@@ -54,6 +60,7 @@ export function createOrganizationTableState(
   const rowSelection = useSelector(rowSelectionAtom)
   const sorting = useSelector(sortingAtom)
   const [ready, setReady] = createSignal(false)
+  let restoringUrlState = false
   const atoms = {
     columnFilters: columnFiltersAtom,
     globalFilter: globalFilterAtom,
@@ -80,6 +87,7 @@ export function createOrganizationTableState(
 
   onMount(() => {
     const resetPage = () => {
+      if (restoringUrlState) return
       const current = paginationAtom.get()
       if (current.pageIndex === 0) rowSelectionAtom.set({})
       else paginationAtom.set({ ...current, pageIndex: 0 })
@@ -92,9 +100,8 @@ export function createOrganizationTableState(
     ]
 
     try {
-      const saved = window.localStorage.getItem(
-        `${STORAGE_PREFIX}:${stateKey}:columns`
-      )
+      const saved =
+        adapters.storage?.read(`${STORAGE_PREFIX}:${stateKey}:columns`) ?? null
       columnVisibilityAtom.set(
         parseTableColumnVisibility(saved, allowedColumnIds)
       )
@@ -102,17 +109,24 @@ export function createOrganizationTableState(
       // Storage is optional.
     }
     const restore = () => {
-      const next = readUrl(stateKey, defaultPageSize, allowedColumnIds)
+      restoringUrlState = true
+      const next = readUrl(
+        adapters,
+        stateKey,
+        defaultPageSize,
+        allowedColumnIds
+      )
       columnFiltersAtom.set(next.columnFilters)
       globalFilterAtom.set(next.globalFilter)
       sortingAtom.set(next.sorting)
       paginationAtom.set(next.pagination)
+      restoringUrlState = false
       setReady(true)
     }
     restore()
-    window.addEventListener("popstate", restore)
+    const unsubscribe = adapters.search.subscribe(restore)
     onCleanup(() => {
-      window.removeEventListener("popstate", restore)
+      unsubscribe()
       for (const subscription of subscriptions) subscription.unsubscribe()
     })
   })
@@ -121,7 +135,7 @@ export function createOrganizationTableState(
     const visibility = columnVisibility()
     if (!ready()) return
     try {
-      window.localStorage.setItem(
+      adapters.storage?.write(
         `${STORAGE_PREFIX}:${stateKey}:columns`,
         serializeTableColumnVisibility(visibility)
       )
@@ -138,14 +152,14 @@ export function createOrganizationTableState(
       sorting: sorting()
     }
     if (!ready()) return
-    const url = new URL(window.location.href)
-    url.search = serializeTableUrlState(
-      url.searchParams,
-      stateKey,
-      defaultPageSize,
-      state
-    ).toString()
-    window.history.replaceState(window.history.state, "", url)
+    adapters.search.replace(
+      serializeTableUrlState(
+        adapters.search.read(),
+        stateKey,
+        defaultPageSize,
+        state
+      )
+    )
   })
 
   return {

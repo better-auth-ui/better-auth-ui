@@ -1,3 +1,4 @@
+import { validateEmailAddress } from "@better-auth-ui/core"
 import {
   isPasskeyAutoFillEnabled,
   withPasskeyAutoFill
@@ -28,18 +29,17 @@ import {
   CardTitle
 } from "@/components/ui/card"
 import { Checkbox } from "@/components/ui/checkbox"
-import { Field, FieldError, FieldLabel } from "@/components/ui/field"
-import { Input } from "@/components/ui/input"
+import { Field, FieldLabel } from "@/components/ui/field"
 import {
   InputGroup,
   InputGroupAddon,
   InputGroupButton,
   InputGroupInput
 } from "@/components/ui/input-group"
-import { Spinner } from "@/components/ui/spinner"
 import { ssoPlugin } from "@/lib/auth/sso-plugin"
 import { useSignInContinuation } from "@/lib/auth/use-sign-in-continuation"
 import { cn } from "@/lib/utils"
+import { createAuthForm, isAuthFormFieldInvalid } from "../auth-form"
 import type { SocialLayout } from "../provider-buttons"
 import { ProviderButtons } from "../provider-buttons"
 
@@ -66,12 +66,8 @@ export function EmailFirstSignIn(props: EmailFirstSignInProps) {
   const socialPosition = () => props.socialPosition ?? "bottom"
 
   const [step, setStep] = createSignal<"email" | "fallback">("email")
-  const [email, setEmail] = createSignal("")
-  const [password, setPassword] = createSignal("")
   const [isPasswordVisible, setIsPasswordVisible] = createSignal(false)
   const [discoveryError, setDiscoveryError] = createSignal("")
-  const [emailError, setEmailError] = createSignal<string>()
-  const [passwordError, setPasswordError] = createSignal<string>()
 
   const signInSso = useSignInSso(auth.authClient as SsoAuthClient, () => ({
     onError: (error) => {
@@ -90,7 +86,7 @@ export function EmailFirstSignIn(props: EmailFirstSignInProps) {
 
   const signInEmail = useSignInEmail(auth.authClient, () => ({
     onError: (error) => {
-      setPassword("")
+      passwordForm.setFieldValue("password", "")
 
       if (error.error?.code === "EMAIL_NOT_VERIFIED") {
         sessionStorage.setItem("better-auth-ui.verify-email", email())
@@ -114,35 +110,40 @@ export function EmailFirstSignIn(props: EmailFirstSignInProps) {
   const showSocialSeparator = () =>
     auth.emailAndPassword.enabled && Boolean(auth.socialProviders?.length)
 
-  const submitEmail = (event: SubmitEvent) => {
-    event.preventDefault()
-    setDiscoveryError("")
-    setSsoFallbackEmail(email())
-
-    signInSso.mutate({
-      email: email(),
-      callbackURL: `${auth.baseURL}${auth.redirectTo}`,
-      loginHint: email()
-    })
-  }
-
-  const submitPassword = (event: SubmitEvent) => {
-    event.preventDefault()
-    const formData = new FormData(event.currentTarget as HTMLFormElement)
-
-    signInEmail.mutate({
-      email: email(),
-      password: password(),
-      ...(auth.emailAndPassword.rememberMe
-        ? { rememberMe: formData.get("rememberMe") === "on" }
-        : {}),
-      fetchOptions: fetchOptions()
-    })
-  }
+  const emailForm = createAuthForm(() => ({
+    defaultValues: { email: "" },
+    onSubmit: async ({ value }) => {
+      setDiscoveryError("")
+      setSsoFallbackEmail(value.email)
+      try {
+        await signInSso.mutateAsync({
+          email: value.email,
+          callbackURL: `${auth.baseURL}${auth.redirectTo}`,
+          loginHint: value.email
+        })
+      } catch (error) {
+        if ((error as { status?: number }).status !== 404) throw error
+      }
+    }
+  }))
+  const passwordForm = createAuthForm(() => ({
+    defaultValues: { password: "", rememberMe: true },
+    onSubmit: async ({ value }) => {
+      await signInEmail.mutateAsync({
+        email: email(),
+        password: value.password,
+        ...(auth.emailAndPassword.rememberMe
+          ? { rememberMe: value.rememberMe }
+          : {}),
+        fetchOptions: fetchOptions()
+      })
+    }
+  }))
+  const email = () => emailForm.state.values.email
 
   const startOver = () => {
     setStep("email")
-    setPassword("")
+    passwordForm.reset()
     setDiscoveryError("")
   }
 
@@ -188,91 +189,114 @@ export function EmailFirstSignIn(props: EmailFirstSignInProps) {
               </Show>
 
               <Show when={auth.emailAndPassword.enabled}>
-                <form class="flex flex-col gap-4" onSubmit={submitPassword}>
-                  <Field data-invalid={Boolean(passwordError())}>
-                    <FieldLabel for="sso-password">
-                      {auth.localization.auth.password}
-                    </FieldLabel>
+                <passwordForm.AppForm>
+                  <passwordForm.AuthFormRoot class="flex flex-col gap-4">
+                    <passwordForm.AppField
+                      name="password"
+                      validators={{
+                        onChange: ({ value }) =>
+                          value
+                            ? undefined
+                            : auth.localization.auth.fieldRequired
+                      }}
+                    >
+                      {(field) => (
+                        <Field
+                          data-invalid={isAuthFormFieldInvalid(
+                            field().state.meta
+                          )}
+                        >
+                          <FieldLabel for="sso-password">
+                            {auth.localization.auth.password}
+                          </FieldLabel>
 
-                    <InputGroup>
-                      <InputGroupInput
-                        aria-invalid={Boolean(passwordError())}
-                        autocomplete={withPasskeyAutoFill(
-                          "current-password",
-                          passkeyAutoFill()
+                          <InputGroup>
+                            <InputGroupInput
+                              aria-invalid={isAuthFormFieldInvalid(
+                                field().state.meta
+                              )}
+                              autocomplete={withPasskeyAutoFill(
+                                "current-password",
+                                passkeyAutoFill()
+                              )}
+                              disabled={isPending()}
+                              id="sso-password"
+                              maxLength={
+                                auth.emailAndPassword.maxPasswordLength
+                              }
+                              minLength={
+                                auth.emailAndPassword.minPasswordLength
+                              }
+                              name={field().name}
+                              onBlur={field().handleBlur}
+                              onInput={(event) =>
+                                field().handleChange(event.currentTarget.value)
+                              }
+                              placeholder={
+                                auth.localization.auth.passwordPlaceholder
+                              }
+                              type={isPasswordVisible() ? "text" : "password"}
+                              value={field().state.value}
+                            />
+                            <InputGroupAddon align="inline-end">
+                              <InputGroupButton
+                                aria-label={
+                                  isPasswordVisible()
+                                    ? auth.localization.auth.hidePassword
+                                    : auth.localization.auth.showPassword
+                                }
+                                onClick={() =>
+                                  setIsPasswordVisible((visible) => !visible)
+                                }
+                                size="icon-xs"
+                                type="button"
+                              >
+                                {isPasswordVisible() ? <EyeOff /> : <Eye />}
+                              </InputGroupButton>
+                            </InputGroupAddon>
+                          </InputGroup>
+
+                          <field.AuthFormFieldError />
+                        </Field>
+                      )}
+                    </passwordForm.AppField>
+
+                    <Show when={auth.emailAndPassword.rememberMe}>
+                      <passwordForm.AppField name="rememberMe">
+                        {(field) => (
+                          <Field>
+                            <div class="flex items-center gap-3">
+                              <Checkbox
+                                disabled={isPending()}
+                                id="sso-remember-me"
+                                name={field().name}
+                                checked={field().state.value}
+                                onChange={(checked) =>
+                                  field().handleChange(checked)
+                                }
+                              />
+                              <FieldLabel
+                                class="cursor-pointer text-sm font-normal"
+                                for="sso-remember-me"
+                              >
+                                {auth.localization.auth.rememberMe}
+                              </FieldLabel>
+                            </div>
+                          </Field>
                         )}
-                        disabled={isPending()}
-                        id="sso-password"
-                        maxLength={auth.emailAndPassword.maxPasswordLength}
-                        minLength={auth.emailAndPassword.minPasswordLength}
-                        name="password"
-                        onInput={(event) => {
-                          setPassword(event.currentTarget.value)
-                          setPasswordError(undefined)
-                        }}
-                        onInvalid={(event) => {
-                          event.preventDefault()
-                          setPasswordError(
-                            event.currentTarget.validationMessage
-                          )
-                        }}
-                        placeholder={auth.localization.auth.passwordPlaceholder}
-                        required
-                        type={isPasswordVisible() ? "text" : "password"}
-                        value={password()}
-                      />
-                      <InputGroupAddon align="inline-end">
-                        <InputGroupButton
-                          aria-label={
-                            isPasswordVisible()
-                              ? auth.localization.auth.hidePassword
-                              : auth.localization.auth.showPassword
-                          }
-                          onClick={() =>
-                            setIsPasswordVisible((visible) => !visible)
-                          }
-                          size="icon-xs"
-                          type="button"
-                        >
-                          {isPasswordVisible() ? <EyeOff /> : <Eye />}
-                        </InputGroupButton>
-                      </InputGroupAddon>
-                    </InputGroup>
-
-                    <Show when={passwordError()}>
-                      {(message) => <FieldError>{message()}</FieldError>}
+                      </passwordForm.AppField>
                     </Show>
-                  </Field>
 
-                  <Show when={auth.emailAndPassword.rememberMe}>
-                    <Field>
-                      <div class="flex items-center gap-3">
-                        <Checkbox
-                          disabled={isPending()}
-                          id="sso-remember-me"
-                          name="rememberMe"
-                        />
-                        <FieldLabel
-                          class="cursor-pointer text-sm font-normal"
-                          for="sso-remember-me"
-                        >
-                          {auth.localization.auth.rememberMe}
-                        </FieldLabel>
-                      </div>
-                    </Field>
-                  </Show>
-
-                  <Show keyed when={captchaComponent()}>
-                    {(Captcha) => <Captcha />}
-                  </Show>
-
-                  <Button disabled={isPending()} type="submit">
-                    <Show when={signInEmail.isPending}>
-                      <Spinner data-icon="inline-start" />
+                    <Show keyed when={captchaComponent()}>
+                      {(Captcha) => <Captcha />}
                     </Show>
-                    {auth.localization.auth.signIn}
-                  </Button>
-                </form>
+
+                    <passwordForm.AuthFormSubmitButton disabled={isPending()}>
+                      {auth.localization.auth.signIn}
+                    </passwordForm.AuthFormSubmitButton>
+                    <passwordForm.AuthFormServerError />
+                  </passwordForm.AuthFormRoot>
+                </passwordForm.AppForm>
               </Show>
 
               <For
@@ -310,50 +334,47 @@ export function EmailFirstSignIn(props: EmailFirstSignInProps) {
           }
           when={step() === "email"}
         >
-          <form class="flex flex-col gap-4" onSubmit={submitEmail}>
-            <Field data-invalid={Boolean(emailError())}>
-              <FieldLabel for="sso-email">
-                {auth.localization.auth.email}
-              </FieldLabel>
-              <Input
-                aria-invalid={Boolean(emailError())}
-                autocomplete={withPasskeyAutoFill("email", passkeyAutoFill())}
-                disabled={isPending()}
-                id="sso-email"
+          <emailForm.AppForm>
+            <emailForm.AuthFormRoot class="flex flex-col gap-4">
+              <emailForm.AppField
                 name="email"
-                onInput={(event) => {
-                  setEmail(event.currentTarget.value)
-                  setEmailError(undefined)
+                validators={{
+                  onChange: ({ value }) =>
+                    validateEmailAddress(value, {
+                      invalidMessage: auth.localization.auth.invalidEmail,
+                      requiredMessage: auth.localization.auth.fieldRequired
+                    })
                 }}
-                onInvalid={(event) => {
-                  event.preventDefault()
-                  setEmailError(event.currentTarget.validationMessage)
-                }}
-                placeholder={auth.localization.auth.emailPlaceholder}
-                required
-                type="email"
-                value={email()}
-              />
-              <Show when={emailError()}>
-                {(message) => <FieldError>{message()}</FieldError>}
-              </Show>
-            </Field>
+              >
+                {(field) => (
+                  <field.AuthFormTextField
+                    autocomplete={withPasskeyAutoFill(
+                      "email",
+                      passkeyAutoFill()
+                    )}
+                    disabled={isPending()}
+                    id="sso-email"
+                    label={auth.localization.auth.email}
+                    placeholder={auth.localization.auth.emailPlaceholder}
+                    type="email"
+                  />
+                )}
+              </emailForm.AppField>
 
-            <Show when={discoveryError()}>
-              {(message) => (
-                <p class="text-sm text-destructive" role="alert">
-                  {message()}
-                </p>
-              )}
-            </Show>
-
-            <Button disabled={isPending()} type="submit">
-              <Show when={signInSso.isPending}>
-                <Spinner data-icon="inline-start" />
+              <Show when={discoveryError()}>
+                {(message) => (
+                  <p class="text-sm text-destructive" role="alert">
+                    {message()}
+                  </p>
+                )}
               </Show>
-              {ssoLocalization.continueWithEmail}
-            </Button>
-          </form>
+
+              <emailForm.AuthFormSubmitButton disabled={isPending()}>
+                {ssoLocalization.continueWithEmail}
+              </emailForm.AuthFormSubmitButton>
+              <emailForm.AuthFormServerError />
+            </emailForm.AuthFormRoot>
+          </emailForm.AppForm>
         </Show>
 
         <Show when={auth.emailAndPassword.enabled}>

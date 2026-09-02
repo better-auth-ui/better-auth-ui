@@ -1,3 +1,4 @@
+import type { TablePersistenceAdapters } from "@better-auth-ui/core"
 import { organizationLocalization } from "@better-auth-ui/core/plugins/organization"
 import {
   act,
@@ -13,6 +14,7 @@ import {
   createOrganizationColumnHelper,
   useOrganizationTable
 } from "../src/components/auth/organization/organization-table"
+import { OrganizationTableRenderer } from "../src/components/auth/organization/organization-table-renderer"
 import { OrganizationTableSelectRow } from "../src/components/auth/organization/organization-table-selection"
 import { useOrganizationTableState } from "../src/components/auth/organization/organization-table-state"
 
@@ -24,8 +26,16 @@ type TestRow = {
 
 const columnHelper = createOrganizationColumnHelper<TestRow>()
 const columns = columnHelper.columns([
-  columnHelper.accessor("group", { filterFn: "includesString" }),
-  columnHelper.accessor("name", { filterFn: "includesString" })
+  columnHelper.accessor("group", {
+    cell: ({ getValue }) => getValue(),
+    filterFn: "includesString",
+    header: "Group"
+  }),
+  columnHelper.accessor("name", {
+    cell: ({ getValue }) => getValue(),
+    filterFn: "includesString",
+    header: "Name"
+  })
 ])
 const rows: TestRow[] = [
   { group: "b", id: "1", name: "Ada" },
@@ -40,6 +50,28 @@ afterEach(() => {
 })
 
 describe("organization table state", () => {
+  it("renders header groups and visible cells through column renderers", () => {
+    function TableFixture() {
+      const table = useOrganizationTable({
+        columns,
+        data: rows.slice(0, 1),
+        getRowId: (row) => row.id
+      })
+
+      return (
+        <table.AppTable>
+          <OrganizationTableRenderer ariaLabel="People" empty="No people" />
+        </table.AppTable>
+      )
+    }
+
+    render(<TableFixture />)
+
+    expect(screen.getByRole("columnheader", { name: "Group" })).toBeVisible()
+    expect(screen.getByRole("columnheader", { name: "Name" })).toBeVisible()
+    expect(screen.getByRole("gridcell", { name: "Ada" })).toBeVisible()
+  })
+
   it("preserves Shift for keyboard range selection", () => {
     const toggleSelected = vi.fn()
     const { result } = renderHook(() =>
@@ -200,6 +232,42 @@ describe("organization table state", () => {
       expect(
         new URL(window.location.href).searchParams.get("test.search")
       ).toBe("Ada")
+    })
+  })
+
+  it("restores state when a router adapter reports navigation", async () => {
+    let params = new URLSearchParams("router.search=first")
+    let notifyNavigation = () => undefined
+    const adapters: TablePersistenceAdapters = {
+      search: {
+        read: () => new URLSearchParams(params),
+        replace: (next) => {
+          params = new URLSearchParams(next)
+        },
+        subscribe: (listener) => {
+          notifyNavigation = listener
+          return () => {
+            notifyNavigation = () => undefined
+          }
+        }
+      }
+    }
+    const { result } = renderHook(() =>
+      useOrganizationTableState("router", 10, TEST_COLUMN_IDS, adapters)
+    )
+
+    await waitFor(() => expect(result.current.ready).toBe(true))
+    expect(result.current.globalFilter).toBe("first")
+
+    params = new URLSearchParams(
+      "router.search=restored&router.sort=name.desc&router.page=2"
+    )
+    act(() => notifyNavigation())
+
+    await waitFor(() => {
+      expect(result.current.globalFilter).toBe("restored")
+      expect(result.current.sorting).toEqual([{ desc: true, id: "name" }])
+      expect(result.current.pagination.pageIndex).toBe(1)
     })
   })
 })

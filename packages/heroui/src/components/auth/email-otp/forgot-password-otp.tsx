@@ -1,4 +1,4 @@
-import { getAuthLinkURL } from "@better-auth-ui/core"
+import { getAuthLinkURL, validateEmailAddress } from "@better-auth-ui/core"
 import type { EmailOtpAuthClient } from "@better-auth-ui/core/plugins/email-otp"
 import { useAuth, useAuthPlugin, useFetchOptions } from "@better-auth-ui/react"
 import { useRequestPasswordResetOtp } from "@better-auth-ui/react/plugins/email-otp"
@@ -7,7 +7,6 @@ import {
   type CardProps,
   cn,
   Description,
-  FieldError,
   Input,
   Label,
   Link,
@@ -55,7 +54,7 @@ export function ForgotPasswordOtp({
 
   const { fetchOptions, resetFetchOptions } = useFetchOptions()
 
-  const { mutate: requestPasswordResetOtp, isPending } =
+  const { mutateAsync: requestPasswordResetOtp, isPending } =
     useRequestPasswordResetOtp(authClient as EmailOtpAuthClient, {
       onError: () => resetFetchOptions(),
       onSuccess: (_data, { email }) => {
@@ -66,8 +65,8 @@ export function ForgotPasswordOtp({
 
   const form = useAuthForm({
     defaultValues: { email: "" },
-    onSubmit: ({ value }) =>
-      requestPasswordResetOtp({
+    onSubmit: async ({ value }) =>
+      await requestPasswordResetOtp({
         email: value.email,
         fetchOptions
       })
@@ -91,7 +90,16 @@ export function ForgotPasswordOtp({
       <Card.Content className="gap-4">
         <form.AppForm>
           <form.AuthFormRoot className="flex flex-col gap-4">
-            <form.AppField name="email">
+            <form.AppField
+              name="email"
+              validators={{
+                onChange: ({ value }) =>
+                  validateEmailAddress(value, {
+                    invalidMessage: localization.auth.invalidEmail,
+                    requiredMessage: localization.auth.fieldRequired
+                  })
+              }}
+            >
               {(field) => (
                 <TextField
                   name={field.name}
@@ -101,11 +109,7 @@ export function ForgotPasswordOtp({
                   value={field.state.value}
                   onBlur={field.handleBlur}
                   onChange={field.handleChange}
-                  validate={(value) => {
-                    if (!value) return localization.auth.fieldRequired
-                    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value))
-                      return localization.auth.invalidEmail
-                  }}
+                  validationBehavior="aria"
                 >
                   <Label>{localization.auth.email}</Label>
 
@@ -117,10 +121,12 @@ export function ForgotPasswordOtp({
                     }
                   />
 
-                  <FieldError />
+                  <field.AuthFormFieldError />
                 </TextField>
               )}
             </form.AppField>
+
+            <form.AuthFormServerError />
 
             {Captcha && <div className="flex justify-center">{Captcha}</div>}
 

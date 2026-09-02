@@ -31,9 +31,11 @@ export function RenamePasskeyDialog({
   })
   const form = useAuthForm({
     defaultValues: { name: passkey.name ?? "" },
-    onSubmit: ({ value }) => {
+    onSubmit: async ({ value }) => {
       const nextName = value.name.trim()
-      if (nextName) updatePasskey.mutate({ id: passkey.id, name: nextName })
+      if (nextName) {
+        await updatePasskey.mutateAsync({ id: passkey.id, name: nextName })
+      }
     }
   })
   const nameIsEmpty = useSelector(

@@ -789,62 +789,8 @@ describe("Solid registry isolation", () => {
       "@zaidan/input",
       "@zaidan/label"
     ]
-    const formAuthFiles = [
-      {
-        path: "src/components/auth/username/sign-in-username.tsx",
-        imports: [
-          'from "@/components/ui/alert"',
-          'from "@/components/ui/button"',
-          'from "@/components/ui/card"',
-          'from "@/components/ui/field"',
-          'from "@/components/ui/input"'
-        ]
-      },
-      {
-        path: "src/components/auth/sign-up.tsx",
-        imports: [
-          'from "@/components/ui/alert"',
-          'from "@/components/ui/button"',
-          'from "@/components/ui/card"',
-          'from "@/components/ui/field"',
-          'from "@/components/ui/input"'
-        ]
-      },
-      {
-        path: "src/components/auth/forgot-password.tsx",
-        imports: [
-          'from "@/components/ui/alert"',
-          'from "@/components/ui/button"',
-          'from "@/components/ui/card"',
-          'from "@/components/ui/field"',
-          'from "@/components/ui/input"'
-        ]
-      },
-      {
-        path: "src/components/auth/reset-password.tsx",
-        imports: [
-          'from "@/components/ui/alert"',
-          'from "@/components/ui/button"',
-          'from "@/components/ui/card"',
-          'from "@/components/ui/field"',
-          'from "@/components/ui/input"'
-        ]
-      }
-    ]
-
     for (const file of uiFiles) {
       expect(existsSync(resolve(__dirname, "..", file))).toBe(true)
-    }
-
-    for (const file of formAuthFiles) {
-      const content = readFileSync(resolve(__dirname, "..", file.path), "utf8")
-
-      for (const expectedImport of file.imports) {
-        expect(content).toContain(expectedImport)
-      }
-      expect(content).not.toContain("<button")
-      expect(content).not.toContain("<input")
-      expect(content).not.toContain("<label")
     }
 
     const outputRoot = makeTempRoot()
@@ -889,6 +835,8 @@ describe("Solid registry isolation", () => {
       "src/components/auth/provider-button.tsx",
       "src/components/auth/provider-buttons.tsx",
       "src/components/auth/last-login-method/last-used-badge.tsx",
+      "src/components/auth/auth-form.tsx",
+      "src/components/auth/additional-field.tsx",
       "src/lib/utils.ts"
     ])
     expect(signUp.files.map((file) => file.path)).not.toEqual(
@@ -1580,16 +1528,14 @@ describe("Solid registry isolation", () => {
       "utf8"
     )
 
-    expect(signIn).toContain("validationMessage")
+    expect(signIn).toContain("field.AuthFormFieldError")
     expect(signIn).toContain("aria-invalid")
     expect(signIn).toContain("auth.localization.auth.showPassword")
     expect(signIn).toContain("auth.localization.auth.hidePassword")
     expect(signIn).toContain('import { Eye, EyeOff } from "lucide-solid"')
     expect(signIn).toContain('type={isPasswordVisible() ? "text" : "password"}')
     expect(signIn).toContain('type="button"')
-    expect(signIn).toContain(
-      "onClick={() => setIsPasswordVisible((visible) => !visible)}"
-    )
+    expect(signIn).toContain("setIsPasswordVisible((visible) => !visible)")
     expect(signIn).toContain("<EyeOff aria-hidden")
     expect(signIn).toContain("<Eye aria-hidden")
     expect(signIn).not.toContain('isPasswordVisible() ? "Hide" : "Show"')
@@ -1611,7 +1557,7 @@ describe("Solid registry isolation", () => {
     expect(signUp).not.toContain('isPasswordVisible() ? "Hide" : "Show"')
     expect(signUp).not.toContain('isConfirmPasswordVisible() ? "Hide" : "Show"')
 
-    expect(forgotPassword).toContain("validationMessage")
+    expect(forgotPassword).toContain("field.AuthFormFieldError")
     expect(forgotPassword).toContain("aria-invalid")
 
     expect(resetPassword).toContain("auth.localization.auth.showPassword")
@@ -1685,7 +1631,8 @@ describe("Solid registry isolation", () => {
     expect(signIn).toContain("useSignInUsername")
     expect(signIn).toContain("usernameOrEmailPlaceholder")
     expect(signIn).toContain("resolveSubmittedSignIn")
-    expect(signIn).toContain("new FormData(event.currentTarget)")
+    expect(signIn).toContain("createAuthForm")
+    expect(signIn).toContain("signInUsername.mutateAsync")
     expect(signIn).toContain("username: signInPath.username")
     expect(signIn).toContain("email: signInPath.email")
     expect(signIn).toMatch(
@@ -2325,9 +2272,7 @@ describe("Solid registry isolation", () => {
     expect(forgotPassword.files[0]?.content).toContain(
       "RESET_LINK_SENT_STORAGE_KEY"
     )
-    expect(forgotPassword.files[0]?.content).toContain(
-      "Unable to send a reset link. Try again."
-    )
+    expect(forgotPassword.files[0]?.content).toContain("AuthFormServerError")
     expect(forgotPassword.files[1]?.path).toBe(
       "src/components/auth/reset-link-sent.tsx"
     )

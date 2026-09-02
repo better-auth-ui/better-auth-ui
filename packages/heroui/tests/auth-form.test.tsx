@@ -22,6 +22,39 @@ function TestAuthForm({ onSubmit }: { onSubmit: () => Promise<void> }) {
   )
 }
 
+function TestFieldForm({
+  onSubmit
+}: {
+  onSubmit: (value: { email: string }) => Promise<void>
+}) {
+  const form = useAuthForm({
+    defaultValues: { email: "" },
+    onSubmit: ({ value }) => onSubmit(value)
+  })
+
+  return (
+    <form.AppForm>
+      <form.AuthFormRoot>
+        <form.AppField
+          name="email"
+          validators={{
+            onChange: ({ value }) => (value ? undefined : "Email is required")
+          }}
+        >
+          {(field) => (
+            <field.AuthFormTextField
+              label="Email"
+              inputProps={{ type: "email" }}
+            />
+          )}
+        </form.AppField>
+        <form.AuthFormServerError />
+        <form.AuthFormSubmitButton>Continue</form.AuthFormSubmitButton>
+      </form.AuthFormRoot>
+    </form.AppForm>
+  )
+}
+
 describe("AuthFormRoot", () => {
   it("rejects concurrent submission and disables the submit button", async () => {
     let finishSubmission!: () => void
@@ -42,6 +75,26 @@ describe("AuthFormRoot", () => {
 
     finishSubmission()
     await waitFor(() => expect(submitButton).toBeEnabled())
+  })
+
+  it("keeps validation and rejected submission errors in TanStack state", async () => {
+    const onSubmit = vi.fn(async () => {
+      throw {
+        body: {
+          fieldErrors: { email: "This email cannot be used" },
+          message: "Account creation failed"
+        }
+      }
+    })
+    render(<TestFieldForm onSubmit={onSubmit} />)
+    const input = screen.getByRole("textbox", { name: "Email" })
+
+    fireEvent.change(input, { target: { value: "ada@example.com" } })
+    fireEvent.click(screen.getByRole("button", { name: /Continue/ }))
+
+    await waitFor(() => expect(onSubmit).toHaveBeenCalledOnce())
+    expect(await screen.findByText("This email cannot be used")).toBeVisible()
+    expect(screen.getByText("Account creation failed")).toBeVisible()
   })
 })
 

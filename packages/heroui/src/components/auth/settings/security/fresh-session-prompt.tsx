@@ -37,10 +37,10 @@ export function FreshSessionPrompt({ onFresh }: FreshSessionPromptProps) {
 
   const form = useAuthForm({
     defaultValues: { password: "" },
-    onSubmit: ({ value }) => {
+    onSubmit: async ({ value }) => {
       const email = session.data?.user.email
       if (!email) return
-      signIn.mutate({ email, password: value.password })
+      await signIn.mutateAsync({ email, password: value.password })
     }
   })
   const passwordIsEmpty = useSelector(

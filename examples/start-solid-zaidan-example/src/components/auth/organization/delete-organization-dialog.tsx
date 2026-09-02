@@ -18,9 +18,9 @@ import {
   AlertDialogMedia,
   AlertDialogTitle
 } from "@/components/ui/alert-dialog"
-import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { organizationPlugin } from "@/lib/auth/organization-plugin"
+import { createAuthForm } from "../auth-form"
 import { OrganizationLogo } from "./organization-logo"
 
 export type DeleteOrganizationDialogProps = {
@@ -50,62 +50,68 @@ export function DeleteOrganizationDialog(props: DeleteOrganizationDialogProps) {
     }
   }))
 
-  const handleSubmit = (event: SubmitEvent) => {
-    event.preventDefault()
-
-    deleteOrganization.mutate({
-      organizationId: props.organization.id
-    } satisfies DeleteOrganizationParams)
-  }
+  const form = createAuthForm(() => ({
+    defaultValues: {},
+    onSubmit: async () => {
+      await deleteOrganization.mutateAsync({
+        organizationId: props.organization.id
+      } satisfies DeleteOrganizationParams)
+    }
+  }))
 
   return (
     <AlertDialog open={props.open} onOpenChange={props.onOpenChange}>
       <AlertDialogContent>
-        <form class="flex flex-col gap-6" onSubmit={handleSubmit}>
-          <AlertDialogHeader>
-            <AlertDialogMedia>
-              <TriangleAlert />
-            </AlertDialogMedia>
-            <AlertDialogTitle>
-              {props.localization.deleteOrganization}
-            </AlertDialogTitle>
-            <AlertDialogDescription>
-              {props.localization.deleteOrganizationDescription}
-            </AlertDialogDescription>
-          </AlertDialogHeader>
+        <form.AppForm>
+          <form.AuthFormRoot class="flex flex-col gap-6">
+            <AlertDialogHeader>
+              <AlertDialogMedia>
+                <TriangleAlert />
+              </AlertDialogMedia>
+              <AlertDialogTitle>
+                {props.localization.deleteOrganization}
+              </AlertDialogTitle>
+              <AlertDialogDescription>
+                {props.localization.deleteOrganizationDescription}
+              </AlertDialogDescription>
+            </AlertDialogHeader>
 
-          <Card>
-            <CardContent>
-              <div class="flex items-center gap-3">
-                <OrganizationLogo organization={props.organization} size="sm" />
-                <div class="grid min-w-0 gap-1">
-                  <span class="truncate text-sm font-medium">
-                    {props.organization.name}
-                  </span>
-                  <span class="truncate text-muted-foreground text-xs">
-                    {props.organization.slug}
-                  </span>
+            <Card>
+              <CardContent>
+                <div class="flex items-center gap-3">
+                  <OrganizationLogo
+                    organization={props.organization}
+                    size="sm"
+                  />
+                  <div class="grid min-w-0 gap-1">
+                    <span class="truncate text-sm font-medium">
+                      {props.organization.name}
+                    </span>
+                    <span class="truncate text-muted-foreground text-xs">
+                      {props.organization.slug}
+                    </span>
+                  </div>
                 </div>
-              </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
 
-          <AlertDialogFooter>
-            <AlertDialogCancel
-              disabled={deleteOrganization.isPending}
-              type="button"
-            >
-              {auth.localization.settings.cancel}
-            </AlertDialogCancel>
-            <Button
-              disabled={deleteOrganization.isPending}
-              type="submit"
-              variant="destructive"
-            >
-              {props.localization.deleteOrganization}
-            </Button>
-          </AlertDialogFooter>
-        </form>
+            <AlertDialogFooter>
+              <AlertDialogCancel
+                disabled={deleteOrganization.isPending}
+                type="button"
+              >
+                {auth.localization.settings.cancel}
+              </AlertDialogCancel>
+              <form.AuthFormSubmitButton
+                disabled={deleteOrganization.isPending}
+                variant="destructive"
+              >
+                {props.localization.deleteOrganization}
+              </form.AuthFormSubmitButton>
+            </AlertDialogFooter>
+            <form.AuthFormServerError />
+          </form.AuthFormRoot>
+        </form.AppForm>
       </AlertDialogContent>
     </AlertDialog>
   )
