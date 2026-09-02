@@ -12,7 +12,6 @@ import {
   cn,
   Description,
   FieldError,
-  Form,
   Input,
   Label,
   Link,
@@ -21,13 +20,14 @@ import {
   toast,
   useIsHydrated
 } from "@heroui/react"
-import { type SyntheticEvent, useEffect, useState } from "react"
+import { useEffect, useState } from "react"
 
 import { emailOtpPlugin } from "../../../lib/auth/email-otp-plugin"
 import {
   RESEND_COOLDOWN_SECONDS,
   useResendCooldown
 } from "../../../lib/auth/use-resend-cooldown"
+import { useAuthForm } from "../auth-form"
 import { OpenEmailButton } from "../open-email-button"
 import { OtpField } from "../otp-field"
 
@@ -69,7 +69,6 @@ export function VerifyEmailOtp({ className, variant }: VerifyEmailOtpProps) {
   const [email, setEmail] = useState(
     (isHydrated && sessionStorage.getItem(VERIFY_EMAIL_STORAGE_KEY)) || ""
   )
-  const [code, setCode] = useState("")
 
   const { cooldown, isCoolingDown, startCooldown } = useResendCooldown()
 
@@ -96,7 +95,7 @@ export function VerifyEmailOtp({ className, variant }: VerifyEmailOtpProps) {
   const { mutate: verifyEmailOtp, isPending: isVerifying } = useVerifyEmailOtp(
     otpClient,
     {
-      onError: () => setCode(""),
+      onError: () => form.setFieldValue("code", ""),
       onSuccess: () => {
         sessionStorage.removeItem(VERIFY_EMAIL_STORAGE_KEY)
         toast.success(emailOtpLocalization.emailVerified)
@@ -113,20 +112,20 @@ export function VerifyEmailOtp({ className, variant }: VerifyEmailOtpProps) {
     verifyEmailOtp({ email, otp: completedCode })
   }
 
-  const handleSubmit = (e: SyntheticEvent<HTMLFormElement>) => {
-    e.preventDefault()
+  const form = useAuthForm({
+    defaultValues: { code: "", email: "" },
+    onSubmit: ({ value }) => {
+      if (!email) {
+        sendVerificationOtp({
+          email: value.email,
+          type: "email-verification"
+        })
+        return
+      }
 
-    if (!email) {
-      const formData = new FormData(e.currentTarget)
-      sendVerificationOtp({
-        email: formData.get("email") as string,
-        type: "email-verification"
-      })
-      return
+      verifyCode(value.code)
     }
-
-    verifyCode(code)
-  }
+  })
 
   return (
     <Card
@@ -146,78 +145,95 @@ export function VerifyEmailOtp({ className, variant }: VerifyEmailOtpProps) {
       </Card.Header>
 
       <Card.Content className="gap-4">
-        <Form onSubmit={handleSubmit} className="flex flex-col gap-4">
-          {email ? (
-            <OtpField
-              autoFocus
-              isDisabled={isPending}
-              label={emailOtpLocalization.code}
-              length={otpLength}
-              name="otp"
-              value={code}
-              variant={variant}
-              onChange={setCode}
-              onComplete={verifyCode}
-            />
-          ) : (
-            <TextField
-              name="email"
-              type="email"
-              autoComplete="email"
-              isDisabled={isPending}
-              validate={(value) => {
-                if (!value) return localization.auth.fieldRequired
-                if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value))
-                  return localization.auth.invalidEmail
-              }}
-            >
-              <Label>{localization.auth.email}</Label>
+        <form.AppForm>
+          <form.AuthFormRoot className="flex flex-col gap-4">
+            {email ? (
+              <form.AppField name="code">
+                {(field) => (
+                  <OtpField
+                    autoFocus
+                    isDisabled={isPending}
+                    label={emailOtpLocalization.code}
+                    length={otpLength}
+                    name={field.name}
+                    value={field.state.value}
+                    variant={variant}
+                    onChange={field.handleChange}
+                    onComplete={verifyCode}
+                  />
+                )}
+              </form.AppField>
+            ) : (
+              <form.AppField name="email">
+                {(field) => (
+                  <TextField
+                    name={field.name}
+                    type="email"
+                    autoComplete="email"
+                    isDisabled={isPending}
+                    value={field.state.value}
+                    onBlur={field.handleBlur}
+                    onChange={field.handleChange}
+                    validate={(value) => {
+                      if (!value) return localization.auth.fieldRequired
+                      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value))
+                        return localization.auth.invalidEmail
+                    }}
+                  >
+                    <Label>{localization.auth.email}</Label>
 
-              <Input
-                placeholder={localization.auth.emailPlaceholder}
-                required
-                variant={variant === "transparent" ? "primary" : "secondary"}
-              />
+                    <Input
+                      placeholder={localization.auth.emailPlaceholder}
+                      required
+                      variant={
+                        variant === "transparent" ? "primary" : "secondary"
+                      }
+                    />
 
-              <FieldError />
-            </TextField>
-          )}
+                    <FieldError />
+                  </TextField>
+                )}
+              </form.AppField>
+            )}
 
-          <div className="flex flex-col gap-3">
-            <Button
-              type="submit"
-              className="w-full"
-              isDisabled={Boolean(email) && code.length !== otpLength}
-              isPending={isPending}
-            >
-              {isPending && <Spinner color="current" size="sm" />}
-
-              {email
-                ? emailOtpLocalization.verifyCode
-                : emailOtpLocalization.sendCode}
-            </Button>
-
-            {email && <OpenEmailButton email={email} variant="secondary" />}
-
-            {email && (
-              <Button
+            <div className="flex flex-col gap-3">
+              <form.AuthFormSubmitButton
                 className="w-full"
-                variant="tertiary"
-                isDisabled={isPending || isCoolingDown}
-                onPress={() =>
-                  sendVerificationOtp({ email, type: "email-verification" })
+                isDisabled={
+                  isPending ||
+                  (Boolean(email) &&
+                    form.state.values.code.length !== otpLength)
                 }
               >
-                {isCoolingDown
-                  ? localization.auth.resendIn.replace(
-                      "{{seconds}}",
-                      String(cooldown)
-                    )
-                  : localization.auth.resend}
-              </Button>
-            )}
-          </div>
-        </Form>
+                {isPending && <Spinner color="current" size="sm" />}
+
+                {email
+                  ? emailOtpLocalization.verifyCode
+                  : emailOtpLocalization.sendCode}
+              </form.AuthFormSubmitButton>
+
+              {email && <OpenEmailButton email={email} variant="secondary" />}
+
+              {email && (
+                <Button
+                  className="w-full"
+                  variant="tertiary"
+                  isDisabled={isPending || isCoolingDown}
+                  onPress={() =>
+                    sendVerificationOtp({ email, type: "email-verification" })
+                  }
+                >
+                  {isCoolingDown
+                    ? localization.auth.resendIn.replace(
+                        "{{seconds}}",
+                        String(cooldown)
+                      )
+                    : localization.auth.resend}
+                </Button>
+              )}
+            </div>
+          </form.AuthFormRoot>
+        </form.AppForm>
       </Card.Content>
 
       <Card.Footer className="flex-col gap-3">

@@ -5,18 +5,16 @@ import {
 import { useAuth, useAuthPlugin, useFetchOptions } from "@better-auth-ui/react"
 import { useRequestPhoneNumberPasswordReset } from "@better-auth-ui/react/plugins/phone-number"
 import {
-  Button,
   Card,
   type CardProps,
   cn,
   Description,
-  Form,
   Link,
   Spinner
 } from "@heroui/react"
-import { type SyntheticEvent, useState } from "react"
 
 import { phoneNumberPlugin } from "../../../lib/auth/phone-number-plugin"
+import { useAuthForm } from "../auth-form"
 import { InternationalPhoneField } from "./international-phone-field"
 
 export const PHONE_NUMBER_RESET_STORAGE_KEY =
@@ -41,10 +39,6 @@ export function ForgotPhoneNumberPassword({
     localization: phoneLocalization,
     viewPaths: phoneNumberViewPaths
   } = useAuthPlugin(phoneNumberPlugin)
-  const [phoneNumber, setPhoneNumber] = useState(() =>
-    createPhoneNumberValue("", defaultCountry, adapter)
-  )
-  const [phoneError, setPhoneError] = useState<string>()
   const { fetchOptions, resetFetchOptions } = useFetchOptions()
   const { mutate: requestReset, isPending } =
     useRequestPhoneNumberPasswordReset(authClient as PhoneNumberAuthClient, {
@@ -60,17 +54,18 @@ export function ForgotPhoneNumberPassword({
     (plugin) => plugin.captchaComponent
   )?.captchaComponent
 
-  const handleSubmit = (event: SyntheticEvent<HTMLFormElement>) => {
-    event.preventDefault()
-    if (!phoneNumber.e164) {
-      setPhoneError(phoneLocalization.invalidPhoneNumber)
-      return
+  const form = useAuthForm({
+    defaultValues: {
+      phoneNumber: createPhoneNumberValue("", defaultCountry, adapter)
+    },
+    onSubmit: ({ value }) => {
+      if (!value.phoneNumber.e164) return
+      requestReset({
+        phoneNumber: value.phoneNumber.e164,
+        fetchOptions
+      })
     }
-    requestReset({
-      phoneNumber: phoneNumber.e164,
-      fetchOptions
-    })
-  }
+  })
 
   return (
     <Card
@@ -83,29 +78,41 @@ export function ForgotPhoneNumberPassword({
         </Card.Title>
       </Card.Header>
       <Card.Content className="gap-4">
-        <Form className="flex flex-col gap-4" onSubmit={handleSubmit}>
-          <InternationalPhoneField
-            adapter={adapter}
-            countryCodes={countries}
-            countryLabel={phoneLocalization.country}
-            error={phoneError}
-            isDisabled={isPending}
-            locale={locale}
-            phoneLabel={phoneLocalization.phoneNumber}
-            placeholder={phoneLocalization.phoneNumberPlaceholder}
-            value={phoneNumber}
-            variant={variant === "transparent" ? "primary" : "secondary"}
-            onChange={(value) => {
-              setPhoneNumber(value)
-              setPhoneError(undefined)
-            }}
-          />
-          {Captcha && <div className="flex justify-center">{Captcha}</div>}
-          <Button className="w-full" type="submit" isPending={isPending}>
-            {isPending && <Spinner color="current" size="sm" />}
-            {phoneLocalization.sendCode}
-          </Button>
-        </Form>
+        <form.AppForm>
+          <form.AuthFormRoot className="flex flex-col gap-4">
+            <form.AppField
+              name="phoneNumber"
+              validators={{
+                onChange: ({ value }) =>
+                  value.e164 ? undefined : phoneLocalization.invalidPhoneNumber
+              }}
+            >
+              {(field) => (
+                <InternationalPhoneField
+                  adapter={adapter}
+                  countryCodes={countries}
+                  countryLabel={phoneLocalization.country}
+                  error={field.state.meta.errors[0]?.toString()}
+                  isDisabled={isPending}
+                  locale={locale}
+                  phoneLabel={phoneLocalization.phoneNumber}
+                  placeholder={phoneLocalization.phoneNumberPlaceholder}
+                  value={field.state.value}
+                  variant={variant === "transparent" ? "primary" : "secondary"}
+                  onChange={field.handleChange}
+                />
+              )}
+            </form.AppField>
+            {Captcha && <div className="flex justify-center">{Captcha}</div>}
+            <form.AuthFormSubmitButton
+              className="w-full"
+              isDisabled={isPending}
+            >
+              {isPending && <Spinner color="current" size="sm" />}
+              {phoneLocalization.sendCode}
+            </form.AuthFormSubmitButton>
+          </form.AuthFormRoot>
+        </form.AppForm>
       </Card.Content>
       <Card.Footer className="flex-col gap-3">
         <Description className="text-sm">
