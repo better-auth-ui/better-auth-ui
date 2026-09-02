@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest"
 import {
   getFormFieldErrorMessage,
+  getFormFieldErrors,
   validateAbsoluteUrl,
   validateAbsoluteUrlList,
   validateEmailAddress,
@@ -83,5 +84,14 @@ describe("form validation", () => {
     )
     expect(getFormFieldErrorMessage(["Invalid"])).toBe("Invalid")
     expect(getFormFieldErrorMessage([])).toBeUndefined()
+    expect(
+      getFormFieldErrors([
+        "Invalid",
+        undefined,
+        { message: "Required" },
+        { message: "" },
+        { other: true }
+      ])
+    ).toEqual([{ message: "Invalid" }, { message: "Required" }])
   })
 })

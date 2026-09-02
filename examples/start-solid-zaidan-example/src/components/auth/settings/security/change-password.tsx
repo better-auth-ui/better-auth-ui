@@ -100,12 +100,16 @@ export function ChangePasswordSettings(
       currentPassword: "",
       newPassword: ""
     },
-    onSubmit: ({ value }) => {
-      changePassword.mutate({
-        currentPassword: value.currentPassword,
-        newPassword: value.newPassword,
-        revokeOtherSessions: true
-      } as Parameters<typeof changePassword.mutate>[0])
+    onSubmit: async ({ value }) => {
+      try {
+        await changePassword.mutateAsync({
+          currentPassword: value.currentPassword,
+          newPassword: value.newPassword,
+          revokeOtherSessions: true
+        } as Parameters<typeof changePassword.mutate>[0])
+      } catch {
+        // The mutation reports the error through its configured handler.
+      }
     }
   }))
 
@@ -171,195 +175,93 @@ export function ChangePasswordSettings(
         {auth.localization.settings.changePassword}
       </h2>
 
-      <form
-        onSubmit={(event) => {
-          event.preventDefault()
-          void form.handleSubmit()
-        }}
-      >
-        <Card>
-          <CardContent class="flex flex-col gap-6">
-            <form.AppField
-              name="currentPassword"
-              validators={{
-                onChange: ({ value }) =>
-                  validateStringLength(value, {
-                    requiredMessage: auth.localization.auth.fieldRequired
-                  })
-              }}
-            >
-              {(field) => {
-                const isInvalid = () =>
-                  isAuthFormFieldInvalid(field().state.meta)
-
-                return (
-                  <Field data-invalid={isInvalid()}>
-                    <FieldLabel for="currentPassword">
-                      {auth.localization.settings.currentPassword}
-                    </FieldLabel>
-                    <Show
-                      fallback={<ChangePasswordSkeletonInput />}
-                      when={session.data && !linkedAccounts.isPending}
-                    >
-                      <InputGroup>
-                        <InputGroupInput
-                          aria-invalid={isInvalid()}
-                          autocomplete="current-password"
-                          disabled={isPasswordPending()}
-                          id="currentPassword"
-                          name={field().name}
-                          onBlur={field().handleBlur}
-                          onInput={(event) =>
-                            field().handleChange(event.currentTarget.value)
-                          }
-                          placeholder={
-                            auth.localization.settings
-                              .currentPasswordPlaceholder
-                          }
-                          required
-                          type={
-                            isCurrentPasswordVisible() ? "text" : "password"
-                          }
-                          value={field().state.value}
-                        />
-                        <InputGroupAddon align="inline-end">
-                          <InputGroupButton
-                            aria-label={
-                              isCurrentPasswordVisible()
-                                ? auth.localization.auth.hidePassword
-                                : auth.localization.auth.showPassword
-                            }
-                            disabled={isPasswordPending()}
-                            onClick={() =>
-                              setIsCurrentPasswordVisible((visible) => !visible)
-                            }
-                            size="icon-sm"
-                            title={
-                              isCurrentPasswordVisible()
-                                ? auth.localization.auth.hidePassword
-                                : auth.localization.auth.showPassword
-                            }
-                          >
-                            <Show
-                              when={isCurrentPasswordVisible()}
-                              fallback={<Eye aria-hidden class="size-4" />}
-                            >
-                              <EyeOff aria-hidden class="size-4" />
-                            </Show>
-                          </InputGroupButton>
-                        </InputGroupAddon>
-                      </InputGroup>
-                    </Show>
-                    <field.AuthFormFieldError />
-                  </Field>
-                )
-              }}
-            </form.AppField>
-
-            <form.AppField
-              name="newPassword"
-              validators={{
-                onChange: ({ value }) =>
-                  validateStringLength(value, {
-                    maxLength: auth.emailAndPassword.maxPasswordLength,
-                    maxLengthMessage: auth.localization.auth.tooLong.replace(
-                      "{{max}}",
-                      String(auth.emailAndPassword.maxPasswordLength)
-                    ),
-                    minLength: auth.emailAndPassword.minPasswordLength,
-                    minLengthMessage: auth.localization.auth.tooShort.replace(
-                      "{{min}}",
-                      String(auth.emailAndPassword.minPasswordLength)
-                    ),
-                    requiredMessage: auth.localization.auth.fieldRequired
-                  })
-              }}
-            >
-              {(field) => {
-                const isInvalid = () =>
-                  isAuthFormFieldInvalid(field().state.meta) || isCompromised()
-
-                return (
-                  <Field data-invalid={isInvalid()}>
-                    <FieldLabel for="newPassword">
-                      {auth.localization.auth.newPassword}
-                    </FieldLabel>
-                    <Show
-                      fallback={<ChangePasswordSkeletonInput />}
-                      when={session.data && !linkedAccounts.isPending}
-                    >
-                      <InputGroup>
-                        <InputGroupInput
-                          aria-invalid={isInvalid()}
-                          autocomplete="new-password"
-                          disabled={isPasswordPending()}
-                          id="newPassword"
-                          maxLength={auth.emailAndPassword.maxPasswordLength}
-                          minLength={auth.emailAndPassword.minPasswordLength}
-                          name={field().name}
-                          onBlur={field().handleBlur}
-                          onInput={(event) => {
-                            field().handleChange(event.currentTarget.value)
-                            setIsCompromised(false)
-                          }}
-                          placeholder={
-                            auth.localization.auth.newPasswordPlaceholder
-                          }
-                          required
-                          type={isNewPasswordVisible() ? "text" : "password"}
-                          value={field().state.value}
-                        />
-                        <InputGroupAddon align="inline-end">
-                          <InputGroupButton
-                            aria-label={
-                              isNewPasswordVisible()
-                                ? auth.localization.auth.hidePassword
-                                : auth.localization.auth.showPassword
-                            }
-                            disabled={isPasswordPending()}
-                            onClick={() =>
-                              setIsNewPasswordVisible((visible) => !visible)
-                            }
-                            size="icon-sm"
-                            title={
-                              isNewPasswordVisible()
-                                ? auth.localization.auth.hidePassword
-                                : auth.localization.auth.showPassword
-                            }
-                            type="button"
-                          >
-                            {isNewPasswordVisible() ? (
-                              <EyeOff aria-hidden class="size-4" />
-                            ) : (
-                              <Eye aria-hidden class="size-4" />
-                            )}
-                          </InputGroupButton>
-                        </InputGroupAddon>
-                      </InputGroup>
-                    </Show>
-                    <Show
-                      when={
-                        isCompromised()
-                          ? auth.localization.auth.passwordCompromised
-                          : undefined
-                      }
-                      fallback={<field.AuthFormFieldError />}
-                    >
-                      {(message) => <FieldError>{message()}</FieldError>}
-                    </Show>
-
-                    <PasswordStrengthMeter password={field().state.value} />
-                  </Field>
-                )
-              }}
-            </form.AppField>
-
-            <Show when={props.confirmPassword}>
+      <form.AppForm>
+        <form.AuthFormRoot>
+          <Card>
+            <CardContent class="flex flex-col gap-6">
               <form.AppField
-                name="confirmPassword"
+                name="currentPassword"
                 validators={{
-                  onChangeListenTo: ["newPassword"],
-                  onChange: ({ fieldApi, value }) =>
+                  onChange: ({ value }) =>
+                    validateStringLength(value, {
+                      requiredMessage: auth.localization.auth.fieldRequired
+                    })
+                }}
+              >
+                {(field) => {
+                  const isInvalid = () =>
+                    isAuthFormFieldInvalid(field().state.meta)
+
+                  return (
+                    <Field data-invalid={isInvalid()}>
+                      <FieldLabel for="currentPassword">
+                        {auth.localization.settings.currentPassword}
+                      </FieldLabel>
+                      <Show
+                        fallback={<ChangePasswordSkeletonInput />}
+                        when={session.data && !linkedAccounts.isPending}
+                      >
+                        <InputGroup>
+                          <InputGroupInput
+                            aria-invalid={isInvalid()}
+                            autocomplete="current-password"
+                            disabled={isPasswordPending()}
+                            id="currentPassword"
+                            name={field().name}
+                            onBlur={field().handleBlur}
+                            onInput={(event) =>
+                              field().handleChange(event.currentTarget.value)
+                            }
+                            placeholder={
+                              auth.localization.settings
+                                .currentPasswordPlaceholder
+                            }
+                            required
+                            type={
+                              isCurrentPasswordVisible() ? "text" : "password"
+                            }
+                            value={field().state.value}
+                          />
+                          <InputGroupAddon align="inline-end">
+                            <InputGroupButton
+                              aria-label={
+                                isCurrentPasswordVisible()
+                                  ? auth.localization.auth.hidePassword
+                                  : auth.localization.auth.showPassword
+                              }
+                              disabled={isPasswordPending()}
+                              onClick={() =>
+                                setIsCurrentPasswordVisible(
+                                  (visible) => !visible
+                                )
+                              }
+                              size="icon-sm"
+                              title={
+                                isCurrentPasswordVisible()
+                                  ? auth.localization.auth.hidePassword
+                                  : auth.localization.auth.showPassword
+                              }
+                            >
+                              <Show
+                                when={isCurrentPasswordVisible()}
+                                fallback={<Eye aria-hidden class="size-4" />}
+                              >
+                                <EyeOff aria-hidden class="size-4" />
+                              </Show>
+                            </InputGroupButton>
+                          </InputGroupAddon>
+                        </InputGroup>
+                      </Show>
+                      <field.AuthFormFieldError />
+                    </Field>
+                  )
+                }}
+              </form.AppField>
+
+              <form.AppField
+                name="newPassword"
+                validators={{
+                  onChange: ({ value }) =>
                     validateStringLength(value, {
                       maxLength: auth.emailAndPassword.maxPasswordLength,
                       maxLengthMessage: auth.localization.auth.tooLong.replace(
@@ -372,22 +274,18 @@ export function ChangePasswordSettings(
                         String(auth.emailAndPassword.minPasswordLength)
                       ),
                       requiredMessage: auth.localization.auth.fieldRequired
-                    }) ??
-                    validateMatchingValue(
-                      value,
-                      fieldApi.form.getFieldValue("newPassword"),
-                      auth.localization.auth.passwordsDoNotMatch
-                    )
+                    })
                 }}
               >
                 {(field) => {
                   const isInvalid = () =>
-                    isAuthFormFieldInvalid(field().state.meta)
+                    isAuthFormFieldInvalid(field().state.meta) ||
+                    isCompromised()
 
                   return (
                     <Field data-invalid={isInvalid()}>
-                      <FieldLabel for="confirmPassword">
-                        {auth.localization.auth.confirmPassword}
+                      <FieldLabel for="newPassword">
+                        {auth.localization.auth.newPassword}
                       </FieldLabel>
                       <Show
                         fallback={<ChangePasswordSkeletonInput />}
@@ -398,45 +296,42 @@ export function ChangePasswordSettings(
                             aria-invalid={isInvalid()}
                             autocomplete="new-password"
                             disabled={isPasswordPending()}
-                            id="confirmPassword"
+                            id="newPassword"
                             maxLength={auth.emailAndPassword.maxPasswordLength}
                             minLength={auth.emailAndPassword.minPasswordLength}
                             name={field().name}
                             onBlur={field().handleBlur}
-                            onInput={(event) =>
+                            onInput={(event) => {
                               field().handleChange(event.currentTarget.value)
-                            }
+                              setIsCompromised(false)
+                            }}
                             placeholder={
-                              auth.localization.auth.confirmPasswordPlaceholder
+                              auth.localization.auth.newPasswordPlaceholder
                             }
                             required
-                            type={
-                              isConfirmPasswordVisible() ? "text" : "password"
-                            }
+                            type={isNewPasswordVisible() ? "text" : "password"}
                             value={field().state.value}
                           />
                           <InputGroupAddon align="inline-end">
                             <InputGroupButton
                               aria-label={
-                                isConfirmPasswordVisible()
+                                isNewPasswordVisible()
                                   ? auth.localization.auth.hidePassword
                                   : auth.localization.auth.showPassword
                               }
                               disabled={isPasswordPending()}
                               onClick={() =>
-                                setIsConfirmPasswordVisible(
-                                  (visible) => !visible
-                                )
+                                setIsNewPasswordVisible((visible) => !visible)
                               }
                               size="icon-sm"
                               title={
-                                isConfirmPasswordVisible()
+                                isNewPasswordVisible()
                                   ? auth.localization.auth.hidePassword
                                   : auth.localization.auth.showPassword
                               }
                               type="button"
                             >
-                              {isConfirmPasswordVisible() ? (
+                              {isNewPasswordVisible() ? (
                                 <EyeOff aria-hidden class="size-4" />
                               ) : (
                                 <Eye aria-hidden class="size-4" />
@@ -445,40 +340,140 @@ export function ChangePasswordSettings(
                           </InputGroupAddon>
                         </InputGroup>
                       </Show>
-                      <field.AuthFormFieldError />
+                      <Show
+                        when={
+                          isCompromised()
+                            ? auth.localization.auth.passwordCompromised
+                            : undefined
+                        }
+                        fallback={<field.AuthFormFieldError />}
+                      >
+                        {(message) => <FieldError>{message()}</FieldError>}
+                      </Show>
+
+                      <PasswordStrengthMeter password={field().state.value} />
                     </Field>
                   )
                 }}
               </form.AppField>
-            </Show>
-          </CardContent>
 
-          <CardFooter>
-            <form.Subscribe
-              selector={(state) =>
-                [state.canSubmit, state.isSubmitting] as const
-              }
-            >
-              {(formState) => (
-                <Button
-                  disabled={
-                    !formState()[0] ||
-                    formState()[1] ||
-                    isPasswordPending() ||
-                    !session.data
-                  }
-                  size="sm"
-                  type="submit"
+              <Show when={props.confirmPassword}>
+                <form.AppField
+                  name="confirmPassword"
+                  validators={{
+                    onChangeListenTo: ["newPassword"],
+                    onChange: ({ fieldApi, value }) =>
+                      validateStringLength(value, {
+                        maxLength: auth.emailAndPassword.maxPasswordLength,
+                        maxLengthMessage:
+                          auth.localization.auth.tooLong.replace(
+                            "{{max}}",
+                            String(auth.emailAndPassword.maxPasswordLength)
+                          ),
+                        minLength: auth.emailAndPassword.minPasswordLength,
+                        minLengthMessage:
+                          auth.localization.auth.tooShort.replace(
+                            "{{min}}",
+                            String(auth.emailAndPassword.minPasswordLength)
+                          ),
+                        requiredMessage: auth.localization.auth.fieldRequired
+                      }) ??
+                      validateMatchingValue(
+                        value,
+                        fieldApi.form.getFieldValue("newPassword"),
+                        auth.localization.auth.passwordsDoNotMatch
+                      )
+                  }}
                 >
-                  {formState()[1] || changePassword.isPending
-                    ? `${auth.localization.settings.updatePassword}…`
-                    : auth.localization.settings.updatePassword}
-                </Button>
-              )}
-            </form.Subscribe>
-          </CardFooter>
-        </Card>
-      </form>
+                  {(field) => {
+                    const isInvalid = () =>
+                      isAuthFormFieldInvalid(field().state.meta)
+
+                    return (
+                      <Field data-invalid={isInvalid()}>
+                        <FieldLabel for="confirmPassword">
+                          {auth.localization.auth.confirmPassword}
+                        </FieldLabel>
+                        <Show
+                          fallback={<ChangePasswordSkeletonInput />}
+                          when={session.data && !linkedAccounts.isPending}
+                        >
+                          <InputGroup>
+                            <InputGroupInput
+                              aria-invalid={isInvalid()}
+                              autocomplete="new-password"
+                              disabled={isPasswordPending()}
+                              id="confirmPassword"
+                              maxLength={
+                                auth.emailAndPassword.maxPasswordLength
+                              }
+                              minLength={
+                                auth.emailAndPassword.minPasswordLength
+                              }
+                              name={field().name}
+                              onBlur={field().handleBlur}
+                              onInput={(event) =>
+                                field().handleChange(event.currentTarget.value)
+                              }
+                              placeholder={
+                                auth.localization.auth
+                                  .confirmPasswordPlaceholder
+                              }
+                              required
+                              type={
+                                isConfirmPasswordVisible() ? "text" : "password"
+                              }
+                              value={field().state.value}
+                            />
+                            <InputGroupAddon align="inline-end">
+                              <InputGroupButton
+                                aria-label={
+                                  isConfirmPasswordVisible()
+                                    ? auth.localization.auth.hidePassword
+                                    : auth.localization.auth.showPassword
+                                }
+                                disabled={isPasswordPending()}
+                                onClick={() =>
+                                  setIsConfirmPasswordVisible(
+                                    (visible) => !visible
+                                  )
+                                }
+                                size="icon-sm"
+                                title={
+                                  isConfirmPasswordVisible()
+                                    ? auth.localization.auth.hidePassword
+                                    : auth.localization.auth.showPassword
+                                }
+                                type="button"
+                              >
+                                {isConfirmPasswordVisible() ? (
+                                  <EyeOff aria-hidden class="size-4" />
+                                ) : (
+                                  <Eye aria-hidden class="size-4" />
+                                )}
+                              </InputGroupButton>
+                            </InputGroupAddon>
+                          </InputGroup>
+                        </Show>
+                        <field.AuthFormFieldError />
+                      </Field>
+                    )
+                  }}
+                </form.AppField>
+              </Show>
+            </CardContent>
+
+            <CardFooter>
+              <form.AuthFormSubmitButton
+                disabled={isPasswordPending() || !session.data}
+                size="sm"
+              >
+                {auth.localization.settings.updatePassword}
+              </form.AuthFormSubmitButton>
+            </CardFooter>
+          </Card>
+        </form.AuthFormRoot>
+      </form.AppForm>
     </div>
   )
 }

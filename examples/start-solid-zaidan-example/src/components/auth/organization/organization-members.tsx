@@ -1,3 +1,4 @@
+import { getClampedTablePageIndex } from "@better-auth-ui/core"
 import {
   hasMemberRole,
   mergeOrganizationRoleLabels,
@@ -14,6 +15,7 @@ import {
   useListRoles,
   useRemoveMember
 } from "@better-auth-ui/solid/plugins/organization"
+import { keepPreviousData } from "@tanstack/solid-query"
 import { Filter, Search, X } from "lucide-solid"
 import { createEffect, createMemo, createSignal, For, Show } from "solid-js"
 import { toast } from "solid-sonner"
@@ -114,6 +116,7 @@ const memberColumns = memberColumnHelper.columns([
     enableSorting: false
   })
 ])
+const MEMBER_COLUMN_IDS = ["name", "role", "teams"] as const
 
 type RoleMap = Record<string, string>
 
@@ -205,7 +208,8 @@ export function OrganizationMembers(props: OrganizationMembersProps) {
   const [inviteOpen, setInviteOpen] = createSignal(false)
   const tableState = createOrganizationTableState(
     "organizationMembers",
-    validatePageSize(props.pageSize) ?? ORGANIZATION_TABLE_PAGE_SIZE
+    validatePageSize(props.pageSize) ?? ORGANIZATION_TABLE_PAGE_SIZE,
+    MEMBER_COLUMN_IDS
   )
   const pageSize = () => validatePageSize(props.pageSize)
   const paged = () => pageSize() !== undefined
@@ -233,6 +237,8 @@ export function OrganizationMembers(props: OrganizationMembersProps) {
     )
 
     return {
+      enabled: tableState.ready(),
+      placeholderData: keepPreviousData,
       query: {
         limit: tableState.pagination().pageSize,
         offset:
@@ -357,7 +363,22 @@ export function OrganizationMembers(props: OrganizationMembersProps) {
     config.teams && canListMemberTeams.data?.success === true
 
   const total = () => members.data?.total ?? memberRows().length
+
+  createEffect(() => {
+    if (!paged() || !tableState.ready() || !members.data) return
+
+    const current = tableState.pagination()
+    const lastPageIndex = getClampedTablePageIndex(
+      current.pageIndex,
+      current.pageSize,
+      total()
+    )
+    if (current.pageIndex > lastPageIndex) {
+      tableState.setPagination({ ...current, pageIndex: lastPageIndex })
+    }
+  })
   const table = createOrganizationTable({
+    atoms: tableState.atoms,
     columns: memberColumns,
     get data() {
       return memberRows()
@@ -387,24 +408,14 @@ export function OrganizationMembers(props: OrganizationMembersProps) {
     },
     get state() {
       return {
-        columnFilters: tableState.columnFilters(),
         columnVisibility: {
           ...tableState.columnVisibility(),
           teams: showTeams() && tableState.columnVisibility().teams !== false
-        },
-        globalFilter: tableState.globalFilter(),
-        pagination: tableState.pagination(),
-        rowSelection: tableState.rowSelection(),
-        sorting: tableState.sorting()
+        }
       }
     },
     getRowId: (member) => member.id,
-    onColumnFiltersChange: tableState.setColumnFilters,
-    onColumnVisibilityChange: tableState.setColumnVisibility,
-    onGlobalFilterChange: tableState.setGlobalFilter,
-    onPaginationChange: tableState.setPagination,
-    onRowSelectionChange: tableState.setRowSelection,
-    onSortingChange: tableState.setSorting
+    onColumnVisibilityChange: tableState.setColumnVisibility
   })
   const removeMembers = useRemoveMember(auth.authClient)
   const selectedMembers = () => table.getSelectedRowModel().rows

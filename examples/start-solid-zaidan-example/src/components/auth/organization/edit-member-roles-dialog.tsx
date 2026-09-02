@@ -1,7 +1,4 @@
-import {
-  type FormFieldError as FormFieldErrorValue,
-  validateMinimumItems
-} from "@better-auth-ui/core"
+import { getFormFieldErrors, validateMinimumItems } from "@better-auth-ui/core"
 import {
   type OrganizationAuthClient,
   type OrganizationLocalization,
@@ -90,14 +87,18 @@ export function EditMemberRolesDialog(props: EditMemberRolesDialogProps) {
         props.protectedRole
       )
     },
-    onSubmit: ({ value }) => {
+    onSubmit: async ({ value }) => {
       if (value.roles.length === 0) return
 
-      updateMemberRole.mutate({
-        memberId: props.member.id,
-        organizationId: props.member.organizationId,
-        role: value.roles as UpdateMemberRoleParams["role"]
-      })
+      try {
+        await updateMemberRole.mutateAsync({
+          memberId: props.member.id,
+          organizationId: props.member.organizationId,
+          role: value.roles as UpdateMemberRoleParams["role"]
+        })
+      } catch {
+        // The mutation reports the error through its configured handler.
+      }
     }
   }))
 
@@ -115,173 +116,153 @@ export function EditMemberRolesDialog(props: EditMemberRolesDialogProps) {
   return (
     <Dialog open={props.open} onOpenChange={props.onOpenChange}>
       <DialogContent>
-        <form
-          class="flex flex-col gap-6"
-          onSubmit={(event) => {
-            event.preventDefault()
-            void form.handleSubmit()
-          }}
-        >
-          <DialogHeader>
-            <DialogTitle class="flex items-center gap-2">
-              <ShieldCheck class="size-4" />
-              {props.localization.changeMemberRole}
-            </DialogTitle>
-            <DialogDescription>
-              {props.localization.changeMemberRoleDescription}
-            </DialogDescription>
-          </DialogHeader>
+        <form.AppForm>
+          <form.AuthFormRoot class="flex flex-col gap-6">
+            <DialogHeader>
+              <DialogTitle class="flex items-center gap-2">
+                <ShieldCheck class="size-4" />
+                {props.localization.changeMemberRole}
+              </DialogTitle>
+              <DialogDescription>
+                {props.localization.changeMemberRoleDescription}
+              </DialogDescription>
+            </DialogHeader>
 
-          <form.AppField
-            name="roles"
-            mode="array"
-            validators={{
-              onChange: ({ value }) =>
-                validateMinimumItems(
-                  value,
-                  1,
-                  props.localization.selectAtLeastOneRole
-                )
-            }}
-          >
-            {(field) => {
-              const selectedRoles = () => field().state.value
-              const protectedRoleSelected = () =>
-                !config.allowMultipleRoles &&
-                props.protectedRoleRemovalDisabled &&
-                props.protectedRole !== undefined &&
-                selectedRoles().includes(props.protectedRole)
+            <form.AppField
+              name="roles"
+              mode="array"
+              validators={{
+                onChange: ({ value }) =>
+                  validateMinimumItems(
+                    value,
+                    1,
+                    props.localization.selectAtLeastOneRole
+                  )
+              }}
+            >
+              {(field) => {
+                const selectedRoles = () => field().state.value
+                const protectedRoleSelected = () =>
+                  !config.allowMultipleRoles &&
+                  props.protectedRoleRemovalDisabled &&
+                  props.protectedRole !== undefined &&
+                  selectedRoles().includes(props.protectedRole)
 
-              return (
-                <>
-                  <Show
-                    when={config.allowMultipleRoles}
-                    fallback={
-                      <RadioGroup
-                        disabled={updateMemberRole.isPending}
-                        onChange={(role) => field().handleChange([role])}
-                        value={selectedRoles()[0] ?? ""}
-                      >
-                        <div class="flex flex-col gap-2">
-                          <For each={props.roles}>
-                            {([role, label]) => {
-                              const selected = () =>
-                                selectedRoles().includes(role)
-                              const disabled = () =>
-                                (protectedRoleSelected() &&
-                                  role !== props.protectedRole) ||
-                                (role === props.protectedRole &&
-                                  selected() &&
-                                  props.protectedRoleRemovalDisabled)
-                              const id = `member-${props.member.id}-role-${role}`
+                return (
+                  <>
+                    <Show
+                      when={config.allowMultipleRoles}
+                      fallback={
+                        <RadioGroup
+                          disabled={updateMemberRole.isPending}
+                          onChange={(role) => field().handleChange([role])}
+                          value={selectedRoles()[0] ?? ""}
+                        >
+                          <div class="flex flex-col gap-2">
+                            <For each={props.roles}>
+                              {([role, label]) => {
+                                const selected = () =>
+                                  selectedRoles().includes(role)
+                                const disabled = () =>
+                                  (protectedRoleSelected() &&
+                                    role !== props.protectedRole) ||
+                                  (role === props.protectedRole &&
+                                    selected() &&
+                                    props.protectedRoleRemovalDisabled)
+                                const id = `member-${props.member.id}-role-${role}`
 
-                              return (
-                                <FieldLabel for={id}>
-                                  <Field
-                                    data-disabled={disabled() || undefined}
-                                    orientation="horizontal"
-                                  >
-                                    <FieldContent>
-                                      <FieldTitle>{label}</FieldTitle>
-                                    </FieldContent>
-                                    <RadioGroupItem
-                                      disabled={disabled()}
-                                      id={id}
-                                      value={role}
-                                    />
-                                  </Field>
-                                </FieldLabel>
-                              )
-                            }}
-                          </For>
-                        </div>
-                      </RadioGroup>
-                    }
-                  >
-                    <div class="flex flex-col gap-2">
-                      <For each={props.roles}>
-                        {([role, label]) => {
-                          const checked = () => selectedRoles().includes(role)
-                          const disabled = () =>
-                            updateMemberRole.isPending ||
-                            (checked() && selectedRoles().length === 1) ||
-                            (role === props.protectedRole &&
-                              checked() &&
-                              props.protectedRoleRemovalDisabled)
-                          const id = `member-${props.member.id}-role-${role}`
-
-                          return (
-                            <FieldLabel for={id}>
-                              <Field
-                                data-disabled={disabled() || undefined}
-                                orientation="horizontal"
-                              >
-                                <FieldContent>
-                                  <FieldTitle>{label}</FieldTitle>
-                                </FieldContent>
-                                <Checkbox
-                                  checked={checked()}
-                                  disabled={disabled()}
-                                  id={id}
-                                  onChange={(selected) => {
-                                    if (selected && !checked()) {
-                                      field().pushValue(role)
-                                      return
-                                    }
-
-                                    const index = selectedRoles().indexOf(role)
-                                    if (index >= 0) field().removeValue(index)
-                                  }}
-                                />
-                              </Field>
-                            </FieldLabel>
-                          )
-                        }}
-                      </For>
-                    </div>
-                  </Show>
-
-                  <FieldError
-                    errors={
-                      field().state.meta.errors as Array<
-                        FormFieldErrorValue | undefined
-                      >
-                    }
-                  />
-
-                  <DialogFooter>
-                    <Button
-                      disabled={updateMemberRole.isPending}
-                      onClick={() => props.onOpenChange(false)}
-                      type="button"
-                      variant="outline"
-                    >
-                      {auth.localization.settings.cancel}
-                    </Button>
-                    <form.Subscribe
-                      selector={(state) =>
-                        [state.canSubmit, state.isSubmitting] as const
+                                return (
+                                  <FieldLabel for={id}>
+                                    <Field
+                                      data-disabled={disabled() || undefined}
+                                      orientation="horizontal"
+                                    >
+                                      <FieldContent>
+                                        <FieldTitle>{label}</FieldTitle>
+                                      </FieldContent>
+                                      <RadioGroupItem
+                                        disabled={disabled()}
+                                        id={id}
+                                        value={role}
+                                      />
+                                    </Field>
+                                  </FieldLabel>
+                                )
+                              }}
+                            </For>
+                          </div>
+                        </RadioGroup>
                       }
                     >
-                      {(formState) => (
-                        <Button
-                          disabled={
-                            updateMemberRole.isPending ||
-                            formState()[1] ||
-                            !formState()[0]
-                          }
-                          type="submit"
-                        >
-                          {auth.localization.settings.saveChanges}
-                        </Button>
-                      )}
-                    </form.Subscribe>
-                  </DialogFooter>
-                </>
-              )
-            }}
-          </form.AppField>
-        </form>
+                      <div class="flex flex-col gap-2">
+                        <For each={props.roles}>
+                          {([role, label]) => {
+                            const checked = () => selectedRoles().includes(role)
+                            const disabled = () =>
+                              updateMemberRole.isPending ||
+                              (checked() && selectedRoles().length === 1) ||
+                              (role === props.protectedRole &&
+                                checked() &&
+                                props.protectedRoleRemovalDisabled)
+                            const id = `member-${props.member.id}-role-${role}`
+
+                            return (
+                              <FieldLabel for={id}>
+                                <Field
+                                  data-disabled={disabled() || undefined}
+                                  orientation="horizontal"
+                                >
+                                  <FieldContent>
+                                    <FieldTitle>{label}</FieldTitle>
+                                  </FieldContent>
+                                  <Checkbox
+                                    checked={checked()}
+                                    disabled={disabled()}
+                                    id={id}
+                                    onChange={(selected) => {
+                                      if (selected && !checked()) {
+                                        field().pushValue(role)
+                                        return
+                                      }
+
+                                      const index =
+                                        selectedRoles().indexOf(role)
+                                      if (index >= 0) field().removeValue(index)
+                                    }}
+                                  />
+                                </Field>
+                              </FieldLabel>
+                            )
+                          }}
+                        </For>
+                      </div>
+                    </Show>
+
+                    <FieldError
+                      errors={getFormFieldErrors(field().state.meta.errors)}
+                    />
+
+                    <DialogFooter>
+                      <Button
+                        disabled={updateMemberRole.isPending}
+                        onClick={() => props.onOpenChange(false)}
+                        type="button"
+                        variant="outline"
+                      >
+                        {auth.localization.settings.cancel}
+                      </Button>
+                      <form.AuthFormSubmitButton
+                        disabled={updateMemberRole.isPending}
+                      >
+                        {auth.localization.settings.saveChanges}
+                      </form.AuthFormSubmitButton>
+                    </DialogFooter>
+                  </>
+                )
+              }}
+            </form.AppField>
+          </form.AuthFormRoot>
+        </form.AppForm>
       </DialogContent>
     </Dialog>
   )

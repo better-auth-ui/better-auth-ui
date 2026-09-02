@@ -1,10 +1,11 @@
-import { act, renderHook } from "@testing-library/react"
-import { describe, expect, it } from "vitest"
+import { act, renderHook, waitFor } from "@testing-library/react"
+import { afterEach, describe, expect, it } from "vitest"
 
 import {
   createOrganizationColumnHelper,
   useOrganizationTable
 } from "../src/components/auth/organization/organization-table"
+import { useOrganizationTableState } from "../src/components/auth/organization/organization-table-state"
 
 type TestRow = {
   group: string
@@ -22,6 +23,12 @@ const rows: TestRow[] = [
   { group: "a", id: "2", name: "Charlie" },
   { group: "a", id: "3", name: "Bea" }
 ]
+const TEST_COLUMN_IDS = ["group", "name"] as const
+
+afterEach(() => {
+  window.history.replaceState({}, "", "/")
+  window.localStorage.clear()
+})
 
 describe("organization table state", () => {
   it("keeps an ordered multi-column sort", () => {
@@ -113,5 +120,45 @@ describe("organization table state", () => {
     expect(
       result.current.getSelectedRowModel().rows.map((row) => row.id)
     ).toEqual(["2", "3"])
+  })
+
+  it("shares URL-owned state with the table through external atoms", async () => {
+    window.history.replaceState(
+      {},
+      "",
+      "/?test.sort=unknown.asc,name.desc&test.filter.group=a"
+    )
+
+    const { result } = renderHook(() => {
+      const state = useOrganizationTableState("test", 10, TEST_COLUMN_IDS)
+      const table = useOrganizationTable({
+        atoms: state.atoms,
+        columns,
+        data: rows,
+        getRowId: (row) => row.id,
+        state: { columnVisibility: state.columnVisibility },
+        onColumnVisibilityChange: state.setColumnVisibility
+      })
+      return { state, table }
+    })
+
+    await waitFor(() => expect(result.current.state.ready).toBe(true))
+    expect(result.current.state.sorting).toEqual([{ desc: true, id: "name" }])
+    expect(result.current.table.getRowModel().rows[0]?.original.id).toBe("2")
+
+    act(() => {
+      result.current.state.setPagination({ pageIndex: 2, pageSize: 10 })
+      result.current.table.getRow("1").toggleSelected(true)
+    })
+    act(() => result.current.table.setGlobalFilter("Ada"))
+
+    expect(result.current.state.pagination.pageIndex).toBe(0)
+    expect(result.current.state.rowSelection).toEqual({})
+
+    await waitFor(() => {
+      expect(
+        new URL(window.location.href).searchParams.get("test.search")
+      ).toBe("Ada")
+    })
   })
 })

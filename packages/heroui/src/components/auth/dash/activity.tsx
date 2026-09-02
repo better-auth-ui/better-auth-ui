@@ -1,5 +1,6 @@
 "use client"
 
+import { getClampedTablePageIndex } from "@better-auth-ui/core"
 import type {
   DashAuditLog,
   DashAuthClient
@@ -56,7 +57,7 @@ import {
   tableFeatures,
   type Updater
 } from "@tanstack/react-table"
-import { useDeferredValue, useMemo, useState } from "react"
+import { useDeferredValue, useEffect, useMemo, useState } from "react"
 import { dashPlugin } from "../../../lib/auth/dash-plugin"
 import { organizationPlugin } from "../../../lib/auth/organization-plugin"
 
@@ -288,6 +289,24 @@ function ActivityFeed({
   const { data, error, isFetching, isPending } = query
   const showPending = !ready || isPending
   const pageEnd = offset + (data?.events.length ?? 0)
+
+  useEffect(() => {
+    if (!ready || !query.isSuccess) return
+    const pageIndex = getClampedTablePageIndex(
+      pagination.pageIndex,
+      pagination.pageSize,
+      data?.total ?? 0
+    )
+    if (pageIndex !== pagination.pageIndex) {
+      setPaginationState((current) => ({ ...current, pageIndex }))
+    }
+  }, [
+    data?.total,
+    pagination.pageIndex,
+    pagination.pageSize,
+    query.isSuccess,
+    ready
+  ])
   const setPagination = (updater: Updater<PaginationState>) =>
     setPaginationState((current) => functionalUpdate(updater, current))
   const setColumnFilters = (updater: Updater<ColumnFiltersState>) => {

@@ -165,6 +165,7 @@ const invitationColumns = invitationColumnHelper.columns([
     filterFn: (row, columnId, value) => row.getValue(columnId) === String(value)
   })
 ])
+const INVITATION_COLUMN_IDS = ["email", "createdAt", "role", "status"] as const
 
 function formatStatus(status?: string | null) {
   if (!status) return "Pending"
@@ -176,7 +177,8 @@ export function OrganizationInvitations(props: OrganizationInvitationsProps) {
   const auth = useAuth<OrganizationAuthClient>()
   const tableState = createOrganizationTableState(
     "organizationInvitations",
-    ORGANIZATION_TABLE_PAGE_SIZE
+    ORGANIZATION_TABLE_PAGE_SIZE,
+    INVITATION_COLUMN_IDS
   )
   const invitations = useListOrganizationInvitations(auth.authClient)
   const invitationRows = () =>
@@ -233,6 +235,7 @@ export function OrganizationInvitations(props: OrganizationInvitationsProps) {
   const invitationStatusLabel = (status: (typeof invitationStatuses)[number]) =>
     localization()[status] ?? formatStatus(status)
   const table = createOrganizationTable({
+    atoms: tableState.atoms,
     columns: invitationColumns,
     get data() {
       return invitationRows()
@@ -242,21 +245,11 @@ export function OrganizationInvitations(props: OrganizationInvitationsProps) {
     globalFilterFn: "includesString",
     get state() {
       return {
-        columnFilters: tableState.columnFilters(),
-        columnVisibility: tableState.columnVisibility(),
-        globalFilter: tableState.globalFilter(),
-        pagination: tableState.pagination(),
-        rowSelection: tableState.rowSelection(),
-        sorting: tableState.sorting()
+        columnVisibility: tableState.columnVisibility()
       }
     },
     getRowId: (invitation) => invitation.id,
-    onColumnFiltersChange: tableState.setColumnFilters,
-    onColumnVisibilityChange: tableState.setColumnVisibility,
-    onGlobalFilterChange: tableState.setGlobalFilter,
-    onPaginationChange: tableState.setPagination,
-    onRowSelectionChange: tableState.setRowSelection,
-    onSortingChange: tableState.setSorting
+    onColumnVisibilityChange: tableState.setColumnVisibility
   })
   const canCancel = useHasPermission(auth.authClient, () => ({
     permissions: { invitation: ["cancel"] }

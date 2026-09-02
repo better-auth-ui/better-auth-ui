@@ -81,6 +81,7 @@ const roleColumns = roleColumnHelper.columns([
       row.getValue<string[]>(columnId).includes(String(value))
   })
 ])
+const ROLE_COLUMN_IDS = ["role", "permissions", "permissionResources"] as const
 const EMPTY_ROLES: Role[] = []
 
 export function OrganizationRoles({
@@ -115,17 +116,12 @@ export function OrganizationRoles({
   const [editingRole, setEditingRole] = useState<Role | null>()
   const tableState = useOrganizationTableState(
     "organizationRoles",
-    ORGANIZATION_TABLE_PAGE_SIZE
+    ORGANIZATION_TABLE_PAGE_SIZE,
+    ROLE_COLUMN_IDS
   )
-  const {
-    columnFilters,
-    columnVisibility,
-    globalFilter,
-    pagination,
-    rowSelection,
-    sorting
-  } = tableState
+  const { columnVisibility, globalFilter, pagination } = tableState
   const table = useOrganizationTable({
+    atoms: tableState.atoms,
     columns: roleColumns,
     data: roles.data ?? EMPTY_ROLES,
     enableRowSelection: canDelete.data?.success === true,
@@ -142,19 +138,9 @@ export function OrganizationRoles({
     },
     getRowId: (role) => role.id,
     state: {
-      columnFilters,
-      columnVisibility: { ...columnVisibility, permissionResources: false },
-      globalFilter,
-      pagination,
-      rowSelection,
-      sorting
+      columnVisibility: { ...columnVisibility, permissionResources: false }
     },
-    onColumnFiltersChange: tableState.setColumnFilters,
-    onColumnVisibilityChange: tableState.setColumnVisibility,
-    onGlobalFilterChange: tableState.setGlobalFilter,
-    onPaginationChange: tableState.setPagination,
-    onRowSelectionChange: tableState.setRowSelection,
-    onSortingChange: tableState.setSorting
+    onColumnVisibilityChange: tableState.setColumnVisibility
   })
   const deleteRoles = useDeleteRole(client, organizationId)
   const permissionFilter = String(

@@ -1285,8 +1285,8 @@ describe("Solid registry isolation", () => {
     expect(signUp).toContain(
       "placeholder={auth.localization.auth.emailPlaceholder}"
     )
-    expect(signUp).toContain(
-      "placeholder={auth.localization.auth.passwordPlaceholder}"
+    expect(signUp).toMatch(
+      /placeholder=\{\s*auth\.localization\.auth\.passwordPlaceholder\s*\}/
     )
     expect(signUp).toContain("auth.emailAndPassword.confirmPassword")
     expect(signUp).toContain(
@@ -1604,7 +1604,7 @@ describe("Solid registry isolation", () => {
       "setIsConfirmPasswordVisible((visible) => !visible)"
     )
     expect(signUp).toContain("auth.localization.auth.passwordsDoNotMatch")
-    expect(signUp).toContain("validationMessage")
+    expect(signUp).toContain("getFormFieldErrors")
     expect(signUp).toContain("aria-invalid")
     expect(signUp).toContain("<EyeOff aria-hidden")
     expect(signUp).toContain("<Eye aria-hidden")
@@ -1632,7 +1632,7 @@ describe("Solid registry isolation", () => {
     expect(resetPassword).toContain(
       "auth.localization.auth.passwordsDoNotMatch"
     )
-    expect(resetPassword).toContain("validationMessage")
+    expect(resetPassword).toContain("getFormFieldErrors")
     expect(resetPassword).toContain("aria-invalid")
     expect(resetPassword).toContain("<EyeOff aria-hidden")
     expect(resetPassword).toContain("<Eye aria-hidden")
@@ -2386,14 +2386,17 @@ describe("Solid registry isolation", () => {
         })
       ])
     )
-    expect(signUp.files[0]?.content).toContain("useSignUpEmail")
-    expect(signUp.files[0]?.content).toContain(
-      "Account created. Check your email if verification is required."
+    const signUpComponent = signUp.files.find(
+      (file) => file.path === "src/components/auth/sign-up.tsx"
     )
-    expect(signUp.files[0]?.content).toContain(
-      "Unable to create an account. Try again."
+    expect(signUpComponent?.content).toContain("useSignUpEmail")
+    expect(signUpComponent?.content).toMatch(
+      /Account created\. Check your email if verification is\s+required\./
     )
-    expect(signUp.files[0]?.content).toContain("auth.emailAndPassword.name")
+    expect(signUpComponent?.content).toMatch(
+      /Unable to create an account\. Try again\./
+    )
+    expect(signUpComponent?.content).toContain("auth.emailAndPassword.name")
   })
 
   it("installs complete Email OTP and Two-Factor dependency closures", () => {

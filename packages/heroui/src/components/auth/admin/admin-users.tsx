@@ -2,6 +2,7 @@
 
 import {
   type AdditionalFieldValue,
+  getClampedTablePageIndex,
   parseAdditionalFieldValues
 } from "@better-auth-ui/core"
 import {
@@ -221,6 +222,18 @@ export function AdminUsers({
     onSelectedUserIdChange?.(userId)
   }
   const total = users.data?.total ?? 0
+
+  useEffect(() => {
+    if (!users.isSuccess) return
+    const pageIndex = getClampedTablePageIndex(
+      pagination.pageIndex,
+      pagination.pageSize,
+      total
+    )
+    if (pageIndex !== pagination.pageIndex) {
+      setPaginationState((current) => ({ ...current, pageIndex }))
+    }
+  }, [pagination.pageIndex, pagination.pageSize, total, users.isSuccess])
   const setPagination = (updater: Updater<PaginationState>) =>
     setPaginationState((current) => functionalUpdate(updater, current))
   const setColumnFilters = (updater: Updater<ColumnFiltersState>) => {
@@ -601,22 +614,26 @@ function CreateUserDialog({
       password: "",
       roles: [config.defaultRole]
     },
-    onSubmit: ({ value }) => {
-      createUser.mutate(
-        {
-          data: {
-            ...additionalFieldValuesRef.current,
-            emailVerified: value.emailVerified
+    onSubmit: async ({ value }) => {
+      try {
+        await createUser.mutateAsync(
+          {
+            data: {
+              ...additionalFieldValuesRef.current,
+              emailVerified: value.emailVerified
+            },
+            email: value.email,
+            name: value.name,
+            password: value.password,
+            ...(canSetRole.data?.success
+              ? { role: asAdminRoles(value.roles) }
+              : {})
           },
-          email: value.email,
-          name: value.name,
-          password: value.password,
-          ...(canSetRole.data?.success
-            ? { role: asAdminRoles(value.roles) }
-            : {})
-        },
-        { onSuccess: close }
-      )
+          { onSuccess: close }
+        )
+      } catch {
+        // The mutation reports the error through its configured handler.
+      }
     }
   })
 
@@ -631,9 +648,8 @@ function CreateUserDialog({
     setFormError(undefined)
     onOpenChange(false)
   }
-  const submit = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault()
-    const data = new FormData(event.currentTarget)
+  const prepareSubmit = async (formElement: HTMLFormElement) => {
+    const data = new FormData(formElement)
     let additionalFieldValues: Record<string, AdditionalFieldValue | null>
     try {
       additionalFieldValues = await parseAdditionalFieldValues(
@@ -642,11 +658,10 @@ function CreateUserDialog({
       )
     } catch (error) {
       setFormError(error instanceof Error ? error.message : String(error))
-      return
+      return false
     }
     setFormError(undefined)
     additionalFieldValuesRef.current = additionalFieldValues
-    await form.handleSubmit()
   }
 
   return (
@@ -656,152 +671,159 @@ function CreateUserDialog({
     >
       <AlertDialog.Container>
         <AlertDialog.Dialog>
-          <Form onSubmit={submit}>
-            <AlertDialog.CloseTrigger />
-            <AlertDialog.Header>
-              <AlertDialog.Icon status="default">
-                <PersonPlus />
-              </AlertDialog.Icon>
-              <AlertDialog.Heading>
-                {config.localization.createUser}
-              </AlertDialog.Heading>
-            </AlertDialog.Header>
-            <AlertDialog.Body className="overflow-visible">
-              <p className="text-sm text-muted">
-                {config.localization.usersDescription}
-              </p>
-              <div className="mt-4 flex flex-col gap-4">
-                <form.Field name="name">
-                  {(field) => (
-                    <TextField
-                      isRequired
-                      name={field.name}
-                      value={field.state.value}
-                      onChange={field.handleChange}
-                    >
-                      <Label>{config.localization.name}</Label>
-                      <Input autoFocus variant="secondary" />
-                      <FieldError />
-                    </TextField>
-                  )}
-                </form.Field>
-                <form.Field name="email">
-                  {(field) => (
-                    <TextField
-                      isRequired
-                      name={field.name}
-                      type="email"
-                      value={field.state.value}
-                      onChange={field.handleChange}
-                    >
-                      <Label>{config.localization.email}</Label>
-                      <Input autoComplete="off" variant="secondary" />
-                      <FieldError />
-                    </TextField>
-                  )}
-                </form.Field>
-                <form.Field name="password">
-                  {(field) => (
-                    <TextField
-                      isRequired
-                      name={field.name}
-                      type="password"
-                      value={field.state.value}
-                      onChange={field.handleChange}
-                    >
-                      <Label>{config.localization.password}</Label>
-                      <Input autoComplete="new-password" variant="secondary" />
-                      <FieldError />
-                    </TextField>
-                  )}
-                </form.Field>
-                {canSetRole.isPending ? (
-                  <Skeleton className="h-10 w-full" />
-                ) : canSetRole.data?.success ? (
-                  <form.Field name="roles">
+          <form.AppForm>
+            <form.AuthFormRoot prepareSubmit={prepareSubmit}>
+              <AlertDialog.CloseTrigger />
+              <AlertDialog.Header>
+                <AlertDialog.Icon status="default">
+                  <PersonPlus />
+                </AlertDialog.Icon>
+                <AlertDialog.Heading>
+                  {config.localization.createUser}
+                </AlertDialog.Heading>
+              </AlertDialog.Header>
+              <AlertDialog.Body className="overflow-visible">
+                <p className="text-sm text-muted">
+                  {config.localization.usersDescription}
+                </p>
+                <div className="mt-4 flex flex-col gap-4">
+                  <form.Field name="name">
                     {(field) => (
-                      <Select
-                        fullWidth
-                        selectionMode={
-                          config.allowMultipleRoles ? "multiple" : "single"
-                        }
+                      <TextField
+                        isRequired
+                        name={field.name}
                         value={field.state.value}
-                        variant="secondary"
-                        onChange={(keys) => {
-                          const next = [...(keys as Iterable<string>)]
-                          if (next.length)
-                            field.handleChange(
-                              config.allowMultipleRoles
-                                ? next
-                                : next.slice(0, 1)
-                            )
-                        }}
+                        onChange={field.handleChange}
                       >
-                        <Label>{config.localization.role}</Label>
-                        <Select.Trigger>
-                          <Select.Value />
-                          <Select.Indicator />
-                        </Select.Trigger>
-                        <Select.Popover>
-                          <ListBox
-                            selectionMode={
-                              config.allowMultipleRoles ? "multiple" : "single"
-                            }
-                          >
-                            {config.roles.map((role) => (
-                              <ListBox.Item
-                                id={role}
-                                key={role}
-                                textValue={role}
-                              >
-                                {role}
-                                <ListBox.ItemIndicator />
-                              </ListBox.Item>
-                            ))}
-                          </ListBox>
-                        </Select.Popover>
-                      </Select>
+                        <Label>{config.localization.name}</Label>
+                        <Input autoFocus variant="secondary" />
+                        <FieldError />
+                      </TextField>
                     )}
                   </form.Field>
-                ) : null}
-                <form.Field name="emailVerified">
-                  {(field) => (
-                    <Switch
-                      isSelected={field.state.value}
-                      onChange={field.handleChange}
-                    >
-                      {config.localization.emailVerified}
-                    </Switch>
-                  )}
-                </form.Field>
-                {additionalFields?.map((field) => (
-                  <AdditionalField
-                    field={field}
-                    isPending={createUser.isPending}
-                    key={field.name}
-                    name={field.name}
-                  />
-                ))}
-                {formError || createUser.error ? (
-                  <FieldError>
-                    {formError ?? getAdminErrorMessage(createUser.error)}
-                  </FieldError>
-                ) : null}
-              </div>
-            </AlertDialog.Body>
-            <AlertDialog.Footer>
-              <Button
-                isDisabled={createUser.isPending}
-                slot="close"
-                variant="tertiary"
-              >
-                {config.localization.cancel}
-              </Button>
-              <Button isPending={createUser.isPending} type="submit">
-                {config.localization.createUser}
-              </Button>
-            </AlertDialog.Footer>
-          </Form>
+                  <form.Field name="email">
+                    {(field) => (
+                      <TextField
+                        isRequired
+                        name={field.name}
+                        type="email"
+                        value={field.state.value}
+                        onChange={field.handleChange}
+                      >
+                        <Label>{config.localization.email}</Label>
+                        <Input autoComplete="off" variant="secondary" />
+                        <FieldError />
+                      </TextField>
+                    )}
+                  </form.Field>
+                  <form.Field name="password">
+                    {(field) => (
+                      <TextField
+                        isRequired
+                        name={field.name}
+                        type="password"
+                        value={field.state.value}
+                        onChange={field.handleChange}
+                      >
+                        <Label>{config.localization.password}</Label>
+                        <Input
+                          autoComplete="new-password"
+                          variant="secondary"
+                        />
+                        <FieldError />
+                      </TextField>
+                    )}
+                  </form.Field>
+                  {canSetRole.isPending ? (
+                    <Skeleton className="h-10 w-full" />
+                  ) : canSetRole.data?.success ? (
+                    <form.Field name="roles">
+                      {(field) => (
+                        <Select
+                          fullWidth
+                          selectionMode={
+                            config.allowMultipleRoles ? "multiple" : "single"
+                          }
+                          value={field.state.value}
+                          variant="secondary"
+                          onChange={(keys) => {
+                            const next = [...(keys as Iterable<string>)]
+                            if (next.length)
+                              field.handleChange(
+                                config.allowMultipleRoles
+                                  ? next
+                                  : next.slice(0, 1)
+                              )
+                          }}
+                        >
+                          <Label>{config.localization.role}</Label>
+                          <Select.Trigger>
+                            <Select.Value />
+                            <Select.Indicator />
+                          </Select.Trigger>
+                          <Select.Popover>
+                            <ListBox
+                              selectionMode={
+                                config.allowMultipleRoles
+                                  ? "multiple"
+                                  : "single"
+                              }
+                            >
+                              {config.roles.map((role) => (
+                                <ListBox.Item
+                                  id={role}
+                                  key={role}
+                                  textValue={role}
+                                >
+                                  {role}
+                                  <ListBox.ItemIndicator />
+                                </ListBox.Item>
+                              ))}
+                            </ListBox>
+                          </Select.Popover>
+                        </Select>
+                      )}
+                    </form.Field>
+                  ) : null}
+                  <form.Field name="emailVerified">
+                    {(field) => (
+                      <Switch
+                        isSelected={field.state.value}
+                        onChange={field.handleChange}
+                      >
+                        {config.localization.emailVerified}
+                      </Switch>
+                    )}
+                  </form.Field>
+                  {additionalFields?.map((field) => (
+                    <AdditionalField
+                      field={field}
+                      isPending={createUser.isPending}
+                      key={field.name}
+                      name={field.name}
+                    />
+                  ))}
+                  {formError || createUser.error ? (
+                    <FieldError>
+                      {formError ?? getAdminErrorMessage(createUser.error)}
+                    </FieldError>
+                  ) : null}
+                </div>
+              </AlertDialog.Body>
+              <AlertDialog.Footer>
+                <Button
+                  isDisabled={createUser.isPending}
+                  slot="close"
+                  variant="tertiary"
+                >
+                  {config.localization.cancel}
+                </Button>
+                <form.AuthFormSubmitButton isDisabled={createUser.isPending}>
+                  {config.localization.createUser}
+                </form.AuthFormSubmitButton>
+              </AlertDialog.Footer>
+            </form.AuthFormRoot>
+          </form.AppForm>
         </AlertDialog.Dialog>
       </AlertDialog.Container>
     </AlertDialog.Backdrop>
@@ -1059,12 +1081,11 @@ function UserDrawer({
           ? config.localization.revokeAllSessions
           : config.localization.impersonateUser
 
-  const saveUser = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault()
-    if (!detail) return
+  const prepareSaveUser = async (formElement: HTMLFormElement) => {
+    if (!detail) return false
 
     if (canUpdate.data?.success) {
-      const formData = new FormData(event.currentTarget)
+      const formData = new FormData(formElement)
       let additionalFieldValues: Record<string, AdditionalFieldValue | null>
       try {
         additionalFieldValues = await parseAdditionalFieldValues(
@@ -1073,13 +1094,11 @@ function UserDrawer({
         )
       } catch (error) {
         setProfileError(error instanceof Error ? error.message : String(error))
-        return
+        return false
       }
       setProfileError(undefined)
       profileAdditionalFieldValuesRef.current = additionalFieldValues
     }
-
-    await profileForm.handleSubmit()
   }
 
   return (
@@ -1180,311 +1199,310 @@ function UserDrawer({
                     </Tabs.List>
                   </Tabs.ListContainer>
                   <Tabs.Panel className="min-h-0 overflow-hidden" id="overview">
-                    <Form
-                      className="grid h-full grid-rows-[minmax(0,1fr)_auto]"
-                      onSubmit={saveUser}
-                    >
-                      <div className="overflow-y-auto">
-                        <section className="flex flex-col gap-5 p-6">
-                          <h3 className="font-medium">
-                            {config.localization.profileAndAccess}
-                          </h3>
-                          <div className="grid gap-5 md:grid-cols-2">
-                            <profileForm.Field name="name">
-                              {(field) => (
-                                <TextField
-                                  isDisabled={!canUpdate.data?.success}
-                                  isRequired
-                                  name={field.name}
-                                  value={field.state.value}
-                                  onChange={field.handleChange}
-                                >
-                                  <Label>{config.localization.name}</Label>
-                                  <Input variant="secondary" />
-                                </TextField>
-                              )}
-                            </profileForm.Field>
-                            <profileForm.Field name="email">
-                              {(field) => (
-                                <TextField
-                                  isDisabled={
-                                    !canUpdate.data?.success ||
-                                    !canSetEmail.data?.success
-                                  }
-                                  isRequired
-                                  name={field.name}
-                                  type="email"
-                                  value={field.state.value}
-                                  onChange={field.handleChange}
-                                >
-                                  <Label>{config.localization.email}</Label>
-                                  <Input variant="secondary" />
-                                  <FieldError />
-                                </TextField>
-                              )}
-                            </profileForm.Field>
-                            <profileForm.Field name="emailVerified">
-                              {(field) => (
-                                <Switch
-                                  isDisabled={
-                                    !canUpdate.data?.success ||
-                                    !canSetEmail.data?.success
-                                  }
-                                  isSelected={field.state.value}
-                                  onChange={field.handleChange}
-                                >
-                                  {config.localization.emailVerified}
-                                </Switch>
-                              )}
-                            </profileForm.Field>
-                            <profileForm.Field name="roles">
-                              {(field) => (
-                                <Select
-                                  fullWidth
-                                  isDisabled={
-                                    isSelf || !canSetRole.data?.success
-                                  }
-                                  selectionMode={
-                                    config.allowMultipleRoles
-                                      ? "multiple"
-                                      : "single"
-                                  }
-                                  value={field.state.value}
-                                  variant="secondary"
-                                  onChange={(keys) => {
-                                    const next = [...(keys as Iterable<string>)]
-                                    if (next.length)
-                                      field.handleChange(
-                                        config.allowMultipleRoles
-                                          ? next
-                                          : next.slice(0, 1)
-                                      )
-                                  }}
-                                >
-                                  <Label>{config.localization.role}</Label>
-                                  <Select.Trigger>
-                                    <Select.Value />
-                                    <Select.Indicator />
-                                  </Select.Trigger>
-                                  <Select.Popover>
-                                    <ListBox
-                                      selectionMode={
-                                        config.allowMultipleRoles
-                                          ? "multiple"
-                                          : "single"
-                                      }
-                                    >
-                                      {config.roles.map((item) => (
-                                        <ListBox.Item
-                                          id={item}
-                                          key={item}
-                                          textValue={item}
-                                        >
-                                          {item}
-                                          <ListBox.ItemIndicator />
-                                        </ListBox.Item>
-                                      ))}
-                                    </ListBox>
-                                  </Select.Popover>
-                                </Select>
-                              )}
-                            </profileForm.Field>
-                            {additionalFields?.map((field) => {
-                              const value = (
-                                detail as unknown as Record<string, unknown>
-                              )[field.name]
-                              return (
-                                <AdditionalField
-                                  field={{
-                                    ...field,
-                                    defaultValue:
-                                      value as AdditionalFieldValue | null
-                                  }}
-                                  isPending={
-                                    updateUser.isPending ||
-                                    !canUpdate.data?.success
-                                  }
-                                  key={`${detail.id}-${field.name}-${String(value ?? "")}`}
-                                  name={field.name}
-                                />
-                              )
-                            })}
-                          </div>
-                          <FieldError>
-                            {profileError ??
-                              getAdminErrorMessage(updateUser.error) ??
-                              getAdminErrorMessage(setRoleMutation.error)}
-                          </FieldError>
-                        </section>
-                        <Separator />
-                        <section className="flex flex-col gap-4 p-6">
-                          <h3 className="font-medium">
-                            {config.localization.accountInformation}
-                          </h3>
-                          <dl className="grid gap-x-8 gap-y-4 text-sm sm:grid-cols-2">
-                            <div className="flex flex-col gap-1">
-                              <dt className="text-muted">
-                                {config.localization.userId}
-                              </dt>
-                              <dd className="flex min-w-0 items-center gap-1">
-                                <code className="truncate text-xs">
-                                  {detail.id}
-                                </code>
-                                <Button
-                                  aria-label={config.localization.copyUserId}
-                                  isIconOnly
-                                  size="sm"
-                                  type="button"
-                                  variant="ghost"
-                                  onPress={() =>
-                                    navigator.clipboard.writeText(detail.id)
-                                  }
-                                >
-                                  <Copy />
-                                </Button>
-                              </dd>
+                    <profileForm.AppForm>
+                      <profileForm.AuthFormRoot
+                        className="grid h-full grid-rows-[minmax(0,1fr)_auto]"
+                        prepareSubmit={prepareSaveUser}
+                      >
+                        <div className="overflow-y-auto">
+                          <section className="flex flex-col gap-5 p-6">
+                            <h3 className="font-medium">
+                              {config.localization.profileAndAccess}
+                            </h3>
+                            <div className="grid gap-5 md:grid-cols-2">
+                              <profileForm.Field name="name">
+                                {(field) => (
+                                  <TextField
+                                    isDisabled={!canUpdate.data?.success}
+                                    isRequired
+                                    name={field.name}
+                                    value={field.state.value}
+                                    onChange={field.handleChange}
+                                  >
+                                    <Label>{config.localization.name}</Label>
+                                    <Input variant="secondary" />
+                                  </TextField>
+                                )}
+                              </profileForm.Field>
+                              <profileForm.Field name="email">
+                                {(field) => (
+                                  <TextField
+                                    isDisabled={
+                                      !canUpdate.data?.success ||
+                                      !canSetEmail.data?.success
+                                    }
+                                    isRequired
+                                    name={field.name}
+                                    type="email"
+                                    value={field.state.value}
+                                    onChange={field.handleChange}
+                                  >
+                                    <Label>{config.localization.email}</Label>
+                                    <Input variant="secondary" />
+                                    <FieldError />
+                                  </TextField>
+                                )}
+                              </profileForm.Field>
+                              <profileForm.Field name="emailVerified">
+                                {(field) => (
+                                  <Switch
+                                    isDisabled={
+                                      !canUpdate.data?.success ||
+                                      !canSetEmail.data?.success
+                                    }
+                                    isSelected={field.state.value}
+                                    onChange={field.handleChange}
+                                  >
+                                    {config.localization.emailVerified}
+                                  </Switch>
+                                )}
+                              </profileForm.Field>
+                              <profileForm.Field name="roles">
+                                {(field) => (
+                                  <Select
+                                    fullWidth
+                                    isDisabled={
+                                      isSelf || !canSetRole.data?.success
+                                    }
+                                    selectionMode={
+                                      config.allowMultipleRoles
+                                        ? "multiple"
+                                        : "single"
+                                    }
+                                    value={field.state.value}
+                                    variant="secondary"
+                                    onChange={(keys) => {
+                                      const next = [
+                                        ...(keys as Iterable<string>)
+                                      ]
+                                      if (next.length)
+                                        field.handleChange(
+                                          config.allowMultipleRoles
+                                            ? next
+                                            : next.slice(0, 1)
+                                        )
+                                    }}
+                                  >
+                                    <Label>{config.localization.role}</Label>
+                                    <Select.Trigger>
+                                      <Select.Value />
+                                      <Select.Indicator />
+                                    </Select.Trigger>
+                                    <Select.Popover>
+                                      <ListBox
+                                        selectionMode={
+                                          config.allowMultipleRoles
+                                            ? "multiple"
+                                            : "single"
+                                        }
+                                      >
+                                        {config.roles.map((item) => (
+                                          <ListBox.Item
+                                            id={item}
+                                            key={item}
+                                            textValue={item}
+                                          >
+                                            {item}
+                                            <ListBox.ItemIndicator />
+                                          </ListBox.Item>
+                                        ))}
+                                      </ListBox>
+                                    </Select.Popover>
+                                  </Select>
+                                )}
+                              </profileForm.Field>
+                              {additionalFields?.map((field) => {
+                                const value = (
+                                  detail as unknown as Record<string, unknown>
+                                )[field.name]
+                                return (
+                                  <AdditionalField
+                                    field={{
+                                      ...field,
+                                      defaultValue:
+                                        value as AdditionalFieldValue | null
+                                    }}
+                                    isPending={
+                                      updateUser.isPending ||
+                                      !canUpdate.data?.success
+                                    }
+                                    key={`${detail.id}-${field.name}-${String(value ?? "")}`}
+                                    name={field.name}
+                                  />
+                                )
+                              })}
                             </div>
-                            <div className="flex flex-col gap-1">
-                              <dt className="text-muted">
-                                {config.localization.created}
-                              </dt>
-                              <dd>{formatDate(detail.createdAt)}</dd>
-                            </div>
-                            <div className="flex flex-col gap-1">
-                              <dt className="text-muted">
-                                {config.localization.status}
-                              </dt>
-                              <dd>
-                                <Chip
-                                  color={detail.banned ? "danger" : "default"}
-                                  size="sm"
-                                >
-                                  {detail.banned
-                                    ? config.localization.banned
-                                    : config.localization.active}
-                                </Chip>
-                              </dd>
-                            </div>
-                            {detail.banned && detail.banReason ? (
-                              <div className="flex flex-col gap-1">
-                                <dt className="text-muted">
-                                  {config.localization.banReason}
-                                </dt>
-                                <dd>{detail.banReason}</dd>
-                              </div>
-                            ) : null}
-                            {detail.banned && detail.banExpires ? (
-                              <div className="flex flex-col gap-1">
-                                <dt className="text-muted">
-                                  {config.localization.banExpires}
-                                </dt>
-                                <dd>{formatDate(detail.banExpires)}</dd>
-                              </div>
-                            ) : null}
-                          </dl>
-                        </section>
-                        <Separator />
-                        <section className="flex flex-col gap-4 p-6">
-                          <h3 className="font-medium">
-                            {config.localization.security}
-                          </h3>
-                          <div>
-                            <Button
-                              isDisabled={
-                                canSetPassword.isPending ||
-                                !canSetPassword.data?.success
-                              }
-                              type="button"
-                              variant="outline"
-                              onPress={() => setPasswordOpen(true)}
-                            >
-                              <Key />
-                              {config.localization.setPassword}
-                            </Button>
-                          </div>
-                        </section>
-                        <Separator />
-                        <section className="flex flex-col gap-4 p-6">
-                          <h3 className="font-medium">
-                            {config.localization.dangerZone}
-                          </h3>
-                          <div className="flex flex-wrap gap-2">
-                            <Button
-                              isDisabled={
-                                canBan.isPending ||
-                                !canBan.data?.success ||
-                                isSelf
-                              }
-                              type="button"
-                              variant="outline"
-                              onPress={() =>
-                                detail.banned
-                                  ? unban.mutate({ userId: detail.id })
-                                  : setDangerousAction("ban")
-                              }
-                            >
-                              <Ban />
-                              {detail.banned
-                                ? config.localization.unbanUser
-                                : config.localization.banUser}
-                            </Button>
-                            <Button
-                              isDisabled={
-                                canDelete.isPending ||
-                                !canDelete.data?.success ||
-                                isSelf
-                              }
-                              type="button"
-                              variant="danger"
-                              onPress={() => setDangerousAction("delete")}
-                            >
-                              <TrashBin />
-                              {config.localization.deleteUser}
-                            </Button>
-                          </div>
-                          {unban.error ? (
                             <FieldError>
-                              {getAdminErrorMessage(unban.error)}
+                              {profileError ??
+                                getAdminErrorMessage(updateUser.error) ??
+                                getAdminErrorMessage(setRoleMutation.error)}
                             </FieldError>
-                          ) : null}
-                        </section>
-                      </div>
-                      <div className="flex flex-col-reverse gap-2 border-t bg-surface-secondary px-6 py-4 sm:flex-row sm:justify-end">
-                        <Button
-                          type="button"
-                          variant="outline"
-                          onPress={() => onOpenChange(false)}
-                        >
-                          {config.localization.cancel}
-                        </Button>
-                        <profileForm.Subscribe
-                          selector={(state) => [
-                            state.values.name,
-                            state.values.email
-                          ]}
-                        >
-                          {([name, email]) => (
-                            <Button
-                              isDisabled={
-                                !name.trim() ||
-                                !email.trim() ||
-                                canUpdate.isPending ||
-                                canSetRole.isPending ||
-                                (!canUpdate.data?.success &&
-                                  (!canSetRole.data?.success || isSelf))
-                              }
-                              isPending={
-                                updateUser.isPending ||
-                                setRoleMutation.isPending
-                              }
-                              type="submit"
-                            >
-                              {config.localization.saveChanges}
-                            </Button>
-                          )}
-                        </profileForm.Subscribe>
-                      </div>
-                    </Form>
+                          </section>
+                          <Separator />
+                          <section className="flex flex-col gap-4 p-6">
+                            <h3 className="font-medium">
+                              {config.localization.accountInformation}
+                            </h3>
+                            <dl className="grid gap-x-8 gap-y-4 text-sm sm:grid-cols-2">
+                              <div className="flex flex-col gap-1">
+                                <dt className="text-muted">
+                                  {config.localization.userId}
+                                </dt>
+                                <dd className="flex min-w-0 items-center gap-1">
+                                  <code className="truncate text-xs">
+                                    {detail.id}
+                                  </code>
+                                  <Button
+                                    aria-label={config.localization.copyUserId}
+                                    isIconOnly
+                                    size="sm"
+                                    type="button"
+                                    variant="ghost"
+                                    onPress={() =>
+                                      navigator.clipboard.writeText(detail.id)
+                                    }
+                                  >
+                                    <Copy />
+                                  </Button>
+                                </dd>
+                              </div>
+                              <div className="flex flex-col gap-1">
+                                <dt className="text-muted">
+                                  {config.localization.created}
+                                </dt>
+                                <dd>{formatDate(detail.createdAt)}</dd>
+                              </div>
+                              <div className="flex flex-col gap-1">
+                                <dt className="text-muted">
+                                  {config.localization.status}
+                                </dt>
+                                <dd>
+                                  <Chip
+                                    color={detail.banned ? "danger" : "default"}
+                                    size="sm"
+                                  >
+                                    {detail.banned
+                                      ? config.localization.banned
+                                      : config.localization.active}
+                                  </Chip>
+                                </dd>
+                              </div>
+                              {detail.banned && detail.banReason ? (
+                                <div className="flex flex-col gap-1">
+                                  <dt className="text-muted">
+                                    {config.localization.banReason}
+                                  </dt>
+                                  <dd>{detail.banReason}</dd>
+                                </div>
+                              ) : null}
+                              {detail.banned && detail.banExpires ? (
+                                <div className="flex flex-col gap-1">
+                                  <dt className="text-muted">
+                                    {config.localization.banExpires}
+                                  </dt>
+                                  <dd>{formatDate(detail.banExpires)}</dd>
+                                </div>
+                              ) : null}
+                            </dl>
+                          </section>
+                          <Separator />
+                          <section className="flex flex-col gap-4 p-6">
+                            <h3 className="font-medium">
+                              {config.localization.security}
+                            </h3>
+                            <div>
+                              <Button
+                                isDisabled={
+                                  canSetPassword.isPending ||
+                                  !canSetPassword.data?.success
+                                }
+                                type="button"
+                                variant="outline"
+                                onPress={() => setPasswordOpen(true)}
+                              >
+                                <Key />
+                                {config.localization.setPassword}
+                              </Button>
+                            </div>
+                          </section>
+                          <Separator />
+                          <section className="flex flex-col gap-4 p-6">
+                            <h3 className="font-medium">
+                              {config.localization.dangerZone}
+                            </h3>
+                            <div className="flex flex-wrap gap-2">
+                              <Button
+                                isDisabled={
+                                  canBan.isPending ||
+                                  !canBan.data?.success ||
+                                  isSelf
+                                }
+                                type="button"
+                                variant="outline"
+                                onPress={() =>
+                                  detail.banned
+                                    ? unban.mutate({ userId: detail.id })
+                                    : setDangerousAction("ban")
+                                }
+                              >
+                                <Ban />
+                                {detail.banned
+                                  ? config.localization.unbanUser
+                                  : config.localization.banUser}
+                              </Button>
+                              <Button
+                                isDisabled={
+                                  canDelete.isPending ||
+                                  !canDelete.data?.success ||
+                                  isSelf
+                                }
+                                type="button"
+                                variant="danger"
+                                onPress={() => setDangerousAction("delete")}
+                              >
+                                <TrashBin />
+                                {config.localization.deleteUser}
+                              </Button>
+                            </div>
+                            {unban.error ? (
+                              <FieldError>
+                                {getAdminErrorMessage(unban.error)}
+                              </FieldError>
+                            ) : null}
+                          </section>
+                        </div>
+                        <div className="flex flex-col-reverse gap-2 border-t bg-surface-secondary px-6 py-4 sm:flex-row sm:justify-end">
+                          <Button
+                            type="button"
+                            variant="outline"
+                            onPress={() => onOpenChange(false)}
+                          >
+                            {config.localization.cancel}
+                          </Button>
+                          <profileForm.Subscribe
+                            selector={(state) => [
+                              state.values.name,
+                              state.values.email
+                            ]}
+                          >
+                            {([name, email]) => (
+                              <profileForm.AuthFormSubmitButton
+                                isDisabled={
+                                  !name.trim() ||
+                                  !email.trim() ||
+                                  canUpdate.isPending ||
+                                  canSetRole.isPending ||
+                                  (!canUpdate.data?.success &&
+                                    (!canSetRole.data?.success || isSelf))
+                                }
+                              >
+                                {config.localization.saveChanges}
+                              </profileForm.AuthFormSubmitButton>
+                            )}
+                          </profileForm.Subscribe>
+                        </div>
+                      </profileForm.AuthFormRoot>
+                    </profileForm.AppForm>
                   </Tabs.Panel>
                   <Tabs.Panel
                     className="flex min-h-0 flex-col gap-3 overflow-y-auto p-6"

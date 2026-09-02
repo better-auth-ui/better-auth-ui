@@ -41,7 +41,6 @@ import {
   Card,
   type CardProps,
   cn,
-  Form,
   Input,
   InputGroup,
   Label,
@@ -329,164 +328,149 @@ export function OAuthClients({
       <Modal.Backdrop isOpen={editorOpen} onOpenChange={setEditorOpen}>
         <Modal.Container>
           <Modal.Dialog>
-            <Form
-              onSubmit={(event) => {
-                event.preventDefault()
-                void form.handleSubmit()
-              }}
-            >
-              <Modal.CloseTrigger />
-              <Modal.Header>
-                <Modal.Icon>
-                  {editingClient ? <Pencil /> : <CirclePlus />}
-                </Modal.Icon>
-                <Modal.Heading>
-                  {editingClient
-                    ? oauthLocalization.editClient
-                    : oauthLocalization.createClient}
-                </Modal.Heading>
-              </Modal.Header>
-              <Modal.Body className="flex flex-col gap-4 overflow-visible">
-                <form.AppField
-                  name="clientName"
-                  validators={{
-                    onChange: ({ value }) =>
-                      validateStringLength(value, {
-                        requiredMessage: localization.auth.fieldRequired,
-                        trim: true
-                      })
-                  }}
-                >
-                  {(field) => (
-                    <TextField
-                      isRequired
-                      name={field.name}
-                      onBlur={field.handleBlur}
-                      onChange={field.handleChange}
-                      value={field.state.value}
-                      isInvalid={
-                        isAuthFormFieldInvalid(field.state.meta) || undefined
-                      }
-                      validationBehavior="aria"
-                    >
-                      <Label>{oauthLocalization.clientName}</Label>
-                      <Input autoFocus variant="secondary" />
-                      <field.AuthFormFieldError />
-                    </TextField>
-                  )}
-                </form.AppField>
-                <form.Field name="applicationType">
-                  {(field) => (
-                    <Select
-                      name={field.name}
-                      onChange={(value) =>
-                        field.handleChange(String(value) as "native" | "web")
-                      }
-                      value={field.state.value}
-                      variant="secondary"
-                    >
-                      <Label>{oauthLocalization.applicationType}</Label>
-                      <Select.Trigger>
-                        <Select.Value />
-                        <Select.Indicator />
-                      </Select.Trigger>
-                      <Select.Popover>
-                        <ListBox>
-                          <ListBox.Item id="web">
-                            {oauthLocalization.webApplication}
-                          </ListBox.Item>
-                          <ListBox.Item id="native">
-                            {oauthLocalization.nativeApplication}
-                          </ListBox.Item>
-                        </ListBox>
-                      </Select.Popover>
-                    </Select>
-                  )}
-                </form.Field>
-                <form.AppField
-                  name="redirectUris"
-                  validators={{
-                    onChange: ({ value }) =>
-                      validateAbsoluteUrlList(value, {
-                        invalidMessage: oauthLocalization.invalidUrl,
-                        requiredMessage: localization.auth.fieldRequired
-                      })
-                  }}
-                >
-                  {(field) => (
-                    <TextField
-                      isRequired
-                      name={field.name}
-                      onBlur={field.handleBlur}
-                      onChange={field.handleChange}
-                      value={field.state.value}
-                      isInvalid={
-                        isAuthFormFieldInvalid(field.state.meta) || undefined
-                      }
-                      validationBehavior="aria"
-                    >
-                      <Label>{oauthLocalization.redirectUrls}</Label>
-                      <TextArea rows={3} variant="secondary" />
-                      <p className="text-muted text-xs">
-                        {oauthLocalization.redirectUrlsDescription}
-                      </p>
-                      <field.AuthFormFieldError />
-                    </TextField>
-                  )}
-                </form.AppField>
-                {(
-                  [
-                    ["clientUri", oauthLocalization.applicationUrl, "url"],
-                    ["logoUri", oauthLocalization.logoUrl, "url"],
-                    ["scope", oauthLocalization.scopes, "text"]
-                  ] as const
-                ).map(([name, label, type]) => (
-                  <form.Field key={name} name={name}>
+            <form.AppForm>
+              <form.AuthFormRoot>
+                <Modal.CloseTrigger />
+                <Modal.Header>
+                  <Modal.Icon>
+                    {editingClient ? <Pencil /> : <CirclePlus />}
+                  </Modal.Icon>
+                  <Modal.Heading>
+                    {editingClient
+                      ? oauthLocalization.editClient
+                      : oauthLocalization.createClient}
+                  </Modal.Heading>
+                </Modal.Header>
+                <Modal.Body className="flex flex-col gap-4 overflow-visible">
+                  <form.AppField
+                    name="clientName"
+                    validators={{
+                      onChange: ({ value }) =>
+                        validateStringLength(value, {
+                          requiredMessage: localization.auth.fieldRequired,
+                          trim: true
+                        })
+                    }}
+                  >
                     {(field) => (
                       <TextField
+                        isRequired
                         name={field.name}
                         onBlur={field.handleBlur}
                         onChange={field.handleChange}
                         value={field.state.value}
+                        isInvalid={
+                          isAuthFormFieldInvalid(field.state.meta) || undefined
+                        }
+                        validationBehavior="aria"
                       >
-                        <Label>{label}</Label>
-                        <Input
-                          placeholder={
-                            name === "scope"
-                              ? "openid profile email"
-                              : undefined
-                          }
-                          type={type}
-                          variant="secondary"
-                        />
+                        <Label>{oauthLocalization.clientName}</Label>
+                        <Input autoFocus variant="secondary" />
+                        <field.AuthFormFieldError />
                       </TextField>
                     )}
+                  </form.AppField>
+                  <form.Field name="applicationType">
+                    {(field) => (
+                      <Select
+                        name={field.name}
+                        onChange={(value) =>
+                          field.handleChange(String(value) as "native" | "web")
+                        }
+                        value={field.state.value}
+                        variant="secondary"
+                      >
+                        <Label>{oauthLocalization.applicationType}</Label>
+                        <Select.Trigger>
+                          <Select.Value />
+                          <Select.Indicator />
+                        </Select.Trigger>
+                        <Select.Popover>
+                          <ListBox>
+                            <ListBox.Item id="web">
+                              {oauthLocalization.webApplication}
+                            </ListBox.Item>
+                            <ListBox.Item id="native">
+                              {oauthLocalization.nativeApplication}
+                            </ListBox.Item>
+                          </ListBox>
+                        </Select.Popover>
+                      </Select>
+                    )}
                   </form.Field>
-                ))}
-              </Modal.Body>
-              <Modal.Footer>
-                <Button variant="ghost" onPress={() => setEditorOpen(false)}>
-                  {oauthLocalization.cancel}
-                </Button>
-                <form.Subscribe
-                  selector={(state) =>
-                    [state.canSubmit, state.isSubmitting] as const
-                  }
-                >
-                  {([canSubmit, isSubmitting]) => (
-                    <Button
-                      type="submit"
-                      isDisabled={!canSubmit}
-                      isPending={isSubmitting}
-                    >
-                      {editingClient
-                        ? oauthLocalization.saveChanges
-                        : oauthLocalization.createClient}
-                    </Button>
-                  )}
-                </form.Subscribe>
-              </Modal.Footer>
-            </Form>
+                  <form.AppField
+                    name="redirectUris"
+                    validators={{
+                      onChange: ({ value }) =>
+                        validateAbsoluteUrlList(value, {
+                          invalidMessage: oauthLocalization.invalidUrl,
+                          requiredMessage: localization.auth.fieldRequired
+                        })
+                    }}
+                  >
+                    {(field) => (
+                      <TextField
+                        isRequired
+                        name={field.name}
+                        onBlur={field.handleBlur}
+                        onChange={field.handleChange}
+                        value={field.state.value}
+                        isInvalid={
+                          isAuthFormFieldInvalid(field.state.meta) || undefined
+                        }
+                        validationBehavior="aria"
+                      >
+                        <Label>{oauthLocalization.redirectUrls}</Label>
+                        <TextArea rows={3} variant="secondary" />
+                        <p className="text-muted text-xs">
+                          {oauthLocalization.redirectUrlsDescription}
+                        </p>
+                        <field.AuthFormFieldError />
+                      </TextField>
+                    )}
+                  </form.AppField>
+                  {(
+                    [
+                      ["clientUri", oauthLocalization.applicationUrl, "url"],
+                      ["logoUri", oauthLocalization.logoUrl, "url"],
+                      ["scope", oauthLocalization.scopes, "text"]
+                    ] as const
+                  ).map(([name, label, type]) => (
+                    <form.Field key={name} name={name}>
+                      {(field) => (
+                        <TextField
+                          name={field.name}
+                          onBlur={field.handleBlur}
+                          onChange={field.handleChange}
+                          value={field.state.value}
+                        >
+                          <Label>{label}</Label>
+                          <Input
+                            placeholder={
+                              name === "scope"
+                                ? "openid profile email"
+                                : undefined
+                            }
+                            type={type}
+                            variant="secondary"
+                          />
+                        </TextField>
+                      )}
+                    </form.Field>
+                  ))}
+                </Modal.Body>
+                <Modal.Footer>
+                  <Button variant="ghost" onPress={() => setEditorOpen(false)}>
+                    {oauthLocalization.cancel}
+                  </Button>
+                  <form.AuthFormSubmitButton>
+                    {editingClient
+                      ? oauthLocalization.saveChanges
+                      : oauthLocalization.createClient}
+                  </form.AuthFormSubmitButton>
+                </Modal.Footer>
+              </form.AuthFormRoot>
+            </form.AppForm>
           </Modal.Dialog>
         </Modal.Container>
       </Modal.Backdrop>

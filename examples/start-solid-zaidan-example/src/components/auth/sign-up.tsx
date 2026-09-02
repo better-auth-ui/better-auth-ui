@@ -1,7 +1,7 @@
 import {
   authQueryKeys,
-  type FormFieldError as FormFieldErrorValue,
   getAuthLinkURL,
+  getFormFieldErrors,
   isPasswordCompromisedError,
   parseAdditionalFieldValue,
   validateEmailAddress,
@@ -106,21 +106,23 @@ export function SignUp(props: SignUpProps) {
       name: "",
       password: ""
     },
-    onSubmit: ({ value }) => {
-      signUp.mutate({
-        email: value.email.trim(),
-        fetchOptions: fetchOptions(),
-        name: auth.emailAndPassword.name ? value.name : "",
-        password: value.password,
-        ...additionalFieldValues
-      } as Parameters<typeof signUp.mutate>[0])
+    onSubmit: async ({ value }) => {
+      try {
+        await signUp.mutateAsync({
+          email: value.email.trim(),
+          fetchOptions: fetchOptions(),
+          name: auth.emailAndPassword.name ? value.name : "",
+          password: value.password,
+          ...additionalFieldValues
+        } as Parameters<typeof signUp.mutate>[0])
+      } catch {
+        // The mutation reports the error through its configured handler.
+      }
     }
   }))
 
-  const submitSignUp = async (event: SubmitEvent) => {
-    event.preventDefault()
-
-    const formData = new FormData(event.currentTarget as HTMLFormElement)
+  const prepareSubmit = async (formElement: HTMLFormElement) => {
+    const formData = new FormData(formElement)
     const values: Record<string, unknown> = {}
 
     for (const field of auth.additionalFields ?? []) {
@@ -136,7 +138,7 @@ export function SignUp(props: SignUpProps) {
           await field.validate(value)
         } catch (error) {
           toast.error(error instanceof Error ? error.message : String(error))
-          return
+          return false
         }
       }
 
@@ -146,7 +148,6 @@ export function SignUp(props: SignUpProps) {
     }
 
     additionalFieldValues = values
-    await form.handleSubmit()
   }
 
   return (
@@ -170,16 +171,59 @@ export function SignUp(props: SignUpProps) {
           </Show>
         </Show>
 
-        <form aria-label="Sign up" onSubmit={submitSignUp}>
-          <div class="flex flex-col gap-6">
-            <Show when={auth.emailAndPassword.name}>
+        <form.AppForm>
+          <form.AuthFormRoot aria-label="Sign up" prepareSubmit={prepareSubmit}>
+            <div class="flex flex-col gap-6">
+              <Show when={auth.emailAndPassword.name}>
+                <form.AppField
+                  name="name"
+                  validators={{
+                    onChange: ({ value }) =>
+                      validateStringLength(value, {
+                        requiredMessage: auth.localization.auth.fieldRequired,
+                        trim: true
+                      })
+                  }}
+                >
+                  {(field) => {
+                    const isInvalid = () =>
+                      isAuthFormFieldInvalid(field().state.meta)
+
+                    return (
+                      <Field data-invalid={isInvalid()}>
+                        <FieldLabel for="sign-up-name">
+                          {auth.localization.auth.name}
+                        </FieldLabel>
+                        <Input
+                          aria-invalid={isInvalid()}
+                          autocomplete="name"
+                          id="sign-up-name"
+                          name={field().name}
+                          onBlur={field().handleBlur}
+                          onInput={(event) =>
+                            field().handleChange(event.currentTarget.value)
+                          }
+                          placeholder={auth.localization.auth.namePlaceholder}
+                          required={auth.emailAndPassword.name}
+                          type="text"
+                          value={field().state.value}
+                        />
+
+                        <FieldError
+                          errors={getFormFieldErrors(field().state.meta.errors)}
+                        />
+                      </Field>
+                    )
+                  }}
+                </form.AppField>
+              </Show>
               <form.AppField
-                name="name"
+                name="email"
                 validators={{
                   onChange: ({ value }) =>
-                    validateStringLength(value, {
-                      requiredMessage: auth.localization.auth.fieldRequired,
-                      trim: true
+                    validateEmailAddress(value, {
+                      invalidMessage: auth.localization.auth.invalidEmail,
+                      requiredMessage: auth.localization.auth.fieldRequired
                     })
                 }}
               >
@@ -189,191 +233,45 @@ export function SignUp(props: SignUpProps) {
 
                   return (
                     <Field data-invalid={isInvalid()}>
-                      <FieldLabel for="sign-up-name">
-                        {auth.localization.auth.name}
+                      <FieldLabel for="sign-up-email">
+                        {auth.localization.auth.email}
                       </FieldLabel>
                       <Input
                         aria-invalid={isInvalid()}
-                        autocomplete="name"
-                        id="sign-up-name"
+                        autocomplete="email"
+                        id="sign-up-email"
                         name={field().name}
                         onBlur={field().handleBlur}
                         onInput={(event) =>
                           field().handleChange(event.currentTarget.value)
                         }
-                        placeholder={auth.localization.auth.namePlaceholder}
-                        required={auth.emailAndPassword.name}
-                        type="text"
+                        placeholder={auth.localization.auth.emailPlaceholder}
+                        required
+                        type="email"
                         value={field().state.value}
                       />
 
                       <FieldError
-                        errors={
-                          field().state.meta.errors as Array<
-                            FormFieldErrorValue | undefined
-                          >
-                        }
+                        errors={getFormFieldErrors(field().state.meta.errors)}
                       />
                     </Field>
                   )
                 }}
               </form.AppField>
-            </Show>
-            <form.AppField
-              name="email"
-              validators={{
-                onChange: ({ value }) =>
-                  validateEmailAddress(value, {
-                    invalidMessage: auth.localization.auth.invalidEmail,
-                    requiredMessage: auth.localization.auth.fieldRequired
-                  })
-              }}
-            >
-              {(field) => {
-                const isInvalid = () =>
-                  isAuthFormFieldInvalid(field().state.meta)
-
-                return (
-                  <Field data-invalid={isInvalid()}>
-                    <FieldLabel for="sign-up-email">
-                      {auth.localization.auth.email}
-                    </FieldLabel>
-                    <Input
-                      aria-invalid={isInvalid()}
-                      autocomplete="email"
-                      id="sign-up-email"
-                      name={field().name}
-                      onBlur={field().handleBlur}
-                      onInput={(event) =>
-                        field().handleChange(event.currentTarget.value)
-                      }
-                      placeholder={auth.localization.auth.emailPlaceholder}
-                      required
-                      type="email"
-                      value={field().state.value}
-                    />
-
-                    <FieldError
-                      errors={
-                        field().state.meta.errors as Array<
-                          FormFieldErrorValue | undefined
-                        >
-                      }
-                    />
-                  </Field>
-                )
-              }}
-            </form.AppField>
-            <For each={signUpFieldsAbove()}>
-              {(field) => (
-                <AdditionalField
-                  field={field}
-                  isPending={signUp.isPending}
-                  name={field.name}
-                  optionalLabel={auth.localization.auth.optional}
-                />
-              )}
-            </For>
-            <form.AppField
-              name="password"
-              validators={{
-                onChange: ({ value }) =>
-                  validateStringLength(value, {
-                    maxLength: auth.emailAndPassword.maxPasswordLength,
-                    maxLengthMessage: auth.localization.auth.tooLong.replace(
-                      "{{max}}",
-                      String(auth.emailAndPassword.maxPasswordLength)
-                    ),
-                    minLength: auth.emailAndPassword.minPasswordLength,
-                    minLengthMessage: auth.localization.auth.tooShort.replace(
-                      "{{min}}",
-                      String(auth.emailAndPassword.minPasswordLength)
-                    ),
-                    requiredMessage: auth.localization.auth.fieldRequired
-                  })
-              }}
-            >
-              {(field) => {
-                const isInvalid = () =>
-                  isAuthFormFieldInvalid(field().state.meta) ||
-                  Boolean(passwordError())
-
-                return (
-                  <Field data-invalid={isInvalid()}>
-                    <FieldLabel for="sign-up-password">
-                      {auth.localization.auth.password}
-                    </FieldLabel>
-                    <div class="relative">
-                      <Input
-                        aria-invalid={isInvalid()}
-                        autocomplete="new-password"
-                        class="pr-12"
-                        id="sign-up-password"
-                        maxLength={auth.emailAndPassword.maxPasswordLength}
-                        minLength={auth.emailAndPassword.minPasswordLength}
-                        name={field().name}
-                        onBlur={field().handleBlur}
-                        onInput={(event) => {
-                          field().handleChange(event.currentTarget.value)
-                          setPasswordError(undefined)
-                        }}
-                        placeholder={auth.localization.auth.passwordPlaceholder}
-                        required
-                        type={isPasswordVisible() ? "text" : "password"}
-                        value={field().state.value}
-                      />
-
-                      <Button
-                        aria-label={
-                          isPasswordVisible()
-                            ? auth.localization.auth.hidePassword
-                            : auth.localization.auth.showPassword
-                        }
-                        class="absolute right-1 top-1/2 -translate-y-1/2"
-                        onClick={() =>
-                          setIsPasswordVisible((visible) => !visible)
-                        }
-                        size="icon-sm"
-                        title={
-                          isPasswordVisible()
-                            ? auth.localization.auth.hidePassword
-                            : auth.localization.auth.showPassword
-                        }
-                        type="button"
-                        variant="ghost"
-                      >
-                        {isPasswordVisible() ? (
-                          <EyeOff aria-hidden class="size-4" />
-                        ) : (
-                          <Eye aria-hidden class="size-4" />
-                        )}
-                      </Button>
-                    </div>
-
-                    <Show when={passwordError()}>
-                      {(message) => <FieldError>{message()}</FieldError>}
-                    </Show>
-                    <Show when={!passwordError()}>
-                      <FieldError
-                        errors={
-                          field().state.meta.errors as Array<
-                            FormFieldErrorValue | undefined
-                          >
-                        }
-                      />
-                    </Show>
-
-                    <PasswordStrengthMeter password={field().state.value} />
-                  </Field>
-                )
-              }}
-            </form.AppField>
-            <Show when={auth.emailAndPassword.confirmPassword}>
+              <For each={signUpFieldsAbove()}>
+                {(field) => (
+                  <AdditionalField
+                    field={field}
+                    isPending={signUp.isPending}
+                    name={field.name}
+                    optionalLabel={auth.localization.auth.optional}
+                  />
+                )}
+              </For>
               <form.AppField
-                name="confirmPassword"
+                name="password"
                 validators={{
-                  onChangeListenTo: ["password"],
-                  onChange: ({ fieldApi, value }) =>
+                  onChange: ({ value }) =>
                     validateStringLength(value, {
                       maxLength: auth.emailAndPassword.maxPasswordLength,
                       maxLengthMessage: auth.localization.auth.tooLong.replace(
@@ -386,66 +284,61 @@ export function SignUp(props: SignUpProps) {
                         String(auth.emailAndPassword.minPasswordLength)
                       ),
                       requiredMessage: auth.localization.auth.fieldRequired
-                    }) ??
-                    validateMatchingValue(
-                      value,
-                      fieldApi.form.getFieldValue("password"),
-                      auth.localization.auth.passwordsDoNotMatch
-                    )
+                    })
                 }}
               >
                 {(field) => {
                   const isInvalid = () =>
-                    isAuthFormFieldInvalid(field().state.meta)
+                    isAuthFormFieldInvalid(field().state.meta) ||
+                    Boolean(passwordError())
 
                   return (
                     <Field data-invalid={isInvalid()}>
-                      <FieldLabel for="sign-up-confirm-password">
-                        {auth.localization.auth.confirmPassword}
+                      <FieldLabel for="sign-up-password">
+                        {auth.localization.auth.password}
                       </FieldLabel>
                       <div class="relative">
                         <Input
                           aria-invalid={isInvalid()}
                           autocomplete="new-password"
                           class="pr-12"
-                          id="sign-up-confirm-password"
+                          id="sign-up-password"
                           maxLength={auth.emailAndPassword.maxPasswordLength}
                           minLength={auth.emailAndPassword.minPasswordLength}
                           name={field().name}
                           onBlur={field().handleBlur}
-                          onInput={(event) =>
+                          onInput={(event) => {
                             field().handleChange(event.currentTarget.value)
-                          }
+                            setPasswordError(undefined)
+                          }}
                           placeholder={
-                            auth.localization.auth.confirmPasswordPlaceholder
+                            auth.localization.auth.passwordPlaceholder
                           }
                           required
-                          type={
-                            isConfirmPasswordVisible() ? "text" : "password"
-                          }
+                          type={isPasswordVisible() ? "text" : "password"}
                           value={field().state.value}
                         />
 
                         <Button
                           aria-label={
-                            isConfirmPasswordVisible()
+                            isPasswordVisible()
                               ? auth.localization.auth.hidePassword
                               : auth.localization.auth.showPassword
                           }
                           class="absolute right-1 top-1/2 -translate-y-1/2"
                           onClick={() =>
-                            setIsConfirmPasswordVisible((visible) => !visible)
+                            setIsPasswordVisible((visible) => !visible)
                           }
                           size="icon-sm"
                           title={
-                            isConfirmPasswordVisible()
+                            isPasswordVisible()
                               ? auth.localization.auth.hidePassword
                               : auth.localization.auth.showPassword
                           }
                           type="button"
                           variant="ghost"
                         >
-                          {isConfirmPasswordVisible() ? (
+                          {isPasswordVisible() ? (
                             <EyeOff aria-hidden class="size-4" />
                           ) : (
                             <Eye aria-hidden class="size-4" />
@@ -453,67 +346,153 @@ export function SignUp(props: SignUpProps) {
                         </Button>
                       </div>
 
-                      <FieldError
-                        errors={
-                          field().state.meta.errors as Array<
-                            FormFieldErrorValue | undefined
-                          >
-                        }
-                      />
+                      <Show when={passwordError()}>
+                        {(message) => <FieldError>{message()}</FieldError>}
+                      </Show>
+                      <Show when={!passwordError()}>
+                        <FieldError
+                          errors={getFormFieldErrors(field().state.meta.errors)}
+                        />
+                      </Show>
+
+                      <PasswordStrengthMeter password={field().state.value} />
                     </Field>
                   )
                 }}
               </form.AppField>
-            </Show>
-            <For each={signUpFieldsBelow()}>
-              {(field) => (
-                <AdditionalField
-                  field={field}
-                  isPending={signUp.isPending}
-                  name={field.name}
-                  optionalLabel={auth.localization.auth.optional}
-                />
-              )}
-            </For>
-            <Show when={captchaComponent()} keyed>
-              {(Captcha) => <Captcha />}
-            </Show>
-            <form.Subscribe
-              selector={(state) =>
-                [state.canSubmit, state.isSubmitting] as const
-              }
-            >
-              {(formState) => (
-                <Button
-                  disabled={
-                    !formState()[0] || formState()[1] || signUp.isPending
-                  }
-                  type="submit"
+              <Show when={auth.emailAndPassword.confirmPassword}>
+                <form.AppField
+                  name="confirmPassword"
+                  validators={{
+                    onChangeListenTo: ["password"],
+                    onChange: ({ fieldApi, value }) =>
+                      validateStringLength(value, {
+                        maxLength: auth.emailAndPassword.maxPasswordLength,
+                        maxLengthMessage:
+                          auth.localization.auth.tooLong.replace(
+                            "{{max}}",
+                            String(auth.emailAndPassword.maxPasswordLength)
+                          ),
+                        minLength: auth.emailAndPassword.minPasswordLength,
+                        minLengthMessage:
+                          auth.localization.auth.tooShort.replace(
+                            "{{min}}",
+                            String(auth.emailAndPassword.minPasswordLength)
+                          ),
+                        requiredMessage: auth.localization.auth.fieldRequired
+                      }) ??
+                      validateMatchingValue(
+                        value,
+                        fieldApi.form.getFieldValue("password"),
+                        auth.localization.auth.passwordsDoNotMatch
+                      )
+                  }}
                 >
-                  {formState()[1] || signUp.isPending
-                    ? `${auth.localization.auth.signUp}…`
-                    : auth.localization.auth.signUp}
-                </Button>
-              )}
-            </form.Subscribe>
-            <Show when={signUp.isSuccess}>
-              <Alert>
-                <AlertDescription role="status">
-                  Account created. Check your email if verification is required.
-                </AlertDescription>
-              </Alert>
-            </Show>
-            <Show
-              when={signUp.isError && !isPasswordCompromisedError(signUp.error)}
-            >
-              <Alert variant="destructive">
-                <AlertDescription>
-                  Unable to create an account. Try again.
-                </AlertDescription>
-              </Alert>
-            </Show>
-          </div>
-        </form>
+                  {(field) => {
+                    const isInvalid = () =>
+                      isAuthFormFieldInvalid(field().state.meta)
+
+                    return (
+                      <Field data-invalid={isInvalid()}>
+                        <FieldLabel for="sign-up-confirm-password">
+                          {auth.localization.auth.confirmPassword}
+                        </FieldLabel>
+                        <div class="relative">
+                          <Input
+                            aria-invalid={isInvalid()}
+                            autocomplete="new-password"
+                            class="pr-12"
+                            id="sign-up-confirm-password"
+                            maxLength={auth.emailAndPassword.maxPasswordLength}
+                            minLength={auth.emailAndPassword.minPasswordLength}
+                            name={field().name}
+                            onBlur={field().handleBlur}
+                            onInput={(event) =>
+                              field().handleChange(event.currentTarget.value)
+                            }
+                            placeholder={
+                              auth.localization.auth.confirmPasswordPlaceholder
+                            }
+                            required
+                            type={
+                              isConfirmPasswordVisible() ? "text" : "password"
+                            }
+                            value={field().state.value}
+                          />
+
+                          <Button
+                            aria-label={
+                              isConfirmPasswordVisible()
+                                ? auth.localization.auth.hidePassword
+                                : auth.localization.auth.showPassword
+                            }
+                            class="absolute right-1 top-1/2 -translate-y-1/2"
+                            onClick={() =>
+                              setIsConfirmPasswordVisible((visible) => !visible)
+                            }
+                            size="icon-sm"
+                            title={
+                              isConfirmPasswordVisible()
+                                ? auth.localization.auth.hidePassword
+                                : auth.localization.auth.showPassword
+                            }
+                            type="button"
+                            variant="ghost"
+                          >
+                            {isConfirmPasswordVisible() ? (
+                              <EyeOff aria-hidden class="size-4" />
+                            ) : (
+                              <Eye aria-hidden class="size-4" />
+                            )}
+                          </Button>
+                        </div>
+
+                        <FieldError
+                          errors={getFormFieldErrors(field().state.meta.errors)}
+                        />
+                      </Field>
+                    )
+                  }}
+                </form.AppField>
+              </Show>
+              <For each={signUpFieldsBelow()}>
+                {(field) => (
+                  <AdditionalField
+                    field={field}
+                    isPending={signUp.isPending}
+                    name={field.name}
+                    optionalLabel={auth.localization.auth.optional}
+                  />
+                )}
+              </For>
+              <Show when={captchaComponent()} keyed>
+                {(Captcha) => <Captcha />}
+              </Show>
+              <form.AuthFormSubmitButton disabled={signUp.isPending}>
+                {auth.localization.auth.signUp}
+              </form.AuthFormSubmitButton>
+              <Show when={signUp.isSuccess}>
+                <Alert>
+                  <AlertDescription role="status">
+                    Account created. Check your email if verification is
+                    required.
+                  </AlertDescription>
+                </Alert>
+              </Show>
+              <Show
+                when={
+                  signUp.isError && !isPasswordCompromisedError(signUp.error)
+                }
+              >
+                <Alert variant="destructive">
+                  <AlertDescription>
+                    Unable to create an account. Try again.
+                  </AlertDescription>
+                </Alert>
+              </Show>
+            </div>
+          </form.AuthFormRoot>
+        </form.AppForm>
 
         <Show
           when={socialPosition() === "bottom" && auth.socialProviders?.length}

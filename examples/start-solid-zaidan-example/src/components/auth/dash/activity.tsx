@@ -1,3 +1,4 @@
+import { getClampedTablePageIndex } from "@better-auth-ui/core"
 import {
   type DashAuditLog,
   type DashAuthClient,
@@ -302,6 +303,19 @@ function ActivityFeed(props: ActivityFeedProps) {
         : userQuery
   const showPending = () => !(props.ready ?? true) || query().isPending
   const pageEnd = () => offset() + (query().data?.events.length ?? 0)
+
+  createEffect(() => {
+    if (!(props.ready ?? true) || !query().isSuccess) return
+    const current = pagination()
+    const pageIndex = getClampedTablePageIndex(
+      current.pageIndex,
+      current.pageSize,
+      query().data?.total ?? 0
+    )
+    if (pageIndex !== current.pageIndex) {
+      setPaginationState({ ...current, pageIndex })
+    }
+  })
   const setPagination = (updater: Updater<PaginationState>) =>
     setPaginationState((current) => functionalUpdate(updater, current))
   const setColumnFilters = (updater: Updater<ColumnFiltersState>) => {

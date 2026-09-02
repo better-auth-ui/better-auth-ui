@@ -27,7 +27,6 @@ import {
   Chip,
   cn,
   FieldError,
-  Form,
   Input,
   Label,
   Skeleton,
@@ -332,105 +331,169 @@ function EditSsoProviderDialog({
     >
       <AlertDialog.Container>
         <AlertDialog.Dialog className="max-w-xl">
-          <Form
-            onSubmit={(event) => {
-              event.preventDefault()
-              void form.handleSubmit()
-            }}
-          >
-            <AlertDialog.CloseTrigger />
-            <AlertDialog.Header>
-              <AlertDialog.Heading>
-                {localization.editProvider}
-              </AlertDialog.Heading>
-            </AlertDialog.Header>
-            <AlertDialog.Body className="flex flex-col gap-4 overflow-visible">
-              <form.AppField
-                name="domain"
-                validators={{
-                  onChange: ({ value }) =>
-                    validateStringLength(value, {
-                      requiredMessage: authLocalization.auth.fieldRequired,
-                      trim: true
-                    })
-                }}
-              >
-                {(field) => (
-                  <TextField
-                    isInvalid={
-                      isAuthFormFieldInvalid(field.state.meta) || undefined
-                    }
-                    isRequired
-                    name={field.name}
-                    onBlur={field.handleBlur}
-                    onChange={field.handleChange}
-                    value={field.state.value}
-                    validationBehavior="aria"
-                  >
-                    <Label>{localization.domain}</Label>
-                    <Input variant="secondary" />
-                    <field.AuthFormFieldError />
-                  </TextField>
-                )}
-              </form.AppField>
-              <form.AppField
-                name="issuer"
-                validators={{
-                  onChange: ({ value }) =>
-                    validateAbsoluteUrl(value, {
-                      invalidMessage: localization.invalidUrl,
-                      requiredMessage: authLocalization.auth.fieldRequired
-                    })
-                }}
-              >
-                {(field) => (
-                  <TextField
-                    isInvalid={
-                      isAuthFormFieldInvalid(field.state.meta) || undefined
-                    }
-                    isRequired
-                    name={field.name}
-                    onBlur={field.handleBlur}
-                    onChange={field.handleChange}
-                    value={field.state.value}
-                    validationBehavior="aria"
-                  >
-                    <Label>{localization.issuer}</Label>
-                    <Input type="url" variant="secondary" />
-                    <field.AuthFormFieldError />
-                  </TextField>
-                )}
-              </form.AppField>
-              {provider?.oidcConfig ? (
-                <>
-                  <form.AppField
-                    name="discoveryEndpoint"
-                    validators={{
-                      onChange: ({ value }) =>
-                        validateAbsoluteUrl(value, {
-                          invalidMessage: localization.invalidUrl
-                        })
-                    }}
-                  >
-                    {(field) => (
-                      <TextField
-                        isInvalid={
-                          isAuthFormFieldInvalid(field.state.meta) || undefined
-                        }
-                        name={field.name}
-                        onBlur={field.handleBlur}
-                        onChange={field.handleChange}
-                        value={field.state.value}
-                        validationBehavior="aria"
-                      >
-                        <Label>{localization.discoveryEndpoint}</Label>
-                        <Input type="url" variant="secondary" />
-                        <field.AuthFormFieldError />
-                      </TextField>
-                    )}
-                  </form.AppField>
-                  <div className="grid gap-4 sm:grid-cols-2">
-                    <form.Field name="clientId">
+          <form.AppForm>
+            <form.AuthFormRoot>
+              <AlertDialog.CloseTrigger />
+              <AlertDialog.Header>
+                <AlertDialog.Heading>
+                  {localization.editProvider}
+                </AlertDialog.Heading>
+              </AlertDialog.Header>
+              <AlertDialog.Body className="flex flex-col gap-4 overflow-visible">
+                <form.AppField
+                  name="domain"
+                  validators={{
+                    onChange: ({ value }) =>
+                      validateStringLength(value, {
+                        requiredMessage: authLocalization.auth.fieldRequired,
+                        trim: true
+                      })
+                  }}
+                >
+                  {(field) => (
+                    <TextField
+                      isInvalid={
+                        isAuthFormFieldInvalid(field.state.meta) || undefined
+                      }
+                      isRequired
+                      name={field.name}
+                      onBlur={field.handleBlur}
+                      onChange={field.handleChange}
+                      value={field.state.value}
+                      validationBehavior="aria"
+                    >
+                      <Label>{localization.domain}</Label>
+                      <Input variant="secondary" />
+                      <field.AuthFormFieldError />
+                    </TextField>
+                  )}
+                </form.AppField>
+                <form.AppField
+                  name="issuer"
+                  validators={{
+                    onChange: ({ value }) =>
+                      validateAbsoluteUrl(value, {
+                        invalidMessage: localization.invalidUrl,
+                        requiredMessage: authLocalization.auth.fieldRequired
+                      })
+                  }}
+                >
+                  {(field) => (
+                    <TextField
+                      isInvalid={
+                        isAuthFormFieldInvalid(field.state.meta) || undefined
+                      }
+                      isRequired
+                      name={field.name}
+                      onBlur={field.handleBlur}
+                      onChange={field.handleChange}
+                      value={field.state.value}
+                      validationBehavior="aria"
+                    >
+                      <Label>{localization.issuer}</Label>
+                      <Input type="url" variant="secondary" />
+                      <field.AuthFormFieldError />
+                    </TextField>
+                  )}
+                </form.AppField>
+                {provider?.oidcConfig ? (
+                  <>
+                    <form.AppField
+                      name="discoveryEndpoint"
+                      validators={{
+                        onChange: ({ value }) =>
+                          validateAbsoluteUrl(value, {
+                            invalidMessage: localization.invalidUrl
+                          })
+                      }}
+                    >
+                      {(field) => (
+                        <TextField
+                          isInvalid={
+                            isAuthFormFieldInvalid(field.state.meta) ||
+                            undefined
+                          }
+                          name={field.name}
+                          onBlur={field.handleBlur}
+                          onChange={field.handleChange}
+                          value={field.state.value}
+                          validationBehavior="aria"
+                        >
+                          <Label>{localization.discoveryEndpoint}</Label>
+                          <Input type="url" variant="secondary" />
+                          <field.AuthFormFieldError />
+                        </TextField>
+                      )}
+                    </form.AppField>
+                    <div className="grid gap-4 sm:grid-cols-2">
+                      <form.Field name="clientId">
+                        {(field) => (
+                          <TextField
+                            name={field.name}
+                            onBlur={field.handleBlur}
+                            onChange={field.handleChange}
+                            value={field.state.value}
+                          >
+                            <Label>{localization.clientId}</Label>
+                            <Input
+                              placeholder={`••••${provider.oidcConfig?.clientIdLastFour}`}
+                              variant="secondary"
+                            />
+                          </TextField>
+                        )}
+                      </form.Field>
+                      <form.Field name="clientSecret">
+                        {(field) => (
+                          <TextField
+                            name={field.name}
+                            onBlur={field.handleBlur}
+                            onChange={field.handleChange}
+                            type="password"
+                            value={field.state.value}
+                          >
+                            <Label>{localization.clientSecret}</Label>
+                            <Input
+                              autoComplete="new-password"
+                              variant="secondary"
+                            />
+                          </TextField>
+                        )}
+                      </form.Field>
+                    </div>
+                  </>
+                ) : null}
+                {provider?.samlConfig ? (
+                  <>
+                    <form.AppField
+                      name="entryPoint"
+                      validators={{
+                        onChange: ({ value }) =>
+                          validateAbsoluteUrl(value, {
+                            invalidMessage: localization.invalidUrl,
+                            requiredMessage: authLocalization.auth.fieldRequired
+                          })
+                      }}
+                    >
+                      {(field) => (
+                        <TextField
+                          isInvalid={
+                            isAuthFormFieldInvalid(field.state.meta) ||
+                            undefined
+                          }
+                          isRequired
+                          name={field.name}
+                          onBlur={field.handleBlur}
+                          onChange={field.handleChange}
+                          value={field.state.value}
+                          validationBehavior="aria"
+                        >
+                          <Label>{localization.entryPoint}</Label>
+                          <Input type="url" variant="secondary" />
+                          <field.AuthFormFieldError />
+                        </TextField>
+                      )}
+                    </form.AppField>
+                    <form.Field name="identityProviderMetadata">
                       {(field) => (
                         <TextField
                           name={field.name}
@@ -438,108 +501,31 @@ function EditSsoProviderDialog({
                           onChange={field.handleChange}
                           value={field.state.value}
                         >
-                          <Label>{localization.clientId}</Label>
-                          <Input
-                            placeholder={`••••${provider.oidcConfig?.clientIdLastFour}`}
-                            variant="secondary"
-                          />
+                          <Label>{localization.identityProviderMetadata}</Label>
+                          <TextArea className="font-mono text-xs" rows={6} />
                         </TextField>
                       )}
                     </form.Field>
-                    <form.Field name="clientSecret">
-                      {(field) => (
-                        <TextField
-                          name={field.name}
-                          onBlur={field.handleBlur}
-                          onChange={field.handleChange}
-                          type="password"
-                          value={field.state.value}
-                        >
-                          <Label>{localization.clientSecret}</Label>
-                          <Input
-                            autoComplete="new-password"
-                            variant="secondary"
-                          />
-                        </TextField>
-                      )}
-                    </form.Field>
-                  </div>
-                </>
-              ) : null}
-              {provider?.samlConfig ? (
-                <>
-                  <form.AppField
-                    name="entryPoint"
-                    validators={{
-                      onChange: ({ value }) =>
-                        validateAbsoluteUrl(value, {
-                          invalidMessage: localization.invalidUrl,
-                          requiredMessage: authLocalization.auth.fieldRequired
-                        })
-                    }}
-                  >
-                    {(field) => (
-                      <TextField
-                        isInvalid={
-                          isAuthFormFieldInvalid(field.state.meta) || undefined
-                        }
-                        isRequired
-                        name={field.name}
-                        onBlur={field.handleBlur}
-                        onChange={field.handleChange}
-                        value={field.state.value}
-                        validationBehavior="aria"
-                      >
-                        <Label>{localization.entryPoint}</Label>
-                        <Input type="url" variant="secondary" />
-                        <field.AuthFormFieldError />
-                      </TextField>
-                    )}
-                  </form.AppField>
-                  <form.Field name="identityProviderMetadata">
-                    {(field) => (
-                      <TextField
-                        name={field.name}
-                        onBlur={field.handleBlur}
-                        onChange={field.handleChange}
-                        value={field.state.value}
-                      >
-                        <Label>{localization.identityProviderMetadata}</Label>
-                        <TextArea className="font-mono text-xs" rows={6} />
-                      </TextField>
-                    )}
-                  </form.Field>
-                </>
-              ) : null}
-              {update.error ? (
-                <FieldError>{getErrorMessage(update.error)}</FieldError>
-              ) : null}
-            </AlertDialog.Body>
-            <AlertDialog.Footer>
-              <Button
-                isDisabled={update.isPending}
-                slot="close"
-                variant="tertiary"
-              >
-                {localization.cancel}
-              </Button>
-              <form.Subscribe
-                selector={(state) =>
-                  [state.canSubmit, state.isSubmitting] as const
-                }
-              >
-                {([canSubmit, isSubmitting]) => (
-                  <Button
-                    isDisabled={!canSubmit}
-                    isPending={isSubmitting}
-                    type="submit"
-                  >
-                    {localization.saveProvider}
-                  </Button>
-                )}
-              </form.Subscribe>
-            </AlertDialog.Footer>
-          </Form>
+                  </>
+                ) : null}
+                {update.error ? (
+                  <FieldError>{getErrorMessage(update.error)}</FieldError>
+                ) : null}
+              </AlertDialog.Body>
+              <AlertDialog.Footer>
+                <Button
+                  isDisabled={update.isPending}
+                  slot="close"
+                  variant="tertiary"
+                >
+                  {localization.cancel}
+                </Button>
+                <form.AuthFormSubmitButton isDisabled={update.isPending}>
+                  {localization.saveProvider}
+                </form.AuthFormSubmitButton>
+              </AlertDialog.Footer>
+            </form.AuthFormRoot>
+          </form.AppForm>
         </AlertDialog.Dialog>
       </AlertDialog.Container>
     </AlertDialog.Backdrop>

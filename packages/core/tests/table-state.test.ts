@@ -1,11 +1,14 @@
 import { describe, expect, it } from "vitest"
 import {
+  getClampedTablePageIndex,
   getLookaheadPage,
   parseTableColumnVisibility,
+  parseTableFilterValue,
   parseTablePage,
   parseTablePageSize,
   parseTableSorting,
-  serializeTableColumnVisibility
+  serializeTableColumnVisibility,
+  serializeTableFilterValue
 } from "../src/lib/table-state"
 
 describe("table state", () => {
@@ -40,6 +43,16 @@ describe("table state", () => {
     expect(parseTableColumnVisibility('{"email":"false"}')).toEqual({})
   })
 
+  it("round trips scalar and multi-value filters without changing legacy strings", () => {
+    expect(parseTableFilterValue("admin")).toBe("admin")
+    expect(
+      parseTableFilterValue(serializeTableFilterValue(["admin", "owner"]) ?? "")
+    ).toEqual(["admin", "owner"])
+    expect(parseTableFilterValue(serializeTableFilterValue(7) ?? "")).toBe(7)
+    expect(serializeTableFilterValue({ role: "admin" })).toBeUndefined()
+    expect(parseTableFilterValue("~not-json")).toBe("~not-json")
+  })
+
   it("splits a lookahead response into visible rows and next-page state", () => {
     expect(getLookaheadPage([1, 2, 3], 2)).toEqual({
       hasNextPage: true,
@@ -49,5 +62,12 @@ describe("table state", () => {
       hasNextPage: false,
       rows: [1, 2]
     })
+  })
+
+  it("clamps pagination after the result count shrinks", () => {
+    expect(getClampedTablePageIndex(2, 10, 35)).toBe(2)
+    expect(getClampedTablePageIndex(3, 10, 21)).toBe(2)
+    expect(getClampedTablePageIndex(1, 10, 0)).toBe(0)
+    expect(getClampedTablePageIndex(-2, 0, -1)).toBe(0)
   })
 })

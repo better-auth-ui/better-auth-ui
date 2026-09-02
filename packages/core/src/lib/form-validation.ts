@@ -24,8 +24,15 @@ export function createFormFieldError(
 export function getFormFieldErrorMessage(
   errors: readonly unknown[]
 ): string | undefined {
-  for (const error of errors) {
-    if (typeof error === "string" && error) return error
+  return getFormFieldErrors(errors)[0]?.message
+}
+
+/** Normalizes the error shapes accepted by TanStack Form field validators. */
+export function getFormFieldErrors(
+  errors: readonly unknown[]
+): FormFieldError[] {
+  return errors.flatMap((error) => {
+    if (typeof error === "string" && error) return [{ message: error }]
 
     if (
       error &&
@@ -34,8 +41,10 @@ export function getFormFieldErrorMessage(
       typeof error.message === "string" &&
       error.message
     )
-      return error.message
-  }
+      return [{ message: error.message }]
+
+    return []
+  })
 }
 
 export function validateStringLength(

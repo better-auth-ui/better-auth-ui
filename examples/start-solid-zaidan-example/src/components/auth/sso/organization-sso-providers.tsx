@@ -61,7 +61,6 @@ import {
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import { Skeleton } from "@/components/ui/skeleton"
-import { Spinner } from "@/components/ui/spinner"
 import { Textarea } from "@/components/ui/textarea"
 import { organizationPlugin } from "@/lib/auth/organization-plugin"
 import { ssoPlugin } from "@/lib/auth/sso-plugin"
@@ -371,173 +370,52 @@ function EditSsoProviderDialog(props: {
       }}
     >
       <DialogContent class="max-h-[90vh] max-w-xl overflow-y-auto">
-        <form
-          class="flex flex-col gap-4"
-          onSubmit={(event) => {
-            event.preventDefault()
-            void form.handleSubmit()
-          }}
-        >
-          <DialogHeader>
-            <DialogTitle>{localization.editProvider}</DialogTitle>
-            <DialogDescription>{props.provider?.providerId}</DialogDescription>
-          </DialogHeader>
-          <FieldGroup>
-            <form.AppField
-              name="domain"
-              validators={{
-                onChange: ({ value }) =>
-                  validateStringLength(value, {
-                    requiredMessage: auth.localization.auth.fieldRequired,
-                    trim: true
-                  })
-              }}
-            >
-              {(field) => {
-                const isInvalid = () =>
-                  isAuthFormFieldInvalid(field().state.meta)
-
-                return (
-                  <Field data-invalid={isInvalid()}>
-                    <FieldLabel for="solid-sso-edit-domain">
-                      {localization.domain}
-                    </FieldLabel>
-                    <Input
-                      id="solid-sso-edit-domain"
-                      name={field().name}
-                      onBlur={field().handleBlur}
-                      onInput={(event) =>
-                        field().handleChange(event.currentTarget.value)
-                      }
-                      required
-                      value={field().state.value}
-                      aria-invalid={isInvalid()}
-                    />
-                    <field.AuthFormFieldError />
-                  </Field>
-                )
-              }}
-            </form.AppField>
-            <form.AppField
-              name="issuer"
-              validators={{
-                onChange: ({ value }) =>
-                  validateAbsoluteUrl(value, {
-                    invalidMessage: localization.invalidUrl,
-                    requiredMessage: auth.localization.auth.fieldRequired
-                  })
-              }}
-            >
-              {(field) => {
-                const isInvalid = () =>
-                  isAuthFormFieldInvalid(field().state.meta)
-
-                return (
-                  <Field data-invalid={isInvalid()}>
-                    <FieldLabel for="solid-sso-edit-issuer">
-                      {localization.issuer}
-                    </FieldLabel>
-                    <Input
-                      id="solid-sso-edit-issuer"
-                      name={field().name}
-                      onBlur={field().handleBlur}
-                      onInput={(event) =>
-                        field().handleChange(event.currentTarget.value)
-                      }
-                      required
-                      type="url"
-                      value={field().state.value}
-                      aria-invalid={isInvalid()}
-                    />
-                    <field.AuthFormFieldError />
-                  </Field>
-                )
-              }}
-            </form.AppField>
-            <Show when={props.provider?.oidcConfig}>
-              {(oidc) => (
-                <>
-                  <form.AppField
-                    name="discoveryEndpoint"
-                    validators={{
-                      onChange: ({ value }) =>
-                        validateAbsoluteUrl(value, {
-                          invalidMessage: localization.invalidUrl
-                        })
-                    }}
-                  >
-                    {(field) => {
-                      const isInvalid = () =>
-                        isAuthFormFieldInvalid(field().state.meta)
-
-                      return (
-                        <Field data-invalid={isInvalid()}>
-                          <FieldLabel for="solid-sso-edit-discovery">
-                            {localization.discoveryEndpoint}
-                          </FieldLabel>
-                          <Input
-                            id="solid-sso-edit-discovery"
-                            name={field().name}
-                            onBlur={field().handleBlur}
-                            onInput={(event) =>
-                              field().handleChange(event.currentTarget.value)
-                            }
-                            type="url"
-                            value={field().state.value}
-                            aria-invalid={isInvalid()}
-                          />
-                          <field.AuthFormFieldError />
-                        </Field>
-                      )
-                    }}
-                  </form.AppField>
-                  <div class="grid gap-4 sm:grid-cols-2">
-                    <form.Field name="clientId">
-                      {(field) => (
-                        <Field>
-                          <FieldLabel for="solid-sso-edit-client-id">
-                            {localization.clientId}
-                          </FieldLabel>
-                          <Input
-                            id="solid-sso-edit-client-id"
-                            name={field().name}
-                            onBlur={field().handleBlur}
-                            onInput={(event) =>
-                              field().handleChange(event.currentTarget.value)
-                            }
-                            placeholder={`••••${oidc().clientIdLastFour}`}
-                            value={field().state.value}
-                          />
-                        </Field>
-                      )}
-                    </form.Field>
-                    <form.Field name="clientSecret">
-                      {(field) => (
-                        <Field>
-                          <FieldLabel for="solid-sso-edit-client-secret">
-                            {localization.clientSecret}
-                          </FieldLabel>
-                          <Input
-                            autocomplete="new-password"
-                            id="solid-sso-edit-client-secret"
-                            name={field().name}
-                            onBlur={field().handleBlur}
-                            onInput={(event) =>
-                              field().handleChange(event.currentTarget.value)
-                            }
-                            type="password"
-                            value={field().state.value}
-                          />
-                        </Field>
-                      )}
-                    </form.Field>
-                  </div>
-                </>
-              )}
-            </Show>
-            <Show when={props.provider?.samlConfig}>
+        <form.AppForm>
+          <form.AuthFormRoot class="flex flex-col gap-4">
+            <DialogHeader>
+              <DialogTitle>{localization.editProvider}</DialogTitle>
+              <DialogDescription>
+                {props.provider?.providerId}
+              </DialogDescription>
+            </DialogHeader>
+            <FieldGroup>
               <form.AppField
-                name="entryPoint"
+                name="domain"
+                validators={{
+                  onChange: ({ value }) =>
+                    validateStringLength(value, {
+                      requiredMessage: auth.localization.auth.fieldRequired,
+                      trim: true
+                    })
+                }}
+              >
+                {(field) => {
+                  const isInvalid = () =>
+                    isAuthFormFieldInvalid(field().state.meta)
+
+                  return (
+                    <Field data-invalid={isInvalid()}>
+                      <FieldLabel for="solid-sso-edit-domain">
+                        {localization.domain}
+                      </FieldLabel>
+                      <Input
+                        id="solid-sso-edit-domain"
+                        name={field().name}
+                        onBlur={field().handleBlur}
+                        onInput={(event) =>
+                          field().handleChange(event.currentTarget.value)
+                        }
+                        required
+                        value={field().state.value}
+                        aria-invalid={isInvalid()}
+                      />
+                      <field.AuthFormFieldError />
+                    </Field>
+                  )
+                }}
+              </form.AppField>
+              <form.AppField
+                name="issuer"
                 validators={{
                   onChange: ({ value }) =>
                     validateAbsoluteUrl(value, {
@@ -552,11 +430,11 @@ function EditSsoProviderDialog(props: {
 
                   return (
                     <Field data-invalid={isInvalid()}>
-                      <FieldLabel for="solid-sso-edit-entry-point">
-                        {localization.entryPoint}
+                      <FieldLabel for="solid-sso-edit-issuer">
+                        {localization.issuer}
                       </FieldLabel>
                       <Input
-                        id="solid-sso-edit-entry-point"
+                        id="solid-sso-edit-issuer"
                         name={field().name}
                         onBlur={field().handleBlur}
                         onInput={(event) =>
@@ -572,57 +450,162 @@ function EditSsoProviderDialog(props: {
                   )
                 }}
               </form.AppField>
-              <form.Field name="identityProviderMetadata">
-                {(field) => (
-                  <Field>
-                    <FieldLabel for="solid-sso-edit-metadata">
-                      {localization.identityProviderMetadata}
-                    </FieldLabel>
-                    <Textarea
-                      class="font-mono text-xs"
-                      id="solid-sso-edit-metadata"
-                      name={field().name}
-                      onBlur={field().handleBlur}
-                      onInput={(event) =>
-                        field().handleChange(event.currentTarget.value)
-                      }
-                      rows={6}
-                      value={field().state.value}
-                    />
-                  </Field>
+              <Show when={props.provider?.oidcConfig}>
+                {(oidc) => (
+                  <>
+                    <form.AppField
+                      name="discoveryEndpoint"
+                      validators={{
+                        onChange: ({ value }) =>
+                          validateAbsoluteUrl(value, {
+                            invalidMessage: localization.invalidUrl
+                          })
+                      }}
+                    >
+                      {(field) => {
+                        const isInvalid = () =>
+                          isAuthFormFieldInvalid(field().state.meta)
+
+                        return (
+                          <Field data-invalid={isInvalid()}>
+                            <FieldLabel for="solid-sso-edit-discovery">
+                              {localization.discoveryEndpoint}
+                            </FieldLabel>
+                            <Input
+                              id="solid-sso-edit-discovery"
+                              name={field().name}
+                              onBlur={field().handleBlur}
+                              onInput={(event) =>
+                                field().handleChange(event.currentTarget.value)
+                              }
+                              type="url"
+                              value={field().state.value}
+                              aria-invalid={isInvalid()}
+                            />
+                            <field.AuthFormFieldError />
+                          </Field>
+                        )
+                      }}
+                    </form.AppField>
+                    <div class="grid gap-4 sm:grid-cols-2">
+                      <form.Field name="clientId">
+                        {(field) => (
+                          <Field>
+                            <FieldLabel for="solid-sso-edit-client-id">
+                              {localization.clientId}
+                            </FieldLabel>
+                            <Input
+                              id="solid-sso-edit-client-id"
+                              name={field().name}
+                              onBlur={field().handleBlur}
+                              onInput={(event) =>
+                                field().handleChange(event.currentTarget.value)
+                              }
+                              placeholder={`••••${oidc().clientIdLastFour}`}
+                              value={field().state.value}
+                            />
+                          </Field>
+                        )}
+                      </form.Field>
+                      <form.Field name="clientSecret">
+                        {(field) => (
+                          <Field>
+                            <FieldLabel for="solid-sso-edit-client-secret">
+                              {localization.clientSecret}
+                            </FieldLabel>
+                            <Input
+                              autocomplete="new-password"
+                              id="solid-sso-edit-client-secret"
+                              name={field().name}
+                              onBlur={field().handleBlur}
+                              onInput={(event) =>
+                                field().handleChange(event.currentTarget.value)
+                              }
+                              type="password"
+                              value={field().state.value}
+                            />
+                          </Field>
+                        )}
+                      </form.Field>
+                    </div>
+                  </>
                 )}
-              </form.Field>
-            </Show>
-          </FieldGroup>
-          <FieldError>{getErrorMessage(update.error)}</FieldError>
-          <DialogFooter>
-            <Button
-              disabled={update.isPending}
-              onClick={close}
-              type="button"
-              variant="outline"
-            >
-              {localization.cancel}
-            </Button>
-            <form.Subscribe
-              selector={(state) =>
-                [state.canSubmit, state.isSubmitting] as const
-              }
-            >
-              {(formState) => (
-                <Button
-                  disabled={!formState()[0] || formState()[1]}
-                  type="submit"
+              </Show>
+              <Show when={props.provider?.samlConfig}>
+                <form.AppField
+                  name="entryPoint"
+                  validators={{
+                    onChange: ({ value }) =>
+                      validateAbsoluteUrl(value, {
+                        invalidMessage: localization.invalidUrl,
+                        requiredMessage: auth.localization.auth.fieldRequired
+                      })
+                  }}
                 >
-                  <Show when={formState()[1]}>
-                    <Spinner />
-                  </Show>
-                  {localization.saveProvider}
-                </Button>
-              )}
-            </form.Subscribe>
-          </DialogFooter>
-        </form>
+                  {(field) => {
+                    const isInvalid = () =>
+                      isAuthFormFieldInvalid(field().state.meta)
+
+                    return (
+                      <Field data-invalid={isInvalid()}>
+                        <FieldLabel for="solid-sso-edit-entry-point">
+                          {localization.entryPoint}
+                        </FieldLabel>
+                        <Input
+                          id="solid-sso-edit-entry-point"
+                          name={field().name}
+                          onBlur={field().handleBlur}
+                          onInput={(event) =>
+                            field().handleChange(event.currentTarget.value)
+                          }
+                          required
+                          type="url"
+                          value={field().state.value}
+                          aria-invalid={isInvalid()}
+                        />
+                        <field.AuthFormFieldError />
+                      </Field>
+                    )
+                  }}
+                </form.AppField>
+                <form.Field name="identityProviderMetadata">
+                  {(field) => (
+                    <Field>
+                      <FieldLabel for="solid-sso-edit-metadata">
+                        {localization.identityProviderMetadata}
+                      </FieldLabel>
+                      <Textarea
+                        class="font-mono text-xs"
+                        id="solid-sso-edit-metadata"
+                        name={field().name}
+                        onBlur={field().handleBlur}
+                        onInput={(event) =>
+                          field().handleChange(event.currentTarget.value)
+                        }
+                        rows={6}
+                        value={field().state.value}
+                      />
+                    </Field>
+                  )}
+                </form.Field>
+              </Show>
+            </FieldGroup>
+            <FieldError>{getErrorMessage(update.error)}</FieldError>
+            <DialogFooter>
+              <Button
+                disabled={update.isPending}
+                onClick={close}
+                type="button"
+                variant="outline"
+              >
+                {localization.cancel}
+              </Button>
+              <form.AuthFormSubmitButton disabled={update.isPending}>
+                {localization.saveProvider}
+              </form.AuthFormSubmitButton>
+            </DialogFooter>
+          </form.AuthFormRoot>
+        </form.AppForm>
       </DialogContent>
     </Dialog>
   )
