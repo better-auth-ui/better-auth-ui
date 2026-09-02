@@ -49,6 +49,9 @@ describe("table state", () => {
       parseTableFilterValue(serializeTableFilterValue(["admin", "owner"]) ?? "")
     ).toEqual(["admin", "owner"])
     expect(parseTableFilterValue(serializeTableFilterValue(7) ?? "")).toBe(7)
+    expect(parseTableFilterValue(serializeTableFilterValue("~7") ?? "")).toBe(
+      "~7"
+    )
     expect(serializeTableFilterValue({ role: "admin" })).toBeUndefined()
     expect(parseTableFilterValue("~not-json")).toBe("~not-json")
   })
@@ -69,5 +72,20 @@ describe("table state", () => {
     expect(getClampedTablePageIndex(3, 10, 21)).toBe(2)
     expect(getClampedTablePageIndex(1, 10, 0)).toBe(0)
     expect(getClampedTablePageIndex(-2, 0, -1)).toBe(0)
+  })
+
+  it("uses finite pagination defaults for non-finite inputs", () => {
+    expect(getClampedTablePageIndex(Number.NaN, 10, 35)).toBe(0)
+    expect(getClampedTablePageIndex(2, Number.POSITIVE_INFINITY, 35)).toBe(2)
+    expect(getClampedTablePageIndex(2, 10, Number.NEGATIVE_INFINITY)).toBe(0)
+    expect(
+      Number.isFinite(
+        getClampedTablePageIndex(
+          Number.POSITIVE_INFINITY,
+          Number.NaN,
+          Number.POSITIVE_INFINITY
+        )
+      )
+    ).toBe(true)
   })
 })

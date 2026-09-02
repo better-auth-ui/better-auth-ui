@@ -1,10 +1,19 @@
-import { act, renderHook, waitFor } from "@testing-library/react"
-import { afterEach, describe, expect, it } from "vitest"
+import { organizationLocalization } from "@better-auth-ui/core/plugins/organization"
+import {
+  act,
+  fireEvent,
+  render,
+  renderHook,
+  screen,
+  waitFor
+} from "@testing-library/react"
+import { afterEach, describe, expect, it, vi } from "vitest"
 
 import {
   createOrganizationColumnHelper,
   useOrganizationTable
 } from "../src/components/auth/organization/organization-table"
+import { OrganizationTableSelectRow } from "../src/components/auth/organization/organization-table-selection"
 import { useOrganizationTableState } from "../src/components/auth/organization/organization-table-state"
 
 type TestRow = {
@@ -31,6 +40,29 @@ afterEach(() => {
 })
 
 describe("organization table state", () => {
+  it("preserves Shift for keyboard range selection", () => {
+    const toggleSelected = vi.fn()
+    render(
+      <OrganizationTableSelectRow
+        localization={organizationLocalization}
+        row={{
+          getCanSelect: () => true,
+          getIsSelected: () => false,
+          getToggleSelectedHandler: () => toggleSelected
+        }}
+      />
+    )
+
+    const checkbox = screen.getByRole("checkbox", { name: "Select row" })
+    fireEvent.keyDown(checkbox, { key: " ", shiftKey: true })
+    fireEvent.click(checkbox)
+
+    expect(toggleSelected).toHaveBeenCalledWith({
+      shiftKey: true,
+      target: { checked: true }
+    })
+  })
+
   it("keeps an ordered multi-column sort", () => {
     const { result } = renderHook(() =>
       useOrganizationTable({
@@ -144,6 +176,9 @@ describe("organization table state", () => {
 
     await waitFor(() => expect(result.current.state.ready).toBe(true))
     expect(result.current.state.sorting).toEqual([{ desc: true, id: "name" }])
+    expect(result.current.state.columnFilters).toEqual([
+      { id: "group", value: "a" }
+    ])
     expect(result.current.table.getRowModel().rows[0]?.original.id).toBe("2")
 
     act(() => {

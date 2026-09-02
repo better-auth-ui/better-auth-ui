@@ -36,8 +36,8 @@ function SelectionCheckbox({
         onChange(next, shiftKey.current)
         shiftKey.current = false
       }}
-      onKeyDown={() => {
-        shiftKey.current = false
+      onKeyDown={(event) => {
+        shiftKey.current = event.shiftKey
       }}
       onPointerDown={(event) => {
         shiftKey.current = event.shiftKey

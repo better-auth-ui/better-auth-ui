@@ -52,6 +52,7 @@ export function passkeyAutoFillOptions<TAuthClient extends PasskeyAuthClient>(
     ...options,
     mutationKey: passkeyMutationKeys.autoFill,
     meta: {
+      ...options.meta,
       errorPresentation: "silent" as const
     }
   }

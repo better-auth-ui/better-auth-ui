@@ -98,10 +98,13 @@
     "tailwind-merge": "^3.4.0"
   },
   "devDependencies": {
+    "@solidjs/testing-library": "^0.8.10",
     "@tailwindcss/vite": "^4.3.2",
     "@testing-library/jest-dom": "^6.9.1",
     "@types/node": "^26.1.2",
+    "@vitest/browser-playwright": "^4.1.9",
     "drizzle-kit": "^0.31.10",
+    "playwright": "^1.62.1",
     "storybook": "^10.5.10",
     "storybook-solidjs-vite": "^10.5.2",
     "tailwindcss": "^4.3.2",

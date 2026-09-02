@@ -111,7 +111,12 @@ export function parseTableFilterValue(value: string): TableFilterValue {
 }
 
 export function serializeTableFilterValue(value: unknown): string | undefined {
-  if (typeof value === "string") return value || undefined
+  if (typeof value === "string") {
+    if (!value) return undefined
+    return value.startsWith(TABLE_FILTER_VALUE_PREFIX)
+      ? `${TABLE_FILTER_VALUE_PREFIX}${JSON.stringify(value)}`
+      : value
+  }
   if (!isTableFilterValue(value)) return undefined
   return `${TABLE_FILTER_VALUE_PREFIX}${JSON.stringify(value)}`
 }
@@ -130,14 +135,22 @@ export function getClampedTablePageIndex(
   pageSize: number,
   rowCount: number
 ) {
-  const normalizedPageSize = Math.max(1, Math.floor(pageSize))
-  const normalizedRowCount = Math.max(0, Math.floor(rowCount))
+  const normalizedPageSize = Number.isFinite(pageSize)
+    ? Math.max(1, Math.floor(pageSize))
+    : 1
+  const normalizedRowCount = Number.isFinite(rowCount)
+    ? Math.max(0, Math.floor(rowCount))
+    : 0
   const lastPageIndex = Math.max(
     0,
     Math.ceil(normalizedRowCount / normalizedPageSize) - 1
   )
 
-  return Math.min(Math.max(0, Math.floor(pageIndex)), lastPageIndex)
+  const normalizedPageIndex = Number.isFinite(pageIndex)
+    ? Math.max(0, Math.floor(pageIndex))
+    : 0
+
+  return Math.min(normalizedPageIndex, lastPageIndex)
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {

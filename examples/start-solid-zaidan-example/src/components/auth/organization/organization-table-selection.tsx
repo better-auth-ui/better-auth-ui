@@ -47,8 +47,8 @@ export function OrganizationTableSelectRow(props: {
         })
         shiftKey = false
       }}
-      onKeyDown={() => {
-        shiftKey = false
+      onKeyDown={(event) => {
+        shiftKey = event.shiftKey
       }}
       onPointerDown={(event) => {
         shiftKey = event.shiftKey

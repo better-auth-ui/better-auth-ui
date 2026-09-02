@@ -1,7 +1,14 @@
 import { getFormFieldErrors } from "@better-auth-ui/core"
 import { createFormHook, createFormHookContexts } from "@tanstack/solid-form"
-import type { ComponentProps } from "solid-js"
-import { Show, splitProps } from "solid-js"
+import {
+  type Accessor,
+  type ComponentProps,
+  createContext,
+  createSignal,
+  Show,
+  splitProps,
+  useContext
+} from "solid-js"
 
 import { Button } from "@/components/ui/button"
 import { FieldError } from "@/components/ui/field"
@@ -9,6 +16,7 @@ import { Spinner } from "@/components/ui/spinner"
 
 const { fieldContext, formContext, useFieldContext, useFormContext } =
   createFormHookContexts()
+const AuthFormPreparationContext = createContext<Accessor<boolean>>(() => false)
 
 export function focusFirstInvalidAuthFormControl(form: HTMLFormElement) {
   requestAnimationFrame(() => {
@@ -51,23 +59,42 @@ type AuthFormRootProps = Omit<ComponentProps<"form">, "onSubmit"> & {
 function AuthFormRoot(props: AuthFormRootProps) {
   const form = useFormContext()
   const [local, formProps] = splitProps(props, ["prepareSubmit"])
+  const [isPreparing, setIsPreparing] = createSignal(false)
+  let preparing = false
 
   const submit = async (event: SubmitEvent) => {
     event.preventDefault()
+    if (preparing || form.state.isSubmitting) return
+
     const formElement = event.currentTarget as HTMLFormElement
-    if ((await local.prepareSubmit?.(formElement)) === false) return
+    preparing = true
+    setIsPreparing(true)
+
+    let shouldSubmit = true
+    try {
+      shouldSubmit = (await local.prepareSubmit?.(formElement)) !== false
+    } finally {
+      preparing = false
+      setIsPreparing(false)
+    }
+
+    if (!shouldSubmit) return
     await form.handleSubmit()
     if (!form.state.isValid) focusFirstInvalidAuthFormControl(formElement)
   }
 
   return (
-    <form
-      {...formProps}
-      onInvalid={(event) =>
-        focusFirstInvalidAuthFormControl(event.currentTarget)
-      }
-      onSubmit={submit}
-    />
+    <AuthFormPreparationContext.Provider value={isPreparing}>
+      <form
+        {...formProps}
+        on:invalid={{
+          capture: true,
+          handleEvent: (event) =>
+            focusFirstInvalidAuthFormControl(event.currentTarget)
+        }}
+        onSubmit={submit}
+      />
+    </AuthFormPreparationContext.Provider>
   )
 }
 
@@ -75,6 +102,7 @@ function AuthFormSubmitButton(
   props: Omit<ComponentProps<typeof Button>, "class"> & { class?: string }
 ) {
   const form = useFormContext()
+  const isPreparing = useContext(AuthFormPreparationContext)
 
   return (
     <form.Subscribe
@@ -84,10 +112,12 @@ function AuthFormSubmitButton(
         <Button
           {...props}
           class={props.class}
-          disabled={props.disabled || !state()[0] || state()[1]}
+          disabled={
+            props.disabled || isPreparing() || !state()[0] || state()[1]
+          }
           type="submit"
         >
-          <Show when={state()[1]}>
+          <Show when={isPreparing() || state()[1]}>
             <Spinner />
           </Show>
           {props.children}
