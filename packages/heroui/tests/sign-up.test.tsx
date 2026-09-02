@@ -64,6 +64,31 @@ afterEach(() => {
 })
 
 describe("<SignUp />", () => {
+  it("trims the submitted email address", async () => {
+    const user = userEvent.setup()
+    const signUpEmail = vi.fn(async () => ({ data: {}, error: null }))
+
+    render(
+      <AuthProvider
+        authClient={createMockAuthClient(signUpEmail)}
+        navigate={() => {}}
+      >
+        <SignUp />
+      </AuthProvider>
+    )
+
+    await user.type(screen.getByLabelText("Name"), "Ada Lovelace")
+    await user.type(screen.getByLabelText("Email"), "  ada@example.com  ")
+    await user.type(screen.getByLabelText("Password"), "correct horse battery")
+    await user.click(screen.getByRole("button", { name: "Sign Up" }))
+
+    await waitFor(() => {
+      expect(signUpEmail).toHaveBeenCalledWith(
+        expect.objectContaining({ email: "ada@example.com" })
+      )
+    })
+  })
+
   it("preserves the redirect target when continuing to email verification", async () => {
     const user = userEvent.setup()
     const navigate = vi.fn()

@@ -21,6 +21,7 @@ export const ssoLocalization = {
   emailFirstDescription: "Enter your work email to continue.",
   entryPoint: "SSO URL",
   identityProviderMetadata: "Identity provider metadata XML",
+  invalidUrl: "Enter a valid absolute URL.",
   issuer: "Issuer URL",
   oidc: "OIDC",
   organizationId: "Organization ID",

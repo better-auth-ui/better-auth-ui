@@ -38,6 +38,9 @@ describe("form validation", () => {
     expect(validateEmailAddress("name@example", messages)).toEqual({
       message: "Invalid"
     })
+    expect(validateEmailAddress("name@other@example.com", messages)).toEqual({
+      message: "Invalid"
+    })
     expect(validateEmailAddress("name@example.com", messages)).toBeUndefined()
   })
 

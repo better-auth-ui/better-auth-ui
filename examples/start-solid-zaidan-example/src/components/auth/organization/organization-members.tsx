@@ -122,6 +122,7 @@ const fallbackLocalization = {
   changeMemberRoleDescription:
     "Choose the roles this member should have in the organization.",
   memberRoleUpdated: "Member role updated",
+  selectAtLeastOneRole: "Select at least one role",
   removeMember: "Remove member",
   removeMemberWarning:
     "Are you sure you want to remove this member from the organization? They will lose access immediately.",
@@ -159,6 +160,7 @@ const fallbackLocalization = {
   | "changeMemberRole"
   | "changeMemberRoleDescription"
   | "memberRoleUpdated"
+  | "selectAtLeastOneRole"
   | "removeMember"
   | "removeMemberWarning"
   | "memberRemoved"
@@ -303,6 +305,7 @@ export function OrganizationMembers(props: OrganizationMembersProps) {
             | "changeMemberRole"
             | "changeMemberRoleDescription"
             | "memberRoleUpdated"
+            | "selectAtLeastOneRole"
             | "removeMember"
             | "removeMemberWarning"
             | "memberRemoved"

@@ -126,7 +126,7 @@ export function EditMemberRolesDialog({
                     validateMinimumItems(
                       value,
                       1,
-                      organizationLocalization.selectRoles
+                      organizationLocalization.selectAtLeastOneRole
                     )
                 }}
               >

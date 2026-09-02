@@ -1,5 +1,6 @@
 "use client"
 
+import { validateAbsoluteUrl, validateStringLength } from "@better-auth-ui/core"
 import {
   hasMemberRole,
   type OrganizationAuthClient
@@ -38,7 +39,7 @@ import type { BetterFetchError } from "better-auth/client"
 import { useMemo, useState } from "react"
 import { organizationPlugin } from "../../../lib/auth/organization-plugin"
 import { ssoPlugin } from "../../../lib/auth/sso-plugin"
-import { useAuthForm } from "../auth-form"
+import { isAuthFormFieldInvalid, useAuthForm } from "../auth-form"
 import { SsoDomainVerification } from "./sso-domain-verification"
 import { SsoProviderSetup } from "./sso-provider-setup"
 
@@ -272,7 +273,7 @@ function EditSsoProviderDialog({
   onOpenChange: (provider: SsoProvider | undefined) => void
   provider?: SsoProvider
 }) {
-  const { authClient } = useAuth()
+  const { authClient, localization: authLocalization } = useAuth()
   const { localization } = useAuthPlugin(ssoPlugin)
   const update = useUpdateSsoProvider(authClient as SsoAuthClient)
 
@@ -344,43 +345,90 @@ function EditSsoProviderDialog({
               </AlertDialog.Heading>
             </AlertDialog.Header>
             <AlertDialog.Body className="flex flex-col gap-4 overflow-visible">
-              {(
-                [
-                  ["domain", localization.domain, "text"],
-                  ["issuer", localization.issuer, "url"]
-                ] as const
-              ).map(([name, label, type]) => (
-                <form.Field key={name} name={name}>
-                  {(field) => (
-                    <TextField
-                      isRequired
-                      name={field.name}
-                      onBlur={field.handleBlur}
-                      onChange={field.handleChange}
-                      value={field.state.value}
-                    >
-                      <Label>{label}</Label>
-                      <Input type={type} variant="secondary" />
-                      <FieldError />
-                    </TextField>
-                  )}
-                </form.Field>
-              ))}
+              <form.AppField
+                name="domain"
+                validators={{
+                  onChange: ({ value }) =>
+                    validateStringLength(value, {
+                      requiredMessage: authLocalization.auth.fieldRequired,
+                      trim: true
+                    })
+                }}
+              >
+                {(field) => (
+                  <TextField
+                    isInvalid={
+                      isAuthFormFieldInvalid(field.state.meta) || undefined
+                    }
+                    isRequired
+                    name={field.name}
+                    onBlur={field.handleBlur}
+                    onChange={field.handleChange}
+                    value={field.state.value}
+                    validationBehavior="aria"
+                  >
+                    <Label>{localization.domain}</Label>
+                    <Input variant="secondary" />
+                    <field.AuthFormFieldError />
+                  </TextField>
+                )}
+              </form.AppField>
+              <form.AppField
+                name="issuer"
+                validators={{
+                  onChange: ({ value }) =>
+                    validateAbsoluteUrl(value, {
+                      invalidMessage: localization.invalidUrl,
+                      requiredMessage: authLocalization.auth.fieldRequired
+                    })
+                }}
+              >
+                {(field) => (
+                  <TextField
+                    isInvalid={
+                      isAuthFormFieldInvalid(field.state.meta) || undefined
+                    }
+                    isRequired
+                    name={field.name}
+                    onBlur={field.handleBlur}
+                    onChange={field.handleChange}
+                    value={field.state.value}
+                    validationBehavior="aria"
+                  >
+                    <Label>{localization.issuer}</Label>
+                    <Input type="url" variant="secondary" />
+                    <field.AuthFormFieldError />
+                  </TextField>
+                )}
+              </form.AppField>
               {provider?.oidcConfig ? (
                 <>
-                  <form.Field name="discoveryEndpoint">
+                  <form.AppField
+                    name="discoveryEndpoint"
+                    validators={{
+                      onChange: ({ value }) =>
+                        validateAbsoluteUrl(value, {
+                          invalidMessage: localization.invalidUrl
+                        })
+                    }}
+                  >
                     {(field) => (
                       <TextField
+                        isInvalid={
+                          isAuthFormFieldInvalid(field.state.meta) || undefined
+                        }
                         name={field.name}
                         onBlur={field.handleBlur}
                         onChange={field.handleChange}
                         value={field.state.value}
+                        validationBehavior="aria"
                       >
                         <Label>{localization.discoveryEndpoint}</Label>
                         <Input type="url" variant="secondary" />
+                        <field.AuthFormFieldError />
                       </TextField>
                     )}
-                  </form.Field>
+                  </form.AppField>
                   <div className="grid gap-4 sm:grid-cols-2">
                     <form.Field name="clientId">
                       {(field) => (
@@ -420,21 +468,34 @@ function EditSsoProviderDialog({
               ) : null}
               {provider?.samlConfig ? (
                 <>
-                  <form.Field name="entryPoint">
+                  <form.AppField
+                    name="entryPoint"
+                    validators={{
+                      onChange: ({ value }) =>
+                        validateAbsoluteUrl(value, {
+                          invalidMessage: localization.invalidUrl,
+                          requiredMessage: authLocalization.auth.fieldRequired
+                        })
+                    }}
+                  >
                     {(field) => (
                       <TextField
+                        isInvalid={
+                          isAuthFormFieldInvalid(field.state.meta) || undefined
+                        }
                         isRequired
                         name={field.name}
                         onBlur={field.handleBlur}
                         onChange={field.handleChange}
                         value={field.state.value}
+                        validationBehavior="aria"
                       >
                         <Label>{localization.entryPoint}</Label>
                         <Input type="url" variant="secondary" />
-                        <FieldError />
+                        <field.AuthFormFieldError />
                       </TextField>
                     )}
-                  </form.Field>
+                  </form.AppField>
                   <form.Field name="identityProviderMetadata">
                     {(field) => (
                       <TextField

@@ -6,10 +6,19 @@ import { FieldError } from "@/components/ui/field"
 
 const { fieldContext, formContext, useFieldContext } = createFormHookContexts()
 
+export function isAuthFormFieldInvalid({
+  isTouched,
+  isValid
+}: {
+  isTouched: boolean
+  isValid: boolean
+}) {
+  return isTouched && !isValid
+}
+
 function AuthFormFieldError() {
   const field = useFieldContext<unknown>()
-  const isInvalid = () =>
-    field().state.meta.isTouched && !field().state.meta.isValid
+  const isInvalid = () => isAuthFormFieldInvalid(field().state.meta)
 
   return (
     <Show when={isInvalid()}>
@@ -28,13 +37,3 @@ export const { useAppForm: createAuthForm } = createFormHook({
   formComponents: {},
   formContext
 })
-
-export function isAuthFormFieldInvalid({
-  isTouched,
-  isValid
-}: {
-  isTouched: boolean
-  isValid: boolean
-}) {
-  return isTouched && !isValid
-}

@@ -138,7 +138,7 @@ export function EditMemberRolesDialog({
                 validateMinimumItems(
                   value,
                   1,
-                  organizationLocalization.selectRoles
+                  organizationLocalization.selectAtLeastOneRole
                 )
             }}
           >
@@ -224,17 +224,21 @@ export function EditMemberRolesDialog({
                     >
                       {localization.settings.cancel}
                     </DialogClose>
-                    <Button
-                      disabled={
-                        isPending ||
-                        form.state.isSubmitting ||
-                        !form.state.canSubmit
+                    <form.Subscribe
+                      selector={(state) =>
+                        [state.canSubmit, state.isSubmitting] as const
                       }
-                      type="submit"
                     >
-                      {isPending && <Spinner />}
-                      {localization.settings.saveChanges}
-                    </Button>
+                      {([canSubmit, isSubmitting]) => (
+                        <Button
+                          disabled={isPending || isSubmitting || !canSubmit}
+                          type="submit"
+                        >
+                          {isPending && <Spinner />}
+                          {localization.settings.saveChanges}
+                        </Button>
+                      )}
+                    </form.Subscribe>
                   </DialogFooter>
                 </>
               )

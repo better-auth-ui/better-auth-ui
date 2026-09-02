@@ -67,6 +67,7 @@ type MemberLocalization = Pick<
   | "leftOrganization"
   | "onlyOwnerActionDisabled"
   | "noTeams"
+  | "selectAtLeastOneRole"
   | "selectRow"
 >
 

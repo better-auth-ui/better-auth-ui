@@ -118,7 +118,12 @@ export function ApiKeys(props: ApiKeysProps = {}) {
   }
 
   createEffect(() => {
-    if (!pending() && pagination().pageIndex > 0 && page().rows.length === 0) {
+    if (
+      apiKeys.isSuccess &&
+      !props.isPending &&
+      pagination().pageIndex > 0 &&
+      page().rows.length === 0
+    ) {
       setPaginationState((current) => ({
         ...current,
         pageIndex: Math.max(0, current.pageIndex - 1)

@@ -36,7 +36,10 @@ import { createAuthForm } from "../auth-form"
 
 type EditMemberRolesLocalization = Pick<
   OrganizationLocalization,
-  "changeMemberRole" | "changeMemberRoleDescription" | "memberRoleUpdated"
+  | "changeMemberRole"
+  | "changeMemberRoleDescription"
+  | "memberRoleUpdated"
+  | "selectAtLeastOneRole"
 >
 
 export type EditMemberRolesDialogProps = {
@@ -137,7 +140,7 @@ export function EditMemberRolesDialog(props: EditMemberRolesDialogProps) {
                 validateMinimumItems(
                   value,
                   1,
-                  props.localization.changeMemberRole
+                  props.localization.selectAtLeastOneRole
                 )
             }}
           >
@@ -255,16 +258,24 @@ export function EditMemberRolesDialog(props: EditMemberRolesDialogProps) {
                     >
                       {auth.localization.settings.cancel}
                     </Button>
-                    <Button
-                      disabled={
-                        updateMemberRole.isPending ||
-                        form.state.isSubmitting ||
-                        !form.state.canSubmit
+                    <form.Subscribe
+                      selector={(state) =>
+                        [state.canSubmit, state.isSubmitting] as const
                       }
-                      type="submit"
                     >
-                      {auth.localization.settings.saveChanges}
-                    </Button>
+                      {(formState) => (
+                        <Button
+                          disabled={
+                            updateMemberRole.isPending ||
+                            formState()[1] ||
+                            !formState()[0]
+                          }
+                          type="submit"
+                        >
+                          {auth.localization.settings.saveChanges}
+                        </Button>
+                      )}
+                    </form.Subscribe>
                   </DialogFooter>
                 </>
               )

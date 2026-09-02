@@ -85,19 +85,20 @@ export function ApiKeys({
   const sortDirection = primarySort?.desc ? "desc" : "asc"
   const sort = `${sortBy}:${sortDirection}`
 
-  const { data: listData, isPending: isListPending } = useListApiKeys(
-    authClient as ApiKeyAuthClient,
-    {
-      enabled: !isPendingProp,
-      query: {
-        limit: pagination.pageSize + 1,
-        offset: pagination.pageIndex * pagination.pageSize,
-        sortBy,
-        sortDirection,
-        ...(organizationId ? { organizationId, configId: "organization" } : {})
-      }
+  const {
+    data: listData,
+    isPending: isListPending,
+    isSuccess: isListSuccess
+  } = useListApiKeys(authClient as ApiKeyAuthClient, {
+    enabled: !isPendingProp,
+    query: {
+      limit: pagination.pageSize + 1,
+      offset: pagination.pageIndex * pagination.pageSize,
+      sortBy,
+      sortDirection,
+      ...(organizationId ? { organizationId, configId: "organization" } : {})
     }
-  )
+  })
 
   const isPending = isPendingProp || isListPending
   const page = useMemo(
@@ -116,13 +117,18 @@ export function ApiKeys({
   }
 
   useEffect(() => {
-    if (!isPending && pagination.pageIndex > 0 && page.rows.length === 0) {
+    if (
+      isListSuccess &&
+      !isPendingProp &&
+      pagination.pageIndex > 0 &&
+      page.rows.length === 0
+    ) {
       setPaginationState((current) => ({
         ...current,
         pageIndex: Math.max(0, current.pageIndex - 1)
       }))
     }
-  }, [isPending, page.rows.length, pagination.pageIndex])
+  }, [isListSuccess, isPendingProp, page.rows.length, pagination.pageIndex])
 
   const table = useApiKeyTable({
     columns: apiKeyColumns,

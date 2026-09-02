@@ -152,7 +152,7 @@ export function SignUp({
     onSubmit: ({ value }) => {
       signUpEmail({
         name: emailAndPassword?.name === false ? "" : value.name,
-        email: value.email,
+        email: value.email.trim(),
         password: value.password,
         ...additionalFieldValuesRef.current,
         fetchOptions

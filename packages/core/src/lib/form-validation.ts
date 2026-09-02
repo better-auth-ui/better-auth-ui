@@ -72,9 +72,11 @@ export function validateEmailAddress(
     return requiredMessage ? createFormFieldError(requiredMessage) : undefined
 
   const separator = candidate.lastIndexOf("@")
+  const firstSeparator = candidate.indexOf("@")
   const domain = candidate.slice(separator + 1)
   const isValid =
     separator > 0 &&
+    separator === firstSeparator &&
     separator < candidate.length - 1 &&
     !candidate.includes(" ") &&
     domain.includes(".") &&

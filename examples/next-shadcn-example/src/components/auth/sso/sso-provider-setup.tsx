@@ -1,5 +1,6 @@
 "use client"
 
+import { validateAbsoluteUrl, validateStringLength } from "@better-auth-ui/core"
 import type {
   RegisterSsoProviderData,
   RegisterSsoProviderParams,
@@ -31,7 +32,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Textarea } from "@/components/ui/textarea"
 import { ssoPlugin } from "@/lib/auth/sso-plugin"
 import { cn } from "@/lib/utils"
-import { useAuthForm } from "../auth-form"
+import { isAuthFormFieldInvalid, useAuthForm } from "../auth-form"
 
 type SsoProtocol = "oidc" | "saml"
 
@@ -66,7 +67,7 @@ export function SsoProviderSetup({
   organizationId: fixedOrganizationId,
   onRegistered
 }: SsoProviderSetupProps) {
-  const { authClient } = useAuth()
+  const { authClient, localization: authLocalization } = useAuth()
   const { localization } = useAuthPlugin(ssoPlugin)
   const [created, setCreated] = useState(false)
   const register = useRegisterSsoProvider(authClient as SsoAuthClient)
@@ -140,9 +141,20 @@ export function SsoProviderSetup({
         <CardContent>
           <FieldGroup>
             <div className="grid gap-4 sm:grid-cols-2">
-              <form.Field name="providerId">
+              <form.AppField
+                name="providerId"
+                validators={{
+                  onChange: ({ value }) =>
+                    validateStringLength(value, {
+                      requiredMessage: authLocalization.auth.fieldRequired,
+                      trim: true
+                    })
+                }}
+              >
                 {(field) => (
-                  <Field>
+                  <Field
+                    data-invalid={isAuthFormFieldInvalid(field.state.meta)}
+                  >
                     <FieldLabel htmlFor="sso-provider-id">
                       {localization.providerId}
                     </FieldLabel>
@@ -155,13 +167,26 @@ export function SsoProviderSetup({
                       }
                       required
                       value={field.state.value}
+                      aria-invalid={isAuthFormFieldInvalid(field.state.meta)}
                     />
+                    <field.AuthFormFieldError />
                   </Field>
                 )}
-              </form.Field>
-              <form.Field name="domain">
+              </form.AppField>
+              <form.AppField
+                name="domain"
+                validators={{
+                  onChange: ({ value }) =>
+                    validateStringLength(value, {
+                      requiredMessage: authLocalization.auth.fieldRequired,
+                      trim: true
+                    })
+                }}
+              >
                 {(field) => (
-                  <Field>
+                  <Field
+                    data-invalid={isAuthFormFieldInvalid(field.state.meta)}
+                  >
                     <FieldLabel htmlFor="sso-domain">
                       {localization.domain}
                     </FieldLabel>
@@ -175,15 +200,26 @@ export function SsoProviderSetup({
                       placeholder="example.com"
                       required
                       value={field.state.value}
+                      aria-invalid={isAuthFormFieldInvalid(field.state.meta)}
                     />
+                    <field.AuthFormFieldError />
                   </Field>
                 )}
-              </form.Field>
+              </form.AppField>
             </div>
 
-            <form.Field name="issuer">
+            <form.AppField
+              name="issuer"
+              validators={{
+                onChange: ({ value }) =>
+                  validateAbsoluteUrl(value, {
+                    invalidMessage: localization.invalidUrl,
+                    requiredMessage: authLocalization.auth.fieldRequired
+                  })
+              }}
+            >
               {(field) => (
-                <Field>
+                <Field data-invalid={isAuthFormFieldInvalid(field.state.meta)}>
                   <FieldLabel htmlFor="sso-issuer">
                     {localization.issuer}
                   </FieldLabel>
@@ -196,10 +232,12 @@ export function SsoProviderSetup({
                     required
                     type="url"
                     value={field.state.value}
+                    aria-invalid={isAuthFormFieldInvalid(field.state.meta)}
                   />
+                  <field.AuthFormFieldError />
                 </Field>
               )}
-            </form.Field>
+            </form.AppField>
 
             {!fixedOrganizationId ? (
               <form.Field name="organizationId">
@@ -238,9 +276,23 @@ export function SsoProviderSetup({
                     className="grid gap-4 sm:grid-cols-2"
                     value="oidc"
                   >
-                    <form.Field name="clientId">
+                    <form.AppField
+                      name="clientId"
+                      validators={{
+                        onChange: ({ value }) =>
+                          validateStringLength(value, {
+                            requiredMessage:
+                              authLocalization.auth.fieldRequired,
+                            trim: true
+                          })
+                      }}
+                    >
                       {(field) => (
-                        <Field>
+                        <Field
+                          data-invalid={isAuthFormFieldInvalid(
+                            field.state.meta
+                          )}
+                        >
                           <FieldLabel htmlFor="sso-client-id">
                             {localization.clientId}
                           </FieldLabel>
@@ -254,13 +306,31 @@ export function SsoProviderSetup({
                             }
                             required
                             value={field.state.value}
+                            aria-invalid={isAuthFormFieldInvalid(
+                              field.state.meta
+                            )}
                           />
+                          <field.AuthFormFieldError />
                         </Field>
                       )}
-                    </form.Field>
-                    <form.Field name="clientSecret">
+                    </form.AppField>
+                    <form.AppField
+                      name="clientSecret"
+                      validators={{
+                        onChange: ({ value }) =>
+                          validateStringLength(value, {
+                            requiredMessage:
+                              authLocalization.auth.fieldRequired,
+                            trim: true
+                          })
+                      }}
+                    >
                       {(field) => (
-                        <Field>
+                        <Field
+                          data-invalid={isAuthFormFieldInvalid(
+                            field.state.meta
+                          )}
+                        >
                           <FieldLabel htmlFor="sso-client-secret">
                             {localization.clientSecret}
                           </FieldLabel>
@@ -275,15 +345,32 @@ export function SsoProviderSetup({
                             required
                             type="password"
                             value={field.state.value}
+                            aria-invalid={isAuthFormFieldInvalid(
+                              field.state.meta
+                            )}
                           />
+                          <field.AuthFormFieldError />
                         </Field>
                       )}
-                    </form.Field>
+                    </form.AppField>
                   </TabsContent>
                   <TabsContent className="flex flex-col gap-4" value="saml">
-                    <form.Field name="entryPoint">
+                    <form.AppField
+                      name="entryPoint"
+                      validators={{
+                        onChange: ({ value }) =>
+                          validateAbsoluteUrl(value, {
+                            invalidMessage: localization.invalidUrl,
+                            requiredMessage: authLocalization.auth.fieldRequired
+                          })
+                      }}
+                    >
                       {(field) => (
-                        <Field>
+                        <Field
+                          data-invalid={isAuthFormFieldInvalid(
+                            field.state.meta
+                          )}
+                        >
                           <FieldLabel htmlFor="sso-entry-point">
                             {localization.entryPoint}
                           </FieldLabel>
@@ -297,13 +384,31 @@ export function SsoProviderSetup({
                             required
                             type="url"
                             value={field.state.value}
+                            aria-invalid={isAuthFormFieldInvalid(
+                              field.state.meta
+                            )}
                           />
+                          <field.AuthFormFieldError />
                         </Field>
                       )}
-                    </form.Field>
-                    <form.Field name="identityProviderMetadata">
+                    </form.AppField>
+                    <form.AppField
+                      name="identityProviderMetadata"
+                      validators={{
+                        onChange: ({ value }) =>
+                          validateStringLength(value, {
+                            requiredMessage:
+                              authLocalization.auth.fieldRequired,
+                            trim: true
+                          })
+                      }}
+                    >
                       {(field) => (
-                        <Field>
+                        <Field
+                          data-invalid={isAuthFormFieldInvalid(
+                            field.state.meta
+                          )}
+                        >
                           <FieldLabel htmlFor="sso-idp-metadata">
                             {localization.identityProviderMetadata}
                           </FieldLabel>
@@ -317,10 +422,14 @@ export function SsoProviderSetup({
                             }
                             required
                             value={field.state.value}
+                            aria-invalid={isAuthFormFieldInvalid(
+                              field.state.meta
+                            )}
                           />
+                          <field.AuthFormFieldError />
                         </Field>
                       )}
-                    </form.Field>
+                    </form.AppField>
                   </TabsContent>
                 </Tabs>
               )}

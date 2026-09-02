@@ -108,7 +108,7 @@ export function SignUp(props: SignUpProps) {
     },
     onSubmit: ({ value }) => {
       signUp.mutate({
-        email: value.email,
+        email: value.email.trim(),
         fetchOptions: fetchOptions(),
         name: auth.emailAndPassword.name ? value.name : "",
         password: value.password,
@@ -312,6 +312,7 @@ export function SignUp(props: SignUpProps) {
                         maxLength={auth.emailAndPassword.maxPasswordLength}
                         minLength={auth.emailAndPassword.minPasswordLength}
                         name={field().name}
+                        onBlur={field().handleBlur}
                         onInput={(event) => {
                           field().handleChange(event.currentTarget.value)
                           setPasswordError(undefined)

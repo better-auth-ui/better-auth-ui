@@ -365,7 +365,8 @@ export function OAuthClients(props: OAuthClientsProps) {
                 validators={{
                   onChange: ({ value }) =>
                     validateStringLength(value, {
-                      requiredMessage: auth.localization.auth.fieldRequired
+                      requiredMessage: auth.localization.auth.fieldRequired,
+                      trim: true
                     })
                 }}
               >
