@@ -8,8 +8,8 @@ import type {
 import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
 import { useAddPasskey } from "@better-auth-ui/react/plugins/passkey"
 import { Fingerprint } from "lucide-react"
-import { type SyntheticEvent, useRef } from "react"
-import { Button, buttonVariants } from "@/components/ui/button"
+import { useRef } from "react"
+import { buttonVariants } from "@/components/ui/button"
 import {
   Dialog,
   DialogClose,
@@ -23,6 +23,7 @@ import { Field, FieldError, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import { Spinner } from "@/components/ui/spinner"
 import { passkeyPlugin } from "@/lib/auth/passkey-plugin"
+import { useAuthForm } from "../auth-form"
 import { FreshSessionPrompt } from "../settings/security/fresh-session-prompt"
 
 export type AddPasskeyDialogProps = {
@@ -41,14 +42,6 @@ export function AddPasskeyDialog({
   const addPasskey = useAddPasskey(authClient)
   const pendingRequest = useRef<AddPasskeyParams<PasskeyAuthClient>>(undefined)
 
-  const handleOpenChange = (nextOpen: boolean) => {
-    if (!nextOpen) {
-      addPasskey.reset()
-      pendingRequest.current = undefined
-    }
-    onOpenChange(nextOpen)
-  }
-
   const submitRequest = (request: AddPasskeyParams<PasskeyAuthClient>) => {
     const requestWithCallbacks = {
       ...request,
@@ -61,16 +54,24 @@ export function AddPasskeyDialog({
     addPasskey.mutate(requestWithCallbacks)
   }
 
-  const handleSubmit = (e: SyntheticEvent<HTMLFormElement>) => {
-    e.preventDefault()
+  const form = useAuthForm({
+    defaultValues: { name: "" },
+    onSubmit: ({ value }) => {
+      const name = value.name.trim()
+      submitRequest({
+        ...(name ? { name } : {}),
+        ...(authenticatorAttachment ? { authenticatorAttachment } : {})
+      } as AddPasskeyParams<PasskeyAuthClient>)
+    }
+  })
 
-    const formData = new FormData(e.target as HTMLFormElement)
-    const name = (formData.get("name") as string)?.trim()
-
-    submitRequest({
-      ...(name ? { name } : {}),
-      ...(authenticatorAttachment ? { authenticatorAttachment } : {})
-    } as AddPasskeyParams<PasskeyAuthClient>)
+  const handleOpenChange = (nextOpen: boolean) => {
+    if (!nextOpen) {
+      addPasskey.reset()
+      form.reset()
+      pendingRequest.current = undefined
+    }
+    onOpenChange(nextOpen)
   }
 
   const needsFreshSession = isSessionNotFreshError(addPasskey.error)
@@ -93,55 +94,65 @@ export function AddPasskeyDialog({
             />
           </>
         ) : (
-          <form onSubmit={handleSubmit} className="flex flex-col gap-6">
-            <DialogHeader>
-              <DialogTitle className="flex items-center gap-2">
-                <Fingerprint />
-                {passkeyLocalization.addPasskey}
-              </DialogTitle>
+          <form.AppForm>
+            <form.AuthFormRoot className="flex flex-col gap-6">
+              <DialogHeader>
+                <DialogTitle className="flex items-center gap-2">
+                  <Fingerprint />
+                  {passkeyLocalization.addPasskey}
+                </DialogTitle>
 
-              <DialogDescription>
-                {passkeyLocalization.passkeysDescription}
-              </DialogDescription>
-            </DialogHeader>
+                <DialogDescription>
+                  {passkeyLocalization.passkeysDescription}
+                </DialogDescription>
+              </DialogHeader>
 
-            <Field data-invalid={addPasskey.isError}>
-              <FieldLabel htmlFor="passkey-name">
-                {passkeyLocalization.name}
-              </FieldLabel>
+              <form.AppField name="name">
+                {(field) => (
+                  <Field data-invalid={addPasskey.isError}>
+                    <FieldLabel htmlFor="passkey-name">
+                      {passkeyLocalization.name}
+                    </FieldLabel>
+                    <Input
+                      id="passkey-name"
+                      name={field.name}
+                      autoFocus
+                      placeholder={localization.settings.optional}
+                      disabled={addPasskey.isPending}
+                      value={field.state.value}
+                      onBlur={field.handleBlur}
+                      onChange={(event) =>
+                        field.handleChange(event.target.value)
+                      }
+                      aria-invalid={addPasskey.isError}
+                    />
+                    {addPasskey.error && (
+                      <FieldError>
+                        {addPasskey.error.error?.message ??
+                          addPasskey.error.message}
+                      </FieldError>
+                    )}
+                  </Field>
+                )}
+              </form.AppField>
 
-              <Input
-                id="passkey-name"
-                name="name"
-                autoFocus
-                placeholder={localization.settings.optional}
-                disabled={addPasskey.isPending}
-                aria-invalid={addPasskey.isError}
-              />
+              <DialogFooter>
+                <DialogClose
+                  className={buttonVariants({ variant: "outline" })}
+                  disabled={addPasskey.isPending}
+                  type="button"
+                >
+                  {localization.settings.cancel}
+                </DialogClose>
 
-              {addPasskey.error && (
-                <FieldError>
-                  {addPasskey.error.error?.message ?? addPasskey.error.message}
-                </FieldError>
-              )}
-            </Field>
+                <form.AuthFormSubmitButton disabled={addPasskey.isPending}>
+                  {addPasskey.isPending && <Spinner />}
 
-            <DialogFooter>
-              <DialogClose
-                className={buttonVariants({ variant: "outline" })}
-                disabled={addPasskey.isPending}
-                type="button"
-              >
-                {localization.settings.cancel}
-              </DialogClose>
-
-              <Button type="submit" disabled={addPasskey.isPending}>
-                {addPasskey.isPending && <Spinner />}
-
-                {passkeyLocalization.addPasskey}
-              </Button>
-            </DialogFooter>
-          </form>
+                  {passkeyLocalization.addPasskey}
+                </form.AuthFormSubmitButton>
+              </DialogFooter>
+            </form.AuthFormRoot>
+          </form.AppForm>
         )}
       </DialogContent>
     </Dialog>

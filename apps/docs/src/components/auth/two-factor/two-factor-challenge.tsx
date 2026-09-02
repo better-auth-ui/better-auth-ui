@@ -1,6 +1,6 @@
 "use client"
 
-import { authQueryKeys } from "@better-auth-ui/core"
+import { authQueryKeys, validateStringLength } from "@better-auth-ui/core"
 import type { TwoFactorAuthClient } from "@better-auth-ui/core/plugins/two-factor"
 import { useAuth, useAuthPlugin, useSession } from "@better-auth-ui/react"
 import {
@@ -10,7 +10,7 @@ import {
   useVerifyTwoFactorOtp
 } from "@better-auth-ui/react/plugins/two-factor"
 import { useQueryClient } from "@tanstack/react-query"
-import { type SyntheticEvent, useEffect, useState } from "react"
+import { useEffect, useState } from "react"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -40,6 +40,7 @@ import {
   useResendCooldown
 } from "@/lib/auth/use-resend-cooldown"
 import { cn } from "@/lib/utils"
+import { useAuthForm } from "../auth-form"
 import { OtpField } from "../otp-field"
 import { useIsHydrated } from "../use-is-hydrated"
 
@@ -88,8 +89,6 @@ export function TwoFactorChallenge({ className }: TwoFactorChallengeProps) {
   const [method, setMethod] = useState<ChallengeMethod>(
     () => methods[0] ?? "totp"
   )
-  const [code, setCode] = useState("")
-  const [trustDevice, setTrustDevice] = useState(false)
   const [otpRequested, setOtpRequested] = useState(false)
   const { cooldown, isCoolingDown, startCooldown } = useResendCooldown()
 
@@ -117,12 +116,15 @@ export function TwoFactorChallenge({ className }: TwoFactorChallengeProps) {
 
   const { mutate: verifyTotp, isPending: isVerifyingTotp } = useVerifyTotp(
     twoFactorClient,
-    { onError: () => setCode(""), onSuccess: onVerified }
+    {
+      onError: () => form.setFieldValue("code", ""),
+      onSuccess: onVerified
+    }
   )
 
   const { mutate: verifyTwoFactorOtp, isPending: isVerifyingOtp } =
     useVerifyTwoFactorOtp(twoFactorClient, {
-      onError: () => setCode(""),
+      onError: () => form.setFieldValue("code", ""),
       onSuccess: onVerified
     })
 
@@ -133,8 +135,21 @@ export function TwoFactorChallenge({ className }: TwoFactorChallengeProps) {
     isSendingOtp || isVerifyingTotp || isVerifyingOtp || isVerifyingBackupCode
   const needsOtpRequest = method === "otp" && !otpRequested
 
+  const form = useAuthForm({
+    defaultValues: { backupCode: "", code: "", trustDevice: false },
+    onSubmit: ({ value }) => {
+      const trust = trustDeviceEnabled ? { trustDevice: value.trustDevice } : {}
+      if (method === "backup") {
+        verifyBackupCode({ code: value.backupCode.trim(), ...trust })
+        return
+      }
+      verifyCode(value.code)
+    }
+  })
+
   const switchMethod = (next: ChallengeMethod) => {
-    setCode("")
+    form.setFieldValue("code", "")
+    form.setFieldValue("backupCode", "")
     setMethod(next)
   }
 
@@ -148,7 +163,9 @@ export function TwoFactorChallenge({ className }: TwoFactorChallengeProps) {
       return
     }
 
-    const trust = trustDeviceEnabled ? { trustDevice } : {}
+    const trust = trustDeviceEnabled
+      ? { trustDevice: form.state.values.trustDevice }
+      : {}
 
     if (method === "otp") {
       verifyTwoFactorOtp({ code: completedCode, ...trust })
@@ -156,23 +173,6 @@ export function TwoFactorChallenge({ className }: TwoFactorChallengeProps) {
     }
 
     verifyTotp({ code: completedCode, ...trust })
-  }
-
-  const handleSubmit = (e: SyntheticEvent<HTMLFormElement>) => {
-    e.preventDefault()
-
-    const trust = trustDeviceEnabled ? { trustDevice } : {}
-
-    if (method === "backup") {
-      const formData = new FormData(e.currentTarget)
-      verifyBackupCode({
-        code: (formData.get("backupCode") as string).trim(),
-        ...trust
-      })
-      return
-    }
-
-    verifyCode(code)
   }
 
   const description =
@@ -210,113 +210,143 @@ export function TwoFactorChallenge({ className }: TwoFactorChallengeProps) {
       </CardHeader>
 
       <CardContent>
-        <form onSubmit={handleSubmit}>
-          <FieldGroup>
-            {method === "backup" ? (
-              <Field>
-                <FieldLabel htmlFor="backupCode">
-                  {twoFactorLocalization.backupCode}
-                </FieldLabel>
-
-                <Input
-                  id="backupCode"
+        <form.AppForm>
+          <form.AuthFormRoot>
+            <FieldGroup>
+              {method === "backup" ? (
+                <form.AppField
                   name="backupCode"
-                  autoComplete="one-time-code"
-                  autoFocus
-                  required
-                  disabled={isPending}
-                />
-              </Field>
-            ) : (
-              <OtpField
-                autoFocus
-                disabled={isPending || needsOtpRequest}
-                label={
-                  method === "otp"
-                    ? twoFactorLocalization.emailedCode
-                    : twoFactorLocalization.authenticatorCode
-                }
-                length={codeLength}
-                name="code"
-                value={code}
-                onChange={setCode}
-                onComplete={verifyCode}
-              />
-            )}
-
-            {trustDeviceEnabled && (
-              <Field orientation="horizontal">
-                <Checkbox
-                  id="trustDevice"
-                  name="trustDevice"
-                  checked={trustDevice}
-                  disabled={isPending}
-                  onCheckedChange={(checked) =>
-                    setTrustDevice(checked === true)
-                  }
-                />
-
-                <FieldLabel htmlFor="trustDevice" className="font-normal">
-                  {twoFactorLocalization.trustDevice}
-                </FieldLabel>
-              </Field>
-            )}
-
-            <div className="flex flex-col gap-3">
-              {needsOtpRequest ? (
-                <Button
-                  type="button"
-                  disabled={isSendingOtp}
-                  onClick={() => sendTwoFactorOtp()}
+                  validators={{
+                    onChange: ({ value }) =>
+                      validateStringLength(value, {
+                        requiredMessage: localization.auth.fieldRequired,
+                        trim: true
+                      })
+                  }}
                 >
-                  {isSendingOtp && <Spinner />}
+                  {(field) => (
+                    <Field>
+                      <FieldLabel htmlFor="backupCode">
+                        {twoFactorLocalization.backupCode}
+                      </FieldLabel>
 
-                  {twoFactorLocalization.sendEmailCode}
-                </Button>
+                      <Input
+                        id="backupCode"
+                        name={field.name}
+                        autoComplete="one-time-code"
+                        autoFocus
+                        required
+                        disabled={isPending}
+                        value={field.state.value}
+                        onBlur={field.handleBlur}
+                        onChange={(event) =>
+                          field.handleChange(event.target.value)
+                        }
+                      />
+                    </Field>
+                  )}
+                </form.AppField>
               ) : (
-                <Button
-                  type="submit"
-                  disabled={
-                    isPending ||
-                    (method !== "backup" && code.length !== codeLength)
-                  }
-                >
-                  {isPending && <Spinner />}
-
-                  {twoFactorLocalization.verify}
-                </Button>
+                <form.AppField name="code">
+                  {(field) => (
+                    <OtpField
+                      autoFocus
+                      disabled={isPending || needsOtpRequest}
+                      label={
+                        method === "otp"
+                          ? twoFactorLocalization.emailedCode
+                          : twoFactorLocalization.authenticatorCode
+                      }
+                      length={codeLength}
+                      name={field.name}
+                      value={field.state.value}
+                      onChange={field.handleChange}
+                      onComplete={verifyCode}
+                    />
+                  )}
+                </form.AppField>
               )}
 
-              {method === "otp" && otpRequested && (
-                <Button
-                  type="button"
-                  variant="outline"
-                  disabled={isPending || isCoolingDown}
-                  onClick={() => sendTwoFactorOtp()}
-                >
-                  {isCoolingDown
-                    ? localization.auth.resendIn.replace(
-                        "{{seconds}}",
-                        String(cooldown)
-                      )
-                    : localization.auth.resend}
-                </Button>
+              {trustDeviceEnabled && (
+                <form.AppField name="trustDevice">
+                  {(field) => (
+                    <Field orientation="horizontal">
+                      <Checkbox
+                        id="trustDevice"
+                        name={field.name}
+                        checked={field.state.value}
+                        disabled={isPending}
+                        onCheckedChange={(checked) =>
+                          field.handleChange(checked === true)
+                        }
+                      />
+
+                      <FieldLabel htmlFor="trustDevice" className="font-normal">
+                        {twoFactorLocalization.trustDevice}
+                      </FieldLabel>
+                    </Field>
+                  )}
+                </form.AppField>
               )}
 
-              {alternatives.map((alternative) => (
-                <Button
-                  type="button"
-                  variant="ghost"
-                  key={alternative.key}
-                  disabled={isPending}
-                  onClick={() => switchMethod(alternative.key)}
-                >
-                  {alternative.label}
-                </Button>
-              ))}
-            </div>
-          </FieldGroup>
-        </form>
+              <div className="flex flex-col gap-3">
+                {needsOtpRequest ? (
+                  <Button
+                    type="button"
+                    disabled={isSendingOtp}
+                    onClick={() => sendTwoFactorOtp()}
+                  >
+                    {isSendingOtp && <Spinner />}
+
+                    {twoFactorLocalization.sendEmailCode}
+                  </Button>
+                ) : (
+                  <form.Subscribe selector={(state) => state.values.code}>
+                    {(code) => (
+                      <form.AuthFormSubmitButton
+                        disabled={
+                          isPending ||
+                          (method !== "backup" && code.length !== codeLength)
+                        }
+                      >
+                        {isPending && <Spinner />}
+                        {twoFactorLocalization.verify}
+                      </form.AuthFormSubmitButton>
+                    )}
+                  </form.Subscribe>
+                )}
+
+                {method === "otp" && otpRequested && (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    disabled={isPending || isCoolingDown}
+                    onClick={() => sendTwoFactorOtp()}
+                  >
+                    {isCoolingDown
+                      ? localization.auth.resendIn.replace(
+                          "{{seconds}}",
+                          String(cooldown)
+                        )
+                      : localization.auth.resend}
+                  </Button>
+                )}
+
+                {alternatives.map((alternative) => (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    key={alternative.key}
+                    disabled={isPending}
+                    onClick={() => switchMethod(alternative.key)}
+                  >
+                    {alternative.label}
+                  </Button>
+                ))}
+              </div>
+            </FieldGroup>
+          </form.AuthFormRoot>
+        </form.AppForm>
 
         <div className="flex flex-col gap-3 items-center w-full mt-4">
           <FieldDescription className="text-center">

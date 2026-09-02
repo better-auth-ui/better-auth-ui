@@ -10,15 +10,15 @@ import {
   AlertDialog,
   Button,
   FieldError,
-  Form,
   Input,
   Label,
   Spinner,
   TextField
 } from "@heroui/react"
-import { type SyntheticEvent, useRef } from "react"
+import { useRef } from "react"
 
 import { passkeyPlugin } from "../../../lib/auth/passkey-plugin"
+import { useAuthForm } from "../auth-form"
 import { FreshSessionPrompt } from "../settings/security/fresh-session-prompt"
 
 export type AddPasskeyDialogProps = {
@@ -57,17 +57,16 @@ export function AddPasskeyDialog({
     addPasskey.mutate(requestWithCallbacks)
   }
 
-  const handleSubmit = (e: SyntheticEvent<HTMLFormElement>) => {
-    e.preventDefault()
-
-    const formData = new FormData(e.target as HTMLFormElement)
-    const name = (formData.get("name") as string)?.trim()
-
-    submitRequest({
-      ...(name ? { name } : {}),
-      ...(authenticatorAttachment ? { authenticatorAttachment } : {})
-    } as AddPasskeyParams<PasskeyAuthClient>)
-  }
+  const form = useAuthForm({
+    defaultValues: { name: "" },
+    onSubmit: ({ value }) => {
+      const name = value.name.trim()
+      submitRequest({
+        ...(name ? { name } : {}),
+        ...(authenticatorAttachment ? { authenticatorAttachment } : {})
+      } as AddPasskeyParams<PasskeyAuthClient>)
+    }
+  })
 
   const needsFreshSession = isSessionNotFreshError(addPasskey.error)
 
@@ -93,64 +92,73 @@ export function AddPasskeyDialog({
               </AlertDialog.Body>
             </>
           ) : (
-            <Form onSubmit={handleSubmit}>
-              <AlertDialog.CloseTrigger />
+            <form.AppForm>
+              <form.AuthFormRoot>
+                <AlertDialog.CloseTrigger />
 
-              <AlertDialog.Header>
-                <AlertDialog.Icon status="default">
-                  <Fingerprint />
-                </AlertDialog.Icon>
+                <AlertDialog.Header>
+                  <AlertDialog.Icon status="default">
+                    <Fingerprint />
+                  </AlertDialog.Icon>
 
-                <AlertDialog.Heading>
-                  {passkeyLocalization.addPasskey}
-                </AlertDialog.Heading>
-              </AlertDialog.Header>
+                  <AlertDialog.Heading>
+                    {passkeyLocalization.addPasskey}
+                  </AlertDialog.Heading>
+                </AlertDialog.Header>
 
-              <AlertDialog.Body className="overflow-visible">
-                <p className="text-muted text-sm">
-                  {passkeyLocalization.passkeysDescription}
-                </p>
+                <AlertDialog.Body className="overflow-visible">
+                  <p className="text-muted text-sm">
+                    {passkeyLocalization.passkeysDescription}
+                  </p>
 
-                <TextField
-                  className="mt-4"
-                  id="name"
-                  name="name"
-                  isDisabled={addPasskey.isPending}
-                  isInvalid={addPasskey.isError}
-                >
-                  <Label>{passkeyLocalization.name}</Label>
+                  <form.AppField name="name">
+                    {(field) => (
+                      <TextField
+                        className="mt-4"
+                        id="name"
+                        name={field.name}
+                        isDisabled={addPasskey.isPending}
+                        isInvalid={addPasskey.isError}
+                        value={field.state.value}
+                        onBlur={field.handleBlur}
+                        onChange={field.handleChange}
+                      >
+                        <Label>{passkeyLocalization.name}</Label>
 
-                  <Input
-                    autoFocus
-                    placeholder={localization.settings.optional}
-                    variant="secondary"
-                  />
+                        <Input
+                          autoFocus
+                          placeholder={localization.settings.optional}
+                          variant="secondary"
+                        />
 
-                  <FieldError>
-                    {addPasskey.error?.error?.message ??
-                      addPasskey.error?.message}
-                  </FieldError>
-                </TextField>
-              </AlertDialog.Body>
+                        <FieldError>
+                          {addPasskey.error?.error?.message ??
+                            addPasskey.error?.message}
+                        </FieldError>
+                      </TextField>
+                    )}
+                  </form.AppField>
+                </AlertDialog.Body>
 
-              <AlertDialog.Footer>
-                <Button
-                  slot="close"
-                  variant="tertiary"
-                  isDisabled={addPasskey.isPending}
-                >
-                  {localization.settings.cancel}
-                </Button>
+                <AlertDialog.Footer>
+                  <Button
+                    slot="close"
+                    variant="tertiary"
+                    isDisabled={addPasskey.isPending}
+                  >
+                    {localization.settings.cancel}
+                  </Button>
 
-                <Button type="submit" isPending={addPasskey.isPending}>
-                  {addPasskey.isPending && (
-                    <Spinner color="current" size="sm" />
-                  )}
+                  <form.AuthFormSubmitButton isDisabled={addPasskey.isPending}>
+                    {addPasskey.isPending && (
+                      <Spinner color="current" size="sm" />
+                    )}
 
-                  {passkeyLocalization.addPasskey}
-                </Button>
-              </AlertDialog.Footer>
-            </Form>
+                    {passkeyLocalization.addPasskey}
+                  </form.AuthFormSubmitButton>
+                </AlertDialog.Footer>
+              </form.AuthFormRoot>
+            </form.AppForm>
           )}
         </AlertDialog.Dialog>
       </AlertDialog.Container>

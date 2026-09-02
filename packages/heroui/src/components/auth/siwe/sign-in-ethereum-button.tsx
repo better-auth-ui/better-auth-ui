@@ -11,7 +11,6 @@ import { Wallet } from "@gravity-ui/icons"
 import {
   Button,
   FieldError,
-  Form,
   Input,
   Label,
   Modal,
@@ -19,9 +18,10 @@ import {
   TextField
 } from "@heroui/react"
 import { useIsMutating } from "@tanstack/react-query"
-import { type SyntheticEvent, useState } from "react"
+import { useState } from "react"
 
 import { siwePlugin } from "../../../lib/auth/siwe-plugin"
+import { useAuthForm } from "../auth-form"
 
 export type SignInEthereumButtonProps = {
   view?: AuthView
@@ -43,8 +43,6 @@ export function SignInEthereumButton({ view }: SignInEthereumButtonProps) {
       useIsMutating({ mutationKey: siweMutationKeys.all }) >
     0
 
-  if (view === "signUp") return null
-
   const completeSignIn = (email?: string) => {
     signIn.mutate(email ? { email } : undefined, {
       onSuccess: () => {
@@ -59,13 +57,15 @@ export function SignInEthereumButton({ view }: SignInEthereumButtonProps) {
     else setIsOpen(true)
   }
 
-  const handleSubmit = (event: SyntheticEvent<HTMLFormElement>) => {
-    event.preventDefault()
-    const email = String(
-      new FormData(event.currentTarget).get("email") ?? ""
-    ).trim()
-    completeSignIn(email || undefined)
-  }
+  const form = useAuthForm({
+    defaultValues: { email: "" },
+    onSubmit: ({ value }) => {
+      const email = value.email.trim()
+      completeSignIn(email || undefined)
+    }
+  })
+
+  if (view === "signUp") return null
 
   return (
     <>
@@ -83,51 +83,60 @@ export function SignInEthereumButton({ view }: SignInEthereumButtonProps) {
       <Modal.Backdrop isOpen={isOpen} onOpenChange={setIsOpen}>
         <Modal.Container>
           <Modal.Dialog className="sm:max-w-md">
-            <Form onSubmit={handleSubmit}>
-              <Modal.CloseTrigger />
-              <Modal.Header>
-                <Modal.Icon className="bg-accent-soft text-accent-soft-foreground">
-                  <Wallet />
-                </Modal.Icon>
-                <Modal.Heading>
-                  {plugin.localization.continueWithEthereum}
-                </Modal.Heading>
-                <p className="mt-1.5 text-muted text-sm">
-                  {plugin.localization.emailDescription}
-                </p>
-              </Modal.Header>
-              <Modal.Body className="overflow-visible">
-                <TextField
-                  className="w-full"
-                  name="email"
-                  type="email"
-                  isRequired={plugin.email === "required"}
-                  isDisabled={signIn.isPending}
-                  variant="secondary"
-                >
-                  <Label>
-                    {plugin.email === "required"
-                      ? plugin.localization.email
-                      : plugin.localization.emailOptional}
-                  </Label>
-                  <Input autoFocus autoComplete="email" />
-                  <FieldError />
-                </TextField>
-              </Modal.Body>
-              <Modal.Footer>
-                <Button
-                  slot="close"
-                  variant="tertiary"
-                  isDisabled={signIn.isPending}
-                >
-                  {localization.settings.cancel}
-                </Button>
-                <Button type="submit" isPending={signIn.isPending}>
-                  {signIn.isPending && <Spinner color="current" size="sm" />}
-                  {plugin.localization.signMessage}
-                </Button>
-              </Modal.Footer>
-            </Form>
+            <form.AppForm>
+              <form.AuthFormRoot>
+                <Modal.CloseTrigger />
+                <Modal.Header>
+                  <Modal.Icon className="bg-accent-soft text-accent-soft-foreground">
+                    <Wallet />
+                  </Modal.Icon>
+                  <Modal.Heading>
+                    {plugin.localization.continueWithEthereum}
+                  </Modal.Heading>
+                  <p className="mt-1.5 text-muted text-sm">
+                    {plugin.localization.emailDescription}
+                  </p>
+                </Modal.Header>
+                <Modal.Body className="overflow-visible">
+                  <form.AppField name="email">
+                    {(field) => (
+                      <TextField
+                        className="w-full"
+                        name={field.name}
+                        type="email"
+                        isRequired={plugin.email === "required"}
+                        isDisabled={signIn.isPending}
+                        variant="secondary"
+                        value={field.state.value}
+                        onBlur={field.handleBlur}
+                        onChange={field.handleChange}
+                      >
+                        <Label>
+                          {plugin.email === "required"
+                            ? plugin.localization.email
+                            : plugin.localization.emailOptional}
+                        </Label>
+                        <Input autoFocus autoComplete="email" />
+                        <FieldError />
+                      </TextField>
+                    )}
+                  </form.AppField>
+                </Modal.Body>
+                <Modal.Footer>
+                  <Button
+                    slot="close"
+                    variant="tertiary"
+                    isDisabled={signIn.isPending}
+                  >
+                    {localization.settings.cancel}
+                  </Button>
+                  <form.AuthFormSubmitButton isDisabled={signIn.isPending}>
+                    {signIn.isPending && <Spinner color="current" size="sm" />}
+                    {plugin.localization.signMessage}
+                  </form.AuthFormSubmitButton>
+                </Modal.Footer>
+              </form.AuthFormRoot>
+            </form.AppForm>
           </Modal.Dialog>
         </Modal.Container>
       </Modal.Backdrop>

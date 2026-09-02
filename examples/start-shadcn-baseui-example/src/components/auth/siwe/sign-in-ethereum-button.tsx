@@ -1,6 +1,10 @@
 "use client"
 
-import { type AuthView, authMutationKeys } from "@better-auth-ui/core"
+import {
+  type AuthView,
+  authMutationKeys,
+  validateEmailAddress
+} from "@better-auth-ui/core"
 import {
   type SiweAuthClient,
   siweMutationKeys
@@ -9,7 +13,7 @@ import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
 import { useSignInSiwe } from "@better-auth-ui/react/plugins/siwe"
 import { useIsMutating } from "@tanstack/react-query"
 import { Wallet } from "lucide-react"
-import { type FormEvent, useState } from "react"
+import { useState } from "react"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -20,16 +24,12 @@ import {
   DialogHeader,
   DialogTitle
 } from "@/components/ui/dialog"
-import {
-  Field,
-  FieldDescription,
-  FieldError,
-  FieldLabel
-} from "@/components/ui/field"
+import { Field, FieldDescription, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import { Spinner } from "@/components/ui/spinner"
 import { siwePlugin } from "@/lib/auth/siwe-plugin"
 import { cn } from "@/lib/utils"
+import { isAuthFormFieldInvalid, useAuthForm } from "../auth-form"
 
 export type SignInEthereumButtonProps = { view?: AuthView }
 
@@ -50,8 +50,6 @@ export function SignInEthereumButton({ view }: SignInEthereumButtonProps) {
       useIsMutating({ mutationKey: siweMutationKeys.all }) >
     0
 
-  if (view === "signUp") return null
-
   const complete = (email?: string) => {
     signIn.mutate(email ? { email } : undefined, {
       onSuccess: () => {
@@ -61,13 +59,12 @@ export function SignInEthereumButton({ view }: SignInEthereumButtonProps) {
     })
   }
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault()
-    const email = String(
-      new FormData(event.currentTarget).get("email") ?? ""
-    ).trim()
-    complete(email || undefined)
-  }
+  const form = useAuthForm({
+    defaultValues: { email: "" },
+    onSubmit: ({ value }) => complete(value.email.trim() || undefined)
+  })
+
+  if (view === "signUp") return null
 
   return (
     <>
@@ -84,50 +81,77 @@ export function SignInEthereumButton({ view }: SignInEthereumButtonProps) {
 
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent>
-          <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-            <DialogHeader>
-              <DialogTitle className="flex items-center gap-2">
-                <Wallet />
-                {plugin.localization.continueWithEthereum}
-              </DialogTitle>
-              <DialogDescription>
-                {plugin.localization.emailDescription}
-              </DialogDescription>
-            </DialogHeader>
-            <Field>
-              <FieldLabel htmlFor="siwe-email">
-                {plugin.email === "required"
-                  ? plugin.localization.email
-                  : plugin.localization.emailOptional}
-              </FieldLabel>
-              <Input
-                id="siwe-email"
+          <form.AppForm>
+            <form.AuthFormRoot className="flex flex-col gap-4">
+              <DialogHeader>
+                <DialogTitle className="flex items-center gap-2">
+                  <Wallet />
+                  {plugin.localization.continueWithEthereum}
+                </DialogTitle>
+                <DialogDescription>
+                  {plugin.localization.emailDescription}
+                </DialogDescription>
+              </DialogHeader>
+              <form.AppField
                 name="email"
-                type="email"
-                autoComplete="email"
-                required={plugin.email === "required"}
-                disabled={signIn.isPending}
-              />
-              <FieldDescription>
-                {plugin.localization.emailDescription}
-              </FieldDescription>
-              <FieldError />
-            </Field>
-            <DialogFooter>
-              <Button
-                type="button"
-                variant="outline"
-                disabled={signIn.isPending}
-                onClick={() => setOpen(false)}
+                validators={{
+                  onChange: ({ value }) =>
+                    validateEmailAddress(value, {
+                      invalidMessage: localization.auth.invalidEmail,
+                      requiredMessage:
+                        plugin.email === "required"
+                          ? localization.auth.fieldRequired
+                          : undefined
+                    })
+                }}
               >
-                {localization.settings.cancel}
-              </Button>
-              <Button type="submit" disabled={signIn.isPending}>
-                {signIn.isPending && <Spinner />}
-                {plugin.localization.signMessage}
-              </Button>
-            </DialogFooter>
-          </form>
+                {(field) => {
+                  const isInvalid = isAuthFormFieldInvalid(field.state.meta)
+                  return (
+                    <Field data-invalid={isInvalid}>
+                      <FieldLabel htmlFor="siwe-email">
+                        {plugin.email === "required"
+                          ? plugin.localization.email
+                          : plugin.localization.emailOptional}
+                      </FieldLabel>
+                      <Input
+                        id="siwe-email"
+                        name={field.name}
+                        type="email"
+                        autoComplete="email"
+                        required={plugin.email === "required"}
+                        disabled={signIn.isPending}
+                        value={field.state.value}
+                        onBlur={field.handleBlur}
+                        onChange={(event) =>
+                          field.handleChange(event.target.value)
+                        }
+                        aria-invalid={isInvalid}
+                      />
+                      <FieldDescription>
+                        {plugin.localization.emailDescription}
+                      </FieldDescription>
+                      <field.AuthFormFieldError />
+                    </Field>
+                  )
+                }}
+              </form.AppField>
+              <DialogFooter>
+                <Button
+                  type="button"
+                  variant="outline"
+                  disabled={signIn.isPending}
+                  onClick={() => setOpen(false)}
+                >
+                  {localization.settings.cancel}
+                </Button>
+                <form.AuthFormSubmitButton disabled={signIn.isPending}>
+                  {signIn.isPending && <Spinner />}
+                  {plugin.localization.signMessage}
+                </form.AuthFormSubmitButton>
+              </DialogFooter>
+            </form.AuthFormRoot>
+          </form.AppForm>
         </DialogContent>
       </Dialog>
     </>

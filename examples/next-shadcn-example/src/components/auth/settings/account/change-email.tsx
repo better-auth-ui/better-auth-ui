@@ -1,17 +1,17 @@
 "use client"
 
-import { getViewURL } from "@better-auth-ui/core"
+import { getViewURL, validateEmailAddress } from "@better-auth-ui/core"
 import { useAuth, useChangeEmail, useSession } from "@better-auth-ui/react"
-import { type SyntheticEvent, useState } from "react"
+import { useEffect } from "react"
 import { toast } from "sonner"
 
-import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter } from "@/components/ui/card"
-import { Field, FieldError, FieldLabel } from "@/components/ui/field"
+import { Field, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Spinner } from "@/components/ui/spinner"
 import { cn } from "@/lib/utils"
+import { isAuthFormFieldInvalid, useAuthForm } from "../../auth-form"
 
 export type ChangeEmailProps = {
   className?: string
@@ -34,23 +34,22 @@ export function ChangeEmail({ className }: ChangeEmailProps) {
     onSuccess: () => toast.success(localization.settings.changeEmailSuccess)
   })
 
-  const [fieldErrors, setFieldErrors] = useState<{
-    email?: string
-  }>({})
+  const form = useAuthForm({
+    defaultValues: { email: "" },
+    onSubmit: ({ value }) =>
+      changeEmail({
+        callbackURL: getViewURL(
+          baseURL,
+          basePaths.settings,
+          viewPaths.settings.account
+        ),
+        newEmail: value.email
+      })
+  })
 
-  function handleSubmit(e: SyntheticEvent<HTMLFormElement>) {
-    e.preventDefault()
-
-    const formData = new FormData(e.currentTarget)
-    changeEmail({
-      newEmail: formData.get("email") as string,
-      callbackURL: getViewURL(
-        baseURL,
-        basePaths.settings,
-        viewPaths.settings.account
-      )
-    })
-  }
+  useEffect(() => {
+    if (session) form.reset({ email: session.user.email })
+  }, [form, session])
 
   return (
     <div>
@@ -58,57 +57,68 @@ export function ChangeEmail({ className }: ChangeEmailProps) {
         {localization.settings.changeEmail}
       </h2>
 
-      <form onSubmit={handleSubmit}>
-        <Card className={cn(className)}>
-          <CardContent className="flex flex-col gap-6">
-            <Field data-invalid={!!fieldErrors.email}>
-              <FieldLabel htmlFor="email">{localization.auth.email}</FieldLabel>
+      <form.AppForm>
+        <form.AuthFormRoot>
+          <Card className={cn(className)}>
+            <CardContent className="flex flex-col gap-6">
+              <form.AppField
+                name="email"
+                validators={{
+                  onChange: ({ value }) =>
+                    validateEmailAddress(value, {
+                      invalidMessage: localization.auth.invalidEmail,
+                      requiredMessage: localization.auth.fieldRequired
+                    })
+                }}
+              >
+                {(field) => {
+                  const isInvalid = isAuthFormFieldInvalid(field.state.meta)
+                  return (
+                    <Field data-invalid={isInvalid}>
+                      <FieldLabel htmlFor="email">
+                        {localization.auth.email}
+                      </FieldLabel>
+                      {session ? (
+                        <Input
+                          id="email"
+                          name={field.name}
+                          type="email"
+                          autoComplete="email"
+                          value={field.state.value}
+                          onBlur={field.handleBlur}
+                          onChange={(event) =>
+                            field.handleChange(event.target.value)
+                          }
+                          placeholder={localization.auth.emailPlaceholder}
+                          disabled={isPending}
+                          required
+                          aria-invalid={isInvalid}
+                        />
+                      ) : (
+                        <Skeleton>
+                          <Input className="invisible" />
+                        </Skeleton>
+                      )}
+                      <field.AuthFormFieldError />
+                    </Field>
+                  )
+                }}
+              </form.AppField>
+            </CardContent>
 
-              {session ? (
-                <Input
-                  key={session?.user.email}
-                  id="email"
-                  name="email"
-                  type="email"
-                  autoComplete="email"
-                  defaultValue={session?.user.email}
-                  placeholder={localization.auth.emailPlaceholder}
-                  disabled={isPending}
-                  required
-                  onChange={() => {
-                    setFieldErrors((prev) => ({
-                      ...prev,
-                      email: undefined
-                    }))
-                  }}
-                  onInvalid={(e) => {
-                    e.preventDefault()
-                    setFieldErrors((prev) => ({
-                      ...prev,
-                      email: (e.target as HTMLInputElement).validationMessage
-                    }))
-                  }}
-                  aria-invalid={!!fieldErrors.email}
-                />
-              ) : (
-                <Skeleton>
-                  <Input className="invisible" />
-                </Skeleton>
-              )}
+            <CardFooter>
+              <form.AuthFormSubmitButton
+                size="sm"
+                disabled={isPending || !session}
+              >
+                {isPending && <Spinner />}
 
-              <FieldError>{fieldErrors.email}</FieldError>
-            </Field>
-          </CardContent>
-
-          <CardFooter>
-            <Button type="submit" size="sm" disabled={isPending || !session}>
-              {isPending && <Spinner />}
-
-              {localization.settings.updateEmail}
-            </Button>
-          </CardFooter>
-        </Card>
-      </form>
+                {localization.settings.updateEmail}
+              </form.AuthFormSubmitButton>
+            </CardFooter>
+          </Card>
+        </form.AuthFormRoot>
+      </form.AppForm>
     </div>
   )
 }

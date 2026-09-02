@@ -6,17 +6,17 @@ import {
   AlertDialog,
   Button,
   FieldError,
-  Form,
   Input,
   Label,
   Spinner,
   TextField,
   toast
 } from "@heroui/react"
-import { type SyntheticEvent, useState } from "react"
+import { useState } from "react"
 
 import { twoFactorPlugin } from "../../../lib/auth/two-factor-plugin"
 import { useTwoFactorPasswordRequirement } from "../../../lib/auth/use-two-factor-password"
+import { useAuthForm } from "../auth-form"
 import { BackupCodes } from "./backup-codes"
 
 export type RegenerateBackupCodesDialogProps = {
@@ -67,88 +67,101 @@ export function RegenerateBackupCodesDialog({
     }
   }
 
-  const handleSubmit = (e: SyntheticEvent<HTMLFormElement>) => {
-    e.preventDefault()
+  const form = useAuthForm({
+    defaultValues: { password: "" },
+    onSubmit: ({ value }) => {
+      if (codes.length) {
+        handleOpenChange(false)
+        return
+      }
 
-    if (codes.length) {
-      handleOpenChange(false)
-      return
+      generateBackupCodes(requiresPassword ? { password: value.password } : {})
     }
-
-    const formData = new FormData(e.currentTarget)
-    const password = formData.get("password") as string
-
-    generateBackupCodes(requiresPassword ? { password } : {})
-  }
+  })
 
   return (
     <AlertDialog.Backdrop isOpen={isOpen} onOpenChange={handleOpenChange}>
       <AlertDialog.Container>
         <AlertDialog.Dialog>
-          <Form onSubmit={handleSubmit}>
-            <AlertDialog.CloseTrigger />
+          <form.AppForm>
+            <form.AuthFormRoot>
+              <AlertDialog.CloseTrigger />
 
-            <AlertDialog.Header>
-              <AlertDialog.Icon status="default">
-                <Key />
-              </AlertDialog.Icon>
+              <AlertDialog.Header>
+                <AlertDialog.Icon status="default">
+                  <Key />
+                </AlertDialog.Icon>
 
-              <AlertDialog.Heading>
-                {twoFactorLocalization.backupCodes}
-              </AlertDialog.Heading>
-            </AlertDialog.Header>
+                <AlertDialog.Heading>
+                  {twoFactorLocalization.backupCodes}
+                </AlertDialog.Heading>
+              </AlertDialog.Header>
 
-            <AlertDialog.Body className="overflow-visible">
-              {codes.length ? (
-                <BackupCodes codes={codes} />
-              ) : (
-                <>
-                  <p className="text-muted text-sm">
-                    {requiresPassword
-                      ? twoFactorLocalization.passwordConfirmation
-                      : twoFactorLocalization.backupCodesDescription}
-                  </p>
+              <AlertDialog.Body className="overflow-visible">
+                {codes.length ? (
+                  <BackupCodes codes={codes} />
+                ) : (
+                  <>
+                    <p className="text-muted text-sm">
+                      {requiresPassword
+                        ? twoFactorLocalization.passwordConfirmation
+                        : twoFactorLocalization.backupCodesDescription}
+                    </p>
 
-                  {requiresPassword && (
-                    <TextField
-                      className="mt-4"
-                      name="password"
-                      autoComplete="current-password"
-                      isDisabled={isPending}
-                    >
-                      <Label>{localization.auth.password}</Label>
+                    {requiresPassword && (
+                      <form.AppField name="password">
+                        {(field) => (
+                          <TextField
+                            className="mt-4"
+                            name={field.name}
+                            autoComplete="current-password"
+                            isDisabled={isPending}
+                            value={field.state.value}
+                            onBlur={field.handleBlur}
+                            onChange={field.handleChange}
+                          >
+                            <Label>{localization.auth.password}</Label>
 
-                      <Input
-                        autoFocus
-                        required
-                        type="password"
-                        placeholder={localization.auth.passwordPlaceholder}
-                        variant="secondary"
-                      />
+                            <Input
+                              autoFocus
+                              required
+                              type="password"
+                              placeholder={
+                                localization.auth.passwordPlaceholder
+                              }
+                              variant="secondary"
+                            />
 
-                      <FieldError />
-                    </TextField>
-                  )}
-                </>
-              )}
-            </AlertDialog.Body>
+                            <FieldError />
+                          </TextField>
+                        )}
+                      </form.AppField>
+                    )}
+                  </>
+                )}
+              </AlertDialog.Body>
 
-            <AlertDialog.Footer>
-              {!codes.length && (
-                <Button slot="close" variant="tertiary" isDisabled={isPending}>
-                  {localization.settings.cancel}
-                </Button>
-              )}
+              <AlertDialog.Footer>
+                {!codes.length && (
+                  <Button
+                    slot="close"
+                    variant="tertiary"
+                    isDisabled={isPending}
+                  >
+                    {localization.settings.cancel}
+                  </Button>
+                )}
 
-              <Button type="submit" isPending={isPending}>
-                {isPending && <Spinner color="current" size="sm" />}
+                <form.AuthFormSubmitButton isDisabled={isPending}>
+                  {isPending && <Spinner color="current" size="sm" />}
 
-                {codes.length
-                  ? twoFactorLocalization.done
-                  : twoFactorLocalization.regenerateBackupCodes}
-              </Button>
-            </AlertDialog.Footer>
-          </Form>
+                  {codes.length
+                    ? twoFactorLocalization.done
+                    : twoFactorLocalization.regenerateBackupCodes}
+                </form.AuthFormSubmitButton>
+              </AlertDialog.Footer>
+            </form.AuthFormRoot>
+          </form.AppForm>
         </AlertDialog.Dialog>
       </AlertDialog.Container>
     </AlertDialog.Backdrop>

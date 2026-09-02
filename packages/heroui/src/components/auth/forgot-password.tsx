@@ -1,25 +1,21 @@
-import { getViewURL } from "@better-auth-ui/core"
+import { getViewURL, validateEmailAddress } from "@better-auth-ui/core"
 import {
   useAuth,
   useFetchOptions,
   useRequestPasswordReset
 } from "@better-auth-ui/react"
 import {
-  Button,
   Card,
   type CardProps,
   cn,
   Description,
-  FieldError,
-  Form,
   Input,
   Label,
   Link,
   Spinner,
   TextField
 } from "@heroui/react"
-import type { SyntheticEvent } from "react"
-
+import { isAuthFormFieldInvalid, useAuthForm } from "./auth-form"
 import { RESET_LINK_SENT_STORAGE_KEY } from "./reset-link-sent"
 
 export type ForgotPasswordProps = {
@@ -64,20 +60,19 @@ export function ForgotPassword({ className, variant }: ForgotPasswordProps) {
     }
   )
 
-  function handleSubmit(e: SyntheticEvent<HTMLFormElement>) {
-    e.preventDefault()
-
-    const formData = new FormData(e.currentTarget)
-    requestPasswordReset({
-      email: formData.get("email") as string,
-      redirectTo: getViewURL(
-        baseURL,
-        basePaths.auth,
-        viewPaths.auth.resetPassword
-      ),
-      fetchOptions
-    })
-  }
+  const form = useAuthForm({
+    defaultValues: { email: "" },
+    onSubmit: ({ value }) =>
+      requestPasswordReset({
+        email: value.email,
+        redirectTo: getViewURL(
+          baseURL,
+          basePaths.auth,
+          viewPaths.auth.resetPassword
+        ),
+        fetchOptions
+      })
+  })
 
   const Captcha = plugins.find(
     (plugin) => plugin.captchaComponent
@@ -95,39 +90,58 @@ export function ForgotPassword({ className, variant }: ForgotPasswordProps) {
       </Card.Header>
 
       <Card.Content className="gap-4">
-        <Form onSubmit={handleSubmit} className="flex flex-col gap-4">
-          <TextField
-            name="email"
-            type="email"
-            autoComplete="email"
-            isDisabled={isPending}
-            validate={(value) => {
-              if (!value) return localization.auth.fieldRequired
-              if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value))
-                return localization.auth.invalidEmail
-            }}
-          >
-            <Label>{localization.auth.email}</Label>
+        <form.AppForm>
+          <form.AuthFormRoot className="flex flex-col gap-4">
+            <form.AppField
+              name="email"
+              validators={{
+                onChange: ({ value }) =>
+                  validateEmailAddress(value, {
+                    invalidMessage: localization.auth.invalidEmail,
+                    requiredMessage: localization.auth.fieldRequired
+                  })
+              }}
+            >
+              {(field) => (
+                <TextField
+                  name={field.name}
+                  type="email"
+                  autoComplete="email"
+                  isDisabled={isPending}
+                  value={field.state.value}
+                  onBlur={field.handleBlur}
+                  onChange={field.handleChange}
+                  isInvalid={isAuthFormFieldInvalid(field.state.meta)}
+                >
+                  <Label>{localization.auth.email}</Label>
 
-            <Input
-              placeholder={localization.auth.emailPlaceholder}
-              required
-              variant={variant === "transparent" ? "primary" : "secondary"}
-            />
+                  <Input
+                    placeholder={localization.auth.emailPlaceholder}
+                    required
+                    variant={
+                      variant === "transparent" ? "primary" : "secondary"
+                    }
+                  />
 
-            <FieldError />
-          </TextField>
+                  <field.AuthFormFieldError />
+                </TextField>
+              )}
+            </form.AppField>
 
-          {Captcha && <div className="flex justify-center">{Captcha}</div>}
+            {Captcha && <div className="flex justify-center">{Captcha}</div>}
 
-          <div className="flex flex-col gap-3">
-            <Button type="submit" className="w-full" isPending={isPending}>
-              {isPending && <Spinner color="current" size="sm" />}
+            <div className="flex flex-col gap-3">
+              <form.AuthFormSubmitButton
+                className="w-full"
+                isDisabled={isPending}
+              >
+                {isPending && <Spinner color="current" size="sm" />}
 
-              {localization.auth.sendResetLink}
-            </Button>
-          </div>
-        </Form>
+                {localization.auth.sendResetLink}
+              </form.AuthFormSubmitButton>
+            </div>
+          </form.AuthFormRoot>
+        </form.AppForm>
       </Card.Content>
 
       <Card.Footer className="flex-col gap-3">

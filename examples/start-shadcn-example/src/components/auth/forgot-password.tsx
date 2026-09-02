@@ -1,25 +1,23 @@
 "use client"
 
-import { getViewURL } from "@better-auth-ui/core"
+import { getViewURL, validateEmailAddress } from "@better-auth-ui/core"
 import {
   useAuth,
   useFetchOptions,
   useRequestPasswordReset
 } from "@better-auth-ui/react"
-import { type SyntheticEvent, useState } from "react"
 
-import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import {
   Field,
   FieldDescription,
-  FieldError,
   FieldGroup,
   FieldLabel
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import { Spinner } from "@/components/ui/spinner"
 import { cn } from "@/lib/utils"
+import { isAuthFormFieldInvalid, useAuthForm } from "./auth-form"
 import { RESET_LINK_SENT_STORAGE_KEY } from "./reset-link-sent"
 
 export type ForgotPasswordProps = {
@@ -64,27 +62,23 @@ export function ForgotPassword({ className }: ForgotPasswordProps) {
     }
   )
 
-  function handleSubmit(e: SyntheticEvent<HTMLFormElement>) {
-    e.preventDefault()
-    const formData = new FormData(e.currentTarget)
-    requestPasswordReset({
-      email: formData.get("email") as string,
-      redirectTo: getViewURL(
-        baseURL,
-        basePaths.auth,
-        viewPaths.auth.resetPassword
-      ),
-      fetchOptions
-    })
-  }
+  const form = useAuthForm({
+    defaultValues: { email: "" },
+    onSubmit: ({ value }) =>
+      requestPasswordReset({
+        email: value.email,
+        redirectTo: getViewURL(
+          baseURL,
+          basePaths.auth,
+          viewPaths.auth.resetPassword
+        ),
+        fetchOptions
+      })
+  })
 
   const Captcha = plugins.find(
     (plugin) => plugin.captchaComponent
   )?.captchaComponent
-
-  const [fieldErrors, setFieldErrors] = useState<{
-    email?: string
-  }>({})
 
   return (
     <Card className={cn("w-full max-w-sm", className)}>
@@ -95,54 +89,58 @@ export function ForgotPassword({ className }: ForgotPasswordProps) {
       </CardHeader>
 
       <CardContent>
-        <form onSubmit={handleSubmit}>
-          <FieldGroup>
-            <Field data-invalid={!!fieldErrors.email}>
-              <FieldLabel htmlFor="email">{localization.auth.email}</FieldLabel>
-
-              <Input
-                id="email"
+        <form.AppForm>
+          <form.AuthFormRoot>
+            <FieldGroup>
+              <form.AppField
                 name="email"
-                type="email"
-                autoComplete="email"
-                placeholder={localization.auth.emailPlaceholder}
-                required
-                disabled={isPending}
-                onChange={() => {
-                  setFieldErrors((prev) => ({
-                    ...prev,
-                    email: undefined
-                  }))
+                validators={{
+                  onChange: ({ value }) =>
+                    validateEmailAddress(value, {
+                      invalidMessage: localization.auth.invalidEmail,
+                      requiredMessage: localization.auth.fieldRequired
+                    })
                 }}
-                onInvalid={(e) => {
-                  e.preventDefault()
-                  const el = e.target as HTMLInputElement
-                  const msg = el.validity.valueMissing
-                    ? localization.auth.fieldRequired
-                    : localization.auth.invalidEmail
-
-                  setFieldErrors((prev) => ({
-                    ...prev,
-                    email: msg
-                  }))
+              >
+                {(field) => {
+                  const isInvalid = isAuthFormFieldInvalid(field.state.meta)
+                  return (
+                    <Field data-invalid={isInvalid}>
+                      <FieldLabel htmlFor="email">
+                        {localization.auth.email}
+                      </FieldLabel>
+                      <Input
+                        id="email"
+                        name={field.name}
+                        type="email"
+                        autoComplete="email"
+                        placeholder={localization.auth.emailPlaceholder}
+                        required
+                        disabled={isPending}
+                        value={field.state.value}
+                        onBlur={field.handleBlur}
+                        onChange={(event) =>
+                          field.handleChange(event.target.value)
+                        }
+                        aria-invalid={isInvalid}
+                      />
+                      <field.AuthFormFieldError />
+                    </Field>
+                  )
                 }}
-                aria-invalid={!!fieldErrors.email}
-              />
+              </form.AppField>
 
-              <FieldError>{fieldErrors.email}</FieldError>
-            </Field>
+              {Captcha && <div className="flex justify-center">{Captcha}</div>}
 
-            {Captcha && <div className="flex justify-center">{Captcha}</div>}
-
-            <div className="flex flex-col gap-3">
-              <Button type="submit" disabled={isPending}>
-                {isPending && <Spinner />}
-
-                {localization.auth.sendResetLink}
-              </Button>
-            </div>
-          </FieldGroup>
-        </form>
+              <div className="flex flex-col gap-3">
+                <form.AuthFormSubmitButton disabled={isPending}>
+                  {isPending && <Spinner />}
+                  {localization.auth.sendResetLink}
+                </form.AuthFormSubmitButton>
+              </div>
+            </FieldGroup>
+          </form.AuthFormRoot>
+        </form.AppForm>
 
         <div className="flex flex-col gap-3 items-center w-full mt-4">
           <FieldDescription className="text-center">

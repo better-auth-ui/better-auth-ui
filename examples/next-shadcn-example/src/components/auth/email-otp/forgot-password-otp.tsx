@@ -1,17 +1,14 @@
 "use client"
 
-import { getAuthLinkURL } from "@better-auth-ui/core"
+import { getAuthLinkURL, validateEmailAddress } from "@better-auth-ui/core"
 import type { EmailOtpAuthClient } from "@better-auth-ui/core/plugins/email-otp"
 import { useAuth, useAuthPlugin, useFetchOptions } from "@better-auth-ui/react"
 import { useRequestPasswordResetOtp } from "@better-auth-ui/react/plugins/email-otp"
-import { type SyntheticEvent, useState } from "react"
 
-import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import {
   Field,
   FieldDescription,
-  FieldError,
   FieldGroup,
   FieldLabel
 } from "@/components/ui/field"
@@ -19,6 +16,7 @@ import { Input } from "@/components/ui/input"
 import { Spinner } from "@/components/ui/spinner"
 import { emailOtpPlugin } from "@/lib/auth/email-otp-plugin"
 import { cn } from "@/lib/utils"
+import { isAuthFormFieldInvalid, useAuthForm } from "../auth-form"
 
 /** `sessionStorage` key the reset-code form reads the pending address from. */
 export const RESET_PASSWORD_OTP_STORAGE_KEY =
@@ -52,7 +50,6 @@ export function ForgotPasswordOtp({ className }: ForgotPasswordOtpProps) {
   const { localization: emailOtpLocalization } = useAuthPlugin(emailOtpPlugin)
 
   const { fetchOptions, resetFetchOptions } = useFetchOptions()
-  const [fieldErrors, setFieldErrors] = useState<{ email?: string }>({})
 
   const { mutate: requestPasswordResetOtp, isPending } =
     useRequestPasswordResetOtp(authClient as EmailOtpAuthClient, {
@@ -63,15 +60,11 @@ export function ForgotPasswordOtp({ className }: ForgotPasswordOtpProps) {
       }
     })
 
-  const handleSubmit = (e: SyntheticEvent<HTMLFormElement>) => {
-    e.preventDefault()
-
-    const formData = new FormData(e.currentTarget)
-    requestPasswordResetOtp({
-      email: formData.get("email") as string,
-      fetchOptions
-    })
-  }
+  const form = useAuthForm({
+    defaultValues: { email: "" },
+    onSubmit: ({ value }) =>
+      requestPasswordResetOtp({ email: value.email, fetchOptions })
+  })
 
   const Captcha = plugins.find(
     (plugin) => plugin.captchaComponent
@@ -86,45 +79,57 @@ export function ForgotPasswordOtp({ className }: ForgotPasswordOtpProps) {
       </CardHeader>
 
       <CardContent>
-        <form onSubmit={handleSubmit}>
-          <FieldGroup>
-            <Field data-invalid={!!fieldErrors.email}>
-              <FieldLabel htmlFor="email">{localization.auth.email}</FieldLabel>
-
-              <Input
-                id="email"
+        <form.AppForm>
+          <form.AuthFormRoot>
+            <FieldGroup>
+              <form.AppField
                 name="email"
-                type="email"
-                autoComplete="email"
-                placeholder={localization.auth.emailPlaceholder}
-                required
-                disabled={isPending}
-                onChange={() =>
-                  setFieldErrors((prev) => ({ ...prev, email: undefined }))
-                }
-                onInvalid={(e) => {
-                  e.preventDefault()
-
-                  setFieldErrors((prev) => ({
-                    ...prev,
-                    email: (e.target as HTMLInputElement).validationMessage
-                  }))
+                validators={{
+                  onChange: ({ value }) =>
+                    validateEmailAddress(value, {
+                      invalidMessage: localization.auth.invalidEmail,
+                      requiredMessage: localization.auth.fieldRequired
+                    })
                 }}
-                aria-invalid={!!fieldErrors.email}
-              />
+              >
+                {(field) => {
+                  const isInvalid = isAuthFormFieldInvalid(field.state.meta)
+                  return (
+                    <Field data-invalid={isInvalid}>
+                      <FieldLabel htmlFor="email">
+                        {localization.auth.email}
+                      </FieldLabel>
+                      <Input
+                        id="email"
+                        name={field.name}
+                        type="email"
+                        autoComplete="email"
+                        placeholder={localization.auth.emailPlaceholder}
+                        required
+                        disabled={isPending}
+                        value={field.state.value}
+                        onBlur={field.handleBlur}
+                        onChange={(event) =>
+                          field.handleChange(event.target.value)
+                        }
+                        aria-invalid={isInvalid}
+                      />
+                      <field.AuthFormFieldError />
+                    </Field>
+                  )
+                }}
+              </form.AppField>
 
-              <FieldError>{fieldErrors.email}</FieldError>
-            </Field>
+              {Captcha && <div className="flex justify-center">{Captcha}</div>}
 
-            {Captcha && <div className="flex justify-center">{Captcha}</div>}
+              <form.AuthFormSubmitButton disabled={isPending}>
+                {isPending && <Spinner />}
 
-            <Button type="submit" disabled={isPending}>
-              {isPending && <Spinner />}
-
-              {emailOtpLocalization.sendCode}
-            </Button>
-          </FieldGroup>
-        </form>
+                {emailOtpLocalization.sendCode}
+              </form.AuthFormSubmitButton>
+            </FieldGroup>
+          </form.AuthFormRoot>
+        </form.AppForm>
 
         <div className="flex flex-col gap-3 items-center w-full mt-4">
           <FieldDescription className="text-center">

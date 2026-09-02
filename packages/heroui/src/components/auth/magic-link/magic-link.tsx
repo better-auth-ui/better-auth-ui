@@ -4,13 +4,10 @@ import { getSsoFallbackEmail } from "@better-auth-ui/core/plugins/sso"
 import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
 import { useSignInMagicLink } from "@better-auth-ui/react/plugins/magic-link"
 import {
-  Button,
   Card,
   type CardProps,
   cn,
   Description,
-  FieldError,
-  Form,
   Input,
   Label,
   Link,
@@ -18,9 +15,9 @@ import {
   TextField
 } from "@heroui/react"
 import { useIsMutating } from "@tanstack/react-query"
-import { type SyntheticEvent, useState } from "react"
 
 import { magicLinkPlugin } from "../../../lib/auth/magic-link-plugin"
+import { useAuthForm } from "../auth-form"
 import { FieldSeparator } from "../field-separator"
 import { ProviderButtons, type SocialLayout } from "../provider-buttons"
 import { MAGIC_LINK_SENT_STORAGE_KEY } from "./magic-link-sent"
@@ -60,8 +57,6 @@ export function MagicLink({
   const { localization: magicLinkLocalization, viewPaths: magicLinkViewPaths } =
     useAuthPlugin(magicLinkPlugin)
 
-  const [email, setEmail] = useState(getSsoFallbackEmail)
-
   const { mutate: signInMagicLink, isPending: signInMagicLinkPending } =
     useSignInMagicLink(authClient as MagicLinkAuthClient, {
       onSuccess: (_data, variables) => {
@@ -80,10 +75,14 @@ export function MagicLink({
   })
   const isPending = signInMutating + signUpMutating > 0
 
-  const handleSubmit = (e: SyntheticEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    signInMagicLink({ email, callbackURL: `${baseURL}${redirectTo}` })
-  }
+  const form = useAuthForm({
+    defaultValues: { email: getSsoFallbackEmail() },
+    onSubmit: ({ value }) =>
+      signInMagicLink({
+        email: value.email,
+        callbackURL: `${baseURL}${redirectTo}`
+      })
+  })
 
   const showSeparator = !!socialProviders?.length
 
@@ -111,43 +110,57 @@ export function MagicLink({
           </>
         )}
 
-        <Form onSubmit={handleSubmit} className="flex flex-col gap-4">
-          <TextField
-            name="email"
-            type="email"
-            autoComplete="email"
-            isDisabled={isPending}
-            value={email}
-            onChange={setEmail}
-          >
-            <Label>{localization.auth.email}</Label>
+        <form.AppForm>
+          <form.AuthFormRoot className="flex flex-col gap-4">
+            <form.AppField name="email">
+              {(field) => (
+                <TextField
+                  name={field.name}
+                  type="email"
+                  autoComplete="email"
+                  isDisabled={isPending}
+                  value={field.state.value}
+                  onBlur={field.handleBlur}
+                  onChange={field.handleChange}
+                >
+                  <Label>{localization.auth.email}</Label>
 
-            <Input
-              placeholder={localization.auth.emailPlaceholder}
-              required
-              variant={variant === "transparent" ? "primary" : "secondary"}
-            />
+                  <Input
+                    placeholder={localization.auth.emailPlaceholder}
+                    required
+                    variant={
+                      variant === "transparent" ? "primary" : "secondary"
+                    }
+                  />
 
-            <FieldError />
-          </TextField>
+                  <field.AuthFormFieldError />
+                </TextField>
+              )}
+            </form.AppField>
 
-          <div className="flex flex-col gap-3">
-            <Button type="submit" className="w-full" isPending={isPending}>
-              {signInMagicLinkPending && <Spinner color="current" size="sm" />}
+            <div className="flex flex-col gap-3">
+              <form.AuthFormSubmitButton
+                className="w-full"
+                isDisabled={isPending}
+              >
+                {signInMagicLinkPending && (
+                  <Spinner color="current" size="sm" />
+                )}
 
-              {magicLinkLocalization.sendMagicLink}
-            </Button>
+                {magicLinkLocalization.sendMagicLink}
+              </form.AuthFormSubmitButton>
 
-            {plugins.flatMap((plugin) =>
-              (plugin.authButtons ?? []).map((AuthButton, index) => (
-                <AuthButton
-                  key={`${plugin.id}-${index.toString()}`}
-                  view="magicLink"
-                />
-              ))
-            )}
-          </div>
-        </Form>
+              {plugins.flatMap((plugin) =>
+                (plugin.authButtons ?? []).map((AuthButton, index) => (
+                  <AuthButton
+                    key={`${plugin.id}-${index.toString()}`}
+                    view="magicLink"
+                  />
+                ))
+              )}
+            </div>
+          </form.AuthFormRoot>
+        </form.AppForm>
 
         {socialPosition === "bottom" && (
           <>

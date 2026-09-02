@@ -1,8 +1,8 @@
 import { isTwoFactorRedirect } from "@better-auth-ui/core/plugins/two-factor"
 import { useAuth, useSession, useSignInEmail } from "@better-auth-ui/react"
-import { Button, Form, Input, Label, Spinner, TextField } from "@heroui/react"
-import { type FormEvent, useState } from "react"
+import { Button, Input, Label, Spinner, TextField } from "@heroui/react"
 import { useSignInContinuation } from "../../../../lib/auth/use-sign-in-continuation"
+import { useAuthForm } from "../../auth-form"
 
 export interface FreshSessionPromptProps {
   onFresh: () => unknown | Promise<unknown>
@@ -20,27 +20,28 @@ export function FreshSessionPrompt({ onFresh }: FreshSessionPromptProps) {
   } = useAuth()
   const session = useSession(authClient)
   const continueSignIn = useSignInContinuation()
-  const [password, setPassword] = useState("")
   const signIn = useSignInEmail(authClient, {
     meta: { errorPresentation: "inline" },
-    onError: () => setPassword(""),
+    onError: () => form.setFieldValue("password", ""),
     onSuccess: async (data) => {
       if (isTwoFactorRedirect(data)) {
         continueSignIn(data)
         return
       }
 
-      setPassword("")
+      form.setFieldValue("password", "")
       await onFresh()
     }
   })
 
-  const submit = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault()
-    const email = session.data?.user.email
-    if (!email) return
-    signIn.mutate({ email, password })
-  }
+  const form = useAuthForm({
+    defaultValues: { password: "" },
+    onSubmit: ({ value }) => {
+      const email = session.data?.user.email
+      if (!email) return
+      signIn.mutate({ email, password: value.password })
+    }
+  })
 
   return (
     <div className="flex flex-col gap-4 p-4">
@@ -54,32 +55,42 @@ export function FreshSessionPrompt({ onFresh }: FreshSessionPromptProps) {
       </div>
 
       {emailAndPassword?.enabled ? (
-        <Form className="flex flex-col gap-3" onSubmit={submit}>
-          <TextField
-            isDisabled={signIn.isPending}
-            isInvalid={signIn.isError}
-            value={password}
-            onChange={setPassword}
-          >
-            <Label>{localization.auth.password}</Label>
-            <Input
-              autoComplete="current-password"
-              name="password"
-              placeholder={localization.auth.passwordPlaceholder}
-              type="password"
-              required
-            />
-          </TextField>
-          {signIn.error && (
-            <p className="text-sm text-danger" role="alert">
-              {signIn.error.error?.message ?? signIn.error.message}
-            </p>
-          )}
-          <Button isDisabled={!password} type="submit" variant="primary">
-            {signIn.isPending && <Spinner color="current" size="sm" />}
-            {localization.settings.freshSessionSubmit}
-          </Button>
-        </Form>
+        <form.AppForm>
+          <form.AuthFormRoot className="flex flex-col gap-3">
+            <form.AppField name="password">
+              {(field) => (
+                <TextField
+                  isDisabled={signIn.isPending}
+                  isInvalid={signIn.isError}
+                  value={field.state.value}
+                  onBlur={field.handleBlur}
+                  onChange={field.handleChange}
+                >
+                  <Label>{localization.auth.password}</Label>
+                  <Input
+                    autoComplete="current-password"
+                    name="password"
+                    placeholder={localization.auth.passwordPlaceholder}
+                    type="password"
+                    required
+                  />
+                </TextField>
+              )}
+            </form.AppField>
+            {signIn.error && (
+              <p className="text-sm text-danger" role="alert">
+                {signIn.error.error?.message ?? signIn.error.message}
+              </p>
+            )}
+            <form.AuthFormSubmitButton
+              isDisabled={!form.state.values.password}
+              variant="primary"
+            >
+              {signIn.isPending && <Spinner color="current" size="sm" />}
+              {localization.settings.freshSessionSubmit}
+            </form.AuthFormSubmitButton>
+          </form.AuthFormRoot>
+        </form.AppForm>
       ) : (
         <Button
           onPress={() =>

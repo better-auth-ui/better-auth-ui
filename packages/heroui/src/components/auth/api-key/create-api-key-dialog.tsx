@@ -9,7 +9,6 @@ import {
   AlertDialog,
   Button,
   FieldError,
-  Form,
   Input,
   Label,
   ListBox,
@@ -17,9 +16,10 @@ import {
   Spinner,
   TextField
 } from "@heroui/react"
-import { type SyntheticEvent, useState } from "react"
+import { useState } from "react"
 
 import { apiKeyPlugin } from "../../../lib/auth/api-key-plugin"
+import { useAuthForm } from "../auth-form"
 
 import { NewApiKeyDialog } from "./new-api-key-dialog"
 
@@ -56,6 +56,7 @@ export function CreateApiKeyDialog({
     if (!open) {
       setKeyName(null)
       setSecretKey(null)
+      form.reset()
     }
 
     onOpenChange(open)
@@ -70,173 +71,210 @@ export function CreateApiKeyDialog({
     }
   }
 
-  const handleSubmit = (e: SyntheticEvent<HTMLFormElement>) => {
-    e.preventDefault()
-
-    const formData = new FormData(e.target as HTMLFormElement)
-    const name = (formData.get("name") as string)?.trim()
-    const expiration = formData.get("expiration")
-    const expirationDays =
-      typeof expiration === "string" && expiration !== "never"
-        ? Number(expiration)
+  const form = useAuthForm({
+    defaultValues: {
+      configId: availableConfigurations[0]?.id ?? "",
+      expiration:
+        keyExpiration && keyExpiration.defaultInterval === null
+          ? "never"
+          : String((keyExpiration && keyExpiration.defaultInterval) ?? "never"),
+      name: ""
+    },
+    onSubmit: ({ value }) => {
+      const name = value.name.trim()
+      const expirationDays =
+        value.expiration !== "never" ? Number(value.expiration) : undefined
+      const expiresIn = expirationDays
+        ? apiKeyExpirationDaysToSeconds(expirationDays)
         : undefined
-    const expiresIn = expirationDays
-      ? apiKeyExpirationDaysToSeconds(expirationDays)
-      : undefined
 
-    const selectedConfig = String(formData.get("configId") ?? "").trim()
-    const resolvedConfigId =
-      selectedConfig || (organizationId ? "organization" : undefined)
-    const payload = {
-      ...(name ? { name } : {}),
-      ...(expiresIn ? { expiresIn } : {}),
-      ...(resolvedConfigId ? { configId: resolvedConfigId } : {}),
-      ...(organizationId ? { organizationId } : {})
-    }
-
-    createApiKey(Object.keys(payload).length > 0 ? payload : undefined, {
-      onSuccess: (result) => {
-        handleOpenChange(false)
-        setKeyName(name)
-        setSecretKey(result.key)
-        setIsNewKeyDialogOpen(true)
+      const selectedConfig = value.configId.trim()
+      const resolvedConfigId =
+        selectedConfig || (organizationId ? "organization" : undefined)
+      const payload = {
+        ...(name ? { name } : {}),
+        ...(expiresIn ? { expiresIn } : {}),
+        ...(resolvedConfigId ? { configId: resolvedConfigId } : {}),
+        ...(organizationId ? { organizationId } : {})
       }
-    })
-  }
+
+      createApiKey(Object.keys(payload).length > 0 ? payload : undefined, {
+        onSuccess: (result) => {
+          handleOpenChange(false)
+          setKeyName(name)
+          setSecretKey(result.key)
+          setIsNewKeyDialogOpen(true)
+        }
+      })
+    }
+  })
 
   return (
     <>
       <AlertDialog.Backdrop isOpen={isOpen} onOpenChange={handleOpenChange}>
         <AlertDialog.Container>
           <AlertDialog.Dialog>
-            <Form onSubmit={handleSubmit}>
-              <AlertDialog.CloseTrigger />
+            <form.AppForm>
+              <form.AuthFormRoot>
+                <AlertDialog.CloseTrigger />
 
-              <AlertDialog.Header>
-                <AlertDialog.Icon status="default">
-                  <Key />
-                </AlertDialog.Icon>
+                <AlertDialog.Header>
+                  <AlertDialog.Icon status="default">
+                    <Key />
+                  </AlertDialog.Icon>
 
-                <AlertDialog.Heading>
-                  {apiKeyLocalization.createApiKey}
-                </AlertDialog.Heading>
-              </AlertDialog.Header>
+                  <AlertDialog.Heading>
+                    {apiKeyLocalization.createApiKey}
+                  </AlertDialog.Heading>
+                </AlertDialog.Header>
 
-              <AlertDialog.Body className="overflow-visible">
-                <p className="text-muted text-sm">
-                  {apiKeyLocalization.apiKeysDescription}
-                </p>
+                <AlertDialog.Body className="overflow-visible">
+                  <p className="text-muted text-sm">
+                    {apiKeyLocalization.apiKeysDescription}
+                  </p>
 
-                <div className="mt-4 flex flex-col gap-4">
-                  <TextField id="name" name="name" isDisabled={isCreating}>
-                    <Label>{apiKeyLocalization.name}</Label>
+                  <div className="mt-4 flex flex-col gap-4">
+                    <form.AppField name="name">
+                      {(field) => (
+                        <TextField
+                          id="name"
+                          name={field.name}
+                          isDisabled={isCreating}
+                          value={field.state.value}
+                          onBlur={field.handleBlur}
+                          onChange={field.handleChange}
+                        >
+                          <Label>{apiKeyLocalization.name}</Label>
 
-                    <Input
-                      autoFocus
-                      placeholder={localization.settings.optional}
-                      variant="secondary"
-                    />
+                          <Input
+                            autoFocus
+                            placeholder={localization.settings.optional}
+                            variant="secondary"
+                          />
 
-                    <FieldError />
-                  </TextField>
+                          <FieldError />
+                        </TextField>
+                      )}
+                    </form.AppField>
 
-                  {availableConfigurations.length > 0 && (
-                    <Select
-                      defaultValue={availableConfigurations[0]?.id}
-                      fullWidth
-                      isDisabled={isCreating}
-                      name="configId"
-                      variant="secondary"
-                    >
-                      <Label>{apiKeyLocalization.configuration}</Label>
-                      <Select.Trigger>
-                        <Select.Value />
-                        <Select.Indicator />
-                      </Select.Trigger>
-                      <Select.Popover>
-                        <ListBox>
-                          {availableConfigurations.map((configuration) => (
-                            <ListBox.Item
-                              id={configuration.id}
-                              key={configuration.id}
-                              textValue={configuration.label}
-                            >
-                              {configuration.label}
-                              <ListBox.ItemIndicator />
-                            </ListBox.Item>
-                          ))}
-                        </ListBox>
-                      </Select.Popover>
-                    </Select>
-                  )}
+                    {availableConfigurations.length > 0 && (
+                      <form.AppField name="configId">
+                        {(field) => (
+                          <Select
+                            value={field.state.value}
+                            onChange={(value) =>
+                              field.handleChange(
+                                value == null ? "" : String(value)
+                              )
+                            }
+                            fullWidth
+                            isDisabled={isCreating}
+                            name={field.name}
+                            variant="secondary"
+                          >
+                            <Label>{apiKeyLocalization.configuration}</Label>
+                            <Select.Trigger>
+                              <Select.Value />
+                              <Select.Indicator />
+                            </Select.Trigger>
+                            <Select.Popover>
+                              <ListBox>
+                                {availableConfigurations.map(
+                                  (configuration) => (
+                                    <ListBox.Item
+                                      id={configuration.id}
+                                      key={configuration.id}
+                                      textValue={configuration.label}
+                                    >
+                                      {configuration.label}
+                                      <ListBox.ItemIndicator />
+                                    </ListBox.Item>
+                                  )
+                                )}
+                              </ListBox>
+                            </Select.Popover>
+                          </Select>
+                        )}
+                      </form.AppField>
+                    )}
 
-                  {keyExpiration ? (
-                    <Select
-                      defaultValue={
-                        keyExpiration.defaultInterval === null
-                          ? "never"
-                          : String(keyExpiration.defaultInterval)
-                      }
-                      fullWidth
-                      isDisabled={isCreating}
-                      name="expiration"
-                      variant="secondary"
-                    >
-                      <Label>{apiKeyLocalization.expiration}</Label>
+                    {keyExpiration ? (
+                      <form.AppField name="expiration">
+                        {(field) => (
+                          <Select
+                            value={field.state.value}
+                            onChange={(value) =>
+                              field.handleChange(
+                                value == null ? "" : String(value)
+                              )
+                            }
+                            fullWidth
+                            isDisabled={isCreating}
+                            name={field.name}
+                            variant="secondary"
+                          >
+                            <Label>{apiKeyLocalization.expiration}</Label>
 
-                      <Select.Trigger>
-                        <Select.Value />
-                        <Select.Indicator />
-                      </Select.Trigger>
+                            <Select.Trigger>
+                              <Select.Value />
+                              <Select.Indicator />
+                            </Select.Trigger>
 
-                      <Select.Popover>
-                        <ListBox>
-                          {keyExpiration.intervals.map((days) => (
-                            <ListBox.Item
-                              id={String(days)}
-                              key={days}
-                              textValue={`${days.toLocaleString(locale.languageTag)} ${
-                                days === 1
-                                  ? apiKeyLocalization.day
-                                  : apiKeyLocalization.days
-                              }`}
-                            >
-                              {days.toLocaleString(locale.languageTag)}{" "}
-                              {days === 1
-                                ? apiKeyLocalization.day
-                                : apiKeyLocalization.days}
-                              <ListBox.ItemIndicator />
-                            </ListBox.Item>
-                          ))}
+                            <Select.Popover>
+                              <ListBox>
+                                {keyExpiration.intervals.map((days) => (
+                                  <ListBox.Item
+                                    id={String(days)}
+                                    key={days}
+                                    textValue={`${days.toLocaleString(locale.languageTag)} ${
+                                      days === 1
+                                        ? apiKeyLocalization.day
+                                        : apiKeyLocalization.days
+                                    }`}
+                                  >
+                                    {days.toLocaleString(locale.languageTag)}{" "}
+                                    {days === 1
+                                      ? apiKeyLocalization.day
+                                      : apiKeyLocalization.days}
+                                    <ListBox.ItemIndicator />
+                                  </ListBox.Item>
+                                ))}
 
-                          {keyExpiration.allowNever ? (
-                            <ListBox.Item
-                              id="never"
-                              textValue={apiKeyLocalization.never}
-                            >
-                              {apiKeyLocalization.never}
-                              <ListBox.ItemIndicator />
-                            </ListBox.Item>
-                          ) : null}
-                        </ListBox>
-                      </Select.Popover>
-                    </Select>
-                  ) : null}
-                </div>
-              </AlertDialog.Body>
+                                {keyExpiration.allowNever ? (
+                                  <ListBox.Item
+                                    id="never"
+                                    textValue={apiKeyLocalization.never}
+                                  >
+                                    {apiKeyLocalization.never}
+                                    <ListBox.ItemIndicator />
+                                  </ListBox.Item>
+                                ) : null}
+                              </ListBox>
+                            </Select.Popover>
+                          </Select>
+                        )}
+                      </form.AppField>
+                    ) : null}
+                  </div>
+                </AlertDialog.Body>
 
-              <AlertDialog.Footer>
-                <Button slot="close" variant="tertiary" isDisabled={isCreating}>
-                  {localization.settings.cancel}
-                </Button>
+                <AlertDialog.Footer>
+                  <Button
+                    slot="close"
+                    variant="tertiary"
+                    isDisabled={isCreating}
+                  >
+                    {localization.settings.cancel}
+                  </Button>
 
-                <Button type="submit" isPending={isCreating}>
-                  {isCreating && <Spinner color="current" size="sm" />}
+                  <form.AuthFormSubmitButton isDisabled={isCreating}>
+                    {isCreating && <Spinner color="current" size="sm" />}
 
-                  {apiKeyLocalization.createApiKey}
-                </Button>
-              </AlertDialog.Footer>
-            </Form>
+                    {apiKeyLocalization.createApiKey}
+                  </form.AuthFormSubmitButton>
+                </AlertDialog.Footer>
+              </form.AuthFormRoot>
+            </form.AppForm>
           </AlertDialog.Dialog>
         </AlertDialog.Container>
       </AlertDialog.Backdrop>
