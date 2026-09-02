@@ -3,22 +3,20 @@ import type { EmailOtpAuthClient } from "@better-auth-ui/core/plugins/email-otp"
 import { useAuth, useAuthPlugin, useFetchOptions } from "@better-auth-ui/react"
 import { useRequestPasswordResetOtp } from "@better-auth-ui/react/plugins/email-otp"
 import {
-  Button,
   Card,
   type CardProps,
   cn,
   Description,
   FieldError,
-  Form,
   Input,
   Label,
   Link,
   Spinner,
   TextField
 } from "@heroui/react"
-import type { SyntheticEvent } from "react"
 
 import { emailOtpPlugin } from "../../../lib/auth/email-otp-plugin"
+import { useAuthForm } from "../auth-form"
 
 /** `sessionStorage` key the reset-code form reads the pending address from. */
 export const RESET_PASSWORD_OTP_STORAGE_KEY =
@@ -66,15 +64,14 @@ export function ForgotPasswordOtp({
       }
     })
 
-  const handleSubmit = (e: SyntheticEvent<HTMLFormElement>) => {
-    e.preventDefault()
-
-    const formData = new FormData(e.currentTarget)
-    requestPasswordResetOtp({
-      email: formData.get("email") as string,
-      fetchOptions
-    })
-  }
+  const form = useAuthForm({
+    defaultValues: { email: "" },
+    onSubmit: ({ value }) =>
+      requestPasswordResetOtp({
+        email: value.email,
+        fetchOptions
+      })
+  })
 
   const Captcha = plugins.find(
     (plugin) => plugin.captchaComponent
@@ -92,37 +89,51 @@ export function ForgotPasswordOtp({
       </Card.Header>
 
       <Card.Content className="gap-4">
-        <Form onSubmit={handleSubmit} className="flex flex-col gap-4">
-          <TextField
-            name="email"
-            type="email"
-            autoComplete="email"
-            isDisabled={isPending}
-            validate={(value) => {
-              if (!value) return localization.auth.fieldRequired
-              if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value))
-                return localization.auth.invalidEmail
-            }}
-          >
-            <Label>{localization.auth.email}</Label>
+        <form.AppForm>
+          <form.AuthFormRoot className="flex flex-col gap-4">
+            <form.AppField name="email">
+              {(field) => (
+                <TextField
+                  name={field.name}
+                  type="email"
+                  autoComplete="email"
+                  isDisabled={isPending}
+                  value={field.state.value}
+                  onBlur={field.handleBlur}
+                  onChange={field.handleChange}
+                  validate={(value) => {
+                    if (!value) return localization.auth.fieldRequired
+                    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value))
+                      return localization.auth.invalidEmail
+                  }}
+                >
+                  <Label>{localization.auth.email}</Label>
 
-            <Input
-              placeholder={localization.auth.emailPlaceholder}
-              required
-              variant={variant === "transparent" ? "primary" : "secondary"}
-            />
+                  <Input
+                    placeholder={localization.auth.emailPlaceholder}
+                    required
+                    variant={
+                      variant === "transparent" ? "primary" : "secondary"
+                    }
+                  />
 
-            <FieldError />
-          </TextField>
+                  <FieldError />
+                </TextField>
+              )}
+            </form.AppField>
 
-          {Captcha && <div className="flex justify-center">{Captcha}</div>}
+            {Captcha && <div className="flex justify-center">{Captcha}</div>}
 
-          <Button type="submit" className="w-full" isPending={isPending}>
-            {isPending && <Spinner color="current" size="sm" />}
+            <form.AuthFormSubmitButton
+              className="w-full"
+              isDisabled={isPending}
+            >
+              {isPending && <Spinner color="current" size="sm" />}
 
-            {emailOtpLocalization.sendCode}
-          </Button>
-        </Form>
+              {emailOtpLocalization.sendCode}
+            </form.AuthFormSubmitButton>
+          </form.AuthFormRoot>
+        </form.AppForm>
       </Card.Content>
 
       <Card.Footer className="flex-col gap-3">

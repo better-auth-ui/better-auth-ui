@@ -18,7 +18,6 @@ import {
   cn,
   Description,
   FieldError,
-  Form,
   Input,
   InputGroup,
   Label,
@@ -27,9 +26,10 @@ import {
   TextField
 } from "@heroui/react"
 import { useIsMutating } from "@tanstack/react-query"
-import { type SyntheticEvent, useState } from "react"
+import { useState } from "react"
 
 import { useSignInContinuation } from "../../lib/auth/use-sign-in-continuation"
+import { useAuthForm } from "./auth-form"
 import { FieldSeparator } from "./field-separator"
 import { LastUsedBadge } from "./last-login-method/last-used-badge"
 import { ProviderButtons, type SocialLayout } from "./provider-buttons"
@@ -66,14 +66,13 @@ export function SignIn({
   const { fetchOptions, resetFetchOptions } = useFetchOptions()
   const continueSignIn = useSignInContinuation()
 
-  const [password, setPassword] = useState("")
   const [isPasswordVisible, setIsPasswordVisible] = useState(false)
 
   const { mutate: signInEmail, isPending: signInEmailPending } = useSignInEmail(
     authClient,
     {
       onError: (error, { email }) => {
-        setPassword("")
+        form.setFieldValue("password", "")
 
         if (error.error?.code === "EMAIL_NOT_VERIFIED") {
           sessionStorage.setItem("better-auth-ui.verify-email", email)
@@ -88,20 +87,18 @@ export function SignIn({
     }
   )
 
-  const handleSubmit = (e: SyntheticEvent<HTMLFormElement>) => {
-    e.preventDefault()
-
-    const formData = new FormData(e.currentTarget)
-    const email = formData.get("email") as string
-    const rememberMe = formData.get("rememberMe") === "on"
-
-    signInEmail({
-      email,
-      password,
-      ...(emailAndPassword?.rememberMe ? { rememberMe } : {}),
-      fetchOptions
-    })
-  }
+  const form = useAuthForm({
+    defaultValues: { email: "", password: "", rememberMe: false },
+    onSubmit: ({ value }) =>
+      signInEmail({
+        email: value.email,
+        password: value.password,
+        ...(emailAndPassword?.rememberMe
+          ? { rememberMe: value.rememberMe }
+          : {}),
+        fetchOptions
+      })
+  })
 
   const signInMutating = useIsMutating({
     mutationKey: authMutationKeys.signIn.all
@@ -145,129 +142,156 @@ export function SignIn({
         )}
 
         {emailAndPassword?.enabled && (
-          <Form onSubmit={handleSubmit} className="flex flex-col gap-4">
-            <TextField
-              name="email"
-              type="email"
-              autoComplete={withPasskeyAutoFill("email", passkeyAutoFill)}
-              isDisabled={isPending}
-              validate={(value) => {
-                if (!value) return localization.auth.fieldRequired
-                if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value))
-                  return localization.auth.invalidEmail
-              }}
-            >
-              <Label>{localization.auth.email}</Label>
-
-              <Input
-                placeholder={localization.auth.emailPlaceholder}
-                variant={variant === "transparent" ? "primary" : "secondary"}
-                required
-              />
-
-              <FieldError />
-            </TextField>
-
-            <TextField
-              minLength={emailAndPassword?.minPasswordLength}
-              maxLength={emailAndPassword?.maxPasswordLength}
-              name="password"
-              autoComplete={withPasskeyAutoFill(
-                "current-password",
-                passkeyAutoFill
-              )}
-              isDisabled={isPending}
-              value={password}
-              onChange={setPassword}
-              validate={(value) => {
-                if (!value) return localization.auth.fieldRequired
-                const min = emailAndPassword?.minPasswordLength
-                const max = emailAndPassword?.maxPasswordLength
-                if (min && value.length < min)
-                  return localization.auth.tooShort.replace(
-                    "{{min}}",
-                    String(min)
-                  )
-                if (max && value.length > max)
-                  return localization.auth.tooLong.replace(
-                    "{{max}}",
-                    String(max)
-                  )
-              }}
-            >
-              <Label>{localization.auth.password}</Label>
-
-              <InputGroup
-                variant={variant === "transparent" ? "primary" : "secondary"}
-              >
-                <InputGroup.Input
-                  placeholder={localization.auth.passwordPlaceholder}
-                  type={isPasswordVisible ? "text" : "password"}
-                  required
-                />
-
-                <InputGroup.Suffix className="px-0">
-                  <Button
-                    isIconOnly
-                    aria-label={
-                      isPasswordVisible
-                        ? localization.auth.hidePassword
-                        : localization.auth.showPassword
-                    }
-                    size="sm"
-                    variant="ghost"
-                    onPress={() => setIsPasswordVisible(!isPasswordVisible)}
+          <form.AppForm>
+            <form.AuthFormRoot className="flex flex-col gap-4">
+              <form.AppField name="email">
+                {(field) => (
+                  <TextField
+                    name={field.name}
+                    type="email"
+                    autoComplete={withPasskeyAutoFill("email", passkeyAutoFill)}
                     isDisabled={isPending}
+                    value={field.state.value}
+                    onBlur={field.handleBlur}
+                    onChange={field.handleChange}
+                    validate={(value) => {
+                      if (!value) return localization.auth.fieldRequired
+                      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value))
+                        return localization.auth.invalidEmail
+                    }}
                   >
-                    {isPasswordVisible ? <EyeSlash /> : <Eye />}
-                  </Button>
-                </InputGroup.Suffix>
-              </InputGroup>
+                    <Label>{localization.auth.email}</Label>
 
-              <FieldError />
-            </TextField>
+                    <Input
+                      placeholder={localization.auth.emailPlaceholder}
+                      variant={
+                        variant === "transparent" ? "primary" : "secondary"
+                      }
+                      required
+                    />
 
-            {emailAndPassword?.rememberMe && (
-              <Checkbox
-                name="rememberMe"
-                isDisabled={isPending}
-                variant={variant === "transparent" ? "primary" : "secondary"}
-              >
-                <Checkbox.Content>
-                  <Checkbox.Control>
-                    <Checkbox.Indicator />
-                  </Checkbox.Control>
+                    <FieldError />
+                  </TextField>
+                )}
+              </form.AppField>
 
-                  {localization.auth.rememberMe}
-                </Checkbox.Content>
-              </Checkbox>
-            )}
+              <form.AppField name="password">
+                {(field) => (
+                  <TextField
+                    minLength={emailAndPassword?.minPasswordLength}
+                    maxLength={emailAndPassword?.maxPasswordLength}
+                    name={field.name}
+                    autoComplete={withPasskeyAutoFill(
+                      "current-password",
+                      passkeyAutoFill
+                    )}
+                    isDisabled={isPending}
+                    value={field.state.value}
+                    onBlur={field.handleBlur}
+                    onChange={field.handleChange}
+                    validate={(value) => {
+                      if (!value) return localization.auth.fieldRequired
+                      const min = emailAndPassword?.minPasswordLength
+                      const max = emailAndPassword?.maxPasswordLength
+                      if (min && value.length < min)
+                        return localization.auth.tooShort.replace(
+                          "{{min}}",
+                          String(min)
+                        )
+                      if (max && value.length > max)
+                        return localization.auth.tooLong.replace(
+                          "{{max}}",
+                          String(max)
+                        )
+                    }}
+                  >
+                    <Label>{localization.auth.password}</Label>
 
-            {Captcha && <div className="flex justify-center">{Captcha}</div>}
+                    <InputGroup
+                      variant={
+                        variant === "transparent" ? "primary" : "secondary"
+                      }
+                    >
+                      <InputGroup.Input
+                        placeholder={localization.auth.passwordPlaceholder}
+                        type={isPasswordVisible ? "text" : "password"}
+                        required
+                      />
 
-            <div className="flex flex-col gap-3">
-              <Button
-                type="submit"
-                className="relative w-full overflow-visible"
-                isPending={isPending}
-              >
-                {signInEmailPending && <Spinner color="current" size="sm" />}
+                      <InputGroup.Suffix className="px-0">
+                        <Button
+                          isIconOnly
+                          aria-label={
+                            isPasswordVisible
+                              ? localization.auth.hidePassword
+                              : localization.auth.showPassword
+                          }
+                          size="sm"
+                          variant="ghost"
+                          onPress={() =>
+                            setIsPasswordVisible(!isPasswordVisible)
+                          }
+                          isDisabled={isPending}
+                        >
+                          {isPasswordVisible ? <EyeSlash /> : <Eye />}
+                        </Button>
+                      </InputGroup.Suffix>
+                    </InputGroup>
 
-                {localization.auth.signIn}
+                    <FieldError />
+                  </TextField>
+                )}
+              </form.AppField>
 
-                <LastUsedBadge method="email" floating />
-              </Button>
+              {emailAndPassword?.rememberMe && (
+                <form.AppField name="rememberMe">
+                  {(field) => (
+                    <Checkbox
+                      name={field.name}
+                      isDisabled={isPending}
+                      isSelected={field.state.value}
+                      onChange={field.handleChange}
+                      variant={
+                        variant === "transparent" ? "primary" : "secondary"
+                      }
+                    >
+                      <Checkbox.Content>
+                        <Checkbox.Control>
+                          <Checkbox.Indicator />
+                        </Checkbox.Control>
 
-              {plugins.flatMap((plugin) =>
-                plugin.authButtons?.map((AuthButton, index) => (
-                  <AuthButton
-                    key={`${plugin.id}-${index.toString()}`}
-                    view="signIn"
-                  />
-                ))
+                        {localization.auth.rememberMe}
+                      </Checkbox.Content>
+                    </Checkbox>
+                  )}
+                </form.AppField>
               )}
-            </div>
-          </Form>
+
+              {Captcha && <div className="flex justify-center">{Captcha}</div>}
+
+              <div className="flex flex-col gap-3">
+                <form.AuthFormSubmitButton
+                  className="relative w-full overflow-visible"
+                  isDisabled={isPending}
+                >
+                  {signInEmailPending && <Spinner color="current" size="sm" />}
+
+                  {localization.auth.signIn}
+
+                  <LastUsedBadge method="email" floating />
+                </form.AuthFormSubmitButton>
+
+                {plugins.flatMap((plugin) =>
+                  plugin.authButtons?.map((AuthButton, index) => (
+                    <AuthButton
+                      key={`${plugin.id}-${index.toString()}`}
+                      view="signIn"
+                    />
+                  ))
+                )}
+              </div>
+            </form.AuthFormRoot>
+          </form.AppForm>
         )}
 
         {socialPosition === "bottom" && (

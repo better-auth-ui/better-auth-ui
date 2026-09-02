@@ -2,11 +2,11 @@ import type { OrganizationAuthClient } from "@better-auth-ui/core/plugins/organi
 import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
 import { useDeleteOrganization } from "@better-auth-ui/react/plugins/organization"
 import { TriangleExclamation } from "@gravity-ui/icons"
-import { AlertDialog, Button, Card, Form, Spinner, toast } from "@heroui/react"
+import { AlertDialog, Button, Card, Spinner, toast } from "@heroui/react"
 import type { Organization } from "better-auth/client"
-import type { SyntheticEvent } from "react"
 
 import { organizationPlugin } from "../../../lib/auth/organization-plugin"
+import { useAuthForm } from "../auth-form"
 import { OrganizationView } from "./organization-view"
 
 export type DeleteOrganizationDialogProps = {
@@ -41,52 +41,57 @@ export function DeleteOrganizationDialog({
     }
   )
 
-  function handleSubmit(e: SyntheticEvent<HTMLFormElement>) {
-    e.preventDefault()
-    deleteOrganization({ organizationId: organization.id })
-  }
+  const form = useAuthForm({
+    defaultValues: {},
+    onSubmit: () => deleteOrganization({ organizationId: organization.id })
+  })
 
   return (
     <AlertDialog.Backdrop isOpen={isOpen} onOpenChange={onOpenChange}>
       <AlertDialog.Container>
         <AlertDialog.Dialog>
-          <Form onSubmit={handleSubmit}>
-            <AlertDialog.CloseTrigger />
+          <form.AppForm>
+            <form.AuthFormRoot>
+              <AlertDialog.CloseTrigger />
 
-            <AlertDialog.Header>
-              <AlertDialog.Icon status="danger">
-                <TriangleExclamation />
-              </AlertDialog.Icon>
+              <AlertDialog.Header>
+                <AlertDialog.Icon status="danger">
+                  <TriangleExclamation />
+                </AlertDialog.Icon>
 
-              <AlertDialog.Heading>
-                {organizationLocalization.deleteOrganization}
-              </AlertDialog.Heading>
-            </AlertDialog.Header>
+                <AlertDialog.Heading>
+                  {organizationLocalization.deleteOrganization}
+                </AlertDialog.Heading>
+              </AlertDialog.Header>
 
-            <AlertDialog.Body className="flex flex-col gap-4 overflow-visible">
-              <p className="text-muted text-sm">
-                {organizationLocalization.deleteOrganizationDescription}
-              </p>
+              <AlertDialog.Body className="flex flex-col gap-4 overflow-visible">
+                <p className="text-muted text-sm">
+                  {organizationLocalization.deleteOrganizationDescription}
+                </p>
 
-              <Card variant="secondary">
-                <Card.Content>
-                  <OrganizationView organization={organization} hideRole />
-                </Card.Content>
-              </Card>
-            </AlertDialog.Body>
+                <Card variant="secondary">
+                  <Card.Content>
+                    <OrganizationView organization={organization} hideRole />
+                  </Card.Content>
+                </Card>
+              </AlertDialog.Body>
 
-            <AlertDialog.Footer>
-              <Button slot="close" variant="tertiary" isDisabled={isPending}>
-                {localization.settings.cancel}
-              </Button>
+              <AlertDialog.Footer>
+                <Button slot="close" variant="tertiary" isDisabled={isPending}>
+                  {localization.settings.cancel}
+                </Button>
 
-              <Button type="submit" variant="danger" isPending={isPending}>
-                {isPending && <Spinner color="current" size="sm" />}
+                <form.AuthFormSubmitButton
+                  variant="danger"
+                  isDisabled={isPending}
+                >
+                  {isPending && <Spinner color="current" size="sm" />}
 
-                {organizationLocalization.deleteOrganization}
-              </Button>
-            </AlertDialog.Footer>
-          </Form>
+                  {organizationLocalization.deleteOrganization}
+                </form.AuthFormSubmitButton>
+              </AlertDialog.Footer>
+            </form.AuthFormRoot>
+          </form.AppForm>
         </AlertDialog.Dialog>
       </AlertDialog.Container>
     </AlertDialog.Backdrop>

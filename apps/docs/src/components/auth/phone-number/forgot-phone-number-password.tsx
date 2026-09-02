@@ -6,14 +6,13 @@ import {
 } from "@better-auth-ui/core/plugins/phone-number"
 import { useAuth, useAuthPlugin, useFetchOptions } from "@better-auth-ui/react"
 import { useRequestPhoneNumberPasswordReset } from "@better-auth-ui/react/plugins/phone-number"
-import { type SyntheticEvent, useState } from "react"
 
-import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { FieldDescription, FieldGroup } from "@/components/ui/field"
 import { Spinner } from "@/components/ui/spinner"
 import { phoneNumberPlugin } from "@/lib/auth/phone-number-plugin"
 import { cn } from "@/lib/utils"
+import { useAuthForm } from "../auth-form"
 import { InternationalPhoneField } from "./international-phone-field"
 
 export const PHONE_NUMBER_RESET_STORAGE_KEY =
@@ -38,10 +37,6 @@ export function ForgotPhoneNumberPassword({
     viewPaths: phoneNumberViewPaths
   } = useAuthPlugin(phoneNumberPlugin)
   const { fetchOptions, resetFetchOptions } = useFetchOptions()
-  const [phoneNumber, setPhoneNumber] = useState(() =>
-    createPhoneNumberValue("", defaultCountry, adapter)
-  )
-  const [fieldError, setFieldError] = useState<string>()
   const { mutate: requestReset, isPending } =
     useRequestPhoneNumberPasswordReset(authClient as PhoneNumberAuthClient, {
       onError: () => resetFetchOptions(),
@@ -56,17 +51,15 @@ export function ForgotPhoneNumberPassword({
     (plugin) => plugin.captchaComponent
   )?.captchaComponent
 
-  const handleSubmit = (event: SyntheticEvent<HTMLFormElement>) => {
-    event.preventDefault()
-    if (!phoneNumber.e164) {
-      setFieldError(phoneLocalization.invalidPhoneNumber)
-      return
+  const form = useAuthForm({
+    defaultValues: {
+      phoneNumber: createPhoneNumberValue("", defaultCountry, adapter)
+    },
+    onSubmit: ({ value }) => {
+      if (!value.phoneNumber.e164) return
+      requestReset({ phoneNumber: value.phoneNumber.e164, fetchOptions })
     }
-    requestReset({
-      phoneNumber: phoneNumber.e164,
-      fetchOptions
-    })
-  }
+  })
 
   return (
     <Card className={cn("w-full max-w-sm", className)}>
@@ -76,30 +69,41 @@ export function ForgotPhoneNumberPassword({
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <form onSubmit={handleSubmit}>
-          <FieldGroup>
-            <InternationalPhoneField
-              adapter={adapter}
-              countryCodes={countries}
-              countryLabel={phoneLocalization.country}
-              disabled={isPending}
-              error={fieldError}
-              locale={locale}
-              phoneLabel={phoneLocalization.phoneNumber}
-              placeholder={phoneLocalization.phoneNumberPlaceholder}
-              value={phoneNumber}
-              onChange={(value) => {
-                setPhoneNumber(value)
-                setFieldError(undefined)
-              }}
-            />
-            {Captcha && <div className="flex justify-center">{Captcha}</div>}
-            <Button type="submit" disabled={isPending}>
-              {isPending && <Spinner />}
-              {phoneLocalization.sendCode}
-            </Button>
-          </FieldGroup>
-        </form>
+        <form.AppForm>
+          <form.AuthFormRoot>
+            <FieldGroup>
+              <form.AppField
+                name="phoneNumber"
+                validators={{
+                  onChange: ({ value }) =>
+                    value.e164
+                      ? undefined
+                      : phoneLocalization.invalidPhoneNumber
+                }}
+              >
+                {(field) => (
+                  <InternationalPhoneField
+                    adapter={adapter}
+                    countryCodes={countries}
+                    countryLabel={phoneLocalization.country}
+                    disabled={isPending}
+                    error={field.state.meta.errors[0]?.toString()}
+                    locale={locale}
+                    phoneLabel={phoneLocalization.phoneNumber}
+                    placeholder={phoneLocalization.phoneNumberPlaceholder}
+                    value={field.state.value}
+                    onChange={field.handleChange}
+                  />
+                )}
+              </form.AppField>
+              {Captcha && <div className="flex justify-center">{Captcha}</div>}
+              <form.AuthFormSubmitButton disabled={isPending}>
+                {isPending && <Spinner />}
+                {phoneLocalization.sendCode}
+              </form.AuthFormSubmitButton>
+            </FieldGroup>
+          </form.AuthFormRoot>
+        </form.AppForm>
         <FieldDescription className="mt-4 text-center">
           {localization.auth.rememberYourPassword}{" "}
           <Link

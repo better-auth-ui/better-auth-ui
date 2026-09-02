@@ -12,7 +12,6 @@ import {
   Card,
   type CardProps,
   FieldError,
-  Form,
   InputGroup,
   Label,
   Spinner,
@@ -20,9 +19,10 @@ import {
   toast
 } from "@heroui/react"
 import { useQueryClient } from "@tanstack/react-query"
-import { type SyntheticEvent, useState } from "react"
+import { useState } from "react"
 
 import { deleteUserPlugin } from "../../../lib/auth/delete-user-plugin"
+import { useAuthForm } from "../auth-form"
 
 export type DeleteAccountProps = {
   className?: string
@@ -49,7 +49,6 @@ export function DeleteAccount({
   const queryClient = useQueryClient()
 
   const [confirmOpen, setConfirmOpen] = useState(false)
-  const [password, setPassword] = useState("")
   const [isPasswordVisible, setIsPasswordVisible] = useState(false)
 
   const hasCredentialAccount = accounts?.some(
@@ -61,36 +60,37 @@ export function DeleteAccount({
 
   const handleDialogOpenChange = (open: boolean) => {
     setConfirmOpen(open)
-    setPassword("")
+    form.setFieldValue("password", "")
     setIsPasswordVisible(false)
   }
 
-  const handleSubmit = async (e: SyntheticEvent<HTMLFormElement>) => {
-    e.preventDefault()
-
-    const params = {
-      ...(needsPassword ? { password } : {})
-    }
-
-    deleteUser(params, {
-      onSuccess: () => {
-        setConfirmOpen(false)
-        setPassword("")
-        setIsPasswordVisible(false)
-
-        if (sendDeleteAccountVerification) {
-          toast.success(deleteUserLocalization.deleteUserVerificationSent)
-        } else {
-          toast.success(deleteUserLocalization.deleteUserSuccess)
-          queryClient.removeQueries({ queryKey: authQueryKeys.all })
-          navigate({
-            to: `${basePaths.auth}/${viewPaths.auth.signIn}`,
-            replace: true
-          })
-        }
+  const form = useAuthForm({
+    defaultValues: { password: "" },
+    onSubmit: ({ value }) => {
+      const params = {
+        ...(needsPassword ? { password: value.password } : {})
       }
-    })
-  }
+
+      deleteUser(params, {
+        onSuccess: () => {
+          setConfirmOpen(false)
+          form.setFieldValue("password", "")
+          setIsPasswordVisible(false)
+
+          if (sendDeleteAccountVerification) {
+            toast.success(deleteUserLocalization.deleteUserVerificationSent)
+          } else {
+            toast.success(deleteUserLocalization.deleteUserSuccess)
+            queryClient.removeQueries({ queryKey: authQueryKeys.all })
+            navigate({
+              to: `${basePaths.auth}/${viewPaths.auth.signIn}`,
+              replace: true
+            })
+          }
+        }
+      })
+    }
+  })
 
   return (
     <Card className={className} variant={variant} {...props}>
@@ -121,87 +121,95 @@ export function DeleteAccount({
           >
             <AlertDialog.Container>
               <AlertDialog.Dialog>
-                <Form onSubmit={handleSubmit}>
-                  <AlertDialog.CloseTrigger />
+                <form.AppForm>
+                  <form.AuthFormRoot>
+                    <AlertDialog.CloseTrigger />
 
-                  <AlertDialog.Header>
-                    <AlertDialog.Icon status="danger">
-                      <TriangleExclamation />
-                    </AlertDialog.Icon>
+                    <AlertDialog.Header>
+                      <AlertDialog.Icon status="danger">
+                        <TriangleExclamation />
+                      </AlertDialog.Icon>
 
-                    <AlertDialog.Heading>
-                      {deleteUserLocalization.deleteAccount}
-                    </AlertDialog.Heading>
-                  </AlertDialog.Header>
+                      <AlertDialog.Heading>
+                        {deleteUserLocalization.deleteAccount}
+                      </AlertDialog.Heading>
+                    </AlertDialog.Header>
 
-                  <AlertDialog.Body className="overflow-visible">
-                    <p className="text-muted text-sm">
-                      {deleteUserLocalization.deleteAccountDescription}
-                    </p>
+                    <AlertDialog.Body className="overflow-visible">
+                      <p className="text-muted text-sm">
+                        {deleteUserLocalization.deleteAccountDescription}
+                      </p>
 
-                    {needsPassword && (
-                      <TextField
-                        className="mt-4"
-                        name="password"
-                        isDisabled={isPending}
-                        value={password}
-                        onChange={setPassword}
-                      >
-                        <Label>{localization.auth.password}</Label>
-
-                        <InputGroup variant="secondary">
-                          <InputGroup.Input
-                            autoComplete="current-password"
-                            placeholder={localization.auth.passwordPlaceholder}
-                            required
-                            type={isPasswordVisible ? "text" : "password"}
-                          />
-
-                          <InputGroup.Suffix className="px-0">
-                            <Button
-                              isIconOnly
-                              aria-label={
-                                isPasswordVisible
-                                  ? localization.auth.hidePassword
-                                  : localization.auth.showPassword
-                              }
+                      {needsPassword && (
+                        <form.AppField name="password">
+                          {(field) => (
+                            <TextField
+                              className="mt-4"
+                              name={field.name}
                               isDisabled={isPending}
-                              onPress={() =>
-                                setIsPasswordVisible(!isPasswordVisible)
-                              }
-                              size="sm"
-                              variant="ghost"
+                              value={field.state.value}
+                              onBlur={field.handleBlur}
+                              onChange={field.handleChange}
                             >
-                              {isPasswordVisible ? <EyeSlash /> : <Eye />}
-                            </Button>
-                          </InputGroup.Suffix>
-                        </InputGroup>
+                              <Label>{localization.auth.password}</Label>
 
-                        <FieldError />
-                      </TextField>
-                    )}
-                  </AlertDialog.Body>
+                              <InputGroup variant="secondary">
+                                <InputGroup.Input
+                                  autoComplete="current-password"
+                                  placeholder={
+                                    localization.auth.passwordPlaceholder
+                                  }
+                                  required
+                                  type={isPasswordVisible ? "text" : "password"}
+                                />
 
-                  <AlertDialog.Footer>
-                    <Button
-                      slot="close"
-                      variant="tertiary"
-                      isDisabled={isPending}
-                    >
-                      {localization.settings.cancel}
-                    </Button>
+                                <InputGroup.Suffix className="px-0">
+                                  <Button
+                                    isIconOnly
+                                    aria-label={
+                                      isPasswordVisible
+                                        ? localization.auth.hidePassword
+                                        : localization.auth.showPassword
+                                    }
+                                    isDisabled={isPending}
+                                    onPress={() =>
+                                      setIsPasswordVisible(!isPasswordVisible)
+                                    }
+                                    size="sm"
+                                    variant="ghost"
+                                  >
+                                    {isPasswordVisible ? <EyeSlash /> : <Eye />}
+                                  </Button>
+                                </InputGroup.Suffix>
+                              </InputGroup>
 
-                    <Button
-                      type="submit"
-                      variant="danger"
-                      isPending={isPending}
-                    >
-                      {isPending && <Spinner color="current" size="sm" />}
+                              <FieldError />
+                            </TextField>
+                          )}
+                        </form.AppField>
+                      )}
+                    </AlertDialog.Body>
 
-                      {deleteUserLocalization.deleteAccount}
-                    </Button>
-                  </AlertDialog.Footer>
-                </Form>
+                    <AlertDialog.Footer>
+                      <Button
+                        slot="close"
+                        variant="tertiary"
+                        isDisabled={isPending}
+                      >
+                        {localization.settings.cancel}
+                      </Button>
+
+                      <form.AuthFormSubmitButton
+                        variant="danger"
+                        isDisabled={isPending}
+                      >
+                        {isPending && <Spinner color="current" size="sm" />}
+
+                        {deleteUserLocalization.deleteAccount}
+                      </form.AuthFormSubmitButton>
+                    </AlertDialog.Footer>
+                  </form.AuthFormRoot>
+                </form.AppForm>
               </AlertDialog.Dialog>
             </AlertDialog.Container>
           </AlertDialog.Backdrop>

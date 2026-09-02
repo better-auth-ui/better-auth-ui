@@ -5,10 +5,9 @@ import type { PhoneNumberAuthClient } from "@better-auth-ui/core/plugins/phone-n
 import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
 import { useResetPhoneNumberPassword } from "@better-auth-ui/react/plugins/phone-number"
 import { Eye, EyeOff } from "lucide-react"
-import { type SyntheticEvent, useEffect, useState } from "react"
+import { useEffect, useState } from "react"
 import { toast } from "sonner"
 
-import { Button } from "@/components/ui/button"
 import {
   Card,
   CardContent,
@@ -32,6 +31,7 @@ import {
 import { Spinner } from "@/components/ui/spinner"
 import { phoneNumberPlugin } from "@/lib/auth/phone-number-plugin"
 import { cn } from "@/lib/utils"
+import { useAuthForm } from "../auth-form"
 import { OtpField } from "../otp-field"
 import { PasswordStrengthMeter } from "../password-strength-meter"
 import { useIsHydrated } from "../use-is-hydrated"
@@ -55,23 +55,11 @@ export function ResetPhoneNumberPassword({
   const isHydrated = useIsHydrated()
   const initialPhoneNumber =
     (isHydrated && sessionStorage.getItem(PHONE_NUMBER_RESET_STORAGE_KEY)) || ""
-  const [phoneNumber, setPhoneNumber] = useState(initialPhoneNumber)
   const [hasStoredPhoneNumber, setHasStoredPhoneNumber] = useState(
     Boolean(initialPhoneNumber)
   )
-  const [code, setCode] = useState("")
-  const [password, setPassword] = useState("")
   const [isPasswordVisible, setIsPasswordVisible] = useState(false)
-  const [fieldErrors, setFieldErrors] = useState<{
-    phoneNumber?: string
-    password?: string
-  }>({})
-
-  useEffect(() => {
-    const stored = sessionStorage.getItem(PHONE_NUMBER_RESET_STORAGE_KEY) ?? ""
-    setPhoneNumber(stored)
-    setHasStoredPhoneNumber(Boolean(stored))
-  }, [])
+  const [passwordError, setPasswordError] = useState("")
 
   const { mutate: resetPassword, isPending } = useResetPhoneNumberPassword(
     authClient as PhoneNumberAuthClient,
@@ -80,13 +68,10 @@ export function ResetPhoneNumberPassword({
         // The haveIBeenPwned plugin rejects on the password itself, so it
         // belongs against the field rather than in a toast.
         if (isPasswordCompromisedError(error)) {
-          setFieldErrors((prev) => ({
-            ...prev,
-            password: localization.auth.passwordCompromised
-          }))
+          setPasswordError(localization.auth.passwordCompromised)
         }
 
-        setCode("")
+        form.setFieldValue("code", "")
       },
       onSuccess: () => {
         sessionStorage.removeItem(PHONE_NUMBER_RESET_STORAGE_KEY)
@@ -98,31 +83,44 @@ export function ResetPhoneNumberPassword({
     }
   )
 
-  const handleSubmit = (event: SyntheticEvent<HTMLFormElement>) => {
-    event.preventDefault()
-    const formData = new FormData(event.currentTarget)
-    const confirmPassword = String(formData.get("confirmPassword") ?? "")
-
-    if (emailAndPassword?.confirmPassword && password !== confirmPassword) {
-      toast.error(localization.auth.passwordsDoNotMatch)
-      return
-    }
-    if (code.length !== otpLength) {
-      toast.error(
-        phoneLocalization.codeLengthMismatch.replace(
-          "{{length}}",
-          String(otpLength)
+  const form = useAuthForm({
+    defaultValues: {
+      code: "",
+      confirmPassword: "",
+      password: "",
+      phoneNumber: initialPhoneNumber
+    },
+    onSubmit: ({ value }) => {
+      if (
+        emailAndPassword?.confirmPassword &&
+        value.password !== value.confirmPassword
+      ) {
+        toast.error(localization.auth.passwordsDoNotMatch)
+        return
+      }
+      if (value.code.length !== otpLength) {
+        toast.error(
+          phoneLocalization.codeLengthMismatch.replace(
+            "{{length}}",
+            String(otpLength)
+          )
         )
-      )
-      return
-    }
+        return
+      }
 
-    resetPassword({
-      phoneNumber,
-      otp: code,
-      newPassword: password
-    })
-  }
+      resetPassword({
+        phoneNumber: value.phoneNumber,
+        otp: value.code,
+        newPassword: value.password
+      })
+    }
+  })
+
+  useEffect(() => {
+    const stored = sessionStorage.getItem(PHONE_NUMBER_RESET_STORAGE_KEY) ?? ""
+    form.setFieldValue("phoneNumber", stored)
+    setHasStoredPhoneNumber(Boolean(stored))
+  }, [form.setFieldValue])
 
   return (
     <Card className={cn("w-full max-w-sm", className)}>
@@ -134,139 +132,146 @@ export function ResetPhoneNumberPassword({
           <CardDescription>
             {phoneLocalization.codeSentTo.replace(
               "{{phoneNumber}}",
-              phoneNumber
+              form.state.values.phoneNumber
             )}
           </CardDescription>
         )}
       </CardHeader>
       <CardContent>
-        <form onSubmit={handleSubmit}>
-          <FieldGroup>
-            {!hasStoredPhoneNumber && (
-              <Field data-invalid={Boolean(fieldErrors.phoneNumber)}>
-                <FieldLabel htmlFor="passwordResetPhoneNumber">
-                  {phoneLocalization.phoneNumber}
-                </FieldLabel>
-                <Input
-                  id="passwordResetPhoneNumber"
-                  name="phoneNumber"
-                  type="tel"
-                  autoComplete="tel"
-                  inputMode="tel"
-                  value={phoneNumber}
-                  placeholder={phoneLocalization.phoneNumberPlaceholder}
-                  required
-                  disabled={isPending}
-                  onChange={(event) => {
-                    setPhoneNumber(event.target.value)
-                    setFieldErrors((current) => ({
-                      ...current,
-                      phoneNumber: undefined
-                    }))
-                  }}
-                  onInvalid={(event) => {
-                    event.preventDefault()
-                    setFieldErrors((current) => ({
-                      ...current,
-                      phoneNumber: event.currentTarget.validationMessage
-                    }))
-                  }}
-                  aria-invalid={Boolean(fieldErrors.phoneNumber)}
-                />
-                <FieldError>{fieldErrors.phoneNumber}</FieldError>
-              </Field>
-            )}
+        <form.AppForm>
+          <form.AuthFormRoot>
+            <FieldGroup>
+              {!hasStoredPhoneNumber && (
+                <form.AppField name="phoneNumber">
+                  {(field) => (
+                    <Field>
+                      <FieldLabel htmlFor="passwordResetPhoneNumber">
+                        {phoneLocalization.phoneNumber}
+                      </FieldLabel>
+                      <Input
+                        id="passwordResetPhoneNumber"
+                        name={field.name}
+                        type="tel"
+                        autoComplete="tel"
+                        inputMode="tel"
+                        value={field.state.value}
+                        placeholder={phoneLocalization.phoneNumberPlaceholder}
+                        required
+                        disabled={isPending}
+                        onBlur={field.handleBlur}
+                        onChange={(event) =>
+                          field.handleChange(event.target.value)
+                        }
+                      />
+                      <field.AuthFormFieldError />
+                    </Field>
+                  )}
+                </form.AppField>
+              )}
 
-            <OtpField
-              autoFocus={hasStoredPhoneNumber}
-              disabled={isPending}
-              label={phoneLocalization.phoneCode}
-              length={otpLength}
-              name="otp"
-              value={code}
-              onChange={setCode}
-            />
+              <form.AppField name="code">
+                {(field) => (
+                  <OtpField
+                    autoFocus={hasStoredPhoneNumber}
+                    disabled={isPending}
+                    label={phoneLocalization.phoneCode}
+                    length={otpLength}
+                    name="otp"
+                    value={field.state.value}
+                    onChange={field.handleChange}
+                  />
+                )}
+              </form.AppField>
 
-            <Field data-invalid={Boolean(fieldErrors.password)}>
-              <FieldLabel htmlFor="phoneNumberNewPassword">
-                {localization.auth.newPassword}
-              </FieldLabel>
-              <InputGroup>
-                <InputGroupInput
-                  id="phoneNumberNewPassword"
-                  name="password"
-                  type={isPasswordVisible ? "text" : "password"}
-                  autoComplete="new-password"
-                  value={password}
-                  placeholder={localization.auth.newPasswordPlaceholder}
-                  required
-                  minLength={emailAndPassword?.minPasswordLength}
-                  maxLength={emailAndPassword?.maxPasswordLength}
-                  disabled={isPending}
-                  onChange={(event) => {
-                    setPassword(event.target.value)
-                    setFieldErrors((current) => ({
-                      ...current,
-                      password: undefined
-                    }))
-                  }}
-                  onInvalid={(event) => {
-                    event.preventDefault()
-                    setFieldErrors((current) => ({
-                      ...current,
-                      password: event.currentTarget.validationMessage
-                    }))
-                  }}
-                  aria-invalid={Boolean(fieldErrors.password)}
-                />
-                <InputGroupAddon align="inline-end">
-                  <InputGroupButton
-                    type="button"
-                    size="icon-xs"
-                    aria-label={
-                      isPasswordVisible
-                        ? localization.auth.hidePassword
-                        : localization.auth.showPassword
-                    }
-                    onClick={() => setIsPasswordVisible((visible) => !visible)}
-                  >
-                    {isPasswordVisible ? <EyeOff /> : <Eye />}
-                  </InputGroupButton>
-                </InputGroupAddon>
-              </InputGroup>
-              <FieldError>{fieldErrors.password}</FieldError>
+              <form.AppField name="password">
+                {(field) => (
+                  <Field data-invalid={Boolean(passwordError)}>
+                    <FieldLabel htmlFor="phoneNumberNewPassword">
+                      {localization.auth.newPassword}
+                    </FieldLabel>
+                    <InputGroup>
+                      <InputGroupInput
+                        id="phoneNumberNewPassword"
+                        name={field.name}
+                        type={isPasswordVisible ? "text" : "password"}
+                        autoComplete="new-password"
+                        value={field.state.value}
+                        placeholder={localization.auth.newPasswordPlaceholder}
+                        required
+                        minLength={emailAndPassword?.minPasswordLength}
+                        maxLength={emailAndPassword?.maxPasswordLength}
+                        disabled={isPending}
+                        onChange={(event) => {
+                          setPasswordError("")
+                          field.handleChange(event.target.value)
+                        }}
+                        aria-invalid={Boolean(passwordError)}
+                      />
+                      <InputGroupAddon align="inline-end">
+                        <InputGroupButton
+                          type="button"
+                          size="icon-xs"
+                          aria-label={
+                            isPasswordVisible
+                              ? localization.auth.hidePassword
+                              : localization.auth.showPassword
+                          }
+                          onClick={() =>
+                            setIsPasswordVisible((visible) => !visible)
+                          }
+                        >
+                          {isPasswordVisible ? <EyeOff /> : <Eye />}
+                        </InputGroupButton>
+                      </InputGroupAddon>
+                    </InputGroup>
+                    {passwordError && <FieldError>{passwordError}</FieldError>}
 
-              <PasswordStrengthMeter password={password} />
-            </Field>
+                    <PasswordStrengthMeter password={field.state.value} />
+                  </Field>
+                )}
+              </form.AppField>
 
-            {emailAndPassword?.confirmPassword && (
-              <Field>
-                <FieldLabel htmlFor="phoneNumberConfirmPassword">
-                  {localization.auth.confirmPassword}
-                </FieldLabel>
-                <Input
-                  id="phoneNumberConfirmPassword"
-                  name="confirmPassword"
-                  type="password"
-                  autoComplete="new-password"
-                  placeholder={localization.auth.confirmPasswordPlaceholder}
-                  required
-                  minLength={emailAndPassword?.minPasswordLength}
-                  maxLength={emailAndPassword?.maxPasswordLength}
-                  disabled={isPending}
-                />
-              </Field>
-            )}
+              {emailAndPassword?.confirmPassword && (
+                <form.AppField name="confirmPassword">
+                  {(field) => (
+                    <Field>
+                      <FieldLabel htmlFor="phoneNumberConfirmPassword">
+                        {localization.auth.confirmPassword}
+                      </FieldLabel>
+                      <Input
+                        id="phoneNumberConfirmPassword"
+                        name={field.name}
+                        type="password"
+                        autoComplete="new-password"
+                        placeholder={
+                          localization.auth.confirmPasswordPlaceholder
+                        }
+                        required
+                        minLength={emailAndPassword?.minPasswordLength}
+                        maxLength={emailAndPassword?.maxPasswordLength}
+                        disabled={isPending}
+                        value={field.state.value}
+                        onBlur={field.handleBlur}
+                        onChange={(event) =>
+                          field.handleChange(event.target.value)
+                        }
+                      />
+                    </Field>
+                  )}
+                </form.AppField>
+              )}
 
-            <Button
-              type="submit"
-              disabled={isPending || code.length !== otpLength}
-            >
-              {isPending && <Spinner />}
-              {phoneLocalization.resetPassword}
-            </Button>
-          </FieldGroup>
-        </form>
+              <form.AuthFormSubmitButton
+                disabled={
+                  isPending || form.state.values.code.length !== otpLength
+                }
+              >
+                {isPending && <Spinner />}
+                {phoneLocalization.resetPassword}
+              </form.AuthFormSubmitButton>
+            </FieldGroup>
+          </form.AuthFormRoot>
+        </form.AppForm>
       </CardContent>
     </Card>
   )

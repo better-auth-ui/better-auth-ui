@@ -18,7 +18,7 @@ import {
 } from "@better-auth-ui/react/plugins/phone-number"
 import { useIsMutating } from "@tanstack/react-query"
 import { Eye, EyeOff } from "lucide-react"
-import { type SyntheticEvent, useState } from "react"
+import { useState } from "react"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -32,7 +32,6 @@ import { Checkbox } from "@/components/ui/checkbox"
 import {
   Field,
   FieldDescription,
-  FieldError,
   FieldGroup,
   FieldLabel,
   FieldSeparator
@@ -48,6 +47,7 @@ import { phoneNumberPlugin } from "@/lib/auth/phone-number-plugin"
 import { useResendCooldown } from "@/lib/auth/use-resend-cooldown"
 import { useSignInContinuation } from "@/lib/auth/use-sign-in-continuation"
 import { cn } from "@/lib/utils"
+import { useAuthForm } from "../auth-form"
 import { OtpField } from "../otp-field"
 import { ProviderButtons, type SocialLayout } from "../provider-buttons"
 import { InternationalPhoneField } from "./international-phone-field"
@@ -95,17 +95,8 @@ export function PhoneNumber({
   const [mode, setMode] = useState<PhoneNumberMode>(
     signIn ? "code" : "password"
   )
-  const [phoneNumber, setPhoneNumber] = useState(() =>
-    createPhoneNumberValue("", defaultCountry, adapter)
-  )
-  const [password, setPassword] = useState("")
-  const [code, setCode] = useState("")
   const [codeSent, setCodeSent] = useState(false)
   const [isPasswordVisible, setIsPasswordVisible] = useState(false)
-  const [fieldErrors, setFieldErrors] = useState<{
-    phoneNumber?: string
-    password?: string
-  }>({})
 
   const { mutate: sendOtp, isPending: isSending } = useSendPhoneNumberOtp(
     phoneClient,
@@ -120,14 +111,14 @@ export function PhoneNumber({
   const { mutate: verify, isPending: isVerifying } = useVerifyPhoneNumber(
     phoneClient,
     {
-      onError: () => setCode(""),
+      onError: () => form.setFieldValue("code", ""),
       onSuccess: (data) => continueSignIn(data)
     }
   )
   const { mutate: signInWithPassword, isPending: isPasswordPending } =
     useSignInPhoneNumber(phoneClient, {
       onError: (error) => {
-        setPassword("")
+        form.setFieldValue("password", "")
         resetFetchOptions()
 
         if (signIn && error.error?.code === "PHONE_NUMBER_NOT_VERIFIED") {
@@ -159,15 +150,8 @@ export function PhoneNumber({
     (plugin) => plugin.captchaComponent
   )?.captchaComponent
 
-  const getPhoneNumber = () => {
-    if (phoneNumber.e164) return phoneNumber.e164
-    setFieldErrors((current) => ({
-      ...current,
-      phoneNumber: phoneLocalization.invalidPhoneNumber
-    }))
-  }
   const sendCode = () => {
-    const normalizedPhoneNumber = getPhoneNumber()
+    const normalizedPhoneNumber = form.state.values.phoneNumber.e164
     if (!normalizedPhoneNumber) return
     sendOtp({
       phoneNumber: normalizedPhoneNumber,
@@ -177,41 +161,49 @@ export function PhoneNumber({
   const verifyCode = (completedCode: string) => {
     if (isPending || completedCode.length !== otpLength) return
 
-    if (!phoneNumber.e164) return
-    verify({ phoneNumber: phoneNumber.e164, code: completedCode })
+    if (!form.state.values.phoneNumber.e164) return
+    verify({
+      phoneNumber: form.state.values.phoneNumber.e164,
+      code: completedCode
+    })
   }
   const switchMode = () => {
     setMode((current) => (current === "code" ? "password" : "code"))
-    setCode("")
+    form.setFieldValue("code", "")
     setCodeSent(false)
-    setPassword("")
+    form.setFieldValue("password", "")
   }
 
-  const handleSubmit = (event: SyntheticEvent<HTMLFormElement>) => {
-    event.preventDefault()
+  const form = useAuthForm({
+    defaultValues: {
+      code: "",
+      password: "",
+      phoneNumber: createPhoneNumberValue("", defaultCountry, adapter),
+      rememberMe: false
+    },
+    onSubmit: ({ value }) => {
+      if (mode === "password") {
+        const normalizedPhoneNumber = value.phoneNumber.e164
+        if (!normalizedPhoneNumber) return
+        signInWithPassword({
+          phoneNumber: normalizedPhoneNumber,
+          password: value.password,
+          ...(emailAndPassword?.rememberMe
+            ? { rememberMe: value.rememberMe }
+            : {}),
+          fetchOptions
+        })
+        return
+      }
 
-    if (mode === "password") {
-      const normalizedPhoneNumber = getPhoneNumber()
-      if (!normalizedPhoneNumber) return
-      const formData = new FormData(event.currentTarget)
-      signInWithPassword({
-        phoneNumber: normalizedPhoneNumber,
-        password,
-        ...(emailAndPassword?.rememberMe
-          ? { rememberMe: formData.get("rememberMe") === "on" }
-          : {}),
-        fetchOptions
-      })
-      return
+      if (!codeSent) {
+        sendCode()
+        return
+      }
+
+      verifyCode(value.code)
     }
-
-    if (!codeSent) {
-      sendCode()
-      return
-    }
-
-    verifyCode(code)
-  }
+  })
 
   return (
     <Card className={cn("w-full max-w-sm", className)}>
@@ -225,7 +217,7 @@ export function PhoneNumber({
           <CardDescription>
             {phoneLocalization.codeSentTo.replace(
               "{{phoneNumber}}",
-              phoneNumber.display
+              form.state.values.phoneNumber.display
             )}
           </CardDescription>
         )}
@@ -244,192 +236,207 @@ export function PhoneNumber({
             </>
           )}
 
-          <form onSubmit={handleSubmit}>
-            <FieldGroup>
-              {codeSent ? (
-                <OtpField
-                  autoFocus
-                  disabled={isPending}
-                  label={phoneLocalization.phoneCode}
-                  length={otpLength}
-                  name="otp"
-                  value={code}
-                  onChange={setCode}
-                  onComplete={verifyCode}
-                />
-              ) : (
-                <>
-                  <InternationalPhoneField
-                    adapter={adapter}
-                    countryCodes={countries}
-                    countryLabel={phoneLocalization.country}
-                    disabled={isPending}
-                    error={fieldErrors.phoneNumber}
-                    locale={locale}
-                    phoneLabel={phoneLocalization.phoneNumber}
-                    placeholder={phoneLocalization.phoneNumberPlaceholder}
-                    value={phoneNumber}
-                    onChange={(value) => {
-                      setPhoneNumber(value)
-                      setFieldErrors((current) => ({
-                        ...current,
-                        phoneNumber: undefined
-                      }))
-                    }}
-                  />
-
-                  {mode === "password" && (
-                    <Field data-invalid={Boolean(fieldErrors.password)}>
-                      <FieldLabel htmlFor="phoneNumberPassword">
-                        {localization.auth.password}
-                      </FieldLabel>
-                      <InputGroup>
-                        <InputGroupInput
-                          id="phoneNumberPassword"
-                          name="password"
-                          type={isPasswordVisible ? "text" : "password"}
-                          autoComplete="current-password"
-                          value={password}
-                          placeholder={localization.auth.passwordPlaceholder}
-                          required
-                          minLength={emailAndPassword?.minPasswordLength}
-                          maxLength={emailAndPassword?.maxPasswordLength}
-                          disabled={isPending}
-                          onChange={(event) => {
-                            setPassword(event.target.value)
-                            setFieldErrors((current) => ({
-                              ...current,
-                              password: undefined
-                            }))
-                          }}
-                          onInvalid={(event) => {
-                            event.preventDefault()
-                            setFieldErrors((current) => ({
-                              ...current,
-                              password: event.currentTarget.validationMessage
-                            }))
-                          }}
-                          aria-invalid={Boolean(fieldErrors.password)}
-                        />
-                        <InputGroupAddon align="inline-end">
-                          <InputGroupButton
-                            type="button"
-                            size="icon-xs"
-                            aria-label={
-                              isPasswordVisible
-                                ? localization.auth.hidePassword
-                                : localization.auth.showPassword
-                            }
-                            title={
-                              isPasswordVisible
-                                ? localization.auth.hidePassword
-                                : localization.auth.showPassword
-                            }
-                            onClick={() =>
-                              setIsPasswordVisible((visible) => !visible)
-                            }
-                          >
-                            {isPasswordVisible ? <EyeOff /> : <Eye />}
-                          </InputGroupButton>
-                        </InputGroupAddon>
-                      </InputGroup>
-                      <FieldError>{fieldErrors.password}</FieldError>
-                    </Field>
-                  )}
-
-                  {mode === "password" && emailAndPassword?.rememberMe && (
-                    <Field orientation="horizontal">
-                      <Checkbox
-                        id="phoneNumberRememberMe"
-                        name="rememberMe"
-                        disabled={isPending}
-                      />
-                      <FieldLabel
-                        htmlFor="phoneNumberRememberMe"
-                        className="cursor-pointer font-normal"
-                      >
-                        {localization.auth.rememberMe}
-                      </FieldLabel>
-                    </Field>
-                  )}
-
-                  {Captcha && (
-                    <div className="flex justify-center">{Captcha}</div>
-                  )}
-                </>
-              )}
-
-              <div className="flex flex-col gap-3">
-                <Button
-                  type="submit"
-                  disabled={
-                    isPending || (codeSent && code.length !== otpLength)
-                  }
-                >
-                  {(isSending || isVerifying || isPasswordPending) && (
-                    <Spinner />
-                  )}
-                  {mode === "password"
-                    ? localization.auth.signIn
-                    : codeSent
-                      ? phoneLocalization.verifyCode
-                      : phoneLocalization.sendCode}
-                </Button>
-
+          <form.AppForm>
+            <form.AuthFormRoot>
+              <FieldGroup>
                 {codeSent ? (
-                  <>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      disabled={isPending || isCoolingDown}
-                      onClick={sendCode}
-                    >
-                      {isCoolingDown
-                        ? localization.auth.resendIn.replace(
-                            "{{seconds}}",
-                            String(cooldown)
-                          )
-                        : localization.auth.resend}
-                    </Button>
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      disabled={isPending}
-                      onClick={() => {
-                        setCode("")
-                        setCodeSent(false)
-                      }}
-                    >
-                      {phoneLocalization.useDifferentPhoneNumber}
-                    </Button>
-                  </>
+                  <form.AppField name="code">
+                    {(field) => (
+                      <OtpField
+                        autoFocus
+                        disabled={isPending}
+                        label={phoneLocalization.phoneCode}
+                        length={otpLength}
+                        name="otp"
+                        value={field.state.value}
+                        onChange={field.handleChange}
+                        onComplete={verifyCode}
+                      />
+                    )}
+                  </form.AppField>
                 ) : (
                   <>
-                    {canSwitchMode && (
-                      <Button
-                        type="button"
-                        variant="outline"
-                        disabled={isPending}
-                        onClick={switchMode}
-                      >
-                        {mode === "code"
-                          ? phoneLocalization.usePassword
-                          : phoneLocalization.useVerificationCode}
-                      </Button>
-                    )}
-                    {plugins.flatMap((plugin) =>
-                      (plugin.authButtons ?? []).map((AuthButton) => (
-                        <AuthButton
-                          key={`${plugin.id}-${AuthButton.displayName ?? AuthButton.name}`}
-                          view="phoneNumber"
+                    <form.AppField
+                      name="phoneNumber"
+                      validators={{
+                        onChange: ({ value }) =>
+                          value.e164
+                            ? undefined
+                            : phoneLocalization.invalidPhoneNumber
+                      }}
+                    >
+                      {(field) => (
+                        <InternationalPhoneField
+                          adapter={adapter}
+                          countryCodes={countries}
+                          countryLabel={phoneLocalization.country}
+                          disabled={isPending}
+                          error={field.state.meta.errors[0]?.toString()}
+                          locale={locale}
+                          phoneLabel={phoneLocalization.phoneNumber}
+                          placeholder={phoneLocalization.phoneNumberPlaceholder}
+                          value={field.state.value}
+                          onChange={field.handleChange}
                         />
-                      ))
+                      )}
+                    </form.AppField>
+
+                    {mode === "password" && (
+                      <form.AppField name="password">
+                        {(field) => (
+                          <Field>
+                            <FieldLabel htmlFor="phoneNumberPassword">
+                              {localization.auth.password}
+                            </FieldLabel>
+                            <InputGroup>
+                              <InputGroupInput
+                                id="phoneNumberPassword"
+                                name={field.name}
+                                type={isPasswordVisible ? "text" : "password"}
+                                autoComplete="current-password"
+                                value={field.state.value}
+                                placeholder={
+                                  localization.auth.passwordPlaceholder
+                                }
+                                required
+                                minLength={emailAndPassword?.minPasswordLength}
+                                maxLength={emailAndPassword?.maxPasswordLength}
+                                disabled={isPending}
+                                onBlur={field.handleBlur}
+                                onChange={(event) =>
+                                  field.handleChange(event.target.value)
+                                }
+                              />
+                              <InputGroupAddon align="inline-end">
+                                <InputGroupButton
+                                  type="button"
+                                  size="icon-xs"
+                                  aria-label={
+                                    isPasswordVisible
+                                      ? localization.auth.hidePassword
+                                      : localization.auth.showPassword
+                                  }
+                                  title={
+                                    isPasswordVisible
+                                      ? localization.auth.hidePassword
+                                      : localization.auth.showPassword
+                                  }
+                                  onClick={() =>
+                                    setIsPasswordVisible((visible) => !visible)
+                                  }
+                                >
+                                  {isPasswordVisible ? <EyeOff /> : <Eye />}
+                                </InputGroupButton>
+                              </InputGroupAddon>
+                            </InputGroup>
+                            <field.AuthFormFieldError />
+                          </Field>
+                        )}
+                      </form.AppField>
+                    )}
+
+                    {mode === "password" && emailAndPassword?.rememberMe && (
+                      <form.AppField name="rememberMe">
+                        {(field) => (
+                          <Field orientation="horizontal">
+                            <Checkbox
+                              id="phoneNumberRememberMe"
+                              name={field.name}
+                              disabled={isPending}
+                              checked={field.state.value}
+                              onCheckedChange={(checked) =>
+                                field.handleChange(checked === true)
+                              }
+                            />
+                            <FieldLabel
+                              htmlFor="phoneNumberRememberMe"
+                              className="cursor-pointer font-normal"
+                            >
+                              {localization.auth.rememberMe}
+                            </FieldLabel>
+                          </Field>
+                        )}
+                      </form.AppField>
+                    )}
+
+                    {Captcha && (
+                      <div className="flex justify-center">{Captcha}</div>
                     )}
                   </>
                 )}
-              </div>
-            </FieldGroup>
-          </form>
+
+                <div className="flex flex-col gap-3">
+                  <form.AuthFormSubmitButton
+                    disabled={
+                      isPending ||
+                      (codeSent && form.state.values.code.length !== otpLength)
+                    }
+                  >
+                    {(isSending || isVerifying || isPasswordPending) && (
+                      <Spinner />
+                    )}
+                    {mode === "password"
+                      ? localization.auth.signIn
+                      : codeSent
+                        ? phoneLocalization.verifyCode
+                        : phoneLocalization.sendCode}
+                  </form.AuthFormSubmitButton>
+
+                  {codeSent ? (
+                    <>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        disabled={isPending || isCoolingDown}
+                        onClick={sendCode}
+                      >
+                        {isCoolingDown
+                          ? localization.auth.resendIn.replace(
+                              "{{seconds}}",
+                              String(cooldown)
+                            )
+                          : localization.auth.resend}
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        disabled={isPending}
+                        onClick={() => {
+                          form.setFieldValue("code", "")
+                          setCodeSent(false)
+                        }}
+                      >
+                        {phoneLocalization.useDifferentPhoneNumber}
+                      </Button>
+                    </>
+                  ) : (
+                    <>
+                      {canSwitchMode && (
+                        <Button
+                          type="button"
+                          variant="outline"
+                          disabled={isPending}
+                          onClick={switchMode}
+                        >
+                          {mode === "code"
+                            ? phoneLocalization.usePassword
+                            : phoneLocalization.useVerificationCode}
+                        </Button>
+                      )}
+                      {plugins.flatMap((plugin) =>
+                        (plugin.authButtons ?? []).map((AuthButton) => (
+                          <AuthButton
+                            key={`${plugin.id}-${AuthButton.displayName ?? AuthButton.name}`}
+                            view="phoneNumber"
+                          />
+                        ))
+                      )}
+                    </>
+                  )}
+                </div>
+              </FieldGroup>
+            </form.AuthFormRoot>
+          </form.AppForm>
 
           {socialPosition === "bottom" && showProviders && (
             <>

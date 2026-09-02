@@ -6,17 +6,16 @@ import {
   AlertDialog,
   Button,
   FieldError,
-  Form,
   Input,
   Label,
   Spinner,
   TextField,
   toast
 } from "@heroui/react"
-import type { SyntheticEvent } from "react"
 
 import { twoFactorPlugin } from "../../../lib/auth/two-factor-plugin"
 import { useTwoFactorPasswordRequirement } from "../../../lib/auth/use-two-factor-password"
+import { useAuthForm } from "../auth-form"
 
 export type DisableTwoFactorDialogProps = {
   isOpen: boolean
@@ -48,73 +47,82 @@ export function DisableTwoFactorDialog({
 
   const isPending = isDisabling || isResolvingPasswordRequirement
 
-  const handleSubmit = (e: SyntheticEvent<HTMLFormElement>) => {
-    e.preventDefault()
-
-    const formData = new FormData(e.currentTarget)
-    const password = formData.get("password") as string
-
-    disableTwoFactor(requiresPassword ? { password } : {})
-  }
+  const form = useAuthForm({
+    defaultValues: { password: "" },
+    onSubmit: ({ value }) =>
+      disableTwoFactor(requiresPassword ? { password: value.password } : {})
+  })
 
   return (
     <AlertDialog.Backdrop isOpen={isOpen} onOpenChange={onOpenChange}>
       <AlertDialog.Container>
         <AlertDialog.Dialog>
-          <Form onSubmit={handleSubmit}>
-            <AlertDialog.CloseTrigger />
+          <form.AppForm>
+            <form.AuthFormRoot>
+              <AlertDialog.CloseTrigger />
 
-            <AlertDialog.Header>
-              <AlertDialog.Icon status="danger">
-                <ShieldExclamation />
-              </AlertDialog.Icon>
+              <AlertDialog.Header>
+                <AlertDialog.Icon status="danger">
+                  <ShieldExclamation />
+                </AlertDialog.Icon>
 
-              <AlertDialog.Heading>
-                {twoFactorLocalization.disableTwoFactor}
-              </AlertDialog.Heading>
-            </AlertDialog.Header>
+                <AlertDialog.Heading>
+                  {twoFactorLocalization.disableTwoFactor}
+                </AlertDialog.Heading>
+              </AlertDialog.Header>
 
-            <AlertDialog.Body className="overflow-visible">
-              <p className="text-muted text-sm">
-                {requiresPassword
-                  ? twoFactorLocalization.passwordConfirmation
-                  : twoFactorLocalization.twoFactorDescription}
-              </p>
+              <AlertDialog.Body className="overflow-visible">
+                <p className="text-muted text-sm">
+                  {requiresPassword
+                    ? twoFactorLocalization.passwordConfirmation
+                    : twoFactorLocalization.twoFactorDescription}
+                </p>
 
-              {requiresPassword && (
-                <TextField
-                  className="mt-4"
-                  name="password"
-                  autoComplete="current-password"
+                {requiresPassword && (
+                  <form.AppField name="password">
+                    {(field) => (
+                      <TextField
+                        className="mt-4"
+                        name={field.name}
+                        autoComplete="current-password"
+                        isDisabled={isPending}
+                        value={field.state.value}
+                        onBlur={field.handleBlur}
+                        onChange={field.handleChange}
+                      >
+                        <Label>{localization.auth.password}</Label>
+
+                        <Input
+                          autoFocus
+                          required
+                          type="password"
+                          placeholder={localization.auth.passwordPlaceholder}
+                          variant="secondary"
+                        />
+
+                        <FieldError />
+                      </TextField>
+                    )}
+                  </form.AppField>
+                )}
+              </AlertDialog.Body>
+
+              <AlertDialog.Footer>
+                <Button slot="close" variant="tertiary" isDisabled={isPending}>
+                  {localization.settings.cancel}
+                </Button>
+
+                <form.AuthFormSubmitButton
+                  variant="danger"
                   isDisabled={isPending}
                 >
-                  <Label>{localization.auth.password}</Label>
+                  {isPending && <Spinner color="current" size="sm" />}
 
-                  <Input
-                    autoFocus
-                    required
-                    type="password"
-                    placeholder={localization.auth.passwordPlaceholder}
-                    variant="secondary"
-                  />
-
-                  <FieldError />
-                </TextField>
-              )}
-            </AlertDialog.Body>
-
-            <AlertDialog.Footer>
-              <Button slot="close" variant="tertiary" isDisabled={isPending}>
-                {localization.settings.cancel}
-              </Button>
-
-              <Button type="submit" variant="danger" isPending={isPending}>
-                {isPending && <Spinner color="current" size="sm" />}
-
-                {twoFactorLocalization.disableTwoFactor}
-              </Button>
-            </AlertDialog.Footer>
-          </Form>
+                  {twoFactorLocalization.disableTwoFactor}
+                </form.AuthFormSubmitButton>
+              </AlertDialog.Footer>
+            </form.AuthFormRoot>
+          </form.AppForm>
         </AlertDialog.Dialog>
       </AlertDialog.Container>
     </AlertDialog.Backdrop>

@@ -12,7 +12,7 @@ import {
 } from "@better-auth-ui/react/plugins/sso"
 import type { BetterFetchError } from "better-auth/client"
 import { CheckIcon, CopyIcon } from "lucide-react"
-import { type FormEvent, useState } from "react"
+import { useState } from "react"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -39,6 +39,7 @@ import {
 import { Spinner } from "@/components/ui/spinner"
 import { ssoPlugin } from "@/lib/auth/sso-plugin"
 import { cn } from "@/lib/utils"
+import { useAuthForm } from "../auth-form"
 
 export type SsoDomainVerificationProps = {
   className?: string
@@ -61,7 +62,6 @@ export function SsoDomainVerification({
 }: SsoDomainVerificationProps) {
   const { authClient } = useAuth()
   const { localization } = useAuthPlugin(ssoPlugin)
-  const [providerId, setProviderId] = useState(defaultProviderId)
   const [token, setToken] = useState(defaultToken)
   const [verified, setVerified] = useState(false)
   const [copyError, setCopyError] = useState("")
@@ -74,7 +74,6 @@ export function SsoDomainVerification({
   const verify = useVerifySsoDomain(authClient as SsoAuthClient, {
     onSuccess: () => setVerified(true)
   })
-  const host = providerId ? `_${tokenPrefix}-${providerId}` : ""
   const hostCopy = useCopyToClipboard({
     onError: (error) =>
       setCopyError(error instanceof Error ? error.message : String(error))
@@ -88,12 +87,14 @@ export function SsoDomainVerification({
       ? requestToken.error
       : verify.error
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault()
-    setCopyError("")
-    setVerified(false)
-    verify.mutate({ providerId })
-  }
+  const form = useAuthForm({
+    defaultValues: { providerId: defaultProviderId },
+    onSubmit: ({ value }) => {
+      setCopyError("")
+      setVerified(false)
+      verify.mutate({ providerId: value.providerId })
+    }
+  })
 
   return (
     <Card className={cn("w-full max-w-xl", className)}>
@@ -104,120 +105,144 @@ export function SsoDomainVerification({
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <form onSubmit={handleSubmit}>
-          <FieldGroup>
-            <Field>
-              <FieldLabel htmlFor="sso-verification-provider-id">
-                {localization.providerId}
-              </FieldLabel>
-              <Input
-                id="sso-verification-provider-id"
-                name="providerId"
-                value={providerId}
-                onChange={(event) => {
-                  setProviderId(event.target.value.trim())
-                  setToken("")
-                  setVerified(false)
-                }}
-                required
-              />
-            </Field>
+        <form.AppForm>
+          <form.AuthFormRoot>
+            <form.Subscribe selector={(state) => state.values.providerId}>
+              {(providerId) => {
+                const host = providerId ? `_${tokenPrefix}-${providerId}` : ""
+                return (
+                  <FieldGroup>
+                    <form.AppField name="providerId">
+                      {(field) => (
+                        <Field>
+                          <FieldLabel htmlFor="sso-verification-provider-id">
+                            {localization.providerId}
+                          </FieldLabel>
+                          <Input
+                            id="sso-verification-provider-id"
+                            name={field.name}
+                            value={field.state.value}
+                            onBlur={field.handleBlur}
+                            onChange={(event) => {
+                              field.handleChange(event.target.value.trim())
+                              setToken("")
+                              setVerified(false)
+                            }}
+                            required
+                          />
+                        </Field>
+                      )}
+                    </form.AppField>
 
-            {token ? (
-              <div className="grid gap-3 rounded-lg border p-3">
-                <Field>
-                  <FieldLabel htmlFor="sso-dns-host">
-                    {localization.txtRecordHost}
-                  </FieldLabel>
-                  <InputGroup>
-                    <InputGroupInput
-                      className="font-mono text-xs"
-                      id="sso-dns-host"
-                      readOnly
-                      value={host}
-                    />
-                    <InputGroupAddon align="inline-end">
-                      <InputGroupButton
-                        aria-label={localization.copyDnsHost}
-                        size="icon-xs"
+                    {token ? (
+                      <div className="grid gap-3 rounded-lg border p-3">
+                        <Field>
+                          <FieldLabel htmlFor="sso-dns-host">
+                            {localization.txtRecordHost}
+                          </FieldLabel>
+                          <InputGroup>
+                            <InputGroupInput
+                              className="font-mono text-xs"
+                              id="sso-dns-host"
+                              readOnly
+                              value={host}
+                            />
+                            <InputGroupAddon align="inline-end">
+                              <InputGroupButton
+                                aria-label={localization.copyDnsHost}
+                                size="icon-xs"
+                                onClick={() => {
+                                  setCopyError("")
+                                  void hostCopy.copy(host)
+                                }}
+                              >
+                                {hostCopy.copied ? <CheckIcon /> : <CopyIcon />}
+                              </InputGroupButton>
+                            </InputGroupAddon>
+                          </InputGroup>
+                        </Field>
+                        <Field>
+                          <FieldLabel htmlFor="sso-dns-value">
+                            {localization.txtRecordValue}
+                          </FieldLabel>
+                          <InputGroup>
+                            <InputGroupInput
+                              className="font-mono text-xs"
+                              id="sso-dns-value"
+                              readOnly
+                              value={token}
+                            />
+                            <InputGroupAddon align="inline-end">
+                              <InputGroupButton
+                                aria-label={localization.copyDnsValue}
+                                size="icon-xs"
+                                onClick={() => {
+                                  setCopyError("")
+                                  void tokenCopy.copy(token)
+                                }}
+                              >
+                                {tokenCopy.copied ? (
+                                  <CheckIcon />
+                                ) : (
+                                  <CopyIcon />
+                                )}
+                              </InputGroupButton>
+                            </InputGroupAddon>
+                          </InputGroup>
+                        </Field>
+                      </div>
+                    ) : null}
+
+                    {error ? (
+                      <FieldError>{getErrorMessage(error)}</FieldError>
+                    ) : null}
+                    {copyError ? <FieldError>{copyError}</FieldError> : null}
+                    {verified ? (
+                      <FieldDescription
+                        role="status"
+                        className="text-foreground"
+                      >
+                        {localization.domainVerified}
+                      </FieldDescription>
+                    ) : null}
+
+                    <div className="flex flex-wrap justify-end gap-2">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        disabled={!providerId || verify.isPending}
                         onClick={() => {
                           setCopyError("")
-                          void hostCopy.copy(host)
+                          setVerified(false)
+                          requestToken.mutate({ providerId })
                         }}
                       >
-                        {hostCopy.copied ? <CheckIcon /> : <CopyIcon />}
-                      </InputGroupButton>
-                    </InputGroupAddon>
-                  </InputGroup>
-                </Field>
-                <Field>
-                  <FieldLabel htmlFor="sso-dns-value">
-                    {localization.txtRecordValue}
-                  </FieldLabel>
-                  <InputGroup>
-                    <InputGroupInput
-                      className="font-mono text-xs"
-                      id="sso-dns-value"
-                      readOnly
-                      value={token}
-                    />
-                    <InputGroupAddon align="inline-end">
-                      <InputGroupButton
-                        aria-label={localization.copyDnsValue}
-                        size="icon-xs"
-                        onClick={() => {
-                          setCopyError("")
-                          void tokenCopy.copy(token)
-                        }}
+                        {requestToken.isPending ? (
+                          <Spinner data-icon="inline-start" />
+                        ) : null}
+                        {localization.requestNewToken}
+                      </Button>
+                      <form.AuthFormSubmitButton
+                        disabled={!providerId || requestToken.isPending}
                       >
-                        {tokenCopy.copied ? <CheckIcon /> : <CopyIcon />}
-                      </InputGroupButton>
-                    </InputGroupAddon>
-                  </InputGroup>
-                </Field>
-              </div>
-            ) : null}
+                        {verify.isPending ? (
+                          <Spinner data-icon="inline-start" />
+                        ) : null}
+                        {localization.verifyDomain}
+                      </form.AuthFormSubmitButton>
+                    </div>
 
-            {error ? <FieldError>{getErrorMessage(error)}</FieldError> : null}
-            {copyError ? <FieldError>{copyError}</FieldError> : null}
-            {verified ? (
-              <FieldDescription role="status" className="text-foreground">
-                {localization.domainVerified}
-              </FieldDescription>
-            ) : null}
-
-            <div className="flex flex-wrap justify-end gap-2">
-              <Button
-                type="button"
-                variant="outline"
-                disabled={!providerId || verify.isPending}
-                onClick={() => {
-                  setCopyError("")
-                  setVerified(false)
-                  requestToken.mutate({ providerId })
-                }}
-              >
-                {requestToken.isPending ? (
-                  <Spinner data-icon="inline-start" />
-                ) : null}
-                {localization.requestNewToken}
-              </Button>
-              <Button
-                type="submit"
-                disabled={!providerId || requestToken.isPending}
-              >
-                {verify.isPending ? <Spinner data-icon="inline-start" /> : null}
-                {localization.verifyDomain}
-              </Button>
-            </div>
-
-            <span className="sr-only" aria-live="polite">
-              {token && !verified
-                ? localization.domainVerificationRequested
-                : ""}
-            </span>
-          </FieldGroup>
-        </form>
+                    <span className="sr-only" aria-live="polite">
+                      {token && !verified
+                        ? localization.domainVerificationRequested
+                        : ""}
+                    </span>
+                  </FieldGroup>
+                )
+              }}
+            </form.Subscribe>
+          </form.AuthFormRoot>
+        </form.AppForm>
       </CardContent>
     </Card>
   )

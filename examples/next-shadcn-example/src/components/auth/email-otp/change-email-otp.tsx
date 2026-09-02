@@ -7,17 +7,18 @@ import {
   useRequestEmailChangeOtp,
   useSendVerificationOtp
 } from "@better-auth-ui/react/plugins/email-otp"
-import { type SyntheticEvent, useReducer, useState } from "react"
+import { useEffect, useReducer } from "react"
 import { toast } from "sonner"
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter } from "@/components/ui/card"
-import { Field, FieldError, FieldLabel } from "@/components/ui/field"
+import { Field, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Spinner } from "@/components/ui/spinner"
 import { emailOtpPlugin } from "@/lib/auth/email-otp-plugin"
 import { cn } from "@/lib/utils"
+import { useAuthForm } from "../auth-form"
 import { OpenEmailButton } from "../open-email-button"
 import { OtpField } from "../otp-field"
 
@@ -84,14 +85,6 @@ export function ChangeEmailOtp({ className }: ChangeEmailOtpProps) {
     changeEmailReducer,
     initialChangeEmailState
   )
-  const [code, setCode] = useState("")
-  const [fieldErrors, setFieldErrors] = useState<{ email?: string }>({})
-
-  const resetFlow = () => {
-    setCode("")
-    dispatch({ type: "restarted" })
-  }
-
   // The step transition is attached per call: the code goes to the current
   // address while the pending change targets the new one, so the address to
   // remember isn't in this mutation's variables.
@@ -100,9 +93,9 @@ export function ChangeEmailOtp({ className }: ChangeEmailOtpProps) {
 
   const { mutate: requestEmailChangeOtp, isPending: isRequesting } =
     useRequestEmailChangeOtp(otpClient, {
-      onError: () => setCode(""),
+      onError: () => form.setFieldValue("code", ""),
       onSuccess: (_data, { newEmail }) => {
-        setCode("")
+        form.setFieldValue("code", "")
         dispatch({ type: "changeRequested", newEmail })
       }
     })
@@ -110,7 +103,7 @@ export function ChangeEmailOtp({ className }: ChangeEmailOtpProps) {
   const { mutate: changeEmailOtp, isPending: isChanging } = useChangeEmailOtp(
     otpClient,
     {
-      onError: () => setCode(""),
+      onError: () => form.setFieldValue("code", ""),
       onSuccess: () => {
         toast.success(localization.settings.changeEmailSuccess)
         resetFlow()
@@ -134,30 +127,39 @@ export function ChangeEmailOtp({ className }: ChangeEmailOtpProps) {
     changeEmailOtp({ newEmail: state.newEmail, otp: completedCode })
   }
 
-  const handleSubmit = (e: SyntheticEvent<HTMLFormElement>) => {
-    e.preventDefault()
+  const form = useAuthForm({
+    defaultValues: { code: "", email: "" },
+    onSubmit: ({ value }) => {
+      if (state.step === "email") {
+        const newEmail = value.email
 
-    if (state.step === "email") {
-      const formData = new FormData(e.currentTarget)
-      const newEmail = formData.get("email") as string
+        if (verifyCurrentEmail && currentEmail) {
+          sendVerificationOtp(
+            { email: currentEmail, type: "change-email" },
+            {
+              onSuccess: () =>
+                dispatch({ type: "currentEmailChallenged", newEmail })
+            }
+          )
+          return
+        }
 
-      if (verifyCurrentEmail && currentEmail) {
-        sendVerificationOtp(
-          { email: currentEmail, type: "change-email" },
-          {
-            onSuccess: () =>
-              dispatch({ type: "currentEmailChallenged", newEmail })
-          }
-        )
+        requestEmailChangeOtp({ newEmail })
         return
       }
-
-      requestEmailChangeOtp({ newEmail })
-      return
+      submitCode(value.code)
     }
+  })
 
-    submitCode(code)
+  const resetFlow = () => {
+    form.reset()
+    if (currentEmail) form.setFieldValue("email", currentEmail)
+    dispatch({ type: "restarted" })
   }
+
+  useEffect(() => {
+    if (currentEmail) form.setFieldValue("email", currentEmail)
+  }, [currentEmail, form])
 
   const codeTarget =
     state.step === "currentCode" ? currentEmail : state.newEmail
@@ -168,109 +170,111 @@ export function ChangeEmailOtp({ className }: ChangeEmailOtpProps) {
         {localization.settings.changeEmail}
       </h2>
 
-      <form onSubmit={handleSubmit}>
-        <Card className={cn(className)}>
-          <CardContent className="flex flex-col gap-6">
-            {state.step === "email" ? (
-              <Field data-invalid={!!fieldErrors.email}>
-                <FieldLabel htmlFor="email">
-                  {localization.auth.email}
-                </FieldLabel>
+      <form.AppForm>
+        <form.AuthFormRoot>
+          <Card className={cn(className)}>
+            <CardContent className="flex flex-col gap-6">
+              {state.step === "email" ? (
+                <form.AppField name="email">
+                  {(field) => (
+                    <Field>
+                      <FieldLabel htmlFor="email">
+                        {localization.auth.email}
+                      </FieldLabel>
 
-                {session ? (
-                  <Input
-                    key={currentEmail}
-                    id="email"
-                    name="email"
-                    type="email"
-                    autoComplete="email"
-                    defaultValue={currentEmail}
-                    placeholder={localization.auth.emailPlaceholder}
-                    disabled={isPending}
-                    required
-                    onChange={() =>
-                      setFieldErrors((prev) => ({ ...prev, email: undefined }))
-                    }
-                    onInvalid={(e) => {
-                      e.preventDefault()
+                      {session ? (
+                        <Input
+                          key={currentEmail}
+                          id="email"
+                          name="email"
+                          type="email"
+                          autoComplete="email"
+                          value={field.state.value}
+                          placeholder={localization.auth.emailPlaceholder}
+                          disabled={isPending}
+                          required
+                          onBlur={field.handleBlur}
+                          onChange={(event) =>
+                            field.handleChange(event.target.value)
+                          }
+                        />
+                      ) : (
+                        <Skeleton>
+                          <Input className="invisible" />
+                        </Skeleton>
+                      )}
 
-                      setFieldErrors((prev) => ({
-                        ...prev,
-                        email: (e.target as HTMLInputElement).validationMessage
-                      }))
-                    }}
-                    aria-invalid={!!fieldErrors.email}
-                  />
-                ) : (
-                  <Skeleton>
-                    <Input className="invisible" />
-                  </Skeleton>
-                )}
-
-                <FieldError>{fieldErrors.email}</FieldError>
-              </Field>
-            ) : (
-              <div className="flex flex-col gap-3">
-                <p className="text-muted-foreground text-sm">
-                  {emailOtpLocalization.confirmEmailDescription.replace(
-                    "{{email}}",
-                    codeTarget ?? ""
+                      <field.AuthFormFieldError />
+                    </Field>
                   )}
-                </p>
+                </form.AppField>
+              ) : (
+                <div className="flex flex-col gap-3">
+                  <p className="text-muted-foreground text-sm">
+                    {emailOtpLocalization.confirmEmailDescription.replace(
+                      "{{email}}",
+                      codeTarget ?? ""
+                    )}
+                  </p>
 
-                <OtpField
-                  autoFocus
+                  <form.AppField name="code">
+                    {(field) => (
+                      <OtpField
+                        autoFocus
+                        disabled={isPending}
+                        label={
+                          state.step === "currentCode"
+                            ? emailOtpLocalization.confirmCurrentEmail
+                            : emailOtpLocalization.confirmNewEmail
+                        }
+                        length={otpLength}
+                        name="otp"
+                        value={field.state.value}
+                        onChange={field.handleChange}
+                        onComplete={submitCode}
+                      />
+                    )}
+                  </form.AppField>
+
+                  {codeTarget && (
+                    <OpenEmailButton email={codeTarget} variant="secondary" />
+                  )}
+                </div>
+              )}
+            </CardContent>
+
+            <CardFooter className="gap-3">
+              {state.step !== "email" && (
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="outline"
                   disabled={isPending}
-                  label={
-                    state.step === "currentCode"
-                      ? emailOtpLocalization.confirmCurrentEmail
-                      : emailOtpLocalization.confirmNewEmail
-                  }
-                  length={otpLength}
-                  name="otp"
-                  value={code}
-                  onChange={setCode}
-                  onComplete={submitCode}
-                />
+                  onClick={resetFlow}
+                >
+                  {localization.settings.cancel}
+                </Button>
+              )}
 
-                {codeTarget && (
-                  <OpenEmailButton email={codeTarget} variant="secondary" />
-                )}
-              </div>
-            )}
-          </CardContent>
-
-          <CardFooter className="gap-3">
-            {state.step !== "email" && (
-              <Button
-                type="button"
+              <form.AuthFormSubmitButton
                 size="sm"
-                variant="outline"
-                disabled={isPending}
-                onClick={resetFlow}
+                disabled={
+                  isPending ||
+                  !session ||
+                  (state.step !== "email" &&
+                    form.state.values.code.length !== otpLength)
+                }
               >
-                {localization.settings.cancel}
-              </Button>
-            )}
+                {isPending && <Spinner />}
 
-            <Button
-              type="submit"
-              size="sm"
-              disabled={
-                isPending ||
-                !session ||
-                (state.step !== "email" && code.length !== otpLength)
-              }
-            >
-              {isPending && <Spinner />}
-
-              {state.step === "email"
-                ? localization.settings.updateEmail
-                : emailOtpLocalization.verifyCode}
-            </Button>
-          </CardFooter>
-        </Card>
-      </form>
+                {state.step === "email"
+                  ? localization.settings.updateEmail
+                  : emailOtpLocalization.verifyCode}
+              </form.AuthFormSubmitButton>
+            </CardFooter>
+          </Card>
+        </form.AuthFormRoot>
+      </form.AppForm>
     </div>
   )
 }

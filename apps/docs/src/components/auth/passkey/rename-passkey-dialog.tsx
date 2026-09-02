@@ -3,8 +3,8 @@
 import type { PasskeyAuthClient } from "@better-auth-ui/core/plugins/passkey"
 import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
 import { useUpdatePasskey } from "@better-auth-ui/react/plugins/passkey"
-import { type FormEvent, useEffect, useState } from "react"
-import { Button, buttonVariants } from "@/components/ui/button"
+import { useEffect } from "react"
+import { buttonVariants } from "@/components/ui/button"
 import {
   Dialog,
   DialogClose,
@@ -17,6 +17,7 @@ import { Field, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import { Spinner } from "@/components/ui/spinner"
 import { passkeyPlugin } from "@/lib/auth/passkey-plugin"
+import { useAuthForm } from "../auth-form"
 import type { ListedPasskey } from "./delete-passkey-dialog"
 
 export function RenamePasskeyDialog({
@@ -30,56 +31,61 @@ export function RenamePasskeyDialog({
 }) {
   const { authClient, localization } = useAuth<PasskeyAuthClient>()
   const { localization: labels } = useAuthPlugin(passkeyPlugin)
-  const [name, setName] = useState(passkey.name ?? "")
-
-  useEffect(() => {
-    if (open) setName(passkey.name ?? "")
-  }, [open, passkey.name])
-
   const updatePasskey = useUpdatePasskey(authClient, {
     onSuccess: () => onOpenChange(false)
   })
-  const submit = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault()
-    const nextName = name.trim()
-    if (nextName) updatePasskey.mutate({ id: passkey.id, name: nextName })
-  }
+  const form = useAuthForm({
+    defaultValues: { name: passkey.name ?? "" },
+    onSubmit: ({ value }) => {
+      const name = value.name.trim()
+      if (name) updatePasskey.mutate({ id: passkey.id, name })
+    }
+  })
+
+  useEffect(() => {
+    if (open) form.reset({ name: passkey.name ?? "" })
+  }, [form, open, passkey.name])
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
-        <form className="flex flex-col gap-6" onSubmit={submit}>
-          <DialogHeader>
-            <DialogTitle>{labels.renamePasskey}</DialogTitle>
-          </DialogHeader>
-          <Field>
-            <FieldLabel htmlFor={`passkey-name-${passkey.id}`}>
-              {labels.name}
-            </FieldLabel>
-            <Input
-              id={`passkey-name-${passkey.id}`}
-              autoFocus
-              value={name}
-              onChange={(event) => setName(event.target.value)}
-              required
-            />
-          </Field>
-          <DialogFooter>
-            <DialogClose
-              className={buttonVariants({ variant: "outline" })}
-              type="button"
-            >
-              {localization.settings.cancel}
-            </DialogClose>
-            <Button
-              disabled={!name.trim() || updatePasskey.isPending}
-              type="submit"
-            >
-              {updatePasskey.isPending && <Spinner />}
-              {localization.settings.saveChanges}
-            </Button>
-          </DialogFooter>
-        </form>
+        <form.AppForm>
+          <form.AuthFormRoot className="flex flex-col gap-6">
+            <DialogHeader>
+              <DialogTitle>{labels.renamePasskey}</DialogTitle>
+            </DialogHeader>
+            <form.AppField name="name">
+              {(field) => (
+                <Field>
+                  <FieldLabel htmlFor={`passkey-name-${passkey.id}`}>
+                    {labels.name}
+                  </FieldLabel>
+                  <Input
+                    id={`passkey-name-${passkey.id}`}
+                    name={field.name}
+                    autoFocus
+                    value={field.state.value}
+                    onBlur={field.handleBlur}
+                    onChange={(event) => field.handleChange(event.target.value)}
+                    required
+                  />
+                </Field>
+              )}
+            </form.AppField>
+            <DialogFooter>
+              <DialogClose
+                className={buttonVariants({ variant: "outline" })}
+                type="button"
+              >
+                {localization.settings.cancel}
+              </DialogClose>
+              <form.AuthFormSubmitButton disabled={updatePasskey.isPending}>
+                {updatePasskey.isPending && <Spinner />}
+                {localization.settings.saveChanges}
+              </form.AuthFormSubmitButton>
+            </DialogFooter>
+          </form.AuthFormRoot>
+        </form.AppForm>
       </DialogContent>
     </Dialog>
   )

@@ -1,13 +1,11 @@
 import { getViewURL } from "@better-auth-ui/core"
 import { useAuth, useChangeEmail, useSession } from "@better-auth-ui/react"
 import {
-  Button,
   Card,
   type CardProps,
   cn,
   FieldError,
   Fieldset,
-  Form,
   Input,
   Label,
   Skeleton,
@@ -15,7 +13,8 @@ import {
   TextField,
   toast
 } from "@heroui/react"
-import type { SyntheticEvent } from "react"
+import { useEffect } from "react"
+import { useAuthForm } from "../../auth-form"
 
 export type ChangeEmailProps = {
   className?: string
@@ -43,19 +42,21 @@ export function ChangeEmail({
     onSuccess: () => toast.success(localization.settings.changeEmailSuccess)
   })
 
-  function handleSubmit(e: SyntheticEvent<HTMLFormElement>) {
-    e.preventDefault()
-    const formData = new FormData(e.currentTarget)
-
-    changeEmail({
-      newEmail: formData.get("email") as string,
-      callbackURL: getViewURL(
-        baseURL,
-        basePaths.settings,
-        viewPaths.settings.account
-      )
-    })
-  }
+  const form = useAuthForm({
+    defaultValues: { email: "" },
+    onSubmit: ({ value }) =>
+      changeEmail({
+        newEmail: value.email,
+        callbackURL: getViewURL(
+          baseURL,
+          basePaths.settings,
+          viewPaths.settings.account
+        )
+      })
+  })
+  useEffect(() => {
+    if (session) form.setFieldValue("email", session.user.email)
+  }, [form.setFieldValue, session])
 
   return (
     <div>
@@ -65,49 +66,57 @@ export function ChangeEmail({
 
       <Card className={cn("p-4 gap-4", className)} variant={variant} {...props}>
         <Card.Content>
-          <Form onSubmit={handleSubmit}>
-            <Fieldset className="w-full gap-4">
-              <Fieldset.Group>
-                <TextField
-                  key={`${session?.user.id}-${session?.user.email}-email`}
-                  name="email"
-                  type="email"
-                  defaultValue={session?.user.email}
-                  isDisabled={isPending || !session}
-                >
-                  <Label>{localization.auth.email}</Label>
+          <form.AppForm>
+            <form.AuthFormRoot>
+              <Fieldset className="w-full gap-4">
+                <Fieldset.Group>
+                  <form.AppField name="email">
+                    {(field) => (
+                      <TextField
+                        key={`${session?.user.id}-${session?.user.email}-email`}
+                        name={field.name}
+                        type="email"
+                        value={field.state.value}
+                        onBlur={field.handleBlur}
+                        onChange={field.handleChange}
+                        isDisabled={isPending || !session}
+                      >
+                        <Label>{localization.auth.email}</Label>
 
-                  {session ? (
-                    <Input
-                      required
-                      variant={
-                        variant === "transparent" ? "primary" : "secondary"
-                      }
-                      autoComplete="email"
-                      placeholder={localization.auth.emailPlaceholder}
-                    />
-                  ) : (
-                    <Skeleton className="h-10 md:h-9 w-full rounded-xl" />
-                  )}
+                        {session ? (
+                          <Input
+                            required
+                            variant={
+                              variant === "transparent"
+                                ? "primary"
+                                : "secondary"
+                            }
+                            autoComplete="email"
+                            placeholder={localization.auth.emailPlaceholder}
+                          />
+                        ) : (
+                          <Skeleton className="h-10 md:h-9 w-full rounded-xl" />
+                        )}
 
-                  <FieldError />
-                </TextField>
-              </Fieldset.Group>
+                        <FieldError />
+                      </TextField>
+                    )}
+                  </form.AppField>
+                </Fieldset.Group>
 
-              <Fieldset.Actions>
-                <Button
-                  type="submit"
-                  isPending={isPending}
-                  isDisabled={!session}
-                  size="sm"
-                >
-                  {isPending && <Spinner color="current" size="sm" />}
+                <Fieldset.Actions>
+                  <form.AuthFormSubmitButton
+                    isDisabled={!session || isPending}
+                    size="sm"
+                  >
+                    {isPending && <Spinner color="current" size="sm" />}
 
-                  {localization.settings.updateEmail}
-                </Button>
-              </Fieldset.Actions>
-            </Fieldset>
-          </Form>
+                    {localization.settings.updateEmail}
+                  </form.AuthFormSubmitButton>
+                </Fieldset.Actions>
+              </Fieldset>
+            </form.AuthFormRoot>
+          </form.AppForm>
         </Card.Content>
       </Card>
     </div>

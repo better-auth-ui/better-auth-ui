@@ -18,14 +18,14 @@ import {
   type CardProps,
   cn,
   Fieldset,
-  Form,
   Skeleton,
   Spinner,
   toast
 } from "@heroui/react"
-import { type SyntheticEvent, useEffect, useState } from "react"
+import { useEffect, useState } from "react"
 
 import { phoneNumberPlugin } from "../../../lib/auth/phone-number-plugin"
+import { useAuthForm } from "../auth-form"
 import { OtpField } from "../otp-field"
 import { InternationalPhoneField } from "./international-phone-field"
 import { RemovePhoneNumberDialog } from "./remove-phone-number-dialog"
@@ -58,18 +58,7 @@ export function ChangePhoneNumber({
   const { data: session } = useSession(phoneClient)
   const currentPhoneNumber =
     (session?.user as PhoneNumberUser | undefined)?.phoneNumber ?? ""
-  const [phoneNumber, setPhoneNumber] = useState(() =>
-    createPhoneNumberValue("", defaultCountry, adapter)
-  )
-  const [phoneError, setPhoneError] = useState<string>()
-  const [code, setCode] = useState("")
   const [codeSent, setCodeSent] = useState(false)
-
-  useEffect(() => {
-    setPhoneNumber(
-      createPhoneNumberValue(currentPhoneNumber, defaultCountry, adapter)
-    )
-  }, [adapter, currentPhoneNumber, defaultCountry])
 
   const { mutate: sendOtp, isPending: isSending } = useSendPhoneNumberOtp(
     phoneClient,
@@ -78,9 +67,9 @@ export function ChangePhoneNumber({
   const { mutate: verify, isPending: isVerifying } = useVerifyPhoneNumber(
     phoneClient,
     {
-      onError: () => setCode(""),
+      onError: () => form.setFieldValue("code", ""),
       onSuccess: () => {
-        setCode("")
+        form.setFieldValue("code", "")
         setCodeSent(false)
         toast.success(localization.phoneNumberUpdated)
       }
@@ -90,25 +79,40 @@ export function ChangePhoneNumber({
     phoneClient,
     {
       onSuccess: () => {
-        setPhoneNumber(createPhoneNumberValue("", defaultCountry, adapter))
+        form.setFieldValue(
+          "phoneNumber",
+          createPhoneNumberValue("", defaultCountry, adapter)
+        )
         toast.success(localization.phoneNumberRemoved)
       }
     }
   )
   const isPending = isSending || isVerifying || isRemoving
 
-  const handleSubmit = (event: SyntheticEvent<HTMLFormElement>) => {
-    event.preventDefault()
-    if (!phoneNumber.e164) {
-      setPhoneError(localization.invalidPhoneNumber)
-      return
+  const form = useAuthForm({
+    defaultValues: {
+      code: "",
+      phoneNumber: createPhoneNumberValue("", defaultCountry, adapter)
+    },
+    onSubmit: ({ value }) => {
+      if (!value.phoneNumber.e164) return
+      if (!codeSent) {
+        sendOtp({ phoneNumber: value.phoneNumber.e164 })
+        return
+      }
+      verify({
+        phoneNumber: value.phoneNumber.e164,
+        code: value.code,
+        updatePhoneNumber: true
+      })
     }
-    if (!codeSent) {
-      sendOtp({ phoneNumber: phoneNumber.e164 })
-      return
-    }
-    verify({ phoneNumber: phoneNumber.e164, code, updatePhoneNumber: true })
-  }
+  })
+  useEffect(() => {
+    form.setFieldValue(
+      "phoneNumber",
+      createPhoneNumberValue(currentPhoneNumber, defaultCountry, adapter)
+    )
+  }, [adapter, currentPhoneNumber, defaultCountry, form.setFieldValue])
   const removePhoneNumber = () =>
     updateUser({
       phoneNumber: null
@@ -121,102 +125,117 @@ export function ChangePhoneNumber({
       </h2>
       <Card className={cn("gap-4 p-4", className)} variant={variant} {...props}>
         <Card.Content>
-          <Form onSubmit={handleSubmit}>
-            <Fieldset className="w-full gap-4">
-              <Fieldset.Group>
-                {codeSent ? (
-                  <div className="flex flex-col gap-3">
-                    <p className="text-sm text-muted">
-                      {localization.codeSentTo.replace(
-                        "{{phoneNumber}}",
-                        phoneNumber.display
+          <form.AppForm>
+            <form.AuthFormRoot>
+              <Fieldset className="w-full gap-4">
+                <Fieldset.Group>
+                  {codeSent ? (
+                    <div className="flex flex-col gap-3">
+                      <p className="text-sm text-muted">
+                        {localization.codeSentTo.replace(
+                          "{{phoneNumber}}",
+                          form.state.values.phoneNumber.display
+                        )}
+                      </p>
+                      <form.AppField name="code">
+                        {(field) => (
+                          <OtpField
+                            autoFocus
+                            isDisabled={isPending}
+                            label={localization.phoneCode}
+                            length={otpLength}
+                            name={field.name}
+                            value={field.state.value}
+                            variant={variant}
+                            onChange={field.handleChange}
+                          />
+                        )}
+                      </form.AppField>
+                    </div>
+                  ) : session ? (
+                    <form.AppField
+                      name="phoneNumber"
+                      validators={{
+                        onChange: ({ value }) =>
+                          value.e164
+                            ? undefined
+                            : localization.invalidPhoneNumber
+                      }}
+                    >
+                      {(field) => (
+                        <InternationalPhoneField
+                          adapter={adapter}
+                          countryCodes={countries}
+                          countryLabel={localization.country}
+                          error={field.state.meta.errors[0]?.toString()}
+                          isDisabled={isPending}
+                          locale={locale}
+                          phoneLabel={localization.phoneNumber}
+                          placeholder={localization.phoneNumberPlaceholder}
+                          value={field.state.value}
+                          variant={
+                            variant === "transparent" ? "primary" : "secondary"
+                          }
+                          onChange={field.handleChange}
+                        />
                       )}
-                    </p>
-                    <OtpField
-                      autoFocus
-                      isDisabled={isPending}
-                      label={localization.phoneCode}
-                      length={otpLength}
-                      name="otp"
-                      value={code}
-                      variant={variant}
-                      onChange={setCode}
-                    />
-                  </div>
-                ) : session ? (
-                  <InternationalPhoneField
-                    adapter={adapter}
-                    countryCodes={countries}
-                    countryLabel={localization.country}
-                    error={phoneError}
-                    isDisabled={isPending}
-                    locale={locale}
-                    phoneLabel={localization.phoneNumber}
-                    placeholder={localization.phoneNumberPlaceholder}
-                    value={phoneNumber}
-                    variant={
-                      variant === "transparent" ? "primary" : "secondary"
-                    }
-                    onChange={(value) => {
-                      setPhoneNumber(value)
-                      setPhoneError(undefined)
-                    }}
-                  />
-                ) : (
-                  <Skeleton className="h-14 w-full rounded-xl" />
-                )}
-              </Fieldset.Group>
-              <Fieldset.Actions>
-                {codeSent && (
-                  <Button
-                    size="sm"
-                    variant="tertiary"
-                    isDisabled={isPending}
-                    onPress={() => {
-                      setCode("")
-                      setCodeSent(false)
-                      setPhoneNumber(
-                        createPhoneNumberValue(
-                          currentPhoneNumber,
-                          defaultCountry,
-                          adapter
-                        )
-                      )
-                    }}
-                  >
-                    {localization.cancel}
-                  </Button>
-                )}
-                <Button
-                  size="sm"
-                  type="submit"
-                  isDisabled={
-                    !session ||
-                    isPending ||
-                    (codeSent && code.length !== otpLength)
-                  }
-                  isPending={isSending || isVerifying}
-                >
-                  {(isSending || isVerifying) && (
-                    <Spinner color="current" size="sm" />
+                    </form.AppField>
+                  ) : (
+                    <Skeleton className="h-14 w-full rounded-xl" />
                   )}
-                  {codeSent
-                    ? localization.verifyCode
-                    : localization.updatePhoneNumber}
-                </Button>
-                {!codeSent && currentPhoneNumber && (
-                  <RemovePhoneNumberDialog
-                    cancelLabel={localization.cancel}
-                    description={localization.removePhoneNumberDescription}
-                    isPending={isRemoving}
-                    label={localization.removePhoneNumber}
-                    title={localization.removePhoneNumberTitle}
-                    onConfirm={removePhoneNumber}
-                  />
-                )}
-              </Fieldset.Actions>
-            </Fieldset>
-          </Form>
+                </Fieldset.Group>
+                <Fieldset.Actions>
+                  {codeSent && (
+                    <Button
+                      size="sm"
+                      variant="tertiary"
+                      isDisabled={isPending}
+                      onPress={() => {
+                        form.setFieldValue("code", "")
+                        setCodeSent(false)
+                        form.setFieldValue(
+                          "phoneNumber",
+                          createPhoneNumberValue(
+                            currentPhoneNumber,
+                            defaultCountry,
+                            adapter
+                          )
+                        )
+                      }}
+                    >
+                      {localization.cancel}
+                    </Button>
+                  )}
+                  <form.AuthFormSubmitButton
+                    size="sm"
+                    type="submit"
+                    isDisabled={
+                      !session ||
+                      isPending ||
+                      (codeSent && form.state.values.code.length !== otpLength)
+                    }
+                  >
+                    {(isSending || isVerifying) && (
+                      <Spinner color="current" size="sm" />
+                    )}
+                    {codeSent
+                      ? localization.verifyCode
+                      : localization.updatePhoneNumber}
+                  </form.AuthFormSubmitButton>
+                  {!codeSent && currentPhoneNumber && (
+                    <RemovePhoneNumberDialog
+                      cancelLabel={localization.cancel}
+                      description={localization.removePhoneNumberDescription}
+                      isPending={isRemoving}
+                      label={localization.removePhoneNumber}
+                      title={localization.removePhoneNumberTitle}
+                      onConfirm={removePhoneNumber}
+                    />
+                  )}
+                </Fieldset.Actions>
+              </Fieldset>
+            </form.AuthFormRoot>
+          </form.AppForm>
         </Card.Content>
       </Card>
     </div>

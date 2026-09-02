@@ -7,8 +7,8 @@ import {
 import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
 import { useCreateApiKey } from "@better-auth-ui/react/plugins/api-key"
 import { Key } from "lucide-react"
-import { type SyntheticEvent, useState } from "react"
-import { Button, buttonVariants } from "@/components/ui/button"
+import { useState } from "react"
+import { buttonVariants } from "@/components/ui/button"
 import {
   Dialog,
   DialogClose,
@@ -35,6 +35,7 @@ import {
 } from "@/components/ui/select"
 import { Spinner } from "@/components/ui/spinner"
 import { apiKeyPlugin } from "@/lib/auth/api-key-plugin"
+import { useAuthForm } from "../auth-form"
 import { NewApiKeyDialog } from "./new-api-key-dialog"
 
 export type CreateApiKeyDialogProps = {
@@ -65,24 +66,48 @@ export function CreateApiKeyDialog({
   const availableConfigurations = configurations.filter(
     (configuration) => configuration.organization === Boolean(organizationId)
   )
-  const expirationItems = keyExpiration
-    ? [
-        ...keyExpiration.intervals.map((days) => ({
-          label: `${days.toLocaleString()} ${
-            days === 1 ? apiKeyLocalization.day : apiKeyLocalization.days
-          }`,
-          value: String(days)
-        })),
-        ...(keyExpiration.allowNever
-          ? [{ label: apiKeyLocalization.never, value: "never" }]
-          : [])
-      ]
-    : []
+
+  const form = useAuthForm({
+    defaultValues: {
+      configId: availableConfigurations[0]?.id ?? "",
+      expiration:
+        keyExpiration && keyExpiration.defaultInterval === null
+          ? "never"
+          : String((keyExpiration && keyExpiration.defaultInterval) ?? "never"),
+      name: ""
+    },
+    onSubmit: ({ value }) => {
+      const name = value.name.trim()
+      const expirationDays =
+        value.expiration !== "never" ? Number(value.expiration) : undefined
+      const expiresIn = expirationDays
+        ? apiKeyExpirationDaysToSeconds(expirationDays)
+        : undefined
+      const configId = value.configId.trim()
+      const resolvedConfigId =
+        configId || (organizationId ? "organization" : undefined)
+      const payload = {
+        ...(name ? { name } : {}),
+        ...(expiresIn ? { expiresIn } : {}),
+        ...(resolvedConfigId ? { configId: resolvedConfigId } : {}),
+        ...(organizationId ? { organizationId } : {})
+      }
+      createApiKey(Object.keys(payload).length > 0 ? payload : undefined, {
+        onSuccess: (result) => {
+          handleOpenChange(false)
+          setKeyName(name)
+          setSecretKey(result.key)
+          setIsNewKeyDialogOpen(true)
+        }
+      })
+    }
+  })
 
   const handleOpenChange = (nextOpen: boolean) => {
     if (!nextOpen) {
       setKeyName(null)
       setSecretKey(null)
+      form.reset()
     }
 
     onOpenChange(nextOpen)
@@ -97,159 +122,177 @@ export function CreateApiKeyDialog({
     }
   }
 
-  const handleSubmit = (e: SyntheticEvent<HTMLFormElement>) => {
-    e.preventDefault()
-
-    const formData = new FormData(e.target as HTMLFormElement)
-    const name = (formData.get("name") as string).trim()
-    const expiration = formData.get("expiration")
-    const expirationDays =
-      typeof expiration === "string" && expiration !== "never"
-        ? Number(expiration)
-        : undefined
-    const expiresIn = expirationDays
-      ? apiKeyExpirationDaysToSeconds(expirationDays)
-      : undefined
-
-    const configId = String(formData.get("configId") ?? "").trim()
-    const resolvedConfigId =
-      configId || (organizationId ? "organization" : undefined)
-    const payload = {
-      ...(name ? { name } : {}),
-      ...(expiresIn ? { expiresIn } : {}),
-      ...(resolvedConfigId ? { configId: resolvedConfigId } : {}),
-      ...(organizationId ? { organizationId } : {})
-    }
-
-    createApiKey(Object.keys(payload).length > 0 ? payload : undefined, {
-      onSuccess: (result) => {
-        handleOpenChange(false)
-        setKeyName(name)
-        setSecretKey(result.key)
-        setIsNewKeyDialogOpen(true)
-      }
-    })
-  }
-
   return (
     <>
       <Dialog open={open} onOpenChange={handleOpenChange}>
         <DialogContent>
-          <form onSubmit={handleSubmit} className="flex flex-col gap-6">
-            <DialogHeader>
-              <DialogTitle className="flex items-center gap-2">
-                <Key />
-                {apiKeyLocalization.createApiKey}
-              </DialogTitle>
+          <form.AppForm>
+            <form.AuthFormRoot className="flex flex-col gap-6">
+              <DialogHeader>
+                <DialogTitle className="flex items-center gap-2">
+                  <Key />
+                  {apiKeyLocalization.createApiKey}
+                </DialogTitle>
 
-              <DialogDescription>
-                {apiKeyLocalization.apiKeysDescription}
-              </DialogDescription>
-            </DialogHeader>
+                <DialogDescription>
+                  {apiKeyLocalization.apiKeysDescription}
+                </DialogDescription>
+              </DialogHeader>
 
-            <FieldGroup>
-              <Field>
-                <FieldLabel htmlFor="api-key-name">
-                  {apiKeyLocalization.name}
-                </FieldLabel>
+              <FieldGroup>
+                <form.AppField name="name">
+                  {(field) => (
+                    <Field>
+                      <FieldLabel htmlFor="api-key-name">
+                        {apiKeyLocalization.name}
+                      </FieldLabel>
 
-                <Input
-                  id="api-key-name"
-                  name="name"
-                  autoFocus
-                  placeholder={localization.settings.optional}
-                  disabled={isCreating}
-                />
+                      <Input
+                        id="api-key-name"
+                        name={field.name}
+                        autoFocus
+                        placeholder={localization.settings.optional}
+                        disabled={isCreating}
+                        value={field.state.value}
+                        onBlur={field.handleBlur}
+                        onChange={(event) =>
+                          field.handleChange(event.target.value)
+                        }
+                      />
 
-                <FieldError />
-              </Field>
+                      <FieldError />
+                    </Field>
+                  )}
+                </form.AppField>
 
-              {availableConfigurations.length > 0 && (
-                <Field>
-                  <FieldLabel htmlFor="api-key-configuration">
-                    {apiKeyLocalization.configuration}
-                  </FieldLabel>
-                  <Select
-                    items={availableConfigurations.map((configuration) => ({
-                      label: configuration.label,
-                      value: configuration.id
-                    }))}
-                    name="configId"
-                    defaultValue={availableConfigurations[0]?.id}
-                    disabled={isCreating}
-                  >
-                    <SelectTrigger
-                      id="api-key-configuration"
-                      className="w-full"
-                    >
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectGroup>
-                        {availableConfigurations.map((configuration) => (
-                          <SelectItem
-                            key={configuration.id}
-                            value={configuration.id}
+                {availableConfigurations.length > 0 && (
+                  <form.AppField name="configId">
+                    {(field) => (
+                      <Field>
+                        <FieldLabel htmlFor="api-key-configuration">
+                          {apiKeyLocalization.configuration}
+                        </FieldLabel>
+                        <Select
+                          items={availableConfigurations.map(
+                            (configuration) => ({
+                              label: configuration.label,
+                              value: configuration.id
+                            })
+                          )}
+                          name={field.name}
+                          value={field.state.value}
+                          onValueChange={(value) =>
+                            field.handleChange(value ?? "")
+                          }
+                          disabled={isCreating}
+                        >
+                          <SelectTrigger
+                            id="api-key-configuration"
+                            className="w-full"
                           >
-                            {configuration.label}
-                          </SelectItem>
-                        ))}
-                      </SelectGroup>
-                    </SelectContent>
-                  </Select>
-                </Field>
-              )}
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectGroup>
+                              {availableConfigurations.map((configuration) => (
+                                <SelectItem
+                                  key={configuration.id}
+                                  value={configuration.id}
+                                >
+                                  {configuration.label}
+                                </SelectItem>
+                              ))}
+                            </SelectGroup>
+                          </SelectContent>
+                        </Select>
+                      </Field>
+                    )}
+                  </form.AppField>
+                )}
 
-              {keyExpiration ? (
-                <Field>
-                  <FieldLabel htmlFor="api-key-expiration">
-                    {apiKeyLocalization.expiration}
-                  </FieldLabel>
+                {keyExpiration ? (
+                  <form.AppField name="expiration">
+                    {(field) => (
+                      <Field>
+                        <FieldLabel htmlFor="api-key-expiration">
+                          {apiKeyLocalization.expiration}
+                        </FieldLabel>
 
-                  <Select
-                    items={expirationItems}
-                    name="expiration"
-                    defaultValue={
-                      keyExpiration.defaultInterval === null
-                        ? "never"
-                        : String(keyExpiration.defaultInterval)
-                    }
-                    disabled={isCreating}
-                  >
-                    <SelectTrigger id="api-key-expiration" className="w-full">
-                      <SelectValue />
-                    </SelectTrigger>
+                        <Select
+                          items={[
+                            ...keyExpiration.intervals.map((days) => ({
+                              label: `${days.toLocaleString()} ${
+                                days === 1
+                                  ? apiKeyLocalization.day
+                                  : apiKeyLocalization.days
+                              }`,
+                              value: String(days)
+                            })),
+                            ...(keyExpiration.allowNever
+                              ? [
+                                  {
+                                    label: apiKeyLocalization.never,
+                                    value: "never"
+                                  }
+                                ]
+                              : [])
+                          ]}
+                          name={field.name}
+                          value={field.state.value}
+                          onValueChange={(value) =>
+                            field.handleChange(value ?? "")
+                          }
+                          disabled={isCreating}
+                        >
+                          <SelectTrigger
+                            id="api-key-expiration"
+                            className="w-full"
+                          >
+                            <SelectValue />
+                          </SelectTrigger>
 
-                    <SelectContent>
-                      <SelectGroup>
-                        {expirationItems.map((item) => (
-                          <SelectItem key={item.value} value={item.value}>
-                            {item.label}
-                          </SelectItem>
-                        ))}
-                      </SelectGroup>
-                    </SelectContent>
-                  </Select>
-                </Field>
-              ) : null}
-            </FieldGroup>
+                          <SelectContent>
+                            <SelectGroup>
+                              {keyExpiration.intervals.map((days) => (
+                                <SelectItem key={days} value={String(days)}>
+                                  {days.toLocaleString()}{" "}
+                                  {days === 1
+                                    ? apiKeyLocalization.day
+                                    : apiKeyLocalization.days}
+                                </SelectItem>
+                              ))}
 
-            <DialogFooter>
-              <DialogClose
-                className={buttonVariants({ variant: "outline" })}
-                disabled={isCreating}
-                type="button"
-              >
-                {localization.settings.cancel}
-              </DialogClose>
+                              {keyExpiration.allowNever ? (
+                                <SelectItem value="never">
+                                  {apiKeyLocalization.never}
+                                </SelectItem>
+                              ) : null}
+                            </SelectGroup>
+                          </SelectContent>
+                        </Select>
+                      </Field>
+                    )}
+                  </form.AppField>
+                ) : null}
+              </FieldGroup>
 
-              <Button type="submit" disabled={isCreating}>
-                {isCreating && <Spinner />}
+              <DialogFooter>
+                <DialogClose
+                  className={buttonVariants({ variant: "outline" })}
+                  disabled={isCreating}
+                  type="button"
+                >
+                  {localization.settings.cancel}
+                </DialogClose>
 
-                {apiKeyLocalization.createApiKey}
-              </Button>
-            </DialogFooter>
-          </form>
+                <form.AuthFormSubmitButton disabled={isCreating}>
+                  {isCreating && <Spinner />}
+
+                  {apiKeyLocalization.createApiKey}
+                </form.AuthFormSubmitButton>
+              </DialogFooter>
+            </form.AuthFormRoot>
+          </form.AppForm>
         </DialogContent>
       </Dialog>
 

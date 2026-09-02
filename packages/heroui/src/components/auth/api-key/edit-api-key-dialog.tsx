@@ -7,14 +7,14 @@ import { useUpdateApiKey } from "@better-auth-ui/react/plugins/api-key"
 import {
   AlertDialog,
   Button,
-  Form,
   Input,
   Label,
   Spinner,
   TextField
 } from "@heroui/react"
-import type { FormEvent } from "react"
+import { useEffect } from "react"
 import { apiKeyPlugin } from "../../../lib/auth/api-key-plugin"
+import { useAuthForm } from "../auth-form"
 
 export function EditApiKeyDialog({
   apiKey,
@@ -32,51 +32,66 @@ export function EditApiKeyDialog({
     onSuccess: () => onOpenChange(false)
   })
 
-  const submit = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault()
-    const formData = new FormData(event.currentTarget)
-    updateApiKey.mutate({
-      keyId: apiKey.id,
-      configId: apiKey.configId,
-      name: String(formData.get("name") ?? "").trim()
-    })
-  }
+  const form = useAuthForm({
+    defaultValues: { name: apiKey.name ?? "" },
+    onSubmit: ({ value }) => {
+      updateApiKey.mutate({
+        keyId: apiKey.id,
+        configId: apiKey.configId,
+        name: value.name.trim()
+      })
+    }
+  })
+  useEffect(() => {
+    if (isOpen) form.setFieldValue("name", apiKey.name ?? "")
+  }, [apiKey.name, form.setFieldValue, isOpen])
 
   return (
     <AlertDialog.Backdrop isOpen={isOpen} onOpenChange={onOpenChange}>
       <AlertDialog.Container>
         <AlertDialog.Dialog>
-          <Form onSubmit={submit}>
-            <AlertDialog.CloseTrigger />
-            <AlertDialog.Header>
-              <AlertDialog.Heading>{labels.editApiKey}</AlertDialog.Heading>
-            </AlertDialog.Header>
-            <AlertDialog.Body className="overflow-visible">
-              <div className="flex flex-col gap-4">
-                <TextField name="name">
-                  <Label>{labels.name}</Label>
-                  <Input defaultValue={apiKey.name ?? ""} variant="secondary" />
-                </TextField>
-              </div>
-              {updateApiKey.error && (
-                <p className="mt-3 text-sm text-danger" role="alert">
-                  {updateApiKey.error.error?.message ??
-                    updateApiKey.error?.message}
-                </p>
-              )}
-            </AlertDialog.Body>
-            <AlertDialog.Footer>
-              <Button slot="close" variant="tertiary">
-                {localization.settings.cancel}
-              </Button>
-              <Button isPending={updateApiKey.isPending} type="submit">
-                {updateApiKey.isPending && (
-                  <Spinner color="current" size="sm" />
+          <form.AppForm>
+            <form.AuthFormRoot>
+              <AlertDialog.CloseTrigger />
+              <AlertDialog.Header>
+                <AlertDialog.Heading>{labels.editApiKey}</AlertDialog.Heading>
+              </AlertDialog.Header>
+              <AlertDialog.Body className="overflow-visible">
+                <div className="flex flex-col gap-4">
+                  <form.AppField name="name">
+                    {(field) => (
+                      <TextField
+                        name={field.name}
+                        value={field.state.value}
+                        onBlur={field.handleBlur}
+                        onChange={field.handleChange}
+                      >
+                        <Label>{labels.name}</Label>
+                        <Input variant="secondary" />
+                      </TextField>
+                    )}
+                  </form.AppField>
+                </div>
+                {updateApiKey.error && (
+                  <p className="mt-3 text-sm text-danger" role="alert">
+                    {updateApiKey.error.error?.message ??
+                      updateApiKey.error?.message}
+                  </p>
                 )}
-                {localization.settings.saveChanges}
-              </Button>
-            </AlertDialog.Footer>
-          </Form>
+              </AlertDialog.Body>
+              <AlertDialog.Footer>
+                <Button slot="close" variant="tertiary">
+                  {localization.settings.cancel}
+                </Button>
+                <form.AuthFormSubmitButton isDisabled={updateApiKey.isPending}>
+                  {updateApiKey.isPending && (
+                    <Spinner color="current" size="sm" />
+                  )}
+                  {localization.settings.saveChanges}
+                </form.AuthFormSubmitButton>
+              </AlertDialog.Footer>
+            </form.AuthFormRoot>
+          </form.AppForm>
         </AlertDialog.Dialog>
       </AlertDialog.Container>
     </AlertDialog.Backdrop>
