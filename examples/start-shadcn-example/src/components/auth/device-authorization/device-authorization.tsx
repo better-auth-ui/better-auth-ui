@@ -10,6 +10,7 @@ import {
   useDenyDevice,
   useVerifyDeviceCode
 } from "@better-auth-ui/react/plugins/device-authorization"
+import { useSelector } from "@tanstack/react-form"
 import { REGEXP_ONLY_DIGITS_AND_CHARS } from "input-otp"
 import { CheckIcon, CircleCheckIcon, CircleXIcon, XIcon } from "lucide-react"
 import {
@@ -312,6 +313,10 @@ function DeviceCodeForm({
     defaultValues: { userCode: initialUserCode },
     onSubmit: ({ value }) => onSubmitCode(value.userCode)
   })
+  const userCodeComplete = useSelector(
+    form.store,
+    (state) => state.values.userCode.length === userCodeLength
+  )
 
   useEffect(() => {
     form.setFieldValue("userCode", initialUserCode)
@@ -390,11 +395,7 @@ function DeviceCodeForm({
 
               <form.AuthFormSubmitButton
                 className="w-full"
-                disabled={
-                  form.state.values.userCode.length !== userCodeLength ||
-                  isSessionPending ||
-                  isVerifying
-                }
+                disabled={!userCodeComplete || isSessionPending || isVerifying}
                 type="submit"
               >
                 {isVerifying ? <Spinner data-icon="inline-start" /> : null}

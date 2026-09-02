@@ -83,6 +83,7 @@ import {
 import { OrganizationTableBulkAction } from "./organization-table-bulk-action"
 import { OrganizationTablePagination } from "./organization-table-pagination"
 import {
+  type OrganizationSelectableRow,
   OrganizationTableSelectAll,
   OrganizationTableSelectRow
 } from "./organization-table-selection"
@@ -464,7 +465,7 @@ function OrganizationRoleRow({
   onEdit: () => void
   organizationId: string
   role: Role
-  selectableRow?: Parameters<typeof OrganizationTableSelectRow>[0]["row"]
+  selectableRow?: OrganizationSelectableRow<Role>
   showPermissions: boolean
 }) {
   const { localization: authLocalization } = useAuth()

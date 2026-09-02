@@ -22,11 +22,14 @@ import { TableCell, TableRow } from "@/components/ui/table"
 import { organizationPlugin } from "@/lib/auth/organization-plugin"
 import { cn } from "@/lib/utils"
 import { OrganizationInvitationRowSkeleton } from "./organization-invitation-row-skeleton"
-import { OrganizationTableSelectRow } from "./organization-table-selection"
+import {
+  type OrganizationSelectableRow,
+  OrganizationTableSelectRow
+} from "./organization-table-selection"
 
 export type OrganizationInvitationRowProps = {
   invitation: Invitation
-  selectableRow?: Parameters<typeof OrganizationTableSelectRow>[0]["row"]
+  selectableRow?: OrganizationSelectableRow<Invitation>
   showCreatedAt?: boolean
   showEmail?: boolean
   showRole?: boolean

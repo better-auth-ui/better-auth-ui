@@ -7,6 +7,9 @@ export type AdditionalFieldValue = string | number | boolean | Date
 /** Value stored for an additional field while it is owned by a form. */
 export type AdditionalFieldFormValue = AdditionalFieldValue | null
 
+/** Default delay for custom additional-field validation after a value changes. */
+export const DEFAULT_ADDITIONAL_FIELD_VALIDATION_DEBOUNCE_MS = 300
+
 /** Runtime additional-field values keyed by their configured model names. */
 export type AdditionalFieldFormValues = Record<string, AdditionalFieldFormValue>
 
@@ -128,6 +131,12 @@ export interface AdditionalField {
   validate?: (
     value: AdditionalFieldValue | null | undefined
   ) => void | Promise<void>
+  /**
+   * Delay custom validation after a value changes. Set to `0` to validate
+   * immediately.
+   * @default 300
+   */
+  validateDebounceMs?: number
   /**
    * Render on the sign-up form. Pass `"above"` to render between the `email`
    * and `password` fields; otherwise the field renders below the password

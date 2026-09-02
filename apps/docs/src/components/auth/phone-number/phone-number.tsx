@@ -1,6 +1,9 @@
 "use client"
 
-import { authMutationKeys } from "@better-auth-ui/core"
+import {
+  authMutationKeys,
+  getFormFieldErrorMessage
+} from "@better-auth-ui/core"
 import {
   createPhoneNumberValue,
   type PhoneNumberAuthClient
@@ -16,6 +19,7 @@ import {
   useSignInPhoneNumber,
   useVerifyPhoneNumber
 } from "@better-auth-ui/react/plugins/phone-number"
+import { useSelector } from "@tanstack/react-form"
 import { useIsMutating } from "@tanstack/react-query"
 import { Eye, EyeOff } from "lucide-react"
 import { useState } from "react"
@@ -204,6 +208,14 @@ export function PhoneNumber({
       verifyCode(value.code)
     }
   })
+  const codeComplete = useSelector(
+    form.store,
+    (state) => state.values.code.length === otpLength
+  )
+  const phoneNumberDisplay = useSelector(
+    form.store,
+    (state) => state.values.phoneNumber.display
+  )
 
   return (
     <Card className={cn("w-full max-w-sm", className)}>
@@ -217,7 +229,7 @@ export function PhoneNumber({
           <CardDescription>
             {phoneLocalization.codeSentTo.replace(
               "{{phoneNumber}}",
-              form.state.values.phoneNumber.display
+              phoneNumberDisplay
             )}
           </CardDescription>
         )}
@@ -271,7 +283,9 @@ export function PhoneNumber({
                           countryCodes={countries}
                           countryLabel={phoneLocalization.country}
                           disabled={isPending}
-                          error={field.state.meta.errors[0]?.toString()}
+                          error={getFormFieldErrorMessage(
+                            field.state.meta.errors
+                          )}
                           locale={locale}
                           phoneLabel={phoneLocalization.phoneNumber}
                           placeholder={phoneLocalization.phoneNumberPlaceholder}
@@ -367,10 +381,7 @@ export function PhoneNumber({
 
                 <div className="flex flex-col gap-3">
                   <form.AuthFormSubmitButton
-                    disabled={
-                      isPending ||
-                      (codeSent && form.state.values.code.length !== otpLength)
-                    }
+                    disabled={isPending || (codeSent && !codeComplete)}
                   >
                     {(isSending || isVerifying || isPasswordPending) && (
                       <Spinner />

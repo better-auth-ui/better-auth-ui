@@ -7,8 +7,10 @@ import {
   parseTablePage,
   parseTablePageSize,
   parseTableSorting,
+  parseTableUrlState,
   serializeTableColumnVisibility,
-  serializeTableFilterValue
+  serializeTableFilterValue,
+  serializeTableUrlState
 } from "../src/lib/table-state"
 
 describe("table state", () => {
@@ -87,5 +89,42 @@ describe("table state", () => {
         )
       )
     ).toBe(true)
+  })
+
+  it("round trips namespaced URL state without changing unrelated parameters", () => {
+    const params = serializeTableUrlState(
+      new URLSearchParams("other=kept&members.filter.stale=value"),
+      "members",
+      10,
+      {
+        columnFilters: [{ id: "role", value: ["admin", "owner"] }],
+        globalFilter: "Ada",
+        pagination: { pageIndex: 2, pageSize: 20 },
+        sorting: [
+          { desc: false, id: "name" },
+          { desc: true, id: "createdAt" }
+        ]
+      }
+    )
+
+    expect(params.get("other")).toBe("kept")
+    expect(params.has("members.filter.stale")).toBe(false)
+    expect(
+      parseTableUrlState(
+        params,
+        "members",
+        10,
+        [10, 20, 50],
+        ["role", "name", "createdAt"]
+      )
+    ).toEqual({
+      columnFilters: [{ id: "role", value: ["admin", "owner"] }],
+      globalFilter: "Ada",
+      pagination: { pageIndex: 2, pageSize: 20 },
+      sorting: [
+        { desc: false, id: "name" },
+        { desc: true, id: "createdAt" }
+      ]
+    })
   })
 })

@@ -1,15 +1,13 @@
 import type { OrganizationLocalization } from "@better-auth-ui/core/plugins/organization"
 import { Checkbox } from "@heroui/react"
+import { type Row, type RowData, Subscribe } from "@tanstack/react-table"
 import { useRef } from "react"
+import type { organizationTableFeatures } from "./organization-table"
 
-type SelectableRow = {
-  getCanSelect: () => boolean
-  getIsSelected: () => boolean
-  getToggleSelectedHandler: () => (event: {
-    shiftKey: boolean
-    target: { checked: boolean }
-  }) => void
-}
+export type OrganizationSelectableRow<TData extends RowData> = Row<
+  typeof organizationTableFeatures,
+  TData
+>
 
 function SelectionCheckbox({
   ariaLabel,
@@ -77,27 +75,33 @@ export function OrganizationTableSelectAll({
   )
 }
 
-export function OrganizationTableSelectRow({
+export function OrganizationTableSelectRow<TData extends RowData>({
   disabled,
   localization,
   row
 }: {
   disabled?: boolean
   localization: OrganizationLocalization
-  row: SelectableRow
+  row: OrganizationSelectableRow<TData>
 }) {
-  const selected = row.getIsSelected()
   return (
-    <SelectionCheckbox
-      ariaLabel={localization.selectRow}
-      disabled={disabled || !row.getCanSelect()}
-      selected={selected}
-      onChange={(next, shiftKey) =>
-        row.getToggleSelectedHandler()({
-          shiftKey,
-          target: { checked: next }
-        })
-      }
-    />
+    <Subscribe
+      source={row.table.atoms.rowSelection}
+      selector={(selection) => selection[row.id] === true}
+    >
+      {(selected) => (
+        <SelectionCheckbox
+          ariaLabel={localization.selectRow}
+          disabled={disabled || !row.getCanSelect()}
+          selected={selected}
+          onChange={(next, shiftKey) =>
+            row.getToggleSelectedHandler()({
+              shiftKey,
+              target: { checked: next }
+            })
+          }
+        />
+      )}
+    </Subscribe>
   )
 }

@@ -1,3 +1,4 @@
+import { getFormFieldErrorMessage } from "@better-auth-ui/core"
 import {
   createPhoneNumberValue,
   type PhoneNumberAuthClient
@@ -22,6 +23,7 @@ import {
   Spinner,
   toast
 } from "@heroui/react"
+import { useSelector } from "@tanstack/react-form"
 import { useEffect, useState } from "react"
 
 import { phoneNumberPlugin } from "../../../lib/auth/phone-number-plugin"
@@ -107,6 +109,14 @@ export function ChangePhoneNumber({
       })
     }
   })
+  const codeComplete = useSelector(
+    form.store,
+    (formState) => formState.values.code.length === otpLength
+  )
+  const phoneNumberDisplay = useSelector(
+    form.store,
+    (formState) => formState.values.phoneNumber.display
+  )
   useEffect(() => {
     form.setFieldValue(
       "phoneNumber",
@@ -134,7 +144,7 @@ export function ChangePhoneNumber({
                       <p className="text-sm text-muted">
                         {localization.codeSentTo.replace(
                           "{{phoneNumber}}",
-                          form.state.values.phoneNumber.display
+                          phoneNumberDisplay
                         )}
                       </p>
                       <form.AppField name="code">
@@ -167,7 +177,9 @@ export function ChangePhoneNumber({
                           adapter={adapter}
                           countryCodes={countries}
                           countryLabel={localization.country}
-                          error={field.state.meta.errors[0]?.toString()}
+                          error={getFormFieldErrorMessage(
+                            field.state.meta.errors
+                          )}
                           isDisabled={isPending}
                           locale={locale}
                           phoneLabel={localization.phoneNumber}
@@ -210,9 +222,7 @@ export function ChangePhoneNumber({
                     size="sm"
                     type="submit"
                     isDisabled={
-                      !session ||
-                      isPending ||
-                      (codeSent && form.state.values.code.length !== otpLength)
+                      !session || isPending || (codeSent && !codeComplete)
                     }
                   >
                     {(isSending || isVerifying) && (

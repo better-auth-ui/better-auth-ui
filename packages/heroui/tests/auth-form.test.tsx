@@ -1,7 +1,14 @@
+import {
+  type AdditionalField,
+  DEFAULT_ADDITIONAL_FIELD_VALIDATION_DEBOUNCE_MS
+} from "@better-auth-ui/core"
 import { fireEvent, render, screen, waitFor } from "@testing-library/react"
 import { describe, expect, it, vi } from "vitest"
 
-import { useAuthForm } from "../src/components/auth/auth-form"
+import {
+  getAuthAdditionalFieldValidators,
+  useAuthForm
+} from "../src/components/auth/auth-form"
 
 function TestAuthForm({ onSubmit }: { onSubmit: () => Promise<void> }) {
   const form = useAuthForm({ defaultValues: {}, onSubmit })
@@ -35,5 +42,31 @@ describe("AuthFormRoot", () => {
 
     finishSubmission()
     await waitFor(() => expect(submitButton).toBeEnabled())
+  })
+})
+
+describe("additional field validation", () => {
+  it("debounces custom validation and allows an explicit override", async () => {
+    const validate = vi.fn()
+    const field: AdditionalField = {
+      label: "Handle",
+      name: "handle",
+      type: "string",
+      validate
+    }
+
+    const validators = getAuthAdditionalFieldValidators(field, "Required")
+    expect(validators.onChangeAsyncDebounceMs).toBe(
+      DEFAULT_ADDITIONAL_FIELD_VALIDATION_DEBOUNCE_MS
+    )
+    await validators.onChangeAsync?.({ value: "ada" })
+    expect(validate).toHaveBeenCalledWith("ada")
+
+    expect(
+      getAuthAdditionalFieldValidators(
+        { ...field, validateDebounceMs: 0 },
+        "Required"
+      ).onChangeAsyncDebounceMs
+    ).toBe(0)
   })
 })

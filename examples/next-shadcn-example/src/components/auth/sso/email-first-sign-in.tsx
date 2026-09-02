@@ -22,6 +22,7 @@ import {
   useSignInEmail
 } from "@better-auth-ui/react"
 import { useSignInSso } from "@better-auth-ui/react/plugins/sso"
+import { useSelector } from "@tanstack/react-form"
 import { useIsMutating } from "@tanstack/react-query"
 import { Eye, EyeOff } from "lucide-react"
 import { useState } from "react"
@@ -163,6 +164,7 @@ export function EmailFirstSignIn({
       })
     }
   })
+  const email = useSelector(form.store, (state) => state.values.email)
 
   const startOver = () => {
     setStep("email")
@@ -178,9 +180,7 @@ export function EmailFirstSignIn({
           {localization.auth.signIn}
         </CardTitle>
         <CardDescription>
-          {step === "email"
-            ? ssoLocalization.emailFirstDescription
-            : form.state.values.email}
+          {step === "email" ? ssoLocalization.emailFirstDescription : email}
         </CardDescription>
       </CardHeader>
 

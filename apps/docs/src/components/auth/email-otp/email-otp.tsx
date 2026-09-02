@@ -8,6 +8,7 @@ import {
   useSendVerificationOtp,
   useSignInEmailOtp
 } from "@better-auth-ui/react/plugins/email-otp"
+import { useSelector } from "@tanstack/react-form"
 import { useIsMutating } from "@tanstack/react-query"
 import { useState } from "react"
 
@@ -123,6 +124,11 @@ export function EmailOtp({
       verifyCode(value.code)
     }
   })
+  const codeComplete = useSelector(
+    form.store,
+    (state) => state.values.code.length === otpLength
+  )
+  const email = useSelector(form.store, (state) => state.values.email)
 
   const showSeparator = socialProviders && socialProviders.length > 0
 
@@ -133,10 +139,7 @@ export function EmailOtp({
 
         {codeSent && (
           <CardDescription>
-            {emailOtpLocalization.codeSentTo.replace(
-              "{{email}}",
-              form.state.values.email
-            )}
+            {emailOtpLocalization.codeSentTo.replace("{{email}}", email)}
           </CardDescription>
         )}
       </CardHeader>
@@ -205,9 +208,7 @@ export function EmailOtp({
                 <div className="flex flex-col gap-3">
                   <form.AuthFormSubmitButton
                     disabled={
-                      isPending ||
-                      isSigningIn ||
-                      (codeSent && form.state.values.code.length !== otpLength)
+                      isPending || isSigningIn || (codeSent && !codeComplete)
                     }
                   >
                     {(isSending || isSigningIn) && <Spinner />}
@@ -219,10 +220,7 @@ export function EmailOtp({
 
                   {codeSent ? (
                     <>
-                      <OpenEmailButton
-                        email={form.state.values.email}
-                        variant="secondary"
-                      />
+                      <OpenEmailButton email={email} variant="secondary" />
 
                       <Button
                         type="button"

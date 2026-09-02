@@ -7,6 +7,7 @@ import {
   useRequestEmailChangeOtp,
   useSendVerificationOtp
 } from "@better-auth-ui/react/plugins/email-otp"
+import { useSelector } from "@tanstack/react-form"
 import { useEffect, useReducer } from "react"
 import { toast } from "sonner"
 
@@ -150,6 +151,10 @@ export function ChangeEmailOtp({ className }: ChangeEmailOtpProps) {
       submitCode(value.code)
     }
   })
+  const codeComplete = useSelector(
+    form.store,
+    (formState) => formState.values.code.length === otpLength
+  )
 
   const resetFlow = () => {
     form.reset()
@@ -261,8 +266,7 @@ export function ChangeEmailOtp({ className }: ChangeEmailOtpProps) {
                 disabled={
                   isPending ||
                   !session ||
-                  (state.step !== "email" &&
-                    form.state.values.code.length !== otpLength)
+                  (state.step !== "email" && !codeComplete)
                 }
               >
                 {isPending && <Spinner />}

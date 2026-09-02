@@ -1,6 +1,7 @@
 import { isTwoFactorRedirect } from "@better-auth-ui/core/plugins/two-factor"
 import { useAuth, useSession, useSignInEmail } from "@better-auth-ui/react"
 import { Button, Input, Label, Spinner, TextField } from "@heroui/react"
+import { useSelector } from "@tanstack/react-form"
 import { useSignInContinuation } from "../../../../lib/auth/use-sign-in-continuation"
 import { useAuthForm } from "../../auth-form"
 
@@ -42,6 +43,10 @@ export function FreshSessionPrompt({ onFresh }: FreshSessionPromptProps) {
       signIn.mutate({ email, password: value.password })
     }
   })
+  const passwordIsEmpty = useSelector(
+    form.store,
+    (state) => state.values.password.length === 0
+  )
 
   return (
     <div className="flex flex-col gap-4 p-4">
@@ -83,7 +88,7 @@ export function FreshSessionPrompt({ onFresh }: FreshSessionPromptProps) {
               </p>
             )}
             <form.AuthFormSubmitButton
-              isDisabled={!form.state.values.password}
+              isDisabled={passwordIsEmpty}
               variant="primary"
             >
               {signIn.isPending && <Spinner color="current" size="sm" />}

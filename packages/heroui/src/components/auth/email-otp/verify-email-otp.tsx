@@ -20,6 +20,7 @@ import {
   toast,
   useIsHydrated
 } from "@heroui/react"
+import { useSelector } from "@tanstack/react-form"
 import { useEffect, useState } from "react"
 
 import { emailOtpPlugin } from "../../../lib/auth/email-otp-plugin"
@@ -126,6 +127,10 @@ export function VerifyEmailOtp({ className, variant }: VerifyEmailOtpProps) {
       verifyCode(value.code)
     }
   })
+  const codeComplete = useSelector(
+    form.store,
+    (state) => state.values.code.length === otpLength
+  )
 
   return (
     <Card
@@ -199,11 +204,7 @@ export function VerifyEmailOtp({ className, variant }: VerifyEmailOtpProps) {
             <div className="flex flex-col gap-3">
               <form.AuthFormSubmitButton
                 className="w-full"
-                isDisabled={
-                  isPending ||
-                  (Boolean(email) &&
-                    form.state.values.code.length !== otpLength)
-                }
+                isDisabled={isPending || (Boolean(email) && !codeComplete)}
               >
                 {isPending && <Spinner color="current" size="sm" />}
 

@@ -1,3 +1,4 @@
+import { getFormFieldErrorMessage } from "@better-auth-ui/core"
 import {
   createPhoneNumberValue,
   type PhoneNumberAuthClient
@@ -92,7 +93,7 @@ export function ForgotPhoneNumberPassword({
                   adapter={adapter}
                   countryCodes={countries}
                   countryLabel={phoneLocalization.country}
-                  error={field.state.meta.errors[0]?.toString()}
+                  error={getFormFieldErrorMessage(field.state.meta.errors)}
                   isDisabled={isPending}
                   locale={locale}
                   phoneLabel={phoneLocalization.phoneNumber}

@@ -1,19 +1,16 @@
 "use client"
 
 import type { OrganizationLocalization } from "@better-auth-ui/core/plugins/organization"
+import { type Row, type RowData, Subscribe } from "@tanstack/react-table"
 import type { MouseEvent } from "react"
 
 import { Checkbox } from "@/components/ui/checkbox"
+import type { organizationTableFeatures } from "./organization-table"
 
-type SelectableRow = {
-  getCanSelect: () => boolean
-  getIsSelected: () => boolean
-  getToggleSelectedHandler: () => (event: {
-    nativeEvent: MouseEvent<HTMLButtonElement>["nativeEvent"]
-    shiftKey: boolean
-    target: { checked: boolean }
-  }) => void
-}
+export type OrganizationSelectableRow<TData extends RowData> = Row<
+  typeof organizationTableFeatures,
+  TData
+>
 
 export function OrganizationTableSelectAll({
   allSelected,
@@ -39,31 +36,34 @@ export function OrganizationTableSelectAll({
   )
 }
 
-export function OrganizationTableSelectRow({
+export function OrganizationTableSelectRow<TData extends RowData>({
   disabled,
   localization,
   row
 }: {
   disabled?: boolean
   localization: OrganizationLocalization
-  row: SelectableRow
+  row: OrganizationSelectableRow<TData>
 }) {
-  const selected = row.getIsSelected()
-
-  function toggle(event: MouseEvent<HTMLElement>) {
-    row.getToggleSelectedHandler()({
-      nativeEvent: event.nativeEvent,
-      shiftKey: event.shiftKey,
-      target: { checked: !selected }
-    })
-  }
-
   return (
-    <Checkbox
-      aria-label={localization.selectRow}
-      checked={selected}
-      disabled={disabled || !row.getCanSelect()}
-      onClick={toggle}
-    />
+    <Subscribe
+      source={row.table.atoms.rowSelection}
+      selector={(selection) => selection[row.id] === true}
+    >
+      {(selected) => (
+        <Checkbox
+          aria-label={localization.selectRow}
+          checked={selected}
+          disabled={disabled || !row.getCanSelect()}
+          onClick={(event: MouseEvent<HTMLElement>) =>
+            row.getToggleSelectedHandler()({
+              nativeEvent: event.nativeEvent,
+              shiftKey: event.shiftKey,
+              target: { checked: !selected }
+            })
+          }
+        />
+      )}
+    </Subscribe>
   )
 }

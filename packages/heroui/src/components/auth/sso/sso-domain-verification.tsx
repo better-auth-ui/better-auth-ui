@@ -25,6 +25,7 @@ import {
   TextField,
   toast
 } from "@heroui/react"
+import { useSelector } from "@tanstack/react-form"
 import type { BetterFetchError } from "better-auth/client"
 import { useState } from "react"
 
@@ -71,7 +72,7 @@ export function SsoDomainVerification({
       verify.mutate({ providerId: value.providerId })
     }
   })
-  const providerId = form.state.values.providerId
+  const providerId = useSelector(form.store, (state) => state.values.providerId)
   const host = providerId ? `_${tokenPrefix}-${providerId}` : ""
   const hostCopy = useCopyToClipboard({
     onError: (error) =>
