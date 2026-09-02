@@ -1,23 +1,21 @@
-import { parseAdditionalFieldValue } from "@better-auth-ui/core"
+import {
+  getAdditionalFieldDefaultValues,
+  getAdditionalFieldSubmitValues,
+  validateStringLength
+} from "@better-auth-ui/core"
 import type { OrganizationAuthClient } from "@better-auth-ui/core/plugins/organization"
 import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
 import { useCreateOrganization } from "@better-auth-ui/react/plugins/organization"
 import { Briefcase } from "@gravity-ui/icons"
-import {
-  AlertDialog,
-  Button,
-  FieldError,
-  Form,
-  Input,
-  Label,
-  Spinner,
-  TextField,
-  toast
-} from "@heroui/react"
-import { type SyntheticEvent, useEffect, useRef, useState } from "react"
+import { AlertDialog, Button, Input, Label, TextField } from "@heroui/react"
+import { useEffect, useRef, useState } from "react"
 
 import { organizationPlugin } from "../../../lib/auth/organization-plugin"
-import { AdditionalField } from "../additional-field"
+import {
+  getAuthAdditionalFieldValidators,
+  isAuthFormFieldInvalid,
+  useAuthForm
+} from "../auth-form"
 import { SlugField, sanitizeSlug } from "./slug-field"
 
 /** Props for the {@link CreateOrganizationDialog} component. */
@@ -47,161 +45,165 @@ export function CreateOrganizationDialog({
   } = useAuthPlugin(organizationPlugin)
   const hideSlug = hideSlugProp ?? pluginHideSlug ?? false
 
-  const [name, setName] = useState("")
-  const [slug, setSlug] = useState("")
   const [slugEdited, setSlugEdited] = useState(false)
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const submissionLocked = useRef(false)
   const submissionGeneration = useRef(0)
+  const submissionAttemptGeneration = useRef(0)
 
-  const { mutate: createOrganization, isPending: isCreating } =
-    useCreateOrganization(authClient as OrganizationAuthClient)
+  const { mutateAsync: createOrganization, isPending } = useCreateOrganization(
+    authClient as OrganizationAuthClient
+  )
 
-  const handleSubmit = async (e: SyntheticEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    if (submissionLocked.current) return
-
-    const generation = ++submissionGeneration.current
-    submissionLocked.current = true
-    setIsSubmitting(true)
-    const formData = new FormData(e.currentTarget)
-    const additionalValues: Record<string, unknown> = {}
-    try {
-      for (const field of additionalFields) {
-        const value = parseAdditionalFieldValue(
-          field,
-          formData.get(field.name) as string | null
-        )
-        await field.validate?.(value)
-        if (value !== undefined) additionalValues[field.name] = value
-      }
-    } catch (error) {
+  const form = useAuthForm({
+    defaultValues: {
+      additionalFields: getAdditionalFieldDefaultValues(additionalFields),
+      name: "",
+      slug: ""
+    },
+    onSubmit: async ({ value }) => {
+      const generation = submissionAttemptGeneration.current
       if (generation !== submissionGeneration.current) return
 
-      submissionLocked.current = false
-      setIsSubmitting(false)
-      toast.danger(error instanceof Error ? error.message : String(error))
-      return
-    }
-
-    if (generation !== submissionGeneration.current) return
-
-    createOrganization(
-      {
-        ...additionalValues,
-        name,
-        slug: hideSlug ? undefined : slug
-      },
-      {
-        onSuccess: () => {
-          if (generation === submissionGeneration.current) onOpenChange(false)
-        },
-        onSettled: () => {
-          if (generation !== submissionGeneration.current) return
-
-          submissionLocked.current = false
-          setIsSubmitting(false)
-        }
+      try {
+        await createOrganization({
+          ...getAdditionalFieldSubmitValues(
+            additionalFields,
+            value.additionalFields
+          ),
+          name: value.name,
+          slug: hideSlug ? undefined : value.slug
+        })
+        if (generation === submissionGeneration.current) onOpenChange(false)
+      } catch {
+        // The mutation reports the error through its configured handler.
       }
-    )
-  }
-
-  const isPending = isCreating || isSubmitting
+    }
+  })
 
   useEffect(() => {
     if (!isOpen) {
       submissionGeneration.current += 1
-      submissionLocked.current = false
-      setIsSubmitting(false)
-      setSlug("")
-      setName("")
+      form.reset()
       setSlugEdited(false)
     }
-  }, [isOpen])
-
-  useEffect(() => {
-    if (slugEdited) return
-    setSlug(sanitizeSlug(name))
-  }, [name, slugEdited])
+  }, [form, isOpen])
 
   return (
     <AlertDialog.Backdrop isOpen={isOpen} onOpenChange={onOpenChange}>
       <AlertDialog.Container>
         <AlertDialog.Dialog>
-          <Form onSubmit={handleSubmit}>
-            <AlertDialog.CloseTrigger />
+          <form.AppForm>
+            <form.AuthFormRoot
+              onBeforeSubmit={() => {
+                submissionAttemptGeneration.current =
+                  submissionGeneration.current
+              }}
+            >
+              <AlertDialog.CloseTrigger />
 
-            <AlertDialog.Header>
-              <AlertDialog.Icon status="default">
-                <Briefcase />
-              </AlertDialog.Icon>
+              <AlertDialog.Header>
+                <AlertDialog.Icon status="default">
+                  <Briefcase />
+                </AlertDialog.Icon>
 
-              <AlertDialog.Heading>
-                {organizationLocalization.createOrganization}
-              </AlertDialog.Heading>
-            </AlertDialog.Header>
+                <AlertDialog.Heading>
+                  {organizationLocalization.createOrganization}
+                </AlertDialog.Heading>
+              </AlertDialog.Header>
 
-            <AlertDialog.Body className="flex flex-col gap-4 overflow-visible">
-              <p className="text-muted text-sm">
-                {organizationLocalization.organizationsDescription}
-              </p>
+              <AlertDialog.Body className="flex flex-col gap-4 overflow-visible">
+                <p className="text-muted text-sm">
+                  {organizationLocalization.organizationsDescription}
+                </p>
 
-              <TextField
-                id="name"
-                name="name"
-                isDisabled={isPending}
-                value={name}
-                onChange={setName}
-                validate={(value) => {
-                  if (!value) return localization.auth.fieldRequired
-                }}
-              >
-                <Label>{organizationLocalization.name}</Label>
-
-                <Input
-                  required
-                  autoFocus
-                  placeholder={organizationLocalization.namePlaceholder}
-                  variant="secondary"
-                />
-
-                <FieldError />
-              </TextField>
-
-              {!hideSlug && (
-                <SlugField
-                  value={slug}
-                  onChange={(value) => {
-                    setSlug(value)
-                    setSlugEdited(true)
+                <form.AppField
+                  name="name"
+                  validators={{
+                    onChange: ({ value }) =>
+                      validateStringLength(value, {
+                        requiredMessage: localization.auth.fieldRequired,
+                        trim: true
+                      })
                   }}
-                  isDisabled={isPending}
-                  variant="secondary"
-                />
-              )}
-              {additionalFields.map((field) => (
-                <AdditionalField
-                  field={field}
-                  isPending={isPending}
-                  key={field.name}
-                  name={field.name}
-                  optionalLabel={localization.settings.optional}
-                />
-              ))}
-            </AlertDialog.Body>
+                >
+                  {(field) => {
+                    const isInvalid = isAuthFormFieldInvalid(field.state.meta)
 
-            <AlertDialog.Footer>
-              <Button slot="close" variant="tertiary" isDisabled={isPending}>
-                {localization.settings.cancel}
-              </Button>
+                    return (
+                      <TextField
+                        id="name"
+                        name={field.name}
+                        isDisabled={isPending}
+                        value={field.state.value}
+                        onBlur={field.handleBlur}
+                        onChange={(value) => {
+                          field.handleChange(value)
+                          if (!slugEdited) {
+                            form.setFieldValue("slug", sanitizeSlug(value))
+                          }
+                        }}
+                        isInvalid={isInvalid || undefined}
+                        validationBehavior="aria"
+                      >
+                        <Label>{organizationLocalization.name}</Label>
 
-              <Button type="submit" isPending={isPending}>
-                {isPending && <Spinner color="current" size="sm" />}
+                        <Input
+                          autoFocus
+                          placeholder={organizationLocalization.namePlaceholder}
+                          variant="secondary"
+                        />
 
-                {organizationLocalization.createOrganization}
-              </Button>
-            </AlertDialog.Footer>
-          </Form>
+                        <field.AuthFormFieldError />
+                      </TextField>
+                    )
+                  }}
+                </form.AppField>
+
+                {!hideSlug && (
+                  <form.AppField name="slug">
+                    {(field) => (
+                      <SlugField
+                        value={field.state.value}
+                        onChange={(value) => {
+                          field.handleChange(value)
+                          setSlugEdited(true)
+                        }}
+                        isDisabled={isPending}
+                        variant="secondary"
+                      />
+                    )}
+                  </form.AppField>
+                )}
+                {additionalFields.map((configuredField) => (
+                  <form.AppField
+                    key={configuredField.name}
+                    name={`additionalFields.${configuredField.name}`}
+                    validators={getAuthAdditionalFieldValidators(
+                      configuredField,
+                      localization.auth.fieldRequired
+                    )}
+                  >
+                    {(field) => (
+                      <field.AuthFormAdditionalField
+                        field={configuredField}
+                        isPending={isPending}
+                        optionalLabel={localization.settings.optional}
+                      />
+                    )}
+                  </form.AppField>
+                ))}
+              </AlertDialog.Body>
+
+              <AlertDialog.Footer>
+                <Button slot="close" variant="tertiary" isDisabled={isPending}>
+                  {localization.settings.cancel}
+                </Button>
+
+                <form.AuthFormSubmitButton>
+                  {organizationLocalization.createOrganization}
+                </form.AuthFormSubmitButton>
+              </AlertDialog.Footer>
+            </form.AuthFormRoot>
+          </form.AppForm>
         </AlertDialog.Dialog>
       </AlertDialog.Container>
     </AlertDialog.Backdrop>

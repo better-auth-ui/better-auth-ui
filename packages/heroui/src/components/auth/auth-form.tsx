@@ -1,19 +1,23 @@
-import { getFormFieldErrorMessage } from "@better-auth-ui/core"
+import {
+  type AdditionalField as AdditionalFieldConfig,
+  type AdditionalFieldFormValue,
+  getFormFieldErrorMessage,
+  getFormFieldErrors,
+  validateAdditionalFieldRequired,
+  validateAdditionalFieldValue
+} from "@better-auth-ui/core"
 import { Button, FieldError, Form, Spinner } from "@heroui/react"
 import { createFormHook, createFormHookContexts } from "@tanstack/react-form"
 import {
   type ComponentProps,
-  createContext,
   type FormEvent,
   type ReactNode,
-  useContext,
-  useRef,
-  useState
+  useRef
 } from "react"
+import { AdditionalField, type AdditionalFieldProps } from "./additional-field"
 
 const { fieldContext, formContext, useFieldContext, useFormContext } =
   createFormHookContexts()
-const AuthFormPreparationContext = createContext(false)
 
 export function focusFirstInvalidAuthFormControl(form: HTMLFormElement) {
   requestAnimationFrame(() => {
@@ -36,53 +40,42 @@ function AuthFormFieldError() {
 }
 
 type AuthFormRootProps = Omit<ComponentProps<typeof Form>, "onSubmit"> & {
-  prepareSubmit?: (
-    form: HTMLFormElement
-  ) => boolean | undefined | Promise<boolean | undefined>
+  onBeforeSubmit?: () => void
 }
 
 function AuthFormRoot({
   children,
-  prepareSubmit,
+  onBeforeSubmit,
   ...props
 }: AuthFormRootProps) {
   const form = useFormContext()
-  const preparingRef = useRef(false)
-  const [isPreparing, setIsPreparing] = useState(false)
+  const submittingRef = useRef(false)
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
-    if (preparingRef.current || form.state.isSubmitting) return
+    if (submittingRef.current || form.state.isSubmitting) return
 
     const formElement = event.currentTarget
-    preparingRef.current = true
-    setIsPreparing(true)
-
-    let shouldSubmit = true
+    onBeforeSubmit?.()
+    submittingRef.current = true
     try {
-      shouldSubmit = (await prepareSubmit?.(formElement)) !== false
+      await form.handleSubmit()
+      if (!form.state.isValid) focusFirstInvalidAuthFormControl(formElement)
     } finally {
-      preparingRef.current = false
-      setIsPreparing(false)
+      submittingRef.current = false
     }
-
-    if (!shouldSubmit) return
-    await form.handleSubmit()
-    if (!form.state.isValid) focusFirstInvalidAuthFormControl(formElement)
   }
 
   return (
-    <AuthFormPreparationContext.Provider value={isPreparing}>
-      <Form
-        {...props}
-        onInvalid={(event) =>
-          focusFirstInvalidAuthFormControl(event.currentTarget)
-        }
-        onSubmit={submit}
-      >
-        {children}
-      </Form>
-    </AuthFormPreparationContext.Provider>
+    <Form
+      {...props}
+      onInvalid={(event) =>
+        focusFirstInvalidAuthFormControl(event.currentTarget)
+      }
+      onSubmit={submit}
+    >
+      {children}
+    </Form>
   )
 }
 
@@ -92,7 +85,6 @@ function AuthFormSubmitButton({
   ...props
 }: Omit<ComponentProps<typeof Button>, "children"> & { children?: ReactNode }) {
   const form = useFormContext()
-  const isPreparing = useContext(AuthFormPreparationContext)
 
   return (
     <form.Subscribe
@@ -101,10 +93,10 @@ function AuthFormSubmitButton({
       {([canSubmit, isSubmitting]) => (
         <Button
           {...props}
-          isDisabled={isDisabled || isPreparing || !canSubmit || isSubmitting}
+          isDisabled={isDisabled || !canSubmit || isSubmitting}
           type="submit"
         >
-          {isPreparing || isSubmitting ? <Spinner /> : null}
+          {isSubmitting ? <Spinner /> : null}
           {children}
         </Button>
       )}
@@ -112,8 +104,32 @@ function AuthFormSubmitButton({
   )
 }
 
+type AuthFormAdditionalFieldProps = Omit<
+  AdditionalFieldProps,
+  "errors" | "isInvalid" | "name" | "onBlur" | "onChange" | "value"
+>
+
+function AuthFormAdditionalField(props: AuthFormAdditionalFieldProps) {
+  const field = useFieldContext<AdditionalFieldFormValue>()
+  const isInvalid = isAuthFormFieldInvalid(field.state.meta)
+
+  return (
+    <AdditionalField
+      {...props}
+      errors={
+        isInvalid ? getFormFieldErrors(field.state.meta.errors) : undefined
+      }
+      isInvalid={isInvalid}
+      name={field.name}
+      onBlur={field.handleBlur}
+      onChange={field.handleChange}
+      value={field.state.value}
+    />
+  )
+}
+
 export const { useAppForm: useAuthForm } = createFormHook({
-  fieldComponents: { AuthFormFieldError },
+  fieldComponents: { AuthFormAdditionalField, AuthFormFieldError },
   fieldContext,
   formComponents: { AuthFormRoot, AuthFormSubmitButton },
   formContext
@@ -127,4 +143,18 @@ export function isAuthFormFieldInvalid({
   isValid: boolean
 }) {
   return isTouched && !isValid
+}
+
+export function getAuthAdditionalFieldValidators(
+  field: AdditionalFieldConfig,
+  requiredMessage: string
+) {
+  return {
+    onChange: ({ value }: { value: AdditionalFieldFormValue }) =>
+      validateAdditionalFieldRequired(field, value, requiredMessage),
+    onChangeAsync: field.validate
+      ? ({ value }: { value: AdditionalFieldFormValue }) =>
+          validateAdditionalFieldValue(field, value)
+      : undefined
+  }
 }

@@ -4,9 +4,13 @@ import {
   type AdditionalField,
   fieldsWithModelValues,
   formatAdditionalFieldValue,
+  getAdditionalFieldDefaultValues,
+  getAdditionalFieldSubmitValues,
   parseAdditionalFieldValue,
   parseAdditionalFieldValues,
-  resolveInputType
+  resolveInputType,
+  validateAdditionalFieldRequired,
+  validateAdditionalFieldValue
 } from "../src/config/additional-fields-config"
 
 const baseField = (overrides: Partial<AdditionalField>): AdditionalField =>
@@ -18,6 +22,48 @@ const baseField = (overrides: Partial<AdditionalField>): AdditionalField =>
   }) as AdditionalField
 
 describe("model field helpers", () => {
+  it("creates typed defaults and filters read-only submit values", () => {
+    const fields = [
+      baseField({ name: "nickname" }),
+      baseField({ name: "score", type: "number", defaultValue: 7 }),
+      baseField({ name: "enabled", type: "boolean" }),
+      baseField({ name: "internal", defaultValue: "secret", readOnly: true })
+    ]
+
+    const defaults = getAdditionalFieldDefaultValues(fields)
+
+    expect(defaults).toEqual({
+      nickname: null,
+      score: 7,
+      enabled: false,
+      internal: "secret"
+    })
+    expect(getAdditionalFieldSubmitValues(fields, defaults)).toEqual({
+      nickname: null,
+      score: 7,
+      enabled: false
+    })
+  })
+
+  it("normalizes required and configured validation errors", async () => {
+    const requiredField = baseField({ required: true })
+    const customField = baseField({
+      validate: async () => {
+        throw new Error("Already taken")
+      }
+    })
+
+    expect(
+      validateAdditionalFieldRequired(requiredField, null, "Required")
+    ).toBe("Required")
+    expect(
+      validateAdditionalFieldRequired(requiredField, "value", "Required")
+    ).toBeUndefined()
+    await expect(
+      validateAdditionalFieldValue(customField, "value")
+    ).resolves.toBe("Already taken")
+  })
+
   it("parses writable values, validates them, and omits read-only fields", async () => {
     const validate = vi.fn()
     const fields = [

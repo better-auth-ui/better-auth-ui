@@ -89,6 +89,51 @@ describe("<SignUp />", () => {
     })
   })
 
+  it("submits runtime-defined fields from TanStack Form state", async () => {
+    const user = userEvent.setup()
+    const signUpEmail = vi.fn(async () => ({ data: {}, error: null }))
+
+    render(
+      <AuthProvider
+        additionalFields={[
+          {
+            label: "Nickname",
+            name: "nickname",
+            signUp: true,
+            type: "string"
+          },
+          {
+            label: "Invite code",
+            name: "inviteCode",
+            required: true,
+            signUp: true,
+            type: "string"
+          }
+        ]}
+        authClient={createMockAuthClient(signUpEmail)}
+        navigate={() => {}}
+      >
+        <SignUp />
+      </AuthProvider>
+    )
+
+    await user.type(screen.getByLabelText("Name"), "Ada Lovelace")
+    await user.type(screen.getByLabelText("Email"), "ada@example.com")
+    await user.type(screen.getByLabelText("Password"), "correct horse battery")
+    await user.type(screen.getByLabelText("Nickname (optional)"), "Enchantress")
+    await user.type(screen.getByLabelText("Invite code"), "analytical-engine")
+    await user.click(screen.getByRole("button", { name: "Sign Up" }))
+
+    await waitFor(() =>
+      expect(signUpEmail).toHaveBeenCalledWith(
+        expect.objectContaining({
+          inviteCode: "analytical-engine",
+          nickname: "Enchantress"
+        })
+      )
+    )
+  })
+
   it("preserves the redirect target when continuing to email verification", async () => {
     const user = userEvent.setup()
     const navigate = vi.fn()

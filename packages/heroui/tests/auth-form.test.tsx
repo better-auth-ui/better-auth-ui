@@ -3,18 +3,12 @@ import { describe, expect, it, vi } from "vitest"
 
 import { useAuthForm } from "../src/components/auth/auth-form"
 
-function TestAuthForm({
-  onSubmit,
-  prepareSubmit
-}: {
-  onSubmit: () => void
-  prepareSubmit: () => Promise<boolean>
-}) {
+function TestAuthForm({ onSubmit }: { onSubmit: () => Promise<void> }) {
   const form = useAuthForm({ defaultValues: {}, onSubmit })
 
   return (
     <form.AppForm>
-      <form.AuthFormRoot prepareSubmit={prepareSubmit}>
+      <form.AuthFormRoot>
         <form.AuthFormSubmitButton>Continue</form.AuthFormSubmitButton>
       </form.AuthFormRoot>
     </form.AppForm>
@@ -22,16 +16,13 @@ function TestAuthForm({
 }
 
 describe("AuthFormRoot", () => {
-  it("rejects concurrent preparation and disables submission while pending", async () => {
-    let finishPreparation!: (result: boolean) => void
-    const preparation = new Promise<boolean>((resolve) => {
-      finishPreparation = resolve
+  it("rejects concurrent submission and disables the submit button", async () => {
+    let finishSubmission!: () => void
+    const submission = new Promise<void>((resolve) => {
+      finishSubmission = resolve
     })
-    const prepareSubmit = vi.fn(() => preparation)
-    const onSubmit = vi.fn()
-    const { container } = render(
-      <TestAuthForm onSubmit={onSubmit} prepareSubmit={prepareSubmit} />
-    )
+    const onSubmit = vi.fn(() => submission)
+    const { container } = render(<TestAuthForm onSubmit={onSubmit} />)
     const form = container.querySelector("form")
     const submitButton = screen.getByRole("button", { name: /Continue/ })
 
@@ -39,10 +30,10 @@ describe("AuthFormRoot", () => {
     fireEvent.submit(form as HTMLFormElement)
     fireEvent.submit(form as HTMLFormElement)
 
-    expect(prepareSubmit).toHaveBeenCalledOnce()
-    expect(submitButton).toBeDisabled()
-
-    finishPreparation(true)
     await waitFor(() => expect(onSubmit).toHaveBeenCalledOnce())
+    await waitFor(() => expect(submitButton).toBeDisabled())
+
+    finishSubmission()
+    await waitFor(() => expect(submitButton).toBeEnabled())
   })
 })

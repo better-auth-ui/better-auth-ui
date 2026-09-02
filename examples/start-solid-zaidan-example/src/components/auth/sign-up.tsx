@@ -1,9 +1,10 @@
 import {
   authQueryKeys,
+  getAdditionalFieldDefaultValues,
+  getAdditionalFieldSubmitValues,
   getAuthLinkURL,
   getFormFieldErrors,
   isPasswordCompromisedError,
-  parseAdditionalFieldValue,
   validateEmailAddress,
   validateMatchingValue,
   validateStringLength
@@ -19,15 +20,17 @@ import {
 import { useQueryClient } from "@tanstack/solid-query"
 import { Eye, EyeOff } from "lucide-solid"
 import { createSignal, For, Show } from "solid-js"
-import { toast } from "solid-sonner"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Field, FieldError, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import { cn } from "@/lib/utils"
-import { AdditionalField } from "./additional-field"
-import { createAuthForm, isAuthFormFieldInvalid } from "./auth-form"
+import {
+  createAuthForm,
+  getAuthAdditionalFieldValidators,
+  isAuthFormFieldInvalid
+} from "./auth-form"
 import { PasswordStrengthMeter } from "./password-strength-meter"
 import { ProviderButtons, type SocialLayout } from "./provider-buttons"
 
@@ -98,9 +101,10 @@ export function SignUp(props: SignUpProps) {
     auth.additionalFields?.filter(
       (field) => field.signUp && field.signUp !== "above"
     ) ?? []
-  let additionalFieldValues: Record<string, unknown> = {}
+  const signUpFields = () => [...signUpFieldsAbove(), ...signUpFieldsBelow()]
   const form = createAuthForm(() => ({
     defaultValues: {
+      additionalFields: getAdditionalFieldDefaultValues(signUpFields()),
       confirmPassword: "",
       email: "",
       name: "",
@@ -113,42 +117,16 @@ export function SignUp(props: SignUpProps) {
           fetchOptions: fetchOptions(),
           name: auth.emailAndPassword.name ? value.name : "",
           password: value.password,
-          ...additionalFieldValues
+          ...getAdditionalFieldSubmitValues(
+            signUpFields(),
+            value.additionalFields
+          )
         } as Parameters<typeof signUp.mutate>[0])
       } catch {
         // The mutation reports the error through its configured handler.
       }
     }
   }))
-
-  const prepareSubmit = async (formElement: HTMLFormElement) => {
-    const formData = new FormData(formElement)
-    const values: Record<string, unknown> = {}
-
-    for (const field of auth.additionalFields ?? []) {
-      if (!field.signUp || field.readOnly) continue
-
-      const value = parseAdditionalFieldValue(
-        field,
-        formData.get(field.name) as string | null
-      )
-
-      if (field.validate) {
-        try {
-          await field.validate(value)
-        } catch (error) {
-          toast.error(error instanceof Error ? error.message : String(error))
-          return false
-        }
-      }
-
-      if (value !== undefined) {
-        values[field.name] = value
-      }
-    }
-
-    additionalFieldValues = values
-  }
 
   return (
     <Card class={cn("w-full max-w-sm", props.class)}>
@@ -172,7 +150,7 @@ export function SignUp(props: SignUpProps) {
         </Show>
 
         <form.AppForm>
-          <form.AuthFormRoot aria-label="Sign up" prepareSubmit={prepareSubmit}>
+          <form.AuthFormRoot aria-label="Sign up">
             <div class="flex flex-col gap-6">
               <Show when={auth.emailAndPassword.name}>
                 <form.AppField
@@ -259,13 +237,22 @@ export function SignUp(props: SignUpProps) {
                 }}
               </form.AppField>
               <For each={signUpFieldsAbove()}>
-                {(field) => (
-                  <AdditionalField
-                    field={field}
-                    isPending={signUp.isPending}
-                    name={field.name}
-                    optionalLabel={auth.localization.auth.optional}
-                  />
+                {(configuredField) => (
+                  <form.AppField
+                    name={`additionalFields.${configuredField.name}`}
+                    validators={getAuthAdditionalFieldValidators(
+                      configuredField,
+                      auth.localization.auth.fieldRequired
+                    )}
+                  >
+                    {(field) => (
+                      <field.AuthFormAdditionalField
+                        field={configuredField}
+                        isPending={signUp.isPending}
+                        optionalLabel={auth.localization.auth.optional}
+                      />
+                    )}
+                  </form.AppField>
                 )}
               </For>
               <form.AppField
@@ -456,13 +443,22 @@ export function SignUp(props: SignUpProps) {
                 </form.AppField>
               </Show>
               <For each={signUpFieldsBelow()}>
-                {(field) => (
-                  <AdditionalField
-                    field={field}
-                    isPending={signUp.isPending}
-                    name={field.name}
-                    optionalLabel={auth.localization.auth.optional}
-                  />
+                {(configuredField) => (
+                  <form.AppField
+                    name={`additionalFields.${configuredField.name}`}
+                    validators={getAuthAdditionalFieldValidators(
+                      configuredField,
+                      auth.localization.auth.fieldRequired
+                    )}
+                  >
+                    {(field) => (
+                      <field.AuthFormAdditionalField
+                        field={configuredField}
+                        isPending={signUp.isPending}
+                        optionalLabel={auth.localization.auth.optional}
+                      />
+                    )}
+                  </form.AppField>
                 )}
               </For>
               <Show when={captchaComponent()} keyed>

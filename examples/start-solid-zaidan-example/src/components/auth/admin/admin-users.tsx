@@ -1,7 +1,8 @@
 import {
-  type AdditionalFieldValue,
-  getClampedTablePageIndex,
-  parseAdditionalFieldValues
+  fieldsWithModelValues,
+  getAdditionalFieldDefaultValues,
+  getAdditionalFieldSubmitValues,
+  getClampedTablePageIndex
 } from "@better-auth-ui/core"
 import {
   type AdminAuthClient,
@@ -45,7 +46,7 @@ import {
   Trash2,
   UserPlus
 } from "lucide-solid"
-import { createEffect, createMemo, createSignal, For, on, Show } from "solid-js"
+import { createEffect, createMemo, createSignal, For, Show } from "solid-js"
 import { Dynamic } from "solid-js/web"
 import {
   AlertDialog,
@@ -110,8 +111,7 @@ import {
 } from "@/components/ui/table"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { cn } from "@/lib/utils"
-import { AdditionalField } from "../additional-field"
-import { createAuthForm } from "../auth-form"
+import { createAuthForm, getAuthAdditionalFieldValidators } from "../auth-form"
 import { UserAvatar } from "../user/user-avatar"
 import { createAdminColumnHelper, createAdminTable } from "./admin-table"
 
@@ -632,10 +632,10 @@ function CreateUserDialog(props: {
   const canSetRole = useAdminPermission(authClient, () => ({
     user: ["set-role"]
   }))
-  const [formError, setFormError] = createSignal<string>()
-  let additionalFieldValues: Record<string, AdditionalFieldValue | null> = {}
+  const additionalFields = () => auth.additionalFields ?? []
   const form = createAuthForm(() => ({
     defaultValues: {
+      additionalFields: getAdditionalFieldDefaultValues(additionalFields()),
       email: "",
       emailVerified: false,
       name: "",
@@ -647,7 +647,10 @@ function CreateUserDialog(props: {
         await createUser.mutateAsync(
           {
             data: {
-              ...additionalFieldValues,
+              ...getAdditionalFieldSubmitValues(
+                additionalFields(),
+                value.additionalFields
+              ),
               emailVerified: value.emailVerified
             },
             email: value.email,
@@ -673,23 +676,7 @@ function CreateUserDialog(props: {
   const close = () => {
     createUser.reset()
     form.reset()
-    setFormError(undefined)
     props.onOpenChange(false)
-  }
-  const prepareSubmit = async (formElement: HTMLFormElement) => {
-    const data = new FormData(formElement)
-    let values: Record<string, AdditionalFieldValue | null>
-    try {
-      values = await parseAdditionalFieldValues(
-        auth.additionalFields ?? [],
-        data
-      )
-    } catch (error) {
-      setFormError(error instanceof Error ? error.message : String(error))
-      return false
-    }
-    setFormError(undefined)
-    additionalFieldValues = values
   }
 
   return (
@@ -699,10 +686,7 @@ function CreateUserDialog(props: {
     >
       <DialogContent>
         <form.AppForm>
-          <form.AuthFormRoot
-            class="flex flex-col gap-4"
-            prepareSubmit={prepareSubmit}
-          >
+          <form.AuthFormRoot class="flex flex-col gap-4">
             <DialogHeader>
               <DialogTitle>{config().localization.createUser}</DialogTitle>
               <DialogDescription>
@@ -852,18 +836,25 @@ function CreateUserDialog(props: {
                 </Field>
               )}
             </form.Field>
-            <For each={auth.additionalFields}>
-              {(field) => (
-                <AdditionalField
-                  field={field}
-                  isPending={createUser.isPending}
-                  name={field.name}
-                />
+            <For each={additionalFields()}>
+              {(configuredField) => (
+                <form.AppField
+                  name={`additionalFields.${configuredField.name}`}
+                  validators={getAuthAdditionalFieldValidators(
+                    configuredField,
+                    auth.localization.auth.fieldRequired
+                  )}
+                >
+                  {(field) => (
+                    <field.AuthFormAdditionalField
+                      field={configuredField}
+                      isPending={createUser.isPending}
+                    />
+                  )}
+                </form.AppField>
               )}
             </For>
-            <FieldError>
-              {formError() ?? getAdminErrorMessage(createUser.error)}
-            </FieldError>
+            <FieldError>{getAdminErrorMessage(createUser.error)}</FieldError>
             <DialogFooter>
               <Button onClick={close} type="button" variant="outline">
                 {config().localization.cancel}
@@ -956,7 +947,6 @@ function UserDialog(props: {
   const banDurationSeconds = createMemo(() =>
     getBanDurationSeconds(banDuration())
   )
-  const [profileError, setProfileError] = createSignal<string>()
   const [passwordOpen, setPasswordOpen] = createSignal(false)
   const [dangerousAction, setDangerousAction] = createSignal<DangerousAction>()
   const detail = () => user.data
@@ -980,12 +970,16 @@ function UserDialog(props: {
   const remove = useRemoveAdminUser(authClient)
   const revokeSession = useRevokeAdminUserSession(authClient, props.userId)
   const revokeSessions = useRevokeAdminUserSessions(authClient, props.userId)
-  let profileAdditionalFieldValues: Record<
-    string,
-    AdditionalFieldValue | null
-  > = {}
+  const configuredUserFields = () => {
+    const selectedUser = detail()
+    return fieldsWithModelValues(
+      auth.additionalFields ?? [],
+      selectedUser ? (selectedUser as unknown as Record<string, unknown>) : {}
+    )
+  }
   const profileForm = createAuthForm(() => ({
     defaultValues: {
+      additionalFields: getAdditionalFieldDefaultValues(configuredUserFields()),
       email: "",
       emailVerified: false,
       name: "",
@@ -1001,7 +995,10 @@ function UserDialog(props: {
           updateUser.mutateAsync({
             userId: selectedUser.id,
             data: {
-              ...profileAdditionalFieldValues,
+              ...getAdditionalFieldSubmitValues(
+                configuredUserFields(),
+                value.additionalFields
+              ),
               name: value.name.trim(),
               ...(canSetEmail.data?.success
                 ? {
@@ -1031,31 +1028,20 @@ function UserDialog(props: {
     }
   }))
 
-  createEffect(
-    on(
-      () =>
-        [
-          detail()?.email,
-          detail()?.emailVerified,
-          detail()?.id,
-          detail()?.name,
-          detail()?.role
-        ] as const,
-      ([userEmail, userEmailVerified, _userId, userName, userRole]) => {
-        profileForm.reset({
-          email: userEmail ?? "",
-          emailVerified: userEmailVerified ?? false,
-          name: userName ?? "",
-          roles: parseAdminRoles(
-            userRole,
-            config().defaultRole,
-            config().allowMultipleRoles
-          )
-        })
-        setProfileError(undefined)
-      }
-    )
-  )
+  createEffect(() => {
+    const selectedUser = detail()
+    profileForm.reset({
+      additionalFields: getAdditionalFieldDefaultValues(configuredUserFields()),
+      email: selectedUser?.email ?? "",
+      emailVerified: selectedUser?.emailVerified ?? false,
+      name: selectedUser?.name ?? "",
+      roles: parseAdminRoles(
+        selectedUser?.role,
+        config().defaultRole,
+        config().allowMultipleRoles
+      )
+    })
+  })
 
   const confirmDangerousAction = () => {
     const selectedUser = detail()
@@ -1130,27 +1116,6 @@ function UserDialog(props: {
         : dangerousAction() === "revokeAll"
           ? config().localization.revokeAllSessions
           : config().localization.impersonateUser
-
-  const prepareSaveUser = async (formElement: HTMLFormElement) => {
-    const selectedUser = detail()
-    if (!selectedUser) return false
-
-    if (canUpdate.data?.success) {
-      const formData = new FormData(formElement)
-      let additionalFieldValues: Record<string, AdditionalFieldValue | null>
-      try {
-        additionalFieldValues = await parseAdditionalFieldValues(
-          auth.additionalFields ?? [],
-          formData
-        )
-      } catch (error) {
-        setProfileError(error instanceof Error ? error.message : String(error))
-        return false
-      }
-      setProfileError(undefined)
-      profileAdditionalFieldValues = additionalFieldValues
-    }
-  }
 
   return (
     <>
@@ -1266,10 +1231,7 @@ function UserDialog(props: {
                   </TabsList>
                   <TabsContent class="min-h-0 overflow-hidden" value="overview">
                     <profileForm.AppForm>
-                      <profileForm.AuthFormRoot
-                        class="grid h-full grid-rows-[minmax(0,1fr)_auto]"
-                        prepareSubmit={prepareSaveUser}
-                      >
+                      <profileForm.AuthFormRoot class="grid h-full grid-rows-[minmax(0,1fr)_auto]">
                         <div class="overflow-y-auto">
                           <section class="flex flex-col gap-5 p-6">
                             <h3 class="font-medium">
@@ -1421,35 +1383,30 @@ function UserDialog(props: {
                                   </FieldSet>
                                 )}
                               </profileForm.Field>
-                              <For each={auth.additionalFields}>
-                                {(field) => {
-                                  const value = () =>
-                                    (
-                                      selectedUser() as unknown as Record<
-                                        string,
-                                        unknown
-                                      >
-                                    )[field.name]
-                                  return (
-                                    <AdditionalField
-                                      field={{
-                                        ...field,
-                                        defaultValue:
-                                          value() as AdditionalFieldValue | null
-                                      }}
-                                      isPending={
-                                        updateUser.isPending ||
-                                        !canUpdate.data?.success
-                                      }
-                                      name={field.name}
-                                    />
-                                  )
-                                }}
+                              <For each={configuredUserFields()}>
+                                {(configuredField) => (
+                                  <profileForm.AppField
+                                    name={`additionalFields.${configuredField.name}`}
+                                    validators={getAuthAdditionalFieldValidators(
+                                      configuredField,
+                                      auth.localization.auth.fieldRequired
+                                    )}
+                                  >
+                                    {(field) => (
+                                      <field.AuthFormAdditionalField
+                                        field={configuredField}
+                                        isPending={
+                                          updateUser.isPending ||
+                                          !canUpdate.data?.success
+                                        }
+                                      />
+                                    )}
+                                  </profileForm.AppField>
+                                )}
                               </For>
                             </FieldGroup>
                             <FieldError>
-                              {profileError() ??
-                                getAdminErrorMessage(updateUser.error) ??
+                              {getAdminErrorMessage(updateUser.error) ??
                                 getAdminErrorMessage(setRoleMutation.error)}
                             </FieldError>
                           </section>

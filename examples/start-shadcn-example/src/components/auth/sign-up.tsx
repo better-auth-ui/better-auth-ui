@@ -2,9 +2,10 @@
 
 import {
   authMutationKeys,
+  getAdditionalFieldDefaultValues,
+  getAdditionalFieldSubmitValues,
   getAuthLinkURL,
   isPasswordCompromisedError,
-  parseAdditionalFieldValue,
   validateEmailAddress,
   validateMatchingValue,
   validateStringLength
@@ -17,8 +18,7 @@ import {
 } from "@better-auth-ui/react"
 import { useIsMutating } from "@tanstack/react-query"
 import { Eye, EyeOff } from "lucide-react"
-import { useRef, useState } from "react"
-import { toast } from "sonner"
+import { useMemo, useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import {
   Field,
@@ -36,8 +36,11 @@ import {
   InputGroupInput
 } from "@/components/ui/input-group"
 import { cn } from "@/lib/utils"
-import { AdditionalField } from "./additional-field"
-import { isAuthFormFieldInvalid, useAuthForm } from "./auth-form"
+import {
+  getAuthAdditionalFieldValidators,
+  isAuthFormFieldInvalid,
+  useAuthForm
+} from "./auth-form"
 import { PasswordStrengthMeter } from "./password-strength-meter"
 import { ProviderButtons, type SocialLayout } from "./provider-buttons"
 
@@ -136,9 +139,13 @@ export function SignUp({
     useState(false)
 
   const [isCompromised, setIsCompromised] = useState(false)
-  const additionalFieldValuesRef = useRef<Record<string, unknown>>({})
+  const signUpFields = useMemo(
+    () => additionalFields?.filter((field) => field.signUp) ?? [],
+    [additionalFields]
+  )
   const form = useAuthForm({
     defaultValues: {
+      additionalFields: getAdditionalFieldDefaultValues(signUpFields),
       confirmPassword: "",
       email: "",
       name: "",
@@ -150,7 +157,10 @@ export function SignUp({
           name: emailAndPassword?.name === false ? "" : value.name,
           email: value.email.trim(),
           password: value.password,
-          ...additionalFieldValuesRef.current,
+          ...getAdditionalFieldSubmitValues(
+            signUpFields,
+            value.additionalFields
+          ),
           fetchOptions
         })
       } catch {
@@ -158,35 +168,6 @@ export function SignUp({
       }
     }
   })
-
-  const prepareSubmit = async (formElement: HTMLFormElement) => {
-    const formData = new FormData(formElement)
-
-    const additionalFieldValues: Record<string, unknown> = {}
-
-    for (const field of additionalFields ?? []) {
-      if (!field.signUp || field.readOnly) continue
-      const value = parseAdditionalFieldValue(
-        field,
-        formData.get(field.name) as string | null
-      )
-
-      if (field.validate) {
-        try {
-          await field.validate(value)
-        } catch (error) {
-          toast.error(error instanceof Error ? error.message : String(error))
-          return false
-        }
-      }
-
-      if (value !== undefined) {
-        additionalFieldValues[field.name] = value
-      }
-    }
-
-    additionalFieldValuesRef.current = additionalFieldValues
-  }
 
   const showSeparator =
     emailAndPassword?.enabled && socialProviders && socialProviders.length > 0
@@ -218,7 +199,7 @@ export function SignUp({
 
           {emailAndPassword?.enabled && (
             <form.AppForm>
-              <form.AuthFormRoot prepareSubmit={prepareSubmit}>
+              <form.AuthFormRoot>
                 <FieldGroup>
                   {emailAndPassword.name !== false && (
                     <form.AppField
@@ -306,16 +287,25 @@ export function SignUp({
                     }}
                   </form.AppField>
 
-                  {additionalFields?.map(
-                    (field) =>
-                      field.signUp === "above" && (
-                        <AdditionalField
-                          key={field.name}
-                          name={field.name}
-                          field={field}
-                          isPending={isPending}
-                          optionalLabel={localization.auth.optional}
-                        />
+                  {signUpFields.map(
+                    (configuredField) =>
+                      configuredField.signUp === "above" && (
+                        <form.AppField
+                          key={configuredField.name}
+                          name={`additionalFields.${configuredField.name}`}
+                          validators={getAuthAdditionalFieldValidators(
+                            configuredField,
+                            localization.auth.fieldRequired
+                          )}
+                        >
+                          {(field) => (
+                            <field.AuthFormAdditionalField
+                              field={configuredField}
+                              isPending={isPending}
+                              optionalLabel={localization.auth.optional}
+                            />
+                          )}
+                        </form.AppField>
                       )
                   )}
 
@@ -503,17 +493,25 @@ export function SignUp({
                     </form.AppField>
                   )}
 
-                  {additionalFields?.map(
-                    (field) =>
-                      field.signUp &&
-                      field.signUp !== "above" && (
-                        <AdditionalField
-                          key={field.name}
-                          name={field.name}
-                          field={field}
-                          isPending={isPending}
-                          optionalLabel={localization.auth.optional}
-                        />
+                  {signUpFields.map(
+                    (configuredField) =>
+                      configuredField.signUp !== "above" && (
+                        <form.AppField
+                          key={configuredField.name}
+                          name={`additionalFields.${configuredField.name}`}
+                          validators={getAuthAdditionalFieldValidators(
+                            configuredField,
+                            localization.auth.fieldRequired
+                          )}
+                        >
+                          {(field) => (
+                            <field.AuthFormAdditionalField
+                              field={configuredField}
+                              isPending={isPending}
+                              optionalLabel={localization.auth.optional}
+                            />
+                          )}
+                        </form.AppField>
                       )
                   )}
 

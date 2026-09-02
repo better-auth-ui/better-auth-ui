@@ -1281,7 +1281,7 @@ describe("Solid registry isolation", () => {
     )
     expect(signUp).toContain("signUpFieldsAbove")
     expect(signUp).toContain("signUpFieldsBelow")
-    expect(signUp).toContain("parseAdditionalFieldValue")
+    expect(signUp).toContain("getAdditionalFieldSubmitValues")
     expect(signUp).toContain(
       "placeholder={auth.localization.auth.emailPlaceholder}"
     )
@@ -1692,8 +1692,10 @@ describe("Solid registry isolation", () => {
       /autocomplete=\{withPasskeyAutoFill\(\s*usernameAuth \? "username" : "email",\s*passkeyAutoFill\s*\)\}/
     )
 
-    expect(signUp).toContain("parseAdditionalFieldValue")
-    expect(signUp).toContain("additionalFieldValues")
+    expect(signUp).toContain("getAdditionalFieldSubmitValues")
+    expect(signUp).toContain(
+      "additionalFields: getAdditionalFieldDefaultValues"
+    )
     expect(signUp).not.toContain('name="username"')
     expect(signUp).not.toContain("username: username()")
   })

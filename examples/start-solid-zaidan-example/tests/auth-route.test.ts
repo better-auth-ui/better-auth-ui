@@ -1580,28 +1580,20 @@ describe("Solid auth route component selection", () => {
       "utf8"
     )
 
-    expect(signUp).toContain("parseAdditionalFieldValue")
+    expect(signUp).toContain("getAdditionalFieldDefaultValues")
+    expect(signUp).toContain("getAdditionalFieldSubmitValues")
     expect(signUp).toContain('field.signUp === "above"')
     expect(signUp).toContain('field.signUp && field.signUp !== "above"')
-    expect(signUp).toContain("<AdditionalField")
-    expect(signUp).toContain("if (!field.signUp || field.readOnly) continue")
-    expect(signUp).toContain("await field.validate(value)")
-    expect(signUp).toContain("values[field.name] = value")
-    expect(signUp).toContain("additionalFieldValues = values")
-    expect(signUp).toContain("...additionalFieldValues")
+    expect(signUp).toContain("<field.AuthFormAdditionalField")
+    expect(signUp).toContain("getAuthAdditionalFieldValidators")
+    expect(signUp).toContain("value.additionalFields")
 
-    expect(userProfile).toContain("parseAdditionalFieldValue")
+    expect(userProfile).toContain("getAdditionalFieldDefaultValues")
+    expect(userProfile).toContain("getAdditionalFieldSubmitValues")
     expect(userProfile).toContain("field.profile !== false")
-    expect(userProfile).toContain("<AdditionalField")
-    expect(userProfile).toContain(
-      "if (field.profile === false || field.readOnly) continue"
-    )
-    expect(userProfile).toContain("await field.validate(value)")
-    expect(userProfile).toContain("additionalFieldValues[field.name] = value")
-    expect(userProfile).toContain("...additionalFieldValues")
-    expect(userProfile).toContain(
-      "defaultValue: value() as AdditionalFieldValue | null"
-    )
+    expect(userProfile).toContain("<field.AuthFormAdditionalField")
+    expect(userProfile).toContain("fieldsWithModelValues")
+    expect(userProfile).toContain("value.additionalFields")
   })
 
   it("keeps Auth view resolution reactive when the external view prop changes", () => {
@@ -1939,16 +1931,14 @@ describe("Solid auth route component selection", () => {
 
     expect(userProfile).toContain("useUpdateUser")
     expect(userProfile).toContain(
-      "const { mutate: updateUser, isPending: updateUserPending } = useUpdateUser"
+      "const { mutateAsync: updateUser, isPending: updateUserPending } ="
     )
-    expect(userProfile).toContain("onSubmit={submitProfile}")
-    expect(userProfile).toContain("const formData = new FormData")
-    expect(userProfile).toContain('formData.get("name")')
-    expect(userProfile).toContain("parseAdditionalFieldValue")
-    expect(userProfile).toContain("additionalFieldValues")
+    expect(userProfile).toContain("createAuthForm")
+    expect(userProfile).toContain("<form.AuthFormRoot")
+    expect(userProfile).toContain("getAdditionalFieldSubmitValues")
     expect(userProfile).toContain("updateUser({")
-    expect(userProfile).toContain("name,")
-    expect(userProfile).toContain("...additionalFieldValues")
+    expect(userProfile).toContain("name: value.name")
+    expect(userProfile).toContain("value.additionalFields")
     expect(userProfile).toContain("profileUpdatedSuccess")
     expect(userProfile).not.toContain(
       "Profile and avatar update mutations are not available in this Solid"
@@ -3645,10 +3635,7 @@ describe("Solid auth route component selection", () => {
     expect(inviteMemberDialog).toContain(
       "organizationId: activeOrganization.data?.id"
     )
-    expect(inviteMemberDialog).toContain(
-      "const invitationEmail = email().trim()"
-    )
-    expect(inviteMemberDialog).toContain("email: invitationEmail")
+    expect(inviteMemberDialog).toContain("email: value.email.trim()")
     expect(inviteMemberDialog).not.toContain("useCancelInvitation")
   })
 
@@ -3718,10 +3705,11 @@ describe("Solid auth route component selection", () => {
     expect(createDialog).toContain("open: boolean")
     expect(createDialog).toContain("onOpenChange: (open: boolean) => void")
     expect(createDialog).toContain("useCreateOrganization")
-    expect(createDialog).toContain("onSuccess: () => props.onOpenChange(false)")
-    expect(createDialog).toContain('setName("")')
-    expect(createDialog).toContain('setSlug("")')
-    expect(createDialog).toContain("setSlug(sanitizeSlug")
+    expect(createDialog).toContain("createAuthForm")
+    expect(createDialog).toContain("props.onOpenChange(false)")
+    expect(createDialog).toContain('name: ""')
+    expect(createDialog).toContain('slug: ""')
+    expect(createDialog).toContain('form.setFieldValue("slug", sanitizeSlug')
     expect(createDialog).toContain("SlugField")
     expect(createDialog).toContain('id="create-organization-slug"')
     expect(slugField).toContain("export function sanitizeSlug")

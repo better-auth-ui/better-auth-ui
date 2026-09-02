@@ -3,7 +3,9 @@
 import {
   type AdditionalFields,
   fieldsWithModelValues,
-  parseAdditionalFieldValues
+  getAdditionalFieldDefaultValues,
+  getAdditionalFieldSubmitValues,
+  validateStringLength
 } from "@better-auth-ui/core"
 import type { OrganizationTeamsAuthClient } from "@better-auth-ui/core/plugins/organization"
 import { useAuth, useAuthPlugin, useSession } from "@better-auth-ui/react"
@@ -28,7 +30,7 @@ import {
   UserRoundMinus,
   Users
 } from "lucide-react"
-import { type FormEvent, useEffect, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { toast } from "sonner"
 import {
   AlertDialog,
@@ -64,7 +66,11 @@ import {
 } from "@/components/ui/select"
 import { Spinner } from "@/components/ui/spinner"
 import { organizationPlugin } from "@/lib/auth/organization-plugin"
-import { AdditionalField } from "../additional-field"
+import {
+  getAuthAdditionalFieldValidators,
+  isAuthFormFieldInvalid,
+  useAuthForm
+} from "../auth-form"
 
 type Team = { id: string; name: string; [key: string]: unknown }
 
@@ -231,8 +237,6 @@ function TeamDialog({
     organizationId,
     permissions: { member: ["delete"] }
   })
-  const [name, setName] = useState("")
-  const [isSubmittingFields, setIsSubmittingFields] = useState(false)
   const [userId, setUserId] = useState("")
   const createTeam = useCreateTeam(authClient, {
     onSuccess: () => {
@@ -273,272 +277,308 @@ function TeamDialog({
     ? localization.activeTeamRemovalDisabled
     : localization.lastTeamRemovalDisabled
 
+  const configuredTeamFields = useMemo(
+    () => fieldsWithModelValues(teamFields, team ?? {}),
+    [team, teamFields]
+  )
+  const form = useAuthForm({
+    defaultValues: {
+      additionalFields: getAdditionalFieldDefaultValues(configuredTeamFields),
+      name: team?.name ?? ""
+    },
+    onSubmit: async ({ value }) => {
+      const name = value.name.trim()
+      if (!name || !organizationId || (!team && teamLimitReached)) return
+      if (team && !canUpdate.data?.success) return
+
+      const data = {
+        ...getAdditionalFieldSubmitValues(
+          configuredTeamFields,
+          value.additionalFields
+        ),
+        name,
+        organizationId
+      }
+
+      try {
+        if (team) await updateTeam.mutateAsync({ teamId: team.id, data })
+        else await createTeam.mutateAsync(data)
+      } catch {
+        // The mutation reports the error through its configured handler.
+      }
+    }
+  })
+
   useEffect(() => {
     if (!open) return
-    setName(team?.name ?? "")
+    form.reset({
+      additionalFields: getAdditionalFieldDefaultValues(configuredTeamFields),
+      name: team?.name ?? ""
+    })
     setUserId("")
-  }, [open, team])
+  }, [configuredTeamFields, form, open, team?.name])
 
-  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault()
-    const trimmedName = name.trim()
-    if (!trimmedName || !organizationId || (!team && teamLimitReached)) return
-    if (team && !canUpdate.data?.success) return
-
-    setIsSubmittingFields(true)
-    try {
-      const values = await parseAdditionalFieldValues(
-        teamFields,
-        new FormData(event.currentTarget)
-      )
-      if (team) {
-        updateTeam.mutate(
-          {
-            teamId: team.id,
-            data: { ...values, name: trimmedName, organizationId }
-          },
-          { onSettled: () => setIsSubmittingFields(false) }
-        )
-      } else {
-        createTeam.mutate(
-          { ...values, name: trimmedName, organizationId },
-          { onSettled: () => setIsSubmittingFields(false) }
-        )
-      }
-    } catch (error) {
-      toast.error(error instanceof Error ? error.message : String(error))
-      setIsSubmittingFields(false)
-    }
-  }
-
-  const pending =
-    createTeam.isPending || updateTeam.isPending || isSubmittingFields
+  const pending = createTeam.isPending || updateTeam.isPending
   const canEdit = !team || canUpdate.data?.success === true
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-h-[85vh] overflow-y-auto sm:max-w-lg">
-        <form className="flex flex-col gap-6" onSubmit={handleSubmit}>
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <Users />
-              {team ? localization.renameTeam : localization.createTeam}
-            </DialogTitle>
-            <DialogDescription>
-              {localization.teamsDescription}
-            </DialogDescription>
-          </DialogHeader>
+        <form.AppForm>
+          <form.AuthFormRoot className="flex flex-col gap-6">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                <Users />
+                {team ? localization.renameTeam : localization.createTeam}
+              </DialogTitle>
+              <DialogDescription>
+                {localization.teamsDescription}
+              </DialogDescription>
+            </DialogHeader>
 
-          <div className="flex flex-col gap-4">
-            <Field>
-              <FieldLabel htmlFor="organization-team-name">
-                {localization.name}
-              </FieldLabel>
-              <Input
-                autoFocus
-                disabled={pending || !canEdit}
-                id="organization-team-name"
-                onChange={(event) => setName(event.target.value)}
-                required
-                value={name}
-              />
-            </Field>
-
-            {fieldsWithModelValues(teamFields, team ?? {}).map((field) => (
-              <AdditionalField
-                field={field}
-                isPending={pending || !canEdit}
-                key={field.name}
-                name={field.name}
-                optionalLabel={authLocalization.settings.optional}
-              />
-            ))}
-          </div>
-
-          {team && canListMembers && (
-            <div className="flex flex-col gap-4 border-t pt-5">
-              <div>
-                <h3 className="text-sm font-medium">
-                  {localization.teamMembers}
-                </h3>
-                <p className="text-sm text-muted-foreground">
-                  {localization.addTeamMember}
-                </p>
-              </div>
-
-              {(canAddMember.isPending || canAddMember.data?.success) && (
-                <div className="flex flex-col items-stretch gap-2 sm:flex-row sm:items-end">
-                  <Field className="flex-1">
-                    <FieldLabel>{localization.addTeamMember}</FieldLabel>
-                    <Select
-                      disabled={canAddMember.isPending || memberLimitReached}
-                      items={availableMembers}
-                      onValueChange={(value) => setUserId(value ?? "")}
-                      value={userId}
-                    >
-                      <SelectTrigger className="w-full">
-                        <SelectValue placeholder={localization.selectMember} />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectGroup>
-                          {availableMembers.map((member) => (
-                            <SelectItem key={member.value} value={member.value}>
-                              {member.label}
-                            </SelectItem>
-                          ))}
-                        </SelectGroup>
-                      </SelectContent>
-                    </Select>
-                  </Field>
-                  <Button
-                    disabled={
-                      canAddMember.isPending ||
-                      !userId ||
-                      addMember.isPending ||
-                      memberLimitReached
-                    }
-                    onClick={() => {
-                      if (!canAddMember.data?.success || !userId) return
-                      addMember.mutate({
-                        teamId: team.id,
-                        userId,
-                        organizationId
-                      })
-                    }}
-                    type="button"
-                  >
-                    <UserPlus data-icon="inline-start" />
-                    {localization.addTeamMember}
-                  </Button>
-                </div>
-              )}
-
-              {canAddMember.data?.success && memberLimitReached && (
-                <p className="text-sm text-destructive" role="alert">
-                  {localization.teamMemberLimitReached}
-                </p>
-              )}
-
-              <div className="flex flex-col gap-2">
-                {teamMembers.isPending && <Spinner />}
-                {teamMembers.data?.map((teamMember) => {
-                  const member = organizationMembers.find(
-                    (candidate) => candidate.userId === teamMember.userId
-                  )
+            <div className="flex flex-col gap-4">
+              <form.AppField
+                name="name"
+                validators={{
+                  onChange: ({ value }) =>
+                    validateStringLength(value, {
+                      requiredMessage: authLocalization.auth.fieldRequired,
+                      trim: true
+                    })
+                }}
+              >
+                {(field) => {
+                  const isInvalid = isAuthFormFieldInvalid(field.state.meta)
                   return (
-                    <div
-                      className="flex items-center justify-between gap-3 rounded-md border px-3 py-2"
-                      key={teamMember.id}
-                    >
-                      <span className="truncate text-sm">
-                        {member?.user.name ||
-                          member?.user.email ||
-                          teamMember.userId}
-                      </span>
-                      {(canRemoveMember.isPending ||
-                        canRemoveMember.data?.success) && (
-                        <Button
-                          aria-label={localization.removeTeamMember}
-                          disabled={
-                            canRemoveMember.isPending || removeMember.isPending
-                          }
-                          onClick={() => {
-                            if (!canRemoveMember.data?.success) return
-                            removeMember.mutate({
-                              teamId: team.id,
-                              userId: teamMember.userId,
-                              organizationId
-                            })
-                          }}
-                          size="icon-sm"
-                          type="button"
-                          variant="ghost"
-                        >
-                          <UserRoundMinus />
-                        </Button>
-                      )}
-                    </div>
+                    <Field data-invalid={isInvalid}>
+                      <FieldLabel htmlFor="organization-team-name">
+                        {localization.name}
+                      </FieldLabel>
+                      <Input
+                        aria-invalid={isInvalid}
+                        autoFocus
+                        disabled={pending || !canEdit}
+                        id="organization-team-name"
+                        name={field.name}
+                        onBlur={field.handleBlur}
+                        onChange={(event) =>
+                          field.handleChange(event.target.value)
+                        }
+                        value={field.state.value}
+                      />
+                      <field.AuthFormFieldError />
+                    </Field>
                   )
-                })}
-              </div>
-            </div>
-          )}
+                }}
+              </form.AppField>
 
-          {team && !canRemoveTeam && canDelete.data?.success && (
-            <p className="text-sm text-muted-foreground">
-              {teamRemovalDisabledReason}
-            </p>
-          )}
-
-          <DialogFooter className="sm:justify-between">
-            {team && (canDelete.isPending || canDelete.data?.success) && (
-              <AlertDialog>
-                <AlertDialogTrigger
-                  className={buttonVariants({ variant: "destructive" })}
-                  disabled={
-                    canDelete.isPending ||
-                    removeTeam.isPending ||
-                    !canRemoveTeam
-                  }
-                  type="button"
+              {configuredTeamFields.map((configuredField) => (
+                <form.AppField
+                  key={configuredField.name}
+                  name={`additionalFields.${configuredField.name}`}
+                  validators={getAuthAdditionalFieldValidators(
+                    configuredField,
+                    authLocalization.auth.fieldRequired
+                  )}
                 >
-                  <Trash2 data-icon="inline-start" />
-                  {localization.deleteTeam}
-                </AlertDialogTrigger>
-                <AlertDialogContent>
-                  <AlertDialogHeader>
-                    <AlertDialogTitle>
-                      {localization.deleteTeam}
-                    </AlertDialogTitle>
-                    <AlertDialogDescription>
-                      {localization.deleteTeamDescription}
-                    </AlertDialogDescription>
-                  </AlertDialogHeader>
-                  <AlertDialogFooter>
-                    <AlertDialogCancel>
-                      {authLocalization.settings.cancel}
-                    </AlertDialogCancel>
-                    <AlertDialogAction
-                      className={buttonVariants({ variant: "destructive" })}
-                      onClick={() =>
-                        removeTeam.mutate({
+                  {(field) => (
+                    <field.AuthFormAdditionalField
+                      field={configuredField}
+                      isPending={pending || !canEdit}
+                      optionalLabel={authLocalization.settings.optional}
+                    />
+                  )}
+                </form.AppField>
+              ))}
+            </div>
+
+            {team && canListMembers && (
+              <div className="flex flex-col gap-4 border-t pt-5">
+                <div>
+                  <h3 className="text-sm font-medium">
+                    {localization.teamMembers}
+                  </h3>
+                  <p className="text-sm text-muted-foreground">
+                    {localization.addTeamMember}
+                  </p>
+                </div>
+
+                {(canAddMember.isPending || canAddMember.data?.success) && (
+                  <div className="flex flex-col items-stretch gap-2 sm:flex-row sm:items-end">
+                    <Field className="flex-1">
+                      <FieldLabel>{localization.addTeamMember}</FieldLabel>
+                      <Select
+                        disabled={canAddMember.isPending || memberLimitReached}
+                        items={availableMembers}
+                        onValueChange={(value) => setUserId(value ?? "")}
+                        value={userId}
+                      >
+                        <SelectTrigger className="w-full">
+                          <SelectValue
+                            placeholder={localization.selectMember}
+                          />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectGroup>
+                            {availableMembers.map((member) => (
+                              <SelectItem
+                                key={member.value}
+                                value={member.value}
+                              >
+                                {member.label}
+                              </SelectItem>
+                            ))}
+                          </SelectGroup>
+                        </SelectContent>
+                      </Select>
+                    </Field>
+                    <Button
+                      disabled={
+                        canAddMember.isPending ||
+                        !userId ||
+                        addMember.isPending ||
+                        memberLimitReached
+                      }
+                      onClick={() => {
+                        if (!canAddMember.data?.success || !userId) return
+                        addMember.mutate({
                           teamId: team.id,
+                          userId,
                           organizationId
                         })
-                      }
+                      }}
+                      type="button"
                     >
-                      <Trash2 data-icon="inline-start" />
-                      {localization.deleteTeam}
-                    </AlertDialogAction>
-                  </AlertDialogFooter>
-                </AlertDialogContent>
-              </AlertDialog>
+                      <UserPlus data-icon="inline-start" />
+                      {localization.addTeamMember}
+                    </Button>
+                  </div>
+                )}
+
+                {canAddMember.data?.success && memberLimitReached && (
+                  <p className="text-sm text-destructive" role="alert">
+                    {localization.teamMemberLimitReached}
+                  </p>
+                )}
+
+                <div className="flex flex-col gap-2">
+                  {teamMembers.isPending && <Spinner />}
+                  {teamMembers.data?.map((teamMember) => {
+                    const member = organizationMembers.find(
+                      (candidate) => candidate.userId === teamMember.userId
+                    )
+                    return (
+                      <div
+                        className="flex items-center justify-between gap-3 rounded-md border px-3 py-2"
+                        key={teamMember.id}
+                      >
+                        <span className="truncate text-sm">
+                          {member?.user.name ||
+                            member?.user.email ||
+                            teamMember.userId}
+                        </span>
+                        {(canRemoveMember.isPending ||
+                          canRemoveMember.data?.success) && (
+                          <Button
+                            aria-label={localization.removeTeamMember}
+                            disabled={
+                              canRemoveMember.isPending ||
+                              removeMember.isPending
+                            }
+                            onClick={() => {
+                              if (!canRemoveMember.data?.success) return
+                              removeMember.mutate({
+                                teamId: team.id,
+                                userId: teamMember.userId,
+                                organizationId
+                              })
+                            }}
+                            size="icon-sm"
+                            type="button"
+                            variant="ghost"
+                          >
+                            <UserRoundMinus />
+                          </Button>
+                        )}
+                      </div>
+                    )
+                  })}
+                </div>
+              </div>
             )}
 
-            <div className="flex flex-col-reverse gap-2 sm:flex-row">
-              <DialogClose
-                className={buttonVariants({ variant: "outline" })}
-                disabled={pending}
-                type="button"
-              >
-                {authLocalization.settings.cancel}
-              </DialogClose>
-              {canEdit && (
-                <Button
-                  disabled={
-                    pending || !name.trim() || (teamLimitReached && !team)
-                  }
-                  type="submit"
-                >
-                  {pending && <Spinner />}
-                  {team
-                    ? authLocalization.settings.saveChanges
-                    : localization.createTeam}
-                </Button>
+            {team && !canRemoveTeam && canDelete.data?.success && (
+              <p className="text-sm text-muted-foreground">
+                {teamRemovalDisabledReason}
+              </p>
+            )}
+
+            <DialogFooter className="sm:justify-between">
+              {team && (canDelete.isPending || canDelete.data?.success) && (
+                <AlertDialog>
+                  <AlertDialogTrigger
+                    className={buttonVariants({ variant: "destructive" })}
+                    disabled={
+                      canDelete.isPending ||
+                      removeTeam.isPending ||
+                      !canRemoveTeam
+                    }
+                    type="button"
+                  >
+                    <Trash2 data-icon="inline-start" />
+                    {localization.deleteTeam}
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>
+                        {localization.deleteTeam}
+                      </AlertDialogTitle>
+                      <AlertDialogDescription>
+                        {localization.deleteTeamDescription}
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>
+                        {authLocalization.settings.cancel}
+                      </AlertDialogCancel>
+                      <AlertDialogAction
+                        className={buttonVariants({ variant: "destructive" })}
+                        onClick={() =>
+                          removeTeam.mutate({
+                            teamId: team.id,
+                            organizationId
+                          })
+                        }
+                      >
+                        <Trash2 data-icon="inline-start" />
+                        {localization.deleteTeam}
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
               )}
-            </div>
-          </DialogFooter>
-        </form>
+
+              <div className="flex flex-col-reverse gap-2 sm:flex-row">
+                <DialogClose
+                  className={buttonVariants({ variant: "outline" })}
+                  disabled={pending}
+                  type="button"
+                >
+                  {authLocalization.settings.cancel}
+                </DialogClose>
+                {canEdit && (
+                  <form.AuthFormSubmitButton
+                    disabled={pending || (teamLimitReached && !team)}
+                  >
+                    {team
+                      ? authLocalization.settings.saveChanges
+                      : localization.createTeam}
+                  </form.AuthFormSubmitButton>
+                )}
+              </div>
+            </DialogFooter>
+          </form.AuthFormRoot>
+        </form.AppForm>
       </DialogContent>
     </Dialog>
   )

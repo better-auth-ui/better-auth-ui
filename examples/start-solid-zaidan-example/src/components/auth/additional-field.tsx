@@ -1,10 +1,12 @@
 import {
   type AdditionalField as AdditionalFieldConfig,
+  type AdditionalFieldFormValue,
+  getFormFieldErrors,
   resolveInputType
 } from "@better-auth-ui/core"
 import { createCopyToClipboard, useAuth } from "@better-auth-ui/solid"
 import { CalendarIcon, Check, Copy } from "lucide-solid"
-import { createEffect, createMemo, createSignal, For, Show } from "solid-js"
+import { createSignal, For, Show } from "solid-js"
 import { toast } from "solid-sonner"
 import { Button } from "@/components/ui/button"
 import { Calendar } from "@/components/ui/calendar"
@@ -41,20 +43,25 @@ import { Textarea } from "@/components/ui/textarea"
 
 export type AdditionalFieldProps = {
   field: AdditionalFieldConfig
+  value: AdditionalFieldFormValue
+  onBlur: () => void
+  onChange: (value: AdditionalFieldFormValue) => void
+  isInvalid?: boolean
+  errors?: unknown[]
   isPending?: boolean
   name: string
   /** Complete suffix appended to labels for fields that are not required. */
   optionalLabel?: string
 }
 
-const valueToString = (value: AdditionalFieldConfig["defaultValue"]) =>
+const valueToString = (value: AdditionalFieldFormValue) =>
   value == null
     ? ""
     : value instanceof Date
       ? value.toISOString()
       : String(value)
 
-const toDate = (value: AdditionalFieldConfig["defaultValue"]) => {
+const toDate = (value: AdditionalFieldFormValue) => {
   if (value instanceof Date) return value
   if (typeof value !== "string") return undefined
 
@@ -69,6 +76,7 @@ const formatTime = (date: Date) => {
 
 export function AdditionalField(props: AdditionalFieldProps) {
   const inputType = () => resolveInputType(props.field)
+  const fieldErrors = () => getFormFieldErrors(props.errors ?? [])
   const label = () =>
     props.optionalLabel && !props.field.required
       ? `${String(props.field.label)}${props.optionalLabel}`
@@ -93,14 +101,14 @@ export function AdditionalField(props: AdditionalFieldProps) {
       <input
         name={props.name}
         type="hidden"
-        value={valueToString(props.field.defaultValue)}
+        value={valueToString(props.value)}
       />
     )
   }
 
   if (inputType() === "textarea") {
     return (
-      <Field>
+      <Field data-invalid={props.isInvalid}>
         <FieldLabel for={props.name}>{label()}</FieldLabel>
         <Textarea
           disabled={props.isPending}
@@ -108,10 +116,13 @@ export function AdditionalField(props: AdditionalFieldProps) {
           name={props.name}
           placeholder={props.field.placeholder}
           readonly={props.field.readOnly}
-          required={props.field.required}
-          value={valueToString(props.field.defaultValue)}
+          aria-invalid={props.isInvalid}
+          aria-required={props.field.required}
+          onBlur={props.onBlur}
+          onInput={(event) => props.onChange(event.currentTarget.value || null)}
+          value={valueToString(props.value)}
         />
-        <FieldError />
+        <FieldError errors={fieldErrors()} />
       </Field>
     )
   }
@@ -120,7 +131,7 @@ export function AdditionalField(props: AdditionalFieldProps) {
     const maxFractionDigits = props.field.formatOptions?.maximumFractionDigits
 
     return (
-      <Field>
+      <Field data-invalid={props.isInvalid}>
         <FieldLabel for={props.name}>{label()}</FieldLabel>
         <Input
           disabled={props.isPending}
@@ -131,15 +142,24 @@ export function AdditionalField(props: AdditionalFieldProps) {
           name={props.name}
           placeholder={props.field.placeholder}
           readonly={props.field.readOnly}
-          required={props.field.required}
+          aria-invalid={props.isInvalid}
+          aria-required={props.field.required}
+          onBlur={props.onBlur}
+          onInput={(event) =>
+            props.onChange(
+              event.currentTarget.value === ""
+                ? null
+                : event.currentTarget.valueAsNumber
+            )
+          }
           step={
             props.field.step ??
             (maxFractionDigits ? 1 / 10 ** maxFractionDigits : undefined)
           }
           type="number"
-          value={valueToString(props.field.defaultValue)}
+          value={typeof props.value === "number" ? props.value : ""}
         />
-        <FieldError />
+        <FieldError errors={fieldErrors()} />
       </Field>
     )
   }
@@ -150,55 +170,60 @@ export function AdditionalField(props: AdditionalFieldProps) {
 
   if (inputType() === "switch") {
     return (
-      <Field orientation="horizontal">
+      <Field data-invalid={props.isInvalid} orientation="horizontal">
         <Switch
-          defaultChecked={
-            props.field.defaultValue === true ||
-            valueToString(props.field.defaultValue) === "true"
-          }
+          checked={props.value === true}
           disabled={props.isPending || props.field.readOnly}
           id={props.name}
           name={props.name}
-          required={props.field.required}
+          onBlur={props.onBlur}
+          onChange={props.onChange}
+          validationState={props.isInvalid ? "invalid" : "valid"}
         />
         <FieldContent>
           <FieldLabel for={props.name}>{label()}</FieldLabel>
         </FieldContent>
+        <FieldError errors={fieldErrors()} />
       </Field>
     )
   }
 
   if (inputType() === "checkbox") {
     return (
-      <Field orientation="horizontal">
+      <Field data-invalid={props.isInvalid} orientation="horizontal">
         <Checkbox
-          defaultChecked={
-            props.field.defaultValue === true ||
-            valueToString(props.field.defaultValue) === "true"
-          }
+          checked={props.value === true}
           disabled={props.isPending || props.field.readOnly}
           id={props.name}
           name={props.name}
-          required={props.field.required}
+          onBlur={props.onBlur}
+          onChange={props.onChange}
+          validationState={props.isInvalid ? "invalid" : "valid"}
         />
         <FieldContent>
           <FieldLabel for={props.name}>{label()}</FieldLabel>
         </FieldContent>
+        <FieldError errors={fieldErrors()} />
       </Field>
     )
   }
 
   if (inputType() === "select") {
     return (
-      <Field>
+      <Field data-invalid={props.isInvalid}>
         <FieldLabel for={props.name}>{label()}</FieldLabel>
         <NativeSelect
           class="w-full"
           disabled={props.isPending || props.field.readOnly}
           id={props.name}
           name={props.name}
-          required={props.field.required}
-          value={valueToString(props.field.defaultValue)}
+          aria-invalid={props.isInvalid}
+          aria-required={props.field.required}
+          onBlur={props.onBlur}
+          onChange={(event) =>
+            props.onChange(event.currentTarget.value || null)
+          }
+          value={valueToString(props.value)}
         >
           <Show when={props.field.placeholder}>
             <NativeSelectOption disabled value="">
@@ -213,22 +238,22 @@ export function AdditionalField(props: AdditionalFieldProps) {
             )}
           </For>
         </NativeSelect>
-        <FieldError />
+        <FieldError errors={fieldErrors()} />
       </Field>
     )
   }
 
   if (inputType() === "combobox") {
     const options = props.field.options ?? []
-    const initialValue = options.find(
-      (option) => option.value === valueToString(props.field.defaultValue)
+    const selectedValue = options.find(
+      (option) => option.value === valueToString(props.value)
     )
 
     return (
-      <Field>
+      <Field data-invalid={props.isInvalid}>
         <FieldLabel for={props.name}>{label()}</FieldLabel>
         <Combobox
-          defaultValue={initialValue}
+          value={selectedValue}
           disabled={props.isPending || props.field.readOnly}
           itemComponent={(itemProps) => (
             <ComboboxItem item={itemProps.item}>
@@ -236,12 +261,14 @@ export function AdditionalField(props: AdditionalFieldProps) {
             </ComboboxItem>
           )}
           name={props.name}
+          onBlur={props.onBlur}
+          onChange={(option) => props.onChange(option?.value ?? null)}
           optionLabel="label"
           optionTextValue="label"
           optionValue="value"
           options={options}
           placeholder={props.field.placeholder}
-          required={props.field.required}
+          validationState={props.isInvalid ? "invalid" : "valid"}
         >
           <ComboboxInput
             class="w-full"
@@ -252,7 +279,7 @@ export function AdditionalField(props: AdditionalFieldProps) {
             <ComboboxEmpty>No items found.</ComboboxEmpty>
           </ComboboxContent>
         </Combobox>
-        <FieldError />
+        <FieldError errors={fieldErrors()} />
       </Field>
     )
   }
@@ -278,6 +305,7 @@ function InputField(props: LabeledAdditionalFieldProps) {
   const hasPrefix = () => props.field.prefix != null
   const hasSuffix = () =>
     props.field.suffix != null || props.field.copyable === true
+  const fieldErrors = () => getFormFieldErrors(props.errors ?? [])
 
   const copyValue = async () => {
     if (!inputRef?.value) return
@@ -287,7 +315,7 @@ function InputField(props: LabeledAdditionalFieldProps) {
 
   if (hasPrefix() || hasSuffix()) {
     return (
-      <Field>
+      <Field data-invalid={props.isInvalid}>
         <FieldLabel for={props.name}>{props.label}</FieldLabel>
         <InputGroup>
           <Show when={props.field.prefix}>
@@ -302,8 +330,13 @@ function InputField(props: LabeledAdditionalFieldProps) {
             placeholder={props.field.placeholder}
             readonly={props.field.readOnly}
             ref={inputRef}
-            required={props.field.required}
-            value={valueToString(props.field.defaultValue)}
+            aria-invalid={props.isInvalid}
+            aria-required={props.field.required}
+            onBlur={props.onBlur}
+            onInput={(event) =>
+              props.onChange(event.currentTarget.value || null)
+            }
+            value={valueToString(props.value)}
           />
           <Show
             when={props.field.copyable}
@@ -337,13 +370,13 @@ function InputField(props: LabeledAdditionalFieldProps) {
             </InputGroupAddon>
           </Show>
         </InputGroup>
-        <FieldError />
+        <FieldError errors={fieldErrors()} />
       </Field>
     )
   }
 
   return (
-    <Field>
+    <Field data-invalid={props.isInvalid}>
       <FieldLabel for={props.name}>{props.label}</FieldLabel>
       <Input
         disabled={props.isPending}
@@ -351,10 +384,13 @@ function InputField(props: LabeledAdditionalFieldProps) {
         name={props.name}
         placeholder={props.field.placeholder}
         readonly={props.field.readOnly}
-        required={props.field.required}
-        value={valueToString(props.field.defaultValue)}
+        aria-invalid={props.isInvalid}
+        aria-required={props.field.required}
+        onBlur={props.onBlur}
+        onInput={(event) => props.onChange(event.currentTarget.value || null)}
+        value={valueToString(props.value)}
       />
-      <FieldError />
+      <FieldError errors={fieldErrors()} />
     </Field>
   )
 }
@@ -365,24 +401,12 @@ function SliderField(props: LabeledAdditionalFieldProps) {
   const max = props.field.max ?? 100
   const step =
     props.field.step ?? (maxFractionDigits ? 1 / 10 ** maxFractionDigits : 1)
-  const defaultValue = () =>
-    typeof props.field.defaultValue === "number"
-      ? props.field.defaultValue
-      : props.field.defaultValue != null &&
-          !Number.isNaN(Number(props.field.defaultValue))
-        ? Number(props.field.defaultValue)
-        : min
-  const [value, setValue] = createSignal(defaultValue())
-  const [isDirty, setIsDirty] = createSignal(false)
+  const value = () => (typeof props.value === "number" ? props.value : min)
   const formatter = new Intl.NumberFormat(undefined, props.field.formatOptions)
-
-  createEffect(() => {
-    const nextValue = defaultValue()
-    if (!isDirty()) setValue(nextValue)
-  })
+  const fieldErrors = () => getFormFieldErrors(props.errors ?? [])
 
   return (
-    <Field>
+    <Field data-invalid={props.isInvalid}>
       <div class="flex items-center justify-between gap-2">
         <FieldLabel for={props.name}>{props.label}</FieldLabel>
         <span class="text-muted-foreground text-sm tabular-nums">
@@ -395,14 +419,14 @@ function SliderField(props: LabeledAdditionalFieldProps) {
         maxValue={max}
         minValue={min}
         name={props.name}
+        onBlur={props.onBlur}
         onChange={(values) => {
-          setIsDirty(true)
-          setValue(values[0] ?? min)
+          props.onChange(values[0] ?? min)
         }}
         step={step}
         value={[value()]}
       />
-      <FieldError />
+      <FieldError errors={fieldErrors()} />
     </Field>
   )
 }
@@ -410,64 +434,28 @@ function SliderField(props: LabeledAdditionalFieldProps) {
 function DateInput(props: LabeledAdditionalFieldProps) {
   const auth = useAuth()
   const isDateTime = () => resolveInputType(props.field) === "datetime"
-  const defaultDate = () => toDate(props.field.defaultValue)
-  const initialDate = defaultDate()
-  const [date, setDate] = createSignal<Date | undefined>(initialDate)
+  const date = () => toDate(props.value)
+  const initialDate = date()
   const [time, setTime] = createSignal(
     initialDate && isDateTime() ? formatTime(initialDate) : ""
   )
-  const [isDirty, setIsDirty] = createSignal(false)
   const [open, setOpen] = createSignal(false)
-  const [error, setError] = createSignal<string>()
-
-  createEffect(() => {
-    const nextDate = defaultDate()
-    if (isDirty()) return
-
-    setDate(nextDate)
-    setTime(nextDate && isDateTime() ? formatTime(nextDate) : "")
-    if (nextDate) setError(undefined)
-  })
-
-  const formValue = createMemo(() => {
-    const selectedDate = date()
-    if (!selectedDate) return ""
-
-    const value = new Date(selectedDate)
-    if (isDateTime() && time().trim()) {
-      const [hours = "0", minutes = "0", seconds = "0"] = time().split(":")
-      value.setHours(Number(hours), Number(minutes), Number(seconds), 0)
-    } else {
-      value.setHours(0, 0, 0, 0)
-    }
-    return value.toISOString()
-  })
+  const fieldErrors = () => getFormFieldErrors(props.errors ?? [])
 
   return (
-    <Field data-invalid={Boolean(error())}>
+    <Field data-invalid={props.isInvalid}>
       <FieldLabel for={`${props.name}-date`}>{props.label}</FieldLabel>
       <div class="relative flex gap-2">
-        <input
-          aria-label={props.label}
-          class="sr-only"
-          name={props.name}
-          onInvalid={(event) => {
-            event.preventDefault()
-            setError(event.currentTarget.validationMessage)
-          }}
-          required={props.field.required}
-          tabindex={-1}
-          type="text"
-          value={formValue()}
-        />
         <Popover onOpenChange={setOpen} open={open()}>
           <PopoverTrigger
-            aria-invalid={Boolean(error())}
+            aria-invalid={props.isInvalid}
+            aria-required={props.field.required}
             as={Button}
             class="flex-1 justify-between font-normal data-[empty=true]:text-muted-foreground"
             data-empty={!date()}
             disabled={props.isPending || props.field.readOnly}
             id={`${props.name}-date`}
+            onBlur={props.onBlur}
             type="button"
             variant="outline"
           >
@@ -482,9 +470,24 @@ function DateInput(props: LabeledAdditionalFieldProps) {
               mode="single"
               monthYearSelection
               onValueChange={(value) => {
-                setIsDirty(true)
-                setDate(value ?? undefined)
-                if (value) setError(undefined)
+                if (!value) {
+                  props.onChange(null)
+                } else {
+                  const nextValue = new Date(value)
+                  if (isDateTime() && time().trim()) {
+                    const [hours = "0", minutes = "0", seconds = "0"] =
+                      time().split(":")
+                    nextValue.setHours(
+                      Number(hours),
+                      Number(minutes),
+                      Number(seconds),
+                      0
+                    )
+                  } else {
+                    nextValue.setHours(0, 0, 0, 0)
+                  }
+                  props.onChange(nextValue)
+                }
                 if (!isDateTime()) setOpen(false)
               }}
               value={date() ?? null}
@@ -501,8 +504,20 @@ function DateInput(props: LabeledAdditionalFieldProps) {
               disabled={props.isPending || props.field.readOnly}
               id={`${props.name}-time`}
               onInput={(event) => {
-                setIsDirty(true)
-                setTime(event.currentTarget.value)
+                const nextTime = event.currentTarget.value
+                setTime(nextTime)
+                const selectedDate = date()
+                if (!selectedDate) return
+                const nextValue = new Date(selectedDate)
+                const [hours = "0", minutes = "0", seconds = "0"] =
+                  nextTime.split(":")
+                nextValue.setHours(
+                  Number(hours),
+                  Number(minutes),
+                  Number(seconds),
+                  0
+                )
+                props.onChange(nextValue)
               }}
               step="1"
               type="time"
@@ -511,7 +526,7 @@ function DateInput(props: LabeledAdditionalFieldProps) {
           </Field>
         </Show>
       </div>
-      <FieldError>{error()}</FieldError>
+      <FieldError errors={fieldErrors()} />
     </Field>
   )
 }

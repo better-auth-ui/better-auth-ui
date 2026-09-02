@@ -1,9 +1,10 @@
 "use client"
 
 import {
-  type AdditionalFieldValue,
-  getClampedTablePageIndex,
-  parseAdditionalFieldValues
+  fieldsWithModelValues,
+  getAdditionalFieldDefaultValues,
+  getAdditionalFieldSubmitValues,
+  getClampedTablePageIndex
 } from "@better-auth-ui/core"
 import {
   type AdminAuthClient,
@@ -72,12 +73,10 @@ import {
   useDeferredValue,
   useEffect,
   useMemo,
-  useRef,
   useState
 } from "react"
 import { adminPlugin } from "../../../lib/auth/admin-plugin"
-import { AdditionalField } from "../additional-field"
-import { useAuthForm } from "../auth-form"
+import { getAuthAdditionalFieldValidators, useAuthForm } from "../auth-form"
 import { UserAvatar } from "../user/user-avatar"
 import { createAdminColumnHelper, useAdminTable } from "./admin-table"
 
@@ -598,16 +597,17 @@ function CreateUserDialog({
   isOpen: boolean
   onOpenChange: (open: boolean) => void
 }) {
-  const { additionalFields, authClient } = useAuth<AdminAuthClient>()
+  const { additionalFields, authClient, localization } =
+    useAuth<AdminAuthClient>()
   const config = useAuthPlugin(adminPlugin)
   const createUser = useCreateAdminUser(authClient)
   const canSetRole = useAdminPermission(authClient, { user: ["set-role"] })
-  const [formError, setFormError] = useState<string>()
-  const additionalFieldValuesRef = useRef<
-    Record<string, AdditionalFieldValue | null>
-  >({})
+  const configuredAdditionalFields = additionalFields ?? []
   const form = useAuthForm({
     defaultValues: {
+      additionalFields: getAdditionalFieldDefaultValues(
+        configuredAdditionalFields
+      ),
       email: "",
       emailVerified: false,
       name: "",
@@ -619,7 +619,10 @@ function CreateUserDialog({
         await createUser.mutateAsync(
           {
             data: {
-              ...additionalFieldValuesRef.current,
+              ...getAdditionalFieldSubmitValues(
+                configuredAdditionalFields,
+                value.additionalFields
+              ),
               emailVerified: value.emailVerified
             },
             email: value.email,
@@ -645,23 +648,7 @@ function CreateUserDialog({
   const close = () => {
     createUser.reset()
     form.reset()
-    setFormError(undefined)
     onOpenChange(false)
-  }
-  const prepareSubmit = async (formElement: HTMLFormElement) => {
-    const data = new FormData(formElement)
-    let additionalFieldValues: Record<string, AdditionalFieldValue | null>
-    try {
-      additionalFieldValues = await parseAdditionalFieldValues(
-        additionalFields ?? [],
-        data
-      )
-    } catch (error) {
-      setFormError(error instanceof Error ? error.message : String(error))
-      return false
-    }
-    setFormError(undefined)
-    additionalFieldValuesRef.current = additionalFieldValues
   }
 
   return (
@@ -672,7 +659,7 @@ function CreateUserDialog({
       <AlertDialog.Container>
         <AlertDialog.Dialog>
           <form.AppForm>
-            <form.AuthFormRoot prepareSubmit={prepareSubmit}>
+            <form.AuthFormRoot>
               <AlertDialog.CloseTrigger />
               <AlertDialog.Header>
                 <AlertDialog.Icon status="default">
@@ -795,17 +782,26 @@ function CreateUserDialog({
                       </Switch>
                     )}
                   </form.Field>
-                  {additionalFields?.map((field) => (
-                    <AdditionalField
-                      field={field}
-                      isPending={createUser.isPending}
-                      key={field.name}
-                      name={field.name}
-                    />
+                  {configuredAdditionalFields.map((configuredField) => (
+                    <form.AppField
+                      key={configuredField.name}
+                      name={`additionalFields.${configuredField.name}`}
+                      validators={getAuthAdditionalFieldValidators(
+                        configuredField,
+                        localization.auth.fieldRequired
+                      )}
+                    >
+                      {(field) => (
+                        <field.AuthFormAdditionalField
+                          field={configuredField}
+                          isPending={createUser.isPending}
+                        />
+                      )}
+                    </form.AppField>
                   ))}
-                  {formError || createUser.error ? (
+                  {createUser.error ? (
                     <FieldError>
-                      {formError ?? getAdminErrorMessage(createUser.error)}
+                      {getAdminErrorMessage(createUser.error)}
                     </FieldError>
                   ) : null}
                 </div>
@@ -841,7 +837,7 @@ function UserDrawer({
   onOpenChange: (open: boolean) => void
   userId?: string
 }) {
-  const { additionalFields, authClient, navigate, plugins } =
+  const { additionalFields, authClient, localization, navigate, plugins } =
     useAuth<AdminAuthClient>()
   const config = useAuthPlugin(adminPlugin)
   const contributedTabs = useMemo(
@@ -909,7 +905,6 @@ function UserDrawer({
   const [banReason, setBanReason] = useState("")
   const [banDuration, setBanDuration] = useState("")
   const banDurationSeconds = getBanDurationSeconds(banDuration)
-  const [profileError, setProfileError] = useState<string>()
   const [passwordOpen, setPasswordOpen] = useState(false)
   const [dangerousAction, setDangerousAction] = useState<DangerousAction>()
   const detail = user.data
@@ -921,7 +916,6 @@ function UserDrawer({
     { user: ["impersonate-admins"] },
     { enabled: Boolean(userId && targetIsAdmin) }
   )
-  const profileUserId = useRef(detail?.id)
   const isSelf = detail?.id === actor?.user.id
   const updateUser = useUpdateAdminUser(authClient)
   const setRoleMutation = useSetAdminUserRole(authClient)
@@ -933,11 +927,17 @@ function UserDrawer({
   const revokeSession = useRevokeAdminUserSession(authClient, userId)
   const revokeSessions = useRevokeAdminUserSessions(authClient, userId)
 
-  const profileAdditionalFieldValuesRef = useRef<
-    Record<string, AdditionalFieldValue | null>
-  >({})
+  const configuredUserFields = useMemo(
+    () =>
+      fieldsWithModelValues(
+        additionalFields ?? [],
+        detail ? (detail as unknown as Record<string, unknown>) : {}
+      ),
+    [additionalFields, detail]
+  )
   const profileForm = useAuthForm({
     defaultValues: {
+      additionalFields: getAdditionalFieldDefaultValues(configuredUserFields),
       email: "",
       emailVerified: false,
       name: "",
@@ -952,7 +952,10 @@ function UserDrawer({
           updateUser.mutateAsync({
             userId: detail.id,
             data: {
-              ...profileAdditionalFieldValuesRef.current,
+              ...getAdditionalFieldSubmitValues(
+                configuredUserFields,
+                value.additionalFields
+              ),
               name: value.name.trim(),
               ...(canSetEmail.data?.success
                 ? {
@@ -984,6 +987,7 @@ function UserDrawer({
 
   useEffect(() => {
     profileForm.reset({
+      additionalFields: getAdditionalFieldDefaultValues(configuredUserFields),
       email: detail?.email ?? "",
       emailVerified: detail?.emailVerified ?? false,
       name: detail?.name ?? "",
@@ -996,18 +1000,13 @@ function UserDrawer({
   }, [
     config.allowMultipleRoles,
     config.defaultRole,
+    configuredUserFields,
     detail?.email,
     detail?.emailVerified,
     detail?.name,
     detail?.role,
     profileForm.reset
   ])
-
-  useEffect(() => {
-    if (profileUserId.current === detail?.id) return
-    profileUserId.current = detail?.id
-    setProfileError(undefined)
-  }, [detail?.id])
 
   const confirmDangerousAction = () => {
     if (!detail) return
@@ -1080,26 +1079,6 @@ function UserDrawer({
         : dangerousAction === "revokeAll"
           ? config.localization.revokeAllSessions
           : config.localization.impersonateUser
-
-  const prepareSaveUser = async (formElement: HTMLFormElement) => {
-    if (!detail) return false
-
-    if (canUpdate.data?.success) {
-      const formData = new FormData(formElement)
-      let additionalFieldValues: Record<string, AdditionalFieldValue | null>
-      try {
-        additionalFieldValues = await parseAdditionalFieldValues(
-          additionalFields ?? [],
-          formData
-        )
-      } catch (error) {
-        setProfileError(error instanceof Error ? error.message : String(error))
-        return false
-      }
-      setProfileError(undefined)
-      profileAdditionalFieldValuesRef.current = additionalFieldValues
-    }
-  }
 
   return (
     <>
@@ -1200,10 +1179,7 @@ function UserDrawer({
                   </Tabs.ListContainer>
                   <Tabs.Panel className="min-h-0 overflow-hidden" id="overview">
                     <profileForm.AppForm>
-                      <profileForm.AuthFormRoot
-                        className="grid h-full grid-rows-[minmax(0,1fr)_auto]"
-                        prepareSubmit={prepareSaveUser}
-                      >
+                      <profileForm.AuthFormRoot className="grid h-full grid-rows-[minmax(0,1fr)_auto]">
                         <div className="overflow-y-auto">
                           <section className="flex flex-col gap-5 p-6">
                             <h3 className="font-medium">
@@ -1311,30 +1287,29 @@ function UserDrawer({
                                   </Select>
                                 )}
                               </profileForm.Field>
-                              {additionalFields?.map((field) => {
-                                const value = (
-                                  detail as unknown as Record<string, unknown>
-                                )[field.name]
-                                return (
-                                  <AdditionalField
-                                    field={{
-                                      ...field,
-                                      defaultValue:
-                                        value as AdditionalFieldValue | null
-                                    }}
-                                    isPending={
-                                      updateUser.isPending ||
-                                      !canUpdate.data?.success
-                                    }
-                                    key={`${detail.id}-${field.name}-${String(value ?? "")}`}
-                                    name={field.name}
-                                  />
-                                )
-                              })}
+                              {configuredUserFields.map((configuredField) => (
+                                <profileForm.AppField
+                                  key={configuredField.name}
+                                  name={`additionalFields.${configuredField.name}`}
+                                  validators={getAuthAdditionalFieldValidators(
+                                    configuredField,
+                                    localization.auth.fieldRequired
+                                  )}
+                                >
+                                  {(field) => (
+                                    <field.AuthFormAdditionalField
+                                      field={configuredField}
+                                      isPending={
+                                        updateUser.isPending ||
+                                        !canUpdate.data?.success
+                                      }
+                                    />
+                                  )}
+                                </profileForm.AppField>
+                              ))}
                             </div>
                             <FieldError>
-                              {profileError ??
-                                getAdminErrorMessage(updateUser.error) ??
+                              {getAdminErrorMessage(updateUser.error) ??
                                 getAdminErrorMessage(setRoleMutation.error)}
                             </FieldError>
                           </section>

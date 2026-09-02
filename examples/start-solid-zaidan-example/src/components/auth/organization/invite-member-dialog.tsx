@@ -1,4 +1,9 @@
-import { parseAdditionalFieldValues } from "@better-auth-ui/core"
+import {
+  getAdditionalFieldDefaultValues,
+  getAdditionalFieldSubmitValues,
+  getFormFieldErrors,
+  validateEmailAddress
+} from "@better-auth-ui/core"
 import type {
   InviteMemberParams,
   OrganizationAuthClient,
@@ -15,7 +20,7 @@ import {
   useListRoles,
   useListTeams
 } from "@better-auth-ui/solid/plugins/organization"
-import { createEffect, createMemo, createSignal, For, on, Show } from "solid-js"
+import { createEffect, createMemo, For, Show } from "solid-js"
 import { toast } from "solid-sonner"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
@@ -28,11 +33,15 @@ import {
   DialogHeader,
   DialogTitle
 } from "@/components/ui/dialog"
-import { Field, FieldLabel } from "@/components/ui/field"
+import { Field, FieldError, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import { NativeSelect, NativeSelectOption } from "@/components/ui/native-select"
 import { organizationPlugin } from "@/lib/auth/organization-plugin"
-import { AdditionalField } from "../additional-field"
+import {
+  createAuthForm,
+  getAuthAdditionalFieldValidators,
+  isAuthFormFieldInvalid
+} from "../auth-form"
 
 export type InviteMemberDialogProps = {
   open: boolean
@@ -79,21 +88,6 @@ export function InviteMemberDialog(props: InviteMemberDialogProps) {
     })
   )
   const invitations = useListOrganizationInvitations(auth.authClient)
-  const [email, setEmail] = createSignal("")
-  const [selectedRoles, setSelectedRoles] = createSignal<string[]>(
-    pickDefaultRole(roles()) ? [pickDefaultRole(roles())] : []
-  )
-  const toggleRole = (role: string, selected: boolean) =>
-    setSelectedRoles((current) => {
-      const next = selected
-        ? [...current, role]
-        : current.filter((entry) => entry !== role)
-
-      // An invitation always carries at least one role.
-      return next.length > 0 ? next : current
-    })
-  const [teamId, setTeamId] = createSignal("")
-  const [isSubmitting, setIsSubmitting] = createSignal(false)
   const inviteMember = useInviteMember(
     auth.authClient as OrganizationTeamsAuthClient,
     () => ({
@@ -104,228 +98,280 @@ export function InviteMemberDialog(props: InviteMemberDialogProps) {
     })
   )
 
+  const invitationLimitReached = createMemo(
+    () =>
+      config.invitationLimit !== undefined &&
+      (invitations.data?.filter((invitation) => invitation.status === "pending")
+        .length ?? 0) >= config.invitationLimit
+  )
+  const form = createAuthForm(() => ({
+    defaultValues: {
+      additionalFields: getAdditionalFieldDefaultValues(
+        config.modelFields.invitation
+      ),
+      email: "",
+      roles: [] as string[],
+      teamId: ""
+    },
+    onSubmit: async ({ value }) => {
+      const organizationId = activeOrganization.data?.id
+      const teamId = teams.data?.some((team) => team.id === value.teamId)
+        ? value.teamId
+        : undefined
+
+      if (
+        !organizationId ||
+        !canInvite.data?.success ||
+        value.roles.length === 0 ||
+        invitationLimitReached()
+      )
+        return
+
+      const payload = {
+        ...getAdditionalFieldSubmitValues(
+          config.modelFields.invitation,
+          value.additionalFields
+        ),
+        email: value.email.trim(),
+        organizationId,
+        teamId,
+        role: value.roles as InviteMemberParams["role"]
+      } satisfies InviteMemberParams<OrganizationTeamsAuthClient>
+
+      try {
+        await inviteMember.mutateAsync(payload)
+      } catch {
+        // The mutation reports the error through its configured handler.
+      }
+    }
+  }))
+
   createEffect(() => {
     if (!props.open) {
-      setEmail("")
-      setSelectedRoles([pickDefaultRole(roles())].filter(Boolean))
+      form.reset({
+        additionalFields: getAdditionalFieldDefaultValues(
+          config.modelFields.invitation
+        ),
+        email: "",
+        roles: [pickDefaultRole(roles())].filter(Boolean),
+        teamId: ""
+      })
       return
     }
 
     const available = roles()
-    const kept = selectedRoles().filter((entry) => entry in available)
+    const current = form.getFieldValue("roles")
+    const kept = current.filter((entry) => entry in available)
     const allowed = config.allowMultipleRoles ? kept : kept.slice(0, 1)
+    const next =
+      allowed.length > 0
+        ? allowed
+        : [pickDefaultRole(available)].filter(Boolean)
 
     if (
-      allowed.length !== selectedRoles().length ||
-      allowed.some((role, index) => role !== selectedRoles()[index])
+      next.length !== current.length ||
+      next.some((role, index) => role !== current[index])
     ) {
-      setSelectedRoles(
-        allowed.length > 0
-          ? allowed
-          : [pickDefaultRole(available)].filter(Boolean)
-      )
+      form.setFieldValue("roles", next)
     }
   })
-
-  createEffect(
-    on([() => props.open, () => activeOrganization.data?.id], () =>
-      setTeamId("")
-    )
-  )
-
-  const handleSubmit = async (event: SubmitEvent) => {
-    event.preventDefault()
-
-    const atInvitationLimit =
-      config.invitationLimit !== undefined &&
-      (invitations.data?.filter((invitation) => invitation.status === "pending")
-        .length ?? 0) >= config.invitationLimit
-
-    const organizationId = activeOrganization.data?.id
-    const invitationEmail = email().trim()
-    const invitationRoles = [...selectedRoles()] as InviteMemberParams["role"]
-    const currentTeamId = teamId()
-    const selectedTeamId = teams.data?.some((team) => team.id === currentTeamId)
-      ? currentTeamId
-      : undefined
-
-    if (
-      !organizationId ||
-      !canInvite.data?.success ||
-      !invitationEmail ||
-      invitationRoles.length === 0 ||
-      atInvitationLimit
-    )
-      return
-
-    const formData = new FormData(event.currentTarget as HTMLFormElement)
-    setIsSubmitting(true)
-    let invitationValues: Record<string, unknown>
-    try {
-      invitationValues = await parseAdditionalFieldValues(
-        config.modelFields.invitation,
-        formData
-      )
-    } catch (error) {
-      toast.error(error instanceof Error ? error.message : String(error))
-      setIsSubmitting(false)
-      return
-    }
-
-    const payload = {
-      ...invitationValues,
-      email: invitationEmail,
-      organizationId,
-      teamId: selectedTeamId,
-      role: invitationRoles
-    } satisfies InviteMemberParams<OrganizationTeamsAuthClient>
-
-    inviteMember.mutate(payload, { onSettled: () => setIsSubmitting(false) })
-  }
 
   return (
     <Dialog open={props.open} onOpenChange={props.onOpenChange}>
       <DialogContent>
-        <form class="flex flex-col gap-6" onSubmit={handleSubmit}>
-          <DialogHeader>
-            <DialogTitle>{config.localization.inviteMember}</DialogTitle>
-            <DialogDescription>
-              {config.localization.inviteMemberDescription}
-            </DialogDescription>
-          </DialogHeader>
+        <form.AppForm>
+          <form.AuthFormRoot class="flex flex-col gap-6">
+            <DialogHeader>
+              <DialogTitle>{config.localization.inviteMember}</DialogTitle>
+              <DialogDescription>
+                {config.localization.inviteMemberDescription}
+              </DialogDescription>
+            </DialogHeader>
 
-          <Field>
-            <FieldLabel for="invite-member-email">
-              {auth.localization.auth.email}
-            </FieldLabel>
-            <Input
-              autofocus
-              disabled={inviteMember.isPending}
-              id="invite-member-email"
+            <form.AppField
               name="email"
-              onInput={(event) => setEmail(event.currentTarget.value)}
-              required
-              type="email"
-              value={email()}
-            />
-          </Field>
+              validators={{
+                onChange: ({ value }) =>
+                  validateEmailAddress(value, {
+                    invalidMessage: auth.localization.auth.invalidEmail,
+                    requiredMessage: auth.localization.auth.fieldRequired
+                  })
+              }}
+            >
+              {(field) => {
+                const isInvalid = () =>
+                  isAuthFormFieldInvalid(field().state.meta)
+                return (
+                  <Field data-invalid={isInvalid()}>
+                    <FieldLabel for="invite-member-email">
+                      {auth.localization.auth.email}
+                    </FieldLabel>
+                    <Input
+                      aria-invalid={isInvalid()}
+                      autofocus
+                      disabled={inviteMember.isPending}
+                      id="invite-member-email"
+                      name={field().name}
+                      onBlur={field().handleBlur}
+                      onInput={(event) =>
+                        field().handleChange(event.currentTarget.value)
+                      }
+                      type="email"
+                      value={field().state.value}
+                    />
+                    <FieldError
+                      errors={getFormFieldErrors(field().state.meta.errors)}
+                    />
+                  </Field>
+                )
+              }}
+            </form.AppField>
 
-          <Show
-            when={config.allowMultipleRoles}
-            fallback={
-              <Field>
-                <FieldLabel for="invite-member-role">
-                  {config.localization.role}
-                </FieldLabel>
-                <NativeSelect
-                  class="w-full"
-                  disabled={inviteMember.isPending}
-                  id="invite-member-role"
-                  onChange={(event) =>
-                    setSelectedRoles([event.currentTarget.value])
-                  }
-                  value={selectedRoles()[0] ?? ""}
-                >
-                  <For each={Object.entries(roles())}>
-                    {([value, label]) => (
-                      <NativeSelectOption value={value}>
-                        {label}
-                      </NativeSelectOption>
-                    )}
-                  </For>
-                </NativeSelect>
-              </Field>
-            }
-          >
-            <fieldset class="flex flex-col gap-2">
-              <legend class="font-medium text-sm">
-                {config.localization.role}
-              </legend>
-              <div class="flex flex-wrap gap-4">
-                <For each={Object.entries(roles())}>
-                  {([value, label]) => (
-                    <Field orientation="horizontal">
-                      <Checkbox
-                        checked={selectedRoles().includes(value)}
-                        disabled={inviteMember.isPending}
-                        id={`invite-member-role-${value}`}
-                        onChange={(selected) => toggleRole(value, selected)}
-                      />
-                      <FieldLabel for={`invite-member-role-${value}`}>
-                        {label}
+            <form.AppField
+              name="roles"
+              validators={{
+                onChange: ({ value }) =>
+                  value.length > 0
+                    ? undefined
+                    : auth.localization.auth.fieldRequired
+              }}
+            >
+              {(field) => (
+                <Show
+                  when={config.allowMultipleRoles}
+                  fallback={
+                    <Field>
+                      <FieldLabel for="invite-member-role">
+                        {config.localization.role}
                       </FieldLabel>
+                      <NativeSelect
+                        class="w-full"
+                        disabled={inviteMember.isPending}
+                        id="invite-member-role"
+                        onBlur={field().handleBlur}
+                        onChange={(event) =>
+                          field().handleChange([event.currentTarget.value])
+                        }
+                        value={field().state.value[0] ?? ""}
+                      >
+                        <For each={Object.entries(roles())}>
+                          {([value, label]) => (
+                            <NativeSelectOption value={value}>
+                              {label}
+                            </NativeSelectOption>
+                          )}
+                        </For>
+                      </NativeSelect>
                     </Field>
-                  )}
-                </For>
-              </div>
-            </fieldset>
-          </Show>
+                  }
+                >
+                  <fieldset class="flex flex-col gap-2">
+                    <legend class="font-medium text-sm">
+                      {config.localization.role}
+                    </legend>
+                    <div class="flex flex-wrap gap-4">
+                      <For each={Object.entries(roles())}>
+                        {([value, label]) => (
+                          <Field orientation="horizontal">
+                            <Checkbox
+                              checked={field().state.value.includes(value)}
+                              disabled={inviteMember.isPending}
+                              id={`invite-member-role-${value}`}
+                              onChange={(selected) => {
+                                const current = field().state.value
+                                const next = selected
+                                  ? [...current, value]
+                                  : current.filter((entry) => entry !== value)
+                                if (next.length > 0) field().handleChange(next)
+                              }}
+                            />
+                            <FieldLabel for={`invite-member-role-${value}`}>
+                              {label}
+                            </FieldLabel>
+                          </Field>
+                        )}
+                      </For>
+                    </div>
+                  </fieldset>
+                </Show>
+              )}
+            </form.AppField>
 
-          <Show when={config.teams}>
-            <Field>
-              <FieldLabel for="invite-member-team">
-                {config.localization.team}
-              </FieldLabel>
-              <NativeSelect
-                class="w-full"
+            <Show when={config.teams}>
+              <form.AppField name="teamId">
+                {(field) => (
+                  <Field>
+                    <FieldLabel for="invite-member-team">
+                      {config.localization.team}
+                    </FieldLabel>
+                    <NativeSelect
+                      class="w-full"
+                      disabled={inviteMember.isPending}
+                      id="invite-member-team"
+                      onBlur={field().handleBlur}
+                      onChange={(event) =>
+                        field().handleChange(event.currentTarget.value)
+                      }
+                      value={field().state.value}
+                    >
+                      <NativeSelectOption value="">
+                        {config.localization.selectTeam}
+                      </NativeSelectOption>
+                      <For each={teams.data}>
+                        {(team) => (
+                          <NativeSelectOption value={team.id}>
+                            {team.name}
+                          </NativeSelectOption>
+                        )}
+                      </For>
+                    </NativeSelect>
+                  </Field>
+                )}
+              </form.AppField>
+            </Show>
+
+            <For each={config.modelFields.invitation}>
+              {(configuredField) => (
+                <form.AppField
+                  name={`additionalFields.${configuredField.name}`}
+                  validators={getAuthAdditionalFieldValidators(
+                    configuredField,
+                    auth.localization.auth.fieldRequired
+                  )}
+                >
+                  {(field) => (
+                    <field.AuthFormAdditionalField
+                      field={configuredField}
+                      isPending={inviteMember.isPending}
+                      optionalLabel={auth.localization.settings.optional}
+                    />
+                  )}
+                </form.AppField>
+              )}
+            </For>
+
+            <DialogFooter>
+              <DialogClose
+                as={Button}
                 disabled={inviteMember.isPending}
-                id="invite-member-team"
-                onChange={(event) => setTeamId(event.currentTarget.value)}
-                value={teamId()}
+                type="button"
+                variant="outline"
               >
-                <NativeSelectOption value="">
-                  {config.localization.selectTeam}
-                </NativeSelectOption>
-                <For each={teams.data}>
-                  {(team) => (
-                    <NativeSelectOption value={team.id}>
-                      {team.name}
-                    </NativeSelectOption>
-                  )}
-                </For>
-              </NativeSelect>
-            </Field>
-          </Show>
-
-          <For each={config.modelFields.invitation}>
-            {(field) => (
-              <AdditionalField
-                field={field}
-                isPending={inviteMember.isPending || isSubmitting()}
-                name={field.name}
-                optionalLabel={auth.localization.settings.optional}
-              />
-            )}
-          </For>
-
-          <DialogFooter>
-            <DialogClose
-              as={Button}
-              disabled={inviteMember.isPending || isSubmitting()}
-              type="button"
-              variant="outline"
-            >
-              {auth.localization.settings.cancel}
-            </DialogClose>
-            <Button
-              disabled={
-                inviteMember.isPending ||
-                isSubmitting() ||
-                canInvite.isPending ||
-                !canInvite.data?.success ||
-                !email().trim() ||
-                selectedRoles().length === 0 ||
-                (config.invitationLimit !== undefined &&
-                  (invitations.data?.filter(
-                    (invitation) => invitation.status === "pending"
-                  ).length ?? 0) >= config.invitationLimit)
-              }
-              type="submit"
-            >
-              {config.localization.inviteMember}
-            </Button>
-          </DialogFooter>
-        </form>
+                {auth.localization.settings.cancel}
+              </DialogClose>
+              <form.AuthFormSubmitButton
+                disabled={
+                  inviteMember.isPending ||
+                  canInvite.isPending ||
+                  !canInvite.data?.success ||
+                  invitationLimitReached()
+                }
+              >
+                {config.localization.inviteMember}
+              </form.AuthFormSubmitButton>
+            </DialogFooter>
+          </form.AuthFormRoot>
+        </form.AppForm>
       </DialogContent>
     </Dialog>
   )

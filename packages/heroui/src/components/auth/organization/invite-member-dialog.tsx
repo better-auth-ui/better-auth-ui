@@ -1,4 +1,8 @@
-import { parseAdditionalFieldValues } from "@better-auth-ui/core"
+import {
+  getAdditionalFieldDefaultValues,
+  getAdditionalFieldSubmitValues,
+  validateEmailAddress
+} from "@better-auth-ui/core"
 import {
   mergeOrganizationRoleLabels,
   type OrganizationAuthClient,
@@ -19,26 +23,21 @@ import {
   AlertDialog,
   Button,
   Checkbox,
-  FieldError,
-  Form,
   Input,
   Label,
   ListBox,
   Select,
-  Spinner,
   TextField,
   toast
 } from "@heroui/react"
-import {
-  type SyntheticEvent,
-  useEffect,
-  useMemo,
-  useRef,
-  useState
-} from "react"
+import { useEffect, useMemo, useRef } from "react"
 
 import { organizationPlugin } from "../../../lib/auth/organization-plugin"
-import { AdditionalField } from "../additional-field"
+import {
+  getAuthAdditionalFieldValidators,
+  isAuthFormFieldInvalid,
+  useAuthForm
+} from "../auth-form"
 
 /** Props for the {@link InviteMemberDialog} component. */
 export type InviteMemberDialogProps = {
@@ -102,37 +101,10 @@ export function InviteMemberDialog({
     invitationLimit !== undefined &&
     (invitations.data?.filter((invitation) => invitation.status === "pending")
       .length ?? 0) >= invitationLimit
-  const [teamIds, setTeamIds] = useState<string[]>([])
-  const [isSubmitting, setIsSubmitting] = useState(false)
   const activeOrganizationId = activeOrganization?.id
   const previousOrganizationId = useRef(activeOrganizationId)
 
-  const [selectedRoles, setSelectedRoles] = useState(() => {
-    const fallback = pickDefaultRole(Object.keys(assignableRoles))
-    return fallback ? [fallback] : []
-  })
-
-  useEffect(() => {
-    setSelectedRoles((current) => {
-      const keys = Object.keys(assignableRoles)
-      const kept = current.filter((entry) => keys.includes(entry))
-
-      if (kept.length > 0) return allowMultipleRoles ? kept : kept.slice(0, 1)
-
-      const fallback = pickDefaultRole(keys)
-      return fallback ? [fallback] : []
-    })
-  }, [allowMultipleRoles, assignableRoles])
-
-  useEffect(() => {
-    const organizationChanged =
-      previousOrganizationId.current !== activeOrganizationId
-
-    if (isOpen || organizationChanged) setTeamIds([])
-    previousOrganizationId.current = activeOrganizationId
-  }, [isOpen, activeOrganizationId])
-
-  const { mutate: inviteMember, isPending: isInviting } = useInviteMember(
+  const { mutateAsync: inviteMember, isPending: isInviting } = useInviteMember(
     authClient as OrganizationTeamsAuthClient,
     {
       onSuccess: () => {
@@ -142,203 +114,258 @@ export function InviteMemberDialog({
     }
   )
 
-  const isRoleValid = selectedRoles.length > 0
-
-  const handleSubmit = async (e: SyntheticEvent<HTMLFormElement>) => {
-    e.preventDefault()
-
-    if (
-      !activeOrganizationId ||
-      !canInvite.data?.success ||
-      !isRoleValid ||
-      invitationLimitReached
-    )
-      return
-
-    const formData = new FormData(e.currentTarget)
-    const invitationEmail = (formData.get("email") as string).trim()
-    const invitationRoles = [...selectedRoles] as Parameters<
-      typeof inviteMember
-    >[0]["role"]
-    const availableTeamIds = new Set(teams.data?.map((team) => team.id))
-    const selectedTeamIds = teamIds.filter((teamId) =>
-      availableTeamIds.has(teamId)
-    )
-
-    setIsSubmitting(true)
-    let invitationValues: Record<string, unknown>
-    try {
-      invitationValues = await parseAdditionalFieldValues(
-        invitationFields,
-        formData
+  const form = useAuthForm({
+    defaultValues: {
+      additionalFields: getAdditionalFieldDefaultValues(invitationFields),
+      email: "",
+      roles: [] as string[],
+      teamIds: [] as string[]
+    },
+    onSubmit: async ({ value }) => {
+      if (
+        !activeOrganizationId ||
+        !canInvite.data?.success ||
+        value.roles.length === 0 ||
+        invitationLimitReached
       )
-    } catch (error) {
-      toast.danger(error instanceof Error ? error.message : String(error))
-      setIsSubmitting(false)
-      return
-    }
+        return
 
-    inviteMember(
-      {
-        ...invitationValues,
-        email: invitationEmail,
-        organizationId: activeOrganizationId,
-        role: invitationRoles,
-        ...(selectedTeamIds.length ? { teamId: selectedTeamIds } : {})
-      },
-      { onSettled: () => setIsSubmitting(false) }
-    )
-  }
+      const availableTeamIds = new Set(teams.data?.map((team) => team.id))
+      const teamIds = value.teamIds.filter((teamId) =>
+        availableTeamIds.has(teamId)
+      )
+
+      try {
+        await inviteMember({
+          ...getAdditionalFieldSubmitValues(
+            invitationFields,
+            value.additionalFields
+          ),
+          email: value.email.trim(),
+          organizationId: activeOrganizationId,
+          role: value.roles as Parameters<typeof inviteMember>[0]["role"],
+          ...(teamIds.length ? { teamId: teamIds } : {})
+        })
+      } catch {
+        // The mutation reports the error through its configured handler.
+      }
+    }
+  })
+
+  useEffect(() => {
+    const keys = Object.keys(assignableRoles)
+    const current = form.getFieldValue("roles")
+    const kept = current.filter((entry) => keys.includes(entry))
+    const roles =
+      kept.length > 0
+        ? allowMultipleRoles
+          ? kept
+          : kept.slice(0, 1)
+        : (() => {
+            const fallback = pickDefaultRole(keys)
+            return fallback ? [fallback] : []
+          })()
+
+    form.setFieldValue("roles", roles)
+  }, [allowMultipleRoles, assignableRoles, form])
+
+  useEffect(() => {
+    const organizationChanged =
+      previousOrganizationId.current !== activeOrganizationId
+
+    if (isOpen || organizationChanged) {
+      const fallback = pickDefaultRole(Object.keys(assignableRoles))
+      form.reset({
+        additionalFields: getAdditionalFieldDefaultValues(invitationFields),
+        email: "",
+        roles: fallback ? [fallback] : [],
+        teamIds: []
+      })
+    }
+    previousOrganizationId.current = activeOrganizationId
+  }, [activeOrganizationId, assignableRoles, form, invitationFields, isOpen])
 
   return (
     <AlertDialog.Backdrop isOpen={isOpen} onOpenChange={onOpenChange}>
       <AlertDialog.Container>
         <AlertDialog.Dialog>
-          <Form onSubmit={handleSubmit}>
-            <AlertDialog.CloseTrigger />
+          <form.AppForm>
+            <form.AuthFormRoot>
+              <AlertDialog.CloseTrigger />
 
-            <AlertDialog.Header>
-              <AlertDialog.Icon status="default">
-                <PersonPlus />
-              </AlertDialog.Icon>
+              <AlertDialog.Header>
+                <AlertDialog.Icon status="default">
+                  <PersonPlus />
+                </AlertDialog.Icon>
 
-              <AlertDialog.Heading>
-                {organizationLocalization.inviteMember}
-              </AlertDialog.Heading>
-            </AlertDialog.Header>
+                <AlertDialog.Heading>
+                  {organizationLocalization.inviteMember}
+                </AlertDialog.Heading>
+              </AlertDialog.Header>
 
-            <AlertDialog.Body className="flex flex-col gap-4 overflow-visible">
-              <p className="text-muted text-sm">
-                {organizationLocalization.inviteMemberDescription}
-              </p>
-              {invitationLimitReached && (
-                <p className="text-danger text-sm" role="alert">
-                  {organizationLocalization.invitationLimitReached}
+              <AlertDialog.Body className="flex flex-col gap-4 overflow-visible">
+                <p className="text-muted text-sm">
+                  {organizationLocalization.inviteMemberDescription}
                 </p>
-              )}
-
-              <TextField
-                id="email"
-                name="email"
-                type="email"
-                isDisabled={isInviting || isSubmitting}
-                validate={(value) => {
-                  if (!value) return localization.auth.fieldRequired
-                  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value))
-                    return localization.auth.invalidEmail
-                }}
-              >
-                <Label>{localization.auth.email}</Label>
-
-                <Input
-                  autoFocus
-                  placeholder={localization.auth.email}
-                  variant="secondary"
-                  required
-                />
-
-                <FieldError />
-              </TextField>
-
-              <Select
-                name="role"
-                selectionMode={allowMultipleRoles ? "multiple" : "single"}
-                value={selectedRoles}
-                onChange={(keys) => {
-                  const next = [...(keys as Iterable<string>)]
-
-                  // An invitation always carries at least one role.
-                  if (next.length === 0) return
-
-                  setSelectedRoles(allowMultipleRoles ? next : next.slice(0, 1))
-                }}
-                isDisabled={isInviting || isSubmitting}
-                variant="secondary"
-                fullWidth
-              >
-                <Label>{organizationLocalization.role}</Label>
-
-                <Select.Trigger>
-                  <Select.Value />
-                  <Select.Indicator />
-                </Select.Trigger>
-
-                <Select.Popover>
-                  <ListBox
-                    selectionMode={allowMultipleRoles ? "multiple" : "single"}
-                  >
-                    {Object.entries(assignableRoles).map(([key, label]) => (
-                      <ListBox.Item key={key} id={key} textValue={label}>
-                        {label}
-
-                        <ListBox.ItemIndicator />
-                      </ListBox.Item>
-                    ))}
-                  </ListBox>
-                </Select.Popover>
-
-                <FieldError />
-              </Select>
-              {teamsEnabled && (teams.data?.length ?? 0) > 0 && (
-                <div className="flex flex-col gap-2">
-                  <Label>{organizationLocalization.teams}</Label>
-                  <div className="flex flex-wrap gap-3">
-                    {teams.data?.map((team) => (
-                      <Checkbox
-                        key={team.id}
-                        isSelected={teamIds.includes(team.id)}
-                        onChange={(selected) =>
-                          setTeamIds((current) =>
-                            selected
-                              ? [...current, team.id]
-                              : current.filter((id) => id !== team.id)
-                          )
-                        }
-                      >
-                        {team.name}
-                      </Checkbox>
-                    ))}
-                  </div>
-                </div>
-              )}
-              {invitationFields.map((field) => (
-                <AdditionalField
-                  key={field.name}
-                  field={field}
-                  name={field.name}
-                  isPending={isInviting || isSubmitting}
-                  optionalLabel={localization.settings.optional}
-                />
-              ))}
-            </AlertDialog.Body>
-
-            <AlertDialog.Footer>
-              <Button
-                slot="close"
-                variant="tertiary"
-                isDisabled={isInviting || isSubmitting}
-              >
-                {localization.settings.cancel}
-              </Button>
-
-              <Button
-                type="submit"
-                isPending={isInviting || isSubmitting}
-                isDisabled={
-                  !isRoleValid ||
-                  invitationLimitReached ||
-                  canInvite.isPending ||
-                  !canInvite.data?.success
-                }
-              >
-                {(isInviting || isSubmitting) && (
-                  <Spinner color="current" size="sm" />
+                {invitationLimitReached && (
+                  <p className="text-danger text-sm" role="alert">
+                    {organizationLocalization.invitationLimitReached}
+                  </p>
                 )}
 
-                {organizationLocalization.inviteMember}
-              </Button>
-            </AlertDialog.Footer>
-          </Form>
+                <form.AppField
+                  name="email"
+                  validators={{
+                    onChange: ({ value }) =>
+                      validateEmailAddress(value, {
+                        invalidMessage: localization.auth.invalidEmail,
+                        requiredMessage: localization.auth.fieldRequired
+                      })
+                  }}
+                >
+                  {(field) => (
+                    <TextField
+                      id="email"
+                      name={field.name}
+                      type="email"
+                      isDisabled={isInviting}
+                      isInvalid={isAuthFormFieldInvalid(field.state.meta)}
+                      value={field.state.value}
+                      onBlur={field.handleBlur}
+                      onChange={field.handleChange}
+                    >
+                      <Label>{localization.auth.email}</Label>
+                      <Input
+                        autoFocus
+                        placeholder={localization.auth.email}
+                        variant="secondary"
+                      />
+                      <field.AuthFormFieldError />
+                    </TextField>
+                  )}
+                </form.AppField>
+
+                <form.AppField
+                  name="roles"
+                  validators={{
+                    onChange: ({ value }) =>
+                      value.length > 0
+                        ? undefined
+                        : localization.auth.fieldRequired
+                  }}
+                >
+                  {(field) => (
+                    <Select
+                      name={field.name}
+                      selectionMode={allowMultipleRoles ? "multiple" : "single"}
+                      value={field.state.value}
+                      onBlur={field.handleBlur}
+                      onChange={(keys) => {
+                        const next = [...(keys as Iterable<string>)]
+                        if (next.length === 0) return
+                        field.handleChange(
+                          allowMultipleRoles ? next : next.slice(0, 1)
+                        )
+                      }}
+                      isDisabled={isInviting}
+                      isInvalid={isAuthFormFieldInvalid(field.state.meta)}
+                      variant="secondary"
+                      fullWidth
+                    >
+                      <Label>{organizationLocalization.role}</Label>
+                      <Select.Trigger>
+                        <Select.Value />
+                        <Select.Indicator />
+                      </Select.Trigger>
+                      <Select.Popover>
+                        <ListBox
+                          selectionMode={
+                            allowMultipleRoles ? "multiple" : "single"
+                          }
+                        >
+                          {Object.entries(assignableRoles).map(
+                            ([key, label]) => (
+                              <ListBox.Item
+                                key={key}
+                                id={key}
+                                textValue={label}
+                              >
+                                {label}
+                                <ListBox.ItemIndicator />
+                              </ListBox.Item>
+                            )
+                          )}
+                        </ListBox>
+                      </Select.Popover>
+                      <field.AuthFormFieldError />
+                    </Select>
+                  )}
+                </form.AppField>
+                {teamsEnabled && (teams.data?.length ?? 0) > 0 && (
+                  <form.AppField name="teamIds">
+                    {(field) => (
+                      <div className="flex flex-col gap-2">
+                        <Label>{organizationLocalization.teams}</Label>
+                        <div className="flex flex-wrap gap-3">
+                          {teams.data?.map((team) => (
+                            <Checkbox
+                              key={team.id}
+                              isSelected={field.state.value.includes(team.id)}
+                              onChange={(selected) =>
+                                field.handleChange(
+                                  selected
+                                    ? [...field.state.value, team.id]
+                                    : field.state.value.filter(
+                                        (id) => id !== team.id
+                                      )
+                                )
+                              }
+                            >
+                              {team.name}
+                            </Checkbox>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </form.AppField>
+                )}
+                {invitationFields.map((configuredField) => (
+                  <form.AppField
+                    key={configuredField.name}
+                    name={`additionalFields.${configuredField.name}`}
+                    validators={getAuthAdditionalFieldValidators(
+                      configuredField,
+                      localization.auth.fieldRequired
+                    )}
+                  >
+                    {(field) => (
+                      <field.AuthFormAdditionalField
+                        field={configuredField}
+                        isPending={isInviting}
+                        optionalLabel={localization.settings.optional}
+                      />
+                    )}
+                  </form.AppField>
+                ))}
+              </AlertDialog.Body>
+
+              <AlertDialog.Footer>
+                <Button slot="close" variant="tertiary" isDisabled={isInviting}>
+                  {localization.settings.cancel}
+                </Button>
+
+                <form.AuthFormSubmitButton
+                  isDisabled={
+                    invitationLimitReached ||
+                    canInvite.isPending ||
+                    !canInvite.data?.success
+                  }
+                >
+                  {organizationLocalization.inviteMember}
+                </form.AuthFormSubmitButton>
+              </AlertDialog.Footer>
+            </form.AuthFormRoot>
+          </form.AppForm>
         </AlertDialog.Dialog>
       </AlertDialog.Container>
     </AlertDialog.Backdrop>
