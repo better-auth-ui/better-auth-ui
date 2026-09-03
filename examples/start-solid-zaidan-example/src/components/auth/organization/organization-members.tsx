@@ -637,7 +637,11 @@ export function OrganizationMembers(props: OrganizationMembersProps) {
                   <TableRow>
                     <TableCell
                       class="text-muted-foreground text-sm"
-                      colSpan={showTeams() ? 4 : 3}
+                      colSpan={
+                        table.getVisibleLeafColumns().length +
+                        1 +
+                        Number(canDeleteMembers.data?.success === true)
+                      }
                     >
                       No members match the current filters.
                     </TableCell>
