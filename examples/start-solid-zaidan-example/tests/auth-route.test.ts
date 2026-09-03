@@ -1363,7 +1363,7 @@ describe("Solid auth route component selection", () => {
 
     expect(signIn).toContain('from "./username/sign-in-username"')
     expect(signIn).not.toContain("function resolveSubmittedSignIn")
-    expect(signInUsername).toContain("resolveSubmittedSignIn")
+    expect(signInUsername).toContain("resolveSignInPath")
     expect(signInUsername).toContain("useSignInUsername")
     expect(signInUsername).toContain("authQueryKeys.session")
     expect(userProfile).toContain(
@@ -1992,9 +1992,9 @@ describe("Solid auth route component selection", () => {
 
     expect(changeEmail).toContain("useChangeEmail")
     expect(changeEmail).toContain("const changeEmail = useChangeEmail")
-    expect(changeEmail).toContain("onSubmit={submitChangeEmail}")
-    expect(changeEmail).toContain("const formData = new FormData")
-    expect(changeEmail).toContain('formData.get("email")')
+    expect(changeEmail).toContain("createAuthForm")
+    expect(changeEmail).toContain("changeEmail.mutateAsync")
+    expect(changeEmail).toContain("value.email")
     expect(changeEmail).toContain("newEmail:")
     expect(changeEmail).toContain("callbackURL:")
     expect(changeEmail).toContain("auth.baseURL")
@@ -2699,7 +2699,7 @@ describe("Solid auth route component selection", () => {
     expect(createApiKeyDialog).not.toMatch(
       /auth\.authClient\s+as\s+ApiKeyAuthClient/
     )
-    expect(createApiKeyDialog).toContain("createApiKey.mutate(")
+    expect(createApiKeyDialog).toContain("createApiKey.mutateAsync(")
     expect(createApiKeyDialog).toContain("setNewApiKeySecret(apiKey.key)")
     expect(createApiKeyDialog).toContain("setIsNewKeyDialogOpen(true)")
     expect(newApiKeyDialog).toContain("createCopyToClipboard")
@@ -2893,7 +2893,7 @@ describe("Solid auth route component selection", () => {
     )
     expect(passkeys).toContain("onPasskeyAdded={() => passkeys.refetch()}")
     expect(addPasskeyDialog).toContain("props.onPasskeyAdded()")
-    expect(addPasskeyDialog).toContain("addPasskey.mutate(")
+    expect(addPasskeyDialog).toContain("addPasskey.mutateAsync(")
     expect(addPasskeyDialog).toContain("useAuthPlugin(passkeyPlugin)")
     expect(addPasskeyDialog).toContain("authenticatorAttachment")
     expect(addPasskeyDialog).toContain("props.onOpenChange(false)")
@@ -3001,7 +3001,7 @@ describe("Solid auth route component selection", () => {
       "queryClient.removeQueries({ queryKey: authQueryKeys.all })"
     )
     expect(deleteAccount).toContain("auth.viewPaths.auth.signIn")
-    expect(deleteAccount).toContain('setPassword("")')
+    expect(deleteAccount).toContain("form.reset()")
     expect(deleteAccount).toContain('name="password"')
     expect(deleteAccount).toContain('autocomplete="current-password"')
     expect(deleteAccount).toContain(

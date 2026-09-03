@@ -1,10 +1,45 @@
+import type { TablePersistenceAdapters } from "@better-auth-ui/core"
 import { cleanup, fireEvent, render } from "@solidjs/testing-library"
 import { afterEach, describe, expect, it, vi } from "vitest"
 
-import { createAuthForm } from "../src/components/auth/auth-form"
+import {
+  createAuthForm,
+  setAuthFormServerError
+} from "../src/components/auth/auth-form"
+import {
+  createOrganizationColumnHelper,
+  createOrganizationTable
+} from "../src/components/auth/organization/organization-table"
+import { OrganizationTableRenderer } from "../src/components/auth/organization/organization-table-renderer"
 import { OrganizationTableSelectRow } from "../src/components/auth/organization/organization-table-selection"
+import { createOrganizationTableState } from "../src/components/auth/organization/organization-table-state"
 
 afterEach(cleanup)
+
+type TestRow = {
+  group: string
+  id: string
+  name: string
+}
+
+const tableColumnHelper = createOrganizationColumnHelper<TestRow>()
+const tableColumns = tableColumnHelper.columns([
+  tableColumnHelper.accessor("group", {
+    cell: ({ getValue }) => getValue(),
+    filterFn: "includesString",
+    header: "Group"
+  }),
+  tableColumnHelper.accessor("name", {
+    cell: ({ getValue }) => getValue(),
+    filterFn: "includesString",
+    header: "Name"
+  })
+])
+const tableRows: TestRow[] = [
+  { group: "b", id: "1", name: "Ada" },
+  { group: "a", id: "2", name: "Charlie" },
+  { group: "a", id: "3", name: "Bea" }
+]
 
 function NativeValidationForm() {
   const form = createAuthForm(() => ({
@@ -35,6 +70,106 @@ function PendingAuthForm(props: { onSubmit: () => Promise<void> }) {
         <form.AuthFormSubmitButton>Submit</form.AuthFormSubmitButton>
       </form.AuthFormRoot>
     </form.AppForm>
+  )
+}
+
+function ValidatedAuthForm() {
+  const form = createAuthForm(() => ({
+    defaultValues: { email: "" },
+    onSubmit: async () => {
+      setAuthFormServerError(
+        form,
+        {
+          fields: { email: "This email is already registered" },
+          message: "Account creation failed"
+        },
+        "Fallback submission error"
+      )
+      throw new Error("Mutation rejected")
+    }
+  }))
+
+  return (
+    <form.AppForm>
+      <form.AuthFormRoot>
+        <form.AppField
+          name="email"
+          validators={{
+            onChange: ({ value }) => (value ? undefined : "Email is required")
+          }}
+        >
+          {(field) => <field.AuthFormTextField label="Email" type="email" />}
+        </form.AppField>
+        <form.AuthFormSubmitButton>Submit</form.AuthFormSubmitButton>
+        <form.AuthFormServerError />
+      </form.AuthFormRoot>
+    </form.AppForm>
+  )
+}
+
+function OrganizationTableFixture() {
+  const table = createOrganizationTable({
+    columns: tableColumns,
+    data: tableRows,
+    getRowId: (row) => row.id,
+    initialState: { pagination: { pageIndex: 0, pageSize: 2 } }
+  })
+
+  return (
+    <>
+      <button
+        onClick={() => table.getColumn("group")?.setFilterValue("a")}
+        type="button"
+      >
+        Filter group
+      </button>
+      <button
+        onClick={() => table.getColumn("name")?.toggleSorting(true)}
+        type="button"
+      >
+        Sort names
+      </button>
+      <button onClick={() => table.nextPage()} type="button">
+        Next page
+      </button>
+      <button
+        onClick={() => table.getRow("1").toggleSelected(true)}
+        type="button"
+      >
+        Select Ada
+      </button>
+      <output aria-label="Selected rows">
+        {table
+          .getSelectedRowModel()
+          .rows.map((row) => row.id)
+          .join(",")}
+      </output>
+      <OrganizationTableRenderer empty="No people" table={table} />
+    </>
+  )
+}
+
+function RouterTableStateFixture(props: {
+  adapters: TablePersistenceAdapters
+}) {
+  const state = createOrganizationTableState(
+    "router",
+    10,
+    ["group", "name"],
+    props.adapters
+  )
+
+  return (
+    <>
+      <button onClick={() => state.setGlobalFilter("local")} type="button">
+        Set table search
+      </button>
+      <output aria-label="Restored table state">
+        {state.ready()
+          ? `${state.globalFilter()}|${state.sorting()[0]?.id ?? ""}|${state.pagination().pageIndex}`
+          : "loading"}
+      </output>
+    </>
   )
 }
 
@@ -73,6 +208,26 @@ describe("Solid auth form", () => {
     finishSubmission()
     await vi.waitFor(() => expect(submitButton).toBeEnabled())
   })
+
+  it("owns field validation and maps rejected server errors", async () => {
+    const view = render(() => <ValidatedAuthForm />)
+    const email = view.getByRole("textbox", { name: "Email" })
+    const submit = view.getByRole("button", { name: "Submit" })
+
+    fireEvent.input(email, { target: { value: "" } })
+    fireEvent.blur(email)
+    await vi.waitFor(() =>
+      expect(view.getByText("Email is required")).toBeVisible()
+    )
+
+    fireEvent.input(email, { target: { value: "ada@example.com" } })
+    fireEvent.click(submit)
+
+    await vi.waitFor(() =>
+      expect(view.getByText("This email is already registered")).toBeVisible()
+    )
+    expect(view.getByText("Account creation failed")).toBeVisible()
+  })
 })
 
 describe("Solid organization table selection", () => {
@@ -101,5 +256,114 @@ describe("Solid organization table selection", () => {
       shiftKey: true,
       target: { checked: true }
     })
+  })
+
+  it("renders columns and composes filtering, sorting, pagination, and selection", async () => {
+    const view = render(() => <OrganizationTableFixture />)
+
+    expect(view.getByRole("columnheader", { name: "Group" })).toBeVisible()
+    expect(view.getByRole("columnheader", { name: "Name" })).toBeVisible()
+    expect(view.getByRole("cell", { name: "Ada" })).toBeVisible()
+    expect(view.getByRole("cell", { name: "Charlie" })).toBeVisible()
+    expect(view.queryByRole("cell", { name: "Bea" })).not.toBeInTheDocument()
+
+    fireEvent.click(view.getByRole("button", { name: "Select Ada" }))
+    expect(
+      view.getByRole("status", { name: "Selected rows" })
+    ).toHaveTextContent("1")
+
+    fireEvent.click(view.getByRole("button", { name: "Next page" }))
+    await vi.waitFor(() =>
+      expect(view.getByRole("cell", { name: "Bea" })).toBeVisible()
+    )
+
+    fireEvent.click(view.getByRole("button", { name: "Filter group" }))
+    await vi.waitFor(() => {
+      expect(view.queryByRole("cell", { name: "Ada" })).not.toBeInTheDocument()
+      expect(view.getByRole("cell", { name: "Charlie" })).toBeVisible()
+      expect(view.getByRole("cell", { name: "Bea" })).toBeVisible()
+    })
+
+    fireEvent.click(view.getByRole("button", { name: "Sort names" }))
+    await vi.waitFor(() => {
+      const names = view
+        .getAllByRole("cell")
+        .map((cell) => cell.textContent)
+        .filter((value) => value === "Bea" || value === "Charlie")
+      expect(names).toEqual(["Charlie", "Bea"])
+    })
+  })
+
+  it("restores URL state when a router adapter reports navigation", async () => {
+    let params = new URLSearchParams("router.search=first")
+    let notifyNavigation = () => undefined
+    const adapters: TablePersistenceAdapters = {
+      search: {
+        read: () => new URLSearchParams(params),
+        replace: (next) => {
+          params = new URLSearchParams(next)
+        },
+        subscribe: (listener) => {
+          notifyNavigation = listener
+          return () => {
+            notifyNavigation = () => undefined
+          }
+        }
+      }
+    }
+    const view = render(() => <RouterTableStateFixture adapters={adapters} />)
+
+    await vi.waitFor(() =>
+      expect(
+        view.getByRole("status", { name: "Restored table state" })
+      ).toHaveTextContent("first||0")
+    )
+
+    params = new URLSearchParams(
+      "router.search=restored&router.sort=name.desc&router.page=2"
+    )
+    notifyNavigation()
+
+    await vi.waitFor(() =>
+      expect(
+        view.getByRole("status", { name: "Restored table state" })
+      ).toHaveTextContent("restored|name|1")
+    )
+  })
+
+  it("bounds URL replacements when the adapter notifies synchronously", async () => {
+    let params = new URLSearchParams("router.search=first")
+    let replacements = 0
+    const listeners = new Set<() => void>()
+    const adapters: TablePersistenceAdapters = {
+      search: {
+        read: () => new URLSearchParams(params),
+        replace: (next) => {
+          replacements += 1
+          params = new URLSearchParams(next)
+          for (const listener of listeners) listener()
+        },
+        subscribe: (listener) => {
+          listeners.add(listener)
+          return () => listeners.delete(listener)
+        }
+      }
+    }
+    const view = render(() => <RouterTableStateFixture adapters={adapters} />)
+
+    await vi.waitFor(() =>
+      expect(
+        view.getByRole("status", { name: "Restored table state" })
+      ).toHaveTextContent("first||0")
+    )
+    fireEvent.click(view.getByRole("button", { name: "Set table search" }))
+
+    await vi.waitFor(() =>
+      expect(
+        view.getByRole("status", { name: "Restored table state" })
+      ).toHaveTextContent("local||0")
+    )
+    expect(replacements).toBe(1)
+    expect(params.get("router.search")).toBe("local")
   })
 })

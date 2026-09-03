@@ -1,6 +1,8 @@
 import {
   getAuthLinkURL,
-  isPasswordCompromisedError
+  isPasswordCompromisedError,
+  validateEmailAddress,
+  validateStringLength
 } from "@better-auth-ui/core"
 import {
   type EmailOtpAuthClient,
@@ -8,12 +10,11 @@ import {
 } from "@better-auth-ui/core/plugins/email-otp"
 import { AuthLink, useAuth, useAuthPlugin } from "@better-auth-ui/solid"
 import { createMutation } from "@tanstack/solid-query"
-import { createSignal, Show } from "solid-js"
+import { Show } from "solid-js"
 import { toast } from "solid-sonner"
 
 import { OpenEmailButton } from "@/components/auth/open-email-button"
 import { OtpField } from "@/components/auth/otp-field"
-import { Button } from "@/components/ui/button"
 import {
   Card,
   CardContent,
@@ -22,16 +23,14 @@ import {
   CardHeader,
   CardTitle
 } from "@/components/ui/card"
-import {
-  Field,
-  FieldError,
-  FieldGroup,
-  FieldLabel
-} from "@/components/ui/field"
-import { Input } from "@/components/ui/input"
-import { Spinner } from "@/components/ui/spinner"
+import { FieldGroup } from "@/components/ui/field"
 import { emailOtpPlugin } from "@/lib/auth/email-otp-plugin"
 import { cn } from "@/lib/utils"
+import {
+  createAuthForm,
+  setAuthFormServerError,
+  submitAuthForm
+} from "../auth-form"
 import { PasswordStrengthMeter } from "../password-strength-meter"
 import { RESET_PASSWORD_OTP_STORAGE_KEY } from "./forgot-password-otp"
 
@@ -59,24 +58,19 @@ export function ResetPasswordOtp(props: ResetPasswordOtpProps) {
       : (sessionStorage.getItem(RESET_PASSWORD_OTP_STORAGE_KEY) ?? "")
 
   const hasStoredEmail = Boolean(storedEmail)
-  const [email, setEmail] = createSignal(storedEmail)
-  const [code, setCode] = createSignal("")
-  const [password, setPassword] = createSignal("")
-  const [passwordError, setPasswordError] = createSignal<string>()
-  let formRef: HTMLFormElement | undefined
-  let submissionLocked = false
-
   const resetPassword = createMutation(() => ({
     ...resetPasswordOtpOptions(auth.authClient as EmailOtpAuthClient),
     onError: (error) => {
       // The haveIBeenPwned plugin rejects on the password itself, so it
       // belongs against the field rather than in a toast.
       if (isPasswordCompromisedError(error)) {
-        setPasswordError(auth.localization.auth.passwordCompromised)
+        setAuthFormServerError(
+          form,
+          { fields: { password: auth.localization.auth.passwordCompromised } },
+          auth.localization.auth.passwordCompromised
+        )
       }
-
-      submissionLocked = false
-      setCode("")
+      form.setFieldValue("code", "")
     },
     onSuccess: () => {
       sessionStorage.removeItem(RESET_PASSWORD_OTP_STORAGE_KEY)
@@ -87,60 +81,37 @@ export function ResetPasswordOtp(props: ResetPasswordOtpProps) {
     }
   }))
 
-  const submitReset = (
-    form: HTMLFormElement,
-    submittedCode: string,
-    reportErrors: boolean
-  ) => {
-    if (resetPassword.isPending || submissionLocked) return
-
-    const formData = new FormData(form)
-    const password = formData.get("password") as string
-    const confirmPassword = formData.get("confirmPassword") as string
-
-    if (
-      auth.emailAndPassword?.confirmPassword &&
-      password !== confirmPassword
-    ) {
-      if (reportErrors) {
-        toast.error(auth.localization.auth.passwordsDoNotMatch)
-      }
-      return
+  const validatePassword = (value: string) =>
+    validateStringLength(value, {
+      maxLength: auth.emailAndPassword?.maxPasswordLength,
+      maxLengthMessage: auth.localization.auth.tooLong.replace(
+        "{{max}}",
+        String(auth.emailAndPassword?.maxPasswordLength)
+      ),
+      minLength: auth.emailAndPassword?.minPasswordLength,
+      minLengthMessage: auth.localization.auth.tooShort.replace(
+        "{{min}}",
+        String(auth.emailAndPassword?.minPasswordLength)
+      ),
+      requiredMessage: auth.localization.auth.fieldRequired
+    })
+  const form = createAuthForm(() => ({
+    defaultValues: {
+      code: "",
+      confirmPassword: "",
+      email: storedEmail,
+      password: ""
+    },
+    onSubmit: async ({ value }) => {
+      await resetPassword.mutateAsync({
+        email: value.email,
+        otp: value.code,
+        password: value.password
+      } as Parameters<typeof resetPassword.mutateAsync>[0])
     }
-
-    if (submittedCode.length !== otpLength) {
-      if (reportErrors) {
-        toast.error(
-          emailOtpLocalization.codeLengthMismatch.replace(
-            "{{length}}",
-            String(otpLength)
-          )
-        )
-      }
-      return
-    }
-
-    submissionLocked = true
-    resetPassword.mutate({
-      email: hasStoredEmail ? email() : (formData.get("email") as string),
-      otp: submittedCode,
-      password
-    } as Parameters<typeof resetPassword.mutate>[0])
-  }
-
-  const tryAutoSubmit = (completedCode?: string) => {
-    if (!formRef?.matches(":valid")) return
-
-    const formData = new FormData(formRef)
-    const submittedCode = completedCode ?? String(formData.get("otp") ?? "")
-
-    submitReset(formRef, submittedCode, false)
-  }
-
-  const submit = (event: SubmitEvent & { currentTarget: HTMLFormElement }) => {
-    event.preventDefault()
-    submitReset(event.currentTarget, code(), true)
-  }
+  }))
+  const email = () => form.state.values.email
+  const password = () => form.state.values.password
 
   return (
     <Card class={cn("w-full max-w-sm", props.class)}>
@@ -157,116 +128,122 @@ export function ResetPasswordOtp(props: ResetPasswordOtpProps) {
       </CardHeader>
 
       <CardContent>
-        <form
-          ref={formRef}
-          aria-label={auth.localization.auth.resetPassword}
-          onSubmit={submit}
-        >
-          <FieldGroup>
-            <Show when={!hasStoredEmail}>
-              <Field>
-                <FieldLabel for="reset-password-email">
-                  {auth.localization.auth.email}
-                </FieldLabel>
-
-                <Input
-                  autocomplete="email"
-                  disabled={resetPassword.isPending}
-                  id="reset-password-email"
+        <form.AppForm>
+          <form.AuthFormRoot aria-label={auth.localization.auth.resetPassword}>
+            <FieldGroup>
+              <Show when={!hasStoredEmail}>
+                <form.AppField
                   name="email"
-                  onInput={(event) => setEmail(event.currentTarget.value)}
-                  placeholder={auth.localization.auth.emailPlaceholder}
-                  required
-                  type="email"
-                  value={email()}
-                />
-              </Field>
-            </Show>
+                  validators={{
+                    onChange: ({ value }) =>
+                      validateEmailAddress(value, {
+                        invalidMessage: auth.localization.auth.invalidEmail,
+                        requiredMessage: auth.localization.auth.fieldRequired
+                      })
+                  }}
+                >
+                  {(field) => (
+                    <field.AuthFormTextField
+                      autocomplete="email"
+                      disabled={resetPassword.isPending}
+                      id="reset-password-email"
+                      label={auth.localization.auth.email}
+                      placeholder={auth.localization.auth.emailPlaceholder}
+                      type="email"
+                    />
+                  )}
+                </form.AppField>
+              </Show>
 
-            <OtpField
-              autofocus={hasStoredEmail}
-              disabled={resetPassword.isPending}
-              id="reset-password-code"
-              label={emailOtpLocalization.code}
-              length={otpLength}
-              name="otp"
-              onInput={setCode}
-              onComplete={tryAutoSubmit}
-              value={code()}
-            />
+              <form.AppField
+                name="code"
+                validators={{
+                  onChange: ({ value }) =>
+                    value.length === otpLength
+                      ? undefined
+                      : emailOtpLocalization.codeLengthMismatch.replace(
+                          "{{length}}",
+                          String(otpLength)
+                        )
+                }}
+              >
+                {(field) => (
+                  <OtpField
+                    autofocus={hasStoredEmail}
+                    disabled={resetPassword.isPending}
+                    id="reset-password-code"
+                    label={emailOtpLocalization.code}
+                    length={otpLength}
+                    name={field().name}
+                    onInput={field().handleChange}
+                    onComplete={() => void submitAuthForm(form)}
+                    value={field().state.value}
+                  />
+                )}
+              </form.AppField>
 
-            <Field data-invalid={Boolean(passwordError())}>
-              <FieldLabel for="reset-password-password">
-                {auth.localization.auth.newPassword}
-              </FieldLabel>
-
-              <Input
-                aria-invalid={Boolean(passwordError())}
-                autocomplete="new-password"
-                disabled={resetPassword.isPending}
-                id="reset-password-password"
-                maxLength={auth.emailAndPassword?.maxPasswordLength}
-                minLength={auth.emailAndPassword?.minPasswordLength}
+              <form.AppField
                 name="password"
-                onInput={(event) => {
-                  setPassword(event.currentTarget.value)
-                  setPasswordError(undefined)
+                validators={{
+                  onChange: ({ value }) => validatePassword(value)
                 }}
-                onInvalid={(event) => {
-                  event.preventDefault()
-                  setPasswordError(event.currentTarget.validationMessage)
-                }}
-                placeholder={auth.localization.auth.newPasswordPlaceholder}
-                required
-                type="password"
-              />
+              >
+                {(field) => (
+                  <>
+                    <field.AuthFormTextField
+                      autocomplete="new-password"
+                      disabled={resetPassword.isPending}
+                      id="reset-password-password"
+                      label={auth.localization.auth.newPassword}
+                      placeholder={
+                        auth.localization.auth.newPasswordPlaceholder
+                      }
+                      type="password"
+                    />
+                    <PasswordStrengthMeter password={password()} />
+                  </>
+                )}
+              </form.AppField>
 
-              <Show when={passwordError()}>
-                {(message) => <FieldError>{message()}</FieldError>}
-              </Show>
-
-              <PasswordStrengthMeter password={password()} />
-            </Field>
-
-            <Show when={auth.emailAndPassword?.confirmPassword}>
-              <Field>
-                <FieldLabel for="reset-password-confirm">
-                  {auth.localization.auth.confirmPassword}
-                </FieldLabel>
-
-                <Input
-                  autocomplete="new-password"
-                  disabled={resetPassword.isPending}
-                  id="reset-password-confirm"
-                  maxLength={auth.emailAndPassword?.maxPasswordLength}
-                  minLength={auth.emailAndPassword?.minPasswordLength}
+              <Show when={auth.emailAndPassword?.confirmPassword}>
+                <form.AppField
                   name="confirmPassword"
-                  placeholder={
-                    auth.localization.auth.confirmPasswordPlaceholder
-                  }
-                  required
-                  type="password"
-                />
-              </Field>
-            </Show>
-
-            <Button
-              class="w-full"
-              disabled={resetPassword.isPending}
-              type="submit"
-            >
-              <Show when={resetPassword.isPending}>
-                <Spinner />
+                  validators={{
+                    onChange: ({ value }) =>
+                      value === password()
+                        ? undefined
+                        : auth.localization.auth.passwordsDoNotMatch
+                  }}
+                >
+                  {(field) => (
+                    <field.AuthFormTextField
+                      autocomplete="new-password"
+                      disabled={resetPassword.isPending}
+                      id="reset-password-confirm"
+                      label={auth.localization.auth.confirmPassword}
+                      placeholder={
+                        auth.localization.auth.confirmPasswordPlaceholder
+                      }
+                      type="password"
+                    />
+                  )}
+                </form.AppField>
               </Show>
 
-              {auth.localization.auth.resetPassword}
-            </Button>
+              <form.AuthFormSubmitButton
+                class="w-full"
+                disabled={resetPassword.isPending}
+              >
+                {auth.localization.auth.resetPassword}
+              </form.AuthFormSubmitButton>
 
-            <Show when={email()}>
-              <OpenEmailButton email={email()} variant="secondary" />
-            </Show>
-          </FieldGroup>
-        </form>
+              <Show when={email()}>
+                <OpenEmailButton email={email()} variant="secondary" />
+              </Show>
+              <form.AuthFormServerError />
+            </FieldGroup>
+          </form.AuthFormRoot>
+        </form.AppForm>
       </CardContent>
 
       <CardFooter class="justify-center">

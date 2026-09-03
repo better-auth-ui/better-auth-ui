@@ -1788,27 +1788,23 @@ function PasswordDialog(props: {
   const config = () =>
     (auth.plugins.find((plugin) => plugin.id === adminPlugin.id) ??
       adminPlugin()) as ReturnType<typeof adminPlugin>
-  const [password, setPassword] = createSignal("")
-  const [errorMessage, setErrorMessage] = createSignal<string>()
   const setPasswordMutation = useSetAdminUserPassword(authClient)
 
+  const form = createAuthForm(() => ({
+    defaultValues: { password: "" },
+    onSubmit: async ({ value }) => {
+      if (!props.userId) return
+      await setPasswordMutation.mutateAsync({
+        userId: props.userId,
+        newPassword: value.password
+      })
+      close()
+    }
+  }))
   const close = () => {
-    setPassword("")
-    setErrorMessage(undefined)
+    form.reset()
     setPasswordMutation.reset()
     props.onOpenChange(false)
-  }
-  const submit = (event: SubmitEvent) => {
-    event.preventDefault()
-    setErrorMessage(undefined)
-    if (props.userId)
-      setPasswordMutation.mutate(
-        { userId: props.userId, newPassword: password() },
-        {
-          onError: (error) => setErrorMessage(getAdminErrorMessage(error)),
-          onSuccess: close
-        }
-      )
   }
 
   return (
@@ -1817,40 +1813,43 @@ function PasswordDialog(props: {
       onOpenChange={(open) => (open ? props.onOpenChange(true) : close())}
     >
       <DialogContent>
-        <form class="flex flex-col gap-4" onSubmit={submit}>
-          <DialogHeader>
-            <DialogTitle>{config().localization.setPassword}</DialogTitle>
-            <DialogDescription>
-              {config().localization.userDetails}
-            </DialogDescription>
-          </DialogHeader>
-          <Field data-invalid={Boolean(errorMessage())}>
-            <FieldLabel for="solid-admin-new-password">
-              {config().localization.password}
-            </FieldLabel>
-            <Input
-              aria-invalid={Boolean(errorMessage())}
-              autocomplete="new-password"
-              id="solid-admin-new-password"
-              required
-              type="password"
-              value={password()}
-              onInput={(event) => setPassword(event.currentTarget.value)}
-            />
-            <FieldError>{errorMessage()}</FieldError>
-          </Field>
-          <DialogFooter>
-            <Button onClick={close} type="button" variant="outline">
-              {config().localization.cancel}
-            </Button>
-            <Button
-              disabled={!password() || setPasswordMutation.isPending}
-              type="submit"
+        <form.AppForm>
+          <form.AuthFormRoot class="flex flex-col gap-4">
+            <DialogHeader>
+              <DialogTitle>{config().localization.setPassword}</DialogTitle>
+              <DialogDescription>
+                {config().localization.userDetails}
+              </DialogDescription>
+            </DialogHeader>
+            <form.AppField
+              name="password"
+              validators={{
+                onChange: ({ value }) =>
+                  value ? undefined : config().localization.password
+              }}
             >
-              {config().localization.setPassword}
-            </Button>
-          </DialogFooter>
-        </form>
+              {(field) => (
+                <field.AuthFormTextField
+                  autocomplete="new-password"
+                  id="solid-admin-new-password"
+                  label={config().localization.password}
+                  type="password"
+                />
+              )}
+            </form.AppField>
+            <form.AuthFormServerError />
+            <DialogFooter>
+              <Button onClick={close} type="button" variant="outline">
+                {config().localization.cancel}
+              </Button>
+              <form.AuthFormSubmitButton
+                disabled={setPasswordMutation.isPending || !props.userId}
+              >
+                {config().localization.setPassword}
+              </form.AuthFormSubmitButton>
+            </DialogFooter>
+          </form.AuthFormRoot>
+        </form.AppForm>
       </DialogContent>
     </Dialog>
   )

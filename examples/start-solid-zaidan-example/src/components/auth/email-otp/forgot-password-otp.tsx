@@ -1,4 +1,4 @@
-import { getAuthLinkURL } from "@better-auth-ui/core"
+import { getAuthLinkURL, validateEmailAddress } from "@better-auth-ui/core"
 import {
   type EmailOtpAuthClient,
   requestPasswordResetOtpOptions
@@ -10,9 +10,7 @@ import {
   useFetchOptions
 } from "@better-auth-ui/solid"
 import { createMutation } from "@tanstack/solid-query"
-import { createSignal, Show } from "solid-js"
 
-import { Button } from "@/components/ui/button"
 import {
   Card,
   CardContent,
@@ -20,16 +18,9 @@ import {
   CardHeader,
   CardTitle
 } from "@/components/ui/card"
-import {
-  Field,
-  FieldError,
-  FieldGroup,
-  FieldLabel
-} from "@/components/ui/field"
-import { Input } from "@/components/ui/input"
-import { Spinner } from "@/components/ui/spinner"
 import { emailOtpPlugin } from "@/lib/auth/email-otp-plugin"
 import { cn } from "@/lib/utils"
+import { createAuthForm } from "../auth-form"
 
 /** `sessionStorage` key the reset-code form reads the pending address from. */
 export const RESET_PASSWORD_OTP_STORAGE_KEY =
@@ -52,8 +43,6 @@ export function ForgotPasswordOtp(props: ForgotPasswordOtpProps) {
   const { localization: emailOtpLocalization } = useAuthPlugin(emailOtpPlugin)
   const { fetchOptions, resetFetchOptions } = useFetchOptions()
 
-  const [emailError, setEmailError] = createSignal<string>()
-
   const requestReset = createMutation(() => ({
     ...requestPasswordResetOtpOptions(auth.authClient as EmailOtpAuthClient),
     onError: () => resetFetchOptions(),
@@ -68,15 +57,15 @@ export function ForgotPasswordOtp(props: ForgotPasswordOtpProps) {
     }
   }))
 
-  const submit = (event: SubmitEvent & { currentTarget: HTMLFormElement }) => {
-    event.preventDefault()
-
-    const formData = new FormData(event.currentTarget)
-    requestReset.mutate({
-      email: formData.get("email") as string,
-      fetchOptions
-    } as Parameters<typeof requestReset.mutate>[0])
-  }
+  const form = createAuthForm(() => ({
+    defaultValues: { email: "" },
+    onSubmit: async ({ value }) => {
+      await requestReset.mutateAsync({
+        email: value.email,
+        fetchOptions: fetchOptions()
+      } as Parameters<typeof requestReset.mutateAsync>[0])
+    }
+  }))
 
   return (
     <Card class={cn("w-full max-w-sm", props.class)}>
@@ -87,50 +76,40 @@ export function ForgotPasswordOtp(props: ForgotPasswordOtpProps) {
       </CardHeader>
 
       <CardContent>
-        <form
-          aria-label={auth.localization.auth.forgotPassword}
-          onSubmit={submit}
-        >
-          <FieldGroup>
-            <Field data-invalid={Boolean(emailError())}>
-              <FieldLabel for="forgot-password-email">
-                {auth.localization.auth.email}
-              </FieldLabel>
-
-              <Input
-                aria-invalid={Boolean(emailError())}
-                autocomplete="email"
-                disabled={requestReset.isPending}
-                id="forgot-password-email"
+        <form.AppForm>
+          <form.AuthFormRoot aria-label={auth.localization.auth.forgotPassword}>
+            <div class="flex flex-col gap-6">
+              <form.AppField
                 name="email"
-                onInput={() => setEmailError(undefined)}
-                onInvalid={(event) => {
-                  event.preventDefault()
-                  setEmailError(event.currentTarget.validationMessage)
+                validators={{
+                  onChange: ({ value }) =>
+                    validateEmailAddress(value, {
+                      invalidMessage: auth.localization.auth.invalidEmail,
+                      requiredMessage: auth.localization.auth.fieldRequired
+                    })
                 }}
-                placeholder={auth.localization.auth.emailPlaceholder}
-                required
-                type="email"
-              />
-
-              <Show when={emailError()}>
-                {(message) => <FieldError>{message()}</FieldError>}
-              </Show>
-            </Field>
-
-            <Button
-              class="w-full"
-              disabled={requestReset.isPending}
-              type="submit"
-            >
-              <Show when={requestReset.isPending}>
-                <Spinner />
-              </Show>
-
-              {emailOtpLocalization.sendCode}
-            </Button>
-          </FieldGroup>
-        </form>
+              >
+                {(field) => (
+                  <field.AuthFormTextField
+                    autocomplete="email"
+                    disabled={requestReset.isPending}
+                    id="forgot-password-email"
+                    label={auth.localization.auth.email}
+                    placeholder={auth.localization.auth.emailPlaceholder}
+                    type="email"
+                  />
+                )}
+              </form.AppField>
+              <form.AuthFormSubmitButton
+                class="w-full"
+                disabled={requestReset.isPending}
+              >
+                {emailOtpLocalization.sendCode}
+              </form.AuthFormSubmitButton>
+              <form.AuthFormServerError />
+            </div>
+          </form.AuthFormRoot>
+        </form.AppForm>
       </CardContent>
 
       <CardFooter class="justify-center">

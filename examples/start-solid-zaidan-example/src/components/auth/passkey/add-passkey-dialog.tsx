@@ -17,10 +17,11 @@ import {
   DialogHeader,
   DialogTitle
 } from "@/components/ui/dialog"
-import { Field, FieldError, FieldLabel } from "@/components/ui/field"
+import { Field, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import { Spinner } from "@/components/ui/spinner"
 import { passkeyPlugin } from "@/lib/auth/passkey-plugin"
+import { createAuthForm } from "../auth-form"
 import { FreshSessionPrompt } from "../settings/security/fresh-session-prompt"
 
 export function AddPasskeyDialog(props: {
@@ -42,7 +43,9 @@ export function AddPasskeyDialog(props: {
     props.onOpenChange(open)
   }
 
-  const submitRequest = (request: AddPasskeyParams<PasskeyAuthClient>) => {
+  const submitRequest = async (
+    request: AddPasskeyParams<PasskeyAuthClient>
+  ) => {
     const requestWithCallbacks = {
       ...request,
       fetchOptions: {
@@ -54,20 +57,19 @@ export function AddPasskeyDialog(props: {
       }
     }
     setPendingRequest(requestWithCallbacks)
-    addPasskey.mutate(requestWithCallbacks)
+    await addPasskey.mutateAsync(requestWithCallbacks)
   }
 
-  const submitAddPasskey = (event: SubmitEvent) => {
-    event.preventDefault()
-
-    const formData = new FormData(event.currentTarget as HTMLFormElement)
-    const name = String(formData.get("name") ?? "").trim()
-
-    submitRequest({
-      ...(name ? { name } : {}),
-      ...(authenticatorAttachment ? { authenticatorAttachment } : {})
-    } as Parameters<typeof addPasskey.mutate>[0])
-  }
+  const form = createAuthForm(() => ({
+    defaultValues: { name: "" },
+    onSubmit: async ({ value }) => {
+      const name = value.name.trim()
+      await submitRequest({
+        ...(name ? { name } : {}),
+        ...(authenticatorAttachment ? { authenticatorAttachment } : {})
+      } as Parameters<typeof addPasskey.mutateAsync>[0])
+    }
+  }))
 
   return (
     <DialogContent>
@@ -83,57 +85,62 @@ export function AddPasskeyDialog(props: {
             <FreshSessionPrompt
               onFresh={() => {
                 const request = pendingRequest()
-                if (request) submitRequest(request)
+                if (request) return submitRequest(request)
               }}
             />
           </>
         }
       >
-        <form class="flex flex-col gap-6" onSubmit={submitAddPasskey}>
-          <DialogHeader>
-            <div class="flex size-10 items-center justify-center rounded-md bg-muted">
-              <Fingerprint class="size-4.5" />
-            </div>
-            <DialogTitle>{labels().addPasskey}</DialogTitle>
-            <DialogDescription>
-              {labels().passkeysDescription}
-            </DialogDescription>
-          </DialogHeader>
+        <form.AppForm>
+          <form.AuthFormRoot class="flex flex-col gap-6">
+            <DialogHeader>
+              <div class="flex size-10 items-center justify-center rounded-md bg-muted">
+                <Fingerprint class="size-4.5" />
+              </div>
+              <DialogTitle>{labels().addPasskey}</DialogTitle>
+              <DialogDescription>
+                {labels().passkeysDescription}
+              </DialogDescription>
+            </DialogHeader>
 
-          <Field data-invalid={addPasskey.isError}>
-            <FieldLabel for="passkey-name">{labels().name}</FieldLabel>
-            <Input
-              autofocus
-              disabled={addPasskey.isPending}
-              id="passkey-name"
-              name="name"
-              placeholder={auth.localization.settings.optional}
-            />
-            <Show when={addPasskey.error}>
-              {(error) => (
-                <FieldError>
-                  {error().error?.message ?? error().message}
-                </FieldError>
+            <form.AppField name="name">
+              {(field) => (
+                <Field>
+                  <FieldLabel for="passkey-name">{labels().name}</FieldLabel>
+                  <Input
+                    autofocus
+                    disabled={addPasskey.isPending}
+                    id="passkey-name"
+                    name={field().name}
+                    placeholder={auth.localization.settings.optional}
+                    value={field().state.value}
+                    onBlur={field().handleBlur}
+                    onInput={(event) =>
+                      field().handleChange(event.currentTarget.value)
+                    }
+                  />
+                </Field>
               )}
-            </Show>
-          </Field>
+            </form.AppField>
+            <form.AuthFormServerError />
 
-          <DialogFooter>
-            <DialogClose
-              as={Button}
-              disabled={addPasskey.isPending}
-              onClick={() => handleOpenChange(false)}
-              type="button"
-              variant="outline"
-            >
-              {auth.localization.settings.cancel}
-            </DialogClose>
-            <Button disabled={addPasskey.isPending} type="submit">
-              {addPasskey.isPending ? <Spinner /> : null}
-              {labels().addPasskey}
-            </Button>
-          </DialogFooter>
-        </form>
+            <DialogFooter>
+              <DialogClose
+                as={Button}
+                disabled={addPasskey.isPending}
+                onClick={() => handleOpenChange(false)}
+                type="button"
+                variant="outline"
+              >
+                {auth.localization.settings.cancel}
+              </DialogClose>
+              <form.AuthFormSubmitButton disabled={addPasskey.isPending}>
+                {addPasskey.isPending ? <Spinner /> : null}
+                {labels().addPasskey}
+              </form.AuthFormSubmitButton>
+            </DialogFooter>
+          </form.AuthFormRoot>
+        </form.AppForm>
       </Show>
     </DialogContent>
   )

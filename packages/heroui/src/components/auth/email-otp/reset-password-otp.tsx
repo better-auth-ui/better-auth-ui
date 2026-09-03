@@ -1,6 +1,8 @@
 import {
   getAuthLinkURL,
-  isPasswordCompromisedError
+  isPasswordCompromisedError,
+  validateEmailAddress,
+  validateStringLength
 } from "@better-auth-ui/core"
 import type { EmailOtpAuthClient } from "@better-auth-ui/core/plugins/email-otp"
 import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
@@ -12,8 +14,6 @@ import {
   type CardProps,
   cn,
   Description,
-  FieldError,
-  Form,
   Input,
   InputGroup,
   Label,
@@ -23,9 +23,16 @@ import {
   toast,
   useIsHydrated
 } from "@heroui/react"
-import { type SyntheticEvent, useEffect, useRef, useState } from "react"
+import { useSelector } from "@tanstack/react-form"
+import { useEffect, useState } from "react"
 
 import { emailOtpPlugin } from "../../../lib/auth/email-otp-plugin"
+import {
+  isAuthFormFieldInvalid,
+  setAuthFormServerError,
+  submitAuthForm,
+  useAuthForm
+} from "../auth-form"
 import { OpenEmailButton } from "../open-email-button"
 import { OtpField } from "../otp-field"
 import { PasswordStrengthMeter } from "../password-strength-meter"
@@ -67,34 +74,24 @@ export function ResetPasswordOtp({
   const isHydrated = useIsHydrated()
   const initialEmail =
     (isHydrated && sessionStorage.getItem(RESET_PASSWORD_OTP_STORAGE_KEY)) || ""
-  const [email, setEmail] = useState(initialEmail)
   const [hasStoredEmail, setHasStoredEmail] = useState(Boolean(initialEmail))
-  const [code, setCode] = useState("")
-  const [password, setPassword] = useState("")
-  const [isCompromised, setIsCompromised] = useState(false)
   const [isPasswordVisible, setIsPasswordVisible] = useState(false)
   const [isConfirmPasswordVisible, setIsConfirmPasswordVisible] =
     useState(false)
-  const formRef = useRef<HTMLFormElement>(null)
-  const submissionLockedRef = useRef(false)
-
-  useEffect(() => {
-    const storedEmail =
-      sessionStorage.getItem(RESET_PASSWORD_OTP_STORAGE_KEY) ?? ""
-    setEmail(storedEmail)
-    setHasStoredEmail(Boolean(storedEmail))
-  }, [])
-
-  const { mutate: resetPasswordOtp, isPending } = useResetPasswordOtp(
+  const { mutateAsync: resetPasswordOtp, isPending } = useResetPasswordOtp(
     authClient as EmailOtpAuthClient,
     {
       onError: (error) => {
         // The haveIBeenPwned plugin rejects on the password itself, so
         // it belongs against the field rather than in a toast.
-        setIsCompromised(isPasswordCompromisedError(error))
-
-        submissionLockedRef.current = false
-        setCode("")
+        if (isPasswordCompromisedError(error)) {
+          setAuthFormServerError(
+            form,
+            { fields: { password: localization.auth.passwordCompromised } },
+            localization.auth.passwordCompromised
+          )
+        }
+        form.setFieldValue("code", "")
       },
       onSuccess: () => {
         sessionStorage.removeItem(RESET_PASSWORD_OTP_STORAGE_KEY)
@@ -104,68 +101,44 @@ export function ResetPasswordOtp({
     }
   )
 
-  const validatePassword = (value: string) => {
-    if (!value) return localization.auth.fieldRequired
-    const min = emailAndPassword?.minPasswordLength
-    const max = emailAndPassword?.maxPasswordLength
-    if (min && value.length < min)
-      return localization.auth.tooShort.replace("{{min}}", String(min))
-    if (max && value.length > max)
-      return localization.auth.tooLong.replace("{{max}}", String(max))
-  }
+  const validatePassword = (value: string) =>
+    validateStringLength(value, {
+      maxLength: emailAndPassword?.maxPasswordLength,
+      maxLengthMessage: localization.auth.tooLong.replace(
+        "{{max}}",
+        String(emailAndPassword?.maxPasswordLength)
+      ),
+      minLength: emailAndPassword?.minPasswordLength,
+      minLengthMessage: localization.auth.tooShort.replace(
+        "{{min}}",
+        String(emailAndPassword?.minPasswordLength)
+      ),
+      requiredMessage: localization.auth.fieldRequired
+    })
 
-  const submitReset = (
-    form: HTMLFormElement,
-    submittedCode: string,
-    reportErrors: boolean
-  ) => {
-    if (isPending || submissionLockedRef.current) return
-
-    const formData = new FormData(form)
-    const password = formData.get("password") as string
-    const confirmPassword = formData.get("confirmPassword") as string
-    const submittedEmail = hasStoredEmail
-      ? email
-      : (formData.get("email") as string)
-
-    if (emailAndPassword?.confirmPassword && password !== confirmPassword) {
-      if (reportErrors) {
-        toast.danger(localization.auth.passwordsDoNotMatch)
-      }
-      return
+  const form = useAuthForm({
+    defaultValues: {
+      code: "",
+      confirmPassword: "",
+      email: initialEmail,
+      password: ""
+    },
+    onSubmit: async ({ value }) => {
+      await resetPasswordOtp({
+        email: value.email,
+        otp: value.code,
+        password: value.password
+      })
     }
+  })
+  const email = useSelector(form.store, (state) => state.values.email)
 
-    if (submittedCode.length !== otpLength) {
-      if (reportErrors) {
-        toast.danger(
-          emailOtpLocalization.codeLengthMismatch.replace(
-            "{{length}}",
-            String(otpLength)
-          )
-        )
-      }
-      return
-    }
-
-    submissionLockedRef.current = true
-    resetPasswordOtp({ email: submittedEmail, otp: submittedCode, password })
-  }
-
-  const tryAutoSubmit = (completedCode?: string) => {
-    const form = formRef.current
-
-    if (!form?.matches(":valid")) return
-
-    const formData = new FormData(form)
-    const submittedCode = completedCode ?? String(formData.get("otp") ?? "")
-
-    submitReset(form, submittedCode, false)
-  }
-
-  const handleSubmit = (e: SyntheticEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    submitReset(e.currentTarget, code, true)
-  }
+  useEffect(() => {
+    const storedEmail =
+      sessionStorage.getItem(RESET_PASSWORD_OTP_STORAGE_KEY) ?? ""
+    form.setFieldValue("email", storedEmail)
+    setHasStoredEmail(Boolean(storedEmail))
+  }, [form.setFieldValue])
 
   return (
     <Card
@@ -185,157 +158,205 @@ export function ResetPasswordOtp({
       </Card.Header>
 
       <Card.Content className="gap-4">
-        <Form
-          ref={formRef}
-          className="flex flex-col gap-4"
-          onSubmit={handleSubmit}
-        >
-          {!hasStoredEmail && (
-            <TextField
-              name="email"
-              type="email"
-              autoComplete="email"
-              isDisabled={isPending}
-              value={email}
-              onChange={setEmail}
-              validate={(value) => {
-                if (!value) return localization.auth.fieldRequired
-                if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value))
-                  return localization.auth.invalidEmail
-              }}
-            >
-              <Label>{localization.auth.email}</Label>
+        <form.AppForm>
+          <form.AuthFormRoot className="flex flex-col gap-4">
+            {!hasStoredEmail && (
+              <form.AppField
+                name="email"
+                validators={{
+                  onChange: ({ value }) =>
+                    validateEmailAddress(value, {
+                      invalidMessage: localization.auth.invalidEmail,
+                      requiredMessage: localization.auth.fieldRequired
+                    })
+                }}
+              >
+                {(field) => (
+                  <TextField
+                    name={field.name}
+                    type="email"
+                    autoComplete="email"
+                    isDisabled={isPending}
+                    isInvalid={isAuthFormFieldInvalid(field.state.meta)}
+                    validationBehavior="aria"
+                    value={field.state.value}
+                    onBlur={field.handleBlur}
+                    onChange={field.handleChange}
+                  >
+                    <Label>{localization.auth.email}</Label>
 
-              <Input
-                placeholder={localization.auth.emailPlaceholder}
-                required
-                variant={variant === "transparent" ? "primary" : "secondary"}
-              />
+                    <Input
+                      placeholder={localization.auth.emailPlaceholder}
+                      variant={
+                        variant === "transparent" ? "primary" : "secondary"
+                      }
+                    />
 
-              <FieldError />
-            </TextField>
-          )}
-
-          <OtpField
-            autoFocus={hasStoredEmail}
-            isDisabled={isPending}
-            label={emailOtpLocalization.code}
-            length={otpLength}
-            name="otp"
-            value={code}
-            variant={variant}
-            onChange={setCode}
-            onComplete={tryAutoSubmit}
-          />
-
-          <TextField
-            minLength={emailAndPassword?.minPasswordLength}
-            maxLength={emailAndPassword?.maxPasswordLength}
-            name="password"
-            autoComplete="new-password"
-            value={password}
-            onChange={(value) => {
-              setPassword(value)
-              setIsCompromised(false)
-            }}
-            isInvalid={isCompromised || undefined}
-            isDisabled={isPending}
-            validate={validatePassword}
-          >
-            <Label>{localization.auth.newPassword}</Label>
-
-            <InputGroup
-              variant={variant === "transparent" ? "primary" : "secondary"}
-            >
-              <InputGroup.Input
-                name="password"
-                placeholder={localization.auth.newPasswordPlaceholder}
-                type={isPasswordVisible ? "text" : "password"}
-                required
-              />
-
-              <InputGroup.Suffix className="px-0">
-                <Button
-                  isIconOnly
-                  aria-label={
-                    isPasswordVisible
-                      ? localization.auth.hidePassword
-                      : localization.auth.showPassword
-                  }
-                  size="sm"
-                  variant="ghost"
-                  onPress={() => setIsPasswordVisible(!isPasswordVisible)}
-                  isDisabled={isPending}
-                >
-                  {isPasswordVisible ? <EyeSlash /> : <Eye />}
-                </Button>
-              </InputGroup.Suffix>
-            </InputGroup>
-
-            {isCompromised ? (
-              <FieldError>{localization.auth.passwordCompromised}</FieldError>
-            ) : (
-              <FieldError />
+                    <field.AuthFormFieldError />
+                  </TextField>
+                )}
+              </form.AppField>
             )}
 
-            <PasswordStrengthMeter password={password} />
-          </TextField>
-
-          {emailAndPassword?.confirmPassword && (
-            <TextField
-              minLength={emailAndPassword?.minPasswordLength}
-              maxLength={emailAndPassword?.maxPasswordLength}
-              name="confirmPassword"
-              autoComplete="new-password"
-              isDisabled={isPending}
-              validate={validatePassword}
+            <form.AppField
+              name="code"
+              validators={{
+                onChange: ({ value }) =>
+                  value.length === otpLength
+                    ? undefined
+                    : emailOtpLocalization.codeLengthMismatch.replace(
+                        "{{length}}",
+                        String(otpLength)
+                      )
+              }}
             >
-              <Label>{localization.auth.confirmPassword}</Label>
-
-              <InputGroup
-                variant={variant === "transparent" ? "primary" : "secondary"}
-              >
-                <InputGroup.Input
-                  name="confirmPassword"
-                  placeholder={localization.auth.confirmPasswordPlaceholder}
-                  type={isConfirmPasswordVisible ? "text" : "password"}
-                  required
+              {(field) => (
+                <OtpField
+                  autoFocus={hasStoredEmail}
+                  isDisabled={isPending}
+                  label={emailOtpLocalization.code}
+                  length={otpLength}
+                  name="otp"
+                  value={field.state.value}
+                  variant={variant}
+                  onChange={field.handleChange}
+                  onComplete={() => void submitAuthForm(form)}
                 />
+              )}
+            </form.AppField>
 
-                <InputGroup.Suffix className="px-0">
-                  <Button
-                    isIconOnly
-                    aria-label={
-                      isConfirmPasswordVisible
-                        ? localization.auth.hidePassword
-                        : localization.auth.showPassword
+            <form.AppField
+              name="password"
+              validators={{ onChange: ({ value }) => validatePassword(value) }}
+            >
+              {(field) => (
+                <TextField
+                  name={field.name}
+                  autoComplete="new-password"
+                  value={field.state.value}
+                  onBlur={field.handleBlur}
+                  onChange={field.handleChange}
+                  isInvalid={isAuthFormFieldInvalid(field.state.meta)}
+                  isDisabled={isPending}
+                  validationBehavior="aria"
+                >
+                  <Label>{localization.auth.newPassword}</Label>
+
+                  <InputGroup
+                    variant={
+                      variant === "transparent" ? "primary" : "secondary"
                     }
-                    size="sm"
-                    variant="ghost"
-                    onPress={() =>
-                      setIsConfirmPasswordVisible(!isConfirmPasswordVisible)
-                    }
-                    isDisabled={isPending}
                   >
-                    {isConfirmPasswordVisible ? <EyeSlash /> : <Eye />}
-                  </Button>
-                </InputGroup.Suffix>
-              </InputGroup>
+                    <InputGroup.Input
+                      placeholder={localization.auth.newPasswordPlaceholder}
+                      type={isPasswordVisible ? "text" : "password"}
+                    />
 
-              <FieldError />
-            </TextField>
-          )}
+                    <InputGroup.Suffix className="px-0">
+                      <Button
+                        isIconOnly
+                        aria-label={
+                          isPasswordVisible
+                            ? localization.auth.hidePassword
+                            : localization.auth.showPassword
+                        }
+                        size="sm"
+                        variant="ghost"
+                        onPress={() => setIsPasswordVisible(!isPasswordVisible)}
+                        isDisabled={isPending}
+                      >
+                        {isPasswordVisible ? <EyeSlash /> : <Eye />}
+                      </Button>
+                    </InputGroup.Suffix>
+                  </InputGroup>
 
-          <div className="flex flex-col gap-3">
-            <Button type="submit" className="w-full" isPending={isPending}>
-              {isPending && <Spinner color="current" size="sm" />}
+                  <field.AuthFormFieldError />
 
-              {localization.auth.resetPassword}
-            </Button>
+                  <PasswordStrengthMeter password={field.state.value} />
+                </TextField>
+              )}
+            </form.AppField>
 
-            {email && <OpenEmailButton email={email} variant="secondary" />}
-          </div>
-        </Form>
+            {emailAndPassword?.confirmPassword && (
+              <form.AppField
+                name="confirmPassword"
+                validators={{
+                  onChangeListenTo: ["password"],
+                  onChange: ({ value, fieldApi }) =>
+                    validatePassword(value) ??
+                    (value === fieldApi.form.getFieldValue("password")
+                      ? undefined
+                      : localization.auth.passwordsDoNotMatch)
+                }}
+              >
+                {(field) => (
+                  <TextField
+                    name={field.name}
+                    autoComplete="new-password"
+                    isDisabled={isPending}
+                    isInvalid={isAuthFormFieldInvalid(field.state.meta)}
+                    validationBehavior="aria"
+                    value={field.state.value}
+                    onBlur={field.handleBlur}
+                    onChange={field.handleChange}
+                  >
+                    <Label>{localization.auth.confirmPassword}</Label>
+
+                    <InputGroup
+                      variant={
+                        variant === "transparent" ? "primary" : "secondary"
+                      }
+                    >
+                      <InputGroup.Input
+                        placeholder={
+                          localization.auth.confirmPasswordPlaceholder
+                        }
+                        type={isConfirmPasswordVisible ? "text" : "password"}
+                      />
+
+                      <InputGroup.Suffix className="px-0">
+                        <Button
+                          isIconOnly
+                          aria-label={
+                            isConfirmPasswordVisible
+                              ? localization.auth.hidePassword
+                              : localization.auth.showPassword
+                          }
+                          size="sm"
+                          variant="ghost"
+                          onPress={() =>
+                            setIsConfirmPasswordVisible(
+                              !isConfirmPasswordVisible
+                            )
+                          }
+                          isDisabled={isPending}
+                        >
+                          {isConfirmPasswordVisible ? <EyeSlash /> : <Eye />}
+                        </Button>
+                      </InputGroup.Suffix>
+                    </InputGroup>
+
+                    <field.AuthFormFieldError />
+                  </TextField>
+                )}
+              </form.AppField>
+            )}
+
+            <div className="flex flex-col gap-3">
+              <form.AuthFormSubmitButton
+                className="w-full"
+                isDisabled={isPending}
+              >
+                {isPending && <Spinner color="current" size="sm" />}
+
+                {localization.auth.resetPassword}
+              </form.AuthFormSubmitButton>
+
+              {email && <OpenEmailButton email={email} variant="secondary" />}
+            </div>
+            <form.AuthFormServerError />
+          </form.AuthFormRoot>
+        </form.AppForm>
       </Card.Content>
 
       <Card.Footer className="flex-col gap-3">

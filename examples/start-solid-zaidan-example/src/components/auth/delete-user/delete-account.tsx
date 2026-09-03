@@ -27,6 +27,7 @@ import {
   InputGroupInput
 } from "@/components/ui/input-group"
 import { cn } from "@/lib/utils"
+import { createAuthForm, isAuthFormFieldInvalid } from "../auth-form"
 
 const defaultDeleteAccountLabel = "Delete account"
 
@@ -38,7 +39,6 @@ export function DeleteAccount(props: DeleteAccountProps = {}) {
   const auth = useAuth()
   const queryClient = useQueryClient()
   const [confirmOpen, setConfirmOpen] = createSignal(false)
-  const [password, setPassword] = createSignal("")
   const [isPasswordVisible, setIsPasswordVisible] = createSignal(false)
   const deleteUserPluginConfig = () =>
     auth.plugins.find((plugin) => plugin.id === "deleteUser") as
@@ -75,7 +75,7 @@ export function DeleteAccount(props: DeleteAccountProps = {}) {
   const deleteUser = useDeleteUser(auth.authClient, () => ({
     onSuccess: () => {
       setConfirmOpen(false)
-      setPassword("")
+      form.reset()
       setIsPasswordVisible(false)
 
       if (sendDeleteAccountVerification()) {
@@ -94,19 +94,20 @@ export function DeleteAccount(props: DeleteAccountProps = {}) {
 
   const handleDialogOpenChange = (open: boolean) => {
     setConfirmOpen(open)
-    setPassword("")
+    form.reset()
     setIsPasswordVisible(false)
   }
 
-  const submitDeleteUser = (event: SubmitEvent) => {
-    event.preventDefault()
-
-    deleteUser.mutate(
-      (needsPassword() ? { password: password() } : {}) as Parameters<
-        typeof deleteUser.mutate
-      >[0]
-    )
-  }
+  const form = createAuthForm(() => ({
+    defaultValues: { password: "" },
+    onSubmit: async ({ value }) => {
+      await deleteUser.mutateAsync(
+        (needsPassword() ? { password: value.password } : {}) as Parameters<
+          typeof deleteUser.mutateAsync
+        >[0]
+      )
+    }
+  }))
 
   return (
     <Card class={cn("z-card-padding-none border-destructive", props.class)}>
@@ -131,86 +132,106 @@ export function DeleteAccount(props: DeleteAccountProps = {}) {
           </AlertDialogTrigger>
 
           <AlertDialogContent>
-            <form class="flex flex-col gap-6" onSubmit={submitDeleteUser}>
-              <AlertDialogHeader>
-                <AlertDialogMedia class="bg-destructive/10 text-destructive dark:bg-destructive/20 dark:text-destructive">
-                  <TriangleAlert />
-                </AlertDialogMedia>
-                <AlertDialogTitle>
-                  {deleteUserLabels().deleteUser}
-                </AlertDialogTitle>
-                <AlertDialogDescription>
-                  {deleteUserLabels().deleteUserDescription}
-                </AlertDialogDescription>
-              </AlertDialogHeader>
+            <form.AppForm>
+              <form.AuthFormRoot class="flex flex-col gap-6">
+                <AlertDialogHeader>
+                  <AlertDialogMedia class="bg-destructive/10 text-destructive dark:bg-destructive/20 dark:text-destructive">
+                    <TriangleAlert />
+                  </AlertDialogMedia>
+                  <AlertDialogTitle>
+                    {deleteUserLabels().deleteUser}
+                  </AlertDialogTitle>
+                  <AlertDialogDescription>
+                    {deleteUserLabels().deleteUserDescription}
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
 
-              <Show when={needsPassword()}>
-                <Field>
-                  <FieldLabel for="delete-password">
-                    {auth.localization.auth.password}
-                  </FieldLabel>
-                  <InputGroup>
-                    <InputGroupInput
-                      autocomplete="current-password"
-                      disabled={deleteUser.isPending}
-                      id="delete-password"
-                      name="password"
-                      onInput={(event) =>
-                        setPassword(event.currentTarget.value)
-                      }
-                      placeholder={auth.localization.auth.passwordPlaceholder}
-                      required
-                      type={isPasswordVisible() ? "text" : "password"}
-                      value={password()}
-                    />
-                    <InputGroupAddon align="inline-end">
-                      <InputGroupButton
-                        aria-label={
-                          isPasswordVisible()
-                            ? auth.localization.auth.hidePassword
-                            : auth.localization.auth.showPassword
-                        }
-                        disabled={deleteUser.isPending}
-                        onClick={() =>
-                          setIsPasswordVisible((visible) => !visible)
-                        }
-                        size="icon-sm"
-                        title={
-                          isPasswordVisible()
-                            ? auth.localization.auth.hidePassword
-                            : auth.localization.auth.showPassword
-                        }
+                <Show when={needsPassword()}>
+                  <form.AppField
+                    name="password"
+                    validators={{
+                      onChange: ({ value }) =>
+                        value ? undefined : auth.localization.auth.fieldRequired
+                    }}
+                  >
+                    {(field) => (
+                      <Field
+                        data-invalid={isAuthFormFieldInvalid(
+                          field().state.meta
+                        )}
                       >
-                        <Show
-                          when={isPasswordVisible()}
-                          fallback={<Eye aria-hidden class="size-4" />}
-                        >
-                          <EyeOff aria-hidden class="size-4" />
-                        </Show>
-                      </InputGroupButton>
-                    </InputGroupAddon>
-                  </InputGroup>
-                </Field>
-              </Show>
+                        <FieldLabel for="delete-password">
+                          {auth.localization.auth.password}
+                        </FieldLabel>
+                        <InputGroup>
+                          <InputGroupInput
+                            aria-invalid={isAuthFormFieldInvalid(
+                              field().state.meta
+                            )}
+                            autocomplete="current-password"
+                            disabled={deleteUser.isPending}
+                            id="delete-password"
+                            name={field().name}
+                            onBlur={field().handleBlur}
+                            onInput={(event) =>
+                              field().handleChange(event.currentTarget.value)
+                            }
+                            placeholder={
+                              auth.localization.auth.passwordPlaceholder
+                            }
+                            type={isPasswordVisible() ? "text" : "password"}
+                            value={field().state.value}
+                          />
+                          <InputGroupAddon align="inline-end">
+                            <InputGroupButton
+                              aria-label={
+                                isPasswordVisible()
+                                  ? auth.localization.auth.hidePassword
+                                  : auth.localization.auth.showPassword
+                              }
+                              disabled={deleteUser.isPending}
+                              onClick={() =>
+                                setIsPasswordVisible((visible) => !visible)
+                              }
+                              size="icon-sm"
+                              title={
+                                isPasswordVisible()
+                                  ? auth.localization.auth.hidePassword
+                                  : auth.localization.auth.showPassword
+                              }
+                            >
+                              <Show
+                                when={isPasswordVisible()}
+                                fallback={<Eye aria-hidden class="size-4" />}
+                              >
+                                <EyeOff aria-hidden class="size-4" />
+                              </Show>
+                            </InputGroupButton>
+                          </InputGroupAddon>
+                        </InputGroup>
+                        <field.AuthFormFieldError />
+                      </Field>
+                    )}
+                  </form.AppField>
+                </Show>
+                <form.AuthFormServerError />
 
-              <AlertDialogFooter>
-                <AlertDialogCancel
-                  disabled={deleteUser.isPending}
-                  type="button"
-                >
-                  {auth.localization.settings.cancel}
-                </AlertDialogCancel>
-                <Button
-                  disabled={deleteUser.isPending}
-                  type="submit"
-                  variant="destructive"
-                >
-                  {deleteUser.isPending
-                    ? `${deleteUserLabels().deleteUser}…`
-                    : deleteUserLabels().deleteUser}
-                </Button>
-              </AlertDialogFooter>
-            </form>
+                <AlertDialogFooter>
+                  <AlertDialogCancel
+                    disabled={deleteUser.isPending}
+                    type="button"
+                  >
+                    {auth.localization.settings.cancel}
+                  </AlertDialogCancel>
+                  <form.AuthFormSubmitButton
+                    disabled={deleteUser.isPending}
+                    variant="destructive"
+                  >
+                    {deleteUserLabels().deleteUser}
+                  </form.AuthFormSubmitButton>
+                </AlertDialogFooter>
+              </form.AuthFormRoot>
+            </form.AppForm>
           </AlertDialogContent>
         </AlertDialog>
       </CardContent>

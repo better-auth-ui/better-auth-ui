@@ -42,7 +42,7 @@ export function CreateApiKeyDialog({
     localization: apiKeyLocalization
   } = useAuthPlugin(apiKeyPlugin)
 
-  const { mutate: createApiKey, isPending: isCreating } =
+  const { mutateAsync: createApiKey, isPending: isCreating } =
     useCreateApiKey(authClient)
 
   const [isNewKeyDialogOpen, setIsNewKeyDialogOpen] = useState(false)
@@ -75,12 +75,12 @@ export function CreateApiKeyDialog({
     defaultValues: {
       configId: availableConfigurations[0]?.id ?? "",
       expiration:
-        keyExpiration && keyExpiration.defaultInterval === null
+        !keyExpiration || keyExpiration.defaultInterval === null
           ? "never"
-          : String((keyExpiration && keyExpiration.defaultInterval) ?? "never"),
+          : String(keyExpiration.defaultInterval),
       name: ""
     },
-    onSubmit: ({ value }) => {
+    onSubmit: async ({ value }) => {
       const name = value.name.trim()
       const expirationDays =
         value.expiration !== "never" ? Number(value.expiration) : undefined
@@ -98,14 +98,17 @@ export function CreateApiKeyDialog({
         ...(organizationId ? { organizationId } : {})
       }
 
-      createApiKey(Object.keys(payload).length > 0 ? payload : undefined, {
-        onSuccess: (result) => {
-          handleOpenChange(false)
-          setKeyName(name)
-          setSecretKey(result.key)
-          setIsNewKeyDialogOpen(true)
+      await createApiKey(
+        Object.keys(payload).length > 0 ? payload : undefined,
+        {
+          onSuccess: (result) => {
+            handleOpenChange(false)
+            setKeyName(name)
+            setSecretKey(result.key)
+            setIsNewKeyDialogOpen(true)
+          }
         }
-      })
+      )
     }
   })
 
@@ -256,6 +259,7 @@ export function CreateApiKeyDialog({
                       </form.AppField>
                     ) : null}
                   </div>
+                  <form.AuthFormServerError />
                 </AlertDialog.Body>
 
                 <AlertDialog.Footer>

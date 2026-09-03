@@ -4,6 +4,9 @@ import solid from "vite-plugin-solid"
 import { defineConfig } from "vitest/config"
 
 export default defineConfig({
+  optimizeDeps: {
+    include: ["@tanstack/solid-store"]
+  },
   plugins: [solid({ ssr: true })],
   resolve: {
     alias: {

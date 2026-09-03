@@ -9,9 +9,8 @@ import {
   useFetchOptions
 } from "@better-auth-ui/solid"
 import { useRequestPhoneNumberPasswordReset } from "@better-auth-ui/solid/plugins/phone-number"
-import { createSignal, Show } from "solid-js"
+import { Show } from "solid-js"
 
-import { Button } from "@/components/ui/button"
 import {
   Card,
   CardContent,
@@ -23,6 +22,7 @@ import { FieldGroup } from "@/components/ui/field"
 import { Spinner } from "@/components/ui/spinner"
 import { phoneNumberPlugin } from "@/lib/auth/phone-number-plugin"
 import { cn } from "@/lib/utils"
+import { createAuthForm } from "../auth-form"
 import { InternationalPhoneField } from "./international-phone-field"
 
 export const PHONE_NUMBER_RESET_STORAGE_KEY =
@@ -46,10 +46,6 @@ export function ForgotPhoneNumberPassword(
     viewPaths: phoneNumberViewPaths
   } = useAuthPlugin(phoneNumberPlugin)
   const { fetchOptions, resetFetchOptions } = useFetchOptions()
-  const [phoneNumber, setPhoneNumber] = createSignal(
-    createPhoneNumberValue("", defaultCountry, adapter)
-  )
-  const [fieldError, setFieldError] = createSignal<string>()
   const requestReset = useRequestPhoneNumberPasswordReset(
     auth.authClient as PhoneNumberAuthClient,
     () => ({
@@ -63,17 +59,18 @@ export function ForgotPhoneNumberPassword(
       }
     })
   )
-  const submit = (event: SubmitEvent & { currentTarget: HTMLFormElement }) => {
-    event.preventDefault()
-    if (!phoneNumber().e164) {
-      setFieldError(localization.invalidPhoneNumber)
-      return
+  const form = createAuthForm(() => ({
+    defaultValues: {
+      phoneNumber: createPhoneNumberValue("", defaultCountry, adapter)
+    },
+    onSubmit: async ({ value }) => {
+      if (!value.phoneNumber.e164) return
+      await requestReset.mutateAsync({
+        phoneNumber: value.phoneNumber.e164,
+        fetchOptions: fetchOptions()
+      } as Parameters<typeof requestReset.mutateAsync>[0])
     }
-    requestReset.mutate({
-      phoneNumber: phoneNumber().e164,
-      fetchOptions: fetchOptions()
-    } as Parameters<typeof requestReset.mutate>[0])
-  }
+  }))
 
   return (
     <Card class={cn("w-full max-w-sm", props.class)}>
@@ -83,35 +80,44 @@ export function ForgotPhoneNumberPassword(
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <form aria-label={localization.forgotPassword} onSubmit={submit}>
-          <FieldGroup>
-            <InternationalPhoneField
-              adapter={adapter}
-              countryCodes={countries}
-              countryLabel={localization.country}
-              disabled={requestReset.isPending}
-              error={fieldError()}
-              locale={locale}
-              phoneLabel={localization.phoneNumber}
-              placeholder={localization.phoneNumberPlaceholder}
-              value={phoneNumber()}
-              onChange={(value) => {
-                setPhoneNumber(value)
-                setFieldError(undefined)
-              }}
-            />
-            <Button
-              class="w-full"
-              disabled={requestReset.isPending}
-              type="submit"
-            >
-              <Show when={requestReset.isPending}>
-                <Spinner />
-              </Show>
-              {localization.sendCode}
-            </Button>
-          </FieldGroup>
-        </form>
+        <form.AppForm>
+          <form.AuthFormRoot aria-label={localization.forgotPassword}>
+            <FieldGroup>
+              <form.AppField
+                name="phoneNumber"
+                validators={{
+                  onChange: ({ value }) =>
+                    value.e164 ? undefined : localization.invalidPhoneNumber
+                }}
+              >
+                {(field) => (
+                  <InternationalPhoneField
+                    adapter={adapter}
+                    countryCodes={countries}
+                    countryLabel={localization.country}
+                    disabled={requestReset.isPending}
+                    error={field().state.meta.errors[0]?.toString()}
+                    locale={locale}
+                    phoneLabel={localization.phoneNumber}
+                    placeholder={localization.phoneNumberPlaceholder}
+                    value={field().state.value}
+                    onChange={field().handleChange}
+                  />
+                )}
+              </form.AppField>
+              <form.AuthFormSubmitButton
+                class="w-full"
+                disabled={requestReset.isPending}
+              >
+                <Show when={requestReset.isPending}>
+                  <Spinner />
+                </Show>
+                {localization.sendCode}
+              </form.AuthFormSubmitButton>
+              <form.AuthFormServerError />
+            </FieldGroup>
+          </form.AuthFormRoot>
+        </form.AppForm>
       </CardContent>
       <CardFooter class="justify-center">
         <p class="text-sm text-muted-foreground">

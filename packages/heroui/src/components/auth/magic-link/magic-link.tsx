@@ -1,4 +1,4 @@
-import { authMutationKeys } from "@better-auth-ui/core"
+import { authMutationKeys, validateEmailAddress } from "@better-auth-ui/core"
 import type { MagicLinkAuthClient } from "@better-auth-ui/core/plugins/magic-link"
 import { getSsoFallbackEmail } from "@better-auth-ui/core/plugins/sso"
 import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
@@ -57,7 +57,7 @@ export function MagicLink({
   const { localization: magicLinkLocalization, viewPaths: magicLinkViewPaths } =
     useAuthPlugin(magicLinkPlugin)
 
-  const { mutate: signInMagicLink, isPending: signInMagicLinkPending } =
+  const { mutateAsync: signInMagicLink, isPending: signInMagicLinkPending } =
     useSignInMagicLink(authClient as MagicLinkAuthClient, {
       onSuccess: (_data, variables) => {
         sessionStorage.setItem(MAGIC_LINK_SENT_STORAGE_KEY, variables.email)
@@ -77,8 +77,8 @@ export function MagicLink({
 
   const form = useAuthForm({
     defaultValues: { email: getSsoFallbackEmail() },
-    onSubmit: ({ value }) =>
-      signInMagicLink({
+    onSubmit: async ({ value }) =>
+      await signInMagicLink({
         email: value.email,
         callbackURL: `${baseURL}${redirectTo}`
       })
@@ -112,7 +112,16 @@ export function MagicLink({
 
         <form.AppForm>
           <form.AuthFormRoot className="flex flex-col gap-4">
-            <form.AppField name="email">
+            <form.AppField
+              name="email"
+              validators={{
+                onChange: ({ value }) =>
+                  validateEmailAddress(value, {
+                    invalidMessage: localization.auth.invalidEmail,
+                    requiredMessage: localization.auth.fieldRequired
+                  })
+              }}
+            >
               {(field) => (
                 <TextField
                   name={field.name}
@@ -137,6 +146,8 @@ export function MagicLink({
                 </TextField>
               )}
             </form.AppField>
+
+            <form.AuthFormServerError />
 
             <div className="flex flex-col gap-3">
               <form.AuthFormSubmitButton

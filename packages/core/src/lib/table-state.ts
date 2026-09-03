@@ -18,6 +18,66 @@ export type TableUrlState = {
   sorting: TableSortingEntry[]
 }
 
+export type TableSearchParamsAdapter = {
+  read: () => URLSearchParams
+  replace: (params: URLSearchParams) => void
+  subscribe: (listener: () => void) => () => void
+}
+
+export type TableStorageAdapter = {
+  read: (key: string) => string | null
+  write: (key: string, value: string) => void
+}
+
+export type TablePersistenceAdapters = {
+  search: TableSearchParamsAdapter
+  storage?: TableStorageAdapter
+}
+
+/**
+ * Create a search adapter from a router's search and navigation primitives.
+ *
+ * TanStack Router consumers can pass `router.state.location.searchStr` from
+ * `read`, use `router.navigate({ replace: true, search })` from `replace`, and
+ * subscribe to router state changes from `subscribe`. Other routers can expose
+ * the same three operations without coupling the table package to that router.
+ */
+export function createTableSearchParamsAdapter(
+  adapter: TableSearchParamsAdapter
+): TableSearchParamsAdapter {
+  return adapter
+}
+
+/** Create browser-backed persistence for tables outside a router context. */
+export function createBrowserTablePersistenceAdapters(): TablePersistenceAdapters {
+  return {
+    search: {
+      read: () =>
+        typeof window === "undefined"
+          ? new URLSearchParams()
+          : new URLSearchParams(window.location.search),
+      replace: (params) => {
+        if (typeof window === "undefined") return
+        const url = new URL(window.location.href)
+        url.search = params.toString()
+        window.history.replaceState(window.history.state, "", url)
+      },
+      subscribe: (listener) => {
+        if (typeof window === "undefined") return () => undefined
+        window.addEventListener("popstate", listener)
+        return () => window.removeEventListener("popstate", listener)
+      }
+    },
+    storage:
+      typeof window === "undefined"
+        ? undefined
+        : {
+            read: (key) => window.localStorage.getItem(key),
+            write: (key, value) => window.localStorage.setItem(key, value)
+          }
+  }
+}
+
 const TABLE_STATE_VERSION = 1
 const TABLE_FILTER_VALUE_PREFIX = "~"
 

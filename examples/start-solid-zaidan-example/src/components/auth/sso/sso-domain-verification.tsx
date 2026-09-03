@@ -8,7 +8,6 @@ import {
   useRequestSsoDomainVerification,
   useVerifySsoDomain
 } from "@better-auth-ui/solid/plugins/sso"
-import type { BetterFetchError } from "better-auth/client"
 import { Check, Copy } from "lucide-solid"
 import { createSignal, Show } from "solid-js"
 
@@ -27,7 +26,6 @@ import {
   FieldGroup,
   FieldLabel
 } from "@/components/ui/field"
-import { Input } from "@/components/ui/input"
 import {
   InputGroup,
   InputGroupButton,
@@ -36,6 +34,7 @@ import {
 import { Spinner } from "@/components/ui/spinner"
 import { ssoPlugin } from "@/lib/auth/sso-plugin"
 import { cn } from "@/lib/utils"
+import { createAuthForm, setAuthFormServerError } from "../auth-form"
 
 export type SsoDomainVerificationProps = {
   class?: string
@@ -44,17 +43,9 @@ export type SsoDomainVerificationProps = {
   tokenPrefix?: string
 }
 
-const getErrorMessage = (error: Error | null | undefined) => {
-  const authError = error as BetterFetchError | null | undefined
-  return authError?.error?.message ?? authError?.message
-}
-
 export function SsoDomainVerification(props: SsoDomainVerificationProps) {
   const auth = useAuth()
   const { localization } = useAuthPlugin(ssoPlugin)
-  const [providerId, setProviderId] = createSignal(
-    props.defaultProviderId ?? ""
-  )
   const [token, setToken] = createSignal(props.defaultToken ?? "")
   const [verified, setVerified] = createSignal(false)
   const [copyError, setCopyError] = createSignal("")
@@ -68,8 +59,8 @@ export function SsoDomainVerification(props: SsoDomainVerificationProps) {
     onSuccess: () => setVerified(true)
   }))
   const host = () =>
-    providerId()
-      ? `_${props.tokenPrefix ?? "better-auth-token"}-${providerId()}`
+    form.state.values.providerId
+      ? `_${props.tokenPrefix ?? "better-auth-token"}-${form.state.values.providerId}`
       : ""
   const hostCopy = createCopyToClipboard({
     onError: (error) =>
@@ -79,16 +70,29 @@ export function SsoDomainVerification(props: SsoDomainVerificationProps) {
     onError: (error) =>
       setCopyError(error instanceof Error ? error.message : String(error))
   })
-  const error = () =>
-    requestToken.submittedAt > verify.submittedAt
-      ? requestToken.error
-      : verify.error
+  const form = createAuthForm(() => ({
+    defaultValues: { providerId: props.defaultProviderId ?? "" },
+    onSubmit: async ({ value }) => {
+      setCopyError("")
+      setVerified(false)
+      await verify.mutateAsync({ providerId: value.providerId.trim() })
+    }
+  }))
 
-  const submit = (event: SubmitEvent) => {
-    event.preventDefault()
+  const requestNewToken = async () => {
     setCopyError("")
     setVerified(false)
-    verify.mutate({ providerId: providerId() })
+    try {
+      await requestToken.mutateAsync({
+        providerId: form.state.values.providerId.trim()
+      })
+    } catch (error) {
+      setAuthFormServerError(
+        form,
+        error,
+        "Unable to request a domain verification token. Try again."
+      )
+    }
   }
 
   return (
@@ -100,115 +104,118 @@ export function SsoDomainVerification(props: SsoDomainVerificationProps) {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <form onSubmit={submit}>
-          <FieldGroup>
-            <Field>
-              <FieldLabel for="solid-sso-verification-provider-id">
-                {localization.providerId}
-              </FieldLabel>
-              <Input
-                id="solid-sso-verification-provider-id"
+        <form.AppForm>
+          <form.AuthFormRoot>
+            <FieldGroup>
+              <form.AppField
+                listeners={{
+                  onChange: () => {
+                    setToken("")
+                    setVerified(false)
+                  }
+                }}
                 name="providerId"
-                onInput={(event) => {
-                  setProviderId(event.currentTarget.value.trim())
-                  setToken("")
-                  setVerified(false)
+                validators={{
+                  onChange: ({ value }) =>
+                    value.trim()
+                      ? undefined
+                      : auth.localization.auth.fieldRequired
                 }}
-                required
-                value={providerId()}
-              />
-            </Field>
-            <Show when={token()}>
-              <div class="grid gap-3 rounded-lg border p-3">
-                <Field>
-                  <FieldLabel for="solid-sso-dns-host">
-                    {localization.txtRecordHost}
-                  </FieldLabel>
-                  <InputGroup>
-                    <InputGroupInput
-                      id="solid-sso-dns-host"
-                      readonly
-                      value={host()}
-                    />
-                    <InputGroupButton
-                      aria-label={localization.copyDnsHost}
-                      onClick={() => {
-                        setCopyError("")
-                        void hostCopy.copy(host())
-                      }}
-                      type="button"
-                    >
-                      <Show fallback={<Copy />} when={hostCopy.copied()}>
-                        <Check />
-                      </Show>
-                    </InputGroupButton>
-                  </InputGroup>
-                </Field>
-                <Field>
-                  <FieldLabel for="solid-sso-dns-value">
-                    {localization.txtRecordValue}
-                  </FieldLabel>
-                  <InputGroup>
-                    <InputGroupInput
-                      id="solid-sso-dns-value"
-                      readonly
-                      value={token()}
-                    />
-                    <InputGroupButton
-                      aria-label={localization.copyDnsValue}
-                      onClick={() => {
-                        setCopyError("")
-                        void tokenCopy.copy(token())
-                      }}
-                      type="button"
-                    >
-                      <Show fallback={<Copy />} when={tokenCopy.copied()}>
-                        <Check />
-                      </Show>
-                    </InputGroupButton>
-                  </InputGroup>
-                </Field>
+              >
+                {(field) => (
+                  <field.AuthFormTextField
+                    id="solid-sso-verification-provider-id"
+                    label={localization.providerId}
+                  />
+                )}
+              </form.AppField>
+              <Show when={token()}>
+                <div class="grid gap-3 rounded-lg border p-3">
+                  <Field>
+                    <FieldLabel for="solid-sso-dns-host">
+                      {localization.txtRecordHost}
+                    </FieldLabel>
+                    <InputGroup>
+                      <InputGroupInput
+                        id="solid-sso-dns-host"
+                        readonly
+                        value={host()}
+                      />
+                      <InputGroupButton
+                        aria-label={localization.copyDnsHost}
+                        onClick={() => {
+                          setCopyError("")
+                          void hostCopy.copy(host())
+                        }}
+                        type="button"
+                      >
+                        <Show fallback={<Copy />} when={hostCopy.copied()}>
+                          <Check />
+                        </Show>
+                      </InputGroupButton>
+                    </InputGroup>
+                  </Field>
+                  <Field>
+                    <FieldLabel for="solid-sso-dns-value">
+                      {localization.txtRecordValue}
+                    </FieldLabel>
+                    <InputGroup>
+                      <InputGroupInput
+                        id="solid-sso-dns-value"
+                        readonly
+                        value={token()}
+                      />
+                      <InputGroupButton
+                        aria-label={localization.copyDnsValue}
+                        onClick={() => {
+                          setCopyError("")
+                          void tokenCopy.copy(token())
+                        }}
+                        type="button"
+                      >
+                        <Show fallback={<Copy />} when={tokenCopy.copied()}>
+                          <Check />
+                        </Show>
+                      </InputGroupButton>
+                    </InputGroup>
+                  </Field>
+                </div>
+              </Show>
+              <div class="flex flex-wrap gap-2">
+                <Button
+                  disabled={
+                    !form.state.values.providerId || requestToken.isPending
+                  }
+                  onClick={() => void requestNewToken()}
+                  type="button"
+                  variant="outline"
+                >
+                  <Show when={requestToken.isPending}>
+                    <Spinner />
+                  </Show>
+                  {localization.requestNewToken}
+                </Button>
+                <form.AuthFormSubmitButton
+                  disabled={!form.state.values.providerId || verify.isPending}
+                >
+                  {localization.verifyDomain}
+                </form.AuthFormSubmitButton>
               </div>
-            </Show>
-            <div class="flex flex-wrap gap-2">
-              <Button
-                disabled={!providerId() || requestToken.isPending}
-                onClick={() => {
-                  setCopyError("")
-                  setVerified(false)
-                  requestToken.mutate({ providerId: providerId() })
-                }}
-                type="button"
-                variant="outline"
-              >
-                <Show when={requestToken.isPending}>
-                  <Spinner />
-                </Show>
-                {localization.requestNewToken}
-              </Button>
-              <Button
-                disabled={!providerId() || verify.isPending}
-                type="submit"
-              >
-                <Show when={verify.isPending}>
-                  <Spinner />
-                </Show>
-                {localization.verifyDomain}
-              </Button>
-            </div>
-            <Show when={verified()}>
-              <FieldDescription role="status">
-                {localization.domainVerified}
-              </FieldDescription>
-            </Show>
-            <FieldError>{copyError() || getErrorMessage(error())}</FieldError>
-            <span aria-live="polite" class="sr-only">
-              {token() && !verified()
-                ? localization.domainVerificationRequested
-                : ""}
-            </span>
-          </FieldGroup>
-        </form>
+              <Show when={verified()}>
+                <FieldDescription role="status">
+                  {localization.domainVerified}
+                </FieldDescription>
+              </Show>
+              <FieldError>{copyError()}</FieldError>
+              <form.AuthFormServerError />
+              <span aria-live="polite" class="sr-only">
+                {token() && !verified()
+                  ? localization.domainVerificationRequested
+                  : ""}
+              </span>
+            </FieldGroup>
+          </form.AuthFormRoot>
+        </form.AppForm>
       </CardContent>
     </Card>
   )

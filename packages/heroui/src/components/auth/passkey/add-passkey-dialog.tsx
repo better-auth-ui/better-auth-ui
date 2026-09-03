@@ -45,7 +45,9 @@ export function AddPasskeyDialog({
     onOpenChange(open)
   }
 
-  const submitRequest = (request: AddPasskeyParams<PasskeyAuthClient>) => {
+  const submitRequest = async (
+    request: AddPasskeyParams<PasskeyAuthClient>
+  ) => {
     const requestWithCallbacks = {
       ...request,
       fetchOptions: {
@@ -54,14 +56,14 @@ export function AddPasskeyDialog({
       }
     }
     pendingRequest.current = requestWithCallbacks
-    addPasskey.mutate(requestWithCallbacks)
+    await addPasskey.mutateAsync(requestWithCallbacks)
   }
 
   const form = useAuthForm({
     defaultValues: { name: "" },
-    onSubmit: ({ value }) => {
+    onSubmit: async ({ value }) => {
       const name = value.name.trim()
-      submitRequest({
+      await submitRequest({
         ...(name ? { name } : {}),
         ...(authenticatorAttachment ? { authenticatorAttachment } : {})
       } as AddPasskeyParams<PasskeyAuthClient>)
@@ -84,9 +86,9 @@ export function AddPasskeyDialog({
               </AlertDialog.Header>
               <AlertDialog.Body>
                 <FreshSessionPrompt
-                  onFresh={() => {
+                  onFresh={async () => {
                     const request = pendingRequest.current
-                    if (request) submitRequest(request)
+                    if (request) await submitRequest(request)
                   }}
                 />
               </AlertDialog.Body>

@@ -1,4 +1,4 @@
-import { authQueryKeys } from "@better-auth-ui/core"
+import { authQueryKeys, validateStringLength } from "@better-auth-ui/core"
 import {
   clearTwoFactorMethods,
   readTwoFactorMethods,
@@ -19,8 +19,6 @@ import {
   Checkbox,
   cn,
   Description,
-  FieldError,
-  Form,
   Input,
   Label,
   Link,
@@ -29,13 +27,20 @@ import {
   useIsHydrated
 } from "@heroui/react"
 import { useQueryClient } from "@tanstack/react-query"
-import { type SyntheticEvent, useEffect, useState } from "react"
+import { useEffect, useState } from "react"
 
 import { twoFactorPlugin } from "../../../lib/auth/two-factor-plugin"
 import {
   RESEND_COOLDOWN_SECONDS,
   useResendCooldown
 } from "../../../lib/auth/use-resend-cooldown"
+import {
+  clearAuthFormServerError,
+  isAuthFormFieldInvalid,
+  setAuthFormServerError,
+  submitAuthForm,
+  useAuthForm
+} from "../auth-form"
 import { OtpField } from "../otp-field"
 
 /** Challenge surfaces the view can render, in the order they are offered. */
@@ -87,8 +92,6 @@ export function TwoFactorChallenge({
   const [method, setMethod] = useState<ChallengeMethod>(
     () => methods[0] ?? "totp"
   )
-  const [code, setCode] = useState("")
-  const [trustDevice, setTrustDevice] = useState(false)
   const [otpRequested, setOtpRequested] = useState(false)
   const { cooldown, isCoolingDown, startCooldown } = useResendCooldown()
 
@@ -106,7 +109,7 @@ export function TwoFactorChallenge({
     navigate({ to: redirectTo })
   }
 
-  const { mutate: sendTwoFactorOtp, isPending: isSendingOtp } =
+  const { mutateAsync: sendTwoFactorOtp, isPending: isSendingOtp } =
     useSendTwoFactorOtp(twoFactorClient, {
       onSuccess: () => {
         setOtpRequested(true)
@@ -114,30 +117,45 @@ export function TwoFactorChallenge({
       }
     })
 
-  const { mutate: verifyTotp, isPending: isVerifyingTotp } = useVerifyTotp(
+  const { mutateAsync: verifyTotp, isPending: isVerifyingTotp } = useVerifyTotp(
     twoFactorClient,
-    { onError: () => setCode(""), onSuccess: onVerified }
+    { onError: () => form.setFieldValue("code", ""), onSuccess: onVerified }
   )
 
-  const { mutate: verifyTwoFactorOtp, isPending: isVerifyingOtp } =
+  const { mutateAsync: verifyTwoFactorOtp, isPending: isVerifyingOtp } =
     useVerifyTwoFactorOtp(twoFactorClient, {
-      onError: () => setCode(""),
+      onError: () => form.setFieldValue("code", ""),
       onSuccess: onVerified
     })
 
-  const { mutate: verifyBackupCode, isPending: isVerifyingBackupCode } =
+  const { mutateAsync: verifyBackupCode, isPending: isVerifyingBackupCode } =
     useVerifyBackupCode(twoFactorClient, { onSuccess: onVerified })
 
   const isPending =
     isSendingOtp || isVerifyingTotp || isVerifyingOtp || isVerifyingBackupCode
   const needsOtpRequest = method === "otp" && !otpRequested
 
+  const form = useAuthForm({
+    defaultValues: { backupCode: "", code: "", trustDevice: false },
+    onSubmit: async ({ value }) => {
+      const trust = trustDeviceEnabled ? { trustDevice: value.trustDevice } : {}
+      if (method === "backup") {
+        await verifyBackupCode({ code: value.backupCode.trim(), ...trust })
+        return
+      }
+
+      await verifyCode(value.code)
+    }
+  })
+
   const switchMethod = (next: ChallengeMethod) => {
-    setCode("")
+    clearAuthFormServerError(form)
+    form.setFieldValue("code", "")
+    form.setFieldValue("backupCode", "")
     setMethod(next)
   }
 
-  const verifyCode = (completedCode: string) => {
+  const verifyCode = async (completedCode: string) => {
     if (
       isPending ||
       needsOtpRequest ||
@@ -147,31 +165,25 @@ export function TwoFactorChallenge({
       return
     }
 
-    const trust = trustDeviceEnabled ? { trustDevice } : {}
+    const trust = trustDeviceEnabled
+      ? { trustDevice: form.state.values.trustDevice }
+      : {}
 
     if (method === "otp") {
-      verifyTwoFactorOtp({ code: completedCode, ...trust })
+      await verifyTwoFactorOtp({ code: completedCode, ...trust })
       return
     }
 
-    verifyTotp({ code: completedCode, ...trust })
+    await verifyTotp({ code: completedCode, ...trust })
   }
 
-  const handleSubmit = (e: SyntheticEvent<HTMLFormElement>) => {
-    e.preventDefault()
-
-    const trust = trustDeviceEnabled ? { trustDevice } : {}
-
-    if (method === "backup") {
-      const formData = new FormData(e.currentTarget)
-      verifyBackupCode({
-        code: (formData.get("backupCode") as string).trim(),
-        ...trust
-      })
-      return
+  const requestOtp = async () => {
+    clearAuthFormServerError(form)
+    try {
+      await sendTwoFactorOtp()
+    } catch (error) {
+      setAuthFormServerError(form, error, twoFactorLocalization.sendEmailCode)
     }
-
-    verifyCode(code)
   }
 
   const description =
@@ -212,112 +224,152 @@ export function TwoFactorChallenge({
       </Card.Header>
 
       <Card.Content className="gap-4">
-        <Form onSubmit={handleSubmit} className="flex flex-col gap-4">
-          {method === "backup" ? (
-            <TextField
-              name="backupCode"
-              autoComplete="one-time-code"
-              isDisabled={isPending}
-            >
-              <Label>{twoFactorLocalization.backupCode}</Label>
-
-              <Input
-                autoFocus
-                required
-                variant={variant === "transparent" ? "primary" : "secondary"}
-              />
-
-              <FieldError />
-            </TextField>
-          ) : (
-            <OtpField
-              autoFocus
-              isDisabled={isPending || needsOtpRequest}
-              label={
-                method === "otp"
-                  ? twoFactorLocalization.emailedCode
-                  : twoFactorLocalization.authenticatorCode
-              }
-              length={codeLength}
-              name="code"
-              value={code}
-              variant={variant}
-              onChange={setCode}
-              onComplete={verifyCode}
-            />
-          )}
-
-          {trustDeviceEnabled && (
-            <Checkbox
-              isDisabled={isPending}
-              isSelected={trustDevice}
-              name="trustDevice"
-              variant={variant === "transparent" ? "primary" : "secondary"}
-              onChange={setTrustDevice}
-            >
-              <Checkbox.Content>
-                <Checkbox.Control>
-                  <Checkbox.Indicator />
-                </Checkbox.Control>
-
-                {twoFactorLocalization.trustDevice}
-              </Checkbox.Content>
-            </Checkbox>
-          )}
-
-          <div className="flex flex-col gap-3">
-            {needsOtpRequest ? (
-              <Button
-                className="w-full"
-                isPending={isSendingOtp}
-                onPress={() => sendTwoFactorOtp()}
+        <form.AppForm>
+          <form.AuthFormRoot className="flex flex-col gap-4">
+            {method === "backup" ? (
+              <form.AppField
+                name="backupCode"
+                validators={{
+                  onChange: ({ value }) =>
+                    validateStringLength(value, {
+                      requiredMessage: localization.auth.fieldRequired,
+                      trim: true
+                    })
+                }}
               >
-                {isSendingOtp && <Spinner color="current" size="sm" />}
-
-                {twoFactorLocalization.sendEmailCode}
-              </Button>
+                {(field) => (
+                  <TextField
+                    isInvalid={isAuthFormFieldInvalid(field.state.meta)}
+                    name={field.name}
+                    autoComplete="one-time-code"
+                    isDisabled={isPending}
+                    validationBehavior="aria"
+                    value={field.state.value}
+                    onBlur={field.handleBlur}
+                    onChange={field.handleChange}
+                  >
+                    <Label>{twoFactorLocalization.backupCode}</Label>
+                    <Input
+                      autoFocus
+                      variant={
+                        variant === "transparent" ? "primary" : "secondary"
+                      }
+                    />
+                    <field.AuthFormFieldError />
+                  </TextField>
+                )}
+              </form.AppField>
             ) : (
-              <Button
-                type="submit"
-                className="w-full"
-                isDisabled={method !== "backup" && code.length !== codeLength}
-                isPending={isPending}
-              >
-                {isPending && <Spinner color="current" size="sm" />}
-
-                {twoFactorLocalization.verify}
-              </Button>
+              <form.AppField name="code">
+                {(field) => (
+                  <OtpField
+                    autoFocus
+                    isDisabled={isPending || needsOtpRequest}
+                    label={
+                      method === "otp"
+                        ? twoFactorLocalization.emailedCode
+                        : twoFactorLocalization.authenticatorCode
+                    }
+                    length={codeLength}
+                    name={field.name}
+                    value={field.state.value}
+                    variant={variant}
+                    onChange={field.handleChange}
+                    onComplete={(code) => {
+                      form.setFieldValue("code", code)
+                      void submitAuthForm(
+                        form,
+                        localization.auth.callbackFailedTitle
+                      )
+                    }}
+                  />
+                )}
+              </form.AppField>
             )}
 
-            {method === "otp" && otpRequested && (
-              <Button
-                className="w-full"
-                variant="tertiary"
-                isDisabled={isPending || isCoolingDown}
-                onPress={() => sendTwoFactorOtp()}
-              >
-                {isCoolingDown
-                  ? localization.auth.resendIn.replace(
-                      "{{seconds}}",
-                      String(cooldown)
-                    )
-                  : localization.auth.resend}
-              </Button>
+            {trustDeviceEnabled && (
+              <form.AppField name="trustDevice">
+                {(field) => (
+                  <Checkbox
+                    isDisabled={isPending}
+                    isSelected={field.state.value}
+                    name={field.name}
+                    variant={
+                      variant === "transparent" ? "primary" : "secondary"
+                    }
+                    onChange={field.handleChange}
+                  >
+                    <Checkbox.Content>
+                      <Checkbox.Control>
+                        <Checkbox.Indicator />
+                      </Checkbox.Control>
+
+                      {twoFactorLocalization.trustDevice}
+                    </Checkbox.Content>
+                  </Checkbox>
+                )}
+              </form.AppField>
             )}
 
-            {alternatives.map((alternative) => (
-              <Button
-                className="w-full"
-                isDisabled={isPending}
-                key={alternative.key}
-                variant="ghost"
-                onPress={() => switchMethod(alternative.key)}
-              >
-                {alternative.label}
-              </Button>
-            ))}
-          </div>
-        </Form>
+            <div className="flex flex-col gap-3">
+              {needsOtpRequest ? (
+                <Button
+                  className="w-full"
+                  isPending={isSendingOtp}
+                  onPress={() => void requestOtp()}
+                >
+                  {isSendingOtp && <Spinner color="current" size="sm" />}
+
+                  {twoFactorLocalization.sendEmailCode}
+                </Button>
+              ) : (
+                <form.Subscribe selector={(state) => state.values.code}>
+                  {(code) => (
+                    <form.AuthFormSubmitButton
+                      className="w-full"
+                      isDisabled={
+                        method !== "backup" && code.length !== codeLength
+                      }
+                    >
+                      {isPending && <Spinner color="current" size="sm" />}
+
+                      {twoFactorLocalization.verify}
+                    </form.AuthFormSubmitButton>
+                  )}
+                </form.Subscribe>
+              )}
+
+              {method === "otp" && otpRequested && (
+                <Button
+                  className="w-full"
+                  variant="tertiary"
+                  isDisabled={isPending || isCoolingDown}
+                  onPress={() => void requestOtp()}
+                >
+                  {isCoolingDown
+                    ? localization.auth.resendIn.replace(
+                        "{{seconds}}",
+                        String(cooldown)
+                      )
+                    : localization.auth.resend}
+                </Button>
+              )}
+
+              {alternatives.map((alternative) => (
+                <Button
+                  className="w-full"
+                  isDisabled={isPending}
+                  key={alternative.key}
+                  variant="ghost"
+                  onPress={() => switchMethod(alternative.key)}
+                >
+                  {alternative.label}
+                </Button>
+              ))}
+            </div>
+            <form.AuthFormServerError />
+          </form.AuthFormRoot>
+        </form.AppForm>
       </Card.Content>
 
       <Card.Footer className="flex-col gap-3">

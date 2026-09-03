@@ -21,17 +21,17 @@ import { useQueryClient } from "@tanstack/solid-query"
 import type { BetterFetchError } from "better-auth/client"
 import { Eye, EyeOff } from "lucide-solid"
 import { type Component, createSignal, For, Show } from "solid-js"
-import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Field, FieldError, FieldLabel } from "@/components/ui/field"
+import { Field, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import { useSignInContinuation } from "@/lib/auth/use-sign-in-continuation"
 import { cn } from "@/lib/utils"
+import { createAuthForm, isAuthFormFieldInvalid } from "../auth-form"
 import { LastUsedBadge } from "../last-login-method/last-used-badge"
 import type { SocialLayout } from "../provider-buttons"
 import { ProviderButtons } from "../provider-buttons"
-import { resolveSubmittedSignIn } from "../sign-in-path"
+import { resolveSignInPath } from "../sign-in-path"
 
 export type SignInUsernameProps = {
   class?: string
@@ -50,10 +50,6 @@ export function SignInUsername(props: SignInUsernameProps) {
   const auth = useAuth<UsernameAuthClient>()
   const { fetchOptions, resetFetchOptions } = useFetchOptions()
   const queryClient = useQueryClient()
-  const [identifier, setIdentifier] = createSignal("")
-  const [identifierError, setIdentifierError] = createSignal<string>()
-  const [password, setPassword] = createSignal("")
-  const [passwordError, setPasswordError] = createSignal<string>()
   const [isPasswordVisible, setIsPasswordVisible] = createSignal(false)
   const continueSignIn = useSignInContinuation()
   const onSignInSuccess = (data: unknown) => {
@@ -95,36 +91,28 @@ export function SignInUsername(props: SignInUsernameProps) {
   const showSeparator = () =>
     Boolean(auth.emailAndPassword?.enabled && auth.socialProviders?.length)
 
-  const submitSignIn = (
-    event: SubmitEvent & { currentTarget: HTMLFormElement }
-  ) => {
-    event.preventDefault()
-
-    const { password: submittedPassword, signInPath } = resolveSubmittedSignIn({
-      formData: new FormData(event.currentTarget),
-      usernameAuth
-    })
-
-    setIdentifier(
-      signInPath.kind === "username" ? signInPath.username : signInPath.email
-    )
-    setPassword(submittedPassword)
-
-    if (signInPath.kind === "username") {
-      signInUsername.mutate({
-        fetchOptions: fetchOptions(),
-        password: submittedPassword,
-        username: signInPath.username
+  const form = createAuthForm(() => ({
+    defaultValues: { identifier: "", password: "" },
+    onSubmit: async ({ value }) => {
+      const signInPath = resolveSignInPath({
+        identifier: value.identifier,
+        usernameAuth
       })
-      return
+      if (signInPath.kind === "username") {
+        await signInUsername.mutateAsync({
+          fetchOptions: fetchOptions(),
+          password: value.password,
+          username: signInPath.username
+        })
+        return
+      }
+      await signIn.mutateAsync({
+        email: signInPath.email,
+        fetchOptions: fetchOptions(),
+        password: value.password
+      })
     }
-
-    signIn.mutate({
-      email: signInPath.email,
-      fetchOptions: fetchOptions(),
-      password: submittedPassword
-    })
-  }
+  }))
 
   return (
     <Card class={cn("w-full max-w-sm", props.class)}>
@@ -147,142 +135,150 @@ export function SignInUsername(props: SignInUsernameProps) {
           </Show>
         </Show>
 
-        <form aria-label="Sign in" onSubmit={submitSignIn}>
-          <div class="flex flex-col gap-6">
-            <Field>
-              <FieldLabel for="sign-in-email">
-                {usernameAuth
-                  ? usernameLabels.username
-                  : auth.localization.auth.email}
-              </FieldLabel>
-              <Input
-                aria-invalid={Boolean(identifierError())}
-                autocomplete={withPasskeyAutoFill(
-                  usernameAuth ? "username" : "email",
-                  passkeyAutoFill
+        <form.AppForm>
+          <form.AuthFormRoot aria-label="Sign in">
+            <div class="flex flex-col gap-6">
+              <form.AppField
+                name="identifier"
+                validators={{
+                  onChange: ({ value }) =>
+                    value.trim()
+                      ? undefined
+                      : auth.localization.auth.fieldRequired
+                }}
+              >
+                {(field) => (
+                  <Field
+                    data-invalid={isAuthFormFieldInvalid(field().state.meta)}
+                  >
+                    <FieldLabel for="sign-in-email">
+                      {usernameAuth
+                        ? usernameLabels.username
+                        : auth.localization.auth.email}
+                    </FieldLabel>
+                    <Input
+                      aria-invalid={isAuthFormFieldInvalid(field().state.meta)}
+                      autocomplete={withPasskeyAutoFill(
+                        usernameAuth ? "username" : "email",
+                        passkeyAutoFill
+                      )}
+                      id="sign-in-email"
+                      name={field().name}
+                      onBlur={field().handleBlur}
+                      onInput={(event) =>
+                        field().handleChange(event.currentTarget.value)
+                      }
+                      placeholder={
+                        usernameAuth
+                          ? usernameLabels.usernameOrEmailPlaceholder
+                          : auth.localization.auth.emailPlaceholder
+                      }
+                      type={usernameAuth ? "text" : "email"}
+                      value={field().state.value}
+                    />
+                    <field.AuthFormFieldError />
+                  </Field>
                 )}
-                id="sign-in-email"
-                name={usernameAuth ? "username" : "email"}
-                onInput={(event) => {
-                  setIdentifier(event.currentTarget.value)
-                  setIdentifierError(undefined)
+              </form.AppField>
+
+              <form.AppField
+                name="password"
+                validators={{
+                  onChange: ({ value }) =>
+                    value ? undefined : auth.localization.auth.fieldRequired
                 }}
-                onInvalid={(event) => {
-                  event.preventDefault()
-                  setIdentifierError(event.currentTarget.validationMessage)
-                }}
-                placeholder={
-                  usernameAuth
-                    ? usernameLabels.usernameOrEmailPlaceholder
-                    : auth.localization.auth.emailPlaceholder
-                }
-                required
-                type={usernameAuth ? "text" : "email"}
-                value={identifier()}
-              />
+              >
+                {(field) => (
+                  <Field
+                    data-invalid={isAuthFormFieldInvalid(field().state.meta)}
+                  >
+                    <FieldLabel for="sign-in-password">
+                      {auth.localization.auth.password}
+                    </FieldLabel>
+                    <div class="relative">
+                      <Input
+                        aria-invalid={isAuthFormFieldInvalid(
+                          field().state.meta
+                        )}
+                        autocomplete={withPasskeyAutoFill(
+                          "current-password",
+                          passkeyAutoFill
+                        )}
+                        class="pr-12"
+                        id="sign-in-password"
+                        maxLength={auth.emailAndPassword.maxPasswordLength}
+                        minLength={auth.emailAndPassword.minPasswordLength}
+                        name={field().name}
+                        onBlur={field().handleBlur}
+                        onInput={(event) =>
+                          field().handleChange(event.currentTarget.value)
+                        }
+                        placeholder={auth.localization.auth.passwordPlaceholder}
+                        type={isPasswordVisible() ? "text" : "password"}
+                        value={field().state.value}
+                      />
 
-              <Show when={identifierError()}>
-                {(message) => <FieldError>{message()}</FieldError>}
+                      <Button
+                        aria-label={
+                          isPasswordVisible()
+                            ? auth.localization.auth.hidePassword
+                            : auth.localization.auth.showPassword
+                        }
+                        class="absolute right-1 top-1/2 -translate-y-1/2"
+                        onClick={() =>
+                          setIsPasswordVisible((visible) => !visible)
+                        }
+                        size="icon-sm"
+                        title={
+                          isPasswordVisible()
+                            ? auth.localization.auth.hidePassword
+                            : auth.localization.auth.showPassword
+                        }
+                        type="button"
+                        variant="ghost"
+                      >
+                        {isPasswordVisible() ? (
+                          <EyeOff aria-hidden class="size-4" />
+                        ) : (
+                          <Eye aria-hidden class="size-4" />
+                        )}
+                      </Button>
+                    </div>
+
+                    <field.AuthFormFieldError />
+                  </Field>
+                )}
+              </form.AppField>
+
+              <Show when={captchaComponent()} keyed>
+                {(Captcha) => <Captcha />}
               </Show>
-            </Field>
 
-            <Field>
-              <FieldLabel for="sign-in-password">
-                {auth.localization.auth.password}
-              </FieldLabel>
-              <div class="relative">
-                <Input
-                  aria-invalid={Boolean(passwordError())}
-                  autocomplete={withPasskeyAutoFill(
-                    "current-password",
-                    passkeyAutoFill
-                  )}
-                  class="pr-12"
-                  id="sign-in-password"
-                  maxLength={auth.emailAndPassword.maxPasswordLength}
-                  minLength={auth.emailAndPassword.minPasswordLength}
-                  name="password"
-                  onInput={(event) => {
-                    setPassword(event.currentTarget.value)
-                    setPasswordError(undefined)
-                  }}
-                  onInvalid={(event) => {
-                    event.preventDefault()
-                    setPasswordError(event.currentTarget.validationMessage)
-                  }}
-                  placeholder={auth.localization.auth.passwordPlaceholder}
-                  required
-                  type={isPasswordVisible() ? "text" : "password"}
-                  value={password()}
-                />
+              <form.AuthFormSubmitButton
+                class="relative overflow-visible"
+                disabled={signIn.isPending || signInUsername.isPending}
+              >
+                {auth.localization.auth.signIn}
 
-                <Button
-                  aria-label={
-                    isPasswordVisible()
-                      ? auth.localization.auth.hidePassword
-                      : auth.localization.auth.showPassword
-                  }
-                  class="absolute right-1 top-1/2 -translate-y-1/2"
-                  onClick={() => setIsPasswordVisible((visible) => !visible)}
-                  size="icon-sm"
-                  title={
-                    isPasswordVisible()
-                      ? auth.localization.auth.hidePassword
-                      : auth.localization.auth.showPassword
-                  }
-                  type="button"
-                  variant="ghost"
-                >
-                  {isPasswordVisible() ? (
-                    <EyeOff aria-hidden class="size-4" />
-                  ) : (
-                    <Eye aria-hidden class="size-4" />
-                  )}
-                </Button>
-              </div>
+                <LastUsedBadge floating method={["email", "username"]} />
+              </form.AuthFormSubmitButton>
 
-              <Show when={passwordError()}>
-                {(message) => <FieldError>{message()}</FieldError>}
-              </Show>
-            </Field>
+              <For
+                each={(auth.plugins as AuthPluginWithButtons[]).flatMap(
+                  (plugin) =>
+                    (plugin.authButtons ?? []).map((AuthButton, index) => ({
+                      AuthButton,
+                      key: `${plugin.id}-${index.toString()}`
+                    }))
+                )}
+              >
+                {({ AuthButton }) => <AuthButton view="signIn" />}
+              </For>
 
-            <Show when={captchaComponent()} keyed>
-              {(Captcha) => <Captcha />}
-            </Show>
-
-            <Button
-              class="relative overflow-visible"
-              disabled={signIn.isPending || signInUsername.isPending}
-              type="submit"
-            >
-              {signIn.isPending || signInUsername.isPending
-                ? `${auth.localization.auth.signIn}…`
-                : auth.localization.auth.signIn}
-
-              <LastUsedBadge floating method={["email", "username"]} />
-            </Button>
-
-            <For
-              each={(auth.plugins as AuthPluginWithButtons[]).flatMap(
-                (plugin) =>
-                  (plugin.authButtons ?? []).map((AuthButton, index) => ({
-                    AuthButton,
-                    key: `${plugin.id}-${index.toString()}`
-                  }))
-              )}
-            >
-              {({ AuthButton }) => <AuthButton view="signIn" />}
-            </For>
-
-            <Show when={signIn.isError || signInUsername.isError}>
-              <Alert variant="destructive">
-                <AlertDescription>
-                  Unable to sign in. Try again.
-                </AlertDescription>
-              </Alert>
-            </Show>
-          </div>
-        </form>
+              <form.AuthFormServerError />
+            </div>
+          </form.AuthFormRoot>
+        </form.AppForm>
 
         <Show
           when={socialPosition() === "bottom" && auth.socialProviders?.length}

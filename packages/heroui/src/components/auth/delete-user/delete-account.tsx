@@ -1,4 +1,4 @@
-import { authQueryKeys } from "@better-auth-ui/core"
+import { authQueryKeys, validateStringLength } from "@better-auth-ui/core"
 import {
   useAuth,
   useAuthPlugin,
@@ -11,7 +11,6 @@ import {
   Button,
   Card,
   type CardProps,
-  FieldError,
   InputGroup,
   Label,
   Spinner,
@@ -22,7 +21,11 @@ import { useQueryClient } from "@tanstack/react-query"
 import { useState } from "react"
 
 import { deleteUserPlugin } from "../../../lib/auth/delete-user-plugin"
-import { useAuthForm } from "../auth-form"
+import {
+  clearAuthFormServerError,
+  isAuthFormFieldInvalid,
+  useAuthForm
+} from "../auth-form"
 
 export type DeleteAccountProps = {
   className?: string
@@ -56,22 +59,23 @@ export function DeleteAccount({
   )
   const needsPassword = !sendDeleteAccountVerification && hasCredentialAccount
 
-  const { mutate: deleteUser, isPending } = useDeleteUser(authClient)
+  const { mutateAsync: deleteUser, isPending } = useDeleteUser(authClient)
 
   const handleDialogOpenChange = (open: boolean) => {
     setConfirmOpen(open)
     form.setFieldValue("password", "")
+    clearAuthFormServerError(form)
     setIsPasswordVisible(false)
   }
 
   const form = useAuthForm({
     defaultValues: { password: "" },
-    onSubmit: ({ value }) => {
+    onSubmit: async ({ value }) => {
       const params = {
         ...(needsPassword ? { password: value.password } : {})
       }
 
-      deleteUser(params, {
+      await deleteUser(params, {
         onSuccess: () => {
           setConfirmOpen(false)
           form.setFieldValue("password", "")
@@ -141,10 +145,21 @@ export function DeleteAccount({
                       </p>
 
                       {needsPassword && (
-                        <form.AppField name="password">
+                        <form.AppField
+                          name="password"
+                          validators={{
+                            onChange: ({ value }) =>
+                              validateStringLength(value, {
+                                requiredMessage: localization.auth.fieldRequired
+                              })
+                          }}
+                        >
                           {(field) => (
                             <TextField
                               className="mt-4"
+                              isInvalid={isAuthFormFieldInvalid(
+                                field.state.meta
+                              )}
                               name={field.name}
                               isDisabled={isPending}
                               value={field.state.value}
@@ -183,11 +198,12 @@ export function DeleteAccount({
                                 </InputGroup.Suffix>
                               </InputGroup>
 
-                              <FieldError />
+                              <field.AuthFormFieldError />
                             </TextField>
                           )}
                         </form.AppField>
                       )}
+                      <form.AuthFormServerError />
                     </AlertDialog.Body>
 
                     <AlertDialog.Footer>

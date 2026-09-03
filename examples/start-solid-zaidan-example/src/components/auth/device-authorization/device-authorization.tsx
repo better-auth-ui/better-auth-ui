@@ -44,6 +44,7 @@ import { Separator } from "@/components/ui/separator"
 import { Spinner } from "@/components/ui/spinner"
 import { deviceAuthorizationPlugin } from "@/lib/auth/device-authorization-plugin"
 import { cn } from "@/lib/utils"
+import { createAuthForm, isAuthFormFieldInvalid } from "../auth-form"
 
 type DeviceAuthorizationStep = "code" | "approval" | "approved" | "denied"
 
@@ -169,7 +170,7 @@ export function DeviceAuthorization(props: DeviceAuthorizationProps) {
     setCodeError("")
   }
 
-  const submitCode = (completedCode: string) => {
+  const submitCode = async (completedCode: string) => {
     const normalizedCode = normalizeDeviceCode(completedCode)
 
     if (
@@ -190,7 +191,7 @@ export function DeviceAuthorization(props: DeviceAuthorizationProps) {
       return
     }
 
-    verifyDeviceCode.mutate({
+    await verifyDeviceCode.mutateAsync({
       query: { user_code: normalizedCode }
     })
   }
@@ -199,20 +200,9 @@ export function DeviceAuthorization(props: DeviceAuthorizationProps) {
     const currentCode = normalizedUserCode()
 
     if (currentCode.length === userCodeLength) {
-      submitCode(currentCode)
+      void submitCode(currentCode).catch(() => undefined)
     }
   })
-
-  const handleSubmit = (event: SubmitEvent) => {
-    event.preventDefault()
-
-    if (normalizedUserCode().length !== userCodeLength) {
-      handleAuthorizationError()
-      return
-    }
-
-    submitCode(normalizedUserCode())
-  }
 
   const cardClass = () => cn("w-full max-w-sm", props.class)
 
@@ -254,8 +244,10 @@ export function DeviceAuthorization(props: DeviceAuthorizationProps) {
           userCode={userCode()}
           userCodeLength={userCodeLength}
           onCodeChange={handleCodeChange}
-          onCodeComplete={submitCode}
-          onSubmit={handleSubmit}
+          onCodeComplete={(value) =>
+            void submitCode(value).catch(() => undefined)
+          }
+          onSubmit={submitCode}
         />
       </Match>
     </Switch>
@@ -272,7 +264,7 @@ type DeviceCodeFormProps = {
   userCodeLength: number
   onCodeChange: (value: string) => void
   onCodeComplete: (value: string) => void
-  onSubmit: (event: SubmitEvent) => void
+  onSubmit: (value: string) => Promise<void>
 }
 
 function DeviceCodeForm(props: DeviceCodeFormProps) {
@@ -281,6 +273,15 @@ function DeviceCodeForm(props: DeviceCodeFormProps) {
   const firstGroup = slots.slice(0, groupBreak)
   const secondGroup = slots.slice(groupBreak)
   const errorId = "device-code-error"
+  const form = createAuthForm(() => ({
+    defaultValues: { userCode: props.userCode },
+    onSubmit: async ({ value }) => props.onSubmit(value.userCode)
+  }))
+  createEffect(() => {
+    if (form.state.values.userCode !== props.userCode) {
+      form.setFieldValue("userCode", props.userCode)
+    }
+  })
 
   return (
     <Card class={props.class}>
@@ -294,69 +295,91 @@ function DeviceCodeForm(props: DeviceCodeFormProps) {
       </CardHeader>
 
       <CardContent>
-        <form
-          aria-label={props.localization.deviceAuthorization}
-          onSubmit={props.onSubmit}
-        >
-          <FieldGroup>
-            <Field data-invalid={Boolean(props.codeError)}>
-              <FieldLabel for="device-code">
-                {props.localization.deviceCode}
-              </FieldLabel>
-
-              <InputOTP
-                maxLength={props.userCodeLength}
-                id="device-code"
-                aria-describedby={props.codeError ? errorId : undefined}
-                aria-invalid={Boolean(props.codeError)}
-                aria-label={props.localization.deviceCode}
-                autocomplete="one-time-code"
-                containerClass="w-full justify-center"
-                disabled={props.isVerifying}
-                inputmode="text"
+        <form.AppForm>
+          <form.AuthFormRoot
+            aria-label={props.localization.deviceAuthorization}
+          >
+            <FieldGroup>
+              <form.AppField
                 name="userCode"
-                pattern="^[A-Za-z0-9]*$"
-                value={props.userCode}
-                onValueChange={props.onCodeChange}
-                onComplete={props.onCodeComplete}
+                validators={{
+                  onChange: ({ value }) =>
+                    normalizeDeviceCode(value).length === props.userCodeLength
+                      ? undefined
+                      : props.localization.invalidDeviceCode
+                }}
               >
-                <InputOTPGroup>
-                  <For each={firstGroup}>
-                    {(slot) => <InputOTPSlot index={slot.index} />}
-                  </For>
-                </InputOTPGroup>
+                {(field) => (
+                  <Field
+                    data-invalid={
+                      Boolean(props.codeError) ||
+                      isAuthFormFieldInvalid(field().state.meta)
+                    }
+                  >
+                    <FieldLabel for="device-code">
+                      {props.localization.deviceCode}
+                    </FieldLabel>
 
-                <Show when={secondGroup.length > 0}>
-                  <InputOTPSeparator />
-                  <InputOTPGroup>
-                    <For each={secondGroup}>
-                      {(slot) => <InputOTPSlot index={slot.index} />}
-                    </For>
-                  </InputOTPGroup>
-                </Show>
-              </InputOTP>
+                    <InputOTP
+                      maxLength={props.userCodeLength}
+                      id="device-code"
+                      aria-describedby={props.codeError ? errorId : undefined}
+                      aria-invalid={Boolean(props.codeError)}
+                      aria-label={props.localization.deviceCode}
+                      autocomplete="one-time-code"
+                      containerClass="w-full justify-center"
+                      disabled={props.isVerifying}
+                      inputmode="text"
+                      name="userCode"
+                      pattern="^[A-Za-z0-9]*$"
+                      value={field().state.value}
+                      onValueChange={(value) => {
+                        field().handleChange(value)
+                        props.onCodeChange(value)
+                      }}
+                      onComplete={(value) => {
+                        field().handleChange(value)
+                        props.onCodeComplete(value)
+                      }}
+                    >
+                      <InputOTPGroup>
+                        <For each={firstGroup}>
+                          {(slot) => <InputOTPSlot index={slot.index} />}
+                        </For>
+                      </InputOTPGroup>
 
-              <Show when={props.codeError}>
-                <FieldError id={errorId}>{props.codeError}</FieldError>
-              </Show>
-            </Field>
+                      <Show when={secondGroup.length > 0}>
+                        <InputOTPSeparator />
+                        <InputOTPGroup>
+                          <For each={secondGroup}>
+                            {(slot) => <InputOTPSlot index={slot.index} />}
+                          </For>
+                        </InputOTPGroup>
+                      </Show>
+                    </InputOTP>
 
-            <Button
-              class="w-full"
-              disabled={
-                props.userCode.length !== props.userCodeLength ||
-                props.isSessionPending ||
-                props.isVerifying
-              }
-              type="submit"
-            >
-              <Show when={props.isVerifying}>
-                <Spinner />
-              </Show>
-              {props.localization.continue}
-            </Button>
-          </FieldGroup>
-        </form>
+                    <Show when={props.codeError}>
+                      <FieldError id={errorId}>{props.codeError}</FieldError>
+                    </Show>
+                    <field.AuthFormFieldError />
+                  </Field>
+                )}
+              </form.AppField>
+
+              <form.AuthFormSubmitButton
+                class="w-full"
+                disabled={
+                  props.userCode.length !== props.userCodeLength ||
+                  props.isSessionPending ||
+                  props.isVerifying
+                }
+              >
+                {props.localization.continue}
+              </form.AuthFormSubmitButton>
+              <form.AuthFormServerError />
+            </FieldGroup>
+          </form.AuthFormRoot>
+        </form.AppForm>
       </CardContent>
     </Card>
   )

@@ -1,4 +1,4 @@
-import { authMutationKeys } from "@better-auth-ui/core"
+import { authMutationKeys, validateEmailAddress } from "@better-auth-ui/core"
 import type { EmailOtpAuthClient } from "@better-auth-ui/core/plugins/email-otp"
 import { getSsoFallbackEmail } from "@better-auth-ui/core/plugins/sso"
 import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
@@ -12,7 +12,6 @@ import {
   type CardProps,
   cn,
   Description,
-  FieldError,
   Input,
   Label,
   Link,
@@ -26,7 +25,11 @@ import { useState } from "react"
 import { emailOtpPlugin } from "../../../lib/auth/email-otp-plugin"
 import { useResendCooldown } from "../../../lib/auth/use-resend-cooldown"
 import { useSignInContinuation } from "../../../lib/auth/use-sign-in-continuation"
-import { useAuthForm } from "../auth-form"
+import {
+  clearAuthFormServerError,
+  setAuthFormServerError,
+  useAuthForm
+} from "../auth-form"
 import { FieldSeparator } from "../field-separator"
 import { OpenEmailButton } from "../open-email-button"
 import { OtpField } from "../otp-field"
@@ -74,7 +77,7 @@ export function EmailOtp({
 
   const [codeSent, setCodeSent] = useState(false)
 
-  const { mutate: sendVerificationOtp, isPending: isSending } =
+  const { mutateAsync: sendVerificationOtp, isPending: isSending } =
     useSendVerificationOtp(otpClient, {
       onSuccess: () => {
         setCodeSent(true)
@@ -82,13 +85,11 @@ export function EmailOtp({
       }
     })
 
-  const { mutate: signInEmailOtp, isPending: isSigningIn } = useSignInEmailOtp(
-    otpClient,
-    {
+  const { mutateAsync: signInEmailOtp, isPending: isSigningIn } =
+    useSignInEmailOtp(otpClient, {
       onError: () => form.setFieldValue("code", ""),
       onSuccess: (data) => continueSignIn(data)
-    }
-  )
+    })
 
   const signInMutating = useIsMutating({
     mutationKey: authMutationKeys.signIn.all
@@ -98,22 +99,30 @@ export function EmailOtp({
   })
   const isPending = signInMutating + signUpMutating > 0 || isSending
 
-  const sendCode = () =>
-    sendVerificationOtp({ email: form.state.values.email, type: "sign-in" })
-  const verifyCode = (completedCode: string) => {
+  const sendCode = () => {
+    clearAuthFormServerError(form)
+    return sendVerificationOtp({
+      email: form.state.values.email,
+      type: "sign-in"
+    })
+  }
+  const verifyCode = async (completedCode: string) => {
     if (isPending || isSigningIn) return
 
-    signInEmailOtp({ email: form.state.values.email, otp: completedCode })
+    return signInEmailOtp({
+      email: form.state.values.email,
+      otp: completedCode
+    })
   }
 
   const form = useAuthForm({
     defaultValues: { code: "", email: getSsoFallbackEmail() },
-    onSubmit: ({ value }) => {
+    onSubmit: async ({ value }) => {
       if (!codeSent) {
-        sendVerificationOtp({ email: value.email, type: "sign-in" })
+        await sendVerificationOtp({ email: value.email, type: "sign-in" })
         return
       }
-      verifyCode(value.code)
+      await verifyCode(value.code)
     }
   })
   const codeComplete = useSelector(
@@ -125,6 +134,7 @@ export function EmailOtp({
   const startOver = () => {
     setCodeSent(false)
     form.setFieldValue("code", "")
+    clearAuthFormServerError(form)
   }
 
   const showSeparator = !!socialProviders?.length
@@ -173,12 +183,29 @@ export function EmailOtp({
                     value={field.state.value}
                     variant={variant}
                     onChange={field.handleChange}
-                    onComplete={verifyCode}
+                    onComplete={(completedCode) =>
+                      void verifyCode(completedCode).catch((error) =>
+                        setAuthFormServerError(
+                          form,
+                          error,
+                          localization.auth.callbackFailedTitle
+                        )
+                      )
+                    }
                   />
                 )}
               </form.AppField>
             ) : (
-              <form.AppField name="email">
+              <form.AppField
+                name="email"
+                validators={{
+                  onChange: ({ value }) =>
+                    validateEmailAddress(value, {
+                      invalidMessage: localization.auth.invalidEmail,
+                      requiredMessage: localization.auth.fieldRequired
+                    })
+                }}
+              >
                 {(field) => (
                   <TextField
                     name={field.name}
@@ -188,11 +215,7 @@ export function EmailOtp({
                     value={field.state.value}
                     onBlur={field.handleBlur}
                     onChange={field.handleChange}
-                    validate={(value) => {
-                      if (!value) return localization.auth.fieldRequired
-                      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value))
-                        return localization.auth.invalidEmail
-                    }}
+                    validationBehavior="aria"
                   >
                     <Label>{localization.auth.email}</Label>
 
@@ -204,11 +227,13 @@ export function EmailOtp({
                       }
                     />
 
-                    <FieldError />
+                    <field.AuthFormFieldError />
                   </TextField>
                 )}
               </form.AppField>
             )}
+
+            <form.AuthFormServerError />
 
             <div className="flex flex-col gap-3">
               <form.AuthFormSubmitButton
@@ -234,7 +259,15 @@ export function EmailOtp({
                     className="w-full"
                     variant="tertiary"
                     isDisabled={isPending || isSigningIn || isCoolingDown}
-                    onPress={sendCode}
+                    onPress={() =>
+                      void sendCode().catch((error) =>
+                        setAuthFormServerError(
+                          form,
+                          error,
+                          localization.auth.callbackFailedTitle
+                        )
+                      )
+                    }
                   >
                     {isCoolingDown
                       ? localization.auth.resendIn.replace(

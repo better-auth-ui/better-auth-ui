@@ -23,6 +23,7 @@ export type SolidRegistryManifest = {
 const solidDependencies = [
   "@better-auth-ui/solid@latest",
   "@better-auth-ui/core@latest",
+  "@tanstack/solid-form",
   "@tanstack/solid-query",
   "@tanstack/solid-router",
   "better-auth",
@@ -111,12 +112,12 @@ const uiFile = (path: SolidRegistryFile["path"]) =>
   ({ path, type: "registry:ui" }) satisfies SolidRegistryFile
 
 const zaidanFormSupportFiles = [
+  componentFile("src/components/auth/auth-form.tsx"),
+  componentFile("src/components/auth/additional-field.tsx"),
   libFile("src/lib/utils.ts")
 ] satisfies SolidRegistryFile[]
 
-const zaidanInteractiveSupportFiles = [
-  libFile("src/lib/utils.ts")
-] satisfies SolidRegistryFile[]
+const zaidanInteractiveSupportFiles = zaidanFormSupportFiles
 
 /** Every form that picks a new password renders the strength meter. */
 const passwordStrengthFiles = [
@@ -172,11 +173,7 @@ const solidRegistryBaseManifest = {
       title: "Solid Additional Field",
       description:
         "Additional field renderer used by Solid sign-up and profile surfaces.",
-      files: [
-        componentFile("src/components/auth/auth-form.tsx"),
-        componentFile("src/components/auth/additional-field.tsx"),
-        ...zaidanFormSupportFiles
-      ]
+      files: [...zaidanFormSupportFiles]
     }),
     item({
       name: "sign-in",
@@ -428,7 +425,7 @@ const solidRegistryBaseManifest = {
       title: "Solid SSO",
       description:
         "Solid email-first sign-in and organization provider management for Better Auth SSO.",
-      dependencies: [...solidAuthDependencies, "@tanstack/solid-form"],
+      dependencies: solidAuthDependencies,
       registryDependencies: [
         betterAuthSolidRegistryDependency("auth-provider"),
         betterAuthSolidRegistryDependency("sign-in")
@@ -718,7 +715,6 @@ const solidRegistryBaseManifest = {
       files: [
         componentFile("src/components/auth/settings/account/user-profile.tsx"),
         componentFile("src/components/auth/settings/account/change-avatar.tsx"),
-        componentFile("src/components/auth/additional-field.tsx"),
         componentFile("src/components/auth/settings/shared/helpers.ts"),
         ...zaidanInteractiveSupportFiles
       ]

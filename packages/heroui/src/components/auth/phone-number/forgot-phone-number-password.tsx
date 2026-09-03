@@ -41,7 +41,7 @@ export function ForgotPhoneNumberPassword({
     viewPaths: phoneNumberViewPaths
   } = useAuthPlugin(phoneNumberPlugin)
   const { fetchOptions, resetFetchOptions } = useFetchOptions()
-  const { mutate: requestReset, isPending } =
+  const { mutateAsync: requestReset, isPending } =
     useRequestPhoneNumberPasswordReset(authClient as PhoneNumberAuthClient, {
       onError: () => resetFetchOptions(),
       onSuccess: (_data, { phoneNumber }) => {
@@ -59,9 +59,9 @@ export function ForgotPhoneNumberPassword({
     defaultValues: {
       phoneNumber: createPhoneNumberValue("", defaultCountry, adapter)
     },
-    onSubmit: ({ value }) => {
+    onSubmit: async ({ value }) => {
       if (!value.phoneNumber.e164) return
-      requestReset({
+      await requestReset({
         phoneNumber: value.phoneNumber.e164,
         fetchOptions
       })

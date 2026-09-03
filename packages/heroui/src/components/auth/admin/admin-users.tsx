@@ -45,7 +45,6 @@ import {
   cn,
   Dropdown,
   FieldError,
-  Form,
   Input,
   Label,
   ListBox,
@@ -68,15 +67,10 @@ import {
   type Updater
 } from "@tanstack/react-table"
 import type { BetterFetchError } from "better-auth/client"
-import {
-  type FormEvent,
-  useDeferredValue,
-  useEffect,
-  useMemo,
-  useState
-} from "react"
+import { useDeferredValue, useEffect, useMemo, useState } from "react"
 import { adminPlugin } from "../../../lib/auth/admin-plugin"
 import { getAuthAdditionalFieldValidators, useAuthForm } from "../auth-form"
+import { getHeroUISortDescriptor, getTanStackSorting } from "../table-bridge"
 import { UserAvatar } from "../user/user-avatar"
 import { createAdminColumnHelper, useAdminTable } from "./admin-table"
 
@@ -429,14 +423,44 @@ export function AdminUsers({
       ) : (
         <Table>
           <Table.ScrollContainer>
-            <Table.Content aria-label={config.localization.users}>
+            <Table.Content
+              aria-label={config.localization.users}
+              selectedKeys={
+                selectedUserId ? new Set([selectedUserId]) : new Set()
+              }
+              selectionBehavior="replace"
+              selectionMode={getPermission.data?.success ? "single" : undefined}
+              sortDescriptor={getHeroUISortDescriptor(sorting)}
+              onSelectionChange={(selection) => {
+                if (selection === "all") return
+                const [userId] = selection
+                selectUser(userId == null ? undefined : String(userId))
+              }}
+              onSortChange={(descriptor) =>
+                setSorting(getTanStackSorting(descriptor))
+              }
+            >
               <Table.Header>
-                <Table.Column isRowHeader>
-                  {config.localization.name}
+                <Table.Column id="name" isRowHeader allowsSorting>
+                  {({ sortDirection }) => (
+                    <Table.SortableColumnHeader sortDirection={sortDirection}>
+                      {config.localization.name}
+                    </Table.SortableColumnHeader>
+                  )}
                 </Table.Column>
-                <Table.Column>{config.localization.role}</Table.Column>
-                <Table.Column>{config.localization.status}</Table.Column>
-                <Table.Column>{config.localization.created}</Table.Column>
+                <Table.Column id="role">
+                  {config.localization.role}
+                </Table.Column>
+                <Table.Column id="status">
+                  {config.localization.status}
+                </Table.Column>
+                <Table.Column id="createdAt" allowsSorting>
+                  {({ sortDirection }) => (
+                    <Table.SortableColumnHeader sortDirection={sortDirection}>
+                      {config.localization.created}
+                    </Table.SortableColumnHeader>
+                  )}
+                </Table.Column>
               </Table.Header>
               <Table.Body>
                 {users.isPending
@@ -1656,25 +1680,18 @@ function PasswordDialog({
   userId?: string
 }) {
   const config = useAuthPlugin(adminPlugin)
-  const [password, setPassword] = useState("")
-  const [errorMessage, setErrorMessage] = useState<string>()
+  const form = useAuthForm({
+    defaultValues: { password: "" },
+    onSubmit: async ({ value }) => {
+      if (!userId) return
+      await mutation.mutateAsync({ userId, newPassword: value.password })
+      close()
+    }
+  })
   const close = () => {
-    setPassword("")
-    setErrorMessage(undefined)
+    form.reset()
     mutation.reset()
     onOpenChange(false)
-  }
-  const submit = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault()
-    setErrorMessage(undefined)
-    if (userId)
-      mutation.mutate(
-        { userId, newPassword: password },
-        {
-          onError: (error) => setErrorMessage(getAdminErrorMessage(error)),
-          onSuccess: close
-        }
-      )
   }
 
   return (
@@ -1684,46 +1701,54 @@ function PasswordDialog({
     >
       <AlertDialog.Container>
         <AlertDialog.Dialog>
-          <Form onSubmit={submit}>
-            <AlertDialog.CloseTrigger />
-            <AlertDialog.Header>
-              <AlertDialog.Icon status="default">
-                <Key />
-              </AlertDialog.Icon>
-              <AlertDialog.Heading>
-                {config.localization.setPassword}
-              </AlertDialog.Heading>
-            </AlertDialog.Header>
-            <AlertDialog.Body className="overflow-visible">
-              <TextField
-                isInvalid={Boolean(errorMessage)}
-                isRequired
-                type="password"
-                value={password}
-                onChange={setPassword}
-              >
-                <Label>{config.localization.password}</Label>
-                <Input autoComplete="new-password" variant="secondary" />
-                <FieldError>{errorMessage}</FieldError>
-              </TextField>
-            </AlertDialog.Body>
-            <AlertDialog.Footer>
-              <Button
-                isDisabled={mutation.isPending}
-                slot="close"
-                variant="tertiary"
-              >
-                {config.localization.cancel}
-              </Button>
-              <Button
-                isDisabled={!password}
-                isPending={mutation.isPending}
-                type="submit"
-              >
-                {config.localization.setPassword}
-              </Button>
-            </AlertDialog.Footer>
-          </Form>
+          <form.AppForm>
+            <form.AuthFormRoot>
+              <AlertDialog.CloseTrigger />
+              <AlertDialog.Header>
+                <AlertDialog.Icon status="default">
+                  <Key />
+                </AlertDialog.Icon>
+                <AlertDialog.Heading>
+                  {config.localization.setPassword}
+                </AlertDialog.Heading>
+              </AlertDialog.Header>
+              <AlertDialog.Body className="overflow-visible">
+                <form.AppField
+                  name="password"
+                  validators={{
+                    onChange: ({ value }) =>
+                      value ? undefined : config.localization.password
+                  }}
+                >
+                  {(field) => (
+                    <field.AuthFormTextField
+                      inputProps={{
+                        autoComplete: "new-password",
+                        variant: "secondary"
+                      }}
+                      label={config.localization.password}
+                      type="password"
+                    />
+                  )}
+                </form.AppField>
+                <form.AuthFormServerError />
+              </AlertDialog.Body>
+              <AlertDialog.Footer>
+                <Button
+                  isDisabled={mutation.isPending}
+                  slot="close"
+                  variant="tertiary"
+                >
+                  {config.localization.cancel}
+                </Button>
+                <form.AuthFormSubmitButton
+                  isDisabled={mutation.isPending || !userId}
+                >
+                  {config.localization.setPassword}
+                </form.AuthFormSubmitButton>
+              </AlertDialog.Footer>
+            </form.AuthFormRoot>
+          </form.AppForm>
         </AlertDialog.Dialog>
       </AlertDialog.Container>
     </AlertDialog.Backdrop>

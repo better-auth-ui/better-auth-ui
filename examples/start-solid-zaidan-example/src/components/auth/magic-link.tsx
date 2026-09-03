@@ -1,3 +1,4 @@
+import { validateEmailAddress } from "@better-auth-ui/core"
 import type { MagicLinkAuthClient } from "@better-auth-ui/core/plugins/magic-link"
 import {
   magicLinkPlugin as coreMagicLinkPlugin,
@@ -6,22 +7,17 @@ import {
 } from "@better-auth-ui/core/plugins/magic-link"
 import { AuthLink, type AuthPlugin, useAuth } from "@better-auth-ui/solid"
 import { useSignInMagicLink } from "@better-auth-ui/solid/plugins/magic-link"
-import { type Component, createSignal, For, Show } from "solid-js"
+import { type Component, For, Show } from "solid-js"
 import { MAGIC_LINK_SENT_STORAGE_KEY } from "@/components/auth/magic-link-sent"
 import {
   ProviderButtons,
   type SocialLayout
 } from "@/components/auth/provider-buttons"
-import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import {
-  Field,
-  FieldError,
-  FieldGroup,
-  FieldLabel
-} from "@/components/ui/field"
+import { Field, FieldGroup, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import { cn } from "@/lib/utils"
+import { createAuthForm, isAuthFormFieldInvalid } from "./auth-form"
 
 export type MagicLinkProps = {
   class?: string
@@ -37,8 +33,6 @@ type AuthPluginWithButtons = AuthPlugin & {
 
 export function MagicLink(props: MagicLinkProps) {
   const auth = useAuth<MagicLinkAuthClient>()
-  const [email, setEmail] = createSignal("")
-  const [emailError, setEmailError] = createSignal<string>()
   const magicLinkPluginConfig = () =>
     auth.plugins.find((plugin) => plugin.id === coreMagicLinkPlugin.id)
   const magicLinkLabels = (): MagicLinkLocalization => ({
@@ -60,15 +54,15 @@ export function MagicLink(props: MagicLinkProps) {
   const showSeparator = () => Boolean(auth.socialProviders?.length)
   const socialPosition = () => props.socialPosition ?? "bottom"
 
-  const submitMagicLink = (
-    event: SubmitEvent & { currentTarget: HTMLFormElement }
-  ) => {
-    event.preventDefault()
-    signInMagicLink.mutate({
-      callbackURL: `${auth.baseURL}${auth.redirectTo}`,
-      email: email()
-    } as Parameters<typeof signInMagicLink.mutate>[0])
-  }
+  const form = createAuthForm(() => ({
+    defaultValues: { email: "" },
+    onSubmit: async ({ value }) => {
+      await signInMagicLink.mutateAsync({
+        callbackURL: `${auth.baseURL}${auth.redirectTo}`,
+        email: value.email
+      } as Parameters<typeof signInMagicLink.mutateAsync>[0])
+    }
+  }))
 
   return (
     <Card class={cn("w-full max-w-sm", props.class)}>
@@ -89,53 +83,68 @@ export function MagicLink(props: MagicLinkProps) {
               </div>
             </Show>
           </Show>
-          <form aria-label="Magic link" onSubmit={submitMagicLink}>
-            <FieldGroup>
-              <Field data-invalid={Boolean(emailError())}>
-                <FieldLabel for="magic-link-email">
-                  {auth.localization.auth.email}
-                </FieldLabel>
-                <Input
-                  aria-invalid={Boolean(emailError())}
-                  autocomplete="email"
-                  disabled={signInMagicLink.isPending}
-                  id="magic-link-email"
+          <form.AppForm>
+            <form.AuthFormRoot aria-label="Magic link">
+              <FieldGroup>
+                <form.AppField
                   name="email"
-                  onInput={(event) => {
-                    setEmail(event.currentTarget.value)
-                    setEmailError(undefined)
+                  validators={{
+                    onChange: ({ value }) =>
+                      validateEmailAddress(value, {
+                        invalidMessage: auth.localization.auth.invalidEmail,
+                        requiredMessage: auth.localization.auth.fieldRequired
+                      })
                   }}
-                  onInvalid={(event) => {
-                    event.preventDefault()
-                    setEmailError(event.currentTarget.validationMessage)
-                  }}
-                  placeholder={auth.localization.auth.emailPlaceholder}
-                  required
-                  type="email"
-                  value={email()}
-                />
-                <Show when={emailError()}>
-                  {(message) => <FieldError>{message()}</FieldError>}
-                </Show>
-              </Field>
-              <div class="flex flex-col gap-3">
-                <Button disabled={signInMagicLink.isPending} type="submit">
-                  {magicLinkLabels().sendMagicLink}
-                </Button>
-
-                <For
-                  each={(auth.plugins as AuthPluginWithButtons[]).flatMap(
-                    (plugin) =>
-                      (plugin.authButtons ?? []).map((AuthButton) => ({
-                        AuthButton
-                      }))
-                  )}
                 >
-                  {({ AuthButton }) => <AuthButton view="magicLink" />}
-                </For>
-              </div>
-            </FieldGroup>
-          </form>
+                  {(field) => (
+                    <Field
+                      data-invalid={isAuthFormFieldInvalid(field().state.meta)}
+                    >
+                      <FieldLabel for="magic-link-email">
+                        {auth.localization.auth.email}
+                      </FieldLabel>
+                      <Input
+                        aria-invalid={isAuthFormFieldInvalid(
+                          field().state.meta
+                        )}
+                        autocomplete="email"
+                        disabled={signInMagicLink.isPending}
+                        id="magic-link-email"
+                        name={field().name}
+                        onBlur={field().handleBlur}
+                        onInput={(event) =>
+                          field().handleChange(event.currentTarget.value)
+                        }
+                        placeholder={auth.localization.auth.emailPlaceholder}
+                        type="email"
+                        value={field().state.value}
+                      />
+                      <field.AuthFormFieldError />
+                    </Field>
+                  )}
+                </form.AppField>
+                <div class="flex flex-col gap-3">
+                  <form.AuthFormSubmitButton
+                    disabled={signInMagicLink.isPending}
+                  >
+                    {magicLinkLabels().sendMagicLink}
+                  </form.AuthFormSubmitButton>
+
+                  <For
+                    each={(auth.plugins as AuthPluginWithButtons[]).flatMap(
+                      (plugin) =>
+                        (plugin.authButtons ?? []).map((AuthButton) => ({
+                          AuthButton
+                        }))
+                    )}
+                  >
+                    {({ AuthButton }) => <AuthButton view="magicLink" />}
+                  </For>
+                </div>
+              </FieldGroup>
+              <form.AuthFormServerError />
+            </form.AuthFormRoot>
+          </form.AppForm>
           <Show
             when={socialPosition() === "bottom" && auth.socialProviders?.length}
           >
