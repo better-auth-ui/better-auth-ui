@@ -2,8 +2,10 @@ import { describe, expect, it } from "vitest"
 import {
   getAuthLinkURL,
   getAuthRedirectAction,
+  getReauthenticationSignInURL,
   getSafeRedirectTo,
-  getViewURL
+  getViewURL,
+  isReauthenticationSignInURL
 } from "../src/lib/auth-redirect"
 
 const origin = "https://app.example.com"
@@ -50,6 +52,22 @@ describe("getSafeRedirectTo", () => {
     ["/settings\n/account", "control characters"]
   ])("rejects %s (%s)", (target) => {
     expect(getSafeRedirectTo(target, origin)).toBe("/")
+  })
+})
+
+describe("reauthentication sign-in URL", () => {
+  it("preserves the exact current path, query, and hash", () => {
+    const signInURL = getReauthenticationSignInURL(
+      new URL(`${origin}/settings/security?tab=sessions#current`),
+      "/auth/sign-in"
+    )
+    const parsedURL = new URL(signInURL, origin)
+
+    expect(parsedURL.pathname).toBe("/auth/sign-in")
+    expect(parsedURL.searchParams.get("redirectTo")).toBe(
+      "/settings/security?tab=sessions#current"
+    )
+    expect(isReauthenticationSignInURL(parsedURL)).toBe(true)
   })
 })
 

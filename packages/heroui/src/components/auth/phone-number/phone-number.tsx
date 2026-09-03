@@ -48,6 +48,7 @@ import {
 import { FieldSeparator } from "../field-separator"
 import { OtpField } from "../otp-field"
 import { ProviderButtons, type SocialLayout } from "../provider-buttons"
+import { ReauthenticationNotice } from "../reauthentication"
 import { InternationalPhoneField } from "./international-phone-field"
 
 type PhoneNumberMode = "code" | "password"
@@ -217,6 +218,7 @@ export function PhoneNumber({
       variant={variant}
     >
       <AuthPrompts view="phoneNumber" />
+      <ReauthenticationNotice />
       <Card.Header>
         <Card.Title className="mb-1 text-xl font-semibold">
           {localization.auth.signIn}

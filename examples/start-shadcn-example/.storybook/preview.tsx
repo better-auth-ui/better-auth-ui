@@ -41,7 +41,13 @@ const preview: Preview = {
           "shadcn",
           [
             "Components",
-            ["Authentication", "User", "Account settings", "Component states"],
+            [
+              "Authentication",
+              "Reauthentication",
+              "User",
+              "Account settings",
+              "Component states"
+            ],
             "Plugins",
             [
               "Core plugins",

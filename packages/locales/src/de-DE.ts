@@ -109,12 +109,10 @@ const deLocalization = deepmerge(localization, {
     accountUnlinked: "Kontoverknüpfung aufgehoben",
     active: "Aktiv",
     activeSessions: "Aktive Sitzungen",
-    freshSessionTitle: "Bestätige deine Identität",
-    freshSessionDescription:
-      "Gib dein Passwort erneut ein, um diese sensible Einstellung zu verwalten.",
-    freshSessionSubmit: "Bestätigen und fortfahren",
-    freshSessionSignIn: "Erneut anmelden",
-    freshSessionSuccess: "Deine Identität wurde bestätigt.",
+    reauthenticationTitle: "Erneut anmelden",
+    reauthenticationDescription:
+      "Bitte melde dich erneut an, um deine Identität zu bestätigen, bevor du fortfährst.",
+    reauthenticationAction: "Erneut anmelden",
     avatar: "Profilbild",
     currentSession: "Aktuelle Sitzung",
     avatarChangedSuccess: "Profilbild erfolgreich geändert",

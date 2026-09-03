@@ -1,4 +1,4 @@
-import { isSessionNotFreshError } from "@better-auth-ui/core"
+import { isReauthenticationRequiredError } from "@better-auth-ui/core"
 import type {
   AddPasskeyParams,
   PasskeyAuthClient
@@ -6,7 +6,7 @@ import type {
 import { useAuth, useAuthPlugin } from "@better-auth-ui/solid"
 import { useAddPasskey } from "@better-auth-ui/solid/plugins/passkey"
 import { Fingerprint } from "lucide-solid"
-import { createSignal, Show } from "solid-js"
+import { Show } from "solid-js"
 import { passkeyLabels } from "@/components/auth/passkey/passkey-localization"
 import { Button } from "@/components/ui/button"
 import {
@@ -22,7 +22,7 @@ import { Input } from "@/components/ui/input"
 import { Spinner } from "@/components/ui/spinner"
 import { passkeyPlugin } from "@/lib/auth/passkey-plugin"
 import { createAuthForm } from "../auth-form"
-import { FreshSessionPrompt } from "../settings/security/fresh-session-prompt"
+import { ReauthenticationAction } from "../reauthentication"
 
 export function AddPasskeyDialog(props: {
   onOpenChange: (open: boolean) => void
@@ -31,14 +31,11 @@ export function AddPasskeyDialog(props: {
   const auth = useAuth<PasskeyAuthClient>()
   const labels = () => passkeyLabels(auth)
   const { authenticatorAttachment } = useAuthPlugin(passkeyPlugin)
-  const [pendingRequest, setPendingRequest] =
-    createSignal<AddPasskeyParams<PasskeyAuthClient>>()
   const addPasskey = useAddPasskey(auth.authClient)
 
   const handleOpenChange = (open: boolean) => {
     if (!open) {
       addPasskey.reset()
-      setPendingRequest()
     }
     props.onOpenChange(open)
   }
@@ -56,7 +53,6 @@ export function AddPasskeyDialog(props: {
         }
       }
     }
-    setPendingRequest(requestWithCallbacks)
     await addPasskey.mutateAsync(requestWithCallbacks)
   }
 
@@ -74,20 +70,15 @@ export function AddPasskeyDialog(props: {
   return (
     <DialogContent>
       <Show
-        when={!isSessionNotFreshError(addPasskey.error)}
+        when={!isReauthenticationRequiredError(addPasskey.error)}
         fallback={
           <>
             <DialogHeader>
               <DialogTitle class="sr-only">
-                {auth.localization.settings.freshSessionTitle}
+                {auth.localization.settings.reauthenticationTitle}
               </DialogTitle>
             </DialogHeader>
-            <FreshSessionPrompt
-              onFresh={() => {
-                const request = pendingRequest()
-                if (request) return submitRequest(request)
-              }}
-            />
+            <ReauthenticationAction showTitle={false} />
           </>
         }
       >

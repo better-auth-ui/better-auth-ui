@@ -42,6 +42,7 @@ import { cn } from "@/lib/utils"
 import { createAuthForm, isAuthFormFieldInvalid } from "../auth-form"
 import type { SocialLayout } from "../provider-buttons"
 import { ProviderButtons } from "../provider-buttons"
+import { ReauthenticationNotice } from "../reauthentication"
 
 type AuthButtonComponent = Component<{ view?: string }>
 
@@ -150,6 +151,7 @@ export function EmailFirstSignIn(props: EmailFirstSignInProps) {
   return (
     <Card class={cn("w-full max-w-sm", props.class)}>
       <AuthPrompts view="signIn" />
+      <ReauthenticationNotice />
 
       <CardHeader>
         <CardTitle class="text-xl font-semibold">

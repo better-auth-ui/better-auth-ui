@@ -1,6 +1,6 @@
 "use client"
 
-import { isSessionNotFreshError } from "@better-auth-ui/core"
+import { isReauthenticationRequiredError } from "@better-auth-ui/core"
 import type {
   AddPasskeyParams,
   PasskeyAuthClient
@@ -8,7 +8,6 @@ import type {
 import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
 import { useAddPasskey } from "@better-auth-ui/react/plugins/passkey"
 import { Fingerprint } from "lucide-react"
-import { useRef } from "react"
 import { buttonVariants } from "@/components/ui/button"
 import {
   Dialog,
@@ -24,7 +23,7 @@ import { Input } from "@/components/ui/input"
 import { Spinner } from "@/components/ui/spinner"
 import { passkeyPlugin } from "@/lib/auth/passkey-plugin"
 import { useAuthForm } from "../auth-form"
-import { FreshSessionPrompt } from "../settings/security/fresh-session-prompt"
+import { ReauthenticationAction } from "../reauthentication"
 
 export type AddPasskeyDialogProps = {
   open: boolean
@@ -40,7 +39,6 @@ export function AddPasskeyDialog({
     useAuthPlugin(passkeyPlugin)
 
   const addPasskey = useAddPasskey(authClient)
-  const pendingRequest = useRef<AddPasskeyParams<PasskeyAuthClient>>(undefined)
 
   const submitRequest = async (
     request: AddPasskeyParams<PasskeyAuthClient>
@@ -52,7 +50,6 @@ export function AddPasskeyDialog({
         onSuccess: () => handleOpenChange(false)
       }
     }
-    pendingRequest.current = requestWithCallbacks
     await addPasskey.mutateAsync(requestWithCallbacks)
   }
 
@@ -71,29 +68,25 @@ export function AddPasskeyDialog({
     if (!nextOpen) {
       addPasskey.reset()
       form.reset()
-      pendingRequest.current = undefined
     }
     onOpenChange(nextOpen)
   }
 
-  const needsFreshSession = isSessionNotFreshError(addPasskey.error)
+  const needsReauthentication = isReauthenticationRequiredError(
+    addPasskey.error
+  )
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent>
-        {needsFreshSession ? (
+        {needsReauthentication ? (
           <>
             <DialogHeader>
               <DialogTitle className="sr-only">
-                {localization.settings.freshSessionTitle}
+                {localization.settings.reauthenticationTitle}
               </DialogTitle>
             </DialogHeader>
-            <FreshSessionPrompt
-              onFresh={async () => {
-                const request = pendingRequest.current
-                if (request) await submitRequest(request)
-              }}
-            />
+            <ReauthenticationAction showTitle={false} />
           </>
         ) : (
           <form.AppForm>

@@ -4,8 +4,8 @@ import {
   authQueryRetryDelay,
   createAuthQueryFetchOptions,
   createAuthQueryRetryOptions,
-  isRetryableAuthQueryError,
-  isSessionNotFreshError
+  isReauthenticationRequiredError,
+  isRetryableAuthQueryError
 } from "../src/lib/auth-query-retry"
 
 type ErrorContext = Parameters<NonNullable<BetterFetchOption["onError"]>>[0]
@@ -31,12 +31,18 @@ describe("auth query retry policy", () => {
     )
   })
 
-  it("recognizes fresh-session failures across Better Fetch error shapes", () => {
-    expect(isSessionNotFreshError({ code: "SESSION_NOT_FRESH" })).toBe(true)
+  it("recognizes reauthentication failures across Better Fetch error shapes", () => {
+    expect(isReauthenticationRequiredError({ code: "SESSION_NOT_FRESH" })).toBe(
+      true
+    )
     expect(
-      isSessionNotFreshError({ error: { code: "SESSION_NOT_FRESH" } })
+      isReauthenticationRequiredError({
+        error: { code: "SESSION_EXPIRED" }
+      })
     ).toBe(true)
-    expect(isSessionNotFreshError({ code: "UNAUTHORIZED" })).toBe(false)
+    expect(isReauthenticationRequiredError({ code: "UNAUTHORIZED" })).toBe(
+      false
+    )
   })
 
   it("stops after three client retries and never retries on the server", () => {

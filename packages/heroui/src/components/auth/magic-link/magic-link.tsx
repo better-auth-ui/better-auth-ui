@@ -20,6 +20,7 @@ import { magicLinkPlugin } from "../../../lib/auth/magic-link-plugin"
 import { useAuthForm } from "../auth-form"
 import { FieldSeparator } from "../field-separator"
 import { ProviderButtons, type SocialLayout } from "../provider-buttons"
+import { ReauthenticationNotice } from "../reauthentication"
 import { MAGIC_LINK_SENT_STORAGE_KEY } from "./magic-link-sent"
 
 export type MagicLinkProps = {
@@ -91,6 +92,7 @@ export function MagicLink({
       className={cn("w-full max-w-sm gap-4 md:p-6", className)}
       variant={variant}
     >
+      <ReauthenticationNotice />
       <Card.Header>
         <Card.Title className="text-xl font-semibold mb-1">
           {localization.auth.signIn}

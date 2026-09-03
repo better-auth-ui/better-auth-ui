@@ -49,7 +49,13 @@ const preview: Preview = {
           "Zaidan",
           [
             "Components",
-            ["Authentication", "User", "Account settings", "Component states"],
+            [
+              "Authentication",
+              "Reauthentication",
+              "User",
+              "Account settings",
+              "Component states"
+            ],
             "Plugins",
             [
               "Magic Link",

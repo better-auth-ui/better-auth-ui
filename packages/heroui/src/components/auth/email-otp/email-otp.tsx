@@ -34,6 +34,7 @@ import { FieldSeparator } from "../field-separator"
 import { OpenEmailButton } from "../open-email-button"
 import { OtpField } from "../otp-field"
 import { ProviderButtons, type SocialLayout } from "../provider-buttons"
+import { ReauthenticationNotice } from "../reauthentication"
 
 export type EmailOtpProps = {
   className?: string
@@ -144,6 +145,7 @@ export function EmailOtp({
       className={cn("w-full max-w-sm gap-4 md:p-6", className)}
       variant={variant}
     >
+      <ReauthenticationNotice />
       <Card.Header>
         <Card.Title className="text-xl font-semibold mb-1">
           {localization.auth.signIn}

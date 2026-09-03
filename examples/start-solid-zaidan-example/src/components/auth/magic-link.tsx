@@ -18,6 +18,7 @@ import { Field, FieldGroup, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import { cn } from "@/lib/utils"
 import { createAuthForm, isAuthFormFieldInvalid } from "./auth-form"
+import { ReauthenticationNotice } from "./reauthentication"
 
 export type MagicLinkProps = {
   class?: string
@@ -66,6 +67,7 @@ export function MagicLink(props: MagicLinkProps) {
 
   return (
     <Card class={cn("w-full max-w-sm", props.class)}>
+      <ReauthenticationNotice />
       <CardHeader>
         <CardTitle class="text-xl font-semibold">
           {auth.localization.auth.signIn}

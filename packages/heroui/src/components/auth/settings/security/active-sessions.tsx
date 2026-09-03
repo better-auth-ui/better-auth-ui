@@ -1,8 +1,8 @@
-import { isSessionNotFreshError } from "@better-auth-ui/core"
+import { isReauthenticationRequiredError } from "@better-auth-ui/core"
 import { useAuth, useListSessions, useSession } from "@better-auth-ui/react"
 import { Card, type CardProps, cn, Skeleton } from "@heroui/react"
+import { ReauthenticationAction } from "../../reauthentication"
 import { ActiveSession } from "./active-session"
-import { FreshSessionPrompt } from "./fresh-session-prompt"
 import { SessionActions } from "./session-actions"
 
 export type ActiveSessionsProps = {
@@ -26,7 +26,9 @@ export function ActiveSessions({
   const { authClient, localization } = useAuth()
   const { data: session } = useSession(authClient)
 
-  const sessionsQuery = useListSessions(authClient)
+  const sessionsQuery = useListSessions(authClient, {
+    meta: { errorPresentation: "inline" }
+  })
   const { data: sessions, error, isPending } = sessionsQuery
 
   const activeSessions =
@@ -43,8 +45,10 @@ export function ActiveSessions({
 
       <Card className={cn("gap-0", className)} variant={variant} {...props}>
         <Card.Content className="gap-0 p-0">
-          {isSessionNotFreshError(error) ? (
-            <FreshSessionPrompt onFresh={() => sessionsQuery.refetch()} />
+          {isReauthenticationRequiredError(error) ? (
+            <ReauthenticationAction />
+          ) : error ? (
+            <div className="p-4 text-danger text-sm">{error.message}</div>
           ) : isPending ? (
             <SessionRowSkeleton />
           ) : (
