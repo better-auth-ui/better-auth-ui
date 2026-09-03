@@ -268,21 +268,15 @@ export const localization = {
     /** @remarks `"Active sessions"` */
     activeSessions: "Active sessions",
 
-    /** @remarks `"Confirm it’s you"` */
-    freshSessionTitle: "Confirm it’s you",
+    /** @remarks `"Sign in again"` */
+    reauthenticationTitle: "Sign in again",
 
-    /** @remarks `"Enter your password again to manage this sensitive setting."` */
-    freshSessionDescription:
-      "Enter your password again to manage this sensitive setting.",
-
-    /** @remarks `"Confirm and continue"` */
-    freshSessionSubmit: "Confirm and continue",
+    /** @remarks `"Please sign in again to verify it’s you before continuing."` */
+    reauthenticationDescription:
+      "Please sign in again to verify it’s you before continuing.",
 
     /** @remarks `"Sign in again"` */
-    freshSessionSignIn: "Sign in again",
-
-    /** @remarks `"Your identity was confirmed."` */
-    freshSessionSuccess: "Your identity was confirmed.",
+    reauthenticationAction: "Sign in again",
 
     /** @remarks `"Avatar"` */
     avatar: "Avatar",

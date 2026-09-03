@@ -1,4 +1,8 @@
-import { authQueryKeys, validateStringLength } from "@better-auth-ui/core"
+import {
+  authQueryKeys,
+  isReauthenticationRequiredError,
+  validateStringLength
+} from "@better-auth-ui/core"
 import {
   useAuth,
   useAuthPlugin,
@@ -26,6 +30,7 @@ import {
   isAuthFormFieldInvalid,
   useAuthForm
 } from "../auth-form"
+import { ReauthenticationAction } from "../reauthentication"
 
 export type DeleteAccountProps = {
   className?: string
@@ -59,10 +64,16 @@ export function DeleteAccount({
   )
   const needsPassword = !sendDeleteAccountVerification && hasCredentialAccount
 
-  const { mutateAsync: deleteUser, isPending } = useDeleteUser(authClient)
+  const deleteUser = useDeleteUser(authClient, {
+    meta: { errorPresentation: "inline" }
+  })
+  const needsReauthentication = isReauthenticationRequiredError(
+    deleteUser.error
+  )
 
   const handleDialogOpenChange = (open: boolean) => {
     setConfirmOpen(open)
+    deleteUser.reset()
     form.setFieldValue("password", "")
     clearAuthFormServerError(form)
     setIsPasswordVisible(false)
@@ -75,7 +86,7 @@ export function DeleteAccount({
         ...(needsPassword ? { password: value.password } : {})
       }
 
-      await deleteUser(params, {
+      await deleteUser.mutateAsync(params, {
         onSuccess: () => {
           setConfirmOpen(false)
           form.setFieldValue("password", "")
@@ -125,107 +136,130 @@ export function DeleteAccount({
           >
             <AlertDialog.Container>
               <AlertDialog.Dialog>
-                <form.AppForm>
-                  <form.AuthFormRoot>
+                {needsReauthentication ? (
+                  <>
                     <AlertDialog.CloseTrigger />
-
                     <AlertDialog.Header>
-                      <AlertDialog.Icon status="danger">
-                        <TriangleExclamation />
-                      </AlertDialog.Icon>
-
                       <AlertDialog.Heading>
-                        {deleteUserLocalization.deleteAccount}
+                        {localization.settings.reauthenticationTitle}
                       </AlertDialog.Heading>
                     </AlertDialog.Header>
-
-                    <AlertDialog.Body className="overflow-visible">
-                      <p className="text-muted text-sm">
-                        {deleteUserLocalization.deleteAccountDescription}
-                      </p>
-
-                      {needsPassword && (
-                        <form.AppField
-                          name="password"
-                          validators={{
-                            onChange: ({ value }) =>
-                              validateStringLength(value, {
-                                requiredMessage: localization.auth.fieldRequired
-                              })
-                          }}
-                        >
-                          {(field) => (
-                            <TextField
-                              className="mt-4"
-                              isInvalid={isAuthFormFieldInvalid(
-                                field.state.meta
-                              )}
-                              name={field.name}
-                              isDisabled={isPending}
-                              value={field.state.value}
-                              onBlur={field.handleBlur}
-                              onChange={field.handleChange}
-                            >
-                              <Label>{localization.auth.password}</Label>
-
-                              <InputGroup variant="secondary">
-                                <InputGroup.Input
-                                  autoComplete="current-password"
-                                  placeholder={
-                                    localization.auth.passwordPlaceholder
-                                  }
-                                  required
-                                  type={isPasswordVisible ? "text" : "password"}
-                                />
-
-                                <InputGroup.Suffix className="px-0">
-                                  <Button
-                                    isIconOnly
-                                    aria-label={
-                                      isPasswordVisible
-                                        ? localization.auth.hidePassword
-                                        : localization.auth.showPassword
-                                    }
-                                    isDisabled={isPending}
-                                    onPress={() =>
-                                      setIsPasswordVisible(!isPasswordVisible)
-                                    }
-                                    size="sm"
-                                    variant="ghost"
-                                  >
-                                    {isPasswordVisible ? <EyeSlash /> : <Eye />}
-                                  </Button>
-                                </InputGroup.Suffix>
-                              </InputGroup>
-
-                              <field.AuthFormFieldError />
-                            </TextField>
-                          )}
-                        </form.AppField>
-                      )}
-                      <form.AuthFormServerError />
+                    <AlertDialog.Body>
+                      <ReauthenticationAction showTitle={false} />
                     </AlertDialog.Body>
+                  </>
+                ) : (
+                  <form.AppForm>
+                    <form.AuthFormRoot>
+                      <AlertDialog.CloseTrigger />
 
-                    <AlertDialog.Footer>
-                      <Button
-                        slot="close"
-                        variant="tertiary"
-                        isDisabled={isPending}
-                      >
-                        {localization.settings.cancel}
-                      </Button>
+                      <AlertDialog.Header>
+                        <AlertDialog.Icon status="danger">
+                          <TriangleExclamation />
+                        </AlertDialog.Icon>
 
-                      <form.AuthFormSubmitButton
-                        variant="danger"
-                        isDisabled={isPending}
-                      >
-                        {isPending && <Spinner color="current" size="sm" />}
+                        <AlertDialog.Heading>
+                          {deleteUserLocalization.deleteAccount}
+                        </AlertDialog.Heading>
+                      </AlertDialog.Header>
 
-                        {deleteUserLocalization.deleteAccount}
-                      </form.AuthFormSubmitButton>
-                    </AlertDialog.Footer>
-                  </form.AuthFormRoot>
-                </form.AppForm>
+                      <AlertDialog.Body className="overflow-visible">
+                        <p className="text-muted text-sm">
+                          {deleteUserLocalization.deleteAccountDescription}
+                        </p>
+
+                        {needsPassword && (
+                          <form.AppField
+                            name="password"
+                            validators={{
+                              onChange: ({ value }) =>
+                                validateStringLength(value, {
+                                  requiredMessage:
+                                    localization.auth.fieldRequired
+                                })
+                            }}
+                          >
+                            {(field) => (
+                              <TextField
+                                className="mt-4"
+                                isInvalid={isAuthFormFieldInvalid(
+                                  field.state.meta
+                                )}
+                                name={field.name}
+                                isDisabled={deleteUser.isPending}
+                                value={field.state.value}
+                                onBlur={field.handleBlur}
+                                onChange={field.handleChange}
+                              >
+                                <Label>{localization.auth.password}</Label>
+
+                                <InputGroup variant="secondary">
+                                  <InputGroup.Input
+                                    autoComplete="current-password"
+                                    placeholder={
+                                      localization.auth.passwordPlaceholder
+                                    }
+                                    required
+                                    type={
+                                      isPasswordVisible ? "text" : "password"
+                                    }
+                                  />
+
+                                  <InputGroup.Suffix className="px-0">
+                                    <Button
+                                      isIconOnly
+                                      aria-label={
+                                        isPasswordVisible
+                                          ? localization.auth.hidePassword
+                                          : localization.auth.showPassword
+                                      }
+                                      isDisabled={deleteUser.isPending}
+                                      onPress={() =>
+                                        setIsPasswordVisible(!isPasswordVisible)
+                                      }
+                                      size="sm"
+                                      variant="ghost"
+                                    >
+                                      {isPasswordVisible ? (
+                                        <EyeSlash />
+                                      ) : (
+                                        <Eye />
+                                      )}
+                                    </Button>
+                                  </InputGroup.Suffix>
+                                </InputGroup>
+
+                                <field.AuthFormFieldError />
+                              </TextField>
+                            )}
+                          </form.AppField>
+                        )}
+                        <form.AuthFormServerError />
+                      </AlertDialog.Body>
+
+                      <AlertDialog.Footer>
+                        <Button
+                          slot="close"
+                          variant="tertiary"
+                          isDisabled={deleteUser.isPending}
+                        >
+                          {localization.settings.cancel}
+                        </Button>
+
+                        <form.AuthFormSubmitButton
+                          variant="danger"
+                          isDisabled={deleteUser.isPending}
+                        >
+                          {deleteUser.isPending && (
+                            <Spinner color="current" size="sm" />
+                          )}
+
+                          {deleteUserLocalization.deleteAccount}
+                        </form.AuthFormSubmitButton>
+                      </AlertDialog.Footer>
+                    </form.AuthFormRoot>
+                  </form.AppForm>
+                )}
               </AlertDialog.Dialog>
             </AlertDialog.Container>
           </AlertDialog.Backdrop>

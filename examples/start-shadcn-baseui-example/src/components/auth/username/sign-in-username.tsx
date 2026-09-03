@@ -43,6 +43,7 @@ import { usernamePlugin } from "@/lib/auth/username-plugin"
 import { cn } from "@/lib/utils"
 import { isAuthFormFieldInvalid, useAuthForm } from "../auth-form"
 import { LastUsedBadge } from "../last-login-method/last-used-badge"
+import { ReauthenticationNotice } from "../reauthentication"
 
 export type SignInUsernameProps = {
   className?: string
@@ -169,6 +170,7 @@ export function SignInUsername({
   return (
     <Card className={cn("w-full max-w-sm", className)}>
       <AuthPrompts view="signIn" />
+      <ReauthenticationNotice />
       <CardHeader>
         <CardTitle className="text-xl font-semibold">
           {localization.auth.signIn}

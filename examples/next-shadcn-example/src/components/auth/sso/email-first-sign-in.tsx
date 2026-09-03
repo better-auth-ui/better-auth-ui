@@ -57,6 +57,7 @@ import { useSignInContinuation } from "@/lib/auth/use-sign-in-continuation"
 import { cn } from "@/lib/utils"
 import { isAuthFormFieldInvalid, useAuthForm } from "../auth-form"
 import { ProviderButtons } from "../provider-buttons"
+import { ReauthenticationNotice } from "../reauthentication"
 
 export type EmailFirstSignInProps = {
   className?: string
@@ -179,6 +180,7 @@ export function EmailFirstSignIn({
   return (
     <Card className={cn("w-full max-w-sm", className)}>
       <AuthPrompts view="signIn" />
+      <ReauthenticationNotice />
       <CardHeader>
         <CardTitle className="text-xl font-semibold">
           {localization.auth.signIn}

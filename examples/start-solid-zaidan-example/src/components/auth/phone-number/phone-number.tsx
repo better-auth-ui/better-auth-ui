@@ -46,6 +46,7 @@ import {
   setAuthFormServerError,
   submitAuthForm
 } from "../auth-form"
+import { ReauthenticationNotice } from "../reauthentication"
 
 type PhoneNumberMode = "code" | "password"
 
@@ -178,6 +179,7 @@ export function PhoneNumber(props: PhoneNumberProps) {
   return (
     <Card class={cn("w-full max-w-sm", props.class)}>
       <AuthPrompts view="phoneNumber" />
+      <ReauthenticationNotice />
       <CardHeader>
         <CardTitle class="text-xl font-semibold">
           {auth.localization.auth.signIn}

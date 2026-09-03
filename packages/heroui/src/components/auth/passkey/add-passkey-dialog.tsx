@@ -1,4 +1,4 @@
-import { isSessionNotFreshError } from "@better-auth-ui/core"
+import { isReauthenticationRequiredError } from "@better-auth-ui/core"
 import type {
   AddPasskeyParams,
   PasskeyAuthClient
@@ -15,11 +15,9 @@ import {
   Spinner,
   TextField
 } from "@heroui/react"
-import { useRef } from "react"
-
 import { passkeyPlugin } from "../../../lib/auth/passkey-plugin"
 import { useAuthForm } from "../auth-form"
-import { FreshSessionPrompt } from "../settings/security/fresh-session-prompt"
+import { ReauthenticationAction } from "../reauthentication"
 
 export type AddPasskeyDialogProps = {
   isOpen: boolean
@@ -35,12 +33,10 @@ export function AddPasskeyDialog({
     useAuthPlugin(passkeyPlugin)
 
   const addPasskey = useAddPasskey(authClient as PasskeyAuthClient)
-  const pendingRequest = useRef<AddPasskeyParams<PasskeyAuthClient>>(undefined)
 
   const handleOpenChange = (open: boolean) => {
     if (!open) {
       addPasskey.reset()
-      pendingRequest.current = undefined
     }
     onOpenChange(open)
   }
@@ -55,7 +51,6 @@ export function AddPasskeyDialog({
         onSuccess: () => handleOpenChange(false)
       }
     }
-    pendingRequest.current = requestWithCallbacks
     await addPasskey.mutateAsync(requestWithCallbacks)
   }
 
@@ -70,27 +65,24 @@ export function AddPasskeyDialog({
     }
   })
 
-  const needsFreshSession = isSessionNotFreshError(addPasskey.error)
+  const needsReauthentication = isReauthenticationRequiredError(
+    addPasskey.error
+  )
 
   return (
     <AlertDialog.Backdrop isOpen={isOpen} onOpenChange={handleOpenChange}>
       <AlertDialog.Container>
         <AlertDialog.Dialog>
-          {needsFreshSession ? (
+          {needsReauthentication ? (
             <>
               <AlertDialog.CloseTrigger />
               <AlertDialog.Header>
                 <AlertDialog.Heading className="sr-only">
-                  {localization.settings.freshSessionTitle}
+                  {localization.settings.reauthenticationTitle}
                 </AlertDialog.Heading>
               </AlertDialog.Header>
               <AlertDialog.Body>
-                <FreshSessionPrompt
-                  onFresh={async () => {
-                    const request = pendingRequest.current
-                    if (request) await submitRequest(request)
-                  }}
-                />
+                <ReauthenticationAction showTitle={false} />
               </AlertDialog.Body>
             </>
           ) : (

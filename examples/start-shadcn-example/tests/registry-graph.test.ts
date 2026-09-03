@@ -140,11 +140,16 @@ describe("React registry import graph", () => {
 
   it("follows internal imports into each installable item", () => {
     expect(targets("admin")).toContain("@components/auth/additional-field.tsx")
-    expect(targets("active-sessions")).toEqual(
-      expect.arrayContaining([
-        "@lib/auth/two-factor-methods.ts",
-        "@lib/auth/use-sign-in-continuation.ts"
-      ])
+    const activeSessionsTargets = targets("active-sessions")
+
+    expect(activeSessionsTargets).toContain(
+      "@components/auth/reauthentication.tsx"
+    )
+    expect(activeSessionsTargets).not.toContain(
+      "@lib/auth/two-factor-methods.ts"
+    )
+    expect(activeSessionsTargets).not.toContain(
+      "@lib/auth/use-sign-in-continuation.ts"
     )
     expect(targets("username")).toContain(
       "@components/auth/provider-buttons.tsx"

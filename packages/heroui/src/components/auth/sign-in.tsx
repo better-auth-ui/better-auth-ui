@@ -36,6 +36,7 @@ import { useAuthForm } from "./auth-form"
 import { FieldSeparator } from "./field-separator"
 import { LastUsedBadge } from "./last-login-method/last-used-badge"
 import { ProviderButtons, type SocialLayout } from "./provider-buttons"
+import { ReauthenticationNotice } from "./reauthentication"
 
 export interface SignInProps {
   className?: string
@@ -123,6 +124,7 @@ export function SignIn({
       variant={variant}
     >
       <AuthPrompts view="signIn" />
+      <ReauthenticationNotice />
       <Card.Header>
         <Card.Title className="text-xl font-semibold mb-1">
           {localization.auth.signIn}

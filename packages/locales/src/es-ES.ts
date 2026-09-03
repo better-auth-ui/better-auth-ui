@@ -109,12 +109,10 @@ const esLocalization = deepmerge(localization, {
     accountUnlinked: "Vinculación de cuenta eliminada",
     active: "Activo",
     activeSessions: "Sesiones activas",
-    freshSessionTitle: "Confirma tu identidad",
-    freshSessionDescription:
-      "Vuelve a introducir tu contraseña para gestionar este ajuste sensible.",
-    freshSessionSubmit: "Confirmar y continuar",
-    freshSessionSignIn: "Iniciar sesión de nuevo",
-    freshSessionSuccess: "Tu identidad ha sido confirmada.",
+    reauthenticationTitle: "Inicia sesión de nuevo",
+    reauthenticationDescription:
+      "Inicia sesión de nuevo para verificar tu identidad antes de continuar.",
+    reauthenticationAction: "Iniciar sesión de nuevo",
     avatar: "Avatar",
     currentSession: "Sesión actual",
     avatarChangedSuccess: "Avatar cambiado correctamente",

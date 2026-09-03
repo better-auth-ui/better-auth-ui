@@ -119,6 +119,10 @@ const zaidanFormSupportFiles = [
 
 const zaidanInteractiveSupportFiles = zaidanFormSupportFiles
 
+const reauthenticationFiles = [
+  componentFile("src/components/auth/reauthentication.tsx")
+] satisfies SolidRegistryFile[]
+
 /** Every form that picks a new password renders the strength meter. */
 const passwordStrengthFiles = [
   componentFile("src/components/auth/password-strength-meter.tsx")
@@ -183,6 +187,7 @@ const solidRegistryBaseManifest = {
         "Solid sign-in surface with email/password, username, and provider button support.",
       files: [
         componentFile("src/components/auth/sign-in.tsx"),
+        ...reauthenticationFiles,
         libFile("src/lib/auth/use-sign-in-continuation.ts"),
         libFile("src/lib/auth/two-factor-methods.ts"),
         componentFile("src/components/auth/username/sign-in-username.tsx"),
@@ -261,6 +266,7 @@ const solidRegistryBaseManifest = {
       ],
       files: [
         libFile("src/lib/auth/email-otp-plugin.ts"),
+        ...reauthenticationFiles,
         libFile("src/lib/auth/use-resend-cooldown.ts"),
         libFile("src/lib/auth/use-sign-in-continuation.ts"),
         libFile("src/lib/auth/two-factor-methods.ts"),
@@ -296,6 +302,7 @@ const solidRegistryBaseManifest = {
       ],
       files: [
         libFile("src/lib/auth/phone-number-plugin.ts"),
+        ...reauthenticationFiles,
         libFile("src/lib/auth/use-resend-cooldown.ts"),
         libFile("src/lib/auth/use-sign-in-continuation.ts"),
         componentFile("src/components/auth/otp-field.tsx"),
@@ -340,6 +347,7 @@ const solidRegistryBaseManifest = {
       ],
       files: [
         libFile("src/lib/auth/magic-link-plugin.ts"),
+        ...reauthenticationFiles,
         componentFile("src/components/auth/magic-link.tsx"),
         componentFile("src/components/auth/magic-link-sent.tsx"),
         componentFile("src/components/auth/magic-link-button.tsx"),
@@ -432,6 +440,7 @@ const solidRegistryBaseManifest = {
       ],
       files: [
         libFile("src/lib/auth/sso-plugin.ts"),
+        ...reauthenticationFiles,
         libFile("src/lib/auth/use-sign-in-continuation.ts"),
         libFile("src/lib/auth/two-factor-methods.ts"),
         componentFile("src/components/auth/sso/email-first-sign-in.tsx"),
@@ -505,6 +514,7 @@ const solidRegistryBaseManifest = {
         "Solid username UI plugin, sign-in form, and username availability field.",
       files: [
         libFile("src/lib/auth/username-plugin.ts"),
+        ...reauthenticationFiles,
         libFile("src/lib/auth/use-sign-in-continuation.ts"),
         libFile("src/lib/auth/two-factor-methods.ts"),
         componentFile("src/components/auth/username/sign-in-username.tsx"),
@@ -524,6 +534,7 @@ const solidRegistryBaseManifest = {
       dependencies: [...solidAuthDependencies, "@better-auth/passkey"],
       files: [
         libFile("src/lib/auth/passkey-plugin.ts"),
+        ...reauthenticationFiles,
         componentFile("src/components/auth/passkey/passkey-localization.ts"),
         componentFile("src/components/auth/passkey/passkey-button.tsx"),
         componentFile("src/components/auth/passkey/passkeys.tsx"),
@@ -792,14 +803,12 @@ const solidRegistryBaseManifest = {
       title: "Solid Active Sessions",
       description: "Solid active sessions management card.",
       files: [
+        ...reauthenticationFiles,
         componentFile(
           "src/components/auth/settings/security/active-sessions.tsx"
         ),
         componentFile(
           "src/components/auth/settings/security/active-session.tsx"
-        ),
-        componentFile(
-          "src/components/auth/settings/security/fresh-session-prompt.tsx"
         ),
         componentFile(
           "src/components/auth/settings/security/session-actions.tsx"
@@ -814,6 +823,7 @@ const solidRegistryBaseManifest = {
       title: "Solid Linked Accounts",
       description: "Solid linked accounts management card.",
       files: [
+        ...reauthenticationFiles,
         componentFile(
           "src/components/auth/settings/security/linked-accounts.tsx"
         ),
@@ -966,6 +976,7 @@ const solidRegistryBaseManifest = {
       description:
         "Solid delete-user danger-zone card and confirmation dialog.",
       files: [
+        ...reauthenticationFiles,
         componentFile("src/components/auth/delete-user/danger-zone.tsx"),
         componentFile("src/components/auth/delete-user/delete-account.tsx"),
         componentFile("src/components/auth/settings/shared/helpers.ts"),

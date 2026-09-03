@@ -50,6 +50,7 @@ import {
 } from "../auth-form"
 import { FieldSeparator } from "../field-separator"
 import { ProviderButtons, type SocialLayout } from "../provider-buttons"
+import { ReauthenticationNotice } from "../reauthentication"
 
 export type EmailFirstSignInProps = {
   className?: string
@@ -184,6 +185,7 @@ export function EmailFirstSignIn({
       variant={variant}
     >
       <AuthPrompts view="signIn" />
+      <ReauthenticationNotice />
       <Card.Header>
         <Card.Title className="mb-1 text-xl font-semibold">
           {localization.auth.signIn}

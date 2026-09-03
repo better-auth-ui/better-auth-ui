@@ -37,6 +37,7 @@ import { runAuthFormAction, submitAuthForm, useAuthForm } from "../auth-form"
 import { OpenEmailButton } from "../open-email-button"
 import { OtpField } from "../otp-field"
 import { ProviderButtons, type SocialLayout } from "../provider-buttons"
+import { ReauthenticationNotice } from "../reauthentication"
 
 export type EmailOtpProps = {
   className?: string
@@ -135,6 +136,7 @@ export function EmailOtp({
 
   return (
     <Card className={cn("w-full max-w-sm", className)}>
+      <ReauthenticationNotice />
       <CardHeader>
         <CardTitle className="text-xl">{localization.auth.signIn}</CardTitle>
 

@@ -1,4 +1,7 @@
-import { isSessionNotFreshError, type ListSession } from "@better-auth-ui/core"
+import {
+  isReauthenticationRequiredError,
+  type ListSession
+} from "@better-auth-ui/core"
 import {
   useAuth,
   useListSessions,
@@ -11,8 +14,8 @@ import { resolveUserLabel } from "@/components/auth/settings/shared/helpers"
 import { Card, CardContent } from "@/components/ui/card"
 import { ItemGroup, ItemSeparator } from "@/components/ui/item"
 import { cn } from "@/lib/utils"
+import { ReauthenticationAction } from "../../reauthentication"
 import { ActiveSessionRow, ActiveSessionRowSkeleton } from "./active-session"
-import { FreshSessionPrompt } from "./fresh-session-prompt"
 import { SessionActions } from "./session-actions"
 
 export type ActiveSessionsSettingsProps = {
@@ -24,7 +27,9 @@ export function ActiveSessionsSettings(
 ) {
   const auth = useAuth()
   const session = useSession(auth.authClient)
-  const activeSessions = useListSessions(auth.authClient)
+  const activeSessions = useListSessions(auth.authClient, () => ({
+    meta: { errorPresentation: "inline" }
+  }))
   const sessions = () =>
     [...(activeSessions.data ?? [])].sort((activeSession) =>
       activeSession.id === session.data?.session.id ? -1 : 1
@@ -56,44 +61,51 @@ export function ActiveSessionsSettings(
         <CardContent class="z-card-content-padding-none">
           <Show
             fallback={
-              <Show
-                fallback={
-                  <ItemGroup class="gap-0!">
-                    <ActiveSessionRowSkeleton />
-                  </ItemGroup>
-                }
-                when={isSessionNotFreshError(activeSessions.error)}
-              >
-                <FreshSessionPrompt onFresh={() => activeSessions.refetch()} />
-              </Show>
+              <ItemGroup class="gap-0!">
+                <ActiveSessionRowSkeleton />
+              </ItemGroup>
             }
-            when={
-              !activeSessions.isPending &&
-              !isSessionNotFreshError(activeSessions.error) &&
-              session.data
-            }
+            when={!activeSessions.isPending}
           >
-            <ItemGroup class="gap-0!">
-              <For each={sessions()}>
-                {(activeSession, index) => (
-                  <>
-                    <Show when={index() > 0}>
-                      <ItemSeparator class="my-0!" />
-                    </Show>
-                    <ActiveSessionRow
-                      activeSession={activeSession}
-                      displayName={displayName()}
-                      isRevoking={revokeSession.isPending}
-                      isCurrentSession={
-                        activeSession.id === session.data?.session.id
-                      }
-                      onRevoke={revoke}
-                      onSignOut={signOut}
-                    />
-                  </>
-                )}
-              </For>
-            </ItemGroup>
+            <Show
+              fallback={
+                <ItemGroup class="gap-0!">
+                  <For each={sessions()}>
+                    {(activeSession, index) => (
+                      <>
+                        <Show when={index() > 0}>
+                          <ItemSeparator class="my-0!" />
+                        </Show>
+                        <ActiveSessionRow
+                          activeSession={activeSession}
+                          displayName={displayName()}
+                          isRevoking={revokeSession.isPending}
+                          isCurrentSession={
+                            activeSession.id === session.data?.session.id
+                          }
+                          onRevoke={revoke}
+                          onSignOut={signOut}
+                        />
+                      </>
+                    )}
+                  </For>
+                </ItemGroup>
+              }
+              when={activeSessions.error}
+            >
+              {(error) => (
+                <Show
+                  fallback={
+                    <p class="p-4 text-destructive text-sm">
+                      {error().message}
+                    </p>
+                  }
+                  when={isReauthenticationRequiredError(error())}
+                >
+                  <ReauthenticationAction />
+                </Show>
+              )}
+            </Show>
           </Show>
         </CardContent>
         <Show

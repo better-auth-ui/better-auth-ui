@@ -33,6 +33,7 @@ import {
   setAuthFormServerError,
   submitAuthForm
 } from "../auth-form"
+import { ReauthenticationNotice } from "../reauthentication"
 
 export type EmailOtpProps = {
   class?: string
@@ -115,6 +116,7 @@ export function EmailOtp(props: EmailOtpProps) {
 
   return (
     <Card class={cn("w-full max-w-sm", props.class)}>
+      <ReauthenticationNotice />
       <CardHeader>
         <CardTitle class="text-xl font-semibold">
           {auth.localization.auth.signIn}

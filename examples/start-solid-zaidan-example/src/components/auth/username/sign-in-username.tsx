@@ -31,6 +31,7 @@ import { createAuthForm, isAuthFormFieldInvalid } from "../auth-form"
 import { LastUsedBadge } from "../last-login-method/last-used-badge"
 import type { SocialLayout } from "../provider-buttons"
 import { ProviderButtons } from "../provider-buttons"
+import { ReauthenticationNotice } from "../reauthentication"
 import { resolveSignInPath } from "../sign-in-path"
 
 export type SignInUsernameProps = {
@@ -117,6 +118,7 @@ export function SignInUsername(props: SignInUsernameProps) {
   return (
     <Card class={cn("w-full max-w-sm", props.class)}>
       <AuthPrompts view="signIn" />
+      <ReauthenticationNotice />
       <CardHeader>
         <CardTitle class="text-xl font-semibold">
           {auth.localization.auth.signIn}

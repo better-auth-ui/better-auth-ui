@@ -16,11 +16,13 @@ export function useUnlinkAccount<TAuthClient extends AuthClient>(
 ) {
   const { data: session } = useSession(authClient, undefined, queryClient)
   const userId = session?.user.id
+  const mutationOptions = unlinkAccountOptions(authClient, userId)
 
   return useMutation(
     {
-      ...unlinkAccountOptions(authClient, userId),
-      ...options
+      ...mutationOptions,
+      ...options,
+      meta: { ...mutationOptions.meta, ...options?.meta }
     },
     queryClient
   )

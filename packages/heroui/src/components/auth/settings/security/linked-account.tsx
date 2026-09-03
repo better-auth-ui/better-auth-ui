@@ -2,7 +2,7 @@ import {
   type AuthSocialProvider,
   getProviderId,
   getProviderName,
-  isSessionNotFreshError
+  isReauthenticationRequiredError
 } from "@better-auth-ui/core"
 import {
   renderProviderIcon,
@@ -21,7 +21,7 @@ import {
   toast
 } from "@heroui/react"
 import type { Account } from "better-auth"
-import { FreshSessionPrompt } from "./fresh-session-prompt"
+import { ReauthenticationAction } from "../../reauthentication"
 
 export type LinkedAccountProps = {
   account?: Account
@@ -54,6 +54,12 @@ export function LinkedAccount({
   const { mutate: linkSocial, isPending: isLinking } = useLinkSocial(authClient)
 
   const unlinkAccount = useUnlinkAccount(authClient, {
+    meta: { errorPresentation: "inline" },
+    onError: (error) => {
+      if (!isReauthenticationRequiredError(error)) {
+        toast.danger(error.error?.message ?? error.message)
+      }
+    },
     onSuccess: () => toast.success(localization.settings.accountUnlinked)
   })
 
@@ -72,7 +78,9 @@ export function LinkedAccount({
     accountInfo?.user?.email ||
     accountInfo?.user?.name ||
     account?.accountId
-  const needsFreshSession = isSessionNotFreshError(unlinkAccount.error)
+  const needsReauthentication = isReauthenticationRequiredError(
+    unlinkAccount.error
+  )
 
   return (
     <>
@@ -163,7 +171,7 @@ export function LinkedAccount({
       </div>
       {account && (
         <AlertDialog.Backdrop
-          isOpen={needsFreshSession}
+          isOpen={needsReauthentication}
           onOpenChange={(nextOpen) => {
             if (!nextOpen) unlinkAccount.reset()
           }}
@@ -173,15 +181,11 @@ export function LinkedAccount({
               <AlertDialog.CloseTrigger />
               <AlertDialog.Header>
                 <AlertDialog.Heading className="sr-only">
-                  {localization.settings.freshSessionTitle}
+                  {localization.settings.reauthenticationTitle}
                 </AlertDialog.Heading>
               </AlertDialog.Header>
               <AlertDialog.Body>
-                <FreshSessionPrompt
-                  onFresh={() =>
-                    unlinkAccount.mutate({ accountId: account.id })
-                  }
-                />
+                <ReauthenticationAction showTitle={false} />
               </AlertDialog.Body>
             </AlertDialog.Dialog>
           </AlertDialog.Container>

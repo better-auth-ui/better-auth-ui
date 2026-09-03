@@ -54,6 +54,7 @@ import { cn } from "@/lib/utils"
 import { runAuthFormAction, submitAuthForm, useAuthForm } from "../auth-form"
 import { OtpField } from "../otp-field"
 import { ProviderButtons, type SocialLayout } from "../provider-buttons"
+import { ReauthenticationNotice } from "../reauthentication"
 import { InternationalPhoneField } from "./international-phone-field"
 
 type PhoneNumberMode = "code" | "password"
@@ -220,6 +221,7 @@ export function PhoneNumber({
   return (
     <Card className={cn("w-full max-w-sm", className)}>
       <AuthPrompts view="phoneNumber" />
+      <ReauthenticationNotice />
       <CardHeader>
         <CardTitle className="text-xl font-semibold">
           {localization.auth.signIn}

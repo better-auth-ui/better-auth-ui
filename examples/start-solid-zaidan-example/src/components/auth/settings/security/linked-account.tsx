@@ -2,7 +2,7 @@ import {
   getProviderId,
   getProviderName,
   isCustomSocialProvider,
-  isSessionNotFreshError
+  isReauthenticationRequiredError
 } from "@better-auth-ui/core"
 import {
   useAccountInfo,
@@ -38,7 +38,7 @@ import {
 import { Skeleton } from "@/components/ui/skeleton"
 import { Spinner } from "@/components/ui/spinner"
 import { cn } from "@/lib/utils"
-import { FreshSessionPrompt } from "./fresh-session-prompt"
+import { ReauthenticationAction } from "../../reauthentication"
 
 function GitHubIcon(props: ComponentProps<"svg">) {
   return (
@@ -120,6 +120,12 @@ export function LinkedAccountRow(props: {
   }))
   const linkSocial = useLinkSocial(auth.authClient)
   const unlinkAccount = useUnlinkAccount(auth.authClient, () => ({
+    meta: { errorPresentation: "inline" },
+    onError: (error) => {
+      if (!isReauthenticationRequiredError(error)) {
+        toast.error(error.error?.message ?? error.message)
+      }
+    },
     onSuccess: () => toast.success(auth.localization.settings.accountUnlinked)
   }))
   const accountInfoData = () =>
@@ -216,23 +222,21 @@ export function LinkedAccountRow(props: {
         </ItemActions>
       </Item>
       <Show when={props.account}>
-        {(account) => (
-          <Dialog
-            open={isSessionNotFreshError(unlinkAccount.error)}
-            onOpenChange={(nextOpen) => {
-              if (!nextOpen) unlinkAccount.reset()
-            }}
-          >
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle class="sr-only">
-                  {auth.localization.settings.freshSessionTitle}
-                </DialogTitle>
-              </DialogHeader>
-              <FreshSessionPrompt onFresh={() => unlinkProvider(account())} />
-            </DialogContent>
-          </Dialog>
-        )}
+        <Dialog
+          open={isReauthenticationRequiredError(unlinkAccount.error)}
+          onOpenChange={(nextOpen) => {
+            if (!nextOpen) unlinkAccount.reset()
+          }}
+        >
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle class="sr-only">
+                {auth.localization.settings.reauthenticationTitle}
+              </DialogTitle>
+            </DialogHeader>
+            <ReauthenticationAction showTitle={false} />
+          </DialogContent>
+        </Dialog>
       </Show>
     </>
   )

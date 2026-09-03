@@ -14,20 +14,32 @@ export type AuthQueryError = BetterFetchError & {
   retryAfterMs?: number
 }
 
-export const SESSION_NOT_FRESH_ERROR_CODE = "SESSION_NOT_FRESH"
+export const REAUTHENTICATION_REQUIRED_ERROR_CODES = new Set([
+  "SESSION_NOT_FRESH",
+  "SESSION_EXPIRED"
+])
 
-/** Return whether Better Auth rejected a request that requires a fresh session. */
-export function isSessionNotFreshError(error: unknown) {
+/** Return whether Better Auth requires the user to authenticate again. */
+export function isReauthenticationRequiredError(error: unknown) {
   if (typeof error !== "object" || error === null) return false
 
-  if ((error as { code?: unknown }).code === SESSION_NOT_FRESH_ERROR_CODE) {
+  const code = (error as { code?: unknown }).code
+  if (
+    typeof code === "string" &&
+    REAUTHENTICATION_REQUIRED_ERROR_CODES.has(code)
+  ) {
     return true
   }
 
   const errorBody = (error as { error?: unknown }).error
   if (typeof errorBody !== "object" || errorBody === null) return false
 
-  return (errorBody as { code?: unknown }).code === SESSION_NOT_FRESH_ERROR_CODE
+  const nestedCode = (errorBody as { code?: unknown }).code
+
+  return (
+    typeof nestedCode === "string" &&
+    REAUTHENTICATION_REQUIRED_ERROR_CODES.has(nestedCode)
+  )
 }
 
 class AuthQueryResponseError extends Error implements AuthQueryError {

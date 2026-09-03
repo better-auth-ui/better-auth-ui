@@ -1,5 +1,7 @@
 const ABSOLUTE_HTTP_URL = /^https?:\/\//i
 
+export const REAUTHENTICATION_QUERY_PARAM = "reauthenticate"
+
 /**
  * Build a callback URL from an optional origin, a configured base path, and a
  * view path.
@@ -38,6 +40,27 @@ export function getAuthLinkURL(href: string, redirectTo: string): string {
   searchParams.set("redirectTo", redirectTo)
 
   return `${pathname}?${searchParams}${hash}`
+}
+
+/** Build a sign-in URL that returns to the exact current page after authentication. */
+export function getReauthenticationSignInURL(
+  currentURL: URL,
+  signInPath: string
+): string {
+  const signInURL = new URL(signInPath, currentURL.origin)
+
+  signInURL.searchParams.set(REAUTHENTICATION_QUERY_PARAM, "true")
+  signInURL.searchParams.set(
+    "redirectTo",
+    `${currentURL.pathname}${currentURL.search}${currentURL.hash}`
+  )
+
+  return `${signInURL.pathname}${signInURL.search}${signInURL.hash}`
+}
+
+/** Return whether the current sign-in URL was opened for reauthentication. */
+export function isReauthenticationSignInURL(currentURL: URL): boolean {
+  return currentURL.searchParams.get(REAUTHENTICATION_QUERY_PARAM) === "true"
 }
 
 function hasUnsafeRedirectCharacters(value: string): boolean {

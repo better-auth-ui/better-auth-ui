@@ -8,10 +8,16 @@ export type UnlinkAccountParams<TAuthClient extends AuthClient> = Parameters<
   TAuthClient["unlinkAccount"]
 >[0]
 
-export type UnlinkAccountOptions<TAuthClient extends AuthClient> = Omit<
-  ReturnType<typeof unlinkAccountOptions<TAuthClient>>,
-  "mutationKey" | "mutationFn" | "meta"
+type UnlinkAccountMutationOptions<TAuthClient extends AuthClient> = ReturnType<
+  typeof unlinkAccountOptions<TAuthClient>
 >
+
+export type UnlinkAccountOptions<TAuthClient extends AuthClient> = Omit<
+  UnlinkAccountMutationOptions<TAuthClient>,
+  "mutationKey" | "mutationFn" | "meta"
+> & {
+  meta?: Record<string, unknown>
+}
 
 /**
  * Mutation options factory for unlinking a social provider from the current user.
