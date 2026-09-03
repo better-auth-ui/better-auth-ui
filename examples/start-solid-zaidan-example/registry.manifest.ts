@@ -465,13 +465,19 @@ const solidRegistryBaseManifest = {
       title: "Solid Dash Activity",
       description:
         "Filtered Solid personal and organization audit logs, plus an administrator view across organizations the current administrator can manage, backed by Better Auth Infrastructure Dash.",
-      dependencies: [...solidAuthDependencies, "@better-auth/infra@latest"],
+      dependencies: [
+        ...solidAuthDependencies,
+        "@better-auth/infra@latest",
+        "@tanstack/solid-pacer",
+        "@tanstack/solid-table"
+      ],
       registryDependencies: [
         betterAuthSolidRegistryDependency("auth-provider"),
         betterAuthSolidRegistryDependency("organization")
       ],
       files: [
         libFile("src/lib/auth/dash-plugin.tsx"),
+        componentFile("src/components/auth/server-table-state.ts"),
         componentFile("src/components/auth/dash/activity.tsx"),
         ...zaidanInteractiveSupportFiles
       ]
@@ -566,9 +572,14 @@ const solidRegistryBaseManifest = {
       type: "registry:component",
       title: "Solid API Keys",
       description: "Solid API key management cards and dialogs.",
-      dependencies: [...solidAuthDependencies, "@better-auth/api-key"],
+      dependencies: [
+        ...solidAuthDependencies,
+        "@better-auth/api-key",
+        "@tanstack/solid-table"
+      ],
       files: [
         libFile("src/lib/auth/api-key-plugin.ts"),
+        componentFile("src/components/auth/server-table-state.ts"),
         componentFile("src/components/auth/api-key/api-keys.tsx"),
         componentFile("src/components/auth/api-key/api-key.tsx"),
         componentFile("src/components/auth/api-key/api-keys-empty.tsx"),
@@ -968,7 +979,11 @@ const solidRegistryBaseManifest = {
       title: "Solid Admin",
       description:
         "Static administration shell with user management, a user inspector, session details, and the stop-impersonating action.",
-      dependencies: [...solidAuthDependencies, "@tanstack/solid-table"],
+      dependencies: [
+        ...solidAuthDependencies,
+        "@tanstack/solid-pacer",
+        "@tanstack/solid-table"
+      ],
       registryDependencies: [
         betterAuthSolidRegistryDependency("auth-provider"),
         betterAuthSolidRegistryDependency("user-button"),
@@ -984,6 +999,7 @@ const solidRegistryBaseManifest = {
       ],
       files: [
         libFile("src/lib/auth/admin-plugin.ts"),
+        componentFile("src/components/auth/server-table-state.ts"),
         componentFile("src/components/auth/admin/admin.tsx"),
         componentFile("src/components/auth/admin/admin-table.ts"),
         componentFile("src/components/auth/admin/admin-users.tsx"),

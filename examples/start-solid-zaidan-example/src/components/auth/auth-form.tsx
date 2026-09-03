@@ -12,7 +12,14 @@ import {
   createFormHook,
   createFormHookContexts
 } from "@tanstack/solid-form"
-import { type ComponentProps, type JSX, Show, splitProps } from "solid-js"
+import {
+  type ComponentProps,
+  type JSX,
+  onCleanup,
+  onMount,
+  Show,
+  splitProps
+} from "solid-js"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -101,6 +108,7 @@ export function setAuthFormServerError(
 }
 
 export function clearAuthFormServerError(form: AnyFormApi) {
+  if (!form.state.errorMap.onServer) return
   form.setErrorMap({ onServer: undefined })
 }
 
@@ -131,7 +139,16 @@ function AuthFormRoot(props: AuthFormRootProps) {
     "onBeforeSubmit",
     "serverErrorMessage"
   ])
+  let formElement: HTMLFormElement | undefined
   let submitting = false
+
+  onMount(() => {
+    if (!formElement) return
+
+    const clearServerError = () => clearAuthFormServerError(form)
+    formElement.addEventListener("input", clearServerError)
+    onCleanup(() => formElement?.removeEventListener("input", clearServerError))
+  })
 
   const submit = async (event: SubmitEvent) => {
     event.preventDefault()
@@ -154,6 +171,7 @@ function AuthFormRoot(props: AuthFormRootProps) {
   return (
     <form
       {...formProps}
+      ref={formElement}
       on:invalid={{
         capture: true,
         handleEvent: (event) =>
@@ -174,6 +192,7 @@ type AuthFormTextFieldProps = Omit<
 
 function AuthFormTextField(props: AuthFormTextFieldProps) {
   const field = useFieldContext<string>()
+  const form = useFormContext()
   const [local, inputProps] = splitProps(props, ["description", "id", "label"])
   const isInvalid = () => isAuthFormFieldInvalid(field().state.meta)
   const inputId = () => local.id ?? field().name
@@ -183,11 +202,15 @@ function AuthFormTextField(props: AuthFormTextFieldProps) {
       <FieldLabel for={inputId()}>{local.label}</FieldLabel>
       <Input
         {...inputProps}
+        aria-busy={field().state.meta.isValidating || undefined}
         aria-invalid={isInvalid()}
         id={inputId()}
         name={field().name}
         onBlur={field().handleBlur}
-        onInput={(event) => field().handleChange(event.currentTarget.value)}
+        onInput={(event) => {
+          clearAuthFormServerError(form)
+          field().handleChange(event.currentTarget.value)
+        }}
         value={field().state.value}
       />
       <Show when={local.description}>
@@ -205,19 +228,19 @@ function AuthFormSubmitButton(
 
   return (
     <form.Subscribe
-      selector={(state) => [state.canSubmit, state.isSubmitting] as const}
+      selector={(state) => [state.isSubmitting, state.isValidating] as const}
     >
       {(state) => (
         <Button
           {...props}
           aria-disabled={
-            props.disabled || !state()[0] || state()[1] || undefined
+            props.disabled || state()[0] || state()[1] || undefined
           }
           class={props.class}
-          disabled={props.disabled || state()[1]}
+          disabled={props.disabled || state()[0] || state()[1]}
           type="submit"
         >
-          <Show when={state()[1]}>
+          <Show when={state()[0]}>
             <Spinner />
           </Show>
           {props.children}
@@ -234,6 +257,7 @@ type AuthFormAdditionalFieldProps = Omit<
 
 function AuthFormAdditionalField(props: AuthFormAdditionalFieldProps) {
   const field = useFieldContext<AdditionalFieldFormValue>()
+  const form = useFormContext()
   const isInvalid = () => isAuthFormFieldInvalid(field().state.meta)
 
   return (
@@ -245,17 +269,16 @@ function AuthFormAdditionalField(props: AuthFormAdditionalFieldProps) {
       isInvalid={isInvalid()}
       name={field().name}
       onBlur={field().handleBlur}
-      onChange={field().handleChange}
+      onChange={(value) => {
+        clearAuthFormServerError(form)
+        field().handleChange(value)
+      }}
       value={field().state.value}
     />
   )
 }
 
-export const {
-  useAppForm: createAuthForm,
-  withFieldGroup: withAuthFieldGroup,
-  withForm: withAuthForm
-} = createFormHook({
+export const { useAppForm: createAuthForm } = createFormHook({
   fieldComponents: {
     AuthFormAdditionalField,
     AuthFormFieldError,

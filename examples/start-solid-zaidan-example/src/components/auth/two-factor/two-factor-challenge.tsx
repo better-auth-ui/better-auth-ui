@@ -153,7 +153,7 @@ export function TwoFactorChallenge(props: TwoFactorChallengeProps) {
       } as Parameters<typeof verifyTotp.mutateAsync>[0])
     }
   }))
-  const code = () => form.state.values.code
+  const code = form.useSelector((state) => state.values.code)
 
   const verifyCode = async (completedCode: string) => {
     if (

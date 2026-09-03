@@ -10,6 +10,7 @@ import {
   setAuthFormServerError,
   useAuthForm
 } from "../src/components/auth/auth-form"
+import { useServerTableState } from "../src/components/auth/server-table-state"
 
 function TestAuthForm({ onSubmit }: { onSubmit: () => Promise<void> }) {
   const form = useAuthForm({ defaultValues: {}, onSubmit })
@@ -63,6 +64,49 @@ function TestFieldForm({
   )
 }
 
+function AsyncValidatedAuthForm({
+  validate
+}: {
+  validate: () => Promise<undefined>
+}) {
+  const form = useAuthForm({ defaultValues: { handle: "" } })
+
+  return (
+    <form.AppForm>
+      <form.AppField
+        name="handle"
+        validators={{ onChangeAsync: validate, onChangeAsyncDebounceMs: 0 }}
+      >
+        {(field) => <field.AuthFormTextField label="Handle" />}
+      </form.AppField>
+    </form.AppForm>
+  )
+}
+
+function ServerTableStateFixture() {
+  const state = useServerTableState({ pageSize: 10 })
+
+  return (
+    <>
+      <button
+        onClick={() => state.setPagination({ pageIndex: 2, pageSize: 10 })}
+        type="button"
+      >
+        Go to page three
+      </button>
+      <button
+        onClick={() => state.atoms.sorting.set([{ id: "name", desc: false }])}
+        type="button"
+      >
+        Sort users
+      </button>
+      <output aria-label="Server table state">
+        {state.sorting[0]?.id ?? "none"}|{state.pagination.pageIndex}
+      </output>
+    </>
+  )
+}
+
 describe("AuthFormRoot", () => {
   it("rejects concurrent submission and disables the submit button", async () => {
     let finishSubmission!: () => void
@@ -103,6 +147,11 @@ describe("AuthFormRoot", () => {
     await waitFor(() => expect(onSubmit).toHaveBeenCalledOnce())
     expect(await screen.findByText("This email cannot be used")).toBeVisible()
     expect(screen.getByText("Account creation failed")).toBeVisible()
+
+    fireEvent.change(input, { target: { value: "grace@example.com" } })
+    await waitFor(() =>
+      expect(screen.queryByText("Account creation failed")).toBeNull()
+    )
   })
 
   it("keeps an invalid submit action reachable so TanStack can reveal errors", async () => {
@@ -115,7 +164,7 @@ describe("AuthFormRoot", () => {
     fireEvent.change(input, { target: { value: "" } })
 
     await waitFor(() =>
-      expect(submitButton).toHaveAttribute("aria-disabled", "true")
+      expect(submitButton).not.toHaveAttribute("aria-disabled")
     )
     expect(submitButton).not.toHaveAttribute("disabled")
 
@@ -149,6 +198,25 @@ describe("AuthFormRoot", () => {
     expect(screen.getByText("Mutation-owned form error")).toBeVisible()
     expect(screen.queryByText("Mutation rejected")).toBeNull()
   })
+
+  it("announces asynchronous field validation without blocking input", async () => {
+    let finishValidation!: () => void
+    const validate = vi.fn(
+      () =>
+        new Promise<undefined>((resolve) => {
+          finishValidation = () => resolve(undefined)
+        })
+    )
+    render(<AsyncValidatedAuthForm validate={validate} />)
+    const input = screen.getByRole("textbox", { name: "Handle" })
+
+    fireEvent.change(input, { target: { value: "ada" } })
+    await waitFor(() => expect(input).toHaveAttribute("aria-busy", "true"))
+    expect(input).toHaveValue("ada")
+
+    finishValidation()
+    await waitFor(() => expect(input).not.toHaveAttribute("aria-busy"))
+  })
 })
 
 describe("additional field validation", () => {
@@ -174,5 +242,23 @@ describe("additional field validation", () => {
         "Required"
       ).onChangeAsyncDebounceMs
     ).toBe(0)
+  })
+})
+
+describe("HeroUI TanStack server table state", () => {
+  it("returns to the first page when sorting changes", async () => {
+    render(<ServerTableStateFixture />)
+
+    fireEvent.click(screen.getByRole("button", { name: "Go to page three" }))
+    expect(screen.getByLabelText("Server table state")).toHaveTextContent(
+      "none|2"
+    )
+
+    fireEvent.click(screen.getByRole("button", { name: "Sort users" }))
+    await waitFor(() =>
+      expect(screen.getByLabelText("Server table state")).toHaveTextContent(
+        "name|0"
+      )
+    )
   })
 })

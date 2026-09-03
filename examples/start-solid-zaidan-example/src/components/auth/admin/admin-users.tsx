@@ -1,4 +1,5 @@
 import {
+  DEFAULT_TABLE_SEARCH_DEBOUNCE_MS,
   fieldsWithModelValues,
   getAdditionalFieldDefaultValues,
   getAdditionalFieldSubmitValues,
@@ -28,14 +29,8 @@ import {
   useUnbanAdminUser,
   useUpdateAdminUser
 } from "@better-auth-ui/solid/plugins/admin"
-import { createDebounce } from "@solid-primitives/debounce"
-import {
-  type ColumnFiltersState,
-  functionalUpdate,
-  type PaginationState,
-  type SortingState,
-  type Updater
-} from "@tanstack/solid-table"
+import { createDebouncedValue } from "@tanstack/solid-pacer"
+import type { SortingState } from "@tanstack/solid-table"
 import {
   Ban,
   Copy,
@@ -48,6 +43,7 @@ import {
 } from "lucide-solid"
 import { createEffect, createMemo, createSignal, For, Show } from "solid-js"
 import { Dynamic } from "solid-js/web"
+import { createServerTableState } from "@/components/auth/server-table-state"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -176,6 +172,7 @@ const adminColumns = adminColumnHelper.columns([
   })
 ])
 const EMPTY_USERS: AdminUser[] = []
+const INITIAL_ADMIN_SORTING: SortingState = [{ id: "createdAt", desc: true }]
 
 /** Zaidan presentation for the static Admin users view. */
 export function AdminUsers(props: AdminUsersProps) {
@@ -186,21 +183,17 @@ export function AdminUsers(props: AdminUsersProps) {
     (auth.plugins.find((plugin) => plugin.id === adminPlugin.id) ??
       defaults) as typeof defaults
   const [localSelectedUserId, setLocalSelectedUserId] = createSignal<string>()
-  const [globalFilter, setGlobalFilterState] = createSignal("")
-  const [debouncedSearch, setDebouncedSearch] = createSignal("")
-  const [columnFilters, setColumnFiltersState] =
-    createSignal<ColumnFiltersState>([])
-  const [pagination, setPaginationState] = createSignal<PaginationState>({
-    pageIndex: 0,
+  const tableState = createServerTableState({
+    initialSorting: INITIAL_ADMIN_SORTING,
     pageSize: config().pageSize
   })
-  const [sorting, setSortingState] = createSignal<SortingState>([
-    { id: "createdAt", desc: true }
-  ])
+  const { columnFilters, globalFilter, pagination, sorting } = tableState
+  const [debouncedSearch] = createDebouncedValue(() => globalFilter().trim(), {
+    wait: DEFAULT_TABLE_SEARCH_DEBOUNCE_MS
+  })
   const [searchField, setSearchField] = createSignal<"email" | "name">("email")
   const [searchOperator, setSearchOperator] =
     createSignal<SearchOperator>("contains")
-  const updateDebouncedSearch = createDebounce(setDebouncedSearch, 300)
   const status = () =>
     String(
       columnFilters().find((filter) => filter.id === "status")?.value ?? "all"
@@ -257,26 +250,11 @@ export function AdminUsers(props: AdminUsersProps) {
       total()
     )
     if (pageIndex !== current.pageIndex) {
-      setPaginationState({ ...current, pageIndex })
+      tableState.setPagination({ ...current, pageIndex })
     }
   })
-  const setPagination = (updater: Updater<PaginationState>) =>
-    setPaginationState((current) => functionalUpdate(updater, current))
-  const setColumnFilters = (updater: Updater<ColumnFiltersState>) => {
-    setColumnFiltersState((current) => functionalUpdate(updater, current))
-    setPaginationState((current) => ({ ...current, pageIndex: 0 }))
-  }
-  const setGlobalFilter = (updater: Updater<string>) => {
-    const next = functionalUpdate(updater, globalFilter())
-    setGlobalFilterState(next)
-    updateDebouncedSearch(next.trim())
-    setPaginationState((current) => ({ ...current, pageIndex: 0 }))
-  }
-  const setSorting = (updater: Updater<SortingState>) => {
-    setSortingState((current) => functionalUpdate(updater, current))
-    setPaginationState((current) => ({ ...current, pageIndex: 0 }))
-  }
   const table = createAdminTable({
+    atoms: tableState.atoms,
     columns: adminColumns,
     get data() {
       return users.data?.users ?? EMPTY_USERS
@@ -284,22 +262,10 @@ export function AdminUsers(props: AdminUsersProps) {
     get rowCount() {
       return total()
     },
-    get state() {
-      return {
-        columnFilters: columnFilters(),
-        globalFilter: globalFilter(),
-        pagination: pagination(),
-        sorting: sorting()
-      }
-    },
     getRowId: (user) => user.id,
     manualFiltering: true,
     manualPagination: true,
-    manualSorting: true,
-    onColumnFiltersChange: setColumnFilters,
-    onGlobalFilterChange: setGlobalFilter,
-    onPaginationChange: setPagination,
-    onSortingChange: setSorting
+    manualSorting: true
   })
 
   return (

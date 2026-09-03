@@ -511,11 +511,11 @@ export function OAuthClients({
               </DialogClose>
               <form.Subscribe
                 selector={(state) =>
-                  [state.canSubmit, state.isSubmitting] as const
+                  [state.isSubmitting, state.isValidating] as const
                 }
               >
-                {([canSubmit, isSubmitting]) => (
-                  <Button type="submit" disabled={!canSubmit || isSubmitting}>
+                {([isSubmitting, isValidating]) => (
+                  <Button type="submit" disabled={isSubmitting || isValidating}>
                     {isSubmitting && <Spinner />}
                     {editingClient
                       ? oauthLocalization.saveChanges

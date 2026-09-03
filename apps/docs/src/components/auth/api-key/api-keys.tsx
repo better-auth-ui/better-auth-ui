@@ -9,13 +9,10 @@ import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
 import { useListApiKeys } from "@better-auth-ui/react/plugins/api-key"
 import {
   createTableHook,
-  functionalUpdate,
-  type PaginationState,
   rowPaginationFeature,
   rowSortingFeature,
   type SortingState,
-  tableFeatures,
-  type Updater
+  tableFeatures
 } from "@tanstack/react-table"
 import { Fragment, useEffect, useMemo, useState } from "react"
 
@@ -31,6 +28,7 @@ import {
 } from "@/components/ui/select"
 import { apiKeyPlugin } from "@/lib/auth/api-key-plugin"
 import { cn } from "@/lib/utils"
+import { useServerTableState } from "../server-table-state"
 import { ApiKey } from "./api-key"
 import { ApiKeySkeleton } from "./api-key-skeleton"
 import { ApiKeysEmpty } from "./api-keys-empty"
@@ -49,6 +47,7 @@ const apiKeyColumns = apiKeyColumnHelper.columns([
   apiKeyColumnHelper.accessor("name", { id: "name" })
 ])
 const EMPTY_API_KEYS: ListedApiKey[] = []
+const INITIAL_API_KEY_SORTING: SortingState = [{ id: "createdAt", desc: true }]
 
 export type ApiKeysProps = {
   className?: string
@@ -75,13 +74,11 @@ export function ApiKeys({
   const { authClient } = useAuth<ApiKeyAuthClient>()
   const { localization: apiKeyLocalization, pageSize } =
     useAuthPlugin(apiKeyPlugin)
-  const [pagination, setPaginationState] = useState<PaginationState>({
-    pageIndex: 0,
+  const tableState = useServerTableState({
+    initialSorting: INITIAL_API_KEY_SORTING,
     pageSize
   })
-  const [sorting, setSortingState] = useState<SortingState>([
-    { id: "createdAt", desc: true }
-  ])
+  const { pagination, setPagination, sorting } = tableState
   const primarySort = sorting[0]
   const sortBy = primarySort?.id === "name" ? "name" : "createdAt"
   const sortDirection = primarySort?.desc ? "desc" : "asc"
@@ -111,13 +108,6 @@ export function ApiKeys({
       ),
     [listData?.apiKeys, pagination.pageSize]
   )
-  const setPagination = (updater: Updater<PaginationState>) =>
-    setPaginationState((current) => functionalUpdate(updater, current))
-  const setSorting = (updater: Updater<SortingState>) => {
-    setSortingState((current) => functionalUpdate(updater, current))
-    setPaginationState((current) => ({ ...current, pageIndex: 0 }))
-  }
-
   useEffect(() => {
     if (
       isListSuccess &&
@@ -125,22 +115,27 @@ export function ApiKeys({
       pagination.pageIndex > 0 &&
       page.rows.length === 0
     ) {
-      setPaginationState((current) => ({
+      setPagination((current) => ({
         ...current,
         pageIndex: Math.max(0, current.pageIndex - 1)
       }))
     }
-  }, [isListSuccess, isPendingProp, page.rows.length, pagination.pageIndex])
+  }, [
+    isListSuccess,
+    isPendingProp,
+    page.rows.length,
+    pagination.pageIndex,
+    setPagination
+  ])
 
   const table = useApiKeyTable({
+    atoms: tableState.atoms,
     columns: apiKeyColumns,
     data: page.rows,
     getRowId: (apiKey) => apiKey.id,
     manualPagination: true,
-    manualSorting: true,
-    state: { pagination, sorting },
-    onPaginationChange: setPagination,
-    onSortingChange: setSorting
+    pageCount: -1,
+    manualSorting: true
   })
 
   const [createOpen, setCreateOpen] = useState(false)

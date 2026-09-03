@@ -90,6 +90,7 @@ export function setAuthFormServerError(
 }
 
 export function clearAuthFormServerError(form: AnyFormApi) {
+  if (!form.state.errorMap.onServer) return
   form.setErrorMap({ onServer: undefined })
 }
 
@@ -134,6 +135,7 @@ type AuthFormRootProps = Omit<ComponentProps<"form">, "onSubmit"> & {
 function AuthFormRoot({
   children,
   onBeforeSubmit,
+  onInput,
   serverErrorMessage = DEFAULT_AUTH_FORM_SERVER_ERROR,
   ...props
 }: AuthFormRootProps) {
@@ -161,6 +163,10 @@ function AuthFormRoot({
       onInvalid={(event) =>
         focusFirstInvalidAuthFormControl(event.currentTarget)
       }
+      onInput={(event) => {
+        clearAuthFormServerError(form)
+        onInput?.(event)
+      }}
       onSubmit={submit}
     >
       {children}
@@ -183,6 +189,7 @@ function AuthFormTextField({
   ...props
 }: AuthFormTextFieldProps) {
   const field = useFieldContext<string>()
+  const form = useFormContext()
   const isInvalid = isAuthFormFieldInvalid(field.state.meta)
   const inputId = id ?? field.name
 
@@ -191,11 +198,15 @@ function AuthFormTextField({
       <FieldLabel htmlFor={inputId}>{label}</FieldLabel>
       <Input
         {...props}
+        aria-busy={field.state.meta.isValidating || undefined}
         aria-invalid={isInvalid}
         id={inputId}
         name={field.name}
         onBlur={field.handleBlur}
-        onChange={(event) => field.handleChange(event.target.value)}
+        onChange={(event) => {
+          clearAuthFormServerError(form)
+          field.handleChange(event.target.value)
+        }}
         value={field.state.value}
       />
       {description ? <FieldDescription>{description}</FieldDescription> : null}
@@ -213,13 +224,13 @@ function AuthFormSubmitButton({
 
   return (
     <form.Subscribe
-      selector={(state) => [state.canSubmit, state.isSubmitting] as const}
+      selector={(state) => [state.isSubmitting, state.isValidating] as const}
     >
-      {([canSubmit, isSubmitting]) => (
+      {([isSubmitting, isValidating]) => (
         <Button
           {...props}
-          aria-disabled={disabled || !canSubmit || isSubmitting || undefined}
-          disabled={disabled || isSubmitting}
+          aria-disabled={disabled || isSubmitting || isValidating || undefined}
+          disabled={disabled || isSubmitting || isValidating}
           type="submit"
         >
           {isSubmitting ? <Spinner data-icon="inline-start" /> : null}
@@ -237,6 +248,7 @@ type AuthFormAdditionalFieldProps = Omit<
 
 function AuthFormAdditionalField(props: AuthFormAdditionalFieldProps) {
   const field = useFieldContext<AdditionalFieldFormValue>()
+  const form = useFormContext()
   const isInvalid = isAuthFormFieldInvalid(field.state.meta)
 
   return (
@@ -248,18 +260,16 @@ function AuthFormAdditionalField(props: AuthFormAdditionalFieldProps) {
       isInvalid={isInvalid}
       name={field.name}
       onBlur={field.handleBlur}
-      onChange={field.handleChange}
+      onChange={(value) => {
+        clearAuthFormServerError(form)
+        field.handleChange(value)
+      }}
       value={field.state.value}
     />
   )
 }
 
-export const {
-  useAppForm: useAuthForm,
-  useTypedAppFormContext: useTypedAuthFormContext,
-  withFieldGroup: withAuthFieldGroup,
-  withForm: withAuthForm
-} = createFormHook({
+export const { useAppForm: useAuthForm } = createFormHook({
   fieldComponents: {
     AuthFormAdditionalField,
     AuthFormFieldError,

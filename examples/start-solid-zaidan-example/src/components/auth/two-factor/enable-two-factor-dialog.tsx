@@ -147,7 +147,7 @@ export function EnableTwoFactorDialog(props: {
       )
     }
   }))
-  const code = () => form.state.values.code
+  const code = form.useSelector((state) => state.values.code)
 
   const submitLabel = () => {
     if (step() === "backupCodes") return twoFactorLocalization.done

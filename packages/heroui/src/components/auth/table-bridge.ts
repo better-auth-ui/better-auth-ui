@@ -13,12 +13,17 @@ export function getHeroUISortDescriptor(
     : undefined
 }
 
-export function getTanStackSorting(descriptor: SortDescriptor): SortingState {
+export function getTanStackSorting(
+  descriptor: SortDescriptor,
+  sorting: SortingState = []
+): SortingState {
+  const id = String(descriptor.column)
   return [
     {
       desc: descriptor.direction === "descending",
-      id: String(descriptor.column)
-    }
+      id
+    },
+    ...sorting.filter((sort) => sort.id !== id)
   ]
 }
 

@@ -1,6 +1,7 @@
 "use client"
 
 import {
+  DEFAULT_TABLE_SEARCH_DEBOUNCE_MS,
   fieldsWithModelValues,
   getAdditionalFieldDefaultValues,
   getAdditionalFieldSubmitValues,
@@ -58,18 +59,14 @@ import {
   Tabs,
   TextField
 } from "@heroui/react"
+import { useDebouncedValue } from "@tanstack/react-pacer"
 import { keepPreviousData } from "@tanstack/react-query"
-import {
-  type ColumnFiltersState,
-  functionalUpdate,
-  type PaginationState,
-  type SortingState,
-  type Updater
-} from "@tanstack/react-table"
+import type { SortingState } from "@tanstack/react-table"
 import type { BetterFetchError } from "better-auth/client"
-import { useDeferredValue, useEffect, useMemo, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { adminPlugin } from "../../../lib/auth/admin-plugin"
 import { getAuthAdditionalFieldValidators, useAuthForm } from "../auth-form"
+import { useServerTableState } from "../server-table-state"
 import { getHeroUISortDescriptor, getTanStackSorting } from "../table-bridge"
 import { UserAvatar } from "../user/user-avatar"
 import { createAdminColumnHelper, useAdminTable } from "./admin-table"
@@ -139,6 +136,7 @@ const adminColumns = adminColumnHelper.columns([
   })
 ])
 const EMPTY_USERS: AdminUser[] = []
+const INITIAL_ADMIN_SORTING: SortingState = [{ id: "createdAt", desc: true }]
 
 /** HeroUI presentation for the static Admin users view. */
 export function AdminUsers({
@@ -149,22 +147,19 @@ export function AdminUsers({
   const { authClient } = useAuth<AdminAuthClient>()
   const config = useAuthPlugin(adminPlugin)
   const [localSelectedUserId, setLocalSelectedUserId] = useState<string>()
-  const [globalFilter, setGlobalFilterState] = useState("")
-  const [columnFilters, setColumnFiltersState] = useState<ColumnFiltersState>(
-    []
-  )
-  const [pagination, setPaginationState] = useState<PaginationState>({
-    pageIndex: 0,
+  const tableState = useServerTableState({
+    initialSorting: INITIAL_ADMIN_SORTING,
     pageSize: config.pageSize
   })
-  const [sorting, setSortingState] = useState<SortingState>([
-    { id: "createdAt", desc: true }
-  ])
+  const { columnFilters, globalFilter, pagination, setPagination, sorting } =
+    tableState
   const [searchField, setSearchField] = useState<SearchFieldName>("email")
   const [searchOperator, setSearchOperator] =
     useState<SearchOperator>("contains")
   const [createOpen, setCreateOpen] = useState(false)
-  const deferredSearch = useDeferredValue(globalFilter.trim())
+  const [debouncedSearch] = useDebouncedValue(globalFilter.trim(), {
+    wait: DEFAULT_TABLE_SEARCH_DEBOUNCE_MS
+  })
   const status = String(
     columnFilters.find((filter) => filter.id === "status")?.value ?? "all"
   ) as StatusFilter
@@ -190,12 +185,12 @@ export function AdminUsers({
       offset: pagination.pageIndex * pagination.pageSize,
       searchField,
       searchOperator,
-      searchValue: deferredSearch || undefined,
+      searchValue: debouncedSearch || undefined,
       sortBy,
       sortDirection
     }
   }, [
-    deferredSearch,
+    debouncedSearch,
     pagination.pageIndex,
     pagination.pageSize,
     searchField,
@@ -224,36 +219,24 @@ export function AdminUsers({
       total
     )
     if (pageIndex !== pagination.pageIndex) {
-      setPaginationState((current) => ({ ...current, pageIndex }))
+      setPagination((current) => ({ ...current, pageIndex }))
     }
-  }, [pagination.pageIndex, pagination.pageSize, total, users.isSuccess])
-  const setPagination = (updater: Updater<PaginationState>) =>
-    setPaginationState((current) => functionalUpdate(updater, current))
-  const setColumnFilters = (updater: Updater<ColumnFiltersState>) => {
-    setColumnFiltersState((current) => functionalUpdate(updater, current))
-    setPaginationState((current) => ({ ...current, pageIndex: 0 }))
-  }
-  const setGlobalFilter = (updater: Updater<string>) => {
-    setGlobalFilterState((current) => functionalUpdate(updater, current))
-    setPaginationState((current) => ({ ...current, pageIndex: 0 }))
-  }
-  const setSorting = (updater: Updater<SortingState>) => {
-    setSortingState((current) => functionalUpdate(updater, current))
-    setPaginationState((current) => ({ ...current, pageIndex: 0 }))
-  }
+  }, [
+    pagination.pageIndex,
+    pagination.pageSize,
+    setPagination,
+    total,
+    users.isSuccess
+  ])
   const table = useAdminTable({
+    atoms: tableState.atoms,
     columns: adminColumns,
     data: users.data?.users ?? EMPTY_USERS,
     getRowId: (user) => user.id,
     manualFiltering: true,
     manualPagination: true,
     manualSorting: true,
-    rowCount: total,
-    state: { columnFilters, globalFilter, pagination, sorting },
-    onColumnFiltersChange: setColumnFilters,
-    onGlobalFilterChange: setGlobalFilter,
-    onPaginationChange: setPagination,
-    onSortingChange: setSorting
+    rowCount: total
   })
 
   return (
@@ -437,7 +420,7 @@ export function AdminUsers({
                 selectUser(userId == null ? undefined : String(userId))
               }}
               onSortChange={(descriptor) =>
-                setSorting(getTanStackSorting(descriptor))
+                table.setSorting(getTanStackSorting(descriptor))
               }
             >
               <Table.Header>

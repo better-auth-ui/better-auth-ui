@@ -94,9 +94,9 @@ export function ChangeEmailOtp(props: ChangeEmailOtpProps = {}) {
       } as Parameters<typeof changeEmail.mutateAsync>[0])
     }
   }))
-  const code = () => form.state.values.code
-  const codeTarget = () =>
-    step() === "currentCode" ? currentEmail() : form.state.values.email
+  const code = form.useSelector((state) => state.values.code)
+  const email = form.useSelector((state) => state.values.email)
+  const codeTarget = () => (step() === "currentCode" ? currentEmail() : email())
   const submitCode = async (completedCode: string) => {
     if (isPending() || step() === "email") return
     form.setFieldValue("code", completedCode)

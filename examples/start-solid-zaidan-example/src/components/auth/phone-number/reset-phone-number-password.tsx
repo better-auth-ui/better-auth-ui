@@ -95,8 +95,8 @@ export function ResetPhoneNumberPassword(props: ResetPhoneNumberPasswordProps) {
       } as Parameters<typeof resetPassword.mutateAsync>[0])
     }
   }))
-  const phoneNumber = () => form.state.values.phoneNumber
-  const password = () => form.state.values.password
+  const phoneNumber = form.useSelector((state) => state.values.phoneNumber)
+  const password = form.useSelector((state) => state.values.password)
   return (
     <Card class={cn("w-full max-w-sm", props.class)}>
       <CardHeader>

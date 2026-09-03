@@ -90,8 +90,8 @@ export function EmailOtp(props: EmailOtpProps) {
       } as Parameters<typeof signIn.mutateAsync>[0])
     }
   }))
-  const email = () => form.state.values.email
-  const code = () => form.state.values.code
+  const email = form.useSelector((state) => state.values.email)
+  const code = form.useSelector((state) => state.values.code)
 
   const requestCode = async () => {
     try {

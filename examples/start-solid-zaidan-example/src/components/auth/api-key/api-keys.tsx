@@ -8,19 +8,17 @@ import { useAuth, useAuthPlugin } from "@better-auth-ui/solid"
 import { useListApiKeys } from "@better-auth-ui/solid/plugins/api-key"
 import {
   createTableHook,
-  functionalUpdate,
-  type PaginationState,
   rowPaginationFeature,
   rowSortingFeature,
   type SortingState,
-  tableFeatures,
-  type Updater
+  tableFeatures
 } from "@tanstack/solid-table"
 import { createEffect, createMemo, createSignal, For, Show } from "solid-js"
 import { ApiKey } from "@/components/auth/api-key/api-key"
 import { ApiKeySkeleton } from "@/components/auth/api-key/api-key-skeleton"
 import { ApiKeysEmpty } from "@/components/auth/api-key/api-keys-empty"
 import { CreateApiKeyDialog } from "@/components/auth/api-key/create-api-key-dialog"
+import { createServerTableState } from "@/components/auth/server-table-state"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Dialog, DialogTrigger } from "@/components/ui/dialog"
@@ -49,6 +47,7 @@ const apiKeyColumns = apiKeyColumnHelper.columns([
   apiKeyColumnHelper.accessor("name", { id: "name" })
 ])
 const EMPTY_API_KEYS: ListedApiKey[] = []
+const INITIAL_API_KEY_SORTING: SortingState = [{ id: "createdAt", desc: true }]
 
 export type ApiKeysProps = {
   class?: string
@@ -64,13 +63,11 @@ export function ApiKeys(props: ApiKeysProps = {}) {
   const config = useAuthPlugin(apiKeyPlugin)
   const [isCreateDialogOpen, setIsCreateDialogOpen] = createSignal(false)
   const pageSize = config.pageSize
-  const [pagination, setPaginationState] = createSignal<PaginationState>({
-    pageIndex: 0,
+  const tableState = createServerTableState({
+    initialSorting: INITIAL_API_KEY_SORTING,
     pageSize
   })
-  const [sorting, setSortingState] = createSignal<SortingState>([
-    { id: "createdAt", desc: true }
-  ])
+  const { pagination, sorting } = tableState
   const sort = () => {
     const primarySort = sorting()[0]
     const id = primarySort?.id === "name" ? "name" : "createdAt"
@@ -110,13 +107,6 @@ export function ApiKeys(props: ApiKeysProps = {}) {
     )
   )
   const pending = () => Boolean(props.isPending || apiKeys.isPending)
-  const setPagination = (updater: Updater<PaginationState>) =>
-    setPaginationState((current) => functionalUpdate(updater, current))
-  const setSorting = (updater: Updater<SortingState>) => {
-    setSortingState((current) => functionalUpdate(updater, current))
-    setPaginationState((current) => ({ ...current, pageIndex: 0 }))
-  }
-
   createEffect(() => {
     if (
       apiKeys.isSuccess &&
@@ -124,7 +114,7 @@ export function ApiKeys(props: ApiKeysProps = {}) {
       pagination().pageIndex > 0 &&
       page().rows.length === 0
     ) {
-      setPaginationState((current) => ({
+      tableState.setPagination((current) => ({
         ...current,
         pageIndex: Math.max(0, current.pageIndex - 1)
       }))
@@ -132,18 +122,15 @@ export function ApiKeys(props: ApiKeysProps = {}) {
   })
 
   const table = createApiKeyTable({
+    atoms: tableState.atoms,
     columns: apiKeyColumns,
     get data() {
       return page().rows
     },
-    get state() {
-      return { pagination: pagination(), sorting: sorting() }
-    },
     getRowId: (apiKey) => apiKey.id,
     manualPagination: true,
-    manualSorting: true,
-    onPaginationChange: setPagination,
-    onSortingChange: setSorting
+    pageCount: -1,
+    manualSorting: true
   })
 
   return (

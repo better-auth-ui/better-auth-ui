@@ -58,10 +58,6 @@ export function SsoDomainVerification(props: SsoDomainVerificationProps) {
   const verify = useVerifySsoDomain(auth.authClient as SsoAuthClient, () => ({
     onSuccess: () => setVerified(true)
   }))
-  const host = () =>
-    form.state.values.providerId
-      ? `_${props.tokenPrefix ?? "better-auth-token"}-${form.state.values.providerId}`
-      : ""
   const hostCopy = createCopyToClipboard({
     onError: (error) =>
       setCopyError(error instanceof Error ? error.message : String(error))
@@ -78,13 +74,18 @@ export function SsoDomainVerification(props: SsoDomainVerificationProps) {
       await verify.mutateAsync({ providerId: value.providerId.trim() })
     }
   }))
+  const providerId = form.useSelector((state) => state.values.providerId)
+  const host = () =>
+    providerId()
+      ? `_${props.tokenPrefix ?? "better-auth-token"}-${providerId()}`
+      : ""
 
   const requestNewToken = async () => {
     setCopyError("")
     setVerified(false)
     try {
       await requestToken.mutateAsync({
-        providerId: form.state.values.providerId.trim()
+        providerId: providerId().trim()
       })
     } catch (error) {
       setAuthFormServerError(
@@ -183,9 +184,7 @@ export function SsoDomainVerification(props: SsoDomainVerificationProps) {
               </Show>
               <div class="flex flex-wrap gap-2">
                 <Button
-                  disabled={
-                    !form.state.values.providerId || requestToken.isPending
-                  }
+                  disabled={!providerId() || requestToken.isPending}
                   onClick={() => void requestNewToken()}
                   type="button"
                   variant="outline"
@@ -196,7 +195,7 @@ export function SsoDomainVerification(props: SsoDomainVerificationProps) {
                   {localization.requestNewToken}
                 </Button>
                 <form.AuthFormSubmitButton
-                  disabled={!form.state.values.providerId || verify.isPending}
+                  disabled={!providerId() || verify.isPending}
                 >
                   {localization.verifyDomain}
                 </form.AuthFormSubmitButton>

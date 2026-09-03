@@ -21,6 +21,18 @@ describe("HeroUI table bridge", () => {
     expect(getTanStackSorting(descriptor)).toEqual(sorting)
   })
 
+  it("honors HeroUI direction changes without dropping secondary sorts", () => {
+    expect(
+      getTanStackSorting({ column: "name", direction: "descending" }, [
+        { id: "createdAt", desc: true },
+        { id: "name", desc: false }
+      ])
+    ).toEqual([
+      { id: "name", desc: true },
+      { id: "createdAt", desc: true }
+    ])
+  })
+
   it("converts explicit and all-row selection", () => {
     expect(getHeroUISelection({ first: true, ignored: false })).toEqual(
       new Set(["first"])
