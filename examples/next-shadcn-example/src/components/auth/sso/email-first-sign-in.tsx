@@ -147,11 +147,15 @@ export function EmailFirstSignIn({
       if (step === "email") {
         setDiscoveryError("")
         setSsoFallbackEmail(value.email)
-        await signInSso({
-          callbackURL: `${baseURL}${redirectTo}`,
-          email: value.email,
-          loginHint: value.email
-        })
+        try {
+          await signInSso({
+            callbackURL: `${baseURL}${redirectTo}`,
+            email: value.email,
+            loginHint: value.email
+          })
+        } catch (error) {
+          if ((error as { status?: number }).status !== 404) throw error
+        }
         return
       }
       await signInEmail({

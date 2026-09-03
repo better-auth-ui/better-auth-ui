@@ -16,7 +16,9 @@ import {
 import { AuthProvider } from "../src/components/auth/auth-provider"
 import { useOrganizationTableState } from "../src/components/auth/organization/organization-table-state"
 import { PhoneNumber } from "../src/components/auth/phone-number/phone-number"
+import { EmailFirstSignIn } from "../src/components/auth/sso/email-first-sign-in"
 import { phoneNumberPlugin } from "../src/lib/auth/phone-number-plugin"
+import { ssoPlugin } from "../src/lib/auth/sso-plugin"
 
 vi.mock("@/lib/auth/use-resend-cooldown", () => ({
   useResendCooldown: () => ({
@@ -140,6 +142,33 @@ function renderPhoneNumber() {
   }
 }
 
+function renderEmailFirstSignIn(status: number) {
+  const sso = vi.fn(async () => {
+    throw Object.assign(new Error("SSO discovery failed"), { status })
+  })
+  const authClient = {
+    signIn: { sso },
+    useSession: () => ({ data: null, isPending: false, error: null })
+  } as unknown as Parameters<typeof AuthProvider>[0]["authClient"] & {
+    signIn: { sso: typeof sso }
+  }
+
+  return render(
+    <AuthProvider
+      authClient={authClient}
+      Link={({ children, href, to: _to, ...props }) => (
+        <a href={href} {...props}>
+          {children}
+        </a>
+      )}
+      navigate={() => {}}
+      plugins={[ssoPlugin()]}
+    >
+      <EmailFirstSignIn />
+    </AuthProvider>
+  )
+}
+
 describe("shadcn TanStack form integration", () => {
   it("tracks the mutation promise and rejects concurrent submissions", async () => {
     let finishSubmission!: () => void
@@ -236,6 +265,33 @@ describe("shadcn TanStack form integration", () => {
         "Unable to verify the phone code"
       )
     ).toBeVisible()
+  })
+
+  it("does not surface a handled missing SSO provider as a server error", async () => {
+    renderEmailFirstSignIn(404)
+
+    fireEvent.change(screen.getByRole("textbox", { name: "Email" }), {
+      target: { value: "person@example.com" }
+    })
+    fireEvent.click(screen.getByRole("button", { name: "Continue with email" }))
+
+    expect(
+      await screen.findByText(
+        "No organization sign-in was found. Choose another way to continue."
+      )
+    ).toBeVisible()
+    expect(screen.queryByText("SSO discovery failed")).not.toBeInTheDocument()
+  })
+
+  it("surfaces an unexpected SSO discovery failure as a server error", async () => {
+    renderEmailFirstSignIn(500)
+
+    fireEvent.change(screen.getByRole("textbox", { name: "Email" }), {
+      target: { value: "person@example.com" }
+    })
+    fireEvent.click(screen.getByRole("button", { name: "Continue with email" }))
+
+    expect(await screen.findByText("SSO discovery failed")).toBeVisible()
   })
 })
 
