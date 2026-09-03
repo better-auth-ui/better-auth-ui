@@ -1798,8 +1798,7 @@ function PasswordDialog(props: {
         userId: props.userId,
         newPassword: value.password
       })
-      setPasswordMutation.reset()
-      props.onOpenChange(false)
+      close()
     }
   }))
   const close = () => {

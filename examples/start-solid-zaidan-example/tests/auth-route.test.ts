@@ -1363,7 +1363,7 @@ describe("Solid auth route component selection", () => {
 
     expect(signIn).toContain('from "./username/sign-in-username"')
     expect(signIn).not.toContain("function resolveSubmittedSignIn")
-    expect(signInUsername).toContain("resolveSubmittedSignIn")
+    expect(signInUsername).toContain("resolveSignInPath")
     expect(signInUsername).toContain("useSignInUsername")
     expect(signInUsername).toContain("authQueryKeys.session")
     expect(userProfile).toContain(

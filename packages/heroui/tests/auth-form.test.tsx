@@ -7,6 +7,7 @@ import { describe, expect, it, vi } from "vitest"
 
 import {
   getAuthAdditionalFieldValidators,
+  setAuthFormServerError,
   useAuthForm
 } from "../src/components/auth/auth-form"
 
@@ -23,13 +24,20 @@ function TestAuthForm({ onSubmit }: { onSubmit: () => Promise<void> }) {
 }
 
 function TestFieldForm({
+  mutationError,
   onSubmit
 }: {
+  mutationError?: unknown
   onSubmit: (value: { email: string }) => Promise<void>
 }) {
   const form = useAuthForm({
     defaultValues: { email: "" },
-    onSubmit: ({ value }) => onSubmit(value)
+    onSubmit: async ({ value }) => {
+      if (mutationError) {
+        setAuthFormServerError(form, mutationError, "Fallback submission error")
+      }
+      await onSubmit(value)
+    }
   })
 
   return (
@@ -95,6 +103,30 @@ describe("AuthFormRoot", () => {
     await waitFor(() => expect(onSubmit).toHaveBeenCalledOnce())
     expect(await screen.findByText("This email cannot be used")).toBeVisible()
     expect(screen.getByText("Account creation failed")).toBeVisible()
+  })
+
+  it("preserves server errors set by a mutation error handler", async () => {
+    render(
+      <TestFieldForm
+        mutationError={{
+          fields: { email: "This password is compromised" },
+          message: "Mutation-owned form error"
+        }}
+        onSubmit={async () => {
+          throw new Error("Mutation rejected")
+        }}
+      />
+    )
+    const input = screen.getByRole("textbox", { name: "Email" })
+
+    fireEvent.change(input, { target: { value: "ada@example.com" } })
+    fireEvent.click(screen.getByRole("button", { name: /Continue/ }))
+
+    expect(
+      await screen.findByText("This password is compromised")
+    ).toBeVisible()
+    expect(screen.getByText("Mutation-owned form error")).toBeVisible()
+    expect(screen.queryByText("Mutation rejected")).toBeNull()
   })
 })
 

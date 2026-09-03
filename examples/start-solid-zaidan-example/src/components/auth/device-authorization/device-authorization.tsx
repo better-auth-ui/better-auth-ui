@@ -200,7 +200,7 @@ export function DeviceAuthorization(props: DeviceAuthorizationProps) {
     const currentCode = normalizedUserCode()
 
     if (currentCode.length === userCodeLength) {
-      void submitCode(currentCode)
+      void submitCode(currentCode).catch(() => undefined)
     }
   })
 
@@ -244,7 +244,9 @@ export function DeviceAuthorization(props: DeviceAuthorizationProps) {
           userCode={userCode()}
           userCodeLength={userCodeLength}
           onCodeChange={handleCodeChange}
-          onCodeComplete={(value) => void submitCode(value)}
+          onCodeComplete={(value) =>
+            void submitCode(value).catch(() => undefined)
+          }
           onSubmit={submitCode}
         />
       </Match>

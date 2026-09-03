@@ -35,6 +35,8 @@ import { AdditionalField, type AdditionalFieldProps } from "./additional-field"
 const { fieldContext, formContext, useFieldContext, useFormContext } =
   createFormHookContexts()
 
+const DEFAULT_AUTH_FORM_SERVER_ERROR = "Unable to submit this form. Try again."
+
 export function focusFirstInvalidAuthFormControl(form: HTMLFormElement) {
   requestAnimationFrame(() => {
     form
@@ -92,14 +94,16 @@ export function clearAuthFormServerError(form: AnyFormApi) {
 
 export async function submitAuthForm(
   form: AnyFormApi,
-  serverErrorMessage = "Unable to submit this form. Try again."
+  serverErrorMessage = DEFAULT_AUTH_FORM_SERVER_ERROR
 ) {
   clearAuthFormServerError(form)
   try {
     await form.handleSubmit()
     return form.state.isValid
   } catch (error) {
-    setAuthFormServerError(form, error, serverErrorMessage)
+    if (!form.state.errorMap.onServer) {
+      setAuthFormServerError(form, error, serverErrorMessage)
+    }
     return false
   }
 }
@@ -112,7 +116,7 @@ type AuthFormRootProps = Omit<ComponentProps<typeof Form>, "onSubmit"> & {
 function AuthFormRoot({
   children,
   onBeforeSubmit,
-  serverErrorMessage = "Unable to submit this form. Try again.",
+  serverErrorMessage = DEFAULT_AUTH_FORM_SERVER_ERROR,
   ...props
 }: AuthFormRootProps) {
   const form = useFormContext()

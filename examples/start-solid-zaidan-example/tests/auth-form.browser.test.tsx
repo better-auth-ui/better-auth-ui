@@ -2,7 +2,10 @@ import type { TablePersistenceAdapters } from "@better-auth-ui/core"
 import { cleanup, fireEvent, render } from "@solidjs/testing-library"
 import { afterEach, describe, expect, it, vi } from "vitest"
 
-import { createAuthForm } from "../src/components/auth/auth-form"
+import {
+  createAuthForm,
+  setAuthFormServerError
+} from "../src/components/auth/auth-form"
 import {
   createOrganizationColumnHelper,
   createOrganizationTable
@@ -74,12 +77,15 @@ function ValidatedAuthForm() {
   const form = createAuthForm(() => ({
     defaultValues: { email: "" },
     onSubmit: async () => {
-      throw {
-        body: {
-          fieldErrors: { email: "This email is already registered" },
+      setAuthFormServerError(
+        form,
+        {
+          fields: { email: "This email is already registered" },
           message: "Account creation failed"
-        }
-      }
+        },
+        "Fallback submission error"
+      )
+      throw new Error("Mutation rejected")
     }
   }))
 
@@ -154,11 +160,16 @@ function RouterTableStateFixture(props: {
   )
 
   return (
-    <output aria-label="Restored table state">
-      {state.ready()
-        ? `${state.globalFilter()}|${state.sorting()[0]?.id ?? ""}|${state.pagination().pageIndex}`
-        : "loading"}
-    </output>
+    <>
+      <button onClick={() => state.setGlobalFilter("local")} type="button">
+        Set table search
+      </button>
+      <output aria-label="Restored table state">
+        {state.ready()
+          ? `${state.globalFilter()}|${state.sorting()[0]?.id ?? ""}|${state.pagination().pageIndex}`
+          : "loading"}
+      </output>
+    </>
   )
 }
 
@@ -318,5 +329,41 @@ describe("Solid organization table selection", () => {
         view.getByRole("status", { name: "Restored table state" })
       ).toHaveTextContent("restored|name|1")
     )
+  })
+
+  it("bounds URL replacements when the adapter notifies synchronously", async () => {
+    let params = new URLSearchParams("router.search=first")
+    let replacements = 0
+    const listeners = new Set<() => void>()
+    const adapters: TablePersistenceAdapters = {
+      search: {
+        read: () => new URLSearchParams(params),
+        replace: (next) => {
+          replacements += 1
+          params = new URLSearchParams(next)
+          for (const listener of listeners) listener()
+        },
+        subscribe: (listener) => {
+          listeners.add(listener)
+          return () => listeners.delete(listener)
+        }
+      }
+    }
+    const view = render(() => <RouterTableStateFixture adapters={adapters} />)
+
+    await vi.waitFor(() =>
+      expect(
+        view.getByRole("status", { name: "Restored table state" })
+      ).toHaveTextContent("first||0")
+    )
+    fireEvent.click(view.getByRole("button", { name: "Set table search" }))
+
+    await vi.waitFor(() =>
+      expect(
+        view.getByRole("status", { name: "Restored table state" })
+      ).toHaveTextContent("local||0")
+    )
+    expect(replacements).toBe(1)
+    expect(params.get("router.search")).toBe("local")
   })
 })

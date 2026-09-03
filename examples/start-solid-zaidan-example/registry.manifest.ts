@@ -117,11 +117,7 @@ const zaidanFormSupportFiles = [
   libFile("src/lib/utils.ts")
 ] satisfies SolidRegistryFile[]
 
-const zaidanInteractiveSupportFiles = [
-  componentFile("src/components/auth/auth-form.tsx"),
-  componentFile("src/components/auth/additional-field.tsx"),
-  libFile("src/lib/utils.ts")
-] satisfies SolidRegistryFile[]
+const zaidanInteractiveSupportFiles = zaidanFormSupportFiles
 
 /** Every form that picks a new password renders the strength meter. */
 const passwordStrengthFiles = [
@@ -429,7 +425,7 @@ const solidRegistryBaseManifest = {
       title: "Solid SSO",
       description:
         "Solid email-first sign-in and organization provider management for Better Auth SSO.",
-      dependencies: [...solidAuthDependencies, "@tanstack/solid-form"],
+      dependencies: solidAuthDependencies,
       registryDependencies: [
         betterAuthSolidRegistryDependency("auth-provider"),
         betterAuthSolidRegistryDependency("sign-in")

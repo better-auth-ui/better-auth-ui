@@ -1,3 +1,4 @@
+import { validateStringLength } from "@better-auth-ui/core"
 import {
   disableTwoFactorOptions,
   type TwoFactorAuthClient
@@ -76,7 +77,15 @@ export function DisableTwoFactorDialog(props: {
           </AlertDialogHeader>
 
           <Show when={requiresPassword()}>
-            <form.AppField name="password">
+            <form.AppField
+              name="password"
+              validators={{
+                onChange: ({ value }) =>
+                  validateStringLength(value, {
+                    requiredMessage: auth.localization.auth.fieldRequired
+                  })
+              }}
+            >
               {(field) => (
                 <Field>
                   <FieldLabel for="disable-two-factor-password">

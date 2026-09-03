@@ -1,3 +1,4 @@
+import { validateStringLength } from "@better-auth-ui/core"
 import {
   generateBackupCodesOptions,
   type TwoFactorAuthClient
@@ -91,7 +92,15 @@ export function RegenerateBackupCodesDialog(props: {
             when={codes().length}
             fallback={
               <Show when={requiresPassword()}>
-                <form.AppField name="password">
+                <form.AppField
+                  name="password"
+                  validators={{
+                    onChange: ({ value }) =>
+                      validateStringLength(value, {
+                        requiredMessage: auth.localization.auth.fieldRequired
+                      })
+                  }}
+                >
                   {(field) => (
                     <Field>
                       <FieldLabel for="regenerate-backup-codes-password">

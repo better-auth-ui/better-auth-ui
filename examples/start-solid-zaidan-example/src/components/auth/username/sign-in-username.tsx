@@ -31,7 +31,7 @@ import { createAuthForm, isAuthFormFieldInvalid } from "../auth-form"
 import { LastUsedBadge } from "../last-login-method/last-used-badge"
 import type { SocialLayout } from "../provider-buttons"
 import { ProviderButtons } from "../provider-buttons"
-import { resolveSubmittedSignIn } from "../sign-in-path"
+import { resolveSignInPath } from "../sign-in-path"
 
 export type SignInUsernameProps = {
   class?: string
@@ -94,18 +94,14 @@ export function SignInUsername(props: SignInUsernameProps) {
   const form = createAuthForm(() => ({
     defaultValues: { identifier: "", password: "" },
     onSubmit: async ({ value }) => {
-      const formData = new FormData()
-      formData.set(usernameAuth ? "username" : "email", value.identifier)
-      formData.set("password", value.password)
-      const { password: submittedPassword, signInPath } =
-        resolveSubmittedSignIn({
-          formData,
-          usernameAuth
-        })
+      const signInPath = resolveSignInPath({
+        identifier: value.identifier,
+        usernameAuth
+      })
       if (signInPath.kind === "username") {
         await signInUsername.mutateAsync({
           fetchOptions: fetchOptions(),
-          password: submittedPassword,
+          password: value.password,
           username: signInPath.username
         })
         return
@@ -113,7 +109,7 @@ export function SignInUsername(props: SignInUsernameProps) {
       await signIn.mutateAsync({
         email: signInPath.email,
         fetchOptions: fetchOptions(),
-        password: submittedPassword
+        password: value.password
       })
     }
   }))

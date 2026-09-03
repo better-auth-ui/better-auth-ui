@@ -27,7 +27,7 @@ import {
   RESEND_COOLDOWN_SECONDS,
   useResendCooldown
 } from "../../../lib/auth/use-resend-cooldown"
-import { useAuthForm } from "../auth-form"
+import { setAuthFormServerError, useAuthForm } from "../auth-form"
 import { OpenEmailButton } from "../open-email-button"
 import { OtpField } from "../otp-field"
 
@@ -104,10 +104,10 @@ export function VerifyEmailOtp({ className, variant }: VerifyEmailOtpProps) {
 
   const isPending = isSending || isVerifying
 
-  const verifyCode = (completedCode: string) => {
+  const verifyCode = async (completedCode: string) => {
     if (isPending || !email) return
 
-    verifyEmailOtp({ email, otp: completedCode })
+    return verifyEmailOtp({ email, otp: completedCode })
   }
 
   const form = useAuthForm({
@@ -161,7 +161,15 @@ export function VerifyEmailOtp({ className, variant }: VerifyEmailOtpProps) {
                     value={field.state.value}
                     variant={variant}
                     onChange={field.handleChange}
-                    onComplete={verifyCode}
+                    onComplete={(completedCode) =>
+                      void verifyCode(completedCode).catch((error) =>
+                        setAuthFormServerError(
+                          form,
+                          error,
+                          localization.auth.callbackFailedTitle
+                        )
+                      )
+                    }
                   />
                 )}
               </form.AppField>
@@ -225,7 +233,16 @@ export function VerifyEmailOtp({ className, variant }: VerifyEmailOtpProps) {
                   variant="tertiary"
                   isDisabled={isPending || isCoolingDown}
                   onPress={() =>
-                    sendVerificationOtp({ email, type: "email-verification" })
+                    void sendVerificationOtp({
+                      email,
+                      type: "email-verification"
+                    }).catch((error) =>
+                      setAuthFormServerError(
+                        form,
+                        error,
+                        localization.auth.callbackFailedTitle
+                      )
+                    )
                   }
                 >
                   {isCoolingDown

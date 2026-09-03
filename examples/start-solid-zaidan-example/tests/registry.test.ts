@@ -789,8 +789,58 @@ describe("Solid registry isolation", () => {
       "@zaidan/input",
       "@zaidan/label"
     ]
+    const formAuthFiles = [
+      {
+        imports: [
+          'from "@/components/ui/button"',
+          'from "@/components/ui/card"',
+          'from "@/components/ui/field"',
+          'from "@/components/ui/input"'
+        ],
+        path: "src/components/auth/username/sign-in-username.tsx"
+      },
+      {
+        imports: [
+          'from "@/components/ui/alert"',
+          'from "@/components/ui/button"',
+          'from "@/components/ui/card"',
+          'from "@/components/ui/field"',
+          'from "@/components/ui/input"'
+        ],
+        path: "src/components/auth/sign-up.tsx"
+      },
+      {
+        imports: [
+          'from "@/components/ui/card"',
+          'from "@/components/ui/field"',
+          'from "@/components/ui/input"'
+        ],
+        path: "src/components/auth/forgot-password.tsx"
+      },
+      {
+        imports: [
+          'from "@/components/ui/alert"',
+          'from "@/components/ui/button"',
+          'from "@/components/ui/card"',
+          'from "@/components/ui/field"',
+          'from "@/components/ui/input"'
+        ],
+        path: "src/components/auth/reset-password.tsx"
+      }
+    ]
     for (const file of uiFiles) {
       expect(existsSync(resolve(__dirname, "..", file))).toBe(true)
+    }
+
+    for (const file of formAuthFiles) {
+      const content = readFileSync(resolve(__dirname, "..", file.path), "utf8")
+
+      for (const expectedImport of file.imports) {
+        expect(content).toContain(expectedImport)
+      }
+      expect(content).not.toContain("<button")
+      expect(content).not.toContain("<input")
+      expect(content).not.toContain("<label")
     }
 
     const outputRoot = makeTempRoot()
@@ -1630,7 +1680,7 @@ describe("Solid registry isolation", () => {
 
     expect(signIn).toContain("useSignInUsername")
     expect(signIn).toContain("usernameOrEmailPlaceholder")
-    expect(signIn).toContain("resolveSubmittedSignIn")
+    expect(signIn).toContain("resolveSignInPath")
     expect(signIn).toContain("createAuthForm")
     expect(signIn).toContain("signInUsername.mutateAsync")
     expect(signIn).toContain("username: signInPath.username")

@@ -22,13 +22,13 @@ import { ORGANIZATION_TABLE_PAGE_SIZE } from "./organization-table"
 const STORAGE_PREFIX = "better-auth-ui:organization-table"
 
 function readUrl(
-  adapters: TablePersistenceAdapters,
+  search: URLSearchParams,
   stateKey: string,
   defaultPageSize: number,
   allowedColumnIds?: readonly string[]
 ) {
   return parseTableUrlState(
-    adapters.search.read(),
+    search,
     stateKey,
     defaultPageSize,
     ORGANIZATION_TABLE_PAGE_SIZE_OPTIONS,
@@ -61,6 +61,7 @@ export function createOrganizationTableState(
   const sorting = useSelector(sortingAtom)
   const [ready, setReady] = createSignal(false)
   let restoringUrlState = false
+  let syncedSearch = ""
   const atoms = {
     columnFilters: columnFiltersAtom,
     globalFilter: globalFilterAtom,
@@ -110,12 +111,9 @@ export function createOrganizationTableState(
     }
     const restore = () => {
       restoringUrlState = true
-      const next = readUrl(
-        adapters,
-        stateKey,
-        defaultPageSize,
-        allowedColumnIds
-      )
+      const search = adapters.search.read()
+      syncedSearch = search.toString()
+      const next = readUrl(search, stateKey, defaultPageSize, allowedColumnIds)
       columnFiltersAtom.set(next.columnFilters)
       globalFilterAtom.set(next.globalFilter)
       sortingAtom.set(next.sorting)
@@ -152,14 +150,17 @@ export function createOrganizationTableState(
       sorting: sorting()
     }
     if (!ready()) return
-    adapters.search.replace(
-      serializeTableUrlState(
-        adapters.search.read(),
-        stateKey,
-        defaultPageSize,
-        state
-      )
+    const next = serializeTableUrlState(
+      adapters.search.read(),
+      stateKey,
+      defaultPageSize,
+      state
     )
+    const nextSearch = next.toString()
+    if (nextSearch === syncedSearch) return
+
+    syncedSearch = nextSearch
+    adapters.search.replace(next)
   })
 
   return {

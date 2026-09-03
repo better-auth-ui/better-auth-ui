@@ -75,9 +75,9 @@ export function CreateApiKeyDialog({
     defaultValues: {
       configId: availableConfigurations[0]?.id ?? "",
       expiration:
-        keyExpiration && keyExpiration.defaultInterval === null
+        !keyExpiration || keyExpiration.defaultInterval === null
           ? "never"
-          : String(keyExpiration?.defaultInterval ?? "never"),
+          : String(keyExpiration.defaultInterval),
       name: ""
     },
     onSubmit: async ({ value }) => {
@@ -259,6 +259,7 @@ export function CreateApiKeyDialog({
                       </form.AppField>
                     ) : null}
                   </div>
+                  <form.AuthFormServerError />
                 </AlertDialog.Body>
 
                 <AlertDialog.Footer>

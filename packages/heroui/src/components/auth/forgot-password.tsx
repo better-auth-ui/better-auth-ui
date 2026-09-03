@@ -138,6 +138,7 @@ export function ForgotPassword({ className, variant }: ForgotPasswordProps) {
                 {localization.auth.sendResetLink}
               </form.AuthFormSubmitButton>
             </div>
+            <form.AuthFormServerError />
           </form.AuthFormRoot>
         </form.AppForm>
       </Card.Content>

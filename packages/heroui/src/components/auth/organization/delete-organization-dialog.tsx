@@ -75,6 +75,7 @@ export function DeleteOrganizationDialog({
                     <OrganizationView organization={organization} hideRole />
                   </Card.Content>
                 </Card>
+                <form.AuthFormServerError />
               </AlertDialog.Body>
 
               <AlertDialog.Footer>

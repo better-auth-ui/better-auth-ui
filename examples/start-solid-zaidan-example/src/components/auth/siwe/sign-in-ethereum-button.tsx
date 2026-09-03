@@ -85,7 +85,9 @@ export function SignInEthereumButton(props: SignInEthereumButtonProps) {
         class={cn("w-full", isPending() && "pointer-events-none")}
         disabled={isPending()}
         onClick={() =>
-          plugin.email === "none" ? void complete() : setOpen(true)
+          plugin.email === "none"
+            ? void complete().catch(() => undefined)
+            : setOpen(true)
         }
         type="button"
         variant="outline"

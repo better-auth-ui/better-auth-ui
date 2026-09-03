@@ -53,8 +53,9 @@ export function SignInEthereumButton({ view }: SignInEthereumButtonProps) {
   }
 
   const handlePress = () => {
-    if (plugin.email === "none") completeSignIn()
-    else setIsOpen(true)
+    if (plugin.email === "none") {
+      void completeSignIn().catch(() => undefined)
+    } else setIsOpen(true)
   }
 
   const form = useAuthForm({

@@ -25,7 +25,7 @@ import { useState } from "react"
 import { emailOtpPlugin } from "../../../lib/auth/email-otp-plugin"
 import { useResendCooldown } from "../../../lib/auth/use-resend-cooldown"
 import { useSignInContinuation } from "../../../lib/auth/use-sign-in-continuation"
-import { useAuthForm } from "../auth-form"
+import { setAuthFormServerError, useAuthForm } from "../auth-form"
 import { FieldSeparator } from "../field-separator"
 import { OpenEmailButton } from "../open-email-button"
 import { OtpField } from "../otp-field"
@@ -97,10 +97,13 @@ export function EmailOtp({
 
   const sendCode = () =>
     sendVerificationOtp({ email: form.state.values.email, type: "sign-in" })
-  const verifyCode = (completedCode: string) => {
+  const verifyCode = async (completedCode: string) => {
     if (isPending || isSigningIn) return
 
-    signInEmailOtp({ email: form.state.values.email, otp: completedCode })
+    return signInEmailOtp({
+      email: form.state.values.email,
+      otp: completedCode
+    })
   }
 
   const form = useAuthForm({
@@ -170,7 +173,15 @@ export function EmailOtp({
                     value={field.state.value}
                     variant={variant}
                     onChange={field.handleChange}
-                    onComplete={verifyCode}
+                    onComplete={(completedCode) =>
+                      void verifyCode(completedCode).catch((error) =>
+                        setAuthFormServerError(
+                          form,
+                          error,
+                          localization.auth.callbackFailedTitle
+                        )
+                      )
+                    }
                   />
                 )}
               </form.AppField>

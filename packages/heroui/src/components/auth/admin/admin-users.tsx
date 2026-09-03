@@ -1685,8 +1685,7 @@ function PasswordDialog({
     onSubmit: async ({ value }) => {
       if (!userId) return
       await mutation.mutateAsync({ userId, newPassword: value.password })
-      mutation.reset()
-      onOpenChange(false)
+      close()
     }
   })
   const close = () => {

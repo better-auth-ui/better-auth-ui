@@ -72,6 +72,7 @@ export function RenamePasskeyDialog({
                     </TextField>
                   )}
                 </form.AppField>
+                <form.AuthFormServerError />
               </AlertDialog.Body>
               <AlertDialog.Footer>
                 <Button slot="close" variant="tertiary">

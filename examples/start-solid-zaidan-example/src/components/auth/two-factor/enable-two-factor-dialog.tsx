@@ -122,7 +122,7 @@ export function EnableTwoFactorDialog(props: {
     }
 
     form.setFieldValue("code", completedCode)
-    await submitAuthForm(form)
+    await submitAuthForm(form, auth.localization.auth.callbackFailedTitle)
   }
 
   const form = createAuthForm(() => ({
@@ -167,7 +167,10 @@ export function EnableTwoFactorDialog(props: {
   return (
     <DialogContent>
       <form.AppForm>
-        <form.AuthFormRoot class="flex flex-col gap-6">
+        <form.AuthFormRoot
+          class="flex flex-col gap-6"
+          serverErrorMessage={auth.localization.auth.callbackFailedTitle}
+        >
           <DialogHeader>
             <div class="flex size-10 items-center justify-center rounded-md bg-muted">
               <ShieldCheck class="size-4.5" />

@@ -6,7 +6,7 @@ import {
 } from "@better-auth-ui/core/plugins/email-otp"
 import { AuthLink, useAuth, useAuthPlugin } from "@better-auth-ui/solid"
 import { createMutation } from "@tanstack/solid-query"
-import { Show } from "solid-js"
+import { createSignal, Show } from "solid-js"
 import { toast } from "solid-sonner"
 
 import { OpenEmailButton } from "@/components/auth/open-email-button"
@@ -55,6 +55,7 @@ export function VerifyEmailOtp(props: VerifyEmailOtpProps) {
     typeof sessionStorage === "undefined"
       ? ""
       : (sessionStorage.getItem(VERIFY_EMAIL_STORAGE_KEY) ?? "")
+  const [codeSent, setCodeSent] = createSignal(Boolean(storedEmail))
 
   const { cooldown, isCoolingDown, startCooldown } = useResendCooldown(
     storedEmail ? RESEND_COOLDOWN_SECONDS : 0
@@ -68,6 +69,7 @@ export function VerifyEmailOtp(props: VerifyEmailOtpProps) {
       const sentTo = (variables as { email: string }).email
       sessionStorage.setItem(VERIFY_EMAIL_STORAGE_KEY, sentTo)
       form.setFieldValue("email", sentTo)
+      setCodeSent(true)
       startCooldown()
       toast.success(emailOtpLocalization.codeSent)
     }
@@ -128,7 +130,7 @@ export function VerifyEmailOtp(props: VerifyEmailOtpProps) {
           <form.AuthFormRoot aria-label={auth.localization.auth.verifyEmail}>
             <FieldGroup>
               <Show
-                when={email()}
+                when={codeSent()}
                 fallback={
                   <form.AppField
                     name="email"
@@ -170,8 +172,7 @@ export function VerifyEmailOtp(props: VerifyEmailOtpProps) {
                 <Button
                   class="w-full"
                   disabled={
-                    isPending() ||
-                    (Boolean(email()) && code().length !== otpLength)
+                    isPending() || (codeSent() && code().length !== otpLength)
                   }
                   type="submit"
                 >
@@ -179,12 +180,12 @@ export function VerifyEmailOtp(props: VerifyEmailOtpProps) {
                     <Spinner />
                   </Show>
 
-                  {email()
+                  {codeSent()
                     ? emailOtpLocalization.verifyCode
                     : emailOtpLocalization.sendCode}
                 </Button>
 
-                <Show when={email()}>
+                <Show when={codeSent()}>
                   <OpenEmailButton email={email()} variant="secondary" />
 
                   <Button

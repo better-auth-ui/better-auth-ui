@@ -188,6 +188,7 @@ export function DeleteAccount({
                           )}
                         </form.AppField>
                       )}
+                      <form.AuthFormServerError />
                     </AlertDialog.Body>
 
                     <AlertDialog.Footer>

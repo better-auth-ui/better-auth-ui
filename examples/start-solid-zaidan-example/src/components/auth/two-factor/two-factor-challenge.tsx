@@ -202,6 +202,14 @@ export function TwoFactorChallenge(props: TwoFactorChallengeProps) {
     }
   }
 
+  const switchMethod = (nextMethod: ChallengeMethod) => {
+    setMethod(nextMethod)
+    form.setFieldValue("code", "")
+    form.setFieldValue("backupCode", "")
+    form.validateField("code", "change")
+    form.validateField("backupCode", "change")
+  }
+
   return (
     <Card class={cn("w-full max-w-sm", props.class)}>
       <CardHeader>
@@ -223,9 +231,12 @@ export function TwoFactorChallenge(props: TwoFactorChallengeProps) {
                     name="code"
                     validators={{
                       onChange: ({ value }) =>
-                        value.length === codeLength
+                        method() === "backup" || value.length === codeLength
                           ? undefined
-                          : `Enter the ${codeLength}-digit code.`
+                          : twoFactorLocalization.codeLengthMismatch.replace(
+                              "{{length}}",
+                              String(codeLength)
+                            )
                     }}
                   >
                     {(field) => (
@@ -252,7 +263,7 @@ export function TwoFactorChallenge(props: TwoFactorChallengeProps) {
                   name="backupCode"
                   validators={{
                     onChange: ({ value }) =>
-                      value.trim()
+                      method() !== "backup" || value.trim()
                         ? undefined
                         : auth.localization.auth.fieldRequired
                   }}
@@ -342,10 +353,7 @@ export function TwoFactorChallenge(props: TwoFactorChallengeProps) {
                     <Button
                       class="w-full"
                       disabled={isPending()}
-                      onClick={() => {
-                        form.setFieldValue("code", "")
-                        setMethod(alternative.key)
-                      }}
+                      onClick={() => switchMethod(alternative.key)}
                       type="button"
                       variant="ghost"
                     >

@@ -35,8 +35,10 @@ import {
   useResendCooldown
 } from "../../../lib/auth/use-resend-cooldown"
 import {
+  clearAuthFormServerError,
   isAuthFormFieldInvalid,
   setAuthFormServerError,
+  submitAuthForm,
   useAuthForm
 } from "../auth-form"
 import { OtpField } from "../otp-field"
@@ -147,6 +149,7 @@ export function TwoFactorChallenge({
   })
 
   const switchMethod = (next: ChallengeMethod) => {
+    clearAuthFormServerError(form)
     form.setFieldValue("code", "")
     form.setFieldValue("backupCode", "")
     setMethod(next)
@@ -271,7 +274,13 @@ export function TwoFactorChallenge({
                     value={field.state.value}
                     variant={variant}
                     onChange={field.handleChange}
-                    onComplete={(code) => void verifyCode(code)}
+                    onComplete={(code) => {
+                      form.setFieldValue("code", code)
+                      void submitAuthForm(
+                        form,
+                        localization.auth.callbackFailedTitle
+                      )
+                    }}
                   />
                 )}
               </form.AppField>
