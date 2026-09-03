@@ -178,6 +178,7 @@ export function TwoFactorChallenge({
   }
 
   const requestOtp = async () => {
+    clearAuthFormServerError(form)
     try {
       await sendTwoFactorOtp()
     } catch (error) {

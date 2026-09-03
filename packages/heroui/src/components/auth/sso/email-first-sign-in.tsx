@@ -43,7 +43,11 @@ import { useState } from "react"
 
 import { ssoPlugin } from "../../../lib/auth/sso-plugin"
 import { useSignInContinuation } from "../../../lib/auth/use-sign-in-continuation"
-import { isAuthFormFieldInvalid, useAuthForm } from "../auth-form"
+import {
+  clearAuthFormServerError,
+  isAuthFormFieldInvalid,
+  useAuthForm
+} from "../auth-form"
 import { FieldSeparator } from "../field-separator"
 import { ProviderButtons, type SocialLayout } from "../provider-buttons"
 
@@ -166,6 +170,7 @@ export function EmailFirstSignIn({
   const startOver = () => {
     setStep("email")
     form.setFieldValue("password", "")
+    clearAuthFormServerError(form)
     setDiscoveryError("")
   }
 

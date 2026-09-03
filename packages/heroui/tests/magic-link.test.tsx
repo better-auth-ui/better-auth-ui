@@ -105,6 +105,7 @@ describe("<MagicLink />", () => {
     })
 
     expect(screen.getByLabelText(/email/i)).toHaveValue("user@example.com")
+    expect(await screen.findByText("network down")).toBeVisible()
     expect(
       screen.getByRole("button", { name: /send magic link/i })
     ).toBeInTheDocument()

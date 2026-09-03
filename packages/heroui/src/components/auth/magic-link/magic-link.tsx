@@ -147,6 +147,8 @@ export function MagicLink({
               )}
             </form.AppField>
 
+            <form.AuthFormServerError />
+
             <div className="flex flex-col gap-3">
               <form.AuthFormSubmitButton
                 className="w-full"

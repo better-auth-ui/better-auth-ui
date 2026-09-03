@@ -249,7 +249,15 @@ export function EmailOtp({
                     className="w-full"
                     variant="tertiary"
                     isDisabled={isPending || isSigningIn || isCoolingDown}
-                    onPress={sendCode}
+                    onPress={() =>
+                      void sendCode().catch((error) =>
+                        setAuthFormServerError(
+                          form,
+                          error,
+                          localization.auth.callbackFailedTitle
+                        )
+                      )
+                    }
                   >
                     {isCoolingDown
                       ? localization.auth.resendIn.replace(

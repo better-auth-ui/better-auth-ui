@@ -1,6 +1,10 @@
 "use client"
 
-import { type AuthView, authMutationKeys } from "@better-auth-ui/core"
+import {
+  type AuthView,
+  authMutationKeys,
+  validateEmailAddress
+} from "@better-auth-ui/core"
 import {
   type SiweAuthClient,
   siweMutationKeys
@@ -8,20 +12,12 @@ import {
 import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
 import { useSignInSiwe } from "@better-auth-ui/react/plugins/siwe"
 import { Wallet } from "@gravity-ui/icons"
-import {
-  Button,
-  FieldError,
-  Input,
-  Label,
-  Modal,
-  Spinner,
-  TextField
-} from "@heroui/react"
+import { Button, Input, Label, Modal, Spinner, TextField } from "@heroui/react"
 import { useIsMutating } from "@tanstack/react-query"
 import { useState } from "react"
 
 import { siwePlugin } from "../../../lib/auth/siwe-plugin"
-import { useAuthForm } from "../auth-form"
+import { isAuthFormFieldInvalid, useAuthForm } from "../auth-form"
 
 export type SignInEthereumButtonProps = {
   view?: AuthView
@@ -99,10 +95,24 @@ export function SignInEthereumButton({ view }: SignInEthereumButtonProps) {
                   </p>
                 </Modal.Header>
                 <Modal.Body className="overflow-visible">
-                  <form.AppField name="email">
+                  <form.AppField
+                    name="email"
+                    validators={
+                      plugin.email === "required"
+                        ? {
+                            onChange: ({ value }) =>
+                              validateEmailAddress(value, {
+                                invalidMessage: localization.auth.invalidEmail,
+                                requiredMessage: localization.auth.fieldRequired
+                              })
+                          }
+                        : undefined
+                    }
+                  >
                     {(field) => (
                       <TextField
                         className="w-full"
+                        isInvalid={isAuthFormFieldInvalid(field.state.meta)}
                         name={field.name}
                         type="email"
                         isRequired={plugin.email === "required"}
@@ -118,10 +128,11 @@ export function SignInEthereumButton({ view }: SignInEthereumButtonProps) {
                             : plugin.localization.emailOptional}
                         </Label>
                         <Input autoFocus autoComplete="email" />
-                        <FieldError />
+                        <field.AuthFormFieldError />
                       </TextField>
                     )}
                   </form.AppField>
+                  <form.AuthFormServerError />
                 </Modal.Body>
                 <Modal.Footer>
                   <Button
