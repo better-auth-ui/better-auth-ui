@@ -3,8 +3,7 @@ import type { ReactNode } from "react"
 import {
   getHeroUISelection,
   getHeroUISortDescriptor,
-  getTanStackRowSelection,
-  getTanStackSorting
+  getTanStackRowSelection
 } from "../table-bridge"
 import { useOrganizationTableContext } from "./organization-table"
 
@@ -29,9 +28,6 @@ export function OrganizationTableRenderer({
           onSelectionChange={(selection) =>
             table.setRowSelection(getTanStackRowSelection(selection, rowIds))
           }
-          onSortChange={(descriptor) =>
-            table.setSorting(getTanStackSorting(descriptor))
-          }
           selectedKeys={getHeroUISelection(table.state.rowSelection)}
           selectionMode={selectable ? "multiple" : "none"}
           sortDescriptor={getHeroUISortDescriptor(table.state.sorting)}
@@ -44,11 +40,7 @@ export function OrganizationTableRenderer({
                   id={header.column.id}
                   key={header.id}
                 >
-                  {header.isPlaceholder ? null : header.column.getCanSort() ? (
-                    <Table.SortableColumnHeader>
-                      <table.FlexRender header={header} />
-                    </Table.SortableColumnHeader>
-                  ) : (
+                  {header.isPlaceholder ? null : (
                     <table.FlexRender header={header} />
                   )}
                 </Table.Column>

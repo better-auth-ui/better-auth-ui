@@ -30,14 +30,14 @@ export function ChangeEmail({ className }: ChangeEmailProps) {
   const { authClient, basePaths, baseURL, localization, viewPaths } = useAuth()
   const { data: session } = useSession(authClient)
 
-  const { mutate: changeEmail, isPending } = useChangeEmail(authClient, {
+  const { mutateAsync: changeEmail, isPending } = useChangeEmail(authClient, {
     onSuccess: () => toast.success(localization.settings.changeEmailSuccess)
   })
 
   const form = useAuthForm({
     defaultValues: { email: "" },
-    onSubmit: ({ value }) =>
-      changeEmail({
+    onSubmit: async ({ value }) =>
+      await changeEmail({
         callbackURL: getViewURL(
           baseURL,
           basePaths.settings,

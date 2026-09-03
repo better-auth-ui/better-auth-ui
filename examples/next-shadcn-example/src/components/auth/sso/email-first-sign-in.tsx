@@ -91,7 +91,7 @@ export function EmailFirstSignIn({
   const [isPasswordVisible, setIsPasswordVisible] = useState(false)
   const [discoveryError, setDiscoveryError] = useState("")
 
-  const { mutate: signInSso, isPending: isDiscovering } = useSignInSso(
+  const { mutateAsync: signInSso, isPending: isDiscovering } = useSignInSso(
     authClient as SsoAuthClient,
     {
       onError: (error) => {
@@ -107,7 +107,7 @@ export function EmailFirstSignIn({
     }
   )
 
-  const { mutate: signInEmail, isPending: isSigningIn } = useSignInEmail(
+  const { mutateAsync: signInEmail, isPending: isSigningIn } = useSignInEmail(
     authClient,
     {
       onError: (error) => {
@@ -143,18 +143,18 @@ export function EmailFirstSignIn({
 
   const form = useAuthForm({
     defaultValues: { email: "", password: "", rememberMe: false },
-    onSubmit: ({ value }) => {
+    onSubmit: async ({ value }) => {
       if (step === "email") {
         setDiscoveryError("")
         setSsoFallbackEmail(value.email)
-        signInSso({
+        await signInSso({
           callbackURL: `${baseURL}${redirectTo}`,
           email: value.email,
           loginHint: value.email
         })
         return
       }
-      signInEmail({
+      await signInEmail({
         email: value.email,
         password: value.password,
         ...(emailAndPassword.rememberMe

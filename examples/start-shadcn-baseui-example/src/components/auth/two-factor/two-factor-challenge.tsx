@@ -106,7 +106,7 @@ export function TwoFactorChallenge({ className }: TwoFactorChallengeProps) {
     navigate({ to: redirectTo })
   }
 
-  const { mutate: sendTwoFactorOtp, isPending: isSendingOtp } =
+  const { mutateAsync: sendTwoFactorOtp, isPending: isSendingOtp } =
     useSendTwoFactorOtp(twoFactorClient, {
       onSuccess: () => {
         setOtpRequested(true)
@@ -114,7 +114,7 @@ export function TwoFactorChallenge({ className }: TwoFactorChallengeProps) {
       }
     })
 
-  const { mutate: verifyTotp, isPending: isVerifyingTotp } = useVerifyTotp(
+  const { mutateAsync: verifyTotp, isPending: isVerifyingTotp } = useVerifyTotp(
     twoFactorClient,
     {
       onError: () => form.setFieldValue("code", ""),
@@ -122,13 +122,13 @@ export function TwoFactorChallenge({ className }: TwoFactorChallengeProps) {
     }
   )
 
-  const { mutate: verifyTwoFactorOtp, isPending: isVerifyingOtp } =
+  const { mutateAsync: verifyTwoFactorOtp, isPending: isVerifyingOtp } =
     useVerifyTwoFactorOtp(twoFactorClient, {
       onError: () => form.setFieldValue("code", ""),
       onSuccess: onVerified
     })
 
-  const { mutate: verifyBackupCode, isPending: isVerifyingBackupCode } =
+  const { mutateAsync: verifyBackupCode, isPending: isVerifyingBackupCode } =
     useVerifyBackupCode(twoFactorClient, { onSuccess: onVerified })
 
   const isPending =
@@ -137,13 +137,13 @@ export function TwoFactorChallenge({ className }: TwoFactorChallengeProps) {
 
   const form = useAuthForm({
     defaultValues: { backupCode: "", code: "", trustDevice: false },
-    onSubmit: ({ value }) => {
+    onSubmit: async ({ value }) => {
       const trust = trustDeviceEnabled ? { trustDevice: value.trustDevice } : {}
       if (method === "backup") {
-        verifyBackupCode({ code: value.backupCode.trim(), ...trust })
+        await verifyBackupCode({ code: value.backupCode.trim(), ...trust })
         return
       }
-      verifyCode(value.code)
+      await verifyCode(value.code)
     }
   })
 
@@ -153,7 +153,7 @@ export function TwoFactorChallenge({ className }: TwoFactorChallengeProps) {
     setMethod(next)
   }
 
-  const verifyCode = (completedCode: string) => {
+  const verifyCode = async (completedCode: string) => {
     if (
       isPending ||
       needsOtpRequest ||
@@ -168,11 +168,11 @@ export function TwoFactorChallenge({ className }: TwoFactorChallengeProps) {
       : {}
 
     if (method === "otp") {
-      verifyTwoFactorOtp({ code: completedCode, ...trust })
+      await verifyTwoFactorOtp({ code: completedCode, ...trust })
       return
     }
 
-    verifyTotp({ code: completedCode, ...trust })
+    await verifyTotp({ code: completedCode, ...trust })
   }
 
   const description =

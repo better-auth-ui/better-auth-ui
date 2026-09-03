@@ -210,8 +210,11 @@ function AuthFormSubmitButton(
       {(state) => (
         <Button
           {...props}
+          aria-disabled={
+            props.disabled || !state()[0] || state()[1] || undefined
+          }
           class={props.class}
-          disabled={props.disabled || !state()[0] || state()[1]}
+          disabled={props.disabled || state()[1]}
           type="submit"
         >
           <Show when={state()[1]}>

@@ -24,11 +24,12 @@ import type { Invitation } from "better-auth/client"
 import { type ComponentProps, useState } from "react"
 
 import { organizationPlugin } from "../../../lib/auth/organization-plugin"
+import { getHeroUISortDescriptor } from "../table-bridge"
 import { InviteMemberDialog } from "./invite-member-dialog"
 import { OrganizationInvitationTableRow } from "./organization-invitation-row"
 import { OrganizationInvitationRowSkeleton } from "./organization-invitation-row-skeleton"
 import { OrganizationInvitationsEmpty } from "./organization-invitations-empty"
-import { OrganizationSortableTableColumn } from "./organization-sortable-table-column"
+import { OrganizationSortableTableHeader } from "./organization-sortable-table-header"
 import {
   createOrganizationColumnHelper,
   ORGANIZATION_TABLE_PAGE_SIZE,
@@ -368,7 +369,10 @@ export function OrganizationInvitations({
 
         <Table>
           <Table.ScrollContainer>
-            <Table.Content aria-label={organizationLocalization.invitations}>
+            <Table.Content
+              aria-label={organizationLocalization.invitations}
+              sortDescriptor={getHeroUISortDescriptor(tableState.sorting)}
+            >
               <Table.Header>
                 {showSelection && (
                   <Table.Column>
@@ -383,35 +387,42 @@ export function OrganizationInvitations({
                     />
                   </Table.Column>
                 )}
-                <OrganizationSortableTableColumn
-                  column={table.getColumn("email")}
-                  isRowHeader
-                >
-                  {localization.auth.email}
-                </OrganizationSortableTableColumn>
+                <Table.Column allowsSorting id="email" isRowHeader>
+                  <OrganizationSortableTableHeader
+                    column={table.getColumn("email")}
+                  >
+                    {localization.auth.email}
+                  </OrganizationSortableTableHeader>
+                </Table.Column>
 
                 {table.getColumn("createdAt")?.getIsVisible() && (
-                  <OrganizationSortableTableColumn
-                    column={table.getColumn("createdAt")}
-                  >
-                    {organizationLocalization.invitedAt}
-                  </OrganizationSortableTableColumn>
+                  <Table.Column allowsSorting id="createdAt">
+                    <OrganizationSortableTableHeader
+                      column={table.getColumn("createdAt")}
+                    >
+                      {organizationLocalization.invitedAt}
+                    </OrganizationSortableTableHeader>
+                  </Table.Column>
                 )}
 
                 {table.getColumn("role")?.getIsVisible() && (
-                  <OrganizationSortableTableColumn
-                    column={table.getColumn("role")}
-                  >
-                    {organizationLocalization.role}
-                  </OrganizationSortableTableColumn>
+                  <Table.Column allowsSorting id="role">
+                    <OrganizationSortableTableHeader
+                      column={table.getColumn("role")}
+                    >
+                      {organizationLocalization.role}
+                    </OrganizationSortableTableHeader>
+                  </Table.Column>
                 )}
 
                 {table.getColumn("status")?.getIsVisible() && (
-                  <OrganizationSortableTableColumn
-                    column={table.getColumn("status")}
-                  >
-                    {organizationLocalization.status}
-                  </OrganizationSortableTableColumn>
+                  <Table.Column allowsSorting id="status">
+                    <OrganizationSortableTableHeader
+                      column={table.getColumn("status")}
+                    >
+                      {organizationLocalization.status}
+                    </OrganizationSortableTableHeader>
+                  </Table.Column>
                 )}
 
                 <Table.Column className="text-end">

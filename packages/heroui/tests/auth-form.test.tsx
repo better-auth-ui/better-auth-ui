@@ -105,6 +105,27 @@ describe("AuthFormRoot", () => {
     expect(screen.getByText("Account creation failed")).toBeVisible()
   })
 
+  it("keeps an invalid submit action reachable so TanStack can reveal errors", async () => {
+    const onSubmit = vi.fn(async () => undefined)
+    render(<TestFieldForm onSubmit={onSubmit} />)
+    const input = screen.getByRole("textbox", { name: "Email" })
+    const submitButton = screen.getByRole("button", { name: /Continue/ })
+
+    fireEvent.change(input, { target: { value: "ada@example.com" } })
+    fireEvent.change(input, { target: { value: "" } })
+
+    await waitFor(() =>
+      expect(submitButton).toHaveAttribute("aria-disabled", "true")
+    )
+    expect(submitButton).not.toHaveAttribute("disabled")
+
+    fireEvent.click(submitButton)
+
+    expect(await screen.findByText("Email is required")).toBeVisible()
+    await waitFor(() => expect(input).toHaveFocus())
+    expect(onSubmit).not.toHaveBeenCalled()
+  })
+
   it("preserves server errors set by a mutation error handler", async () => {
     render(
       <TestFieldForm

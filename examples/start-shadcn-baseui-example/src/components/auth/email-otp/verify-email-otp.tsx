@@ -88,7 +88,7 @@ export function VerifyEmailOtp({ className }: VerifyEmailOtpProps) {
     if (pendingEmail) startCooldown(RESEND_COOLDOWN_SECONDS)
   }, [startCooldown])
 
-  const { mutate: sendVerificationOtp, isPending: isSending } =
+  const { mutateAsync: sendVerificationOtp, isPending: isSending } =
     useSendVerificationOtp(otpClient, {
       onSuccess: (_data, { email: sentTo }) => {
         sessionStorage.setItem(VERIFY_EMAIL_STORAGE_KEY, sentTo)
@@ -98,37 +98,35 @@ export function VerifyEmailOtp({ className }: VerifyEmailOtpProps) {
       }
     })
 
-  const { mutate: verifyEmailOtp, isPending: isVerifying } = useVerifyEmailOtp(
-    otpClient,
-    {
+  const { mutateAsync: verifyEmailOtp, isPending: isVerifying } =
+    useVerifyEmailOtp(otpClient, {
       onError: () => form.setFieldValue("code", ""),
       onSuccess: () => {
         sessionStorage.removeItem(VERIFY_EMAIL_STORAGE_KEY)
         toast.success(emailOtpLocalization.emailVerified)
         navigate({ to: redirectTo })
       }
-    }
-  )
+    })
 
   const isPending = isSending || isVerifying
 
-  const verifyCode = (completedCode: string) => {
+  const verifyCode = async (completedCode: string) => {
     if (isPending || !email) return
 
-    verifyEmailOtp({ email, otp: completedCode })
+    await verifyEmailOtp({ email, otp: completedCode })
   }
 
   const form = useAuthForm({
     defaultValues: { code: "", email: "" },
-    onSubmit: ({ value }) => {
+    onSubmit: async ({ value }) => {
       if (!email) {
-        sendVerificationOtp({
+        await sendVerificationOtp({
           email: value.email,
           type: "email-verification"
         })
         return
       }
-      verifyCode(value.code)
+      await verifyCode(value.code)
     }
   })
   const codeComplete = useSelector(

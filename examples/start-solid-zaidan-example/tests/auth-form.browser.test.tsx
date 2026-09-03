@@ -228,6 +228,27 @@ describe("Solid auth form", () => {
     )
     expect(view.getByText("Account creation failed")).toBeVisible()
   })
+
+  it("keeps an invalid submit action reachable so TanStack can reveal errors", async () => {
+    const view = render(() => <ValidatedAuthForm />)
+    const email = view.getByRole("textbox", { name: "Email" })
+    const submit = view.getByRole("button", { name: "Submit" })
+
+    fireEvent.input(email, { target: { value: "ada@example.com" } })
+    fireEvent.input(email, { target: { value: "" } })
+
+    await vi.waitFor(() =>
+      expect(submit).toHaveAttribute("aria-disabled", "true")
+    )
+    expect(submit).not.toHaveAttribute("disabled")
+
+    fireEvent.click(submit)
+
+    await vi.waitFor(() =>
+      expect(view.getByText("Email is required")).toBeVisible()
+    )
+    await vi.waitFor(() => expect(email).toHaveFocus())
+  })
 })
 
 describe("Solid organization table selection", () => {

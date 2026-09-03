@@ -63,12 +63,12 @@ export function DeleteAccount({ className }: DeleteAccountProps) {
   )
   const needsPassword = !sendDeleteAccountVerification && hasCredentialAccount
 
-  const { mutate: deleteUser, isPending } = useDeleteUser(authClient)
+  const { mutateAsync: deleteUser, isPending } = useDeleteUser(authClient)
 
   const form = useAuthForm({
     defaultValues: { password: "" },
-    onSubmit: ({ value }) => {
-      deleteUser(needsPassword ? { password: value.password } : {}, {
+    onSubmit: async ({ value }) => {
+      await deleteUser(needsPassword ? { password: value.password } : {}, {
         onSuccess: () => {
           setConfirmOpen(false)
           form.reset()

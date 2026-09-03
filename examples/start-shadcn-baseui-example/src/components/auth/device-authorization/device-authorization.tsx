@@ -151,7 +151,7 @@ export function DeviceAuthorization({ className }: DeviceAuthorizationProps) {
     )
   }, [userCodeLength])
 
-  const { mutate: verifyDeviceCode, isPending: isVerifying } =
+  const { mutateAsync: verifyDeviceCode, isPending: isVerifying } =
     useVerifyDeviceCode(deviceAuthClient, {
       onError: handleAuthorizationError,
       onSuccess: ({ status }) => {
@@ -176,7 +176,7 @@ export function DeviceAuthorization({ className }: DeviceAuthorizationProps) {
   )
 
   const submitCode = useCallback(
-    (completedCode: string) => {
+    async (completedCode: string) => {
       const normalizedCode = normalizeDeviceCode(completedCode)
 
       if (
@@ -197,7 +197,7 @@ export function DeviceAuthorization({ className }: DeviceAuthorizationProps) {
         return
       }
 
-      verifyDeviceCode({
+      await verifyDeviceCode({
         query: { user_code: normalizedCode }
       })
     },
@@ -215,7 +215,7 @@ export function DeviceAuthorization({ className }: DeviceAuthorizationProps) {
   )
 
   const handleSubmit = useCallback(
-    (code: string) => {
+    async (code: string) => {
       const normalizedCode = normalizeDeviceCode(code)
       if (normalizedCode.length !== userCodeLength) {
         dispatch({
@@ -224,7 +224,7 @@ export function DeviceAuthorization({ className }: DeviceAuthorizationProps) {
         })
         return
       }
-      submitCode(normalizedCode)
+      await submitCode(normalizedCode)
     },
     [localization.invalidDeviceCode, submitCode, userCodeLength]
   )
@@ -290,7 +290,7 @@ type DeviceCodeFormProps = {
   initialUserCode: string
   userCodeLength: number
   onCodeChange: (value: string) => void
-  onSubmitCode: (code: string) => void
+  onSubmitCode: (code: string) => Promise<void>
 }
 
 function DeviceCodeForm({
@@ -311,7 +311,9 @@ function DeviceCodeForm({
   const errorId = "device-code-error"
   const form = useAuthForm({
     defaultValues: { userCode: initialUserCode },
-    onSubmit: ({ value }) => onSubmitCode(value.userCode)
+    onSubmit: async ({ value }) => {
+      await onSubmitCode(value.userCode)
+    }
   })
   const userCodeComplete = useSelector(
     form.store,
@@ -321,7 +323,7 @@ function DeviceCodeForm({
   useEffect(() => {
     form.setFieldValue("userCode", initialUserCode)
     if (initialUserCode.length === userCodeLength) {
-      onSubmitCode(initialUserCode)
+      void onSubmitCode(initialUserCode)
     }
   }, [form.setFieldValue, initialUserCode, onSubmitCode, userCodeLength])
 
@@ -367,7 +369,7 @@ function DeviceCodeForm({
                         field.handleChange(nextCode)
                         onCodeChange(nextCode)
                         if (nextCode.length === userCodeLength)
-                          onSubmitCode(nextCode)
+                          void onSubmitCode(nextCode)
                       }}
                     >
                       <InputOTPGroup>

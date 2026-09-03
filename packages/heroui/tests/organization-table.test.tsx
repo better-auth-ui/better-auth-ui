@@ -9,7 +9,7 @@ import {
   waitFor
 } from "@testing-library/react"
 import { afterEach, describe, expect, it, vi } from "vitest"
-
+import { OrganizationSortableTableHeader } from "../src/components/auth/organization/organization-sortable-table-header"
 import {
   createOrganizationColumnHelper,
   useOrganizationTable
@@ -120,6 +120,56 @@ describe("organization table state", () => {
     expect(
       result.current.getRowModel().rows.map((row) => row.original.id)
     ).toEqual(["3", "2", "1"])
+  })
+
+  it("renders TanStack multi-sort state through HeroUI columns", () => {
+    const sortableColumns = columnHelper.columns([
+      columnHelper.accessor("group", {
+        cell: ({ getValue }) => getValue(),
+        header: ({ column }) => (
+          <OrganizationSortableTableHeader column={column}>
+            Group
+          </OrganizationSortableTableHeader>
+        )
+      }),
+      columnHelper.accessor("name", {
+        cell: ({ getValue }) => getValue(),
+        header: ({ column }) => (
+          <OrganizationSortableTableHeader column={column}>
+            Name
+          </OrganizationSortableTableHeader>
+        )
+      })
+    ])
+
+    function TableFixture() {
+      const table = useOrganizationTable({
+        columns: sortableColumns,
+        data: rows,
+        getRowId: (row) => row.id,
+        initialState: {
+          sorting: [
+            { desc: false, id: "group" },
+            { desc: false, id: "name" }
+          ]
+        }
+      })
+
+      return (
+        <table.AppTable>
+          <OrganizationTableRenderer ariaLabel="People" empty="No people" />
+        </table.AppTable>
+      )
+    }
+
+    render(<TableFixture />)
+
+    expect(screen.getByRole("columnheader", { name: /Group/ })).toHaveAttribute(
+      "aria-sort",
+      "ascending"
+    )
+    expect(screen.getByRole("button", { name: /Group/ })).toHaveTextContent("1")
+    expect(screen.getByRole("button", { name: /Name/ })).toHaveTextContent("2")
   })
 
   it("paginates client data but leaves server pages intact", () => {
@@ -269,5 +319,34 @@ describe("organization table state", () => {
       expect(result.current.sorting).toEqual([{ desc: true, id: "name" }])
       expect(result.current.pagination.pageIndex).toBe(1)
     })
+  })
+
+  it("bounds URL replacements when the adapter notifies synchronously", async () => {
+    let params = new URLSearchParams("router.search=first")
+    let replacements = 0
+    const listeners = new Set<() => void>()
+    const adapters: TablePersistenceAdapters = {
+      search: {
+        read: () => new URLSearchParams(params),
+        replace: (next) => {
+          replacements += 1
+          params = new URLSearchParams(next)
+          for (const listener of listeners) listener()
+        },
+        subscribe: (listener) => {
+          listeners.add(listener)
+          return () => listeners.delete(listener)
+        }
+      }
+    }
+    const { result } = renderHook(() =>
+      useOrganizationTableState("router", 10, TEST_COLUMN_IDS, adapters)
+    )
+
+    await waitFor(() => expect(result.current.ready).toBe(true))
+    act(() => result.current.setGlobalFilter("local"))
+
+    await waitFor(() => expect(params.get("router.search")).toBe("local"))
+    expect(replacements).toBe(1)
   })
 })

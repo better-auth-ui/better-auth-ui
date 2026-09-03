@@ -81,7 +81,7 @@ export function SignInUsername({
 
   const { localization: usernameLocalization } = useAuthPlugin(usernamePlugin)
 
-  const { mutate: signInEmail, isPending: isSignInEmailPending } =
+  const { mutateAsync: signInEmail, isPending: isSignInEmailPending } =
     useSignInEmail(authClient, {
       onError: (error, { email }) => {
         form.setFieldValue("password", "")
@@ -101,7 +101,7 @@ export function SignInUsername({
       }
     })
 
-  const { mutate: signInUsername, isPending: isSignInUsernamePending } =
+  const { mutateAsync: signInUsername, isPending: isSignInUsernamePending } =
     useSignInUsername(authClient, {
       onError: (error) => {
         form.setFieldValue("password", "")
@@ -140,9 +140,9 @@ export function SignInUsername({
   const [isPasswordVisible, setIsPasswordVisible] = useState(false)
   const form = useAuthForm({
     defaultValues: { identifier: "", password: "", rememberMe: false },
-    onSubmit: ({ value }) => {
+    onSubmit: async ({ value }) => {
       if (isEmail(value.identifier)) {
-        signInEmail({
+        await signInEmail({
           email: value.identifier,
           password: value.password,
           ...(emailAndPassword?.rememberMe
@@ -151,7 +151,7 @@ export function SignInUsername({
           fetchOptions
         })
       } else {
-        signInUsername({
+        await signInUsername({
           username: value.identifier,
           password: value.password,
           ...(emailAndPassword?.rememberMe

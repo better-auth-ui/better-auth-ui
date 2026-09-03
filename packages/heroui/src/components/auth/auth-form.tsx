@@ -201,7 +201,8 @@ function AuthFormSubmitButton({
       {([canSubmit, isSubmitting]) => (
         <Button
           {...props}
-          isDisabled={isDisabled || !canSubmit || isSubmitting}
+          aria-disabled={isDisabled || !canSubmit || isSubmitting || undefined}
+          isDisabled={isDisabled || isSubmitting}
           type="submit"
         >
           {isSubmitting ? <Spinner /> : null}

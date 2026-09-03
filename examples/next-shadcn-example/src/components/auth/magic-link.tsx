@@ -58,7 +58,7 @@ export function MagicLink({
   const { localization: magicLinkLocalization, viewPaths: magicLinkViewPaths } =
     useAuthPlugin(magicLinkPlugin)
 
-  const { mutate: signInMagicLink, isPending: signInMagicLinkPending } =
+  const { mutateAsync: signInMagicLink, isPending: signInMagicLinkPending } =
     useSignInMagicLink(authClient, {
       onSuccess: (_data, variables) => {
         sessionStorage.setItem(MAGIC_LINK_SENT_STORAGE_KEY, variables.email)
@@ -78,8 +78,8 @@ export function MagicLink({
 
   const form = useAuthForm({
     defaultValues: { email: getSsoFallbackEmail() },
-    onSubmit: ({ value }) =>
-      signInMagicLink({
+    onSubmit: async ({ value }) =>
+      await signInMagicLink({
         callbackURL: `${baseURL}${redirectTo}`,
         email: value.email
       })

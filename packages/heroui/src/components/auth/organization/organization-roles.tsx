@@ -41,7 +41,8 @@ import {
   isAuthFormFieldInvalid,
   useAuthForm
 } from "../auth-form"
-import { OrganizationSortableTableColumn } from "./organization-sortable-table-column"
+import { getHeroUISortDescriptor } from "../table-bridge"
+import { OrganizationSortableTableHeader } from "./organization-sortable-table-header"
 import {
   createOrganizationColumnHelper,
   ORGANIZATION_TABLE_PAGE_SIZE,
@@ -320,7 +321,10 @@ export function OrganizationRoles({
       ) : !canRead.data?.success ? null : roles.data?.length ? (
         <Table>
           <Table.ScrollContainer>
-            <Table.Content aria-label={localization.roles}>
+            <Table.Content
+              aria-label={localization.roles}
+              sortDescriptor={getHeroUISortDescriptor(tableState.sorting)}
+            >
               <Table.Header>
                 {showSelection && (
                   <Table.Column>
@@ -335,18 +339,21 @@ export function OrganizationRoles({
                     />
                   </Table.Column>
                 )}
-                <OrganizationSortableTableColumn
-                  column={table.getColumn("role")}
-                  isRowHeader
-                >
-                  {localization.roleName}
-                </OrganizationSortableTableColumn>
-                {table.getColumn("permissions")?.getIsVisible() && (
-                  <OrganizationSortableTableColumn
-                    column={table.getColumn("permissions")}
+                <Table.Column allowsSorting id="role" isRowHeader>
+                  <OrganizationSortableTableHeader
+                    column={table.getColumn("role")}
                   >
-                    {localization.permissions}
-                  </OrganizationSortableTableColumn>
+                    {localization.roleName}
+                  </OrganizationSortableTableHeader>
+                </Table.Column>
+                {table.getColumn("permissions")?.getIsVisible() && (
+                  <Table.Column allowsSorting id="permissions">
+                    <OrganizationSortableTableHeader
+                      column={table.getColumn("permissions")}
+                    >
+                      {localization.permissions}
+                    </OrganizationSortableTableHeader>
+                  </Table.Column>
                 )}
                 <Table.Column className="text-end">
                   {localization.actions}

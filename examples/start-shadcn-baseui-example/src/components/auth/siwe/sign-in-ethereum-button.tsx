@@ -50,8 +50,8 @@ export function SignInEthereumButton({ view }: SignInEthereumButtonProps) {
       useIsMutating({ mutationKey: siweMutationKeys.all }) >
     0
 
-  const complete = (email?: string) => {
-    signIn.mutate(email ? { email } : undefined, {
+  const complete = async (email?: string) => {
+    await signIn.mutateAsync(email ? { email } : undefined, {
       onSuccess: () => {
         setOpen(false)
         navigate({ to: redirectTo })
@@ -61,7 +61,9 @@ export function SignInEthereumButton({ view }: SignInEthereumButtonProps) {
 
   const form = useAuthForm({
     defaultValues: { email: "" },
-    onSubmit: ({ value }) => complete(value.email.trim() || undefined)
+    onSubmit: async ({ value }) => {
+      await complete(value.email.trim() || undefined)
+    }
   })
 
   if (view === "signUp") return null
@@ -73,7 +75,9 @@ export function SignInEthereumButton({ view }: SignInEthereumButtonProps) {
         variant="outline"
         disabled={isPending}
         className={cn("w-full", isPending && "pointer-events-none opacity-50")}
-        onClick={() => (plugin.email === "none" ? complete() : setOpen(true))}
+        onClick={() =>
+          plugin.email === "none" ? void complete() : setOpen(true)
+        }
       >
         {signIn.isPending ? <Spinner /> : <Wallet />}
         {plugin.localization.continueWithEthereum}

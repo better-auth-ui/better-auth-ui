@@ -4,8 +4,7 @@ import {
   parseTableUrlState,
   serializeTableColumnVisibility,
   serializeTableUrlState,
-  type TablePersistenceAdapters,
-  type TableUrlState
+  type TablePersistenceAdapters
 } from "@better-auth-ui/core"
 import { useCreateAtom, useSelector } from "@tanstack/react-store"
 import {
@@ -17,7 +16,14 @@ import {
   type SortingState,
   type Updater
 } from "@tanstack/react-table"
-import { useCallback, useEffect, useMemo, useRef, useState } from "react"
+import {
+  type MutableRefObject,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState
+} from "react"
 import { ORGANIZATION_TABLE_PAGE_SIZE } from "./organization-table"
 
 const TABLE_STATE_STORAGE_PREFIX = "better-auth-ui:organization-table"
@@ -27,21 +33,6 @@ type OrganizationTableUrlState = {
   globalFilter: string
   pagination: PaginationState
   sorting: SortingState
-}
-
-function readUrlState(
-  adapters: TablePersistenceAdapters,
-  stateKey: string,
-  defaultPageSize: number,
-  allowedColumnIds?: readonly string[]
-): TableUrlState {
-  return parseTableUrlState(
-    adapters.search.read(),
-    stateKey,
-    defaultPageSize,
-    ORGANIZATION_TABLE_PAGE_SIZE_OPTIONS,
-    allowedColumnIds
-  )
 }
 
 function readColumnVisibility(
@@ -64,16 +55,20 @@ function writeUrlState(
   adapters: TablePersistenceAdapters,
   stateKey: string,
   defaultPageSize: number,
-  state: OrganizationTableUrlState
+  state: OrganizationTableUrlState,
+  syncedSearch: MutableRefObject<string>
 ) {
-  adapters.search.replace(
-    serializeTableUrlState(
-      adapters.search.read(),
-      stateKey,
-      defaultPageSize,
-      state
-    )
+  const next = serializeTableUrlState(
+    adapters.search.read(),
+    stateKey,
+    defaultPageSize,
+    state
   )
+  const nextSearch = next.toString()
+  if (nextSearch === syncedSearch.current) return
+
+  syncedSearch.current = nextSearch
+  adapters.search.replace(next)
 }
 
 export function useOrganizationTableState(
@@ -82,6 +77,11 @@ export function useOrganizationTableState(
   allowedColumnIds?: readonly string[],
   persistenceAdapters?: TablePersistenceAdapters
 ) {
+  const allowedColumnIdsKey = allowedColumnIds?.join("\u0000")
+  const stableAllowedColumnIds = useMemo(
+    () => allowedColumnIdsKey?.split("\u0000"),
+    [allowedColumnIdsKey]
+  )
   const adapters = useMemo(
     () => persistenceAdapters ?? createBrowserTablePersistenceAdapters(),
     [persistenceAdapters]
@@ -104,6 +104,7 @@ export function useOrganizationTableState(
   const [urlReady, setUrlReady] = useState(false)
   const [visibilityReady, setVisibilityReady] = useState(false)
   const restoringUrlState = useRef(false)
+  const syncedSearch = useRef("")
   const atoms = useMemo(
     () => ({
       columnFilters: columnFiltersAtom,
@@ -179,12 +180,18 @@ export function useOrganizationTableState(
 
   useEffect(() => {
     if (!urlReady) return
-    writeUrlState(adapters, stateKey, defaultPageSize, {
-      columnFilters,
-      globalFilter,
-      pagination,
-      sorting
-    })
+    writeUrlState(
+      adapters,
+      stateKey,
+      defaultPageSize,
+      {
+        columnFilters,
+        globalFilter,
+        pagination,
+        sorting
+      },
+      syncedSearch
+    )
   }, [
     adapters,
     columnFilters,
@@ -210,16 +217,19 @@ export function useOrganizationTableState(
 
   useEffect(() => {
     columnVisibilityAtom.set(
-      readColumnVisibility(adapters, stateKey, allowedColumnIds)
+      readColumnVisibility(adapters, stateKey, stableAllowedColumnIds)
     )
     setVisibilityReady(true)
     const restoreUrlState = () => {
       restoringUrlState.current = true
-      const next = readUrlState(
-        adapters,
+      const search = adapters.search.read()
+      syncedSearch.current = search.toString()
+      const next = parseTableUrlState(
+        search,
         stateKey,
         defaultPageSize,
-        allowedColumnIds
+        ORGANIZATION_TABLE_PAGE_SIZE_OPTIONS,
+        stableAllowedColumnIds
       )
       columnFiltersAtom.set(next.columnFilters)
       globalFilterAtom.set(next.globalFilter)
@@ -232,13 +242,13 @@ export function useOrganizationTableState(
     return adapters.search.subscribe(restoreUrlState)
   }, [
     adapters,
-    allowedColumnIds,
     columnFiltersAtom,
     columnVisibilityAtom,
     defaultPageSize,
     globalFilterAtom,
     paginationAtom,
     sortingAtom,
+    stableAllowedColumnIds,
     stateKey
   ])
 

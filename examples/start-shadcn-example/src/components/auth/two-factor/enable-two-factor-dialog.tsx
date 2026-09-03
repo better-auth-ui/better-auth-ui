@@ -112,7 +112,7 @@ export function EnableTwoFactorDialog({
   }
 
   const {
-    mutate: enableTwoFactor,
+    mutateAsync: enableTwoFactor,
     isPending: isEnabling,
     reset: resetEnrollment
   } = useEnableTwoFactor(twoFactorClient, {
@@ -129,7 +129,7 @@ export function EnableTwoFactorDialog({
     }
   })
 
-  const { mutate: verifyTotp, isPending: isVerifying } = useVerifyTotp(
+  const { mutateAsync: verifyTotp, isPending: isVerifying } = useVerifyTotp(
     twoFactorClient,
     {
       onError: () => form.setFieldValue("code", ""),
@@ -144,27 +144,27 @@ export function EnableTwoFactorDialog({
 
   const form = useAuthForm({
     defaultValues: { code: "", password: "" },
-    onSubmit: ({ value }) => {
+    onSubmit: async ({ value }) => {
       if (step === "backupCodes") {
         handleOpenChange(false)
         return
       }
       if (step === "verify") {
-        verifyCode(value.code)
+        await verifyCode(value.code)
         return
       }
-      enableTwoFactor(
+      await enableTwoFactor(
         requiresPassword ? { method, password: value.password } : { method }
       )
     }
   })
 
-  const verifyCode = (completedCode: string) => {
+  const verifyCode = async (completedCode: string) => {
     if (isPending || step !== "verify" || completedCode.length !== codeLength) {
       return
     }
 
-    verifyTotp({ code: completedCode })
+    await verifyTotp({ code: completedCode })
   }
 
   const handleOpenChange = (nextOpen: boolean) => {
