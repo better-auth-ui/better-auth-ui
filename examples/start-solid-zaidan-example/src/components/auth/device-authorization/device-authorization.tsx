@@ -278,7 +278,7 @@ function DeviceCodeForm(props: DeviceCodeFormProps) {
     onSubmit: async ({ value }) => props.onSubmit(value.userCode)
   }))
   createEffect(() => {
-    if (form.state.values.userCode !== props.userCode) {
+    if (form.getFieldValue("userCode") !== props.userCode) {
       form.setFieldValue("userCode", props.userCode)
     }
   })

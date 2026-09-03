@@ -16,6 +16,7 @@ import {
 import { AuthProvider } from "../src/components/auth/auth-provider"
 import { useOrganizationTableState } from "../src/components/auth/organization/organization-table-state"
 import { PhoneNumber } from "../src/components/auth/phone-number/phone-number"
+import { useServerTableState } from "../src/components/auth/server-table-state"
 import { EmailFirstSignIn } from "../src/components/auth/sso/email-first-sign-in"
 import { phoneNumberPlugin } from "../src/lib/auth/phone-number-plugin"
 import { ssoPlugin } from "../src/lib/auth/sso-plugin"
@@ -73,6 +74,46 @@ function ValidatedAuthForm() {
         <form.AuthFormServerError />
       </form.AuthFormRoot>
     </form.AppForm>
+  )
+}
+
+function AsyncValidatedAuthForm({
+  validate
+}: {
+  validate: () => Promise<undefined>
+}) {
+  const form = useAuthForm({ defaultValues: { handle: "" } })
+
+  return (
+    <form.AppForm>
+      <form.AppField
+        name="handle"
+        validators={{ onChangeAsync: validate, onChangeAsyncDebounceMs: 0 }}
+      >
+        {(field) => <field.AuthFormTextField label="Handle" />}
+      </form.AppField>
+    </form.AppForm>
+  )
+}
+
+function ServerTableStateFixture() {
+  const state = useServerTableState({ pageSize: 10 })
+
+  return (
+    <>
+      <button
+        onClick={() => state.setPagination({ pageIndex: 2, pageSize: 10 })}
+        type="button"
+      >
+        Go to page three
+      </button>
+      <button onClick={() => state.atoms.globalFilter.set("ada")} type="button">
+        Filter users
+      </button>
+      <output aria-label="Server table state">
+        {state.globalFilter}|{state.pagination.pageIndex}
+      </output>
+    </>
   )
 }
 
@@ -199,7 +240,7 @@ describe("shadcn TanStack form integration", () => {
     fireEvent.change(email, { target: { value: "ada@example.com" } })
     fireEvent.change(email, { target: { value: "" } })
 
-    await waitFor(() => expect(submit).toHaveAttribute("aria-disabled", "true"))
+    await waitFor(() => expect(submit).not.toHaveAttribute("aria-disabled"))
     expect(submit).not.toHaveAttribute("disabled")
 
     fireEvent.click(submit)
@@ -213,6 +254,30 @@ describe("shadcn TanStack form integration", () => {
       await screen.findByText("This email is already registered")
     ).toBeVisible()
     expect(screen.getByText("Account creation failed")).toBeVisible()
+
+    fireEvent.change(email, { target: { value: "grace@example.com" } })
+    await waitFor(() =>
+      expect(screen.queryByText("Account creation failed")).toBeNull()
+    )
+  })
+
+  it("announces asynchronous field validation without blocking input", async () => {
+    let finishValidation!: () => void
+    const validate = vi.fn(
+      () =>
+        new Promise<undefined>((resolve) => {
+          finishValidation = () => resolve(undefined)
+        })
+    )
+    render(<AsyncValidatedAuthForm validate={validate} />)
+    const input = screen.getByRole("textbox", { name: "Handle" })
+
+    fireEvent.change(input, { target: { value: "ada" } })
+    await waitFor(() => expect(input).toHaveAttribute("aria-busy", "true"))
+    expect(input).toHaveValue("ada")
+
+    finishValidation()
+    await waitFor(() => expect(input).not.toHaveAttribute("aria-busy"))
   })
 
   it("surfaces a rejected phone code resend in the form", async () => {
@@ -292,6 +357,22 @@ describe("shadcn TanStack form integration", () => {
     fireEvent.click(screen.getByRole("button", { name: "Continue with email" }))
 
     expect(await screen.findByText("SSO discovery failed")).toBeVisible()
+  })
+})
+
+describe("shadcn TanStack server table state", () => {
+  it("returns to the first page when a query input changes", async () => {
+    render(<ServerTableStateFixture />)
+
+    fireEvent.click(screen.getByRole("button", { name: "Go to page three" }))
+    expect(screen.getByLabelText("Server table state")).toHaveTextContent("|2")
+
+    fireEvent.click(screen.getByRole("button", { name: "Filter users" }))
+    await waitFor(() =>
+      expect(screen.getByLabelText("Server table state")).toHaveTextContent(
+        "ada|0"
+      )
+    )
   })
 })
 

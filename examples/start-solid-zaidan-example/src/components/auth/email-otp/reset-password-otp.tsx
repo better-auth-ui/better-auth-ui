@@ -110,8 +110,8 @@ export function ResetPasswordOtp(props: ResetPasswordOtpProps) {
       } as Parameters<typeof resetPassword.mutateAsync>[0])
     }
   }))
-  const email = () => form.state.values.email
-  const password = () => form.state.values.password
+  const email = form.useSelector((state) => state.values.email)
+  const password = form.useSelector((state) => state.values.password)
 
   return (
     <Card class={cn("w-full max-w-sm", props.class)}>

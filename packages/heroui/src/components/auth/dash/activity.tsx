@@ -1,6 +1,9 @@
 "use client"
 
-import { getClampedTablePageIndex } from "@better-auth-ui/core"
+import {
+  DEFAULT_TABLE_SEARCH_DEBOUNCE_MS,
+  getClampedTablePageIndex
+} from "@better-auth-ui/core"
 import type {
   DashAuditLog,
   DashAuthClient
@@ -45,21 +48,19 @@ import {
   Skeleton,
   Spinner
 } from "@heroui/react"
+import { useDebouncedValue } from "@tanstack/react-pacer"
 import { keepPreviousData } from "@tanstack/react-query"
 import {
-  type ColumnFiltersState,
   columnFilteringFeature,
   createTableHook,
-  functionalUpdate,
   globalFilteringFeature,
-  type PaginationState,
   rowPaginationFeature,
-  tableFeatures,
-  type Updater
+  tableFeatures
 } from "@tanstack/react-table"
-import { useDeferredValue, useEffect, useMemo, useState } from "react"
+import { useEffect, useMemo } from "react"
 import { dashPlugin } from "../../../lib/auth/dash-plugin"
 import { organizationPlugin } from "../../../lib/auth/organization-plugin"
+import { useServerTableState } from "../server-table-state"
 
 type ActivityAccess = "admin" | "admin-user" | "organization" | "user"
 
@@ -232,18 +233,14 @@ function ActivityFeed({
 }: ActivityFeedProps) {
   const { authClient, locale } = useAuth()
   const { localization, pageSize } = useAuthPlugin(dashPlugin)
-  const [pagination, setPaginationState] = useState<PaginationState>({
-    pageIndex: 0,
-    pageSize
-  })
-  const [columnFilters, setColumnFiltersState] = useState<ColumnFiltersState>(
-    []
-  )
-  const [globalFilter, setGlobalFilterState] = useState("")
+  const tableState = useServerTableState({ pageSize })
+  const { columnFilters, globalFilter, pagination, setPagination } = tableState
   const eventType = String(
     columnFilters.find((filter) => filter.id === "eventType")?.value ?? "all"
   )
-  const deferredIdentifier = useDeferredValue(globalFilter.trim())
+  const [debouncedIdentifier] = useDebouncedValue(globalFilter.trim(), {
+    wait: DEFAULT_TABLE_SEARCH_DEBOUNCE_MS
+  })
   const eventOptions = useMemo(
     () => Object.entries(localization.eventLabels),
     [localization.eventLabels]
@@ -252,7 +249,7 @@ function ActivityFeed({
   const offset = pagination.pageIndex * pagination.pageSize
   const params = {
     eventType: eventType === "all" ? undefined : eventType,
-    identifier: deferredIdentifier || undefined,
+    identifier: debouncedIdentifier || undefined,
     limit: pagination.pageSize,
     offset,
     organizationId
@@ -298,36 +295,24 @@ function ActivityFeed({
       data?.total ?? 0
     )
     if (pageIndex !== pagination.pageIndex) {
-      setPaginationState((current) => ({ ...current, pageIndex }))
+      setPagination((current) => ({ ...current, pageIndex }))
     }
   }, [
     data?.total,
     pagination.pageIndex,
     pagination.pageSize,
     query.isSuccess,
-    ready
+    ready,
+    setPagination
   ])
-  const setPagination = (updater: Updater<PaginationState>) =>
-    setPaginationState((current) => functionalUpdate(updater, current))
-  const setColumnFilters = (updater: Updater<ColumnFiltersState>) => {
-    setColumnFiltersState((current) => functionalUpdate(updater, current))
-    setPaginationState((current) => ({ ...current, pageIndex: 0 }))
-  }
-  const setGlobalFilter = (updater: Updater<string>) => {
-    setGlobalFilterState((current) => functionalUpdate(updater, current))
-    setPaginationState((current) => ({ ...current, pageIndex: 0 }))
-  }
   const table = useActivityTable({
+    atoms: tableState.atoms,
     columns: activityColumns,
     data: data?.events ?? EMPTY_EVENTS,
     getRowId: getDashEventKey,
     manualFiltering: true,
     manualPagination: true,
-    rowCount: data?.total ?? 0,
-    state: { columnFilters, globalFilter, pagination },
-    onColumnFiltersChange: setColumnFilters,
-    onGlobalFilterChange: setGlobalFilter,
-    onPaginationChange: setPagination
+    rowCount: data?.total ?? 0
   })
 
   return (

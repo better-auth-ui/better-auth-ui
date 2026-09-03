@@ -103,8 +103,8 @@ export function VerifyEmailOtp(props: VerifyEmailOtpProps) {
       } as Parameters<typeof verifyEmail.mutateAsync>[0])
     }
   }))
-  const email = () => form.state.values.email
-  const code = () => form.state.values.code
+  const email = form.useSelector((state) => state.values.email)
+  const code = form.useSelector((state) => state.values.code)
   const verifyCode = async (completedCode: string) => {
     if (isPending() || !email()) return
     form.setFieldValue("code", completedCode)

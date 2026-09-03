@@ -208,7 +208,7 @@ describe("<SignUp />", () => {
     await user.type(password, "correct horse battery")
     await user.type(confirmPassword, "different horse battery")
     expect(screen.getByText("Passwords do not match")).toBeVisible()
-    expect(screen.getByRole("button", { name: "Sign Up" })).toBeDisabled()
+    expect(screen.getByRole("button", { name: "Sign Up" })).toBeEnabled()
     expect(password).toHaveValue("correct horse battery")
     expect(confirmPassword).toHaveValue("different horse battery")
     expect(name).toHaveValue("Ada Lovelace")

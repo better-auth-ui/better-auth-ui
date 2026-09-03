@@ -13,6 +13,7 @@ import {
 import { OrganizationTableRenderer } from "../src/components/auth/organization/organization-table-renderer"
 import { OrganizationTableSelectRow } from "../src/components/auth/organization/organization-table-selection"
 import { createOrganizationTableState } from "../src/components/auth/organization/organization-table-state"
+import { createServerTableState } from "../src/components/auth/server-table-state"
 
 afterEach(cleanup)
 
@@ -104,6 +105,50 @@ function ValidatedAuthForm() {
         <form.AuthFormServerError />
       </form.AuthFormRoot>
     </form.AppForm>
+  )
+}
+
+function AsyncValidatedAuthForm(props: { validate: () => Promise<undefined> }) {
+  const form = createAuthForm(() => ({ defaultValues: { handle: "" } }))
+
+  return (
+    <form.AppForm>
+      <form.AppField
+        name="handle"
+        validators={{
+          onChangeAsync: props.validate,
+          onChangeAsyncDebounceMs: 0
+        }}
+      >
+        {(field) => <field.AuthFormTextField label="Handle" />}
+      </form.AppField>
+    </form.AppForm>
+  )
+}
+
+function ServerTableStateFixture() {
+  const state = createServerTableState({ pageSize: 10 })
+
+  return (
+    <>
+      <button
+        onClick={() => state.setPagination({ pageIndex: 2, pageSize: 10 })}
+        type="button"
+      >
+        Go to page three
+      </button>
+      <button
+        onClick={() =>
+          state.atoms.columnFilters.set([{ id: "status", value: "active" }])
+        }
+        type="button"
+      >
+        Filter users
+      </button>
+      <output aria-label="Server table state">
+        {state.columnFilters().length}|{state.pagination().pageIndex}
+      </output>
+    </>
   )
 }
 
@@ -227,6 +272,11 @@ describe("Solid auth form", () => {
       expect(view.getByText("This email is already registered")).toBeVisible()
     )
     expect(view.getByText("Account creation failed")).toBeVisible()
+
+    fireEvent.input(email, { target: { value: "grace@example.com" } })
+    await vi.waitFor(() =>
+      expect(view.queryByText("Account creation failed")).toBeNull()
+    )
   })
 
   it("keeps an invalid submit action reachable so TanStack can reveal errors", async () => {
@@ -237,9 +287,7 @@ describe("Solid auth form", () => {
     fireEvent.input(email, { target: { value: "ada@example.com" } })
     fireEvent.input(email, { target: { value: "" } })
 
-    await vi.waitFor(() =>
-      expect(submit).toHaveAttribute("aria-disabled", "true")
-    )
+    await vi.waitFor(() => expect(submit).not.toHaveAttribute("aria-disabled"))
     expect(submit).not.toHaveAttribute("disabled")
 
     fireEvent.click(submit)
@@ -248,6 +296,39 @@ describe("Solid auth form", () => {
       expect(view.getByText("Email is required")).toBeVisible()
     )
     await vi.waitFor(() => expect(email).toHaveFocus())
+  })
+
+  it("announces asynchronous field validation without blocking input", async () => {
+    let finishValidation!: () => void
+    const validate = vi.fn(
+      () =>
+        new Promise<undefined>((resolve) => {
+          finishValidation = () => resolve(undefined)
+        })
+    )
+    const view = render(() => <AsyncValidatedAuthForm validate={validate} />)
+    const input = view.getByRole("textbox", { name: "Handle" })
+
+    fireEvent.input(input, { target: { value: "ada" } })
+    await vi.waitFor(() => expect(input).toHaveAttribute("aria-busy", "true"))
+    expect(input).toHaveValue("ada")
+
+    finishValidation()
+    await vi.waitFor(() => expect(input).not.toHaveAttribute("aria-busy"))
+  })
+})
+
+describe("Solid TanStack server table state", () => {
+  it("returns to the first page when a filter changes", async () => {
+    const view = render(() => <ServerTableStateFixture />)
+
+    fireEvent.click(view.getByRole("button", { name: "Go to page three" }))
+    expect(view.getByLabelText("Server table state")).toHaveTextContent("0|2")
+
+    fireEvent.click(view.getByRole("button", { name: "Filter users" }))
+    await vi.waitFor(() =>
+      expect(view.getByLabelText("Server table state")).toHaveTextContent("1|0")
+    )
   })
 })
 

@@ -292,7 +292,7 @@ describe("SSO provider management", () => {
     expect(screen.getAllByText("This field is required")).toHaveLength(2)
     expect(
       screen.getByRole("button", { name: /add sso provider/i })
-    ).toBeDisabled()
+    ).toBeEnabled()
     expect(authClient.sso.register).not.toHaveBeenCalled()
   })
 

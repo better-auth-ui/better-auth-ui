@@ -142,8 +142,8 @@ export function PhoneNumber(props: PhoneNumberProps) {
       } as Parameters<typeof verify.mutateAsync>[0])
     }
   }))
-  const phoneNumber = () => form.state.values.phoneNumber
-  const code = () => form.state.values.code
+  const phoneNumber = form.useSelector((state) => state.values.phoneNumber)
+  const code = form.useSelector((state) => state.values.code)
   const requestCode = async () => {
     try {
       await sendOtp.mutateAsync({

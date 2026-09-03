@@ -34,6 +34,8 @@ export type TablePersistenceAdapters = {
   storage?: TableStorageAdapter
 }
 
+export const DEFAULT_TABLE_SEARCH_DEBOUNCE_MS = 300
+
 /**
  * Create a search adapter from a router's search and navigation primitives.
  *
