@@ -323,7 +323,7 @@ function DeviceCodeForm({
   useEffect(() => {
     form.setFieldValue("userCode", initialUserCode)
     if (initialUserCode.length === userCodeLength) {
-      void onSubmitCode(initialUserCode)
+      void onSubmitCode(initialUserCode).catch(() => undefined)
     }
   }, [form.setFieldValue, initialUserCode, onSubmitCode, userCodeLength])
 
@@ -369,7 +369,7 @@ function DeviceCodeForm({
                         field.handleChange(nextCode)
                         onCodeChange(nextCode)
                         if (nextCode.length === userCodeLength)
-                          void onSubmitCode(nextCode)
+                          void onSubmitCode(nextCode).catch(() => undefined)
                       }}
                     >
                       <InputOTPGroup>

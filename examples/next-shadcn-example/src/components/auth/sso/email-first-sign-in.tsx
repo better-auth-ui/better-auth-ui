@@ -237,6 +237,8 @@ export function EmailFirstSignIn({
                   </FieldDescription>
                 )}
 
+                <form.AuthFormServerError />
+
                 <form.AuthFormSubmitButton disabled={isPending}>
                   {isDiscovering && <Spinner data-icon="inline-start" />}
                   {ssoLocalization.continueWithEmail}
@@ -372,6 +374,8 @@ export function EmailFirstSignIn({
                     {Captcha && (
                       <div className="flex justify-center">{Captcha}</div>
                     )}
+
+                    <form.AuthFormServerError />
 
                     <form.AuthFormSubmitButton disabled={isPending}>
                       {isSigningIn && <Spinner data-icon="inline-start" />}

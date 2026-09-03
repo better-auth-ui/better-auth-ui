@@ -8,8 +8,8 @@ import {
   screen,
   waitFor
 } from "@testing-library/react"
+import userEvent from "@testing-library/user-event"
 import { afterEach, describe, expect, it, vi } from "vitest"
-import { OrganizationSortableTableHeader } from "../src/components/auth/organization/organization-sortable-table-header"
 import {
   createOrganizationColumnHelper,
   useOrganizationTable
@@ -122,23 +122,16 @@ describe("organization table state", () => {
     ).toEqual(["3", "2", "1"])
   })
 
-  it("renders TanStack multi-sort state through HeroUI columns", () => {
+  it("renders TanStack multi-sort state through HeroUI columns", async () => {
+    const user = userEvent.setup()
     const sortableColumns = columnHelper.columns([
       columnHelper.accessor("group", {
         cell: ({ getValue }) => getValue(),
-        header: ({ column }) => (
-          <OrganizationSortableTableHeader column={column}>
-            Group
-          </OrganizationSortableTableHeader>
-        )
+        header: "Group"
       }),
       columnHelper.accessor("name", {
         cell: ({ getValue }) => getValue(),
-        header: ({ column }) => (
-          <OrganizationSortableTableHeader column={column}>
-            Name
-          </OrganizationSortableTableHeader>
-        )
+        header: "Name"
       })
     ])
 
@@ -168,8 +161,22 @@ describe("organization table state", () => {
       "aria-sort",
       "ascending"
     )
-    expect(screen.getByRole("button", { name: /Group/ })).toHaveTextContent("1")
-    expect(screen.getByRole("button", { name: /Name/ })).toHaveTextContent("2")
+    expect(
+      screen.getByRole("columnheader", { name: /Group/ })
+    ).toHaveTextContent("1")
+    expect(
+      screen.getByRole("columnheader", { name: /Name/ })
+    ).toHaveTextContent("2")
+
+    await user.click(screen.getByRole("columnheader", { name: /Group/ }))
+    await waitFor(() =>
+      expect(
+        screen.getByRole("columnheader", { name: /Group/ })
+      ).toHaveAttribute("aria-sort", "descending")
+    )
+    expect(
+      screen.getByRole("columnheader", { name: /Name/ })
+    ).toHaveTextContent("2")
   })
 
   it("paginates client data but leaves server pages intact", () => {
@@ -348,5 +355,51 @@ describe("organization table state", () => {
 
     await waitFor(() => expect(params.get("router.search")).toBe("local"))
     expect(replacements).toBe(1)
+  })
+
+  it("restores before writing when the adapter and state key change", async () => {
+    let firstParams = new URLSearchParams("first.search=alpha")
+    let secondParams = new URLSearchParams("second.search=beta")
+    let secondReplacements = 0
+    const firstAdapters: TablePersistenceAdapters = {
+      search: {
+        read: () => new URLSearchParams(firstParams),
+        replace: (next) => {
+          firstParams = new URLSearchParams(next)
+        },
+        subscribe: () => () => {}
+      }
+    }
+    const secondAdapters: TablePersistenceAdapters = {
+      search: {
+        read: () => new URLSearchParams(secondParams),
+        replace: (next) => {
+          secondReplacements += 1
+          secondParams = new URLSearchParams(next)
+        },
+        subscribe: () => () => {}
+      }
+    }
+    const { result, rerender } = renderHook(
+      ({ adapters, stateKey }) =>
+        useOrganizationTableState(stateKey, 10, TEST_COLUMN_IDS, adapters),
+      {
+        initialProps: { adapters: firstAdapters, stateKey: "first" }
+      }
+    )
+
+    await waitFor(() => {
+      expect(result.current.ready).toBe(true)
+      expect(result.current.globalFilter).toBe("alpha")
+    })
+
+    rerender({ adapters: secondAdapters, stateKey: "second" })
+
+    await waitFor(() => {
+      expect(result.current.ready).toBe(true)
+      expect(result.current.globalFilter).toBe("beta")
+    })
+    expect(secondReplacements).toBe(0)
+    expect(secondParams.get("second.search")).toBe("beta")
   })
 })

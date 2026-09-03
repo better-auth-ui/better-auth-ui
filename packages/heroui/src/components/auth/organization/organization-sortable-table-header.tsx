@@ -11,23 +11,20 @@ type SortableColumn = {
 
 export function OrganizationSortableTableHeader({
   children,
-  column
+  column,
+  interactive = true
 }: {
   children: ReactNode
   column?: SortableColumn
+  interactive?: boolean
 }) {
   const sortDirection = column?.getIsSorted()
   const onPress = column?.getToggleSortingHandler()
 
   if (!onPress) return children
 
-  return (
-    <Button
-      className="h-auto min-w-0 justify-start gap-1 p-0 font-medium"
-      onPress={(event) => onPress(event)}
-      size="sm"
-      variant="tertiary"
-    >
+  const content = (
+    <>
       {children}
 
       {sortDirection && (
@@ -43,6 +40,21 @@ export function OrganizationSortableTableHeader({
           </span>
         </>
       )}
+    </>
+  )
+
+  if (!interactive) {
+    return <span className="flex items-center gap-1">{content}</span>
+  }
+
+  return (
+    <Button
+      className="h-auto min-w-0 justify-start gap-1 p-0 font-medium"
+      onPress={(event) => onPress(event)}
+      size="sm"
+      variant="tertiary"
+    >
+      {content}
     </Button>
   )
 }

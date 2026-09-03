@@ -39,7 +39,7 @@ import { Spinner } from "@/components/ui/spinner"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { twoFactorPlugin } from "@/lib/auth/two-factor-plugin"
 import { useTwoFactorPasswordRequirement } from "@/lib/auth/use-two-factor-password"
-import { useAuthForm } from "../auth-form"
+import { submitAuthForm, useAuthForm } from "../auth-form"
 import { OtpField } from "../otp-field"
 import { BackupCodes } from "./backup-codes"
 
@@ -339,7 +339,7 @@ export function EnableTwoFactorDialog({
                       name={field.name}
                       value={field.state.value}
                       onChange={field.handleChange}
-                      onComplete={verifyCode}
+                      onComplete={() => void submitAuthForm(form)}
                     />
                   )}
                 </form.AppField>
@@ -347,6 +347,8 @@ export function EnableTwoFactorDialog({
             )}
 
             {step === "backupCodes" && <BackupCodes codes={backupCodes} />}
+
+            <form.AuthFormServerError />
 
             <DialogFooter>
               {step !== "backupCodes" && (

@@ -33,7 +33,7 @@ import {
   useResendCooldown
 } from "@/lib/auth/use-resend-cooldown"
 import { cn } from "@/lib/utils"
-import { useAuthForm } from "../auth-form"
+import { runAuthFormAction, submitAuthForm, useAuthForm } from "../auth-form"
 import { OpenEmailButton } from "../open-email-button"
 import { OtpField } from "../otp-field"
 import { useIsHydrated } from "../use-is-hydrated"
@@ -163,7 +163,7 @@ export function VerifyEmailOtp({ className }: VerifyEmailOtpProps) {
                       name="otp"
                       value={field.state.value}
                       onChange={field.handleChange}
-                      onComplete={verifyCode}
+                      onComplete={() => void submitAuthForm(form)}
                     />
                   )}
                 </form.AppField>
@@ -196,6 +196,8 @@ export function VerifyEmailOtp({ className }: VerifyEmailOtpProps) {
                 </form.AppField>
               )}
 
+              <form.AuthFormServerError />
+
               <div className="flex flex-col gap-3">
                 <form.AuthFormSubmitButton
                   disabled={isPending || (Boolean(email) && !codeComplete)}
@@ -215,7 +217,12 @@ export function VerifyEmailOtp({ className }: VerifyEmailOtpProps) {
                     variant="outline"
                     disabled={isPending || isCoolingDown}
                     onClick={() =>
-                      sendVerificationOtp({ email, type: "email-verification" })
+                      void runAuthFormAction(form, () =>
+                        sendVerificationOtp({
+                          email,
+                          type: "email-verification"
+                        })
+                      )
                     }
                   >
                     {isCoolingDown

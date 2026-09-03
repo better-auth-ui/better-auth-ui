@@ -349,6 +349,8 @@ export function SignInUsername({
                     <div className="flex justify-center">{Captcha}</div>
                   )}
 
+                  <form.AuthFormServerError />
+
                   <div className="flex flex-col gap-3">
                     <form.AuthFormSubmitButton
                       className="relative overflow-visible"

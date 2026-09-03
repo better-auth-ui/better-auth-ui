@@ -51,7 +51,7 @@ import { phoneNumberPlugin } from "@/lib/auth/phone-number-plugin"
 import { useResendCooldown } from "@/lib/auth/use-resend-cooldown"
 import { useSignInContinuation } from "@/lib/auth/use-sign-in-continuation"
 import { cn } from "@/lib/utils"
-import { useAuthForm } from "../auth-form"
+import { runAuthFormAction, submitAuthForm, useAuthForm } from "../auth-form"
 import { OtpField } from "../otp-field"
 import { ProviderButtons, type SocialLayout } from "../provider-buttons"
 import { InternationalPhoneField } from "./international-phone-field"
@@ -262,7 +262,7 @@ export function PhoneNumber({
                         name="otp"
                         value={field.state.value}
                         onChange={field.handleChange}
-                        onComplete={verifyCode}
+                        onComplete={() => void submitAuthForm(form)}
                       />
                     )}
                   </form.AppField>
@@ -379,6 +379,8 @@ export function PhoneNumber({
                   </>
                 )}
 
+                <form.AuthFormServerError />
+
                 <div className="flex flex-col gap-3">
                   <form.AuthFormSubmitButton
                     disabled={isPending || (codeSent && !codeComplete)}
@@ -399,7 +401,7 @@ export function PhoneNumber({
                         type="button"
                         variant="outline"
                         disabled={isPending || isCoolingDown}
-                        onClick={sendCode}
+                        onClick={() => void runAuthFormAction(form, sendCode)}
                       >
                         {isCoolingDown
                           ? localization.auth.resendIn.replace(

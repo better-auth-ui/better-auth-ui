@@ -88,6 +88,10 @@ export function useOrganizationTableState(
     () => persistenceAdapters ?? createBrowserTablePersistenceAdapters(),
     [persistenceAdapters]
   )
+  const urlStateToken = useMemo(
+    () => ({ adapters, defaultPageSize, stableAllowedColumnIds, stateKey }),
+    [adapters, defaultPageSize, stableAllowedColumnIds, stateKey]
+  )
   const columnFiltersAtom = useCreateAtom<ColumnFiltersState>([])
   const columnVisibilityAtom = useCreateAtom<ColumnVisibilityState>({})
   const globalFilterAtom = useCreateAtom("")
@@ -103,8 +107,10 @@ export function useOrganizationTableState(
   const pagination = useSelector(paginationAtom)
   const rowSelection = useSelector(rowSelectionAtom)
   const sorting = useSelector(sortingAtom)
-  const [urlReady, setUrlReady] = useState(false)
+  const [restoredUrlStateToken, setRestoredUrlStateToken] =
+    useState<typeof urlStateToken>()
   const [visibilityReady, setVisibilityReady] = useState(false)
+  const urlReady = restoredUrlStateToken === urlStateToken
   const restoringUrlState = useRef(false)
   const syncedSearch = useRef("")
   const atoms = useMemo(
@@ -206,7 +212,7 @@ export function useOrganizationTableState(
   ])
 
   useEffect(() => {
-    if (!visibilityReady) return
+    if (!urlReady || !visibilityReady) return
     try {
       adapters.storage?.write(
         `${TABLE_STATE_STORAGE_PREFIX}:${stateKey}:columns`,
@@ -215,9 +221,11 @@ export function useOrganizationTableState(
     } catch {
       // Browsers can disable storage while still allowing the table to work.
     }
-  }, [adapters, columnVisibility, stateKey, visibilityReady])
+  }, [adapters, columnVisibility, stateKey, urlReady, visibilityReady])
 
   useEffect(() => {
+    setRestoredUrlStateToken(undefined)
+    setVisibilityReady(false)
     columnVisibilityAtom.set(
       readColumnVisibility(adapters, stateKey, stableAllowedColumnIds)
     )
@@ -238,7 +246,7 @@ export function useOrganizationTableState(
       sortingAtom.set(next.sorting)
       paginationAtom.set(next.pagination)
       restoringUrlState.current = false
-      setUrlReady(true)
+      setRestoredUrlStateToken(urlStateToken)
     }
     restoreUrlState()
     return adapters.search.subscribe(restoreUrlState)
@@ -251,7 +259,8 @@ export function useOrganizationTableState(
     paginationAtom,
     sortingAtom,
     stableAllowedColumnIds,
-    stateKey
+    stateKey,
+    urlStateToken
   ])
 
   return {

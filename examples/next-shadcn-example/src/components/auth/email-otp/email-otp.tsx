@@ -33,7 +33,7 @@ import { emailOtpPlugin } from "@/lib/auth/email-otp-plugin"
 import { useResendCooldown } from "@/lib/auth/use-resend-cooldown"
 import { useSignInContinuation } from "@/lib/auth/use-sign-in-continuation"
 import { cn } from "@/lib/utils"
-import { useAuthForm } from "../auth-form"
+import { runAuthFormAction, submitAuthForm, useAuthForm } from "../auth-form"
 import { OpenEmailButton } from "../open-email-button"
 import { OtpField } from "../otp-field"
 import { ProviderButtons, type SocialLayout } from "../provider-buttons"
@@ -175,7 +175,7 @@ export function EmailOtp({
                         name={field.name}
                         value={field.state.value}
                         onChange={field.handleChange}
-                        onComplete={verifyCode}
+                        onComplete={() => void submitAuthForm(form)}
                       />
                     )}
                   </form.AppField>
@@ -206,6 +206,8 @@ export function EmailOtp({
                   </form.AppField>
                 )}
 
+                <form.AuthFormServerError />
+
                 <div className="flex flex-col gap-3">
                   <form.AuthFormSubmitButton
                     disabled={
@@ -227,7 +229,7 @@ export function EmailOtp({
                         type="button"
                         variant="outline"
                         disabled={isPending || isSigningIn || isCoolingDown}
-                        onClick={sendCode}
+                        onClick={() => void runAuthFormAction(form, sendCode)}
                       >
                         {isCoolingDown
                           ? localization.auth.resendIn.replace(

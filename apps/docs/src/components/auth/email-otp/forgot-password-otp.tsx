@@ -122,6 +122,8 @@ export function ForgotPasswordOtp({ className }: ForgotPasswordOtpProps) {
 
               {Captcha && <div className="flex justify-center">{Captcha}</div>}
 
+              <form.AuthFormServerError />
+
               <form.AuthFormSubmitButton disabled={isPending}>
                 {isPending && <Spinner />}
 

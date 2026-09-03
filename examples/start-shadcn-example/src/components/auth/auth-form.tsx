@@ -93,6 +93,23 @@ export function clearAuthFormServerError(form: AnyFormApi) {
   form.setErrorMap({ onServer: undefined })
 }
 
+export async function runAuthFormAction(
+  form: AnyFormApi,
+  action: () => Promise<unknown>,
+  serverErrorMessage = DEFAULT_AUTH_FORM_SERVER_ERROR
+) {
+  clearAuthFormServerError(form)
+  try {
+    await action()
+    return true
+  } catch (error) {
+    if (!form.state.errorMap.onServer) {
+      setAuthFormServerError(form, error, serverErrorMessage)
+    }
+    return false
+  }
+}
+
 export async function submitAuthForm(
   form: AnyFormApi,
   serverErrorMessage = DEFAULT_AUTH_FORM_SERVER_ERROR

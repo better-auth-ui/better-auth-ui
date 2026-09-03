@@ -5,15 +5,26 @@ import {
   fireEvent,
   render,
   screen,
-  waitFor
+  waitFor,
+  within
 } from "@testing-library/react"
 import { afterEach, describe, expect, it, vi } from "vitest"
-
 import {
   setAuthFormServerError,
   useAuthForm
 } from "../src/components/auth/auth-form"
+import { AuthProvider } from "../src/components/auth/auth-provider"
 import { useOrganizationTableState } from "../src/components/auth/organization/organization-table-state"
+import { PhoneNumber } from "../src/components/auth/phone-number/phone-number"
+import { phoneNumberPlugin } from "../src/lib/auth/phone-number-plugin"
+
+vi.mock("@/lib/auth/use-resend-cooldown", () => ({
+  useResendCooldown: () => ({
+    cooldown: 0,
+    isCoolingDown: false,
+    startCooldown: vi.fn()
+  })
+}))
 
 afterEach(cleanup)
 
@@ -64,12 +75,14 @@ function ValidatedAuthForm() {
 }
 
 function RouterTableStateFixture({
-  adapters
+  adapters,
+  stateKey = "router"
 }: {
   adapters: TablePersistenceAdapters
+  stateKey?: string
 }) {
   const state = useOrganizationTableState(
-    "router",
+    stateKey,
     10,
     ["group", "name"],
     adapters
@@ -87,6 +100,44 @@ function RouterTableStateFixture({
       </output>
     </>
   )
+}
+
+function createPhoneAuthClient() {
+  const sendOtp = vi.fn(async () => ({ status: true }))
+  const verify = vi.fn(async () => ({ token: "session-token" }))
+
+  return {
+    phoneNumber: { sendOtp, verify },
+    signIn: { phoneNumber: vi.fn(async () => ({ token: "session-token" })) },
+    getSession: async () => null
+  } as unknown as Parameters<typeof AuthProvider>[0]["authClient"] & {
+    phoneNumber: {
+      sendOtp: typeof sendOtp
+      verify: typeof verify
+    }
+  }
+}
+
+function renderPhoneNumber() {
+  const authClient = createPhoneAuthClient()
+
+  return {
+    authClient,
+    ...render(
+      <AuthProvider
+        authClient={authClient}
+        Link={({ children, href, to: _to, ...props }) => (
+          <a href={href} {...props}>
+            {children}
+          </a>
+        )}
+        navigate={() => {}}
+        plugins={[phoneNumberPlugin({ countries: ["US"] })]}
+      >
+        <PhoneNumber />
+      </AuthProvider>
+    )
+  }
 }
 
 describe("shadcn TanStack form integration", () => {
@@ -134,6 +185,58 @@ describe("shadcn TanStack form integration", () => {
     ).toBeVisible()
     expect(screen.getByText("Account creation failed")).toBeVisible()
   })
+
+  it("surfaces a rejected phone code resend in the form", async () => {
+    const { authClient, container } = renderPhoneNumber()
+
+    fireEvent.change(screen.getByRole("textbox", { name: "Phone number" }), {
+      target: { value: "4155552671" }
+    })
+    fireEvent.click(screen.getByRole("button", { name: "Send code" }))
+    await waitFor(() =>
+      expect(authClient.phoneNumber.sendOtp).toHaveBeenCalled()
+    )
+
+    authClient.phoneNumber.sendOtp.mockRejectedValueOnce(
+      new Error("Unable to resend the phone code")
+    )
+    fireEvent.click(screen.getByRole("button", { name: "Resend" }))
+
+    const form = container.querySelector("form")
+    expect(form).not.toBeNull()
+    expect(
+      await within(form as HTMLFormElement).findByText(
+        "Unable to resend the phone code"
+      )
+    ).toBeVisible()
+  })
+
+  it("surfaces a rejected phone code verification in the form", async () => {
+    const { authClient, container } = renderPhoneNumber()
+
+    fireEvent.change(screen.getByRole("textbox", { name: "Phone number" }), {
+      target: { value: "4155552671" }
+    })
+    fireEvent.click(screen.getByRole("button", { name: "Send code" }))
+    await waitFor(() =>
+      expect(authClient.phoneNumber.sendOtp).toHaveBeenCalled()
+    )
+
+    authClient.phoneNumber.verify.mockRejectedValueOnce(
+      new Error("Unable to verify the phone code")
+    )
+    fireEvent.change(screen.getByRole("textbox", { name: "Phone code" }), {
+      target: { value: "123456" }
+    })
+
+    const form = container.querySelector("form")
+    expect(form).not.toBeNull()
+    expect(
+      await within(form as HTMLFormElement).findByText(
+        "Unable to verify the phone code"
+      )
+    ).toBeVisible()
+  })
 })
 
 describe("shadcn TanStack table state", () => {
@@ -172,5 +275,51 @@ describe("shadcn TanStack table state", () => {
     )
     expect(replacements).toBe(1)
     expect(params.get("router.search")).toBe("local")
+  })
+
+  it("restores before writing when the adapter and state key change", async () => {
+    let firstParams = new URLSearchParams("first.search=alpha")
+    let secondParams = new URLSearchParams("second.search=beta")
+    let secondReplacements = 0
+    const firstAdapters: TablePersistenceAdapters = {
+      search: {
+        read: () => new URLSearchParams(firstParams),
+        replace: (next) => {
+          firstParams = new URLSearchParams(next)
+        },
+        subscribe: () => () => {}
+      }
+    }
+    const secondAdapters: TablePersistenceAdapters = {
+      search: {
+        read: () => new URLSearchParams(secondParams),
+        replace: (next) => {
+          secondReplacements += 1
+          secondParams = new URLSearchParams(next)
+        },
+        subscribe: () => () => {}
+      }
+    }
+    const { rerender } = render(
+      <RouterTableStateFixture adapters={firstAdapters} stateKey="first" />
+    )
+
+    await waitFor(() =>
+      expect(
+        screen.getByRole("status", { name: "Restored table state" })
+      ).toHaveTextContent("alpha||0")
+    )
+
+    rerender(
+      <RouterTableStateFixture adapters={secondAdapters} stateKey="second" />
+    )
+
+    await waitFor(() =>
+      expect(
+        screen.getByRole("status", { name: "Restored table state" })
+      ).toHaveTextContent("beta||0")
+    )
+    expect(secondReplacements).toBe(0)
+    expect(secondParams.get("second.search")).toBe("beta")
   })
 })

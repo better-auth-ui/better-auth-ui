@@ -40,7 +40,7 @@ import {
   useResendCooldown
 } from "@/lib/auth/use-resend-cooldown"
 import { cn } from "@/lib/utils"
-import { useAuthForm } from "../auth-form"
+import { runAuthFormAction, submitAuthForm, useAuthForm } from "../auth-form"
 import { OtpField } from "../otp-field"
 import { useIsHydrated } from "../use-is-hydrated"
 
@@ -261,7 +261,7 @@ export function TwoFactorChallenge({ className }: TwoFactorChallengeProps) {
                       name={field.name}
                       value={field.state.value}
                       onChange={field.handleChange}
-                      onComplete={verifyCode}
+                      onComplete={() => void submitAuthForm(form)}
                     />
                   )}
                 </form.AppField>
@@ -289,12 +289,16 @@ export function TwoFactorChallenge({ className }: TwoFactorChallengeProps) {
                 </form.AppField>
               )}
 
+              <form.AuthFormServerError />
+
               <div className="flex flex-col gap-3">
                 {needsOtpRequest ? (
                   <Button
                     type="button"
                     disabled={isSendingOtp}
-                    onClick={() => sendTwoFactorOtp()}
+                    onClick={() =>
+                      void runAuthFormAction(form, () => sendTwoFactorOtp())
+                    }
                   >
                     {isSendingOtp && <Spinner />}
 
@@ -321,7 +325,9 @@ export function TwoFactorChallenge({ className }: TwoFactorChallengeProps) {
                     type="button"
                     variant="outline"
                     disabled={isPending || isCoolingDown}
-                    onClick={() => sendTwoFactorOtp()}
+                    onClick={() =>
+                      void runAuthFormAction(form, () => sendTwoFactorOtp())
+                    }
                   >
                     {isCoolingDown
                       ? localization.auth.resendIn.replace(

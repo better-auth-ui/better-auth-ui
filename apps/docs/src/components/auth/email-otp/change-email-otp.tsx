@@ -19,7 +19,7 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { Spinner } from "@/components/ui/spinner"
 import { emailOtpPlugin } from "@/lib/auth/email-otp-plugin"
 import { cn } from "@/lib/utils"
-import { useAuthForm } from "../auth-form"
+import { submitAuthForm, useAuthForm } from "../auth-form"
 import { OpenEmailButton } from "../open-email-button"
 import { OtpField } from "../otp-field"
 
@@ -234,10 +234,12 @@ export function ChangeEmailOtp({ className }: ChangeEmailOtpProps) {
                         name="otp"
                         value={field.state.value}
                         onChange={field.handleChange}
-                        onComplete={submitCode}
+                        onComplete={() => void submitAuthForm(form)}
                       />
                     )}
                   </form.AppField>
+
+                  <form.AuthFormServerError />
 
                   {codeTarget && (
                     <OpenEmailButton email={codeTarget} variant="secondary" />
