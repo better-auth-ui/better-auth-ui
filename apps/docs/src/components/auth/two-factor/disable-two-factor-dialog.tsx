@@ -43,7 +43,7 @@ export function DisableTwoFactorDialog({
   const { isPending: isResolvingPasswordRequirement, requiresPassword } =
     useTwoFactorPasswordRequirement()
 
-  const { mutate: disableTwoFactor, isPending: isDisabling } =
+  const { mutateAsync: disableTwoFactor, isPending: isDisabling } =
     useDisableTwoFactor(authClient as TwoFactorAuthClient, {
       onSuccess: () => {
         toast.success(twoFactorLocalization.twoFactorDisabled)
@@ -55,8 +55,10 @@ export function DisableTwoFactorDialog({
 
   const form = useAuthForm({
     defaultValues: { password: "" },
-    onSubmit: ({ value }) =>
-      disableTwoFactor(requiresPassword ? { password: value.password } : {})
+    onSubmit: async ({ value }) =>
+      await disableTwoFactor(
+        requiresPassword ? { password: value.password } : {}
+      )
   })
 
   return (

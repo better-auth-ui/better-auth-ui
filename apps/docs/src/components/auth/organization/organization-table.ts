@@ -38,8 +38,7 @@ export const organizationTableFeatures = tableFeatures({
 
 export const {
   createAppColumnHelper: createOrganizationColumnHelper,
-  useAppTable: useOrganizationTable,
-  useTableContext: useOrganizationTableContext
+  useAppTable: useOrganizationTable
 } = createTableHook({
   enableMultiSort: true,
   sortDescFirst: false,

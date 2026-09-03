@@ -33,7 +33,7 @@ import {
   useResendCooldown
 } from "@/lib/auth/use-resend-cooldown"
 import { cn } from "@/lib/utils"
-import { useAuthForm } from "../auth-form"
+import { runAuthFormAction, submitAuthForm, useAuthForm } from "../auth-form"
 import { OpenEmailButton } from "../open-email-button"
 import { OtpField } from "../otp-field"
 import { useIsHydrated } from "../use-is-hydrated"
@@ -88,7 +88,7 @@ export function VerifyEmailOtp({ className }: VerifyEmailOtpProps) {
     if (pendingEmail) startCooldown(RESEND_COOLDOWN_SECONDS)
   }, [startCooldown])
 
-  const { mutate: sendVerificationOtp, isPending: isSending } =
+  const { mutateAsync: sendVerificationOtp, isPending: isSending } =
     useSendVerificationOtp(otpClient, {
       onSuccess: (_data, { email: sentTo }) => {
         sessionStorage.setItem(VERIFY_EMAIL_STORAGE_KEY, sentTo)
@@ -98,37 +98,35 @@ export function VerifyEmailOtp({ className }: VerifyEmailOtpProps) {
       }
     })
 
-  const { mutate: verifyEmailOtp, isPending: isVerifying } = useVerifyEmailOtp(
-    otpClient,
-    {
+  const { mutateAsync: verifyEmailOtp, isPending: isVerifying } =
+    useVerifyEmailOtp(otpClient, {
       onError: () => form.setFieldValue("code", ""),
       onSuccess: () => {
         sessionStorage.removeItem(VERIFY_EMAIL_STORAGE_KEY)
         toast.success(emailOtpLocalization.emailVerified)
         navigate({ to: redirectTo })
       }
-    }
-  )
+    })
 
   const isPending = isSending || isVerifying
 
-  const verifyCode = (completedCode: string) => {
+  const verifyCode = async (completedCode: string) => {
     if (isPending || !email) return
 
-    verifyEmailOtp({ email, otp: completedCode })
+    await verifyEmailOtp({ email, otp: completedCode })
   }
 
   const form = useAuthForm({
     defaultValues: { code: "", email: "" },
-    onSubmit: ({ value }) => {
+    onSubmit: async ({ value }) => {
       if (!email) {
-        sendVerificationOtp({
+        await sendVerificationOtp({
           email: value.email,
           type: "email-verification"
         })
         return
       }
-      verifyCode(value.code)
+      await verifyCode(value.code)
     }
   })
   const codeComplete = useSelector(
@@ -165,7 +163,7 @@ export function VerifyEmailOtp({ className }: VerifyEmailOtpProps) {
                       name="otp"
                       value={field.state.value}
                       onChange={field.handleChange}
-                      onComplete={verifyCode}
+                      onComplete={() => void submitAuthForm(form)}
                     />
                   )}
                 </form.AppField>
@@ -198,6 +196,8 @@ export function VerifyEmailOtp({ className }: VerifyEmailOtpProps) {
                 </form.AppField>
               )}
 
+              <form.AuthFormServerError />
+
               <div className="flex flex-col gap-3">
                 <form.AuthFormSubmitButton
                   disabled={isPending || (Boolean(email) && !codeComplete)}
@@ -217,7 +217,12 @@ export function VerifyEmailOtp({ className }: VerifyEmailOtpProps) {
                     variant="outline"
                     disabled={isPending || isCoolingDown}
                     onClick={() =>
-                      sendVerificationOtp({ email, type: "email-verification" })
+                      void runAuthFormAction(form, () =>
+                        sendVerificationOtp({
+                          email,
+                          type: "email-verification"
+                        })
+                      )
                     }
                   >
                     {isCoolingDown

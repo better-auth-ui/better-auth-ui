@@ -35,6 +35,8 @@ import { AdditionalField, type AdditionalFieldProps } from "./additional-field"
 const { fieldContext, formContext, useFieldContext, useFormContext } =
   createFormHookContexts()
 
+const DEFAULT_AUTH_FORM_SERVER_ERROR = "Unable to submit this form. Try again."
+
 export function focusFirstInvalidAuthFormControl(form: HTMLFormElement) {
   requestAnimationFrame(() => {
     form
@@ -91,16 +93,35 @@ export function clearAuthFormServerError(form: AnyFormApi) {
   form.setErrorMap({ onServer: undefined })
 }
 
+export async function runAuthFormAction(
+  form: AnyFormApi,
+  action: () => Promise<unknown>,
+  serverErrorMessage = DEFAULT_AUTH_FORM_SERVER_ERROR
+) {
+  clearAuthFormServerError(form)
+  try {
+    await action()
+    return true
+  } catch (error) {
+    if (!form.state.errorMap.onServer) {
+      setAuthFormServerError(form, error, serverErrorMessage)
+    }
+    return false
+  }
+}
+
 export async function submitAuthForm(
   form: AnyFormApi,
-  serverErrorMessage = "Unable to submit this form. Try again."
+  serverErrorMessage = DEFAULT_AUTH_FORM_SERVER_ERROR
 ) {
   clearAuthFormServerError(form)
   try {
     await form.handleSubmit()
     return form.state.isValid
   } catch (error) {
-    setAuthFormServerError(form, error, serverErrorMessage)
+    if (!form.state.errorMap.onServer) {
+      setAuthFormServerError(form, error, serverErrorMessage)
+    }
     return false
   }
 }
@@ -113,7 +134,7 @@ type AuthFormRootProps = Omit<ComponentProps<"form">, "onSubmit"> & {
 function AuthFormRoot({
   children,
   onBeforeSubmit,
-  serverErrorMessage = "Unable to submit this form. Try again.",
+  serverErrorMessage = DEFAULT_AUTH_FORM_SERVER_ERROR,
   ...props
 }: AuthFormRootProps) {
   const form = useFormContext()
@@ -197,10 +218,11 @@ function AuthFormSubmitButton({
       {([canSubmit, isSubmitting]) => (
         <Button
           {...props}
-          disabled={disabled || !canSubmit || isSubmitting}
+          aria-disabled={disabled || !canSubmit || isSubmitting || undefined}
+          disabled={disabled || isSubmitting}
           type="submit"
         >
-          {isSubmitting ? <Spinner /> : null}
+          {isSubmitting ? <Spinner data-icon="inline-start" /> : null}
           {children}
         </Button>
       )}

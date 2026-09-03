@@ -76,9 +76,8 @@ export function SignIn({
   const { fetchOptions, resetFetchOptions } = useFetchOptions()
   const continueSignIn = useSignInContinuation()
 
-  const { mutate: signInEmail, isPending: signInEmailPending } = useSignInEmail(
-    authClient,
-    {
+  const { mutateAsync: signInEmail, isPending: signInEmailPending } =
+    useSignInEmail(authClient, {
       onError: (error, { email }) => {
         form.setFieldValue("password", "")
 
@@ -92,8 +91,7 @@ export function SignIn({
         resetFetchOptions()
       },
       onSuccess: (data) => continueSignIn(data)
-    }
-  )
+    })
 
   const signInMutating = useIsMutating({
     mutationKey: authMutationKeys.signIn.all
@@ -112,8 +110,8 @@ export function SignIn({
   const [isPasswordVisible, setIsPasswordVisible] = useState(false)
   const form = useAuthForm({
     defaultValues: { email: "", password: "", rememberMe: false },
-    onSubmit: ({ value }) =>
-      signInEmail({
+    onSubmit: async ({ value }) =>
+      await signInEmail({
         email: value.email,
         password: value.password,
         ...(emailAndPassword?.rememberMe

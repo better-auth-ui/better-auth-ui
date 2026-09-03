@@ -27,10 +27,11 @@ import type { Member, User } from "better-auth/client"
 import { type ComponentProps, useEffect, useRef, useState } from "react"
 
 import { organizationPlugin } from "../../../lib/auth/organization-plugin"
+import { getHeroUISortDescriptor } from "../table-bridge"
 import { InviteMemberDialog } from "./invite-member-dialog"
 import { OrganizationMemberRow } from "./organization-member-row"
 import { OrganizationMemberRowSkeleton } from "./organization-member-row-skeleton"
-import { OrganizationSortableTableColumn } from "./organization-sortable-table-column"
+import { OrganizationSortableTableHeader } from "./organization-sortable-table-header"
 import {
   createOrganizationColumnHelper,
   ORGANIZATION_TABLE_PAGE_SIZE,
@@ -460,7 +461,10 @@ export function OrganizationMembers({
 
         <Table>
           <Table.ScrollContainer>
-            <Table.Content aria-label={organizationLocalization.members}>
+            <Table.Content
+              aria-label={organizationLocalization.members}
+              sortDescriptor={getHeroUISortDescriptor(sorting)}
+            >
               <Table.Header>
                 {showSelection && (
                   <Table.Column>
@@ -482,20 +486,23 @@ export function OrganizationMembers({
                     {organizationLocalization.member}
                   </Table.Column>
                 ) : (
-                  <OrganizationSortableTableColumn
-                    column={table.getColumn("user")}
-                    isRowHeader
-                  >
-                    {organizationLocalization.member}
-                  </OrganizationSortableTableColumn>
+                  <Table.Column allowsSorting id="user" isRowHeader>
+                    <OrganizationSortableTableHeader
+                      column={table.getColumn("user")}
+                    >
+                      {organizationLocalization.member}
+                    </OrganizationSortableTableHeader>
+                  </Table.Column>
                 )}
 
                 {table.getColumn("role")?.getIsVisible() && (
-                  <OrganizationSortableTableColumn
-                    column={table.getColumn("role")}
-                  >
-                    {organizationLocalization.role}
-                  </OrganizationSortableTableColumn>
+                  <Table.Column allowsSorting id="role">
+                    <OrganizationSortableTableHeader
+                      column={table.getColumn("role")}
+                    >
+                      {organizationLocalization.role}
+                    </OrganizationSortableTableHeader>
+                  </Table.Column>
                 )}
 
                 {showTeams && table.getColumn("teams")?.getIsVisible() && (

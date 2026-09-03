@@ -44,8 +44,8 @@ export function EditApiKeyDialog({
   })
   const form = useAuthForm({
     defaultValues: { name: apiKey.name ?? "" },
-    onSubmit: ({ value }) =>
-      updateApiKey.mutate({
+    onSubmit: async ({ value }) =>
+      await updateApiKey.mutateAsync({
         configId: apiKey.configId,
         keyId: apiKey.id,
         name: value.name.trim()

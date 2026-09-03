@@ -56,11 +56,11 @@ export function ChangePhoneNumber({ className }: ChangePhoneNumberProps) {
     (session?.user as PhoneNumberUser | undefined)?.phoneNumber ?? ""
   const [codeSent, setCodeSent] = useState(false)
 
-  const { mutate: sendOtp, isPending: isSending } = useSendPhoneNumberOtp(
+  const { mutateAsync: sendOtp, isPending: isSending } = useSendPhoneNumberOtp(
     phoneClient,
     { onSuccess: () => setCodeSent(true) }
   )
-  const { mutate: verify, isPending: isVerifying } = useVerifyPhoneNumber(
+  const { mutateAsync: verify, isPending: isVerifying } = useVerifyPhoneNumber(
     phoneClient,
     {
       onError: () => form.setFieldValue("code", ""),
@@ -90,13 +90,13 @@ export function ChangePhoneNumber({ className }: ChangePhoneNumberProps) {
       code: "",
       phoneNumber: createPhoneNumberValue("", defaultCountry, adapter)
     },
-    onSubmit: ({ value }) => {
+    onSubmit: async ({ value }) => {
       if (!value.phoneNumber.e164) return
       if (!codeSent) {
-        sendOtp({ phoneNumber: value.phoneNumber.e164 })
+        await sendOtp({ phoneNumber: value.phoneNumber.e164 })
         return
       }
-      verify({
+      await verify({
         phoneNumber: value.phoneNumber.e164,
         code: value.code,
         updatePhoneNumber: true

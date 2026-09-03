@@ -89,10 +89,10 @@ export function SsoDomainVerification({
 
   const form = useAuthForm({
     defaultValues: { providerId: defaultProviderId },
-    onSubmit: ({ value }) => {
+    onSubmit: async ({ value }) => {
       setCopyError("")
       setVerified(false)
-      verify.mutate({ providerId: value.providerId })
+      await verify.mutateAsync({ providerId: value.providerId })
     }
   })
 

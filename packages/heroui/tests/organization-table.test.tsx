@@ -8,8 +8,8 @@ import {
   screen,
   waitFor
 } from "@testing-library/react"
+import userEvent from "@testing-library/user-event"
 import { afterEach, describe, expect, it, vi } from "vitest"
-
 import {
   createOrganizationColumnHelper,
   useOrganizationTable
@@ -120,6 +120,63 @@ describe("organization table state", () => {
     expect(
       result.current.getRowModel().rows.map((row) => row.original.id)
     ).toEqual(["3", "2", "1"])
+  })
+
+  it("renders TanStack multi-sort state through HeroUI columns", async () => {
+    const user = userEvent.setup()
+    const sortableColumns = columnHelper.columns([
+      columnHelper.accessor("group", {
+        cell: ({ getValue }) => getValue(),
+        header: "Group"
+      }),
+      columnHelper.accessor("name", {
+        cell: ({ getValue }) => getValue(),
+        header: "Name"
+      })
+    ])
+
+    function TableFixture() {
+      const table = useOrganizationTable({
+        columns: sortableColumns,
+        data: rows,
+        getRowId: (row) => row.id,
+        initialState: {
+          sorting: [
+            { desc: false, id: "group" },
+            { desc: false, id: "name" }
+          ]
+        }
+      })
+
+      return (
+        <table.AppTable>
+          <OrganizationTableRenderer ariaLabel="People" empty="No people" />
+        </table.AppTable>
+      )
+    }
+
+    render(<TableFixture />)
+
+    expect(screen.getByRole("columnheader", { name: /Group/ })).toHaveAttribute(
+      "aria-sort",
+      "ascending"
+    )
+    expect(
+      screen.getByRole("columnheader", { name: /Group/ })
+    ).toHaveTextContent("1")
+    expect(
+      screen.getByRole("columnheader", { name: /Name/ })
+    ).toHaveTextContent("2")
+
+    await user.click(screen.getByRole("columnheader", { name: /Group/ }))
+    await waitFor(() =>
+      expect(
+        screen.getByRole("columnheader", { name: /Group/ })
+      ).toHaveAttribute("aria-sort", "descending")
+    )
+    expect(
+      screen.getByRole("columnheader", { name: /Name/ })
+    ).toHaveTextContent("2")
   })
 
   it("paginates client data but leaves server pages intact", () => {
@@ -269,5 +326,80 @@ describe("organization table state", () => {
       expect(result.current.sorting).toEqual([{ desc: true, id: "name" }])
       expect(result.current.pagination.pageIndex).toBe(1)
     })
+  })
+
+  it("bounds URL replacements when the adapter notifies synchronously", async () => {
+    let params = new URLSearchParams("router.search=first")
+    let replacements = 0
+    const listeners = new Set<() => void>()
+    const adapters: TablePersistenceAdapters = {
+      search: {
+        read: () => new URLSearchParams(params),
+        replace: (next) => {
+          replacements += 1
+          params = new URLSearchParams(next)
+          for (const listener of listeners) listener()
+        },
+        subscribe: (listener) => {
+          listeners.add(listener)
+          return () => listeners.delete(listener)
+        }
+      }
+    }
+    const { result } = renderHook(() =>
+      useOrganizationTableState("router", 10, TEST_COLUMN_IDS, adapters)
+    )
+
+    await waitFor(() => expect(result.current.ready).toBe(true))
+    act(() => result.current.setGlobalFilter("local"))
+
+    await waitFor(() => expect(params.get("router.search")).toBe("local"))
+    expect(replacements).toBe(1)
+  })
+
+  it("restores before writing when the adapter and state key change", async () => {
+    let firstParams = new URLSearchParams("first.search=alpha")
+    let secondParams = new URLSearchParams("second.search=beta")
+    let secondReplacements = 0
+    const firstAdapters: TablePersistenceAdapters = {
+      search: {
+        read: () => new URLSearchParams(firstParams),
+        replace: (next) => {
+          firstParams = new URLSearchParams(next)
+        },
+        subscribe: () => () => {}
+      }
+    }
+    const secondAdapters: TablePersistenceAdapters = {
+      search: {
+        read: () => new URLSearchParams(secondParams),
+        replace: (next) => {
+          secondReplacements += 1
+          secondParams = new URLSearchParams(next)
+        },
+        subscribe: () => () => {}
+      }
+    }
+    const { result, rerender } = renderHook(
+      ({ adapters, stateKey }) =>
+        useOrganizationTableState(stateKey, 10, TEST_COLUMN_IDS, adapters),
+      {
+        initialProps: { adapters: firstAdapters, stateKey: "first" }
+      }
+    )
+
+    await waitFor(() => {
+      expect(result.current.ready).toBe(true)
+      expect(result.current.globalFilter).toBe("alpha")
+    })
+
+    rerender({ adapters: secondAdapters, stateKey: "second" })
+
+    await waitFor(() => {
+      expect(result.current.ready).toBe(true)
+      expect(result.current.globalFilter).toBe("beta")
+    })
+    expect(secondReplacements).toBe(0)
+    expect(secondParams.get("second.search")).toBe("beta")
   })
 })

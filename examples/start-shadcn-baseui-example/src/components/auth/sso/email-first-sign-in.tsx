@@ -91,7 +91,7 @@ export function EmailFirstSignIn({
   const [isPasswordVisible, setIsPasswordVisible] = useState(false)
   const [discoveryError, setDiscoveryError] = useState("")
 
-  const { mutate: signInSso, isPending: isDiscovering } = useSignInSso(
+  const { mutateAsync: signInSso, isPending: isDiscovering } = useSignInSso(
     authClient as SsoAuthClient,
     {
       onError: (error) => {
@@ -107,7 +107,7 @@ export function EmailFirstSignIn({
     }
   )
 
-  const { mutate: signInEmail, isPending: isSigningIn } = useSignInEmail(
+  const { mutateAsync: signInEmail, isPending: isSigningIn } = useSignInEmail(
     authClient,
     {
       onError: (error) => {
@@ -143,18 +143,22 @@ export function EmailFirstSignIn({
 
   const form = useAuthForm({
     defaultValues: { email: "", password: "", rememberMe: false },
-    onSubmit: ({ value }) => {
+    onSubmit: async ({ value }) => {
       if (step === "email") {
         setDiscoveryError("")
         setSsoFallbackEmail(value.email)
-        signInSso({
-          callbackURL: `${baseURL}${redirectTo}`,
-          email: value.email,
-          loginHint: value.email
-        })
+        try {
+          await signInSso({
+            callbackURL: `${baseURL}${redirectTo}`,
+            email: value.email,
+            loginHint: value.email
+          })
+        } catch (error) {
+          if ((error as { status?: number }).status !== 404) throw error
+        }
         return
       }
-      signInEmail({
+      await signInEmail({
         email: value.email,
         password: value.password,
         ...(emailAndPassword.rememberMe
@@ -236,6 +240,8 @@ export function EmailFirstSignIn({
                     {discoveryError}
                   </FieldDescription>
                 )}
+
+                <form.AuthFormServerError />
 
                 <form.AuthFormSubmitButton disabled={isPending}>
                   {isDiscovering && <Spinner data-icon="inline-start" />}
@@ -372,6 +378,8 @@ export function EmailFirstSignIn({
                     {Captcha && (
                       <div className="flex justify-center">{Captcha}</div>
                     )}
+
+                    <form.AuthFormServerError />
 
                     <form.AuthFormSubmitButton disabled={isPending}>
                       {isSigningIn && <Spinner data-icon="inline-start" />}

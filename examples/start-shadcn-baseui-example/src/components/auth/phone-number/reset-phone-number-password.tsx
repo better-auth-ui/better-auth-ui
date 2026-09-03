@@ -1,6 +1,10 @@
 "use client"
 
-import { isPasswordCompromisedError } from "@better-auth-ui/core"
+import {
+  isPasswordCompromisedError,
+  validateMatchingValue,
+  validateStringLength
+} from "@better-auth-ui/core"
 import type { PhoneNumberAuthClient } from "@better-auth-ui/core/plugins/phone-number"
 import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
 import { useResetPhoneNumberPassword } from "@better-auth-ui/react/plugins/phone-number"
@@ -16,12 +20,7 @@ import {
   CardHeader,
   CardTitle
 } from "@/components/ui/card"
-import {
-  Field,
-  FieldError,
-  FieldGroup,
-  FieldLabel
-} from "@/components/ui/field"
+import { Field, FieldGroup, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import {
   InputGroup,
@@ -29,10 +28,13 @@ import {
   InputGroupButton,
   InputGroupInput
 } from "@/components/ui/input-group"
-import { Spinner } from "@/components/ui/spinner"
 import { phoneNumberPlugin } from "@/lib/auth/phone-number-plugin"
 import { cn } from "@/lib/utils"
-import { useAuthForm } from "../auth-form"
+import {
+  isAuthFormFieldInvalid,
+  setAuthFormServerError,
+  useAuthForm
+} from "../auth-form"
 import { OtpField } from "../otp-field"
 import { PasswordStrengthMeter } from "../password-strength-meter"
 import { useIsHydrated } from "../use-is-hydrated"
@@ -60,16 +62,19 @@ export function ResetPhoneNumberPassword({
     Boolean(initialPhoneNumber)
   )
   const [isPasswordVisible, setIsPasswordVisible] = useState(false)
-  const [passwordError, setPasswordError] = useState("")
 
-  const { mutate: resetPassword, isPending } = useResetPhoneNumberPassword(
+  const { mutateAsync: resetPassword, isPending } = useResetPhoneNumberPassword(
     authClient as PhoneNumberAuthClient,
     {
       onError: (error) => {
         // The haveIBeenPwned plugin rejects on the password itself, so it
         // belongs against the field rather than in a toast.
         if (isPasswordCompromisedError(error)) {
-          setPasswordError(localization.auth.passwordCompromised)
+          setAuthFormServerError(
+            form,
+            { fields: { password: localization.auth.passwordCompromised } },
+            localization.auth.passwordCompromised
+          )
         }
 
         form.setFieldValue("code", "")
@@ -84,6 +89,21 @@ export function ResetPhoneNumberPassword({
     }
   )
 
+  const validatePassword = (value: string) =>
+    validateStringLength(value, {
+      maxLength: emailAndPassword?.maxPasswordLength,
+      maxLengthMessage: localization.auth.tooLong.replace(
+        "{{max}}",
+        String(emailAndPassword?.maxPasswordLength)
+      ),
+      minLength: emailAndPassword?.minPasswordLength,
+      minLengthMessage: localization.auth.tooShort.replace(
+        "{{min}}",
+        String(emailAndPassword?.minPasswordLength)
+      ),
+      requiredMessage: localization.auth.fieldRequired
+    })
+
   const form = useAuthForm({
     defaultValues: {
       code: "",
@@ -91,35 +111,14 @@ export function ResetPhoneNumberPassword({
       password: "",
       phoneNumber: initialPhoneNumber
     },
-    onSubmit: ({ value }) => {
-      if (
-        emailAndPassword?.confirmPassword &&
-        value.password !== value.confirmPassword
-      ) {
-        toast.error(localization.auth.passwordsDoNotMatch)
-        return
-      }
-      if (value.code.length !== otpLength) {
-        toast.error(
-          phoneLocalization.codeLengthMismatch.replace(
-            "{{length}}",
-            String(otpLength)
-          )
-        )
-        return
-      }
-
-      resetPassword({
+    onSubmit: async ({ value }) => {
+      await resetPassword({
         phoneNumber: value.phoneNumber,
         otp: value.code,
         newPassword: value.password
       })
     }
   })
-  const codeComplete = useSelector(
-    form.store,
-    (formState) => formState.values.code.length === otpLength
-  )
   const phoneNumber = useSelector(
     form.store,
     (formState) => formState.values.phoneNumber
@@ -151,9 +150,17 @@ export function ResetPhoneNumberPassword({
           <form.AuthFormRoot>
             <FieldGroup>
               {!hasStoredPhoneNumber && (
-                <form.AppField name="phoneNumber">
+                <form.AppField
+                  name="phoneNumber"
+                  validators={{
+                    onChange: ({ value }) =>
+                      value.trim() ? undefined : localization.auth.fieldRequired
+                  }}
+                >
                   {(field) => (
-                    <Field>
+                    <Field
+                      data-invalid={isAuthFormFieldInvalid(field.state.meta)}
+                    >
                       <FieldLabel htmlFor="passwordResetPhoneNumber">
                         {phoneLocalization.phoneNumber}
                       </FieldLabel>
@@ -171,6 +178,7 @@ export function ResetPhoneNumberPassword({
                         onChange={(event) =>
                           field.handleChange(event.target.value)
                         }
+                        aria-invalid={isAuthFormFieldInvalid(field.state.meta)}
                       />
                       <field.AuthFormFieldError />
                     </Field>
@@ -178,7 +186,18 @@ export function ResetPhoneNumberPassword({
                 </form.AppField>
               )}
 
-              <form.AppField name="code">
+              <form.AppField
+                name="code"
+                validators={{
+                  onChange: ({ value }) =>
+                    value.length === otpLength
+                      ? undefined
+                      : phoneLocalization.codeLengthMismatch.replace(
+                          "{{length}}",
+                          String(otpLength)
+                        )
+                }}
+              >
                 {(field) => (
                   <OtpField
                     autoFocus={hasStoredPhoneNumber}
@@ -192,9 +211,16 @@ export function ResetPhoneNumberPassword({
                 )}
               </form.AppField>
 
-              <form.AppField name="password">
+              <form.AppField
+                name="password"
+                validators={{
+                  onChange: ({ value }) => validatePassword(value)
+                }}
+              >
                 {(field) => (
-                  <Field data-invalid={Boolean(passwordError)}>
+                  <Field
+                    data-invalid={isAuthFormFieldInvalid(field.state.meta)}
+                  >
                     <FieldLabel htmlFor="phoneNumberNewPassword">
                       {localization.auth.newPassword}
                     </FieldLabel>
@@ -210,11 +236,11 @@ export function ResetPhoneNumberPassword({
                         minLength={emailAndPassword?.minPasswordLength}
                         maxLength={emailAndPassword?.maxPasswordLength}
                         disabled={isPending}
+                        onBlur={field.handleBlur}
                         onChange={(event) => {
-                          setPasswordError("")
                           field.handleChange(event.target.value)
                         }}
-                        aria-invalid={Boolean(passwordError)}
+                        aria-invalid={isAuthFormFieldInvalid(field.state.meta)}
                       />
                       <InputGroupAddon align="inline-end">
                         <InputGroupButton
@@ -233,7 +259,7 @@ export function ResetPhoneNumberPassword({
                         </InputGroupButton>
                       </InputGroupAddon>
                     </InputGroup>
-                    {passwordError && <FieldError>{passwordError}</FieldError>}
+                    <field.AuthFormFieldError />
 
                     <PasswordStrengthMeter password={field.state.value} />
                   </Field>
@@ -241,9 +267,22 @@ export function ResetPhoneNumberPassword({
               </form.AppField>
 
               {emailAndPassword?.confirmPassword && (
-                <form.AppField name="confirmPassword">
+                <form.AppField
+                  name="confirmPassword"
+                  validators={{
+                    onChangeListenTo: ["password"],
+                    onChange: ({ value, fieldApi }) =>
+                      validateMatchingValue(
+                        value,
+                        fieldApi.form.getFieldValue("password"),
+                        localization.auth.passwordsDoNotMatch
+                      )
+                  }}
+                >
                   {(field) => (
-                    <Field>
+                    <Field
+                      data-invalid={isAuthFormFieldInvalid(field.state.meta)}
+                    >
                       <FieldLabel htmlFor="phoneNumberConfirmPassword">
                         {localization.auth.confirmPassword}
                       </FieldLabel>
@@ -264,16 +303,19 @@ export function ResetPhoneNumberPassword({
                         onChange={(event) =>
                           field.handleChange(event.target.value)
                         }
+                        aria-invalid={isAuthFormFieldInvalid(field.state.meta)}
                       />
+
+                      <field.AuthFormFieldError />
                     </Field>
                   )}
                 </form.AppField>
               )}
 
-              <form.AuthFormSubmitButton disabled={isPending || !codeComplete}>
-                {isPending && <Spinner />}
+              <form.AuthFormSubmitButton disabled={isPending}>
                 {phoneLocalization.resetPassword}
               </form.AuthFormSubmitButton>
+              <form.AuthFormServerError />
             </FieldGroup>
           </form.AuthFormRoot>
         </form.AppForm>

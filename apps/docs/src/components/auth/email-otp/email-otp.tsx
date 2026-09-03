@@ -33,7 +33,7 @@ import { emailOtpPlugin } from "@/lib/auth/email-otp-plugin"
 import { useResendCooldown } from "@/lib/auth/use-resend-cooldown"
 import { useSignInContinuation } from "@/lib/auth/use-sign-in-continuation"
 import { cn } from "@/lib/utils"
-import { useAuthForm } from "../auth-form"
+import { runAuthFormAction, submitAuthForm, useAuthForm } from "../auth-form"
 import { OpenEmailButton } from "../open-email-button"
 import { OtpField } from "../otp-field"
 import { ProviderButtons, type SocialLayout } from "../provider-buttons"
@@ -78,7 +78,7 @@ export function EmailOtp({
 
   const [codeSent, setCodeSent] = useState(false)
 
-  const { mutate: sendVerificationOtp, isPending: isSending } =
+  const { mutateAsync: sendVerificationOtp, isPending: isSending } =
     useSendVerificationOtp(otpClient, {
       onSuccess: () => {
         setCodeSent(true)
@@ -86,13 +86,11 @@ export function EmailOtp({
       }
     })
 
-  const { mutate: signInEmailOtp, isPending: isSigningIn } = useSignInEmailOtp(
-    otpClient,
-    {
+  const { mutateAsync: signInEmailOtp, isPending: isSigningIn } =
+    useSignInEmailOtp(otpClient, {
       onError: () => form.setFieldValue("code", ""),
       onSuccess: (data) => continueSignIn(data)
-    }
-  )
+    })
 
   const signInMutating = useIsMutating({
     mutationKey: authMutationKeys.signIn.all
@@ -102,26 +100,29 @@ export function EmailOtp({
   })
   const isPending = signInMutating + signUpMutating > 0 || isSending
 
-  const sendCode = () =>
-    sendVerificationOtp({
+  const sendCode = async () =>
+    await sendVerificationOtp({
       email: form.state.values.email,
       type: "sign-in"
     })
-  const verifyCode = (completedCode: string) => {
+  const verifyCode = async (completedCode: string) => {
     if (isPending || isSigningIn) return
 
-    signInEmailOtp({ email: form.state.values.email, otp: completedCode })
+    await signInEmailOtp({
+      email: form.state.values.email,
+      otp: completedCode
+    })
   }
 
   const form = useAuthForm({
     defaultValues: { code: "", email: getSsoFallbackEmail() },
-    onSubmit: ({ value }) => {
+    onSubmit: async ({ value }) => {
       if (!codeSent) {
-        sendVerificationOtp({ email: value.email, type: "sign-in" })
+        await sendVerificationOtp({ email: value.email, type: "sign-in" })
         return
       }
 
-      verifyCode(value.code)
+      await verifyCode(value.code)
     }
   })
   const codeComplete = useSelector(
@@ -174,7 +175,7 @@ export function EmailOtp({
                         name={field.name}
                         value={field.state.value}
                         onChange={field.handleChange}
-                        onComplete={verifyCode}
+                        onComplete={() => void submitAuthForm(form)}
                       />
                     )}
                   </form.AppField>
@@ -205,6 +206,8 @@ export function EmailOtp({
                   </form.AppField>
                 )}
 
+                <form.AuthFormServerError />
+
                 <div className="flex flex-col gap-3">
                   <form.AuthFormSubmitButton
                     disabled={
@@ -226,7 +229,7 @@ export function EmailOtp({
                         type="button"
                         variant="outline"
                         disabled={isPending || isSigningIn || isCoolingDown}
-                        onClick={sendCode}
+                        onClick={() => void runAuthFormAction(form, sendCode)}
                       >
                         {isCoolingDown
                           ? localization.auth.resendIn.replace(

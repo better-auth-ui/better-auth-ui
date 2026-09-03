@@ -51,7 +51,7 @@ import { phoneNumberPlugin } from "@/lib/auth/phone-number-plugin"
 import { useResendCooldown } from "@/lib/auth/use-resend-cooldown"
 import { useSignInContinuation } from "@/lib/auth/use-sign-in-continuation"
 import { cn } from "@/lib/utils"
-import { useAuthForm } from "../auth-form"
+import { runAuthFormAction, submitAuthForm, useAuthForm } from "../auth-form"
 import { OtpField } from "../otp-field"
 import { ProviderButtons, type SocialLayout } from "../provider-buttons"
 import { InternationalPhoneField } from "./international-phone-field"
@@ -102,7 +102,7 @@ export function PhoneNumber({
   const [codeSent, setCodeSent] = useState(false)
   const [isPasswordVisible, setIsPasswordVisible] = useState(false)
 
-  const { mutate: sendOtp, isPending: isSending } = useSendPhoneNumberOtp(
+  const { mutateAsync: sendOtp, isPending: isSending } = useSendPhoneNumberOtp(
     phoneClient,
     {
       onError: () => resetFetchOptions(),
@@ -112,14 +112,14 @@ export function PhoneNumber({
       }
     }
   )
-  const { mutate: verify, isPending: isVerifying } = useVerifyPhoneNumber(
+  const { mutateAsync: verify, isPending: isVerifying } = useVerifyPhoneNumber(
     phoneClient,
     {
       onError: () => form.setFieldValue("code", ""),
       onSuccess: (data) => continueSignIn(data)
     }
   )
-  const { mutate: signInWithPassword, isPending: isPasswordPending } =
+  const { mutateAsync: signInWithPassword, isPending: isPasswordPending } =
     useSignInPhoneNumber(phoneClient, {
       onError: (error) => {
         form.setFieldValue("password", "")
@@ -154,19 +154,19 @@ export function PhoneNumber({
     (plugin) => plugin.captchaComponent
   )?.captchaComponent
 
-  const sendCode = () => {
+  const sendCode = async () => {
     const normalizedPhoneNumber = form.state.values.phoneNumber.e164
     if (!normalizedPhoneNumber) return
-    sendOtp({
+    await sendOtp({
       phoneNumber: normalizedPhoneNumber,
       fetchOptions
     } as Parameters<typeof sendOtp>[0])
   }
-  const verifyCode = (completedCode: string) => {
+  const verifyCode = async (completedCode: string) => {
     if (isPending || completedCode.length !== otpLength) return
 
     if (!form.state.values.phoneNumber.e164) return
-    verify({
+    await verify({
       phoneNumber: form.state.values.phoneNumber.e164,
       code: completedCode
     })
@@ -185,11 +185,11 @@ export function PhoneNumber({
       phoneNumber: createPhoneNumberValue("", defaultCountry, adapter),
       rememberMe: false
     },
-    onSubmit: ({ value }) => {
+    onSubmit: async ({ value }) => {
       if (mode === "password") {
         const normalizedPhoneNumber = value.phoneNumber.e164
         if (!normalizedPhoneNumber) return
-        signInWithPassword({
+        await signInWithPassword({
           phoneNumber: normalizedPhoneNumber,
           password: value.password,
           ...(emailAndPassword?.rememberMe
@@ -201,11 +201,11 @@ export function PhoneNumber({
       }
 
       if (!codeSent) {
-        sendCode()
+        await sendCode()
         return
       }
 
-      verifyCode(value.code)
+      await verifyCode(value.code)
     }
   })
   const codeComplete = useSelector(
@@ -262,7 +262,7 @@ export function PhoneNumber({
                         name="otp"
                         value={field.state.value}
                         onChange={field.handleChange}
-                        onComplete={verifyCode}
+                        onComplete={() => void submitAuthForm(form)}
                       />
                     )}
                   </form.AppField>
@@ -379,6 +379,8 @@ export function PhoneNumber({
                   </>
                 )}
 
+                <form.AuthFormServerError />
+
                 <div className="flex flex-col gap-3">
                   <form.AuthFormSubmitButton
                     disabled={isPending || (codeSent && !codeComplete)}
@@ -399,7 +401,7 @@ export function PhoneNumber({
                         type="button"
                         variant="outline"
                         disabled={isPending || isCoolingDown}
-                        onClick={sendCode}
+                        onClick={() => void runAuthFormAction(form, sendCode)}
                       >
                         {isCoolingDown
                           ? localization.auth.resendIn.replace(

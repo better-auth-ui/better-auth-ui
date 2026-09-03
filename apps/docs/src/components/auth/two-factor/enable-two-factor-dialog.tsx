@@ -39,7 +39,7 @@ import { Spinner } from "@/components/ui/spinner"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { twoFactorPlugin } from "@/lib/auth/two-factor-plugin"
 import { useTwoFactorPasswordRequirement } from "@/lib/auth/use-two-factor-password"
-import { useAuthForm } from "../auth-form"
+import { submitAuthForm, useAuthForm } from "../auth-form"
 import { OtpField } from "../otp-field"
 import { BackupCodes } from "./backup-codes"
 
@@ -112,7 +112,7 @@ export function EnableTwoFactorDialog({
   }
 
   const {
-    mutate: enableTwoFactor,
+    mutateAsync: enableTwoFactor,
     isPending: isEnabling,
     reset: resetEnrollment
   } = useEnableTwoFactor(twoFactorClient, {
@@ -129,7 +129,7 @@ export function EnableTwoFactorDialog({
     }
   })
 
-  const { mutate: verifyTotp, isPending: isVerifying } = useVerifyTotp(
+  const { mutateAsync: verifyTotp, isPending: isVerifying } = useVerifyTotp(
     twoFactorClient,
     {
       onError: () => form.setFieldValue("code", ""),
@@ -144,27 +144,27 @@ export function EnableTwoFactorDialog({
 
   const form = useAuthForm({
     defaultValues: { code: "", password: "" },
-    onSubmit: ({ value }) => {
+    onSubmit: async ({ value }) => {
       if (step === "backupCodes") {
         handleOpenChange(false)
         return
       }
       if (step === "verify") {
-        verifyCode(value.code)
+        await verifyCode(value.code)
         return
       }
-      enableTwoFactor(
+      await enableTwoFactor(
         requiresPassword ? { method, password: value.password } : { method }
       )
     }
   })
 
-  const verifyCode = (completedCode: string) => {
+  const verifyCode = async (completedCode: string) => {
     if (isPending || step !== "verify" || completedCode.length !== codeLength) {
       return
     }
 
-    verifyTotp({ code: completedCode })
+    await verifyTotp({ code: completedCode })
   }
 
   const handleOpenChange = (nextOpen: boolean) => {
@@ -339,7 +339,7 @@ export function EnableTwoFactorDialog({
                       name={field.name}
                       value={field.state.value}
                       onChange={field.handleChange}
-                      onComplete={verifyCode}
+                      onComplete={() => void submitAuthForm(form)}
                     />
                   )}
                 </form.AppField>
@@ -347,6 +347,8 @@ export function EnableTwoFactorDialog({
             )}
 
             {step === "backupCodes" && <BackupCodes codes={backupCodes} />}
+
+            <form.AuthFormServerError />
 
             <DialogFooter>
               {step !== "backupCodes" && (

@@ -3,9 +3,9 @@ import type { ReactNode } from "react"
 import {
   getHeroUISelection,
   getHeroUISortDescriptor,
-  getTanStackRowSelection,
-  getTanStackSorting
+  getTanStackRowSelection
 } from "../table-bridge"
+import { OrganizationSortableTableHeader } from "./organization-sortable-table-header"
 import { useOrganizationTableContext } from "./organization-table"
 
 export function OrganizationTableRenderer({
@@ -20,6 +20,8 @@ export function OrganizationTableRenderer({
   const table = useOrganizationTableContext()
   const rows = table.getRowModel().rows
   const rowIds = rows.map((row) => row.id)
+  const rowHeaderColumn = table.getVisibleLeafColumns()[0]
+  const sortDescriptor = getHeroUISortDescriptor(table.state.sorting)
 
   return (
     <Table>
@@ -29,12 +31,14 @@ export function OrganizationTableRenderer({
           onSelectionChange={(selection) =>
             table.setRowSelection(getTanStackRowSelection(selection, rowIds))
           }
-          onSortChange={(descriptor) =>
-            table.setSorting(getTanStackSorting(descriptor))
-          }
+          onSortChange={(descriptor) => {
+            const column = table.getColumn(String(descriptor.column))
+            const toggleSorting = column?.getToggleSortingHandler()
+            toggleSorting?.({ shiftKey: table.state.sorting.length > 1 })
+          }}
           selectedKeys={getHeroUISelection(table.state.rowSelection)}
           selectionMode={selectable ? "multiple" : "none"}
-          sortDescriptor={getHeroUISortDescriptor(table.state.sorting)}
+          sortDescriptor={sortDescriptor}
         >
           <Table.Header>
             {table.getHeaderGroups().flatMap((headerGroup) =>
@@ -42,12 +46,16 @@ export function OrganizationTableRenderer({
                 <Table.Column
                   allowsSorting={header.column.getCanSort()}
                   id={header.column.id}
+                  isRowHeader={header.column === rowHeaderColumn}
                   key={header.id}
                 >
                   {header.isPlaceholder ? null : header.column.getCanSort() ? (
-                    <Table.SortableColumnHeader>
+                    <OrganizationSortableTableHeader
+                      column={header.column}
+                      interactive={false}
+                    >
                       <table.FlexRender header={header} />
-                    </Table.SortableColumnHeader>
+                    </OrganizationSortableTableHeader>
                   ) : (
                     <table.FlexRender header={header} />
                   )}

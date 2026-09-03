@@ -209,6 +209,7 @@ export function ResetPasswordOtp(props: ResetPasswordOtpProps) {
                 <form.AppField
                   name="confirmPassword"
                   validators={{
+                    onChangeListenTo: ["password"],
                     onChange: ({ value }) =>
                       value === password()
                         ? undefined
