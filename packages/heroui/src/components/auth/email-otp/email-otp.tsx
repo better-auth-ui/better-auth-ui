@@ -25,7 +25,11 @@ import { useState } from "react"
 import { emailOtpPlugin } from "../../../lib/auth/email-otp-plugin"
 import { useResendCooldown } from "../../../lib/auth/use-resend-cooldown"
 import { useSignInContinuation } from "../../../lib/auth/use-sign-in-continuation"
-import { setAuthFormServerError, useAuthForm } from "../auth-form"
+import {
+  clearAuthFormServerError,
+  setAuthFormServerError,
+  useAuthForm
+} from "../auth-form"
 import { FieldSeparator } from "../field-separator"
 import { OpenEmailButton } from "../open-email-button"
 import { OtpField } from "../otp-field"
@@ -95,8 +99,13 @@ export function EmailOtp({
   })
   const isPending = signInMutating + signUpMutating > 0 || isSending
 
-  const sendCode = () =>
-    sendVerificationOtp({ email: form.state.values.email, type: "sign-in" })
+  const sendCode = () => {
+    clearAuthFormServerError(form)
+    return sendVerificationOtp({
+      email: form.state.values.email,
+      type: "sign-in"
+    })
+  }
   const verifyCode = async (completedCode: string) => {
     if (isPending || isSigningIn) return
 
@@ -125,6 +134,7 @@ export function EmailOtp({
   const startOver = () => {
     setCodeSent(false)
     form.setFieldValue("code", "")
+    clearAuthFormServerError(form)
   }
 
   const showSeparator = !!socialProviders?.length
