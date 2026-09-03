@@ -228,16 +228,19 @@ export function AdminUsers({
     total,
     users.isSuccess
   ])
-  const table = useAdminTable({
-    atoms: tableState.atoms,
-    columns: adminColumns,
-    data: users.data?.users ?? EMPTY_USERS,
-    getRowId: (user) => user.id,
-    manualFiltering: true,
-    manualPagination: true,
-    manualSorting: true,
-    rowCount: total
-  })
+  const table = useAdminTable(
+    {
+      atoms: tableState.atoms,
+      columns: adminColumns,
+      data: users.data?.users ?? EMPTY_USERS,
+      getRowId: (user) => user.id,
+      manualFiltering: true,
+      manualPagination: true,
+      manualSorting: true,
+      rowCount: total
+    },
+    () => null
+  )
 
   return (
     <section className={cn("flex flex-col gap-4", className)}>

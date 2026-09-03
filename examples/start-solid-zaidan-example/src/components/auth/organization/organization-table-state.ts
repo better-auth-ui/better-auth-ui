@@ -64,6 +64,7 @@ export function createOrganizationTableState(
   let syncedSearch = ""
   const atoms = {
     columnFilters: columnFiltersAtom,
+    columnVisibility: columnVisibilityAtom,
     globalFilter: globalFilterAtom,
     pagination: paginationAtom,
     rowSelection: rowSelectionAtom,

@@ -1,13 +1,13 @@
 import { Table } from "@heroui/react"
 import type { ReactNode } from "react"
+import { OrganizationSortableTableHeader } from "../src/components/auth/organization/organization-sortable-table-header"
+import { useOrganizationTableContext } from "../src/components/auth/organization/organization-table"
 import {
   getHeroUISelection,
   getHeroUISortDescriptor,
   getTanStackRowSelection,
   getTanStackSorting
-} from "../table-bridge"
-import { OrganizationSortableTableHeader } from "./organization-sortable-table-header"
-import { useOrganizationTableContext } from "./organization-table"
+} from "../src/components/auth/table-bridge"
 
 export function OrganizationTableRenderer({
   ariaLabel,
@@ -50,16 +50,19 @@ export function OrganizationTableRenderer({
                   isRowHeader={header.column === rowHeaderColumn}
                   key={header.id}
                 >
-                  {header.isPlaceholder ? null : header.column.getCanSort() ? (
-                    <OrganizationSortableTableHeader
-                      column={header.column}
-                      interactive={false}
-                    >
+                  {({ sortDirection }) =>
+                    header.isPlaceholder ? null : header.column.getCanSort() ? (
+                      <OrganizationSortableTableHeader
+                        column={header.column}
+                        interactive={false}
+                        nativeSortDirection={sortDirection}
+                      >
+                        <table.FlexRender header={header} />
+                      </OrganizationSortableTableHeader>
+                    ) : (
                       <table.FlexRender header={header} />
-                    </OrganizationSortableTableHeader>
-                  ) : (
-                    <table.FlexRender header={header} />
-                  )}
+                    )
+                  }
                 </Table.Column>
               ))
             )}

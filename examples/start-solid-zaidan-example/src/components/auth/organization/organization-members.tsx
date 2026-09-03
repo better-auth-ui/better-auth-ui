@@ -102,7 +102,7 @@ const memberColumnHelper = createOrganizationColumnHelper<OrganizationMember>()
 const memberColumns = memberColumnHelper.columns([
   memberColumnHelper.accessor(
     (member) => member.user?.name ?? member.user?.email ?? "",
-    { id: "name", enableHiding: false, filterFn: "includesString" }
+    { id: "user", enableHiding: false, filterFn: "includesString" }
   ),
   memberColumnHelper.accessor((member) => member.role ?? "", {
     id: "role",
@@ -116,7 +116,10 @@ const memberColumns = memberColumnHelper.columns([
     enableSorting: false
   })
 ])
-const MEMBER_COLUMN_IDS = ["name", "role", "teams"] as const
+const memberColumnsWithoutTeams = memberColumns.filter(
+  (column) => column.id !== "teams"
+)
+const MEMBER_COLUMN_IDS = ["user", "role", "teams"] as const
 
 type RoleMap = Record<string, string>
 
@@ -361,6 +364,11 @@ export function OrganizationMembers(props: OrganizationMembersProps) {
   const ownerCount = () => owners.data?.total ?? owners.data?.members.length
   const showTeams = () =>
     config.teams && canListMemberTeams.data?.success === true
+  const isPending = () =>
+    members.isPending ||
+    owners.isPending ||
+    canDeleteMembers.isPending ||
+    (config.teams && canListMemberTeams.isPending)
 
   const total = () => members.data?.total ?? memberRows().length
 
@@ -379,7 +387,9 @@ export function OrganizationMembers(props: OrganizationMembersProps) {
   })
   const table = createOrganizationTable({
     atoms: tableState.atoms,
-    columns: memberColumns,
+    get columns() {
+      return showTeams() ? memberColumns : memberColumnsWithoutTeams
+    },
     get data() {
       return memberRows()
     },
@@ -406,16 +416,7 @@ export function OrganizationMembers(props: OrganizationMembersProps) {
     get rowCount() {
       return paged() ? total() : undefined
     },
-    get state() {
-      return {
-        columnVisibility: {
-          ...tableState.columnVisibility(),
-          teams: showTeams() && tableState.columnVisibility().teams !== false
-        }
-      }
-    },
-    getRowId: (member) => member.id,
-    onColumnVisibilityChange: tableState.setColumnVisibility
+    getRowId: (member) => member.id
   })
   const removeMembers = useRemoveMember(auth.authClient)
   const selectedMembers = () => table.getSelectedRowModel().rows
@@ -467,243 +468,223 @@ export function OrganizationMembers(props: OrganizationMembersProps) {
           </Button>
         </Show>
       </div>
-      <Show
-        when={
-          !members.isPending &&
-          !owners.isPending &&
-          !(config.teams && canListMemberTeams.isPending)
-        }
-        fallback={
-          <Card class="z-card-padding-none">
-            <Table>
-              <TableBody>
-                <OrganizationMemberRowSkeleton showTeams={config.teams} />
-                <OrganizationMemberRowSkeleton showTeams={config.teams} />
-              </TableBody>
-            </Table>
-          </Card>
-        }
-      >
-        <Show
-          when={memberRows().length > 0}
-          fallback={
-            <p class="rounded-md border border-dashed p-4 text-sm text-muted-foreground">
-              No members found for this organization.
-            </p>
-          }
-        >
-          <div class="flex flex-col gap-2 sm:flex-row sm:items-center">
-            {/* list-members has no search parameter, so a search box would
+      <div class="flex flex-col gap-2 sm:flex-row sm:items-center">
+        {/* list-members has no search parameter, so a search box would
                 only ever filter the page in front of you. */}
-            <Show when={!paged()}>
-              <InputGroup class="min-w-0 sm:w-[220px]">
-                <InputGroupAddon>
-                  <Search class="size-4 text-muted-foreground" />
-                </InputGroupAddon>
-                <InputGroupInput
-                  aria-label={localization().search}
-                  onInput={(event) =>
-                    table.setGlobalFilter(event.currentTarget.value)
-                  }
-                  placeholder={localization().search}
-                  type="search"
-                  value={tableState.globalFilter()}
-                />
-              </InputGroup>
-            </Show>
-            <DropdownMenu>
-              <DropdownMenuTrigger
-                as={Button}
-                class="shrink-0"
-                variant="outline"
-              >
-                <Filter class="size-4" />
-                {localization().role}
-              </DropdownMenuTrigger>
-              <DropdownMenuContent>
-                <DropdownMenuRadioGroup
-                  onChange={(value) =>
-                    table
-                      .getColumn("role")
-                      ?.setFilterValue(value === "all" ? undefined : value)
-                  }
-                  value={memberRoleFilter()}
-                >
-                  <DropdownMenuRadioItem value="all">
-                    {localization().all}
-                  </DropdownMenuRadioItem>
-                  <For each={Object.entries(roles())}>
-                    {([role, label]) => (
-                      <DropdownMenuRadioItem value={role}>
-                        {label}
-                        {!paged()
-                          ? ` (${roleFacetRows()?.filter((row) => hasMemberRole(row.original.role, role)).length ?? 0})`
-                          : ""}
-                      </DropdownMenuRadioItem>
-                    )}
-                  </For>
-                </DropdownMenuRadioGroup>
-              </DropdownMenuContent>
-            </DropdownMenu>
-            <div class="ms-auto">
-              <OrganizationTableViewOptions
-                columns={[
-                  {
-                    id: "role",
-                    label: localization().role,
-                    visible: table.getColumn("role")?.getIsVisible() ?? true,
-                    onVisibleChange: (visible) =>
-                      table.getColumn("role")?.toggleVisibility(visible)
-                  },
-                  ...(showTeams()
-                    ? [
-                        {
-                          id: "teams",
-                          label: localization().teams,
-                          visible:
-                            table.getColumn("teams")?.getIsVisible() ?? true,
-                          onVisibleChange: (visible: boolean) =>
-                            table.getColumn("teams")?.toggleVisibility(visible)
-                        }
-                      ]
-                    : [])
-                ]}
-                localization={localization()}
-              />
-            </div>
-          </div>
-          <Show when={memberRoleFilter() !== "all"}>
-            <div class="flex flex-wrap gap-2">
-              <Show when={memberRoleFilter() !== "all"}>
-                <Badge class="gap-1 pr-1" variant="secondary">
-                  {localization().role}: {selectedRoleLabel()}
-                  <Button
-                    aria-label={`${localization().clear} member role filter`}
-                    class="size-4 rounded-sm"
-                    onClick={() =>
-                      table.getColumn("role")?.setFilterValue(undefined)
-                    }
-                    size="icon-xs"
-                    type="button"
-                    variant="ghost"
-                  >
-                    <X class="size-3" />
-                  </Button>
-                </Badge>
-              </Show>
-            </div>
-          </Show>
-          <OrganizationTableBulkAction
-            cancelLabel={auth.localization.settings.cancel}
-            confirmLabel={localization().removeSelectedMembers}
-            description={localization().removeSelectedMembersDescription}
-            localization={localization()}
-            onConfirm={removeSelectedMembers}
-            pending={removeMembers.isPending}
-            selectedCount={selectedMembers().length}
-            title={localization().removeSelectedMembers}
-          />
-          <Card class="z-card-padding-none">
-            <Table aria-label="Members">
-              <TableHeader>
-                <TableRow>
-                  <Show when={canDeleteMembers.data?.success}>
-                    <TableHead>
-                      <OrganizationTableSelectAll
-                        allSelected={table.getIsAllPageRowsSelected()}
-                        localization={localization()}
-                        onCheckedChange={(checked) =>
-                          table.toggleAllPageRowsSelected(checked)
-                        }
-                        someSelected={table.getIsSomePageRowsSelected()}
-                      />
-                    </TableHead>
-                  </Show>
-                  {/* Name and email live on the joined user row, which
-                      list-members cannot sort by. */}
-                  <Show
-                    when={!paged()}
-                    fallback={<TableHead>{localization().member}</TableHead>}
-                  >
-                    <OrganizationSortableTableHead
-                      column={table.getColumn("name")}
-                    >
-                      {localization().member}
-                    </OrganizationSortableTableHead>
-                  </Show>
-                  <Show when={table.getColumn("role")?.getIsVisible()}>
-                    <OrganizationSortableTableHead
-                      column={table.getColumn("role")}
-                    >
-                      {localization().role}
-                    </OrganizationSortableTableHead>
-                  </Show>
-                  <Show
-                    when={
-                      showTeams() && table.getColumn("teams")?.getIsVisible()
-                    }
-                  >
-                    <TableHead>{localization().teams}</TableHead>
-                  </Show>
-                  <TableHead class="z-table-head-align-end">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                <Show
-                  when={table.getRowModel().rows.length > 0}
-                  fallback={
-                    <TableRow>
-                      <TableCell
-                        class="text-muted-foreground text-sm"
-                        colSpan={showTeams() ? 4 : 3}
-                      >
-                        No members match the current filters.
-                      </TableCell>
-                    </TableRow>
-                  }
-                >
-                  <For each={table.getRowModel().rows}>
-                    {(row) => (
-                      <OrganizationMemberRow
-                        isOwner={isOwner()}
-                        localization={localization()}
-                        member={row.original}
-                        ownerCount={ownerCount()}
-                        roles={roles()}
-                        selectableRow={
-                          canDeleteMembers.data?.success ? row : undefined
-                        }
-                        showRole={table.getColumn("role")?.getIsVisible()}
-                        showTeams={
-                          showTeams() &&
-                          table.getColumn("teams")?.getIsVisible() === true
-                        }
-                      />
-                    )}
-                  </For>
-                </Show>
-              </TableBody>
-            </Table>
-          </Card>
-
-          <OrganizationTablePagination
-            canNextPage={table.getCanNextPage()}
-            canPreviousPage={table.getCanPreviousPage()}
-            disabled={members.isPending}
-            localization={localization()}
-            onFirstPage={() => table.firstPage()}
-            onLastPage={() => table.lastPage()}
-            onNextPage={() => table.nextPage()}
-            onPageSizeChange={(size) => table.setPageSize(size)}
-            onPreviousPage={() => table.previousPage()}
-            pageCount={table.getPageCount()}
-            pageIndex={tableState.pagination().pageIndex}
-            pageSize={tableState.pagination().pageSize}
-            rowCount={table.getRowCount()}
-            visibleRowCount={table.getRowModel().rows.length}
-          />
+        <Show when={!paged()}>
+          <InputGroup class="min-w-0 sm:w-[220px]">
+            <InputGroupAddon>
+              <Search class="size-4 text-muted-foreground" />
+            </InputGroupAddon>
+            <InputGroupInput
+              aria-label={localization().search}
+              disabled={isPending()}
+              onInput={(event) =>
+                table.setGlobalFilter(event.currentTarget.value)
+              }
+              placeholder={localization().search}
+              type="search"
+              value={tableState.globalFilter()}
+            />
+          </InputGroup>
         </Show>
+        <DropdownMenu>
+          <DropdownMenuTrigger
+            as={Button}
+            class="shrink-0"
+            disabled={isPending()}
+            variant="outline"
+          >
+            <Filter class="size-4" />
+            {localization().role}
+          </DropdownMenuTrigger>
+          <DropdownMenuContent>
+            <DropdownMenuRadioGroup
+              onChange={(value) =>
+                table
+                  .getColumn("role")
+                  ?.setFilterValue(value === "all" ? undefined : value)
+              }
+              value={memberRoleFilter()}
+            >
+              <DropdownMenuRadioItem value="all">
+                {localization().all}
+              </DropdownMenuRadioItem>
+              <For each={Object.entries(roles())}>
+                {([role, label]) => (
+                  <DropdownMenuRadioItem value={role}>
+                    {label}
+                    {!paged()
+                      ? ` (${roleFacetRows()?.filter((row) => hasMemberRole(row.original.role, role)).length ?? 0})`
+                      : ""}
+                  </DropdownMenuRadioItem>
+                )}
+              </For>
+            </DropdownMenuRadioGroup>
+          </DropdownMenuContent>
+        </DropdownMenu>
+        <div class="ms-auto">
+          <OrganizationTableViewOptions
+            columns={[
+              {
+                id: "role",
+                label: localization().role,
+                visible: table.getColumn("role")?.getIsVisible() ?? true,
+                onVisibleChange: (visible) =>
+                  table.getColumn("role")?.toggleVisibility(visible)
+              },
+              ...(showTeams()
+                ? [
+                    {
+                      id: "teams",
+                      label: localization().teams,
+                      visible: table.getColumn("teams")?.getIsVisible() ?? true,
+                      onVisibleChange: (visible: boolean) =>
+                        table.getColumn("teams")?.toggleVisibility(visible)
+                    }
+                  ]
+                : [])
+            ]}
+            disabled={isPending()}
+            localization={localization()}
+          />
+        </div>
+      </div>
+      <Show when={memberRoleFilter() !== "all"}>
+        <div class="flex flex-wrap gap-2">
+          <Show when={memberRoleFilter() !== "all"}>
+            <Badge class="gap-1 pr-1" variant="secondary">
+              {localization().role}: {selectedRoleLabel()}
+              <Button
+                aria-label={`${localization().clear} member role filter`}
+                class="size-4 rounded-sm"
+                onClick={() =>
+                  table.getColumn("role")?.setFilterValue(undefined)
+                }
+                size="icon-xs"
+                type="button"
+                variant="ghost"
+              >
+                <X class="size-3" />
+              </Button>
+            </Badge>
+          </Show>
+        </div>
       </Show>
+      <OrganizationTableBulkAction
+        cancelLabel={auth.localization.settings.cancel}
+        confirmLabel={localization().removeSelectedMembers}
+        description={localization().removeSelectedMembersDescription}
+        localization={localization()}
+        onConfirm={removeSelectedMembers}
+        pending={removeMembers.isPending}
+        selectedCount={selectedMembers().length}
+        title={localization().removeSelectedMembers}
+      />
+      <Card class="z-card-padding-none">
+        <Table aria-label="Members">
+          <TableHeader>
+            <TableRow>
+              <Show when={canDeleteMembers.data?.success}>
+                <TableHead>
+                  <OrganizationTableSelectAll
+                    allSelected={table.getIsAllPageRowsSelected()}
+                    disabled={isPending()}
+                    localization={localization()}
+                    onCheckedChange={(checked) =>
+                      table.toggleAllPageRowsSelected(checked)
+                    }
+                    someSelected={table.getIsSomePageRowsSelected()}
+                  />
+                </TableHead>
+              </Show>
+              {/* Name and email live on the joined user row, which
+                      list-members cannot sort by. */}
+              <Show
+                when={!paged()}
+                fallback={<TableHead>{localization().member}</TableHead>}
+              >
+                <OrganizationSortableTableHead column={table.getColumn("user")}>
+                  {localization().member}
+                </OrganizationSortableTableHead>
+              </Show>
+              <Show when={table.getColumn("role")?.getIsVisible()}>
+                <OrganizationSortableTableHead column={table.getColumn("role")}>
+                  {localization().role}
+                </OrganizationSortableTableHead>
+              </Show>
+              <Show
+                when={showTeams() && table.getColumn("teams")?.getIsVisible()}
+              >
+                <TableHead>{localization().teams}</TableHead>
+              </Show>
+              <TableHead class="z-table-head-align-end">Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            <Show
+              when={!members.isPending}
+              fallback={
+                <>
+                  <OrganizationMemberRowSkeleton showTeams={showTeams()} />
+                  <OrganizationMemberRowSkeleton showTeams={showTeams()} />
+                </>
+              }
+            >
+              <Show
+                when={table.getRowModel().rows.length > 0}
+                fallback={
+                  <TableRow>
+                    <TableCell
+                      class="text-muted-foreground text-sm"
+                      colSpan={showTeams() ? 4 : 3}
+                    >
+                      No members match the current filters.
+                    </TableCell>
+                  </TableRow>
+                }
+              >
+                <For each={table.getRowModel().rows}>
+                  {(row) => (
+                    <OrganizationMemberRow
+                      isOwner={isOwner()}
+                      localization={localization()}
+                      member={row.original}
+                      ownerCount={ownerCount()}
+                      roles={roles()}
+                      selectableRow={
+                        canDeleteMembers.data?.success ? row : undefined
+                      }
+                      showRole={table.getColumn("role")?.getIsVisible()}
+                      showTeams={
+                        showTeams() &&
+                        table.getColumn("teams")?.getIsVisible() === true
+                      }
+                    />
+                  )}
+                </For>
+              </Show>
+            </Show>
+          </TableBody>
+        </Table>
+      </Card>
+
+      <OrganizationTablePagination
+        canNextPage={table.getCanNextPage()}
+        canPreviousPage={table.getCanPreviousPage()}
+        disabled={isPending()}
+        localization={localization()}
+        onFirstPage={() => table.firstPage()}
+        onLastPage={() => table.lastPage()}
+        onNextPage={() => table.nextPage()}
+        onPageSizeChange={(size) => table.setPageSize(size)}
+        onPreviousPage={() => table.previousPage()}
+        pageCount={table.getPageCount()}
+        pageIndex={tableState.pagination().pageIndex}
+        pageSize={tableState.pagination().pageSize}
+        rowCount={table.getRowCount()}
+        visibleRowCount={table.getRowModel().rows.length}
+      />
       <Show when={canInvite.data?.success}>
         <InviteMemberDialog open={inviteOpen()} onOpenChange={setInviteOpen} />
       </Show>

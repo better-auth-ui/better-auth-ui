@@ -14,9 +14,9 @@ import {
   createOrganizationColumnHelper,
   useOrganizationTable
 } from "../src/components/auth/organization/organization-table"
-import { OrganizationTableRenderer } from "../src/components/auth/organization/organization-table-renderer"
 import { OrganizationTableSelectRow } from "../src/components/auth/organization/organization-table-selection"
 import { useOrganizationTableState } from "../src/components/auth/organization/organization-table-state"
+import { OrganizationTableRenderer } from "./organization-table-renderer"
 
 type TestRow = {
   group: string
@@ -258,14 +258,15 @@ describe("organization table state", () => {
 
     const { result } = renderHook(() => {
       const state = useOrganizationTableState("test", 10, TEST_COLUMN_IDS)
-      const table = useOrganizationTable({
-        atoms: state.atoms,
-        columns,
-        data: rows,
-        getRowId: (row) => row.id,
-        state: { columnVisibility: state.columnVisibility },
-        onColumnVisibilityChange: state.setColumnVisibility
-      })
+      const table = useOrganizationTable<TestRow, null>(
+        {
+          atoms: state.atoms,
+          columns,
+          data: rows,
+          getRowId: (row) => row.id
+        },
+        () => null
+      )
       return { state, table }
     })
 
@@ -284,6 +285,9 @@ describe("organization table state", () => {
 
     expect(result.current.state.pagination.pageIndex).toBe(0)
     expect(result.current.state.rowSelection).toEqual({})
+
+    act(() => result.current.table.getColumn("group")?.toggleVisibility(false))
+    expect(result.current.state.columnVisibility).toEqual({ group: false })
 
     await waitFor(() => {
       expect(

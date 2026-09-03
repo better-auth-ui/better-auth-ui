@@ -158,32 +158,35 @@ export function OrganizationRoles({
     ORGANIZATION_TABLE_PAGE_SIZE,
     ROLE_COLUMN_IDS
   )
-  const { columnVisibility, globalFilter, pagination } = tableState
-  const table = useOrganizationTable({
-    atoms: tableState.atoms,
-    columns: roleColumns,
-    data: roles.data ?? EMPTY_ROLES,
-    enableRowSelection: canDelete.data?.success === true,
-    globalFilterFn: (row, _columnId, value) => {
-      const query = String(value).toLowerCase()
-      return (
-        row.original.role.toLowerCase().includes(query) ||
-        Object.entries(row.original.permission).some(
-          ([resource, actions]) =>
-            resource.toLowerCase().includes(query) ||
-            actions.some((action) => action.toLowerCase().includes(query))
+  const { globalFilter, pagination } = tableState
+  useEffect(() => {
+    tableState.setColumnVisibility((current) =>
+      current.permissionResources === false
+        ? current
+        : { ...current, permissionResources: false }
+    )
+  }, [tableState.setColumnVisibility])
+  const table = useOrganizationTable(
+    {
+      atoms: tableState.atoms,
+      columns: roleColumns,
+      data: roles.data ?? EMPTY_ROLES,
+      enableRowSelection: canDelete.data?.success === true,
+      globalFilterFn: (row, _columnId, value) => {
+        const query = String(value).toLowerCase()
+        return (
+          row.original.role.toLowerCase().includes(query) ||
+          Object.entries(row.original.permission).some(
+            ([resource, actions]) =>
+              resource.toLowerCase().includes(query) ||
+              actions.some((action) => action.toLowerCase().includes(query))
+          )
         )
-      )
+      },
+      getRowId: (role) => role.id
     },
-    getRowId: (role) => role.id,
-    state: {
-      columnVisibility: {
-        ...columnVisibility,
-        permissionResources: false
-      }
-    },
-    onColumnVisibilityChange: tableState.setColumnVisibility
-  })
+    () => null
+  )
   const deleteRoles = useDeleteRole(authClient, organizationId)
   const permissionFilter = String(
     table.getColumn("permissionResources")?.getFilterValue() ?? "all"

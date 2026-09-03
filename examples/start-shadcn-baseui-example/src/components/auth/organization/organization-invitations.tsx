@@ -111,21 +111,20 @@ export function OrganizationInvitations({
     ORGANIZATION_TABLE_PAGE_SIZE,
     INVITATION_COLUMN_IDS
   )
-  const { columnVisibility, globalFilter, pagination } = tableState
+  const { globalFilter, pagination } = tableState
 
-  const table = useOrganizationTable({
-    atoms: tableState.atoms,
-    columns: invitationColumns,
-    data: invitations ?? EMPTY_INVITATIONS,
-    enableRowSelection: (row) =>
-      canCancel.data?.success === true && row.original.status === "pending",
-    globalFilterFn: "includesString",
-    getRowId: (invitation) => invitation.id,
-    state: {
-      columnVisibility
+  const table = useOrganizationTable(
+    {
+      atoms: tableState.atoms,
+      columns: invitationColumns,
+      data: invitations ?? EMPTY_INVITATIONS,
+      enableRowSelection: (row) =>
+        canCancel.data?.success === true && row.original.status === "pending",
+      globalFilterFn: "includesString",
+      getRowId: (invitation) => invitation.id
     },
-    onColumnVisibilityChange: tableState.setColumnVisibility
-  })
+    () => null
+  )
 
   const cancelInvitations = useCancelInvitation(authClient)
   const roleFilter = String(table.getColumn("role")?.getFilterValue() ?? "all")

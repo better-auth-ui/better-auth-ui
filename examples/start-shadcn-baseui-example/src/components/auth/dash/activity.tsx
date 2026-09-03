@@ -314,15 +314,18 @@ function ActivityFeed({
     ready,
     setPagination
   ])
-  const table = useActivityTable({
-    atoms: tableState.atoms,
-    columns: activityColumns,
-    data: data?.events ?? EMPTY_EVENTS,
-    getRowId: getDashEventKey,
-    manualFiltering: true,
-    manualPagination: true,
-    rowCount: data?.total ?? 0
-  })
+  const table = useActivityTable(
+    {
+      atoms: tableState.atoms,
+      columns: activityColumns,
+      data: data?.events ?? EMPTY_EVENTS,
+      getRowId: getDashEventKey,
+      manualFiltering: true,
+      manualPagination: true,
+      rowCount: data?.total ?? 0
+    },
+    () => null
+  )
 
   return (
     <Card
