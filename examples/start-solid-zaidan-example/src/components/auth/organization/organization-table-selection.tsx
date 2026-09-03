@@ -1,14 +1,12 @@
 import type { OrganizationLocalization } from "@better-auth-ui/core/plugins/organization"
+import type { Row, RowData } from "@tanstack/solid-table"
 import { Checkbox } from "@/components/ui/checkbox"
+import type { organizationTableFeatures } from "./organization-table"
 
-export type OrganizationSelectableRow = {
-  getCanSelect: () => boolean
-  getIsSelected: () => boolean
-  getToggleSelectedHandler: () => (event: {
-    shiftKey: boolean
-    target: { checked: boolean }
-  }) => void
-}
+export type OrganizationSelectableRow<TData extends RowData = RowData> = Pick<
+  Row<typeof organizationTableFeatures, TData>,
+  "getCanSelect" | "getIsSelected" | "getToggleSelectedHandler"
+>
 
 export function OrganizationTableSelectAll(props: {
   allSelected: boolean
@@ -28,10 +26,10 @@ export function OrganizationTableSelectAll(props: {
   )
 }
 
-export function OrganizationTableSelectRow(props: {
+export function OrganizationTableSelectRow<TData extends RowData>(props: {
   disabled?: boolean
   localization: Pick<OrganizationLocalization, "selectRow">
-  row: OrganizationSelectableRow
+  row: OrganizationSelectableRow<TData>
 }) {
   let shiftKey = false
 

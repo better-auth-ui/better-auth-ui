@@ -243,13 +243,7 @@ export function OrganizationInvitations(props: OrganizationInvitationsProps) {
     enableRowSelection: (row) =>
       canCancel.data?.success === true && row.original.status === "pending",
     globalFilterFn: "includesString",
-    get state() {
-      return {
-        columnVisibility: tableState.columnVisibility()
-      }
-    },
-    getRowId: (invitation) => invitation.id,
-    onColumnVisibilityChange: tableState.setColumnVisibility
+    getRowId: (invitation) => invitation.id
   })
   const canCancel = useHasPermission(auth.authClient, () => ({
     permissions: { invitation: ["cancel"] }

@@ -152,6 +152,13 @@ export function OrganizationRoles(props: { organizationId: string }) {
     ORGANIZATION_TABLE_PAGE_SIZE,
     ROLE_COLUMN_IDS
   )
+  createEffect(() => {
+    tableState.setColumnVisibility((current) =>
+      current.permissionResources === false
+        ? current
+        : { ...current, permissionResources: false }
+    )
+  })
   const table = createOrganizationTable({
     atoms: tableState.atoms,
     columns: roleColumns,
@@ -172,16 +179,7 @@ export function OrganizationRoles(props: { organizationId: string }) {
         )
       )
     },
-    get state() {
-      return {
-        columnVisibility: {
-          ...tableState.columnVisibility(),
-          permissionResources: false
-        }
-      }
-    },
-    getRowId: (role) => role.id,
-    onColumnVisibilityChange: tableState.setColumnVisibility
+    getRowId: (role) => role.id
   })
   const deleteRoles = useDeleteRole(auth.authClient, () => props.organizationId)
   const permissionFilter = () =>

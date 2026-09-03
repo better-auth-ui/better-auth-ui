@@ -10,10 +10,10 @@ import {
   createOrganizationColumnHelper,
   createOrganizationTable
 } from "../src/components/auth/organization/organization-table"
-import { OrganizationTableRenderer } from "../src/components/auth/organization/organization-table-renderer"
 import { OrganizationTableSelectRow } from "../src/components/auth/organization/organization-table-selection"
 import { createOrganizationTableState } from "../src/components/auth/organization/organization-table-state"
 import { createServerTableState } from "../src/components/auth/server-table-state"
+import { OrganizationTableRenderer } from "./organization-table-renderer"
 
 afterEach(cleanup)
 
@@ -122,6 +122,40 @@ function AsyncValidatedAuthForm(props: { validate: () => Promise<undefined> }) {
       >
         {(field) => <field.AuthFormTextField label="Handle" />}
       </form.AppField>
+    </form.AppForm>
+  )
+}
+
+function MultiFieldServerErrorForm() {
+  const form = createAuthForm(() => ({
+    defaultValues: { email: "", password: "" },
+    onSubmit: async () => {
+      setAuthFormServerError(
+        form,
+        {
+          fields: {
+            email: "Email is unavailable",
+            password: "Password is compromised"
+          },
+          message: "Update the highlighted fields"
+        },
+        "Fallback submission error"
+      )
+    }
+  }))
+
+  return (
+    <form.AppForm>
+      <form.AuthFormRoot>
+        <form.AppField name="email">
+          {(field) => <field.AuthFormTextField label="Email" />}
+        </form.AppField>
+        <form.AppField name="password">
+          {(field) => <field.AuthFormTextField label="Password" />}
+        </form.AppField>
+        <form.AuthFormServerError />
+        <form.AuthFormSubmitButton>Continue</form.AuthFormSubmitButton>
+      </form.AuthFormRoot>
     </form.AppForm>
   )
 }
@@ -315,6 +349,30 @@ describe("Solid auth form", () => {
 
     finishValidation()
     await vi.waitFor(() => expect(input).not.toHaveAttribute("aria-busy"))
+  })
+
+  it("preserves unrelated server field errors while editing", async () => {
+    const view = render(() => <MultiFieldServerErrorForm />)
+    const email = view.getByRole("textbox", { name: "Email" })
+    const password = view.getByRole("textbox", { name: "Password" })
+
+    fireEvent.input(email, { target: { value: "ada@example.com" } })
+    fireEvent.input(password, { target: { value: "password" } })
+    fireEvent.click(view.getByRole("button", { name: /Continue/ }))
+
+    await vi.waitFor(() =>
+      expect(view.getByText("Email is unavailable")).toBeVisible()
+    )
+    expect(view.getByText("Password is compromised")).toBeVisible()
+    expect(view.getByText("Update the highlighted fields")).toBeVisible()
+
+    fireEvent.input(password, { target: { value: "safer password" } })
+
+    await vi.waitFor(() =>
+      expect(view.queryByText("Password is compromised")).toBeNull()
+    )
+    expect(view.getByText("Email is unavailable")).toBeVisible()
+    expect(view.queryByText("Update the highlighted fields")).toBeNull()
   })
 })
 

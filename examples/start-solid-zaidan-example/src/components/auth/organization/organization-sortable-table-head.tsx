@@ -1,3 +1,4 @@
+import type { Column, RowData } from "@tanstack/solid-table"
 import { ChevronUp } from "lucide-solid"
 import type { JSX } from "solid-js"
 import { Show } from "solid-js"
@@ -5,16 +6,11 @@ import { Show } from "solid-js"
 import { Button } from "@/components/ui/button"
 import { TableHead } from "@/components/ui/table"
 import { cn } from "@/lib/utils"
+import type { organizationTableFeatures } from "./organization-table"
 
-type SortableColumn = {
-  getIsSorted: () => false | "asc" | "desc"
-  getSortIndex: () => number
-  getToggleSortingHandler: () => undefined | ((event: unknown) => void)
-}
-
-export function OrganizationSortableTableHead(props: {
+export function OrganizationSortableTableHead<TData extends RowData>(props: {
   children: JSX.Element
-  column?: SortableColumn
+  column?: Column<typeof organizationTableFeatures, TData>
 }) {
   const column = props.column
 

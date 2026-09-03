@@ -27,7 +27,7 @@ import type { Member, User } from "better-auth/client"
 import { type ComponentProps, useEffect, useRef, useState } from "react"
 
 import { organizationPlugin } from "../../../lib/auth/organization-plugin"
-import { getHeroUISortDescriptor } from "../table-bridge"
+import { getHeroUISortDescriptor, getTanStackSorting } from "../table-bridge"
 import { InviteMemberDialog } from "./invite-member-dialog"
 import { OrganizationMemberRow } from "./organization-member-row"
 import { OrganizationMemberRowSkeleton } from "./organization-member-row-skeleton"
@@ -62,6 +62,9 @@ const memberColumns = memberColumnHelper.columns([
     enableSorting: false
   })
 ])
+const memberColumnsWithoutTeams = memberColumns.filter(
+  (column) => column.id !== "teams"
+)
 const EMPTY_MEMBERS: MemberRow[] = []
 const MEMBER_COLUMN_IDS = ["user", "role", "teams"] as const
 
@@ -118,8 +121,7 @@ export function OrganizationMembers({
     validatedPageSize ?? ORGANIZATION_TABLE_PAGE_SIZE,
     MEMBER_COLUMN_IDS
   )
-  const { columnFilters, columnVisibility, globalFilter, pagination, sorting } =
-    tableState
+  const { columnFilters, globalFilter, pagination, sorting } = tableState
   const roleFilter = String(
     columnFilters.find((filter) => filter.id === "role")?.value ?? "all"
   )
@@ -244,33 +246,29 @@ export function OrganizationMembers({
   const ownerCount = owners.data?.total ?? owners.data?.members.length
   const showTeams = teams && canListMemberTeams.data?.success === true
 
-  const table = useOrganizationTable({
-    atoms: tableState.atoms,
-    columns: memberColumns,
-    data: membersData?.members ?? EMPTY_MEMBERS,
-    enableRowSelection: (row) => {
-      const targetIsOwner = hasMemberRole(row.original.role, creatorRole)
-      return (
-        canDeleteMembers.data?.success === true &&
-        row.original.userId !== session?.user.id &&
-        (isOwner || !targetIsOwner) &&
-        !(targetIsOwner && (ownerCount === undefined || ownerCount <= 1))
-      )
+  const table = useOrganizationTable<MemberRow, null>(
+    {
+      atoms: tableState.atoms,
+      columns: showTeams ? memberColumns : memberColumnsWithoutTeams,
+      data: membersData?.members ?? EMPTY_MEMBERS,
+      enableRowSelection: (row) => {
+        const targetIsOwner = hasMemberRole(row.original.role, creatorRole)
+        return (
+          canDeleteMembers.data?.success === true &&
+          row.original.userId !== session?.user.id &&
+          (isOwner || !targetIsOwner) &&
+          !(targetIsOwner && (ownerCount === undefined || ownerCount <= 1))
+        )
+      },
+      globalFilterFn: "includesString",
+      getRowId: (member) => member.id,
+      manualFiltering: paged,
+      manualPagination: paged,
+      manualSorting: paged,
+      rowCount: paged ? total : undefined
     },
-    globalFilterFn: "includesString",
-    getRowId: (member) => member.id,
-    manualFiltering: paged,
-    manualPagination: paged,
-    manualSorting: paged,
-    rowCount: paged ? total : undefined,
-    state: {
-      columnVisibility: {
-        ...columnVisibility,
-        teams: showTeams && columnVisibility.teams !== false
-      }
-    },
-    onColumnVisibilityChange: tableState.setColumnVisibility
-  })
+    () => null
+  )
 
   const removeMembers = useRemoveMember(authClient as OrganizationAuthClient)
   const roleFacetRows = table.getColumn("role")?.getFacetedRowModel().flatRows
@@ -463,6 +461,9 @@ export function OrganizationMembers({
           <Table.ScrollContainer>
             <Table.Content
               aria-label={organizationLocalization.members}
+              onSortChange={(descriptor) =>
+                table.setSorting(getTanStackSorting(descriptor, sorting))
+              }
               sortDescriptor={getHeroUISortDescriptor(sorting)}
             >
               <Table.Header>
@@ -487,21 +488,29 @@ export function OrganizationMembers({
                   </Table.Column>
                 ) : (
                   <Table.Column allowsSorting id="user" isRowHeader>
-                    <OrganizationSortableTableHeader
-                      column={table.getColumn("user")}
-                    >
-                      {organizationLocalization.member}
-                    </OrganizationSortableTableHeader>
+                    {({ sortDirection }) => (
+                      <OrganizationSortableTableHeader
+                        column={table.getColumn("user")}
+                        interactive={false}
+                        nativeSortDirection={sortDirection}
+                      >
+                        {organizationLocalization.member}
+                      </OrganizationSortableTableHeader>
+                    )}
                   </Table.Column>
                 )}
 
                 {table.getColumn("role")?.getIsVisible() && (
                   <Table.Column allowsSorting id="role">
-                    <OrganizationSortableTableHeader
-                      column={table.getColumn("role")}
-                    >
-                      {organizationLocalization.role}
-                    </OrganizationSortableTableHeader>
+                    {({ sortDirection }) => (
+                      <OrganizationSortableTableHeader
+                        column={table.getColumn("role")}
+                        interactive={false}
+                        nativeSortDirection={sortDirection}
+                      >
+                        {organizationLocalization.role}
+                      </OrganizationSortableTableHeader>
+                    )}
                   </Table.Column>
                 )}
 

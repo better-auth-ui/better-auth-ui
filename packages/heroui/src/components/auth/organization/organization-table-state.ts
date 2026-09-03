@@ -114,6 +114,7 @@ export function useOrganizationTableState(
   const atoms = useMemo(
     () => ({
       columnFilters: columnFiltersAtom,
+      columnVisibility: columnVisibilityAtom,
       globalFilter: globalFilterAtom,
       pagination: paginationAtom,
       rowSelection: rowSelectionAtom,
@@ -121,6 +122,7 @@ export function useOrganizationTableState(
     }),
     [
       columnFiltersAtom,
+      columnVisibilityAtom,
       globalFilterAtom,
       paginationAtom,
       rowSelectionAtom,

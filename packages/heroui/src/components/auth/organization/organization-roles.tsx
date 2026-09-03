@@ -41,7 +41,7 @@ import {
   isAuthFormFieldInvalid,
   useAuthForm
 } from "../auth-form"
-import { getHeroUISortDescriptor } from "../table-bridge"
+import { getHeroUISortDescriptor, getTanStackSorting } from "../table-bridge"
 import { OrganizationSortableTableHeader } from "./organization-sortable-table-header"
 import {
   createOrganizationColumnHelper,
@@ -126,29 +126,35 @@ export function OrganizationRoles({
     ORGANIZATION_TABLE_PAGE_SIZE,
     ROLE_COLUMN_IDS
   )
-  const { columnVisibility, globalFilter, pagination } = tableState
-  const table = useOrganizationTable({
-    atoms: tableState.atoms,
-    columns: roleColumns,
-    data: roles.data ?? EMPTY_ROLES,
-    enableRowSelection: canDelete.data?.success === true,
-    globalFilterFn: (row, _columnId, value) => {
-      const query = String(value).toLowerCase()
-      return (
-        row.original.role.toLowerCase().includes(query) ||
-        Object.entries(row.original.permission).some(
-          ([resource, actions]) =>
-            resource.toLowerCase().includes(query) ||
-            actions.some((action) => action.toLowerCase().includes(query))
+  const { globalFilter, pagination } = tableState
+  useEffect(() => {
+    tableState.setColumnVisibility((current) =>
+      current.permissionResources === false
+        ? current
+        : { ...current, permissionResources: false }
+    )
+  }, [tableState.setColumnVisibility])
+  const table = useOrganizationTable(
+    {
+      atoms: tableState.atoms,
+      columns: roleColumns,
+      data: roles.data ?? EMPTY_ROLES,
+      enableRowSelection: canDelete.data?.success === true,
+      globalFilterFn: (row, _columnId, value) => {
+        const query = String(value).toLowerCase()
+        return (
+          row.original.role.toLowerCase().includes(query) ||
+          Object.entries(row.original.permission).some(
+            ([resource, actions]) =>
+              resource.toLowerCase().includes(query) ||
+              actions.some((action) => action.toLowerCase().includes(query))
+          )
         )
-      )
+      },
+      getRowId: (role) => role.id
     },
-    getRowId: (role) => role.id,
-    state: {
-      columnVisibility: { ...columnVisibility, permissionResources: false }
-    },
-    onColumnVisibilityChange: tableState.setColumnVisibility
-  })
+    () => null
+  )
   const deleteRoles = useDeleteRole(client, organizationId)
   const permissionFilter = String(
     table.getColumn("permissionResources")?.getFilterValue() ?? "all"
@@ -323,6 +329,11 @@ export function OrganizationRoles({
           <Table.ScrollContainer>
             <Table.Content
               aria-label={localization.roles}
+              onSortChange={(descriptor) =>
+                table.setSorting(
+                  getTanStackSorting(descriptor, tableState.sorting)
+                )
+              }
               sortDescriptor={getHeroUISortDescriptor(tableState.sorting)}
             >
               <Table.Header>
@@ -340,19 +351,27 @@ export function OrganizationRoles({
                   </Table.Column>
                 )}
                 <Table.Column allowsSorting id="role" isRowHeader>
-                  <OrganizationSortableTableHeader
-                    column={table.getColumn("role")}
-                  >
-                    {localization.roleName}
-                  </OrganizationSortableTableHeader>
+                  {({ sortDirection }) => (
+                    <OrganizationSortableTableHeader
+                      column={table.getColumn("role")}
+                      interactive={false}
+                      nativeSortDirection={sortDirection}
+                    >
+                      {localization.roleName}
+                    </OrganizationSortableTableHeader>
+                  )}
                 </Table.Column>
                 {table.getColumn("permissions")?.getIsVisible() && (
                   <Table.Column allowsSorting id="permissions">
-                    <OrganizationSortableTableHeader
-                      column={table.getColumn("permissions")}
-                    >
-                      {localization.permissions}
-                    </OrganizationSortableTableHeader>
+                    {({ sortDirection }) => (
+                      <OrganizationSortableTableHeader
+                        column={table.getColumn("permissions")}
+                        interactive={false}
+                        nativeSortDirection={sortDirection}
+                      >
+                        {localization.permissions}
+                      </OrganizationSortableTableHeader>
+                    )}
                   </Table.Column>
                 )}
                 <Table.Column className="text-end">

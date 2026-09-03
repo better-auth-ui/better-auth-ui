@@ -276,16 +276,19 @@ export function AdminUsers({
     total,
     users.isSuccess
   ])
-  const table = useAdminTable({
-    atoms: tableState.atoms,
-    columns: adminColumns,
-    data: users.data?.users ?? EMPTY_USERS,
-    getRowId: (user) => user.id,
-    manualFiltering: true,
-    manualPagination: true,
-    manualSorting: true,
-    rowCount: total
-  })
+  const table = useAdminTable(
+    {
+      atoms: tableState.atoms,
+      columns: adminColumns,
+      data: users.data?.users ?? EMPTY_USERS,
+      getRowId: (user) => user.id,
+      manualFiltering: true,
+      manualPagination: true,
+      manualSorting: true,
+      rowCount: total
+    },
+    () => null
+  )
   const from = total ? pagination.pageIndex * pagination.pageSize + 1 : 0
   const to = Math.min(total, (pagination.pageIndex + 1) * pagination.pageSize)
 

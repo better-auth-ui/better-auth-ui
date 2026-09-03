@@ -77,6 +77,9 @@ const memberColumns = memberColumnHelper.columns([
     enableSorting: false
   })
 ])
+const memberColumnsWithoutTeams = memberColumns.filter(
+  (column) => column.id !== "teams"
+)
 const EMPTY_MEMBERS: MemberRow[] = []
 const MEMBER_COLUMN_IDS = ["user", "role", "teams"] as const
 
@@ -133,8 +136,7 @@ export function OrganizationMembers({
     validatedPageSize ?? ORGANIZATION_TABLE_PAGE_SIZE,
     MEMBER_COLUMN_IDS
   )
-  const { columnFilters, columnVisibility, globalFilter, pagination, sorting } =
-    tableState
+  const { columnFilters, globalFilter, pagination, sorting } = tableState
   const roleFilter = String(
     columnFilters.find((filter) => filter.id === "role")?.value ?? "all"
   )
@@ -249,33 +251,29 @@ export function OrganizationMembers({
     total
   ])
 
-  const table = useOrganizationTable({
-    atoms: tableState.atoms,
-    columns: memberColumns,
-    data: membersData?.members ?? EMPTY_MEMBERS,
-    enableRowSelection: (row) => {
-      const targetIsOwner = hasMemberRole(row.original.role, creatorRole)
-      return (
-        canDeleteMembers.data?.success === true &&
-        row.original.userId !== session?.user.id &&
-        (isOwner || !targetIsOwner) &&
-        !(targetIsOwner && (ownerCount === undefined || ownerCount <= 1))
-      )
+  const table = useOrganizationTable<MemberRow, null>(
+    {
+      atoms: tableState.atoms,
+      columns: showTeams ? memberColumns : memberColumnsWithoutTeams,
+      data: membersData?.members ?? EMPTY_MEMBERS,
+      enableRowSelection: (row) => {
+        const targetIsOwner = hasMemberRole(row.original.role, creatorRole)
+        return (
+          canDeleteMembers.data?.success === true &&
+          row.original.userId !== session?.user.id &&
+          (isOwner || !targetIsOwner) &&
+          !(targetIsOwner && (ownerCount === undefined || ownerCount <= 1))
+        )
+      },
+      globalFilterFn: "includesString",
+      getRowId: (member) => member.id,
+      manualFiltering: paged,
+      manualPagination: paged,
+      manualSorting: paged,
+      rowCount: paged ? total : undefined
     },
-    globalFilterFn: "includesString",
-    getRowId: (member) => member.id,
-    manualFiltering: paged,
-    manualPagination: paged,
-    manualSorting: paged,
-    rowCount: paged ? total : undefined,
-    state: {
-      columnVisibility: {
-        ...columnVisibility,
-        teams: showTeams && columnVisibility.teams !== false
-      }
-    },
-    onColumnVisibilityChange: tableState.setColumnVisibility
-  })
+    () => null
+  )
 
   const removeMembers = useRemoveMember(authClient)
   const roleFacetRows = table.getColumn("role")?.getFacetedRowModel().flatRows

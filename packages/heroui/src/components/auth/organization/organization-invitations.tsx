@@ -24,7 +24,7 @@ import type { Invitation } from "better-auth/client"
 import { type ComponentProps, useState } from "react"
 
 import { organizationPlugin } from "../../../lib/auth/organization-plugin"
-import { getHeroUISortDescriptor } from "../table-bridge"
+import { getHeroUISortDescriptor, getTanStackSorting } from "../table-bridge"
 import { InviteMemberDialog } from "./invite-member-dialog"
 import { OrganizationInvitationTableRow } from "./organization-invitation-row"
 import { OrganizationInvitationRowSkeleton } from "./organization-invitation-row-skeleton"
@@ -95,21 +95,20 @@ export function OrganizationInvitations({
     ORGANIZATION_TABLE_PAGE_SIZE,
     INVITATION_COLUMN_IDS
   )
-  const { columnVisibility, globalFilter, pagination } = tableState
+  const { globalFilter, pagination } = tableState
 
-  const table = useOrganizationTable({
-    atoms: tableState.atoms,
-    columns: invitationColumns,
-    data: invitations ?? EMPTY_INVITATIONS,
-    enableRowSelection: (row) =>
-      canCancel.data?.success === true && row.original.status === "pending",
-    globalFilterFn: "includesString",
-    getRowId: (invitation) => invitation.id,
-    state: {
-      columnVisibility
+  const table = useOrganizationTable(
+    {
+      atoms: tableState.atoms,
+      columns: invitationColumns,
+      data: invitations ?? EMPTY_INVITATIONS,
+      enableRowSelection: (row) =>
+        canCancel.data?.success === true && row.original.status === "pending",
+      globalFilterFn: "includesString",
+      getRowId: (invitation) => invitation.id
     },
-    onColumnVisibilityChange: tableState.setColumnVisibility
-  })
+    () => null
+  )
 
   const cancelInvitations = useCancelInvitation(
     authClient as OrganizationAuthClient
@@ -371,6 +370,11 @@ export function OrganizationInvitations({
           <Table.ScrollContainer>
             <Table.Content
               aria-label={organizationLocalization.invitations}
+              onSortChange={(descriptor) =>
+                table.setSorting(
+                  getTanStackSorting(descriptor, tableState.sorting)
+                )
+              }
               sortDescriptor={getHeroUISortDescriptor(tableState.sorting)}
             >
               <Table.Header>
@@ -388,40 +392,56 @@ export function OrganizationInvitations({
                   </Table.Column>
                 )}
                 <Table.Column allowsSorting id="email" isRowHeader>
-                  <OrganizationSortableTableHeader
-                    column={table.getColumn("email")}
-                  >
-                    {localization.auth.email}
-                  </OrganizationSortableTableHeader>
+                  {({ sortDirection }) => (
+                    <OrganizationSortableTableHeader
+                      column={table.getColumn("email")}
+                      interactive={false}
+                      nativeSortDirection={sortDirection}
+                    >
+                      {localization.auth.email}
+                    </OrganizationSortableTableHeader>
+                  )}
                 </Table.Column>
 
                 {table.getColumn("createdAt")?.getIsVisible() && (
                   <Table.Column allowsSorting id="createdAt">
-                    <OrganizationSortableTableHeader
-                      column={table.getColumn("createdAt")}
-                    >
-                      {organizationLocalization.invitedAt}
-                    </OrganizationSortableTableHeader>
+                    {({ sortDirection }) => (
+                      <OrganizationSortableTableHeader
+                        column={table.getColumn("createdAt")}
+                        interactive={false}
+                        nativeSortDirection={sortDirection}
+                      >
+                        {organizationLocalization.invitedAt}
+                      </OrganizationSortableTableHeader>
+                    )}
                   </Table.Column>
                 )}
 
                 {table.getColumn("role")?.getIsVisible() && (
                   <Table.Column allowsSorting id="role">
-                    <OrganizationSortableTableHeader
-                      column={table.getColumn("role")}
-                    >
-                      {organizationLocalization.role}
-                    </OrganizationSortableTableHeader>
+                    {({ sortDirection }) => (
+                      <OrganizationSortableTableHeader
+                        column={table.getColumn("role")}
+                        interactive={false}
+                        nativeSortDirection={sortDirection}
+                      >
+                        {organizationLocalization.role}
+                      </OrganizationSortableTableHeader>
+                    )}
                   </Table.Column>
                 )}
 
                 {table.getColumn("status")?.getIsVisible() && (
                   <Table.Column allowsSorting id="status">
-                    <OrganizationSortableTableHeader
-                      column={table.getColumn("status")}
-                    >
-                      {organizationLocalization.status}
-                    </OrganizationSortableTableHeader>
+                    {({ sortDirection }) => (
+                      <OrganizationSortableTableHeader
+                        column={table.getColumn("status")}
+                        interactive={false}
+                        nativeSortDirection={sortDirection}
+                      >
+                        {organizationLocalization.status}
+                      </OrganizationSortableTableHeader>
+                    )}
                   </Table.Column>
                 )}
 

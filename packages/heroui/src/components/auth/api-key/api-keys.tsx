@@ -126,15 +126,18 @@ export function ApiKeys({
     setPagination
   ])
 
-  const table = useApiKeyTable({
-    atoms: tableState.atoms,
-    columns: apiKeyColumns,
-    data: page.rows,
-    getRowId: (apiKey) => apiKey.id,
-    manualPagination: true,
-    pageCount: -1,
-    manualSorting: true
-  })
+  const table = useApiKeyTable(
+    {
+      atoms: tableState.atoms,
+      columns: apiKeyColumns,
+      data: page.rows,
+      getRowId: (apiKey) => apiKey.id,
+      manualPagination: true,
+      pageCount: -1,
+      manualSorting: true
+    },
+    () => null
+  )
 
   const [createOpen, setCreateOpen] = useState(false)
 

@@ -8,7 +8,7 @@ import {
   TableHeader,
   TableRow
 } from "@/components/ui/table"
-import type { organizationTableFeatures } from "./organization-table"
+import type { organizationTableFeatures } from "../src/components/auth/organization/organization-table"
 
 type OrganizationTableInstance<TData extends RowData> = AppSolidTable<
   typeof organizationTableFeatures,

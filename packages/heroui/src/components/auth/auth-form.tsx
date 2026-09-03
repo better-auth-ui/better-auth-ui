@@ -90,8 +90,24 @@ export function setAuthFormServerError(
 }
 
 export function clearAuthFormServerError(form: AnyFormApi) {
-  if (!form.state.errorMap.onServer) return
+  form.setErrorMap({ onServer: { fields: {} } })
+}
+
+export function clearAuthFormFieldServerError(
+  form: AnyFormApi,
+  fieldName: string
+) {
   form.setErrorMap({ onServer: undefined })
+  if (!fieldName) return
+
+  const fieldMeta = form.getFieldMeta(fieldName as never)
+  if (!fieldMeta?.errorMap.onServer) return
+
+  form.setFieldMeta(fieldName as never, (current = fieldMeta) => ({
+    ...current,
+    errorMap: { ...current.errorMap, onServer: undefined },
+    errorSourceMap: { ...current.errorSourceMap, onServer: undefined }
+  }))
 }
 
 export async function submitAuthForm(
@@ -129,7 +145,16 @@ function AuthFormRoot({
     const formElement = formElementRef.current
     if (!formElement) return
 
-    const clearServerError = () => clearAuthFormServerError(form)
+    const clearServerError = (event: Event) => {
+      const target = event.target
+      const fieldName =
+        target instanceof HTMLInputElement ||
+        target instanceof HTMLSelectElement ||
+        target instanceof HTMLTextAreaElement
+          ? target.name
+          : ""
+      clearAuthFormFieldServerError(form, fieldName)
+    }
     formElement.addEventListener("input", clearServerError)
     return () => formElement.removeEventListener("input", clearServerError)
   }, [form])
@@ -190,7 +215,7 @@ function AuthFormTextField({
       name={field.name}
       onBlur={field.handleBlur}
       onChange={(value) => {
-        clearAuthFormServerError(form)
+        clearAuthFormFieldServerError(form, field.name)
         field.handleChange(value)
       }}
       validationBehavior="aria"
@@ -255,7 +280,7 @@ function AuthFormAdditionalField(props: AuthFormAdditionalFieldProps) {
       name={field.name}
       onBlur={field.handleBlur}
       onChange={(value) => {
-        clearAuthFormServerError(form)
+        clearAuthFormFieldServerError(form, field.name)
         field.handleChange(value)
       }}
       value={field.state.value}
@@ -263,7 +288,11 @@ function AuthFormAdditionalField(props: AuthFormAdditionalFieldProps) {
   )
 }
 
-export const { useAppForm: useAuthForm } = createFormHook({
+export const {
+  useAppForm: useAuthForm,
+  withFieldGroup: withAuthFieldGroup,
+  withForm: withAuthForm
+} = createFormHook({
   fieldComponents: {
     AuthFormAdditionalField,
     AuthFormFieldError,
