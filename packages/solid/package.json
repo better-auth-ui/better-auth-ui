@@ -1,6 +1,6 @@
 {
   "name": "@better-auth-ui/solid",
-  "version": "1.7.22",
+  "version": "1.7.23",
   "type": "module",
   "scripts": {
     "build": "vite build && vite build --config vite.email.config.ts",
