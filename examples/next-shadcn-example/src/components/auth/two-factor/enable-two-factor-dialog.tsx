@@ -35,7 +35,6 @@ import {
   InputGroupButton,
   InputGroupInput
 } from "@/components/ui/input-group"
-import { Spinner } from "@/components/ui/spinner"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { twoFactorPlugin } from "@/lib/auth/two-factor-plugin"
 import { useTwoFactorPasswordRequirement } from "@/lib/auth/use-two-factor-password"
@@ -364,12 +363,12 @@ export function EnableTwoFactorDialog({
               <form.Subscribe selector={(state) => state.values.code}>
                 {(code) => (
                   <form.AuthFormSubmitButton
+                    isPending={isPending}
                     disabled={
                       isPending ||
                       (step === "verify" && code.length !== codeLength)
                     }
                   >
-                    {isPending && <Spinner />}
                     {submitLabel}
                   </form.AuthFormSubmitButton>
                 )}

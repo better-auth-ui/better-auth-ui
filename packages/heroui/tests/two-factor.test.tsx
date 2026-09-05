@@ -107,6 +107,30 @@ afterEach(() => {
 })
 
 describe("sign-in continuation", () => {
+  it("shows one spinner while email sign-in and form submission overlap", async () => {
+    const user = userEvent.setup()
+    let resolve!: (result: SignInResult) => void
+    const promise = new Promise<SignInResult>((finish) => {
+      resolve = finish
+    })
+    const authClient = createMockAuthClient()
+    authClient.signIn.email.mockImplementation(() => promise)
+    renderWithProvider(<SignIn />, authClient)
+
+    await user.type(screen.getByLabelText(/email/i), "user@example.com")
+    await user.type(screen.getByLabelText(/^password$/i), "password123")
+    const button = screen.getByRole("button", { name: /^sign in$/i })
+    await user.click(button)
+
+    await waitFor(() => expect(authClient.signIn.email).toHaveBeenCalledOnce())
+    expect(button.querySelectorAll('[data-slot="spinner"]')).toHaveLength(1)
+    expect(button).toBeDisabled()
+
+    resolve({})
+    await waitFor(() => expect(button).toBeEnabled())
+    expect(button.querySelectorAll('[data-slot="spinner"]')).toHaveLength(0)
+  })
+
   it("routes to the challenge and stores the offered methods", async () => {
     const user = userEvent.setup()
     const { navigate } = renderWithProvider(

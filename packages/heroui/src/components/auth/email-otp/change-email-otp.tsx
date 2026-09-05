@@ -15,7 +15,6 @@ import {
   Input,
   Label,
   Skeleton,
-  Spinner,
   TextField,
   toast
 } from "@heroui/react"
@@ -291,8 +290,6 @@ export function ChangeEmailOtp({
                     }
                     size="sm"
                   >
-                    {isPending && <Spinner color="current" size="sm" />}
-
                     {state.step === "email"
                       ? localization.settings.updateEmail
                       : emailOtpLocalization.verifyCode}

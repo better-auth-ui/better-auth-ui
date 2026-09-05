@@ -396,11 +396,11 @@ function DeviceCodeForm({
               </form.AppField>
 
               <form.AuthFormSubmitButton
+                isPending={isVerifying}
                 className="w-full"
                 disabled={!userCodeComplete || isSessionPending || isVerifying}
                 type="submit"
               >
-                {isVerifying ? <Spinner data-icon="inline-start" /> : null}
                 {localization.continue}
               </form.AuthFormSubmitButton>
             </FieldGroup>

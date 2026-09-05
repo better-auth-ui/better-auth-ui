@@ -20,7 +20,6 @@ import {
 } from "@/components/ui/alert-dialog"
 import { Field, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
-import { Spinner } from "@/components/ui/spinner"
 import { twoFactorPlugin } from "@/lib/auth/two-factor-plugin"
 import { useTwoFactorPasswordRequirement } from "@/lib/auth/use-two-factor-password"
 import { createAuthForm } from "../auth-form"
@@ -118,13 +117,10 @@ export function DisableTwoFactorDialog(props: {
             </AlertDialogCancel>
 
             <form.AuthFormSubmitButton
+              isPending={isPending()}
               disabled={isPending()}
               variant="destructive"
             >
-              <Show when={isPending()}>
-                <Spinner />
-              </Show>
-
               {twoFactorLocalization.disableTwoFactor}
             </form.AuthFormSubmitButton>
           </AlertDialogFooter>

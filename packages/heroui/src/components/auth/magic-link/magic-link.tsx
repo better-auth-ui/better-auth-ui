@@ -11,7 +11,6 @@ import {
   Input,
   Label,
   Link,
-  Spinner,
   TextField
 } from "@heroui/react"
 import { useIsMutating } from "@tanstack/react-query"
@@ -153,13 +152,10 @@ export function MagicLink({
 
             <div className="flex flex-col gap-3">
               <form.AuthFormSubmitButton
+                isPending={signInMagicLinkPending}
                 className="w-full"
                 isDisabled={isPending}
               >
-                {signInMagicLinkPending && (
-                  <Spinner color="current" size="sm" />
-                )}
-
                 {magicLinkLocalization.sendMagicLink}
               </form.AuthFormSubmitButton>
 

@@ -5,14 +5,7 @@ import {
 } from "@better-auth-ui/core/plugins/phone-number"
 import { useAuth, useAuthPlugin, useFetchOptions } from "@better-auth-ui/react"
 import { useRequestPhoneNumberPasswordReset } from "@better-auth-ui/react/plugins/phone-number"
-import {
-  Card,
-  type CardProps,
-  cn,
-  Description,
-  Link,
-  Spinner
-} from "@heroui/react"
+import { Card, type CardProps, cn, Description, Link } from "@heroui/react"
 
 import { phoneNumberPlugin } from "../../../lib/auth/phone-number-plugin"
 import { useAuthForm } from "../auth-form"
@@ -106,10 +99,10 @@ export function ForgotPhoneNumberPassword({
             </form.AppField>
             {Captcha && <div className="flex justify-center">{Captcha}</div>}
             <form.AuthFormSubmitButton
+              isPending={isPending}
               className="w-full"
               isDisabled={isPending}
             >
-              {isPending && <Spinner color="current" size="sm" />}
               {phoneLocalization.sendCode}
             </form.AuthFormSubmitButton>
           </form.AuthFormRoot>

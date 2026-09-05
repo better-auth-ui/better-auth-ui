@@ -25,7 +25,6 @@ import {
   InputGroup,
   Label,
   Link,
-  Spinner,
   TextField
 } from "@heroui/react"
 import { useIsMutating } from "@tanstack/react-query"
@@ -285,11 +284,10 @@ export function SignIn({
 
               <div className="flex flex-col gap-3">
                 <form.AuthFormSubmitButton
+                  isPending={signInEmailPending}
                   className="relative w-full overflow-visible"
                   isDisabled={isPending}
                 >
-                  {signInEmailPending && <Spinner color="current" size="sm" />}
-
                   {localization.auth.signIn}
 
                   <LastUsedBadge method="email" floating />

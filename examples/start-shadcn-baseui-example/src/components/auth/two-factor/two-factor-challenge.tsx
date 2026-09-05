@@ -308,12 +308,12 @@ export function TwoFactorChallenge({ className }: TwoFactorChallengeProps) {
                   <form.Subscribe selector={(state) => state.values.code}>
                     {(code) => (
                       <form.AuthFormSubmitButton
+                        isPending={isPending}
                         disabled={
                           isPending ||
                           (method !== "backup" && code.length !== codeLength)
                         }
                       >
-                        {isPending && <Spinner />}
                         {twoFactorLocalization.verify}
                       </form.AuthFormSubmitButton>
                     )}

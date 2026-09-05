@@ -223,11 +223,9 @@ export function SsoDomainVerification({
                         {localization.requestNewToken}
                       </Button>
                       <form.AuthFormSubmitButton
+                        isPending={verify.isPending}
                         disabled={!providerId || requestToken.isPending}
                       >
-                        {verify.isPending ? (
-                          <Spinner data-icon="inline-start" />
-                        ) : null}
                         {localization.verifyDomain}
                       </form.AuthFormSubmitButton>
                     </div>

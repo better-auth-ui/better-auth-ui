@@ -18,7 +18,6 @@ import {
   AlertDialogTitle
 } from "@/components/ui/alert-dialog"
 import { Card, CardContent } from "@/components/ui/card"
-import { Spinner } from "@/components/ui/spinner"
 import { organizationPlugin } from "@/lib/auth/organization-plugin"
 import { useAuthForm } from "../auth-form"
 import { OrganizationView } from "./organization-view"
@@ -94,11 +93,10 @@ export function DeleteOrganizationDialog({
               </AlertDialogCancel>
 
               <form.AuthFormSubmitButton
+                isPending={isPending}
                 variant="destructive"
                 disabled={isPending}
               >
-                {isPending && <Spinner />}
-
                 {organizationLocalization.deleteOrganization}
               </form.AuthFormSubmitButton>
             </AlertDialogFooter>

@@ -34,7 +34,6 @@ import {
   InputGroup,
   Label,
   Link,
-  Spinner,
   TextField
 } from "@heroui/react"
 import { useSelector } from "@tanstack/react-form"
@@ -242,10 +241,10 @@ export function EmailFirstSignIn({
 
               <form.AuthFormServerError />
               <form.AuthFormSubmitButton
+                isPending={isDiscovering}
                 className="w-full"
                 isDisabled={isPending}
               >
-                {isDiscovering && <Spinner color="current" size="sm" />}
                 {ssoLocalization.continueWithEmail}
               </form.AuthFormSubmitButton>
             </form.AuthFormRoot>
@@ -364,10 +363,10 @@ export function EmailFirstSignIn({
 
                   <form.AuthFormServerError />
                   <form.AuthFormSubmitButton
+                    isPending={isSigningIn}
                     className="w-full"
                     isDisabled={isPending}
                   >
-                    {isSigningIn && <Spinner color="current" size="sm" />}
                     {localization.auth.signIn}
                   </form.AuthFormSubmitButton>
                 </form.AuthFormRoot>

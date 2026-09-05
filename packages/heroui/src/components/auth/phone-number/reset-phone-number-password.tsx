@@ -14,7 +14,6 @@ import {
   Input,
   InputGroup,
   Label,
-  Spinner,
   TextField,
   toast,
   useIsHydrated
@@ -294,10 +293,10 @@ export function ResetPhoneNumberPassword({
             )}
             <form.AuthFormServerError />
             <form.AuthFormSubmitButton
+              isPending={isPending}
               className="w-full"
               isDisabled={!codeComplete || isPending}
             >
-              {isPending && <Spinner color="current" size="sm" />}
               {phoneLocalization.resetPassword}
             </form.AuthFormSubmitButton>
           </form.AuthFormRoot>

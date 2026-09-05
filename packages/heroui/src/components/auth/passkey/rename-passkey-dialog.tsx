@@ -1,14 +1,7 @@
 import type { PasskeyAuthClient } from "@better-auth-ui/core/plugins/passkey"
 import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
 import { useUpdatePasskey } from "@better-auth-ui/react/plugins/passkey"
-import {
-  AlertDialog,
-  Button,
-  Input,
-  Label,
-  Spinner,
-  TextField
-} from "@heroui/react"
+import { AlertDialog, Button, Input, Label, TextField } from "@heroui/react"
 import { useSelector } from "@tanstack/react-form"
 import { useEffect } from "react"
 import { passkeyPlugin } from "../../../lib/auth/passkey-plugin"
@@ -79,11 +72,9 @@ export function RenamePasskeyDialog({
                   {localization.settings.cancel}
                 </Button>
                 <form.AuthFormSubmitButton
+                  isPending={updatePasskey.isPending}
                   isDisabled={nameIsEmpty || updatePasskey.isPending}
                 >
-                  {updatePasskey.isPending && (
-                    <Spinner color="current" size="sm" />
-                  )}
                   {localization.settings.saveChanges}
                 </form.AuthFormSubmitButton>
               </AlertDialog.Footer>

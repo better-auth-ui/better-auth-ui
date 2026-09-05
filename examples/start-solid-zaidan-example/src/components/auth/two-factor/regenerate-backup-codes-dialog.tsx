@@ -21,7 +21,6 @@ import {
 } from "@/components/ui/alert-dialog"
 import { Field, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
-import { Spinner } from "@/components/ui/spinner"
 import { twoFactorPlugin } from "@/lib/auth/two-factor-plugin"
 import { useTwoFactorPasswordRequirement } from "@/lib/auth/use-two-factor-password"
 import { createAuthForm } from "../auth-form"
@@ -138,11 +137,10 @@ export function RegenerateBackupCodesDialog(props: {
               </AlertDialogCancel>
             </Show>
 
-            <form.AuthFormSubmitButton disabled={isPending()}>
-              <Show when={isPending()}>
-                <Spinner />
-              </Show>
-
+            <form.AuthFormSubmitButton
+              isPending={isPending()}
+              disabled={isPending()}
+            >
               {codes().length
                 ? twoFactorLocalization.done
                 : twoFactorLocalization.regenerateBackupCodes}

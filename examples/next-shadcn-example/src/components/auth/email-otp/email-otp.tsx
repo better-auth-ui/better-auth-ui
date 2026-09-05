@@ -28,7 +28,6 @@ import {
   FieldSeparator
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
-import { Spinner } from "@/components/ui/spinner"
 import { emailOtpPlugin } from "@/lib/auth/email-otp-plugin"
 import { useResendCooldown } from "@/lib/auth/use-resend-cooldown"
 import { useSignInContinuation } from "@/lib/auth/use-sign-in-continuation"
@@ -212,12 +211,11 @@ export function EmailOtp({
 
                 <div className="flex flex-col gap-3">
                   <form.AuthFormSubmitButton
+                    isPending={isSending || isSigningIn}
                     disabled={
                       isPending || isSigningIn || (codeSent && !codeComplete)
                     }
                   >
-                    {(isSending || isSigningIn) && <Spinner />}
-
                     {codeSent
                       ? emailOtpLocalization.verifyCode
                       : emailOtpLocalization.sendCode}

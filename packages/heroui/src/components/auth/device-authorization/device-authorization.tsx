@@ -429,10 +429,10 @@ function DeviceCodeForm({
             >
               {(complete) => (
                 <form.AuthFormSubmitButton
+                  isPending={isVerifying}
                   className="w-full"
                   isDisabled={!complete || isSessionPending || isVerifying}
                 >
-                  {isVerifying ? <Spinner color="current" size="sm" /> : null}
                   {localization.continue}
                 </form.AuthFormSubmitButton>
               )}

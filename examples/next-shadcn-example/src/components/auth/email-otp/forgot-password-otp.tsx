@@ -13,7 +13,6 @@ import {
   FieldLabel
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
-import { Spinner } from "@/components/ui/spinner"
 import { emailOtpPlugin } from "@/lib/auth/email-otp-plugin"
 import { cn } from "@/lib/utils"
 import { isAuthFormFieldInvalid, useAuthForm } from "../auth-form"
@@ -124,9 +123,10 @@ export function ForgotPasswordOtp({ className }: ForgotPasswordOtpProps) {
 
               <form.AuthFormServerError />
 
-              <form.AuthFormSubmitButton disabled={isPending}>
-                {isPending && <Spinner />}
-
+              <form.AuthFormSubmitButton
+                isPending={isPending}
+                disabled={isPending}
+              >
                 {emailOtpLocalization.sendCode}
               </form.AuthFormSubmitButton>
             </FieldGroup>

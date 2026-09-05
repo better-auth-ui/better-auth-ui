@@ -23,7 +23,6 @@ import {
   FieldLabel
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
-import { Spinner } from "@/components/ui/spinner"
 import { apiKeyPlugin } from "@/lib/auth/api-key-plugin"
 import { useAuthForm } from "../auth-form"
 
@@ -95,8 +94,10 @@ export function EditApiKeyDialog({
               >
                 {localization.settings.cancel}
               </DialogClose>
-              <form.AuthFormSubmitButton disabled={updateApiKey.isPending}>
-                {updateApiKey.isPending && <Spinner />}
+              <form.AuthFormSubmitButton
+                isPending={updateApiKey.isPending}
+                disabled={updateApiKey.isPending}
+              >
                 {localization.settings.saveChanges}
               </form.AuthFormSubmitButton>
             </DialogFooter>

@@ -195,13 +195,11 @@ export function SsoDomainVerification({
                 {localization.requestNewToken}
               </Button>
               <form.AuthFormSubmitButton
+                isPending={verify.isPending}
                 isDisabled={
                   !providerId || requestToken.isPending || verify.isPending
                 }
               >
-                {verify.isPending ? (
-                  <Spinner color="current" size="sm" />
-                ) : null}
                 {localization.verifyDomain}
               </form.AuthFormSubmitButton>
             </div>

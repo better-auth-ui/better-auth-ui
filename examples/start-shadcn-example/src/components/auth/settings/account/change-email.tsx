@@ -9,7 +9,6 @@ import { Card, CardContent, CardFooter } from "@/components/ui/card"
 import { Field, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import { Skeleton } from "@/components/ui/skeleton"
-import { Spinner } from "@/components/ui/spinner"
 import { cn } from "@/lib/utils"
 import { isAuthFormFieldInvalid, useAuthForm } from "../../auth-form"
 
@@ -108,11 +107,10 @@ export function ChangeEmail({ className }: ChangeEmailProps) {
 
             <CardFooter>
               <form.AuthFormSubmitButton
+                isPending={isPending}
                 size="sm"
                 disabled={isPending || !session}
               >
-                {isPending && <Spinner />}
-
                 {localization.settings.updateEmail}
               </form.AuthFormSubmitButton>
             </CardFooter>

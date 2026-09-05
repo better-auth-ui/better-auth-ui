@@ -29,7 +29,6 @@ import {
   InputGroup,
   Label,
   Link,
-  Spinner,
   TextField
 } from "@heroui/react"
 import { useSelector } from "@tanstack/react-form"
@@ -371,14 +370,12 @@ export function PhoneNumber({
             {Captcha && <div className="flex justify-center">{Captcha}</div>}
             <div className="flex flex-col gap-3">
               <form.AuthFormSubmitButton
+                isPending={isSending || isVerifying || isPasswordPending}
                 className="w-full"
                 isDisabled={
                   isPending || isPasswordPending || (codeSent && !codeComplete)
                 }
               >
-                {(isSending || isVerifying || isPasswordPending) && (
-                  <Spinner color="current" size="sm" />
-                )}
                 {mode === "password"
                   ? localization.auth.signIn
                   : codeSent

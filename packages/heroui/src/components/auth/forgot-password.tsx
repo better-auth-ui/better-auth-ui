@@ -12,7 +12,6 @@ import {
   Input,
   Label,
   Link,
-  Spinner,
   TextField
 } from "@heroui/react"
 import { isAuthFormFieldInvalid, useAuthForm } from "./auth-form"
@@ -130,11 +129,10 @@ export function ForgotPassword({ className, variant }: ForgotPasswordProps) {
 
             <div className="flex flex-col gap-3">
               <form.AuthFormSubmitButton
+                isPending={isPending}
                 className="w-full"
                 isDisabled={isPending}
               >
-                {isPending && <Spinner color="current" size="sm" />}
-
                 {localization.auth.sendResetLink}
               </form.AuthFormSubmitButton>
             </div>

@@ -51,7 +51,6 @@ import {
   InputGroupButton,
   InputGroupInput
 } from "@/components/ui/input-group"
-import { Spinner } from "@/components/ui/spinner"
 import { ssoPlugin } from "@/lib/auth/sso-plugin"
 import { useSignInContinuation } from "@/lib/auth/use-sign-in-continuation"
 import { cn } from "@/lib/utils"
@@ -245,8 +244,10 @@ export function EmailFirstSignIn({
 
                 <form.AuthFormServerError />
 
-                <form.AuthFormSubmitButton disabled={isPending}>
-                  {isDiscovering && <Spinner data-icon="inline-start" />}
+                <form.AuthFormSubmitButton
+                  isPending={isDiscovering}
+                  disabled={isPending}
+                >
                   {ssoLocalization.continueWithEmail}
                 </form.AuthFormSubmitButton>
               </FieldGroup>
@@ -383,8 +384,10 @@ export function EmailFirstSignIn({
 
                     <form.AuthFormServerError />
 
-                    <form.AuthFormSubmitButton disabled={isPending}>
-                      {isSigningIn && <Spinner data-icon="inline-start" />}
+                    <form.AuthFormSubmitButton
+                      isPending={isSigningIn}
+                      disabled={isPending}
+                    >
                       {localization.auth.signIn}
                     </form.AuthFormSubmitButton>
                   </FieldGroup>

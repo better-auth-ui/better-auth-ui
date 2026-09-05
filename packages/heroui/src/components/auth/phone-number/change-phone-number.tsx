@@ -20,7 +20,6 @@ import {
   cn,
   Fieldset,
   Skeleton,
-  Spinner,
   toast
 } from "@heroui/react"
 import { useSelector } from "@tanstack/react-form"
@@ -219,15 +218,13 @@ export function ChangePhoneNumber({
                     </Button>
                   )}
                   <form.AuthFormSubmitButton
+                    isPending={isSending || isVerifying}
                     size="sm"
                     type="submit"
                     isDisabled={
                       !session || isPending || (codeSent && !codeComplete)
                     }
                   >
-                    {(isSending || isVerifying) && (
-                      <Spinner color="current" size="sm" />
-                    )}
                     {codeSent
                       ? localization.verifyCode
                       : localization.updatePhoneNumber}

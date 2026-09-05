@@ -23,7 +23,6 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter } from "@/components/ui/card"
 import { FieldDescription } from "@/components/ui/field"
 import { Skeleton } from "@/components/ui/skeleton"
-import { Spinner } from "@/components/ui/spinner"
 import { phoneNumberPlugin } from "@/lib/auth/phone-number-plugin"
 import { cn } from "@/lib/utils"
 import { useAuthForm } from "../auth-form"
@@ -207,10 +206,10 @@ export function ChangePhoneNumber({ className }: ChangePhoneNumberProps) {
                 </Button>
               )}
               <form.AuthFormSubmitButton
+                isPending={isSending || isVerifying}
                 size="sm"
                 disabled={isPending || !session || (codeSent && !codeComplete)}
               >
-                {(isSending || isVerifying) && <Spinner />}
                 {codeSent
                   ? localization.verifyCode
                   : localization.updatePhoneNumber}

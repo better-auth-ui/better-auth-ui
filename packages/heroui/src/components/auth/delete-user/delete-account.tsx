@@ -17,7 +17,6 @@ import {
   type CardProps,
   InputGroup,
   Label,
-  Spinner,
   TextField,
   toast
 } from "@heroui/react"
@@ -247,13 +246,10 @@ export function DeleteAccount({
                         </Button>
 
                         <form.AuthFormSubmitButton
+                          isPending={deleteUser.isPending}
                           variant="danger"
                           isDisabled={deleteUser.isPending}
                         >
-                          {deleteUser.isPending && (
-                            <Spinner color="current" size="sm" />
-                          )}
-
                           {deleteUserLocalization.deleteAccount}
                         </form.AuthFormSubmitButton>
                       </AlertDialog.Footer>

@@ -46,7 +46,6 @@ import {
   InputGroupButton,
   InputGroupInput
 } from "@/components/ui/input-group"
-import { Spinner } from "@/components/ui/spinner"
 import { phoneNumberPlugin } from "@/lib/auth/phone-number-plugin"
 import { useResendCooldown } from "@/lib/auth/use-resend-cooldown"
 import { useSignInContinuation } from "@/lib/auth/use-sign-in-continuation"
@@ -385,11 +384,9 @@ export function PhoneNumber({
 
                 <div className="flex flex-col gap-3">
                   <form.AuthFormSubmitButton
+                    isPending={isSending || isVerifying || isPasswordPending}
                     disabled={isPending || (codeSent && !codeComplete)}
                   >
-                    {(isSending || isVerifying || isPasswordPending) && (
-                      <Spinner />
-                    )}
                     {mode === "password"
                       ? localization.auth.signIn
                       : codeSent

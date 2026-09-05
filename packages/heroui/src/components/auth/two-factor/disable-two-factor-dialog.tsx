@@ -8,7 +8,6 @@ import {
   FieldError,
   Input,
   Label,
-  Spinner,
   TextField,
   toast
 } from "@heroui/react"
@@ -115,11 +114,10 @@ export function DisableTwoFactorDialog({
                 </Button>
 
                 <form.AuthFormSubmitButton
+                  isPending={isPending}
                   variant="danger"
                   isDisabled={isPending}
                 >
-                  {isPending && <Spinner color="current" size="sm" />}
-
                   {twoFactorLocalization.disableTwoFactor}
                 </form.AuthFormSubmitButton>
               </AlertDialog.Footer>

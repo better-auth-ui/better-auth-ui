@@ -9,7 +9,6 @@ import {
   useFetchOptions
 } from "@better-auth-ui/solid"
 import { useRequestPhoneNumberPasswordReset } from "@better-auth-ui/solid/plugins/phone-number"
-import { Show } from "solid-js"
 
 import {
   Card,
@@ -19,7 +18,6 @@ import {
   CardTitle
 } from "@/components/ui/card"
 import { FieldGroup } from "@/components/ui/field"
-import { Spinner } from "@/components/ui/spinner"
 import { phoneNumberPlugin } from "@/lib/auth/phone-number-plugin"
 import { cn } from "@/lib/utils"
 import { createAuthForm } from "../auth-form"
@@ -106,12 +104,10 @@ export function ForgotPhoneNumberPassword(
                 )}
               </form.AppField>
               <form.AuthFormSubmitButton
+                isPending={requestReset.isPending}
                 class="w-full"
                 disabled={requestReset.isPending}
               >
-                <Show when={requestReset.isPending}>
-                  <Spinner />
-                </Show>
                 {localization.sendCode}
               </form.AuthFormSubmitButton>
               <form.AuthFormServerError />

@@ -15,7 +15,6 @@ import {
   Input,
   Label,
   Link,
-  Spinner,
   TextField
 } from "@heroui/react"
 import { useSelector } from "@tanstack/react-form"
@@ -239,15 +238,12 @@ export function EmailOtp({
 
             <div className="flex flex-col gap-3">
               <form.AuthFormSubmitButton
+                isPending={isSending || isSigningIn}
                 className="w-full"
                 isDisabled={
                   isPending || isSigningIn || (codeSent && !codeComplete)
                 }
               >
-                {(isSending || isSigningIn) && (
-                  <Spinner color="current" size="sm" />
-                )}
-
                 {codeSent
                   ? emailOtpLocalization.verifyCode
                   : emailOtpLocalization.sendCode}

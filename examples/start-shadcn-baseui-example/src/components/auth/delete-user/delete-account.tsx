@@ -35,7 +35,6 @@ import {
   InputGroupButton,
   InputGroupInput
 } from "@/components/ui/input-group"
-import { Spinner } from "@/components/ui/spinner"
 import { deleteUserPlugin } from "@/lib/auth/delete-user-plugin"
 import { cn } from "@/lib/utils"
 import { isAuthFormFieldInvalid, useAuthForm } from "../auth-form"
@@ -231,11 +230,10 @@ export function DeleteAccount({ className }: DeleteAccountProps) {
                     </AlertDialogCancel>
 
                     <form.AuthFormSubmitButton
+                      isPending={deleteUser.isPending}
                       variant="destructive"
                       disabled={deleteUser.isPending}
                     >
-                      {deleteUser.isPending && <Spinner />}
-
                       {deleteUserLocalization.deleteAccount}
                     </form.AuthFormSubmitButton>
                   </AlertDialogFooter>

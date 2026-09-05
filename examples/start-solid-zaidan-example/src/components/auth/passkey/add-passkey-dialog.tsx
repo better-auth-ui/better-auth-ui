@@ -19,7 +19,6 @@ import {
 } from "@/components/ui/dialog"
 import { Field, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
-import { Spinner } from "@/components/ui/spinner"
 import { passkeyPlugin } from "@/lib/auth/passkey-plugin"
 import { createAuthForm } from "../auth-form"
 import { ReauthenticationAction } from "../reauthentication"
@@ -125,8 +124,10 @@ export function AddPasskeyDialog(props: {
               >
                 {auth.localization.settings.cancel}
               </DialogClose>
-              <form.AuthFormSubmitButton disabled={addPasskey.isPending}>
-                {addPasskey.isPending ? <Spinner /> : null}
+              <form.AuthFormSubmitButton
+                isPending={addPasskey.isPending}
+                disabled={addPasskey.isPending}
+              >
                 {labels().addPasskey}
               </form.AuthFormSubmitButton>
             </DialogFooter>

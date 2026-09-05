@@ -2,7 +2,7 @@ import type { OrganizationAuthClient } from "@better-auth-ui/core/plugins/organi
 import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
 import { useDeleteOrganization } from "@better-auth-ui/react/plugins/organization"
 import { TriangleExclamation } from "@gravity-ui/icons"
-import { AlertDialog, Button, Card, Spinner, toast } from "@heroui/react"
+import { AlertDialog, Button, Card, toast } from "@heroui/react"
 import type { Organization } from "better-auth/client"
 
 import { organizationPlugin } from "../../../lib/auth/organization-plugin"
@@ -84,11 +84,10 @@ export function DeleteOrganizationDialog({
                 </Button>
 
                 <form.AuthFormSubmitButton
+                  isPending={isPending}
                   variant="danger"
                   isDisabled={isPending}
                 >
-                  {isPending && <Spinner color="current" size="sm" />}
-
                   {organizationLocalization.deleteOrganization}
                 </form.AuthFormSubmitButton>
               </AlertDialog.Footer>

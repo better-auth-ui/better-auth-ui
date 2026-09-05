@@ -12,13 +12,21 @@ import {
 } from "../src/components/auth/auth-form"
 import { useServerTableState } from "../src/components/auth/server-table-state"
 
-function TestAuthForm({ onSubmit }: { onSubmit: () => Promise<void> }) {
+function TestAuthForm({
+  onSubmit,
+  isPending
+}: {
+  onSubmit: () => Promise<void>
+  isPending?: boolean
+}) {
   const form = useAuthForm({ defaultValues: {}, onSubmit })
 
   return (
     <form.AppForm>
       <form.AuthFormRoot>
-        <form.AuthFormSubmitButton>Continue</form.AuthFormSubmitButton>
+        <form.AuthFormSubmitButton isPending={isPending}>
+          Continue
+        </form.AuthFormSubmitButton>
       </form.AuthFormRoot>
     </form.AppForm>
   )
@@ -142,6 +150,39 @@ function ServerTableStateFixture() {
 }
 
 describe("AuthFormRoot", () => {
+  it("shares one loading indicator across form and external pending transitions", async () => {
+    let resolve!: () => void
+    const promise = new Promise<void>((finish) => {
+      resolve = finish
+    })
+    const onSubmit = vi.fn(() => promise)
+    const view = render(<TestAuthForm onSubmit={onSubmit} isPending />)
+    const button = view.getByRole("button", { name: /Continue/ })
+    const spinners = () => button.querySelectorAll('[data-slot="spinner"]')
+
+    expect(spinners()).toHaveLength(1)
+    expect(button).toBeDisabled()
+    view.rerender(<TestAuthForm onSubmit={onSubmit} isPending={false} />)
+    expect(spinners()).toHaveLength(0)
+    expect(button).toBeEnabled()
+
+    fireEvent.click(button)
+    await waitFor(() => expect(onSubmit).toHaveBeenCalledOnce())
+    expect(spinners()).toHaveLength(1)
+
+    view.rerender(<TestAuthForm onSubmit={onSubmit} isPending />)
+    expect(spinners()).toHaveLength(1)
+    expect(button).toBeDisabled()
+
+    view.rerender(<TestAuthForm onSubmit={onSubmit} isPending={false} />)
+    expect(spinners()).toHaveLength(1)
+    expect(button).toBeDisabled()
+
+    resolve()
+    await waitFor(() => expect(button).toBeEnabled())
+    expect(spinners()).toHaveLength(0)
+  })
+
   it("rejects concurrent submission and disables the submit button", async () => {
     let finishSubmission!: () => void
     const submission = new Promise<void>((resolve) => {

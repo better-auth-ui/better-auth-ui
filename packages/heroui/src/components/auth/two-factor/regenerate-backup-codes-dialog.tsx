@@ -8,7 +8,6 @@ import {
   FieldError,
   Input,
   Label,
-  Spinner,
   TextField,
   toast
 } from "@heroui/react"
@@ -154,9 +153,10 @@ export function RegenerateBackupCodesDialog({
                   </Button>
                 )}
 
-                <form.AuthFormSubmitButton isDisabled={isPending}>
-                  {isPending && <Spinner color="current" size="sm" />}
-
+                <form.AuthFormSubmitButton
+                  isPending={isPending}
+                  isDisabled={isPending}
+                >
                   {codes.length
                     ? twoFactorLocalization.done
                     : twoFactorLocalization.regenerateBackupCodes}

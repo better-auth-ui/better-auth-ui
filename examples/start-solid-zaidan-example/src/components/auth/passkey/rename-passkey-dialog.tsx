@@ -15,7 +15,6 @@ import {
 } from "@/components/ui/dialog"
 import { Field, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
-import { Spinner } from "@/components/ui/spinner"
 import { createAuthForm } from "../auth-form"
 
 export function RenamePasskeyDialog(props: {
@@ -81,8 +80,10 @@ export function RenamePasskeyDialog(props: {
             <DialogClose as={Button} type="button" variant="outline">
               {auth.localization.settings.cancel}
             </DialogClose>
-            <form.AuthFormSubmitButton disabled={updatePasskey.isPending}>
-              {updatePasskey.isPending ? <Spinner /> : null}
+            <form.AuthFormSubmitButton
+              isPending={updatePasskey.isPending}
+              disabled={updatePasskey.isPending}
+            >
               {auth.localization.settings.saveChanges}
             </form.AuthFormSubmitButton>
           </DialogFooter>

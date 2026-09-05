@@ -18,7 +18,6 @@ import {
   InputGroup,
   Label,
   Link,
-  Spinner,
   TextField,
   toast,
   useIsHydrated
@@ -344,11 +343,10 @@ export function ResetPasswordOtp({
 
             <div className="flex flex-col gap-3">
               <form.AuthFormSubmitButton
+                isPending={isPending}
                 className="w-full"
                 isDisabled={isPending}
               >
-                {isPending && <Spinner color="current" size="sm" />}
-
                 {localization.auth.resetPassword}
               </form.AuthFormSubmitButton>
 

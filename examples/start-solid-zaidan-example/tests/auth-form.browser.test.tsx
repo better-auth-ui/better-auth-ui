@@ -1,5 +1,6 @@
 import type { TablePersistenceAdapters } from "@better-auth-ui/core"
 import { cleanup, fireEvent, render } from "@solidjs/testing-library"
+import { createSignal } from "solid-js"
 import { afterEach, describe, expect, it, vi } from "vitest"
 
 import {
@@ -59,7 +60,10 @@ function NativeValidationForm() {
   )
 }
 
-function PendingAuthForm(props: { onSubmit: () => Promise<void> }) {
+function PendingAuthForm(props: {
+  onSubmit: () => Promise<void>
+  isPending?: boolean
+}) {
   const form = createAuthForm(() => ({
     defaultValues: {},
     onSubmit: props.onSubmit
@@ -68,7 +72,9 @@ function PendingAuthForm(props: { onSubmit: () => Promise<void> }) {
   return (
     <form.AppForm>
       <form.AuthFormRoot>
-        <form.AuthFormSubmitButton>Submit</form.AuthFormSubmitButton>
+        <form.AuthFormSubmitButton isPending={props.isPending}>
+          Submit
+        </form.AuthFormSubmitButton>
       </form.AuthFormRoot>
     </form.AppForm>
   )
@@ -264,6 +270,42 @@ describe("Solid auth form", () => {
 
     await vi.waitFor(() => expect(focus).toHaveBeenCalled())
     expect(document.activeElement).toBe(firstControl)
+  })
+
+  it("shares one loading indicator across form and external pending transitions", async () => {
+    let resolve!: () => void
+    const promise = new Promise<void>((finish) => {
+      resolve = finish
+    })
+    const onSubmit = vi.fn(() => promise)
+    const [isPending, setIsPending] = createSignal(true)
+    const view = render(() => (
+      <PendingAuthForm onSubmit={onSubmit} isPending={isPending()} />
+    ))
+    const button = view.getByRole("button", { name: /Submit/ })
+    const spinners = () => button.querySelectorAll('[role="status"]')
+
+    expect(spinners()).toHaveLength(1)
+    expect(button).toBeDisabled()
+    setIsPending(false)
+    expect(spinners()).toHaveLength(0)
+    expect(button).toBeEnabled()
+
+    fireEvent.click(button)
+    await vi.waitFor(() => expect(onSubmit).toHaveBeenCalledOnce())
+    expect(spinners()).toHaveLength(1)
+
+    setIsPending(true)
+    expect(spinners()).toHaveLength(1)
+    expect(button).toBeDisabled()
+
+    setIsPending(false)
+    expect(spinners()).toHaveLength(1)
+    expect(button).toBeDisabled()
+
+    resolve()
+    await vi.waitFor(() => expect(button).toBeEnabled())
+    expect(spinners()).toHaveLength(0)
   })
 
   it("rejects concurrent submission and exposes its pending state", async () => {

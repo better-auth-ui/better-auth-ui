@@ -9,7 +9,6 @@ import {
   Input,
   Label,
   Skeleton,
-  Spinner,
   TextField,
   toast
 } from "@heroui/react"
@@ -106,11 +105,10 @@ export function ChangeEmail({
 
                 <Fieldset.Actions>
                   <form.AuthFormSubmitButton
+                    isPending={isPending}
                     isDisabled={!session || isPending}
                     size="sm"
                   >
-                    {isPending && <Spinner color="current" size="sm" />}
-
                     {localization.settings.updateEmail}
                   </form.AuthFormSubmitButton>
                 </Fieldset.Actions>

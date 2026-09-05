@@ -247,8 +247,12 @@ function AuthFormTextField(props: AuthFormTextFieldProps) {
 }
 
 function AuthFormSubmitButton(
-  props: Omit<ComponentProps<typeof Button>, "class"> & { class?: string }
+  props: Omit<ComponentProps<typeof Button>, "class"> & {
+    class?: string
+    isPending?: boolean
+  }
 ) {
+  const [local, others] = splitProps(props, ["isPending", "children"])
   const form = useFormContext()
 
   return (
@@ -257,18 +261,25 @@ function AuthFormSubmitButton(
     >
       {(state) => (
         <Button
-          {...props}
+          {...others}
+          aria-busy={local.isPending || state()[0] || undefined}
           aria-disabled={
-            props.disabled || state()[0] || state()[1] || undefined
+            props.disabled ||
+            local.isPending ||
+            state()[0] ||
+            state()[1] ||
+            undefined
           }
           class={props.class}
-          disabled={props.disabled || state()[0] || state()[1]}
+          disabled={
+            props.disabled || local.isPending || state()[0] || state()[1]
+          }
           type="submit"
         >
-          <Show when={state()[0]}>
+          <Show when={local.isPending || state()[0]}>
             <Spinner />
           </Show>
-          {props.children}
+          {local.children}
         </Button>
       )}
     </form.Subscribe>

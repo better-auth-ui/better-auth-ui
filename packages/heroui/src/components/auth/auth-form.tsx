@@ -235,6 +235,7 @@ function AuthFormTextField({
 function AuthFormSubmitButton({
   children,
   isDisabled,
+  isPending,
   ...props
 }: Omit<ComponentProps<typeof Button>, "children"> & { children?: ReactNode }) {
   const form = useFormContext()
@@ -246,13 +247,16 @@ function AuthFormSubmitButton({
       {([isSubmitting, isValidating]) => (
         <Button
           {...props}
+          isPending={isPending || isSubmitting}
           aria-disabled={
-            isDisabled || isSubmitting || isValidating || undefined
+            isDisabled || isPending || isSubmitting || isValidating || undefined
           }
-          isDisabled={isDisabled || isSubmitting || isValidating}
+          isDisabled={isDisabled || isPending || isSubmitting || isValidating}
           type="submit"
         >
-          {isSubmitting ? <Spinner /> : null}
+          {isPending || isSubmitting ? (
+            <Spinner color="current" size="sm" />
+          ) : null}
           {children}
         </Button>
       )}

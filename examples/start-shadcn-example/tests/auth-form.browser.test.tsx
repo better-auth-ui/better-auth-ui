@@ -31,13 +31,21 @@ vi.mock("@/lib/auth/use-resend-cooldown", () => ({
 
 afterEach(cleanup)
 
-function TestAuthForm({ onSubmit }: { onSubmit: () => Promise<void> }) {
+function TestAuthForm({
+  onSubmit,
+  isPending
+}: {
+  onSubmit: () => Promise<void>
+  isPending?: boolean
+}) {
   const form = useAuthForm({ defaultValues: {}, onSubmit })
 
   return (
     <form.AppForm>
       <form.AuthFormRoot>
-        <form.AuthFormSubmitButton>Continue</form.AuthFormSubmitButton>
+        <form.AuthFormSubmitButton isPending={isPending}>
+          Continue
+        </form.AuthFormSubmitButton>
       </form.AuthFormRoot>
     </form.AppForm>
   )
@@ -245,6 +253,39 @@ function renderEmailFirstSignIn(status: number) {
 }
 
 describe("shadcn TanStack form integration", () => {
+  it("shares one loading indicator across form and external pending transitions", async () => {
+    let resolve!: () => void
+    const promise = new Promise<void>((finish) => {
+      resolve = finish
+    })
+    const onSubmit = vi.fn(() => promise)
+    const view = render(<TestAuthForm onSubmit={onSubmit} isPending />)
+    const button = view.getByRole("button", { name: /Continue/ })
+    const spinners = () => button.querySelectorAll('[role="status"]')
+
+    expect(spinners()).toHaveLength(1)
+    expect(button).toBeDisabled()
+    view.rerender(<TestAuthForm onSubmit={onSubmit} isPending={false} />)
+    expect(spinners()).toHaveLength(0)
+    expect(button).toBeEnabled()
+
+    fireEvent.click(button)
+    await waitFor(() => expect(onSubmit).toHaveBeenCalledOnce())
+    expect(spinners()).toHaveLength(1)
+
+    view.rerender(<TestAuthForm onSubmit={onSubmit} isPending />)
+    expect(spinners()).toHaveLength(1)
+    expect(button).toBeDisabled()
+
+    view.rerender(<TestAuthForm onSubmit={onSubmit} isPending={false} />)
+    expect(spinners()).toHaveLength(1)
+    expect(button).toBeDisabled()
+
+    resolve()
+    await waitFor(() => expect(button).toBeEnabled())
+    expect(spinners()).toHaveLength(0)
+  })
+
   it("tracks the mutation promise and rejects concurrent submissions", async () => {
     let finishSubmission!: () => void
     const submission = new Promise<void>((resolve) => {

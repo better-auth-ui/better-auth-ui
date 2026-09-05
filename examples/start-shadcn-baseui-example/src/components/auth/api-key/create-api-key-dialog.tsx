@@ -33,7 +33,6 @@ import {
   SelectTrigger,
   SelectValue
 } from "@/components/ui/select"
-import { Spinner } from "@/components/ui/spinner"
 import { apiKeyPlugin } from "@/lib/auth/api-key-plugin"
 import { useAuthForm } from "../auth-form"
 import { NewApiKeyDialog } from "./new-api-key-dialog"
@@ -288,9 +287,10 @@ export function CreateApiKeyDialog({
                   {localization.settings.cancel}
                 </DialogClose>
 
-                <form.AuthFormSubmitButton disabled={isCreating}>
-                  {isCreating && <Spinner />}
-
+                <form.AuthFormSubmitButton
+                  isPending={isCreating}
+                  disabled={isCreating}
+                >
                   {apiKeyLocalization.createApiKey}
                 </form.AuthFormSubmitButton>
               </DialogFooter>

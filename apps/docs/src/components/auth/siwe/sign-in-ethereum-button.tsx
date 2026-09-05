@@ -159,8 +159,10 @@ export function SignInEthereumButton({ view }: SignInEthereumButtonProps) {
               >
                 {localization.settings.cancel}
               </Button>
-              <form.AuthFormSubmitButton disabled={signIn.isPending}>
-                {signIn.isPending && <Spinner />}
+              <form.AuthFormSubmitButton
+                isPending={signIn.isPending}
+                disabled={signIn.isPending}
+              >
                 {plugin.localization.signMessage}
               </form.AuthFormSubmitButton>
             </DialogFooter>

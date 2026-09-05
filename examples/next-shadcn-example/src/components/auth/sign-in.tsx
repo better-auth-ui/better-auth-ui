@@ -35,7 +35,6 @@ import {
   InputGroupButton,
   InputGroupInput
 } from "@/components/ui/input-group"
-import { Spinner } from "@/components/ui/spinner"
 import { useSignInContinuation } from "@/lib/auth/use-sign-in-continuation"
 import { cn } from "@/lib/utils"
 import { isAuthFormFieldInvalid, useAuthForm } from "./auth-form"
@@ -309,11 +308,10 @@ export function SignIn({
 
                   <div className="flex flex-col gap-3">
                     <form.AuthFormSubmitButton
+                      isPending={signInEmailPending}
                       className="relative overflow-visible"
                       disabled={isPending}
                     >
-                      {signInEmailPending && <Spinner />}
-
                       {localization.auth.signIn}
 
                       <LastUsedBadge method="email" floating />

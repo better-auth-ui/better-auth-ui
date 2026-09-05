@@ -10,7 +10,6 @@ import {
   Input,
   Label,
   Link,
-  Spinner,
   TextField
 } from "@heroui/react"
 
@@ -131,11 +130,10 @@ export function ForgotPasswordOtp({
             {Captcha && <div className="flex justify-center">{Captcha}</div>}
 
             <form.AuthFormSubmitButton
+              isPending={isPending}
               className="w-full"
               isDisabled={isPending}
             >
-              {isPending && <Spinner color="current" size="sm" />}
-
               {emailOtpLocalization.sendCode}
             </form.AuthFormSubmitButton>
           </form.AuthFormRoot>

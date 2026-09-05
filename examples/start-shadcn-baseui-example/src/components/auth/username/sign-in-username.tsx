@@ -37,7 +37,6 @@ import {
   InputGroupButton,
   InputGroupInput
 } from "@/components/ui/input-group"
-import { Spinner } from "@/components/ui/spinner"
 import { useSignInContinuation } from "@/lib/auth/use-sign-in-continuation"
 import { usernamePlugin } from "@/lib/auth/username-plugin"
 import { cn } from "@/lib/utils"
@@ -355,11 +354,10 @@ export function SignInUsername({
 
                   <div className="flex flex-col gap-3">
                     <form.AuthFormSubmitButton
+                      isPending={isSignInPending}
                       className="relative overflow-visible"
                       disabled={isPending}
                     >
-                      {isSignInPending && <Spinner />}
-
                       {localization.auth.signIn}
 
                       <LastUsedBadge method={["email", "username"]} floating />

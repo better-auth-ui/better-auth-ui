@@ -4,14 +4,7 @@ import type {
 } from "@better-auth-ui/core/plugins/api-key"
 import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
 import { useUpdateApiKey } from "@better-auth-ui/react/plugins/api-key"
-import {
-  AlertDialog,
-  Button,
-  Input,
-  Label,
-  Spinner,
-  TextField
-} from "@heroui/react"
+import { AlertDialog, Button, Input, Label, TextField } from "@heroui/react"
 import { useEffect } from "react"
 import { apiKeyPlugin } from "../../../lib/auth/api-key-plugin"
 import { useAuthForm } from "../auth-form"
@@ -83,10 +76,10 @@ export function EditApiKeyDialog({
                 <Button slot="close" variant="tertiary">
                   {localization.settings.cancel}
                 </Button>
-                <form.AuthFormSubmitButton isDisabled={updateApiKey.isPending}>
-                  {updateApiKey.isPending && (
-                    <Spinner color="current" size="sm" />
-                  )}
+                <form.AuthFormSubmitButton
+                  isPending={updateApiKey.isPending}
+                  isDisabled={updateApiKey.isPending}
+                >
                   {localization.settings.saveChanges}
                 </form.AuthFormSubmitButton>
               </AlertDialog.Footer>

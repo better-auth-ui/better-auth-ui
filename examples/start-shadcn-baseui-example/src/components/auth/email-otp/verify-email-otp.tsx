@@ -26,7 +26,6 @@ import {
   FieldLabel
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
-import { Spinner } from "@/components/ui/spinner"
 import { emailOtpPlugin } from "@/lib/auth/email-otp-plugin"
 import {
   RESEND_COOLDOWN_SECONDS,
@@ -200,10 +199,9 @@ export function VerifyEmailOtp({ className }: VerifyEmailOtpProps) {
 
               <div className="flex flex-col gap-3">
                 <form.AuthFormSubmitButton
+                  isPending={isPending}
                   disabled={isPending || (Boolean(email) && !codeComplete)}
                 >
-                  {isPending && <Spinner />}
-
                   {email
                     ? emailOtpLocalization.verifyCode
                     : emailOtpLocalization.sendCode}

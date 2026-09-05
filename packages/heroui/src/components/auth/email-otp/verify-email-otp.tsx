@@ -14,7 +14,6 @@ import {
   Input,
   Label,
   Link,
-  Spinner,
   TextField,
   toast,
   useIsHydrated
@@ -215,11 +214,10 @@ export function VerifyEmailOtp({ className, variant }: VerifyEmailOtpProps) {
 
             <div className="flex flex-col gap-3">
               <form.AuthFormSubmitButton
+                isPending={isPending}
                 className="w-full"
                 isDisabled={isPending || (Boolean(email) && !codeComplete)}
               >
-                {isPending && <Spinner color="current" size="sm" />}
-
                 {email
                   ? emailOtpLocalization.verifyCode
                   : emailOtpLocalization.sendCode}

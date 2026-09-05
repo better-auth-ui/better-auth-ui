@@ -19,7 +19,6 @@ import {
   Input,
   InputGroup,
   Label,
-  Spinner,
   Tabs,
   TextField,
   toast
@@ -376,12 +375,12 @@ export function EnableTwoFactorDialog({
                 <form.Subscribe selector={(state) => state.values.code}>
                   {(code) => (
                     <form.AuthFormSubmitButton
+                      isPending={isPending}
                       isDisabled={
                         isPending ||
                         (step === "verify" && code.length !== codeLength)
                       }
                     >
-                      {isPending && <Spinner color="current" size="sm" />}
                       {submitLabel}
                     </form.AuthFormSubmitButton>
                   )}

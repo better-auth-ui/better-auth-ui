@@ -13,7 +13,6 @@ import {
   Label,
   ListBox,
   Select,
-  Spinner,
   TextField
 } from "@heroui/react"
 import { useState } from "react"
@@ -271,9 +270,10 @@ export function CreateApiKeyDialog({
                     {localization.settings.cancel}
                   </Button>
 
-                  <form.AuthFormSubmitButton isDisabled={isCreating}>
-                    {isCreating && <Spinner color="current" size="sm" />}
-
+                  <form.AuthFormSubmitButton
+                    isPending={isCreating}
+                    isDisabled={isCreating}
+                  >
                     {apiKeyLocalization.createApiKey}
                   </form.AuthFormSubmitButton>
                 </AlertDialog.Footer>

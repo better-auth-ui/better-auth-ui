@@ -12,7 +12,6 @@ import {
   FieldError,
   Input,
   Label,
-  Spinner,
   TextField
 } from "@heroui/react"
 import { passkeyPlugin } from "../../../lib/auth/passkey-plugin"
@@ -143,11 +142,10 @@ export function AddPasskeyDialog({
                     {localization.settings.cancel}
                   </Button>
 
-                  <form.AuthFormSubmitButton isDisabled={addPasskey.isPending}>
-                    {addPasskey.isPending && (
-                      <Spinner color="current" size="sm" />
-                    )}
-
+                  <form.AuthFormSubmitButton
+                    isPending={addPasskey.isPending}
+                    isDisabled={addPasskey.isPending}
+                  >
                     {passkeyLocalization.addPasskey}
                   </form.AuthFormSubmitButton>
                 </AlertDialog.Footer>
