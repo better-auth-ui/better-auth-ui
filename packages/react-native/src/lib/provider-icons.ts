@@ -1,0 +1,83 @@
+import type { SocialProvider } from "better-auth/social-providers"
+import type { ComponentType } from "react"
+import type { SvgProps } from "react-native-svg"
+import {
+  Apple,
+  Atlassian,
+  Cognito,
+  Discord,
+  Dropbox,
+  Facebook,
+  Figma,
+  GitHub,
+  GitLab,
+  Google,
+  HuggingFace,
+  Kakao,
+  Kick,
+  Line,
+  Linear,
+  LinkedIn,
+  Microsoft,
+  Naver,
+  Notion,
+  Paybin,
+  PayPal,
+  Polar,
+  Railway,
+  Reddit,
+  Roblox,
+  Salesforce,
+  Slack,
+  Spotify,
+  TikTok,
+  Twitch,
+  Vercel,
+  VK,
+  WeChat,
+  X,
+  Zoom
+} from "../components/icons"
+
+/**
+ * Social provider → `react-native-svg` icon component. Mirrors the web
+ * `providerIcons` map from `@better-auth-ui/react`, keyed identically so the
+ * provider button can look up an icon by provider name.
+ */
+export const providerIcons: Record<SocialProvider, ComponentType<SvgProps>> = {
+  apple: Apple,
+  atlassian: Atlassian,
+  cognito: Cognito,
+  discord: Discord,
+  dropbox: Dropbox,
+  facebook: Facebook,
+  figma: Figma,
+  github: GitHub,
+  gitlab: GitLab,
+  google: Google,
+  huggingface: HuggingFace,
+  kakao: Kakao,
+  kick: Kick,
+  line: Line,
+  linear: Linear,
+  linkedin: LinkedIn,
+  microsoft: Microsoft,
+  naver: Naver,
+  notion: Notion,
+  paybin: Paybin,
+  paypal: PayPal,
+  polar: Polar,
+  railway: Railway,
+  reddit: Reddit,
+  roblox: Roblox,
+  salesforce: Salesforce,
+  slack: Slack,
+  spotify: Spotify,
+  tiktok: TikTok,
+  twitch: Twitch,
+  twitter: X,
+  vercel: Vercel,
+  vk: VK,
+  wechat: WeChat,
+  zoom: Zoom
+}
