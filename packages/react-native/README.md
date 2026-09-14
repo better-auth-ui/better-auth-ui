@@ -2,7 +2,9 @@
 
 Beautiful, plug-and-play [Better Auth](https://better-auth.com) UI for **React Native & Expo**. A native render target for [`better-auth-ui`](https://better-auth-ui.com) that mirrors the `@better-auth-ui/heroui` components — reusing the framework-agnostic logic from `@better-auth-ui/core` and `@better-auth-ui/react` unchanged.
 
-> Full parity with `@better-auth-ui/heroui` **except passkey**: sign-in/up/out, forgot/reset/verify, social buttons, magic-link, username, the complete settings surface (account, security, sessions, linked accounts, appearance), delete-user, additional-fields, api-keys, multi-session, and the full organization surface. Passkey is deferred (WebAuthn needs a native module).
+> **Covered:** sign-in/up/out, forgot/reset password, verify email, social buttons, the settings surface (account, security, change email/password/avatar, sessions, linked accounts, additional fields), and the `api-key`, `delete-user`, `magic-link`, `multi-session`, `organization`, `theme` and `username` plugins.
+>
+> **Not yet covered:** the `admin`, `agent-auth`, `billing`, `dash`, `device-authorization`, `email-otp`, `oauth-provider`, `passkey`, `siwe`, `sso` and `two-factor` plugin surfaces. This package registers only the plugins it implements, so an app using one of those simply gets no native UI for it — nothing else is affected.
 
 ## Zero styling setup
 
