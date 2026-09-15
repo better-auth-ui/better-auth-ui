@@ -9,7 +9,7 @@ const EXTENSIONLESS_RELATIVE_PATTERNS = [
   INLINE_TYPE_IMPORT
 ] as const
 
-const HAS_DECLARATION_EXTENSION = /\.(?:js|json|css|mjs|cjs)$/
+const HAS_DECLARATION_EXTENSION = /\.(?:d\.[cm]?ts|[cm]?js|json|css)$/
 
 function appendJsExtension(specifier: string): string {
   if (HAS_DECLARATION_EXTENSION.test(specifier)) {

@@ -44,6 +44,17 @@ describe("declaration import extensions", () => {
     )
   })
 
+  it("preserves declaration file extensions in relative specifiers", () => {
+    const input = [
+      "import type { X } from './types.d.ts';",
+      "import type { Y } from './types.d.mts';",
+      "import type { Z } from './types.d.cts';",
+      "export type { W } from '../shared.d.ts';"
+    ].join("\n")
+
+    expect(rewriteRelativeImportExtensionsInDeclarations(input)).toBe(input)
+  })
+
   it("ships .d.ts files with explicit .js extensions in dist", () => {
     expect(existsSync("dist")).toBe(true)
 
