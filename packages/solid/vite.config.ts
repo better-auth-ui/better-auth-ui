@@ -3,6 +3,7 @@ import { resolve } from "node:path"
 import { defineConfig, type Plugin } from "vite"
 import dts from "vite-plugin-dts"
 import solid from "vite-plugin-solid"
+import { createDtsPluginOptions } from "../../tools/vite/dts-node-import-extensions.ts"
 
 /**
  * Deterministically clears `dist` before the build instead of relying on
@@ -28,10 +29,12 @@ export default defineConfig({
   plugins: [
     cleanOutDir(),
     solid(),
-    dts({
-      tsconfigPath: "./tsconfig.json",
-      compilerOptions: { incremental: false, composite: false }
-    })
+    dts(
+      createDtsPluginOptions({
+        tsconfigPath: "./tsconfig.json",
+        compilerOptions: { incremental: false, composite: false }
+      })
+    )
   ],
   build: {
     lib: {

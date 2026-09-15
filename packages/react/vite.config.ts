@@ -1,9 +1,13 @@
 import react from "@vitejs/plugin-react"
 import { defineConfig } from "vite"
 import dts from "vite-plugin-dts"
+import { createDtsPluginOptions } from "../../tools/vite/dts-node-import-extensions.ts"
 
 export default defineConfig({
-  plugins: [react(), dts({ tsconfigPath: "./tsconfig.json" })],
+  plugins: [
+    react(),
+    dts(createDtsPluginOptions({ tsconfigPath: "./tsconfig.json" }))
+  ],
   build: {
     lib: {
       entry: {

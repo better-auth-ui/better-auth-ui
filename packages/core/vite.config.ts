@@ -1,8 +1,9 @@
 import { defineConfig } from "vite"
 import dts from "vite-plugin-dts"
+import { createDtsPluginOptions } from "../../tools/vite/dts-node-import-extensions.ts"
 
 export default defineConfig({
-  plugins: [dts({ tsconfigPath: "./tsconfig.json" })],
+  plugins: [dts(createDtsPluginOptions({ tsconfigPath: "./tsconfig.json" }))],
   build: {
     lib: {
       entry: {

@@ -1,14 +1,17 @@
 import { defineConfig } from "vite"
 import dts from "vite-plugin-dts"
 import solid from "vite-plugin-solid"
+import { createDtsPluginOptions } from "../../tools/vite/dts-node-import-extensions.ts"
 
 export default defineConfig({
   plugins: [
     solid({ solid: { generate: "ssr" } }),
-    dts({
-      tsconfigPath: "./tsconfig.json",
-      compilerOptions: { incremental: false, composite: false }
-    })
+    dts(
+      createDtsPluginOptions({
+        tsconfigPath: "./tsconfig.json",
+        compilerOptions: { incremental: false, composite: false }
+      })
+    )
   ],
   build: {
     lib: {

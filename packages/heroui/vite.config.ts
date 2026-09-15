@@ -3,6 +3,7 @@ import { resolve } from "node:path"
 import react from "@vitejs/plugin-react"
 import { defineConfig, type Plugin } from "vite"
 import dts from "vite-plugin-dts"
+import { createDtsPluginOptions } from "../../tools/vite/dts-node-import-extensions.ts"
 
 /**
  * Copies `src/styles.css` to `dist/styles.css` after each build so the
@@ -22,7 +23,11 @@ function copyStyles(): Plugin {
 }
 
 export default defineConfig({
-  plugins: [react(), dts({ tsconfigPath: "./tsconfig.json" }), copyStyles()],
+  plugins: [
+    react(),
+    dts(createDtsPluginOptions({ tsconfigPath: "./tsconfig.json" })),
+    copyStyles()
+  ],
   build: {
     lib: {
       entry: {
