@@ -32,7 +32,7 @@ export type ChangeOrganizationLogoProps = {
 export function ChangeOrganizationLogo({
   className
 }: ChangeOrganizationLogoProps) {
-  const { authClient } = useAuth<OrganizationAuthClient>()
+  const { authClient, localization } = useAuth<OrganizationAuthClient>()
   const { logo, localization: organizationLocalization } =
     useAuthPlugin(organizationPlugin)
 
@@ -76,9 +76,8 @@ export function ChangeOrganizationLogo({
       )
     } catch (error) {
       setIsUploading(false)
-      if (error instanceof Error) {
-        toast.error(error.message)
-      }
+      console.error("[Better Auth UI] Image operation failed", error)
+      toast.error(localization.errors.imageUploadFailed)
     }
   }
 
@@ -100,9 +99,8 @@ export function ChangeOrganizationLogo({
             await logo.delete?.(currentLogo)
             toast.success(organizationLocalization.logoDeletedSuccess)
           } catch (error) {
-            if (error instanceof Error) {
-              toast.error(error.message)
-            }
+            console.error("[Better Auth UI] Image operation failed", error)
+            toast.error(localization.errors.imageDeleteFailed)
           } finally {
             setIsDeleting(false)
           }

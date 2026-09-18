@@ -17,6 +17,25 @@
         "cwd": "."
       },
       "cache": true
+    },
+    "declarations-check": {
+      "executor": "nx:run-commands",
+      "dependsOn": [
+        {
+          "projects": [
+            "@better-auth-ui/core",
+            "@better-auth-ui/react",
+            "@better-auth-ui/solid",
+            "@better-auth-ui/heroui",
+            "@better-auth-ui/locales"
+          ],
+          "target": "build"
+        }
+      ],
+      "options": {
+        "command": "bun tools/vite/check-declaration-consumers.ts",
+        "cwd": "."
+      }
     }
   }
 }

@@ -1,4 +1,5 @@
 import {
+  getAuthErrorMessage,
   getProviderId,
   getProviderName,
   isCustomSocialProvider,
@@ -123,7 +124,11 @@ export function LinkedAccountRow(props: {
     meta: { errorPresentation: "inline" },
     onError: (error) => {
       if (!isReauthenticationRequiredError(error)) {
-        toast.error(error.error?.message ?? error.message)
+        const message = getAuthErrorMessage(error, auth.localization)
+        if (message) {
+          console.error("[Better Auth UI]", error)
+          toast.error(message)
+        }
       }
     },
     onSuccess: () => toast.success(auth.localization.settings.accountUnlinked)

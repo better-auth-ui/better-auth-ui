@@ -1,75 +1,86 @@
-import { existsSync, readdirSync, readFileSync, statSync } from "node:fs"
-import { join } from "node:path"
+import { resolve } from "node:path"
 import { describe, expect, it } from "vitest"
 import {
-  findExtensionlessRelativeSpecifiers,
+  declarationSpecifiers,
   rewriteRelativeImportExtensionsInDeclarations
-} from "../../../tools/vite/dts-node-import-extensions.ts"
+} from "../../../tools/vite/dts-node-import-extensions"
 
-const PUBLISHED_PACKAGE_DIST_DIRS = [
-  "dist",
-  "../react/dist",
-  "../solid/dist",
-  "../locales/dist",
-  "../heroui/dist"
-] as const
+const entry = resolve("/declarations/index.d.ts")
+const files = new Set([
+  entry,
+  resolve("/declarations/config.shared.d.ts"),
+  resolve("/declarations/config/index.d.ts"),
+  resolve("/declarations/view-paths.d.ts"),
+  resolve("/declarations/helpers.d.mts"),
+  resolve("/declarations/legacy.d.cts")
+])
 
-function declarationFiles(dir: string): string[] {
-  return readdirSync(dir).flatMap((entry) => {
-    const path = join(dir, entry)
-    const stat = statSync(path)
-
-    if (stat.isDirectory()) return declarationFiles(path)
-    if (path.endsWith(".d.ts")) return [path]
-    return []
-  })
+function rewrite(content: string) {
+  return rewriteRelativeImportExtensionsInDeclarations(entry, content, files)
 }
 
-describe("declaration import extensions", () => {
-  it("rewrites extensionless relative specifiers to .js", () => {
-    const input = [
-      "export * from './components/auth/email';",
-      'import type { X } from "../lib/auth-client";',
-      "export { Y } from './already.js';",
-      "mutationFn: () => Promise<import('./siwe-auth-client').SiweVerifyResult>;"
-    ].join("\n")
+function specifiers(content: string) {
+  return declarationSpecifiers(entry, content).specifiers.map(
+    (node) => node.text
+  )
+}
 
-    expect(rewriteRelativeImportExtensionsInDeclarations(input)).toBe(
-      [
-        "export * from './components/auth/email.js';",
-        'import type { X } from "../lib/auth-client.js";',
-        "export { Y } from './already.js';",
-        "mutationFn: () => Promise<import('./siwe-auth-client.js').SiweVerifyResult>;"
-      ].join("\n")
-    )
-  })
-
-  it("preserves declaration file extensions in relative specifiers", () => {
-    const input = [
-      "import type { X } from './types.d.ts';",
-      "import type { Y } from './types.d.mts';",
-      "import type { Z } from './types.d.cts';",
-      "export type { W } from '../shared.d.ts';"
-    ].join("\n")
-
-    expect(rewriteRelativeImportExtensionsInDeclarations(input)).toBe(input)
-  })
-
-  it("ships .d.ts files with explicit .js extensions in dist", () => {
-    expect(existsSync("dist")).toBe(true)
-
-    const offenders = PUBLISHED_PACKAGE_DIST_DIRS.flatMap((distDir) => {
-      if (!existsSync(distDir)) return []
-
-      const files = declarationFiles(distDir)
-
-      return files.flatMap((file) =>
-        findExtensionlessRelativeSpecifiers(readFileSync(file, "utf8")).map(
-          (specifier) => `${file}: ${specifier}`
-        )
+describe("declaration module resolution", () => {
+  it("resolves files, directory indexes and runtime module extensions", () => {
+    expect(
+      specifiers(
+        rewrite(`
+      export * from './config';
+      import type { View } from './view-paths';
+      type Helper = import('./helpers').Helper;
+      import legacy = require('./legacy');
+    `)
       )
-    })
+    ).toEqual([
+      "./config/index.js",
+      "./view-paths.js",
+      "./helpers.mjs",
+      "./legacy.cjs"
+    ])
+  })
 
-    expect(offenders).toEqual([])
+  it("rewrites augmentations and parent-directory imports", () => {
+    const path = resolve("/declarations/config/index.d.ts")
+    const content = `declare module '../view-paths' { interface View { custom: string } } export * from '..';`
+    const output = rewriteRelativeImportExtensionsInDeclarations(
+      path,
+      content,
+      files
+    )
+    expect(specifiers(output)).toEqual(["../view-paths.js", "../index.js"])
+  })
+
+  it("leaves bare imports, explicit extensions, comments and string literal types intact", () => {
+    const content = `
+      import type { View } from 'external';
+      export * from './view-paths.js';
+      export * from './types.d.ts';
+      declare module 'external' { interface Extension {} }
+      type Example = "export * from './missing'";
+      /** import('./missing').Example */
+    `
+    expect(rewrite(content)).toBe(content)
+  })
+
+  it("rejects unresolved extensionless imports instead of shipping invented paths", () => {
+    expect(() => rewrite(`export * from './missing';`)).toThrow()
+  })
+
+  it("resolves dotted basenames", () => {
+    expect(specifiers(rewrite(`export * from './config.shared';`))).toEqual([
+      "./config.shared.js"
+    ])
+  })
+
+  it("is idempotent", () => {
+    const once = rewrite(
+      `export * from './config'; type View = import('./view-paths').View;`
+    )
+    expect(rewrite(once)).toBe(once)
   })
 })

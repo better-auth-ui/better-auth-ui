@@ -58,9 +58,8 @@ export function ChangeAvatar(props: ChangeAvatarProps) {
         }
       )
     } catch (error) {
-      if (error instanceof Error) {
-        toast.error(error.message)
-      }
+      console.error("[Better Auth UI] Image operation failed", error)
+      toast.error(auth.localization.errors.imageUploadFailed)
     } finally {
       setIsUploadingAvatar(false)
     }

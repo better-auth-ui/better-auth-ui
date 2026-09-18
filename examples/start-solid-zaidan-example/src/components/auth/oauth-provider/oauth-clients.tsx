@@ -136,8 +136,10 @@ export function OAuthClients(props: OAuthClientsProps) {
   const [secret, setSecret] = createSignal<ManagedOAuthClient>()
 
   const { copied, copy, reset } = createCopyToClipboard({
-    onError: (error) =>
-      toast.error(error instanceof Error ? error.message : String(error))
+    onError: (error) => {
+      console.error("[Better Auth UI] Copy failed", error)
+      toast.error(auth.localization.errors.copyFailed)
+    }
   })
   const form = createAuthForm(() => ({
     defaultValues: getOAuthClientFormValues(),

@@ -60,7 +60,7 @@ export function SsoDomainVerification({
   defaultToken = "",
   tokenPrefix = "better-auth-token"
 }: SsoDomainVerificationProps) {
-  const { authClient } = useAuth()
+  const { authClient, localization: authLocalization } = useAuth()
   const { localization } = useAuthPlugin(ssoPlugin)
   const [token, setToken] = useState(defaultToken)
   const [verified, setVerified] = useState(false)
@@ -75,12 +75,16 @@ export function SsoDomainVerification({
     onSuccess: () => setVerified(true)
   })
   const hostCopy = useCopyToClipboard({
-    onError: (error) =>
-      setCopyError(error instanceof Error ? error.message : String(error))
+    onError: (error) => {
+      console.error("[Better Auth UI] Copy failed", error)
+      setCopyError(authLocalization.errors.copyFailed)
+    }
   })
   const tokenCopy = useCopyToClipboard({
-    onError: (error) =>
-      setCopyError(error instanceof Error ? error.message : String(error))
+    onError: (error) => {
+      console.error("[Better Auth UI] Copy failed", error)
+      setCopyError(authLocalization.errors.copyFailed)
+    }
   })
   const error =
     requestToken.submittedAt > verify.submittedAt

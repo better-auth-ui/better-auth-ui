@@ -52,7 +52,7 @@ export function SsoDomainVerification({
   variant,
   ...props
 }: SsoDomainVerificationProps) {
-  const { authClient } = useAuth()
+  const { authClient, localization: authLocalization } = useAuth()
   const { localization } = useAuthPlugin(ssoPlugin)
   const [token, setToken] = useState(defaultToken)
   const [verified, setVerified] = useState(false)
@@ -75,12 +75,16 @@ export function SsoDomainVerification({
   const providerId = useSelector(form.store, (state) => state.values.providerId)
   const host = providerId ? `_${tokenPrefix}-${providerId}` : ""
   const hostCopy = useCopyToClipboard({
-    onError: (error) =>
-      toast.danger(error instanceof Error ? error.message : String(error))
+    onError: (error) => {
+      console.error("[Better Auth UI] Copy failed", error)
+      toast.danger(authLocalization.errors.copyFailed)
+    }
   })
   const tokenCopy = useCopyToClipboard({
-    onError: (error) =>
-      toast.danger(error instanceof Error ? error.message : String(error))
+    onError: (error) => {
+      console.error("[Better Auth UI] Copy failed", error)
+      toast.danger(authLocalization.errors.copyFailed)
+    }
   })
   const error =
     requestToken.submittedAt > verify.submittedAt

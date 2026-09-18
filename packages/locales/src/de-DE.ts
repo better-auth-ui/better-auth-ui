@@ -2,6 +2,35 @@ import { deepmerge, defineAuthLocale, localization } from "@better-auth-ui/core"
 import { deDEPlugins } from "./de-DE-plugins"
 
 const deLocalization = deepmerge(localization, {
+  errors: {
+    generic: "Etwas ist schiefgelaufen. Bitte versuche es erneut.",
+    invalidCredentials:
+      "Die Anmeldedaten sind falsch. Bitte versuche es erneut.",
+    invalidCode:
+      "Dieser Code ist ungültig oder abgelaufen. Fordere einen neuen Code an.",
+    sessionExpired: "Bitte melde dich erneut an, um fortzufahren.",
+    permissionDenied: "Du hast dafür keine Berechtigung.",
+    rateLimited: "Zu viele Versuche. Bitte warte und versuche es erneut.",
+    passwordTooShort: "Dein Passwort ist zu kurz.",
+    passwordTooLong: "Dein Passwort ist zu lang.",
+    accountExists:
+      "Ein Konto mit diesen Angaben existiert bereits. Versuche, dich anzumelden.",
+    popupBlocked:
+      "Erlaube Pop-ups in deinem Browser und versuche erneut, dich anzumelden.",
+    popupTimeout:
+      "Die Anmeldung hat zu lange gedauert. Bitte versuche es erneut.",
+    passkeyFailed:
+      "Die Anmeldung mit deinem Passkey ist fehlgeschlagen. Versuche es erneut oder nutze eine andere Anmeldemethode.",
+    walletFailed:
+      "Die Wallet-Anfrage ist fehlgeschlagen. Prüfe deine Wallet und versuche es erneut.",
+    copyFailed: "Kopieren fehlgeschlagen. Versuche es erneut.",
+    imageUploadFailed:
+      "Das Bild konnte nicht hochgeladen werden. Versuche es mit einem anderen Bild.",
+    imageDeleteFailed:
+      "Das Bild konnte nicht gelöscht werden. Bitte versuche es erneut.",
+    roleHasMembers:
+      "Weise den Mitgliedern eine andere Rolle zu, bevor du diese Rolle löschst."
+  },
   auth: {
     callbackAccountLinkedTitle: "Konto verknüpft",
     callbackAccountLinkedDescription: "Dein Konto ist jetzt verbunden.",

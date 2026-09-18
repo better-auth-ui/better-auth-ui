@@ -126,7 +126,8 @@
           "vite-plugin-dts",
           "vite-plugin-solid"
         ]
-      }
+      },
+      "{workspaceRoot}/tools/vite/**/*"
     ],
     "typecheckToolchain": [{ "externalDependencies": ["typescript"] }],
     "testToolchain": [
@@ -137,7 +138,8 @@
           "typescript",
           "vitest"
         ]
-      }
+      },
+      "{workspaceRoot}/tools/vite/**/*"
     ],
     "storybookToolchain": [
       {

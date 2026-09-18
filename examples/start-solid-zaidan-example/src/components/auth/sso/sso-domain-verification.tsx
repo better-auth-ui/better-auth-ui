@@ -59,12 +59,16 @@ export function SsoDomainVerification(props: SsoDomainVerificationProps) {
     onSuccess: () => setVerified(true)
   }))
   const hostCopy = createCopyToClipboard({
-    onError: (error) =>
-      setCopyError(error instanceof Error ? error.message : String(error))
+    onError: (error) => {
+      console.error("[Better Auth UI] Copy failed", error)
+      setCopyError(auth.localization.errors.copyFailed)
+    }
   })
   const tokenCopy = createCopyToClipboard({
-    onError: (error) =>
-      setCopyError(error instanceof Error ? error.message : String(error))
+    onError: (error) => {
+      console.error("[Better Auth UI] Copy failed", error)
+      setCopyError(auth.localization.errors.copyFailed)
+    }
   })
   const form = createAuthForm(() => ({
     defaultValues: { providerId: props.defaultProviderId ?? "" },

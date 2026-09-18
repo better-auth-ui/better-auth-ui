@@ -1,10 +1,15 @@
-import type { MutationOptions } from "@tanstack/query-core"
+import type {
+  MutationFunctionContext,
+  MutationOptions
+} from "@tanstack/query-core"
 import type {
   SignInPopupOptions,
   SignInPopupResult
 } from "better-auth/client/plugins"
 import type { AuthClient } from "../lib/auth-client"
 import { authMutationKeys } from "../lib/auth-mutation-keys"
+import { authQueryKeys } from "../lib/auth-query-keys"
+import { fetchSession } from "../queries/auth/session-query"
 
 export type OAuthPopupAuthClient<TAuthClient extends AuthClient = AuthClient> =
   TAuthClient & {
@@ -26,12 +31,20 @@ export type SignInOAuthPopupOptions<TAuthClient extends OAuthPopupAuthClient> =
 export function signInOAuthPopupOptions<
   TAuthClient extends OAuthPopupAuthClient
 >(authClient: TAuthClient) {
-  const mutationFn = async (params: SignInOAuthPopupParams) => {
+  const mutationFn = async (
+    params: SignInOAuthPopupParams,
+    { client }: MutationFunctionContext
+  ) => {
     const result = await authClient.signIn.popup(params)
 
     if (result.error) {
       throw result.error
     }
+
+    // Popup sign-in refreshes Better Auth's store, not the query cache used by
+    // route guards. Replace any pre-login request before success can navigate.
+    await client.cancelQueries({ queryKey: authQueryKeys.session })
+    await fetchSession(client, authClient, { staleTime: 0 })
 
     return result
   }

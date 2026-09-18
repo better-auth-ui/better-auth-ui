@@ -71,6 +71,9 @@ jobs:
       # Ensure all publishable packages are built (cache hits when unaffected)
       - run: bun nx run-many -t build --projects 'packages/*'
 
+      - name: Validate published declaration consumers
+        run: bun nx run workspace:declarations-check
+
       - name: Validate agent skills and package contents
         run: bun nx run workspace:skills-check
 

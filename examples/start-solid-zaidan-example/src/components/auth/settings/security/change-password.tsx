@@ -66,8 +66,6 @@ export function ChangePasswordSettings(
         setIsCompromised(true)
         return
       }
-
-      toast.error(error.error?.message || error.message)
     },
     onSuccess: () => {
       form.reset()

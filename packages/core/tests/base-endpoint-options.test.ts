@@ -1,4 +1,4 @@
-import { skipToken } from "@tanstack/query-core"
+import { QueryClient, skipToken } from "@tanstack/query-core"
 import { describe, expect, expectTypeOf, it, vi } from "vitest"
 import {
   type AuthClient,
@@ -119,6 +119,7 @@ describe("core base endpoint option factories", () => {
 
   it("builds base mutation options and keeps deleteUser out of auth keys", async () => {
     const authClient = {
+      getSession: vi.fn(async () => ({ user: { id: "user-1" } })),
       requestPasswordReset: vi.fn(async (params) => ({ data: params.email })),
       resetPassword: vi.fn(async (params) => ({ data: params.token })),
       sendVerificationEmail: vi.fn(async (params) => ({ data: params.email })),
@@ -213,11 +214,14 @@ describe("core base endpoint option factories", () => {
       fetchOptions: { credentials: "include", throw: true }
     })
 
+    const queryClient = new QueryClient()
     await expect(
-      (
-        signInPopup as { mutationFn?: (variables: unknown) => unknown }
-      ).mutationFn?.({ provider: "github", callbackURL: "/dashboard" })
+      queryClient.getMutationCache().build(queryClient, signInPopup).execute({
+        provider: "github",
+        callbackURL: "/dashboard"
+      })
     ).resolves.toEqual({ data: { success: true }, error: null })
+    queryClient.clear()
     expect(authClient.signIn.popup).toHaveBeenCalledWith({
       provider: "github",
       callbackURL: "/dashboard"

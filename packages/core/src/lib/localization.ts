@@ -1,4 +1,26 @@
 export const localization = {
+  errors: {
+    generic: "Something went wrong. Please try again.",
+    invalidCredentials: "The sign-in details are incorrect. Please try again.",
+    invalidCode: "This code is invalid or has expired. Request a new code.",
+    sessionExpired: "Please sign in again to continue.",
+    permissionDenied: "You don't have permission to do this.",
+    rateLimited: "Too many attempts. Please wait and try again.",
+    passwordTooShort: "Your password is too short.",
+    passwordTooLong: "Your password is too long.",
+    accountExists:
+      "An account with these details already exists. Try signing in.",
+    popupBlocked: "Allow popups in your browser, then try signing in again.",
+    popupTimeout: "Sign-in timed out. Please try again.",
+    passkeyFailed:
+      "Couldn't sign in with your passkey. Try again or use another sign-in method.",
+    walletFailed:
+      "Couldn't complete the wallet request. Check your wallet and try again.",
+    copyFailed: "Couldn't copy. Try again.",
+    imageUploadFailed: "Couldn't upload this image. Try another image.",
+    imageDeleteFailed: "Couldn't delete the image. Please try again.",
+    roleHasMembers: "Move members to another role before deleting this role."
+  },
   auth: {
     /** @remarks `"Account linked"` */
     callbackAccountLinkedTitle: "Account linked",

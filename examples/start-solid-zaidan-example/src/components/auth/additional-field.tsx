@@ -298,8 +298,10 @@ type LabeledAdditionalFieldProps = AdditionalFieldProps & {
 function InputField(props: LabeledAdditionalFieldProps) {
   const auth = useAuth()
   const { copied, copy } = createCopyToClipboard({
-    onError: (error) =>
-      toast.error(error instanceof Error ? error.message : String(error))
+    onError: (error) => {
+      console.error("[Better Auth UI] Copy failed", error)
+      toast.error(auth.localization.errors.copyFailed)
+    }
   })
   let inputRef: HTMLInputElement | undefined
   const hasPrefix = () => props.field.prefix != null

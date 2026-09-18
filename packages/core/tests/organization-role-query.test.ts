@@ -108,7 +108,7 @@ describe("organization role mutation factories", () => {
 
     await expect(
       options.mutationFn?.({ roleId: "role-1" } as never, {} as never)
-    ).rejects.toThrow('Move members out of the "support" role')
+    ).rejects.toMatchObject({ code: "ROLE_HAS_MEMBERS" })
 
     expect(authClient.organization.listMembers).toHaveBeenCalledWith(
       expect.objectContaining({

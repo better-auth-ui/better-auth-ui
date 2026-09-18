@@ -59,8 +59,11 @@ function roleMutationOptions<
         })
 
         if (assignments?.members.length) {
-          throw new Error(
-            `[Better Auth UI] Move members out of the "${role.role}" role before deleting it.`
+          throw Object.assign(
+            new Error(
+              "Move members to another role before deleting this role."
+            ),
+            { code: "ROLE_HAS_MEMBERS" }
           )
         }
       }

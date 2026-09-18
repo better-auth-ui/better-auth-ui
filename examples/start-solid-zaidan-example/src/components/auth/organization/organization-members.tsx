@@ -434,16 +434,9 @@ export function OrganizationMembers(props: OrganizationMembersProps) {
     const count = results.filter(
       (result) => result.status === "fulfilled"
     ).length
-    const failed = results.find((result) => result.status === "rejected")
     if (count)
       toast.success(
         localization().membersRemoved.replace("{{count}}", String(count))
-      )
-    if (failed?.status === "rejected")
-      toast.error(
-        failed.reason instanceof Error
-          ? failed.reason.message
-          : String(failed.reason)
       )
     table.resetRowSelection(true)
   }

@@ -151,8 +151,10 @@ export function OAuthClients({
     { label: oauthLocalization.nativeApplication, value: "native" }
   ]
   const { copied, copy, reset } = useCopyToClipboard({
-    onError: (error) =>
-      toast.error(error instanceof Error ? error.message : String(error))
+    onError: (error) => {
+      console.error("[Better Auth UI] Copy failed", error)
+      toast.error(localization.errors.copyFailed)
+    }
   })
   const form = useAuthForm({
     defaultValues: getOAuthClientFormValues(),

@@ -1,20 +1,23 @@
 import {
   authMutationKeys,
   authQueryKeys,
+  getAuthErrorCode,
+  getAuthErrorMessage,
   getAuthErrorPresentation,
   isPasswordCompromisedError
 } from "@better-auth-ui/core"
 import { oneTapMutationKeys } from "@better-auth-ui/core/plugins/one-tap"
+import { useAuth } from "@better-auth-ui/solid"
 import {
   matchMutation,
   matchQuery,
   useQueryClient
 } from "@tanstack/solid-query"
-import type { BetterFetchError } from "better-auth/client"
 import { onCleanup, onMount } from "solid-js"
 import { toast } from "solid-sonner"
 
 export function ErrorToaster() {
+  const auth = useAuth()
   const queryClient = useQueryClient()
 
   onMount(() => {
@@ -27,9 +30,12 @@ export function ErrorToaster() {
       if (!matchQuery({ queryKey: authQueryKeys.all }, query)) return
       if (getAuthErrorPresentation(query.meta) !== "toast") return
 
-      const err = error as BetterFetchError
-      if (err?.error?.code === "EMAIL_NOT_VERIFIED") return
-      if (err?.error) toast.error(err.error.message)
+      if (getAuthErrorCode(error) === "EMAIL_NOT_VERIFIED") return
+      const message = getAuthErrorMessage(error, auth.localization)
+      if (message) {
+        console.error("[Better Auth UI]", error)
+        toast.error(message)
+      }
     }
 
     const mutationCache = queryClient.getMutationCache()
@@ -58,14 +64,21 @@ export function ErrorToaster() {
       // password field, so a toast would just repeat it.
       if (isPasswordCompromisedError(error)) return
 
-      const err = error as BetterFetchError
       if (
-        err.error?.code === "EMAIL_NOT_VERIFIED" &&
+        getAuthErrorCode(error) === "EMAIL_NOT_VERIFIED" &&
         !matchMutation({ mutationKey: oneTapMutationKeys.prompt }, mutation)
       ) {
         return
       }
-      toast.error(err.error?.message || err.message)
+      const message = getAuthErrorMessage(
+        error,
+        auth.localization,
+        mutation.options.mutationKey
+      )
+      if (message) {
+        console.error("[Better Auth UI]", error)
+        toast.error(message)
+      }
     }
 
     onCleanup(() => {

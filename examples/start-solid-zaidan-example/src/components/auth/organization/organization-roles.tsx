@@ -207,16 +207,9 @@ export function OrganizationRoles(props: { organizationId: string }) {
     const count = results.filter(
       (result) => result.status === "fulfilled"
     ).length
-    const failed = results.find((result) => result.status === "rejected")
     if (count)
       toast.success(
         config.localization.rolesDeleted.replace("{{count}}", String(count))
-      )
-    if (failed?.status === "rejected")
-      toast.error(
-        failed.reason instanceof Error
-          ? failed.reason.message
-          : String(failed.reason)
       )
     table.resetRowSelection(true)
   }
@@ -471,8 +464,7 @@ function OrganizationRoleRow(props: {
       onSuccess: () => {
         setDeleteOpen(false)
         toast.success(config.localization.roleDeleted)
-      },
-      onError: (error) => toast.error(error.message)
+      }
     })
   )
   const assignments = useListOrganizationMembers(props.authClient, () => ({

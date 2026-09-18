@@ -31,8 +31,10 @@ export function NewApiKeyDialog(props: {
     copy,
     reset
   } = createCopyToClipboard({
-    onError: (error) =>
-      toast.error(error instanceof Error ? error.message : String(error))
+    onError: (error) => {
+      console.error("[Better Auth UI] Copy failed", error)
+      toast.error(auth.localization.errors.copyFailed)
+    }
   })
 
   createEffect(() => {

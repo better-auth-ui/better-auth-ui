@@ -22,12 +22,17 @@ export function signInPasskeyOptions<TAuthClient extends PasskeyAuthClient>(
 ) {
   const mutationKey = passkeyMutationKeys.signIn
 
-  // biome-ignore lint/suspicious/noConfusingVoidType: void allows no-arg mutate
-  const mutationFn = (params?: SignInPasskeyParams<TAuthClient> | void) =>
-    authClient.signIn.passkey({
+  const mutationFn = async (
+    // biome-ignore lint/suspicious/noConfusingVoidType: void allows no-arg mutate
+    params?: SignInPasskeyParams<TAuthClient> | void
+  ) => {
+    const result = await authClient.signIn.passkey({
       ...(params ?? {}),
       fetchOptions: { ...params?.fetchOptions, throw: true }
     })
+    if (result.error) throw result.error
+    return result
+  }
 
   return {
     mutationKey,
