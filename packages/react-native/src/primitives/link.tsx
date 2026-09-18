@@ -1,0 +1,76 @@
+import type { AuthView } from "@better-auth-ui/core"
+import type { ReactNode } from "react"
+import { Linking } from "react-native"
+import { cn } from "../lib/cn"
+import { useAuthNavigation } from "../navigation/navigation-context"
+import type { ViewTarget } from "../navigation/types"
+import { Txt } from "./styled"
+
+export interface LinkProps {
+  /** Internal auth view to navigate to (shorthand for `{ section: "auth", view }`). */
+  view?: AuthView
+  /** Section-qualified target (settings / organization). Takes precedence over `view`. */
+  target?: ViewTarget
+  /** External URL — opened in the system browser. */
+  href?: string
+  params?: Record<string, string>
+  replace?: boolean
+  isDisabled?: boolean
+  className?: string
+  /** Escape hatch for custom press handling. */
+  onPress?: () => void
+  children?: ReactNode
+}
+
+/**
+ * Inline text link. Renders as a pressable `Text` so it composes inside a
+ * `Description` (RN can't nest a `Pressable`/`View` inside `Text`). Internal
+ * `view` links go through the navigation adapter; external `href` links open
+ * in the system browser. For button-styled links use `Button` instead.
+ */
+export function Link({
+  view,
+  target,
+  href,
+  params,
+  replace,
+  isDisabled,
+  className,
+  onPress,
+  children
+}: LinkProps) {
+  const navigation = useAuthNavigation()
+
+  const handlePress = () => {
+    if (isDisabled) return
+    if (onPress) {
+      onPress()
+      return
+    }
+    if (target) {
+      navigation.push(target, { params, replace })
+      return
+    }
+    if (view) {
+      navigation.push(view, { params, replace })
+      return
+    }
+    if (href && /^https?:\/\//.test(href)) {
+      void Linking.openURL(href)
+    }
+  }
+
+  return (
+    <Txt
+      accessibilityRole="link"
+      onPress={handlePress}
+      className={cn(
+        "font-medium text-accent",
+        isDisabled && "opacity-50",
+        className
+      )}
+    >
+      {children}
+    </Txt>
+  )
+}

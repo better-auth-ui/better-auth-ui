@@ -9,7 +9,7 @@ import { type BasePaths, basePaths } from "../lib/base-paths"
 import type { DeepPartial } from "../lib/deep-partial"
 import { type Localization, localization } from "../lib/localization"
 import { deepmerge, resizeAvatar } from "../lib/utils"
-import { type ViewPaths, viewPaths } from "../lib/view-paths"
+import { type AuthView, type ViewPaths, viewPaths } from "../lib/view-paths"
 import type {
   AdditionalField,
   AdditionalFields
@@ -19,6 +19,36 @@ import type { EmailAndPasswordConfig } from "./email-and-password-config"
 import type { AuthSocialProvider } from "./social-provider-config"
 
 export type SocialSignInMode = "redirect" | "popup"
+
+/**
+ * Options passed to {@link AuthConfig.navigate}.
+ *
+ * `to` is the composed path used by path-based routers (expo-router, web,
+ * TanStack, Next). `view` and `params` are additive, optional hints used by
+ * name-based routers (React Navigation) and state-only hosting (the React
+ * Native state adapter) that have no URL to read — path routers can ignore
+ * them, so this stays backward compatible with every existing web adapter.
+ */
+export interface NavigateOptions {
+  /** Composed path — used by path-based routers (expo-router, web). */
+  to: string
+  /**
+   * Semantic view key — used by name-based routers and state-only hosting
+   * that navigate by identity rather than by URL.
+   * @remarks `AuthView`
+   */
+  view?: AuthView
+  /**
+   * Route params carried alongside the view (e.g. deep-link tokens such as a
+   * password-reset `token`) for routers that don't parse them from a URL.
+   */
+  params?: Record<string, string>
+  /** Replace the current history entry instead of pushing a new one. */
+  replace?: boolean
+}
+
+/** Navigation callback supplied by the host router. */
+export type NavigateFn = (options: NavigateOptions) => void
 
 /**
  * Core authentication configuration interface.
@@ -113,16 +143,20 @@ export interface AuthConfig<TAuthClient extends AuthClient = AuthClient> {
    */
   viewPaths: ViewPaths
   /**
-   * Function to navigate to a new path
-   * @param options - Navigation options with href and optional replace flag
-   * @default window.location.href = href (or window.location.replace if replace: true)
+   * Function to navigate between auth views.
+   *
+   * Receives the composed `to` path plus optional additive `view`/`params`
+   * hints for name-based / state-only routers (see {@link NavigateOptions}).
+   * Path-based routers can read `to` and ignore the rest.
+   * @remarks `NavigateFn`
+   * @default window.location.href = to (or window.location.replace if replace: true)
    * @example
    * // TanStack Router
    * navigate={navigate}
    * // Next.js
-   * navigate={({href, replace}) => replace ? router.replace(href) : router.push(href)}
+   * navigate={({ to, replace }) => replace ? router.replace(to) : router.push(to)}
    */
-  navigate: (options: { to: string; replace?: boolean }) => void
+  navigate: NavigateFn
 }
 
 export const defaultAuthConfig: Omit<AuthConfig, "authClient"> = {
