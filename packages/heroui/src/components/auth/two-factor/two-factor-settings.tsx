@@ -1,4 +1,5 @@
 import { useAuth, useAuthPlugin, useSession } from "@better-auth-ui/react"
+import { ShieldCheck } from "@gravity-ui/icons"
 import { Button, Card, type CardProps, cn, Skeleton } from "@heroui/react"
 import { useState } from "react"
 
@@ -67,29 +68,51 @@ export function TwoFactorSettings({
 
       <Card variant={variant} {...props}>
         <Card.Content className="gap-4">
-          {isPending ? (
-            <Skeleton className="h-5 w-48 rounded-lg" />
+          {!isPending && !isEnabled ? (
+            <div className="flex flex-col items-center justify-center gap-4">
+              <div className="flex size-10 items-center justify-center rounded-xl bg-surface-secondary">
+                <ShieldCheck className="size-4.5" />
+              </div>
+
+              <div className="flex flex-col items-center justify-center gap-1 text-center">
+                <p className="text-sm font-semibold">
+                  {twoFactorLocalization.twoFactorDisabled}
+                </p>
+
+                <p className="text-muted text-xs">
+                  {twoFactorLocalization.twoFactorDescription}
+                </p>
+              </div>
+
+              <Button size="sm" onPress={() => setEnableOpen(true)}>
+                {twoFactorLocalization.enableTwoFactor}
+              </Button>
+            </div>
           ) : (
-            <p className="text-sm font-medium">
-              {isEnabled
-                ? twoFactorLocalization.twoFactorEnabled
-                : twoFactorLocalization.twoFactorDisabled}
-            </p>
-          )}
+            <>
+              {isPending ? (
+                <Skeleton className="h-5 w-48 rounded-lg" />
+              ) : (
+                <p className="text-sm font-medium">
+                  {twoFactorLocalization.twoFactorEnabled}
+                </p>
+              )}
 
-          <p className="text-muted text-sm">
-            {twoFactorLocalization.twoFactorDescription}
-          </p>
+              <p className="text-muted text-sm">
+                {twoFactorLocalization.twoFactorDescription}
+              </p>
 
-          {isEnabled && backupCodesEnabled && (
-            <Button
-              className="self-start"
-              size="sm"
-              variant="tertiary"
-              onPress={() => setRegenerateOpen(true)}
-            >
-              {twoFactorLocalization.regenerateBackupCodes}
-            </Button>
+              {isEnabled && backupCodesEnabled && (
+                <Button
+                  className="self-start"
+                  size="sm"
+                  variant="tertiary"
+                  onPress={() => setRegenerateOpen(true)}
+                >
+                  {twoFactorLocalization.regenerateBackupCodes}
+                </Button>
+              )}
+            </>
           )}
         </Card.Content>
       </Card>
