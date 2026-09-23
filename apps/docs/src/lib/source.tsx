@@ -37,7 +37,7 @@ export const source = loader({
         createElement(customIcons[icon as keyof typeof customIcons])
       )
 
-    // biome-ignore lint/performance/noDynamicNamespaceImportAccess: Static Icons
+    // Static Icons.
     if (icon in icons) return icons[icon as keyof typeof icons]
 
     return icon

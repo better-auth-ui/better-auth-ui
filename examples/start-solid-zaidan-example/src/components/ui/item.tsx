@@ -20,7 +20,7 @@ const ItemGroup = (props: ItemGroupProps) => {
   const [local, others] = splitProps(props, ["class"])
 
   return (
-    // biome-ignore lint/a11y/useSemanticElements: div with role=list keeps the upstream Zaidan item-group shape flexible.
+    // Div with role=list keeps the upstream Zaidan item-group shape flexible.
     <div
       class={cn(
         "group/item-group z-item-group flex w-full flex-col",

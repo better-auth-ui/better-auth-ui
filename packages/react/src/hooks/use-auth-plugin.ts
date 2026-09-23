@@ -12,7 +12,7 @@ import type { AuthPlugin } from "../lib/auth-plugin"
  */
 export type AuthPluginFactory<T extends AuthPlugin = AuthPlugin> = {
   id: string
-  // biome-ignore lint/suspicious/noExplicitAny: factory args vary by plugin
+  // Factory args vary by plugin.
   (...args: any[]): T
 }
 

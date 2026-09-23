@@ -1,5 +1,5 @@
 pre-commit:
-    commands:
-        biome:
-            run: bun x biome check --write --no-errors-on-unmatched {staged_files}
-            stage_fixed: true
+  commands:
+    oxc:
+      run: bunx oxlint --fix --no-error-on-unmatched-pattern {staged_files} && bunx oxfmt --no-error-on-unmatched-pattern {staged_files}
+      stage_fixed: true

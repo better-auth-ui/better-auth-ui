@@ -1,0 +1,28 @@
+{
+  "$schema": "./node_modules/oxfmt/configuration_schema.json",
+  "useTabs": false,
+  "tabWidth": 2,
+  "printWidth": 80,
+  "singleQuote": false,
+  "jsxSingleQuote": false,
+  "quoteProps": "as-needed",
+  "trailingComma": "none",
+  "semi": false,
+  "arrowParens": "always",
+  "bracketSameLine": false,
+  "bracketSpacing": true,
+  "sortImports": false,
+  "sortPackageJson": false,
+  "ignorePatterns": [
+    "**/*.svg",
+    "**/src/routeTree.gen.ts",
+    "**/auth-schema.ts",
+    "**/drizzle/**",
+    "apps/docs/.source/**",
+    "apps/docs/public/**",
+    "apps/docs/src/components/ui/**",
+    "examples/*/src/components/ui/**",
+    "**/*.md",
+    "**/*.mdx"
+  ]
+}

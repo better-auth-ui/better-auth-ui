@@ -9,7 +9,10 @@
     "storybook": "nx run-many -t storybook -p start-heroui-example start-shadcn-example start-solid-zaidan-example",
     "storybook:build": "nx run-many -t storybook:build -p start-heroui-example start-shadcn-example start-solid-zaidan-example",
     "test": "nx run-many -t test",
-    "registry:build": "nx run-many -t registry:build -p start-shadcn-example start-solid-zaidan-example"
+    "registry:build": "nx run-many -t registry:build -p start-shadcn-example start-solid-zaidan-example",
+    "lint": "nx run workspace:lint",
+    "format": "oxfmt",
+    "format:check": "oxfmt --check"
   },
   "workspaces": [
     "apps/*",
@@ -20,7 +23,6 @@
     "@better-auth-ui/react": "workspace:*",
     "@better-auth/api-key": "1.7.2",
     "@better-auth/core": "1.7.2",
-    "@biomejs/biome": "2.5.11",
     "@nx/js": "23.1.2",
     "@swc-node/register": "~1.12.1",
     "@swc/core": "~1.16.0",
@@ -29,6 +31,8 @@
     "@vitejs/plugin-react": "^6.0.5",
     "lefthook": "^2.1.8",
     "nx": "23.1.2",
+    "oxfmt": "0.70.0",
+    "oxlint": "1.85.0",
     "skills": "1.5.23",
     "typescript": "^6.0.3",
     "vite": "^8.2.1",

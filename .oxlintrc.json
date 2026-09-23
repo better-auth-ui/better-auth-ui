@@ -1,0 +1,57 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "categories": {
+    "correctness": "error"
+  },
+  "plugins": ["eslint", "unicorn", "typescript", "oxc"],
+  "ignorePatterns": [
+    "**/src/routeTree.gen.ts",
+    "**/auth-schema.ts",
+    "**/drizzle/**",
+    "apps/docs/.source/**",
+    "apps/docs/public/**",
+    "apps/docs/src/components/ui/**",
+    "examples/*/src/components/ui/**"
+  ],
+  "rules": {
+    "react/react-in-jsx-scope": "off",
+    "unicorn/no-useless-fallback-in-spread": "off",
+    "react/set-state-in-effect": "off",
+    "react-hooks/exhaustive-deps": "off",
+    "react/immutability": "off",
+    "react/refs": "off",
+    "react/globals": "off",
+    "react/preserve-manual-memoization": "off",
+    "react/static-components": "off",
+    "eslint/no-unused-vars": "warn",
+    "unicorn/no-empty-file": "off",
+    "unicorn/no-useless-spread": "off"
+  },
+  "overrides": [
+    {
+      "files": ["packages/solid/**", "examples/start-solid-zaidan-example/**"],
+      "rules": {
+        "eslint/no-unassigned-vars": "off"
+      }
+    },
+    {
+      "files": [
+        "apps/docs/**",
+        "apps/heroui-dev/**",
+        "packages/react/**",
+        "packages/heroui/**",
+        "examples/start-shadcn-example/**",
+        "examples/start-shadcn-baseui-example/**",
+        "examples/start-heroui-example/**"
+      ],
+      "plugins": ["eslint", "unicorn", "typescript", "oxc", "react"]
+    },
+    {
+      "files": [
+        "examples/next-heroui-example/**",
+        "examples/next-shadcn-example/**"
+      ],
+      "plugins": ["eslint", "unicorn", "typescript", "oxc", "react", "nextjs"]
+    }
+  ]
+}

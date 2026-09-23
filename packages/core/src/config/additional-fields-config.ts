@@ -36,7 +36,7 @@ export type AdditionalFieldInputType =
  *   interface AdditionalFieldRegister { label: ReactNode }
  * }
  */
-// biome-ignore lint/suspicious/noEmptyInterface: augmentation target
+// Augmentation target.
 export interface AdditionalFieldRegister {}
 
 /** Resolved label type. Defaults to `string`. */

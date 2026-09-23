@@ -10,8 +10,8 @@ When using third party libraries, use MCP to look up the docs.
 
 Before completing any task, ensure all of the following pass:
 
-1. **Biome** — No formatting errors in modified files
-2. **Linter** — No lint errors in the project
+1. **Oxfmt**: No formatting errors in modified files.
+2. **Oxlint**: No lint errors in the project.
 
 ## Platform Parity
 

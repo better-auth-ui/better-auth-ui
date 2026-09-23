@@ -169,12 +169,10 @@ async function buildTypeProperty(
 ): Promise<EstreeNode> {
   return createObjectExpression(
     await Promise.all(
-      document.entries.map(
-        async (entry): Promise<[string, EstreeNode]> => [
-          entry.name,
-          await buildEntry(entry)
-        ]
-      )
+      document.entries.map(async (entry): Promise<[string, EstreeNode]> => [
+        entry.name,
+        await buildEntry(entry)
+      ])
     )
   )
 }

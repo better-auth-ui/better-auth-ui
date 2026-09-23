@@ -11,7 +11,7 @@ const InputGroup = (props: InputGroupProps) => {
   const [local, others] = splitProps(props, ["class"])
 
   return (
-    // biome-ignore lint/a11y/useSemanticElements: input group needs group semantics without fieldset styling constraints.
+    // Input group needs group semantics without fieldset styling constraints.
     <div
       class={cn(
         "group/input-group relative z-input-group flex w-full min-w-0 items-center outline-none has-[>textarea]:h-auto",
@@ -58,8 +58,8 @@ const InputGroupAddon = (props: InputGroupAddonProps) => {
   }
 
   return (
-    // biome-ignore lint/a11y/useSemanticElements: input group addon needs group semantics without fieldset styling constraints.
-    // biome-ignore lint/a11y/useKeyWithClickEvents: click delegates focus to the input inside the group.
+    // Input group addon needs group semantics without fieldset styling constraints.
+    // Click delegates focus to the input inside the group.
     <div
       class={cn(inputGroupAddonVariants({ align: align() }), local.class)}
       data-align={align()}

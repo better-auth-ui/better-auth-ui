@@ -11,7 +11,7 @@ import type { BetterFetchError, BetterFetchOption } from "better-auth/client"
 // NOT assignable to `(variables: unknown) => ...`. `any` is the variance bridge
 // that keeps every Better Auth client method assignable while `TFn` still
 // infers the real parameter type for `AuthMutationFnVariables`.
-// biome-ignore lint/suspicious/noExplicitAny: variance bridge, see above
+// Variance bridge, see above.
 type AuthMutationFn = (variables: any) => Promise<unknown>
 
 type AuthMutationFnData<TFn extends AuthMutationFn> = Awaited<ReturnType<TFn>>
@@ -19,7 +19,7 @@ type AuthMutationFnData<TFn extends AuthMutationFn> = Awaited<ReturnType<TFn>>
 type AuthMutationFnVariables<TFn extends AuthMutationFn> =
   Parameters<TFn>[0] extends infer P
     ? undefined extends P
-      ? // biome-ignore lint/suspicious/noConfusingVoidType: preserve no-arg mutate ergonomics
+      ? // Preserve no-arg mutate ergonomics.
         NonNullable<P> | void
       : P
     : never

@@ -74,7 +74,6 @@ const loader = createServerFn({
 
 const clientLoader = browserCollections.docs.createClientLoader({
   component({ toc, frontmatter, lastModified, default: MDX }) {
-    // biome-ignore lint/correctness/useHookAtTopLevel: ignore
     const data = Route.useLoaderData()
 
     return (
@@ -161,7 +160,7 @@ function transformPageTree(root: PageTree.Root): PageTree.Root {
         ...item,
         icon: (
           <span
-            // biome-ignore lint/security/noDangerouslySetInnerHtml: Icons are safe
+            // Icons are safe.
             dangerouslySetInnerHTML={{
               __html: item.icon
             }}

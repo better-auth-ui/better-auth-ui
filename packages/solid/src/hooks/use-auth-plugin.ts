@@ -7,7 +7,7 @@ import { useAuth } from "../lib/auth-provider"
  */
 export type AuthPluginFactory<T extends AuthPlugin = AuthPlugin> = {
   id: string
-  // biome-ignore lint/suspicious/noExplicitAny: factory arguments vary by plugin
+  // Factory arguments vary by plugin.
   (...args: any[]): T
 }
 

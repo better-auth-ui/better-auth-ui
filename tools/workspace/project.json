@@ -13,7 +13,7 @@
       "executor": "nx:run-commands",
       "inputs": ["workspaceLint"],
       "options": {
-        "command": "biome lint",
+        "command": "oxlint . && oxfmt --check .",
         "cwd": "."
       },
       "cache": true

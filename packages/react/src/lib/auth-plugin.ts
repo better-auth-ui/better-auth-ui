@@ -180,9 +180,7 @@ export type AuthPluginCardOverrides<TAccountCardProps = AccountCardProps> = {
  */
 export type AuthPlugin<
   TComponents = AuthPluginComponents,
-  // biome-ignore lint/suspicious/noExplicitAny: any
   TAuthViewProps = any,
-  // biome-ignore lint/suspicious/noExplicitAny: any
   TSettingsViewProps = any,
   TAccountCardProps = AccountCardProps
 > = AuthPluginBase &

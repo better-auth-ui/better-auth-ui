@@ -15,11 +15,10 @@
     "dev": "next dev --turbo",
     "build": "next build",
     "start": "next start",
-    "lint": "biome check",
-    "format": "biome format --write"
+    "lint": "oxlint . && oxfmt --check .",
+    "format": "oxfmt ."
   },
   "devDependencies": {
-    "@biomejs/biome": "^2.5.7",
     "@tailwindcss/postcss": "^4.3.2",
     "@types/node": "^26.1.2",
     "@types/react": "^19.2.18",

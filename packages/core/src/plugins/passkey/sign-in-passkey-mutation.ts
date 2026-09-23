@@ -23,7 +23,7 @@ export function signInPasskeyOptions<TAuthClient extends PasskeyAuthClient>(
   const mutationKey = passkeyMutationKeys.signIn
 
   const mutationFn = async (
-    // biome-ignore lint/suspicious/noConfusingVoidType: void allows no-arg mutate
+    // Void allows no-arg mutate.
     params?: SignInPasskeyParams<TAuthClient> | void
   ) => {
     const result = await authClient.signIn.passkey({

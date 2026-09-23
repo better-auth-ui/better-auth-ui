@@ -156,14 +156,15 @@
     ],
     "lint": [
       "default",
-      "{workspaceRoot}/biome.json",
+      "{workspaceRoot}/.oxlintrc.json",
+      "{workspaceRoot}/.oxfmtrc.json",
       "{workspaceRoot}/.gitignore",
-      { "externalDependencies": ["@biomejs/biome"] }
+      { "externalDependencies": ["oxlint", "oxfmt"] }
     ],
     "workspaceLint": [
       "{workspaceRoot}/**/*",
       "sharedGlobals",
-      { "externalDependencies": ["@biomejs/biome"] }
+      { "externalDependencies": ["oxlint", "oxfmt"] }
     ]
   },
   "pluginsConfig": {

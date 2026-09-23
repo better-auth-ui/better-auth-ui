@@ -16,6 +16,5 @@ export interface SettingsTab {
   /** Display label */
   label: ReactNode
   /** Component rendered in the tab panel */
-  // biome-ignore lint/suspicious/noExplicitAny: any
   component: ComponentType<any>
 }

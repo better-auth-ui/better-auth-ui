@@ -1,7 +1,6 @@
 import { cn } from "@/lib/utils"
 
-interface ComponentPreviewContainerProps
-  extends React.HTMLAttributes<HTMLDivElement> {
+interface ComponentPreviewContainerProps extends React.HTMLAttributes<HTMLDivElement> {
   align?: "center" | "start" | "end"
   minHeight?: string
   isBgSolid?: boolean

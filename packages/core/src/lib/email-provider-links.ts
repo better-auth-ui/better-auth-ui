@@ -1,6 +1,4 @@
-import emailProviderData from "@mikkelscheike/email-provider-links/dist/providers/emailproviders.json" with {
-  type: "json"
-}
+import emailProviderData from "@mikkelscheike/email-provider-links/dist/providers/emailproviders.json" with { type: "json" }
 
 type RawEmailProvider = {
   companyProvider: string

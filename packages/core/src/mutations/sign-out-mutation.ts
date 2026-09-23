@@ -23,7 +23,7 @@ export function signOutOptions<TAuthClient extends AuthClient>(
 ) {
   const mutationKey = authMutationKeys.signOut
 
-  // biome-ignore lint/suspicious/noConfusingVoidType: void allows no-arg mutate
+  // Void allows no-arg mutate.
   const mutationFn = (params?: SignOutParams<TAuthClient> | void) =>
     authClient.signOut({
       ...(params ?? {}),

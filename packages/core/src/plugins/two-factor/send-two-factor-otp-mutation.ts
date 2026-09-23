@@ -17,7 +17,7 @@ export function sendTwoFactorOtpOptions<
   TAuthClient extends TwoFactorAuthClient
 >(authClient: TAuthClient) {
   const mutationFn = (
-    // biome-ignore lint/suspicious/noConfusingVoidType: void allows no-arg mutate
+    // Void allows no-arg mutate.
     params?: SendTwoFactorOtpParams<TAuthClient> | void
   ) =>
     authClient.twoFactor.sendOtp({

@@ -76,7 +76,7 @@ export interface AuthPluginBase {
  *   }
  * }
  */
-// biome-ignore lint/suspicious/noEmptyInterface: declaration-merging slot
+// Declaration-merging slot.
 export interface AuthPluginRegister {}
 
 /**

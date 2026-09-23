@@ -1,4 +1,4 @@
-/** biome-ignore-all lint/a11y/noLabelWithoutControl: component file; for/htmlFor is provided by consumers */
+/** Consumers provide for/htmlFor to connect this label to a control. */
 import type { ComponentProps } from "solid-js"
 import { splitProps } from "solid-js"
 import { cn } from "@/lib/utils"

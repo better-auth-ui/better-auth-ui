@@ -15,9 +15,10 @@ jobs:
       - uses: oven-sh/setup-bun@v2
         with:
           bun-version: latest
-                
+
       - run: bun install
-      
-      - run: bun biome check --write
+
+      - run: bunx oxlint --fix
+      - run: bunx oxfmt
 
       - uses: autofix-ci/action@635ffb0c9798bd160680f18fd73371e355b85f27

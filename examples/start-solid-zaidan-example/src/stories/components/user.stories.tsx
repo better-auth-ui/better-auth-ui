@@ -131,7 +131,9 @@ function createUserButtonRouter(component: () => JSX.Element) {
 function UserButtonPreviewStory() {
   return (
     <RouterProvider
-      router={createUserButtonRouter(() => <UserButtonPreviewContent />)}
+      router={createUserButtonRouter(() => (
+        <UserButtonPreviewContent />
+      ))}
     />
   )
 }

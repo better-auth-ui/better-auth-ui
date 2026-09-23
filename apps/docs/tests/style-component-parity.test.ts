@@ -68,12 +68,12 @@ describe("shadcn/Solid feature parity", () => {
   })
 
   it("gives every shadcn registry item a Solid registry item", async () => {
-    const { solidRegistryManifest } = await import(
-      "../../../examples/start-solid-zaidan-example/registry.manifest"
-    )
-    const shadcnRegistry = (await import(
-      "../public/r/radix-nova/registry.json"
-    )) as { default: { items: { name: string }[] } }
+    const { solidRegistryManifest } =
+      await import("../../../examples/start-solid-zaidan-example/registry.manifest")
+    const shadcnRegistry =
+      (await import("../public/r/radix-nova/registry.json")) as {
+        default: { items: { name: string }[] }
+      }
 
     const solid = new Set(
       solidRegistryManifest.items.map((item) => item.name as string)

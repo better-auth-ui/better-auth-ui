@@ -1,7 +1,7 @@
 import type { SocialProvider } from "better-auth/social-providers"
 
 /** Augmentation target for framework-specific provider icon values. */
-// biome-ignore lint/suspicious/noEmptyInterface: augmentation target
+// Augmentation target.
 export interface SocialProviderRegister {}
 
 /** Icon value accepted by a configured provider. UI packages define this type. */

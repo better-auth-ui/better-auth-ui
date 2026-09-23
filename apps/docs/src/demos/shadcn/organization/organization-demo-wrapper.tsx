@@ -10,10 +10,7 @@ export function OrganizationDemoWrapper({ children }: { children: ReactNode }) {
       authClient={authClient}
       navigate={() => {}}
       plugins={[organizationPlugin()]}
-      Link={(props) => (
-        // biome-ignore lint/a11y/useValidAnchor: ignore
-        <a {...props} href={undefined} />
-      )}
+      Link={(props) => <a {...props} href={undefined} />}
     >
       <div className="w-full">{children}</div>
     </AuthProvider>

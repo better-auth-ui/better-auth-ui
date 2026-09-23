@@ -209,10 +209,10 @@ const mapSubscription = (value: unknown): BillingSubscription | undefined => {
     ),
     cancelAtPeriodEnd: Boolean(
       subscription.cancelAtPeriodEnd ??
-        subscription.cancel_at_period_end ??
-        subscription.cancelAtNextBillingDate ??
-        subscription.cancel_at_next_billing_date ??
-        subscription.status === "scheduled_cancel"
+      subscription.cancel_at_period_end ??
+      subscription.cancelAtNextBillingDate ??
+      subscription.cancel_at_next_billing_date ??
+      subscription.status === "scheduled_cancel"
     ),
     canceledAt: dateValue(canceledAt),
     seats:

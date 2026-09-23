@@ -18,7 +18,7 @@ export function revokeSessionsOptions<TAuthClient extends AuthClient>(
   authClient: TAuthClient
 ) {
   const mutationFn = (
-    // biome-ignore lint/suspicious/noConfusingVoidType: void allows no-arg mutate
+    // Void allows no-arg mutate.
     params?: RevokeSessionsParams<TAuthClient> | void
   ) =>
     authClient.revokeSessions({

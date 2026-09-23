@@ -9,10 +9,7 @@ export function SignUpUsernameDemo() {
       authClient={authClient}
       navigate={() => {}}
       plugins={[usernamePlugin({ isUsernameAvailable: true })]}
-      Link={(props) => (
-        // biome-ignore lint/a11y/useValidAnchor: ignore
-        <a {...props} href={undefined} />
-      )}
+      Link={(props) => <a {...props} href={undefined} />}
     >
       <SignUp />
     </AuthProvider>

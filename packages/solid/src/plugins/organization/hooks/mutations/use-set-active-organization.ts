@@ -53,9 +53,8 @@ export function useSetActiveOrganization<
 
   return useMutation(() => {
     const mutationOptions = options?.() ?? {}
-    const activeOrganizationQueryKey = organizationQueryKeys.activeOrganization(
-      userId()
-    )
+    const activeOrganizationQueryKey =
+      organizationQueryKeys.activeOrganization(userId())
 
     return {
       ...setActiveOrganizationOptions(authClient, userId()),

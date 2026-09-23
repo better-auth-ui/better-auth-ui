@@ -148,7 +148,7 @@ export function PhoneNumber({
     !codeSent &&
     Boolean(
       socialProviders?.length &&
-        (emailAndPassword?.enabled || signIn || passwordSignIn)
+      (emailAndPassword?.enabled || signIn || passwordSignIn)
     )
   const Captcha = plugins.find(
     (plugin) => plugin.captchaComponent

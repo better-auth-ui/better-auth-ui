@@ -67,9 +67,9 @@ export function OAuthConsent(props: OAuthConsentProps) {
   const canRespond = () =>
     Boolean(
       request()?.clientId &&
-        session.data &&
-        publicClient.data &&
-        !consent.isPending
+      session.data &&
+      publicClient.data &&
+      !consent.isPending
     )
 
   return (

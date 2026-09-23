@@ -9,10 +9,7 @@ export function PasskeysDemo() {
       authClient={authClient}
       navigate={() => {}}
       plugins={[passkeyPlugin()]}
-      Link={(props) => (
-        // biome-ignore lint/a11y/useValidAnchor: ignore
-        <a {...props} href={undefined} />
-      )}
+      Link={(props) => <a {...props} href={undefined} />}
     >
       <div className="w-full">
         <Passkeys />

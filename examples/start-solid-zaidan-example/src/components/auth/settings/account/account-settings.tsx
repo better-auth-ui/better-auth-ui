@@ -35,8 +35,8 @@ export function AccountSettings(props: AccountSettingsProps = {}) {
   const showChangeEmail = () =>
     Boolean(
       auth.emailAndPassword?.enabled ||
-        auth.plugins.some((plugin) => plugin.id === "magicLink") ||
-        changeEmailOverride()
+      auth.plugins.some((plugin) => plugin.id === "magicLink") ||
+      changeEmailOverride()
     )
 
   return (

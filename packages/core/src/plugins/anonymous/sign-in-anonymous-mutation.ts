@@ -17,7 +17,7 @@ export type SignInAnonymousOptions<TAuthClient extends AnonymousAuthClient> =
 export function signInAnonymousOptions<TAuthClient extends AnonymousAuthClient>(
   authClient: TAuthClient
 ) {
-  // biome-ignore lint/suspicious/noConfusingVoidType: void allows no-arg mutate
+  // Void allows no-arg mutate.
   const mutationFn = (params?: SignInAnonymousParams<TAuthClient> | void) =>
     authClient.signIn.anonymous({
       ...(params ?? {}),
