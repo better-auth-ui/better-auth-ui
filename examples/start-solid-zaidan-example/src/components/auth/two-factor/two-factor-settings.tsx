@@ -1,4 +1,5 @@
 import { useAuth, useAuthPlugin, useSession } from "@better-auth-ui/solid"
+import { ShieldCheck } from "lucide-solid"
 import { createSignal, Show } from "solid-js"
 
 import { DisableTwoFactorDialog } from "@/components/auth/two-factor/disable-two-factor-dialog"
@@ -8,6 +9,14 @@ import { AlertDialog, AlertDialogTrigger } from "@/components/ui/alert-dialog"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Dialog, DialogTrigger } from "@/components/ui/dialog"
+import {
+  Empty,
+  EmptyContent,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle
+} from "@/components/ui/empty"
 import { Skeleton } from "@/components/ui/skeleton"
 import { twoFactorPlugin } from "@/lib/auth/two-factor-plugin"
 import { cn } from "@/lib/utils"
@@ -81,42 +90,74 @@ export function TwoFactorSettings(props: TwoFactorSettingsProps = {}) {
         </Show>
       </div>
 
-      <Card>
-        <CardContent class="flex flex-col gap-4">
-          <Show
-            when={!session.isPending}
-            fallback={<Skeleton class="h-5 w-48" />}
-          >
-            <p class="text-sm font-medium">
-              {isEnabled()
-                ? twoFactorLocalization.twoFactorEnabled
-                : twoFactorLocalization.twoFactorDisabled}
-            </p>
-          </Show>
-
-          <p class="text-muted-foreground text-sm">
-            {twoFactorLocalization.twoFactorDescription}
-          </p>
-
-          <Show when={isEnabled() && backupCodesEnabled}>
-            <AlertDialog
-              open={isRegenerateOpen()}
-              onOpenChange={setIsRegenerateOpen}
+      <Show
+        when={session.isPending || isEnabled()}
+        fallback={
+          <Card class="z-card-padding-none">
+            <CardContent class="z-card-content-padding-none">
+              <Empty>
+                <EmptyHeader>
+                  <EmptyMedia variant="icon">
+                    <ShieldCheck />
+                  </EmptyMedia>
+                  <EmptyTitle>
+                    {twoFactorLocalization.twoFactorDisabled}
+                  </EmptyTitle>
+                  <EmptyDescription>
+                    {twoFactorLocalization.twoFactorDescription}
+                  </EmptyDescription>
+                </EmptyHeader>
+                <EmptyContent>
+                  <Button
+                    onClick={() => setIsEnableOpen(true)}
+                    size="sm"
+                    type="button"
+                  >
+                    {twoFactorLocalization.enableTwoFactor}
+                  </Button>
+                </EmptyContent>
+              </Empty>
+            </CardContent>
+          </Card>
+        }
+      >
+        <Card>
+          <CardContent class="flex flex-col gap-4">
+            <Show
+              when={!session.isPending}
+              fallback={<Skeleton class="h-5 w-48" />}
             >
-              <AlertDialogTrigger
-                as={Button}
-                class="self-start"
-                size="sm"
-                variant="outline"
-              >
-                {twoFactorLocalization.regenerateBackupCodes}
-              </AlertDialogTrigger>
+              <p class="text-sm font-medium">
+                {twoFactorLocalization.twoFactorEnabled}
+              </p>
+            </Show>
 
-              <RegenerateBackupCodesDialog onOpenChange={setIsRegenerateOpen} />
-            </AlertDialog>
-          </Show>
-        </CardContent>
-      </Card>
+            <p class="text-muted-foreground text-sm">
+              {twoFactorLocalization.twoFactorDescription}
+            </p>
+
+            <Show when={isEnabled() && backupCodesEnabled}>
+              <AlertDialog
+                open={isRegenerateOpen()}
+                onOpenChange={setIsRegenerateOpen}
+              >
+                <AlertDialogTrigger
+                  as={Button}
+                  class="self-start"
+                  size="sm"
+                  variant="outline"
+                >
+                  {twoFactorLocalization.regenerateBackupCodes}
+                </AlertDialogTrigger>
+
+                <RegenerateBackupCodesDialog
+                  onOpenChange={setIsRegenerateOpen}
+                />
+              </AlertDialog>
+            </Show>
+          </CardContent>
+        </Card>
+      </Show>
     </div>
   )
 }

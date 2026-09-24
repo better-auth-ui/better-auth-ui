@@ -243,7 +243,9 @@ describe("<TwoFactorSettings />", () => {
       twoFactorPlugin({ enrollmentMethods: ["totp", "otp"] })
     )
 
-    await user.click(screen.getByRole("button", { name: /enable two-factor/i }))
+    await user.click(
+      screen.getAllByRole("button", { name: /enable two-factor/i })[0]
+    )
 
     const dialog = await screen.findByRole("alertdialog")
     await user.click(
@@ -269,7 +271,9 @@ describe("<TwoFactorSettings />", () => {
       .mockResolvedValue()
     const { authClient } = renderWithProvider(<TwoFactorSettings />)
 
-    await user.click(screen.getByRole("button", { name: /enable two-factor/i }))
+    await user.click(
+      screen.getAllByRole("button", { name: /enable two-factor/i })[0]
+    )
 
     const dialog = await screen.findByRole("alertdialog")
     await user.type(within(dialog).getByLabelText(/password/i), "password123")
