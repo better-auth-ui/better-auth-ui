@@ -82,11 +82,10 @@ export function SearchField({
  * TextArea
  * ---------------------------------------------------------------------- */
 
-export interface TextAreaProps
-  extends Omit<
-    TextInputProps,
-    "multiline" | "onChangeText" | "value" | "style" | "className"
-  > {
+export interface TextAreaProps extends Omit<
+  TextInputProps,
+  "multiline" | "onChangeText" | "value" | "style" | "className"
+> {
   value: string
   onChangeText: (value: string) => void
   placeholder?: string
