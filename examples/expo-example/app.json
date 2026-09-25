@@ -1,0 +1,13 @@
+{
+  "expo": {
+    "name": "better-auth-ui-expo",
+    "slug": "better-auth-ui-expo",
+    "scheme": "betterauthuiexpo",
+    "version": "0.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
+    "web": { "bundler": "metro" },
+    "plugins": ["expo-router", "expo-secure-store"]
+  }
+}
