@@ -16,8 +16,10 @@ import { useThemeColors } from "../lib/theme-colors"
 import { useForm } from "./form"
 import { Btn, Txt } from "./styled"
 
-export interface ButtonProps
-  extends Omit<PressableProps, "children" | "disabled" | "style"> {
+export interface ButtonProps extends Omit<
+  PressableProps,
+  "children" | "disabled" | "style"
+> {
   variant?: ButtonVariant
   size?: ButtonSize
   isPending?: boolean

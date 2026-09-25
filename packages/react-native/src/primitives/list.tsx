@@ -223,11 +223,10 @@ export interface DataListColumn {
   className?: string
 }
 
-export interface DataListProps<T>
-  extends Omit<
-    FlatListProps<T>,
-    "data" | "renderItem" | "keyExtractor" | "style" | "ItemSeparatorComponent"
-  > {
+export interface DataListProps<T> extends Omit<
+  FlatListProps<T>,
+  "data" | "renderItem" | "keyExtractor" | "style" | "ItemSeparatorComponent"
+> {
   data: readonly T[]
   renderItem: (item: T, index: number) => ReactNode
   keyExtractor: (item: T, index: number) => string
