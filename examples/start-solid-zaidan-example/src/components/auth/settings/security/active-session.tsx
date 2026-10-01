@@ -27,14 +27,16 @@ export function ActiveSessionRow(props: {
 }) {
   const auth = useAuth()
   const userAgent = createMemo(() =>
-    Bowser.parse(props.activeSession.userAgent || "")
+    props.activeSession.userAgent
+      ? Bowser.parse(props.activeSession.userAgent)
+      : undefined
   )
   const isMobile = () =>
-    userAgent().platform.type === "mobile" ||
-    userAgent().platform.type === "tablet"
+    userAgent()?.platform.type === "mobile" ||
+    userAgent()?.platform.type === "tablet"
   const browserAndOs = () => {
-    const browser = userAgent().browser.name || "Unknown Browser"
-    const os = userAgent().os.name
+    const browser = userAgent()?.browser.name || "Unknown Browser"
+    const os = userAgent()?.os.name
 
     return os ? `${browser}, ${os}` : browser
   }
