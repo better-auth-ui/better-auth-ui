@@ -4,6 +4,16 @@
   "type": "module",
   "nx": {
     "targets": {
+      "test": {
+        "inputs": [
+          "default",
+          "^production",
+          "typescript",
+          "testEnvironment",
+          "testToolchain",
+          "{workspaceRoot}/examples/start-shadcn-baseui-example/src/**/*"
+        ]
+      },
       "registry:build": {
         "cache": true,
         "inputs": [

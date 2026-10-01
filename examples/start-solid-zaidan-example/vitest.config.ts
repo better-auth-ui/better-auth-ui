@@ -1,4 +1,5 @@
 import { resolve } from "node:path"
+import tailwindcss from "@tailwindcss/vite"
 import { playwright } from "@vitest/browser-playwright"
 import solid from "vite-plugin-solid"
 import { defineConfig } from "vitest/config"
@@ -7,7 +8,7 @@ export default defineConfig({
   optimizeDeps: {
     include: ["@tanstack/solid-store"]
   },
-  plugins: [solid({ ssr: true })],
+  plugins: [tailwindcss(), solid({ ssr: true })],
   resolve: {
     alias: {
       "@": resolve(import.meta.dirname, "src"),

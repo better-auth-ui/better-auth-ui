@@ -40,6 +40,7 @@ BASE_UI_OVERRIDES=(
   components/auth/billing/billing-settings.tsx
   components/auth/dash/activity.tsx
   components/auth/oauth-provider/oauth-clients.tsx
+  # Preserve Base UI's onCheckedChange handler instead of Radix's onSelect.
   components/auth/organization/invite-member-dialog.tsx
   components/auth/organization/organization-member-row.tsx
   components/auth/organization/organization-teams.tsx

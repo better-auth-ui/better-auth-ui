@@ -20,6 +20,13 @@ Before completing any task, ensure all of the following pass:
 - Implement every feature and UI change for shadcn/ui, HeroUI, and Zaidan.
 - Do not complete a change while any platform remains behind the others.
 
+## Source sync
+
+- Run `bun nx run start-shadcn-example:source:sync` to copy shared shadcn sources into the docs, Next.js, and Base UI examples.
+- Keep Base UI components that use different primitive APIs in `BASE_UI_OVERRIDES` in `examples/start-shadcn-example/scripts/sync-consumers.sh`.
+- Keep `components/auth/organization/invite-member-dialog.tsx` in that override list. Its checkbox menu items use Base UI's `onCheckedChange`; the Radix dialog uses `onSelect`.
+- When you change invitation role selection, run the browser tests for Radix, Base UI, HeroUI, and Solid/Zaidan.
+
 <!-- nx configuration start-->
 <!-- Leave the start & end comments to automatically receive updates. -->
 
