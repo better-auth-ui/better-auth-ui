@@ -134,45 +134,65 @@ describe("<SignUp />", () => {
     )
   })
 
-  it("preserves the redirect target when continuing to email verification", async () => {
-    const user = userEvent.setup()
-    const navigate = vi.fn()
-    const redirectTo = "/projects/acme?tab=members"
-    window.history.pushState(
-      {},
-      "",
-      `/auth/sign-up?redirectTo=${encodeURIComponent(redirectTo)}`
-    )
+  it.each([
+    { baseURL: "", redirectOverride: undefined },
+    {
+      baseURL: "https://app.example.com",
+      redirectOverride: "/projects/acme?tab=members"
+    }
+  ])(
+    "preserves the verification callback ($baseURL, $redirectOverride)",
+    async ({ baseURL, redirectOverride }) => {
+      const user = userEvent.setup()
+      const navigate = vi.fn()
+      const redirectTo = redirectOverride ?? "/dashboard"
+      const signUpEmail = vi.fn(async () => ({ data: {}, error: null }))
+      window.history.pushState(
+        {},
+        "",
+        redirectOverride
+          ? `/auth/sign-up?redirectTo=${encodeURIComponent(redirectOverride)}`
+          : "/auth/sign-up"
+      )
 
-    render(
-      <AuthProvider
-        authClient={createMockAuthClient()}
-        emailAndPassword={{ requireEmailVerification: true }}
-        navigate={navigate}
-        queryClient={
-          new QueryClient({
-            defaultOptions: {
-              queries: { retry: false },
-              mutations: { retry: false }
-            }
-          })
-        }
-      >
-        <SignUp />
-      </AuthProvider>
-    )
+      render(
+        <AuthProvider
+          authClient={createMockAuthClient(signUpEmail)}
+          baseURL={baseURL}
+          redirectTo="/dashboard"
+          emailAndPassword={{ requireEmailVerification: true }}
+          navigate={navigate}
+          queryClient={
+            new QueryClient({
+              defaultOptions: {
+                queries: { retry: false },
+                mutations: { retry: false }
+              }
+            })
+          }
+        >
+          <SignUp />
+        </AuthProvider>
+      )
 
-    await user.type(screen.getByLabelText("Name"), "Ada Lovelace")
-    await user.type(screen.getByLabelText("Email"), "ada@example.com")
-    await user.type(screen.getByLabelText("Password"), "correct horse battery")
-    await user.click(screen.getByRole("button", { name: "Sign Up" }))
+      await user.type(screen.getByLabelText("Name"), "Ada Lovelace")
+      await user.type(screen.getByLabelText("Email"), "ada@example.com")
+      await user.type(
+        screen.getByLabelText("Password"),
+        "correct horse battery"
+      )
+      await user.click(screen.getByRole("button", { name: "Sign Up" }))
 
-    await waitFor(() => {
-      expect(navigate).toHaveBeenCalledWith({
-        to: `/auth/verify-email?redirectTo=${encodeURIComponent(redirectTo)}`
+      await waitFor(() => {
+        expect(signUpEmail).toHaveBeenCalledWith(
+          expect.objectContaining({ callbackURL: `${baseURL}${redirectTo}` })
+        )
+        expect(navigate).toHaveBeenCalledWith({
+          to: `/auth/verify-email?redirectTo=${encodeURIComponent(redirectTo)}`
+        })
       })
-    })
-  })
+    }
+  )
 
   it("validates matching passwords and clears secrets after request errors", async () => {
     const user = userEvent.setup()

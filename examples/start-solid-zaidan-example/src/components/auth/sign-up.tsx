@@ -120,7 +120,8 @@ export function SignUp(props: SignUpProps) {
           ...getAdditionalFieldSubmitValues(
             signUpFields(),
             value.additionalFields
-          )
+          ),
+          callbackURL: `${auth.baseURL}${auth.redirectTo}`
         } as Parameters<typeof signUp.mutate>[0])
       } catch {
         // The mutation reports the error through its configured handler.

@@ -81,6 +81,7 @@ export function SignUp({
     additionalFields,
     authClient,
     basePaths,
+    baseURL,
     emailAndPassword,
     localization,
     plugins,
@@ -161,6 +162,7 @@ export function SignUp({
             signUpFields,
             value.additionalFields
           ),
+          callbackURL: `${baseURL}${redirectTo}`,
           fetchOptions
         })
       } catch {
