@@ -2,6 +2,16 @@ const ABSOLUTE_HTTP_URL = /^https?:\/\//i
 
 export const REAUTHENTICATION_QUERY_PARAM = "reauthenticate"
 
+/** Resolve a callback destination against an optional base URL. */
+export function getAuthCallbackURL(
+  baseURL: string,
+  redirectTo: string
+): string {
+  if (!baseURL || ABSOLUTE_HTTP_URL.test(redirectTo)) return redirectTo
+
+  return `${baseURL.replace(/\/+$/, "")}/${redirectTo.replace(/^\/+/, "")}`
+}
+
 /**
  * Build a callback URL from an optional origin, a configured base path, and a
  * view path.

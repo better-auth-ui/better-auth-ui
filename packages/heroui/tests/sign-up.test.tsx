@@ -135,17 +135,42 @@ describe("<SignUp />", () => {
   })
 
   it.each([
-    { baseURL: "", redirectOverride: undefined },
+    {
+      baseURL: "",
+      configuredRedirectTo: "/dashboard",
+      redirectOverride: undefined,
+      callbackURL: "/dashboard"
+    },
     {
       baseURL: "https://app.example.com",
-      redirectOverride: "/projects/acme?tab=members"
+      configuredRedirectTo: "/dashboard",
+      redirectOverride: "/projects/acme?tab=members",
+      callbackURL: "https://app.example.com/projects/acme?tab=members"
+    },
+    {
+      baseURL: "https://app.example.com/",
+      configuredRedirectTo: "projects/acme?tab=members#team",
+      redirectOverride: undefined,
+      callbackURL: "https://app.example.com/projects/acme?tab=members#team"
+    },
+    {
+      baseURL: "https://app.example.com",
+      configuredRedirectTo:
+        "https://other.example.com/projects/acme?tab=members#team",
+      redirectOverride: undefined,
+      callbackURL: "https://other.example.com/projects/acme?tab=members#team"
     }
   ])(
-    "preserves the verification callback ($baseURL, $redirectOverride)",
-    async ({ baseURL, redirectOverride }) => {
+    "preserves the verification callback ($baseURL, $configuredRedirectTo, $redirectOverride)",
+    async ({
+      baseURL,
+      configuredRedirectTo,
+      redirectOverride,
+      callbackURL
+    }) => {
       const user = userEvent.setup()
       const navigate = vi.fn()
-      const redirectTo = redirectOverride ?? "/dashboard"
+      const redirectTo = redirectOverride ?? configuredRedirectTo
       const signUpEmail = vi.fn(async () => ({ data: {}, error: null }))
       window.history.pushState(
         {},
@@ -159,7 +184,7 @@ describe("<SignUp />", () => {
         <AuthProvider
           authClient={createMockAuthClient(signUpEmail)}
           baseURL={baseURL}
-          redirectTo="/dashboard"
+          redirectTo={configuredRedirectTo}
           emailAndPassword={{ requireEmailVerification: true }}
           navigate={navigate}
           queryClient={
@@ -185,7 +210,7 @@ describe("<SignUp />", () => {
 
       await waitFor(() => {
         expect(signUpEmail).toHaveBeenCalledWith(
-          expect.objectContaining({ callbackURL: `${baseURL}${redirectTo}` })
+          expect.objectContaining({ callbackURL })
         )
         expect(navigate).toHaveBeenCalledWith({
           to: `/auth/verify-email?redirectTo=${encodeURIComponent(redirectTo)}`

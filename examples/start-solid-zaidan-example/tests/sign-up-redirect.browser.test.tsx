@@ -18,21 +18,46 @@ afterEach(() => {
 
 describe("sign-up verification redirects", () => {
   it.each([
-    { baseURL: "", redirectOverride: undefined },
+    {
+      baseURL: "",
+      configuredRedirectTo: "/dashboard",
+      redirectOverride: undefined,
+      callbackURL: "/dashboard"
+    },
     {
       baseURL: "https://app.example.com",
-      redirectOverride: "/projects/acme?tab=members"
+      configuredRedirectTo: "/dashboard",
+      redirectOverride: "/projects/acme?tab=members",
+      callbackURL: "https://app.example.com/projects/acme?tab=members"
+    },
+    {
+      baseURL: "https://app.example.com/",
+      configuredRedirectTo: "projects/acme?tab=members#team",
+      redirectOverride: undefined,
+      callbackURL: "https://app.example.com/projects/acme?tab=members#team"
+    },
+    {
+      baseURL: "https://app.example.com",
+      configuredRedirectTo:
+        "https://other.example.com/projects/acme?tab=members#team",
+      redirectOverride: undefined,
+      callbackURL: "https://other.example.com/projects/acme?tab=members#team"
     }
   ])(
-    "sends the effective callback ($baseURL, $redirectOverride)",
-    async ({ baseURL, redirectOverride }) => {
+    "sends the effective callback ($baseURL, $configuredRedirectTo, $redirectOverride)",
+    async ({
+      baseURL,
+      configuredRedirectTo,
+      redirectOverride,
+      callbackURL
+    }) => {
       const signUpEmail = vi.fn(async () => ({ data: {}, error: null }))
       const authClient = {
         getSession: vi.fn(async () => null),
         signUp: { email: signUpEmail }
       } as unknown as Parameters<typeof AuthProvider>[0]["authClient"]
       const navigate = vi.fn()
-      const redirectTo = redirectOverride ?? "/dashboard"
+      const redirectTo = redirectOverride ?? configuredRedirectTo
       window.history.pushState(
         {},
         "",
@@ -44,7 +69,7 @@ describe("sign-up verification redirects", () => {
         <AuthProvider
           authClient={authClient}
           baseURL={baseURL}
-          redirectTo="/dashboard"
+          redirectTo={configuredRedirectTo}
           emailAndPassword={{ requireEmailVerification: true }}
           navigate={navigate}
           queryClient={
@@ -71,7 +96,7 @@ describe("sign-up verification redirects", () => {
       fireEvent.click(screen.getByRole("button", { name: "Sign Up" }))
       await waitFor(() => {
         expect(signUpEmail).toHaveBeenCalledWith(
-          expect.objectContaining({ callbackURL: `${baseURL}${redirectTo}` })
+          expect.objectContaining({ callbackURL })
         )
         expect(navigate).toHaveBeenCalledWith({
           to: `/auth/verify-email?redirectTo=${encodeURIComponent(redirectTo)}`

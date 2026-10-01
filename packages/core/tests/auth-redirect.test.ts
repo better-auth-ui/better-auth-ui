@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest"
 import {
+  getAuthCallbackURL,
   getAuthLinkURL,
   getAuthRedirectAction,
   getReauthenticationSignInURL,
@@ -9,6 +10,43 @@ import {
 } from "../src/lib/auth-redirect"
 
 const origin = "https://app.example.com"
+
+describe("getAuthCallbackURL", () => {
+  it.each([
+    [origin, "/dashboard", `${origin}/dashboard`],
+    [`${origin}/`, "dashboard/", `${origin}/dashboard/`],
+    [
+      `${origin}///`,
+      "///dashboard?tab=members#team",
+      `${origin}/dashboard?tab=members#team`
+    ],
+    [`${origin}/app/`, "/dashboard", `${origin}/app/dashboard`],
+    [
+      origin,
+      "https://other.example.com/dashboard",
+      "https://other.example.com/dashboard"
+    ],
+    [
+      origin,
+      "http://other.example.com/dashboard",
+      "http://other.example.com/dashboard"
+    ],
+    [
+      origin,
+      "HTTPS://other.example.com/dashboard",
+      "HTTPS://other.example.com/dashboard"
+    ],
+    ["", "/dashboard", "/dashboard"],
+    ["", "dashboard", "dashboard"],
+    [
+      "",
+      "https://other.example.com/dashboard",
+      "https://other.example.com/dashboard"
+    ]
+  ])("resolves %s with %s", (baseURL, redirectTo, expected) => {
+    expect(getAuthCallbackURL(baseURL, redirectTo)).toBe(expected)
+  })
+})
 
 describe("getAuthLinkURL", () => {
   it("preserves redirect targets and existing URL details", () => {

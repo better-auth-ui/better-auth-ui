@@ -2,6 +2,7 @@ import {
   authQueryKeys,
   getAdditionalFieldDefaultValues,
   getAdditionalFieldSubmitValues,
+  getAuthCallbackURL,
   getAuthLinkURL,
   getFormFieldErrors,
   isPasswordCompromisedError,
@@ -121,7 +122,7 @@ export function SignUp(props: SignUpProps) {
             signUpFields(),
             value.additionalFields
           ),
-          callbackURL: `${auth.baseURL}${auth.redirectTo}`
+          callbackURL: getAuthCallbackURL(auth.baseURL, auth.redirectTo)
         } as Parameters<typeof signUp.mutate>[0])
       } catch {
         // The mutation reports the error through its configured handler.
