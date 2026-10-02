@@ -1,0 +1,37 @@
+{
+  "name": "expo-example",
+  "version": "0.0.0",
+  "private": true,
+  "main": "expo-router/entry",
+  "scripts": {
+    "start": "expo start",
+    "android": "expo start --android",
+    "ios": "expo start --ios",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@better-auth-ui/core": "workspace:*",
+    "@better-auth-ui/react": "workspace:*",
+    "@better-auth-ui/react-native": "workspace:*",
+    "@better-auth/expo": "^1.6.19",
+    "@expo/metro-runtime": "~57.0.3",
+    "@tanstack/react-query": "^5.101.0",
+    "better-auth": "^1.6.19",
+    "expo": "~57.0.4",
+    "expo-linking": "~57.0.2",
+    "expo-router": "~57.0.4",
+    "expo-secure-store": "~57.0.0",
+    "expo-status-bar": "~57.0.0",
+    "react": "19.2.6",
+    "react-dom": "19.2.6",
+    "react-native": "0.86.0",
+    "react-native-safe-area-context": "~5.7.0",
+    "react-native-screens": "~4.25.2",
+    "react-native-svg": "^15.15.5",
+    "react-native-web": "^0.21.2"
+  },
+  "devDependencies": {
+    "@types/react": "~19.2.2",
+    "typescript": "~6.0.3"
+  }
+}
