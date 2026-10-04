@@ -16,7 +16,7 @@ import {
   DropdownMenuRadioItem,
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu"
-import { cn } from "@/lib/utils"
+import { cn } from "cn"
 import { ORGANIZATION_TABLE_PAGE_SIZE_OPTIONS } from "./organization-table-state"
 
 export function OrganizationTablePagination({

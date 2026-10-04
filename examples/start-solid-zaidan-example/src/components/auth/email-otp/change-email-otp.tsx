@@ -15,7 +15,7 @@ import { OtpField } from "@/components/auth/otp-field"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter } from "@/components/ui/card"
 import { emailOtpPlugin } from "@/lib/auth/email-otp-plugin"
-import { cn } from "@/lib/utils"
+import { cn } from "cn"
 import { createAuthForm, submitAuthForm } from "../auth-form"
 
 type ChangeEmailStep = "email" | "currentCode" | "newCode"

@@ -17,7 +17,7 @@ import { ChangeAvatar } from "@/components/auth/settings/account/change-avatar"
 import { Card, CardContent, CardFooter } from "@/components/ui/card"
 import { Field, FieldError, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
-import { cn } from "@/lib/utils"
+import { cn } from "cn"
 
 export type UserProfileProps = {
   class?: string

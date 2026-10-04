@@ -6,7 +6,7 @@ import type { MouseEvent, ReactNode } from "react"
 
 import { Button } from "@/components/ui/button"
 import { TableHead } from "@/components/ui/table"
-import { cn } from "@/lib/utils"
+import { cn } from "cn"
 import type { organizationTableFeatures } from "./organization-table"
 
 export function OrganizationSortableTableHead<TData extends RowData>({

@@ -15,7 +15,7 @@ import {
   FieldLabel
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
-import { cn } from "@/lib/utils"
+import { cn } from "cn"
 import { isAuthFormFieldInvalid, useAuthForm } from "./auth-form"
 import { RESET_LINK_SENT_STORAGE_KEY } from "./reset-link-sent"
 

@@ -6,7 +6,7 @@ import { useEffect, useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { FieldDescription } from "@/components/ui/field"
 import { magicLinkPlugin } from "@/lib/auth/magic-link-plugin"
-import { cn } from "@/lib/utils"
+import { cn } from "cn"
 import { OpenEmailButton } from "./open-email-button"
 import { useIsHydrated } from "./use-is-hydrated"
 

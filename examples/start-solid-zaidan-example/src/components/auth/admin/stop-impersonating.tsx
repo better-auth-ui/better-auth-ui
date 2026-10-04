@@ -11,7 +11,7 @@ import { UserRoundCheck } from "lucide-solid"
 import { Show } from "solid-js"
 import { DropdownMenuItem } from "@/components/ui/dropdown-menu"
 import { Spinner } from "@/components/ui/spinner"
-import { cn } from "@/lib/utils"
+import { cn } from "cn"
 
 export type StopImpersonatingProps = {
   class?: string

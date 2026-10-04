@@ -1,7 +1,7 @@
 import { LoaderCircle } from "lucide-solid"
 import type { ComponentProps } from "solid-js"
 import { splitProps } from "solid-js"
-import { cn } from "@/lib/utils"
+import { cn } from "cn"
 
 type SpinnerProps = ComponentProps<"svg"> & {
   class?: string | undefined

@@ -48,7 +48,6 @@ type ResolvedRegistryFile = RegistryMetadataFile & {
 }
 
 const SOURCE_EXTENSIONS = [".ts", ".tsx", ".js", ".jsx"] as const
-const HOST_PROVIDED_IMPORTS = new Set(["@/lib/utils"])
 const HOST_PACKAGES = new Set(["react", "react-dom"])
 const PACKAGE_REGISTRY_DEPENDENCIES = new Map([["sonner", "sonner"]])
 
@@ -242,10 +241,6 @@ const createRegistryItem = ({
 
       if (uiImport) {
         registryDependencies.add(uiImport[1])
-        continue
-      }
-
-      if (HOST_PROVIDED_IMPORTS.has(specifier)) {
         continue
       }
 

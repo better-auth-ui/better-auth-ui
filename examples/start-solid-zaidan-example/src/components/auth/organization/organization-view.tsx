@@ -13,7 +13,7 @@ import type { ComponentProps } from "solid-js"
 import { Show, splitProps } from "solid-js"
 import { Badge } from "@/components/ui/badge"
 import { organizationPlugin } from "@/lib/auth/organization-plugin"
-import { cn } from "@/lib/utils"
+import { cn } from "cn"
 import {
   OrganizationLogo,
   type OrganizationLogoSize

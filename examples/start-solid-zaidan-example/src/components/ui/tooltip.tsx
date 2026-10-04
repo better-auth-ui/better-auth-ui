@@ -2,7 +2,7 @@ import type { PolymorphicProps } from "@kobalte/core/polymorphic"
 import * as TooltipPrimitive from "@kobalte/core/tooltip"
 import type { ComponentProps, ValidComponent } from "solid-js"
 import { mergeProps, splitProps } from "solid-js"
-import { cn } from "@/lib/utils"
+import { cn } from "cn"
 
 const Tooltip = (props: TooltipPrimitive.TooltipRootProps) => {
   const mergedProps = mergeProps(

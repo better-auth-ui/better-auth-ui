@@ -3,7 +3,7 @@ import { type AlertRootProps, Root } from "@kobalte/core/alert"
 import { cva, type VariantProps } from "class-variance-authority"
 import type { ComponentProps, ValidComponent } from "solid-js"
 import { splitProps } from "solid-js"
-import { cn } from "@/lib/utils"
+import { cn } from "cn"
 
 const alertVariants = cva("group/alert relative z-alert w-full", {
   variants: {

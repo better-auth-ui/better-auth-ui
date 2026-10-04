@@ -1,7 +1,7 @@
 /** Consumers provide for/htmlFor to connect this label to a control. */
 import type { ComponentProps } from "solid-js"
 import { splitProps } from "solid-js"
-import { cn } from "@/lib/utils"
+import { cn } from "cn"
 
 type LabelProps = ComponentProps<"label">
 

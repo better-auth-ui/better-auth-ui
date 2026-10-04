@@ -8,7 +8,7 @@ import { Fragment } from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { ItemGroup, ItemSeparator } from "@/components/ui/item"
 import { multiSessionPlugin } from "@/lib/auth/multi-session-plugin"
-import { cn } from "@/lib/utils"
+import { cn } from "cn"
 import { ManageAccount } from "./manage-account"
 
 export type ManageAccountsProps = {

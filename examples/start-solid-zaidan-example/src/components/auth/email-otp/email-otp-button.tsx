@@ -5,7 +5,7 @@ import { Show } from "solid-js"
 
 import { buttonVariants } from "@/components/ui/button"
 import { emailOtpPlugin } from "@/lib/auth/email-otp-plugin"
-import { cn } from "@/lib/utils"
+import { cn } from "cn"
 
 export type EmailOtpButtonProps = {
   /** Current auth view. On `"emailOtp"` this links back to password sign-in. */

@@ -9,7 +9,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
 import { Skeleton } from "@/components/ui/skeleton"
 import { organizationPlugin } from "@/lib/auth/organization-plugin"
-import { cn } from "@/lib/utils"
+import { cn } from "cn"
 import { DeleteOrganization } from "./delete-organization"
 import { LeaveOrganization } from "./leave-organization"
 

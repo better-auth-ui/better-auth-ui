@@ -6,7 +6,7 @@ import { ShieldAlertIcon, UsersIcon } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { adminPlugin } from "@/lib/auth/admin-plugin"
-import { cn } from "@/lib/utils"
+import { cn } from "cn"
 
 import { AdminUsers } from "./admin-users"
 

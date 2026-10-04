@@ -8,7 +8,7 @@ import { AuthLink, useAuth } from "@better-auth-ui/solid"
 import { useIsMutating } from "@tanstack/solid-query"
 import { Lock, Mail } from "lucide-solid"
 import { buttonVariants } from "@/components/ui/button"
-import { cn } from "@/lib/utils"
+import { cn } from "cn"
 
 export type MagicLinkButtonProps = {
   view?: AuthView

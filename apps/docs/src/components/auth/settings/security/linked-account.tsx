@@ -35,7 +35,7 @@ import {
 } from "@/components/ui/item"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Spinner } from "@/components/ui/spinner"
-import { cn } from "@/lib/utils"
+import { cn } from "cn"
 import { ReauthenticationAction } from "../../reauthentication"
 
 export type LinkedAccountProps = {

@@ -2207,7 +2207,7 @@ describe("Solid auth route component selection", () => {
     expect(item).toContain(
       'import { Separator, type SeparatorProps } from "@/components/ui/separator"'
     )
-    expect(item).toContain('import { cn } from "@/lib/utils"')
+    expect(item).toContain('import { cn } from "cn"')
     expect(item).toContain('type ItemVariant = "default" | "outline" | "muted"')
     expect(item).toContain('type ItemSize = "default" | "sm" | "xs"')
     expect(item).toContain(
@@ -2897,7 +2897,7 @@ describe("Solid auth route component selection", () => {
     expect(settingsComponents).not.toContain("function DeleteAccountSettings")
     expect(dangerZone).toContain("export type DangerZoneProps = {")
     expect(dangerZone).toContain("class?: string")
-    expect(dangerZone).toContain('import { cn } from "@/lib/utils"')
+    expect(dangerZone).toContain('import { cn } from "cn"')
     expect(dangerZone).toContain(
       "export function DangerZone(props: DangerZoneProps = {})"
     )
@@ -2909,7 +2909,7 @@ describe("Solid auth route component selection", () => {
     expect(dangerZone).toContain("<DeleteAccount />")
     expect(deleteAccount).toContain("export type DeleteAccountProps = {")
     expect(deleteAccount).toContain("class?: string")
-    expect(deleteAccount).toContain('import { cn } from "@/lib/utils"')
+    expect(deleteAccount).toContain('import { cn } from "cn"')
     expect(deleteAccount).toContain(
       "export function DeleteAccount(props: DeleteAccountProps = {})"
     )

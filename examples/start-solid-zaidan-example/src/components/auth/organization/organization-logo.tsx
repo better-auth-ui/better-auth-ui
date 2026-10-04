@@ -4,7 +4,7 @@ import type { JSX } from "solid-js"
 import { Show } from "solid-js"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Skeleton } from "@/components/ui/skeleton"
-import { cn } from "@/lib/utils"
+import { cn } from "cn"
 
 export type OrganizationLogoSize = "sm" | "md" | "lg"
 

@@ -122,8 +122,7 @@ const collectRegistryInstall = ({
     for (const specifier of extractModuleSpecifiers(content)) {
       if (
         specifier.startsWith("@/components/ui/") ||
-        specifier.startsWith("@/hooks/") ||
-        specifier === "@/lib/utils"
+        specifier.startsWith("@/hooks/")
       ) {
         continue
       }
@@ -300,6 +299,20 @@ describe("Solid registry isolation", () => {
     ).toBe(true)
   })
 
+  it("installs cn for every payload that imports it", () => {
+    for (const item of solidRegistryManifest.items) {
+      const importsCn = item.files.some((file) =>
+        extractModuleSpecifiers(
+          readFileSync(resolve(__dirname, "..", file.path), "utf8")
+        ).includes("cn")
+      )
+
+      if (importsCn) {
+        expect(item.dependencies, item.name).toContain("cn")
+      }
+    }
+  })
+
   it("exposes registry payloads for implemented Solid auth surfaces", () => {
     expect(solidRegistryManifest.items.map((item) => item.name)).toEqual(
       expectedSolidRegistryPayloadNames
@@ -431,8 +444,7 @@ describe("Solid registry isolation", () => {
     expect(packageJson.dependencies).toMatchObject({
       "@kobalte/core": expect.any(String),
       "class-variance-authority": expect.any(String),
-      clsx: expect.any(String),
-      "tailwind-merge": expect.any(String)
+      cn: expect.any(String)
     })
     expect(packageJson.devDependencies).toMatchObject({
       "@tailwindcss/vite": expect.any(String),
@@ -755,8 +767,7 @@ describe("Solid registry isolation", () => {
       "src/components/ui/card.tsx",
       "src/components/ui/field.tsx",
       "src/components/ui/input.tsx",
-      "src/components/ui/label.tsx",
-      "src/lib/utils.ts"
+      "src/components/ui/label.tsx"
     ]
     const upstreamFormUiDependencies = [
       "@zaidan/alert",
@@ -852,8 +863,7 @@ describe("Solid registry isolation", () => {
       expect.arrayContaining([
         "@kobalte/core",
         "class-variance-authority",
-        "clsx",
-        "tailwind-merge"
+        "cn"
       ])
     )
     expect(signUp.files.map((file) => file.path)).toEqual([
@@ -863,8 +873,7 @@ describe("Solid registry isolation", () => {
       "src/components/auth/provider-buttons.tsx",
       "src/components/auth/last-login-method/last-used-badge.tsx",
       "src/components/auth/auth-form.tsx",
-      "src/components/auth/additional-field.tsx",
-      "src/lib/utils.ts"
+      "src/components/auth/additional-field.tsx"
     ])
     expect(signUp.files.map((file) => file.path)).not.toEqual(
       expect.arrayContaining(uiFiles.filter((file) => file.includes("/ui/")))

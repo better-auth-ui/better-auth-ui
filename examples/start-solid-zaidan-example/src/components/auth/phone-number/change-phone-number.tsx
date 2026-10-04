@@ -21,7 +21,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
 import { phoneNumberPlugin } from "@/lib/auth/phone-number-plugin"
-import { cn } from "@/lib/utils"
+import { cn } from "cn"
 import { createAuthForm, isAuthFormFieldInvalid } from "../auth-form"
 import { RemovePhoneNumberDialog } from "./remove-phone-number-dialog"
 

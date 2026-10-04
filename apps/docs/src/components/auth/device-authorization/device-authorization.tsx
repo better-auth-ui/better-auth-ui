@@ -46,7 +46,7 @@ import {
 import { Separator } from "@/components/ui/separator"
 import { Spinner } from "@/components/ui/spinner"
 import { deviceAuthorizationPlugin } from "@/lib/auth/device-authorization-plugin"
-import { cn } from "@/lib/utils"
+import { cn } from "cn"
 import { useAuthForm } from "../auth-form"
 
 type DeviceAuthorizationStep = "code" | "approval" | "approved" | "denied"

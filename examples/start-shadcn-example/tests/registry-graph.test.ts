@@ -74,8 +74,8 @@ describe("React registry import graph", () => {
           }
         }
         install("auth")
-        // Host-provided shadcn primitives and utilities, without optional auth plugins.
-        for (const path of ["components/ui", "lib/utils.ts"]) {
+        // Host-provided shadcn primitives, without optional auth plugins.
+        for (const path of ["components/ui"]) {
           cpSync(
             resolve(sourceRoot, "src", path),
             resolve(installation, "src", path),
@@ -133,7 +133,8 @@ describe("React registry import graph", () => {
       expect.arrayContaining([
         "@better-auth-ui/core@latest",
         "@better-auth-ui/react@latest",
-        "@tanstack/react-query"
+        "@tanstack/react-query",
+        "cn"
       ])
     )
   })

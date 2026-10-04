@@ -1,6 +1,6 @@
 import { useAuth } from "@better-auth-ui/solid"
 import { For } from "solid-js"
-import { cn } from "@/lib/utils"
+import { cn } from "cn"
 import { ProviderButton } from "./provider-button"
 import type { SocialAuthView } from "./sign-in-path"
 

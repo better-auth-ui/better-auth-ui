@@ -51,7 +51,7 @@
         "better-auth": "1.7.2",
         "bowser": "^2.11.0",
         "class-variance-authority": "^0.7.1",
-        "cn": "^0.2.6",
+        "cn": "^0.4.0",
         "date-fns": "^4.3.0",
         "fumadocs-core": "16.15.4",
         "fumadocs-mdx": "15.4.0",
@@ -191,7 +191,7 @@
         "better-auth": "1.7.2",
         "bowser": "^2.11.0",
         "class-variance-authority": "^0.7.1",
-        "cn": "^0.2.6",
+        "cn": "^0.4.0",
         "date-fns": "^4.3.0",
         "drizzle-orm": "^0.45.2",
         "input-otp": "^1.4.2",
@@ -286,7 +286,7 @@
         "better-auth": "1.7.2",
         "bowser": "^2.11.0",
         "class-variance-authority": "^0.7.1",
-        "cn": "^0.2.6",
+        "cn": "^0.4.0",
         "date-fns": "^4.4.0",
         "drizzle-orm": "^0.45.2",
         "input-otp": "^1.4.2",
@@ -348,7 +348,7 @@
         "better-auth": "1.7.2",
         "bowser": "^2.11.0",
         "class-variance-authority": "^0.7.1",
-        "cn": "^0.2.6",
+        "cn": "^0.4.0",
         "date-fns": "^4.3.0",
         "drizzle-orm": "^0.45.2",
         "input-otp": "^1.4.2",
@@ -412,14 +412,13 @@
         "better-auth": "1.7.2",
         "bowser": "^2.11.0",
         "class-variance-authority": "^0.7.1",
-        "clsx": "^2.1.1",
+        "cn": "^0.4.0",
         "date-fns": "^4.4.0",
         "drizzle-orm": "^0.45.2",
         "lucide-solid": "^1.29.0",
         "shadcn": "^4.19.0",
         "solid-js": "^1.9.14",
         "solid-sonner": "^0.3.1",
-        "tailwind-merge": "^3.4.0",
       },
       "devDependencies": {
         "@solidjs/testing-library": "^0.8.10",
@@ -566,12 +565,11 @@
         "@vitejs/plugin-react": "^6.0.5",
         "@vitest/browser-playwright": "^4.1.9",
         "better-auth": "1.7.2",
-        "clsx": "^2.1.1",
+        "cn": "^0.4.0",
         "playwright": "^1.62.1",
         "react": "^19.2.6",
         "react-dom": "^19.2.6",
         "react-email": "^6.6.8",
-        "tailwind-merge": "^3.5.0",
         "tailwindcss": "^4.3.2",
         "vitest": "^4.1.9",
         "zod": "^4.4.3",
@@ -583,11 +581,10 @@
         "@tanstack/query-core": ">=5.101.2",
         "@tanstack/react-query": ">=5.101.2",
         "better-auth": ">=1.7.0",
-        "clsx": ">=2.0.0",
+        "cn": ">=0.4.0",
         "react": ">=19.2.6",
         "react-dom": ">=19.2.6",
         "react-email": ">=6.0.0",
-        "tailwind-merge": ">=3.5.0",
         "tailwindcss": ">=4.3.2",
         "zod": ">=4.4.3",
       },
@@ -2195,7 +2192,7 @@
 
     "clsx": ["clsx@2.1.1", "", {}, "sha512-eYm0QWBtUrBWZWG0d386OGAw16Z995PiOVo2B7bjWSbHedGl5e0ZWaq65kOGgUSNesEIDkB9ISbTg/JK9dhCZA=="],
 
-    "cn": ["cn@0.2.6", "", { "bin": { "cn": "bin/cn.mjs" } }, "sha512-+i4L0zUGgRcEnhsxueVrP7iBGxBx5iD0WOTYg1MwFEu2ZyCmH5Ov2V1cul2Ht5UchRQQgftCf4be/RxspuW6QQ=="],
+    "cn": ["cn@0.4.0", "", { "bin": { "cn": "bin/cn.mjs" } }, "sha512-qOAeUhPwPzBxx6jaeQdo646XIKliKHc2j1ZF7Ngb1o0pJZKH5gq8FkA0aVdUdPFUDXNXyUCXpCtoJISo6dhizg=="],
 
     "cnfast": ["cnfast@0.1.0", "", { "bin": { "cnfast": "bin/cli.js" } }, "sha512-rH0jBKeLkVrK7NsZ5Ba2l7WdMBmm1k0FMpABeXUU1PgTUxbz3261gEuCSsrYuXo4BwAe3yCcIbQ93YyS52lOGQ=="],
 
@@ -3367,7 +3364,7 @@
 
     "tagged-tag": ["tagged-tag@1.0.0", "", {}, "sha512-yEFYrVhod+hdNyx7g5Bnkkb0G6si8HJurOoOEgC8B/O0uXLHlaey/65KRv6cuWBNhBgHKAROVpc7QyYqE5gFng=="],
 
-    "tailwind-merge": ["tailwind-merge@3.6.0", "", {}, "sha512-uxL7qAVQriqRQPAyK3pj66VqskWqoZ37PW94jwOTwNfq/z9oyu1V+eqrZqtR2+fCiXdYOZe/Modt8GtvqNzu+w=="],
+    "tailwind-merge": ["tailwind-merge@3.4.0", "", {}, "sha512-uSaO4gnW+b3Y2aWoWfFpX62vn2sR3skfhbjsEnaBI81WD1wBLlHZe5sWf0AqjksNdYTbGBEd0UasQMT3SNV15g=="],
 
     "tailwind-variants": ["tailwind-variants@3.2.2", "", { "peerDependencies": { "tailwind-merge": ">=3.0.0", "tailwindcss": "*" }, "optionalPeers": ["tailwind-merge"] }, "sha512-Mi4kHeMTLvKlM98XPnK+7HoBPmf4gygdFmqQPaDivc3DpYS6aIY6KiG/PgThrGvii5YZJqRsPz0aPyhoFzmZgg=="],
 
@@ -3671,8 +3668,6 @@
 
     "@esbuild-kit/core-utils/source-map-support": ["source-map-support@0.5.21", "", { "dependencies": { "buffer-from": "^1.0.0", "source-map": "^0.6.0" } }, "sha512-uBHU3L3czsIyYXKX88fdrGovxdSCoTGDRZ6SYXtSRxLZUzHg5P/66Ht6uoUlHu9EZod+inXhKo3qQgwXUT/y1w=="],
 
-    "@heroui/react/tailwind-merge": ["tailwind-merge@3.4.0", "", {}, "sha512-uSaO4gnW+b3Y2aWoWfFpX62vn2sR3skfhbjsEnaBI81WD1wBLlHZe5sWf0AqjksNdYTbGBEd0UasQMT3SNV15g=="],
-
     "@img/sharp-wasm32/@emnapi/runtime": ["@emnapi/runtime@1.11.3", "", { "dependencies": { "tslib": "^2.4.0" } }, "sha512-Xz4Tpyki7XyrpbUK1jR1AhdAdaXyhhY4lZ3neLodmhpuWfy2PAQN5B46sAiU4liOXGLkHypn/qU+jvfWSCYYLA=="],
 
     "@mdx-js/mdx/source-map": ["source-map@0.7.6", "", {}, "sha512-i5uvt8C3ikiWeNZSVZNWcfZPItFQOsYTUAOkcUPGd8DqDy1uOUikjt5dG+uRlwyvR108Fb9DOd4GvXfT0N2/uQ=="],
@@ -3962,6 +3957,8 @@
     "shadcn/open": ["open@11.0.0", "", { "dependencies": { "default-browser": "^5.4.0", "define-lazy-prop": "^3.0.0", "is-in-ssh": "^1.0.0", "is-inside-container": "^1.0.0", "powershell-utils": "^0.1.0", "wsl-utils": "^0.3.0" } }, "sha512-smsWv2LzFjP03xmvFoJ331ss6h+jixfA4UUV/Bsiyuu4YJPfN+FIQGOIiv4w9/+MoHkfkJ22UIaQWRVFRfH6Vw=="],
 
     "shadcn/ora": ["ora@8.2.0", "", { "dependencies": { "chalk": "^5.3.0", "cli-cursor": "^5.0.0", "cli-spinners": "^2.9.2", "is-interactive": "^2.0.0", "is-unicode-supported": "^2.0.0", "log-symbols": "^6.0.0", "stdin-discarder": "^0.2.2", "string-width": "^7.2.0", "strip-ansi": "^7.1.0" } }, "sha512-weP+BZ8MVNnlCm8c0Qdc1WSWq4Qn7I+9CJGm7Qali6g44e/PUzbjNqJX5NJ9ljlNMosfJvg1fKEGILklK9cwnw=="],
+
+    "shadcn/tailwind-merge": ["tailwind-merge@3.6.0", "", {}, "sha512-uxL7qAVQriqRQPAyK3pj66VqskWqoZ37PW94jwOTwNfq/z9oyu1V+eqrZqtR2+fCiXdYOZe/Modt8GtvqNzu+w=="],
 
     "shadcn/ts-morph": ["ts-morph@26.0.0", "", { "dependencies": { "@ts-morph/common": "~0.27.0", "code-block-writer": "^13.0.3" } }, "sha512-ztMO++owQnz8c/gIENcM9XfCEzgoGphTv+nKpYNM1bgsdOVC/jRZuEBf6N+mLLDNg68Kl+GgUZfOySaRiG1/Ug=="],
 

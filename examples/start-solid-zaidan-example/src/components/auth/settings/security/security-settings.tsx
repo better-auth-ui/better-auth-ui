@@ -7,7 +7,7 @@ import { ChangePasswordSettings } from "@/components/auth/settings/security/chan
 import { LinkedAccountsSettings } from "@/components/auth/settings/security/linked-accounts"
 import { hasAuthPlugin } from "@/components/auth/settings/shared/helpers"
 import type { SecurityCardsPlugin } from "@/components/auth/settings/shared/types"
-import { cn } from "@/lib/utils"
+import { cn } from "cn"
 
 export type SecuritySettingsProps = {
   class?: string

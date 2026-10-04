@@ -26,7 +26,7 @@ import { Field, FieldDescription, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import { Spinner } from "@/components/ui/spinner"
 import { siwePlugin } from "@/lib/auth/siwe-plugin"
-import { cn } from "@/lib/utils"
+import { cn } from "cn"
 import { createAuthForm, isAuthFormFieldInvalid } from "../auth-form"
 
 export type SignInEthereumButtonProps = {

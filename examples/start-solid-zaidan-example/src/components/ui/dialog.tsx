@@ -5,7 +5,7 @@ import type { Component, ComponentProps, ValidComponent } from "solid-js"
 import { mergeProps, Show, splitProps } from "solid-js"
 
 import { Button } from "@/components/ui/button"
-import { cn } from "@/lib/utils"
+import { cn } from "cn"
 
 const Dialog: Component<DialogPrimitive.DialogRootProps> = (props) => {
   return <DialogPrimitive.Root data-slot="dialog" {...props} />

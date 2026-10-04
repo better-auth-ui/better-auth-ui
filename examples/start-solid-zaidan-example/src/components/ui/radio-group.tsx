@@ -10,7 +10,7 @@ import {
 import { Circle } from "lucide-solid"
 import { type ComponentProps, splitProps, type ValidComponent } from "solid-js"
 
-import { cn } from "@/lib/utils"
+import { cn } from "cn"
 
 type RadioGroupProps<T extends ValidComponent = "div"> = PolymorphicProps<
   T,

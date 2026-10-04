@@ -6,7 +6,7 @@ import {
 } from "@better-auth-ui/core"
 import { useAuth } from "@better-auth-ui/react"
 
-import { cn } from "@/lib/utils"
+import { cn } from "cn"
 
 /** Fixed segment identities, so the bars keep their own React keys. */
 const STRENGTH_SEGMENTS = [1, 2, 3, 4] as const

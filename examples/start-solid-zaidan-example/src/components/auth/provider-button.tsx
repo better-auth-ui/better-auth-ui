@@ -16,7 +16,7 @@ import { createSignal, Show } from "solid-js"
 import { Dynamic } from "solid-js/web"
 import { Button } from "@/components/ui/button"
 import { Spinner } from "@/components/ui/spinner"
-import { cn } from "@/lib/utils"
+import { cn } from "cn"
 import { LastUsedBadge } from "./last-login-method/last-used-badge"
 import { resolveSocialAuthParams, type SocialAuthView } from "./sign-in-path"
 

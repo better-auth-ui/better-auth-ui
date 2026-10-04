@@ -3,7 +3,7 @@ import type { PolymorphicProps } from "@kobalte/core/polymorphic"
 import type { Component, ComponentProps, ValidComponent } from "solid-js"
 import { mergeProps, splitProps } from "solid-js"
 import { Button, type ButtonProps } from "@/components/ui/button"
-import { cn } from "@/lib/utils"
+import { cn } from "cn"
 
 const AlertDialog: Component<AlertDialogPrimitive.AlertDialogRootProps> = (
   props

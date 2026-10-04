@@ -36,7 +36,7 @@ import {
   InputGroupInput
 } from "@/components/ui/input-group"
 import { emailOtpPlugin } from "@/lib/auth/email-otp-plugin"
-import { cn } from "@/lib/utils"
+import { cn } from "cn"
 import {
   isAuthFormFieldInvalid,
   setAuthFormServerError,

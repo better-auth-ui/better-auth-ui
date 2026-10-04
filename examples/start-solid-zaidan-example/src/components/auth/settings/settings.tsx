@@ -10,7 +10,7 @@ import type {
   SettingsRouteResolution
 } from "@/components/auth/settings/shared/types"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { cn } from "@/lib/utils"
+import { cn } from "cn"
 
 export { AccountSettings } from "@/components/auth/settings/account/account-settings"
 export { SecuritySettings } from "@/components/auth/settings/security/security-settings"

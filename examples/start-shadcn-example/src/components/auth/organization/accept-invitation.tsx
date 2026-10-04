@@ -18,7 +18,7 @@ import { FieldDescription } from "@/components/ui/field"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Spinner } from "@/components/ui/spinner"
 import { organizationPlugin } from "@/lib/auth/organization-plugin"
-import { cn } from "@/lib/utils"
+import { cn } from "cn"
 import { useIsHydrated } from "../use-is-hydrated"
 
 type UserInvitation = Invitation & { organizationName?: string }

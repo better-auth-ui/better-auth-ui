@@ -43,7 +43,7 @@ import {
   RESEND_COOLDOWN_SECONDS,
   useResendCooldown
 } from "@/lib/auth/use-resend-cooldown"
-import { cn } from "@/lib/utils"
+import { cn } from "cn"
 import {
   createAuthForm,
   setAuthFormServerError,

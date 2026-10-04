@@ -1,7 +1,7 @@
 import { cva, type VariantProps } from "class-variance-authority"
 import type { ComponentProps } from "solid-js"
 import { splitProps } from "solid-js"
-import { cn } from "@/lib/utils"
+import { cn } from "cn"
 
 type EmptyProps = ComponentProps<"div">
 

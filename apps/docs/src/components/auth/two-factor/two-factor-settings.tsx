@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/empty"
 import { Skeleton } from "@/components/ui/skeleton"
 import { twoFactorPlugin } from "@/lib/auth/two-factor-plugin"
-import { cn } from "@/lib/utils"
+import { cn } from "cn"
 import { DisableTwoFactorDialog } from "./disable-two-factor-dialog"
 import { EnableTwoFactorDialog } from "./enable-two-factor-dialog"
 import { RegenerateBackupCodesDialog } from "./regenerate-backup-codes-dialog"

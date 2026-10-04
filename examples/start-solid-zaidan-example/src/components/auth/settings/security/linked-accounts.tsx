@@ -7,7 +7,7 @@ import type {
 } from "@/components/auth/settings/shared/types"
 import { Card, CardContent } from "@/components/ui/card"
 import { ItemGroup, ItemSeparator } from "@/components/ui/item"
-import { cn } from "@/lib/utils"
+import { cn } from "cn"
 import { LinkedAccountRow, LinkedAccountRowSkeleton } from "./linked-account"
 
 export type LinkedAccountsSettingsProps = {

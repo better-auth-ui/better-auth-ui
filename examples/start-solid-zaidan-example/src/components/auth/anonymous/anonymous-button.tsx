@@ -9,7 +9,7 @@ import { Show } from "solid-js"
 import { Button } from "@/components/ui/button"
 import { Spinner } from "@/components/ui/spinner"
 import { anonymousPlugin } from "@/lib/auth/anonymous-plugin"
-import { cn } from "@/lib/utils"
+import { cn } from "cn"
 
 /** Sign in with a temporary anonymous account. */
 export function AnonymousButton() {

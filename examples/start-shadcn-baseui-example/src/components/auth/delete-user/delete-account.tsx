@@ -36,7 +36,7 @@ import {
   InputGroupInput
 } from "@/components/ui/input-group"
 import { deleteUserPlugin } from "@/lib/auth/delete-user-plugin"
-import { cn } from "@/lib/utils"
+import { cn } from "cn"
 import { isAuthFormFieldInvalid, useAuthForm } from "../auth-form"
 import { ReauthenticationAction } from "../reauthentication"
 

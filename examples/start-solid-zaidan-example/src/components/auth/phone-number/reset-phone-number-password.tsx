@@ -18,7 +18,7 @@ import {
 } from "@/components/ui/card"
 import { FieldGroup } from "@/components/ui/field"
 import { phoneNumberPlugin } from "@/lib/auth/phone-number-plugin"
-import { cn } from "@/lib/utils"
+import { cn } from "cn"
 import { createAuthForm, setAuthFormServerError } from "../auth-form"
 import { PasswordStrengthMeter } from "../password-strength-meter"
 import { PHONE_NUMBER_RESET_STORAGE_KEY } from "./forgot-phone-number-password"

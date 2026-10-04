@@ -5,7 +5,7 @@ import { For, Show } from "solid-js"
 import { Dynamic } from "solid-js/web"
 
 import { Button } from "@/components/ui/button"
-import { cn } from "@/lib/utils"
+import { cn } from "cn"
 
 import { AdminUsers } from "./admin-users"
 

@@ -36,7 +36,7 @@ import {
   InputGroupInput
 } from "@/components/ui/input-group"
 import { useSignInContinuation } from "@/lib/auth/use-sign-in-continuation"
-import { cn } from "@/lib/utils"
+import { cn } from "cn"
 import { isAuthFormFieldInvalid, useAuthForm } from "./auth-form"
 import { LastUsedBadge } from "./last-login-method/last-used-badge"
 import { ProviderButtons, type SocialLayout } from "./provider-buttons"

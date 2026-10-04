@@ -15,7 +15,7 @@ import {
   Text
 } from "react-email"
 
-import { cn } from "../../../lib/utils"
+import { cn } from "cn"
 import {
   type EmailClassNames,
   type EmailColors,

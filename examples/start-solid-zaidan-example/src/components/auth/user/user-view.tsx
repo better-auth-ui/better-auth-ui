@@ -2,7 +2,7 @@ import { useAuth, useSession } from "@better-auth-ui/solid"
 import type { User as AuthUserBase } from "better-auth"
 import { Show } from "solid-js"
 import { Skeleton } from "@/components/ui/skeleton"
-import { cn } from "@/lib/utils"
+import { cn } from "cn"
 import { UserAvatar } from "./user-avatar"
 
 type AuthUser = AuthUserBase & {

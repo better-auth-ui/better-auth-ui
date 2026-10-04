@@ -83,7 +83,7 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { Spinner } from "@/components/ui/spinner"
 import { dashPlugin } from "@/lib/auth/dash-plugin"
 import { organizationPlugin } from "@/lib/auth/organization-plugin"
-import { cn } from "@/lib/utils"
+import { cn } from "cn"
 import { useServerTableState } from "../server-table-state"
 
 type ActivityAccess = "admin" | "admin-user" | "organization" | "user"

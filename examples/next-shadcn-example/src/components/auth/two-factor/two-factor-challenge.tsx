@@ -39,7 +39,7 @@ import {
   RESEND_COOLDOWN_SECONDS,
   useResendCooldown
 } from "@/lib/auth/use-resend-cooldown"
-import { cn } from "@/lib/utils"
+import { cn } from "cn"
 import { runAuthFormAction, submitAuthForm, useAuthForm } from "../auth-form"
 import { OtpField } from "../otp-field"
 import { useIsHydrated } from "../use-is-hydrated"

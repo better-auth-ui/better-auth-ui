@@ -4,7 +4,7 @@ import { For, Show } from "solid-js"
 import { Dynamic } from "solid-js/web"
 import { ChangeEmail } from "@/components/auth/settings/account/change-email"
 import { UserProfile } from "@/components/auth/settings/account/user-profile"
-import { cn } from "@/lib/utils"
+import { cn } from "cn"
 
 export type AccountSettingsProps = {
   class?: string

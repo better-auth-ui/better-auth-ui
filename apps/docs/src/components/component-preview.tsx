@@ -1,7 +1,7 @@
 import { Suspense } from "react"
 import { Skeleton } from "@/components/ui/skeleton"
 import { demos } from "@/demos"
-import { cn } from "@/lib/utils"
+import { cn } from "cn"
 import { ComponentPreviewContainer } from "./component-preview-container"
 
 interface ComponentPreviewProps extends React.HTMLAttributes<HTMLDivElement> {

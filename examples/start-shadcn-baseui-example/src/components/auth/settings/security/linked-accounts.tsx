@@ -12,7 +12,7 @@ import {
   ItemSeparator
 } from "@/components/ui/item"
 import { Skeleton } from "@/components/ui/skeleton"
-import { cn } from "@/lib/utils"
+import { cn } from "cn"
 import { LinkedAccount } from "./linked-account"
 
 export type LinkedAccountsProps = {

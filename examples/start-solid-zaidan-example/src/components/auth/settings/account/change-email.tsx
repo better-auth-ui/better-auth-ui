@@ -4,7 +4,7 @@ import { toast } from "solid-sonner"
 import { Card, CardContent, CardFooter } from "@/components/ui/card"
 import { Field, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
-import { cn } from "@/lib/utils"
+import { cn } from "cn"
 import { createAuthForm, isAuthFormFieldInvalid } from "../../auth-form"
 
 export type ChangeEmailProps = {

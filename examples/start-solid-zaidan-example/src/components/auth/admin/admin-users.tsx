@@ -113,7 +113,7 @@ import {
   TableRow
 } from "@/components/ui/table"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { cn } from "@/lib/utils"
+import { cn } from "cn"
 import { createAuthForm, getAuthAdditionalFieldValidators } from "../auth-form"
 import { UserAvatar } from "../user/user-avatar"
 import { createAdminColumnHelper, createAdminTable } from "./admin-table"

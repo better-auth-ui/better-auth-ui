@@ -8,7 +8,7 @@ import {
 import { useCopyButton } from "fumadocs-ui/utils/use-copy-button"
 import { Check, ChevronDown, Copy, ExternalLinkIcon } from "lucide-react"
 import { useMemo, useState } from "react"
-import { cn } from "../lib/cn"
+import { cn } from "cn"
 import { buttonVariants } from "./ui/button"
 
 const cache = new Map<string, string>()

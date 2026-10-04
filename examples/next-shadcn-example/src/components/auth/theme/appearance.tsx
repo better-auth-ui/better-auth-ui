@@ -18,7 +18,7 @@ import {
 } from "@/components/ui/field"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { themePlugin } from "@/lib/auth/theme-plugin"
-import { cn } from "@/lib/utils"
+import { cn } from "cn"
 
 export type AppearanceProps = {
   className?: string

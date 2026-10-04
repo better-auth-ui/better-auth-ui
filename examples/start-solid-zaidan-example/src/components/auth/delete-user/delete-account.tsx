@@ -29,7 +29,7 @@ import {
   InputGroupButton,
   InputGroupInput
 } from "@/components/ui/input-group"
-import { cn } from "@/lib/utils"
+import { cn } from "cn"
 import { createAuthForm, isAuthFormFieldInvalid } from "../auth-form"
 import { ReauthenticationAction } from "../reauthentication"
 
