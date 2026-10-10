@@ -6,6 +6,7 @@ import {
   type AuthConfigOptions,
   authQueryKeys,
   createAuthQueryRetryOptions,
+  type NavigateFn,
   resolveAuthConfig
 } from "@better-auth-ui/core"
 import {
@@ -67,7 +68,7 @@ declare module "@better-auth-ui/core" {
 export type AuthProviderProps<TAuthClient extends AuthClient = AuthClient> =
   PropsWithChildren<
     Omit<AuthConfigOptions<TAuthClient>, "navigate"> & {
-      navigate: (options: { to: string; replace?: boolean }) => void
+      navigate: NavigateFn
       /** TanStack QueryClient to use for your application's queries */
       queryClient?: QueryClient
     }
@@ -104,6 +105,7 @@ export function AuthProvider<TAuthClient extends AuthClient = AuthClient>({
       enumerable: true,
       get: () =>
         (typeof window !== "undefined" &&
+          window.location &&
           new URLSearchParams(window.location.search)
             .get("redirectTo")
             ?.trim()) ||
