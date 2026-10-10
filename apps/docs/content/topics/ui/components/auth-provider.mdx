@@ -73,10 +73,11 @@ In a client-only application, import the supported locales and match `navigator.
 import { matchAuthLocale } from "@better-auth-ui/locales"
 import { deDE } from "@better-auth-ui/locales/de-DE"
 import { enUS } from "@better-auth-ui/locales/en-US"
+import { ptBR } from "@better-auth-ui/locales/pt-BR"
 
 const locale = matchAuthLocale({
   requested: navigator.languages,
-  supported: [enUS, deDE],
+  supported: [enUS, deDE, ptBR],
   fallback: enUS
 })
 ```
