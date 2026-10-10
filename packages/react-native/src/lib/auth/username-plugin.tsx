@@ -1,4 +1,9 @@
-import { createAuthPlugin } from "@better-auth-ui/core"
+import {
+  type AdditionalFields,
+  type AuthPluginBase,
+  type AuthPluginLocalizationContext,
+  createAuthPlugin
+} from "@better-auth-ui/core"
 import {
   usernamePlugin as coreUsernamePlugin,
   type UsernamePluginOptions
@@ -15,11 +20,24 @@ export const usernamePlugin = createAuthPlugin(
   (options: UsernamePluginOptions = {}) => {
     const core = coreUsernamePlugin(options)
 
+    const renderFields = (fields: AdditionalFields | undefined) =>
+      fields?.map((field) =>
+        field.name === "username" ? { ...field, render: UsernameField } : field
+      )
+
     return {
       ...core,
-      additionalFields: core.additionalFields?.map((field) =>
-        field.name === "username" ? { ...field, render: UsernameField } : field
-      ),
+      additionalFields: renderFields(core.additionalFields),
+      _localizationResolver: (
+        plugin: AuthPluginBase,
+        context: AuthPluginLocalizationContext
+      ) => {
+        const resolved = core._localizationResolver?.(plugin, context) ?? plugin
+        return {
+          ...resolved,
+          additionalFields: renderFields(resolved.additionalFields)
+        }
+      },
       views: {
         auth: { signIn: SignInUsername }
       }

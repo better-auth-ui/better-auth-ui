@@ -27,6 +27,7 @@
             "@better-auth-ui/react",
             "@better-auth-ui/solid",
             "@better-auth-ui/heroui",
+            "@better-auth-ui/react-native",
             "@better-auth-ui/locales"
           ],
           "target": "build"

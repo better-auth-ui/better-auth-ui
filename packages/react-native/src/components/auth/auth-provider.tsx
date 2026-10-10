@@ -3,7 +3,9 @@ import {
   AuthProvider as AuthProviderPrimitive,
   type AuthProviderProps as AuthProviderPropsPrimitive
 } from "@better-auth-ui/react"
+import { useMemo } from "react"
 import { AuthNavigationProvider } from "../../navigation/navigation-context"
+import { resolveOrganizationPlugins } from "../../navigation/organization-plugins"
 import { useStateNavigation } from "../../navigation/state-adapter"
 import type { AuthNavigation } from "../../navigation/types"
 import { ToastHost } from "../../primitives/toast"
@@ -25,18 +27,32 @@ export type AuthProviderProps<TAuthClient extends AuthClient = AuthClient> =
  * `@better-auth-ui/react` provider, installs the navigation adapter (state
  * adapter by default), and mounts the `ErrorToaster` + toast host.
  */
-export function AuthProvider({
+export function AuthProvider<TAuthClient extends AuthClient = AuthClient>({
   children,
   navigation,
   initialView,
   ...config
-}: AuthProviderProps) {
+}: AuthProviderProps<TAuthClient>) {
   // Always create the state adapter (cheap); used only when no adapter is passed.
   const stateNavigation = useStateNavigation(initialView)
   const activeNavigation = navigation ?? stateNavigation
 
+  const current = activeNavigation.current()
+  const routeSlug =
+    current?.section === "organization"
+      ? current.slug
+      : activeNavigation.getParam("slug")
+  const plugins = useMemo(
+    () => resolveOrganizationPlugins(config.plugins, routeSlug),
+    [config.plugins, routeSlug]
+  )
+
   return (
-    <AuthProviderPrimitive navigate={activeNavigation.navigate} {...config}>
+    <AuthProviderPrimitive
+      {...config}
+      plugins={plugins}
+      navigate={activeNavigation.navigate}
+    >
       <AuthNavigationProvider navigation={activeNavigation}>
         {children}
 

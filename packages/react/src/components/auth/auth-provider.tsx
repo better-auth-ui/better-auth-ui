@@ -105,6 +105,7 @@ export function AuthProvider<TAuthClient extends AuthClient = AuthClient>({
       enumerable: true,
       get: () =>
         (typeof window !== "undefined" &&
+          window.location &&
           new URLSearchParams(window.location.search)
             .get("redirectTo")
             ?.trim()) ||

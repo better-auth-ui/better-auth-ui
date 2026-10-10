@@ -2,8 +2,7 @@ import type { OrganizationAuthClient } from "@better-auth-ui/core/plugins/organi
 import { useAuth, useAuthPlugin, useSession } from "@better-auth-ui/react"
 import {
   useActiveOrganization,
-  useListOrganizations,
-  useSetActiveOrganization
+  useListOrganizations
 } from "@better-auth-ui/react/plugins/organization"
 import type { Organization } from "better-auth/client"
 import { type ReactNode, useState } from "react"
@@ -44,7 +43,7 @@ export type OrganizationSwitcherProps = {
  * adapted for React Native: the `Dropdown` popover becomes the shared `Menu`
  * bottom-sheet primitive (same pattern as `UserButton`'s menu), and the
  * "Manage" affordance and organization switching go through
- * `useAuthNavigation().push(...)` / `setActiveOrganization` instead of raw
+ * `useAuthNavigation().push(...)` instead of raw
  * URL navigation.
  */
 export function OrganizationSwitcher({
@@ -61,7 +60,7 @@ export function OrganizationSwitcher({
 }: OrganizationSwitcherProps & Omit<ButtonProps, "size">) {
   const { authClient, localization } = useAuth()
   const { data: session, isPending: sessionPending } = useSession(authClient)
-  const { localization: organizationLocalization, slug } =
+  const { localization: organizationLocalization } =
     useAuthPlugin(organizationPlugin)
 
   const navigation = useAuthNavigation()
@@ -73,10 +72,6 @@ export function OrganizationSwitcher({
   const { data: organizations, isPending: organizationsPending } =
     useListOrganizations(authClient as OrganizationAuthClient)
 
-  const { mutate: setActiveOrganization } = useSetActiveOrganization(
-    authClient as OrganizationAuthClient
-  )
-
   const isPending =
     sessionPending ||
     (!!session && (organizationsPending || activeOrganizationPending))
@@ -87,22 +82,20 @@ export function OrganizationSwitcher({
   function handleSetActive(organization: Organization | null) {
     if (setActive) {
       setActive(organization)
-    } else if (slug !== undefined && organization) {
+    } else if (organization) {
       navigation.push({
         section: "organization",
         view: "settings",
         slug: organization.slug
       })
-    } else if (slug !== undefined) {
-      navigation.push({ section: "settings", view: "account" })
     } else {
-      setActiveOrganization({ organizationId: organization?.id ?? null })
+      navigation.push({ section: "settings", view: "account" })
     }
   }
 
   function manageActiveOrganization() {
     setMenuOpen(false)
-    if (slug !== undefined && activeOrganization) {
+    if (activeOrganization) {
       navigation.push({
         section: "organization",
         view: "settings",

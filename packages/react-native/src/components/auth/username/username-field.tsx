@@ -22,7 +22,8 @@ export function UsernameField({
   name,
   field,
   isPending,
-  variant
+  variant,
+  onChange
 }: AdditionalFieldProps) {
   const { authClient } = useAuth()
   const {
@@ -63,6 +64,7 @@ export function UsernameField({
 
   function handleChange(next: string) {
     setValue(next)
+    onChange?.(next || null)
     resetAvailability()
 
     if (checkAvailability) {

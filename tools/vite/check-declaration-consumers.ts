@@ -5,7 +5,7 @@ import { resolve } from "node:path"
 import ts from "typescript"
 
 const root = resolve(import.meta.dirname, "../..")
-const packages = ["core", "react", "solid", "heroui", "locales"]
+const packages = ["core", "react", "solid", "heroui", "react-native", "locales"]
 const fixtures = {
   core: `
     import { resolveAuthConfig } from '@better-auth-ui/core';
@@ -47,6 +47,16 @@ const fixtures = {
     import { AuthProvider } from '@better-auth-ui/heroui';
     import { ResetPasswordEmail } from '@better-auth-ui/heroui/email';
     void AuthProvider; void ResetPasswordEmail;
+  `,
+  reactNative: `
+    import { AuthProvider, createExpoRouterNavigation, createReactNavigationNavigation } from '@better-auth-ui/react-native';
+    import { organizationPlugin, usernamePlugin } from '@better-auth-ui/react-native/plugins';
+    void AuthProvider; void createExpoRouterNavigation; void createReactNavigationNavigation;
+    void organizationPlugin; void usernamePlugin;
+    createReactNavigationNavigation({
+      navigation: { navigate: () => {} },
+      screens: { auth: { signIn: 'SignIn' } }
+    });
   `,
   locales: `
     import { defineAuthLocale } from '@better-auth-ui/locales';

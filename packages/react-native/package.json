@@ -1,6 +1,6 @@
 {
   "name": "@better-auth-ui/react-native",
-  "version": "1.6.27",
+  "version": "1.7.27",
   "type": "module",
   "scripts": {
     "build": "vite build",
@@ -41,13 +41,14 @@
     "@tanstack/react-query": "^5.101.0",
     "@types/react": "^19.2.15",
     "@vitejs/plugin-react": "^6.0.2",
-    "better-auth": "^1.6.19",
+    "better-auth": "1.7.2",
     "expo-clipboard": "~8.0.8",
     "expo-image-manipulator": "~14.0.8",
     "expo-image-picker": "~17.0.11",
     "react": "^19.2.6",
     "react-native": "0.86.0",
-    "react-native-svg": "^15.15.5"
+    "react-native-svg": "^15.15.5",
+    "react-dom": "^19.2.6"
   },
   "peerDependencies": {
     "@better-auth-ui/core": "*",
@@ -55,7 +56,7 @@
     "@react-native-community/datetimepicker": ">=8.0.0",
     "@react-native-community/slider": ">=4.5.0",
     "@tanstack/react-query": ">=5.100.0",
-    "better-auth": ">=1.6.19",
+    "better-auth": ">=1.7.2",
     "expo-clipboard": ">=7.0.0",
     "expo-image-manipulator": ">=13.0.0",
     "expo-image-picker": ">=16.0.0",

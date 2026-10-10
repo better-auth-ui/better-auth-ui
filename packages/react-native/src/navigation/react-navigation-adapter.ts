@@ -21,7 +21,7 @@ export interface ReactNavigationLike {
 
 /** Screen-name map, one entry per section. */
 export interface ReactNavigationScreens {
-  auth: Record<AuthView, string>
+  auth: Partial<Record<AuthView, string>>
   settings?: Record<string, string>
   organization?: Record<string, string>
 }

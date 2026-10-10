@@ -1,4 +1,8 @@
-import { createAuthPlugin } from "@better-auth-ui/core"
+import {
+  type AuthPluginBase,
+  type AuthPluginLocalizationContext,
+  createAuthPlugin
+} from "@better-auth-ui/core"
 import {
   organizationPlugin as coreOrganizationPlugin,
   type OrganizationLocalization,
@@ -28,20 +32,27 @@ export const organizationPlugin = createAuthPlugin(
   (options: OrganizationPluginOptions = {}) => {
     const coreOptions = coreOrganizationPlugin(options)
 
+    const settingsTabs = (localization: OrganizationLocalization) => [
+      {
+        view: "organizations" as const,
+        label: <OrganizationsTabLabel label={localization.organizations} />,
+        component: OrganizationsSettings
+      }
+    ]
+
     return {
       ...coreOptions,
       localization: coreOptions.localization as OrganizationLocalization,
-      settingsTabs: [
-        {
-          view: "organizations",
-          label: (
-            <OrganizationsTabLabel
-              label={coreOptions.localization.organizations}
-            />
-          ),
-          component: OrganizationsSettings
-        }
-      ]
+      settingsTabs: settingsTabs(coreOptions.localization),
+      _localizationResolver: (
+        plugin: AuthPluginBase,
+        context: AuthPluginLocalizationContext
+      ) => ({
+        ...(coreOptions._localizationResolver?.(plugin, context) ?? plugin),
+        settingsTabs: settingsTabs(
+          context.localization as OrganizationLocalization
+        )
+      })
     }
   }
 )
