@@ -19,10 +19,11 @@ import { matchAuthLocale } from "@better-auth-ui/locales"
 import { deDE } from "@better-auth-ui/locales/de-DE"
 import { enUS } from "@better-auth-ui/locales/en-US"
 import { esES } from "@better-auth-ui/locales/es-ES"
+import { ptBR } from "@better-auth-ui/locales/pt-BR"
 
 const locale = matchAuthLocale({
   requested: request.headers.get("Accept-Language"),
-  supported: [enUS, deDE, esES],
+  supported: [enUS, deDE, esES, ptBR],
   fallback: enUS
 })
 ```

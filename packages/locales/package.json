@@ -34,6 +34,11 @@
       "src": "./src/es-ES.ts",
       "types": "./dist/es-ES.d.ts",
       "import": "./dist/es-ES.js"
+    },
+    "./pt-BR": {
+      "src": "./src/pt-BR.ts",
+      "types": "./dist/pt-BR.d.ts",
+      "import": "./dist/pt-BR.js"
     }
   },
   "peerDependencies": {
