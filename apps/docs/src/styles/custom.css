@@ -18,3 +18,384 @@
 a {
   cursor: pointer;
 }
+
+/* The homepage shares the documentation palette and keeps its styles scoped. */
+.home-layout {
+  --fd-layout-width: 1200px;
+}
+
+.home-page {
+  --home-accent: #b45309;
+  width: min(100% - 64px, 1152px);
+  margin-inline: auto;
+  color: var(--color-fd-foreground);
+}
+
+.dark .home-page {
+  --home-accent: #fdba74;
+}
+
+.home-intro {
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
+  align-items: center;
+  gap: 80px;
+  padding-block: 48px 40px;
+}
+
+.home-intro h1 {
+  font-size: clamp(36px, 4vw, 56px);
+  font-weight: 600;
+  line-height: 1.08;
+  letter-spacing: -0.055em;
+}
+
+.home-intro h1 span {
+  color: var(--home-accent);
+}
+
+.home-description {
+  max-width: 480px;
+  margin-top: 24px;
+  color: var(--color-fd-muted-foreground);
+  font-size: 17px;
+  line-height: 1.65;
+}
+
+.home-description a {
+  color: var(--color-fd-foreground);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  text-decoration-color: var(--color-fd-border);
+}
+
+.home-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 24px;
+  margin-top: 28px;
+}
+
+.home-primary-action {
+  min-height: 44px;
+  gap: 16px;
+  padding-inline: 20px;
+  background: var(--color-fd-foreground);
+  color: var(--color-fd-background);
+}
+
+.home-primary-action:hover {
+  background: var(--color-fd-foreground);
+  opacity: 0.85;
+}
+
+.home-text-link,
+.home-library-link,
+.home-footer a {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.home-text-link:hover,
+.home-library-link:hover,
+.home-footer a:hover,
+.home-component-links a:hover {
+  color: var(--home-accent);
+}
+
+.home-license {
+  margin-top: 20px;
+  color: var(--color-fd-muted-foreground);
+  font-size: 12px;
+}
+
+.home-install h2 {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.home-install-tabs {
+  margin: 16px 0 0;
+  border-radius: 8px;
+}
+
+.home-install-tabs [role="tablist"] {
+  gap: 24px;
+  padding-inline: 16px;
+}
+
+.home-install-tabs [role="tabpanel"] {
+  border-radius: 0;
+  min-height: 174px;
+}
+
+.home-command {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  min-height: 56px;
+}
+
+.home-command code {
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  padding-block: 6px;
+  font-size: 12px;
+  line-height: 1.8;
+}
+
+.home-command button {
+  flex-shrink: 0;
+}
+
+.home-install-description {
+  margin-block: 16px 12px;
+  color: var(--color-fd-muted-foreground);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.home-section-heading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.home-section-heading h2 {
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: -0.025em;
+}
+
+.home-section-heading p {
+  color: var(--color-fd-muted-foreground);
+  font-size: 14px;
+}
+
+.home-preview-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 24px;
+}
+
+.home-library {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid var(--color-fd-border);
+  border-radius: 8px;
+}
+
+.home-library-heading,
+.home-library-heading h3,
+.home-library-heading span {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.home-library-heading {
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--color-fd-border);
+}
+
+.home-library-heading h3 {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.home-library-heading span {
+  color: var(--color-fd-muted-foreground);
+  font-size: 12px;
+}
+
+.home-preview {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 440px;
+  padding: 24px;
+  background: var(--color-fd-muted);
+}
+
+.home-preview img {
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+.home-preview-dark,
+.dark .home-preview-light {
+  display: none;
+}
+
+.dark .home-preview-dark {
+  display: block;
+}
+
+.home-library-link {
+  display: flex;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-top: 1px solid var(--color-fd-border);
+}
+
+.home-components {
+  margin-top: 64px;
+  padding-block: 32px 48px;
+  border-top: 1px solid var(--color-fd-border);
+}
+
+.home-component-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 32px;
+}
+
+.home-component-grid h3 {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.home-component-grid p {
+  margin-top: 12px;
+  color: var(--color-fd-muted-foreground);
+  font-size: 14px;
+  line-height: 1.65;
+}
+
+.home-component-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 16px;
+  font-size: 12px;
+}
+
+.home-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding-block: 24px 32px;
+  border-top: 1px solid var(--color-fd-border);
+  font-size: 12px;
+}
+
+.home-footer span {
+  margin-left: 16px;
+  color: var(--color-fd-muted-foreground);
+}
+
+.home-footer > div {
+  display: flex;
+  gap: 20px;
+}
+
+.home-page a:focus-visible {
+  outline: 2px solid var(--color-fd-ring);
+  outline-offset: 4px;
+}
+
+@media (max-width: 1023px) {
+  .home-intro {
+    gap: 32px;
+  }
+
+  .home-preview-grid {
+    gap: 16px;
+  }
+
+  .home-preview {
+    height: 340px;
+    padding: 16px;
+  }
+
+  .home-library-heading,
+  .home-library-link {
+    padding: 14px;
+  }
+
+  .home-library-heading span svg {
+    display: none;
+  }
+
+  .home-component-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 767px) {
+  .home-page {
+    width: min(100% - 40px, 560px);
+  }
+
+  .home-intro {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 32px;
+    padding-block: 40px;
+  }
+
+  .home-intro h1 {
+    font-size: clamp(32px, 7.8vw, 44px);
+  }
+
+  .home-description {
+    margin-top: 20px;
+    font-size: 16px;
+  }
+
+  .home-install-tabs [role="tablist"] {
+    gap: 12px;
+  }
+
+  .home-preview-grid {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+
+  .home-preview {
+    height: auto;
+    padding: 24px;
+  }
+
+  .home-preview img {
+    width: 100%;
+    max-width: 320px;
+    max-height: none;
+  }
+
+  .home-section-heading p {
+    font-size: 13px;
+  }
+
+  .home-components {
+    margin-top: 40px;
+  }
+
+  .home-component-grid {
+    gap: 28px 20px;
+  }
+
+  .home-footer {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .home-footer span {
+    display: block;
+    margin: 8px 0 0;
+  }
+}

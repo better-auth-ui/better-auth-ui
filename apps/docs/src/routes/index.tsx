@@ -1,15 +1,15 @@
-import { Discord, GitHub, useCopyToClipboard } from "@better-auth-ui/react"
+import { GitHub, useCopyToClipboard } from "@better-auth-ui/react"
 import { createFileRoute, Link } from "@tanstack/react-router"
-import { HomeLayout } from "fumadocs-ui/layouts/home"
 import {
-  ArrowRight,
-  Check,
-  Copy,
-  LayoutTemplate,
-  ShieldCheck,
-  Zap
-} from "lucide-react"
-import type { ReactNode } from "react"
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger
+} from "fumadocs-ui/components/tabs"
+import { buttonVariants } from "fumadocs-ui/components/ui/button"
+import { HomeLayout } from "fumadocs-ui/layouts/home"
+import { ArrowRight, ArrowUpRight, Check, Copy } from "lucide-react"
+import { toast } from "sonner"
 import { HeroUI } from "@/components/icons/heroui"
 import { React as ReactIcon } from "@/components/icons/react"
 import { Shadcn } from "@/components/icons/shadcn"
@@ -17,350 +17,293 @@ import { Solid } from "@/components/icons/solid"
 import { Zaidan } from "@/components/icons/zaidan"
 import { baseOptions } from "@/lib/layout.shared"
 
-const shadcnInstallCommand = "bun x shadcn@latest add @better-auth-ui/auth"
+const libraries = [
+  {
+    id: "shadcn",
+    name: "shadcn/ui",
+    framework: "React",
+    icon: Shadcn,
+    frameworkIcon: ReactIcon,
+    imageWidth: 768,
+    imageHeight: 1020,
+    command: "bun x shadcn@latest add @better-auth-ui/auth",
+    description: "Add components to your codebase with the shadcn CLI."
+  },
+  {
+    id: "heroui",
+    name: "HeroUI",
+    framework: "React",
+    icon: HeroUI,
+    frameworkIcon: ReactIcon,
+    imageWidth: 768,
+    imageHeight: 1000,
+    command:
+      "bun add @better-auth-ui/heroui@latest @better-auth-ui/react@latest @better-auth-ui/core@latest",
+    description: "Install the HeroUI components and shared React hooks."
+  },
+  {
+    id: "zaidan",
+    name: "Zaidan",
+    framework: "SolidJS",
+    icon: Zaidan,
+    frameworkIcon: Solid,
+    imageWidth: 384,
+    imageHeight: 458,
+    command:
+      "bun add @better-auth-ui/solid@latest @better-auth-ui/core@latest @tanstack/solid-query",
+    description: "Install the Solid hooks, then add the Zaidan components."
+  }
+] as const
+
+const signInPaths = {
+  React: "components/auth/sign-in",
+  SolidJS: "components/sign-in"
+}
+
+const componentGroups = [
+  {
+    title: "Authentication",
+    description: "Sign in, sign up, social login, and password recovery.",
+    paths: signInPaths
+  },
+  {
+    title: "Account settings",
+    description: "Profiles, linked accounts, and session management.",
+    paths: {
+      React: "components/settings/settings",
+      SolidJS: "components/settings"
+    }
+  },
+  {
+    title: "Security",
+    description: "Passkeys, two-factor authentication, and email verification.",
+    paths: { React: "plugins/two-factor", SolidJS: "plugins/two-factor" }
+  },
+  {
+    title: "Organizations",
+    description: "Members, invitations, teams, and roles.",
+    paths: { React: "plugins/organization", SolidJS: "plugins/organization" }
+  }
+]
 
 export const Route = createFileRoute("/")({
-  component: Home
+  component: Home,
+  head: () => ({
+    meta: [
+      {
+        name: "description",
+        content:
+          "Authentication, account settings, and organization components for Better Auth. Built for React and SolidJS with shadcn/ui, HeroUI, and Zaidan."
+      }
+    ]
+  })
 })
 
 function Home() {
-  const { copied: copiedShadcn, copy: copyShadcn } = useCopyToClipboard()
-  const { copied: copiedHeroui, copy: copyHeroui } = useCopyToClipboard()
-  const { copied: copiedSolid, copy: copySolid } = useCopyToClipboard()
-
-  const copyShadcnCommand = () => copyShadcn(shadcnInstallCommand)
-
-  const copyHeroUiCommand = () =>
-    copyHeroui(
-      "bun add @better-auth-ui/heroui@latest @better-auth-ui/react@latest @better-auth-ui/core@latest"
-    )
-
-  const copySolidCommand = () =>
-    copySolid(
-      "bun add @better-auth-ui/solid@latest @better-auth-ui/core@latest @tanstack/solid-query"
-    )
-
   return (
-    <HomeLayout {...baseOptions()}>
-      <div className="relative grow overflow-hidden">
-        {/* Background */}
-        <div className="absolute inset-0 bg-neutral-50 dark:bg-neutral-950" />
-
-        {/* Gradient orbs */}
-        <div className="absolute top-0 left-1/4 h-[500px] w-[500px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-orange-500/20 blur-[120px] dark:bg-orange-500/10" />
-        <div className="absolute right-0 top-1/3 h-[400px] w-[400px] translate-x-1/2 rounded-full bg-amber-500/15 blur-[100px] dark:bg-amber-500/5" />
-
-        {/* Grid pattern */}
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,#8882_1px,transparent_1px),linear-gradient(to_bottom,#8882_1px,transparent_1px)] bg-size-[24px_24px] mask-[radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_110%)]" />
-
-        {/* Content */}
-        <div className="relative z-10 flex flex-col items-center px-6 py-12 text-center sm:pt-24 lg:pt-32">
-          {/* Badge */}
-          <div className="group mb-8 inline-flex items-center gap-2 rounded-full border border-neutral-200 bg-white px-4 py-1.5 text-sm text-neutral-600 transition-all hover:border-neutral-300 dark:border-neutral-800 dark:bg-neutral-900 dark:text-neutral-400 dark:hover:border-neutral-700">
-            <span className="relative flex h-2 w-2">
-              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-orange-500 opacity-75" />
-              <span className="relative inline-flex h-2 w-2 rounded-full bg-orange-500" />
-            </span>
-            Open Source • MIT Licensed
+    <HomeLayout {...baseOptions()} className="home-layout">
+      <div className="home-page">
+        <section className="home-intro" aria-labelledby="home-title">
+          <div>
+            <h1 id="home-title">
+              Authentication UI.
+              <br />
+              <span>Your app’s style.</span>
+            </h1>
+            <p className="home-description">
+              Sign-in, account settings, and organizations for{" "}
+              <a href="https://better-auth.com">Better Auth</a>. Built for React
+              and SolidJS.
+            </p>
+            <div className="home-actions">
+              <Link
+                to="/docs/$"
+                params={{ _splat: "" }}
+                className={buttonVariants({
+                  variant: "primary",
+                  className: "home-primary-action"
+                })}
+              >
+                Get started <ArrowRight aria-hidden="true" className="size-4" />
+              </Link>
+              <a
+                href="https://demo.better-auth-ui.com"
+                className="home-text-link"
+              >
+                Try the demo{" "}
+                <ArrowUpRight aria-hidden="true" className="size-4" />
+              </a>
+            </div>
+            <p className="home-license">
+              Open source. MIT licensed. Yours to customize.
+            </p>
           </div>
+          <section className="home-install" aria-labelledby="install-title">
+            <h2 id="install-title">Start with your stack</h2>
+            <Tabs defaultValue="shadcn" className="home-install-tabs">
+              <TabsList aria-label="Installation library">
+                {libraries.map((library) => (
+                  <TabsTrigger key={library.id} value={library.id}>
+                    <library.icon aria-hidden="true" /> {library.name}
+                  </TabsTrigger>
+                ))}
+              </TabsList>
+              {libraries.map((library) => (
+                <TabsContent key={library.id} value={library.id}>
+                  <InstallCommand
+                    command={library.command}
+                    name={library.name}
+                  />
+                  <p className="home-install-description">
+                    {library.description}
+                  </p>
+                  <Link
+                    to="/docs/$"
+                    params={{ _splat: library.id }}
+                    className="home-text-link"
+                  >
+                    {library.name} setup{" "}
+                    <ArrowRight aria-hidden="true" className="size-4" />
+                  </Link>
+                </TabsContent>
+              ))}
+            </Tabs>
+          </section>
+        </section>
 
-          {/* Main heading */}
-          <h1 className="max-w-4xl text-4xl font-bold tracking-tight text-neutral-900 sm:text-5xl lg:text-7xl dark:text-white">
-            <span className="bg-linear-to-r from-neutral-900 to-orange-700 bg-clip-text text-transparent dark:from-white dark:to-orange-300/80">
-              Better
-            </span>{" "}
-            Auth UI
-          </h1>
+        <section className="home-libraries" aria-labelledby="libraries-title">
+          <div className="home-section-heading">
+            <h2 id="libraries-title">Choose your UI library</h2>
+            <p>Same auth flows. A look that fits your stack.</p>
+          </div>
+          <div className="home-preview-grid">
+            {libraries.map((library) => (
+              <article key={library.id} className="home-library">
+                <div className="home-library-heading">
+                  <h3>
+                    <library.icon aria-hidden="true" className="size-5" />{" "}
+                    {library.name}
+                  </h3>
+                  <span>
+                    <library.frameworkIcon
+                      aria-hidden="true"
+                      className="size-4"
+                    />{" "}
+                    {library.framework}
+                  </span>
+                </div>
+                <Link
+                  to="/docs/$"
+                  params={{
+                    _splat: `${library.id}/${signInPaths[library.framework]}`
+                  }}
+                  className="home-preview"
+                  aria-label={`Explore the ${library.name} sign-in component`}
+                >
+                  <img
+                    src={`/screenshots/${library.id}-sign-in-light.png`}
+                    alt={`${library.name} sign-in form with email and social login`}
+                    className="home-preview-light"
+                    width={library.imageWidth}
+                    height={library.imageHeight}
+                    draggable={false}
+                  />
+                  <img
+                    src={`/screenshots/${library.id}-sign-in-dark.png`}
+                    alt={`${library.name} sign-in form with email and social login`}
+                    className="home-preview-dark"
+                    width={library.imageWidth}
+                    height={library.imageHeight}
+                    draggable={false}
+                  />
+                </Link>
+                <Link
+                  to="/docs/$"
+                  params={{ _splat: library.id }}
+                  className="home-library-link"
+                >
+                  Explore {library.name}{" "}
+                  <ArrowUpRight aria-hidden="true" className="size-4" />
+                </Link>
+              </article>
+            ))}
+          </div>
+        </section>
 
-          {/* Tagline */}
-          <p className="mt-6 max-w-2xl text-lg text-neutral-600 sm:text-xl dark:text-neutral-400">
-            Beautiful, ready-to-use authentication components for{" "}
-            <a
-              href="https://better-auth.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="font-medium text-neutral-900 underline decoration-orange-500/50 underline-offset-4 transition-colors hover:text-orange-600 dark:text-white dark:hover:text-orange-400"
-            >
-              Better Auth
-            </a>
-            . Built with shadcn/ui, HeroUI, and Zaidan (SolidJS). Drop in and
-            go.
-          </p>
-
-          {/* CTA Buttons */}
-          <div className="mt-10 flex flex-col gap-3 sm:flex-row">
+        <section className="home-components" aria-labelledby="components-title">
+          <div className="home-section-heading">
+            <h2 id="components-title">Beyond the sign-in screen</h2>
             <Link
               to="/docs/$"
-              params={{ _splat: "shadcn" }}
-              className="group inline-flex items-center justify-center gap-2 rounded-xl bg-neutral-900 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-neutral-900/25 transition-all hover:bg-neutral-800 hover:shadow-xl hover:shadow-neutral-900/30 dark:bg-white dark:text-neutral-900 dark:shadow-white/5 dark:hover:bg-neutral-100 dark:hover:shadow-white/10"
+              params={{ _splat: "" }}
+              className="home-text-link"
             >
-              Get Started
-              <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+              Browse the docs{" "}
+              <ArrowRight aria-hidden="true" className="size-4" />
             </Link>
-            <a
-              href="https://github.com/better-auth-ui/better-auth-ui"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center justify-center gap-2 rounded-xl border border-neutral-200 bg-white/80 px-6 py-3 text-sm font-semibold text-neutral-700 backdrop-blur-sm transition-all hover:border-neutral-300 hover:bg-white dark:border-neutral-800 dark:bg-neutral-900/80 dark:text-neutral-300 dark:hover:border-neutral-700 dark:hover:bg-neutral-900"
-            >
-              <GitHub className="size-4" />
-              Star on GitHub
-            </a>
-            <a
-              href="https://better-auth-ui.com/discord"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center justify-center gap-2 rounded-xl border border-neutral-200 bg-white/80 px-6 py-3 text-sm font-semibold text-neutral-700 backdrop-blur-sm transition-all hover:border-neutral-300 hover:bg-white dark:border-neutral-800 dark:bg-neutral-900/80 dark:text-neutral-300 dark:hover:border-neutral-700 dark:hover:bg-neutral-900"
-            >
-              <Discord className="size-4" />
-              Join Discord
-            </a>
           </div>
-
-          {/* Install commands */}
-          <div className="mt-12 grid w-full max-w-5xl gap-4 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
-            <button
-              type="button"
-              onClick={copyShadcnCommand}
-              className="group flex min-w-0 items-center justify-between gap-3 overflow-hidden rounded-xl border border-neutral-200 bg-white/80 px-4 py-3 text-left font-mono text-xs backdrop-blur-sm transition-all hover:border-neutral-300 hover:bg-white dark:border-neutral-800 dark:bg-neutral-900/80 dark:hover:border-neutral-700 dark:hover:bg-neutral-900"
-            >
-              <div className="flex min-w-0 items-center gap-2">
-                <span className="shrink-0 text-orange-500">$</span>
-                <span className="truncate text-neutral-600 dark:text-neutral-400">
-                  {shadcnInstallCommand}
-                </span>
-              </div>
-              <span className="shrink-0 text-neutral-400 transition-colors group-hover:text-neutral-600 dark:text-neutral-600 dark:group-hover:text-neutral-400">
-                {copiedShadcn ? (
-                  <Check className="h-3.5 w-3.5 text-green-500" />
-                ) : (
-                  <Copy className="h-3.5 w-3.5" />
-                )}
-              </span>
-            </button>
-            <button
-              type="button"
-              onClick={copyHeroUiCommand}
-              className="group flex min-w-0 items-center justify-between gap-3 overflow-hidden rounded-xl border border-neutral-200 bg-white/80 px-4 py-3 text-left font-mono text-xs backdrop-blur-sm transition-all hover:border-neutral-300 hover:bg-white dark:border-neutral-800 dark:bg-neutral-900/80 dark:hover:border-neutral-700 dark:hover:bg-neutral-900"
-            >
-              <div className="flex min-w-0 items-center gap-2">
-                <span className="shrink-0 text-orange-500">$</span>
-                <span className="truncate text-neutral-600 dark:text-neutral-400">
-                  bun add @better-auth-ui/heroui @better-auth-ui/react
-                  @better-auth-ui/core
-                </span>
-              </div>
-              <span className="shrink-0 text-neutral-400 transition-colors group-hover:text-neutral-600 dark:text-neutral-600 dark:group-hover:text-neutral-400">
-                {copiedHeroui ? (
-                  <Check className="h-3.5 w-3.5 text-green-500" />
-                ) : (
-                  <Copy className="h-3.5 w-3.5" />
-                )}
-              </span>
-            </button>
-            <button
-              type="button"
-              onClick={copySolidCommand}
-              className="group flex min-w-0 items-center justify-between gap-3 overflow-hidden rounded-xl border border-neutral-200 bg-white/80 px-4 py-3 text-left font-mono text-xs backdrop-blur-sm transition-all hover:border-neutral-300 hover:bg-white dark:border-neutral-800 dark:bg-neutral-900/80 dark:hover:border-neutral-700 dark:hover:bg-neutral-900"
-            >
-              <div className="flex min-w-0 items-center gap-2">
-                <span className="shrink-0 text-orange-500">$</span>
-                <span className="truncate text-neutral-600 dark:text-neutral-400">
-                  bun add @better-auth-ui/solid @better-auth-ui/core
-                  @tanstack/solid-query
-                </span>
-              </div>
-              <span className="shrink-0 text-neutral-400 transition-colors group-hover:text-neutral-600 dark:text-neutral-600 dark:group-hover:text-neutral-400">
-                {copiedSolid ? (
-                  <Check className="h-3.5 w-3.5 text-green-500" />
-                ) : (
-                  <Copy className="h-3.5 w-3.5" />
-                )}
-              </span>
-            </button>
-          </div>
-
-          {/* Component Screenshots */}
-          <div className="relative mt-12 w-full max-w-5xl sm:mt-16">
-            {/* Glow effect behind cards */}
-            <div className="absolute inset-x-0 top-1/2 h-64 -translate-y-1/2 bg-linear-to-r from-orange-500/20 via-amber-500/20 to-orange-500/20 blur-3xl dark:from-orange-500/10 dark:via-amber-500/10 dark:to-orange-500/10" />
-
-            <div className="relative flex flex-col items-center justify-center gap-6 sm:flex-row sm:items-start lg:gap-8">
-              {/* shadcn Screenshot */}
-              <Link
-                to="/docs/$"
-                params={{ _splat: "shadcn" }}
-                className="group relative w-full max-w-sm sm:w-auto sm:max-w-none"
-              >
-                <div className="absolute -inset-1 rounded-2xl bg-linear-to-br from-orange-300 to-orange-500 opacity-0 blur transition-opacity duration-300 will-change-[opacity] group-hover:opacity-30 dark:from-orange-400 dark:to-orange-600" />
-                <div className="relative overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-2xl shadow-neutral-900/20 transition-transform duration-300 ease-out will-change-transform group-hover:scale-[1.02] dark:border-neutral-700 dark:bg-neutral-900 dark:shadow-black/50">
-                  <div className="flex items-center justify-between gap-3 border-b border-neutral-200 bg-neutral-100 px-4 py-3 dark:border-neutral-800 dark:bg-neutral-900">
-                    <div className="flex min-w-0 items-center gap-1.5">
-                      <div className="h-3 w-3 rounded-full bg-red-500/80" />
-                      <div className="h-3 w-3 rounded-full bg-yellow-500/80" />
-                      <div className="h-3 w-3 rounded-full bg-green-500/80" />
-                      <span className="ml-3 truncate text-xs text-neutral-500">
-                        shadcn/ui
-                      </span>
-                    </div>
-                    <PreviewBadge label="React and shadcn/ui preview badge">
-                      <ReactIcon className="h-4 w-4 text-[#61dafb]" />
-                      <div className="h-3 w-px bg-neutral-300/80 dark:bg-neutral-700/80" />
-                      <Shadcn className="h-4 w-4 text-neutral-900 dark:text-white" />
-                    </PreviewBadge>
-                  </div>
-                  <img
-                    src="/screenshots/shadcn-sign-in-light.png"
-                    alt="shadcn/ui Sign In Component"
-                    className="w-full dark:hidden sm:w-80 lg:w-96"
-                    draggable={false}
-                  />
-                  <img
-                    src="/screenshots/shadcn-sign-in-dark.png"
-                    alt="shadcn/ui Sign In Component"
-                    className="hidden w-full dark:block sm:w-80 lg:w-96"
-                    draggable={false}
-                  />
+          <div className="home-component-grid">
+            {componentGroups.map((group) => (
+              <div key={group.title}>
+                <h3>{group.title}</h3>
+                <p>{group.description}</p>
+                <div className="home-component-links">
+                  {libraries.map((library) => (
+                    <Link
+                      key={library.id}
+                      to="/docs/$"
+                      params={{
+                        _splat: `${library.id}/${group.paths[library.framework]}`
+                      }}
+                    >
+                      {library.name}
+                      <span className="sr-only"> {group.title}</span>
+                    </Link>
+                  ))}
                 </div>
-              </Link>
-
-              {/* HeroUI Screenshot */}
-              <Link
-                to="/docs/$"
-                params={{ _splat: "heroui" }}
-                className="group relative w-full max-w-sm sm:w-auto sm:max-w-none sm:translate-y-8 lg:translate-y-12"
-              >
-                <div className="absolute -inset-1 rounded-3xl bg-linear-to-br from-blue-400 to-blue-600 opacity-0 blur transition-opacity duration-300 will-change-[opacity] group-hover:opacity-60 dark:from-blue-500 dark:to-blue-700" />
-                <div className="relative overflow-hidden rounded-2xl rounded-b-3xl border border-neutral-200 bg-white shadow-2xl shadow-neutral-900/20 transition-transform duration-300 ease-out will-change-transform group-hover:scale-[1.02] dark:border-neutral-700 dark:bg-neutral-900 dark:shadow-black/50">
-                  <div className="flex items-center justify-between gap-3 border-b border-neutral-200 bg-neutral-100 px-4 py-3 dark:border-neutral-800 dark:bg-neutral-900">
-                    <div className="flex min-w-0 items-center gap-1.5">
-                      <div className="h-3 w-3 rounded-full bg-red-500/80" />
-                      <div className="h-3 w-3 rounded-full bg-yellow-500/80" />
-                      <div className="h-3 w-3 rounded-full bg-green-500/80" />
-                      <span className="ml-3 truncate text-xs text-neutral-500">
-                        HeroUI
-                      </span>
-                    </div>
-                    <PreviewBadge label="React and HeroUI preview badge">
-                      <ReactIcon className="h-4 w-4 text-[#61dafb]" />
-                      <div className="h-3 w-px bg-neutral-300/80 dark:bg-neutral-700/80" />
-                      <HeroUI className="h-4 w-4 text-neutral-900 dark:text-white" />
-                    </PreviewBadge>
-                  </div>
-                  <img
-                    src="/screenshots/heroui-sign-in-light.png"
-                    alt="HeroUI Sign In Component"
-                    className="w-full dark:hidden sm:w-80 lg:w-96"
-                    draggable={false}
-                  />
-                  <img
-                    src="/screenshots/heroui-sign-in-dark.png"
-                    alt="HeroUI Sign In Component"
-                    className="hidden w-full dark:block sm:w-80 lg:w-96"
-                    draggable={false}
-                  />
-                </div>
-              </Link>
-
-              {/* Zaidan Screenshot */}
-              <Link
-                to="/docs/$"
-                params={{ _splat: "zaidan" }}
-                className="group relative w-full max-w-sm sm:w-auto sm:max-w-none lg:translate-y-6"
-              >
-                <div className="absolute -inset-1 rounded-2xl bg-linear-to-br from-sky-400 via-indigo-400 to-cyan-600 opacity-0 blur transition-opacity duration-300 will-change-[opacity] group-hover:opacity-50 dark:from-sky-500 dark:via-indigo-500 dark:to-cyan-700" />
-                <div className="relative overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-2xl shadow-neutral-900/20 transition-transform duration-300 ease-out will-change-transform group-hover:scale-[1.02] dark:border-neutral-700 dark:bg-neutral-900 dark:shadow-black/50">
-                  <div className="flex items-center justify-between gap-3 border-b border-neutral-200 bg-neutral-100 px-4 py-3 dark:border-neutral-800 dark:bg-neutral-900">
-                    <div className="flex min-w-0 items-center gap-1.5">
-                      <div className="h-3 w-3 rounded-full bg-red-500/80" />
-                      <div className="h-3 w-3 rounded-full bg-yellow-500/80" />
-                      <div className="h-3 w-3 rounded-full bg-green-500/80" />
-                      <span className="ml-3 truncate text-xs text-neutral-500">
-                        Zaidan
-                      </span>
-                    </div>
-                    <PreviewBadge label="SolidJS and Zaidan preview badge">
-                      <Solid className="h-4 w-4" />
-                      <div className="h-3 w-px bg-neutral-300/80 dark:bg-neutral-700/80" />
-                      <Zaidan className="h-4 w-5" />
-                    </PreviewBadge>
-                  </div>
-                  <div className="relative">
-                    <img
-                      src="/screenshots/shadcn-sign-in-light.png"
-                      alt="Zaidan Sign In Component"
-                      className="w-full dark:hidden sm:w-80 lg:w-96"
-                      draggable={false}
-                    />
-                    <img
-                      src="/screenshots/shadcn-sign-in-dark.png"
-                      alt="Zaidan Sign In Component"
-                      className="hidden w-full dark:block sm:w-80 lg:w-96"
-                      draggable={false}
-                    />
-                  </div>
-                </div>
-              </Link>
-            </div>
-          </div>
-
-          {/* Features */}
-          <div className="mt-20 grid w-full max-w-4xl gap-4 sm:mt-28 sm:grid-cols-3 lg:gap-6">
-            {[
-              {
-                icon: <LayoutTemplate className="h-5 w-5" />,
-                title: "Fully Customizable",
-                description:
-                  "Built on shadcn/ui, HeroUI, and Zaidan (SolidJS). Own your code, style it your way."
-              },
-              {
-                icon: <Zap className="h-5 w-5" />,
-                title: "Drop-in Ready",
-                description:
-                  "Pre-built Sign In, Sign Up, Forgot Password, and more. Just add and configure."
-              },
-              {
-                icon: <ShieldCheck className="h-5 w-5" />,
-                title: "Better Auth Native",
-                description:
-                  "Built specifically for Better Auth. Social logins, magic links, and more."
-              }
-            ].map((feature) => (
-              <div
-                key={feature.title}
-                className="group rounded-2xl border border-neutral-200 bg-white/50 p-6 backdrop-blur-sm transition-all hover:border-neutral-300 hover:bg-white dark:border-neutral-800 dark:bg-neutral-900/50 dark:hover:border-neutral-700 dark:hover:bg-neutral-900"
-              >
-                <div className="mb-3 inline-flex rounded-lg bg-orange-100 p-2.5 text-orange-600 dark:bg-orange-500/10 dark:text-orange-400">
-                  {feature.icon}
-                </div>
-                <h3 className="font-semibold text-neutral-900 dark:text-white">
-                  {feature.title}
-                </h3>
-                <p className="mt-1 text-sm text-neutral-600 dark:text-neutral-400">
-                  {feature.description}
-                </p>
               </div>
             ))}
           </div>
-        </div>
+        </section>
+        <footer className="home-footer">
+          <p>
+            Better Auth UI{" "}
+            <span>Built on Better Auth. Built for your app.</span>
+          </p>
+          <div>
+            <a href="https://github.com/better-auth-ui/better-auth-ui">
+              <GitHub aria-hidden="true" className="size-4" /> GitHub
+            </a>
+            <a href="https://better-auth-ui.com/discord">
+              Discord <ArrowUpRight aria-hidden="true" className="size-4" />
+            </a>
+          </div>
+        </footer>
       </div>
     </HomeLayout>
   )
 }
 
-function PreviewBadge({
-  children,
-  label
-}: {
-  children: ReactNode
-  label: string
-}) {
+function InstallCommand({ command, name }: { command: string; name: string }) {
+  const { copied, copy } = useCopyToClipboard({
+    onError: () =>
+      toast.error("Could not copy the command. Select and copy it manually.")
+  })
+
   return (
-    <div
-      title={label}
-      className="pointer-events-none flex h-4 shrink-0 items-center gap-1.5 text-neutral-500 dark:text-neutral-400"
-    >
-      {children}
+    <div className="home-command">
+      <code>{command}</code>
+      <button
+        type="button"
+        onClick={() => copy(command)}
+        aria-label={`Copy ${name} install command`}
+        className={buttonVariants({ variant: "ghost", size: "icon" })}
+      >
+        {copied ? <Check aria-hidden="true" /> : <Copy aria-hidden="true" />}
+      </button>
+      <span role="status" className="sr-only">
+        {copied ? "Install command copied" : ""}
+      </span>
     </div>
   )
 }
