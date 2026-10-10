@@ -67,6 +67,34 @@ export function sanitizeOAuthClientUrl(
   }
 }
 
+/**
+ * Read the callback destination from a signed authorization query.
+ * Show the origin for web callbacks and the scheme for native applications.
+ * This helper formats the destination. Better Auth must verify the query first.
+ */
+export function getOAuthAuthorizationDestination(
+  search: string
+): string | undefined {
+  const redirectUris = new URLSearchParams(search).getAll("redirect_uri")
+  if (redirectUris.length !== 1 || !redirectUris[0]) return undefined
+
+  try {
+    const url = new URL(redirectUris[0])
+    if (url.username || url.password) return undefined
+    if (url.protocol === "https:" || url.protocol === "http:") return url.origin
+    if (
+      ["javascript:", "data:", "file:", "blob:", "about:"].includes(
+        url.protocol
+      )
+    ) {
+      return undefined
+    }
+    return url.host ? `${url.protocol}//${url.host}` : url.protocol
+  } catch {
+    return undefined
+  }
+}
+
 const splitSpaceDelimited = (value: string | null) =>
   Array.from(
     new Set(

@@ -1,5 +1,5 @@
 import {
-  type OAuthAuthorizationRequest,
+  getOAuthAuthorizationDestination,
   type OAuthProviderAuthClient,
   parseOAuthAuthorizationRequest,
   resolveOAuthScopeMetadata,
@@ -10,8 +10,15 @@ import {
   useOAuthConsent,
   usePublicOAuthClient
 } from "@better-auth-ui/solid/plugins/oauth-provider"
-import { Check, ShieldCheck } from "lucide-solid"
-import { createSignal, For, onMount, Show } from "solid-js"
+import { AppWindow, Check, Ellipsis, Link as LinkIcon } from "lucide-solid"
+import {
+  createMemo,
+  createSignal,
+  For,
+  onCleanup,
+  onMount,
+  Show
+} from "solid-js"
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
@@ -32,6 +39,8 @@ import { UserAvatar } from "../user/user-avatar"
 
 export type OAuthConsentProps = {
   class?: string
+  /** The complete signed query. Pass it from your router for same-page navigation. */
+  oauthQuery?: string
 }
 
 const interpolateClient = (template: string, clientName: string) =>
@@ -42,22 +51,46 @@ export function OAuthConsent(props: OAuthConsentProps) {
   const { localization, scopeMetadata } = useAuthPlugin(oauthProviderPlugin)
   const oauthClient = auth.authClient as OAuthProviderAuthClient
   const session = useSession(oauthClient)
-  const [request, setRequest] = createSignal<OAuthAuthorizationRequest>()
-
+  const [browserQuery, setBrowserQuery] = createSignal<string>()
   onMount(() => {
-    setRequest(parseOAuthAuthorizationRequest(window.location.search))
+    const updateQuery = () => setBrowserQuery(window.location.search)
+    updateQuery()
+    window.addEventListener("popstate", updateQuery)
+    onCleanup(() => window.removeEventListener("popstate", updateQuery))
   })
-
+  const query = () => props.oauthQuery ?? browserQuery()
+  const request = createMemo(() => {
+    const search = query()
+    return search === undefined
+      ? undefined
+      : parseOAuthAuthorizationRequest(search)
+  })
   const publicClient = usePublicOAuthClient(
     oauthClient,
-    () => request()?.clientId
+    () => request()?.clientId,
+    () => ({
+      enabled: Boolean(session.data && request()?.clientId),
+      oauthQuery: query(),
+      retry: false,
+      staleTime: 0,
+      gcTime: 0
+    })
   )
+  const client = () =>
+    !publicClient.isFetching && !publicClient.isError
+      ? publicClient.data
+      : undefined
+  const destination = () => {
+    const search = query()
+    return client() && search
+      ? getOAuthAuthorizationDestination(search)
+      : undefined
+  }
   const consent = useOAuthConsent(oauthClient)
-  const clientName = () =>
-    publicClient.data?.client_name || localization.application
-  const logoUrl = () => sanitizeOAuthClientUrl(publicClient.data?.logo_uri)
-  const policyUrl = () => sanitizeOAuthClientUrl(publicClient.data?.policy_uri)
-  const termsUrl = () => sanitizeOAuthClientUrl(publicClient.data?.tos_uri)
+  const clientName = () => client()?.client_name || localization.application
+  const logoUrl = () => sanitizeOAuthClientUrl(client()?.logo_uri)
+  const policyUrl = () => sanitizeOAuthClientUrl(client()?.policy_uri)
+  const termsUrl = () => sanitizeOAuthClientUrl(client()?.tos_uri)
   const invalidRequest = () =>
     request() !== undefined &&
     (!request()?.clientId ||
@@ -66,10 +99,7 @@ export function OAuthConsent(props: OAuthConsentProps) {
       (!publicClient.isPending && session.data && !publicClient.data))
   const canRespond = () =>
     Boolean(
-      request()?.clientId &&
-      session.data &&
-      publicClient.data &&
-      !consent.isPending
+      request()?.clientId && session.data && client() && !consent.isPending
     )
 
   return (
@@ -78,7 +108,9 @@ export function OAuthConsent(props: OAuthConsentProps) {
       fallback={
         <Card class={cn("w-full max-w-md", props.class)}>
           <CardHeader>
-            <CardTitle class="text-xl">{localization.invalidRequest}</CardTitle>
+            <CardTitle role="heading" aria-level={2} class="text-xl!">
+              {localization.invalidRequest}
+            </CardTitle>
             <CardDescription>
               {localization.invalidRequestDescription}
             </CardDescription>
@@ -87,57 +119,59 @@ export function OAuthConsent(props: OAuthConsentProps) {
       }
     >
       <Card class={cn("w-full max-w-md", props.class)}>
-        <CardHeader class="gap-4">
-          <div class="flex items-center gap-3">
+        <CardHeader class="gap-4!">
+          <div class="flex items-center justify-center gap-5">
             <Show
-              when={publicClient.data}
-              fallback={<Skeleton class="size-10 rounded-full" />}
+              when={client()}
+              fallback={<Skeleton class="size-16 rounded-full" />}
             >
-              {(_client) => (
-                <Avatar size="lg">
-                  <AvatarImage
-                    alt={clientName()}
-                    referrerpolicy="no-referrer"
-                    src={logoUrl()}
-                  />
-                  <AvatarFallback>
-                    <ShieldCheck class="size-5" />
-                  </AvatarFallback>
-                </Avatar>
+              <Avatar class="size-16!">
+                <AvatarImage
+                  alt={clientName()}
+                  referrerpolicy="no-referrer"
+                  src={logoUrl()}
+                />
+                <AvatarFallback>
+                  <AppWindow class="size-7" />
+                </AvatarFallback>
+              </Avatar>
+            </Show>
+            <Ellipsis aria-hidden="true" class="size-5 text-muted-foreground" />
+            <Show
+              when={session.data}
+              fallback={<Skeleton class="size-16 rounded-full" />}
+            >
+              {(currentSession) => (
+                <UserAvatar class="size-16!" user={currentSession().user} />
               )}
             </Show>
-
-            <div class="min-w-0 flex-1">
+          </div>
+          <div class="grid justify-items-center gap-1 text-center">
+            <CardTitle
+              role="heading"
+              aria-level={2}
+              class="max-w-full break-words text-xl! font-semibold!"
+            >
+              <Show when={client()} fallback={<Skeleton class="h-6 w-36" />}>
+                {clientName()}
+              </Show>
+            </CardTitle>
+            <CardDescription>
+              {localization.authorizationRequest}
+            </CardDescription>
+            <div class="mt-2 flex max-w-full flex-wrap justify-center gap-x-1 text-sm text-muted-foreground">
+              <span>{localization.signedInAs}</span>
               <Show
-                when={publicClient.data}
-                fallback={<Skeleton class="h-4 w-36" />}
+                when={session.data}
+                fallback={<Skeleton class="h-4 w-32" />}
               >
-                {(client) => (
-                  <>
-                    <p class="truncate font-medium">{clientName()}</p>
-                    <Show when={client().client_uri}>
-                      {(uri) => (
-                        <p class="truncate text-muted-foreground text-xs">
-                          {uri()}
-                        </p>
-                      )}
-                    </Show>
-                  </>
+                {(currentSession) => (
+                  <span class="break-all font-medium">
+                    {currentSession().user.name || currentSession().user.email}
+                  </span>
                 )}
               </Show>
             </div>
-          </div>
-
-          <div class="grid gap-1">
-            <CardTitle class="text-xl">
-              {interpolateClient(localization.authorize, clientName())}
-            </CardTitle>
-            <CardDescription>
-              {interpolateClient(
-                localization.authorizationDescription,
-                clientName()
-              )}
-            </CardDescription>
           </div>
         </CardHeader>
 
@@ -151,7 +185,7 @@ export function OAuthConsent(props: OAuthConsentProps) {
             </p>
 
             <Show
-              when={request()}
+              when={client() && request()}
               fallback={
                 <div class="flex gap-3">
                   <Skeleton class="mt-0.5 size-4 shrink-0 rounded-full" />
@@ -198,35 +232,22 @@ export function OAuthConsent(props: OAuthConsentProps) {
 
           <Separator />
 
-          <div class="flex items-center gap-3">
-            <UserAvatar
-              isPending={session.isPending}
-              user={session.data?.user}
-            />
-            <div class="min-w-0 flex-1">
-              <p class="text-muted-foreground text-xs">
-                {localization.signedInAs}
-              </p>
-              <Show
-                when={session.data}
-                fallback={<Skeleton class="mt-1 h-4 w-40" />}
-              >
-                {(currentSession) => (
-                  <>
-                    <p class="truncate text-sm font-medium">
-                      {currentSession().user.name ||
-                        currentSession().user.email}
-                    </p>
-                    <Show when={currentSession().user.name}>
-                      <p class="truncate text-muted-foreground text-xs">
-                        {currentSession().user.email}
-                      </p>
-                    </Show>
-                  </>
-                )}
-              </Show>
-            </div>
-          </div>
+          <Show when={destination()}>
+            {(uri) => (
+              <div class="flex gap-2 text-xs text-muted-foreground">
+                <LinkIcon aria-hidden="true" class="mt-0.5 size-4 shrink-0" />
+                <p>
+                  {localization.redirectTo}{" "}
+                  <span class="block break-all font-medium text-foreground">
+                    {uri()}
+                  </span>
+                </p>
+              </div>
+            )}
+          </Show>
+          <p class="text-xs text-muted-foreground">
+            {localization.applicationInformation}
+          </p>
 
           <Show when={policyUrl() || termsUrl()}>
             <div class="flex flex-wrap gap-x-4 gap-y-2 text-xs">
@@ -262,7 +283,9 @@ export function OAuthConsent(props: OAuthConsentProps) {
           <Button
             disabled={!canRespond()}
             variant="outline"
-            onClick={() => consent.mutate({ accept: false })}
+            onClick={() =>
+              consent.mutate({ accept: false, oauth_query: query() })
+            }
           >
             <Show
               when={consent.isPending && consent.variables?.accept === false}
@@ -273,7 +296,9 @@ export function OAuthConsent(props: OAuthConsentProps) {
           </Button>
           <Button
             disabled={!canRespond()}
-            onClick={() => consent.mutate({ accept: true })}
+            onClick={() =>
+              consent.mutate({ accept: true, oauth_query: query() })
+            }
           >
             <Show
               when={consent.isPending && consent.variables?.accept === true}

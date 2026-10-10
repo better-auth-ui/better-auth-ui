@@ -684,6 +684,15 @@ describe("Solid registry isolation", () => {
     const authRoot = resolve(__dirname, "../src/components/auth")
     const expectedImportantClassTokens = {
       "src/components/auth/admin/admin-users.tsx": ["sm:max-w-[56rem]!"],
+      // The consent layout overrides Zaidan's unlayered avatar and card defaults.
+      "src/components/auth/oauth-provider/oauth-consent.tsx": [
+        "text-xl!",
+        "gap-4!",
+        "size-16!",
+        "size-16!",
+        "text-xl!",
+        "font-semibold!"
+      ],
       "src/components/auth/settings/security/active-sessions.tsx": [
         "gap-0!",
         "gap-0!",

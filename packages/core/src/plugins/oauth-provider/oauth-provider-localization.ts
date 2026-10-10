@@ -3,6 +3,13 @@ export const oauthProviderLocalization = {
   authorize: "Authorize {{client}}",
   /** @remarks `"{{client}} wants to access your account."` */
   authorizationDescription: "{{client}} wants to access your account.",
+  /** @remarks `"wants to access your account"` */
+  authorizationRequest: "wants to access your account",
+  /** @remarks `"Authorizing will redirect you to"` */
+  redirectTo: "Authorizing will redirect you to",
+  /** @remarks `"Application names and logos are provided by their developers. Only authorize applications you trust."` */
+  applicationInformation:
+    "Application names and logos are provided by their developers. Only authorize applications you trust.",
   /** @remarks `"This will allow {{client}} to:"` */
   requestedPermissions: "This will allow {{client}} to:",
   /** @remarks `"Signed in as"` */

@@ -89,6 +89,7 @@ function createMockAuthClient(overrides: ClientOverrides = {}) {
       deleteConsent,
       getConsents,
       publicClient,
+      publicClientPrelogin: publicClient,
       ...overrides.oauth2
     }
   } as never
@@ -106,6 +107,7 @@ type MockAuthClient = ReturnType<typeof createMockAuthClient> & {
     deleteConsent: ReturnType<typeof vi.fn>
     getConsents: ReturnType<typeof vi.fn>
     publicClient: ReturnType<typeof vi.fn>
+    publicClientPrelogin: ReturnType<typeof vi.fn>
   }
 }
 
@@ -214,7 +216,7 @@ describe("oauthProviderPlugin (heroui)", () => {
     renderWithAuth(<Auth path="oauth-consent" />)
 
     expect(
-      await screen.findByRole("heading", { name: "Authorize Acme CLI" })
+      await screen.findByRole("heading", { name: "Acme CLI" })
     ).toBeInTheDocument()
   })
 })
@@ -230,7 +232,7 @@ describe("<OAuthConsent />", () => {
     const { authClient } = renderWithAuth(<OAuthConsent />)
 
     expect(
-      await screen.findByRole("heading", { name: "Authorize Acme CLI" })
+      await screen.findByRole("heading", { name: "Acme CLI" })
     ).toBeInTheDocument()
     expect(screen.getByText("Verify your identity")).toBeInTheDocument()
     expect(screen.getByText("View your email address")).toBeInTheDocument()
@@ -239,8 +241,9 @@ describe("<OAuthConsent />", () => {
       screen.getByRole("link", { name: "Privacy policy" })
     ).toHaveAttribute("href", "https://acme.example/privacy")
 
-    expect(authClient.oauth2.publicClient).toHaveBeenCalledWith({
-      query: { client_id: "desktop-client" },
+    expect(authClient.oauth2.publicClientPrelogin).toHaveBeenCalledWith({
+      client_id: "desktop-client",
+      oauth_query: window.location.search,
       fetchOptions: expect.objectContaining({ throw: true })
     })
 
@@ -249,6 +252,7 @@ describe("<OAuthConsent />", () => {
     await waitFor(() => {
       expect(authClient.oauth2.consent).toHaveBeenCalledWith({
         accept: true,
+        oauth_query: window.location.search,
         fetchOptions: { throw: true }
       })
     })
@@ -285,15 +289,83 @@ describe("<OAuthConsent />", () => {
     const user = userEvent.setup()
     const { authClient } = renderWithAuth(<OAuthConsent />)
 
-    await screen.findByRole("heading", { name: "Authorize Acme CLI" })
+    await screen.findByRole("heading", { name: "Acme CLI" })
     await user.click(screen.getByRole("button", { name: "Cancel" }))
 
     await waitFor(() => {
       expect(authClient.oauth2.consent).toHaveBeenCalledWith({
         accept: false,
+        oauth_query: window.location.search,
         fetchOptions: { throw: true }
       })
     })
+  })
+
+  it("does not expose request metadata or enable consent before verification", async () => {
+    let resolveClient!: (value: {
+      client_id: string
+      client_name: string
+    }) => void
+    const verification = new Promise<{
+      client_id: string
+      client_name: string
+    }>((resolve) => {
+      resolveClient = resolve
+    })
+    const publicClientPrelogin = vi.fn(() => verification)
+    const authClient = createMockAuthClient({
+      oauth2: { publicClientPrelogin }
+    })
+    renderWithAuth(
+      <OAuthConsent oauthQuery="?client_id=desktop-client&scope=private_scope&redirect_uri=https://callback.example/cb&sig=signed" />,
+      { authClient }
+    )
+    await waitFor(() => expect(publicClientPrelogin).toHaveBeenCalled())
+    expect(screen.queryByText("private_scope")).not.toBeInTheDocument()
+    expect(
+      screen.queryByText("https://callback.example")
+    ).not.toBeInTheDocument()
+    expect(screen.getByRole("button", { name: "Allow" })).toBeDisabled()
+    resolveClient({ client_id: "desktop-client", client_name: "Acme CLI" })
+    expect(await screen.findByText("private_scope")).toBeInTheDocument()
+    expect(screen.getByText("https://callback.example")).toBeInTheDocument()
+    expect(screen.getByRole("button", { name: "Allow" })).toBeEnabled()
+  })
+
+  it("rejects a changed query without reusing verified metadata for the same client", async () => {
+    const publicClientPrelogin = vi
+      .fn()
+      .mockResolvedValueOnce({
+        client_id: "desktop-client",
+        client_name: "Acme CLI"
+      })
+      .mockRejectedValue(new Error("Invalid signature"))
+    const authClient = createMockAuthClient({
+      oauth2: { publicClientPrelogin }
+    })
+    window.history.pushState(
+      {},
+      "",
+      "/auth/oauth-consent?client_id=desktop-client&scope=openid&sig=signed"
+    )
+    renderWithAuth(<OAuthConsent />, { authClient })
+    await screen.findByRole("heading", { name: "Acme CLI" })
+    // Keep the provider and its metadata cache mounted.
+    window.history.pushState(
+      {},
+      "",
+      "/auth/oauth-consent?client_id=desktop-client&scope=email&sig=tampered"
+    )
+    window.dispatchEvent(new PopStateEvent("popstate"))
+    expect(
+      await screen.findByRole("heading", {
+        name: "Invalid authorization request"
+      })
+    ).toBeInTheDocument()
+    expect(
+      screen.queryByRole("button", { name: "Allow" })
+    ).not.toBeInTheDocument()
+    expect(publicClientPrelogin).toHaveBeenCalledTimes(2)
   })
 
   it("rejects direct visits without an OAuth client ID", async () => {

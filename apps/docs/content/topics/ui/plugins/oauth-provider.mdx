@@ -102,6 +102,7 @@ export const auth = betterAuth({
     jwt(),
     multiSession(),
     oauthProvider({
+      allowPublicClientPrelogin: true,
       loginPage: "/auth/sign-in",
       consentPage: "/auth/oauth-consent",
       signup: {
@@ -127,6 +128,7 @@ export const auth = betterAuth({
     jwt(),
     multiSession(),
     oauthProvider({
+      allowPublicClientPrelogin: true,
       loginPage: "/auth/sign-in",
       consentPage: "/auth/oauth-consent",
       signup: {
@@ -365,6 +367,10 @@ Keep these paths aligned with the server's `consentPage`, `signup.page`, and `se
 </Step>
 
 </Steps>
+
+The consent view verifies the signed authorization query with Better Auth before showing application metadata, permissions, or the redirect destination. Enable `allowPublicClientPrelogin` on the server for this check. This option does not enable dynamic client registration.
+
+Application names and logos come from the application's developer. The consent view keeps the logo, uses a neutral fallback, and shows the actual callback destination. A name or logo does not prove that an application is official.
 
 ## Scope metadata
 

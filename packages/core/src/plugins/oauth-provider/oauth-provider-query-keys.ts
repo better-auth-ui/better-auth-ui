@@ -7,8 +7,14 @@ export const oauthProviderQueryKeys = {
   /** Prefix for public OAuth client metadata queries. */
   publicClients: ["auth", "oauthProvider", "publicClient"] as const,
   /** Key for the public metadata of a specific OAuth client. */
-  publicClient: (clientId: string | undefined) =>
-    [...oauthProviderQueryKeys.publicClients, clientId ?? null] as const,
+  publicClient: (clientId: string | undefined, oauthQuery?: string) =>
+    oauthQuery === undefined
+      ? ([...oauthProviderQueryKeys.publicClients, clientId ?? null] as const)
+      : ([
+          ...oauthProviderQueryKeys.publicClients,
+          clientId ?? null,
+          oauthQuery
+        ] as const),
 
   /**
    * Prefix for the signed-in user's OAuth consent queries.

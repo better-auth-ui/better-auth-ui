@@ -1,7 +1,7 @@
 "use client"
 
 import {
-  type OAuthAuthorizationRequest,
+  getOAuthAuthorizationDestination,
   type OAuthProviderAuthClient,
   parseOAuthAuthorizationRequest,
   resolveOAuthScopeMetadata,
@@ -12,8 +12,8 @@ import {
   useOAuthConsent,
   usePublicOAuthClient
 } from "@better-auth-ui/react/plugins/oauth-provider"
-import { Check, ShieldCheck } from "lucide-react"
-import { useEffect, useState } from "react"
+import { AppWindow, Check, Ellipsis, Link as LinkIcon } from "lucide-react"
+import { useSyncExternalStore } from "react"
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
@@ -34,27 +34,45 @@ import { UserAvatar } from "../user/user-avatar"
 
 export type OAuthConsentProps = {
   className?: string
+  /** The complete signed query. Pass it from your router for same-page navigation. */
+  oauthQuery?: string
+}
+
+const subscribeToQuery = (onChange: () => void) => {
+  window.addEventListener("popstate", onChange)
+  return () => window.removeEventListener("popstate", onChange)
 }
 
 const interpolateClient = (template: string, clientName: string) =>
   template.replace("{{client}}", clientName)
 
-export function OAuthConsent({ className }: OAuthConsentProps) {
+export function OAuthConsent({ className, oauthQuery }: OAuthConsentProps) {
   const { authClient } = useAuth()
   const { localization, scopeMetadata } = useAuthPlugin(oauthProviderPlugin)
   const oauthClient = authClient as OAuthProviderAuthClient
   const { data: session, isPending: isSessionPending } = useSession(oauthClient)
-  const [request, setRequest] = useState<OAuthAuthorizationRequest>()
-
-  useEffect(() => {
-    setRequest(parseOAuthAuthorizationRequest(window.location.search))
-  }, [])
-
+  const browserQuery = useSyncExternalStore(
+    subscribeToQuery,
+    () => window.location.search,
+    () => undefined
+  )
+  const query = oauthQuery ?? browserQuery
+  const request =
+    query === undefined ? undefined : parseOAuthAuthorizationRequest(query)
   const publicClient = usePublicOAuthClient(oauthClient, request?.clientId, {
-    enabled: Boolean(session && request?.clientId)
+    enabled: Boolean(session && request?.clientId),
+    oauthQuery: query,
+    retry: false,
+    staleTime: 0,
+    gcTime: 0
   })
   const consent = useOAuthConsent(oauthClient)
-  const client = publicClient.data
+  const client =
+    !publicClient.isFetching && !publicClient.isError
+      ? publicClient.data
+      : undefined
+  const destination =
+    client && query ? getOAuthAuthorizationDestination(query) : undefined
   const clientName = client?.client_name || localization.application
   const logoUrl = sanitizeOAuthClientUrl(client?.logo_uri)
   const policyUrl = sanitizeOAuthClientUrl(client?.policy_uri)
@@ -65,7 +83,10 @@ export function OAuthConsent({ className }: OAuthConsentProps) {
     (!request.clientId ||
       (!isSessionPending && !session) ||
       publicClient.isError ||
-      (!publicClient.isPending && session && !client))
+      (!publicClient.isPending &&
+        !publicClient.isFetching &&
+        session &&
+        !client))
   const canRespond = Boolean(
     request?.clientId && session && client && !consent.isPending
   )
@@ -74,7 +95,7 @@ export function OAuthConsent({ className }: OAuthConsentProps) {
     return (
       <Card className={cn("w-full max-w-md", className)}>
         <CardHeader>
-          <CardTitle className="text-xl">
+          <CardTitle role="heading" aria-level={2} className="text-xl">
             {localization.invalidRequest}
           </CardTitle>
           <CardDescription>
@@ -88,46 +109,50 @@ export function OAuthConsent({ className }: OAuthConsentProps) {
   return (
     <Card className={cn("w-full max-w-md", className)}>
       <CardHeader className="gap-4">
-        <div className="flex items-center gap-3">
+        <div className="flex items-center justify-center gap-5">
           {client ? (
-            <Avatar size="lg">
+            <Avatar className="size-16">
               <AvatarImage
                 alt={clientName}
                 referrerPolicy="no-referrer"
                 src={logoUrl}
               />
               <AvatarFallback>
-                <ShieldCheck className="size-5" />
+                <AppWindow className="size-7" />
               </AvatarFallback>
             </Avatar>
           ) : (
-            <Skeleton className="size-10 rounded-full" />
+            <Skeleton className="size-16 rounded-full" />
           )}
-
-          <div className="min-w-0 flex-1">
-            {client ? (
-              <p className="truncate font-medium">{clientName}</p>
-            ) : (
-              <Skeleton className="h-4 w-36" />
-            )}
-            {client?.client_uri ? (
-              <p className="truncate text-xs text-muted-foreground">
-                {client.client_uri}
-              </p>
-            ) : null}
-          </div>
+          <Ellipsis
+            aria-hidden="true"
+            className="size-5 text-muted-foreground"
+          />
+          <UserAvatar
+            className="size-16"
+            isPending={isSessionPending}
+            user={session?.user}
+          />
         </div>
-
-        <div className="grid gap-1">
-          <CardTitle className="text-xl">
-            {interpolateClient(localization.authorize, clientName)}
+        <div className="grid justify-items-center gap-1 text-center">
+          <CardTitle
+            role="heading"
+            aria-level={2}
+            className="max-w-full break-words text-xl font-semibold"
+          >
+            {client ? clientName : <Skeleton className="h-6 w-36" />}
           </CardTitle>
-          <CardDescription>
-            {interpolateClient(
-              localization.authorizationDescription,
-              clientName
+          <CardDescription>{localization.authorizationRequest}</CardDescription>
+          <div className="mt-2 flex max-w-full flex-wrap justify-center gap-x-1 text-sm text-muted-foreground">
+            <span>{localization.signedInAs}</span>
+            {session ? (
+              <span className="break-all font-medium">
+                {session.user.name || session.user.email}
+              </span>
+            ) : (
+              <Skeleton className="h-4 w-32" />
             )}
-          </CardDescription>
+          </div>
         </div>
       </CardHeader>
 
@@ -137,7 +162,7 @@ export function OAuthConsent({ className }: OAuthConsentProps) {
             {interpolateClient(localization.requestedPermissions, clientName)}
           </p>
 
-          {request ? (
+          {client && request ? (
             <ul className="grid gap-3">
               {request.scopes.map((scope) => {
                 const metadata = resolveOAuthScopeMetadata(
@@ -177,28 +202,20 @@ export function OAuthConsent({ className }: OAuthConsentProps) {
 
         <Separator />
 
-        <div className="flex items-center gap-3">
-          <UserAvatar isPending={isSessionPending} user={session?.user} />
-          <div className="min-w-0 flex-1">
-            <p className="text-xs text-muted-foreground">
-              {localization.signedInAs}
+        {destination ? (
+          <div className="flex gap-2 text-xs text-muted-foreground">
+            <LinkIcon aria-hidden="true" className="mt-0.5 size-4 shrink-0" />
+            <p>
+              {localization.redirectTo}{" "}
+              <span className="block break-all font-medium text-foreground">
+                {destination}
+              </span>
             </p>
-            {session ? (
-              <>
-                <p className="truncate text-sm font-medium">
-                  {session.user.name || session.user.email}
-                </p>
-                {session.user.name ? (
-                  <p className="truncate text-xs text-muted-foreground">
-                    {session.user.email}
-                  </p>
-                ) : null}
-              </>
-            ) : (
-              <Skeleton className="mt-1 h-4 w-40" />
-            )}
           </div>
-        </div>
+        ) : null}
+        <p className="text-xs text-muted-foreground">
+          {localization.applicationInformation}
+        </p>
 
         {policyUrl || termsUrl ? (
           <div className="flex flex-wrap gap-x-4 gap-y-2 text-xs">
@@ -230,7 +247,7 @@ export function OAuthConsent({ className }: OAuthConsentProps) {
         <Button
           disabled={!canRespond}
           variant="outline"
-          onClick={() => consent.mutate({ accept: false })}
+          onClick={() => consent.mutate({ accept: false, oauth_query: query })}
         >
           {consent.isPending && consent.variables?.accept === false ? (
             <Spinner />
@@ -239,7 +256,7 @@ export function OAuthConsent({ className }: OAuthConsentProps) {
         </Button>
         <Button
           disabled={!canRespond}
-          onClick={() => consent.mutate({ accept: true })}
+          onClick={() => consent.mutate({ accept: true, oauth_query: query })}
         >
           {consent.isPending && consent.variables?.accept === true ? (
             <Spinner />

@@ -19,7 +19,14 @@ export type PublicOAuthClientParams<
     NonNullable<Parameters<TAuthClient["oauth2"]["publicClient"]>[0]>,
     "query"
   >
->
+> & {
+  /**
+   * The complete signed authorization query, including `sig` and `exp`.
+   * Uses `publicClientPrelogin` to verify the query before returning metadata.
+   * Requires `allowPublicClientPrelogin: true` on the OAuth provider server.
+   */
+  oauthQuery?: string
+}
 
 export type PublicOAuthClientOptions<
   TAuthClient extends OAuthProviderAuthClient = OAuthProviderAuthClient
@@ -31,7 +38,7 @@ export type PublicOAuthClientOptions<
  *
  * @param authClient - The Better Auth client with the OAuth provider plugin.
  * @param clientId - The OAuth client ID from the signed authorization request.
- * @param params - Fetch options forwarded to `oauth2.publicClient`.
+ * @param params - Fetch options and an optional signed authorization query.
  */
 export function publicOAuthClientOptions<
   TAuthClient extends OAuthProviderAuthClient
@@ -41,20 +48,42 @@ export function publicOAuthClientOptions<
   params?: PublicOAuthClientParams<TAuthClient>
 ) {
   type TData = PublicOAuthClientData<TAuthClient>
-  const queryKey = oauthProviderQueryKeys.publicClient(clientId)
+  const { oauthQuery, ...clientParams } = params ?? {}
+  const queryKey = oauthProviderQueryKeys.publicClient(clientId, oauthQuery)
 
   return {
     queryKey,
     queryFn: clientId
-      ? ({ signal }) =>
-          authClient.oauth2.publicClient({
-            ...params,
-            query: { client_id: clientId },
-            fetchOptions: createAuthQueryFetchOptions(
-              params?.fetchOptions,
-              signal
+      ? ({ signal }) => {
+          // The endpoint verifies oauth_query, but client_id is a separate body field.
+          if (oauthQuery !== undefined) {
+            const clientIds = new URLSearchParams(oauthQuery).getAll(
+              "client_id"
             )
-          }) as Promise<TData>
+            if (clientIds.length !== 1 || clientIds[0] !== clientId) {
+              throw new Error(
+                "OAuth client ID does not match the authorization request."
+              )
+            }
+          }
+          const fetchOptions = createAuthQueryFetchOptions(
+            params?.fetchOptions,
+            signal
+          )
+          return (
+            oauthQuery !== undefined
+              ? authClient.oauth2.publicClientPrelogin({
+                  client_id: clientId,
+                  oauth_query: oauthQuery,
+                  fetchOptions
+                })
+              : authClient.oauth2.publicClient({
+                  ...clientParams,
+                  query: { client_id: clientId },
+                  fetchOptions
+                })
+          ) as Promise<TData>
+        }
       : skipToken
   } satisfies QueryOptions
 }
@@ -67,11 +96,12 @@ export const ensurePublicOAuthClient = <
   clientId: string,
   options?: PublicOAuthClientOptions<TAuthClient>
 ) => {
-  const { fetchOptions, ...queryOptions } = options ?? {}
+  const { fetchOptions, oauthQuery, ...queryOptions } = options ?? {}
 
   return queryClient.ensureQueryData({
     ...publicOAuthClientOptions(authClient, clientId, {
-      fetchOptions
+      fetchOptions,
+      oauthQuery
     } as PublicOAuthClientParams<TAuthClient>),
     ...queryOptions
   })
@@ -85,11 +115,12 @@ export const prefetchPublicOAuthClient = <
   clientId: string,
   options?: PublicOAuthClientOptions<TAuthClient>
 ) => {
-  const { fetchOptions, ...queryOptions } = options ?? {}
+  const { fetchOptions, oauthQuery, ...queryOptions } = options ?? {}
 
   return queryClient.prefetchQuery({
     ...publicOAuthClientOptions(authClient, clientId, {
-      fetchOptions
+      fetchOptions,
+      oauthQuery
     } as PublicOAuthClientParams<TAuthClient>),
     ...queryOptions
   })
@@ -103,11 +134,12 @@ export const fetchPublicOAuthClient = <
   clientId: string,
   options?: PublicOAuthClientOptions<TAuthClient>
 ) => {
-  const { fetchOptions, ...queryOptions } = options ?? {}
+  const { fetchOptions, oauthQuery, ...queryOptions } = options ?? {}
 
   return queryClient.fetchQuery({
     ...publicOAuthClientOptions(authClient, clientId, {
-      fetchOptions
+      fetchOptions,
+      oauthQuery
     } as PublicOAuthClientParams<TAuthClient>),
     ...queryOptions
   })
