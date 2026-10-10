@@ -346,6 +346,10 @@ export const deDEPlugins = {
   oauthProvider: {
     authorize: "{{client}} autorisieren",
     authorizationDescription: "{{client}} möchte auf dein Konto zugreifen.",
+    authorizationRequest: "möchte auf dein Konto zugreifen",
+    redirectTo: "Nach der Autorisierung wirst du weitergeleitet zu",
+    applicationInformation:
+      "Namen und Logos der Anwendungen werden von ihren Entwicklern bereitgestellt. Autorisiere nur Anwendungen, denen du vertraust.",
     requestedPermissions: "Dadurch kann {{client}} Folgendes ausführen:",
     signedInAs: "Angemeldet als",
     allow: "Erlauben",

@@ -342,6 +342,10 @@ export const ptBRPlugins = {
   oauthProvider: {
     authorize: "Autorizar {{client}}",
     authorizationDescription: "{{client}} deseja acessar sua conta.",
+    authorizationRequest: "deseja acessar sua conta",
+    redirectTo: "Ao autorizar, você será redirecionado para",
+    applicationInformation:
+      "Os nomes e logotipos dos aplicativos são fornecidos por seus desenvolvedores. Autorize apenas aplicativos em que você confia.",
     requestedPermissions: "Isso permitirá que {{client}}:",
     signedInAs: "Conectado como",
     allow: "Permitir",

@@ -344,6 +344,10 @@ export const esESPlugins = {
   oauthProvider: {
     authorize: "Autorizar a {{client}}",
     authorizationDescription: "{{client}} quiere acceder a tu cuenta.",
+    authorizationRequest: "quiere acceder a tu cuenta",
+    redirectTo: "Al autorizar, se te redirigirá a",
+    applicationInformation:
+      "Los desarrolladores proporcionan los nombres y logotipos de las aplicaciones. Autoriza solo aplicaciones en las que confíes.",
     requestedPermissions: "Esto permitirá a {{client}} lo siguiente:",
     signedInAs: "Sesión iniciada como",
     allow: "Permitir",

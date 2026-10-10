@@ -13,6 +13,22 @@ Before completing any task, ensure all of the following pass:
 1. **Oxfmt**: No formatting errors in modified files.
 2. **Oxlint**: No lint errors in the project.
 
+## Localization parity
+
+- When you add, rename, or remove a localization key, update every locale in `packages/locales/src` in the same change.
+- Keep translated keys and interpolation placeholders consistent with the English localization, including plugin messages.
+- Add complete translations instead of type assertions or English fallbacks that hide missing keys.
+- Run `CI=true bun nx run-many -t test typecheck -p @better-auth-ui/locales` before you commit localization changes.
+
+## CI validation
+
+- Before you push, run the affected builds, tests, and typechecks, plus the workspace lint target.
+- Keep Playwright installation and cache keys tied to the locked executable through `bun run playwright`.
+- Keep dependency installation reproducible with `bun install --frozen-lockfile`.
+- Test behavior and registry integrity instead of literal source strings or documentation wording.
+- Before you merge, wait for the actual `CI` workflow to finish successfully.
+- A green `autofix.ci` check only confirms formatting. It does not confirm that builds, tests, or typechecks pass.
+
 ## Platform Parity
 
 - Keep all supported platforms at feature and UI parity.
