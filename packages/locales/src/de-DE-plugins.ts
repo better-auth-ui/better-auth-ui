@@ -352,7 +352,7 @@ export const deDEPlugins = {
       "Namen und Logos der Anwendungen werden von ihren Entwicklern bereitgestellt. Autorisiere nur Anwendungen, denen du vertraust.",
     requestedPermissions: "Dadurch kann {{client}} Folgendes ausführen:",
     signedInAs: "Angemeldet als",
-    allow: "Erlauben",
+    allow: "Autorisieren",
     cancel: "Abbrechen",
     privacyPolicy: "Datenschutzrichtlinie",
     termsOfService: "Nutzungsbedingungen",

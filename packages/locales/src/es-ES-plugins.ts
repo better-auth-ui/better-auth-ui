@@ -350,7 +350,7 @@ export const esESPlugins = {
       "Los desarrolladores proporcionan los nombres y logotipos de las aplicaciones. Autoriza solo aplicaciones en las que confíes.",
     requestedPermissions: "Esto permitirá a {{client}} lo siguiente:",
     signedInAs: "Sesión iniciada como",
-    allow: "Permitir",
+    allow: "Autorizar",
     cancel: "Cancelar",
     privacyPolicy: "Política de privacidad",
     termsOfService: "Términos del servicio",

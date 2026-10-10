@@ -14,8 +14,8 @@ export const oauthProviderLocalization = {
   requestedPermissions: "This will allow {{client}} to:",
   /** @remarks `"Signed in as"` */
   signedInAs: "Signed in as",
-  /** @remarks `"Allow"` */
-  allow: "Allow",
+  /** @remarks `"Authorize"` */
+  allow: "Authorize",
   /** @remarks `"Cancel"` */
   cancel: "Cancel",
   /** @remarks `"Privacy policy"` */

@@ -60,7 +60,7 @@ describe("Base UI OAuth consent", () => {
     await waitFor(() => expect(publicClientPrelogin).toHaveBeenCalled())
     expect(screen.queryByText("private_scope")).toBeNull()
     expect(screen.queryByText("https://callback.example")).toBeNull()
-    expect(screen.getByRole("button", { name: "Allow" })).toHaveProperty(
+    expect(screen.getByRole("button", { name: "Authorize" })).toHaveProperty(
       "disabled",
       true
     )
@@ -68,7 +68,7 @@ describe("Base UI OAuth consent", () => {
     await screen.findByRole("heading", { name: "Acme" })
     expect(screen.getByText("private_scope")).toBeTruthy()
     expect(screen.getByText("https://callback.example")).toBeTruthy()
-    await userEvent.click(screen.getByRole("button", { name: "Allow" }))
+    await userEvent.click(screen.getByRole("button", { name: "Authorize" }))
     await waitFor(() =>
       expect(consent).toHaveBeenCalledWith({
         accept: true,
@@ -100,7 +100,62 @@ describe("Base UI OAuth consent", () => {
     await screen.findByRole("heading", {
       name: "Invalid authorization request"
     })
-    expect(screen.queryByRole("button", { name: "Allow" })).toBeNull()
+    expect(screen.queryByRole("button", { name: "Authorize" })).toBeNull()
     expect(publicClient).not.toHaveBeenCalled()
+  })
+  it("keeps both decisions visible while a long permission list scrolls", async () => {
+    const scopes = Array.from(
+      { length: 24 },
+      (_, number) => `permission_${number + 1}`
+    )
+    const signedQuery = `?client_id=client&scope=${scopes.join("%20")}&redirect_uri=https://callback.example/cb&sig=signed&exp=100`
+    const consent = vi.fn(async () => ({
+      redirect_uri: "https://callback.example/cb"
+    }))
+    const authClient = {
+      getSession: vi.fn(async () => session),
+      oauth2: {
+        publicClientPrelogin: vi.fn(async () => ({
+          client_id: "client",
+          client_name: "Acme"
+        })),
+        consent
+      }
+    } as never
+    render(
+      <AuthProvider
+        navigate={vi.fn()}
+        authClient={authClient}
+        plugins={[oauthProviderPlugin()]}
+        queryClient={new QueryClient()}
+      >
+        <OAuthConsent oauthQuery={signedQuery} />
+      </AuthProvider>
+    )
+    const region = await screen.findByRole("region", { name: "Authorize Acme" })
+    await screen.findByText(scopes.at(-1)!)
+    const cancel = screen.getByRole("button", { name: "Cancel" })
+    const authorize = screen.getByRole("button", {
+      name: "Authorize"
+    })
+    expect(region.scrollHeight).toBeGreaterThan(region.clientHeight)
+    for (const button of [cancel, authorize]) {
+      const bounds = button.getBoundingClientRect()
+      expect(bounds.top).toBeGreaterThanOrEqual(
+        region.getBoundingClientRect().bottom
+      )
+      expect(bounds.bottom).toBeLessThanOrEqual(window.innerHeight)
+    }
+    region.focus()
+    await userEvent.keyboard("{End}")
+    await waitFor(() => expect(region.scrollTop).toBeGreaterThan(0))
+    await userEvent.click(cancel)
+    await waitFor(() =>
+      expect(consent).toHaveBeenCalledWith({
+        accept: false,
+        oauth_query: signedQuery,
+        fetchOptions: { throw: true }
+      })
+    )
   })
 })

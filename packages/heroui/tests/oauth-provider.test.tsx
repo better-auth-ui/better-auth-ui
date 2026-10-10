@@ -247,7 +247,7 @@ describe("<OAuthConsent />", () => {
       fetchOptions: expect.objectContaining({ throw: true })
     })
 
-    await user.click(screen.getByRole("button", { name: "Allow" }))
+    await user.click(screen.getByRole("button", { name: "Authorize" }))
 
     await waitFor(() => {
       expect(authClient.oauth2.consent).toHaveBeenCalledWith({
@@ -325,11 +325,11 @@ describe("<OAuthConsent />", () => {
     expect(
       screen.queryByText("https://callback.example")
     ).not.toBeInTheDocument()
-    expect(screen.getByRole("button", { name: "Allow" })).toBeDisabled()
+    expect(screen.getByRole("button", { name: "Authorize" })).toBeDisabled()
     resolveClient({ client_id: "desktop-client", client_name: "Acme CLI" })
     expect(await screen.findByText("private_scope")).toBeInTheDocument()
     expect(screen.getByText("https://callback.example")).toBeInTheDocument()
-    expect(screen.getByRole("button", { name: "Allow" })).toBeEnabled()
+    expect(screen.getByRole("button", { name: "Authorize" })).toBeEnabled()
   })
 
   it("rejects a changed query without reusing verified metadata for the same client", async () => {
@@ -363,7 +363,7 @@ describe("<OAuthConsent />", () => {
       })
     ).toBeInTheDocument()
     expect(
-      screen.queryByRole("button", { name: "Allow" })
+      screen.queryByRole("button", { name: "Authorize" })
     ).not.toBeInTheDocument()
     expect(publicClientPrelogin).toHaveBeenCalledTimes(2)
   })

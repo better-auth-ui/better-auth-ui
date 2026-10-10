@@ -41,7 +41,7 @@ it("verifies consent metadata before accepting and follows the authorized native
   })
   app.render(<OAuthConsent />)
   const allow = await screen.findByRole("button", {
-    name: "Allow",
+    name: "Authorize",
     exact: true
   })
   await waitFor(() => expect(allow).toBeEnabled())
@@ -61,6 +61,54 @@ it("verifies consent metadata before accepting and follows the authorized native
       "myapp://oauth/callback?code=code&state=state"
     )
   )
+})
+it("keeps native consent decisions visible while long permissions scroll", async () => {
+  const scopes = Array.from(
+    { length: 24 },
+    (_, number) => `permission_${number + 1}`
+  )
+  const query = new URLSearchParams({
+    client_id: "client",
+    scope: scopes.join(" "),
+    redirect_uri: "myapp://oauth/callback",
+    sig: "signed"
+  }).toString()
+  const consent = vi.fn(async () => ({ url: "myapp://oauth/callback" }))
+  const app = nativeApp({
+    authenticated: true,
+    plugins: [oauthProviderPlugin()],
+    params: { oauth_query: query },
+    client: {
+      oauth2: {
+        publicClientPrelogin: async () => ({
+          client_id: "client",
+          client_name: "Application"
+        }),
+        consent
+      }
+    }
+  })
+  app.render(<OAuthConsent />)
+  const lastPermission = await screen.findByText(scopes.at(-1)!)
+  const cancel = screen.getByRole("button", { name: "Cancel", exact: true })
+  const authorize = screen.getByRole("button", {
+    name: "Authorize",
+    exact: true
+  })
+  for (const button of [cancel, authorize]) {
+    const bounds = button.getBoundingClientRect()
+    expect(bounds.top).toBeGreaterThanOrEqual(0)
+    expect(bounds.bottom).toBeLessThanOrEqual(window.innerHeight)
+  }
+  const before = lastPermission.getBoundingClientRect().bottom
+  lastPermission.scrollIntoView({ block: "end" })
+  await waitFor(() =>
+    expect(lastPermission.getBoundingClientRect().bottom).toBeLessThan(before)
+  )
+  expect(authorize.getBoundingClientRect().bottom).toBeLessThanOrEqual(
+    window.innerHeight
+  )
+  expect(consent).not.toHaveBeenCalled()
 })
 it("keeps activity filters mounted while resolving organization access and scopes privileged requests explicitly", async () => {
   let resolveRole!: (value: { role: string }) => void

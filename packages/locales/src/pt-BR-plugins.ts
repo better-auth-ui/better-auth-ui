@@ -348,7 +348,7 @@ export const ptBRPlugins = {
       "Os nomes e logotipos dos aplicativos são fornecidos por seus desenvolvedores. Autorize apenas aplicativos em que você confia.",
     requestedPermissions: "Isso permitirá que {{client}}:",
     signedInAs: "Conectado como",
-    allow: "Permitir",
+    allow: "Autorizar",
     cancel: "Cancelar",
     privacyPolicy: "Política de privacidade",
     termsOfService: "Termos de uso",

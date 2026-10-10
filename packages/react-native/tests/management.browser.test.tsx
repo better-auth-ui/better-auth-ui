@@ -376,11 +376,9 @@ it("blocks OAuth consent if the authorization server rejects the signed request"
     "This authorization request is missing required information or is no longer valid."
   )
   expect(consent).not.toHaveBeenCalled()
-  const buttons = screen
-    .getAllByRole("button")
-    .filter((button) => /Allow|Authorize|Deny/.test(button.textContent ?? ""))
-  for (const button of buttons)
-    expect(button).toHaveAttribute("aria-disabled", "true")
+  expect(
+    screen.queryByRole("button", { name: "Authorize", exact: true })
+  ).toBeNull()
 })
 it("keeps the entered email when SSO discovery returns no provider", async () => {
   const sso = vi.fn(async () => {

@@ -10,7 +10,13 @@ import {
   useOAuthConsent,
   usePublicOAuthClient
 } from "@better-auth-ui/solid/plugins/oauth-provider"
-import { AppWindow, Check, Ellipsis, Link as LinkIcon } from "lucide-solid"
+import {
+  AppWindow,
+  Check,
+  Ellipsis,
+  Link as LinkIcon,
+  Shield
+} from "lucide-solid"
 import {
   createMemo,
   createSignal,
@@ -118,171 +124,196 @@ export function OAuthConsent(props: OAuthConsentProps) {
         </Card>
       }
     >
-      <Card class={cn("w-full max-w-md", props.class)}>
-        <CardHeader class="gap-4!">
-          <div class="flex items-center justify-center gap-5">
-            <Show
-              when={client()}
-              fallback={<Skeleton class="size-16 rounded-full" />}
-            >
-              <Avatar class="size-16!">
-                <AvatarImage
-                  alt={clientName()}
-                  referrerpolicy="no-referrer"
-                  src={logoUrl()}
-                />
-                <AvatarFallback>
-                  <AppWindow class="size-7" />
-                </AvatarFallback>
-              </Avatar>
-            </Show>
-            <Ellipsis aria-hidden="true" class="size-5 text-muted-foreground" />
-            <Show
-              when={session.data}
-              fallback={<Skeleton class="size-16 rounded-full" />}
-            >
-              {(currentSession) => (
-                <UserAvatar class="size-16!" user={currentSession().user} />
-              )}
-            </Show>
-          </div>
-          <div class="grid justify-items-center gap-1 text-center">
-            <CardTitle
-              role="heading"
-              aria-level={2}
-              class="max-w-full break-words text-xl! font-semibold!"
-            >
-              <Show when={client()} fallback={<Skeleton class="h-6 w-36" />}>
-                {clientName()}
+      <Card
+        class={cn(
+          "max-h-[calc(100dvh-2rem)] w-full max-w-lg gap-0! overflow-hidden py-0!",
+          props.class
+        )}
+      >
+        <div
+          class="min-h-0 overflow-y-auto overscroll-contain focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ring"
+          role="region"
+          aria-label={interpolateClient(localization.authorize, clientName())}
+          tabIndex={0}
+        >
+          <CardHeader class="gap-5! p-6!">
+            <div class="flex items-center justify-center gap-5">
+              <Show
+                when={client()}
+                fallback={<Skeleton class="size-16 rounded-full" />}
+              >
+                <Avatar class="size-16!">
+                  <AvatarImage
+                    alt={clientName()}
+                    referrerpolicy="no-referrer"
+                    src={logoUrl()}
+                  />
+                  <AvatarFallback>
+                    <AppWindow class="size-7" />
+                  </AvatarFallback>
+                </Avatar>
               </Show>
-            </CardTitle>
-            <CardDescription>
-              {localization.authorizationRequest}
-            </CardDescription>
-            <div class="mt-2 flex max-w-full flex-wrap justify-center gap-x-1 text-sm text-muted-foreground">
-              <span>{localization.signedInAs}</span>
+              <Ellipsis
+                aria-hidden="true"
+                class="size-5 text-muted-foreground"
+              />
               <Show
                 when={session.data}
-                fallback={<Skeleton class="h-4 w-32" />}
+                fallback={<Skeleton class="size-16 rounded-full" />}
               >
                 {(currentSession) => (
-                  <span class="break-all font-medium">
-                    {currentSession().user.name || currentSession().user.email}
-                  </span>
+                  <UserAvatar class="size-16!" user={currentSession().user} />
                 )}
               </Show>
             </div>
-          </div>
-        </CardHeader>
-
-        <CardContent class="flex flex-col gap-5">
-          <div class="grid gap-3">
-            <p class="text-sm font-medium">
-              {interpolateClient(
-                localization.requestedPermissions,
-                clientName()
-              )}
-            </p>
-
-            <Show
-              when={client() && request()}
-              fallback={
-                <div class="flex gap-3">
-                  <Skeleton class="mt-0.5 size-4 shrink-0 rounded-full" />
-                  <div class="grid flex-1 gap-2">
-                    <Skeleton class="h-4 w-32" />
-                    <Skeleton class="h-3 w-full max-w-64" />
-                  </div>
-                </div>
-              }
-            >
-              {(authorizationRequest) => (
-                <ul class="grid gap-3">
-                  <For each={authorizationRequest().scopes}>
-                    {(scope) => {
-                      const metadata = () =>
-                        resolveOAuthScopeMetadata(scopeMetadata, scope, {
-                          clientId: authorizationRequest().clientId,
-                          requestedScopes: authorizationRequest().scopes
-                        })
-
-                      return (
-                        <li class="flex gap-3">
-                          <Check class="mt-0.5 size-4 shrink-0 text-primary" />
-                          <div class="grid gap-0.5">
-                            <p class="text-sm font-medium">
-                              {metadata().label}
-                            </p>
-                            <Show when={metadata().description}>
-                              {(description) => (
-                                <p class="text-muted-foreground text-xs">
-                                  {description()}
-                                </p>
-                              )}
-                            </Show>
-                          </div>
-                        </li>
-                      )
-                    }}
-                  </For>
-                </ul>
-              )}
-            </Show>
-          </div>
-
-          <Separator />
-
-          <Show when={destination()}>
-            {(uri) => (
-              <div class="flex gap-2 text-xs text-muted-foreground">
-                <LinkIcon aria-hidden="true" class="mt-0.5 size-4 shrink-0" />
-                <p>
-                  {localization.redirectTo}{" "}
-                  <span class="block break-all font-medium text-foreground">
-                    {uri()}
-                  </span>
-                </p>
+            <div class="grid justify-items-center gap-1 text-center">
+              <CardTitle
+                role="heading"
+                aria-level={2}
+                class="max-w-full break-words text-xl! font-semibold!"
+              >
+                <Show when={client()} fallback={<Skeleton class="h-6 w-36" />}>
+                  {clientName()}
+                </Show>
+              </CardTitle>
+              <CardDescription>
+                {localization.authorizationRequest}
+              </CardDescription>
+              <div class="mt-2 flex max-w-full flex-wrap justify-center gap-x-1 text-sm text-muted-foreground">
+                <span>{localization.signedInAs}</span>
+                <Show
+                  when={session.data}
+                  fallback={<Skeleton class="h-4 w-32" />}
+                >
+                  {(currentSession) => (
+                    <span class="break-all font-medium text-foreground">
+                      {currentSession().user.name ||
+                        currentSession().user.email}
+                    </span>
+                  )}
+                </Show>
               </div>
-            )}
-          </Show>
-          <p class="text-xs text-muted-foreground">
-            {localization.applicationInformation}
-          </p>
-
-          <Show when={policyUrl() || termsUrl()}>
-            <div class="flex flex-wrap gap-x-4 gap-y-2 text-xs">
-              <Show when={policyUrl()}>
-                {(uri) => (
-                  <a
-                    class="text-muted-foreground underline underline-offset-4 hover:text-foreground"
-                    href={uri()}
-                    rel="noreferrer"
-                    target="_blank"
-                  >
-                    {localization.privacyPolicy}
-                  </a>
-                )}
-              </Show>
-              <Show when={termsUrl()}>
-                {(uri) => (
-                  <a
-                    class="text-muted-foreground underline underline-offset-4 hover:text-foreground"
-                    href={uri()}
-                    rel="noreferrer"
-                    target="_blank"
-                  >
-                    {localization.termsOfService}
-                  </a>
-                )}
-              </Show>
             </div>
-          </Show>
-        </CardContent>
+          </CardHeader>
 
-        <CardFooter class="grid grid-cols-2 gap-2">
+          <CardContent class="px-4! pt-0! pb-6! sm:px-6!">
+            <div class="flex flex-col gap-5 rounded-lg bg-muted/50 p-5">
+              <div class="grid gap-3">
+                <p class="text-sm font-medium">
+                  {interpolateClient(
+                    localization.requestedPermissions,
+                    clientName()
+                  )}
+                </p>
+
+                <Show
+                  when={client() && request()}
+                  fallback={
+                    <div class="flex gap-3">
+                      <Skeleton class="mt-0.5 size-4 shrink-0 rounded-full" />
+                      <div class="grid flex-1 gap-2">
+                        <Skeleton class="h-4 w-32" />
+                        <Skeleton class="h-3 w-full max-w-64" />
+                      </div>
+                    </div>
+                  }
+                >
+                  {(authorizationRequest) => (
+                    <ul class="grid gap-3">
+                      <For each={authorizationRequest().scopes}>
+                        {(scope) => {
+                          const metadata = () =>
+                            resolveOAuthScopeMetadata(scopeMetadata, scope, {
+                              clientId: authorizationRequest().clientId,
+                              requestedScopes: authorizationRequest().scopes
+                            })
+
+                          return (
+                            <li class="flex gap-3">
+                              <Check
+                                aria-hidden="true"
+                                class="mt-0.5 size-5 shrink-0 text-muted-foreground"
+                              />
+                              <div class="grid min-w-0 gap-1">
+                                <p class="text-base leading-6 break-words">
+                                  {metadata().label}
+                                </p>
+                                <Show when={metadata().description}>
+                                  {(description) => (
+                                    <p class="text-sm leading-5 text-muted-foreground">
+                                      {description()}
+                                    </p>
+                                  )}
+                                </Show>
+                              </div>
+                            </li>
+                          )
+                        }}
+                      </For>
+                    </ul>
+                  )}
+                </Show>
+              </div>
+
+              <Separator />
+
+              <Show when={destination()}>
+                {(uri) => (
+                  <div class="flex gap-3 text-sm leading-5 text-muted-foreground">
+                    <LinkIcon
+                      aria-hidden="true"
+                      class="mt-0.5 size-4 shrink-0"
+                    />
+                    <p>
+                      {localization.redirectTo}{" "}
+                      <span class="block break-all font-medium text-foreground">
+                        {uri()}
+                      </span>
+                    </p>
+                  </div>
+                )}
+              </Show>
+              <Show when={policyUrl() || termsUrl()}>
+                <div class="flex flex-wrap gap-x-4 gap-y-2 text-sm">
+                  <Show when={policyUrl()}>
+                    {(uri) => (
+                      <a
+                        class="text-primary underline underline-offset-4"
+                        href={uri()}
+                        rel="noreferrer"
+                        target="_blank"
+                      >
+                        {localization.privacyPolicy}
+                      </a>
+                    )}
+                  </Show>
+                  <Show when={termsUrl()}>
+                    {(uri) => (
+                      <a
+                        class="text-primary underline underline-offset-4"
+                        href={uri()}
+                        rel="noreferrer"
+                        target="_blank"
+                      >
+                        {localization.termsOfService}
+                      </a>
+                    )}
+                  </Show>
+                </div>
+              </Show>
+              <div class="flex gap-3 text-sm leading-5 text-muted-foreground">
+                <Shield aria-hidden="true" class="mt-0.5 size-4 shrink-0" />
+                <p>{localization.applicationInformation}</p>
+              </div>
+            </div>
+          </CardContent>
+        </div>
+
+        <CardFooter class="grid shrink-0 grid-cols-2 gap-3 border-t border-border p-4! sm:p-6!">
           <Button
+            class="h-11! w-full"
             disabled={!canRespond()}
-            variant="outline"
+            variant="secondary"
             onClick={() =>
               consent.mutate({ accept: false, oauth_query: query() })
             }
@@ -295,6 +326,7 @@ export function OAuthConsent(props: OAuthConsentProps) {
             {localization.cancel}
           </Button>
           <Button
+            class="h-11! w-full"
             disabled={!canRespond()}
             onClick={() =>
               consent.mutate({ accept: true, oauth_query: query() })
