@@ -161,8 +161,8 @@
     "@tanstack/react-form": "^1.33.5"
   },
   "devDependencies": {
-    "@better-auth-ui/core": "workspace:*",
-    "@better-auth-ui/react": "workspace:*",
+    "@better-auth-ui/core": "*",
+    "@better-auth-ui/react": "*",
     "@react-native-community/datetimepicker": "9.1.0",
     "@react-native-community/slider": "5.2.0",
     "@tanstack/react-pacer": "^0.22.1",
@@ -220,5 +220,18 @@
   },
   "keywords": [
     "tanstack-intent"
-  ]
+  ],
+  "nx": {
+    "targets": {
+      "typecheck": {
+        "command": "tsc --build tsconfig.typecheck.json --emitDeclarationOnly",
+        "options": {
+          "cwd": "packages/react-native"
+        },
+        "outputs": [
+          "{projectRoot}/.typecheck"
+        ]
+      }
+    }
+  }
 }
