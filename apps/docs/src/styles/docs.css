@@ -1,0 +1,610 @@
+@theme inline {
+  --font-sans: "Geist Variable", sans-serif;
+  --font-mono: "Geist Mono Variable", monospace;
+}
+
+:root {
+  --color-fd-background: #ffffff;
+  --color-fd-foreground: #171717;
+  --color-fd-primary: #171717;
+  --color-fd-primary-foreground: #ffffff;
+  --color-fd-ring: #737373;
+  --color-fd-card: #fafafa;
+  --color-fd-card-foreground: #171717;
+  --color-fd-border: #ebebeb;
+  --color-fd-muted: #f5f5f5;
+  --color-fd-muted-foreground: #737373;
+  --color-fd-secondary: #f5f5f5;
+  --color-fd-secondary-foreground: #171717;
+  --color-fd-accent: #f2f2f2;
+  --color-fd-accent-foreground: #171717;
+}
+
+html.dark {
+  --color-fd-background: #000000;
+  --color-fd-foreground: #ededed;
+  --color-fd-primary: #ededed;
+  --color-fd-primary-foreground: #000000;
+  --color-fd-ring: #a3a3a3;
+  --color-fd-card: #080808;
+  --color-fd-card-foreground: #ededed;
+  --color-fd-border: #1c1c1c;
+  --color-fd-muted: #111111;
+  --color-fd-muted-foreground: #999999;
+  --color-fd-secondary: #111111;
+  --color-fd-secondary-foreground: #ededed;
+  --color-fd-accent: #141414;
+  --color-fd-accent-foreground: #ededed;
+}
+
+html body {
+  background: var(--color-fd-background);
+  color: var(--color-fd-foreground);
+  font-family: "Geist Variable", sans-serif;
+}
+
+.docs-shell {
+  --fd-banner-height: 48px;
+  --fd-layout-width: 1500px;
+  padding-top: var(--fd-banner-height);
+  font-family: "Geist Variable", sans-serif;
+}
+
+.docs-site-header {
+  position: fixed;
+  inset: 0 0 auto;
+  z-index: 30;
+  display: flex;
+  height: 48px;
+  border-bottom: 1px solid var(--color-fd-border);
+  background: var(--color-fd-background);
+  color: var(--color-fd-foreground);
+}
+
+.docs-brand {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 8px;
+  padding-inline: 16px;
+  font-size: 15px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.docs-site-links {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+}
+
+.docs-site-link,
+.docs-header-github {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-width: 0;
+  padding-inline: 24px;
+  border-inline-start: 1px solid var(--color-fd-border);
+  font-family: "Geist Mono Variable", monospace;
+  font-size: 11px;
+  font-weight: 400;
+  letter-spacing: 0.035em;
+  text-transform: uppercase;
+  color: var(--color-fd-muted-foreground);
+  transition:
+    background-color 150ms,
+    color 150ms;
+}
+
+.docs-site-link {
+  flex: 1;
+}
+
+.docs-site-link > svg {
+  width: 12px;
+  height: 12px;
+}
+
+.docs-site-link[data-active="true"] {
+  box-shadow: inset 0 -1px var(--color-fd-foreground);
+  color: var(--color-fd-foreground);
+}
+
+.docs-site-link:hover,
+.docs-header-github:hover {
+  background: var(--color-fd-accent);
+  color: var(--color-fd-foreground);
+}
+
+.docs-mobile-controls {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-inline-start: auto;
+  padding-inline: 8px;
+}
+
+.docs-desktop-controls {
+  display: none;
+  align-items: center;
+  gap: 8px;
+  padding-inline: 12px;
+  border-inline-start: 1px solid var(--color-fd-border);
+}
+
+.docs-icon-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 2px;
+  color: var(--color-fd-muted-foreground);
+}
+
+.docs-icon-button > svg {
+  width: 18px;
+  height: 18px;
+}
+
+.docs-icon-button:hover {
+  background: var(--color-fd-accent);
+  color: var(--color-fd-foreground);
+}
+
+.docs-sidebar {
+  position: fixed;
+  inset: 48px auto 0 0;
+  display: flex;
+  flex-direction: column;
+  width: var(--fd-sidebar-width);
+  border-inline-end: 1px solid var(--color-fd-border);
+  background: var(--color-fd-background);
+  font-size: 14px;
+}
+
+.docs-library-switcher {
+  width: 100%;
+  min-height: 60px;
+  padding: 12px 16px;
+  border: 0;
+  border-bottom: 1px solid var(--color-fd-border);
+  border-radius: 0;
+  background: transparent;
+  color: var(--color-fd-foreground);
+}
+
+.docs-library-switcher:hover,
+.docs-library-switcher[data-state="open"] {
+  background: var(--color-fd-accent);
+}
+
+.docs-library-switcher > div:first-child {
+  width: 20px;
+  height: 20px;
+}
+
+.docs-library-switcher > div > p + p {
+  display: block;
+  margin-top: 3px;
+  font-size: 12px;
+}
+
+.docs-sidebar-search {
+  min-height: 42px;
+  padding: 10px 16px;
+  border: 0;
+  border-bottom: 1px solid var(--color-fd-border);
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  font-size: 13px;
+}
+
+.docs-sidebar-search kbd {
+  border: 1px solid var(--color-fd-border);
+  border-radius: 2px;
+  background: transparent;
+  font-family: "Geist Mono Variable", monospace;
+  font-size: 10px;
+}
+
+.docs-sidebar-pages {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-fd-border) transparent;
+  padding-block: 4px 24px;
+}
+
+.docs-nav-folder[data-depth="0"] {
+  border-bottom: 1px solid var(--color-fd-border);
+}
+
+.docs-nav-group,
+.docs-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  width: 100%;
+  min-height: 30px;
+  padding: 5px 16px;
+  font-size: 13px;
+  line-height: 20px;
+  text-align: start;
+  color: var(--color-fd-muted-foreground);
+  transition:
+    background-color 150ms,
+    color 150ms;
+}
+
+.docs-nav-group {
+  min-height: 41px;
+  color: var(--color-fd-foreground);
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.docs-nav-group > .docs-nav-name {
+  min-width: 0;
+  flex: 1;
+}
+
+.docs-nav-group svg,
+.docs-nav-item svg {
+  width: 15px;
+  height: 15px;
+  flex-shrink: 0;
+}
+
+.docs-nav-group:hover,
+.docs-nav-item:hover {
+  background: var(--color-fd-accent);
+  color: var(--color-fd-foreground);
+}
+
+.docs-nav-item[data-active="true"] {
+  background: var(--color-fd-accent);
+  color: var(--color-fd-foreground);
+}
+
+.docs-nav-content {
+  padding-block: 0 8px;
+  animation: none;
+}
+
+.docs-nav-label {
+  margin: 16px 16px 5px 28px;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--color-fd-muted-foreground);
+}
+
+.docs-sidebar-footer {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-height: 48px;
+  padding: 8px 16px;
+  border-top: 1px solid var(--color-fd-border);
+}
+
+.docs-footer-link {
+  font-size: 11px;
+  color: var(--color-fd-muted-foreground);
+}
+
+.docs-footer-link:hover {
+  color: var(--color-fd-foreground);
+}
+
+.docs-theme-switch {
+  margin-inline-start: auto;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+
+.docs-theme-switch > button {
+  border-radius: 2px;
+}
+
+.docs-navigation-sheet {
+  width: min(88vw, 360px);
+  max-width: none;
+  gap: 0;
+  border-color: var(--color-fd-border);
+  background: var(--color-fd-background);
+  color: var(--color-fd-foreground);
+  font-family: "Geist Variable", sans-serif;
+}
+
+.docs-sheet-header {
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 12px 6px 16px;
+  border-bottom: 1px solid var(--color-fd-border);
+}
+
+.docs-sheet-header [data-slot="sheet-title"] {
+  color: var(--color-fd-foreground);
+}
+
+.docs-site-links-mobile {
+  flex: none;
+  flex-wrap: wrap;
+  border-bottom: 1px solid var(--color-fd-border);
+}
+
+.docs-site-links-mobile .docs-site-link {
+  padding: 12px;
+  border-inline-start: 0;
+}
+
+.docs-navigation-menu {
+  min-width: 180px;
+  border: 1px solid var(--color-fd-border);
+  border-radius: 3px;
+  background: var(--color-fd-background);
+  color: var(--color-fd-foreground);
+  font-family: "Geist Variable", sans-serif;
+}
+
+.docs-navigation-menu [data-slot="dropdown-menu-item"] {
+  border-radius: 2px;
+  padding: 8px;
+}
+
+.docs-navigation-menu [data-highlighted] {
+  background: var(--color-fd-accent);
+  color: var(--color-fd-foreground);
+}
+
+.docs-page-header {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 12px;
+}
+
+.docs-page-header h1 {
+  font-size: 28px;
+  font-weight: 600;
+  letter-spacing: -0.025em;
+}
+
+.docs-page-header p {
+  font-size: 17px;
+  line-height: 27px;
+}
+
+.docs-page-actions {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 8px;
+}
+
+.docs-page-actions > button {
+  height: 28px;
+  padding-inline: 4px;
+  border: 0;
+  border-radius: 2px;
+  background: transparent;
+  color: var(--color-fd-muted-foreground);
+  font-family: "Geist Mono Variable", monospace;
+  font-size: 10px;
+  font-weight: 400;
+  text-transform: uppercase;
+  box-shadow: none;
+}
+
+.docs-page-actions > button:hover {
+  background: var(--color-fd-accent);
+  color: var(--color-fd-foreground);
+}
+
+.docs-shell .shiki {
+  border-color: var(--color-fd-border);
+  border-radius: 2px;
+  background: var(--color-fd-card);
+  box-shadow: none;
+}
+
+.docs-shell .shiki pre {
+  font-family: "Geist Mono Variable", monospace;
+  font-size: 13px;
+}
+
+.docs-shell [role="tablist"]:has(+ [role="tabpanel"] .shiki),
+.docs-shell [role="tablist"]:has(+ div .shiki) {
+  border-radius: 2px 2px 0 0;
+  border-color: var(--color-fd-border);
+  background: var(--color-fd-card);
+}
+
+.docs-shell [role="tabpanel"]:has(.shiki) {
+  border-color: var(--color-fd-border);
+  border-radius: 0 0 2px 2px;
+  background: var(--color-fd-card);
+  box-shadow: none;
+}
+
+.docs-shell .preview,
+.docs-shell .zaidan-preview {
+  border: 1px solid var(--color-fd-border);
+  border-radius: 2px;
+  background: var(--color-fd-background);
+}
+
+.docs-shell .preview {
+  font-family: var(--font-sans);
+}
+
+.docs-shell #nd-page > .\@container {
+  gap: 0;
+  margin-top: 32px;
+  border-top: 1px solid var(--color-fd-border);
+}
+
+.docs-shell #nd-page > .\@container > a {
+  padding: 20px 16px;
+  border: 0;
+  border-bottom: 1px solid var(--color-fd-border);
+  border-radius: 0;
+  background: transparent;
+}
+
+.docs-shell #nd-page > .\@container > a:hover {
+  background: var(--color-fd-accent);
+}
+
+.docs-shell #nd-page > .\@container > a:first-child:not(:last-child) {
+  border-inline-end: 1px solid var(--color-fd-border);
+}
+
+.docs-shell #nd-page > .\@container > a > div > p {
+  font-family: "Geist Mono Variable", monospace;
+  font-size: 12px;
+}
+
+.docs-shell #nd-page > .\@container > a > p {
+  font-size: 12px;
+}
+
+.docs-shell #nd-page :is(h2, h3) {
+  letter-spacing: -0.02em;
+}
+
+.docs-shell #nd-page .prose :is(p, li) {
+  line-height: 1.75;
+}
+
+.docs-shell #nd-page :is(h1, h2, h3, h4) {
+  scroll-margin-top: 112px;
+}
+
+.docs-library-cards {
+  display: grid;
+  gap: 12px;
+  margin-block: 24px;
+}
+
+.docs-library-card {
+  overflow: hidden;
+  border: 1px solid var(--color-fd-border);
+  background: var(--color-fd-card);
+  transition: border-color 150ms;
+}
+
+.docs-library-card:hover {
+  border-color: var(--color-fd-ring);
+}
+
+.docs-library-preview {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  aspect-ratio: 3 / 4;
+  max-height: 360px;
+  padding: 16px;
+  background: var(--color-fd-background);
+}
+
+.docs-library-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.docs-library-caption {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px;
+  border-top: 1px solid var(--color-fd-border);
+}
+
+.docs-library-caption > svg {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+
+.docs-shell .docs-library-caption > h3 {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0;
+}
+
+.docs-library-caption > span {
+  margin-inline-start: auto;
+  font-family: "Geist Mono Variable", monospace;
+  font-size: 10px;
+  color: var(--color-fd-muted-foreground);
+}
+
+:is(.docs-shell, .docs-navigation-sheet, .docs-navigation-menu) :focus-visible {
+  outline: 2px solid var(--color-fd-ring);
+  outline-offset: -2px;
+}
+
+@media (max-width: 767px) {
+  .docs-site-header > .docs-site-links,
+  .docs-header-github {
+    display: none;
+  }
+}
+
+@media (min-width: 768px) {
+  .docs-shell {
+    --fd-sidebar-width: min(24vw, 300px);
+  }
+
+  .docs-brand {
+    width: var(--fd-sidebar-width, min(24vw, 300px));
+  }
+
+  .docs-mobile-controls {
+    display: none;
+  }
+
+  .docs-desktop-controls {
+    display: flex;
+  }
+
+  .docs-library-cards {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1280px) {
+  .docs-shell {
+    --fd-toc-width: 260px;
+  }
+
+  .docs-shell #nd-toc {
+    padding: 64px 16px 32px 32px;
+  }
+
+  .docs-page-header {
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 24px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .docs-navigation-sheet {
+    animation: none;
+    transition: none;
+  }
+}

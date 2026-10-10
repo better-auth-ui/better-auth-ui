@@ -11,6 +11,7 @@ import { HomeLayout } from "fumadocs-ui/layouts/home"
 import { ArrowRight, ArrowUpRight, Check, Copy } from "lucide-react"
 import { toast } from "sonner"
 import { HeroUI } from "@/components/icons/heroui"
+import { HomeHeader } from "@/components/DocsShell"
 import { React as ReactIcon } from "@/components/icons/react"
 import { Shadcn } from "@/components/icons/shadcn"
 import { Solid } from "@/components/icons/solid"
@@ -101,7 +102,11 @@ export const Route = createFileRoute("/")({
 
 function Home() {
   return (
-    <HomeLayout {...baseOptions()} className="home-layout">
+    <HomeLayout
+      {...baseOptions()}
+      nav={{ ...baseOptions().nav, component: <HomeHeader /> }}
+      className="home-layout"
+    >
       <div className="home-page">
         <section className="home-intro" aria-labelledby="home-title">
           <div>

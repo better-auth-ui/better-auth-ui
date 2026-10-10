@@ -3,15 +3,17 @@ import type { BaseLayoutProps } from "fumadocs-ui/layouts/shared"
 import { ArrowUpRight, Book, BookOpen, PanelsTopLeft } from "lucide-react"
 import { Logo } from "@/components/icons/logo"
 
+export const brand = (
+  <>
+    <Logo className="size-5" />
+    BETTER-AUTH-UI.
+  </>
+)
+
 export function baseOptions(): BaseLayoutProps {
   return {
     nav: {
-      title: (
-        <>
-          <Logo className="size-5" />
-          BETTER-AUTH. UI
-        </>
-      )
+      title: brand
     },
     themeSwitch: {
       mode: "light-dark-system"

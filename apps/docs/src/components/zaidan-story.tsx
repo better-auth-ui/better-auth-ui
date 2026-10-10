@@ -85,7 +85,7 @@ export function ZaidanStory({
   return (
     <div
       className={cn(
-        "not-prose my-4 w-full overflow-hidden rounded-xl border border-separator bg-background",
+        "zaidan-preview not-prose my-4 w-full overflow-hidden rounded-xl border border-separator bg-background",
         containerClassName
       )}
       style={style}

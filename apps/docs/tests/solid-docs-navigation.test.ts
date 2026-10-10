@@ -21,16 +21,12 @@ function listFilesRecursive(root: string, prefix = ""): string[] {
 
 describe("Solid docs navigation", () => {
   it("adds Solid as a root docs section with the expected page order", async () => {
-    const docsIndex = await readDocsFile("index.mdx")
     const rootMeta = JSON.parse(await readDocsFile("meta.json")) as {
       pages: string[]
     }
 
     expect(rootMeta.pages).toContain("solid")
     expect(rootMeta.pages).toContain("zaidan")
-    expect(docsIndex).toContain("/docs/zaidan")
-    expect(docsIndex).toContain("Zaidan Solid")
-    expect(docsIndex).toContain("Copied Solid components for TanStack Start")
 
     const solidMeta = JSON.parse(await readDocsFile("solid", "meta.json")) as {
       title: string

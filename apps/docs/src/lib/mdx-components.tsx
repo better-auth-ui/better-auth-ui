@@ -5,6 +5,7 @@ import defaultComponents from "fumadocs-ui/mdx"
 import type { MDXComponents } from "mdx/types"
 
 import { ComponentPreview } from "@/components/component-preview"
+import { DocsLibraryCards } from "@/components/DocsLibraryCards"
 import { HeroUI } from "@/components/icons/heroui"
 import { NextJS } from "@/components/icons/nextjs"
 import { React } from "@/components/icons/react"
@@ -31,6 +32,7 @@ export function getMDXComponents(components?: MDXComponents): MDXComponents {
     Solid,
     TanStackStart,
     ComponentPreview,
+    DocsLibraryCards,
     ZaidanStory,
     ...components
   }

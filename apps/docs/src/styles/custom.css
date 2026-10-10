@@ -1,13 +1,3 @@
-@theme {
-  --color-fd-ring: var(--color-orange-400);
-  --color-fd-primary: var(--color-orange-400);
-}
-
-.dark {
-  --color-fd-ring: var(--color-orange-300);
-  --color-fd-primary: var(--color-orange-300);
-}
-
 @layer base {
   button:not([disabled]),
   [role="button"]:not([disabled]) {
@@ -22,17 +12,14 @@ a {
 /* The homepage shares the documentation palette and keeps its styles scoped. */
 .home-layout {
   --fd-layout-width: 1200px;
+  padding-top: 48px;
 }
 
 .home-page {
-  --home-accent: #b45309;
+  --home-accent: var(--color-fd-foreground);
   width: min(100% - 64px, 1152px);
   margin-inline: auto;
   color: var(--color-fd-foreground);
-}
-
-.dark .home-page {
-  --home-accent: #fdba74;
 }
 
 .home-intro {

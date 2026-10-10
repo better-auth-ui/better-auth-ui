@@ -14,6 +14,7 @@ import {
 import { Fragment, useEffect, useMemo } from "react"
 import { Providers as HeroUIProviders } from "@/components/demos/heroui/providers"
 import { Providers as ShadcnProviders } from "@/components/demos/shadcn/providers"
+import { docsSlots } from "@/components/DocsShell"
 import { LLMCopyButton, ViewOptions } from "@/components/page-actions"
 import { baseOptions } from "@/lib/layout.shared"
 import { getMDXComponents } from "@/lib/mdx-components"
@@ -79,21 +80,25 @@ const clientLoader = browserCollections.docs.createClientLoader({
     return (
       <DocsPage
         toc={toc}
+        breadcrumb={{ enabled: false }}
         tableOfContent={{
           style: "clerk"
         }}
       >
-        <DocsTitle>{frontmatter.title}</DocsTitle>
-        <DocsDescription className="mb-0">
-          {frontmatter.description}
-        </DocsDescription>
-
-        <div className="flex flex-row gap-2 items-center border-b pt-2 pb-6">
-          <LLMCopyButton markdownUrl={data.markdownUrl} />
-          <ViewOptions
-            markdownUrl={data.markdownUrl}
-            githubUrl={`https://github.com/${owner}/${repo}/blob/main/apps/docs/content/docs/${data.path}`}
-          />
+        <div className="docs-page-header">
+          <div className="min-w-0">
+            <DocsTitle className="mb-0">{frontmatter.title}</DocsTitle>
+            <DocsDescription className="mt-2 mb-0">
+              {frontmatter.description}
+            </DocsDescription>
+          </div>
+          <div className="docs-page-actions">
+            <LLMCopyButton markdownUrl={data.markdownUrl} />
+            <ViewOptions
+              markdownUrl={data.markdownUrl}
+              githubUrl={`https://github.com/${owner}/${repo}/blob/main/apps/docs/content/docs/${data.path}`}
+            />
+          </div>
         </div>
 
         <DocsBody>
@@ -146,7 +151,12 @@ function Page() {
 
   return (
     <Providers>
-      <DocsLayout {...baseOptions()} tree={tree}>
+      <DocsLayout
+        {...baseOptions()}
+        tree={tree}
+        slots={docsSlots}
+        containerProps={{ className: "docs-shell" }}
+      >
         <Content />
       </DocsLayout>
     </Providers>
