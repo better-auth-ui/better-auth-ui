@@ -140,3 +140,8 @@ Join the [Better Auth UI Discord](https://better-auth-ui.com/discord) to ask que
 ## License
 
 Better Auth UI is available under the [MIT License](./LICENSE).
+
+## Contributing and support
+
+Read [the contribution guide](CONTRIBUTING.md) for development and review.
+Use [the support guide](SUPPORT.md) for questions and issue routing.

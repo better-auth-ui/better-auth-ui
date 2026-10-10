@@ -3,7 +3,7 @@ import type { PolymorphicProps } from "@kobalte/core/polymorphic"
 import { CheckIcon } from "lucide-solid"
 import { type ComponentProps, splitProps, type ValidComponent } from "solid-js"
 
-import { cn } from "@/lib/utils"
+import { cn } from "cn"
 
 type CheckboxProps<T extends ValidComponent = "div"> = PolymorphicProps<
   T,

@@ -31,7 +31,7 @@ import {
   SelectValue
 } from "@/components/ui/select"
 import { apiKeyPlugin } from "@/lib/auth/api-key-plugin"
-import { cn } from "@/lib/utils"
+import { cn } from "cn"
 
 const { createAppColumnHelper, createAppTable: createApiKeyTable } =
   createTableHook({

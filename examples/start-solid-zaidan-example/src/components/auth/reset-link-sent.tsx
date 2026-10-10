@@ -3,7 +3,7 @@ import { AuthLink, useAuth } from "@better-auth-ui/solid"
 import { createSignal, onMount, Show } from "solid-js"
 import { isServer } from "solid-js/web"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { cn } from "@/lib/utils"
+import { cn } from "cn"
 import { OpenEmailButton } from "./open-email-button"
 
 /** `sessionStorage` key the forgot-password form stores the submitted email under. */

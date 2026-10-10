@@ -27,7 +27,7 @@ import {
   RESEND_COOLDOWN_SECONDS,
   useResendCooldown
 } from "@/lib/auth/use-resend-cooldown"
-import { cn } from "@/lib/utils"
+import { cn } from "cn"
 import { createAuthForm, submitAuthForm } from "../auth-form"
 
 /** `sessionStorage` key the sign-up and sign-in flows store the pending address under. */

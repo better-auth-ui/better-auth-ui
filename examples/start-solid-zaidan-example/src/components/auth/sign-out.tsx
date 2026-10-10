@@ -1,7 +1,7 @@
 import { useAuth } from "@better-auth-ui/solid"
 import { onMount } from "solid-js"
 import { Spinner } from "@/components/ui/spinner"
-import { cn } from "@/lib/utils"
+import { cn } from "cn"
 
 export type SignOutProps = {
   class?: string

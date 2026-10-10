@@ -11,7 +11,7 @@ import type { ComponentProps } from "react"
 
 import { Badge } from "@/components/ui/badge"
 import { organizationPlugin } from "@/lib/auth/organization-plugin"
-import { cn } from "@/lib/utils"
+import { cn } from "cn"
 import {
   OrganizationLogo,
   type OrganizationLogoSize

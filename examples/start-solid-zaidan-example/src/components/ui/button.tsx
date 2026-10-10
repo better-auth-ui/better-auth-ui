@@ -2,7 +2,7 @@ import { type ButtonRootProps, Root } from "@kobalte/core/button"
 import type { PolymorphicProps } from "@kobalte/core/polymorphic"
 import { cva, type VariantProps } from "class-variance-authority"
 import { type ComponentProps, splitProps, type ValidComponent } from "solid-js"
-import { cn } from "@/lib/utils"
+import { cn } from "cn"
 
 const buttonVariants = cva(
   "group/button z-button inline-flex shrink-0 select-none items-center justify-center whitespace-nowrap outline-none transition-all active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0",

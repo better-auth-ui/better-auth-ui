@@ -3,7 +3,7 @@ import type { PolymorphicProps } from "@kobalte/core/polymorphic"
 import type { ComponentProps, ValidComponent } from "solid-js"
 import { mergeProps, splitProps } from "solid-js"
 
-import { cn } from "@/lib/utils"
+import { cn } from "cn"
 
 type AvatarRootProps<T extends ValidComponent = "span"> = PolymorphicProps<
   T,

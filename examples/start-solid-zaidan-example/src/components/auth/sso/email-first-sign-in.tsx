@@ -38,7 +38,7 @@ import {
 } from "@/components/ui/input-group"
 import { ssoPlugin } from "@/lib/auth/sso-plugin"
 import { useSignInContinuation } from "@/lib/auth/use-sign-in-continuation"
-import { cn } from "@/lib/utils"
+import { cn } from "cn"
 import { createAuthForm, isAuthFormFieldInvalid } from "../auth-form"
 import type { SocialLayout } from "../provider-buttons"
 import { ProviderButtons } from "../provider-buttons"

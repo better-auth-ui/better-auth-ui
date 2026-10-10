@@ -1,7 +1,7 @@
 import type { ComponentProps } from "solid-js"
 import { Show, splitProps } from "solid-js"
 import { Skeleton } from "@/components/ui/skeleton"
-import { cn } from "@/lib/utils"
+import { cn } from "cn"
 import {
   OrganizationLogo,
   type OrganizationLogoSize

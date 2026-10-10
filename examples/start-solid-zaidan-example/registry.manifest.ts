@@ -37,9 +37,8 @@ const zaidanUiDependencies = [
   "@corvu/otp-field",
   "@kobalte/core",
   "class-variance-authority",
-  "clsx",
-  "date-fns",
-  "tailwind-merge"
+  "cn",
+  "date-fns"
 ]
 
 const solidAuthDependencies = [...solidDependencies, ...zaidanUiDependencies]
@@ -113,8 +112,7 @@ const uiFile = (path: SolidRegistryFile["path"]) =>
 
 const zaidanFormSupportFiles = [
   componentFile("src/components/auth/auth-form.tsx"),
-  componentFile("src/components/auth/additional-field.tsx"),
-  libFile("src/lib/utils.ts")
+  componentFile("src/components/auth/additional-field.tsx")
 ] satisfies SolidRegistryFile[]
 
 const zaidanInteractiveSupportFiles = zaidanFormSupportFiles
@@ -654,7 +652,7 @@ const solidRegistryBaseManifest = {
       title: "Solid Auth Redirect",
       description:
         "Solid session-aware redirect view that safely continues authenticated users to a same-origin target or sends them through sign in first.",
-      dependencies: solidDependencies,
+      dependencies: [...solidDependencies, "cn"],
       files: [componentFile("src/components/auth/auth-redirect.tsx")]
     }),
     item({
@@ -663,7 +661,7 @@ const solidRegistryBaseManifest = {
       title: "Solid Sign Out",
       description:
         "Solid sign-out component that ends the session and returns to sign in.",
-      dependencies: solidDependencies,
+      dependencies: [...solidDependencies, "cn"],
       files: [componentFile("src/components/auth/sign-out.tsx")]
     }),
     item({
@@ -707,10 +705,7 @@ const solidRegistryBaseManifest = {
       type: "registry:component",
       title: "Solid User Avatar",
       description: "Solid user avatar primitive for auth account surfaces.",
-      files: [
-        componentFile("src/components/auth/user/user-avatar.tsx"),
-        libFile("src/lib/utils.ts")
-      ]
+      files: [componentFile("src/components/auth/user/user-avatar.tsx")]
     }),
     item({
       name: "user-view",
@@ -721,8 +716,7 @@ const solidRegistryBaseManifest = {
       registryDependencies: [betterAuthSolidRegistryDependency("user-avatar")],
       files: [
         componentFile("src/components/auth/user/user-view.tsx"),
-        componentFile("src/components/auth/user/user-avatar.tsx"),
-        libFile("src/lib/utils.ts")
+        componentFile("src/components/auth/user/user-avatar.tsx")
       ]
     }),
     item({
@@ -1184,8 +1178,7 @@ const solidRegistryBaseManifest = {
         componentFile("src/components/auth/theme/appearance.tsx"),
         componentFile("src/components/auth/theme/theme-toggle-item.tsx"),
         componentFile("src/components/auth/theme/theme-plugin-state.ts"),
-        libFile("src/lib/theme.ts"),
-        libFile("src/lib/utils.ts")
+        libFile("src/lib/theme.ts")
       ]
     })
   ]

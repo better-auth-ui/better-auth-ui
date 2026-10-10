@@ -28,7 +28,7 @@ import {
   SelectValue
 } from "@/components/ui/select"
 import { apiKeyPlugin } from "@/lib/auth/api-key-plugin"
-import { cn } from "@/lib/utils"
+import { cn } from "cn"
 import { useServerTableState } from "../server-table-state"
 import { ApiKey } from "./api-key"
 import { ApiKeySkeleton } from "./api-key-skeleton"

@@ -9,7 +9,7 @@ import { useSyncExternalStore } from "react"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Button } from "@/components/ui/button"
 import { Spinner } from "@/components/ui/spinner"
-import { cn } from "@/lib/utils"
+import { cn } from "cn"
 
 const subscribeToLocation = () => () => undefined
 

@@ -1,4 +1,4 @@
-import { cn } from "@/lib/utils"
+import { cn } from "cn"
 
 interface ComponentPreviewContainerProps extends React.HTMLAttributes<HTMLDivElement> {
   align?: "center" | "start" | "end"

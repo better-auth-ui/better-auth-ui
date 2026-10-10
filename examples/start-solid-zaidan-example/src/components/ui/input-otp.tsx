@@ -2,7 +2,7 @@ import OtpField, { type RootProps as OtpFieldRootProps } from "@corvu/otp-field"
 import { Minus } from "lucide-solid"
 import { type ComponentProps, Show, splitProps } from "solid-js"
 
-import { cn } from "@/lib/utils"
+import { cn } from "cn"
 
 type InputOTPProps = OtpFieldRootProps &
   ComponentProps<"div"> &

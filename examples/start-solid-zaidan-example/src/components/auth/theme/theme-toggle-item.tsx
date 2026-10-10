@@ -8,7 +8,7 @@ import {
 import { DropdownMenuItem } from "@/components/ui/dropdown-menu"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { applyThemePreference, isThemeMode, type ThemeMode } from "@/lib/theme"
-import { cn } from "@/lib/utils"
+import { cn } from "cn"
 
 export type ThemeToggleItemProps = {
   class?: string

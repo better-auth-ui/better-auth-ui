@@ -49,7 +49,7 @@ import {
 import { phoneNumberPlugin } from "@/lib/auth/phone-number-plugin"
 import { useResendCooldown } from "@/lib/auth/use-resend-cooldown"
 import { useSignInContinuation } from "@/lib/auth/use-sign-in-continuation"
-import { cn } from "@/lib/utils"
+import { cn } from "cn"
 import { runAuthFormAction, submitAuthForm, useAuthForm } from "../auth-form"
 import { OtpField } from "../otp-field"
 import { ProviderButtons, type SocialLayout } from "../provider-buttons"

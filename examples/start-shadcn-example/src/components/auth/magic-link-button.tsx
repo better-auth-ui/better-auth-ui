@@ -7,7 +7,7 @@ import { Lock, Mail } from "lucide-react"
 
 import { buttonVariants } from "@/components/ui/button"
 import { magicLinkPlugin } from "@/lib/auth/magic-link-plugin"
-import { cn } from "@/lib/utils"
+import { cn } from "cn"
 
 export type MagicLinkButtonProps = {
   /** @remarks `AuthView` */

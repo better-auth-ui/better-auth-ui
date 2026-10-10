@@ -3,7 +3,7 @@
 import { getOrganizationCardKey, useAuth } from "@better-auth-ui/react"
 import type { ComponentProps } from "react"
 
-import { cn } from "@/lib/utils"
+import { cn } from "cn"
 import { OrganizationDangerZone } from "./organization-danger-zone"
 import { OrganizationProfile } from "./organization-profile"
 

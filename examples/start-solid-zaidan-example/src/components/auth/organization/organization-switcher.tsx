@@ -27,7 +27,7 @@ import {
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu"
 import { organizationPlugin } from "@/lib/auth/organization-plugin"
-import { cn } from "@/lib/utils"
+import { cn } from "cn"
 import { CreateOrganizationDialog } from "./create-organization-dialog"
 import { createOrganizationPath } from "./organization-path"
 import { OrganizationView } from "./organization-view"

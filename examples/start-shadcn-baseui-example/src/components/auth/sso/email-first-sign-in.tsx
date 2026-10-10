@@ -53,7 +53,7 @@ import {
 } from "@/components/ui/input-group"
 import { ssoPlugin } from "@/lib/auth/sso-plugin"
 import { useSignInContinuation } from "@/lib/auth/use-sign-in-continuation"
-import { cn } from "@/lib/utils"
+import { cn } from "cn"
 import { isAuthFormFieldInvalid, useAuthForm } from "../auth-form"
 import { ProviderButtons } from "../provider-buttons"
 import { ReauthenticationNotice } from "../reauthentication"

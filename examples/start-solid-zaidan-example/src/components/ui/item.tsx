@@ -8,7 +8,7 @@ import {
 } from "solid-js"
 import { Dynamic } from "solid-js/web"
 import { Separator, type SeparatorProps } from "@/components/ui/separator"
-import { cn } from "@/lib/utils"
+import { cn } from "cn"
 
 type ItemVariant = "default" | "outline" | "muted"
 type ItemSize = "default" | "sm" | "xs"

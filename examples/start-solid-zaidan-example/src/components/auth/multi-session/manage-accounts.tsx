@@ -20,7 +20,7 @@ import { resolveUserLabel } from "@/components/auth/settings/shared/helpers"
 import type { DeviceSession } from "@/components/auth/settings/shared/types"
 import { Card, CardContent } from "@/components/ui/card"
 import { ItemGroup, ItemSeparator } from "@/components/ui/item"
-import { cn } from "@/lib/utils"
+import { cn } from "cn"
 
 export type ManageAccountsProps = {
   class?: string

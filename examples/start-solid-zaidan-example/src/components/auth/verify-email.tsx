@@ -8,7 +8,7 @@ import { isServer } from "solid-js/web"
 import { toast } from "solid-sonner"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { cn } from "@/lib/utils"
+import { cn } from "cn"
 import { OpenEmailButton } from "./open-email-button"
 
 export type VerifyEmailProps = {

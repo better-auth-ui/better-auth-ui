@@ -2,7 +2,7 @@ import { getAuthRedirectAction } from "@better-auth-ui/core"
 import { useAuth, useSession } from "@better-auth-ui/solid"
 import { createEffect } from "solid-js"
 import { Spinner } from "@/components/ui/spinner"
-import { cn } from "@/lib/utils"
+import { cn } from "cn"
 
 export type AuthRedirectProps = {
   class?: string

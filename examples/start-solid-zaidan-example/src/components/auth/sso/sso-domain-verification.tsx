@@ -33,7 +33,7 @@ import {
 } from "@/components/ui/input-group"
 import { Spinner } from "@/components/ui/spinner"
 import { ssoPlugin } from "@/lib/auth/sso-plugin"
-import { cn } from "@/lib/utils"
+import { cn } from "cn"
 import { createAuthForm, setAuthFormServerError } from "../auth-form"
 
 export type SsoDomainVerificationProps = {

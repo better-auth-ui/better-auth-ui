@@ -9,7 +9,7 @@ import {
   InputOTPGroup,
   InputOTPSlot
 } from "@/components/ui/input-otp"
-import { cn } from "@/lib/utils"
+import { cn } from "cn"
 
 export type OtpFieldProps = {
   /** Visible label rendered above the slots. */

@@ -1,0 +1,27 @@
+name: Documentation correction
+description: Report an inaccurate or missing instruction.
+body:
+  - type: markdown
+    attributes:
+      value:
+        For setup questions, read [the support guide](https://github.com/better-auth-ui/better-auth-ui/blob/main/SUPPORT.md).
+        Remove secrets and private data from reports.
+  - type: input
+    id: location
+    attributes:
+      label: Page or file
+      description: Link the page or source file that needs a correction.
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem with the documentation
+      description: Describe the inaccurate, missing, or unclear information.
+    validations:
+      required: true
+  - type: textarea
+    id: correction
+    attributes:
+      label: Suggested correction
+      description: Include the relevant version and a source or example that supports the correction.

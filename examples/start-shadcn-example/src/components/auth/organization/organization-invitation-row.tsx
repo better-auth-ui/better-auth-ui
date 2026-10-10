@@ -20,7 +20,7 @@ import { Button } from "@/components/ui/button"
 import { Spinner } from "@/components/ui/spinner"
 import { TableCell, TableRow } from "@/components/ui/table"
 import { organizationPlugin } from "@/lib/auth/organization-plugin"
-import { cn } from "@/lib/utils"
+import { cn } from "cn"
 import { OrganizationInvitationRowSkeleton } from "./organization-invitation-row-skeleton"
 import {
   type OrganizationSelectableRow,

@@ -7,7 +7,7 @@ import { Lock, Smartphone } from "lucide-react"
 
 import { buttonVariants } from "@/components/ui/button"
 import { phoneNumberPlugin } from "@/lib/auth/phone-number-plugin"
-import { cn } from "@/lib/utils"
+import { cn } from "cn"
 
 export type PhoneNumberButtonProps = {
   /** @remarks `AuthView` */

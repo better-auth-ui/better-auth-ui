@@ -1,4 +1,4 @@
-import { cn } from "@/lib/utils"
+import { cn } from "cn"
 import { OrganizationInvitations } from "./organization-invitations"
 import { OrganizationMembers } from "./organization-members"
 

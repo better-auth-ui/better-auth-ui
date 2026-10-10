@@ -3,7 +3,7 @@ import type { ComponentProps, JSX } from "solid-js"
 import { createMemo, For, Show, splitProps } from "solid-js"
 import { Label } from "@/components/ui/label"
 import { Separator } from "@/components/ui/separator"
-import { cn } from "@/lib/utils"
+import { cn } from "cn"
 
 type FieldSetProps = ComponentProps<"fieldset"> & {
   class?: string | undefined

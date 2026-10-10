@@ -28,7 +28,7 @@ import {
   InputGroupInput
 } from "@/components/ui/input-group"
 import { Skeleton } from "@/components/ui/skeleton"
-import { cn } from "@/lib/utils"
+import { cn } from "cn"
 import { createAuthForm, isAuthFormFieldInvalid } from "../../auth-form"
 
 function ChangePasswordSkeletonInput() {

@@ -7,7 +7,7 @@ import {
   type ValidComponent
 } from "solid-js"
 
-import { cn } from "@/lib/utils"
+import { cn } from "cn"
 
 type SwitchProps<T extends ValidComponent = "div"> = PolymorphicProps<
   T,

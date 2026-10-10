@@ -32,7 +32,7 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Spinner } from "@/components/ui/spinner"
 import { agentAuthPlugin } from "@/lib/auth/agent-auth-plugin"
-import { cn } from "@/lib/utils"
+import { cn } from "cn"
 
 type ApprovalResult = "approved" | "denied"
 

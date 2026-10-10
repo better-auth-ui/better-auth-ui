@@ -1,7 +1,7 @@
 import { useLastLoginMethod } from "@better-auth-ui/solid"
 import { Show } from "solid-js"
 import { Badge } from "@/components/ui/badge"
-import { cn } from "@/lib/utils"
+import { cn } from "cn"
 
 export type LastUsedBadgeProps = {
   /** Login method IDs that should display the indicator. */

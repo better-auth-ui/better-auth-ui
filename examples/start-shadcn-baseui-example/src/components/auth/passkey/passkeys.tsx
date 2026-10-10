@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { ItemGroup, ItemSeparator } from "@/components/ui/item"
 import { passkeyPlugin } from "@/lib/auth/passkey-plugin"
-import { cn } from "@/lib/utils"
+import { cn } from "cn"
 
 import { AddPasskeyDialog } from "./add-passkey-dialog"
 import { Passkey } from "./passkey"

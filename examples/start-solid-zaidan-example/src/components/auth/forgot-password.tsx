@@ -11,7 +11,7 @@ import { RESET_LINK_SENT_STORAGE_KEY } from "@/components/auth/reset-link-sent"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Field, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
-import { cn } from "@/lib/utils"
+import { cn } from "cn"
 import { createAuthForm, isAuthFormFieldInvalid } from "./auth-form"
 
 export type ForgotPasswordProps = {

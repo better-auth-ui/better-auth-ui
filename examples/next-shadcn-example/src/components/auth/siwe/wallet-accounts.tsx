@@ -31,7 +31,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Spinner } from "@/components/ui/spinner"
 import { siwePlugin } from "@/lib/auth/siwe-plugin"
-import { cn } from "@/lib/utils"
+import { cn } from "cn"
 
 const shortAddress = (address: string) =>
   address.length > 14 ? `${address.slice(0, 8)}…${address.slice(-6)}` : address

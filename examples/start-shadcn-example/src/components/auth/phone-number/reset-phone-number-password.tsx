@@ -29,7 +29,7 @@ import {
   InputGroupInput
 } from "@/components/ui/input-group"
 import { phoneNumberPlugin } from "@/lib/auth/phone-number-plugin"
-import { cn } from "@/lib/utils"
+import { cn } from "cn"
 import {
   isAuthFormFieldInvalid,
   setAuthFormServerError,

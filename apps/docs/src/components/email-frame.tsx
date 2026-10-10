@@ -1,6 +1,6 @@
 import { useTheme } from "fumadocs-ui/provider/base"
 import { useEffect, useMemo, useState } from "react"
-import { cn } from "@/lib/utils"
+import { cn } from "cn"
 
 interface EmailFrameProps {
   title: string

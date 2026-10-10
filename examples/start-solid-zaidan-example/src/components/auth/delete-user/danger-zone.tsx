@@ -1,5 +1,5 @@
 import { useAuth } from "@better-auth-ui/solid"
-import { cn } from "@/lib/utils"
+import { cn } from "cn"
 import { DeleteAccount } from "./delete-account"
 
 const defaultDangerZoneTitle = "Danger zone"

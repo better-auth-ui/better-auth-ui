@@ -19,7 +19,7 @@ import {
 } from "@/components/ui/empty"
 import { Skeleton } from "@/components/ui/skeleton"
 import { twoFactorPlugin } from "@/lib/auth/two-factor-plugin"
-import { cn } from "@/lib/utils"
+import { cn } from "cn"
 
 export type TwoFactorSettingsProps = {
   class?: string

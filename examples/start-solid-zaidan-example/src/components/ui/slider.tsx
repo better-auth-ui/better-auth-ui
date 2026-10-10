@@ -16,7 +16,7 @@ import {
   untrack,
   type ValidComponent
 } from "solid-js"
-import { cn } from "@/lib/utils"
+import { cn } from "cn"
 
 type SliderProps<T extends ValidComponent = "div"> = PolymorphicProps<
   T,

@@ -39,7 +39,7 @@ import {
 } from "@/components/ui/input-group"
 import { useSignInContinuation } from "@/lib/auth/use-sign-in-continuation"
 import { usernamePlugin } from "@/lib/auth/username-plugin"
-import { cn } from "@/lib/utils"
+import { cn } from "cn"
 import { isAuthFormFieldInvalid, useAuthForm } from "../auth-form"
 import { LastUsedBadge } from "../last-login-method/last-used-badge"
 import { ReauthenticationNotice } from "../reauthentication"

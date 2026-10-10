@@ -20,7 +20,7 @@ import {
 } from "@/components/ui/card"
 import { Spinner } from "@/components/ui/spinner"
 import { oauthProviderPlugin } from "@/lib/auth/oauth-provider-plugin"
-import { cn } from "@/lib/utils"
+import { cn } from "cn"
 import type { SocialLayout } from "../provider-buttons"
 import { SignUp } from "../sign-up"
 

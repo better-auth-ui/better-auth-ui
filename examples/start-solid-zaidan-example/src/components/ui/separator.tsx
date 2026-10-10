@@ -10,7 +10,7 @@ import {
   type ValidComponent
 } from "solid-js"
 
-import { cn } from "@/lib/utils"
+import { cn } from "cn"
 
 type SeparatorProps<T extends ValidComponent = "hr"> = PolymorphicProps<
   T,

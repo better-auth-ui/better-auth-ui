@@ -53,7 +53,7 @@ import {
 } from "@/components/ui/select"
 import { Spinner } from "@/components/ui/spinner"
 import { billingPlugin } from "@/lib/auth/billing-plugin"
-import { cn } from "@/lib/utils"
+import { cn } from "cn"
 
 type SubscriptionAction = "cancel" | "restore"
 

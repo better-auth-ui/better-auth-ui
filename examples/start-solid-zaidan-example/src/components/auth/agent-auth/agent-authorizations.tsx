@@ -27,7 +27,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Spinner } from "@/components/ui/spinner"
 import { agentAuthPlugin } from "@/lib/auth/agent-auth-plugin"
-import { cn } from "@/lib/utils"
+import { cn } from "cn"
 
 type RevokeTarget = {
   agent: AgentAuthorization

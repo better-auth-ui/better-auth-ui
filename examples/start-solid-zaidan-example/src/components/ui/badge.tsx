@@ -2,7 +2,7 @@ import { type BadgeRootProps, Root } from "@kobalte/core/badge"
 import type { PolymorphicProps } from "@kobalte/core/polymorphic"
 import { cva, type VariantProps } from "class-variance-authority"
 import { splitProps, type ValidComponent } from "solid-js"
-import { cn } from "@/lib/utils"
+import { cn } from "cn"
 
 const badgeVariants = cva(
   "group/badge z-badge inline-flex w-fit shrink-0 items-center justify-center overflow-hidden whitespace-nowrap transition-colors focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 [&>svg]:pointer-events-none",

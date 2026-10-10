@@ -12,7 +12,7 @@ import {
   ItemSeparator
 } from "@/components/ui/item"
 import { Skeleton } from "@/components/ui/skeleton"
-import { cn } from "@/lib/utils"
+import { cn } from "cn"
 import { ReauthenticationAction } from "../../reauthentication"
 import { ActiveSession } from "./active-session"
 import { SessionActions } from "./session-actions"

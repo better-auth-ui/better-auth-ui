@@ -27,7 +27,7 @@ import { Separator } from "@/components/ui/separator"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Spinner } from "@/components/ui/spinner"
 import { oauthProviderPlugin } from "@/lib/auth/oauth-provider-plugin"
-import { cn } from "@/lib/utils"
+import { cn } from "cn"
 import { UserAvatar } from "../user/user-avatar"
 
 export type OAuthConsentProps = {

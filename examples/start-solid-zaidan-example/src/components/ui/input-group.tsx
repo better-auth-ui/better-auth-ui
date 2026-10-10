@@ -3,7 +3,7 @@ import { type ComponentProps, type JSX, splitProps } from "solid-js"
 import { Button, type ButtonProps } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
-import { cn } from "@/lib/utils"
+import { cn } from "cn"
 
 type InputGroupProps = ComponentProps<"div">
 

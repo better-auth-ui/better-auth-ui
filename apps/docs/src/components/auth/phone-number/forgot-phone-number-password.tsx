@@ -11,7 +11,7 @@ import { useRequestPhoneNumberPasswordReset } from "@better-auth-ui/react/plugin
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { FieldDescription, FieldGroup } from "@/components/ui/field"
 import { phoneNumberPlugin } from "@/lib/auth/phone-number-plugin"
-import { cn } from "@/lib/utils"
+import { cn } from "cn"
 import { useAuthForm } from "../auth-form"
 import { InternationalPhoneField } from "./international-phone-field"
 

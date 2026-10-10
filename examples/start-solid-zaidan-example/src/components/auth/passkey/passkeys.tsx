@@ -12,7 +12,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Dialog, DialogTrigger } from "@/components/ui/dialog"
 import { ItemGroup, ItemSeparator } from "@/components/ui/item"
-import { cn } from "@/lib/utils"
+import { cn } from "cn"
 
 export type PasskeysSettingsProps = {
   class?: string

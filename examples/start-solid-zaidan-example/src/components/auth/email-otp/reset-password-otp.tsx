@@ -25,7 +25,7 @@ import {
 } from "@/components/ui/card"
 import { FieldGroup } from "@/components/ui/field"
 import { emailOtpPlugin } from "@/lib/auth/email-otp-plugin"
-import { cn } from "@/lib/utils"
+import { cn } from "cn"
 import {
   createAuthForm,
   setAuthFormServerError,

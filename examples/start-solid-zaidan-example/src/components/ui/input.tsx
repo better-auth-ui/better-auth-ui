@@ -1,5 +1,5 @@
 import { type ComponentProps, splitProps } from "solid-js"
-import { cn } from "@/lib/utils"
+import { cn } from "cn"
 
 type InputProps = ComponentProps<"input">
 
