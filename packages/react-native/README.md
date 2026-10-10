@@ -6,6 +6,7 @@ This package is an incomplete native port. It includes seven plugin UI surfaces 
 The current web implementations expose 21 plugin UI surfaces. React Native lacks 14 of them, plus 19 capability groups described below.
 
 [Read the feature parity assessment](#feature-parity) before choosing this package for a production app.
+The [full parity checklist](./PARITY.md) tracks implementation and native validation after PR #446.
 
 ## Zero styling setup
 
