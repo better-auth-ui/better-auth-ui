@@ -1,3 +1,4 @@
+import { memberRoleLabels } from "@better-auth-ui/core/plugins/organization"
 import type { OrganizationAuthClient } from "@better-auth-ui/core/plugins/organization"
 import { useAuth, useAuthPlugin, useSession } from "@better-auth-ui/react"
 import {
@@ -93,7 +94,7 @@ export function OrganizationView({
 
           {!hideRole && !!membership && (
             <Chip className="shrink-0 -my-0.5">
-              {roles?.[membership.role] ?? membership.role}
+              {memberRoleLabels(membership.role, roles).join(", ")}
             </Chip>
           )}
         </Box>

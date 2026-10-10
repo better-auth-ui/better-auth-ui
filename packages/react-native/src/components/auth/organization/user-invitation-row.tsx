@@ -1,3 +1,4 @@
+import { memberRoleLabels } from "@better-auth-ui/core/plugins/organization"
 import type { OrganizationAuthClient } from "@better-auth-ui/core/plugins/organization"
 import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
 import {
@@ -7,7 +8,7 @@ import {
 import type { Invitation } from "better-auth/client"
 
 import { organizationPlugin } from "../../../lib/auth/organization-plugin"
-import { formatDateTime } from "../../../lib/format-date"
+import { useFormatDateTime } from "../../../lib/format-date"
 import { useThemeColors } from "../../../lib/theme-colors"
 import { Button } from "../../../primitives/button"
 import { Box, Txt } from "../../../primitives/styled"
@@ -28,6 +29,8 @@ export type UserInvitationRowProps = {
  * `Spinner` alongside the icon.
  */
 export function UserInvitationRow({ invitation }: UserInvitationRowProps) {
+  const formatDateTime = useFormatDateTime()
+
   const { authClient } = useAuth()
   const { localization: organizationLocalization, roles } =
     useAuthPlugin(organizationPlugin)
@@ -39,6 +42,9 @@ export function UserInvitationRow({ invitation }: UserInvitationRowProps) {
   const { mutate: rejectInvitation, isPending: isRejecting } =
     useRejectInvitation(authClient as OrganizationAuthClient)
 
+  const unavailable =
+    invitation.status !== "pending" ||
+    new Date(invitation.expiresAt).getTime() <= Date.now()
   return (
     <Box className="flex-row items-center gap-3">
       <Box className="h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-surface-secondary">
@@ -54,7 +60,7 @@ export function UserInvitationRow({ invitation }: UserInvitationRowProps) {
             {invitation.organizationName}
           </Txt>
 
-          <Chip>{roles?.[invitation.role] ?? invitation.role}</Chip>
+          <Chip>{memberRoleLabels(invitation.role, roles).join(", ")}</Chip>
         </Box>
 
         <Txt numberOfLines={1} className="text-xs text-muted">
@@ -67,7 +73,7 @@ export function UserInvitationRow({ invitation }: UserInvitationRowProps) {
           variant="outline"
           size="sm"
           isPending={isAccepting}
-          isDisabled={isRejecting}
+          isDisabled={isRejecting || unavailable}
           onPress={() =>
             acceptInvitation({
               invitationId: invitation.id
@@ -83,7 +89,7 @@ export function UserInvitationRow({ invitation }: UserInvitationRowProps) {
           size="sm"
           isIconOnly
           isPending={isRejecting}
-          isDisabled={isAccepting}
+          isDisabled={isAccepting || unavailable}
           onPress={() =>
             rejectInvitation({
               invitationId: invitation.id

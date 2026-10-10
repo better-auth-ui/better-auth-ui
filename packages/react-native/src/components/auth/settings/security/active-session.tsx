@@ -1,3 +1,4 @@
+import { useNativeLocale } from "../../../../lib/native-locale"
 import { useAuth, useRevokeSession, useSession } from "@better-auth-ui/react"
 import type { Session } from "better-auth"
 import { useAuthNavigation } from "../../../../navigation/navigation-context"
@@ -13,9 +14,9 @@ import {
   Xmark
 } from "../../../../primitives/ui-icons"
 
-function timeAgo(date: Date) {
+function timeAgo(date: Date, languageTag?: string) {
   const seconds = Math.floor((Date.now() - date.getTime()) / 1000)
-  const rtf = new Intl.RelativeTimeFormat(undefined, { numeric: "auto" })
+  const rtf = new Intl.RelativeTimeFormat(languageTag, { numeric: "auto" })
 
   const UNITS: [Intl.RelativeTimeFormatUnit, number][] = [
     ["year", 31536000],
@@ -93,6 +94,7 @@ export type ActiveSessionProps = {
  * goes through the adapter.
  */
 export function ActiveSession({ activeSession }: ActiveSessionProps) {
+  const { languageTag } = useNativeLocale()
   const { authClient, localization } = useAuth()
   const { data: session } = useSession(authClient, { refetchOnMount: false })
 
@@ -133,7 +135,7 @@ export function ActiveSession({ activeSession }: ActiveSessionProps) {
         ) : (
           activeSession.createdAt && (
             <Txt className="text-xs capitalize text-muted">
-              {timeAgo(activeSession.createdAt)}
+              {timeAgo(new Date(activeSession.createdAt), languageTag)}
             </Txt>
           )
         )}

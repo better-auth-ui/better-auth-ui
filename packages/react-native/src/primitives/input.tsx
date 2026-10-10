@@ -1,3 +1,4 @@
+import { useNativeLocale } from "../lib/native-locale"
 import type { ReactNode } from "react"
 import { TextInput, type TextInputProps } from "react-native"
 import { cn } from "../lib/cn"
@@ -9,13 +10,15 @@ import { Box } from "./styled"
 export type InputVariant = "primary" | "secondary"
 
 function keyboardFor(type: FieldType): TextInputProps["keyboardType"] {
-  return type === "email" ? "email-address" : "default"
+  return type === "email" ? "email-address" : type === "url" ? "url" : "default"
 }
 
 function autoCompleteFor(value?: string): TextInputProps["autoComplete"] {
   switch (value) {
     case "email":
       return "email"
+    case "one-time-code":
+      return "one-time-code"
     case "name":
       return "name"
     case "current-password":
@@ -31,6 +34,9 @@ const BASE_INPUT =
   "h-11 rounded-lg border border-border px-3 text-base text-foreground"
 
 export interface InputProps {
+  multiline?: boolean
+  numberOfLines?: number
+  autoCapitalize?: TextInputProps["autoCapitalize"]
   placeholder?: string
   required?: boolean
   variant?: InputVariant
@@ -48,32 +54,57 @@ export interface InputProps {
  * keyboard/masking derived from the field `type`).
  */
 export function Input({
+  multiline,
+  numberOfLines,
   placeholder,
   className,
   secureTextEntry,
+  autoCapitalize,
   autoComplete,
   keyboardType
 }: InputProps) {
+  const { direction } = useNativeLocale()
   const field = useField()
   const colors = useThemeColors()
   const isPassword = field.type === "password"
 
   return (
     <TextInput
+      aria-labelledby={field.labelId}
+      accessibilityLabelledBy={field.labelId}
+      accessibilityLabel={field.accessibilityLabel}
+      accessibilityHint={field.error}
+      multiline={multiline}
+      numberOfLines={numberOfLines}
+      textAlignVertical={multiline ? "top" : "center"}
       value={field.value}
       onChangeText={field.setValue}
+      onBlur={field.onBlur}
       editable={!field.isDisabled}
       placeholder={placeholder}
       placeholderTextColor={colors.muted}
-      autoCapitalize={field.type === "text" ? "sentences" : "none"}
+      autoCapitalize={
+        autoCapitalize ?? (field.type === "text" ? "sentences" : "none")
+      }
       autoCorrect={field.type === "text"}
       autoComplete={autoCompleteFor(autoComplete ?? field.autoComplete)}
       keyboardType={keyboardType ?? keyboardFor(field.type)}
       secureTextEntry={secureTextEntry ?? isPassword}
-      style={tw(
-        cn(BASE_INPUT, field.isDisabled && "opacity-50", className),
-        colors
-      )}
+      style={[
+        {
+          writingDirection: direction,
+          textAlign: direction === "rtl" ? "right" : "left"
+        },
+        tw(
+          cn(
+            BASE_INPUT,
+            multiline && "h-auto min-h-24 py-3",
+            field.isDisabled && "opacity-50",
+            className
+          ),
+          colors
+        )
+      ]}
     />
   )
 }
@@ -120,12 +151,18 @@ function InputGroupInput({
   keyboardType?: TextInputProps["keyboardType"]
   className?: string
 }) {
+  const { direction } = useNativeLocale()
   const field = useField()
   const colors = useThemeColors()
   return (
     <TextInput
+      aria-labelledby={field.labelId}
+      accessibilityLabelledBy={field.labelId}
+      accessibilityLabel={field.accessibilityLabel}
+      accessibilityHint={field.error}
       value={field.value}
       onChangeText={field.setValue}
+      onBlur={field.onBlur}
       editable={!field.isDisabled}
       placeholder={placeholder}
       placeholderTextColor={colors.muted}
@@ -133,10 +170,13 @@ function InputGroupInput({
       autoComplete={autoCompleteFor(autoComplete ?? field.autoComplete)}
       keyboardType={keyboardType}
       secureTextEntry={type === "password"}
-      style={tw(
-        cn("h-full flex-1 text-base text-foreground", className),
-        colors
-      )}
+      style={[
+        {
+          writingDirection: direction,
+          textAlign: direction === "rtl" ? "right" : "left"
+        },
+        tw(cn("h-full flex-1 text-base text-foreground", className), colors)
+      ]}
     />
   )
 }

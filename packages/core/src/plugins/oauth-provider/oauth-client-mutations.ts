@@ -25,6 +25,7 @@ export function createOAuthClientOptions(
   ownerKey?: string
 ) {
   return {
+    gcTime: 0,
     mutationKey: oauthProviderMutationKeys.createClient,
     mutationFn: (input: OAuthClientInput) => manager.create(owner, input),
     meta: awaitsClients(ownerKey)
@@ -70,6 +71,7 @@ export function rotateOAuthClientSecretOptions(
   ownerKey?: string
 ) {
   return {
+    gcTime: 0,
     mutationKey: oauthProviderMutationKeys.rotateClientSecret,
     mutationFn: (clientId: string) => manager.rotateSecret(owner, clientId),
     meta: awaitsClients(ownerKey)

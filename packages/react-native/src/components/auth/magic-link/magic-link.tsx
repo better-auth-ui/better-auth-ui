@@ -1,9 +1,17 @@
-import { authMutationKeys } from "@better-auth-ui/core"
+import { getAuthButtonKey } from "@better-auth-ui/react"
+import { LastUsedBadge } from "../last-login-method/last-used-badge"
+import {
+  authMutationKeys,
+  getAuthCallbackURL,
+  validateEmailAddress
+} from "@better-auth-ui/core"
 import type { MagicLinkAuthClient } from "@better-auth-ui/core/plugins/magic-link"
-import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
+import { AuthPrompts, useAuth, useAuthPlugin } from "@better-auth-ui/react"
 import { useSignInMagicLink } from "@better-auth-ui/react/plugins/magic-link"
 import { useIsMutating } from "@tanstack/react-query"
 import { useState } from "react"
+import { setPendingEmail } from "../../../lib/pending-email"
+import { useAuthNavigation } from "../../../navigation/navigation-context"
 import { magicLinkPlugin } from "../../../lib/auth/magic-link-plugin"
 import { cn } from "../../../lib/cn"
 import { Button } from "../../../primitives/button"
@@ -48,13 +56,15 @@ export function MagicLink({
   } = useAuth()
   const { localization: magicLinkLocalization } = useAuthPlugin(magicLinkPlugin)
 
+  const navigation = useAuthNavigation()
   const [email, setEmail] = useState("")
 
   const { mutate: signInMagicLink } = useSignInMagicLink(
     authClient as MagicLinkAuthClient,
     {
-      onSuccess: () => {
-        setEmail("")
+      onSuccess: (_data, { email: submittedEmail }) => {
+        setPendingEmail(submittedEmail, "magicLinkSent")
+        navigation.push("magicLinkSent", { params: { redirectTo } })
         toast.success(magicLinkLocalization.magicLinkSent)
       }
     }
@@ -69,7 +79,10 @@ export function MagicLink({
   const isPending = signInMutating + signUpMutating > 0
 
   const handleSubmit = () => {
-    signInMagicLink({ email, callbackURL: `${baseURL}${redirectTo}` })
+    signInMagicLink({
+      email: email.trim(),
+      callbackURL: getAuthCallbackURL(baseURL, redirectTo)
+    })
   }
 
   const showSeparator = !!socialProviders?.length
@@ -77,6 +90,7 @@ export function MagicLink({
 
   return (
     <Card className={cn("w-full max-w-sm gap-4", className)} variant={variant}>
+      <AuthPrompts view="magicLink" />
       <Card.Header>
         <Card.Title className="mb-1">{localization.auth.signIn}</Card.Title>
       </Card.Header>
@@ -102,6 +116,12 @@ export function MagicLink({
             isDisabled={isPending}
             value={email}
             onChange={setEmail}
+            validate={(value) =>
+              validateEmailAddress(value, {
+                requiredMessage: localization.auth.fieldRequired,
+                invalidMessage: localization.auth.invalidEmail
+              })?.message
+            }
           >
             <Label>{localization.auth.email}</Label>
 
@@ -117,12 +137,13 @@ export function MagicLink({
           <Box className="gap-3">
             <Button type="submit" className="w-full" isPending={isPending}>
               {magicLinkLocalization.sendMagicLink}
+              <LastUsedBadge method="magic-link" />
             </Button>
 
             {plugins.flatMap((plugin) =>
-              (plugin.authButtons ?? []).map((AuthButton, index) => (
+              (plugin.authButtons ?? []).map((AuthButton) => (
                 <AuthButton
-                  key={`${plugin.id}-${index.toString()}`}
+                  key={getAuthButtonKey(plugin.id, AuthButton)}
                   view="magicLink"
                 />
               ))

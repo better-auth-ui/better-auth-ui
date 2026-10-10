@@ -210,7 +210,8 @@ export function Select({
       )}
 
       <Btn
-        accessibilityRole="button"
+        accessibilityRole="combobox"
+        accessibilityLabel={label ?? placeholder}
         accessibilityState={{ disabled: isDisabled, expanded: open }}
         disabled={isDisabled}
         onPress={() => setOpen(true)}

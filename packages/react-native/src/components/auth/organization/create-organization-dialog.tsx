@@ -1,214 +1,201 @@
-import type { OrganizationAuthClient } from "@better-auth-ui/core/plugins/organization"
+import {
+  SlugField,
+  sanitizeOrganizationSlug,
+  getSlugAvailabilityValidator
+} from "./slug-field"
+import { getFormFieldErrorMessage } from "@better-auth-ui/core"
+import {
+  getAdditionalFieldDefaultValues,
+  getAdditionalFieldSubmitValues,
+  validateStringLength
+} from "@better-auth-ui/core"
+import type {
+  OrganizationAuthClient,
+  CreateOrganizationParams
+} from "@better-auth-ui/core/plugins/organization"
 import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
 import {
-  useCheckSlug,
-  useCreateOrganization
+  useCreateOrganization,
+  useListOrganizations
 } from "@better-auth-ui/react/plugins/organization"
-import { useDebouncer } from "@tanstack/react-pacer"
-import { useEffect, useState } from "react"
-
+import { useState } from "react"
 import { organizationPlugin } from "../../../lib/auth/organization-plugin"
-import { useThemeColors } from "../../../lib/theme-colors"
 import { AlertDialog } from "../../../primitives/alert-dialog"
 import { Button } from "../../../primitives/button"
-import { FieldError, Label, TextField } from "../../../primitives/field"
-import { Form } from "../../../primitives/form"
-import { Input, InputGroup } from "../../../primitives/input"
-import { Spinner } from "../../../primitives/spinner"
-import { Txt } from "../../../primitives/styled"
-import { Briefcase, Check, Xmark } from "../../../primitives/ui-icons"
+import { Description } from "../../../primitives/description"
+import {
+  getAuthAdditionalFieldValidators,
+  useAuthForm,
+  isAuthFormFieldInvalid
+} from "../auth-form"
 
-/** Props for the {@link CreateOrganizationDialog} component. */
 export type CreateOrganizationDialogProps = {
   isOpen: boolean
   onOpenChange: (open: boolean) => void
+  hideSlug?: boolean
 }
-
-/**
- * Sanitize a slug value so it only contains lowercase alphanumeric characters
- * and dashes. Runs of disallowed characters are collapsed to a single dash,
- * mirroring the heroui `sanitizeSlug` helper from `slug-field.tsx`.
- */
-function sanitizeSlug(value: string) {
-  return value.toLowerCase().replace(/[^a-z0-9]+/g, "-")
-}
-
-/**
- * Render a dialog for creating a new organization.
- *
- * Mirrors the heroui `CreateOrganizationDialog`, adapted for React Native:
- * the dialog shell is the RN `AlertDialog` primitive (controlled `isOpen`),
- * `name`/`slug` are controlled state (no `FormData`), and the debounced slug
- * availability check (heroui's `SlugField`) is inlined here via `InputGroup`
- * since RN has no separate shared `SlugField` component yet — matching the
- * pattern already established in the RN `OrganizationProfile` port.
- *
- * @param isOpen - Whether the dialog is open
- * @param onOpenChange - Callback for when the dialog open state changes
- * @returns The create organization dialog as a JSX element
- */
 export function CreateOrganizationDialog({
   isOpen,
-  onOpenChange
+  onOpenChange,
+  hideSlug
 }: CreateOrganizationDialogProps) {
-  const { authClient, localization } = useAuth()
+  return isOpen ? (
+    <CreateOrganizationForm
+      hideSlug={hideSlug}
+      onClose={() => onOpenChange(false)}
+    />
+  ) : null
+}
+function CreateOrganizationForm({
+  hideSlug: hideSlugProp,
+  onClose
+}: {
+  hideSlug?: boolean
+  onClose: () => void
+}) {
+  const { authClient, localization: common } = useAuth()
   const {
-    localization: organizationLocalization,
-    checkSlug: checkSlugEnabled,
-    slugPrefix
+    localization,
+    additionalFields,
+    hideSlug: configuredHideSlug,
+    organizationLimit,
+    allowOrganizationCreation,
+    checkSlug
   } = useAuthPlugin(organizationPlugin)
-
-  const colors = useThemeColors()
-
-  const [name, setName] = useState("")
-  const [slug, setSlug] = useState("")
-  const [slugEdited, setSlugEdited] = useState(false)
-
-  const { mutate: createOrganization, isPending: isCreating } =
-    useCreateOrganization(authClient as OrganizationAuthClient, {
-      onSuccess: () => onOpenChange(false)
-    })
-
-  const {
-    mutate: checkSlug,
-    data: checkSlugData,
-    error: checkSlugError,
-    reset: resetCheckSlug
-  } = useCheckSlug(authClient as OrganizationAuthClient)
-
-  const debouncer = useDebouncer(
-    (value: string) => {
-      if (!checkSlugEnabled || !value.trim()) return
-      checkSlug({ slug: value.trim() })
-    },
-    { wait: 500 }
+  const organizations = useListOrganizations(
+    authClient as OrganizationAuthClient
   )
-
-  const handleSubmit = () => {
-    createOrganization({ name, slug })
-  }
-
-  useEffect(() => {
-    if (!isOpen) {
-      setSlug("")
-      setName("")
-      setSlugEdited(false)
+  const create = useCreateOrganization(authClient as OrganizationAuthClient)
+  const [editedSlug, setEditedSlug] = useState(false)
+  const hideSlug = hideSlugProp ?? configuredHideSlug
+  const atLimit =
+    organizationLimit !== undefined &&
+    (organizations.data?.length ?? 0) >= organizationLimit
+  const form = useAuthForm({
+    defaultValues: {
+      name: "",
+      slug: "",
+      additionalFields: getAdditionalFieldDefaultValues(additionalFields)
+    },
+    onSubmit: async ({ value }) => {
+      if (!allowOrganizationCreation || atLimit)
+        throw new Error(localization.organizationLimitReached)
+      await create.mutateAsync({
+        ...getAdditionalFieldSubmitValues(
+          additionalFields,
+          value.additionalFields
+        ),
+        name: value.name.trim(),
+        slug: hideSlug ? undefined : value.slug
+      } as CreateOrganizationParams)
+      onClose()
     }
-  }, [isOpen])
-
-  useEffect(() => {
-    if (slugEdited) return
-    setSlug(sanitizeSlug(name))
-  }, [name, slugEdited])
-
-  useEffect(() => {
-    if (!checkSlugEnabled) return
-
-    resetCheckSlug()
-    debouncer.maybeExecute(slug)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [checkSlugEnabled, slug, debouncer.maybeExecute, resetCheckSlug])
-
-  const isCheckingSlug = checkSlugEnabled && !!slug.trim()
-
+  })
+  const required = (value: string) =>
+    validateStringLength(value, {
+      trim: true,
+      requiredMessage: common.auth.fieldRequired
+    })
   return (
-    <AlertDialog isOpen={isOpen} onOpenChange={onOpenChange}>
-      <Form onSubmit={handleSubmit} className="gap-4">
-        <AlertDialog.CloseTrigger />
-
-        <AlertDialog.Header>
-          <AlertDialog.Icon status="default">
-            <Briefcase width={20} height={20} color={colors.foreground} />
-          </AlertDialog.Icon>
-
-          <AlertDialog.Heading>
-            {organizationLocalization.createOrganization}
-          </AlertDialog.Heading>
-        </AlertDialog.Header>
-
-        <AlertDialog.Body contentClassName="gap-4">
-          <Txt className="text-sm text-muted">
-            {organizationLocalization.organizationsDescription}
-          </Txt>
-
-          <TextField
-            name="name"
-            isDisabled={isCreating}
-            value={name}
-            onChange={setName}
-            validate={(value) => {
-              if (!value) return localization.auth.fieldRequired
-            }}
-          >
-            <Label>{organizationLocalization.name}</Label>
-
-            <Input
-              placeholder={organizationLocalization.namePlaceholder}
-              variant="secondary"
-              required
-            />
-
-            <FieldError />
-          </TextField>
-
-          <TextField
-            name="slug"
-            isDisabled={isCreating}
-            value={slug}
-            onChange={(value) => {
-              setSlug(sanitizeSlug(value))
-              setSlugEdited(true)
-            }}
-            validate={(value) => {
-              if (!value) return localization.auth.fieldRequired
-            }}
-          >
-            <Label>{organizationLocalization.slug}</Label>
-
-            <InputGroup variant="secondary">
-              {slugPrefix && (
-                <InputGroup.Prefix>
-                  <Txt className="text-muted">{slugPrefix}</Txt>
-                </InputGroup.Prefix>
+    <AlertDialog
+      isOpen
+      onOpenChange={(open) => {
+        if (!open && !create.isPending) onClose()
+      }}
+    >
+      <AlertDialog.Header>
+        <AlertDialog.Heading>
+          {localization.createOrganization}
+        </AlertDialog.Heading>
+      </AlertDialog.Header>
+      <AlertDialog.Body>
+        <form.AppForm>
+          <form.AuthFormRoot className="gap-4">
+            <form.AppField
+              name="name"
+              validators={{ onChange: ({ value }) => required(value) }}
+              listeners={{
+                onChange: ({ value }) => {
+                  if (!editedSlug)
+                    form.setFieldValue("slug", sanitizeOrganizationSlug(value))
+                }
+              }}
+            >
+              {(field) => (
+                <field.AuthFormTextField
+                  label={localization.name}
+                  isDisabled={create.isPending}
+                />
               )}
-
-              <InputGroup.Input
-                placeholder={organizationLocalization.slugPlaceholder}
-                required
-              />
-
-              {isCheckingSlug && (
-                <InputGroup.Suffix>
-                  {checkSlugData?.status ? (
-                    <Check width={16} height={16} color={colors.accent} />
-                  ) : checkSlugError ? (
-                    <Xmark width={16} height={16} color={colors.danger} />
-                  ) : (
-                    <Spinner size="sm" />
-                  )}
-                </InputGroup.Suffix>
-              )}
-            </InputGroup>
-
-            <FieldError />
-          </TextField>
-        </AlertDialog.Body>
-
-        <AlertDialog.Footer>
-          <Button
-            variant="tertiary"
-            isDisabled={isCreating}
-            onPress={() => onOpenChange(false)}
-          >
-            {localization.settings.cancel}
-          </Button>
-
-          <Button type="submit" isPending={isCreating}>
-            {isCreating && <Spinner color="current" size="sm" />}
-            {organizationLocalization.createOrganization}
-          </Button>
-        </AlertDialog.Footer>
-      </Form>
+            </form.AppField>
+            {!hideSlug ? (
+              <form.AppField
+                name="slug"
+                validators={{
+                  onChange: ({ value }) => required(value),
+                  onChangeAsync: getSlugAvailabilityValidator(
+                    authClient as OrganizationAuthClient,
+                    checkSlug
+                  ),
+                  onChangeAsyncDebounceMs: 500
+                }}
+              >
+                {(field) => (
+                  <SlugField
+                    value={field.state.value}
+                    onChange={(value) => {
+                      setEditedSlug(true)
+                      field.handleChange(value)
+                    }}
+                    onBlur={field.handleBlur}
+                    error={
+                      isAuthFormFieldInvalid(field.state.meta)
+                        ? getFormFieldErrorMessage(field.state.meta.errors)
+                        : undefined
+                    }
+                    isDisabled={create.isPending}
+                  />
+                )}
+              </form.AppField>
+            ) : null}
+            {additionalFields.map((configured) => (
+              <form.AppField
+                key={configured.name}
+                name={`additionalFields.${configured.name}`}
+                validators={getAuthAdditionalFieldValidators(
+                  configured,
+                  common.auth.fieldRequired
+                )}
+              >
+                {(field) => (
+                  <field.AuthFormAdditionalField
+                    field={configured}
+                    isPending={create.isPending}
+                  />
+                )}
+              </form.AppField>
+            ))}
+            {atLimit ? (
+              <Description>{localization.organizationLimitReached}</Description>
+            ) : null}
+            <AlertDialog.Footer>
+              <Button isDisabled={create.isPending} onPress={onClose}>
+                {common.settings.cancel}
+              </Button>
+              <form.AuthFormSubmitButton
+                isPending={create.isPending}
+                isDisabled={
+                  !allowOrganizationCreation ||
+                  atLimit ||
+                  (organizationLimit !== undefined && organizations.isPending)
+                }
+              >
+                {localization.createOrganization}
+              </form.AuthFormSubmitButton>
+            </AlertDialog.Footer>
+          </form.AuthFormRoot>
+        </form.AppForm>
+      </AlertDialog.Body>
     </AlertDialog>
   )
 }

@@ -1,117 +1,162 @@
-import type { OrganizationAuthClient } from "@better-auth-ui/core/plugins/organization"
+import {
+  memberRoleLabels,
+  type InviteMemberParams,
+  type OrganizationAuthClient
+} from "@better-auth-ui/core/plugins/organization"
 import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
 import {
   useCancelInvitation,
+  useInviteMember,
   useHasPermission
 } from "@better-auth-ui/react/plugins/organization"
 import type { Invitation } from "better-auth/client"
-
+import { useState } from "react"
 import { organizationPlugin } from "../../../lib/auth/organization-plugin"
-import { formatDateTime } from "../../../lib/format-date"
-import { useThemeColors } from "../../../lib/theme-colors"
+import { useFormatDateTime } from "../../../lib/format-date"
+import { useResendCooldown } from "../../../lib/auth/use-resend-cooldown"
+import { AlertDialog } from "../../../primitives/alert-dialog"
 import { Button } from "../../../primitives/button"
 import { Skeleton } from "../../../primitives/skeleton"
-import { Spinner } from "../../../primitives/spinner"
 import { Box, Txt } from "../../../primitives/styled"
 import { Chip } from "../../../primitives/tabs"
-import { Xmark } from "../../../primitives/ui-icons"
-
+import { AdditionalField } from "../additional-field"
+import type { AdditionalFieldFormValue } from "@better-auth-ui/core"
+import { useOrganizationRoleLabels } from "./role-picker"
 export type OrganizationInvitationRowProps = {
   invitation: Invitation
+  visibleFields?: readonly string[]
 }
-
-/** Placeholder row matching {@link OrganizationInvitationRow} while invitations load. */
-function OrganizationInvitationRowSkeleton() {
-  return (
-    <Box className="flex-row items-center justify-between gap-2 px-4 py-3">
-      <Box className="min-w-0 flex-1 gap-1.5">
-        <Skeleton className="h-4 w-48 rounded-lg" />
-        <Skeleton className="h-3 w-36 rounded-lg" />
-      </Box>
-
-      <Skeleton className="h-5 w-14 rounded-full" />
-    </Box>
-  )
-}
-
-/**
- * Single organization-scoped invitation row: email + created-at/role
- * subtitle, a status `Chip`, and a per-row cancel action. Mirrors the heroui
- * `OrganizationInvitationTableRow`, adapted for React Native: the `Table.Row`/
- * `Table.Cell` grid becomes a horizontally laid-out `View` row (no table
- * primitive on RN), the `Chip` uses the RN color-variant primitive, and the
- * cancel button renders the RN `Spinner`/icon pair instead of the heroui
- * `isIconOnly` button icon swap.
- */
 export function OrganizationInvitationRow({
-  invitation
+  invitation,
+  visibleFields
 }: OrganizationInvitationRowProps) {
-  const { authClient } = useAuth()
-  const { localization: organizationLocalization, roles } =
-    useAuthPlugin(organizationPlugin)
-  const colors = useThemeColors()
-
-  const {
-    data: cancelInvitationPermission,
-    isPending: cancelPermissionPending
-  } = useHasPermission(authClient as OrganizationAuthClient, {
+  const { authClient, localization: common } = useAuth()
+  const { localization, modelFields } = useAuthPlugin(organizationPlugin)
+  const roles = useOrganizationRoleLabels(invitation.organizationId)
+  const format = useFormatDateTime()
+  const client = authClient as OrganizationAuthClient
+  const cancelPermission = useHasPermission(client, {
+    organizationId: invitation.organizationId,
     permissions: { invitation: ["cancel"] }
   })
-
-  const { mutate: cancelInvitation, isPending: cancelPending } =
-    useCancelInvitation(authClient as OrganizationAuthClient)
-
-  const roleLabel = roles?.[invitation.role] ?? invitation.role
-
-  const statusLabel =
-    organizationLocalization[invitation.status] ?? invitation.status
-
-  const statusColor =
-    invitation.status === "pending"
-      ? "warning"
-      : invitation.status === "accepted"
-        ? "success"
-        : invitation.status === "rejected"
-          ? "danger"
-          : "default"
-
-  if (cancelPermissionPending) {
-    return <OrganizationInvitationRowSkeleton />
-  }
-
+  const resendPermission = useHasPermission(client, {
+    organizationId: invitation.organizationId,
+    permissions: { invitation: ["create"] }
+  })
+  const cancel = useCancelInvitation(client)
+  const resend = useInviteMember(client)
+  const cooldown = useResendCooldown()
+  const [confirm, setConfirm] = useState(false)
+  const show = (field: string) =>
+    !visibleFields || visibleFields.includes(field)
+  const pending = invitation.status === "pending"
   return (
-    <Box className="flex-row items-center justify-between gap-2">
-      <Box className="min-w-0 flex-1 gap-1">
-        <Txt numberOfLines={1} className="text-sm font-medium text-foreground">
-          {invitation.email}
-        </Txt>
-
-        <Txt numberOfLines={1} className="text-xs text-muted">
-          {formatDateTime(invitation.createdAt)} · {roleLabel}
-        </Txt>
-      </Box>
-
-      <Chip color={statusColor} className="shrink-0">
-        {statusLabel}
-      </Chip>
-
-      {cancelInvitationPermission?.success &&
-        invitation.status === "pending" && (
+    <Box className="gap-2">
+      {show("email") ? (
+        <Txt className="font-medium">{invitation.email}</Txt>
+      ) : null}
+      {show("role") ? (
+        <Txt>{memberRoleLabels(invitation.role, roles).join(", ")}</Txt>
+      ) : null}
+      {show("createdAt") ? (
+        <Txt className="text-sm text-muted">{format(invitation.createdAt)}</Txt>
+      ) : null}
+      {show("status") ? (
+        <Chip>{localization[invitation.status] ?? invitation.status}</Chip>
+      ) : null}
+      {modelFields.invitation
+        .filter((field) => show(field.name))
+        .map((field) => (
+          <AdditionalField
+            key={field.name}
+            name={field.name}
+            field={{ ...field, readOnly: true }}
+            value={
+              (
+                invitation as unknown as Record<
+                  string,
+                  AdditionalFieldFormValue
+                >
+              )[field.name] ?? null
+            }
+            onChange={() => {}}
+            onBlur={() => {}}
+          />
+        ))}
+      {pending ? (
+        <Box className="flex-row flex-wrap gap-2">
+          {resendPermission.isPending ? (
+            <Skeleton className="h-8 w-20" />
+          ) : resendPermission.data?.success ? (
+            <Button
+              size="sm"
+              isDisabled={cooldown.isCoolingDown}
+              isPending={resend.isPending}
+              onPress={() =>
+                resend.mutate(
+                  {
+                    organizationId: invitation.organizationId,
+                    email: invitation.email,
+                    role: invitation.role as InviteMemberParams["role"],
+                    resend: true,
+                    ...(invitation.teamId ? { teamId: invitation.teamId } : {})
+                  },
+                  { onSuccess: () => cooldown.startCooldown() }
+                )
+              }
+            >
+              {common.auth.resend}
+              {cooldown.cooldown > 0 ? ` (${cooldown.cooldown})` : ""}
+            </Button>
+          ) : null}
+          {cancelPermission.isPending ? (
+            <Skeleton className="h-8 w-20" />
+          ) : cancelPermission.data?.success ? (
+            <Button size="sm" variant="danger" onPress={() => setConfirm(true)}>
+              {localization.cancelInvitation}
+            </Button>
+          ) : null}
+        </Box>
+      ) : null}
+      <AlertDialog
+        isOpen={confirm}
+        onOpenChange={(open) => {
+          if (!cancel.isPending) setConfirm(open)
+        }}
+      >
+        <AlertDialog.CloseTrigger />
+        <AlertDialog.Header>
+          <AlertDialog.Heading>
+            {localization.cancelInvitation}
+          </AlertDialog.Heading>
+        </AlertDialog.Header>
+        <AlertDialog.Body>
+          <Txt>{invitation.email}</Txt>
+          {cancel.error ? (
+            <Txt accessibilityRole="alert">{cancel.error.message}</Txt>
+          ) : null}
+        </AlertDialog.Body>
+        <AlertDialog.Footer>
           <Button
-            isIconOnly
-            size="sm"
-            variant="danger"
-            isPending={cancelPending}
-            onPress={() => cancelInvitation({ invitationId: invitation.id })}
-            aria-label={organizationLocalization.cancelInvitation}
+            isDisabled={cancel.isPending}
+            onPress={() => setConfirm(false)}
           >
-            {cancelPending ? (
-              <Spinner color="current" size="sm" />
-            ) : (
-              <Xmark width={16} height={16} color={colors.danger} />
-            )}
+            {common.settings.cancel}
           </Button>
-        )}
+          <Button
+            variant="danger"
+            isPending={cancel.isPending}
+            onPress={() =>
+              cancel.mutate(
+                { invitationId: invitation.id },
+                { onSuccess: () => setConfirm(false) }
+              )
+            }
+          >
+            {localization.cancelInvitation}
+          </Button>
+        </AlertDialog.Footer>
+      </AlertDialog>
     </Box>
   )
 }

@@ -1,7 +1,8 @@
+import { useNativeAvatar } from "../../../../lib/native-avatar"
 import { useAuth, useSession, useUpdateUser } from "@better-auth-ui/react"
 import { useState } from "react"
 import { cn } from "../../../../lib/cn"
-import { pickImage, resizeImage } from "../../../../lib/image"
+import { prepareNativeImage } from "../../../../lib/image"
 import { useThemeColors } from "../../../../lib/theme-colors"
 import { Button } from "../../../../primitives/button"
 import { Label } from "../../../../primitives/field"
@@ -16,23 +17,14 @@ export type ChangeAvatarProps = {
   className?: string
 }
 
-/**
- * Current-avatar control: tapping the avatar or "Change avatar" opens a menu
- * with Upload / Delete. Mirrors the heroui `ChangeAvatar`, adapted for React
- * Native: there is no `<input type="file">`, so "Upload" calls `pickImage()`
- * (system image library) then `resizeImage(uri)` (square-crop + PNG data URI)
- * and passes the resulting data URI straight to `updateUser` — no
- * `avatar.resize`/`avatar.upload`/`fileToBase64` (all DOM-only) in the loop.
- * The Upload/Delete affordance itself reuses the `Menu` primitive (the same
- * Modal-bottom-sheet pattern as `UserButton`'s menu) instead of a web
- * `Dropdown`.
- */
+/** Pick, optimize, upload, and remove the current user avatar. */
 export function ChangeAvatar({ className }: ChangeAvatarProps) {
-  const { authClient, localization, avatar } = useAuth()
+  const { authClient, localization } = useAuth()
+  const avatar = useNativeAvatar()
   const { data: session } = useSession(authClient)
   const colors = useThemeColors()
 
-  const { mutate: updateUser, isPending: updatePending } =
+  const { mutateAsync: updateUser, isPending: updatePending } =
     useUpdateUser(authClient)
 
   const [isUploading, setIsUploading] = useState(false)
@@ -45,15 +37,13 @@ export function ChangeAvatar({ className }: ChangeAvatarProps) {
     setIsUploading(true)
 
     try {
-      const picked = await pickImage()
-      if (!picked) {
+      const image = await prepareNativeImage(avatar)
+      if (!image) {
         setIsUploading(false)
         return
       }
 
-      const image = await resizeImage(picked.uri)
-
-      updateUser(
+      await updateUser(
         { image },
         {
           onSuccess: () =>
@@ -72,24 +62,19 @@ export function ChangeAvatar({ className }: ChangeAvatarProps) {
   async function handleDelete() {
     const currentImage = session?.user.image
 
-    updateUser(
-      { image: null },
-      {
-        onSuccess: async () => {
-          if (currentImage) {
-            setIsDeleting(true)
-            try {
-              await avatar.delete?.(currentImage)
-            } finally {
-              setIsDeleting(false)
-            }
-          }
-
-          toast.success(localization.settings.avatarDeletedSuccess)
-        }
-      }
-    )
+    setIsDeleting(true)
+    try {
+      await updateUser({ image: null })
+      if (currentImage) await avatar.delete?.(currentImage)
+      toast.success(localization.settings.avatarDeletedSuccess)
+    } catch (error) {
+      if (error instanceof Error) toast.danger(error.message)
+    } finally {
+      setIsDeleting(false)
+    }
   }
+
+  if (!avatar.enabled) return null
 
   return (
     <Box className={cn("gap-1", className)}>

@@ -1,5 +1,7 @@
 import type { AuthView, NavigateFn, SettingsView } from "@better-auth-ui/core"
 
+import type { NavigationRouteConfig } from "./route-config"
+
 /**
  * Options for a {@link Navigation} navigation.
  */
@@ -19,6 +21,7 @@ export interface AuthNavigateOptions {
 export type ViewTarget =
   | { section: "auth"; view: AuthView }
   | { section: "settings"; view: SettingsView | (string & {}) }
+  | { section: "admin"; view: string }
   | { section: "organization"; view: string; slug?: string }
 
 /** A bare `AuthView` string is shorthand for `{ section: "auth", view }`. */
@@ -52,6 +55,8 @@ export interface Navigation {
    * return `undefined` and rely on the `view`/`path` prop passed to the host.
    */
   current(): ViewTarget | undefined
+  /** Current configured path, or the path of a supplied view. */
+  getPath?: (target?: ViewTarget) => string | undefined
   /**
    * Read a navigation param (e.g. the `token` for reset-password or the
    * `redirectTo` after sign-in). Sourced from route params / deep links.
@@ -61,6 +66,7 @@ export interface Navigation {
    * The {@link NavigateFn} handed to the underlying `@better-auth-ui/react`
    * `AuthProvider`. Shared logic (e.g. `useAuthenticate`) calls this.
    */
+  configure?: (config: NavigationRouteConfig) => void
   navigate: NavigateFn
 }
 

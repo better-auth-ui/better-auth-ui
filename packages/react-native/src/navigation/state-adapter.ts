@@ -1,9 +1,10 @@
 import {
-  type AuthView,
-  type NavigateOptions,
-  type SettingsView,
-  viewPaths
-} from "@better-auth-ui/core"
+  getNavigationParams,
+  getNavigationPath,
+  resolveNavigationTarget,
+  handleUnhandledNavigation,
+  type NavigationRouteConfig
+} from "./route-config"
 import { useCallback, useMemo, useRef, useState } from "react"
 import {
   type Navigation,
@@ -11,30 +12,6 @@ import {
   toViewTarget,
   type ViewTarget
 } from "./types"
-
-/**
- * Resolve a {@link ViewTarget} from a core {@link NavigateOptions}: prefer the
- * explicit `view` hint (auth), otherwise match the last path segment of `to`
- * against the auth and settings view paths.
- */
-function resolveTarget(options: NavigateOptions): ViewTarget | undefined {
-  if (options.view) return { section: "auth", view: options.view }
-
-  const segment = options.to.split("?")[0].split("/").filter(Boolean).pop()
-  if (!segment) return undefined
-
-  const authEntry = (
-    Object.entries(viewPaths.auth) as [AuthView, string][]
-  ).find(([, path]) => path === segment)
-  if (authEntry) return { section: "auth", view: authEntry[0] }
-
-  const settingsEntry = (
-    Object.entries(viewPaths.settings) as [SettingsView, string][]
-  ).find(([, path]) => path === segment)
-  if (settingsEntry) return { section: "settings", view: settingsEntry[0] }
-
-  return undefined
-}
 
 /**
  * Default, router-free navigation: keeps the current target in React state so
@@ -51,24 +28,44 @@ export function useStateNavigation(
   const [target, setTarget] = useState<ViewTarget>(() =>
     toViewTarget(initialView)
   )
+  const routesRef = useRef<NavigationRouteConfig>({})
+  const configure = useCallback((config: NavigationRouteConfig) => {
+    routesRef.current = config
+  }, [])
   const paramsRef = useRef<Record<string, string>>({})
 
   const push = useCallback<Navigation["push"]>((next, options) => {
-    paramsRef.current = options?.params ?? {}
+    const target = toViewTarget(next)
+    paramsRef.current = {
+      ...(target.section === "auth" && paramsRef.current.redirectTo
+        ? { redirectTo: paramsRef.current.redirectTo }
+        : {}),
+      ...options?.params
+    }
     setTarget(toViewTarget(next))
   }, [])
 
   const navigate = useCallback<Navigation["navigate"]>((options) => {
-    const next = resolveTarget(options)
-    paramsRef.current = options.params ?? {}
+    const next = resolveNavigationTarget(options, routesRef.current)
+    paramsRef.current = getNavigationParams(options.to, options.params)
     if (next) setTarget(next)
+    else handleUnhandledNavigation(options, routesRef.current)
   }, [])
 
   const current = useCallback(() => target, [target])
+  const getPath = useCallback(
+    (next?: ViewTarget) =>
+      getNavigationPath(
+        next ?? target,
+        routesRef.current,
+        next ? undefined : paramsRef.current
+      ),
+    [target]
+  )
   const getParam = useCallback((key: string) => paramsRef.current[key], [])
 
   return useMemo(
-    () => ({ push, current, getParam, navigate }),
-    [push, current, getParam, navigate]
+    () => ({ push, current, getParam, navigate, configure, getPath }),
+    [push, current, getParam, navigate, configure, getPath]
   )
 }

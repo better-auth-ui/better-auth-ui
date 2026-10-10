@@ -13,6 +13,8 @@ const origin = "https://app.example.com"
 
 describe("getAuthCallbackURL", () => {
   it.each([
+    ["myapp://", "/auth/callback?token=a", "myapp:///auth/callback?token=a"],
+    ["myapp://app/", "/auth/callback", "myapp://app/auth/callback"],
     [origin, "/dashboard", `${origin}/dashboard`],
     [`${origin}/`, "dashboard/", `${origin}/dashboard/`],
     [

@@ -35,6 +35,13 @@ domains:
       - Import a locale from the root entrypoint or invent an unsupported locale.
       - Choose different languages during server and browser rendering.
       - Assume browser provider localization also translates server-rendered emails.
+  - name: Native authentication interfaces
+    slug: react-native
+    failure_modes:
+      - Remount the provider during authentication and lose a pending action.
+      - Use browser credential or image APIs on native.
+      - Drop callback tokens, plugin paths, or signed OAuth parameters during navigation.
+      - Assume browser component tests verify OS permission prompts and accessibility.
 
 skills:
   - slug: better-auth-ui-core
@@ -52,3 +59,6 @@ skills:
   - slug: better-auth-ui-localization
     packages: ["@better-auth-ui/locales"]
     domain: localization
+  - slug: better-auth-ui-react-native
+    packages: ["@better-auth-ui/react-native"]
+    domain: react-native

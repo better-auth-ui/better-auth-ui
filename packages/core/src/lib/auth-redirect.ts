@@ -9,7 +9,7 @@ export function getAuthCallbackURL(
 ): string {
   if (!baseURL || ABSOLUTE_HTTP_URL.test(redirectTo)) return redirectTo
 
-  return `${baseURL.replace(/\/+$/, "")}/${redirectTo.replace(/^\/+/, "")}`
+  return `${baseURL.endsWith("://") ? baseURL : baseURL.replace(/\/+$/, "")}/${redirectTo.replace(/^\/+/, "")}`
 }
 
 /**
@@ -24,7 +24,7 @@ export function getViewURL(
   basePath: string,
   viewPath: string
 ): string {
-  const origin = baseURL.replace(/\/+$/, "")
+  const origin = baseURL.endsWith("://") ? baseURL : baseURL.replace(/\/+$/, "")
   const path = [basePath, viewPath]
     .map((segment) => segment.replace(/^\/+|\/+$/g, ""))
     .filter(Boolean)

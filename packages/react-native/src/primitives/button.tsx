@@ -54,8 +54,9 @@ export function Button({
   "aria-label": ariaLabel,
   ...props
 }: ButtonProps) {
-  const disabled = isDisabled || isPending
   const form = useForm()
+  const pending = isPending || (type === "submit" && !!form?.isSubmitting)
+  const disabled = isDisabled || pending
   const colors = useThemeColors()
 
   // A `type="submit"` button with no explicit handler drives the enclosing
@@ -66,14 +67,14 @@ export function Button({
       onPress(event)
       return
     }
-    if (type === "submit") form?.submit()
+    if (type === "submit") void form?.submit()
   }
 
   return (
     <Btn
       accessibilityRole="button"
       accessibilityLabel={ariaLabel}
-      accessibilityState={{ disabled, busy: isPending }}
+      accessibilityState={{ disabled, busy: pending }}
       disabled={disabled}
       onPress={handlePress}
       className={cn(
@@ -82,7 +83,7 @@ export function Button({
       )}
       {...props}
     >
-      {isPending && (
+      {pending && (
         <ActivityIndicator
           size="small"
           color={colors[VARIANT_FOREGROUND[variant]]}

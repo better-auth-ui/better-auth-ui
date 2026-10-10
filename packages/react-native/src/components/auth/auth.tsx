@@ -3,6 +3,9 @@ import { useAuth } from "@better-auth-ui/react"
 import { type ComponentType, useEffect } from "react"
 import { useAuthNavigation } from "../../navigation/navigation-context"
 import type { CardVariant } from "../../primitives/card"
+import { AuthCallback, AuthError } from "./auth-result"
+import { AuthRedirect } from "./auth-redirect"
+import { ResetLinkSent } from "./email-link-sent"
 import { ForgotPassword } from "./forgot-password"
 import type { SocialLayout } from "./provider-buttons"
 import { ResetPassword } from "./reset-password"
@@ -29,7 +32,8 @@ export type AuthProps = {
 const PASSWORD_ONLY_VIEWS: AuthView[] = [
   "signUp",
   "forgotPassword",
-  "resetPassword"
+  "resetPassword",
+  "resetLinkSent"
 ]
 
 const AUTH_VIEWS: Partial<Record<AuthView, ComponentType<AuthProps>>> = {
@@ -38,7 +42,11 @@ const AUTH_VIEWS: Partial<Record<AuthView, ComponentType<AuthProps>>> = {
   signUp: SignUp,
   forgotPassword: ForgotPassword,
   resetPassword: ResetPassword,
-  verifyEmail: VerifyEmail
+  verifyEmail: VerifyEmail,
+  resetLinkSent: ResetLinkSent,
+  callback: AuthCallback,
+  error: AuthError,
+  redirect: AuthRedirect
 }
 
 /**

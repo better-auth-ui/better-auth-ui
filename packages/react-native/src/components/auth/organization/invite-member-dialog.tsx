@@ -1,170 +1,239 @@
-import type { OrganizationAuthClient } from "@better-auth-ui/core/plugins/organization"
+import {
+  getAdditionalFieldDefaultValues,
+  getAdditionalFieldSubmitValues,
+  validateEmailAddress
+} from "@better-auth-ui/core"
+import {
+  hasMemberRole,
+  type OrganizationTeamsAuthClient,
+  type InviteMemberParams
+} from "@better-auth-ui/core/plugins/organization"
 import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
-import { useInviteMember } from "@better-auth-ui/react/plugins/organization"
-import { useEffect, useState } from "react"
-
+import {
+  useActiveOrganization,
+  useActiveMemberRole,
+  useInviteMember,
+  useHasPermission,
+  useListOrganizationMembers,
+  useListOrganizationInvitations,
+  useListTeams
+} from "@better-auth-ui/react/plugins/organization"
+import { useState } from "react"
 import { organizationPlugin } from "../../../lib/auth/organization-plugin"
-import { useThemeColors } from "../../../lib/theme-colors"
 import { AlertDialog } from "../../../primitives/alert-dialog"
 import { Button } from "../../../primitives/button"
-import { FieldError, Label, TextField } from "../../../primitives/field"
-import { Form } from "../../../primitives/form"
-import { Input } from "../../../primitives/input"
-import { Menu } from "../../../primitives/menu"
+import { Checkbox } from "../../../primitives/checkbox"
+import { Description } from "../../../primitives/description"
 import { Box, Txt } from "../../../primitives/styled"
 import { toast } from "../../../primitives/toast"
-import { ChevronDown, PersonPlus } from "../../../primitives/ui-icons"
+import { getAuthAdditionalFieldValidators, useAuthForm } from "../auth-form"
+import { RolePicker, useOrganizationRoleLabels } from "./role-picker"
 
-/** Props for the {@link InviteMemberDialog} component. */
 export type InviteMemberDialogProps = {
   isOpen: boolean
   onOpenChange: (open: boolean) => void
 }
-
-const pickDefaultRole = (keys: string[]) =>
-  keys.includes("member") ? "member" : (keys.at(-1) ?? "")
-
-/**
- * Render a dialog for inviting a member to the organization. Mirrors the
- * heroui `InviteMemberDialog`, adapted for React Native: the web `Select` +
- * `ListBox` role picker becomes a labeled trigger that opens the RN `Menu`
- * bottom sheet (same pattern already used by `organization-members.tsx`'s
- * role-filter/role-change menus), and the email field is controlled state
- * submitted through the RN `Form` coordinator instead of `FormData`.
- *
- * @param isOpen - Whether the dialog is open
- * @param onOpenChange - Callback for when the dialog open state changes
- * @returns The invite member dialog as a JSX element
- */
 export function InviteMemberDialog({
   isOpen,
   onOpenChange
 }: InviteMemberDialogProps) {
-  const { authClient, localization } = useAuth()
-  const { localization: organizationLocalization, roles } =
-    useAuthPlugin(organizationPlugin)
-  const colors = useThemeColors()
-
-  const [email, setEmail] = useState("")
-  const [role, setRole] = useState(() => pickDefaultRole(Object.keys(roles)))
-  const [roleMenuOpen, setRoleMenuOpen] = useState(false)
-
-  useEffect(() => {
-    setRole((current) => {
-      const keys = Object.keys(roles)
-      return keys.includes(current) ? current : pickDefaultRole(keys)
-    })
-  }, [roles])
-
-  const { mutate: inviteMember, isPending: isInviting } = useInviteMember(
-    authClient as OrganizationAuthClient,
-    {
-      onSuccess: () => {
-        onOpenChange(false)
-        toast.success(organizationLocalization.inviteMemberSuccess)
-      }
-    }
+  return isOpen ? (
+    <InviteMemberForm onClose={() => onOpenChange(false)} />
+  ) : null
+}
+function InviteMemberForm({ onClose }: { onClose: () => void }) {
+  const { authClient, localization: common } = useAuth()
+  const {
+    localization,
+    allowMultipleRoles,
+    creatorRole,
+    modelFields,
+    teams: teamsEnabled,
+    invitationLimit,
+    membershipLimit
+  } = useAuthPlugin(organizationPlugin)
+  const client = authClient as OrganizationTeamsAuthClient
+  const organization = useActiveOrganization(client)
+  const organizationId = organization.data?.id
+  const role = useActiveMemberRole(client, { query: { organizationId } })
+  const labels = useOrganizationRoleLabels(organizationId)
+  const roles = Object.fromEntries(
+    Object.entries(labels).filter(
+      ([key]) =>
+        hasMemberRole(role.data?.role, creatorRole) || key !== creatorRole
+    )
   )
-
-  const isRoleValid = Object.keys(roles).includes(role)
-  const roleLabel = roles?.[role] ?? role
-
-  const handleSubmit = () => {
-    if (!isRoleValid) return
-
-    inviteMember({
-      email: email.trim(),
-      role: role as Parameters<typeof inviteMember>[0]["role"]
-    })
-  }
-
+  const permission = useHasPermission(client, {
+    organizationId,
+    permissions: { invitation: ["create"] }
+  })
+  const members = useListOrganizationMembers(client, {
+    query: { organizationId },
+    enabled: !!organizationId
+  })
+  const invitations = useListOrganizationInvitations(client, {
+    query: { organizationId },
+    enabled: !!organizationId
+  })
+  const teams = useListTeams(client, {
+    query: { organizationId },
+    enabled: teamsEnabled && !!organizationId
+  })
+  const invite = useInviteMember(client)
+  const [selectedRoles, setRoles] = useState([
+    Object.hasOwn(labels, "member")
+      ? "member"
+      : (Object.keys(roles).at(-1) ?? "")
+  ])
+  const [selectedTeams, setTeams] = useState<string[]>([])
+  const atMemberLimit =
+    membershipLimit !== undefined &&
+    (members.data?.total ?? members.data?.members.length ?? 0) >=
+      membershipLimit
+  const atInvitationLimit =
+    invitationLimit !== undefined &&
+    (invitations.data?.filter((invitation) => invitation.status === "pending")
+      .length ?? 0) >= invitationLimit
+  const form = useAuthForm({
+    defaultValues: {
+      email: "",
+      additionalFields: getAdditionalFieldDefaultValues(modelFields.invitation)
+    },
+    onSubmit: async ({ value }) => {
+      if (
+        !permission.data?.success ||
+        !organizationId ||
+        atMemberLimit ||
+        atInvitationLimit ||
+        !selectedRoles.length ||
+        selectedRoles.some((role) => !Object.hasOwn(roles, role))
+      )
+        throw new Error(localization.selectAtLeastOneRole)
+      await invite.mutateAsync({
+        ...getAdditionalFieldSubmitValues(
+          modelFields.invitation,
+          value.additionalFields
+        ),
+        email: value.email.trim(),
+        organizationId,
+        role: selectedRoles,
+        ...(selectedTeams.length && {
+          teamId: selectedTeams.filter((id) =>
+            teams.data?.some((team) => team.id === id)
+          )
+        })
+      } as InviteMemberParams)
+      toast.success(localization.inviteMemberSuccess)
+      onClose()
+    }
+  })
   return (
-    <AlertDialog isOpen={isOpen} onOpenChange={onOpenChange}>
-      <AlertDialog.CloseTrigger />
-
+    <AlertDialog
+      isOpen
+      onOpenChange={(open) => {
+        if (!open && !invite.isPending) onClose()
+      }}
+    >
       <AlertDialog.Header>
-        <AlertDialog.Icon status="default">
-          <PersonPlus width={20} height={20} color={colors.foreground} />
-        </AlertDialog.Icon>
-
-        <AlertDialog.Heading>
-          {organizationLocalization.inviteMember}
-        </AlertDialog.Heading>
+        <AlertDialog.Heading>{localization.inviteMember}</AlertDialog.Heading>
       </AlertDialog.Header>
-
-      <Form onSubmit={handleSubmit} className="gap-4">
-        <AlertDialog.Body contentClassName="gap-4">
-          <Txt className="text-sm text-muted">
-            {organizationLocalization.inviteMemberDescription}
-          </Txt>
-
-          <TextField
-            name="email"
-            type="email"
-            autoComplete="email"
-            isDisabled={isInviting}
-            value={email}
-            onChange={setEmail}
-            validate={(value) => {
-              if (!value) return localization.auth.fieldRequired
-              if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value))
-                return localization.auth.invalidEmail
-            }}
-          >
-            <Label>{localization.auth.email}</Label>
-
-            <Input placeholder={localization.auth.email} required />
-
-            <FieldError />
-          </TextField>
-
-          <Box className="gap-1.5">
-            <Label>{organizationLocalization.role}</Label>
-
-            <Button
-              variant="secondary"
-              isDisabled={isInviting}
-              className="w-full flex-row items-center justify-between"
-              onPress={() => setRoleMenuOpen(true)}
+      <AlertDialog.Body>
+        <form.AppForm>
+          <form.AuthFormRoot className="gap-4">
+            <Description>{localization.inviteMemberDescription}</Description>
+            <form.AppField
+              name="email"
+              validators={{
+                onChange: ({ value }) =>
+                  validateEmailAddress(value, {
+                    requiredMessage: common.auth.fieldRequired,
+                    invalidMessage: common.auth.invalidEmail
+                  })
+              }}
             >
-              <Txt className="text-base text-foreground">{roleLabel}</Txt>
-
-              <ChevronDown width={16} height={16} color={colors.muted} />
-            </Button>
-
-            <Menu
-              isOpen={roleMenuOpen}
-              onOpenChange={setRoleMenuOpen}
-              selectedKey={role}
-              onSelect={setRole}
-            >
-              {Object.entries(roles).map(([key, label]) => (
-                <Menu.Item key={key} id={key}>
-                  {label}
-                </Menu.Item>
-              ))}
-            </Menu>
-          </Box>
-        </AlertDialog.Body>
-
-        <AlertDialog.Footer>
-          <Button
-            variant="tertiary"
-            isDisabled={isInviting}
-            onPress={() => onOpenChange(false)}
-          >
-            {localization.settings.cancel}
-          </Button>
-
-          <Button
-            type="submit"
-            isPending={isInviting}
-            isDisabled={!isRoleValid}
-          >
-            {organizationLocalization.inviteMember}
-          </Button>
-        </AlertDialog.Footer>
-      </Form>
+              {(field) => (
+                <field.AuthFormTextField
+                  label={common.auth.email}
+                  type="email"
+                  autoComplete="email"
+                  isDisabled={invite.isPending}
+                />
+              )}
+            </form.AppField>
+            <RolePicker
+              roles={roles}
+              value={selectedRoles}
+              onChange={setRoles}
+              multiple={allowMultipleRoles}
+              disabled={invite.isPending || role.isPending}
+            />
+            {teamsEnabled && teams.data?.length ? (
+              <Box className="gap-2">
+                <Txt>{localization.teams}</Txt>
+                {teams.data.map((team) => (
+                  <Checkbox
+                    key={team.id}
+                    isSelected={selectedTeams.includes(team.id)}
+                    isDisabled={invite.isPending}
+                    onChange={(checked) =>
+                      setTeams(
+                        checked
+                          ? [...selectedTeams, team.id]
+                          : selectedTeams.filter((id) => id !== team.id)
+                      )
+                    }
+                  >
+                    {team.name}
+                  </Checkbox>
+                ))}
+              </Box>
+            ) : null}
+            {modelFields.invitation.map((configured) => (
+              <form.AppField
+                key={configured.name}
+                name={`additionalFields.${configured.name}`}
+                validators={getAuthAdditionalFieldValidators(
+                  configured,
+                  common.auth.fieldRequired
+                )}
+              >
+                {(field) => (
+                  <field.AuthFormAdditionalField
+                    field={configured}
+                    isPending={invite.isPending}
+                  />
+                )}
+              </form.AppField>
+            ))}
+            {atMemberLimit || atInvitationLimit ? (
+              <Description>
+                {atMemberLimit
+                  ? localization.membershipLimitReached
+                  : localization.invitationLimitReached}
+              </Description>
+            ) : null}
+            <AlertDialog.Footer>
+              <Button isDisabled={invite.isPending} onPress={onClose}>
+                {common.settings.cancel}
+              </Button>
+              <form.AuthFormSubmitButton
+                isPending={invite.isPending}
+                isDisabled={
+                  !permission.data?.success ||
+                  role.isPending ||
+                  !selectedRoles.length ||
+                  atMemberLimit ||
+                  atInvitationLimit ||
+                  (membershipLimit !== undefined && members.isPending) ||
+                  (invitationLimit !== undefined && invitations.isPending)
+                }
+              >
+                {localization.inviteMember}
+              </form.AuthFormSubmitButton>
+            </AlertDialog.Footer>
+          </form.AuthFormRoot>
+        </form.AppForm>
+      </AlertDialog.Body>
     </AlertDialog>
   )
 }

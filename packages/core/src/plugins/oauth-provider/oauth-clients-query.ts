@@ -18,6 +18,11 @@ export function oauthClientsOptions(
 ) {
   return {
     queryKey: oauthProviderQueryKeys.clients(ownerKey),
-    queryFn: ownerKey ? ({ signal }) => manager.list(owner, signal) : skipToken
+    queryFn: ownerKey
+      ? async ({ signal }) =>
+          (await manager.list(owner, signal)).map(
+            ({ client_secret: _secret, ...client }) => client
+          )
+      : skipToken
   } satisfies QueryOptions<ManagedOAuthClient[]>
 }

@@ -5,6 +5,8 @@ import { oauthProviderMutationKeys } from "./oauth-provider-mutation-keys"
 import type { OAuthContinueVariables } from "./oauth-provider-plugin"
 
 export type OAuthContinueParams = OAuthContinueVariables & {
+  /** Signed authorization query forwarded by native router adapters. */
+  oauth_query?: string
   fetchOptions?: BetterFetchOption
 }
 

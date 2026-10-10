@@ -1,3 +1,6 @@
+import { hasMemberRole } from "@better-auth-ui/core/plugins/organization"
+import { useSession } from "@better-auth-ui/react"
+import { useAllOrganizationMembers } from "./use-all-members"
 import type { OrganizationAuthClient } from "@better-auth-ui/core/plugins/organization"
 import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
 import {
@@ -56,21 +59,15 @@ export function OrganizationDangerZone({
 
       <Card variant={variant}>
         <Card.Content className="gap-0">
+          <LeaveOrganization />
           {deletePermissionPending ? (
             <DeleteOrganizationSkeleton />
-          ) : (
+          ) : canDelete ? (
             <>
-              <LeaveOrganization />
-
-              {canDelete && (
-                <>
-                  <Box className="-mx-4 my-4 border-b border-dashed border-border" />
-
-                  <DeleteOrganization />
-                </>
-              )}
+              <Box className="-mx-4 my-4 border-b border-dashed border-border" />
+              <DeleteOrganization />
             </>
-          )}
+          ) : null}
         </Card.Content>
       </Card>
     </Box>
@@ -92,6 +89,20 @@ function LeaveOrganization() {
     authClient as OrganizationAuthClient
   )
 
+  const { creatorRole } = useAuthPlugin(organizationPlugin)
+  const session = useSession(authClient)
+  const members = useAllOrganizationMembers(activeOrganization?.id)
+  const current = members.data?.members.find(
+    (member) => member.userId === session.data?.user.id
+  )
+  const blocked =
+    members.isPending ||
+    members.isError ||
+    (!!current &&
+      hasMemberRole(current.role, creatorRole) &&
+      (members.data?.members.filter((member) =>
+        hasMemberRole(member.role, creatorRole)
+      ).length ?? 0) <= 1)
   const [confirmOpen, setConfirmOpen] = useState(false)
 
   return (
@@ -110,13 +121,18 @@ function LeaveOrganization() {
         className="self-start"
         size="sm"
         variant="danger"
-        isDisabled={!activeOrganization}
+        isDisabled={!activeOrganization || blocked}
         onPress={() => setConfirmOpen(true)}
       >
         {organizationLocalization.leaveOrganization}
       </Button>
 
-      {activeOrganization && (
+      {blocked && !members.isPending ? (
+        <Txt className="text-sm text-muted">
+          {organizationLocalization.onlyOwnerActionDisabled}
+        </Txt>
+      ) : null}
+      {activeOrganization && !blocked && (
         <LeaveOrganizationDialog
           isOpen={confirmOpen}
           onOpenChange={setConfirmOpen}

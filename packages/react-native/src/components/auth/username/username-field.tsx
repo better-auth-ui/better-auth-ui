@@ -1,8 +1,9 @@
+import { Txt } from "../../../primitives/styled"
+import { getFormFieldErrorMessage } from "@better-auth-ui/core"
 import type { UsernameAuthClient } from "@better-auth-ui/core/plugins/username"
 import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
 import { useIsUsernameAvailable } from "@better-auth-ui/react/plugins/username"
 import { useDebouncer } from "@tanstack/react-pacer"
-import { useState } from "react"
 import { usernamePlugin } from "../../../lib/auth/username-plugin"
 import type { AdditionalFieldProps } from "../../../lib/auth-plugin"
 import { useThemeColors } from "../../../lib/theme-colors"
@@ -23,6 +24,10 @@ export function UsernameField({
   field,
   isPending,
   variant,
+  value: formValue,
+  onBlur,
+  errors,
+  isInvalid,
   onChange
 }: AdditionalFieldProps) {
   const { authClient } = useAuth()
@@ -36,7 +41,7 @@ export function UsernameField({
   const colors = useThemeColors()
 
   const currentUsername = String(field.defaultValue ?? "")
-  const [value, setValue] = useState(currentUsername)
+  const value = formValue == null ? "" : String(formValue)
 
   const {
     mutate: requestAvailability,
@@ -63,8 +68,7 @@ export function UsernameField({
   )
 
   function handleChange(next: string) {
-    setValue(next)
-    onChange?.(next || null)
+    onChange(next || null)
     resetAvailability()
 
     if (checkAvailability) {
@@ -84,9 +88,11 @@ export function UsernameField({
       autoComplete="username"
       minLength={minUsernameLength}
       maxLength={maxUsernameLength}
-      isDisabled={isPending}
+      isDisabled={isPending || field.readOnly}
       value={value}
       onChange={handleChange}
+      onBlur={onBlur}
+      error={isInvalid ? getFormFieldErrorMessage(errors ?? []) : undefined}
       validate={(val) => {
         if (!val) {
           if (field.required) return authLocalization.auth.fieldRequired
@@ -107,9 +113,9 @@ export function UsernameField({
       <Label>{field.label}</Label>
 
       <InputGroup variant={variant === "transparent" ? "primary" : "secondary"}>
-        {usernamePrefix && (
+        {!!usernamePrefix && (
           <InputGroup.Prefix className="pr-1.5 text-muted">
-            {usernamePrefix}
+            <Txt>{usernamePrefix}</Txt>
           </InputGroup.Prefix>
         )}
 

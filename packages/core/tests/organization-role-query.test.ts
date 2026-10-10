@@ -116,10 +116,53 @@ describe("organization role mutation factories", () => {
           organizationId: "org-1",
           filterField: "role",
           filterValue: "support",
-          limit: 1
+          limit: 100
         })
       })
     )
     expect(authClient.organization.deleteRole).not.toHaveBeenCalled()
   })
+})
+
+it("checks exact role membership across every matching page before deleting a role", async () => {
+  const client = createAuthClient()
+  client.organization.getRole.mockResolvedValue({
+    id: "role",
+    role: "support",
+    permission: {}
+  } as never)
+  client.organization.listMembers
+    .mockResolvedValueOnce({
+      members: [{ id: "a", role: "support-agent" }],
+      total: 2
+    } as never)
+    .mockResolvedValueOnce({
+      members: [{ id: "b", role: "member,support" }],
+      total: 2
+    } as never)
+  const options = deleteRoleOptions(client as never, "user", "org")
+  await expect(
+    options.mutationFn?.({ roleId: "role" } as never, {} as never)
+  ).rejects.toMatchObject({ code: "ROLE_HAS_MEMBERS" })
+  expect(client.organization.listMembers.mock.calls[1]?.[0].query.offset).toBe(
+    1
+  )
+  expect(client.organization.deleteRole).not.toHaveBeenCalled()
+})
+it("does not treat a role name prefix as an assignment", async () => {
+  const client = createAuthClient()
+  client.organization.getRole.mockResolvedValue({
+    id: "role",
+    role: "support",
+    permission: {}
+  } as never)
+  client.organization.listMembers.mockResolvedValueOnce({
+    members: [{ id: "a", role: "support-agent" }],
+    total: 1
+  } as never)
+  const options = deleteRoleOptions(client as never, "user", "org")
+  await options.mutationFn?.({ roleId: "role" } as never, {} as never)
+  expect(client.organization.deleteRole).toHaveBeenCalledWith(
+    expect.objectContaining({ roleId: "role", organizationId: "org" })
+  )
 })

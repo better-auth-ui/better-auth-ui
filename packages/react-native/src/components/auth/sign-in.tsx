@@ -1,3 +1,7 @@
+import { getAuthButtonKey } from "@better-auth-ui/react"
+import { LastUsedBadge } from "./last-login-method/last-used-badge"
+import { useSignInContinuation } from "../../lib/auth/use-sign-in-continuation"
+import { AuthPrompts } from "@better-auth-ui/react"
 import { authMutationKeys } from "@better-auth-ui/core"
 import { useAuth, useFetchOptions, useSignInEmail } from "@better-auth-ui/react"
 import { useIsMutating } from "@tanstack/react-query"
@@ -18,6 +22,7 @@ import { FieldSeparator } from "./field-separator"
 import { ProviderButtons, type SocialLayout } from "./provider-buttons"
 
 export interface SignInProps {
+  initialEmail?: string
   className?: string
   socialLayout?: SocialLayout
   socialPosition?: "top" | "bottom"
@@ -32,6 +37,7 @@ export interface SignInProps {
  * through the adapter.
  */
 export function SignIn({
+  initialEmail = "",
   className,
   socialLayout,
   socialPosition = "bottom",
@@ -42,11 +48,10 @@ export function SignIn({
     emailAndPassword,
     localization,
     plugins,
-    redirectTo,
-    socialProviders,
-    navigate
+    socialProviders
   } = useAuth()
 
+  const onSignInSuccess = useSignInContinuation()
   const captcha = plugins.find(
     (plugin) => plugin.captchaComponent
   )?.captchaComponent
@@ -54,7 +59,7 @@ export function SignIn({
   const navigation = useAuthNavigation()
   const { fetchOptions, resetFetchOptions } = useFetchOptions()
 
-  const [email, setEmail] = useState("")
+  const [email, setEmail] = useState(initialEmail)
   const [password, setPassword] = useState("")
   const [rememberMe, setRememberMe] = useState(false)
 
@@ -69,12 +74,12 @@ export function SignIn({
 
       resetFetchOptions()
     },
-    onSuccess: () => navigate({ to: redirectTo })
+    onSuccess: onSignInSuccess
   })
 
   const handleSubmit = () => {
     signInEmail({
-      email,
+      email: email.trim(),
       password,
       ...(emailAndPassword?.rememberMe ? { rememberMe } : {}),
       fetchOptions
@@ -94,6 +99,7 @@ export function SignIn({
 
   return (
     <Card className={cn("w-full max-w-sm gap-4", className)} variant={variant}>
+      <AuthPrompts view="signIn" />
       <Card.Header>
         <Card.Title className="mb-1">{localization.auth.signIn}</Card.Title>
       </Card.Header>
@@ -186,12 +192,13 @@ export function SignIn({
                 isPending={isPending}
               >
                 {localization.auth.signIn}
+                <LastUsedBadge method="email" />
               </Button>
 
               {plugins.flatMap((plugin) =>
-                (plugin.authButtons ?? []).map((AuthButton, index) => (
+                (plugin.authButtons ?? []).map((AuthButton) => (
                   <AuthButton
-                    key={`${plugin.id}-${index.toString()}`}
+                    key={getAuthButtonKey(plugin.id, AuthButton)}
                     view="signIn"
                   />
                 ))

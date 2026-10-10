@@ -8,7 +8,8 @@
   },
   "files": [
     "src",
-    "dist"
+    "dist",
+    "skills"
   ],
   "exports": {
     ".": {
@@ -22,6 +23,132 @@
       "react-native": "./src/plugins.ts",
       "src": "./src/plugins.ts",
       "import": "./dist/plugins.js"
+    },
+    "./plugins/admin": {
+      "types": "./dist/plugins/admin/index.d.ts",
+      "react-native": "./src/plugins/admin/index.ts",
+      "src": "./src/plugins/admin/index.ts",
+      "import": "./dist/plugins/admin.js"
+    },
+    "./plugins/agent-auth": {
+      "types": "./dist/plugins/agent-auth/index.d.ts",
+      "react-native": "./src/plugins/agent-auth/index.ts",
+      "src": "./src/plugins/agent-auth/index.ts",
+      "import": "./dist/plugins/agent-auth.js"
+    },
+    "./plugins/anonymous": {
+      "types": "./dist/plugins/anonymous/index.d.ts",
+      "react-native": "./src/plugins/anonymous/index.ts",
+      "src": "./src/plugins/anonymous/index.ts",
+      "import": "./dist/plugins/anonymous.js"
+    },
+    "./plugins/api-key": {
+      "types": "./dist/plugins/api-key/index.d.ts",
+      "react-native": "./src/plugins/api-key/index.ts",
+      "src": "./src/plugins/api-key/index.ts",
+      "import": "./dist/plugins/api-key.js"
+    },
+    "./plugins/billing": {
+      "types": "./dist/plugins/billing/index.d.ts",
+      "react-native": "./src/plugins/billing/index.ts",
+      "src": "./src/plugins/billing/index.ts",
+      "import": "./dist/plugins/billing.js"
+    },
+    "./plugins/dash": {
+      "types": "./dist/plugins/dash/index.d.ts",
+      "react-native": "./src/plugins/dash/index.ts",
+      "src": "./src/plugins/dash/index.ts",
+      "import": "./dist/plugins/dash.js"
+    },
+    "./plugins/delete-user": {
+      "types": "./dist/plugins/delete-user/index.d.ts",
+      "react-native": "./src/plugins/delete-user/index.ts",
+      "src": "./src/plugins/delete-user/index.ts",
+      "import": "./dist/plugins/delete-user.js"
+    },
+    "./plugins/device-authorization": {
+      "types": "./dist/plugins/device-authorization/index.d.ts",
+      "react-native": "./src/plugins/device-authorization/index.ts",
+      "src": "./src/plugins/device-authorization/index.ts",
+      "import": "./dist/plugins/device-authorization.js"
+    },
+    "./plugins/email-otp": {
+      "types": "./dist/plugins/email-otp/index.d.ts",
+      "react-native": "./src/plugins/email-otp/index.ts",
+      "src": "./src/plugins/email-otp/index.ts",
+      "import": "./dist/plugins/email-otp.js"
+    },
+    "./plugins/last-login-method": {
+      "types": "./dist/plugins/last-login-method/index.d.ts",
+      "react-native": "./src/plugins/last-login-method/index.ts",
+      "src": "./src/plugins/last-login-method/index.ts",
+      "import": "./dist/plugins/last-login-method.js"
+    },
+    "./plugins/magic-link": {
+      "types": "./dist/plugins/magic-link/index.d.ts",
+      "react-native": "./src/plugins/magic-link/index.ts",
+      "src": "./src/plugins/magic-link/index.ts",
+      "import": "./dist/plugins/magic-link.js"
+    },
+    "./plugins/multi-session": {
+      "types": "./dist/plugins/multi-session/index.d.ts",
+      "react-native": "./src/plugins/multi-session/index.ts",
+      "src": "./src/plugins/multi-session/index.ts",
+      "import": "./dist/plugins/multi-session.js"
+    },
+    "./plugins/oauth-provider": {
+      "types": "./dist/plugins/oauth-provider/index.d.ts",
+      "react-native": "./src/plugins/oauth-provider/index.ts",
+      "src": "./src/plugins/oauth-provider/index.ts",
+      "import": "./dist/plugins/oauth-provider.js"
+    },
+    "./plugins/organization": {
+      "types": "./dist/plugins/organization/index.d.ts",
+      "react-native": "./src/plugins/organization/index.ts",
+      "src": "./src/plugins/organization/index.ts",
+      "import": "./dist/plugins/organization.js"
+    },
+    "./plugins/passkey": {
+      "types": "./dist/plugins/passkey/index.d.ts",
+      "react-native": "./src/plugins/passkey/index.ts",
+      "src": "./src/plugins/passkey/index.ts",
+      "import": "./dist/plugins/passkey.js"
+    },
+    "./plugins/phone-number": {
+      "types": "./dist/plugins/phone-number/index.d.ts",
+      "react-native": "./src/plugins/phone-number/index.ts",
+      "src": "./src/plugins/phone-number/index.ts",
+      "import": "./dist/plugins/phone-number.js"
+    },
+    "./plugins/siwe": {
+      "types": "./dist/plugins/siwe/index.d.ts",
+      "react-native": "./src/plugins/siwe/index.ts",
+      "src": "./src/plugins/siwe/index.ts",
+      "import": "./dist/plugins/siwe.js"
+    },
+    "./plugins/sso": {
+      "types": "./dist/plugins/sso/index.d.ts",
+      "react-native": "./src/plugins/sso/index.ts",
+      "src": "./src/plugins/sso/index.ts",
+      "import": "./dist/plugins/sso.js"
+    },
+    "./plugins/theme": {
+      "types": "./dist/plugins/theme/index.d.ts",
+      "react-native": "./src/plugins/theme/index.ts",
+      "src": "./src/plugins/theme/index.ts",
+      "import": "./dist/plugins/theme.js"
+    },
+    "./plugins/two-factor": {
+      "types": "./dist/plugins/two-factor/index.d.ts",
+      "react-native": "./src/plugins/two-factor/index.ts",
+      "src": "./src/plugins/two-factor/index.ts",
+      "import": "./dist/plugins/two-factor.js"
+    },
+    "./plugins/username": {
+      "types": "./dist/plugins/username/index.d.ts",
+      "react-native": "./src/plugins/username/index.ts",
+      "src": "./src/plugins/username/index.ts",
+      "import": "./dist/plugins/username.js"
     }
   },
   "react-native": "./src/index.ts",
@@ -30,7 +157,8 @@
   "dependencies": {
     "@tanstack/react-pacer": "^0.22.1",
     "clsx": "^2.1.1",
-    "tailwind-merge": "^2.6.1"
+    "tailwind-merge": "^2.6.1",
+    "@tanstack/react-form": "^1.33.5"
   },
   "devDependencies": {
     "@better-auth-ui/core": "workspace:*",
@@ -48,7 +176,8 @@
     "react": "^19.2.6",
     "react-native": "0.86.0",
     "react-native-svg": "^15.15.5",
-    "react-dom": "^19.2.6"
+    "react-dom": "^19.2.6",
+    "react-native-web": "^0.21.2"
   },
   "peerDependencies": {
     "@better-auth-ui/core": "*",
@@ -88,5 +217,8 @@
   },
   "publishConfig": {
     "access": "public"
-  }
+  },
+  "keywords": [
+    "tanstack-intent"
+  ]
 }

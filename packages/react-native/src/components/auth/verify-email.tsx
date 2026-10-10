@@ -1,3 +1,6 @@
+import { getAuthCallbackURL } from "@better-auth-ui/core"
+import { useAuthNavigation } from "../../navigation/navigation-context"
+import { AuthPrompts } from "@better-auth-ui/react"
 import { useAuth, useSendVerificationEmail } from "@better-auth-ui/react"
 import { useEffect, useState } from "react"
 import { cn } from "../../lib/cn"
@@ -34,12 +37,15 @@ const RESEND_COOLDOWN_SECONDS = 60
 export function VerifyEmail({ className, variant }: VerifyEmailProps) {
   const { authClient, baseURL, localization, redirectTo } = useAuth()
 
-  const [email, setEmail] = useState(() => getPendingEmail() ?? "")
+  const navigation = useAuthNavigation()
+  const [email, setEmail] = useState(
+    () => getPendingEmail() ?? navigation.getParam("email") ?? ""
+  )
   const [cooldown, setCooldown] = useState(RESEND_COOLDOWN_SECONDS)
 
   useEffect(() => {
-    setEmail(getPendingEmail() ?? "")
-  }, [])
+    setEmail(getPendingEmail() ?? navigation.getParam("email") ?? "")
+  }, [navigation])
 
   useEffect(() => {
     if (cooldown <= 0 || !email) return
@@ -65,6 +71,7 @@ export function VerifyEmail({ className, variant }: VerifyEmailProps) {
 
   return (
     <Card className={cn("w-full max-w-sm gap-4", className)} variant={variant}>
+      <AuthPrompts view="verifyEmail" />
       <Card.Header>
         <Card.Title className="mb-1">
           {localization.auth.verifyEmail}
@@ -76,7 +83,7 @@ export function VerifyEmail({ className, variant }: VerifyEmailProps) {
           {localization.auth.checkYourEmail}
         </Description>
 
-        {email && (
+        {!!email && (
           <Box className="flex-col gap-3">
             <OpenEmailButton email={email} />
 
@@ -88,7 +95,7 @@ export function VerifyEmail({ className, variant }: VerifyEmailProps) {
               onPress={() =>
                 sendVerificationEmail({
                   email,
-                  callbackURL: `${baseURL}${redirectTo}`
+                  callbackURL: getAuthCallbackURL(baseURL, redirectTo)
                 })
               }
             >

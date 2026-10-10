@@ -1,3 +1,5 @@
+import { apiKeyExpirationDaysToSeconds } from "@better-auth-ui/core/plugins/api-key"
+import { Select } from "../../../primitives/menu"
 import type { ApiKeyAuthClient } from "@better-auth-ui/core/plugins/api-key"
 import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
 import { useCreateApiKey } from "@better-auth-ui/react/plugins/api-key"
@@ -18,6 +20,7 @@ export type CreateApiKeyDialogProps = {
   onOpenChange: (open: boolean) => void
   /** Create an organization-owned key by passing the organization id. */
   organizationId?: string
+  configId?: string
 }
 
 /**
@@ -31,20 +34,27 @@ export type CreateApiKeyDialogProps = {
 export function CreateApiKeyDialog({
   isOpen,
   onOpenChange,
-  organizationId
+  organizationId,
+  configId
 }: CreateApiKeyDialogProps) {
   const { authClient, localization } = useAuth()
-  const { localization: apiKeyLocalization } = useAuthPlugin(apiKeyPlugin)
+  const { localization: apiKeyLocalization, keyExpiration } =
+    useAuthPlugin(apiKeyPlugin)
   const colors = useThemeColors()
 
-  const { mutate: createApiKey, isPending: isCreating } = useCreateApiKey(
-    authClient as ApiKeyAuthClient
-  )
+  const {
+    mutate: createApiKey,
+    reset,
+    isPending: isCreating
+  } = useCreateApiKey(authClient as ApiKeyAuthClient)
 
   const [isNewKeyDialogOpen, setIsNewKeyDialogOpen] = useState(false)
   const [keyName, setKeyName] = useState<string | null>(null)
   const [secretKey, setSecretKey] = useState<string | null>(null)
 
+  const [expiration, setExpiration] = useState(
+    keyExpiration ? String(keyExpiration.defaultInterval ?? "never") : "never"
+  )
   const [name, setName] = useState("")
 
   const handleOpenChange = (open: boolean) => {
@@ -60,12 +70,18 @@ export function CreateApiKeyDialog({
   const handleSubmit = () => {
     const trimmedName = name.trim()
 
+    const expiresIn =
+      expiration !== "never" && keyExpiration
+        ? apiKeyExpirationDaysToSeconds(Number(expiration))
+        : undefined
     const payload =
-      trimmedName || organizationId
+      trimmedName || organizationId || configId || expiresIn
         ? {
+            ...(expiresIn ? { expiresIn } : {}),
+            ...(configId ? { configId } : {}),
             ...(trimmedName ? { name: trimmedName } : {}),
             ...(organizationId
-              ? { organizationId, configId: "organization" }
+              ? { organizationId, configId: configId ?? "organization" }
               : {})
           }
         : undefined
@@ -76,6 +92,7 @@ export function CreateApiKeyDialog({
         setKeyName(trimmedName)
         setSecretKey(result.key)
         setIsNewKeyDialogOpen(true)
+        reset()
       }
     })
   }
@@ -117,6 +134,23 @@ export function CreateApiKeyDialog({
 
               <FieldError />
             </TextField>
+            {keyExpiration ? (
+              <Select
+                label={apiKeyLocalization.expiration}
+                selectedKey={expiration}
+                onSelectionChange={setExpiration}
+                isDisabled={isCreating}
+                options={[
+                  ...keyExpiration.intervals.map((days) => ({
+                    key: String(days),
+                    label: `${days} ${days === 1 ? apiKeyLocalization.day : apiKeyLocalization.days}`
+                  })),
+                  ...(keyExpiration.allowNever
+                    ? [{ key: "never", label: apiKeyLocalization.never }]
+                    : [])
+                ]}
+              />
+            ) : null}
           </AlertDialog.Body>
 
           <AlertDialog.Footer>
@@ -137,7 +171,13 @@ export function CreateApiKeyDialog({
 
       <NewApiKeyDialog
         isOpen={isNewKeyDialogOpen}
-        onOpenChange={setIsNewKeyDialogOpen}
+        onOpenChange={(open) => {
+          setIsNewKeyDialogOpen(open)
+          if (!open) {
+            setSecretKey(null)
+            setKeyName(null)
+          }
+        }}
         secretKey={secretKey}
         name={keyName}
       />

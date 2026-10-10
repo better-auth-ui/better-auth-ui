@@ -27,13 +27,19 @@ export type OrganizationsProps = {
  */
 export function Organizations({ className, variant }: OrganizationsProps) {
   const { authClient } = useAuth()
-  const { localization: organizationLocalization } =
-    useAuthPlugin(organizationPlugin)
+  const {
+    localization: organizationLocalization,
+    allowOrganizationCreation,
+    organizationLimit
+  } = useAuthPlugin(organizationPlugin)
 
   const [createOpen, setCreateOpen] = useState(false)
 
-  const { data: organizations, isPending: organizationsPending } =
-    useListOrganizations(authClient as OrganizationAuthClient)
+  const {
+    data: organizations,
+    isPending: organizationsPending,
+    error
+  } = useListOrganizations(authClient as OrganizationAuthClient)
 
   return (
     <>
@@ -46,7 +52,12 @@ export function Organizations({ className, variant }: OrganizationsProps) {
           <Button
             className="shrink-0"
             size="sm"
-            isDisabled={organizationsPending}
+            isDisabled={
+              organizationsPending ||
+              !allowOrganizationCreation ||
+              (organizationLimit !== undefined &&
+                (organizations?.length ?? 0) >= organizationLimit)
+            }
             onPress={() => setCreateOpen(true)}
           >
             {organizationLocalization.createOrganization}
@@ -57,8 +68,15 @@ export function Organizations({ className, variant }: OrganizationsProps) {
           <Card.Content className="gap-0">
             {organizationsPending ? (
               <OrganizationViewSkeleton />
+            ) : error ? (
+              <Txt accessibilityRole="alert">{error.message}</Txt>
             ) : !organizations?.length ? (
-              <OrganizationsEmpty onCreatePress={() => setCreateOpen(true)} />
+              <OrganizationsEmpty
+                onCreatePress={() => setCreateOpen(true)}
+                isDisabled={
+                  !allowOrganizationCreation || organizationLimit === 0
+                }
+              />
             ) : (
               organizations.map((organization, index) => (
                 <Box key={organization.id}>

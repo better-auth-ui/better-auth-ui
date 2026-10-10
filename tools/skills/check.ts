@@ -69,7 +69,18 @@ async function assertSameFiles(source: string, destination: string) {
   }
 }
 
-run([bun, cli("intent"), "validate", "--check"])
+// Workspace packages can also publish a bin named intent. Resolve the actual
+// validator from its manifest instead of Bun's colliding .bin symlink.
+const intentPackage = join(root, "node_modules/@tanstack/intent")
+const intentManifest = JSON.parse(
+  await readFile(join(intentPackage, "package.json"), "utf8")
+)
+run([
+  bun,
+  join(intentPackage, intentManifest.bin.intent),
+  "validate",
+  "--check"
+])
 
 const tree = Bun.YAML.parse(
   await readFile(join(root, "_artifacts/skill_tree.yaml"), "utf8")

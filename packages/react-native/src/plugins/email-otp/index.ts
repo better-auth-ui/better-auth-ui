@@ -1,0 +1,8 @@
+export { emailOtpPlugin } from "../../lib/auth/email-otp-plugin"
+export * from "../../components/auth/email-otp/change-email-otp"
+export * from "../../components/auth/email-otp/email-otp-button"
+export * from "../../components/auth/email-otp/email-otp-flow"
+export * from "../../components/auth/email-otp/email-otp"
+export * from "../../components/auth/email-otp/forgot-password-otp"
+export * from "../../components/auth/email-otp/reset-password-otp"
+export * from "../../components/auth/email-otp/verify-email-otp"

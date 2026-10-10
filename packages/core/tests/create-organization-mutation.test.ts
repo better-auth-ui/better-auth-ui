@@ -60,7 +60,7 @@ describe("organization creation with generated slugs", () => {
 
     const result = await submit({ name: "Acme" })
 
-    expect(result.slug).toMatch(/^acme-[a-f0-9-]+$/)
+    expect(result.slug).toMatch(/^acme-[a-z0-9]+-[a-z0-9]+$/)
     expect(checkSlug).toHaveBeenCalledTimes(2)
     expect(checkSlug).toHaveBeenLastCalledWith(
       expect.objectContaining({ slug: result.slug })

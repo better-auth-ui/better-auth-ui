@@ -7,17 +7,25 @@
     "start": "expo start",
     "android": "expo start --android",
     "ios": "expo start --ios",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "build": "expo export --platform all"
   },
   "dependencies": {
     "@better-auth-ui/core": "workspace:*",
     "@better-auth-ui/react": "workspace:*",
     "@better-auth-ui/react-native": "workspace:*",
+    "@better-auth/api-key": "1.7.2",
     "@better-auth/expo": "1.7.2",
+    "@better-auth/sso": "1.7.2",
     "@expo/metro-runtime": "~57.0.3",
+    "@react-native-community/datetimepicker": "9.1.0",
+    "@react-native-community/slider": "5.2.0",
     "@tanstack/react-query": "^5.101.0",
     "better-auth": "1.7.2",
     "expo": "~57.0.4",
+    "expo-clipboard": "~57.0.2",
+    "expo-image-manipulator": "~57.0.21",
+    "expo-image-picker": "~57.0.20",
     "expo-linking": "~57.0.2",
     "expo-router": "~57.0.4",
     "expo-secure-store": "~57.0.0",
@@ -28,8 +36,7 @@
     "react-native-safe-area-context": "~5.7.0",
     "react-native-screens": "~4.25.2",
     "react-native-svg": "^15.15.5",
-    "react-native-web": "^0.21.2",
-    "@better-auth/api-key": "1.7.2"
+    "react-native-web": "^0.21.2"
   },
   "devDependencies": {
     "@types/react": "~19.2.2",

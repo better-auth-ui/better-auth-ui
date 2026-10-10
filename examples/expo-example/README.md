@@ -1,25 +1,53 @@
-# expo-example
+# Expo example
 
-A minimal Expo Router app showing [`@better-auth-ui/react-native`](../../packages/react-native) with the built-in **state adapter** — the whole auth flow (sign-in, sign-up, forgot/reset password, verify email, social) renders from a single `<Auth />` with no router wiring. After sign-in, `Stack.Protected` swaps to the protected dashboard automatically from the Better Auth session.
+This app uses the native Expo Router adapter. One provider stays mounted above all
+routes, preserving verification state and actions that require fresh authentication.
+The UI uses plain React Native styles.
 
 ## Run
 
-```sh
-# from the repo root
-bun install
+From the repository root:
 
-# point at your Better Auth server (defaults to http://localhost:3000)
-EXPO_PUBLIC_API_URL=http://localhost:3000 bun --cwd examples/expo-example start
-# then press i (iOS) or a (Android)
+```sh
+bun install
+EXPO_PUBLIC_API_URL=http://localhost:3000 bun nx run expo-example:start
 ```
 
-The server must register the [`expo()`](https://www.better-auth.com/docs/integrations/expo) plugin and trust the `betterauthuiexpo://` scheme.
+Use your machine's LAN address on a physical device. The server must register
+[Better Auth's Expo integration](https://www.better-auth.com/docs/integrations/expo)
+and trust `betterauthuiexpo://` callbacks.
 
-## What to look at
+## Server configuration
 
-- `app/_layout.tsx` — session-driven routing (`Stack.Protected`).
-- `app/(auth)/index.tsx` — `<AuthProvider><Auth /></AuthProvider>`, the entire flow.
-- `app/(app)/index.tsx` — protected dashboard with `<UserButton />`.
-- `src/auth-client.ts` — `@better-auth/expo` client + `expo-secure-store`.
-- `metro.config.js` / `babel.config.js` — plain Expo + monorepo wiring. **No nativewind / tailwind** — `@better-auth-ui/react-native` styles itself, so this app has zero styling setup.
-- `app/showcase.tsx` — `/showcase`, mounts every subsystem at once for QA.
+Enable email/password authentication and matching client plugins: API key, admin,
+anonymous, device authorization, email OTP, last login method, magic link,
+multi-session, organization, phone number, SSO, two-factor, and username.
+Organization client options enable teams and dynamic access control.
+Configure the same features on the server, including its permission registry.
+Configure mail and SMS delivery, OAuth provider credentials, and application origins.
+
+Features backed by application integrations, such as billing, native passkeys,
+SIWE wallets, Agent Auth, Dash, and OAuth client management, are available in the
+package. This example does not supply those application integrations.
+
+## Routes
+
+- `app/_layout.tsx` configures the persistent provider, plugins, and navigation adapter.
+- `app/auth/[...view].tsx` resolves built-in and plugin views, tokens, and return destinations.
+- `app/settings/[...view].tsx` renders account, security, and contributed settings tabs.
+- `app/organization/[slug]/[...view].tsx` uses explicit organization access.
+- `app/admin/[...view].tsx` renders administration with server permission checks.
+- `app/(app)/index.tsx` links to settings and redirects unauthenticated users to sign-in.
+- `app/showcase.tsx` renders account and organization components with the root configuration.
+- `src/auth-client.ts` configures client plugins and native secure session storage.
+
+## Validate
+
+```sh
+bun nx run expo-example:typecheck
+bun nx run expo-example:build
+```
+
+The build exports iOS, Android, and web bundles. It does not test a running device.
+Follow the [native device checklist](../../packages/react-native/PARITY.md#device-validation-to-finish)
+against your configured server before shipping.

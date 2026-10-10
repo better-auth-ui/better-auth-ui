@@ -19,6 +19,7 @@ export type DeleteApiKeyDialogProps = {
   apiKey: ListedApiKey
   /** Scope the delete payload to an organization (sets `configId`). */
   organizationId?: string
+  configId?: string
 }
 
 /**
@@ -34,7 +35,8 @@ export function DeleteApiKeyDialog({
   isOpen,
   onOpenChange,
   apiKey,
-  organizationId
+  organizationId,
+  configId
 }: DeleteApiKeyDialogProps) {
   const { authClient, localization } = useAuth()
   const { localization: apiKeyLocalization } = useAuthPlugin(apiKeyPlugin)
@@ -95,7 +97,9 @@ export function DeleteApiKeyDialog({
           onPress={() =>
             deleteApiKey({
               keyId: apiKey.id,
-              ...(organizationId ? { configId: "organization" } : {})
+              ...((configId ?? (organizationId ? "organization" : undefined))
+                ? { configId: configId ?? "organization" }
+                : {})
             })
           }
         >

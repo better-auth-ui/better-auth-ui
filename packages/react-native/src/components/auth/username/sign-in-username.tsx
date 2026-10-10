@@ -1,6 +1,9 @@
+import { LastUsedBadge } from "../last-login-method/last-used-badge"
+import { useSignInContinuation } from "../../../lib/auth/use-sign-in-continuation"
 import { authMutationKeys } from "@better-auth-ui/core"
 import type { UsernameAuthClient } from "@better-auth-ui/core/plugins/username"
 import {
+  getAuthButtonKey,
   useAuth,
   useAuthPlugin,
   useFetchOptions,
@@ -22,6 +25,7 @@ import { Form } from "../../../primitives/form"
 import { Input } from "../../../primitives/input"
 import { Link } from "../../../primitives/link"
 import { Box } from "../../../primitives/styled"
+import { AuthPrompts } from "@better-auth-ui/react"
 import { FieldSeparator } from "../field-separator"
 import { ProviderButtons, type SocialLayout } from "../provider-buttons"
 
@@ -56,9 +60,7 @@ export function SignInUsername({
     emailAndPassword,
     localization,
     plugins,
-    redirectTo,
-    socialProviders,
-    navigate
+    socialProviders
   } = useAuth()
 
   const { localization: usernameLocalization } = useAuthPlugin(usernamePlugin)
@@ -66,6 +68,7 @@ export function SignInUsername({
   const navigation = useAuthNavigation()
   const { fetchOptions, resetFetchOptions } = useFetchOptions()
 
+  const onSignInSuccess = useSignInContinuation()
   const [identifier, setIdentifier] = useState("")
   const [password, setPassword] = useState("")
   const [rememberMe, setRememberMe] = useState(false)
@@ -82,7 +85,7 @@ export function SignInUsername({
 
         resetFetchOptions()
       },
-      onSuccess: () => navigate({ to: redirectTo })
+      onSuccess: onSignInSuccess
     })
 
   const { mutate: signInUsername, isPending: isSignInUsernamePending } =
@@ -96,7 +99,7 @@ export function SignInUsername({
 
         resetFetchOptions()
       },
-      onSuccess: () => navigate({ to: redirectTo })
+      onSuccess: onSignInSuccess
     })
 
   const handleSubmit = () => {
@@ -140,6 +143,7 @@ export function SignInUsername({
       </Card.Header>
 
       <Card.Content className="gap-4">
+        <AuthPrompts view="signIn" />
         {socialPosition === "top" && (
           <>
             {!!socialProviders?.length && (
@@ -227,12 +231,13 @@ export function SignInUsername({
                 isPending={isSignInPending || isPending}
               >
                 {localization.auth.signIn}
+                <LastUsedBadge method={["username", "email"]} />
               </Button>
 
               {plugins.flatMap((plugin) =>
-                (plugin.authButtons ?? []).map((AuthButton, index) => (
+                (plugin.authButtons ?? []).map((AuthButton) => (
                   <AuthButton
-                    key={`${plugin.id}-${index.toString()}`}
+                    key={getAuthButtonKey(plugin.id, AuthButton)}
                     view="signIn"
                   />
                 ))

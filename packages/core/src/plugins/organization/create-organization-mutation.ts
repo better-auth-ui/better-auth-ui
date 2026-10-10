@@ -1,6 +1,9 @@
 import type { MutationOptions } from "@tanstack/query-core"
 import type { BetterFetchError } from "better-auth/client"
-import { generateOrganizationSlug } from "./generate-organization-slug"
+import {
+  generateOrganizationSlug,
+  generateOrganizationSlugSuffix
+} from "./generate-organization-slug"
 import type { OrganizationAuthClient } from "./organization-auth-client"
 import { organizationMutationKeys } from "./organization-mutation-keys"
 import { organizationQueryKeys } from "./organization-query-keys"
@@ -61,7 +64,10 @@ export function createOrganizationOptions<
           throw error
         }
 
-        slug = generateOrganizationSlug(params.name, crypto.randomUUID())
+        slug = generateOrganizationSlug(
+          params.name,
+          generateOrganizationSlugSuffix()
+        )
       }
     }
   }

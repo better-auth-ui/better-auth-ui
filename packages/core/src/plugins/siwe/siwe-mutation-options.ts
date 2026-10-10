@@ -28,10 +28,8 @@ export const signInSiweOptions = (
 ) => {
   const mutationFn = async ({ email }: SignInSiweVariables = {}) => {
     const wallet = await config.connector.connect()
-    const nonceResult = await authClient.siwe.nonce({
-      fetchOptions: { throw: true }
-    })
-    const nonce = nonceResult.data?.nonce
+    const nonceResult = await authClient.siwe.nonce(undefined, { throw: true })
+    const nonce = nonceResult.nonce
     if (!nonce) throw new Error("The SIWE nonce response was empty.")
 
     const message = createSiweMessage({

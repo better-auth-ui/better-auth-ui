@@ -1,46 +1,53 @@
-import { authMutationKeys } from "@better-auth-ui/core"
-import { useAuth, useFetchOptions, useSignUpEmail } from "@better-auth-ui/react"
+import { getAuthButtonKey } from "@better-auth-ui/react"
+import {
+  authMutationKeys,
+  getAdditionalFieldDefaultValues,
+  getAdditionalFieldSubmitValues,
+  getAuthCallbackURL,
+  isPasswordCompromisedError,
+  validateEmailAddress,
+  validateMatchingValue,
+  validateStringLength
+} from "@better-auth-ui/core"
+import {
+  AuthPrompts,
+  useAuth,
+  useFetchOptions,
+  useSignUpEmail
+} from "@better-auth-ui/react"
 import { useIsMutating } from "@tanstack/react-query"
-import { useState } from "react"
+import { useMemo, useState } from "react"
 import { cn } from "../../lib/cn"
 import { setPendingEmail } from "../../lib/pending-email"
 import { useAuthNavigation } from "../../navigation/navigation-context"
-import { Button } from "../../primitives/button"
 import { Card, type CardVariant } from "../../primitives/card"
-import { Description } from "../../primitives/description"
-import { FieldError, Label, TextField } from "../../primitives/field"
-import { Form } from "../../primitives/form"
-import { Input, InputGroup } from "../../primitives/input"
 import { Link } from "../../primitives/link"
-import { Box } from "../../primitives/styled"
-import { toast } from "../../primitives/toast"
-import { Eye, EyeSlash } from "../../primitives/ui-icons"
+import { Description } from "../../primitives/description"
+import { getAuthAdditionalFieldValidators, useAuthForm } from "./auth-form"
 import { FieldSeparator } from "./field-separator"
 import { ProviderButtons, type SocialLayout } from "./provider-buttons"
 
 export interface SignUpProps {
+  verificationRedirectTo?: string
   className?: string
   socialLayout?: SocialLayout
   socialPosition?: "top" | "bottom"
   variant?: CardVariant
+  onSignUpSuccess?: () => void
 }
 
-/**
- * Sign-up screen: name, email, password (and optional confirm password)
- * fields, optional social provider buttons, and password visibility
- * controls. Mirrors the heroui `SignUp`, adapted for React Native: fields
- * are controlled state (no `FormData`), the verify-email hand-off uses the
- * in-memory pending-email store (no `sessionStorage`), and navigation goes
- * through the adapter.
- */
 export function SignUp({
   className,
   socialLayout,
   socialPosition = "bottom",
-  variant
+  variant,
+  onSignUpSuccess,
+  verificationRedirectTo
 }: SignUpProps) {
   const {
+    additionalFields,
     authClient,
+    baseURL,
     emailAndPassword,
     localization,
     plugins,
@@ -48,286 +55,247 @@ export function SignUp({
     socialProviders,
     navigate
   } = useAuth()
-
-  const captcha = plugins.find(
-    (plugin) => plugin.captchaComponent
-  )?.captchaComponent
-
   const navigation = useAuthNavigation()
   const { fetchOptions, resetFetchOptions } = useFetchOptions()
-
-  const [name, setName] = useState("")
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
-  const [confirmPassword, setConfirmPassword] = useState("")
-
-  const { mutate: signUpEmail } = useSignUpEmail(authClient, {
-    onError: () => {
-      setPassword("")
-      setConfirmPassword("")
+  const [isCompromised, setIsCompromised] = useState(false)
+  const fields = useMemo(
+    () => additionalFields?.filter((field) => field.signUp) ?? [],
+    [additionalFields]
+  )
+  const { mutateAsync: signUpEmail } = useSignUpEmail(authClient, {
+    onError: (error) => {
+      setIsCompromised(isPasswordCompromisedError(error))
+      form.setFieldValue("password", "")
+      form.setFieldValue("confirmPassword", "")
       resetFetchOptions()
     },
-    onSuccess: (_data, { email: submittedEmail }) => {
+    onSuccess: (_data, { email }) => {
       if (emailAndPassword?.requireEmailVerification) {
-        setPendingEmail(submittedEmail)
-        navigation.push("verifyEmail")
-      } else {
-        navigate({ to: redirectTo })
-      }
+        setPendingEmail(email)
+        navigation.push("verifyEmail", {
+          params: { redirectTo: verificationRedirectTo ?? redirectTo }
+        })
+      } else if (onSignUpSuccess) onSignUpSuccess()
+      else navigate({ to: redirectTo })
     }
   })
-
-  const [isPasswordVisible, setIsPasswordVisible] = useState(false)
-  const [isConfirmPasswordVisible, setIsConfirmPasswordVisible] =
-    useState(false)
-
-  const signInMutating = useIsMutating({
+  const form = useAuthForm({
+    defaultValues: {
+      name: "",
+      email: "",
+      password: "",
+      confirmPassword: "",
+      additionalFields: getAdditionalFieldDefaultValues(fields)
+    },
+    onSubmit: async ({ value }) => {
+      await signUpEmail({
+        ...getAdditionalFieldSubmitValues(fields, value.additionalFields),
+        name: emailAndPassword?.name === false ? "" : value.name,
+        email: value.email.trim(),
+        password: value.password,
+        callbackURL: getAuthCallbackURL(
+          baseURL,
+          verificationRedirectTo ?? redirectTo
+        ),
+        fetchOptions
+      })
+    }
+  })
+  const pendingSignIn = useIsMutating({
     mutationKey: authMutationKeys.signIn.all
   })
-  const signUpMutating = useIsMutating({
+  const pendingSignUp = useIsMutating({
     mutationKey: authMutationKeys.signUp.all
   })
-  const isPending = signInMutating + signUpMutating > 0
-
-  const handleSubmit = () => {
-    if (emailAndPassword?.confirmPassword && password !== confirmPassword) {
-      toast.danger(localization.auth.passwordsDoNotMatch)
-      setPassword("")
-      setConfirmPassword("")
-      return
-    }
-
-    signUpEmail({
-      name,
-      email,
-      password,
-      fetchOptions
+  const isPending = pendingSignIn + pendingSignUp > 0
+  const passwordValidation = (value: string) =>
+    validateStringLength(value, {
+      requiredMessage: localization.auth.fieldRequired,
+      minLength: emailAndPassword?.minPasswordLength,
+      maxLength: emailAndPassword?.maxPasswordLength,
+      minLengthMessage: localization.auth.tooShort.replace(
+        "{{min}}",
+        String(emailAndPassword?.minPasswordLength)
+      ),
+      maxLengthMessage: localization.auth.tooLong.replace(
+        "{{max}}",
+        String(emailAndPassword?.maxPasswordLength)
+      )
     })
-  }
-
-  const showSeparator = emailAndPassword?.enabled && !!socialProviders?.length
-  const inputVariant = variant === "transparent" ? "primary" : "secondary"
-
+  const renderAdditionalFields = (position: "above" | "below") =>
+    fields
+      .filter((field) =>
+        position === "above"
+          ? field.signUp === "above"
+          : field.signUp !== "above"
+      )
+      .map((configured) => (
+        <form.AppField
+          key={configured.name}
+          name={`additionalFields.${configured.name}`}
+          validators={getAuthAdditionalFieldValidators(
+            configured,
+            localization.auth.fieldRequired
+          )}
+        >
+          {(field) => (
+            <field.AuthFormAdditionalField
+              field={configured}
+              isPending={isPending}
+              variant={variant}
+              optionalLabel={localization.auth.optional}
+            />
+          )}
+        </form.AppField>
+      ))
+  const providers = (
+    <>
+      {!!socialProviders?.length && (
+        <ProviderButtons socialLayout={socialLayout} />
+      )}
+    </>
+  )
+  const separator =
+    emailAndPassword?.enabled && !!socialProviders?.length ? (
+      <FieldSeparator>{localization.auth.or}</FieldSeparator>
+    ) : null
   return (
     <Card className={cn("w-full max-w-sm gap-4", className)} variant={variant}>
+      <AuthPrompts view="signUp" />
       <Card.Header>
-        <Card.Title className="mb-1">{localization.auth.signUp}</Card.Title>
+        <Card.Title>{localization.auth.signUp}</Card.Title>
       </Card.Header>
-
       <Card.Content className="gap-4">
-        {socialPosition === "top" && (
+        {socialPosition === "top" ? (
           <>
-            {!!socialProviders?.length && (
-              <ProviderButtons socialLayout={socialLayout} />
-            )}
-            {showSeparator && (
-              <FieldSeparator>{localization.auth.or}</FieldSeparator>
-            )}
+            {providers}
+            {separator}
           </>
-        )}
-
-        {emailAndPassword?.enabled && (
-          <Form onSubmit={handleSubmit} className="gap-4">
-            {emailAndPassword.name !== false && (
-              <TextField
-                name="name"
-                type="text"
-                autoComplete="name"
-                isDisabled={isPending}
-                value={name}
-                onChange={setName}
-                validate={(value) => {
-                  if (!value) return localization.auth.fieldRequired
-                }}
-              >
-                <Label>{localization.auth.name}</Label>
-                <Input
-                  placeholder={localization.auth.namePlaceholder}
-                  variant={inputVariant}
-                  required
-                />
-                <FieldError />
-              </TextField>
-            )}
-
-            <TextField
-              name="email"
-              type="email"
-              autoComplete="email"
-              isDisabled={isPending}
-              value={email}
-              onChange={setEmail}
-              validate={(value) => {
-                if (!value) return localization.auth.fieldRequired
-                if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value))
-                  return localization.auth.invalidEmail
-              }}
-            >
-              <Label>{localization.auth.email}</Label>
-              <Input
-                placeholder={localization.auth.emailPlaceholder}
-                variant={inputVariant}
-                required
-              />
-              <FieldError />
-            </TextField>
-
-            <TextField
-              name="password"
-              type="password"
-              autoComplete="new-password"
-              isDisabled={isPending}
-              value={password}
-              onChange={setPassword}
-              validate={(value) => {
-                if (!value) return localization.auth.fieldRequired
-                const min = emailAndPassword?.minPasswordLength
-                const max = emailAndPassword?.maxPasswordLength
-                if (min && value.length < min)
-                  return localization.auth.tooShort.replace(
-                    "{{min}}",
-                    String(min)
-                  )
-                if (max && value.length > max)
-                  return localization.auth.tooLong.replace(
-                    "{{max}}",
-                    String(max)
-                  )
-              }}
-            >
-              <Label>{localization.auth.password}</Label>
-              <InputGroup variant={inputVariant}>
-                <InputGroup.Input
-                  name="password"
-                  placeholder={localization.auth.passwordPlaceholder}
-                  type={isPasswordVisible ? "text" : "password"}
-                  required
-                />
-                <InputGroup.Suffix className="px-0">
-                  <Button
-                    isIconOnly
-                    size="sm"
-                    variant="ghost"
-                    isDisabled={isPending}
-                    aria-label={
-                      isPasswordVisible
-                        ? localization.auth.hidePassword
-                        : localization.auth.showPassword
-                    }
-                    onPress={() => setIsPasswordVisible(!isPasswordVisible)}
-                  >
-                    {isPasswordVisible ? (
-                      <EyeSlash width={18} height={18} color="#525252" />
-                    ) : (
-                      <Eye width={18} height={18} color="#525252" />
-                    )}
-                  </Button>
-                </InputGroup.Suffix>
-              </InputGroup>
-              <FieldError />
-            </TextField>
-
-            {emailAndPassword?.confirmPassword && (
-              <TextField
-                name="confirmPassword"
-                type="password"
-                autoComplete="new-password"
-                isDisabled={isPending}
-                value={confirmPassword}
-                onChange={setConfirmPassword}
-                validate={(value) => {
-                  if (!value) return localization.auth.fieldRequired
-                  const min = emailAndPassword?.minPasswordLength
-                  const max = emailAndPassword?.maxPasswordLength
-                  if (min && value.length < min)
-                    return localization.auth.tooShort.replace(
-                      "{{min}}",
-                      String(min)
-                    )
-                  if (max && value.length > max)
-                    return localization.auth.tooLong.replace(
-                      "{{max}}",
-                      String(max)
-                    )
-                }}
-              >
-                <Label>{localization.auth.confirmPassword}</Label>
-                <InputGroup variant={inputVariant}>
-                  <InputGroup.Input
-                    name="confirmPassword"
-                    placeholder={localization.auth.confirmPasswordPlaceholder}
-                    type={isConfirmPasswordVisible ? "text" : "password"}
-                    required
-                  />
-                  <InputGroup.Suffix className="px-0">
-                    <Button
-                      isIconOnly
-                      size="sm"
-                      variant="ghost"
+        ) : null}
+        {emailAndPassword?.enabled ? (
+          <form.AppForm>
+            <form.AuthFormRoot className="gap-4">
+              {emailAndPassword.name !== false ? (
+                <form.AppField
+                  name="name"
+                  validators={{
+                    onChange: ({ value }) =>
+                      validateStringLength(value, {
+                        requiredMessage: localization.auth.fieldRequired,
+                        trim: true
+                      })
+                  }}
+                >
+                  {(field) => (
+                    <field.AuthFormTextField
+                      label={localization.auth.name}
+                      autoComplete="name"
                       isDisabled={isPending}
-                      aria-label={
-                        isConfirmPasswordVisible
-                          ? localization.auth.hidePassword
-                          : localization.auth.showPassword
-                      }
-                      onPress={() =>
-                        setIsConfirmPasswordVisible(!isConfirmPasswordVisible)
-                      }
-                    >
-                      {isConfirmPasswordVisible ? (
-                        <EyeSlash width={18} height={18} color="#525252" />
-                      ) : (
-                        <Eye width={18} height={18} color="#525252" />
-                      )}
-                    </Button>
-                  </InputGroup.Suffix>
-                </InputGroup>
-                <FieldError />
-              </TextField>
-            )}
-
-            {captcha}
-
-            <Box className="gap-3">
-              <Button
-                type="submit"
-                variant="primary"
-                className="w-full"
-                isPending={isPending}
+                      inputProps={{
+                        placeholder: localization.auth.namePlaceholder
+                      }}
+                    />
+                  )}
+                </form.AppField>
+              ) : null}
+              <form.AppField
+                name="email"
+                validators={{
+                  onChange: ({ value }) =>
+                    validateEmailAddress(value, {
+                      requiredMessage: localization.auth.fieldRequired,
+                      invalidMessage: localization.auth.invalidEmail
+                    })
+                }}
               >
-                {localization.auth.signUp}
-              </Button>
-
-              {plugins.flatMap((plugin) =>
-                (plugin.authButtons ?? []).map((AuthButton, index) => (
-                  <AuthButton
-                    key={`${plugin.id}-${index.toString()}`}
-                    view="signUp"
+                {(field) => (
+                  <field.AuthFormTextField
+                    label={localization.auth.email}
+                    type="email"
+                    autoComplete="email"
+                    isDisabled={isPending}
+                    inputProps={{
+                      placeholder: localization.auth.emailPlaceholder
+                    }}
                   />
-                ))
+                )}
+              </form.AppField>
+              {renderAdditionalFields("above")}
+              <form.AppField
+                name="password"
+                validators={{
+                  onChange: ({ value }) => passwordValidation(value)
+                }}
+                listeners={{ onChange: () => setIsCompromised(false) }}
+              >
+                {(field) => (
+                  <field.AuthFormPasswordField
+                    label={localization.auth.password}
+                    isPending={isPending}
+                    strengthMeter
+                    error={
+                      isCompromised
+                        ? localization.auth.passwordCompromised
+                        : undefined
+                    }
+                  />
+                )}
+              </form.AppField>
+              {emailAndPassword.confirmPassword ? (
+                <form.AppField
+                  name="confirmPassword"
+                  validators={{
+                    onChangeListenTo: ["password"],
+                    onChange: ({ value, fieldApi }) =>
+                      passwordValidation(value) ??
+                      validateMatchingValue(
+                        value,
+                        fieldApi.form.getFieldValue("password"),
+                        localization.auth.passwordsDoNotMatch
+                      )
+                  }}
+                >
+                  {(field) => (
+                    <field.AuthFormPasswordField
+                      label={localization.auth.confirmPassword}
+                      isPending={isPending}
+                    />
+                  )}
+                </form.AppField>
+              ) : null}
+              {renderAdditionalFields("below")}
+              {
+                plugins.find((plugin) => plugin.captchaComponent)
+                  ?.captchaComponent
+              }
+              <form.AuthFormSubmitButton isPending={isPending}>
+                {localization.auth.signUp}
+              </form.AuthFormSubmitButton>
+              {plugins.flatMap(
+                (plugin) =>
+                  plugin.authButtons?.map((AuthButton) => (
+                    <AuthButton
+                      key={getAuthButtonKey(plugin.id, AuthButton)}
+                      view="signUp"
+                    />
+                  )) ?? []
               )}
-            </Box>
-          </Form>
-        )}
-
-        {socialPosition === "bottom" && (
+            </form.AuthFormRoot>
+          </form.AppForm>
+        ) : null}
+        {socialPosition === "bottom" ? (
           <>
-            {showSeparator && (
-              <FieldSeparator>{localization.auth.or}</FieldSeparator>
-            )}
-            {!!socialProviders?.length && (
-              <ProviderButtons socialLayout={socialLayout} />
-            )}
+            {separator}
+            {providers}
           </>
-        )}
-      </Card.Content>
-
-      <Card.Footer className="flex-col gap-3">
-        <Description className="text-sm">
+        ) : null}
+        <Description>
           {localization.auth.alreadyHaveAnAccount}{" "}
-          <Link view="signIn">{localization.auth.signIn}</Link>
+          <Link onPress={() => navigation.push("signIn")}>
+            {localization.auth.signIn}
+          </Link>
         </Description>
-      </Card.Footer>
+      </Card.Content>
     </Card>
   )
 }
