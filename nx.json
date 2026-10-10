@@ -166,6 +166,7 @@
           "@tanstack/devtools-vite",
           "@tanstack/react-start",
           "@tanstack/solid-start",
+          "@typescript/native",
           "@vitejs/plugin-react",
           "fumadocs-mdx",
           "next",
@@ -179,7 +180,7 @@
     ],
     "typecheckToolchain": [
       {
-        "externalDependencies": ["typescript"]
+        "externalDependencies": ["@typescript/native", "next", "typescript"]
       }
     ],
     "testToolchain": [

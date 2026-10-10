@@ -13,6 +13,14 @@ Before completing any task, ensure all of the following pass:
 1. **Oxfmt**: No formatting errors in modified files.
 2. **Oxlint**: No lint errors in the project.
 
+## TypeScript toolchain
+
+- Use Nx's [TypeScript 7 guidance](https://nx.dev/docs/kb/typescript-7) for compiler updates.
+- Keep `@typescript/native` aliased to TypeScript 7 and `typescript` aliased to `@typescript/typescript6` across workspace dependencies.
+- Use `tsc` for native compilation and typechecking. Use the `typescript` alias for API tooling and `tsc6` for legacy compiler tasks.
+- Include both compiler dependencies in Nx cache inputs for tasks that use the compiler.
+- Run the full validation suite and declaration consumer checks before you commit compiler updates.
+
 ## Localization parity
 
 - When you add, rename, or remove a localization key, update every locale in `packages/locales/src` in the same change.

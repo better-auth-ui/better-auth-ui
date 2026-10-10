@@ -20,7 +20,6 @@
       "fumadocs-mdx:collections/*": ["./.source/*"]
     },
     "noEmit": true,
-    "noUncheckedSideEffectImports": false,
-    "ignoreDeprecations": "6.0"
+    "noUncheckedSideEffectImports": false
   }
 }
