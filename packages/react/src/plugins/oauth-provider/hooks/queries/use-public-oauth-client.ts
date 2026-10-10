@@ -28,12 +28,13 @@ export function usePublicOAuthClient<
   options: UsePublicOAuthClientOptions<TAuthClient> = {},
   queryClient?: QueryClient
 ) {
-  const { fetchOptions, ...queryOptions } = options
+  const { fetchOptions, oauthQuery, ...queryOptions } = options
 
   return useQuery(
     {
       ...publicOAuthClientOptions(authClient, clientId, {
-        fetchOptions
+        fetchOptions,
+        oauthQuery
       } as PublicOAuthClientParams<TAuthClient>),
       ...queryOptions
     },

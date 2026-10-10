@@ -47,3 +47,20 @@ const client = await fetchPublicOAuthClient(queryClient, authClient, clientId)
 ## Params
 
 <type-table path="packages/core/src/plugins/oauth-provider/public-oauth-client-query.ts" name="PublicOAuthClientParams" />
+
+## Verify an authorization request
+
+For consent pages, pass the complete signed query, including `sig` and `exp`:
+
+```tsx
+const publicClient = usePublicOAuthClient(authClient, clientId, {
+  oauthQuery: window.location.search,
+  retry: false
+})
+```
+
+For Solid, return these options from an accessor. The query uses Better Auth's `publicClientPrelogin` endpoint and requires `allowPublicClientPrelogin: true` in the server's OAuth provider configuration. A rejected signature does not fall back to an unverified metadata lookup. Each signed query has its own cache entry.
+
+Omit `oauthQuery` for ordinary metadata lookups, such as the connected applications list. The imperative query helpers also accept this option.
+
+The consent component reads the browser query by default. If your router updates the query without remounting the component or firing `popstate`, pass its complete query string through the component's `oauthQuery` prop. Consent submission forwards the same query that was verified.

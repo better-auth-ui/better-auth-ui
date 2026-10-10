@@ -27,11 +27,13 @@ export function usePublicOAuthClient<
   queryClient?: Accessor<QueryClient>
 ) {
   return useQuery(() => {
-    const { fetchOptions, initialData, ...queryOptions } = options?.() ?? {}
+    const { fetchOptions, oauthQuery, initialData, ...queryOptions } =
+      options?.() ?? {}
 
     return {
       ...publicOAuthClientOptions(authClient, clientId(), {
-        fetchOptions
+        fetchOptions,
+        oauthQuery
       } as PublicOAuthClientParams<TAuthClient>),
       ...queryOptions,
       initialData: initialData as undefined

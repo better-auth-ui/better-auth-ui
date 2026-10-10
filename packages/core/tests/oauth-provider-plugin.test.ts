@@ -2,6 +2,7 @@ import { describe, expect, it, vi } from "vitest"
 import {
   createBetterAuthOAuthClientManager,
   groupOAuthConsents,
+  getOAuthAuthorizationDestination,
   hasOAuthPrompt,
   type OAuthScopeMetadataDefinition,
   oauthProviderLocalization,
@@ -376,5 +377,36 @@ describe("groupOAuthConsents", () => {
   it("handles an empty or missing list", () => {
     expect(groupOAuthConsents([])).toEqual([])
     expect(groupOAuthConsents(undefined)).toEqual([])
+  })
+})
+
+describe("getOAuthAuthorizationDestination", () => {
+  it.each([
+    [
+      "https://app.example/callback?trusted=official.example",
+      "https://app.example"
+    ],
+    ["http://127.0.0.1:3000/cb", "http://127.0.0.1:3000"],
+    ["acme://callback/path", "acme://callback"],
+    ["acme:/callback", "acme:"]
+  ])("shows the actual destination of %s", (redirectUri, expected) => {
+    expect(
+      getOAuthAuthorizationDestination(
+        new URLSearchParams({ redirect_uri: redirectUri }).toString()
+      )
+    ).toBe(expected)
+  })
+
+  it.each([
+    "",
+    "redirect_uri=",
+    "redirect_uri=https://one.example&redirect_uri=https://two.example",
+    "redirect_uri=javascript:alert(1)",
+    "redirect_uri=data:text/html,hello",
+    "redirect_uri=file:///tmp/callback",
+    "redirect_uri=https://official.example@attacker.example/cb",
+    "redirect_uri=not-a-url"
+  ])("hides unsafe or ambiguous destinations (%s)", (search) => {
+    expect(getOAuthAuthorizationDestination(search)).toBeUndefined()
   })
 })

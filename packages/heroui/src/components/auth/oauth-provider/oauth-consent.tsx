@@ -1,7 +1,7 @@
 "use client"
 
 import {
-  type OAuthAuthorizationRequest,
+  getOAuthAuthorizationDestination,
   type OAuthProviderAuthClient,
   parseOAuthAuthorizationRequest,
   resolveOAuthScopeMetadata,
@@ -12,7 +12,7 @@ import {
   useOAuthConsent,
   usePublicOAuthClient
 } from "@better-auth-ui/react/plugins/oauth-provider"
-import { Check, Shield } from "@gravity-ui/icons"
+import { Check, Ellipsis, Link as LinkIcon, Square } from "@gravity-ui/icons"
 import {
   Avatar,
   Button,
@@ -23,35 +23,57 @@ import {
   Skeleton,
   Spinner
 } from "@heroui/react"
-import { useEffect, useState } from "react"
+import { useSyncExternalStore } from "react"
 
 import { oauthProviderPlugin } from "../../../lib/auth/oauth-provider-plugin"
 import { UserAvatar } from "../user/user-avatar"
 
 export type OAuthConsentProps = {
   className?: string
+  /** The complete signed query. Pass it from your router for same-page navigation. */
+  oauthQuery?: string
   variant?: CardProps["variant"]
+}
+
+const subscribeToQuery = (onChange: () => void) => {
+  window.addEventListener("popstate", onChange)
+  return () => window.removeEventListener("popstate", onChange)
 }
 
 const interpolateClient = (template: string, clientName: string) =>
   template.replace("{{client}}", clientName)
 
-export function OAuthConsent({ className, variant }: OAuthConsentProps) {
+export function OAuthConsent({
+  className,
+  variant,
+  oauthQuery
+}: OAuthConsentProps) {
   const { authClient } = useAuth()
   const { localization, scopeMetadata } = useAuthPlugin(oauthProviderPlugin)
   const oauthClient = authClient as OAuthProviderAuthClient
   const { data: session, isPending: isSessionPending } = useSession(oauthClient)
-  const [request, setRequest] = useState<OAuthAuthorizationRequest>()
-
-  useEffect(() => {
-    setRequest(parseOAuthAuthorizationRequest(window.location.search))
-  }, [])
-
+  const browserQuery = useSyncExternalStore(
+    subscribeToQuery,
+    () => window.location.search,
+    () => undefined
+  )
+  const query = oauthQuery ?? browserQuery
+  const request =
+    query === undefined ? undefined : parseOAuthAuthorizationRequest(query)
   const publicClient = usePublicOAuthClient(oauthClient, request?.clientId, {
-    enabled: Boolean(session && request?.clientId)
+    enabled: Boolean(session && request?.clientId),
+    oauthQuery: query,
+    retry: false,
+    staleTime: 0,
+    gcTime: 0
   })
   const consent = useOAuthConsent(oauthClient)
-  const client = publicClient.data
+  const client =
+    !publicClient.isFetching && !publicClient.isError
+      ? publicClient.data
+      : undefined
+  const destination =
+    client && query ? getOAuthAuthorizationDestination(query) : undefined
   const clientName = client?.client_name || localization.application
   const logoUrl = sanitizeOAuthClientUrl(client?.logo_uri)
   const policyUrl = sanitizeOAuthClientUrl(client?.policy_uri)
@@ -62,7 +84,10 @@ export function OAuthConsent({ className, variant }: OAuthConsentProps) {
     (!request.clientId ||
       (!isSessionPending && !session) ||
       publicClient.isError ||
-      (!publicClient.isPending && session && !client))
+      (!publicClient.isPending &&
+        !publicClient.isFetching &&
+        session &&
+        !client))
   const canRespond = Boolean(
     request?.clientId && session && client && !consent.isPending
   )
@@ -86,44 +111,45 @@ export function OAuthConsent({ className, variant }: OAuthConsentProps) {
   return (
     <Card className={cardClassName} variant={variant}>
       <Card.Header className="flex flex-col gap-4">
-        <div className="flex items-center gap-3">
+        <div className="flex items-center justify-center gap-5">
           {client ? (
-            <Avatar size="lg">
+            <Avatar className="size-16">
               <Avatar.Image
                 alt={clientName}
                 referrerPolicy="no-referrer"
                 src={logoUrl}
               />
               <Avatar.Fallback>
-                <Shield className="size-5" />
+                <Square className="size-7" />
               </Avatar.Fallback>
             </Avatar>
           ) : (
-            <Skeleton className="size-12 rounded-full" />
+            <Skeleton className="size-16 rounded-full" />
           )}
-
-          <div className="min-w-0 flex-1">
-            {client ? (
-              <p className="truncate font-medium">{clientName}</p>
-            ) : (
-              <Skeleton className="h-4 w-36" />
-            )}
-            {client?.client_uri ? (
-              <p className="truncate text-xs text-muted">{client.client_uri}</p>
-            ) : null}
-          </div>
+          <Ellipsis aria-hidden="true" className="size-5 text-muted" />
+          <UserAvatar
+            className="size-16"
+            isPending={isSessionPending}
+            user={session?.user}
+          />
         </div>
-
-        <div className="flex flex-col gap-1">
-          <Card.Title className="text-xl font-semibold">
-            {interpolateClient(localization.authorize, clientName)}
+        <div className="grid justify-items-center gap-1 text-center">
+          <Card.Title className="max-w-full break-words text-xl font-semibold">
+            {client ? clientName : <Skeleton className="h-6 w-36" />}
           </Card.Title>
           <Card.Description>
-            {interpolateClient(
-              localization.authorizationDescription,
-              clientName
-            )}
+            {localization.authorizationRequest}
           </Card.Description>
+          <div className="mt-2 flex max-w-full flex-wrap justify-center gap-x-1 text-sm text-muted">
+            <span>{localization.signedInAs}</span>
+            {session ? (
+              <span className="break-all font-medium">
+                {session.user.name || session.user.email}
+              </span>
+            ) : (
+              <Skeleton className="h-4 w-32" />
+            )}
+          </div>
         </div>
       </Card.Header>
 
@@ -133,7 +159,7 @@ export function OAuthConsent({ className, variant }: OAuthConsentProps) {
             {interpolateClient(localization.requestedPermissions, clientName)}
           </p>
 
-          {request ? (
+          {client && request ? (
             <ul className="flex flex-col gap-3">
               {request.scopes.map((scope) => {
                 const metadata = resolveOAuthScopeMetadata(
@@ -173,30 +199,20 @@ export function OAuthConsent({ className, variant }: OAuthConsentProps) {
 
         <div className="h-px bg-separator" />
 
-        <div className="flex items-center gap-3">
-          <UserAvatar
-            isPending={isSessionPending}
-            size="md"
-            user={session?.user}
-          />
-          <div className="min-w-0 flex-1">
-            <p className="text-xs text-muted">{localization.signedInAs}</p>
-            {session ? (
-              <>
-                <p className="truncate text-sm font-medium">
-                  {session.user.name || session.user.email}
-                </p>
-                {session.user.name ? (
-                  <p className="truncate text-xs text-muted">
-                    {session.user.email}
-                  </p>
-                ) : null}
-              </>
-            ) : (
-              <Skeleton className="mt-1 h-4 w-40" />
-            )}
+        {destination ? (
+          <div className="flex gap-2 text-xs text-muted">
+            <LinkIcon aria-hidden="true" className="mt-0.5 size-4 shrink-0" />
+            <p>
+              {localization.redirectTo}{" "}
+              <span className="block break-all font-medium text-foreground">
+                {destination}
+              </span>
+            </p>
           </div>
-        </div>
+        ) : null}
+        <p className="text-xs text-muted">
+          {localization.applicationInformation}
+        </p>
 
         {policyUrl || termsUrl ? (
           <div className="flex flex-wrap gap-x-4 gap-y-2 text-xs">
@@ -229,7 +245,7 @@ export function OAuthConsent({ className, variant }: OAuthConsentProps) {
           isDisabled={!canRespond}
           isPending={consent.isPending && consent.variables?.accept === false}
           variant="outline"
-          onPress={() => consent.mutate({ accept: false })}
+          onPress={() => consent.mutate({ accept: false, oauth_query: query })}
         >
           {consent.isPending && consent.variables?.accept === false ? (
             <Spinner color="current" size="sm" />
@@ -239,7 +255,7 @@ export function OAuthConsent({ className, variant }: OAuthConsentProps) {
         <Button
           isDisabled={!canRespond}
           isPending={consent.isPending && consent.variables?.accept === true}
-          onPress={() => consent.mutate({ accept: true })}
+          onPress={() => consent.mutate({ accept: true, oauth_query: query })}
         >
           {consent.isPending && consent.variables?.accept === true ? (
             <Spinner color="current" size="sm" />
