@@ -1,4 +1,4 @@
-import { useAuth } from "@better-auth-ui/react"
+import { getOrganizationCardKey, useAuth } from "@better-auth-ui/react"
 import { cn } from "../../../../lib/cn"
 import type { CardVariant } from "../../../../primitives/card"
 import { Box } from "../../../../primitives/styled"
@@ -33,8 +33,11 @@ export function SecuritySettings({
       {!!socialProviders?.length && <LinkedAccounts variant={variant} />}
       <ActiveSessions variant={variant} />
       {plugins.flatMap((plugin) =>
-        plugin.securityCards?.map((Card, index) => (
-          <Card key={`${plugin.id}-${index.toString()}`} variant={variant} />
+        plugin.securityCards?.map((Card) => (
+          <Card
+            key={getOrganizationCardKey(plugin.id, Card)}
+            variant={variant}
+          />
         ))
       )}
     </Box>

@@ -1,339 +1,235 @@
-import type { OrganizationAuthClient } from "@better-auth-ui/core/plugins/organization"
+import {
+  hasMemberRole,
+  type OrganizationAuthClient
+} from "@better-auth-ui/core/plugins/organization"
 import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
 import {
-  useCancelInvitation,
+  useActiveOrganization,
+  useListOrganizationInvitations,
   useHasPermission,
-  useListOrganizationInvitations
+  useCancelInvitation
 } from "@better-auth-ui/react/plugins/organization"
-import type { Invitation } from "better-auth/client"
-import { useMemo, useState } from "react"
+import { useState } from "react"
 import { organizationPlugin } from "../../../lib/auth/organization-plugin"
 import type { SettingsViewProps } from "../../../lib/auth-plugin"
-import { cn } from "../../../lib/cn"
-import { formatDateTime } from "../../../lib/format-date"
-import { useThemeColors } from "../../../lib/theme-colors"
+import { AlertDialog } from "../../../primitives/alert-dialog"
 import { Button } from "../../../primitives/button"
 import { Card } from "../../../primitives/card"
+import { Checkbox } from "../../../primitives/checkbox"
 import { SearchField } from "../../../primitives/inputs-extra"
-import { Menu } from "../../../primitives/menu"
+import { Select } from "../../../primitives/menu"
 import { Skeleton } from "../../../primitives/skeleton"
-import { Spinner } from "../../../primitives/spinner"
 import { Box, Txt } from "../../../primitives/styled"
-import { Chip, EmptyState } from "../../../primitives/tabs"
-import { Filter, Send, Xmark } from "../../../primitives/ui-icons"
+import { OrganizationInvitationRow } from "./organization-invitation-row"
 import { InviteMemberDialog } from "./invite-member-dialog"
-
-type InvitationStatus = "pending" | "accepted" | "rejected" | "canceled"
-
-/** Props for the {@link OrganizationInvitations} component. */
+import { useOrganizationRoleLabels } from "./role-picker"
+import {
+  useNativeList,
+  NativeListTools,
+  NativeListPagination
+} from "./list-tools"
 export type OrganizationInvitationsProps = SettingsViewProps
-
-const STATUSES: InvitationStatus[] = [
-  "pending",
-  "accepted",
-  "rejected",
-  "canceled"
-]
-
-/**
- * Organization invitations list with search/filter controls and per-row
- * cancel action. Mirrors the heroui `OrganizationInvitations`, adapted for
- * React Native: the sortable `Table` becomes a `Card` of mapped rows with
- * dashed separators (no column sort — a simple filtered list), the role/
- * status filter `Dropdown`s become the RN `Menu` bottom sheet, and
- * `SearchField` is the RN controlled `TextInput` wrapper.
- */
-export function OrganizationInvitations({
-  className,
-  variant
-}: OrganizationInvitationsProps) {
-  const { authClient } = useAuth()
-  const { localization: organizationLocalization, roles } =
-    useAuthPlugin(organizationPlugin)
-
-  const { data: invitations, isPending: invitationsPending } =
-    useListOrganizationInvitations(authClient as OrganizationAuthClient)
-
-  const { isPending: invitationPermissionPending } = useHasPermission(
-    authClient as OrganizationAuthClient,
-    {
-      permissions: { invitation: ["cancel"] }
-    }
-  )
-
-  const isPending = invitationsPending || invitationPermissionPending
-
-  const [roleFilter, setRoleFilter] = useState("all")
-  const [roleFilterOpen, setRoleFilterOpen] = useState(false)
-  const [statusFilter, setStatusFilter] = useState("all")
-  const [statusFilterOpen, setStatusFilterOpen] = useState(false)
-  const [search, setSearch] = useState("")
-
-  const filteredInvitations = useMemo(() => {
-    return invitations?.filter(
-      (invitation) =>
-        (roleFilter === "all" || invitation.role === roleFilter) &&
-        (statusFilter === "all" || invitation.status === statusFilter) &&
-        invitation.email.toLowerCase().includes(search.toLowerCase())
-    )
-  }, [search, invitations, roleFilter, statusFilter])
-
-  const [inviteOpen, setInviteOpen] = useState(false)
-
-  return (
-    <Box className={cn("flex-col gap-3", className)}>
-      <Txt
-        numberOfLines={1}
-        className="shrink text-sm font-semibold text-foreground"
-      >
-        {organizationLocalization.invitations}
-      </Txt>
-
-      <Box className="flex-col gap-4">
-        <Box className="flex-row items-center gap-3">
-          <SearchField
-            className="min-w-0 flex-1"
-            aria-label={organizationLocalization.search}
-            value={search}
-            onChangeText={setSearch}
-            placeholder={organizationLocalization.search}
-            isDisabled={isPending}
-          />
-
-          <Button
-            size="sm"
-            variant="secondary"
-            isDisabled={isPending}
-            onPress={() => setRoleFilterOpen(true)}
-          >
-            <Filter width={16} height={16} />
-            {organizationLocalization.role}
-          </Button>
-
-          <Menu
-            isOpen={roleFilterOpen}
-            onOpenChange={setRoleFilterOpen}
-            selectedKey={roleFilter}
-            onSelect={setRoleFilter}
-          >
-            <Menu.Item id="all">{organizationLocalization.all}</Menu.Item>
-
-            {Object.entries(roles).map(([role, label]) => (
-              <Menu.Item key={role} id={role}>
-                {label}
-              </Menu.Item>
-            ))}
-          </Menu>
-
-          <Button
-            size="sm"
-            variant="secondary"
-            isDisabled={isPending}
-            onPress={() => setStatusFilterOpen(true)}
-          >
-            <Filter width={16} height={16} />
-            {organizationLocalization.status}
-          </Button>
-
-          <Menu
-            isOpen={statusFilterOpen}
-            onOpenChange={setStatusFilterOpen}
-            selectedKey={statusFilter}
-            onSelect={setStatusFilter}
-          >
-            <Menu.Item id="all">{organizationLocalization.all}</Menu.Item>
-
-            {STATUSES.map((status) => (
-              <Menu.Item key={status} id={status}>
-                {organizationLocalization[status] ?? status}
-              </Menu.Item>
-            ))}
-          </Menu>
-        </Box>
-
-        {(roleFilter !== "all" || statusFilter !== "all") && (
-          <Box className="flex-row flex-wrap gap-2">
-            {roleFilter !== "all" && (
-              <Chip className="w-fit flex-row items-center gap-1.5">
-                <Chip.Label>
-                  {organizationLocalization.role}:{" "}
-                  {roles?.[roleFilter] ?? roleFilter}
-                </Chip.Label>
-
-                <Button
-                  size="sm"
-                  variant="tertiary"
-                  isIconOnly
-                  className="h-4 w-4 p-0"
-                  aria-label={organizationLocalization.clear}
-                  onPress={() => setRoleFilter("all")}
-                >
-                  <Xmark width={12} height={12} />
-                </Button>
-              </Chip>
-            )}
-
-            {statusFilter !== "all" && (
-              <Chip className="w-fit flex-row items-center gap-1.5">
-                <Chip.Label>
-                  {organizationLocalization.status}:{" "}
-                  {organizationLocalization[statusFilter as InvitationStatus] ??
-                    statusFilter}
-                </Chip.Label>
-
-                <Button
-                  size="sm"
-                  variant="tertiary"
-                  isIconOnly
-                  className="h-4 w-4 p-0"
-                  aria-label={organizationLocalization.clear}
-                  onPress={() => setStatusFilter("all")}
-                >
-                  <Xmark width={12} height={12} />
-                </Button>
-              </Chip>
-            )}
-          </Box>
-        )}
-
-        <Card variant={variant}>
-          <Card.Content className="gap-0">
-            {isPending ? (
-              <>
-                <OrganizationInvitationRowSkeleton />
-                <Box className="-mx-4 my-4 border-b border-dashed border-border" />
-                <OrganizationInvitationRowSkeleton />
-              </>
-            ) : !filteredInvitations?.length ? (
-              <OrganizationInvitationsEmpty
-                onInvitePress={() => setInviteOpen(true)}
-              />
-            ) : (
-              filteredInvitations.map((invitation, index) => (
-                <Box key={invitation.id}>
-                  {index > 0 && (
-                    <Box className="-mx-4 my-4 border-b border-dashed border-border" />
-                  )}
-
-                  <OrganizationInvitationRow invitation={invitation} />
-                </Box>
-              ))
-            )}
-          </Card.Content>
-        </Card>
-      </Box>
-
-      <InviteMemberDialog isOpen={inviteOpen} onOpenChange={setInviteOpen} />
-    </Box>
-  )
-}
-
-/** Placeholder row matching {@link OrganizationInvitationRow} while invitations load. */
-function OrganizationInvitationRowSkeleton() {
-  return (
-    <Box className="flex-row items-center justify-between gap-2 px-4 py-3">
-      <Box className="min-w-0 flex-1 gap-1.5">
-        <Skeleton className="h-4 w-48 rounded-lg" />
-        <Skeleton className="h-3 w-36 rounded-lg" />
-      </Box>
-
-      <Skeleton className="h-5 w-14 rounded-full" />
-    </Box>
-  )
-}
-
-function OrganizationInvitationRow({ invitation }: { invitation: Invitation }) {
-  const { authClient } = useAuth()
-  const { localization: organizationLocalization, roles } =
-    useAuthPlugin(organizationPlugin)
-  const colors = useThemeColors()
-
-  const {
-    data: cancelInvitationPermission,
-    isPending: cancelPermissionPending
-  } = useHasPermission(authClient as OrganizationAuthClient, {
+export function OrganizationInvitations(props: OrganizationInvitationsProps) {
+  const { authClient, localization: common } = useAuth()
+  const { localization, modelFields } = useAuthPlugin(organizationPlugin)
+  const client = authClient as OrganizationAuthClient
+  const organization = useActiveOrganization(client)
+  const id = organization.data?.id
+  const invitations = useListOrganizationInvitations(client, {
+    query: { organizationId: id }
+  })
+  const roles = useOrganizationRoleLabels(id)
+  const createPermission = useHasPermission(client, {
+    organizationId: id,
+    permissions: { invitation: ["create"] }
+  })
+  const cancelPermission = useHasPermission(client, {
+    organizationId: id,
     permissions: { invitation: ["cancel"] }
   })
-
-  const { mutate: cancelInvitation, isPending: cancelPending } =
-    useCancelInvitation(authClient as OrganizationAuthClient)
-
-  const roleLabel = roles?.[invitation.role] ?? invitation.role
-
-  const statusLabel =
-    organizationLocalization[invitation.status as InvitationStatus] ??
-    invitation.status
-
-  const statusColor =
-    invitation.status === "pending"
-      ? "warning"
-      : invitation.status === "accepted"
-        ? "success"
-        : invitation.status === "rejected"
-          ? "danger"
-          : "default"
-
-  if (cancelPermissionPending) {
-    return <OrganizationInvitationRowSkeleton />
-  }
-
-  return (
-    <Box className="flex-row items-center justify-between gap-2">
-      <Box className="min-w-0 flex-1 gap-1">
-        <Txt numberOfLines={1} className="text-sm font-medium text-foreground">
-          {invitation.email}
-        </Txt>
-
-        <Txt numberOfLines={1} className="text-xs text-muted">
-          {formatDateTime(invitation.createdAt)} · {roleLabel}
-        </Txt>
-      </Box>
-
-      <Chip color={statusColor} className="shrink-0">
-        {statusLabel}
-      </Chip>
-
-      {cancelInvitationPermission?.success &&
-        invitation.status === "pending" && (
-          <Button
-            isIconOnly
-            size="sm"
-            variant="danger"
-            isPending={cancelPending}
-            onPress={() => cancelInvitation({ invitationId: invitation.id })}
-            aria-label={organizationLocalization.cancelInvitation}
-          >
-            {cancelPending ? (
-              <Spinner color="current" size="sm" />
-            ) : (
-              <Xmark width={16} height={16} color={colors.danger} />
-            )}
-          </Button>
-        )}
-    </Box>
+  const cancel = useCancelInvitation(client)
+  const [search, setSearch] = useState("")
+  const [role, setRole] = useState("all")
+  const [status, setStatus] = useState("all")
+  const [inviteOpen, setInviteOpen] = useState(false)
+  const [bulkOpen, setBulkOpen] = useState(false)
+  const [busy, setBusy] = useState(false)
+  const [error, setError] = useState("")
+  const filtered = (invitations.data ?? []).filter(
+    (invitation) =>
+      (role === "all" || hasMemberRole(invitation.role, role)) &&
+      (status === "all" || invitation.status === status) &&
+      invitation.email.toLowerCase().includes(search.trim().toLowerCase())
   )
-}
-
-function OrganizationInvitationsEmpty({
-  onInvitePress
-}: {
-  onInvitePress: () => void
-}) {
-  const { localization: organizationLocalization } =
-    useAuthPlugin(organizationPlugin)
-
+  const list = useNativeList(
+    filtered,
+    {
+      email: common.auth.email,
+      role: localization.role,
+      status: localization.status,
+      createdAt: localization.invitedAt,
+      ...Object.fromEntries(
+        modelFields.invitation.map((field) => [
+          field.name,
+          field.label ?? field.name
+        ])
+      )
+    },
+    {
+      email: (a, b) => a.email.localeCompare(b.email),
+      newest: (a, b) => +new Date(b.createdAt) - +new Date(a.createdAt),
+      oldest: (a, b) => +new Date(a.createdAt) - +new Date(b.createdAt)
+    }
+  )
+  const bulk = async () => {
+    if (busy || !cancelPermission.data?.success) return
+    setBusy(true)
+    setError("")
+    try {
+      for (const invitationId of list.selected) {
+        if (
+          invitations.data?.find((item) => item.id === invitationId)?.status !==
+          "pending"
+        )
+          continue
+        await cancel.mutateAsync({ invitationId })
+        list.setSelected((ids) => ids.filter((id) => id !== invitationId))
+      }
+      setBulkOpen(false)
+    } catch (error) {
+      setError((error as Error).message)
+    } finally {
+      setBusy(false)
+    }
+  }
   return (
-    <EmptyState
-      icon={<Send width={18} height={18} />}
-      title={organizationLocalization.noInvitations}
-      description={
-        organizationLocalization.organizationInvitationsEmptyDescription
-      }
-      action={
-        <Button size="sm" onPress={onInvitePress}>
-          {organizationLocalization.inviteMember}
-        </Button>
-      }
-    />
+    <Box className={props.className ?? "gap-4"}>
+      <Txt className="font-semibold">{localization.invitations}</Txt>
+      <Button
+        isDisabled={!createPermission.data?.success}
+        onPress={() => setInviteOpen(true)}
+      >
+        {localization.inviteMember}
+      </Button>
+      <SearchField
+        value={search}
+        onChangeText={(value) => {
+          setSearch(value)
+          list.setPage(0)
+        }}
+        placeholder={localization.search}
+      />
+      <Select
+        label={localization.role}
+        selectedKey={role}
+        onSelectionChange={setRole}
+        options={[
+          { key: "all", label: localization.all },
+          ...Object.entries(roles).map(([key, label]) => ({ key, label }))
+        ]}
+      />
+      <Select
+        label={localization.status}
+        selectedKey={status}
+        onSelectionChange={setStatus}
+        options={[
+          { key: "all", label: localization.all },
+          ...(["pending", "accepted", "rejected", "canceled"] as const).map(
+            (key) => ({ key, label: localization[key] })
+          )
+        ]}
+      />
+      <NativeListTools
+        list={list}
+        sortLabels={{
+          email: common.auth.email,
+          newest: `${localization.invitedAt} ↓`,
+          oldest: `${localization.invitedAt} ↑`
+        }}
+        selection={!!cancelPermission.data?.success}
+      >
+        {list.selected.some((id) =>
+          invitations.data?.some(
+            (item) => item.id === id && item.status === "pending"
+          )
+        ) && cancelPermission.data?.success ? (
+          <Button variant="danger" onPress={() => setBulkOpen(true)}>
+            {localization.cancelSelectedInvitations}
+          </Button>
+        ) : null}
+      </NativeListTools>
+      <Card variant={props.variant}>
+        <Card.Content className="gap-4">
+          {invitations.isPending ? (
+            <Skeleton className="h-12 w-full" />
+          ) : invitations.error ? (
+            <Txt accessibilityRole="alert">{invitations.error.message}</Txt>
+          ) : !filtered.length ? (
+            <Txt>{localization.noInvitations}</Txt>
+          ) : (
+            list.rows.map((invitation) => (
+              <Box key={invitation.id} className="gap-2">
+                {cancelPermission.data?.success &&
+                invitation.status === "pending" ? (
+                  <Checkbox
+                    isSelected={list.selected.includes(invitation.id)}
+                    onChange={(checked) =>
+                      list.setSelected((ids) =>
+                        checked
+                          ? [...ids, invitation.id]
+                          : ids.filter((id) => id !== invitation.id)
+                      )
+                    }
+                  >
+                    {localization.selectRow}
+                  </Checkbox>
+                ) : null}
+                <OrganizationInvitationRow
+                  invitation={invitation}
+                  visibleFields={list.visible}
+                />
+              </Box>
+            ))
+          )}
+        </Card.Content>
+      </Card>
+      <NativeListPagination
+        page={list.page}
+        lastPage={list.lastPage}
+        onPage={list.setPage}
+      />
+      <InviteMemberDialog isOpen={inviteOpen} onOpenChange={setInviteOpen} />
+      <AlertDialog
+        isOpen={bulkOpen}
+        onOpenChange={(open) => {
+          if (!busy) setBulkOpen(open)
+        }}
+      >
+        <AlertDialog.CloseTrigger />
+        <AlertDialog.Header>
+          <AlertDialog.Heading>
+            {localization.cancelSelectedInvitations}
+          </AlertDialog.Heading>
+        </AlertDialog.Header>
+        <AlertDialog.Body>
+          <Txt>{localization.cancelSelectedInvitationsDescription}</Txt>
+          {error ? <Txt accessibilityRole="alert">{error}</Txt> : null}
+        </AlertDialog.Body>
+        <AlertDialog.Footer>
+          <Button isDisabled={busy} onPress={() => setBulkOpen(false)}>
+            {common.settings.cancel}
+          </Button>
+          <Button
+            variant="danger"
+            isPending={busy}
+            onPress={() => {
+              void bulk()
+            }}
+          >
+            {localization.cancelSelectedInvitations}
+          </Button>
+        </AlertDialog.Footer>
+      </AlertDialog>
+    </Box>
   )
 }

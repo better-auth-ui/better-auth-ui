@@ -66,3 +66,13 @@ it("resolves organization tab labels and role overrides with the locale", () => 
   expect(resolved.roles.member).toBe("Mitglied")
   expect(resolved.roles.auditor).toBe("Auditor")
 })
+
+vi.mock("../src/components/auth/organization/accept-invitation", () => ({
+  AcceptInvitation: () => null
+}))
+vi.mock("../src/components/auth/organization/organization-teams", () => ({
+  OrganizationTeams: () => null
+}))
+vi.mock("../src/components/auth/organization/organization-roles", () => ({
+  OrganizationRoles: () => null
+}))

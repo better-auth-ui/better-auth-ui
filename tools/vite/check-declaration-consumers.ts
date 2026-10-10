@@ -53,6 +53,27 @@ const fixtures = {
     import { organizationPlugin, usernamePlugin } from '@better-auth-ui/react-native/plugins';
     void AuthProvider; void createExpoRouterNavigation; void createReactNavigationNavigation;
     void organizationPlugin; void usernamePlugin;
+    import '@better-auth-ui/react-native/plugins/admin';
+    import '@better-auth-ui/react-native/plugins/agent-auth';
+    import '@better-auth-ui/react-native/plugins/anonymous';
+    import '@better-auth-ui/react-native/plugins/api-key';
+    import '@better-auth-ui/react-native/plugins/billing';
+    import '@better-auth-ui/react-native/plugins/dash';
+    import '@better-auth-ui/react-native/plugins/delete-user';
+    import '@better-auth-ui/react-native/plugins/device-authorization';
+    import '@better-auth-ui/react-native/plugins/email-otp';
+    import '@better-auth-ui/react-native/plugins/last-login-method';
+    import '@better-auth-ui/react-native/plugins/magic-link';
+    import '@better-auth-ui/react-native/plugins/multi-session';
+    import '@better-auth-ui/react-native/plugins/oauth-provider';
+    import '@better-auth-ui/react-native/plugins/organization';
+    import '@better-auth-ui/react-native/plugins/passkey';
+    import '@better-auth-ui/react-native/plugins/phone-number';
+    import '@better-auth-ui/react-native/plugins/siwe';
+    import '@better-auth-ui/react-native/plugins/sso';
+    import '@better-auth-ui/react-native/plugins/theme';
+    import '@better-auth-ui/react-native/plugins/two-factor';
+    import '@better-auth-ui/react-native/plugins/username';
     createReactNavigationNavigation({
       navigation: { navigate: () => {} },
       screens: { auth: { signIn: 'SignIn' } }

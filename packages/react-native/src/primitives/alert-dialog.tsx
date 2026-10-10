@@ -115,6 +115,8 @@ function AlertDialogBase({
           >
             <Btn
               accessibilityRole="alert"
+              accessibilityViewIsModal
+              style={{ maxHeight: "100%" }}
               onPress={(event) => event.stopPropagation()}
               className={cn(
                 "w-full max-w-sm gap-4 rounded-2xl border border-border bg-surface p-5",

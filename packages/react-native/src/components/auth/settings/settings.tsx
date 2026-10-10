@@ -1,5 +1,6 @@
+import { useNativeAuthenticate } from "../../../lib/auth/use-native-authenticate"
 import type { SettingsView } from "@better-auth-ui/core"
-import { useAuth, useAuthenticate } from "@better-auth-ui/react"
+import { useAuth } from "@better-auth-ui/react"
 import { cn } from "../../../lib/cn"
 import { useAuthNavigation } from "../../../navigation/navigation-context"
 import type { CardVariant } from "../../../primitives/card"
@@ -30,8 +31,8 @@ export type SettingsProps = {
  * @param view - Explicit settings view to activate, e.g. `"account"` or `"security"`
  */
 export function Settings({ className, variant, view }: SettingsProps) {
-  const { authClient, localization, plugins } = useAuth()
-  useAuthenticate(authClient)
+  const { localization, plugins } = useAuth()
+  useNativeAuthenticate({ section: "settings", view: view ?? "account" })
 
   const navigation = useAuthNavigation()
 
@@ -62,9 +63,9 @@ export function Settings({ className, variant, view }: SettingsProps) {
 
         {plugins.flatMap(
           (plugin) =>
-            plugin.settingsTabs?.map((settingsTab, index) => (
+            plugin.settingsTabs?.map((settingsTab) => (
               <Tabs.Tab
-                key={`${plugin.id}-${index.toString()}`}
+                key={`${plugin.id}-${settingsTab.view}`}
                 id={settingsTab.view}
                 className="gap-2"
               >
@@ -83,9 +84,9 @@ export function Settings({ className, variant, view }: SettingsProps) {
       </Tabs.Panel>
 
       {plugins.flatMap((plugin) =>
-        plugin.settingsTabs?.map((settingsTab, index) => (
+        plugin.settingsTabs?.map((settingsTab) => (
           <Tabs.Panel
-            key={`${plugin.id}-${index.toString()}`}
+            key={`${plugin.id}-${settingsTab.view}`}
             id={settingsTab.view}
           >
             <settingsTab.component variant={variant} />

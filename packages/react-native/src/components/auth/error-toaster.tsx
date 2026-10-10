@@ -1,19 +1,26 @@
-import { authMutationKeys, authQueryKeys } from "@better-auth-ui/core"
+import {
+  authMutationKeys,
+  authQueryKeys,
+  getAuthErrorCode,
+  getAuthErrorMessage,
+  getAuthErrorPresentation,
+  isReauthenticationRequiredError,
+  isPasswordCompromisedError
+} from "@better-auth-ui/core"
+import { useAuth } from "@better-auth-ui/react"
+import { toast } from "../../primitives/toast"
+import { useNativeReauthentication } from "./reauthentication"
 import {
   matchMutation,
   matchQuery,
   useQueryClient
 } from "@tanstack/react-query"
-import type { BetterFetchError } from "better-auth/react"
 import { useEffect } from "react"
-import { toast } from "../../primitives/toast"
 
-/**
- * Bridges react-query auth errors to toasts. Identical logic to the heroui
- * `ErrorToaster` — only the `toast` implementation differs. Renders nothing.
- */
 export function ErrorToaster() {
+  const { localization } = useAuth()
   const queryClient = useQueryClient()
+  const recovery = useNativeReauthentication()
 
   useEffect(() => {
     const queryCache = queryClient.getQueryCache()
@@ -23,10 +30,17 @@ export function ErrorToaster() {
       previousQueryOnError?.(error, query)
 
       if (!matchQuery({ queryKey: authQueryKeys.all }, query)) return
+      if (isReauthenticationRequiredError(error)) {
+        recovery.capture(() => query.fetch())
+        return
+      }
+      if (getAuthErrorPresentation(query.meta) !== "toast") return
 
-      const err = error as BetterFetchError
-      if (err?.error?.code === "EMAIL_NOT_VERIFIED") return
-      if (err?.error) toast.danger(err.error.message)
+      if (getAuthErrorCode(error) === "EMAIL_NOT_VERIFIED") return
+      const message = getAuthErrorMessage(error, localization)
+      if (message) {
+        toast.danger(message)
+      }
     }
 
     const mutationCache = queryClient.getMutationCache()
@@ -50,17 +64,33 @@ export function ErrorToaster() {
       if (!matchMutation({ mutationKey: authMutationKeys.all }, mutation)) {
         return
       }
+      if (isReauthenticationRequiredError(error)) {
+        recovery.capture(() => mutation.execute(variables))
+        return
+      }
+      if (getAuthErrorPresentation(mutation.meta) !== "toast") return
+      // Every form that sets a new password renders this one against the
+      // password field, so a toast would just repeat it.
+      if (isPasswordCompromisedError(error)) return
 
-      const err = error as BetterFetchError
-      if (err.error?.code === "EMAIL_NOT_VERIFIED") return
-      toast.danger(err.error?.message || err.message)
+      if (getAuthErrorCode(error) === "EMAIL_NOT_VERIFIED") {
+        return
+      }
+      const message = getAuthErrorMessage(
+        error,
+        localization,
+        mutation.options.mutationKey
+      )
+      if (message) {
+        toast.danger(message)
+      }
     }
 
     return () => {
       queryCache.config.onError = previousQueryOnError
       mutationCache.config.onError = previousMutationOnError
     }
-  }, [queryClient])
+  }, [queryClient, localization, recovery])
 
   return null
 }

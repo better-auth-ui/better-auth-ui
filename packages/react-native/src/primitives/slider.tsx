@@ -1,6 +1,7 @@
 import { type ComponentType, useMemo } from "react"
 import { cn } from "../lib/cn"
 import { useThemeColors } from "../lib/theme-colors"
+import { NumberField } from "./inputs-extra"
 import { Box } from "./styled"
 
 export interface SliderProps {
@@ -32,8 +33,7 @@ type NativeSliderProps = {
  * native view at eval time and crash the whole app on import wherever that
  * native module isn't linked (e.g. Expo Go), even on screens with no slider.
  * The `require` sits in a try/catch so Metro treats it as an optional
- * dependency: if it's absent (or its native side is missing) we fall back to a
- * static track instead of throwing.
+ * dependency: if it's absent (or its native side is missing) we fall back to an editable numeric control.
  */
 function resolveNativeSlider(): ComponentType<NativeSliderProps> | null {
   try {
@@ -60,13 +60,17 @@ export function Slider({
   const RNSlider = useMemo(resolveNativeSlider, [])
 
   if (!RNSlider) {
-    // Native module unavailable (e.g. Expo Go) — degrade to a static track.
     return (
-      <Box
-        className={cn(
-          "h-2 w-full rounded-full bg-surface-secondary",
-          className
-        )}
+      <NumberField
+        value={value}
+        onChange={(next) => {
+          if (Number.isFinite(next)) onChange?.(next)
+        }}
+        minValue={minimumValue}
+        maxValue={maximumValue}
+        step={step}
+        isDisabled={isDisabled}
+        className={className}
       />
     )
   }

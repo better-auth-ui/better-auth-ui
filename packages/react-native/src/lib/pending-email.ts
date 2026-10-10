@@ -1,14 +1,14 @@
-/**
- * Transient in-memory store for the email that sign-in / sign-up hand off to
- * the verify-email screen. Replaces the web components' `sessionStorage`
- * (unavailable in React Native). It's a per-session hint, not durable state.
- */
-let pendingEmail: string | undefined
+type EmailFlow = "verifyEmail" | "resetLinkSent" | "magicLinkSent"
+const pendingEmails = new Map<EmailFlow, string>()
 
-export function setPendingEmail(email: string): void {
-  pendingEmail = email
+/** Remember an email within the current app session for a follow-up screen. */
+export function setPendingEmail(
+  email: string,
+  flow: EmailFlow = "verifyEmail"
+) {
+  pendingEmails.set(flow, email)
 }
 
-export function getPendingEmail(): string | undefined {
-  return pendingEmail
+export function getPendingEmail(flow: EmailFlow = "verifyEmail") {
+  return pendingEmails.get(flow)
 }

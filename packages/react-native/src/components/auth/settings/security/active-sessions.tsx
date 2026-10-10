@@ -4,6 +4,7 @@ import { Card, type CardVariant } from "../../../../primitives/card"
 import { Separator } from "../../../../primitives/separator"
 import { Skeleton } from "../../../../primitives/skeleton"
 import { Box, Txt } from "../../../../primitives/styled"
+import { SessionActions } from "./session-actions"
 import { ActiveSession } from "./active-session"
 
 export type ActiveSessionsProps = {
@@ -51,6 +52,11 @@ export function ActiveSessions({ className, variant }: ActiveSessionsProps) {
             ))
           )}
         </Card.Content>
+        <SessionActions
+          hasOtherSessions={
+            !!sessions?.some((item) => item.id !== session?.session.id)
+          }
+        />
       </Card>
     </Box>
   )

@@ -1,0 +1,8 @@
+export { phoneNumberPlugin } from "../../lib/auth/phone-number-plugin"
+export * from "../../components/auth/phone-number/change-phone-number"
+export * from "../../components/auth/phone-number/forgot-phone-number-password"
+export * from "../../components/auth/phone-number/phone-number-button"
+export * from "../../components/auth/phone-number/phone-number-field"
+export * from "../../components/auth/phone-number/phone-number-flow"
+export * from "../../components/auth/phone-number/phone-number"
+export * from "../../components/auth/phone-number/reset-phone-number-password"

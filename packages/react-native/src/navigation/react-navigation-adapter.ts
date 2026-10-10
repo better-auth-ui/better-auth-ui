@@ -1,9 +1,12 @@
+import { type AuthView } from "@better-auth-ui/core"
 import {
-  type AuthView,
-  viewPaths as defaultViewPaths,
-  type NavigateOptions,
-  type SettingsView
-} from "@better-auth-ui/core"
+  getNavigationParams,
+  getNavigationPath,
+  mergeRouteConfig,
+  resolveNavigationTarget,
+  handleUnhandledNavigation,
+  type NavigationRouteConfig
+} from "./route-config"
 import {
   type AuthNavigateOptions,
   type Navigation,
@@ -22,32 +25,18 @@ export interface ReactNavigationLike {
 /** Screen-name map, one entry per section. */
 export interface ReactNavigationScreens {
   auth: Partial<Record<AuthView, string>>
+  admin?: Record<string, string>
   settings?: Record<string, string>
   organization?: Record<string, string>
 }
 
-export interface ReactNavigationOptions {
+export interface ReactNavigationOptions extends NavigationRouteConfig {
   /** The React Navigation `navigation` object (`useNavigation()`). */
   navigation: ReactNavigationLike
   /** Map each view (by section) to the screen name registered in your navigator. */
   screens: ReactNavigationScreens
   /** The current route (`useRoute()`) — powers `getParam`. */
-  route?: { params?: Record<string, unknown> }
-}
-
-function resolveTarget(options: NavigateOptions): ViewTarget | undefined {
-  if (options.view) return { section: "auth", view: options.view }
-  const segment = options.to.split("?")[0].split("/").filter(Boolean).pop()
-  if (!segment) return undefined
-  const authEntry = (
-    Object.entries(defaultViewPaths.auth) as [AuthView, string][]
-  ).find(([, path]) => path === segment)
-  if (authEntry) return { section: "auth", view: authEntry[0] }
-  const settingsEntry = (
-    Object.entries(defaultViewPaths.settings) as [SettingsView, string][]
-  ).find(([, path]) => path === segment)
-  if (settingsEntry) return { section: "settings", view: settingsEntry[0] }
-  return undefined
+  route?: { name?: string; params?: Record<string, unknown> }
 }
 
 function screenFor(
@@ -56,6 +45,7 @@ function screenFor(
 ): string | undefined {
   if (target.section === "auth") return screens.auth[target.view]
   if (target.section === "settings") return screens.settings?.[target.view]
+  if (target.section === "admin") return screens.admin?.[target.view]
   return screens.organization?.[target.view]
 }
 
@@ -75,12 +65,20 @@ export function createReactNavigationNavigation(
   options: ReactNavigationOptions
 ): Navigation {
   const { navigation, screens, route } = options
+  let routes: NavigationRouteConfig = options
 
   const push = (next: PushTarget, opts?: AuthNavigateOptions) => {
     const target = toViewTarget(next)
     const screen = screenFor(screens, target)
-    if (!screen) return
+    if (!screen)
+      throw new Error(
+        `[Better Auth UI] No screen is configured for ${target.section}.${target.view}`
+      )
     const params = {
+      ...(target.section === "auth" &&
+      typeof route?.params?.redirectTo === "string"
+        ? { redirectTo: route.params.redirectTo }
+        : {}),
       ...opts?.params,
       ...(target.section === "organization" && target.slug
         ? { slug: target.slug }
@@ -95,16 +93,75 @@ export function createReactNavigationNavigation(
 
   return {
     push,
-    current: () => undefined,
+    configure: (config) => {
+      routes = mergeRouteConfig(config, options)
+    },
+    current: () => {
+      for (const section of [
+        "auth",
+        "settings",
+        "admin",
+        "organization"
+      ] as const) {
+        const entry = Object.entries(screens[section] ?? {}).find(
+          ([, screen]) => screen === route?.name
+        )
+        if (!entry) continue
+        if (section === "organization")
+          return {
+            section,
+            view: entry[0],
+            slug:
+              typeof route?.params?.slug === "string"
+                ? route.params.slug
+                : undefined
+          }
+        if (section === "auth") return { section, view: entry[0] as AuthView }
+        return { section, view: entry[0] }
+      }
+      return undefined
+    },
+    getPath: (target) => {
+      if (target) return getNavigationPath(target, routes)
+      for (const section of [
+        "auth",
+        "settings",
+        "admin",
+        "organization"
+      ] as const) {
+        const entry = Object.entries(screens[section] ?? {}).find(
+          ([, screen]) => screen === route?.name
+        )
+        if (!entry) continue
+        const params = Object.fromEntries(
+          Object.entries(route?.params ?? {}).filter(
+            (entry): entry is [string, string] => typeof entry[1] === "string"
+          )
+        )
+        return getNavigationPath(
+          {
+            section,
+            view: entry[0],
+            ...(section === "organization" ? { slug: params.slug } : {})
+          } as ViewTarget,
+          routes,
+          params
+        )
+      }
+      return undefined
+    },
     getParam: (key) => {
       const value = route?.params?.[key]
       return typeof value === "string" ? value : undefined
     },
     navigate: (navOptions) => {
-      const target = resolveTarget(navOptions)
-      if (!target) return
+      const target = resolveNavigationTarget(navOptions, routes)
+      if (!target) {
+        handleUnhandledNavigation(navOptions, routes)
+        return
+      }
       push(target, {
-        params: navOptions.params,
+        params: getNavigationParams(navOptions.to, navOptions.params),
         replace: navOptions.replace
       })
     }

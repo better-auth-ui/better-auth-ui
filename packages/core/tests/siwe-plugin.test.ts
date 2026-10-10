@@ -1,3 +1,5 @@
+import { createAuthClient } from "better-auth/client"
+import { siweClient } from "better-auth/client/plugins"
 import { describe, expect, it, vi } from "vitest"
 
 import {
@@ -60,10 +62,9 @@ describe("SIWE", () => {
     const connect = vi.fn(async () => ({ address: "0xabc", chainId: 1 }))
     const signMessage = vi.fn(async () => "0xsigned")
     const nonce = vi.fn(async () => ({
-      data: { nonce: "fresh-nonce" },
-      error: null
+      nonce: "fresh-nonce"
     }))
-    const verify = vi.fn(async () => ({ data: { success: true }, error: null }))
+    const verify = vi.fn(async () => ({ success: true }))
     const options = signInSiweOptions({ siwe: { nonce, verify } } as never, {
       connector: { id: "test", label: "Test", connect, signMessage },
       domain: "app.example.com",
@@ -72,9 +73,7 @@ describe("SIWE", () => {
 
     await options.mutationFn?.({ email: "person@example.com" })
 
-    expect(nonce).toHaveBeenCalledWith({
-      fetchOptions: { throw: true }
-    })
+    expect(nonce).toHaveBeenCalledWith(undefined, { throw: true })
     expect(signMessage).toHaveBeenCalledWith({
       address: "0xabc",
       message: expect.stringContaining("Nonce: fresh-nonce")
@@ -146,4 +145,52 @@ describe("SIWE", () => {
       signature: "0xsigned"
     })
   })
+})
+
+it("authenticates through the installed Better Auth SIWE client using throw-aware responses", async () => {
+  const requests: { url: string; body: Record<string, unknown> }[] = []
+  const authClient = createAuthClient({
+    baseURL: "https://auth.example",
+    plugins: [siweClient()],
+    fetchOptions: {
+      customFetchImpl: async (input, init) => {
+        const url = String(input)
+        requests.push({ url, body: JSON.parse(String(init?.body ?? "{}")) })
+        return new Response(
+          JSON.stringify(
+            url.endsWith("/nonce")
+              ? { nonce: "server-nonce" }
+              : {
+                  success: true,
+                  token: "token",
+                  user: { id: "user", walletAddress: "0xabc", chainId: 1 }
+                }
+          ),
+          { headers: { "Content-Type": "application/json" } }
+        )
+      }
+    }
+  })
+  const result = await signInSiweOptions(authClient, {
+    domain: "app.example",
+    uri: "https://app.example",
+    connector: {
+      id: "native",
+      label: "Wallet",
+      connect: async () => ({ address: "0xabc", chainId: 1 }),
+      signMessage: async () => "signature"
+    }
+  }).mutationFn({ email: "ada@example.com" })
+  expect(result.success).toBe(true)
+  expect(requests.map((request) => new URL(request.url).pathname)).toEqual([
+    "/api/auth/siwe/nonce",
+    "/api/auth/siwe/verify"
+  ])
+  expect(requests[1]?.body).toEqual(
+    expect.objectContaining({
+      signature: "signature",
+      email: "ada@example.com",
+      message: expect.stringContaining("Nonce: server-nonce")
+    })
+  )
 })

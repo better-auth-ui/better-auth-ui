@@ -12,7 +12,7 @@ The same files ship in npm tarballs for TanStack Intent and remain available on 
 - Put optional UI-specific detail in references inside that skill's directory.
 - Use standard Agent Skills frontmatter, with package and framework information under `metadata`.
 - Describe API boundaries and common mistakes instead of copying the entire reference documentation.
-- Cover React, Solid, shadcn/ui, HeroUI, and Zaidan when shared behavior changes.
+- Cover React, React Native, Solid, shadcn/ui, HeroUI, and Zaidan when shared behavior changes.
 - Keep organization access explicit through slugs or IDs.
 
 `domain_map.yaml` records the task areas and failure modes. `skill_tree.yaml` maps each skill to its package and source files.

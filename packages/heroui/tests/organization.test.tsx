@@ -324,7 +324,7 @@ describe("<CreateOrganizationDialog />", () => {
     expect(authClient.organization.checkSlug).toHaveBeenCalledTimes(2)
     expect(authClient.organization.create).toHaveBeenLastCalledWith(
       expect.objectContaining({
-        slug: expect.stringMatching(/^acme-[a-f0-9-]+$/)
+        slug: expect.stringMatching(/^acme-[a-z0-9]+-[a-z0-9]+$/)
       })
     )
   })

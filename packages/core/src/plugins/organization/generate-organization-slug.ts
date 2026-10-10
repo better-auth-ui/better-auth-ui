@@ -1,3 +1,7 @@
+/** Slugs are public identifiers. Availability checks resolve collisions on every platform. */
+export const generateOrganizationSlugSuffix = () =>
+  `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 12)}`
+
 /** Generate a slug candidate. Creation checks availability before using it. */
 export function generateOrganizationSlug(name: string, suffix?: string) {
   const slug = name
@@ -7,6 +11,6 @@ export function generateOrganizationSlug(name: string, suffix?: string) {
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-|-$/g, "")
 
-  const candidate = slug || crypto.randomUUID()
+  const candidate = slug || `organization-${generateOrganizationSlugSuffix()}`
   return suffix ? `${candidate}-${suffix}` : candidate
 }

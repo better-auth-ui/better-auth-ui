@@ -1,4 +1,4 @@
-import { useAuth } from "@better-auth-ui/react"
+import { getOrganizationCardKey, useAuth } from "@better-auth-ui/react"
 
 import type { SettingsViewProps } from "../../../lib/auth-plugin"
 import { cn } from "../../../lib/cn"
@@ -6,7 +6,10 @@ import { Box } from "../../../primitives/styled"
 import { OrganizationDangerZone } from "./organization-danger-zone"
 import { OrganizationProfile } from "./organization-profile"
 
-export type OrganizationSettingsProps = SettingsViewProps
+export type OrganizationSettingsProps = SettingsViewProps & {
+  organizationId?: string
+  organizationSlug?: string
+}
 
 /**
  * Organization settings UI: profile card, plugin-contributed cards
@@ -20,6 +23,8 @@ export type OrganizationSettingsProps = SettingsViewProps
  */
 export function OrganizationSettings({
   className,
+  organizationId,
+  organizationSlug,
   variant
 }: OrganizationSettingsProps) {
   const { plugins } = useAuth()
@@ -28,11 +33,18 @@ export function OrganizationSettings({
     <Box className={cn("flex-col gap-4", className)}>
       <OrganizationProfile variant={variant} />
 
-      {plugins.flatMap((plugin) =>
-        plugin.organizationCards?.map((Card, index) => (
-          <Card key={`${plugin.id}-${index.toString()}`} variant={variant} />
-        ))
-      )}
+      {organizationId && organizationSlug
+        ? plugins.flatMap((plugin) =>
+            plugin.organizationCards?.map((Card) => (
+              <Card
+                key={getOrganizationCardKey(plugin.id, Card)}
+                variant={variant}
+                organizationId={organizationId}
+                organizationSlug={organizationSlug}
+              />
+            ))
+          )
+        : null}
 
       <OrganizationDangerZone variant={variant} />
     </Box>

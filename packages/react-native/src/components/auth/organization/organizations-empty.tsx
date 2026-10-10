@@ -7,6 +7,7 @@ import { Briefcase } from "../../../primitives/ui-icons"
 
 export type OrganizationsEmptyProps = {
   onCreatePress: () => void
+  isDisabled?: boolean
 }
 
 /**
@@ -16,7 +17,10 @@ export type OrganizationsEmptyProps = {
  * primitive instead of raw `div`/`p`/`span` markup, and the gravity-ui
  * `Briefcase` icon becomes RN's `react-native-svg` `Briefcase`.
  */
-export function OrganizationsEmpty({ onCreatePress }: OrganizationsEmptyProps) {
+export function OrganizationsEmpty({
+  onCreatePress,
+  isDisabled
+}: OrganizationsEmptyProps) {
   const { localization: organizationLocalization } =
     useAuthPlugin(organizationPlugin)
 
@@ -26,7 +30,7 @@ export function OrganizationsEmpty({ onCreatePress }: OrganizationsEmptyProps) {
       title={organizationLocalization.noOrganizations}
       description={organizationLocalization.organizationsDescription}
       action={
-        <Button size="sm" onPress={onCreatePress}>
+        <Button isDisabled={isDisabled} size="sm" onPress={onCreatePress}>
           {organizationLocalization.createOrganization}
         </Button>
       }

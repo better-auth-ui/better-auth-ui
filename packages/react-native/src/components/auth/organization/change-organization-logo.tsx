@@ -2,13 +2,14 @@ import type { OrganizationAuthClient } from "@better-auth-ui/core/plugins/organi
 import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
 import {
   useActiveOrganization,
+  useHasPermission,
   useUpdateOrganization
 } from "@better-auth-ui/react/plugins/organization"
 import { useState } from "react"
 
 import { organizationPlugin } from "../../../lib/auth/organization-plugin"
 import { cn } from "../../../lib/cn"
-import { pickImage, resizeImage } from "../../../lib/image"
+import { prepareNativeImage } from "../../../lib/image"
 import { useThemeColors } from "../../../lib/theme-colors"
 import { Button } from "../../../primitives/button"
 import { Label } from "../../../primitives/field"
@@ -43,9 +44,13 @@ export function ChangeOrganizationLogo({
   const { data: activeOrganization, isPending: activeOrganizationPending } =
     useActiveOrganization(authClient as OrganizationAuthClient)
 
-  const { mutate: updateOrganization, isPending: updatePending } =
+  const { mutateAsync: updateOrganization, isPending: updatePending } =
     useUpdateOrganization(authClient as OrganizationAuthClient)
 
+  const permission = useHasPermission(authClient as OrganizationAuthClient, {
+    organizationId: activeOrganization?.id,
+    permissions: { organization: ["update"] }
+  })
   const [menuOpen, setMenuOpen] = useState(false)
   const [isUploading, setIsUploading] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
@@ -54,60 +59,38 @@ export function ChangeOrganizationLogo({
 
   async function handleUpload() {
     setMenuOpen(false)
-    if (!activeOrganization) return
-
-    const picked = await pickImage()
-    if (!picked) return
-
+    if (!activeOrganization || !permission.data?.success || isPending) return
     setIsUploading(true)
-
     try {
-      const image = await resizeImage(picked.uri, logo.size)
-
-      updateOrganization(
-        { data: { logo: image } },
-        {
-          onSuccess: () =>
-            toast.success(organizationLocalization.logoChangedSuccess),
-          onSettled: () => setIsUploading(false)
-        }
-      )
+      const image = await prepareNativeImage(logo)
+      if (image === null) return
+      await updateOrganization({
+        organizationId: activeOrganization.id,
+        data: { logo: image }
+      })
+      toast.success(organizationLocalization.logoChangedSuccess)
     } catch (error) {
+      toast.danger((error as Error).message)
+    } finally {
       setIsUploading(false)
-      if (error instanceof Error) {
-        toast.danger(error.message)
-      }
     }
   }
-
   async function handleDelete() {
     setMenuOpen(false)
-
-    const currentLogo = activeOrganization?.logo
-
-    updateOrganization(
-      { data: { logo: "" } },
-      {
-        onSuccess: async () => {
-          if (!currentLogo) {
-            toast.success(organizationLocalization.logoDeletedSuccess)
-            return
-          }
-
-          setIsDeleting(true)
-          try {
-            await logo.delete?.(currentLogo)
-            toast.success(organizationLocalization.logoDeletedSuccess)
-          } catch (error) {
-            if (error instanceof Error) {
-              toast.danger(error.message)
-            }
-          } finally {
-            setIsDeleting(false)
-          }
-        }
-      }
-    )
+    if (!activeOrganization || !permission.data?.success || isPending) return
+    setIsDeleting(true)
+    try {
+      await updateOrganization({
+        organizationId: activeOrganization.id,
+        data: { logo: "" }
+      })
+      if (activeOrganization.logo) await logo.delete?.(activeOrganization.logo)
+      toast.success(organizationLocalization.logoDeletedSuccess)
+    } catch (error) {
+      toast.danger((error as Error).message)
+    } finally {
+      setIsDeleting(false)
+    }
   }
 
   if (!logo.enabled) {
@@ -125,7 +108,9 @@ export function ChangeOrganizationLogo({
           variant="ghost"
           isIconOnly
           className="h-auto w-auto rounded-full p-0"
-          isDisabled={!activeOrganization || isPending}
+          isDisabled={
+            !activeOrganization || !permission.data?.success || isPending
+          }
           onPress={handleUpload}
         >
           <OrganizationLogo
@@ -138,7 +123,9 @@ export function ChangeOrganizationLogo({
         <Button
           size="sm"
           variant="secondary"
-          isDisabled={!activeOrganization || isPending}
+          isDisabled={
+            !activeOrganization || !permission.data?.success || isPending
+          }
           onPress={() => setMenuOpen(true)}
         >
           {isPending && <Spinner size="sm" color="current" />}

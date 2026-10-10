@@ -1,3 +1,6 @@
+import { getViewURL, validateEmailAddress } from "@better-auth-ui/core"
+import { setPendingEmail } from "../../lib/pending-email"
+import { AuthPrompts } from "@better-auth-ui/react"
 import {
   useAuth,
   useFetchOptions,
@@ -44,17 +47,24 @@ export function ForgotPassword({ className, variant }: ForgotPasswordProps) {
       onError: () => {
         resetFetchOptions()
       },
-      onSuccess: () => {
+      onSuccess: (_data, { email: submittedEmail }) => {
         toast.success(localization.auth.passwordResetEmailSent)
-        navigation.push("signIn")
+        setPendingEmail(submittedEmail, "resetLinkSent")
+        navigation.push("resetLinkSent", {
+          params: { redirectTo: navigation.getParam("redirectTo") ?? "/" }
+        })
       }
     }
   )
 
   const handleSubmit = () => {
     requestPasswordReset({
-      email,
-      redirectTo: `${baseURL}${basePaths.auth}/${viewPaths.auth.resetPassword}`,
+      email: email.trim(),
+      redirectTo: getViewURL(
+        baseURL,
+        basePaths.auth,
+        viewPaths.auth.resetPassword
+      ),
       fetchOptions
     })
   }
@@ -63,6 +73,7 @@ export function ForgotPassword({ className, variant }: ForgotPasswordProps) {
 
   return (
     <Card className={cn("w-full max-w-sm gap-4", className)} variant={variant}>
+      <AuthPrompts view="forgotPassword" />
       <Card.Header>
         <Card.Title className="mb-1">
           {localization.auth.forgotPassword}
@@ -79,9 +90,10 @@ export function ForgotPassword({ className, variant }: ForgotPasswordProps) {
             value={email}
             onChange={setEmail}
             validate={(value) => {
-              if (!value) return localization.auth.fieldRequired
-              if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value))
-                return localization.auth.invalidEmail
+              return validateEmailAddress(value, {
+                requiredMessage: localization.auth.fieldRequired,
+                invalidMessage: localization.auth.invalidEmail
+              })?.message
             }}
           >
             <Label>{localization.auth.email}</Label>

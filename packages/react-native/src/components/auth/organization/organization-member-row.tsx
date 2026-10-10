@@ -1,4 +1,10 @@
-import type { OrganizationAuthClient } from "@better-auth-ui/core/plugins/organization"
+import type { AdditionalFieldFormValue } from "@better-auth-ui/core"
+import {
+  hasMemberRole,
+  memberRoleLabels,
+  parseMemberRoles,
+  type OrganizationAuthClient
+} from "@better-auth-ui/core/plugins/organization"
 import { useAuth, useAuthPlugin, useSession } from "@better-auth-ui/react"
 import {
   useHasPermission,
@@ -8,308 +14,243 @@ import {
 } from "@better-auth-ui/react/plugins/organization"
 import type { Member, Organization, User } from "better-auth/client"
 import { useState } from "react"
-
 import { organizationPlugin } from "../../../lib/auth/organization-plugin"
-import { useThemeColors } from "../../../lib/theme-colors"
 import { AlertDialog } from "../../../primitives/alert-dialog"
 import { Button } from "../../../primitives/button"
-import { Card } from "../../../primitives/card"
-import { Menu } from "../../../primitives/menu"
-import { Spinner } from "../../../primitives/spinner"
+import { Skeleton } from "../../../primitives/skeleton"
 import { Box, Txt } from "../../../primitives/styled"
-import { Chip } from "../../../primitives/tabs"
 import { toast } from "../../../primitives/toast"
-import {
-  ArrowRightFromSquare,
-  Pencil,
-  Trash
-} from "../../../primitives/ui-icons"
 import { UserView } from "../user/user-view"
-import { OrganizationMemberRowSkeleton } from "./organization-member-row-skeleton"
+import { AdditionalField } from "../additional-field"
+import { RolePicker, useOrganizationRoleLabels } from "./role-picker"
+import { useAllOrganizationMembers } from "./use-all-members"
 
 export type OrganizationMemberRowProps = {
   member: Member & { user: Partial<User> }
-  isOwner?: boolean
   organization: Organization
+  isOwner?: boolean
+  visibleFields?: readonly string[]
 }
-
-/**
- * A single member list row: `UserView` + role label, a row-scoped Menu to
- * change the member's role (gated by `member:update` permission), and either
- * a "leave organization" action (when the row is the current user) or a
- * "remove member" action (gated by `member:delete` permission). Mirrors the
- * heroui `OrganizationMemberRow`, adapted for React Native: `Table.Row`/
- * `.Cell` become a plain `View` row (the enclosing list supplies dashed
- * separators between rows), the per-row `Dropdown` role-change menu becomes
- * the RN `Menu` bottom sheet, and `RemoveMemberDialog`/`LeaveOrganizationDialog`
- * are inlined as controlled `AlertDialog`s rather than separate files.
- */
 export function OrganizationMemberRow({
   member,
+  organization,
   isOwner,
-  organization
+  visibleFields
 }: OrganizationMemberRowProps) {
-  const { authClient } = useAuth()
-  const { localization: organizationLocalization, roles } =
+  const { authClient, localization: common } = useAuth()
+  const { localization, creatorRole, allowMultipleRoles, modelFields } =
     useAuthPlugin(organizationPlugin)
-
+  const roles = useOrganizationRoleLabels(organization.id)
   const { data: session } = useSession(authClient)
-
-  const { data: hasUpdatePermission, isPending: updatePermissionPending } =
-    useHasPermission(authClient as OrganizationAuthClient, {
-      permissions: { member: ["update"] }
-    })
-
-  const { data: hasDeletePermission, isPending: deletePermissionPending } =
-    useHasPermission(authClient as OrganizationAuthClient, {
-      permissions: { member: ["delete"] }
-    })
-
-  const isPending = updatePermissionPending || deletePermissionPending
-
-  const { mutate: updateMemberRole, isPending: isUpdatingRole } =
-    useUpdateMemberRole(authClient as OrganizationAuthClient, {
-      onSuccess: () => toast.success(organizationLocalization.memberRoleUpdated)
-    })
-
-  const roleLabel = roles?.[member.role] ?? member.role
-
-  const assignableRoles = Object.entries(roles).filter(
-    ([key]) => isOwner || key !== "owner"
+  const client = authClient as OrganizationAuthClient
+  const updatePermission = useHasPermission(client, {
+    organizationId: organization.id,
+    permissions: { member: ["update"] }
+  })
+  const deletePermission = useHasPermission(client, {
+    organizationId: organization.id,
+    permissions: { member: ["delete"] }
+  })
+  const members = useAllOrganizationMembers(organization.id)
+  const onlyOwner =
+    hasMemberRole(member.role, creatorRole) &&
+    (members.isPending ||
+      (members.data?.members.filter((item) =>
+        hasMemberRole(item.role, creatorRole)
+      ).length ?? 0) <= 1)
+  const currentUser = session?.user.id === member.userId
+  const update = useUpdateMemberRole(client)
+  const remove = useRemoveMember(client)
+  const leave = useLeaveOrganization(client)
+  const [action, setAction] = useState<"role" | "remove" | "leave">()
+  const [selected, setSelected] = useState(parseMemberRoles(member.role))
+  const assignable = Object.fromEntries(
+    Object.entries({
+      ...roles,
+      ...Object.fromEntries(
+        parseMemberRoles(member.role).map((role) => [role, roles[role] ?? role])
+      )
+    }).filter(
+      ([role]) =>
+        isOwner || role !== creatorRole || hasMemberRole(member.role, role)
+    )
   )
-
-  const isCurrentUser = session?.user.id === member.userId
-
-  const [roleMenuOpen, setRoleMenuOpen] = useState(false)
-  const [removeOpen, setRemoveOpen] = useState(false)
-  const [leaveOpen, setLeaveOpen] = useState(false)
-
-  if (isPending) {
-    return <OrganizationMemberRowSkeleton />
+  const busy = update.isPending || remove.isPending || leave.isPending
+  const error = update.error || remove.error || leave.error
+  const close = () => {
+    if (busy) return
+    setAction(undefined)
+    update.reset()
+    remove.reset()
+    leave.reset()
   }
-
+  const show = (field: string) =>
+    !visibleFields || visibleFields.includes(field)
+  const submit = async () => {
+    if (busy) return
+    // Re-read before removal or demotion, including owners on other pages.
+    const fresh = await members.refetch()
+    if (fresh.error) return
+    const protectedOwner =
+      hasMemberRole(member.role, creatorRole) &&
+      (fresh.data?.members.filter((item) =>
+        hasMemberRole(item.role, creatorRole)
+      ).length ?? 0) <= 1
+    if (
+      protectedOwner &&
+      (action !== "role" || !selected.includes(creatorRole))
+    ) {
+      toast.danger(localization.onlyOwnerActionDisabled)
+      return
+    }
+    if (action === "role" && updatePermission.data?.success && selected.length)
+      await update.mutateAsync({
+        organizationId: organization.id,
+        memberId: member.id,
+        role: allowMultipleRoles ? selected : selected[0]!
+      })
+    else if (action === "leave" && currentUser)
+      await leave.mutateAsync({ organizationId: organization.id })
+    else if (
+      action === "remove" &&
+      !currentUser &&
+      deletePermission.data?.success
+    )
+      await remove.mutateAsync({
+        organizationId: organization.id,
+        memberIdOrEmail: member.id
+      })
+    else return
+    setAction(undefined)
+    toast.success(
+      action === "role"
+        ? localization.memberRoleUpdated
+        : action === "leave"
+          ? localization.leftOrganization
+          : localization.memberRemoved
+    )
+  }
   return (
-    <Box className="flex-row items-center justify-between gap-2">
-      <UserView className="min-w-0 flex-1" user={member.user} />
-
-      <Txt className="shrink-0 text-sm text-muted">{roleLabel}</Txt>
-
-      <Box className="shrink-0 flex-row items-center gap-1">
-        {hasUpdatePermission?.success && (
+    <Box className="gap-3">
+      {show("user") ? <UserView user={member.user} /> : null}
+      {show("role") ? (
+        <Txt>{memberRoleLabels(member.role, roles).join(", ")}</Txt>
+      ) : null}
+      {modelFields.member
+        .filter((field) => show(field.name))
+        .map((field) => (
+          <AdditionalField
+            key={field.name}
+            name={field.name}
+            field={{ ...field, readOnly: true }}
+            value={
+              (member as unknown as Record<string, AdditionalFieldFormValue>)[
+                field.name
+              ] ?? null
+            }
+            onChange={() => {}}
+            onBlur={() => {}}
+          />
+        ))}
+      <Box className="flex-row flex-wrap gap-2">
+        {updatePermission.isPending ? (
+          <Skeleton className="h-8 w-20" />
+        ) : updatePermission.data?.success ? (
           <Button
-            isIconOnly
             size="sm"
-            variant="tertiary"
-            isDisabled={isUpdatingRole}
-            aria-label={organizationLocalization.changeMemberRole}
-            onPress={() => setRoleMenuOpen(true)}
+            onPress={() => {
+              setSelected(parseMemberRoles(member.role))
+              setAction("role")
+            }}
           >
-            {isUpdatingRole ? (
-              <Spinner color="current" size="sm" />
-            ) : (
-              <Pencil width={16} height={16} />
-            )}
+            {localization.changeMemberRole}
           </Button>
-        )}
-
-        {isCurrentUser ? (
+        ) : null}
+        {currentUser ? (
           <Button
-            isIconOnly
             size="sm"
             variant="danger"
-            aria-label={organizationLocalization.leaveOrganization}
-            onPress={() => setLeaveOpen(true)}
+            isDisabled={onlyOwner}
+            onPress={() => setAction("leave")}
           >
-            <ArrowRightFromSquare width={16} height={16} />
+            {localization.leaveOrganization}
           </Button>
-        ) : (
-          hasDeletePermission?.success && (
-            <Button
-              isIconOnly
-              size="sm"
-              variant="danger"
-              aria-label={organizationLocalization.removeMember}
-              onPress={() => setRemoveOpen(true)}
-            >
-              <Trash width={16} height={16} />
-            </Button>
-          )
-        )}
+        ) : deletePermission.isPending ? (
+          <Skeleton className="h-8 w-20" />
+        ) : deletePermission.data?.success ? (
+          <Button
+            size="sm"
+            variant="danger"
+            isDisabled={onlyOwner}
+            onPress={() => setAction("remove")}
+          >
+            {localization.removeMember}
+          </Button>
+        ) : null}
       </Box>
-
-      <Menu
-        isOpen={roleMenuOpen}
-        onOpenChange={setRoleMenuOpen}
-        selectedKey={member.role}
-        onSelect={(role) => updateMemberRole({ memberId: member.id, role })}
+      {onlyOwner ? (
+        <Txt className="text-sm text-muted">
+          {localization.onlyOwnerActionDisabled}
+        </Txt>
+      ) : null}
+      <AlertDialog
+        isOpen={!!action}
+        onOpenChange={(open) => {
+          if (!open) close()
+        }}
       >
-        {assignableRoles.map(([role, label]) => (
-          <Menu.Item key={role} id={role} isDisabled={member.role === role}>
-            {label}
-          </Menu.Item>
-        ))}
-      </Menu>
-
-      {isCurrentUser && organization ? (
-        <LeaveOrganizationConfirmDialog
-          isOpen={leaveOpen}
-          onOpenChange={setLeaveOpen}
-          organization={organization}
-        />
-      ) : (
-        hasDeletePermission?.success && (
-          <RemoveMemberConfirmDialog
-            isOpen={removeOpen}
-            onOpenChange={setRemoveOpen}
-            member={member}
-          />
-        )
-      )}
+        <AlertDialog.CloseTrigger />
+        <AlertDialog.Header>
+          <AlertDialog.Heading>
+            {action === "role"
+              ? localization.changeMemberRole
+              : action === "leave"
+                ? localization.leaveOrganization
+                : localization.removeMember}
+          </AlertDialog.Heading>
+        </AlertDialog.Header>
+        <AlertDialog.Body>
+          {action === "role" ? (
+            <RolePicker
+              roles={assignable}
+              value={selected}
+              onChange={setSelected}
+              multiple={allowMultipleRoles}
+              disabled={busy}
+            />
+          ) : (
+            <Txt>
+              {action === "leave"
+                ? localization.leaveOrganizationDescription
+                : localization.removeMemberWarning}
+            </Txt>
+          )}
+          {error ? <Txt accessibilityRole="alert">{error.message}</Txt> : null}
+        </AlertDialog.Body>
+        <AlertDialog.Footer>
+          <Button variant="tertiary" isDisabled={busy} onPress={close}>
+            {common.settings.cancel}
+          </Button>
+          <Button
+            isPending={busy}
+            isDisabled={
+              action === "role" &&
+              (!selected.length ||
+                (onlyOwner && !selected.includes(creatorRole)))
+            }
+            variant={action === "role" ? "primary" : "danger"}
+            onPress={() => {
+              void submit().catch(() => {})
+            }}
+          >
+            {action === "role"
+              ? common.settings.saveChanges
+              : action === "leave"
+                ? localization.leaveOrganization
+                : localization.removeMember}
+          </Button>
+        </AlertDialog.Footer>
+      </AlertDialog>
     </Box>
-  )
-}
-
-function RemoveMemberConfirmDialog({
-  isOpen,
-  onOpenChange,
-  member
-}: {
-  isOpen: boolean
-  onOpenChange: (open: boolean) => void
-  member: Member & { user: Partial<User> }
-}) {
-  const { authClient, localization } = useAuth()
-  const { localization: organizationLocalization, roles } =
-    useAuthPlugin(organizationPlugin)
-  const colors = useThemeColors()
-
-  const { mutate: removeMember, isPending } = useRemoveMember(
-    authClient as OrganizationAuthClient,
-    {
-      onSuccess: () => {
-        onOpenChange(false)
-        toast.success(organizationLocalization.memberRemoved)
-      }
-    }
-  )
-
-  return (
-    <AlertDialog isOpen={isOpen} onOpenChange={onOpenChange}>
-      <AlertDialog.CloseTrigger />
-
-      <AlertDialog.Header>
-        <AlertDialog.Icon status="danger">
-          <Trash width={20} height={20} color={colors.danger} />
-        </AlertDialog.Icon>
-
-        <AlertDialog.Heading>
-          {organizationLocalization.removeMember}
-        </AlertDialog.Heading>
-      </AlertDialog.Header>
-
-      <AlertDialog.Body>
-        <Txt className="text-sm text-muted">
-          {organizationLocalization.removeMemberWarning}
-        </Txt>
-
-        <Card variant="secondary">
-          <Card.Content className="flex-row items-center justify-between gap-2">
-            <UserView user={member.user} />
-
-            <Chip>
-              <Chip.Label>{roles?.[member.role] ?? member.role}</Chip.Label>
-            </Chip>
-          </Card.Content>
-        </Card>
-      </AlertDialog.Body>
-
-      <AlertDialog.Footer>
-        <Button
-          variant="tertiary"
-          isDisabled={isPending}
-          onPress={() => onOpenChange(false)}
-        >
-          {localization.settings.cancel}
-        </Button>
-
-        <Button
-          variant="danger"
-          isPending={isPending}
-          onPress={() =>
-            removeMember({
-              memberIdOrEmail: member.id,
-              organizationId: member.organizationId
-            })
-          }
-        >
-          {organizationLocalization.removeMember}
-        </Button>
-      </AlertDialog.Footer>
-    </AlertDialog>
-  )
-}
-
-function LeaveOrganizationConfirmDialog({
-  isOpen,
-  onOpenChange,
-  organization
-}: {
-  isOpen: boolean
-  onOpenChange: (open: boolean) => void
-  organization: Organization
-}) {
-  const { authClient, localization } = useAuth()
-  const { localization: organizationLocalization } =
-    useAuthPlugin(organizationPlugin)
-  const colors = useThemeColors()
-
-  const { mutate: leaveOrganization, isPending } = useLeaveOrganization(
-    authClient as OrganizationAuthClient,
-    {
-      onSuccess: () => {
-        onOpenChange(false)
-        toast.success(organizationLocalization.leftOrganization)
-      }
-    }
-  )
-
-  return (
-    <AlertDialog isOpen={isOpen} onOpenChange={onOpenChange}>
-      <AlertDialog.CloseTrigger />
-
-      <AlertDialog.Header>
-        <AlertDialog.Icon status="danger">
-          <ArrowRightFromSquare width={20} height={20} color={colors.danger} />
-        </AlertDialog.Icon>
-
-        <AlertDialog.Heading>
-          {organizationLocalization.leaveOrganization}
-        </AlertDialog.Heading>
-      </AlertDialog.Header>
-
-      <AlertDialog.Body>
-        <Txt className="text-sm text-muted">
-          {organizationLocalization.leaveOrganizationDescription}
-        </Txt>
-      </AlertDialog.Body>
-
-      <AlertDialog.Footer>
-        <Button
-          variant="tertiary"
-          isDisabled={isPending}
-          onPress={() => onOpenChange(false)}
-        >
-          {localization.settings.cancel}
-        </Button>
-
-        <Button
-          variant="danger"
-          isPending={isPending}
-          onPress={() => leaveOrganization({ organizationId: organization.id })}
-        >
-          {organizationLocalization.leaveOrganization}
-        </Button>
-      </AlertDialog.Footer>
-    </AlertDialog>
   )
 }

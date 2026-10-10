@@ -1,0 +1,6 @@
+export { oauthProviderPlugin } from "../../lib/auth/oauth-provider-plugin"
+export * from "../../components/auth/oauth-provider/authorized-applications"
+export * from "../../components/auth/oauth-provider/oauth-clients"
+export * from "../../components/auth/oauth-provider/oauth-consent"
+export * from "../../components/auth/oauth-provider/oauth-select-account"
+export * from "../../components/auth/oauth-provider/oauth-sign-up"

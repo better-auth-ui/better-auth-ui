@@ -60,8 +60,11 @@ export function OrganizationSwitcher({
 }: OrganizationSwitcherProps & Omit<ButtonProps, "size">) {
   const { authClient, localization } = useAuth()
   const { data: session, isPending: sessionPending } = useSession(authClient)
-  const { localization: organizationLocalization } =
-    useAuthPlugin(organizationPlugin)
+  const {
+    localization: organizationLocalization,
+    allowOrganizationCreation,
+    organizationLimit
+  } = useAuthPlugin(organizationPlugin)
 
   const navigation = useAuthNavigation()
   const colors = useThemeColors()
@@ -218,9 +221,13 @@ export function OrganizationSwitcher({
           </Menu.Item>
         ))}
 
-        {!hideCreate && (
+        {!hideCreate && allowOrganizationCreation && (
           <Menu.Item
             icon={<CirclePlus width={18} height={18} color={colors.muted} />}
+            isDisabled={
+              organizationLimit !== undefined &&
+              (organizations?.length ?? 0) >= organizationLimit
+            }
             onPress={() => setCreateOpen(true)}
           >
             <Txt className="text-sm text-foreground">

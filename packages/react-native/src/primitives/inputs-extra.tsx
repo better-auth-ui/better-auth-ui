@@ -1,6 +1,8 @@
 import { useState } from "react"
 import { TextInput, type TextInputProps } from "react-native"
 import { cn } from "../lib/cn"
+import { useNativeLocale } from "../lib/native-locale"
+import { directionalStyle } from "../lib/directional-style"
 import { useThemeColors } from "../lib/theme-colors"
 import { tw } from "../lib/tw"
 import { Box, Btn } from "./styled"
@@ -38,6 +40,7 @@ export function SearchField({
   "aria-label": ariaLabel
 }: SearchFieldProps) {
   const colors = useThemeColors()
+  const { direction } = useNativeLocale()
 
   return (
     <Box
@@ -57,10 +60,22 @@ export function SearchField({
         autoCapitalize="none"
         autoCorrect={false}
         accessibilityLabel={ariaLabel ?? placeholder}
-        style={tw(
-          cn("h-full flex-1 px-2 text-base text-foreground", inputClassName),
-          colors
-        )}
+        style={[
+          directionalStyle(
+            tw(
+              cn(
+                "h-full flex-1 px-2 text-base text-foreground",
+                inputClassName
+              ),
+              colors
+            ),
+            direction
+          ),
+          {
+            writingDirection: direction,
+            textAlign: direction === "rtl" ? "right" : "left"
+          }
+        ]}
       />
       {value.length > 0 && (
         <Btn
@@ -109,6 +124,7 @@ export function TextArea({
   ...props
 }: TextAreaProps) {
   const colors = useThemeColors()
+  const { direction } = useNativeLocale()
 
   return (
     <TextInput
@@ -120,14 +136,23 @@ export function TextArea({
       multiline
       numberOfLines={numberOfLines}
       textAlignVertical="top"
-      style={tw(
-        cn(
-          "min-h-24 rounded-lg border border-border px-3 py-2 text-base text-foreground",
-          isDisabled && "opacity-50",
-          className
+      style={[
+        directionalStyle(
+          tw(
+            cn(
+              "min-h-24 rounded-lg border border-border px-3 py-2 text-base text-foreground",
+              isDisabled && "opacity-50",
+              className
+            ),
+            colors
+          ),
+          direction
         ),
-        colors
-      )}
+        {
+          writingDirection: direction,
+          textAlign: direction === "rtl" ? "right" : "left"
+        }
+      ]}
       {...props}
     />
   )
@@ -140,6 +165,7 @@ export function TextArea({
 export interface NumberFieldProps {
   value: number
   onChange: (value: number) => void
+  onBlur?: () => void
   minValue?: number
   maxValue?: number
   step?: number
@@ -166,6 +192,7 @@ function clamp(value: number, min?: number, max?: number): number {
 export function NumberField({
   value,
   onChange,
+  onBlur,
   minValue,
   maxValue,
   step = 1,
@@ -176,12 +203,13 @@ export function NumberField({
   "aria-label": ariaLabel
 }: NumberFieldProps) {
   const colors = useThemeColors()
-  const [text, setText] = useState(String(value))
-
-  // Keep the visible text in sync when `value` changes externally (e.g. via
-  // the stepper buttons or a parent-driven reset).
-  if (Number(text) !== value && text !== "" && text !== "-") {
-    if (String(value) !== text) setText(String(value))
+  const display = (number: number) =>
+    Number.isFinite(number) ? String(number) : ""
+  const [text, setText] = useState(() => display(value))
+  const [previous, setPrevious] = useState(value)
+  if (!Object.is(previous, value)) {
+    setPrevious(value)
+    if (!Object.is(Number(text), value) || text === "") setText(display(value))
   }
 
   const commit = (next: number) => {
@@ -191,9 +219,13 @@ export function NumberField({
   }
 
   const canDecrement =
-    !isDisabled && !isReadOnly && (minValue === undefined || value > minValue)
+    !isDisabled &&
+    !isReadOnly &&
+    (minValue === undefined || !Number.isFinite(value) || value > minValue)
   const canIncrement =
-    !isDisabled && !isReadOnly && (maxValue === undefined || value < maxValue)
+    !isDisabled &&
+    !isReadOnly &&
+    (maxValue === undefined || !Number.isFinite(value) || value < maxValue)
 
   return (
     <Box
@@ -207,7 +239,9 @@ export function NumberField({
         accessibilityRole="button"
         accessibilityLabel="Decrement"
         disabled={!canDecrement}
-        onPress={() => commit(value - step)}
+        onPress={() =>
+          commit((Number.isFinite(value) ? value : (minValue ?? 0)) - step)
+        }
         hitSlop={8}
         className={cn(
           "h-full w-11 items-center justify-center border-r border-border",
@@ -222,13 +256,15 @@ export function NumberField({
         onChangeText={(raw) => {
           setText(raw)
           const parsed = Number(raw)
-          if (raw !== "" && raw !== "-" && !Number.isNaN(parsed)) {
-            onChange(clamp(parsed, minValue, maxValue))
-          }
+          onChange(
+            raw === "" || !Number.isFinite(parsed)
+              ? Number.NaN
+              : clamp(parsed, minValue, maxValue)
+          )
         }}
         onBlur={() => {
-          const parsed = Number(text)
-          commit(Number.isNaN(parsed) ? 0 : parsed)
+          if (text !== "" && Number.isFinite(Number(text))) commit(Number(text))
+          onBlur?.()
         }}
         editable={!isDisabled && !isReadOnly}
         placeholder={placeholder}
@@ -245,7 +281,9 @@ export function NumberField({
         accessibilityRole="button"
         accessibilityLabel="Increment"
         disabled={!canIncrement}
-        onPress={() => commit(value + step)}
+        onPress={() =>
+          commit((Number.isFinite(value) ? value : (minValue ?? 0)) + step)
+        }
         hitSlop={8}
         className={cn(
           "h-full w-11 items-center justify-center border-l border-border",

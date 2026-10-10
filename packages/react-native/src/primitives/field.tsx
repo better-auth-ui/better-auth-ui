@@ -1,10 +1,13 @@
 import {
+  Children,
+  isValidElement,
   createContext,
   type ReactNode,
   useCallback,
   useContext,
   useEffect,
   useMemo,
+  useId,
   useRef,
   useState
 } from "react"
@@ -12,9 +15,11 @@ import { cn } from "../lib/cn"
 import { useForm } from "./form"
 import { Box, Txt } from "./styled"
 
-export type FieldType = "text" | "email" | "password"
+export type FieldType = "text" | "email" | "password" | "url"
 
 export interface FieldContextValue {
+  accessibilityLabel?: string
+  labelId: string
   value: string
   setValue: (value: string) => void
   error: string | undefined
@@ -22,6 +27,7 @@ export interface FieldContextValue {
   type: FieldType
   autoComplete?: string
   name?: string
+  onBlur?: () => void
 }
 
 const FieldContext = createContext<FieldContextValue | null>(null)
@@ -38,6 +44,7 @@ export function useField(): FieldContextValue {
 }
 
 export interface TextFieldProps {
+  accessibilityLabel?: string
   name?: string
   type?: FieldType
   autoComplete?: string
@@ -45,6 +52,8 @@ export interface TextFieldProps {
   /** Controlled value (RN fields are always controlled — no FormData). */
   value?: string
   onChange?: (value: string) => void
+  onBlur?: () => void
+  error?: string
   /** Returns a localized error string, or `undefined` when valid. */
   validate?: (value: string) => string | undefined
   minLength?: number
@@ -60,16 +69,28 @@ export interface TextFieldProps {
  * submit button can trigger validation.
  */
 export function TextField({
+  accessibilityLabel,
   name,
   type = "text",
   autoComplete,
   isDisabled = false,
   value: valueProp,
   onChange,
+  onBlur,
+  error: externalError,
   validate,
   className,
   children
 }: TextFieldProps) {
+  const labelId = useId()
+  const label = Children.toArray(children).find(
+    (child) => isValidElement(child) && child.type === Label
+  )
+  const labelText =
+    accessibilityLabel ??
+    (isValidElement<{ children?: ReactNode }>(label)
+      ? nativeLabelText(label.props.children)
+      : name)
   const form = useForm()
   const isControlled = valueProp !== undefined
   const [internal, setInternal] = useState("")
@@ -104,8 +125,31 @@ export function TextField({
   )
 
   const context = useMemo<FieldContextValue>(
-    () => ({ value, setValue, error, isDisabled, type, autoComplete, name }),
-    [value, setValue, error, isDisabled, type, autoComplete, name]
+    () => ({
+      labelId,
+      accessibilityLabel: labelText,
+      value,
+      setValue,
+      error: externalError ?? error,
+      isDisabled,
+      type,
+      autoComplete,
+      name,
+      onBlur
+    }),
+    [
+      labelId,
+      labelText,
+      value,
+      setValue,
+      error,
+      externalError,
+      isDisabled,
+      type,
+      autoComplete,
+      name,
+      onBlur
+    ]
   )
 
   return (
@@ -125,8 +169,10 @@ export function Label({
   isDisabled?: boolean
   children?: ReactNode
 }) {
+  const field = useContext(FieldContext)
   return (
     <Txt
+      nativeID={field?.labelId}
       className={cn(
         "text-sm font-medium text-foreground",
         isDisabled && "opacity-50",
@@ -142,5 +188,24 @@ export function Label({
 export function FieldError({ className }: { className?: string }) {
   const { error } = useField()
   if (!error) return null
-  return <Txt className={cn("text-sm text-danger", className)}>{error}</Txt>
+  return (
+    <Txt
+      accessibilityRole="alert"
+      className={cn("text-sm text-danger", className)}
+    >
+      {error}
+    </Txt>
+  )
+}
+
+function nativeLabelText(node: ReactNode): string {
+  return Children.toArray(node)
+    .map((child) =>
+      typeof child === "string" || typeof child === "number"
+        ? String(child)
+        : isValidElement<{ children?: ReactNode }>(child)
+          ? nativeLabelText(child.props.children)
+          : ""
+    )
+    .join("")
 }

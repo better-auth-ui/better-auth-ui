@@ -1,14 +1,16 @@
 import {
-  basePaths as defaultBasePaths,
-  viewPaths as defaultViewPaths,
-  type SettingsView
-} from "@better-auth-ui/core"
+  getNavigationPath,
+  getNavigationParams,
+  mergeRouteConfig,
+  resolveNavigationTarget,
+  type NavigationRouteConfig
+} from "./route-config"
+import { basePaths as defaultBasePaths } from "@better-auth-ui/core"
 import {
   type AuthNavigateOptions,
   type Navigation,
   type PushTarget,
-  toViewTarget,
-  type ViewTarget
+  toViewTarget
 } from "./types"
 
 /** Minimal shape of the object returned by expo-router's `useRouter()`. */
@@ -18,9 +20,11 @@ export interface ExpoRouterLike {
   back?: () => void
 }
 
-export interface ExpoRouterNavigationOptions {
+export interface ExpoRouterNavigationOptions extends NavigationRouteConfig {
   /** The expo-router router (`useRouter()`). */
   router: ExpoRouterLike
+  /** Result of usePathname(), used to preserve the current destination. */
+  pathname?: string
   /** Result of `useLocalSearchParams()` — powers `getParam` (token, redirectTo, slug). */
   params?: Record<string, string | string[] | undefined>
   /** Base path for auth routes. @default `basePaths.auth` (`"/auth"`). */
@@ -31,16 +35,6 @@ export interface ExpoRouterNavigationOptions {
   organizationBasePath?: string
   /** Prefix before the organization slug segment (e.g. `"@"`). @default `""`. */
   slugPrefix?: string
-}
-
-function buildQuery(params?: Record<string, string>): string {
-  if (!params) return ""
-  const entries = Object.entries(params)
-  if (!entries.length) return ""
-  // Built by hand: `URLSearchParams` is not reliably available under Hermes.
-  return `?${entries
-    .map(([k, v]) => `${encodeURIComponent(k)}=${encodeURIComponent(v)}`)
-    .join("&")}`
 }
 
 /**
@@ -66,37 +60,85 @@ export function createExpoRouterNavigation(
     slugPrefix = ""
   } = options
 
-  const settingsSegment = (view: SettingsView | string) =>
-    (defaultViewPaths.settings as unknown as Record<string, string>)[view] ??
-    view
-
-  const pathFor = (target: ViewTarget, extra?: Record<string, string>) => {
-    const query = buildQuery(extra)
-    if (target.section === "auth") {
-      return `${authBasePath}/${defaultViewPaths.auth[target.view]}${query}`
-    }
-    if (target.section === "settings") {
-      return `${settingsBasePath}/${settingsSegment(target.view)}${query}`
-    }
-    const slugSeg = target.slug ? `/${slugPrefix}${target.slug}` : ""
-    return `${organizationBasePath}${slugSeg}/${target.view}${query}`
+  let routes: NavigationRouteConfig = {
+    ...options,
+    basePaths: {
+      auth: authBasePath,
+      settings: settingsBasePath,
+      organization: organizationBasePath,
+      ...options.basePaths
+    },
+    slugPrefix
   }
 
   const push = (next: PushTarget, opts?: AuthNavigateOptions) => {
-    const href = pathFor(toViewTarget(next), opts?.params)
+    const target = toViewTarget(next)
+    const redirectTo = params.redirectTo
+    const inherited: Record<string, string> =
+      target.section === "auth" && typeof redirectTo === "string"
+        ? { redirectTo }
+        : {}
+    const href = getNavigationPath(target, routes, {
+      ...inherited,
+      ...opts?.params
+    })
     if (opts?.replace) router.replace(href)
     else router.push(href)
   }
 
   return {
     push,
-    current: () => undefined,
+    configure: (config) => {
+      routes = mergeRouteConfig(config, {
+        ...options,
+        basePaths: {
+          ...options.basePaths,
+          auth: options.authBasePath ?? options.basePaths?.auth,
+          settings: options.settingsBasePath ?? options.basePaths?.settings,
+          organization:
+            options.organizationBasePath ?? options.basePaths?.organization
+        }
+      })
+    },
+    current: () =>
+      options.pathname
+        ? resolveNavigationTarget({ to: options.pathname }, routes)
+        : undefined,
+    getPath: (target) =>
+      target
+        ? getNavigationPath(target, routes)
+        : options.pathname
+          ? `${options.pathname}${
+              Object.keys(params).length
+                ? "?" +
+                  Object.entries(params)
+                    .filter(([, value]) => typeof value === "string")
+                    .map(
+                      ([key, value]) =>
+                        `${encodeURIComponent(key)}=${encodeURIComponent(String(value))}`
+                    )
+                    .join("&")
+                : ""
+            }`
+          : undefined,
     getParam: (key) => {
       const value = params[key]
       return Array.isArray(value) ? value[0] : value
     },
-    navigate: ({ to, replace }) => {
-      if (replace) router.replace(to)
+    navigate: (navOptions) => {
+      const extra = getNavigationParams(navOptions.to, navOptions.params)
+      const base = navOptions.to.split(/[?#]/)[0]
+      const hash = navOptions.to.includes("#")
+        ? `#${navOptions.to.split("#")[1]}`
+        : ""
+      const query = Object.entries(extra)
+        .map(
+          ([key, value]) =>
+            `${encodeURIComponent(key)}=${encodeURIComponent(value)}`
+        )
+        .join("&")
+      const to = `${base}${query ? `?${query}` : ""}${hash}`
+      if (navOptions.replace) router.replace(to)
       else router.push(to)
     }
   }

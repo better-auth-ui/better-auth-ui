@@ -1,4 +1,4 @@
-import { useAuth } from "@better-auth-ui/react"
+import { getOrganizationCardKey, useAuth } from "@better-auth-ui/react"
 import type { SettingsViewProps } from "../../../../lib/auth-plugin"
 import { cn } from "../../../../lib/cn"
 import { Box } from "../../../../primitives/styled"
@@ -22,17 +22,27 @@ export type AccountSettingsProps = SettingsViewProps
 export function AccountSettings({ className, variant }: AccountSettingsProps) {
   const { emailAndPassword, plugins } = useAuth()
 
+  const ChangeEmailCard =
+    plugins.find((plugin) => plugin.cardOverrides?.account?.changeEmail)
+      ?.cardOverrides?.account?.changeEmail ?? ChangeEmail
+  const hasOverride = plugins.some(
+    (plugin) => plugin.cardOverrides?.account?.changeEmail
+  )
+
   const hasMagicLink = plugins.some((plugin) => plugin.id === "magicLink")
 
   return (
     <Box className={cn("flex w-full flex-col gap-4", className)}>
       <UserProfile variant={variant} />
-      {(emailAndPassword?.enabled || hasMagicLink) && (
-        <ChangeEmail variant={variant} />
+      {(emailAndPassword?.enabled || hasMagicLink || hasOverride) && (
+        <ChangeEmailCard variant={variant} />
       )}
       {plugins.flatMap((plugin) =>
-        plugin.accountCards?.map((Card, index) => (
-          <Card key={`${plugin.id}-${index.toString()}`} variant={variant} />
+        plugin.accountCards?.map((Card) => (
+          <Card
+            key={getOrganizationCardKey(plugin.id, Card)}
+            variant={variant}
+          />
         ))
       )}
     </Box>

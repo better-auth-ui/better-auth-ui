@@ -45,3 +45,12 @@ skills:
       - packages/locales/src/de-DE.ts
       - packages/core/src/lib/auth-locale.ts
       - apps/docs/content/topics/ui/components/auth-provider.mdx
+  - name: better-auth-ui-react-native
+    package: packages/react-native
+    path: packages/react-native/skills/better-auth-ui-react-native/SKILL.md
+    sources:
+      - packages/react-native/src/components/auth/auth-provider.tsx
+      - packages/react-native/src/navigation/expo-router-adapter.ts
+      - packages/react-native/src/plugins.ts
+      - packages/react-native/README.md
+      - packages/react-native/PARITY.md

@@ -1,3 +1,4 @@
+import { directionalStyle } from "../lib/directional-style"
 import { useMemo } from "react"
 import {
   Pressable,
@@ -10,6 +11,7 @@ import {
   type ViewProps
 } from "react-native"
 import { useThemeColors } from "../lib/theme-colors"
+import { useNativeLocale } from "../lib/native-locale"
 import { tw } from "../lib/tw"
 
 /**
@@ -23,20 +25,42 @@ import { tw } from "../lib/tw"
 type WithClass<P> = P & { className?: string }
 
 export function Box({ className, style, ...props }: WithClass<ViewProps>) {
+  const { direction } = useNativeLocale()
   const colors = useThemeColors()
-  const s = useMemo(() => tw(className, colors), [className, colors])
+  const s = useMemo(
+    () => ({
+      direction,
+      ...directionalStyle(tw(className, colors), direction)
+    }),
+    [className, colors, direction]
+  )
   return <View style={style ? [s, style] : s} {...props} />
 }
 
 export function Txt({ className, style, ...props }: WithClass<TextProps>) {
+  const { direction } = useNativeLocale()
   const colors = useThemeColors()
-  const s = useMemo(() => tw(className, colors), [className, colors])
+  const s = useMemo(
+    () => ({
+      direction,
+      writingDirection: direction,
+      ...directionalStyle(tw(className, colors), direction)
+    }),
+    [className, colors, direction]
+  )
   return <Text style={style ? [s, style] : s} {...props} />
 }
 
 export function Btn({ className, style, ...props }: WithClass<PressableProps>) {
+  const { direction } = useNativeLocale()
   const colors = useThemeColors()
-  const s = useMemo(() => tw(className, colors), [className, colors])
+  const s = useMemo(
+    () => ({
+      direction,
+      ...directionalStyle(tw(className, colors), direction)
+    }),
+    [className, colors, direction]
+  )
   return (
     <Pressable
       style={(state) => {
@@ -55,11 +79,18 @@ export function ScrollBox({
   contentContainerStyle,
   ...props
 }: WithClass<ScrollViewProps> & { contentContainerClassName?: string }) {
+  const { direction } = useNativeLocale()
   const colors = useThemeColors()
-  const s = useMemo(() => tw(className, colors), [className, colors])
+  const s = useMemo(
+    () => ({
+      direction,
+      ...directionalStyle(tw(className, colors), direction)
+    }),
+    [className, colors, direction]
+  )
   const cs = useMemo(
-    () => tw(contentContainerClassName, colors),
-    [contentContainerClassName, colors]
+    () => directionalStyle(tw(contentContainerClassName, colors), direction),
+    [contentContainerClassName, colors, direction]
   )
   return (
     <ScrollView

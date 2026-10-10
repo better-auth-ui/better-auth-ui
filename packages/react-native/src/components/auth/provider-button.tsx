@@ -1,6 +1,7 @@
 import {
   type AuthSocialProvider,
   authMutationKeys,
+  getAuthCallbackURL,
   getProviderId,
   getProviderName,
   isCustomSocialProvider
@@ -8,6 +9,7 @@ import {
 import { useAuth, useSignInSocial } from "@better-auth-ui/react"
 import { useIsMutating } from "@tanstack/react-query"
 import type { SocialProvider } from "better-auth/social-providers"
+import { LastUsedBadge } from "./last-login-method/last-used-badge"
 import { providerIcons } from "../../lib/provider-icons"
 import { useThemeColors } from "../../lib/theme-colors"
 import { Button, type ButtonProps } from "../../primitives/button"
@@ -30,7 +32,7 @@ export function ProviderButton({
   const { authClient, baseURL, localization, redirectTo } = useAuth()
   const colors = useThemeColors()
 
-  const callbackURL = `${baseURL}${redirectTo}`
+  const callbackURL = getAuthCallbackURL(baseURL, redirectTo)
 
   const { mutate: signInSocial } = useSignInSocial(authClient)
 
@@ -71,6 +73,7 @@ export function ProviderButton({
         : display === "name"
           ? getProviderName(provider)
           : null}
+      <LastUsedBadge method={providerId} compact={display === "icon"} />
     </Button>
   )
 }

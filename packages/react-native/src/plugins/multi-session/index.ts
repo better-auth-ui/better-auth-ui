@@ -1,0 +1,6 @@
+export { multiSessionPlugin } from "../../lib/auth/multi-session-plugin"
+export * from "../../components/auth/multi-session/manage-account"
+export * from "../../components/auth/multi-session/manage-accounts"
+export * from "../../components/auth/multi-session/switch-account-submenu-content"
+export * from "../../components/auth/multi-session/switch-account-submenu-item"
+export * from "../../components/auth/multi-session/switch-account-submenu"

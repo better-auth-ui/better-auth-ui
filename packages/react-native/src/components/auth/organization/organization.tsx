@@ -1,8 +1,9 @@
+import { useNativeAuthenticate } from "../../../lib/auth/use-native-authenticate"
 import type {
   OrganizationAuthClient,
   OrganizationView
 } from "@better-auth-ui/core/plugins/organization"
-import { useAuth, useAuthenticate, useAuthPlugin } from "@better-auth-ui/react"
+import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
 import { useActiveOrganization } from "@better-auth-ui/react/plugins/organization"
 import { useEffect } from "react"
 
@@ -20,7 +21,7 @@ export type OrganizationProps = {
   hideNav?: boolean
   variant?: CardVariant
   /** @remarks `OrganizationView` */
-  view?: OrganizationView
+  view?: OrganizationView | (string & {})
 }
 
 /**
@@ -46,8 +47,13 @@ export function Organization({
   variant,
   view
 }: OrganizationProps) {
-  const { authClient, localization } = useAuth()
-  useAuthenticate(authClient)
+  const { authClient, localization, plugins } = useAuth()
+  const navigation = useAuthNavigation()
+  const authenticated = useNativeAuthenticate({
+    section: "organization",
+    view: view ?? "settings",
+    slug: navigation.getParam("slug")
+  })
 
   const { localization: organizationLocalization, slug } =
     useAuthPlugin(organizationPlugin)
@@ -56,7 +62,9 @@ export function Organization({
     authClient as OrganizationAuthClient
   )
 
-  const navigation = useAuthNavigation()
+  const contributedTabs = plugins.flatMap(
+    (plugin) => plugin.organizationTabs ?? []
+  )
 
   const current = navigation.current()
   const currentView: OrganizationView | (string & {}) =
@@ -65,15 +73,15 @@ export function Organization({
     "settings"
 
   useEffect(() => {
-    if (!isPending && !activeOrganization) {
+    if (authenticated.data && !isPending && !activeOrganization) {
       navigation.push(
         { section: "settings", view: "organizations" },
         { replace: true }
       )
     }
-  }, [isPending, activeOrganization, navigation])
+  }, [authenticated.data, isPending, activeOrganization, navigation])
 
-  if (!isPending && !activeOrganization) {
+  if (authenticated.data && !isPending && !activeOrganization) {
     return null
   }
 
@@ -100,16 +108,35 @@ export function Organization({
             <Person className="text-muted" />
             {organizationLocalization.people}
           </Tabs.Tab>
+          {contributedTabs.map((tab) => (
+            <Tabs.Tab key={tab.id} id={tab.id}>
+              {tab.label}
+            </Tabs.Tab>
+          ))}
         </Tabs.List>
       )}
 
       <Tabs.Panel id="settings">
-        <OrganizationSettings variant={variant} />
+        <OrganizationSettings
+          variant={variant}
+          organizationId={activeOrganization?.id}
+          organizationSlug={activeOrganization?.slug}
+        />
       </Tabs.Panel>
 
       <Tabs.Panel id="people">
         <OrganizationPeople />
       </Tabs.Panel>
+      {contributedTabs.map((tab) => (
+        <Tabs.Panel key={tab.id} id={tab.id}>
+          {activeOrganization ? (
+            <tab.component
+              organizationId={activeOrganization.id}
+              organizationSlug={activeOrganization.slug}
+            />
+          ) : null}
+        </Tabs.Panel>
+      ))}
     </Tabs>
   )
 }

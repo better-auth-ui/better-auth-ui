@@ -1,9 +1,10 @@
 import type {
   AdditionalField as AdditionalFieldConfig,
-  AdditionalFieldValue
+  AdditionalFieldFormValue
 } from "@better-auth-ui/core"
 import type {
   AuthButtonProps,
+  AuthPrompt,
   AuthPlugin as AuthPluginPrimitive,
   UserMenuItemProps
 } from "@better-auth-ui/react"
@@ -11,20 +12,18 @@ import type { ComponentType, ReactNode } from "react"
 import type { SocialLayout } from "../components/auth/provider-buttons"
 import type { CardVariant } from "../primitives/card"
 
-/**
- * Props for the RN `<AdditionalField>` component and `field.render` callbacks.
- * Mirrors heroui's `AdditionalFieldProps` (`name`, `field`, `isPending`,
- * `variant`) but adds `onChange`: RN has no `FormData` to read a submitted
- * value from, so every additional-field renderer is a controlled component
- * that owns its local input state and reports parsed value changes back up
- * to the parent form (`SignUp`, `UserProfile`, …) via this callback.
- */
+/** Controlled bindings supplied to native fields and custom renderers. */
 export type AdditionalFieldProps = {
   name: string
   field: AdditionalFieldConfig
+  value: AdditionalFieldFormValue
+  onBlur: () => void
+  onChange: (value: AdditionalFieldFormValue) => void
+  isInvalid?: boolean
+  errors?: unknown[]
+  optionalLabel?: ReactNode
   isPending?: boolean
   variant?: CardVariant
-  onChange?: (value: AdditionalFieldValue | null) => void
 }
 
 /**
@@ -49,15 +48,21 @@ export type SettingsViewProps = {
 }
 
 /** RN card slot props — narrows the react base so cards accept `variant`. */
-type CardSlotProps = SettingsViewProps & { children?: ReactNode }
+export type CardSlotProps = SettingsViewProps & { children?: ReactNode }
 
 /** RN plugin slot map (cards carry the RN `variant`, matching the hosts). */
 export type AuthPluginComponents = {
   authButtons?: ComponentType<AuthButtonProps>[]
+  authPrompts?: AuthPrompt[]
   captchaComponent?: ReactNode
   securityCards?: ComponentType<CardSlotProps>[]
   accountCards?: ComponentType<CardSlotProps>[]
-  organizationCards?: ComponentType<CardSlotProps>[]
+  organizationCards?: ComponentType<
+    CardSlotProps & {
+      organizationId: string
+      organizationSlug: string
+    }
+  >[]
   userMenuItems?: ComponentType<UserMenuItemProps>[]
 }
 
@@ -69,7 +74,8 @@ export type AuthPluginComponents = {
 export type AuthPlugin = AuthPluginPrimitive<
   AuthPluginComponents,
   AuthViewProps,
-  SettingsViewProps
+  SettingsViewProps,
+  CardSlotProps
 >
 
 // Widen the resolved `AuthPlugin` (core declaration-merging slot) so
