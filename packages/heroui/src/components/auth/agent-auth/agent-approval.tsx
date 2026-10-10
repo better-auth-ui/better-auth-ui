@@ -2,8 +2,7 @@
 
 import type {
   AgentApprovalRequest,
-  AgentAuthClient,
-  AgentCapabilityGrant
+  AgentAuthClient
 } from "@better-auth-ui/core/plugins/agent-auth"
 import { useAuth, useAuthPlugin, useSession } from "@better-auth-ui/react"
 import {
@@ -16,30 +15,24 @@ import {
   CircleCheck,
   CircleXmark,
   FaceRobot,
-  Fingerprint
+  Fingerprint,
+  Ellipsis
 } from "@gravity-ui/icons"
 import {
   Button,
   Card,
   type CardProps,
   Checkbox,
-  Chip,
   cn,
   Skeleton,
   Spinner
 } from "@heroui/react"
 import { useEffect, useMemo, useState } from "react"
 
+import { UserAvatar } from "../user/user-avatar"
 import { agentAuthPlugin } from "../../../lib/auth/agent-auth-plugin"
 
 type ApprovalResult = "approved" | "denied"
-
-const strengthColor = (strength: AgentCapabilityGrant["approvalStrength"]) =>
-  strength === "webauthn"
-    ? "warning"
-    : strength === "session"
-      ? "accent"
-      : "default"
 
 export type AgentApprovalProps = {
   className?: string
@@ -146,143 +139,188 @@ export function AgentApproval({ className, variant }: AgentApprovalProps) {
 
   return (
     <Card
-      className={cn("w-full max-w-md gap-5 md:p-6", className)}
+      className={cn(
+        "max-h-[calc(100dvh-2rem)] w-full max-w-lg gap-0 overflow-hidden p-0",
+        className
+      )}
       variant={variant}
     >
-      <Card.Header className="flex items-start gap-3">
-        <div className="bg-surface-secondary flex size-11 shrink-0 items-center justify-center rounded-xl">
-          <FaceRobot className="size-5" />
-        </div>
-        <div className="flex min-w-0 flex-col gap-1">
-          <Card.Title>{plugin.localization.approvalTitle}</Card.Title>
-          <Card.Description>
-            {plugin.localization.approvalDescription}
-          </Card.Description>
-        </div>
-      </Card.Header>
-      <Card.Content className="flex flex-col gap-5">
-        {approval.isPending || session.isPending ? (
-          <div className="flex flex-col gap-3">
-            <Skeleton className="h-14 rounded-xl" />
-            <Skeleton className="h-20 rounded-xl" />
-            <Skeleton className="h-20 rounded-xl" />
+      <div
+        className="min-h-0 overflow-y-auto overscroll-contain focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-focus"
+        role="region"
+        aria-label={plugin.localization.approvalTitle}
+        tabIndex={0}
+      >
+        <Card.Header className="flex flex-col items-stretch gap-5 p-6">
+          <div className="flex items-center justify-center gap-5">
+            <div className="flex size-16 shrink-0 items-center justify-center rounded-full bg-surface-secondary">
+              <FaceRobot aria-hidden="true" className="size-7" />
+            </div>
+            <Ellipsis aria-hidden="true" className="size-5 text-muted" />
+            <UserAvatar
+              className="size-16"
+              user={session.data?.user}
+              isPending={session.isPending}
+            />
           </div>
-        ) : approval.isError ? (
-          <p className="text-danger text-sm">
-            {plugin.localization.approvalError}
-          </p>
-        ) : approval.data ? (
-          <>
-            <div className="bg-surface-secondary flex items-center justify-between gap-3 rounded-xl p-3">
-              <div className="flex min-w-0 flex-col">
-                <span className="truncate text-sm font-semibold">
-                  {approval.data.name}
-                </span>
-                <span className="text-muted truncate text-xs">
-                  {approval.data.hostName ?? approval.data.hostId}
-                </span>
-              </div>
-              <Chip size="sm" variant="soft">
+          <div className="grid justify-items-center gap-1 text-center">
+            <Card.Title className="max-w-full break-words text-xl font-semibold">
+              {approval.data ? (
+                approval.data.name
+              ) : approval.isPending ? (
+                <Skeleton className="h-6 w-40" />
+              ) : (
+                plugin.localization.approvalTitle
+              )}
+            </Card.Title>
+            <Card.Description>
+              {plugin.localization.approvalDescription}
+            </Card.Description>
+            {approval.data ? (
+              <p className="text-sm text-muted">
+                {approval.data.hostName ?? approval.data.hostId} ·{" "}
                 {approval.data.mode === "autonomous"
                   ? plugin.localization.autonomousAgent
                   : plugin.localization.delegatedAgent}
-              </Chip>
+              </p>
+            ) : approval.isPending ? (
+              <Skeleton className="h-4 w-48" />
+            ) : null}
+            <div className="mt-2 flex max-w-full flex-wrap justify-center gap-x-1 text-sm text-muted">
+              <span>{plugin.localization.signedInAs}</span>
+              {session.data ? (
+                <span className="break-all font-medium text-foreground">
+                  {session.data.user.name || session.data.user.email}
+                </span>
+              ) : session.isPending ? (
+                <Skeleton className="h-4 w-32" />
+              ) : null}
             </div>
-            <div className="flex flex-col gap-3">
-              <h2 className="text-sm font-semibold">
-                {plugin.localization.requestedCapabilities}
-              </h2>
-              {requested.length ? (
-                requested.map((grant) => (
-                  <Checkbox
+          </div>
+        </Card.Header>
+        <Card.Content className="px-4 pb-6 sm:px-6">
+          <div className="grid gap-4 rounded-lg bg-surface-secondary p-5">
+            <h2 className="text-sm font-medium">
+              {plugin.localization.requestedCapabilities}
+            </h2>
+            {approval.isError ? (
+              <p className="text-sm text-danger">
+                {plugin.localization.approvalError}
+              </p>
+            ) : approval.isPending || session.isPending ? (
+              <div className="flex gap-3">
+                <Skeleton className="size-4 shrink-0" />
+                <div className="grid flex-1 gap-2">
+                  <Skeleton className="h-4 w-32" />
+                  <Skeleton className="h-4 w-full" />
+                </div>
+              </div>
+            ) : requested.length ? (
+              <div className="grid gap-5">
+                {requested.map((grant) => (
+                  <div
                     key={grant.capability}
-                    isSelected={selected.has(grant.capability)}
-                    onChange={(isSelected) =>
-                      updateSelection(grant.capability, isSelected)
-                    }
+                    className="flex items-start gap-3"
                   >
-                    <Checkbox.Content className="items-start gap-3">
-                      <Checkbox.Control className="mt-0.5">
-                        <Checkbox.Indicator>
-                          <Check />
-                        </Checkbox.Indicator>
-                      </Checkbox.Control>
-                      <div className="flex min-w-0 flex-1 flex-col gap-1">
-                        <span className="break-words text-sm font-medium">
-                          {grant.capability}
-                        </span>
-                        {grant.description && (
-                          <span className="text-muted text-xs">
-                            {grant.description}
-                          </span>
-                        )}
-                        {grant.reason && (
-                          <span className="text-muted text-xs">
-                            {plugin.localization.requestReason}: {grant.reason}
-                          </span>
-                        )}
-                        {grant.constraints && (
-                          <span className="text-muted text-xs">
-                            {plugin.localization.constraints}:{" "}
-                            <code>{JSON.stringify(grant.constraints)}</code>
-                          </span>
-                        )}
-                        <Chip
-                          className="mt-1 self-start"
-                          color={strengthColor(grant.approvalStrength)}
-                          size="sm"
-                          variant="soft"
-                        >
-                          {grant.approvalStrength === "webauthn" && (
-                            <Fingerprint />
+                    <Checkbox
+                      isSelected={selected.has(grant.capability)}
+                      isDisabled={approve.isPending || deny.isPending}
+                      aria-label={grant.capability}
+                      onChange={(checked) =>
+                        updateSelection(grant.capability, checked)
+                      }
+                    >
+                      <Checkbox.Content>
+                        <Checkbox.Control className="mt-1">
+                          <Checkbox.Indicator>
+                            <Check />
+                          </Checkbox.Indicator>
+                        </Checkbox.Control>
+                      </Checkbox.Content>
+                    </Checkbox>
+                    <div className="grid min-w-0 flex-1 gap-1">
+                      <span className="text-base leading-6 break-words">
+                        {grant.capability}
+                      </span>
+                      {grant.description ? (
+                        <p className="text-sm leading-5 text-muted">
+                          {grant.description}
+                        </p>
+                      ) : null}
+                      {grant.reason ? (
+                        <p className="text-sm leading-5 text-muted">
+                          {plugin.localization.requestReason}: {grant.reason}
+                        </p>
+                      ) : null}
+                      {grant.approvalStrength !== "none" ? (
+                        <p className="flex items-center gap-1.5 text-sm text-muted">
+                          {grant.approvalStrength === "webauthn" ? (
+                            <>
+                              <Fingerprint
+                                aria-hidden="true"
+                                className="size-4"
+                              />
+                              {plugin.localization.approvalWebauthn}
+                            </>
+                          ) : (
+                            plugin.localization.approvalSession
                           )}
-                          {grant.approvalStrength === "webauthn"
-                            ? plugin.localization.approvalWebauthn
-                            : grant.approvalStrength === "session"
-                              ? plugin.localization.approvalSession
-                              : plugin.localization.approvalNone}
-                        </Chip>
-                      </div>
-                    </Checkbox.Content>
-                  </Checkbox>
-                ))
-              ) : (
-                <p className="text-muted text-sm">
-                  {plugin.localization.noCapabilities}
-                </p>
-              )}
-            </div>
-          </>
-        ) : null}
-      </Card.Content>
-      <Card.Footer className="flex gap-3">
+                        </p>
+                      ) : null}
+                      {grant.constraints ? (
+                        <details className="mt-1 text-sm text-muted">
+                          <summary className="w-fit cursor-pointer rounded-sm focus-visible:outline-2 focus-visible:outline-focus">
+                            {plugin.localization.constraints}
+                          </summary>
+                          <pre className="mt-2 max-w-full overflow-x-auto rounded-md bg-background/50 p-3 text-xs">
+                            {JSON.stringify(grant.constraints, null, 2)}
+                          </pre>
+                        </details>
+                      ) : null}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-sm text-muted">
+                {plugin.localization.noCapabilities}
+              </p>
+            )}
+          </div>
+        </Card.Content>
+      </div>
+      <Card.Footer className="grid shrink-0 grid-cols-2 gap-3 border-t border-separator p-4 sm:p-6">
         <Button
-          className="flex-1"
-          variant="outline"
-          isDisabled={approve.isPending || deny.isPending || !approval.data}
-          isPending={deny.isPending}
+          className="h-11 w-full"
+          isDisabled={
+            approve.isPending ||
+            deny.isPending ||
+            !approval.data ||
+            !session.data ||
+            approval.isFetching ||
+            approval.isError
+          }
+          variant="secondary"
           onPress={() =>
-            deny.mutate(denyDecision, {
-              onSuccess: () => setResult("denied")
-            })
+            deny.mutate(denyDecision, { onSuccess: () => setResult("denied") })
           }
         >
           {deny.isPending && <Spinner color="current" size="sm" />}
           {plugin.localization.deny}
         </Button>
         <Button
-          className="flex-1"
+          className="h-11 w-full"
           isDisabled={
             approve.isPending ||
-            !selected.size ||
             deny.isPending ||
-            !approval.data
+            !selected.size ||
+            !approval.data ||
+            !session.data ||
+            approval.isFetching ||
+            approval.isError
           }
-          isPending={approve.isPending}
           onPress={() =>
-            approve.mutate(decision, {
-              onSuccess: () => setResult("approved")
-            })
+            approve.mutate(decision, { onSuccess: () => setResult("approved") })
           }
         >
           {approve.isPending && <Spinner color="current" size="sm" />}

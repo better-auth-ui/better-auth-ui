@@ -13,7 +13,7 @@ import {
 import { useAuth, useAuthPlugin, useSession } from "@better-auth-ui/solid"
 import { usePublicOAuthClient } from "@better-auth-ui/solid/plugins/oauth-provider"
 import { createMutation, createQuery } from "@tanstack/solid-query"
-import { ShieldCheck } from "lucide-solid"
+import { ShieldCheck, ChevronRight } from "lucide-solid"
 import { createSignal, For, onMount, Show } from "solid-js"
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
@@ -26,15 +26,7 @@ import {
   CardHeader,
   CardTitle
 } from "@/components/ui/card"
-import {
-  Item,
-  ItemActions,
-  ItemContent,
-  ItemDescription,
-  ItemGroup,
-  ItemMedia,
-  ItemTitle
-} from "@/components/ui/item"
+
 import { Skeleton } from "@/components/ui/skeleton"
 import { Spinner } from "@/components/ui/spinner"
 import { oauthProviderPlugin } from "@/lib/auth/oauth-provider-plugin"
@@ -134,48 +126,40 @@ export function OAuthSelectAccount(props: OAuthSelectAccountProps) {
         </Card>
       }
     >
-      <Card class={cn("w-full max-w-md", props.class)}>
-        <CardHeader class="gap-4">
-          <div class="flex items-center gap-3">
-            <Show
-              when={publicClient.data}
-              fallback={<Skeleton class="size-10 rounded-full" />}
-            >
-              <Avatar size="lg">
+      <Card
+        class={cn(
+          "max-h-[calc(100dvh-2rem)] w-full max-w-lg gap-0! overflow-y-auto py-0!",
+          props.class
+        )}
+      >
+        <CardHeader class="grid justify-items-center gap-5! p-6! text-center">
+          <div class="grid justify-items-center gap-3">
+            {publicClient.data ? (
+              <Avatar class="size-16!">
                 <AvatarImage
                   alt={clientName()}
                   referrerpolicy="no-referrer"
                   src={logoUrl()}
                 />
                 <AvatarFallback>
-                  <ShieldCheck class="size-5" />
+                  <ShieldCheck class="size-7" />
                 </AvatarFallback>
               </Avatar>
-            </Show>
-
-            <div class="min-w-0 flex-1">
-              <Show
-                when={publicClient.data}
-                fallback={<Skeleton class="h-4 w-36" />}
-              >
-                {(client) => (
-                  <>
-                    <p class="truncate font-medium">{clientName()}</p>
-                    <Show when={client().client_uri}>
-                      {(uri) => (
-                        <p class="truncate text-muted-foreground text-xs">
-                          {uri()}
-                        </p>
-                      )}
-                    </Show>
-                  </>
-                )}
-              </Show>
-            </div>
+            ) : (
+              <Skeleton class="size-16 rounded-full" />
+            )}
+            {publicClient.data ? (
+              <p class="max-w-full break-words text-base font-medium">
+                {clientName()}
+              </p>
+            ) : (
+              <Skeleton class="h-5 w-36" />
+            )}
           </div>
-
           <div class="grid gap-1">
-            <CardTitle class="text-xl">{localization.selectAccount}</CardTitle>
+            <CardTitle class="text-xl! font-semibold!">
+              {localization.selectAccount}
+            </CardTitle>
             <CardDescription>
               {interpolateClient(
                 localization.selectAccountDescription,
@@ -184,90 +168,79 @@ export function OAuthSelectAccount(props: OAuthSelectAccountProps) {
             </CardDescription>
           </div>
         </CardHeader>
-
-        <CardContent>
-          <Show
-            when={!deviceSessions.isPending}
-            fallback={
-              <ItemGroup>
-                <Item variant="outline">
-                  <ItemMedia>
-                    <UserAvatar isPending />
-                  </ItemMedia>
-                  <ItemContent>
-                    <Skeleton class="h-4 w-28" />
-                    <Skeleton class="h-3 w-40" />
-                  </ItemContent>
-                </Item>
-              </ItemGroup>
-            }
-          >
-            <Show
-              when={accounts().length > 0}
-              fallback={
-                <div class="flex flex-col items-center gap-1 py-6 text-center">
-                  <p class="font-semibold text-sm">{localization.noAccounts}</p>
-                  <p class="text-muted-foreground text-xs">
-                    {interpolateClient(
-                      localization.noAccountsDescription,
-                      clientName()
-                    )}
-                  </p>
-                </div>
-              }
-            >
-              <ItemGroup class="gap-2">
-                <For each={accounts()}>
-                  {(deviceSession) => (
-                    <Item variant="outline">
-                      <ItemMedia>
-                        <UserAvatar user={deviceSession.user} />
-                      </ItemMedia>
-
-                      <ItemContent>
-                        <ItemTitle class="truncate">
-                          {deviceSession.user.name || deviceSession.user.email}
-                        </ItemTitle>
-                        <Show when={deviceSession.user.name}>
-                          <ItemDescription class="truncate">
-                            {deviceSession.user.email}
-                          </ItemDescription>
-                        </Show>
-                      </ItemContent>
-
-                      <ItemActions>
-                        <Show
-                          when={
-                            deviceSession.session.id ===
-                            session.data?.session.id
-                          }
-                        >
-                          <Badge variant="secondary">
+        <CardContent class="px-4! pt-0! pb-6! sm:px-6!">
+          {deviceSessions.isPending ? (
+            <div class="flex items-center gap-3 rounded-lg bg-muted/50 p-4">
+              <UserAvatar isPending />
+              <div class="grid flex-1 gap-2">
+                <Skeleton class="h-4 w-28" />
+                <Skeleton class="h-3 w-40" />
+              </div>
+            </div>
+          ) : !accounts().length ? (
+            <div class="grid justify-items-center gap-1 py-6 text-center">
+              <p class="text-sm font-semibold">{localization.noAccounts}</p>
+              <p class="text-sm text-muted-foreground">
+                {interpolateClient(
+                  localization.noAccountsDescription,
+                  clientName()
+                )}
+              </p>
+            </div>
+          ) : (
+            <ul class="divide-y divide-border overflow-hidden rounded-lg bg-muted/50">
+              <For each={accounts()}>
+                {(deviceSession) => {
+                  const isCurrent = () =>
+                    deviceSession.session.id === session.data?.session.id
+                  const isSelecting = () =>
+                    pendingSessionId() === deviceSession.session.id
+                  return (
+                    <li>
+                      <Button
+                        class="h-auto! min-h-20 w-full justify-start! gap-3 rounded-none! p-4! text-left whitespace-normal!"
+                        variant="ghost"
+                        disabled={
+                          isBusy() || !publicClient.data || session.isPending
+                        }
+                        aria-label={`${localization.continue}: ${deviceSession.user.name || deviceSession.user.email} (${deviceSession.user.email})`}
+                        onClick={() => selectAccount(deviceSession)}
+                      >
+                        <UserAvatar
+                          class="size-10! shrink-0"
+                          user={deviceSession.user}
+                        />
+                        <span class="grid min-w-0 flex-1 gap-0.5">
+                          <span class="break-words text-base font-medium">
+                            {deviceSession.user.name ||
+                              deviceSession.user.email}
+                          </span>
+                          {deviceSession.user.name ? (
+                            <span class="break-all text-sm text-muted-foreground">
+                              {deviceSession.user.email}
+                            </span>
+                          ) : null}
+                        </span>
+                        {isCurrent() ? (
+                          <Badge class="shrink-0" variant="secondary">
                             {localization.currentAccount}
                           </Badge>
-                        </Show>
-
-                        <Button
-                          disabled={isBusy()}
-                          size="sm"
-                          onClick={() => selectAccount(deviceSession)}
-                        >
-                          <Show
-                            when={
-                              pendingSessionId() === deviceSession.session.id
-                            }
-                          >
-                            <Spinner />
-                          </Show>
-                          {localization.continue}
-                        </Button>
-                      </ItemActions>
-                    </Item>
-                  )}
-                </For>
-              </ItemGroup>
-            </Show>
-          </Show>
+                        ) : null}
+                        {isSelecting() ? (
+                          <Spinner />
+                        ) : (
+                          <ChevronRight
+                            aria-hidden="true"
+                            class="size-4 shrink-0 text-muted-foreground"
+                          />
+                        )}
+                      </Button>
+                    </li>
+                  )
+                }}
+              </For>
+            </ul>
+          )}
         </CardContent>
       </Card>
     </Show>

@@ -1,3 +1,4 @@
+import type { User } from "better-auth"
 import {
   approveDeviceOptions,
   type DeviceAuthorizationAuthClient,
@@ -8,7 +9,7 @@ import {
 import { useAuth, useAuthPlugin, useSession } from "@better-auth-ui/solid"
 import { createMutation } from "@tanstack/solid-query"
 import type { BetterFetchError } from "better-auth/client"
-import { Check, CircleCheck, CircleX, X } from "lucide-solid"
+import { CircleCheck, CircleX } from "lucide-solid"
 import {
   createEffect,
   createSignal,
@@ -40,9 +41,9 @@ import {
   InputOTPSeparator,
   InputOTPSlot
 } from "@/components/ui/input-otp"
-import { Separator } from "@/components/ui/separator"
 import { Spinner } from "@/components/ui/spinner"
 import { deviceAuthorizationPlugin } from "@/lib/auth/device-authorization-plugin"
+import { UserAvatar } from "../user/user-avatar"
 import { cn } from "cn"
 import { createAuthForm, isAuthFormFieldInvalid } from "../auth-form"
 
@@ -211,7 +212,7 @@ export function DeviceAuthorization(props: DeviceAuthorizationProps) {
       <Match when={step() === "approval" ? session.data : undefined}>
         {(currentSession) => (
           <DeviceApproval
-            class={cardClass()}
+            class={props.class ?? ""}
             isApproving={approveDevice.isPending}
             isDenying={denyDevice.isPending}
             localization={localization}
@@ -390,10 +391,7 @@ type DeviceApprovalProps = {
   isApproving: boolean
   isDenying: boolean
   localization: DeviceAuthorizationLocalization
-  user: {
-    email: string
-    name: string
-  }
+  user: User
   userCode: string
   onApprove: () => void
   onDeny: () => void
@@ -403,55 +401,55 @@ function DeviceApproval(props: DeviceApprovalProps) {
   const isPending = () => props.isApproving || props.isDenying
 
   return (
-    <Card class={props.class}>
-      <CardHeader>
-        <CardTitle class="text-xl">
-          {props.localization.approveDevice}
-        </CardTitle>
-        <CardDescription>
-          {props.localization.approveDeviceDescription}
-        </CardDescription>
+    <Card
+      class={cn("w-full max-w-lg gap-0! overflow-hidden py-0!", props.class)}
+    >
+      <CardHeader class="grid justify-items-center gap-5! p-6! text-center">
+        <UserAvatar class="size-16!" user={props.user} />
+        <div class="grid gap-1">
+          <CardTitle class="text-xl! font-semibold!">
+            {props.localization.approveDevice}
+          </CardTitle>
+          <CardDescription>
+            {props.localization.approveDeviceDescription}
+          </CardDescription>
+        </div>
+        <div class="grid max-w-full gap-1 text-sm text-muted-foreground">
+          <span>{props.localization.signedInAs}</span>
+          <span class="break-all font-medium text-foreground">
+            {props.user.name || props.user.email}
+          </span>
+          {props.user.name ? (
+            <span class="break-all">{props.user.email}</span>
+          ) : null}
+        </div>
       </CardHeader>
-
-      <CardContent>
-        <div class="flex flex-col gap-3 rounded-lg border bg-muted/50 p-3">
-          <div class="flex flex-col gap-1">
-            <p class="text-xs text-muted-foreground">
-              {props.localization.deviceCode}
-            </p>
-            <p class="font-mono text-sm font-medium tracking-wider">
-              {props.userCode}
-            </p>
-          </div>
-
-          <Separator />
-
-          <div class="flex flex-col gap-1">
-            <p class="text-xs text-muted-foreground">
-              {props.localization.signedInAs}
-            </p>
-            <p class="text-sm font-medium">
-              {props.user.name || props.user.email}
-            </p>
-            <Show when={props.user.name}>
-              <p class="text-xs text-muted-foreground">{props.user.email}</p>
-            </Show>
-          </div>
+      <CardContent class="px-4! pt-0! pb-6! sm:px-6!">
+        <div class="grid justify-items-center gap-2 rounded-lg bg-muted/50 p-5">
+          <p class="text-sm text-muted-foreground">
+            {props.localization.deviceCode}
+          </p>
+          <p class="font-mono text-2xl font-semibold tracking-widest">
+            {props.userCode}
+          </p>
         </div>
       </CardContent>
-
-      <CardFooter class="grid grid-cols-2 gap-2">
-        <Button disabled={isPending()} variant="outline" onClick={props.onDeny}>
-          <Show when={props.isDenying} fallback={<X />}>
-            <Spinner />
-          </Show>
+      <CardFooter class="grid grid-cols-2 gap-3 border-t border-border p-4! sm:p-6!">
+        <Button
+          class="h-11! w-full"
+          disabled={isPending()}
+          variant="secondary"
+          onClick={props.onDeny}
+        >
+          {props.isDenying ? <Spinner /> : null}
           {props.localization.deny}
         </Button>
-
-        <Button disabled={isPending()} onClick={props.onApprove}>
-          <Show when={props.isApproving} fallback={<Check />}>
-            <Spinner />
-          </Show>
+        <Button
+          class="h-11! w-full"
+          disabled={isPending()}
+          onClick={props.onApprove}
+        >
+          {props.isApproving ? <Spinner /> : null}
           {props.localization.approve}
         </Button>
       </CardFooter>

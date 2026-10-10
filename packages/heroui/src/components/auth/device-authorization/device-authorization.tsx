@@ -1,3 +1,4 @@
+import { UserAvatar } from "../user/user-avatar"
 import type {
   DeviceAuthorizationAuthClient,
   DeviceAuthorizationLocalization
@@ -8,7 +9,7 @@ import {
   useDenyDevice,
   useVerifyDeviceCode
 } from "@better-auth-ui/react/plugins/device-authorization"
-import { Check, CircleCheck, CircleXmark, Xmark } from "@gravity-ui/icons"
+import { CircleCheck, CircleXmark } from "@gravity-ui/icons"
 import {
   Button,
   Card,
@@ -246,7 +247,7 @@ export function DeviceAuthorization({
   if (state.step === "approval" && session) {
     return (
       <DeviceApproval
-        className={cardClassName}
+        className={className ?? ""}
         localization={localization}
         userCode={authorizedCode}
         user={session.user}
@@ -474,56 +475,52 @@ function DeviceApproval({
   const isPending = isApproving || isDenying
 
   return (
-    <Card className={className} variant={variant}>
-      <Card.Header>
-        <Card.Title className="text-xl font-semibold mb-1">
-          {localization.approveDevice}
-        </Card.Title>
-        <Card.Description>
-          {localization.approveDeviceDescription}
-        </Card.Description>
+    <Card
+      className={cn("w-full max-w-lg gap-0 overflow-hidden p-0", className)}
+      variant={variant}
+    >
+      <Card.Header className="grid justify-items-center gap-5 p-6 text-center">
+        <UserAvatar className="size-16" user={user} />
+        <div className="grid gap-1">
+          <Card.Title className="text-xl font-semibold">
+            {localization.approveDevice}
+          </Card.Title>
+          <Card.Description>
+            {localization.approveDeviceDescription}
+          </Card.Description>
+        </div>
+        <div className="grid max-w-full gap-1 text-sm text-muted">
+          <span>{localization.signedInAs}</span>
+          <span className="break-all font-medium text-foreground">
+            {user.name || user.email}
+          </span>
+          {user.name ? <span className="break-all">{user.email}</span> : null}
+        </div>
       </Card.Header>
-
-      <Card.Content>
-        <dl className="flex flex-col gap-3 rounded-lg border border-border bg-surface-secondary p-4">
-          <div className="flex flex-col gap-1">
-            <dt className="text-xs text-muted">{localization.deviceCode}</dt>
-            <dd className="font-mono text-sm font-medium tracking-wider">
-              {userCode}
-            </dd>
-          </div>
-
-          <div className="border-t border-border pt-3">
-            <dt className="text-xs text-muted">{localization.signedInAs}</dt>
-            <dd className="mt-1 flex flex-col text-sm">
-              <span className="font-medium">{user.name || user.email}</span>
-              {user.name ? (
-                <span className="text-muted">{user.email}</span>
-              ) : null}
-            </dd>
-          </div>
-        </dl>
+      <Card.Content className="px-4 pb-6 sm:px-6">
+        <div className="grid justify-items-center gap-2 rounded-lg bg-surface-secondary p-5">
+          <p className="text-sm text-muted">{localization.deviceCode}</p>
+          <p className="font-mono text-2xl font-semibold tracking-widest">
+            {userCode}
+          </p>
+        </div>
       </Card.Content>
-
-      <Card.Footer className="grid grid-cols-2 gap-3">
+      <Card.Footer className="grid grid-cols-2 gap-3 border-t border-separator p-4 sm:p-6">
         <Button
-          className="w-full"
+          className="h-11 w-full"
           isDisabled={isPending}
-          isPending={isDenying}
           variant="secondary"
           onPress={onDeny}
         >
-          {isDenying ? <Spinner color="current" size="sm" /> : <Xmark />}
+          {isDenying ? <Spinner color="current" size="sm" /> : null}
           {localization.deny}
         </Button>
-
         <Button
-          className="w-full"
+          className="h-11 w-full"
           isDisabled={isPending}
-          isPending={isApproving}
           onPress={onApprove}
         >
-          {isApproving ? <Spinner color="current" size="sm" /> : <Check />}
+          {isApproving ? <Spinner color="current" size="sm" /> : null}
           {localization.approve}
         </Button>
       </Card.Footer>

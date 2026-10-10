@@ -104,6 +104,8 @@ export const oauthProviderLocalization = {
   applicationUrl: "Application URL",
   /** @remarks `"Logo URL"` */
   logoUrl: "Logo URL",
+  /** @remarks `"Permissions"` */
+  permissions: "Permissions",
   /** @remarks `"Scopes"` */
   scopes: "Scopes",
   /** @remarks `"Save changes"` */

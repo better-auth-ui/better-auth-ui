@@ -8,8 +8,8 @@ import {
 } from "@better-auth-ui/core/plugins/oauth-provider"
 import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
 import { usePublicOAuthClient } from "@better-auth-ui/react/plugins/oauth-provider"
-import { Shield } from "@gravity-ui/icons"
-import { Avatar, Button, Chip, Link, Skeleton } from "@heroui/react"
+import { Shield, ChevronRight, Check } from "@gravity-ui/icons"
+import { Avatar, Button, Link, Skeleton } from "@heroui/react"
 import { useState } from "react"
 
 import { oauthProviderPlugin } from "../../../lib/auth/oauth-provider-plugin"
@@ -44,7 +44,7 @@ export function AuthorizedApplication({
   const websiteUrl = sanitizeOAuthClientUrl(client?.client_uri)
 
   return (
-    <div className="flex flex-wrap items-start gap-3">
+    <div className="grid grid-cols-[auto_minmax(0,1fr)] items-start gap-x-3 gap-y-4 sm:grid-cols-[auto_minmax(0,1fr)_auto]">
       {publicClient.isPending ? (
         <Skeleton className="size-10 shrink-0 rounded-xl" />
       ) : (
@@ -90,31 +90,55 @@ export function AuthorizedApplication({
             </span>
           ) : null}
         </div>
-
-        {application.scopes.length > 0 && (
-          <div className="flex flex-wrap gap-1.5">
-            {application.scopes.map((scope) => (
-              <Chip key={scope} size="sm" variant="secondary">
-                {
-                  resolveOAuthScopeMetadata(scopeMetadata, scope, {
-                    clientId: application.clientId,
-                    requestedScopes: application.scopes
-                  }).label
-                }
-              </Chip>
-            ))}
-          </div>
-        )}
       </div>
 
       <Button
-        className="shrink-0"
+        className="col-start-2 w-fit shrink-0 sm:col-start-3 sm:row-start-1"
         size="sm"
         variant="outline"
         onPress={() => setRemoveOpen(true)}
       >
         {localization.removeAuthorization}
       </Button>
+
+      {application.scopes.length > 0 ? (
+        <details className="group/permissions col-span-full sm:col-start-2 sm:col-span-2">
+          <summary className="flex w-fit cursor-pointer list-none items-center gap-2 rounded-sm text-sm text-muted focus-visible:outline-2 focus-visible:outline-focus [&::-webkit-details-marker]:hidden">
+            <ChevronRight
+              aria-hidden="true"
+              className="size-4 shrink-0 group-open/permissions:rotate-90"
+            />
+            {localization.permissions}{" "}
+            <span>({application.scopes.length})</span>
+          </summary>
+          <ul className="mt-3 grid gap-3 rounded-lg bg-surface-secondary p-4">
+            {application.scopes.map((scope) => {
+              const details = resolveOAuthScopeMetadata(scopeMetadata, scope, {
+                clientId: application.clientId,
+                requestedScopes: application.scopes
+              })
+              return (
+                <li key={scope} className="flex gap-3">
+                  <Check
+                    aria-hidden="true"
+                    className="mt-0.5 size-4 shrink-0 text-muted"
+                  />
+                  <div className="grid min-w-0 gap-1">
+                    <p className="text-sm font-medium break-words">
+                      {details.label}
+                    </p>
+                    {details.description ? (
+                      <p className="text-sm leading-5 text-muted">
+                        {details.description}
+                      </p>
+                    ) : null}
+                  </div>
+                </li>
+              )
+            })}
+          </ul>
+        </details>
+      ) : null}
 
       <RemoveAuthorizationDialog
         application={application}

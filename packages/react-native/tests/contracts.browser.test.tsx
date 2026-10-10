@@ -2,6 +2,8 @@ import { cleanup, screen, waitFor, act } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { Linking } from "react-native"
 import { afterEach, expect, it, vi } from "vitest"
+import { AuthorizedApplications } from "../src/components/auth/oauth-provider/authorized-applications"
+import { oauthProviderLocalization } from "@better-auth-ui/core/plugins/oauth-provider"
 import { OAuthConsent } from "../src/components/auth/oauth-provider/oauth-consent"
 import { OrganizationActivity } from "../src/components/auth/dash/activity"
 import { AnonymousButton } from "../src/components/auth/anonymous/anonymous-button"
@@ -169,4 +171,42 @@ it("completes an anonymous server sign-in before navigating", async () => {
   await waitFor(() =>
     expect(app.navigation.navigate).toHaveBeenCalledWith({ to: "/" })
   )
+})
+
+it("discloses native permissions without revoking the application", async () => {
+  const remove = vi.fn(async () => ({}))
+  const app = nativeApp({
+    authenticated: true,
+    plugins: [
+      oauthProviderPlugin({
+        scopeMetadata: {
+          custom: { label: "custom-access", description: "custom-description" }
+        }
+      })
+    ],
+    client: {
+      oauth2: {
+        getConsents: async () => [
+          { id: "consent", clientId: "client", scopes: ["custom"] }
+        ],
+        publicClient: async () => ({
+          client_id: "client",
+          client_name: "Client"
+        }),
+        deleteConsent: remove
+      }
+    }
+  })
+  app.render(<AuthorizedApplications />)
+  const toggle = await screen.findByRole("button", {
+    name: `${oauthProviderLocalization.permissions}: Client`
+  })
+  expect(screen.queryByText("custom-access")).toBeNull()
+  const user = userEvent.setup()
+  await user.click(toggle)
+  expect(await screen.findByText("custom-access")).toBeInTheDocument()
+  expect(toggle).toHaveAttribute("aria-expanded", "true")
+  expect(remove).not.toHaveBeenCalled()
+  await user.click(toggle)
+  expect(screen.queryByText("custom-access")).toBeNull()
 })

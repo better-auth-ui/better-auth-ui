@@ -102,6 +102,7 @@ export const deDEPlugins = {
     approvalTitle: "Agentenzugriff genehmigen",
     approvalDescription:
       "Prüfe, was dieser Agent in deinem Namen ausführen möchte.",
+    signedInAs: "Angemeldet als",
     requestedCapabilities: "Angeforderte Berechtigungen",
     requestReason: "Grund",
     constraints: "Einschränkungen",
@@ -399,6 +400,7 @@ export const deDEPlugins = {
     invalidUrl: "Gib eine gültige absolute URL ein.",
     applicationUrl: "Anwendungs-URL",
     logoUrl: "Logo-URL",
+    permissions: "Berechtigungen",
     scopes: "Geltungsbereiche",
     saveChanges: "Änderungen speichern",
     clientId: "Client-ID",

@@ -8,11 +8,10 @@ import {
 } from "@better-auth-ui/core/plugins/oauth-provider"
 import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
 import { usePublicOAuthClient } from "@better-auth-ui/react/plugins/oauth-provider"
-import { ShieldCheck } from "lucide-react"
+import { ShieldCheck, ChevronRight, Check } from "lucide-react"
 import { useState } from "react"
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import {
   Item,
@@ -55,7 +54,7 @@ export function AuthorizedApplication({
   const websiteUrl = sanitizeOAuthClientUrl(client?.client_uri)
 
   return (
-    <Item>
+    <Item className="grid grid-cols-[auto_minmax(0,1fr)] items-start gap-x-3 gap-y-4 p-4 sm:grid-cols-[auto_minmax(0,1fr)_auto]">
       <ItemMedia variant="image">
         {publicClient.isPending ? (
           <Skeleton className="size-10 shrink-0 rounded-md" />
@@ -72,7 +71,7 @@ export function AuthorizedApplication({
           </Avatar>
         )}
       </ItemMedia>
-      <ItemContent>
+      <ItemContent className="min-w-0">
         {publicClient.isPending ? (
           <Skeleton className="h-4 w-32" />
         ) : (
@@ -100,23 +99,8 @@ export function AuthorizedApplication({
             )}`}
           </ItemDescription>
         ) : null}
-
-        {application.scopes.length > 0 && (
-          <div className="flex flex-wrap gap-1.5">
-            {application.scopes.map((scope) => (
-              <Badge key={scope} variant="secondary">
-                {
-                  resolveOAuthScopeMetadata(scopeMetadata, scope, {
-                    clientId: application.clientId,
-                    requestedScopes: application.scopes
-                  }).label
-                }
-              </Badge>
-            ))}
-          </div>
-        )}
       </ItemContent>
-      <ItemActions>
+      <ItemActions className="col-start-2 sm:col-start-3 sm:row-start-1">
         <Button size="sm" variant="outline" onClick={() => setRemoveOpen(true)}>
           {localization.removeAuthorization}
         </Button>
@@ -128,6 +112,44 @@ export function AuthorizedApplication({
           onOpenChange={setRemoveOpen}
         />
       </ItemActions>
+      {application.scopes.length > 0 ? (
+        <details className="group/permissions col-span-full sm:col-start-2 sm:col-span-2">
+          <summary className="flex w-fit cursor-pointer list-none items-center gap-2 rounded-sm text-sm text-muted-foreground focus-visible:outline-2 focus-visible:outline-ring [&::-webkit-details-marker]:hidden">
+            <ChevronRight
+              aria-hidden="true"
+              className="size-4 shrink-0 group-open/permissions:rotate-90"
+            />
+            {localization.permissions}{" "}
+            <span>({application.scopes.length})</span>
+          </summary>
+          <ul className="mt-3 grid gap-3 rounded-lg bg-muted/50 p-4">
+            {application.scopes.map((scope) => {
+              const details = resolveOAuthScopeMetadata(scopeMetadata, scope, {
+                clientId: application.clientId,
+                requestedScopes: application.scopes
+              })
+              return (
+                <li key={scope} className="flex gap-3">
+                  <Check
+                    aria-hidden="true"
+                    className="mt-0.5 size-4 shrink-0 text-muted-foreground"
+                  />
+                  <div className="grid min-w-0 gap-1">
+                    <p className="text-sm font-medium break-words">
+                      {details.label}
+                    </p>
+                    {details.description ? (
+                      <p className="text-sm leading-5 text-muted-foreground">
+                        {details.description}
+                      </p>
+                    ) : null}
+                  </div>
+                </li>
+              )
+            })}
+          </ul>
+        </details>
+      ) : null}
     </Item>
   )
 }

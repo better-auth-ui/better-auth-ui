@@ -14,10 +14,13 @@ import { useEffect, useRef, useState } from "react"
 import { deviceAuthorizationPlugin } from "../../../lib/auth/device-authorization-plugin"
 import type { AuthViewProps } from "../../../lib/auth-plugin"
 import { useAuthNavigation } from "../../../navigation/navigation-context"
+import { cn } from "../../../lib/cn"
+import { Separator } from "../../../primitives/separator"
+import { UserAvatar } from "../user/user-avatar"
 import { Button } from "../../../primitives/button"
 import { Card } from "../../../primitives/card"
 import { Description } from "../../../primitives/description"
-import { Txt } from "../../../primitives/styled"
+import { Box, Txt } from "../../../primitives/styled"
 import { useAuthForm, submitAuthForm } from "../auth-form"
 
 const normalizeCode = (value: string) =>
@@ -114,6 +117,74 @@ export function DeviceAuthorization(props: AuthViewProps) {
         : step === "approval"
           ? localization.approveDevice
           : localization.deviceAuthorization
+  if (step === "approval") {
+    return (
+      <Card
+        className={cn("overflow-hidden p-0", props.className)}
+        variant={props.variant}
+      >
+        <Card.Header className="items-center gap-5 p-6">
+          <UserAvatar
+            className="size-16"
+            user={session?.user}
+            isPending={sessionPending}
+          />
+          <Box className="items-center gap-1">
+            <Card.Title className="text-center">
+              {localization.approveDevice}
+            </Card.Title>
+            <Description className="text-center">
+              {localization.approveDeviceDescription}
+            </Description>
+          </Box>
+          <Box className="items-center gap-1">
+            <Description>{localization.signedInAs}</Description>
+            <Txt className="text-sm font-medium text-foreground">
+              {session?.user.name || session?.user.email}
+            </Txt>
+            {session?.user.name ? (
+              <Description>{session.user.email}</Description>
+            ) : null}
+          </Box>
+        </Card.Header>
+        <Card.Content className="px-4 pb-6">
+          <Box className="items-center gap-2 rounded-lg bg-surface-secondary p-5">
+            <Description>{localization.deviceCode}</Description>
+            <Txt className="font-mono text-2xl font-semibold text-foreground">
+              {normalizeCode(form.state.values.code)}
+            </Txt>
+          </Box>
+        </Card.Content>
+        <Separator />
+        <Card.Footer className="flex-row gap-3 p-4">
+          <Button
+            className="flex-1"
+            variant="secondary"
+            isPending={deny.isPending}
+            isDisabled={pending}
+            onPress={() =>
+              deny.mutate({ userCode: normalizeCode(form.state.values.code) })
+            }
+          >
+            {localization.deny}
+          </Button>
+          <Button
+            className="flex-1"
+            variant="primary"
+            isPending={approve.isPending}
+            isDisabled={pending}
+            onPress={() =>
+              approve.mutate({
+                userCode: normalizeCode(form.state.values.code)
+              })
+            }
+          >
+            {localization.approve}
+          </Button>
+        </Card.Footer>
+      </Card>
+    )
+  }
   return (
     <Card className={props.className} variant={props.variant}>
       <Card.Header>
@@ -125,9 +196,7 @@ export function DeviceAuthorization(props: AuthViewProps) {
             ? localization.deviceApprovedDescription
             : step === "denied"
               ? localization.deviceDeniedDescription
-              : step === "approval"
-                ? localization.approveDeviceDescription
-                : localization.deviceAuthorizationDescription}
+              : localization.deviceAuthorizationDescription}
         </Description>
         {step === "code" ? (
           <form.AppForm>
@@ -165,41 +234,12 @@ export function DeviceAuthorization(props: AuthViewProps) {
             </form.AuthFormRoot>
           </form.AppForm>
         ) : null}
-        {step === "approval" ? (
-          <>
-            <Txt>
-              {localization.signedInAs}: {session?.user.email}
-            </Txt>
-            <Button
-              variant="primary"
-              isPending={approve.isPending}
-              isDisabled={pending}
-              onPress={() =>
-                approve.mutate({
-                  userCode: normalizeCode(form.state.values.code)
-                })
-              }
-            >
-              {localization.approve}
-            </Button>
-            <Button
-              variant="danger"
-              isPending={deny.isPending}
-              isDisabled={pending}
-              onPress={() =>
-                deny.mutate({ userCode: normalizeCode(form.state.values.code) })
-              }
-            >
-              {localization.deny}
-            </Button>
-          </>
-        ) : null}
         {final ? (
           <Button onPress={() => navigation.navigate({ to: redirectTo })}>
             {localization.returnToApplication}
           </Button>
         ) : null}
-        {!final && step !== "approval" ? (
+        {!final ? (
           <Description>{authLocalization.auth.signIn}</Description>
         ) : null}
       </Card.Content>

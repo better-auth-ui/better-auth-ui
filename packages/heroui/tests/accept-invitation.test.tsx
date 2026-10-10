@@ -115,7 +115,7 @@ describe("organizationPlugin invitation view (heroui)", () => {
     renderInvitation(createMockAuthClient(), <Auth path="accept-invitation" />)
 
     expect(
-      await screen.findByRole("heading", { name: "Organization invitation" })
+      await screen.findByRole("heading", { name: "Analytical Engines" })
     ).toBeInTheDocument()
     expect(screen.getByText("Analytical Engines")).toBeInTheDocument()
     expect(screen.getByText("Admin")).toBeInTheDocument()

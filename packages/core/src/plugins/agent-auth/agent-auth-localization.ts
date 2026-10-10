@@ -1,6 +1,7 @@
 export const agentAuthLocalization = {
   approvalTitle: "Approve agent access",
   approvalDescription: "Review what this agent wants to do on your behalf.",
+  signedInAs: "Signed in as",
   requestedCapabilities: "Requested capabilities",
   requestReason: "Reason",
   constraints: "Limits",

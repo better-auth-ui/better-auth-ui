@@ -1,3 +1,4 @@
+import { UserAvatar } from "../user/user-avatar"
 import { getSafeRedirectTo } from "@better-auth-ui/core"
 import type { OrganizationAuthClient } from "@better-auth-ui/core/plugins/organization"
 import { useAuth, useAuthenticate, useAuthPlugin } from "@better-auth-ui/react"
@@ -6,12 +7,11 @@ import {
   useInvitation,
   useRejectInvitation
 } from "@better-auth-ui/react/plugins/organization"
-import { Briefcase, Check, Xmark } from "@gravity-ui/icons"
+import { Briefcase } from "@gravity-ui/icons"
 import {
   Button,
   Card,
   type CardProps,
-  Chip,
   cn,
   Description,
   Skeleton,
@@ -86,86 +86,102 @@ export function AcceptInvitation({
 
   return (
     <Card
-      className={cn("w-full max-w-sm gap-4 md:p-6", className)}
+      className={cn("w-full max-w-lg gap-0 overflow-hidden p-0", className)}
       variant={variant}
     >
-      <Card.Header className="gap-3">
-        <div className="flex size-10 items-center justify-center rounded-xl bg-surface-secondary">
-          <Briefcase className="size-5" />
+      <Card.Header className="grid justify-items-center gap-5 p-6 text-center">
+        <div className="flex size-16 items-center justify-center rounded-full bg-surface-secondary">
+          <Briefcase aria-hidden="true" className="size-7" />
         </div>
-
-        <div className="flex min-w-0 flex-col gap-1">
-          <Card.Title className="text-xl font-semibold">
+        <div className="grid gap-1">
+          <Card.Title className="max-w-full break-words text-xl font-semibold">
             {isLoading ? (
-              <Skeleton className="h-6 w-48 rounded-lg" />
+              <Skeleton className="h-6 w-48" />
             ) : isAvailable ? (
-              localization.acceptInvitationTitle
+              organizationName
             ) : (
               localization.invitationUnavailable
             )}
           </Card.Title>
+          <Card.Description>
+            {localization.acceptInvitationTitle}
+          </Card.Description>
         </div>
       </Card.Header>
-
-      <Card.Content className="gap-4">
-        {isLoading ? (
-          <div className="flex flex-col gap-2">
-            <Skeleton className="h-4 w-full rounded-lg" />
-            <Skeleton className="h-4 w-3/4 rounded-lg" />
-          </div>
-        ) : isAvailable ? (
-          <>
-            <Description className="text-sm">
-              {localization.acceptInvitationDescription
-                .replace("{{organization}}", organizationName)
-                .replace("{{role}}", role)}
+      <Card.Content className="px-4 pb-6 sm:px-6">
+        <div className="grid gap-5 rounded-lg bg-surface-secondary p-5">
+          {isLoading ? (
+            <Skeleton className="h-10 w-full" />
+          ) : isAvailable ? (
+            <>
+              <Description>
+                {localization.acceptInvitationDescription
+                  .replace("{{organization}}", organizationName)
+                  .replace("{{role}}", role)}
+              </Description>
+              <dl className="grid gap-1">
+                <dt className="text-sm text-muted">{localization.role}</dt>
+                <dd className="text-base font-medium">{role}</dd>
+              </dl>
+            </>
+          ) : (
+            <Description>
+              {localization.invitationUnavailableDescription}
             </Description>
-
-            <div className="flex items-center gap-3 rounded-xl bg-surface-secondary p-3">
-              <div className="min-w-0 flex-1 truncate text-sm font-medium">
-                {organizationName}
+          )}
+          <div className="flex min-w-0 items-center gap-3">
+            <UserAvatar
+              user={session.data?.user}
+              isPending={session.isPending}
+            />
+            {session.data ? (
+              <div className="grid min-w-0 gap-0.5">
+                <p className="break-words text-sm font-medium">
+                  {session.data.user.name || session.data.user.email}
+                </p>
+                {session.data.user.name ? (
+                  <p className="break-all text-sm text-muted">
+                    {session.data.user.email}
+                  </p>
+                ) : null}
               </div>
-              <Chip size="sm">{role}</Chip>
-            </div>
-          </>
-        ) : (
-          <Description className="text-sm">
-            {localization.invitationUnavailableDescription}
-          </Description>
-        )}
+            ) : (
+              <Skeleton className="h-4 w-40" />
+            )}
+          </div>
+        </div>
       </Card.Content>
-
-      <Card.Footer className="gap-2">
+      <Card.Footer className="grid grid-cols-2 gap-3 border-t border-separator p-4 sm:p-6">
         {isLoading ? (
           <>
-            <Skeleton className="h-10 flex-1 rounded-xl" />
-            <Skeleton className="h-10 flex-1 rounded-xl" />
+            <Skeleton className="h-11 w-full" />
+            <Skeleton className="h-11 w-full" />
           </>
         ) : isAvailable && invitation ? (
           <>
             <Button
-              className="flex-1"
-              variant="tertiary"
+              className="h-11 w-full"
+              variant="secondary"
               isDisabled={isAccepting || isRejecting}
-              isPending={isRejecting}
               onPress={() => rejectInvitation({ invitationId: invitation.id })}
             >
-              {isRejecting ? <Spinner color="current" size="sm" /> : <Xmark />}
+              {isRejecting ? <Spinner color="current" size="sm" /> : null}
               {localization.rejectInvitation}
             </Button>
-
             <Button
-              className="flex-1"
+              className="h-11 w-full"
               isDisabled={isAccepting || isRejecting}
-              isPending={isAccepting}
               onPress={() => acceptInvitation({ invitationId: invitation.id })}
             >
-              {isAccepting ? <Spinner color="current" size="sm" /> : <Check />}
+              {isAccepting ? <Spinner color="current" size="sm" /> : null}
               {localization.accept}
             </Button>
           </>
         ) : (
-          <Button className="w-full" onPress={returnToApplication}>
+          <Button
+            className="col-span-2 h-11 w-full"
+            onPress={returnToApplication}
+          >
             {localization.return}
           </Button>
         )}

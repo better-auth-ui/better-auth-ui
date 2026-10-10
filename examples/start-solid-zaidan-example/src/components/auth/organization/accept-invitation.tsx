@@ -10,15 +10,22 @@ import {
   useInvitation,
   useRejectInvitation
 } from "@better-auth-ui/solid/plugins/organization"
-import { BriefcaseBusiness, Check, X } from "lucide-solid"
+import { BriefcaseBusiness } from "lucide-solid"
 import { createMemo, createSignal, onMount, Show } from "solid-js"
 
-import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle
+} from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Spinner } from "@/components/ui/spinner"
 import { organizationPlugin } from "@/lib/auth/organization-plugin"
+import { UserAvatar } from "../user/user-avatar"
 import { cn } from "cn"
 
 type UserInvitation = {
@@ -111,115 +118,114 @@ export function AcceptInvitation(props: AcceptInvitationProps) {
   })
 
   return (
-    <Card class={cn("w-full max-w-sm", props.class)}>
-      <CardHeader class="gap-3">
-        <div class="flex size-10 items-center justify-center rounded-md bg-muted">
-          <BriefcaseBusiness class="size-5" />
+    <Card
+      class={cn("w-full max-w-lg gap-0! overflow-hidden py-0!", props.class)}
+    >
+      <CardHeader class="grid justify-items-center gap-5! p-6! text-center">
+        <div class="flex size-16 items-center justify-center rounded-full bg-muted/50">
+          <BriefcaseBusiness aria-hidden="true" class="size-7" />
         </div>
-
-        <CardTitle class="text-xl font-semibold">
-          <Show when={!isLoading()} fallback={<Skeleton class="h-6 w-48" />}>
-            {isAvailable()
-              ? localization().acceptInvitationTitle
-              : localization().invitationUnavailable}
-          </Show>
-        </CardTitle>
+        <div class="grid gap-1">
+          <CardTitle class="max-w-full break-words text-xl! font-semibold!">
+            {isLoading() ? (
+              <Skeleton class="h-6 w-48" />
+            ) : isAvailable() ? (
+              organizationName()
+            ) : (
+              localization().invitationUnavailable
+            )}
+          </CardTitle>
+          <CardDescription>
+            {localization().acceptInvitationTitle}
+          </CardDescription>
+        </div>
       </CardHeader>
-
-      <CardContent class="flex flex-col gap-4">
-        <Show
-          when={!isLoading()}
-          fallback={
-            <div class="flex flex-col gap-2">
-              <Skeleton class="h-4 w-full" />
-              <Skeleton class="h-4 w-3/4" />
-            </div>
-          }
-        >
-          <Show
-            when={isAvailable()}
-            fallback={
+      <CardContent class="px-4! pt-0! pb-6! sm:px-6!">
+        <div class="grid gap-5 rounded-lg bg-muted/50 p-5">
+          {isLoading() ? (
+            <Skeleton class="h-10 w-full" />
+          ) : isAvailable() ? (
+            <>
               <p class="text-sm text-muted-foreground">
-                {localization().invitationUnavailableDescription}
+                {localization()
+                  .acceptInvitationDescription.replace(
+                    "{{organization}}",
+                    organizationName()
+                  )
+                  .replace("{{role}}", role())}
               </p>
-            }
-          >
+              <dl class="grid gap-1">
+                <dt class="text-sm text-muted-foreground">
+                  {localization().role}
+                </dt>
+                <dd class="text-base font-medium">{role()}</dd>
+              </dl>
+            </>
+          ) : (
             <p class="text-sm text-muted-foreground">
-              {localization()
-                .acceptInvitationDescription.replace(
-                  "{{organization}}",
-                  organizationName()
-                )
-                .replace("{{role}}", role())}
+              {localization().invitationUnavailableDescription}
             </p>
-
-            <div class="flex items-center gap-3 rounded-md bg-muted p-3">
-              <div class="min-w-0 flex-1 truncate text-sm font-medium">
-                {organizationName()}
-              </div>
-              <Badge variant="secondary">{role()}</Badge>
-            </div>
-          </Show>
-        </Show>
-
-        <div class="flex gap-2">
-          <Show
-            when={!isLoading()}
-            fallback={
-              <>
-                <Skeleton class="h-9 flex-1" />
-                <Skeleton class="h-9 flex-1" />
-              </>
-            }
-          >
+          )}
+          <div class="flex min-w-0 items-center gap-3">
             <Show
-              when={isAvailable() && invitation()}
-              fallback={
-                <Button
-                  class="w-full"
-                  onClick={returnToApplication}
-                  type="button"
-                >
-                  {localization().return}
-                </Button>
-              }
+              when={!session.isPending}
+              fallback={<Skeleton class="size-9 rounded-full" />}
             >
-              {(pendingInvitation) => (
-                <>
-                  <Button
-                    class="flex-1"
-                    disabled={isMutating()}
-                    onClick={() =>
-                      rejectInvitation.mutate({
-                        invitationId: pendingInvitation().id
-                      })
-                    }
-                    type="button"
-                    variant="outline"
-                  >
-                    {rejectInvitation.isPending ? <Spinner /> : <X />}
-                    {localization().rejectInvitation}
-                  </Button>
-
-                  <Button
-                    class="flex-1"
-                    disabled={isMutating()}
-                    onClick={() =>
-                      acceptInvitation.mutate({
-                        invitationId: pendingInvitation().id
-                      })
-                    }
-                    type="button"
-                  >
-                    {acceptInvitation.isPending ? <Spinner /> : <Check />}
-                    {localization().accept}
-                  </Button>
-                </>
-              )}
+              <UserAvatar user={session.data?.user} />
             </Show>
-          </Show>
+            {session.data ? (
+              <div class="grid min-w-0 gap-0.5">
+                <p class="break-words text-sm font-medium">
+                  {session.data.user.name || session.data.user.email}
+                </p>
+                {session.data.user.name ? (
+                  <p class="break-all text-sm text-muted-foreground">
+                    {session.data.user.email}
+                  </p>
+                ) : null}
+              </div>
+            ) : (
+              <Skeleton class="h-4 w-40" />
+            )}
+          </div>
         </div>
       </CardContent>
+      <CardFooter class="grid grid-cols-2 gap-3 border-t border-border p-4! sm:p-6!">
+        {isLoading() ? (
+          <>
+            <Skeleton class="h-11! w-full" />
+            <Skeleton class="h-11! w-full" />
+          </>
+        ) : isAvailable() && invitation() ? (
+          <>
+            <Button
+              class="h-11! w-full"
+              variant="secondary"
+              disabled={isMutating()}
+              onClick={() =>
+                rejectInvitation.mutate({ invitationId: invitation()!.id })
+              }
+            >
+              {rejectInvitation.isPending ? <Spinner /> : null}
+              {localization().rejectInvitation}
+            </Button>
+            <Button
+              class="h-11! w-full"
+              disabled={isMutating()}
+              onClick={() =>
+                acceptInvitation.mutate({ invitationId: invitation()!.id })
+              }
+            >
+              {acceptInvitation.isPending ? <Spinner /> : null}
+              {localization().accept}
+            </Button>
+          </>
+        ) : (
+          <Button class="col-span-2 h-11! w-full" onClick={returnToApplication}>
+            {localization().return}
+          </Button>
+        )}
+      </CardFooter>
     </Card>
   )
 }

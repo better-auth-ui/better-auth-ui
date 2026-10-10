@@ -1,5 +1,7 @@
 "use client"
 
+import type { User } from "better-auth"
+
 import type {
   DeviceAuthorizationAuthClient,
   DeviceAuthorizationLocalization
@@ -12,7 +14,7 @@ import {
 } from "@better-auth-ui/react/plugins/device-authorization"
 import { useSelector } from "@tanstack/react-form"
 import { REGEXP_ONLY_DIGITS_AND_CHARS } from "input-otp"
-import { CheckIcon, CircleCheckIcon, CircleXIcon, XIcon } from "lucide-react"
+import { CircleCheckIcon, CircleXIcon } from "lucide-react"
 import {
   type ReactNode,
   useCallback,
@@ -43,9 +45,9 @@ import {
   InputOTPSeparator,
   InputOTPSlot
 } from "@/components/ui/input-otp"
-import { Separator } from "@/components/ui/separator"
 import { Spinner } from "@/components/ui/spinner"
 import { deviceAuthorizationPlugin } from "@/lib/auth/device-authorization-plugin"
+import { UserAvatar } from "../user/user-avatar"
 import { cn } from "cn"
 import { useAuthForm } from "../auth-form"
 
@@ -236,7 +238,7 @@ export function DeviceAuthorization({ className }: DeviceAuthorizationProps) {
   if (state.step === "approval" && session) {
     return (
       <DeviceApproval
-        className={cardClassName}
+        className={className ?? ""}
         localization={localization}
         userCode={authorizedCode}
         user={session.user}
@@ -416,10 +418,7 @@ type DeviceApprovalProps = {
   isApproving: boolean
   isDenying: boolean
   localization: DeviceAuthorizationLocalization
-  user: {
-    email: string
-    name: string
-  }
+  user: User
   userCode: string
   onApprove: () => void
   onDeny: () => void
@@ -438,55 +437,53 @@ function DeviceApproval({
   const isPending = isApproving || isDenying
 
   return (
-    <Card className={className}>
-      <CardHeader>
-        <CardTitle className="text-xl">{localization.approveDevice}</CardTitle>
-        <CardDescription>
-          {localization.approveDeviceDescription}
-        </CardDescription>
+    <Card
+      className={cn("w-full max-w-lg gap-0 overflow-hidden p-0", className)}
+    >
+      <CardHeader className="grid justify-items-center gap-5 p-6 text-center">
+        <UserAvatar className="size-16" user={user} />
+        <div className="grid gap-1">
+          <CardTitle className="text-xl font-semibold">
+            {localization.approveDevice}
+          </CardTitle>
+          <CardDescription>
+            {localization.approveDeviceDescription}
+          </CardDescription>
+        </div>
+        <div className="grid max-w-full gap-1 text-sm text-muted-foreground">
+          <span>{localization.signedInAs}</span>
+          <span className="break-all font-medium text-foreground">
+            {user.name || user.email}
+          </span>
+          {user.name ? <span className="break-all">{user.email}</span> : null}
+        </div>
       </CardHeader>
-
-      <CardContent>
-        <div className="flex flex-col gap-3 rounded-lg border bg-muted/50 p-3">
-          <div className="flex flex-col gap-1">
-            <p className="text-xs text-muted-foreground">
-              {localization.deviceCode}
-            </p>
-            <p className="font-mono text-sm font-medium tracking-wider">
-              {userCode}
-            </p>
-          </div>
-
-          <Separator />
-
-          <div className="flex flex-col gap-1">
-            <p className="text-xs text-muted-foreground">
-              {localization.signedInAs}
-            </p>
-            <p className="text-sm font-medium">{user.name || user.email}</p>
-            {user.name ? (
-              <p className="text-xs text-muted-foreground">{user.email}</p>
-            ) : null}
-          </div>
+      <CardContent className="px-4 pb-6 sm:px-6">
+        <div className="grid justify-items-center gap-2 rounded-lg bg-muted/50 p-5">
+          <p className="text-sm text-muted-foreground">
+            {localization.deviceCode}
+          </p>
+          <p className="font-mono text-2xl font-semibold tracking-widest">
+            {userCode}
+          </p>
         </div>
       </CardContent>
-
-      <CardFooter className="grid grid-cols-2 gap-2">
-        <Button disabled={isPending} variant="outline" onClick={onDeny}>
-          {isDenying ? (
-            <Spinner data-icon="inline-start" />
-          ) : (
-            <XIcon data-icon="inline-start" />
-          )}
+      <CardFooter className="grid grid-cols-2 gap-3 p-4 sm:p-6">
+        <Button
+          className="h-11 w-full"
+          disabled={isPending}
+          variant="secondary"
+          onClick={onDeny}
+        >
+          {isDenying ? <Spinner /> : null}
           {localization.deny}
         </Button>
-
-        <Button disabled={isPending} onClick={onApprove}>
-          {isApproving ? (
-            <Spinner data-icon="inline-start" />
-          ) : (
-            <CheckIcon data-icon="inline-start" />
-          )}
+        <Button
+          className="h-11 w-full"
+          disabled={isPending}
+          onClick={onApprove}
+        >
+          {isApproving ? <Spinner /> : null}
           {localization.approve}
         </Button>
       </CardFooter>

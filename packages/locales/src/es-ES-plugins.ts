@@ -102,6 +102,7 @@ export const esESPlugins = {
   agentAuth: {
     approvalTitle: "Aprobar acceso del agente",
     approvalDescription: "Revisa lo que este agente quiere hacer en tu nombre.",
+    signedInAs: "Sesión iniciada como",
     requestedCapabilities: "Permisos solicitados",
     requestReason: "Motivo",
     constraints: "Restricciones",
@@ -397,6 +398,7 @@ export const esESPlugins = {
     invalidUrl: "Introduce una URL absoluta válida.",
     applicationUrl: "URL de la aplicación",
     logoUrl: "URL del logotipo",
+    permissions: "Permisos",
     scopes: "Ámbitos",
     saveChanges: "Guardar cambios",
     clientId: "ID de cliente",

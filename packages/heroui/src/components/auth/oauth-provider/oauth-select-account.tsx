@@ -130,37 +130,38 @@ export function OAuthSelectAccount({
   const isBusy = pendingSessionId !== undefined
 
   return (
-    <Card className={cardClassName} variant={variant}>
-      <Card.Header className="flex flex-col gap-4">
-        <div className="flex items-center gap-3">
+    <Card
+      className={cn(
+        "max-h-[calc(100dvh-2rem)] w-full max-w-lg gap-0 overflow-y-auto p-0",
+        className
+      )}
+      variant={variant}
+    >
+      <Card.Header className="grid justify-items-center gap-5 p-6 text-center">
+        <div className="grid justify-items-center gap-3">
           {client ? (
-            <Avatar size="lg">
+            <Avatar className="size-16">
               <Avatar.Image
                 alt={clientName}
                 referrerPolicy="no-referrer"
                 src={logoUrl}
               />
               <Avatar.Fallback>
-                <Shield className="size-5" />
+                <Shield className="size-7" />
               </Avatar.Fallback>
             </Avatar>
           ) : (
-            <Skeleton className="size-12 rounded-full" />
+            <Skeleton className="size-16 rounded-full" />
           )}
-
-          <div className="min-w-0 flex-1">
-            {client ? (
-              <p className="truncate font-medium">{clientName}</p>
-            ) : (
-              <Skeleton className="h-4 w-36" />
-            )}
-            {client?.client_uri ? (
-              <p className="truncate text-xs text-muted">{client.client_uri}</p>
-            ) : null}
-          </div>
+          {client ? (
+            <p className="max-w-full break-words text-base font-medium">
+              {clientName}
+            </p>
+          ) : (
+            <Skeleton className="h-5 w-36" />
+          )}
         </div>
-
-        <div className="flex flex-col gap-1">
+        <div className="grid gap-1">
           <Card.Title className="text-xl font-semibold">
             {localization.selectAccount}
           </Card.Title>
@@ -173,7 +174,7 @@ export function OAuthSelectAccount({
         </div>
       </Card.Header>
 
-      <Card.Content>
+      <Card.Content className="px-4 pb-6 sm:px-6">
         {isDeviceSessionsPending ? (
           <div className="flex items-center gap-3">
             <Skeleton className="size-8 rounded-full" />
@@ -194,8 +195,13 @@ export function OAuthSelectAccount({
           </div>
         ) : (
           <ListBox
+            className="divide-y divide-separator rounded-lg bg-surface-secondary p-0"
             aria-label={localization.selectAccount}
-            disabledKeys={isBusy ? deviceSessions.map((s) => s.session.id) : []}
+            disabledKeys={
+              isBusy || !client || isSessionPending
+                ? deviceSessions.map((s) => s.session.id)
+                : []
+            }
             selectionMode="none"
             onAction={(key) => {
               const deviceSession = deviceSessions.find(
@@ -209,16 +215,17 @@ export function OAuthSelectAccount({
               <ListBox.Item
                 id={deviceSession.session.id}
                 key={deviceSession.session.id}
+                className="gap-3 rounded-none p-4"
                 textValue={deviceSession.user.name || deviceSession.user.email}
               >
-                <UserAvatar size="sm" user={deviceSession.user} />
+                <UserAvatar className="size-10" user={deviceSession.user} />
 
                 <div className="flex min-w-0 flex-col">
-                  <Label className="truncate">
+                  <Label className="break-words text-base">
                     {deviceSession.user.name || deviceSession.user.email}
                   </Label>
                   {deviceSession.user.name ? (
-                    <Description className="truncate">
+                    <Description className="break-all text-sm">
                       {deviceSession.user.email}
                     </Description>
                   ) : null}

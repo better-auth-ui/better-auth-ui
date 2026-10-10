@@ -101,6 +101,7 @@ export const ptBRPlugins = {
   agentAuth: {
     approvalTitle: "Aprovar acesso de agente",
     approvalDescription: "Confira o que esse agente deseja fazer em seu nome.",
+    signedInAs: "Conectado como",
     requestedCapabilities: "Capacidades solicitadas",
     requestReason: "Motivo",
     constraints: "Limites",
@@ -394,6 +395,7 @@ export const ptBRPlugins = {
     invalidUrl: "Insira um URL absoluto válido.",
     applicationUrl: "URL do aplicativo",
     logoUrl: "URL do logotipo",
+    permissions: "Permissões",
     scopes: "Escopos",
     saveChanges: "Salvar alterações",
     clientId: "ID do cliente",
