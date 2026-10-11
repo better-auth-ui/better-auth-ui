@@ -44,7 +44,7 @@ export function OrganizationMemberRow({
   ownerCount,
   organization,
   selectableRow,
-  showRole = true,
+  showRole = false,
   showTeams
 }: OrganizationMemberRowProps) {
   const { authClient, locale } = useAuth()
