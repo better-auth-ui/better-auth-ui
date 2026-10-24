@@ -24,32 +24,13 @@ export function getAuthErrorCode(error: unknown): string | undefined {
   return typeof body?.code === "string" ? body.code.toUpperCase() : undefined
 }
 
-const messageKeys = {
-  INVALID_EMAIL_OR_PASSWORD: "invalidCredentials",
-  INVALID_USERNAME_OR_PASSWORD: "invalidCredentials",
-  INVALID_PHONE_NUMBER_OR_PASSWORD: "invalidCredentials",
-  INVALID_PASSWORD: "invalidCredentials",
-  INVALID_CODE: "invalidCode",
-  INVALID_BACKUP_CODE: "invalidCode",
-  TOO_MANY_ATTEMPTS: "rateLimited",
-  INVALID_OTP: "invalidCode",
-  OTP_EXPIRED: "invalidCode",
-  INVALID_TWO_FACTOR_COOKIE: "sessionExpired",
-  SESSION_EXPIRED: "sessionExpired",
-  SESSION_NOT_FRESH: "sessionExpired",
-  UNAUTHORIZED: "sessionExpired",
-  FORBIDDEN: "permissionDenied",
-  TOO_MANY_REQUESTS: "rateLimited",
-  PASSWORD_TOO_SHORT: "passwordTooShort",
-  PASSWORD_TOO_LONG: "passwordTooLong",
-  USER_ALREADY_EXISTS: "accountExists",
-  USER_ALREADY_EXISTS_USE_ANOTHER_EMAIL: "accountExists",
+const clientMessageKeys = {
   POPUP_BLOCKED: "popupBlocked",
   POPUP_TIMEOUT: "popupTimeout",
   ROLE_HAS_MEMBERS: "roleHasMembers"
 } satisfies Record<string, keyof Localization["errors"]>
 
-/** Resolve safe localized copy. Only confirmed cancellations in their own flow are silent. */
+/** Prefer API messages and codes, with localized fallbacks for client failures. */
 export function getAuthErrorMessage(
   error: unknown,
   localization: Localization,
@@ -84,16 +65,28 @@ export function getAuthErrorMessage(
   )
     return null
 
-  if (code && Object.hasOwn(messageKeys, code)) {
-    return localization.errors[messageKeys[code as keyof typeof messageKeys]]
+  if (code && Object.hasOwn(clientMessageKeys, code)) {
+    return localization.errors[
+      clientMessageKeys[code as keyof typeof clientMessageKeys]
+    ]
   }
-  if (code === "EMAIL_NOT_VERIFIED")
-    return localization.auth.callbackEmailNotVerifiedDescription
-  if (code === "INVALID_EMAIL") return localization.auth.invalidEmail
-  if (code === "INVALID_TOKEN" || code === "TOKEN_EXPIRED")
-    return localization.auth.callbackExpiredLinkDescription
+
+  // Better Auth's passkey client also attaches HTTP-style status fields to
+  // browser failures. These are not server messages.
+  if (isPasskey && (code === "AUTH_CANCELLED" || code?.startsWith("ERROR_")))
+    return localization.errors.passkeyFailed
 
   const status = body?.status ?? asRecord(error)?.status
+  const isResponseError = body !== asRecord(error) || typeof status === "number"
+  if (
+    !(body instanceof Error) &&
+    (isResponseError || (!isPasskey && !isWallet))
+  ) {
+    if (typeof body?.message === "string" && body.message.trim())
+      return body.message
+    if (typeof body?.code === "string" && body.code.trim()) return body.code
+  }
+
   if (status === 429) return localization.errors.rateLimited
   if (status === 401) return localization.errors.sessionExpired
   if (status === 403) return localization.errors.permissionDenied

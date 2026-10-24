@@ -4,15 +4,10 @@ import { ptBRPlugins } from "./pt-BR-plugins"
 const ptBRLocalization = deepmerge(localization, {
   errors: {
     generic: "Algo deu errado. Tente novamente.",
-    invalidCredentials: "Os dados de login estão incorretos. Tente novamente.",
-    invalidCode: "Este código é inválido ou expirou. Solicite um novo código.",
     sessionExpired: "Faça login novamente para continuar.",
     permissionDenied: "Você não tem permissão para fazer isso.",
     rateLimited:
       "Muitas tentativas. Aguarde um pouco antes de tentar novamente.",
-    passwordTooShort: "Sua senha é muito curta.",
-    passwordTooLong: "Sua senha é muito longa.",
-    accountExists: "Já existe uma conta com esses detalhes. Tente fazer login.",
     popupBlocked:
       "Permita pop-ups no seu navegador e tente fazer login novamente.",
     popupTimeout: "O tempo para fazer login expirou. Tente novamente.",

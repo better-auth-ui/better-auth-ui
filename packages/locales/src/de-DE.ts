@@ -4,17 +4,9 @@ import { deDEPlugins } from "./de-DE-plugins"
 const deLocalization = deepmerge(localization, {
   errors: {
     generic: "Etwas ist schiefgelaufen. Bitte versuche es erneut.",
-    invalidCredentials:
-      "Die Anmeldedaten sind falsch. Bitte versuche es erneut.",
-    invalidCode:
-      "Dieser Code ist ungültig oder abgelaufen. Fordere einen neuen Code an.",
     sessionExpired: "Bitte melde dich erneut an, um fortzufahren.",
     permissionDenied: "Du hast dafür keine Berechtigung.",
     rateLimited: "Zu viele Versuche. Bitte warte und versuche es erneut.",
-    passwordTooShort: "Dein Passwort ist zu kurz.",
-    passwordTooLong: "Dein Passwort ist zu lang.",
-    accountExists:
-      "Ein Konto mit diesen Angaben existiert bereits. Versuche, dich anzumelden.",
     popupBlocked:
       "Erlaube Pop-ups in deinem Browser und versuche erneut, dich anzumelden.",
     popupTimeout:

@@ -46,6 +46,30 @@ function setup() {
 }
 
 describe("error toaster cache integration", () => {
+  it("toasts server messages from mutations and queries", async () => {
+    const { client, danger, fail } = setup()
+    const error = {
+      code: "INVALID_EMAIL_OR_PASSWORD",
+      message: "Ungültige E-Mail oder Passwort"
+    }
+
+    await fail(error)
+    expect(danger).toHaveBeenLastCalledWith(error.message)
+
+    await expect(
+      client.fetchQuery({
+        queryKey: authQueryKeys.session,
+        retry: false,
+        queryFn: async () => {
+          throw { error }
+        }
+      })
+    ).rejects.toEqual({ error })
+    expect(danger).toHaveBeenCalledTimes(2)
+    expect(danger).toHaveBeenLastCalledWith(error.message)
+    client.clear()
+  })
+
   it("keeps cancellation silent without skipping the host callback", async () => {
     const { client, danger, previousOnError, fail, consoleError } = setup()
     await fail({ code: "POPUP_CLOSED" })

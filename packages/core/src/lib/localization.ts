@@ -1,15 +1,9 @@
 export const localization = {
   errors: {
     generic: "Something went wrong. Please try again.",
-    invalidCredentials: "The sign-in details are incorrect. Please try again.",
-    invalidCode: "This code is invalid or has expired. Request a new code.",
     sessionExpired: "Please sign in again to continue.",
     permissionDenied: "You don't have permission to do this.",
     rateLimited: "Too many attempts. Please wait and try again.",
-    passwordTooShort: "Your password is too short.",
-    passwordTooLong: "Your password is too long.",
-    accountExists:
-      "An account with these details already exists. Try signing in.",
     popupBlocked: "Allow popups in your browser, then try signing in again.",
     popupTimeout: "Sign-in timed out. Please try again.",
     passkeyFailed:

@@ -4,16 +4,9 @@ import { esESPlugins } from "./es-ES-plugins"
 const esLocalization = deepmerge(localization, {
   errors: {
     generic: "Algo salió mal. Inténtalo de nuevo.",
-    invalidCredentials:
-      "Los datos de inicio de sesión son incorrectos. Inténtalo de nuevo.",
-    invalidCode: "Este código no es válido o ha caducado. Solicita uno nuevo.",
     sessionExpired: "Vuelve a iniciar sesión para continuar.",
     permissionDenied: "No tienes permiso para realizar esta acción.",
     rateLimited: "Demasiados intentos. Espera y vuelve a intentarlo.",
-    passwordTooShort: "Tu contraseña es demasiado corta.",
-    passwordTooLong: "Tu contraseña es demasiado larga.",
-    accountExists:
-      "Ya existe una cuenta con estos datos. Intenta iniciar sesión.",
     popupBlocked:
       "Permite las ventanas emergentes en tu navegador y vuelve a iniciar sesión.",
     popupTimeout: "Se agotó el tiempo para iniciar sesión. Inténtalo de nuevo.",
