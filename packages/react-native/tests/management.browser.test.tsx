@@ -1,3 +1,5 @@
+import { ChangePassword } from "../src/components/auth/settings/security/change-password"
+import { emailOtpPlugin } from "../src/lib/auth/email-otp-plugin"
 import { cleanup, screen, waitFor, within } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { afterEach, expect, it, vi } from "vitest"
@@ -407,5 +409,31 @@ it("keeps the entered email when SSO discovery returns no provider", async () =>
       email: "ada@example.com",
       loginHint: "ada@example.com"
     })
+  )
+})
+
+it("uses code delivery when setting a password with OTP recovery enabled", async () => {
+  const requestOtp = vi.fn(async () => ({ success: true }))
+  const requestLink = vi.fn(async () => ({ status: true }))
+  const app = nativeApp({
+    authenticated: true,
+    plugins: [emailOtpPlugin({ passwordReset: true })],
+    client: {
+      listAccounts: async () => [{ providerId: "google" }],
+      requestPasswordReset: requestLink,
+      emailOtp: { requestPasswordReset: requestOtp }
+    }
+  })
+  app.render(<ChangePassword />)
+  const user = userEvent.setup()
+  await user.click(await screen.findByRole("button", { name: /^send code$/i }))
+  await waitFor(() =>
+    expect(app.navigation.push).toHaveBeenCalledWith("resetPassword", {
+      params: { email: app.session.user.email }
+    })
+  )
+  expect(requestLink).not.toHaveBeenCalled()
+  expect(requestOtp).toHaveBeenCalledWith(
+    expect.objectContaining({ email: app.session.user.email })
   )
 })

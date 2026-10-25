@@ -4,7 +4,7 @@ import {
   sendVerificationOtpOptions,
   signInEmailOtpOptions
 } from "@better-auth-ui/core/plugins/email-otp"
-import { useAuth, useAuthPlugin } from "@better-auth-ui/solid"
+import { useAuth, useAuthPlugin, useFetchOptions } from "@better-auth-ui/solid"
 import { createMutation } from "@tanstack/solid-query"
 import { createSignal, Show } from "solid-js"
 
@@ -50,6 +50,10 @@ export type EmailOtpProps = {
  */
 export function EmailOtp(props: EmailOtpProps) {
   const auth = useAuth()
+  const { fetchOptions, resetFetchOptions } = useFetchOptions()
+  const Captcha = auth.plugins.find(
+    (plugin) => plugin.captchaComponent
+  )?.captchaComponent
   const { localization: emailOtpLocalization, otpLength } =
     useAuthPlugin(emailOtpPlugin)
   const continueSignIn = useSignInContinuation()
@@ -61,7 +65,9 @@ export function EmailOtp(props: EmailOtpProps) {
 
   const sendCode = createMutation(() => ({
     ...sendVerificationOtpOptions(otpClient()),
+    onError: () => resetFetchOptions(),
     onSuccess: () => {
+      resetFetchOptions()
       setCodeSent(true)
       startCooldown()
     }
@@ -69,7 +75,10 @@ export function EmailOtp(props: EmailOtpProps) {
 
   const signIn = createMutation(() => ({
     ...signInEmailOtpOptions(otpClient()),
-    onError: () => form.setFieldValue("code", ""),
+    onError: () => {
+      form.setFieldValue("code", "")
+      resetFetchOptions()
+    },
     onSuccess: (data) => continueSignIn(data)
   }))
 
@@ -81,13 +90,15 @@ export function EmailOtp(props: EmailOtpProps) {
       if (!codeSent()) {
         await sendCode.mutateAsync({
           email: value.email,
-          type: "sign-in"
+          type: "sign-in",
+          fetchOptions: fetchOptions()
         } as Parameters<typeof sendCode.mutateAsync>[0])
         return
       }
       await signIn.mutateAsync({
         email: value.email,
-        otp: value.code
+        otp: value.code,
+        fetchOptions: fetchOptions()
       } as Parameters<typeof signIn.mutateAsync>[0])
     }
   }))
@@ -98,7 +109,8 @@ export function EmailOtp(props: EmailOtpProps) {
     try {
       await sendCode.mutateAsync({
         email: email(),
-        type: "sign-in"
+        type: "sign-in",
+        fetchOptions: fetchOptions()
       } as Parameters<typeof sendCode.mutateAsync>[0])
     } catch (error) {
       setAuthFormServerError(form, error, "Unable to send a code. Try again.")
@@ -240,6 +252,7 @@ export function EmailOtp(props: EmailOtpProps) {
                   </Show>
                 </div>
                 <form.AuthFormServerError />
+                <Show when={Captcha}>{Captcha}</Show>
               </FieldGroup>
             </form.AuthFormRoot>
           </form.AppForm>

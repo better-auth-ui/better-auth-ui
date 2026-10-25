@@ -1,4 +1,8 @@
-import { type AuthView, authMutationKeys } from "@better-auth-ui/core"
+import {
+  getAuthLinkURL,
+  type AuthView,
+  authMutationKeys
+} from "@better-auth-ui/core"
 import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
 import { Lock, Smartphone } from "@gravity-ui/icons"
 import { cn, Link } from "@heroui/react"
@@ -14,7 +18,8 @@ export type PhoneNumberButtonProps = {
 
 /** Switch between phone-number and password sign-in. */
 export function PhoneNumberButton({ view }: PhoneNumberButtonProps) {
-  const { basePaths, emailAndPassword, localization, viewPaths } = useAuth()
+  const { basePaths, emailAndPassword, localization, redirectTo, viewPaths } =
+    useAuth()
   const { localization: phoneLocalization, viewPaths: phoneNumberViewPaths } =
     useAuthPlugin(phoneNumberPlugin)
   const signInMutating = useIsMutating({
@@ -30,11 +35,14 @@ export function PhoneNumberButton({ view }: PhoneNumberButtonProps) {
 
   return (
     <Link
-      href={`${basePaths.auth}/${
-        isPhoneNumberView
-          ? viewPaths.auth.signIn
-          : phoneNumberViewPaths.auth.phoneNumber
-      }`}
+      href={getAuthLinkURL(
+        `${basePaths.auth}/${
+          isPhoneNumberView
+            ? viewPaths.auth.signIn
+            : phoneNumberViewPaths.auth.phoneNumber
+        }`,
+        redirectTo
+      )}
       isDisabled={isPending}
       className={cn(
         buttonVariants({ variant: "tertiary" }),

@@ -58,7 +58,7 @@ export type EmailOtpPluginOptions = {
    */
   emailVerification?: boolean
   /**
-   * Replace the link-based password reset views with code forms.
+   * Replace link-based password reset views and settings password setup with code forms.
    *
    * `/auth/forgot-password` sends a code and `/auth/reset-password` takes the
    * code plus the new password, so the emailed reset link is never used.

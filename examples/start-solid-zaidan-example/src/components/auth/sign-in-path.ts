@@ -1,3 +1,4 @@
+import { getAuthCallbackURL } from "@better-auth-ui/core"
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
 export type SignInPathInput = {
@@ -86,12 +87,12 @@ export function resolveSocialAuthURLs({
   const authViewPath =
     view === "signUp" ? viewPaths.auth.signUp : viewPaths.auth.signIn
   const urls: SocialAuthURLs = {
-    callbackURL: `${baseURL}${redirectTo}`,
+    callbackURL: getAuthCallbackURL(baseURL, redirectTo),
     errorCallbackURL: `${baseURL}${basePaths.auth}/${authViewPath}`
   }
 
   if (view === "signUp") {
-    urls.newUserCallbackURL = `${baseURL}${redirectTo}`
+    urls.newUserCallbackURL = getAuthCallbackURL(baseURL, redirectTo)
   }
 
   return urls

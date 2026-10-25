@@ -1,3 +1,4 @@
+import { getAuthCallbackURL } from "@better-auth-ui/core"
 import { useAuth, useSendVerificationEmail } from "@better-auth-ui/react"
 import {
   Button,
@@ -105,7 +106,7 @@ export function VerifyEmail({ className, variant }: VerifyEmailProps) {
               onPress={() =>
                 sendVerificationEmail({
                   email,
-                  callbackURL: `${baseURL}${redirectTo}`
+                  callbackURL: getAuthCallbackURL(baseURL, redirectTo)
                 })
               }
             >

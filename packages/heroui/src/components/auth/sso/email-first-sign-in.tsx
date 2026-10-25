@@ -1,4 +1,6 @@
 import {
+  getAuthCallbackURL,
+  getAuthLinkURL,
   authMutationKeys,
   validateEmailAddress,
   validateStringLength
@@ -119,7 +121,10 @@ export function EmailFirstSignIn({
             form.state.values.email
           )
           navigate({
-            to: `${basePaths.auth}/${viewPaths.auth.verifyEmail}`
+            to: getAuthLinkURL(
+              `${basePaths.auth}/${viewPaths.auth.verifyEmail}`,
+              redirectTo
+            )
           })
         }
 
@@ -149,7 +154,7 @@ export function EmailFirstSignIn({
         setSsoFallbackEmail(value.email)
         try {
           await signInSso({
-            callbackURL: `${baseURL}${redirectTo}`,
+            callbackURL: getAuthCallbackURL(baseURL, redirectTo),
             email: value.email,
             loginHint: value.email
           })

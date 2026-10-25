@@ -50,6 +50,7 @@ export function EnableTwoFactorDialog(props: {
 }) {
   const auth = useAuth()
   const {
+    backupCodes: backupCodesEnabled,
     codeLength,
     enrollmentMethods,
     localization: twoFactorLocalization
@@ -103,7 +104,8 @@ export function EnableTwoFactorDialog(props: {
     onError: () => form.setFieldValue("code", ""),
     onSuccess: () => {
       toast.success(twoFactorLocalization.twoFactorEnabled)
-      setStep("backupCodes")
+      if (backupCodesEnabled && backupCodes().length) setStep("backupCodes")
+      else props.onOpenChange(false)
     }
   }))
 

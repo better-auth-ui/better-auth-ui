@@ -168,7 +168,7 @@ const esLocalization = deepmerge(localization, {
     saveChanges: "Guardar cambios",
     setPassword: "Establecer contraseña",
     setPasswordDescription:
-      "Todavía no tienes una contraseña. Solicita un enlace de restablecimiento para establecer una.",
+      "Todavía no tienes una contraseña. Solicita un correo de restablecimiento para establecer una.",
     security: "Seguridad",
     settings: "Ajustes",
     time: "Hora",

@@ -1,3 +1,4 @@
+import { getAuthLinkURL } from "@better-auth-ui/core"
 import type { AuthView } from "@better-auth-ui/core"
 import { AuthLink, useAuth, useAuthPlugin } from "@better-auth-ui/solid"
 import { Lock, Smartphone } from "lucide-solid"
@@ -23,11 +24,14 @@ export function PhoneNumberButton(props: PhoneNumberButtonProps) {
     <Show when={isVisible()}>
       <AuthLink
         class={cn(buttonVariants({ variant: "outline" }), "w-full")}
-        href={`${auth.basePaths.auth}/${
-          isPhoneNumberView()
-            ? auth.viewPaths.auth.signIn
-            : phoneNumberViewPaths.auth.phoneNumber
-        }`}
+        href={getAuthLinkURL(
+          `${auth.basePaths.auth}/${
+            isPhoneNumberView()
+              ? auth.viewPaths.auth.signIn
+              : phoneNumberViewPaths.auth.phoneNumber
+          }`,
+          auth.redirectTo
+        )}
       >
         <Show fallback={<Smartphone />} when={isPhoneNumberView()}>
           <Lock />

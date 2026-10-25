@@ -1,4 +1,4 @@
-import { validateEmailAddress } from "@better-auth-ui/core"
+import { getAuthCallbackURL, validateEmailAddress } from "@better-auth-ui/core"
 import type { MagicLinkAuthClient } from "@better-auth-ui/core/plugins/magic-link"
 import {
   magicLinkPlugin as coreMagicLinkPlugin,
@@ -59,7 +59,7 @@ export function MagicLink(props: MagicLinkProps) {
     defaultValues: { email: "" },
     onSubmit: async ({ value }) => {
       await signInMagicLink.mutateAsync({
-        callbackURL: `${auth.baseURL}${auth.redirectTo}`,
+        callbackURL: getAuthCallbackURL(auth.baseURL, auth.redirectTo),
         email: value.email
       } as Parameters<typeof signInMagicLink.mutateAsync>[0])
     }

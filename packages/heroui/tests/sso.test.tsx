@@ -373,3 +373,55 @@ describe("SSO provider management", () => {
     })
   })
 })
+
+it("preserves an absolute destination while discovering an SSO provider", async () => {
+  const user = userEvent.setup()
+  const authClient = createMockAuthClient({ hasProvider: true })
+  const redirectTo = "https://app.example.com/projects/acme"
+  render(
+    <AuthProvider
+      authClient={authClient}
+      navigate={vi.fn()}
+      baseURL="https://app.example.com/"
+      redirectTo={redirectTo}
+      plugins={[ssoPlugin()]}
+    >
+      <Auth view="signIn" />
+    </AuthProvider>
+  )
+  await user.type(screen.getByLabelText(/email/i), "person@example.com")
+  await user.click(screen.getByRole("button", { name: /continue with email/i }))
+  await waitFor(() =>
+    expect(authClient.signIn.sso).toHaveBeenCalledWith(
+      expect.objectContaining({ callbackURL: redirectTo })
+    )
+  )
+})
+
+it("preserves the destination when SSO fallback requires email verification", async () => {
+  const user = userEvent.setup()
+  const authClient = createMockAuthClient()
+  authClient.signIn.email.mockRejectedValueOnce({
+    error: { code: "EMAIL_NOT_VERIFIED" }
+  })
+  const navigate = vi.fn()
+  render(
+    <AuthProvider
+      authClient={authClient}
+      navigate={navigate}
+      redirectTo="/invitation?token=abc"
+      plugins={[ssoPlugin()]}
+    >
+      <Auth view="signIn" />
+    </AuthProvider>
+  )
+  await user.type(screen.getByLabelText(/email/i), "person@example.com")
+  await user.click(screen.getByRole("button", { name: /continue with email/i }))
+  await user.type(await screen.findByLabelText(/^password$/i), "password123")
+  await user.click(screen.getByRole("button", { name: /^sign in$/i }))
+  await waitFor(() =>
+    expect(navigate).toHaveBeenCalledWith({
+      to: "/auth/verify-email?redirectTo=%2Finvitation%3Ftoken%3Dabc"
+    })
+  )
+})

@@ -4,6 +4,7 @@ import userEvent from "@testing-library/user-event"
 import { describe, expect, it, vi } from "vitest"
 
 import { AuthProvider } from "../src/components/auth/auth-provider"
+import { emailOtpPlugin } from "../src/lib/auth/email-otp-plugin"
 import { ChangePassword } from "../src/components/auth/settings/security/change-password"
 
 /**
@@ -17,6 +18,7 @@ function createMockAuthClient(
   })
 ) {
   const requestPasswordReset = vi.fn(requestPasswordResetImpl)
+  const requestPasswordResetOtp = vi.fn(async () => ({ success: true }))
 
   return {
     getSession: async () => ({
@@ -24,21 +26,29 @@ function createMockAuthClient(
       session: {}
     }),
     listAccounts: async () => [{ providerId: "google" }],
-    requestPasswordReset
+    requestPasswordReset,
+    emailOtp: { requestPasswordReset: requestPasswordResetOtp }
   } as unknown as Parameters<typeof AuthProvider>[0]["authClient"] & {
     requestPasswordReset: typeof requestPasswordReset
+    emailOtp: { requestPasswordReset: typeof requestPasswordResetOtp }
   }
 }
 
-function renderChangePassword(authClient = createMockAuthClient()) {
+function renderChangePassword(
+  authClient = createMockAuthClient(),
+  plugins: Parameters<typeof AuthProvider>[0]["plugins"] = []
+) {
+  const navigate = vi.fn()
   return {
     authClient,
+    navigate,
     ...render(
       <AuthProvider
         authClient={authClient}
         basePaths={{ auth: "/login/" }}
         baseURL="https://example.com/"
-        navigate={() => {}}
+        navigate={navigate}
+        plugins={plugins}
         queryClient={
           new QueryClient({
             defaultOptions: {
@@ -106,4 +116,28 @@ describe("<ChangePassword /> without a credential account", () => {
       screen.queryByRole("link", { name: /open/i })
     ).not.toBeInTheDocument()
   })
+})
+
+it("uses the configured OTP reset flow for social-only password setup", async () => {
+  const user = userEvent.setup()
+  const { authClient, navigate } = renderChangePassword(
+    createMockAuthClient(),
+    [emailOtpPlugin({ passwordReset: true })]
+  )
+  await user.click(await screen.findByRole("button", { name: /^send code$/i }))
+  await waitFor(() =>
+    expect(navigate).toHaveBeenCalledWith({
+      to: "/login/new-password?redirectTo=%2F"
+    })
+  )
+  expect(authClient.emailOtp.requestPasswordReset).toHaveBeenCalledWith(
+    expect.objectContaining({
+      email: "user@gmail.com",
+      fetchOptions: expect.objectContaining({ throw: true })
+    })
+  )
+  expect(authClient.requestPasswordReset).not.toHaveBeenCalled()
+  expect(sessionStorage.getItem("better-auth-ui.reset-password-otp")).toBe(
+    "user@gmail.com"
+  )
 })

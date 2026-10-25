@@ -171,7 +171,7 @@ const deLocalization = deepmerge(localization, {
     saveChanges: "Änderungen speichern",
     setPassword: "Passwort festlegen",
     setPasswordDescription:
-      "Du hast noch kein Passwort. Fordere einen Link zum Zurücksetzen an, um ein Passwort festzulegen.",
+      "Du hast noch kein Passwort. Fordere eine E-Mail zum Zurücksetzen an, um ein Passwort festzulegen.",
     security: "Sicherheit",
     settings: "Einstellungen",
     time: "Zeit",

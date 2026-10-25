@@ -1,3 +1,4 @@
+import { getAuthCallbackURL } from "@better-auth-ui/core"
 import {
   AuthLink,
   useAuth,
@@ -65,7 +66,7 @@ export function VerifyEmail(props: VerifyEmailProps) {
 
   const resend = () => {
     sendVerificationEmail.mutate({
-      callbackURL: `${auth.baseURL}${auth.redirectTo}`,
+      callbackURL: getAuthCallbackURL(auth.baseURL, auth.redirectTo),
       email: email()
     } as Parameters<typeof sendVerificationEmail.mutate>[0])
   }

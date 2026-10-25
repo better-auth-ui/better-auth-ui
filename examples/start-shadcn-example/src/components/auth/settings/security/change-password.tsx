@@ -1,6 +1,13 @@
 "use client"
 
 import {
+  emailOtpPlugin,
+  type EmailOtpAuthClient
+} from "@better-auth-ui/core/plugins/email-otp"
+import { useRequestPasswordResetOtp } from "@better-auth-ui/react/plugins/email-otp"
+
+import {
+  getAuthLinkURL,
   getViewURL,
   isPasswordCompromisedError,
   validateMatchingValue,
@@ -72,23 +79,49 @@ export function ChangePassword({ className }: ChangePasswordProps) {
 }
 
 function SetPassword({ className }: { className?: string }) {
-  const { authClient, basePaths, baseURL, localization, plugins, viewPaths } =
-    useAuth()
+  const {
+    authClient,
+    basePaths,
+    baseURL,
+    localization,
+    navigate,
+    plugins,
+    redirectTo,
+    viewPaths
+  } = useAuth<EmailOtpAuthClient>()
+  const emailOtp = plugins.find(
+    (plugin): plugin is ReturnType<typeof emailOtpPlugin> =>
+      plugin.id === emailOtpPlugin.id
+  )
+  const useOtp = Boolean(emailOtp?.passwordReset)
   const { data: session } = useSession(authClient)
   const { fetchOptions, resetFetchOptions } = useFetchOptions()
   const [sentEmail, setSentEmail] = useState("")
 
-  const { mutate: requestPasswordReset, isPending } = useRequestPasswordReset(
-    authClient,
-    {
+  const { mutate: requestPasswordReset, isPending: isLinkPending } =
+    useRequestPasswordReset(authClient, {
       onError: () => {
         resetFetchOptions()
       },
       onSuccess: (_data, { email }) => {
         setSentEmail(email)
       }
-    }
-  )
+    })
+
+  const { mutate: requestPasswordResetOtp, isPending: isOtpPending } =
+    useRequestPasswordResetOtp(authClient, {
+      onError: () => resetFetchOptions(),
+      onSuccess: (_data, { email }) => {
+        sessionStorage.setItem("better-auth-ui.reset-password-otp", email)
+        navigate({
+          to: getAuthLinkURL(
+            getViewURL("", basePaths.auth, viewPaths.auth.resetPassword),
+            redirectTo
+          )
+        })
+      }
+    })
+  const isPending = isLinkPending || isOtpPending
 
   const Captcha = plugins.find(
     (plugin) => plugin.captchaComponent
@@ -97,6 +130,10 @@ function SetPassword({ className }: { className?: string }) {
   const handleSetPassword = () => {
     if (!session) return
 
+    if (useOtp) {
+      requestPasswordResetOtp({ email: session.user.email, fetchOptions })
+      return
+    }
     requestPasswordReset({
       email: session.user.email,
       redirectTo: getViewURL(
@@ -148,7 +185,9 @@ function SetPassword({ className }: { className?: string }) {
               >
                 {isPending && <Spinner />}
 
-                {localization.auth.sendResetLink}
+                {useOtp
+                  ? emailOtp?.localization.sendCode
+                  : localization.auth.sendResetLink}
               </Button>
             </div>
           )}
@@ -169,7 +208,7 @@ function ChangePasswordForm({
   localization: ReturnType<typeof useAuth>["localization"]
   session: ReturnType<typeof useSession>["data"]
 }) {
-  const { authClient } = useAuth()
+  const { authClient } = useAuth<EmailOtpAuthClient>()
   const { mutateAsync: changePassword, isPending } = useChangePassword(
     authClient,
     {

@@ -395,9 +395,9 @@ export const localization = {
     /** @remarks `"Set password"` */
     setPassword: "Set password",
 
-    /** @remarks `"You don't have a password yet. Request a reset link to set one up."` */
+    /** @remarks `"You don't have a password yet. Request a password reset email to set one up."` */
     setPasswordDescription:
-      "You don't have a password yet. Request a reset link to set one up.",
+      "You don't have a password yet. Request a password reset email to set one up.",
 
     /** @remarks `"Security"` */
     security: "Security",

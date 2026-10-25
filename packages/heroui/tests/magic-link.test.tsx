@@ -139,3 +139,27 @@ describe("<MagicLinkSent />", () => {
     })
   })
 })
+
+it("keeps an absolute callback destination intact when a base URL is configured", async () => {
+  const user = userEvent.setup()
+  const authClient = createMockAuthClient()
+  const redirectTo = "https://app.example.com/invitations/accept?invite=abc"
+  render(
+    <AuthProvider
+      authClient={authClient}
+      navigate={vi.fn()}
+      baseURL="https://app.example.com/"
+      redirectTo={redirectTo}
+      plugins={[magicLinkPlugin()]}
+    >
+      <MagicLink />
+    </AuthProvider>
+  )
+  await user.type(screen.getByLabelText(/email/i), "user@example.com")
+  await user.click(screen.getByRole("button", { name: /send magic link/i }))
+  await waitFor(() =>
+    expect(authClient.signIn.magicLink).toHaveBeenCalledWith(
+      expect.objectContaining({ callbackURL: redirectTo })
+    )
+  )
+})

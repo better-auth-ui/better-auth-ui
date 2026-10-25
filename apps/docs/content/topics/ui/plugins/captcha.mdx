@@ -84,6 +84,8 @@ export const auth = betterAuth({
 By default, Better Auth protects `/sign-up/email`, `/sign-in/email`, and `/request-password-reset`.
 </DocVariant>
 
+For email-code sign-in, protect `/email-otp/send-verification-otp` and `/sign-in/email-otp` explicitly. For code-based password reset, protect `/email-otp/request-password-reset`. The code forms forward CAPTCHA tokens through the same fetch options.
+
 Better Auth 1.7 and later matches complete authentication paths. Use an exact endpoint or an explicit wildcard such as `/sign-in/*`.
 
 Do not use a partial prefix such as `/sign-in`. To protect username and social sign-in, add their endpoints explicitly:

@@ -1,3 +1,10 @@
+import { setPendingEmail } from "../../../../lib/pending-email"
+import { useAuthNavigation } from "../../../../navigation/navigation-context"
+import {
+  emailOtpPlugin,
+  type EmailOtpAuthClient
+} from "@better-auth-ui/core/plugins/email-otp"
+import { useRequestPasswordResetOtp } from "@better-auth-ui/react/plugins/email-otp"
 import {
   isPasswordCompromisedError,
   validateMatchingValue,
@@ -59,19 +66,33 @@ export function ChangePassword({ className, variant }: ChangePasswordProps) {
 }
 
 function SetPassword({ className, variant }: ChangePasswordProps) {
-  const { authClient, localization, plugins } = useAuth()
+  const { authClient, localization, plugins } = useAuth<EmailOtpAuthClient>()
+  const emailOtp = plugins.find(
+    (plugin): plugin is ReturnType<typeof emailOtpPlugin> =>
+      plugin.id === emailOtpPlugin.id
+  )
+  const useOtp = Boolean(emailOtp?.passwordReset)
+  const navigation = useAuthNavigation()
   const { data: session } = useSession(authClient)
   const { fetchOptions, resetFetchOptions } = useFetchOptions()
 
-  const { mutate: requestPasswordReset, isPending } = useRequestPasswordReset(
-    authClient,
-    {
+  const { mutate: requestPasswordReset, isPending: isLinkPending } =
+    useRequestPasswordReset(authClient, {
       onError: () => {
         resetFetchOptions()
       },
       onSuccess: () => toast.success(localization.auth.passwordResetEmailSent)
-    }
-  )
+    })
+
+  const { mutate: requestPasswordResetOtp, isPending: isOtpPending } =
+    useRequestPasswordResetOtp(authClient, {
+      onError: () => resetFetchOptions(),
+      onSuccess: (_data, { email }) => {
+        setPendingEmail(email, "resetLinkSent")
+        navigation.push("resetPassword", { params: { email } })
+      }
+    })
+  const isPending = isLinkPending || isOtpPending
 
   const Captcha = plugins.find(
     (plugin) => plugin.captchaComponent
@@ -79,6 +100,10 @@ function SetPassword({ className, variant }: ChangePasswordProps) {
 
   const handleSetPassword = () => {
     if (!session?.user.email) return
+    if (useOtp) {
+      requestPasswordResetOtp({ email: session.user.email, fetchOptions })
+      return
+    }
     requestPasswordReset({ email: session.user.email, fetchOptions })
   }
 
@@ -109,7 +134,9 @@ function SetPassword({ className, variant }: ChangePasswordProps) {
               isDisabled={!session?.user.email}
               onPress={handleSetPassword}
             >
-              {localization.auth.sendResetLink}
+              {useOtp
+                ? emailOtp?.localization.sendCode
+                : localization.auth.sendResetLink}
             </Button>
           </Box>
         </Card.Content>

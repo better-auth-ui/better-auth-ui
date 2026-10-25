@@ -1,9 +1,12 @@
+import { captchaPlugin } from "@better-auth-ui/react/plugins/captcha"
 import { useFetchOptions } from "@better-auth-ui/react"
 import { QueryClient } from "@tanstack/react-query"
 import { fireEvent, render, screen, waitFor } from "@testing-library/react"
 import { useEffect, useRef } from "react"
 import { describe, expect, it, vi } from "vitest"
 import { AuthProvider } from "../src/components/auth/auth-provider"
+import { EmailOtp } from "../src/components/auth/email-otp/email-otp"
+import { emailOtpPlugin } from "../src/lib/auth/email-otp-plugin"
 import { ProviderButton } from "../src/components/auth/provider-button"
 
 function CaptchaControls({ reset }: { reset: () => void }) {
@@ -104,4 +107,64 @@ describe("provider CAPTCHA", () => {
     expect(social).not.toHaveBeenCalled()
     expect(screen.getByLabelText("CAPTCHA token")).toHaveTextContent("empty")
   })
+})
+
+it("forwards a fresh CAPTCHA token for each email-code sign-in step", async () => {
+  const reset = vi.fn()
+  const sendCode = vi.fn(async () => ({ success: true }))
+  const signIn = vi.fn(async () => ({ token: "session" }))
+  const navigate = vi.fn()
+  const authClient = {
+    getSession: async () => null,
+    emailOtp: { sendVerificationOtp: sendCode },
+    signIn: { emailOtp: signIn }
+  } as unknown as Parameters<typeof AuthProvider>[0]["authClient"]
+  render(
+    <AuthProvider
+      authClient={authClient}
+      navigate={navigate}
+      plugins={[
+        emailOtpPlugin(),
+        captchaPlugin({ render: () => <CaptchaControls reset={reset} /> })
+      ]}
+      queryClient={
+        new QueryClient({ defaultOptions: { mutations: { retry: false } } })
+      }
+    >
+      <EmailOtp />
+    </AuthProvider>
+  )
+  fireEvent.click(screen.getByRole("button", { name: "Solve CAPTCHA" }))
+  fireEvent.change(screen.getByLabelText(/^email$/i), {
+    target: { value: "user@example.com" }
+  })
+  fireEvent.click(screen.getByRole("button", { name: /^send code$/i }))
+  await waitFor(() =>
+    expect(sendCode).toHaveBeenCalledWith(
+      expect.objectContaining({
+        fetchOptions: expect.objectContaining({
+          headers: { "x-captcha-response": "token-1" }
+        })
+      })
+    )
+  )
+  await waitFor(() => expect(reset).toHaveBeenCalledOnce())
+  fireEvent.click(screen.getByRole("button", { name: "Solve CAPTCHA" }))
+  const codeInput = screen
+    .getAllByRole("textbox")
+    .find((element) => !(element as HTMLInputElement).readOnly)
+  if (!codeInput) throw new Error("Missing code input")
+  fireEvent.change(codeInput, { target: { value: "123456" } })
+  fireEvent.click(screen.getByRole("button", { name: /^verify code$/i }))
+  await waitFor(() =>
+    expect(signIn).toHaveBeenCalledWith(
+      expect.objectContaining({
+        otp: "123456",
+        fetchOptions: expect.objectContaining({
+          headers: { "x-captcha-response": "token-2" }
+        })
+      })
+    )
+  )
+  await waitFor(() => expect(navigate).toHaveBeenCalled())
 })

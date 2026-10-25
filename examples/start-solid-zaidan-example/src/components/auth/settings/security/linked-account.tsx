@@ -1,4 +1,5 @@
 import {
+  getAuthCallbackURL,
   getAuthErrorMessage,
   getProviderId,
   getProviderName,
@@ -153,7 +154,7 @@ export function LinkedAccountRow(props: {
     )
   const linkProvider = () => {
     linkSocial.mutate({
-      callbackURL: `${auth.baseURL}${window.location.pathname}`,
+      callbackURL: getAuthCallbackURL(auth.baseURL, window.location.pathname),
       provider: getProviderId(props.provider)
     } as Parameters<typeof linkSocial.mutate>[0])
   }

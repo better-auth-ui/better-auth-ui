@@ -323,3 +323,58 @@ describe("<TwoFactorSettings />", () => {
     )
   })
 })
+
+it("finishes TOTP enrollment without a backup-code screen when recovery codes are disabled", async () => {
+  const user = userEvent.setup()
+  const { authClient } = renderWithProvider(
+    <TwoFactorSettings />,
+    createMockAuthClient(),
+    twoFactorPlugin({ backupCodes: false })
+  )
+  await user.click(
+    screen.getAllByRole("button", { name: /enable two-factor/i })[0]
+  )
+  const dialog = await screen.findByRole("alertdialog")
+  await user.type(within(dialog).getByLabelText(/password/i), "password123")
+  await user.click(
+    within(dialog).getByRole("button", { name: /enable two-factor/i })
+  )
+  await waitFor(() =>
+    expect(authClient.twoFactor.enable).toHaveBeenCalledOnce()
+  )
+  await typeCode(user, "246810")
+  await waitFor(() =>
+    expect(authClient.twoFactor.verifyTotp).toHaveBeenCalledOnce()
+  )
+  await waitFor(() =>
+    expect(screen.queryByRole("alertdialog")).not.toBeInTheDocument()
+  )
+  expect(screen.queryByText("code-1")).not.toBeInTheDocument()
+})
+
+it("keeps the destination when email sign-in requires verification", async () => {
+  const user = userEvent.setup()
+  const authClient = createMockAuthClient()
+  authClient.signIn.email.mockRejectedValueOnce({
+    error: { code: "EMAIL_NOT_VERIFIED" }
+  })
+  const navigate = vi.fn()
+  const target = "/invitations/accept?invite=abc"
+  render(
+    <AuthProvider
+      authClient={authClient}
+      navigate={navigate}
+      redirectTo={target}
+    >
+      <SignIn />
+    </AuthProvider>
+  )
+  await user.type(screen.getByLabelText(/^email$/i), "user@example.com")
+  await user.type(screen.getByLabelText(/^password$/i), "password123")
+  await user.click(screen.getByRole("button", { name: /^sign in$/i }))
+  await waitFor(() =>
+    expect(navigate).toHaveBeenCalledWith({
+      to: `/auth/verify-email?redirectTo=${encodeURIComponent(target)}`
+    })
+  )
+})

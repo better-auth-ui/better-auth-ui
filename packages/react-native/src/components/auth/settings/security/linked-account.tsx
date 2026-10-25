@@ -1,4 +1,5 @@
 import {
+  getAuthCallbackURL,
   type AuthSocialProvider,
   getProviderId,
   getProviderName
@@ -139,7 +140,7 @@ export function LinkedAccount({
           onPress={() =>
             linkSocial({
               provider: providerId,
-              callbackURL: `${baseURL}${redirectTo}`
+              callbackURL: getAuthCallbackURL(baseURL, redirectTo)
             })
           }
           isPending={isLinking}

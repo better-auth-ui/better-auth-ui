@@ -1,6 +1,11 @@
 "use client"
 
-import { type AuthView, authMutationKeys } from "@better-auth-ui/core"
+import {
+  getAuthLinkURL,
+  type AuthView,
+  authMutationKeys
+} from "@better-auth-ui/core"
+
 import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
 import { useIsMutating } from "@tanstack/react-query"
 import { Lock, Smartphone } from "lucide-react"
@@ -16,8 +21,14 @@ export type PhoneNumberButtonProps = {
 
 /** Switch between the configured phone-number view and password sign-in. */
 export function PhoneNumberButton({ view }: PhoneNumberButtonProps) {
-  const { basePaths, emailAndPassword, localization, viewPaths, Link } =
-    useAuth()
+  const {
+    basePaths,
+    emailAndPassword,
+    localization,
+    redirectTo,
+    viewPaths,
+    Link
+  } = useAuth()
   const { localization: phoneLocalization, viewPaths: phoneNumberViewPaths } =
     useAuthPlugin(phoneNumberPlugin)
   const isPhoneNumberView = view === "phoneNumber"
@@ -30,11 +41,14 @@ export function PhoneNumberButton({ view }: PhoneNumberButtonProps) {
 
   return (
     <Link
-      href={`${basePaths.auth}/${
-        isPhoneNumberView
-          ? viewPaths.auth.signIn
-          : phoneNumberViewPaths.auth.phoneNumber
-      }`}
+      href={getAuthLinkURL(
+        `${basePaths.auth}/${
+          isPhoneNumberView
+            ? viewPaths.auth.signIn
+            : phoneNumberViewPaths.auth.phoneNumber
+        }`,
+        redirectTo
+      )}
       aria-disabled={isPending || undefined}
       tabIndex={isPending ? -1 : undefined}
       onClick={(event) => {

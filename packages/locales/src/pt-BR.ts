@@ -165,7 +165,7 @@ const ptBRLocalization = deepmerge(localization, {
     saveChanges: "Salvar alterações",
     setPassword: "Definir senha",
     setPasswordDescription:
-      "Você ainda não tem uma senha. Solicite um link de redefinição para configurar um.",
+      "Você ainda não tem uma senha. Solicite um e-mail de redefinição para configurar uma.",
     security: "Segurança",
     settings: "Configurações",
     time: "Hora",

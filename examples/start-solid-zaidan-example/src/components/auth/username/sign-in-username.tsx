@@ -1,4 +1,4 @@
-import { authQueryKeys } from "@better-auth-ui/core"
+import { getAuthLinkURL, authQueryKeys } from "@better-auth-ui/core"
 import {
   isPasskeyAutoFillEnabled,
   withPasskeyAutoFill
@@ -62,7 +62,10 @@ export function SignInUsername(props: SignInUsernameProps) {
       if ((error as BetterFetchError).error?.code === "EMAIL_NOT_VERIFIED") {
         sessionStorage.setItem("better-auth-ui.verify-email", variables.email)
         auth.navigate({
-          to: `${auth.basePaths.auth}/${auth.viewPaths.auth.verifyEmail}`
+          to: getAuthLinkURL(
+            `${auth.basePaths.auth}/${auth.viewPaths.auth.verifyEmail}`,
+            auth.redirectTo
+          )
         })
       }
 

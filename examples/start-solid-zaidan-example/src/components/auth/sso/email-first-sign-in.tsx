@@ -1,4 +1,8 @@
-import { validateEmailAddress } from "@better-auth-ui/core"
+import {
+  getAuthCallbackURL,
+  getAuthLinkURL,
+  validateEmailAddress
+} from "@better-auth-ui/core"
 import {
   isPasskeyAutoFillEnabled,
   withPasskeyAutoFill
@@ -92,7 +96,10 @@ export function EmailFirstSignIn(props: EmailFirstSignInProps) {
       if (error.error?.code === "EMAIL_NOT_VERIFIED") {
         sessionStorage.setItem("better-auth-ui.verify-email", email())
         auth.navigate({
-          to: `${auth.basePaths.auth}/${auth.viewPaths.auth.verifyEmail}`
+          to: getAuthLinkURL(
+            `${auth.basePaths.auth}/${auth.viewPaths.auth.verifyEmail}`,
+            auth.redirectTo
+          )
         })
       }
 
@@ -119,7 +126,7 @@ export function EmailFirstSignIn(props: EmailFirstSignInProps) {
       try {
         await signInSso.mutateAsync({
           email: value.email,
-          callbackURL: `${auth.baseURL}${auth.redirectTo}`,
+          callbackURL: getAuthCallbackURL(auth.baseURL, auth.redirectTo),
           loginHint: value.email
         })
       } catch (error) {

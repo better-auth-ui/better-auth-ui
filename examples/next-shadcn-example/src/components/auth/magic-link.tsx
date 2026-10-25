@@ -1,6 +1,11 @@
 "use client"
 
-import { authMutationKeys, validateEmailAddress } from "@better-auth-ui/core"
+import {
+  getAuthCallbackURL,
+  authMutationKeys,
+  validateEmailAddress
+} from "@better-auth-ui/core"
+
 import type { MagicLinkAuthClient } from "@better-auth-ui/core/plugins/magic-link"
 import { getSsoFallbackEmail } from "@better-auth-ui/core/plugins/sso"
 import { useAuth, useAuthPlugin } from "@better-auth-ui/react"
@@ -80,7 +85,7 @@ export function MagicLink({
     defaultValues: { email: getSsoFallbackEmail() },
     onSubmit: async ({ value }) =>
       await signInMagicLink({
-        callbackURL: `${baseURL}${redirectTo}`,
+        callbackURL: getAuthCallbackURL(baseURL, redirectTo),
         email: value.email
       })
   })
